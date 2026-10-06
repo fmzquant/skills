@@ -8,13 +8,7 @@ Skills that teach an AI coding agent (Claude Code, Codex, Cursor, Gemini CLI, ..
 npx skills add fmzquant/skills --global --yes -a claude-code
 ```
 
-Set `-a` to your agent (`npx skills add --help` lists them). Without GitHub access, the same bundle is served by the platform itself:
-
-```bash
-npx skills add https://www.fmz.com/agent/skills.zip --global --yes -a claude-code
-```
-
-Single files are readable at `https://www.fmz.com/agent/skills/<skill>/SKILL.md`.
+Set `-a` to your agent (`npx skills add --help` lists them).
 
 Connecting an agent to the platform (device-code authorization, MCP URL, permissions) is described at https://www.fmz.com/agent/setup.md — the agent can read that page and do it by itself.
 
