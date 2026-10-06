@@ -191,7 +191,7 @@ mode: 1
     "FeeDenominator": 5, "FeeMaker": 150, "FeeTaker": 200, "FeeMin": 0, "SlipPoint": 0
   }],
   "Options": {
-    "DataServer": "https://q.fmz.com", "TimeBegin": 1704067200, "TimeEnd": 1709251200,
+    "DataServer": "http://q.fmz.com", "TimeBegin": 1704067200, "TimeEnd": 1709251200,
     "Period": 3600000, "RetFlags": 305, "MaxRuntimeLogs": 2000, "MaxProfitLogs": 800, "MaxChartLogs": 0,
     "SnapshotPeriod": 86400000, "NetDelay": 200, "UpdatePeriod": 5000
   }
