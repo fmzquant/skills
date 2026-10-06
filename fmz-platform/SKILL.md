@@ -1,13 +1,25 @@
 ---
 name: fmz-platform
-description: "Operate the FMZ Quant trading platform (fmz.com) through its MCP tools — the platform model (exchange accounts, nodes, strategies, templates, robots, backtests, messages), the complete tool catalog by scope, the workflows for writing, checking, backtesting and running a strategy live, the REST \"extended API\" alternative, and the safety rules a real-money trading platform needs. Use whenever the fmz MCP server is connected, or when a task mentions FMZ robots, strategies, backtests, nodes or API keys."
+description: "Operate the FMZ Quant trading platform (fmz.com) through its MCP tools — how an agent gets authorized and connects (device-code flow, API key, Bearer header, scopes), the platform model (exchange accounts, nodes, strategies, templates, robots, backtests, messages), the complete tool catalog by scope, the workflows for writing, checking, backtesting and running a strategy live, the REST \"extended API\" alternative, and the safety rules a real-money trading platform needs. Use whenever the fmz MCP server is connected, or when a task mentions FMZ robots, strategies, backtests, nodes or API keys."
 ---
 
 # FMZ platform via MCP
 
-FMZ (fmz.com) is a quant trading platform: strategies written in JavaScript, TypeScript, Python, C++, Rust, Pine, MyLanguage (麦语言) or Blockly run as "robots" (实盘) on the user's own nodes (托管者) against the user's exchange accounts. Everything below is done through the `fmz` MCP server. Not connected yet? Read `https://www.fmz.com/agent/setup.md` and follow it.
+FMZ (fmz.com) is a quant trading platform: strategies written in JavaScript, TypeScript, Python, C++, Rust, Pine, MyLanguage (麦语言) or Blockly run as "robots" (实盘) on the user's own nodes (托管者) against the user's exchange accounts. Everything below is done through the `fmz` MCP server. Not connected yet? See "Connecting" below.
 
 Sibling skills installed with this one: `fmz-strategy-javascript` / `-python` / `-cpp` / `-rust` / `-pine` / `-mylanguage` (how to write code in each language), `fmz-api-reference` (the full API documentation), `fmz-backtest` (backtest configuration and semantics).
+
+## Connecting (authorization)
+
+The authoritative, always-current version is `https://www.fmz.com/agent/setup.md`; this is the short form. The user never types a password for you and you never see one: you ask for an API key, the user clicks Approve once in a browser.
+
+1. **Request a key**: `POST https://www.fmz.com/api/agent/device/code` with JSON `{"name": "<your name @ machine>", "scopes": "read,backtest,write,trade"}`. The response has `device_code`, `user_code`, `verification_uri_complete` (`https://www.fmz.com/agent/authorize?code=XXXX-XXXX`), `expires_in` (600 s) and `interval` (5 s). Show `verification_uri_complete` to the user verbatim and ask them to open it and approve. `name` is the key's identity: approving a request with the same name revokes the previous key, so re-running setup does not pile up keys.
+2. **Poll**: `POST https://www.fmz.com/api/agent/device/token` with `{"device_code": "..."}` every `interval` seconds. `status` is `pending` (keep waiting), `slow_down` (back off), `denied` / `expired` (stop and tell the user) or `approved`, which returns `access_key`, `secret_key`, `mcp_url` (`https://www.fmz.com/api/mcp/<access_key>`) and the granted `scopes` — **once**. Write it to your MCP configuration immediately; never into the conversation, logs or a repository.
+3. **Connect**: MCP Streamable HTTP at `mcp_url` with header `Authorization: Bearer <secret_key>` (the secret goes in the header only, never in the URL). Claude Code: `claude mcp add --transport http fmz "<mcp_url>" --header "Authorization: Bearer <secret_key>"`; Cursor / Claude Desktop / other clients: the same URL and header in their MCP server configuration. Then `tools/list`; the `instructions` returned by `server/discover` (or `initialize` on older protocol revisions) describe the recommended workflow.
+
+Scopes: `read`, `backtest`, `write`, `trade` are granted by default; `danger` (delete / publish) is never included unless you ask for it explicitly and tell the user why. The user can untick scopes on the approval page and change a key's privileges later at `/m/account#apikey`. A key created by hand on that page works the same way (same `mcp_url` form, same header).
+
+Scripts can use the same key against the signed REST API instead (`references/rest-api.md`). To disconnect for good, call `revoke_my_key` with `confirm: true`.
 
 ## The platform model
 
