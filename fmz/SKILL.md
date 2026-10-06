@@ -1,13 +1,13 @@
 ---
-name: fmz-platform
-description: "Operate the FMZ Quant trading platform (fmz.com) through its MCP tools — how an agent gets authorized and connects (device-code flow, API key, Bearer header, scopes), the platform model (exchange accounts, nodes, strategies, templates, robots, backtests, messages), the complete tool catalog by scope, the workflows for writing, checking, backtesting and running a strategy live, the REST \"extended API\" alternative, and the safety rules a real-money trading platform needs. Use whenever the fmz MCP server is connected, or when a task mentions FMZ robots, strategies, backtests, nodes or API keys."
+name: fmz
+description: "Operate the FMZ Quant trading platform (fmz.com) through its MCP tools and write strategies for it in JavaScript/TypeScript, Python, C++, Rust, Pine Script or MyLanguage (麦语言). Covers getting authorized and connected (device-code flow, API key, Bearer header, scopes), the platform model (exchange accounts, nodes, strategies, templates, robots, backtests, messages), every MCP tool and the REST extended API, the complete strategy API documentation with four-language examples, TA/talib indicators, cloud backtest configuration and result reading, and the safety rules of a real-money platform. Use whenever the fmz MCP server is connected, or when a task mentions FMZ, its robots, strategies, backtests, nodes or API keys, or strategy code for the platform."
+license: MIT
 ---
-
 # FMZ platform via MCP
 
 FMZ (fmz.com) is a quant trading platform: strategies written in JavaScript, TypeScript, Python, C++, Rust, Pine, MyLanguage (麦语言) or Blockly run as "robots" (实盘) on the user's own nodes (托管者) against the user's exchange accounts. Everything below is done through the `fmz` MCP server. Not connected yet? See "Connecting" below.
 
-Sibling skills installed with this one: `fmz-strategy-javascript` / `-python` / `-cpp` / `-rust` / `-pine` / `-mylanguage` (how to write code in each language), `fmz-api-reference` (the full API documentation), `fmz-backtest` (backtest configuration and semantics).
+This file is the entry point: the platform model, how to connect, the tool catalog and the safety rules. Everything else — writing code in each language, the full API documentation, indicators, backtesting — lives in `references/` and is listed in "Where to read next" at the end; read only the file the task needs.
 
 ## Connecting (authorization)
 
@@ -30,7 +30,7 @@ Scripts can use the same key against the signed REST API instead (`references/re
 | Strategy | Source code + language + parameter definitions (`args`) + optional templates. Has versions (snapshots), a group (folder), a visibility (private/shared/verify/premium/system). Rented or public strategies can be run but their source may be hidden. | `list_strategies` (scope mine/public/official/templates), `get_strategy`, `save_strategy`, `check_strategy`, `save_strategy_version`. |
 | Template | A strategy of category "template" whose functions a strategy imports (`$.` namespace in JS). Listed in `save_strategy.templates` by id. | `list_strategies` with `scope: templates`. |
 | Robot (实盘) | A running instance: strategy (+ pinned version) + `exchanges: [{platform_id, pair}]` + `args` + `period` + node. Prepaid by the hour from the account balance. Has a log database (trades, errors, prints), a status page (`LogStatus`), stdout/stderr output, and a profit curve (`LogProfit`). | `list_robots`, `get_robot`, `get_robot_logs`, `get_robot_output`; `create_robot` / `start_robot` / `stop_robot` / `restart_robot` / `send_robot_command` are `[trade]`. |
-| Backtest | A cloud task that replays history data through the strategy with simulated accounts. Holds a concurrency slot until collected or stopped. | `run_backtest`, `get_backtest`, `list_backtests`, `stop_backtest` (see `fmz-backtest`). |
+| Backtest | A cloud task that replays history data through the strategy with simulated accounts. Holds a concurrency slot until collected or stopped. | `run_backtest`, `get_backtest`, `list_backtests`, `stop_backtest` (see `references/backtest.md`). |
 | Messages | Robot push messages (`Log("...@")`, trade notices) and system alerts (node offline, robot stopped). | `list_messages`, `delete_messages`, `set_robot_alert`, `set_node_alert`. |
 | Groups | Folders for robots or strategies. | `list_groups`, `save_group`, `move_to_group`, `delete_group`. |
 
@@ -94,8 +94,21 @@ A tool missing from `tools/list` means the key lacks that scope; the user can ed
 
 Scripts and schedulers can use the signed REST "extended API" with the same key: `references/rest-api.md` has the endpoint, the signature, the return codes, the robot status codes and the method list (GetRobotList, GetRobotDetail, GetRobotLogs, CommandRobot, StopRobot, RestartRobot, NewRobot, GetNodeList, GetPlatformList, ...). The REST surface is older and lower-level than the MCP tools; prefer MCP when it is available.
 
-## Documentation
+## Where to read next
 
-- `references/tools.md` — generated tool catalog (authoritative for parameters).
-- `references/user-guide.en.md` / `references/user-guide.zh.md` — the platform user guide converted to markdown. Grep its `## ` sections: Live Trading, Docker (nodes), Exchange, Strategy Library, Backtesting System, Strategy Entry Functions, Template Library, Strategy Parameters, Interactive Controls, Options Trading, the per-language writing guides, Built-in Libraries, Extended API Interface, MCP Service, Trading Terminal, Data Explorer, General Protocol, Debugging Tool.
-- The API itself (every function, structure and constant, with examples in four languages) lives in the `fmz-api-reference` skill.
+| Task | Read |
+|---|---|
+| Write or review a strategy in JavaScript / TypeScript | `references/javascript.md` (signatures: `references/fmz.d.ts`, Chinese `references/fmz.zh_CN.d.ts`; native event API `references/ctx.d.ts` + `references/events.md`; known-good sample `references/selfcheck.js`) |
+| Python | `references/python.md` (`references/fmz.pyi`, `references/fmz.zh_CN.pyi`, `references/talib.pyi`, `references/selfcheck.py`) |
+| C++ | `references/cpp.md` (`references/fmz.hpp`, `references/json.hpp`, `references/TA.hpp`, `references/talib.hpp`, `references/selfcheck.cpp`) |
+| Rust | `references/rust.md` (`references/fmz.rs`, `references/selfcheck.rs`) |
+| Pine Script | `references/pine.md` (built-ins the engine implements: `references/pine-builtins.md`) |
+| MyLanguage (麦语言) | `references/mylanguage.md` (`references/mylanguage-functions.md`, official templates in `references/mylanguage-examples/`) |
+| Exact signature / return fields / failure behaviour of one API call, structure or constant | `references/api-docs.md` explains how to grep `references/api.en.md` (English, 1 MB, four-language examples) or `references/api.zh.md` |
+| Indicators (`TA.*`, `talib.*`) | `references/indicators.md` (`references/ta.md`, `references/talib.md`) |
+| Configure, run, debug or interpret a backtest | `references/backtest.md` (every config key: `references/backtest-config.md`) |
+| Exact parameters of an MCP tool | `references/tools.md` (generated from the server) |
+| Scripts that call the platform without MCP | `references/rest-api.md` |
+| Platform concepts as written for people (nodes, robots, templates, parameters, interactive controls, options, debugging tool...) | `references/user-guide.en.md` / `references/user-guide.zh.md` (grep the `## ` section titles) |
+
+Read one language file plus `references/api-docs.md` for a coding task; `references/backtest.md` before the first backtest; nothing else unless the task calls for it.

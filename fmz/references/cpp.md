@@ -1,7 +1,4 @@
----
-name: fmz-strategy-cpp
-description: "Write FMZ Quant strategies in C++ — how the platform wraps the source (void main inside namespace strategy, parameters as typed globals, C++20 toolchain on the build cluster), the exchange/market/account/order API with its Valid-flag error model and TId order ids, nlohmann json usage, Log/LogStatus/_C/_N/_D/_G, Chart/KLineChart, TA/talib, exchange.Go concurrency, HttpQuery/Dial, and the C++-specific mistakes (unchecked Valid, retrying order calls with _C, json exceptions, blocking loops) that make live robots fail. Use when writing or editing a C++ (language \"cpp\") strategy for the FMZ platform, then save it with the fmz MCP tools."
----
+> Part of the `fmz` skill. File paths below are relative to the skill directory (the folder that holds `SKILL.md`).
 
 # FMZ C++ strategies
 
@@ -177,7 +174,7 @@ if (!body.empty()) {
 ## Indicators
 
 `TA` (TA.hpp): `MA, SMA, EMA, RSI, ATR, OBV, CMF, Highest, Lowest` return `vector<double>`; `MACD, KDJ, BOLL, Alligator` return `array<vector<double>, 3>` (`auto m = TA.MACD(r, 12, 26, 9); m[0]` = DIF). Overloads accept `Records &` or `vector<double> &`; periods are `size_t`.
-`talib` (talib.hpp): the full TA-Lib set, each as `talib.NAME(Records &r, params...)` or `talib.NAME(vector<double> &high, &low, &close, ...)`; multi-output functions return `array<vector<double>, N>`. Outputs are aligned with the input and hold NaN where the window is not full — check `std::isnan(v.back())`. Defaults and parameter names are in `references/talib.hpp`; the per-function docs are in the `fmz-api-reference` skill (Indicators section).
+`talib` (talib.hpp): the full TA-Lib set, each as `talib.NAME(Records &r, params...)` or `talib.NAME(vector<double> &high, &low, &close, ...)`; multi-output functions return `array<vector<double>, N>`. Outputs are aligned with the input and hold NaN where the window is not full — check `std::isnan(v.back())`. Defaults and parameter names are in `references/talib.hpp`; the per-function docs are in the `references/indicators.md`.
 
 ## Pitfalls
 
@@ -199,7 +196,7 @@ if (!body.empty()) {
 
 1. `check_strategy` with `language: "cpp"` — it compiles on the build cluster and takes a while; read the returned `error` with its `main.cpp:<line>` positions.
 2. `save_strategy` with `language: "cpp"`, `source`, `args` (parameter definitions) → `strategy_id`.
-3. `run_backtest` (`strategy_id`, or `source` + `language: "cpp"`), then `get_backtest` and read `errors` / `error_lines`. A `/*backtest ... */` header at the top of the source (start, end, period, basePeriod, exchanges) sets the defaults; it is documented in the `fmz-backtest` skill, and api.en.md "exchange.GetOrders" shows one on a C++ file.
+3. `run_backtest` (`strategy_id`, or `source` + `language: "cpp"`), then `get_backtest` and read `errors` / `error_lines`. A `/*backtest ... */` header at the top of the source (start, end, period, basePeriod, exchanges) sets the defaults; it is documented in the `references/backtest.md`, and api.en.md "exchange.GetOrders" shows one on a C++ file.
 4. For a live robot the source is compiled again for the node's reported OS/arch when the robot starts; an outdated node fails with `not support, please update docker`.
 
 ## References
@@ -208,4 +205,4 @@ if (!body.empty()) {
 - `references/selfcheck.cpp` — a known-good strategy that calls the whole API once; copy its idioms (Valid checks with `GetLastError()`, `_G`, `DBExec`, `JSONParse` try/catch, `Chart`, the complete `KLineChart` pass, `Go`/`wait`, condition orders, `IsVirtual()` gating of writes).
 - `references/json.hpp` — the nlohmann `json` surface available to strategies: constructors, `parse`, `dump`, `is_*`, `get<T>`, `value`, `contains`, `items()`, operators, exception classes.
 - `references/TA.hpp` and `references/talib.hpp` — indicator signatures, overloads and default parameters; grep the indicator name.
-- Sibling skills: `fmz-api-reference` (full prose docs, grep the fenced `cpp` blocks by function name in `references/api.en.md`), `fmz-backtest` (backtest header and MCP flow) (the indicator guide is inside `fmz-api-reference`) (per-indicator semantics), `fmz-platform` (MCP tools, robots, safety rules).
+- See also: `references/api-docs.md` (full prose docs, grep the fenced `cpp` blocks by function name in `references/api.en.md`), `references/backtest.md` (backtest header and MCP flow) (the indicator guide is inside `references/api-docs.md`) (per-indicator semantics), `SKILL.md` (MCP tools, robots, safety rules).

@@ -1,11 +1,8 @@
----
-name: fmz-strategy-pine
-description: "Write TradingView-style Pine Script (v5) strategies that run on the FMZ Quant platform's own Pine engine, in backtests and as live robots against real exchange accounts. Covers which strategy() settings FMZ honours and how they map to a real account, how strategy.entry/exit/close/order/cancel become exchange orders (pyramiding, quantity units, simulated limit/stop/trailing), the position and trade fields, series semantics (var/varip, history, request.security, timeframe/syminfo/barstate), inputs as robot parameters, plotting, alerts and logging, restart behaviour, the built-ins that exist (references/builtins.md) and the TradingView features that do not, plus how to save, compile-check and backtest with the fmz MCP tools. Use when writing, porting or debugging a Pine strategy for FMZ."
----
+> Part of the `fmz` skill. File paths below are relative to the skill directory (the folder that holds `SKILL.md`).
 
 # FMZ Pine strategies
 
-FMZ compiles a Pine script to JavaScript on the platform and runs it in its own Pine engine, on the user's node for a live robot and in the cloud for a backtest. The same script runs in both. Only the built-ins the engine registers exist: `references/builtins.md` is the authoritative list (with the engine's parameter names); anything else is not available, however standard it is on TradingView.
+FMZ compiles a Pine script to JavaScript on the platform and runs it in its own Pine engine, on the user's node for a live robot and in the cloud for a backtest. The same script runs in both. Only the built-ins the engine registers exist: `references/pine-builtins.md` is the authoritative list (with the engine's parameter names); anything else is not available, however standard it is on TradingView.
 
 Fixed facts about the runtime:
 
@@ -136,7 +133,7 @@ Other data:
 
 ## Pitfalls
 
-- A built-in missing from `references/builtins.md` passes `check_strategy` (the compiler only checks syntax and undeclared assignments) and fails when the script first runs: `Could not find function or function reference 'x'`. Read the backtest `errors` before going live.
+- A built-in missing from `references/pine-builtins.md` passes `check_strategy` (the compiler only checks syntax and undeclared assignments) and fails when the script first runs: `Could not find function or function reference 'x'`. Read the backtest `errors` before going live.
 - Quantities are coins on spot and contracts on futures; `strategy.cash` converts at the bar close. TradingView defaults (`default_qty_value=1`) are 1 BTC on a BTC pair.
 - `strategy.entry` in the opposite direction closes the whole opposite position first, regardless of id; `pyramiding` only limits same-direction stacking.
 - Limit/stop prices on entries and exits are simulated by the engine from bar highs/lows and executed at market when touched; expect slippage and no partial fills.
@@ -148,7 +145,7 @@ Other data:
 
 ## Save and run
 
-1. Source starts with the optional `/*backtest ... */` header (see the `fmz-backtest` skill for its fields), then `//@version=5` and `strategy(...)`.
+1. Source starts with the optional `/*backtest ... */` header (see the `references/backtest.md` for its fields), then `//@version=5` and `strategy(...)`.
 2. `check_strategy` with `language: "pine"` compiles the script (syntax errors come back as `line N:M ...`).
 3. `save_strategy` with `language: "pine"`, no `args` (parameters come from `input.*`), plus `templates` with the Pine trade library id if the platform does not attach it.
 4. `run_backtest` with `strategy_id` or `source` + `language: "pine"`, `period` = the chart timeframe, `exchanges[].exchange` = eid, then `get_backtest` and read `profit`, `orders`, `errors`, `error_lines`; the robot log in `detail: "logs"` shows every `[id]` execution line.
@@ -156,7 +153,7 @@ Other data:
 
 ## References
 
-- `references/builtins.md`: every built-in the engine registers, with parameter lists.
-- Skill `fmz-backtest`: the `/*backtest*/` header and backtest tools.
-- Skill `fmz-platform`: MCP workflow, safety rules, robot and strategy tools.
+- `references/pine-builtins.md`: every built-in the engine registers, with parameter lists.
+- Skill `references/backtest.md`: the `/*backtest*/` header and backtest tools.
+- Skill `SKILL.md`: MCP workflow, safety rules, robot and strategy tools.
 - Platform Pine documentation: https://www.fmz.com/bbs-topic/9315

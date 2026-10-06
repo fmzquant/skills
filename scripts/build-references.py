@@ -6,13 +6,13 @@ Inputs (all public or in the platform's own repositories):
         https://www.fmz.com/lang/en/syntax-guide.data   https://www.fmz.com/lang/zh/syntax-guide.data
         https://www.fmz.com/lang/en/user-guide.data     https://www.fmz.com/lang/zh/user-guide.data
     (react-router .data = turbo-stream JSON; the doc tree is the JSON string after the key
-    "syntaxGuide" / "userGuide")  →  fmz-api-reference/references/api.{en,zh}.md,
-    fmz-platform/references/user-guide.{en,zh}.md, fmz-platform/references/rest-api.md
+    "syntaxGuide" / "userGuide")  →  fmz/references/api.{en,zh}.md,
+    fmz/references/user-guide.{en,zh}.md, fmz/references/rest-api.md
   - MCP tool table: dumped from the server (`mcpToolTable`, JSON with scope + mcp.Tool)
-        → fmz-platform/references/tools.md
-  - talib descriptions: botvs misc/helper/talib/api_gen.js (`talibInfo`)   → fmz-api-reference/references/talib.md
-  - Pine built-ins: botvs backtest/pinescript/src/lib_*.js (`scope.register`) → fmz-strategy-pine/references/builtins.md
-  - MyLanguage dictionary: botvs misc/helper/my/trans_dic.txt            → fmz-strategy-mylanguage/references/functions.md
+        → fmz/references/tools.md
+  - talib descriptions: botvs misc/helper/talib/api_gen.js (`talibInfo`)   → fmz/references/talib.md
+  - Pine built-ins: botvs backtest/pinescript/src/lib_*.js (`scope.register`) → fmz/references/pine-builtins.md
+  - MyLanguage dictionary: botvs misc/helper/my/trans_dic.txt            → fmz/references/mylanguage-functions.md
   - Declaration files are copied verbatim from botvs misc/helper/gen_helper/ (js .d.ts, python .pyi,
     cpp .hpp, rust types.rs) and fmz/client/sdk/docs/typings/js/ (newest .d.ts, ctx.d.ts, EVENTS.md).
 

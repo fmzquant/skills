@@ -1,7 +1,4 @@
----
-name: fmz-strategy-javascript
-description: "Writes FMZ Quant strategies in JavaScript or TypeScript — entry functions (main/init/onexit/onerror, async main), parameter globals, the symbol convention (BTC_USDT, BTC_USDT.swap, .quarter, option codes), the exchange object for market data, account, spot and futures orders (amount units, SetDirection vs CreateOrder, order states, conditional orders), concurrency and IO (exchange.Go, threading, Dial, HttpQuery, DBExec, exchange.IO raw calls), logging and UI (Log, LogStatus tables and buttons, Chart, KLineChart, GetCommand), templates ($.), the optional native ctx event API, and the mistakes that make live robots fail; references/fmz.d.ts holds every signature. Use when writing, reviewing or debugging an FMZ strategy in JavaScript or TypeScript (then save it with the fmz MCP tools)."
----
+> Part of the `fmz` skill. File paths below are relative to the skill directory (the folder that holds `SKILL.md`).
 
 # FMZ JavaScript strategies
 
@@ -47,7 +44,7 @@ TypeScript:
 - Optional parameters left empty are `""` (string) or `null` (number, dropdown, encrypted string).
 - A dropdown's value is the selected index (or the data bound to the option); an array when multi-select is enabled.
 - Names must be valid identifiers and not reserved words.
-- A backtest can pin values in the header comment: `/*backtest ... args: [["fast",5],["slow",20]] */` (see `fmz-backtest`).
+- A backtest can pin values in the header comment: `/*backtest ... args: [["fast",5],["slow",20]] */` (see `references/backtest.md`).
 
 ## Symbols, pairs and contracts
 
@@ -191,7 +188,7 @@ Interaction and persistence:
 ## Templates and built-in libraries
 
 - A template is a strategy of category "template" that exports functions on the `$` namespace: `$.Test = function () { Log("Test") }`; its own `main()` only runs when the template is debugged. A strategy that references it (editor checkbox, or `save_strategy.templates: [id]`) calls `$.Test()`. Template parameters are globals inside the template code. `$` is declared `any` in fmz.d.ts.
-- Built in: `talib.*` (full TA-Lib: `talib.MACD(records, 12, 26, 9)` → `[dif, dea, hist]`, `talib.BBANDS`, `talib.RSI`, `talib.ATR`, `CDL*` patterns), `TA.*` (`MA, EMA, SMA, MACD, BOLL, KDJ, RSI, ATR, OBV, CMF, Alligator, Highest, Lowest`), `_` (underscore), `Decimal` (decimal.js). Indicator functions take a records array (uses `Close`) or a number array and return arrays aligned with the input; values before the warm-up period are invalid. Details in `fmz-api-reference` (Indicators section).
+- Built in: `talib.*` (full TA-Lib: `talib.MACD(records, 12, 26, 9)` → `[dif, dea, hist]`, `talib.BBANDS`, `talib.RSI`, `talib.ATR`, `CDL*` patterns), `TA.*` (`MA, EMA, SMA, MACD, BOLL, KDJ, RSI, ATR, OBV, CMF, Alligator, Highest, Lowest`), `_` (underscore), `Decimal` (decimal.js). Indicator functions take a records array (uses `Close`) or a number array and return arrays aligned with the input; values before the warm-up period are invalid. Details in `references/indicators.md`.
 - mathjs is listed as integrated in one guide section, but the "Built-in Libraries" section loads it with `eval(HttpQuery("https://cdnjs.cloudflare.com/ajax/libs/mathjs/13.2.0/math.min.js"))`; load third-party libraries that way.
 - `BigDecimal`/`BigFloat` are declared `any` in fmz.d.ts and undocumented elsewhere; standard `BigInt` and `JSON.parse(s, true)` (big numbers as strings, live only) are the documented options.
 
@@ -257,13 +254,13 @@ if (id instanceof Error) { ctx.log("rejected", id.message); }
 - **Threads are sandboxes.** A `threading.Thread` body cannot use closures or outer functions; pass what it needs as arguments.
 - **`wait()` semantics.** `undefined` = timed out (call `wait` again), `null` = the call failed; waiting on a consumed object errors.
 - **Strings.** Byte strings that cannot be encoded come back as `ArrayBuffer`; every string parameter accepts `ArrayBuffer` too (user-guide "JavaScript Strategy Writing Guide").
-- Before saving run `check_strategy`; before going live run `run_backtest` and read `error_lines`; test with a sandbox account or a tiny amount first (`fmz-platform`).
+- Before saving run `check_strategy`; before going live run `run_backtest` and read `error_lines`; test with a sandbox account or a tiny amount first (`SKILL.md`).
 
 ## References
 
 - `references/fmz.d.ts` — every global, `IExchange` method, structure and constant with JSDoc. Grep `GetRecords(`, `CreateOrder(`, `interface IOrder`, `interface IMarket`, `IO(k:`, `interface IDial`, `interface IThreading`, `interface IKLineChart`, `declare function HttpQuery`, `interface IHttpOptions`, `ORDER_STATE_`, `declare namespace os`, `class Trader` (a `Trader` helper class declared here but not covered by the platform docs). `references/fmz.zh_CN.d.ts` is the Chinese copy.
 - `references/ctx.d.ts` and `references/events.md` — the native `ctx` API: `ISubOpts`, `IOrderOpts`, `ICondOpts`, `ICtx`, event field tables, delivery modes, `ctx.rest` method names.
 - `references/selfcheck.js` — a known-good strategy that calls the whole classic API once (meta, `_G`, DB, HTTP, markets, market data, account, `Go`, `Chart`, `KLineChart`, orders and conditional orders gated by `IsVirtual()`). Copy its idioms and null checks.
-- `fmz-api-reference` — `references/api.en.md`; grep `#### exchange.GetTicker`, `#### exchange.Buy`, `#### exchange.CreateOrder`, `#### exchange.GetPositions`, `#### exchange.SetContractType`, `#### exchange.SetDirection`, `#### exchange.IO`, `#### Spot Exchanges`, `#### Futures Exchanges`, `#### exchange.Go`, `#### threading`, `#### Dial`, `#### DBExec`, `#### Log`, `#### LogStatus`, `#### LogStatus-btnTypeTwo`, `#### Chart`, `#### KLineChart`, `#### GetCommand`, `#### EventLoop`, `#### __Serve`, `#### _G`, `#### _C`, `### Structures`.
-- `fmz-platform` — `references/user-guide.en.md`: "Strategy Entry Functions", "Strategy Parameters", "Interactive Controls", "Template Library", "Built-in Libraries", "JavaScript Strategy Writing Guide", "### TypeScript", "API Rate Limiting Control", "Options Trading", "Common Causes of Live Trading Errors"; `references/tools.md` for `save_strategy`, `run_backtest`, `send_robot_command`.
-- `fmz-backtest` — backtest header comment, exchanges, data granularity. `fmz-api-reference` (Indicators section) — `talib`/`TA` argument and output details.
+- `references/api-docs.md` — `references/api.en.md`; grep `#### exchange.GetTicker`, `#### exchange.Buy`, `#### exchange.CreateOrder`, `#### exchange.GetPositions`, `#### exchange.SetContractType`, `#### exchange.SetDirection`, `#### exchange.IO`, `#### Spot Exchanges`, `#### Futures Exchanges`, `#### exchange.Go`, `#### threading`, `#### Dial`, `#### DBExec`, `#### Log`, `#### LogStatus`, `#### LogStatus-btnTypeTwo`, `#### Chart`, `#### KLineChart`, `#### GetCommand`, `#### EventLoop`, `#### __Serve`, `#### _G`, `#### _C`, `### Structures`.
+- `SKILL.md` — `references/user-guide.en.md`: "Strategy Entry Functions", "Strategy Parameters", "Interactive Controls", "Template Library", "Built-in Libraries", "JavaScript Strategy Writing Guide", "### TypeScript", "API Rate Limiting Control", "Options Trading", "Common Causes of Live Trading Errors"; `references/tools.md` for `save_strategy`, `run_backtest`, `send_robot_command`.
+- `references/backtest.md` — backtest header comment, exchanges, data granularity. `references/indicators.md` — `talib`/`TA` argument and output details.

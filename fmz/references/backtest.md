@@ -1,11 +1,8 @@
----
-name: fmz-backtest
-description: "Runs and interprets FMZ Quant backtests. Covers the cloud task model (run_backtest, get_backtest with wait, stop_backtest, concurrency slots), the two ways to configure a run (MCP run_backtest parameters, or the /*backtest ... */ header comment the website reads), every config key with units and defaults (period and base period, balance/stocks, fees in percent, slippage, network delay, fault tolerance, depth, bar limits), exchange eid and pair/contract naming, how the engine simulates fills, fees, latency and tick vs bar data, what a strategy sees under IsVirtual() (virtual clock, pre-fetched records, no real IO), how to read profit, drawdown, orders and error_lines, custom data via exchange.SetData, and the common failure messages. Use when starting, configuring, debugging or interpreting a backtest of an FMZ strategy, or when strategy code must behave differently in a backtest."
----
+> Part of the `fmz` skill. File paths below are relative to the skill directory (the folder that holds `SKILL.md`).
 
 # FMZ backtesting
 
-The backtest engine is one C++ program (`backtest.cpp`), compiled to WebAssembly for in-browser runs of JavaScript/C++/Rust strategies and run natively on a node for Python and for cloud runs. It replays history with a virtual clock and a simulated account per exchange. Everything below is what that engine, the MCP tools and the website form actually do; `references/config.md` has the full key table and worked configurations.
+The backtest engine is one C++ program (`backtest.cpp`), compiled to WebAssembly for in-browser runs of JavaScript/C++/Rust strategies and run natively on a node for Python and for cloud runs. It replays history with a virtual clock and a simulated account per exchange. Everything below is what that engine, the MCP tools and the website form actually do; `references/backtest-config.md` has the full key table and worked configurations.
 
 ## 1. How a cloud backtest runs (MCP)
 

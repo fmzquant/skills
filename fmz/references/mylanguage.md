@@ -1,11 +1,8 @@
----
-name: fmz-strategy-mylanguage
-description: "Write FMZ Quant strategies in MyLanguage (麦语言), the Wenhua-style (文华财经) formula language that FMZ compiles with its own engine and runs live on the user's node against real exchange accounts (crypto spot/futures, commodity futures via CTP). Covers the statement forms (:=  :  ^^  ..), series functions (REF, HHV/LLV, CROSS, BARSLAST), the trading instructions (指令) BK/SK/BP/SP/BPK/SPK/CLOSEOUT and the signal/position model behind them (AUTOFILTER, TRADE_AGAIN, ISLAST*, BKVOL/BKPRICE, MONEYTOT/UNIT sizing), multi-period #EXPORT/#IMPORT, the built-in trade library (交易类库) parameters (bar-close vs tick model, default lot, slippage, contract), the (*backtest*) header, and what differs from Wenhua. Use when writing, porting or debugging a MyLanguage / 麦语言 strategy for FMZ (then check and save it with the fmz MCP tools, language \"mylanguage\")."
----
+> Part of the `fmz` skill. File paths below are relative to the skill directory (the folder that holds `SKILL.md`).
 
 # FMZ MyLanguage (麦语言) strategies
 
-A MyLanguage strategy is a list of formula lines. FMZ compiles them into JavaScript and runs them inside its own MyLanguage runtime plus the built-in trade library (麦语言交易类库); the platform documents it as "compatible with most syntax, instructions and functions of Wenhua MyLanguage" — not all. `references/functions.md` is the authoritative list of what exists on FMZ; a name that is not there does not compile or fails at run time. The official templates in `references/examples/` show real syntax.
+A MyLanguage strategy is a list of formula lines. FMZ compiles them into JavaScript and runs them inside its own MyLanguage runtime plus the built-in trade library (麦语言交易类库); the platform documents it as "compatible with most syntax, instructions and functions of Wenhua MyLanguage" — not all. `references/mylanguage-functions.md` is the authoritative list of what exists on FMZ; a name that is not there does not compile or fails at run time. The official templates in `references/mylanguage-examples/` show real syntax.
 
 ```
 MA1:MA(C,N1);                 // output line: plotted in the indicator pane
@@ -147,7 +144,7 @@ TRADE_AGAIN(10);                                  // no AUTOFILTER: adding is al
 
 - Full-width punctuation (`，` `；` `（`): the lexer treats every multi-byte character as a letter, so `C>O，BK;` becomes one identifier `O，BK` and fails with `undefined locals` or a syntax error on that line. Use ASCII `, ; ( )`.
 - A missing `;` is `Line N: syntax error`. `#IMPORT`/`#EXPORT`/`#END` lines take no `;`.
-- Any name not in `references/functions.md` is an error — including Wenhua-only functions (`FEE`, `SETDEALPERCENT`, `CONDITION_ORDER`, `STOP`, `CLOSEMINUTE1`, `REFWH`, `KLINESIG`). Check the table before using a function; do not guess argument orders either (`SMA(X,N,M)`, `SAR(N,STEP,MAX)`, `ROUND(N,M)`).
+- Any name not in `references/mylanguage-functions.md` is an error — including Wenhua-only functions (`FEE`, `SETDEALPERCENT`, `CONDITION_ORDER`, `STOP`, `CLOSEMINUTE1`, `REFWH`, `KLINESIG`). Check the table before using a function; do not guess argument orders either (`SMA(X,N,M)`, `SAR(N,STEP,MAX)`, `ROUND(N,M)`).
 - `==`, `!=`, `!` do not exist: use `=`, `<>`, `NOT()`.
 - Signal flicker: in the tick model a condition on `C` flips during the bar; because one instruction per bar is executed and `BKPRICE` is the bar close at execution, a mid-bar BK followed by a mid-bar stop on the same bar is blocked until the next bar. Prefer the bar-close model unless the strategy needs intrabar fills; then design conditions on `H`/`L`/`REF` values that do not flicker.
 - Warm-up silence: lines that lack history or reference a signal that has not happened simply do nothing — guard entries with `BARPOS>=N` as the turtle template does, and remember `BARSBK=1` style conditions are false (absent) until a BK has executed.
@@ -178,7 +175,7 @@ exchanges: [{"eid":"Futures_Binance","currency":"BTC_USDT"}]
 
 ## References
 
-- `references/functions.md` — every function and keyword that exists on FMZ (name, 中文, English). Authoritative.
-- `references/examples/*.txt` — official templates: `海龟交易` (sizing, adding, stops, `TRADE_AGAIN`), `跨指标` (KDJ + MA, `..`/`^^` outputs), `多周期引用` (`#EXPORT`/`#IMPORT`), `限价止损+限价止赢` (`MINPRICE1` stops), `MA组合`, `ATR`, `CCI`, `BBIBOLL`, screening formulas with `SELECT`.
-- Sibling skills: `fmz-backtest` (backtest header fields, reading results), `fmz-platform` (MCP tools, robot lifecycle, safety rules).
+- `references/mylanguage-functions.md` — every function and keyword that exists on FMZ (name, 中文, English). Authoritative.
+- `references/mylanguage-examples/*.txt` — official templates: `海龟交易` (sizing, adding, stops, `TRADE_AGAIN`), `跨指标` (KDJ + MA, `..`/`^^` outputs), `多周期引用` (`#EXPORT`/`#IMPORT`), `限价止损+限价止赢` (`MINPRICE1` stops), `MA组合`, `ATR`, `CCI`, `BBIBOLL`, screening formulas with `SELECT`.
+- See also: `references/backtest.md` (backtest header fields, reading results), `SKILL.md` (MCP tools, robot lifecycle, safety rules).
 - Platform docs: FMZ MyLanguage documentation `https://www.fmz.com/bbs-topic/2569`; trade library parameters `https://www.fmz.com/bbs-topic/5768`.
