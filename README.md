@@ -17,7 +17,7 @@ Connecting an agent to the platform (device-code authorization, MCP URL, permiss
 | Skill | Covers |
 |---|---|
 | `fmz-platform` | The platform model and every MCP tool: accounts, nodes, strategies, robots, backtests, messages; workflows; safety rules; the REST extended API; the user guide as markdown (en/zh). |
-| `fmz-api-reference` | The complete strategy API documentation as greppable markdown (en/zh): every function, structure and constant with examples in JavaScript, Python, C++ and Rust. |
+| `fmz-api-reference` | The complete strategy API documentation as greppable markdown (en/zh): every function, structure and constant with examples in JavaScript, Python, C++ and Rust; plus the indicator guide (`TA.*` and the 151 `talib.*` functions: inputs, outputs, language differences). |
 | `fmz-strategy-javascript` | Writing strategies in JavaScript/TypeScript: structure, parameters, the exchange API, concurrency, IO, logging and charts, pitfalls. References: `fmz.d.ts` (full typed declarations), the native event API, the platform self-check strategy. |
 | `fmz-strategy-python` | The same for Python. References: `fmz.pyi`, `talib.pyi`, self-check. |
 | `fmz-strategy-cpp` | The same for C++. References: `fmz.hpp`, json/TA/talib headers, self-check. |
@@ -25,7 +25,6 @@ Connecting an agent to the platform (device-code authorization, MCP URL, permiss
 | `fmz-strategy-pine` | Pine Script on FMZ: what the engine implements, strategy() options, orders, live specifics. Reference: generated built-in list. |
 | `fmz-strategy-mylanguage` | 麦语言 (MyLanguage) on FMZ: syntax, trading instructions, money management, live specifics. References: function dictionary, official templates. |
 | `fmz-backtest` | Cloud backtesting: configuration (MCP parameters and the `/*backtest*/` header), simulation model, reading results. |
-| `fmz-indicators` | `TA.*` and the 151 `talib.*` functions: inputs, outputs, language differences. |
 
 ## Layout
 

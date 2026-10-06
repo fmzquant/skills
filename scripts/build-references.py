@@ -10,7 +10,7 @@ Inputs (all public or in the platform's own repositories):
     fmz-platform/references/user-guide.{en,zh}.md, fmz-platform/references/rest-api.md
   - MCP tool table: dumped from the server (`mcpToolTable`, JSON with scope + mcp.Tool)
         → fmz-platform/references/tools.md
-  - talib descriptions: botvs misc/helper/talib/api_gen.js (`talibInfo`)   → fmz-indicators/references/talib.md
+  - talib descriptions: botvs misc/helper/talib/api_gen.js (`talibInfo`)   → fmz-api-reference/references/talib.md
   - Pine built-ins: botvs backtest/pinescript/src/lib_*.js (`scope.register`) → fmz-strategy-pine/references/builtins.md
   - MyLanguage dictionary: botvs misc/helper/my/trans_dic.txt            → fmz-strategy-mylanguage/references/functions.md
   - Declaration files are copied verbatim from botvs misc/helper/gen_helper/ (js .d.ts, python .pyi,

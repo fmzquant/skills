@@ -163,7 +163,7 @@ if cmd:
 ## Indicators
 
 - `TA.MA(records, n)`, `TA.EMA`, `TA.SMA`, `TA.RSI(records, 14)`, `TA.ATR(records, 14)`, `TA.OBV(records)`, `TA.CMF(records, 20)`, `TA.Alligator(records, 13, 8, 5)` return lists aligned with `records`; `TA.MACD(records, 12, 26, 9)` → `[dif, dea, histogram]`, `TA.BOLL(records, 20, 2)` → `[upper, middle, lower]`, `TA.KDJ(records, 9, 3, 3)` → `[k, d, j]`; `TA.Highest(records, n, "High")` / `TA.Lowest(records, n, "Low")` return one number. Inputs may be the records list or a plain list of floats. Leading entries are `None` until enough bars exist: test `is None` before comparing.
-- `talib` (TA-Lib via its Python binding, needs numpy on the host; the global is injected, `import talib` also works) takes flat arrays, not records: `talib.MACD(records.Close, 12, 26, 9)` → tuple of three arrays, `talib.ATR(records.High, records.Low, records.Close, 14)`, `talib.CDL2CROWS(records.Open, records.High, records.Low, records.Close)`. Missing TA-Lib raises `Please install talib module for python` on first use. Full signatures: `references/talib.pyi`; indicator semantics: the `fmz-indicators` skill.
+- `talib` (TA-Lib via its Python binding, needs numpy on the host; the global is injected, `import talib` also works) takes flat arrays, not records: `talib.MACD(records.Close, 12, 26, 9)` → tuple of three arrays, `talib.ATR(records.High, records.Low, records.Close, 14)`, `talib.CDL2CROWS(records.Open, records.High, records.Low, records.Close)`. Missing TA-Lib raises `Please install talib module for python` on first use. Full signatures: `references/talib.pyi`; indicator semantics: the `fmz-api-reference` skill (Indicators section).
 
 ## What a failed call looks like
 
@@ -201,4 +201,4 @@ if cmd:
 - `references/selfcheck.py` — known-good strategy exercising the whole surface; copy its idioms (`if t:` guards, `tk, ok = g.wait(0)`, `_D(r["Time"] // 1000)`, KLineChart keyword args, `IsVirtual()` gating of writes, condition-order dicts).
 - `fmz-api-reference` skill (`references/api.en.md`): grep `#### exchange.Buy`, `#### exchange.GetRecords`, `#### exchange.Go`, `#### _D`, `#### _C`, `#### _G`, `#### LogStatus`, `#### LogStatus-table`, `#### Dial`, `#### Chart`, `#### KLineChart`, `#### EventLoop`, `### Order`, `### Account`, `### Position`, `### Market` (each with a `python` example block).
 - `fmz-platform` skill (`references/user-guide.en.md`): grep `### Python` (interpreter shebang, encryption, custom modules), `## Strategy Entry Functions`, `## Strategy Parameters`, `## Interactive Controls`, `## Template Library`, `### Local Backtesting Engine`.
-- `fmz-backtest` skill — the `'''backtest'''` header, periods, exchanges and reading results. `fmz-indicators` skill — TA/talib semantics.
+- `fmz-backtest` skill — the `'''backtest'''` header, periods, exchanges and reading results. `fmz-api-reference` skill (Indicators section) — TA/talib semantics.

@@ -177,7 +177,7 @@ if (!body.empty()) {
 ## Indicators
 
 `TA` (TA.hpp): `MA, SMA, EMA, RSI, ATR, OBV, CMF, Highest, Lowest` return `vector<double>`; `MACD, KDJ, BOLL, Alligator` return `array<vector<double>, 3>` (`auto m = TA.MACD(r, 12, 26, 9); m[0]` = DIF). Overloads accept `Records &` or `vector<double> &`; periods are `size_t`.
-`talib` (talib.hpp): the full TA-Lib set, each as `talib.NAME(Records &r, params...)` or `talib.NAME(vector<double> &high, &low, &close, ...)`; multi-output functions return `array<vector<double>, N>`. Outputs are aligned with the input and hold NaN where the window is not full — check `std::isnan(v.back())`. Defaults and parameter names are in `references/talib.hpp`; the per-function docs are in the `fmz-indicators` skill.
+`talib` (talib.hpp): the full TA-Lib set, each as `talib.NAME(Records &r, params...)` or `talib.NAME(vector<double> &high, &low, &close, ...)`; multi-output functions return `array<vector<double>, N>`. Outputs are aligned with the input and hold NaN where the window is not full — check `std::isnan(v.back())`. Defaults and parameter names are in `references/talib.hpp`; the per-function docs are in the `fmz-api-reference` skill (Indicators section).
 
 ## Pitfalls
 
@@ -208,4 +208,4 @@ if (!body.empty()) {
 - `references/selfcheck.cpp` — a known-good strategy that calls the whole API once; copy its idioms (Valid checks with `GetLastError()`, `_G`, `DBExec`, `JSONParse` try/catch, `Chart`, the complete `KLineChart` pass, `Go`/`wait`, condition orders, `IsVirtual()` gating of writes).
 - `references/json.hpp` — the nlohmann `json` surface available to strategies: constructors, `parse`, `dump`, `is_*`, `get<T>`, `value`, `contains`, `items()`, operators, exception classes.
 - `references/TA.hpp` and `references/talib.hpp` — indicator signatures, overloads and default parameters; grep the indicator name.
-- Sibling skills: `fmz-api-reference` (full prose docs, grep the fenced `cpp` blocks by function name in `references/api.en.md`), `fmz-backtest` (backtest header and MCP flow), `fmz-indicators` (per-indicator semantics), `fmz-platform` (MCP tools, robots, safety rules).
+- Sibling skills: `fmz-api-reference` (full prose docs, grep the fenced `cpp` blocks by function name in `references/api.en.md`), `fmz-backtest` (backtest header and MCP flow) (the indicator guide is inside `fmz-api-reference`) (per-indicator semantics), `fmz-platform` (MCP tools, robots, safety rules).

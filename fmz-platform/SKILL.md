@@ -7,7 +7,7 @@ description: "Operate the FMZ Quant trading platform (fmz.com) through its MCP t
 
 FMZ (fmz.com) is a quant trading platform: strategies written in JavaScript, TypeScript, Python, C++, Rust, Pine, MyLanguage (麦语言) or Blockly run as "robots" (实盘) on the user's own nodes (托管者) against the user's exchange accounts. Everything below is done through the `fmz` MCP server. Not connected yet? Read `https://www.fmz.com/agent/setup.md` and follow it.
 
-Sibling skills installed with this one: `fmz-strategy-javascript` / `-python` / `-cpp` / `-rust` / `-pine` / `-mylanguage` (how to write code in each language), `fmz-api-reference` (the full API documentation), `fmz-backtest` (backtest configuration and semantics), `fmz-indicators` (TA / talib).
+Sibling skills installed with this one: `fmz-strategy-javascript` / `-python` / `-cpp` / `-rust` / `-pine` / `-mylanguage` (how to write code in each language), `fmz-api-reference` (the full API documentation), `fmz-backtest` (backtest configuration and semantics).
 
 ## The platform model
 
