@@ -4,7 +4,7 @@ Same API keys as MCP (website: `/m/account#apikey`). For REST the key's privileg
 
 ## Endpoint and signature
 
-`POST https://www.fmz.com/api/v1` (youquant: `https://www.youquant.com/api/v1`), form-encoded fields:
+`POST https://www.fmz.com/api/v1`, form-encoded fields:
 
 | Field | Value |
 |---|---|

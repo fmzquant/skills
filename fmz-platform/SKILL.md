@@ -1,11 +1,11 @@
 ---
 name: fmz-platform
-description: "Operate the FMZ Quant trading platform (fmz.com / youquant.com) through its MCP tools — the platform model (exchange accounts, nodes, strategies, templates, robots, backtests, messages), the complete tool catalog by scope, the workflows for writing, checking, backtesting and running a strategy live, the REST \"extended API\" alternative, and the safety rules a real-money trading platform needs. Use whenever the fmz MCP server is connected, or when a task mentions FMZ robots, strategies, backtests, nodes or API keys."
+description: "Operate the FMZ Quant trading platform (fmz.com) through its MCP tools — the platform model (exchange accounts, nodes, strategies, templates, robots, backtests, messages), the complete tool catalog by scope, the workflows for writing, checking, backtesting and running a strategy live, the REST \"extended API\" alternative, and the safety rules a real-money trading platform needs. Use whenever the fmz MCP server is connected, or when a task mentions FMZ robots, strategies, backtests, nodes or API keys."
 ---
 
 # FMZ platform via MCP
 
-FMZ (fmz.com, global; youquant.com / 优宽量化, China, CNY and commodity futures via CTP) is a quant trading platform: strategies written in JavaScript, TypeScript, Python, C++, Rust, Pine, MyLanguage (麦语言) or Blockly run as "robots" (实盘) on the user's own nodes (托管者) against the user's exchange accounts. Everything below is done through the `fmz` MCP server. Not connected yet? Read `https://www.fmz.com/agent/setup.md` (youquant users: `https://www.youquant.com/agent/setup.zh-CN.md`) and follow it.
+FMZ (fmz.com) is a quant trading platform: strategies written in JavaScript, TypeScript, Python, C++, Rust, Pine, MyLanguage (麦语言) or Blockly run as "robots" (实盘) on the user's own nodes (托管者) against the user's exchange accounts. Everything below is done through the `fmz` MCP server. Not connected yet? Read `https://www.fmz.com/agent/setup.md` and follow it.
 
 Sibling skills installed with this one: `fmz-strategy-javascript` / `-python` / `-cpp` / `-rust` / `-pine` / `-mylanguage` (how to write code in each language), `fmz-api-reference` (the full API documentation), `fmz-backtest` (backtest configuration and semantics), `fmz-indicators` (TA / talib).
 
@@ -54,7 +54,7 @@ A tool missing from `tools/list` means the key lacks that scope; the user can ed
 - `args` everywhere: `{name: value}` object or `[[name, value], ...]`; omitted parameters keep the strategy defaults. Values are typed by the default (number / string / boolean).
 - Enumerations are words, not numbers: robot `status` queue/running/stopping/complete/stopped/error; strategy `visibility` private/shared/verify/premium/system; `language` javascript/typescript/python/cpp/blockly/mylanguage/pine/flow/rust.
 - Times: ISO 8601 or unix seconds in; ISO UTC out. Backtest `period`: 1m/5m/15m/30m/1h/4h/1d. Robot `period` is in seconds.
-- Pairs: `BTC_USDT` (spot). Futures contracts are chosen in code with `exchange.SetContractType("swap" | "quarter" | ...)`, so the robot pair stays `BTC_USDT`. Commodity futures (CTP counters on youquant) select the contract in code too (`exchange.SetContractType("rb2501")`); for a backtest the tool accepts a bare contract code as `pair` and quotes it in CNY.
+- Pairs: `BTC_USDT` (spot). Futures contracts are chosen in code with `exchange.SetContractType("swap" | "quarter" | ...)`, so the robot pair stays `BTC_USDT`.
 - Backtest `exchanges[].exchange` is the `eid` from `list_exchanges` (e.g. `Binance`, `Futures_Binance`, `Futures_CTP`); robots use `platform_id` from `list_platforms` instead.
 - All list tools paginate with `offset` / `limit` (max 200). Results never contain secrets.
 

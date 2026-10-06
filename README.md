@@ -1,6 +1,6 @@
 # FMZ Quant skills for AI agents
 
-Skills that teach an AI coding agent (Claude Code, Codex, Cursor, Gemini CLI, ... anything that follows the [Agent Skills](https://agentskills.io) format) how to operate the [FMZ Quant](https://www.fmz.com) / [优宽量化](https://www.youquant.com) trading platform and how to write strategies for it in every supported language.
+Skills that teach an AI coding agent (Claude Code, Codex, Cursor, Gemini CLI, ... anything that follows the [Agent Skills](https://agentskills.io) format) how to operate the [FMZ Quant](https://www.fmz.com) trading platform and how to write strategies for it in every supported language.
 
 ## Install
 
@@ -14,7 +14,7 @@ Set `-a` to your agent (`npx skills add --help` lists them). Without GitHub acce
 npx skills add https://www.fmz.com/agent/skills.zip --global --yes -a claude-code
 ```
 
-(youquant users: `https://www.youquant.com/agent/skills.zip`). Single files are readable at `https://www.fmz.com/agent/skills/<skill>/SKILL.md`.
+Single files are readable at `https://www.fmz.com/agent/skills/<skill>/SKILL.md`.
 
 Connecting an agent to the platform (device-code authorization, MCP URL, permissions) is described at https://www.fmz.com/agent/setup.md — the agent can read that page and do it by itself.
 

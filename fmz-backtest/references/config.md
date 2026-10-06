@@ -24,7 +24,7 @@ Fee integers: the engine computes `rate = FeeMaker / 10^FeeDenominator`. The MCP
 | `btMaxProfitLogs` | - | `MaxProfitLogs` | `LogProfit` points kept | 800 | 8000 | capped at 10000 |
 | `btMaxChartLogs` | - | `MaxChartLogs` | chart data points kept | 0 | 3000 | capped at 10000 |
 | - | - | `SnapshotPeriod` | ms between account snapshots | auto: span <= 2 h -> 60 s, <= 2 d -> 5 min, < 30 d -> 1 h, else 1 d | auto (same, `< 20 d` for the hourly step) | required |
-| `dataServer` (local JS engine only) | - | `DataServer` | history server | `https://q.fmz.com`; `https://q.youquant.com` on the CNY site or when any exchange is `Futures_CTP`/`Futures_XTP` | site origin (`q.` host) | required |
+| `dataServer` (local JS engine only) | - | `DataServer` | history server | `https://q.fmz.com` | site origin (`q.` host) | required |
 | - | - | `RetFlags` | bitmask of result sections: 1 Status, 2 Symbols, 4 Indicators, 8 Chart, 16 ProfitLogs, 32 RuntimeLogs, 64 CloseProfitLogs, 128 Accounts, 256 Accounts_PnL, 512 Event, 1024 Orders, 2048 FilledOrders | `1|16|32|256` | `1|8|16|32|64|128|256` | required |
 | - | - | `UpdatePeriod` | ms between progress callbacks | 5000 | 500 (5000 for Python) | required |
 | `args` | `args` | `Code[i][1]` | parameter values: header `[["name", value]]` or `[["name", value, templateId]]`; MCP `{name: value}` or `[[name, value]]` | - | form | - |
@@ -139,30 +139,6 @@ function main() {
 ```
 
 Here the margin currency is the base coin: fund `stocks` (BTC), not `balance`; contract value is `amount x multiplier / price` in BTC. The MCP tool keeps `balance` at its default 10000 unless you pass 0, which only matters if the strategy reads the quote balance.
-
-### Chinese commodity futures (Futures_CTP, CNY, youquant data server)
-
-```javascript
-/*backtest
-start: 2024-03-01 00:00:00
-end: 2024-04-01 00:00:00
-period: 5m
-basePeriod: 1m
-exchanges: [{"eid":"Futures_CTP","currency":"FUTURES_CNY","balance":200000,"fee":[0.025,0.025],"feeMin":1}]
-*/
-function main() {
-    var info = exchange.SetContractType("<contract code>")  // the CTP contract code, e.g. the symbol shown by the exchange's contract list
-    Log(info)  // {InstrumentID, PriceTick, VolumeMultiple, ...}
-    ...
-}
-```
-
-```json
-{"begin":"2024-03-01","end":"2024-04-01","period":"5m",
- "exchanges":[{"exchange":"Futures_CTP","pair":"FUTURES","balance":200000}]}
-```
-
-What the sources guarantee: the id is `Futures_CTP`; a pair without `_` gets `_CNY`; `DepthDeep` is forced to 1; the data server becomes `https://q.youquant.com`; default fees are 0.025 %/0.025 %; `FeeMin` is honoured; daily bars are aligned with `TimezoneOffset` (engine default UTC+8, website 0). The exact `currency` value and contract-code format are not shown in the sources used here; the only documented non-crypto header is Futu (`"currency":"STOCK"`, `SetContractType("TLSA.US")`), so verify the CTP market symbol on the website's backtest form before relying on it.
 
 ### Multiple exchanges (cross-exchange, `exchanges[0]`, `exchanges[1]`)
 
