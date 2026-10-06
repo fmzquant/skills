@@ -1,0 +1,5 @@
+
+
+//[trans]后为文字说明，编写模型时不用写出|[/trans]
+TR : MAX(MAX((HIGH-LOW),ABS(REF(CLOSE,1)-HIGH)),ABS(REF(CLOSE,1)-LOW));//[trans]求最高价减去最低价，一个周期前的收盘价减去最高价的绝对值，一个周期前的收盘价减去最低价的绝对值，这三个值中的最大值|[/trans]
+ATR : MA(TR,N);//[trans]求N个周期内的TR的简单移动平均|[/trans]

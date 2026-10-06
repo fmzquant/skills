@@ -1,0 +1,5 @@
+
+
+REF(((HHV(H,N)-LLV(L,N))/LLV(L,N)),1)<=(N1/100) AND C>=REF(HHV(H,N),1) AND BARSCOUNT(C)>N,SELECT;//[trans]选出前N天，K线的最高价最低价在上下N1%范围内浮动，当日的价格突破N日最高价的K线。|[/trans]
+
+//[trans]N、N1为参数，默认值为30、30，即选出在前30日，K线的最高最低值在30%的范围内浮动，当日价格突破30日最高价的K线。N、N1的数值可以在参数列表修改。|[/trans]

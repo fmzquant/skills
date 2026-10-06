@@ -1,0 +1,9 @@
+//[trans]该示范主要演示“限价止损+限价止赢”的编写方法|[/trans]
+//[trans]用户需要根据自己交易经验，补充完整开平仓条件，进行修改后再实际应用!!!|[/trans]
+
+
+//[trans]止损点差为SL,止赢点差为TP|[/trans]
+A:=MINPRICE1;//[trans]取模组交易合约的最小变动价位|[/trans]
+(C<=BKPRICE-SL*A||C>=BKPRICE+TP*A)&&BKPRICE>0,SP;//[trans]低于买开仓价10个点差，多头止损；高于买开仓价20个点差，多头止赢|[/trans]
+(C>=SKPRICE+SL*A||C<=SKPRICE-TP*A)&&SKPRICE>0,BP;//[trans]高于卖开仓价10个点差，空头止损；低于卖开仓价20个点差，空头止赢|[/trans]
+AUTOFILTER;

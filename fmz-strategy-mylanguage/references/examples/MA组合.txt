@@ -1,0 +1,9 @@
+
+
+//[trans]后为文字说明，编写模型时不用写出|[/trans]
+MA1:MA(CLOSE,N1);
+MA2:MA(CLOSE,N2);
+MA3:MA(CLOSE,N3);
+MA4:MA(CLOSE,N4);
+MA5:MA(CLOSE,N5);
+MA6:MA(CLOSE,N6);//[trans]定义6条均线|[/trans]

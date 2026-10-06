@@ -1,0 +1,15 @@
+//[trans]该示范用均线和KDJ两个指标结合使用，演示“跨指标模型”的编写方法|[/trans]
+//[trans]编写示范中，只对示范重点内容语句进行了注释，其他语句请自行翻译，或者咨询客服|[/trans]
+
+
+RSV:=(CLOSE-LLV(LOW,9))/(HHV(HIGH,9)-LLV(LOW,9))*100;
+K..SMA(RSV,3,1);
+D..SMA(K,3,1);
+J..3*K-2*D;//[trans]以上为KDJ公式|[/trans]
+MA5^^MA(CLOSE,5);
+MA10^^MA(CLOSE,10);//[trans]以上为定义5周期均线和10周期均线|[/trans]
+CROSSUP(MA5,MA10)&&REF(J,1)<70,BK;//[trans]5周期均线上穿10周期均线并且前一个周期的J值少于70时买入开仓|[/trans]
+CROSSDOWN(K,D)&&REF(J,1)>70,SP;//[trans]KD出现死叉并且前一个周期J值大于70时卖出平仓|[/trans]
+CROSSDOWN(MA5,MA10)&&REF(J,1)>30,SK;//[trans]5周期均线下穿10周期均线并且前一个周期的J值大于30时卖出开仓|[/trans]
+CROSSUP(K,D)&&REF(J,1)<30,BP;//[trans]KD出现金叉并且前一个周期J值小于30时买入平仓|[/trans]
+AUTOFILTER;

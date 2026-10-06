@@ -1,0 +1,3 @@
+
+
+EVERY(CLOSE>OPEN,4),SELECT;//[trans]选出连续四日收阳的K线。|[/trans]

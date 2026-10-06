@@ -1,0 +1,16 @@
+
+//[trans]本代码演示如何引用不同周期的公式在同一代码里|[/trans]
+
+//[trans]#EXPORT扩展语法, 以#END结束标记为一个公式,可以声明多个|[/trans]
+#EXPORT TEST 
+均值1:EMA(C, 20);
+均值2:EMA(C, 10);
+#END //[trans]结束|[/trans]
+
+#IMPORT [MIN,15,TEST] AS VAR15 //[trans]引用公式, K线周期用15分钟|[/trans]
+#IMPORT [MIN,30,TEST] AS VAR30 //[trans]引用公式, K线周期用30分钟|[/trans]
+CROSSUP(VAR15.均值1, VAR30.均值1),BPK;
+CROSSDOWN(VAR15.均值2, VAR30.均值2),SPK;
+十五分最高价:VAR15.HIGH;
+三十分最高价:VAR30.HIGH;
+AUTOFILTER;

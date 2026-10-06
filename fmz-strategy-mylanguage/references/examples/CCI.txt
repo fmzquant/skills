@@ -1,0 +1,6 @@
+
+
+//[trans]后为文字说明，编写模型时不用写出|[/trans]
+TYP:=(CLOSE+HIGH+LOW)/3;//[trans]求最新价，最高价和最低价三者的简单平均|[/trans]
+CCI:(TYP-MA(TYP,N))/(0.015*AVEDEV(TYP,N));//[trans]TYP与TYP的N周期平均值做差，该差值与TYP在N个周期内的0.015倍的平均绝对偏差值做比值|[/trans]
+REFLINE:-100,0,100;
