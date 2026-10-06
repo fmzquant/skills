@@ -24,7 +24,7 @@ Fee integers: the engine computes `rate = FeeMaker / 10^FeeDenominator`. The MCP
 | `btMaxProfitLogs` | - | `MaxProfitLogs` | `LogProfit` points kept | 800 | 8000 | capped at 10000 |
 | `btMaxChartLogs` | - | `MaxChartLogs` | chart data points kept | 0 | 3000 | capped at 10000 |
 | - | - | `SnapshotPeriod` | ms between account snapshots | auto: span <= 2 h -> 60 s, <= 2 d -> 5 min, < 30 d -> 1 h, else 1 d | auto (same, `< 20 d` for the hourly step) | required |
-| `dataServer` (local JS engine only) | - | `DataServer` | history server | `https://q.fmz.com` | site origin (`q.` host) | required |
+| `dataServer` (local JS engine only) | - | `DataServer` | history server | set by the server (`http://q.fmz.com`, reached via the cluster proxy) | site origin | required |
 | - | - | `RetFlags` | bitmask of result sections: 1 Status, 2 Symbols, 4 Indicators, 8 Chart, 16 ProfitLogs, 32 RuntimeLogs, 64 CloseProfitLogs, 128 Accounts, 256 Accounts_PnL, 512 Event, 1024 Orders, 2048 FilledOrders | `1|16|32|256` | `1|8|16|32|64|128|256` | required |
 | - | - | `UpdatePeriod` | ms between progress callbacks | 5000 | 500 (5000 for Python) | required |
 | `args` | `args` | `Code[i][1]` | parameter values: header `[["name", value]]` or `[["name", value, templateId]]`; MCP `{name: value}` or `[[name, value]]` | - | form | - |

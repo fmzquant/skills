@@ -69,7 +69,7 @@ The open-source local engines (`backtest_python`: `VCtx(__doc__)`, `backtest_jav
 - Pair is `BASE_QUOTE`, upper case (`BTC_USDT`). The MCP tool uppercases it and, if there is no `_`, appends `_USD`.
 - Crypto futures: the pair is the **margin pair** (`BTC_USDT` for USDT-margined, `BTC_USD` for coin-margined). The contract is chosen in the strategy with `exchange.SetContractType("swap" | "this_week" | "next_week" | "quarter" | "next_quarter")`, or by passing a full symbol such as `BTC_USDT.swap` to `GetRecords/GetTicker`. Until a contract is set, the engine raises `symbol BTC_USDT not set contract on Futures_Binance`. Do not put `.swap` into the MCP `pair` (it is split on `_`).
 - Futu (`Futures_Futu`) supports daily data only, with `currency: "STOCK"` and `exchange.SetContractType("TLSA.US")`-style codes.
-- Data server: `https://q.fmz.com`. No data for the pair in the date range -> the task ends with a symbol-not-found error (see section 7).
+- The history data server is chosen by the platform (the cloud nodes reach it through the cluster's own proxy); you never set it. No data for the pair in the date range -> the task ends with a symbol-not-found error (see section 7).
 
 ## 4. The simulation model (what the engine does)
 
