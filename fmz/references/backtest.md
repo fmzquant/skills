@@ -4,6 +4,13 @@
 
 The backtest engine is one C++ program (`backtest.cpp`), compiled to WebAssembly for in-browser runs of JavaScript/C++/Rust strategies and run natively on a node for Python and for cloud runs. It replays history with a virtual clock and a simulated account per exchange. Everything below is what that engine, the MCP tools and the website form actually do; `references/backtest-config.md` has the full key table and worked configurations.
 
+## 0. Cloud or local?
+
+Two ways to run a backtest, same engine core and the same history data:
+
+- **Cloud** — `run_backtest` / `get_backtest` through MCP. Any language, templates and class libraries attached automatically, the result is also visible on the website. Costs an account concurrency slot and a round trip of tens of seconds to minutes. Everything below describes this path.
+- **Local** — the open-source engine installed on the machine the agent runs on (`pip install` of `fmzquant/backtest_python`). JavaScript/Python strategies only, no templates, but a two-week run finishes in well under a second and there is no slot to wait for. Use it for the write–run–fix loop and parameter sweeps, then confirm once on the cloud. Details, install and result format: `references/backtest-local.md`.
+
 ## 1. How a cloud backtest runs (MCP)
 
 1. `run_backtest` submits a task to the cloud cluster and returns `task_id` immediately.

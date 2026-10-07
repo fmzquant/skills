@@ -28,7 +28,7 @@ fmz/
     ├── mylanguage-functions.md mylanguage-examples/                   麦语言 dictionary and official templates
     ├── api-docs.md api.en.md api.zh.md                                the complete strategy API documentation (en/zh)
     ├── indicators.md ta.md talib.md                                   TA.* and talib.*
-    ├── backtest.md backtest-config.md                                 cloud backtesting
+    ├── backtest.md backtest-config.md backtest-local.md               cloud backtesting, local engine on the agent's machine
     ├── tools.md rest-api.md                                           MCP tool parameters, REST extended API
     └── user-guide.en.md user-guide.zh.md                              the platform user guide as markdown
 ```
