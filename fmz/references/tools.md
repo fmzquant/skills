@@ -244,7 +244,7 @@ Delete a robot or strategy group. Its members are kept, just ungrouped.
 
 ### set_robot_alert
 
-Turn the watchdog on or off for a robot: when on, the user is notified if the robot leaves the running state. It resets to off every time the robot starts, so set it after start_robot/create_robot.
+Turn the alert (watchdog) on or off for a robot: when on, the user is notified the moment the robot leaves the running state. The flag is cleared automatically every time the robot stops — whether by stop_robot/restart_robot, by the strategy exiting, or by an error — and again every time it starts, so it only lives for one run: set it after start_robot/create_robot and again after every restart. get_robot and list_robots report it as `alert`.
 
 - `enabled` (boolean, required)
 - `robot_id` (number, required)
@@ -284,19 +284,19 @@ Create/start/stop robots and send them commands: spends balance and places real 
 
 ### start_robot
 
-[trade] Start a stopped robot with its current configuration (use update_robot first to change it). Charges the platform fee when the prepaid hour is used up and resumes real trading. Returns the robot's state after the start attempt.
+[trade] Start a stopped robot with its current configuration (use update_robot first to change it). Charges the platform fee when the prepaid hour is used up and resumes real trading. Returns the robot's state after the start attempt. Starting clears the robot's alert flag (see set_robot_alert).
 
 - `robot_id` (number, required)
 
 ### stop_robot
 
-[trade] Stop a running robot (the strategy's exit handler runs; open positions are NOT closed automatically). Waits briefly for it to reach a final state and returns it.
+[trade] Stop a running robot (the strategy's exit handler runs; open positions are NOT closed automatically). Waits briefly for it to reach a final state and returns it. Stopping clears the robot's alert flag (`alert` in the result is then false; see set_robot_alert).
 
 - `robot_id` (number, required)
 
 ### restart_robot
 
-[trade] Stop a robot, wait for it to finish, then start it again with its current configuration. Same costs and effects as stop_robot + start_robot.
+[trade] Stop a robot, wait for it to finish, then start it again with its current configuration. Same costs and effects as stop_robot + start_robot, including clearing the alert flag (see set_robot_alert).
 
 - `robot_id` (number, required)
 
@@ -319,7 +319,7 @@ Delete strategies/robots/nodes, publish strategies. Never included in a key by d
 
 ### delete_robot
 
-[danger] Delete a STOPPED robot. With remove_logs the robot's log database on the node is erased too (irreversible).
+[danger] Delete a STOPPED robot. With remove_logs the robot's log database on the node is erased too (irreversible). A deleted robot is gone for this interface: get_robot and the other robot tools report it as not found.
 
 - `remove_logs` (boolean): Default false
 - `robot_id` (number, required)
