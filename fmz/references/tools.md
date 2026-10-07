@@ -75,13 +75,14 @@ One saved strategy version, with its source when with_source is true.
 
 ### list_robots
 
-List the user's robots (live strategies) with status and profit. `total` is how many robots match the filters (the page is a slice of it); `status_totals` counts ALL the user's robots per status, regardless of filters and paging. Use get_robot for configuration and get_robot_logs for what it is doing.
+List the user's robots (live strategies) with status and profit. `total` is how many robots match the filters (the page is a slice of it); `status_totals` counts ALL the user's robots per status, regardless of filters and paging. Use get_robot for configuration, get_robot_logs for what it is doing and get_robot_profit for its profit curve.
 
 - `group_id` (number): Only this robot group; 0 = ungrouped
 - `keyword` (string): Fuzzy match on the robot name
 - `limit` (number): Default 50, max 200
 - `offset` (number)
 - `status` (string one of all/queue/running/stopping/complete/stopped/error): Default all
+- `strategy_id` (number): Only robots of this strategy, whatever their status — e.g. to see what still references a strategy before deleting it
 
 ### get_robot
 
@@ -98,6 +99,14 @@ A robot's runtime log, newest first: trades, errors, prints. The tool to find ou
 - `robot_id` (number, required)
 - `types` (array of string): Only these entry types
 - `with_status` (boolean): Also return the robot's status page text
+
+### get_robot_profit
+
+A robot's profit curve, newest first: one point per LogProfit() call the strategy made (a strategy that never calls LogProfit has no curve; the robot's `profit` field is its last point). The points live on the robot's node, so an offline node gives an empty page even for a stopped robot. Page older points with before_id = the smallest id already seen.
+
+- `before_id` (number): Only points with id below this
+- `limit` (number): Default 50, max 200
+- `robot_id` (number, required)
 
 ### get_robot_output
 
@@ -171,7 +180,7 @@ Save strategies and versions, groups, alert switches, edit stopped robots.
 
 Change a STOPPED robot's configuration: name, exchanges/pairs, parameter values, period, node, pinned strategy version or group. Only the fields given change. The strategy itself cannot be changed (create a new robot). Start it afterwards with start_robot.
 
-- `args` (object): {name: value} or [[name, value], ...]; replaces all values
+- `args` (object): Parameter values to change: {name: value} or [[name, value], ...] for the strategy's own parameters, [name, value, template_id] for a template's. MERGED into the current values — only the parameters named here change
 - `exchanges` (array of object)
   - `pair` (string, required): e.g. BTC_USDT
   - `platform_id` (number, required): id from list_platforms
@@ -179,6 +188,7 @@ Change a STOPPED robot's configuration: name, exchanges/pairs, parameter values,
 - `name` (string)
 - `node_id` (number): 0 = pick automatically at start
 - `period` (number): Seconds
+- `replace_args` (boolean): Replace the whole parameter set with args instead of merging; parameters left out revert to the strategy's defaults when the robot starts
 - `robot_id` (number, required)
 - `strategy_version_id` (number): 0 = latest source
 
@@ -313,7 +323,7 @@ Delete strategies/robots/nodes, publish strategies. Never included in a key by d
 
 ### delete_strategy
 
-[danger] Delete one of the user's own strategies (soft delete, but there is no undo for the user; rented strategies cannot be deleted here). Refused while any robot, even a stopped one, still references it — delete those robots first.
+[danger] Delete one of the user's own strategies (soft delete, but there is no undo for the user; rented strategies cannot be deleted here). Refused while any robot, even a stopped one, still references it — find them with list_robots(strategy_id) and delete those robots first.
 
 - `strategy_id` (number, required)
 
