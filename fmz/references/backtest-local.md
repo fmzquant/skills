@@ -6,7 +6,7 @@ The platform publishes its backtest engine as a local package, so a JavaScript o
 
 | | Local engine | Cloud (`run_backtest`) |
 |---|---|---|
-| Languages | Python (works), JavaScript (package currently fails to load on Node 26, see below) | all eight |
+| Languages | JavaScript and Python (see the package notes below) | all eight |
 | Templates / class libraries | not resolved: paste the template code into the file | attached automatically |
 | Speed, measured | 2 weeks of 1h bars (15m base): 0.6 s end to end on a laptop | queue + run + poll, tens of seconds to minutes |
 | Limits | none (your CPU) | account concurrency slots |
@@ -14,6 +14,8 @@ The platform publishes its backtest engine as a local package, so a JavaScript o
 | Result | raw engine JSON (`Join(False)`), pandas frame (`Join(True)`), chart (`Show()`) | `get_backtest` summary / logs / full |
 
 ## Python engine
+
+The two engines share the core and the result format; pick the one matching the strategy language.
 
 Install once (Windows, Linux, macOS; Python 2 and 3 per the project README, tested here on 3.14):
 
@@ -85,7 +87,25 @@ To report the same numbers `get_backtest` gives: `profit` = last `ProfitLogs` va
 
 ## JavaScript engine
 
-Package: https://github.com/fmzquant/backtest_javascript (`npm install git+https://github.com/fmzquant/backtest_javascript.git`, then `var fmz = require("fmz"); var task = fmz.VCtx({start, end, period, exchanges}); ...; task.Join()`). As of October 2026 the published bundle fails at `require` time on Node 26 with `TypeError: Cannot read properties of null (reading 'talib')` (it touches the wasm module before the asynchronous instantiation has finished), so treat it as unavailable until the package is fixed: backtest JavaScript strategies on the cloud, or port the logic to the Python engine for the fast loop.
+Package: https://github.com/fmzquant/backtest_javascript.
+
+```bash
+npm install git+https://github.com/fmzquant/backtest_javascript.git
+```
+
+```javascript
+var fmz = require("fmz")
+var task = fmz.VCtx({
+  start: "2026-09-01 00:00:00", end: "2026-09-15 00:00:00", period: "1h", basePeriod: "15m",
+  exchanges: [{ eid: "Binance", currency: "BTC_USDT", balance: 10000, stocks: 0 }]
+})
+// exchange / exchanges / Log / TA / talib ... are globals from here on; paste the strategy and call main()
+try { main() } catch (e) { /* the engine throws "EOF" when the virtual clock reaches `end` */ }
+var result = JSON.parse(task.Join())      // same JSON as the Python engine's Join(False)
+console.log(result.Profit, result.LogsCount)
+```
+
+`task.Join(true)` returns a small table object (PnL / Utilization) instead. Two defects were fixed in the engine source on 2026-10-07: packages published before that fail at `require` on current Node with `TypeError: Cannot read properties of null (reading 'talib')`, and `period: "1h"` was read as 6 minutes (use `"60m"` with an old package). If you hit either, reinstall the package; if it still fails, fall back to the cloud or the Python engine.
 
 ## Recommended loop
 

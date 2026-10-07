@@ -255,7 +255,7 @@ if (id instanceof Error) { ctx.log("rejected", id.message); }
 - **`wait()` semantics.** `undefined` = timed out (call `wait` again), `null` = the call failed; waiting on a consumed object errors.
 - **Strings.** Byte strings that cannot be encoded come back as `ArrayBuffer`; every string parameter accepts `ArrayBuffer` too (user-guide "JavaScript Strategy Writing Guide").
 - Before saving run `check_strategy`; before going live run `run_backtest` and read `error_lines`; test with a sandbox account or a tiny amount first (`SKILL.md`).
-- Fast local iteration: the platform's local engine (`references/backtest-local.md`) runs on this machine in seconds, but the JavaScript package currently fails to load on Node 26; backtest JS on the cloud, or port the logic to Python for the local loop.
+- Fast local iteration: the platform's local engine (`references/backtest-local.md`) runs a JavaScript strategy on this machine in seconds (`npm install git+https://github.com/fmzquant/backtest_javascript.git`); confirm on the cloud with `run_backtest` before going live.
 
 ## References
 
