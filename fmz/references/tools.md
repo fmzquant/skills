@@ -26,7 +26,7 @@ Account overview: counts of robots, strategies, exchange accounts and nodes, plu
 
 ### list_exchanges
 
-Exchanges the platform supports. `eid` is the exchange id used by run_backtest.
+Exchanges the platform supports. `eid` is the exchange id used by run_backtest (already the name the history data server uses, e.g. OKX / HTX); backtest=false means the platform has no history data for that exchange, so it can only be traded live.
 
 (no parameters)
 
@@ -44,7 +44,7 @@ The user's own nodes (the hosts that run robots). A robot can only start on an o
 
 ### list_strategies
 
-List strategies. scope: mine (default; the user's own plus rented ones, see is_owner), public (community shared), official, templates. Use get_strategy for the source.
+List strategies. scope: mine (default; the user's own plus rented ones, see is_owner), public (community shared), official, templates (template libraries usable in save_strategy's `templates`: the user's own and rented ones plus the platform's built-in ones, marked builtin). Use get_strategy for the source.
 
 - `group_id` (number): Only this strategy group (see list_groups)
 - `keyword` (string): Fuzzy match on the strategy name
@@ -75,7 +75,7 @@ One saved strategy version, with its source when with_source is true.
 
 ### list_robots
 
-List the user's robots (live strategies) with status and profit. Use get_robot for configuration and get_robot_logs for what it is doing.
+List the user's robots (live strategies) with status and profit. `total` is how many robots match the filters (the page is a slice of it); `status_totals` counts ALL the user's robots per status, regardless of filters and paging. Use get_robot for configuration and get_robot_logs for what it is doing.
 
 - `group_id` (number): Only this robot group; 0 = ungrouped
 - `keyword` (string): Fuzzy match on the robot name
@@ -124,9 +124,9 @@ Start, poll, stop cloud backtests.
 
 ### run_backtest
 
-Start a backtest on the cloud cluster, either of a saved strategy (strategy_id) or of raw source (source + language). Returns task_id; poll with get_backtest. Prices come from the platform's history data; the simulated account per exchange starts with `balance` quote currency and `stocks` base currency.
+Start a backtest on the cloud cluster, either of a saved strategy (strategy_id) or of raw source (source + language). Returns task_id; poll with get_backtest at least every 5 minutes (a task nobody polls for 5 minutes is discarded, result included). Prices come from the platform's history data; the simulated account per exchange starts with `balance` quote currency and `stocks` base currency.
 
-- `args` (object): Strategy parameter values, {name: value} or [[name, value], ...]
+- `args` (object): Strategy parameter values, {name: value} or [[name, value], ...]. With strategy_id, omitted parameters take the strategy's defaults; with raw source there are no defaults, so pass every parameter the code reads. Libraries the language requires (e.g. the Pine / MyLanguage trading class) are attached automatically.
 - `begin` (string, required): ISO date or unix seconds
 - `end` (string, required): ISO date or unix seconds
 - `exchanges` (array of object, required): Simulated exchange accounts, e.g. [{"exchange":"Binance","pair":"BTC_USDT","balance":10000,"stocks":0}]. exchange = eid from list_exchanges; fee_maker/fee_taker in percent (default 0.15/0.2).
@@ -145,7 +145,7 @@ Start a backtest on the cloud cluster, either of a saved strategy (strategy_id) 
 
 ### get_backtest
 
-Progress or result of a backtest. With wait>0 the call blocks up to that many seconds for the task to finish. detail=summary (default) gives profit, max drawdown, order/error counts, error lines and the final accounts; logs adds the last runtime log lines; full returns the raw engine result.
+Progress or result of a backtest. With wait>0 the call blocks up to that many seconds for the task to finish. detail=summary (default) gives profit, max drawdown, order/error counts, error lines and the final accounts; logs adds the last runtime log lines; full returns the raw engine result. The task (and its result) is kept only while it is polled: 5 minutes after the last get_backtest call it is discarded, as it is by stop_backtest; a returned result frees the account's concurrency slot.
 
 - `detail` (string one of summary/logs/full)
 - `task_id` (string, required)
@@ -153,13 +153,13 @@ Progress or result of a backtest. With wait>0 the call blocks up to that many se
 
 ### list_backtests
 
-The account's cloud backtests that still hold a concurrency slot (running, or finished but never collected). Use stop_backtest on a stale one when run_backtest says too many are running.
+The account's cloud backtests that still hold a concurrency slot (running, or finished but not yet seen by get_backtest). When run_backtest says too many are running, get_backtest a finished one (that frees its slot) or stop_backtest a stale one.
 
 (no parameters)
 
 ### stop_backtest
 
-Stop a running backtest, or discard a finished one's result and free the node.
+Stop a running backtest, or discard a finished one. Read the result with get_backtest first: after stop_backtest the task and its result are gone (get_backtest then says not found). Not needed to free the concurrency slot after a result was read.
 
 - `task_id` (string, required)
 
@@ -202,7 +202,7 @@ Create a strategy (omit strategy_id) or update one of the user's own (pass strat
 - `note` (string): Private notes
 - `source` (string): Required when creating
 - `strategy_id` (number): Omit to create
-- `templates` (array of number): Ids of template strategies this one depends on
+- `templates` (array of number): Ids of template strategies this one depends on. The library the language requires (e.g. the Pine / MyLanguage trading class) is added automatically
 
 ### save_strategy_version
 
@@ -258,7 +258,7 @@ Turn the offline alert on or off for one of the user's nodes.
 
 ### delete_messages
 
-Delete notifications by id (see list_messages). kind must match the list they came from.
+Delete notifications by id (see list_messages). kind must match the list they came from. Returns `deleted` (how many were actually removed) and `not_found` (ids that matched no message of this account in that list).
 
 - `ids` (array of number, required)
 - `kind` (string one of robot/system)
@@ -313,7 +313,7 @@ Delete strategies/robots/nodes, publish strategies. Never included in a key by d
 
 ### delete_strategy
 
-[danger] Delete one of the user's strategies (soft delete, but there is no undo for the user). Refused while any robot, even a stopped one, still references it — delete those robots first.
+[danger] Delete one of the user's own strategies (soft delete, but there is no undo for the user; rented strategies cannot be deleted here). Refused while any robot, even a stopped one, still references it — delete those robots first.
 
 - `strategy_id` (number, required)
 

@@ -15,7 +15,8 @@ Two ways to run a backtest, same engine core and the same history data:
 
 1. `run_backtest` submits a task to the cloud cluster and returns `task_id` immediately.
 2. `get_backtest(task_id, wait)` returns progress or the result. `wait` (0-60 s) blocks on the server, polling every 2 s, so one call per minute is enough. While running it returns `{status:"running", progress, elapsed_ms, logs_count}`.
-3. `stop_backtest(task_id)` stops a running task or discards a finished one. Call it once you have read the result: a task holds one of the account's concurrency slots while running **and after finishing until it is collected or stopped**. Results are kept only a few minutes after completion; afterwards `get_backtest` says `not found`.
+3. Read the result **before** calling `stop_backtest`: stopping deletes the task and its result on the node. A task nobody polls for 5 minutes (running or finished) is also discarded by the cluster, so keep polling with `wait` until you have read it. Reading a finished result already frees its slot.
+4. `stop_backtest(task_id)` stops a running task or discards a finished one. Call it once you have read the result: a task holds one of the account's concurrency slots while running **and after finishing until it is collected or stopped**. Results are kept only a few minutes after completion; afterwards `get_backtest` says `not found`.
 4. `list_backtests` lists the tasks still holding a slot (`task_id`, `started`). Use it with `stop_backtest` when `run_backtest` says too many are running.
 
 `run_backtest` takes either `strategy_id` (own, rented or public; its templates are attached automatically and `args` override saved parameter values) or `source` + `language` (raw code). Supported strategy languages on the platform: JavaScript, TypeScript, Python, C++, Rust, Pine, My language, Blockly, Workflow; the tool's `language` enum lists what it accepts.
@@ -102,7 +103,7 @@ The open-source local engines (`backtest_python`: `VCtx(__doc__)`, `backtest_jav
 | Field | Meaning |
 |---|---|
 | `status` | `done`, `error` (engine `TaskStatus` 2; see `exception`), or `running` |
-| `elapsed_ms` | wall time the engine spent |
+| `elapsed_ms` | wall time the engine spent, milliseconds |
 | `profit` | last `LogProfit` value (quote currency) |
 | `max_drawdown` | largest peak-to-trough drop of the `LogProfit` curve, absolute, same unit as `profit` |
 | `profit_curve` | ~60 sampled `[iso_time, profit]` points |
