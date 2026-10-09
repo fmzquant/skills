@@ -2,349 +2,1040 @@
 
 由 https://www.fmz.com/user-guide 生成：平台如何运作（托管者、实盘、策略、模板、回测、扩展 API、MCP），面向人写的说明；agent 用它理解概念与限制。
 
-## 欢迎使用发明者量化交易平台
+## 入门
 
-发明者量化交易平台是量化交易领域最专业的量化社区。在这里，您可以学习、编写、分享、出售量化交易和程序化交易策略；进行在线回测和模拟盘交易；运行、公开、围观策略实盘。发明者量化交易平台（FMZ量化）支持几乎所有主流加密货币交易所。
-在发明者量化交易平台学习和使用过程中遇到问题，可以随时到论坛发帖提问、讨论，在平台提交工单，或在[Telegram](https://t.me/fmzquant_cn)社群@管理员，问题通常会得到快速解答。平台支持ChatGPT辅助开发，发明者量化交易平台已接入**ChatGPT**作为辅助开发工具，您可以在「控制中心」的快捷方式栏内点击「ChatGPT」跳转至[ChatGPT辅助工具页面](https://www.fmz.com/m/chat)。
+第一次使用先读这里：认识平台、从添加交易所到运行实盘的五个步骤、密钥的安全设置。
 
-在发明者量化交易平台，您可以通过注册和登录开始您的量化交易之旅。登录后，访问[主页面](https://www.fmz.com/m)，您将看到以下内容：
+### 欢迎使用发明者量化交易平台
+
+发明者量化交易平台（FMZ量化）是一个量化交易平台：在网页上编写策略、在线回测，然后在自己部署或租用的托管者上运行实盘；也可以在策略广场学习、分享、出租策略，或公开展示自己的实盘。
+
+**支持的市场**
+- 加密货币：主流中心化交易所的现货、期货与永续合约，以及部分链上交易所。
+- 证券与期货：富途证券、盈透证券（Interactive Brokers）等。
+- 平台尚未对接的交易所，可以通过`通用协议`自行接入。
+
+**支持的策略语言**
+JavaScript、TypeScript、Python、Rust、PINE、My语言（麦语言）、Blockly可视化和Workflow工作流，见`编程语言`。
+
+**AI 辅助**
+- 策略编辑器内置`AI助手`，可以生成、解释、修改策略代码并分析回测结果。
+- 也可以把自己使用的外部 AI 助手接入平台，通过对话管理策略、回测和实盘，见`AI接入`。
+
+**控制台**
+注册并登录后进入[控制台](https://www.fmz.com/m)：
+
 ![控制中心概览](https://www.fmz.com/upload/asset/2e4e636a6fe51c8f620e8.png)
 
-- 左侧导航栏：包含用户控制台的主要功能跳转选项。
-- 顶端导航栏：提供平台公共资源的跳转选项。
-- 页面中部：展示账户设置、调试工具、分析工具、开发文档、平台功能快捷跳转等内容。
+- [控制中心](https://www.fmz.com/m/dashboard)：账户概况和常用功能入口。运行一个实盘需要三样东西：一个在线的托管者、一个策略、一个配置好的交易所账户。
+- [实盘](https://www.fmz.com/m/robots)：创建、管理、控制实盘。实盘即运行中的策略程序实例。
+- [策略库](https://www.fmz.com/m/strategies)：编写、保存、分组管理各种语言的策略。
+- [托管者](https://www.fmz.com/m/nodes)：部署和管理运行策略的托管者程序。
+- [交易所](https://www.fmz.com/m/platforms)：添加和管理交易所账户。
 
-用户控制台主要功能：
-- [控制中心](https://www.fmz.com/m/dashboard)
-  跳转至『控制中心』页面。在发明者量化交易平台运行量化交易程序（即实盘）需要满足三个条件：1、部署一个可用的托管者。2、拥有一个可用的策略。3、配置交易所账户供策略程序操作。
-- [实盘](https://www.fmz.com/m/robots)
-  跳转至『实盘』页面。实盘即量化交易策略程序实例。实盘页面主要用于管理、创建和控制策略实盘。
-- [策略库](https://www.fmz.com/m/strategies)
-  跳转至『策略库』页面。策略库可以分类保存、管理和编写各种编程语言的策略。
-- [托管者](https://www.fmz.com/m/nodes)
-  跳转至『托管者』页面。托管者页面可以管理和部署当前账户关联的托管者程序。
-- [交易所](https://www.fmz.com/m/platforms)
-  跳转至『交易所』页面。交易所页面可以管理和配置需要进行量化交易的交易所账户。
+**平台公共资源**
+- [策略广场](https://www.fmz.com/square)：公开分享或上架出租的策略，适合学习和参考。
+- [实盘围观](https://www.fmz.com/live)：用户公开展示的实盘。
+- [文库](https://www.fmz.com/digest)：平台原创文章。
+- [社区](https://www.fmz.com/bbs)：交流、讨论量化交易的论坛。
+- [众包](https://www.fmz.com/markets)：发布和承接策略开发需求。
+- [公开课](https://www.fmz.com/class)：视频教程。
+- [API文档](https://www.fmz.com/api)：策略编写的API语法手册。
 
-平台公共资源：
-- [策略](https://www.fmz.com/square)
-  在策略广场，您可以找到各种编程语言编写的公开或出租策略，适合学习和参考。
-- [围观](https://www.fmz.com/live)
-  实盘围观页面展示用户公开的策略实盘。
-- [文库](https://www.fmz.com/digest)
-  平台文库保存了平台原创文章等资料，方便您入门学习。
-- [社区](https://www.fmz.com/bbs)
-  社区论坛为您提供交流和讨论量化交易领域的平台。
-- [众包](https://www.fmz.com/markets)
-  众包版块为策略设计者和需求者搭建高效的沟通渠道。
-- [公开课](https://www.fmz.com/class)
-  公开课页面提供平台的视频教程。
-- [API文档](https://www.fmz.com/api)
-  API文档页面为您编写和设计策略提供技术资料支持。
+**获取帮助**
+遇到问题可以在社区发帖、在控制台提交工单，或在[Telegram](https://t.me/fmzquant_cn)社群联系管理员。
 
-## 编程语言
+### 快速开始
+
+从添加交易所到运行第一个实盘，按下面五步完成，每一步后面标了详细说明所在的章节。
+
+**1. 添加交易所账户**
+
+在控制中心的「交易所」页面添加交易所的API KEY。API KEY只开启读取和交易权限，不要开启提现；第一次使用建议先用交易所的模拟盘或小额子账号。见`交易所`和`密钥安全性`。
+
+**2. 部署托管者**
+
+托管者是运行策略的程序，策略和实盘都运行在托管者上。可以一键租用平台提供的托管者，也可以部署在自己的服务器上。见`托管者`。
+
+**3. 编写策略**
+
+在「策略库」新建策略并选择编程语言。策略由入口函数```main()```和其中的主循环构成：每轮获取行情、计算信号、下单，然后休眠等待下一轮。见「编写策略」，其中`策略结构`有各语言的主循环模板和全部API函数的速查表。也可以从策略广场复制一个公开策略开始。
+
+**4. 回测**
+
+在策略编辑页面选择交易所、交易对、时间范围和K线周期后开始回测，检查收益曲线、交易记录和日志。回测通过后再上实盘。见`回测系统`。
+
+**5. 创建实盘**
+
+在控制中心的「实盘」页面新建实盘，选择策略、托管者和交易所账户，设置策略参数后启动。实盘按小时计费，启动前账户里需要有余额，见`实盘计费与充值`。运行状态、日志和收益在实盘页面查看，异常可以推送到手机。见`实盘`。
+
+之后可以按需阅读：「开发工具」介绍编辑与调试，「进阶专题」介绍限流、实盘间通信、多线程和链上交易，「对外接口」介绍用程序或AI助手操作平台。
+
+### 密钥安全性
+
+交易所密钥一旦泄露，损失的是交易所账户里的资产。配置交易所账户前，按下面的清单检查一遍：
+
+- **只开交易权限**：API KEY只开启读取和交易权限，**不要开启提现**。
+- **绑定 IP 白名单**：在交易所把API KEY绑定到托管者所在服务器的出口IP。服务器有多个IP时，用托管者的```-I```参数固定出口IP，见`命令行参数`。
+- **私钥留在本地**：交易所支持RSA等非对称密钥时优先使用；私钥以凭据文件的形式放在托管者所在的机器上，平台只保存文件路径，见`本地凭据文件`。
+- **先小额试运行**：第一次运行新策略时使用交易所的模拟盘或小额子账号。
+- **不公开敏感信息**：策略代码、参数、描述里如果写了密钥、账号等信息，不要公开或出售该策略。
+
+平台如何保存密钥：在交易所配置页面填写的密钥等加密字段，在浏览器端用平台账号密码加密后才上传，平台不保存明文；只有用账号密码启动的托管者能在本地解密。因此修改平台账号密码后，原有的交易所配置会失效，处理方法见`实盘报错、异常退出的常见原因`。
+
+## 平台基础
+
+平台的几个基本对象：账号与计费、交易所账户、运行策略的托管者、策略库和实盘。
+
+### 账号与计费
+
+实盘怎样计费、如何充值，以及如何用子账号把部分实盘交给他人管理。账号的其它设置（推送、二次验证、API接口等）在[账号设置页面](https://www.fmz.com/m/account)。
+
+#### 实盘计费与充值
+
+**实盘计费**
+- 实盘按小时计费，每个实盘每小时 0.05 USD，不足一小时按一小时计费。
+- 创建实盘即开始计费，启动时需要预付第一个小时，账户余额不足时实盘无法启动。实盘「停止」/「重启」不会重复计费。
+- 实盘运行中账户余额耗尽时，平台会停止该实盘；租用的策略到期时，使用该策略的实盘同样会被停止。
+- 一键租用托管者的服务器费用单独计费，与实盘计费无关，见`一键租用托管者`。
+
+**查询账单与余额预警**
+- 在[充值页面](https://www.fmz.com/m/billing)可以查看余额、充值记录和所有计费的账单明细。
+- 在[账号设置的额度预警](https://www.fmz.com/m/account#alertthreshold)中设置预警阈值：可用余额低于该值时会收到邮件和微信通知（24小时内最多通知一次，充值或修改设置后重新计算）；设置为0表示关闭。
+
+**充值**
+在[充值页面](https://www.fmz.com/m/billing)选择充值方式和金额。使用```USDT```充值时务必注意：
+- 转账网络必须与充值页面选择的网络一致，目前支持TRC20、ERC20、BSC。ERC20与BSC的地址都以```0x```开头，格式相同，最容易选错。
+- 充值资产选择```USDT```。
+- 转账地址与充值页面显示的地址一致。
+
+#### 子账号
+
+子账号用来把部分实盘交给他人查看和操作，而不交出主账号。
+
+**创建子账号**
+在[账号设置页面](https://www.fmz.com/m/account#shadowmember)打开子账号页签，在操作权限中选择该子账号可以访问的实盘，填写子账号的用户名和登录密码后创建。创建后的子账号显示在同一页面，可以修改、锁定/解锁、删除。
+
+![子账号设置](https://www.fmz.com/upload/asset/2e46d725dbe6b471f1b33.png)
+
+**子账号的权限**
+子账号只能看到授权给它的实盘。对这些实盘可以修改参数、停止、重启，但不能修改实盘配置的交易所对象。
+
+**常见用途**
+- 量化团队分工管理多个实盘。
+- 出租策略时，让租用方协助调试实盘。
+
+### 交易所
+
+[交易所](https://www.fmz.com/m/platforms)页面用来管理已配置的交易所账户。在发明者量化交易平台中，「交易所」指一个可供策略程序操作的账户：它包含资金账户的密钥配置，以及与该交易所通信的协议和接口封装。
+
+在交易所管理页面点击「添加交易所」进入[交易所添加页面](https://www.fmz.com/m/add-platform)，按需选择交易所并填写配置。密钥等加密字段在浏览器端加密后才保存到平台，平台不记录明文，见`密钥安全性`。
+
+**交易所对象**
+配置好的交易所在策略代码中就是交易所对象`exchange`。配置回测或实盘时可以添加多个交易所，在代码中对应交易所对象数组`exchanges`。
+
+**使用交易所对象**
+在策略代码中通过交易所对象读取账户和行情、下单、撤单，以```JavaScript```为例：
+
+```js
+function main() {
+    let account = exchange.GetAccount()    // 查询账户信息
+    let ticker = exchange.GetTicker()      // 获取ticker行情
+    let id = exchange.Buy(1000, 1)         // 价格为1000，下单量为1
+    if (id) {
+        exchange.CancelOrder(id)           // 下单成功才有订单Id，订单未成交时可以撤单
+    }
+}
+```
+
+本章其余内容：
+- `通用协议`：接入平台尚未对接的交易所。
+- `本地凭据文件`：把私钥等敏感信息只保存在托管者所在的机器上。
+- `交易所特殊说明`：个别交易所的配置方法和与通用行为不同之处。
+
+#### 通用协议
+
+对于发明者量化交易平台尚未封装对接的交易所API接口，可通过编写通用协议插件程序进行接入。
+
+![通用协议配置截图](https://www.fmz.com/upload/asset/2e43b059b3ec9f42ded6e.png)
+
+该通用协议可用于接入任何提供API接口的交易所，支持以下两种协议：
+- ```REST```协议：[参考文档](https://www.fmz.com/digest-topic/10518)。
+- ```FIX```协议：[参考项目](https://github.com/fmzquant/fixc)。
+
+```FIX```协议插件程序与```REST```协议插件程序的区别仅在于插件程序与交易所接口的交互方式不同。协议插件程序与发明者量化托管者程序的交互方式、数据格式等细节处理完全相同，具体实现可参考上述链接中的示例。
+
+#### 本地凭据文件
+
+配置交易所时，所有带掩码的加密输入框（Secret Key、私钥、密码等）都可以不填写内容本身，而填写一个凭据文件路径```file:///文件名.txt```。实盘运行时，托管者从本机读取该文件的内容作为这一项的值。这样私钥只存在于托管者所在的机器上，平台上保存的只是一个路径。
+
+**路径规则**
+- 路径相对于**本实盘的目录**```logs/storage/<实盘ID>/```解析（```logs```位于托管者的工作目录下）。例如实盘ID为```123456```时，```file:///rsaKey.txt```对应```logs/storage/123456/rsaKey.txt```。
+- 可以有子目录，例如```file:///keys/rsaKey.txt```。
+- 只认```.txt```后缀；其它后缀不会当作文件读取，而是把这串文字原样作为配置值。
+- 路径不能是绝对路径，不能包含```..```，解析后也不能跳出实盘目录（指向目录外的符号链接同样不行）。
+- 凭据文件按实盘目录读取，多个实盘使用同一个交易所配置时，每个实盘的目录里都要放一份。
+- 文件读不到时实盘启动失败，报错中包含```read key file```；路径不合法时报错为```key file path must be relative and cannot contain '..'```或```key file path escapes the robot directory```。
+
+**示例：使用 RSA 密钥**
+以支持```RSA KEY```验证的交易所为例：
+1. 生成RSA公钥和私钥，例如用```openssl```生成PKCS#8格式的密钥对。
+2. 在交易所创建```RSA KEY```，上传第1步生成的公钥。
+3. 在平台配置交易所：```Access Key```填写交易所创建的```RSA KEY```，```Secret Key```填写```file:///rsaKey.txt```。
+4. 创建实盘，得到实盘ID（例如```123456```）。
+5. 把第1步生成的私钥保存为```logs/storage/123456/rsaKey.txt```，然后启动（或重启）实盘。
+
+详细过程可以参考[视频讲解](https://www.bilibili.com/video/BV1UM41147Jj/)。
+
+#### 交易所特殊说明
+
+个别交易所的配置方法，以及与通用接口行为不同的地方。没有列出的交易所按语法手册中的通用说明使用；各交易所```exchange.IO()```支持的切换功能见`exchange.IO`。
+
+##### 证券与期货
+
+**富途证券**
+
+支持富途牛牛的实盘交易和模拟交易，需要在托管者所在的机器上运行[```FutuOpenD```](https://www.futunn.com/download/OpenAPI?lang=zh-CN)。配置交易所对象、运行```FutuOpenD```等操作参看[富途证券配置说明文档](https://www.fmz.com/bbs-topic/10185)。
+
+使用```FutuOpenD```接入模拟交易时，有些股票代码不支持，因而无法交易（富途牛牛手机App上可以模拟交易）。
+
+- 接口调用频率
+  ```GetOrder```、```GetOrders```、```GetPositions```、```GetAccount```默认使用**缓存数据**，不限制调用频率；```FutuOpenD```收到新数据时会自动更新缓存。
+  调用```exchange.IO("refresh", true)```可以禁用缓存，禁用后的调用频率为**每30秒内最多10次查询**，超过会报错。
+
+- 股票代码
+  格式为```代码.市场```，例如```600519.SH```。市场后缀：
+  - HK：港股
+  - US：美股
+  - SH：沪市
+  - SZ：深市
+  - SG：新加坡期货
+  - JP：日本期货
+
+  在策略中用```exchange.SetContractType()```设置股票代码，例如：
+
+  ```js
+  function main() {
+      var info = exchange.SetContractType("600519.SH")    // 设置为股票600519.SH（贵州茅台），账户切换到A股市场
+      Log(info)
+      Log(exchange.GetAccount())                          // 当前股票是茅台，GetAccount返回A股市场的账户资产
+      Log(exchange.GetTicker())                           // 获取茅台的当前行情
+  }
+  ```
+
+  ```python
+  def main():
+      info = exchange.SetContractType("600519.SH")
+      Log(info)
+      Log(exchange.GetAccount())
+      Log(exchange.GetTicker())
+  ```
+
+  ```rust
+  fn main() {
+      let info = exchange.SetContractType("600519.SH");    // 设置为股票600519.SH（贵州茅台），账户切换到A股市场
+      Log!(info);
+      Log!(exchange.GetAccount());                          // 当前股票是茅台，GetAccount返回A股市场的账户资产
+      Log!(exchange.GetTicker(None));                       // 获取茅台的当前行情
+  }
+  ```
+
+  设置交易方向的```exchange.SetDirection```、下单的```exchange.Buy```/```exchange.Sell```、撤单的```exchange.CancelOrder```、查询订单的```exchange.GetOrder```等函数，用法与期货市场相同。
+
+- 账户信息
+  富途用```TrdMarket```区分香港市场、美国市场、大陆市场等。以下摘自[```Futu API```文档](https://openapi.futunn.com/futu-api-doc/)：
+
+  ```go
+  const (
+      TrdMarket_TrdMarket_Unknown TrdMarket = 0 // 未知市场
+      TrdMarket_TrdMarket_HK      TrdMarket = 1 // 香港市场
+      TrdMarket_TrdMarket_US      TrdMarket = 2 // 美国市场
+      TrdMarket_TrdMarket_CN      TrdMarket = 3 // 大陆市场
+      TrdMarket_TrdMarket_HKCC    TrdMarket = 4 // 香港A股通市场
+      TrdMarket_TrdMarket_Futures TrdMarket = 5 // 期货市场
+  )
+  ```
+
+  ```exchange.GetAccount()```返回的数据：
+
+  ```json
+  {
+      "Info": [{
+          "Header": {
+              ...                 // 省略
+              "TrdMarket": 1      // Info原始数据中的市场ID，表示香港市场的账户资产
+          },
+          "Funds": {              // 该市场的账户资产信息
+              ...
+          }
+      }, ...],
+      "Stocks": 0,
+      "FrozenStocks": 0,
+      "Balance": 1000000,         // 当前市场的资产
+      "FrozenBalance": 0
+  }
+  ```
+
+- ```FutuOpenD```按登录的**IP**地址区分地区，非大陆IP登录的账户获取行情时有所限制，具体查阅```FutuOpenD```（富途）官方文档。
+
+**盈透证券（Interactive Brokers）**
+
+- 配置交易所
+  需要在托管者所在的机器上运行「IB Gateway」或「TWS（Trader Workstation）」。以TWS为例：登录后点击右上角的配置按钮，选择「配置」→「API」→「设置」，**不要**勾选「只读API」，勾选「启用ActiveX和套接字客户端」，并记下「套接字端口」（TWS默认实盘7496、模拟盘7497；IB Gateway默认实盘4001、模拟盘4002）。
+  然后在平台的[交易所添加页面](https://www.fmz.com/m/add-platform)选择**盈透证券（Interactive Brokers）**：
+  - 服务器地址：TWS或IB Gateway的地址和端口，例如```localhost:7496```。
+  - 行情类型：实时数据、冻结数据、延迟数据、延迟冻结数据之一。没有订阅实时行情的账户可以选择延迟数据。运行中也可以用```exchange.IO("marketDataType", n)```切换（```n```为1到4，顺序同上）。
+
+- 合约代码
+  用```exchange.SetContractType()```设置，格式为```代码.货币[.类型[.交易所]]```，类型缺省为股票```STK```，交易所缺省为```SMART```：
+  - 美股：```AAPL.US```、```TSLA.US```（```US```表示美元计价）。
+  - 港股：```代码.HK```（```HK```表示港币计价）。
+  - 期货（```FUT```）：```代码-到期月份[-乘数].货币.FUT.交易所```，到期月份写成```YYYYMM```，交易所为IB的交易所代码。
+  - 期权（```OPT```）与期货期权（```FOP```）：```代码-到期-C或P-行权价×100[-乘数].货币.OPT或FOP.交易所```，行权价乘以100后写成整数。
+  - 纯数字：直接作为IB的合约ID（conId）。
+
+- 其它说明
+  - 托管者以实盘ID作为连接TWS的客户端号（clientId），实盘重启后客户端号不变，仍可撤销、修改此前挂出的订单。TWS只允许订单的原始客户端号（或主客户端）修改、撤销订单。
+  - 持仓、订单的```Symbol```是简写形式（如```Z74.SGD```），```exchange.GetPositions()```、```exchange.GetOrders()```传入简写或下单时用的完整代码（如```Z74.SGD.STK.SGX```）都可以。
+  - 订单被网关拒绝时，订单```Info```中的```Reject```字段记录拒单原因。
+  - ```exchange.IO("debug", true)```开启后，与TWS收发的每一帧按TWS API日志的格式输出到日志，便于与网关日志对照排查。
+
+##### 加密货币
+
+- Futures_Binance
+  支持币安的中文交易对：
+
+  ```js
+  function main() {
+      let ticker = exchange.GetTicker("币安人生_USDT.swap")
+      Log("ticker:", ticker)   // {"Info":{...},"Symbol":"币安人生_USDT.swap","Open":0.29622,"High":0.31661, ...}
+  }
+  ```
+
+  币安期货的```exchange.IO()```切换功能（双向持仓、逐仓/全仓、统一账户、STP模式等）见`exchange.IO`。
+- Futures_HuobiDM
+  使用```exchange.IO("base", "https://xxx.xxx.xxx")```或```exchange.SetBase("https://xxx.xxx.xxx")```切换交易所接口的基地址。
+
+  火币期货的```exchange.IO()```切换功能（signHost、逐仓/全仓、单向/双向持仓、统一账户等）见`exchange.IO`。
+
+  条件单不支持OCO类型（```ORDER_CONDITION_TYPE_OCO```）；多资产保证金模式下同样可以使用条件单。
+- Huobi
+  支持火币的中文交易对：
+
+  ```js
+  function main() {
+      let ticker = exchange.GetTicker("币安人生_USDT")
+      Log("ticker:", ticker)   // {"Info":{...},"Symbol":"币安人生_USDT","Open":0.29622,"High":0.31661, ...}
+  }
+  ```
+- Bitfinex
+  现货市价买单的下单量是交易币数，不是金额。
+- AscendEx
+  现货市价买单的下单量是交易币数，不是金额。
+- Futures_Hyperliquid
+  参考[Hyperliquid 使用指南](https://www.fmz.com/digest-topic/10574)。
+
+  Hyperliquid期货的```exchange.IO()```切换功能（逐仓/全仓、主网/测试网、vaultAddress、walletAddress、expiresAfter等）见`exchange.IO`。
+- Futures_Lighter
+  测试环境可以在配置交易所对象时勾选，也可以用```exchange.SetBase()```修改REST API端点切换到测试环境。
+
+  Futures_Lighter的```exchange.IO()```切换功能（逐仓/全仓、订单过期时间等）见`exchange.IO`。
+
+  ```exchange.GetTickers()```返回的```Buy```、```Sell```是各品种的最新成交价（交易所没有批量盘口接口）；需要买一、卖一价时用```exchange.GetTicker()```或```exchange.GetDepth()```。
+- Futures_edgeX
+  edgeX的永续合约都以USDC计价，交易对写作```BTC_USDC```等，完整代码形如```BTC_USDC.swap```；写成```BTC_USDT```、```BTC_USD```会提示合约不存在。
+- Poloniex
+  现货条件单只支持止损（```ORDER_CONDITION_TYPE_SL```）：买单在价格涨到触发价时触发，卖单在价格跌到触发价时触发。止盈（```ORDER_CONDITION_TYPE_TP```）和OCO条件单会直接报错，不会下单。
+
+### 托管者
+
+[托管者](https://www.fmz.com/m/nodes)是运行策略的程序：实盘策略运行在托管者上，而不是运行在发明者量化交易平台网站上。托管者负责与平台通信、启动和停止策略进程、回传日志；策略访问交易所的网络请求也都从托管者所在的机器发出。托管者运行在你自己的服务器（或一键租用的服务器）上，平台网站出现网络故障也不影响托管者上正在运行的实盘。
+
+**支持的系统**
+托管者只发布64位版本：Linux（x86_64、ARM64）、macOS（Intel、Apple Silicon）、Windows（x64、ARM64，另有界面版）。不支持32位系统。
+
+**数据目录**
+托管者的数据都在工作目录（默认为启动目录，可用```-w```指定）下的```logs```目录中：
+- ```logs/storage/<实盘ID>/<实盘ID>.db3```：实盘数据库（```SQLite```），保存日志、收益、图表、状态栏和```_G()```数据，可以用```SQLite```管理软件打开。
+- ```logs/storage/<实盘ID>/stdout.log```、```stderr.log```：策略进程的标准输出和标准错误。
+- ```logs/docker.log```：托管者自身的运行日志。
+- ```logs/docker.pid```：托管者的身份信息，保留它，重启后平台会沿用原来的托管者ID。
+
+**网络代理**
+托管者不会读取系统代理设置或```HTTP_PROXY```等环境变量。需要通过代理访问交易所时：
+- 在策略中用`exchange.SetProxy`给交易所对象设置代理；
+- 或使用在网络层接管流量的透明代理（例如 Clash 的 TUN 模式），托管者无需任何配置。
+
+本章内容：`部署托管者`（手动部署、一键租用、操作注意事项）、`命令行参数`、`实盘数据迁移`、`托管者监控`。
+
+#### 部署托管者
+
+[托管者管理页面](https://www.fmz.com/m/nodes)列出当前账号下的托管者，可以切换列表或详细信息展示，查看托管者的IP地址、版本、编译时间等信息。点击**部署托管者**进入[托管者部署页面](https://www.fmz.com/m/add-node)，有两种方式：一键租用托管者、手动部署托管者。
+
+![托管者部署页面](https://www.fmz.com/upload/asset/2e527e497b3fa27ba497b.png)
+
+##### 一键租用托管者
+
+在[托管者部署页面](https://www.fmz.com/m/add-node)点击**一键租用托管者**标签，根据配置、服务器机房地区等需求选择需要部署的服务器。
+
+点击「立即购买」并输入当前发明者量化交易平台的账号密码进行验证，验证通过后将自动进行托管者程序部署。整个部署过程需要几分钟时间，系统会自动安装常用的Python库。
+
+点击「立即购买」后租用的服务器由于是通过平台代为租用，仅具有有限的系统权限，不支持远程登录。如果需要使用未预装的第三方Python库，建议使用私有服务器进行手动部署。
+
+通过**一键租用托管者**功能租用的服务器采用独立计费方式，与实盘计费相互独立。
+
+点击「重新部署」按钮不会删除托管者目录下logs目录中的实盘日志和数据文件。
+
+##### 手动部署托管者
+
+可以把托管者部署在个人电脑、服务器、树莓派（64位系统）等设备上。托管者只发布64位版本：
+- Linux命令行版：x86_64（amd64）、ARM64（aarch64）
+- macOS命令行版：Intel、Apple Silicon
+- Windows：x64、ARM64，各有命令行版和界面版
+
+在[托管者部署页面](https://www.fmz.com/m/add-node)点击**手动部署托管者**，按系统下载对应的托管者程序并解压，可执行文件```robot```即托管者程序。同一页面还显示部署需要的两项信息：
+
+![手动部署托管者页面](https://www.fmz.com/upload/asset/2e460507bc21582ba1448.png)
+
+1. 通信地址：包含账号UID，形如```node.fmz.com/123456```。
+2. 密码：UID对应的发明者量化交易平台账号的密码。
+
+**Windows界面版**
+运行```robot.exe```，在界面上填写通信地址和密码，点击启动。
+
+**命令行版**
+```bash
+chmod +x robot                      # Linux/macOS 首次运行前加上执行权限
+./robot -s node.fmz.com/123456      # 启动后提示输入密码，输入时不回显
+```
+
+```123456```只是示例，实际的通信地址在托管者部署页面查看。不要用```-p```在命令行里写明文密码，它会留在shell历史和进程列表里；需要无人值守启动时，把地址和密码写进只有自己可读的配置文件```robot.conf```：
+
+```bash
+cat > robot.conf <<'EOF'
+s=node.fmz.com/123456
+p=你的密码
+EOF
+chmod 600 robot.conf
+./robot -c robot.conf               # 启动目录下有robot.conf时，直接 ./robot 也会自动加载
+```
+
+全部参数和配置文件格式见`命令行参数`。
+
+**在后台运行**
+托管者忽略终端挂断信号：在SSH里前台启动后直接断开连接，托管者会继续运行，运行日志同时写在```logs/docker.log```。需要开机自启或崩溃后自动拉起时，可以用systemd等服务管理器运行，例如```/etc/systemd/system/robot.service```：
+
+```ini
+[Unit]
+Description=FMZ robot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+WorkingDirectory=/opt/robot
+ExecStart=/opt/robot/robot -c /opt/robot/robot.conf
+Restart=on-failure
+TimeoutStopSec=90
+
+[Install]
+WantedBy=multi-user.target
+```
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now robot
+```
+
+```systemctl stop robot```发送的```SIGTERM```会让托管者优雅退出：先停止其上的所有实盘、上报状态，再从平台下线。```TimeoutStopSec```留出足够的时间，避免收尾未完成就被强制结束。
+
+**升级托管者**
+策略运行时和交易所连接器由平台按需下发，不需要手动更新。升级托管者程序本身：先停止托管者（见`托管者操作注意事项`），用新版本替换```robot```可执行文件，再在**同一工作目录**启动。工作目录下的```logs```目录保留了托管者身份和实盘数据，启动后沿用原来的托管者ID。
+
+**用Docker容器隔离策略进程**
+Linux和macOS的命令行版可以用```-i```参数让每个策略进程运行在独立的Docker容器里（需要本机已安装并运行Docker）。这是策略进程的隔离方式，不是托管者本身的Docker镜像，参数见`命令行参数`。
+
+##### 托管者操作注意事项
+
+**先停实盘，再停托管者**
+删除托管者或停止托管者进程前，先确认它上面没有运行中的实盘。
+
+**正常停止托管者**
+- 命令行版：在终端按一次```Ctrl+C```，或向进程发送```SIGTERM```（```kill <PID>```、```systemctl stop```）。
+- Windows界面版：点击界面上的停止按钮。
+
+托管者收到停止指令后会优雅退出：先停止其上的所有实盘、上报最终状态，再从平台下线。收尾期间再按一次```Ctrl+C```会跳过状态上报和下线，直接退出，一般不要这样做。
+
+**避免强制结束**
+不要用```kill -9```结束托管者进程，也不要直接断电或强制关机。这样托管者来不及下线，平台上的实盘可能仍显示为运行中并继续计费；出现这种情况，需要先删除已离线的托管者，才能停止这些实盘。重启服务器前先停止托管者；用systemd等服务管理器运行时，系统关机会自动发送```SIGTERM```。
+
+#### 命令行参数
+
+命令行版托管者程序```robot```的启动方式：
+
+```bash
+./robot -s node.fmz.com/123456            # 启动后交互输入密码（不回显）
+./robot node.fmz.com/123456               # 简写：robot 地址 [密码]
+./robot -c robot.conf                     # 从配置文件读取参数
+./robot -v                                # 查看版本
+```
+
+**参数**
+
+| 参数 | 说明 |
+| --- | --- |
+| ```-s 地址``` | 与平台通信的地址，形如```node.fmz.com/123456```（```123456```为账号UID），可带```ws://```或```wss://```前缀。在[托管者部署页面](https://www.fmz.com/m/add-node)查看。 |
+| ```-p 密码``` | 账号密码。不建议使用：明文密码会留在shell历史和进程列表中。不给时启动后交互输入，或写在配置文件里。 |
+| ```-n 名称``` | 托管者名称，显示在平台的托管者页面上。 |
+| ```-w 目录``` | 工作目录。```logs```（实盘数据、托管者日志、身份文件）都在这个目录下。 |
+| ```-c 文件``` | 配置文件，格式见下文。 |
+| ```-u 用户``` | 仅Linux/macOS：以该系统用户运行策略进程，托管者本身需要以root运行。使用```-i```时忽略。 |
+| ```-I IP``` | 指定本机出口IP，托管者与平台的连接以及策略访问交易所的连接都绑定这个地址，见下文。 |
+| ```-i 镜像``` | 仅Linux/macOS：用该Docker镜像为每个策略进程创建独立容器运行，需要本机已安装并运行Docker。 |
+| ```-e 路径``` | 配合```-i```：容器内的可执行文件路径。 |
+| ```-f JSON``` | 配合```-i```：Docker容器设置，可以直接写JSON，也可以写```@文件路径```从文件读取。 |
+| ```-H 地址``` | 配合```-i```：容器回连宿主机的地址。 |
+| ```-vv``` | 输出详细日志（托管者与平台的交互消息等），默认不输出，以免日志膨胀。 |
+| ```-d DNS``` | 旧版的自定义DNS参数，仍可接受但会被忽略，托管者一律使用系统的DNS解析。 |
+| ```-v```、```-V```、```--version``` | 打印版本和编译信息后退出。 |
+| ```-h```、```--help``` | 打印用法。 |
+| ```--ctl-stdin``` | 从标准输入读取控制指令（没有```-p```时第一行为密码），收到```stop```或输入结束时优雅退出。供把托管者封装成服务的程序使用。 |
+
+取值型参数也可以写成```-参数=值```，例如```-n=server01```。参数写错时打印用法并退出。
+
+**配置文件 robot.conf**
+每行一个```键=值```，键是参数名去掉```-```（```s p n w u I d i e f H vv```），```#```开头的行是注释：
+
+```ini
+# robot.conf
+s=node.fmz.com/123456
+p=你的密码
+n=server01
+vv=true
+```
+
+- 用```-c```指定配置文件；没有```-c```也没有给出通信地址时，如果启动目录下有```robot.conf```，会自动加载。
+- 同一项命令行和配置文件都给了时，以命令行为准。
+- 键区分大小写：```I```是出口IP，```i```是Docker镜像。
+- 配置文件路径和```-f @文件```都相对启动目录解析（在```-w```切换目录之前）。
+- 配置文件里有密码，记得设置只有自己可读（```chmod 600 robot.conf```）。
+
+**指定出口IP（-I）**
+服务器有多个IP地址，而交易所API KEY绑定了其中某个IP的白名单时，用```-I```指定出口IP，例如```./robot -s node.fmz.com/123456 -I 192.168.1.100```。指定后托管者与平台的连接、策略访问交易所的连接都从该地址发出。使用```-i```容器隔离时，容器的网络里可能没有这个地址，此时需要让容器使用宿主机网络。
+
+Windows界面版没有IP设置，需要指定出口IP时请使用命令行版。界面版只接受```-s```、```-p```、```-n```三个启动参数，用于预填界面，同时给出```-s```和```-p```时自动启动。
+
+#### 实盘数据迁移
+
+每个实盘的数据都在托管者工作目录下的```logs/storage/<实盘ID>/```目录里（数据库```<实盘ID>.db3```、```stdout.log```、```stderr.log```等）。平台显示的实盘日志、收益、图表都是从运行该实盘的托管者上读取的。
+
+**把单个实盘迁移到另一台机器的托管者**
+1. 停止该实盘。
+2. 把整个```logs/storage/<实盘ID>/```目录复制到新托管者工作目录下的相同位置，目录名保持为实盘ID。
+3. 在实盘配置中把托管者改为新托管者，再启动实盘。
+
+这样实盘原有的日志、收益等数据不会因为换了机器而丢失。
+
+**整体迁移托管者**
+1. 停止旧托管者上的实盘，再停止旧托管者。
+2. 把旧托管者工作目录下的整个```logs```目录复制到新机器的工作目录。
+3. 在新机器上启动托管者。
+
+```logs/docker.pid```保存了托管者的身份，旧托管者已离线时，新机器上的托管者会沿用原来的托管者ID，实盘配置无需修改。不要让两台机器同时使用同一份```logs```目录运行托管者。
+
+#### 托管者监控
+
+在[托管者管理页面](https://www.fmz.com/m/nodes)，托管者列表或托管者详情的操作项中可以开启**托管者监控**。开启后，托管者异常离线时，平台会向账号绑定的邮箱发送通知。
+
+### 策略库
+
+[策略库](https://www.fmz.com/m/strategies)页面保存当前账号下的所有策略，策略可以用多种编程语言或可视化方式编写。
+
+- 分组：策略和实盘一样可以分组管理，见`分组`。
+- 导入与导出：一个完整的策略除了源码，还包括参数、交互、描述、笔记、手册、模板引用等，迁移策略要导出、导入完整策略，见`完整策略的导入与导出`。
+- 分享与出租：生成「复制码」分享策略，生成「注册码」出租策略，见`策略分享与出租`。
+
+#### 完整策略的导入与导出
+
+迁移策略不能只复制源码：参数设计、交互设计、模板引用等都不在源码里。在策略编辑页面使用「导出策略」和「导入策略」可以完整地迁移一个策略。
+
+![策略导入导出截图](https://www.fmz.com/upload/asset/2e52ccf44526f396fb795.png)
+
+- 导出策略
+  导出为一个```xml```文件，所有编程语言的策略都一样。导出时可以勾选要包含的内容：策略名称、源码、笔记、描述、手册、模板引用、策略参数、交互控件、回测设置。
+
+- 导入策略
+  在策略编辑页面点击「导入策略」，选择用「导出策略」得到的```xml```文件，再勾选要导入的内容。导入后点击「保存」保存策略。
+
+#### 策略分享与出租
+
+在[策略库](https://www.fmz.com/m/strategies)页面，点击策略右侧的「操作项」按钮后，弹出菜单中包含分享和出租操作选项。
+
+重要提示：创建和分发策略**注册码**时，请务必仔细确认是「注册码」还是「复制码」，以免误将策略泄露。
+
+##### 策略分享
+
+![策略分享](https://www.fmz.com/upload/asset/2e593d57dc36afc004ef6.png)
+
+- 公开分享
+  点击「分享」按钮后会弹出对话框，可以选择「公开分享」。策略将完整地分享到平台的策略广场，任何用户都可以复制该策略。
+
+- 内部分享
+  点击「分享」按钮后会弹出对话框，可以选择「内部分享」。选择分享有效期、分享次数后会生成该策略的**复制页面地址**和**复制码**。可以分发给指定的FMZ平台用户，需要该策略的用户只需使用**复制页面地址**链接，登录**复制页面**后输入复制码即可获取该策略，获取后策略会自动出现在策略库中。
+
+##### 策略出租
+
+![策略出租](https://www.fmz.com/upload/asset/2e4e78f6c46c9dde1ce90.png)
+
+- 公开出售
+  点击「出租」按钮后会弹出对话框，可以选择「公开出售」。策略即可申请上架（需要通过审核）。
+
+- 内部出售
+  点击「出租」按钮后会弹出对话框，可以选择「内部出售」。选择使用天数、最大并发数、注册码数量后，系统会生成该策略的**注册页面地址**和**注册码**。您可以将其分发给指定的FMZ平台用户，需要该策略的用户只需访问**注册页面地址**链接，登录**注册页面**后输入注册码即可获取策略的使用权。策略也会出现在策略库中，但用户只有回测和实盘使用权限，无法查看策略源码等信息。并发实盘个数设置为0时表示不限制并发数量，允许无限制地创建实盘。
+
+### 实盘
+
+「实盘」区别于「回测」，指真正与交易所交互（获取行情、查询持仓、下单撤单等）的策略程序实例。连接交易所生产环境的是实盘，连接交易所模拟环境（很多交易所提供测试环境）的同样是实盘。
+
+**创建实盘**
+在[实盘创建页面](https://www.fmz.com/m/add-robot)选择运行策略、托管主机和交易所后创建，需要事先准备好三样东西：
+- 一个策略：在[策略库](https://www.fmz.com/m/strategies)点击「新建策略」编写并保存。
+- 一个在线的托管者：在[托管者页面](https://www.fmz.com/m/nodes)点击「部署托管者」，见`托管者`。
+- 一个交易所账户：在[交易所页面](https://www.fmz.com/m/platforms)点击「添加交易所」配置，见`交易所`。
+
+实盘按小时计费，账户余额不足时无法启动，见`实盘计费与充值`。
+
+**实盘监控**
+在[实盘管理页面](https://www.fmz.com/m/robots)，运行中的实盘右侧操作栏可以点击「监控」开启实盘监控。开启后，实盘不是因手动操作而退出时，平台会向账号绑定的邮箱发送通知。
+
+**实盘数据库**
+以实盘ID```123456```为例，它的数据库文件位于所属托管者工作目录下的```logs/storage/123456/123456.db3```（```SQLite```格式），包含以下表：
+- chart：图表数据。
+- cfg：状态栏内容、图表配置等最新状态。
+- kvdb：```_G()```函数持久化保存的数据。
+- log：实盘日志。
+- profit：收益数据。
+
+同一目录下还有策略进程的标准输出```stdout.log```和标准错误```stderr.log```。
+
+**本章内容**
+- `分组`：实盘和策略的分组管理。
+- `实盘围观`：公开展示实盘，或生成私有围观链接。
+- `实盘消息推送`：把日志推送到手机App、邮箱或WebHook。
+- `实盘报错、异常退出的常见原因`。
+
+让他人查看、操作部分实盘可以使用`子账号`。
+
+#### 分组
+
+在「实盘」页面和「策略库」页面点击右侧的**分组管理**按钮，可以给实盘、策略分组管理，分组名称可以自定义。
+例如给策略分组时，可以把**模板类库**分为一组、**JavaScript语言的策略**分为一组、**测试用策略**分为一组。
+
+- 策略分组
+  ![策略分组](https://www.fmz.com/upload/asset/2e482ba9b9aa272085d00.png)
+
+- 实盘分组
+  ![实盘分组](https://www.fmz.com/upload/asset/2e577d050e817837bbfdf.png)
+
+#### 实盘围观
+
+在发明者量化交易平台[实盘页面](https://www.fmz.com/m/robots)的实盘列表中点击「公开」按钮即可公开展示当前行的实盘。
+
+实盘围观目前支持两种方式：
+- 1、在发明者量化交易平台的[实盘围观](https://www.fmz.com/live)页面公开展示实盘。点击「公开」按钮后选择**公开分享**即可。
+- 2、创建实盘围观私有链接。
+  点击「公开」按钮后选择**内部分享**，设置有效期后即可生成私有链接，用于访问该策略实盘的私有围观页面。
+
+#### 实盘消息推送
+
+[推送设置页面](https://www.fmz.com/m/account#push)中可以开启消息推送功能。
+
+![推送设置](https://www.fmz.com/upload/asset/2e4ad17706aa842c914ce.png)
+
+- 移动端（App）
+  开启移动端App推送后，实盘程序发出的推送消息将发送至发明者量化移动端App。
+- 邮箱
+  开启邮箱推送需先验证邮箱，验证通过后即可接收实盘程序发出的推送消息。
+- WebHook
+  开启WebHook推送后，可自定义推送地址，例如设置为：```http://abc.com/push.php?data={body}```。
+  当实盘程序发出推送消息时，平台会向所设置的地址```http://abc.com/push.php?data={body}```发送一个请求（仅支持```GET```方法），推送的消息内容将替换到```{body}```位置。
+
+策略中推送消息
+- JavaScript/TypeScript/Python/Rust语言
+  在策略代码中，可使用```Log()```函数以及其它能在日志区域输出日志信息的函数，例如：```exchange.CreateOrder()```、```exchange.CancelOrder()```等。
+  为这些函数传入一个附带参数```"@"```（即在必要参数之外再增加一个附带参数），例如：```Log("This is a push message", "@")```，即可将这条输出的日志信息进行推送，平台会根据「推送设置」进行消息推送。Rust语言中对应```Log!```宏，用法相同：```Log!("This is a push message", "@");```。
+- PINE语言/My语言
+  在PINE语言/My语言策略所集成的「交易类库」参数中，可开启交易日志推送，触发交易动作后将自动进行推送。
+- Blockly可视化
+  在「工具」一栏中选择**消息推送**模块，即可实现指定信息的推送。
+
+消息推送存在频率限制，具体规则如下：在实盘的每个20秒周期内，仅保留并推送最后一条消息，其余消息将被过滤，不予推送。
+
+#### 实盘报错、异常退出的常见原因
+
+**实盘无法启动**
+- 没有在线的托管者
+  实盘所选的托管者离线时实盘无法启动。在[托管者页面](https://www.fmz.com/m/nodes)确认托管者在线，或换一个在线的托管者。
+- 账户余额不足
+  启动实盘需要预付第一个小时的费用，余额不足时无法启动；运行中余额耗尽，实盘会被平台停止。充值后重新启动，见`实盘计费与充值`。
+- 租用的策略到期或并发数已满
+  租用的策略到期后，使用它的实盘会被停止且无法再启动；达到租用的最多并发实盘数后，无法再启动新的实盘。
+- 密钥解密失败
+  报错中包含```secret key decrypt failed (wrong password)```。原因是修改了发明者量化交易平台的账号密码，原先配置的交易所密钥无法再解密。处理方法：
+  1. 在[「交易所」管理页面](https://www.fmz.com/m/platforms)重新填写交易所的密钥、密码等信息。
+  2. 停止所有托管者，用新密码重新启动托管者。
+- 凭据文件读不到
+  交易所配置中使用了```file:///xxx.txt```凭据文件，而实盘目录里没有该文件，报错中包含```read key file```；路径不合法时报```key file path must be relative and cannot contain '..'```或```key file path escapes the robot directory```。见`本地凭据文件`。
+
+**策略代码导致的错误**
+- 静态语法错误
+
+  ![编辑器中语法错误](https://www.fmz.com/upload/asset/2e4daebbb80548adf3927.png)
+
+  此类错误比较明显，通常在策略编辑页面就能看到错误标记，回测时也能发现。
+- 运行时错误
+  最常见的是对函数返回值不做合法性判断就直接使用。
+- 过度占用内存
+  在全局变量里保存过多无法被垃圾回收的内容，导致内存占用过大。
+- 未合理使用```exchange.Go```并发请求
+  调用异步的```exchange.Go```后没有及时```wait```等待结果，导致并发任务数量过多。
+- 递归调用过深
+  递归层数过多，超出调用栈大小。
+
+**其它报错**
+- 接口业务错误、网络请求错误
+  此类报错会显示相关的交易所对象名称、函数名称、错误消息和原因，本身不会导致实盘异常停止。它们通常是起因而不是直接原因，直接原因一般是**没有判断接口返回值是否合法就直接使用而引发的程序异常**。
+- ```interrupt```错误
+  程序正在执行某个操作（例如访问交易所接口）时，用户点击了实盘页面上的**停止**按钮，停止中断了当前操作而打印的日志。它没有影响，只是一条记录。
+
+更多问题见[常见问题汇总](https://www.fmz.com/bbs-topic/1427)。
+
+## 编写策略
+
+用各种编程语言编写策略：各语言的说明，策略结构（生命周期、主循环、事件驱动），策略参数，交互控件，模板类库，内置库，以及策略界面文字的多语言写法。
+
+### 编程语言
 
 **在发明者量化交易平台上，可以使用哪些编程语言来编写我的策略呢？**
 
 ![支持的编程语言](https://www.fmz.com/upload/asset/2e52c7501f57044f7f0ef.png)
 
-发明者量化交易平台支持使用```JavaScript```、```TypeScript```、```Python```、```Rust```、```C++```、[```PINE```](https://www.fmz.com/bbs-topic/9315)、[```My语言```](https://www.fmz.com/bbs-topic/2569)、```Blockly```可视化以及```Workflow```工作流来编写和设计交易策略。
+发明者量化交易平台支持使用```JavaScript```、```TypeScript```、```Python```、```Rust```、[```PINE```](https://www.fmz.com/bbs-topic/9315)、[```My语言```](https://www.fmz.com/bbs-topic/2569)、```Blockly```可视化以及```Workflow```工作流来编写和设计交易策略。
 
-### JavaScript
+#### JavaScript
 
-支持JavaScript语言，集成了以下JavaScript库：
-- http://mathjs.org/
-- http://mikemcl.github.io/decimal.js/
-- http://underscorejs.org/
-- http://ta-lib.org/
+平台支持用```JavaScript```编写策略。运行时基于 QuickJS 引擎，支持```async```/```await```、```class```、```BigInt```等现代语法；实盘时策略在托管者上运行，回测时在浏览器端的回测系统中运行。在代码中加入```// @ts-check```即可改用 TypeScript 编写，见 `TypeScript`。
 
-程序异常报错、接口业务报错
-在```JavaScript```语言策略中，发生程序异常报错或接口业务报错时，错误日志将显示策略代码中发生错误的具体行号，便于策略调试与BUG排查。
+**策略结构与参数**
 
-支持```JavaScript```异步编程特性：
-- setTimeout / clearTimeout
-  ```js
-  function main() {
-      let symbol = "ETH_USDT"
-      let delay = 10
-      let depth = exchange.GetDepth(symbol)
-      let callback = function(e, id, msg) {
-          Log(msg + ", canceling order.")
-          e.CancelOrder(id)
-      }
+策略入口为```function main()```，可选的```init()```、```onexit()```、```onerror(msg)```由托管者自动调用，见 `策略结构`。界面参数是同名的全局变量，可以直接读取，也可以在代码中修改，见 `策略参数`。
 
-      let ordersLen = 3
-      let arrTimerId = []
-      for (let i = 1 ; i <= ordersLen ; i++) {
-          let orderId = exchange.CreateOrder(symbol, "buy", depth.Bids[i * 3].Price, i * 0.1)
-          let timerId = setTimeout(callback, delay * 1000, exchange, orderId, `Delayed ${delay} seconds`)
-          Log("i:", i, ", timerId:", timerId)
-          arrTimerId.push(timerId)
-      }
+**错误与返回值**
 
-      // clearTimeout
-      let clearTimeoutIdx = 1
-      Log("clearTimeoutIdx:", clearTimeoutIdx, `, arrTimerId[clearTimeoutIdx]:`, arrTimerId[clearTimeoutIdx])
-      clearTimeout(arrTimerId[clearTimeoutIdx])
+API 函数调用失败（交易所返回错误、网络问题等）时返回```null```，并在日志中输出错误信息。使用返回值之前先判断，或者用 `_C` 重试：
 
-      Sleep(60 * 1000)
-  }
-  ```
-- fetch
-  ```fetch```函数是```HttpQuery```函数的异步版本重载。
+```js
+function main() {
+    var ticker = exchange.GetTicker()
+    // 调用失败时返回 null
+    if (ticker) {
+        Log(ticker)
+    }
 
-  使用```await```关键字以同步语法处理异步操作：
-  ```js
-  function main() {
-      let url = "https://www.okx.com/api/v5/market/books?instId=BTC-USDT"
-      const promiseBooks = new Promise(async function(resolve, reject) {
-          Log("Start execution")
-          let data = await fetch(url)
-          Log("data.ok:", data.ok, ", data.text():", data.text())
-          if (data.ok) {
-              Log("Successfully retrieved data:", data)
-              return resolve(data.text())
-          } else {
-              return reject(new Error("data 无效"))
-          }
-      })
+    // 失败时自动重试，直到返回有效数据
+    var account = _C(exchange.GetAccount)
+    Log(account)
+}
+```
 
-      promiseBooks.then(function(ret) {
-          Log("ret:", ret)
-      }).catch(function(err) {
-          Log("err.name:", err.name, "err.stack:", err.stack, "err.message:", err.message)
-      })
-  }
-  ```
-- 使用```Promise.all```并发执行多个异步网络请求：
-  ```js
-  async function main() {
-      // let symbols = ["BTC-USDT", "ETH-USDT", "LTC-USDT"]                                   // 等待请求耗时：99毫秒
-      let symbols = ["BTC-USDT", "ETH-USDT", "LTC-USDT", "SOL-USDT", "BNB-USDT", "ADA-USDT"]  // 等待请求耗时：99毫秒
-      let arr = []
+程序异常（例如读取```undefined```的属性）和接口业务报错的日志中会显示出错位置在策略代码中的行号，便于调试和排查。
 
-      let beginTs1 = new Date().getTime()
-      for (let symbol of symbols) {
-          let url = `https://www.okx.com/api/v5/market/books?instId=${symbol}`
-          arr.push(fetch(url).then(function(resp) {
-              if (resp.ok) {
-                  return {"symbol": symbol, "json": resp.json()}
-              } else {
-                  throw "req failed"
-              }
-          }))
-      }
-      let endTs1 = new Date().getTime()
+**字符串与ArrayBuffer**
 
-      let beginTs2 = new Date().getTime()
-      const ret = await Promise.all(arr)
-      for (let data of ret) {
-          Log(data)
-      }
-      let endTs2 = new Date().getTime()
+JavaScript 的字符串是 UTF-16 编码。平台 API 返回的文本如果不是合法的 UTF-8 字节序列，为了不丢失数据，会返回```ArrayBuffer```（原始字节）。所有可以传入字符串的 API 参数也都接受```ArrayBuffer```。
 
-      Log("Request creation time:", endTs1 - beginTs1, "ms")
-      Log("Request waiting time:", endTs2 - beginTs2, "ms")
+```js
+function stringToHex(str) {
+    let hex = ''
+    for (let i = 0; i < str.length; i++) {
+        const charCode = str.charCodeAt(i).toString(16)
+        hex += charCode.length === 1 ? '0' + charCode : charCode
+    }
+    return hex
+}
 
-      LogStatus(_D(), ret)
-  }
-  ```
-- 使用```Promise.race```获取多个异步请求中最先```resolved```或```rejected```的结果：
-  ```js
-  async function getTicker(e) {
-      return Promise.resolve().then(function() {
-          /* 测试
-          if (e.GetName() == "Huobi" || e.GetName() == "Binance") {
-              Sleep(1000)
-          }
-          */
-          let ret = e.GetTicker("BTC_USDT")
-          return {"name": e.GetName(), "ret": ret}
-      })
-  }
+function main() {
+    // “𠮷”的 Unicode 码点超出 16 位，在 JavaScript 字符串中占两个 UTF-16 码元
+    const inputString = "abc𠮷123"
 
-  async function main() {
-      Log("begin")
-      let arrPromise = []
-      for (let e of exchanges) {
-          arrPromise.push(getTicker(e))
-      }
+    // Encode 按 UTF-8 编码后输出 hex
+    const encodedHex = Encode("raw", "string", "hex", inputString)
+    Log(encodedHex)                       // 616263f0a0aeb7313233
 
-      let ret = await Promise.race(arrPromise)
-      Log(ret)
-  }
-  ```
-- 在```threading.Thread```中使用```setTimeout()```函数：
-  ```js
-  function test() {
-      Log("Test function started")                           // step 3. Test function started
-      let timerId1 = setTimeout(function() {
-          Log("Timeout callback executed after 5 seconds")   // step 5. Timeout callback executed after 5 seconds
-      }, 5000)
-      Log("Test function completed")                         // step 4. Test function completed
-  }
+    // charCodeAt 取的是 UTF-16 码元，“𠮷”被写成 d842、dfb7，结果不是 UTF-8 编码
+    const manuallyEncodedHex = stringToHex(inputString)
+    Log(manuallyEncodedHex)               // 616263d842dfb7313233
 
-  function main() {
-      Log("Main function started")                           // step 1. Main function started
-      let t1 = threading.Thread(test)
-      Log("Worker thread created successfully")              // step 2. Worker thread created successfully
-      t1.join()
-      Log("Main function completed")                         // step 6. Main function completed
-  }
-  ```
-- 多线程并发获取```ticker```数据的异步处理示例：
-  由于```exchange.GetTicker()```是同步阻塞操作，即使包装在Promise中，内部执行仍是同步的；JavaScript是单线程的，同步操作会阻塞事件循环；微任务队列中的回调函数仍然是串行执行的。
-  ```js
-  async function getTicker(symbol) {
-      Log("getTicker symbol:", symbol)
-      return Promise.resolve().then(function() {
-          // 注意与fetch请求数据时的区别
-          let ret = exchange.GetTicker(symbol)
-          Log(ret)
-          return ret
-      })
-  }
+    // 合法的 UTF-8 字节可以还原为字符串
+    const decodedString = Encode("raw", "hex", "string", encodedHex)
+    Log(decodedString)                    // abc𠮷123
 
-  async function main() {
-      let symbols = ["BTC_USDT", "ETH_USDT", "SOL_USDT"]
-      let t1 = threading.Thread(async function(symbols, func) {
-          let arrPromise = []
-          for (let symbol of symbols) {
-              arrPromise.push(func(symbol))
-          }
-          let ret = await Promise.all(arrPromise)
-          Log("ret:", ret)
-      }, symbols, getTicker)
+    // 不是合法的 UTF-8 字节，返回 ArrayBuffer
+    // （如果 inputString 改为 "abcG123"，两种编码结果相同，这里得到的是字符串）
+    const outputD = Encode("raw", "hex", "string", manuallyEncodedHex)
+    Log(outputD instanceof ArrayBuffer)   // true
 
-      t1.join()
-  }
-  ```
+    // 查看 ArrayBuffer 中的原始字节
+    const bufferD = new Uint8Array(outputD)
+    let hexBufferD = ''
+    for (let i = 0; i < bufferD.length; i++) {
+        hexBufferD += bufferD[i].toString(16).padStart(2, '0')
+    }
+    Log(hexBufferD)                       // 616263d842dfb7313233
+}
+```
 
-### TypeScript
+**异步与多线程**
 
-支持TypeScript语言，在策略创建时仍设置为JavaScript策略，然后在策略代码开头写入```// @ts-check```或点击策略编辑区域右上角的「TypeScript」按钮，即可切换到TypeScript。平台将自动识别代码为TypeScript，并提供相应的编译和类型检查支持：
+- ```setTimeout```/```clearTimeout```：回调在主线程调用```Sleep()```等待期间执行；```main()```返回时还没到期的定时器会先执行完，再调用```onexit()```。
+- ```fetch(url)```：返回```Promise```，结果为响应对象（```ok```、```status```、```headers```属性，```text()```、```json()```直接返回内容）。托管者中的```fetch```在调用时就同步完成请求，返回的是已经完成的```Promise```，所以用```Promise.all```组合多个```fetch```并不会并发请求。
+- 交易所 API（例如```exchange.GetTicker()```）是同步阻塞调用，包装进```Promise```或```async```函数也不会并发执行。
+- 需要并发时使用 `exchange.Go`、`HttpQuery_Go`，或者用 `Thread` 创建线程，见 `JavaScript多线程`。
 
-- 类型安全：TypeScript的静态类型检查功能可帮助您在编写代码时发现潜在错误，提高代码质量。
+```js
+async function main() {
+    let resp = await fetch("https://www.okx.com/api/v5/market/books?instId=BTC-USDT")
+    if (resp.ok) {
+        Log(resp.json())
+    } else {
+        Log("status:", resp.status)
+    }
+}
+```
 
-- 代码自动补全：TypeScript的类型系统使您在编写代码时能够更快地找到所需的属性和方法，提高开发效率。
+**库与依赖**
 
-- 更清晰的代码结构：使用TypeScript，您可以更好地组织和维护代码，使其易于阅读和理解。
+JavaScript 策略可以直接使用内置的```TA```指标库和```talib```指标库，各语言可用的内置库见 `内置库`。其它第三方 JavaScript 库可以在运行时下载后用```eval```加载，示例见同一页。
 
-- 强大的面向对象编程特性：TypeScript提供了接口、类、泛型等强大的面向对象编程特性，帮助您编写更加健壮、可重用的策略代码。
+#### TypeScript
 
-### Python
+TypeScript 不是单独的语言选项：创建策略时选择```JavaScript```，在代码中加入一行```// @ts-check```（或点击策略编辑区右上角的「TypeScript」按钮），平台就按 TypeScript 处理，在回测和实盘运行前先编译为 JavaScript。通过 AI/MCP 工具保存策略时，语言可以直接写```typescript```，平台按 JavaScript 策略保存，并在代码开头自动加上```//@ts-check```，见 `AI接入`。
 
-- 设置Python策略程序使用的Python解释器
-  使用Python编写的策略，在回测或实盘时，如果托管者所在系统环境同时安装了Python2和Python3，可以在策略开始的第一行设置策略运行时启动的Python版本。例如：```#!python3```、```#!python2```，系统将自动查找对应的解释器。也可以指定绝对路径，例如：```#!/usr/bin/python3```。
-- 基于Python的策略安全性
-  在发明者量化交易平台上开发的策略，仅对发明者量化交易平台账户的持有者可见。此外，在发明者量化交易平台上可以实现策略代码的完全本地化，例如将策略封装成一个**Python库**，在策略代码中加载，从而实现策略代码本地化。
-  Python代码的安全性：
-  由于Python是开源且易于反编译的语言，如果策略非自用而是出租，担心策略泄露可以让策略运行在自己部署的托管者上，并以子账号或全托管管理的形式出租。
+静态类型检查能在编写时发现参数个数、属性名、类型用错之类的问题，编辑器的补全也更准确。
 
-  Python策略代码加密：
-  默认情况下，Python策略代码作者自用时不加密，租给他人使用时加密。在Python策略开头编写如下代码，可以指定自用或租出Python策略运行时是否加密策略代码。支持策略代码加密的Python版本为：Python 2.7版本、Python 3.5版本、Python 3.6版本。
+最小示例：
 
-  - 策略作者自己运行、通过注册码给他人使用时，均加密策略代码：
-    使用代码```#!python```指定Python解释器版本，之后使用逗号```,```间隔，输入加密指令```encrypt```。如果不指定Python版本，可以直接添加```#!encrypt```。
-    ```python
-    #!python,encrypt
-    ```
-    或
-    ```python
-    #!encrypt
-    ```
-  - 策略作者自己运行、通过注册码给他人使用时均不加密策略代码：
-    ```python
-    #!python,not encrypted
-    ```
-    或者
-    ```python
-    #!not encrypted
-    ```
+```ts
+// @ts-check
+interface Signal {
+    side: "buy" | "sell"
+    price: number
+}
 
-  判断Python策略代码加密是否生效，使用代码```os.getenv('__FMZ_ENV__')```，返回字符串```"encrypt"```表示已经生效。仅在实盘有效，回测不会加密Python策略代码。
-  ```python
-  #!encrypt
-  def main():
-      ret = os.getenv('__FMZ_ENV__')
-      # 打印变量ret为字符串encrypt或者ret == "encrypt"为真，即代表加密生效
-      Log(ret, ret == "encrypt")
-  ```
-- Python自定义模块导入功能
-  FMZ平台支持在Python策略中导入自定义模块，实现代码的模块化开发和复用。
+function getSignal(ticker: ITicker, ma: number): Signal | null {
+    if (ticker.Last > ma) {
+        return {side: "buy", price: ticker.Last}
+    }
+    if (ticker.Last < ma) {
+        return {side: "sell", price: ticker.Last}
+    }
+    return null
+}
 
-  例如，我们需要设计一个模块：```mymath```，将```mymath.py```保存为一个单独的文件。
+function main() {
+    while (true) {
+        const records = exchange.GetRecords()
+        const ticker = exchange.GetTicker()
+        if (records && ticker && records.length > 20) {
+            const ma = TA.MA(records, 20)
+            const signal = getSignal(ticker, ma[ma.length - 1])
+            if (signal) {
+                Log(signal.side, signal.price)
+            }
+        }
+        Sleep(60 * 1000)
+    }
+}
+```
 
-  ```python
-  # mymath.py - 保存为一个单独的文件
-  """
-  简单的数学工具模块
-  """
+平台 API 的类型声明由策略编辑器内置提供，不需要在代码中引用：全局函数、```exchange```对象、```ITicker```、```IRecord```、```IOrder```、```IPosition```等数据结构接口，以及```TA```、```talib```等。运行时的语言特性、API 和库与 JavaScript 策略相同，见 `JavaScript`。
 
-  def add(a, b):
-      """加法"""
-      return a + b
-  ```
+#### Python
 
-  部署模块文件，将```mymath.py```文件放置到托管者程序目录下的指定位置（storage目录中的文件夹名称是实盘Id，以实盘Id为```123456```为例）：
+平台支持用```Python 3```编写策略，不支持 Python 2。实盘以及在托管者上进行的回测，使用托管者所在机器上安装的 Python 解释器运行策略。
 
-  > 托管者程序目录/logs/storage/123456/mymath.py
+**解释器**
 
-  最后在FMZ平台上的Python策略中直接导入```mymath```模块。
+托管者按以下顺序查找解释器，使用第一个能启动、并且版本为 Python 3 的程序：
+1. 环境变量```PYTHON_BIN```指定的解释器；
+2. ```python3```；
+3. ```python```。
 
-  ```python
-  import mymath
+需要使用指定的解释器（例如虚拟环境中的 Python）时，在启动托管者之前设置环境变量：
 
-  def main():
-      Log("mymath.add(1, 2):", mymath.add(1, 2))
-  ```
+```bash
+export PYTHON_BIN=/opt/venv/bin/python3
+```
 
-  Id为```123456```的实盘（策略实例）所绑定的策略中即可调用```mymath```模块中的方法。
+策略代码首行的```#!python3```、```#!python2```等写法不再用于选择解释器。
 
-### Rust
+**策略结构与参数**
 
-平台支持使用```Rust```编程语言编写策略。Rust语言的策略采用预先编译、再执行的方式运行：回测时，策略代码由平台服务器编译，并在浏览器端的回测系统中运行；实盘环境中，Rust语言的策略在编译通过后基于托管者运行。
+策略入口为```def main()```，可选的```init()```、```onexit()```由托管者自动调用（Python 不支持```onerror()```），见 `策略结构`。界面参数是同名的全局变量；在函数中给参数重新赋值时，需要先用```global```声明。
 
-借助Rust的所有权模型与静态类型系统，您可以在FMZ量化交易平台上编写兼具内存安全与高性能的交易策略。
+**错误与返回值**
 
-- 平台API自动注入
-  策略代码只需一个```fn main()```入口函数。所有平台API（```exchange```、```exchanges```、```TA```、```Log!```/```LogStatus!```、```_G!```/```_C!```等）均通过prelude自动注入，无需任何```use```/```mod```声明即可直接调用。可能失败的API调用会返回```Result<T>```类型，可配合```_C!```宏实现自动重试。
-  ```rust
-  fn main() {
-      // GetTicker返回Result<Ticker>，用_C!宏重试直到调用成功
-      let ticker = _C!(exchange.GetTicker(None));
-      Log!("Last:", ticker.Last);
-  }
-  ```
-- 策略参数注入为全局常量
-  界面上配置的策略参数会以全局常量的形式注入策略，其Rust类型由参数的实际值决定（数字对应```f64```、布尔对应```bool```、字符串/密码对应```&str```等），可直接通过参数名引用；您也可以通过```params()```函数获取参数集的JSON文本并自行解析。
-- 支持第三方crate
-  策略源码是唯一的代码文件（不含单独的Cargo.toml），可在源码顶部使用cargo-script风格的frontmatter声明依赖，构建时会自动合并至Cargo.toml：
-  ```rust
-  ---
-  [dependencies]
-  serde_json = "1"
-  ---
-  fn main() {
-      let v: serde_json::Value = serde_json::from_str(params()).unwrap();
-      Log!("参数:", v.to_string());
-  }
-  ```
-  注意：编译沙盒中未提供系统OpenSSL，因此需要TLS的crate（如HTTP/WebSocket客户端等）请选择基于纯Rust实现的```rustls```（例如为```tokio-tungstenite```开启```rustls-tls-webpki-roots```特性），避免依赖```native-tls```/```openssl-sys```；WebSocket连接建议优先使用内置的```Dial()```函数，无需引入第三方crate。
-- 编辑器支持
-  策略编辑器为Rust策略集成了```rust-analyzer```，可提供代码补全与实时诊断功能。
+API 函数调用失败时返回```None```，并在日志中输出错误信息。使用返回值之前先判断，或者用```_C()```重试。策略中未捕获的异常会结束运行，错误信息记录在日志中。
 
-### C++
+**输出**
 
-平台支持C++编程语言，兼容```C++ 11```标准。C++策略需要预先编译后执行，在回测系统中，C++策略运行于专用的C++回测服务器；在实盘环境中，C++策略编译通过后基于托管者运行。
+```print()```的输出写到托管者进程的标准输出，不会出现在实盘日志里。需要显示在日志中的内容请用 `Log`。
 
-借助C++编程语言和```C++ 11```标准，您可以在FMZ量化交易平台上开发高性能的交易策略。利用C++的现代特性，您能够构建灵活、可扩展的交易算法，实现自动化交易。
+**第三方库**
 
-集成了以下C++库：
+策略可以导入解释器中已经安装的任何库。安装时要使用托管者运行策略的那个解释器，例如：
 
-- https://nlohmann.github.io/json/
+```bash
+python3 -m pip install numpy
+# 设置了 PYTHON_BIN 时
+$PYTHON_BIN -m pip install numpy
+```
 
-### My语言（麦语言）
+使用```talib```需要在托管者所在机器上安装 TA-Lib（```talib```包）和```numpy```。
+
+**自定义模块**
+
+策略运行时的当前目录和```PYTHONPATH```是托管者为本次运行创建的临时目录，运行结束后会被删除；放在托管者程序目录下（例如```logs/storage/<实盘ID>/```）的```.py```文件不会被自动找到。导入自己编写的模块有两种方式：
+- 把模块安装到解释器的```site-packages```中（例如做成包用```pip install```安装，或者直接复制到```site-packages```目录）；
+- 在策略中先把模块所在目录的绝对路径加入```sys.path```，再导入。
+
+例如模块文件```/home/user/fmz_modules/mymath.py```：
+
+```python
+# mymath.py
+def add(a, b):
+    return a + b
+```
+
+策略代码：
+
+```python
+import sys
+sys.path.append("/home/user/fmz_modules")   # 模块所在目录的绝对路径
+
+import mymath
+
+def main():
+    Log("mymath.add(1, 2):", mymath.add(1, 2))
+```
+
+把核心代码做成模块放在自己的托管者上，策略代码中只保留调用部分，也是一种不把核心代码上传到平台的做法。
+
+#### Rust
+
+平台支持用```Rust```编写策略。Rust 策略先编译再运行：回测时由平台服务器编译，在浏览器端的回测系统中运行；实盘时编译通过后在托管者上运行。策略编辑器为 Rust 集成了```rust-analyzer```，提供代码补全与实时诊断。
+
+**策略结构**
+
+策略代码只需要一个```fn main()```。平台 API（```exchange```、```exchanges```、```TA```、```Log!```、```_C!```等）已经自动导入，不需要写```use```或```mod```声明。
+
+可选的```fn init()```、```fn onexit()```由托管者自动调用，定义即可，不需要注册：```init()```在```main()```之前执行；```onexit()```在```main()```正常返回、实盘被停止、策略```panic```时都会执行。Rust 不支持```onerror()```。详见 `策略结构`。
+
+```rust
+fn init() {
+    Log!("初始化");
+}
+
+fn main() {
+    // 可能失败的 API 返回 Result<T>，_C! 宏在失败时重试，直到调用成功
+    let ticker = _C!(exchange.GetTicker(None));
+    Log!("Last:", ticker.Last);
+}
+
+fn onexit() {
+    Log!("策略退出，执行扫尾处理");
+}
+```
+
+日志等部分功能以宏的形式提供（注意感叹号）：```Log!()```、```LogStatus!()```、```Panic!()```、```_G!()```、```_C!()```；```LogProfit()```、```Sleep()```、```_D()```、```_N()```、```HttpQuery()```等是普通函数。
+
+**参数类型**
+
+界面参数以同名的全局常量注入策略，只能读取，不能在代码中修改（需要变化的值请复制到局部变量）。类型由参数种类决定：
+
+| 参数种类 | Rust 类型 |
+| - | - |
+| 数字型 | ```f64``` |
+| 布尔型 | ```bool``` |
+| 字符串 | ```&str``` |
+| 下拉框（单选） | ```f64```（选项索引）；选项绑定了字符串数据时为```&str``` |
+| 下拉框（多选） | ```&[i64]```、```&[f64]```或```&[&str]```；选项值类型混杂时为 JSON 文本```&str``` |
+| 加密串 | ```&str```或```Decrypted```（可解引用为```str```） |
+
+- 整数用途需要自行转换，例如```let n = Period as usize;```。
+- 选填参数没有填写时为该类型的零值：```0.0```、```""```、```false```，多选下拉框为空。
+- 加密串参数在服务端不能预先解密时（例如私有托管者），注入为```static```的```Decrypted```类型，第一次使用时才解密。它实现了```Display```，可以直接用于```format!```；传给```Log!```或其它需要```&str```的地方写```&*参数名```（对```&str```类型的参数同样适用）：
+
+```rust
+fn main() {
+    let key: &str = &*ApiKey;   // ApiKey 为加密串参数
+    Log!("key length:", key.len());
+}
+```
+
+- 参数名与代码中的其它名字冲突时，可以用```args::参数名```引用参数。
+
+**错误与返回值**
+
+可能失败的 API 调用返回```Result<T>```，用 Rust 惯用的方式处理（JavaScript 中失败返回```null```）：
+
+```rust
+fn main() {
+    // 方式一：模式匹配
+    if let Ok(ticker) = exchange.GetTicker(None) {
+        Log!(ticker);
+    }
+
+    // 方式二：_C! 宏在失败时重试，直到调用成功
+    let ticker = _C!(exchange.GetTicker(None));
+    Log!(ticker);
+}
+```
+
+可选参数（例如```GetTicker```的```symbol```参数）不传时用```None```占位，传值时直接传入，例如```exchange.GetTicker("BTC_USDT")```。
+
+**JSON**
+
+平台 API 返回的原始 JSON 文本（例如```exchange.IO()```的返回值、各结构体的```Info```字段）用内置的```JSONParse()```解析，得到```Option<JsonValue>```；用```v["key"]```、```v[0]```取子节点，用```as_f64()```、```as_str()```、```as_bool()```等方法取值。```JsonValue```实现了```Display```，```v.to_string()```或```format!("{}", v)```得到紧凑的 JSON 文本。SDK 没有提供构造 JSON 的便捷接口，生成 JSON 文本可以用```format!```拼接，或者引入```serde_json```。
+
+**第三方 crate**
+
+策略源码是唯一的代码文件（没有单独的```Cargo.toml```）。在源码最顶部用```---```包裹的 frontmatter 声明依赖，构建时合并进```Cargo.toml```：
+
+```rust
+---
+[dependencies]
+serde_json = "1"
+---
+/*backtest
+start: 2024-01-01 00:00:00
+end: 2024-02-01 00:00:00
+period: 1h
+*/
+fn main() {
+    let v: serde_json::Value = serde_json::from_str(r#"{"a": 1}"#).unwrap();
+    Log!("a:", v["a"].to_string());
+}
+```
+
+- frontmatter 必须在源码开头，前面只能有空行；```/*backtest ... */```回测配置块要放在 frontmatter 结束的```---```之后。策略中还没有回测配置块时，「保存回测设置」会把配置块插入到源码最前面，这时需要把它移到 frontmatter 之后（之后再保存会在原位置更新）。
+- 策略和它引用的模板类库中，依赖块只能写在其中一处，两处都写会编译失败。
+- 编译环境中没有系统 OpenSSL，需要 TLS 的 crate（HTTP/WebSocket 客户端等）请选用纯 Rust 实现的```rustls```（例如```tokio-tungstenite```开启```rustls-tls-webpki-roots```特性），避免依赖```native-tls```/```openssl-sys```；WebSocket 连接优先使用内置的 `Dial` 函数，不需要第三方 crate。
+
+**内置库**
+
+Rust 策略可以使用```TA```指标库，不支持```talib```，见 `内置库`。
+
+#### My语言（麦语言）
 
 平台支持My语言（麦语言）编写和设计策略，兼容文华麦语言的大部分语法、指令和函数。My语言鼓励积木式编程，将复杂算法拆解为函数模块。通过简洁的语法、专用数据结构和强大的金融函数库，支持复杂金融逻辑的实现。以模块化方式构建应用，提升开发效率和代码可维护性。
 
@@ -376,7 +1067,7 @@ AUTOFILTER;
 - [FMZ量化My语言文档](https://www.fmz.com/bbs-topic/2569)
 - [FMZ量化My语言--My语言交易类库参数](https://www.fmz.com/bbs-topic/5768)
 
-### PINE语言
+#### PINE语言
 
 平台支持并兼容```Trading View```的PINE语言脚本。PINE语言是一种轻量级但功能强大的策略编程语言，用于创建可进行回测和实盘交易的技术指标与策略。活跃的社区已创作了超过10万个PINE脚本。
 用户可以轻松获取并应用各种技术分析工具和交易策略；能够借助社区脚本快速实现交易想法，无需从零开始编写代码，从而大幅缩短开发周期；帮助新手和资深交易员学习并理解不同的技术指标、策略及编程概念。
@@ -403,7 +1094,7 @@ else if direction > 0
 
 - [PINE Script 文档](https://www.fmz.com/bbs-topic/9315)
 
-### Blockly可视化
+#### Blockly可视化
 
 平台支持Blockly可视化编程方式。借助Blockly编辑器，用户可以通过拼接图形块（类似积木）来表达代码概念，如变量、逻辑表达式、循环等。这种方式使编程过程无需过多关注繁琐的语法细节，而是可以直接按照编程原则进行操作。通过图形块的排列组合，用户能够轻松理解编程逻辑，实现创意想法，非常适合培养策略设计兴趣，快速入门程序化和量化交易。
 
@@ -415,7 +1106,7 @@ else if direction > 0
 
   - [可视化模块搭建交易策略--浅出](https://www.fmz.com/digest-topic/4107)
 
-### Workflow工作流
+#### Workflow工作流
 
 平台支持 Workflow 工作流方式编写策略。工作流是一种可视化的策略设计方式，通过节点连接和配置来构建交易逻辑，无需编写代码即可实现策略。
 
@@ -428,279 +1119,1750 @@ else if direction > 0
 **学习资源**：
 - [工作流系列视频教程](https://www.fmz.com/class/workflow)
 
-## 密钥安全性
+### 策略结构
 
-在发明者量化交易平台上配置的账户信息、策略参数中的加密字符串等敏感数据均在浏览器端进行加密。这些存储在发明者量化交易平台上的信息均为加密信息（非明文数据）。只有用户的私有设备可以解密使用，从而极大地提高了敏感数据的安全性。如果在策略代码、参数设置、策略描述等信息中包含了其他敏感信息，请勿公开或出售该策略。
+```JavaScript```（含 TypeScript）、```Python```、```Rust```策略由几个约定名称的函数组成，托管者在固定的时机调用它们。My语言、PINE、Blockly、Workflow 策略不需要编写这些函数。
 
-- 平台支持将交易所账户相关信息、密钥等敏感信息本地化配置
-  在平台配置交易所信息的页面，所有带掩码的加密文本框控件都支持以配置文件路径的方式载入托管者本地文件。下面以交易所的```RSA KEY```验证方式为例，详细说明如何将敏感信息配置在托管者程序所在设备的本地。
-  1、创建RSA公钥、私钥。例如创建格式为PKCS#8的公钥、私钥，有很多工具可以创建，例如：openssl。
-  2、在交易所创建```RSA KEY```，创建时上传第一步中创建的公钥。
-  3、将第一步中创建的私钥以txt文件格式保存在托管者目录```../logs/storage/xxx```路径下，xxx为实盘Id；也可以保存在托管者程序所在目录中的其他路径。
-  4、在FMZ量化平台上配置交易所时，在```Access Key```的编辑框中填写在交易所创建的```RSA KEY```。
-  5、在FMZ量化平台上配置交易所时，在```Secret Key```的编辑框中填写第三步中在托管者目录放置的txt文件的路径，例如放置的文件名为：```rsaKey.txt```，则填写：```file:///rsaKey.txt```。在运行实盘并引用该交易所（对象）时，托管者会自动载入目录```../logs/storage/xxx/rsaKey.txt```的文件内容作为交易所对象的配置信息，例如本例中的```RSA```私钥。
+**生命周期函数**
 
-  这样私钥本地化保存更加安全，详细过程可以参考[视频讲解](https://www.bilibili.com/video/BV1UM41147Jj/)
-- 修改发明者量化交易平台的账号密码会导致交易所配置失效
-  如果修改了发明者量化交易平台的账号密码，会导致所有交易所配置失效，需要按照以下步骤处理：
-  1、重新在[「交易所」管理页面](https://www.fmz.com/m/platforms)配置交易所账户相关密钥、密码等信息。
-  2、停止所有托管者，使用修改后的发明者量化交易平台账户密码重新部署、运行托管者。
+| 函数 | 是否必须 | 调用时机 |
+| - | - | - |
+| ```main()``` | 必须 | 入口函数，策略的主体。```main()```返回，策略即运行结束。 |
+| ```init()``` | 可选 | 在```main()```之前调用一次，用于初始化。 |
+| ```onexit()``` | 可选 | 策略退出时调用，用于扫尾（撤单、平仓、保存状态等）。 |
+| ```onerror(msg)``` | 可选 | 仅```JavaScript```：```main()```因未捕获的异常结束时调用，```msg```为错误信息。调用了```onerror()```就不再调用```onexit()```。 |
+| ```destroy()``` | 可选 | 仅```JavaScript```模板类库：策略退出时，在```onexit()```或```onerror()```之后调用，见 `模板类库`。 |
 
-## 实盘
+退出时调用哪个函数：
 
-在发明者量化交易平台上，「实盘」的概念区别于「回测」，指的是创建一个真正与交易所交互（获取行情、查询持仓、下单撤单等）的策略程序实例。与交易所生产环境交互的策略程序实例称为实盘，与交易所模拟环境（许多交易所提供测试环境）交互的策略程序实例也称为实盘。
-在发明者量化交易平台上[创建一个实盘](https://www.fmz.com/m/add-robot)需要满足三个条件：
+| 退出原因 | JavaScript | Python | Rust |
+| - | - | - | - |
+| ```main()```正常返回 | ```onexit()``` | ```onexit()``` | ```onexit()``` |
+| 停止实盘 | ```onexit()``` | ```onexit()``` | ```onexit()``` |
+| 未捕获的异常、```panic``` | ```onerror(msg)``` | 都不调用 | ```onexit()``` |
 
-**创建实盘的条件**
-- 一个可用的策略
-  可以在平台[策略库页面](https://www.fmz.com/m/strategies)点击「新建策略」按钮创建策略。编写并设计策略后保存，策略将保存在策略库中。创建实盘时，在[实盘创建页面](https://www.fmz.com/m/add-robot)的「实盘配置」栏目下「运行策略」下拉框中即可选择策略库中的策略。
-- 至少部署一个可用的托管者
-  可以在平台[托管者页面](https://www.fmz.com/m/nodes)点击「部署托管者」按钮进行托管者部署。托管者部署成功后，创建实盘时在[实盘创建页面](https://www.fmz.com/m/add-robot)的「实盘配置」栏目下「托管主机」下拉框中即可选择已部署的托管者。
-- 至少配置一个可用的交易所
-  可以在平台[交易所页面](https://www.fmz.com/m/platforms)点击「添加交易所」按钮添加交易所，配置交易所账号信息。交易所配置完成后，创建实盘时在[实盘创建页面](https://www.fmz.com/m/add-robot)的「交易配置」栏目下「交易平台」下拉框中即可选择已配置的交易所。
+**注意事项：**
+- ```onexit()```、```onerror()```最长执行 5 分钟（时长由服务端按任务下发，默认 5 分钟），超时会被强制结束。
+- 回测中策略通常是不停轮询的死循环，回测结束时```main()```并没有正常返回，处理方法见 `onexit()`。
+- ```JavaScript```策略的```main()```返回时，用```threading```创建的子线程会被终止；还没有到期的```setTimeout```回调会先执行完，再调用```onexit()```。
+- ```JavaScript```、```Python```模板类库可以定义自己的```init()```，在模板加载时执行，早于策略的```init()```。
 
-最后在实盘创建页面点击「创建实盘」按钮即可创建并运行一个量化交易策略程序实例（即发明者量化交易平台的实盘）。
+**主循环与事件驱动**
 
-**实盘分组**
-可以对已创建的实盘进行分组管理，支持自定义分组名称。
+大多数策略在```main()```中写一个循环：每轮获取数据、计算、下单，然后```Sleep()```等待下一轮，见 `主循环`。也可以等待行情、订单等事件到达后再处理，见 `事件驱动`。全部 API 函数的分类速查见 `API函数速查`。
 
-**实盘围观**
-实盘可以公开展示，也可以创建私有围观链接发送给特定群体展示。
+#### init()
 
-**实盘计费**
-实盘按小时计费，每个实盘每小时 0.05 USD，不足一小时按一小时计费。创建新实盘将立即开始计费，实盘「停止」/「重启」不会重复计费。
+```init()``` 为用户实现的初始化函数。策略开始运行时，会首先自动执行 ```init()``` 函数，以完成策略中设计的初始化任务。
 
-可以在[充值页面](https://www.fmz.com/m/billing)查询所有计费的「账单明细」。
+```javascript
+function main(){
+    Log("First line of code executed!", "#FF0000")
+    Log("Exiting!")
+}
 
-重要提示：使用```USDT```充值时务必注意：
-- 1、转账网络是否正确（例如目前支持：TRC20、ERC20、BSC）。
-- 2、充值资产选择是否正确（例如：USDT）。
-- 3、充值地址是否一致。
-
-**实盘监控**
-在[实盘管理页面](https://www.fmz.com/m/robots)的实盘列表中，处于运行中的实盘右侧**操作栏**中可以点击「监控」按钮开启实盘监控。开启监控后，如果实盘非手动操作退出，当前发明者量化交易平台绑定的邮箱将收到通知消息。
-
-**实盘数据库**
-以实盘Id```123456```为例，其对应的数据库文件位于该实盘所属托管者目录下的路径：```/logs/storage/123456/123456.db3```，其中数据库文件名为```123456.db3```。
-数据库中包含以下表：
-- chart：记录图表数据。
-- kvdb：记录```_G()```函数持久化保存的数据。
-- log：记录实盘日志数据。
-- profit：记录实盘收益数据。
-
-## 策略库
-
-[策略库](https://www.fmz.com/m/strategies)页面保存当前账号下的所有策略，策略可以使用多种编程语言和方式进行设计。
-
-**策略分组**
-策略支持分组管理功能，可以自定义分组名称。
-
-**策略公开、出租**
-可以生成策略的「复制码」用于公开策略。
-可以生成策略的「注册码」用于出租策略。
-
-**策略导出、导入**
-在策略库页面中，点击策略名称即可跳转至该策略的编辑页面，编辑页面提供「导入」、「导出」功能。
-
-一个完整的策略包含：
-- 策略源码
-- 策略描述
-- 策略笔记
-- 策略说明书
-- 策略参数配置
-- 策略交互配置
-
-因此在导出策略时，导出的文件为XML格式，包含上述所有信息。新建空白策略后，导入该XML文件即可完整还原策略。策略迁移不能仅复制源码，必须导入完整的策略文件（或手动添加策略参数设计、交互设计等配置）。
-
-## 托管者
-
-发明者量化交易平台的托管者软件是整个量化交易系统的核心组件。[托管者](https://www.fmz.com/m/add-node)可以理解为您交易策略的执行者，负责复杂的数据请求、数据接收、网络连接、日志回传等工作。实盘策略程序运行在托管者软件上，而非运行在发明者量化交易平台网站上。托管者运行在您的服务器上，即使**发明者量化交易平台**网站出现网络故障，也不会影响您的托管者运行。托管者可运行在```Linux```、```Windows```、```Mac OS```、```Android```、```树莓派 ARM Linux```等系统上。
-
-托管者管理的实盘日志均保存在托管者程序所在目录```./logs/storage```内，文件为扩展名```db3```的```Sqlite```数据库文件。可以使用```Sqlite```管理软件直接编辑。对于这些扩展名为```db3```的实盘数据库文件，文件名即为实盘的```Id```。
-
-托管者程序支持自动识别和使用系统代理设置。当系统中运行了代理软件（例如```Clash X```、```V2Ray```、```Shadowsocks```等）并开启增强模式或系统代理模式时，托管者会自动检测并使用该代理进行网络访问，无需手动配置。这对于需要通过代理访问交易所API的用户来说非常便捷，托管者启动后即可自动适配系统的网络环境。
-
-### 部署托管者
-
-在[托管者管理页面](https://www.fmz.com/m/nodes)可以查看当前发明者量化交易平台账号部署关联的托管者，支持列表视图和详细信息视图切换。该页面显示托管者的IP地址、版本号、编译发布时间等相关信息。点击**部署托管者**按钮可跳转至[托管者部署页面](https://www.fmz.com/m/add-node)。托管者部署提供两种模式：1、一键租用托管者；2、手动部署托管者。
-
-  ![托管者部署页面](https://www.fmz.com/upload/asset/2e527e497b3fa27ba497b.png)
-
-#### 一键租用托管者
-
-在[托管者部署页面](https://www.fmz.com/m/add-node)点击**一键租用托管者**标签，根据配置、服务器机房地区等需求选择需要部署的服务器。
-
-点击「立即购买」并输入当前发明者量化交易平台的账号密码进行验证，验证通过后将自动进行托管者程序部署。整个部署过程需要几分钟时间，系统会自动安装常用的Python库。
-
-点击「立即购买」后租用的服务器由于是通过平台代为租用，仅具有有限的系统权限，不支持远程登录。如果需要使用未预装的第三方Python库，建议使用私有服务器进行手动部署。
-
-通过**一键租用托管者**功能租用的服务器采用独立计费方式，与实盘计费相互独立。
-
-点击「重新部署」按钮不会删除托管者目录下logs目录中的实盘日志和数据文件。
-
-#### 手动部署托管者
-
-您可以将托管者部署到各种设备上，例如：个人电脑、服务器、树莓派等，支持多种主流操作系统。
-- Linux 命令行版本：Linux AMD64 / Linux 386 / Linux ARM64 / Linux ARMv7
-- Mac 命令行版本：Mac Intel64 / Apple Silicon
-- Windows 命令行版本、界面版本：64位 / 32位
-- Docker 镜像
-
-登录需要部署托管者程序的设备后，根据设备的操作系统下载对应的托管者程序。下载链接可以在[托管者部署页面](https://www.fmz.com/m/add-node)点击**手动部署托管者**标签后显示的内容中找到。
-部署托管者程序需要设置2个参数：
-![手动部署托管者页面](https://www.fmz.com/upload/asset/2e460507bc21582ba1448.png)
-
-1、包含发明者量化交易平台UID的通信地址。
-2、UID对应的发明者量化交易平台账号的密码。
-
-**部署托管者时配置「通信地址」和「发明者量化交易平台账号密码」：**
-- Windows界面版托管者
-  Windows界面版托管者可以直接将这两个参数填写到托管者界面上对应的输入框控件中。
-
-- 命令行版托管者
-  对于其他命令行版托管者程序，不同的操作系统有不同的指令。以Linux & Mac为例，使用命令：```./robot -s node.fmz.com/123456 -p 654321```，以下说明命令中的各个部分：
-
-  ```./robot```表示运行robot这个可执行程序（即托管者程序），其中```123456```为UID，```654321```为UID对应的发明者量化交易平台账户的密码。
-  ```-s```参数表示「发明者量化交易平台UID的通信地址」，参数值可以填写例如：```node.fmz.com/123456```。
-  ```-p```参数表示「UID对应的发明者量化交易平台账号的密码」，参数值可以填写例如：```654321```。
-
-  请注意这里的参数仅为示例，实际参数可以登录FMZ.COM后，在[托管者部署页面](https://www.fmz.com/m/add-node)点击**手动部署托管者**标签后查看。```-p```参数并非必须明文写在部署托管者的命令中，可以使用```./robot -s node.fmz.com/123456```命令运行，然后会提示输入密码，再手动输入密码即可。另外请注意执行程序的权限等问题，需要给予托管者程序足够的权限，解除运行限制。
-
-#### 托管者操作注意事项
-
-重要操作提示
-- 错误操作：
-  请勿直接在服务器等设备上强制终止托管者进程（如直接杀死进程或重启服务器）。此类操作可能导致托管者与FMZ平台断开连接，引发以下问题：
-  - 实盘无法正常停止
-  - 实盘持续运行并产生费用
-  出现此类情况时，需要先删除已离线的托管者，才能停止实盘。
-
-- 正确操作流程：
-  - 确认托管者上没有任何运行中的实盘
-  - 再执行删除托管者或停止托管者进程的操作
-  操作原则：先停止实盘，再停止托管者。
-
-### 全局指定IP地址
-
-- ```Windows```系统的界面版托管者可以直接在托管者软件界面上设置IP地址，托管者软件默认为自动设置IP。
-- 命令行环境运行的托管者使用```-I```参数指定IP地址。
-  ```log
-  -I string
-      custom local ip address
-  -c string
-      config file
-  -d string
-      custom dns resolve server
-  -e string
-      docker node executable path
-  -f string
-      docker settings json
-  -i string
-      docker image name
-  -n string
-      node name
-  -p string
-      password
-  -s string
-      server address
-  -u string
-      run as system user
-  -v  version info
-  -vv
-      show verbose log
-  -w string
-      working directory
-  ```
-
-### 命令行版本托管者程序的参数
-
-下载托管者软件后，解压缩得到的可执行文件```robot```即为托管者程序，在部署托管者时可以为托管者程序指定参数。
-- ```-v```：
-  查看当前托管者程序的版本、编译时间等信息。
-  完整的执行命令以```苹果电脑Mac系统```为例：```./robot -v```。
-- ```-vv```：
-  托管者程序的运行详细日志和交互消息，默认不显示且不写入托管者日志文件。
-  这样可以防止频繁的交互指令导致日志记录膨胀并占用硬盘空间。如果您需要记录托管者的详细日志并在托管者运行时显示出来，可以通过使用```-vv```参数来设置详细日志和交互消息写入托管者日志文件。
-- ```-s```：
-  运行托管者程序时指定与发明者量化交易平台通信的地址。
-  完整的执行命令以```苹果电脑Mac系统```为例：```./robot -s node.fmz.com/xxxxxxx```，```xxxxxxx```部分为每个发明者量化交易平台账号的唯一识别ID，命令执行后会提示要求输入对应的发明者量化交易平台账号密码。
-- ```-p```：
-  可以直接在运行命令中通过参数指定密码，不建议这样做，因为会在当前系统记录中留下密码参数。假设地址```node.fmz.com/xxxxxxx```对应的账号密码为：```abc123456```。
-  完整的执行命令以```苹果电脑Mac系统```为例：```./robot -s node.fmz.com/xxxxxxx -p abc123456```。
-- ```-n```：
-  为运行的托管者程序添加标签信息。
-  完整的执行命令以```苹果电脑Mac系统```为例：```./robot -n macTest -s node.fmz.com/xxxxxxx```。在平台托管者管理页面的托管者信息中会显示```macTest```文本标记。
-- ```-l```：
-  打印当前托管者支持的交易所列表。
-  完整的执行命令以```苹果电脑Mac系统```为例：```./robot -l```。即可输出所支持的交易所名称。
-
-### 实盘数据迁移
-
-当需要将实盘数据迁移到其他设备（服务器）上的托管者时，可以将实盘的数据库文件（扩展名为db3的数据库文件）移动到目标设备（服务器）上托管者目录中的对应路径位置。
-
-将文件名设置为平台上对应的实盘ID，这样之前实盘的所有日志信息就不会因为迁移到新设备而丢失。
-
-### 托管者监控
-
-在[托管者管理页面](https://www.fmz.com/m/nodes)的**托管者列表操作项**或**托管者详情操作项**中，可以开启**托管者监控**功能。开启监控后，若托管者异常离线，当前发明者量化交易平台绑定的邮箱将收到通知消息。
-
-## 交易所
-
-[交易所](https://www.fmz.com/m/platforms)页面用于管理和展示当前配置的交易所。在发明者量化交易平台中，「交易所」是一个核心概念，它指的是包含可供策略程序操作的资金账户相关密钥配置、通信协议和接口封装的对象。
-
-在交易所管理页面，点击「添加交易所」按钮即可跳转至[交易所添加页面](https://www.fmz.com/m/add-platform)，根据需求选择并填写配置信息。所有配置信息在本地加密后存储于发明者量化交易平台，因此平台不会记录任何明文数据。
-
-**交易所对象**
-已配置的交易所在策略代码层面对应```exchange```对象（交易所对象）。详情请参阅「语法手册」中的[```exchange```](https://www.fmz.com/syntax-guide#var_exchange)。
-在配置回测或实盘时，可以添加多个交易所。因此在策略代码层面存在```exchanges```对象数组（交易所对象数组）。详情请参阅「语法手册」中的[```exchanges```](https://www.fmz.com/syntax-guide#var_exchanges)。
-
-**使用交易所对象**
-在策略代码中可以调用交易所对象执行账户查询、行情获取、下单、撤单等操作。以```JavaScript```语言为例：
-
-```js
-function main() {
-    let account = exchange.GetAccount()    // 查询账户信息
-    let ticker = exchange.GetTicker()      // 获取ticker行情
-    let id = exchange.Buy(1000, 1)         // 价格为1000，下单量为1
-    exchange.CancelOrder(id)               // 如果订单没成交，则可以撤单
+// 初始化函数
+function init(){
+    Log("Initializing!")
 }
 ```
 
-## 策略编辑器
+```python
+def main():
+    Log("First line of code executed!", "#FF0000")
+    Log("Exiting!")
 
-在[新建策略页面](https://www.fmz.com/m/add-strategy)或者在[策略库](https://www.fmz.com/m/strategies)中打开一个现有策略进入**编辑页面**（例如策略ID为123456的地址为：```https://www.fmz.com/m/edit-strategy/123456```），即可编写和设计策略。
+def init():
+    Log("Initializing!")
+```
 
-发明者量化交易平台的在线策略编辑器提供了强大的策略编辑辅助功能。
+```rust
+fn main() {
+    Log!("First line of code executed!", "#FF0000");
+    Log!("Exiting!");
+}
+
+// 初始化函数
+fn init() {
+    Log!("Initializing!");
+}
+```
+
+#### onexit()
+
+```onexit()```由用户实现，在策略退出时处理扫尾工作，可以不定义。最长执行 5 分钟，超时会被强制结束。各语言在哪些情况下调用```onexit()```，见 `策略结构`。
+
+测试```onexit()```函数：
+
+```javascript
+function main(){
+    Log("Starting, will stop after 5 seconds and execute cleanup function!")
+    Sleep(1000 * 5)
+}
+
+// 扫尾函数实现
+function onexit(){
+    var beginTime = new Date().getTime()
+    while(true){
+        var nowTime = new Date().getTime()
+        Log("Program stop countdown..cleanup started, elapsed time:", (nowTime - beginTime) / 1000, "seconds!")
+        Sleep(1000)
+    }
+}
+```
+
+```python
+import time
+def main():
+    Log("Starting, will stop after 5 seconds and execute cleanup function!")
+    Sleep(1000 * 5)
+
+def onexit():
+    beginTime = time.time() * 1000
+    while True:
+        ts = time.time() * 1000
+        Log("Program stop countdown..cleanup started, elapsed time:", (ts - beginTime) / 1000, "seconds!")
+        Sleep(1000)
+```
+
+```rust
+fn main() {
+    Log!("Starting, will stop after 5 seconds and execute cleanup function!");
+    Sleep(1000 * 5);
+}
+
+// 扫尾函数实现
+fn onexit() {
+    let beginTime = Unix() * 1000;
+    loop {
+        let nowTime = Unix() * 1000;
+        Log!("Program stop countdown..cleanup started, elapsed time:", (nowTime - beginTime) / 1000, "seconds!");
+        Sleep(1000);
+    }
+}
+```
+
+回测系统中，策略通常写成不停轮询的死循环，回测数据结束时```main()```并没有正常返回，```JavaScript```、```Python```策略因此不会执行```onexit()```。可以在回测中（```IsVirtual()```为真）捕获回测结束时抛出的异常（EOF），让```main()```返回，从而执行```onexit()```。```Rust```策略在回测结束时 API 调用返回```Err```，退出循环即可。
+
+```javascript
+function main() {
+    if (exchange.GetName().startsWith("Futures_")) {
+        Log("Exchange is futures")
+        exchange.SetContractType("swap")
+    } else {
+        Log("Exchange is spot")
+    }
+
+    if (IsVirtual()) {
+        try {
+            onTick()
+        } catch (e) {
+            Log("error:", e)
+        }
+    } else {
+        onTick()
+    }
+}
+
+function onTick() {
+    while (true) {
+        var ticker = exchange.GetTicker()
+        LogStatus(_D(), ticker ? ticker.Last : "--")
+        Sleep(500)
+    }
+}
+
+function onexit() {
+    Log("Executing cleanup function")
+}
+```
+
+```python
+def main():
+    if exchange.GetName().startswith("Futures_"):
+        Log("Exchange is futures")
+    else:
+        Log("Exchange is spot")
+
+    if IsVirtual():
+        try:
+            onTick()
+        except Exception as e:
+            Log(e)
+    else:
+        onTick()
+
+def onTick():
+    while True:
+        ticker = exchange.GetTicker()
+        LogStatus(_D(), ticker["Last"] if ticker else "--")
+        Sleep(500)
+
+def onexit():
+    Log("Executing cleanup function")
+```
+
+```rust
+fn onTick() {
+    loop {
+        match exchange.GetTicker(None) {
+            Ok(ticker) => LogStatus!(_D(None), ticker.Last),
+            Err(e) => {
+                // 回测结束时API调用返回Err，退出循环使main返回，从而触发onexit()扫尾函数
+                Log!("error:", e);
+                break;
+            }
+        }
+        Sleep(500);
+    }
+}
+
+fn main() {
+    if exchange.GetName().starts_with("Futures_") {
+        Log!("Exchange is futures");
+        let _ = exchange.SetContractType("swap");
+    } else {
+        Log!("Exchange is spot");
+    }
+
+    onTick();
+}
+
+fn onexit() {
+    Log!("Executing cleanup function");
+}
+```
+
+#### onerror()
+
+```onerror(msg)```只有```JavaScript```（含 TypeScript）策略支持：```main()```因未捕获的异常结束时调用，参数```msg```为异常的错误信息。调用了```onerror()```就不再调用```onexit()```。最长执行 5 分钟，超时会被强制结束。回测系统不支持该函数。
+
+```Python```、```Rust```策略不支持```onerror()```。
+
+```javascript
+function main() {
+    var arr = []
+    Log(arr[6].Close)  // 这里故意引发一个程序异常
+}
+
+function onerror(msg) {
+    Log("Error:", msg)
+}
+```
+
+```python
+# Python 不支持
+```
+
+```rust
+// Rust 不支持
+```
+
+#### 主循环
+
+策略通常在```main()```中写一个循环：每轮获取行情、计算信号、下单，然后调用 `Sleep` 等待下一轮。```Sleep()```在回测中推进回测时间、控制回溯速度，在实盘中控制轮询间隔，从而控制访问交易所 API 的频率。循环中不调用```Sleep()```会以最快速度反复请求交易所接口，容易触发交易所的频率限制。需要在托管者上限制 API 调用频率时，见 `API限流控制`。
+
+基本框架：
+
+```javascript
+function onTick(){
+    // 在这里写策略逻辑，将会不断调用，例如打印行情信息
+    Log(exchange.GetTicker())
+}
+
+function main(){
+    while(true){
+        onTick()
+        // Sleep函数主要用于数字货币策略的轮询频率控制，防止访问交易所API接口过于频繁
+        Sleep(60000)
+    }
+}
+```
+
+```python
+def onTick():
+    Log(exchange.GetTicker())
+
+def main():
+    while True:
+        onTick()
+        Sleep(60000)
+```
+
+```rust
+fn onTick() {
+    // 在这里写策略逻辑，将会不断调用，例如打印行情信息
+    Log!(exchange.GetTicker(None));
+}
+
+fn main() {
+    loop {
+        onTick();
+        // Sleep函数主要用于数字货币策略的轮询频率控制，防止访问交易所API接口过于频繁
+        Sleep(60000);
+    }
+}
+```
+
+举个最简单的例子：每隔1秒钟在交易所挂一个价格为100、数量为1的买单，可以这样写：
+
+```javascript
+function onTick(){
+    // 这个仅仅是例子，回测或者实盘会很快把资金全部用于下单，实盘请勿使用
+    exchange.Buy(100, 1)
+}
+
+function main(){
+    while(true){
+        onTick()
+        // 暂停多久可自定义，单位为毫秒，1秒等于1000毫秒
+        Sleep(1000)
+    }
+}
+```
+
+```python
+def onTick():
+    exchange.Buy(100, 1)
+
+def main():
+    while True:
+        onTick()
+        Sleep(1000)
+```
+
+```rust
+fn onTick() {
+    // 这个仅仅是例子，回测或者实盘会很快把资金全部用于下单，实盘请勿使用
+    let _ = exchange.Buy(100, 1);
+}
+
+fn main() {
+    loop {
+        onTick();
+        // 暂停多久可自定义，单位为毫秒，1秒等于1000毫秒
+        Sleep(1000);
+    }
+}
+```
+
+按K线更新处理的策略（On Bar）：最新一根K线的时间变化时才执行```onTick()```：
+
+```javascript
+function onTick() {
+    Log("K-line updated, new BAR generated")
+}
+
+function main() {
+    var exName = exchange.GetName()
+    if (exName.includes("Futures_")) {
+        exchange.SetContractType("swap")
+    }
+
+    var lastTs = 0
+    while (true) {
+        var r = _C(exchange.GetRecords)
+        if (r.length > 0 && r[r.length - 1].Time != lastTs) {
+            onTick()
+            lastTs = r[r.length - 1].Time
+        }
+        Sleep(1000)
+    }
+}
+```
+
+```python
+def onTick():
+    Log("K-line updated, new BAR generated")
+
+def main():
+    exName = exchange.GetName()
+    if "Futures_" in exName:
+        exchange.SetContractType("swap")
+
+    lastTs = 0
+    while True:
+        r = _C(exchange.GetRecords)
+        if len(r) > 0 and r[-1]["Time"] != lastTs:
+            onTick()
+            lastTs = r[-1]["Time"]
+        Sleep(1000)
+```
+
+```rust
+fn onTick() {
+    Log!("K-line updated, new BAR generated");
+}
+
+fn main() {
+    let exName = exchange.GetName();
+    if exName.contains("Futures_") {
+        let _ = exchange.SetContractType("swap");
+    }
+
+    let mut lastTs = 0;
+    loop {
+        let r = _C!(exchange.GetRecords(None, None, None));
+        if r.len() > 0 && r[r.len() - 1].Time != lastTs {
+            onTick();
+            lastTs = r[r.len() - 1].Time;
+        }
+        Sleep(1000);
+    }
+}
+```
+
+#### 事件驱动
+
+除了按固定间隔轮询，策略也可以等待事件到达后再处理，减少无效请求，也能更快地响应行情变化。
+
+**EventLoop**
+
+`EventLoop` 等待```exchange.Go()```、```HttpQuery_Go()```等并发任务完成、WebSocket 连接有可读数据、线程消息等事件；有事件时返回事件信息，策略再去读取对应的数据。第一次调用```EventLoop()```时才开始记录事件，所以先调用一次```EventLoop(-1)```再发起并发任务：
+
+```js
+function main() {
+    EventLoop(-1)                       // 开始记录事件，避免错过之后发生的事件
+    var r1 = exchange.Go("GetTicker")
+    var r2 = exchange.Go("GetDepth")
+    var ev = EventLoop(1000)            // 等待任意一个并发任务完成，最多等 1 秒
+    Log("event:", ev)
+    Log("ticker:", r1.wait(), "depth:", r2.wait())
+}
+```
+
+**ctx.subscribe / ctx.poll**
+
+```JavaScript```和```Rust```策略还可以使用托管者的事件订阅接口：```ctx.subscribe()```订阅某个账户、某个品种的行情或订单回报，返回流 ID；```ctx.poll()```取出下一条事件（可以设置等待超时），策略按事件的```kind```分别处理。```Python```策略不支持。
+
+```js
+function main() {
+    ctx.subscribe(0, "BTC_USDT", {channel: "ticker"})   // 第一个参数是账户在 exchanges 中的下标
+    ctx.subscribe(0, "", {channel: "orders"})           // 订单回报
+    while (true) {
+        const ev = ctx.poll([], 1000)                    // [] 表示所有订阅，最多等 1 秒
+        if (!ev) {
+            continue
+        }
+        if (ev.kind === 1) {
+            Log("ticker:", ev.symbol, ev.bid, ev.ask, ev.last)
+        } else if (ev.kind === 16) {
+            Log("order:", ev.id, ev.state, ev.filledQty)
+        }
+    }
+}
+```
+
+- ```channel```可选```"ticker"```、```"bbo"```、```"depth"```、```"trade"```、```"kline"```（```interval```为周期秒数）、```"orders"```。
+- 事件的```kind```：1 为 ticker，3 为深度（事件只表示订单簿已更新，档位用```ctx.book(ev.ex, ev.symbol, n)```读取），4 为成交，5 为 K 线，16 为订单回报。
+- 行情类订阅消费不及时会只保留最新数据或丢弃最旧的数据，订单回报不会丢弃，策略需要持续调用```ctx.poll()```。
+
+```Rust```策略中的写法为```ctx::subscribe()```、```ctx::poll()```，事件为原始结构，价格、数量是定点整数：
+
+```rust
+fn main() {
+    let s = ctx::subscribe(0, "BTC_USDT", ctx::SubOpts::ticker()).unwrap();
+    loop {
+        match ctx::poll(&[s], Some(1000)) {
+            ctx::Polled::Event(ev) => Log!("event kind:", ev.kind),
+            ctx::Polled::Stopped => break,
+            _ => {}
+        }
+    }
+}
+```
+
+#### API函数速查
+
+按API手册的分类列出全部函数、结构体和常量，每项一句话说明，点击名称查看完整文档。本页由```doc_tools/gen_api_index.py```根据手册生成。
+
+## 内置函数
+
+### Global
+
+| 名称 | 说明 |
+| - | - |
+| `Version` | 返回当前系统版本号。 |
+| `IsVirtual` | 用于判断策略的运行环境是否为回测系统。 |
+| `GetOS` | 获取托管者所在设备的操作系统信息。 |
+| `GetPid` | 获取实盘进程的 ID。 |
+| `GetMeta` | 获取在生成策略注册码时写入的```Meta```值。 |
+| `Sleep` | 休眠函数，使程序暂停运行一段指定的时间。 |
+| `Unix` | 获取当前时刻的秒级时间戳。 |
+| `UnixNano` | 获取当前时刻的纳秒级时间戳。 |
+| `_D` | 将毫秒级时间戳或```Date```对象转换为时间字符串。 |
+| `GetCommand` | 获取策略的交互命令。 |
+| `GetLastError` | 获取最近一次的错误信息。 |
+| `SetErrorFilter` | 过滤错误日志。 |
+| `_N` | 格式化浮点数。 |
+| `_C` | 重试函数，用于对接口调用进行容错处理。 |
+| `_Cross` | 返回数组```arr1```与数组```arr2```的交叉周期数。 |
+| `JSON.parse` | ```JSON.parse```函数是**ECMAScript**标准内建对象```JSON```的方法，用于解码（解析）JSON字符串。 |
+| `JSON.stringify` | ```JSON.stringify```函数是**ECMAScript**标准内置对象```JSON```的方法，用于将JavaScript值转换为JSON字符串。 |
+| `Encode` | 该函数根据传入的参数对数据进行编码。 |
+| `MD5` | 计算参数```data```的 MD5 哈希值。 |
+| `UUID` | 创建一个 UUID。 |
+
+### Log
+
+| 名称 | 说明 |
+| - | - |
+| `Log` | ```Log()```函数用于输出日志。 |
+| `LogStatus` | 在回测系统或实盘页面的状态栏中输出信息。 |
+| `LogProfit` | 记录并打印盈亏数值，并根据盈亏数值绘制收益曲线。 |
+| `LogProfitReset` | 清空所有收益日志及收益图表。 |
+| `LogReset` | 清除日志。 |
+| `LogVacuum` | 用于在调用 ```LogReset()``` 函数清除日志后，回收 **SQLite** 删除数据时所占用的存储空间。 |
+| `EnableLog` | 启用或禁用订单信息的日志记录。 |
+| `Chart` | 自定义图表绘图函数。 |
+| `KLineChart` | 该函数用于采用类似```Pine```语言的绘图方式，在策略运行时进行自定义绘图。 |
+| `console.log` | 用于在实盘页面的「调试信息」栏中输出调试信息。 |
+| `console.error` | 用于在实盘页面的「调试信息」栏中输出错误信息。 |
+| `exchange.Log` | ```exchange.Log()```函数用于在日志栏区域输出下单、撤单日志。 |
+
+### Market
+
+| 名称 | 说明 |
+| - | - |
+| `exchange.GetTicker` | 获取当前设置的交易对、合约代码所对应现货或合约的Ticker结构，即行情数据。 |
+| `exchange.GetTickers` | ```exchange.GetTickers()```函数用于获取交易所的聚合行情数据（Ticker结构的数组）。 |
+| `exchange.GetDepth` | 获取当前设置的交易对、合约代码所对应的现货或合约的Depth结构，即订单簿数据。 |
+| `exchange.GetTrades` | 获取当前设置的交易对、合约代码所对应的现货或合约的Trade结构数组，即市场的成交数据。 |
+| `exchange.GetRecords` | 获取当前设置的交易对、合约代码所对应的现货或合约的Record结构数组，即K线数据。 |
+| `exchange.GetMarkets` | ```exchange.GetMarkets()```函数用于获取交易所的市场信息。 |
+| `exchange.GetRawJSON` | 获取当前交易所对象（exchange、exchanges）最近一次```rest```请求返回的原始内容。 |
+| `exchange.SetData` | ```exchange.SetData()```函数用于设置策略运行时所加载的数据。 |
+| `exchange.GetData` | ```exchange.GetData()```函数用于获取由```exchange.SetData()```函数加载的数据，或外部链接提供的数据。 |
+
+### Trade
+
+| 名称 | 说明 |
+| - | - |
+| `exchange.Buy` | ```exchange.Buy()```函数用于下买单。 |
+| `exchange.Sell` | ```exchange.Sell()```函数用于下达卖单。 |
+| `exchange.CreateOrder` | ```exchange.CreateOrder()```函数用于下单。 |
+| `exchange.ModifyOrder` | ```exchange.ModifyOrder()```函数用于修改现有的普通订单，可修改订单的价格和数量。 |
+| `exchange.CancelOrder` | ```exchange.CancelOrder()```函数用于取消订单。 |
+| `exchange.GetOrder` | ```exchange.GetOrder()```函数用于获取订单信息。 |
+| `exchange.GetOrders` | ```exchange.GetOrders()```函数用于获取当前未完成的订单。 |
+| `exchange.GetHistoryOrders` | ```exchange.GetHistoryOrders()```函数用于获取当前交易对、合约的历史订单，并支持指定具体的交易品种。 |
+| `exchange.CreateConditionOrder` | ```exchange.CreateConditionOrder()```函数用于创建条件单。 |
+| `exchange.ModifyConditionOrder` | ```exchange.ModifyConditionOrder()```函数用于修改现有的条件单，可修改条件单的下单量、触发条件和执行价格。 |
+| `exchange.CancelConditionOrder` | ```exchange.CancelConditionOrder()```函数用于取消条件单。 |
+| `exchange.GetConditionOrder` | ```exchange.GetConditionOrder()```函数用于获取指定条件单的信息。 |
+| `exchange.GetConditionOrders` | ```exchange.GetConditionOrders()```函数用于获取未完成的条件单（尚未触发或尚未取消的条件单）。 |
+| `exchange.GetHistoryConditionOrders` | ```exchange.GetHistoryConditionOrders()```函数用于获取当前交易对、合约的历史条件单（包括已触发、已取消、已过期的条件单），并支持指定具体的交易品种。 |
+
+### Account
+
+| 名称 | 说明 |
+| - | - |
+| `exchange.GetAccount` | ```exchange.GetAccount()```函数用于请求交易所账户信息。 |
+| `exchange.GetAssets` | ```exchange.GetAssets```函数用于请求交易所账户的资产信息。 |
+
+### Futures
+
+| 名称 | 说明 |
+| - | - |
+| `exchange.SetContractType` | ```exchange.SetContractType()```函数用于设置exchange交易所对象当前的合约代码。 |
+| `exchange.GetContractType` | ```exchange.GetContractType()```函数用于获取exchange交易所对象当前设置的合约代码。 |
+| `exchange.SetDirection` | ```exchange.SetDirection()```函数用于设置调用exchange.Buy函数、exchange.Sell函数进行期货合约下单时的订单方向。 |
+| `exchange.SetMarginLevel` | ```exchange.SetMarginLevel()```函数用于设置```symbol```参数所指定的交易对、合约的杠杆值。 |
+| `exchange.GetPositions` | ```exchange.GetPositions()```函数用于获取持仓信息；```GetPositions()```函数是交易所对象exchange的成员函数。 |
+| `exchange.GetFundings` | ```exchange.GetFundings()```函数用于获取当前周期的资金费率数据。 |
+
+### Exchange
+
+| 名称 | 说明 |
+| - | - |
+| `exchange.GetName` | ```exchange.GetName()```函数用于获取当前交易所对象所绑定的交易所名称。 |
+| `exchange.GetLabel` | ```exchange.GetLabel()```函数用于获取配置交易所对象时设置的自定义标签。 |
+| `exchange.GetCurrency` | ```exchange.GetCurrency()```函数用于获取当前设置的交易对。 |
+| `exchange.SetCurrency` | ```exchange.SetCurrency()```函数用于切换交易所对象exchange当前的交易对。 |
+| `exchange.GetQuoteCurrency` | ```exchange.GetQuoteCurrency()```函数用于获取当前交易对的计价币名称，即```quoteCurrency```。 |
+| `exchange.GetPeriod` | 获取回测或实盘运行策略时，在发明者量化交易平台网站页面上所设置的 K 线周期，即调用 ```exchange.GetRecords()``` 函数且不传入参数时使用的默认 K 线周期。 |
+| `exchange.SetMaxBarLen` | 设置K线的最大长度。 |
+| `exchange.SetPrecision` | ```exchange.SetPrecision()```函数用于设置```exchange```交易所对象的**价格**与**下单量**的精度，设置后系统会自动忽略数据中超出精度的多余部分。 |
+| `exchange.GetRate` | 获取交易所对象当前设置的汇率。 |
+| `exchange.SetRate` | 设置交易所对象当前的汇率。 |
+| `exchange.SetBase` | ```exchange.SetBase()```函数用于设置exchange交易所对象所使用的交易所API接口基地址。 |
+| `exchange.GetBase` | ```exchange.GetBase()``` 函数用于获取当前交易所 API 接口的基础地址。 |
+| `exchange.SetProxy` | ```exchange.SetProxy()```函数用于设置exchange交易所对象的代理配置。 |
+| `exchange.SetTimeout` | ```exchange.SetTimeout()```函数用于设置exchange交易所对象```rest```请求的超时时间。 |
+| `exchange.Encode` | ```exchange.Encode()```函数用于执行签名与加密计算。 |
+
+### IO
+
+| 名称 | 说明 |
+| - | - |
+| `exchange.IO` | ```exchange.IO()```函数用于调用交易所对象相关的其它接口。 |
+| ```exchange.IO("api", ...)``` | ```exchange.IO("api", ...)```调用交易所未封装的原始REST接口，签名由平台自动处理。 |
+| ```exchange.IO("currency", ...)``` | ```exchange.IO("currency", ...)```在运行时切换交易所对象的当前交易对。 |
+| ```exchange.IO("base", ...)``` | ```exchange.IO("base", ...)```切换交易接口的基地址，```exchange.IO("mbase", ...)```切换行情接口的基地址。 |
+| ```exchange.IO(mode, value)``` | ```exchange.IO(mode, value)```切换交易所的交易模式：模拟盘/实盘、全仓/逐仓、双向/单向持仓、统一账户、杠杆模式、自成交预防等。 |
+| ```exchange.IO("rate", ...)``` | ```exchange.IO("rate", ...)```与```exchange.IO("quota", ...)```限制API函数的调用频率。 |
+
+### Network
+
+| 名称 | 说明 |
+| - | - |
+| `HttpQuery` | 发送HTTP请求。 |
+| `HttpQuery_Go` | 发送Http请求，是```HttpQuery```函数的异步版本。 |
+| `Dial` | 用于原始 ```Socket``` 访问，支持 ```tcp```、```udp```、```tls```、```unix``` 协议。 |
+| `Mail` | 发送邮件。 |
+| `Mail_Go` | ```Mail```函数的异步版本。 |
+
+### Storage
+
+| 名称 | 说明 |
+| - | - |
+| `_G` | 持久化保存数据。 |
+| `DBExec` | 数据库接口函数。 |
+| `SetChannelData` | 在频道上发布最新的状态数据。 |
+| `GetChannelData` | 订阅指定实盘的频道数据。 |
+
+### Threads
+
+| 名称 | 说明 |
+| - | - |
+| `exchange.Go` | 多线程异步支持函数，可将所有受支持函数的操作转换为异步并发执行。 |
+| `EventLoop` | 监听事件，当任意```WebSocket```有可读数据，或```exchange.Go()```、```HttpQuery_Go()```等并发任务完成后返回。 |
+
+#### Threads/threading
+
+| 名称 | 说明 |
+| - | - |
+| `Thread` | ```Thread()```函数用于创建并发线程。 |
+| `getThread` | ```getThread()```函数用于根据指定的线程ID获取线程对象。 |
+| `mainThread` | ```mainThread()```函数用于获取主线程的线程对象，即策略中```main()```函数所在的线程。 |
+| `currentThread` | ```currentThread()```函数用于获取当前线程的线程对象。 |
+| `Lock` | ```Lock()```函数用于创建线程锁对象。 |
+| `Condition` | ```Condition()```函数用于创建一个条件变量对象，该对象用于在多线程并发环境中实现线程间的同步与通信。 |
+| `Event` | ```Event()```函数用于创建一个*线程事件*对象，该对象用于线程间的同步，允许一个线程等待另一个线程的通知或信号。 |
+| `Dict` | ```Dict()```函数用于创建一个字典对象，用于在并发线程间传递和共享数据。 |
+| `Serve` | ```Serve()```函数在策略进程内创建Http服务、TCP服务、Websocket服务（基于Http协议），返回Server对象。 |
+| `pending` | ```pending```函数用于获取当前策略程序中正在运行的并发线程数量。 |
+
+#### Threads/Thread
+
+| 名称 | 说明 |
+| - | - |
+| `peekMessage` | ```peekMessage()```函数用于从线程接收消息。 |
+| `postMessage` | ```postMessage()```函数用于向线程发送消息。 |
+| `join` | ```join()```函数用于等待线程退出，并回收系统资源。 |
+| `terminate` | ```terminate()```函数用于强制终止线程，释放创建线程时占用的硬件资源。 |
+| `getData` | ```getData()```函数用于访问线程环境中记录的变量。 |
+| `setData` | ```setData()```函数用于在线程环境中存储变量。 |
+| `id` | ```id()```函数用于返回当前多线程对象实例的```threadId```。 |
+| `name` | ```name()```函数用于返回当前多线程对象实例的名称。 |
+| `eventLoop` | ```eventLoop()``` 函数用于监听当前线程接收到的事件。 |
+
+#### Threads/ThreadLock
+
+| 名称 | 说明 |
+| - | - |
+| `acquire` | ```acquire()```函数用于请求线程锁（加锁）。 |
+| `release` | ```release()```函数用于释放线程锁（解锁）。 |
+
+#### Threads/ThreadEvent
+
+| 名称 | 说明 |
+| - | - |
+| `set` | ```set()```函数用于设置事件信号。 |
+| `clear` | ```clear()```函数用于清除信号。 |
+| `wait` | ```wait()```函数用于设置事件（信号）等待，在事件（信号）被设置之前会阻塞；支持设置超时参数。 |
+| `isSet` | ```isSet()```函数用于判断事件（信号）是否已被设置。 |
+
+#### Threads/ThreadCondition
+
+| 名称 | 说明 |
+| - | - |
+| `notify` | ```notify()```函数用于唤醒一个正在等待的线程（如果存在）。 |
+| `notifyAll` | ```notifyAll()```函数用于唤醒所有正在等待的线程。 |
+| `wait` | ```wait()```函数用于在特定条件下使线程进入等待状态。 |
+| `acquire` | ```acquire()```函数用于请求线程锁（加锁）。 |
+| `release` | ```release()```函数用于释放线程锁（解锁）。 |
+
+#### Threads/ThreadDict
+
+| 名称 | 说明 |
+| - | - |
+| `get` | ```get()```函数用于获取字典对象中记录的键值。 |
+| `set` | ```set()```函数用于设置键值对。 |
+
+#### Threads/Server
+
+| 名称 | 说明 |
+| - | - |
+| `addr` | ```addr()```函数返回服务实际监听的地址和端口。 |
+| `close` | ```close()```函数停止接收新连接，正在执行的处理函数继续执行完（优雅关闭）。 |
+| `stop` | ```stop()```函数先关闭服务（同```close()```），再强制结束所有正在执行的处理函数线程。 |
+| `join` | ```join()```函数等待服务关闭且所有处理函数执行完毕。 |
+| `pending` | ```pending()```函数返回当前正在执行的处理函数数量，即正在处理的连接或请求数。 |
+
+### Web3
+
+| 名称 | 说明 |
+| - | - |
+| ```exchange.IO("abi", ...)``` | 在发明者量化交易平台中，区块链相关的各种功能和调用主要通过```exchange.IO()```函数实现。 |
+| ```exchange.IO("api", blockChain, ...)``` | ```exchange.IO("api", "eth", ...)```调用方式用于调用以太坊RPC方法（配置Web3交易所对象时需选择eth）。 |
+| ```exchange.IO("encode", ...)``` | ```exchange.IO("encode", ...)```函数的这种调用方式用于数据编码。 |
+| ```exchange.IO("encodePacked", ...)``` | ```exchange.IO("encodePacked", ...)```函数用于执行```encodePacked```编码操作。 |
+| ```exchange.IO("decode", ...)``` | ```exchange.IO("decode", ...)```调用方式用于对数据进行解码。 |
+| ```exchange.IO("hash", ...)``` | ```exchange.IO("hash", ...)```函数的调用方式用于计算哈希摘要、HMAC，以及使用交易所对象配置的私钥签名等，参数与Encode函数相同。 |
+| ```exchange.IO("key", ...)``` | ```exchange.IO("key", ...)```函数用于切换私钥的调用方式。 |
+| ```exchange.IO("sign", ...)``` | ```exchange.IO("sign", ...)```调用方式用于使用secp256k1私钥对32字节哈希进行签名，返回r、s、v等签名数据，适用于EIP-712结构化数据签名（如ERC-20 Permit授权、1inch限价单）等需要链下签名的场景。 |
+| ```exchange.IO("signTypedData", ...)``` | ```exchange.IO("signTypedData", ...)```函数的调用方式用于按照EIP-712标准对结构化数据进行签名，一次调用即可完成类型哈希、域分隔符、结构体哈希和摘要的计算并签名，适用于ERC-20 Permit、Permit2、UniswapX、CoW、1inch限价单等场景。 |
+| ```exchange.IO("signMessage", ...)``` | ```exchange.IO("signMessage", ...)```调用方式用于按照EIP-191标准（```personal_sign```）对消息进行签名，签名结果与ethers的```signMessage```、钱包的```personal_sign```一致，常用于DApp登录、链下鉴权等场景。 |
+| ```exchange.IO("api", ...)``` | ```exchange.IO("api", ...)```调用方式用于调用智能合约的方法。 |
+| ```exchange.IO("call", ...)``` | ```exchange.IO("call", ...)```调用方式通过```eth_call```模拟执行智能合约的任意方法（包括会修改链上状态的写入方法），该过程不签名、不广播交易、不消耗gas，适用于链上询价、交易预演以及检查交易能否成功执行。 |
+| ```exchange.IO("multicall", ...)``` | ```exchange.IO("multicall", ...)```调用方式用于通过Multicall3合约在一次请求中批量读取多个合约调用的结果，适用于批量查询余额、流动池状态、报价等数据，可有效减少RPC请求次数。 |
+| ```exchange.IO("logs", ...)``` | ```exchange.IO("logs", ...)```调用方式用于查询合约的事件日志（```eth_getLogs```），并按ABI进行解码。 |
+| ```exchange.IO("waitReceipt", ...)``` | ```exchange.IO("waitReceipt", ...)```调用方式用于等待交易上链并达到指定的确认数，返回交易回执及解码后的事件日志。 |
+| ```exchange.IO("nonce", ...)``` | ```exchange.IO("nonce", ...)```函数的调用方式用于查看、同步或设置发送交易时使用的nonce计数。 |
+| ```exchange.IO("speedUp", ...)``` | ```exchange.IO("speedUp", ...)```调用方式用于对卡住（长时间未上链）的交易进行加价重发：保持接收地址、金额、调用数据和gas上限不变，仅提高手续费。 |
+| ```exchange.IO("cancelTx", ...)``` | ```exchange.IO("cancelTx", ...)```调用方式用于取消尚未上链的交易：使用与原交易相同的nonce，以更高的手续费发送一笔转给自己的0金额交易；该交易先上链后，原交易即失效。 |
+| ```exchange.IO("toUnits", ...)``` | ```exchange.IO("toUnits", ...)```函数的调用方式用于将可读数量换算为链上整数。 |
+| ```exchange.IO("fromUnits", ...)``` | ```exchange.IO("fromUnits", ...)```调用方式用于将链上整数值换算为可读数量，整个换算过程基于字符串进行精确计算，不经过浮点数运算，避免精度损失。 |
+| ```exchange.IO("uniswapV3", ...)``` | ```exchange.IO("uniswapV3", ...)```调用方式用于集中流动性（Uniswap V3）相关的计算，包括tick、价格与sqrtPriceX96之间的换算，以及流动性与代币数量之间的换算。 |
+| ```exchange.IO("contracts", ...)``` | ```exchange.IO("contracts", ...)```调用方式用于获取当前链（或指定链）的常用合约地址，包括主流代币、Multicall3、Permit2，以及Uniswap V3、PancakeSwap V3的Factory、路由、QuoterV2和头寸管理合约。 |
+| `exchange.IO("address")` | ```exchange.IO("address")```函数的调用方式用于获取exchange交易所对象配置的钱包的地址。 |
+| ```exchange.IO("base", ...)``` | ```exchange.IO("base", ...)```调用方式用于设置RPC节点地址，支持设置多个节点互为备用。 |
+| ```exchange.IO("sendBase", ...)``` | ```exchange.IO("sendBase", ...)```调用方式用于设置仅用于广播交易的节点。 |
+
+### Uniswap
+
+| 名称 | 说明 |
+| - | - |
+| ```exchange.IO("transfer", ...)``` | ```exchange.IO("transfer", ...)```调用方式用于从Uniswap交易所对象所配置的钱包中转出链上原生币（如ETH、BNB）或ERC20代币。 |
+| ```exchange.IO("receipt", ...)``` | 以```exchange.IO("receipt", ...)```方式调用该函数，可查询Uniswap交易所对象所发出交易（如下单、转账等）的回执，也可等待交易上链。 |
+| ```exchange.IO("route", ...)``` | ```exchange.IO("route", ...)```调用用于在Uniswap交易所对象上询价：列出一笔兑换在各条候选路径上的报价以及最优路径，不会实际下单。 |
+| ```exchange.IO("simulate", ...)``` | ```exchange.IO("simulate", ...)```调用方式按照Uniswap交易所对象的下单逻辑（路径选择、询价、价格保护）构造兑换交易，仅在链上进行模拟执行（```eth_call```），不签名、不广播，也不消耗gas。 |
+| ```exchange.IO("token", ...)``` | ```exchange.IO("token", ...)```函数的调用方式用于在Uniswap交易所对象上登记代币，或者列出代币表。 |
+| ```exchange.IO("wrap", ...)``` | ```exchange.IO("wrap", ...)```函数的调用方式用于在Uniswap交易所对象上把原生币（ETH、BNB）包装成包装币（WETH、WBNB），1:1兑换，没有滑点，只花gas。 |
+| ```exchange.IO("unwrap", ...)``` | ```exchange.IO("unwrap", ...)```函数的调用方式用于在Uniswap交易所对象上把包装币（WETH、WBNB）解包成原生币（ETH、BNB），1:1兑换，没有滑点，只花gas。 |
+| ```exchange.IO("approve", ...)``` | 以```exchange.IO("approve", ...)```方式调用该函数，可在Uniswap交易所对象上设置代币授权模式。 |
+| ```exchange.IO("slippage", ...)``` | ```exchange.IO("slippage", ...)```函数的此种调用方式用于为Uniswap交易所对象设置市价单的滑点保护。 |
+| ```exchange.IO("deadline", ...)``` | ```exchange.IO("deadline", ...)```调用方式用于在Uniswap交易所对象上设置交易的截止时间。 |
+| ```exchange.IO("gasMultiplier", ...)``` | ```exchange.IO("gasMultiplier", ...)```调用方式用于在Uniswap交易所对象上设置gas上限倍数。 |
+
+### TA
+
+| 名称 | 说明 |
+| - | - |
+| `TA.MACD` | ```TA.MACD()```函数用于计算**指数平滑异同移动平均线（MACD）指标**。 |
+| `TA.KDJ` | ```TA.KDJ()```函数用于计算**随机指标（KDJ）**。 |
+| `TA.RSI` | ```TA.RSI()```函数用于计算**相对强弱指标（RSI）**。 |
+| `TA.ATR` | ```TA.ATR()```函数用于计算**平均真实波幅指标（ATR）**。 |
+| `TA.OBV` | ```TA.OBV()```函数用于计算**能量潮指标（OBV）**。 |
+| `TA.MA` | ```TA.MA()```函数用于计算**移动平均线指标（Moving Average）**。 |
+| `TA.EMA` | ```TA.EMA()```函数用于计算**指数移动平均线（EMA）指标**。 |
+| `TA.BOLL` | ```TA.BOLL()```函数用于计算**布林带指标**。 |
+| `TA.Alligator` | ```TA.Alligator()```函数用于计算**鳄鱼线指标（Alligator）**。 |
+| `TA.CMF` | ```TA.CMF()```函数用于计算**蔡金资金流量指标（Chaikin Money Flow）**。 |
+| `TA.Highest` | ```TA.Highest()```函数用于计算**周期内最高价**。 |
+| `TA.Lowest` | ```TA.Lowest()```函数用于计算**周期最低价**。 |
+| `TA.SMA` | ```TA.SMA()```函数用于计算**简单移动平均线（SMA）指标**。 |
+
+#### Talib/OverlapStudies
+
+| 名称 | 说明 |
+| - | - |
+| `talib.BBANDS` | ```talib.BBANDS()```函数用于计算**Bollinger Bands（布林带）**。 |
+| `talib.DEMA` | ```talib.DEMA()```函数用于计算**Double Exponential Moving Average（双指数移动平均线）**。 |
+| `talib.EMA` | ```talib.EMA()```函数用于计算**Exponential Moving Average（指数移动平均线）**。 |
+| `talib.HT_TRENDLINE` | ```talib.HT_TRENDLINE()```函数用于计算**Hilbert Transform - Instantaneous Trendline（希尔伯特变换瞬时趋势线）**。 |
+| `talib.KAMA` | ```talib.KAMA()```函数用于计算**Kaufman自适应移动平均线（Kaufman Adaptive Moving Average）**。 |
+| `talib.MA` | ```talib.MA()```函数用于计算**Moving average（移动平均线）**。 |
+| `talib.MAMA` | ```talib.MAMA()```函数用于计算**MESA自适应移动平均线（MESA Adaptive Moving Average）**。 |
+| `talib.MIDPOINT` | ```talib.MIDPOINT()```函数用于计算**MidPoint over period（中点价格）**。 |
+| `talib.MIDPRICE` | ```talib.MIDPRICE()```函数用于计算**Midpoint Price over period（中点价格）**。 |
+| `talib.SAR` | ```talib.SAR()```函数用于计算**抛物线转向指标（Parabolic SAR）**。 |
+| `talib.SAREXT` | ```talib.SAREXT()```函数用于计算**Parabolic SAR - Extended（增强型抛物线转向指标）**。 |
+| `talib.SMA` | ```talib.SMA()```函数用于计算**Simple Moving Average（简单移动平均线）**。 |
+| `talib.T3` | ```talib.T3()```函数用于计算**Triple Exponential Moving Average (T3) (三重指数移动平均)**。 |
+| `talib.TEMA` | ```talib.TEMA()```函数用于计算**Triple Exponential Moving Average（三重指数移动平均线）**。 |
+| `talib.TRIMA` | ```talib.TRIMA()```函数用于计算**Triangular Moving Average（三角移动平均线）**。 |
+| `talib.WMA` | ```talib.WMA()```函数用于计算**Weighted Moving Average（加权移动平均）**。 |
+
+#### Talib/MomentumIndicators
+
+| 名称 | 说明 |
+| - | - |
+| `talib.ADX` | ```talib.ADX()```函数用于计算**Average Directional Movement Index（平均趋向指数）**。 |
+| `talib.ADXR` | ```talib.ADXR()```函数用于计算**平均趋向指数评级（Average Directional Movement Index Rating）**。 |
+| `talib.APO` | ```talib.APO()```函数用于计算**Absolute Price Oscillator（绝对价格振荡器）**。 |
+| `talib.AROON` | ```talib.AROON()```函数用于计算**Aroon（阿隆指标）**。 |
+| `talib.AROONOSC` | ```talib.AROONOSC()```函数用于计算**Aroon Oscillator（阿隆震荡指标）**。 |
+| `talib.BOP` | ```talib.BOP()```函数用于计算**Balance Of Power（均势指标）**。 |
+| `talib.CCI` | ```talib.CCI()```函数用于计算**Commodity Channel Index（商品通道指数）**。 |
+| `talib.CMO` | ```talib.CMO()```函数用于计算**Chande Momentum Oscillator（钱德动量摆动指标）**。 |
+| `talib.DX` | ```talib.DX()```函数用于计算**Directional Movement Index（动向指数）**。 |
+| `talib.MACD` | ```talib.MACD()```函数用于计算**Moving Average Convergence/Divergence（移动平均收敛发散指标）**。 |
+| `talib.MACDEXT` | ```talib.MACDEXT()```函数用于计算**MACD with controllable MA type（可控移动平均类型的MACD）**。 |
+| `talib.MACDFIX` | ```talib.MACDFIX()```函数用于计算**Moving Average Convergence/Divergence Fix 12/26（移动平均收敛/发散固定12/26）**。 |
+| `talib.MFI` | ```talib.MFI()```函数用于计算**Money Flow Index（资金流量指数）**。 |
+| `talib.MINUS_DI` | ```talib.MINUS_DI()```函数用于计算**负向指标（Minus Directional Indicator）**。 |
+| `talib.MINUS_DM` | ```talib.MINUS_DM()```函数用于计算**负向运动指标（Minus Directional Movement）**。 |
+| `talib.MOM` | ```talib.MOM()```函数用于计算**Momentum（动量指标）**。 |
+| `talib.PLUS_DI` | ```talib.PLUS_DI()```函数用于计算**Plus Directional Indicator（正向指标）**。 |
+| `talib.PLUS_DM` | ```talib.PLUS_DM()```函数用于计算**Plus Directional Movement（正向运动指标）**。 |
+| `talib.PPO` | ```talib.PPO()```函数用于计算**Percentage Price Oscillator（价格振荡百分比）**。 |
+| `talib.ROC` | ```talib.ROC()```函数用于计算**变动率指标（Rate of change）：((price/prevPrice)-1)*100**。 |
+| `talib.ROCP` | ```talib.ROCP()```函数用于计算**价格变化率百分比：(price-prevPrice)/prevPrice**。 |
+| `talib.ROCR` | ```talib.ROCR()```函数用于计算**价格变化率比值：(price/prevPrice)**。 |
+| `talib.ROCR100` | ```talib.ROCR100()```函数用于计算**Rate of change ratio 100 scale: (price/prevPrice)*100（价格变化率比例100倍）**。 |
+| `talib.RSI` | ```talib.RSI()```函数用于计算**Relative Strength Index（相对强弱指标）**。 |
+| `talib.STOCH` | ```talib.STOCH()```函数用于计算**随机指标（STOCH指标）**。 |
+| `talib.STOCHF` | ```talib.STOCHF()```函数用于计算**快速随机指标（Stochastic Fast）**。 |
+| `talib.STOCHRSI` | ```talib.STOCHRSI()```函数用于计算**随机相对强弱指数（Stochastic Relative Strength Index）**。 |
+| `talib.TRIX` | ```talib.TRIX()```函数用于计算**1-day Rate-Of-Change (ROC) of a Triple Smooth EMA（三重指数平滑移动平均线的一日变化率）**。 |
+| `talib.ULTOSC` | ```talib.ULTOSC()```函数用于计算**Ultimate Oscillator（极限振荡器）**。 |
+| `talib.WILLR` | ```talib.WILLR()```函数用于计算**Williams' %R（威廉指标）**。 |
+
+#### Talib/VolumeIndicators
+
+| 名称 | 说明 |
+| - | - |
+| `talib.AD` | ```talib.AD()```函数用于计算**Chaikin A/D Line（累积/派发线指标）**。 |
+| `talib.ADOSC` | ```talib.ADOSC()```函数用于计算**Chaikin A/D Oscillator（佳庆指标）**。 |
+| `talib.OBV` | ```talib.OBV()```函数用于计算**On Balance Volume（能量潮指标）**。 |
+
+#### Talib/VolatilityIndicators
+
+| 名称 | 说明 |
+| - | - |
+| `talib.ATR` | ```talib.ATR()```函数用于计算**Average True Range（平均真实波幅）**指标。 |
+| `talib.NATR` | ```talib.NATR()```函数用于计算**Normalized Average True Range（归一化平均真实范围）**。 |
+| `talib.TRANGE` | ```talib.TRANGE()```函数用于计算**True Range（真实范围）**指标。 |
+
+#### Talib/CycleIndicators
+
+| 名称 | 说明 |
+| - | - |
+| `talib.HT_DCPERIOD` | ```talib.HT_DCPERIOD()```函数用于计算**Hilbert Transform - Dominant Cycle Period（希尔伯特变换主导周期）**。 |
+| `talib.HT_DCPHASE` | ```talib.HT_DCPHASE()```函数用于计算**希尔伯特变换主周期相位（Hilbert Transform - Dominant Cycle Phase）**。 |
+| `talib.HT_PHASOR` | ```talib.HT_PHASOR()```函数用于计算**Hilbert Transform - Phasor Components（希尔伯特变换-相量分量）**。 |
+| `talib.HT_SINE` | ```talib.HT_SINE()```函数用于计算**Hilbert Transform - SineWave（希尔伯特变换 - 正弦波）**。 |
+| `talib.HT_TRENDMODE` | ```talib.HT_TRENDMODE()```函数用于计算**Hilbert Transform - Trend vs Cycle Mode（希尔伯特变换 - 趋势与周期模式）**。 |
+
+#### Talib/PriceTransform
+
+| 名称 | 说明 |
+| - | - |
+| `talib.AVGPRICE` | ```talib.AVGPRICE()```函数用于计算**Average Price（平均价格）**。 |
+| `talib.MEDPRICE` | ```talib.MEDPRICE()```函数用于计算**Median Price（中位数价格）**。 |
+| `talib.TYPPRICE` | ```talib.TYPPRICE()```函数用于计算**典型价格（Typical Price）**。 |
+| `talib.WCLPRICE` | ```talib.WCLPRICE()```函数用于计算**Weighted Close Price（加权收盘价）**。 |
+
+#### Talib/StatisticFunctions
+
+| 名称 | 说明 |
+| - | - |
+| `talib.LINEARREG` | ```talib.LINEARREG()```函数用于计算**Linear Regression（线性回归）**指标。 |
+| `talib.LINEARREG_ANGLE` | ```talib.LINEARREG_ANGLE()```函数用于计算**Linear Regression Angle（线性回归角度）**。 |
+| `talib.LINEARREG_INTERCEPT` | ```talib.LINEARREG_INTERCEPT()```函数用于计算**线性回归截距（Linear Regression Intercept）**。 |
+| `talib.LINEARREG_SLOPE` | ```talib.LINEARREG_SLOPE()```函数用于计算**Linear Regression Slope（线性回归斜率）**。 |
+| `talib.STDDEV` | ```talib.STDDEV()```函数用于计算**标准偏差（Standard Deviation）**。 |
+| `talib.TSF` | ```talib.TSF()```函数用于计算**Time Series Forecast（时间序列预测）**。 |
+| `talib.VAR` | ```talib.VAR()```函数用于计算**方差（Variance）**。 |
+
+#### Talib/MathTransform
+
+| 名称 | 说明 |
+| - | - |
+| `talib.ACOS` | ```talib.ACOS()```函数用于计算**向量三角反余弦函数（Vector Trigonometric ACos）**。 |
+| `talib.ASIN` | ```talib.ASIN()```函数用于计算**向量三角反正弦函数（Vector Trigonometric ASin）**。 |
+| `talib.ATAN` | ```talib.ATAN()```函数用于计算**向量三角反正切函数（Vector Trigonometric ATan）**。 |
+| `talib.CEIL` | ```talib.CEIL()```函数用于计算**向上取整（Vector Ceil）**。 |
+| `talib.COS` | ```talib.COS()```函数用于计算**Vector Trigonometric Cos（向量三角余弦函数）**。 |
+| `talib.COSH` | ```talib.COSH()```函数用于计算**向量三角双曲余弦值（Vector Trigonometric Cosh）**。 |
+| `talib.EXP` | ```talib.EXP()```函数用于计算**向量算术指数函数（Vector Arithmetic Exp）**。 |
+| `talib.FLOOR` | ```talib.FLOOR()```函数用于计算**向量向下取整（Vector Floor）**。 |
+| `talib.LN` | ```talib.LN()```函数用于计算**向量自然对数（Vector Log Natural）**。 |
+| `talib.LOG10` | ```talib.LOG10()```函数用于计算**Vector Log10（对数函数）**。 |
+| `talib.SIN` | ```talib.SIN()```函数用于计算**Vector Trigonometric Sin（正弦值）**。 |
+| `talib.SINH` | ```talib.SINH()```函数用于计算**向量三角双曲正弦函数（Vector Trigonometric Sinh）**。 |
+| `talib.SQRT` | ```talib.SQRT()```函数用于计算**向量平方根（Vector Square Root）**。 |
+| `talib.TAN` | ```talib.TAN()```函数用于计算**向量三角正切值（Vector Trigonometric Tan）**。 |
+| `talib.TANH` | ```talib.TANH()```函数用于计算**向量三角双曲正切函数（Vector Trigonometric Tanh）**。 |
+
+#### Talib/MathOperators
+
+| 名称 | 说明 |
+| - | - |
+| `talib.MAX` | ```talib.MAX()```函数用于计算**指定周期内的最大值（Highest value over a specified period）**。 |
+| `talib.MAXINDEX` | ```talib.MAXINDEX()```函数用于计算**指定周期内最大值的索引位置（Index of highest value over a specified period）**。 |
+| `talib.MIN` | ```talib.MIN()```函数用于计算**指定周期内的最小值（Lowest value over a specified period）**。 |
+| `talib.MININDEX` | ```talib.MININDEX()```函数用于计算**指定周期内最小值的索引位置（Index of lowest value over a specified period）**。 |
+| `talib.MINMAX` | ```talib.MINMAX()```函数用于计算**指定周期内的最小值和最大值（Lowest and highest values over a specified period）**。 |
+| `talib.MINMAXINDEX` | ```talib.MINMAXINDEX()```函数用于计算**指定周期内最低值和最高值的索引位置（Indexes of lowest and highest values over a specified period）**。 |
+| `talib.SUM` | ```talib.SUM()```函数用于计算**求和（Summation）**。 |
+
+#### Talib/PatternRecognition
+
+| 名称 | 说明 |
+| - | - |
+| `talib.CDL2CROWS` | ```talib.CDL2CROWS()```函数用于计算**Two Crows（K线形态--两只乌鸦）**。 |
+| `talib.CDL3BLACKCROWS` | ```talib.CDL3BLACKCROWS()```函数用于计算**Three Black Crows（K线图形态--三只黑乌鸦）**。 |
+| `talib.CDL3INSIDE` | ```talib.CDL3INSIDE()```函数用于计算**Three Inside Up/Down（K线形态：三内上下震荡）**。 |
+| `talib.CDL3LINESTRIKE` | ```talib.CDL3LINESTRIKE()```函数用于计算**Three-Line Strike（K线图：三线震荡）**。 |
+| `talib.CDL3OUTSIDE` | ```talib.CDL3OUTSIDE()```函数用于计算**Three Outside Up/Down（K线形态：三外包线）**。 |
+| `talib.CDL3STARSINSOUTH` | ```talib.CDL3STARSINSOUTH()```函数用于计算**Three Stars In The South（K线形态：南方三星）**。 |
+| `talib.CDL3WHITESOLDIERS` | ```talib.CDL3WHITESOLDIERS()```函数用于计算**Three Advancing White Soldiers（K线形态：三白兵）**。 |
+| `talib.CDLABANDONEDBABY` | ```talib.CDLABANDONEDBABY()```函数用于计算**弃婴形态（K线图：Abandoned Baby）**。 |
+| `talib.CDLADVANCEBLOCK` | ```talib.CDLADVANCEBLOCK()```函数用于计算**Advance Block（K线形态：推进阻挡）**。 |
+| `talib.CDLBELTHOLD` | ```talib.CDLBELTHOLD()```函数用于计算**Belt-hold（K线形态：腰带线）**。 |
+| `talib.CDLBREAKAWAY` | ```talib.CDLBREAKAWAY()```函数用于计算**Breakaway（K线形态：分离形态）**。 |
+| `talib.CDLCLOSINGMARUBOZU` | ```talib.CDLCLOSINGMARUBOZU()```函数用于计算**收盘光头光脚线（Closing Marubozu）**K线形态。 |
+| `talib.CDLCONCEALBABYSWALL` | ```talib.CDLCONCEALBABYSWALL()```函数用于计算**Concealing Baby Swallow（K线图：藏婴吞没形态）**。 |
+| `talib.CDLCOUNTERATTACK` | ```talib.CDLCOUNTERATTACK()```函数用于计算**反击线形态（K线图：反击）**。 |
+| `talib.CDLDARKCLOUDCOVER` | ```talib.CDLDARKCLOUDCOVER()```函数用于计算**乌云盖顶（Dark Cloud Cover）K线形态**。 |
+| `talib.CDLDOJI` | ```talib.CDLDOJI()```函数用于计算**Doji（K线图：十字星）**。 |
+| `talib.CDLDOJISTAR` | ```talib.CDLDOJISTAR()```函数用于计算**Doji Star（K线图：十字星）**。 |
+| `talib.CDLDRAGONFLYDOJI` | ```talib.CDLDRAGONFLYDOJI()```函数用于计算**Dragonfly Doji（K线形态：蜻蜓十字星）**。 |
+| `talib.CDLENGULFING` | ```talib.CDLENGULFING()```函数用于计算**吞没形态（Engulfing Pattern）**。 |
+| `talib.CDLEVENINGDOJISTAR` | ```talib.CDLEVENINGDOJISTAR()```函数用于计算**Evening Doji Star（K线形态：黄昏十字星）**。 |
+| `talib.CDLEVENINGSTAR` | ```talib.CDLEVENINGSTAR()```函数用于计算**Evening Star（K线图：黄昏之星）**形态。 |
+| `talib.CDLGAPSIDESIDEWHITE` | ```talib.CDLGAPSIDESIDEWHITE()```函数用于计算**Up/Down-gap side-by-side white lines (K线图：上/下间隙并排白色线条)**。 |
+| `talib.CDLGRAVESTONEDOJI` | ```talib.CDLGRAVESTONEDOJI()```函数用于计算**墓碑十字线（Gravestone Doji）**K线形态。 |
+| `talib.CDLHAMMER` | ```talib.CDLHAMMER()```函数用于计算**锤子线（K线形态：锤子）**。 |
+| `talib.CDLHANGINGMAN` | ```talib.CDLHANGINGMAN()```函数用于计算**Hanging Man（K线形态：吊人线）**。 |
+| `talib.CDLHARAMI` | ```talib.CDLHARAMI()```函数用于计算**Harami Pattern（K线图：阴阳线模式）**。 |
+| `talib.CDLHARAMICROSS` | ```talib.CDLHARAMICROSS()```函数用于计算**Harami Cross Pattern（K线图：十字星孕线形态）**。 |
+| `talib.CDLHIGHWAVE` | ```talib.CDLHIGHWAVE()```函数用于计算**High-Wave Candle（K线图：长脚十字线）**。 |
+| `talib.CDLHIKKAKE` | ```talib.CDLHIKKAKE()```函数用于计算**Hikkake Pattern（K线图：陷阱模式）**。 |
+| `talib.CDLHIKKAKEMOD` | ```talib.CDLHIKKAKEMOD()```函数用于计算**Modified Hikkake Pattern（K线图：改良陷阱模式）**。 |
+| `talib.CDLHOMINGPIGEON` | ```talib.CDLHOMINGPIGEON()```函数用于计算**Homing Pigeon（K线形态：信鸽形态）**。 |
+| `talib.CDLIDENTICAL3CROWS` | ```talib.CDLIDENTICAL3CROWS()```函数用于计算**Identical Three Crows（K线形态：相同三只乌鸦）**。 |
+| `talib.CDLINNECK` | ```talib.CDLINNECK()```函数用于计算**颈内线形态（K线图：颈内线）**。 |
+| `talib.CDLINVERTEDHAMMER` | ```talib.CDLINVERTEDHAMMER()```函数用于计算**倒锤形态（K线图：倒锤）**。 |
+| `talib.CDLKICKING` | ```talib.CDLKICKING()```函数用于计算**Kicking（K线形态：踢腿形态）**。 |
+| `talib.CDLKICKINGBYLENGTH` | ```talib.CDLKICKINGBYLENGTH()```函数用于计算**Kicking - bull/bear determined by the longer marubozu (K线图：踢牛/踢熊)**。 |
+| `talib.CDLLADDERBOTTOM` | ```talib.CDLLADDERBOTTOM()```函数用于计算**Ladder Bottom（K线形态：梯底）**。 |
+| `talib.CDLLONGLEGGEDDOJI` | ```talib.CDLLONGLEGGEDDOJI()```函数用于计算**长腿十字线（K线形态：Long Legged Doji）**。 |
+| `talib.CDLLONGLINE` | ```talib.CDLLONGLINE()```函数用于计算**长线蜡烛形态（K线图：长线）**。 |
+| `talib.CDLMARUBOZU` | ```talib.CDLMARUBOZU()```函数用于计算**Marubozu（K线图：光头光脚）**模式。 |
+| `talib.CDLMATCHINGLOW` | ```talib.CDLMATCHINGLOW()```函数用于计算**Matching Low（K线图：匹配低点）**。 |
+| `talib.CDLMATHOLD` | ```talib.CDLMATHOLD()```函数用于计算**Mat Hold（K线形态：垫住）**。 |
+| `talib.CDLMORNINGDOJISTAR` | ```talib.CDLMORNINGDOJISTAR()```函数用于计算**Morning Doji Star（K线形态：早晨十字星）**。 |
+| `talib.CDLMORNINGSTAR` | ```talib.CDLMORNINGSTAR()```函数用于计算**Morning Star（K线形态：晨星）**。 |
+| `talib.CDLONNECK` | ```talib.CDLONNECK()```函数用于计算**On-Neck Pattern（K线图：颈上线形态）**。 |
+| `talib.CDLPIERCING` | ```talib.CDLPIERCING()```函数用于计算**Piercing Pattern（K线图：穿透形态）**。 |
+| `talib.CDLRICKSHAWMAN` | ```talib.CDLRICKSHAWMAN()```函数用于计算**Rickshaw Man（K线形态：车夫线）**。 |
+| `talib.CDLRISEFALL3METHODS` | ```talib.CDLRISEFALL3METHODS()```函数用于计算**Rising/Falling Three Methods（K线形态：上升/下降三法）**。 |
+| `talib.CDLSEPARATINGLINES` | ```talib.CDLSEPARATINGLINES()```函数用于计算**分离线形态（K线图：分离线）**。 |
+| `talib.CDLSHOOTINGSTAR` | ```talib.CDLSHOOTINGSTAR()```函数用于计算**Shooting Star（K线形态：流星）**。 |
+| `talib.CDLSHORTLINE` | ```talib.CDLSHORTLINE()```函数用于计算**短线蜡烛图形态（K线图：短线）**。 |
+| `talib.CDLSPINNINGTOP` | ```talib.CDLSPINNINGTOP()```函数用于计算**Spinning Top（K线形态：陀螺）**。 |
+| `talib.CDLSTALLEDPATTERN` | ```talib.CDLSTALLEDPATTERN()```函数用于计算**Stalled Pattern（K线图：停滞模式）**。 |
+| `talib.CDLSTICKSANDWICH` | ```talib.CDLSTICKSANDWICH()```函数用于计算**Stick Sandwich（K线形态：棍子三明治）**。 |
+| `talib.CDLTAKURI` | ```talib.CDLTAKURI()```函数用于计算**Takuri (Dragonfly Doji with very long lower shadow) (K线图:托里)**蜡烛图形态。 |
+| `talib.CDLTASUKIGAP` | ```talib.CDLTASUKIGAP()```函数用于计算**Tasuki Gap（K线图：翼隙）**。 |
+| `talib.CDLTHRUSTING` | ```talib.CDLTHRUSTING()```函数用于计算**Thrusting Pattern（K线图：推进模式）**。 |
+| `talib.CDLTRISTAR` | ```talib.CDLTRISTAR()```函数用于计算**三星形态（K线图：三星模式）**。 |
+| `talib.CDLUNIQUE3RIVER` | ```talib.CDLUNIQUE3RIVER()```函数用于计算**Unique 3 River（K线形态：独特三河）**。 |
+| `talib.CDLUPSIDEGAP2CROWS` | ```talib.CDLUPSIDEGAP2CROWS()```函数用于计算**向上跳空双乌鸦形态（K线图：双飞乌鸦）**。 |
+| `talib.CDLXSIDEGAP3METHODS` | ```talib.CDLXSIDEGAP3METHODS()```函数用于计算**上行/下行缺口三方法（K线形态识别）**。 |
+
+### OS
+
+| 名称 | 说明 |
+| - | - |
+| `ListFilesResult` | 文件列表对象，用于记录目录列表信息。 |
+| `FileStat` | 文件统计信息对象。 |
+
+#### OS/os
+
+| 名称 | 说明 |
+| - | - |
+| `open` | 以指定模式打开文件。 |
+| `fgets` | 一次性读取整个文件的内容。 |
+| `fputs` | 向文件写入内容。 |
+| `mmap` | 内存映射文件，返回文件的二进制数据。 |
+| `getRootDir` | 获取文件操作的根目录路径。 |
+| `listFiles` | 列出指定目录中的文件和子目录。 |
+| `exists` | 检查指定的文件或目录是否存在。 |
+| `remove` | 删除指定文件。 |
+| `mkdir` | 创建目录。 |
+| `rmdir` | 删除目录及其所有内容。 |
+| `rename` | 重命名文件或移动文件。 |
+| `stat` | 获取文件的详细统计信息。 |
+| `exit` | 退出程序。 |
+
+#### OS/File
+
+| 名称 | 说明 |
+| - | - |
+| `close` | 关闭文件并释放相关资源。 |
+| `puts` | 向文件写入一个或多个字符串。 |
+| `printf` | 格式化写入数据到文件。 |
+| `flush` | 刷新文件缓冲区，确保数据写入磁盘。 |
+| `tell` | 获取当前文件指针的位置。 |
+| `seek` | 将文件指针移动到指定位置。 |
+| `eof` | 检查文件指针是否已到达文件末尾。 |
+| `read` | 从文件中读取数据。 |
+| `write` | 向文件写入字符串数据。 |
+| `getline` | 从文件中读取下一行内容。 |
+| `toString` | 获取文件对象的字符串表示形式。 |
+
+## 结构体
+
+| 名称 | 说明 |
+| - | - |
+| `Ticker` | 市场行情数据结构。 |
+| `Depth` | 市场深度数据结构。 |
+| `OrderBook` | 市场深度中的订单结构。 |
+| `Trade` | 市场成交记录的数据结构。 |
+| `Record` | K线柱的数据结构，标准的OHLC格式，用于绘制K线图和技术指标计算分析。 |
+| `Market` | 交易品种市场信息的数据结构。 |
+| `Order` | 订单结构。 |
+| `Condition` | 条件单配置信息结构，用于设置条件单的触发条件和执行价格。 |
+| `Account` | 账户信息的数据结构。 |
+| `Asset` | 具体币种资产信息的数据结构。 |
+| `Position` | 合约仓位信息的数据结构。 |
+| `Funding` | 交易品种资金费率信息的数据结构，仅加密货币永续合约支持资金费率功能。 |
+
+### OtherStruct
+
+| 名称 | 说明 |
+| - | - |
+| `HttpQuery-options` | 此JSON结构用于配置HttpQuery函数和HttpQuery_Go函数发送HTTP请求的各项参数。 |
+| `HttpQuery-return` | 该JSON结构是调用HttpQuery函数时，在参数```options```结构中将debug字段指定为true后，HttpQuery函数在调试模式下返回的数据结构。 |
+| `LogStatus-table` | 此JSON结构用于配置策略状态栏中显示的表格内容。 |
+| `LogStatus-btnTypeOne` | 该JSON结构用于配置状态栏中的按钮控件，按钮控件JSON结构可以嵌入到状态栏表格JSON结构中。 |
+| `LogStatus-btnTypeTwo` | 此JSON结构用于配置状态栏中的按钮控件，按钮控件JSON结构可以嵌入到状态栏表格JSON结构中。 |
+| `Chart-options` | 此JSON用于配置自定义绘图函数```Chart()```的图表设置信息，图表库使用Highcharts。 |
+| `KLineChart-options` | 此JSON用于设置自定义绘图函数```KLineChart```的图表配置信息。 |
+| `SetData-data` | 该JSON用于设置```exchange.SetData()```函数所要加载的数据。 |
+| `EventLoop-return` | 该JSON是```EventLoop()```函数返回的数据结构。 |
+| `DBExec-return` | 该JSON是```DBExec()```函数返回的数据结构；使用```Dial()```函数创建的对象的```exec()```方法执行SQL语句时，也返回此JSON数据结构。 |
+| `Thread.join-return` | 该JSON是```Thread```对象的成员函数```join()```返回的数据结构，用于保存```JavaScript```语言策略中并发线程的相关信息。 |
+
+## 内置变量与常量
+
+### EXCHANGE
+
+| 名称 | 说明 |
+| - | - |
+| `exchange` | exchange 是一个交易所对象，也是在策略实盘设置、回测设置中添加的第一个交易所对象。 |
+| `exchanges` | exchanges 是一个交易所对象数组，包含在策略实盘设置或回测设置中添加的所有交易所对象，其中 exchanges[0] 即为 exchange。 |
+
+### ORDER_STATE
+
+| 名称 | 说明 |
+| - | - |
+| `ORDER_STATE_PENDING` | ORDER_STATE_PENDING是Order结构中的```Status```属性的值，表示订单状态为待处理状态。 |
+| `ORDER_STATE_CLOSED` | ORDER_STATE_CLOSED是Order结构中的```Status```属性的值，表示订单状态为已完成。 |
+| `ORDER_STATE_CANCELED` | ORDER_STATE_CANCELED 是 Order 结构中 ```Status``` 属性的值，表示订单状态为已取消。 |
+| `ORDER_STATE_UNKNOWN` | ORDER_STATE_UNKNOWN是Order结构中的```Status```属性的值，表示订单状态为未知状态（其他状态）。 |
+
+### ORDER_TYPE
+
+| 名称 | 说明 |
+| - | - |
+| `ORDER_TYPE_BUY` | ORDER_TYPE_BUY是Order结构中的```Type```属性值，表示买入订单类型。 |
+| `ORDER_TYPE_SELL` | ORDER_TYPE_SELL是Order结构中的```Type```属性值，用于表示卖单类型。 |
+
+### ORDER_CONDITION_TYPE
+
+| 名称 | 说明 |
+| - | - |
+| `ORDER_CONDITION_TYPE_OCO` | ORDER_CONDITION_TYPE_OCO是Condition结构中的```ConditionType```属性的值，表示OCO订单（One-Cancels-the-Other，一触即撤订单）。 |
+| `ORDER_CONDITION_TYPE_TP` | ORDER_CONDITION_TYPE_TP 是 Condition 结构中的 ```ConditionType``` 属性值，表示止盈单（Take Profit）。 |
+| `ORDER_CONDITION_TYPE_SL` | ORDER_CONDITION_TYPE_SL 是 Condition 结构中的 ```ConditionType``` 属性值，表示止损单（Stop Loss）。 |
+| `ORDER_CONDITION_TYPE_GENERIC` | ORDER_CONDITION_TYPE_GENERIC 是 Condition 结构中的 ```ConditionType``` 属性值，表示通用条件单。 |
+
+### POSITION_DIRECTION
+
+| 名称 | 说明 |
+| - | - |
+| `PD_LONG` | PD_LONG是Position结构中的```Type```属性值，表示多头仓位类型。 |
+| `PD_SHORT` | PD_SHORT是Position结构中的```Type```属性值，表示空头仓位类型。 |
+
+### ORDER_OFFSET
+
+| 名称 | 说明 |
+| - | - |
+| `ORDER_OFFSET_OPEN` | ORDER_OFFSET_OPEN是Order结构中```Offset```属性的取值，表示该订单为开仓操作。 |
+| `ORDER_OFFSET_CLOSE` | ORDER_OFFSET_CLOSE是Order结构中```Offset```属性的取值，表示订单为平仓方向。 |
+
+### PERIOD
+
+| 名称 | 说明 |
+| - | - |
+| `PERIOD_M1` | 表示1分钟K线周期的常量，数值为60。 |
+| `PERIOD_M3` | 表示3分钟K线周期的常量，其值为180。 |
+| `PERIOD_M5` | 表示5分钟K线周期的常量，数值为300。 |
+| `PERIOD_M15` | 表示15分钟K线周期的常量，其值为900。 |
+| `PERIOD_M30` | 表示30分钟K线周期的常量，其值为1800秒。 |
+| `PERIOD_H1` | 表示1小时K线周期的常量，数值为3600。 |
+| `PERIOD_H2` | 表示2小时K线周期的常量，数值为7200。 |
+| `PERIOD_H4` | 表示4小时K线周期的常量，数值为14400。 |
+| `PERIOD_H6` | 表示6小时K线周期的常量，数值为21600。 |
+| `PERIOD_H12` | 表示12小时K线周期的常量，数值为43200。 |
+| `PERIOD_D1` | 表示1日K线周期的常量，数值为86400。 |
+| `PERIOD_D3` | 表示3日K线周期的常量，数值为259200。 |
+| `PERIOD_W1` | 表示1周K线周期的常量，数值为604800秒。 |
+
+### LOG_TYPE
+
+| 名称 | 说明 |
+| - | - |
+| `LOG_TYPE_BUY` | LOG_TYPE_BUY是exchange.Log函数的```LogType```参数可选值，用于设置```exchange.Log```函数打印的日志类型为买单日志。 |
+| `LOG_TYPE_SELL` | LOG_TYPE_SELL是exchange.Log函数的```LogType```参数可选值，用于设置```exchange.Log```函数打印卖单日志。 |
+| `LOG_TYPE_CANCEL` | LOG_TYPE_CANCEL是exchange.Log函数的```LogType```参数可选值，用于设置```exchange.Log```函数打印撤销订单日志。 |
+
+### 策略参数
+
+策略界面上设置的策略参数，在策略代码中以同名的全局变量（Rust 中为全局常量）出现，直接用变量名访问：
+- ```JavaScript```、```My语言```：可以直接读取参数，也可以在代码中修改参数变量。
+- ```Python```：可以直接读取；在函数中给参数变量重新赋值时，需要先用```global```声明。
+- ```Rust```：参数是常量，只能读取，不能修改；各种参数对应的类型见 `Rust`。
+- ```PINE```：使用```input()```函数创建界面参数。
+- ```Blockly可视化```：没有界面参数。
+
+![策略参数设置界面](https://www.fmz.com/upload/asset/2e46b5e593de3b2f11445.png)
+
+#### 界面参数种类
+
+| 变量(命名举例) | 描述 | 类型 | 默认值(说明) | 组件配置(说明) | 备注 |
+| - | - | - | - | - | - |
+| pNum       | 参数pNum的描述       | 数字型(number)     | 举例设置默认值为:100，Rust策略中为f64| 用于设置当前参数绑定的界面控件的：组件类型、最小值、最大值、分组、过滤器等 | 参数pNum的备注，pNum的值为数值类型 |
+| pBool      | 参数pBool的描述      | 布尔型(true/false) | 使用开关控件设置默认值，不具备选填控件 | 同上                                                          | 参数pBool的备注，pBool的值为布尔类型 |
+| pStr       | 参数pStr的描述       | 字符串(string)     | 举例设置默认值为:abc               | 同上                                                          | 参数pStr的备注，pStr的值为字符串类型 |
+| pCombox    | 参数pCombox的描述    | 下拉框(selected)   | 设置选项中的某一个选项或多个选项      | 同上                                                          | 参数pCombox的备注，pCombox的值可能有多种形式 |
+| pSecretStr | 参数pSecretStr的描述 | 加密串(string)     | 举例设置默认值为:xyz               | 同上                                                          | 参数pSecretStr的备注，pSecretStr的值为字符串类型 |
+
+界面参数，在策略编辑页面代码编辑区下方策略参数区设置，需要注意：
+1、参数设置的默认值选项中「选填」控件默认为选填状态，可以改变该控件的状态，设置当前参数为必填。设置参数默认值为必填后，如果策略在回测/实盘时没有设置该参数则无法进行回测/启动实盘。
+2、界面参数在策略代码中的变量名不要设置为当前编程语言的保留字（关键字）。
+3、在回测/实盘界面鼠标放在参数绑定的控件上时，会显示设置的参数备注信息。
+4、参数的「描述」即参数绑定的控件的显示名称。
+5、参数的「变量」即以上表格中的：```pNum```、```pBool```、```pStr```、```pCombox```、```pSecretStr```。在策略代码中是以全局变量形式存在的，也就是说可以在代码中修改策略参数（Rust 除外：Rust 中参数是全局常量，不能修改）。
+6、对于「加密串」和「字符串」类型的参数，默认值输入时不需要加引号，输入均作为字符串处理。「加密串」参数的使用与「字符串」参数相同，加密字符串会被加密发送，不会明文传输。
+7、「字符串」类型的参数如果设置为「选填」，当参数绑定的控件中不填写参数时，参数变量的值为**空字符串**；
+  同理，如果是「数字型」的参数，参数变量的值为**空值**。
+  同理，如果是「下拉框」的参数，参数变量的值为**空值**。
+  同理，如果是「加密串」的参数，参数变量的值为**空值**。
+  ```Rust```策略中，没有填写的选填参数为该类型的零值：数字为```0```，字符串、加密串为空字符串，布尔为```false```。
+8、对于下拉框类型的界面参数，例如变量名为```pCombox```。在「组件配置」中没有开启「支持多选」时，pCombox的值为当前选中的选项索引或具体数据（给选项绑定数据时）。
+  如果开启了「支持多选」时，pCombox的值为一个数组，数组包含所有当前选中的选项的索引或具体数据（给选项绑定数据时）。
+
+#### 组件配置
+
+策略界面参数和策略交互控件都有「组件配置」选项，用于设置参数（或交互控件）对应的界面控件，以及最小值、最大值、分组、过滤器等。
+
+各种类型支持的组件：
+- 数字型(number)
+  输入框控件（默认）、时间选择器控件、滑动输入条控件。
+- 布尔型(true/false)
+  仅支持开关控件（默认）。
+- 字符串(string)
+  输入框控件（默认）、文本框控件、时间选择器控件、颜色选择器控件、币种、交易代码。
+- 下拉框(selected)
+  下拉框控件（默认）、分段控制器控件、币种、交易代码。
+- 加密串(string)，仅策略参数
+  仅支持加密输入框控件（默认）。
+- 按钮(button)，仅交互控件
+  只有一个按钮控件（默认），没有输入项。
+
+**分组**
+
+在组件配置的「分组」输入框中输入一个标签名，可以把若干个策略参数划分到同一个分组中（代替平台旧功能「策略分组」）。交互控件同样可以分组（代替旧功能「交互控件分组」）。
+
+**过滤器**
+
+策略参数的组件配置中，「过滤器」输入框可以填写判定表达式，控制参数是否可用（代替平台旧功能「参数依赖」）。
+过滤器默认为空，不做任何过滤；可以设置：```a > b```、```a == 1```、```a```、```!a```、```a >= 1 && a <= 10```等。过滤条件为真时，当前参数可用。
+- 设置过滤器```a == 1```：该参数是否可用取决于参数```a```的值，```a```等于1时可用，否则不可用。
+- 设置过滤器```a >= 1 && a <= 10```：```a```大于等于1并且小于等于10时可用，否则不可用。
+- 设置过滤器```!a```：过滤条件为「非a」；```a```可以是布尔值，也可以是数值（```!0```为真）。
+
+#### 保存参数设置
+
+- 回测系统中的参数保存
+  在回测时如果希望将策略参数保存，可以在策略参数修改后点击「保存回测设置」按钮，参考 `回测配置与保存`。
+
+  | 变量 | 描述 | 类型 | 默认值 |
+  | - | - | - | - |
+  |number |数值类型 |数字型(number) |1 |
+  |string |字符串 |字符串(string) |Hello FMZ |
+  |combox |下拉框 |下拉框(selected) |1\|2\|3|
+  |bool |布尔值 |布尔型(true/false) |true |
+  |numberA@isShowA |数值A |数字型(number) |2 |
+  |isShowA |是否显示numberA参数 |布尔型(true/false) |false |
+
+  设置后的策略参数以代码形式保存在策略中，例如：
+
+  ```js
+  /*backtest
+  start: 2020-02-29 00:00:00
+  end: 2020-03-29 00:00:00
+  period: 1d
+  args: [["number",2],["string","Hello FMZ.COM"],["combox",2],["bool",false],["numberA@isShowA",666],["isShowA",true]]
+  */
+  ```
+
+  ```python
+  '''backtest
+  start: 2020-02-29 00:00:00
+  end: 2020-03-29 00:00:00
+  period: 1d
+  args: [["number",2],["string","Hello FMZ.COM"],["combox",2],["bool",false],["numberA@isShowA",666],["isShowA",true]]
+  '''
+  ```
+
+  ```rust
+  /*backtest
+  start: 2020-02-29 00:00:00
+  end: 2020-03-29 00:00:00
+  period: 1d
+  args: [["number",2],["string","Hello FMZ.COM"],["combox",2],["bool",false],["numberA@isShowA",666],["isShowA",true]]
+  */
+  ```
+
+  ```Rust```策略如果在开头用 frontmatter 声明了依赖，回测配置块要放在 frontmatter 之后，见 `Rust`。
+- 实盘参数导入导出
+  运行实盘时需要保存实盘配置的参数数据，可以点击策略实盘页面中「参数设置」选项，再点击「导出参数」按钮，导出的策略参数将以```json```文件保存。
+  导出的策略参数配置也可以再次导入实盘，点击「导入参数」按钮即可把保存的策略实盘参数导入到当前实盘，导入后点击「更新参数」按钮保存生效。
+
+### 交互控件
+
+```JavaScript```、```Python```、```Rust```、My语言策略可以设计交互控件，策略的交互控件用来在策略实盘运行时给运行的策略程序发送交互指令。对于```JavaScript```、```Python```、```Rust```语言类型的策略，在策略代码中使用 `GetCommand` 函数获取交互控件产生的消息。交互控件的「组件配置」与策略参数相同，见 `组件配置`。
+
+![交互控件](https://www.fmz.com/upload/asset/2e4320d0cc33c15eb935d.png)
+
+在策略中设计好处理交互控件消息的代码，在实盘时使用交互控件可以实现（不限于）诸如以下功能：
+- 手动平掉策略持仓。
+- 动态修改策略参数，避免重启策略实盘。
+- 切换策略逻辑。
+- 触发打印某些调试信息、数据，用来测试某些功能。
+
+#### 交互控件种类
+
+| 变量(命名举例) | 描述 | 类型 | 默认值(说明) | 组件配置(说明) | 备注 |
+| - | - | - | - | - | - |
+| cmdNum | 交互控件cmdNum的描述 | 数字型(number) | 默认值选填，可留空 | 用于设置当前交互项绑定的界面控件的：组件类型、最小值、最大值、分组等 | 交互控件cmdNum的备注 |
+| cmdBool | 交互控件cmdBool的描述 | 布尔型(true/false) | 默认值必选，开启或关闭 | 同上 | 交互控件cmdBool的备注 |
+| cmdStr | 交互控件cmdStr的描述 | 字符串(string) | 默认值选填，可留空 | 同上 | 交互控件cmdStr的备注 |
+| cmdCombox | 交互控件cmdCombox的描述 | 下拉框(selected) | 默认值选填，可留空 | 同上 | 交互控件cmdCombox的备注 |
+| cmdBtn | 交互控件cmdBtn的描述 | 按钮(button) | 按钮控件不绑定输入项 | 同上 | 交互控件cmdBtn的备注 |
+
+交互控件触发后发送给策略的消息（字符串）：
+- 数字型
+  在交互控件```cmdNum```的输入框中输入交互数据：```123```后，点击交互控件cmdNum的按钮。策略程序中的```GetCommand()```函数会收到消息：```cmdNum:123```。
+- 布尔型
+  在交互控件```cmdBool```的开关控件上设置为打开，点击交互控件cmdBool的按钮。策略程序中的```GetCommand()```函数会收到消息：```cmdBool:true```。
+- 字符串
+  在交互控件```cmdStr```的输入框中输入交互数据：```abc```后，点击交互控件cmdStr的按钮。策略程序中的```GetCommand()```函数会收到消息：```cmdStr:abc```。
+- 下拉框
+  在交互控件```cmdCombox```的下拉框中选中第二个选项后，点击交互控件cmdCombox的按钮。策略程序中的```GetCommand()```函数会收到消息：```cmdCombox:1```，1表示选中的选项的索引，第一个选项索引为0，第二个选项索引为1。
+- 按钮
+  点击交互控件```cmdBtn```的按钮。策略程序中的```GetCommand()```函数会收到消息：```cmdBtn```。
+
+交互控件的「组件配置」与策略参数相同，见 `组件配置`。
+
+**示例：用交互控件动态修改策略参数**
+
+在策略编辑页面的「策略交互」中添加一个字符串类型的交互控件，变量名为```changeSymbol```。交互控件的设置界面：
+
+![设置交互控件](https://www.fmz.com/upload/asset/1741a2b35e569c5e07e3.png)
+
+实盘运行时，在该控件的输入框中填入```ETH_USDT```并点击按钮，```GetCommand()```会收到消息```changeSymbol:ETH_USDT```。策略检测到这条消息后更新对应的变量（策略界面上的参数也是全局变量，这里用代码中的全局变量演示）：
+
+```js
+// 策略参数
+var symbol = "BTC_USDT"
+
+function main() {
+    while (true) {
+        var cmd = GetCommand()
+        if (cmd) {
+            var arr = cmd.split(":")
+            if (arr.length == 2 && arr[0] == "changeSymbol") {
+                // 检测到 changeSymbol 控件触发，就会执行参数更新操作
+                Log("Changed symbol parameter to:", arr[1])
+                symbol = arr[1]
+            }
+        }
+
+        LogStatus(_D(), ", Current symbol parameter value:", symbol)
+        Sleep(3000)
+    }
+}
+```
+
+#### 状态栏中的交互控件
+
+除了在「策略交互」栏中设计交互控件，还可以在策略状态栏中设计交互控件。目前支持的交互控件种类仅有按钮类型，见 `LogStatus`。
+
+状态栏中的按钮控件可以分为：
+- 普通按钮控件
+  数据结构举例为：
+  ```json
+  {"type": "button", "name": "Button 1", "cmd": "button1", "description": "This is the first button"}
+  ```
+- 带一个输入数据的按钮控件
+  使用```input```属性设置输入控件选项，数据结构举例为：
+  ```json
+  {"type": "button", "name": "Button 2", "cmd": "button2", "description": "This is the second button", "input": {"name": "Open Quantity", "type": "number", "defValue": 1}}
+  ```
+
+  ```json
+  {
+      "type": "button",
+      "cmd": "test1",
+      "name": "test1",
+      "input": {
+          "type": "selected",
+          "name": "selected",
+          "label": "Dropdown",
+          "description": "description",
+          "default": 100,
+          "settings": {
+              "multiple": true,
+              "customizable": true,
+              "options":[{"name": "A", "value": 100}, {"name": "B", "value": 200}]
+          }
+      }
+  }
+  ```
+- 带一组输入数据的按钮控件
+  使用```group```属性设置一组输入控件的选项，数据结构举例为：
+  ```json
+  {
+      "type": "button",
+      "cmd": "open",
+      "name": "Open",
+      "group": [
+          {"name": "orderType", "description": "下单方式|order type", "type": "selected", "defValue": "市价单|挂单"},
+          {"name": "tradePrice@orderType==1", "description": "交易价格|trade price", "type": "number", "defValue": 100},
+          {"name": "orderAmount", "description": "委托数量|order amount", "type": "string", "defValue": 100},
+          {"name": "boolean", "description": "是/否|boolean", "type": "boolean", "defValue": true}
+      ]
+  }
+  ```
+
+  ```json
+  {
+      "type": "button",
+      "cmd": "test2",
+      "name": "test2",
+      "group": [{
+          "type": "selected",
+          "name": "selected",
+          "label": "Dropdown",
+          "description": "description",
+          "default": 200,
+          "group": "group1",
+          "settings": {
+              "multiple": true,
+              "options":[{"name": "A", "value": 100}, {"name": "B", "value": 200}]
+          }
+      }, {
+          "type": "string",
+          "name": "string",
+          "label": "Input Box",
+          "description": "description",
+          "default": "ABC",
+          "group": "group1"
+      }]
+  }
+  ```
+
+将这些按钮控件JSON数据编码为JSON字符串，然后使用``` ` ```字符包裹住，在状态栏输出。以JavaScript语言为例：
+
+```js
+function main() {
+    var btn = {"type": "button", "name": "Button 1", "cmd": "button1", "description": "This is the first button"}
+    LogStatus("`" + JSON.stringify(btn) + "`")
+}
+```
+
+这些按钮控件也可以写入状态栏表格中，详细例子见 `LogStatus`。
+
+```input```字段结构与```group```字段中单个控件结构一致，以下为详细说明（带注释的 JavaScript 对象）：
+
+```js
+{
+    "type": "selected",     // 控件类型（必要字段），支持设置为：number, string, selected, boolean
+    "name": "test",         // 名称（group中使用时，为必要字段）
+    "label": "topic",       // 标题（必要字段）
+    "description": "desc",  // 组件的提示
+    "default": 1,           // 默认值；当前JSON结构中如果不设置settings字段，兼容defValue，可以用defValue代替default
+    "filter": "a>1",        // 选择器，不设置该字段表示不过滤（显示控件）；设置该字段时，当表达式为真时不过滤（显示控件）。当表达式为假时过滤（不显示控件）
+                            // 对于选择器，以当前例子中表达式a>1为例，a指的是type=button的结构中group字段下name为a的控件值，根据此数值判断是否过滤
+    "group": "group1",      // 分组
+    "settings": {}          // 组件配置，各字段见下文
+}
+```
+
+组件配置```settings```各个字段详细说明：
+- ```settings.required```：是否必选。
+- ```settings.disabled```：是否禁用。
+- ```settings.min```：```type=number```时有效，表示最小值。
+- ```settings.max```：```type=number```时有效，表示最大值。
+- ```settings.step```：```type=number```，```render=slider```时有效，表示步长。
+- ```settings.multiple```：```type=selected```时有效，表示支持多选。
+- ```settings.customizable```：```type=selected```时有效，表示支持自定义；用户可以直接在下拉框控件中编辑添加新选项，如果选中新编辑的选项，在触发交互时使用该选项的名称而不是选项代表的值。
+- ```settings.options```：```type=selected```时有效，表示选择器的选项数据格式：```["Option 1", "Option 2"]```、```[{'name':'xxx','value':0}, {'name':'xxx','value':1}]```。
+- ```settings.render```：渲染组件类型。
+  ```type=number```时，```settings.render```不设置(默认数字输入框)，可选：```slider```(滑动条)、```date```(时间选择器返回时间戳)。
+  ```type=string```时，```settings.render```不设置(默认单行输入框)，可选：```textarea```(多行输入)、```date```(时间选择器返回yyyy-MM-dd hh:mm:ss)、```color```(颜色选择器返回#FF00FF)。
+  ```type=selected```时，```settings.render```不设置(默认下拉框)，可选：```segment```(分段选择器)。
+  ```type=boolean```时，目前只有默认复选框。
+
+支持双语设置，例如：```'选项|options'```文本内容会根据当前语言环境适配；以```group```字段中单个控件为例，完整的例子（JavaScript 对象）：
+
+```js
+{
+    type:'selected',
+    name:'test',
+    label:'选项|options',
+    description:'描述|description',
+    default:0,                            // 这里default默认值设置0，表示{name:'xxx|yyy',value:0}选项中的value值
+    filter:'a>1&&a<10',
+    group:'分组|group',
+    settings:{
+        multiple:true,
+        customizable:true,
+        options:[{name:'xxx|yyy',value:0}]
+    }
+}
+```
+
+### 模板类库
+
+**模板类库**是发明者量化交易平台中可复用的代码模块，是策略代码的一种类别。支持模板类库的语言有：```JavaScript```（含 TypeScript）、```Python```、```Rust```；```Blockly可视化```策略可以使用 JavaScript 模板类库提供的积木。创建策略时如果类别设置为模板类库，会在当前登录账号的策略库中创建一个模板类库，创建后不能再修改类别为普通策略。
+
+![创建模板类库页面](https://www.fmz.com/upload/asset/2e4c55da99fd457ca94a0.png)
+
+各语言中导出、调用模板函数的方式：
+
+| 语言 | 模板中导出 | 策略中调用 |
+| - | - | - |
+| JavaScript | 挂到```$```上：```$.Test = function() {...}``` | ```$.Test()``` |
+| Python | 挂到```ext```上：```ext.Test = Test``` | ```ext.Test()``` |
+| Rust | 模板代码并入```ext```模块，供策略调用的函数声明为```pub fn``` | ```ext::Test()``` |
+
+- 模板中的```main()```函数在策略中不会执行，只作为单独回测、调试模板时的入口。
+- ```JavaScript```模板可以定义```init()```和```destroy()```：```init()```在模板加载时执行（早于策略的```init()```），```destroy()```在策略退出时、```onexit()```或```onerror()```之后执行。```Python```模板可以定义```init()```，在模板加载时执行。
+- ```Rust```模板和策略都可以用 frontmatter 声明第三方 crate，但依赖块只能写在其中一处，两处都写会编译失败。
+
+#### 模板类库的导出函数
+
+导出函数为模板类库的接口函数，可以被引用该模板类库的策略调用。
+
+不同的编程语言的模板类库书写格式有所不同，导出函数在模板类库中声明以及实现的例子代码如下：
+
+```javascript
+/*
+-- 策略引用该模板以后直接用 $.Test() 调用此方法
+-- main 函数在策略中不会触发, 只做为模板调试的入口
+*/
+$.Test = function() {
+    Log('Test')
+}
+
+function main() {
+    $.Test()
+}
+```
+
+```python
+def Test():
+    Log("template call")
+
+# 导出Test函数, 主策略可以通过ext.Test()调用
+ext.Test = Test
+```
+
+```rust
+// 策略引用该模板以后直接用 ext::Test() 调用此函数
+// 供策略调用的函数必须声明为 pub
+pub fn Test() {
+    Log!("template call");
+}
+```
+
+```Blockly可视化```方式编写的策略使用类库功能可以藉由```JavaScript```语言的模板类库编写实现，使用以下书写格式编写。
+
+```js
+/*blockly
+    {
+        "type": "ext_testA",
+        "message0": "testA|testA",
+        "template": "function(){return 99;}()",
+        "order": "ORDER_ATOMIC",
+        "output": "Number"
+    },{
+        "type": "ext_MA",
+        "message0": "MA 周期 %1| MA Period %1",
+        "args0": [{
+            "type": "input_value",
+            "check": "Number"
+        }],
+        "template": "(function(){var r = exchange.GetRecords(); return (!r || r.length < %1) ? false : TA.MA(r, %1); })()",
+        "order": "ORDER_ATOMIC",
+        "output": null,
+        "colour": 85
+    }
+*/
+```
+
+#### 模板类库的参数
+
+模板类库也可以设置自己的界面参数，模板类库的参数在模板类库代码中是以全局变量的形式使用的（Rust 中为全局常量）。
+例如我们设置了一个模板类库的参数：
+
+![模板参数](https://www.fmz.com/upload/asset/2e4ab550b85e6a1cac08e.png)
+
+| 策略代码中参数的变量名 | 策略界面上显示的参数名称 | 类型 | 默认值 |
+| - | - | - | - |
+| param1 | 模板参数1 | 数字型(number) | 99 |
+
+```Rust```模板的参数是常量，只能读取，不能修改，所以下面的例子在 Rust 中只能实现读取参数：
+
+```rust
+// 模板代码
+pub fn GetParam1() -> f64 {
+    Log!("param1:", param1);
+    param1
+}
+```
+
+```rust
+// 策略代码
+fn main() {
+    Log!("Calling ext::GetParam1:", ext::GetParam1());
+}
+```
+
+用于测试```param1```参数的模板类库代码：
+
+```javascript
+$.SetParam1 = function(p1) {
+    param1 = p1
+}
+
+$.GetParam1 = function() {
+    Log("param1:", param1)
+    return param1
+}
+```
+
+```python
+def SetParam1(p1):
+    global param1
+    param1 = p1
+
+def GetParam1():
+    Log("param1:", param1)
+    return param1
+
+ext.SetParam1 = SetParam1
+ext.GetParam1 = GetParam1
+```
+
+```rust
+// Rust 模板参数是只读常量，不能修改，读取参数的写法见上文
+```
+
+引用以上模板类库例子的策略代码，使用模板类库的导出函数获取参数```param1```和修改参数```param1```。
+
+```javascript
+function main () {
+    Log("Calling $.GetParam1:", $.GetParam1())
+    Log("Calling $.SetParam1:", "#FF0000")
+    $.SetParam1(20)
+    Log("Calling $.GetParam1:", $.GetParam1())
+}
+```
+
+```python
+def main():
+    Log("Calling ext.GetParam1:", ext.GetParam1())
+    Log("Calling ext.SetParam1:", "#FF0000")
+    ext.SetParam1(20)
+    Log("Calling ext.GetParam1:", ext.GetParam1())
+```
+
+```rust
+// Rust 模板参数是只读常量，不能修改，读取参数的写法见上文
+```
+
+#### 引用模板类库
+
+策略引用模板类库时，需要当前登录的发明者量化交易平台账号的策略库中存在可用的模板类库。在[策略编辑页面](https://www.fmz.com/m/add-strategy)的模板栏中勾选需要引用的模板，保存策略后即可完成引用。
+
+![模板引用截图](https://www.fmz.com/upload/asset/2e4ee2ec7b3e7b1649af8.png)
+
+### 内置库
+
+发明者量化交易平台内置了一些常用库。各语言可用情况：
+
+| 库 | JavaScript / TypeScript | Python | Rust |
+| - | - | - | - |
+| ```TA```指标库 | 支持 | 支持 | 支持 |
+| ```talib```指标库 | 支持 | 需在托管者所在机器安装 TA-Lib 和 numpy | 不支持 |
+| JSON | 语言内置```JSON``` | 标准库```json``` | ```JSONParse()```/```JsonValue``` |
+
+完整的函数列表与参数见手册 `TA`、`Talib`。
+
+**TA指标库**
+
+平台的```TA```指标库优化了常用指标算法（[开源TA库代码](https://www.fmz.com/bbs-topic/409)）。K 线数量不足以计算指标时，对应位置返回无效值。
+
+```js
+function main(){
+    var records = exchange.GetRecords()
+    var macd = TA.MACD(records)
+    var atr = TA.ATR(records, 14)
+
+    // 打印最后一组指标值
+    Log(macd[0][records.length-1], macd[1][records.length-1], macd[2][records.length-1])
+    Log(atr[atr.length-1])
+}
+```
+
+```rust
+fn main() {
+    let r = exchange.GetRecords(None, None, None).unwrap();
+    let macd = TA.MACD(&r, None, None, None);
+    let atr = TA.ATR(&r, 14);
+    Log!(macd[0][r.len() - 1], macd[1][r.len() - 1], macd[2][r.len() - 1]);
+    Log!(atr[atr.len() - 1]);
+}
+```
+
+**talib指标库**
+
+```js
+function main() {
+    var records = exchange.GetRecords()
+    var cci = talib.CCI(records, 14)
+    Log(cci)
+}
+```
+
+```python
+# Python 需要在托管者所在机器安装 TA-Lib 与 numpy，未安装时调用 talib 会报错提示安装
+def main():
+    records = exchange.GetRecords()
+    cci = talib.CCI(records.High, records.Low, records.Close, 14)
+    Log(cci)
+```
+
+**JavaScript：动态加载第三方库**
+
+其它第三方 JavaScript 库可以在运行时下载后用```eval```加载：
+
+```js
+function main() {
+    // via. https://cdnjs.com/libraries
+    eval(HttpQuery("https://cdnjs.cloudflare.com/ajax/libs/mathjs/13.2.0/math.min.js"))
+
+    Log(math.round(math.e, 3))                // 2.718
+    Log(math.atan2(3, -3) / math.pi)          // 0.75
+    Log(math.log(10000, 10))                  // 4
+    Log(math.sqrt(-4))                        // {"mathjs":"Complex","re":0,"im":2}
+}
+```
+
+### 多语言支持
+
+策略名称和策略参数的描述均可采用```中文|英文```的格式书写，使网页能够自动识别并显示相应的语言。在其它使用场景中，例如**策略描述**、**使用说明**等```Markdown```格式的文本，使用```[trans]中文|英文[/trans]```或```[trans]中文||英文[/trans]```同样可以实现语言的自动识别。切换语言后，刷新网页即可生效。此外，在策略代码中，凡是可以写入字符串的函数也支持语言切换，例如```Log()```函数、```LogStatus()```函数等。
+
+```js
+function main() {
+    Log("[trans]日志|log[/trans]")
+    var table = {
+        type: "table",
+        title: "[trans]操作|option[/trans]",
+        cols: ["[trans]列1|col1[/trans]", "[trans]列2|col2[/trans]", "[trans]操作|option[/trans]"],
+        rows: [
+            ["[trans]比特币|BTC[/trans]", "[trans]以太坊|ETH[/trans]", {"type": "button", "cmd": "coverAll", "name": "平仓|cover", "description": "描述|description"}]  // 注意：按钮中不用加[trans]标签
+        ]
+    }
+    LogStatus("[trans]信息|message[/trans]", "\n`" + JSON.stringify(table) + "`")
+    throw "[trans]错误|error[/trans]"
+}
+```
+
+```python
+import json
+
+def main():
+    Log("[trans]日志|log[/trans]")
+    table = {
+        "type": "table",
+        "title": "[trans]操作|option[/trans]",
+        "cols": ["[trans]列1|col1[/trans]", "[trans]列2|col2[/trans]", "[trans]操作|option[/trans]"],
+        "rows": [
+            ["[trans]比特币|BTC[/trans]", "[trans]以太坊|ETH[/trans]", {"type": "button", "cmd": "coverAll", "name": "平仓|cover", "description": "描述|description"}]
+        ]
+    }
+    LogStatus("[trans]信息|message[/trans]", "\n`" + json.dumps(table) + "`")
+    raise Exception("[trans]错误|error[/trans]")
+```
+
+```rust
+fn main() {
+    Log!("[trans]日志|log[/trans]");
+    let table = r#"{
+        "type": "table",
+        "title": "[trans]操作|option[/trans]",
+        "cols": ["[trans]列1|col1[/trans]", "[trans]列2|col2[/trans]", "[trans]操作|option[/trans]"],
+        "rows": [
+            ["[trans]比特币|BTC[/trans]", "[trans]以太坊|ETH[/trans]", {"type": "button", "cmd": "coverAll", "name": "平仓|cover", "description": "描述|description"}]
+        ]
+    }"#;
+    LogStatus!("[trans]信息|message[/trans]", format!("\n`{}`", table));
+    Panic!("[trans]错误|error[/trans]");
+}
+```
+
+## 开发工具
+
+编写和调试策略的工具：策略编辑器、调试工具、在本地编辑器里远程编辑。
+
+### 策略编辑器
+
+在[新建策略页面](https://www.fmz.com/m/add-strategy)或者从[策略库](https://www.fmz.com/m/strategies)打开一个现有策略，进入**编辑页面**（例如策略ID为123456的地址为```https://www.fmz.com/m/edit-strategy/123456```）编写策略。
 
 ![线上策略编辑器界面](https://www.fmz.com/upload/asset/2e50fff4160187be92248.png)
 
-### AI助手
+本章介绍编辑器的辅助功能。与编辑页面相关的其它功能：
+- `远程编辑`：用本地编辑器编写，自动同步到平台。
+- `回测配置与保存`：把回测配置和策略参数随策略保存。
+- `完整策略的导入与导出`：导出、导入包含参数等全部信息的完整策略。
 
-FMZ量化交易平台集成了先进的AI大模型助手功能，为用户提供智能化的策略开发和交易辅助服务。通过与业界领先的大语言模型深度集成，平台能够帮助用户快速解决编程问题、优化交易策略、分析市场数据，并提供专业的量化交易指导。
+#### AI助手
 
-FMZ平台目前支持以下AI大模型：
-Claude Sonnet 4 - Anthropic最新发布的高性能模型，具备卓越的代码理解和生成能力。
+策略编辑器内置AI助手，可以根据描述生成策略代码，解释、修改选中的代码，调整策略参数和交互控件，并自动回测、分析回测结果。
 
-- 如何调用AI助手
-
-  ![策略编辑器菜单中的AI助手](https://www.fmz.com/upload/asset/16b08991d9857b82a46b.png)
-
-  在空白处点击右键，在弹出的菜单中选择「AI助手」选项，即可调用AI助手，或者使用快捷键```⌘K```调用AI助手。
-- 使用AI助手解释代码
+- AI助手面板
+  代码编辑区右侧是AI助手面板，可以收起和展开。在输入框中描述需求即可对话；先在编辑器中选中代码，选中的代码会作为对话的上下文。
+  AI给出的代码、参数和交互控件修改以差异形式显示，可以逐处「接受」或「拒绝」，也可以全部接受；修改策略或自动回测前会先询问是否允许。
+- 选中代码的快捷操作
+  选中代码后点击鼠标右键，菜单中有AI操作（例如解释这段代码、优化代码），也可以用```⌘1```、```⌘2```……（Windows为```Ctrl+1```、```Ctrl+2```……）触发。
 
   ![策略编辑器中的AI助手解释代码](https://www.fmz.com/upload/asset/16aa01684eda4e8163ed.png)
+- 智能补全
+  在右键菜单中选择开启或关闭智能补全，快捷键为```⌘J```（Windows为```Ctrl+J```）。
 
-  AI助手不仅能够帮助您编写代码，还能为您解释代码逻辑。选中需要解释的代码片段后点击右键，在弹出的菜单中选择「解释这段代码」，即可查看AI助手提供的详细代码解释。
-- 优化和改进代码
-  选中需要优化的代码片段后点击右键，在弹出的菜单中选择「提出优化建议」或「重新优化代码」，AI助手将为您提供优化建议或直接生成优化后的代码。
+AI助手按使用量从账户余额扣费，对话中会显示本次费用。
 
-### 命令面板
+除了编辑器内的AI助手，也可以把自己使用的外部AI助手接入平台，通过对话管理策略、回测和实盘，见`AI接入`。
+
+#### 命令面板
 
 在策略代码编辑区域点击鼠标右键，选择弹出菜单中的「命令面板」选项，可查看各种功能的快捷键组合和编辑器命令。
 
 ![策略编辑器中菜单的命令面板显示](https://www.fmz.com/upload/asset/2e429269f02185dfbab3b.png)
 
-### 语法手册速查
+#### 语法手册速查
 
 在**策略编辑页面**的「代码」编辑区内，可以快速查询「语法手册」。根据操作系统不同，使用相应的快捷键：
 
@@ -711,7 +2873,7 @@ Claude Sonnet 4 - Anthropic最新发布的高性能模型，具备卓越的代�
 
 然后将鼠标移动到需要查询的**变量名**或**函数名**上时，会出现跳转链接。点击该链接即可弹出「语法手册」，并自动定位到查询的内容。
 
-### 定义与引用跳转
+#### 定义与引用跳转
 
 选中需要查询的内容，点击鼠标右键弹出菜单。
 - 转到定义：跳转至所查询内容的定义位置。
@@ -719,19 +2881,19 @@ Claude Sonnet 4 - Anthropic最新发布的高性能模型，具备卓越的代�
 - 快速查看-速览定义：在不离开当前代码行的情况下查看所选代码的定义。
 - 快速查看-查看引用：在不离开当前代码行的情况下查看其他代码行中对当前代码的引用情况，支持快速跳转，便于更好地理解代码逻辑和结构。
 
-### 策略文档
+#### 策略文档
 
-线上策略编辑页面提供了完善的文档记录功能，可将策略代码、策略描述、使用说明、开发日志等信息分类管理。
+线上策略编辑页面把策略代码、策略描述、使用说明、开发记录等信息分开记录。
 
 ![策略文档选项说明](https://www.fmz.com/upload/asset/2e47983c191c1779bd52e.png)
 
-- 代码：策略程序的源代码。
-  发明者量化交易平台上的完整策略包含：策略源码、[策略参数设计](https://www.fmz.com/user-guide#策略参数)、[策略交互设计](https://www.fmz.com/user-guide#交互控件)、[策略模板引用](https://www.fmz.com/user-guide#模板类库)。
-- 笔记：用于记录策略开发过程中的相关内容。
-- 描述：用于记录策略公开展示时的介绍信息。
-- 手册：用于记录仅在策略租用后才可查看的详细信息。
+- 代码：策略程序的源码。
+  平台上一个完整的策略包含：策略源码、`策略参数`设计、`交互控件`设计、`模板类库`引用。
+- 笔记：记录策略开发过程中的内容。
+- 描述：策略公开展示时显示的介绍。
+- 手册：只有租用策略后才能看到的说明。
 
-### 历史版本管理
+#### 历史版本管理
 
 平台支持策略开发过程中的版本迭代功能，在**策略编辑页面**「代码」编辑区内，点击「历史版本」按钮可以打开策略历史版本管理页面。
 
@@ -755,38 +2917,108 @@ Claude Sonnet 4 - Anthropic最新发布的高性能模型，具备卓越的代�
 
 - **出租策略的版本控制**：当策略出租给其他用户时，租用方只能运行策略所有者设置的「默认运行版本」，无法选择其他历史版本。策略所有者可以通过设置默认运行版本来控制出租策略使用的版本。
 
-### 其它
+### 调试工具
 
-- [远程编辑](https://www.fmz.com/user-guide#远程编辑)
-  ![远程编辑截图](https://www.fmz.com/upload/asset/2e4e8975d1e32517fd989.png)
-- [保存回测设置](https://www.fmz.com/user-guide#保存回测设置)
-  ![保存回测设置截图](https://www.fmz.com/upload/asset/2e51f69b120f9b6aadaee.png)
-- [策略导入、导出](https://www.fmz.com/user-guide#完整策略的导入与导出)
-  ![策略导入导出截图](https://www.fmz.com/upload/asset/2e52ccf44526f396fb795.png)
+[调试工具](https://www.fmz.com/m/debug)页面提供了一个用于快速测试实盘代码的免费环境，目前仅支持```JavaScript```语言。
+
+![调试工具](https://www.fmz.com/upload/asset/2e48d6d1bc77e46099058.png)
+
+使用调试工具测试代码时，代码将直接在指定的托管者上运行，最长运行时间为3分钟。支持调用发明者量化交易平台的所有API函数，但仅支持单个交易所对象。
+
+### 远程编辑
+
+可以用本地编辑器编写策略，保存时自动同步到发明者量化交易平台。支持```VSCode```、```Vim```、```Sublime Text 3```，```JavaScript```策略还可以用```WebStorm```，```Python```策略还可以用```PyCharm```。Blockly可视化策略不支持远程编辑。
+
+![远程编辑截图](https://www.fmz.com/upload/asset/2e4e8975d1e32517fd989.png)
+
+**使用步骤**
+1. 在策略编辑页面点击「远程编辑」。弹出的窗口上方是各编辑器插件的下载链接，点击跳转到对应的插件页面安装，不同编辑器的安装方式略有差别。
+2. 窗口中显示当前策略的远程同步密钥（token）。密钥为空时，点击「更新密钥」生成。
+3. 把策略源码保存到本地，在源码第一行插入窗口中给出的密钥行（例如```JavaScript```为```// fmz@<密钥>```，```Python```为```# fmz@<密钥>```），之后每次保存都会自动同步到平台。
+
+也可以不装插件，用```curl```直接上传本地源码（窗口中有带密钥的完整命令），例如：
+
+```bash
+curl -T quant.js -H "Authorization: Bearer <密钥>" https://www.fmz.com/rsync
+```
+
+**管理密钥**
+- 「更新密钥」：生成新密钥，原密钥随即失效。
+- 「删除密钥」：删除当前策略的密钥，关闭远程编辑。
+
+拿到密钥的人可以改写这个策略的源码，不要把密钥公开。
 
 ## 回测系统
 
-当您完成量化交易策略的设计后，如何验证策略的逻辑正确性、收益预期等关键指标？显然不能直接使用真实资金在市场中测试。正确的做法是使用历史数据对策略进行回测，通过分析策略在历史行情中的表现来评估其盈利能力和风险特征。
+用历史数据检验策略：回测系统用历史行情驱动策略代码，模拟撮合与账户，给出收益、回撤等结果。回测只反映策略在历史行情下的表现，不代表未来收益。
 
-### 回测系统模式
+### 概述与发起回测
 
-发明者量化交易平台将回测模式分为**实盘级 Tick**回测和**模拟级 Tick**回测。**实盘级 Tick**回测完全基于完整的历史数据进行回测；**模拟级 Tick**回测则根据真实K线数据生成**tick数据**来进行回测。两者都基于真实历史数据进行回测，但**实盘级 Tick**回测的数据更精准，结果更加可信。需要注意的是，回测仅反映策略在历史数据下的表现，历史数据并不能完全代表未来的行情，因此对待回测结果应保持理性、客观的态度。
+回测用平台的历史行情驱动策略代码：回测引擎维护一个虚拟时钟，为每个交易所对象维护一个模拟账户，策略调用的行情、下单、账户等函数都由引擎按历史数据应答。回测结果只反映策略在历史行情下的表现，历史行情不能代表未来，对回测结果要理性、客观地看待。
 
-**模拟级 Tick**回测根据底层K线周期生成模拟的**tick数据**，每个底层K线周期上最多生成12个回测时间点。而**实盘级 Tick**回测使用真实收集的逐秒tick数据，数据量大，回测速度较慢，因此不适合回测特别长的时间范围。FMZ量化的回测机制允许策略在一根K线上进行多次交易，避免了仅能在收盘价成交的局限性，在保证精准度的同时兼顾了回测速度。
+**发起回测**
 
-[回测系统机制说明](https://www.fmz.com/digest-topic/4009)
+- 网页：打开策略编辑页面，切换到「模拟回测」分页，设置回测配置和策略参数后点击「开始回测」（快捷键见`回测页面快捷键`）。回测配置可以保存进策略源码，见`回测配置与保存`。
+- AI助手：通过MCP工具```run_backtest```发起回测、```get_backtest```读取结果，见`AI接入`。MCP发起的回测只使用模拟级Tick模式。
+- 本机：使用开源的本地回测引擎，见`本地回测引擎`。
 
-- 模拟级 Tick
-  **模拟级 Tick**回测根据回测系统的底层K线数据，按照特定算法在给定的底层K线Bar的最高价、最低价、开盘价、收盘价构成的价格框架内模拟生成tick数据进行回测，作为回测时间序列上的实时tick数据，在策略程序调用接口时返回。具体可参考：[回测系统模拟级别机制说明](https://www.fmz.com/bbs-topic/662)。
+**回测配置项**
 
-- 实盘级 Tick
-  实盘级别回测使用Bar时间序列中的真实tick级别数据。对于基于tick级别数据的策略，使用实盘级别回测更贴近实际情况。实盘级别回测的tick是真实记录的数据，并非模拟生成。支持深度数据、市场成交记录数据回放，支持自定义深度，支持分笔数据。实盘级别回测数据最大支持50MB，在数据上限内不限制回测时间范围。如需尽可能增大回测时间范围，可降低深度档位数值设置，不使用分笔数据以扩展回测时间范围。调用```GetDepth```、```GetTrades```函数获取回放行情数据。在时间轴上某个行情数据时刻，调用```GetTicker```、```GetTrades```、```GetDepth```、```GetRecords```，不会多次推动时间在回测时间轴上移动（不会触发跳转到下一个行情数据时刻）。对于以上某个函数的重复调用，将推动回测时间在回测时间轴上移动（跳转到下一个行情数据时刻）。回测时使用实盘级别回测不宜选择过早的时间，因为过早的时间段可能没有实盘级别数据。
+| 配置项 | 说明 |
+| - | - |
+| 时间范围 | 回测的开始时间和结束时间。 |
+| K线周期 | 策略调用```GetRecords()```默认得到的K线周期。 |
+| 底层K线周期 | 模拟级Tick模式下用来生成tick的K线周期。越小越接近真实行情，回测也越慢；策略K线由底层K线合成，不能小于底层K线周期。 |
+| 模式 | 模拟级Tick或实盘级Tick，见`回测模式与撮合`。 |
+| 交易所、交易对 | 每个交易所对象有各自的模拟账户；交易对写成```BTC_USDT```的形式。期货交易所需要在策略中先调用```exchange.SetContractType()```设置合约，才能获取行情、下单。 |
+| 初始资金 | 计价币（如USDT）和交易币（如BTC）的初始余额。币本位合约以交易币作保证金，需要设置交易币余额。 |
+| 手续费 | 挂单（maker）和吃单（taker）费率，单位为百分比，默认取该交易所市场的配置。限价单下单时立即成交按吃单费率计算，挂在盘口上之后才成交按挂单费率计算。 |
+| 滑点 | 单位为价格最小变动单位（一跳）的个数，加在模拟盘口买一价、卖一价的外侧，默认为0。 |
+| 网络延迟 | 单位为毫秒，策略每调用一次交易所接口，虚拟时钟前进相应时间，默认为200。 |
+| 深度档位、每档数量 | ```GetDepth()```返回的档位数（1～20）和模拟盘口每档的数量；实盘级Tick模式下深度档位是向数据源请求的真实深度档数。 |
+| K线最大条数 | 第一次调用```GetRecords()```时返回的历史K线条数上限（100～5000，默认300）。 |
+| 日志条数 | 回测保留的运行日志、收益日志、图表数据的条数上限。 |
+| 数据源 | 默认使用平台的历史数据，也可以使用自定义数据源，见`自定义数据源`。 |
 
-**实盘级Tick**和**模拟级Tick**模式的回测系统成交撮合机制：订单成交撮合按照见价成交、全量成交进行。因此回测系统中无法测试部分成交的场景。
+**容错测试**
 
-### 回测数据粒度对回测的影响
+回测页面另外提供「容错测试」：按一定概率（默认0.5）让交易所接口调用失败，并且每种接口的第一次调用一定失败，失败时记录错误日志```FaultTolerant Test```。用于检验策略对接口失败的处理，例如是否用```_C()```重试。
 
-以下测试代码针对不同的数据粒度（A. 实盘级别回测、B. 模拟级别回测（较小底层K线周期）、C. 模拟级别回测（较大底层K线周期）等）会呈现不同的表现。交易次数和盈亏结果均会有所差异。进行回测时应尽可能保持较小的数据粒度。虽然数据粒度较大时回测速度可能更快，但所得结果可能缺乏客观性。
+**回测中的策略**
+
+- ```IsVirtual()```返回```true```，不应在回测中执行的逻辑可以据此跳过，见`IsVirtual`。
+- 时间是虚拟时间：```Unix()```、```_D()```等读取的是回测时钟，```Sleep()```推动时钟前进。时钟越过结束时间时，引擎抛出```EOF```异常结束回测，此时不会调用```onexit()```。
+- 回测中```GetCommand()```收不到交互命令，不支持```onerror()```，网络请求类功能受限。
+
+### 回测模式与撮合
+
+回测分为**模拟级Tick**和**实盘级Tick**两种模式。两者都基于真实的历史数据：模拟级Tick由K线生成tick，实盘级Tick回放真实记录的tick，后者更精确，也更慢。
+
+**模拟级Tick**
+
+回测引擎在每根底层K线的开盘价、最高价、最低价、收盘价构成的价格框架内，沿 开盘→最低/最高→收盘 的路径生成2～14个模拟tick，K线的成交量分摊到这些tick上；策略调用行情接口时得到的是当前模拟tick的数据。因此每根底层K线上有多个回测时间点，策略可以在一根K线内多次交易，而不是只能按收盘价成交。底层K线周期越小，生成的tick越接近真实走势，回测也越慢。机制详见[回测系统模拟级别机制说明](https://www.fmz.com/bbs-topic/662)、[回测系统机制说明](https://www.fmz.com/digest-topic/4009)。
+
+模拟盘口：卖一价 = 当前tick收盘价 + 一跳 + 滑点，买一价 = 收盘价 − 一跳 − 滑点（滑点以跳数计）；```GetDepth()```返回按此间隔排列的若干档模拟深度，每档数量为配置中的「每档数量」。
+
+**实盘级Tick**
+
+使用平台真实记录的逐秒tick数据，包含盘口深度（档位可设置，最多20档），可以选择回放逐笔成交数据；```GetDepth()```、```GetTrades()```返回回放的真实数据。由于数据量大、回测速度慢，单次回测的数据上限为50MB，可回测的时间范围因此受限；需要更长的时间范围时，可以降低深度档位、不使用逐笔成交数据。较早的时间段可能没有实盘级数据，时间范围不宜选得过早。
+
+在某个行情时刻，```GetTicker()```、```GetDepth()```、```GetTrades()```、```GetRecords()```各调用一次不会推动回测时间；再次调用其中同一个函数时，回测时间跳到下一个行情时刻。实盘级Tick模式下，策略循环中的```Sleep()```宜设得短一些（例如100毫秒）。
+
+**撮合规则**
+
+两种模式使用相同的撮合规则：
+
+- 按价格触及成交，并且一次全部成交，回测中不会出现部分成交。
+- 市价单在当前tick按卖一价/买一价成交；现货市价买单的数量是计价币金额。
+- 限价买单价格大于等于卖一价、限价卖单价格小于等于买一价时成交，挂单后的每个tick都会检查。下单时立即成交的，按市场价成交并收取吃单（taker）手续费；挂在盘口之后被价格触及而成交的，按委托价成交并收取挂单（maker）手续费。
+- 实盘级Tick模式下，挂在买一/卖一价位上的订单，要等排在它前面的挂单量被消耗后才成交。
+- 期货按 名义价值 ÷ 杠杆 冻结保证金；行情数据中包含资金费率时，永续合约按资金费率结算资金费。
+
+**数据粒度的影响**
+
+同一个策略在不同的数据粒度下（实盘级Tick、底层K线周期较小的模拟级Tick、底层K线周期较大的模拟级Tick等）回测，交易次数和盈亏都会不同。数据粒度大时回测快，但结果可能失真，回测时应尽量使用较小的数据粒度。可以用下面的策略在几种粒度下分别回测对比：
 
 ```js
 /*backtest
@@ -820,164 +3052,260 @@ function main() {
             Log("Long @", ticker.Last)
             direction = "long"
         }
-        // Tick模式中应尽可能短，K线回测中无影响
+        // Tick 模式中尽量短，K线模式中没有影响
         Sleep(100)
     }
 }
 ```
 
-### 回测系统支持多种编程语言
+### 回测配置与保存
 
-回测系统支持对以下语言编写的策略进行回测：```JavaScript```、```TypeScript```、```Python```、```Rust```、```C++```、[```PINE```](https://www.fmz.com/bbs-topic/9315)、[```My语言```](https://www.fmz.com/bbs-topic/2569)、```Blockly``` 可视化以及 ```Workflow``` 工作流。
+「模拟回测」分页中的回测配置（时间范围、交易所、手续费等）和策略参数可以随策略保存，再次打开策略时自动载入。
 
-  1、**JavaScript** 和 **C++** 策略的回测在浏览器端进行，其策略在实盘和回测运行时均无需安装任何其它软件、库或模块。
+**保存**
 
-  2、**Python** 语言的策略回测在托管者上进行，既可以在 FMZ 量化的公共服务器上回测，也可以在用户自己的托管者上回测。实盘和回测均依赖托管者所在系统中安装的 Python 环境，如需使用某些库，请自行安装，FMZ 量化的公共服务器仅支持常用的 **Python** 库。
+- 点击「保存回测设置」：把回测配置和策略参数以注释（```backtest```注释块）的形式写在策略源码开头。
+- 点击「保存策略」：平台同时记录当前的回测配置和策略参数。
 
-  3、**JavaScript** 语言的策略回测支持在 Chrome 浏览器的 DevTools 中进行调试，详见[参考说明](https://www.fmz.com/digest-topic/9459)。
+**载入**
 
-  4、**Workflow** 工作流策略支持回测，可视化查看节点执行状态和数据流转过程。
+- 打开或刷新策略编辑页面时，优先载入源码中```backtest```注释块记录的配置。
+- 源码中没有```backtest```注释块时，载入最后一次「保存策略」时记录的配置。
+- 在源码中手动修改了```backtest```注释块后，点击注释块上方的「回测设置」按钮，把修改同步到回测页面的选项中。
 
-  5、**Rust** 语言的策略在回测时由平台服务器编译，编译后的模块在浏览器端的回测系统中运行；策略中通过 frontmatter 声明的第三方 crate 依赖在编译时自动获取，无需在本地安装任何工具链。
+**注释块格式**
 
-### 回测系统支持的交易所
+在该语言的块注释起始符后紧接着写```backtest```，之后每行一个```键: 值```：
 
-- 加密货币
-  支持主流加密货币现货及期货交易所，覆盖交易所全部交易品种数据。
-- 富途证券
-  支持港股、美股等多个市场。
-
-  回测注意事项：回测系统目前仅支持富途日线级别数据：
-  ```js
-  /*backtest
-  start: 2024-05-01 00:00:00
-  end: 2025-02-17 00:00:00
-  period: 1d
-  basePeriod: 1d
-  exchanges: [{"eid":"Futures_Futu","currency":"STOCK","fee":[0.03,0.03]}]
-  */
-
-  function main() {
-      let info = exchange.SetContractType("TLSA.US")   // 设置股票代码：特斯拉
-      Log("info:", info)         // info: {"InstrumentID":"TLSA.US","LotTick":1,"PriceTick":0.01,"VolumeMultiple":1}
-      Log(exchange.GetTicker())  // {"Time":1714482000000,"Symbol":"TLSA.US","Open":0.62,"High":0.63,"Low":0.61,"Sell":0.63,"Buy":0.61,"Last":0.62,"Volume":0,"OpenInterest":0}
-  }
-  ```
-
-### 回测系统参数调优
-
-发明者量化交易平台回测系统参数调优功能允许在回测时根据各个参数的调优选项设置参数组合。在「模拟回测」页面的策略参数部分，勾选策略参数右侧的**调优**选项即可显示调优设置。
-
-- 最小值：设定参数的起始值。
-- 最大值：设定参数递增变化后的最大值。
-- 步长：参数递增的变化量。
-- 并发线程：
-  参数调优时，设置各个回测参数组合并发执行的线程数。该选项仅支持```JavaScript```、```PINE```、```My语言```的策略参数调优，不支持模板参数的调优。
-
-系统根据```最小值```、```最大值```、```步长```设置生成参数组合，并遍历这些参数组合进行回测（即对每种参数组合都执行一次回测）。策略参数只有类型为**数字型(number)**的参数才能在回测系统中进行参数调优设置。
-
-### 保存回测设置
-
-在[策略编辑页面](https://www.fmz.com/m/add-strategy)的「模拟回测」分页（即回测系统）中，可以设置回测配置、策略参数等选项进行策略回测。回测配置用于设置回测的时间范围、交易所、交易滑点、手续费等条件；策略参数则用于设置策略的参数选项。
-
-设置好这些参数配置后，即可按照设定进行策略回测。那么，如何保存这些已设置好的配置信息呢？
-
-- 1、可以使用[策略编辑页面](https://www.fmz.com/m/add-strategy)的「保存回测设置」按钮，将所有回测配置信息（包含回测设置、策略参数设置）以代码形式记录在策略源码中。
-
-- 2、在策略编辑页面点击「保存策略」按钮保存策略时，平台会自动记录当前的回测设置、策略参数配置等信息。
-
-回测系统如何载入回测配置呢？
-
-- 1、刷新或重新打开策略编辑页面时，系统会优先自动载入「保存回测设置」按钮所记录的回测配置信息。
-
-- 2、如果当前策略代码中没有以注释形式```backtest```记录的回测配置信息（即未通过「保存回测设置」按钮保存在策略代码中），回测系统会自动将回测设置配置为当前策略最后一次点击「保存策略」按钮时的回测配置信息。
-
-- 3、如果在策略编辑页面中修改了策略代码开头部分以注释形式记录的回测配置信息，需要将更新后的回测配置信息同步到策略回测界面的选项，可以点击策略编辑区域```backtest```上方的「回测设置」按钮。
-
-点击「保存回测设置」时，```JavaScript```/```Python```/```C++```/```My语言```/```PINE```语言的策略将回测设置保存到策略代码时，格式略有差别：
-
-```javascript
+```js
 /*backtest
-start: 2021-06-26 00:00:00
-end: 2021-09-23 00:00:00
-period: 1d
-basePeriod: 1h
-exchanges: [{"eid":"Binance","currency":"BTC_USDT"}]
+start: 2024-01-01 00:00:00
+end: 2024-03-01 00:00:00
+period: 1h
+basePeriod: 15m
+exchanges: [{"eid":"Binance","currency":"BTC_USDT","balance":10000,"stocks":0,"fee":[0.1,0.1]}]
+args: [["fast",5],["slow",20]]
 */
 ```
 
-```python
-'''backtest
-start: 2021-06-26 00:00:00
-end: 2021-09-23 00:00:00
-period: 1d
-basePeriod: 1h
-exchanges: [{"eid":"Binance","currency":"BTC_USDT"}]
-'''
-```
+各语言的注释写法：JavaScript、TypeScript、Rust、PINE语言使用```/*backtest ... */```；Python使用```'''backtest ... '''```；My语言使用```(*backtest ... *)```。
 
-```rust
+| 键 | 格式 | 说明 |
+| - | - | - |
+| start、end | ```YYYY-MM-DD HH:mm:ss``` | 开始、结束时间，按浏览器所在时区解析。 |
+| period | ```1m```、```1h```、```1d```等，或秒数 | 策略K线周期。 |
+| basePeriod | 同上 | 底层K线周期，不写时与```period```相同；实盘级Tick模式下忽略。 |
+| mode | ```1``` | 实盘级Tick模式；不写为模拟级Tick模式。 |
+| exchanges | JSON数组 | 每个元素对应一个交易所对象，字段见下表。 |
+| args | JSON数组 | 策略参数，```[["参数名", 值], ...]```；第三个元素为模板Id时设置该模板的参数：```["参数名", 值, 模板Id]```。 |
+
+```exchanges```元素的字段，除```eid```、```currency```外都可以省略：
+
+| 字段 | 说明 |
+| - | - |
+| eid | 交易所Id，例如```Binance```、```Futures_OKX```。 |
+| currency | 交易对，例如```BTC_USDT```。 |
+| balance、stocks | 计价币、交易币的初始余额。 |
+| fee | ```[挂单费率, 吃单费率]```，单位为百分比。 |
+| feeMin | 每笔成交的最低手续费，只对部分市场生效。 |
+| depthDeep、depthAmount | 深度档位、模拟盘口每档的数量。 |
+| tradesMode | 实盘级Tick模式下是否回放逐笔成交：```"0"```回放，```"1"```不回放。 |
+| feeder | 自定义数据源地址，见`自定义数据源`。 |
+
+「保存回测设置」还会写入一些以```bt```开头的键（例如```btSlipPoint```滑点、```btNetDelay```网络延迟、```btFaultTolerant```容错概率、```btMaxBarLen```K线最大条数），记录回测页面上其他选项的取值，不建议手工修改。本地回测引擎也读取同样的注释块，见`本地回测引擎`。
+
+### 支持范围
+
+**编程语言**
+
+回测系统支持以下语言编写的策略：JavaScript、TypeScript、Python、Rust、[PINE语言](https://www.fmz.com/bbs-topic/9315)、[My语言](https://www.fmz.com/bbs-topic/2569)、Blockly可视化、Workflow工作流。
+
+- JavaScript策略（TypeScript先编译为JavaScript）在浏览器中回测，回测引擎以WebAssembly形式运行，不需要安装任何软件。JavaScript策略回测时可以在Chrome浏览器的DevTools中调试，见[参考说明](https://www.fmz.com/digest-topic/9459)。
+- Rust策略由平台服务器编译，编译结果在浏览器中回测；策略中通过frontmatter声明的第三方crate在编译时自动获取，本地不需要安装工具链。
+- Python策略在托管者上回测，可以使用平台的公共服务器，也可以使用自己的托管者。回测与实盘都依赖托管者所在系统的Python 3环境，需要的第三方库要自行安装；公共服务器只提供常用的库。
+- Workflow工作流策略回测时可以可视化查看各节点的执行状态和数据流转。
+
+**交易所**
+
+回测数据来自平台的历史数据，可以回测的交易所以回测页面中可选的为准（也可以通过MCP工具```list_exchanges```查看，```backtest```为```true```的交易所有历史数据）。
+
+- 加密货币：主流交易所的现货和期货，例如Binance与Futures_Binance、OKX与Futures_OKX、HTX与Futures_HTX、Bybit与Futures_Bybit、Bitget与Futures_Bitget、GateIO与Futures_GateIO，支持交易所的全部品种。
+- 富途证券（```Futures_Futu```）：港股、美股等市场。回测只支持日线级别数据，```currency```设置为```STOCK```，在策略中用```exchange.SetContractType()```设置股票代码：
+
+```js
 /*backtest
-start: 2021-06-26 00:00:00
-end: 2021-09-23 00:00:00
+start: 2024-05-01 00:00:00
+end: 2025-02-17 00:00:00
 period: 1d
-basePeriod: 1h
-exchanges: [{"eid":"Binance","currency":"BTC_USDT"}]
+basePeriod: 1d
+exchanges: [{"eid":"Futures_Futu","currency":"STOCK","fee":[0.03,0.03]}]
 */
+
+function main() {
+    var info = exchange.SetContractType("TSLA.US")   // 设置股票代码：特斯拉
+    Log("info:", info)                               // 合约信息：InstrumentID、PriceTick、LotTick、VolumeMultiple等
+    Log(exchange.GetTicker())                        // 回测时间点的日线行情
+}
 ```
 
-```cpp
-/*backtest
-start: 2021-06-26 00:00:00
-end: 2021-09-23 00:00:00
-period: 1d
-basePeriod: 1h
-exchanges: [{"eid":"Binance","currency":"BTC_USDT"}]
-*/
+### 参数调优
+
+参数调优在回测时按设置的范围生成多组参数，逐组回测。在「模拟回测」分页的策略参数部分，勾选参数右侧的**调优**选项后出现调优设置：
+
+- 最小值：参数的起始值。
+- 最大值：参数递增后的最大值。
+- 步长：每次递增的量。
+- 并发线程：参数调优时同时执行的回测数。该选项只支持JavaScript、PINE、My语言策略的参数调优，不支持模板上的参数调优。
+
+回测系统按```最小值```、```最大值```、```步长```生成参数组合，对每种组合各回测一次。只有**数字型（number）**的策略参数可以设置调优。
+
+### 结果解读
+
+回测结束后，回测页面显示收益曲线、统计指标、状态信息、日志信息和账户信息。
+
+**收益曲线**
+
+收益曲线由策略调用```LogProfit()```记录的收益值组成（`LogProfit`）。策略不调用```LogProfit()```时没有收益曲线，下面依赖收益序列的统计指标也无法计算，只能从账户信息中查看回测结束时的资产。MCP工具```get_backtest```返回的```profit```、```max_drawdown```同样来自```LogProfit()```。
+
+**统计指标**
+
+统计指标由收益序列```profits```（每个元素为```[时间戳, 收益]```）和初始资产```totalAssets```按下面的算法计算：
+
+| 指标 | 含义 |
+| - | - |
+| 收益率（totalReturns） | 最后一个收益值 ÷ 初始资产。 |
+| 年化收益（annualizedReturns） | 收益率 × 一年的时长（yearDays天）÷ 回测时长，按比例线性折算。 |
+| 最大回撤（maxDrawdown） | 资产（初始资产 + 收益）相对此前最高点下跌的最大比例。maxDrawdownStartTime为该最高点的时间，maxDrawdownTime为回撤最深的时间。 |
+| 胜率（winningRate） | 收益序列中高于前一个点的点所占的比例（第一个点与0比较）。统计的是收益记录，不是逐笔交易的胜率。 |
+| 波动率（volatility） | 把回测时间按天切分，每天的收益额 ÷ 初始资产，再乘以yearDays折算为年化值（没有收益记录的日子按0计），取这些值的总体标准差。 |
+| 夏普比率（sharpeRatio） | （年化收益 − 无风险利率3%）÷ 波动率；波动率为0时为0。 |
+
+yearDays是年化时使用的一年天数，由回测页面传入。注意波动率是把每日收益率直接乘以yearDays年化，而不是常见的乘以√yearDays，因此这里的夏普比率不宜与其他平台的数值直接比较。
+
+算法源码：
+
+```js
+function returnAnalyze(totalAssets, profits, ts, te, period, yearDays) {
+    // force by days
+    period = 86400000
+    if (profits.length == 0) {
+        return null
+    }
+    var freeProfit = 0.03 // 0.04
+    var yearRange = yearDays * 86400000
+    var totalReturns = profits[profits.length - 1][1] / totalAssets
+    var annualizedReturns = (totalReturns * yearRange) / (te - ts)
+
+    // MaxDrawDown
+    var maxDrawdown = 0
+    var maxAssets = totalAssets
+    var maxAssetsTime = 0
+    var maxDrawdownTime = 0
+    var maxDrawdownStartTime = 0
+    var winningRate = 0
+    var winningResult = 0
+    for (var i = 0; i < profits.length; i++) {
+        if (i == 0) {
+            if (profits[i][1] > 0) {
+                winningResult++
+            }
+        } else {
+            if (profits[i][1] > profits[i - 1][1]) {
+                winningResult++
+            }
+        }
+        if ((profits[i][1] + totalAssets) > maxAssets) {
+            maxAssets = profits[i][1] + totalAssets
+            maxAssetsTime = profits[i][0]
+        }
+        if (maxAssets > 0) {
+            var drawDown = 1 - (profits[i][1] + totalAssets) / maxAssets
+            if (drawDown > maxDrawdown) {
+                maxDrawdown = drawDown
+                maxDrawdownTime = profits[i][0]
+                maxDrawdownStartTime = maxAssetsTime
+            }
+        }
+    }
+    if (profits.length > 0) {
+        winningRate = winningResult / profits.length
+    }
+    // trim profits
+    var i = 0
+    var datas = []
+    var sum = 0
+    var preProfit = 0
+    var perRatio = 0
+    var rangeEnd = te
+    if ((te - ts) % period > 0) {
+        rangeEnd = (parseInt(te / period) + 1) * period
+    }
+    for (var n = ts; n < rangeEnd; n += period) {
+        var dayProfit = 0.0
+        var cut = n + period
+        while (i < profits.length && profits[i][0] < cut) {
+            dayProfit += (profits[i][1] - preProfit)
+            preProfit = profits[i][1]
+            i++
+        }
+        perRatio = ((dayProfit / totalAssets) * yearRange) / period
+        sum += perRatio
+        datas.push(perRatio)
+    }
+
+    var sharpeRatio = 0
+    var volatility = 0
+    if (datas.length > 0) {
+        var avg = sum / datas.length;
+        var std = 0;
+        for (i = 0; i < datas.length; i++) {
+            std += Math.pow(datas[i] - avg, 2);
+        }
+        volatility = Math.sqrt(std / datas.length);
+        if (volatility !== 0) {
+            sharpeRatio = (annualizedReturns - freeProfit) / volatility
+        }
+    }
+
+    return {
+        totalAssets: totalAssets,
+        yearDays: yearDays,
+        totalReturns: totalReturns,
+        annualizedReturns: annualizedReturns,
+        sharpeRatio: sharpeRatio,
+        volatility: volatility,
+        maxDrawdown: maxDrawdown,
+        maxDrawdownTime: maxDrawdownTime,
+        maxAssetsTime: maxAssetsTime,
+        maxDrawdownStartTime: maxDrawdownStartTime,
+        winningRate: winningRate
+    }
+}
 ```
 
-My语言：
+**数据下载**
 
-```My
-(*backtest
-start: 2021-06-26 00:00:00
-end: 2021-09-23 00:00:00
-period: 1d
-basePeriod: 1h
-exchanges: [{"eid":"Binance","currency":"BTC_USDT"}]
-*)
-```
-
-PINE语言：
-
-```pine
-/*backtest
-start: 2021-06-26 00:00:00
-end: 2021-09-23 00:00:00
-period: 1d
-basePeriod: 1h
-exchanges: [{"eid":"Binance","currency":"BTC_USDT"}]
-*/
-```
+- 状态栏数据下载：回测结束后，在「状态信息」栏右上角点击「下载表格」，下载回测结束时状态栏数据的CSV文件。
+- 日志数据下载：在「日志信息」栏右上角点击「下载表格」，下载回测日志的CSV文件。
 
 ### 自定义数据源
 
-发明者量化交易平台的回测系统支持自定义数据源，回测系统使用```GET```方法请求自定义的URL（可公开访问的网址）来获取外部数据源进行回测，附加的请求参数如下：
+发明者量化交易平台的回测系统支持自定义数据源，回测时由平台的数据服务器使用```GET```方法请求自定义的URL获取数据，因此该URL必须能从公网访问。请求附加的参数如下：
 
 | 参数 | 意义 | 说明 |
 | - | - | - |
-| symbol | 品种名称 | 现货行情数据示例：```BTC_USDT```，期货行情数据示例：```BTC_USDT.swap```，期货永续合约资金费率数据示例：```BTC_USDT.funding```，期货永续合约价格指数数据示例：```BTC_USDT.index``` |
+| symbol | 品种名 | 现货行情数据例如：```BTC_USDT```，期货行情数据例如：```BTC_USDT.swap```，期货永续合约资金费率数据例如：```BTC_USDT.funding```，期货永续合约价格指数数据例如：```BTC_USDT.index``` |
 | eid | 交易所 | 例如：OKX、Futures_OKX |
-| round | 数据精度 | 为true时，表示由自定义数据源返回的数据中定义具体精度。发明者量化交易平台回测系统向自定义数据源发送的请求固定为：```round=true``` |
-| period | K线数据的周期（毫秒） | 例如：```60000```表示1分钟周期 |
+| round | 数据精度 | 固定为```round=true```：返回的价格、数量都写成按精度放大后的整数，精度由返回数据```detail```中的```quotePrecision```、```basePrecision```给出，见`数据格式`。 |
+| period | K线数据的周期(毫秒) | 例如：```60000```为1分钟周期 |
 | depth | 深度档数 | 1-20 |
-| trades | 是否需要逐笔成交数据 | 真（1）/假（0） |
-| from | 开始时间 | unix时间戳 |
-| to | 结束时间 | unix时间戳 |
-| detail | 请求品种的详细信息 | 为true时，表示需要由自定义数据源提供。发明者量化交易平台回测系统向自定义数据源发送的请求固定为：```detail=true``` |
-| custom | -- | 可忽略此参数 |
+| trades | 是否需要逐笔成交数据 | 是（1）/否（0） |
+| from | 开始时间 | Unix时间戳，单位为秒 |
+| to | 结束时间 | Unix时间戳，单位为秒 |
+| detail | 请求数据的品种详细信息 | 为true，表示需要由自定义数据源提供。发明者量化交易平台回测系统向自定义数据源发送的请求固定为：```detail=true``` |
+| custom | -- | 可以忽略该参数 |
 
-现货交易所、期货交易所对象的数据源设置为自定义数据源（feeder）时，回测系统向自定义数据源服务发送请求的示例：
+现货交易所、期货交易所对象的数据源设置为自定义数据源（feeder）时回测系统向自定义数据源服务发送请求的例子：
 
 ```url
 http://customserver:9090/data?custom=0&depth=20&detail=true&eid=Bitget&from=1351641600&period=86400000&round=true&symbol=BTC_USDT&to=1611244800&trades=1
@@ -986,8 +3314,8 @@ http://customserver:9090/data?custom=0&depth=20&detail=true&eid=Futures_OKX&from
 
 #### 数据格式
 
-返回的格式必须为以下两种格式之一（系统自动识别）：
-- 模拟级Tick，以下是JSON数据示例：
+返回的格式必须为以下两种格式其中之一（系统自动识别）：
+- 模拟级Tick，以下是JSON数据范例：
   ```json
   {
       "detail": {
@@ -1014,8 +3342,8 @@ http://customserver:9090/data?custom=0&depth=20&detail=true&eid=Futures_OKX&from
       ]
   }
   ```
-- 实盘级Tick，以下是JSON数据示例：
-  Tick级回测数据（包含盘口深度信息，深度格式为```[价格, 数量]```的数组。可包含多级深度，```asks```按价格升序排列，```bids```按价格降序排列）。
+- 实盘级Tick，以下是JSON数据范例：
+  Tick级回测的数据（包含盘口深度信息，深度格式为```[价格, 量]```的数组。可有多级深度，```asks```为价格升序，```bids```为价格倒序）。
   ```json
   {
       "detail": {
@@ -1045,17 +3373,26 @@ http://customserver:9090/data?custom=0&depth=20&detail=true&eid=Futures_OKX&from
 
 | 字段 | 说明 |
 | - | - |
-| detail | 请求数据的品种详细信息，包含计价币名称、交易币名称、精度、最小下单量等 |
-| schema | 指定data数组中列的属性，区分大小写。仅限于 time, open, high, low, close, vol, asks, bids, trades |
-| data | 按照schema设置的列结构记录的数据 |
+| detail | 请求数据的品种详细信息，包含计价币名称、交易币名称，精度，最小下单量等 |
+| schema | 指定data数组中列的属性，区分大小写。仅限于 time, open, high, low, close, vol, asks, bids, trades|
+| data | 按照schema设置的列结构，记录的数据。|
+
+**数值精度**
+
+请求中固定带```round=true```，返回的数值都写成按精度放大后的整数，以免传输过程中丢失浮点数精度：
+
+- 价格类数值（```open```、```high```、```low```、```close```，```asks```/```bids```和```trades```中的价格）= 实际值 × 10^```quotePrecision```。
+- 数量类数值（```vol```，```asks```/```bids```和```trades```中的数量）= 实际值 × 10^```basePrecision```。
+
+例如上面的范例中```quotePrecision```为2，```9531300```表示价格95313.00；```basePrecision```为5，```787```表示数量0.00787。时间列（```time```及```trades```中的时间）是毫秒时间戳，不放大。
 
 **detail字段**
 
 | 字段 | 说明 |
 | - | - |
-| eid            | 交易所ID，注意同一交易所的现货与期货使用不同的eid |
+| eid            | 交易所Id，注意某个交易所现货与期货是不同的eid |
 | symbol         | 交易品种代码 |
-| alias          | 当前交易品种代码在交易所中对应的symbol |
+| alias          | 当前交易品种代码对应的交易所中的symbol |
 | baseCurrency   | 交易币种 |
 | quoteCurrency  | 计价币种 |
 | marginCurrency | 保证金币种 |
@@ -1065,20 +3402,20 @@ http://customserver:9090/data?custom=0&depth=20&detail=true&eid=Futures_OKX&from
 | maxQty         | 最大下单量 |
 | minNotional    | 最小下单金额 |
 | maxNotional    | 最大下单金额 |
-| priceTick      | 价格最小变动单位 |
-| volumeTick     | 下单量最小变动单位 |
-| marginLevel    | 期货杠杆倍数 |
-| contractType   | 对于永续合约设置为：```swap```，回测系统将继续发送资金费率、价格指数请求 |
+| priceTick      | 价格一跳 |
+| volumeTick     | 下单量最小变动数值（下单量一跳） |
+| marginLevel    | 期货杠杆值 |
+| contractType   | 对于永续合约设置为：```swap```，回测系统会继续发送资金费率、价格指数请求 |
 
-特殊列属性```asks```、```bids```、```trades```说明：
+特殊的列属性```asks```、```bids```、```trades```：
 
 | 字段 | 说明 | 备注 |
 | - | - | - |
-| asks / bids | [[价格, 数量], ...]                      | 例如```实盘级 Tick```数据示例中的数据：```[[9531300, 10]]``` |
-| trades      | [[时间, 方向(0:买,1:卖), 价格, 数量], ...] | 例如```实盘级 Tick```数据示例中的数据：```[[1564315200000, 0, 9531300, 10]]``` |
+| asks / bids | [[价格, 数量], ...]                      | 例如```实盘级Tick```数据范例中的数据：```[[9531300, 10]]``` |
+| trades      | [[时间, 方向(0:买,1:卖), 价格, 数量], ...] | 例如```实盘级Tick```数据范例中的数据：```[[1564315200000, 0, 9531300, 10]]``` |
 
-期货交易所的永续合约回测时，自定义数据源还需要提供额外的资金费率数据和价格指数数据。只有当请求的行情数据返回时，返回结构中的detail字段包含```"contractType": "swap"```键值对，回测系统才会继续发送资金费率请求。
-当回测系统收到资金费率数据后，才会继续发送价格指数数据请求。
+期货交易所的永续合约回测时，自定义数据源还需要额外的资金费率数据、价格指数数据。只有当请求的行情数据返回时，返回的结构中detail字段包含```"contractType": "swap"```键值对，回测系统才会继续发送对于资金费率的请求。
+当回测系统收到资金费率数据时，才会继续发送对于价格指数数据的请求。
 
 资金费率数据结构如下：
 ```json
@@ -1125,16 +3462,15 @@ http://customserver:9090/data?custom=0&depth=20&detail=true&eid=Futures_OKX&from
             -16294,
             0
         ]
-        // ...
     ]
 }
 ```
 
-- 相邻周期间隔为8小时
-- 例如币安资金费率每8小时更新一次，资金费率数据为何是 -16795？
-  这是因为与K线数据一样，为避免网络传输过程中浮点数精度丢失，数据采用整型表示；资金费率数据也可能为负值。
+- 相邻的周期间隔8小时
+- 资金费率数据为什么是 -16795？
+  与K线数据一样按精度放大为整数：该数据的```quotePrecision```为8，-16795表示资金费率-0.00016795。资金费率可以为负值。
 
-回测系统发出的资金费率数据请求示例：
+回测系统发出的资金费率数据请求，举例为：
 
 ```url
 http://customserver:9090/data?custom=0&depth=20&detail=true&eid=Futures_Binance&from=1351641600&period=86400000&round=true&symbol=BTC_USDT.funding&to=1611244800&trades=0
@@ -1172,20 +3508,19 @@ http://customserver:9090/data?custom=0&depth=20&detail=true&eid=Futures_Binance&
     ],
     "data": [
         [1584921600000, 58172, 59167, 56902, 58962, 0],
-        [1584922500000, 58975, 59428, 58581, 59154, 0],
-        // ...
+        [1584922500000, 58975, 59428, 58581, 59154, 0]
     ]
 }
 ```
 
-回测系统发出的价格指数数据请求示例：
+回测系统发出的价格指数数据请求，举例为：
 ```url
 http://customserver:9090/data?custom=0&depth=20&detail=true&eid=Futures_Binance&from=1351641600&period=86400000&round=true&symbol=BTC_USDT.index&to=1611244800&trades=0
 ```
 
 #### 自定义数据源范例
 
-指定数据源地址，例如：```http://120.24.2.20:9090/data```。自定义数据源服务程序使用```Golang```编写：
+把下面的服务程序部署在能从公网访问的服务器上，数据源地址即为```http://<服务器地址>:9090/data```（```<服务器地址>```替换为该服务器的公网IP或域名）。自定义数据源服务程序使用```Golang```编写：
 
 ```golang
 package main
@@ -1197,7 +3532,7 @@ import (
 )
 
 func Handle (w http.ResponseWriter, r *http.Request) {
-    // e.g. set on backtest DataSourse: http://xxx.xx.x.xx:9090/data
+    // e.g. set on backtest DataSource: http://xxx.xx.x.xx:9090/data
 
     // request: GET http://xxx.xx.x.xx:9090/data?custom=0&depth=20&detail=true&eid=OKX&from=1584921600&period=86400000&round=true&symbol=BTC_USDT&to=1611244800&trades=1
     //              http://xxx.xx.x.xx:9090/data?custom=0&depth=20&detail=true&eid=Futures_Binance&from=1599958800&period=3600000&round=true&symbol=BTC_USDT.swap&to=1611244800&trades=0
@@ -1322,14 +3657,14 @@ func main () {
 }
 ```
 
-测试策略，```JavaScript```示例：
+测试策略，```JavaScript```范例：
 ```js
 /*backtest
 start: 2021-01-16 08:00:00
 end: 2021-01-22 00:00:00
 period: 1d
 basePeriod: 1d
-exchanges: [{"eid":"OKX","currency":"BTC_USDT","feeder":"http://120.24.2.20:9090/data"}]
+exchanges: [{"eid":"OKX","currency":"BTC_USDT","feeder":"http://<服务器地址>:9090/data"}]
 args: [["number",2]]
 */
 
@@ -1344,53 +3679,95 @@ function main() {
 
 ### 本地回测引擎
 
-发明者量化交易平台开源了```JavaScript```语言和```Python```语言的本地回测引擎，支持回测时设置底层K线周期。
-- [JavaScript语言回测引擎](https://github.com/fmzquant/backtest_javascript)
-- [Python语言回测引擎](https://github.com/fmzquant/backtest_python)
+平台开源了JavaScript和Python的本地回测引擎，与云端回测使用相同的引擎核心和历史数据（从平台的数据服务器下载），可以在自己的电脑上快速回测JavaScript、Python策略：
 
-以Python语言为例，简要说明本地回测引擎的使用方法：
+- [Python回测引擎](https://github.com/fmzquant/backtest_python)
+- [JavaScript回测引擎](https://github.com/fmzquant/backtest_javascript)
+
+**Python**
+
+安装（需要Python 3和pip）：
+
+```bash
+pip install https://github.com/fmzquant/backtest_python/archive/master.zip
+pip install pandas matplotlib   # 仅在使用 Join(True)、Show() 时需要
+```
+
+第一次使用时会从数据服务器下载对应系统的引擎文件，之后除了历史数据不再联网。策略文件就是普通的FMZ策略，加上开头的```backtest```配置注释（格式见`回测配置与保存`）和几行引擎调用代码：
+
 ```python
 '''backtest
-start: 2022-02-19 00:00:00
-end: 2022-03-22 12:00:00
-period: 15m
+start: 2026-09-01 00:00:00
+end: 2026-09-15 00:00:00
+period: 1h
+basePeriod: 15m
 exchanges: [{"eid":"Binance","currency":"BTC_USDT","balance":10000,"stocks":0}]
 '''
-
-# Part 1 -----------------------------------
-# 初始化回测引擎，backtest 为回测引擎配置信息，与 FMZ 平台线上回测系统配置保持一致
-# 通过 __doc__ 读取上方的配置字符串并初始化回测环境
+import json
 from fmz import *
-task = VCtx(__doc__) # initialize backtest engine from __doc__
-# End    -----------------------------------
+task = VCtx(__doc__)  # 按上方注释中的配置初始化回测引擎，exchange、Log、TA 等成为全局对象
 
-# Part 2 -----------------------------------
-# 以下为待测试的策略代码示例（可以从 FMZ 平台复制完整的策略代码）
-# 注意：仅复制策略代码时不包含参数设计、交互设计等其他配置内容
-def onTick():
-	ticker = _C(exchange.GetTicker)
-	LogStatus(_D(), ticker.Last)
-
+# 以下为待测试的策略代码，可以从平台直接复制
 def main():
-	exchange.SetCurrency("ETH_USDT")
-	# exchange.SetContractType("swap")  # 如果测试期货交易所对象，需要设置合约，例如这里设置为永续合约
-	Log(exchange.GetAccount())
-	while True:
-		onTick()
-		Sleep(1000)
-# End    -----------------------------------
+    Log(exchange.GetAccount())
+    while True:
+        r = exchange.GetRecords()
+        LogStatus(_D(), r[-1]["Close"])
+        Sleep(60 * 60 * 1000)
 
-# Part 3 -----------------------------------
-# 执行回测并捕获结束信号，回测结束时会触发 EOF 异常
-# 捕获异常后可以输出回测结果数据或展示回测图表
 try:
-	main()
-except:
-	print("Strategy testing completed.")
-	print(task.Join(False)) # print backtest result
-	# task.Show() # or show backtest chart
-# End    -----------------------------------
+    main()
+except EOFError:      # 虚拟时钟到达结束时间时，引擎抛出 EOFError
+    pass
+result = json.loads(task.Join(False))   # 原始回测结果（JSON）
+print(result["LogsCount"], result["Elapsed"] / 1e6)
+# task.Show()                           # 或者显示收益图表（需要 matplotlib）
 ```
+
+用```python strategy.py```运行。```task.Join(False)```返回原始回测结果的JSON，```task.Join(True)```返回收益数据的pandas表格，```task.Show()```画出收益曲线。
+
+**JavaScript**
+
+```bash
+npm install git+https://github.com/fmzquant/backtest_javascript.git
+```
+
+```js
+var fmz = require("fmz")
+var task = fmz.VCtx({
+    start: "2026-09-01 00:00:00", end: "2026-09-15 00:00:00", period: "1h", basePeriod: "15m",
+    exchanges: [{eid: "Binance", currency: "BTC_USDT", balance: 10000, stocks: 0}]
+})
+// 从这里开始 exchange、Log、TA 等成为全局对象，粘贴策略代码后调用 main()
+
+function main() {
+    Log(exchange.GetAccount())
+    while (true) {
+        var r = exchange.GetRecords()
+        LogStatus(_D(), r[r.length - 1].Close)
+        Sleep(60 * 60 * 1000)
+    }
+}
+
+try {
+    main()
+} catch (e) {
+    // 虚拟时钟到达结束时间时，引擎抛出 "EOF"
+}
+var result = JSON.parse(task.Join())    // 与 Python 引擎 Join(False) 的结果相同
+console.log(result.LogsCount)
+```
+
+**与云端回测的区别**
+
+- 只支持JavaScript和Python策略，不会自动加载模板：策略引用的模板代码需要粘贴到文件中，因此依赖交易类库的PINE、My语言策略不能在本地回测。
+- 策略参数不会自动注入，需要在代码中定义为全局变量。
+- 注释中的```start```、```end```按本机时区解析；网络延迟固定为200毫秒，不支持滑点和实盘级Tick模式。
+- 收益、回撤和收益曲线同样只在策略调用```LogProfit()```时才有。
+
+**AI回测**
+
+在AI助手中可以直接让它回测：AI助手通过MCP工具```run_backtest```发起云端回测，用```get_backtest```读取收益、回撤、错误日志等结果，见`AI接入`。也可以让AI助手在本机安装本地回测引擎，快速修改、回测，再用云端回测确认一次。
 
 ### 回测页面快捷键
 
@@ -1401,2116 +3778,408 @@ except:
 - 启动回测的快捷键
   使用```Ctrl + b```键启动回测。
 
-### 回测数据下载
+## 进阶专题
 
-- 回测系统日志数据下载
-  打开具体策略，切换到「回测页面」进行策略回测。回测结束后，在显示的「状态信息」栏右上角有「下载表格」按钮，点击即可下载回测结束时状态栏数据的CSV格式文件。
-- 回测系统状态栏数据下载
-  打开具体策略，切换到「回测页面」进行策略回测。回测结束后，在显示的「日志信息」栏右上角有「下载表格」按钮，点击即可下载回测日志数据的CSV格式文件。
+进阶用法：JavaScript多线程、实盘之间通信、API限流、期权交易、Web3链上交易。
 
-### 回测系统夏普算法
+### JavaScript多线程
 
-回测系统夏普比率算法源码：
-```js
-function returnAnalyze(totalAssets, profits, ts, te, period, yearDays) {
-    // force by days
-    period = 86400000
-    if (profits.length == 0) {
-        return null
-    }
-    var freeProfit = 0.03 // 0.04
-    var yearRange = yearDays * 86400000
-    var totalReturns = profits[profits.length - 1][1] / totalAssets
-    var annualizedReturns = (totalReturns * yearRange) / (te - ts)
+JavaScript策略可以用```threading```对象创建真正并行执行的线程，并用消息、共享字典、锁等对象在线程之间通信。本页说明怎么选用、怎么组织线程代码；各函数的参数和返回值见语法手册`Threads`。
 
-    // MaxDrawDown
-    var maxDrawdown = 0
-    var maxAssets = totalAssets
-    var maxAssetsTime = 0
-    var maxDrawdownTime = 0
-    var maxDrawdownStartTime = 0
-    var winningRate = 0
-    var winningResult = 0
-    for (var i = 0; i < profits.length; i++) {
-        if (i == 0) {
-            if (profits[i][1] > 0) {
-                winningResult++
+## 先选对工具
+
+| 需求 | 推荐 | 适用语言 |
+| - | - | - |
+| 同时发出几个API请求（如同时取多个交易所的行情），等结果回来 | `exchange.Go`，配合`EventLoop`等待完成事件 | 所有语言 |
+| 长时间在后台运行的任务：独立的行情采集、风控巡检、耗时计算 | `threading.Thread` | 仅JavaScript |
+| 在策略内提供HTTP、WebSocket或TCP服务 | `threading.Serve` | 仅JavaScript |
+
+只是并发几个请求时，```exchange.Go()```更简单，也不需要处理线程间的数据传递。本页的```threading```对象只适用于JavaScript策略，Python、Rust策略请使用```exchange.Go()```。
+
+回测系统中可以调用这些函数，但线程实际是按顺序执行的，只用于保证代码在回测中能运行。
+
+## 线程运行在隔离的环境中
+
+传给```threading.Thread()```的函数在一个独立的JavaScript环境中执行，这是写线程代码时最需要注意的一点：
+
+- 线程函数**不能引用外部的变量和闭包**，也不能调用策略里自定义的其它函数。需要的数据通过```threading.Thread(func, arg1, arg2, ...)```的参数传入。
+- 普通对象、数组作为参数时是**深拷贝**：线程里修改它不影响其它线程。需要多个线程看到同一份数据时，使用```threading.Dict()```创建的字典。
+- 函数也可以作为参数传入；```threading.Thread()```还支持传入函数源码字符串，用于在线程中加载外部库。
+- 线程里可以直接调用平台的API函数，如```exchange.GetTicker()```、```Log()```。
+- 线程函数的返回值通过```join()```取回：```t.join().ret```。
+
+## 线程之间怎样交换数据
+
+| 方式 | 用法 | 说明 |
+| - | - | - |
+| 消息 | ```t.postMessage(msg)```发给线程```t```；线程内用```threading.currentThread().peekMessage(timeout)```读取自己收到的消息；子线程用```threading.mainThread().postMessage(msg)```发回主线程 | 每个线程有自己的收件箱，按顺序读取。```peekMessage(-1)```不阻塞，没有消息时返回空值 |
+| 共享字典 | ```var d = threading.Dict()```，作为参数传入线程后各线程```d.get(key)```、```d.set(key, value)``` | 适合保存「最新状态」，例如最新行情、运行标志 |
+| 线程数据 | ```t.setData(key, value)```、```t.getData(key)``` | 挂在某个线程对象上的键值，线程结束（```join()```、```terminate()```）后失效 |
+| 同步对象 | ```threading.Lock()```、```threading.Event()```、```threading.Condition()``` | 作为参数传入线程，用于互斥访问和等待通知 |
+
+线程收到消息时也会产生事件，可以用线程对象的`eventLoop`统一等待消息和其它事件。
+
+## 线程的生命周期
+
+- ```t.join()```等待线程结束并取回返回值，可以设置超时；```t.terminate()```强制结束线程。
+- 线程结束且不再被引用时，资源会自动回收，不必为了释放资源调用```join()```。持续引用、无法回收的线程累计超过2000个时会报错。
+- ```threading.pending()```返回正在运行的线程数（包括主线程）。
+- 实盘停止时所有线程一起结束。```peekMessage()```、```join()```、锁和事件的等待都会被停止打断。
+
+## 在策略内提供服务
+
+```threading.Serve(地址, 处理函数, ...参数)```在策略进程内启动HTTP（含WebSocket）或TCP服务，每个请求或连接在独立的线程中调用处理函数，返回`Server`对象（```addr()```取实际监听地址，```close()```关闭）。处理函数与线程函数一样运行在隔离环境中，需要的数据通过参数传入，常用```threading.Dict()```与主线程共享状态。地址写法、```ctx```对象的方法见`Serve`。
+
+旧的全局函数```__Serve()```仍可使用，它只返回监听地址字符串，新代码请使用```threading.Serve()```。
+
+## 示例
+
+### 多个线程并行计算，主线程汇总结果
+
+每个线程拉取一个交易对的K线并计算均线，结果通过返回值交给主线程。注意交易对通过参数传入，线程函数里没有引用外部变量。
+
+```javascript
+function main() {
+    var symbols = ["BTC_USDT", "ETH_USDT", "SOL_USDT"]
+    var threads = []
+    for (var i = 0; i < symbols.length; i++) {
+        threads.push(threading.Thread(function(symbol, period) {
+            // 在线程中运行：只能使用参数和平台API
+            var records = exchange.GetRecords(symbol, period)
+            if (!records || records.length < 20) {
+                return null
             }
-        } else {
-            if (profits[i][1] > profits[i - 1][1]) {
-                winningResult++
+            var ma = TA.MA(records, 20)
+            return {symbol: symbol, close: records[records.length - 1].Close, ma20: ma[ma.length - 1]}
+        }, symbols[i], PERIOD_H1))
+    }
+    for (var i = 0; i < threads.length; i++) {
+        var r = threads[i].join().ret
+        if (r) {
+            Log(r.symbol, "收盘价:", r.close, "MA20:", r.ma20)
+        }
+    }
+}
+```
+
+### 后台线程采集行情，主线程读取与下发指令
+
+后台线程把最新价写进共享字典，并把异常通过消息报告给主线程；主线程通过消息通知后台线程退出。
+
+```javascript
+function main() {
+    var shared = threading.Dict()
+    var worker = threading.Thread(function(dict, symbol) {
+        while (true) {
+            // 读取主线程发来的指令，-1 表示不阻塞
+            var cmd = threading.currentThread().peekMessage(-1)
+            if (cmd == "stop") {
+                break
             }
-        }
-        if ((profits[i][1] + totalAssets) > maxAssets) {
-            maxAssets = profits[i][1] + totalAssets
-            maxAssetsTime = profits[i][0]
-        }
-        if (maxAssets > 0) {
-            var drawDown = 1 - (profits[i][1] + totalAssets) / maxAssets
-            if (drawDown > maxDrawdown) {
-                maxDrawdown = drawDown
-                maxDrawdownTime = profits[i][0]
-                maxDrawdownStartTime = maxAssetsTime
-            }
-        }
-    }
-    if (profits.length > 0) {
-        winningRate = winningResult / profits.length
-    }
-    // trim profits
-    var i = 0
-    var datas = []
-    var sum = 0
-    var preProfit = 0
-    var perRatio = 0
-    var rangeEnd = te
-    if ((te - ts) % period > 0) {
-        rangeEnd = (parseInt(te / period) + 1) * period
-    }
-    for (var n = ts; n < rangeEnd; n += period) {
-        var dayProfit = 0.0
-        var cut = n + period
-        while (i < profits.length && profits[i][0] < cut) {
-            dayProfit += (profits[i][1] - preProfit)
-            preProfit = profits[i][1]
-            i++
-        }
-        perRatio = ((dayProfit / totalAssets) * yearRange) / period
-        sum += perRatio
-        datas.push(perRatio)
-    }
-
-    var sharpeRatio = 0
-    var volatility = 0
-    if (datas.length > 0) {
-        var avg = sum / datas.length;
-        var std = 0;
-        for (i = 0; i < datas.length; i++) {
-            std += Math.pow(datas[i] - avg, 2);
-        }
-        volatility = Math.sqrt(std / datas.length);
-        if (volatility !== 0) {
-            sharpeRatio = (annualizedReturns - freeProfit) / volatility
-        }
-    }
-
-    return {
-        totalAssets: totalAssets,
-        yearDays: yearDays,
-        totalReturns: totalReturns,
-        annualizedReturns: annualizedReturns,
-        sharpeRatio: sharpeRatio,
-        volatility: volatility,
-        maxDrawdown: maxDrawdown,
-        maxDrawdownTime: maxDrawdownTime,
-        maxAssetsTime: maxAssetsTime,
-        maxDrawdownStartTime: maxDrawdownStartTime,
-        winningRate: winningRate
-    }
-}
-```
-
-## 策略入口函数
-
-对于```JavaScript```、```Python```、```Rust```、```C++```语言的策略，发明者量化交易平台已经定义了以下入口函数。
-
-| 函数名 | 说明 |
-| - | - |
-|```main()```| 入口函数，即策略的主函数。 |
-|```onexit()```| 正常退出时执行的收尾函数，最长执行时间为5分钟，可以不声明；如果执行超时，将报出**interrupt**错误。在实盘中，若已先触发```onerror()```函数，则不会再触发```onexit()```函数。
-|```onerror()```| 异常退出时触发执行的函数，最长执行时间为5分钟，可以不声明。```Python```语言、```C++```语言编写的策略不支持该函数，回测系统也不支持该函数。
-|```init()```| 初始化函数，策略程序在开始运行时会首先自动调用该函数，可以不声明。 |
-
-**注意事项：**
-
-- 当```main()```函数执行结束时，所有已创建的子线程都会被自动终止。
-
-- 在```Rust```语言策略中，直接定义```fn main()```、```fn init()```、```fn onexit()```即可（由引导层自动调用）；也可以在策略代码中调用```OnExit()```注册额外的退出钩子，详见「Rust策略编写说明」。
-
-### onexit()
-
-```onexit()```函数用于处理策略的扫尾工作，最长执行时间为5分钟，需由用户自行实现。
-
-测试```onexit()```函数：
-
-```javascript
-function main(){
-    Log("Starting, will stop after 5 seconds and execute cleanup function!")
-    Sleep(1000 * 5)
-}
-
-// 扫尾函数的实现
-function onexit(){
-    var beginTime = new Date().getTime()
-    while(true){
-        var nowTime = new Date().getTime()
-        Log("Program stop countdown..cleanup started, elapsed time:", (nowTime - beginTime) / 1000, "seconds!")
-        Sleep(1000)
-    }
-}
-```
-
-```python
-import time
-def main():
-    Log("Starting, will stop after 5 seconds and execute cleanup function!")
-    Sleep(1000 * 5)
-
-def onexit():
-    beginTime = time.time() * 1000
-    while True:
-        ts = time.time() * 1000
-        Log("Program stop countdown..cleanup started, elapsed time:", (ts - beginTime) / 1000, "seconds!")
-        Sleep(1000)
-```
-
-```rust
-fn main() {
-    Log!("Starting, will stop after 5 seconds and execute cleanup function!");
-    Sleep(1000 * 5);
-}
-
-// 扫尾函数的实现
-fn onexit() {
-    let beginTime = Unix() * 1000;
-    loop {
-        let nowTime = Unix() * 1000;
-        Log!("Program stop countdown..cleanup started, elapsed time:", (nowTime - beginTime) / 1000, "seconds!");
-        Sleep(1000);
-    }
-}
-```
-
-```cpp
-void main() {
-    Log("Starting, will stop after 5 seconds and execute cleanup function!");
-    Sleep(1000 * 5);
-}
-
-void onexit() {
-    auto beginTime = Unix() * 1000;
-    while(true) {
-        auto ts = Unix() * 1000;
-        Log("Program stop countdown..cleanup started, elapsed time:", (ts - beginTime) / 1000, "seconds!");
-        Sleep(1000);
-    }
-}
-```
-
-由于回测系统中的策略通常被设计为一个死循环，不断轮询执行，因此在回测系统中无法触发策略所实现的```onexit()```函数。可以通过检测回测系统的结束标记（EOF 异常）来触发```onexit()```函数的执行。
-
-```javascript
-function main() {
-    if (exchange.GetName().startsWith("Futures_")) {
-        Log("Exchange is futures")
-        exchange.SetContractType("swap")
-    } else {
-        Log("Exchange is spot")
-    }
-
-    if (IsVirtual()) {
-        try {
-            onTick()
-        } catch (e) {
-            Log("error:", e)
-        }
-    } else {
-        onTick()
-    }
-}
-
-function onTick() {
-    while (true) {
-        var ticker = exchange.GetTicker()
-        LogStatus(_D(), ticker ? ticker.Last : "--")
-        Sleep(500)
-    }
-}
-
-function onexit() {
-    Log("Executing cleanup function")
-}
-```
-
-```python
-def main():
-    if exchange.GetName().startswith("Futures_"):
-        Log("Exchange is futures")
-    else:
-        Log("Exchange is spot")
-
-    if IsVirtual():
-        try:
-            onTick()
-        except Exception as e:
-            Log(e)
-    else:
-        onTick()
-
-def onTick():
-    while True:
-        ticker = exchange.GetTicker()
-        LogStatus(_D(), ticker["Last"] if ticker else "--")
-        Sleep(500)
-
-def onexit():
-    Log("Executing cleanup function")
-```
-
-```rust
-fn onTick() {
-    loop {
-        match exchange.GetTicker(None) {
-            Ok(ticker) => LogStatus!(_D(None), ticker.Last),
-            Err(e) => {
-                // 回测结束时，API 调用返回 Err，退出循环使 main 返回，从而触发 onexit() 扫尾函数
-                Log!("error:", e);
-                break;
-            }
-        }
-        Sleep(500);
-    }
-}
-
-fn main() {
-    if exchange.GetName().starts_with("Futures_") {
-        Log!("Exchange is futures");
-        let _ = exchange.SetContractType("swap");
-    } else {
-        Log!("Exchange is spot");
-    }
-
-    onTick();
-}
-
-fn onexit() {
-    Log!("Executing cleanup function");
-}
-```
-
-```cpp
-#include <iostream>
-#include <exception>
-#include <string>
-
-void onTick() {
-    while (true) {
-        auto ticker = exchange.GetTicker();
-        LogStatus(_D(), ticker);
-        Sleep(500);
-    }
-}
-
-void main() {
-    std::string prefix = "Futures_";
-    bool startsWith = exchange.GetName().substr(0, prefix.length()) == prefix;
-    if (startsWith) {
-        Log("Exchange is futures");
-        exchange.SetContractType("swap");
-    } else {
-        Log("Exchange is spot");
-    }
-
-    if (IsVirtual()) {
-        try {
-            onTick();
-        } catch (...) {
-            std::cerr << "Caught unknown exception" << std::endl;
-        }
-    } else {
-        onTick();
-    }
-}
-
-void onexit() {
-    Log("Executing cleanup function");
-}
-```
-
-### init()
-
-```init()``` 为用户实现的初始化函数。策略开始运行时，会首先自动执行 ```init()``` 函数，以完成策略中设计的初始化任务。
-
-```javascript
-function main(){
-    Log("First line of code executed!", "#FF0000")
-    Log("Exiting!")
-}
-
-// 初始化函数
-function init(){
-    Log("Initializing!")
-}
-```
-
-```python
-def main():
-    Log("First line of code executed!", "#FF0000")
-    Log("Exiting!")
-
-def init():
-    Log("Initializing!")
-```
-
-```rust
-fn main() {
-    Log!("First line of code executed!", "#FF0000");
-    Log!("Exiting!");
-}
-
-// 初始化函数
-fn init() {
-    Log!("Initializing!");
-}
-```
-
-```cpp
-void main() {
-    Log("First line of code executed!", "#FF0000");
-    Log("Exiting!");
-}
-
-void init() {
-    Log("Initializing!");
-}
-```
-
-### onerror()
-
-```onerror()```，当发生异常时会触发```onerror()```函数执行，该函数不支持```Python```、```C++```语言的策略。```onerror()```函数可以接收一个```msg```参数，该```msg```参数为异常触发时的错误信息。
-
-```javascript
-function main() {
-    var arr = []
-    Log(arr[6].Close)  // 这里故意引发一个程序异常
-}
-
-function onerror(msg) {
-    Log("Error:", msg)
-}
-```
-
-```python
-# python不支持
-```
-
-```cpp
-// C++不支持
-```
-
-## 策略框架与API函数
-
-在使用```JavaScript```、```Python```、```Rust```、```C++```语言编写的策略中，需要在策略主循环中调用```Sleep()```函数。回测时用于控制回测速度，实盘时用于控制策略的轮询间隔，从而控制对交易所API接口的请求频率。
-
-### 全局函数
-
-| 函数名称 | 简介 |
-| - | - |
-| [Version](/syntax-guide#fun_version)               | 返回系统当前版本号 |
-| [Sleep](/syntax-guide#fun_sleep)                   | 休眠函数，参数为暂停的毫秒数 |
-| [IsVirtual](/syntax-guide#fun_isvirtual)           | 判断执行环境，返回真值表示回测环境 |
-| [Mail](/syntax-guide#fun_mail)                     | 发送邮件 |
-| [Mail_Go](/syntax-guide#fun_mail_go)               | ```Mail```函数的异步版本 |
-| [SetErrorFilter](/syntax-guide#fun_seterrorfilter) | 过滤错误日志，参数为正则表达式字符串，匹配该正则表达式的错误日志将不会上传到日志系统 |
-| [GetPid](/syntax-guide#fun_getpid)                 | 获取实盘进程ID |
-| [GetLastError](/syntax-guide#fun_getlasterror)     | 获取最近一次的错误信息 |
-| [GetCommand](/syntax-guide#fun_getcommand)         | 获取策略交互命令，策略交互控件设置请参考：[交互控件](/user-guide#交互控件) |
-| [GetMeta](/syntax-guide#fun_getmeta)               | 获取生成策略注册码时写入的Meta值 |
-| [Dial](/syntax-guide#fun_dial)                     | 用于原始Socket访问 |
-| [HttpQuery](/syntax-guide#fun_httpquery)           | 发送HTTP请求 |
-| [HttpQuery_Go](/syntax-guide#fun_httpquery_go)     | ```HttpQuery```函数的异步版本 |
-| [Encode](/syntax-guide#fun_encode)                 | 数据编码函数 |
-| [UnixNano](/syntax-guide#fun_unixnano)             | 获取纳秒级时间戳 |
-| [Unix](/syntax-guide#fun_unix)                     | 获取秒级时间戳 |
-| [GetOS](/syntax-guide#fun_getos)                   | 获取系统信息 |
-| [MD5](/syntax-guide#fun_md5)                       | 计算MD5哈希值 |
-| [DBExec](/syntax-guide#fun_dbexec)                 | 数据库函数，用于执行SQL语句并进行数据库操作 |
-| [UUID](/syntax-guide#fun_uuid)                     | 生成UUID |
-| [EventLoop](/syntax-guide#fun_eventloop)           | 监听事件，在任意WebSocket可读或```exchange.Go```、```HttpQuery_Go```等并发任务完成后返回，该函数仅适用于实盘 |
-| [_G](/syntax-guide#fun__g)                         | 持久化保存数据，该函数实现了一个可保存的全局字典功能。数据结构为键值对表，永久保存在托管者本地数据库文件中 |
-| [_D](/syntax-guide#fun__d)                         | 时间戳处理函数，将毫秒时间戳或Date对象转换为时间字符串 |
-| [_N](/syntax-guide#fun__n)                         | 格式化浮点数，例如```_N(3.1415, 2)```将删除3.1415小数点后两位以后的数值，函数返回3.14 |
-| [_C](/syntax-guide#fun__c)                         | 重试函数，用于接口容错。注意，例如对```exchange.GetTicker```函数进行容错，应使用```_C(exchange.GetTicker)```而非```_C(exchange.GetTicker())``` |
-| [_Cross](/syntax-guide#fun__cross)                 | 交叉判断函数，```_Cross()```函数返回正数表示上穿周期数，负数表示下穿周期数，0表示当前价格相同 |
-| [JSONParse](/syntax-guide#fun_jsonparse)           | 解析JSON，能够正确解析包含大数值的JSON字符串，将大数值解析为字符串类型。回测系统不支持```JSONParse()```函数 |
-| [SetChannelData](/syntax-guide#fun_setchanneldata) | 在频道上发布最新状态数据，用于实盘间通信 |
-| [GetChannelData](/syntax-guide#fun_getchanneldata) | 订阅指定实盘的频道数据，用于实盘间通信 |
-
-### 日志函数
-
-| 函数名称 | 简介 |
-| - | - |
-| [Log](/syntax-guide#fun_log)                       | 输出日志，支持设置日志文本颜色、推送功能，以及打印base64编码的图片 |
-| [LogProfit](/syntax-guide#fun_logprofit)           | 输出盈亏数据，打印盈亏数值并根据数值绘制收益曲线 |
-| [LogProfitReset](/syntax-guide#fun_logprofitreset) | 清空```LogProfit```函数输出的所有收益日志和收益图表 |
-| [LogStatus](/syntax-guide#fun_logstatus)           | 在状态栏输出信息，支持在状态栏中设置按钮控件和输出表格 |
-| [EnableLog](/syntax-guide#fun_enablelog)           | 开启或关闭订单信息的日志记录功能 |
-| [Chart](/syntax-guide#fun_chart)                   | 图表绘制函数，基于Highcharts/Highstocks图表库 |
-| [KLineChart](/syntax-guide#fun_klinechart)         | Pine语言风格的图表绘制函数，用于在策略运行时以类似Pine语言的方式进行自定义绘图 |
-| [LogReset](/syntax-guide#fun_logreset)             | 清除日志，支持通过参数设置保留最近指定数量的日志记录 |
-| [LogVacuum](/syntax-guide#fun_logvacuum)           | 回收SQLite资源，在调用```LogReset()```函数清除日志后，回收SQLite删除数据时占用的存储空间 |
-| [console.log](/syntax-guide#fun_console.log)       | 在实盘页面的「调试信息」栏中输出调试信息 |
-| [console.error](/syntax-guide#fun_console.error)   | 在实盘页面的「调试信息」栏中输出错误信息 |
-
-### 行情函数
-
-| 函数名称 | 简介 |
-| - | - |
-| [exchange.GetTicker](/syntax-guide#fun_exchange.getticker)       | 获取Tick行情数据 |
-| [exchange.GetDepth](/syntax-guide#fun_exchange.getdepth)         | 获取订单簿深度数据 |
-| [exchange.GetTrades](/syntax-guide#fun_exchange.gettrades)       | 获取市场成交记录 |
-| [exchange.GetRecords](/syntax-guide#fun_exchange.getrecords)     | 获取K线数据 |
-| [exchange.GetPeriod](/syntax-guide#fun_exchange.getperiod)       | 获取当前K线周期 |
-| [exchange.SetMaxBarLen](/syntax-guide#fun_exchange.setmaxbarlen) | 设置K线最大长度 |
-| [exchange.GetRawJSON](/syntax-guide#fun_exchange.getrawjson)     | 获取最近一次REST请求返回的原始内容 |
-| [exchange.GetRate](/syntax-guide#fun_exchange.getrate)           | 获取当前设置的汇率值 |
-| [exchange.SetData](/syntax-guide#fun_exchange.setdata)           | 设置策略运行时加载的数据 |
-| [exchange.GetData](/syntax-guide#fun_exchange.getdata)           | 获取已加载的数据或外部链接提供的数据 |
-| [exchange.GetMarkets](/syntax-guide#fun_exchange.getmarkets)     | 获取交易所市场信息 |
-| [exchange.GetTickers](/syntax-guide#fun_exchange.gettickers)     | 获取交易所聚合行情数据 |
-
-### 交易函数
-
-| 函数名称 | 简介 |
-| - | - |
-| [exchange.Buy](/syntax-guide#fun_exchange.buy)                          | 提交买单，期货合约下单时必须注意交易方向是否设置正确，如果交易方向与交易函数不匹配将报错 |
-| [exchange.Sell](/syntax-guide#fun_exchange.sell)                        | 提交卖单，期货合约下单时必须注意交易方向是否设置正确，如果交易方向与交易函数不匹配将报错 |
-| [exchange.CreateOrder](/syntax-guide#fun_exchange.createorder)          | 提交订单，通过参数指定交易品种、交易方向、价格、数量 |
-| [exchange.ModifyOrder](/syntax-guide#fun_exchange.modifyorder)          | 修改普通订单的价格和数量，支持通过附加参数修改订单的其他属性 |
-| [exchange.ModifyConditionOrder](/syntax-guide#fun_exchange.modifyconditionorder) | 修改条件单的数量和触发条件，支持通过附加参数修改条件单的其他属性 |
-| [exchange.CancelOrder](/syntax-guide#fun_exchange.cancelorder)          | 取消订单 |
-| [exchange.GetOrder](/syntax-guide#fun_exchange.getorder)                | 获取订单信息，数据结构为[Order](/syntax-guide#struct_order)结构 |
-| [exchange.GetOrders](/syntax-guide#fun_exchange.getorders)              | 获取未完成的订单，数据结构为[Order](/syntax-guide#struct_order)结构数组（列表） |
-| [exchange.GetHistoryOrders](/syntax-guide#fun_exchange.gethistoryorders)| 获取当前交易对、合约的历史订单，支持指定具体交易品种 |
-| [exchange.SetPrecision](/syntax-guide#fun_exchange.setprecision)        | 设置exchange交易所对象的价格与下单量精度，设置后系统将自动忽略数据的多余部分 |
-| [exchange.SetRate](/syntax-guide#fun_exchange.setrate)                  | 设置汇率 |
-| [exchange.IO](/syntax-guide#fun_exchange.io)                            | 用于交易所对象相关的其他接口调用 |
-| [exchange.Log](/syntax-guide#fun_exchange.log)                          | 输出并记录交易日志，不实际下单 |
-| [exchange.Encode](/syntax-guide#fun_exchange.encode)                    | 签名加密计算 |
-| [exchange.Go](/syntax-guide#fun_exchange.go)                            | 多线程异步支持函数 |
-| [exchange.GetAccount](/syntax-guide#fun_exchange.getaccount)            | 获取账户信息 |
-| [exchange.GetAssets](/syntax-guide#fun_exchange.getassets)              | 请求交易所账户资产信息 |
-| [exchange.GetName](/syntax-guide#fun_exchange.getname)                  | 获取交易所对象的名称 |
-| [exchange.GetLabel](/syntax-guide#fun_exchange.getlabel)                | 获取交易所对象的标签 |
-| [exchange.GetCurrency](/syntax-guide#fun_exchange.getcurrency)          | 获取当前交易对 |
-| [exchange.SetCurrency](/syntax-guide#fun_exchange.setcurrency)          | 切换交易对 |
-| [exchange.GetQuoteCurrency](/syntax-guide#fun_exchange.getquotecurrency)| 获取当前交易对的计价币名称 |
-
-### 期货函数
-
-| 函数名称 | 简介 |
-| - | - |
-| [exchange.GetPositions](/syntax-guide#fun_exchange.getpositions)       | 获取期货持仓信息，返回[Position](/syntax-guide#struct_position)结构数组（列表） |
-| [exchange.SetMarginLevel](/syntax-guide#fun_exchange.setmarginlevel)   | 设置杠杆倍数 |
-| [exchange.SetDirection](/syntax-guide#fun_exchange.setdirection)       | 设置[exchange.Buy](/syntax-guide#fun_exchange.buy)函数、[exchange.Sell](/syntax-guide#fun_exchange.sell)函数在期货合约下单时的订单方向 |
-| [exchange.SetContractType](/syntax-guide#fun_exchange.setcontracttype) | 设置合约代码，例如：```exchange.SetContractType("swap")```设置合约代码为```swap```，将当前操作的合约设置为永续合约 |
-| [exchange.GetContractType](/syntax-guide#fun_exchange.getcontracttype) | 获取当前设置的合约代码 |
-| [exchange.GetFundings](/syntax-guide#fun_exchange.getfundings)         | 获取当前期货交易所永续合约的资金费率数据 |
-
-### 网络函数
-
-| 函数名称 | 简介 |
-| - | - |
-| [exchange.SetBase](/syntax-guide#fun_exchange.setbase)       | 设置交易所API接口的基础地址 |
-| [exchange.GetBase](/syntax-guide#fun_exchange.getbase)       | 获取当前交易所API接口的基础地址 |
-| [exchange.SetProxy](/syntax-guide#fun_exchange.setproxy)     | 设置网络代理 |
-| [exchange.SetTimeout](/syntax-guide#fun_exchange.settimeout) | 设置REST协议的超时时间 |
-
-### API限流控制
-
-## 功能概述
-
-API限流控制功能用于限制策略对交易所API的调用频率，防止因触发交易所的频率限制而导致账号被封禁或临时受限。FMZ平台提供了灵活的限流配置方式，支持两种限流模式和多种配置策略。
-
-### 为什么需要API限流
-
-- **避免触发交易所限制**：大多数交易所对API调用频率有严格限制，一旦超限，可能导致账号被临时或永久封禁。
-
-- **合理分配API配额**：在多策略、多交易对场景下，需要合理分配API调用资源。
-
-- **提高策略稳定性**：通过主动限流，避免因频繁调用导致的连接失败和数据获取异常。
-
-- **符合交易所规范**：遵守交易所的API使用规范，维护良好的API使用关系。
-
-### 两种限流模式
-
-**rate模式（平滑限流）**
-
-- 适用于一般的限流需求
-
-- 不严格对齐时间窗口
-
-- 调用分布相对平滑
-
-- 推荐用于日常的API调用限制
-
-**quota模式（额度限流）**
-
-- 严格对齐时间窗口
-
-- 例如：设置```"1s"```时，窗口对齐到整秒；设置```"1m"```时，窗口对齐到整分钟
-
-- 适用于需要严格控制时间窗口的场景
-
-- 推荐用于日内配额管理
-
-## 基本用法
-
-### rate模式基本示例
-
-```javascript
-function main() {
-    // Limit GetTicker to maximum 10 times per second
-    exchange.IO("rate", "GetTicker", 10, "1s")
-
-    // Normal API calls
-    for (var i = 0; i < 20; i++) {
-        var ticker = exchange.GetTicker("BTC_USDT")
-        if (ticker) {
-            Log("Success:", ticker.Last)
-        } else {
-            Log("Rate limit exceeded")  // Returns null when exceeding 10 times/second
-        }
-        Sleep(50)
-    }
-}
-```
-
-```python
-def main():
-    # Limit GetTicker to maximum 10 times per second
-    exchange.IO("rate", "GetTicker", 10, "1s")
-
-    # Normal API calls
-    for i in range(20):
-        ticker = exchange.GetTicker("BTC_USDT")
-        if ticker:
-            Log("Success:", ticker["Last"])
-        else:
-            Log("Rate limit exceeded")  # Returns None when exceeding 10 times/second
-        Sleep(50)
-```
-
-```rust
-fn main() {
-    // Limit GetTicker to maximum 10 times per second
-    let _ = exchange.IO(("rate", "GetTicker", 10, "1s"));
-
-    // Normal API calls
-    for _i in 0..20 {
-        match exchange.GetTicker("BTC_USDT") {
-            Ok(ticker) => Log!("Success:", ticker.Last),
-            Err(_) => Log!("Rate limit exceeded"),  // Returns Err when exceeding 10 times/second
-        }
-        Sleep(50);
-    }
-}
-```
-
-```cpp
-// C++暂不支持
-```
-
-### quota模式基本示例
-
-```javascript
-function main() {
-    // Strict limit, time window aligned to whole seconds
-    exchange.IO("quota", "GetTicker", 5, "1s")
-
-    for (var i = 0; i < 10; i++) {
-        var ticker = exchange.GetTicker("BTC_USDT")
-        Log(_D(), "Call", i+1, ticker ? "Success" : "Quota exceeded")
-        Sleep(150)  // About 6-7 calls per second, will trigger limit
-    }
-}
-```
-
-```python
-def main():
-    # Strict limit, time window aligned to whole seconds
-    exchange.IO("quota", "GetTicker", 5, "1s")
-
-    for i in range(10):
-        ticker = exchange.GetTicker("BTC_USDT")
-        Log(_D(), "Call", i+1, "Success" if ticker else "Quota exceeded")
-        Sleep(150)  # About 6-7 calls per second, will trigger limit
-```
-
-```rust
-fn main() {
-    // Strict limit, time window aligned to whole seconds
-    let _ = exchange.IO(("quota", "GetTicker", 5, "1s"));
-
-    for i in 0..10 {
-        match exchange.GetTicker("BTC_USDT") {
-            Ok(_) => Log!(_D(None), "Call", i + 1, "Success"),
-            Err(_) => Log!(_D(None), "Call", i + 1, "Quota exceeded"),
-        }
-        Sleep(150);  // About 6-7 calls per second, will trigger limit
-    }
-}
-```
-
-```cpp
-// C++暂不支持
-```
-
-## 函数名配置
-
-### 单个函数限流
-
-```javascript
-function main() {
-    // Only limit GetTicker function
-    exchange.IO("rate", "GetTicker", 10, "1s")
-
-    // GetTicker is limited, GetDepth is not limited
-    exchange.GetTicker("BTC_USDT")
-    exchange.GetDepth("BTC_USDT")
-}
-```
-
-```python
-def main():
-    # Only limit GetTicker function
-    exchange.IO("rate", "GetTicker", 10, "1s")
-
-    # GetTicker is limited, GetDepth is not limited
-    exchange.GetTicker("BTC_USDT")
-    exchange.GetDepth("BTC_USDT")
-```
-
-```rust
-fn main() {
-    // Only limit GetTicker function
-    let _ = exchange.IO(("rate", "GetTicker", 10, "1s"));
-
-    // GetTicker is limited, GetDepth is not limited
-    let _ = exchange.GetTicker("BTC_USDT");
-    let _ = exchange.GetDepth("BTC_USDT");
-}
-```
-
-```cpp
-// C++暂不支持
-```
-
-### 多个函数联合限流
-
-```javascript
-function main() {
-    // GetTicker and GetDepth share quota, total 10 times per second
-    exchange.IO("rate", "GetTicker,GetDepth", 10, "1s")
-
-    for (var i = 0; i < 15; i++) {
-        if (i % 2 == 0) {
-            exchange.GetTicker("BTC_USDT")  // Counted in shared quota
-        } else {
-            exchange.GetDepth("BTC_USDT")   // Counted in shared quota
-        }
-    }
-}
-```
-
-```python
-def main():
-    # GetTicker and GetDepth share quota, total 10 times per second
-    exchange.IO("rate", "GetTicker,GetDepth", 10, "1s")
-
-    for i in range(15):
-        if i % 2 == 0:
-            exchange.GetTicker("BTC_USDT")  # Counted in shared quota
-        else:
-            exchange.GetDepth("BTC_USDT")   # Counted in shared quota
-```
-
-```rust
-fn main() {
-    // GetTicker and GetDepth share quota, total 10 times per second
-    let _ = exchange.IO(("rate", "GetTicker,GetDepth", 10, "1s"));
-
-    for i in 0..15 {
-        if i % 2 == 0 {
-            let _ = exchange.GetTicker("BTC_USDT");  // Counted in shared quota
-        } else {
-            let _ = exchange.GetDepth("BTC_USDT");   // Counted in shared quota
-        }
-    }
-}
-```
-
-```cpp
-// C++暂不支持
-```
-
-### 使用通配符限制所有函数
-
-```javascript
-function main() {
-    // Limit all API calls to total 100 times per minute
-    exchange.IO("rate", "*", 100, "1m")
-
-    // All calls are counted in total quota
-    exchange.GetTicker("BTC_USDT")
-    exchange.GetDepth("BTC_USDT")
-    exchange.GetAccount()
-    exchange.CreateOrder("BTC_USDT", "buy", 50000, 0.001)
-}
-```
-
-```python
-def main():
-    # Limit all API calls to total 100 times per minute
-    exchange.IO("rate", "*", 100, "1m")
-
-    # All calls are counted in total quota
-    exchange.GetTicker("BTC_USDT")
-    exchange.GetDepth("BTC_USDT")
-    exchange.GetAccount()
-    exchange.CreateOrder("BTC_USDT", "buy", 50000, 0.001)
-```
-
-```rust
-fn main() {
-    // Limit all API calls to total 100 times per minute
-    let _ = exchange.IO(("rate", "*", 100, "1m"));
-
-    // All calls are counted in total quota
-    let _ = exchange.GetTicker("BTC_USDT");
-    let _ = exchange.GetDepth("BTC_USDT");
-    let _ = exchange.GetAccount();
-    let _ = exchange.CreateOrder("BTC_USDT", "buy", 50000, 0.001);
-}
-```
-
-```cpp
-// C++暂不支持
-```
-
-## 时间周期配置
-
-### 支持的时间单位
-
-- ```ns```：纳秒
-
-- ```us``` 或 ```µs```：微秒
-
-- ```ms```：毫秒
-
-- ```s```：秒
-
-- ```m```：分钟
-
-- ```h```：小时
-
-- ```d```：天
-
-示例：```"100ms"```, ```"1s"```, ```"5m"```, ```"1h"```, ```"1d"```
-
-```javascript
-function main() {
-    // Different time period configurations
-    exchange.IO("rate", "GetTicker", 10, "1s")     // 10 times per second
-    exchange.IO("rate", "GetDepth", 30, "1m")      // 30 times per minute
-    exchange.IO("rate", "GetAccount", 100, "1h")   // 100 times per hour
-    exchange.IO("rate", "CreateOrder", 500, "1d")  // 500 times per day
-}
-```
-
-```python
-def main():
-    # 不同时间周期的配置
-    exchange.IO("rate", "GetTicker", 10, "1s")     # 每秒10次
-    exchange.IO("rate", "GetDepth", 30, "1m")      # 每分钟30次
-    exchange.IO("rate", "GetAccount", 100, "1h")   # 每小时100次
-    exchange.IO("rate", "CreateOrder", 500, "1d")  # 每天500次
-```
-
-```rust
-fn main() {
-    // 不同时间周期的配置
-    let _ = exchange.IO(("rate", "GetTicker", 10, "1s"));     // 每秒10次
-    let _ = exchange.IO(("rate", "GetDepth", 30, "1m"));      // 每分钟30次
-    let _ = exchange.IO(("rate", "GetAccount", 100, "1h"));   // 每小时100次
-    let _ = exchange.IO(("rate", "CreateOrder", 500, "1d"));  // 每天500次
-}
-```
-
-```cpp
-// C++暂不支持
-```
-
-### 重置时间点配置
-
-使用 ```@HHMM``` 或 ```@HHMMSS``` 格式指定每日的重置时间点，仅在 quota 模式下有效。
-
-```javascript
-function main() {
-    // Reset quota daily at 08:15
-    exchange.IO("quota", "GetTicker", 1000, "@0815")
-
-    // Reset quota daily at 00:00
-    exchange.IO("quota", "CreateOrder", 500, "@0000")
-
-    // Reset quota daily at 23:59:59
-    exchange.IO("quota", "*", 5000, "@235959")
-}
-```
-
-```python
-def main():
-    # Reset quota daily at 08:15
-    exchange.IO("quota", "GetTicker", 1000, "@0815")
-
-    # Reset quota daily at 00:00
-    exchange.IO("quota", "CreateOrder", 500, "@0000")
-
-    # Reset quota daily at 23:59:59
-    exchange.IO("quota", "*", 5000, "@235959")
-```
-
-```rust
-fn main() {
-    // Reset quota daily at 08:15
-    let _ = exchange.IO(("quota", "GetTicker", 1000, "@0815"));
-
-    // Reset quota daily at 00:00
-    let _ = exchange.IO(("quota", "CreateOrder", 500, "@0000"));
-
-    // Reset quota daily at 23:59:59
-    let _ = exchange.IO(("quota", "*", 5000, "@235959"));
-}
-```
-
-```cpp
-// C++暂不支持
-```
-
-## 行为模式
-
-### 默认模式（超限返回null）
-
-```javascript
-function main() {
-    exchange.IO("rate", "GetTicker", 5, "1s")  // 不指定 behavior 参数
-
-    for (var i = 0; i < 10; i++) {
-        var ticker = exchange.GetTicker("BTC_USDT")
-        if (ticker) {
-            Log("Call", i+1, "Success:", ticker.Last)
-        } else {
-            Log("Call", i+1, "Failed: rate limit exceeded")
-            // 可选择 Sleep 等待，或跳过本次调用
-            Sleep(200)
-        }
-    }
-}
-```
-
-```python
-def main():
-    exchange.IO("rate", "GetTicker", 5, "1s")  # 不指定 behavior 参数
-
-    for i in range(10):
-        ticker = exchange.GetTicker("BTC_USDT")
-        if ticker:
-            Log("Call", i+1, "Success:", ticker["Last"])
-        else:
-            Log("Call", i+1, "Failed: rate limit exceeded")
-            # 可选择 Sleep 等待，或跳过本次调用
-            Sleep(200)
-```
-
-```rust
-fn main() {
-    let _ = exchange.IO(("rate", "GetTicker", 5, "1s"));  // 不指定 behavior 参数
-
-    for i in 0..10 {
-        match exchange.GetTicker("BTC_USDT") {
-            Ok(ticker) => Log!("Call", i + 1, "Success:", ticker.Last),
-            Err(_) => {
-                Log!("Call", i + 1, "Failed: rate limit exceeded");
-                // 可选择 Sleep 等待，或跳过本次调用
-                Sleep(200);
-            }
-        }
-    }
-}
-```
-
-```cpp
-// C++暂不支持
-```
-
-### delay模式（超限自动等待）
-
-```javascript
-function main() {
-    exchange.IO("rate", "GetTicker", 5, "1s", "delay")  // 指定delay参数
-
-    // 调用超限时会自动等待，确保每次调用都成功
-    for (var i = 0; i < 10; i++) {
-        var ticker = exchange.GetTicker("BTC_USDT")
-        Log("Call", i+1, "Success:", ticker.Last)  // ticker不会为null
-    }
-}
-```
-
-```python
-def main():
-    exchange.IO("rate", "GetTicker", 5, "1s", "delay")  # 指定delay参数
-
-    # 调用超限时会自动等待，确保每次调用都成功
-    for i in range(10):
-        ticker = exchange.GetTicker("BTC_USDT")
-        Log("Call", i+1, "Success:", ticker["Last"])  # ticker不会为None
-```
-
-```rust
-fn main() {
-    let _ = exchange.IO(("rate", "GetTicker", 5, "1s", "delay"));  // 指定delay参数
-
-    // 调用超限时会自动等待，确保每次调用都成功
-    for i in 0..10 {
-        let ticker = exchange.GetTicker("BTC_USDT").unwrap();
-        Log!("Call", i + 1, "Success:", ticker.Last);  // ticker不会返回Err
-    }
-}
-```
-
-```cpp
-// C++暂不支持
-```
-
-## 支持的函数列表
-
-### 交易类函数
-- ```CreateOrder```：创建订单
-- ```CancelOrder```：取消订单
-- ```Buy```：买入（受CreateOrder限制）
-- ```Sell```：卖出（受CreateOrder限制）
-- ```CreateConditionOrder```：创建条件单
-- ```CancelConditionOrder```：取消条件单
-
-### 账户类函数
-- ```GetAccount```：获取账户信息
-- ```GetAssets```：获取资产信息
-- ```GetPositions```：获取持仓信息
-
-### 订单类函数
-- ```GetOrder```：获取单个订单
-- ```GetOrders```：获取所有订单
-- ```GetHistoryOrders```：获取历史订单
-- ```GetConditionOrder```：获取单个条件单
-- ```GetConditionOrders```：获取所有条件单
-- ```GetHistoryConditionOrders```：获取历史条件单
-
-### 行情类函数
-- ```GetTicker```：获取单个行情（ticker）
-- ```GetTickers```：获取多个行情（ticker）
-- ```GetDepth```：获取市场深度
-- ```GetRecords```：获取K线数据
-- ```GetTrades```：获取最新成交记录
-
-### 其它函数
-- ```GetMarkets```：获取市场列表
-- ```GetFundings```：获取资金费率
-- ```SetMarginLevel```：设置杠杆倍数
-- ```Go```：并发调用（受实际调用函数限制）
-- ```IO/api```：自定义API调用（仅限exchange.IO("api", ...)）
-
-## 实际应用场景
-
-### 场景1：防止触发交易所的频率限制
-
-```javascript
-function main() {
-    // 假设交易所限制：GetTicker 每秒 20 次，CreateOrder 每秒 5 次
-    // 将频率设置为略低于交易所限制的值，以预留安全余量
-    exchange.IO("rate", "GetTicker", 15, "1s")
-    exchange.IO("rate", "CreateOrder", 4, "1s")
-
-    while (true) {
-        var ticker = exchange.GetTicker("BTC_USDT")
-        if (ticker && ticker.Last < 50000) {
-            exchange.CreateOrder("BTC_USDT", "buy", ticker.Last, 0.001)
-        }
-        Sleep(100)
-    }
-}
-```
-
-```python
-def main():
-    # 假设交易所限制：GetTicker 每秒 20 次，CreateOrder 每秒 5 次
-    # 将频率设置为略低于交易所限制的值，以预留安全余量
-    exchange.IO("rate", "GetTicker", 15, "1s")
-    exchange.IO("rate", "CreateOrder", 4, "1s")
-
-    while True:
-        ticker = exchange.GetTicker("BTC_USDT")
-        if ticker and ticker["Last"] < 50000:
-            exchange.CreateOrder("BTC_USDT", "buy", ticker["Last"], 0.001)
-        Sleep(100)
-```
-
-```rust
-fn main() {
-    // 假设交易所限制：GetTicker 每秒 20 次，CreateOrder 每秒 5 次
-    // 将频率设置为略低于交易所限制的值，以预留安全余量
-    let _ = exchange.IO(("rate", "GetTicker", 15, "1s"));
-    let _ = exchange.IO(("rate", "CreateOrder", 4, "1s"));
-
-    loop {
-        if let Ok(ticker) = exchange.GetTicker("BTC_USDT") {
-            if ticker.Last < 50000.0 {
-                let _ = exchange.CreateOrder("BTC_USDT", "buy", ticker.Last, 0.001);
-            }
-        }
-        Sleep(100);
-    }
-}
-```
-
-```cpp
-// C++ 暂不支持
-```
-
-### 场景2：多交易所对象统一限流
-
-```javascript
-function main() {
-    // 为每个交易所对象设置限流
-    for (var i = 0; i < exchanges.length; i++) {
-        exchanges[i].IO("rate", "GetTicker", 10, "1s")
-        exchanges[i].IO("rate", "CreateOrder", 2, "1s")
-    }
-
-    // 并发获取多个交易所的行情
-    while (true) {
-        for (var i = 0; i < exchanges.length; i++) {
-            var ticker = exchanges[i].GetTicker("BTC_USDT")
+            var ticker = exchange.GetTicker(symbol)
             if (ticker) {
-                Log(exchanges[i].GetName(), "Price:", ticker.Last)
+                dict.set("last", ticker.Last)
+                dict.set("time", ticker.Time)
+            } else {
+                threading.mainThread().postMessage("行情获取失败: " + GetLastError())
             }
+            Sleep(1000)
         }
-        Sleep(1000)
+        return "worker exited"
+    }, shared, "BTC_USDT")
+
+    for (var i = 0; i < 10; i++) {
+        // 最多等 1 秒后台线程的消息
+        var msg = threading.currentThread().peekMessage(1000)
+        if (msg) {
+            Log("后台线程报告:", msg)
+        }
+        LogStatus("最新价:", shared.get("last"), "时间:", _D(shared.get("time")))
     }
+    worker.postMessage("stop")
+    Log(worker.join().ret)
 }
 ```
 
-```python
-def main():
-    # 为每个交易所对象设置限流
-    for i in range(len(exchanges)):
-        exchanges[i].IO("rate", "GetTicker", 10, "1s")
-        exchanges[i].IO("rate", "CreateOrder", 2, "1s")
+### 用threading.Serve提供状态查询接口
 
-    # 并发获取多个交易所的行情
-    while True:
-        for i in range(len(exchanges)):
-            ticker = exchanges[i].GetTicker("BTC_USDT")
-            if ticker:
-                Log(exchanges[i].GetName(), "Price:", ticker["Last"])
-        Sleep(1000)
-```
-
-```rust
-fn main() {
-    // 为每个交易所对象设置限流
-    for e in exchanges.iter() {
-        let _ = e.IO(("rate", "GetTicker", 10, "1s"));
-        let _ = e.IO(("rate", "CreateOrder", 2, "1s"));
-    }
-
-    // 并发获取多个交易所的行情
-    loop {
-        for e in exchanges.iter() {
-            if let Ok(ticker) = e.GetTicker("BTC_USDT") {
-                Log!(e.GetName(), "Price:", ticker.Last);
-            }
-        }
-        Sleep(1000);
-    }
-}
-```
-
-```cpp
-// C++ 暂不支持
-```
-
-### 场景3：日内配额管理
+主线程把状态写进共享字典，HTTP处理函数从参数取到同一个字典并返回JSON。
 
 ```javascript
 function main() {
-    // 每天最多 1000 次 API 调用，每天早上 8 点重置
-    exchange.IO("quota", "*", 1000, "@0800")
+    var state = threading.Dict()
+    var server = threading.Serve("http://127.0.0.1:8088", function(ctx, st) {
+        if (ctx.path() == "/status") {
+            ctx.setHeader("Content-Type", "application/json")
+            ctx.write(JSON.stringify({last: st.get("last"), updated: st.get("updated")}))
+        } else {
+            ctx.setStatus(404)
+        }
+    }, state)
+    Log("服务地址:", server.addr())
 
-    var callCount = 0
     while (true) {
         var ticker = exchange.GetTicker("BTC_USDT")
         if (ticker) {
-            callCount++
-            Log("Call count:", callCount, "Price:", ticker.Last)
-        } else {
-            Log("Daily quota exceeded, waiting for tomorrow 08:00")
-            Sleep(60000)  // 等待 1 分钟后重试
+            state.set("last", ticker.Last)
+            state.set("updated", _D())
         }
-        Sleep(10000)
+        Sleep(3000)
     }
 }
 ```
 
-```python
-def main():
-    # 每天最多 1000 次 API 调用，每天早上 8 点重置
-    exchange.IO("quota", "*", 1000, "@0800")
-
-    callCount = 0
-    while True:
-        ticker = exchange.GetTicker("BTC_USDT")
-        if ticker:
-            callCount += 1
-            Log("Call count:", callCount, "Price:", ticker["Last"])
-        else:
-            Log("Daily quota exceeded, waiting for tomorrow 08:00")
-            Sleep(60000)  # 等待 1 分钟后重试
-        Sleep(10000)
-```
-
-```rust
-fn main() {
-    // 每天最多 1000 次 API 调用，每天早上 8 点重置
-    let _ = exchange.IO(("quota", "*", 1000, "@0800"));
-
-    let mut callCount = 0;
-    loop {
-        match exchange.GetTicker("BTC_USDT") {
-            Ok(ticker) => {
-                callCount += 1;
-                Log!("Call count:", callCount, "Price:", ticker.Last);
-            }
-            Err(_) => {
-                Log!("Daily quota exceeded, waiting for tomorrow 08:00");
-                Sleep(60000);  // 等待 1 分钟后重试
-            }
-        }
-        Sleep(10000);
-    }
-}
-```
-
-```cpp
-// C++ 暂不支持
-```
-
-### 场景4：组合限流策略
-
-```javascript
-function main() {
-    // 组合使用多种限流策略
-    // 1. 行情类API每秒限流
-    exchange.IO("rate", "GetTicker,GetDepth", 20, "1s")
-
-    // 2. 交易类API每秒限流
-    exchange.IO("rate", "CreateOrder,CancelOrder", 5, "1s")
-
-    // 3. 账户查询类API每分钟限流
-    exchange.IO("rate", "GetAccount,GetPositions", 30, "1m")
-
-    // 4. 所有API每日总配额
-    exchange.IO("quota", "*", 10000, "@0000")
-
-    Log("Multi-level rate limiting configured")
-
-    // 策略主循环
-    while (true) {
-        // 获取行情数据
-        var ticker = exchange.GetTicker("BTC_USDT")
-        var depth = exchange.GetDepth("BTC_USDT")
-
-        // 查询账户信息
-        if (Date.now() % 60000 < 1000) {  // 每分钟查询一次
-            var account = exchange.GetAccount()
-            Log("Account:", account)
-        }
-
-        // 交易逻辑
-        if (ticker && ticker.Last < 50000) {
-            exchange.CreateOrder("BTC_USDT", "buy", ticker.Last, 0.001)
-        }
-
-        Sleep(500)
-    }
-}
-```
-
-```python
-import time
-def main():
-    # 组合使用多种限流策略
-    # 1. 行情类API每秒限流
-    exchange.IO("rate", "GetTicker,GetDepth", 20, "1s")
-
-    # 2. 交易类API每秒限流
-    exchange.IO("rate", "CreateOrder,CancelOrder", 5, "1s")
-
-    # 3. 账户查询类API每分钟限流
-    exchange.IO("rate", "GetAccount,GetPositions", 30, "1m")
-
-    # 4. 所有API每日总配额
-    exchange.IO("quota", "*", 10000, "@0000")
-
-    Log("Multi-level rate limiting configured")
-
-    # 策略主循环
-    while True:
-        # 获取行情数据
-        ticker = exchange.GetTicker("BTC_USDT")
-        depth = exchange.GetDepth("BTC_USDT")
-
-        # 查询账户信息
-        if int(time.time() * 1000) % 60000 < 1000:  # 每分钟查询一次
-            account = exchange.GetAccount()
-            Log("Account:", account)
-
-        # 交易逻辑
-        if ticker and ticker["Last"] < 50000:
-            exchange.CreateOrder("BTC_USDT", "buy", ticker["Last"], 0.001)
-
-        Sleep(500)
-```
-
-```rust
-fn main() {
-    // 组合使用多种限流策略
-    // 1. 行情类API每秒限流
-    let _ = exchange.IO(("rate", "GetTicker,GetDepth", 20, "1s"));
-
-    // 2. 交易类API每秒限流
-    let _ = exchange.IO(("rate", "CreateOrder,CancelOrder", 5, "1s"));
-
-    // 3. 账户查询类API每分钟限流
-    let _ = exchange.IO(("rate", "GetAccount,GetPositions", 30, "1m"));
-
-    // 4. 所有API每日总配额
-    let _ = exchange.IO(("quota", "*", 10000, "@0000"));
-
-    Log!("Multi-level rate limiting configured");
-
-    // 策略主循环
-    loop {
-        // 获取行情数据
-        let ticker = exchange.GetTicker("BTC_USDT");
-        let depth = exchange.GetDepth("BTC_USDT");
-
-        // 查询账户信息
-        if UnixNano() / 1000000 % 60000 < 1000 {  // 每分钟查询一次
-            let account = exchange.GetAccount();
-            Log!("Account:", account);
-        }
-
-        // 交易逻辑
-        if let Ok(t) = ticker {
-            if t.Last < 50000.0 {
-                let _ = exchange.CreateOrder("BTC_USDT", "buy", t.Last, 0.001);
-            }
-        }
-
-        Sleep(500);
-    }
-}
-```
-
-```cpp
-// C++ 暂不支持
-```
-
-## 注意事项
-
-### 1. quota模式时间窗口对齐
-
-quota模式严格对齐时间窗口：
-- ```"1s"```：对齐到整秒（例如：12:00:00、12:00:01、12:00:02……）
-- ```"1m"```：对齐到整分钟（例如：12:00:00、12:01:00、12:02:00……）
-- ```"1h"```：对齐到整小时（例如：12:00:00、13:00:00、14:00:00……）
-
-这意味着即使从12:00:00.500开始计数，到12:00:01.000时，当前时间窗口也会重置。
-
-```javascript
-function main() {
-    // quota模式：严格对齐到整秒
-    exchange.IO("quota", "GetTicker", 3, "1s")
-
-    // 假设当前时间为 12:00:00.500
-    exchange.GetTicker("BTC_USDT")  // 第1次，成功
-    exchange.GetTicker("BTC_USDT")  // 第2次，成功
-    exchange.GetTicker("BTC_USDT")  // 第3次，成功
-    exchange.GetTicker("BTC_USDT")  // 第4次，失败（超限）
-
-    Sleep(500)  // 等待500ms，此时时间为 12:00:01.000
-
-    // 窗口已重置
-    exchange.GetTicker("BTC_USDT")  // 新窗口第1次，成功
-}
-```
-
-```python
-def main():
-    # quota模式：严格对齐到整秒
-    exchange.IO("quota", "GetTicker", 3, "1s")
-
-    # 假设当前时间为 12:00:00.500
-    exchange.GetTicker("BTC_USDT")  # 第1次，成功
-    exchange.GetTicker("BTC_USDT")  # 第2次，成功
-    exchange.GetTicker("BTC_USDT")  # 第3次，成功
-    exchange.GetTicker("BTC_USDT")  # 第4次，失败（超限）
-
-    Sleep(500)  # 等待500ms，此时时间为 12:00:01.000
-
-    # 窗口已重置
-    exchange.GetTicker("BTC_USDT")  # 新窗口第1次，成功
-```
-
-```rust
-fn main() {
-    // quota模式：严格对齐到整秒
-    let _ = exchange.IO(("quota", "GetTicker", 3, "1s"));
-
-    // 假设当前时间为 12:00:00.500
-    let _ = exchange.GetTicker("BTC_USDT");  // 第1次，成功
-    let _ = exchange.GetTicker("BTC_USDT");  // 第2次，成功
-    let _ = exchange.GetTicker("BTC_USDT");  // 第3次，成功
-    let _ = exchange.GetTicker("BTC_USDT");  // 第4次，失败（超限）
-
-    Sleep(500);  // 等待500ms，此时时间为 12:00:01.000
-
-    // 窗口已重置
-    let _ = exchange.GetTicker("BTC_USDT");  // 新窗口第1次，成功
-}
-```
-
-```cpp
-// C++暂不支持
-```
-
-### 2. delay模式下的时间差异
-
-使用```"delay"```参数时，实际的API调用时间与日志记录的时间可能并不一致。这是因为触发限流时程序会进入等待，而日志记录的是等待结束后的时间。
-
-```javascript
-function main() {
-    exchange.IO("rate", "GetTicker", 2, "1s", "delay")
-
-    Log(_D(), "Call 1")  // 12:00:00.000
-    exchange.GetTicker("BTC_USDT")
-
-    Log(_D(), "Call 2")  // 12:00:00.100
-    exchange.GetTicker("BTC_USDT")
-
-    Log(_D(), "Call 3")  // 12:00:00.200，但实际会等待到12:00:01.000
-    exchange.GetTicker("BTC_USDT")  // 触发限流，自动等待
-
-    Log(_D(), "Call 3 completed")  // 日志显示12:00:01.000+
-    // 看起来一秒内调用了3次，但实际第3次是在新窗口执行的
-}
-```
-
-```python
-def main():
-    exchange.IO("rate", "GetTicker", 2, "1s", "delay")
-
-    Log(_D(), "Call 1")  # 12:00:00.000
-    exchange.GetTicker("BTC_USDT")
-
-    Log(_D(), "Call 2")  # 12:00:00.100
-    exchange.GetTicker("BTC_USDT")
-
-    Log(_D(), "Call 3")  # 12:00:00.200，但实际会等待到12:00:01.000
-    exchange.GetTicker("BTC_USDT")  # 触发限流，自动等待
-
-    Log(_D(), "Call 3 completed")  # 日志显示12:00:01.000+
-    # 看起来一秒内调用了3次，但实际第3次是在新窗口执行的
-```
-
-```rust
-fn main() {
-    let _ = exchange.IO(("rate", "GetTicker", 2, "1s", "delay"));
-
-    Log!(_D(None), "Call 1");  // 12:00:00.000
-    let _ = exchange.GetTicker("BTC_USDT");
-
-    Log!(_D(None), "Call 2");  // 12:00:00.100
-    let _ = exchange.GetTicker("BTC_USDT");
-
-    Log!(_D(None), "Call 3");  // 12:00:00.200，但实际会等待到12:00:01.000
-    let _ = exchange.GetTicker("BTC_USDT");  // 触发限流，自动等待
-
-    Log!(_D(None), "Call 3 completed");  // 日志显示12:00:01.000+
-    // 看起来一秒内调用了3次，但实际第3次是在新窗口执行的
-}
-```
-
-```cpp
-// C++暂不支持
-```
-
-### 3. Buy/Sell函数的限流
-
-```Buy```和```Sell```函数在底层均调用```CreateOrder```，因此其限流规则遵循```CreateOrder```的设置。
-
-```javascript
-function main() {
-    // 设置CreateOrder限流
-    exchange.IO("rate", "CreateOrder", 5, "1s")
-
-    // Buy和Sell也会受到此限制
-    for (var i = 0; i < 10; i++) {
-        if (i % 2 == 0) {
-            exchange.Buy(50000, 0.001)   // 受CreateOrder限制
-        } else {
-            exchange.Sell(51000, 0.001)  // 受CreateOrder限制
-        }
-    }
-}
-```
-
-```python
-def main():
-    # 设置CreateOrder限流
-    exchange.IO("rate", "CreateOrder", 5, "1s")
-
-    # Buy和Sell也会受到此限制
-    for i in range(10):
-        if i % 2 == 0:
-            exchange.Buy(50000, 0.001)   # 受CreateOrder限制
-        else:
-            exchange.Sell(51000, 0.001)  # 受CreateOrder限制
-```
-
-```rust
-fn main() {
-    // 设置CreateOrder限流
-    let _ = exchange.IO(("rate", "CreateOrder", 5, "1s"));
-
-    // Buy和Sell也会受到此限制
-    for i in 0..10 {
-        if i % 2 == 0 {
-            let _ = exchange.Buy(50000, 0.001);   // 受CreateOrder限制
-        } else {
-            let _ = exchange.Sell(51000, 0.001);  // 受CreateOrder限制
-        }
-    }
-}
-```
-
-```cpp
-// C++暂不支持
-```
-
-### 4. Go函数的限流
-
-```Go```函数的限流取决于实际被并发调用的函数。
-
-```javascript
-function main() {
-    // 限制GetTicker
-    exchange.IO("rate", "GetTicker", 5, "1s")
-
-    // 并发调用GetTicker时受限
-    var tasks = []
-    for (var i = 0; i < 10; i++) {
-        tasks.push(exchange.Go("GetTicker", "BTC_USDT"))
-    }
-
-    for (var i = 0; i < tasks.length; i++) {
-        var ticker = tasks[i].wait()
-        Log("Task", i, ticker ? "Success" : "Rate limited")
-    }
-}
-```
-
-```python
-def main():
-    # 限制GetTicker
-    exchange.IO("rate", "GetTicker", 5, "1s")
-
-    # 并发调用GetTicker时受限
-    tasks = []
-    for i in range(10):
-        tasks.append(exchange.Go("GetTicker", "BTC_USDT"))
-
-    for i in range(len(tasks)):
-        ticker = tasks[i].wait()
-        Log("Task", i, "Success" if ticker else "Rate limited")
-```
-
-```rust
-fn main() {
-    // 限制GetTicker
-    let _ = exchange.IO(("rate", "GetTicker", 5, "1s"));
-
-    // 并发调用GetTicker时受限
-    // Rust中exchange.Go为类型化写法，使用Go::GetTicker token
-    let mut tasks = Vec::new();
-    for _i in 0..10 {
-        tasks.push(exchange.Go(Go::GetTicker, ("BTC_USDT",)));
-    }
-
-    for (i, task) in tasks.iter().enumerate() {
-        match task.wait(0) {
-            Ok(_) => Log!("Task", i, "Success"),
-            Err(_) => Log!("Task", i, "Rate limited"),
-        }
-    }
-}
-```
-
-```cpp
-// C++暂不支持
-```
-
-### 5. IO/api的限流
-
-```IO/api``` 限流仅对 ```exchange.IO("api", ...)``` 调用生效，不会影响其他 ```exchange.IO``` 功能。
-
-```javascript
-function main() {
-    // 限制exchange.IO("api", ...)调用
-    exchange.IO("rate", "IO/api", 10, "1s")
-
-    // 受限制
-    for (var i = 0; i < 15; i++) {
-        var ret = exchange.IO("api", "GET", "/api/v5/account/balance", "")
-        Log("API call", i, ret ? "Success" : "Rate limited")
-    }
-
-    // 不受限制
-    exchange.IO("currency", "LTC_USDT")  // 切换交易对，不受限
-    exchange.IO("rate", "GetDepth", 5, "1s")  // 设置其它限流，不受限
-}
-```
-
-```python
-def main():
-    # 限制exchange.IO("api", ...)调用
-    exchange.IO("rate", "IO/api", 10, "1s")
-
-    # 受限制
-    for i in range(15):
-        ret = exchange.IO("api", "GET", "/api/v5/account/balance", "")
-        Log("API call", i, "Success" if ret else "Rate limited")
-
-    # 不受限制
-    exchange.IO("currency", "LTC_USDT")  # 切换交易对，不受限
-    exchange.IO("rate", "GetDepth", 5, "1s")  # 设置其它限流，不受限
-```
-
-```rust
-fn main() {
-    // 限制exchange.IO("api", ...)调用
-    let _ = exchange.IO(("rate", "IO/api", 10, "1s"));
-
-    // 受限制
-    for i in 0..15 {
-        match exchange.IO(("api", "GET", "/api/v5/account/balance", "")) {
-            Ok(_) => Log!("API call", i, "Success"),
-            Err(_) => Log!("API call", i, "Rate limited"),
-        }
-    }
-
-    // 不受限制
-    let _ = exchange.IO(("currency", "LTC_USDT"));  // 切换交易对，不受限
-    let _ = exchange.IO(("rate", "GetDepth", 5, "1s"));  // 设置其它限流，不受限
-}
-```
-
-```cpp
-// C++暂不支持
-```
-
-## 最佳实践
-
-1. **根据交易所限制设置**：请参考交易所的 API 文档，将限流值设置为略低于交易所限制的水平。
-
-2. **留出安全余量**：请勿将限流值设置为交易所允许的最大值，建议设置为最大值的 70%-80%。
-
-3. **分层限流**：针对不同类型的 API 设置不同的限流值，并为重要 API 保留更多余量。
-
-4. **使用 delay 模式处理关键调用**：对于必须成功的 API 调用，请使用 ```"delay"``` 模式以确保调用成功。
-
-5. **监控 API 使用情况**：定期检查策略的 API 调用频率，并持续优化调用逻辑。
-
-6. **避免过度调用**：合理设计策略逻辑，避免不必要的 API 调用。
-
-7. **测试限流配置**：在实盘运行前，先在模拟环境中测试限流配置是否合理。
-
-See also: `exchange.IO`, `exchange.Go`, `exchange.Buy`, `exchange.Sell`
+See also: `Threads`, `Thread`, `Dict`, `Serve`, `exchange.Go`, `EventLoop`
 
 ### 策略实盘间通信
 
-## 功能概述
+每个实盘都有一个频道，频道ID就是实盘ID。实盘用```SetChannelData()```在自己的频道上发布数据，其它实盘用```GetChannelData(实盘ID)```读取。数据经平台服务端转发，可以跨托管者、跨服务器传递。
 
-  策略实盘间通信功能允许不同的实盘策略之间共享数据并同步状态。通过频道机制，一个实盘可以将自身的状态数据广播给其他实盘，从而实现跨实盘、跨托管者、跨服务器的数据通信。
+频道保存的是**最新状态**，不是消息队列：每次发布都覆盖上一次的数据，订阅端每次读到的都是当前最新的一份。需要历史记录时由订阅端自己保存。
 
-  ### 核心概念
+常见用途：
 
-  - **频道(Channel)**：每个实盘都拥有一个独立的频道，频道ID即为实盘ID
+- **主从协同**：主策略分析行情并发布信号，多个从策略读取信号在各自账户上执行。
+- **状态监控**：各策略发布运行状态，监控实盘汇总展示或告警。
+- **数据共享**：一个实盘计算指标、发布结果，其它实盘直接使用，避免重复计算。
 
-  - **广播端**：使用```SetChannelData()```函数在频道上发布数据的实盘
+## 使用要点
 
-  - **订阅端**：使用```GetChannelData()```函数订阅其他实盘频道数据的实盘
+- **首次读取即订阅**：对某个频道第一次调用```GetChannelData()```时完成订阅并返回空值（```null```/```None```），之后服务端把该频道的更新推送到本实盘，再调用就能读到最新数据。订阅端应在启动时就开始读取，并处理空值。
+- **订阅上限**：每个实盘最多订阅10个不同的频道（包括下面的UUID频道）。超出时该次调用返回空值，并记录一条错误日志```channel subscriber exceed limit```。
+- **数据格式**：JavaScript、Python的```SetChannelData()```可以传入任何可以JSON序列化的数据，订阅端读到的是解析后的对象。数据不变时不会重复发送。数据大小限制见`SetChannelData`。
+- **Rust**：```SetChannelData(string)```只接受字符串，需要自己拼好JSON文本；```GetChannelData()```没有频道参数，不能指定要读取的频道，因此不能订阅其它实盘或UUID频道。Rust策略适合作为广播端，订阅端请使用JavaScript或Python。
+- **跨平台推送**：外部系统（如TradingView告警、自建程序）可以通过扩展API的```method=pub```向指定实盘推送一个以32位UUID标识的频道数据，实盘用```GetChannelData(UUID)```读取，具体方法见`SetChannelData`、`GetChannelData`。
+- **实盘功能**：频道通信用于实盘之间，回测时不要依赖它。当前实盘ID可以用```_G()```获取。
+- 不要在频道中传递密钥等敏感信息。
 
-  - **状态覆盖**：频道上仅保存最新状态，新数据会覆盖旧数据，而非采用消息队列机制
+## 基本用法
 
-  ### 主要特性
-
-  - **非阻塞通信**：所有函数调用均为非阻塞，不会影响策略主流程
-
-  - **跨平台支持**：支持跨实盘、跨托管者、跨服务器进行数据传输
-
-  - **多频道订阅**：单个实盘可同时订阅多个不同实盘的频道
-
-  - **灵活的数据格式**：支持任何可JSON序列化的数据结构
-
-  ### 应用场景
-
-  - **主从策略协同**：主策略分析市场并广播信号，从策略接收信号并执行交易
-
-  - **多账户同步**：在多个交易账户之间同步交易信号和仓位信息
-
-  - **策略监控**：广播策略运行状态，由监控实盘订阅并进行展示或告警
-
-  - **数据共享**：共享行情分析、指标计算等结果，避免重复计算
-
-  ## 基本用法
-
-### 广播端示例 - 发布市场数据
+### 广播端：发布行情摘要
 
 ```javascript
 function main() {
+    var robotId = _G()  // 当前实盘ID，也就是本实盘的频道ID
     var updateId = 0
-    var robotId = _G()  // 获取当前实盘ID
 
-    while(true) {
-        // 获取市场数据
+    while (true) {
         var ticker = exchange.GetTicker("BTC_USDT")
-        if (!ticker) {
-            Sleep(5000)
-            continue
+        if (ticker) {
+            // 发布最新状态，覆盖上一次的数据
+            SetChannelData({
+                robotId: robotId,
+                updateId: ++updateId,
+                timestamp: Date.now(),
+                symbol: "BTC_USDT",
+                lastPrice: ticker.Last
+            })
+            LogStatus("频道", robotId, "第", updateId, "次发布，最新价:", ticker.Last)
         }
-
-        // 准备频道状态数据
-        var channelState = {
-            robotId: robotId,
-            updateId: ++updateId,
-            timestamp: Date.now(),
-            symbol: "BTC_USDT",
-            lastPrice: ticker.Last,
-            volume: ticker.Volume,
-            high: ticker.High,
-            low: ticker.Low
-        }
-
-        // 在频道上发布最新状态(覆盖旧状态)
-        SetChannelData(channelState)
-
-        // 显示当前频道状态
-        LogStatus("Channel Broadcaster [Bot ID: " + robotId + "]\n" +
-                  "Update ID: #" + channelState.updateId + "\n" +
-                  "Time: " + _D(channelState.timestamp) + "\n" +
-                  "Symbol: " + channelState.symbol + "\n" +
-                  "Last Price: $" + channelState.lastPrice.toFixed(2))
-
-        Sleep(60000)  // 每分钟更新一次频道状态
+        Sleep(60000)  // 每分钟发布一次
     }
 }
 ```
 
 ```python
+import time
+
 def main():
+    robotId = _G()  # 当前实盘ID，也就是本实盘的频道ID
     updateId = 0
-    robotId = _G()  # 获取当前实盘ID
 
     while True:
-        # 获取市场数据
         ticker = exchange.GetTicker("BTC_USDT")
-        if not ticker:
-            Sleep(5000)
-            continue
-
-        # 准备频道状态数据
-        channelState = {
-            "robotId": robotId,
-            "updateId": updateId + 1,
-            "timestamp": time.time() * 1000,
-            "symbol": "BTC_USDT",
-            "lastPrice": ticker["Last"],
-            "volume": ticker["Volume"],
-            "high": ticker["High"],
-            "low": ticker["Low"]
-        }
-        updateId += 1
-
-        # 在频道上发布最新状态(覆盖旧状态)
-        SetChannelData(channelState)
-
-        # 显示当前频道状态
-        LogStatus("Channel Broadcaster [Bot ID: {}]\n".format(robotId) +
-                  "Update ID: #{}\n".format(channelState["updateId"]) +
-                  "Time: {}\n".format(_D(channelState["timestamp"])) +
-                  "Last Price: ${:.2f}".format(channelState["lastPrice"]))
-
-        Sleep(60000)  # 每分钟更新一次频道状态
+        if ticker:
+            updateId += 1
+            # 发布最新状态，覆盖上一次的数据
+            SetChannelData({
+                "robotId": robotId,
+                "updateId": updateId,
+                "timestamp": int(time.time() * 1000),
+                "symbol": "BTC_USDT",
+                "lastPrice": ticker["Last"]
+            })
+            LogStatus("频道", robotId, "第", updateId, "次发布，最新价:", ticker["Last"])
+        Sleep(60000)  # 每分钟发布一次
 ```
 
 ```rust
 fn main() {
+    let robotId = _G!();  // 当前实盘ID，也就是本实盘的频道ID
     let mut updateId = 0;
-    let robotId = _G!();  // 获取当前实盘ID
 
     loop {
-        // 获取市场数据
-        let ticker = match exchange.GetTicker("BTC_USDT") {
-            Ok(t) => t,
-            Err(_) => {
-                Sleep(5000);
-                continue;
-            }
-        };
-
-        // 准备频道状态数据
-        // Rust 的 SetChannelData 只接受字符串参数，使用 format! 构造JSON文本
-        updateId += 1;
-        let timestamp = Unix() * 1000;
-        let channelState = format!(
-            r#"{{"robotId": {}, "updateId": {}, "timestamp": {}, "symbol": "BTC_USDT", "lastPrice": {}, "volume": {}, "high": {}, "low": {}}}"#,
-            robotId, updateId, timestamp, ticker.Last, ticker.Volume, ticker.High, ticker.Low
-        );
-
-        // 在频道上发布最新状态(覆盖旧状态)
-        SetChannelData(&channelState);
-
-        // 显示当前频道状态
-        LogStatus!(format!(
-            "Channel Broadcaster [Bot ID: {}]\nUpdate ID: #{}\nTime: {}\nSymbol: BTC_USDT\nLast Price: ${:.2}",
-            robotId, updateId, _D(timestamp), ticker.Last
-        ));
-
-        Sleep(60000);  // 每分钟更新一次频道状态
+        if let Ok(ticker) = exchange.GetTicker("BTC_USDT") {
+            updateId += 1;
+            // Rust 的 SetChannelData 只接受字符串，自己拼 JSON 文本
+            let state = format!(
+                r#"{{"robotId": "{}", "updateId": {}, "timestamp": {}, "symbol": "BTC_USDT", "lastPrice": {}}}"#,
+                robotId, updateId, Unix() * 1000, ticker.Last
+            );
+            SetChannelData(&state);
+            LogStatus!("频道", robotId, "第", updateId, "次发布，最新价:", ticker.Last);
+        }
+        Sleep(60000);  // 每分钟发布一次
     }
 }
 ```
 
-### 订阅端示例 - 订阅多个频道
+### 订阅端：读取两个频道
 
 ```javascript
 function main() {
-    // 获取需要订阅的两个频道 ID（请根据实际情况修改）
-    var channelId1 = "632799"  // 频道 1 的实盘 ID
-    var channelId2 = "632800"  // 频道 2 的实盘 ID
+    // 要订阅的实盘ID（按实际情况修改）
+    var channels = ["632799", "632800"]
 
-    while(true) {
-        // 获取频道 1 的当前状态
-        var state1 = GetChannelData(channelId1)
-
-        // 获取频道 2 的当前状态
-        var state2 = GetChannelData(channelId2)
-
-        // 构建状态显示信息
-        var statusMsg = "频道订阅端 - 当前订阅状态\n\n"
-
-        // 显示频道 1 的状态
-        statusMsg += "═══ 频道1 [" + channelId1 + "] ═══\n"
-        if (state1 !== null) {
-            statusMsg += "更新ID: #" + state1.updateId + "\n"
-            statusMsg += "时间: " + _D(state1.timestamp) + "\n"
-            statusMsg += "交易对: " + state1.symbol + "\n"
-            statusMsg += "最新价: $" + state1.lastPrice.toFixed(2) + "\n"
-        } else {
-            statusMsg += "状态: 等待中... (首次调用返回 null)\n"
+    while (true) {
+        var msg = ""
+        for (var i = 0; i < channels.length; i++) {
+            // 第一次调用完成订阅并返回 null，之后返回最新数据
+            var state = GetChannelData(channels[i])
+            if (state) {
+                msg += "频道 " + channels[i] + "：#" + state.updateId + " " + _D(state.timestamp) + " 最新价 " + state.lastPrice + "\n"
+            } else {
+                msg += "频道 " + channels[i] + "：等待数据\n"
+            }
         }
-
-        statusMsg += "\n"
-
-        // 显示频道 2 的状态
-        statusMsg += "═══ 频道2 [" + channelId2 + "] ═══\n"
-        if (state2 !== null) {
-            statusMsg += "更新ID: #" + state2.updateId + "\n"
-            statusMsg += "时间: " + _D(state2.timestamp) + "\n"
-            statusMsg += "最新价: $" + state2.lastPrice.toFixed(2) + "\n"
-        } else {
-            statusMsg += "状态: 等待中... (首次调用返回 null)\n"
-        }
-
-        LogStatus(statusMsg)
-
-        Sleep(5000)  // 每 5 秒获取一次频道数据
+        LogStatus(msg)
+        Sleep(5000)
     }
 }
 ```
 
 ```python
 def main():
-    # 获取需要订阅的两个频道 ID（请根据实际情况修改）
-    channelId1 = "632799"  # 频道 1 的实盘 ID
-    channelId2 = "632800"  # 频道 2 的实盘 ID
+    # 要订阅的实盘ID（按实际情况修改）
+    channels = ["632799", "632800"]
 
     while True:
-        # 获取频道 1 的当前状态
-        state1 = GetChannelData(channelId1)
-
-        # 获取频道 2 的当前状态
-        state2 = GetChannelData(channelId2)
-
-        # 构建状态显示信息
-        statusMsg = "频道订阅端 - 当前订阅状态\n\n"
-
-        # 显示频道 1 的状态
-        statusMsg += "═══ 频道1 [{}] ═══\n".format(channelId1)
-        if state1 is not None:
-            statusMsg += "更新ID: #{}\n".format(state1["updateId"])
-            statusMsg += "时间: {}\n".format(_D(state1["timestamp"]))
-            statusMsg += "最新价: ${:.2f}\n".format(state1["lastPrice"])
-        else:
-            statusMsg += "状态: 等待中... (首次调用返回 None)\n"
-
-        statusMsg += "\n"
-
-        # 显示频道 2 的状态
-        statusMsg += "═══ 频道2 [{}] ═══\n".format(channelId2)
-        if state2 is not None:
-            statusMsg += "更新ID: #{}\n".format(state2["updateId"])
-            statusMsg += "时间: {}\n".format(_D(state2["timestamp"]))
-            statusMsg += "最新价: ${:.2f}\n".format(state2["lastPrice"])
-        else:
-            statusMsg += "状态: 等待中... (首次调用返回 None)\n"
-
-        LogStatus(statusMsg)
-
-        Sleep(5000)  # 每 5 秒获取一次频道数据
+        msg = ""
+        for ch in channels:
+            # 第一次调用完成订阅并返回 None，之后返回最新数据
+            state = GetChannelData(ch)
+            if state:
+                msg += "频道 {}：#{} {} 最新价 {}\n".format(ch, state["updateId"], _D(state["timestamp"]), state["lastPrice"])
+            else:
+                msg += "频道 {}：等待数据\n".format(ch)
+        LogStatus(msg)
+        Sleep(5000)
 ```
 
 ```rust
-fn main() {
-    // Rust 的 GetChannelData() 函数不接受频道 ID 参数，无法订阅其他实盘的频道，
-    // 只能读取当前实盘自身频道（即本实盘通过 SetChannelData() 发布）的最新数据
-    loop {
-        // 读取本实盘频道的当前状态
-        let state = GetChannelData();
-
-        // 构建状态显示信息
-        let mut statusMsg = String::from("频道订阅端 - 当前订阅状态\n\n");
-
-        if !state.is_null() {
-            statusMsg += &format!("更新ID: #{}\n", state["updateId"].as_f64().unwrap_or(0.0));
-            statusMsg += &format!("时间: {}\n", _D(state["timestamp"].as_i64().unwrap_or(0)));
-            statusMsg += &format!("交易对: {}\n", state["symbol"].as_str().unwrap_or(""));
-            statusMsg += &format!("最新价: ${:.2}\n", state["lastPrice"].as_f64().unwrap_or(0.0));
-        } else {
-            statusMsg += "状态: 等待中... (首次调用返回 null)\n";
-        }
-
-        LogStatus!(statusMsg);
-
-        Sleep(5000);  // 每 5 秒读取一次频道数据
-    }
-}
+// Rust 的 GetChannelData() 没有频道参数，不能订阅其它实盘的频道
 ```
 
-## 实际应用场景
+## 场景：主从策略协同
 
-### 场景1：主从策略协同交易
+主策略计算均线交叉信号并发布；从策略读取信号，在信号变化时下单。
 
-**主策略（信号广播端）**
+**主策略（发布信号）**
 
 ```javascript
 function main() {
-    var robotId = _G()
-    Log("Main strategy started, Bot ID:", robotId)
-
-    while(true) {
-        // 分析市场行情，生成交易信号
+    while (true) {
         var records = exchange.GetRecords("BTC_USDT")
-        if (!records || records.length < 20) {
-            Sleep(5000)
-            continue
+        if (records && records.length >= 21) {
+            var ma5 = TA.MA(records, 5)
+            var ma20 = TA.MA(records, 20)
+            var n = records.length
+            var signal = "HOLD"
+            if (ma5[n - 1] > ma20[n - 1] && ma5[n - 2] <= ma20[n - 2]) {
+                signal = "BUY"
+            } else if (ma5[n - 1] < ma20[n - 1] && ma5[n - 2] >= ma20[n - 2]) {
+                signal = "SELL"
+            }
+            SetChannelData({
+                timestamp: Date.now(),
+                symbol: "BTC_USDT",
+                signal: signal,
+                price: records[n - 1].Close
+            })
+            LogStatus("当前信号:", signal, "价格:", records[n - 1].Close)
         }
-
-        // 简单的均线交叉策略
-        var ma5 = TA.MA(records, 5)
-        var ma20 = TA.MA(records, 20)
-        var signal = "HOLD"
-
-        if (ma5[ma5.length-1] > ma20[ma20.length-1] &&
-            ma5[ma5.length-2] <= ma20[ma20.length-2]) {
-            signal = "BUY"
-        } else if (ma5[ma5.length-1] < ma20[ma20.length-1] &&
-                   ma5[ma5.length-2] >= ma20[ma20.length-2]) {
-            signal = "SELL"
-        }
-
-        // 广播交易信号
-        var signalData = {
-            timestamp: Date.now(),
-            symbol: "BTC_USDT",
-            signal: signal,
-            price: records[records.length-1].Close,
-            ma5: ma5[ma5.length-1],
-            ma20: ma20[ma20.length-1]
-        }
-
-        SetChannelData(signalData)
-        LogStatus("Main Strategy - Signal Broadcast\n" +
-                  "Signal: " + signal + "\n" +
-                  "Price: $" + signalData.price.toFixed(2) + "\n" +
-                  "MA5: " + signalData.ma5.toFixed(2) + "\n" +
-                  "MA20: " + signalData.ma20.toFixed(2))
-
         Sleep(60000)
     }
 }
 ```
 
 ```python
+import time
+
 def main():
-    robotId = _G()
-    Log("Main strategy started, Bot ID:", robotId)
-
     while True:
-        # 分析市场行情，生成交易信号
         records = exchange.GetRecords("BTC_USDT")
-        if not records or len(records) < 20:
-            Sleep(5000)
-            continue
-
-        # 简单的均线交叉策略
-        ma5 = TA.MA(records, 5)
-        ma20 = TA.MA(records, 20)
-        signal = "HOLD"
-
-        if ma5[-1] > ma20[-1] and ma5[-2] <= ma20[-2]:
-            signal = "BUY"
-        elif ma5[-1] < ma20[-1] and ma5[-2] >= ma20[-2]:
-            signal = "SELL"
-
-        # 广播交易信号
-        signalData = {
-            "timestamp": time.time() * 1000,
-            "symbol": "BTC_USDT",
-            "signal": signal,
-            "price": records[-1]["Close"],
-            "ma5": ma5[-1],
-            "ma20": ma20[-1]
-        }
-
-        SetChannelData(signalData)
-        LogStatus("Main Strategy - Signal Broadcast\n" +
-                  "Signal: {}\n".format(signal) +
-                  "Price: ${:.2f}\n".format(signalData["price"]) +
-                  "MA5: {:.2f}\n".format(signalData["ma5"]) +
-                  "MA20: {:.2f}".format(signalData["ma20"]))
-
+        if records and len(records) >= 21:
+            ma5 = TA.MA(records, 5)
+            ma20 = TA.MA(records, 20)
+            signal = "HOLD"
+            if ma5[-1] > ma20[-1] and ma5[-2] <= ma20[-2]:
+                signal = "BUY"
+            elif ma5[-1] < ma20[-1] and ma5[-2] >= ma20[-2]:
+                signal = "SELL"
+            SetChannelData({
+                "timestamp": int(time.time() * 1000),
+                "symbol": "BTC_USDT",
+                "signal": signal,
+                "price": records[-1]["Close"]
+            })
+            LogStatus("当前信号:", signal, "价格:", records[-1]["Close"])
         Sleep(60000)
 ```
 
 ```rust
 fn main() {
-    let robotId = _G!();
-    Log!("Main strategy started, Bot ID:", robotId);
-
     loop {
-        // 分析市场行情，生成交易信号
-        let records = match exchange.GetRecords("BTC_USDT", None, None) {
-            Ok(r) if r.len() >= 20 => r,
-            _ => {
-                Sleep(5000);
-                continue;
+        if let Ok(records) = exchange.GetRecords("BTC_USDT", None, None) {
+            let n = records.len();
+            if n >= 21 {
+                let ma5 = TA.MA(&records, 5);
+                let ma20 = TA.MA(&records, 20);
+                let mut signal = "HOLD";
+                if ma5[n - 1] > ma20[n - 1] && ma5[n - 2] <= ma20[n - 2] {
+                    signal = "BUY";
+                } else if ma5[n - 1] < ma20[n - 1] && ma5[n - 2] >= ma20[n - 2] {
+                    signal = "SELL";
+                }
+                let price = records[n - 1].Close;
+                // Rust 的 SetChannelData 只接受字符串，自己拼 JSON 文本
+                let data = format!(
+                    r#"{{"timestamp": {}, "symbol": "BTC_USDT", "signal": "{}", "price": {}}}"#,
+                    Unix() * 1000, signal, price
+                );
+                SetChannelData(&data);
+                LogStatus!("当前信号:", signal, "价格:", price);
             }
-        };
-
-        // 简单的均线交叉策略
-        let ma5 = TA.MA(&records, 5);
-        let ma20 = TA.MA(&records, 20);
-        let n = ma5.len();
-        let mut signal = "HOLD";
-
-        if ma5[n - 1] > ma20[n - 1] && ma5[n - 2] <= ma20[n - 2] {
-            signal = "BUY";
-        } else if ma5[n - 1] < ma20[n - 1] && ma5[n - 2] >= ma20[n - 2] {
-            signal = "SELL";
         }
-
-        // 广播交易信号
-        // Rust 的 SetChannelData 仅接受字符串参数，因此使用 format! 构造 JSON 文本
-        let price = records[records.len() - 1].Close;
-        let signalData = format!(
-            r#"{{"timestamp": {}, "symbol": "BTC_USDT", "signal": "{}", "price": {}, "ma5": {}, "ma20": {}}}"#,
-            Unix() * 1000, signal, price, ma5[n - 1], ma20[n - 1]
-        );
-
-        SetChannelData(&signalData);
-        LogStatus!(format!(
-            "Main Strategy - Signal Broadcast\nSignal: {}\nPrice: ${:.2}\nMA5: {:.2}\nMA20: {:.2}",
-            signal, price, ma5[n - 1], ma20[n - 1]
-        ));
-
         Sleep(60000);
     }
 }
 ```
 
-## 实际应用场景
-
-### 场景1：主从策略协同交易
-
-**从策略（信号接收执行端）**
+**从策略（读取信号并执行）**
 
 ```javascript
 function main() {
-    var masterRobotId = "632799"  // 主策略的实盘ID
+    var masterId = "632799"  // 主策略的实盘ID
     var lastSignal = null
 
-    Log("Follower strategy started, subscribing to main strategy:", masterRobotId)
-
-    while(true) {
-        // 获取主策略的信号
-        var signalData = GetChannelData(masterRobotId)
-
-        if (signalData === null) {
-            LogStatus("Waiting for main strategy signal...")
-            Sleep(5000)
-            continue
-        }
-
-        // 检查是否有新信号
-        if (lastSignal !== signalData.signal) {
-            Log("Received new signal:", signalData.signal, "Price:", signalData.price)
-
-            // 执行交易
-            if (signalData.signal === "BUY") {
-                var ticker = exchange.GetTicker(signalData.symbol)
-                if (ticker) {
-                    exchange.Buy(ticker.Last, 0.01)
-                    Log("Executing buy, Price:", ticker.Last)
+    while (true) {
+        var data = GetChannelData(masterId)
+        if (!data) {
+            LogStatus("等待主策略信号...")
+        } else {
+            if (data.signal !== lastSignal) {
+                Log("收到新信号:", data.signal, "信号价格:", data.price)
+                var ticker = exchange.GetTicker(data.symbol)
+                if (ticker && data.signal === "BUY") {
+                    exchange.CreateOrder(data.symbol, "buy", ticker.Last, 0.01)
+                } else if (ticker && data.signal === "SELL") {
+                    exchange.CreateOrder(data.symbol, "sell", ticker.Last, 0.01)
                 }
-            } else if (signalData.signal === "SELL") {
-                var ticker = exchange.GetTicker(signalData.symbol)
-                if (ticker) {
-                    exchange.Sell(ticker.Last, 0.01)
-                    Log("Executing sell, Price:", ticker.Last)
-                }
+                lastSignal = data.signal
             }
-
-            lastSignal = signalData.signal
+            LogStatus("当前信号:", data.signal, "信号时间:", _D(data.timestamp))
         }
-
-        LogStatus("Follower Strategy - Following Main Strategy\n" +
-                  "Current Signal: " + signalData.signal + "\n" +
-                  "Signal Price: $" + signalData.price.toFixed(2) + "\n" +
-                  "Signal Time: " + _D(signalData.timestamp))
-
         Sleep(5000)
     }
 }
@@ -3518,144 +4187,49 @@ function main() {
 
 ```python
 def main():
-    masterRobotId = "632799"  # 主策略的实盘ID
+    masterId = "632799"  # 主策略的实盘ID
     lastSignal = None
 
-    Log("Follower strategy started, subscribing to main strategy:", masterRobotId)
-
     while True:
-        # 获取主策略的信号
-        signalData = GetChannelData(masterRobotId)
-
-        if signalData is None:
-            LogStatus("Waiting for main strategy signal...")
-            Sleep(5000)
-            continue
-
-        # 检查是否有新信号
-        if lastSignal != signalData["signal"]:
-            Log("Received new signal:", signalData["signal"], "Price:", signalData["price"])
-
-            # 执行交易
-            if signalData["signal"] == "BUY":
-                ticker = exchange.GetTicker(signalData["symbol"])
-                if ticker:
-                    exchange.Buy(ticker["Last"], 0.01)
-                    Log("Executing buy, Price:", ticker["Last"])
-            elif signalData["signal"] == "SELL":
-                ticker = exchange.GetTicker(signalData["symbol"])
-                if ticker:
-                    exchange.Sell(ticker["Last"], 0.01)
-                    Log("Executing sell, Price:", ticker["Last"])
-
-            lastSignal = signalData["signal"]
-
-        LogStatus("Follower Strategy - Following Main Strategy\n" +
-                  "Current Signal: {}\n".format(signalData["signal"]) +
-                  "Signal Price: ${:.2f}\n".format(signalData["price"]) +
-                  "Signal Time: {}".format(_D(signalData["timestamp"])))
-
+        data = GetChannelData(masterId)
+        if not data:
+            LogStatus("等待主策略信号...")
+        else:
+            if data["signal"] != lastSignal:
+                Log("收到新信号:", data["signal"], "信号价格:", data["price"])
+                ticker = exchange.GetTicker(data["symbol"])
+                if ticker and data["signal"] == "BUY":
+                    exchange.CreateOrder(data["symbol"], "buy", ticker["Last"], 0.01)
+                elif ticker and data["signal"] == "SELL":
+                    exchange.CreateOrder(data["symbol"], "sell", ticker["Last"], 0.01)
+                lastSignal = data["signal"]
+            LogStatus("当前信号:", data["signal"], "信号时间:", _D(data["timestamp"]))
         Sleep(5000)
 ```
 
 ```rust
-fn main() {
-    // Rust 的 GetChannelData() 函数不接受频道 ID 参数，无法订阅主策略实盘的频道，
-    // 只能读取当前实盘自身频道的最新数据（此处演示等价的信号处理逻辑）
-    let mut lastSignal = String::new();
-
-    Log!("Follower strategy started");
-
-    loop {
-        // 获取频道中的信号
-        let signalData = GetChannelData();
-
-        if signalData.is_null() {
-            LogStatus!("Waiting for signal...");
-            Sleep(5000);
-            continue;
-        }
-
-        let signal = signalData["signal"].as_str().unwrap_or("").to_string();
-        let price = signalData["price"].as_f64().unwrap_or(0.0);
-        let symbol = signalData["symbol"].as_str().unwrap_or("BTC_USDT").to_string();
-
-        // 检查是否有新信号
-        if lastSignal != signal {
-            Log!("Received new signal:", &signal, "Price:", price);
-
-            // 执行交易
-            if signal == "BUY" {
-                if let Ok(ticker) = exchange.GetTicker(symbol.as_str()) {
-                    let _ = exchange.Buy(ticker.Last, 0.01);
-                    Log!("Executing buy, Price:", ticker.Last);
-                }
-            } else if signal == "SELL" {
-                if let Ok(ticker) = exchange.GetTicker(symbol.as_str()) {
-                    let _ = exchange.Sell(ticker.Last, 0.01);
-                    Log!("Executing sell, Price:", ticker.Last);
-                }
-            }
-
-            lastSignal = signal.clone();
-        }
-
-        LogStatus!(format!(
-            "Follower Strategy\nCurrent Signal: {}\nSignal Price: ${:.2}\nSignal Time: {}",
-            signal, price, _D(signalData["timestamp"].as_i64().unwrap_or(0))
-        ));
-
-        Sleep(5000);
-    }
-}
+// Rust 的 GetChannelData() 没有频道参数，不能读取主策略实盘的频道
 ```
 
-### 场景2：多策略状态监控
+## 场景：多策略状态监控
 
-**监控策略**
+各策略按上面广播端的方式发布状态，监控实盘读取所有频道，用表格展示，超过2分钟没有更新的标记为异常。
 
 ```javascript
 function main() {
-    // 需要监控的策略实盘ID列表
-    var monitorList = ["632799", "632800", "632801"]
+    var monitorList = ["632799", "632800", "632801"]  // 最多10个
 
-    while(true) {
-        var table = {
-            type: "table",
-            title: "策略运行状态监控",
-            cols: ["实盘ID", "状态", "最后更新", "交易对", "当前价格", "盈亏"],
-            rows: []
-        }
-
+    while (true) {
+        var table = {type: "table", title: "策略运行状态", cols: ["实盘ID", "状态", "最后更新", "交易对", "最新价"], rows: []}
         for (var i = 0; i < monitorList.length; i++) {
-            var robotId = monitorList[i]
-            var data = GetChannelData(robotId)
-
-            if (data !== null) {
-                var updateTime = _D(data.timestamp)
-                var timeDiff = Date.now() - data.timestamp
-                var status = timeDiff < 120000 ? "运行中" : "异常"
-
-                table.rows.push([
-                    robotId,
-                    status,
-                    updateTime,
-                    data.symbol || "-",
-                    data.lastPrice ? "$" + data.lastPrice.toFixed(2) : "-",
-                    data.profit ? data.profit.toFixed(2) + "%" : "-"
-                ])
+            var data = GetChannelData(monitorList[i])
+            if (data) {
+                var status = Date.now() - data.timestamp < 120000 ? "运行中" : "异常"
+                table.rows.push([monitorList[i], status, _D(data.timestamp), data.symbol || "-", data.lastPrice || "-"])
             } else {
-                table.rows.push([
-                    robotId,
-                    "等待数据",
-                    "-",
-                    "-",
-                    "-",
-                    "-"
-                ])
+                table.rows.push([monitorList[i], "等待数据", "-", "-", "-"])
             }
         }
-
         LogStatus("`" + JSON.stringify(table) + "`")
         Sleep(10000)
     }
@@ -3663,1533 +4237,2091 @@ function main() {
 ```
 
 ```python
+import json
+import time
+
 def main():
-    # 需要监控的策略实盘ID列表
-    monitorList = ["632799", "632800", "632801"]
+    monitorList = ["632799", "632800", "632801"]  # 最多10个
 
     while True:
-        table = {
-            "type": "table",
-            "title": "策略运行状态监控",
-            "cols": ["实盘ID", "状态", "最后更新", "交易对", "当前价格", "盈亏"],
-            "rows": []
-        }
-
+        table = {"type": "table", "title": "策略运行状态", "cols": ["实盘ID", "状态", "最后更新", "交易对", "最新价"], "rows": []}
         for robotId in monitorList:
             data = GetChannelData(robotId)
-
-            if data is not None:
-                updateTime = _D(data["timestamp"])
-                timeDiff = time.time() * 1000 - data["timestamp"]
-                status = "运行中" if timeDiff < 120000 else "异常"
-
-                table["rows"].append([
-                    robotId,
-                    status,
-                    updateTime,
-                    data.get("symbol", "-"),
-                    "${:.2f}".format(data["lastPrice"]) if "lastPrice" in data else "-",
-                    "{:.2f}%".format(data["profit"]) if "profit" in data else "-"
-                ])
+            if data:
+                status = "运行中" if time.time() * 1000 - data["timestamp"] < 120000 else "异常"
+                table["rows"].append([robotId, status, _D(data["timestamp"]), data.get("symbol", "-"), data.get("lastPrice", "-")])
             else:
-                table["rows"].append([
-                    robotId,
-                    "等待数据",
-                    "-",
-                    "-",
-                    "-",
-                    "-"
-                ])
-
+                table["rows"].append([robotId, "等待数据", "-", "-", "-"])
         LogStatus("`" + json.dumps(table) + "`")
         Sleep(10000)
 ```
 
 ```rust
-fn main() {
-    // Rust 的 GetChannelData() 函数不接受频道 ID 参数，无法订阅其它实盘的频道进行监控，
-    // 只能读取当前实盘自身频道的最新数据（此处演示等价的状态表格展示逻辑）
-    loop {
-        let data = GetChannelData();
-
-        let row = if !data.is_null() {
-            let timestamp = data["timestamp"].as_i64().unwrap_or(0);
-            let updateTime = _D(timestamp);
-            let timeDiff = Unix() * 1000 - timestamp;
-            let status = if timeDiff < 120000 { "运行中" } else { "异常" };
-            format!(
-                r#"["{}", "{}", "{}", "{}"]"#,
-                _G!(), status, updateTime,
-                data["symbol"].as_str().unwrap_or("-")
-            )
-        } else {
-            format!(r#"["{}", "等待数据", "-", "-"]"#, _G!())
-        };
-
-        // 构造表格JSON文本(Rust无JSON序列化,使用format!拼接)
-        let table = format!(
-            r#"{{"type": "table", "title": "策略运行状态监控", "cols": ["实盘ID", "状态", "最后更新", "交易对"], "rows": [{}]}}"#,
-            row
-        );
-
-        LogStatus!(format!("`{}`", table));
-        Sleep(10000);
-    }
-}
+// Rust 的 GetChannelData() 没有频道参数，不能读取其它实盘的频道
 ```
 
-## API函数说明
+See also: `SetChannelData`, `GetChannelData`, `_G`
 
-### SetChannelData(data)
+### API限流控制
 
-**功能**：在频道上发布最新的状态数据
-
-**参数**：
-
-- data：待发布的数据，可以是任意可进行JSON序列化的数据结构
-
-**返回值**：无
-
-**特性**：
-
-- 非阻塞调用
-
-- 覆盖此前的数据，不累积历史记录
-
-- 自动使用当前实盘ID作为频道ID
-
-**数据长度限制**：
-
-- JSON序列化后不得超过1024字节
-
-- 建议仅传输必要的状态信息
-
-**详细文档**：[SetChannelData](/syntax-guide#fun_setchanneldata)
-
-### GetChannelData(robotId)
-
-**功能**：订阅指定实盘的频道数据
-
-**参数**：
-
-- robotId：待订阅的实盘ID（字符串或数字）
-
-**返回值**：
-
-- 首次调用返回null，需要重试
-
-- 成功后返回该频道的最新数据
-
-**特性**：
-
-- 非阻塞调用
-
-- 支持订阅多个频道
-
-- 支持订阅自身的频道
-
-**详细文档**：[GetChannelData](/syntax-guide#fun_getchanneldata)
-
-## 注意事项
-
-- **首次调用返回null**：```GetChannelData()```函数在首次调用时会返回```null```，这是正常现象，需要等待数据同步完成。建议在代码中进行null判断。
-
-- **数据覆盖机制**：频道上仅保存最新状态，调用```SetChannelData()```会覆盖此前的数据。如需保存历史数据，应在订阅端自行记录。
-
-- **非阻塞特性**：所有频道通信函数均为非阻塞调用，不会影响策略主流程的执行。但这也意味着无法保证数据的实时性。
-
-- **数据大小限制**：传入SetChannelData的数据经JSON序列化后不得超过1024字节。应仅传输必要的状态信息，如交易信号、价格、持仓等关键数据，避免传输完整的K线数组或大量历史数据。
-
-- **实盘环境限制**：频道通信功能主要适用于实盘环境，在回测系统中可能受限或不可用。
-
-- **实盘ID获取**：可通过```_G()```函数获取当前实盘ID，也可在平台界面中查看实盘ID。
-
-- **安全性考虑**：频道数据可能被其他具有相应权限的实盘订阅，请勿在频道中传输敏感信息（如API密钥等）。
-
-## 最佳实践
-
-- **合理的更新频率**：根据实际需求设置数据更新频率，避免因更新过于频繁而造成资源浪费。
-
-- **数据结构设计**：设计清晰的数据结构，并包含必要的元数据（如时间戳、版本号等），以便于订阅端处理。
-
-- **错误处理**：订阅端应处理null返回值，广播端应确保数据格式正确。
-
-- **状态版本控制**：在数据中包含版本号或更新ID，帮助订阅端判断是否存在新数据。
-
-- **监控与告警**：对于关键的通信链路，建议实现超时监控与告警机制。
-
-- **测试验证**：在正式使用前，应先在测试环境中验证频道通信的稳定性与延迟。
-
-- **文档记录**：记录频道数据格式与通信协议，以便于后续维护与多人协作。
-
-See also: `SetChannelData`; `GetChannelData`; `_G`
-
-### JavaScript多线程
-
-发明者量化交易平台从系统底层真正支持```JavaScript```语言策略的多线程功能，实现了以下对象：
-
-| 对象 | 说明 | 备注 |
-| - | - | - |
-| threading | 多线程全局对象 | 成员函数：```Thread```、```getThread```、```mainThread```等。 |
-| Thread | 线程对象 | 成员函数：```peekMessage```、```postMessage```、```join```等。 |
-| ThreadLock | 线程锁对象 | 成员函数：```acquire```、```release```。可作为线程执行函数的参数传入线程环境。 |
-| ThreadEvent | 事件对象 | 成员函数：```set```、```clear```、```wait```、```isSet```。可作为线程执行函数的参数传入线程环境。 |
-| ThreadCondition | 条件对象 | 成员函数：```notify```、```notifyAll```、```wait```、```acquire```、```release```。可作为线程执行函数的参数传入线程环境。 |
-| ThreadDict | 字典对象 | 成员函数：```get```、```set```。可作为线程执行函数的参数传入线程环境。 |
-
-发明者量化交易平台语法手册：[JavaScript多线程](https://www.fmz.com/syntax-guide/fun/threads)
-
-### Web3
-
-| 函数名称 | 简介 |
-| - | - |
-| [exchange.IO("abi", ...)](/syntax-guide#fun_exchange.ioabi-...) | 注册ABI接口 |
-| [exchange.IO("api", "eth", ...)](/syntax-guide#fun_exchange.ioapi-eth-...) | 调用以太坊RPC方法 |
-| [exchange.IO("encode", ...)](/syntax-guide#fun_exchange.ioencode-...) | 对函数调用进行编码 |
-| [exchange.IO("encodePacked", ...)](/syntax-guide#fun_exchange.ioencodepacked-...) | 执行encodePacked编码 |
-| [exchange.IO("decode", ...)](/syntax-guide#fun_exchange.iodecode-...) | 对数据进行解码 |
-| [exchange.IO("key", ...)](/syntax-guide#fun_exchange.iokey-...) | 切换私钥 |
-| [exchange.IO("api", ...)](/syntax-guide#fun_exchange.ioapi-...) | 调用智能合约方法 |
-| [exchange.IO("address")](/syntax-guide#fun_exchange.ioaddress) | 获取当前配置的钱包地址 |
-| [exchange.IO("base", ...)](/syntax-guide#fun_exchange.iobase-...) | 设置RPC节点地址 |
-
-### TA指标库
-
-| 函数名称 | 简介 |
-| - | - |
-| [TA.MACD](/syntax-guide#fun_ta.macd)           | 计算指数平滑异同移动平均线指标 |
-| [TA.KDJ](/syntax-guide#fun_ta.kdj)             | 计算随机指标 |
-| [TA.RSI](/syntax-guide#fun_ta.rsi)             | 计算相对强弱指标 |
-| [TA.ATR](/syntax-guide#fun_ta.atr)             | 计算真实波动幅度均值指标 |
-| [TA.OBV](/syntax-guide#fun_ta.obv)             | 计算能量潮指标 |
-| [TA.MA](/syntax-guide#fun_ta.ma)               | 计算移动平均线指标 |
-| [TA.EMA](/syntax-guide#fun_ta.ema)             | 计算指数移动平均线指标 |
-| [TA.BOLL](/syntax-guide#fun_ta.boll)           | 计算布林带指标 |
-| [TA.Alligator](/syntax-guide#fun_ta.alligator) | 计算鳄鱼线指标 |
-| [TA.CMF](/syntax-guide#fun_ta.cmf)             | 计算蔡金资金流量指标 |
-| [TA.Highest](/syntax-guide#fun_ta.highest)     | 计算指定周期内的最高价 |
-| [TA.Lowest](/syntax-guide#fun_ta.lowest)       | 计算指定周期内的最低价 |
-| [TA.SMA](/syntax-guide#fun_ta.sma)             | 计算简单移动平均线指标 |
-
-### talib指标库
-
-talib指标库包含众多技术分析指标，例如：[talib.CDL2CROWS](/syntax-guide#fun_talib.cdl2crows)。详细信息请参阅语法手册。
-
-## 模板类库
-
-**模板类库**是发明者量化交易平台中可复用的代码模块，属于策略代码的一种类别。发明者量化交易平台支持模板类库功能的编程语言包括：```JavaScript```、```Python```、```C++```、```Blockly可视化```。创建策略时，如果将类别设置为模板类库，系统会在发明者量化交易平台当前登录账号的策略库中创建一个模板类库。创建后，该类别无法再修改为普通策略。
-
-![创建模板类库页面](https://www.fmz.com/upload/asset/2e4c55da99fd457ca94a0.png)
-
-### 模板类库的导出函数
-
-导出函数是模板类库的接口函数，可被引用该模板类库的策略调用。
-
-不同编程语言的模板类库编写格式有所不同，以下是导出函数在模板类库中声明和实现的示例代码：
-
-```javascript
-/*
--- 策略引用该模板以后直接用 $.Test() 调用此方法
--- main 函数在策略中不会触发, 只做为模板调试的入口
-*/
-$.Test = function() {
-    Log('Test')
-}
-
-function main() {
-    $.Test()
-}
-```
-
-```python
-def Test():
-    Log("template call")
-
-# 导出Test函数, 主策略可以通过ext.Test()调用
-ext.Test = Test
-```
-
-```cpp
-// 策略引用该模板以后直接用 ext::Test() 调用此方法
-void Test() {
-    Log("template call");
-}
-```
-
-```Blockly可视化```方式编写的策略可通过```JavaScript```语言的模板类库实现类库功能，请使用以下格式编写。
+交易所对API调用频率有限制，超限轻则请求被拒，重则账号被临时封禁。用```exchange.IO("rate", ...)```或```exchange.IO("quota", ...)```可以在托管者本地给标准函数设置调用频率上限：超限的调用不会发出请求。
 
 ```js
-/*blockly
-    {
-        "type": "ext_testA",
-        "message0": "testA|testA",
-        "template": "function(){return 99;}()",
-        "order": "ORDER_ATOMIC",
-        "output": "Number"
-    },{
-        "type": "ext_MA",
-        "message0": "MA 周期 %1| MA Period %1",
-        "args0": [{
-            "type": "input_value",
-            "check": "Number"
-        }],
-        "template": "(function(){var r = exchange.GetRecords(); return (!r || r.length < %1) ? false : TA.MA(r, %1); })()",
-        "order": "ORDER_ATOMIC",
-        "output": null,
-        "colour": 85
+exchange.IO("rate" | "quota", 名字, 次数, 窗口[, "delay"])
+```
+
+## 两种模式
+
+- **rate（令牌桶）**：桶容量默认等于```次数```，开始时是满的，之后按「次数/窗口」的速度匀速补充，每次调用消耗一个。允许短时间连续调用，长期平均不超过「次数/窗口」。```次数```写成```"10/5"```时表示每个窗口补充10次、桶容量为5，用来限制突发。
+- **quota（固定窗口）**：每个窗口内最多调用```次数```次，进入下一个窗口时清零。窗口按时间纪元对齐：```"1s"```对齐整秒，```"1m"```对齐整分钟，```"1h"```对齐整点，```"1d"```对齐UTC零点（即北京时间08:00）。例如12:00:00.900开始计数，到12:00:01.000就进入了新窗口。
+
+需要严格保证「任意一个交易所计数周期内不超过N次」时用```quota```并让窗口与交易所的计数周期一致；只需要控制平均频率时用```rate```。
+
+## 参数
+
+| 参数 | 说明 |
+| - | - |
+| 名字 | 要限制的函数名，见下表。多个名字用逗号分隔（如```"GetTicker,GetDepth"```）时共用一条规则，调用次数合并计算。```"*"```是兜底规则，只对没有专属规则的函数生效。 |
+| 次数 | 每个窗口允许的调用次数，必须大于0；```rate```模式可以写成```"次数/突发"```。传```0```或负数表示删除该名字的规则。 |
+| 窗口 | 时长，写法同Go语言的```time.ParseDuration```：单位```ns```、```us```（或```µs```）、```ms```、```s```、```m```、```h```，可以带小数（```"1.5s"```），可以组合（```"1h30m"```）；另外支持```"Nd"```表示N天（可以带小数，如```"0.5d"```，不能与其它单位组合）。写成```"@HHMM"```或```"@HHMMSS"```（如```"@0800"```）表示按天计数、每天在该时刻（北京时间）清零，```rate```和```quota```都可以使用。 |
+| 动作 | 省略时超限的调用立即失败；写```"delay"```时阻塞等待，直到有可用次数再发出请求。等待期间停止实盘会打断等待。 |
+
+## 可以限制的函数名
+
+| 类别 | 名字 |
+| - | - |
+| 行情 | ```GetTicker```、```GetTickers```、```GetDepth```、```GetTrades```、```GetRecords```、```GetMarkets```、```GetFundings``` |
+| 账户 | ```GetAccount```、```GetAssets```、```GetPositions```、```SetMarginLevel``` |
+| 交易 | ```CreateOrder```（```Buy```、```Sell```也计入）、```CancelOrder```、```ModifyOrder``` |
+| 订单查询 | ```GetOrder```、```GetOrders```、```GetHistoryOrders``` |
+| 条件单 | ```CreateConditionOrder```、```ModifyConditionOrder```、```CancelConditionOrder```、```GetConditionOrder```、```GetConditionOrders```、```GetHistoryConditionOrders``` |
+| 自定义请求 | ```IO/api```：只限制```exchange.IO("api", ...)```，不影响其它```exchange.IO()```指令 |
+
+- ```GetAccount```和```GetAssets```是同一个底层请求，写其中任何一个名字的规则对两个函数都生效。
+- 通过```exchange.Go()```并发调用时，按实际调用的函数计数。
+
+## 规则的作用范围
+
+- 规则按交易所对象分别设置：```exchanges[0]```上的规则不影响```exchanges[1]```。
+- 规则只在本次运行中有效，实盘重启后需要重新设置，通常写在```main()```开头。
+- 同一个名字再次设置时覆盖原规则；名字传空字符串（```exchange.IO("rate", "")```）清空该交易所对象上的全部规则。
+- 一次调用只按一条规则计数：有专属规则的函数不再计入```"*"```，所以```"*"```不能当作「所有调用的总配额」叠加在专属规则之上。
+
+## 超限时的表现
+
+默认动作下，超限的调用不发请求，按调用失败处理（JavaScript返回```null```，Python返回```None```，Rust返回```Err```），错误信息形如：
+
+```
+rate limit exceeded: GetTicker 10/1s
+quota limit exceeded: GetTicker 10/1m
+quota limit exceeded: GetRecords 2000/day (resets at 0800)
+```
+
+使用```"delay"```动作时调用会阻塞到有可用次数，日志中记录的调用时间是等待结束之后的时间。对每天清零的规则使用```"delay"```，最长可能等待到第二天，请谨慎使用。
+
+## 示例
+
+### 默认动作：超限时调用失败
+
+```javascript
+function main() {
+    // GetTicker 平均每秒最多 5 次（令牌桶，容量 5）
+    exchange.IO("rate", "GetTicker", 5, "1s")
+
+    for (var i = 0; i < 10; i++) {
+        var ticker = exchange.GetTicker("BTC_USDT")
+        if (ticker) {
+            Log("第", i + 1, "次成功:", ticker.Last)
+        } else {
+            // 超限的调用不发请求，返回 null
+            Log("第", i + 1, "次被限流:", GetLastError())
+        }
     }
-*/
-```
-
-### 模板类库的参数
-
-模板类库也可以设置自己的界面参数，模板类库的参数在模板类库代码中以全局变量的形式使用。
-
-例如，我们设置了一个模板类库的参数：
-
-![模板参数](https://www.fmz.com/upload/asset/2e4ab550b85e6a1cac08e.png)
-
-| 策略代码中参数的变量名 | 策略界面上显示的参数名称 | 类型 | 默认值 |
-| - | - | - | - |
-| param1 | 模板参数1 | 数字型(number) | 99 |
-
-用于测试```param1```参数的模板类库代码：
-
-```javascript
-$.SetParam1 = function(p1) {
-    param1 = p1
-}
-
-$.GetParam1 = function() {
-    Log("param1:", param1)
-    return param1
-}
-```
-
-```python
-def SetParam1(p1):
-    global param1
-    param1 = p1
-
-def GetParam1():
-    Log("param1:", param1)
-    return param1
-
-ext.SetParam1 = SetParam1
-ext.GetParam1 = GetParam1
-```
-
-```cpp
-void SetParam1(float p1) {
-    param1 = p1;
-}
-
-float GetParam1() {
-    Log("param1:", param1);
-    return param1;
-}
-```
-
-引用上述模板类库示例的策略代码，使用模板类库的导出函数获取参数```param1```并修改参数```param1```。
-
-```javascript
-function main () {
-    Log("Calling $.GetParam1:", $.GetParam1())
-    Log("Calling $.SetParam1:", "#FF0000")
-    $.SetParam1(20)
-    Log("Calling $.GetParam1:", $.GetParam1())
 }
 ```
 
 ```python
 def main():
-    Log("Calling ext.GetParam1:", ext.GetParam1())
-    Log("Calling ext.SetParam1:", "#FF0000")
-    ext.SetParam1(20)
-    Log("Calling ext.GetParam1:", ext.GetParam1())
+    # GetTicker 平均每秒最多 5 次（令牌桶，容量 5）
+    exchange.IO("rate", "GetTicker", 5, "1s")
+
+    for i in range(10):
+        ticker = exchange.GetTicker("BTC_USDT")
+        if ticker:
+            Log("第", i + 1, "次成功:", ticker["Last"])
+        else:
+            # 超限的调用不发请求，返回 None
+            Log("第", i + 1, "次被限流:", GetLastError())
 ```
 
-```cpp
-void main() {
-    Log("Calling ext::GetParam1:", ext::GetParam1());
-    Log("Calling ext::SetParam1:", "#FF0000");
-    ext::SetParam1(20);
-    Log("Calling ext::GetParam1:", ext::GetParam1());
+```rust
+fn main() {
+    // GetTicker 平均每秒最多 5 次（令牌桶，容量 5）
+    let _ = exchange.IO(("rate", "GetTicker", 5, "1s"));
+
+    for i in 0..10 {
+        match exchange.GetTicker("BTC_USDT") {
+            Ok(ticker) => Log!("第", i + 1, "次成功:", ticker.Last),
+            // 超限的调用不发请求，返回 Err
+            Err(e) => Log!("第", i + 1, "次被限流:", e),
+        }
+    }
 }
 ```
 
-### 引用模板类库
+### 按交易所的限频规则分组设置
 
-策略引用模板类库时，需要当前登录的发明者量化交易平台账号的策略库中存在可用的模板类库。在[策略编辑页面](https://www.fmz.com/m/add-strategy)的模板栏中勾选需要引用的模板，保存策略后即可完成引用。
+行情和交易分别共用一条规则；交易类超限时等待而不是失败；其余没有专属规则的函数用```"*"```兜底。
 
-![模板引用截图](https://www.fmz.com/upload/asset/2e4ee2ec7b3e7b1649af8.png)
+```javascript
+function main() {
+    // 行情：GetTicker、GetDepth 合计平均每秒 20 次
+    exchange.IO("rate", "GetTicker,GetDepth", 20, "1s")
+    // 交易：下单（含 Buy/Sell）、撤单合计每秒 5 次，超限时等待
+    exchange.IO("rate", "CreateOrder,CancelOrder", 5, "1s", "delay")
+    // 兜底：其它函数（如 GetAccount、GetPositions）合计每分钟 60 次，窗口对齐整分钟
+    exchange.IO("quota", "*", 60, "1m")
 
-## 策略参数
+    while (true) {
+        var ticker = exchange.GetTicker("BTC_USDT")
+        var depth = exchange.GetDepth("BTC_USDT")
+        if (ticker && depth) {
+            Log("最新价:", ticker.Last, "买一:", depth.Bids[0].Price)
+        }
+        Sleep(1000)
+    }
+}
+```
 
-策略界面上设置的参数在策略代码中以全局变量的形式存在。```JavaScript```、```C++```、```My语言```策略代码可以直接访问和修改策略界面上设置的参数值。```Python```策略在函数中修改全局变量或策略界面参数时需要使用```global```关键字。```PINE```语言使用```input()```函数创建界面参数。```Blockly可视化```方式设计的策略不支持界面参数。
+```python
+def main():
+    # 行情：GetTicker、GetDepth 合计平均每秒 20 次
+    exchange.IO("rate", "GetTicker,GetDepth", 20, "1s")
+    # 交易：下单（含 Buy/Sell）、撤单合计每秒 5 次，超限时等待
+    exchange.IO("rate", "CreateOrder,CancelOrder", 5, "1s", "delay")
+    # 兜底：其它函数（如 GetAccount、GetPositions）合计每分钟 60 次，窗口对齐整分钟
+    exchange.IO("quota", "*", 60, "1m")
 
-![策略参数设置界面](https://www.fmz.com/upload/asset/2e46b5e593de3b2f11445.png)
+    while True:
+        ticker = exchange.GetTicker("BTC_USDT")
+        depth = exchange.GetDepth("BTC_USDT")
+        if ticker and depth:
+            Log("最新价:", ticker["Last"], "买一:", depth["Bids"][0]["Price"])
+        Sleep(1000)
+```
 
-### 界面参数种类
+```rust
+fn main() {
+    // 行情：GetTicker、GetDepth 合计平均每秒 20 次
+    let _ = exchange.IO(("rate", "GetTicker,GetDepth", 20, "1s"));
+    // 交易：下单（含 Buy/Sell）、撤单合计每秒 5 次，超限时等待
+    let _ = exchange.IO(("rate", "CreateOrder,CancelOrder", 5, "1s", "delay"));
+    // 兜底：其它函数（如 GetAccount、GetPositions）合计每分钟 60 次，窗口对齐整分钟
+    let _ = exchange.IO(("quota", "*", 60, "1m"));
 
-| 变量(命名举例) | 描述 | 类型 | 默认值(说明) | 组件配置(说明) | 备注 |
-| - | - | - | - | - | - |
-| pNum       | 参数pNum的描述       | 数字型(number)     | 举例：设置默认值为100，C++策略中为浮点型| 用于设置当前参数绑定的界面控件：组件类型、最小值、最大值、分组、过滤器等 | 参数pNum的备注信息，pNum的值为数值类型 |
-| pBool      | 参数pBool的描述      | 布尔型(true/false) | 使用开关控件设置默认值，不支持选填控件 | 同上                                                          | 参数pBool的备注信息，pBool的值为布尔类型 |
-| pStr       | 参数pStr的描述       | 字符串(string)     | 举例：设置默认值为abc               | 同上                                                          | 参数pStr的备注信息，pStr的值为字符串类型 |
-| pCombox    | 参数pCombox的描述    | 下拉框(selected)   | 设置选项中的一个或多个选项      | 同上                                                          | 参数pCombox的备注信息，pCombox的值可能有多种形式 |
-| pSecretStr | 参数pSecretStr的描述 | 加密串(string)     | 举例：设置默认值为xyz               | 同上                                                          | 参数pSecretStr的备注信息，pSecretStr的值为字符串类型 |
+    loop {
+        if let (Ok(ticker), Ok(depth)) = (exchange.GetTicker("BTC_USDT"), exchange.GetDepth("BTC_USDT")) {
+            Log!("最新价:", ticker.Last, "买一:", depth.Bids[0].Price);
+        }
+        Sleep(1000);
+    }
+}
+```
 
-界面参数在策略编辑页面代码编辑区下方的策略参数区进行设置，需要注意以下几点：
-1、参数设置的默认值选项中，「选填」控件默认为选填状态，可以更改该控件的状态，将当前参数设置为必填。设置参数为必填后，如果策略在回测或实盘时未设置该参数，则无法进行回测或启动实盘。
-2、界面参数在策略代码中的变量名不应使用当前编程语言的保留字（关键字）。
-3、在回测或实盘界面，将鼠标悬停在参数绑定的控件上时，会显示该参数的备注信息。
-4、参数的「描述」即为参数绑定控件的显示名称。
-5、参数的「变量」即上表中的：```pNum```、```pBool```、```pStr```、```pCombox```、```pSecretStr```。在策略代码中以全局变量形式存在，因此可以在代码中修改策略参数的值。
-6、对于「加密串」和「字符串」类型的参数，输入默认值时无需添加引号，所有输入均作为字符串处理。「加密串」参数的使用方式与「字符串」参数相同，但加密字符串会被加密传输，不会以明文形式发送。
-7、「字符串」类型的参数如果设置为「选填」，当参数绑定的控件中未填写参数时，参数变量的值为**空字符串**；
-  同理，「数字型」参数的值为**空值**；
-  同理，「下拉框」参数的值为**空值**；
-  同理，「加密串」参数的值为**空值**。
-8、对于下拉框类型的界面参数（例如变量名为```pCombox```），在「组件配置」中未开启「支持多选」时，pCombox的值为当前选中选项的索引或具体数据（当给选项绑定数据时）。
-  如果开启了「支持多选」，pCombox的值为一个数组，包含所有当前选中选项的索引或具体数据（当给选项绑定数据时）。
+### 突发容量、每日配额与删除规则
 
-### 组件配置
+```javascript
+function main() {
+    // 平均每秒 10 次，但最多连续突发 2 次
+    exchange.IO("rate", "GetDepth", "10/2", "1s")
+    // 每天北京时间 08:00 清零，每天最多 2000 次
+    exchange.IO("quota", "GetRecords", 2000, "@0800")
+    // 窗口可以组合单位：每 1 小时 30 分钟最多 100 次
+    exchange.IO("rate", "GetOrders", 100, "1h30m")
 
-策略界面参数的「组件配置」选项用于设置平台上5种参数类型对应的控件，增强功能并简化设计。
+    // 次数传 0：删除 GetOrders 的规则
+    exchange.IO("rate", "GetOrders", 0)
+    // 名字传空字符串：清空本交易所对象上的全部规则
+    exchange.IO("rate", "")
+}
+```
 
-5种界面参数支持的组件类型：
-- 数字型（number）参数
-  支持的组件类型：输入框控件（默认）、时间选择器控件、滑动输入条控件。
-- 布尔型（true/false）参数
-  仅支持开关控件（默认）。
-- 字符串（string）参数
-  支持的组件类型：输入框控件（默认）、文本框控件、时间选择器控件、颜色选择器控件、币种选择器、交易代码选择器。
-- 下拉框（selected）参数
-  支持的组件类型：下拉框控件（默认）、分段控制器控件、币种选择器、交易代码选择器。
-- 加密串（string）参数
-  仅支持加密输入框控件（默认）。
+```python
+def main():
+    # 平均每秒 10 次，但最多连续突发 2 次
+    exchange.IO("rate", "GetDepth", "10/2", "1s")
+    # 每天北京时间 08:00 清零，每天最多 2000 次
+    exchange.IO("quota", "GetRecords", 2000, "@0800")
+    # 窗口可以组合单位：每 1 小时 30 分钟最多 100 次
+    exchange.IO("rate", "GetOrders", 100, "1h30m")
 
-除了设置界面参数对应的控件类型外，还可以设置界面参数的分组和过滤。
-- 分组
-  在组件配置的「分组」输入框中，可以输入一个标签名称，将若干个策略界面参数划分到同一个分组标签中（替代平台旧功能「策略分组」）。
-- 过滤器
-  在组件配置的「过滤器」输入框中，可以输入过滤判定的表达式，控制界面参数是否生效（替代平台旧功能「参数依赖」）。
-  过滤器默认为空，不进行任何参数条件过滤；可以设置：```a > b```、```a == 1```、```a```、```!a```、```a >= 1 && a <= 10```、```a > b```等。当过滤器条件为真时，当前参数可用。
-  - 当某个参数设置了过滤器```a == 1```时，该参数的可用性依赖于参数```a```的取值。当参数```a```等于1时该参数可用，否则该参数不可用。
-  - 当某个参数设置了过滤器```a >= 1 && a <= 10```时，表示过滤条件为：a大于等于1且a小于等于10。符合此条件时参数可用，否则参数不可用。
-  - 当某个参数设置了过滤器```!a```时，表示过滤条件为：非a；a可以是布尔值，也可以是数值（!0表示真值）。
+    # 次数传 0：删除 GetOrders 的规则
+    exchange.IO("rate", "GetOrders", 0)
+    # 名字传空字符串：清空本交易所对象上的全部规则
+    exchange.IO("rate", "")
+```
 
-### 保存参数设置
+```rust
+fn main() {
+    // 平均每秒 10 次，但最多连续突发 2 次
+    let _ = exchange.IO(("rate", "GetDepth", "10/2", "1s"));
+    // 每天北京时间 08:00 清零，每天最多 2000 次
+    let _ = exchange.IO(("quota", "GetRecords", 2000, "@0800"));
+    // 窗口可以组合单位：每 1 小时 30 分钟最多 100 次
+    let _ = exchange.IO(("rate", "GetOrders", 100, "1h30m"));
 
-- 回测系统中的参数保存
-  在回测时，如果希望保存策略参数，可以在修改策略参数后点击「保存回测设置」按钮，具体可参考回测系统的[「保存回测设置」](/user-guide/回测系统/保存回测设置)。
+    // 次数传 0：删除 GetOrders 的规则
+    let _ = exchange.IO(("rate", "GetOrders", 0));
+    // 名字传空字符串：清空本交易所对象上的全部规则
+    let _ = exchange.IO(("rate", ""));
+}
+```
 
-  | 变量 | 描述 | 类型 | 默认值 |
-  | - | - | - | - |
-  |number |数值类型 |数字型(number) |1 |
-  |string |字符串 |字符串(string) |Hello FMZ |
-  |combox |下拉框 |下拉框(selected) |1\|2\|3|
-  |bool |布尔值 |布尔型(true/false) |true |
-  |numberA@isShowA |数值A |数字型(number) |2 |
-  |isShowA |是否显示 numberA 参数 |布尔型(true/false) |false |
+See also: `exchange.IO`, `exchange.Go`, `GetLastError`
 
-  设置后的策略参数会以代码形式保存在策略中，例如：
+### 期权交易
 
-  ```js
-  /*backtest
-  start: 2020-02-29 00:00:00
-  end: 2020-03-29 00:00:00
-  period: 1d
-  args: [["number",2],["string","Hello FMZ.COM"],["combox",2],["bool",false],["numberA@isShowA",666],["isShowA",true]]
-  */
-  ```
+发明者量化交易平台支持在以下加密货币期货交易所交易期权。期权的用法与期货合约相同：用```exchange.SetContractType()```把合约设为期权代码（期权代码就是交易所的原生代码，各交易所写法不同），之后```GetTicker()```、```GetDepth()```等行情函数，```Buy()```、```Sell()```（下单前用```exchange.SetDirection()```设置交易方向）、```CancelOrder()```、```GetPositions()```等交易函数都作用于该期权合约。也可以用完整的交易品种代码直接下单，形如```交易对.期权代码```，例如```BTC_USDT.BTC-260925-145000-C```。
 
-  ```python
-  '''backtest
-  start: 2020-02-29 00:00:00
-  end: 2020-03-29 00:00:00
-  period: 1d
-  args: [["number",2],["string","Hello FMZ.COM"],["combox",2],["bool",false],["numberA@isShowA",666],["isShowA",true]]
-  '''
-  ```
+期权合约的盘口通常较薄：买一、卖一没有挂单时```Ticker```的```Buy```、```Sell```为0，从未成交的合约```Last```也可能为0，各交易所的处理见下文。```exchange.GetMarkets()```是否列出期权合约因交易所而异；不列出时，期权代码需要从交易所的接口或网页获取。
 
-  ```rust
-  /*backtest
-  start: 2020-02-29 00:00:00
-  end: 2020-03-29 00:00:00
-  period: 1d
-  args: [["number",2],["string","Hello FMZ.COM"],["combox",2],["bool",false],["numberA@isShowA",666],["isShowA",true]]
-  */
-  ```
+## Futures_Deribit
 
-  ```cpp
-  /*backtest
-  start: 2020-02-29 00:00:00
-  end: 2020-03-29 00:00:00
-  period: 1d
-  args: [["number",2],["string","Hello FMZ.COM"],["combox",2],["bool",false],["numberA@isShowA",666],["isShowA",true]]
-  */
-  ```
-- 实盘参数导入导出
-  运行实盘时如需保存实盘配置的参数数据，可以在策略实盘页面中点击「参数设置」选项，再点击「导出参数」按钮，导出的策略参数将以```json```文件形式保存。
-  导出的策略参数配置也可以再次导入实盘，点击「导入参数」按钮即可将保存的策略实盘参数导入到当前实盘，导入后点击「更新参数」按钮即可保存生效。
+设置期权合约后即可获取行情、下单、撤单、查询持仓。期权代码例子：```BTC-13SEP24-60000-C```、```XRP_USDC-27SEP24-1-C```，组合合约例子：```BTC-CS-6SEP24-57000_57500```、```BTC-PCAL-20SEP24_13SEP24-55000```。```exchange.GetMarkets()```的结果包含期权合约。
 
-## 交互控件
+可供参考的策略代码：[Deribit期权测试策略](https://www.fmz.com/strategy/179475)
 
-```JavaScript```、```Python```、```Rust```、```C++```、My语言策略均可设计交互控件。策略的交互控件用于在策略实盘运行时向正在运行的策略程序发送交互指令。对于```JavaScript```、```Python```、```Rust```、```C++```语言类型的策略，可在策略代码中使用[```GetCommand()```](https://www.fmz.com/syntax-guide#fun_getcommand)函数获取交互控件产生的消息。
+## Futures_OKX
 
-![交互控件](https://www.fmz.com/upload/asset/2e4320d0cc33c15eb935d.png)
-
-在策略中编写好处理交互控件消息的代码后，实盘运行时使用交互控件即可实现（但不限于）以下功能：
-
-- 手动平掉策略持仓。
-
-- 动态修改策略参数，无需重启策略实盘。
-
-- 切换策略逻辑。
-
-- 触发打印某些调试信息或数据，用于测试特定功能。
-
-### 交互控件种类
-
-| 变量(命名举例) | 描述 | 类型 | 默认值(说明) | 组件配置(说明) | 备注 |
-| - | - | - | - | - | - |
-| cmdNum | 交互控件cmdNum的描述 | 数字型(number) | 默认值选填，可留空 | 用于设置当前交互项绑定的界面控件的组件类型、最小值、最大值、分组等 | 交互控件cmdNum的备注 |
-| cmdBool | 交互控件cmdBool的描述 | 布尔型(true/false) | 默认值必填，开启或关闭 | 同上 | 交互控件cmdBool的备注 |
-| cmdStr | 交互控件cmdStr的描述 | 字符串(string) | 默认值选填，可留空 | 同上 | 交互控件cmdStr的备注 |
-| cmdCombox | 交互控件cmdCombox的描述 | 下拉框(selected) | 默认值选填，可留空 | 同上 | 交互控件cmdCombox的备注 |
-| cmdBtn | 交互控件cmdBtn的描述 | 按钮(button) | 按钮控件不绑定输入项 | 同上 | 交互控件cmdBtn的备注 |
-
-交互控件触发后发送给策略的消息（字符串）：
-- 数字型
-  在交互控件```cmdNum```的输入框中输入交互数据```123```后，点击交互控件cmdNum的按钮。策略程序中的```GetCommand()```函数将收到消息：```cmdNum:123```。
-- 布尔型
-  在交互控件```cmdBool```的开关控件上设置为打开，点击交互控件cmdBool的按钮。策略程序中的```GetCommand()```函数将收到消息：```cmdBool:true```。
-- 字符串
-  在交互控件```cmdStr```的输入框中输入交互数据```abc```后，点击交互控件cmdStr的按钮。策略程序中的```GetCommand()```函数将收到消息：```cmdStr:abc```。
-- 下拉框
-  在交互控件```cmdCombox```的下拉框中选中第二个选项后，点击交互控件cmdCombox的按钮。策略程序中的```GetCommand()```函数将收到消息：```cmdCombox:1```，其中1表示所选选项的索引，第一个选项索引为0，第二个选项索引为1。
-- 按钮
-  点击交互控件```cmdBtn```的按钮。策略程序中的```GetCommand()```函数将收到消息：```cmdBtn```。
-
-交互控件的应用：动态修改策略参数
-例如，策略有一个参数为symbol，在策略界面上添加的策略参数也是全局变量，因此这里使用代码中的全局变量作为演示。
+用法与Deribit相同，交易对设置为```BTC_USD```等，期权代码形如```BTC-USD-200626-4500-C```。从未成交的期权合约，```GetTicker()```的```Last```取标记价格。```exchange.GetMarkets()```不列出期权合约，可以通过OKX的```/api/v5/public/instruments```接口查询期权合约列表，例如查询BTC期权：
 
 ```js
-// 策略参数
-var symbol = "BTC_USDT"
-
 function main() {
-    while (true) {
-        var cmd = GetCommand()
-        if (cmd) {
-            var arr = cmd.split(":")
-            if (arr.length == 2 && arr[0] == "changeSymbol") {
-                // 检测到 changeSymbol 控件触发，就会执行参数更新操作
-                Log("Changed symbol parameter to:", arr[1])
-                symbol = arr[1]
-            }
-        }
+    Log(HttpQuery("https://www.okx.com/api/v5/public/instruments?instType=OPTION&uly=BTC-USD"))
+}
+```
 
-        LogStatus(_D(), ", Current symbol parameter value:", symbol)
+```python
+import json
+import urllib.request
+def main():
+    ret = json.loads(urllib.request.urlopen("https://www.okx.com/api/v5/public/instruments?instType=OPTION&uly=BTC-USD").read().decode('utf-8'))
+    Log(ret)
+```
+
+```rust
+fn main() {
+    let body: String = HttpQuery("https://www.okx.com/api/v5/public/instruments?instType=OPTION&uly=BTC-USD", None);
+    Log!(body);
+}
+```
+
+## Futures_Binance
+
+支持币安欧式期权（USDT结算），交易对设置为```BTC_USDT```等，期权代码形如```BTC-260925-145000-C```（标的-到期日YYMMDD-行权价-C/P）。需要账户已开通期权交易。限制：
+
+- 只支持限价单，不支持市价单、条件单和改单（```exchange.ModifyOrder()```）。
+- 不支持```exchange.SetMarginLevel()```等杠杆、保证金模式设置。
+- 统一账户（组合保证金）不支持期权。
+- ```exchange.GetMarkets()```不列出期权合约。
+
+## Futures_Bybit
+
+支持两种结算的期权：
+
+- USDC结算：交易对设置为```ETH_USDC```等，期权代码形如```ETH-25NOV22-1375-P```。
+- USDT结算：交易对设置为```ETH_USDT```等，期权代码比USDC结算的多一段结算币后缀，形如```ETH-25JUN27-2800-C-USDT```。
+
+```exchange.GetMarkets()```的结果包含两种结算的期权合约。Bybit期权没有K线接口，```GetRecords()```由成交记录合成。
+
+## Futures_Aevo
+
+支持Aevo交易所的USDC期权，交易对设置为```ETH_USDC```等，期权代码形如```ETH-30JUN23-1600-C```。```GetTicker()```的```Last```为标记价格。Aevo没有K线接口，```GetRecords()```由成交记录合成，合约没有成交时为空。```exchange.GetMarkets()```的结果包含期权合约。
+
+## Futures_GateIO
+
+支持Gate交易所的USDT期权，交易对设置为```BTC_USDT```等，期权代码形如```BTC_USDT-20211130-65000-C```。```exchange.GetMarkets()```的结果包含期权合约。账户没有开通期权时，查询订单、持仓会返回交易所的错误。
+
+## Futures_Kraken
+
+支持Kraken期货的期权，交易对设置为```ETH_USD```等，期权代码形如```OF_ETHUSD_261225_4000_C```（```OF_```、标的与计价币、到期日YYMMDD、行权价、C/P），代码中的标的与计价币必须与交易对一致，BTC在代码中写作```XBT```（如```OF_XBTUSD_...```）。
+
+- Kraken没有期权合约列表接口，```exchange.GetMarkets()```不包含期权合约，期权代码需要从Kraken网页获取。
+- ```GetTicker()```的```Last```取标记价格，```Buy```、```Sell```、```High```、```Low```为0，原始数据```Info```中有隐含波动率、希腊值等字段。
+- 行情、K线、订单、持仓、历史订单的查询可用；期权下单与期货合约走同一个下单接口，尚未经过实盘验证。
+- 期权没有资金费率，不支持```exchange.SetMarginLevel()```。
+
+See also: `exchange.SetContractType`, `exchange.SetDirection`, `exchange.GetPositions`
+
+### Web3
+
+在去中心化交易所Uniswap、PancakeSwap上兑换代币，请使用Uniswap交易所对象，见`Uniswap与PancakeSwap`；查询链上数据、调用智能合约、发送自定义交易，请使用Web3交易所对象，它支持以太坊等EVM兼容链和波场。
+
+#### Uniswap与PancakeSwap
+
+Uniswap交易所对象在一条链上连接Uniswap或PancakeSwap的V2、V3资金池，把链上兑换映射为现货交易函数：用```exchange.GetTicker()```看价格、用```exchange.CreateOrder()```下单，不需要自己注册ABI、编码合约调用。选路、询价、代币授权、价格保护、发送交易都由交易所对象完成。
+
+## 什么时候用Uniswap交易所对象，什么时候用Web3
+
+- 在Uniswap、PancakeSwap上**兑换代币**：用Uniswap交易所对象。
+- 调用其它合约、DEX的其它功能（如提供流动性、管理V3头寸）、其它链、自定义交易：用Web3交易所对象，见`以太坊（EVM）`。
+
+一个策略可以同时添加两种交易所对象，使用同一个钱包。
+
+## 配置交易所对象
+
+| 字段 | 说明 |
+| - | - |
+| DEX | ```Uniswap```或```PancakeSwap``` |
+| Chain | ```Ethereum```、```Arbitrum```、```Base```、```BNB Chain```。一个交易所对象只对应一条链上的一个DEX |
+| Private Key | 钱包私钥（十六进制字符串）。支持把私钥本地化部署在托管者上，参看`密钥安全性` |
+| Rpc Address | 该链的节点地址，选择Chain时自动填入公共节点（如以太坊为```https://ethereum-rpc.publicnode.com```）。可以写多个节点，用逗号分隔，互为备用 |
+| Rpc Api Key | 节点鉴权，可以留空。写成```名称: 值```时作为该名称的请求头发送，否则作为```Authorization: Basic <值>```发送 |
+
+第一次调用时会核对节点所在的链与Chain是否一致，不一致时报错，不会把交易发到别的链上。钱包里需要有该链的原生币（ETH或BNB）支付gas。
+
+## 交易对
+
+- 交易对写作```ETH_USDC```、```UNI_USDT```这样的```基础币_计价币```。
+- 代币名按以下顺序解析：内置的常用代币（原生币、包装币、USDC、USDT等）→ 用```exchange.IO("token", 名字, 合约地址)```登记的代币 → 官方代币列表。官方列表中同一条链上有同名代币时，请改用合约地址。
+- 不在代币表中的代币可以直接用合约地址作为交易对的一部分，例如```0x1f9840a85d5af5bf1d1762f925bdaddc4201f984_USDC```。
+- **原生币与包装币是两种资产**：```ETH```与```WETH```、```BNB```与```WBNB```分别是不同的币。交易原生币时路由合约会自动包装、解包。两者之间的转换不能下单，用```exchange.IO("wrap", 数量)```、```exchange.IO("unwrap", 数量)```直接调用包装币合约，1:1兑换，只花gas。
+- ```exchange.GetMarkets()```只列出常用的交易对，没有列出的交易对同样可以交易。
+
+## 标准函数的含义
+
+| 函数 | 行为 |
+| - | - |
+| ```exchange.GetTicker()``` | 买一、卖一是按一定规模实际询价得到的可成交价格（已包含池子手续费）；链上没有24小时统计 |
+| ```exchange.GetDepth()``` | 按逐档递增的规模在链上询价，推算出的价位，不是真实的挂单簿 |
+| ```exchange.GetTrades()``` | 该交易对资金池最近的链上兑换记录 |
+| ```exchange.GetAccount()```、```exchange.GetAssets()``` | 钱包中原生币和代币表中各代币的余额 |
+| ```exchange.CreateOrder()``` | 立即在链上兑换，见下文 |
+| ```exchange.GetOrder()``` | 订单ID就是交易哈希，状态来自交易回执：上链前为未完成，上链后为成交或失败 |
+| ```exchange.GetOrders()``` | 本次运行发出、还没有上链的订单 |
+| ```exchange.CancelOrder()``` | 用同一个nonce发送一笔替换交易，尽力撤销，见下文 |
+
+不支持```exchange.GetRecords()```、```exchange.GetTickers()```、```exchange.GetHistoryOrders()```。
+
+## 下单
+
+DEX没有挂单簿，每笔订单都是一次立即执行的链上兑换：要么整笔成交，要么整笔回滚（只损失gas），不会部分成交、也不会挂在那里等价格。
+
+- **限价单**：限价是**最差成交价**。下单时先询价，按当前价格达不到限价时直接报错，不发交易；达得到时把「最少得到/最多支付」写进链上交易，交易上链前价格变动导致达不到时整笔回滚。
+- **市价单**：按询价结果扣除滑点得到最少得到/最多支付的数量，滑点默认0.5%，用```exchange.IO("slippage", 比例)```修改。
+- **数量**：卖出时是卖出的基础币数量；限价买入时是要买到的基础币数量；**市价买入时是要花费的计价币数量**。
+- 单笔订单可以在方向参数后附加设置，例如```exchange.CreateOrder("ETH_USDC", 'sell;{"slippage":0.01,"route":"v3"}', -1, 0.1)```：```slippage```为本单滑点，```route```限定路径类型（```v2```、```v3```、```hop```两跳、```direct```直连）。
+- 卖出代币（ERC20）前会检查路由合约的授权额度，不够时先发送授权交易并等待上链。默认只授权本次需要的数量，```exchange.IO("approve", "max")```改为无限授权，省去之后的授权交易。
+- 交易超过截止时间（默认120秒，```exchange.IO("deadline", 秒数)```修改）仍未上链时会回滚，避免在价格大幅变化后才成交。
+
+## 撤单
+
+```exchange.CancelOrder()```用原订单的nonce发送一笔转给自己的0金额交易，手续费更高，先上链则原订单失效。这只是尽力撤销：原订单可能在替换交易之前上链并成交；原订单已经上链时撤单直接报错。撤单后用```exchange.GetOrder()```确认最终状态。
+
+## 常用的exchange.IO()指令
+
+| 指令 | 作用 |
+| - | - |
+| ```exchange.IO("slippage", 比例)``` | 市价单滑点，默认```0.005``` |
+| ```exchange.IO("deadline", 秒数)``` | 交易截止时间，默认120秒 |
+| ```exchange.IO("gasMultiplier", 倍数)``` | gas上限 = 节点估算值 × 倍数，默认1.2 |
+| ```exchange.IO("approve", "exact" 或 "max")``` | 授权模式 |
+| ```exchange.IO("token", 名字, 合约地址)``` | 登记代币；不传参数时列出代币表 |
+| ```exchange.IO("route", 交易对, 方向, 数量)``` | 只询价：各候选路径的报价和最优路径，不下单 |
+| ```exchange.IO("simulate", 交易对, 方向, 数量[, 价格])``` | 按下单逻辑构造交易，只在链上模拟执行，不花gas |
+| ```exchange.IO("transfer", 收款地址, 数量[, 代币])``` | 转出原生币或代币，数量可以写```"all"``` |
+| ```exchange.IO("receipt", 交易哈希[, 等待毫秒])``` | 查询转账等交易的回执，可以等待上链 |
+| ```exchange.IO("wrap", 数量)```、```exchange.IO("unwrap", 数量)``` | 原生币与包装币1:1互换 |
+| ```exchange.IO("contracts")``` | 当前DEX在当前链上的合约地址 |
+| ```exchange.IO("base", 节点地址)```、```exchange.IO("sendBase", 节点地址)``` | 切换节点；设置只用于广播交易的节点（私有交易通道） |
+| ```exchange.IO("address")``` | 钱包地址 |
+
+各指令的参数与返回值见语法手册`Uniswap`分类。
+
+## 示例：询价、模拟，然后市价卖出
+
+以以太坊上的```ETH_USDC```为例。注意```CreateOrder```会发出真实交易。
+
+```javascript
+function main() {
+    var symbol = "ETH_USDC"
+    exchange.IO("slippage", 0.003)   // 市价单滑点 0.3%
+
+    var t = exchange.GetTicker(symbol)
+    Log("买一:", t.Buy, "卖一:", t.Sell)
+
+    // 只询价：卖出 0.1 ETH 的最优路径
+    var r = exchange.IO("route", symbol, "sell", 0.1)
+    Log("最优路径:", r.best, "价格:", r.price)
+
+    // 链上模拟一遍，不花 gas
+    if (!exchange.IO("simulate", symbol, "sell", 0.1)) {
+        Log("模拟失败:", GetLastError())
+        return
+    }
+
+    // 市价卖出 0.1 ETH，订单 ID 是交易哈希
+    var id = exchange.CreateOrder(symbol, "sell", -1, 0.1)
+    if (!id) {
+        Log("下单失败:", GetLastError())
+        return
+    }
+    while (true) {
+        var o = exchange.GetOrder(id)
+        if (o && o.Status != ORDER_STATE_PENDING) {
+            Log("状态:", o.Status, "成交数量:", o.DealAmount, "成交均价:", o.AvgPrice)
+            break
+        }
         Sleep(3000)
     }
 }
 ```
 
-设置交互控件：
+See also: `Uniswap`, `exchange.CreateOrder`, `exchange.CancelOrder`
 
-/upload/asset/1741a2b35e569c5e07e3.png
+#### 以太坊（EVM）
 
-### 组件配置
+Web3交易所对象选择```ChainType```为```ETH```时，可以连接以太坊以及所有EVM兼容链（BSC、Base、Arbitrum、Optimism、Polygon等）的节点，用```exchange.IO()```的各个指令查询余额、调用合约、发送交易。本页按一笔链上操作的流程介绍常用指令，每个指令的完整参数见语法手册`Web3`分类中对应的```exchange.IO("指令", ...)```。
 
-策略交互控件的「组件配置」选项用于设置平台上5种交互控件类型对应的控件，增强功能并简化设计。
+只是想在Uniswap、PancakeSwap上兑换代币时，请使用`Uniswap交易所对象`：它直接支持```exchange.GetTicker()```、```exchange.CreateOrder()```等标准函数，不需要自己编码合约调用。
 
-5种交互控件支持的组件类型：
-- 数字型(number)交互控件
-  支持的组件类型：输入框控件（默认）、时间选择器控件、滑动输入条控件。
-- 布尔型(true/false)交互控件
-  仅支持开关控件（默认）。
-- 字符串(string)交互控件
-  支持的组件类型：输入框控件（默认）、文本框控件、时间选择器控件、颜色选择器控件、币种选择器、交易代码选择器。
-- 下拉框(selected)交互控件
-  支持的组件类型：下拉框控件（默认）、分段控制器控件、币种选择器、交易代码选择器。
-- 按钮(button)交互控件
-  仅支持按钮控件（默认），无输入项控件。
+## 1. 配置交易所对象
 
-交互控件与界面参数设置相同，均支持分组功能。在组件配置中可进行分组设置。
-- 分组
-  在组件配置的「分组」输入框中，可以输入标签名称，将多个策略交互控件划分到同一分组标签下（此功能替代平台原有的「交互控件分组」功能）。
+在「交易所」页面（```/m/add-platform```）添加交易所，协议选择「加密货币」，交易所选择```Web3```：
 
-### 状态栏中的交互控件
+| 字段 | 说明 |
+| - | - |
+| ChainType | ```ETH```：以太坊及所有EVM兼容链；```TRON```：波场，见`波场（TRON）` |
+| Private Key | 钱包私钥（十六进制字符串，可以带```0x```前缀）。支持把私钥本地化部署在托管者上，参看`密钥安全性` |
+| Rpc Address | 节点地址，默认```https://ethereum-rpc.publicnode.com```（以太坊主网公共节点）。连接其它链时填写该链的节点，例如BSC：```https://bsc-dataseed.binance.org```。支持```http(s)://```和```ws(s)://```。可以写多个节点，用逗号分隔，互为备用 |
+| Rpc Api Key | 节点鉴权，可以留空。写成```名称: 值```（如```x-api-key: xxx```）时作为该名称的请求头发送；否则作为```Authorization: Basic <值>```发送 |
 
-除了在「策略交互」栏中设计交互控件，还可以在策略状态栏中设计交互控件。目前支持的交互控件类型仅有按钮类型，可以参考[「语法手册」中```LogStatus```函数章节](https://www.fmz.com/syntax-guide#fun_logstatus)。
+多个节点时，从上次成功的节点开始依次尝试：只有节点不可用（连接失败、超时、限流）时才换下一个，合约执行失败之类的错误直接返回；链ID与第一个节点不同的节点会被跳过，避免把交易发到另一条链。
 
-状态栏中的按钮控件可以分为：
-- 普通按钮控件
-  数据结构示例：
-  ```json
-  {"type": "button", "name": "Button 1", "cmd": "button1", "description": "This is the first button"}
-  ```
-- 带单个输入数据的按钮控件
-  使用```input```属性设置输入控件选项，数据结构示例：
-  ```json
-  {"type": "button", "name": "Button 2", "cmd": "button2", "description": "This is the second button", "input": {"name": "Open Quantity", "type": "number", "defValue": 1}}
-  ```
+运行中可以用```exchange.IO("base", 节点地址)```切换节点（多个节点可以传数组或逗号分隔的字符串），用```exchange.IO("key", 私钥)```切换钱包私钥，用`exchange.IO("address")`获取当前钱包地址。
 
-  ```json
-  {
-      "type": "button",
-      "cmd": "test1",
-      "name": "test1",
-      "input": {
-          "type": "selected",
-          "name": "selected",
-          "label": "Dropdown",
-          "description": "description",
-          "default": 100,
-          "settings": {
-              "multiple": true,
-              "customizable": true,
-              "options":[{"name": "A", "value": 100}, {"name": "B", "value": 200}]
-          }
-      },
-  }
-  ```
-- 带一组输入数据的按钮控件
-  使用```group```属性设置一组输入控件的选项，数据结构示例：
-  ```json
-  {
-      "type": "button",
-      "cmd": "open",
-      "name": "Open",
-      "group": [
-          {"name": "orderType", "description": "下单方式|order type", "type": "selected", "defValue": "市价单|挂单"},
-          {"name": "tradePrice@orderType==1", "description": "交易价格|trade price", "type": "number", "defValue": 100},
-          {"name": "orderAmount", "description": "委托数量|order amount", "type": "string", "defValue": 100},
-          {"name": "boolean", "description": "是/否|boolean", "type": "boolean", "defValue": true}
-      ]
-  }
-  ```
+标准函数中只有```exchange.GetAccount()```、```exchange.GetAssets()```可用，返回钱包的原生币余额（币种按链ID识别，如BSC为```BNB```）。
 
-  ```json
-  {
-      "type": "button",
-      "cmd": "test2",
-      "name": "test2",
-      "group": [{
-          "type": "selected",
-          "name": "selected",
-          "label": "Dropdown",
-          "description": "description",
-          "default": 200,
-          "group": "group1",
-          "settings": {
-              "multiple": true,
-              "options":[{"name": "A", "value": 100}, {"name": "B", "value": 200}]
-          }
-      }, {
-          "type": "string",
-          "name": "string",
-          "label": "Input Box",
-          "description": "description",
-          "default": "ABC",
-          "group": "group1"
-      }],
-  }
-  ```
+## 2. 查询余额与读取合约
 
-将这些按钮控件的JSON数据编码为JSON字符串，然后使用``` ` ```字符包裹，在状态栏中输出。以JavaScript语言为例：
+调用合约的只读方法（```view```/```pure```）不消耗gas，直接返回解码后的结果：
 
 ```js
-function main() {
-    var btn = {"type": "button", "name": "Button 1", "cmd": "button1", "description": "This is the first button"}
-    LogStatus("`" + JSON.stringify(btn) + "`")
-}
+exchange.IO("api", "eth", "eth_getBalance", wallet, "latest")   // 原生币余额，链上整数（十六进制字符串）
+exchange.IO("api", tokenAddress, "balanceOf", wallet)           // ERC20余额，链上整数
+exchange.IO("api", tokenAddress, "decimals")                    // 代币精度
 ```
 
-这些按钮控件也可以写入状态栏表格中，详细示例请参阅[语法手册](https://www.fmz.com/syntax-guide#fun_logstatus)。
+- ```exchange.IO("api", "eth", 方法, ...参数)```直接调用节点的JSON-RPC方法，如```eth_gasPrice```、```eth_blockNumber```、```eth_getTransactionReceipt```。
+- ```exchange.IO("api", 合约地址, 方法, ...参数)```调用合约方法。方法可以写方法名、完整签名（如```"approve(address,uint256)"```，用于区分重载）或方法选择器（如```"0x095ea7b3"```）。
+- 链上数量都是整数。用```exchange.IO("fromUnits", 链上整数, 精度)```换算成可读数量，用```exchange.IO("toUnits", "1.5", 精度)```换算回链上整数；精度也可以直接传代币合约地址。两者都按字符串精确计算。
+- 批量读取多个合约时用```exchange.IO("multicall", ...)```一次请求完成；查询事件日志用```exchange.IO("logs", ...)```。
 
-```input```字段结构与```group```字段中单个控件结构一致，以下为详细说明：
+## 3. 注册ABI
 
-```desc
-{
-    "type": "selected",     // 控件类型（必填字段），支持设置为：number、string、selected、boolean
-    "name": "test",         // 名称（在group中使用时为必填字段）
-    "label": "topic",       // 标题（必填字段）
-    "description": "desc",  // 组件的提示信息
-    "default": 1,           // 默认值；当前JSON结构中如果不设置settings字段，兼容defValue，可以用defValue代替default
-    "filter": "a>1",        // 选择器，不设置该字段表示不过滤（显示控件）；设置该字段时，当表达式为真时不过滤（显示控件），当表达式为假时过滤（不显示控件）
-                            // 对于选择器，以当前示例中表达式a>1为例，a指的是type=button结构中group字段下name为a的控件值，根据此数值判断是否过滤
-    "group": "group1",      // 分组
-    "settings": { ... },    // 组件配置
-}
-```
+标准ERC20方法（```balanceOf```、```decimals```、```allowance```、```approve```、```transfer```等）已内置，不需要注册。调用其它合约的方法前，需要用```exchange.IO("abi", 合约地址, ABI)```注册该合约的ABI。
 
-组件配置```settings```各字段详细说明：
-- ```settings.required```：是否必填。
-- ```settings.disabled```：是否禁用。
-- ```settings.min```：```type=number```时有效，表示最小值或字符串最小长度。
-- ```settings.max```：```type=number```时有效，表示最大值或字符串最大长度。
-- ```settings.step```：```type=number```且```render=slider```时有效，表示步长。
-- ```settings.multiple```：```type=selected```时有效，表示支持多选。
-- ```settings.customizable```：```type=selected```时有效，表示支持自定义；用户可以直接在下拉框控件中编辑添加新选项，如果选中新编辑的选项，触发交互时将使用该选项的名称而非选项代表的值。
-- ```settings.options```：```type=selected```时有效，表示选择器的选项数据格式：```["Option 1", "Option 2"]```、```[{'name':'xxx','value':0}, {'name':'xxx','value':1}]```。
-- ```settings.render```：渲染组件类型。
-  ```type=number```时，```settings.render```不设置（默认为数字输入框），可选：```slider```（滑动条）、```date```（时间选择器，返回时间戳）。
-  ```type=string```时，```settings.render```不设置（默认为单行输入框），可选：```textarea```（多行输入）、```date```（时间选择器，返回yyyy-MM-dd hh:mm:ss）、```color```（颜色选择器，返回#FF00FF）。
-  ```type=selected```时，```settings.render```不设置（默认为下拉框），可选：```segment```（分段选择器）。
-  ```type=boolean```时，目前仅有默认复选框。
+常用合约可以直接使用内置模板，第三个参数传模板名：```"weth"```、```"uniswapV3Pool"```、```"uniswapV3Factory"```、```"uniswapV3QuoterV2"```、```"uniswapV3SwapRouter02"```、```"uniswapV3PositionManager"```、```"permit2"```（PancakeSwap V3使用相同的模板，也可以写```"pancakeV3Pool"```等别名）。常用合约的地址可以用```exchange.IO("contracts")```查询。
 
-支持双语设置，例如：```'选项｜options'```文本内容会根据当前语言环境自动适配；以```group```字段中单个控件为例，完整示例：
-
-```json
-{
-    type:'selected',
-    name:'test',
-    label:'选项｜options',
-    description:'描述｜description',
-    default:0,                            // 此处default默认值设置为0，表示{name:'xxx|yyy',value:0}选项中的value值
-    filter:'a>1&&a<10',
-    group:'分组|group',
-    settings:{
-        multiple:true,
-        customizable:true,
-        options:[{name:'xxx|yyy',value:0}]
-    }
-}
-```
-
-## 期权交易
-
-发明者量化交易平台支持加密货币期权交易。
-
-### 加密货币期权
-
-使用```exchange.SetContractType()```函数设置期权合约，不同交易所的期权合约代码格式各不相同。发明者量化交易平台支持的加密货币期权交易所如下：
-
-- Futures_Deribit
-  对于```Deribit```交易所，只需调用```exchange.SetContractType()```函数将合约设置为期权合约即可。设置期权合约后，调用```GetTicker()```等行情接口时，获取的均为该期权合约的行情数据。
-  下单使用```exchange.Sell()```、```exchange.Buy()```函数，下单时需注意交易方向，可使用```exchange.SetDirection()```函数设置交易方向。
-  撤单使用```exchange.CancelOrder()```函数，查询持仓使用```exchange.GetPositions()```函数。
-
-  可供参考的策略代码：[Deribit期权测试策略](https://www.fmz.com/strategy/179475)
-  期权合约代码示例：```BTC-13SEP24-60000-C```、```XRP_USDC-27SEP24-1-C```、```BTC-CS-6SEP24-57000_57500```、```BTC-PCAL-20SEP24_13SEP24-55000```等。
-- Futures_OKX
-  设置合约、下单、撤单、查询订单、获取行情等操作与```Deribit```相同，合约代码形式为```BTC-USD-200626-4500-C```。
-  可通过```https://www.okx.com/api/v5/public/instruments```接口查询合约相关信息。
-
-  例如，查询BTC期权合约的信息：
-  ```js
-  function main() {
-      Log(HttpQuery("https://www.okx.com/api/v5/public/instruments?instType=OPTION&uly=BTC-USD"))
-  }
-  ```
-
-  ```python
-  import json
-  import urllib.request
-  def main():
-      ret = json.loads(urllib.request.urlopen("https://www.okx.com/api/v5/public/instruments?instType=OPTION&uly=BTC-USD").read().decode('utf-8'))
-      Log(ret)
-  ```
-
-  ```rust
-  fn main() {
-      let body: String = HttpQuery("https://www.okx.com/api/v5/public/instruments?instType=OPTION&uly=BTC-USD", None);
-      Log!(body);
-  }
-  ```
-
-  ```cpp
-  void main() {
-      Log(HttpQuery("https://www.okx.com/api/v5/public/instruments?instType=OPTION&uly=BTC-USD"));
-  }
-  ```
-- Futures_HuobiDM
-  火币期权合约代码示例：```BTC-USDT-201225-P-13000```，其中合约标的为```BTC```，行权日为2020年12月25日，期权类型为看跌期权（PUT），行权价格为13000美元。
-  看涨期权：买方支付的权利金为USDT，使用账户资产中的USDT；卖方保证金为币，使用账户资产中的币作为担保。
-  看跌期权：买方支付的权利金为USDT，使用账户资产中的USDT；卖方保证金为USDT，使用账户资产中的USDT作为担保。
-- Futures_Bybit
-  支持Bybit交易所的USDC期权，交易对设置为```ETH_USDC```，调用```exchange.SetContractType()```函数将合约设置为期权合约即可。
-  期权合约代码示例：```ETH-25NOV22-1375-P```。
-- Futures_Aevo
-  支持Aevo交易所的USDC期权，期权合约代码示例：```ETH-30JUN23-1600-C```。
-- Futures_GateIO
-  支持GATE.IO交易所的USDT期权，期权合约代码示例：```BTC_USDT-20211130-65000-C```
-
-## Rust策略编写说明
-
-1、使用```Rust```编写策略与使用```JavaScript```编写策略的区别，主要在于平台API函数返回数据形式的不同，例如```exchange.GetTicker()```函数：
-- JavaScript
-  ```exchange.GetTicker()```调用成功时返回一个对象；若调用失败（如交易所服务器问题、网络问题等）则返回```null```。
-
-  ```js
-  function main() {
-      var ticker = exchange.GetTicker()
-      // 判断exchange.GetTicker函数是否调用失败（返回null）
-      if (ticker) {
-          Log(ticker)
-      }
-  }
-  ```
-- Rust
-  可能失败的API调用统一返回```Result<T>```类型，可采用Rust惯用的方式处理错误：
-
-  ```rust
-  fn main() {
-      // 方式一：模式匹配，判断exchange.GetTicker函数是否调用成功
-      if let Ok(ticker) = exchange.GetTicker(None) {
-          Log!(ticker);
-      }
-
-      // 方式二：使用_C!宏自动重试，直到调用成功返回
-      let ticker = _C!(exchange.GetTicker(None));
-      Log!(ticker);
-  }
-  ```
-  可选参数（例如```GetTicker```的```symbol```参数）在不传时使用```None```占位，需要传值时直接传入，例如```exchange.GetTicker("BTC_USDT")```。
-
-2、策略入口与生命周期：Rust策略的入口为```fn main()```（与标准Rust程序的入口同名，但由平台调用，且无返回值）。与JavaScript一样，可以选择性地定义```fn init()```（策略开始运行时首先自动执行）和```fn onexit()```（策略退出时执行扫尾工作），引导层会自动调用；此外，也可以在策略代码中调用```OnExit()```注册额外的退出钩子：
-
-```rust
-fn main() {
-    // 策略逻辑...
-}
-
-fn init() {
-    Log!("初始化");
-}
-
-fn onexit() {
-    Log!("策略退出，执行扫尾处理");
-}
-```
-
-3、日志与全局功能以宏的形式提供：```Log!()```、```LogStatus!()```、```Panic!()```、```_G!()```、```_C!()```等为Rust宏（注意末尾的感叹号）；而```LogProfit()```、```Sleep()```、```_D()```、```_N()```、```HttpQuery()```等则为普通函数。
-
-4、策略参数注入为全局常量：界面上配置的策略参数按其值类型注入策略代码（number对应```f64```、boolean对应```bool```、string/密码对应```&str```、下拉框按其选项值类型），可直接以参数名引用。若需用作整数，请自行转换，例如```let n = Period as usize;```。完整的参数集可通过```params()```函数获取JSON文本后自行解析。
-
-5、JSON数据处理：平台API返回的原始JSON文本（例如```exchange.IO()```的返回值、各结构体的```Info```字段）可使用内置的```JSONParse()```函数解析为```JsonValue```，并以```v["key"]```、```v[0]```的形式进行索引导航，再通过```as_f64()```、```as_str()```、```as_bool()```等方法获取标量值。由于SDK未内置JSON序列化功能，构造JSON文本时可使用```format!```宏拼接，或引入第三方crate（如```serde_json```）。
-
-6、第三方crate与TLS注意事项：策略源码是唯一的代码文件，需在源码最顶部用```---```包裹的```[dependencies]``` frontmatter中声明依赖（详见「编程语言 - Rust」一节）。由于编译沙盒中没有系统OpenSSL，对于需要TLS的crate，请选择纯Rust实现的```rustls```，避免依赖```native-tls```/```openssl-sys```；WebSocket连接则优先使用内置的```Dial()```函数。
-
-## C++策略编写说明
-
-1、使用```C++```编写策略与```JavaScript```编写策略的主要区别在于发明者量化交易平台的API函数返回数据的差异，例如```exchange.GetTicker()```函数：
-- JavaScript
-  ```exchange.GetTicker()```调用成功时返回一个对象，如果调用失败（如交易所服务器问题、网络问题等）返回```null```。
-
-  ```js
-  function main() {
-      var ticker = exchange.GetTicker()
-      // 判断exchange.GetTicker函数是否调用失败，返回null
-      if (ticker){
-          Log(ticker)
-      }
-  }
-  ```
-- C++
-  ```exchange.GetTicker()```调用成功时返回一个对象，调用失败时返回的仍然是一个对象。成功调用与失败调用返回的对象通过```Valid```属性来区分。
-
-  ```cpp
-  void main() {
-      auto ticker = exchange.GetTicker();
-      // 判断exchange.GetTicker()函数是否调用失败，检查返回对象中Valid属性是否为false
-      if (ticker.Valid) {
-          Log(ticker);
-      }
-  }
-  ```
-2、```C++```策略中的```main()```函数与标准C11中```main()```函数的区别：
-C11中的C++程序入口函数```main()```返回值为```int```类型，而在FMZ量化的C++策略中，策略的启动函数也是```main()```函数。但这两者并非同一个函数，仅是同名而已。FMZ量化的C++策略中```main()```函数的返回值为```void```类型。
-
-```cpp
-void main() {
-    // 使用Test函数测试
-    if (!Test("c++")) {
-        // 抛出异常，终止程序运行
-        Panic("请下载最新版本托管者");
-    }
-
-    // 所有返回的对象使用Valid属性判断是否有效
-    LogProfitReset();
-    LogReset();
-    Log(_N(9.12345, 2));
-    Log("use _C", _C(exchange.GetTicker), _C(exchange.GetAccount));
-}
-```
-
-## JavaScript策略编写说明
-
-由于```JavaScript```语言自身的特性（JavaScript语言内置字符串仅支持ASCII与UTF-16编码，为避免数据丢失），当遇到无法编码的字符串时会返回```ArrayBuffer```类型。FMZ量化平台的所有API接口中，可以传入字符串参数的地方均支持传入```ArrayBuffer```类型。
-
-以下示例详细说明了这一特性：
 ```js
-function stringToHex(str) {
-    let hex = '';
-    for (let i = 0; i < str.length; i++) {
-        const charCode = str.charCodeAt(i).toString(16);
-        hex += charCode.length === 1 ? '0' + charCode : charCode;
-    }
-    return hex;
-}
-
-function main() {
-    const inputString = "abc𠮷123";  // 此"𠮷"字符的Unicode码点超出了16位范围
-    // const inputString = "abcG123"; // 如果使用abcG123字符串测试，则变量outputD不会被赋值为ArrayBuffer
-
-    // 使用Encode函数将inputString编码为十六进制编码
-    const encodedHex = Encode("raw", "string", "hex", inputString);
-    Log(encodedHex);  // 内容为：61 62 63 f0a0aeb7 31 32 33
-
-    // 使用自定义的stringToHex函数编码，由于无法处理"𠮷"字符，导致十六进制编码错误
-    const manuallyEncodedHex = stringToHex(inputString);
-    Log(manuallyEncodedHex);  // 内容为：61 62 63 d842dfb7 31 32 33
-
-    // 成功从十六进制编码还原为字符串（变量inputString）
-    const decodedString = Encode("raw", "hex", "string", encodedHex);
-    Log(decodedString);
-
-    // 无法解码，返回ArrayBuffer，即变量outputD为ArrayBuffer类型
-    const outputD = Encode("raw", "hex", "string", manuallyEncodedHex);
-    Log(outputD);
-
-    // 验证返回的ArrayBuffer类型变量outputD
-    const bufferD = new Uint8Array(outputD);
-    let hexBufferD = '';
-    for (let i = 0; i < bufferD.length; i++) {
-        hexBufferD += bufferD[i].toString(16).padStart(2, '0');
-    }
-    Log(hexBufferD);    // 61 62 63 d842dfb7 31 32 33
-}
+exchange.IO("abi", poolAddress, "uniswapV3Pool")
+var slot0 = exchange.IO("api", poolAddress, "slot0")
 ```
 
-## Web3
-
-发明者量化交易平台支持```Web3```相关功能，可轻松接入加密货币市场的```DeFi```交易所。
-
-### 以太坊
-
-在发明者量化交易平台，通过```exchange.IO()```函数编写策略代码，实现以太坊链上RPC方法调用和智能合约交互。
-
-#### Web3交易所对象配置
-
-需要在发明者量化交易平台上配置接入节点。接入节点可以是自建节点或使用第三方服务，例如：```infura```。在发明者量化交易平台的[「交易所」](https://www.fmz.com/m/add-platform)页面，选择协议：**加密货币**，然后选择交易所为```Web3```。
-
-配置```Rpc Address```（接入节点的服务地址）和```Private Key```（私钥）。支持私钥本地化部署，详情请参考[「密钥安全性」](/user-guide/密钥安全性)。
-
-#### 注册ABI
-
-调用合约时，如果使用标准的```ERC20```方法，则无需注册即可直接调用。调用标准合约以外的方法需要先注册ABI内容：```exchange.IO("abi", tokenAddress, abiContent)```。
-
-获取合约的ABI内容可以通过以下URL获取，仅需提取```result```字段。
+其它合约的ABI可以从区块浏览器获取，例如Etherscan的V2接口（需要Etherscan的API Key，```chainid```为链ID，取返回结果中的```result```字段）：
 
 ```url
-https://api.etherscan.io/api?module=contract&action=getabi&address=0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45
+https://api.etherscan.io/v2/api?chainid=1&module=contract&action=getabi&address=0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45&apikey=YourApiKey
 ```
 
-#### 调用以太坊RPC方法
+## 4. 发送交易
 
-使用```exchange.IO()```函数调用以太坊RPC方法。
-- 查询钱包中ETH余额
-  ```
-  exchange.IO("api", "eth", "eth_getBalance", owner, "latest")   // owner为具体的钱包地址
-  ```
-- ETH转账
-  ```
-  exchange.IO("api", "eth", "send", toAddress, toAmount)   // toAddress为接收ETH的钱包地址，toAmount为转账数量
-  ```
-- 查询Gas价格
-  ```
-  exchange.IO("api", "eth", "eth_gasPrice")
-  ```
-- 查询预估Gas费用
-  ```
-  exchange.IO("api", "eth", "eth_estimateGas", data)
-  ```
+调用合约的写方法时，交易所对象用配置的私钥签名并广播交易，返回交易哈希。发送前可以把```"api"```换成```"call"```，用```exchange.IO("call", ...)```预演同一笔调用：在节点上模拟执行，不签名、不消耗gas，执行失败时返回空值，```GetLastError()```中有合约给出的失败原因。
 
-#### 支持encode
+以授权（approve）为例：
 
-```exchange.IO()```函数封装了```encode```方法，可以将函数调用编码为```hex```字符串格式并返回。具体用法可以参考平台公开的[「Uniswap V3 交易类库」模板](https://www.fmz.com/strategy/397260)。
-
-以下以编码```unwrapWETH9```方法的调用为例：
 ```js
-function main() {
-    // ContractV3SwapRouterV2 主网地址 : 0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45
-    // 调用unwrapWETH9方法前需要先注册ABI，此处省略注册步骤
-    // "owner"代表钱包地址，需要填写实际地址；1代表解包装数量，即把1个WETH解包装为ETH
-    var data = exchange.IO("encode", "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45", "unwrapWETH9(uint256,address)", 1, "owner")
-    Log(data)
-}
+var amount = exchange.IO("toUnits", "100", tokenAddress)                 // 100个代币换算成链上整数
+var txHash = exchange.IO("api", tokenAddress, "approve", spender, amount)
 ```
 
-调用```exchange.IO("encode", ...)```函数时，如果第二个参数（字符串类型）以```0x```开头，表示对智能合约的方法调用进行编码（encode）。
-如果第二个参数不以```0x```开头，则表示按指定的类型顺序对数据进行编码，功能等同于```solidity```中的```abi.encode```，可参考以下例子。
+方法的```stateMutability```为```payable```时，方法参数之前要多传一个参数：附带的原生币数量（链上整数）。最后一个参数可以传选项对象：
 
-```js
+| 选项 | 说明 |
+| - | - |
+| gasLimit | gas上限。不传时由节点估算（```eth_estimateGas```）。合约调用不要写```21000```，那只够普通转账 |
+| gasPrice | 固定gas价格，传入时发送传统（legacy）交易。不传时，支持EIP-1559的链发送EIP-1559交易：小费取节点建议值与最近区块实际小费的较大者，最高费用为```2 × baseFee + 小费``` |
+| nonce | 指定nonce。不传时自动分配，并与链上待处理计数同步，连续发送不会重复使用nonce |
+| dryRun | 设为```true```时只签名不广播，返回```hash```、```raw```（签名后的交易）、```nonce```、```gasLimit```等字段，可用于检查交易或交给其它渠道发送 |
+
+转出原生币使用```exchange.IO("api", "eth", "send", 收款地址, 数量)```，数量是链上整数（wei）。它的选项还支持```data```（十六进制调用数据），用于原样发送聚合器等API返回的交易```{to, data, value}```，此时gas按合约调用估算。注意：普通转账不传```gasPrice```时按固定的100 Gwei出价、gas上限为21000，在以太坊主网上通常偏高，建议先用```eth_gasPrice```查询后传入。
+
+需要把交易发到私有交易通道（如Flashbots Protect、MEV Blocker）避免被抢跑时，用```exchange.IO("sendBase", 节点地址)```设置只用于广播交易的节点。
+
+## 5. 等待交易上链
+
+```exchange.IO("waitReceipt", 交易哈希, {timeout, confirmations})```等待交易上链并达到确认数，返回交易回执：```status```为```1```表示成功、```0```表示失败（```revertReason```为失败原因），```events```为按已注册ABI解码的事件。超时未上链时返回空值。
+
+## 6. nonce管理、加速与取消
+
+- ```exchange.IO("nonce")```查看链上与本地的nonce计数；```exchange.IO("nonce", "sync")```按链上重新同步（在别处用同一个钱包发过交易后使用）。
+- 交易长时间未上链时，用```exchange.IO("speedUp", 交易哈希)```以同一个nonce、更高的手续费重发；用```exchange.IO("cancelTx", 交易哈希)```发送一笔同nonce、转给自己的0金额交易顶替原交易。两者都在原交易上链前才有效。
+- 本地nonce记录只在当前实盘内有效：多个实盘共用一个钱包时彼此看不到对方的记录，仍可能冲突，建议每个实盘使用独立的钱包。
+
+## 其它指令
+
+- 编码与解码：```exchange.IO("encode", ...)```编码合约调用数据或按类型编码（同Solidity的```abi.encode```），```exchange.IO("encodePacked", ...)```紧凑编码（如Uniswap V3的兑换路径），```exchange.IO("decode", ...)```按类型解码。
+- 签名：```exchange.IO("sign", ...)```对32字节哈希签名，```exchange.IO("signTypedData", ...)```对EIP-712结构化数据签名（如ERC-20 Permit），```exchange.IO("signMessage", ...)```对消息做EIP-191签名。
+- Uniswap V3数学：```exchange.IO("uniswapV3", ...)```在tick、价格、sqrtPrice之间换算，在流动性与代币数量之间换算。
+- 哈希：```exchange.IO("hash", "keccak256", "raw", "hex", 文本)```计算keccak256等摘要，可用于计算方法选择器、EIP-712摘要，参数与```Encode()```函数相同。
+- 完整范例：通过聚合器兑换（询价、生成交易、用```exchange.IO("call", ...)```预演、带```data```发送）见手册中```exchange.IO("call", ...)```的范例；ERC-20 Permit签名并由合约验签见```exchange.IO("sign", ...)```、```exchange.IO("signTypedData", ...)```的范例。
+
+## 示例：查余额、授权并等待上链
+
+以以太坊主网的USDC为例。注意这段代码会发出真实交易、消耗gas。
+
+```javascript
 function main() {
-    var x = 10
-    var address = "0x02a5fBb259d20A3Ad2Fdf9CCADeF86F6C1c1Ccc9"
-    var str = "Hello World"
-    var array = [1, 2, 3]
-    var ret = exchange.IO("encode", "uint256,address,string,uint256[]", x, address, str, array)   // uint 即 uint256 , FMZ上需要明确指定类型长度
-    Log("ret:", ret)
-    /*
-    000000000000000000000000000000000000000000000000000000000000000a    // x
-    00000000000000000000000002a5fbb259d20a3ad2fdf9ccadef86f6c1c1ccc9    // address
-    0000000000000000000000000000000000000000000000000000000000000080    // str 的偏移量
-    00000000000000000000000000000000000000000000000000000000000000c0    // array 的偏移量
-    000000000000000000000000000000000000000000000000000000000000000b    // str 的长度
-    48656c6c6f20576f726c64000000000000000000000000000000000000000000    // str 的数据
-    0000000000000000000000000000000000000000000000000000000000000003    // array 的长度
-    0000000000000000000000000000000000000000000000000000000000000001    // array 的第一个元素
-    0000000000000000000000000000000000000000000000000000000000000002    // array 的第二个元素
-    0000000000000000000000000000000000000000000000000000000000000003    // array 的第三个元素
-    */
-}
-```
+    var usdc = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"     // 以太坊主网 USDC
+    var spender = "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45"  // 被授权的合约，这里以 Uniswap SwapRouter02 为例
+    var wallet = exchange.IO("address")
 
-支持对元组（tuple）或者包含元组的类型顺序进行编码：
-```js
-function main() {
-    var types = "(uint256,uint8,address),bytes"
-    var ret = exchange.IO("encode", types, [30, 20, "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"], "0011")
-    Log("encode: ", ret)
-}
-```
+    // 查余额：标准 ERC20 方法不需要注册 ABI
+    var eth = exchange.IO("fromUnits", exchange.IO("api", "eth", "eth_getBalance", wallet, "latest"), 18)
+    var usdcBalance = exchange.IO("fromUnits", exchange.IO("api", usdc, "balanceOf", wallet), usdc)
+    Log("ETH:", eth, "USDC:", usdcBalance)
 
-该类型顺序由```tuple```和```bytes```组成，因此调用```exchange.IO()```函数进行```encode```时，需要继续传入两个参数：
-- 对应tuple类型的变量：
-  ```json
-  [30, 20, "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"]
-  ```
-  元组的值以数组形式按位置传入，元素的个数、顺序和类型必须与```types```参数中的```(uint256,uint8,address)```一致。字面量元组没有字段名，解码时各字段按位置依次命名为```Field1```、```Field2```……
-- 对应bytes类型的变量：
-  ```string
-  "0011"
-  ```
+    // 读合约：当前授权额度
+    var allowance = exchange.IO("api", usdc, "allowance", wallet, spender)
+    Log("当前授权:", exchange.IO("fromUnits", allowance, usdc))
 
-支持对数组或者包含数组的类型顺序进行编码：
-```js
-function main() {
-    var path = ["0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2", "0xdac17f958d2ee523a2206206994597c13d831ec7"]   // ETH address, USDT address
-    var ret = exchange.IO("encode", "address[]", path)
-    Log("encode: ", ret)
-}
-```
-
-#### 支持encodePacked
-
-例如在```Uniswap V3```这个去中心化交易所的方法调用时，需要传入兑换路径等参数，就需要使用```encodePacked```操作：
-```js
-function main() {
-    var fee = exchange.IO("encodePacked", "uint24", 3000)
-    var tokenInAddress = "0x111111111117dC0aa78b770fA6A738034120C302"
-    var tokenOutAddress = "0x6b175474e89094c44da98b954eedeac495271d0f"
-    var path = tokenInAddress.slice(2).toLowerCase()
-    path += fee + tokenOutAddress.slice(2).toLowerCase()
-    Log("path:", path)
-}
-```
-
-#### 支持decode
-
-数据处理不仅支持编码（encode），还支持解码（decode）。可使用```exchange.IO("decode", types, rawData)```函数执行```decode```操作。
-```js
-function main() {
-    // register SwapRouter02 abi
-    var walletAddress = "0x398a93ca23CBdd2642a07445bCD2b8435e0a373f"
-    var routerAddress = "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45"
-    var abi = `[{"inputs":[{"components":[{"internalType":"bytes","name":"path","type":"bytes"},{"internalType":"address","name":"recipient","type":"address"},{"internalType":"uint256","name":"amountOut","type":"uint256"},{"internalType":"uint256","name":"amountInMaximum","type":"uint256"}],"internalType":"struct IV3SwapRouter.ExactOutputParams","name":"params","type":"tuple"}],"name":"exactOutput","outputs":[{"internalType":"uint256","name":"amountIn","type":"uint256"}],"stateMutability":"payable","type":"function"}]`
-    exchange.IO("abi", routerAddress, abi)   // 此处abi仅包含exactOutput方法的部分内容，完整的abi可自行在网上查询
-
-    // encode path
-    var fee = exchange.IO("encodePacked", "uint24", 3000)
-    var tokenInAddress = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
-    var tokenOutAddress = "0xdac17f958d2ee523a2206206994597c13d831ec7"
-    var path = tokenInAddress.slice(2).toLowerCase()
-    path += fee + tokenOutAddress.slice(2).toLowerCase()
-    Log("path:", path)
-
-    var dataTuple = {
-        "path" : path,
-        "recipient" : walletAddress,
-        "amountOut" : 1000,
-        "amountInMaximum" : 1,
+    // 授权 100 USDC：先预演，再发送
+    var amount = exchange.IO("toUnits", "100", usdc)
+    if (!exchange.IO("call", usdc, "approve", spender, amount)) {
+        Log("预演失败:", GetLastError())
+        return
     }
-    // encode SwapRouter02 exactOutput
-    var rawData = exchange.IO("encode", routerAddress, "exactOutput", dataTuple)
-    Log("method hash:", rawData.slice(0, 8))   // 09b81346
-    Log("params hash:", rawData.slice(8))
+    var txHash = exchange.IO("api", usdc, "approve", spender, amount)
+    Log("交易哈希:", txHash)
 
-    // decode exactOutput params
-    var decodeRaw = exchange.IO("decode", "(bytes,address,uint256,uint256)", rawData.slice(8))
-    Log("decodeRaw:", decodeRaw)
+    // 等待上链，最多 3 分钟
+    var receipt = exchange.IO("waitReceipt", txHash, {timeout: 180000})
+    if (receipt && receipt.status == 1) {
+        Log("授权成功，区块:", receipt.blockNumber)
+    } else if (receipt) {
+        Log("交易失败:", receipt.revertReason)
+    } else {
+        // 未上链：可以用 speedUp 加价重发，或 cancelTx 取消
+        Log("超时未上链:", GetLastError())
+    }
 }
 ```
 
-该示例首先对```path```参数进行```encodePacked```编码，因为后续需要编码的```exactOutput```方法调用要以```path```作为参数。随后对路由合约的```exactOutput```方法进行```encode```编码，该方法只有一个参数，其类型为```tuple```。
-方法名```exactOutput```编码后为```0x09b81346```。使用```exchange.IO("decode", ...)```方法按```(bytes,address,uint256,uint256)```类型解码得到```decodeRaw```，其字段按位置依次编号为```Field1```～```Field4```，各字段的值与变量```dataTuple```中的内容依次对应。
+See also: `Web3`, `exchange.IO`
 
-#### 支持切换私钥
+#### 波场（TRON）
 
-支持切换私钥，可以操作多个钱包地址，例如：
+Web3交易所对象选择```ChainType```为```TRON```时连接波场节点。用法与`以太坊（EVM）`基本一致：注册ABI、调用合约、编码解码、签名、切换私钥等```exchange.IO()```指令相同，地址使用波场格式（```T```开头），TRX数量的单位是sun（1 TRX = 1000000 sun）。本页说明配置和波场特有的部分。
+
+## 配置交易所对象
+
+| 字段 | 说明 |
+| - | - |
+| ChainType | 选择```TRON``` |
+| Private Key | 钱包私钥（十六进制字符串）。支持把私钥本地化部署在托管者上，参看`密钥安全性` |
+| Rpc Address | 波场全节点的HTTP地址，例如官方节点```https://api.trongrid.io```（测试网：```https://nile.trongrid.io```、```https://api.shasta.trongrid.io```） |
+| Rpc Api Key | TronGrid的API Key，只填Key本身，会作为```TRON-PRO-API-KEY```请求头发送。不填也能使用，但TronGrid对没有Key的请求限频更严格 |
+
+托管者通过全节点的HTTP接口（```/wallet/...```）访问波场，不再使用gRPC。选择TRON时表单默认填入的旧gRPC地址```grpc.trongrid.io:50051```会自动换成```https://api.trongrid.io```（```grpc.nile.trongrid.io:50051```、```grpc.shasta.trongrid.io:50051```同样换成对应测试网的HTTP地址）；其它gRPC地址会报错，请改填节点的HTTP地址。
+
+运行中可以用```exchange.IO("base", 节点地址)```切换节点，用```exchange.IO("key", 私钥)```切换钱包，用```exchange.IO("address")```获取当前钱包地址（```T```开头）。标准函数```exchange.GetAccount()```、```exchange.GetAssets()```返回钱包的TRX余额。账户还未激活（链上没有记录）时余额为0。
+
+## 调用智能合约
+
+与以太坊相同，使用```exchange.IO("api", 合约地址, 方法, ...参数)```：只读方法直接返回结果，写方法签名并广播交易，返回交易ID。TRC20标准方法已内置；其它合约没有注册ABI时，会自动从链上读取该合约的ABI，读取不到时再用```exchange.IO("abi", 合约地址, ABI)```手动注册。写方法的最后一个参数可以传```{gasLimit: 数量}```设置手续费上限（feeLimit，单位sun）。
+
 ```js
+// USDT（TRC20）合约
+var usdt = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t"
+Log(exchange.IO("api", usdt, "balanceOf", exchange.IO("address")))   // 链上整数，USDT精度为6
+```
+
+编码解码与以太坊一致，地址参数可以直接写```T```开头的地址：
+
+```js
+exchange.IO("encode", "address", "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t")
+// 000000000000000000000000a614f803b6fd780986a42c78ec9c7f77e6ded13c
+exchange.IO("encodePacked", "address", "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t")
+// a614f803b6fd780986a42c78ec9c7f77e6ded13c
+exchange.IO("decode", "string", "0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000a5465746865722055534400000000000000000000000000000000000000000000")
+// Tether USD
+```
+
+## 调用波场节点的方法
+
+```exchange.IO("api", "tron", 方法, ...参数)```调用波场节点的方法，方法名不区分大小写。需要签名的方法（转账、触发合约等）会自动签名并广播。常用方法：
+
+| 方法 | 参数 | 说明 |
+| - | - | - |
+| ```send``` | 收款地址, 数量(sun) | 从当前钱包转出TRX |
+| ```Transfer``` | 付款地址, 收款地址, 数量(sun) | 转出TRX，付款地址必须是当前钱包 |
+| ```GetAccount``` | 地址 | 账户信息 |
+| ```GetAccountResource``` | 地址 | 账户的能量、带宽资源 |
+| ```GetContractABI``` | 合约地址 | 合约在链上的ABI |
+| ```GetAssetIssueByName``` | 名称 | TRC10资产信息 |
+| ```GetNowBlock``` | 无 | 当前区块 |
+| ```GetBlockByNum``` | 区块高度 | 指定区块 |
+| ```GetTransactionByID``` | 交易ID | 交易内容 |
+| ```GetTransactionInfoByID``` | 交易ID | 交易执行结果（手续费、能量消耗、日志等） |
+| ```GetChainParameters``` | 无 | 链参数 |
+| ```TriggerConstantContract``` | 调用者地址（可为空）, 合约地址, 方法, 参数编码 | 只读调用合约，结果在```constant_result```中（十六进制字符串，可以用```exchange.IO("decode", ...)```解码） |
+| ```TRC20ContractBalance``` | 地址, 合约地址 | TRC20余额（链上整数） |
+| ```TRC20GetName```、```TRC20GetSymbol```、```TRC20GetDecimals``` | 合约地址 | TRC20的名称、符号、精度 |
+| ```TRC20Send```、```TRC20Approve``` | 付款地址, 收款或被授权地址, 合约地址, 数量, feeLimit | TRC20转账、授权 |
+| ```TRC20Call``` | 调用者地址（可为空）, 合约地址, 调用数据, 是否只读, feeLimit | 用原始调用数据调用合约 |
+| ```ParseTRC20NumericProperty```、```ParseTRC20StringProperty``` | 十六进制数据 | 解析TRC20返回的数值、字符串 |
+
+表中没有的节点接口，可以直接传路径和请求体：```exchange.IO("api", "tron", "/wallet/接口名", {请求体})```。
+
+## 与以太坊的差异
+
+以下指令只支持以太坊（EVM），在波场上调用会报错：```call```、```multicall```、```logs```、```waitReceipt```、```nonce```、```speedUp```、```cancelTx```、```contracts```；```sendBase```和多个节点互为备用也只对以太坊有效。在波场上模拟执行合约调用可以用节点方法```TriggerConstantContract```，查询交易的执行结果用```GetTransactionInfoByID```。
+
+```toUnits```、```fromUnits```、```uniswapV3```、编码解码和签名指令在波场上同样可用，精度参数可以直接传TRC20合约地址：
+
+```js
+var usdt = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t"
+var raw = exchange.IO("api", usdt, "balanceOf", exchange.IO("address"))
+Log(exchange.IO("fromUnits", raw, usdt))   // 按合约的 decimals() 换算为可读数量
+```
+
+合约调用在节点校验阶段被拒绝时（例如合约不存在），错误信息中是节点给出的原因，例如```tron contract call rejected (CONTRACT_VALIDATE_ERROR): Smart contract is not exist.```；合约执行失败（revert）时报```tron contract execution failed```及失败原因。
+
+## 签名
+
+```exchange.IO("hash", "sign", "hex", "hex", 交易哈希)```用当前私钥对32字节哈希签名，返回65字节签名```r‖s‖v```（v为0或1）；```hash```的其它算法（如```"sha256"```）用于计算摘要，功能与```Encode()```函数相同。需要分别取得r、s、v（v为27或28）用于合约校验时，使用```exchange.IO("sign", ...)```，见语法手册`Web3`分类。
+
+## 示例
+
+### 查询TRX与USDT余额，读取代币信息
+
+```javascript
 function main() {
-    exchange.IO("key", "Private Key")   // "Private Key"代表私钥字符串，需要填写实际的私钥值
+    var usdt = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t"
+    var wallet = exchange.IO("address")
+
+    // TRX 余额（标准函数，单位 TRX）
+    Log("账户:", exchange.GetAccount())
+
+    // USDT 余额：链上整数，按精度换算
+    var raw = exchange.IO("api", "tron", "TRC20ContractBalance", wallet, usdt)
+    var decimals = exchange.IO("api", "tron", "TRC20GetDecimals", usdt)
+    Log("USDT:", raw / Math.pow(10, decimals))
+
+    // 用 TRC20Call 只读调用 name()（选择器 0x06fdde03），再解析返回的字符串
+    var ret = exchange.IO("api", "tron", "TRC20Call", "", usdt, "0x06fdde03", true, 0)
+    // constant_result 中是十六进制字符串，直接解析
+    Log("名称:", exchange.IO("api", "tron", "ParseTRC20StringProperty", ret.constant_result[0]))
 }
 ```
 
-#### 调用智能合约方法
+### 用Multicall合约一次读取多个合约方法
 
-以下内容是一些智能合约方法的调用示例。
-- decimals
-  ```decimals```方法是```ERC20```的一个```constant```方法（在FMZ量化策略代码中调用标准ERC20方法时无需注册ABI），不会产生```gas```消耗，可以查询某个```token```的精度数据。
-  ```decimals```方法没有参数，返回值为```token```的精度数据。
+```javascript
+function main() {
+    var usdt = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t"
+    var multicall = "TGXuuKAb4bnrn137u39EKbYzKNXvdCes98"
+    var wallet = exchange.IO("address")
 
-  ```js
-  function main(){
-      var tokenAddress = "0x111111111117dC0aa78b770fA6A738034120C302"    // 代币的合约地址，例子中的代币为1INCH
-      Log(exchange.IO("api", tokenAddress, "decimals"))                  // 查询，打印1INCH代币的精度指数为18
-  }
-  ```
-- allowance
-  ```allowance```方法是```ERC20```的一个```constant```方法，不会产生```gas```消耗，可以查询某个```token```对某个合约地址的授权额度。
-  ```allowance```方法需要传入2个参数，第一个参数为钱包地址，第二个参数为被授权的地址。返回值为```token```的授权额度。
-
-  ```js
-  function main(){
-      // 代币的合约地址，例子中的代币为1INCH
-      var tokenAddress = "0x111111111117dC0aa78b770fA6A738034120C302"
-      var owner = ""
-      var spender = ""
-
-      // 例如查询得出1000000000000000000，除以该token的精度单位1e18，得出当前交易所对象绑定的钱包给spender地址授权了1个1INCH数量
-      Log(exchange.IO("api", tokenAddress, "allowance", owner, spender))
-  }
-  ```
-
-  ```owner```：钱包地址，实际使用时需要填写具体地址。
-  ```spender```：被授权的合约地址，实际使用时需要填写具体地址，例如可以是```Uniswap V3 router v1```地址。
-- approve
-  ```approve```方法是```ERC20```的一个非```constant```方法，会产生```gas```消耗，用于给某个合约地址授权```token```的操作额度。
-  ```approve```方法需要传入2个参数，第一个参数为被授权的地址，第二个参数为授权的额度。返回值为```txid```。
-
-  ```js
-  function main(){
-      // 代币的合约地址，例子中的代币为1INCH
-      var tokenAddress = "0x111111111117dC0aa78b770fA6A738034120C302"
-      var spender = ""
-      var amount = "0xde0b6b3a7640000"
-
-      // 授权量的十六进制字符串: 0xde0b6b3a7640000 , 对应的十进制字符串: 1e18 , 1e18除以该token的精度单位，即1个代币数量 , 所以这里指授权一个代币
-      Log(exchange.IO("api", tokenAddress, "approve", spender, amount))
-  }
-  ```
-
-  ```spender```：被授权的合约地址，实际使用时需要填写具体地址，例如可以是```Uniswap V3 router v1```地址。
-  ```amount```：授权数量，这里使用的是十六进制字符串表示。对应的十进制数值为```1e18```，除以示例中的```token```精度单位（即1e18），得出授权了1个```token```。
-
-  ```exchange.IO()```函数的第三个参数传入方法名```approve```，也可以写成```methodId```的形式，例如："0x571ac8b0"。也可以写成完整的标准方法名，例如："approve(address,uint256)"。
-- multicall
-  ```multicall```方法是```Uniswap V3```的一个非constant方法，会产生```gas```消耗，用于批量兑换代币。
-  ```multicall```方法可能有多种传参方式，具体可以查询包含该方法的ABI，调用该方法之前需要先注册ABI。返回值为```txid```。
-
-  具体的```multicall```方法调用示例，可以参考平台公开的[「Uniswap V3 交易类库」模板](https://www.fmz.com/strategy/397260)
-
-  ```js
-  function main() {
-      var ABI_Route = ""
-      var contractV3SwapRouterV2 = ""
-      var value = 0
-      var deadline = (new Date().getTime() / 1000) + 3600
-      var data = ""
-      exchange.IO("abi", contractV3SwapRouterV2, ABI_Route)
-      exchange.IO("api", contractV3SwapRouterV2, "multicall(uint256,bytes[])", value, deadline, data)
-  }
-  ```
-
-  ```ABI_Route```：Uniswap V3的router v2合约的ABI，需要根据实际情况填写。
-  ```contractV3SwapRouterV2```：Uniswap V3的router v2地址，实际使用时需要填写具体地址。
-  ```value```：转账的ETH数量，如果兑换操作的```tokenIn```代币不是ETH则设置为0，需要根据实际情况填写。
-  ```deadline```：可以设置为```(new Date().getTime() / 1000) + 3600```，表示一小时内有效。
-  ```data```：需要执行的打包操作数据，需要根据实际情况填写。
-
-  也可以指定方法调用的```gasLimit/gasPrice/nonce```设置：
-
-  ```js
-  exchange.IO("api", contractV3SwapRouterV2, "multicall(uint256,bytes[])", value, deadline, data, {gasPrice: 5000000000, gasLimit: 21000})
-  ```
-
-  可以根据具体需求设置```{gasPrice: 5000000000, gasLimit: 21000, nonce: 100}```参数，该参数设置在```exchange.IO()```函数的最后一个参数上。
-  可以省略其中的```nonce```使用系统默认值，或者不设置```gasLimit/gasPrice/nonce```，全部使用系统默认值。
-
-  需要注意示例中的```multicall(uint256,bytes[])```方法的```stateMutability```属性是```payable```，需要传入```value```参数。
-  ```stateMutability":"payable"```属性可以从```ABI```中查看，```exchange.IO()```函数会根据已注册的```ABI```中的```stateMutability```属性判断所需的参数，
-  如果```stateMutability```属性是```nonpayable```则不需要传入```value```参数。
-
-#### 其它功能调用
-
-- 获取交易所对象配置的钱包地址
-  ```js
-  function main() {
-      Log(exchange.IO("address"))         // 打印交易所对象配置的私钥对应的钱包地址
-  }
-  ```
-- 切换区块链RPC节点
-  ```js
-  function main() {
-      var chainRpc = "https://bsc-dataseed.binance.org"
-
-      // 切换至BSC链，也可使用SetBase函数进行切换
-      e.IO("base", chainRpc)
-  }
-  ```
-
-### 波场
-
-在发明者量化交易平台，通过```exchange.IO()```函数可以实现对波场（TRON）链上gRPC方法和智能合约的调用，从而编写相关策略代码。
-
-#### Web3交易所对象配置
-
-配置方式与以太坊交易所对象配置类似，```ChainType```需要选择为```TRON```。```RPC Address```默认为：```grpc.trongrid.io:50051```，即波场官方节点地址。
-
-#### 注册ABI
-
-默认已注册TRC20的合约ABI，底层封装了自动根据合约地址获取合约ABI的机制。通常情况下无需手动注册ABI，仅在某些合约ABI无法自动获取时才需要手动注册。
-
-注册ABI的方式与以太坊一致，例如：
-```js
-// USDT合约地址：TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t
-let abi = `[{"constant":true,"inputs":[{"name":"who","type":"address"}],"name":"balanceOf","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}]`
-
-// 注册 balanceOf 方法
-exchange.IO("abi", "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t", abi)
-```
-
-#### 调用TRON的RPC方法
-
-使用```exchange.IO()```函数调用TRON的RPC方法。对于需要签名的方法，底层已自动封装签名操作。以下列举常用方法，其他方法请参考TRON官方项目文档。
-- GetAccount
-  ```js
-  exchange.IO("api", "tron", "GetAccount", "TKCG...")   // "TKCG..."为TRON钱包地址，该函数返回"TKCG..."地址的账户信息。
-  ```
-- GetAccountResource
-  ```js
-  exchange.IO("api", "tron", "GetAccountResource", "TKCG...") // 获取指定钱包地址的资源，包括能量和带宽。
-  ```
-- GetContractABI
-  ```js
-  exchange.IO("api", "tron", "GetContractABI", "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t")  // 获取 USDT TRC20合约ABI
-  ```
-- GetAssetIssueByName
-  ```js
-  exchange.IO("api", "tron", "GetAssetIssueByName", "TRX")  // 根据代币名称获取代币资产信息
-  ```
-- GetNowBlock
-  ```js
-  exchange.IO("api", "tron", "GetNowBlock")   // 获取当前区块信息
-  ```
-- GetBlockByNum
-  ```js
-  exchange.IO("api", "tron", "GetBlockByNum", 70624300)
-  ```
-- GetTransactionByID
-  ```js
-  exchange.IO("api", "tron", "GetTransactionByID", "05a8fae2cd1cbf36b61d12e219588d25b4826436f055f93388a96e620ec3f3f2")   // 根据交易哈希值获取Transaction
-  ```
-- TRC20ContractBalance
-  ```js
-  exchange.IO("api", "tron", "TRC20ContractBalance", "TKCG...", "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t")   // 获取钱包 USDT 余额，注意返回的数据未经精度处理，例如返回数据为：```6890251```，即```6.890251 USDT```。
-  ```
-- TriggerConstantContract
-  ```js
-  function main() {
-      let ret = exchange.IO("api", "tron", "TriggerConstantContract", "", "TSUUVjysXV8YqHytSNjfkNXnnB49QDvZpx", "token0()", "")  // 调用智能合约的token0()方法，TriggerConstantContract用于调用只读方法
-      let data = exchange.IO("decode", "address", Encode("raw", "raw", "hex", ret["constant_result"][0]))                        // 解码数据
-      return data                                                                                                                 // data: 0x891cdb91d149f23b1a45d9c5ca78a88d0cb44c18
-  }
-  ```
-- TRC20Call
-  ```js
-  function main() {
-      let ret = exchange.IO("api", "tron", "TRC20Call", "", "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t", "0x06fdde03", true, 0)         // 使用TRC20Call调用只读方法0x06fdde03
-      let data = Encode("raw", "raw", "hex", ret.constant_result[0])
-      return exchange.IO("api", "tron", "ParseTRC20StringProperty", data)                                                        // Tether USD
-  }
-  ```
-- Transfer
-  ```js
-  exchange.IO("api", "tron", "Transfer", "TWTbn...", "TKCG...", 1000000)            // 使用Transfer方法转账TRX，从"TWTbn..."转至"TKCG..."，1000000即1TRX。
-  ```
-
-#### 编码/解码
-
-当交易所对象设置为Web3并选择TRON时，编码/解码等操作与以太坊的Web3交易所对象保持一致。
-- encode：
-  ```js
-  let ret = exchange.IO("encode", "address", "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t")
-  Log(ret) // ret: 000000000000000000000000a614f803b6fd780986a42c78ec9c7f77e6ded13c , 对USDT代币的TRON地址进行编码。
-  ```
-- decode：
-  ```js
-  let data = "0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000a5465746865722055534400000000000000000000000000000000000000000000"
-  let ret = exchange.IO("decode", "string", data)
-  Log(ret)  // ret: Tether USD , 类似于ParseTRC20StringProperty的功能
-  ```
-- encodePacked：
-  ```js
-  let ret = exchange.IO("encodePacked", "address", "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t")
-  Log(ret)  // ret: a614f803b6fd780986a42c78ec9c7f77e6ded13c
-  ```
-
-#### 支持切换私钥
-
-切换方式与Web3以太坊交易所对象保持一致。
-
-#### 调用智能合约方法
-
-TRON上智能合约方法的调用与以太坊基本一致，以下是一个具体示例，演示如何：
-- 调用智能合约方法，在一次请求中调用多个合约方法：
-  ```js
-  function main() {
-      let usdtAddress = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t"                  // token usdt contract address
-      let data1 = exchange.IO("encode", usdtAddress, "name")                  // call function: name
-      let data2 = exchange.IO("encode", usdtAddress, "decimals")              // call function: decimals
-      let data3 = exchange.IO("encode", usdtAddress, "balanceOf", "TKCG...")  // call function: balanceOf
-
-      var data = []
-      data.push([usdtAddress, data1])
-      data.push([usdtAddress, data2])
-      data.push([usdtAddress, data3])
-
-      exchange.IO("abi", "TGXuuKAb4bnrn137u39EKbYzKNXvdCes98", `[{"inputs":[{"components":[{"internalType":"address","name":"target","type":"address"},{"internalType":"bytes","name":"callData","type":"bytes"}],"internalType":"struct TronMulticall.Call[]","name":"calls","type":"tuple[]"}],"name":"aggregate","outputs":[{"internalType":"uint256","name":"blockNumber","type":"uint256"},{"internalType":"bytes[]","name":"returnData","type":"bytes[]"}],"stateMutability":"view","type":"function"}]`)
-      let ret = exchange.IO("api", "TGXuuKAb4bnrn137u39EKbYzKNXvdCes98", "aggregate", data)
-      Log("name:", exchange.IO("decode", "string", ret["returnData"][0]))
-      Log("decimals:", exchange.IO("decode", "uint8", ret["returnData"][1]))
-      Log("balanceOf:", exchange.IO("decode", "uint256", ret["returnData"][2]))
-  }
-  ```
-
-  输出内容：
-  ```log
-  信息 balanceOf: 6890251
-  信息 decimals: 6
-  信息 name: Tether USD
-  ```
-
-#### 其它功能调用
-
-- 获取交易所对象配置的钱包地址
-  与以太坊的使用方式一致。
-- 切换区块链RPC节点
-  与以太坊的使用方式一致。
-- 计算hash
-  ```js
-  let algo = "sign"                   // algo: 使用的算法或方式
-  let inputFormat = "hex"             // inputFormat: 输入数据的格式，签名时data为十六进制的32字节哈希
-  let outputFormat = "hex"            // outputFormat: 输出数据的格式
-  let data = "txHash"                 // txHash: 具体的hash值（64个十六进制字符）
-  let signature = exchange.IO("hash", algo, inputFormat, outputFormat, data)  // 返回签名数据
-  ```
-
-  algo设置为```"sign"```时，表示用于计算签名，此时```data```必须为32字节哈希，```inputFormat```须使用```"hex"```；返回65字节的签名数据```r‖s‖v```，其中v为0或1。设置为其它算法参数时（例如："sha256"），功能等同于```Encode()```函数。
-
-  如需分别获取r、s、v（v为27或28）用于合约校验，可以使用```exchange.IO("sign", ...)```（参见语法手册Web3章节）。
-
-## 内置库
-
-发明者量化交易平台内置集成了一些常用库。
-
-### TA指标库
-
-发明者量化的```TA```指标库对常用指标算法进行了优化，支持在```JavaScript```、```Python```、```Rust```、```C++```等语言的策略中调用。[开源TA库代码](https://www.fmz.com/bbs-topic/409)、[发明者量化交易平台API手册](https://www.fmz.com/syntax-guide)。
-
-```js
-function main(){
-    // records 的长度；当数据长度不满足指标函数参数的计算要求时，将返回无效值
-    var records = exchange.GetRecords()
-    var macd = TA.MACD(records)
-    var atr = TA.ATR(records, 14)
-
-    // 打印最后一组指标值
-    Log(macd[0][records.length-1], macd[1][records.length-1], macd[2][records.length-1])
-    Log(atr[atr.length-1])
+    var calls = [
+        [usdt, exchange.IO("encode", usdt, "name")],
+        [usdt, exchange.IO("encode", usdt, "decimals")],
+        [usdt, exchange.IO("encode", usdt, "balanceOf", wallet)]
+    ]
+    // 注册 Multicall 合约的 aggregate 方法
+    exchange.IO("abi", multicall, `[{"inputs":[{"components":[{"internalType":"address","name":"target","type":"address"},{"internalType":"bytes","name":"callData","type":"bytes"}],"internalType":"struct TronMulticall.Call[]","name":"calls","type":"tuple[]"}],"name":"aggregate","outputs":[{"internalType":"uint256","name":"blockNumber","type":"uint256"},{"internalType":"bytes[]","name":"returnData","type":"bytes[]"}],"stateMutability":"view","type":"function"}]`)
+    var ret = exchange.IO("api", multicall, "aggregate", calls)
+    Log("name:", exchange.IO("decode", "string", ret.returnData[0]))
+    Log("decimals:", exchange.IO("decode", "uint8", ret.returnData[1]))
+    Log("balanceOf:", exchange.IO("decode", "uint256", ret.returnData[2]))
 }
 ```
+
+See also: `Web3`, `exchange.IO`
+
+## 数据与研究
+
+数据探索和Alpha因子分析工具。
+
+### 数据探索
+
+发明者量化自研的**datadata**是一个量化金融数据平台，发明者量化交易平台的[数据探索](https://www.fmz.com/m/database)模块集成了它的服务和功能，发明者量化用户无需另外注册**datadata**账号即可使用。可以用SQL查询分析海量数据，通过可视化界面生成多种图表，并与团队分享。使用例子可以参考[数据探索模块专题文章](https://www.fmz.com/digest-topic/10370)。
+
+- 数据源：datadata提供的数据源实时、持续更新，涵盖多种类型的数据；也可以上传CSV文件作为私有数据源，并在「数据探索」页面预览。
+- 数据查询：用SQL语句查询数据，支持查询参数；查询结果可以下载为CSV或JSON文件。
+- 保存研究：点击右上角的「保存」，把当前SQL查询保存到账号「数据探索」的资源列表中（资源列表按钮在「保存」按钮左侧）。
+- 数据图形化：查询结果除了以表格展示，还可以用多种可视化组件展示。
+- 分享研究：支持公开链接、嵌入代码（例如嵌入平台社区帖子）、嵌入网页、数据链接、预览图链接等形式。用「数据链接」还可以把数据直接提供给策略使用，回测和实盘都支持。
+
+### Alpha因子分析工具
+
+分析公式参考了```worldquant```公开的[```alpha101```](https://github.com/yli188/WorldQuant_alpha101_code/blob/master/101%20Formulaic%20Alphas.pdf)中的行情计算方法，基本兼容其语法（未实现的功能已说明），并进行了增强。该工具用于快速对时间序列进行运算和验证交易想法。[Alpha因子分析工具页面](https://www.fmz.com/m/alpha)。
+
+#### 函数和操作符
+
+**下面的```{}```代表占位符，所有表达式大小写不敏感，x代表数据时间序列**
+
+- ```abs(x), log(x), sign(x)```：分别是绝对值、对数、符号函数。
+
+以下操作符``` +, -, *, /, >, < ```也符合其标准的含义，```==```：是否相等，```||```：逻辑或，```x ? y : z```：三元条件运算符。
+
+- ```rank(x)``` ：横截面排序，返回所在的百分位。需要指定由多个标的组成的候选池；只有单个行情时无法排序，直接返回原值。
+- ```delay(x, d)``` ： 返回序列x在d个周期前的值。
+- ```sma(x, d)``` ： 计算序列x在d个周期内的简单移动平均值。
+- ```correlation(x, y, d)```：计算时间序列x和y在过去d个周期内的相关系数。
+- ```covariance(x, y, d)``` ：计算时间序列x和y在过去d个周期内的协方差。
+- ```scale(x, a)``` ：归一化数据，使得```sum(abs(x))=a```(a默认为1)。
+- ```delta(x, d)``` ：计算时间序列x的当前值减去d个周期前的值。
+- ```signedpower(x, a)``` ： ```x^a```。
+- ```decay_linear(x, d)``` ：计算时间序列x的d周期加权移动平均值，权重为d,d-1,d-2....1(经过归一化处理)。
+- ```indneutralize(x, g)``` ： 针对行业分类g进行中性化处理，目前不支持。
+- ```ts_{O}(x, d)``` ： 对时间序列x的过去d个周期执行O操作(O可具体代表min、max等，详见下文），d会转换为整数。
+- ```ts_min(x, d)``` ： 过去d个周期的最小值。
+- ```ts_max(x, d)``` ： 过去d个周期的最大值。
+- ```ts_argmax(x, d)``` ： ```ts_max(x, d)```的位置。
+- ```ts_argmin(x, d)``` ： ```ts_min(x, d)```的位置。
+- ```ts_rank(x, d)``` ： 时间序列x在过去d个周期内的排序（百分位排序）。
+- ```min(x, d)``` ： ```ts_min(x, d)```。
+- ```max(x, d)```： ```ts_max(x, d)```。
+- ```sum(x, d)``` ：过去d个周期的累计和。
+- ```product(x, d)``` ：过去d个周期的累计积。
+- ```stddev(x, d)``` ：过去d个周期的标准差。
+
+#### 输入数据
+
+**输入数据不区分大小写，默认数据为网页上选择的品种，也可直接指定，例如：```binance.ada_bnb```**
+
+- ```returns```：收盘价收益率。
+- ```open, close, high, low, volume```：周期内的开盘价、收盘价、最高价、最低价和成交量。
+- ```vwap```：成交量加权平均价（暂未实现，当前使用收盘价）。
+- ```cap```：总市值（暂未实现）。
+- ```IndClass```：行业分类（暂未实现）。
+
+#### 其它
+
+支持一次输出多个结果，使用列表形式表示。例如```[sma(close, 10), sma(high, 30)]```将在图表中绘制两条线。除了输入时间序列数据外，还可以作为简单的计算器使用。
+
+## 对外接口
+
+从AI助手或外部程序操作平台：AI接入（MCP服务）、扩展API接口、交易终端插件。
+
+### AI接入
+
+把发明者量化接入Claude Code、Codex、Cursor等AI编程助手（AI agent）后，可以直接用对话完成写策略、回测、创建和管理实盘、查看日志与收益。AI助手通过平台提供的MCP（Model Context Protocol）服务调用这些功能，用的是一把专门为它创建的API KEY，权限由你在授权时决定，随时可以修改或吊销。
+
+**一句话接入**
+
+在AI助手里输入：
+
+```
+读 https://www.fmz.com/agent/setup.zh-CN.md 然后接入发明者量化
+```
+
+AI助手会按这份说明完成以下步骤，你只需要在浏览器里点一次同意：
+
+1. AI助手向平台申请授权，然后给出一个授权链接（形如```https://www.fmz.com/agent/authorize?code=XXXX-XXXX```），链接10分钟内有效。
+2. 在已登录发明者量化的浏览器中打开链接，确认申请者名称和权限后点击同意。可以在页面上取消勾选不想给的权限。
+3. AI助手取得API KEY，写入自己的MCP配置并连接。之后就可以直接对它说「列出我的实盘」「给这个策略跑一次回测」。
+
+申请时AI助手会用「名字 @ 机器名」（例如```Claude Code @ MacBook```）作为这把API KEY的名称。同一个名称再次申请并同意时，旧的API KEY会被吊销、换成新的，重复接入不会累积多余的API KEY。
+
+**权限**
+
+| 权限 | 允许的操作 | 默认 |
+| - | - | - |
+| read | 查看策略、实盘、托管者、交易所账户列表与详情，读取日志、消息、账户概览（不含任何密钥） | 是 |
+| backtest | 发起、查询、停止回测 | 是 |
+| write | 保存策略与版本、分组、告警开关，修改已停止实盘的配置 | 是 |
+| trade | 创建、启动、停止实盘，给实盘发送交互命令（会扣费并真实下单） | 是 |
+| danger | 删除策略、实盘、托管者，公开策略 | 否 |
+
+```danger```权限默认不授予，只有AI助手明确申请、并在授权页面勾选时才会获得。AI助手调用```[trade]```或```[danger]```类工具前，应当先向你确认。
+
+**手动配置**
+
+不能执行命令的客户端（例如Cherry Studio）可以手动配置：
+
+1. 在「账号设置 → API KEY」（```https://www.fmz.com/m/account#apikey```）创建API KEY，记下Access Key和Secret Key。
+2. 在客户端添加一个MCP服务，类型选Streamable HTTP：
+   - URL：```https://www.fmz.com/api/mcp/<Access Key>```
+   - 请求头：```Authorization: Bearer <Secret Key>```
+
+Secret Key只能放在请求头里，不能写进URL。各客户端的配置示例：
+
+```bash
+# Claude Code
+claude mcp add --transport http fmz "https://www.fmz.com/api/mcp/<Access Key>" --header "Authorization: Bearer <Secret Key>"
+```
+
+```json
+{"mcpServers": {"fmz": {"url": "https://www.fmz.com/api/mcp/<Access Key>", "headers": {"Authorization": "Bearer <Secret Key>"}}}}
+```
+
+上面的JSON用于Cursor（```~/.cursor/mcp.json```）等支持Streamable HTTP的客户端；Claude Desktop需要通过```npx mcp-remote```转接，见接入说明原文。
+
+**安装skills（推荐）**
+
+skills是给AI助手阅读的平台知识包：平台操作流程、完整的API文档、各编程语言的策略写法、回测和指标。装上之后AI助手写出的策略更准确。在终端执行：
+
+```bash
+npx skills add fmzquant/skills --global --yes -a claude-code
+```
+
+```-a```后面填你使用的AI助手名称（claude-code、codex、cursor、gemini-cli等）。也可以直接在GitHub阅读：```https://github.com/fmzquant/skills```。
+
+**可用的工具**
+
+连接后AI助手可以使用以下工具，完整说明以AI助手看到的工具列表为准：
+
+| 权限 | 工具 |
+| - | - |
+| read | ```ping```、```get_account_summary```、```list_exchanges```、```list_platforms```、```list_nodes```、```list_strategies```、```get_strategy```、```list_strategy_versions```、```get_strategy_version```、```list_robots```、```get_robot```、```get_robot_logs```、```get_robot_profit```、```get_robot_output```、```list_messages```、```list_groups```、```revoke_my_key``` |
+| backtest | ```run_backtest```、```get_backtest```、```list_backtests```、```stop_backtest``` |
+| write | ```check_strategy```、```save_strategy```、```save_strategy_version```、```delete_strategy_version```、```update_robot```、```save_group```、```move_to_group```、```delete_group```、```set_robot_alert```、```set_node_alert```、```delete_messages``` |
+| trade | ```create_robot```、```start_robot```、```stop_robot```、```restart_robot```、```send_robot_command```，以及交易终端插件工具```plugin_*```（查询行情、下单等） |
+| danger | ```delete_strategy```、```delete_robot```、```delete_node```、```publish_strategy``` |
+
+一个典型的流程：```list_platforms```和```list_nodes```了解账户里有哪些交易所账户和托管者；```save_strategy```保存策略并用```check_strategy```检查语法；```run_backtest```和```get_backtest```回测；确认后```create_robot```创建实盘，再用```get_robot```、```get_robot_logs```观察运行情况。
+
+**安全与管理**
+
+- 交易所的API KEY不经过AI助手：在网页的「交易所」页面添加，AI助手按编号选择。所有工具的返回结果里都不包含任何密钥。
+- 在```https://www.fmz.com/m/account#apikey```可以查看AI助手使用的API KEY，修改权限或锁定。权限除了填写上表的权限名，还可以填工具名，用```!工具名```排除某个工具。
+- 不再使用时，让AI助手调用```revoke_my_key```吊销它自己的API KEY，或在上面的页面中删除。
+- ```stop_robot```只停止实盘，不会平仓。
+- 第一次让AI助手创建实盘时，建议先回测，再用模拟盘或小额资金运行。
+
+**常见问题**
+
+- 提示没有在线托管者：创建实盘需要至少一个在线的托管者，见「平台基础 → 托管者」。
+- 提示回测任务过多：同时运行的回测数量有上限，让AI助手先用```stop_backtest```停止不再需要的回测。
+- AI助手说没有某个工具，或者调用被拒绝：这把API KEY没有对应的权限，在API KEY页面修改权限后重新连接。
+
+同一把API KEY也可以用于`扩展API接口`，供脚本和定时任务调用；能用MCP的场景优先使用MCP。
+
+### 扩展API接口
+
+扩展API接口是平台的HTTP接口（```https://www.fmz.com/api/v1```），供脚本、定时任务等程序调用平台功能：查询账号、托管者、策略和实盘，创建、重启、停止实盘，向实盘发送交互命令等。
+
+在AI助手（Claude Code、Cursor等）中交互式地操作平台时，优先使用`AI接入`（MCP服务）：工具更全，参数按名称传递，权限可以按类别授予。两者可以使用同一把API KEY。
+
+使用步骤：`创建ApiKey`，按`验证方式`发送请求，方法与参数见`扩展API接口详解`。
+
+#### 创建ApiKey
+
+在[账号设置 → API KEY](https://www.fmz.com/m/account#apikey)页面（```/m/account#apikey```）点击「创建新的ApiKey」，得到一对```AccessKey```和```SecretKey```。```SecretKey```代表这把API KEY的全部权限，不要泄露。在该页面也可以修改已有API KEY的权限，或者禁用、删除API KEY。
+
+**权限**
+
+创建或修改时，在「API权限」输入框中填写逗号分隔的列表：
+
+- ```*```：允许全部扩展API接口。
+- 方法名：只允许列出的方法，例如```GetRobotList,GetRobotDetail,CommandRobot```。
+- ```!方法名```：排除某个方法，通常与```*```搭配，例如```*,!DeleteRobot,!DeleteNode```。
+
+同一把API KEY也可以用于`AI接入`（MCP服务）。MCP工具除了按工具名授权，还可以按权限类别授权：```read```、```backtest```、```write```、```trade```、```danger```（含义见AI接入页面），同样支持用```!名称```排除。权限类别只对MCP工具生效；扩展API接口只认方法名和```*```。
+
+权限留空时，扩展API接口不限制方法（MCP开放```danger```以外的全部工具）。建议按用途只授予需要的方法，例如只用于TradingView警报的API KEY只授予```CommandRobot```。
+
+#### 验证方式
+
+调用扩展API接口时有两种验证方式：
+
+- `签名验证`：用```SecretKey```对请求参数签名，```SecretKey```本身不在网络上传输。程序调用应使用这种方式。
+- `直接验证`：把```SecretKey```直接放进请求URL，主要用于TradingView等只能填写一个URL的Webhook场景。
+
+##### 签名验证
+
+**请求格式**
+
+向```https://www.fmz.com/api/v1```发送```POST```请求，参数以表单（```application/x-www-form-urlencoded```）提交。服务端也接受把同样的参数放在URL查询串中的```GET```请求，但参数会留在各处的访问日志里，推荐使用```POST```。
+
+| 参数 | 说明 |
+| - | - |
+| version | 版本号，固定为```1.0```。 |
+| access_key | API KEY的```AccessKey```。 |
+| method | 调用的方法名，例如```GetNodeList```。 |
+| args | 方法参数组成的JSON字符串：按顺序排列的数组（如```[]```、```[123, "ok"]```），或按参数名传值的对象（如```{"robotId": 123}```），见`扩展API接口详解`。不传时按```[]```处理。 |
+| nonce | 毫秒时间戳。与服务器时间相差不能超过1小时，并且必须大于这把API KEY上一次请求使用的```nonce```。 |
+| sign | 签名，计算方法见下文。 |
+
+请求中不包含```SecretKey```。
+
+**签名方式**
+
+按下面的格式拼接字符串，其中```args```是实际提交的JSON字符串原文：
+
+```plaintext
+version + "|" + method + "|" + args + "|" + nonce + "|" + secretKey
+```
+
+对拼接结果计算MD5，转换为32位小写十六进制字符串，作为```sign```的值。
+
+**Python示例**
 
 ```python
-def main():
-    r = exchange.GetRecords()
-    macd = TA.MACD(r)
-    atr = TA.ATR(r, 14)
-    Log(macd[0][-1], macd[1][-1], macd[2][-1])
-    Log(atr[-1])
+import hashlib
+import json
+import time
+import urllib.parse
+import urllib.request
+
+ACCESS_KEY = ''   # API KEY 的 AccessKey
+SECRET_KEY = ''   # API KEY 的 SecretKey
+
+def api(method, *args, **kwargs):
+    d = {
+        'version': '1.0',
+        'access_key': ACCESS_KEY,
+        'method': method,
+        # 位置参数传数组，关键字参数传对象（按参数名传值）
+        'args': json.dumps(kwargs if kwargs else list(args)),
+        'nonce': int(time.time() * 1000),
+    }
+    s = '%s|%s|%s|%d|%s' % (d['version'], d['method'], d['args'], d['nonce'], SECRET_KEY)
+    d['sign'] = hashlib.md5(s.encode('utf-8')).hexdigest()
+    body = urllib.parse.urlencode(d).encode('utf-8')
+    with urllib.request.urlopen('https://www.fmz.com/api/v1', body, timeout=10) as resp:
+        return json.loads(resp.read().decode('utf-8'))
+
+print(api('GetNodeList'))                             # 托管者列表
+print(api('GetRobotList', appId='member2'))           # 按参数名传值：标签为 member2 的实盘
+print(api('CommandRobot', 123, 'ok'))                 # 向实盘 123 发送交互命令
+print(api('GetRobotDetail', 123))                     # 实盘 123 的详细信息
 ```
 
-```rust
-fn main() {
-    let r = exchange.GetRecords(None, None, None).unwrap();
-    let macd = TA.MACD(&r, None, None, None);
-    let atr = TA.ATR(&r, 14);
-    Log!(macd[0][r.len() - 1], macd[1][r.len() - 1], macd[2][r.len() - 1]);
-    Log!(atr[atr.len() - 1]);
+**Go示例**
+
+```go
+package main
+
+import (
+    "crypto/md5"
+    "encoding/hex"
+    "encoding/json"
+    "fmt"
+    "io"
+    "net/http"
+    "net/url"
+    "strconv"
+    "time"
+)
+
+const (
+    accessKey = "" // API KEY 的 AccessKey
+    secretKey = "" // API KEY 的 SecretKey
+    baseAPI   = "https://www.fmz.com/api/v1"
+)
+
+var client = &http.Client{Timeout: 10 * time.Second}
+
+func api(method string, args ...interface{}) (string, error) {
+    if args == nil {
+        args = []interface{}{}
+    }
+    b, err := json.Marshal(args)
+    if err != nil {
+        return "", err
+    }
+    nonce := strconv.FormatInt(time.Now().UnixMilli(), 10)
+    sum := md5.Sum([]byte("1.0|" + method + "|" + string(b) + "|" + nonce + "|" + secretKey))
+    form := url.Values{
+        "version":    {"1.0"},
+        "access_key": {accessKey},
+        "method":     {method},
+        "args":       {string(b)},
+        "nonce":      {nonce},
+        "sign":       {hex.EncodeToString(sum[:])},
+    }
+    resp, err := client.PostForm(baseAPI, form)
+    if err != nil {
+        return "", err
+    }
+    defer resp.Body.Close()
+    body, err := io.ReadAll(resp.Body)
+    return string(body), err
+}
+
+func main() {
+    ret, err := api("GetNodeList")
+    fmt.Println(ret, err)
+
+    // 用新的配置重启实盘 123，settings 字段见「扩展API接口详解」中的实盘配置说明
+    settings := map[string]interface{}{
+        "name":     "hedge test",
+        "strategy": 456,
+        "period":   60,
+        "node":     789,
+        "exchanges": []interface{}{
+            map[string]interface{}{"pid": 1001, "pair": "BTC_USDT"},
+        },
+    }
+    ret, err = api("RestartRobot", 123, settings)
+    fmt.Println(ret, err)
 }
 ```
 
-```cpp
-void main() {
-    auto r = exchange.GetRecords();
-    auto macd = TA.MACD(r);
-    auto atr = TA.ATR(r, 14);
-    Log(macd[0][macd[0].size() - 1], macd[1][macd[1].size() - 1], macd[2][macd[2].size() - 1]);
-    Log(atr[atr.size() - 1]);
-}
+##### 直接验证
+
+直接验证不计算签名，而是把```secret_key```直接放在请求参数中，因此可以生成一个固定的URL，填到TradingView等只能设置一个URL的Webhook回调里。
+
+> **安全提示**：```secret_key```写在URL中，会留在浏览器历史、代理和服务器的访问日志、Webhook服务方的配置里，任何拿到这个URL的人都能以这把API KEY的权限调用接口。建议只在```CommandRobot```的Webhook中使用直接验证，并为它单独创建一把只授权```CommandRobot```的API KEY（见`创建ApiKey`）；一旦泄露，立即删除这把API KEY。
+
+请求参数为```access_key```、```secret_key```、```method```、```args```（JSON数组，需要URL编码），不需要```version```、```nonce```、```sign```。```CommandRobot```不做```nonce```校验；其他方法仍会校验：不传```nonce```时服务器以当前时间（精确到秒）代替，同一秒内的第二次调用会返回Nonce错误（```code```为3）。
+
+例如API KEY的```AccessKey```为```xxx```、```SecretKey```为```yyy```，访问下面的URL即可向Id为```186515```的实盘发送交互命令```ok12345```：
+
+```plaintext
+https://www.fmz.com/api/v1?access_key=xxx&secret_key=yyy&method=CommandRobot&args=%5B186515%2C%22ok12345%22%5D
 ```
 
-### talib指标库
+**接收Webhook请求体**
 
-以下是```CCI```指标调用示例代码，更多talib指标函数请参阅[发明者量化交易平台API手册](https://www.fmz.com/syntax-guide)
+```CommandRobot```的命令参数为空字符串、请求为```POST```时，服务器把请求体（Body）作为交互命令发给实盘。例如在TradingView的Webhook URL中设置：
+
+```plaintext
+https://www.fmz.com/api/v1?access_key=xxx&secret_key=yyy&method=CommandRobot&args=%5B186515%2C+%22%22%5D
+```
+
+其中```args```的值```%5B186515%2C+%22%22%5D```解码后为```[186515, ""]```（```+```是URL编码中的空格），```186515```是实盘Id，命令为空字符串。
+
+模拟TradingView发送Webhook警报：
 
 ```js
 function main() {
-    var records = exchange.GetRecords()
-    var cci = talib.CCI(records, 14)
-    Log(cci)
+    var options = {
+        method: "POST",
+        body: `{"test": 123}`,
+        headers: {"Content-Type": "application/json"}
+    }
+
+    // Webhook 警报会自动发送 POST 请求，并带上需要的 headers
+    return HttpQuery("https://www.fmz.com/api/v1?access_key=xxx&secret_key=yyy&method=CommandRobot&args=%5B186515%2C+%22%22%5D", options)
 }
 ```
+
+TradingView警报消息框中的内容就是请求体：
+
+- JSON格式：
+
+  ![](https://www.fmz.com/upload/asset/16d8a37ef80d9ccd0079.png)
+
+  ```plaintext
+  {"close": {{close}}, "name": "aaa"}
+  ```
+
+  Id为```186515```的实盘收到交互命令：```{"close": 39773.75, "name": "aaa"}```。
+
+- 文本格式：
+
+  ![](https://www.fmz.com/upload/asset/16d8a506dfbb6c60a077.png)
+
+  ```plaintext
+  BTCUSDTPERP 穿过(Crossing) 39700.00 close: {{close}}
+  ```
+
+  Id为```186515```的实盘收到交互命令：```BTCUSDTPERP 穿过(Crossing) 39700.00 close: 39739.4```。
+
+**Python、Go示例**
 
 ```python
-# Python需要单独安装talib库
+import json
+import urllib.parse
+import urllib.request
 
-import talib
+ACCESS_KEY = ''   # 只授权了 CommandRobot 的 API KEY 的 AccessKey
+SECRET_KEY = ''   # SecretKey
 
-def main():
-    records = exchange.GetRecords()
-    # 14这个参数可以缺省
-    cci = talib.CCI(records.High, records.Low, records.Close, 14)
-    Log(cci)
+def api(method, *args):
+    query = urllib.parse.urlencode({
+        'access_key': ACCESS_KEY,
+        'secret_key': SECRET_KEY,
+        'method': method,
+        'args': json.dumps(list(args)),
+    })
+    with urllib.request.urlopen('https://www.fmz.com/api/v1?' + query, timeout=10) as resp:
+        return json.loads(resp.read().decode('utf-8'))
+
+# API KEY 没有该方法的权限时返回 {'code': 4, 'data': None}
+print(api('CommandRobot', 186515, 'ok12345'))
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto cci = talib.CCI(records, 14);
-    Log(cci);
+```go
+package main
+
+import (
+    "encoding/json"
+    "fmt"
+    "io"
+    "net/http"
+    "net/url"
+    "time"
+)
+
+const (
+    accessKey = "" // 只授权了 CommandRobot 的 API KEY 的 AccessKey
+    secretKey = "" // SecretKey
+    baseAPI   = "https://www.fmz.com/api/v1"
+)
+
+var client = &http.Client{Timeout: 10 * time.Second}
+
+func api(method string, args ...interface{}) (string, error) {
+    if args == nil {
+        args = []interface{}{}
+    }
+    b, err := json.Marshal(args)
+    if err != nil {
+        return "", err
+    }
+    q := url.Values{
+        "access_key": {accessKey},
+        "secret_key": {secretKey},
+        "method":     {method},
+        "args":       {string(b)},
+    }
+    resp, err := client.Get(baseAPI + "?" + q.Encode())
+    if err != nil {
+        return "", err
+    }
+    defer resp.Body.Close()
+    body, err := io.ReadAll(resp.Body)
+    return string(body), err
+}
+
+func main() {
+    ret, err := api("CommandRobot", 186515, "ok12345")
+    fmt.Println(ret, err)
 }
 ```
 
-### JavaScript库
+参考：
 
-- http://mikemcl.github.io/decimal.js/
-  ```javascript
-  // 解决JavaScript语言数值计算时的精度问题
-  function main() {
-      var x = -1.2
-      var a = Decimal.abs(x)
-      var b = new Decimal(x).abs()
-      Log(a.equals(b))                           // true
+- [使用发明者量化交易平台扩展API实现TradingView报警信号交易](https://www.fmz.com/digest-topic/5533)
+- [使用发明者量化交易平台扩展API实现TradingView报警信号交易（B站视频）](https://www.bilibili.com/video/BV1Wk4y1k7zz/)
 
-      var y = 2.2
-      var sum = Decimal.add(x, y)
-      Log(sum.equals(new Decimal(x).plus(y)))    // true
-  }
-  ```
-- http://underscorejs.org/
-  ```javascript
-  function main() {
-      var sum = _.reduce([1, 2, 3], function(memo, num){return memo + num}, 0)
-      Log(sum)
-  }
-  ```
-- http://ta-lib.org/
-  ```javascript
-  function main(){
-      var records = exchange.GetRecords()
-      // 打印所有技术指标数据，在发明者量化交易平台上，JavaScript语言策略已内置talib库
-      Log(talib.MACD(records))
-      Log(talib.MACD(records, 12, 26, 9))
-  }
-  ```
-- 动态加载JavaScript库
-  如需使用其他第三方JavaScript库，可通过以下方式动态加载：
-  ```javascript
-  function main() {
-      // via. https://cdnjs.com/libraries
-      eval(HttpQuery("https://cdnjs.cloudflare.com/ajax/libs/mathjs/13.2.0/math.min.js"))
+#### 扩展API接口详解
 
-      Log(math.round(math.e, 3))                // 2.718
-      Log(math.atan2(3, -3) / math.pi)          // 0.75
-      Log(math.log(10000, 10))                  // 4
-      Log(math.sqrt(-4))                        // {"mathjs":"Complex","re":0,"im":2}
-  }
-  ```
+所有方法都通过```https://www.fmz.com/api/v1```调用，请求格式与签名见`签名验证`，返回结构与错误码见`扩展API接口返回码`。各方法页面示例中的```api()```即签名验证页面Python示例中的函数。
 
-### C++库
+**方法一览**
 
-- https://nlohmann.github.io/json/
-  ```cpp
-  void main() {
-      json table = R"({"type": "table", "title": "Position Info", "cols": ["Column 1", "Column 2"], "rows": [["abc", "def"], ["ABC", "support color #ff0000"]]})"_json;
-      LogStatus("`" + table.dump() + "`");
-      LogStatus("First line message\n`" + table.dump() + "`\nThird line message");
-      json arr = R"([])"_json;
-      arr.push_back(table);
-      arr.push_back(table);
-      LogStatus("`" + arr.dump() + "`");
+| 对象 | 方法 | 参数（按顺序，方括号内可省略） | 说明 | 注意 |
+| - | - | - | - | - |
+| 账号 | GetAccount | 无 | 账号信息 | 只读 |
+| 托管者 | GetNodeList | [offset, limit] | 托管者列表 | 只读 |
+| 托管者 | DeleteNode | nid | 删除托管者 | 删除，不可恢复 |
+| 交易所 | GetExchangeList | isSummary | 平台支持的交易所及配置项 | 只读 |
+| 交易所 | GetPlatformList | [offset, limit] | 已添加的交易所账户 | 只读 |
+| 策略 | GetStrategyList | offset, length, strategyType, category, language, kw[, groupId, orderBy] | 策略列表 | 只读 |
+| 实盘 | GetRobotGroupList | 无 | 实盘分组 | 只读 |
+| 实盘 | GetRobotList | [offset, length, customStatus, appId, kw, groupId, orderBy, strategyId] | 实盘列表 | 只读 |
+| 实盘 | GetRobotDetail | robotId | 实盘详细信息 | 只读 |
+| 实盘 | GetRobotLogs | robotId, logMinId, …, summaryLimit[, logExchange, logKeyword, logTypes] | 日志、收益、图表与状态栏数据 | 只读 |
+| 实盘 | NewRobot | settings | 创建并启动实盘 | 扣费；实盘会真实交易 |
+| 实盘 | RestartRobot | robotId[, settings] | 启动（重启）实盘 | 扣费；实盘会真实交易 |
+| 实盘 | StopRobot | robotId | 停止实盘 | 不会平仓 |
+| 实盘 | CommandRobot | robotId, cmd | 向实盘发送交互命令 | 策略可能据此下单 |
+| 实盘 | DeleteRobot | robotId[, removeLog] | 删除实盘 | 删除，不可恢复 |
+| 调试 | PluginRun | settings | 在托管者上执行一段代码 | 代码可以真实下单 |
 
-      table = R"({
-          "type" : "table",
-          "title" : "Position Operation",
-          "cols" : ["Column 1", "Column 2", "Action"],
-          "rows" : [
-              ["abc", "def", {"type": "button", "cmd": "coverAll", "name": "Close"}]
-          ]
-      })"_json;
-      LogStatus("`" + table.dump() + "`", "\n`" + R"({"type": "button", "cmd": "coverAll", "name": "Close"})"_json.dump() + "`");
-  }
-  ```
+API KEY需要有对应方法的权限，见`创建ApiKey`。
 
-## 扩展API接口
+**参数传法**
 
-发明者量化平台开放了扩展API接口，支持通过程序化方式调用发明者量化交易平台的各项功能。
+```args```有两种写法：
 
-### 创建ApiKey
+- 数组：按上表的顺序传位置参数，例如```[123, "ok"]```。
+- 对象：按参数名传值，例如```{"robotId": 123, "cmd": "ok"}```。参数名不区分大小写、忽略下划线，没有传的参数取默认值。可选参数多的方法（GetRobotList、GetRobotLogs、GetStrategyList）建议用这种写法。
 
-发明者量化交易平台支持扩展API接口的权限管理，可以设置```API KEY```的权限。在平台[账号设置](https://www.fmz.com/m/account)页面的「API接口」选项中，点击「创建新的ApiKey」按钮即可创建扩展```API KEY```。
+**实盘配置（settings）**
 
-创建```API KEY```时，可在「API权限」输入框中输入```*```符号以开启所有**扩展API接口**权限。如需指定具体接口权限，请输入对应的扩展API函数名，使用英文逗号分隔，例如：```GetRobotDetail,DeleteRobot```，这将授予该```API KEY```调用**获取实盘详细信息**接口和**删除实盘**接口的权限。
+NewRobot、RestartRobot、PluginRun的```settings```参数是一个JSON对象，常用字段如下：
 
-在```API KEY```管理页面，您还可以对已创建的```API KEY```进行**修改**、**禁用**、**删除**等操作。
+| 字段 | 说明 |
+| - | - |
+| name | 实盘名称。 |
+| strategy | 策略Id，可用GetStrategyList查询。RestartRobot不能更换实盘的策略。 |
+| args | 策略参数，每个元素为```["参数名", 值]```，例如```[["Interval", 500]]```；策略没有参数时为```[]```。 |
+| exchanges | 交易所对象配置数组，每个元素对应一个交易所对象，写法见下文。 |
+| period | 默认K线周期，单位为秒，例如```60```、```3600```。 |
+| node | 运行实盘的托管者Id，可用GetNodeList查询；不写或为```-1```时自动分配。 |
+| group | 实盘分组Id，可用GetRobotGroupList查询。 |
+| appid | 自定义标签，GetRobotList可以按标签筛选。 |
 
-### 扩展API接口返回码
+```exchanges```的元素有两种写法，同一个数组中不能混用（以第一个元素的写法为准）：
 
-扩展API接口返回的数据结构示例如下：
+- 引用平台上已添加的交易所账户：```{"pid": 123, "pair": "BTC_USDT"}```。```pid```可用GetPlatformList查询（返回数据中的```id```）。
+- 直接传入交易所配置：```{"eid": "Binance", "label": "test", "pair": "BTC_USDT", "meta": {"AccessKey": "...", "SecretKey": "..."}}```。```eid```为交易所Id；```meta```的字段名见GetExchangeList返回的```meta```；```label```是交易所对象的标签，策略中用```exchange.GetLabel()```获取。平台不保存```meta```中的密钥，而是直接转发给托管者，所以用这种写法创建的实盘，每次重启时都必须重新传入```settings```。
+
+通用协议交易所的写法：```{"eid": "Exchange", "label": "test", "pair": "BTC_USDT", "meta": {"AccessKey": "...", "SecretKey": "...", "Front": "http://127.0.0.1:6666/test"}}```，```Front```为通用协议服务的地址。
+
+###### GetAccount
+
+```GetAccount```方法用于获取请求中的```API KEY```对应的发明者量化交易平台账号的账户信息。
+
+Parameters:
+
+无参数
+
+Returns:
 
 ```json
 {
     "code":0,
     "data":{
-        // ...
+        "result":{
+            "balance":22944702436,
+            "concurrent":0,
+            "consumed":211092719653,
+            "email":"123@qq.com",
+            "openai":false,
+            "settings":null,
+            "sns":{"wechat":true},
+            "uid":"105ea6e51bcc177926a10fdbb7e2a1d6",
+            "username":"abc"
+        },
+        "error":null
     }
 }
 ```
 
-```code```字段表示扩展API接口调用时返回的状态码。
+- balance: 账户余额，单位为USD。为了控制精度使用整数表示，除以1e8（10的8次方）得到实际数值，示例中为229.44702436。
+- consumed: 累计消费金额，单位与换算方式同```balance```。
+
+###### GetNodeList
+
+```GetNodeList```方法用于获取请求中的```API KEY```对应的平台账号可以使用的托管者列表，包括自己的托管者和平台的公共托管者。
+
+Parameters:
+
+- `offset` (number, optional): 分页偏移，默认为0。
+- `limit` (number, optional): 每页数量；不传或小于等于0时返回全部。
+
+Returns:
+
+```json
+{
+    "code": 0,
+    "data": {
+        "result": {
+            "all": 1,
+            "nodes": [{
+                "build": "3.7",
+                "city": "...",
+                "created": "2024-11-08 09:21:08",
+                "date": "2024-11-08 16:37:16",
+                "forward": "...",
+                "guid": "...",
+                "host": "node.fmz.com:9902",
+                "id": 123,
+                "ip": "...",
+                "is_owner": true,
+                "loaded": 0,
+                "name": "MacBook-Pro-2.local",
+                "online": true,
+                "os": "darwin/amd64",
+                "peer": "...",
+                "public": 0,
+                "region": "...",
+                "tunnel": false,
+                "version": "...",
+                "wd": 0
+            }]
+        },
+        "error": null
+    }
+}
+```
+
+返回值字段说明（字面意思较明显的不再赘述）：
+- all: 托管者总数（包括公共托管者）。
+- nodes: 记录托管者节点详细信息。
+  - build: 版本号。
+  - city: 所在城市。
+  - is_owner: true表示是私有托管者，false表示是公共托管者。
+  - loaded: 负载，搭载策略实例的个数。
+  - public: 0表示私有托管者，1表示公共托管者。
+  - region: 地理位置。
+  - version: 托管者详细版本信息。
+  - wd: 是否开启离线报警，0表示未开启。
+
+一键部署的托管者包含一些额外信息，字段以```ecs_```、```unit_```前缀开头，记录了一键部署托管者服务器的相关信息（运营商名称、配置、状态等），计费周期、价格等信息，不再赘述。
+
+###### DeleteNode
+
+```DeleteNode```方法用于删除请求中```API KEY```对应的发明者量化交易平台账号下的托管者节点，删除的托管者节点ID为```nid```参数指定的托管者ID。
+
+Parameters:
+
+- `nid` (number, required): ```nid```参数用于指定要删除的托管者ID，可通过```GetNodeList```方法获取账号下托管者的信息。
+
+Returns:
+
+```json
+{
+    "code":0,
+    "data":{
+        "result":true,
+        "error":null
+    }
+}
+```
+
+- result: 是否成功删除关联的托管者程序。
+
+###### GetExchangeList
+
+```GetExchangeList```方法用于获取FMZ量化交易平台支持的交易所列表及其配置信息。
+
+Parameters:
+
+- `isSummary` (bool, required): ```isSummary```参数用于指定返回的数据是否为摘要信息。
+
+Returns:
+
+```isSummary```参数为```false```时，返回的数据：
+
+```json
+{
+    "code": 0,
+    "data": {
+        "result": {
+            "exchanges": [{
+                "category": "加密货币||Crypto",
+                "eid": "Futures_Binance",
+                "id": 74,
+                "logo": "/upload/asset/d8d84b23e573e9326b99.svg",
+                "meta": "[{\"desc\": \"Access Key\", \"qr\":\"apiKey\",\"required\": true, \"type\": \"string\", \"name\": \"AccessKey\", \"label\": \"Access Key\"}, {\"encrypt\": true, \"qr\":\"secretKey\",\"name\": \"SecretKey\", \"required\": true, \"label\": \"Secret Key\", \"type\": \"password\", \"desc\": \"Secret Key\"}]",
+                "name": "币安期货|Futures_Binance",
+                "priority": 200,
+                "stocks": "BTC_USDT,ETH_USDT,ETH_USD",
+                "website": "https://accounts.binance.com/zh-TC/register?ref=45110270"
+            }]
+        },
+        "error": null
+    }
+}
+```
+
+```isSummary```参数为```true```时，返回的数据：
+
+```json
+{
+    "code": 0,
+    "data": {
+        "result": {
+            "exchanges": [{
+                "category": "加密货币||Crypto",
+                "eid": "Futures_Binance",
+                "id": 74,
+                "logo": "/upload/asset/d8d84b23e573e9326b99.svg",
+                "name": "币安期货|Futures_Binance",
+                "priority": 200,
+                "website": "https://accounts.binance.com/zh-TC/register?ref=45110270"
+            }]
+        },
+        "error": null
+    }
+}
+```
+
+- meta: 交易所配置元数据。
+
+###### GetPlatformList
+
+```GetPlatformList```方法用于获取请求中的```API KEY```对应的发明者量化交易平台账号下的已添加的交易所列表。
+
+Parameters:
+
+- `offset` (number, optional): 分页偏移，默认为0。
+- `limit` (number, optional): 每页数量；不传或小于等于0时返回全部。
+
+Returns:
+
+```json
+{
+    "code": 0,
+    "data": {
+        "result": {
+            "all": 2,
+            "platforms": [{
+                "category": "加密货币||Crypto",
+                "date": "2023-12-07 13:44:52",
+                "eid": "Binance",
+                "id": 123,
+                "label": "币安",
+                "logo": "...",
+                "name": "币安现货|Binance",
+                "stocks": ["BTC_USDT", "LTC_USDT", "ETH_USDT", "ETC_USDT", "BTC_TUSD", "ETH_TUSD", "BNB_TUSD"],
+                "website": "..."
+            }, {
+                "category": "通用协议|Custom Protocol",
+                "date": "2020-11-09 11:23:48",
+                "eid": "Exchange",
+                "id": 123,
+                "label": "XX交易所REST协议",
+                "logo": "...",
+                "name": "通用协议|Custom Protocol",
+                "stocks": ["BTC_USDT", "ETH_USDT"],
+                "website": ""
+            }]
+        },
+        "error": null
+    }
+}
+```
+
+- all: 已添加/配置的交易所对象个数。
+- platforms: 交易所相关信息。
+  - eid: 在发明者量化交易平台上交易所的Id，一些配置、参数中会使用到```eid```。
+
+###### GetStrategyList
+
+```GetStrategyList```方法用于获取平台策略信息。
+
+Parameters:
+
+- `offset` (number, required): 分页偏移。
+- `length` (number, required): 每页数量；小于等于0时返回全部。
+- `strategyType` (number, required): 查询范围：
+- ```-1```：自己的策略和租用的策略（含官方策略）。
+- ```0```：自己的策略和租用的策略（不含官方策略）。
+- ```-3```：只查自己的策略。
+- ```-6```：只查租用的策略（含已过期的）。
+- ```-4```：官方策略。
+- ```-2```：策略广场中公开的策略和付费策略。
+- ```1```：已公开的策略。
+- ```2```：待审核的策略。
+- `category` (number, required): 策略类型：
+- ```-1```：全部。
+- ```0```：普通策略。
+- ```20```：模板类库。
+- ```21```：交易插件。
+- `language` (number, required): 策略的编程语言：
+- ```-1```：全部语言。
+- ```0```：JavaScript（TypeScript策略也按JavaScript保存，源码中带```//@ts-check```）。
+- ```1```：Python。
+- ```3```：Blockly可视化。
+- ```4```：My语言。
+- ```5```：PINE语言。
+- ```6```：Workflow工作流。
+- ```7```：Rust。
+- `kw` (string, required): 按策略名称模糊匹配的关键字，多个词用空格分隔；空字符串表示不筛选。以```id:```开头时按策略Id查询，例如```id:123,456```。
+- `groupId` (number, optional): 策略分组：```-1```全部（默认），```0```未分组，大于0为指定分组。只对自己的策略生效。
+- `orderBy` (string, optional): 排序字段：```name```、```last_modified```、```date```，可在后面加``` asc```表示升序（默认降序）；空字符串为默认排序。
+
+Returns:
+
+```json
+{
+    "code": 0,
+    "data": {
+        "result": {
+            "all": 123,
+            "strategies": [{
+                "category": 9,
+                "date": "2024-11-10 20:40:04",
+                "description": "",
+                "forked": 0,
+                "hits": 0,
+                "id": 123,
+                "is_buy": false,
+                "is_owner": false,
+                "language": 0,
+                "last_modified": "2024-11-11 17:23:52",
+                "name": "HedgeGridStrategy",
+                "profile": {
+                    "avatar": "...",
+                    "nickname": "abc",
+                    "uid": "4ed225440db1eda23fe05ed10184113e"
+                },
+                "public": 0,
+                "tags": "",
+                "uid": "4ed225440db1eda23fe05ed10184113e",
+                "username": "abc"
+            }]
+        },
+        "error": null
+    }
+}
+```
+
+- all: 筛选查询出的策略总数。
+- strategies: 查询出的具体策略信息，其中```category```、```language```的取值同上面的参数说明。
+
+参数中没有```needArgs```。按旧版文档在```category```之后多传一个参数，会使后面的参数错位，请按上面的顺序传参，或按参数名传值：
+
+```plaintext
+api('GetStrategyList', 0, 10, -3, -1, -1, '')           # 自己的前10个策略
+api('GetStrategyList', strategyType=-3, language=7)     # 自己的全部Rust策略
+```
+
+###### GetRobotGroupList
+
+```GetRobotGroupList```方法用于获取请求中的```API KEY```对应的发明者量化交易平台账号下的实盘分组列表。
+
+Parameters:
+
+无参数
+
+Returns:
+
+```json
+{
+    "code": 0,
+    "data": {
+        "result": {
+            "items": [{
+                "id": 3417,
+                "name": "测试"
+            }, {
+                "id": 3608,
+                "name": "实盘演示"
+            }]
+        },
+        "error": null
+    }
+}
+```
+
+- items: 实盘分组信息。
+  - id: 实盘分组Id。
+  - name: 实盘分组名称。
+
+```items```字段只记录创建的新分组，「默认」分组不在```items```中。
+
+###### GetRobotList
+
+```GetRobotList```方法用于获取请求中的```API KEY```对应的平台账号下的实盘列表。参数都可以省略。
+
+Parameters:
+
+- `offset` (number, optional): 分页偏移，默认为0。
+- `length` (number, optional): 每页数量；小于等于0时返回全部（默认）。
+- `customStatus` (number, optional): 按实盘状态码筛选，见`实盘状态码`；```-1```为全部实盘（默认），```-2```为全部实盘并按启动时间排序。
+- `appId` (string, optional): 按实盘的自定义标签（创建时```settings```中的```appid```）筛选，空字符串表示不筛选。
+- `kw` (string, optional): 按实盘名称模糊匹配的关键字，空字符串表示不筛选。
+- `groupId` (number, optional): 实盘分组：```-1```全部（默认），```0```未分组，大于0为指定分组。
+- `orderBy` (string, optional): 排序字段：```name```、```status```、```node```、```profit```、```date```、```refresh```、```start_time```、```strategy_name```，可在后面加``` asc```表示升序（默认降序）；空字符串为默认排序。
+- `strategyId` (number, optional): 大于0时只返回该策略的实盘，默认为0（不筛选）。
+
+Returns:
+
+```json
+{
+    "code": 0,
+    "data": {
+        "result": {
+            "all": 1,
+            "concurrent": 0,
+            "robots": [{
+                "charge_time": 1731654846,
+                "date": "2024-11-12 14:05:29",
+                "end_time": "2024-11-15 14:56:32",
+                "fixed_id": 4509153,
+                "id": 591026,
+                "is_sandbox": 0,
+                "name": "测试",
+                "node_guid": "45891bcf3d57f99b08a43dff76ee1ea1",
+                "node_id": 4519153,
+                "node_public": 0,
+                "profit": 0,
+                "public": 0,
+                "refresh": 1731651257000,
+                "start_time": "2024-11-15 14:56:30",
+                "status": 3,
+                "strategy_id": 411670,
+                "strategy_isowner": true,
+                "strategy_language": 0,
+                "strategy_name": "测试",
+                "strategy_public": 0,
+                "uid": "105ed6e511cc977921610fdbb7e2a1d6",
+                "wd": 0
+            }]
+        },
+        "error": null
+    }
+}
+```
+
+- all: 符合条件的实盘总数。
+- robots: 实盘信息，```status```为实盘状态码。
+  - group_id: 实盘分组Id；如果策略实盘在默认分组中则没有```group_id```字段。
+
+以签名验证页面Python示例中的```api()```为例：
+
+- ```api('GetRobotList')```：获取全部实盘。
+- ```api('GetRobotList', 'member2')```：只传一个字符串时视为标签，获取标签为member2的全部实盘。
+- ```api('GetRobotList', 0, 100, -1, 'member2', '')```：按位置传参，从第0条开始最多获取100个标签为member2的实盘。
+- ```api('GetRobotList', appId='member2', length=100)```：按参数名传值，效果同上。
+
+###### GetRobotDetail
+
+```GetRobotDetail```方法用于获取请求中的```API KEY```对应的发明者量化交易平台账号下的实盘详细信息，所要被获取详细信息的实盘Id为```robotId```参数指定的实盘Id。
+
+Parameters:
+
+- `robotId` (number, required): ```robotId```参数用于指定所要获取详细信息的实盘Id，可以用```GetRobotList```方法获取账号下实盘的信息，其中包含实盘Id。
+
+Returns:
+
+```json
+{
+    "code": 0,
+    "data": {
+        "result": {
+            "robot": {
+                "charge_time": 1732246539,
+                "charged": 5850000,
+                "consumed": 5375000000,
+                "date": "2018-12-28 14:34:51",
+                "favorite": {
+                    "added": false,
+                    "type": "R"
+                },
+                "fixed_id": 123,
+                "hits": 1,
+                "id": 123,
+                "is_deleted": 0,
+                "is_manager": true,
+                "is_sandbox": 0,
+                "name": "测试",
+                "node_id": 123,
+                "pexchanges": {
+                    "123": "Futures_OKX"
+                },
+                "phash": {
+                    "123": "ca1aca74b9cf7d8624f2af2dac01e36d"
+                },
+                "plabels": {
+                    "123": "OKX期货"
+                },
+                "priority": 0,
+                "profit": 0,
+                "public": 0,
+                "refresh": 1732244453000,
+                "robot_args": "[]",
+                "start_time": "2024-11-22 11:00:48",
+                "status": 1,
+                "strategy_args": "[]",
+                "strategy_exchange_pairs": "[60,[123],[\"ETH_USDT\"]]",
+                "strategy_id": 123,
+                "strategy_last_modified": "2024-11-21 16:49:25",
+                "strategy_name": "测试",
+                "strategy_public": "0",
+                "uid": "105ed6e51bcc17792a610fdbb7e2a1d6",
+                "username": "abc",
+                "wd": 0
+            }
+        },
+        "error": null
+    }
+}
+```
+
+- charge_time: 下次扣费时间（Unix时间戳，秒），即当前已付费时段的截止时间。
+- charged: 累计计费时长，单位为秒。
+- consumed: 累计扣费金额，单位为USD，按1e8放大为整数，示例中5375000000即53.75 USD。
+- date: 创建日期。
+- fixed_id: 实盘运行时指派的托管者ID，如果是自动，该值为-1。
+- is_manager: 是否有权限管理该实盘。
+- is_sandbox: 是否是模拟盘。
+- name: 实盘名称。
+- node_id: 托管者ID。
+- pexchanges: 实盘配置的交易所对象，123为pid，"Futures_OKX"为交易所Id（eid）。
+- plabels: 实盘配置的交易所对象的标签信息。
+- profit: 实盘收益数据。
+- public: 实盘是否公开。
+- refresh: 最近活跃时间。
+- strategy_exchange_pairs: 配置的交易所对象，设置的交易对信息。
+- wd: 是否开启离线报警。
+
+```strategy_exchange_pairs```属性说明，用以下数据为例：
+
+```plaintext
+"[60,[44314,42960,15445,14703],[\"BTC_USDT\",\"BTC_USDT\",\"ETH_USDT\",\"ETH_USDT\"]]"
+```
+
+其中第一个数据```60```，代表实盘设置的默认K线周期为1分钟，即60秒。
+
+```[44314,42960,15445,14703]```为实盘配置的交易所对象的```pid```（按添加顺序）。
+
+```[\"BTC_USDT\",\"BTC_USDT\",\"ETH_USDT\",\"ETH_USDT\"]```为实盘配置的交易所对象设置的交易对（按添加顺序与pid一一对应）。
+
+###### GetRobotLogs
+
+```GetRobotLogs```方法用于获取请求中的```API KEY```对应的发明者量化交易平台账号下的实盘日志信息，所要被获取日志信息的实盘Id为```robotId```参数指定的实盘Id。
+
+Parameters:
+
+- `robotId` (number, required): ```robotId```参数用于指定所要获取日志信息的实盘Id，可以用```GetRobotList```方法获取账号下实盘的信息，其中包含实盘Id。
+- `logMinId` (number, required): ```logMinId```参数用于指定Log日志的最小Id。
+- `logMaxId` (number, required): ```logMaxId```参数用于指定Log日志的最大Id。
+- `logOffset` (number, required): ```logOffset```参数用于设置偏移，由```logMinId```和```logMaxId```确定范围后，根据```logOffset```偏移（跳过多少条记录），开始作为获取数据的起始位置。
+- `logLimit` (number, required): ```logLimit```参数用于设置确定起始位置后，选取的数据记录条数。
+- `profitMinId` (number, required): ```profitMinId```参数用于设置收益日志的最小Id。
+- `profitMaxId` (number, required): ```profitMaxId```参数用于设置收益日志的最大Id。
+- `profitOffset` (number, required): ```profitOffset```参数用于设置偏移（跳过多少条记录），作为起始位置。
+- `profitLimit` (number, required): ```profitLimit```参数用于设置确定起始位置后，选取的数据记录条数。
+- `chartMinId` (number, required): ```chartMinId```参数用于设置图表数据记录的最小Id。
+- `chartMaxId` (number, required): ```chartMaxId```参数用于设置图表数据记录的最大Id。
+- `chartOffset` (number, required): ```chartOffset```参数用于设置偏移。
+- `chartLimit` (number, required): ```chartLimit```参数用于设置获取的记录条数。
+- `chartUpdateBaseId` (number, required): ```chartUpdateBaseId```参数用于设置查询更新后的基础Id。
+- `chartUpdateDate` (number, required): ```chartUpdateDate```参数用于设置数据记录更新时间戳，会筛选出比这个时间戳大的记录。
+- `summaryLimit` (number, required): ```summaryLimit```参数用于设置查询的状态栏数据字节数。查询实盘的状态栏数据，该参数类型为整型。
+设置0表示不需要查询状态栏信息，设置为非0表示需要查询的状态栏信息字节数（该接口不限制数据量，可以指定一个较大的summaryLimit参数来获取所有状态栏信息），状态栏数据储存在返回的数据的```summary```字段中。
+- `logExchange` (string, optional): 只返回该交易所对象（按标签）的日志，空字符串表示不筛选。
+- `logKeyword` (string, optional): 只返回日志内容包含该关键字的日志，空字符串表示不筛选。
+- `logTypes` (string, optional): 只返回这些类型的日志，日志类型号用逗号分隔，例如```"0,1,2"```只看买单、卖单、撤单日志；空字符串表示全部类型。
+
+Returns:
+
+```json
+{
+    "code": 0,
+    "data": {
+        "result": {
+            "chart": "",
+            "chartTime": 0,
+            "logs": [{
+                "Total": 20,
+                "Max": 20,
+                "Min": 1,
+                "Arr": []
+            }, {
+                "Total": 0,
+                "Max": 0,
+                "Min": 0,
+                "Arr": []
+            }, {
+                "Total": 0,
+                "Max": 0,
+                "Min": 0,
+                "Arr": []
+            }],
+            "node_id": 123,
+            "online": true,
+            "refresh": 1732201544000,
+            "status": 4,
+            "summary": "...",
+            "updateTime": 1732201532636,
+            "wd": 0
+        },
+        "error": null
+    }
+}
+```
+
+- logs: 日志信息；查询出的若干条日志数据在Arr字段中。
+  logs中第一个数据结构为实盘数据库中策略日志表中的日志记录。
+  logs中第二个数据结构为实盘数据库中收益日志表中的日志记录。
+  logs中第三个数据结构为实盘数据库中图表日志表中的日志记录。
+- summary: 实盘状态栏数据。
+
+- 数据库中的策略日志表
+  返回数据中```logs```的属性值（数组结构）的第一个元素中（日志数据）```Arr```属性值描述如下：
+
+  ```plaintext
+  "Arr": [
+      [3977, 3, "Futures_OKX", "", 0, 0, "Sell(688.9, 2): 20016", 1526954372591, "", ""],
+      [3976, 5, "", "", 0, 0, "this_week 仓位过多, 多: 2", 1526954372410, "", ""]
+  ],
+  ```
+
+  | id | logType | eid | orderId | price | amount | extra | date | contractType | direction |
+  | - | - | - | - | - | - | - | - | - | - |
+  | 3977 | 3 | "Futures_OKX" | "" | 0 | 0 | "Sell(688.9, 2): 20016" | 1526954372591 | "" | "" |
+  | 3976 | 5 | "" | "" | 0 | 0 | "this_week 仓位过多, 多: 2" | 1526954372410 | "" | "" |
+
+  ```extra```为打印的日志的附加消息。
+
+  ```logType```值具体代表的日志类型描述如下：
+
+  | logType: | 0 | 1 | 2 | 3 | 4 | 5 | 6 |
+  | - | - | - | - | - | - | - | - |
+  | logType意义: | BUY | SALE | RETRACT | ERROR | PROFIT | MESSAGE | RESTART |
+  | 中文意义 | 买单类型日志 | 卖单类型日志 | 撤销 | 错误 | 收益 | 日志 | 重启 |
+
+- 数据库中的收益图表日志表
+  该图表日志表数据与策略日志表中的收益日志一致。
+
+  ```plaintext
+  "Arr": [
+      [202, 2515.44, 1575896700315],
+      [201, 1415.44, 1575896341568]
+  ]
+  ```
+
+  以其中一条日志数据为例：
+
+  ```plaintext
+  [202, 2515.44, 1575896700315]
+  ```
+
+  ```202```为日志Id，```2515.44```为收益数值，```1575896700315```为时间戳。
+- 数据库中的图表日志表
+
+  ```plaintext
+  "Arr": [
+      [23637, 0, "{\"close\":648,\"high\":650.5,\"low\":647,\"open\":650,\"x\":1575960300000}"],
+      [23636, 5, "{\"x\":1575960300000,\"y\":3.0735}"]
+  ]
+  ```
+
+  以其中一条日志数据为例：
+
+  ```plaintext
+  [23637, 0, "{\"close\":648,\"high\":650.5,\"low\":647,\"open\":650,\"x\":1575960300000}"],
+  ```
+
+  ```23637```为日志Id，```0```为图表数据系列索引，最后的数据```"{\"close\":648,\"high\":650.5,\"low\":647,\"open\":650,\"x\":1575960300000}"```为日志数据，这条数据为图表上的K线数据。
+
+###### NewRobot
+
+```NewRobot```方法用于在请求中的```API KEY```对应的平台账号下创建一个实盘并启动运行，与在网页上创建实盘一样会扣费。
+
+Parameters:
+
+- `settings` (JSON对象, required): 实盘配置，字段见`扩展API接口详解`中的「实盘配置（settings）」。例如：
+
+```json
+{
+    "name": "test",
+    "strategy": 123,
+    "args": [],
+    "exchanges": [
+        {"pid": 123, "pair": "SOL_USDT"}
+    ],
+    "period": 60,
+    "node": 123,
+    "group": 123,
+    "appid": "test"
+}
+```
+
+Returns:
+
+```json
+{
+    "code":0,
+    "data":{
+        "result":591988,
+        "error":null
+    }
+}
+```
+
+- result: 创建成功时为新实盘的Id；失败时为负数，含义同`实盘状态码`中的异常代码（例如```-2```没有找到托管者，```-5```余额不足）。
+
+用```eid```方式直接传入交易所配置时，平台不保存```meta```中的密钥，之后每次用```RestartRobot```重启这个实盘都必须传入```settings```。
+
+###### RestartRobot
+
+```RestartRobot```方法用于启动（重启）请求中的```API KEY```对应的平台账号下的实盘，实盘Id由```robotId```参数指定。启动会扣费。
+
+Parameters:
+
+- `robotId` (number, required): 实盘Id，可以用```GetRobotList```方法查询。
+- `settings` (JSON对象, optional): 实盘配置，字段见`扩展API接口详解`中的「实盘配置（settings）」。传入时先用它更新实盘的配置（名称、参数、交易所、K线周期、托管者、分组），再启动；不能更换策略。
+
+Returns:
+
+```json
+{
+    "code":0,
+    "data":{
+        "result":1,
+        "error":null
+    }
+}
+```
+
+- result: 实盘状态码，1即运行中。
+
+在平台页面创建、使用已添加交易所账户（```pid```）的实盘，可以只传```robotId```，按实盘当前的配置启动。用```eid```方式直接传入交易所配置的实盘（通常由扩展API接口创建），平台没有保存密钥，每次重启都必须传入```settings```。
+
+###### StopRobot
+
+```StopRobot```方法用于停止请求中```API KEY```对应的发明者量化交易平台账号下的实盘。停止运行的实盘Id由```robotId```参数指定。
+
+Parameters:
+
+- `robotId` (number, required): ```robotId```参数用于指定要停止的实盘Id。可以通过```GetRobotList```方法获取账号下的实盘信息，其中包含实盘Id。
+
+Returns:
+
+```json
+{
+    "code":0,
+    "data":{
+        "result":2,
+        "error":null
+    }
+}
+```
+
+- result: 实盘状态码，2表示停止中。
+
+###### CommandRobot
+
+```CommandRobot```方法用于向请求中的```API KEY```对应的发明者量化交易平台账号下的实盘发送交互命令，接收交互命令的实盘Id为```robotId```参数指定的实盘Id，交互命令由策略中调用的```GetCommand()```函数捕获返回。
+
+Parameters:
+
+- `robotId` (number, required): ```robotId```参数用于指定接收交互指令的实盘Id，可以用```GetRobotList```方法获取账号下实盘的信息，其中包含实盘Id。
+- `cmd` (string, required): 发送给实盘的交互命令，策略中用```GetCommand()```函数获取，见`GetCommand`。
+
+Returns:
+
+```json
+{
+    "code":0,
+    "data":{
+        "result":true,
+        "error":null
+    }
+}
+```
+
+- result: 交互指令是否发送成功；向一个没有运行的实盘发送指令，返回的数据中result为false。
+
+实盘策略，假设这个策略实盘处于运行中，实盘Id为123：
+```js
+function main() {
+    while (true) {
+        var cmd = GetCommand()
+        if (cmd) {
+            Log(cmd)
+        }
+        Sleep(2000)
+    }
+}
+```
+
+用签名验证页面Python示例中的```api()```调用```api("CommandRobot", 123, "test command")```，Id为123的实盘会收到交互指令：```test command```，然后通过Log函数输出打印出来。
+
+###### DeleteRobot
+
+```DeleteRobot```方法用于删除请求中的```API KEY```对应的平台账号下的实盘，实盘Id由```robotId```参数指定。运行中的实盘需要先停止才能删除。删除后不可恢复。
+
+Parameters:
+
+- `robotId` (number, required): 要删除的实盘Id，可以用```GetRobotList```方法查询。
+- `removeLog` (bool, optional): 是否同时删除托管者上的实盘日志数据，默认为```true```。
+
+Returns:
+
+```json
+{
+    "code":0,
+    "data":{
+        "result":0,
+        "error":null
+    }
+}
+```
+
+- result: 删除操作的结果。
+  - 0：删除成功。
+  - -1：没有删除：实盘不存在，或者仍在运行、启动中、停止中。
+  - -2：实盘已删除，但无法与实盘所在的托管者联系，日志数据没有删除；需要到托管者目录```logs/storage/<实盘Id>/```下手动删除（例如```123.db3```）。
+
+###### PluginRun
+
+```PluginRun```方法在托管者上执行一段JavaScript代码并返回结果，与开发工具中的「调试工具」、交易终端插件使用同一种执行机制（见`插件原理与编写`）。执行时不创建实盘、不计费，单次执行最长5分钟。
+
+Parameters:
+
+- `settings` (JSON对象, required): 执行配置，例如：
+
+```json
+{
+    "source": "function main() {Log(\"Hello FMZ\")}",
+    "node": 123,
+    "period": 60,
+    "exchanges": [{"pid": 123, "pair": "SOL_USDT"}]
+}
+```
+
+- source：要执行的代码。入口为```main()```，其返回值就是执行结果。
+- strategy：不传```source```时，执行账号中这个Id的策略（例如交易插件）。
+- node：执行代码的托管者Id；不写或为```-1```时自动选择。
+- exchanges：交易所对象配置，写法同`扩展API接口详解`中的「实盘配置（settings）」。
+
+Returns:
+
+```json
+{
+    "code": 0,
+    "data": {
+        "result": "{\"logs\":[{\"PlatformId\":\"\",\"OrderId\":\"0\",\"LogType\":5,\"Price\":0,\"Amount\":0,\"Extra\":\"Hello FMZ\",\"Currency\":\"\",\"Instrument\":\"\",\"Direction\":\"\",\"Time\":1732267473108}],\"result\":\"\"}",
+        "error": null
+    }
+}
+```
+
+- result: 执行结果，是一个JSON字符串：```logs```为代码中```Log()```输出的日志，```result```为```main()```返回值的JSON文本。
+
+```exchanges```也可以不引用平台上的交易所账户，直接传入交易所配置，例如：
+
+```plaintext
+{"eid": "Binance", "pair": "ETH_BTC", "meta": {"AccessKey": "...", "SecretKey": "..."}}
+```
+
+```meta```的字段名见```GetExchangeList```返回的```meta```。```exchanges```中通常只设置一个交易所对象（调试工具页面也只支持一个）；设置两个不会报错，但代码中访问第二个交易所对象时会报错。
+
+#### 扩展API接口返回码
+
+扩展API接口返回的结构如下：
+
+```json
+{
+    "code": 0,
+    "data": {
+        "result": null,
+        "error": null
+    }
+}
+```
+
+```code```是请求本身的状态码：
 
 | 描述 | 代码 |
 | - | - |
 | 执行成功 | 0 |
-| 错误的API KEY | 1 |
+| 错误的API KEY：```AccessKey```不存在或已禁用；直接验证时```secret_key```不正确 | 1 |
 | 错误的签名 | 2 |
-| Nonce错误 | 3 |
-| 方法不正确 | 4 |
-| 参数不正确 | 5 |
+| Nonce错误：```nonce```不大于上次请求的值，或与服务器时间相差超过1小时 | 3 |
+| 方法不正确：方法不存在、不对外开放，或这把API KEY没有该方法的权限 | 4 |
+| 参数不正确：```args```不是合法的JSON，或调用失败 | 5 |
 | 内部未知错误 | 6 |
+| 请求来源IP不在这把API KEY的IP白名单内 | 7 |
 
-### 实盘状态码
+```code```为0只表示请求被受理。方法的结果在```data.result```中；方法执行出错时，```data.error```为错误信息（成功时为```null```）。例如参数个数不对：
+
+```json
+{
+    "code": 0,
+    "data": {
+        "result": null,
+        "error": "Params number mismatch for StopRobot: expected 1, got 0"
+    }
+}
+```
+
+#### 实盘状态码
 
 ```GetRobotList```接口、```GetRobotDetail```接口、```GetRobotLogs```接口返回的数据中```status```字段为：实盘状态码。
 
@@ -5212,23067 +6344,99 @@ void main() {
   | 余额不足 | -5 |
   | 策略并发数超限 | -6 |
 
-### 验证方式
+### 交易终端
 
-调用扩展API接口时支持两种验证方式：```token```验证和直接验证。
+平台提供模块化、可定制的[交易终端](https://www.fmz.com/m/trade)页面：可以自由添加行情、交易等各种模块，模块可以拖动、缩放，可以修改模块绑定的交易所、交易对，同一类模块可以添加多个，方便手动交易和半程序化交易。
 
-#### token验证
+交易终端还支持交易插件：自己编写一段代码作为模块，在选定的托管者上执行，辅助手动交易。
 
-使用```md5```加密方式进行验证，以下是```Python```、```Golang```语言的调用示例：
+#### 插件原理与编写
 
-```python
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-import time
-import json
-import ssl
-ssl._create_default_https_context = ssl._create_unverified_context
+**原理**
 
-try:
-    import md5
-    import urllib2
-    from urllib import urlencode
-except:
-    import hashlib as md5
-    import urllib.request as urllib2
-    from urllib.parse import urlencode
+交易插件是一段在托管者上执行的短代码：在交易终端页面点击「执行」时，平台把插件代码和模块选定的交易所账户发送到选定的托管者执行，执行结束后把返回值显示在模块中。下面几个入口使用同一种执行机制：
 
-accessKey = ''   # your API KEY
-secretKey = ''
+| 入口 | 执行的代码 | 说明 |
+| - | - | - |
+| 交易终端插件 | 策略库中类型为「交易插件」的策略 | 在交易终端页面添加、执行 |
+| 调试工具（开发工具） | 页面中临时编写的JavaScript代码 | 用于测试API调用 |
+| 扩展API接口`PluginRun` | 请求中的```source```，或账号中已有的策略 | 供程序调用 |
+| MCP的```plugin_*```工具 | 平台内置的查询行情、下单等函数 | 供AI助手调用，按```trade```权限授权，见`AI接入` |
 
-def api(method, *args):
-    d = {
-        'version': '1.0',
-        'access_key': accessKey,
-        'method': method,
-        'args': json.dumps(list(args)),
-        'nonce': int(time.time() * 1000),
-        }
+这种执行方式不创建实盘、不计费，单次执行最长5分钟，超时中断。适合辅助手动交易的简单任务，例如冰山委托、批量挂单撤单、计算；需要长期运行的逻辑应创建实盘。
 
-    d['sign'] = md5.md5(('%s|%s|%s|%d|%s' % (d['version'], d['method'], d['args'], d['nonce'], secretKey)).encode('utf-8')).hexdigest()
-    # 注意：urllib2.urlopen 函数可能存在超时问题，可以设置超时时间，例如：urllib2.urlopen('https://www.fmz.com/api/v1', urlencode(d).encode('utf-8'), timeout=10) 设置超时时间为10秒
-    return json.loads(urllib2.urlopen('https://www.fmz.com/api/v1', urlencode(d).encode('utf-8')).read().decode('utf-8'))
+**编写**
 
-# 返回托管者列表
-print(api('GetNodeList'))
-# 返回交易所列表
-print(api('GetPlatformList'))
-# GetRobotList(offset, length, robotStatus, label)，传入-1表示获取全部
-print(api('GetRobotList', 0, 5, -1, 'member2'))
-# CommandRobot(robotId, cmd)向实盘发送命令
-print(api('CommandRobot', 123, 'ok'))
-# StopRobot(robotId)返回实盘状态码
-print(api('StopRobot', 123))
-# RestartRobot(robotId)返回实盘状态码
-print(api('RestartRobot', 123))
-# GetRobotDetail(robotId)返回实盘详细信息
-print(api('GetRobotDetail', 123))
-```
+在新建策略页面把策略类型设置为「交易插件」即可创建交易插件。交易插件、调试工具和```PluginRun```都只支持JavaScript。
 
-```go
-package main
+插件的入口是```main()```，返回值就是执行结果：返回表格对象、图表对象时，在模块中显示为表格、图表（示例见`插件示例`）。插件中```Log()```输出的日志不会在模块中显示。
 
-import (
-    "fmt"
-    "time"
-    "encoding/json"
-    "crypto/md5"
-    "encoding/hex"
-    "net/http"
-    "io/ioutil"
-    "strconv"
-    "net/url"
-)
+**使用**
 
-// 填写您的FMZ平台API密钥
-var apiKey string = ""
-// 填写您的FMZ平台密钥
-var secretKey string = ""
-var baseApi string = "https://www.fmz.com/api/v1"
+- 添加：在交易终端页面打开模块添加菜单，账号策略库中的交易插件会出现在列表中，选择需要的插件添加。
+- 执行：点击插件模块中的「执行」运行插件。
 
-func api(method string, args ... interface{}) (ret interface{}) {
-    // 处理参数
-    jsonStr, err := json.Marshal(args)
-    if err != nil {
-        panic(err)
-    }
+**数据目录**
 
-    params := map[string]string{
-        "version" : "1.0",
-        "access_key" : apiKey,
-        "method" : method,
-        "args" : string(jsonStr),
-        "nonce" : strconv.FormatInt(time.Now().UnixNano() / 1e6, 10),
-    }
+插件和调试工具在托管者上执行时，以托管者运行目录下的```logs/storage/p<数字>/```为工作目录（每个平台账号一个以```p```开头的目录，第一次执行后创建）。如果交易终端使用的交易所账户以密钥文件路径（```file:///xxx.txt```）的方式配置密钥，需要把密钥文件放在这个目录中。
 
-    data := fmt.Sprintf("%s|%s|%s|%v|%s", params["version"], params["method"], params["args"], params["nonce"], secretKey)
-    h := md5.New()
-    h.Write([]byte(data))
-    sign := h.Sum(nil)
+#### 插件示例
 
-    params["sign"] = hex.EncodeToString(sign)
+插件可以在一段时间内执行代码，完成一些简单的操作，例如冰山委托、挂单、撤单、计算等。插件用```return```返回结果，返回表格、图表对象时直接显示为表格、图表。下面是两个例子，更多范例可以在**策略广场**中查找，例如逐笔小量买入/卖出。
 
-    // http request
-    client := &http.Client{}
+**返回深度快照**
 
-    // request
-    urlValue := url.Values{}
-    for k, v := range params {
-        urlValue.Add(k, v)
-    }
-    urlStr := urlValue.Encode()
-    request, err := http.NewRequest("GET", baseApi + "?" + urlStr, nil)
-    if err != nil {
-        panic(err)
-    }
-
-    resp, err := client.Do(request)
-    if err != nil {
-        panic(err)
-    }
-
-    defer resp.Body.Close()
-
-    b, err := ioutil.ReadAll(resp.Body)
-    if err != nil {
-        panic(err)
-    }
-
-    ret = string(b)
-    return
-}
-
-func main() {
-    settings := map[string]interface{}{
-        "name": "hedge test",
-        "strategy": 104150,
-        // K线周期参数，60表示60秒
-        "period": 60,
-        "node" : 73938,
-        "appid": "member2",
-        "exchanges": []interface{}{
-            map[string]interface{}{
-                "eid": "Exchange",
-                "label" : "test_bjex",
-                "pair": "BTC_USDT",
-                "meta" : map[string]interface{}{
-                    // 填写访问密钥
-                    "AccessKey": "",
-                    // 填写密钥
-                    "SecretKey": "",
-                    "Front" : "http://127.0.0.1:6666/exchange",
-                },
-            },
-        },
-    }
-
-    method := "RestartRobot"
-    fmt.Println("调用接口：", method)
-    ret := api(method, 124577, settings)
-    fmt.Println("main ret:", ret)
-}
-```
-
-#### 直接验证
-
-支持不使用```token```验证（直接传递```secret_key```验证），可以生成一个用于直接访问的URL。例如直接向实盘发送交互指令的URL，可用于```Trading View```或其他场景的```WebHook```回调。对于扩展API接口```CommandRobot()```函数，不进行```nonce```校验，不限制该接口的访问频率和访问次数。
-
-例如：创建的扩展```API KEY```中的```AccessKey```为：```xxx```，```SecretKey```为：```yyy```。访问以下链接即可向ID为```186515```的实盘发送交互指令消息，消息内容为字符串：```"ok12345"```。
-
-```plaintext
-https://www.fmz.com/api/v1?access_key=xxx&secret_key=yyy&method=CommandRobot&args=%5B186515%2C%22ok12345%22%5D
-```
-
-在支持直接验证方式下，可获取请求中的```Body```数据，仅支持```CommandRobot```接口。例如在```Trading View```的```WebHook URL```中设置：
-
-```plaintext
-https://www.fmz.com/api/v1?access_key=xxx&secret_key=yyy&method=CommandRobot&args=%5B186515%2C+%22%22%5D
-```
-
-注意需要按照此格式设置：```%5B186515%2C+%22%22%5D```（编码前为：```[186515, ""]```），其中```186515```是发明者量化交易平台的实盘ID。
-
-模拟```Trading View```发送```WebHook URL```警报：
-```js
-function main() {
-    var options = {
-        method: "POST",
-        body: `{"test": 123}`,
-        headers: {"Content-Type": "application/json"}
-    }
-
-    // WebHook URL 警报会自动发送POST请求，包含需要的 headers 设置
-    return HttpQuery("https://www.fmz.com/api/v1?access_key=xxx&secret_key=xxx&method=CommandRobot&args=%5B186515%2C+%22%22%5D", options)
-}
-```
-
-```Trading View```消息框中设置（要发送的请求中的Body数据）：
-- JSON格式：
-
-  https://www.fmz.com/upload/asset/16d8a37ef80d9ccd0079.png
-
-  ```plaintext
-  {"close": {{close}}, "name": "aaa"}
-  ```
-
-  ID为```186515```的实盘即可收到交互命令字符串：```{"close": 39773.75, "name": "aaa"}```。
-- 文本格式：
-
-  https://www.fmz.com/upload/asset/16d8a506dfbb6c60a077.png
-
-  ```plaintext
-  BTCUSDTPERP 穿过(Crossing) 39700.00 close: {{close}}
-  ```
-
-  ID为```186515```的实盘即可收到交互命令字符串：```BTCUSDTPERP 穿过(Crossing) 39700.00 close: 39739.4```。
-
-```Python```、```Golang```语言调用示例：
-
-```python
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-
-import json
-import ssl
-
-ssl._create_default_https_context = ssl._create_unverified_context
-
-try:
-    import urllib2
-except:
-    import urllib.request as urllib2
-
-accessKey = 'your accessKey'
-secretKey = 'your secretKey'
-
-def api(method, *args):
-    return json.loads(urllib2.urlopen(('https://www.fmz.com/api/v1?access_key=%s&secret_key=%s&method=%s&args=%s' % (accessKey, secretKey, method, json.dumps(list(args)))).replace(' ', '')).read().decode('utf-8'))
-
-# 如果API KEY没有该接口权限，调用print(api('RestartRobot', 186515)) 会失败，返回数据：{'code': 4, 'data': None}
-# print(api('RestartRobot', 186515))
-
-# 打印Id为：186515的实盘详细信息
-print(api('GetRobotDetail', 186515))
-```
-
-```go
-package main
-
-import (
-    "fmt"
-    "encoding/json"
-    "net/http"
-    "io/ioutil"
-    "net/url"
-)
-
-// 填写自己的FMZ平台api key
-var apiKey string = "your access_key"
-
-// 填写自己的FMZ平台secret key
-var secretKey string = "your secret_key"
-var baseApi string = "https://www.fmz.com/api/v1"
-
-func api(method string, args ... interface{}) (ret interface{}) {
-    jsonStr, err := json.Marshal(args)
-    if err != nil {
-        panic(err)
-    }
-
-    params := map[string]string{
-        "access_key" : apiKey,
-        "secret_key" : secretKey,
-        "method" : method,
-        "args" : string(jsonStr),
-    }
-
-    // http request
-    client := &http.Client{}
-
-    // request
-    urlValue := url.Values{}
-    for k, v := range params {
-        urlValue.Add(k, v)
-    }
-    urlStr := urlValue.Encode()
-    request, err := http.NewRequest("GET", baseApi + "?" + urlStr, nil)
-    if err != nil {
-        panic(err)
-    }
-
-    resp, err := client.Do(request)
-    if err != nil {
-        panic(err)
-    }
-
-    defer resp.Body.Close()
-
-    b, err := ioutil.ReadAll(resp.Body)
-    if err != nil {
-        panic(err)
-    }
-
-    ret = string(b)
-    return
-}
-
-func main() {
-    method := "GetRobotDetail"
-    fmt.Println("调用接口：", method)
-    ret := api(method, 186515)
-    fmt.Println("main ret:", ret)
-}
-```
-
-[使用发明者量化交易平台扩展API实现TradingView报警信号交易](https://www.fmz.com/digest-topic/5533)
-[使用发明者量化交易平台扩展API实现TradingView报警信号交易，B站视频链接](https://www.bilibili.com/video/BV1Wk4y1k7zz/)
-
-### 扩展API接口详解
-
-- 发明者量化交易平台扩展API接口
-  在```https://www.fmz.com/api/v1```后直接附加请求的查询参数（以```?```分隔），以下是使用```Python```表达的请求参数：
-
-  ```json
-  {
-      "version"   : "1.0",
-      "access_key": "xxx",
-      "method"    : "GetNodeList",
-      "args"      : [],
-      "nonce"     : 1516292399361,
-      "sign"      : "085b63456c93hfb243a757366600f9c2"
-  }
-  ```
-
-  | 字段 | 说明 |
-  | - | - |
-  | version    | 版本号。 |
-  | access_key | AccessKey，在账户管理页面申请。 |
-  | method     | 具体调用的方法。 |
-  | args       | 调用method方法的参数列表。 |
-  | nonce      | 时间戳，单位为毫秒，允许与标准时间戳前后误差1小时，nonce必须大于上一次访问时的nonce值。 |
-  | sign       | 签名。 |
-
-  各参数以字符```&```分隔，参数名和参数值用符号```=```连接，完整的请求URL（以```method=GetNodeList```为例）：
-
-  ```plaintext
-  https://www.fmz.com/api/v1?access_key=xxx&nonce=1516292399361&args=%5B%5D&sign=085b63456c93hfb243a757366600f9c2&version=1.0&method=GetNodeList
-  ```
-
-  注意：请求参数中不包含```secret_key```参数。
-- 签名方式
-  请求参数中```sign```参数的加密方式如下，按照以下格式：
-
-  ```plaintext
-  version + "|" + method + "|" + args + "|" + nonce + "|" + secretKey
-  ```
-
-  拼接字符串后，使用```MD5```加密算法对字符串进行加密，并转换为十六进制字符串，该值作为参数```sign```的值。签名部分可参考```Python```代码扩展API接口[「验证方式」](/user-guide/扩展api接口/验证方式)：
-
-  ```python
-  # 参数
-  d = {
-      'version': '1.0',
-      'access_key': accessKey,
-      'method': method,
-      'args': json.dumps(list(args)),
-      'nonce': int(time.time() * 1000),
-  }
-
-  # 计算sign签名
-  d['sign'] = md5.md5(('%s|%s|%s|%d|%s' % (d['version'], d['method'], d['args'], d['nonce'], secretKey)).encode('utf-8')).hexdigest()
-  ```
-- 接口业务错误：
-  - 参数不足：
-    ```json
-    {
-        "code":0,
-        "data":{
-            "result":null,
-            "error":"Params length incorrect"
-        }
-    }
-    ```
-
-##### GetNodeList
-
-```GetNodeList```方法用于获取请求中```API KEY```对应的发明者量化交易平台账号下的托管者列表。
-
-Parameters:
-
-- 无
-- 参
-- 数
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: j
-
-Returns: s
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: a
-
-Returns: l
-
-Returns: l
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 1
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: n
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: [
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: b
-
-Returns: u
-
-Returns: i
-
-Returns: l
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 3
-
-Returns: .
-
-Returns: 7
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: i
-
-Returns: t
-
-Returns: y
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: .
-
-Returns: .
-
-Returns: .
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: r
-
-Returns: e
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 2
-
-Returns: 0
-
-Returns: 2
-
-Returns: 4
-
-Returns: -
-
-Returns: 1
-
-Returns: 1
-
-Returns: -
-
-Returns: 0
-
-Returns: 8
-
-Returns: 
-
-Returns: 0
-
-Returns: 9
-
-Returns: :
-
-Returns: 2
-
-Returns: 1
-
-Returns: :
-
-Returns: 0
-
-Returns: 8
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 2
-
-Returns: 0
-
-Returns: 2
-
-Returns: 4
-
-Returns: -
-
-Returns: 1
-
-Returns: 1
-
-Returns: -
-
-Returns: 0
-
-Returns: 8
-
-Returns: 
-
-Returns: 1
-
-Returns: 6
-
-Returns: :
-
-Returns: 3
-
-Returns: 7
-
-Returns: :
-
-Returns: 1
-
-Returns: 6
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: f
-
-Returns: o
-
-Returns: r
-
-Returns: w
-
-Returns: a
-
-Returns: r
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: .
-
-Returns: .
-
-Returns: .
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: g
-
-Returns: u
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: .
-
-Returns: .
-
-Returns: .
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: h
-
-Returns: o
-
-Returns: s
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: n
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: .
-
-Returns: f
-
-Returns: m
-
-Returns: z
-
-Returns: .
-
-Returns: c
-
-Returns: o
-
-Returns: m
-
-Returns: :
-
-Returns: 9
-
-Returns: 9
-
-Returns: 0
-
-Returns: 2
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 1
-
-Returns: 2
-
-Returns: 3
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: i
-
-Returns: p
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: .
-
-Returns: .
-
-Returns: .
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: i
-
-Returns: s
-
-Returns: _
-
-Returns: o
-
-Returns: w
-
-Returns: n
-
-Returns: e
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: t
-
-Returns: r
-
-Returns: u
-
-Returns: e
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: l
-
-Returns: o
-
-Returns: a
-
-Returns: d
-
-Returns: e
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: n
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: M
-
-Returns: a
-
-Returns: c
-
-Returns: B
-
-Returns: o
-
-Returns: o
-
-Returns: k
-
-Returns: -
-
-Returns: P
-
-Returns: r
-
-Returns: o
-
-Returns: -
-
-Returns: 2
-
-Returns: .
-
-Returns: l
-
-Returns: o
-
-Returns: c
-
-Returns: a
-
-Returns: l
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: o
-
-Returns: n
-
-Returns: l
-
-Returns: i
-
-Returns: n
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: t
-
-Returns: r
-
-Returns: u
-
-Returns: e
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: o
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: r
-
-Returns: w
-
-Returns: i
-
-Returns: n
-
-Returns: /
-
-Returns: a
-
-Returns: m
-
-Returns: d
-
-Returns: 6
-
-Returns: 4
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: p
-
-Returns: e
-
-Returns: e
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: .
-
-Returns: .
-
-Returns: .
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: p
-
-Returns: u
-
-Returns: b
-
-Returns: l
-
-Returns: i
-
-Returns: c
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: g
-
-Returns: i
-
-Returns: o
-
-Returns: n
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: .
-
-Returns: .
-
-Returns: .
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: t
-
-Returns: u
-
-Returns: n
-
-Returns: n
-
-Returns: e
-
-Returns: l
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: f
-
-Returns: a
-
-Returns: l
-
-Returns: s
-
-Returns: e
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: v
-
-Returns: e
-
-Returns: r
-
-Returns: s
-
-Returns: i
-
-Returns: o
-
-Returns: n
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: .
-
-Returns: .
-
-Returns: .
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: w
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ]
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: r
-
-Returns: r
-
-Returns: o
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: n
-
-Returns: u
-
-Returns: l
-
-Returns: l
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 
-
-Returns: 
-
-Returns: 返
-
-Returns: 回
-
-Returns: 值
-
-Returns: 字
-
-Returns: 段
-
-Returns: 说
-
-Returns: 明
-
-Returns: （
-
-Returns: 字
-
-Returns: 面
-
-Returns: 意
-
-Returns: 思
-
-Returns: 明
-
-Returns: 显
-
-Returns: 的
-
-Returns: 字
-
-Returns: 段
-
-Returns: 不
-
-Returns: 再
-
-Returns: 赘
-
-Returns: 述
-
-Returns: ）
-
-Returns: ：
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: a
-
-Returns: l
-
-Returns: l
-
-Returns: :
-
-Returns: 
-
-Returns: 当
-
-Returns: 前
-
-Returns: 账
-
-Returns: 户
-
-Returns: 关
-
-Returns: 联
-
-Returns: 的
-
-Returns: 托
-
-Returns: 管
-
-Returns: 者
-
-Returns: 总
-
-Returns: 数
-
-Returns: 。
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: n
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: s
-
-Returns: :
-
-Returns: 
-
-Returns: 托
-
-Returns: 管
-
-Returns: 者
-
-Returns: 节
-
-Returns: 点
-
-Returns: 的
-
-Returns: 详
-
-Returns: 细
-
-Returns: 信
-
-Returns: 息
-
-Returns: 列
-
-Returns: 表
-
-Returns: 。
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: b
-
-Returns: u
-
-Returns: i
-
-Returns: l
-
-Returns: d
-
-Returns: :
-
-Returns: 
-
-Returns: 版
-
-Returns: 本
-
-Returns: 号
-
-Returns: 。
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: c
-
-Returns: i
-
-Returns: t
-
-Returns: y
-
-Returns: :
-
-Returns: 
-
-Returns: 所
-
-Returns: 在
-
-Returns: 城
-
-Returns: 市
-
-Returns: 。
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: i
-
-Returns: s
-
-Returns: _
-
-Returns: o
-
-Returns: w
-
-Returns: n
-
-Returns: e
-
-Returns: r
-
-Returns: :
-
-Returns: 
-
-Returns: t
-
-Returns: r
-
-Returns: u
-
-Returns: e
-
-Returns: 表
-
-Returns: 示
-
-Returns: 私
-
-Returns: 有
-
-Returns: 托
-
-Returns: 管
-
-Returns: 者
-
-Returns: ，
-
-Returns: f
-
-Returns: a
-
-Returns: l
-
-Returns: s
-
-Returns: e
-
-Returns: 表
-
-Returns: 示
-
-Returns: 公
-
-Returns: 共
-
-Returns: 托
-
-Returns: 管
-
-Returns: 者
-
-Returns: 。
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: l
-
-Returns: o
-
-Returns: a
-
-Returns: d
-
-Returns: e
-
-Returns: d
-
-Returns: :
-
-Returns: 
-
-Returns: 负
-
-Returns: 载
-
-Returns: 量
-
-Returns: ，
-
-Returns: 即
-
-Returns: 当
-
-Returns: 前
-
-Returns: 运
-
-Returns: 行
-
-Returns: 的
-
-Returns: 策
-
-Returns: 略
-
-Returns: 实
-
-Returns: 例
-
-Returns: 数
-
-Returns: 量
-
-Returns: 。
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: p
-
-Returns: u
-
-Returns: b
-
-Returns: l
-
-Returns: i
-
-Returns: c
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: 表
-
-Returns: 示
-
-Returns: 私
-
-Returns: 有
-
-Returns: 托
-
-Returns: 管
-
-Returns: 者
-
-Returns: ，
-
-Returns: 1
-
-Returns: 表
-
-Returns: 示
-
-Returns: 公
-
-Returns: 共
-
-Returns: 托
-
-Returns: 管
-
-Returns: 者
-
-Returns: 。
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: r
-
-Returns: e
-
-Returns: g
-
-Returns: i
-
-Returns: o
-
-Returns: n
-
-Returns: :
-
-Returns: 
-
-Returns: 地
-
-Returns: 理
-
-Returns: 位
-
-Returns: 置
-
-Returns: 。
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: v
-
-Returns: e
-
-Returns: r
-
-Returns: s
-
-Returns: i
-
-Returns: o
-
-Returns: n
-
-Returns: :
-
-Returns: 
-
-Returns: 托
-
-Returns: 管
-
-Returns: 者
-
-Returns: 的
-
-Returns: 详
-
-Returns: 细
-
-Returns: 版
-
-Returns: 本
-
-Returns: 信
-
-Returns: 息
-
-Returns: 。
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: w
-
-Returns: d
-
-Returns: :
-
-Returns: 
-
-Returns: 离
-
-Returns: 线
-
-Returns: 报
-
-Returns: 警
-
-Returns: 开
-
-Returns: 关
-
-Returns: ，
-
-Returns: 0
-
-Returns: 表
-
-Returns: 示
-
-Returns: 未
-
-Returns: 开
-
-Returns: 启
-
-Returns: 。
-
-Returns: 
-
-Returns: 一
-
-Returns: 键
-
-Returns: 部
-
-Returns: 署
-
-Returns: 的
-
-Returns: 托
-
-Returns: 管
-
-Returns: 者
-
-Returns: 包
-
-Returns: 含
-
-Returns: 额
-
-Returns: 外
-
-Returns: 信
-
-Returns: 息
-
-Returns: ，
-
-Returns: 相
-
-Returns: 关
-
-Returns: 字
-
-Returns: 段
-
-Returns: 以
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: e
-
-Returns: c
-
-Returns: s
-
-Returns: _
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 、
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: u
-
-Returns: n
-
-Returns: i
-
-Returns: t
-
-Returns: _
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 为
-
-Returns: 前
-
-Returns: 缀
-
-Returns: ，
-
-Returns: 记
-
-Returns: 录
-
-Returns: 了
-
-Returns: 一
-
-Returns: 键
-
-Returns: 部
-
-Returns: 署
-
-Returns: 托
-
-Returns: 管
-
-Returns: 者
-
-Returns: 服
-
-Returns: 务
-
-Returns: 器
-
-Returns: 的
-
-Returns: 相
-
-Returns: 关
-
-Returns: 信
-
-Returns: 息
-
-Returns: （
-
-Returns: 运
-
-Returns: 营
-
-Returns: 商
-
-Returns: 名
-
-Returns: 称
-
-Returns: 、
-
-Returns: 配
-
-Returns: 置
-
-Returns: 、
-
-Returns: 状
-
-Returns: 态
-
-Returns: 等
-
-Returns: ）
-
-Returns: 、
-
-Returns: 计
-
-Returns: 费
-
-Returns: 周
-
-Returns: 期
-
-Returns: 、
-
-Returns: 价
-
-Returns: 格
-
-Returns: 等
-
-Returns: 信
-
-Returns: 息
-
-Returns: ，
-
-Returns: 此
-
-Returns: 处
-
-Returns: 不
-
-Returns: 再
-
-Returns: 详
-
-Returns: 述
-
-Returns: 。
-
-##### GetRobotGroupList
-
-```GetRobotGroupList```方法用于获取请求中```API KEY```对应的发明者量化交易平台账号下的实盘分组列表。
-
-Parameters:
-
-- 无
-- 参
-- 数
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: j
-
-Returns: s
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: i
-
-Returns: t
-
-Returns: e
-
-Returns: m
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: [
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 3
-
-Returns: 4
-
-Returns: 1
-
-Returns: 7
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: n
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 测
-
-Returns: 试
-
-Returns: "
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ,
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 3
-
-Returns: 6
-
-Returns: 0
-
-Returns: 8
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: n
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 实
-
-Returns: 盘
-
-Returns: 演
-
-Returns: 示
-
-Returns: "
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ]
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: r
-
-Returns: r
-
-Returns: o
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: n
-
-Returns: u
-
-Returns: l
-
-Returns: l
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: i
-
-Returns: t
-
-Returns: e
-
-Returns: m
-
-Returns: s
-
-Returns: :
-
-Returns: 
-
-Returns: 实
-
-Returns: 盘
-
-Returns: 分
-
-Returns: 组
-
-Returns: 信
-
-Returns: 息
-
-Returns: 。
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: i
-
-Returns: d
-
-Returns: :
-
-Returns: 
-
-Returns: 实
-
-Returns: 盘
-
-Returns: 分
-
-Returns: 组
-
-Returns: I
-
-Returns: D
-
-Returns: 。
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: n
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: :
-
-Returns: 
-
-Returns: 实
-
-Returns: 盘
-
-Returns: 分
-
-Returns: 组
-
-Returns: 名
-
-Returns: 称
-
-Returns: 。
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: i
-
-Returns: t
-
-Returns: e
-
-Returns: m
-
-Returns: s
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 字
-
-Returns: 段
-
-Returns: 仅
-
-Returns: 记
-
-Returns: 录
-
-Returns: 创
-
-Returns: 建
-
-Returns: 的
-
-Returns: 新
-
-Returns: 分
-
-Returns: 组
-
-Returns: ，
-
-Returns: 「
-
-Returns: 默
-
-Returns: 认
-
-Returns: 」
-
-Returns: 分
-
-Returns: 组
-
-Returns: 不
-
-Returns: 包
-
-Returns: 含
-
-Returns: 在
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: i
-
-Returns: t
-
-Returns: e
-
-Returns: m
-
-Returns: s
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 中
-
-Returns: 。
-
-##### GetPlatformList
-
-```GetPlatformList```方法用于获取请求中```API KEY```对应的发明者量化交易平台账号下已配置的交易所列表。
-
-Parameters:
-
-- 无
-- 参
-- 数
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: j
-
-Returns: s
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: a
-
-Returns: l
-
-Returns: l
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 2
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: p
-
-Returns: l
-
-Returns: a
-
-Returns: t
-
-Returns: f
-
-Returns: o
-
-Returns: r
-
-Returns: m
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: [
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: g
-
-Returns: o
-
-Returns: r
-
-Returns: y
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 加
-
-Returns: 密
-
-Returns: 货
-
-Returns: 币
-
-Returns: |
-
-Returns: |
-
-Returns: C
-
-Returns: r
-
-Returns: y
-
-Returns: p
-
-Returns: t
-
-Returns: o
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 2
-
-Returns: 0
-
-Returns: 2
-
-Returns: 3
-
-Returns: -
-
-Returns: 1
-
-Returns: 2
-
-Returns: -
-
-Returns: 0
-
-Returns: 7
-
-Returns: 
-
-Returns: 1
-
-Returns: 3
-
-Returns: :
-
-Returns: 4
-
-Returns: 4
-
-Returns: :
-
-Returns: 5
-
-Returns: 2
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: B
-
-Returns: i
-
-Returns: n
-
-Returns: a
-
-Returns: n
-
-Returns: c
-
-Returns: e
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 1
-
-Returns: 2
-
-Returns: 3
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: l
-
-Returns: a
-
-Returns: b
-
-Returns: e
-
-Returns: l
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 币
-
-Returns: 安
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: l
-
-Returns: o
-
-Returns: g
-
-Returns: o
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: .
-
-Returns: .
-
-Returns: .
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: n
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 币
-
-Returns: 安
-
-Returns: 现
-
-Returns: 货
-
-Returns: |
-
-Returns: B
-
-Returns: i
-
-Returns: n
-
-Returns: a
-
-Returns: n
-
-Returns: c
-
-Returns: e
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: t
-
-Returns: o
-
-Returns: c
-
-Returns: k
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: [
-
-Returns: "
-
-Returns: B
-
-Returns: T
-
-Returns: C
-
-Returns: _
-
-Returns: U
-
-Returns: S
-
-Returns: D
-
-Returns: T
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: "
-
-Returns: L
-
-Returns: T
-
-Returns: C
-
-Returns: _
-
-Returns: U
-
-Returns: S
-
-Returns: D
-
-Returns: T
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: "
-
-Returns: E
-
-Returns: T
-
-Returns: H
-
-Returns: _
-
-Returns: U
-
-Returns: S
-
-Returns: D
-
-Returns: T
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: "
-
-Returns: E
-
-Returns: T
-
-Returns: C
-
-Returns: _
-
-Returns: U
-
-Returns: S
-
-Returns: D
-
-Returns: T
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: "
-
-Returns: B
-
-Returns: T
-
-Returns: C
-
-Returns: _
-
-Returns: T
-
-Returns: U
-
-Returns: S
-
-Returns: D
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: "
-
-Returns: E
-
-Returns: T
-
-Returns: H
-
-Returns: _
-
-Returns: T
-
-Returns: U
-
-Returns: S
-
-Returns: D
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: "
-
-Returns: B
-
-Returns: N
-
-Returns: B
-
-Returns: _
-
-Returns: T
-
-Returns: U
-
-Returns: S
-
-Returns: D
-
-Returns: "
-
-Returns: ]
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: w
-
-Returns: e
-
-Returns: b
-
-Returns: s
-
-Returns: i
-
-Returns: t
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: .
-
-Returns: .
-
-Returns: .
-
-Returns: "
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ,
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: g
-
-Returns: o
-
-Returns: r
-
-Returns: y
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 通
-
-Returns: 用
-
-Returns: 协
-
-Returns: 议
-
-Returns: |
-
-Returns: C
-
-Returns: u
-
-Returns: s
-
-Returns: t
-
-Returns: o
-
-Returns: m
-
-Returns: 
-
-Returns: P
-
-Returns: r
-
-Returns: o
-
-Returns: t
-
-Returns: o
-
-Returns: c
-
-Returns: o
-
-Returns: l
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 2
-
-Returns: 0
-
-Returns: 2
-
-Returns: 0
-
-Returns: -
-
-Returns: 1
-
-Returns: 1
-
-Returns: -
-
-Returns: 0
-
-Returns: 9
-
-Returns: 
-
-Returns: 1
-
-Returns: 1
-
-Returns: :
-
-Returns: 2
-
-Returns: 3
-
-Returns: :
-
-Returns: 4
-
-Returns: 8
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: E
-
-Returns: x
-
-Returns: c
-
-Returns: h
-
-Returns: a
-
-Returns: n
-
-Returns: g
-
-Returns: e
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 1
-
-Returns: 2
-
-Returns: 3
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: l
-
-Returns: a
-
-Returns: b
-
-Returns: e
-
-Returns: l
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: X
-
-Returns: X
-
-Returns: 交
-
-Returns: 易
-
-Returns: 所
-
-Returns: R
-
-Returns: E
-
-Returns: S
-
-Returns: T
-
-Returns: 协
-
-Returns: 议
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: l
-
-Returns: o
-
-Returns: g
-
-Returns: o
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: .
-
-Returns: .
-
-Returns: .
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: n
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 通
-
-Returns: 用
-
-Returns: 协
-
-Returns: 议
-
-Returns: |
-
-Returns: C
-
-Returns: u
-
-Returns: s
-
-Returns: t
-
-Returns: o
-
-Returns: m
-
-Returns: 
-
-Returns: P
-
-Returns: r
-
-Returns: o
-
-Returns: t
-
-Returns: o
-
-Returns: c
-
-Returns: o
-
-Returns: l
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: t
-
-Returns: o
-
-Returns: c
-
-Returns: k
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: [
-
-Returns: "
-
-Returns: B
-
-Returns: T
-
-Returns: C
-
-Returns: _
-
-Returns: U
-
-Returns: S
-
-Returns: D
-
-Returns: T
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: "
-
-Returns: E
-
-Returns: T
-
-Returns: H
-
-Returns: _
-
-Returns: U
-
-Returns: S
-
-Returns: D
-
-Returns: T
-
-Returns: "
-
-Returns: ]
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: w
-
-Returns: e
-
-Returns: b
-
-Returns: s
-
-Returns: i
-
-Returns: t
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: "
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ]
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: r
-
-Returns: r
-
-Returns: o
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: n
-
-Returns: u
-
-Returns: l
-
-Returns: l
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: a
-
-Returns: l
-
-Returns: l
-
-Returns: :
-
-Returns: 
-
-Returns: 已
-
-Returns: 配
-
-Returns: 置
-
-Returns: 的
-
-Returns: 交
-
-Returns: 易
-
-Returns: 所
-
-Returns: 对
-
-Returns: 象
-
-Returns: 总
-
-Returns: 数
-
-Returns: 。
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: p
-
-Returns: l
-
-Returns: a
-
-Returns: t
-
-Returns: f
-
-Returns: o
-
-Returns: r
-
-Returns: m
-
-Returns: s
-
-Returns: :
-
-Returns: 
-
-Returns: 交
-
-Returns: 易
-
-Returns: 所
-
-Returns: 相
-
-Returns: 关
-
-Returns: 信
-
-Returns: 息
-
-Returns: 。
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: e
-
-Returns: i
-
-Returns: d
-
-Returns: :
-
-Returns: 
-
-Returns: 发
-
-Returns: 明
-
-Returns: 者
-
-Returns: 量
-
-Returns: 化
-
-Returns: 交
-
-Returns: 易
-
-Returns: 平
-
-Returns: 台
-
-Returns: 上
-
-Returns: 的
-
-Returns: 交
-
-Returns: 易
-
-Returns: 所
-
-Returns: 标
-
-Returns: 识
-
-Returns: 符
-
-Returns: ，
-
-Returns: 在
-
-Returns: 某
-
-Returns: 些
-
-Returns: 配
-
-Returns: 置
-
-Returns: 和
-
-Returns: 参
-
-Returns: 数
-
-Returns: 中
-
-Returns: 需
-
-Returns: 要
-
-Returns: 使
-
-Returns: 用
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: e
-
-Returns: i
-
-Returns: d
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 。
-
-##### GetRobotList
-
-```GetRobotList```方法用于获取请求中```API KEY```对应的发明者量化交易平台账号下的实盘列表。
-
-Parameters:
-
-- `offset` (number, optional): 分页查询的偏移量设置。
-- `length` (number, optional): 分页查询的数据长度设置。
-- `robotStatus` (number, optional): 指定要查询的实盘状态，参考扩展API接口[「实盘状态码」](/user-guide/扩展api接口/实盘状态码)，传入```-1```表示获取全部实盘。
-- `label` (string, optional): 指定要查询的实盘自定义标签，可筛选出包含该标签的所有实盘。
-- `keyWord` (string, optional): 查询关键字。
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: j
-
-Returns: s
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: a
-
-Returns: l
-
-Returns: l
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 1
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: o
-
-Returns: n
-
-Returns: c
-
-Returns: u
-
-Returns: r
-
-Returns: r
-
-Returns: e
-
-Returns: n
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: o
-
-Returns: b
-
-Returns: o
-
-Returns: t
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: [
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: h
-
-Returns: a
-
-Returns: r
-
-Returns: g
-
-Returns: e
-
-Returns: _
-
-Returns: t
-
-Returns: i
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 1
-
-Returns: 7
-
-Returns: 3
-
-Returns: 1
-
-Returns: 6
-
-Returns: 5
-
-Returns: 4
-
-Returns: 8
-
-Returns: 4
-
-Returns: 6
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 2
-
-Returns: 0
-
-Returns: 2
-
-Returns: 4
-
-Returns: -
-
-Returns: 1
-
-Returns: 1
-
-Returns: -
-
-Returns: 1
-
-Returns: 2
-
-Returns: 
-
-Returns: 1
-
-Returns: 4
-
-Returns: :
-
-Returns: 0
-
-Returns: 5
-
-Returns: :
-
-Returns: 2
-
-Returns: 9
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: n
-
-Returns: d
-
-Returns: _
-
-Returns: t
-
-Returns: i
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 2
-
-Returns: 0
-
-Returns: 2
-
-Returns: 4
-
-Returns: -
-
-Returns: 1
-
-Returns: 1
-
-Returns: -
-
-Returns: 1
-
-Returns: 5
-
-Returns: 
-
-Returns: 1
-
-Returns: 4
-
-Returns: :
-
-Returns: 5
-
-Returns: 6
-
-Returns: :
-
-Returns: 3
-
-Returns: 2
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: f
-
-Returns: i
-
-Returns: x
-
-Returns: e
-
-Returns: d
-
-Returns: _
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 4
-
-Returns: 5
-
-Returns: 0
-
-Returns: 9
-
-Returns: 1
-
-Returns: 5
-
-Returns: 3
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 5
-
-Returns: 9
-
-Returns: 1
-
-Returns: 0
-
-Returns: 2
-
-Returns: 6
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: i
-
-Returns: s
-
-Returns: _
-
-Returns: s
-
-Returns: a
-
-Returns: n
-
-Returns: d
-
-Returns: b
-
-Returns: o
-
-Returns: x
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: n
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 测
-
-Returns: 试
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: n
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: _
-
-Returns: g
-
-Returns: u
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 4
-
-Returns: 5
-
-Returns: 8
-
-Returns: 9
-
-Returns: 1
-
-Returns: b
-
-Returns: c
-
-Returns: f
-
-Returns: 3
-
-Returns: d
-
-Returns: 5
-
-Returns: 7
-
-Returns: f
-
-Returns: 9
-
-Returns: 9
-
-Returns: b
-
-Returns: 0
-
-Returns: 8
-
-Returns: a
-
-Returns: 4
-
-Returns: 3
-
-Returns: d
-
-Returns: f
-
-Returns: f
-
-Returns: 7
-
-Returns: 6
-
-Returns: e
-
-Returns: e
-
-Returns: 1
-
-Returns: e
-
-Returns: a
-
-Returns: 1
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: n
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: _
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 4
-
-Returns: 5
-
-Returns: 1
-
-Returns: 9
-
-Returns: 1
-
-Returns: 5
-
-Returns: 3
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: n
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: _
-
-Returns: p
-
-Returns: u
-
-Returns: b
-
-Returns: l
-
-Returns: i
-
-Returns: c
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: p
-
-Returns: r
-
-Returns: o
-
-Returns: f
-
-Returns: i
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: p
-
-Returns: u
-
-Returns: b
-
-Returns: l
-
-Returns: i
-
-Returns: c
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: f
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: h
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 1
-
-Returns: 7
-
-Returns: 3
-
-Returns: 1
-
-Returns: 6
-
-Returns: 5
-
-Returns: 1
-
-Returns: 2
-
-Returns: 5
-
-Returns: 7
-
-Returns: 0
-
-Returns: 0
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: t
-
-Returns: a
-
-Returns: r
-
-Returns: t
-
-Returns: _
-
-Returns: t
-
-Returns: i
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 2
-
-Returns: 0
-
-Returns: 2
-
-Returns: 4
-
-Returns: -
-
-Returns: 1
-
-Returns: 1
-
-Returns: -
-
-Returns: 1
-
-Returns: 5
-
-Returns: 
-
-Returns: 1
-
-Returns: 4
-
-Returns: :
-
-Returns: 5
-
-Returns: 6
-
-Returns: :
-
-Returns: 3
-
-Returns: 0
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: t
-
-Returns: a
-
-Returns: t
-
-Returns: u
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 3
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: g
-
-Returns: y
-
-Returns: _
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 4
-
-Returns: 1
-
-Returns: 1
-
-Returns: 6
-
-Returns: 7
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: g
-
-Returns: y
-
-Returns: _
-
-Returns: i
-
-Returns: s
-
-Returns: o
-
-Returns: w
-
-Returns: n
-
-Returns: e
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: t
-
-Returns: r
-
-Returns: u
-
-Returns: e
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: g
-
-Returns: y
-
-Returns: _
-
-Returns: l
-
-Returns: a
-
-Returns: n
-
-Returns: g
-
-Returns: u
-
-Returns: a
-
-Returns: g
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: g
-
-Returns: y
-
-Returns: _
-
-Returns: n
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 测
-
-Returns: 试
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: g
-
-Returns: y
-
-Returns: _
-
-Returns: p
-
-Returns: u
-
-Returns: b
-
-Returns: l
-
-Returns: i
-
-Returns: c
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: u
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 1
-
-Returns: 0
-
-Returns: 5
-
-Returns: e
-
-Returns: d
-
-Returns: 6
-
-Returns: e
-
-Returns: 5
-
-Returns: 1
-
-Returns: 1
-
-Returns: c
-
-Returns: c
-
-Returns: 9
-
-Returns: 7
-
-Returns: 7
-
-Returns: 9
-
-Returns: 2
-
-Returns: 1
-
-Returns: 6
-
-Returns: 1
-
-Returns: 0
-
-Returns: f
-
-Returns: d
-
-Returns: b
-
-Returns: b
-
-Returns: 7
-
-Returns: e
-
-Returns: 2
-
-Returns: a
-
-Returns: 1
-
-Returns: d
-
-Returns: 6
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: w
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ]
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: r
-
-Returns: r
-
-Returns: o
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: n
-
-Returns: u
-
-Returns: l
-
-Returns: l
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: r
-
-Returns: o
-
-Returns: b
-
-Returns: o
-
-Returns: t
-
-Returns: s
-
-Returns: :
-
-Returns: 
-
-Returns: 实
-
-Returns: 盘
-
-Returns: 信
-
-Returns: 息
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: g
-
-Returns: r
-
-Returns: o
-
-Returns: u
-
-Returns: p
-
-Returns: _
-
-Returns: i
-
-Returns: d
-
-Returns: :
-
-Returns: 
-
-Returns: 实
-
-Returns: 盘
-
-Returns: 分
-
-Returns: 组
-
-Returns: I
-
-Returns: D
-
-Returns: ；
-
-Returns: 如
-
-Returns: 果
-
-Returns: 实
-
-Returns: 盘
-
-Returns: 位
-
-Returns: 于
-
-Returns: 默
-
-Returns: 认
-
-Returns: 分
-
-Returns: 组
-
-Returns: 中
-
-Returns: ，
-
-Returns: 则
-
-Returns: 不
-
-Returns: 包
-
-Returns: 含
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: g
-
-Returns: r
-
-Returns: o
-
-Returns: u
-
-Returns: p
-
-Returns: _
-
-Returns: i
-
-Returns: d
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 字
-
-Returns: 段
-
-Returns: 。
-
-以```Python```语言的扩展API接口[「验证方式」](/user-guide/扩展api接口/验证方式)为例：
-
-```print(api('GetRobotList'))```：获取全部实盘信息。
-
-```print(api('GetRobotList', 'member2'))```：打印所有自定义标签为member2的实盘信息。
-
-```print(api('GetRobotList', 0, 5, -1, 'member2'))```：分页查询，从偏移量0开始，最多返回5个标签为member2的实盘。
-
-##### CommandRobot
-
-```CommandRobot```方法用于向请求中```API KEY```对应的发明者量化交易平台账号下的实盘发送交互命令。接收交互命令的实盘Id由```robotId```参数指定，交互命令由策略中调用的```GetCommand()```函数捕获并返回。
-
-Parameters:
-
-- `robotId` (number, required): ```robotId```参数用于指定接收交互指令的实盘Id。可以使用```GetRobotList```方法获取账号下实盘的信息，其中包含实盘Id。
-- `cmd` (string, required): ```cmd```参数是发送给实盘的交互指令。实盘策略中的```GetCommand()```函数会捕获该交互命令，触发策略的交互逻辑。策略代码中的具体交互逻辑实现，请参考[发明者量化交易平台API手册](https://www.fmz.com/syntax-guide#fun_getcommand)中的```GetCommand()```函数说明。
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: j
-
-Returns: s
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: "
-
-Returns: :
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: t
-
-Returns: r
-
-Returns: u
-
-Returns: e
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: r
-
-Returns: r
-
-Returns: o
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: n
-
-Returns: u
-
-Returns: l
-
-Returns: l
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: :
-
-Returns: 
-
-Returns: 交
-
-Returns: 互
-
-Returns: 指
-
-Returns: 令
-
-Returns: 是
-
-Returns: 否
-
-Returns: 发
-
-Returns: 送
-
-Returns: 成
-
-Returns: 功
-
-Returns: 。
-
-Returns: 向
-
-Returns: 未
-
-Returns: 运
-
-Returns: 行
-
-Returns: 的
-
-Returns: 实
-
-Returns: 盘
-
-Returns: 发
-
-Returns: 送
-
-Returns: 指
-
-Returns: 令
-
-Returns: 时
-
-Returns: ，
-
-Returns: 返
-
-Returns: 回
-
-Returns: 数
-
-Returns: 据
-
-Returns: 中
-
-Returns: 的
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: 为
-
-Returns: f
-
-Returns: a
-
-Returns: l
-
-Returns: s
-
-Returns: e
-
-Returns: 。
-
-实盘策略示例（假设该策略实盘正在运行，实盘Id为123）：
-```js
-function main() {
-    while (true) {
-        var cmd = GetCommand()
-        if (cmd) {
-            Log(cmd)
-        }
-        Sleep(2000)
-    }
-}
-```
-
-如果使用本章节的Python测试脚本访问发明者量化交易平台的扩展API：```api("CommandRobot", 123, "test command")```，Id为123的实盘将收到交互指令：```test command```，并通过Log函数输出打印。
-
-##### StopRobot
-
-```StopRobot```方法用于停止请求中```API KEY```对应的发明者量化交易平台账号下的实盘。停止运行的实盘Id由```robotId```参数指定。
-
-Parameters:
-
-- `robotId` (number, required): ```robotId```参数用于指定要停止的实盘Id。可以通过```GetRobotList```方法获取账号下的实盘信息，其中包含实盘Id。
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: j
-
-Returns: s
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: "
-
-Returns: :
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: 2
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: r
-
-Returns: r
-
-Returns: o
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: n
-
-Returns: u
-
-Returns: l
-
-Returns: l
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: :
-
-Returns: 
-
-Returns: 实
-
-Returns: 盘
-
-Returns: 状
-
-Returns: 态
-
-Returns: 码
-
-Returns: ，
-
-Returns: 2
-
-Returns: 表
-
-Returns: 示
-
-Returns: 停
-
-Returns: 止
-
-Returns: 中
-
-Returns: 。
-
-##### RestartRobot
-
-```RestartRobot```方法用于重启请求中```API KEY```对应的发明者量化交易平台账号下的实盘。重启的实盘ID由```robotId```参数指定。
-
-Parameters:
-
-- `robotId` (number, required): ```robotId```参数用于指定要重启的实盘ID。可以使用```GetRobotList```方法获取账号下实盘的信息，其中包含实盘ID。
-- `settings` (JSON对象, optional): 实盘配置参数，```settings```参数格式如下：
-
-```json
-{
-    "appid":"test",
-    "args":[],
-    "exchanges":[
-        {"pair":"SOL_USDT","pid":123},
-        {"pair":"ETH_USDT","pid":456}
-    ],
-    "name":"测试",
-    "node":123,
-    "period":60,
-    "strategy":123
-}
-```
-
-- appid: 自定义字段
-  可以定义标签。
-- args: 策略参数设置
-  结构为数组，每个元素为一个参数。例如，策略有一个参数```Interval```，重启策略时希望将```Interval```设置为500，则```args```中应包含：```["Interval", 500]```，即：```"args": [["Interval", 500]]```。
-- exchanges: 实盘绑定的交易所对象配置
-  结构为数组，其中每个元素为一个交易所对象配置。
-  - 可以绑定已在平台配置的交易所对象
-    使用```pid```配置：```{"pair":"SOL_USDT","pid":123}```；```pid```可以通过```GetPlatformList```接口查询，返回数据中的```id```字段即为交易所```pid```。
-  - 可以直接传入配置信息，绑定交易所对象
-    使用```eid```配置：```{"eid":"Huobi","label":"test Huobi","meta":{"AccessKey":"123","SecretKey":"123"},"pair":"BCH_BTC"}```；传入的```API KEY```等敏感信息，发明者量化交易平台不会存储，这些数据将直接转发给托管者程序。如果使用此类配置，每次创建或重启实盘时必须配置该信息。
-  - 可以绑定**通用协议**交易所对象
-    可以传入配置信息：```{"eid":"Exchange","label":"test exchange","pair":"BTC_USDT","meta":{"AccessKey":"123","SecretKey":"123","Front":"http://127.0.0.1:6666/test"}}```。
-    ```label```属性用于为当前**通用协议**接入的交易所对象设置标签，在策略中可以使用```exchange.GetLabel()```函数获取。
-- name: 策略名称
-- node: 托管者ID
-  指定在哪个托管者上运行。如果不设置该属性，系统将自动分配运行。
-- period: 默认K线周期
-  K线周期参数，60表示60秒。
-- strategy: 策略ID
-  可以使用```GetStrategyList```方法获取。
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: j
-
-Returns: s
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: "
-
-Returns: :
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: 1
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: r
-
-Returns: r
-
-Returns: o
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: n
-
-Returns: u
-
-Returns: l
-
-Returns: l
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: :
-
-Returns: 
-
-Returns: 实
-
-Returns: 盘
-
-Returns: 状
-
-Returns: 态
-
-Returns: 码
-
-Returns: ，
-
-Returns: 1
-
-Returns: 表
-
-Returns: 示
-
-Returns: 运
-
-Returns: 行
-
-Returns: 中
-
-Returns: 。
-
-如果实盘是通过扩展API接口创建的，重启时必须使用扩展API接口```RestartRobot```进行重启，并且必须传入```settings```参数。对于在平台页面上创建的实盘，可以通过扩展API接口重启或点击实盘页面上的按钮重启。可以传入```settings```参数或不传入。如果只传入```robotId```参数，则按照实盘的当前设置启动运行。
-
-##### GetRobotDetail
-
-```GetRobotDetail```方法用于获取请求中```API KEY```对应的发明者量化交易平台账号下的实盘详细信息。所要获取的实盘详细信息由```robotId```参数指定。
-
-Parameters:
-
-- `robotId` (number, required): ```robotId```参数用于指定要获取详细信息的实盘ID。可通过```GetRobotList```方法获取账号下的实盘信息，其中包含实盘ID。
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: j
-
-Returns: s
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: o
-
-Returns: b
-
-Returns: o
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: h
-
-Returns: a
-
-Returns: r
-
-Returns: g
-
-Returns: e
-
-Returns: _
-
-Returns: t
-
-Returns: i
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 1
-
-Returns: 7
-
-Returns: 3
-
-Returns: 2
-
-Returns: 2
-
-Returns: 4
-
-Returns: 6
-
-Returns: 5
-
-Returns: 3
-
-Returns: 9
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: h
-
-Returns: a
-
-Returns: r
-
-Returns: g
-
-Returns: e
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 5
-
-Returns: 8
-
-Returns: 5
-
-Returns: 0
-
-Returns: 0
-
-Returns: 0
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: o
-
-Returns: n
-
-Returns: s
-
-Returns: u
-
-Returns: m
-
-Returns: e
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 5
-
-Returns: 3
-
-Returns: 7
-
-Returns: 5
-
-Returns: 0
-
-Returns: 0
-
-Returns: 0
-
-Returns: 0
-
-Returns: 0
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 2
-
-Returns: 0
-
-Returns: 1
-
-Returns: 8
-
-Returns: -
-
-Returns: 1
-
-Returns: 2
-
-Returns: -
-
-Returns: 2
-
-Returns: 8
-
-Returns: 
-
-Returns: 1
-
-Returns: 4
-
-Returns: :
-
-Returns: 3
-
-Returns: 4
-
-Returns: :
-
-Returns: 5
-
-Returns: 1
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: f
-
-Returns: a
-
-Returns: v
-
-Returns: o
-
-Returns: r
-
-Returns: i
-
-Returns: t
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: a
-
-Returns: d
-
-Returns: d
-
-Returns: e
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: f
-
-Returns: a
-
-Returns: l
-
-Returns: s
-
-Returns: e
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: t
-
-Returns: y
-
-Returns: p
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: R
-
-Returns: "
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: f
-
-Returns: i
-
-Returns: x
-
-Returns: e
-
-Returns: d
-
-Returns: _
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 1
-
-Returns: 2
-
-Returns: 3
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: h
-
-Returns: i
-
-Returns: t
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 1
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 1
-
-Returns: 2
-
-Returns: 3
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: i
-
-Returns: s
-
-Returns: _
-
-Returns: d
-
-Returns: e
-
-Returns: l
-
-Returns: e
-
-Returns: t
-
-Returns: e
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: i
-
-Returns: s
-
-Returns: _
-
-Returns: m
-
-Returns: a
-
-Returns: n
-
-Returns: a
-
-Returns: g
-
-Returns: e
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: t
-
-Returns: r
-
-Returns: u
-
-Returns: e
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: i
-
-Returns: s
-
-Returns: _
-
-Returns: s
-
-Returns: a
-
-Returns: n
-
-Returns: d
-
-Returns: b
-
-Returns: o
-
-Returns: x
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: n
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 测
-
-Returns: 试
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: n
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: _
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 1
-
-Returns: 2
-
-Returns: 3
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: p
-
-Returns: e
-
-Returns: x
-
-Returns: c
-
-Returns: h
-
-Returns: a
-
-Returns: n
-
-Returns: g
-
-Returns: e
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: 1
-
-Returns: 2
-
-Returns: 3
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: F
-
-Returns: u
-
-Returns: t
-
-Returns: u
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: _
-
-Returns: O
-
-Returns: K
-
-Returns: C
-
-Returns: o
-
-Returns: i
-
-Returns: n
-
-Returns: "
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: p
-
-Returns: h
-
-Returns: a
-
-Returns: s
-
-Returns: h
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: 1
-
-Returns: 2
-
-Returns: 3
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: a
-
-Returns: 1
-
-Returns: a
-
-Returns: c
-
-Returns: a
-
-Returns: 7
-
-Returns: 4
-
-Returns: b
-
-Returns: 9
-
-Returns: c
-
-Returns: f
-
-Returns: 7
-
-Returns: d
-
-Returns: 8
-
-Returns: 6
-
-Returns: 2
-
-Returns: 4
-
-Returns: f
-
-Returns: 2
-
-Returns: a
-
-Returns: f
-
-Returns: 2
-
-Returns: d
-
-Returns: a
-
-Returns: c
-
-Returns: 0
-
-Returns: 1
-
-Returns: e
-
-Returns: 3
-
-Returns: 6
-
-Returns: d
-
-Returns: "
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: p
-
-Returns: l
-
-Returns: a
-
-Returns: b
-
-Returns: e
-
-Returns: l
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: 1
-
-Returns: 2
-
-Returns: 3
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: O
-
-Returns: K
-
-Returns: E
-
-Returns: X
-
-Returns: 期
-
-Returns: 货
-
-Returns: 
-
-Returns: V
-
-Returns: 5
-
-Returns: "
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: p
-
-Returns: r
-
-Returns: i
-
-Returns: o
-
-Returns: r
-
-Returns: i
-
-Returns: t
-
-Returns: y
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: p
-
-Returns: r
-
-Returns: o
-
-Returns: f
-
-Returns: i
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: p
-
-Returns: u
-
-Returns: b
-
-Returns: l
-
-Returns: i
-
-Returns: c
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: f
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: h
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 1
-
-Returns: 7
-
-Returns: 3
-
-Returns: 2
-
-Returns: 2
-
-Returns: 4
-
-Returns: 4
-
-Returns: 4
-
-Returns: 5
-
-Returns: 3
-
-Returns: 0
-
-Returns: 0
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: o
-
-Returns: b
-
-Returns: o
-
-Returns: t
-
-Returns: _
-
-Returns: a
-
-Returns: r
-
-Returns: g
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: [
-
-Returns: ]
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: t
-
-Returns: a
-
-Returns: r
-
-Returns: t
-
-Returns: _
-
-Returns: t
-
-Returns: i
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 2
-
-Returns: 0
-
-Returns: 2
-
-Returns: 4
-
-Returns: -
-
-Returns: 1
-
-Returns: 1
-
-Returns: -
-
-Returns: 2
-
-Returns: 2
-
-Returns: 
-
-Returns: 1
-
-Returns: 1
-
-Returns: :
-
-Returns: 0
-
-Returns: 0
-
-Returns: :
-
-Returns: 4
-
-Returns: 8
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: t
-
-Returns: a
-
-Returns: t
-
-Returns: u
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 1
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: g
-
-Returns: y
-
-Returns: _
-
-Returns: a
-
-Returns: r
-
-Returns: g
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: [
-
-Returns: ]
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: g
-
-Returns: y
-
-Returns: _
-
-Returns: e
-
-Returns: x
-
-Returns: c
-
-Returns: h
-
-Returns: a
-
-Returns: n
-
-Returns: g
-
-Returns: e
-
-Returns: _
-
-Returns: p
-
-Returns: a
-
-Returns: i
-
-Returns: r
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: [
-
-Returns: 6
-
-Returns: 0
-
-Returns: ,
-
-Returns: [
-
-Returns: 1
-
-Returns: 2
-
-Returns: 3
-
-Returns: ]
-
-Returns: ,
-
-Returns: [
-
-Returns: \
-
-Returns: "
-
-Returns: E
-
-Returns: T
-
-Returns: H
-
-Returns: _
-
-Returns: U
-
-Returns: S
-
-Returns: D
-
-Returns: T
-
-Returns: \
-
-Returns: "
-
-Returns: ]
-
-Returns: ]
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: g
-
-Returns: y
-
-Returns: _
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 1
-
-Returns: 2
-
-Returns: 3
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: g
-
-Returns: y
-
-Returns: _
-
-Returns: l
-
-Returns: a
-
-Returns: s
-
-Returns: t
-
-Returns: _
-
-Returns: m
-
-Returns: o
-
-Returns: d
-
-Returns: i
-
-Returns: f
-
-Returns: i
-
-Returns: e
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 2
-
-Returns: 0
-
-Returns: 2
-
-Returns: 4
-
-Returns: -
-
-Returns: 1
-
-Returns: 1
-
-Returns: -
-
-Returns: 2
-
-Returns: 1
-
-Returns: 
-
-Returns: 1
-
-Returns: 6
-
-Returns: :
-
-Returns: 4
-
-Returns: 9
-
-Returns: :
-
-Returns: 2
-
-Returns: 5
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: g
-
-Returns: y
-
-Returns: _
-
-Returns: n
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 测
-
-Returns: 试
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: g
-
-Returns: y
-
-Returns: _
-
-Returns: p
-
-Returns: u
-
-Returns: b
-
-Returns: l
-
-Returns: i
-
-Returns: c
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 0
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: u
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 1
-
-Returns: 0
-
-Returns: 5
-
-Returns: e
-
-Returns: d
-
-Returns: 6
-
-Returns: e
-
-Returns: 5
-
-Returns: 1
-
-Returns: b
-
-Returns: c
-
-Returns: c
-
-Returns: 1
-
-Returns: 7
-
-Returns: 7
-
-Returns: 9
-
-Returns: 2
-
-Returns: a
-
-Returns: 6
-
-Returns: 1
-
-Returns: 0
-
-Returns: f
-
-Returns: d
-
-Returns: b
-
-Returns: b
-
-Returns: 7
-
-Returns: e
-
-Returns: 2
-
-Returns: a
-
-Returns: 1
-
-Returns: d
-
-Returns: 6
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: u
-
-Returns: s
-
-Returns: e
-
-Returns: r
-
-Returns: n
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: a
-
-Returns: b
-
-Returns: c
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: w
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: r
-
-Returns: r
-
-Returns: o
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: n
-
-Returns: u
-
-Returns: l
-
-Returns: l
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: c
-
-Returns: h
-
-Returns: a
-
-Returns: r
-
-Returns: g
-
-Returns: e
-
-Returns: _
-
-Returns: t
-
-Returns: i
-
-Returns: m
-
-Returns: e
-
-Returns: :
-
-Returns: 
-
-Returns: 下
-
-Returns: 次
-
-Returns: 扣
-
-Returns: 费
-
-Returns: 时
-
-Returns: 间
-
-Returns: ，
-
-Returns: 即
-
-Returns: 当
-
-Returns: 前
-
-Returns: 扣
-
-Returns: 费
-
-Returns: 后
-
-Returns: 的
-
-Returns: 有
-
-Returns: 效
-
-Returns: 截
-
-Returns: 止
-
-Returns: 时
-
-Returns: 间
-
-Returns: 。
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: c
-
-Returns: h
-
-Returns: a
-
-Returns: r
-
-Returns: g
-
-Returns: e
-
-Returns: d
-
-Returns: :
-
-Returns: 
-
-Returns: 已
-
-Returns: 消
-
-Returns: 耗
-
-Returns: 的
-
-Returns: 时
-
-Returns: 间
-
-Returns: 。
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: c
-
-Returns: o
-
-Returns: n
-
-Returns: s
-
-Returns: u
-
-Returns: m
-
-Returns: e
-
-Returns: d
-
-Returns: :
-
-Returns: 
-
-Returns: 已
-
-Returns: 消
-
-Returns: 耗
-
-Returns: 的
-
-Returns: 金
-
-Returns: 额
-
-Returns: （
-
-Returns: 0
-
-Returns: .
-
-Returns: 1
-
-Returns: 2
-
-Returns: 5
-
-Returns: 
-
-Returns: U
-
-Returns: S
-
-Returns: D
-
-Returns: 
-
-Returns: =
-
-Returns: 
-
-Returns: 1
-
-Returns: 2
-
-Returns: 5
-
-Returns: 0
-
-Returns: 0
-
-Returns: 0
-
-Returns: 0
-
-Returns: 0
-
-Returns: 
-
-Returns: /
-
-Returns: 
-
-Returns: 1
-
-Returns: e
-
-Returns: 8
-
-Returns: ）
-
-Returns: 。
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: :
-
-Returns: 
-
-Returns: 创
-
-Returns: 建
-
-Returns: 日
-
-Returns: 期
-
-Returns: 。
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: f
-
-Returns: i
-
-Returns: x
-
-Returns: e
-
-Returns: d
-
-Returns: _
-
-Returns: i
-
-Returns: d
-
-Returns: :
-
-Returns: 
-
-Returns: 实
-
-Returns: 盘
-
-Returns: 运
-
-Returns: 行
-
-Returns: 时
-
-Returns: 分
-
-Returns: 配
-
-Returns: 的
-
-Returns: 托
-
-Returns: 管
-
-Returns: 者
-
-Returns: I
-
-Returns: D
-
-Returns: ，
-
-Returns: 如
-
-Returns: 果
-
-Returns: 是
-
-Returns: 自
-
-Returns: 动
-
-Returns: 分
-
-Returns: 配
-
-Returns: ，
-
-Returns: 该
-
-Returns: 值
-
-Returns: 为
-
-Returns: -
-
-Returns: 1
-
-Returns: 。
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: i
-
-Returns: s
-
-Returns: _
-
-Returns: m
-
-Returns: a
-
-Returns: n
-
-Returns: a
-
-Returns: g
-
-Returns: e
-
-Returns: r
-
-Returns: :
-
-Returns: 
-
-Returns: 是
-
-Returns: 否
-
-Returns: 有
-
-Returns: 权
-
-Returns: 限
-
-Returns: 管
-
-Returns: 理
-
-Returns: 该
-
-Returns: 实
-
-Returns: 盘
-
-Returns: 。
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: i
-
-Returns: s
-
-Returns: _
-
-Returns: s
-
-Returns: a
-
-Returns: n
-
-Returns: d
-
-Returns: b
-
-Returns: o
-
-Returns: x
-
-Returns: :
-
-Returns: 
-
-Returns: 是
-
-Returns: 否
-
-Returns: 为
-
-Returns: 模
-
-Returns: 拟
-
-Returns: 盘
-
-Returns: 。
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: n
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: :
-
-Returns: 
-
-Returns: 实
-
-Returns: 盘
-
-Returns: 名
-
-Returns: 称
-
-Returns: 。
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: n
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: _
-
-Returns: i
-
-Returns: d
-
-Returns: :
-
-Returns: 
-
-Returns: 托
-
-Returns: 管
-
-Returns: 者
-
-Returns: I
-
-Returns: D
-
-Returns: 。
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: p
-
-Returns: e
-
-Returns: x
-
-Returns: c
-
-Returns: h
-
-Returns: a
-
-Returns: n
-
-Returns: g
-
-Returns: e
-
-Returns: s
-
-Returns: :
-
-Returns: 
-
-Returns: 实
-
-Returns: 盘
-
-Returns: 配
-
-Returns: 置
-
-Returns: 的
-
-Returns: 交
-
-Returns: 易
-
-Returns: 所
-
-Returns: 对
-
-Returns: 象
-
-Returns: ，
-
-Returns: 1
-
-Returns: 2
-
-Returns: 3
-
-Returns: 为
-
-Returns: p
-
-Returns: i
-
-Returns: d
-
-Returns: ，
-
-Returns: "
-
-Returns: F
-
-Returns: u
-
-Returns: t
-
-Returns: u
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: _
-
-Returns: O
-
-Returns: K
-
-Returns: C
-
-Returns: o
-
-Returns: i
-
-Returns: n
-
-Returns: "
-
-Returns: 为
-
-Returns: 交
-
-Returns: 易
-
-Returns: 所
-
-Returns: 名
-
-Returns: 称
-
-Returns: 。
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: p
-
-Returns: l
-
-Returns: a
-
-Returns: b
-
-Returns: e
-
-Returns: l
-
-Returns: s
-
-Returns: :
-
-Returns: 
-
-Returns: 实
-
-Returns: 盘
-
-Returns: 配
-
-Returns: 置
-
-Returns: 的
-
-Returns: 交
-
-Returns: 易
-
-Returns: 所
-
-Returns: 对
-
-Returns: 象
-
-Returns: 的
-
-Returns: 标
-
-Returns: 签
-
-Returns: 信
-
-Returns: 息
-
-Returns: 。
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: p
-
-Returns: r
-
-Returns: o
-
-Returns: f
-
-Returns: i
-
-Returns: t
-
-Returns: :
-
-Returns: 
-
-Returns: 实
-
-Returns: 盘
-
-Returns: 收
-
-Returns: 益
-
-Returns: 数
-
-Returns: 据
-
-Returns: 。
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: p
-
-Returns: u
-
-Returns: b
-
-Returns: l
-
-Returns: i
-
-Returns: c
-
-Returns: :
-
-Returns: 
-
-Returns: 实
-
-Returns: 盘
-
-Returns: 是
-
-Returns: 否
-
-Returns: 公
-
-Returns: 开
-
-Returns: 。
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: r
-
-Returns: e
-
-Returns: f
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: h
-
-Returns: :
-
-Returns: 
-
-Returns: 最
-
-Returns: 近
-
-Returns: 活
-
-Returns: 跃
-
-Returns: 时
-
-Returns: 间
-
-Returns: 。
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: s
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: g
-
-Returns: y
-
-Returns: _
-
-Returns: e
-
-Returns: x
-
-Returns: c
-
-Returns: h
-
-Returns: a
-
-Returns: n
-
-Returns: g
-
-Returns: e
-
-Returns: _
-
-Returns: p
-
-Returns: a
-
-Returns: i
-
-Returns: r
-
-Returns: s
-
-Returns: :
-
-Returns: 
-
-Returns: 配
-
-Returns: 置
-
-Returns: 的
-
-Returns: 交
-
-Returns: 易
-
-Returns: 所
-
-Returns: 对
-
-Returns: 象
-
-Returns: 及
-
-Returns: 其
-
-Returns: 交
-
-Returns: 易
-
-Returns: 对
-
-Returns: 信
-
-Returns: 息
-
-Returns: 。
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: w
-
-Returns: d
-
-Returns: :
-
-Returns: 
-
-Returns: 是
-
-Returns: 否
-
-Returns: 开
-
-Returns: 启
-
-Returns: 离
-
-Returns: 线
-
-Returns: 报
-
-Returns: 警
-
-Returns: 。
-
-```strategy_exchange_pairs```属性说明，以下列数据为例：
-
-```plaintext
-"[60,[44314,42960,15445,14703],[\"BTC_USDT\",\"BTC_USDT\",\"ETH_USDT\",\"ETH_USDT\"]]"
-```
-
-其中第一个数据```60```表示实盘设置的默认K线周期为1分钟，即60秒。
-
-```[44314,42960,15445,14703]```为实盘配置的交易所对象的```pid```（按添加顺序排列）。
-
-```[\"BTC_USDT\",\"BTC_USDT\",\"ETH_USDT\",\"ETH_USDT\"]```为实盘配置的交易所对象设置的交易对（按添加顺序与pid一一对应）。
-
-##### GetAccount
-
-```GetAccount```方法用于获取请求中```API KEY```对应的发明者量化交易平台账号的账户信息。
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: j
-
-Returns: s
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: "
-
-Returns: :
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: b
-
-Returns: a
-
-Returns: l
-
-Returns: a
-
-Returns: n
-
-Returns: c
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 2
-
-Returns: 2
-
-Returns: 9
-
-Returns: 4
-
-Returns: 4
-
-Returns: 7
-
-Returns: 0
-
-Returns: 2
-
-Returns: 4
-
-Returns: 3
-
-Returns: 6
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: o
-
-Returns: n
-
-Returns: c
-
-Returns: u
-
-Returns: r
-
-Returns: r
-
-Returns: e
-
-Returns: n
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: o
-
-Returns: n
-
-Returns: s
-
-Returns: u
-
-Returns: m
-
-Returns: e
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 2
-
-Returns: 1
-
-Returns: 1
-
-Returns: 0
-
-Returns: 9
-
-Returns: 2
-
-Returns: 7
-
-Returns: 1
-
-Returns: 9
-
-Returns: 6
-
-Returns: 5
-
-Returns: 3
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: u
-
-Returns: r
-
-Returns: r
-
-Returns: e
-
-Returns: n
-
-Returns: c
-
-Returns: y
-
-Returns: "
-
-Returns: :
-
-Returns: "
-
-Returns: U
-
-Returns: S
-
-Returns: D
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: m
-
-Returns: a
-
-Returns: i
-
-Returns: l
-
-Returns: "
-
-Returns: :
-
-Returns: "
-
-Returns: 1
-
-Returns: 2
-
-Returns: 3
-
-Returns: @
-
-Returns: q
-
-Returns: q
-
-Returns: .
-
-Returns: c
-
-Returns: o
-
-Returns: m
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: o
-
-Returns: p
-
-Returns: e
-
-Returns: n
-
-Returns: a
-
-Returns: i
-
-Returns: "
-
-Returns: :
-
-Returns: f
-
-Returns: a
-
-Returns: l
-
-Returns: s
-
-Returns: e
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: e
-
-Returns: t
-
-Returns: t
-
-Returns: i
-
-Returns: n
-
-Returns: g
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: n
-
-Returns: u
-
-Returns: l
-
-Returns: l
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: n
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: {
-
-Returns: "
-
-Returns: w
-
-Returns: e
-
-Returns: c
-
-Returns: h
-
-Returns: a
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: t
-
-Returns: r
-
-Returns: u
-
-Returns: e
-
-Returns: }
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: u
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: "
-
-Returns: 1
-
-Returns: 0
-
-Returns: 5
-
-Returns: e
-
-Returns: a
-
-Returns: 6
-
-Returns: e
-
-Returns: 5
-
-Returns: 1
-
-Returns: b
-
-Returns: c
-
-Returns: c
-
-Returns: 1
-
-Returns: 7
-
-Returns: 7
-
-Returns: 9
-
-Returns: 2
-
-Returns: 6
-
-Returns: a
-
-Returns: 1
-
-Returns: 0
-
-Returns: f
-
-Returns: d
-
-Returns: b
-
-Returns: b
-
-Returns: 7
-
-Returns: e
-
-Returns: 2
-
-Returns: a
-
-Returns: 1
-
-Returns: d
-
-Returns: 6
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: u
-
-Returns: s
-
-Returns: e
-
-Returns: r
-
-Returns: n
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: "
-
-Returns: a
-
-Returns: b
-
-Returns: c
-
-Returns: "
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: r
-
-Returns: r
-
-Returns: o
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: n
-
-Returns: u
-
-Returns: l
-
-Returns: l
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: b
-
-Returns: a
-
-Returns: l
-
-Returns: a
-
-Returns: n
-
-Returns: c
-
-Returns: e
-
-Returns: :
-
-Returns: 
-
-Returns: 账
-
-Returns: 户
-
-Returns: 余
-
-Returns: 额
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 此
-
-Returns: 处
-
-Returns: 的
-
-Returns: 数
-
-Returns: 值
-
-Returns: 采
-
-Returns: 用
-
-Returns: 整
-
-Returns: 数
-
-Returns: 表
-
-Returns: 示
-
-Returns: 以
-
-Returns: 确
-
-Returns: 保
-
-Returns: 精
-
-Returns: 度
-
-Returns: ，
-
-Returns: 实
-
-Returns: 际
-
-Returns: 数
-
-Returns: 值
-
-Returns: 需
-
-Returns: 除
-
-Returns: 以
-
-Returns: 1
-
-Returns: e
-
-Returns: 8
-
-Returns: （
-
-Returns: 即
-
-Returns: 1
-
-Returns: 0
-
-Returns: 的
-
-Returns: 8
-
-Returns: 次
-
-Returns: 方
-
-Returns: ）
-
-Returns: 进
-
-Returns: 行
-
-Returns: 换
-
-Returns: 算
-
-Returns: 。
-
-Returns: 本
-
-Returns: 例
-
-Returns: 中
-
-Returns: 实
-
-Returns: 际
-
-Returns: 余
-
-Returns: 额
-
-Returns: 为
-
-Returns: ：
-
-Returns: 2
-
-Returns: 2
-
-Returns: 9
-
-Returns: .
-
-Returns: 4
-
-Returns: 4
-
-Returns: 7
-
-Returns: 0
-
-Returns: 2
-
-Returns: 4
-
-Returns: 3
-
-Returns: 6
-
-##### GetExchangeList
-
-```GetExchangeList```方法用于获取FMZ量化交易平台支持的交易所列表及其配置信息。
-
-Parameters:
-
-- `isSummary` (bool, required): ```isSummary```参数用于指定返回的数据是否为摘要信息。
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: i
-
-Returns: s
-
-Returns: S
-
-Returns: u
-
-Returns: m
-
-Returns: m
-
-Returns: a
-
-Returns: r
-
-Returns: y
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 参
-
-Returns: 数
-
-Returns: 为
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: f
-
-Returns: a
-
-Returns: l
-
-Returns: s
-
-Returns: e
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 时
-
-Returns: ，
-
-Returns: 返
-
-Returns: 回
-
-Returns: 的
-
-Returns: 数
-
-Returns: 据
-
-Returns: ：
-
-Returns: 
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: j
-
-Returns: s
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: x
-
-Returns: c
-
-Returns: h
-
-Returns: a
-
-Returns: n
-
-Returns: g
-
-Returns: e
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: [
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: g
-
-Returns: o
-
-Returns: r
-
-Returns: y
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 加
-
-Returns: 密
-
-Returns: 货
-
-Returns: 币
-
-Returns: |
-
-Returns: |
-
-Returns: C
-
-Returns: r
-
-Returns: y
-
-Returns: p
-
-Returns: t
-
-Returns: o
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: F
-
-Returns: u
-
-Returns: t
-
-Returns: u
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: _
-
-Returns: B
-
-Returns: i
-
-Returns: n
-
-Returns: a
-
-Returns: n
-
-Returns: c
-
-Returns: e
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 7
-
-Returns: 4
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: l
-
-Returns: o
-
-Returns: g
-
-Returns: o
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: /
-
-Returns: u
-
-Returns: p
-
-Returns: l
-
-Returns: o
-
-Returns: a
-
-Returns: d
-
-Returns: /
-
-Returns: a
-
-Returns: s
-
-Returns: s
-
-Returns: e
-
-Returns: t
-
-Returns: /
-
-Returns: d
-
-Returns: 8
-
-Returns: d
-
-Returns: 8
-
-Returns: 4
-
-Returns: b
-
-Returns: 2
-
-Returns: 3
-
-Returns: e
-
-Returns: 5
-
-Returns: 7
-
-Returns: 3
-
-Returns: e
-
-Returns: 9
-
-Returns: 3
-
-Returns: 2
-
-Returns: 6
-
-Returns: b
-
-Returns: 9
-
-Returns: 9
-
-Returns: .
-
-Returns: s
-
-Returns: v
-
-Returns: g
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: m
-
-Returns: e
-
-Returns: t
-
-Returns: a
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: [
-
-Returns: {
-
-Returns: \
-
-Returns: "
-
-Returns: d
-
-Returns: e
-
-Returns: s
-
-Returns: c
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: \
-
-Returns: "
-
-Returns: A
-
-Returns: c
-
-Returns: c
-
-Returns: e
-
-Returns: s
-
-Returns: s
-
-Returns: 
-
-Returns: K
-
-Returns: e
-
-Returns: y
-
-Returns: \
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: \
-
-Returns: "
-
-Returns: q
-
-Returns: r
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: \
-
-Returns: "
-
-Returns: a
-
-Returns: p
-
-Returns: i
-
-Returns: K
-
-Returns: e
-
-Returns: y
-
-Returns: \
-
-Returns: "
-
-Returns: ,
-
-Returns: \
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: q
-
-Returns: u
-
-Returns: i
-
-Returns: r
-
-Returns: e
-
-Returns: d
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: t
-
-Returns: r
-
-Returns: u
-
-Returns: e
-
-Returns: ,
-
-Returns: 
-
-Returns: \
-
-Returns: "
-
-Returns: t
-
-Returns: y
-
-Returns: p
-
-Returns: e
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: \
-
-Returns: "
-
-Returns: s
-
-Returns: t
-
-Returns: r
-
-Returns: i
-
-Returns: n
-
-Returns: g
-
-Returns: \
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: \
-
-Returns: "
-
-Returns: n
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: \
-
-Returns: "
-
-Returns: A
-
-Returns: c
-
-Returns: c
-
-Returns: e
-
-Returns: s
-
-Returns: s
-
-Returns: K
-
-Returns: e
-
-Returns: y
-
-Returns: \
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: \
-
-Returns: "
-
-Returns: l
-
-Returns: a
-
-Returns: b
-
-Returns: e
-
-Returns: l
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: \
-
-Returns: "
-
-Returns: A
-
-Returns: c
-
-Returns: c
-
-Returns: e
-
-Returns: s
-
-Returns: s
-
-Returns: 
-
-Returns: K
-
-Returns: e
-
-Returns: y
-
-Returns: \
-
-Returns: "
-
-Returns: }
-
-Returns: ,
-
-Returns: 
-
-Returns: {
-
-Returns: \
-
-Returns: "
-
-Returns: e
-
-Returns: n
-
-Returns: c
-
-Returns: r
-
-Returns: y
-
-Returns: p
-
-Returns: t
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: t
-
-Returns: r
-
-Returns: u
-
-Returns: e
-
-Returns: ,
-
-Returns: 
-
-Returns: \
-
-Returns: "
-
-Returns: q
-
-Returns: r
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: \
-
-Returns: "
-
-Returns: s
-
-Returns: e
-
-Returns: c
-
-Returns: r
-
-Returns: e
-
-Returns: t
-
-Returns: K
-
-Returns: e
-
-Returns: y
-
-Returns: \
-
-Returns: "
-
-Returns: ,
-
-Returns: \
-
-Returns: "
-
-Returns: n
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: \
-
-Returns: "
-
-Returns: S
-
-Returns: e
-
-Returns: c
-
-Returns: r
-
-Returns: e
-
-Returns: t
-
-Returns: K
-
-Returns: e
-
-Returns: y
-
-Returns: \
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: \
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: q
-
-Returns: u
-
-Returns: i
-
-Returns: r
-
-Returns: e
-
-Returns: d
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: t
-
-Returns: r
-
-Returns: u
-
-Returns: e
-
-Returns: ,
-
-Returns: 
-
-Returns: \
-
-Returns: "
-
-Returns: l
-
-Returns: a
-
-Returns: b
-
-Returns: e
-
-Returns: l
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: \
-
-Returns: "
-
-Returns: S
-
-Returns: e
-
-Returns: c
-
-Returns: r
-
-Returns: e
-
-Returns: t
-
-Returns: 
-
-Returns: K
-
-Returns: e
-
-Returns: y
-
-Returns: \
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: \
-
-Returns: "
-
-Returns: t
-
-Returns: y
-
-Returns: p
-
-Returns: e
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: \
-
-Returns: "
-
-Returns: p
-
-Returns: a
-
-Returns: s
-
-Returns: s
-
-Returns: w
-
-Returns: o
-
-Returns: r
-
-Returns: d
-
-Returns: \
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: \
-
-Returns: "
-
-Returns: d
-
-Returns: e
-
-Returns: s
-
-Returns: c
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: \
-
-Returns: "
-
-Returns: S
-
-Returns: e
-
-Returns: c
-
-Returns: r
-
-Returns: e
-
-Returns: t
-
-Returns: 
-
-Returns: K
-
-Returns: e
-
-Returns: y
-
-Returns: \
-
-Returns: "
-
-Returns: }
-
-Returns: ]
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: n
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 币
-
-Returns: 安
-
-Returns: 期
-
-Returns: 货
-
-Returns: |
-
-Returns: F
-
-Returns: u
-
-Returns: t
-
-Returns: u
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: _
-
-Returns: B
-
-Returns: i
-
-Returns: n
-
-Returns: a
-
-Returns: n
-
-Returns: c
-
-Returns: e
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: p
-
-Returns: r
-
-Returns: i
-
-Returns: o
-
-Returns: r
-
-Returns: i
-
-Returns: t
-
-Returns: y
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 2
-
-Returns: 0
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: t
-
-Returns: o
-
-Returns: c
-
-Returns: k
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: B
-
-Returns: T
-
-Returns: C
-
-Returns: _
-
-Returns: U
-
-Returns: S
-
-Returns: D
-
-Returns: T
-
-Returns: ,
-
-Returns: E
-
-Returns: T
-
-Returns: H
-
-Returns: _
-
-Returns: U
-
-Returns: S
-
-Returns: D
-
-Returns: T
-
-Returns: ,
-
-Returns: E
-
-Returns: T
-
-Returns: H
-
-Returns: _
-
-Returns: U
-
-Returns: S
-
-Returns: D
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: w
-
-Returns: e
-
-Returns: b
-
-Returns: s
-
-Returns: i
-
-Returns: t
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: h
-
-Returns: t
-
-Returns: t
-
-Returns: p
-
-Returns: s
-
-Returns: :
-
-Returns: /
-
-Returns: /
-
-Returns: a
-
-Returns: c
-
-Returns: c
-
-Returns: o
-
-Returns: u
-
-Returns: n
-
-Returns: t
-
-Returns: s
-
-Returns: .
-
-Returns: b
-
-Returns: i
-
-Returns: n
-
-Returns: a
-
-Returns: n
-
-Returns: c
-
-Returns: e
-
-Returns: .
-
-Returns: c
-
-Returns: o
-
-Returns: m
-
-Returns: /
-
-Returns: z
-
-Returns: h
-
-Returns: -
-
-Returns: T
-
-Returns: C
-
-Returns: /
-
-Returns: r
-
-Returns: e
-
-Returns: g
-
-Returns: i
-
-Returns: s
-
-Returns: t
-
-Returns: e
-
-Returns: r
-
-Returns: ?
-
-Returns: r
-
-Returns: e
-
-Returns: f
-
-Returns: =
-
-Returns: 4
-
-Returns: 5
-
-Returns: 1
-
-Returns: 1
-
-Returns: 0
-
-Returns: 2
-
-Returns: 7
-
-Returns: 0
-
-Returns: "
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ]
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: r
-
-Returns: r
-
-Returns: o
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: n
-
-Returns: u
-
-Returns: l
-
-Returns: l
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: i
-
-Returns: s
-
-Returns: S
-
-Returns: u
-
-Returns: m
-
-Returns: m
-
-Returns: a
-
-Returns: r
-
-Returns: y
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 参
-
-Returns: 数
-
-Returns: 为
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: t
-
-Returns: r
-
-Returns: u
-
-Returns: e
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 时
-
-Returns: ，
-
-Returns: 返
-
-Returns: 回
-
-Returns: 的
-
-Returns: 数
-
-Returns: 据
-
-Returns: ：
-
-Returns: 
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: j
-
-Returns: s
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: x
-
-Returns: c
-
-Returns: h
-
-Returns: a
-
-Returns: n
-
-Returns: g
-
-Returns: e
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: [
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: g
-
-Returns: o
-
-Returns: r
-
-Returns: y
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 加
-
-Returns: 密
-
-Returns: 货
-
-Returns: 币
-
-Returns: |
-
-Returns: |
-
-Returns: C
-
-Returns: r
-
-Returns: y
-
-Returns: p
-
-Returns: t
-
-Returns: o
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: F
-
-Returns: u
-
-Returns: t
-
-Returns: u
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: _
-
-Returns: B
-
-Returns: i
-
-Returns: n
-
-Returns: a
-
-Returns: n
-
-Returns: c
-
-Returns: e
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 7
-
-Returns: 4
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: l
-
-Returns: o
-
-Returns: g
-
-Returns: o
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: /
-
-Returns: u
-
-Returns: p
-
-Returns: l
-
-Returns: o
-
-Returns: a
-
-Returns: d
-
-Returns: /
-
-Returns: a
-
-Returns: s
-
-Returns: s
-
-Returns: e
-
-Returns: t
-
-Returns: /
-
-Returns: d
-
-Returns: 8
-
-Returns: d
-
-Returns: 8
-
-Returns: 4
-
-Returns: b
-
-Returns: 2
-
-Returns: 3
-
-Returns: e
-
-Returns: 5
-
-Returns: 7
-
-Returns: 3
-
-Returns: e
-
-Returns: 9
-
-Returns: 3
-
-Returns: 2
-
-Returns: 6
-
-Returns: b
-
-Returns: 9
-
-Returns: 9
-
-Returns: .
-
-Returns: s
-
-Returns: v
-
-Returns: g
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: n
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 币
-
-Returns: 安
-
-Returns: 期
-
-Returns: 货
-
-Returns: |
-
-Returns: F
-
-Returns: u
-
-Returns: t
-
-Returns: u
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: _
-
-Returns: B
-
-Returns: i
-
-Returns: n
-
-Returns: a
-
-Returns: n
-
-Returns: c
-
-Returns: e
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: p
-
-Returns: r
-
-Returns: i
-
-Returns: o
-
-Returns: r
-
-Returns: i
-
-Returns: t
-
-Returns: y
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 2
-
-Returns: 0
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: w
-
-Returns: e
-
-Returns: b
-
-Returns: s
-
-Returns: i
-
-Returns: t
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: h
-
-Returns: t
-
-Returns: t
-
-Returns: p
-
-Returns: s
-
-Returns: :
-
-Returns: /
-
-Returns: /
-
-Returns: a
-
-Returns: c
-
-Returns: c
-
-Returns: o
-
-Returns: u
-
-Returns: n
-
-Returns: t
-
-Returns: s
-
-Returns: .
-
-Returns: b
-
-Returns: i
-
-Returns: n
-
-Returns: a
-
-Returns: n
-
-Returns: c
-
-Returns: e
-
-Returns: .
-
-Returns: c
-
-Returns: o
-
-Returns: m
-
-Returns: /
-
-Returns: z
-
-Returns: h
-
-Returns: -
-
-Returns: T
-
-Returns: C
-
-Returns: /
-
-Returns: r
-
-Returns: e
-
-Returns: g
-
-Returns: i
-
-Returns: s
-
-Returns: t
-
-Returns: e
-
-Returns: r
-
-Returns: ?
-
-Returns: r
-
-Returns: e
-
-Returns: f
-
-Returns: =
-
-Returns: 4
-
-Returns: 5
-
-Returns: 1
-
-Returns: 1
-
-Returns: 0
-
-Returns: 2
-
-Returns: 7
-
-Returns: 0
-
-Returns: "
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ]
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: r
-
-Returns: r
-
-Returns: o
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: n
-
-Returns: u
-
-Returns: l
-
-Returns: l
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: m
-
-Returns: e
-
-Returns: t
-
-Returns: a
-
-Returns: :
-
-Returns: 
-
-Returns: 交
-
-Returns: 易
-
-Returns: 所
-
-Returns: 配
-
-Returns: 置
-
-Returns: 元
-
-Returns: 数
-
-Returns: 据
-
-Returns: 。
-
-##### DeleteNode
-
-```DeleteNode```方法用于删除请求中```API KEY```对应的发明者量化交易平台账号下的托管者节点，删除的托管者节点ID为```nid```参数指定的托管者ID。
-
-Parameters:
-
-- `nid` (number, required): ```nid```参数用于指定要删除的托管者ID，可通过```GetNodeList```方法获取账号下托管者的信息。
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: j
-
-Returns: s
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: "
-
-Returns: :
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: t
-
-Returns: r
-
-Returns: u
-
-Returns: e
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: r
-
-Returns: r
-
-Returns: o
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: n
-
-Returns: u
-
-Returns: l
-
-Returns: l
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: :
-
-Returns: 
-
-Returns: 是
-
-Returns: 否
-
-Returns: 成
-
-Returns: 功
-
-Returns: 删
-
-Returns: 除
-
-Returns: 关
-
-Returns: 联
-
-Returns: 的
-
-Returns: 托
-
-Returns: 管
-
-Returns: 者
-
-Returns: 程
-
-Returns: 序
-
-Returns: 。
-
-##### DeleteRobot
-
-```DeleteRobot```方法用于删除请求中```API KEY```对应的发明者量化交易平台账号下的实盘。删除的实盘ID为```robotId```参数指定的实盘ID。
-
-Parameters:
-
-- `robotId` (number, required): ```robotId```参数用于指定要删除的实盘ID。可以使用```GetRobotList```方法获取账号下实盘的信息，其中包含实盘ID。
-- `deleteLogs` (bool, required): ```deleteLogs```参数用于设置是否删除实盘日志。如果传入真值（例如：```true```），则删除实盘日志。
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: j
-
-Returns: s
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: "
-
-Returns: :
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: r
-
-Returns: r
-
-Returns: o
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: n
-
-Returns: u
-
-Returns: l
-
-Returns: l
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: :
-
-Returns: 
-
-Returns: 实
-
-Returns: 盘
-
-Returns: 删
-
-Returns: 除
-
-Returns: 操
-
-Returns: 作
-
-Returns: 的
-
-Returns: 反
-
-Returns: 馈
-
-Returns: 结
-
-Returns: 果
-
-Returns: 。
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: 0
-
-Returns: :
-
-Returns: 
-
-Returns: 正
-
-Returns: 常
-
-Returns: 删
-
-Returns: 除
-
-Returns: 。
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: -
-
-Returns: 2
-
-Returns: :
-
-Returns: 
-
-Returns: 删
-
-Returns: 除
-
-Returns: 成
-
-Returns: 功
-
-Returns: ，
-
-Returns: 但
-
-Returns: 无
-
-Returns: 法
-
-Returns: 与
-
-Returns: 实
-
-Returns: 盘
-
-Returns: 关
-
-Returns: 联
-
-Returns: 的
-
-Returns: 托
-
-Returns: 管
-
-Returns: 者
-
-Returns: 联
-
-Returns: 系
-
-Returns: ，
-
-Returns: 请
-
-Returns: 手
-
-Returns: 动
-
-Returns: 删
-
-Returns: 除
-
-Returns: 文
-
-Returns: 件
-
-Returns: 
-
-Returns: 1
-
-Returns: 2
-
-Returns: 3
-
-Returns: .
-
-Returns: d
-
-Returns: b
-
-Returns: 3
-
-Returns: ！
-
-##### GetStrategyList
-
-```GetStrategyList```方法用于获取平台策略信息。
-
-Parameters:
-
-- `offset` (number, required): ```offset```参数用于设置查询的偏移量。
-- `length` (number, required): ```length```参数用于设置查询返回的数据条数。
-- `strategyType` (number, required): ```strategyType```参数用于设置要查询的策略类型。
-
-- ```strategyType```参数设置为```0```：查询所有策略。
-
-- ```strategyType```参数设置为```1```：查询已公开的策略。
-
-- ```strategyType```参数设置为```2```：查询待审核的策略。
-- `category` (number, required): ```category```参数用于设置要查询的策略类别。
-
-- ```category```参数设置为```-1```：查询所有策略。
-
-- ```category```参数设置为```0```：查询通用策略。
-- `needArgs` (number, required): ```needArgs```参数用于设置查询的策略是否需要参数。
-
-- ```needArgs```参数设置为```0```：查询所有策略。
-- `language` (number, required): ```language```参数用于设置要查询的策略编程语言。
-
-- ```language```参数设置为```0```：JavaScript语言。
-
-- ```language```参数设置为```1```：Python语言。
-
-- ```language```参数设置为```2```：C++语言。
-
-- ```language```参数设置为```3```：可视化策略。
-
-- ```language```参数设置为```4```：My语言。
-
-- ```language```参数设置为```5```：PINE语言。
-- `kw` (string, required): ```kw```参数用于设置查询策略的关键字。
-
-- 设置为空字符串表示不使用关键字筛选。
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: j
-
-Returns: s
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: a
-
-Returns: l
-
-Returns: l
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 1
-
-Returns: 2
-
-Returns: 3
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: g
-
-Returns: i
-
-Returns: e
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: [
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: g
-
-Returns: o
-
-Returns: r
-
-Returns: y
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 9
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 2
-
-Returns: 0
-
-Returns: 2
-
-Returns: 4
-
-Returns: -
-
-Returns: 1
-
-Returns: 1
-
-Returns: -
-
-Returns: 1
-
-Returns: 0
-
-Returns: 
-
-Returns: 2
-
-Returns: 0
-
-Returns: :
-
-Returns: 4
-
-Returns: 0
-
-Returns: :
-
-Returns: 0
-
-Returns: 4
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: e
-
-Returns: s
-
-Returns: c
-
-Returns: r
-
-Returns: i
-
-Returns: p
-
-Returns: t
-
-Returns: i
-
-Returns: o
-
-Returns: n
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: f
-
-Returns: o
-
-Returns: r
-
-Returns: k
-
-Returns: e
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: h
-
-Returns: i
-
-Returns: t
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 1
-
-Returns: 2
-
-Returns: 3
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: i
-
-Returns: s
-
-Returns: _
-
-Returns: b
-
-Returns: u
-
-Returns: y
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: f
-
-Returns: a
-
-Returns: l
-
-Returns: s
-
-Returns: e
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: i
-
-Returns: s
-
-Returns: _
-
-Returns: o
-
-Returns: w
-
-Returns: n
-
-Returns: e
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: f
-
-Returns: a
-
-Returns: l
-
-Returns: s
-
-Returns: e
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: l
-
-Returns: a
-
-Returns: n
-
-Returns: g
-
-Returns: u
-
-Returns: a
-
-Returns: g
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 2
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: l
-
-Returns: a
-
-Returns: s
-
-Returns: t
-
-Returns: _
-
-Returns: m
-
-Returns: o
-
-Returns: d
-
-Returns: i
-
-Returns: f
-
-Returns: i
-
-Returns: e
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 2
-
-Returns: 0
-
-Returns: 2
-
-Returns: 4
-
-Returns: -
-
-Returns: 1
-
-Returns: 1
-
-Returns: -
-
-Returns: 1
-
-Returns: 1
-
-Returns: 
-
-Returns: 1
-
-Returns: 7
-
-Returns: :
-
-Returns: 2
-
-Returns: 3
-
-Returns: :
-
-Returns: 5
-
-Returns: 2
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: n
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: H
-
-Returns: e
-
-Returns: d
-
-Returns: g
-
-Returns: e
-
-Returns: G
-
-Returns: r
-
-Returns: i
-
-Returns: d
-
-Returns: S
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: g
-
-Returns: y
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: p
-
-Returns: r
-
-Returns: o
-
-Returns: f
-
-Returns: i
-
-Returns: l
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: a
-
-Returns: v
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: .
-
-Returns: .
-
-Returns: .
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: n
-
-Returns: i
-
-Returns: c
-
-Returns: k
-
-Returns: n
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: a
-
-Returns: b
-
-Returns: c
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: u
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 4
-
-Returns: e
-
-Returns: d
-
-Returns: 2
-
-Returns: 2
-
-Returns: 5
-
-Returns: 4
-
-Returns: 4
-
-Returns: 0
-
-Returns: d
-
-Returns: b
-
-Returns: 1
-
-Returns: e
-
-Returns: d
-
-Returns: a
-
-Returns: 2
-
-Returns: 3
-
-Returns: f
-
-Returns: e
-
-Returns: 0
-
-Returns: 5
-
-Returns: e
-
-Returns: d
-
-Returns: 1
-
-Returns: 0
-
-Returns: 1
-
-Returns: 8
-
-Returns: 4
-
-Returns: 1
-
-Returns: 1
-
-Returns: 3
-
-Returns: e
-
-Returns: "
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: p
-
-Returns: u
-
-Returns: b
-
-Returns: l
-
-Returns: i
-
-Returns: c
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: t
-
-Returns: a
-
-Returns: g
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: u
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 4
-
-Returns: e
-
-Returns: d
-
-Returns: 2
-
-Returns: 2
-
-Returns: 5
-
-Returns: 4
-
-Returns: 4
-
-Returns: 0
-
-Returns: d
-
-Returns: b
-
-Returns: 1
-
-Returns: e
-
-Returns: d
-
-Returns: a
-
-Returns: 2
-
-Returns: 3
-
-Returns: f
-
-Returns: e
-
-Returns: 0
-
-Returns: 5
-
-Returns: e
-
-Returns: d
-
-Returns: 1
-
-Returns: 0
-
-Returns: 1
-
-Returns: 8
-
-Returns: 4
-
-Returns: 1
-
-Returns: 1
-
-Returns: 3
-
-Returns: e
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: u
-
-Returns: s
-
-Returns: e
-
-Returns: r
-
-Returns: n
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: a
-
-Returns: b
-
-Returns: c
-
-Returns: "
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ]
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: r
-
-Returns: r
-
-Returns: o
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: n
-
-Returns: u
-
-Returns: l
-
-Returns: l
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: a
-
-Returns: l
-
-Returns: l
-
-Returns: :
-
-Returns: 
-
-Returns: 符
-
-Returns: 合
-
-Returns: 筛
-
-Returns: 选
-
-Returns: 条
-
-Returns: 件
-
-Returns: 的
-
-Returns: 策
-
-Returns: 略
-
-Returns: 总
-
-Returns: 数
-
-Returns: 。
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: s
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: g
-
-Returns: i
-
-Returns: e
-
-Returns: s
-
-Returns: :
-
-Returns: 
-
-Returns: 查
-
-Returns: 询
-
-Returns: 返
-
-Returns: 回
-
-Returns: 的
-
-Returns: 策
-
-Returns: 略
-
-Returns: 详
-
-Returns: 细
-
-Returns: 信
-
-Returns: 息
-
-Returns: 。
-
-##### NewRobot
-
-```NewRobot```方法用于创建请求中```API KEY```对应的发明者量化交易平台账号下的实盘。
-
-Parameters:
-
-- `settings` (JSON对象, required): 实盘配置参数，```settings```参数格式如下：
-
-```json
-{
-    "appid":"test",
-    "args":[],
-    "exchanges":[
-        {"pair":"SOL_USDT","pid":123}
-    ],
-    "group":123,
-    "name":"test",
-    "node":123,
-    "period":60,
-    "strategy":123
-}
-```
-
-- group: 指定实盘分组。
-- args: 策略参数，如果策略没有参数则为空数组。
-- exchanges: 交易所对象配置，可参考```RestartRobot```接口。
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: j
-
-Returns: s
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: "
-
-Returns: :
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: 5
-
-Returns: 9
-
-Returns: 1
-
-Returns: 9
-
-Returns: 8
-
-Returns: 8
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: r
-
-Returns: r
-
-Returns: o
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: n
-
-Returns: u
-
-Returns: l
-
-Returns: l
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: :
-
-Returns: 
-
-Returns: 创
-
-Returns: 建
-
-Returns: 成
-
-Returns: 功
-
-Returns: ，
-
-Returns: 返
-
-Returns: 回
-
-Returns: 实
-
-Returns: 盘
-
-Returns: I
-
-Returns: D
-
-Returns: 。
-
-```settings```参数中```eid```配置的```"meta":{"AccessKey": "123", "SecretKey": "123"}```等敏感信息，发明者量化交易平台不会存储。这些数据将直接转发给托管者程序，因此每次创建或重启实盘时必须配置此信息。
-
-如果创建使用通用协议交易所对象的实盘，在配置```settings```参数时，```exchanges```属性可使用如下设置：
-```json
-{
-    "eid": "Exchange",
-    "label": "test",
-    "pair": "ETH_BTC",
-    "meta": {
-        "AccessKey": "123",
-        "SecretKey": "123",
-        "Front": "http://127.0.0.1:6666/test"
-    }
-}
-```
-
-```label```属性用于为当前通用协议接入的交易所对象设置标签，在策略中可使用```exchange.GetLabel()```函数获取。
-
-##### PluginRun
-
-```PluginRun```方法用于调用发明者量化交易平台的**调试工具**功能；仅支持JavaScript语言。
-
-Parameters:
-
-- `settings` (JSON对象, required): 调试工具中的设置参数，```settings```配置中包含测试代码，位于```source```属性中。```settings```参数格式如下：
-
-```json
-{
-    "exchanges":[{"pair":"SOL_USDT","pid":123}],
-    "node":123,
-    "period":60,
-    "source":"function main() {Log(\"Hello FMZ\")}"
-}
-```
-
-- source: 需要调试的代码。
-- node: 托管者ID，可指定在哪个托管者上运行实盘。若该值为-1，则表示自动分配。
-- exchanges: 交易所对象配置，可参考```RestartRobot```接口。
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: j
-
-Returns: s
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: {
-
-Returns: \
-
-Returns: "
-
-Returns: l
-
-Returns: o
-
-Returns: g
-
-Returns: s
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: [
-
-Returns: {
-
-Returns: \
-
-Returns: "
-
-Returns: P
-
-Returns: l
-
-Returns: a
-
-Returns: t
-
-Returns: f
-
-Returns: o
-
-Returns: r
-
-Returns: m
-
-Returns: I
-
-Returns: d
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: \
-
-Returns: "
-
-Returns: \
-
-Returns: "
-
-Returns: ,
-
-Returns: \
-
-Returns: "
-
-Returns: O
-
-Returns: r
-
-Returns: d
-
-Returns: e
-
-Returns: r
-
-Returns: I
-
-Returns: d
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: \
-
-Returns: "
-
-Returns: 0
-
-Returns: \
-
-Returns: "
-
-Returns: ,
-
-Returns: \
-
-Returns: "
-
-Returns: L
-
-Returns: o
-
-Returns: g
-
-Returns: T
-
-Returns: y
-
-Returns: p
-
-Returns: e
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: 5
-
-Returns: ,
-
-Returns: \
-
-Returns: "
-
-Returns: P
-
-Returns: r
-
-Returns: i
-
-Returns: c
-
-Returns: e
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: 0
-
-Returns: ,
-
-Returns: \
-
-Returns: "
-
-Returns: A
-
-Returns: m
-
-Returns: o
-
-Returns: u
-
-Returns: n
-
-Returns: t
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: 0
-
-Returns: ,
-
-Returns: \
-
-Returns: "
-
-Returns: E
-
-Returns: x
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: \
-
-Returns: "
-
-Returns: H
-
-Returns: e
-
-Returns: l
-
-Returns: l
-
-Returns: o
-
-Returns: 
-
-Returns: F
-
-Returns: M
-
-Returns: Z
-
-Returns: \
-
-Returns: "
-
-Returns: ,
-
-Returns: \
-
-Returns: "
-
-Returns: C
-
-Returns: u
-
-Returns: r
-
-Returns: r
-
-Returns: e
-
-Returns: n
-
-Returns: c
-
-Returns: y
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: \
-
-Returns: "
-
-Returns: \
-
-Returns: "
-
-Returns: ,
-
-Returns: \
-
-Returns: "
-
-Returns: I
-
-Returns: n
-
-Returns: s
-
-Returns: t
-
-Returns: r
-
-Returns: u
-
-Returns: m
-
-Returns: e
-
-Returns: n
-
-Returns: t
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: \
-
-Returns: "
-
-Returns: \
-
-Returns: "
-
-Returns: ,
-
-Returns: \
-
-Returns: "
-
-Returns: D
-
-Returns: i
-
-Returns: r
-
-Returns: e
-
-Returns: c
-
-Returns: t
-
-Returns: i
-
-Returns: o
-
-Returns: n
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: \
-
-Returns: "
-
-Returns: \
-
-Returns: "
-
-Returns: ,
-
-Returns: \
-
-Returns: "
-
-Returns: T
-
-Returns: i
-
-Returns: m
-
-Returns: e
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: 1
-
-Returns: 7
-
-Returns: 3
-
-Returns: 2
-
-Returns: 2
-
-Returns: 6
-
-Returns: 7
-
-Returns: 4
-
-Returns: 7
-
-Returns: 3
-
-Returns: 1
-
-Returns: 0
-
-Returns: 8
-
-Returns: }
-
-Returns: ]
-
-Returns: ,
-
-Returns: \
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: \
-
-Returns: "
-
-Returns: \
-
-Returns: "
-
-Returns: }
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: r
-
-Returns: r
-
-Returns: o
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: n
-
-Returns: u
-
-Returns: l
-
-Returns: l
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: :
-
-Returns: 
-
-Returns: 调
-
-Returns: 试
-
-Returns: 工
-
-Returns: 具
-
-Returns: 成
-
-Returns: 功
-
-Returns: 执
-
-Returns: 行
-
-Returns: 传
-
-Returns: 入
-
-Returns: 的
-
-Returns: J
-
-Returns: a
-
-Returns: v
-
-Returns: a
-
-Returns: S
-
-Returns: c
-
-Returns: r
-
-Returns: i
-
-Returns: p
-
-Returns: t
-
-Returns: 代
-
-Returns: 码
-
-Returns: 后
-
-Returns: 返
-
-Returns: 回
-
-Returns: 的
-
-Returns: 测
-
-Returns: 试
-
-Returns: 结
-
-Returns: 果
-
-Returns: 数
-
-Returns: 据
-
-Returns: 。
-
-```{"eid": "OKEX", "pair": "ETH_BTC", "meta" :{"AccessKey": "123", "SecretKey": "123"}}```
-```{"eid": "Huobi", "pair": "BCH_BTC", "meta" :{"AccessKey": "123", "SecretKey": "123"}}```
-
-对于```settings```中的```exchanges```属性，调用```PluginRun```方法时只需设置一个（在调试工具页面使用时也仅支持一个交易所对象）。在```settings```中设置2个交易所对象不会引发报错，但在代码中访问第二个交易所对象时将会报错。
-
-##### GetRobotLogs
-
-```GetRobotLogs```方法用于获取请求中```API KEY```对应的FMZ量化交易平台账号下的实盘日志信息。要获取日志信息的实盘ID由```robotId```参数指定。
-
-Parameters:
-
-- `robotId` (number, required): ```robotId```参数用于指定要获取日志信息的实盘ID。可以使用```GetRobotList```方法获取账号下的实盘信息，其中包含实盘ID。
-- `logMinId` (number, required): ```logMinId```参数用于指定日志记录的最小ID。
-- `logMaxId` (number, required): ```logMaxId```参数用于指定日志记录的最大ID。
-- `logOffset` (number, required): ```logOffset```参数用于设置偏移量。在由```logMinId```和```logMaxId```确定的范围内，根据```logOffset```跳过指定数量的记录，从而确定数据获取的起始位置。
-- `logLimit` (number, required): ```logLimit```参数用于设置从起始位置开始要获取的数据记录条数。
-- `profitMinId` (number, required): ```profitMinId```参数用于设置收益日志的最小ID。
-- `profitMaxId` (number, required): ```profitMaxId```参数用于设置收益日志的最大ID。
-- `profitOffset` (number, required): ```profitOffset```参数用于设置偏移量，即跳过指定数量的记录作为起始位置。
-- `profitLimit` (number, required): ```profitLimit```参数用于设置从起始位置开始要获取的数据记录条数。
-- `chartMinId` (number, required): ```chartMinId```参数用于设置图表数据记录的最小ID。
-- `chartMaxId` (number, required): ```chartMaxId```参数用于设置图表数据记录的最大ID。
-- `chartOffset` (number, required): ```chartOffset```参数用于设置偏移量。
-- `chartLimit` (number, required): ```chartLimit```参数用于设置要获取的记录条数。
-- `chartUpdateBaseId` (number, required): ```chartUpdateBaseId```参数用于设置查询更新记录的基准ID。
-- `chartUpdateDate` (number, required): ```chartUpdateDate```参数用于设置数据记录的更新时间戳，系统将筛选出大于此时间戳的记录。
-- `summaryLimit` (number, required): ```summaryLimit```参数用于设置要查询的状态栏数据字节数。该参数为整型，用于查询实盘的状态栏数据。
-
-设置为0表示不查询状态栏信息；设置为非0值表示要查询的状态栏信息字节数（此接口不限制数据量，可以指定一个较大的summaryLimit参数来获取所有状态栏信息）。状态栏数据存储在返回数据的```summary```字段中。
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: j
-
-Returns: s
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: h
-
-Returns: a
-
-Returns: r
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: h
-
-Returns: a
-
-Returns: r
-
-Returns: t
-
-Returns: T
-
-Returns: i
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: l
-
-Returns: o
-
-Returns: g
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: [
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: T
-
-Returns: o
-
-Returns: t
-
-Returns: a
-
-Returns: l
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 2
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: M
-
-Returns: a
-
-Returns: x
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 2
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: M
-
-Returns: i
-
-Returns: n
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 1
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: A
-
-Returns: r
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: [
-
-Returns: ]
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ,
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: T
-
-Returns: o
-
-Returns: t
-
-Returns: a
-
-Returns: l
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: M
-
-Returns: a
-
-Returns: x
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: M
-
-Returns: i
-
-Returns: n
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: A
-
-Returns: r
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: [
-
-Returns: ]
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ,
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: T
-
-Returns: o
-
-Returns: t
-
-Returns: a
-
-Returns: l
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: M
-
-Returns: a
-
-Returns: x
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: M
-
-Returns: i
-
-Returns: n
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: A
-
-Returns: r
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: [
-
-Returns: ]
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ]
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: n
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: _
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 1
-
-Returns: 2
-
-Returns: 3
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: o
-
-Returns: n
-
-Returns: l
-
-Returns: i
-
-Returns: n
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: t
-
-Returns: r
-
-Returns: u
-
-Returns: e
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: f
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: h
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 1
-
-Returns: 7
-
-Returns: 3
-
-Returns: 2
-
-Returns: 2
-
-Returns: 0
-
-Returns: 1
-
-Returns: 5
-
-Returns: 4
-
-Returns: 4
-
-Returns: 0
-
-Returns: 0
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: t
-
-Returns: a
-
-Returns: t
-
-Returns: u
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 4
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: u
-
-Returns: m
-
-Returns: m
-
-Returns: a
-
-Returns: r
-
-Returns: y
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: .
-
-Returns: .
-
-Returns: .
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: u
-
-Returns: p
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: T
-
-Returns: i
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 1
-
-Returns: 7
-
-Returns: 3
-
-Returns: 2
-
-Returns: 2
-
-Returns: 0
-
-Returns: 1
-
-Returns: 5
-
-Returns: 3
-
-Returns: 2
-
-Returns: 6
-
-Returns: 3
-
-Returns: 6
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: w
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: r
-
-Returns: r
-
-Returns: o
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: n
-
-Returns: u
-
-Returns: l
-
-Returns: l
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: l
-
-Returns: o
-
-Returns: g
-
-Returns: s
-
-Returns: :
-
-Returns: 
-
-Returns: 日
-
-Returns: 志
-
-Returns: 信
-
-Returns: 息
-
-Returns: ；
-
-Returns: 查
-
-Returns: 询
-
-Returns: 出
-
-Returns: 的
-
-Returns: 若
-
-Returns: 干
-
-Returns: 条
-
-Returns: 日
-
-Returns: 志
-
-Returns: 数
-
-Returns: 据
-
-Returns: 存
-
-Returns: 储
-
-Returns: 在
-
-Returns: A
-
-Returns: r
-
-Returns: r
-
-Returns: 字
-
-Returns: 段
-
-Returns: 中
-
-Returns: 。
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: l
-
-Returns: o
-
-Returns: g
-
-Returns: s
-
-Returns: 中
-
-Returns: 第
-
-Returns: 一
-
-Returns: 个
-
-Returns: 数
-
-Returns: 据
-
-Returns: 结
-
-Returns: 构
-
-Returns: 为
-
-Returns: 实
-
-Returns: 盘
-
-Returns: 数
-
-Returns: 据
-
-Returns: 库
-
-Returns: 中
-
-Returns: 策
-
-Returns: 略
-
-Returns: 日
-
-Returns: 志
-
-Returns: 表
-
-Returns: 的
-
-Returns: 日
-
-Returns: 志
-
-Returns: 记
-
-Returns: 录
-
-Returns: 。
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: l
-
-Returns: o
-
-Returns: g
-
-Returns: s
-
-Returns: 中
-
-Returns: 第
-
-Returns: 二
-
-Returns: 个
-
-Returns: 数
-
-Returns: 据
-
-Returns: 结
-
-Returns: 构
-
-Returns: 为
-
-Returns: 实
-
-Returns: 盘
-
-Returns: 数
-
-Returns: 据
-
-Returns: 库
-
-Returns: 中
-
-Returns: 收
-
-Returns: 益
-
-Returns: 日
-
-Returns: 志
-
-Returns: 表
-
-Returns: 的
-
-Returns: 日
-
-Returns: 志
-
-Returns: 记
-
-Returns: 录
-
-Returns: 。
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: l
-
-Returns: o
-
-Returns: g
-
-Returns: s
-
-Returns: 中
-
-Returns: 第
-
-Returns: 三
-
-Returns: 个
-
-Returns: 数
-
-Returns: 据
-
-Returns: 结
-
-Returns: 构
-
-Returns: 为
-
-Returns: 实
-
-Returns: 盘
-
-Returns: 数
-
-Returns: 据
-
-Returns: 库
-
-Returns: 中
-
-Returns: 图
-
-Returns: 表
-
-Returns: 日
-
-Returns: 志
-
-Returns: 表
-
-Returns: 的
-
-Returns: 日
-
-Returns: 志
-
-Returns: 记
-
-Returns: 录
-
-Returns: 。
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: s
-
-Returns: u
-
-Returns: m
-
-Returns: m
-
-Returns: a
-
-Returns: r
-
-Returns: y
-
-Returns: :
-
-Returns: 
-
-Returns: 实
-
-Returns: 盘
-
-Returns: 状
-
-Returns: 态
-
-Returns: 栏
-
-Returns: 数
-
-Returns: 据
-
-Returns: 。
-
-- 数据库中的策略日志表
-  返回数据中```logs```的属性值（数组结构）的第一个元素中（日志数据）```Arr```属性值描述如下：
-
-  ```plaintext
-  "Arr": [
-      [3977, 3, "Futures_OKCoin", "", 0, 0, "Sell(688.9, 2): 20016", 1526954372591, "", ""],
-      [3976, 5, "", "", 0, 0, "OKCoin:this_week 仓位过多, 多: 2", 1526954372410, "", ""]
-  ],
-  ```
-
-  | id | logType | eid | orderId | price | amount | extra | date | contractType | direction |
-  | - | - | - | - | - | - | - | - | - | - |
-  | 3977 | 3 | "Futures_OKCoin" | "" | 0 | 0 | "Sell(688.9, 2): 20016" | 1526954372591 | "" | "" |
-  | 3976 | 5 | "" | "" | 0 | 0 | "OKCoin:this_week 仓位过多, 多: 2" | 1526954372410 | "" | "" |
-
-  ```extra```为打印日志的附加信息。
-
-  ```logType```值对应的日志类型描述如下：
-
-  | logType: | 0 | 1 | 2 | 3 | 4 | 5 | 6 |
-  | - | - | - | - | - | - | - | - |
-  | logType意义: | BUY | SALE | RETRACT | ERROR | PROFIT | MESSAGE | RESTART |
-  | 中文意义 | 买入订单日志 | 卖出订单日志 | 撤单 | 错误 | 收益 | 消息 | 重启 |
-
-- 数据库中的收益图表日志表
-  该图表日志表数据与策略日志表中的收益日志保持一致。
-
-  ```plaintext
-  "Arr": [
-      [202, 2515.44, 1575896700315],
-      [201, 1415.44, 1575896341568]
-  ]
-  ```
-
-  以其中一条日志数据为例：
-
-  ```plaintext
-  [202, 2515.44, 1575896700315]
-  ```
-
-  ```202```为日志ID，```2515.44```为收益数值，```1575896700315```为时间戳。
-- 数据库中的图表日志表
-
-  ```plaintext
-  "Arr": [
-      [23637, 0, "{\"close\":648,\"high\":650.5,\"low\":647,\"open\":650,\"x\":1575960300000}"],
-      [23636, 5, "{\"x\":1575960300000,\"y\":3.0735}"]
-  ]
-  ```
-
-  以其中一条日志数据为例：
-
-  ```plaintext
-  [23637, 0, "{\"close\":648,\"high\":650.5,\"low\":647,\"open\":650,\"x\":1575960300000}"],
-  ```
-
-  ```23637```为日志ID，```0```为图表数据系列索引，最后的数据```"{\"close\":648,\"high\":650.5,\"low\":647,\"open\":650,\"x\":1575960300000}"```为日志数据，该条数据为图表上的K线数据。
-
-## MCP 服务
-
-MCP（Model Context Protocol）服务是一个用于模型上下文管理的协议服务，提供统一的接口来管理和交换AI模型的上下文信息。该服务支持多种数据格式和通信协议，确保不同AI系统之间的互操作性和数据一致性。
-
-配置及使用场景请参考：
-
-[FMZ平台Claude智能交易指南（1）](https://www.fmz.com/digest-topic/10690)
-
-[FMZ平台Claude智能交易指南（2）](https://www.fmz.com/digest-topic/10692)
-
-## 交易终端
-
-发明者量化交易平台提供模块化、可定制的[交易终端](https://www.fmz.com/m/trade)页面。用户可以自由添加各种数据模块、交易功能模块，甚至可以编写代码开发自定义模块（交易终端插件）。
-
-凭借高度灵活、自由的使用方式，极大地方便了手动交易和半程序化交易用户。交易终端页面上的各种模块均支持拖动、缩放，可以修改模块绑定的交易对、交易所等设置，并可添加多个同类型模块。
-
-发明者量化交易平台持续完善交易终端功能，为更好地支持手动交易，推出了交易终端插件功能。
-
-交易终端的相关数据存储在托管者程序（robot可执行文件）的运行目录下，具体路径为：```logs/storage/0```。如果交易终端使用的交易所对象采用密钥文件路径方式配置，需要将密钥文件放置在该目录中。
-
-### 插件原理
-
-原理与**调试工具**相同，将一段代码发送到交易终端页面选定的托管者执行，支持返回图表和表格（调试工具目前也已升级支持此功能）。与**调试工具**功能相同，仅能执行3分钟，该功能不计费。可用于实现辅助手动交易的简单功能，复杂策略仍需运行实盘。
-
-### 插件编写
-
-创建交易终端插件，可在**新建策略**页面将策略类型设置为「交易插件」。交易插件支持```JavaScript```、```Python```、```C++```、```My语言```。
-
-### 插件用途
-
-插件可以运行一段代码，执行一些简单的操作，例如冰山委托、挂单、撤单、计算等任务。与调试工具一样，插件通过 return 返回结果，也可以直接返回图表和表格。下面列举几个示例，其他功能可自行探索。
-
-- 返回深度快照
-  ```js
-  // 返回深度的快照
-  function main() {
-      var tbl = {
-          type: 'table',
-          title: '深度快照 @ ' + _D(),
-          cols: ['#', 'Amount', 'Ask', 'Bid', 'Amount'],
-          rows: []
-      }
-      var d = exchange.GetDepth()
-      for (var i = 0; i < Math.min(Math.min(d.Asks.length, d.Bids.length), 15); i++) {
-          tbl.rows.push([i, d.Asks[i].Amount, d.Asks[i].Price+'#ff0000', d.Bids[i].Price+'#0000ff', d.Bids[i].Amount])
-      }
-      return tbl
-  }
-  ```
-
-  ```python
-  def main():
-      tbl = {
-          "type": "table",
-          "title": "深度快照 @ " + _D(),
-          "cols": ["#", "Amount", "Ask", "Bid", "Amount"],
-          "rows": []
-      }
-      d = exchange.GetDepth()
-      for i in range(min(min(len(d["Asks"]), len(d["Bids"])), 15)):
-          tbl["rows"].append([i, d["Asks"][i]["Amount"], str(d["Asks"][i]["Price"]) + "#FF0000", str(d["Bids"][i]["Price"]) + "#0000FF", d["Bids"][i]["Amount"]])
-      return tbl
-  ```
-
-  ```rust
-  fn main() {
-      let d = exchange.GetDepth(None).unwrap();
-      let n = d.Asks.len().min(d.Bids.len()).min(15);
-      let mut rows = Vec::new();
-      for i in 0..n {
-          rows.push(format!(r#"[{}, {}, "{}#ff0000", "{}#0000ff", {}]"#, i, d.Asks[i].Amount, d.Asks[i].Price, d.Bids[i].Price, d.Bids[i].Amount));
-      }
-      let tbl = format!(
-          r##"{{"type": "table", "title": "深度快照 @ {}", "cols": ["#", "Amount", "Ask", "Bid", "Amount"], "rows": [{}]}}"##,
-          _D(None), rows.join(","));
-
-      LogStatus!(format!("`{}`", tbl));
-      // Rust 不支持return json 显示表格，可以创建实盘显示状态栏表格
-  }
-  ```
-
-  ```cpp
-  void main() {
-      json tbl = R"({
-          "type": "table",
-          "title": "abc",
-          "cols": ["#", "Amount", "Ask", "Bid", "Amount"],
-          "rows": []
-      })"_json;
-
-      tbl["title"] = "深度快照 @" + _D();
-      auto d = exchange.GetDepth();
-      for(int i = 0; i < 5; i++) {
-          tbl["rows"].push_back({format("%d", i), format("%f", d.Asks[i].Amount), format("%f #FF0000", d.Asks[i].Price), format("%f #0000FF", d.Bids[i].Price), format("%f", d.Bids[i].Amount)});
-      }
-
-      LogStatus("`" + tbl.dump() + "`");
-      // C++ 不支持return json 显示表格，可以创建实盘显示状态栏表格
-  }
-  ```
-- 绘制跨期差价
-  ```js
-  // 画跨期差价
-  var chart = {
-      __isStock: true,
-      title : { text : '差价分析图'},
-      xAxis: { type: 'datetime'},
-      yAxis : {
-          title: {text: '差价'},
-          opposite: false
-      },
-      series : [
-          {name : "diff", data : []}
-      ]
-  }
-
-  function main() {
-      exchange.SetContractType('quarter')
-      var recordsA = exchange.GetRecords(PERIOD_M5)
-      exchange.SetContractType('this_week')
-      var recordsB = exchange.GetRecords(PERIOD_M5)
-
-      for(var i = 0; i < Math.min(recordsA.length, recordsB.length); i++){
-          var diff = recordsA[recordsA.length - Math.min(recordsA.length, recordsB.length) + i].Close - recordsB[recordsB.length - Math.min(recordsA.length, recordsB.length) + i].Close
-          chart.series[0].data.push([recordsA[recordsA.length - Math.min(recordsA.length, recordsB.length) + i].Time, diff])
-      }
-      return chart
-  }
-  ```
-
-  ```python
-  chart = {
-      "__isStock": True,
-      "title": {"text": "差价分析图"},
-      "xAxis": {"type": "datetime"},
-      "yAxis": {
-          "title": {"text": "差价"},
-          "opposite": False
-      },
-      "series": [
-          {"name": "diff", "data": []}
-      ]
-  }
-
-  def main():
-      exchange.SetContractType("quarter")
-      recordsA = exchange.GetRecords(PERIOD_M5)
-      exchange.SetContractType("this_week")
-      recordsB = exchange.GetRecords(PERIOD_M5)
-
-      for i in range(min(len(recordsA), len(recordsB))):
-          diff = recordsA[len(recordsA) - min(len(recordsA), len(recordsB)) + i].Close - recordsB[len(recordsB) - min(len(recordsA), len(recordsB)) + i].Close
-          chart["series"][0]["data"].append([recordsA[len(recordsA) - min(len(recordsA), len(recordsB)) + i]["Time"], diff])
-      return chart
-  ```
-
-  ```cpp
-  // C++ 不支持 return json 结构画图
-  ```
-
-**策略广场**中还有其他范例可供参考，例如：逐笔小量买入/卖出。
-
-### 使用方式
-
-- 添加交易终端插件模块
-  在交易终端页面打开模块添加菜单，当前FMZ账号策略库中的交易终端插件将自动显示在列表中，找到需要添加的插件并点击添加。
-  - 运行插件
-  点击「执行」按钮，交易终端插件即开始运行。插件不会显示日志信息，但可以返回并显示数据表格。
-- 插件运行时间
-  交易终端插件的最长运行时间为3分钟，超过3分钟将自动停止运行。
-
-## 数据探索
-
-发明者量化自研的**datadata**平台是一个量化金融数据平台，发明者量化交易平台[数据探索](https://www.fmz.com/m/database)模块已集成**datadata**平台的服务和功能。
-
-发明者量化用户无需重新注册**datadata**账号，即可开箱即用。使用户在多维度数据分析、挖掘、数据可视化、交易策略探索等方面更具优势。通过SQL查询分析海量数据，并借助可视化界面进行配置，生成适用于数据分析的多种图表并与团队共享，助您轻松掌握市场动态，精准把握投资机会！使用示例请参考：[数据探索模块专题文章](https://www.fmz.com/digest-topic/10370)。
-
-### 数据源
-
-DataData平台提供的数据源实时持续更新，提供多维度、多类型的数据支持。支持使用私有数据作为数据源，支持上传CSV格式文件，并可在「数据探索」页面预览数据。
-
-### 数据查询
-
-支持使用SQL语句查询数据，并可配置查询参数。支持以下数据导出格式：CSV文件、JSON文件。
-
-### 保存探索研究
-
-如需保存当前数据探索研究的内容，请点击右上角的「保存」按钮，将此SQL查询记录保存至当前FMZ账户「数据探索」的资源列表中（资源列表按钮位于保存按钮左侧）。
-
-### 数据图形化
-
-分析和查询得出的数据除了可以使用表格形式展示外，还可以适配多种可视化组件，以更加丰富生动的方式展示数据。
-
-### 分享研究
-
-支持分享数据探索研究成果，支持多种分享形式：公开链接、嵌入代码（例如在FMZ平台社区帖子中嵌入）、嵌入网页、数据链接、预览图链接。数据探索模块的研究成果除了用于展示外，还可以通过创建的「数据链接」直接为策略提供数据，支持实盘和回测环境。
-
-## Alpha因子分析工具
-
-分析公式参考了```worldquant```公开的[```alpha101```](https://github.com/yli188/WorldQuant_alpha101_code/blob/master/101%20Formulaic%20Alphas.pdf)中的行情计算方法，基本兼容其语法（未实现的功能已说明），并进行了增强。该工具用于快速对时间序列进行运算和验证交易想法。[Alpha因子分析工具页面](https://www.fmz.com/m/alpha)。
-
-### 函数和操作符
-
-**下面的"{}"代表占位符，所有表达式大小写不敏感，x代表数据时间序列**
-
-- ```abs(x), log(x), sign(x)```字面意思，分别是绝对值、对数、符号函数。
-
-以下操作符``` +, -, *, /, >, < ```也符合其标准的含义，```==```：是否相等，```||```：逻辑或，```x ? y : z```：三元条件运算符。
-
-- ```rank(x)``` ：横截面排序，返回所在百分位。需要指定候选标的池，用于单个行情时无法计算，将直接返回原始结果。
-- ```delay(x, d)``` ： 返回序列x在d个周期前的值。
-- ```sma(x, d)``` ： 计算序列x在d个周期内的简单移动平均值。
-- ```correlation(x, y, d)```：计算时间序列x和y在过去d个周期内的相关系数。
-- ```covariance(x, y, d)``` ：计算时间序列x和y在过去d个周期内的协方差。
-- ```scale(x, a)``` ：归一化数据，使得```sum(abs(x))=a```(a默认为1)。
-- ```delta(x, d)``` ：计算时间序列x的当前值减去d个周期前的值。
-- ```signedpower(x, a)``` ： ```x^a```。
-- ```decay_linear(x, d)``` ：计算时间序列x的d周期加权移动平均值，权重为d,d-1,d-2....1(经过归一化处理)。
-- ```indneutralize(x, g)``` ： 针对行业分类g进行中性化处理，目前不支持。
-- ```ts_{O}(x, d)``` ： 对时间序列x的过去d个周期执行O操作(O可具体代表min、max等，详见下文），d会转换为整数。
-- ```ts_min(x, d)``` ： 过去d个周期的最小值。
-- ```ts_max(x, d)``` ： 过去d个周期的最大值。
-- ```ts_argmax(x, d)``` ： ```ts_max(x, d)```的位置。
-- ```ts_argmin(x, d)``` ： ```ts_min(x, d)```的位置。
-- ```ts_rank(x, d)``` ： 时间序列x在过去d个周期内的排序（百分位排序）。
-- ```min(x, d)``` ： ```ts_min(x, d)```。
-- ```max(x, d)```： ```ts_max(x, d)```。
-- ```sum(x, d)``` ：过去d个周期的累计和。
-- ```product(x, d)``` ：过去d个周期的累计积。
-- ```stddev(x, d)``` ：过去d个周期的标准差。
-
-### 输入数据
-
-**输入数据不区分大小写，默认数据为网页上选择的品种，也可直接指定，例如：```binance.ada_bnb```**
-
-- ```returns```：收盘价收益率。
-- ```open, close, high, low, volume```：周期内的开盘价、收盘价、最高价、最低价和成交量。
-- ```vwap```：成交量加权平均价（暂未实现，当前使用收盘价）。
-- ```cap```：总市值（暂未实现）。
-- ```IndClass```：行业分类（暂未实现）。
-
-### 其它
-
-支持一次输出多个结果，使用列表形式表示。例如```[sma(close, 10), sma(high, 30)]```将在图表中绘制两条线。除了输入时间序列数据外，还可以作为简单的计算器使用。
-
-## 通用协议
-
-对于发明者量化交易平台尚未封装对接的交易所API接口，可通过编写通用协议插件程序进行接入。
-
-![通用协议配置截图](https://www.fmz.com/upload/asset/2e43b059b3ec9f42ded6e.png)
-
-该通用协议可用于接入任何提供API接口的交易所，支持以下两种协议：
-- ```REST```协议：[参考文档](https://www.fmz.com/digest-topic/10518)。
-- ```FIX```协议：[参考项目](https://github.com/fmzquant/fixc)。
-
-```FIX```协议插件程序与```REST```协议插件程序的区别仅在于插件程序与交易所接口的交互方式不同。协议插件程序与发明者量化托管者程序的交互方式、数据格式等细节处理完全相同，具体实现可参考上述链接中的示例。
-
-## 调试工具
-
-[调试工具](https://www.fmz.com/m/debug)页面提供了一个用于快速测试实盘代码的免费环境，目前仅支持```JavaScript```语言。
-
-![调试工具](https://www.fmz.com/upload/asset/2e48d6d1bc77e46099058.png)
-
-使用调试工具测试代码时，代码将直接在指定的托管者上运行，最长运行时间为3分钟。支持调用发明者量化交易平台的所有API函数，但仅支持单个交易所对象。
-
-## 远程编辑
-
-![远程编辑截图](https://www.fmz.com/upload/asset/2e4e8975d1e32517fd989.png)
-
-支持使用本地编辑器远程同步策略代码至发明者量化交易平台，支持```Sublime Text```/```Atom```/```Vim```/```VSCode```编辑器。
-
-![远程编辑支持的编辑器插件](https://www.fmz.com/upload/asset/2e4da2d2a1fc4bc9bbce5.png)
-
-在策略编辑页面点击「远程编辑」展开插件下载地址按钮，显示当前策略的远程同步密钥（token）。
-- 点击「更新密钥」可刷新当前策略的密钥（token）。
-- 点击「删除密钥」可删除当前策略的密钥（token）。
-
-点击页面上的```Sublime Text 3 Plugin```/```Atom Plugin```/```Vim Plugin```/```VSCode Plugin```编辑器插件下载按钮即可跳转至对应的插件项目，不同编辑器的插件安装方式略有差异。
-
-## 完整策略的导入与导出
-
-![策略导入导出截图](https://www.fmz.com/upload/asset/2e52ccf44526f396fb795.png)
-
-- 下载源码
-  导出策略源代码，导出的文件类型取决于策略所使用的编程语言。```JavaScript```策略导出为扩展名为```js```的文件；Python策略导出为扩展名为```py```的文件；C++策略导出为扩展名为```cpp```的文件；My语言（麦语言）策略导出为扩展名为```txt```的文件。
-  注意：仅导出策略源代码，不包含策略参数、模板引用等配置信息。
-
-- 导出策略
-  导出完整的策略配置，包含策略源代码、参数设置等所有策略相关信息，导出的文件格式为```xml```。
-
-- 导入策略
-  使用「导出策略」功能导出的```xml```文件，在策略编辑页面点击「导入策略」按钮，选择需要导入的```xml```文件即可导入完整的策略配置。
-  导入完成后需要点击「保存」按钮以保存策略。
-
-## 多语言支持
-
-策略名称和策略参数的描述均可采用```中文|英文```的格式书写，使网页能够自动识别并显示相应的语言。在其它使用场景中，例如**策略描述**、**使用说明**等```Markdown```格式的文本，使用```[trans]中文|英文[/trans]```或```[trans]中文||英文[/trans]```同样可以实现语言的自动识别。切换语言后，刷新网页即可生效。此外，在策略代码中，凡是可以写入字符串的函数也支持语言切换，例如```Log()```函数、```LogStatus()```函数等。
+以表格显示当前盘口前15档：
 
 ```js
+// 返回深度快照
 function main() {
-    Log("[trans]日志|log[/trans]")
-    var table = {
-        type: "table",
-        title: "[trans]操作|option[/trans]",
-        cols: ["[trans]列1|col1[/trans]", "[trans]列2|col2[/trans]", "[trans]操作|option[/trans]"],
-        rows: [
-            ["[trans]比特币|BTC[/trans]", "[trans]以太坊|ETH[/trans]", {"type": "button", "cmd": "coverAll", "name": "平仓|cover", "description": "描述|description"}]  // 注意：按钮中不用加[trans]标签
-        ]
+    var tbl = {
+        type: 'table',
+        title: '深度快照 @ ' + _D(),
+        cols: ['#', 'Amount', 'Ask', 'Bid', 'Amount'],
+        rows: []
     }
-    LogStatus("[trans]信息|message[/trans]", "\n`" + JSON.stringify(table) + "`")
-    throw "[trans]错误|error[/trans]"
+    var d = exchange.GetDepth()
+    var n = Math.min(d.Asks.length, d.Bids.length, 15)
+    for (var i = 0; i < n; i++) {
+        tbl.rows.push([i, d.Asks[i].Amount, d.Asks[i].Price + '#ff0000', d.Bids[i].Price + '#0000ff', d.Bids[i].Amount])
+    }
+    return tbl
 }
 ```
 
-```python
-import json
+**画跨期差价**
 
-def main():
-    Log("[trans]日志|log[/trans]")
-    table = {
-        "type": "table",
-        "title": "[trans]操作|option[/trans]",
-        "cols": ["[trans]列1|col1[/trans]", "[trans]列2|col2[/trans]", "[trans]操作|option[/trans]"],
-        "rows": [
-            ["[trans]比特币|BTC[/trans]", "[trans]以太坊|ETH[/trans]", {"type": "button", "cmd": "coverAll", "name": "平仓|cover", "description": "描述|description"}]
-        ]
+期货交易所对象上，取季度合约与当周合约的5分钟K线，画出收盘价差：
+
+```js
+// 画跨期差价
+var chart = {
+    __isStock: true,
+    title: {text: '差价分析图'},
+    xAxis: {type: 'datetime'},
+    yAxis: {
+        title: {text: '差价'},
+        opposite: false
+    },
+    series: [
+        {name: "diff", data: []}
+    ]
+}
+
+function main() {
+    exchange.SetContractType('quarter')
+    var recordsA = exchange.GetRecords(PERIOD_M5)
+    exchange.SetContractType('this_week')
+    var recordsB = exchange.GetRecords(PERIOD_M5)
+
+    var n = Math.min(recordsA.length, recordsB.length)
+    for (var i = 0; i < n; i++) {
+        var a = recordsA[recordsA.length - n + i]
+        var b = recordsB[recordsB.length - n + i]
+        chart.series[0].data.push([a.Time, a.Close - b.Close])
     }
-    LogStatus("[trans]信息|message[/trans]", "\n`" + json.dumps(table) + "`")
-    raise Exception("[trans]错误|error[/trans]")
-```
-
-```rust
-fn main() {
-    Log!("[trans]日志|log[/trans]");
-    let table = r#"{
-        "type": "table",
-        "title": "[trans]操作|option[/trans]",
-        "cols": ["[trans]列1|col1[/trans]", "[trans]列2|col2[/trans]", "[trans]操作|option[/trans]"],
-        "rows": [
-            ["[trans]比特币|BTC[/trans]", "[trans]以太坊|ETH[/trans]", {"type": "button", "cmd": "coverAll", "name": "平仓|cover", "description": "描述|description"}]
-        ]
-    }"#;
-    LogStatus!("[trans]信息|message[/trans]", format!("\n`{}`", table));
-    Panic!("[trans]错误|error[/trans]");
+    return chart
 }
 ```
-
-```cpp
-void main() {
-    Log("[trans]日志|log[/trans]");
-    json table = R"({
-        "type": "table",
-        "title": "[trans]操作|option[/trans]",
-        "cols": ["[trans]列1|col1[/trans]", "[trans]列2|col2[/trans]", "[trans]操作|option[/trans]"],
-        "rows": [
-            ["[trans]比特币|BTC[/trans]", "[trans]以太坊|ETH[/trans]", {"type": "button", "cmd": "coverAll", "name": "平仓|cover", "description": "描述|description"}]
-        ]
-    })"_json;
-    LogStatus("[trans]信息|message[/trans]", "\n`" + table.dump() + "`");
-    Panic("[trans]错误|error[/trans]");
-}
-```
-
-## 实盘、策略分组
-
-在发明者量化交易平台的「实盘」页面和「策略库」页面，可以点击右侧的**分组管理**按钮，对策略和实盘进行分组管理。
-例如，在进行策略分组管理时，可以将**模板类库**归为一组、**JavaScript语言的策略**归为一组、**测试用策略**归为一组。
-
-- 策略分组
-  ![策略分组](https://www.fmz.com/upload/asset/2e482ba9b9aa272085d00.png)
-
-- 实盘分组
-  ![实盘分组](https://www.fmz.com/upload/asset/2e577d050e817837bbfdf.png)
-
-## 实盘展示
-
-发明者量化交易平台提供多种展示策略实盘运行状态的方式。
-
-### 子账号
-
-登录平台后，点击「控制中心」、「账号设置」跳转到FMZ账户[管理页面](https://www.fmz.com/m/account)。点击「子账户组」可以看到子账户创建页面，在**操作权限**控件中选择所创建子账号可以访问的实盘，在**用户信息**控件中设置子账号的**用户名**和**子账号登录密码**。点击「创建子账户」按钮即可创建一个子账号。创建后的子账号会在当前页面显示，并且可以进行「修改」、「锁定/解锁」、「删除」操作。
-
-  子账号仅拥有有限权限，只能查看**操作权限**设置中授权的实盘。对于已授权的实盘，子账号拥有修改参数、停止实盘、重启实盘的权限，但无法修改实盘配置的交易所对象。
-
-  ![子账号设置](https://www.fmz.com/upload/asset/2e46d725dbe6b471f1b33.png)
-
-  子账号的使用场景通常包括：
-  - 1、量化团队管理多个实盘策略时，便于登录和管理。
-  - 2、策略出租时，用于用户的实盘调试工作。
-
-### 实盘围观
-
-在发明者量化交易平台[实盘页面](https://www.fmz.com/m/robots)的实盘列表中点击「公开」按钮即可公开展示当前行的实盘。
-
-实盘围观目前支持两种方式：
-- 1、在发明者量化交易平台的[实盘围观](https://www.fmz.com/live)页面公开展示实盘。点击「公开」按钮后选择**公开分享**即可。
-- 2、创建实盘围观私有链接。
-  点击「公开」按钮后选择**内部分享**，设置有效期后即可生成私有链接，用于访问该策略实盘的私有围观页面。
-
-## 策略分享与出租
-
-在[策略库](https://www.fmz.com/m/strategies)页面，点击策略右侧的「操作项」按钮后，弹出菜单中包含分享和出租操作选项。
-
-重要提示：创建和分发策略**注册码**时，请务必仔细确认是「注册码」还是「复制码」，以免误将策略泄露。
-
-### 策略分享
-
-![策略分享](https://www.fmz.com/upload/asset/2e593d57dc36afc004ef6.png)
-
-- 公开分享
-  点击「分享」按钮后会弹出对话框，可以选择「公开分享」。策略将完整地分享到平台的策略广场，任何用户都可以复制该策略。
-
-- 内部分享
-  点击「分享」按钮后会弹出对话框，可以选择「内部分享」。选择分享有效期、分享次数后会生成该策略的**复制页面地址**和**复制码**。可以分发给指定的FMZ平台用户，需要该策略的用户只需使用**复制页面地址**链接，登录**复制页面**后输入复制码即可获取该策略，获取后策略会自动出现在策略库中。
-
-### 策略出租
-
-![策略出租](https://www.fmz.com/upload/asset/2e4e78f6c46c9dde1ce90.png)
-
-- 公开出售
-  点击「出租」按钮后会弹出对话框，可以选择「公开出售」。策略即可申请上架（需要通过审核）。
-
-- 内部出售
-  点击「出租」按钮后会弹出对话框，可以选择「内部出售」。选择使用天数、最大并发数、注册码数量后，系统会生成该策略的**注册页面地址**和**注册码**。您可以将其分发给指定的FMZ平台用户，需要该策略的用户只需访问**注册页面地址**链接，登录**注册页面**后输入注册码即可获取策略的使用权。策略也会出现在策略库中，但用户只有回测和实盘使用权限，无法查看策略源码等信息。并发实盘个数设置为0时表示不限制并发数量，允许无限制地创建实盘。
-
-## 实盘消息推送
-
-[推送设置页面](https://www.fmz.com/m/account#push)中可以开启消息推送功能。
-
-![推送设置](https://www.fmz.com/upload/asset/2e4ad17706aa842c914ce.png)
-
-- 移动端（App）
-  开启移动端App推送后，实盘程序发出的推送消息将发送至发明者量化移动端App。
-- 邮箱
-  开启邮箱推送需先验证邮箱，验证通过后即可接收实盘程序发出的推送消息。
-- WebHook
-  开启WebHook推送后，可自定义推送地址，例如设置为：```http://abc.com/push.php?data={body}```。
-  当实盘程序发出推送消息时，平台会向所设置的地址```http://abc.com/push.php?data={body}```发送一个请求（仅支持```GET```方法），推送的消息内容将替换到```{body}```位置。
-
-策略中推送消息
-- JavaScript/TypeScript/Python/Rust/C++语言
-  在策略代码中，可使用```Log()```函数以及其它能在日志区域输出日志信息的函数，例如：```exchange.CreateOrder()```、```exchange.CancelOrder()```等。
-  为这些函数传入一个附带参数```"@"```（即在必要参数之外再增加一个附带参数），例如：```Log("This is a push message", "@")```，即可将这条输出的日志信息进行推送，平台会根据「推送设置」进行消息推送。Rust语言中对应```Log!```宏，用法相同：```Log!("This is a push message", "@");```。
-- PINE语言/My语言
-  在PINE语言/My语言策略所集成的「交易类库」参数中，可开启交易日志推送，触发交易动作后将自动进行推送。
-- Blockly可视化
-  在「工具」一栏中选择**消息推送**模块，即可实现指定信息的推送。
-
-消息推送存在频率限制，具体规则如下：在实盘的每个20秒周期内，仅保留并推送最后一条消息，其余消息将被过滤，不予推送。
-
-## 实盘报错、异常退出的常见原因
-
-- 策略静态语法错误
-
-  ![编辑器中语法错误](https://www.fmz.com/upload/asset/2e4daebbb80548adf3927.png)
-
-  此类错误较为明显，通常在策略编辑页面可以看到错误标记，在回测时即可发现并纠正。
-- 策略运行时错误
-  最常见的情况是对函数返回值不进行合法性判断就直接使用。
-- 内存占用过度
-  在全局变量中保存过多无法进行垃圾回收的内容，导致内存占用过大。
-- 未合理使用```exchange.Go```函数并发请求
-  使用异步```exchange.Go```函数时，没有合理使用```wait```等待协程结束，导致协程数量过多。
-- 函数递归调用
-  函数递归调用层数过深，导致超出协程堆栈大小限制。
-- 接口业务错误、网络请求错误等
-  此类报错会显示相关的交易所对象名称、函数名称、错误相关的消息和原因等信息。此类错误不会导致实盘异常停止（此类报错通常是起因，但并非直接原因，直接原因通常是**未对接口返回值进行合法性判断就直接使用而引起的程序异常**）。
-- 平台底层报错
-  常见的有```Decrypt: Secret key decrypt failed```错误，该错误会导致实盘无法启动。错误原因是修改了发明者量化交易平台的账号密码，导致所有已配置的```API KEY```失效，需要重新配置```API KEY```并重启托管者即可。
-- Python策略加密问题
-  Python策略出租时，由于平台加密策略的Python版本与策略运行时的Python版本不兼容导致的报错：```ValueError: bad marshal data (unknown type code) ```，将策略运行的Python环境升级或安装为```Python 2.7```、```Python 3.5```、```Python 3.6```中任一策略支持的版本即可。
-- ```interrupt```错误
-  该错误是由于程序在执行某个操作（例如访问交易所接口）时，用户点击了实盘页面上的**停止实盘按钮**，实盘停止中断了当前操作而打印的报错信息。该报错不会产生实质影响，仅是一条日志记录。
-
-[常见问题汇总](https://www.fmz.com/bbs-topic/1427)。
-
-## 交易所特殊说明
-
-- 富途证券
-  支持富途牛牛实盘交易、模拟盘交易，需要下载[```FutuOpenD```](https://www.futunn.com/download/OpenAPI?lang=zh-CN)软件。
-  使用```FutuOpenD```接入模拟交易时，部分股票代码不受支持，因此无法交易；但富途牛牛手机APP支持模拟交易。
-  在发明者量化平台上配置交易所对象、运行```FutuOpenD```软件等操作，请参阅[富途证券配置说明文档](https://www.fmz.com/bbs-topic/10185)。
-
-  - 接口调用频率
-    ```GetOrder```、```GetOrders```、```GetPositions```、```GetAccount```函数默认使用**缓存数据**，因此不限制调用频率。
-    当有新数据时，```FutuOpenD```会自动更新数据，**缓存数据**也会随之同步更新。
-
-    调用```exchange.IO("refresh", true)```函数可以禁用缓存；**禁用缓存**后，调用频率限制为**每30秒内最多请求10次查询**，超过该频率限制将会报错。
-
-  - 股票代码
-    例如：```600519.SH```
-    - HK 港股
-    - US 美股
-    - SH 沪股
-    - SZ 深股
-
-    在策略代码中使用```exchange.SetContractType()```函数设置股票代码，例如：
-
-    ```js
-    function main() {
-        var info = exchange.SetContractType("600519.SH")    // Set to stock 600519.SH (Moutai), account switches to mainland market
-        Log(info)
-        Log(exchange.GetAccount())                          // Current stock is Moutai, calling GetAccount function gets account assets for mainland market
-        Log(exchange.GetTicker())                           // Get current price information for Moutai stock
-    }
-    ```
-
-    ```python
-    def main():
-        info = exchange.SetContractType("600519.SH")
-        Log(info)
-        Log(exchange.GetAccount())
-        Log(exchange.GetTicker())
-    ```
-
-    ```rust
-    fn main() {
-        let info = exchange.SetContractType("600519.SH");    // Set to stock 600519.SH (Moutai), account switches to mainland market
-        Log!(info);
-        Log!(exchange.GetAccount());                          // Current stock is Moutai, calling GetAccount function gets account assets for mainland market
-        Log!(exchange.GetTicker(None));                       // Get current price information for Moutai stock
-    }
-    ```
-
-    ```cpp
-    void main() {
-        auto info = exchange.SetContractType("600519.SH");
-        Log(info);
-        Log(exchange.GetAccount());
-        Log(exchange.GetTicker());
-    }
-    ```
-
-    设置交易方向的函数```exchange.SetDirection```、下单函数```exchange.Buy```/```exchange.Sell```、
-    撤单函数```exchange.CancelOrder```、查询订单函数```exchange.GetOrder```等，使用方法均与期货市场相同。
-
-  - 账户信息数据格式：
-    使用```TrdMarket```定义市场，用以区分```香港市场```、```美国市场```和```大陆市场```。
-
-    摘录自[```Futu API```文档](https://openapi.futunn.com/futu-api-doc/)：
-    ```
-    const (
-        TrdMarket_TrdMarket_Unknown TrdMarket = 0 //Unknown market
-        TrdMarket_TrdMarket_HK      TrdMarket = 1 //Hong Kong market
-        TrdMarket_TrdMarket_US      TrdMarket = 2 //US market
-        TrdMarket_TrdMarket_CN      TrdMarket = 3 //Mainland market
-        TrdMarket_TrdMarket_HKCC    TrdMarket = 4 //Hong Kong Stock Connect market
-        TrdMarket_TrdMarket_Futures TrdMarket = 5 //Futures market
-    )
-    ```
-
-    获取账户信息数据，```exchange.GetAccount()```函数返回：
-    ```json
-    {
-        "Info": [{
-            "Header": {
-                ...                 // Omitted
-                "TrdMarket": 1      // Market ID in Info raw data, indicates account assets for Hong Kong market trading
-            },
-            "Funds": {              // Account asset information in this market
-                ...
-            }
-        }, ...],
-        "Stocks": 0,
-        "FrozenStocks": 0,
-        "Balance": 1000000,         // Asset value in current market
-        "FrozenBalance": 0
-    }
-    ```
-
-  - ```FutuOpenD```根据登录的**IP**地址进行地区区分
-    使用非大陆IP地址登录的账户在获取行情数据时会受到限制，具体请查阅```FutuOpenD```（富途）官方文档。
-- 盈透证券
-  配置交易所：
-  使用盈透需要在托管者所在的系统环境中运行「IB Gateway」或「TWS (Trader Workstation)」软件，此处以「TWS」软件为例。运行「TWS」并登录后，点击软件右上角的配置按钮打开软件配置界面。
-  - 选择：「配置」->「API」->「设置」，不要勾选「只读API」选项，需要勾选「启用ActiveX和套接字客户端」选项，注意配置中的「套接字端口」（TWS默认端口为7496实盘/7497模拟盘）。
-  - 在平台的添加交易所页面「https://www.fmz.com/m/platforms/add」选择**盈透证券(Interactive Brokers)**，并配置参数。在「服务器地址」配置项中填写「TWS」软件对应的地址（如127.0.0.1或localhost）与端口即可，例如：```localhost:7496```。
-
-  支持市场：
-  - 目前仅支持美股市场，暂不支持期货、外汇等其它市场。
-  - 美股市场股票代码格式示例：
-    苹果公司(Apple Inc.)在纳斯达克(NASDAQ)交易所的股票代码：```AAPL.US```。
-    特斯拉公司(Tesla, Inc.)在纳斯达克(NASDAQ)交易所的股票代码：```TSLA.US```。
-- Futures_Binance
-  支持币安的中文交易对：
-
-  ```js
-  function main() {
-      let ticker = exchange.GetTicker("币安人生_USDT.swap")
-      Log("ticker:", ticker)   // {"Info":{...},"Symbol":"币安人生_USDT.swap","Open":0.29622,"High":0.31661, ...}
-  }
-  ```
-
-  关于币安期货的```exchange.IO()```切换功能（双向持仓、逐仓/全仓、统一账户、STP模式等），请参考`exchange.IO`函数文档。
-- Futures_HuobiDM
-  - 切换地址：
-    使用```exchange.IO("base", "https://xxx.xxx.xxx")```或```exchange.SetBase("https://xxx.xxx.xxx")```切换交易所接口的基础地址。
-
-  支持火币的中文交易对：
-
-  ```js
-  function main() {
-      let ticker = exchange.GetTicker("币安人生_USDT.swap")
-      Log("ticker:", ticker)   // {"Info":{...},"Symbol":"币安人生_USDT.swap","Open":0.29622,"High":0.31661, ...}
-  }
-  ```
-
-  关于火币期货的```exchange.IO()```切换功能（signHost、逐仓/全仓、持仓单向/双向、统一账户等），请参考`exchange.IO`函数文档。
-- Huobi
-  - 切换特殊交易对：
-    支持火币现货杠杆代币，例如```LINK*(-3)```，交易所定义的代码为```link3susdt```，在发明者量化交易平台上设置该交易对时写作```LINK3S_USDT```。
-    也可以在策略中切换交易对：
-
-    ```js
-    function main() {
-        exchange.SetCurrency("LINK3S_USDT")
-        Log(exchange.GetTicker())
-    }
-    ```
-
-    ```python
-    def main():
-        exchange.SetCurrency("LINK3S_USDT")
-        Log(exchange.GetTicker())
-    ```
-
-    ```rust
-    fn main() {
-        exchange.SetCurrency("LINK3S_USDT");
-        Log!(exchange.GetTicker(None));
-    }
-    ```
-
-    ```cpp
-    void main() {
-        exchange.SetCurrency("LINK3S_USDT");
-        Log(exchange.GetTicker());
-    }
-    ```
-
-  支持火币的中文交易对：
-
-  ```js
-  function main() {
-      let ticker = exchange.GetTicker("币安人生_USDT")
-      Log("ticker:", ticker)   // {"Info":{...},"Symbol":"币安人生_USDT","Open":0.29622,"High":0.31661, ...}
-  }
-  ```
-
-- Futures_Bibox
-  - 不支持的接口：
-    该交易所不提供查询当前挂单和查询市场历史成交记录的接口，因此不支持```GetOrders```、```GetTrades```函数。
-- BitMEX
-  - 市价单买单
-    BitMEX现货交易下单接口中，市价单买单的下单量不是金额，而是交易币数。
-- Bitfinex
-  - 市价单买单
-    Bitfinex现货交易下单接口中，市价单买单的下单量不是金额，而是交易币数。
-- AscendEx
-  - 市价单买单
-    AscendEx现货交易下单接口中，市价单买单的下单量不是金额，而是交易币数。
-- Futures_Phemex
-  - K线接口
-    该交易所K线接口返回的数据不包含当前Bar数据。
-  - 切换逐仓/全仓：
-    该交易所未提供切换全仓/逐仓的接口，需要在交易所端进行设置。
-- Futures_Aevo
-  - 订单```Id```说明：
-    该交易所订单```Id```由实际```Id```和订单时间戳组成，二者之间使用英文逗号分隔，目的是为了支持```exchange.GetOrder(Id)```函数查询订单。由于交易所返回数据中的订单时间戳会随订单状态变化，如果本地需要记录订单```Id```等信息，请分离出实际订单```Id```后再进行记录。
-- Futures_dYdX
-  目前支持dYdX v4版本，请参考[dYdX v4 使用指南](https://www.fmz.com/digest-topic/10564)。
-- Futures_Hyperliquid
-  请参考[Hyperliquid 使用指南](https://www.fmz.com/digest-topic/10574)。
-
-  关于Hyperliquid期货的```exchange.IO()```切换功能（逐仓/全仓、主网/测试网、vaultAddress、walletAddress、expiresAfter等），请参考`exchange.IO`函数文档。
-- Futures_Lighter
-  - 切换测试环境：
-    测试环境可以在配置交易所对象时勾选设置，也可以使用```exchange.SetBase()```函数修改REST API端点以切换到测试环境。
-
-  关于Futures_Lighter的```exchange.IO()```切换功能（逐仓/全仓、订单过期时间等），请参考`exchange.IO`函数文档。

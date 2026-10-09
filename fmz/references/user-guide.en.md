@@ -2,350 +2,1040 @@
 
 Generated from https://www.fmz.com/user-guide: how the platform works (nodes, robots, strategies, templates, backtesting, extended API, MCP), as written for people; agents use it for concepts and limits.
 
-## Welcome to FMZ Quant Trading Platform
+## Getting Started
 
-FMZ Quant Trading Platform is the most professional quantitative community in the field of quantitative trading. Here, you can learn, write, share, and sell quantitative trading and algorithmic trading strategies; conduct online backtesting and paper trading; run, publish, and observe live trading strategies. FMZ Quant Trading Platform supports almost all mainstream cryptocurrency exchanges.
+Start here: what the platform is, the five steps from adding an exchange to running a live robot, and keeping API keys safe.
 
-If you encounter any issues while learning and using FMZ Quant Trading Platform, you can post questions and discussions on the forum at any time, submit tickets on the platform, or @administrators in the [Telegram](https://t.me/fmzquant_cn) community. Questions are usually answered quickly. The platform supports ChatGPT-assisted development. FMZ Quant Trading Platform has integrated **ChatGPT** as an auxiliary development tool. You can click "ChatGPT" in the shortcut bar of the "Dashboard" to jump to the [ChatGPT Assistant Tool Page](https://www.fmz.com/m/chat).
+### Welcome to FMZ Quant Trading Platform
 
-On FMZ Quant Trading Platform, you can start your quantitative trading journey by registering and logging in. After logging in, visit the [main page](https://www.fmz.com/m), where you will see the following:
-![Dashboard Overview](https://www.fmz.com/upload/asset/2e4e636a6fe51c8f620e8.png)
+FMZ Quant is a quantitative trading platform: write strategies in the browser, backtest them online, then run them as live robots on a docker you deploy yourself or rent. You can also learn from, share and rent out strategies in the strategy square, or show your own live robots publicly.
 
-- Left navigation bar: Contains the main function navigation options for the user console.
-- Top navigation bar: Provides navigation options for platform public resources.
-- Page center: Displays account settings, debugging tools, analysis tools, development documentation, platform function shortcuts, and other content.
+**Supported markets**
+- Crypto: spot, futures and perpetual contracts on the major centralized exchanges, plus some on-chain exchanges.
+- Securities and futures: Futu Securities, Interactive Brokers and others.
+- Exchanges the platform has not integrated yet can be connected yourself through the general protocol (see Platform Basics → Exchange → General Protocol).
 
-Main functions of the user console:
-- [Dashboard](https://www.fmz.com/m/dashboard)
-  Navigate to the "Dashboard" page. Running quantitative trading programs (i.e., live trading) on FMZ Quant Trading Platform requires three conditions: 1. Deploy an available docker. 2. Have an available strategy. 3. Configure exchange accounts for strategy program operations.
-- [Live Trading](https://www.fmz.com/m/robots)
-  Navigate to the "Live Trading" page. Live trading refers to instances of quantitative trading strategy programs. The live trading page is mainly used to manage, create, and control strategy live trading.
-- [Strategy Library](https://www.fmz.com/m/strategies)
-  Navigate to the "Strategy Library" page. The strategy library can categorize, save, manage, and write strategies in various programming languages.
-- [Dockers](https://www.fmz.com/m/nodes)
-  Navigate to the "Dockers" page. The dockers page can manage and deploy docker programs associated with the current account.
-- [Exchanges](https://www.fmz.com/m/platforms)
-  Navigate to the "Exchanges" page. The exchanges page can manage and configure exchange accounts needed for quantitative trading.
+**Strategy languages**
+JavaScript, TypeScript, Python, Rust, PINE, MyLanguage, Blockly visual programming and Workflow; see Writing Strategies → Programming Languages.
 
-Platform public resources:
-- [Strategies](https://www.fmz.com/square)
-  In the strategy square, you can find public or rental strategies written in various programming languages, suitable for learning and reference.
-- [Live Observation](https://www.fmz.com/live)
-  The live observation page displays users' public strategy live trading.
-- [Library](https://www.fmz.com/digest)
-  The platform library stores original articles and other materials from the platform, facilitating your introductory learning.
-- [Community](https://www.fmz.com/bbs)
-  The community forum provides you with a platform for communication and discussion in the field of quantitative trading.
-- [Crowdsourcing](https://www.fmz.com/markets)
-  The crowdsourcing section builds an efficient communication channel for strategy designers and demanders.
-- [Public Courses](https://www.fmz.com/class)
-  The public courses page provides video tutorials for the platform.
-- [API Documentation](https://www.fmz.com/api)
-  The API documentation page provides technical documentation support for writing and designing strategies.
+**AI assistance**
+- The strategy editor has a built-in AI assistant that generates, explains and edits strategy code and analyzes backtest results (see Development Tools → Strategy Editor → AI Assistant).
+- You can also connect the external AI assistant you already use to the platform and manage strategies, backtests and live robots through conversation (see Integrations → AI Integration).
 
-## Programming Languages
+**Dashboard**
+After signing up and logging in, open the [dashboard](https://www.fmz.com/m):
+
+![Dashboard overview](https://www.fmz.com/upload/asset/2e4e636a6fe51c8f620e8.png)
+
+- [Control Center](https://www.fmz.com/m/dashboard): account overview and shortcuts. Running a live robot takes three things: an online docker, a strategy and a configured exchange account.
+- [Live Trading](https://www.fmz.com/m/robots): create, manage and control live robots. A live robot is a running instance of a strategy program.
+- [Strategy Library](https://www.fmz.com/m/strategies): write, save and group strategies in any supported language.
+- [Docker](https://www.fmz.com/m/nodes): deploy and manage the docker programs that run strategies.
+- [Exchange](https://www.fmz.com/m/platforms): add and manage exchange accounts.
+
+**Public resources**
+- [Strategy Square](https://www.fmz.com/square): strategies shared publicly or listed for rent, good for learning and reference.
+- [Live](https://www.fmz.com/live): live robots that users show publicly.
+- [Digest](https://www.fmz.com/digest): original articles by the platform.
+- [Community](https://www.fmz.com/bbs): the forum for discussing quantitative trading.
+- [Crowdsourcing](https://www.fmz.com/markets): post and take on strategy development requests.
+- [Classes](https://www.fmz.com/class): video tutorials.
+- [API Docs](https://www.fmz.com/api): the API syntax manual for writing strategies.
+
+**Getting help**
+Post in the community, submit a ticket from the dashboard, or contact the administrators in the [Telegram](https://t.me/fmzquant_cn) group.
+
+### Quick Start
+
+Five steps take you from adding an exchange to running your first live robot; each step names the chapter with the details.
+
+**1. Add an exchange account**
+
+Add the exchange's API key on the Exchange page of the dashboard. Enable only read and trade permissions, never withdrawal; for a first try, use the exchange's demo trading or a small sub-account. See "Platform Basics → Exchange" and "Getting Started → Key Security".
+
+**2. Deploy a docker**
+
+The docker is the program that runs strategies; every live robot runs on one. Rent a docker provided by the platform with one click, or deploy it on your own server. See "Platform Basics → Docker".
+
+**3. Write a strategy**
+
+Create a strategy in the Strategy Library and pick a programming language. A strategy is an entry function ```main()``` with a main loop: each round fetches market data, computes signals, places orders and sleeps until the next round. See "Writing Strategies"; its "Strategy Structure" chapter has main-loop templates for every language and a quick reference of all API functions. You can also start from a public strategy in the strategy square.
+
+**4. Backtest**
+
+On the strategy editing page, choose the exchange, trading pair, time range and K-line period, then start a backtest and check the profit curve, trades and logs. Go live only after the backtest looks right. See "Backtesting System".
+
+**5. Create a live robot**
+
+On the Live Trading page of the dashboard, create a robot with the strategy, a docker and the exchange account, set the strategy parameters and start it. Live robots are billed by the hour, so the account needs a balance before you start; see "Platform Basics → Account and Billing → Live Robot Billing and Top-up". Its status, logs and profit are on the robot page, and errors can be pushed to your phone. See "Platform Basics → Live Trading".
+
+Read on as needed: "Development Tools" covers editing and debugging, "Advanced Topics" covers rate limiting, communication between robots, multi-threading and on-chain trading, and "Integrations" covers driving the platform from programs or AI assistants.
+
+### Key Security
+
+A leaked exchange key costs you the assets in that exchange account. Before configuring an exchange account, go through this checklist:
+
+- **Trade permission only**: enable only read and trade permissions for the API key, and **never enable withdrawal**.
+- **Bind an IP whitelist**: on the exchange, bind the API key to the outbound IP of the server running your docker. If the server has several IPs, pin the outbound IP with the docker's ```-I``` option (see Platform Basics → Docker → Command-Line Options).
+- **Keep private keys local**: if the exchange supports asymmetric keys such as RSA, prefer them, and keep the private key as a credential file on the docker's machine so that the platform stores only the file path (see Platform Basics → Exchange → Local Credential Files).
+- **Start small**: run a new strategy against the exchange's demo trading or a small sub-account first.
+- **Do not publish secrets**: if the strategy code, parameters or description contain keys, account names or similar information, do not publish or sell the strategy.
+
+How the platform stores keys: encrypted fields such as keys on the exchange configuration page are encrypted in the browser with your platform account password before upload, so the platform never stores them in plain text; only a docker started with that account password can decrypt them locally. Changing the platform account password therefore invalidates existing exchange configurations; see Platform Basics → Live Trading → Common Causes of Live Trading Errors and Abnormal Exits for what to do.
+
+## Platform Basics
+
+The basic objects of the platform: account and billing, exchange accounts, the docker that runs strategies, the strategy library and live robots.
+
+### Account and Billing
+
+How live robots are billed, how to top up, and how to hand some live robots to other people with sub-accounts. Other account settings (push notifications, two-factor authentication, API keys, etc.) are on the [account settings page](https://www.fmz.com/m/account).
+
+#### Live Robot Billing and Top-up
+
+**Billing**
+- Live robots are billed by the hour at 0.05 USD per robot per hour; a partial hour counts as a full hour.
+- Billing starts when the robot is created, and starting it prepays the first hour, so a robot cannot start if the account balance is insufficient. Stopping or restarting a robot does not bill it twice.
+- If the balance runs out while a robot is running, the platform stops the robot; when a rented strategy expires, the robots using it are stopped as well.
+- Servers rented with one-click docker rental are billed separately from live robots (see Platform Basics → Docker → Deploy Docker → One-Click Docker Rental).
+
+**Bills and balance alerts**
+- The [billing page](https://www.fmz.com/m/billing) shows the balance, top-up records and every billing item.
+- Under [balance alert in account settings](https://www.fmz.com/m/account#alertthreshold), set an alert threshold: when the available balance drops below it you get an email and WeChat notification (at most once every 24 hours unless you top up or change the setting); 0 turns the alert off.
+
+**Top-up**
+Choose the payment method and amount on the [billing page](https://www.fmz.com/m/billing). When topping up with ```USDT```, check carefully:
+- The transfer network must match the network selected on the billing page; TRC20, ERC20 and BSC are supported. ERC20 and BSC addresses both start with ```0x``` and look the same, which makes them the easiest to mix up.
+- The asset is ```USDT```.
+- The destination address is the one shown on the billing page.
+
+#### Sub-accounts
+
+A sub-account lets other people view and operate some of your live robots without giving them the main account.
+
+**Create a sub-account**
+On the [account settings page](https://www.fmz.com/m/account#shadowmember), open the sub-account tab, select the live robots the sub-account may access under operation permissions, enter its username and login password, and create it. Sub-accounts are listed on the same page, where you can edit, lock/unlock or delete them.
+
+![Sub-account settings](https://www.fmz.com/upload/asset/2e46d725dbe6b471f1b33.png)
+
+**Permissions**
+A sub-account sees only the live robots authorized to it. On those robots it can change parameters, stop and restart, but it cannot change the exchange objects configured for the robot.
+
+**Typical uses**
+- A quant team sharing the management of several live robots.
+- Letting the renter of a strategy help debug a live robot.
+
+### Exchange
+
+The [Exchange](https://www.fmz.com/m/platforms) page manages the exchange accounts you have configured. On FMZ, an "exchange" is an account a strategy program can operate: it holds the keys of the funding account together with the protocol and API wrapper used to talk to that exchange.
+
+Click "Add Exchange" on the exchange management page to open the [add exchange page](https://www.fmz.com/m/add-platform), then choose the exchange and fill in its configuration. Encrypted fields such as keys are encrypted in the browser before being saved to the platform, so the platform never stores them in plain text (see Getting Started → Key Security).
+
+**Exchange objects**
+In strategy code a configured exchange is the exchange object `exchange`. A backtest or live robot can be configured with several exchanges; in code they form the exchange object array `exchanges`.
+
+**Using an exchange object**
+Strategy code reads the account and market data, places orders and cancels them through the exchange object. In ```JavaScript```:
+
+```js
+function main() {
+    let account = exchange.GetAccount()    // query account information
+    let ticker = exchange.GetTicker()      // get the ticker
+    let id = exchange.Buy(1000, 1)         // price 1000, amount 1
+    if (id) {
+        exchange.CancelOrder(id)           // an order Id exists only if the order was placed; cancel it if still open
+    }
+}
+```
+
+The rest of this chapter:
+- General Protocol: connect an exchange the platform has not integrated yet.
+- Local Credential Files: keep private keys and other secrets only on the docker's machine.
+- Exchange-Specific Notes: configuration steps and behavior differences of individual exchanges.
+
+#### General Protocol
+
+For exchange API interfaces that have not yet been encapsulated and integrated by the FMZ Quant Trading Platform, you can access them by writing general protocol plugin programs.
+
+![General Protocol Configuration Screenshot](https://www.fmz.com/upload/asset/2e43b059b3ec9f42ded6e.png)
+
+This general protocol can be used to access any exchange that provides API interfaces, supporting the following two protocols:
+- ```REST``` Protocol: [Reference Documentation](https://www.fmz.com/digest-topic/10518).
+- ```FIX``` Protocol: [Reference Project](https://github.com/fmzquant/fixc).
+
+The difference between ```FIX``` protocol plugin programs and ```REST``` protocol plugin programs lies only in the interaction method between the plugin program and the exchange interface. The interaction method, data format, and other implementation details between the protocol plugin program and the FMZ Quant docker program are exactly the same. For specific implementation, please refer to the examples in the above links.
+
+#### Local Credential Files
+
+When configuring an exchange, every masked encrypted input (Secret Key, private key, password, etc.) can hold a credential file path ```file:///name.txt``` instead of the secret itself. When the live robot runs, the docker reads that file on its own machine and uses the content as the value. The private key then exists only on the docker's machine, and the platform stores nothing but a path.
+
+**Path rules**
+- The path is resolved relative to **this robot's directory** ```logs/storage/<robot ID>/``` (```logs``` is under the docker's working directory). For robot ID ```123456```, ```file:///rsaKey.txt``` means ```logs/storage/123456/rsaKey.txt```.
+- Subdirectories are allowed, e.g. ```file:///keys/rsaKey.txt```.
+- Only the ```.txt``` suffix is recognized; with any other suffix the text is not read as a file but used literally as the configuration value.
+- The path cannot be absolute, cannot contain ```..```, and after resolution cannot leave the robot directory (symbolic links pointing outside are rejected too).
+- Credential files are read from each robot's own directory, so when several robots use the same exchange configuration, every robot directory needs its own copy.
+- If the file cannot be read, the robot fails to start with an error containing ```read key file```; an invalid path fails with ```key file path must be relative and cannot contain '..'``` or ```key file path escapes the robot directory```.
+
+**Example: an RSA key**
+For an exchange that supports ```RSA KEY``` authentication:
+1. Generate an RSA public/private key pair, e.g. a PKCS#8 pair with ```openssl```.
+2. Create an ```RSA KEY``` on the exchange and upload the public key from step 1.
+3. Configure the exchange on the platform: put the exchange's ```RSA KEY``` in ```Access Key``` and ```file:///rsaKey.txt``` in ```Secret Key```.
+4. Create the live robot and note its ID (e.g. ```123456```).
+5. Save the private key from step 1 as ```logs/storage/123456/rsaKey.txt```, then start (or restart) the robot.
+
+See the [video walkthrough](https://www.bilibili.com/video/BV1UM41147Jj/) (Chinese) for the full process.
+
+#### Exchange-Specific Notes
+
+Configuration steps of individual exchanges and the places where they behave differently from the general API. Exchanges not listed here follow the general descriptions in the syntax manual; the switches each exchange supports through ```exchange.IO()``` are listed under `exchange.IO`.
+
+##### Securities and Futures
+
+**Futu Securities**
+
+Futu NiuNiu live trading and paper trading are supported. [```FutuOpenD```](https://www.futunn.com/download/OpenAPI?lang=zh-CN) must run on the docker's machine. For configuring the exchange object and running ```FutuOpenD```, see the [Futu Securities configuration guide](https://www.fmz.com/bbs-topic/10185).
+
+When ```FutuOpenD``` is used for paper trading, some stock codes are not supported and cannot be traded (paper trading works in the Futu NiuNiu mobile app).
+
+- Call frequency
+  ```GetOrder```, ```GetOrders```, ```GetPositions``` and ```GetAccount``` use **cached data** by default, so their call frequency is not limited; ```FutuOpenD``` updates the cache automatically when new data arrives.
+  ```exchange.IO("refresh", true)``` disables the cache; without the cache the limit is **at most 10 queries every 30 seconds**, and exceeding it returns an error.
+
+- Stock codes
+  The format is ```code.market```, e.g. ```600519.SH```. Market suffixes:
+  - HK: Hong Kong stocks
+  - US: US stocks
+  - SH: Shanghai
+  - SZ: Shenzhen
+  - SG: Singapore futures
+  - JP: Japan futures
+
+  Set the stock code with ```exchange.SetContractType()``` in the strategy, for example:
+
+  ```js
+  function main() {
+      var info = exchange.SetContractType("600519.SH")    // set the stock 600519.SH (Moutai); the account switches to the mainland market
+      Log(info)
+      Log(exchange.GetAccount())                          // the current stock is Moutai, so GetAccount returns the mainland market assets
+      Log(exchange.GetTicker())                           // current quote of Moutai
+  }
+  ```
+
+  ```python
+  def main():
+      info = exchange.SetContractType("600519.SH")
+      Log(info)
+      Log(exchange.GetAccount())
+      Log(exchange.GetTicker())
+  ```
+
+  ```rust
+  fn main() {
+      let info = exchange.SetContractType("600519.SH");    // set the stock 600519.SH (Moutai); the account switches to the mainland market
+      Log!(info);
+      Log!(exchange.GetAccount());                          // the current stock is Moutai, so GetAccount returns the mainland market assets
+      Log!(exchange.GetTicker(None));                       // current quote of Moutai
+  }
+  ```
+
+  ```exchange.SetDirection``` (trade direction), ```exchange.Buy```/```exchange.Sell``` (orders), ```exchange.CancelOrder``` (cancellation), ```exchange.GetOrder``` (order query) and the like are used the same way as in futures markets.
+
+- Account information
+  Futu uses ```TrdMarket``` to tell the Hong Kong, US, mainland and other markets apart. From the [```Futu API``` documentation](https://openapi.futunn.com/futu-api-doc/):
+
+  ```go
+  const (
+      TrdMarket_TrdMarket_Unknown TrdMarket = 0 // unknown market
+      TrdMarket_TrdMarket_HK      TrdMarket = 1 // Hong Kong market
+      TrdMarket_TrdMarket_US      TrdMarket = 2 // US market
+      TrdMarket_TrdMarket_CN      TrdMarket = 3 // mainland market
+      TrdMarket_TrdMarket_HKCC    TrdMarket = 4 // Hong Kong Stock Connect market
+      TrdMarket_TrdMarket_Futures TrdMarket = 5 // futures market
+  )
+  ```
+
+  Data returned by ```exchange.GetAccount()```:
+
+  ```json
+  {
+      "Info": [{
+          "Header": {
+              ...                 // omitted
+              "TrdMarket": 1      // market ID in the raw Info data: assets of the Hong Kong market
+          },
+          "Funds": {              // account assets in this market
+              ...
+          }
+      }, ...],
+      "Stocks": 0,
+      "FrozenStocks": 0,
+      "Balance": 1000000,         // assets in the current market
+      "FrozenBalance": 0
+  }
+  ```
+
+- ```FutuOpenD``` decides the region by the **IP** address it logs in from; accounts logged in from outside mainland China have some market data restrictions. See the official ```FutuOpenD``` (Futu) documentation.
+
+**Interactive Brokers**
+
+- Configure the exchange
+  Run "IB Gateway" or "TWS (Trader Workstation)" on the docker's machine. With TWS: after logging in, click the configuration button at the top right, open "Configure" → "API" → "Settings", **uncheck** "Read-Only API", check "Enable ActiveX and Socket Clients", and note the "Socket port" (TWS defaults to 7496 for live and 7497 for paper; IB Gateway to 4001 for live and 4002 for paper).
+  Then choose **Interactive Brokers** on the platform's [add exchange page](https://www.fmz.com/m/add-platform):
+  - Server address: the address and port of TWS or IB Gateway, e.g. ```localhost:7496```.
+  - Market data type: realtime, frozen, delayed or delayed frozen. Accounts without a realtime market data subscription can choose delayed data. It can also be switched at run time with ```exchange.IO("marketDataType", n)``` (```n``` from 1 to 4, in the order above).
+
+- Contract codes
+  Set with ```exchange.SetContractType()``` in the form ```symbol.currency[.type[.exchange]]```; the type defaults to stock ```STK``` and the exchange to ```SMART```:
+  - US stocks: ```AAPL.US```, ```TSLA.US``` (```US``` means priced in USD).
+  - Hong Kong stocks: ```symbol.HK``` (```HK``` means priced in HKD).
+  - Futures (```FUT```): ```symbol-expiry[-multiplier].currency.FUT.exchange```, with the expiry month written as ```YYYYMM``` and the exchange as IB's exchange code.
+  - Options (```OPT```) and futures options (```FOP```): ```symbol-expiry-C or P-strike×100[-multiplier].currency.OPT or FOP.exchange```, with the strike multiplied by 100 and written as an integer.
+  - A plain number: used directly as the IB contract ID (conId).
+
+- Other notes
+  - The docker connects to TWS with the live trading ID as its client ID (clientId), so the client ID stays the same across restarts and orders placed earlier can still be cancelled or modified. TWS only lets the client ID that placed an order (or the master client) modify or cancel it.
+  - ```Symbol``` in positions and orders is the short form (e.g. ```Z74.SGD```); ```exchange.GetPositions()``` and ```exchange.GetOrders()``` accept either the short form or the full code used when ordering (e.g. ```Z74.SGD.STK.SGX```).
+  - When the gateway rejects an order, the ```Reject``` field in the order's ```Info``` holds the reason.
+  - After ```exchange.IO("debug", true)```, every frame sent to or received from TWS is logged in the TWS API log format, so it can be matched against the gateway's own log.
+
+##### Crypto
+
+- Futures_Binance
+  Binance trading pairs with Chinese names are supported:
+
+  ```js
+  function main() {
+      let ticker = exchange.GetTicker("币安人生_USDT.swap")
+      Log("ticker:", ticker)   // {"Info":{...},"Symbol":"币安人生_USDT.swap","Open":0.29622,"High":0.31661, ...}
+  }
+  ```
+
+  For the ```exchange.IO()``` switches of Binance Futures (dual-side position mode, isolated/cross margin, unified account, STP mode, etc.), see `exchange.IO`.
+- Futures_HuobiDM
+  Use ```exchange.IO("base", "https://xxx.xxx.xxx")``` or ```exchange.SetBase("https://xxx.xxx.xxx")``` to switch the base address of the exchange API.
+
+  For the ```exchange.IO()``` switches of Huobi Futures (signHost, isolated/cross margin, one-way/two-way position mode, unified account, etc.), see `exchange.IO`.
+
+  Condition orders of the OCO type (```ORDER_CONDITION_TYPE_OCO```) are not supported; condition orders also work in multi-asset margin mode.
+- Huobi
+  Huobi trading pairs with Chinese names are supported:
+
+  ```js
+  function main() {
+      let ticker = exchange.GetTicker("币安人生_USDT")
+      Log("ticker:", ticker)   // {"Info":{...},"Symbol":"币安人生_USDT","Open":0.29622,"High":0.31661, ...}
+  }
+  ```
+- Bitfinex
+  The amount of a spot market buy order is the quantity of the traded coin, not the quote amount.
+- AscendEx
+  The amount of a spot market buy order is the quantity of the traded coin, not the quote amount.
+- Futures_Hyperliquid
+  See the [Hyperliquid guide](https://www.fmz.com/digest-topic/10574).
+
+  For the ```exchange.IO()``` switches of Hyperliquid Futures (isolated/cross margin, mainnet/testnet, vaultAddress, walletAddress, expiresAfter, etc.), see `exchange.IO`.
+- Futures_Lighter
+  The test environment can be selected when configuring the exchange object, or reached by changing the REST API endpoint with ```exchange.SetBase()```.
+
+  For the ```exchange.IO()``` switches of Futures_Lighter (isolated/cross margin, order expiry, etc.), see `exchange.IO`.
+
+  ```Buy``` and ```Sell``` returned by ```exchange.GetTickers()``` are each instrument's last trade price (the exchange has no batch order book endpoint); use ```exchange.GetTicker()``` or ```exchange.GetDepth()``` when you need the best bid and ask.
+- Futures_edgeX
+  All edgeX perpetuals are quoted in USDC: write the trading pair as ```BTC_USDC``` and so on, with full symbols such as ```BTC_USDC.swap```; ```BTC_USDT``` or ```BTC_USD``` is reported as a contract that does not exist.
+- Poloniex
+  Spot condition orders support stop-loss only (```ORDER_CONDITION_TYPE_SL```): a buy triggers when the price rises to the trigger price, a sell when it falls to the trigger price. Take-profit (```ORDER_CONDITION_TYPE_TP```) and OCO condition orders return an error and no order is placed.
+
+### Docker
+
+The [docker](https://www.fmz.com/m/nodes) is the program that runs strategies: live strategies run on a docker, not on the FMZ website. The docker talks to the platform, starts and stops strategy processes and sends logs back; every request a strategy makes to an exchange also leaves from the docker's machine. The docker runs on your own server (or a server rented with one click), so a network failure of the platform website does not affect the live robots already running on it.
+
+**Supported systems**
+Only 64-bit builds are released: Linux (x86_64, ARM64), macOS (Intel, Apple Silicon) and Windows (x64, ARM64, plus a GUI version). 32-bit systems are not supported.
+
+**Data directory**
+All docker data is in the ```logs``` directory under the working directory (the startup directory by default, or the one given with ```-w```):
+- ```logs/storage/<robot ID>/<robot ID>.db3```: the robot database (```SQLite```) holding logs, profit, charts, the status bar and ```_G()``` data; it can be opened with any ```SQLite``` tool.
+- ```logs/storage/<robot ID>/stdout.log```, ```stderr.log```: standard output and standard error of the strategy process.
+- ```logs/docker.log```: the docker's own log.
+- ```logs/docker.pid```: the docker's identity; keep it and the platform gives the docker its old ID back after a restart.
+
+**Network proxy**
+The docker does not read the system proxy settings or environment variables such as ```HTTP_PROXY```. To reach an exchange through a proxy:
+- set a proxy on the exchange object in the strategy with `exchange.SetProxy`;
+- or use a transparent proxy that takes over traffic at the network layer (such as Clash in TUN mode), which needs no docker configuration.
+
+This chapter covers deploying the docker (manual deployment, one-click rental, operation precautions), command-line options, migrating live robot data and docker monitoring.
+
+#### Deploy Docker
+
+The [docker management page](https://www.fmz.com/m/nodes) lists the dockers of your account, as a list or with details, including each docker's IP address, version and build time. Click **Deploy Docker** to open the [docker deployment page](https://www.fmz.com/m/add-node), which offers two ways: one-click docker rental and manual deployment.
+
+![Docker deployment page](https://www.fmz.com/upload/asset/2e527e497b3fa27ba497b.png)
+
+##### One-Click Docker Rental
+
+On the [Docker Deployment Page](https://www.fmz.com/m/add-node), click the **One-Click Docker Rental** tab and select the server to deploy based on your configuration requirements and server location preferences.
+
+Click "Buy Now" and enter your FMZ Quant Trading Platform account credentials for verification. After successful verification, the docker program will be deployed automatically. The entire deployment process takes a few minutes, and the system will automatically install commonly used Python libraries.
+
+After clicking "Buy Now", the rented server is provisioned through the platform on your behalf and has limited system permissions, with no support for remote login. If you need to use third-party Python libraries that are not pre-installed, it is recommended to use a private server for manual deployment.
+
+Servers rented through the **One-Click Docker Rental** feature use independent billing, which is separate from live trading billing.
+
+Clicking the "Redeploy" button will not delete the live trading logs and data files in the logs directory under the docker directory.
+
+##### Manual Deployment of Docker
+
+The docker can run on a PC, a server, a Raspberry Pi (64-bit OS) and similar devices. Only 64-bit builds are released:
+- Linux command line: x86_64 (amd64), ARM64 (aarch64)
+- macOS command line: Intel, Apple Silicon
+- Windows: x64 and ARM64, each with a command-line and a GUI version
+
+On the [docker deployment page](https://www.fmz.com/m/add-node), click **Manual Deployment**, download the build for your system and unpack it; the executable ```robot``` is the docker program. The same page shows the two pieces of information needed:
+
+![Manual docker deployment page](https://www.fmz.com/upload/asset/2e460507bc21582ba1448.png)
+
+1. Communication address: contains your account UID, like ```node.fmz.com/123456```.
+2. Password: the password of the FMZ account that owns the UID.
+
+**Windows GUI version**
+Run ```robot.exe```, enter the communication address and password, and click start.
+
+**Command-line version**
+```bash
+chmod +x robot                      # Linux/macOS: make it executable before the first run
+./robot -s node.fmz.com/123456      # prompts for the password, which is not echoed
+```
+
+```123456``` is only an example; the real address is on the docker deployment page. Do not pass the password in plain text with ```-p```: it stays in the shell history and the process list. For unattended start-up, put the address and password in a configuration file ```robot.conf``` that only you can read:
+
+```bash
+cat > robot.conf <<'EOF'
+s=node.fmz.com/123456
+p=your-password
+EOF
+chmod 600 robot.conf
+./robot -c robot.conf               # with robot.conf in the startup directory, plain ./robot loads it too
+```
+
+All options and the configuration file format are described in Platform Basics → Docker → Command-Line Options.
+
+**Running in the background**
+The docker ignores the terminal hang-up signal: start it in the foreground over SSH and simply disconnect, and it keeps running, with its log also written to ```logs/docker.log```. To start at boot or restart after a crash, run it under a service manager such as systemd, e.g. ```/etc/systemd/system/robot.service```:
+
+```ini
+[Unit]
+Description=FMZ robot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+WorkingDirectory=/opt/robot
+ExecStart=/opt/robot/robot -c /opt/robot/robot.conf
+Restart=on-failure
+TimeoutStopSec=90
+
+[Install]
+WantedBy=multi-user.target
+```
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now robot
+```
+
+The ```SIGTERM``` sent by ```systemctl stop robot``` makes the docker shut down gracefully: it stops all its live robots, reports their state and then logs out of the platform. ```TimeoutStopSec``` leaves enough time so that it is not killed before finishing.
+
+**Upgrading the docker**
+The strategy runtime and the exchange connectors are delivered by the platform when needed and need no manual updates. To upgrade the docker program itself, stop the docker (see Docker Operation Precautions), replace the ```robot``` executable with the new version and start it in the **same working directory**. The ```logs``` directory there keeps the docker identity and the robot data, so the docker comes back with its old ID.
+
+**Isolating strategy processes in Docker containers**
+On Linux and macOS, the command-line version can run each strategy process in its own Docker container with the ```-i``` option (Docker must be installed and running on the machine). This isolates strategy processes; it is not a Docker image of the docker program itself. See Command-Line Options for the parameters.
+
+##### Docker Operation Precautions
+
+**Stop the robots first, then the docker**
+Before deleting a docker or stopping its process, make sure no live robot is running on it.
+
+**Stopping the docker normally**
+- Command-line version: press ```Ctrl+C``` once in the terminal, or send ```SIGTERM``` to the process (```kill <PID>```, ```systemctl stop```).
+- Windows GUI version: click the stop button.
+
+On a stop request the docker shuts down gracefully: it stops all its live robots, reports their final state and then logs out of the platform. Pressing ```Ctrl+C``` again during this shutdown skips the reporting and logout and exits at once; normally do not do that.
+
+**Avoid forced termination**
+Do not end the docker with ```kill -9```, cut the power or force a shutdown. The docker then has no chance to log out, and its live robots may still show as running on the platform and keep being billed; in that case the offline docker has to be deleted before those robots can be stopped. Stop the docker before rebooting the server; when it runs under a service manager such as systemd, a system shutdown sends ```SIGTERM``` automatically.
+
+#### Command-Line Options
+
+Starting the command-line docker program ```robot```:
+
+```bash
+./robot -s node.fmz.com/123456            # prompts for the password (not echoed)
+./robot node.fmz.com/123456               # short form: robot address [password]
+./robot -c robot.conf                     # read options from a configuration file
+./robot -v                                # show the version
+```
+
+**Options**
+
+| Option | Description |
+| --- | --- |
+| ```-s address``` | Address for talking to the platform, like ```node.fmz.com/123456``` (```123456``` is the account UID); a ```ws://``` or ```wss://``` prefix is allowed. Shown on the [docker deployment page](https://www.fmz.com/m/add-node). |
+| ```-p password``` | Account password. Not recommended: a plain-text password stays in the shell history and the process list. Without it the password is prompted for, or read from the configuration file. |
+| ```-n name``` | Docker name, shown on the platform's docker page. |
+| ```-w dir``` | Working directory. ```logs``` (robot data, docker log, identity file) lives under it. |
+| ```-c file``` | Configuration file; format below. |
+| ```-u user``` | Linux/macOS only: run strategy processes as this system user; the docker itself must run as root. Ignored with ```-i```. |
+| ```-I IP``` | Local outbound IP: the connection to the platform and the strategies' connections to exchanges are bound to this address; see below. |
+| ```-i image``` | Linux/macOS only: run each strategy process in its own container created from this Docker image; Docker must be installed and running. |
+| ```-e path``` | With ```-i```: path of the executable inside the container. |
+| ```-f JSON``` | With ```-i```: Docker container settings, as inline JSON or ```@path``` to read them from a file. |
+| ```-H address``` | With ```-i```: address the container uses to connect back to the host. |
+| ```-vv``` | Verbose log (including the messages exchanged with the platform); off by default to keep logs small. |
+| ```-d DNS``` | The old custom DNS option; still accepted but ignored, as the docker always uses the system resolver. |
+| ```-v```, ```-V```, ```--version``` | Print version and build information and exit. |
+| ```-h```, ```--help``` | Print usage. |
+| ```--ctl-stdin``` | Read control commands from standard input (the first line is the password when ```-p``` is not given); ```stop``` or end of input triggers a graceful shutdown. Meant for programs that wrap the docker as a service. |
+
+Options that take a value can also be written as ```-option=value```, e.g. ```-n=server01```. An invalid option prints the usage and exits.
+
+**Configuration file robot.conf**
+One ```key=value``` per line; the key is the option name without ```-``` (```s p n w u I d i e f H vv```), and lines starting with ```#``` are comments:
+
+```ini
+# robot.conf
+s=node.fmz.com/123456
+p=your-password
+n=server01
+vv=true
+```
+
+- Give the file with ```-c```; without ```-c``` and without an address, ```robot.conf``` in the startup directory is loaded automatically if present.
+- When an option is given both on the command line and in the file, the command line wins.
+- Keys are case-sensitive: ```I``` is the outbound IP and ```i``` the Docker image.
+- The configuration file path and ```-f @file``` are resolved relative to the startup directory (before ```-w``` changes directory).
+- The file holds your password, so make it readable only by you (```chmod 600 robot.conf```).
+
+**Pinning the outbound IP (-I)**
+When the server has several IP addresses and the exchange API key is whitelisted for one of them, pin the outbound IP with ```-I```, e.g. ```./robot -s node.fmz.com/123456 -I 192.168.1.100```. The connection to the platform and the strategies' connections to exchanges then leave from that address. With ```-i``` container isolation the container's network may not have that address; in that case let the container use the host network.
+
+The Windows GUI version has no IP setting; use the command-line version when you need to pin the outbound IP. The GUI version accepts only ```-s```, ```-p``` and ```-n```, which prefill the window; when both ```-s``` and ```-p``` are given it starts automatically.
+
+#### Live Trading Data Migration
+
+Each live robot's data is in ```logs/storage/<robot ID>/``` under the docker's working directory (the database ```<robot ID>.db3```, ```stdout.log```, ```stderr.log``` and so on). The logs, profit and charts the platform shows for a robot are read from the docker that runs it.
+
+**Moving one robot to a docker on another machine**
+1. Stop the robot.
+2. Copy the whole ```logs/storage/<robot ID>/``` directory to the same place under the new docker's working directory, keeping the robot ID as the directory name.
+3. Switch the robot's docker to the new one in the robot configuration and start the robot.
+
+The robot's existing logs, profit and other data are then kept on the new machine.
+
+**Moving a whole docker**
+1. Stop the robots on the old docker, then stop the old docker.
+2. Copy the entire ```logs``` directory from the old docker's working directory to the working directory on the new machine.
+3. Start the docker on the new machine.
+
+```logs/docker.pid``` holds the docker's identity: with the old docker offline, the docker on the new machine gets the old docker ID back, so robot configurations need no change. Never run dockers on two machines with the same ```logs``` directory at the same time.
+
+#### Docker Monitor
+
+On the [docker management page](https://www.fmz.com/m/nodes), **Docker Monitor** can be enabled from the actions of the docker list or of the docker details. Once enabled, the platform emails the address bound to your account when the docker goes offline abnormally.
+
+### Strategy Library
+
+The [Strategy Library](https://www.fmz.com/m/strategies) page holds all strategies of the current account, written in any of the programming languages or visually.
+
+- Grouping: strategies can be grouped just like robots (see Platform Basics → Live Trading → Grouping).
+- Import and export: besides the source code, a complete strategy includes its parameters, interactions, description, notes, manual, template references and more, so move a strategy by exporting and importing the complete strategy (see Import and Export of Complete Strategies).
+- Sharing and renting: generate a "copy code" to share a strategy or a "registration code" to rent it out (see Strategy Sharing and Renting).
+
+#### Import and Export of Complete Strategies
+
+Copying the source code is not enough to move a strategy: the parameter design, interaction design, template references and more are not in the source. "Export Strategy" and "Import Strategy" on the strategy editing page move a strategy completely.
+
+![Strategy import/export screenshot](https://www.fmz.com/upload/asset/2e52ccf44526f396fb795.png)
+
+- Export Strategy
+  Exports one ```xml``` file, for strategies in every programming language. When exporting you can choose what to include: name, source code, notes, description, manual, template references, strategy parameters, interactive controls and backtest settings.
+
+- Import Strategy
+  Click "Import Strategy" on the strategy editing page, choose an ```xml``` file produced by "Export Strategy", and select what to import. Click "Save" afterwards to save the strategy.
+
+#### Strategy Sharing and Renting
+
+On the [Strategy Library](https://www.fmz.com/m/strategies) page, click the "Actions" button on the right side of a strategy to display a menu containing sharing and renting options.
+
+Important Notice: When creating and distributing strategy **registration codes**, please carefully confirm whether it is a "Registration Code" or "Copy Code" to avoid accidentally leaking your strategy.
+
+##### Strategy Sharing
+
+![Strategy Sharing](https://www.fmz.com/upload/asset/2e593d57dc36afc004ef6.png)
+
+- Public Sharing
+  After clicking the "Share" button, a dialog box will pop up where you can select "Public Sharing". The strategy will be fully shared to the platform's Strategy Square, where any user can copy the strategy.
+
+- Private Sharing
+  After clicking the "Share" button, a dialog box will pop up where you can select "Private Sharing". After selecting the sharing validity period and sharing limit, a **copy page URL** and **copy code** for the strategy will be generated. These can be distributed to designated FMZ platform users. Users who need the strategy can simply use the **copy page URL** link, log in to the **copy page** and enter the copy code to obtain the strategy. Once obtained, the strategy will automatically appear in their strategy library.
+
+##### Strategy Rental
+
+![Strategy Rental](https://www.fmz.com/upload/asset/2e4e78f6c46c9dde1ce90.png)
+
+- Public Sale
+  After clicking the "Rent" button, a dialog box will pop up where you can select "Public Sale". The strategy can then be submitted for listing (requires approval).
+
+- Internal Sale
+  After clicking the "Rent" button, a dialog box will pop up where you can select "Internal Sale". After selecting the number of days, maximum concurrent instances, and number of registration codes, the system will generate a **registration page URL** and **registration codes** for this strategy. You can distribute these to designated FMZ platform users. Users who need this strategy only need to visit the **registration page URL** link, log in to the **registration page**, and enter the registration code to obtain access to the strategy. The strategy will also appear in the strategy library, but users will only have backtesting and live trading permissions, and cannot view the strategy source code or other information. When the number of concurrent live trading instances is set to 0, it means there is no limit on concurrent instances, allowing unlimited creation of live trading bots.
+
+### Live Trading
+
+As opposed to a backtest, a live robot is a strategy program instance that really interacts with an exchange (fetching market data, querying positions, placing and canceling orders, etc.). An instance connected to the exchange's production environment is a live robot, and so is one connected to the exchange's simulation environment (many exchanges offer a test environment).
+
+**Creating a live robot**
+On the [robot creation page](https://www.fmz.com/m/add-robot), choose the strategy, the docker host and the exchanges, then create the robot. Three things must be ready beforehand:
+- A strategy: click "New Strategy" in the [Strategy Library](https://www.fmz.com/m/strategies), write it and save it.
+- An online docker: click "Deploy Docker" on the [Docker page](https://www.fmz.com/m/nodes) (see Platform Basics → Docker).
+- An exchange account: click "Add Exchange" on the [Exchange page](https://www.fmz.com/m/platforms) and configure it (see Platform Basics → Exchange).
+
+Live robots are billed by the hour and cannot start without enough balance (see Platform Basics → Account and Billing → Live Robot Billing and Top-up).
+
+**Robot monitoring**
+On the [live trading page](https://www.fmz.com/m/robots), click "Monitor" in the actions column of a running robot to enable monitoring. Once enabled, the platform emails the address bound to your account when the robot exits for any reason other than a manual operation.
+
+**Robot database**
+For robot ID ```123456```, the database file is ```logs/storage/123456/123456.db3``` (```SQLite```) under the working directory of the docker running it, with these tables:
+- chart: chart data.
+- cfg: the latest state such as the status bar content and the chart configuration.
+- kvdb: data persisted with the ```_G()``` function.
+- log: robot logs.
+- profit: profit data.
+
+The same directory also holds the strategy process's standard output ```stdout.log``` and standard error ```stderr.log```.
+
+**In this chapter**
+- Grouping: group management of robots and strategies.
+- Live Trading Observation: show a robot publicly or create a private viewing link.
+- Live Trading Message Push: push logs to the mobile app, email or a WebHook.
+- Common Causes of Live Trading Errors and Abnormal Exits.
+
+To let other people view and operate some of your robots, use sub-accounts (see Platform Basics → Account and Billing → Sub-accounts).
+
+#### Grouping
+
+Click the **Group Management** button on the right of the "Live Trading" page or the "Strategy Library" page to group robots or strategies; group names are up to you.
+For strategies, for example, you can put **template libraries** in one group, **JavaScript strategies** in another and **test strategies** in a third.
+
+- Strategy groups
+  ![Strategy groups](https://www.fmz.com/upload/asset/2e482ba9b9aa272085d00.png)
+
+- Robot groups
+  ![Robot groups](https://www.fmz.com/upload/asset/2e577d050e817837bbfdf.png)
+
+#### Live Trading Observation
+
+Click the "Public" button in the live trading list on the [Live Trading Page](https://www.fmz.com/m/robots) of FMZ Quant Trading Platform to publicly display the current live trading instance.
+
+Live trading observation currently supports two methods:
+- 1. Publicly display live trading on the [Live Trading Observation](https://www.fmz.com/live) page of FMZ Quant Trading Platform. Click the "Public" button and select **Public Sharing**.
+- 2. Create a private link for live trading observation.
+  Click the "Public" button and select **Internal Sharing**, set the validity period to generate a private link for accessing the private observation page of this strategy's live trading.
+
+#### Live Trading Message Push
+
+You can enable the message push feature on the [Push Settings page](https://www.fmz.com/m/account#push).
+
+![Push Settings](https://www.fmz.com/upload/asset/2e4ad17706aa842c914ce.png)
+
+- Mobile (App)
+  After enabling mobile App push, push messages sent by the live trading program will be delivered to the FMZ Quant mobile App.
+- Email
+  To enable email push, you must first verify your email address. Once verified, you can receive push messages sent by the live trading program.
+- WebHook
+  After enabling WebHook push, you can customize the push address, for example: ```http://abc.com/push.php?data={body}```.
+  When the live trading program sends a push message, the platform will send a request to the configured address ```http://abc.com/push.php?data={body}``` (only the ```GET``` method is supported), and the pushed message content will replace the ```{body}``` placeholder.
+
+Pushing Messages in Strategies
+- JavaScript/TypeScript/Python/Rust Languages
+  In the strategy code, you can use the ```Log()``` function as well as other functions that output log information in the log area, such as ```exchange.CreateOrder()```, ```exchange.CancelOrder()```, etc.
+  By passing an additional parameter ```"@"``` to these functions (i.e., adding an extra parameter beyond the required ones), for example ```Log("This is a push message", "@")```, the output log information will be pushed, and the platform will push the message according to the "Push Settings". In the Rust language, the corresponding ```Log!``` macro is used the same way: ```Log!("This is a push message", "@");```.
+- PINE Language/My Language
+  In the "Trading Library" parameters integrated into PINE Language/My Language strategies, you can enable trading log push, which will automatically push messages after a trading action is triggered.
+- Blockly Visual
+  In the "Tools" section, select the **Message Push** module to push specified information.
+
+Message push is subject to a frequency limit, with the following rule: within each 20-second cycle of live trading, only the last message is retained and pushed, while all other messages are filtered out and not pushed.
+
+#### Common Causes of Live Trading Errors and Abnormal Exits
+
+**The robot cannot start**
+- No online docker
+  A robot cannot start while its docker is offline. Check on the [docker page](https://www.fmz.com/m/nodes) that the docker is online, or pick another online docker.
+- Insufficient balance
+  Starting a robot prepays its first hour, so it cannot start without enough balance; if the balance runs out while it runs, the platform stops it. Top up and start it again (see Platform Basics → Account and Billing → Live Robot Billing and Top-up).
+- Rented strategy expired or concurrency limit reached
+  When a rented strategy expires, robots using it are stopped and cannot be started again; once the rental's maximum number of concurrent robots is reached, no further robot can start.
+- Key decryption failed
+  The error contains ```secret key decrypt failed (wrong password)```. The FMZ account password was changed, so the exchange keys configured earlier can no longer be decrypted. To fix it:
+  1. Re-enter the exchange keys, passwords and similar fields on the [Exchange management page](https://www.fmz.com/m/platforms).
+  2. Stop all dockers and start them again with the new password.
+- Credential file not found
+  The exchange configuration uses a ```file:///xxx.txt``` credential file that is missing from the robot directory; the error contains ```read key file```. An invalid path fails with ```key file path must be relative and cannot contain '..'``` or ```key file path escapes the robot directory```. See Platform Basics → Exchange → Local Credential Files.
+
+**Errors caused by strategy code**
+- Static syntax errors
+
+  ![Syntax error in editor](https://www.fmz.com/upload/asset/2e4daebbb80548adf3927.png)
+
+  These are obvious: the strategy editing page usually marks them, and a backtest reveals them too.
+- Runtime errors
+  The most common one is using a function's return value without checking that it is valid.
+- Excessive memory usage
+  Keeping too much data that cannot be garbage-collected in global variables.
+- Improper use of ```exchange.Go``` for concurrent requests
+  Calling the asynchronous ```exchange.Go``` without calling ```wait``` for the results in time, so that too many concurrent tasks pile up.
+- Recursion too deep
+  Too many levels of recursion exceed the call stack size.
+
+**Other errors**
+- API business errors and network request errors
+  These show the exchange object name, the function name, the error message and the reason, and do not stop the robot by themselves. They are usually the trigger rather than the direct cause, which is typically **a program exception from using an API return value without checking it**.
+- ```interrupt``` error
+  Logged when the user clicks the **Stop** button on the robot page while the program is in the middle of an operation (such as an exchange API call) and the stop interrupts it. It is harmless, just a log entry.
+
+See the [FAQ collection](https://www.fmz.com/bbs-topic/1427) for more.
+
+## Writing Strategies
+
+Writing strategies in the supported languages: notes for each language, strategy structure (lifecycle, main loop, event-driven), strategy parameters, interactive controls, template libraries, built-in libraries, and multi-language text in the strategy UI.
+
+### Programming Languages
 
 **What programming languages can I use to write my strategies on the FMZ Quant trading platform?**
 
   ![Supported Programming Languages](https://www.fmz.com/upload/asset/2e52c7501f57044f7f0ef.png)
 
-  The FMZ Quant trading platform supports writing and designing trading strategies using ```JavaScript```, ```TypeScript```, ```Python```, ```Rust```, ```C++```, [```PINE```](https://www.fmz.com/bbs-topic/9315), [```My Language```](https://www.fmz.com/bbs-topic/2569), ```Blockly``` visual programming, and the ```Workflow``` workflow tool.
+  The FMZ Quant trading platform supports writing and designing trading strategies using ```JavaScript```, ```TypeScript```, ```Python```, ```Rust```, [```PINE```](https://www.fmz.com/bbs-topic/9315), [```My Language```](https://www.fmz.com/bbs-topic/2569), ```Blockly``` visual programming, and the ```Workflow``` workflow tool.
 
-### JavaScript
+#### JavaScript
 
-Supports JavaScript language with the following integrated JavaScript libraries:
-- http://mathjs.org/
-- http://mikemcl.github.io/decimal.js/
-- http://underscorejs.org/
-- http://ta-lib.org/
+Strategies can be written in ```JavaScript```. The runtime is based on the QuickJS engine and supports modern syntax such as ```async```/```await```, ```class``` and ```BigInt```. In live trading the strategy runs on the docker; in backtesting it runs in the browser-side backtesting system. Adding ```// @ts-check``` to the code switches to TypeScript (see Programming Languages → TypeScript).
 
-Program exceptions and API business errors
-In ```JavaScript``` language strategies, when program exceptions or API business errors occur, the error log will display the specific line number where the error occurred in the strategy code, facilitating strategy debugging and bug tracking.
+**Structure and parameters**
 
-Supports ```JavaScript``` asynchronous programming features:
-- setTimeout / clearTimeout
-  ```js
-  function main() {
-      let symbol = "ETH_USDT"
-      let delay = 10
-      let depth = exchange.GetDepth(symbol)
-      let callback = function(e, id, msg) {
-          Log(msg + ", canceling order.")
-          e.CancelOrder(id)
-      }
+The entry point is ```function main()```. The optional ```init()```, ```onexit()``` and ```onerror(msg)``` are called automatically by the docker (see Writing Strategies → Strategy Structure). Interface parameters are global variables with the same names; they can be read directly and also modified in code (see Writing Strategies → Strategy Parameters).
 
-      let ordersLen = 3
-      let arrTimerId = []
-      for (let i = 1 ; i <= ordersLen ; i++) {
-          let orderId = exchange.CreateOrder(symbol, "buy", depth.Bids[i * 3].Price, i * 0.1)
-          let timerId = setTimeout(callback, delay * 1000, exchange, orderId, `Delayed ${delay} seconds`)
-          Log("i:", i, ", timerId:", timerId)
-          arrTimerId.push(timerId)
-      }
+**Errors and return values**
 
-      // clearTimeout
-      let clearTimeoutIdx = 1
-      Log("clearTimeoutIdx:", clearTimeoutIdx, `, arrTimerId[clearTimeoutIdx]:`, arrTimerId[clearTimeoutIdx])
-      clearTimeout(arrTimerId[clearTimeoutIdx])
+When an API call fails (the exchange returns an error, a network problem, etc.) it returns ```null``` and writes the error to the log. Check the return value before using it, or retry with `_C`:
 
-      Sleep(60 * 1000)
-  }
-  ```
-- fetch
-  The ```fetch``` function is an asynchronous version overload of the ```HttpQuery``` function.
+```js
+function main() {
+    var ticker = exchange.GetTicker()
+    // null when the call fails
+    if (ticker) {
+        Log(ticker)
+    }
 
-  Using the ```await``` keyword to handle asynchronous operations with synchronous syntax:
-  ```js
-  function main() {
-      let url = "https://www.okx.com/api/v5/market/books?instId=BTC-USDT"
-      const promiseBooks = new Promise(async function(resolve, reject) {
-          Log("Start execution")
-          let data = await fetch(url)
-          Log("data.ok:", data.ok, ", data.text():", data.text())
-          if (data.ok) {
-              Log("Successfully retrieved data:", data)
-              return resolve(data.text())
-          } else {
-              return reject(new Error("data invalid"))
-          }
-      })
+    // retry until valid data is returned
+    var account = _C(exchange.GetAccount)
+    Log(account)
+}
+```
 
-      promiseBooks.then(function(ret) {
-          Log("ret:", ret)
-      }).catch(function(err) {
-          Log("err.name:", err.name, "err.stack:", err.stack, "err.message:", err.message)
-      })
-  }
-  ```
-- Using ```Promise.all``` to execute multiple asynchronous network requests concurrently:
-  ```js
-  async function main() {
-      // let symbols = ["BTC-USDT", "ETH-USDT", "LTC-USDT"]                                   // Request waiting time: 99ms
-      let symbols = ["BTC-USDT", "ETH-USDT", "LTC-USDT", "SOL-USDT", "BNB-USDT", "ADA-USDT"]  // Request waiting time: 99ms
-      let arr = []
+For program exceptions (for example reading a property of ```undefined```) and API business errors, the log shows the line number in the strategy code where the error occurred, which makes debugging easier.
 
-      let beginTs1 = new Date().getTime()
-      for (let symbol of symbols) {
-          let url = `https://www.okx.com/api/v5/market/books?instId=${symbol}`
-          arr.push(fetch(url).then(function(resp) {
-              if (resp.ok) {
-                  return {"symbol": symbol, "json": resp.json()}
-              } else {
-                  throw "req failed"
-              }
-          }))
-      }
-      let endTs1 = new Date().getTime()
+**Strings and ArrayBuffer**
 
-      let beginTs2 = new Date().getTime()
-      const ret = await Promise.all(arr)
-      for (let data of ret) {
-          Log(data)
-      }
-      let endTs2 = new Date().getTime()
+JavaScript strings are UTF-16. If text returned by a platform API is not a valid UTF-8 byte sequence, an ```ArrayBuffer``` (the raw bytes) is returned instead so that no data is lost. Every API parameter that accepts a string also accepts an ```ArrayBuffer```.
 
-      Log("Request creation time:", endTs1 - beginTs1, "ms")
-      Log("Request waiting time:", endTs2 - beginTs2, "ms")
+```js
+function stringToHex(str) {
+    let hex = ''
+    for (let i = 0; i < str.length; i++) {
+        const charCode = str.charCodeAt(i).toString(16)
+        hex += charCode.length === 1 ? '0' + charCode : charCode
+    }
+    return hex
+}
 
-      LogStatus(_D(), ret)
-  }
-  ```
-- Using ```Promise.race``` to get the first ```resolved``` or ```rejected``` result from multiple asynchronous requests:
-  ```js
-  async function getTicker(e) {
-      return Promise.resolve().then(function() {
-          /* Test
-          if (e.GetName() == "Huobi" || e.GetName() == "Binance") {
-              Sleep(1000)
-          }
-          */
-          let ret = e.GetTicker("BTC_USDT")
-          return {"name": e.GetName(), "ret": ret}
-      })
-  }
+function main() {
+    // the code point of "𠮷" exceeds 16 bits; it takes two UTF-16 code units in a JavaScript string
+    const inputString = "abc𠮷123"
 
-  async function main() {
-      Log("begin")
-      let arrPromise = []
-      for (let e of exchanges) {
-          arrPromise.push(getTicker(e))
-      }
+    // Encode outputs the UTF-8 bytes as hex
+    const encodedHex = Encode("raw", "string", "hex", inputString)
+    Log(encodedHex)                       // 616263f0a0aeb7313233
 
-      let ret = await Promise.race(arrPromise)
-      Log(ret)
-  }
-  ```
-- Using ```setTimeout()``` function in ```threading.Thread```:
-  ```js
-  function test() {
-      Log("Test function started")                           // step 3. Test function started
-      let timerId1 = setTimeout(function() {
-          Log("Timeout callback executed after 5 seconds")   // step 5. Timeout callback executed after 5 seconds
-      }, 5000)
-      Log("Test function completed")                         // step 4. Test function completed
-  }
+    // charCodeAt returns UTF-16 code units, so "𠮷" becomes d842, dfb7 - not UTF-8
+    const manuallyEncodedHex = stringToHex(inputString)
+    Log(manuallyEncodedHex)               // 616263d842dfb7313233
 
-  function main() {
-      Log("Main function started")                           // step 1. Main function started
-      let t1 = threading.Thread(test)
-      Log("Worker thread created successfully")              // step 2. Worker thread created successfully
-      t1.join()
-      Log("Main function completed")                         // step 6. Main function completed
-  }
-  ```
-- Example of asynchronous processing for multi-threaded concurrent ```ticker``` data retrieval:
-  Since ```exchange.GetTicker()``` is a synchronous blocking operation, even when wrapped in a Promise, the internal execution is still synchronous; JavaScript is single-threaded, and synchronous operations will block the event loop; callback functions in the microtask queue are still executed serially.
-  ```js
-  async function getTicker(symbol) {
-      Log("getTicker symbol:", symbol)
-      return Promise.resolve().then(function() {
-          // Note the difference from fetch request data
-          let ret = exchange.GetTicker(symbol)
-          Log(ret)
-          return ret
-      })
-  }
+    // valid UTF-8 bytes decode back to a string
+    const decodedString = Encode("raw", "hex", "string", encodedHex)
+    Log(decodedString)                    // abc𠮷123
 
-  async function main() {
-      let symbols = ["BTC_USDT", "ETH_USDT", "SOL_USDT"]
-      let t1 = threading.Thread(async function(symbols, func) {
-          let arrPromise = []
-          for (let symbol of symbols) {
-              arrPromise.push(func(symbol))
-          }
-          let ret = await Promise.all(arrPromise)
-          Log("ret:", ret)
-      }, symbols, getTicker)
+    // bytes that are not valid UTF-8 come back as an ArrayBuffer
+    // (with inputString = "abcG123" both encodings are identical and this is a string)
+    const outputD = Encode("raw", "hex", "string", manuallyEncodedHex)
+    Log(outputD instanceof ArrayBuffer)   // true
 
-      t1.join()
-  }
-  ```
+    // inspect the raw bytes in the ArrayBuffer
+    const bufferD = new Uint8Array(outputD)
+    let hexBufferD = ''
+    for (let i = 0; i < bufferD.length; i++) {
+        hexBufferD += bufferD[i].toString(16).padStart(2, '0')
+    }
+    Log(hexBufferD)                       // 616263d842dfb7313233
+}
+```
 
-### TypeScript
+**Asynchrony and threads**
 
-TypeScript language is supported. When creating a strategy, still set it as a JavaScript strategy, then write ```// @ts-check``` at the beginning of the strategy code or click the "TypeScript" button in the upper right corner of the strategy editing area to switch to TypeScript. The platform will automatically recognize the code as TypeScript and provide corresponding compilation and type checking support:
+- ```setTimeout```/```clearTimeout```: callbacks run while the main thread is waiting in ```Sleep()```. When ```main()``` returns, timers that have not fired yet run first, then ```onexit()``` is called.
+- ```fetch(url)```: returns a ```Promise``` that resolves to a response object (```ok```, ```status```, ```headers```; ```text()``` and ```json()``` return the content directly). On the docker, ```fetch``` completes the request synchronously when called and returns an already settled ```Promise```, so combining several ```fetch``` calls with ```Promise.all``` does not make them concurrent.
+- Exchange APIs (such as ```exchange.GetTicker()```) are synchronous blocking calls; wrapping them in a ```Promise``` or an ```async``` function does not make them concurrent either.
+- For concurrency use `exchange.Go`, `HttpQuery_Go`, or create threads with `Thread` (see Advanced Topics → JavaScript Multithreading).
 
-- Type Safety: TypeScript's static type checking helps you discover potential errors while writing code, improving code quality.
+```js
+async function main() {
+    let resp = await fetch("https://www.okx.com/api/v5/market/books?instId=BTC-USDT")
+    if (resp.ok) {
+        Log(resp.json())
+    } else {
+        Log("status:", resp.status)
+    }
+}
+```
 
-- Code Auto-completion: TypeScript's type system enables you to find required properties and methods faster when writing code, improving development efficiency.
+**Libraries and dependencies**
 
-- Clearer Code Structure: Using TypeScript, you can better organize and maintain code, making it easy to read and understand.
+JavaScript strategies can use the built-in ```TA``` and ```talib``` indicator libraries directly; see Writing Strategies → Built-in Libraries for what each language provides. Other third-party JavaScript libraries can be downloaded at run time and loaded with ```eval```; the same page has an example.
 
-- Powerful Object-Oriented Programming Features: TypeScript provides powerful object-oriented programming features such as interfaces, classes, and generics, helping you write more robust and reusable strategy code.
+#### TypeScript
 
-### Python
+TypeScript is not a separate language option. Create the strategy as ```JavaScript``` and add a ```// @ts-check``` line to the code (or click the "TypeScript" button at the top right of the editor); the platform then treats it as TypeScript and compiles it to JavaScript before backtesting or live trading. When a strategy is saved through the AI/MCP tools, the language can be given as ```typescript```: the platform saves it as a JavaScript strategy and adds ```//@ts-check``` at the top automatically (see External Interfaces → AI Access).
 
-- Setting the Python interpreter for Python strategy programs
-  For strategies written in Python, during backtesting or live trading, if the host system has both Python2 and Python3 installed, you can set the Python version to launch at runtime in the first line of the strategy. For example: ```#!python3```, ```#!python2```, the system will automatically find the corresponding interpreter. You can also specify an absolute path, for example: ```#!/usr/bin/python3```.
-- Security of Python-based strategies
-  Strategies developed on the FMZ Quant Trading Platform are only visible to the holder of the FMZ Quant Trading Platform account. Additionally, complete localization of strategy code can be achieved on the FMZ Quant Trading Platform, such as packaging the strategy into a **Python library** and loading it in the strategy code, thus achieving strategy code localization.
-  Python code security:
-  Since Python is an open-source and easily decompilable language, if the strategy is not for personal use but for rental, and you are concerned about strategy leakage, you can run the strategy on your own deployed host and rent it out in the form of sub-account or fully managed management.
+Static type checking catches mistakes such as wrong argument counts, property names or types while you write, and makes editor completion more accurate.
 
-  Python strategy code encryption:
-  By default, Python strategy code is not encrypted when used by the author themselves, but encrypted when rented to others. By writing the following code at the beginning of the Python strategy, you can specify whether to encrypt the strategy code when running for personal use or rental. Python versions that support strategy code encryption are: Python 2.7, Python 3.5, Python 3.6.
+A minimal example:
 
-  - Encrypt strategy code both when the strategy author runs it themselves and when providing it to others via registration code:
-    Use code ```#!python``` to specify the Python interpreter version, then use comma ```,``` as separator, and input the encryption command ```encrypt```. If you don't specify the Python version, you can directly add ```#!encrypt```.
-    ```python
-    #!python,encrypt
-    ```
-    or
-    ```python
-    #!encrypt
-    ```
-  - Do not encrypt strategy code when the strategy author runs it themselves or provides it to others via registration code:
-    ```python
-    #!python,not encrypted
-    ```
-    or
-    ```python
-    #!not encrypted
-    ```
+```ts
+// @ts-check
+interface Signal {
+    side: "buy" | "sell"
+    price: number
+}
 
-  To check if Python strategy code encryption is effective, use code ```os.getenv('__FMZ_ENV__')```, which returns the string ```"encrypt"``` to indicate it's effective. Only valid in live trading, backtesting will not encrypt Python strategy code.
-  ```python
-  #!encrypt
-  def main():
-      ret = os.getenv('__FMZ_ENV__')
-      # Printing variable ret as string encrypt or ret == "encrypt" being true means encryption is effective
-      Log(ret, ret == "encrypt")
-  ```
-- Python custom module import functionality
-  The FMZ platform supports importing custom modules in Python strategies, enabling modular development and code reuse.
+function getSignal(ticker: ITicker, ma: number): Signal | null {
+    if (ticker.Last > ma) {
+        return {side: "buy", price: ticker.Last}
+    }
+    if (ticker.Last < ma) {
+        return {side: "sell", price: ticker.Last}
+    }
+    return null
+}
 
-  For example, if we need to design a module: ```mymath```, save ```mymath.py``` as a separate file.
+function main() {
+    while (true) {
+        const records = exchange.GetRecords()
+        const ticker = exchange.GetTicker()
+        if (records && ticker && records.length > 20) {
+            const ma = TA.MA(records, 20)
+            const signal = getSignal(ticker, ma[ma.length - 1])
+            if (signal) {
+                Log(signal.side, signal.price)
+            }
+        }
+        Sleep(60 * 1000)
+    }
+}
+```
 
-  ```python
-  # mymath.py - save as a separate file
-  """
-  Simple math utility module
-  """
+Type declarations for the platform API are built into the strategy editor; nothing needs to be referenced in the code. They cover the global functions, the ```exchange``` object, data structure interfaces such as ```ITicker```, ```IRecord```, ```IOrder``` and ```IPosition```, and ```TA```, ```talib``` and so on. Language features, APIs and libraries at run time are the same as for JavaScript strategies (see Programming Languages → JavaScript).
 
-  def add(a, b):
-      """Addition"""
-      return a + b
-  ```
+#### Python
 
-  Deploy the module file by placing ```mymath.py``` in the specified location under the host program directory (the folder name in the storage directory is the live trading Id, using live trading Id ```123456``` as an example):
+Strategies can be written in ```Python 3```; Python 2 is not supported. Live trading, and backtests that run on a docker, use the Python interpreter installed on the docker's machine.
 
-  > Host program directory/logs/storage/123456/mymath.py
+**Interpreter**
 
-  Finally, directly import the ```mymath``` module in the Python strategy on the FMZ platform.
+The docker looks for an interpreter in this order and uses the first program that starts and is Python 3:
+1. the interpreter given by the environment variable ```PYTHON_BIN```;
+2. ```python3```;
+3. ```python```.
 
-  ```python
-  import mymath
+To use a specific interpreter (for example the Python of a virtual environment), set the environment variable before starting the docker:
 
-  def main():
-      Log("mymath.add(1, 2):", mymath.add(1, 2))
-  ```
+```bash
+export PYTHON_BIN=/opt/venv/bin/python3
+```
 
-  The strategy bound to the live trading instance (strategy instance) with Id ```123456``` can then call methods from the ```mymath``` module.
+A first line such as ```#!python3``` or ```#!python2``` in the strategy is no longer used to choose the interpreter.
 
-### Rust
+**Structure and parameters**
 
-The platform supports writing strategies using the ```Rust``` programming language. Rust strategies run on a compile-first, then-execute basis: during backtesting, the strategy code is compiled by the platform server and runs in the backtesting system on the browser side; in live trading, Rust strategies run on the docker host after passing compilation.
+The entry point is ```def main()```. The optional ```init()``` and ```onexit()``` are called automatically by the docker (Python does not support ```onerror()```); see Writing Strategies → Strategy Structure. Interface parameters are global variables with the same names; to assign a new value to one inside a function, declare it with ```global``` first.
 
-Leveraging Rust's ownership model and static type system, you can write trading strategies that are both memory-safe and high-performance on the FMZ Quant trading platform.
+**Errors and return values**
 
-- Automatic injection of platform APIs
-  The strategy code only needs a single ```fn main()``` entry function. All platform APIs (```exchange```, ```exchanges```, ```TA```, ```Log!```/```LogStatus!```, ```_G!```/```_C!```, etc.) are automatically injected via the prelude and can be called directly without any ```use```/```mod``` declarations. API calls that may fail return a ```Result<T>``` type, which can be combined with the ```_C!``` macro for automatic retries.
-  ```rust
-  fn main() {
-      // GetTicker returns Result<Ticker>; use the _C! macro to retry until the call succeeds
-      let ticker = _C!(exchange.GetTicker(None));
-      Log!("Last:", ticker.Last);
-  }
-  ```
-- Strategy parameters injected as global constants
-  Strategy parameters configured in the interface are injected into the strategy as global constants, whose Rust types are determined by the actual value of the parameter (numbers map to ```f64```, booleans to ```bool```, strings/passwords to ```&str```, etc.), and can be referenced directly by parameter name; you can also use the ```params()``` function to obtain the parameter set as JSON text and parse it yourself.
-- Third-party crate support
-  The strategy source is the only code file (there is no separate Cargo.toml). You can declare dependencies at the top of the source using cargo-script-style frontmatter, which is automatically merged into Cargo.toml at build time:
-  ```rust
-  ---
-  [dependencies]
-  serde_json = "1"
-  ---
-  fn main() {
-      let v: serde_json::Value = serde_json::from_str(params()).unwrap();
-      Log!("Parameters:", v.to_string());
-  }
-  ```
-  Note: the compilation sandbox does not provide system OpenSSL, so for crates that require TLS (such as HTTP/WebSocket clients), please choose the pure-Rust ```rustls``` implementation (for example, enable the ```rustls-tls-webpki-roots``` feature for ```tokio-tungstenite```) and avoid depending on ```native-tls```/```openssl-sys```; for WebSocket connections, it is recommended to prefer the built-in ```Dial()``` function, which requires no third-party crate.
-- Editor support
-  The strategy editor integrates ```rust-analyzer``` for Rust strategies, providing code completion and real-time diagnostics.
+When an API call fails it returns ```None``` and writes the error to the log. Check the return value before using it, or retry with ```_C()```. An uncaught exception ends the strategy, and the error is recorded in the log.
 
-### C++
+**Output**
 
-The platform supports C++ programming language, compatible with ```C++ 11``` standard. C++ strategies need to be pre-compiled before execution. In the backtesting system, C++ strategies run on dedicated C++ backtesting servers; in live trading environments, C++ strategies run on the docker after compilation.
+The output of ```print()``` goes to the docker process's standard output and does not appear in the live trading log. Use `Log` for anything that should show up in the log.
 
-Leveraging the C++ programming language and ```C++ 11``` standard, you can develop high-performance trading strategies on the FMZ Quant Trading Platform. Using modern C++ features, you can build flexible and scalable trading algorithms to implement automated trading.
+**Third-party packages**
 
-The following C++ libraries are integrated:
+A strategy can import any package installed in the interpreter. Install packages with the same interpreter the docker uses, for example:
 
-- https://nlohmann.github.io/json/
+```bash
+python3 -m pip install numpy
+# when PYTHON_BIN is set
+$PYTHON_BIN -m pip install numpy
+```
 
-### MyLanguage
+To use ```talib```, install TA-Lib (the ```talib``` package) and ```numpy``` on the docker's machine.
+
+**Your own modules**
+
+While a strategy runs, its current directory and ```PYTHONPATH``` are a temporary directory created by the docker for that run and deleted afterwards; ```.py``` files placed under the docker's directory (for example ```logs/storage/<live trading ID>/```) are not found automatically. There are two ways to import your own modules:
+- install the module into the interpreter's ```site-packages``` (for example package it and install it with ```pip install```, or copy it into the ```site-packages``` directory);
+- in the strategy, append the absolute path of the module's directory to ```sys.path```, then import it.
+
+For example, with the module file ```/home/user/fmz_modules/mymath.py```:
+
+```python
+# mymath.py
+def add(a, b):
+    return a + b
+```
+
+the strategy code is:
+
+```python
+import sys
+sys.path.append("/home/user/fmz_modules")   # absolute path of the module's directory
+
+import mymath
+
+def main():
+    Log("mymath.add(1, 2):", mymath.add(1, 2))
+```
+
+Keeping the core logic in a module on your own docker, with only the calling code in the strategy, is also a way to avoid uploading that logic to the platform.
+
+#### Rust
+
+Strategies can be written in ```Rust```. Rust strategies are compiled before they run: for backtesting the platform server compiles them and they run in the browser-side backtesting system; in live trading they run on the docker once compiled. The strategy editor integrates ```rust-analyzer``` for Rust, with code completion and live diagnostics.
+
+**Structure**
+
+A strategy only needs a ```fn main()```. The platform API (```exchange```, ```exchanges```, ```TA```, ```Log!```, ```_C!``` and so on) is imported automatically; no ```use``` or ```mod``` declarations are needed.
+
+The optional ```fn init()``` and ```fn onexit()``` are called automatically by the docker; just define them, no registration is needed. ```init()``` runs before ```main()```; ```onexit()``` runs when ```main()``` returns normally, when the live trading is stopped, and when the strategy panics. Rust does not support ```onerror()```. See Writing Strategies → Strategy Structure.
+
+```rust
+fn init() {
+    Log!("initializing");
+}
+
+fn main() {
+    // APIs that can fail return Result<T>; the _C! macro retries until the call succeeds
+    let ticker = _C!(exchange.GetTicker(None));
+    Log!("Last:", ticker.Last);
+}
+
+fn onexit() {
+    Log!("strategy exiting, cleaning up");
+}
+```
+
+Some functions are macros (note the exclamation mark): ```Log!()```, ```LogStatus!()```, ```Panic!()```, ```_G!()```, ```_C!()```. ```LogProfit()```, ```Sleep()```, ```_D()```, ```_N()```, ```HttpQuery()``` and others are ordinary functions.
+
+**Parameter types**
+
+Interface parameters are injected as global constants with the same names. They can only be read, not modified in code (copy a value into a local variable if it needs to change). The type depends on the kind of parameter:
+
+| Parameter kind | Rust type |
+| - | - |
+| Number | ```f64``` |
+| Boolean | ```bool``` |
+| String | ```&str``` |
+| Dropdown (single choice) | ```f64``` (option index); ```&str``` when the options are bound to string data |
+| Dropdown (multiple choice) | ```&[i64]```, ```&[f64]``` or ```&[&str]```; JSON text as ```&str``` when the option values have mixed types |
+| Encrypted string | ```&str``` or ```Decrypted``` (dereferences to ```str```) |
+
+- Convert explicitly where an integer is needed, for example ```let n = Period as usize;```.
+- An optional parameter that is left empty has the zero value of its type: ```0.0```, ```""```, ```false```, or an empty list for a multiple-choice dropdown.
+- When the server cannot decrypt an encrypted-string parameter in advance (for example on a private docker), it is injected as a ```static``` of type ```Decrypted``` and decrypted on first use. It implements ```Display```, so it can be used directly with ```format!```; when passing it to ```Log!``` or anywhere a ```&str``` is needed, write ```&*ParamName``` (this also works for ```&str``` parameters):
+
+```rust
+fn main() {
+    let key: &str = &*ApiKey;   // ApiKey is an encrypted-string parameter
+    Log!("key length:", key.len());
+}
+```
+
+- If a parameter name clashes with another name in the code, refer to the parameter as ```args::ParamName```.
+
+**Errors and return values**
+
+API calls that can fail return ```Result<T>```; handle it the usual Rust way (in JavaScript a failed call returns ```null```):
+
+```rust
+fn main() {
+    // option 1: pattern matching
+    if let Ok(ticker) = exchange.GetTicker(None) {
+        Log!(ticker);
+    }
+
+    // option 2: the _C! macro retries until the call succeeds
+    let ticker = _C!(exchange.GetTicker(None));
+    Log!(ticker);
+}
+```
+
+Optional arguments (such as the ```symbol``` argument of ```GetTicker```) are passed as ```None``` when omitted, or given directly, for example ```exchange.GetTicker("BTC_USDT")```.
+
+**JSON**
+
+Raw JSON text returned by the platform API (for example the return value of ```exchange.IO()``` or the ```Info``` field of each structure) is parsed with the built-in ```JSONParse()```, which returns an ```Option<JsonValue>```. Navigate with ```v["key"]``` and ```v[0]``` and read values with methods such as ```as_f64()```, ```as_str()``` and ```as_bool()```. ```JsonValue``` implements ```Display```, so ```v.to_string()``` or ```format!("{}", v)``` gives compact JSON text. The SDK has no convenient API for building JSON; build JSON text with ```format!```, or use ```serde_json```.
+
+**Third-party crates**
+
+The strategy source is the only code file (there is no separate ```Cargo.toml```). Declare dependencies in a frontmatter block wrapped in ```---``` at the very top of the source; it is merged into ```Cargo.toml``` at build time:
+
+```rust
+---
+[dependencies]
+serde_json = "1"
+---
+/*backtest
+start: 2024-01-01 00:00:00
+end: 2024-02-01 00:00:00
+period: 1h
+*/
+fn main() {
+    let v: serde_json::Value = serde_json::from_str(r#"{"a": 1}"#).unwrap();
+    Log!("a:", v["a"].to_string());
+}
+```
+
+- The frontmatter must be at the start of the source, with only blank lines before it; the ```/*backtest ... */``` backtest configuration block goes after the closing ```---```. If the strategy has no backtest configuration block yet, "Save Backtest Settings" inserts one at the very top of the source; move it below the frontmatter (later saves update it in place).
+- Between a strategy and the template libraries it references, the dependency block may appear in only one place; declaring it in both fails the build.
+- The build environment has no system OpenSSL. For crates that need TLS (HTTP/WebSocket clients and the like), choose the pure-Rust ```rustls``` implementation (for example ```tokio-tungstenite``` with the ```rustls-tls-webpki-roots``` feature) and avoid ```native-tls```/```openssl-sys```. For WebSocket connections prefer the built-in `Dial` function, which needs no third-party crate.
+
+**Built-in libraries**
+
+Rust strategies can use the ```TA``` indicator library; ```talib``` is not supported. See Writing Strategies → Built-in Libraries.
+
+#### MyLanguage
 
 The platform supports MyLanguage for writing and designing strategies, compatible with most syntax, instructions and functions of Wenhua MyLanguage. MyLanguage encourages modular programming, breaking down complex algorithms into function modules. Through concise syntax, dedicated data structures and powerful financial function libraries, it supports the implementation of complex financial logic. Building applications in a modular way improves development efficiency and code maintainability.
 
@@ -377,7 +1067,7 @@ AUTOFILTER;
 - [FMZ Quant MyLanguage Documentation](https://www.fmz.com/bbs-topic/2569)
 - [FMZ Quant MyLanguage--MyLanguage Trading Library Parameters](https://www.fmz.com/bbs-topic/5768)
 
-### PINE Language
+#### PINE Language
 
 The platform supports and is compatible with ```Trading View```'s PINE language scripts. PINE is a lightweight yet powerful strategy programming language for creating technical indicators and strategies that can be backtested and traded live. The active community has created over 100,000 PINE scripts.
 Users can easily access and apply various technical analysis tools and trading strategies; leverage community scripts to quickly implement trading ideas without writing code from scratch, significantly reducing development cycles; help both beginners and experienced traders learn and understand different technical indicators, strategies, and programming concepts.
@@ -404,7 +1094,7 @@ else if direction > 0
 
 - [PINE Script Documentation](https://www.fmz.com/bbs-topic/9315)
 
-### Blockly Visual Programming
+#### Blockly Visual Programming
 
 The platform supports Blockly visual programming. With the Blockly editor, users can express code concepts such as variables, logical expressions, and loops by connecting graphical blocks (similar to building blocks). This approach allows the programming process to focus less on tedious syntax details and instead operate directly according to programming principles. Through the arrangement and combination of graphical blocks, users can easily understand programming logic and implement creative ideas, making it ideal for cultivating interest in strategy design and quickly getting started with programmatic and quantitative trading.
 
@@ -416,7 +1106,7 @@ The platform supports Blockly visual programming. With the Blockly editor, users
 
   - [Building Trading Strategies with Visual Modules - Simplified](https://www.fmz.com/digest-topic/4107)
 
-### Workflow
+#### Workflow
 
 The platform supports writing strategies using the Workflow approach. Workflow is a visual strategy design method that builds trading logic through node connections and configurations, enabling strategy implementation without writing code.
 
@@ -429,280 +1119,1751 @@ The platform supports writing strategies using the Workflow approach. Workflow i
 **Learning Resources**:
 - [Workflow Video Tutorial Series](https://www.fmz.com/class/workflow)
 
-## Key Security
+### Strategy Structure
 
-Sensitive data such as account information and encrypted strings in strategy parameters configured on the FMZ Quant Trading Platform are encrypted on the browser side. All information stored on the FMZ Quant Trading Platform is encrypted (not plaintext data). Only the user's private devices can decrypt and use it, greatly improving the security of sensitive data. If other sensitive information is included in strategy code, parameter settings, strategy descriptions, etc., please do not disclose or sell the strategy.
+Strategies in ```JavaScript``` (including TypeScript), ```Python``` and ```Rust``` consist of a few functions with agreed names, which the docker calls at fixed points. MyLanguage, PINE, Blockly and Workflow strategies do not need to define them.
 
-- The platform supports local configuration of exchange account information, keys and other sensitive information
-  On the platform's exchange configuration page, all masked encrypted text box controls support loading local files from the docker's location via file path. Below is a detailed example using the exchange's ```RSA KEY``` authentication method to explain how to configure sensitive information locally on the device where the docker program is located.
-  1. Create RSA public and private keys. For example, create public and private keys in PKCS#8 format. There are many tools available for creation, such as: openssl.
-  2. Create an ```RSA KEY``` on the exchange, uploading the public key created in step 1.
-  3. Save the private key created in step 1 as a txt file in the docker directory ```../logs/storage/xxx```, where xxx is the live trading Id; it can also be saved in other paths within the docker program's directory.
-  4. When configuring the exchange on the FMZ Quant Platform, fill in the ```RSA KEY``` created on the exchange in the ```Access Key``` edit box.
-  5. When configuring the exchange on the FMZ Quant Platform, fill in the path of the txt file placed in the docker directory from step 3 in the ```Secret Key``` edit box. For example, if the file name is: ```rsaKey.txt```, then fill in: ```file:///rsaKey.txt```. When running live trading and referencing this exchange (object), the docker will automatically load the file content from the directory ```../logs/storage/xxx/rsaKey.txt``` as the exchange object's configuration information, such as the ```RSA``` private key in this example.
+**Lifecycle functions**
 
-  This way, storing the private key locally is more secure. For detailed process, please refer to the [video tutorial](https://www.bilibili.com/video/BV1UM41147Jj/)
-- Changing the FMZ Quant Trading Platform account password will invalidate exchange configurations
-  If you change the FMZ Quant Trading Platform account password, all exchange configurations will become invalid and need to be handled according to the following steps:
-  1. Reconfigure exchange account related keys, passwords and other information on the ["Exchange" management page](https://www.fmz.com/m/platforms).
-  2. Stop all dockers, and redeploy and run the dockers using the modified FMZ Quant Trading Platform account password.
+| Function | Required | When it is called |
+| - | - | - |
+| ```main()``` | Yes | The entry function and body of the strategy. When ```main()``` returns, the strategy has finished. |
+| ```init()``` | No | Called once before ```main()```, for initialization. |
+| ```onexit()``` | No | Called when the strategy exits, for cleanup (cancel orders, close positions, save state, etc.). |
+| ```onerror(msg)``` | No | ```JavaScript``` only: called when ```main()``` ends with an uncaught exception; ```msg``` is the error message. When ```onerror()``` is called, ```onexit()``` is not. |
+| ```destroy()``` | No | ```JavaScript``` template libraries only: called when the strategy exits, after ```onexit()``` or ```onerror()```; see Writing Strategies → Template Library. |
 
-## Live Trading
+Which function runs on exit:
 
-On the FMZ Quant Trading Platform, the concept of "Live Trading" is distinguished from "Backtesting". It refers to creating a real strategy program instance that interacts with exchanges (obtaining market data, querying positions, placing and canceling orders, etc.). Strategy program instances that interact with the exchange's production environment are called live trading, and strategy program instances that interact with the exchange's simulation environment (many exchanges provide test environments) are also called live trading.
+| Exit reason | JavaScript | Python | Rust |
+| - | - | - | - |
+| ```main()``` returns normally | ```onexit()``` | ```onexit()``` | ```onexit()``` |
+| Live trading stopped | ```onexit()``` | ```onexit()``` | ```onexit()``` |
+| Uncaught exception or ```panic``` | ```onerror(msg)``` | neither | ```onexit()``` |
 
-Creating a [live trading instance](https://www.fmz.com/m/add-robot) on the FMZ Quant Trading Platform requires meeting three conditions:
+**Notes:**
+- ```onexit()``` and ```onerror()``` may run for at most 5 minutes (the limit is sent by the server with each task; the default is 5 minutes) and are terminated when they exceed it.
+- In backtesting a strategy is usually an endless polling loop, so ```main()``` does not return normally when the backtest ends; see Strategy Structure → onexit() for how to handle this.
+- When ```main()``` of a ```JavaScript``` strategy returns, threads created with ```threading``` are terminated; ```setTimeout``` callbacks that have not fired yet run first, then ```onexit()``` is called.
+- ```JavaScript``` and ```Python``` template libraries can define their own ```init()```, which runs when the template is loaded, before the strategy's ```init()```.
 
-**Conditions for Creating Live Trading**
-- An available strategy
-  You can create a strategy by clicking the "New Strategy" button on the platform's [Strategy Library page](https://www.fmz.com/m/strategies). After writing and designing the strategy and saving it, the strategy will be saved in the strategy library. When creating live trading, you can select strategies from the strategy library in the "Running Strategy" dropdown box under the "Live Trading Configuration" section on the [Live Trading Creation page](https://www.fmz.com/m/add-robot).
-- At least one available docker deployed
-  You can deploy a docker by clicking the "Deploy Docker" button on the platform's [Docker page](https://www.fmz.com/m/nodes). After successful docker deployment, when creating live trading, you can select the deployed docker in the "Docker Host" dropdown box under the "Live Trading Configuration" section on the [Live Trading Creation page](https://www.fmz.com/m/add-robot).
-- At least one configured exchange
-  You can add an exchange by clicking the "Add Exchange" button on the platform's [Exchange page](https://www.fmz.com/m/platforms) and configure the exchange account information. After the exchange configuration is complete, when creating live trading, you can select the configured exchange in the "Trading Platform" dropdown box under the "Trading Configuration" section on the [Live Trading Creation page](https://www.fmz.com/m/add-robot).
+**Main loop and event-driven strategies**
 
-Finally, click the "Create Live Trading" button on the live trading creation page to create and run a quantitative trading strategy program instance (i.e., live trading on the FMZ Quant Trading Platform).
+Most strategies run a loop in ```main()```: each round fetches data, computes, places orders, then calls ```Sleep()``` to wait for the next round (see Strategy Structure → Main Loop). A strategy can also wait for market data, order updates and other events and handle them as they arrive (see Strategy Structure → Event-Driven). For a categorized list of all API functions see Strategy Structure → API Quick Reference.
 
-**Live Trading Grouping**
-You can manage created live trading instances by grouping them, with support for custom group names.
+#### init()
 
-**Live Trading Observation**
-Live trading can be displayed publicly, or you can create private observation links to send to specific groups for display.
+```init()``` is the initialization function implemented by the user. When a strategy starts running, the ```init()``` function is automatically executed first to complete the initialization tasks designed within the strategy.
 
-**Live Trading Billing**
-Live trading is billed hourly at 0.05 USD per live trading instance per hour, with partial hours billed as full hours. Creating a new live trading instance will immediately start billing. "Stopping"/"Restarting" live trading will not result in duplicate billing.
+```javascript
+function main(){
+    Log("First line of code executed!", "#FF0000")
+    Log("Exiting!")
+}
 
-You can check all billing "Transaction Details" on the [Recharge page](https://www.fmz.com/m/billing).
-
-Important Notice: When recharging with ```USDT```, please pay attention to:
-- 1. Whether the transfer network is correct (e.g., currently supports: TRC20, ERC20, BSC).
-- 2. Whether the recharge asset selection is correct (e.g., USDT).
-- 3. Whether the recharge address is consistent.
-
-**Live Trading Monitoring**
-In the live trading list on the [Live Trading Management page](https://www.fmz.com/m/robots), you can click the "Monitor" button in the **Actions column** on the right side of running live trading instances to enable live trading monitoring. After enabling monitoring, if the live trading exits without manual operation, the email address currently bound to the FMZ Quant Trading Platform will receive a notification message.
-
-**Live Trading Database**
-Taking live trading ID ```123456``` as an example, its corresponding database file is located in the path under the docker directory to which the live trading belongs: ```/logs/storage/123456/123456.db3```, where the database file name is ```123456.db3```.
-The database contains the following tables:
-- chart: Records chart data.
-- kvdb: Records data persistently saved by the ```_G()``` function.
-- log: Records live trading log data.
-- profit: Records live trading profit data.
-
-## Strategy Library
-
-The [Strategy Library](https://www.fmz.com/m/strategies) page stores all strategies under the current account. Strategies can be designed using various programming languages and methods.
-
-**Strategy Grouping**
-Strategies support group management functionality, allowing custom group names.
-
-**Strategy Publishing and Leasing**
-You can generate a strategy's "Copy Code" for publishing strategies.
-You can generate a strategy's "Registration Code" for leasing strategies.
-
-**Strategy Export and Import**
-On the Strategy Library page, clicking a strategy name will redirect to that strategy's editing page, which provides "Import" and "Export" functions.
-
-A complete strategy includes:
-- Strategy source code
-- Strategy description
-- Strategy notes
-- Strategy documentation
-- Strategy parameter configuration
-- Strategy interaction configuration
-
-Therefore, when exporting a strategy, the exported file is in XML format, containing all the above information. After creating a new blank strategy, importing this XML file can completely restore the strategy. Strategy migration cannot rely solely on copying source code; you must import the complete strategy file (or manually add strategy parameter design, interaction design, and other configurations).
-
-## Docker
-
-The Docker software of the FMZ Quant Trading Platform is the core component of the entire quantitative trading system. [Docker](https://www.fmz.com/m/add-node) can be understood as the executor of your trading strategy, responsible for complex data requests, data reception, network connections, log transmission, and other tasks. Live trading strategy programs run on the Docker software, not on the FMZ Quant Trading Platform website. The Docker runs on your server, so even if the **FMZ Quant Trading Platform** website experiences network failures, it will not affect your Docker's operation. Docker can run on systems such as ```Linux```, ```Windows```, ```Mac OS```, ```Android```, ```Raspberry Pi ARM Linux```, etc.
-
-The live trading logs managed by the Docker are all saved in the ```./logs/storage``` directory where the Docker program is located. The files are ```Sqlite``` database files with the ```db3``` extension. You can use ```Sqlite``` management software to edit them directly. For these live trading database files with the ```db3``` extension, the filename is the live trading ```Id```.
-
-The Docker program supports automatic detection and use of system proxy settings. When proxy software (such as ```Clash X```, ```V2Ray```, ```Shadowsocks```, etc.) is running on the system with enhanced mode or system proxy mode enabled, the Docker will automatically detect and use the proxy for network access without manual configuration. This is very convenient for users who need to access exchange APIs through a proxy, as the Docker can automatically adapt to the system's network environment after startup.
-
-### Deploy Docker
-
-You can view the dockers associated with your FMZ Quant Trading Platform account on the [Docker Management Page](https://www.fmz.com/m/nodes), with support for switching between list view and detailed information view. This page displays the docker's IP address, version number, compilation release time, and other related information. Click the **Deploy Docker** button to navigate to the [Docker Deployment Page](https://www.fmz.com/m/add-node). Docker deployment offers two modes: 1. One-click docker rental; 2. Manual docker deployment.
-
-  ![Docker Deployment Page](https://www.fmz.com/upload/asset/2e527e497b3fa27ba497b.png)
-
-#### One-Click Docker Rental
-
-On the [Docker Deployment Page](https://www.fmz.com/m/add-node), click the **One-Click Docker Rental** tab and select the server to deploy based on your configuration requirements and server location preferences.
-
-Click "Buy Now" and enter your FMZ Quant Trading Platform account credentials for verification. After successful verification, the docker program will be deployed automatically. The entire deployment process takes a few minutes, and the system will automatically install commonly used Python libraries.
-
-After clicking "Buy Now", the rented server is provisioned through the platform on your behalf and has limited system permissions, with no support for remote login. If you need to use third-party Python libraries that are not pre-installed, it is recommended to use a private server for manual deployment.
-
-Servers rented through the **One-Click Docker Rental** feature use independent billing, which is separate from live trading billing.
-
-Clicking the "Redeploy" button will not delete the live trading logs and data files in the logs directory under the docker directory.
-
-#### Manual Deployment of Bot
-
-You can deploy the bot to various devices, such as: personal computers, servers, Raspberry Pi, etc., supporting multiple mainstream operating systems.
-- Linux command-line version: Linux AMD64 / Linux 386 / Linux ARM64 / Linux ARMv7
-- Mac command-line version: Mac Intel64 / Apple Silicon
-- Windows command-line version, GUI version: 64-bit / 32-bit
-- Docker image
-
-After logging into the device where you need to deploy the bot program, download the corresponding bot program according to the device's operating system. The download link can be found in the content displayed after clicking the **Manual Bot Deployment** tab on the [Bot Deployment Page](https://www.fmz.com/m/add-node).
-Deploying the bot program requires setting 2 parameters:
-![Manual Bot Deployment Page](https://www.fmz.com/upload/asset/2e460507bc21582ba1448.png)
-
-1. Communication address containing the FMZ Quant Trading Platform UID.
-2. Password for the FMZ Quant Trading Platform account corresponding to the UID.
-
-**Configuring "Communication Address" and "FMZ Quant Trading Platform Account Password" when deploying the bot:**
-- Windows GUI version bot
-  The Windows GUI version bot can directly fill these two parameters into the corresponding input box controls on the bot interface.
-
-- Command-line version bot
-  For other command-line version bot programs, different operating systems have different commands. Taking Linux & Mac as an example, use the command: ```./robot -s node.fmz.com/123456 -p 654321```, the following explains each part of the command:
-
-  ```./robot``` means running the robot executable program (i.e., the bot program), where ```123456``` is the UID, and ```654321``` is the password for the FMZ Quant Trading Platform account corresponding to the UID.
-  ```-s``` parameter represents "Communication address with FMZ Quant Trading Platform UID", the parameter value can be filled in, for example: ```node.fmz.com/123456```.
-  ```-p``` parameter represents "Password for the FMZ Quant Trading Platform account corresponding to the UID", the parameter value can be filled in, for example: ```654321```.
-
-  Please note that the parameters here are only examples. The actual parameters can be viewed after logging into FMZ.COM and clicking the **Manual Bot Deployment** tab on the [Bot Deployment Page](https://www.fmz.com/m/add-node). The ```-p``` parameter does not necessarily need to be written in plain text in the bot deployment command. You can use the ```./robot -s node.fmz.com/123456``` command to run, then it will prompt for password input, and you can manually enter the password. Also, please pay attention to issues such as program execution permissions, you need to grant the bot program sufficient permissions and remove running restrictions.
-
-#### Docker Operation Precautions
-
-Important Operation Tips
-- Incorrect Operations:
-  Do not forcibly terminate the docker process directly on servers or other devices (such as killing the process directly or restarting the server). Such operations may cause the docker to disconnect from the FMZ platform, leading to the following issues:
-  - Live trading cannot be stopped normally
-  - Live trading continues to run and incur charges
-  When this happens, you need to delete the offline docker first before you can stop the live trading.
-
-- Correct Operation Procedure:
-  - Confirm that there are no running live trades on the docker
-  - Then perform the operation to delete the docker or stop the docker process
-  Operating Principle: Stop live trading first, then stop the docker.
-
-### Global IP Address Specification
-
-- The GUI version of the docker on ```Windows``` system can set the IP address directly in the docker software interface. The docker software defaults to automatic IP configuration.
-- Dockers running in command-line environment use the ```-I``` parameter to specify the IP address.
-  ```log
-  -I string
-      custom local ip address
-  -c string
-      config file
-  -d string
-      custom dns resolve server
-  -e string
-      docker node executable path
-  -f string
-      docker settings json
-  -i string
-      docker image name
-  -n string
-      node name
-  -p string
-      password
-  -s string
-      server address
-  -u string
-      run as system user
-  -v  version info
-  -vv
-      show verbose log
-  -w string
-      working directory
-  ```
-
-### Command Line Parameters for Bot Program
-
-After downloading the bot software, the executable file ```robot``` obtained from decompression is the bot program. You can specify parameters for the bot program when deploying it.
-- ```-v```:
-  View the current bot program version, compilation time and other information.
-  Complete execution command example for ```Mac OS```: ```./robot -v```.
-- ```-vv```:
-  Detailed running logs and interaction messages of the bot program are not displayed by default and not written to the bot log file.
-  This prevents frequent interaction commands from causing log expansion and occupying disk space. If you need to record detailed bot logs and display them during bot operation, you can use the ```-vv``` parameter to set detailed logs and interaction messages to be written to the bot log file.
-- ```-s```:
-  Specify the communication address with FMZ Quant Trading Platform when running the bot program.
-  Complete execution command example for ```Mac OS```: ```./robot -s node.fmz.com/xxxxxxx```, where ```xxxxxxx``` is the unique identification ID for each FMZ Quant Trading Platform account. After executing the command, you will be prompted to enter the corresponding FMZ Quant Trading Platform account password.
-- ```-p```:
-  You can directly specify the password through parameters in the run command, which is not recommended as it will leave password parameters in the current system records. Assuming the password for address ```node.fmz.com/xxxxxxx``` is: ```abc123456```.
-  Complete execution command example for ```Mac OS```: ```./robot -s node.fmz.com/xxxxxxx -p abc123456```.
-- ```-n```:
-  Add label information to the running bot program.
-  Complete execution command example for ```Mac OS```: ```./robot -n macTest -s node.fmz.com/xxxxxxx```. The ```macTest``` text label will be displayed in the bot information on the platform's bot management page.
-- ```-l```:
-  Print the list of exchanges supported by the current bot.
-  Complete execution command example for ```Mac OS```: ```./robot -l```. This will output the names of supported exchanges.
-
-### Live Trading Data Migration
-
-When you need to migrate live trading data to a bot on another device (server), you can move the live trading database file (database file with .db3 extension) to the corresponding path location in the bot directory on the target device (server).
-
-Set the filename to the corresponding live trading ID on the platform, so that all previous live trading log information will not be lost due to migration to the new device.
-
-### Docker Monitor
-
-In the [Docker Management Page](https://www.fmz.com/m/nodes), you can enable the **Docker Monitor** function in the **Docker List Actions** or **Docker Details Actions**. After enabling monitoring, if the docker goes offline abnormally, the email address bound to the current FMZ Quant Trading Platform will receive a notification message.
-
-## Exchange
-
-The [Exchange](https://www.fmz.com/m/platforms) page is used to manage and display currently configured exchanges. In the FMZ Quant Trading Platform, "Exchange" is a core concept that refers to an object containing API key configurations, communication protocols, and interface encapsulations for fund accounts that can be operated by strategy programs.
-
-On the Exchange Management page, click the "Add Exchange" button to navigate to the [Add Exchange page](https://www.fmz.com/m/add-platform), where you can select and fill in configuration information according to your needs. All configuration information is encrypted locally and stored on the FMZ Quant Trading Platform, so the platform does not record any plaintext data.
-
-**Exchange Object**
-Configured exchanges correspond to the ```exchange``` object at the strategy code level. For details, please refer to [```exchange```](https://www.fmz.com/syntax-guide#var_exchange) in the "Syntax Manual".
-When configuring backtesting or live trading, you can add multiple exchanges. Therefore, at the strategy code level, there exists an ```exchanges``` object array (array of exchange objects). For details, please refer to [```exchanges```](https://www.fmz.com/syntax-guide#var_exchanges) in the "Syntax Manual".
-
-**Using Exchange Objects**
-In strategy code, you can call exchange objects to perform operations such as account queries, market data retrieval, order placement, and order cancellation. Using ```JavaScript``` as an example:
-
-```js
-function main() {
-    let account = exchange.GetAccount()    // Query account information
-    let ticker = exchange.GetTicker()      // Get ticker market data
-    let id = exchange.Buy(1000, 1)         // Price is 1000, order quantity is 1
-    exchange.CancelOrder(id)               // If the order is not filled, it can be cancelled
+// Initialization function
+function init(){
+    Log("Initializing!")
 }
 ```
 
-## Strategy Editor
+```python
+def main():
+    Log("First line of code executed!", "#FF0000")
+    Log("Exiting!")
 
-You can write and design strategies by entering the **edit page** from the [Create New Strategy page](https://www.fmz.com/m/add-strategy) or by opening an existing strategy from the [Strategy Library](https://www.fmz.com/m/strategies) (for example, the URL for strategy ID 123456 is: ```https://www.fmz.com/m/edit-strategy/123456```).
+def init():
+    Log("Initializing!")
+```
 
-The FMZ Quant Trading Platform's online strategy editor provides powerful strategy editing assistance features.
+```rust
+fn main() {
+    Log!("First line of code executed!", "#FF0000");
+    Log!("Exiting!");
+}
 
-![Online Strategy Editor Interface](https://www.fmz.com/upload/asset/2e50fff4160187be92248.png)
+// Initialization function
+fn init() {
+    Log!("Initializing!");
+}
+```
 
-### AI Assistant
+#### onexit()
 
-FMZ Quant Trading Platform integrates advanced AI large model assistant functionality, providing users with intelligent strategy development and trading assistance services. Through deep integration with industry-leading large language models, the platform can help users quickly solve programming problems, optimize trading strategies, analyze market data, and provide professional quantitative trading guidance.
+```onexit()``` is implemented by the user to clean up when the strategy exits; it is optional. It may run for at most 5 minutes and is terminated when it exceeds that. For when each language calls ```onexit()```, see Writing Strategies → Strategy Structure.
 
-FMZ platform currently supports the following AI large models:
-Claude Sonnet 4 - Anthropic's latest high-performance model with excellent code understanding and generation capabilities.
+Testing the ```onexit()``` function:
 
-- How to invoke AI Assistant
+```javascript
+function main(){
+    Log("Starting, will stop after 5 seconds and execute cleanup function!")
+    Sleep(1000 * 5)
+}
 
-  ![AI Assistant in Strategy Editor Menu](https://www.fmz.com/upload/asset/16b08991d9857b82a46b.png)
+// cleanup function
+function onexit(){
+    var beginTime = new Date().getTime()
+    while(true){
+        var nowTime = new Date().getTime()
+        Log("Program stop countdown..cleanup started, elapsed time:", (nowTime - beginTime) / 1000, "seconds!")
+        Sleep(1000)
+    }
+}
+```
 
-  Right-click in a blank area and select "AI Assistant" from the popup menu to invoke the AI Assistant, or use the shortcut key ```⌘K``` to invoke the AI Assistant.
-- Using AI Assistant to explain code
+```python
+import time
+def main():
+    Log("Starting, will stop after 5 seconds and execute cleanup function!")
+    Sleep(1000 * 5)
 
-  ![AI Assistant explaining code in Strategy Editor](https://www.fmz.com/upload/asset/16aa01684eda4e8163ed.png)
+def onexit():
+    beginTime = time.time() * 1000
+    while True:
+        ts = time.time() * 1000
+        Log("Program stop countdown..cleanup started, elapsed time:", (ts - beginTime) / 1000, "seconds!")
+        Sleep(1000)
+```
 
-  The AI Assistant can not only help you write code but also explain code logic for you. After selecting the code snippet that needs explanation, right-click and select "Explain this code" from the popup menu to view the detailed code explanation provided by the AI Assistant.
-- Optimize and improve code
-  After selecting the code snippet that needs optimization, right-click and select "Suggest optimizations" or "Refactor code" from the popup menu. The AI Assistant will provide optimization suggestions or directly generate optimized code for you.
+```rust
+fn main() {
+    Log!("Starting, will stop after 5 seconds and execute cleanup function!");
+    Sleep(1000 * 5);
+}
 
-### Command Palette
+// cleanup function
+fn onexit() {
+    let beginTime = Unix() * 1000;
+    loop {
+        let nowTime = Unix() * 1000;
+        Log!("Program stop countdown..cleanup started, elapsed time:", (nowTime - beginTime) / 1000, "seconds!");
+        Sleep(1000);
+    }
+}
+```
+
+In the backtesting system a strategy is usually an endless polling loop, so ```main()``` has not returned normally when the backtest data ends, and ```JavaScript``` and ```Python``` strategies therefore do not run ```onexit()```. In a backtest (```IsVirtual()``` is true) you can catch the exception (EOF) thrown when the backtest ends so that ```main()``` returns and ```onexit()``` runs. In ```Rust``` the API calls return ```Err``` when the backtest ends, so just leave the loop.
+
+```javascript
+function main() {
+    if (exchange.GetName().startsWith("Futures_")) {
+        Log("Exchange is futures")
+        exchange.SetContractType("swap")
+    } else {
+        Log("Exchange is spot")
+    }
+
+    if (IsVirtual()) {
+        try {
+            onTick()
+        } catch (e) {
+            Log("error:", e)
+        }
+    } else {
+        onTick()
+    }
+}
+
+function onTick() {
+    while (true) {
+        var ticker = exchange.GetTicker()
+        LogStatus(_D(), ticker ? ticker.Last : "--")
+        Sleep(500)
+    }
+}
+
+function onexit() {
+    Log("Executing cleanup function")
+}
+```
+
+```python
+def main():
+    if exchange.GetName().startswith("Futures_"):
+        Log("Exchange is futures")
+    else:
+        Log("Exchange is spot")
+
+    if IsVirtual():
+        try:
+            onTick()
+        except Exception as e:
+            Log(e)
+    else:
+        onTick()
+
+def onTick():
+    while True:
+        ticker = exchange.GetTicker()
+        LogStatus(_D(), ticker["Last"] if ticker else "--")
+        Sleep(500)
+
+def onexit():
+    Log("Executing cleanup function")
+```
+
+```rust
+fn onTick() {
+    loop {
+        match exchange.GetTicker(None) {
+            Ok(ticker) => LogStatus!(_D(None), ticker.Last),
+            Err(e) => {
+                // API calls return Err when the backtest ends; leaving the loop lets main return, which triggers onexit()
+                Log!("error:", e);
+                break;
+            }
+        }
+        Sleep(500);
+    }
+}
+
+fn main() {
+    if exchange.GetName().starts_with("Futures_") {
+        Log!("Exchange is futures");
+        let _ = exchange.SetContractType("swap");
+    } else {
+        Log!("Exchange is spot");
+    }
+
+    onTick();
+}
+
+fn onexit() {
+    Log!("Executing cleanup function");
+}
+```
+
+#### onerror()
+
+```onerror(msg)``` is supported only by ```JavaScript``` (including TypeScript) strategies. It is called when ```main()``` ends with an uncaught exception; the argument ```msg``` is the error message. When ```onerror()``` is called, ```onexit()``` is not. It may run for at most 5 minutes and is terminated when it exceeds that. The backtesting system does not support this function.
+
+```Python``` and ```Rust``` strategies do not support ```onerror()```.
+
+```javascript
+function main() {
+    var arr = []
+    Log(arr[6].Close)  // deliberately raise an exception here
+}
+
+function onerror(msg) {
+    Log("Error:", msg)
+}
+```
+
+```python
+# Not supported in Python
+```
+
+```rust
+// Not supported in Rust
+```
+
+#### Main Loop
+
+A strategy usually runs a loop in ```main()```: each round fetches market data, computes signals, places orders, then calls `Sleep` to wait for the next round. In backtesting ```Sleep()``` advances backtest time and controls the replay speed; in live trading it controls the polling interval and therefore how often the exchange API is called. A loop without ```Sleep()``` calls the exchange API as fast as it can and easily hits the exchange's rate limits. To limit the API call rate on the docker, see Advanced Topics → API Rate Limit Control.
+
+Basic framework:
+
+```javascript
+function onTick(){
+    // strategy logic goes here and is called repeatedly, e.g. print market data
+    Log(exchange.GetTicker())
+}
+
+function main(){
+    while(true){
+        onTick()
+        // Sleep controls the polling frequency so the exchange API is not called too often
+        Sleep(60000)
+    }
+}
+```
+
+```python
+def onTick():
+    Log(exchange.GetTicker())
+
+def main():
+    while True:
+        onTick()
+        Sleep(60000)
+```
+
+```rust
+fn onTick() {
+    // strategy logic goes here and is called repeatedly, e.g. print market data
+    Log!(exchange.GetTicker(None));
+}
+
+fn main() {
+    loop {
+        onTick();
+        // Sleep controls the polling frequency so the exchange API is not called too often
+        Sleep(60000);
+    }
+}
+```
+
+The simplest example: place a buy order at price 100 for amount 1 every second:
+
+```javascript
+function onTick(){
+    // only an example: it quickly spends all funds on orders, do not run it live
+    exchange.Buy(100, 1)
+}
+
+function main(){
+    while(true){
+        onTick()
+        // the pause is in milliseconds; 1 second = 1000 milliseconds
+        Sleep(1000)
+    }
+}
+```
+
+```python
+def onTick():
+    exchange.Buy(100, 1)
+
+def main():
+    while True:
+        onTick()
+        Sleep(1000)
+```
+
+```rust
+fn onTick() {
+    // only an example: it quickly spends all funds on orders, do not run it live
+    let _ = exchange.Buy(100, 1);
+}
+
+fn main() {
+    loop {
+        onTick();
+        // the pause is in milliseconds; 1 second = 1000 milliseconds
+        Sleep(1000);
+    }
+}
+```
+
+A strategy that acts on K-line updates (On Bar): ```onTick()``` runs only when the time of the latest K-line changes:
+
+```javascript
+function onTick() {
+    Log("K-line updated, new BAR generated")
+}
+
+function main() {
+    var exName = exchange.GetName()
+    if (exName.includes("Futures_")) {
+        exchange.SetContractType("swap")
+    }
+
+    var lastTs = 0
+    while (true) {
+        var r = _C(exchange.GetRecords)
+        if (r.length > 0 && r[r.length - 1].Time != lastTs) {
+            onTick()
+            lastTs = r[r.length - 1].Time
+        }
+        Sleep(1000)
+    }
+}
+```
+
+```python
+def onTick():
+    Log("K-line updated, new BAR generated")
+
+def main():
+    exName = exchange.GetName()
+    if "Futures_" in exName:
+        exchange.SetContractType("swap")
+
+    lastTs = 0
+    while True:
+        r = _C(exchange.GetRecords)
+        if len(r) > 0 and r[-1]["Time"] != lastTs:
+            onTick()
+            lastTs = r[-1]["Time"]
+        Sleep(1000)
+```
+
+```rust
+fn onTick() {
+    Log!("K-line updated, new BAR generated");
+}
+
+fn main() {
+    let exName = exchange.GetName();
+    if exName.contains("Futures_") {
+        let _ = exchange.SetContractType("swap");
+    }
+
+    let mut lastTs = 0;
+    loop {
+        let r = _C!(exchange.GetRecords(None, None, None));
+        if r.len() > 0 && r[r.len() - 1].Time != lastTs {
+            onTick();
+            lastTs = r[r.len() - 1].Time;
+        }
+        Sleep(1000);
+    }
+}
+```
+
+#### Event-Driven
+
+Besides polling at a fixed interval, a strategy can wait for events and handle them as they arrive, which avoids useless requests and reacts faster to market changes.
+
+**EventLoop**
+
+`EventLoop` waits for events such as the completion of concurrent tasks started with ```exchange.Go()``` or ```HttpQuery_Go()```, readable data on a WebSocket connection, or thread messages; when one occurs it returns the event information and the strategy then reads the corresponding data. Events are recorded only from the first call of ```EventLoop()```, so call ```EventLoop(-1)``` once before starting concurrent tasks:
+
+```js
+function main() {
+    EventLoop(-1)                       // start recording events so none are missed
+    var r1 = exchange.Go("GetTicker")
+    var r2 = exchange.Go("GetDepth")
+    var ev = EventLoop(1000)            // wait up to 1 second for either task to finish
+    Log("event:", ev)
+    Log("ticker:", r1.wait(), "depth:", r2.wait())
+}
+```
+
+**ctx.subscribe / ctx.poll**
+
+```JavaScript``` and ```Rust``` strategies can also use the docker's event subscription interface: ```ctx.subscribe()``` subscribes to market data or order updates for an account and symbol and returns a stream ID; ```ctx.poll()``` takes the next event (optionally with a timeout), and the strategy handles it according to its ```kind```. ```Python``` strategies do not support it.
+
+```js
+function main() {
+    ctx.subscribe(0, "BTC_USDT", {channel: "ticker"})   // the first argument is the account's index in exchanges
+    ctx.subscribe(0, "", {channel: "orders"})           // order updates
+    while (true) {
+        const ev = ctx.poll([], 1000)                    // [] means all subscriptions; wait up to 1 second
+        if (!ev) {
+            continue
+        }
+        if (ev.kind === 1) {
+            Log("ticker:", ev.symbol, ev.bid, ev.ask, ev.last)
+        } else if (ev.kind === 16) {
+            Log("order:", ev.id, ev.state, ev.filledQty)
+        }
+    }
+}
+```
+
+- ```channel``` can be ```"ticker"```, ```"bbo"```, ```"depth"```, ```"trade"```, ```"kline"``` (```interval``` is the period in seconds) or ```"orders"```.
+- Event ```kind```: 1 ticker, 3 depth (the event only signals that the order book changed; read the levels with ```ctx.book(ev.ex, ev.symbol, n)```), 4 trade, 5 K-line, 16 order update.
+- If market data subscriptions are not consumed in time, only the latest data is kept or the oldest is dropped; order updates are never dropped, so the strategy must keep calling ```ctx.poll()```.
+
+In ```Rust``` the calls are ```ctx::subscribe()``` and ```ctx::poll()```; events are raw structures whose prices and quantities are fixed-point integers:
+
+```rust
+fn main() {
+    let s = ctx::subscribe(0, "BTC_USDT", ctx::SubOpts::ticker()).unwrap();
+    loop {
+        match ctx::poll(&[s], Some(1000)) {
+            ctx::Polled::Event(ev) => Log!("event kind:", ev.kind),
+            ctx::Polled::Stopped => break,
+            _ => {}
+        }
+    }
+}
+```
+
+#### API Quick Reference
+
+Every function, structure and constant of the API reference, grouped by its category, with a one-line description; click a name for the full page. This page is generated from the reference by ```doc_tools/gen_api_index.py```.
+
+## Built-in Functions
+
+### Global
+
+| Name | Description |
+| - | - |
+| `Version` | Returns the current system version number. |
+| `IsVirtual` | Used to determine whether the strategy's runtime environment is the backtesting system. |
+| `GetOS` | Retrieves the operating system information of the device hosting the bot. |
+| `GetPid` | Get the ID of the live trading process. |
+| `GetMeta` | Get the ```Meta``` value written when generating the strategy registration code. |
+| `Sleep` | The sleep function pauses program execution for a specified period of time. |
+| `Unix` | Get the second-level timestamp of the current moment. |
+| `UnixNano` | Get the nanosecond-level timestamp of the current moment. |
+| `_D` | Convert a millisecond-level timestamp or a ```Date``` object into a time string. |
+| `GetCommand` | Get the strategy's interactive command. |
+| `GetLastError` | Retrieves the most recent error message. |
+| `SetErrorFilter` | Filters error logs. |
+| `_N` | Format a floating-point number. |
+| `_C` | A retry function used for fault-tolerant handling of interface calls. |
+| `_Cross` | Returns the number of crossover periods between array ```arr1``` and array ```arr2```. |
+| `JSON.parse` | The ```JSON.parse``` function is a method of the **ECMAScript** standard built-in object ```JSON```, used to decode (parse) a JSON string. |
+| `JSON.stringify` | The ```JSON.stringify``` function is a method of the **ECMAScript** standard built-in object ```JSON```, used to convert JavaScript values to JSON strings. |
+| `Encode` | This function encodes data according to the parameters passed in. |
+| `MD5` | Calculate the MD5 hash of the parameter ```data```. |
+| `UUID` | Create a UUID. |
+
+### Log
+
+| Name | Description |
+| - | - |
+| `Log` | The ```Log()``` function is used to output logs. |
+| `LogStatus` | Outputs information to the status bar on the backtesting system or the live trading page. |
+| `LogProfit` | Records and prints the profit/loss value, and plots the equity curve based on the profit/loss value. |
+| `LogProfitReset` | Clear all profit logs and the profit chart. |
+| `LogReset` | Clear the logs. |
+| `LogVacuum` | Used to reclaim the storage space occupied by deleted data in **SQLite** after clearing logs with the ```LogReset()``` function. |
+| `EnableLog` | Enable or disable logging of order information. |
+| `Chart` | Custom chart plotting function. |
+| `KLineChart` | This function is used to perform custom drawing while a strategy is running, using a drawing approach similar to the ```Pine``` language. |
+| `console.log` | Used to output debug information in the "Debug Info" section of the live trading page. |
+| `console.error` | Used to output error messages in the "Debug Information" section of the live trading page. |
+| `exchange.Log` | The ```exchange.Log()``` function is used to output order placement and cancellation logs in the log column area. |
+
+### Market
+
+| Name | Description |
+| - | - |
+| `exchange.GetTicker` | Retrieves the Ticker structure (i.e., the market data) corresponding to the spot or contract of the currently configured trading pair and contract code. |
+| `exchange.GetTickers` | The ```exchange.GetTickers()``` function is used to retrieve aggregated market data from the exchange (an array of Ticker structures). |
+| `exchange.GetDepth` | Gets the Depth structure, i.e. |
+| `exchange.GetTrades` | Gets the Trade structure array of the spot or futures corresponding to the currently set trading pair and contract code, i.e. |
+| `exchange.GetRecords` | Get the Record structure array (i.e. |
+| `exchange.GetMarkets` | The ```exchange.GetMarkets()``` function is used to retrieve market information from the exchange. |
+| `exchange.GetRawJSON` | Get the raw content returned by the most recent ```rest``` request from the current exchange object (exchange, exchanges). |
+| `exchange.SetData` | The ```exchange.SetData()``` function is used to set the data loaded when the strategy is running. |
+| `exchange.GetData` | The ```exchange.GetData()``` function is used to retrieve data loaded by the ```exchange.SetData()``` function, or data provided by an external link. |
+
+### Trade
+
+| Name | Description |
+| - | - |
+| `exchange.Buy` | The ```exchange.Buy()``` function is used to place a buy order. |
+| `exchange.Sell` | The ```exchange.Sell()``` function is used to place a sell order. |
+| `exchange.CreateOrder` | ```exchange.CreateOrder()``` function is used to place orders. |
+| `exchange.ModifyOrder` | The ```exchange.ModifyOrder()``` function is used to modify an existing regular order, allowing you to modify the order's price and quantity. |
+| `exchange.CancelOrder` | The ```exchange.CancelOrder()``` function is used to cancel an order. |
+| `exchange.GetOrder` | The ```exchange.GetOrder()``` function is used to obtain order information. |
+| `exchange.GetOrders` | The ```exchange.GetOrders()``` function is used to obtain the current unfilled orders. |
+| `exchange.GetHistoryOrders` | ```exchange.GetHistoryOrders()``` function is used to retrieve the historical orders of the current trading pair or contract, and supports specifying a parti... |
+| `exchange.CreateConditionOrder` | The ```exchange.CreateConditionOrder()``` function is used to create a conditional order. |
+| `exchange.ModifyConditionOrder` | The ```exchange.ModifyConditionOrder()``` function is used to modify an existing conditional order, allowing modification of the order amount, trigger condit... |
+| `exchange.CancelConditionOrder` | ```exchange.CancelConditionOrder()``` function is used to cancel a conditional order. |
+| `exchange.GetConditionOrder` | The ```exchange.GetConditionOrder()``` function is used to retrieve information about a specified conditional order. |
+| `exchange.GetConditionOrders` | ```exchange.GetConditionOrders()``` function is used to obtain unfinished conditional orders (conditional orders that have not yet been triggered or canceled). |
+| `exchange.GetHistoryConditionOrders` | The ```exchange.GetHistoryConditionOrders()``` function is used to retrieve the historical conditional orders (including triggered, canceled, and expired con... |
+
+### Account
+
+| Name | Description |
+| - | - |
+| `exchange.GetAccount` | The ```exchange.GetAccount()``` function is used to request the exchange account information. |
+| `exchange.GetAssets` | The ```exchange.GetAssets``` function is used to request the asset information of the exchange account. |
+
+### Futures
+
+| Name | Description |
+| - | - |
+| `exchange.SetContractType` | The ```exchange.SetContractType()``` function is used to set the current contract code of the exchange exchange object. |
+| `exchange.GetContractType` | The ```exchange.GetContractType()``` function is used to get the contract code currently set for the exchange exchange object. |
+| `exchange.SetDirection` | The ```exchange.SetDirection()``` function is used to set the order direction when calling the exchange.Buy function or exchange.Sell function to place futur... |
+| `exchange.SetMarginLevel` | The ```exchange.SetMarginLevel()``` function is used to set the leverage value for the trading pair or contract specified by the ```symbol``` parameter. |
+| `exchange.GetPositions` | ```exchange.GetPositions()``` function is used to get position information; the ```GetPositions()``` function is a member function of the exchange object exc... |
+| `exchange.GetFundings` | The ```exchange.GetFundings()``` function is used to obtain the funding rate data for the current period. |
+
+### Exchange
+
+| Name | Description |
+| - | - |
+| `exchange.GetName` | The ```exchange.GetName()``` function is used to get the name of the exchange bound to the current exchange object. |
+| `exchange.GetLabel` | The ```exchange.GetLabel()``` function is used to obtain the custom label set when configuring the exchange object. |
+| `exchange.GetCurrency` | The ```exchange.GetCurrency()``` function is used to get the currently set trading pair. |
+| `exchange.SetCurrency` | The ```exchange.SetCurrency()``` function is used to switch the current trading pair of the exchange object exchange. |
+| `exchange.GetQuoteCurrency` | The ```exchange.GetQuoteCurrency()``` function is used to get the name of the quote currency of the current trading pair, i.e. |
+| `exchange.GetPeriod` | Retrieves the K-line period configured on the FMZ Quant Trading platform website page when running a strategy in backtesting or live trading, i.e., the defau... |
+| `exchange.SetMaxBarLen` | Set the maximum length of the K-line (candlestick chart). |
+| `exchange.SetPrecision` | The ```exchange.SetPrecision()``` function is used to set the precision of the **price** and **order amount** for the ```exchange``` exchange object. |
+| `exchange.GetRate` | Get the exchange rate currently set for the exchange object. |
+| `exchange.SetRate` | Sets the current exchange rate for the exchange object. |
+| `exchange.SetBase` | The ```exchange.SetBase()``` function is used to set the base URL of the exchange API interface used by the exchange exchange object. |
+| `exchange.GetBase` | The ```exchange.GetBase()``` function is used to get the base address of the current exchange API interface. |
+| `exchange.SetProxy` | The ```exchange.SetProxy()``` function is used to configure the proxy settings of the exchange exchange object. |
+| `exchange.SetTimeout` | The ```exchange.SetTimeout()``` function is used to set the timeout for ```rest``` requests of the exchange exchange object. |
+| `exchange.Encode` | The ```exchange.Encode()``` function is used to perform signature and encryption computations. |
+
+### IO
+
+| Name | Description |
+| - | - |
+| `exchange.IO` | ```exchange.IO()``` function is used to call other interfaces related to the exchange object. |
+| ```exchange.IO("api", ...)``` | ```exchange.IO("api", ...)``` calls a raw REST endpoint of the exchange that has no wrapper function; the platform signs the request. |
+| ```exchange.IO("currency", ...)``` | ```exchange.IO("currency", ...)``` switches the current trading pair of the exchange object at runtime. |
+| ```exchange.IO("base", ...)``` | ```exchange.IO("base", ...)``` switches the base address of the trading API, and ```exchange.IO("mbase", ...)``` that of the market data API. |
+| ```exchange.IO(mode, value)``` | ```exchange.IO(mode, value)``` switches trading modes of the exchange: simulated or live, cross or isolated margin, hedge or one-way positions, unified accou... |
+| ```exchange.IO("rate", ...)``` | ```exchange.IO("rate", ...)``` and ```exchange.IO("quota", ...)``` limit how often API functions are called. |
+
+### Network
+
+| Name | Description |
+| - | - |
+| `HttpQuery` | Sends an HTTP request. |
+| `HttpQuery_Go` | Sends an Http request. |
+| `Dial` | Used for raw ```Socket``` access, supporting the ```tcp```, ```udp```, ```tls```, and ```unix``` protocols. |
+| `Mail` | Send an email. |
+| `Mail_Go` | Asynchronous version of the ```Mail``` function. |
+
+### Storage
+
+| Name | Description |
+| - | - |
+| `_G` | Persistently store data. |
+| `DBExec` | Database interface function. |
+| `SetChannelData` | Publishes the latest status data to a channel. |
+| `GetChannelData` | Subscribes to the channel data of a specified live trading bot. |
+
+### Threads
+
+| Name | Description |
+| - | - |
+| `exchange.Go` | Multi-threaded asynchronous support function that can convert the operations of all supported functions into asynchronous concurrent execution. |
+| `EventLoop` | Listens for events and returns when any ```WebSocket``` has readable data, or when concurrent tasks such as ```exchange.Go()``` or ```HttpQuery_Go()``` compl... |
+
+#### Threads/threading
+
+| Name | Description |
+| - | - |
+| `Thread` | The ```Thread()``` function is used to create concurrent threads. |
+| `getThread` | The ```getThread()``` function is used to get a thread object based on the specified thread ID. |
+| `mainThread` | The ```mainThread()``` function is used to get the thread object of the main thread, which is the thread where the ```main()``` function in the strategy is l... |
+| `currentThread` | The ```currentThread()``` function is used to get the thread object of the current thread. |
+| `Lock` | The ```Lock()``` function is used to create a thread lock object. |
+| `Condition` | The ```Condition()``` function is used to create a condition variable object, which is used to implement synchronization and communication between threads in... |
+| `Event` | The ```Event()``` function is used to create a *thread event* object, which is used for synchronization between threads, allowing one thread to wait for noti... |
+| `Dict` | The ```Dict()``` function is used to create a dictionary object for passing and sharing data between concurrent threads. |
+| `Serve` | The ```Serve()``` function starts an HTTP, TCP or WebSocket (over HTTP) service inside the strategy process and returns a Server object. |
+| `pending` | The ```pending``` function is used to get the number of concurrent threads currently running in the strategy program. |
+
+#### Threads/Thread
+
+| Name | Description |
+| - | - |
+| `peekMessage` | The ```peekMessage()``` function is used to receive messages from a thread. |
+| `postMessage` | The ```postMessage()``` function is used to send messages to a thread. |
+| `join` | The ```join()``` function is used to wait for a thread to exit and reclaim system resources. |
+| `terminate` | The ```terminate()``` function is used to forcibly terminate a thread and release the hardware resources occupied when the thread was created. |
+| `getData` | The ```getData()``` function is used to access variables recorded in the thread environment. |
+| `setData` | The ```setData()``` function is used to store variables in the thread environment. |
+| `id` | The ```id()``` function is used to return the ```threadId``` of the current multi-threaded object instance. |
+| `name` | The ```name()``` function is used to return the name of the current multi-threaded object instance. |
+| `eventLoop` | The ```eventLoop()``` function is used to listen for events received by the current thread. |
+
+#### Threads/ThreadLock
+
+| Name | Description |
+| - | - |
+| `acquire` | The ```acquire()``` function is used to request a thread lock (acquire lock). |
+| `release` | The ```release()``` function is used to release a thread lock (unlock). |
+
+#### Threads/ThreadEvent
+
+| Name | Description |
+| - | - |
+| `set` | The ```set()``` function is used to set an event signal. |
+| `clear` | The ```clear()``` function is used to clear the signal. |
+| `wait` | The ```wait()``` function is used to set event (signal) waiting, which will block until the event (signal) is set; supports setting timeout parameters. |
+| `isSet` | The ```isSet()``` function is used to determine whether an event (signal) has been set. |
+
+#### Threads/ThreadCondition
+
+| Name | Description |
+| - | - |
+| `notify` | The ```notify()``` function is used to wake up one waiting thread (if any exists). |
+| `notifyAll` | The ```notifyAll()``` function is used to wake up all waiting threads. |
+| `wait` | The ```wait()``` function is used to put a thread into a waiting state under specific conditions. |
+| `acquire` | The ```acquire()``` function is used to request a thread lock (acquire lock). |
+| `release` | The ```release()``` function is used to release the thread lock (unlock). |
+
+#### Threads/ThreadDict
+
+| Name | Description |
+| - | - |
+| `get` | The ```get()``` function is used to retrieve the value of a key recorded in a dictionary object. |
+| `set` | The ```set()``` function is used to set key-value pairs. |
+
+#### Threads/Server
+
+| Name | Description |
+| - | - |
+| `addr` | The ```addr()``` function returns the address and port the service actually listens on. |
+| `close` | The ```close()``` function stops accepting new connections; handlers already running finish normally (graceful shutdown). |
+| `stop` | The ```stop()``` function closes the service (as ```close()```) and then terminates every handler thread that is still running. |
+| `join` | The ```join()``` function waits until the service is closed and no handler is running. |
+| `pending` | The ```pending()``` function returns the number of handlers currently running, i.e. |
+
+### Web3
+
+| Name | Description |
+| - | - |
+| ```exchange.IO("abi", ...)``` | On the FMZ Quant Trading Platform, various blockchain-related functions and calls are mainly implemented through the ```exchange.IO()``` function. |
+| ```exchange.IO("api", blockChain, ...)``` | The ```exchange.IO("api", "eth", ...)``` calling method is used to call Ethereum RPC methods (select eth when configuring the Web3 exchange object). |
+| ```exchange.IO("encode", ...)``` | The ```exchange.IO("encode", ...)``` function is called in this way for data encoding. |
+| ```exchange.IO("encodePacked", ...)``` | The ```exchange.IO("encodePacked", ...)``` function is used to perform ```encodePacked``` encoding operations. |
+| ```exchange.IO("decode", ...)``` | The ```exchange.IO("decode", ...)``` calling method is used to decode data. |
+| ```exchange.IO("hash", ...)``` | The ```exchange.IO("hash", ...)``` call computes hash digests and HMACs, signs with the private key configured on the exchange object, and so on. |
+| ```exchange.IO("key", ...)``` | The ```exchange.IO("key", ...)``` function is used to switch the private key calling method. |
+| ```exchange.IO("sign", ...)``` | The ```exchange.IO("sign", ...)``` calling method is used to sign a 32-byte hash with a secp256k1 private key and returns signature data such as r, s, and v. |
+| ```exchange.IO("signTypedData", ...)``` | The ```exchange.IO("signTypedData", ...)``` calling method is used to sign structured data according to the EIP-712 standard. |
+| ```exchange.IO("signMessage", ...)``` | The ```exchange.IO("signMessage", ...)``` calling method is used to sign messages according to the EIP-191 standard (```personal_sign```). |
+| ```exchange.IO("api", ...)``` | The ```exchange.IO("api", ...)``` calling method is used to call methods of smart contracts. |
+| ```exchange.IO("call", ...)``` | The ```exchange.IO("call", ...)``` calling method simulates the execution of any smart contract method (including write methods that modify on-chain state) v... |
+| ```exchange.IO("multicall", ...)``` | The ```exchange.IO("multicall", ...)``` calling method is used to batch-read the results of multiple contract calls in a single request through the Multicall... |
+| ```exchange.IO("logs", ...)``` | The ```exchange.IO("logs", ...)``` calling method is used to query the event logs of a contract (```eth_getLogs```) and decode them according to the ABI. |
+| ```exchange.IO("waitReceipt", ...)``` | The ```exchange.IO("waitReceipt", ...)``` calling method is used to wait for a transaction to be included on-chain and reach the specified number of confirma... |
+| ```exchange.IO("nonce", ...)``` | The ```exchange.IO("nonce", ...)``` function call is used to query, synchronize, or set the nonce counter used when sending transactions. |
+| ```exchange.IO("speedUp", ...)``` | The ```exchange.IO("speedUp", ...)``` call is used to resend a stuck transaction (one that has not been mined for a long time) with a higher fee: the recipie... |
+| ```exchange.IO("cancelTx", ...)``` | The ```exchange.IO("cancelTx", ...)``` calling method is used to cancel a transaction that has not yet been included on-chain: it sends a zero-amount transac... |
+| ```exchange.IO("toUnits", ...)``` | The ```exchange.IO("toUnits", ...)``` function call is used to convert a human-readable amount into an on-chain integer. |
+| ```exchange.IO("fromUnits", ...)``` | The ```exchange.IO("fromUnits", ...)``` calling method is used to convert an on-chain integer value into a human-readable amount. |
+| ```exchange.IO("uniswapV3", ...)``` | The ```exchange.IO("uniswapV3", ...)``` calling method is used for concentrated liquidity (Uniswap V3) related calculations, including conversions between ti... |
+| ```exchange.IO("contracts", ...)``` | The ```exchange.IO("contracts", ...)``` call is used to obtain commonly used contract addresses on the current chain (or a specified chain), including mainst... |
+| `exchange.IO("address")` | The ```exchange.IO("address")``` call returns the address of the wallet configured on the exchange object. |
+| ```exchange.IO("base", ...)``` | The ```exchange.IO("base", ...)``` calling method is used to set the RPC node address, and supports setting multiple nodes as backups for each other. |
+| ```exchange.IO("sendBase", ...)``` | The ```exchange.IO("sendBase", ...)``` call is used to set a node dedicated solely to broadcasting transactions. |
+
+### Uniswap
+
+| Name | Description |
+| - | - |
+| ```exchange.IO("transfer", ...)``` | The ```exchange.IO("transfer", ...)``` call transfers the chain's native coin (such as ETH or BNB) or an ERC20 token out of the wallet configured on the Unis... |
+| ```exchange.IO("receipt", ...)``` | When called as ```exchange.IO("receipt", ...)```, this function queries the receipt of a transaction sent by the Uniswap exchange object (such as an order or... |
+| ```exchange.IO("route", ...)``` | The ```exchange.IO("route", ...)``` call requests quotes on a Uniswap exchange object. |
+| ```exchange.IO("simulate", ...)``` | The ```exchange.IO("simulate", ...)``` call builds a swap transaction using the same order logic as the Uniswap exchange object (route selection, quoting and... |
+| ```exchange.IO("token", ...)``` | The ```exchange.IO("token", ...)``` call is used to register a token on a Uniswap exchange object, or to list the token table. |
+| ```exchange.IO("wrap", ...)``` | The ```exchange.IO("wrap", ...)``` call wraps the native coin (ETH, BNB) into the wrapped coin (WETH, WBNB) on a Uniswap exchange object: 1:1, no slippage, o... |
+| ```exchange.IO("unwrap", ...)``` | The ```exchange.IO("unwrap", ...)``` call unwraps the wrapped coin (WETH, WBNB) into the native coin (ETH, BNB) on a Uniswap exchange object: 1:1, no slippag... |
+| ```exchange.IO("approve", ...)``` | When called as ```exchange.IO("approve", ...)```, this function sets the token approval mode on a Uniswap exchange object. |
+| ```exchange.IO("slippage", ...)``` | When called this way, ```exchange.IO("slippage", ...)``` sets slippage protection for market orders on a Uniswap exchange object. |
+| ```exchange.IO("deadline", ...)``` | The ```exchange.IO("deadline", ...)``` call sets the transaction deadline on a Uniswap exchange object. |
+| ```exchange.IO("gasMultiplier", ...)``` | ```exchange.IO("gasMultiplier", ...)``` is used to set the gas limit multiplier on a Uniswap exchange object. |
+
+### TA
+
+| Name | Description |
+| - | - |
+| `TA.MACD` | The ```TA.MACD()``` function is used to calculate the **Moving Average Convergence Divergence (MACD) indicator**. |
+| `TA.KDJ` | The ```TA.KDJ()``` function is used to calculate the **Stochastic Oscillator (KDJ)**. |
+| `TA.RSI` | The ```TA.RSI()``` function is used to calculate the **Relative Strength Index (RSI)**. |
+| `TA.ATR` | The ```TA.ATR()``` function is used to calculate the **Average True Range indicator (ATR)**. |
+| `TA.OBV` | ```TA.OBV()``` function is used to calculate the **On-Balance Volume (OBV)**. |
+| `TA.MA` | The ```TA.MA()``` function is used to calculate the **Moving Average indicator (Moving Average)**. |
+| `TA.EMA` | The ```TA.EMA()``` function is used to calculate the **Exponential Moving Average (EMA) indicator**. |
+| `TA.BOLL` | The ```TA.BOLL()``` function is used to calculate the **Bollinger Bands indicator**. |
+| `TA.Alligator` | ```TA.Alligator()``` function is used to calculate the **Alligator indicator**. |
+| `TA.CMF` | The ```TA.CMF()``` function is used to calculate the **Chaikin Money Flow (CMF)** indicator. |
+| `TA.Highest` | The ```TA.Highest()``` function is used to calculate the **highest price within a period**. |
+| `TA.Lowest` | The ```TA.Lowest()``` function is used to calculate the **lowest price over a period**. |
+| `TA.SMA` | The ```TA.SMA()``` function is used to calculate the **Simple Moving Average (SMA) indicator**. |
+
+#### Talib/OverlapStudies
+
+| Name | Description |
+| - | - |
+| `talib.BBANDS` | The ```talib.BBANDS()``` function is used to calculate **Bollinger Bands**. |
+| `talib.DEMA` | The ```talib.DEMA()``` function is used to calculate **Double Exponential Moving Average**. |
+| `talib.EMA` | The ```talib.EMA()``` function is used to calculate **Exponential Moving Average**. |
+| `talib.HT_TRENDLINE` | The ```talib.HT_TRENDLINE()``` function is used to calculate **Hilbert Transform - Instantaneous Trendline**. |
+| `talib.KAMA` | The ```talib.KAMA()``` function is used to calculate **Kaufman Adaptive Moving Average**. |
+| `talib.MA` | The ```talib.MA()``` function is used to calculate **Moving average**. |
+| `talib.MAMA` | The ```talib.MAMA()``` function is used to calculate the **MESA Adaptive Moving Average**. |
+| `talib.MIDPOINT` | The ```talib.MIDPOINT()``` function is used to calculate **MidPoint over period**. |
+| `talib.MIDPRICE` | The ```talib.MIDPRICE()``` function is used to calculate **Midpoint Price over period**. |
+| `talib.SAR` | The ```talib.SAR()``` function is used to calculate the **Parabolic SAR (Stop and Reverse)** indicator. |
+| `talib.SAREXT` | The ```talib.SAREXT()``` function is used to calculate **Parabolic SAR - Extended**. |
+| `talib.SMA` | The ```talib.SMA()``` function is used to calculate **Simple Moving Average**. |
+| `talib.T3` | The ```talib.T3()``` function is used to calculate **Triple Exponential Moving Average (T3)**. |
+| `talib.TEMA` | The ```talib.TEMA()``` function is used to calculate **Triple Exponential Moving Average**. |
+| `talib.TRIMA` | The ```talib.TRIMA()``` function is used to calculate **Triangular Moving Average**. |
+| `talib.WMA` | The ```talib.WMA()``` function is used to calculate **Weighted Moving Average**. |
+
+#### Talib/MomentumIndicators
+
+| Name | Description |
+| - | - |
+| `talib.ADX` | The ```talib.ADX()``` function is used to calculate the **Average Directional Movement Index**. |
+| `talib.ADXR` | The ```talib.ADXR()``` function is used to calculate the **Average Directional Movement Index Rating**. |
+| `talib.APO` | The ```talib.APO()``` function is used to calculate **Absolute Price Oscillator**. |
+| `talib.AROON` | The ```talib.AROON()``` function is used to calculate **Aroon (Aroon Indicator)**. |
+| `talib.AROONOSC` | The ```talib.AROONOSC()``` function is used to calculate the **Aroon Oscillator**. |
+| `talib.BOP` | The ```talib.BOP()``` function is used to calculate **Balance Of Power**. |
+| `talib.CCI` | The ```talib.CCI()``` function is used to calculate the **Commodity Channel Index**. |
+| `talib.CMO` | The ```talib.CMO()``` function is used to calculate the **Chande Momentum Oscillator**. |
+| `talib.DX` | The ```talib.DX()``` function is used to calculate the **Directional Movement Index**. |
+| `talib.MACD` | The ```talib.MACD()``` function is used to calculate **Moving Average Convergence/Divergence**. |
+| `talib.MACDEXT` | The ```talib.MACDEXT()``` function is used to calculate **MACD with controllable MA type**. |
+| `talib.MACDFIX` | The ```talib.MACDFIX()``` function is used to calculate **Moving Average Convergence/Divergence Fix 12/26**. |
+| `talib.MFI` | The ```talib.MFI()``` function is used to calculate **Money Flow Index**. |
+| `talib.MINUS_DI` | The ```talib.MINUS_DI()``` function is used to calculate the **Minus Directional Indicator**. |
+| `talib.MINUS_DM` | The ```talib.MINUS_DM()``` function is used to calculate **Minus Directional Movement**. |
+| `talib.MOM` | The ```talib.MOM()``` function is used to calculate **Momentum (Momentum Indicator)**. |
+| `talib.PLUS_DI` | The ```talib.PLUS_DI()``` function is used to calculate the **Plus Directional Indicator**. |
+| `talib.PLUS_DM` | The ```talib.PLUS_DM()``` function is used to calculate **Plus Directional Movement**. |
+| `talib.PPO` | The ```talib.PPO()``` function is used to calculate **Percentage Price Oscillator**. |
+| `talib.ROC` | The ```talib.ROC()``` function is used to calculate the **Rate of Change indicator: ((price/prevPrice)-1)*100**. |
+| `talib.ROCP` | The ```talib.ROCP()``` function is used to calculate **Rate of change Percentage: (price-prevPrice)/prevPrice**. |
+| `talib.ROCR` | The ```talib.ROCR()``` function is used to calculate **Rate of change ratio: (price/prevPrice)**. |
+| `talib.ROCR100` | The ```talib.ROCR100()``` function is used to calculate **Rate of change ratio 100 scale: (price/prevPrice)*100**. |
+| `talib.RSI` | The ```talib.RSI()``` function is used to calculate the **Relative Strength Index**. |
+| `talib.STOCH` | The ```talib.STOCH()``` function is used to calculate the **Stochastic Oscillator (STOCH indicator)**. |
+| `talib.STOCHF` | The ```talib.STOCHF()``` function is used to calculate **Stochastic Fast**. |
+| `talib.STOCHRSI` | The ```talib.STOCHRSI()``` function is used to calculate the **Stochastic Relative Strength Index**. |
+| `talib.TRIX` | The ```talib.TRIX()``` function is used to calculate **1-day Rate-Of-Change (ROC) of a Triple Smooth EMA**. |
+| `talib.ULTOSC` | The ```talib.ULTOSC()``` function is used to calculate the **Ultimate Oscillator**. |
+| `talib.WILLR` | The ```talib.WILLR()``` function is used to calculate **Williams' %R (Williams Percent Range)**. |
+
+#### Talib/VolumeIndicators
+
+| Name | Description |
+| - | - |
+| `talib.AD` | The ```talib.AD()``` function is used to calculate the **Chaikin A/D Line (Accumulation/Distribution Line indicator)**. |
+| `talib.ADOSC` | The ```talib.ADOSC()``` function is used to calculate **Chaikin A/D Oscillator**. |
+| `talib.OBV` | The ```talib.OBV()``` function is used to calculate **On Balance Volume**. |
+
+#### Talib/VolatilityIndicators
+
+| Name | Description |
+| - | - |
+| `talib.ATR` | The ```talib.ATR()``` function is used to calculate the **Average True Range** indicator. |
+| `talib.NATR` | The ```talib.NATR()``` function is used to calculate **Normalized Average True Range**. |
+| `talib.TRANGE` | The ```talib.TRANGE()``` function is used to calculate the **True Range** indicator. |
+
+#### Talib/CycleIndicators
+
+| Name | Description |
+| - | - |
+| `talib.HT_DCPERIOD` | The ```talib.HT_DCPERIOD()``` function is used to calculate **Hilbert Transform - Dominant Cycle Period**. |
+| `talib.HT_DCPHASE` | The ```talib.HT_DCPHASE()``` function is used to calculate the **Hilbert Transform - Dominant Cycle Phase**. |
+| `talib.HT_PHASOR` | The ```talib.HT_PHASOR()``` function is used to calculate **Hilbert Transform - Phasor Components**. |
+| `talib.HT_SINE` | The ```talib.HT_SINE()``` function is used to calculate **Hilbert Transform - SineWave**. |
+| `talib.HT_TRENDMODE` | The ```talib.HT_TRENDMODE()``` function is used to calculate **Hilbert Transform - Trend vs Cycle Mode**. |
+
+#### Talib/PriceTransform
+
+| Name | Description |
+| - | - |
+| `talib.AVGPRICE` | The ```talib.AVGPRICE()``` function is used to calculate **Average Price**. |
+| `talib.MEDPRICE` | The ```talib.MEDPRICE()``` function is used to calculate **Median Price**. |
+| `talib.TYPPRICE` | The ```talib.TYPPRICE()``` function is used to calculate **Typical Price**. |
+| `talib.WCLPRICE` | The ```talib.WCLPRICE()``` function is used to calculate **Weighted Close Price**. |
+
+#### Talib/StatisticFunctions
+
+| Name | Description |
+| - | - |
+| `talib.LINEARREG` | The ```talib.LINEARREG()``` function is used to calculate the **Linear Regression** indicator. |
+| `talib.LINEARREG_ANGLE` | The ```talib.LINEARREG_ANGLE()``` function is used to calculate **Linear Regression Angle**. |
+| `talib.LINEARREG_INTERCEPT` | The ```talib.LINEARREG_INTERCEPT()``` function is used to calculate the **Linear Regression Intercept**. |
+| `talib.LINEARREG_SLOPE` | The ```talib.LINEARREG_SLOPE()``` function is used to calculate **Linear Regression Slope**. |
+| `talib.STDDEV` | The ```talib.STDDEV()``` function is used to calculate **Standard Deviation**. |
+| `talib.TSF` | The ```talib.TSF()``` function is used to calculate **Time Series Forecast**. |
+| `talib.VAR` | The ```talib.VAR()``` function is used to calculate **Variance**. |
+
+#### Talib/MathTransform
+
+| Name | Description |
+| - | - |
+| `talib.ACOS` | The ```talib.ACOS()``` function is used to calculate **Vector Trigonometric ACos**. |
+| `talib.ASIN` | The ```talib.ASIN()``` function is used to calculate **Vector Trigonometric ASin**. |
+| `talib.ATAN` | The ```talib.ATAN()``` function is used to calculate **Vector Trigonometric ATan**. |
+| `talib.CEIL` | The ```talib.CEIL()``` function is used to calculate **Vector Ceil**. |
+| `talib.COS` | The ```talib.COS()``` function is used to calculate **Vector Trigonometric Cos**. |
+| `talib.COSH` | The ```talib.COSH()``` function is used to calculate **Vector Trigonometric Cosh**. |
+| `talib.EXP` | The ```talib.EXP()``` function is used to calculate **Vector Arithmetic Exp**. |
+| `talib.FLOOR` | The ```talib.FLOOR()``` function is used to calculate **Vector Floor**. |
+| `talib.LN` | The ```talib.LN()``` function is used to calculate **Vector Log Natural**. |
+| `talib.LOG10` | The ```talib.LOG10()``` function is used to calculate **Vector Log10 (logarithm function)**. |
+| `talib.SIN` | The ```talib.SIN()``` function is used to calculate **Vector Trigonometric Sin**. |
+| `talib.SINH` | The ```talib.SINH()``` function is used to calculate **Vector Trigonometric Sinh**. |
+| `talib.SQRT` | The ```talib.SQRT()``` function is used to calculate **Vector Square Root**. |
+| `talib.TAN` | The ```talib.TAN()``` function is used to calculate **Vector Trigonometric Tan**. |
+| `talib.TANH` | The ```talib.TANH()``` function is used to calculate **Vector Trigonometric Tanh**. |
+
+#### Talib/MathOperators
+
+| Name | Description |
+| - | - |
+| `talib.MAX` | The ```talib.MAX()``` function is used to calculate the **Highest value over a specified period**. |
+| `talib.MAXINDEX` | The ```talib.MAXINDEX()``` function is used to calculate the **Index of highest value over a specified period**. |
+| `talib.MIN` | The ```talib.MIN()``` function is used to calculate the **Lowest value over a specified period**. |
+| `talib.MININDEX` | The ```talib.MININDEX()``` function is used to calculate the **Index of lowest value over a specified period**. |
+| `talib.MINMAX` | The ```talib.MINMAX()``` function is used to calculate the **Lowest and highest values over a specified period**. |
+| `talib.MINMAXINDEX` | The ```talib.MINMAXINDEX()``` function is used to calculate **Indexes of lowest and highest values over a specified period**. |
+| `talib.SUM` | The ```talib.SUM()``` function is used to calculate **Summation**. |
+
+#### Talib/PatternRecognition
+
+| Name | Description |
+| - | - |
+| `talib.CDL2CROWS` | The ```talib.CDL2CROWS()``` function is used to calculate **Two Crows (K-line pattern - Two Crows)**. |
+| `talib.CDL3BLACKCROWS` | The ```talib.CDL3BLACKCROWS()``` function is used to calculate **Three Black Crows (K-line pattern - Three Black Crows)**. |
+| `talib.CDL3INSIDE` | The ```talib.CDL3INSIDE()``` function is used to calculate **Three Inside Up/Down (Candlestick Pattern: Three Inside Up/Down)**. |
+| `talib.CDL3LINESTRIKE` | The ```talib.CDL3LINESTRIKE()``` function is used to calculate **Three-Line Strike (Candlestick Pattern: Three-Line Strike)**. |
+| `talib.CDL3OUTSIDE` | The ```talib.CDL3OUTSIDE()``` function is used to calculate **Three Outside Up/Down (Candlestick Pattern: Three Outside)**. |
+| `talib.CDL3STARSINSOUTH` | The ```talib.CDL3STARSINSOUTH()``` function is used to calculate **Three Stars In The South (Candlestick Pattern: Three Stars In The South)**. |
+| `talib.CDL3WHITESOLDIERS` | The ```talib.CDL3WHITESOLDIERS()``` function is used to calculate **Three Advancing White Soldiers (K-line pattern: Three White Soldiers)**. |
+| `talib.CDLABANDONEDBABY` | The ```talib.CDLABANDONEDBABY()``` function is used to calculate **Abandoned Baby (Candlestick Pattern: Abandoned Baby)**. |
+| `talib.CDLADVANCEBLOCK` | The ```talib.CDLADVANCEBLOCK()``` function is used to calculate **Advance Block (Candlestick Pattern: Advance Block)**. |
+| `talib.CDLBELTHOLD` | The ```talib.CDLBELTHOLD()``` function is used to calculate **Belt-hold (Candlestick Pattern: Belt-hold)**. |
+| `talib.CDLBREAKAWAY` | The ```talib.CDLBREAKAWAY()``` function is used to calculate **Breakaway (Candlestick Pattern: Breakaway Pattern)**. |
+| `talib.CDLCLOSINGMARUBOZU` | The ```talib.CDLCLOSINGMARUBOZU()``` function is used to calculate the **Closing Marubozu** candlestick pattern. |
+| `talib.CDLCONCEALBABYSWALL` | The ```talib.CDLCONCEALBABYSWALL()``` function is used to calculate **Concealing Baby Swallow (Candlestick Pattern: Concealing Baby Swallow)**. |
+| `talib.CDLCOUNTERATTACK` | The ```talib.CDLCOUNTERATTACK()``` function is used to calculate **Counterattack Lines (K-Line Pattern: Counterattack)**. |
+| `talib.CDLDARKCLOUDCOVER` | The ```talib.CDLDARKCLOUDCOVER()``` function is used to calculate **Dark Cloud Cover candlestick pattern**. |
+| `talib.CDLDOJI` | The ```talib.CDLDOJI()``` function is used to calculate **Doji (K-line pattern: Doji Star)**. |
+| `talib.CDLDOJISTAR` | The ```talib.CDLDOJISTAR()``` function is used to calculate **Doji Star (Candlestick Pattern: Doji Star)**. |
+| `talib.CDLDRAGONFLYDOJI` | The ```talib.CDLDRAGONFLYDOJI()``` function is used to calculate **Dragonfly Doji (Candlestick Pattern: Dragonfly Doji)**. |
+| `talib.CDLENGULFING` | The ```talib.CDLENGULFING()``` function is used to calculate **Engulfing Pattern**. |
+| `talib.CDLEVENINGDOJISTAR` | The ```talib.CDLEVENINGDOJISTAR()``` function is used to calculate **Evening Doji Star (K-line pattern: Evening Doji Star)**. |
+| `talib.CDLEVENINGSTAR` | The ```talib.CDLEVENINGSTAR()``` function is used to calculate the **Evening Star** candlestick pattern. |
+| `talib.CDLGAPSIDESIDEWHITE` | The ```talib.CDLGAPSIDESIDEWHITE()``` function is used to calculate **Up/Down-gap side-by-side white lines (K-line pattern: Up/Down-gap side-by-side white li... |
+| `talib.CDLGRAVESTONEDOJI` | The ```talib.CDLGRAVESTONEDOJI()``` function is used to calculate the **Gravestone Doji** candlestick pattern. |
+| `talib.CDLHAMMER` | The ```talib.CDLHAMMER()``` function is used to calculate **Hammer (Candlestick Pattern: Hammer)**. |
+| `talib.CDLHANGINGMAN` | The ```talib.CDLHANGINGMAN()``` function is used to calculate **Hanging Man (Candlestick Pattern: Hanging Man)**. |
+| `talib.CDLHARAMI` | The ```talib.CDLHARAMI()``` function is used to calculate **Harami Pattern (K-line chart: bullish/bearish pattern)**. |
+| `talib.CDLHARAMICROSS` | The ```talib.CDLHARAMICROSS()``` function is used to calculate **Harami Cross Pattern (Candlestick Pattern: Harami Cross)**. |
+| `talib.CDLHIGHWAVE` | The ```talib.CDLHIGHWAVE()``` function is used to calculate **High-Wave Candle (Candlestick Pattern: High Wave Candle)**. |
+| `talib.CDLHIKKAKE` | The ```talib.CDLHIKKAKE()``` function is used to calculate **Hikkake Pattern (Candlestick: Trap Pattern)**. |
+| `talib.CDLHIKKAKEMOD` | The ```talib.CDLHIKKAKEMOD()``` function is used to calculate **Modified Hikkake Pattern (Candlestick: Modified Hikkake Pattern)**. |
+| `talib.CDLHOMINGPIGEON` | The ```talib.CDLHOMINGPIGEON()``` function is used to calculate **Homing Pigeon (Candlestick Pattern: Homing Pigeon)**. |
+| `talib.CDLIDENTICAL3CROWS` | The ```talib.CDLIDENTICAL3CROWS()``` function is used to calculate **Identical Three Crows (Candlestick Pattern: Identical Three Crows)**. |
+| `talib.CDLINNECK` | The ```talib.CDLINNECK()``` function is used to calculate **In-Neck Pattern (Candlestick Chart: In-Neck Pattern)**. |
+| `talib.CDLINVERTEDHAMMER` | The ```talib.CDLINVERTEDHAMMER()``` function is used to calculate **Inverted Hammer (K-Line Pattern: Inverted Hammer)**. |
+| `talib.CDLKICKING` | The ```talib.CDLKICKING()``` function is used to calculate **Kicking (Candlestick Pattern: Kicking Pattern)**. |
+| `talib.CDLKICKINGBYLENGTH` | The ```talib.CDLKICKINGBYLENGTH()``` function is used to calculate **Kicking - bull/bear determined by the longer marubozu (K-line pattern: Kicking Bull/Bear... |
+| `talib.CDLLADDERBOTTOM` | The ```talib.CDLLADDERBOTTOM()``` function is used to calculate **Ladder Bottom (Candlestick Pattern: Ladder Bottom)**. |
+| `talib.CDLLONGLEGGEDDOJI` | The ```talib.CDLLONGLEGGEDDOJI()``` function is used to calculate **Long Legged Doji (Candlestick Pattern: Long Legged Doji)**. |
+| `talib.CDLLONGLINE` | The ```talib.CDLLONGLINE()``` function is used to calculate **Long Line Candle Pattern (Candlestick Chart: Long Line)**. |
+| `talib.CDLMARUBOZU` | The ```talib.CDLMARUBOZU()``` function is used to calculate the **Marubozu (Candlestick Pattern: Shaven Head and Bottom)** pattern. |
+| `talib.CDLMATCHINGLOW` | The ```talib.CDLMATCHINGLOW()``` function is used to calculate **Matching Low (Candlestick Pattern: Matching Low)**. |
+| `talib.CDLMATHOLD` | The ```talib.CDLMATHOLD()``` function is used to calculate **Mat Hold (Candlestick Pattern: Mat Hold)**. |
+| `talib.CDLMORNINGDOJISTAR` | The ```talib.CDLMORNINGDOJISTAR()``` function is used to calculate **Morning Doji Star (Candlestick Pattern: Morning Doji Star)**. |
+| `talib.CDLMORNINGSTAR` | The ```talib.CDLMORNINGSTAR()``` function is used to calculate **Morning Star (Candlestick Pattern: Morning Star)**. |
+| `talib.CDLONNECK` | The ```talib.CDLONNECK()``` function is used to calculate **On-Neck Pattern (Candlestick Chart: On-Neck Pattern)**. |
+| `talib.CDLPIERCING` | The ```talib.CDLPIERCING()``` function is used to calculate **Piercing Pattern (Candlestick Pattern: Piercing Pattern)**. |
+| `talib.CDLRICKSHAWMAN` | The ```talib.CDLRICKSHAWMAN()``` function is used to calculate **Rickshaw Man (Candlestick Pattern: Rickshaw Man)**. |
+| `talib.CDLRISEFALL3METHODS` | The ```talib.CDLRISEFALL3METHODS()``` function is used to calculate **Rising/Falling Three Methods (Candlestick Pattern: Rising/Falling Three Methods)**. |
+| `talib.CDLSEPARATINGLINES` | The ```talib.CDLSEPARATINGLINES()``` function is used to calculate **Separating Lines Pattern (Candlestick Chart: Separating Lines)**. |
+| `talib.CDLSHOOTINGSTAR` | The ```talib.CDLSHOOTINGSTAR()``` function is used to calculate **Shooting Star (Candlestick Pattern: Shooting Star)**. |
+| `talib.CDLSHORTLINE` | The ```talib.CDLSHORTLINE()``` function is used to calculate **Short Line Candle Pattern (K-Line: Short Line)**. |
+| `talib.CDLSPINNINGTOP` | The ```talib.CDLSPINNINGTOP()``` function is used to calculate **Spinning Top (Candlestick Pattern: Spinning Top)**. |
+| `talib.CDLSTALLEDPATTERN` | The ```talib.CDLSTALLEDPATTERN()``` function is used to calculate **Stalled Pattern (Candlestick Pattern: Stalled Pattern)**. |
+| `talib.CDLSTICKSANDWICH` | The ```talib.CDLSTICKSANDWICH()``` function is used to calculate **Stick Sandwich (Candlestick Pattern: Stick Sandwich)**. |
+| `talib.CDLTAKURI` | The ```talib.CDLTAKURI()``` function is used to calculate **Takuri (Dragonfly Doji with very long lower shadow)** candlestick pattern. |
+| `talib.CDLTASUKIGAP` | The ```talib.CDLTASUKIGAP()``` function is used to calculate **Tasuki Gap (Candlestick Pattern: Tasuki Gap)**. |
+| `talib.CDLTHRUSTING` | The ```talib.CDLTHRUSTING()``` function is used to calculate **Thrusting Pattern (Candlestick Pattern: Thrusting Pattern)**. |
+| `talib.CDLTRISTAR` | The ```talib.CDLTRISTAR()``` function is used to calculate **Tristar Pattern (Candlestick Chart: Tristar Pattern)**. |
+| `talib.CDLUNIQUE3RIVER` | The ```talib.CDLUNIQUE3RIVER()``` function is used to calculate **Unique 3 River (Candlestick Pattern: Unique Three River)**. |
+| `talib.CDLUPSIDEGAP2CROWS` | The ```talib.CDLUPSIDEGAP2CROWS()``` function is used to calculate **Upside Gap Two Crows (Candlestick Pattern: Two Crows)**. |
+| `talib.CDLXSIDEGAP3METHODS` | The ```talib.CDLXSIDEGAP3METHODS()``` function is used to calculate **Upside/Downside Gap Three Methods (Candlestick Pattern Recognition)**. |
+
+### OS
+
+| Name | Description |
+| - | - |
+| `ListFilesResult` | File list object used to record directory listing information. |
+| `FileStat` | File statistics information object. |
+
+#### OS/os
+
+| Name | Description |
+| - | - |
+| `open` | Open a file in the specified mode. |
+| `fgets` | Read the entire file content at once. |
+| `fputs` | Write content to a file. |
+| `mmap` | Memory-mapped file, returns the binary data of the file. |
+| `getRootDir` | Get the root directory path for file operations. |
+| `listFiles` | List files and subdirectories in the specified directory. |
+| `exists` | Check if the specified file or directory exists. |
+| `remove` | Delete the specified file. |
+| `mkdir` | Create a directory. |
+| `rmdir` | Remove a directory and all its contents. |
+| `rename` | Rename a file or move a file. |
+| `stat` | Get detailed statistics information of a file. |
+| `exit` | Exit the program. |
+
+#### OS/File
+
+| Name | Description |
+| - | - |
+| `close` | Close the file and release associated resources. |
+| `puts` | Write one or more strings to a file. |
+| `printf` | Write formatted data to file. |
+| `flush` | Flush the file buffer to ensure data is written to disk. |
+| `tell` | Get the current file pointer position. |
+| `seek` | Move the file pointer to a specified position. |
+| `eof` | Check if the file pointer has reached the end of file. |
+| `read` | Read data from a file. |
+| `write` | Write string data to a file. |
+| `getline` | Read the next line from the file. |
+| `toString` | Get the string representation of the file object. |
+
+## Structures
+
+| Name | Description |
+| - | - |
+| `Ticker` | Market data structure. |
+| `Depth` | Market depth data structure. |
+| `OrderBook` | Order structure in market depth. |
+| `Trade` | Data structure for market trade records. |
+| `Record` | Data structure for candlestick bars in standard OHLC format, used for charting candlesticks and calculating technical indicators. |
+| `Market` | Data structure for trading symbol market information. |
+| `Order` | Order structure. |
+| `Condition` | Conditional order configuration structure, used to set trigger conditions and execution prices for conditional orders. |
+| `Account` | Data structure for account information. |
+| `Asset` | Data structure for specific currency asset information. |
+| `Position` | Data structure for contract position information. |
+| `Funding` | Data structure for trading instrument funding rate information, only cryptocurrency perpetual contracts support funding rate functionality. |
+
+### OtherStruct
+
+| Name | Description |
+| - | - |
+| `HttpQuery-options` | This JSON structure is used to configure various parameters for HTTP requests sent by HttpQuery and HttpQuery_Go functions. |
+| `HttpQuery-return` | This JSON structure is the data structure returned by the HttpQuery function in debug mode, when the debug field is set to true in the ```options``` paramete... |
+| `LogStatus-table` | This JSON structure is used to configure the table content displayed in the strategy status bar. |
+| `LogStatus-btnTypeOne` | This JSON structure is used to configure button controls in the status bar. |
+| `LogStatus-btnTypeTwo` | This JSON structure is used to configure button controls in the status bar. |
+| `Chart-options` | This JSON is used to configure chart settings for the custom plotting function ```Chart()```. |
+| `KLineChart-options` | This JSON is used to configure the chart settings for the custom drawing function ```KLineChart```. |
+| `SetData-data` | This JSON is used to set the data to be loaded by the ```exchange.SetData()``` function. |
+| `EventLoop-return` | This JSON is the data structure returned by the ```EventLoop()``` function. |
+| `DBExec-return` | This JSON is the data structure returned by the ```DBExec()``` function; this JSON data structure is also returned when executing SQL statements using the ``... |
+| `Thread.join-return` | This JSON is the data structure returned by the ```join()``` member function of the ```Thread``` object, used to store information related to concurrent thre... |
+
+## Built-in Variables and Constants
+
+### EXCHANGE
+
+| Name | Description |
+| - | - |
+| `exchange` | exchange is an exchange object, and it is also the first exchange object added in the strategy live trading settings and backtesting settings. |
+| `exchanges` | exchanges is an array of exchange objects that contains all the exchange objects added in the strategy's live trading settings or backtesting settings, where... |
+
+### ORDER_STATE
+
+| Name | Description |
+| - | - |
+| `ORDER_STATE_PENDING` | ORDER_STATE_PENDING is the value of the ```Status``` property in the Order structure, indicating that the order status is pending. |
+| `ORDER_STATE_CLOSED` | ORDER_STATE_CLOSED is the value of the ```Status``` property in the Order structure, indicating that the order status is completed. |
+| `ORDER_STATE_CANCELED` | ORDER_STATE_CANCELED is the value of the ```Status``` property in the Order structure, indicating that the order status is canceled. |
+| `ORDER_STATE_UNKNOWN` | ORDER_STATE_UNKNOWN is the value of the ```Status``` property in the Order structure, indicating that the order status is unknown (other status). |
+
+### ORDER_TYPE
+
+| Name | Description |
+| - | - |
+| `ORDER_TYPE_BUY` | ORDER_TYPE_BUY is the value of the ```Type``` property in the Order structure, representing a buy order type. |
+| `ORDER_TYPE_SELL` | ORDER_TYPE_SELL is the ```Type``` property value in the Order structure, used to indicate a sell order type. |
+
+### ORDER_CONDITION_TYPE
+
+| Name | Description |
+| - | - |
+| `ORDER_CONDITION_TYPE_OCO` | ORDER_CONDITION_TYPE_OCO is the value of the ```ConditionType``` property in the Condition structure, representing OCO orders (One-Cancels-the-Other). |
+| `ORDER_CONDITION_TYPE_TP` | ORDER_CONDITION_TYPE_TP is the ```ConditionType``` attribute value in the Condition structure, representing a Take Profit order. |
+| `ORDER_CONDITION_TYPE_SL` | ORDER_CONDITION_TYPE_SL is the ```ConditionType``` attribute value in the Condition structure, representing a Stop Loss order. |
+| `ORDER_CONDITION_TYPE_GENERIC` | ORDER_CONDITION_TYPE_GENERIC is the ```ConditionType``` property value in the Condition structure, representing a generic conditional order. |
+
+### POSITION_DIRECTION
+
+| Name | Description |
+| - | - |
+| `PD_LONG` | PD_LONG is the value of the ```Type``` property in the Position structure, representing a long position type. |
+| `PD_SHORT` | PD_SHORT is the value of the ```Type``` property in the Position structure, representing a short position type. |
+
+### ORDER_OFFSET
+
+| Name | Description |
+| - | - |
+| `ORDER_OFFSET_OPEN` | ORDER_OFFSET_OPEN is a value for the ```Offset``` property in the Order structure, indicating that the order is an opening position operation. |
+| `ORDER_OFFSET_CLOSE` | ORDER_OFFSET_CLOSE is a value for the ```Offset``` property in the Order structure, indicating that the order is in the close position direction. |
+
+### PERIOD
+
+| Name | Description |
+| - | - |
+| `PERIOD_M1` | Constant representing 1-minute candlestick period, with a value of 60. |
+| `PERIOD_M3` | Constant representing the 3-minute candlestick period, with a value of 180. |
+| `PERIOD_M5` | Constant representing the 5-minute candlestick period, with a value of 300. |
+| `PERIOD_M15` | Constant representing the 15-minute candlestick period, with a value of 900. |
+| `PERIOD_M30` | Constant representing the 30-minute candlestick period, with a value of 1800 seconds. |
+| `PERIOD_H1` | Constant representing 1-hour candlestick period, with a value of 3600. |
+| `PERIOD_H2` | Constant representing the 2-hour candlestick period, with a value of 7200. |
+| `PERIOD_H4` | Constant representing the 4-hour candlestick period, with a value of 14400. |
+| `PERIOD_H6` | Constant representing the 6-hour candlestick period, with a value of 21600. |
+| `PERIOD_H12` | Constant representing the 12-hour candlestick period, with a value of 43200. |
+| `PERIOD_D1` | Constant representing 1-day candlestick period, with a value of 86400. |
+| `PERIOD_D3` | Constant representing the 3-day candlestick period, with a value of 259200. |
+| `PERIOD_W1` | Constant representing 1-week candlestick period, with a value of 604800 seconds. |
+
+### LOG_TYPE
+
+| Name | Description |
+| - | - |
+| `LOG_TYPE_BUY` | LOG_TYPE_BUY is an optional value for the ```LogType``` parameter of the exchange.Log function, used to set the log type printed by the ```exchange.Log``` fu... |
+| `LOG_TYPE_SELL` | LOG_TYPE_SELL is an optional value for the ```LogType``` parameter of the exchange.Log function, used to set the ```exchange.Log``` function to print sell or... |
+| `LOG_TYPE_CANCEL` | LOG_TYPE_CANCEL is an optional value for the ```LogType``` parameter of the exchange.Log function, used to set the ```exchange.Log``` function to print order... |
+
+### Strategy Parameters
+
+Parameters set in the strategy interface appear in the strategy code as global variables with the same names (global constants in Rust) and are accessed by name:
+- ```JavaScript```, ```MyLanguage```: parameters can be read directly and the parameter variables can also be modified in code.
+- ```Python```: parameters can be read directly; to assign a new value to one inside a function, declare it with ```global``` first.
+- ```Rust```: parameters are constants that can only be read, not modified; see Programming Languages → Rust for the type of each kind of parameter.
+- ```PINE```: interface parameters are created with the ```input()``` function.
+- ```Blockly Visual```: there are no interface parameters.
+
+![Strategy Parameter Settings Interface](https://www.fmz.com/upload/asset/2e46b5e593de3b2f11445.png)
+
+#### Interface Parameter Types
+
+| Variable (naming example) | Description | Type | Default Value (description) | Component Configuration (description) | Remarks |
+| - | - | - | - | - | - |
+| pNum       | Description of parameter pNum       | Numeric (number)     | Example: Set default value to 100; f64 in Rust strategies| Used to set the interface control bound to the current parameter: component type, minimum value, maximum value, grouping, filters, etc. | Remarks for parameter pNum, the value of pNum is numeric type |
+| pBool      | Description of parameter pBool      | Boolean (true/false) | Use switch control to set default value, optional control not supported | Same as above                                                          | Remarks for parameter pBool, the value of pBool is boolean type |
+| pStr       | Description of parameter pStr       | String (string)     | Example: Set default value to abc               | Same as above                                                          | Remarks for parameter pStr, the value of pStr is string type |
+| pCombox    | Description of parameter pCombox    | Dropdown (selected)   | Set one or more options from the options      | Same as above                                                          | Remarks for parameter pCombox, the value of pCombox may have various forms |
+| pSecretStr | Description of parameter pSecretStr | Encrypted string (string)     | Example: Set default value to xyz               | Same as above                                                          | Remarks for parameter pSecretStr, the value of pSecretStr is string type |
+
+Interface parameters are configured in the strategy parameters area below the code editor on the strategy editing page. Please note the following:
+1. In the default value option of parameter settings, the "Optional" control is optional by default. You can change the state of this control to set the current parameter as required. After setting a parameter as required, if the parameter is not set during backtesting or live trading, backtesting cannot be performed or live trading cannot be started.
+2. Variable names for interface parameters in strategy code should not use reserved words (keywords) of the current programming language.
+3. In the backtesting or live trading interface, hovering the mouse over the control bound to a parameter will display the parameter's remarks.
+4. The "Description" of a parameter is the display name of the control bound to the parameter.
+5. The "Variable" of a parameter refers to those in the table above: ```pNum```, ```pBool```, ```pStr```, ```pCombox```, ```pSecretStr```. They exist as global variables in the strategy code, so the values of strategy parameters can be modified in the code (except in Rust, where parameters are global constants and cannot be modified).
+6. For "Encrypted string" and "String" type parameters, no quotes are needed when entering default values; all input is treated as strings. "Encrypted string" parameters are used the same way as "String" parameters, but encrypted strings are transmitted encrypted and not sent in plain text.
+7. If a "String" type parameter is set to "Optional", when no parameter is filled in the control bound to the parameter, the value of the parameter variable is **empty string**;
+  Similarly, the value of a "Numeric" parameter is **null**;
+  Similarly, the value of a "Dropdown" parameter is **null**;
+  Similarly, the value of an "Encrypted string" parameter is **null**.
+  In ```Rust``` strategies, an optional parameter that is left empty has the zero value of its type: ```0``` for numbers, an empty string for strings and encrypted strings, ```false``` for booleans.
+8. For dropdown type interface parameters (e.g., variable name ```pCombox```), when "Support multiple selection" is not enabled in "Component Configuration", the value of pCombox is the index or specific data of the currently selected option (when data is bound to options).
+  If "Support multiple selection" is enabled, the value of pCombox is an array containing the indices or specific data of all currently selected options (when data is bound to options).
+
+#### Component Configuration
+
+Both strategy interface parameters and strategy interactive controls have a "Component Configuration" option. It sets the UI control used for the parameter (or interactive control), as well as the minimum, maximum, group, filter and so on.
+
+Components supported by each type:
+- Number (number)
+  Input box (default), time picker, slider.
+- Boolean (true/false)
+  Switch only (default).
+- String (string)
+  Input box (default), text box, time picker, color picker, currency, trading symbol.
+- Dropdown (selected)
+  Dropdown (default), segmented control, currency, trading symbol.
+- Encrypted string (string), strategy parameters only
+  Encrypted input box only (default).
+- Button (button), interactive controls only
+  A single button (default), with no input.
+
+**Group**
+
+Enter a label in the "Group" box of the component configuration to put several strategy parameters in the same group (replacing the platform's old "Strategy Grouping" feature). Interactive controls can be grouped the same way (replacing the old "Interactive Control Grouping" feature).
+
+**Filter**
+
+In the component configuration of a strategy parameter, the "Filter" box takes a condition expression that controls whether the parameter is available (replacing the platform's old "Parameter Dependency" feature).
+The filter is empty by default, meaning no filtering. Expressions such as ```a > b```, ```a == 1```, ```a```, ```!a``` and ```a >= 1 && a <= 10``` can be used. The parameter is available when the condition is true.
+- With the filter ```a == 1```, the parameter's availability depends on the value of parameter ```a```: it is available when ```a``` equals 1, otherwise not.
+- With the filter ```a >= 1 && a <= 10```, the parameter is available when ```a``` is greater than or equal to 1 and less than or equal to 10, otherwise not.
+- With the filter ```!a```, the condition is "not a"; ```a``` can be a boolean or a number (```!0``` is true).
+
+#### Save Parameter Settings
+
+- Parameter saving in the backtesting system
+  When backtesting, if you want to save the strategy parameters, you can click the "Save Backtest Settings" button after modifying the strategy parameters. For details, see Backtesting System → Backtest Configuration and Saving.
+
+  | Variable | Description | Type | Default Value |
+  | - | - | - | - |
+  |number |Numeric type |Number (number) |1 |
+  |string |String |String (string) |Hello FMZ |
+  |combox |Dropdown box |Dropdown (selected) |1\|2\|3|
+  |bool |Boolean value |Boolean (true/false) |true |
+  |numberA@isShowA |Numeric A |Number (number) |2 |
+  |isShowA |Whether to display the numberA parameter |Boolean (true/false) |false |
+
+  The configured strategy parameters will be saved in the strategy in the form of code, for example:
+
+  ```js
+  /*backtest
+  start: 2020-02-29 00:00:00
+  end: 2020-03-29 00:00:00
+  period: 1d
+  args: [["number",2],["string","Hello FMZ.COM"],["combox",2],["bool",false],["numberA@isShowA",666],["isShowA",true]]
+  */
+  ```
+
+  ```python
+  '''backtest
+  start: 2020-02-29 00:00:00
+  end: 2020-03-29 00:00:00
+  period: 1d
+  args: [["number",2],["string","Hello FMZ.COM"],["combox",2],["bool",false],["numberA@isShowA",666],["isShowA",true]]
+  '''
+  ```
+
+  ```rust
+  /*backtest
+  start: 2020-02-29 00:00:00
+  end: 2020-03-29 00:00:00
+  period: 1d
+  args: [["number",2],["string","Hello FMZ.COM"],["combox",2],["bool",false],["numberA@isShowA",666],["isShowA",true]]
+  */
+  ```
+
+  If a ```Rust``` strategy declares dependencies in a frontmatter block at the top, the backtest configuration block must come after the frontmatter (see Programming Languages → Rust).
+- Importing and exporting live trading parameters
+  When running live trading, if you need to save the parameter data of the live trading configuration, you can click the "Parameter Settings" option on the strategy live trading page, then click the "Export Parameters" button. The exported strategy parameters will be saved as a ```json``` file.
+  The exported strategy parameter configuration can also be imported into live trading again. Click the "Import Parameters" button to import the saved strategy live trading parameters into the current live trading, and after importing, click the "Update Parameters" button to save and apply them.
+
+### Interactive Controls
+
+Strategies in ```JavaScript```, ```Python```, ```Rust``` and MyLanguage can have interactive controls, which send interaction commands to the strategy while it is running live. In ```JavaScript```, ```Python``` and ```Rust``` strategies, the messages produced by interactive controls are read with the `GetCommand` function. The "Component Configuration" of interactive controls is the same as for strategy parameters (see Strategy Parameters → Component Configuration).
+
+![Interactive Controls](https://www.fmz.com/upload/asset/2e4320d0cc33c15eb935d.png)
+
+With code in the strategy that handles interactive control messages, interactive controls in live trading can be used for (among other things):
+- Manually closing the strategy's positions.
+- Changing strategy parameters dynamically without restarting the live trading.
+- Switching strategy logic.
+- Printing debugging information or data to test a feature.
+
+#### Types of Interactive Controls
+
+| Variable (naming example) | Description | Type | Default Value (description) | Component Configuration (description) | Notes |
+| - | - | - | - | - | - |
+| cmdNum | Description of interactive control cmdNum | Number type (number) | Default value is optional, can be left empty | Used to set the component type, minimum value, maximum value, grouping, etc. of the interface control bound to the current interactive item | Notes for interactive control cmdNum |
+| cmdBool | Description of interactive control cmdBool | Boolean type (true/false) | Default value is required, on or off | Same as above | Notes for interactive control cmdBool |
+| cmdStr | Description of interactive control cmdStr | String type (string) | Default value is optional, can be left empty | Same as above | Notes for interactive control cmdStr |
+| cmdCombox | Description of interactive control cmdCombox | Dropdown (selected) | Default value is optional, can be left empty | Same as above | Notes for interactive control cmdCombox |
+| cmdBtn | Description of interactive control cmdBtn | Button (button) | Button control does not bind input items | Same as above | Notes for interactive control cmdBtn |
+
+Messages (strings) sent to the strategy after interactive control is triggered:
+- Number type
+  After entering interactive data ```123``` in the input box of interactive control ```cmdNum```, click the button of interactive control cmdNum. The ```GetCommand()``` function in the strategy program will receive the message: ```cmdNum:123```.
+- Boolean type
+  After setting the switch control of interactive control ```cmdBool``` to on, click the button of interactive control cmdBool. The ```GetCommand()``` function in the strategy program will receive the message: ```cmdBool:true```.
+- String type
+  After entering interactive data ```abc``` in the input box of interactive control ```cmdStr```, click the button of interactive control cmdStr. The ```GetCommand()``` function in the strategy program will receive the message: ```cmdStr:abc```.
+- Dropdown
+  After selecting the second option in the dropdown of interactive control ```cmdCombox```, click the button of interactive control cmdCombox. The ```GetCommand()``` function in the strategy program will receive the message: ```cmdCombox:1```, where 1 represents the index of the selected option, the first option has index 0, the second option has index 1.
+- Button
+  Click the button of interactive control ```cmdBtn```. The ```GetCommand()``` function in the strategy program will receive the message: ```cmdBtn```.
+
+The "Component Configuration" of interactive controls is the same as for strategy parameters (see Strategy Parameters → Component Configuration).
+
+**Example: changing a strategy parameter with an interactive control**
+
+On the strategy editing page, add a string interactive control named ```changeSymbol``` under "Strategy Interaction". The settings of the interactive control:
+
+![Setting up an interactive control](https://www.fmz.com/upload/asset/1741a2b35e569c5e07e3.png)
+
+While the strategy runs live, enter ```ETH_USDT``` in the control's input box and click its button; ```GetCommand()``` receives the message ```changeSymbol:ETH_USDT```. The strategy detects the message and updates the corresponding variable (parameters set in the strategy interface are global variables too; a global variable in the code is used here for demonstration):
+
+```js
+// strategy parameter
+var symbol = "BTC_USDT"
+
+function main() {
+    while (true) {
+        var cmd = GetCommand()
+        if (cmd) {
+            var arr = cmd.split(":")
+            if (arr.length == 2 && arr[0] == "changeSymbol") {
+                // the changeSymbol control was triggered: update the parameter
+                Log("Changed symbol parameter to:", arr[1])
+                symbol = arr[1]
+            }
+        }
+
+        LogStatus(_D(), ", Current symbol parameter value:", symbol)
+        Sleep(3000)
+    }
+}
+```
+
+#### Interactive Controls in Status Bar
+
+In addition to designing interactive controls in the "Strategy Interaction" section, you can also design interactive controls in the strategy status bar. Currently, the only supported interactive control type is the button type. See `LogStatus`.
+
+Button controls in the status bar can be divided into:
+- Regular button controls
+  Data structure example:
+  ```json
+  {"type": "button", "name": "Button 1", "cmd": "button1", "description": "This is the first button"}
+  ```
+- Button controls with a single input data
+  Use the ```input``` attribute to set input control options. Data structure example:
+  ```json
+  {"type": "button", "name": "Button 2", "cmd": "button2", "description": "This is the second button", "input": {"name": "Open Quantity", "type": "number", "defValue": 1}}
+  ```
+
+  ```json
+  {
+      "type": "button",
+      "cmd": "test1",
+      "name": "test1",
+      "input": {
+          "type": "selected",
+          "name": "selected",
+          "label": "Dropdown",
+          "description": "description",
+          "default": 100,
+          "settings": {
+              "multiple": true,
+              "customizable": true,
+              "options":[{"name": "A", "value": 100}, {"name": "B", "value": 200}]
+          }
+      }
+  }
+  ```
+- Button controls with a group of input data
+  Use the ```group``` attribute to set options for a group of input controls. Data structure example:
+  ```json
+  {
+      "type": "button",
+      "cmd": "open",
+      "name": "Open",
+      "group": [
+          {"name": "orderType", "description": "Order Method|order type", "type": "selected", "defValue": "Market Order|Limit Order"},
+          {"name": "tradePrice@orderType==1", "description": "Trade Price|trade price", "type": "number", "defValue": 100},
+          {"name": "orderAmount", "description": "Order Quantity|order amount", "type": "string", "defValue": 100},
+          {"name": "boolean", "description": "Yes/No|boolean", "type": "boolean", "defValue": true}
+      ]
+  }
+  ```
+
+  ```json
+  {
+      "type": "button",
+      "cmd": "test2",
+      "name": "test2",
+      "group": [{
+          "type": "selected",
+          "name": "selected",
+          "label": "Dropdown",
+          "description": "description",
+          "default": 200,
+          "group": "group1",
+          "settings": {
+              "multiple": true,
+              "options":[{"name": "A", "value": 100}, {"name": "B", "value": 200}]
+          }
+      }, {
+          "type": "string",
+          "name": "string",
+          "label": "Input Box",
+          "description": "description",
+          "default": "ABC",
+          "group": "group1"
+      }]
+  }
+  ```
+
+Encode the JSON data of these button controls as a JSON string, then wrap it with ``` ` ``` characters and output it in the status bar. Using JavaScript as an example:
+
+```js
+function main() {
+    var btn = {"type": "button", "name": "Button 1", "cmd": "button1", "description": "This is the first button"}
+    LogStatus("`" + JSON.stringify(btn) + "`")
+}
+```
+
+These button controls can also be written into status bar tables. For detailed examples see `LogStatus`.
+
+The ```input``` field structure is consistent with the single control structure in the ```group``` field. The following is a detailed explanation (an annotated JavaScript object):
+
+```js
+{
+    "type": "selected",     // Control type (required field), supports: number, string, selected, boolean
+    "name": "test",         // Name (required field when used in group)
+    "label": "topic",       // Title (required field)
+    "description": "desc",  // Tooltip information for the component
+    "default": 1,           // Default value; if the settings field is not set in the current JSON structure, it is compatible with defValue, and defValue can be used instead of default
+    "filter": "a>1",        // Selector, not setting this field means no filtering (display control); when this field is set, the control is not filtered (displayed) when the expression is true, and filtered (not displayed) when the expression is false
+                            // For the selector, using the expression a>1 in this example, 'a' refers to the control value with name 'a' under the group field in the type=button structure, and this value is used to determine whether to filter
+    "group": "group1",      // Grouping
+    "settings": {}          // Component configuration, fields described below
+}
+```
+
+Detailed explanation of each field in the component configuration ```settings```:
+- ```settings.required```: Whether it is required.
+- ```settings.disabled```: Whether it is disabled.
+- ```settings.min```: Valid when ```type=number```, represents the minimum value.
+- ```settings.max```: Valid when ```type=number```, represents the maximum value.
+- ```settings.step```: Valid when ```type=number``` and ```render=slider```, represents the step size.
+- ```settings.multiple```: Valid when ```type=selected```, indicates support for multiple selection.
+- ```settings.customizable```: Valid when ```type=selected```, indicates support for customization; users can directly edit and add new options in the dropdown control. If a newly edited option is selected, the option's name will be used instead of the option's value when triggering the interaction.
+- ```settings.options```: Valid when ```type=selected```, represents the selector's option data format: ```["Option 1", "Option 2"]```, ```[{'name':'xxx','value':0}, {'name':'xxx','value':1}]```.
+- ```settings.render```: Render component type.
+  When ```type=number```, ```settings.render``` is not set (defaults to number input box), options: ```slider``` (slider), ```date``` (date picker, returns timestamp).
+  When ```type=string```, ```settings.render``` is not set (defaults to single-line input box), options: ```textarea``` (multi-line input), ```date``` (date picker, returns yyyy-MM-dd hh:mm:ss), ```color``` (color picker, returns #FF00FF).
+  When ```type=selected```, ```settings.render``` is not set (defaults to dropdown), options: ```segment``` (segmented selector).
+  When ```type=boolean```, currently only the default checkbox is available.
+
+Bilingual settings are supported. For example, the text ```'选项|options'``` adapts to the current language. Using a single control in the ```group``` field as an example, a complete example (a JavaScript object):
+
+```js
+{
+    type:'selected',
+    name:'test',
+    label:'选项|options',
+    description:'描述|description',
+    default:0,                            // Here the default value is set to 0, representing the value in {name:'xxx|yyy',value:0} option
+    filter:'a>1&&a<10',
+    group:'Group|group',
+    settings:{
+        multiple:true,
+        customizable:true,
+        options:[{name:'xxx|yyy',value:0}]
+    }
+}
+```
+
+### Template Library
+
+A **template library** is a reusable code module on the FMZ Quant Trading Platform and a category of strategy code. Languages that support template libraries: ```JavaScript``` (including TypeScript), ```Python``` and ```Rust```; ```Blockly Visual``` strategies can use blocks provided by JavaScript template libraries. If the category is set to template library when a strategy is created, a template library is created in the strategy library of the logged-in account; its category cannot be changed to an ordinary strategy afterwards.
+
+![Create Template Library Page](https://www.fmz.com/upload/asset/2e4c55da99fd457ca94a0.png)
+
+How template functions are exported and called in each language:
+
+| Language | Export in the template | Call in the strategy |
+| - | - | - |
+| JavaScript | attach to ```$```: ```$.Test = function() {...}``` | ```$.Test()``` |
+| Python | attach to ```ext```: ```ext.Test = Test``` | ```ext.Test()``` |
+| Rust | the template code goes into the ```ext``` module; functions the strategy calls are declared ```pub fn``` | ```ext::Test()``` |
+
+- A template's ```main()``` function is not run by the strategy; it is only the entry point for backtesting or debugging the template on its own.
+- ```JavaScript``` templates can define ```init()``` and ```destroy()```: ```init()``` runs when the template is loaded (before the strategy's ```init()```), and ```destroy()``` runs when the strategy exits, after ```onexit()``` or ```onerror()```. ```Python``` templates can define ```init()```, which runs when the template is loaded.
+- Both ```Rust``` templates and strategies can declare third-party crates in a frontmatter block, but the dependency block may appear in only one of them; declaring it in both fails the build.
+
+#### Export Functions of Template Libraries
+
+Export functions are the interface functions of template libraries, which can be called by strategies that reference the template library.
+
+Different programming languages have different formats for writing template libraries. The following are example codes for declaring and implementing export functions in template libraries:
+
+```javascript
+/*
+-- 策略引用该模板以后直接用 $.Test() 调用此方法
+-- main 函数在策略中不会触发, 只做为模板调试的入口
+*/
+$.Test = function() {
+    Log('Test')
+}
+
+function main() {
+    $.Test()
+}
+```
+
+```python
+def Test():
+    Log("template call")
+
+# 导出Test函数, 主策略可以通过ext.Test()调用
+ext.Test = Test
+```
+
+```rust
+// after referencing this template, a strategy calls it as ext::Test()
+// functions called by the strategy must be declared pub
+pub fn Test() {
+    Log!("template call");
+}
+```
+
+Strategies written in ```Blockly visual``` mode can implement library functions through ```JavaScript``` language template libraries. Please use the following format.
+
+```js
+/*blockly
+    {
+        "type": "ext_testA",
+        "message0": "testA|testA",
+        "template": "function(){return 99;}()",
+        "order": "ORDER_ATOMIC",
+        "output": "Number"
+    },{
+        "type": "ext_MA",
+        "message0": "MA 周期 %1| MA Period %1",
+        "args0": [{
+            "type": "input_value",
+            "check": "Number"
+        }],
+        "template": "(function(){var r = exchange.GetRecords(); return (!r || r.length < %1) ? false : TA.MA(r, %1); })()",
+        "order": "ORDER_ATOMIC",
+        "output": null,
+        "colour": 85
+    }
+*/
+```
+
+#### Template Library Parameters
+
+Template libraries can also set their own interface parameters. Template library parameters are used as global variables in the template library code.
+
+For example, we set a template library parameter:
+
+![Template Parameter](https://www.fmz.com/upload/asset/2e4ab550b85e6a1cac08e.png)
+
+| Variable Name in Strategy Code | Parameter Name Displayed on Strategy Interface | Type | Default Value |
+| - | - | - | - |
+| param1 | Template Parameter 1 | Number | 99 |
+
+Parameters of a ```Rust``` template are constants that can only be read, not modified, so in Rust the example below can only read the parameter:
+
+```rust
+// template code
+pub fn GetParam1() -> f64 {
+    Log!("param1:", param1);
+    param1
+}
+```
+
+```rust
+// strategy code
+fn main() {
+    Log!("Calling ext::GetParam1:", ext::GetParam1());
+}
+```
+
+Template library code for testing the ```param1``` parameter:
+
+```javascript
+$.SetParam1 = function(p1) {
+    param1 = p1
+}
+
+$.GetParam1 = function() {
+    Log("param1:", param1)
+    return param1
+}
+```
+
+```python
+def SetParam1(p1):
+    global param1
+    param1 = p1
+
+def GetParam1():
+    Log("param1:", param1)
+    return param1
+
+ext.SetParam1 = SetParam1
+ext.GetParam1 = GetParam1
+```
+
+```rust
+// Rust template parameters are read-only constants; see above for how to read them
+```
+
+Strategy code referencing the above template library example, using the template library's exported functions to get parameter ```param1``` and modify parameter ```param1```.
+
+```javascript
+function main () {
+    Log("Calling $.GetParam1:", $.GetParam1())
+    Log("Calling $.SetParam1:", "#FF0000")
+    $.SetParam1(20)
+    Log("Calling $.GetParam1:", $.GetParam1())
+}
+```
+
+```python
+def main():
+    Log("Calling ext.GetParam1:", ext.GetParam1())
+    Log("Calling ext.SetParam1:", "#FF0000")
+    ext.SetParam1(20)
+    Log("Calling ext.GetParam1:", ext.GetParam1())
+```
+
+```rust
+// Rust template parameters are read-only constants; see above for how to read them
+```
+
+#### Reference Template Library
+
+When a strategy references a template library, the currently logged-in FMZ Quant Trading Platform account must have available template libraries in its strategy library. On the [Strategy Edit Page](https://www.fmz.com/m/add-strategy), check the templates you need to reference in the Template section, then save the strategy to complete the reference.
+
+![Template Reference Screenshot](https://www.fmz.com/upload/asset/2e4ee2ec7b3e7b1649af8.png)
+
+### Built-in Libraries
+
+The FMZ Quant Trading Platform has some commonly used libraries built in. Availability by language:
+
+| Library | JavaScript / TypeScript | Python | Rust |
+| - | - | - | - |
+| ```TA``` indicators | yes | yes | yes |
+| ```talib``` indicators | yes | requires TA-Lib and numpy installed on the docker's machine | no |
+| JSON | the language's built-in ```JSON``` | the standard ```json``` module | ```JSONParse()```/```JsonValue``` |
+
+For the full list of functions and their arguments see `TA` and `Talib` in the reference.
+
+**TA indicator library**
+
+The platform's ```TA``` library optimizes the common indicator algorithms ([open-source TA library code](https://www.fmz.com/bbs-topic/409)). Where there are not enough K-lines to compute an indicator, invalid values are returned at those positions.
+
+```js
+function main(){
+    var records = exchange.GetRecords()
+    var macd = TA.MACD(records)
+    var atr = TA.ATR(records, 14)
+
+    // print the last set of indicator values
+    Log(macd[0][records.length-1], macd[1][records.length-1], macd[2][records.length-1])
+    Log(atr[atr.length-1])
+}
+```
+
+```rust
+fn main() {
+    let r = exchange.GetRecords(None, None, None).unwrap();
+    let macd = TA.MACD(&r, None, None, None);
+    let atr = TA.ATR(&r, 14);
+    Log!(macd[0][r.len() - 1], macd[1][r.len() - 1], macd[2][r.len() - 1]);
+    Log!(atr[atr.len() - 1]);
+}
+```
+
+**talib indicator library**
+
+```js
+function main() {
+    var records = exchange.GetRecords()
+    var cci = talib.CCI(records, 14)
+    Log(cci)
+}
+```
+
+```python
+# Python needs TA-Lib and numpy installed on the docker's machine; without them calling talib raises an error asking to install it
+def main():
+    records = exchange.GetRecords()
+    cci = talib.CCI(records.High, records.Low, records.Close, 14)
+    Log(cci)
+```
+
+**JavaScript: loading third-party libraries dynamically**
+
+Other third-party JavaScript libraries can be downloaded at run time and loaded with ```eval```:
+
+```js
+function main() {
+    // via. https://cdnjs.com/libraries
+    eval(HttpQuery("https://cdnjs.cloudflare.com/ajax/libs/mathjs/13.2.0/math.min.js"))
+
+    Log(math.round(math.e, 3))                // 2.718
+    Log(math.atan2(3, -3) / math.pi)          // 0.75
+    Log(math.log(10000, 10))                  // 4
+    Log(math.sqrt(-4))                        // {"mathjs":"Complex","re":0,"im":2}
+}
+```
+
+### Multi-language Support
+
+Both the strategy name and the descriptions of strategy parameters can be written in the ```Chinese|English``` format, allowing the web page to automatically recognize and display the corresponding language. In other use cases—such as **strategy description**, **usage instructions**, and other ```Markdown```-formatted text—using ```[trans]Chinese|English[/trans]``` or ```[trans]Chinese||English[/trans]``` can likewise achieve automatic language recognition. After switching the language, refresh the web page for it to take effect. In addition, in strategy code, any function that can accept a string also supports language switching, such as the ```Log()``` function, the ```LogStatus()``` function, and so on.
+
+```js
+function main() {
+    Log("[trans]日志|log[/trans]")
+    var table = {
+        type: "table",
+        title: "[trans]操作|option[/trans]",
+        cols: ["[trans]列1|col1[/trans]", "[trans]列2|col2[/trans]", "[trans]操作|option[/trans]"],
+        rows: [
+            ["[trans]比特币|BTC[/trans]", "[trans]以太坊|ETH[/trans]", {"type": "button", "cmd": "coverAll", "name": "平仓|cover", "description": "描述|description"}]  // Note: there is no need to add the [trans] tag inside buttons
+        ]
+    }
+    LogStatus("[trans]信息|message[/trans]", "\n`" + JSON.stringify(table) + "`")
+    throw "[trans]错误|error[/trans]"
+}
+```
+
+```python
+import json
+
+def main():
+    Log("[trans]日志|log[/trans]")
+    table = {
+        "type": "table",
+        "title": "[trans]操作|option[/trans]",
+        "cols": ["[trans]列1|col1[/trans]", "[trans]列2|col2[/trans]", "[trans]操作|option[/trans]"],
+        "rows": [
+            ["[trans]比特币|BTC[/trans]", "[trans]以太坊|ETH[/trans]", {"type": "button", "cmd": "coverAll", "name": "平仓|cover", "description": "描述|description"}]
+        ]
+    }
+    LogStatus("[trans]信息|message[/trans]", "\n`" + json.dumps(table) + "`")
+    raise Exception("[trans]错误|error[/trans]")
+```
+
+```rust
+fn main() {
+    Log!("[trans]日志|log[/trans]");
+    let table = r#"{
+        "type": "table",
+        "title": "[trans]操作|option[/trans]",
+        "cols": ["[trans]列1|col1[/trans]", "[trans]列2|col2[/trans]", "[trans]操作|option[/trans]"],
+        "rows": [
+            ["[trans]比特币|BTC[/trans]", "[trans]以太坊|ETH[/trans]", {"type": "button", "cmd": "coverAll", "name": "平仓|cover", "description": "描述|description"}]
+        ]
+    }"#;
+    LogStatus!("[trans]信息|message[/trans]", format!("\n`{}`", table));
+    Panic!("[trans]错误|error[/trans]");
+}
+```
+
+## Development Tools
+
+Tools for writing and debugging strategies: the strategy editor, the debugging tool and remote editing from a local editor.
+
+### Strategy Editor
+
+Open the **edit page** from the [new strategy page](https://www.fmz.com/m/add-strategy) or by opening an existing strategy in the [Strategy Library](https://www.fmz.com/m/strategies) (for strategy ID 123456 the address is ```https://www.fmz.com/m/edit-strategy/123456```) to write strategies.
+
+![Online strategy editor](https://www.fmz.com/upload/asset/2e50fff4160187be92248.png)
+
+This chapter covers the editor's assistance features. Related features of the editing page:
+- Remote editing: write in a local editor and sync to the platform automatically (see Development Tools → Remote Editing).
+- Backtest configuration and saving: save the backtest configuration and strategy parameters with the strategy (see Backtesting System).
+- Import and export of complete strategies: export and import a strategy with its parameters and everything else (see Platform Basics → Strategy Library).
+
+#### AI Assistant
+
+The strategy editor has a built-in AI assistant that generates strategy code from a description, explains and edits selected code, adjusts strategy parameters and interactive controls, and runs backtests and analyzes their results automatically.
+
+- AI assistant panel
+  The AI assistant panel sits to the right of the code editor and can be collapsed or expanded. Describe what you want in the input box to start a conversation; code selected in the editor beforehand becomes context for the conversation.
+  Changes the AI proposes to code, parameters and interactive controls are shown as diffs that you can "Accept" or "Reject" one by one, or accept all at once; it asks for permission before modifying the strategy or running a backtest automatically.
+- Quick actions on selected code
+  Select code and right-click: the menu has AI actions (such as explaining or optimizing the code), which can also be triggered with ```⌘1```, ```⌘2```, ... (```Ctrl+1```, ```Ctrl+2```, ... on Windows).
+
+  ![AI assistant explaining code in the strategy editor](https://www.fmz.com/upload/asset/16aa01684eda4e8163ed.png)
+- Smart completion
+  Turn smart completion on or off from the right-click menu, or with ```⌘J``` (```Ctrl+J``` on Windows).
+
+The AI assistant is charged to your account balance by usage, and each conversation shows its cost.
+
+Besides the assistant in the editor, you can connect the external AI assistant you already use to the platform and manage strategies, backtests and live robots through conversation (see Integrations → AI Integration).
+
+#### Command Palette
 
 Right-click in the strategy code editing area and select "Command Palette" from the context menu to view keyboard shortcuts and editor commands for various functions.
 
 ![Command Palette display in strategy editor menu](https://www.fmz.com/upload/asset/2e429269f02185dfbab3b.png)
 
-### Syntax Manual Quick Reference
+#### Syntax Manual Quick Reference
 
 In the "Code" editing area of the **Strategy Editor Page**, you can quickly access the "Syntax Manual". Use the corresponding keyboard shortcuts based on your operating system:
 
@@ -713,7 +2874,7 @@ In the "Code" editing area of the **Strategy Editor Page**, you can quickly acce
 
 Then when you hover your mouse over the **variable name** or **function name** you want to look up, a jump link will appear. Click the link to open the "Syntax Manual" popup, which will automatically navigate to the queried content.
 
-### Go to Definition and References
+#### Go to Definition and References
 
 Select the content you want to query, then right-click to open the context menu.
 
@@ -725,19 +2886,19 @@ Select the content you want to query, then right-click to open the context menu.
 
 - Peek - Peek References: View references to the current code in other lines without leaving the current position, with support for quick navigation to better understand code logic and structure.
 
-### Strategy Documentation
+#### Strategy Documentation
 
-The online strategy editor provides comprehensive documentation features, allowing categorized management of strategy code, strategy descriptions, usage instructions, development logs, and other information.
+The online strategy editing page keeps the code, description, usage instructions and development notes of a strategy separately.
 
-![Strategy Documentation Options](https://www.fmz.com/upload/asset/2e47983c191c1779bd52e.png)
+![Strategy documentation options](https://www.fmz.com/upload/asset/2e47983c191c1779bd52e.png)
 
-- Code: The source code of the strategy program.
-  A complete strategy on the FMZ Quant Trading Platform includes: strategy source code, [strategy parameter design](https://www.fmz.com/user-guide#策略参数), [strategy interaction design](https://www.fmz.com/user-guide#交互控件), [strategy template references](https://www.fmz.com/user-guide#模板类库).
-- Notes: For recording relevant content during the strategy development process.
-- Description: For recording introductory information displayed when the strategy is publicly shown.
-- Manual: For recording detailed information that can only be viewed after the strategy is rented.
+- Code: the source code of the strategy program.
+  A complete strategy on the platform consists of the source code, the strategy parameter design, the interactive control design and the template library references (see Writing Strategies → Strategy Parameters, Interactive Controls and Template Libraries).
+- Notes: notes taken while developing the strategy.
+- Description: the introduction shown when the strategy is published.
+- Manual: instructions visible only to those who rent the strategy.
 
-### History Version Management
+#### History Version Management
 
 The platform supports version iteration functionality during strategy development. On the **Strategy Editing Page**, click the "History Version" button in the "Code" editing area to open the strategy history version management page.
 
@@ -761,38 +2922,108 @@ Strategy history versions can not only be used for code management and version r
 
 - **Version Control for Rented Strategies**: When a strategy is rented to other users, the renter can only run the "default running version" set by the strategy owner and cannot select other history versions. The strategy owner can control which version is used for rented strategies by setting the default running version.
 
-### Others
+### Debugging Tool
 
-- [Remote Editing](https://www.fmz.com/user-guide#远程编辑)
-  ![Remote Editing Screenshot](https://www.fmz.com/upload/asset/2e4e8975d1e32517fd989.png)
-- [Save Backtest Settings](https://www.fmz.com/user-guide#保存回测设置)
-  ![Save Backtest Settings Screenshot](https://www.fmz.com/upload/asset/2e51f69b120f9b6aadaee.png)
-- [Strategy Import/Export](https://www.fmz.com/user-guide#完整策略的导入与导出)
-  ![Strategy Import/Export Screenshot](https://www.fmz.com/upload/asset/2e52ccf44526f396fb795.png)
+The [Debugging Tool](https://www.fmz.com/m/debug) page provides a free environment for quickly testing live trading code, currently supporting only the ```JavaScript``` language.
+
+![Debugging Tool](https://www.fmz.com/upload/asset/2e48d6d1bc77e46099058.png)
+
+When using the debugging tool to test code, the code will run directly on the specified docker, with a maximum runtime of 3 minutes. It supports calling all API functions of the FMZ Quant Trading Platform, but only supports a single exchange object.
+
+### Remote Editing
+
+You can write a strategy in a local editor and have it synced to FMZ automatically on save. ```VSCode```, ```Vim``` and ```Sublime Text 3``` are supported; ```JavaScript``` strategies can also use ```WebStorm``` and ```Python``` strategies ```PyCharm```. Blockly visual strategies do not support remote editing.
+
+![Remote editing screenshot](https://www.fmz.com/upload/asset/2e4e8975d1e32517fd989.png)
+
+**Steps**
+1. Click "Remote Editing" on the strategy editing page. The top of the dialog has download links for the editor plugins; follow one to the plugin page and install it (installation differs slightly between editors).
+2. The dialog shows the current strategy's remote sync token. If it is empty, click "Update Token" to generate one.
+3. Save the strategy source locally and insert the token line shown in the dialog as the first line (e.g. ```// fmz@<token>``` for ```JavaScript```, ```# fmz@<token>``` for ```Python```); from then on every save is synced to the platform.
+
+Without a plugin you can upload the local source with ```curl``` (the dialog shows the full command with your token), for example:
+
+```bash
+curl -T quant.js -H "Authorization: Bearer <token>" https://www.fmz.com/rsync
+```
+
+**Managing the token**
+- "Update Token": generates a new token; the old one stops working at once.
+- "Delete Token": deletes the strategy's token and turns remote editing off.
+
+Anyone holding the token can overwrite the strategy's source code, so keep it private.
 
 ## Backtesting System
 
-After completing the design of your quantitative trading strategy, how do you verify key metrics such as the strategy's logical correctness and expected returns? Obviously, you cannot test directly in the market with real funds. The correct approach is to backtest the strategy using historical data, evaluating its profitability and risk characteristics by analyzing the strategy's performance in historical market conditions.
+Test strategies on historical data: the backtesting system drives the strategy code with past market data, simulates order matching and accounts, and reports profit, drawdown and other results. A backtest only shows how a strategy behaved on past data; it does not predict future returns.
 
-### Backtesting System Modes
+### Overview and Starting a Backtest
 
-The FMZ Quant Trading Platform divides backtesting modes into **Real-tick Level** backtesting and **Simulated-tick Level** backtesting. **Real-tick Level** backtesting is completely based on complete historical data for backtesting; **Simulated-tick Level** backtesting generates **tick data** based on real candlestick data for backtesting. Both are based on real historical data for backtesting, but **Real-tick Level** backtesting has more accurate data and more reliable results. It should be noted that backtesting only reflects the performance of strategies under historical data, and historical data cannot fully represent future market conditions, so backtesting results should be treated with a rational and objective attitude.
+A backtest drives the strategy code with the platform's historical market data: the backtest engine keeps a virtual clock and one simulated account per exchange object, and answers every market, order and account call from history. A backtest only shows how the strategy would have behaved on past data; the past does not represent the future, so read backtest results with caution.
 
-**Simulated-tick Level** backtesting generates simulated **tick data** based on the underlying candlestick period, generating up to 12 backtesting time points on each underlying candlestick period. **Real-tick Level** backtesting uses real collected second-by-second tick data, which has a large amount of data and slower backtesting speed, so it is not suitable for backtesting particularly long time ranges. FMZ Quant's backtesting mechanism allows strategies to trade multiple times on a single candlestick, avoiding the limitation of only being able to trade at the closing price, ensuring accuracy while balancing backtesting speed.
+**Starting a backtest**
 
-[Backtesting System Mechanism Description](https://www.fmz.com/digest-topic/4009)
+- Website: open the strategy editor, switch to the "Backtest" tab, set the backtest configuration and strategy parameters, then click "Start Backtest" (keyboard shortcuts: see Backtesting System → Backtest Page Shortcuts). The configuration can be saved into the strategy source, see Backtesting System → Backtest Configuration and Saving.
+- AI assistant: start a backtest with the MCP tool ```run_backtest``` and read the result with ```get_backtest```, see Integrations → AI Integration. Backtests started through MCP always use the simulated-tick mode.
+- Your own machine: use the open-source local backtest engine, see Backtesting System → Local Backtesting Engine.
 
-- Simulated-tick Level
-  **Simulated-tick Level** backtesting generates tick data for backtesting based on the underlying candlestick data of the backtesting system, simulating tick data within the price framework composed of the high, low, open, and close prices of the given underlying candlestick bar according to specific algorithms, serving as real-time tick data on the backtesting time series, which is returned when the strategy program calls the interface. For details, please refer to: [Backtesting System Simulated Level Mechanism Description](https://www.fmz.com/bbs-topic/662).
+**Configuration items**
 
-- Real-tick Level
-  Real-tick level backtesting uses real tick-level data in the bar time series. For strategies based on tick-level data, using real-tick level backtesting is closer to actual conditions. The ticks in real-tick level backtesting are real recorded data, not simulated. It supports depth data, market trade record data playback, supports custom depth, and supports trade-by-trade data. Real-tick level backtesting data supports a maximum of 50MB, with no limit on the backtesting time range within the data limit. To maximize the backtesting time range as much as possible, you can reduce the depth level value settings and not use trade-by-trade data to extend the backtesting time range. Call ```GetDepth``` and ```GetTrades``` functions to obtain playback market data. At a certain market data moment on the timeline, calling ```GetTicker```, ```GetTrades```, ```GetDepth```, ```GetRecords``` will not move time forward multiple times on the backtesting timeline (will not trigger jumping to the next market data moment). Repeated calls to any of the above functions will push the backtesting time forward on the backtesting timeline (jump to the next market data moment). When using real-tick level backtesting, it is not advisable to select too early a time, as earlier time periods may not have real-tick level data.
+| Item | Description |
+| - | - |
+| Time range | Start and end time of the backtest. |
+| K-line period | The K-line period that ```GetRecords()``` returns by default. |
+| Base K-line period | The K-line period from which ticks are generated in simulated-tick mode. Smaller is closer to real markets and slower. Strategy K-lines are built from base K-lines, so they cannot be shorter than the base period. |
+| Mode | Simulated tick or real tick, see Backtesting System → Backtest Modes and Order Matching. |
+| Exchange, trading pair | Each exchange object has its own simulated account; pairs are written like ```BTC_USDT```. For futures exchanges the strategy must call ```exchange.SetContractType()``` before requesting market data or placing orders. |
+| Initial funds | Initial balances of the quote currency (e.g. USDT) and the base currency (e.g. BTC). Coin-margined contracts use the base currency as margin, so set the base-currency balance. |
+| Fees | Maker and taker rates in percent; the defaults come from the exchange market's configuration. A limit order that fills immediately when placed pays the taker rate; one that rests in the book and is filled later pays the maker rate. |
+| Slippage | Number of price ticks added outside the simulated best bid and best ask; default 0. |
+| Network delay | In milliseconds; every exchange call advances the virtual clock by this amount; default 200. |
+| Depth levels, amount per level | Number of levels ```GetDepth()``` returns (1-20) and the amount on each simulated level; in real-tick mode the depth levels are the real depth requested from the data source. |
+| Max K-line bars | Upper limit of history bars returned by the first ```GetRecords()``` call (100-5000, default 300). |
+| Log limits | Upper limits on kept runtime logs, profit logs and chart data points. |
+| Data source | The platform's historical data by default; a custom data source can be used instead, see Backtesting System → Custom Data Source. |
 
-**Real-tick Level** and **Simulated-tick Level** mode backtesting system order matching mechanism: Order matching is executed based on price-taking and full-fill execution. Therefore, partial fill scenarios cannot be tested in the backtesting system.
+**Fault-tolerance test**
 
-### Impact of Backtest Data Granularity on Backtesting
+The backtest page also offers a "fault-tolerance test": exchange calls fail with a given probability (0.5 by default), and the first call of each kind always fails; each failure is logged as the error ```FaultTolerant Test```. Use it to check how the strategy handles failed calls, e.g. whether it retries with ```_C()```.
 
-The following test code will exhibit different performance for different data granularities (A. Live trading level backtest, B. Simulation level backtest (smaller underlying K-line period), C. Simulation level backtest (larger underlying K-line period), etc.). Both the number of trades and profit/loss results will vary. When backtesting, the smallest possible data granularity should be maintained. While backtesting may be faster with larger data granularity, the results obtained may lack objectivity.
+**What the strategy sees in a backtest**
+
+- ```IsVirtual()``` returns ```true```; logic that must not run in a backtest can be skipped based on it, see `IsVirtual`.
+- Time is virtual: ```Unix()```, ```_D()``` and similar functions read the backtest clock, and ```Sleep()``` advances it. When the clock passes the end time, the engine throws an ```EOF``` exception and the backtest ends; ```onexit()``` is not called in that case.
+- In a backtest ```GetCommand()``` receives no interactive commands, ```onerror()``` is not supported, and network request functions are restricted.
+
+### Backtest Modes and Order Matching
+
+There are two backtest modes, **simulated tick** and **real tick**. Both are based on real historical data: simulated tick generates ticks from K-lines, real tick replays recorded ticks. The latter is more accurate and slower.
+
+**Simulated tick**
+
+Within the price frame of each base K-line (open, high, low, close), the engine generates 2-14 simulated ticks along the path open → low/high → close and spreads the bar's volume over them; market calls return the data of the current simulated tick. Each base K-line therefore has several backtest time points, and a strategy can trade several times inside one bar instead of only at the close. The smaller the base K-line period, the closer the ticks follow the real price path, and the slower the backtest. Details: [Simulated-tick mechanism](https://www.fmz.com/bbs-topic/662), [Backtesting mechanism](https://www.fmz.com/digest-topic/4009).
+
+Simulated order book: best ask = tick close + one tick + slippage, best bid = close − one tick − slippage (slippage counted in ticks); ```GetDepth()``` returns several simulated levels spaced by that amount, each with the configured "amount per level".
+
+**Real tick**
+
+Uses per-second ticks recorded by the platform, including order-book depth (configurable, up to 20 levels) and, optionally, replayed trade prints; ```GetDepth()``` and ```GetTrades()``` return the replayed real data. Because the data is large and the backtest slow, one backtest may use at most 50 MB of data, which limits the time range; to cover a longer range, lower the depth levels and do not use trade prints. Early periods may have no real-tick data, so do not choose a start time that is too early.
+
+At a given market moment, calling each of ```GetTicker()```, ```GetDepth()```, ```GetTrades()``` and ```GetRecords()``` once does not move the backtest time; calling the same function again jumps to the next market moment. In real-tick mode keep the ```Sleep()``` in the strategy loop short (e.g. 100 ms).
+
+**Order matching**
+
+Both modes use the same matching rules:
+
+- Orders fill when the price is touched, and always in full; there are no partial fills in a backtest.
+- A market order fills on the current tick at the best ask/bid; the amount of a spot market buy order is in the quote currency.
+- A limit buy fills when its price is at or above the best ask, a limit sell when its price is at or below the best bid; this is checked on every tick after the order is placed. An order that fills immediately when placed fills at the market price and pays the taker fee; an order that rests in the book and is touched later fills at its own price and pays the maker fee.
+- In real-tick mode an order resting exactly at the best bid/ask fills only after the volume queued ahead of it has been consumed.
+- Futures freeze margin of notional value ÷ leverage; when the market data includes funding rates, perpetual contracts are charged funding.
+
+**Effect of data granularity**
+
+The same strategy produces different trade counts and P&L at different data granularities (real tick, simulated tick with a small base period, simulated tick with a large base period, ...). Coarse data backtests faster but may give misleading results, so use fine granularity where possible. The following strategy can be backtested at several granularities for comparison:
 
 ```js
 /*backtest
@@ -816,170 +3047,266 @@ function main() {
         }
         var diff = ticker.Last - lastPrice
         if ((!direction || direction == "long") && diff >= delta) {
-            // Price rises above threshold -> Go short
+            // Price rose above the threshold -> go short
             exchange.Sell(ticker.Last, lotSize)
             Log("Short @", ticker.Last)
             direction = "short"
         } else if ((!direction || direction == "short") && diff <= -delta) {
-            // Price falls below threshold -> Go long
+            // Price fell below the threshold -> go long
             exchange.Buy(ticker.Last, lotSize)
             Log("Long @", ticker.Last)
             direction = "long"
         }
-        // Should be as short as possible in Tick mode, no impact in K-line backtest
+        // Keep it short in tick mode; it has no effect in K-line mode
         Sleep(100)
     }
 }
 ```
 
-### The backtesting system supports multiple programming languages
+### Backtest Configuration and Saving
 
-The backtesting system supports backtesting strategies written in the following languages: ```JavaScript```, ```TypeScript```, ```Python```, ```Rust```, ```C++```, [```PINE```](https://www.fmz.com/bbs-topic/9315), [```My Language```](https://www.fmz.com/bbs-topic/2569), ```Blockly``` visual programming, and the ```Workflow``` workflow.
+The backtest configuration on the "Backtest" tab (time range, exchanges, fees, ...) and the strategy parameters can be saved with the strategy and are loaded again the next time the strategy is opened.
 
-  1. Backtesting of **JavaScript** and **C++** strategies is performed in the browser, and these strategies require no additional software, libraries, or modules to be installed when running in either live trading or backtesting.
+**Saving**
 
-  2. Backtesting of **Python** strategies is performed on the docker, and can be run either on FMZ Quant's public servers or on the user's own docker. Both live trading and backtesting depend on the Python environment installed on the system where the docker resides; if you need to use certain libraries, please install them yourself, as FMZ Quant's public servers only support commonly used **Python** libraries.
+- Click "Save Backtest Settings": the configuration and strategy parameters are written as a comment block (the ```backtest``` block) at the top of the strategy source.
+- Click "Save Strategy": the platform also records the current backtest configuration and strategy parameters.
 
-  3. Backtesting of **JavaScript** strategies supports debugging in Chrome's DevTools; see the [reference documentation](https://www.fmz.com/digest-topic/9459) for details.
+**Loading**
 
-  4. **Workflow** strategies support backtesting, allowing you to visually view node execution status and the data flow process.
+- When the strategy editor is opened or refreshed, the configuration in the source's ```backtest``` block is loaded first.
+- If the source has no ```backtest``` block, the configuration recorded by the last "Save Strategy" is loaded.
+- After editing the ```backtest``` block by hand, click the "Backtest Settings" button above the block to apply the change to the backtest form.
 
-  5. **Rust** strategies are compiled by the platform server during backtesting, and the compiled module runs in the browser-based backtesting system; third-party crate dependencies declared via frontmatter in the strategy are automatically fetched at compile time, with no need to install any toolchain locally.
+**Block format**
 
-### Exchanges Supported by Backtesting System
+The word ```backtest``` follows the language's block-comment opener directly, then one ```key: value``` per line:
 
-- Cryptocurrency
-  Supports mainstream cryptocurrency spot and futures exchanges, covering all trading pairs data from exchanges.
-- Futu Securities
-  Supports multiple markets including Hong Kong stocks and US stocks.
-
-  Backtesting Notes: The backtesting system currently only supports Futu daily level data:
-  ```js
-  /*backtest
-  start: 2024-05-01 00:00:00
-  end: 2025-02-17 00:00:00
-  period: 1d
-  basePeriod: 1d
-  exchanges: [{"eid":"Futures_Futu","currency":"STOCK","fee":[0.03,0.03]}]
-  */
-
-  function main() {
-      let info = exchange.SetContractType("TLSA.US")   // Set stock symbol: Tesla
-      Log("info:", info)         // info: {"InstrumentID":"TLSA.US","LotTick":1,"PriceTick":0.01,"VolumeMultiple":1}
-      Log(exchange.GetTicker())  // {"Time":1714482000000,"Symbol":"TLSA.US","Open":0.62,"High":0.63,"Low":0.61,"Sell":0.63,"Buy":0.61,"Last":0.62,"Volume":0,"OpenInterest":0}
-  }
-  ```
-
-### Backtest System Parameter Optimization
-
-The FMZ Quant Trading Platform backtest system parameter optimization feature allows you to set parameter combinations based on optimization options for each parameter during backtesting. On the "Simulation Backtest" page in the strategy parameters section, check the **Optimization** option on the right side of the strategy parameter to display optimization settings.
-
-- Minimum Value: Set the starting value of the parameter.
-- Maximum Value: Set the maximum value after the parameter increments.
-- Step Size: The increment amount for parameter changes.
-- Concurrent Threads:
-  When optimizing parameters, set the number of threads for concurrent execution of each backtest parameter combination. This option only supports parameter optimization for ```JavaScript```, ```PINE```, and ```MyLanguage``` strategies, and does not support template parameter optimization.
-
-The system generates parameter combinations based on ```Minimum Value```, ```Maximum Value```, and ```Step Size``` settings, and iterates through these parameter combinations for backtesting (i.e., executes one backtest for each parameter combination). Only strategy parameters of type **number** can be configured for parameter optimization in the backtest system.
-
-### Save Backtest Settings
-
-In the "Simulated Backtest" tab (i.e., the backtesting system) of the [Strategy Editing Page](https://www.fmz.com/m/add-strategy), you can configure options such as the backtest configuration and strategy parameters to run a strategy backtest. The backtest configuration is used to set conditions such as the backtest time range, exchanges, trading slippage, and fees; the strategy parameters are used to set the strategy's parameter options.
-
-Once you have configured these parameters, you can run the strategy backtest according to your settings. So, how do you save these configured settings?
-
-- 1. You can use the "Save Backtest Settings" button on the [Strategy Editing Page](https://www.fmz.com/m/add-strategy) to record all backtest configuration information (including backtest settings and strategy parameter settings) as code within the strategy source code.
-
-- 2. When you click the "Save Strategy" button on the strategy editing page to save the strategy, the platform will automatically record the current backtest settings, strategy parameter configuration, and other information.
-
-How does the backtesting system load the backtest configuration?
-
-- 1. When you refresh or reopen the strategy editing page, the system will preferentially and automatically load the backtest configuration recorded by the "Save Backtest Settings" button.
-
-- 2. If the current strategy code does not contain backtest configuration information recorded as a ```backtest``` comment (i.e., it was not saved in the strategy code via the "Save Backtest Settings" button), the backtesting system will automatically set the backtest configuration to the backtest settings from the last time the "Save Strategy" button was clicked for the current strategy.
-
-- 3. If you modify the backtest configuration information recorded as a comment at the beginning of the strategy code on the strategy editing page and need to sync the updated backtest configuration to the options in the strategy backtest interface, you can click the "Backtest Settings" button above the ```backtest``` section in the strategy editing area.
-
-When you click "Save Backtest Settings", the format in which ```JavaScript```/```Python```/```C++```/```My Language```/```PINE``` strategies save the backtest settings to the strategy code differs slightly:
-
-```javascript
+```js
 /*backtest
-start: 2021-06-26 00:00:00
-end: 2021-09-23 00:00:00
-period: 1d
-basePeriod: 1h
-exchanges: [{"eid":"Binance","currency":"BTC_USDT"}]
+start: 2024-01-01 00:00:00
+end: 2024-03-01 00:00:00
+period: 1h
+basePeriod: 15m
+exchanges: [{"eid":"Binance","currency":"BTC_USDT","balance":10000,"stocks":0,"fee":[0.1,0.1]}]
+args: [["fast",5],["slow",20]]
 */
 ```
 
-```python
-'''backtest
-start: 2021-06-26 00:00:00
-end: 2021-09-23 00:00:00
-period: 1d
-basePeriod: 1h
-exchanges: [{"eid":"Binance","currency":"BTC_USDT"}]
-'''
-```
+Comment syntax per language: JavaScript, TypeScript, Rust and PINE use ```/*backtest ... */```; Python uses ```'''backtest ... '''```; MyLanguage uses ```(*backtest ... *)```.
 
-```rust
+| Key | Format | Description |
+| - | - | - |
+| start, end | ```YYYY-MM-DD HH:mm:ss``` | Start and end time, parsed in the browser's time zone. |
+| period | ```1m```, ```1h```, ```1d``` etc., or seconds | Strategy K-line period. |
+| basePeriod | same | Base K-line period; defaults to ```period```; ignored in real-tick mode. |
+| mode | ```1``` | Real-tick mode; omit for simulated-tick mode. |
+| exchanges | JSON array | One element per exchange object, fields below. |
+| args | JSON array | Strategy parameters, ```[["name", value], ...]```; a third element with a template ID sets that template's parameter: ```["name", value, templateId]```. |
+
+Fields of an ```exchanges``` element; everything except ```eid``` and ```currency``` is optional:
+
+| Field | Description |
+| - | - |
+| eid | Exchange ID, e.g. ```Binance```, ```Futures_OKX```. |
+| currency | Trading pair, e.g. ```BTC_USDT```. |
+| balance, stocks | Initial quote-currency and base-currency balances. |
+| fee | ```[maker rate, taker rate]``` in percent. |
+| feeMin | Minimum fee per fill; only applies to some markets. |
+| depthDeep, depthAmount | Depth levels and the amount on each simulated level. |
+| tradesMode | Whether trade prints are replayed in real-tick mode: ```"0"``` replay, ```"1"``` do not. |
+| feeder | Custom data source URL, see Backtesting System → Custom Data Source. |
+
+"Save Backtest Settings" also writes some keys starting with ```bt``` (e.g. ```btSlipPoint``` slippage, ```btNetDelay``` network delay, ```btFaultTolerant``` failure probability, ```btMaxBarLen``` max K-line bars) that record the other options of the backtest form; editing them by hand is not recommended. The local backtest engines read the same block, see Backtesting System → Local Backtesting Engine.
+
+### Supported Languages and Exchanges
+
+**Programming languages**
+
+The backtesting system supports strategies written in JavaScript, TypeScript, Python, Rust, [PINE](https://www.fmz.com/bbs-topic/9315), [MyLanguage](https://www.fmz.com/bbs-topic/2569), Blockly and Workflow.
+
+- JavaScript strategies (TypeScript is compiled to JavaScript first) are backtested in the browser, where the backtest engine runs as WebAssembly; nothing needs to be installed. JavaScript strategies can be debugged with Chrome DevTools during a backtest, see [this guide](https://www.fmz.com/digest-topic/9459).
+- Rust strategies are compiled by the platform's servers and the result is backtested in the browser; third-party crates declared in the strategy's frontmatter are fetched at compile time, so no local toolchain is needed.
+- Python strategies are backtested on a docker, either the platform's public servers or your own docker. Both backtesting and live trading use the Python 3 environment of the docker's system; install the third-party libraries you need yourself. The public servers only provide common libraries.
+- Workflow strategies show each node's execution state and data flow visually during a backtest.
+
+**Exchanges**
+
+Backtests use the platform's historical data; the exchanges selectable on the backtest page are the ones that can be backtested (the MCP tool ```list_exchanges``` also shows this: exchanges with ```backtest``` set to ```true``` have history data).
+
+- Cryptocurrency: spot and futures of major exchanges, e.g. Binance and Futures_Binance, OKX and Futures_OKX, HTX and Futures_HTX, Bybit and Futures_Bybit, Bitget and Futures_Bitget, GateIO and Futures_GateIO, with all symbols of the exchange.
+- Futu Securities (```Futures_Futu```): Hong Kong, US and other stock markets. Only daily data is available for backtesting; set ```currency``` to ```STOCK``` and select the stock code in the strategy with ```exchange.SetContractType()```:
+
+```js
 /*backtest
-start: 2021-06-26 00:00:00
-end: 2021-09-23 00:00:00
+start: 2024-05-01 00:00:00
+end: 2025-02-17 00:00:00
 period: 1d
-basePeriod: 1h
-exchanges: [{"eid":"Binance","currency":"BTC_USDT"}]
+basePeriod: 1d
+exchanges: [{"eid":"Futures_Futu","currency":"STOCK","fee":[0.03,0.03]}]
 */
+
+function main() {
+    var info = exchange.SetContractType("TSLA.US")   // Set the stock code: Tesla
+    Log("info:", info)                               // Contract info: InstrumentID, PriceTick, LotTick, VolumeMultiple, ...
+    Log(exchange.GetTicker())                        // Daily market data at the current backtest time
+}
 ```
 
-```cpp
-/*backtest
-start: 2021-06-26 00:00:00
-end: 2021-09-23 00:00:00
-period: 1d
-basePeriod: 1h
-exchanges: [{"eid":"Binance","currency":"BTC_USDT"}]
-*/
+### Parameter Optimization
+
+Parameter optimization generates several parameter sets from the ranges you configure and backtests each of them. In the strategy parameter section of the "Backtest" tab, tick the **Optimize** option to the right of a parameter to show its settings:
+
+- Min: the starting value of the parameter.
+- Max: the largest value the parameter is increased to.
+- Step: the increment.
+- Concurrent threads: how many backtests run at the same time during optimization. This option only applies to JavaScript, PINE and MyLanguage strategies, and not to template parameters.
+
+The system generates parameter combinations from ```Min```, ```Max``` and ```Step``` and backtests every combination once. Only **number** parameters can be optimized.
+
+### Reading Backtest Results
+
+When a backtest finishes, the backtest page shows the profit curve, statistics, status information, logs and account information.
+
+**Profit curve**
+
+The profit curve consists of the values the strategy records with ```LogProfit()``` (`LogProfit`). If the strategy never calls ```LogProfit()```, there is no profit curve and the statistics below, which depend on that series, cannot be computed; only the final assets in the account information remain. The ```profit``` and ```max_drawdown``` returned by the MCP tool ```get_backtest``` also come from ```LogProfit()```.
+
+**Statistics**
+
+The statistics are computed from the profit series ```profits``` (each element ```[timestamp, profit]```) and the initial assets ```totalAssets``` with the algorithm below:
+
+| Metric | Meaning |
+| - | - |
+| Return (totalReturns) | Last profit value ÷ initial assets. |
+| Annualized return (annualizedReturns) | Return × one year (yearDays days) ÷ backtest duration, scaled linearly. |
+| Max drawdown (maxDrawdown) | The largest fractional drop of assets (initial assets + profit) from their previous peak. maxDrawdownStartTime is the time of that peak, maxDrawdownTime the time of the deepest point. |
+| Win rate (winningRate) | Share of points in the profit series that are higher than the previous point (the first point is compared with 0). It counts profit records, not individual trades. |
+| Volatility (volatility) | The backtest period is cut into days; each day's profit ÷ initial assets is multiplied by yearDays to annualize it (days without profit records count as 0); volatility is the population standard deviation of these values. |
+| Sharpe ratio (sharpeRatio) | (Annualized return − risk-free rate 3%) ÷ volatility; 0 when volatility is 0. |
+
+yearDays is the number of days per year used for annualization, passed in by the backtest page. Note that daily returns are annualized by multiplying by yearDays rather than the usual √yearDays, so this Sharpe ratio should not be compared directly with values from other platforms.
+
+Algorithm source:
+
+```js
+function returnAnalyze(totalAssets, profits, ts, te, period, yearDays) {
+    // force by days
+    period = 86400000
+    if (profits.length == 0) {
+        return null
+    }
+    var freeProfit = 0.03 // 0.04
+    var yearRange = yearDays * 86400000
+    var totalReturns = profits[profits.length - 1][1] / totalAssets
+    var annualizedReturns = (totalReturns * yearRange) / (te - ts)
+
+    // MaxDrawDown
+    var maxDrawdown = 0
+    var maxAssets = totalAssets
+    var maxAssetsTime = 0
+    var maxDrawdownTime = 0
+    var maxDrawdownStartTime = 0
+    var winningRate = 0
+    var winningResult = 0
+    for (var i = 0; i < profits.length; i++) {
+        if (i == 0) {
+            if (profits[i][1] > 0) {
+                winningResult++
+            }
+        } else {
+            if (profits[i][1] > profits[i - 1][1]) {
+                winningResult++
+            }
+        }
+        if ((profits[i][1] + totalAssets) > maxAssets) {
+            maxAssets = profits[i][1] + totalAssets
+            maxAssetsTime = profits[i][0]
+        }
+        if (maxAssets > 0) {
+            var drawDown = 1 - (profits[i][1] + totalAssets) / maxAssets
+            if (drawDown > maxDrawdown) {
+                maxDrawdown = drawDown
+                maxDrawdownTime = profits[i][0]
+                maxDrawdownStartTime = maxAssetsTime
+            }
+        }
+    }
+    if (profits.length > 0) {
+        winningRate = winningResult / profits.length
+    }
+    // trim profits
+    var i = 0
+    var datas = []
+    var sum = 0
+    var preProfit = 0
+    var perRatio = 0
+    var rangeEnd = te
+    if ((te - ts) % period > 0) {
+        rangeEnd = (parseInt(te / period) + 1) * period
+    }
+    for (var n = ts; n < rangeEnd; n += period) {
+        var dayProfit = 0.0
+        var cut = n + period
+        while (i < profits.length && profits[i][0] < cut) {
+            dayProfit += (profits[i][1] - preProfit)
+            preProfit = profits[i][1]
+            i++
+        }
+        perRatio = ((dayProfit / totalAssets) * yearRange) / period
+        sum += perRatio
+        datas.push(perRatio)
+    }
+
+    var sharpeRatio = 0
+    var volatility = 0
+    if (datas.length > 0) {
+        var avg = sum / datas.length;
+        var std = 0;
+        for (i = 0; i < datas.length; i++) {
+            std += Math.pow(datas[i] - avg, 2);
+        }
+        volatility = Math.sqrt(std / datas.length);
+        if (volatility !== 0) {
+            sharpeRatio = (annualizedReturns - freeProfit) / volatility
+        }
+    }
+
+    return {
+        totalAssets: totalAssets,
+        yearDays: yearDays,
+        totalReturns: totalReturns,
+        annualizedReturns: annualizedReturns,
+        sharpeRatio: sharpeRatio,
+        volatility: volatility,
+        maxDrawdown: maxDrawdown,
+        maxDrawdownTime: maxDrawdownTime,
+        maxAssetsTime: maxAssetsTime,
+        maxDrawdownStartTime: maxDrawdownStartTime,
+        winningRate: winningRate
+    }
+}
 ```
 
-My Language:
+**Downloading data**
 
-```My
-(*backtest
-start: 2021-06-26 00:00:00
-end: 2021-09-23 00:00:00
-period: 1d
-basePeriod: 1h
-exchanges: [{"eid":"Binance","currency":"BTC_USDT"}]
-*)
-```
-
-PINE Language:
-
-```pine
-/*backtest
-start: 2021-06-26 00:00:00
-end: 2021-09-23 00:00:00
-period: 1d
-basePeriod: 1h
-exchanges: [{"eid":"Binance","currency":"BTC_USDT"}]
-*/
-```
+- Status bar data: after the backtest finishes, click "Download Table" at the top right of the "Status" panel to download the final status bar data as a CSV file.
+- Log data: click "Download Table" at the top right of the "Logs" panel to download the backtest logs as a CSV file.
 
 ### Custom Data Source
 
-The FMZ Quant Trading Platform's backtesting system supports custom data sources. The backtesting system uses the ```GET``` method to request custom URLs (publicly accessible addresses) to obtain external data sources for backtesting. The additional request parameters are as follows:
+The FMZ Quant Trading Platform's backtesting system supports custom data sources. During a backtest the platform's data server requests the custom URL with the ```GET``` method, so the URL must be reachable from the public internet. The request carries these parameters:
 
 | Parameter | Meaning | Description |
 | - | - | - |
 | symbol | Symbol name | Spot market data example: ```BTC_USDT```, Futures market data example: ```BTC_USDT.swap```, Perpetual futures funding rate data example: ```BTC_USDT.funding```, Perpetual futures price index data example: ```BTC_USDT.index``` |
 | eid | Exchange | For example: OKX, Futures_OKX |
-| round | Data precision | When true, indicates that the data returned by the custom data source defines specific precision. The request sent by the FMZ Quant Trading Platform backtesting system to the custom data source is fixed as: ```round=true``` |
+| round | Data precision | Always ```round=true```: prices and amounts are returned as integers scaled by their precision, which is given by ```quotePrecision``` and ```basePrecision``` in the returned ```detail```; see Backtesting System → Custom Data Source → Data Format. |
 | period | K-line data period (milliseconds) | For example: ```60000``` represents a 1-minute period |
 | depth | Order book depth levels | 1-20 |
-| trades | Whether tick data is required | True (1) / False (0) |
-| from | Start time | Unix timestamp |
-| to | End time | Unix timestamp |
+| trades | Whether trade-by-trade data is required | Yes (1) / No (0) |
+| from | Start time | Unix timestamp in seconds |
+| to | End time | Unix timestamp in seconds |
 | detail | Request detailed information of the symbol | When true, indicates that it needs to be provided by the custom data source. The request sent by the FMZ Quant Trading Platform backtesting system to the custom data source is fixed as: ```detail=true``` |
 | custom | -- | This parameter can be ignored |
 
@@ -1054,6 +3381,15 @@ The returned format must be one of the following two formats (automatically reco
 | detail | Detailed information of the requested instrument, including quote currency name, base currency name, precision, minimum order quantity, etc. |
 | schema | Specifies the column attributes in the data array, case-sensitive. Limited to time, open, high, low, close, vol, asks, bids, trades |
 | data | Data recorded according to the column structure set by schema |
+
+**Numeric precision**
+
+Requests always carry ```round=true```, and all values are returned as integers scaled by their precision, so that no floating-point precision is lost in transit:
+
+- Prices (```open```, ```high```, ```low```, ```close```, and the prices in ```asks```/```bids``` and ```trades```) = actual value × 10^```quotePrecision```.
+- Amounts (```vol```, and the amounts in ```asks```/```bids``` and ```trades```) = actual value × 10^```basePrecision```.
+
+In the examples above ```quotePrecision``` is 2, so ```9531300``` means a price of 95313.00; ```basePrecision``` is 5, so ```787``` means an amount of 0.00787. Time columns (```time``` and the time in ```trades```) are millisecond timestamps and are not scaled.
 
 **detail field**
 
@@ -1131,14 +3467,13 @@ Funding rate data structure is as follows:
             -16294,
             0
         ]
-        // ...
     ]
 }
 ```
 
 - Adjacent period interval is 8 hours
-- For example, Binance funding rate updates every 8 hours, why is the funding rate data -16795?
-  This is because, like K-line data, to avoid floating-point precision loss during network transmission, data is represented as integers; funding rate data can also be negative.
+- Why is the funding rate -16795?
+  Like K-line data it is an integer scaled by precision: ```quotePrecision``` of this data is 8, so -16795 means a funding rate of -0.00016795. Funding rates can be negative.
 
 Example of funding rate data request sent by the backtest system:
 
@@ -1178,8 +3513,7 @@ Price index data structure is as follows:
     ],
     "data": [
         [1584921600000, 58172, 59167, 56902, 58962, 0],
-        [1584922500000, 58975, 59428, 58581, 59154, 0],
-        // ...
+        [1584922500000, 58975, 59428, 58581, 59154, 0]
     ]
 }
 ```
@@ -1191,7 +3525,7 @@ http://customserver:9090/data?custom=0&depth=20&detail=true&eid=Futures_Binance&
 
 #### Custom Data Source Example
 
-Specify the data source address, for example: ```http://120.24.2.20:9090/data```. The custom data source service program is written in ```Golang```:
+Deploy the service below on a server reachable from the public internet; the data source URL is then ```http://<server>:9090/data``` (replace ```<server>``` with the server's public IP or domain name). The custom data source service is written in ```Golang```:
 
 ```golang
 package main
@@ -1203,7 +3537,7 @@ import (
 )
 
 func Handle (w http.ResponseWriter, r *http.Request) {
-    // e.g. set on backtest DataSourse: http://xxx.xx.x.xx:9090/data
+    // e.g. set on backtest DataSource: http://xxx.xx.x.xx:9090/data
 
     // request: GET http://xxx.xx.x.xx:9090/data?custom=0&depth=20&detail=true&eid=OKX&from=1584921600&period=86400000&round=true&symbol=BTC_USDT&to=1611244800&trades=1
     //              http://xxx.xx.x.xx:9090/data?custom=0&depth=20&detail=true&eid=Futures_Binance&from=1599958800&period=3600000&round=true&symbol=BTC_USDT.swap&to=1611244800&trades=0
@@ -1335,7 +3669,7 @@ start: 2021-01-16 08:00:00
 end: 2021-01-22 00:00:00
 period: 1d
 basePeriod: 1d
-exchanges: [{"eid":"OKX","currency":"BTC_USDT","feeder":"http://120.24.2.20:9090/data"}]
+exchanges: [{"eid":"OKX","currency":"BTC_USDT","feeder":"http://<server>:9090/data"}]
 args: [["number",2]]
 */
 
@@ -1350,54 +3684,95 @@ function main() {
 
 ### Local Backtesting Engine
 
-FMZ Quant Trading Platform has open-sourced local backtesting engines for ```JavaScript``` and ```Python``` languages, supporting custom underlying K-line periods during backtesting.
-- [JavaScript Backtesting Engine](https://github.com/fmzquant/backtest_javascript)
-- [Python Backtesting Engine](https://github.com/fmzquant/backtest_python)
+The platform publishes local backtest engines for JavaScript and Python. They use the same engine core and the same history data (downloaded from the platform's data server) as cloud backtests, and backtest JavaScript and Python strategies quickly on your own computer:
 
-Using Python as an example, here's a brief guide on how to use the local backtesting engine:
+- [Python backtest engine](https://github.com/fmzquant/backtest_python)
+- [JavaScript backtest engine](https://github.com/fmzquant/backtest_javascript)
+
+**Python**
+
+Install (requires Python 3 and pip):
+
+```bash
+pip install https://github.com/fmzquant/backtest_python/archive/master.zip
+pip install pandas matplotlib   # only needed for Join(True) and Show()
+```
+
+On first use the package downloads the engine file for your system from the data server; afterwards only history data is downloaded. A strategy file is an ordinary FMZ strategy plus the ```backtest``` configuration comment at the top (format: see Backtesting System → Backtest Configuration and Saving) and a few lines that drive the engine:
+
 ```python
 '''backtest
-start: 2022-02-19 00:00:00
-end: 2022-03-22 12:00:00
-period: 15m
+start: 2026-09-01 00:00:00
+end: 2026-09-15 00:00:00
+period: 1h
+basePeriod: 15m
 exchanges: [{"eid":"Binance","currency":"BTC_USDT","balance":10000,"stocks":0}]
 '''
-
-# Part 1 -----------------------------------
-# Initialize the backtesting engine, backtest contains the engine configuration
-# which is consistent with the FMZ platform's online backtesting system configuration
-# Read the configuration string above via __doc__ and initialize the backtesting environment
+import json
 from fmz import *
-task = VCtx(__doc__) # initialize backtest engine from __doc__
-# End    -----------------------------------
+task = VCtx(__doc__)  # Initialize the engine from the configuration above; exchange, Log, TA etc. become globals
 
-# Part 2 -----------------------------------
-# Below is an example of strategy code to be tested (complete strategy code can be copied from FMZ platform)
-# Note: When copying strategy code only, it does not include parameter design, interaction design, and other configurations
-def onTick():
-	ticker = _C(exchange.GetTicker)
-	LogStatus(_D(), ticker.Last)
-
+# The strategy under test, copied from the platform as is
 def main():
-	exchange.SetCurrency("ETH_USDT")
-	# exchange.SetContractType("swap")  # If testing futures exchange objects, you need to set the contract, for example, set to perpetual contract here
-	Log(exchange.GetAccount())
-	while True:
-		onTick()
-		Sleep(1000)
-# End    -----------------------------------
+    Log(exchange.GetAccount())
+    while True:
+        r = exchange.GetRecords()
+        LogStatus(_D(), r[-1]["Close"])
+        Sleep(60 * 60 * 1000)
 
-# Part 3 -----------------------------------
-# Execute backtesting and catch the termination signal, EOF exception will be triggered when backtesting ends
-# After catching the exception, you can output backtesting result data or display backtesting charts
 try:
-	main()
-except:
-	print("Strategy testing completed.")
-	print(task.Join(False)) # print backtest result
-	# task.Show() # or show backtest chart
-# End    -----------------------------------
+    main()
+except EOFError:      # The engine raises EOFError when the virtual clock reaches the end time
+    pass
+result = json.loads(task.Join(False))   # Raw backtest result (JSON)
+print(result["LogsCount"], result["Elapsed"] / 1e6)
+# task.Show()                           # Or show the profit chart (requires matplotlib)
 ```
+
+Run it with ```python strategy.py```. ```task.Join(False)``` returns the raw result as JSON, ```task.Join(True)``` returns the profit data as a pandas DataFrame, and ```task.Show()``` plots the profit curve.
+
+**JavaScript**
+
+```bash
+npm install git+https://github.com/fmzquant/backtest_javascript.git
+```
+
+```js
+var fmz = require("fmz")
+var task = fmz.VCtx({
+    start: "2026-09-01 00:00:00", end: "2026-09-15 00:00:00", period: "1h", basePeriod: "15m",
+    exchanges: [{eid: "Binance", currency: "BTC_USDT", balance: 10000, stocks: 0}]
+})
+// From here on exchange, Log, TA etc. are globals; paste the strategy code and call main()
+
+function main() {
+    Log(exchange.GetAccount())
+    while (true) {
+        var r = exchange.GetRecords()
+        LogStatus(_D(), r[r.length - 1].Close)
+        Sleep(60 * 60 * 1000)
+    }
+}
+
+try {
+    main()
+} catch (e) {
+    // The engine throws "EOF" when the virtual clock reaches the end time
+}
+var result = JSON.parse(task.Join())    // Same result as Join(False) of the Python engine
+console.log(result.LogsCount)
+```
+
+**Differences from cloud backtests**
+
+- Only JavaScript and Python strategies are supported and templates are not loaded automatically: paste the code of referenced templates into the file. PINE and MyLanguage strategies depend on trading libraries and therefore cannot be backtested locally.
+- Strategy parameters are not injected; define them as global variables in the code.
+- ```start``` and ```end``` in the comment are parsed in the machine's time zone; network delay is fixed at 200 ms; slippage and real-tick mode are not supported.
+- As in the cloud, profit, drawdown and the profit curve exist only if the strategy calls ```LogProfit()```.
+
+**Backtesting with an AI assistant**
+
+An AI assistant can run backtests for you: it starts a cloud backtest with the MCP tool ```run_backtest``` and reads profit, drawdown, error logs and other results with ```get_backtest```, see Integrations → AI Integration. It can also install the local engine on your machine for a fast edit-and-run loop, then confirm once with a cloud backtest.
 
 ### Backtest Page Shortcuts
 
@@ -1408,2126 +3783,408 @@ except:
 - Shortcut for starting backtest
   Use ```Ctrl + b``` to start backtest.
 
-### Backtest Data Download
+## Advanced Topics
 
-- Backtest System Log Data Download
-  Open the specific strategy and switch to the "Backtest Page" to run strategy backtesting. After the backtest is completed, there is a "Download Table" button in the upper right corner of the displayed "Status Information" bar. Click it to download the CSV format file of the status bar data at the end of the backtest.
-- Backtest System Status Bar Data Download
-  Open the specific strategy and switch to the "Backtest Page" to run strategy backtesting. After the backtest is completed, there is a "Download Table" button in the upper right corner of the displayed "Log Information" bar. Click it to download the CSV format file of the backtest log data.
+Advanced usage: JavaScript multi-threading, communication between live tradings, API rate limiting, options trading and on-chain trading with Web3.
 
-### Backtest System Sharpe Ratio Algorithm
+### JavaScript Multi-threading
 
-Backtesting system Sharpe ratio algorithm source code:
-```js
-function returnAnalyze(totalAssets, profits, ts, te, period, yearDays) {
-    // force by days
-    period = 86400000
-    if (profits.length == 0) {
-        return null
-    }
-    var freeProfit = 0.03 // 0.04
-    var yearRange = yearDays * 86400000
-    var totalReturns = profits[profits.length - 1][1] / totalAssets
-    var annualizedReturns = (totalReturns * yearRange) / (te - ts)
+JavaScript strategies can use the ```threading``` object to create threads that really run in parallel, and exchange data between them with messages, shared dictionaries, locks and similar objects. This page explains when to use threads and how to organize thread code; for the parameters and return values of each function see `Threads` in the syntax manual.
 
-    // MaxDrawDown
-    var maxDrawdown = 0
-    var maxAssets = totalAssets
-    var maxAssetsTime = 0
-    var maxDrawdownTime = 0
-    var maxDrawdownStartTime = 0
-    var winningRate = 0
-    var winningResult = 0
-    for (var i = 0; i < profits.length; i++) {
-        if (i == 0) {
-            if (profits[i][1] > 0) {
-                winningResult++
+## Pick the right tool first
+
+| Need | Recommended | Languages |
+| - | - | - |
+| Send several API requests at once (for example tickers from several exchanges) and wait for the results | `exchange.Go`, with `EventLoop` to wait for completion events | All languages |
+| Long-running background work: separate market data collection, risk checks, heavy computation | `threading.Thread` | JavaScript only |
+| Serve HTTP, WebSocket or TCP from inside the strategy | `threading.Serve` | JavaScript only |
+
+When you only need a few concurrent requests, ```exchange.Go()``` is simpler and involves no data passing between threads. The ```threading``` object on this page is for JavaScript strategies only; Python and Rust strategies use ```exchange.Go()```.
+
+These functions can be called in the backtesting system, but the threads actually run one after another there; this only keeps the code runnable in backtests.
+
+## Threads run in isolated environments
+
+The function passed to ```threading.Thread()``` runs in a separate JavaScript environment. This is the most important thing to keep in mind when writing thread code:
+
+- A thread function **cannot reference outer variables or closures**, nor call other functions defined in the strategy. Pass the data it needs as arguments: ```threading.Thread(func, arg1, arg2, ...)```.
+- Plain objects and arrays passed as arguments are **deep-copied**: changing them inside the thread does not affect other threads. When several threads need to see the same data, use a dictionary created by ```threading.Dict()```.
+- Functions can be passed as arguments too; ```threading.Thread()``` also accepts function source strings, which can be used to load external libraries in the thread.
+- Platform API functions such as ```exchange.GetTicker()``` and ```Log()``` can be called directly in a thread.
+- The return value of the thread function is retrieved with ```join()```: ```t.join().ret```.
+
+## Exchanging data between threads
+
+| Method | Usage | Notes |
+| - | - | - |
+| Messages | ```t.postMessage(msg)``` sends to thread ```t```; inside a thread, ```threading.currentThread().peekMessage(timeout)``` reads the messages it received; a child thread sends back to the main thread with ```threading.mainThread().postMessage(msg)``` | Each thread has its own inbox, read in order. ```peekMessage(-1)``` does not block and returns an empty value when there is no message |
+| Shared dictionary | ```var d = threading.Dict()```, pass it to threads as an argument, then each thread uses ```d.get(key)``` and ```d.set(key, value)``` | Good for holding the "latest state", such as the latest price or a running flag |
+| Thread data | ```t.setData(key, value)```, ```t.getData(key)``` | Key-value pairs attached to a thread object; invalid after the thread ends (```join()```, ```terminate()```) |
+| Synchronization objects | ```threading.Lock()```, ```threading.Event()```, ```threading.Condition()``` | Passed to threads as arguments for mutual exclusion and waiting for notifications |
+
+A message received by a thread also raises an event, so the thread object's `eventLoop` can wait for messages and other events in one place.
+
+## Thread lifecycle
+
+- ```t.join()``` waits for the thread to end and returns its result, with an optional timeout; ```t.terminate()``` ends a thread forcibly.
+- When a thread has ended and is no longer referenced, its resources are reclaimed automatically; there is no need to call ```join()``` just to free them. An error is raised when more than 2000 threads are kept referenced and cannot be reclaimed.
+- ```threading.pending()``` returns the number of running threads (main thread included).
+- All threads end when the live trading stops. Waits in ```peekMessage()```, ```join()```, locks and events are interrupted by the stop.
+
+## Serving from inside the strategy
+
+```threading.Serve(address, handler, ...args)``` starts an HTTP (WebSocket included) or TCP service inside the strategy process. Each request or connection calls the handler in its own thread. It returns a `Server` object (```addr()``` gives the actual listening address, ```close()``` shuts it down). Like thread functions, handlers run in isolated environments and receive what they need as arguments; a ```threading.Dict()``` is commonly used to share state with the main thread. For the address syntax and the methods of the ```ctx``` object see `Serve`.
+
+The old global function ```__Serve()``` still works but only returns the listening address string; use ```threading.Serve()``` in new code.
+
+## Examples
+
+### Several threads compute in parallel, the main thread collects the results
+
+Each thread fetches the K-lines of one symbol and computes a moving average; the result goes back to the main thread as the return value. Note that the symbol is passed as an argument and the thread function references no outer variables.
+
+```javascript
+function main() {
+    var symbols = ["BTC_USDT", "ETH_USDT", "SOL_USDT"]
+    var threads = []
+    for (var i = 0; i < symbols.length; i++) {
+        threads.push(threading.Thread(function(symbol, period) {
+            // runs in the thread: only arguments and platform APIs are available
+            var records = exchange.GetRecords(symbol, period)
+            if (!records || records.length < 20) {
+                return null
             }
-        } else {
-            if (profits[i][1] > profits[i - 1][1]) {
-                winningResult++
+            var ma = TA.MA(records, 20)
+            return {symbol: symbol, close: records[records.length - 1].Close, ma20: ma[ma.length - 1]}
+        }, symbols[i], PERIOD_H1))
+    }
+    for (var i = 0; i < threads.length; i++) {
+        var r = threads[i].join().ret
+        if (r) {
+            Log(r.symbol, "close:", r.close, "MA20:", r.ma20)
+        }
+    }
+}
+```
+
+### A background thread collects prices, the main thread reads them and sends commands
+
+The background thread writes the latest price into a shared dictionary and reports errors to the main thread through messages; the main thread tells it to exit with a message.
+
+```javascript
+function main() {
+    var shared = threading.Dict()
+    var worker = threading.Thread(function(dict, symbol) {
+        while (true) {
+            // read commands from the main thread; -1 means do not block
+            var cmd = threading.currentThread().peekMessage(-1)
+            if (cmd == "stop") {
+                break
             }
-        }
-        if ((profits[i][1] + totalAssets) > maxAssets) {
-            maxAssets = profits[i][1] + totalAssets
-            maxAssetsTime = profits[i][0]
-        }
-        if (maxAssets > 0) {
-            var drawDown = 1 - (profits[i][1] + totalAssets) / maxAssets
-            if (drawDown > maxDrawdown) {
-                maxDrawdown = drawDown
-                maxDrawdownTime = profits[i][0]
-                maxDrawdownStartTime = maxAssetsTime
-            }
-        }
-    }
-    if (profits.length > 0) {
-        winningRate = winningResult / profits.length
-    }
-    // trim profits
-    var i = 0
-    var datas = []
-    var sum = 0
-    var preProfit = 0
-    var perRatio = 0
-    var rangeEnd = te
-    if ((te - ts) % period > 0) {
-        rangeEnd = (parseInt(te / period) + 1) * period
-    }
-    for (var n = ts; n < rangeEnd; n += period) {
-        var dayProfit = 0.0
-        var cut = n + period
-        while (i < profits.length && profits[i][0] < cut) {
-            dayProfit += (profits[i][1] - preProfit)
-            preProfit = profits[i][1]
-            i++
-        }
-        perRatio = ((dayProfit / totalAssets) * yearRange) / period
-        sum += perRatio
-        datas.push(perRatio)
-    }
-
-    var sharpeRatio = 0
-    var volatility = 0
-    if (datas.length > 0) {
-        var avg = sum / datas.length;
-        var std = 0;
-        for (i = 0; i < datas.length; i++) {
-            std += Math.pow(datas[i] - avg, 2);
-        }
-        volatility = Math.sqrt(std / datas.length);
-        if (volatility !== 0) {
-            sharpeRatio = (annualizedReturns - freeProfit) / volatility
-        }
-    }
-
-    return {
-        totalAssets: totalAssets,
-        yearDays: yearDays,
-        totalReturns: totalReturns,
-        annualizedReturns: annualizedReturns,
-        sharpeRatio: sharpeRatio,
-        volatility: volatility,
-        maxDrawdown: maxDrawdown,
-        maxDrawdownTime: maxDrawdownTime,
-        maxAssetsTime: maxAssetsTime,
-        maxDrawdownStartTime: maxDrawdownStartTime,
-        winningRate: winningRate
-    }
-}
-```
-
-## Strategy Entry Functions
-
-For strategies written in ```JavaScript```, ```Python```, ```Rust```, and ```C++```, the FMZ Quant Trading Platform has already defined the following entry functions.
-
-  | Function Name | Description |
-  | - | - |
-  |```main()```| The entry function, i.e., the main function of the strategy. |
-
-  |```onexit()```| The cleanup function executed upon normal exit, with a maximum execution time of 5 minutes; it does not have to be declared. If execution times out, an **interrupt** error will be reported. In live trading, if the ```onerror()``` function has already been triggered first, the ```onexit()``` function will no longer be triggered.
-
-  |```onerror()```| The function triggered upon abnormal exit, with a maximum execution time of 5 minutes; it does not have to be declared. Strategies written in ```Python``` and ```C++``` do not support this function, and the backtesting system does not support this function either.
-
-  |```init()```| The initialization function, which the strategy program automatically calls first when it starts running; it does not have to be declared. |
-
-  **Notes:**
-
-  - When the ```main()``` function finishes executing, all created child threads will be automatically terminated.
-
-  - In ```Rust``` language strategies, you can directly define ```fn main()```, ```fn init()```, and ```fn onexit()``` (which are automatically called by the bootstrap layer); you can also call ```OnExit()``` in the strategy code to register additional exit hooks. For details, see "Rust Strategy Writing Guide".
-
-### onexit()
-
-The ```onexit()``` function is used to handle the cleanup work of a strategy. Its maximum execution time is 5 minutes, and it must be implemented by the user.
-
-Test the ```onexit()``` function:
-
-```javascript
-function main(){
-    Log("Starting, will stop after 5 seconds and execute cleanup function!")
-    Sleep(1000 * 5)
-}
-
-// Implementation of the cleanup function
-function onexit(){
-    var beginTime = new Date().getTime()
-    while(true){
-        var nowTime = new Date().getTime()
-        Log("Program stop countdown..cleanup started, elapsed time:", (nowTime - beginTime) / 1000, "seconds!")
-        Sleep(1000)
-    }
-}
-```
-
-```python
-import time
-def main():
-    Log("Starting, will stop after 5 seconds and execute cleanup function!")
-    Sleep(1000 * 5)
-
-def onexit():
-    beginTime = time.time() * 1000
-    while True:
-        ts = time.time() * 1000
-        Log("Program stop countdown..cleanup started, elapsed time:", (ts - beginTime) / 1000, "seconds!")
-        Sleep(1000)
-```
-
-```rust
-fn main() {
-    Log!("Starting, will stop after 5 seconds and execute cleanup function!");
-    Sleep(1000 * 5);
-}
-
-// Implementation of the cleanup function
-fn onexit() {
-    let beginTime = Unix() * 1000;
-    loop {
-        let nowTime = Unix() * 1000;
-        Log!("Program stop countdown..cleanup started, elapsed time:", (nowTime - beginTime) / 1000, "seconds!");
-        Sleep(1000);
-    }
-}
-```
-
-```cpp
-void main() {
-    Log("Starting, will stop after 5 seconds and execute cleanup function!");
-    Sleep(1000 * 5);
-}
-
-void onexit() {
-    auto beginTime = Unix() * 1000;
-    while(true) {
-        auto ts = Unix() * 1000;
-        Log("Program stop countdown..cleanup started, elapsed time:", (ts - beginTime) / 1000, "seconds!");
-        Sleep(1000);
-    }
-}
-```
-
-Since a strategy in the backtesting system is usually designed as an infinite loop that continuously polls and executes, the ```onexit()``` function implemented by the strategy cannot be triggered in the backtesting system. You can trigger the execution of the ```onexit()``` function by detecting the backtesting system's end marker (the EOF exception).
-
-```javascript
-function main() {
-    if (exchange.GetName().startsWith("Futures_")) {
-        Log("Exchange is futures")
-        exchange.SetContractType("swap")
-    } else {
-        Log("Exchange is spot")
-    }
-
-    if (IsVirtual()) {
-        try {
-            onTick()
-        } catch (e) {
-            Log("error:", e)
-        }
-    } else {
-        onTick()
-    }
-}
-
-function onTick() {
-    while (true) {
-        var ticker = exchange.GetTicker()
-        LogStatus(_D(), ticker ? ticker.Last : "--")
-        Sleep(500)
-    }
-}
-
-function onexit() {
-    Log("Executing cleanup function")
-}
-```
-
-```python
-def main():
-    if exchange.GetName().startswith("Futures_"):
-        Log("Exchange is futures")
-    else:
-        Log("Exchange is spot")
-
-    if IsVirtual():
-        try:
-            onTick()
-        except Exception as e:
-            Log(e)
-    else:
-        onTick()
-
-def onTick():
-    while True:
-        ticker = exchange.GetTicker()
-        LogStatus(_D(), ticker["Last"] if ticker else "--")
-        Sleep(500)
-
-def onexit():
-    Log("Executing cleanup function")
-```
-
-```rust
-fn onTick() {
-    loop {
-        match exchange.GetTicker(None) {
-            Ok(ticker) => LogStatus!(_D(None), ticker.Last),
-            Err(e) => {
-                // When the backtest ends, the API call returns Err; exit the loop so that main returns, thereby triggering the onexit() cleanup function
-                Log!("error:", e);
-                break;
-            }
-        }
-        Sleep(500);
-    }
-}
-
-fn main() {
-    if exchange.GetName().starts_with("Futures_") {
-        Log!("Exchange is futures");
-        let _ = exchange.SetContractType("swap");
-    } else {
-        Log!("Exchange is spot");
-    }
-
-    onTick();
-}
-
-fn onexit() {
-    Log!("Executing cleanup function");
-}
-```
-
-```cpp
-#include <iostream>
-#include <exception>
-#include <string>
-
-void onTick() {
-    while (true) {
-        auto ticker = exchange.GetTicker();
-        LogStatus(_D(), ticker);
-        Sleep(500);
-    }
-}
-
-void main() {
-    std::string prefix = "Futures_";
-    bool startsWith = exchange.GetName().substr(0, prefix.length()) == prefix;
-    if (startsWith) {
-        Log("Exchange is futures");
-        exchange.SetContractType("swap");
-    } else {
-        Log("Exchange is spot");
-    }
-
-    if (IsVirtual()) {
-        try {
-            onTick();
-        } catch (...) {
-            std::cerr << "Caught unknown exception" << std::endl;
-        }
-    } else {
-        onTick();
-    }
-}
-
-void onexit() {
-    Log("Executing cleanup function");
-}
-```
-
-### init()
-
-```init()``` is the initialization function implemented by the user. When a strategy starts running, the ```init()``` function is automatically executed first to complete the initialization tasks designed within the strategy.
-
-```javascript
-function main(){
-    Log("First line of code executed!", "#FF0000")
-    Log("Exiting!")
-}
-
-// Initialization function
-function init(){
-    Log("Initializing!")
-}
-```
-
-```python
-def main():
-    Log("First line of code executed!", "#FF0000")
-    Log("Exiting!")
-
-def init():
-    Log("Initializing!")
-```
-
-```rust
-fn main() {
-    Log!("First line of code executed!", "#FF0000");
-    Log!("Exiting!");
-}
-
-// Initialization function
-fn init() {
-    Log!("Initializing!");
-}
-```
-
-```cpp
-void main() {
-    Log("First line of code executed!", "#FF0000");
-    Log("Exiting!");
-}
-
-void init() {
-    Log("Initializing!");
-}
-```
-
-### onerror()
-
-```onerror()```, triggered when an exception occurs, the ```onerror()``` function will be executed. This function is not supported in ```Python``` and ```C++``` language strategies. The ```onerror()``` function can accept a ```msg``` parameter, which contains the error message when the exception is triggered.
-
-```javascript
-function main() {
-    var arr = []
-    Log(arr[6].Close)  // Intentionally trigger a program exception here
-}
-
-function onerror(msg) {
-    Log("Error:", msg)
-}
-```
-
-```python
-# Python not supported
-```
-
-```cpp
-// C++ not supported
-```
-
-## Strategy Framework and API Functions
-
-In strategies written in ```JavaScript```, ```Python```, ```Rust```, or ```C++```, you need to call the ```Sleep()``` function within the strategy's main loop. During backtesting, it is used to control the backtesting speed; in live trading, it is used to control the strategy's polling interval, thereby controlling the request frequency to the exchange's API interface.
-
-### Global Functions
-
-| Function Name | Description |
-| - | - |
-| [Version](/syntax-guide#fun_version)               | Returns the current system version number |
-| [Sleep](/syntax-guide#fun_sleep)                   | Sleep function, parameter is the number of milliseconds to pause |
-| [IsVirtual](/syntax-guide#fun_isvirtual)           | Determines the execution environment, returns true for backtesting environment |
-| [Mail](/syntax-guide#fun_mail)                     | Send email |
-| [Mail_Go](/syntax-guide#fun_mail_go)               | Asynchronous version of the ```Mail``` function |
-| [SetErrorFilter](/syntax-guide#fun_seterrorfilter) | Filter error logs, parameter is a regular expression string, error logs matching this regex will not be uploaded to the log system |
-| [GetPid](/syntax-guide#fun_getpid)                 | Get live trading process ID |
-| [GetLastError](/syntax-guide#fun_getlasterror)     | Get the most recent error message |
-| [GetCommand](/syntax-guide#fun_getcommand)         | Get strategy interaction commands, for strategy interaction control settings please refer to: [Interactive Controls](/user-guide#interactive-controls) |
-| [GetMeta](/syntax-guide#fun_getmeta)               | Get the Meta value written when generating the strategy registration code |
-| [Dial](/syntax-guide#fun_dial)                     | Used for raw Socket access |
-| [HttpQuery](/syntax-guide#fun_httpquery)           | Send HTTP request |
-| [HttpQuery_Go](/syntax-guide#fun_httpquery_go)     | Asynchronous version of the ```HttpQuery``` function |
-| [Encode](/syntax-guide#fun_encode)                 | Data encoding function |
-| [UnixNano](/syntax-guide#fun_unixnano)             | Get nanosecond timestamp |
-| [Unix](/syntax-guide#fun_unix)                     | Get second-level timestamp |
-| [GetOS](/syntax-guide#fun_getos)                   | Get system information |
-| [MD5](/syntax-guide#fun_md5)                       | Calculate MD5 hash value |
-| [DBExec](/syntax-guide#fun_dbexec)                 | Database function for executing SQL statements and performing database operations |
-| [UUID](/syntax-guide#fun_uuid)                     | Generate UUID |
-| [EventLoop](/syntax-guide#fun_eventloop)           | Listen for events, returns when any WebSocket is readable or concurrent tasks like ```exchange.Go```, ```HttpQuery_Go``` are completed, this function is only available for live trading |
-| [_G](/syntax-guide#fun__g)                         | Persistently save data, this function implements a saveable global dictionary feature. The data structure is a key-value pair table, permanently saved in the docker's local database file |
-| [_D](/syntax-guide#fun__d)                         | Timestamp processing function, converts millisecond timestamp or Date object to time string |
-| [_N](/syntax-guide#fun__n)                         | Format floating-point numbers, for example ```_N(3.1415, 2)``` will remove digits after the second decimal place of 3.1415, the function returns 3.14 |
-| [_C](/syntax-guide#fun__c)                         | Retry function for interface fault tolerance. Note that for fault tolerance of ```exchange.GetTicker``` function, use ```_C(exchange.GetTicker)``` instead of ```_C(exchange.GetTicker())``` |
-| [_Cross](/syntax-guide#fun__cross)                 | Crossover detection function, ```_Cross()``` returns a positive number indicating the number of periods since upward crossover, negative number for downward crossover, 0 means current prices are equal |
-| [JSONParse](/syntax-guide#fun_jsonparse)           | Parse JSON, can correctly parse JSON strings containing large numeric values, parsing large numbers as string type. The backtesting system does not support the ```JSONParse()``` function |
-| [SetChannelData](/syntax-guide#fun_setchanneldata) | Publish latest status data on a channel for inter-bot communication |
-| [GetChannelData](/syntax-guide#fun_getchanneldata) | Subscribe to channel data from specified live trading bot for inter-bot communication |
-
-### Logging Functions
-
-| Function Name | Description |
-| - | - |
-| [Log](/syntax-guide#fun_log)                       | Output logs, supports setting log text color, push notifications, and printing base64-encoded images |
-| [LogProfit](/syntax-guide#fun_logprofit)           | Output profit/loss data, print P&L values and draw profit curves based on the values |
-| [LogProfitReset](/syntax-guide#fun_logprofitreset) | Clear all profit logs and profit charts output by the ```LogProfit``` function |
-| [LogStatus](/syntax-guide#fun_logstatus)           | Output information in the status bar, supports setting button controls and outputting tables in the status bar |
-| [EnableLog](/syntax-guide#fun_enablelog)           | Enable or disable logging for order information |
-| [Chart](/syntax-guide#fun_chart)                   | Chart drawing function, based on Highcharts/Highstocks chart library |
-| [KLineChart](/syntax-guide#fun_klinechart)         | Pine language-style chart drawing function, used for custom drawing in a Pine-like manner during strategy execution |
-| [LogReset](/syntax-guide#fun_logreset)             | Clear logs, supports retaining a specified number of recent log records through parameters |
-| [LogVacuum](/syntax-guide#fun_logvacuum)           | Reclaim SQLite resources, reclaim storage space occupied by SQLite when deleting data after calling ```LogReset()``` function to clear logs |
-| [console.log](/syntax-guide#fun_console.log)       | Output debug information in the "Debug Info" section of the live trading page |
-| [console.error](/syntax-guide#fun_console.error)   | Output error information in the "Debug Info" section of the live trading page |
-
-### Market Functions
-
-| Function Name | Description |
-| - | - |
-| [exchange.GetTicker](/syntax-guide#fun_exchange.getticker)       | Get tick market data |
-| [exchange.GetDepth](/syntax-guide#fun_exchange.getdepth)         | Get order book depth data |
-| [exchange.GetTrades](/syntax-guide#fun_exchange.gettrades)       | Get market trade records |
-| [exchange.GetRecords](/syntax-guide#fun_exchange.getrecords)     | Get K-line data |
-| [exchange.GetPeriod](/syntax-guide#fun_exchange.getperiod)       | Get current K-line period |
-| [exchange.SetMaxBarLen](/syntax-guide#fun_exchange.setmaxbarlen) | Set maximum K-line length |
-| [exchange.GetRawJSON](/syntax-guide#fun_exchange.getrawjson)     | Get raw content returned from the most recent REST request |
-| [exchange.GetRate](/syntax-guide#fun_exchange.getrate)           | Get current exchange rate value |
-| [exchange.SetData](/syntax-guide#fun_exchange.setdata)           | Set data loaded at strategy runtime |
-| [exchange.GetData](/syntax-guide#fun_exchange.getdata)           | Get loaded data or data provided by external links |
-| [exchange.GetMarkets](/syntax-guide#fun_exchange.getmarkets)     | Get exchange market information |
-| [exchange.GetTickers](/syntax-guide#fun_exchange.gettickers)     | Get exchange aggregated market data |
-
-### Trading Functions
-
-| Function Name | Description |
-| - | - |
-| [exchange.Buy](/syntax-guide#fun_exchange.buy)                          | Submit a buy order. When placing futures contract orders, ensure the trading direction is set correctly; an error will occur if the trading direction does not match the trading function |
-| [exchange.Sell](/syntax-guide#fun_exchange.sell)                        | Submit a sell order. When placing futures contract orders, ensure the trading direction is set correctly; an error will occur if the trading direction does not match the trading function |
-| [exchange.CreateOrder](/syntax-guide#fun_exchange.createorder)          | Submit an order by specifying the trading instrument, trading direction, price, and quantity through parameters |
-| [exchange.ModifyOrder](/syntax-guide#fun_exchange.modifyorder)          | Modify the price and quantity of a regular order, supports modifying other order attributes through additional parameters |
-| [exchange.ModifyConditionOrder](/syntax-guide#fun_exchange.modifyconditionorder) | Modify the quantity and trigger conditions of a conditional order, supports modifying other conditional order attributes through additional parameters |
-| [exchange.CancelOrder](/syntax-guide#fun_exchange.cancelorder)          | Cancel an order |
-| [exchange.GetOrder](/syntax-guide#fun_exchange.getorder)                | Get order information, data structure is [Order](/syntax-guide#struct_order) structure |
-| [exchange.GetOrders](/syntax-guide#fun_exchange.getorders)              | Get unfilled orders, data structure is an array (list) of [Order](/syntax-guide#struct_order) structures |
-| [exchange.GetHistoryOrders](/syntax-guide#fun_exchange.gethistoryorders)| Get historical orders for the current trading pair/contract, supports specifying specific trading instruments |
-| [exchange.SetPrecision](/syntax-guide#fun_exchange.setprecision)        | Set the price and order quantity precision for the exchange object, the system will automatically truncate excess digits after setting |
-| [exchange.SetRate](/syntax-guide#fun_exchange.setrate)                  | Set the exchange rate |
-| [exchange.IO](/syntax-guide#fun_exchange.io)                            | Used for other interface calls related to the exchange object |
-| [exchange.Log](/syntax-guide#fun_exchange.log)                          | Output and record trading logs without actually placing orders |
-| [exchange.Encode](/syntax-guide#fun_exchange.encode)                    | Signature encryption calculation |
-| [exchange.Go](/syntax-guide#fun_exchange.go)                            | Multi-threaded asynchronous support function |
-| [exchange.GetAccount](/syntax-guide#fun_exchange.getaccount)            | Get account information |
-| [exchange.GetAssets](/syntax-guide#fun_exchange.getassets)              | Request exchange account asset information |
-| [exchange.GetName](/syntax-guide#fun_exchange.getname)                  | Get the name of the exchange object |
-| [exchange.GetLabel](/syntax-guide#fun_exchange.getlabel)                | Get the label of the exchange object |
-| [exchange.GetCurrency](/syntax-guide#fun_exchange.getcurrency)          | Get the current trading pair |
-| [exchange.SetCurrency](/syntax-guide#fun_exchange.setcurrency)          | Switch trading pair |
-| [exchange.GetQuoteCurrency](/syntax-guide#fun_exchange.getquotecurrency)| Get the quote currency name of the current trading pair |
-
-### Futures Functions
-
-| Function Name | Description |
-| - | - |
-| [exchange.GetPositions](/syntax-guide#fun_exchange.getpositions)       | Get futures position information, returns an array (list) of [Position](/syntax-guide#struct_position) structures |
-| [exchange.SetMarginLevel](/syntax-guide#fun_exchange.setmarginlevel)   | Set leverage multiplier |
-| [exchange.SetDirection](/syntax-guide#fun_exchange.setdirection)       | Set the order direction for [exchange.Buy](/syntax-guide#fun_exchange.buy) and [exchange.Sell](/syntax-guide#fun_exchange.sell) functions when placing orders in futures contracts |
-| [exchange.SetContractType](/syntax-guide#fun_exchange.setcontracttype) | Set contract code, for example: ```exchange.SetContractType("swap")``` sets the contract code to ```swap```, setting the current operating contract to perpetual contract |
-| [exchange.GetContractType](/syntax-guide#fun_exchange.getcontracttype) | Get the currently set contract code |
-| [exchange.GetFundings](/syntax-guide#fun_exchange.getfundings)         | Get funding rate data for perpetual contracts on the current futures exchange |
-
-### Network Functions
-
-| Function Name | Description |
-| - | - |
-| [exchange.SetBase](/syntax-guide#fun_exchange.setbase)       | Set the base address of the exchange API interface |
-| [exchange.GetBase](/syntax-guide#fun_exchange.getbase)       | Get the current base address of the exchange API interface |
-| [exchange.SetProxy](/syntax-guide#fun_exchange.setproxy)     | Set network proxy |
-| [exchange.SetTimeout](/syntax-guide#fun_exchange.settimeout) | Set timeout for REST protocol |
-
-### API Rate Limiting Control
-
-## Overview
-
-The API rate limiting control feature is used to limit how frequently a strategy calls the exchange's API, preventing account bans or temporary restrictions caused by triggering the exchange's rate limits. The FMZ platform provides flexible rate limiting configuration options, supporting two rate limiting modes and multiple configuration strategies.
-
-### Why API Rate Limiting Is Needed
-
-- **Avoid triggering exchange limits**: Most exchanges impose strict limits on API call frequency; once exceeded, your account may be temporarily or permanently banned.
-
-- **Allocate API quota sensibly**: In multi-strategy, multi-trading-pair scenarios, API call resources need to be allocated sensibly.
-
-- **Improve strategy stability**: By proactively rate limiting, you avoid connection failures and data retrieval anomalies caused by frequent calls.
-
-- **Comply with exchange rules**: Adhere to the exchange's API usage rules and maintain a healthy API usage relationship.
-
-### Two Rate Limiting Modes
-
-**rate mode (smooth rate limiting)**
-
-- Suitable for general rate limiting needs
-
-- Does not strictly align to time windows
-
-- Distributes calls relatively smoothly
-
-- Recommended for everyday API call limiting
-
-**quota mode (quota-based rate limiting)**
-
-- Strictly aligns to time windows
-
-- For example: when set to ```"1s"```, the window aligns to whole seconds; when set to ```"1m"```, the window aligns to whole minutes
-
-- Suitable for scenarios that require strict time window control
-
-- Recommended for intraday quota management
-
-## Basic Usage
-
-### Basic rate Mode Example
-
-```javascript
-function main() {
-    // Limit GetTicker to maximum 10 times per second
-    exchange.IO("rate", "GetTicker", 10, "1s")
-
-    // Normal API calls
-    for (var i = 0; i < 20; i++) {
-        var ticker = exchange.GetTicker("BTC_USDT")
-        if (ticker) {
-            Log("Success:", ticker.Last)
-        } else {
-            Log("Rate limit exceeded")  // Returns null when exceeding 10 times/second
-        }
-        Sleep(50)
-    }
-}
-```
-
-```python
-def main():
-    # Limit GetTicker to maximum 10 times per second
-    exchange.IO("rate", "GetTicker", 10, "1s")
-
-    # Normal API calls
-    for i in range(20):
-        ticker = exchange.GetTicker("BTC_USDT")
-        if ticker:
-            Log("Success:", ticker["Last"])
-        else:
-            Log("Rate limit exceeded")  # Returns None when exceeding 10 times/second
-        Sleep(50)
-```
-
-```rust
-fn main() {
-    // Limit GetTicker to maximum 10 times per second
-    let _ = exchange.IO(("rate", "GetTicker", 10, "1s"));
-
-    // Normal API calls
-    for _i in 0..20 {
-        match exchange.GetTicker("BTC_USDT") {
-            Ok(ticker) => Log!("Success:", ticker.Last),
-            Err(_) => Log!("Rate limit exceeded"),  // Returns Err when exceeding 10 times/second
-        }
-        Sleep(50);
-    }
-}
-```
-
-```cpp
-// C++ is not supported yet
-```
-
-### Basic quota Mode Example
-
-```javascript
-function main() {
-    // Strict limit, time window aligned to whole seconds
-    exchange.IO("quota", "GetTicker", 5, "1s")
-
-    for (var i = 0; i < 10; i++) {
-        var ticker = exchange.GetTicker("BTC_USDT")
-        Log(_D(), "Call", i+1, ticker ? "Success" : "Quota exceeded")
-        Sleep(150)  // About 6-7 calls per second, will trigger limit
-    }
-}
-```
-
-```python
-def main():
-    # Strict limit, time window aligned to whole seconds
-    exchange.IO("quota", "GetTicker", 5, "1s")
-
-    for i in range(10):
-        ticker = exchange.GetTicker("BTC_USDT")
-        Log(_D(), "Call", i+1, "Success" if ticker else "Quota exceeded")
-        Sleep(150)  # About 6-7 calls per second, will trigger limit
-```
-
-```rust
-fn main() {
-    // Strict limit, time window aligned to whole seconds
-    let _ = exchange.IO(("quota", "GetTicker", 5, "1s"));
-
-    for i in 0..10 {
-        match exchange.GetTicker("BTC_USDT") {
-            Ok(_) => Log!(_D(None), "Call", i + 1, "Success"),
-            Err(_) => Log!(_D(None), "Call", i + 1, "Quota exceeded"),
-        }
-        Sleep(150);  // About 6-7 calls per second, will trigger limit
-    }
-}
-```
-
-```cpp
-// C++ is not supported yet
-```
-
-## Function Name Configuration
-
-### Rate Limiting a Single Function
-
-```javascript
-function main() {
-    // Only limit GetTicker function
-    exchange.IO("rate", "GetTicker", 10, "1s")
-
-    // GetTicker is limited, GetDepth is not limited
-    exchange.GetTicker("BTC_USDT")
-    exchange.GetDepth("BTC_USDT")
-}
-```
-
-```python
-def main():
-    # Only limit GetTicker function
-    exchange.IO("rate", "GetTicker", 10, "1s")
-
-    # GetTicker is limited, GetDepth is not limited
-    exchange.GetTicker("BTC_USDT")
-    exchange.GetDepth("BTC_USDT")
-```
-
-```rust
-fn main() {
-    // Only limit GetTicker function
-    let _ = exchange.IO(("rate", "GetTicker", 10, "1s"));
-
-    // GetTicker is limited, GetDepth is not limited
-    let _ = exchange.GetTicker("BTC_USDT");
-    let _ = exchange.GetDepth("BTC_USDT");
-}
-```
-
-```cpp
-// C++ not supported yet
-```
-
-### Joint Rate Limiting Across Multiple Functions
-
-```javascript
-function main() {
-    // GetTicker and GetDepth share quota, total 10 times per second
-    exchange.IO("rate", "GetTicker,GetDepth", 10, "1s")
-
-    for (var i = 0; i < 15; i++) {
-        if (i % 2 == 0) {
-            exchange.GetTicker("BTC_USDT")  // Counted in shared quota
-        } else {
-            exchange.GetDepth("BTC_USDT")   // Counted in shared quota
-        }
-    }
-}
-```
-
-```python
-def main():
-    # GetTicker and GetDepth share quota, total 10 times per second
-    exchange.IO("rate", "GetTicker,GetDepth", 10, "1s")
-
-    for i in range(15):
-        if i % 2 == 0:
-            exchange.GetTicker("BTC_USDT")  # Counted in shared quota
-        else:
-            exchange.GetDepth("BTC_USDT")   # Counted in shared quota
-```
-
-```rust
-fn main() {
-    // GetTicker and GetDepth share quota, total 10 times per second
-    let _ = exchange.IO(("rate", "GetTicker,GetDepth", 10, "1s"));
-
-    for i in 0..15 {
-        if i % 2 == 0 {
-            let _ = exchange.GetTicker("BTC_USDT");  // Counted in shared quota
-        } else {
-            let _ = exchange.GetDepth("BTC_USDT");   // Counted in shared quota
-        }
-    }
-}
-```
-
-```cpp
-// C++ not supported yet
-```
-
-### Restrict All Functions Using Wildcards
-
-```javascript
-function main() {
-    // Limit all API calls to total 100 times per minute
-    exchange.IO("rate", "*", 100, "1m")
-
-    // All calls are counted in total quota
-    exchange.GetTicker("BTC_USDT")
-    exchange.GetDepth("BTC_USDT")
-    exchange.GetAccount()
-    exchange.CreateOrder("BTC_USDT", "buy", 50000, 0.001)
-}
-```
-
-```python
-def main():
-    # Limit all API calls to total 100 times per minute
-    exchange.IO("rate", "*", 100, "1m")
-
-    # All calls are counted in total quota
-    exchange.GetTicker("BTC_USDT")
-    exchange.GetDepth("BTC_USDT")
-    exchange.GetAccount()
-    exchange.CreateOrder("BTC_USDT", "buy", 50000, 0.001)
-```
-
-```rust
-fn main() {
-    // Limit all API calls to total 100 times per minute
-    let _ = exchange.IO(("rate", "*", 100, "1m"));
-
-    // All calls are counted in total quota
-    let _ = exchange.GetTicker("BTC_USDT");
-    let _ = exchange.GetDepth("BTC_USDT");
-    let _ = exchange.GetAccount();
-    let _ = exchange.CreateOrder("BTC_USDT", "buy", 50000, 0.001);
-}
-```
-
-```cpp
-// C++ not supported yet
-```
-
-## Time Period Configuration
-
-### Supported Time Units
-
-- ```ns```: nanoseconds
-
-- ```us``` or ```µs```: microseconds
-
-- ```ms```: milliseconds
-
-- ```s```: seconds
-
-- ```m```: minutes
-
-- ```h```: hours
-
-- ```d```: days
-
-Example: ```"100ms"```, ```"1s"```, ```"5m"```, ```"1h"```, ```"1d"```
-
-```javascript
-function main() {
-    // Different time period configurations
-    exchange.IO("rate", "GetTicker", 10, "1s")     // 10 times per second
-    exchange.IO("rate", "GetDepth", 30, "1m")      // 30 times per minute
-    exchange.IO("rate", "GetAccount", 100, "1h")   // 100 times per hour
-    exchange.IO("rate", "CreateOrder", 500, "1d")  // 500 times per day
-}
-```
-
-```python
-def main():
-    # Configurations for different time periods
-    exchange.IO("rate", "GetTicker", 10, "1s")     # 10 times per second
-    exchange.IO("rate", "GetDepth", 30, "1m")      # 30 times per minute
-    exchange.IO("rate", "GetAccount", 100, "1h")   # 100 times per hour
-    exchange.IO("rate", "CreateOrder", 500, "1d")  # 500 times per day
-```
-
-```rust
-fn main() {
-    // Configurations for different time periods
-    let _ = exchange.IO(("rate", "GetTicker", 10, "1s"));     // 10 times per second
-    let _ = exchange.IO(("rate", "GetDepth", 30, "1m"));      // 30 times per minute
-    let _ = exchange.IO(("rate", "GetAccount", 100, "1h"));   // 100 times per hour
-    let _ = exchange.IO(("rate", "CreateOrder", 500, "1d"));  // 500 times per day
-}
-```
-
-```cpp
-// C++ not supported yet
-```
-
-### Reset Time Point Configuration
-
-Use ```@HHMM``` or ```@HHMMSS``` format to specify the daily reset time point, valid only in quota mode.
-
-```javascript
-function main() {
-    // Reset quota daily at 08:15
-    exchange.IO("quota", "GetTicker", 1000, "@0815")
-
-    // Reset quota daily at 00:00
-    exchange.IO("quota", "CreateOrder", 500, "@0000")
-
-    // Reset quota daily at 23:59:59
-    exchange.IO("quota", "*", 5000, "@235959")
-}
-```
-
-```python
-def main():
-    # Reset quota daily at 08:15
-    exchange.IO("quota", "GetTicker", 1000, "@0815")
-
-    # Reset quota daily at 00:00
-    exchange.IO("quota", "CreateOrder", 500, "@0000")
-
-    # Reset quota daily at 23:59:59
-    exchange.IO("quota", "*", 5000, "@235959")
-```
-
-```rust
-fn main() {
-    // Reset quota daily at 08:15
-    let _ = exchange.IO(("quota", "GetTicker", 1000, "@0815"));
-
-    // Reset quota daily at 00:00
-    let _ = exchange.IO(("quota", "CreateOrder", 500, "@0000"));
-
-    // Reset quota daily at 23:59:59
-    let _ = exchange.IO(("quota", "*", 5000, "@235959"));
-}
-```
-
-```cpp
-// C++ not supported yet
-```
-
-## Behavior Modes
-
-### Default Mode (returns null when limit exceeded)
-
-```javascript
-function main() {
-    exchange.IO("rate", "GetTicker", 5, "1s")  // behavior parameter not specified
-
-    for (var i = 0; i < 10; i++) {
-        var ticker = exchange.GetTicker("BTC_USDT")
-        if (ticker) {
-            Log("Call", i+1, "Success:", ticker.Last)
-        } else {
-            Log("Call", i+1, "Failed: rate limit exceeded")
-            // Optionally Sleep to wait, or skip this call
-            Sleep(200)
-        }
-    }
-}
-```
-
-```python
-def main():
-    exchange.IO("rate", "GetTicker", 5, "1s")  # behavior parameter not specified
-
-    for i in range(10):
-        ticker = exchange.GetTicker("BTC_USDT")
-        if ticker:
-            Log("Call", i+1, "Success:", ticker["Last"])
-        else:
-            Log("Call", i+1, "Failed: rate limit exceeded")
-            # Optionally Sleep to wait, or skip this call
-            Sleep(200)
-```
-
-```rust
-fn main() {
-    let _ = exchange.IO(("rate", "GetTicker", 5, "1s"));  // behavior parameter not specified
-
-    for i in 0..10 {
-        match exchange.GetTicker("BTC_USDT") {
-            Ok(ticker) => Log!("Call", i + 1, "Success:", ticker.Last),
-            Err(_) => {
-                Log!("Call", i + 1, "Failed: rate limit exceeded");
-                // Optionally Sleep to wait, or skip this call
-                Sleep(200);
-            }
-        }
-    }
-}
-```
-
-```cpp
-// C++ not supported yet
-```
-
-### delay mode (automatically wait when rate limit is exceeded)
-
-```javascript
-function main() {
-    exchange.IO("rate", "GetTicker", 5, "1s", "delay")  // Specify the delay parameter
-
-    // When the call exceeds the rate limit, it automatically waits to ensure every call succeeds
-    for (var i = 0; i < 10; i++) {
-        var ticker = exchange.GetTicker("BTC_USDT")
-        Log("Call", i+1, "Success:", ticker.Last)  // ticker will not be null
-    }
-}
-```
-
-```python
-def main():
-    exchange.IO("rate", "GetTicker", 5, "1s", "delay")  # Specify the delay parameter
-
-    # When the call exceeds the rate limit, it automatically waits to ensure every call succeeds
-    for i in range(10):
-        ticker = exchange.GetTicker("BTC_USDT")
-        Log("Call", i+1, "Success:", ticker["Last"])  # ticker will not be None
-```
-
-```rust
-fn main() {
-    let _ = exchange.IO(("rate", "GetTicker", 5, "1s", "delay"));  // Specify the delay parameter
-
-    // When the call exceeds the rate limit, it automatically waits to ensure every call succeeds
-    for i in 0..10 {
-        let ticker = exchange.GetTicker("BTC_USDT").unwrap();
-        Log!("Call", i + 1, "Success:", ticker.Last);  // ticker will not return Err
-    }
-}
-```
-
-```cpp
-// Not yet supported in C++
-```
-
-## List of Supported Functions
-
-### Trading Functions
-- ```CreateOrder```: Create an order
-- ```CancelOrder```: Cancel an order
-- ```Buy```: Buy (subject to CreateOrder restrictions)
-- ```Sell```: Sell (subject to CreateOrder restrictions)
-- ```CreateConditionOrder```: Create a conditional order
-- ```CancelConditionOrder```: Cancel a conditional order
-
-### Account Functions
-- ```GetAccount```: Get account information
-- ```GetAssets```: Get asset information
-- ```GetPositions```: Get position information
-
-### Order Functions
-- ```GetOrder```: Get a single order
-- ```GetOrders```: Get all orders
-- ```GetHistoryOrders```: Get historical orders
-- ```GetConditionOrder```: Get a single conditional order
-- ```GetConditionOrders```: Get all conditional orders
-- ```GetHistoryConditionOrders```: Get historical conditional orders
-
-### Market Data Functions
-- ```GetTicker```: Get a single ticker
-- ```GetTickers```: Get multiple tickers
-- ```GetDepth```: Get market depth
-- ```GetRecords```: Get K-line (candlestick) data
-- ```GetTrades```: Get the latest trade records
-
-### Other Functions
-- ```GetMarkets```: Get the list of markets
-- ```GetFundings```: Get funding rates
-- ```SetMarginLevel```: Set the leverage level
-- ```Go```: Concurrent call (subject to the restrictions of the actual function being called)
-- ```IO/api```: Custom API call (limited to exchange.IO("api", ...))
-
-## Practical Application Scenarios
-
-
-    ### Scenario 1: Preventing Exchange Rate Limit Triggers
-
-```javascript
-function main() {
-    // Assume exchange limits: GetTicker 20 times per second, CreateOrder 5 times per second
-    // Set the rate slightly below the exchange limit to reserve a safety margin
-    exchange.IO("rate", "GetTicker", 15, "1s")
-    exchange.IO("rate", "CreateOrder", 4, "1s")
-
-    while (true) {
-        var ticker = exchange.GetTicker("BTC_USDT")
-        if (ticker && ticker.Last < 50000) {
-            exchange.CreateOrder("BTC_USDT", "buy", ticker.Last, 0.001)
-        }
-        Sleep(100)
-    }
-}
-```
-
-```python
-def main():
-    # Assume exchange limits: GetTicker 20 times per second, CreateOrder 5 times per second
-    # Set the rate slightly below the exchange limit to reserve a safety margin
-    exchange.IO("rate", "GetTicker", 15, "1s")
-    exchange.IO("rate", "CreateOrder", 4, "1s")
-
-    while True:
-        ticker = exchange.GetTicker("BTC_USDT")
-        if ticker and ticker["Last"] < 50000:
-            exchange.CreateOrder("BTC_USDT", "buy", ticker["Last"], 0.001)
-        Sleep(100)
-```
-
-```rust
-fn main() {
-    // Assume exchange limits: GetTicker 20 times per second, CreateOrder 5 times per second
-    // Set the rate slightly below the exchange limit to reserve a safety margin
-    let _ = exchange.IO(("rate", "GetTicker", 15, "1s"));
-    let _ = exchange.IO(("rate", "CreateOrder", 4, "1s"));
-
-    loop {
-        if let Ok(ticker) = exchange.GetTicker("BTC_USDT") {
-            if ticker.Last < 50000.0 {
-                let _ = exchange.CreateOrder("BTC_USDT", "buy", ticker.Last, 0.001);
-            }
-        }
-        Sleep(100);
-    }
-}
-```
-
-```cpp
-// C++ not supported yet
-```
-
-### Scenario 2: Unified Rate Limiting Across Multiple Exchange Objects
-
-```javascript
-function main() {
-    // Set rate limiting for each exchange object
-    for (var i = 0; i < exchanges.length; i++) {
-        exchanges[i].IO("rate", "GetTicker", 10, "1s")
-        exchanges[i].IO("rate", "CreateOrder", 2, "1s")
-    }
-
-    // Concurrently fetch tickers from multiple exchanges
-    while (true) {
-        for (var i = 0; i < exchanges.length; i++) {
-            var ticker = exchanges[i].GetTicker("BTC_USDT")
+            var ticker = exchange.GetTicker(symbol)
             if (ticker) {
-                Log(exchanges[i].GetName(), "Price:", ticker.Last)
+                dict.set("last", ticker.Last)
+                dict.set("time", ticker.Time)
+            } else {
+                threading.mainThread().postMessage("failed to get ticker: " + GetLastError())
             }
+            Sleep(1000)
         }
-        Sleep(1000)
+        return "worker exited"
+    }, shared, "BTC_USDT")
+
+    for (var i = 0; i < 10; i++) {
+        // wait at most 1 second for a message from the background thread
+        var msg = threading.currentThread().peekMessage(1000)
+        if (msg) {
+            Log("background thread reports:", msg)
+        }
+        LogStatus("last:", shared.get("last"), "time:", _D(shared.get("time")))
     }
+    worker.postMessage("stop")
+    Log(worker.join().ret)
 }
 ```
 
-```python
-def main():
-    # Set rate limiting for each exchange object
-    for i in range(len(exchanges)):
-        exchanges[i].IO("rate", "GetTicker", 10, "1s")
-        exchanges[i].IO("rate", "CreateOrder", 2, "1s")
+### A status endpoint with threading.Serve
 
-    # Concurrently fetch tickers from multiple exchanges
-    while True:
-        for i in range(len(exchanges)):
-            ticker = exchanges[i].GetTicker("BTC_USDT")
-            if ticker:
-                Log(exchanges[i].GetName(), "Price:", ticker["Last"])
-        Sleep(1000)
-```
-
-```rust
-fn main() {
-    // Set rate limiting for each exchange object
-    for e in exchanges.iter() {
-        let _ = e.IO(("rate", "GetTicker", 10, "1s"));
-        let _ = e.IO(("rate", "CreateOrder", 2, "1s"));
-    }
-
-    // Concurrently fetch tickers from multiple exchanges
-    loop {
-        for e in exchanges.iter() {
-            if let Ok(ticker) = e.GetTicker("BTC_USDT") {
-                Log!(e.GetName(), "Price:", ticker.Last);
-            }
-        }
-        Sleep(1000);
-    }
-}
-```
-
-```cpp
-// C++ is not supported yet
-```
-
-### Scenario 3: Intraday Quota Management
+The main thread writes the state into a shared dictionary; the HTTP handler gets the same dictionary as an argument and returns it as JSON.
 
 ```javascript
 function main() {
-    // Maximum 1000 API calls per day, resets at 08:00 every morning
-    exchange.IO("quota", "*", 1000, "@0800")
+    var state = threading.Dict()
+    var server = threading.Serve("http://127.0.0.1:8088", function(ctx, st) {
+        if (ctx.path() == "/status") {
+            ctx.setHeader("Content-Type", "application/json")
+            ctx.write(JSON.stringify({last: st.get("last"), updated: st.get("updated")}))
+        } else {
+            ctx.setStatus(404)
+        }
+    }, state)
+    Log("listening on:", server.addr())
 
-    var callCount = 0
     while (true) {
         var ticker = exchange.GetTicker("BTC_USDT")
         if (ticker) {
-            callCount++
-            Log("Call count:", callCount, "Price:", ticker.Last)
-        } else {
-            Log("Daily quota exceeded, waiting for tomorrow 08:00")
-            Sleep(60000)  // Wait 1 minute before retrying
+            state.set("last", ticker.Last)
+            state.set("updated", _D())
         }
-        Sleep(10000)
+        Sleep(3000)
     }
 }
 ```
 
-```python
-def main():
-    # Maximum 1000 API calls per day, resets at 08:00 every morning
-    exchange.IO("quota", "*", 1000, "@0800")
-
-    callCount = 0
-    while True:
-        ticker = exchange.GetTicker("BTC_USDT")
-        if ticker:
-            callCount += 1
-            Log("Call count:", callCount, "Price:", ticker["Last"])
-        else:
-            Log("Daily quota exceeded, waiting for tomorrow 08:00")
-            Sleep(60000)  # Wait 1 minute before retrying
-        Sleep(10000)
-```
-
-```rust
-fn main() {
-    // Maximum 1000 API calls per day, resets at 08:00 every morning
-    let _ = exchange.IO(("quota", "*", 1000, "@0800"));
-
-    let mut callCount = 0;
-    loop {
-        match exchange.GetTicker("BTC_USDT") {
-            Ok(ticker) => {
-                callCount += 1;
-                Log!("Call count:", callCount, "Price:", ticker.Last);
-            }
-            Err(_) => {
-                Log!("Daily quota exceeded, waiting for tomorrow 08:00");
-                Sleep(60000);  // Wait 1 minute before retrying
-            }
-        }
-        Sleep(10000);
-    }
-}
-```
-
-```cpp
-// C++ is not supported yet
-```
-
-### Scenario 4: Combined Rate Limiting Strategy
-
-```javascript
-function main() {
-    // Combine multiple rate limiting strategies
-    // 1. Rate limit market data APIs per second
-    exchange.IO("rate", "GetTicker,GetDepth", 20, "1s")
-
-    // 2. Rate limit trading APIs per second
-    exchange.IO("rate", "CreateOrder,CancelOrder", 5, "1s")
-
-    // 3. Rate limit account query APIs per minute
-    exchange.IO("rate", "GetAccount,GetPositions", 30, "1m")
-
-    // 4. Total daily quota for all APIs
-    exchange.IO("quota", "*", 10000, "@0000")
-
-    Log("Multi-level rate limiting configured")
-
-    // Main strategy loop
-    while (true) {
-        // Fetch market data
-        var ticker = exchange.GetTicker("BTC_USDT")
-        var depth = exchange.GetDepth("BTC_USDT")
-
-        // Query account info
-        if (Date.now() % 60000 < 1000) {  // Query once per minute
-            var account = exchange.GetAccount()
-            Log("Account:", account)
-        }
-
-        // Trading logic
-        if (ticker && ticker.Last < 50000) {
-            exchange.CreateOrder("BTC_USDT", "buy", ticker.Last, 0.001)
-        }
-
-        Sleep(500)
-    }
-}
-```
-
-```python
-import time
-def main():
-    # Combine multiple rate limiting strategies
-    # 1. Rate limit market data APIs per second
-    exchange.IO("rate", "GetTicker,GetDepth", 20, "1s")
-
-    # 2. Rate limit trading APIs per second
-    exchange.IO("rate", "CreateOrder,CancelOrder", 5, "1s")
-
-    # 3. Rate limit account query APIs per minute
-    exchange.IO("rate", "GetAccount,GetPositions", 30, "1m")
-
-    # 4. Total daily quota for all APIs
-    exchange.IO("quota", "*", 10000, "@0000")
-
-    Log("Multi-level rate limiting configured")
-
-    # Main strategy loop
-    while True:
-        # Fetch market data
-        ticker = exchange.GetTicker("BTC_USDT")
-        depth = exchange.GetDepth("BTC_USDT")
-
-        # Query account info
-        if int(time.time() * 1000) % 60000 < 1000:  # Query once per minute
-            account = exchange.GetAccount()
-            Log("Account:", account)
-
-        # Trading logic
-        if ticker and ticker["Last"] < 50000:
-            exchange.CreateOrder("BTC_USDT", "buy", ticker["Last"], 0.001)
-
-        Sleep(500)
-```
-
-```rust
-fn main() {
-    // Combine multiple rate limiting strategies
-    // 1. Rate limit market data APIs per second
-    let _ = exchange.IO(("rate", "GetTicker,GetDepth", 20, "1s"));
-
-    // 2. Rate limit trading APIs per second
-    let _ = exchange.IO(("rate", "CreateOrder,CancelOrder", 5, "1s"));
-
-    // 3. Rate limit account query APIs per minute
-    let _ = exchange.IO(("rate", "GetAccount,GetPositions", 30, "1m"));
-
-    // 4. Total daily quota for all APIs
-    let _ = exchange.IO(("quota", "*", 10000, "@0000"));
-
-    Log!("Multi-level rate limiting configured");
-
-    // Main strategy loop
-    loop {
-        // Fetch market data
-        let ticker = exchange.GetTicker("BTC_USDT");
-        let depth = exchange.GetDepth("BTC_USDT");
-
-        // Query account info
-        if UnixNano() / 1000000 % 60000 < 1000 {  // Query once per minute
-            let account = exchange.GetAccount();
-            Log!("Account:", account);
-        }
-
-        // Trading logic
-        if let Ok(t) = ticker {
-            if t.Last < 50000.0 {
-                let _ = exchange.CreateOrder("BTC_USDT", "buy", t.Last, 0.001);
-            }
-        }
-
-        Sleep(500);
-    }
-}
-```
-
-```cpp
-// C++ not supported yet
-```
-
-## Notes
-
-### 1. Time Window Alignment in quota Mode
-
-The quota mode strictly aligns to time windows:
-
-- ```"1s"```: aligns to whole seconds (e.g., 12:00:00, 12:00:01, 12:00:02……)
-
-- ```"1m"```: aligns to whole minutes (e.g., 12:00:00, 12:01:00, 12:02:00……)
-
-- ```"1h"```: aligns to whole hours (e.g., 12:00:00, 13:00:00, 14:00:00……)
-
-This means that even if counting starts at 12:00:00.500, the current time window will still reset at 12:00:01.000.
-
-```javascript
-function main() {
-    // quota mode: strictly aligns to whole seconds
-    exchange.IO("quota", "GetTicker", 3, "1s")
-
-    // Assume the current time is 12:00:00.500
-    exchange.GetTicker("BTC_USDT")  // 1st call, success
-    exchange.GetTicker("BTC_USDT")  // 2nd call, success
-    exchange.GetTicker("BTC_USDT")  // 3rd call, success
-    exchange.GetTicker("BTC_USDT")  // 4th call, failed (limit exceeded)
-
-    Sleep(500)  // Wait 500ms; the time is now 12:00:01.000
-
-    // Window has been reset
-    exchange.GetTicker("BTC_USDT")  // 1st call in the new window, success
-}
-```
-
-```python
-def main():
-    # quota mode: strictly aligns to whole seconds
-    exchange.IO("quota", "GetTicker", 3, "1s")
-
-    # Assume the current time is 12:00:00.500
-    exchange.GetTicker("BTC_USDT")  # 1st call, success
-    exchange.GetTicker("BTC_USDT")  # 2nd call, success
-    exchange.GetTicker("BTC_USDT")  # 3rd call, success
-    exchange.GetTicker("BTC_USDT")  # 4th call, failed (limit exceeded)
-
-    Sleep(500)  # Wait 500ms; the time is now 12:00:01.000
-
-    # Window has been reset
-    exchange.GetTicker("BTC_USDT")  # 1st call in the new window, success
-```
-
-```rust
-fn main() {
-    // quota mode: strictly aligns to whole seconds
-    let _ = exchange.IO(("quota", "GetTicker", 3, "1s"));
-
-    // Assume the current time is 12:00:00.500
-    let _ = exchange.GetTicker("BTC_USDT");  // 1st call, success
-    let _ = exchange.GetTicker("BTC_USDT");  // 2nd call, success
-    let _ = exchange.GetTicker("BTC_USDT");  // 3rd call, success
-    let _ = exchange.GetTicker("BTC_USDT");  // 4th call, failed (limit exceeded)
-
-    Sleep(500);  // Wait 500ms; the time is now 12:00:01.000
-
-    // Window has been reset
-    let _ = exchange.GetTicker("BTC_USDT");  // 1st call in the new window, success
-}
-```
-
-```cpp
-// C++ is not supported yet
-```
-
-### 2. Time discrepancy in delay mode
-
-When using the ```"delay"``` parameter, the actual API call time may not match the time recorded in the log. This is because the program enters a waiting state when rate limiting is triggered, while the log records the time after the wait ends.
-
-```javascript
-function main() {
-    exchange.IO("rate", "GetTicker", 2, "1s", "delay")
-
-    Log(_D(), "Call 1")  // 12:00:00.000
-    exchange.GetTicker("BTC_USDT")
-
-    Log(_D(), "Call 2")  // 12:00:00.100
-    exchange.GetTicker("BTC_USDT")
-
-    Log(_D(), "Call 3")  // 12:00:00.200, but it will actually wait until 12:00:01.000
-    exchange.GetTicker("BTC_USDT")  // Triggers rate limiting, waits automatically
-
-    Log(_D(), "Call 3 completed")  // Log shows 12:00:01.000+
-    // It appears that 3 calls were made within one second, but the 3rd call was actually executed in a new window
-}
-```
-
-```python
-def main():
-    exchange.IO("rate", "GetTicker", 2, "1s", "delay")
-
-    Log(_D(), "Call 1")  # 12:00:00.000
-    exchange.GetTicker("BTC_USDT")
-
-    Log(_D(), "Call 2")  # 12:00:00.100
-    exchange.GetTicker("BTC_USDT")
-
-    Log(_D(), "Call 3")  # 12:00:00.200, but it will actually wait until 12:00:01.000
-    exchange.GetTicker("BTC_USDT")  # Triggers rate limiting, waits automatically
-
-    Log(_D(), "Call 3 completed")  # Log shows 12:00:01.000+
-    # It appears that 3 calls were made within one second, but the 3rd call was actually executed in a new window
-```
-
-```rust
-fn main() {
-    let _ = exchange.IO(("rate", "GetTicker", 2, "1s", "delay"));
-
-    Log!(_D(None), "Call 1");  // 12:00:00.000
-    let _ = exchange.GetTicker("BTC_USDT");
-
-    Log!(_D(None), "Call 2");  // 12:00:00.100
-    let _ = exchange.GetTicker("BTC_USDT");
-
-    Log!(_D(None), "Call 3");  // 12:00:00.200, but it will actually wait until 12:00:01.000
-    let _ = exchange.GetTicker("BTC_USDT");  // Triggers rate limiting, waits automatically
-
-    Log!(_D(None), "Call 3 completed");  // Log shows 12:00:01.000+
-    // It appears that 3 calls were made within one second, but the 3rd call was actually executed in a new window
-}
-```
-
-```cpp
-// C++ is not supported yet
-```
-
-### 3. Rate limiting for the Buy/Sell functions
-
-Both the ```Buy``` and ```Sell``` functions call ```CreateOrder``` under the hood, so their rate-limiting rules follow the ```CreateOrder``` settings.
-
-```javascript
-function main() {
-    // Set CreateOrder rate limiting
-    exchange.IO("rate", "CreateOrder", 5, "1s")
-
-    // Buy and Sell are also subject to this limit
-    for (var i = 0; i < 10; i++) {
-        if (i % 2 == 0) {
-            exchange.Buy(50000, 0.001)   // Subject to the CreateOrder limit
-        } else {
-            exchange.Sell(51000, 0.001)  // Subject to the CreateOrder limit
-        }
-    }
-}
-```
-
-```python
-def main():
-    # Set CreateOrder rate limiting
-    exchange.IO("rate", "CreateOrder", 5, "1s")
-
-    # Buy and Sell are also subject to this limit
-    for i in range(10):
-        if i % 2 == 0:
-            exchange.Buy(50000, 0.001)   # Subject to the CreateOrder limit
-        else:
-            exchange.Sell(51000, 0.001)  # Subject to the CreateOrder limit
-```
-
-```rust
-fn main() {
-    // Set CreateOrder rate limiting
-    let _ = exchange.IO(("rate", "CreateOrder", 5, "1s"));
-
-    // Buy and Sell are also subject to this limit
-    for i in 0..10 {
-        if i % 2 == 0 {
-            let _ = exchange.Buy(50000, 0.001);   // Subject to the CreateOrder limit
-        } else {
-            let _ = exchange.Sell(51000, 0.001);  // Subject to the CreateOrder limit
-        }
-    }
-}
-```
-
-```cpp
-// C++ is not supported yet
-```
-
-### 4. Rate Limiting for Go Functions
-
-    Rate limiting for the ```Go``` function depends on the actual function being called concurrently.
-
-```javascript
-function main() {
-    // Rate limit GetTicker
-    exchange.IO("rate", "GetTicker", 5, "1s")
-
-    // Concurrent calls to GetTicker are rate limited
-    var tasks = []
-    for (var i = 0; i < 10; i++) {
-        tasks.push(exchange.Go("GetTicker", "BTC_USDT"))
-    }
-
-    for (var i = 0; i < tasks.length; i++) {
-        var ticker = tasks[i].wait()
-        Log("Task", i, ticker ? "Success" : "Rate limited")
-    }
-}
-```
-
-```python
-def main():
-    # Rate limit GetTicker
-    exchange.IO("rate", "GetTicker", 5, "1s")
-
-    # Concurrent calls to GetTicker are rate limited
-    tasks = []
-    for i in range(10):
-        tasks.append(exchange.Go("GetTicker", "BTC_USDT"))
-
-    for i in range(len(tasks)):
-        ticker = tasks[i].wait()
-        Log("Task", i, "Success" if ticker else "Rate limited")
-```
-
-```rust
-fn main() {
-    // Rate limit GetTicker
-    let _ = exchange.IO(("rate", "GetTicker", 5, "1s"));
-
-    // Concurrent calls to GetTicker are rate limited
-    // In Rust, exchange.Go uses a typed syntax with the Go::GetTicker token
-    let mut tasks = Vec::new();
-    for _i in 0..10 {
-        tasks.push(exchange.Go(Go::GetTicker, ("BTC_USDT",)));
-    }
-
-    for (i, task) in tasks.iter().enumerate() {
-        match task.wait(0) {
-            Ok(_) => Log!("Task", i, "Success"),
-            Err(_) => Log!("Task", i, "Rate limited"),
-        }
-    }
-}
-```
-
-```cpp
-// C++ is not supported yet
-```
-
-### 5. Rate Limiting for IO/api
-
-    ```IO/api``` rate limiting only takes effect on ```exchange.IO("api", ...)``` calls, and does not affect other ```exchange.IO```
-    functions.
-
-```javascript
-function main() {
-    // Limit exchange.IO("api", ...) calls
-    exchange.IO("rate", "IO/api", 10, "1s")
-
-    // Rate limited
-    for (var i = 0; i < 15; i++) {
-        var ret = exchange.IO("api", "GET", "/api/v5/account/balance", "")
-        Log("API call", i, ret ? "Success" : "Rate limited")
-    }
-
-    // Not rate limited
-    exchange.IO("currency", "LTC_USDT")  // Switch trading pair, not rate limited
-    exchange.IO("rate", "GetDepth", 5, "1s")  // Set other rate limits, not rate limited
-}
-```
-
-```python
-def main():
-    # Limit exchange.IO("api", ...) calls
-    exchange.IO("rate", "IO/api", 10, "1s")
-
-    # Rate limited
-    for i in range(15):
-        ret = exchange.IO("api", "GET", "/api/v5/account/balance", "")
-        Log("API call", i, "Success" if ret else "Rate limited")
-
-    # Not rate limited
-    exchange.IO("currency", "LTC_USDT")  # Switch trading pair, not rate limited
-    exchange.IO("rate", "GetDepth", 5, "1s")  # Set other rate limits, not rate limited
-```
-
-```rust
-fn main() {
-    // Limit exchange.IO("api", ...) calls
-    let _ = exchange.IO(("rate", "IO/api", 10, "1s"));
-
-    // Rate limited
-    for i in 0..15 {
-        match exchange.IO(("api", "GET", "/api/v5/account/balance", "")) {
-            Ok(_) => Log!("API call", i, "Success"),
-            Err(_) => Log!("API call", i, "Rate limited"),
-        }
-    }
-
-    // Not rate limited
-    let _ = exchange.IO(("currency", "LTC_USDT"));  // Switch trading pair, not rate limited
-    let _ = exchange.IO(("rate", "GetDepth", 5, "1s"));  // Set other rate limits, not rate limited
-}
-```
-
-```cpp
-// C++ is not supported yet
-```
-
-## Best Practices
-
-    1. **Set according to exchange limits**: Please refer to the exchange's API documentation and set the rate limit value slightly below the exchange's limit.
-
-    2. **Leave a safety margin**: Do not set the rate limit value to the maximum allowed by the exchange; it is recommended to set it to 70%-80% of the maximum.
-
-    3. **Tiered rate limiting**: Set different rate limit values for different types of APIs, and reserve a larger margin for important APIs.
-
-    4. **Use delay mode for critical calls**: For API calls that must succeed, use ```"delay"``` mode to ensure the call succeeds.
-
-    5. **Monitor API usage**: Regularly check the strategy's API call frequency and continuously optimize the call logic.
-
-    6. **Avoid excessive calls**: Design the strategy logic reasonably to avoid unnecessary API calls.
-
-    7. **Test rate limit configuration**: Before running live, test whether the rate limit configuration is reasonable in a simulated environment.
-
-See also: `exchange.IO`, `exchange.Go`, `exchange.Buy`, `exchange.Sell`
+See also: `Threads`, `Thread`, `Dict`, `Serve`, `exchange.Go`, `EventLoop`
 
 ### Communication Between Live Trading Strategies
 
-## Overview
+Every live trading has a channel whose ID is the live trading ID. A live trading publishes data on its own channel with ```SetChannelData()```, and other live tradings read it with ```GetChannelData(liveTradingId)```. The data is relayed by the platform server, so it can travel across dockers and servers.
 
-  The inter-strategy communication feature allows different live trading strategies to share data and synchronize state with one another. Through a channel mechanism, one live strategy can broadcast its own state data to other live strategies, enabling data communication across strategies, across managers, and across servers.
+A channel holds the **latest state**, not a message queue: each publish overwrites the previous data, and a subscriber always reads the current latest copy. If history is needed, the subscriber keeps it itself.
 
-  ### Core Concepts
+Typical uses:
 
-  - **Channel**: Every live strategy owns an independent channel, and the channel ID is the live strategy ID
+- **Master/follower**: a master strategy analyzes the market and publishes signals; several follower strategies read them and trade on their own accounts.
+- **Status monitoring**: each strategy publishes its running status; a monitoring live trading collects them for display or alerts.
+- **Data sharing**: one live trading computes indicators and publishes the results; others use them directly instead of computing them again.
 
-  - **Broadcaster**: A live strategy that publishes data on a channel using the ```SetChannelData()``` function
+## Key points
 
-  - **Subscriber**: A live strategy that subscribes to another live strategy's channel data using the ```GetChannelData()``` function
+- **The first read subscribes**: the first ```GetChannelData()``` call for a channel subscribes to it and returns an empty value (```null```/```None```). From then on the server pushes the channel's updates to this live trading, and later calls return the latest data. A subscriber should start reading at startup and handle empty values.
+- **Subscription limit**: a live trading can subscribe to at most 10 different channels (UUID channels below included). Beyond that, the call returns an empty value and logs the error ```channel subscriber exceed limit```.
+- **Data format**: in JavaScript and Python, ```SetChannelData()``` accepts any JSON-serializable data and the subscriber reads the parsed object. Unchanged data is not sent again. For the data size limit see `SetChannelData`.
+- **Rust**: ```SetChannelData(string)``` only accepts a string, so build the JSON text yourself; ```GetChannelData()``` takes no channel argument and cannot choose the channel to read, so it cannot subscribe to other live tradings or UUID channels. Rust strategies are suited to publishing; write subscribers in JavaScript or Python.
+- **Cross-platform push**: an external system (a TradingView alert, your own program, etc.) can push data to a given live trading on a channel identified by a 32-character UUID through the extended API's ```method=pub```; the live trading reads it with ```GetChannelData(UUID)```. See `SetChannelData` and `GetChannelData` for details.
+- **Live trading feature**: channels are meant for communication between live tradings; do not rely on them in backtests. The current live trading ID is available from ```_G()```.
+- Do not pass keys or other sensitive information through channels.
 
-  - **State Overwrite**: A channel retains only the latest state; new data overwrites old data rather than using a message queue mechanism
+## Basic usage
 
-  ### Key Features
-
-  - **Non-blocking Communication**: All function calls are non-blocking and will not affect the strategy's main workflow
-
-  - **Cross-platform Support**: Supports data transmission across strategies, across managers, and across servers
-
-  - **Multi-channel Subscription**: A single live strategy can subscribe to the channels of multiple different live strategies simultaneously
-
-  - **Flexible Data Format**: Supports any JSON-serializable data structure
-
-  ### Use Cases
-
-  - **Master-slave Strategy Coordination**: The master strategy analyzes the market and broadcasts signals, while slave strategies receive the signals and execute trades
-
-  - **Multi-account Synchronization**: Synchronize trading signals and position information across multiple trading accounts
-
-  - **Strategy Monitoring**: Broadcast strategy running status, which a monitoring live strategy subscribes to for display or alerting
-
-  - **Data Sharing**: Share results such as market analysis and indicator calculations to avoid redundant computation
-
-  ## Basic Usage
-
-### Broadcaster Example - Publishing Market Data
+### Publisher: publish a market summary
 
 ```javascript
 function main() {
+    var robotId = _G()  // current live trading ID, which is also this live trading's channel ID
     var updateId = 0
-    var robotId = _G()  // Get the current live bot ID
 
-    while(true) {
-        // Fetch market data
+    while (true) {
         var ticker = exchange.GetTicker("BTC_USDT")
-        if (!ticker) {
-            Sleep(5000)
-            continue
+        if (ticker) {
+            // publish the latest state, overwriting the previous data
+            SetChannelData({
+                robotId: robotId,
+                updateId: ++updateId,
+                timestamp: Date.now(),
+                symbol: "BTC_USDT",
+                lastPrice: ticker.Last
+            })
+            LogStatus("channel", robotId, "publish #", updateId, "last price:", ticker.Last)
         }
-
-        // Prepare the channel state data
-        var channelState = {
-            robotId: robotId,
-            updateId: ++updateId,
-            timestamp: Date.now(),
-            symbol: "BTC_USDT",
-            lastPrice: ticker.Last,
-            volume: ticker.Volume,
-            high: ticker.High,
-            low: ticker.Low
-        }
-
-        // Publish the latest state on the channel (overwrites the old state)
-        SetChannelData(channelState)
-
-        // Display the current channel state
-        LogStatus("Channel Broadcaster [Bot ID: " + robotId + "]\n" +
-                  "Update ID: #" + channelState.updateId + "\n" +
-                  "Time: " + _D(channelState.timestamp) + "\n" +
-                  "Symbol: " + channelState.symbol + "\n" +
-                  "Last Price: $" + channelState.lastPrice.toFixed(2))
-
-        Sleep(60000)  // Update the channel state once per minute
+        Sleep(60000)  // publish once a minute
     }
 }
 ```
 
 ```python
+import time
+
 def main():
+    robotId = _G()  # current live trading ID, which is also this live trading's channel ID
     updateId = 0
-    robotId = _G()  # Get the current live bot ID
 
     while True:
-        # Fetch market data
         ticker = exchange.GetTicker("BTC_USDT")
-        if not ticker:
-            Sleep(5000)
-            continue
-
-        # Prepare the channel state data
-        channelState = {
-            "robotId": robotId,
-            "updateId": updateId + 1,
-            "timestamp": time.time() * 1000,
-            "symbol": "BTC_USDT",
-            "lastPrice": ticker["Last"],
-            "volume": ticker["Volume"],
-            "high": ticker["High"],
-            "low": ticker["Low"]
-        }
-        updateId += 1
-
-        # Publish the latest state on the channel (overwrites the old state)
-        SetChannelData(channelState)
-
-        # Display the current channel state
-        LogStatus("Channel Broadcaster [Bot ID: {}]\n".format(robotId) +
-                  "Update ID: #{}\n".format(channelState["updateId"]) +
-                  "Time: {}\n".format(_D(channelState["timestamp"])) +
-                  "Last Price: ${:.2f}".format(channelState["lastPrice"]))
-
-        Sleep(60000)  # Update the channel state once per minute
+        if ticker:
+            updateId += 1
+            # publish the latest state, overwriting the previous data
+            SetChannelData({
+                "robotId": robotId,
+                "updateId": updateId,
+                "timestamp": int(time.time() * 1000),
+                "symbol": "BTC_USDT",
+                "lastPrice": ticker["Last"]
+            })
+            LogStatus("channel", robotId, "publish #", updateId, "last price:", ticker["Last"])
+        Sleep(60000)  # publish once a minute
 ```
 
 ```rust
 fn main() {
+    let robotId = _G!();  // current live trading ID, which is also this live trading's channel ID
     let mut updateId = 0;
-    let robotId = _G!();  // Get the current live bot ID
 
     loop {
-        // Fetch market data
-        let ticker = match exchange.GetTicker("BTC_USDT") {
-            Ok(t) => t,
-            Err(_) => {
-                Sleep(5000);
-                continue;
-            }
-        };
-
-        // Prepare the channel state data
-        // Rust's SetChannelData only accepts a string argument, so use format! to build the JSON text
-        updateId += 1;
-        let timestamp = Unix() * 1000;
-        let channelState = format!(
-            r#"{{"robotId": {}, "updateId": {}, "timestamp": {}, "symbol": "BTC_USDT", "lastPrice": {}, "volume": {}, "high": {}, "low": {}}}"#,
-            robotId, updateId, timestamp, ticker.Last, ticker.Volume, ticker.High, ticker.Low
-        );
-
-        // Publish the latest state on the channel (overwrites the old state)
-        SetChannelData(&channelState);
-
-        // Display the current channel state
-        LogStatus!(format!(
-            "Channel Broadcaster [Bot ID: {}]\nUpdate ID: #{}\nTime: {}\nSymbol: BTC_USDT\nLast Price: ${:.2}",
-            robotId, updateId, _D(timestamp), ticker.Last
-        ));
-
-        Sleep(60000);  // Update the channel state once per minute
+        if let Ok(ticker) = exchange.GetTicker("BTC_USDT") {
+            updateId += 1;
+            // Rust's SetChannelData only accepts a string; build the JSON text yourself
+            let state = format!(
+                r#"{{"robotId": "{}", "updateId": {}, "timestamp": {}, "symbol": "BTC_USDT", "lastPrice": {}}}"#,
+                robotId, updateId, Unix() * 1000, ticker.Last
+            );
+            SetChannelData(&state);
+            LogStatus!("channel", robotId, "publish #", updateId, "last price:", ticker.Last);
+        }
+        Sleep(60000);  // publish once a minute
     }
 }
 ```
 
-### Subscriber Example - Subscribe to Multiple Channels
+### Subscriber: read two channels
 
 ```javascript
 function main() {
-    // Get the IDs of the two channels to subscribe to (please modify according to your actual situation)
-    var channelId1 = "632799"  // Live trading ID of channel 1
-    var channelId2 = "632800"  // Live trading ID of channel 2
+    // live trading IDs to subscribe to (change as needed)
+    var channels = ["632799", "632800"]
 
-    while(true) {
-        // Get the current state of channel 1
-        var state1 = GetChannelData(channelId1)
-
-        // Get the current state of channel 2
-        var state2 = GetChannelData(channelId2)
-
-        // Build the status display message
-        var statusMsg = "Channel Subscriber - Current Subscription Status\n\n"
-
-        // Display the status of channel 1
-        statusMsg += "═══ Channel1 [" + channelId1 + "] ═══\n"
-        if (state1 !== null) {
-            statusMsg += "Update ID: #" + state1.updateId + "\n"
-            statusMsg += "Time: " + _D(state1.timestamp) + "\n"
-            statusMsg += "Symbol: " + state1.symbol + "\n"
-            statusMsg += "Last Price: $" + state1.lastPrice.toFixed(2) + "\n"
-        } else {
-            statusMsg += "Status: Waiting... (first call returns null)\n"
+    while (true) {
+        var msg = ""
+        for (var i = 0; i < channels.length; i++) {
+            // the first call subscribes and returns null; later calls return the latest data
+            var state = GetChannelData(channels[i])
+            if (state) {
+                msg += "channel " + channels[i] + ": #" + state.updateId + " " + _D(state.timestamp) + " last " + state.lastPrice + "\n"
+            } else {
+                msg += "channel " + channels[i] + ": waiting for data\n"
+            }
         }
-
-        statusMsg += "\n"
-
-        // Display the status of channel 2
-        statusMsg += "═══ Channel2 [" + channelId2 + "] ═══\n"
-        if (state2 !== null) {
-            statusMsg += "Update ID: #" + state2.updateId + "\n"
-            statusMsg += "Time: " + _D(state2.timestamp) + "\n"
-            statusMsg += "Last Price: $" + state2.lastPrice.toFixed(2) + "\n"
-        } else {
-            statusMsg += "Status: Waiting... (first call returns null)\n"
-        }
-
-        LogStatus(statusMsg)
-
-        Sleep(5000)  // Fetch channel data every 5 seconds
+        LogStatus(msg)
+        Sleep(5000)
     }
 }
 ```
 
 ```python
 def main():
-    # Get the IDs of the two channels to subscribe to (please modify according to your actual situation)
-    channelId1 = "632799"  # Live trading ID of channel 1
-    channelId2 = "632800"  # Live trading ID of channel 2
+    # live trading IDs to subscribe to (change as needed)
+    channels = ["632799", "632800"]
 
     while True:
-        # Get the current state of channel 1
-        state1 = GetChannelData(channelId1)
-
-        # Get the current state of channel 2
-        state2 = GetChannelData(channelId2)
-
-        # Build the status display message
-        statusMsg = "Channel Subscriber - Current Subscription Status\n\n"
-
-        # Display the status of channel 1
-        statusMsg += "═══ Channel1 [{}] ═══\n".format(channelId1)
-        if state1 is not None:
-            statusMsg += "Update ID: #{}\n".format(state1["updateId"])
-            statusMsg += "Time: {}\n".format(_D(state1["timestamp"]))
-            statusMsg += "Last Price: ${:.2f}\n".format(state1["lastPrice"])
-        else:
-            statusMsg += "Status: Waiting... (first call returns None)\n"
-
-        statusMsg += "\n"
-
-        # Display the status of channel 2
-        statusMsg += "═══ Channel2 [{}] ═══\n".format(channelId2)
-        if state2 is not None:
-            statusMsg += "Update ID: #{}\n".format(state2["updateId"])
-            statusMsg += "Time: {}\n".format(_D(state2["timestamp"]))
-            statusMsg += "Last Price: ${:.2f}\n".format(state2["lastPrice"])
-        else:
-            statusMsg += "Status: Waiting... (first call returns None)\n"
-
-        LogStatus(statusMsg)
-
-        Sleep(5000)  # Fetch channel data every 5 seconds
+        msg = ""
+        for ch in channels:
+            # the first call subscribes and returns None; later calls return the latest data
+            state = GetChannelData(ch)
+            if state:
+                msg += "channel {}: #{} {} last {}\n".format(ch, state["updateId"], _D(state["timestamp"]), state["lastPrice"])
+            else:
+                msg += "channel {}: waiting for data\n".format(ch)
+        LogStatus(msg)
+        Sleep(5000)
 ```
 
 ```rust
-fn main() {
-    // Rust's GetChannelData() function does not accept a channel ID parameter and cannot subscribe to channels of other live trading bots,
-    // it can only read the latest data of the current live trading bot's own channel (i.e. the data this bot publishes via SetChannelData())
-    loop {
-        // Read the current state of this bot's channel
-        let state = GetChannelData();
-
-        // Build the status display message
-        let mut statusMsg = String::from("Channel Subscriber - Current Subscription Status\n\n");
-
-        if !state.is_null() {
-            statusMsg += &format!("Update ID: #{}\n", state["updateId"].as_f64().unwrap_or(0.0));
-            statusMsg += &format!("Time: {}\n", _D(state["timestamp"].as_i64().unwrap_or(0)));
-            statusMsg += &format!("Symbol: {}\n", state["symbol"].as_str().unwrap_or(""));
-            statusMsg += &format!("Last Price: ${:.2}\n", state["lastPrice"].as_f64().unwrap_or(0.0));
-        } else {
-            statusMsg += "Status: Waiting... (first call returns null)\n";
-        }
-
-        LogStatus!(statusMsg);
-
-        Sleep(5000);  // Read channel data every 5 seconds
-    }
-}
+// Rust's GetChannelData() takes no channel argument and cannot subscribe to other live tradings' channels
 ```
 
-## Practical Application Scenarios
+## Scenario: master/follower strategies
 
-### Scenario 1: Master-Slave Strategy Collaborative Trading
+The master strategy computes a moving-average crossover signal and publishes it; the follower reads the signal and places an order when it changes.
 
-**Master Strategy (Signal Broadcasting End)**
+**Master strategy (publishes signals)**
 
 ```javascript
 function main() {
-    var robotId = _G()
-    Log("Main strategy started, Bot ID:", robotId)
-
-    while(true) {
-        // Analyze market conditions and generate trading signals
+    while (true) {
         var records = exchange.GetRecords("BTC_USDT")
-        if (!records || records.length < 20) {
-            Sleep(5000)
-            continue
+        if (records && records.length >= 21) {
+            var ma5 = TA.MA(records, 5)
+            var ma20 = TA.MA(records, 20)
+            var n = records.length
+            var signal = "HOLD"
+            if (ma5[n - 1] > ma20[n - 1] && ma5[n - 2] <= ma20[n - 2]) {
+                signal = "BUY"
+            } else if (ma5[n - 1] < ma20[n - 1] && ma5[n - 2] >= ma20[n - 2]) {
+                signal = "SELL"
+            }
+            SetChannelData({
+                timestamp: Date.now(),
+                symbol: "BTC_USDT",
+                signal: signal,
+                price: records[n - 1].Close
+            })
+            LogStatus("current signal:", signal, "price:", records[n - 1].Close)
         }
-
-        // Simple moving average crossover strategy
-        var ma5 = TA.MA(records, 5)
-        var ma20 = TA.MA(records, 20)
-        var signal = "HOLD"
-
-        if (ma5[ma5.length-1] > ma20[ma20.length-1] &&
-            ma5[ma5.length-2] <= ma20[ma20.length-2]) {
-            signal = "BUY"
-        } else if (ma5[ma5.length-1] < ma20[ma20.length-1] &&
-                   ma5[ma5.length-2] >= ma20[ma20.length-2]) {
-            signal = "SELL"
-        }
-
-        // Broadcast the trading signal
-        var signalData = {
-            timestamp: Date.now(),
-            symbol: "BTC_USDT",
-            signal: signal,
-            price: records[records.length-1].Close,
-            ma5: ma5[ma5.length-1],
-            ma20: ma20[ma20.length-1]
-        }
-
-        SetChannelData(signalData)
-        LogStatus("Main Strategy - Signal Broadcast\n" +
-                  "Signal: " + signal + "\n" +
-                  "Price: $" + signalData.price.toFixed(2) + "\n" +
-                  "MA5: " + signalData.ma5.toFixed(2) + "\n" +
-                  "MA20: " + signalData.ma20.toFixed(2))
-
         Sleep(60000)
     }
 }
 ```
 
 ```python
+import time
+
 def main():
-    robotId = _G()
-    Log("Main strategy started, Bot ID:", robotId)
-
     while True:
-        # Analyze market conditions and generate trading signals
         records = exchange.GetRecords("BTC_USDT")
-        if not records or len(records) < 20:
-            Sleep(5000)
-            continue
-
-        # Simple moving average crossover strategy
-        ma5 = TA.MA(records, 5)
-        ma20 = TA.MA(records, 20)
-        signal = "HOLD"
-
-        if ma5[-1] > ma20[-1] and ma5[-2] <= ma20[-2]:
-            signal = "BUY"
-        elif ma5[-1] < ma20[-1] and ma5[-2] >= ma20[-2]:
-            signal = "SELL"
-
-        # Broadcast the trading signal
-        signalData = {
-            "timestamp": time.time() * 1000,
-            "symbol": "BTC_USDT",
-            "signal": signal,
-            "price": records[-1]["Close"],
-            "ma5": ma5[-1],
-            "ma20": ma20[-1]
-        }
-
-        SetChannelData(signalData)
-        LogStatus("Main Strategy - Signal Broadcast\n" +
-                  "Signal: {}\n".format(signal) +
-                  "Price: ${:.2f}\n".format(signalData["price"]) +
-                  "MA5: {:.2f}\n".format(signalData["ma5"]) +
-                  "MA20: {:.2f}".format(signalData["ma20"]))
-
+        if records and len(records) >= 21:
+            ma5 = TA.MA(records, 5)
+            ma20 = TA.MA(records, 20)
+            signal = "HOLD"
+            if ma5[-1] > ma20[-1] and ma5[-2] <= ma20[-2]:
+                signal = "BUY"
+            elif ma5[-1] < ma20[-1] and ma5[-2] >= ma20[-2]:
+                signal = "SELL"
+            SetChannelData({
+                "timestamp": int(time.time() * 1000),
+                "symbol": "BTC_USDT",
+                "signal": signal,
+                "price": records[-1]["Close"]
+            })
+            LogStatus("current signal:", signal, "price:", records[-1]["Close"])
         Sleep(60000)
 ```
 
 ```rust
 fn main() {
-    let robotId = _G!();
-    Log!("Main strategy started, Bot ID:", robotId);
-
     loop {
-        // Analyze market conditions and generate trading signals
-        let records = match exchange.GetRecords("BTC_USDT", None, None) {
-            Ok(r) if r.len() >= 20 => r,
-            _ => {
-                Sleep(5000);
-                continue;
+        if let Ok(records) = exchange.GetRecords("BTC_USDT", None, None) {
+            let n = records.len();
+            if n >= 21 {
+                let ma5 = TA.MA(&records, 5);
+                let ma20 = TA.MA(&records, 20);
+                let mut signal = "HOLD";
+                if ma5[n - 1] > ma20[n - 1] && ma5[n - 2] <= ma20[n - 2] {
+                    signal = "BUY";
+                } else if ma5[n - 1] < ma20[n - 1] && ma5[n - 2] >= ma20[n - 2] {
+                    signal = "SELL";
+                }
+                let price = records[n - 1].Close;
+                // Rust's SetChannelData only accepts a string; build the JSON text yourself
+                let data = format!(
+                    r#"{{"timestamp": {}, "symbol": "BTC_USDT", "signal": "{}", "price": {}}}"#,
+                    Unix() * 1000, signal, price
+                );
+                SetChannelData(&data);
+                LogStatus!("current signal:", signal, "price:", price);
             }
-        };
-
-        // Simple moving average crossover strategy
-        let ma5 = TA.MA(&records, 5);
-        let ma20 = TA.MA(&records, 20);
-        let n = ma5.len();
-        let mut signal = "HOLD";
-
-        if ma5[n - 1] > ma20[n - 1] && ma5[n - 2] <= ma20[n - 2] {
-            signal = "BUY";
-        } else if ma5[n - 1] < ma20[n - 1] && ma5[n - 2] >= ma20[n - 2] {
-            signal = "SELL";
         }
-
-        // Broadcast the trading signal
-        // Rust's SetChannelData only accepts a string argument, so use format! to build the JSON text
-        let price = records[records.len() - 1].Close;
-        let signalData = format!(
-            r#"{{"timestamp": {}, "symbol": "BTC_USDT", "signal": "{}", "price": {}, "ma5": {}, "ma20": {}}}"#,
-            Unix() * 1000, signal, price, ma5[n - 1], ma20[n - 1]
-        );
-
-        SetChannelData(&signalData);
-        LogStatus!(format!(
-            "Main Strategy - Signal Broadcast\nSignal: {}\nPrice: ${:.2}\nMA5: {:.2}\nMA20: {:.2}",
-            signal, price, ma5[n - 1], ma20[n - 1]
-        ));
-
         Sleep(60000);
     }
 }
 ```
 
-## Real-World Application Scenarios
-
-
-### Scenario 1: Master-Follower Strategy Coordinated Trading
-
-
-**Follower Strategy (Signal Receiving and Execution End)**
+**Follower strategy (reads and executes signals)**
 
 ```javascript
 function main() {
-    var masterRobotId = "632799"  // Live trading ID of the master strategy
+    var masterId = "632799"  // live trading ID of the master strategy
     var lastSignal = null
 
-    Log("Follower strategy started, subscribing to main strategy:", masterRobotId)
-
-    while(true) {
-        // Get the signal from the master strategy
-        var signalData = GetChannelData(masterRobotId)
-
-        if (signalData === null) {
-            LogStatus("Waiting for main strategy signal...")
-            Sleep(5000)
-            continue
-        }
-
-        // Check whether there is a new signal
-        if (lastSignal !== signalData.signal) {
-            Log("Received new signal:", signalData.signal, "Price:", signalData.price)
-
-            // Execute the trade
-            if (signalData.signal === "BUY") {
-                var ticker = exchange.GetTicker(signalData.symbol)
-                if (ticker) {
-                    exchange.Buy(ticker.Last, 0.01)
-                    Log("Executing buy, Price:", ticker.Last)
+    while (true) {
+        var data = GetChannelData(masterId)
+        if (!data) {
+            LogStatus("waiting for the master strategy's signal...")
+        } else {
+            if (data.signal !== lastSignal) {
+                Log("new signal:", data.signal, "signal price:", data.price)
+                var ticker = exchange.GetTicker(data.symbol)
+                if (ticker && data.signal === "BUY") {
+                    exchange.CreateOrder(data.symbol, "buy", ticker.Last, 0.01)
+                } else if (ticker && data.signal === "SELL") {
+                    exchange.CreateOrder(data.symbol, "sell", ticker.Last, 0.01)
                 }
-            } else if (signalData.signal === "SELL") {
-                var ticker = exchange.GetTicker(signalData.symbol)
-                if (ticker) {
-                    exchange.Sell(ticker.Last, 0.01)
-                    Log("Executing sell, Price:", ticker.Last)
-                }
+                lastSignal = data.signal
             }
-
-            lastSignal = signalData.signal
+            LogStatus("current signal:", data.signal, "signal time:", _D(data.timestamp))
         }
-
-        LogStatus("Follower Strategy - Following Main Strategy\n" +
-                  "Current Signal: " + signalData.signal + "\n" +
-                  "Signal Price: $" + signalData.price.toFixed(2) + "\n" +
-                  "Signal Time: " + _D(signalData.timestamp))
-
         Sleep(5000)
     }
 }
@@ -3535,144 +4192,49 @@ function main() {
 
 ```python
 def main():
-    masterRobotId = "632799"  # Live trading ID of the master strategy
+    masterId = "632799"  # live trading ID of the master strategy
     lastSignal = None
 
-    Log("Follower strategy started, subscribing to main strategy:", masterRobotId)
-
     while True:
-        # Get the signal from the master strategy
-        signalData = GetChannelData(masterRobotId)
-
-        if signalData is None:
-            LogStatus("Waiting for main strategy signal...")
-            Sleep(5000)
-            continue
-
-        # Check whether there is a new signal
-        if lastSignal != signalData["signal"]:
-            Log("Received new signal:", signalData["signal"], "Price:", signalData["price"])
-
-            # Execute the trade
-            if signalData["signal"] == "BUY":
-                ticker = exchange.GetTicker(signalData["symbol"])
-                if ticker:
-                    exchange.Buy(ticker["Last"], 0.01)
-                    Log("Executing buy, Price:", ticker["Last"])
-            elif signalData["signal"] == "SELL":
-                ticker = exchange.GetTicker(signalData["symbol"])
-                if ticker:
-                    exchange.Sell(ticker["Last"], 0.01)
-                    Log("Executing sell, Price:", ticker["Last"])
-
-            lastSignal = signalData["signal"]
-
-        LogStatus("Follower Strategy - Following Main Strategy\n" +
-                  "Current Signal: {}\n".format(signalData["signal"]) +
-                  "Signal Price: ${:.2f}\n".format(signalData["price"]) +
-                  "Signal Time: {}".format(_D(signalData["timestamp"])))
-
+        data = GetChannelData(masterId)
+        if not data:
+            LogStatus("waiting for the master strategy's signal...")
+        else:
+            if data["signal"] != lastSignal:
+                Log("new signal:", data["signal"], "signal price:", data["price"])
+                ticker = exchange.GetTicker(data["symbol"])
+                if ticker and data["signal"] == "BUY":
+                    exchange.CreateOrder(data["symbol"], "buy", ticker["Last"], 0.01)
+                elif ticker and data["signal"] == "SELL":
+                    exchange.CreateOrder(data["symbol"], "sell", ticker["Last"], 0.01)
+                lastSignal = data["signal"]
+            LogStatus("current signal:", data["signal"], "signal time:", _D(data["timestamp"]))
         Sleep(5000)
 ```
 
 ```rust
-fn main() {
-    // Rust's GetChannelData() function does not accept a channel ID parameter, so it cannot subscribe to the master strategy's live trading channel,
-    // it can only read the latest data from the current live trading instance's own channel (this demonstrates equivalent signal-processing logic)
-    let mut lastSignal = String::new();
-
-    Log!("Follower strategy started");
-
-    loop {
-        // Get the signal from the channel
-        let signalData = GetChannelData();
-
-        if signalData.is_null() {
-            LogStatus!("Waiting for signal...");
-            Sleep(5000);
-            continue;
-        }
-
-        let signal = signalData["signal"].as_str().unwrap_or("").to_string();
-        let price = signalData["price"].as_f64().unwrap_or(0.0);
-        let symbol = signalData["symbol"].as_str().unwrap_or("BTC_USDT").to_string();
-
-        // Check whether there is a new signal
-        if lastSignal != signal {
-            Log!("Received new signal:", &signal, "Price:", price);
-
-            // Execute the trade
-            if signal == "BUY" {
-                if let Ok(ticker) = exchange.GetTicker(symbol.as_str()) {
-                    let _ = exchange.Buy(ticker.Last, 0.01);
-                    Log!("Executing buy, Price:", ticker.Last);
-                }
-            } else if signal == "SELL" {
-                if let Ok(ticker) = exchange.GetTicker(symbol.as_str()) {
-                    let _ = exchange.Sell(ticker.Last, 0.01);
-                    Log!("Executing sell, Price:", ticker.Last);
-                }
-            }
-
-            lastSignal = signal.clone();
-        }
-
-        LogStatus!(format!(
-            "Follower Strategy\nCurrent Signal: {}\nSignal Price: ${:.2}\nSignal Time: {}",
-            signal, price, _D(signalData["timestamp"].as_i64().unwrap_or(0))
-        ));
-
-        Sleep(5000);
-    }
-}
+// Rust's GetChannelData() takes no channel argument and cannot read the master strategy's channel
 ```
 
-### Scenario 2: Multi-Strategy Status Monitoring
+## Scenario: monitoring several strategies
 
-    **Monitoring Strategies**
+Each strategy publishes its status as the publisher above does; the monitoring live trading reads every channel, shows them in a table and marks those without an update for over 2 minutes as abnormal.
 
 ```javascript
 function main() {
-    // List of live-trading bot IDs to monitor
-    var monitorList = ["632799", "632800", "632801"]
+    var monitorList = ["632799", "632800", "632801"]  // at most 10
 
-    while(true) {
-        var table = {
-            type: "table",
-            title: "Strategy Running Status Monitor",
-            cols: ["Bot ID", "Status", "Last Update", "Symbol", "Current Price", "PnL"],
-            rows: []
-        }
-
+    while (true) {
+        var table = {type: "table", title: "Strategy status", cols: ["Live trading ID", "Status", "Last update", "Symbol", "Last price"], rows: []}
         for (var i = 0; i < monitorList.length; i++) {
-            var robotId = monitorList[i]
-            var data = GetChannelData(robotId)
-
-            if (data !== null) {
-                var updateTime = _D(data.timestamp)
-                var timeDiff = Date.now() - data.timestamp
-                var status = timeDiff < 120000 ? "Running" : "Error"
-
-                table.rows.push([
-                    robotId,
-                    status,
-                    updateTime,
-                    data.symbol || "-",
-                    data.lastPrice ? "$" + data.lastPrice.toFixed(2) : "-",
-                    data.profit ? data.profit.toFixed(2) + "%" : "-"
-                ])
+            var data = GetChannelData(monitorList[i])
+            if (data) {
+                var status = Date.now() - data.timestamp < 120000 ? "running" : "abnormal"
+                table.rows.push([monitorList[i], status, _D(data.timestamp), data.symbol || "-", data.lastPrice || "-"])
             } else {
-                table.rows.push([
-                    robotId,
-                    "Waiting for Data",
-                    "-",
-                    "-",
-                    "-",
-                    "-"
-                ])
+                table.rows.push([monitorList[i], "waiting for data", "-", "-", "-"])
             }
         }
-
         LogStatus("`" + JSON.stringify(table) + "`")
         Sleep(10000)
     }
@@ -3680,1767 +4242,1066 @@ function main() {
 ```
 
 ```python
+import json
+import time
+
 def main():
-    # List of live-trading bot IDs to monitor
-    monitorList = ["632799", "632800", "632801"]
+    monitorList = ["632799", "632800", "632801"]  # at most 10
 
     while True:
-        table = {
-            "type": "table",
-            "title": "Strategy Running Status Monitor",
-            "cols": ["Bot ID", "Status", "Last Update", "Symbol", "Current Price", "PnL"],
-            "rows": []
-        }
-
+        table = {"type": "table", "title": "Strategy status", "cols": ["Live trading ID", "Status", "Last update", "Symbol", "Last price"], "rows": []}
         for robotId in monitorList:
             data = GetChannelData(robotId)
-
-            if data is not None:
-                updateTime = _D(data["timestamp"])
-                timeDiff = time.time() * 1000 - data["timestamp"]
-                status = "Running" if timeDiff < 120000 else "Error"
-
-                table["rows"].append([
-                    robotId,
-                    status,
-                    updateTime,
-                    data.get("symbol", "-"),
-                    "${:.2f}".format(data["lastPrice"]) if "lastPrice" in data else "-",
-                    "{:.2f}%".format(data["profit"]) if "profit" in data else "-"
-                ])
+            if data:
+                status = "running" if time.time() * 1000 - data["timestamp"] < 120000 else "abnormal"
+                table["rows"].append([robotId, status, _D(data["timestamp"]), data.get("symbol", "-"), data.get("lastPrice", "-")])
             else:
-                table["rows"].append([
-                    robotId,
-                    "Waiting for Data",
-                    "-",
-                    "-",
-                    "-",
-                    "-"
-                ])
-
+                table["rows"].append([robotId, "waiting for data", "-", "-", "-"])
         LogStatus("`" + json.dumps(table) + "`")
         Sleep(10000)
 ```
 
 ```rust
-fn main() {
-    // Rust's GetChannelData() function does not accept a channel ID parameter, so it cannot subscribe to other bots' channels for monitoring;
-    // it can only read the latest data from the current bot's own channel (this demonstrates the equivalent status-table display logic)
-    loop {
-        let data = GetChannelData();
-
-        let row = if !data.is_null() {
-            let timestamp = data["timestamp"].as_i64().unwrap_or(0);
-            let updateTime = _D(timestamp);
-            let timeDiff = Unix() * 1000 - timestamp;
-            let status = if timeDiff < 120000 { "Running" } else { "Error" };
-            format!(
-                r#"["{}", "{}", "{}", "{}"]"#,
-                _G!(), status, updateTime,
-                data["symbol"].as_str().unwrap_or("-")
-            )
-        } else {
-            format!(r#"["{}", "Waiting for Data", "-", "-"]"#, _G!())
-        };
-
-        // Build the table JSON text (Rust has no JSON serialization, so use format! to concatenate)
-        let table = format!(
-            r#"{{"type": "table", "title": "Strategy Running Status Monitor", "cols": ["Bot ID", "Status", "Last Update", "Symbol"], "rows": [{}]}}"#,
-            row
-        );
-
-        LogStatus!(format!("`{}`", table));
-        Sleep(10000);
-    }
-}
+// Rust's GetChannelData() takes no channel argument and cannot read other live tradings' channels
 ```
 
-## API Function Reference
+See also: `SetChannelData`, `GetChannelData`, `_G`
 
+### API Rate Limiting Control
 
-    ### SetChannelData(data)
-
-
-    **Function**: Publishes the latest status data to a channel
-
-
-    **Parameters**:
-
-    - data: The data to publish, which can be any JSON-serializable data structure
-
-
-    **Return Value**: None
-
-
-    **Characteristics**:
-
-    - Non-blocking call
-
-    - Overwrites the previous data; does not accumulate historical records
-
-    - Automatically uses the current live trading ID as the channel ID
-
-
-    **Data Size Limit**:
-
-    - Must not exceed 1024 bytes after JSON serialization
-
-    - It is recommended to transmit only the necessary status information
-
-
-    **Detailed Documentation**: [SetChannelData](/syntax-guide#fun_setchanneldata)
-
-
-    ### GetChannelData(robotId)
-
-
-    **Function**: Subscribes to the channel data of a specified live trading bot
-
-
-    **Parameters**:
-
-    - robotId: The live trading ID to subscribe to (string or number)
-
-
-    **Return Value**:
-
-    - Returns null on the first call; a retry is required
-
-    - Returns the latest data of the channel upon success
-
-
-    **Characteristics**:
-
-    - Non-blocking call
-
-    - Supports subscribing to multiple channels
-
-    - Supports subscribing to its own channel
-
-
-    **Detailed Documentation**: [GetChannelData](/syntax-guide#fun_getchanneldata)
-
-
-    ## Notes
-
-
-    - **First call returns null**: The ```GetChannelData()``` function returns ```null``` on its first call. This is normal behavior, as it needs to wait for data synchronization to complete. It is recommended to add a null check in your code.
-
-
-    - **Data overwrite mechanism**: Only the latest status is stored on the channel. Calling ```SetChannelData()``` overwrites the previous data. If you need to preserve historical data, you should record it yourself on the subscriber side.
-
-
-    - **Non-blocking characteristic**: All channel communication functions are non-blocking calls and will not affect the execution of the strategy's main flow. However, this also means the real-time delivery of data cannot be guaranteed.
-
-
-    - **Data size limit**: The data passed to SetChannelData must not exceed 1024 bytes after JSON serialization. You should transmit only the necessary status information, such as key data like trading signals, prices, and positions, and avoid transmitting complete candlestick (K-line) arrays or large amounts of historical data.
-
-
-    - **Live trading environment limitation**: The channel communication feature is primarily intended for the live trading environment and may be restricted or unavailable in the backtesting system.
-
-
-    - **Obtaining the live trading ID**: You can obtain the current live trading ID via the ```_G()``` function, or view it in the platform interface.
-
-
-    - **Security considerations**: Channel data may be subscribed to by other live trading bots with the appropriate permissions, so do not transmit sensitive information (such as API keys) through the channel.
-
-
-    ## Best Practices
-
-
-    - **Reasonable update frequency**: Set the data update frequency according to your actual needs to avoid wasting resources due to overly frequent updates.
-
-
-    - **Data structure design**: Design a clear data structure and include the necessary metadata (such as timestamps and version numbers) to facilitate processing on the subscriber side.
-
-
-    - **Error handling**: The subscriber side should handle null return values, and the broadcasting side should ensure the data format is correct.
-
-
-    - **Status version control**: Include a version number or update ID in the data to help the subscriber side determine whether new data is available.
-
-
-    - **Monitoring and alerting**: For critical communication links, it is recommended to implement timeout monitoring and alerting mechanisms.
-
-
-    - **Testing and validation**: Before using it in production, first validate the stability and latency of channel communication in a test environment.
-
-
-    - **Documentation**: Document the channel data format and communication protocol to facilitate future maintenance and team collaboration.
-
-See also: `SetChannelData`; `GetChannelData`; `_G`
-
-### JavaScript Multi-threading
-
-The FMZ Quant Trading Platform provides true multi-threading support for ```JavaScript``` language strategies from the system level, implementing the following objects:
-
-| Object | Description | Notes |
-| - | - | - |
-| threading | Global multi-threading object | Member functions: ```Thread```, ```getThread```, ```mainThread```, etc. |
-| Thread | Thread object | Member functions: ```peekMessage```, ```postMessage```, ```join```, etc. |
-| ThreadLock | Thread lock object | Member functions: ```acquire```, ```release```. Can be passed as a parameter to thread execution functions into the thread environment. |
-| ThreadEvent | Event object | Member functions: ```set```, ```clear```, ```wait```, ```isSet```. Can be passed as a parameter to thread execution functions into the thread environment. |
-| ThreadCondition | Condition object | Member functions: ```notify```, ```notifyAll```, ```wait```, ```acquire```, ```release```. Can be passed as a parameter to thread execution functions into the thread environment. |
-| ThreadDict | Dictionary object | Member functions: ```get```, ```set```. Can be passed as a parameter to thread execution functions into the thread environment. |
-
-FMZ Quant Trading Platform Syntax Manual: [JavaScript Multi-threading](https://www.fmz.com/syntax-guide/fun/threads)
-
-### Web3
-
-| Function Name | Description |
-| - | - |
-| [exchange.IO("abi", ...)](/syntax-guide#fun_exchange.ioabi-...) | Register ABI interface |
-| [exchange.IO("api", "eth", ...)](/syntax-guide#fun_exchange.ioapi-eth-...) | Call Ethereum RPC methods |
-| [exchange.IO("encode", ...)](/syntax-guide#fun_exchange.ioencode-...) | Encode function calls |
-| [exchange.IO("encodePacked", ...)](/syntax-guide#fun_exchange.ioencodepacked-...) | Execute encodePacked encoding |
-| [exchange.IO("decode", ...)](/syntax-guide#fun_exchange.iodecode-...) | Decode data |
-| [exchange.IO("key", ...)](/syntax-guide#fun_exchange.iokey-...) | Switch private key |
-| [exchange.IO("api", ...)](/syntax-guide#fun_exchange.ioapi-...) | Call smart contract methods |
-| [exchange.IO("address")](/syntax-guide#fun_exchange.ioaddress) | Get current configured wallet address |
-| [exchange.IO("base", ...)](/syntax-guide#fun_exchange.iobase-...) | Set RPC node address |
-
-### TA Indicator Library
-
-| Function Name | Description |
-| - | - |
-| [TA.MACD](/syntax-guide#fun_ta.macd)           | Calculate Moving Average Convergence Divergence indicator |
-| [TA.KDJ](/syntax-guide#fun_ta.kdj)             | Calculate Stochastic Oscillator indicator |
-| [TA.RSI](/syntax-guide#fun_ta.rsi)             | Calculate Relative Strength Index |
-| [TA.ATR](/syntax-guide#fun_ta.atr)             | Calculate Average True Range indicator |
-| [TA.OBV](/syntax-guide#fun_ta.obv)             | Calculate On Balance Volume indicator |
-| [TA.MA](/syntax-guide#fun_ta.ma)               | Calculate Moving Average indicator |
-| [TA.EMA](/syntax-guide#fun_ta.ema)             | Calculate Exponential Moving Average indicator |
-| [TA.BOLL](/syntax-guide#fun_ta.boll)           | Calculate Bollinger Bands indicator |
-| [TA.Alligator](/syntax-guide#fun_ta.alligator) | Calculate Alligator indicator |
-| [TA.CMF](/syntax-guide#fun_ta.cmf)             | Calculate Chaikin Money Flow indicator |
-| [TA.Highest](/syntax-guide#fun_ta.highest)     | Calculate the highest price within specified period |
-| [TA.Lowest](/syntax-guide#fun_ta.lowest)       | Calculate the lowest price within specified period |
-| [TA.SMA](/syntax-guide#fun_ta.sma)             | Calculate Simple Moving Average indicator |
-
-### talib Indicator Library
-
-The talib indicator library contains numerous technical analysis indicators, for example: [talib.CDL2CROWS](/syntax-guide#fun_talib.cdl2crows). Please refer to the syntax manual for detailed information.
-
-## Template Library
-
-**Template Library** is a reusable code module in the FMZ Quant Trading Platform, which belongs to a category of strategy code. The programming languages that support template library functionality on the FMZ Quant Trading Platform include: ```JavaScript```, ```Python```, ```C++```, ```Blockly Visual```. When creating a strategy, if the category is set to Template Library, the system will create a template library in the strategy repository of the currently logged-in account on the FMZ Quant Trading Platform. Once created, this category cannot be changed back to a regular strategy.
-
-![Create Template Library Page](https://www.fmz.com/upload/asset/2e4c55da99fd457ca94a0.png)
-
-### Export Functions of Template Libraries
-
-Export functions are the interface functions of template libraries, which can be called by strategies that reference the template library.
-
-Different programming languages have different formats for writing template libraries. The following are example codes for declaring and implementing export functions in template libraries:
-
-```javascript
-/*
--- 策略引用该模板以后直接用 $.Test() 调用此方法
--- main 函数在策略中不会触发, 只做为模板调试的入口
-*/
-$.Test = function() {
-    Log('Test')
-}
-
-function main() {
-    $.Test()
-}
-```
-
-```python
-def Test():
-    Log("template call")
-
-# 导出Test函数, 主策略可以通过ext.Test()调用
-ext.Test = Test
-```
-
-```cpp
-// 策略引用该模板以后直接用 ext::Test() 调用此方法
-void Test() {
-    Log("template call");
-}
-```
-
-Strategies written in ```Blockly visual``` mode can implement library functions through ```JavaScript``` language template libraries. Please use the following format.
+Exchanges limit how often their API may be called. Going over the limit gets requests rejected at best and the account temporarily banned at worst. With ```exchange.IO("rate", ...)``` or ```exchange.IO("quota", ...)``` you can cap the call frequency of standard functions locally on the docker: a call that exceeds the limit is never sent.
 
 ```js
-/*blockly
-    {
-        "type": "ext_testA",
-        "message0": "testA|testA",
-        "template": "function(){return 99;}()",
-        "order": "ORDER_ATOMIC",
-        "output": "Number"
-    },{
-        "type": "ext_MA",
-        "message0": "MA 周期 %1| MA Period %1",
-        "args0": [{
-            "type": "input_value",
-            "check": "Number"
-        }],
-        "template": "(function(){var r = exchange.GetRecords(); return (!r || r.length < %1) ? false : TA.MA(r, %1); })()",
-        "order": "ORDER_ATOMIC",
-        "output": null,
-        "colour": 85
+exchange.IO("rate" | "quota", name, count, window[, "delay"])
+```
+
+## Two modes
+
+- **rate (token bucket)**: the bucket capacity defaults to ```count```. It starts full and refills at a steady "count per window"; each call takes one token. Short bursts are allowed, while the long-run average never exceeds "count per window". Writing ```count``` as ```"10/5"``` means 10 refills per window with a bucket capacity of 5, which limits bursts.
+- **quota (fixed window)**: at most ```count``` calls per window; the counter resets when the next window starts. Windows are aligned to the Unix epoch: ```"1s"``` to whole seconds, ```"1m"``` to whole minutes, ```"1h"``` to whole hours, ```"1d"``` to UTC midnight (08:00 Beijing time). For example, counting that starts at 12:00:00.900 is already in a new window at 12:00:01.000.
+
+Use ```quota``` with a window matching the exchange's counting period when you must guarantee "no more than N calls in any of the exchange's periods"; use ```rate``` when you only need to control the average frequency.
+
+## Parameters
+
+| Parameter | Description |
+| - | - |
+| name | The function to limit, see the table below. Several names separated by commas (such as ```"GetTicker,GetDepth"```) share one rule and their calls are counted together. ```"*"``` is a fallback rule that applies only to functions without a rule of their own. |
+| count | Calls allowed per window, must be greater than 0; in ```rate``` mode it can be written as ```"count/burst"```. Passing ```0``` or a negative number deletes the rule for that name. |
+| window | A duration in the syntax of Go's ```time.ParseDuration```: units ```ns```, ```us``` (or ```µs```), ```ms```, ```s```, ```m```, ```h```, decimals allowed (```"1.5s"```), units can be combined (```"1h30m"```); ```"Nd"``` means N days (decimals allowed, such as ```"0.5d"```, not combinable with other units). ```"@HHMM"``` or ```"@HHMMSS"``` (such as ```"@0800"```) counts per day and resets at that time of day (Beijing time); it works with both ```rate``` and ```quota```. |
+| action | When omitted, a call over the limit fails immediately; with ```"delay"``` the call blocks until a call is available and is then sent. Stopping the live trading interrupts the wait. |
+
+## Function names that can be limited
+
+| Category | Names |
+| - | - |
+| Market data | ```GetTicker```, ```GetTickers```, ```GetDepth```, ```GetTrades```, ```GetRecords```, ```GetMarkets```, ```GetFundings``` |
+| Account | ```GetAccount```, ```GetAssets```, ```GetPositions```, ```SetMarginLevel``` |
+| Trading | ```CreateOrder``` (```Buy``` and ```Sell``` count here too), ```CancelOrder```, ```ModifyOrder``` |
+| Order queries | ```GetOrder```, ```GetOrders```, ```GetHistoryOrders``` |
+| Conditional orders | ```CreateConditionOrder```, ```ModifyConditionOrder```, ```CancelConditionOrder```, ```GetConditionOrder```, ```GetConditionOrders```, ```GetHistoryConditionOrders``` |
+| Custom requests | ```IO/api```: limits only ```exchange.IO("api", ...)```, other ```exchange.IO()``` commands are unaffected |
+
+- ```GetAccount``` and ```GetAssets``` are the same underlying request; a rule under either name applies to both functions.
+- Calls made concurrently through ```exchange.Go()``` are counted under the function actually called.
+
+## Scope of rules
+
+- Rules are set per exchange object: a rule on ```exchanges[0]``` does not affect ```exchanges[1]```.
+- Rules last for the current run only. Set them again after the live trading restarts, usually at the beginning of ```main()```.
+- Setting the same name again replaces its rule; an empty name (```exchange.IO("rate", "")```) clears all rules of that exchange object.
+- Each call is counted under one rule only: a function with its own rule is no longer counted under ```"*"```, so ```"*"``` cannot be used as a "total quota for all calls" stacked on top of specific rules.
+
+## When the limit is exceeded
+
+With the default action, a call over the limit sends no request and is treated as a failed call (JavaScript returns ```null```, Python returns ```None```, Rust returns ```Err```). The error message looks like:
+
+```
+rate limit exceeded: GetTicker 10/1s
+quota limit exceeded: GetTicker 10/1m
+quota limit exceeded: GetRecords 2000/day (resets at 0800)
+```
+
+With the ```"delay"``` action the call blocks until a call is available, so the time recorded in the log is the time after the wait. With a rule that resets daily, ```"delay"``` may wait until the next day; use it with care.
+
+## Examples
+
+### Default action: calls over the limit fail
+
+```javascript
+function main() {
+    // GetTicker at most 5 calls per second on average (token bucket, capacity 5)
+    exchange.IO("rate", "GetTicker", 5, "1s")
+
+    for (var i = 0; i < 10; i++) {
+        var ticker = exchange.GetTicker("BTC_USDT")
+        if (ticker) {
+            Log("call", i + 1, "succeeded:", ticker.Last)
+        } else {
+            // a call over the limit sends no request and returns null
+            Log("call", i + 1, "rate limited:", GetLastError())
+        }
     }
-*/
-```
-
-### Template Library Parameters
-
-Template libraries can also set their own interface parameters. Template library parameters are used as global variables in the template library code.
-
-For example, we set a template library parameter:
-
-![Template Parameter](https://www.fmz.com/upload/asset/2e4ab550b85e6a1cac08e.png)
-
-| Variable Name in Strategy Code | Parameter Name Displayed on Strategy Interface | Type | Default Value |
-| - | - | - | - |
-| param1 | Template Parameter 1 | Number | 99 |
-
-Template library code for testing the ```param1``` parameter:
-
-```javascript
-$.SetParam1 = function(p1) {
-    param1 = p1
-}
-
-$.GetParam1 = function() {
-    Log("param1:", param1)
-    return param1
-}
-```
-
-```python
-def SetParam1(p1):
-    global param1
-    param1 = p1
-
-def GetParam1():
-    Log("param1:", param1)
-    return param1
-
-ext.SetParam1 = SetParam1
-ext.GetParam1 = GetParam1
-```
-
-```cpp
-void SetParam1(float p1) {
-    param1 = p1;
-}
-
-float GetParam1() {
-    Log("param1:", param1);
-    return param1;
-}
-```
-
-Strategy code referencing the above template library example, using the template library's exported functions to get parameter ```param1``` and modify parameter ```param1```.
-
-```javascript
-function main () {
-    Log("Calling $.GetParam1:", $.GetParam1())
-    Log("Calling $.SetParam1:", "#FF0000")
-    $.SetParam1(20)
-    Log("Calling $.GetParam1:", $.GetParam1())
 }
 ```
 
 ```python
 def main():
-    Log("Calling ext.GetParam1:", ext.GetParam1())
-    Log("Calling ext.SetParam1:", "#FF0000")
-    ext.SetParam1(20)
-    Log("Calling ext.GetParam1:", ext.GetParam1())
+    # GetTicker at most 5 calls per second on average (token bucket, capacity 5)
+    exchange.IO("rate", "GetTicker", 5, "1s")
+
+    for i in range(10):
+        ticker = exchange.GetTicker("BTC_USDT")
+        if ticker:
+            Log("call", i + 1, "succeeded:", ticker["Last"])
+        else:
+            # a call over the limit sends no request and returns None
+            Log("call", i + 1, "rate limited:", GetLastError())
 ```
 
-```cpp
-void main() {
-    Log("Calling ext::GetParam1:", ext::GetParam1());
-    Log("Calling ext::SetParam1:", "#FF0000");
-    ext::SetParam1(20);
-    Log("Calling ext::GetParam1:", ext::GetParam1());
+```rust
+fn main() {
+    // GetTicker at most 5 calls per second on average (token bucket, capacity 5)
+    let _ = exchange.IO(("rate", "GetTicker", 5, "1s"));
+
+    for i in 0..10 {
+        match exchange.GetTicker("BTC_USDT") {
+            Ok(ticker) => Log!("call", i + 1, "succeeded:", ticker.Last),
+            // a call over the limit sends no request and returns Err
+            Err(e) => Log!("call", i + 1, "rate limited:", e),
+        }
+    }
 }
 ```
 
-### Reference Template Library
+### Rules grouped after the exchange's own limits
 
-When a strategy references a template library, the currently logged-in FMZ Quant Trading Platform account must have available template libraries in its strategy library. On the [Strategy Edit Page](https://www.fmz.com/m/add-strategy), check the templates you need to reference in the Template section, then save the strategy to complete the reference.
+Market data and trading each share one rule; trading calls wait instead of failing when over the limit; every other function without a rule of its own falls back to ```"*"```.
 
-![Template Reference Screenshot](https://www.fmz.com/upload/asset/2e4ee2ec7b3e7b1649af8.png)
+```javascript
+function main() {
+    // market data: GetTicker and GetDepth together at most 20 calls per second on average
+    exchange.IO("rate", "GetTicker,GetDepth", 20, "1s")
+    // trading: placing orders (Buy/Sell included) and cancelling together 5 per second, wait when over the limit
+    exchange.IO("rate", "CreateOrder,CancelOrder", 5, "1s", "delay")
+    // fallback: other functions (such as GetAccount, GetPositions) together 60 per minute, window aligned to whole minutes
+    exchange.IO("quota", "*", 60, "1m")
 
-## Strategy Parameters
+    while (true) {
+        var ticker = exchange.GetTicker("BTC_USDT")
+        var depth = exchange.GetDepth("BTC_USDT")
+        if (ticker && depth) {
+            Log("last:", ticker.Last, "best bid:", depth.Bids[0].Price)
+        }
+        Sleep(1000)
+    }
+}
+```
 
-Parameters configured in the strategy interface exist as global variables in the strategy code. ```JavaScript```, ```C++```, and ```MyLanguage``` strategy code can directly access and modify parameter values set in the strategy interface. ```Python``` strategies need to use the ```global``` keyword when modifying global variables or strategy interface parameters within functions. ```PINE``` language uses the ```input()``` function to create interface parameters. Strategies designed using ```Blockly Visual``` mode do not support interface parameters.
+```python
+def main():
+    # market data: GetTicker and GetDepth together at most 20 calls per second on average
+    exchange.IO("rate", "GetTicker,GetDepth", 20, "1s")
+    # trading: placing orders (Buy/Sell included) and cancelling together 5 per second, wait when over the limit
+    exchange.IO("rate", "CreateOrder,CancelOrder", 5, "1s", "delay")
+    # fallback: other functions (such as GetAccount, GetPositions) together 60 per minute, window aligned to whole minutes
+    exchange.IO("quota", "*", 60, "1m")
 
-![Strategy Parameter Settings Interface](https://www.fmz.com/upload/asset/2e46b5e593de3b2f11445.png)
+    while True:
+        ticker = exchange.GetTicker("BTC_USDT")
+        depth = exchange.GetDepth("BTC_USDT")
+        if ticker and depth:
+            Log("last:", ticker["Last"], "best bid:", depth["Bids"][0]["Price"])
+        Sleep(1000)
+```
 
-### Interface Parameter Types
+```rust
+fn main() {
+    // market data: GetTicker and GetDepth together at most 20 calls per second on average
+    let _ = exchange.IO(("rate", "GetTicker,GetDepth", 20, "1s"));
+    // trading: placing orders (Buy/Sell included) and cancelling together 5 per second, wait when over the limit
+    let _ = exchange.IO(("rate", "CreateOrder,CancelOrder", 5, "1s", "delay"));
+    // fallback: other functions (such as GetAccount, GetPositions) together 60 per minute, window aligned to whole minutes
+    let _ = exchange.IO(("quota", "*", 60, "1m"));
 
-| Variable (naming example) | Description | Type | Default Value (description) | Component Configuration (description) | Remarks |
-| - | - | - | - | - | - |
-| pNum       | Description of parameter pNum       | Numeric (number)     | Example: Set default value to 100, floating point type in C++ strategies| Used to set the interface control bound to the current parameter: component type, minimum value, maximum value, grouping, filters, etc. | Remarks for parameter pNum, the value of pNum is numeric type |
-| pBool      | Description of parameter pBool      | Boolean (true/false) | Use switch control to set default value, optional control not supported | Same as above                                                          | Remarks for parameter pBool, the value of pBool is boolean type |
-| pStr       | Description of parameter pStr       | String (string)     | Example: Set default value to abc               | Same as above                                                          | Remarks for parameter pStr, the value of pStr is string type |
-| pCombox    | Description of parameter pCombox    | Dropdown (selected)   | Set one or more options from the options      | Same as above                                                          | Remarks for parameter pCombox, the value of pCombox may have various forms |
-| pSecretStr | Description of parameter pSecretStr | Encrypted string (string)     | Example: Set default value to xyz               | Same as above                                                          | Remarks for parameter pSecretStr, the value of pSecretStr is string type |
+    loop {
+        if let (Ok(ticker), Ok(depth)) = (exchange.GetTicker("BTC_USDT"), exchange.GetDepth("BTC_USDT")) {
+            Log!("last:", ticker.Last, "best bid:", depth.Bids[0].Price);
+        }
+        Sleep(1000);
+    }
+}
+```
 
-Interface parameters are configured in the strategy parameters area below the code editor on the strategy editing page. Please note the following:
-1. In the default value option of parameter settings, the "Optional" control is optional by default. You can change the state of this control to set the current parameter as required. After setting a parameter as required, if the parameter is not set during backtesting or live trading, backtesting cannot be performed or live trading cannot be started.
-2. Variable names for interface parameters in strategy code should not use reserved words (keywords) of the current programming language.
-3. In the backtesting or live trading interface, hovering the mouse over the control bound to a parameter will display the parameter's remarks.
-4. The "Description" of a parameter is the display name of the control bound to the parameter.
-5. The "Variable" of a parameter refers to those in the table above: ```pNum```, ```pBool```, ```pStr```, ```pCombox```, ```pSecretStr```. They exist as global variables in the strategy code, so the values of strategy parameters can be modified in the code.
-6. For "Encrypted string" and "String" type parameters, no quotes are needed when entering default values; all input is treated as strings. "Encrypted string" parameters are used the same way as "String" parameters, but encrypted strings are transmitted encrypted and not sent in plain text.
-7. If a "String" type parameter is set to "Optional", when no parameter is filled in the control bound to the parameter, the value of the parameter variable is **empty string**;
-  Similarly, the value of a "Numeric" parameter is **null**;
-  Similarly, the value of a "Dropdown" parameter is **null**;
-  Similarly, the value of an "Encrypted string" parameter is **null**.
-8. For dropdown type interface parameters (e.g., variable name ```pCombox```), when "Support multiple selection" is not enabled in "Component Configuration", the value of pCombox is the index or specific data of the currently selected option (when data is bound to options).
-  If "Support multiple selection" is enabled, the value of pCombox is an array containing the indices or specific data of all currently selected options (when data is bound to options).
+### Burst capacity, daily quota and deleting rules
 
-### Component Configuration
+```javascript
+function main() {
+    // 10 calls per second on average, but at most 2 in a burst
+    exchange.IO("rate", "GetDepth", "10/2", "1s")
+    // resets every day at 08:00 Beijing time, at most 2000 calls per day
+    exchange.IO("quota", "GetRecords", 2000, "@0800")
+    // units can be combined: at most 100 calls every 1 hour 30 minutes
+    exchange.IO("rate", "GetOrders", 100, "1h30m")
 
-The "Component Configuration" option for strategy interface parameters is used to set controls corresponding to 5 parameter types on the platform, enhancing functionality and simplifying design.
+    // count 0: delete the rule for GetOrders
+    exchange.IO("rate", "GetOrders", 0)
+    // empty name: clear all rules of this exchange object
+    exchange.IO("rate", "")
+}
+```
 
-Supported component types for the 5 interface parameters:
-- Number type parameters
-  Supported component types: Input box control (default), Time picker control, Slider control.
-- Boolean (true/false) parameters
-  Only supports switch control (default).
-- String parameters
-  Supported component types: Input box control (default), Text box control, Time picker control, Color picker control, Currency selector, Trading code selector.
-- Dropdown (selected) parameters
-  Supported component types: Dropdown control (default), Segmented control, Currency selector, Trading code selector.
-- Encrypted string parameters
-  Only supports encrypted input box control (default).
+```python
+def main():
+    # 10 calls per second on average, but at most 2 in a burst
+    exchange.IO("rate", "GetDepth", "10/2", "1s")
+    # resets every day at 08:00 Beijing time, at most 2000 calls per day
+    exchange.IO("quota", "GetRecords", 2000, "@0800")
+    # units can be combined: at most 100 calls every 1 hour 30 minutes
+    exchange.IO("rate", "GetOrders", 100, "1h30m")
 
-In addition to setting the control types for interface parameters, you can also set grouping and filtering for interface parameters.
-- Grouping
-  In the "Group" input box of component configuration, you can enter a label name to group several strategy interface parameters under the same group label (replacing the platform's old "Strategy Grouping" feature).
-- Filter
-  In the "Filter" input box of component configuration, you can enter filter condition expressions to control whether interface parameters take effect (replacing the platform's old "Parameter Dependency" feature).
-  The filter is empty by default, with no parameter condition filtering; you can set: ```a > b```, ```a == 1```, ```a```, ```!a```, ```a >= 1 && a <= 10```, ```a > b```, etc. When the filter condition is true, the current parameter is available.
-  - When a parameter has filter ```a == 1``` set, the availability of this parameter depends on the value of parameter ```a```. When parameter ```a``` equals 1, this parameter is available; otherwise, it is unavailable.
-  - When a parameter has filter ```a >= 1 && a <= 10``` set, it means the filter condition is: a is greater than or equal to 1 and a is less than or equal to 10. When this condition is met, the parameter is available; otherwise, it is unavailable.
-  - When a parameter has filter ```!a``` set, it means the filter condition is: not a; a can be a boolean value or a numeric value (!0 represents true).
+    # count 0: delete the rule for GetOrders
+    exchange.IO("rate", "GetOrders", 0)
+    # empty name: clear all rules of this exchange object
+    exchange.IO("rate", "")
+```
 
-### Save Parameter Settings
+```rust
+fn main() {
+    // 10 calls per second on average, but at most 2 in a burst
+    let _ = exchange.IO(("rate", "GetDepth", "10/2", "1s"));
+    // resets every day at 08:00 Beijing time, at most 2000 calls per day
+    let _ = exchange.IO(("quota", "GetRecords", 2000, "@0800"));
+    // units can be combined: at most 100 calls every 1 hour 30 minutes
+    let _ = exchange.IO(("rate", "GetOrders", 100, "1h30m"));
 
-- Parameter saving in the backtesting system
-  When backtesting, if you want to save the strategy parameters, you can click the "Save Backtest Settings" button after modifying the strategy parameters. For details, please refer to ["Save Backtest Settings"](/user-guide/回测系统/保存回测设置) in the backtesting system.
+    // count 0: delete the rule for GetOrders
+    let _ = exchange.IO(("rate", "GetOrders", 0));
+    // empty name: clear all rules of this exchange object
+    let _ = exchange.IO(("rate", ""));
+}
+```
 
-  | Variable | Description | Type | Default Value |
-  | - | - | - | - |
-  |number |Numeric type |Number (number) |1 |
-  |string |String |String (string) |Hello FMZ |
-  |combox |Dropdown box |Dropdown (selected) |1\|2\|3|
-  |bool |Boolean value |Boolean (true/false) |true |
-  |numberA@isShowA |Numeric A |Number (number) |2 |
-  |isShowA |Whether to display the numberA parameter |Boolean (true/false) |false |
+See also: `exchange.IO`, `exchange.Go`, `GetLastError`
 
-  The configured strategy parameters will be saved in the strategy in the form of code, for example:
+### Options Trading
 
-  ```js
-  /*backtest
-  start: 2020-02-29 00:00:00
-  end: 2020-03-29 00:00:00
-  period: 1d
-  args: [["number",2],["string","Hello FMZ.COM"],["combox",2],["bool",false],["numberA@isShowA",666],["isShowA",true]]
-  */
-  ```
+The FMZ Quant Trading Platform supports options trading on the cryptocurrency futures exchanges below. Options are used the same way as futures contracts: set the contract to an option code with ```exchange.SetContractType()``` (the option code is the exchange's native code, and the format differs between exchanges). After that, market data functions such as ```GetTicker()``` and ```GetDepth()``` and trading functions such as ```Buy()```, ```Sell()``` (set the trade direction with ```exchange.SetDirection()``` before placing orders), ```CancelOrder()``` and ```GetPositions()``` all work on that option contract. You can also place orders with the full instrument code in the form ```pair.optionCode```, for example ```BTC_USDT.BTC-260925-145000-C```.
 
-  ```python
-  '''backtest
-  start: 2020-02-29 00:00:00
-  end: 2020-03-29 00:00:00
-  period: 1d
-  args: [["number",2],["string","Hello FMZ.COM"],["combox",2],["bool",false],["numberA@isShowA",666],["isShowA",true]]
-  '''
-  ```
+Option order books are usually thin: when there is no bid or ask, ```Buy``` and ```Sell``` in the ```Ticker``` are 0, and ```Last``` may be 0 for a contract that has never traded; see each exchange below. Whether ```exchange.GetMarkets()``` lists option contracts depends on the exchange; where it does not, get the option codes from the exchange's API or website.
 
-  ```rust
-  /*backtest
-  start: 2020-02-29 00:00:00
-  end: 2020-03-29 00:00:00
-  period: 1d
-  args: [["number",2],["string","Hello FMZ.COM"],["combox",2],["bool",false],["numberA@isShowA",666],["isShowA",true]]
-  */
-  ```
+## Futures_Deribit
 
-  ```cpp
-  /*backtest
-  start: 2020-02-29 00:00:00
-  end: 2020-03-29 00:00:00
-  period: 1d
-  args: [["number",2],["string","Hello FMZ.COM"],["combox",2],["bool",false],["numberA@isShowA",666],["isShowA",true]]
-  */
-  ```
-- Importing and exporting live trading parameters
-  When running live trading, if you need to save the parameter data of the live trading configuration, you can click the "Parameter Settings" option on the strategy live trading page, then click the "Export Parameters" button. The exported strategy parameters will be saved as a ```json``` file.
-  The exported strategy parameter configuration can also be imported into live trading again. Click the "Import Parameters" button to import the saved strategy live trading parameters into the current live trading, and after importing, click the "Update Parameters" button to save and apply them.
+After setting an option contract you can get market data, place and cancel orders and query positions. Option code examples: ```BTC-13SEP24-60000-C```, ```XRP_USDC-27SEP24-1-C```; combination examples: ```BTC-CS-6SEP24-57000_57500```, ```BTC-PCAL-20SEP24_13SEP24-55000```. The result of ```exchange.GetMarkets()``` includes option contracts.
 
-## Interactive Controls
+Reference strategy: [Deribit options test strategy](https://www.fmz.com/strategy/179475)
 
-```JavaScript```, ```Python```, ```Rust```, ```C++```, and My-language strategies can all be designed with interactive controls. A strategy's interactive controls are used to send interaction commands to a running strategy program while the strategy is running live. For strategies written in ```JavaScript```, ```Python```, ```Rust```, and ```C++```, you can use the [```GetCommand()```](https://www.fmz.com/syntax-guide#fun_getcommand) function in the strategy code to obtain the messages generated by the interactive controls.
+## Futures_OKX
 
-
-  ![Interactive Controls](https://www.fmz.com/upload/asset/2e4320d0cc33c15eb935d.png)
-
-
-  After writing the code to handle interactive control messages in your strategy, you can use the interactive controls during live trading to implement (but are not limited to) the following functions:
-
-  - Manually close the strategy's positions.
-
-  - Dynamically modify strategy parameters without restarting the live strategy.
-
-  - Switch strategy logic.
-
-  - Trigger the printing of certain debugging information or data to test specific features.
-
-### Types of Interactive Controls
-
-| Variable (naming example) | Description | Type | Default Value (description) | Component Configuration (description) | Notes |
-| - | - | - | - | - | - |
-| cmdNum | Description of interactive control cmdNum | Number type (number) | Default value is optional, can be left empty | Used to set the component type, minimum value, maximum value, grouping, etc. of the interface control bound to the current interactive item | Notes for interactive control cmdNum |
-| cmdBool | Description of interactive control cmdBool | Boolean type (true/false) | Default value is required, on or off | Same as above | Notes for interactive control cmdBool |
-| cmdStr | Description of interactive control cmdStr | String type (string) | Default value is optional, can be left empty | Same as above | Notes for interactive control cmdStr |
-| cmdCombox | Description of interactive control cmdCombox | Dropdown (selected) | Default value is optional, can be left empty | Same as above | Notes for interactive control cmdCombox |
-| cmdBtn | Description of interactive control cmdBtn | Button (button) | Button control does not bind input items | Same as above | Notes for interactive control cmdBtn |
-
-Messages (strings) sent to the strategy after interactive control is triggered:
-- Number type
-  After entering interactive data ```123``` in the input box of interactive control ```cmdNum```, click the button of interactive control cmdNum. The ```GetCommand()``` function in the strategy program will receive the message: ```cmdNum:123```.
-- Boolean type
-  After setting the switch control of interactive control ```cmdBool``` to on, click the button of interactive control cmdBool. The ```GetCommand()``` function in the strategy program will receive the message: ```cmdBool:true```.
-- String type
-  After entering interactive data ```abc``` in the input box of interactive control ```cmdStr```, click the button of interactive control cmdStr. The ```GetCommand()``` function in the strategy program will receive the message: ```cmdStr:abc```.
-- Dropdown
-  After selecting the second option in the dropdown of interactive control ```cmdCombox```, click the button of interactive control cmdCombox. The ```GetCommand()``` function in the strategy program will receive the message: ```cmdCombox:1```, where 1 represents the index of the selected option, the first option has index 0, the second option has index 1.
-- Button
-  Click the button of interactive control ```cmdBtn```. The ```GetCommand()``` function in the strategy program will receive the message: ```cmdBtn```.
-
-Application of interactive controls: Dynamically modify strategy parameters
-For example, the strategy has a parameter called symbol. The strategy parameters added on the strategy interface are also global variables, so global variables in the code are used here for demonstration.
+Used the same way as Deribit. Set the trading pair to ```BTC_USD``` or similar; option codes look like ```BTC-USD-200626-4500-C```. For an option that has never traded, ```Last``` in ```GetTicker()``` is the mark price. ```exchange.GetMarkets()``` does not list option contracts; the option contract list is available from OKX's ```/api/v5/public/instruments``` endpoint, for example BTC options:
 
 ```js
-// Strategy parameters
-var symbol = "BTC_USDT"
-
 function main() {
-    while (true) {
-        var cmd = GetCommand()
-        if (cmd) {
-            var arr = cmd.split(":")
-            if (arr.length == 2 && arr[0] == "changeSymbol") {
-                // When changeSymbol control is triggered, parameter update operation will be executed
-                Log("Changed symbol parameter to:", arr[1])
-                symbol = arr[1]
-            }
-        }
+    Log(HttpQuery("https://www.okx.com/api/v5/public/instruments?instType=OPTION&uly=BTC-USD"))
+}
+```
 
-        LogStatus(_D(), ", Current symbol parameter value:", symbol)
+```python
+import json
+import urllib.request
+def main():
+    ret = json.loads(urllib.request.urlopen("https://www.okx.com/api/v5/public/instruments?instType=OPTION&uly=BTC-USD").read().decode('utf-8'))
+    Log(ret)
+```
+
+```rust
+fn main() {
+    let body: String = HttpQuery("https://www.okx.com/api/v5/public/instruments?instType=OPTION&uly=BTC-USD", None);
+    Log!(body);
+}
+```
+
+## Futures_Binance
+
+Binance European options (USDT-settled) are supported. Set the trading pair to ```BTC_USDT``` or similar; option codes look like ```BTC-260925-145000-C``` (underlying-expiry YYMMDD-strike-C/P). Options trading must be enabled on the account. Limitations:
+
+- Only limit orders are supported; market orders, conditional orders and order amendment (```exchange.ModifyOrder()```) are not.
+- Leverage and margin mode settings such as ```exchange.SetMarginLevel()``` are not supported.
+- Unified (portfolio margin) accounts do not support options.
+- ```exchange.GetMarkets()``` does not list option contracts.
+
+## Futures_Bybit
+
+Options with two settlement currencies are supported:
+
+- USDC-settled: set the trading pair to ```ETH_USDC``` or similar; option codes look like ```ETH-25NOV22-1375-P```.
+- USDT-settled: set the trading pair to ```ETH_USDT``` or similar; the option code has an extra settlement-currency suffix compared with USDC-settled ones, like ```ETH-25JUN27-2800-C-USDT```.
+
+The result of ```exchange.GetMarkets()``` includes options of both settlement currencies. Bybit has no kline endpoint for options, so ```GetRecords()``` is built from trades.
+
+## Futures_Aevo
+
+USDC options on Aevo are supported. Set the trading pair to ```ETH_USDC``` or similar; option codes look like ```ETH-30JUN23-1600-C```. ```Last``` in ```GetTicker()``` is the mark price. Aevo has no kline endpoint, so ```GetRecords()``` is built from trades and is empty while the contract has no trades. The result of ```exchange.GetMarkets()``` includes option contracts.
+
+## Futures_GateIO
+
+USDT options on Gate are supported. Set the trading pair to ```BTC_USDT``` or similar; option codes look like ```BTC_USDT-20211130-65000-C```. The result of ```exchange.GetMarkets()``` includes option contracts. If options are not enabled on the account, order and position queries return the exchange's error.
+
+## Futures_Kraken
+
+Options on Kraken Futures are supported. Set the trading pair to ```ETH_USD``` or similar; option codes look like ```OF_ETHUSD_261225_4000_C``` (```OF_```, underlying and quote currency, expiry YYMMDD, strike, C/P). The underlying and quote currency in the code must match the trading pair, and BTC is written as ```XBT``` in the code (e.g. ```OF_XBTUSD_...```).
+
+- Kraken has no option listing endpoint, so ```exchange.GetMarkets()``` does not include option contracts; get the option codes from the Kraken website.
+- ```Last``` in ```GetTicker()``` is the mark price, and ```Buy```, ```Sell```, ```High``` and ```Low``` are 0; the raw data in ```Info``` carries the implied volatility, the greeks and other fields.
+- Market data, klines, orders, positions and order history queries work; option orders go through the same order endpoint as futures contracts and have not been verified in live trading yet.
+- Options have no funding rate, and ```exchange.SetMarginLevel()``` is not supported.
+
+See also: `exchange.SetContractType`, `exchange.SetDirection`, `exchange.GetPositions`
+
+### Web3
+
+To swap tokens on the decentralized exchanges Uniswap and PancakeSwap, use the Uniswap exchange object (see Uniswap and PancakeSwap below). To read on-chain data, call smart contracts and send custom transactions, use the Web3 exchange object, which supports Ethereum and other EVM-compatible chains as well as TRON.
+
+#### Uniswap and PancakeSwap
+
+The Uniswap exchange object connects to the V2 and V3 pools of Uniswap or PancakeSwap on one chain and maps on-chain swaps to spot trading functions: check prices with ```exchange.GetTicker()``` and place orders with ```exchange.CreateOrder()```, with no ABIs to register and no contract calls to encode. Routing, quoting, token approval, price protection and sending transactions are all handled by the exchange object.
+
+## When to use the Uniswap exchange object and when to use Web3
+
+- To **swap tokens** on Uniswap or PancakeSwap: use the Uniswap exchange object.
+- To call other contracts or other DEX features (such as providing liquidity or managing V3 positions), to use other chains, or to build custom transactions: use the Web3 exchange object, see Advanced Topics → Web3 → Ethereum (EVM).
+
+A strategy can add both kinds of exchange objects and use the same wallet with them.
+
+## Configure the exchange object
+
+| Field | Description |
+| - | - |
+| DEX | ```Uniswap``` or ```PancakeSwap``` |
+| Chain | ```Ethereum```, ```Arbitrum```, ```Base```, ```BNB Chain```. One exchange object is one DEX on one chain |
+| Private Key | Wallet private key (hex string). The key can be deployed locally on the docker, see Getting Started → Key Security |
+| Rpc Address | Node address of the chain; a public node is filled in when the chain is chosen (```https://ethereum-rpc.publicnode.com``` for Ethereum, for example). Several nodes separated by commas back each other up |
+| Rpc Api Key | Node authentication, may be left empty. Written as ```Name: value``` it is sent as a request header with that name; otherwise it is sent as ```Authorization: Basic <value>``` |
+
+On the first call the exchange object checks that the node is on the configured chain and reports an error otherwise, so transactions never go to another chain. The wallet needs the chain's native coin (ETH or BNB) to pay gas.
+
+## Trading pairs
+
+- Pairs are written as ```base_quote```, such as ```ETH_USDC``` or ```UNI_USDT```.
+- Token names are resolved in this order: built-in common tokens (native coin, wrapped native coin, USDC, USDT, etc.) → tokens registered with ```exchange.IO("token", name, contractAddress)``` → the official token lists. When the official list has several tokens with the same name on a chain, use the contract address instead.
+- Tokens not in the token table can be used directly by contract address as part of the pair, for example ```0x1f9840a85d5af5bf1d1762f925bdaddc4201f984_USDC```.
+- **The native coin and its wrapped token are two different assets**: ```ETH``` and ```WETH```, ```BNB``` and ```WBNB``` are different currencies. When trading the native coin, the router wraps and unwraps automatically. Converting between the two cannot be done with orders; use ```exchange.IO("wrap", amount)``` and ```exchange.IO("unwrap", amount)```, which call the wrapped token contract directly, 1:1, costing only gas.
+- ```exchange.GetMarkets()``` lists only common pairs; pairs not listed can be traded as well.
+
+## What the standard functions do
+
+| Function | Behavior |
+| - | - |
+| ```exchange.GetTicker()``` | Best bid and ask are executable prices from actual quotes of a certain size (pool fees included); there are no 24-hour statistics on chain |
+| ```exchange.GetDepth()``` | Price levels derived from on-chain quotes of increasing size, not a real order book |
+| ```exchange.GetTrades()``` | Recent on-chain swaps in the pair's pools |
+| ```exchange.GetAccount()```, ```exchange.GetAssets()``` | Balances of the native coin and of the tokens in the token table |
+| ```exchange.CreateOrder()``` | Swaps on chain immediately, see below |
+| ```exchange.GetOrder()``` | The order ID is the transaction hash and the status comes from the receipt: unfinished before it is mined, filled or failed after |
+| ```exchange.GetOrders()``` | Orders sent in the current run that are not mined yet |
+| ```exchange.CancelOrder()``` | Sends a replacement transaction with the same nonce, best effort, see below |
+
+```exchange.GetRecords()```, ```exchange.GetTickers()``` and ```exchange.GetHistoryOrders()``` are not supported.
+
+## Placing orders
+
+A DEX has no order book; every order is a swap executed on chain immediately. It either fills completely or reverts completely (losing only gas); it never fills partially and never rests waiting for a price.
+
+- **Limit orders**: the limit price is the **worst execution price**. A quote is taken first; if the current price cannot reach the limit, an error is returned and no transaction is sent. Otherwise the minimum to receive / maximum to pay is written into the on-chain transaction, and if the price moves before the transaction is mined so that the limit can no longer be met, the whole swap reverts.
+- **Market orders**: the minimum to receive / maximum to pay is the quote minus slippage. Slippage defaults to 0.5% and is changed with ```exchange.IO("slippage", ratio)```.
+- **Amount**: for sells, the amount of base currency to sell; for limit buys, the amount of base currency to buy; **for market buys, the amount of quote currency to spend**.
+- Settings for a single order can be appended after the side argument, for example ```exchange.CreateOrder("ETH_USDC", 'sell;{"slippage":0.01,"route":"v3"}', -1, 0.1)```: ```slippage``` is the slippage for this order, ```route``` restricts the route type (```v2```, ```v3```, ```hop``` for two hops, ```direct```).
+- Before selling a token (ERC20), the router's allowance is checked; if it is not enough, an approval transaction is sent first and waited for. By default only the amount needed is approved; ```exchange.IO("approve", "max")``` switches to unlimited approval and saves later approval transactions.
+- A transaction not mined before its deadline (120 seconds by default, change it with ```exchange.IO("deadline", seconds)```) reverts, so it cannot fill after the price has moved a lot.
+
+## Cancelling orders
+
+```exchange.CancelOrder()``` sends a zero-value transaction to yourself with the original order's nonce and a higher fee; if it is mined first, the original order becomes invalid. This is a best effort: the original order may be mined and filled before the replacement, and cancelling an order that is already mined returns an error. Check the final status with ```exchange.GetOrder()``` after cancelling.
+
+## Common exchange.IO() commands
+
+| Command | Purpose |
+| - | - |
+| ```exchange.IO("slippage", ratio)``` | Slippage for market orders, default ```0.005``` |
+| ```exchange.IO("deadline", seconds)``` | Transaction deadline, default 120 seconds |
+| ```exchange.IO("gasMultiplier", x)``` | Gas limit = node estimate × x, default 1.2 |
+| ```exchange.IO("approve", "exact" or "max")``` | Approval mode |
+| ```exchange.IO("token", name, contractAddress)``` | Register a token; without arguments, list the token table |
+| ```exchange.IO("route", symbol, side, amount)``` | Quote only: prices of the candidate routes and the best one, no order |
+| ```exchange.IO("simulate", symbol, side, amount[, price])``` | Build the transaction as an order would and only simulate it on chain, no gas spent |
+| ```exchange.IO("transfer", toAddress, amount[, token])``` | Send the native coin or a token; the amount can be ```"all"``` |
+| ```exchange.IO("receipt", txHash[, waitMs])``` | Receipt of a transfer or other transaction, optionally waiting for it to be mined |
+| ```exchange.IO("wrap", amount)```, ```exchange.IO("unwrap", amount)``` | Convert between the native coin and the wrapped token 1:1 |
+| ```exchange.IO("contracts")``` | Contract addresses of this DEX on this chain |
+| ```exchange.IO("base", nodeAddress)```, ```exchange.IO("sendBase", nodeAddress)``` | Switch nodes; set a node used only for broadcasting transactions (private transaction channel) |
+| ```exchange.IO("address")``` | Wallet address |
+
+For the parameters and return values of each command see the `Uniswap` category of the syntax manual.
+
+## Example: quote, simulate, then sell at market
+
+Uses ```ETH_USDC``` on Ethereum. Note that ```CreateOrder``` sends a real transaction.
+
+```javascript
+function main() {
+    var symbol = "ETH_USDC"
+    exchange.IO("slippage", 0.003)   // 0.3% slippage for market orders
+
+    var t = exchange.GetTicker(symbol)
+    Log("bid:", t.Buy, "ask:", t.Sell)
+
+    // quote only: best route for selling 0.1 ETH
+    var r = exchange.IO("route", symbol, "sell", 0.1)
+    Log("best route:", r.best, "price:", r.price)
+
+    // simulate on chain first, no gas spent
+    if (!exchange.IO("simulate", symbol, "sell", 0.1)) {
+        Log("simulation failed:", GetLastError())
+        return
+    }
+
+    // sell 0.1 ETH at market; the order ID is the transaction hash
+    var id = exchange.CreateOrder(symbol, "sell", -1, 0.1)
+    if (!id) {
+        Log("order failed:", GetLastError())
+        return
+    }
+    while (true) {
+        var o = exchange.GetOrder(id)
+        if (o && o.Status != ORDER_STATE_PENDING) {
+            Log("status:", o.Status, "filled:", o.DealAmount, "average price:", o.AvgPrice)
+            break
+        }
         Sleep(3000)
     }
 }
 ```
 
-Setting up interactive controls:
+See also: `Uniswap`, `exchange.CreateOrder`, `exchange.CancelOrder`
 
-/upload/asset/1741a2b35e569c5e07e3.png
+#### Ethereum (EVM)
 
-### Component Configuration
+With ```ChainType``` set to ```ETH```, the Web3 exchange object connects to nodes of Ethereum and every EVM-compatible chain (BSC, Base, Arbitrum, Optimism, Polygon and so on), and uses the ```exchange.IO()``` commands to query balances, call contracts and send transactions. This page walks through the commands in the order of a typical on-chain operation; for the full parameters of each command see the corresponding ```exchange.IO("command", ...)``` in the `Web3` category of the syntax manual.
 
-The "Component Configuration" option for strategy interaction controls is used to set up controls corresponding to 5 types of interaction controls on the platform, enhancing functionality and simplifying design.
+If you only want to swap tokens on Uniswap or PancakeSwap, use the Uniswap exchange object (see Advanced Topics → Web3 → Uniswap and PancakeSwap): it supports standard functions such as ```exchange.GetTicker()``` and ```exchange.CreateOrder()``` directly, with no contract calls to encode yourself.
 
-Supported component types for the 5 interaction controls:
-- Number type interaction control
-  Supported component types: Input box control (default), Time picker control, Slider input control.
-- Boolean (true/false) interaction control
-  Only supports Switch control (default).
-- String type interaction control
-  Supported component types: Input box control (default), Text box control, Time picker control, Color picker control, Currency selector, Trading code selector.
-- Dropdown (selected) interaction control
-  Supported component types: Dropdown control (default), Segmented controller control, Currency selector, Trading code selector.
-- Button type interaction control
-  Only supports Button control (default), no input controls.
+## 1. Configure the exchange object
 
-Interaction controls support grouping functionality, same as interface parameter settings. Grouping can be configured in Component Configuration.
-- Grouping
-  In the "Group" input box of Component Configuration, you can enter a label name to group multiple strategy interaction controls under the same group label (this feature replaces the platform's original "Interaction Control Grouping" function).
+Add an exchange on the "Exchange" page (```/m/add-platform```), choose the protocol "Cryptocurrency" and the exchange ```Web3```:
 
-### Interactive Controls in Status Bar
+| Field | Description |
+| - | - |
+| ChainType | ```ETH```: Ethereum and all EVM-compatible chains; ```TRON```: TRON, see Advanced Topics → Web3 → TRON |
+| Private Key | Wallet private key (hex string, the ```0x``` prefix is optional). The key can be deployed locally on the docker, see Getting Started → Key Security |
+| Rpc Address | Node address, by default ```https://ethereum-rpc.publicnode.com``` (a public Ethereum mainnet node). For other chains enter a node of that chain, for example BSC: ```https://bsc-dataseed.binance.org```. ```http(s)://``` and ```ws(s)://``` are supported. Several nodes separated by commas back each other up |
+| Rpc Api Key | Node authentication, may be left empty. Written as ```Name: value``` (such as ```x-api-key: xxx```) it is sent as a request header with that name; otherwise it is sent as ```Authorization: Basic <value>``` |
 
-In addition to designing interactive controls in the "Strategy Interaction" section, you can also design interactive controls in the strategy status bar. Currently, the only supported interactive control type is the button type. Please refer to [the ```LogStatus``` function chapter in the "Syntax Guide"](https://www.fmz.com/syntax-guide#fun_logstatus).
+With several nodes, requests start from the node that last succeeded and move on only when a node is unavailable (connection failure, timeout, rate limiting); errors such as a failed contract execution are returned directly. Nodes whose chain ID differs from the first node's are skipped, so transactions are never sent to another chain.
 
-Button controls in the status bar can be divided into:
-- Regular button controls
-  Data structure example:
-  ```json
-  {"type": "button", "name": "Button 1", "cmd": "button1", "description": "This is the first button"}
-  ```
-- Button controls with a single input data
-  Use the ```input``` attribute to set input control options. Data structure example:
-  ```json
-  {"type": "button", "name": "Button 2", "cmd": "button2", "description": "This is the second button", "input": {"name": "Open Quantity", "type": "number", "defValue": 1}}
-  ```
+At runtime, ```exchange.IO("base", nodeAddress)``` switches nodes (several nodes can be passed as an array or a comma-separated string), ```exchange.IO("key", privateKey)``` switches the wallet private key, and `exchange.IO("address")` returns the current wallet address.
 
-  ```json
-  {
-      "type": "button",
-      "cmd": "test1",
-      "name": "test1",
-      "input": {
-          "type": "selected",
-          "name": "selected",
-          "label": "Dropdown",
-          "description": "description",
-          "default": 100,
-          "settings": {
-              "multiple": true,
-              "customizable": true,
-              "options":[{"name": "A", "value": 100}, {"name": "B", "value": 200}]
-          }
-      },
-  }
-  ```
-- Button controls with a group of input data
-  Use the ```group``` attribute to set options for a group of input controls. Data structure example:
-  ```json
-  {
-      "type": "button",
-      "cmd": "open",
-      "name": "Open",
-      "group": [
-          {"name": "orderType", "description": "Order Method|order type", "type": "selected", "defValue": "Market Order|Limit Order"},
-          {"name": "tradePrice@orderType==1", "description": "Trade Price|trade price", "type": "number", "defValue": 100},
-          {"name": "orderAmount", "description": "Order Quantity|order amount", "type": "string", "defValue": 100},
-          {"name": "boolean", "description": "Yes/No|boolean", "type": "boolean", "defValue": true}
-      ]
-  }
-  ```
+Among the standard functions only ```exchange.GetAccount()``` and ```exchange.GetAssets()``` are available; they return the wallet's native coin balance (the currency is recognized from the chain ID, ```BNB``` on BSC for example).
 
-  ```json
-  {
-      "type": "button",
-      "cmd": "test2",
-      "name": "test2",
-      "group": [{
-          "type": "selected",
-          "name": "selected",
-          "label": "Dropdown",
-          "description": "description",
-          "default": 200,
-          "group": "group1",
-          "settings": {
-              "multiple": true,
-              "options":[{"name": "A", "value": 100}, {"name": "B", "value": 200}]
-          }
-      }, {
-          "type": "string",
-          "name": "string",
-          "label": "Input Box",
-          "description": "description",
-          "default": "ABC",
-          "group": "group1"
-      }],
-  }
-  ```
+## 2. Query balances and read contracts
 
-Encode the JSON data of these button controls as a JSON string, then wrap it with ``` ` ``` characters and output it in the status bar. Using JavaScript as an example:
+Read-only contract methods (```view```/```pure```) cost no gas and return decoded results directly:
 
 ```js
-function main() {
-    var btn = {"type": "button", "name": "Button 1", "cmd": "button1", "description": "This is the first button"}
-    LogStatus("`" + JSON.stringify(btn) + "`")
-}
+exchange.IO("api", "eth", "eth_getBalance", wallet, "latest")   // native coin balance, on-chain integer (hex string)
+exchange.IO("api", tokenAddress, "balanceOf", wallet)           // ERC20 balance, on-chain integer
+exchange.IO("api", tokenAddress, "decimals")                    // token decimals
 ```
 
-These button controls can also be written into status bar tables. For detailed examples, please refer to the [Syntax Guide](https://www.fmz.com/syntax-guide#fun_logstatus).
+- ```exchange.IO("api", "eth", method, ...args)``` calls the node's JSON-RPC methods directly, such as ```eth_gasPrice```, ```eth_blockNumber``` and ```eth_getTransactionReceipt```.
+- ```exchange.IO("api", contractAddress, method, ...args)``` calls a contract method. The method can be a name, a full signature (such as ```"approve(address,uint256)"```, to tell overloads apart) or a selector (such as ```"0x095ea7b3"```).
+- On-chain amounts are integers. ```exchange.IO("fromUnits", onChainInteger, decimals)``` converts to a readable amount and ```exchange.IO("toUnits", "1.5", decimals)``` converts back; a token contract address can be passed in place of the decimals. Both compute exactly on strings.
+- Use ```exchange.IO("multicall", ...)``` to read many contracts in one request, and ```exchange.IO("logs", ...)``` to query event logs.
 
-The ```input``` field structure is consistent with the single control structure in the ```group``` field. The following is a detailed explanation:
+## 3. Register ABIs
 
-```desc
-{
-    "type": "selected",     // Control type (required field), supports: number, string, selected, boolean
-    "name": "test",         // Name (required field when used in group)
-    "label": "topic",       // Title (required field)
-    "description": "desc",  // Tooltip information for the component
-    "default": 1,           // Default value; if the settings field is not set in the current JSON structure, it is compatible with defValue, and defValue can be used instead of default
-    "filter": "a>1",        // Selector, not setting this field means no filtering (display control); when this field is set, the control is not filtered (displayed) when the expression is true, and filtered (not displayed) when the expression is false
-                            // For the selector, using the expression a>1 in this example, 'a' refers to the control value with name 'a' under the group field in the type=button structure, and this value is used to determine whether to filter
-    "group": "group1",      // Grouping
-    "settings": { ... },    // Component configuration
-}
-```
+Standard ERC20 methods (```balanceOf```, ```decimals```, ```allowance```, ```approve```, ```transfer``` and others) are built in and need no registration. Before calling methods of other contracts, register the contract's ABI with ```exchange.IO("abi", contractAddress, abi)```.
 
-Detailed explanation of each field in the component configuration ```settings```:
-- ```settings.required```: Whether it is required.
-- ```settings.disabled```: Whether it is disabled.
-- ```settings.min```: Valid when ```type=number```, represents the minimum value or minimum string length.
-- ```settings.max```: Valid when ```type=number```, represents the maximum value or maximum string length.
-- ```settings.step```: Valid when ```type=number``` and ```render=slider```, represents the step size.
-- ```settings.multiple```: Valid when ```type=selected```, indicates support for multiple selection.
-- ```settings.customizable```: Valid when ```type=selected```, indicates support for customization; users can directly edit and add new options in the dropdown control. If a newly edited option is selected, the option's name will be used instead of the option's value when triggering the interaction.
-- ```settings.options```: Valid when ```type=selected```, represents the selector's option data format: ```["Option 1", "Option 2"]```, ```[{'name':'xxx','value':0}, {'name':'xxx','value':1}]```.
-- ```settings.render```: Render component type.
-  When ```type=number```, ```settings.render``` is not set (defaults to number input box), options: ```slider``` (slider), ```date``` (date picker, returns timestamp).
-  When ```type=string```, ```settings.render``` is not set (defaults to single-line input box), options: ```textarea``` (multi-line input), ```date``` (date picker, returns yyyy-MM-dd hh:mm:ss), ```color``` (color picker, returns #FF00FF).
-  When ```type=selected```, ```settings.render``` is not set (defaults to dropdown), options: ```segment``` (segmented selector).
-  When ```type=boolean```, currently only the default checkbox is available.
+Common contracts can use built-in templates by passing the template name as the third argument: ```"weth"```, ```"uniswapV3Pool"```, ```"uniswapV3Factory"```, ```"uniswapV3QuoterV2"```, ```"uniswapV3SwapRouter02"```, ```"uniswapV3PositionManager"```, ```"permit2"``` (PancakeSwap V3 uses the same templates, aliases such as ```"pancakeV3Pool"``` also work). Addresses of common contracts are available from ```exchange.IO("contracts")```.
 
-Bilingual settings are supported. For example: ```'Option｜options'``` text content will automatically adapt based on the current language environment. Using a single control in the ```group``` field as an example, complete example:
-
-```json
-{
-    type:'selected',
-    name:'test',
-    label:'Option｜options',
-    description:'Description｜description',
-    default:0,                            // Here the default value is set to 0, representing the value in {name:'xxx|yyy',value:0} option
-    filter:'a>1&&a<10',
-    group:'Group|group',
-    settings:{
-        multiple:true,
-        customizable:true,
-        options:[{name:'xxx|yyy',value:0}]
-    }
-}
-```
-
-## Options Trading
-
-FMZ Quant Trading Platform supports cryptocurrency options trading.
-
-### Cryptocurrency Options
-
-Use the ```exchange.SetContractType()``` function to set the options contract. The format of options contract codes varies across different exchanges. The cryptocurrency options exchanges supported by the FMZ Quant Trading Platform are as follows:
-
-- Futures_Deribit
-  For the ```Deribit``` exchange, you only need to call the ```exchange.SetContractType()``` function to set the contract to an options contract. After setting the options contract, when you call market data interfaces such as ```GetTicker()```, the data obtained will be the market data of that options contract.
-  Use the ```exchange.Sell()``` and ```exchange.Buy()``` functions to place orders. Pay attention to the trade direction when placing orders; you can use the ```exchange.SetDirection()``` function to set the trade direction.
-  Use the ```exchange.CancelOrder()``` function to cancel orders, and the ```exchange.GetPositions()``` function to query positions.
-
-  Reference strategy code: [Deribit Options Test Strategy](https://www.fmz.com/strategy/179475)
-  Examples of options contract codes: ```BTC-13SEP24-60000-C```, ```XRP_USDC-27SEP24-1-C```, ```BTC-CS-6SEP24-57000_57500```, ```BTC-PCAL-20SEP24_13SEP24-55000```, etc.
-- Futures_OKX
-  Setting contracts, placing orders, canceling orders, querying orders, obtaining market data, and other operations are the same as with ```Deribit```. The contract code format is ```BTC-USD-200626-4500-C```.
-  You can query contract-related information via the ```https://www.okx.com/api/v5/public/instruments``` interface.
-
-  For example, to query the information of BTC options contracts:
-  ```js
-  function main() {
-      Log(HttpQuery("https://www.okx.com/api/v5/public/instruments?instType=OPTION&uly=BTC-USD"))
-  }
-  ```
-
-  ```python
-  import json
-  import urllib.request
-  def main():
-      ret = json.loads(urllib.request.urlopen("https://www.okx.com/api/v5/public/instruments?instType=OPTION&uly=BTC-USD").read().decode('utf-8'))
-      Log(ret)
-  ```
-
-  ```rust
-  fn main() {
-      let body: String = HttpQuery("https://www.okx.com/api/v5/public/instruments?instType=OPTION&uly=BTC-USD", None);
-      Log!(body);
-  }
-  ```
-
-  ```cpp
-  void main() {
-      Log(HttpQuery("https://www.okx.com/api/v5/public/instruments?instType=OPTION&uly=BTC-USD"));
-  }
-  ```
-- Futures_HuobiDM
-  Example of a Huobi options contract code: ```BTC-USDT-201225-P-13000```, where the underlying asset is ```BTC```, the exercise date is December 25, 2020, the option type is a put option (PUT), and the strike price is 13,000 USD.
-  Call options: the premium paid by the buyer is in USDT, using the USDT in the account assets; the seller's margin is in coin, using the coin in the account assets as collateral.
-  Put options: the premium paid by the buyer is in USDT, using the USDT in the account assets; the seller's margin is in USDT, using the USDT in the account assets as collateral.
-- Futures_Bybit
-  Supports USDC options on the Bybit exchange. Set the trading pair to ```ETH_USDC``` and call the ```exchange.SetContractType()``` function to set the contract to an options contract.
-  Example of an options contract code: ```ETH-25NOV22-1375-P```.
-- Futures_Aevo
-  Supports USDC options on the Aevo exchange. Example of an options contract code: ```ETH-30JUN23-1600-C```.
-- Futures_GateIO
-  Supports USDT options on the GATE.IO exchange. Example of an options contract code: ```BTC_USDT-20211130-65000-C```
-
-## Rust Strategy Development Guide
-
-1. The difference between writing strategies in ```Rust``` and in ```JavaScript``` lies mainly in the different form of data returned by the platform API functions. Take the ```exchange.GetTicker()``` function as an example:
-- JavaScript
-  ```exchange.GetTicker()``` returns an object on a successful call; if the call fails (e.g., due to exchange server issues, network issues, etc.), it returns ```null```.
-
-  ```js
-  function main() {
-      var ticker = exchange.GetTicker()
-      // Check whether the exchange.GetTicker call failed (returns null)
-      if (ticker) {
-          Log(ticker)
-      }
-  }
-  ```
-- Rust
-  API calls that may fail uniformly return the ```Result<T>``` type, and errors can be handled in idiomatic Rust style:
-
-  ```rust
-  fn main() {
-      // Approach 1: pattern matching to check whether the exchange.GetTicker call succeeded
-      if let Ok(ticker) = exchange.GetTicker(None) {
-          Log!(ticker);
-      }
-
-      // Approach 2: use the _C! macro to retry automatically until the call succeeds
-      let ticker = _C!(exchange.GetTicker(None));
-      Log!(ticker);
-  }
-  ```
-  Optional parameters (such as the ```symbol``` parameter of ```GetTicker```) use ```None``` as a placeholder when not passed, and are passed directly when a value is needed, e.g., ```exchange.GetTicker("BTC_USDT")```.
-
-2. Strategy entry point and lifecycle: The entry point of a Rust strategy is ```fn main()``` (which shares the same name as the entry point of a standard Rust program, but is invoked by the platform and has no return value). As with JavaScript, you can optionally define ```fn init()``` (executed automatically first when the strategy starts running) and ```fn onexit()``` (executed to perform cleanup when the strategy exits), which the bootstrap layer will call automatically. In addition, you can also call ```OnExit()``` within the strategy code to register additional exit hooks:
-
-```rust
-fn main() {
-    // Strategy logic...
-}
-
-fn init() {
-    Log!("Initializing");
-}
-
-fn onexit() {
-    Log!("Strategy exiting, performing cleanup");
-}
-```
-
-3. Logging and global features are provided in the form of macros: ```Log!()```, ```LogStatus!()```, ```Panic!()```, ```_G!()```, ```_C!()```, etc. are Rust macros (note the trailing exclamation mark); whereas ```LogProfit()```, ```Sleep()```, ```_D()```, ```_N()```, ```HttpQuery()```, etc. are regular functions.
-
-4. Strategy parameters are injected as global constants: strategy parameters configured in the UI are injected into the strategy code according to their value types (number maps to ```f64```, boolean to ```bool```, string/password to ```&str```, and dropdowns according to the value type of their options), and can be referenced directly by parameter name. If you need to use them as integers, convert them yourself, e.g., ```let n = Period as usize;```. The complete parameter set can be obtained as JSON text via the ```params()``` function and parsed yourself.
-
-5. JSON data handling: The raw JSON text returned by the platform API (such as the return value of ```exchange.IO()``` and the ```Info``` field of various structs) can be parsed into a ```JsonValue``` using the built-in ```JSONParse()``` function, and navigated by indexing in the form of ```v["key"]``` and ```v[0]```, then obtaining scalar values via methods such as ```as_f64()```, ```as_str()```, and ```as_bool()```. Since the SDK does not have built-in JSON serialization, you can assemble JSON text using the ```format!``` macro, or introduce a third-party crate (such as ```serde_json```).
-
-6. Third-party crates and TLS notes: The strategy source code is the only code file, and dependencies must be declared in a ```[dependencies]``` frontmatter block wrapped by ```---``` at the very top of the source code (see the "Programming Languages - Rust" section for details). Since the compilation sandbox does not have system OpenSSL, for crates that require TLS please choose the pure-Rust implementation ```rustls``` and avoid depending on ```native-tls```/```openssl-sys```; for WebSocket connections, prefer the built-in ```Dial()``` function.
-
-## C++ Strategy Writing Guide
-
-1. The main difference between writing strategies in ```C++``` and ```JavaScript``` lies in the data returned by API functions on the FMZ Quant Trading Platform. For example, the ```exchange.GetTicker()``` function:
-- JavaScript
-  ```exchange.GetTicker()``` returns an object when called successfully, and returns ```null``` if the call fails (e.g., exchange server issues, network problems, etc.).
-
-  ```js
-  function main() {
-      var ticker = exchange.GetTicker()
-      // Check if exchange.GetTicker function call failed and returned null
-      if (ticker){
-          Log(ticker)
-      }
-  }
-  ```
-- C++
-  ```exchange.GetTicker()``` returns an object when called successfully, and still returns an object when the call fails. The objects returned from successful and failed calls are distinguished by the ```Valid``` property.
-
-  ```cpp
-  void main() {
-      auto ticker = exchange.GetTicker();
-      // Check if exchange.GetTicker() function call failed by checking if the Valid property in the returned object is false
-      if (ticker.Valid) {
-          Log(ticker);
-      }
-  }
-  ```
-2. The difference between the ```main()``` function in ```C++``` strategies and the ```main()``` function in standard C11:
-The entry function ```main()``` in C11 C++ programs returns an ```int``` type, while in FMZ Quant's C++ strategies, the strategy's startup function is also ```main()```. However, these are not the same function, they just share the same name. The ```main()``` function in FMZ Quant's C++ strategies returns a ```void``` type.
-
-```cpp
-void main() {
-    // Test using the Test function
-    if (!Test("c++")) {
-        // Throw an exception to terminate program execution
-        Panic("Please download the latest version of the docker");
-    }
-
-    // All returned objects use the Valid property to determine validity
-    LogProfitReset();
-    LogReset();
-    Log(_N(9.12345, 2));
-    Log("use _C", _C(exchange.GetTicker), _C(exchange.GetAccount));
-}
-```
-
-## JavaScript Strategy Writing Guide
-
-Due to the inherent characteristics of the ```JavaScript``` language (JavaScript's built-in strings only support ASCII and UTF-16 encoding, to avoid data loss), when encountering strings that cannot be encoded, an ```ArrayBuffer``` type will be returned. In all API interfaces of the FMZ Quant platform, wherever string parameters can be passed, ```ArrayBuffer``` type is also supported.
-
-The following example demonstrates this feature in detail:
 ```js
-function stringToHex(str) {
-    let hex = '';
-    for (let i = 0; i < str.length; i++) {
-        const charCode = str.charCodeAt(i).toString(16);
-        hex += charCode.length === 1 ? '0' + charCode : charCode;
-    }
-    return hex;
-}
-
-function main() {
-    const inputString = "abc𠮷123";  // The Unicode code point of this "𠮷" character exceeds the 16-bit range
-    // const inputString = "abcG123"; // If using abcG123 string for testing, the variable outputD will not be assigned as ArrayBuffer
-
-    // Use the Encode function to encode inputString to hexadecimal encoding
-    const encodedHex = Encode("raw", "string", "hex", inputString);
-    Log(encodedHex);  // Content: 61 62 63 f0a0aeb7 31 32 33
-
-    // Use custom stringToHex function to encode, unable to handle "𠮷" character, resulting in incorrect hexadecimal encoding
-    const manuallyEncodedHex = stringToHex(inputString);
-    Log(manuallyEncodedHex);  // Content: 61 62 63 d842dfb7 31 32 33
-
-    // Successfully restore from hexadecimal encoding to string (variable inputString)
-    const decodedString = Encode("raw", "hex", "string", encodedHex);
-    Log(decodedString);
-
-    // Unable to decode, returns ArrayBuffer, i.e., variable outputD is of ArrayBuffer type
-    const outputD = Encode("raw", "hex", "string", manuallyEncodedHex);
-    Log(outputD);
-
-    // Verify the returned ArrayBuffer type variable outputD
-    const bufferD = new Uint8Array(outputD);
-    let hexBufferD = '';
-    for (let i = 0; i < bufferD.length; i++) {
-        hexBufferD += bufferD[i].toString(16).padStart(2, '0');
-    }
-    Log(hexBufferD);    // 61 62 63 d842dfb7 31 32 33
-}
+exchange.IO("abi", poolAddress, "uniswapV3Pool")
+var slot0 = exchange.IO("api", poolAddress, "slot0")
 ```
 
-## Web3
-
-FMZ Quant Trading Platform supports ```Web3``` related features, enabling easy access to ```DeFi``` exchanges in the cryptocurrency market.
-
-### Ethereum
-
-On the FMZ Quant Trading Platform, use the ```exchange.IO()``` function to write strategy code to implement Ethereum blockchain RPC method calls and smart contract interactions.
-
-#### Web3 Exchange Object Configuration
-
-You need to configure access nodes on the FMZ Quant Trading Platform. Access nodes can be self-hosted nodes or third-party services, such as: ```infura```. On the FMZ Quant Trading Platform's ["Exchange"](https://www.fmz.com/m/add-platform) page, select protocol: **Cryptocurrency**, then select exchange as ```Web3```.
-
-Configure ```Rpc Address``` (service address of the access node) and ```Private Key``` (private key). Supports local deployment of private keys. For details, please refer to ["Key Security"](/user-guide/密钥安全性).
-
-#### Register ABI
-
-When calling contracts, if using standard ```ERC20``` methods, you can call directly without registration. Calling methods outside of standard contracts requires registering the ABI content first: ```exchange.IO("abi", tokenAddress, abiContent)```.
-
-To obtain the contract's ABI content, you can use the following URL and extract only the ```result``` field.
+The ABI of other contracts can be obtained from a block explorer, for example Etherscan's V2 API (an Etherscan API key is required, ```chainid``` is the chain ID, take the ```result``` field of the response):
 
 ```url
-https://api.etherscan.io/api?module=contract&action=getabi&address=0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45
+https://api.etherscan.io/v2/api?chainid=1&module=contract&action=getabi&address=0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45&apikey=YourApiKey
 ```
 
-#### Calling Ethereum RPC Methods
+## 4. Send transactions
 
-Use the ```exchange.IO()``` function to call Ethereum RPC methods.
-- Query ETH balance in wallet
-  ```
-  exchange.IO("api", "eth", "eth_getBalance", owner, "latest")   // owner is the specific wallet address
-  ```
-- ETH transfer
-  ```
-  exchange.IO("api", "eth", "send", toAddress, toAmount)   // toAddress is the wallet address receiving ETH, toAmount is the transfer amount
-  ```
-- Query Gas price
-  ```
-  exchange.IO("api", "eth", "eth_gasPrice")
-  ```
-- Query estimated Gas fee
-  ```
-  exchange.IO("api", "eth", "eth_estimateGas", data)
-  ```
+When a write method of a contract is called, the exchange object signs the transaction with the configured private key, broadcasts it and returns the transaction hash. Before sending you can replace ```"api"``` with ```"call"``` and rehearse the same call with ```exchange.IO("call", ...)```: it is simulated on the node without signing or spending gas; on failure it returns an empty value and ```GetLastError()``` holds the reason given by the contract.
 
-#### Support for encode
+Taking approve as an example:
 
-The ```exchange.IO()``` function encapsulates the ```encode``` method, which can encode a function call into ```hex``` string format and return it. For specific usage, refer to the platform's publicly available ["Uniswap V3 Trading Library" template](https://www.fmz.com/strategy/397260).
-
-The following takes encoding a call to the ```unwrapWETH9``` method as an example:
 ```js
-function main() {
-    // ContractV3SwapRouterV2 mainnet address : 0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45
-    // The ABI must be registered before calling the unwrapWETH9 method; the registration step is omitted here
-    // "owner" represents the wallet address and must be replaced with the actual address; 1 represents the unwrap amount, i.e. unwrapping 1 WETH into ETH
-    var data = exchange.IO("encode", "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45", "unwrapWETH9(uint256,address)", 1, "owner")
-    Log(data)
-}
+var amount = exchange.IO("toUnits", "100", tokenAddress)                 // 100 tokens as an on-chain integer
+var txHash = exchange.IO("api", tokenAddress, "approve", spender, amount)
 ```
 
-When calling the ```exchange.IO("encode", ...)``` function, if the second parameter (string type) starts with ```0x```, it means encoding a method call on a smart contract.
-If the second parameter does not start with ```0x```, it means encoding the data according to the specified type order, which is functionally equivalent to ```abi.encode``` in ```solidity```. Refer to the following example.
+When the method's ```stateMutability``` is ```payable```, pass one extra argument before the method arguments: the amount of native coin to attach (on-chain integer). The last argument can be an options object:
 
-```js
+| Option | Description |
+| - | - |
+| gasLimit | Gas limit. Estimated by the node (```eth_estimateGas```) when omitted. Do not use ```21000``` for contract calls; that is only enough for a plain transfer |
+| gasPrice | Fixed gas price; when given, a legacy transaction is sent. When omitted, chains that support EIP-1559 get an EIP-1559 transaction: the tip is the larger of the node's suggestion and the tips actually paid in recent blocks, and the max fee is ```2 × baseFee + tip``` |
+| nonce | A specific nonce. Allocated automatically when omitted and kept in sync with the on-chain pending count, so consecutive sends never reuse a nonce |
+| dryRun | When ```true```, sign without broadcasting and return fields such as ```hash```, ```raw``` (the signed transaction), ```nonce``` and ```gasLimit```, for checking the transaction or sending it through another channel |
+
+Native coin is sent with ```exchange.IO("api", "eth", "send", toAddress, amount)```, where the amount is an on-chain integer (wei). Its options also accept ```data``` (hex call data) to send a transaction ```{to, data, value}``` returned by an aggregator API as is; gas is then estimated as for a contract call. Note: a plain transfer without ```gasPrice``` bids a fixed 100 Gwei with a gas limit of 21000, usually too high on Ethereum mainnet; query ```eth_gasPrice``` first and pass it in.
+
+To send transactions through a private channel (such as Flashbots Protect or MEV Blocker) and avoid front-running, set a node used only for broadcasting with ```exchange.IO("sendBase", nodeAddress)```.
+
+## 5. Wait for the transaction to be mined
+
+```exchange.IO("waitReceipt", txHash, {timeout, confirmations})``` waits until the transaction is mined with the required confirmations and returns the receipt: ```status``` is ```1``` for success and ```0``` for failure (with the reason in ```revertReason```), and ```events``` holds the events decoded with the registered ABIs. It returns an empty value on timeout.
+
+## 6. Nonce management, speeding up and cancelling
+
+- ```exchange.IO("nonce")``` shows the on-chain and local nonce counts; ```exchange.IO("nonce", "sync")``` resyncs from the chain (use it after the same wallet has sent transactions elsewhere).
+- When a transaction stays unmined for a long time, ```exchange.IO("speedUp", txHash)``` resends it with the same nonce and a higher fee, and ```exchange.IO("cancelTx", txHash)``` replaces it with a zero-value transaction to yourself using the same nonce. Both only work before the original transaction is mined.
+- The local nonce record only exists inside the current live trading instance: instances that share one wallet cannot see each other's records and may still collide, so give each instance its own wallet.
+
+## Other commands
+
+- Encoding and decoding: ```exchange.IO("encode", ...)``` encodes contract call data or values by type (like Solidity's ```abi.encode```), ```exchange.IO("encodePacked", ...)``` does packed encoding (for example a Uniswap V3 swap path), and ```exchange.IO("decode", ...)``` decodes by type.
+- Signing: ```exchange.IO("sign", ...)``` signs a 32-byte hash, ```exchange.IO("signTypedData", ...)``` signs EIP-712 typed data (such as ERC-20 Permit), and ```exchange.IO("signMessage", ...)``` signs a message with EIP-191.
+- Uniswap V3 math: ```exchange.IO("uniswapV3", ...)``` converts between ticks, prices and sqrtPrice, and between liquidity and token amounts.
+- Hashing: ```exchange.IO("hash", "keccak256", "raw", "hex", text)``` computes keccak256 and other digests, for example method selectors and EIP-712 digests; its parameters are the same as those of the ```Encode()``` function.
+- Complete examples: a swap through an aggregator (quote, build the transaction, rehearse it with ```exchange.IO("call", ...)```, send it with ```data```) is in the examples of ```exchange.IO("call", ...)``` in the syntax manual; an ERC-20 Permit signature verified by the contract is in the examples of ```exchange.IO("sign", ...)``` and ```exchange.IO("signTypedData", ...)```.
+
+## Example: query balances, approve and wait for the transaction
+
+Uses USDC on Ethereum mainnet. Note that this code sends a real transaction and spends gas.
+
+```javascript
 function main() {
-    var x = 10
-    var address = "0x02a5fBb259d20A3Ad2Fdf9CCADeF86F6C1c1Ccc9"
-    var str = "Hello World"
-    var array = [1, 2, 3]
-    var ret = exchange.IO("encode", "uint256,address,string,uint256[]", x, address, str, array)   // uint means uint256 , the type length must be specified explicitly on FMZ
-    Log("ret:", ret)
-    /*
-    000000000000000000000000000000000000000000000000000000000000000a    // x
-    00000000000000000000000002a5fbb259d20a3ad2fdf9ccadef86f6c1c1ccc9    // address
-    0000000000000000000000000000000000000000000000000000000000000080    // offset of str
-    00000000000000000000000000000000000000000000000000000000000000c0    // offset of array
-    000000000000000000000000000000000000000000000000000000000000000b    // length of str
-    48656c6c6f20576f726c64000000000000000000000000000000000000000000    // data of str
-    0000000000000000000000000000000000000000000000000000000000000003    // length of array
-    0000000000000000000000000000000000000000000000000000000000000001    // first element of array
-    0000000000000000000000000000000000000000000000000000000000000002    // second element of array
-    0000000000000000000000000000000000000000000000000000000000000003    // third element of array
-    */
-}
-```
+    var usdc = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"     // USDC on Ethereum mainnet
+    var spender = "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45"  // the contract to approve, Uniswap SwapRouter02 here
+    var wallet = exchange.IO("address")
 
-Encoding of tuples, or of type orders containing tuples, is supported:
-```js
-function main() {
-    var types = "(uint256,uint8,address),bytes"
-    var ret = exchange.IO("encode", types, [30, 20, "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"], "0011")
-    Log("encode: ", ret)
-}
-```
+    // balances: standard ERC20 methods need no ABI registration
+    var eth = exchange.IO("fromUnits", exchange.IO("api", "eth", "eth_getBalance", wallet, "latest"), 18)
+    var usdcBalance = exchange.IO("fromUnits", exchange.IO("api", usdc, "balanceOf", wallet), usdc)
+    Log("ETH:", eth, "USDC:", usdcBalance)
 
-This type order consists of ```tuple``` and ```bytes```, so when calling the ```exchange.IO()``` function to perform ```encode```, two more parameters need to be passed in:
-- The variable corresponding to the tuple type:
-  ```json
-  [30, 20, "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"]
-  ```
-  The tuple's values are passed in as an array by position; the number, order, and types of the elements must match ```(uint256,uint8,address)``` in the ```types``` parameter. A literal tuple has no field names; when decoding, the fields are named ```Field1```, ```Field2```, ... in order of position.
-- The variable corresponding to the bytes type:
-  ```string
-  "0011"
-  ```
+    // read a contract: current allowance
+    var allowance = exchange.IO("api", usdc, "allowance", wallet, spender)
+    Log("current allowance:", exchange.IO("fromUnits", allowance, usdc))
 
-Encoding of arrays, or of type orders containing arrays, is supported:
-```js
-function main() {
-    var path = ["0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2", "0xdac17f958d2ee523a2206206994597c13d831ec7"]   // ETH address, USDT address
-    var ret = exchange.IO("encode", "address[]", path)
-    Log("encode: ", ret)
-}
-```
-
-#### Support for encodePacked
-
-For example, when calling methods on ```Uniswap V3``` decentralized exchange, you need to pass parameters such as swap path, which requires using the ```encodePacked``` operation:
-```js
-function main() {
-    var fee = exchange.IO("encodePacked", "uint24", 3000)
-    var tokenInAddress = "0x111111111117dC0aa78b770fA6A738034120C302"
-    var tokenOutAddress = "0x6b175474e89094c44da98b954eedeac495271d0f"
-    var path = tokenInAddress.slice(2).toLowerCase()
-    path += fee + tokenOutAddress.slice(2).toLowerCase()
-    Log("path:", path)
-}
-```
-
-#### Decode Support
-
-Data processing supports not only encoding (encode) but also decoding (decode). You can use the ```exchange.IO("decode", types, rawData)``` function to perform the ```decode``` operation.
-```js
-function main() {
-    // register SwapRouter02 abi
-    var walletAddress = "0x398a93ca23CBdd2642a07445bCD2b8435e0a373f"
-    var routerAddress = "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45"
-    var abi = `[{"inputs":[{"components":[{"internalType":"bytes","name":"path","type":"bytes"},{"internalType":"address","name":"recipient","type":"address"},{"internalType":"uint256","name":"amountOut","type":"uint256"},{"internalType":"uint256","name":"amountInMaximum","type":"uint256"}],"internalType":"struct IV3SwapRouter.ExactOutputParams","name":"params","type":"tuple"}],"name":"exactOutput","outputs":[{"internalType":"uint256","name":"amountIn","type":"uint256"}],"stateMutability":"payable","type":"function"}]`
-    exchange.IO("abi", routerAddress, abi)   // The abi here contains only part of the content for the exactOutput method; the complete abi can be found online
-
-    // encode path
-    var fee = exchange.IO("encodePacked", "uint24", 3000)
-    var tokenInAddress = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
-    var tokenOutAddress = "0xdac17f958d2ee523a2206206994597c13d831ec7"
-    var path = tokenInAddress.slice(2).toLowerCase()
-    path += fee + tokenOutAddress.slice(2).toLowerCase()
-    Log("path:", path)
-
-    var dataTuple = {
-        "path" : path,
-        "recipient" : walletAddress,
-        "amountOut" : 1000,
-        "amountInMaximum" : 1,
+    // approve 100 USDC: rehearse first, then send
+    var amount = exchange.IO("toUnits", "100", usdc)
+    if (!exchange.IO("call", usdc, "approve", spender, amount)) {
+        Log("rehearsal failed:", GetLastError())
+        return
     }
-    // encode SwapRouter02 exactOutput
-    var rawData = exchange.IO("encode", routerAddress, "exactOutput", dataTuple)
-    Log("method hash:", rawData.slice(0, 8))   // 09b81346
-    Log("params hash:", rawData.slice(8))
+    var txHash = exchange.IO("api", usdc, "approve", spender, amount)
+    Log("tx hash:", txHash)
 
-    // decode exactOutput params
-    var decodeRaw = exchange.IO("decode", "(bytes,address,uint256,uint256)", rawData.slice(8))
-    Log("decodeRaw:", decodeRaw)
+    // wait at most 3 minutes for the transaction to be mined
+    var receipt = exchange.IO("waitReceipt", txHash, {timeout: 180000})
+    if (receipt && receipt.status == 1) {
+        Log("approved in block:", receipt.blockNumber)
+    } else if (receipt) {
+        Log("transaction failed:", receipt.revertReason)
+    } else {
+        // not mined yet: speedUp resends with a higher fee, cancelTx cancels it
+        Log("not mined before timeout:", GetLastError())
+    }
 }
 ```
 
-This example first performs ```encodePacked``` encoding on the ```path``` parameter, because the ```exactOutput``` method call to be encoded subsequently requires ```path``` as a parameter. It then performs ```encode``` encoding on the ```exactOutput``` method of the router contract, which has only one parameter, of type ```tuple```.
-The method name ```exactOutput``` is encoded as ```0x09b81346```. Using the ```exchange.IO("decode", ...)``` method to decode according to the ```(bytes,address,uint256,uint256)``` types yields ```decodeRaw```, whose fields are numbered by position as ```Field1``` through ```Field4```, with each field's value corresponding in order to the contents of the variable ```dataTuple```.
+See also: `Web3`, `exchange.IO`
 
-#### Support Private Key Switching
+#### TRON
 
-Support private key switching to operate multiple wallet addresses, for example:
+With ```ChainType``` set to ```TRON```, the Web3 exchange object connects to a TRON node. Usage is largely the same as on Ethereum (see Advanced Topics → Web3 → Ethereum (EVM)): the ```exchange.IO()``` commands for registering ABIs, calling contracts, encoding and decoding, signing and switching private keys are the same, addresses use the TRON format (starting with ```T```), and TRX amounts are in sun (1 TRX = 1000000 sun). This page covers the configuration and the TRON-specific parts.
+
+## Configure the exchange object
+
+| Field | Description |
+| - | - |
+| ChainType | Choose ```TRON``` |
+| Private Key | Wallet private key (hex string). The key can be deployed locally on the docker, see Getting Started → Key Security |
+| Rpc Address | HTTP address of a TRON full node, for example the official node ```https://api.trongrid.io``` (testnets: ```https://nile.trongrid.io```, ```https://api.shasta.trongrid.io```) |
+| Rpc Api Key | TronGrid API key. Enter only the key itself; it is sent as the ```TRON-PRO-API-KEY``` request header. It works without a key, but TronGrid rate-limits keyless requests more strictly |
+
+The docker accesses TRON through the full node's HTTP API (```/wallet/...```) and no longer uses gRPC. The old gRPC address ```grpc.trongrid.io:50051``` that the form fills in by default for TRON is replaced automatically with ```https://api.trongrid.io``` (```grpc.nile.trongrid.io:50051``` and ```grpc.shasta.trongrid.io:50051``` likewise become the HTTP addresses of the corresponding testnets); any other gRPC address is rejected, so enter the node's HTTP address instead.
+
+At runtime, ```exchange.IO("base", nodeAddress)``` switches nodes, ```exchange.IO("key", privateKey)``` switches wallets, and ```exchange.IO("address")``` returns the current wallet address (starting with ```T```). The standard functions ```exchange.GetAccount()``` and ```exchange.GetAssets()``` return the wallet's TRX balance. An account that has not been activated yet (no on-chain record) reads as 0 TRX.
+
+## Calling smart contracts
+
+As on Ethereum, use ```exchange.IO("api", contractAddress, method, ...args)```: read-only methods return results directly, write methods sign and broadcast a transaction and return the transaction ID. Standard TRC20 methods are built in; for other contracts without a registered ABI, the ABI is read from the chain automatically, and only when that fails do you need to register it with ```exchange.IO("abi", contractAddress, abi)```. The last argument of a write method can be ```{gasLimit: amount}``` to set the fee limit (feeLimit, in sun).
+
 ```js
+// USDT (TRC20) contract
+var usdt = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t"
+Log(exchange.IO("api", usdt, "balanceOf", exchange.IO("address")))   // on-chain integer, USDT has 6 decimals
+```
+
+Encoding and decoding work as on Ethereum; address arguments can be written directly as ```T``` addresses:
+
+```js
+exchange.IO("encode", "address", "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t")
+// 000000000000000000000000a614f803b6fd780986a42c78ec9c7f77e6ded13c
+exchange.IO("encodePacked", "address", "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t")
+// a614f803b6fd780986a42c78ec9c7f77e6ded13c
+exchange.IO("decode", "string", "0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000a5465746865722055534400000000000000000000000000000000000000000000")
+// Tether USD
+```
+
+## Calling TRON node methods
+
+```exchange.IO("api", "tron", method, ...args)``` calls TRON node methods; method names are case-insensitive. Methods that need a signature (transfers, triggering contracts, etc.) are signed and broadcast automatically. Common methods:
+
+| Method | Arguments | Description |
+| - | - | - |
+| ```send``` | to address, amount (sun) | Send TRX from the current wallet |
+| ```Transfer``` | from address, to address, amount (sun) | Send TRX; the from address must be the current wallet |
+| ```GetAccount``` | address | Account information |
+| ```GetAccountResource``` | address | The account's energy and bandwidth resources |
+| ```GetContractABI``` | contract address | The contract's on-chain ABI |
+| ```GetAssetIssueByName``` | name | TRC10 asset information |
+| ```GetNowBlock``` | none | Current block |
+| ```GetBlockByNum``` | block height | A given block |
+| ```GetTransactionByID``` | transaction ID | Transaction content |
+| ```GetTransactionInfoByID``` | transaction ID | Execution result of a transaction (fees, energy used, logs, etc.) |
+| ```GetChainParameters``` | none | Chain parameters |
+| ```TriggerConstantContract``` | caller address (may be empty), contract address, method, encoded arguments | Read-only contract call; the result is in ```constant_result``` (hex strings, decode them with ```exchange.IO("decode", ...)```) |
+| ```TRC20ContractBalance``` | address, contract address | TRC20 balance (on-chain integer) |
+| ```TRC20GetName```, ```TRC20GetSymbol```, ```TRC20GetDecimals``` | contract address | Name, symbol and decimals of a TRC20 token |
+| ```TRC20Send```, ```TRC20Approve``` | from address, to or spender address, contract address, amount, feeLimit | TRC20 transfer and approval |
+| ```TRC20Call``` | caller address (may be empty), contract address, call data, read-only flag, feeLimit | Call a contract with raw call data |
+| ```ParseTRC20NumericProperty```, ```ParseTRC20StringProperty``` | hex data | Parse numbers and strings returned by TRC20 |
+
+Node endpoints not in the table can be called with a path and a request body: ```exchange.IO("api", "tron", "/wallet/endpointName", {body})```.
+
+## Differences from Ethereum
+
+The following commands only work on Ethereum (EVM) and report an error on TRON: ```call```, ```multicall```, ```logs```, ```waitReceipt```, ```nonce```, ```speedUp```, ```cancelTx``` and ```contracts```; ```sendBase``` and multiple fallback nodes also only apply to Ethereum. On TRON, simulate a contract call with the node method ```TriggerConstantContract```, and query a transaction's execution result with ```GetTransactionInfoByID```.
+
+```toUnits```, ```fromUnits```, ```uniswapV3```, the encoding and decoding commands and the signing commands work on TRON as well, and a TRC20 contract address can be passed as the decimals:
+
+```js
+var usdt = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t"
+var raw = exchange.IO("api", usdt, "balanceOf", exchange.IO("address"))
+Log(exchange.IO("fromUnits", raw, usdt))   // converted to a readable amount with the contract's decimals()
+```
+
+When the node rejects a contract call at validation time (for example because the contract does not exist), the error carries the node's reason, such as ```tron contract call rejected (CONTRACT_VALIDATE_ERROR): Smart contract is not exist.```; a contract execution failure (revert) reports ```tron contract execution failed``` with the reason.
+
+## Signing
+
+```exchange.IO("hash", "sign", "hex", "hex", txHash)``` signs a 32-byte hash with the current private key and returns the 65-byte signature ```r‖s‖v``` (v is 0 or 1); other ```hash``` algorithms (such as ```"sha256"```) compute digests, the same as the ```Encode()``` function. When r, s and v (v being 27 or 28) are needed separately for contract verification, use ```exchange.IO("sign", ...)```, see the `Web3` category of the syntax manual.
+
+## Examples
+
+### Query TRX and USDT balances and read token information
+
+```javascript
 function main() {
-    exchange.IO("key", "Private Key")   // "Private Key" represents the private key string, you need to fill in the actual private key value
+    var usdt = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t"
+    var wallet = exchange.IO("address")
+
+    // TRX balance (standard function, in TRX)
+    Log("account:", exchange.GetAccount())
+
+    // USDT balance: an on-chain integer, scale it by the decimals
+    var raw = exchange.IO("api", "tron", "TRC20ContractBalance", wallet, usdt)
+    var decimals = exchange.IO("api", "tron", "TRC20GetDecimals", usdt)
+    Log("USDT:", raw / Math.pow(10, decimals))
+
+    // read-only call of name() (selector 0x06fdde03) with TRC20Call, then parse the returned string
+    var ret = exchange.IO("api", "tron", "TRC20Call", "", usdt, "0x06fdde03", true, 0)
+    // constant_result holds hex strings, parse them directly
+    Log("name:", exchange.IO("api", "tron", "ParseTRC20StringProperty", ret.constant_result[0]))
 }
 ```
 
-#### Call Smart Contract Method
+### Read several contract methods at once with a Multicall contract
 
-The following are examples of smart contract method calls.
-- decimals
-  ```decimals``` method is a ```constant``` method of ```ERC20``` (no need to register ABI when calling standard ERC20 methods in FMZ quantitative strategy code), which does not consume ```gas``` and can query the precision data of a ```token```.
-  The ```decimals``` method has no parameters and returns the precision data of the ```token```.
-
-  ```js
-  function main(){
-      var tokenAddress = "0x111111111117dC0aa78b770fA6A738034120C302"    // Token contract address, the token in this example is 1INCH
-      Log(exchange.IO("api", tokenAddress, "decimals"))                  // Query and print that the precision exponent of 1INCH token is 18
-  }
-  ```
-- allowance
-  ```allowance``` method is a ```constant``` method of ```ERC20```, which does not consume ```gas``` and can query the authorization amount of a ```token``` for a certain contract address.
-  The ```allowance``` method requires 2 parameters, the first parameter is the wallet address, and the second parameter is the authorized address. The return value is the authorization amount of the ```token```.
-
-  ```js
-  function main(){
-      // Token contract address, the token in this example is 1INCH
-      var tokenAddress = "0x111111111117dC0aa78b770fA6A738034120C302"
-      var owner = ""
-      var spender = ""
-
-      // For example, if the query returns 1000000000000000000, divide by the token's precision unit 1e18 to get that the wallet bound to the current exchange object has authorized 1 1INCH to the spender address
-      Log(exchange.IO("api", tokenAddress, "allowance", owner, spender))
-  }
-  ```
-
-  ```owner```: Wallet address, needs to be filled with the specific address in actual use.
-  ```spender```: Authorized contract address, needs to be filled with the specific address in actual use, for example, it can be the ```Uniswap V3 router v1``` address.
-- approve
-  ```approve``` method is a non-```constant``` method of ```ERC20```, which consumes ```gas``` and is used to authorize a certain contract address with the operation amount of ```token```.
-  The ```approve``` method requires 2 parameters, the first parameter is the authorized address, and the second parameter is the authorization amount. The return value is ```txid```.
-
-  ```js
-  function main(){
-      // Token contract address, the token in this example is 1INCH
-      var tokenAddress = "0x111111111117dC0aa78b770fA6A738034120C302"
-      var spender = ""
-      var amount = "0xde0b6b3a7640000"
-
-      // Hexadecimal string of authorization amount: 0xde0b6b3a7640000, corresponding decimal string: 1e18, 1e18 divided by the token's precision unit equals 1 token amount, so this authorizes one token
-      Log(exchange.IO("api", tokenAddress, "approve", spender, amount))
-  }
-  ```
-
-  ```spender```: Authorized contract address, needs to be filled with the specific address in actual use, for example, it can be the ```Uniswap V3 router v1``` address.
-  ```amount```: Authorization amount, represented here as a hexadecimal string. The corresponding decimal value is ```1e18```, divided by the ```token``` precision unit in the example (i.e., 1e18), resulting in authorization of 1 ```token```.
-
-  The third parameter of the ```exchange.IO()``` function passes the method name ```approve```, which can also be written in the form of ```methodId```, for example: "0x571ac8b0". It can also be written as the complete standard method name, for example: "approve(address,uint256)".
-- multicall
-  ```multicall``` method is a non-constant method of ```Uniswap V3```, which consumes ```gas``` and is used for batch token swaps.
-  The ```multicall``` method may have multiple parameter passing methods, you can check the ABI containing this method for details. The ABI needs to be registered before calling this method. The return value is ```txid```.
-
-  For specific ```multicall``` method call examples, you can refer to the platform's public ["Uniswap V3 Trading Library" template](https://www.fmz.com/strategy/397260)
-
-  ```js
-  function main() {
-      var ABI_Route = ""
-      var contractV3SwapRouterV2 = ""
-      var value = 0
-      var deadline = (new Date().getTime() / 1000) + 3600
-      var data = ""
-      exchange.IO("abi", contractV3SwapRouterV2, ABI_Route)
-      exchange.IO("api", contractV3SwapRouterV2, "multicall(uint256,bytes[])", value, deadline, data)
-  }
-  ```
-
-  ```ABI_Route```: ABI of Uniswap V3's router v2 contract, needs to be filled according to actual situation.
-  ```contractV3SwapRouterV2```: Uniswap V3's router v2 address, needs to be filled with the specific address in actual use.
-  ```value```: Amount of ETH to transfer, set to 0 if the ```tokenIn``` token for the swap operation is not ETH, needs to be filled according to actual situation.
-  ```deadline```: Can be set to ```(new Date().getTime() / 1000) + 3600```, indicating validity within one hour.
-  ```data```: Packed operation data to be executed, needs to be filled according to actual situation.
-
-  You can also specify ```gasLimit/gasPrice/nonce``` settings for method calls:
-
-  ```js
-  exchange.IO("api", contractV3SwapRouterV2, "multicall(uint256,bytes[])", value, deadline, data, {gasPrice: 5000000000, gasLimit: 21000})
-  ```
-
-  You can set ```{gasPrice: 5000000000, gasLimit: 21000, nonce: 100}``` parameters according to specific needs, this parameter is set as the last parameter of the ```exchange.IO()``` function.
-  You can omit ```nonce``` to use the system default value, or not set ```gasLimit/gasPrice/nonce``` to use all system default values.
-
-  Note that the ```stateMutability``` attribute of the ```multicall(uint256,bytes[])``` method in the example is ```payable```, which requires passing the ```value``` parameter.
-  The ```stateMutability":"payable"``` attribute can be viewed from the ```ABI```, the ```exchange.IO()``` function will determine the required parameters based on the ```stateMutability``` attribute in the registered ```ABI```.
-  If the ```stateMutability``` attribute is ```nonpayable```, there is no need to pass the ```value``` parameter.
-
-#### Other Function Calls
-
-- Get wallet address configured for exchange object
-  ```js
-  function main() {
-      Log(exchange.IO("address"))         // Print the wallet address corresponding to the private key configured for the exchange object
-  }
-  ```
-- Switch blockchain RPC node
-  ```js
-  function main() {
-      var chainRpc = "https://bsc-dataseed.binance.org"
-
-      // Switch to BSC chain, can also use SetBase function to switch
-      e.IO("base", chainRpc)
-  }
-  ```
-
-### TRON
-
-On the FMZ Quant Trading Platform, you can use the ```exchange.IO()``` function to call gRPC methods and smart contracts on the TRON blockchain, enabling you to write related strategy code.
-
-#### Web3 Exchange Object Configuration
-
-Configuration method is similar to Ethereum exchange object configuration, ```ChainType``` needs to be selected as ```TRON```. ```RPC Address``` defaults to: ```grpc.trongrid.io:50051```, which is the official TRON node address.
-
-#### Register ABI
-
-TRC20 contract ABI is registered by default, with an underlying mechanism that automatically retrieves contract ABI based on contract address. Manual ABI registration is typically not required, only needed when certain contract ABIs cannot be automatically retrieved.
-
-The method for registering ABI is the same as Ethereum, for example:
-
-```js
-// USDT contract address: TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t
-let abi = `[{"constant":true,"inputs":[{"name":"who","type":"address"}],"name":"balanceOf","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}]`
-
-// Register balanceOf method
-exchange.IO("abi", "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t", abi)
-```
-
-#### Calling TRON RPC Methods
-
-Use the ```exchange.IO()``` function to call TRON RPC methods. For methods requiring signatures, the underlying layer has automatically encapsulated the signing operations. The following lists commonly used methods. For other methods, please refer to the official TRON project documentation.
-- GetAccount
-  ```js
-  exchange.IO("api", "tron", "GetAccount", "TKCG...")   // "TKCG..." is the TRON wallet address, this function returns the account information for the "TKCG..." address.
-  ```
-- GetAccountResource
-  ```js
-  exchange.IO("api", "tron", "GetAccountResource", "TKCG...") // Get resources for the specified wallet address, including energy and bandwidth.
-  ```
-- GetContractABI
-  ```js
-  exchange.IO("api", "tron", "GetContractABI", "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t")  // Get USDT TRC20 contract ABI
-  ```
-- GetAssetIssueByName
-  ```js
-  exchange.IO("api", "tron", "GetAssetIssueByName", "TRX")  // Get token asset information by token name
-  ```
-- GetNowBlock
-  ```js
-  exchange.IO("api", "tron", "GetNowBlock")   // Get current block information
-  ```
-- GetBlockByNum
-  ```js
-  exchange.IO("api", "tron", "GetBlockByNum", 70624300)
-  ```
-- GetTransactionByID
-  ```js
-  exchange.IO("api", "tron", "GetTransactionByID", "05a8fae2cd1cbf36b61d12e219588d25b4826436f055f93388a96e620ec3f3f2")   // Get Transaction by transaction hash
-  ```
-- TRC20ContractBalance
-  ```js
-  exchange.IO("api", "tron", "TRC20ContractBalance", "TKCG...", "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t")   // Get wallet USDT balance, note that the returned data is not precision-processed, for example, returned data: ```6890251``` means ```6.890251 USDT```.
-  ```
-- TriggerConstantContract
-  ```js
-  function main() {
-      let ret = exchange.IO("api", "tron", "TriggerConstantContract", "", "TSUUVjysXV8YqHytSNjfkNXnnB49QDvZpx", "token0()", "")  // Call the token0() method of the smart contract, TriggerConstantContract is used to call read-only methods
-      let data = exchange.IO("decode", "address", Encode("raw", "raw", "hex", ret["constant_result"][0]))                        // Decode data
-      return data                                                                                                                 // data: 0x891cdb91d149f23b1a45d9c5ca78a88d0cb44c18
-  }
-  ```
-- TRC20Call
-  ```js
-  function main() {
-      let ret = exchange.IO("api", "tron", "TRC20Call", "", "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t", "0x06fdde03", true, 0)         // Use TRC20Call to call read-only method 0x06fdde03
-      let data = Encode("raw", "raw", "hex", ret.constant_result[0])
-      return exchange.IO("api", "tron", "ParseTRC20StringProperty", data)                                                        // Tether USD
-  }
-  ```
-- Transfer
-  ```js
-  exchange.IO("api", "tron", "Transfer", "TWTbn...", "TKCG...", 1000000)            // Use Transfer method to transfer TRX, from "TWTbn..." to "TKCG...", 1000000 equals 1 TRX.
-  ```
-
-#### Encoding/Decoding
-
-When the exchange object is set to Web3 and TRON is selected, encoding/decoding operations remain consistent with Ethereum's Web3 exchange object.
-- encode:
-  ```js
-  let ret = exchange.IO("encode", "address", "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t")
-  Log(ret) // ret: 000000000000000000000000a614f803b6fd780986a42c78ec9c7f77e6ded13c , encoding the TRON address of USDT token.
-  ```
-- decode:
-  ```js
-  let data = "0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000a5465746865722055534400000000000000000000000000000000000000000000"
-  let ret = exchange.IO("decode", "string", data)
-  Log(ret)  // ret: Tether USD , similar to the functionality of ParseTRC20StringProperty
-  ```
-- encodePacked:
-  ```js
-  let ret = exchange.IO("encodePacked", "address", "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t")
-  Log(ret)  // ret: a614f803b6fd780986a42c78ec9c7f77e6ded13c
-  ```
-
-#### Support for Private Key Switching
-
-The switching method is consistent with Web3 Ethereum exchange objects.
-
-#### Calling Smart Contract Methods
-
-Calling smart contract methods on TRON is basically the same as on Ethereum. Here is a specific example demonstrating how to:
-- Call smart contract methods, calling multiple contract methods in a single request:
-  ```js
-  function main() {
-      let usdtAddress = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t"                  // token usdt contract address
-      let data1 = exchange.IO("encode", usdtAddress, "name")                  // call function: name
-      let data2 = exchange.IO("encode", usdtAddress, "decimals")              // call function: decimals
-      let data3 = exchange.IO("encode", usdtAddress, "balanceOf", "TKCG...")  // call function: balanceOf
-
-      var data = []
-      data.push([usdtAddress, data1])
-      data.push([usdtAddress, data2])
-      data.push([usdtAddress, data3])
-
-      exchange.IO("abi", "TGXuuKAb4bnrn137u39EKbYzKNXvdCes98", `[{"inputs":[{"components":[{"internalType":"address","name":"target","type":"address"},{"internalType":"bytes","name":"callData","type":"bytes"}],"internalType":"struct TronMulticall.Call[]","name":"calls","type":"tuple[]"}],"name":"aggregate","outputs":[{"internalType":"uint256","name":"blockNumber","type":"uint256"},{"internalType":"bytes[]","name":"returnData","type":"bytes[]"}],"stateMutability":"view","type":"function"}]`)
-      let ret = exchange.IO("api", "TGXuuKAb4bnrn137u39EKbYzKNXvdCes98", "aggregate", data)
-      Log("name:", exchange.IO("decode", "string", ret["returnData"][0]))
-      Log("decimals:", exchange.IO("decode", "uint8", ret["returnData"][1]))
-      Log("balanceOf:", exchange.IO("decode", "uint256", ret["returnData"][2]))
-  }
-  ```
-
-  Output:
-  ```log
-  Info balanceOf: 6890251
-  Info decimals: 6
-  Info name: Tether USD
-  ```
-
-#### Other Function Calls
-
-- Get the wallet address configured for the exchange object
-  The usage is the same as for Ethereum.
-- Switch the blockchain RPC node
-  The usage is the same as for Ethereum.
-- Calculate hash
-  ```js
-  let algo = "sign"                   // algo: the algorithm or method to use
-  let inputFormat = "hex"             // inputFormat: the format of the input data; when signing, data is a 32-byte hash in hexadecimal
-  let outputFormat = "hex"            // outputFormat: the format of the output data
-  let data = "txHash"                 // txHash: the specific hash value (64 hexadecimal characters)
-  let signature = exchange.IO("hash", algo, inputFormat, outputFormat, data)  // Returns the signature data
-  ```
-
-  When algo is set to ```"sign"```, it is used to calculate a signature. In this case, ```data``` must be a 32-byte hash and ```inputFormat``` must be ```"hex"```; it returns 65 bytes of signature data ```r‖s‖v```, where v is 0 or 1. When set to other algorithm parameters (for example: "sha256"), the function is equivalent to the ```Encode()``` function.
-
-  If you need to obtain r, s, and v separately (with v being 27 or 28) for contract verification, you can use ```exchange.IO("sign", ...)``` (see the Web3 section of the Syntax Manual).
-
-## Built-in Libraries
-
-The FMZ Quant Trading Platform has integrated some commonly used libraries.
-
-### TA Indicator Library
-
-FMZ Quant's ```TA``` indicator library optimizes commonly used indicator algorithms and supports being called in strategies written in ```JavaScript```, ```Python```, ```Rust```, ```C++``` and other languages. [Open-source TA library code](https://www.fmz.com/bbs-topic/409), [FMZ Quant Trading Platform API Manual](https://www.fmz.com/syntax-guide).
-
-```js
-function main(){
-    // The length of records; when the data length does not meet the calculation requirements of the indicator function parameters, an invalid value will be returned
-    var records = exchange.GetRecords()
-    var macd = TA.MACD(records)
-    var atr = TA.ATR(records, 14)
-
-    // Print the last set of indicator values
-    Log(macd[0][records.length-1], macd[1][records.length-1], macd[2][records.length-1])
-    Log(atr[atr.length-1])
-}
-```
-
-```python
-def main():
-    r = exchange.GetRecords()
-    macd = TA.MACD(r)
-    atr = TA.ATR(r, 14)
-    Log(macd[0][-1], macd[1][-1], macd[2][-1])
-    Log(atr[-1])
-```
-
-```rust
-fn main() {
-    let r = exchange.GetRecords(None, None, None).unwrap();
-    let macd = TA.MACD(&r, None, None, None);
-    let atr = TA.ATR(&r, 14);
-    Log!(macd[0][r.len() - 1], macd[1][r.len() - 1], macd[2][r.len() - 1]);
-    Log!(atr[atr.len() - 1]);
-}
-```
-
-```cpp
-void main() {
-    auto r = exchange.GetRecords();
-    auto macd = TA.MACD(r);
-    auto atr = TA.ATR(r, 14);
-    Log(macd[0][macd[0].size() - 1], macd[1][macd[1].size() - 1], macd[2][macd[2].size() - 1]);
-    Log(atr[atr.size() - 1]);
-}
-```
-
-### talib Indicator Library
-
-Below is example code for calling the ```CCI``` indicator. For more talib indicator functions, please refer to the [FMZ Quant Trading Platform API Manual](https://www.fmz.com/syntax-guide)
-
-```js
+```javascript
 function main() {
-    var records = exchange.GetRecords()
-    var cci = talib.CCI(records, 14)
-    Log(cci)
+    var usdt = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t"
+    var multicall = "TGXuuKAb4bnrn137u39EKbYzKNXvdCes98"
+    var wallet = exchange.IO("address")
+
+    var calls = [
+        [usdt, exchange.IO("encode", usdt, "name")],
+        [usdt, exchange.IO("encode", usdt, "decimals")],
+        [usdt, exchange.IO("encode", usdt, "balanceOf", wallet)]
+    ]
+    // register the aggregate method of the Multicall contract
+    exchange.IO("abi", multicall, `[{"inputs":[{"components":[{"internalType":"address","name":"target","type":"address"},{"internalType":"bytes","name":"callData","type":"bytes"}],"internalType":"struct TronMulticall.Call[]","name":"calls","type":"tuple[]"}],"name":"aggregate","outputs":[{"internalType":"uint256","name":"blockNumber","type":"uint256"},{"internalType":"bytes[]","name":"returnData","type":"bytes[]"}],"stateMutability":"view","type":"function"}]`)
+    var ret = exchange.IO("api", multicall, "aggregate", calls)
+    Log("name:", exchange.IO("decode", "string", ret.returnData[0]))
+    Log("decimals:", exchange.IO("decode", "uint8", ret.returnData[1]))
+    Log("balanceOf:", exchange.IO("decode", "uint256", ret.returnData[2]))
 }
 ```
 
-```python
-# Python requires separate installation of talib library
+See also: `Web3`, `exchange.IO`
 
-import talib
+## Data and Research
 
-def main():
-    records = exchange.GetRecords()
-    # The parameter 14 can be omitted
-    cci = talib.CCI(records.High, records.Low, records.Close, 14)
-    Log(cci)
+The data explorer and the alpha factor analysis tool.
+
+### Data Explorer
+
+**datadata**, developed by FMZ Quant, is a quantitative financial data platform. The [Data Explorer](https://www.fmz.com/m/database) module of FMZ integrates its services and features, and FMZ users can use it without registering a separate **datadata** account. Analyze large amounts of data with SQL, build various charts through a visual interface and share them with your team. For examples, see the [Data Explorer articles](https://www.fmz.com/digest-topic/10370).
+
+- Data sources: the data sources provided by datadata are updated continuously in real time and cover many kinds of data; you can also upload CSV files as private data sources and preview them on the Data Explorer page.
+- Queries: query data with SQL, with query parameters; results can be downloaded as CSV or JSON files.
+- Saving research: click "Save" at the top right to save the current SQL query to the resource list of your Data Explorer (the resource list button is to the left of "Save").
+- Visualization: query results can be shown as tables or with various visualization components.
+- Sharing research: as a public link, embed code (e.g. in a community post), an embedded web page, a data link or a preview image link. A "data link" also feeds the data straight to strategies, in both backtests and live robots.
+
+### Alpha Factor Analysis Tool
+
+The analysis formulas reference the market calculation methods from ```worldquant```'s publicly available [```alpha101```](https://github.com/yli188/WorldQuant_alpha101_code/blob/master/101%20Formulaic%20Alphas.pdf), with basic compatibility for its syntax (unimplemented features are noted), and have been enhanced. This tool is used for rapid time series computation and validation of trading ideas. [Alpha Factor Analysis Tool Page](https://www.fmz.com/m/alpha).
+
+#### Functions and Operators
+
+**The ```{}``` below represents placeholders, all expressions are case-insensitive, x represents data time series**
+
+- ```abs(x), log(x), sign(x)```: absolute value, logarithm and sign function respectively.
+
+The following operators ``` +, -, *, /, >, < ``` also conform to their standard meanings, ```==```: equality check, ```||```: logical OR, ```x ? y : z```: ternary conditional operator.
+
+- ```rank(x)``` : Cross-sectional ranking, returns the percentile position. Requires a candidate pool of several instruments; with a single instrument nothing can be ranked and the raw value is returned.
+- ```delay(x, d)``` : Returns the value of series x from d periods ago.
+- ```sma(x, d)``` : Calculates the simple moving average of series x over d periods.
+- ```correlation(x, y, d)```: Calculates the correlation coefficient between time series x and y over the past d periods.
+- ```covariance(x, y, d)``` : Calculates the covariance between time series x and y over the past d periods.
+- ```scale(x, a)``` : Normalizes data such that ```sum(abs(x))=a``` (a defaults to 1).
+- ```delta(x, d)``` : Calculates the current value of time series x minus the value from d periods ago.
+- ```signedpower(x, a)``` : ```x^a```.
+- ```decay_linear(x, d)``` : Calculates the d-period weighted moving average of time series x, with weights d,d-1,d-2....1 (normalized).
+- ```indneutralize(x, g)``` : Industry neutralization based on industry classification g, currently not supported.
+- ```ts_{O}(x, d)``` : Performs operation O on the past d periods of time series x (O can specifically represent min, max, etc., see below), d will be converted to integer.
+- ```ts_min(x, d)``` : Minimum value over the past d periods.
+- ```ts_max(x, d)``` : Maximum value over the past d periods.
+- ```ts_argmax(x, d)``` : Position of ```ts_max(x, d)```.
+- ```ts_argmin(x, d)``` : Position of ```ts_min(x, d)```.
+- ```ts_rank(x, d)``` : Ranking of time series x over the past d periods (percentile ranking).
+- ```min(x, d)``` : ```ts_min(x, d)```.
+- ```max(x, d)```: ```ts_max(x, d)```.
+- ```sum(x, d)``` : Cumulative sum over the past d periods.
+- ```product(x, d)``` : Cumulative product over the past d periods.
+- ```stddev(x, d)``` : Standard deviation over the past d periods.
+
+#### Input Data
+
+**Input data is case-insensitive. Default data is the instrument selected on the webpage, but can also be specified directly, for example: ```binance.ada_bnb```**
+
+- ```returns```: Close price returns.
+- ```open, close, high, low, volume```: Open price, close price, high price, low price and volume within the period.
+- ```vwap```: Volume-weighted average price (not yet implemented, currently using close price).
+- ```cap```: Total market capitalization (not yet implemented).
+- ```IndClass```: Industry classification (not yet implemented).
+
+#### Others
+
+Supports outputting multiple results at once, represented as a list. For example, ```[sma(close, 10), sma(high, 30)]``` will plot two lines on the chart. Besides inputting time series data, it can also be used as a simple calculator.
+
+## Integrations
+
+Driving the platform from AI assistants or other programs: AI integration (the MCP service), the extended API and trading terminal plugins.
+
+### AI Integration
+
+Connect FMZ to an AI coding assistant (AI agent) such as Claude Code, Codex or Cursor, and you can write strategies, run backtests, create and manage live trading, and read logs and profit just by talking to it. The assistant reaches these functions through the platform's MCP (Model Context Protocol) service, with an API KEY created for it alone; you choose its permissions when you approve it and can change or revoke them at any time.
+
+**Connect with one sentence**
+
+Tell your AI assistant:
+
+```
+Read https://www.fmz.com/agent/setup.md and connect to FMZ
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto cci = talib.CCI(records, 14);
-    Log(cci);
-}
+The assistant follows that page; your only step is one click in the browser:
+
+1. The assistant requests authorization and shows you a link such as ```https://www.fmz.com/agent/authorize?code=XXXX-XXXX```, valid for 10 minutes.
+2. Open it in a browser where you are logged in to FMZ, check the requester's name and the permissions, and approve. You can untick permissions you do not want to grant.
+3. The assistant receives an API KEY, writes it into its own MCP configuration and connects. From then on you can simply ask it to "list my live trading" or "backtest this strategy".
+
+The assistant names the key "name @ machine" (for example ```Claude Code @ MacBook```). When a request with the same name is approved again, the old key is revoked and replaced, so connecting again does not pile up keys.
+
+**Permissions**
+
+| Permission | Allows | Default |
+| - | - | - |
+| read | Lists and details of strategies, live trading, nodes and exchange accounts; logs, messages, account summary (never any secret) | Yes |
+| backtest | Start, query and stop backtests | Yes |
+| write | Save strategies and versions, groups, alert switches; change the configuration of stopped live trading | Yes |
+| trade | Create, start and stop live trading, send interactive commands (costs balance and places real orders) | Yes |
+| danger | Delete strategies, live trading and nodes; publish strategies | No |
+
+```danger``` is never granted by default: the assistant has to request it explicitly and you have to tick it on the approval page. Before calling a ```[trade]``` or ```[danger]``` tool the assistant should ask you first.
+
+**Manual configuration**
+
+Clients that cannot run commands (for example Cherry Studio) can be configured by hand:
+
+1. Create an API KEY under Account settings → API KEY (```https://www.fmz.com/m/account#apikey```) and note its Access Key and Secret Key.
+2. Add an MCP server of type Streamable HTTP to the client:
+   - URL: ```https://www.fmz.com/api/mcp/<Access Key>```
+   - Header: ```Authorization: Bearer <Secret Key>```
+
+The Secret Key goes in the header only, never in the URL. Examples:
+
+```bash
+# Claude Code
+claude mcp add --transport http fmz "https://www.fmz.com/api/mcp/<Access Key>" --header "Authorization: Bearer <Secret Key>"
 ```
-
-### JavaScript Libraries
-
-- http://mikemcl.github.io/decimal.js/
-  ```javascript
-  // Solve precision issues in JavaScript numerical calculations
-  function main() {
-      var x = -1.2
-      var a = Decimal.abs(x)
-      var b = new Decimal(x).abs()
-      Log(a.equals(b))                           // true
-
-      var y = 2.2
-      var sum = Decimal.add(x, y)
-      Log(sum.equals(new Decimal(x).plus(y)))    // true
-  }
-  ```
-- http://underscorejs.org/
-  ```javascript
-  function main() {
-      var sum = _.reduce([1, 2, 3], function(memo, num){return memo + num}, 0)
-      Log(sum)
-  }
-  ```
-- http://ta-lib.org/
-  ```javascript
-  function main(){
-      var records = exchange.GetRecords()
-      // Print all technical indicator data. On FMZ Quant Trading Platform, JavaScript strategies have the talib library built-in
-      Log(talib.MACD(records))
-      Log(talib.MACD(records, 12, 26, 9))
-  }
-  ```
-- Dynamic Loading of JavaScript Libraries
-  To use other third-party JavaScript libraries, you can dynamically load them as follows:
-  ```javascript
-  function main() {
-      // via. https://cdnjs.com/libraries
-      eval(HttpQuery("https://cdnjs.cloudflare.com/ajax/libs/mathjs/13.2.0/math.min.js"))
-
-      Log(math.round(math.e, 3))                // 2.718
-      Log(math.atan2(3, -3) / math.pi)          // 0.75
-      Log(math.log(10000, 10))                  // 4
-      Log(math.sqrt(-4))                        // {"mathjs":"Complex","re":0,"im":2}
-  }
-  ```
-
-### C++ Library
-
-- https://nlohmann.github.io/json/
-  ```cpp
-  void main() {
-      json table = R"({"type": "table", "title": "Position Info", "cols": ["Column 1", "Column 2"], "rows": [["abc", "def"], ["ABC", "support color #ff0000"]]})"_json;
-      LogStatus("`" + table.dump() + "`");
-      LogStatus("First line message\n`" + table.dump() + "`\nThird line message");
-      json arr = R"([])"_json;
-      arr.push_back(table);
-      arr.push_back(table);
-      LogStatus("`" + arr.dump() + "`");
-
-      table = R"({
-          "type" : "table",
-          "title" : "Position Operation",
-          "cols" : ["Column 1", "Column 2", "Action"],
-          "rows" : [
-              ["abc", "def", {"type": "button", "cmd": "coverAll", "name": "Close"}]
-          ]
-      })"_json;
-      LogStatus("`" + table.dump() + "`", "\n`" + R"({"type": "button", "cmd": "coverAll", "name": "Close"})"_json.dump() + "`");
-  }
-  ```
-
-## Extended API Interface
-
-FMZ Quant Trading Platform provides extended API interfaces, supporting programmatic access to various functions of the FMZ quantitative trading platform.
-
-### Create ApiKey
-
-FMZ Quant Trading Platform supports permission management for extended API interfaces, allowing you to set permissions for ```API KEY```. On the platform's [Account Settings](https://www.fmz.com/m/account) page under the "API Interface" option, click the "Create New ApiKey" button to create an extended ```API KEY```.
-
-When creating an ```API KEY```, you can enter the ```*``` symbol in the "API Permissions" input box to enable all **extended API interface** permissions. To specify specific interface permissions, enter the corresponding extended API function names separated by commas, for example: ```GetRobotDetail,DeleteRobot```, which will grant this ```API KEY``` permission to call the **Get Live Trading Details** interface and **Delete Live Trading** interface.
-
-On the ```API KEY``` management page, you can also perform operations such as **modify**, **disable**, and **delete** on created ```API KEY```s.
-
-### Extended API Interface Return Codes
-
-The data structure returned by the extended API interface is as follows:
 
 ```json
-{
-    "code":0,
-    "data":{
-        // ...
-    }
-}
+{"mcpServers": {"fmz": {"url": "https://www.fmz.com/api/mcp/<Access Key>", "headers": {"Authorization": "Bearer <Secret Key>"}}}}
 ```
 
-The ```code``` field indicates the status code returned when calling the extended API interface.
+The JSON is for Cursor (```~/.cursor/mcp.json```) and other clients that speak Streamable HTTP; Claude Desktop needs the ```npx mcp-remote``` bridge described in the setup page.
 
-| Description | Code |
+**Install the skills (recommended)**
+
+The skills are knowledge packs written for AI assistants: platform workflow, the full API reference, how to write strategies in each language, backtesting and indicators. With them installed the assistant writes noticeably more accurate strategies. In a terminal:
+
+```bash
+npx skills add fmzquant/skills --global --yes -a claude-code
+```
+
+Put your assistant's name after ```-a``` (claude-code, codex, cursor, gemini-cli, ...). They can also be read on GitHub: ```https://github.com/fmzquant/skills```.
+
+**Available tools**
+
+Once connected the assistant can use the tools below; the list the assistant sees is authoritative:
+
+| Permission | Tools |
 | - | - |
-| Execution successful | 0 |
-| Invalid API KEY | 1 |
-| Invalid signature | 2 |
-| Nonce error | 3 |
-| Incorrect method | 4 |
-| Incorrect parameters | 5 |
-| Internal unknown error | 6 |
+| read | ```ping```, ```get_account_summary```, ```list_exchanges```, ```list_platforms```, ```list_nodes```, ```list_strategies```, ```get_strategy```, ```list_strategy_versions```, ```get_strategy_version```, ```list_robots```, ```get_robot```, ```get_robot_logs```, ```get_robot_profit```, ```get_robot_output```, ```list_messages```, ```list_groups```, ```revoke_my_key``` |
+| backtest | ```run_backtest```, ```get_backtest```, ```list_backtests```, ```stop_backtest``` |
+| write | ```check_strategy```, ```save_strategy```, ```save_strategy_version```, ```delete_strategy_version```, ```update_robot```, ```save_group```, ```move_to_group```, ```delete_group```, ```set_robot_alert```, ```set_node_alert```, ```delete_messages``` |
+| trade | ```create_robot```, ```start_robot```, ```stop_robot```, ```restart_robot```, ```send_robot_command```, and the trading terminal plugin tools ```plugin_*``` (market data, orders, ...) |
+| danger | ```delete_strategy```, ```delete_robot```, ```delete_node```, ```publish_strategy``` |
 
-### Live Trading Status Codes
+A typical session: ```list_platforms``` and ```list_nodes``` to see which exchange accounts and nodes the account has; ```save_strategy``` to save a strategy and ```check_strategy``` to check it; ```run_backtest``` and ```get_backtest``` to backtest; then ```create_robot``` to go live and ```get_robot``` / ```get_robot_logs``` to watch it.
 
-The ```status``` field in the data returned by ```GetRobotList```, ```GetRobotDetail```, and ```GetRobotLogs``` interfaces represents: Live Trading Status Code.
+**Security and management**
 
-- Normal Start
-  | Status | Code |
-  | - | - |
-  | Idle | 0 |
-  | Running | 1 |
-  | Stopping | 2 |
-  | Exited | 3 |
-  | Stopped | 4 |
-  | Strategy Error | 5 |
-- Exception
-  | Status | Code |
-  | - | - |
-  | Strategy expired, please contact author to repurchase | -1 |
-  | Docker not found | -2 |
-  | Strategy compilation error | -3 |
-  | Live trading already running | -4 |
-  | Insufficient balance | -5 |
-  | Strategy concurrency limit exceeded | -6 |
+- Exchange API KEYs never pass through the assistant: add them on the Exchanges page of the website and the assistant picks them by id. No tool result ever contains a secret.
+- At ```https://www.fmz.com/m/account#apikey``` you can see the key the assistant uses, change its permissions or lock it. Besides the permission names above, permissions can list tool names, and ```!tool_name``` excludes one tool.
+- When you are done, ask the assistant to call ```revoke_my_key``` to revoke its own key, or delete it on that page.
+- ```stop_robot``` stops live trading; it does not close positions.
+- The first time the assistant creates live trading, backtest first and then run on a demo account or with a small amount.
 
-### Authentication Methods
+**Common problems**
 
-Two authentication methods are supported when calling extended API interfaces: ```token``` authentication and direct authentication.
+- No online node: live trading needs at least one online node, see Platform Basics → Nodes.
+- Too many backtests: concurrent backtests are limited; have the assistant ```stop_backtest``` the ones it no longer needs.
+- The assistant says a tool is missing or a call is refused: the key lacks that permission; change it on the API KEY page and reconnect.
 
-#### Token Authentication
+The same API KEY also works with the Extended API (Integrations → Extended API Interface) for scripts and schedulers; prefer MCP wherever it can be used.
 
-Use ```md5``` encryption for verification. Below are calling examples in ```Python``` and ```Golang```:
+### Extended API Interface
+
+The extended API is the platform's HTTP interface (```https://www.fmz.com/api/v1```) for scripts, scheduled jobs and other programs: query the account, dockers, strategies and live trading bots, create, restart and stop bots, send interactive commands to bots, and so on.
+
+To operate the platform interactively from an AI assistant (Claude Code, Cursor, ...), prefer AI Integration (the MCP service, see Integrations → AI Integration): it has more tools, takes named parameters, and can be authorized by permission category. Both can use the same API KEY.
+
+Steps: create an API KEY (Create ApiKey), send requests as described in Authentication Methods, and look up methods and parameters in Extended API Interface Details.
+
+#### Create ApiKey
+
+On the [Account Settings → API KEY](https://www.fmz.com/m/account#apikey) page (```/m/account#apikey```), click "Create New ApiKey" to get an ```AccessKey``` and a ```SecretKey```. The ```SecretKey``` carries every permission of the key; keep it secret. The same page lets you change the permissions of existing keys, or disable and delete them.
+
+**Permissions**
+
+When creating or editing a key, enter a comma-separated list in the "API Permissions" field:
+
+- ```*```: allow all extended API methods.
+- Method names: allow only the listed methods, e.g. ```GetRobotList,GetRobotDetail,CommandRobot```.
+- ```!MethodName```: exclude a method, usually together with ```*```, e.g. ```*,!DeleteRobot,!DeleteNode```.
+
+The same API KEY can also be used for AI Integration (the MCP service, see Integrations → AI Integration). Besides tool names, MCP tools can be authorized by permission category: ```read```, ```backtest```, ```write```, ```trade```, ```danger``` (see the AI Integration page), and ```!name``` excludes as well. Categories only apply to MCP tools; the extended API only recognizes method names and ```*```.
+
+With an empty permission list the extended API does not restrict methods (MCP allows every tool except ```danger```). Grant only what each use needs, e.g. a key used only for TradingView alerts should get ```CommandRobot``` and nothing else.
+
+#### Authentication Methods
+
+The extended API supports two authentication methods:
+
+- Signature authentication: the request parameters are signed with the ```SecretKey```, which itself never travels over the network. Programs should use this method.
+- Direct verification: the ```SecretKey``` is put into the request URL itself; meant for webhooks such as TradingView that accept only a single URL.
+
+##### Signature Authentication
+
+**Request format**
+
+Send a ```POST``` request to ```https://www.fmz.com/api/v1``` with the parameters as a form (```application/x-www-form-urlencoded```). The server also accepts the same parameters in the URL query string of a ```GET``` request, but then they end up in access logs along the way, so ```POST``` is recommended.
+
+| Parameter | Description |
+| - | - |
+| version | Version, always ```1.0```. |
+| access_key | The ```AccessKey``` of the API KEY. |
+| method | Method name, e.g. ```GetNodeList```. |
+| args | Method parameters as a JSON string: an array in parameter order (e.g. ```[]```, ```[123, "ok"]```), or an object keyed by parameter name (e.g. ```{"robotId": 123}```), see Extended API Interface Details. Treated as ```[]``` when omitted. |
+| nonce | Timestamp in milliseconds. It must be within 1 hour of server time and greater than the ```nonce``` of this API KEY's previous request. |
+| sign | Signature, computed as described below. |
+
+The request does not contain the ```SecretKey```.
+
+**Signature**
+
+Concatenate the string below, where ```args``` is the exact JSON string being submitted:
+
+```plaintext
+version + "|" + method + "|" + args + "|" + nonce + "|" + secretKey
+```
+
+Compute the MD5 of the result and use its 32-character lowercase hexadecimal form as ```sign```.
+
+**Python example**
 
 ```python
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-import time
+import hashlib
 import json
-import ssl
-ssl._create_default_https_context = ssl._create_unverified_context
+import time
+import urllib.parse
+import urllib.request
 
-try:
-    import md5
-    import urllib2
-    from urllib import urlencode
-except:
-    import hashlib as md5
-    import urllib.request as urllib2
-    from urllib.parse import urlencode
+ACCESS_KEY = ''   # AccessKey of the API KEY
+SECRET_KEY = ''   # SecretKey of the API KEY
 
-accessKey = ''   # your API KEY
-secretKey = ''
-
-def api(method, *args):
+def api(method, *args, **kwargs):
     d = {
         'version': '1.0',
-        'access_key': accessKey,
+        'access_key': ACCESS_KEY,
         'method': method,
-        'args': json.dumps(list(args)),
+        # Positional arguments are sent as an array, keyword arguments as an object (by name)
+        'args': json.dumps(kwargs if kwargs else list(args)),
         'nonce': int(time.time() * 1000),
-        }
+    }
+    s = '%s|%s|%s|%d|%s' % (d['version'], d['method'], d['args'], d['nonce'], SECRET_KEY)
+    d['sign'] = hashlib.md5(s.encode('utf-8')).hexdigest()
+    body = urllib.parse.urlencode(d).encode('utf-8')
+    with urllib.request.urlopen('https://www.fmz.com/api/v1', body, timeout=10) as resp:
+        return json.loads(resp.read().decode('utf-8'))
 
-    d['sign'] = md5.md5(('%s|%s|%s|%d|%s' % (d['version'], d['method'], d['args'], d['nonce'], secretKey)).encode('utf-8')).hexdigest()
-    # Note: urllib2.urlopen function may have timeout issues, you can set timeout, for example: urllib2.urlopen('https://www.fmz.com/api/v1', urlencode(d).encode('utf-8'), timeout=10) sets timeout to 10 seconds
-    return json.loads(urllib2.urlopen('https://www.fmz.com/api/v1', urlencode(d).encode('utf-8')).read().decode('utf-8'))
-
-# Return docker list
-print(api('GetNodeList'))
-# Return exchange list
-print(api('GetPlatformList'))
-# GetRobotList(offset, length, robotStatus, label), pass -1 to get all
-print(api('GetRobotList', 0, 5, -1, 'member2'))
-# CommandRobot(robotId, cmd) send command to live trading bot
-print(api('CommandRobot', 123, 'ok'))
-# StopRobot(robotId) return live trading bot status code
-print(api('StopRobot', 123))
-# RestartRobot(robotId) return live trading bot status code
-print(api('RestartRobot', 123))
-# GetRobotDetail(robotId) return live trading bot detailed information
-print(api('GetRobotDetail', 123))
+print(api('GetNodeList'))                             # Docker list
+print(api('GetRobotList', appId='member2'))           # By name: bots labeled member2
+print(api('CommandRobot', 123, 'ok'))                 # Send an interactive command to bot 123
+print(api('GetRobotDetail', 123))                     # Details of bot 123
 ```
+
+**Go example**
 
 ```go
 package main
 
 import (
-    "fmt"
-    "time"
-    "encoding/json"
     "crypto/md5"
     "encoding/hex"
+    "encoding/json"
+    "fmt"
+    "io"
     "net/http"
-    "io/ioutil"
-    "strconv"
     "net/url"
+    "strconv"
+    "time"
 )
 
-// Fill in your FMZ platform API key
-var apiKey string = ""
-// Fill in your FMZ platform secret key
-var secretKey string = ""
-var baseApi string = "https://www.fmz.com/api/v1"
+const (
+    accessKey = "" // AccessKey of the API KEY
+    secretKey = "" // SecretKey of the API KEY
+    baseAPI   = "https://www.fmz.com/api/v1"
+)
 
-func api(method string, args ... interface{}) (ret interface{}) {
-    // Process parameters
-    jsonStr, err := json.Marshal(args)
+var client = &http.Client{Timeout: 10 * time.Second}
+
+func api(method string, args ...interface{}) (string, error) {
+    if args == nil {
+        args = []interface{}{}
+    }
+    b, err := json.Marshal(args)
     if err != nil {
-        panic(err)
+        return "", err
     }
-
-    params := map[string]string{
-        "version" : "1.0",
-        "access_key" : apiKey,
-        "method" : method,
-        "args" : string(jsonStr),
-        "nonce" : strconv.FormatInt(time.Now().UnixNano() / 1e6, 10),
+    nonce := strconv.FormatInt(time.Now().UnixMilli(), 10)
+    sum := md5.Sum([]byte("1.0|" + method + "|" + string(b) + "|" + nonce + "|" + secretKey))
+    form := url.Values{
+        "version":    {"1.0"},
+        "access_key": {accessKey},
+        "method":     {method},
+        "args":       {string(b)},
+        "nonce":      {nonce},
+        "sign":       {hex.EncodeToString(sum[:])},
     }
-
-    data := fmt.Sprintf("%s|%s|%s|%v|%s", params["version"], params["method"], params["args"], params["nonce"], secretKey)
-    h := md5.New()
-    h.Write([]byte(data))
-    sign := h.Sum(nil)
-
-    params["sign"] = hex.EncodeToString(sign)
-
-    // http request
-    client := &http.Client{}
-
-    // request
-    urlValue := url.Values{}
-    for k, v := range params {
-        urlValue.Add(k, v)
-    }
-    urlStr := urlValue.Encode()
-    request, err := http.NewRequest("GET", baseApi + "?" + urlStr, nil)
+    resp, err := client.PostForm(baseAPI, form)
     if err != nil {
-        panic(err)
+        return "", err
     }
-
-    resp, err := client.Do(request)
-    if err != nil {
-        panic(err)
-    }
-
     defer resp.Body.Close()
-
-    b, err := ioutil.ReadAll(resp.Body)
-    if err != nil {
-        panic(err)
-    }
-
-    ret = string(b)
-    return
+    body, err := io.ReadAll(resp.Body)
+    return string(body), err
 }
 
 func main() {
+    ret, err := api("GetNodeList")
+    fmt.Println(ret, err)
+
+    // Restart bot 123 with a new configuration; settings fields: see the bot configuration section in Extended API Interface Details
     settings := map[string]interface{}{
-        "name": "hedge test",
-        "strategy": 104150,
-        // K-line period parameter, 60 means 60 seconds
-        "period": 60,
-        "node" : 73938,
-        "appid": "member2",
+        "name":     "hedge test",
+        "strategy": 456,
+        "period":   60,
+        "node":     789,
         "exchanges": []interface{}{
-            map[string]interface{}{
-                "eid": "Exchange",
-                "label" : "test_bjex",
-                "pair": "BTC_USDT",
-                "meta" : map[string]interface{}{
-                    // Fill in access key
-                    "AccessKey": "",
-                    // Fill in secret key
-                    "SecretKey": "",
-                    "Front" : "http://127.0.0.1:6666/exchange",
-                },
-            },
+            map[string]interface{}{"pid": 1001, "pair": "BTC_USDT"},
         },
     }
-
-    method := "RestartRobot"
-    fmt.Println("Call interface:", method)
-    ret := api(method, 124577, settings)
-    fmt.Println("main ret:", ret)
+    ret, err = api("RestartRobot", 123, settings)
+    fmt.Println(ret, err)
 }
 ```
 
-#### Direct Verification
+##### Direct Verification
 
-Supports authentication without using ```token``` (direct ```secret_key``` authentication), allowing generation of URLs for direct access. For example, URLs for sending interactive commands directly to live trading bots can be used for ```Trading View``` or other ```WebHook``` callback scenarios. For the extended API interface ```CommandRobot()``` function, ```nonce``` verification is not performed, and there are no limits on access frequency or number of accesses for this interface.
+Direct verification computes no signature; the ```secret_key``` is put into the request parameters instead. This produces a fixed URL that can be entered into webhooks such as TradingView that accept only a single URL.
 
-For example: If the ```AccessKey``` in the created extended ```API KEY``` is: ```xxx```, and the ```SecretKey``` is: ```yyy```. Accessing the following link will send an interactive command message to the live trading bot with ID ```186515```, with the message content being the string: ```"ok12345"```.
+> **Security note**: a ```secret_key``` in a URL ends up in browser history, proxy and server access logs, and the webhook provider's configuration; anyone who obtains the URL can call the API with this key's permissions. Use direct verification only for ```CommandRobot``` webhooks, and create a dedicated API KEY for it that is granted ```CommandRobot``` only (see Create ApiKey). If it leaks, delete that API KEY immediately.
+
+The request parameters are ```access_key```, ```secret_key```, ```method``` and ```args``` (a JSON array, URL-encoded); ```version```, ```nonce``` and ```sign``` are not needed. ```CommandRobot``` skips the ```nonce``` check; other methods are still checked: without a ```nonce``` the server uses the current time (to the second), so a second call within the same second returns a nonce error (```code``` 3).
+
+For example, with an API KEY whose ```AccessKey``` is ```xxx``` and ```SecretKey``` is ```yyy```, opening the URL below sends the interactive command ```ok12345``` to the live trading bot with ID ```186515```:
 
 ```plaintext
 https://www.fmz.com/api/v1?access_key=xxx&secret_key=yyy&method=CommandRobot&args=%5B186515%2C%22ok12345%22%5D
 ```
 
-When direct authentication is supported, the ```Body``` data from the request can be obtained, only supporting the ```CommandRobot``` interface. For example, setting in ```Trading View```'s ```WebHook URL```:
+**Receiving a webhook body**
+
+When the command argument of ```CommandRobot``` is an empty string and the request is a ```POST```, the server sends the request body to the bot as the interactive command. For example, set the TradingView webhook URL to:
 
 ```plaintext
 https://www.fmz.com/api/v1?access_key=xxx&secret_key=yyy&method=CommandRobot&args=%5B186515%2C+%22%22%5D
 ```
 
-Note that it must be set in this format: ```%5B186515%2C+%22%22%5D``` (before encoding: ```[186515, ""]```), where ```186515``` is the live trading bot ID on the FMZ Quant Trading Platform.
+The ```args``` value ```%5B186515%2C+%22%22%5D``` decodes to ```[186515, ""]``` (```+``` is a URL-encoded space): ```186515``` is the bot ID and the command is an empty string.
 
-Simulating ```Trading View``` sending ```WebHook URL``` alerts:
+Simulating a TradingView webhook alert:
+
 ```js
 function main() {
     var options = {
@@ -5449,10890 +5310,568 @@ function main() {
         headers: {"Content-Type": "application/json"}
     }
 
-    // WebHook URL alerts will automatically send POST requests, including required headers settings
-    return HttpQuery("https://www.fmz.com/api/v1?access_key=xxx&secret_key=xxx&method=CommandRobot&args=%5B186515%2C+%22%22%5D", options)
+    // A webhook alert sends a POST request with the required headers automatically
+    return HttpQuery("https://www.fmz.com/api/v1?access_key=xxx&secret_key=yyy&method=CommandRobot&args=%5B186515%2C+%22%22%5D", options)
 }
 ```
 
-Setting in ```Trading View``` message box (Body data to be sent in the request):
+The content of the TradingView alert message box is the request body:
+
 - JSON format:
 
-  https://www.fmz.com/upload/asset/16d8a37ef80d9ccd0079.png
+  ![](https://www.fmz.com/upload/asset/16d8a37ef80d9ccd0079.png)
 
   ```plaintext
   {"close": {{close}}, "name": "aaa"}
   ```
 
-  The live trading bot with ID ```186515``` will receive the interactive command string: ```{"close": 39773.75, "name": "aaa"}```.
+  The bot with ID ```186515``` receives the interactive command ```{"close": 39773.75, "name": "aaa"}```.
+
 - Text format:
 
-  https://www.fmz.com/upload/asset/16d8a506dfbb6c60a077.png
+  ![](https://www.fmz.com/upload/asset/16d8a506dfbb6c60a077.png)
 
   ```plaintext
   BTCUSDTPERP Crossing 39700.00 close: {{close}}
   ```
 
-  The live trading bot with ID ```186515``` will receive the interactive command string: ```BTCUSDTPERP Crossing 39700.00 close: 39739.4```.
+  The bot with ID ```186515``` receives the interactive command ```BTCUSDTPERP Crossing 39700.00 close: 39739.4```.
 
-```Python```, ```Golang``` language call examples:
+**Python and Go examples**
 
 ```python
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-
 import json
-import ssl
+import urllib.parse
+import urllib.request
 
-ssl._create_default_https_context = ssl._create_unverified_context
-
-try:
-    import urllib2
-except:
-    import urllib.request as urllib2
-
-accessKey = 'your accessKey'
-secretKey = 'your secretKey'
+ACCESS_KEY = ''   # AccessKey of an API KEY granted CommandRobot only
+SECRET_KEY = ''   # SecretKey
 
 def api(method, *args):
-    return json.loads(urllib2.urlopen(('https://www.fmz.com/api/v1?access_key=%s&secret_key=%s&method=%s&args=%s' % (accessKey, secretKey, method, json.dumps(list(args)))).replace(' ', '')).read().decode('utf-8'))
+    query = urllib.parse.urlencode({
+        'access_key': ACCESS_KEY,
+        'secret_key': SECRET_KEY,
+        'method': method,
+        'args': json.dumps(list(args)),
+    })
+    with urllib.request.urlopen('https://www.fmz.com/api/v1?' + query, timeout=10) as resp:
+        return json.loads(resp.read().decode('utf-8'))
 
-# If the API KEY doesn't have permission for this interface, calling print(api('RestartRobot', 186515)) will fail, returning data: {'code': 4, 'data': None}
-# print(api('RestartRobot', 186515))
-
-# Print detailed information of the live trading bot with ID: 186515
-print(api('GetRobotDetail', 186515))
+# Without permission for the method the result is {'code': 4, 'data': None}
+print(api('CommandRobot', 186515, 'ok12345'))
 ```
 
 ```go
 package main
 
 import (
-    "fmt"
     "encoding/json"
+    "fmt"
+    "io"
     "net/http"
-    "io/ioutil"
     "net/url"
+    "time"
 )
 
-// Fill in your own FMZ platform api key
-var apiKey string = "your access_key"
+const (
+    accessKey = "" // AccessKey of an API KEY granted CommandRobot only
+    secretKey = "" // SecretKey
+    baseAPI   = "https://www.fmz.com/api/v1"
+)
 
-// Fill in your own FMZ platform secret key
-var secretKey string = "your secret_key"
-var baseApi string = "https://www.fmz.com/api/v1"
+var client = &http.Client{Timeout: 10 * time.Second}
 
-func api(method string, args ... interface{}) (ret interface{}) {
-    jsonStr, err := json.Marshal(args)
+func api(method string, args ...interface{}) (string, error) {
+    if args == nil {
+        args = []interface{}{}
+    }
+    b, err := json.Marshal(args)
     if err != nil {
-        panic(err)
+        return "", err
     }
-
-    params := map[string]string{
-        "access_key" : apiKey,
-        "secret_key" : secretKey,
-        "method" : method,
-        "args" : string(jsonStr),
+    q := url.Values{
+        "access_key": {accessKey},
+        "secret_key": {secretKey},
+        "method":     {method},
+        "args":       {string(b)},
     }
-
-    // http request
-    client := &http.Client{}
-
-    // request
-    urlValue := url.Values{}
-    for k, v := range params {
-        urlValue.Add(k, v)
-    }
-    urlStr := urlValue.Encode()
-    request, err := http.NewRequest("GET", baseApi + "?" + urlStr, nil)
+    resp, err := client.Get(baseAPI + "?" + q.Encode())
     if err != nil {
-        panic(err)
+        return "", err
     }
-
-    resp, err := client.Do(request)
-    if err != nil {
-        panic(err)
-    }
-
     defer resp.Body.Close()
-
-    b, err := ioutil.ReadAll(resp.Body)
-    if err != nil {
-        panic(err)
-    }
-
-    ret = string(b)
-    return
+    body, err := io.ReadAll(resp.Body)
+    return string(body), err
 }
 
 func main() {
-    method := "GetRobotDetail"
-    fmt.Println("Calling interface:", method)
-    ret := api(method, 186515)
-    fmt.Println("main ret:", ret)
+    ret, err := api("CommandRobot", 186515, "ok12345")
+    fmt.Println(ret, err)
 }
 ```
 
-[Implementing TradingView Alert Signal Trading Using FMZ Quant Trading Platform Extended API](https://www.fmz.com/digest-topic/5533)
-[Implementing TradingView Alert Signal Trading Using FMZ Quant Trading Platform Extended API, Bilibili Video Link](https://www.bilibili.com/video/BV1Wk4y1k7zz/)
+References:
 
-### Extended API Interface Details
+- [Trading on TradingView alert signals with the FMZ extended API](https://www.fmz.com/digest-topic/5533)
+- [Trading on TradingView alert signals with the FMZ extended API (video, Bilibili)](https://www.bilibili.com/video/BV1Wk4y1k7zz/)
 
-- FMZ Quant Trading Platform Extended API Interface
-  Append query parameters directly after ```https://www.fmz.com/api/v1``` (separated by ```?```). Below are the request parameters expressed in ```Python```:
+#### Extended API Interface Details
 
-  ```json
-  {
-      "version"   : "1.0",
-      "access_key": "xxx",
-      "method"    : "GetNodeList",
-      "args"      : [],
-      "nonce"     : 1516292399361,
-      "sign"      : "085b63456c93hfb243a757366600f9c2"
-  }
-  ```
+All methods are called through ```https://www.fmz.com/api/v1```; for the request format and signature see Authentication Methods → Signature Authentication, for the response structure and error codes see Extended API Interface Return Codes. The ```api()``` used in the examples on the method pages is the function from the Python example on the signature authentication page.
 
-  | Field | Description |
-  | - | - |
-  | version    | Version number. |
-  | access_key | AccessKey, apply on the account management page. |
-  | method     | The specific method to call. |
-  | args       | Parameter list for calling the method. |
-  | nonce      | Timestamp in milliseconds, allowing a 1-hour deviation from standard timestamp. The nonce must be greater than the nonce value from the previous access. |
-  | sign       | Signature. |
+**Method overview**
 
-  Parameters are separated by ```&```, parameter names and values are connected by ```=```. Complete request URL (using ```method=GetNodeList``` as an example):
+| Object | Method | Parameters (in order; bracketed ones may be omitted) | Description | Notes |
+| - | - | - | - | - |
+| Account | GetAccount | none | Account information | Read-only |
+| Docker | GetNodeList | [offset, limit] | Docker list | Read-only |
+| Docker | DeleteNode | nid | Delete a docker | Deletes, cannot be undone |
+| Exchange | GetExchangeList | isSummary | Exchanges supported by the platform and their settings | Read-only |
+| Exchange | GetPlatformList | [offset, limit] | Exchange accounts you added | Read-only |
+| Strategy | GetStrategyList | offset, length, strategyType, category, language, kw[, groupId, orderBy] | Strategy list | Read-only |
+| Live trading | GetRobotGroupList | none | Live trading groups | Read-only |
+| Live trading | GetRobotList | [offset, length, customStatus, appId, kw, groupId, orderBy, strategyId] | Live trading list | Read-only |
+| Live trading | GetRobotDetail | robotId | Live trading details | Read-only |
+| Live trading | GetRobotLogs | robotId, logMinId, …, summaryLimit[, logExchange, logKeyword, logTypes] | Logs, profit, chart and status bar data | Read-only |
+| Live trading | NewRobot | settings | Create and start a live trading bot | Charges fees; the bot trades for real |
+| Live trading | RestartRobot | robotId[, settings] | Start (restart) a live trading bot | Charges fees; the bot trades for real |
+| Live trading | StopRobot | robotId | Stop a live trading bot | Does not close positions |
+| Live trading | CommandRobot | robotId, cmd | Send an interactive command | The strategy may place orders on it |
+| Live trading | DeleteRobot | robotId[, removeLog] | Delete a live trading bot | Deletes, cannot be undone |
+| Debugging | PluginRun | settings | Run a piece of code on a docker | The code can place real orders |
 
-  ```plaintext
-  https://www.fmz.com/api/v1?access_key=xxx&nonce=1516292399361&args=%5B%5D&sign=085b63456c93hfb243a757366600f9c2&version=1.0&method=GetNodeList
-  ```
+The API KEY needs permission for the method, see Create ApiKey.
 
-  Note: The request parameters do not include the ```secret_key``` parameter.
-- Signature Method
-  The encryption method for the ```sign``` parameter in the request is as follows, formatted as:
+**Passing parameters**
 
-  ```plaintext
-  version + "|" + method + "|" + args + "|" + nonce + "|" + secretKey
-  ```
+```args``` can be written in two ways:
 
-  After concatenating the string, use the ```MD5``` encryption algorithm to encrypt the string and convert it to a hexadecimal string. This value is used as the value of the ```sign``` parameter. For the signature part, refer to the ```Python``` code Extended API Interface ["Authentication Method"](/user-guide/extended-api-interface/authentication-method):
+- Array: positional parameters in the order of the table above, e.g. ```[123, "ok"]```.
+- Object: values by parameter name, e.g. ```{"robotId": 123, "cmd": "ok"}```. Names are case-insensitive and underscores are ignored; omitted parameters take their defaults. Recommended for methods with many optional parameters (GetRobotList, GetRobotLogs, GetStrategyList).
 
-  ```python
-  # Parameters
-  d = {
-      'version': '1.0',
-      'access_key': accessKey,
-      'method': method,
-      'args': json.dumps(list(args)),
-      'nonce': int(time.time() * 1000),
-  }
+**Live trading configuration (settings)**
 
-  # Calculate sign signature
-  d['sign'] = md5.md5(('%s|%s|%s|%d|%s' % (d['version'], d['method'], d['args'], d['nonce'], secretKey)).encode('utf-8')).hexdigest()
-  ```
-- Interface Business Errors:
-  - Insufficient parameters:
-    ```json
-    {
-        "code":0,
-        "data":{
-            "result":null,
-            "error":"Params length incorrect"
-        }
+The ```settings``` parameter of NewRobot, RestartRobot and PluginRun is a JSON object; common fields:
+
+| Field | Description |
+| - | - |
+| name | Name of the live trading bot. |
+| strategy | Strategy ID, see GetStrategyList. RestartRobot cannot change a bot's strategy. |
+| args | Strategy parameters, each element ```["name", value]```, e.g. ```[["Interval", 500]]```; ```[]``` if the strategy has none. |
+| exchanges | Array of exchange object configurations, one element per exchange object, see below. |
+| period | Default K-line period in seconds, e.g. ```60```, ```3600```. |
+| node | ID of the docker that runs the bot, see GetNodeList; omitted or ```-1``` means automatic assignment. |
+| group | Live trading group ID, see GetRobotGroupList. |
+| appid | Custom label; GetRobotList can filter by it. |
+
+An ```exchanges``` element takes one of two forms, which cannot be mixed in one array (the first element decides):
+
+- Reference an exchange account added on the platform: ```{"pid": 123, "pair": "BTC_USDT"}```. ```pid``` is the ```id``` returned by GetPlatformList.
+- Pass the exchange configuration directly: ```{"eid": "Binance", "label": "test", "pair": "BTC_USDT", "meta": {"AccessKey": "...", "SecretKey": "..."}}```. ```eid``` is the exchange ID; the field names of ```meta``` are given by the ```meta``` returned by GetExchangeList; ```label``` is the exchange object's label, read in the strategy with ```exchange.GetLabel()```. The platform does not store the keys in ```meta``` but forwards them to the docker, so a bot created this way needs ```settings``` again on every restart.
+
+For a custom-protocol exchange: ```{"eid": "Exchange", "label": "test", "pair": "BTC_USDT", "meta": {"AccessKey": "...", "SecretKey": "...", "Front": "http://127.0.0.1:6666/test"}}```, where ```Front``` is the address of the custom-protocol service.
+
+###### GetAccount
+
+The ```GetAccount``` method is used to retrieve account information for the FMZ Quant Trading Platform account corresponding to the ```API KEY``` in the request.
+
+Parameters:
+
+No parameters
+
+Returns:
+
+```json
+{
+    "code":0,
+    "data":{
+        "result":{
+            "balance":22944702436,
+            "concurrent":0,
+            "consumed":211092719653,
+            "email":"123@qq.com",
+            "openai":false,
+            "settings":null,
+            "sns":{"wechat":true},
+            "uid":"105ea6e51bcc177926a10fdbb7e2a1d6",
+            "username":"abc"
+        },
+        "error":null
     }
-    ```
+}
+```
 
-##### GetNodeList
+- balance: Account balance in USD, stored as an integer for precision; divide by 1e8 (10 to the power of 8) to get the actual value, 229.44702436 in this example.
+- consumed: Total amount spent, same unit and conversion as ```balance```.
 
-The ```GetNodeList``` method is used to retrieve the list of docker nodes under the FMZ Quant Trading Platform account corresponding to the ```API KEY``` in the request.
+###### GetNodeList
+
+The ```GetNodeList``` method returns the dockers available to the platform account of the ```API KEY``` in the request, including your own dockers and the platform's public dockers.
 
 Parameters:
 
-- N
-- o
-- 
-- p
-- a
-- r
-- a
-- m
-- e
-- t
-- e
-- r
-- s
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: j
-
-Returns: s
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: a
-
-Returns: l
-
-Returns: l
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 1
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: n
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: [
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: b
-
-Returns: u
-
-Returns: i
-
-Returns: l
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 3
-
-Returns: .
-
-Returns: 7
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: i
-
-Returns: t
-
-Returns: y
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: .
-
-Returns: .
-
-Returns: .
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: r
-
-Returns: e
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 2
-
-Returns: 0
-
-Returns: 2
-
-Returns: 4
-
-Returns: -
-
-Returns: 1
-
-Returns: 1
-
-Returns: -
-
-Returns: 0
-
-Returns: 8
-
-Returns: 
-
-Returns: 0
-
-Returns: 9
-
-Returns: :
-
-Returns: 2
-
-Returns: 1
-
-Returns: :
-
-Returns: 0
-
-Returns: 8
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 2
-
-Returns: 0
-
-Returns: 2
-
-Returns: 4
-
-Returns: -
-
-Returns: 1
-
-Returns: 1
-
-Returns: -
-
-Returns: 0
-
-Returns: 8
-
-Returns: 
-
-Returns: 1
-
-Returns: 6
-
-Returns: :
-
-Returns: 3
-
-Returns: 7
-
-Returns: :
-
-Returns: 1
-
-Returns: 6
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: f
-
-Returns: o
-
-Returns: r
-
-Returns: w
-
-Returns: a
-
-Returns: r
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: .
-
-Returns: .
-
-Returns: .
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: g
-
-Returns: u
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: .
-
-Returns: .
-
-Returns: .
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: h
-
-Returns: o
-
-Returns: s
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: n
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: .
-
-Returns: f
-
-Returns: m
-
-Returns: z
-
-Returns: .
-
-Returns: c
-
-Returns: o
-
-Returns: m
-
-Returns: :
-
-Returns: 9
-
-Returns: 9
-
-Returns: 0
-
-Returns: 2
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 1
-
-Returns: 2
-
-Returns: 3
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: i
-
-Returns: p
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: .
-
-Returns: .
-
-Returns: .
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: i
-
-Returns: s
-
-Returns: _
-
-Returns: o
-
-Returns: w
-
-Returns: n
-
-Returns: e
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: t
-
-Returns: r
-
-Returns: u
-
-Returns: e
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: l
-
-Returns: o
-
-Returns: a
-
-Returns: d
-
-Returns: e
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: n
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: M
-
-Returns: a
-
-Returns: c
-
-Returns: B
-
-Returns: o
-
-Returns: o
-
-Returns: k
-
-Returns: -
-
-Returns: P
-
-Returns: r
-
-Returns: o
-
-Returns: -
-
-Returns: 2
-
-Returns: .
-
-Returns: l
-
-Returns: o
-
-Returns: c
-
-Returns: a
-
-Returns: l
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: o
-
-Returns: n
-
-Returns: l
-
-Returns: i
-
-Returns: n
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: t
-
-Returns: r
-
-Returns: u
-
-Returns: e
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: o
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: r
-
-Returns: w
-
-Returns: i
-
-Returns: n
-
-Returns: /
-
-Returns: a
-
-Returns: m
-
-Returns: d
-
-Returns: 6
-
-Returns: 4
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: p
-
-Returns: e
-
-Returns: e
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: .
-
-Returns: .
-
-Returns: .
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: p
-
-Returns: u
-
-Returns: b
-
-Returns: l
-
-Returns: i
-
-Returns: c
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: g
-
-Returns: i
-
-Returns: o
-
-Returns: n
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: .
-
-Returns: .
-
-Returns: .
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: t
-
-Returns: u
-
-Returns: n
-
-Returns: n
-
-Returns: e
-
-Returns: l
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: f
-
-Returns: a
-
-Returns: l
-
-Returns: s
-
-Returns: e
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: v
-
-Returns: e
-
-Returns: r
-
-Returns: s
-
-Returns: i
-
-Returns: o
-
-Returns: n
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: .
-
-Returns: .
-
-Returns: .
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: w
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ]
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: r
-
-Returns: r
-
-Returns: o
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: n
-
-Returns: u
-
-Returns: l
-
-Returns: l
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 
-
-Returns: 
-
-Returns: R
-
-Returns: e
-
-Returns: t
-
-Returns: u
-
-Returns: r
-
-Returns: n
-
-Returns: 
-
-Returns: v
-
-Returns: a
-
-Returns: l
-
-Returns: u
-
-Returns: e
-
-Returns: 
-
-Returns: f
-
-Returns: i
-
-Returns: e
-
-Returns: l
-
-Returns: d
-
-Returns: 
-
-Returns: d
-
-Returns: e
-
-Returns: s
-
-Returns: c
-
-Returns: r
-
-Returns: i
-
-Returns: p
-
-Returns: t
-
-Returns: i
-
-Returns: o
-
-Returns: n
-
-Returns: s
-
-Returns: 
-
-Returns: (
-
-Returns: f
-
-Returns: i
-
-Returns: e
-
-Returns: l
-
-Returns: d
-
-Returns: s
-
-Returns: 
-
-Returns: w
-
-Returns: i
-
-Returns: t
-
-Returns: h
-
-Returns: 
-
-Returns: o
-
-Returns: b
-
-Returns: v
-
-Returns: i
-
-Returns: o
-
-Returns: u
-
-Returns: s
-
-Returns: 
-
-Returns: l
-
-Returns: i
-
-Returns: t
-
-Returns: e
-
-Returns: r
-
-Returns: a
-
-Returns: l
-
-Returns: 
-
-Returns: m
-
-Returns: e
-
-Returns: a
-
-Returns: n
-
-Returns: i
-
-Returns: n
-
-Returns: g
-
-Returns: s
-
-Returns: 
-
-Returns: a
-
-Returns: r
-
-Returns: e
-
-Returns: 
-
-Returns: n
-
-Returns: o
-
-Returns: t
-
-Returns: 
-
-Returns: e
-
-Returns: l
-
-Returns: a
-
-Returns: b
-
-Returns: o
-
-Returns: r
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: d
-
-Returns: )
-
-Returns: :
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: a
-
-Returns: l
-
-Returns: l
-
-Returns: :
-
-Returns: 
-
-Returns: T
-
-Returns: o
-
-Returns: t
-
-Returns: a
-
-Returns: l
-
-Returns: 
-
-Returns: n
-
-Returns: u
-
-Returns: m
-
-Returns: b
-
-Returns: e
-
-Returns: r
-
-Returns: 
-
-Returns: o
-
-Returns: f
-
-Returns: 
-
-Returns: d
-
-Returns: o
-
-Returns: c
-
-Returns: k
-
-Returns: e
-
-Returns: r
-
-Returns: 
-
-Returns: n
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: s
-
-Returns: 
-
-Returns: a
-
-Returns: s
-
-Returns: s
-
-Returns: o
-
-Returns: c
-
-Returns: i
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: d
-
-Returns: 
-
-Returns: w
-
-Returns: i
-
-Returns: t
-
-Returns: h
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: c
-
-Returns: u
-
-Returns: r
-
-Returns: r
-
-Returns: e
-
-Returns: n
-
-Returns: t
-
-Returns: 
-
-Returns: a
-
-Returns: c
-
-Returns: c
-
-Returns: o
-
-Returns: u
-
-Returns: n
-
-Returns: t
-
-Returns: .
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: n
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: s
-
-Returns: :
-
-Returns: 
-
-Returns: L
-
-Returns: i
-
-Returns: s
-
-Returns: t
-
-Returns: 
-
-Returns: o
-
-Returns: f
-
-Returns: 
-
-Returns: d
-
-Returns: e
-
-Returns: t
-
-Returns: a
-
-Returns: i
-
-Returns: l
-
-Returns: e
-
-Returns: d
-
-Returns: 
-
-Returns: i
-
-Returns: n
-
-Returns: f
-
-Returns: o
-
-Returns: r
-
-Returns: m
-
-Returns: a
-
-Returns: t
-
-Returns: i
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: f
-
-Returns: o
-
-Returns: r
-
-Returns: 
-
-Returns: d
-
-Returns: o
-
-Returns: c
-
-Returns: k
-
-Returns: e
-
-Returns: r
-
-Returns: 
-
-Returns: n
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: s
-
-Returns: .
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: b
-
-Returns: u
-
-Returns: i
-
-Returns: l
-
-Returns: d
-
-Returns: :
-
-Returns: 
-
-Returns: V
-
-Returns: e
-
-Returns: r
-
-Returns: s
-
-Returns: i
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: n
-
-Returns: u
-
-Returns: m
-
-Returns: b
-
-Returns: e
-
-Returns: r
-
-Returns: .
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: c
-
-Returns: i
-
-Returns: t
-
-Returns: y
-
-Returns: :
-
-Returns: 
-
-Returns: C
-
-Returns: i
-
-Returns: t
-
-Returns: y
-
-Returns: 
-
-Returns: l
-
-Returns: o
-
-Returns: c
-
-Returns: a
-
-Returns: t
-
-Returns: i
-
-Returns: o
-
-Returns: n
-
-Returns: .
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: i
-
-Returns: s
-
-Returns: _
-
-Returns: o
-
-Returns: w
-
-Returns: n
-
-Returns: e
-
-Returns: r
-
-Returns: :
-
-Returns: 
-
-Returns: t
-
-Returns: r
-
-Returns: u
-
-Returns: e
-
-Returns: 
-
-Returns: i
-
-Returns: n
-
-Returns: d
-
-Returns: i
-
-Returns: c
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: s
-
-Returns: 
-
-Returns: p
-
-Returns: r
-
-Returns: i
-
-Returns: v
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: 
-
-Returns: d
-
-Returns: o
-
-Returns: c
-
-Returns: k
-
-Returns: e
-
-Returns: r
-
-Returns: ,
-
-Returns: 
-
-Returns: f
-
-Returns: a
-
-Returns: l
-
-Returns: s
-
-Returns: e
-
-Returns: 
-
-Returns: i
-
-Returns: n
-
-Returns: d
-
-Returns: i
-
-Returns: c
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: s
-
-Returns: 
-
-Returns: p
-
-Returns: u
-
-Returns: b
-
-Returns: l
-
-Returns: i
-
-Returns: c
-
-Returns: 
-
-Returns: d
-
-Returns: o
-
-Returns: c
-
-Returns: k
-
-Returns: e
-
-Returns: r
-
-Returns: .
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: l
-
-Returns: o
-
-Returns: a
-
-Returns: d
-
-Returns: e
-
-Returns: d
-
-Returns: :
-
-Returns: 
-
-Returns: L
-
-Returns: o
-
-Returns: a
-
-Returns: d
-
-Returns: 
-
-Returns: a
-
-Returns: m
-
-Returns: o
-
-Returns: u
-
-Returns: n
-
-Returns: t
-
-Returns: ,
-
-Returns: 
-
-Returns: i
-
-Returns: .
-
-Returns: e
-
-Returns: .
-
-Returns: ,
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: n
-
-Returns: u
-
-Returns: m
-
-Returns: b
-
-Returns: e
-
-Returns: r
-
-Returns: 
-
-Returns: o
-
-Returns: f
-
-Returns: 
-
-Returns: c
-
-Returns: u
-
-Returns: r
-
-Returns: r
-
-Returns: e
-
-Returns: n
-
-Returns: t
-
-Returns: l
-
-Returns: y
-
-Returns: 
-
-Returns: r
-
-Returns: u
-
-Returns: n
-
-Returns: n
-
-Returns: i
-
-Returns: n
-
-Returns: g
-
-Returns: 
-
-Returns: s
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: g
-
-Returns: y
-
-Returns: 
-
-Returns: i
-
-Returns: n
-
-Returns: s
-
-Returns: t
-
-Returns: a
-
-Returns: n
-
-Returns: c
-
-Returns: e
-
-Returns: s
-
-Returns: .
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: p
-
-Returns: u
-
-Returns: b
-
-Returns: l
-
-Returns: i
-
-Returns: c
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: 
-
-Returns: i
-
-Returns: n
-
-Returns: d
-
-Returns: i
-
-Returns: c
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: s
-
-Returns: 
-
-Returns: p
-
-Returns: r
-
-Returns: i
-
-Returns: v
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: 
-
-Returns: d
-
-Returns: o
-
-Returns: c
-
-Returns: k
-
-Returns: e
-
-Returns: r
-
-Returns: ,
-
-Returns: 
-
-Returns: 1
-
-Returns: 
-
-Returns: i
-
-Returns: n
-
-Returns: d
-
-Returns: i
-
-Returns: c
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: s
-
-Returns: 
-
-Returns: p
-
-Returns: u
-
-Returns: b
-
-Returns: l
-
-Returns: i
-
-Returns: c
-
-Returns: 
-
-Returns: d
-
-Returns: o
-
-Returns: c
-
-Returns: k
-
-Returns: e
-
-Returns: r
-
-Returns: .
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: r
-
-Returns: e
-
-Returns: g
-
-Returns: i
-
-Returns: o
-
-Returns: n
-
-Returns: :
-
-Returns: 
-
-Returns: G
-
-Returns: e
-
-Returns: o
-
-Returns: g
-
-Returns: r
-
-Returns: a
-
-Returns: p
-
-Returns: h
-
-Returns: i
-
-Returns: c
-
-Returns: 
-
-Returns: l
-
-Returns: o
-
-Returns: c
-
-Returns: a
-
-Returns: t
-
-Returns: i
-
-Returns: o
-
-Returns: n
-
-Returns: .
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: v
-
-Returns: e
-
-Returns: r
-
-Returns: s
-
-Returns: i
-
-Returns: o
-
-Returns: n
-
-Returns: :
-
-Returns: 
-
-Returns: D
-
-Returns: e
-
-Returns: t
-
-Returns: a
-
-Returns: i
-
-Returns: l
-
-Returns: e
-
-Returns: d
-
-Returns: 
-
-Returns: v
-
-Returns: e
-
-Returns: r
-
-Returns: s
-
-Returns: i
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: i
-
-Returns: n
-
-Returns: f
-
-Returns: o
-
-Returns: r
-
-Returns: m
-
-Returns: a
-
-Returns: t
-
-Returns: i
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: o
-
-Returns: f
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: d
-
-Returns: o
-
-Returns: c
-
-Returns: k
-
-Returns: e
-
-Returns: r
-
-Returns: .
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: w
-
-Returns: d
-
-Returns: :
-
-Returns: 
-
-Returns: O
-
-Returns: f
-
-Returns: f
-
-Returns: l
-
-Returns: i
-
-Returns: n
-
-Returns: e
-
-Returns: 
-
-Returns: a
-
-Returns: l
-
-Returns: a
-
-Returns: r
-
-Returns: m
-
-Returns: 
-
-Returns: s
-
-Returns: w
-
-Returns: i
-
-Returns: t
-
-Returns: c
-
-Returns: h
-
-Returns: ,
-
-Returns: 
-
-Returns: 0
-
-Returns: 
-
-Returns: i
-
-Returns: n
-
-Returns: d
-
-Returns: i
-
-Returns: c
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: s
-
-Returns: 
-
-Returns: n
-
-Returns: o
-
-Returns: t
-
-Returns: 
-
-Returns: e
-
-Returns: n
-
-Returns: a
-
-Returns: b
-
-Returns: l
-
-Returns: e
-
-Returns: d
-
-Returns: .
-
-Returns: 
-
-Returns: O
-
-Returns: n
-
-Returns: e
-
-Returns: -
-
-Returns: c
-
-Returns: l
-
-Returns: i
-
-Returns: c
-
-Returns: k
-
-Returns: 
-
-Returns: d
-
-Returns: e
-
-Returns: p
-
-Returns: l
-
-Returns: o
-
-Returns: y
-
-Returns: e
-
-Returns: d
-
-Returns: 
-
-Returns: d
-
-Returns: o
-
-Returns: c
-
-Returns: k
-
-Returns: e
-
-Returns: r
-
-Returns: s
-
-Returns: 
-
-Returns: c
-
-Returns: o
-
-Returns: n
-
-Returns: t
-
-Returns: a
-
-Returns: i
-
-Returns: n
-
-Returns: 
-
-Returns: a
-
-Returns: d
-
-Returns: d
-
-Returns: i
-
-Returns: t
-
-Returns: i
-
-Returns: o
-
-Returns: n
-
-Returns: a
-
-Returns: l
-
-Returns: 
-
-Returns: i
-
-Returns: n
-
-Returns: f
-
-Returns: o
-
-Returns: r
-
-Returns: m
-
-Returns: a
-
-Returns: t
-
-Returns: i
-
-Returns: o
-
-Returns: n
-
-Returns: ,
-
-Returns: 
-
-Returns: w
-
-Returns: i
-
-Returns: t
-
-Returns: h
-
-Returns: 
-
-Returns: r
-
-Returns: e
-
-Returns: l
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: d
-
-Returns: 
-
-Returns: f
-
-Returns: i
-
-Returns: e
-
-Returns: l
-
-Returns: d
-
-Returns: s
-
-Returns: 
-
-Returns: p
-
-Returns: r
-
-Returns: e
-
-Returns: f
-
-Returns: i
-
-Returns: x
-
-Returns: e
-
-Returns: d
-
-Returns: 
-
-Returns: b
-
-Returns: y
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: e
-
-Returns: c
-
-Returns: s
-
-Returns: _
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 
-
-Returns: a
-
-Returns: n
-
-Returns: d
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: u
-
-Returns: n
-
-Returns: i
-
-Returns: t
-
-Returns: _
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: ,
-
-Returns: 
-
-Returns: r
-
-Returns: e
-
-Returns: c
-
-Returns: o
-
-Returns: r
-
-Returns: d
-
-Returns: i
-
-Returns: n
-
-Returns: g
-
-Returns: 
-
-Returns: i
-
-Returns: n
-
-Returns: f
-
-Returns: o
-
-Returns: r
-
-Returns: m
-
-Returns: a
-
-Returns: t
-
-Returns: i
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: a
-
-Returns: b
-
-Returns: o
-
-Returns: u
-
-Returns: t
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: o
-
-Returns: n
-
-Returns: e
-
-Returns: -
-
-Returns: c
-
-Returns: l
-
-Returns: i
-
-Returns: c
-
-Returns: k
-
-Returns: 
-
-Returns: d
-
-Returns: e
-
-Returns: p
-
-Returns: l
-
-Returns: o
-
-Returns: y
-
-Returns: e
-
-Returns: d
-
-Returns: 
-
-Returns: d
-
-Returns: o
-
-Returns: c
-
-Returns: k
-
-Returns: e
-
-Returns: r
-
-Returns: 
-
-Returns: s
-
-Returns: e
-
-Returns: r
-
-Returns: v
-
-Returns: e
-
-Returns: r
-
-Returns: 
-
-Returns: (
-
-Returns: o
-
-Returns: p
-
-Returns: e
-
-Returns: r
-
-Returns: a
-
-Returns: t
-
-Returns: o
-
-Returns: r
-
-Returns: 
-
-Returns: n
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: ,
-
-Returns: 
-
-Returns: c
-
-Returns: o
-
-Returns: n
-
-Returns: f
-
-Returns: i
-
-Returns: g
-
-Returns: u
-
-Returns: r
-
-Returns: a
-
-Returns: t
-
-Returns: i
-
-Returns: o
-
-Returns: n
-
-Returns: ,
-
-Returns: 
-
-Returns: s
-
-Returns: t
-
-Returns: a
-
-Returns: t
-
-Returns: u
-
-Returns: s
-
-Returns: ,
-
-Returns: 
-
-Returns: e
-
-Returns: t
-
-Returns: c
-
-Returns: .
-
-Returns: )
-
-Returns: ,
-
-Returns: 
-
-Returns: b
-
-Returns: i
-
-Returns: l
-
-Returns: l
-
-Returns: i
-
-Returns: n
-
-Returns: g
-
-Returns: 
-
-Returns: c
-
-Returns: y
-
-Returns: c
-
-Returns: l
-
-Returns: e
-
-Returns: ,
-
-Returns: 
-
-Returns: p
-
-Returns: r
-
-Returns: i
-
-Returns: c
-
-Returns: e
-
-Returns: ,
-
-Returns: 
-
-Returns: a
-
-Returns: n
-
-Returns: d
-
-Returns: 
-
-Returns: o
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: r
-
-Returns: 
-
-Returns: i
-
-Returns: n
-
-Returns: f
-
-Returns: o
-
-Returns: r
-
-Returns: m
-
-Returns: a
-
-Returns: t
-
-Returns: i
-
-Returns: o
-
-Returns: n
-
-Returns: ,
-
-Returns: 
-
-Returns: w
-
-Returns: h
-
-Returns: i
-
-Returns: c
-
-Returns: h
-
-Returns: 
-
-Returns: w
-
-Returns: i
-
-Returns: l
-
-Returns: l
-
-Returns: 
-
-Returns: n
-
-Returns: o
-
-Returns: t
-
-Returns: 
-
-Returns: b
-
-Returns: e
-
-Returns: 
-
-Returns: d
-
-Returns: e
-
-Returns: t
-
-Returns: a
-
-Returns: i
-
-Returns: l
-
-Returns: e
-
-Returns: d
-
-Returns: 
-
-Returns: h
-
-Returns: e
-
-Returns: r
-
-Returns: e
-
-Returns: .
-
-##### GetRobotGroupList
-
-The ```GetRobotGroupList``` method is used to get the list of live trading groups under the FMZ Quant Trading Platform account corresponding to the ```API KEY``` in the request.
+- `offset` (number, optional): Paging offset, default 0.
+- `limit` (number, optional): Page size; omitted or less than or equal to 0 returns everything.
+
+Returns:
+
+```json
+{
+    "code": 0,
+    "data": {
+        "result": {
+            "all": 1,
+            "nodes": [{
+                "build": "3.7",
+                "city": "...",
+                "created": "2024-11-08 09:21:08",
+                "date": "2024-11-08 16:37:16",
+                "forward": "...",
+                "guid": "...",
+                "host": "node.fmz.com:9902",
+                "id": 123,
+                "ip": "...",
+                "is_owner": true,
+                "loaded": 0,
+                "name": "MacBook-Pro-2.local",
+                "online": true,
+                "os": "darwin/amd64",
+                "peer": "...",
+                "public": 0,
+                "region": "...",
+                "tunnel": false,
+                "version": "...",
+                "wd": 0
+            }]
+        },
+        "error": null
+    }
+}
+```
+
+Return value field descriptions (fields with obvious literal meanings are not elaborated):
+- all: Total number of dockers (public dockers included).
+- nodes: List of detailed information for docker nodes.
+  - build: Version number.
+  - city: City location.
+  - is_owner: true indicates private docker, false indicates public docker.
+  - loaded: Load amount, i.e., the number of currently running strategy instances.
+  - public: 0 indicates private docker, 1 indicates public docker.
+  - region: Geographic location.
+  - version: Detailed version information of the docker.
+  - wd: Offline alarm switch, 0 indicates not enabled.
+
+One-click deployed dockers contain additional information, with related fields prefixed by ```ecs_``` and ```unit_```, recording information about the one-click deployed docker server (operator name, configuration, status, etc.), billing cycle, price, and other information, which will not be detailed here.
+
+###### DeleteNode
+
+The ```DeleteNode``` method is used to delete a docker node under the FMZ Quant Trading Platform account corresponding to the ```API KEY``` in the request. The docker node ID to be deleted is specified by the ```nid``` parameter.
 
 Parameters:
 
-- N
-- o
-- 
-- p
-- a
-- r
-- a
-- m
-- e
-- t
-- e
-- r
-- s
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: j
-
-Returns: s
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: i
-
-Returns: t
-
-Returns: e
-
-Returns: m
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: [
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 3
-
-Returns: 4
-
-Returns: 1
-
-Returns: 7
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: n
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: T
-
-Returns: e
-
-Returns: s
-
-Returns: t
-
-Returns: "
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ,
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 3
-
-Returns: 6
-
-Returns: 0
-
-Returns: 8
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: n
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: L
-
-Returns: i
-
-Returns: v
-
-Returns: e
-
-Returns: 
-
-Returns: T
-
-Returns: r
-
-Returns: a
-
-Returns: d
-
-Returns: i
-
-Returns: n
-
-Returns: g
-
-Returns: 
-
-Returns: D
-
-Returns: e
-
-Returns: m
-
-Returns: o
-
-Returns: "
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ]
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: r
-
-Returns: r
-
-Returns: o
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: n
-
-Returns: u
-
-Returns: l
-
-Returns: l
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: i
-
-Returns: t
-
-Returns: e
-
-Returns: m
-
-Returns: s
-
-Returns: :
-
-Returns: 
-
-Returns: L
-
-Returns: i
-
-Returns: v
-
-Returns: e
-
-Returns: 
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: d
-
-Returns: i
-
-Returns: n
-
-Returns: g
-
-Returns: 
-
-Returns: g
-
-Returns: r
-
-Returns: o
-
-Returns: u
-
-Returns: p
-
-Returns: 
-
-Returns: i
-
-Returns: n
-
-Returns: f
-
-Returns: o
-
-Returns: r
-
-Returns: m
-
-Returns: a
-
-Returns: t
-
-Returns: i
-
-Returns: o
-
-Returns: n
-
-Returns: .
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: i
-
-Returns: d
-
-Returns: :
-
-Returns: 
-
-Returns: L
-
-Returns: i
-
-Returns: v
-
-Returns: e
-
-Returns: 
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: d
-
-Returns: i
-
-Returns: n
-
-Returns: g
-
-Returns: 
-
-Returns: g
-
-Returns: r
-
-Returns: o
-
-Returns: u
-
-Returns: p
-
-Returns: 
-
-Returns: I
-
-Returns: D
-
-Returns: .
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: n
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: :
-
-Returns: 
-
-Returns: L
-
-Returns: i
-
-Returns: v
-
-Returns: e
-
-Returns: 
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: d
-
-Returns: i
-
-Returns: n
-
-Returns: g
-
-Returns: 
-
-Returns: g
-
-Returns: r
-
-Returns: o
-
-Returns: u
-
-Returns: p
-
-Returns: 
-
-Returns: n
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: .
-
-Returns: 
-
-Returns: T
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: i
-
-Returns: t
-
-Returns: e
-
-Returns: m
-
-Returns: s
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 
-
-Returns: f
-
-Returns: i
-
-Returns: e
-
-Returns: l
-
-Returns: d
-
-Returns: 
-
-Returns: o
-
-Returns: n
-
-Returns: l
-
-Returns: y
-
-Returns: 
-
-Returns: r
-
-Returns: e
-
-Returns: c
-
-Returns: o
-
-Returns: r
-
-Returns: d
-
-Returns: s
-
-Returns: 
-
-Returns: n
-
-Returns: e
-
-Returns: w
-
-Returns: l
-
-Returns: y
-
-Returns: 
-
-Returns: c
-
-Returns: r
-
-Returns: e
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: d
-
-Returns: 
-
-Returns: g
-
-Returns: r
-
-Returns: o
-
-Returns: u
-
-Returns: p
-
-Returns: s
-
-Returns: ,
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: "
-
-Returns: D
-
-Returns: e
-
-Returns: f
-
-Returns: a
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: "
-
-Returns: 
-
-Returns: g
-
-Returns: r
-
-Returns: o
-
-Returns: u
-
-Returns: p
-
-Returns: 
-
-Returns: i
-
-Returns: s
-
-Returns: 
-
-Returns: n
-
-Returns: o
-
-Returns: t
-
-Returns: 
-
-Returns: i
-
-Returns: n
-
-Returns: c
-
-Returns: l
-
-Returns: u
-
-Returns: d
-
-Returns: e
-
-Returns: d
-
-Returns: 
-
-Returns: i
-
-Returns: n
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: i
-
-Returns: t
-
-Returns: e
-
-Returns: m
-
-Returns: s
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: .
-
-##### GetPlatformList
+- `nid` (number, required): The ```nid``` parameter is used to specify the docker ID to be deleted. You can obtain the docker information under the account through the ```GetNodeList``` method.
+
+Returns:
+
+```json
+{
+    "code":0,
+    "data":{
+        "result":true,
+        "error":null
+    }
+}
+```
+
+- result: Whether the associated docker program was successfully deleted.
+
+###### GetExchangeList
+
+The ```GetExchangeList``` method is used to get the list of exchanges supported by the FMZ quantitative trading platform and their configuration information.
+
+Parameters:
+
+- `isSummary` (bool, required): The ```isSummary``` parameter is used to specify whether the returned data is summary information.
+
+Returns:
+
+When the ```isSummary``` parameter is ```false```, the returned data:
+
+```json
+{
+    "code": 0,
+    "data": {
+        "result": {
+            "exchanges": [{
+                "category": "加密货币||Crypto",
+                "eid": "Futures_Binance",
+                "id": 74,
+                "logo": "/upload/asset/d8d84b23e573e9326b99.svg",
+                "meta": "[{\"desc\": \"Access Key\", \"qr\":\"apiKey\",\"required\": true, \"type\": \"string\", \"name\": \"AccessKey\", \"label\": \"Access Key\"}, {\"encrypt\": true, \"qr\":\"secretKey\",\"name\": \"SecretKey\", \"required\": true, \"label\": \"Secret Key\", \"type\": \"password\", \"desc\": \"Secret Key\"}]",
+                "name": "币安期货|Futures_Binance",
+                "priority": 200,
+                "stocks": "BTC_USDT,ETH_USDT,ETH_USD",
+                "website": "https://accounts.binance.com/zh-TC/register?ref=45110270"
+            }]
+        },
+        "error": null
+    }
+}
+```
+
+When the ```isSummary``` parameter is ```true```, the returned data:
+
+```json
+{
+    "code": 0,
+    "data": {
+        "result": {
+            "exchanges": [{
+                "category": "加密货币||Crypto",
+                "eid": "Futures_Binance",
+                "id": 74,
+                "logo": "/upload/asset/d8d84b23e573e9326b99.svg",
+                "name": "币安期货|Futures_Binance",
+                "priority": 200,
+                "website": "https://accounts.binance.com/zh-TC/register?ref=45110270"
+            }]
+        },
+        "error": null
+    }
+}
+```
+
+- meta: Exchange configuration metadata.
+
+###### GetPlatformList
 
 The ```GetPlatformList``` method is used to get the list of configured exchanges under the FMZ Quant Trading Platform account corresponding to the ```API KEY``` in the request.
 
 Parameters:
 
-- N
-- o
-- 
-- p
-- a
-- r
-- a
-- m
-- e
-- t
-- e
-- r
-- s
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: j
-
-Returns: s
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: a
-
-Returns: l
-
-Returns: l
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 2
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: p
-
-Returns: l
-
-Returns: a
-
-Returns: t
-
-Returns: f
-
-Returns: o
-
-Returns: r
-
-Returns: m
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: [
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: g
-
-Returns: o
-
-Returns: r
-
-Returns: y
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 加
-
-Returns: 密
-
-Returns: 货
-
-Returns: 币
-
-Returns: |
-
-Returns: |
-
-Returns: C
-
-Returns: r
-
-Returns: y
-
-Returns: p
-
-Returns: t
-
-Returns: o
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 2
-
-Returns: 0
-
-Returns: 2
-
-Returns: 3
-
-Returns: -
-
-Returns: 1
-
-Returns: 2
-
-Returns: -
-
-Returns: 0
-
-Returns: 7
-
-Returns: 
-
-Returns: 1
-
-Returns: 3
-
-Returns: :
-
-Returns: 4
-
-Returns: 4
-
-Returns: :
-
-Returns: 5
-
-Returns: 2
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: B
-
-Returns: i
-
-Returns: n
-
-Returns: a
-
-Returns: n
-
-Returns: c
-
-Returns: e
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 1
-
-Returns: 2
-
-Returns: 3
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: l
-
-Returns: a
-
-Returns: b
-
-Returns: e
-
-Returns: l
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 币
-
-Returns: 安
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: l
-
-Returns: o
-
-Returns: g
-
-Returns: o
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: .
-
-Returns: .
-
-Returns: .
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: n
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 币
-
-Returns: 安
-
-Returns: 现
-
-Returns: 货
-
-Returns: |
-
-Returns: B
-
-Returns: i
-
-Returns: n
-
-Returns: a
-
-Returns: n
-
-Returns: c
-
-Returns: e
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: t
-
-Returns: o
-
-Returns: c
-
-Returns: k
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: [
-
-Returns: "
-
-Returns: B
-
-Returns: T
-
-Returns: C
-
-Returns: _
-
-Returns: U
-
-Returns: S
-
-Returns: D
-
-Returns: T
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: "
-
-Returns: L
-
-Returns: T
-
-Returns: C
-
-Returns: _
-
-Returns: U
-
-Returns: S
-
-Returns: D
-
-Returns: T
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: "
-
-Returns: E
-
-Returns: T
-
-Returns: H
-
-Returns: _
-
-Returns: U
-
-Returns: S
-
-Returns: D
-
-Returns: T
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: "
-
-Returns: E
-
-Returns: T
-
-Returns: C
-
-Returns: _
-
-Returns: U
-
-Returns: S
-
-Returns: D
-
-Returns: T
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: "
-
-Returns: B
-
-Returns: T
-
-Returns: C
-
-Returns: _
-
-Returns: T
-
-Returns: U
-
-Returns: S
-
-Returns: D
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: "
-
-Returns: E
-
-Returns: T
-
-Returns: H
-
-Returns: _
-
-Returns: T
-
-Returns: U
-
-Returns: S
-
-Returns: D
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: "
-
-Returns: B
-
-Returns: N
-
-Returns: B
-
-Returns: _
-
-Returns: T
-
-Returns: U
-
-Returns: S
-
-Returns: D
-
-Returns: "
-
-Returns: ]
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: w
-
-Returns: e
-
-Returns: b
-
-Returns: s
-
-Returns: i
-
-Returns: t
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: .
-
-Returns: .
-
-Returns: .
-
-Returns: "
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ,
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: g
-
-Returns: o
-
-Returns: r
-
-Returns: y
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 通
-
-Returns: 用
-
-Returns: 协
-
-Returns: 议
-
-Returns: |
-
-Returns: C
-
-Returns: u
-
-Returns: s
-
-Returns: t
-
-Returns: o
-
-Returns: m
-
-Returns: 
-
-Returns: P
-
-Returns: r
-
-Returns: o
-
-Returns: t
-
-Returns: o
-
-Returns: c
-
-Returns: o
-
-Returns: l
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 2
-
-Returns: 0
-
-Returns: 2
-
-Returns: 0
-
-Returns: -
-
-Returns: 1
-
-Returns: 1
-
-Returns: -
-
-Returns: 0
-
-Returns: 9
-
-Returns: 
-
-Returns: 1
-
-Returns: 1
-
-Returns: :
-
-Returns: 2
-
-Returns: 3
-
-Returns: :
-
-Returns: 4
-
-Returns: 8
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: E
-
-Returns: x
-
-Returns: c
-
-Returns: h
-
-Returns: a
-
-Returns: n
-
-Returns: g
-
-Returns: e
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 1
-
-Returns: 2
-
-Returns: 3
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: l
-
-Returns: a
-
-Returns: b
-
-Returns: e
-
-Returns: l
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: X
-
-Returns: X
-
-Returns: 交
-
-Returns: 易
-
-Returns: 所
-
-Returns: R
-
-Returns: E
-
-Returns: S
-
-Returns: T
-
-Returns: 协
-
-Returns: 议
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: l
-
-Returns: o
-
-Returns: g
-
-Returns: o
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: .
-
-Returns: .
-
-Returns: .
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: n
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 通
-
-Returns: 用
-
-Returns: 协
-
-Returns: 议
-
-Returns: |
-
-Returns: C
-
-Returns: u
-
-Returns: s
-
-Returns: t
-
-Returns: o
-
-Returns: m
-
-Returns: 
-
-Returns: P
-
-Returns: r
-
-Returns: o
-
-Returns: t
-
-Returns: o
-
-Returns: c
-
-Returns: o
-
-Returns: l
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: t
-
-Returns: o
-
-Returns: c
-
-Returns: k
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: [
-
-Returns: "
-
-Returns: B
-
-Returns: T
-
-Returns: C
-
-Returns: _
-
-Returns: U
-
-Returns: S
-
-Returns: D
-
-Returns: T
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: "
-
-Returns: E
-
-Returns: T
-
-Returns: H
-
-Returns: _
-
-Returns: U
-
-Returns: S
-
-Returns: D
-
-Returns: T
-
-Returns: "
-
-Returns: ]
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: w
-
-Returns: e
-
-Returns: b
-
-Returns: s
-
-Returns: i
-
-Returns: t
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: "
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ]
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: r
-
-Returns: r
-
-Returns: o
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: n
-
-Returns: u
-
-Returns: l
-
-Returns: l
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: a
-
-Returns: l
-
-Returns: l
-
-Returns: :
-
-Returns: 
-
-Returns: T
-
-Returns: o
-
-Returns: t
-
-Returns: a
-
-Returns: l
-
-Returns: 
-
-Returns: n
-
-Returns: u
-
-Returns: m
-
-Returns: b
-
-Returns: e
-
-Returns: r
-
-Returns: 
-
-Returns: o
-
-Returns: f
-
-Returns: 
-
-Returns: c
-
-Returns: o
-
-Returns: n
-
-Returns: f
-
-Returns: i
-
-Returns: g
-
-Returns: u
-
-Returns: r
-
-Returns: e
-
-Returns: d
-
-Returns: 
-
-Returns: e
-
-Returns: x
-
-Returns: c
-
-Returns: h
-
-Returns: a
-
-Returns: n
-
-Returns: g
-
-Returns: e
-
-Returns: 
-
-Returns: o
-
-Returns: b
-
-Returns: j
-
-Returns: e
-
-Returns: c
-
-Returns: t
-
-Returns: s
-
-Returns: .
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: p
-
-Returns: l
-
-Returns: a
-
-Returns: t
-
-Returns: f
-
-Returns: o
-
-Returns: r
-
-Returns: m
-
-Returns: s
-
-Returns: :
-
-Returns: 
-
-Returns: E
-
-Returns: x
-
-Returns: c
-
-Returns: h
-
-Returns: a
-
-Returns: n
-
-Returns: g
-
-Returns: e
-
-Returns: 
-
-Returns: r
-
-Returns: e
-
-Returns: l
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: d
-
-Returns: 
-
-Returns: i
-
-Returns: n
-
-Returns: f
-
-Returns: o
-
-Returns: r
-
-Returns: m
-
-Returns: a
-
-Returns: t
-
-Returns: i
-
-Returns: o
-
-Returns: n
-
-Returns: .
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: e
-
-Returns: i
-
-Returns: d
-
-Returns: :
-
-Returns: 
-
-Returns: E
-
-Returns: x
-
-Returns: c
-
-Returns: h
-
-Returns: a
-
-Returns: n
-
-Returns: g
-
-Returns: e
-
-Returns: 
-
-Returns: i
-
-Returns: d
-
-Returns: e
-
-Returns: n
-
-Returns: t
-
-Returns: i
-
-Returns: f
-
-Returns: i
-
-Returns: e
-
-Returns: r
-
-Returns: 
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: F
-
-Returns: M
-
-Returns: Z
-
-Returns: 
-
-Returns: Q
-
-Returns: u
-
-Returns: a
-
-Returns: n
-
-Returns: t
-
-Returns: 
-
-Returns: T
-
-Returns: r
-
-Returns: a
-
-Returns: d
-
-Returns: i
-
-Returns: n
-
-Returns: g
-
-Returns: 
-
-Returns: P
-
-Returns: l
-
-Returns: a
-
-Returns: t
-
-Returns: f
-
-Returns: o
-
-Returns: r
-
-Returns: m
-
-Returns: ,
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: e
-
-Returns: i
-
-Returns: d
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 
-
-Returns: i
-
-Returns: s
-
-Returns: 
-
-Returns: r
-
-Returns: e
-
-Returns: q
-
-Returns: u
-
-Returns: i
-
-Returns: r
-
-Returns: e
-
-Returns: d
-
-Returns: 
-
-Returns: i
-
-Returns: n
-
-Returns: 
-
-Returns: c
-
-Returns: e
-
-Returns: r
-
-Returns: t
-
-Returns: a
-
-Returns: i
-
-Returns: n
-
-Returns: 
-
-Returns: c
-
-Returns: o
-
-Returns: n
-
-Returns: f
-
-Returns: i
-
-Returns: g
-
-Returns: u
-
-Returns: r
-
-Returns: a
-
-Returns: t
-
-Returns: i
-
-Returns: o
-
-Returns: n
-
-Returns: s
-
-Returns: 
-
-Returns: a
-
-Returns: n
-
-Returns: d
-
-Returns: 
-
-Returns: p
-
-Returns: a
-
-Returns: r
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: t
-
-Returns: e
-
-Returns: r
-
-Returns: s
-
-Returns: .
-
-##### GetRobotList
-
-The ```GetRobotList``` method is used to get the list of live trading bots under the FMZ Quant Trading Platform account corresponding to the ```API KEY``` in the request.
-
-Parameters:
-
-- `offset` (number, optional): Offset setting for pagination query.
-- `length` (number, optional): Data length setting for pagination query.
-- `robotStatus` (number, optional): Specify the status of live trading bots to query, refer to Extended API Interface ["Live Trading Status Codes"](/user-guide/extended-api-interface/live-trading-status-codes), pass ```-1``` to get all live trading bots.
-- `label` (string, optional): Specify the custom label of live trading bots to query, can filter all live trading bots containing this label.
-- `keyWord` (string, optional): Query keyword.
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: j
-
-Returns: s
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: a
-
-Returns: l
-
-Returns: l
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 1
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: o
-
-Returns: n
-
-Returns: c
-
-Returns: u
-
-Returns: r
-
-Returns: r
-
-Returns: e
-
-Returns: n
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: o
-
-Returns: b
-
-Returns: o
-
-Returns: t
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: [
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: h
-
-Returns: a
-
-Returns: r
-
-Returns: g
-
-Returns: e
-
-Returns: _
-
-Returns: t
-
-Returns: i
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 1
-
-Returns: 7
-
-Returns: 3
-
-Returns: 1
-
-Returns: 6
-
-Returns: 5
-
-Returns: 4
-
-Returns: 8
-
-Returns: 4
-
-Returns: 6
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 2
-
-Returns: 0
-
-Returns: 2
-
-Returns: 4
-
-Returns: -
-
-Returns: 1
-
-Returns: 1
-
-Returns: -
-
-Returns: 1
-
-Returns: 2
-
-Returns: 
-
-Returns: 1
-
-Returns: 4
-
-Returns: :
-
-Returns: 0
-
-Returns: 5
-
-Returns: :
-
-Returns: 2
-
-Returns: 9
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: n
-
-Returns: d
-
-Returns: _
-
-Returns: t
-
-Returns: i
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 2
-
-Returns: 0
-
-Returns: 2
-
-Returns: 4
-
-Returns: -
-
-Returns: 1
-
-Returns: 1
-
-Returns: -
-
-Returns: 1
-
-Returns: 5
-
-Returns: 
-
-Returns: 1
-
-Returns: 4
-
-Returns: :
-
-Returns: 5
-
-Returns: 6
-
-Returns: :
-
-Returns: 3
-
-Returns: 2
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: f
-
-Returns: i
-
-Returns: x
-
-Returns: e
-
-Returns: d
-
-Returns: _
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 4
-
-Returns: 5
-
-Returns: 0
-
-Returns: 9
-
-Returns: 1
-
-Returns: 5
-
-Returns: 3
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 5
-
-Returns: 9
-
-Returns: 1
-
-Returns: 0
-
-Returns: 2
-
-Returns: 6
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: i
-
-Returns: s
-
-Returns: _
-
-Returns: s
-
-Returns: a
-
-Returns: n
-
-Returns: d
-
-Returns: b
-
-Returns: o
-
-Returns: x
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: n
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: T
-
-Returns: e
-
-Returns: s
-
-Returns: t
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: n
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: _
-
-Returns: g
-
-Returns: u
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 4
-
-Returns: 5
-
-Returns: 8
-
-Returns: 9
-
-Returns: 1
-
-Returns: b
-
-Returns: c
-
-Returns: f
-
-Returns: 3
-
-Returns: d
-
-Returns: 5
-
-Returns: 7
-
-Returns: f
-
-Returns: 9
-
-Returns: 9
-
-Returns: b
-
-Returns: 0
-
-Returns: 8
-
-Returns: a
-
-Returns: 4
-
-Returns: 3
-
-Returns: d
-
-Returns: f
-
-Returns: f
-
-Returns: 7
-
-Returns: 6
-
-Returns: e
-
-Returns: e
-
-Returns: 1
-
-Returns: e
-
-Returns: a
-
-Returns: 1
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: n
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: _
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 4
-
-Returns: 5
-
-Returns: 1
-
-Returns: 9
-
-Returns: 1
-
-Returns: 5
-
-Returns: 3
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: n
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: _
-
-Returns: p
-
-Returns: u
-
-Returns: b
-
-Returns: l
-
-Returns: i
-
-Returns: c
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: p
-
-Returns: r
-
-Returns: o
-
-Returns: f
-
-Returns: i
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: p
-
-Returns: u
-
-Returns: b
-
-Returns: l
-
-Returns: i
-
-Returns: c
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: f
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: h
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 1
-
-Returns: 7
-
-Returns: 3
-
-Returns: 1
-
-Returns: 6
-
-Returns: 5
-
-Returns: 1
-
-Returns: 2
-
-Returns: 5
-
-Returns: 7
-
-Returns: 0
-
-Returns: 0
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: t
-
-Returns: a
-
-Returns: r
-
-Returns: t
-
-Returns: _
-
-Returns: t
-
-Returns: i
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 2
-
-Returns: 0
-
-Returns: 2
-
-Returns: 4
-
-Returns: -
-
-Returns: 1
-
-Returns: 1
-
-Returns: -
-
-Returns: 1
-
-Returns: 5
-
-Returns: 
-
-Returns: 1
-
-Returns: 4
-
-Returns: :
-
-Returns: 5
-
-Returns: 6
-
-Returns: :
-
-Returns: 3
-
-Returns: 0
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: t
-
-Returns: a
-
-Returns: t
-
-Returns: u
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 3
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: g
-
-Returns: y
-
-Returns: _
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 4
-
-Returns: 1
-
-Returns: 1
-
-Returns: 6
-
-Returns: 7
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: g
-
-Returns: y
-
-Returns: _
-
-Returns: i
-
-Returns: s
-
-Returns: o
-
-Returns: w
-
-Returns: n
-
-Returns: e
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: t
-
-Returns: r
-
-Returns: u
-
-Returns: e
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: g
-
-Returns: y
-
-Returns: _
-
-Returns: l
-
-Returns: a
-
-Returns: n
-
-Returns: g
-
-Returns: u
-
-Returns: a
-
-Returns: g
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: g
-
-Returns: y
-
-Returns: _
-
-Returns: n
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: T
-
-Returns: e
-
-Returns: s
-
-Returns: t
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: g
-
-Returns: y
-
-Returns: _
-
-Returns: p
-
-Returns: u
-
-Returns: b
-
-Returns: l
-
-Returns: i
-
-Returns: c
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: u
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 1
-
-Returns: 0
-
-Returns: 5
-
-Returns: e
-
-Returns: d
-
-Returns: 6
-
-Returns: e
-
-Returns: 5
-
-Returns: 1
-
-Returns: 1
-
-Returns: c
-
-Returns: c
-
-Returns: 9
-
-Returns: 7
-
-Returns: 7
-
-Returns: 9
-
-Returns: 2
-
-Returns: 1
-
-Returns: 6
-
-Returns: 1
-
-Returns: 0
-
-Returns: f
-
-Returns: d
-
-Returns: b
-
-Returns: b
-
-Returns: 7
-
-Returns: e
-
-Returns: 2
-
-Returns: a
-
-Returns: 1
-
-Returns: d
-
-Returns: 6
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: w
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ]
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: r
-
-Returns: r
-
-Returns: o
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: n
-
-Returns: u
-
-Returns: l
-
-Returns: l
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: r
-
-Returns: o
-
-Returns: b
-
-Returns: o
-
-Returns: t
-
-Returns: s
-
-Returns: :
-
-Returns: 
-
-Returns: L
-
-Returns: i
-
-Returns: v
-
-Returns: e
-
-Returns: 
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: d
-
-Returns: i
-
-Returns: n
-
-Returns: g
-
-Returns: 
-
-Returns: b
-
-Returns: o
-
-Returns: t
-
-Returns: 
-
-Returns: i
-
-Returns: n
-
-Returns: f
-
-Returns: o
-
-Returns: r
-
-Returns: m
-
-Returns: a
-
-Returns: t
-
-Returns: i
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: g
-
-Returns: r
-
-Returns: o
-
-Returns: u
-
-Returns: p
-
-Returns: _
-
-Returns: i
-
-Returns: d
-
-Returns: :
-
-Returns: 
-
-Returns: L
-
-Returns: i
-
-Returns: v
-
-Returns: e
-
-Returns: 
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: d
-
-Returns: i
-
-Returns: n
-
-Returns: g
-
-Returns: 
-
-Returns: b
-
-Returns: o
-
-Returns: t
-
-Returns: 
-
-Returns: g
-
-Returns: r
-
-Returns: o
-
-Returns: u
-
-Returns: p
-
-Returns: 
-
-Returns: I
-
-Returns: D
-
-Returns: ;
-
-Returns: 
-
-Returns: i
-
-Returns: f
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: l
-
-Returns: i
-
-Returns: v
-
-Returns: e
-
-Returns: 
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: d
-
-Returns: i
-
-Returns: n
-
-Returns: g
-
-Returns: 
-
-Returns: b
-
-Returns: o
-
-Returns: t
-
-Returns: 
-
-Returns: i
-
-Returns: s
-
-Returns: 
-
-Returns: i
-
-Returns: n
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: d
-
-Returns: e
-
-Returns: f
-
-Returns: a
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: 
-
-Returns: g
-
-Returns: r
-
-Returns: o
-
-Returns: u
-
-Returns: p
-
-Returns: ,
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: g
-
-Returns: r
-
-Returns: o
-
-Returns: u
-
-Returns: p
-
-Returns: _
-
-Returns: i
-
-Returns: d
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 
-
-Returns: f
-
-Returns: i
-
-Returns: e
-
-Returns: l
-
-Returns: d
-
-Returns: 
-
-Returns: i
-
-Returns: s
-
-Returns: 
-
-Returns: n
-
-Returns: o
-
-Returns: t
-
-Returns: 
-
-Returns: i
-
-Returns: n
-
-Returns: c
-
-Returns: l
-
-Returns: u
-
-Returns: d
-
-Returns: e
-
-Returns: d
-
-Returns: .
-
-Taking the Extended API Interface ["Authentication Method"](/user-guide/extended-api-interface/authentication-method) in ```Python``` language as an example:
-
-```print(api('GetRobotList'))```: Get all live trading bot information.
-
-```print(api('GetRobotList', 'member2'))```: Print all live trading bot information with custom label member2.
-
-```print(api('GetRobotList', 0, 5, -1, 'member2'))```: Pagination query, starting from offset 0, returning at most 5 live trading bots with label member2.
-
-##### CommandRobot
-
-The ```CommandRobot``` method is used to send interactive commands to a live trading bot under the FMZ Quant Trading Platform account corresponding to the ```API KEY``` in the request. The bot Id that receives the interactive command is specified by the ```robotId``` parameter, and the interactive command is captured and returned by the ```GetCommand()``` function called in the strategy.
-
-Parameters:
-
-- `robotId` (number, required): The ```robotId``` parameter is used to specify the bot Id that receives the interactive command. You can use the ```GetRobotList``` method to get information about bots under the account, which includes the bot Id.
-- `cmd` (string, required): The ```cmd``` parameter is the interactive command sent to the bot. The ```GetCommand()``` function in the bot strategy will capture this interactive command and trigger the strategy's interaction logic. For the specific implementation of interaction logic in the strategy code, please refer to the ```GetCommand()``` function description in the [FMZ Quant Trading Platform API Manual](https://www.fmz.com/syntax-guide#fun_getcommand).
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: j
-
-Returns: s
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: "
-
-Returns: :
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: t
-
-Returns: r
-
-Returns: u
-
-Returns: e
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: r
-
-Returns: r
-
-Returns: o
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: n
-
-Returns: u
-
-Returns: l
-
-Returns: l
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: :
-
-Returns: 
-
-Returns: W
-
-Returns: h
-
-Returns: e
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: r
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: i
-
-Returns: n
-
-Returns: t
-
-Returns: e
-
-Returns: r
-
-Returns: a
-
-Returns: c
-
-Returns: t
-
-Returns: i
-
-Returns: v
-
-Returns: e
-
-Returns: 
-
-Returns: c
-
-Returns: o
-
-Returns: m
-
-Returns: m
-
-Returns: a
-
-Returns: n
-
-Returns: d
-
-Returns: 
-
-Returns: w
-
-Returns: a
-
-Returns: s
-
-Returns: 
-
-Returns: s
-
-Returns: e
-
-Returns: n
-
-Returns: t
-
-Returns: 
-
-Returns: s
-
-Returns: u
-
-Returns: c
-
-Returns: c
-
-Returns: e
-
-Returns: s
-
-Returns: s
-
-Returns: f
-
-Returns: u
-
-Returns: l
-
-Returns: l
-
-Returns: y
-
-Returns: .
-
-Returns: 
-
-Returns: W
-
-Returns: h
-
-Returns: e
-
-Returns: n
-
-Returns: 
-
-Returns: s
-
-Returns: e
-
-Returns: n
-
-Returns: d
-
-Returns: i
-
-Returns: n
-
-Returns: g
-
-Returns: 
-
-Returns: a
-
-Returns: 
-
-Returns: c
-
-Returns: o
-
-Returns: m
-
-Returns: m
-
-Returns: a
-
-Returns: n
-
-Returns: d
-
-Returns: 
-
-Returns: t
-
-Returns: o
-
-Returns: 
-
-Returns: a
-
-Returns: 
-
-Returns: b
-
-Returns: o
-
-Returns: t
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: a
-
-Returns: t
-
-Returns: 
-
-Returns: i
-
-Returns: s
-
-Returns: 
-
-Returns: n
-
-Returns: o
-
-Returns: t
-
-Returns: 
-
-Returns: r
-
-Returns: u
-
-Returns: n
-
-Returns: n
-
-Returns: i
-
-Returns: n
-
-Returns: g
-
-Returns: ,
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: 
-
-Returns: i
-
-Returns: n
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: r
-
-Returns: e
-
-Returns: t
-
-Returns: u
-
-Returns: r
-
-Returns: n
-
-Returns: e
-
-Returns: d
-
-Returns: 
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: 
-
-Returns: w
-
-Returns: i
-
-Returns: l
-
-Returns: l
-
-Returns: 
-
-Returns: b
-
-Returns: e
-
-Returns: 
-
-Returns: f
-
-Returns: a
-
-Returns: l
-
-Returns: s
-
-Returns: e
-
-Returns: .
-
-Example of bot strategy (assuming this strategy bot is running with bot Id 123):
-```js
-function main() {
-    while (true) {
-        var cmd = GetCommand()
-        if (cmd) {
-            Log(cmd)
-        }
-        Sleep(2000)
+- `offset` (number, optional): Paging offset, default 0.
+- `limit` (number, optional): Page size; omitted or less than or equal to 0 returns everything.
+
+Returns:
+
+```json
+{
+    "code": 0,
+    "data": {
+        "result": {
+            "all": 2,
+            "platforms": [{
+                "category": "加密货币||Crypto",
+                "date": "2023-12-07 13:44:52",
+                "eid": "Binance",
+                "id": 123,
+                "label": "币安",
+                "logo": "...",
+                "name": "币安现货|Binance",
+                "stocks": ["BTC_USDT", "LTC_USDT", "ETH_USDT", "ETC_USDT", "BTC_TUSD", "ETH_TUSD", "BNB_TUSD"],
+                "website": "..."
+            }, {
+                "category": "通用协议|Custom Protocol",
+                "date": "2020-11-09 11:23:48",
+                "eid": "Exchange",
+                "id": 123,
+                "label": "XX交易所REST协议",
+                "logo": "...",
+                "name": "通用协议|Custom Protocol",
+                "stocks": ["BTC_USDT", "ETH_USDT"],
+                "website": ""
+            }]
+        },
+        "error": null
     }
 }
 ```
 
-If you use the Python test script in this section to access the FMZ Quant Trading Platform's extended API: ```api("CommandRobot", 123, "test command")```, the bot with Id 123 will receive the interactive command: ```test command```, and output it through the Log function.
+- all: Total number of configured exchange objects.
+- platforms: Exchange related information.
+  - eid: Exchange identifier on the FMZ Quant Trading Platform, ```eid``` is required in certain configurations and parameters.
 
-##### StopRobot
+###### GetStrategyList
 
-The ```StopRobot``` method is used to stop a live trading bot under the FMZ Quant Trading Platform account corresponding to the ```API KEY``` in the request. The bot Id to be stopped is specified by the ```robotId``` parameter.
+The ```GetStrategyList``` method is used to retrieve platform strategy information.
 
 Parameters:
 
-- `robotId` (number, required): The ```robotId``` parameter is used to specify the bot Id to be stopped. You can obtain the bot information under the account through the ```GetRobotList``` method, which includes the bot Id.
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: j
-
-Returns: s
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: "
-
-Returns: :
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: 2
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: r
-
-Returns: r
-
-Returns: o
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: n
-
-Returns: u
-
-Returns: l
-
-Returns: l
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: :
-
-Returns: 
-
-Returns: B
-
-Returns: o
-
-Returns: t
-
-Returns: 
-
-Returns: s
-
-Returns: t
-
-Returns: a
-
-Returns: t
-
-Returns: u
-
-Returns: s
-
-Returns: 
-
-Returns: c
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: ,
-
-Returns: 
-
-Returns: 2
-
-Returns: 
-
-Returns: i
-
-Returns: n
-
-Returns: d
-
-Returns: i
-
-Returns: c
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: s
-
-Returns: 
-
-Returns: s
-
-Returns: t
-
-Returns: o
-
-Returns: p
-
-Returns: p
-
-Returns: i
-
-Returns: n
-
-Returns: g
-
-Returns: .
-
-##### RestartRobot
-
-The ```RestartRobot``` method is used to restart a live trading bot under the FMZ Quant Trading Platform account corresponding to the ```API KEY``` in the request. The bot ID to be restarted is specified by the ```robotId``` parameter.
-
-Parameters:
-
-- `robotId` (number, required): The ```robotId``` parameter is used to specify the ID of the live trading bot to be restarted. You can use the ```GetRobotList``` method to get information about live trading bots under the account, which includes the bot ID.
-- `settings` (JSON object, optional): Live trading configuration parameters. The ```settings``` parameter format is as follows:
+- `offset` (number, required): Paging offset.
+- `length` (number, required): Page size; less than or equal to 0 returns everything.
+- `strategyType` (number, required): Scope of the query:
+- ```-1```: your own and rented strategies (official strategies included).
+- ```0```: your own and rented strategies (official strategies excluded).
+- ```-3```: only your own strategies.
+- ```-6```: only rented strategies (expired ones included).
+- ```-4```: official strategies.
+- ```-2```: public and paid strategies in the Strategy Square.
+- ```1```: published strategies.
+- ```2```: strategies pending review.
+- `category` (number, required): Strategy type:
+- ```-1```: all.
+- ```0```: ordinary strategies.
+- ```20```: template libraries.
+- ```21```: trading plugins.
+- `language` (number, required): Programming language of the strategy:
+- ```-1```: all languages.
+- ```0```: JavaScript (TypeScript strategies are stored as JavaScript with a ```//@ts-check``` line in the source).
+- ```1```: Python.
+- ```3```: Blockly.
+- ```4```: MyLanguage.
+- ```5```: PINE.
+- ```6```: Workflow.
+- ```7```: Rust.
+- `kw` (string, required): Keywords matched against strategy names, separated by spaces; an empty string means no filter. Starting with ```id:``` queries by strategy ID, e.g. ```id:123,456```.
+- `groupId` (number, optional): Strategy group: ```-1``` all (default), ```0``` ungrouped, greater than 0 a specific group. Only applies to your own strategies.
+- `orderBy` (string, optional): Sort field: ```name```, ```last_modified```, ```date```, optionally followed by ``` asc``` for ascending order (default descending); an empty string keeps the default order.
+
+Returns:
 
 ```json
 {
-    "appid":"test",
-    "args":[],
-    "exchanges":[
-        {"pair":"SOL_USDT","pid":123},
-        {"pair":"ETH_USDT","pid":456}
-    ],
-    "name":"Test",
-    "node":123,
-    "period":60,
-    "strategy":123
+    "code": 0,
+    "data": {
+        "result": {
+            "all": 123,
+            "strategies": [{
+                "category": 9,
+                "date": "2024-11-10 20:40:04",
+                "description": "",
+                "forked": 0,
+                "hits": 0,
+                "id": 123,
+                "is_buy": false,
+                "is_owner": false,
+                "language": 0,
+                "last_modified": "2024-11-11 17:23:52",
+                "name": "HedgeGridStrategy",
+                "profile": {
+                    "avatar": "...",
+                    "nickname": "abc",
+                    "uid": "4ed225440db1eda23fe05ed10184113e"
+                },
+                "public": 0,
+                "tags": "",
+                "uid": "4ed225440db1eda23fe05ed10184113e",
+                "username": "abc"
+            }]
+        },
+        "error": null
+    }
 }
 ```
 
-- appid: Custom field
-  Can be used to define labels.
-- args: Strategy parameter settings
-  Structure is an array, with each element being a parameter. For example, if the strategy has a parameter ```Interval``` and you want to set ```Interval``` to 500 when restarting the strategy, ```args``` should contain: ```["Interval", 500]```, i.e.: ```"args": [["Interval", 500]]```.
-- exchanges: Exchange object configuration bound to the live trading bot
-  Structure is an array, where each element is an exchange object configuration.
-  - Can bind exchange objects already configured on the platform
-    Using ```pid``` configuration: ```{"pair":"SOL_USDT","pid":123}```; ```pid``` can be queried through the ```GetPlatformList``` interface, where the ```id``` field in the returned data is the exchange ```pid```.
-  - Can directly pass configuration information to bind exchange objects
-    Using ```eid``` configuration: ```{"eid":"Huobi","label":"test Huobi","meta":{"AccessKey":"123","SecretKey":"123"},"pair":"BCH_BTC"}```; Sensitive information such as the passed ```API KEY``` will not be stored by the FMZ Quant Trading Platform, and this data will be directly forwarded to the docker program. If using this type of configuration, this information must be configured each time creating or restarting a live trading bot.
-  - Can bind **General Protocol** exchange objects
-    Can pass configuration information: ```{"eid":"Exchange","label":"test exchange","pair":"BTC_USDT","meta":{"AccessKey":"123","SecretKey":"123","Front":"http://127.0.0.1:6666/test"}}```.
-    The ```label``` attribute is used to set a label for the current **General Protocol** connected exchange object, which can be retrieved in the strategy using the ```exchange.GetLabel()``` function.
-- name: Strategy name
-- node: Docker ID
-  Specifies which docker to run on. If this attribute is not set, the system will automatically allocate.
-- period: Default K-line period
-  K-line period parameter, 60 means 60 seconds.
-- strategy: Strategy ID
-  Can be obtained using the ```GetStrategyList``` method.
+- all: Total number of strategies matching the filter criteria.
+- strategies: Detailed information of the strategies found; ```category``` and ```language``` take the values described in the parameters above.
+
+There is no ```needArgs``` parameter. Passing an extra parameter after ```category```, as older documentation did, shifts all following parameters; pass them in the order above, or by name:
+
+```plaintext
+api('GetStrategyList', 0, 10, -3, -1, -1, '')           # first 10 of your own strategies
+api('GetStrategyList', strategyType=-3, language=7)     # all of your own Rust strategies
+```
+
+###### GetRobotGroupList
+
+The ```GetRobotGroupList``` method is used to get the list of live trading groups under the FMZ Quant Trading Platform account corresponding to the ```API KEY``` in the request.
+
+Parameters:
+
+No parameters
+
+Returns:
+
+```json
+{
+    "code": 0,
+    "data": {
+        "result": {
+            "items": [{
+                "id": 3417,
+                "name": "Test"
+            }, {
+                "id": 3608,
+                "name": "Live Trading Demo"
+            }]
+        },
+        "error": null
+    }
+}
+```
+
+- items: Live trading group information.
+  - id: Live trading group ID.
+  - name: Live trading group name.
+
+The ```items``` field only records newly created groups, the "Default" group is not included in ```items```.
+
+###### GetRobotList
+
+The ```GetRobotList``` method returns the live trading bots of the platform account of the ```API KEY``` in the request. All parameters are optional.
+
+Parameters:
+
+- `offset` (number, optional): Paging offset, default 0.
+- `length` (number, optional): Page size; less than or equal to 0 returns everything (default).
+- `customStatus` (number, optional): Filter by live trading status code, see Live Trading Status Codes; ```-1``` returns all bots (default), ```-2``` returns all bots sorted by start time.
+- `appId` (string, optional): Filter by the bot's custom label (```appid``` in ```settings``` when it was created); an empty string means no filter.
+- `kw` (string, optional): Keyword matched against bot names; an empty string means no filter.
+- `groupId` (number, optional): Live trading group: ```-1``` all (default), ```0``` ungrouped, greater than 0 a specific group.
+- `orderBy` (string, optional): Sort field: ```name```, ```status```, ```node```, ```profit```, ```date```, ```refresh```, ```start_time```, ```strategy_name```, optionally followed by ``` asc``` for ascending order (default descending); an empty string keeps the default order.
+- `strategyId` (number, optional): When greater than 0, only bots of this strategy are returned; default 0 (no filter).
+
+Returns:
+
+```json
+{
+    "code": 0,
+    "data": {
+        "result": {
+            "all": 1,
+            "concurrent": 0,
+            "robots": [{
+                "charge_time": 1731654846,
+                "date": "2024-11-12 14:05:29",
+                "end_time": "2024-11-15 14:56:32",
+                "fixed_id": 4509153,
+                "id": 591026,
+                "is_sandbox": 0,
+                "name": "Test",
+                "node_guid": "45891bcf3d57f99b08a43dff76ee1ea1",
+                "node_id": 4519153,
+                "node_public": 0,
+                "profit": 0,
+                "public": 0,
+                "refresh": 1731651257000,
+                "start_time": "2024-11-15 14:56:30",
+                "status": 3,
+                "strategy_id": 411670,
+                "strategy_isowner": true,
+                "strategy_language": 0,
+                "strategy_name": "Test",
+                "strategy_public": 0,
+                "uid": "105ed6e511cc977921610fdbb7e2a1d6",
+                "wd": 0
+            }]
+        },
+        "error": null
+    }
+}
+```
+
+- all: Total number of bots matching the filters.
+- robots: Live trading bot information; ```status``` is the live trading status code.
+  - group_id: Live trading bot group ID; if the live trading bot is in the default group, the ```group_id``` field is not included.
 
-Returns: `
+Using ```api()``` from the Python example on the signature authentication page:
 
-Returns: `
+- ```api('GetRobotList')```: all live trading bots.
+- ```api('GetRobotList', 'member2')```: a single string is taken as the label; all bots labeled member2.
+- ```api('GetRobotList', 0, 100, -1, 'member2', '')```: positional parameters; up to 100 bots labeled member2, starting at offset 0.
+- ```api('GetRobotList', appId='member2', length=100)```: the same by parameter name.
 
-Returns: `
-
-Returns: j
-
-Returns: s
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: "
-
-Returns: :
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: 1
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: r
-
-Returns: r
-
-Returns: o
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: n
-
-Returns: u
-
-Returns: l
-
-Returns: l
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: :
-
-Returns: 
-
-Returns: L
-
-Returns: i
-
-Returns: v
-
-Returns: e
-
-Returns: 
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: d
-
-Returns: i
-
-Returns: n
-
-Returns: g
-
-Returns: 
-
-Returns: s
-
-Returns: t
-
-Returns: a
-
-Returns: t
-
-Returns: u
-
-Returns: s
-
-Returns: 
-
-Returns: c
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: ,
-
-Returns: 
-
-Returns: 1
-
-Returns: 
-
-Returns: i
-
-Returns: n
-
-Returns: d
-
-Returns: i
-
-Returns: c
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: s
-
-Returns: 
-
-Returns: r
-
-Returns: u
-
-Returns: n
-
-Returns: n
-
-Returns: i
-
-Returns: n
-
-Returns: g
-
-Returns: .
-
-If the live trading bot was created through the extended API interface, it must be restarted using the extended API interface ```RestartRobot```, and the ```settings``` parameter must be passed. For live trading bots created on the platform page, they can be restarted through the extended API interface or by clicking the button on the live trading page. The ```settings``` parameter can be passed or not. If only the ```robotId``` parameter is passed, it will start running according to the current settings of the live trading bot.
-
-##### GetRobotDetail
+###### GetRobotDetail
 
 The ```GetRobotDetail``` method is used to get detailed information of a live trading bot under the FMZ Quant Trading Platform account corresponding to the ```API KEY``` in the request. The detailed information of the live trading bot to be retrieved is specified by the ```robotId``` parameter.
 
@@ -16340,5137 +5879,78 @@ Parameters:
 
 - `robotId` (number, required): The ```robotId``` parameter is used to specify the ID of the live trading bot for which to retrieve detailed information. The live trading bot information under the account, including the bot ID, can be obtained through the ```GetRobotList``` method.
 
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: j
-
-Returns: s
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: o
-
-Returns: b
-
-Returns: o
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: h
-
-Returns: a
-
-Returns: r
-
-Returns: g
-
-Returns: e
-
-Returns: _
-
-Returns: t
-
-Returns: i
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 1
-
-Returns: 7
-
-Returns: 3
-
-Returns: 2
-
-Returns: 2
-
-Returns: 4
-
-Returns: 6
-
-Returns: 5
-
-Returns: 3
-
-Returns: 9
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: h
-
-Returns: a
-
-Returns: r
-
-Returns: g
-
-Returns: e
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 5
-
-Returns: 8
-
-Returns: 5
-
-Returns: 0
-
-Returns: 0
-
-Returns: 0
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: o
-
-Returns: n
-
-Returns: s
-
-Returns: u
-
-Returns: m
-
-Returns: e
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 5
-
-Returns: 3
-
-Returns: 7
-
-Returns: 5
-
-Returns: 0
-
-Returns: 0
-
-Returns: 0
-
-Returns: 0
-
-Returns: 0
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 2
-
-Returns: 0
-
-Returns: 1
-
-Returns: 8
-
-Returns: -
-
-Returns: 1
-
-Returns: 2
-
-Returns: -
-
-Returns: 2
-
-Returns: 8
-
-Returns: 
-
-Returns: 1
-
-Returns: 4
-
-Returns: :
-
-Returns: 3
-
-Returns: 4
-
-Returns: :
-
-Returns: 5
-
-Returns: 1
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: f
-
-Returns: a
-
-Returns: v
-
-Returns: o
-
-Returns: r
-
-Returns: i
-
-Returns: t
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: a
-
-Returns: d
-
-Returns: d
-
-Returns: e
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: f
-
-Returns: a
-
-Returns: l
-
-Returns: s
-
-Returns: e
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: t
-
-Returns: y
-
-Returns: p
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: R
-
-Returns: "
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: f
-
-Returns: i
-
-Returns: x
-
-Returns: e
-
-Returns: d
-
-Returns: _
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 1
-
-Returns: 2
-
-Returns: 3
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: h
-
-Returns: i
-
-Returns: t
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 1
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 1
-
-Returns: 2
-
-Returns: 3
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: i
-
-Returns: s
-
-Returns: _
-
-Returns: d
-
-Returns: e
-
-Returns: l
-
-Returns: e
-
-Returns: t
-
-Returns: e
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: i
-
-Returns: s
-
-Returns: _
-
-Returns: m
-
-Returns: a
-
-Returns: n
-
-Returns: a
-
-Returns: g
-
-Returns: e
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: t
-
-Returns: r
-
-Returns: u
-
-Returns: e
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: i
-
-Returns: s
-
-Returns: _
-
-Returns: s
-
-Returns: a
-
-Returns: n
-
-Returns: d
-
-Returns: b
-
-Returns: o
-
-Returns: x
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: n
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: T
-
-Returns: e
-
-Returns: s
-
-Returns: t
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: n
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: _
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 1
-
-Returns: 2
-
-Returns: 3
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: p
-
-Returns: e
-
-Returns: x
-
-Returns: c
-
-Returns: h
-
-Returns: a
-
-Returns: n
-
-Returns: g
-
-Returns: e
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: 1
-
-Returns: 2
-
-Returns: 3
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: F
-
-Returns: u
-
-Returns: t
-
-Returns: u
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: _
-
-Returns: O
-
-Returns: K
-
-Returns: C
-
-Returns: o
-
-Returns: i
-
-Returns: n
-
-Returns: "
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: p
-
-Returns: h
-
-Returns: a
-
-Returns: s
-
-Returns: h
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: 1
-
-Returns: 2
-
-Returns: 3
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: a
-
-Returns: 1
-
-Returns: a
-
-Returns: c
-
-Returns: a
-
-Returns: 7
-
-Returns: 4
-
-Returns: b
-
-Returns: 9
-
-Returns: c
-
-Returns: f
-
-Returns: 7
-
-Returns: d
-
-Returns: 8
-
-Returns: 6
-
-Returns: 2
-
-Returns: 4
-
-Returns: f
-
-Returns: 2
-
-Returns: a
-
-Returns: f
-
-Returns: 2
-
-Returns: d
-
-Returns: a
-
-Returns: c
-
-Returns: 0
-
-Returns: 1
-
-Returns: e
-
-Returns: 3
-
-Returns: 6
-
-Returns: d
-
-Returns: "
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: p
-
-Returns: l
-
-Returns: a
-
-Returns: b
-
-Returns: e
-
-Returns: l
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: 1
-
-Returns: 2
-
-Returns: 3
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: O
-
-Returns: K
-
-Returns: E
-
-Returns: X
-
-Returns: 
-
-Returns: F
-
-Returns: u
-
-Returns: t
-
-Returns: u
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: 
-
-Returns: V
-
-Returns: 5
-
-Returns: "
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: p
-
-Returns: r
-
-Returns: i
-
-Returns: o
-
-Returns: r
-
-Returns: i
-
-Returns: t
-
-Returns: y
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: p
-
-Returns: r
-
-Returns: o
-
-Returns: f
-
-Returns: i
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: p
-
-Returns: u
-
-Returns: b
-
-Returns: l
-
-Returns: i
-
-Returns: c
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: f
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: h
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 1
-
-Returns: 7
-
-Returns: 3
-
-Returns: 2
-
-Returns: 2
-
-Returns: 4
-
-Returns: 4
-
-Returns: 4
-
-Returns: 5
-
-Returns: 3
-
-Returns: 0
-
-Returns: 0
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: o
-
-Returns: b
-
-Returns: o
-
-Returns: t
-
-Returns: _
-
-Returns: a
-
-Returns: r
-
-Returns: g
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: [
-
-Returns: ]
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: t
-
-Returns: a
-
-Returns: r
-
-Returns: t
-
-Returns: _
-
-Returns: t
-
-Returns: i
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 2
-
-Returns: 0
-
-Returns: 2
-
-Returns: 4
-
-Returns: -
-
-Returns: 1
-
-Returns: 1
-
-Returns: -
-
-Returns: 2
-
-Returns: 2
-
-Returns: 
-
-Returns: 1
-
-Returns: 1
-
-Returns: :
-
-Returns: 0
-
-Returns: 0
-
-Returns: :
-
-Returns: 4
-
-Returns: 8
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: t
-
-Returns: a
-
-Returns: t
-
-Returns: u
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 1
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: g
-
-Returns: y
-
-Returns: _
-
-Returns: a
-
-Returns: r
-
-Returns: g
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: [
-
-Returns: ]
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: g
-
-Returns: y
-
-Returns: _
-
-Returns: e
-
-Returns: x
-
-Returns: c
-
-Returns: h
-
-Returns: a
-
-Returns: n
-
-Returns: g
-
-Returns: e
-
-Returns: _
-
-Returns: p
-
-Returns: a
-
-Returns: i
-
-Returns: r
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: [
-
-Returns: 6
-
-Returns: 0
-
-Returns: ,
-
-Returns: [
-
-Returns: 1
-
-Returns: 2
-
-Returns: 3
-
-Returns: ]
-
-Returns: ,
-
-Returns: [
-
-Returns: \
-
-Returns: "
-
-Returns: E
-
-Returns: T
-
-Returns: H
-
-Returns: _
-
-Returns: U
-
-Returns: S
-
-Returns: D
-
-Returns: T
-
-Returns: \
-
-Returns: "
-
-Returns: ]
-
-Returns: ]
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: g
-
-Returns: y
-
-Returns: _
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 1
-
-Returns: 2
-
-Returns: 3
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: g
-
-Returns: y
-
-Returns: _
-
-Returns: l
-
-Returns: a
-
-Returns: s
-
-Returns: t
-
-Returns: _
-
-Returns: m
-
-Returns: o
-
-Returns: d
-
-Returns: i
-
-Returns: f
-
-Returns: i
-
-Returns: e
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 2
-
-Returns: 0
-
-Returns: 2
-
-Returns: 4
-
-Returns: -
-
-Returns: 1
-
-Returns: 1
-
-Returns: -
-
-Returns: 2
-
-Returns: 1
-
-Returns: 
-
-Returns: 1
-
-Returns: 6
-
-Returns: :
-
-Returns: 4
-
-Returns: 9
-
-Returns: :
-
-Returns: 2
-
-Returns: 5
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: g
-
-Returns: y
-
-Returns: _
-
-Returns: n
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: T
-
-Returns: e
-
-Returns: s
-
-Returns: t
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: g
-
-Returns: y
-
-Returns: _
-
-Returns: p
-
-Returns: u
-
-Returns: b
-
-Returns: l
-
-Returns: i
-
-Returns: c
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 0
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: u
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 1
-
-Returns: 0
-
-Returns: 5
-
-Returns: e
-
-Returns: d
-
-Returns: 6
-
-Returns: e
-
-Returns: 5
-
-Returns: 1
-
-Returns: b
-
-Returns: c
-
-Returns: c
-
-Returns: 1
-
-Returns: 7
-
-Returns: 7
-
-Returns: 9
-
-Returns: 2
-
-Returns: a
-
-Returns: 6
-
-Returns: 1
-
-Returns: 0
-
-Returns: f
-
-Returns: d
-
-Returns: b
-
-Returns: b
-
-Returns: 7
-
-Returns: e
-
-Returns: 2
-
-Returns: a
-
-Returns: 1
-
-Returns: d
-
-Returns: 6
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: u
-
-Returns: s
-
-Returns: e
-
-Returns: r
-
-Returns: n
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: a
-
-Returns: b
-
-Returns: c
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: w
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: r
-
-Returns: r
-
-Returns: o
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: n
-
-Returns: u
-
-Returns: l
-
-Returns: l
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: c
-
-Returns: h
-
-Returns: a
-
-Returns: r
-
-Returns: g
-
-Returns: e
-
-Returns: _
-
-Returns: t
-
-Returns: i
-
-Returns: m
-
-Returns: e
-
-Returns: :
-
-Returns: 
-
-Returns: N
-
-Returns: e
-
-Returns: x
-
-Returns: t
-
-Returns: 
-
-Returns: b
-
-Returns: i
-
-Returns: l
-
-Returns: l
-
-Returns: i
-
-Returns: n
-
-Returns: g
-
-Returns: 
-
-Returns: t
-
-Returns: i
-
-Returns: m
-
-Returns: e
-
-Returns: ,
-
-Returns: 
-
-Returns: i
-
-Returns: .
-
-Returns: e
-
-Returns: .
-
-Returns: ,
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: v
-
-Returns: a
-
-Returns: l
-
-Returns: i
-
-Returns: d
-
-Returns: 
-
-Returns: e
-
-Returns: x
-
-Returns: p
-
-Returns: i
-
-Returns: r
-
-Returns: a
-
-Returns: t
-
-Returns: i
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: t
-
-Returns: i
-
-Returns: m
-
-Returns: e
-
-Returns: 
-
-Returns: a
-
-Returns: f
-
-Returns: t
-
-Returns: e
-
-Returns: r
-
-Returns: 
-
-Returns: c
-
-Returns: u
-
-Returns: r
-
-Returns: r
-
-Returns: e
-
-Returns: n
-
-Returns: t
-
-Returns: 
-
-Returns: b
-
-Returns: i
-
-Returns: l
-
-Returns: l
-
-Returns: i
-
-Returns: n
-
-Returns: g
-
-Returns: .
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: c
-
-Returns: h
-
-Returns: a
-
-Returns: r
-
-Returns: g
-
-Returns: e
-
-Returns: d
-
-Returns: :
-
-Returns: 
-
-Returns: T
-
-Returns: i
-
-Returns: m
-
-Returns: e
-
-Returns: 
-
-Returns: c
-
-Returns: o
-
-Returns: n
-
-Returns: s
-
-Returns: u
-
-Returns: m
-
-Returns: e
-
-Returns: d
-
-Returns: .
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: c
-
-Returns: o
-
-Returns: n
-
-Returns: s
-
-Returns: u
-
-Returns: m
-
-Returns: e
-
-Returns: d
-
-Returns: :
-
-Returns: 
-
-Returns: A
-
-Returns: m
-
-Returns: o
-
-Returns: u
-
-Returns: n
-
-Returns: t
-
-Returns: 
-
-Returns: c
-
-Returns: o
-
-Returns: n
-
-Returns: s
-
-Returns: u
-
-Returns: m
-
-Returns: e
-
-Returns: d
-
-Returns: 
-
-Returns: (
-
-Returns: 0
-
-Returns: .
-
-Returns: 1
-
-Returns: 2
-
-Returns: 5
-
-Returns: 
-
-Returns: U
-
-Returns: S
-
-Returns: D
-
-Returns: 
-
-Returns: =
-
-Returns: 
-
-Returns: 1
-
-Returns: 2
-
-Returns: 5
-
-Returns: 0
-
-Returns: 0
-
-Returns: 0
-
-Returns: 0
-
-Returns: 0
-
-Returns: 
-
-Returns: /
-
-Returns: 
-
-Returns: 1
-
-Returns: e
-
-Returns: 8
-
-Returns: )
-
-Returns: .
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: :
-
-Returns: 
-
-Returns: C
-
-Returns: r
-
-Returns: e
-
-Returns: a
-
-Returns: t
-
-Returns: i
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: .
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: f
-
-Returns: i
-
-Returns: x
-
-Returns: e
-
-Returns: d
-
-Returns: _
-
-Returns: i
-
-Returns: d
-
-Returns: :
-
-Returns: 
-
-Returns: D
-
-Returns: o
-
-Returns: c
-
-Returns: k
-
-Returns: e
-
-Returns: r
-
-Returns: 
-
-Returns: I
-
-Returns: D
-
-Returns: 
-
-Returns: a
-
-Returns: s
-
-Returns: s
-
-Returns: i
-
-Returns: g
-
-Returns: n
-
-Returns: e
-
-Returns: d
-
-Returns: 
-
-Returns: d
-
-Returns: u
-
-Returns: r
-
-Returns: i
-
-Returns: n
-
-Returns: g
-
-Returns: 
-
-Returns: l
-
-Returns: i
-
-Returns: v
-
-Returns: e
-
-Returns: 
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: d
-
-Returns: i
-
-Returns: n
-
-Returns: g
-
-Returns: .
-
-Returns: 
-
-Returns: I
-
-Returns: f
-
-Returns: 
-
-Returns: a
-
-Returns: u
-
-Returns: t
-
-Returns: o
-
-Returns: -
-
-Returns: a
-
-Returns: s
-
-Returns: s
-
-Returns: i
-
-Returns: g
-
-Returns: n
-
-Returns: e
-
-Returns: d
-
-Returns: ,
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: i
-
-Returns: s
-
-Returns: 
-
-Returns: v
-
-Returns: a
-
-Returns: l
-
-Returns: u
-
-Returns: e
-
-Returns: 
-
-Returns: i
-
-Returns: s
-
-Returns: 
-
-Returns: -
-
-Returns: 1
-
-Returns: .
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: i
-
-Returns: s
-
-Returns: _
-
-Returns: m
-
-Returns: a
-
-Returns: n
-
-Returns: a
-
-Returns: g
-
-Returns: e
-
-Returns: r
-
-Returns: :
-
-Returns: 
-
-Returns: W
-
-Returns: h
-
-Returns: e
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: r
-
-Returns: 
-
-Returns: h
-
-Returns: a
-
-Returns: s
-
-Returns: 
-
-Returns: p
-
-Returns: e
-
-Returns: r
-
-Returns: m
-
-Returns: i
-
-Returns: s
-
-Returns: s
-
-Returns: i
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: t
-
-Returns: o
-
-Returns: 
-
-Returns: m
-
-Returns: a
-
-Returns: n
-
-Returns: a
-
-Returns: g
-
-Returns: e
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: i
-
-Returns: s
-
-Returns: 
-
-Returns: l
-
-Returns: i
-
-Returns: v
-
-Returns: e
-
-Returns: 
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: d
-
-Returns: i
-
-Returns: n
-
-Returns: g
-
-Returns: 
-
-Returns: b
-
-Returns: o
-
-Returns: t
-
-Returns: .
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: i
-
-Returns: s
-
-Returns: _
-
-Returns: s
-
-Returns: a
-
-Returns: n
-
-Returns: d
-
-Returns: b
-
-Returns: o
-
-Returns: x
-
-Returns: :
-
-Returns: 
-
-Returns: W
-
-Returns: h
-
-Returns: e
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: r
-
-Returns: 
-
-Returns: i
-
-Returns: t
-
-Returns: 
-
-Returns: i
-
-Returns: s
-
-Returns: 
-
-Returns: a
-
-Returns: 
-
-Returns: s
-
-Returns: i
-
-Returns: m
-
-Returns: u
-
-Returns: l
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: d
-
-Returns: 
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: d
-
-Returns: i
-
-Returns: n
-
-Returns: g
-
-Returns: 
-
-Returns: b
-
-Returns: o
-
-Returns: t
-
-Returns: .
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: n
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: :
-
-Returns: 
-
-Returns: L
-
-Returns: i
-
-Returns: v
-
-Returns: e
-
-Returns: 
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: d
-
-Returns: i
-
-Returns: n
-
-Returns: g
-
-Returns: 
-
-Returns: b
-
-Returns: o
-
-Returns: t
-
-Returns: 
-
-Returns: n
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: .
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: n
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: _
-
-Returns: i
-
-Returns: d
-
-Returns: :
-
-Returns: 
-
-Returns: D
-
-Returns: o
-
-Returns: c
-
-Returns: k
-
-Returns: e
-
-Returns: r
-
-Returns: 
-
-Returns: I
-
-Returns: D
-
-Returns: .
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: p
-
-Returns: e
-
-Returns: x
-
-Returns: c
-
-Returns: h
-
-Returns: a
-
-Returns: n
-
-Returns: g
-
-Returns: e
-
-Returns: s
-
-Returns: :
-
-Returns: 
-
-Returns: E
-
-Returns: x
-
-Returns: c
-
-Returns: h
-
-Returns: a
-
-Returns: n
-
-Returns: g
-
-Returns: e
-
-Returns: 
-
-Returns: o
-
-Returns: b
-
-Returns: j
-
-Returns: e
-
-Returns: c
-
-Returns: t
-
-Returns: s
-
-Returns: 
-
-Returns: c
-
-Returns: o
-
-Returns: n
-
-Returns: f
-
-Returns: i
-
-Returns: g
-
-Returns: u
-
-Returns: r
-
-Returns: e
-
-Returns: d
-
-Returns: 
-
-Returns: f
-
-Returns: o
-
-Returns: r
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: l
-
-Returns: i
-
-Returns: v
-
-Returns: e
-
-Returns: 
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: d
-
-Returns: i
-
-Returns: n
-
-Returns: g
-
-Returns: 
-
-Returns: b
-
-Returns: o
-
-Returns: t
-
-Returns: ,
-
-Returns: 
-
-Returns: w
-
-Returns: h
-
-Returns: e
-
-Returns: r
-
-Returns: e
-
-Returns: 
-
-Returns: 1
-
-Returns: 2
-
-Returns: 3
-
-Returns: 
-
-Returns: i
-
-Returns: s
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: p
-
-Returns: i
-
-Returns: d
-
-Returns: 
-
-Returns: a
-
-Returns: n
-
-Returns: d
-
-Returns: 
-
-Returns: "
-
-Returns: F
-
-Returns: u
-
-Returns: t
-
-Returns: u
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: _
-
-Returns: O
-
-Returns: K
-
-Returns: C
-
-Returns: o
-
-Returns: i
-
-Returns: n
-
-Returns: "
-
-Returns: 
-
-Returns: i
-
-Returns: s
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: e
-
-Returns: x
-
-Returns: c
-
-Returns: h
-
-Returns: a
-
-Returns: n
-
-Returns: g
-
-Returns: e
-
-Returns: 
-
-Returns: n
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: .
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: p
-
-Returns: l
-
-Returns: a
-
-Returns: b
-
-Returns: e
-
-Returns: l
-
-Returns: s
-
-Returns: :
-
-Returns: 
-
-Returns: L
-
-Returns: a
-
-Returns: b
-
-Returns: e
-
-Returns: l
-
-Returns: 
-
-Returns: i
-
-Returns: n
-
-Returns: f
-
-Returns: o
-
-Returns: r
-
-Returns: m
-
-Returns: a
-
-Returns: t
-
-Returns: i
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: f
-
-Returns: o
-
-Returns: r
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: e
-
-Returns: x
-
-Returns: c
-
-Returns: h
-
-Returns: a
-
-Returns: n
-
-Returns: g
-
-Returns: e
-
-Returns: 
-
-Returns: o
-
-Returns: b
-
-Returns: j
-
-Returns: e
-
-Returns: c
-
-Returns: t
-
-Returns: s
-
-Returns: 
-
-Returns: c
-
-Returns: o
-
-Returns: n
-
-Returns: f
-
-Returns: i
-
-Returns: g
-
-Returns: u
-
-Returns: r
-
-Returns: e
-
-Returns: d
-
-Returns: 
-
-Returns: f
-
-Returns: o
-
-Returns: r
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: l
-
-Returns: i
-
-Returns: v
-
-Returns: e
-
-Returns: 
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: d
-
-Returns: i
-
-Returns: n
-
-Returns: g
-
-Returns: 
-
-Returns: b
-
-Returns: o
-
-Returns: t
-
-Returns: .
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: p
-
-Returns: r
-
-Returns: o
-
-Returns: f
-
-Returns: i
-
-Returns: t
-
-Returns: :
-
-Returns: 
-
-Returns: L
-
-Returns: i
-
-Returns: v
-
-Returns: e
-
-Returns: 
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: d
-
-Returns: i
-
-Returns: n
-
-Returns: g
-
-Returns: 
-
-Returns: b
-
-Returns: o
-
-Returns: t
-
-Returns: 
-
-Returns: p
-
-Returns: r
-
-Returns: o
-
-Returns: f
-
-Returns: i
-
-Returns: t
-
-Returns: 
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: .
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: p
-
-Returns: u
-
-Returns: b
-
-Returns: l
-
-Returns: i
-
-Returns: c
-
-Returns: :
-
-Returns: 
-
-Returns: W
-
-Returns: h
-
-Returns: e
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: r
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: l
-
-Returns: i
-
-Returns: v
-
-Returns: e
-
-Returns: 
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: d
-
-Returns: i
-
-Returns: n
-
-Returns: g
-
-Returns: 
-
-Returns: b
-
-Returns: o
-
-Returns: t
-
-Returns: 
-
-Returns: i
-
-Returns: s
-
-Returns: 
-
-Returns: p
-
-Returns: u
-
-Returns: b
-
-Returns: l
-
-Returns: i
-
-Returns: c
-
-Returns: .
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: r
-
-Returns: e
-
-Returns: f
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: h
-
-Returns: :
-
-Returns: 
-
-Returns: L
-
-Returns: a
-
-Returns: s
-
-Returns: t
-
-Returns: 
-
-Returns: a
-
-Returns: c
-
-Returns: t
-
-Returns: i
-
-Returns: v
-
-Returns: e
-
-Returns: 
-
-Returns: t
-
-Returns: i
-
-Returns: m
-
-Returns: e
-
-Returns: .
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: s
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: g
-
-Returns: y
-
-Returns: _
-
-Returns: e
-
-Returns: x
-
-Returns: c
-
-Returns: h
-
-Returns: a
-
-Returns: n
-
-Returns: g
-
-Returns: e
-
-Returns: _
-
-Returns: p
-
-Returns: a
-
-Returns: i
-
-Returns: r
-
-Returns: s
-
-Returns: :
-
-Returns: 
-
-Returns: C
-
-Returns: o
-
-Returns: n
-
-Returns: f
-
-Returns: i
-
-Returns: g
-
-Returns: u
-
-Returns: r
-
-Returns: e
-
-Returns: d
-
-Returns: 
-
-Returns: e
-
-Returns: x
-
-Returns: c
-
-Returns: h
-
-Returns: a
-
-Returns: n
-
-Returns: g
-
-Returns: e
-
-Returns: 
-
-Returns: o
-
-Returns: b
-
-Returns: j
-
-Returns: e
-
-Returns: c
-
-Returns: t
-
-Returns: s
-
-Returns: 
-
-Returns: a
-
-Returns: n
-
-Returns: d
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: i
-
-Returns: r
-
-Returns: 
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: d
-
-Returns: i
-
-Returns: n
-
-Returns: g
-
-Returns: 
-
-Returns: p
-
-Returns: a
-
-Returns: i
-
-Returns: r
-
-Returns: 
-
-Returns: i
-
-Returns: n
-
-Returns: f
-
-Returns: o
-
-Returns: r
-
-Returns: m
-
-Returns: a
-
-Returns: t
-
-Returns: i
-
-Returns: o
-
-Returns: n
-
-Returns: .
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: w
-
-Returns: d
-
-Returns: :
-
-Returns: 
-
-Returns: W
-
-Returns: h
-
-Returns: e
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: r
-
-Returns: 
-
-Returns: o
-
-Returns: f
-
-Returns: f
-
-Returns: l
-
-Returns: i
-
-Returns: n
-
-Returns: e
-
-Returns: 
-
-Returns: a
-
-Returns: l
-
-Returns: e
-
-Returns: r
-
-Returns: t
-
-Returns: 
-
-Returns: i
-
-Returns: s
-
-Returns: 
-
-Returns: e
-
-Returns: n
-
-Returns: a
-
-Returns: b
-
-Returns: l
-
-Returns: e
-
-Returns: d
-
-Returns: .
+Returns:
+
+```json
+{
+    "code": 0,
+    "data": {
+        "result": {
+            "robot": {
+                "charge_time": 1732246539,
+                "charged": 5850000,
+                "consumed": 5375000000,
+                "date": "2018-12-28 14:34:51",
+                "favorite": {
+                    "added": false,
+                    "type": "R"
+                },
+                "fixed_id": 123,
+                "hits": 1,
+                "id": 123,
+                "is_deleted": 0,
+                "is_manager": true,
+                "is_sandbox": 0,
+                "name": "Test",
+                "node_id": 123,
+                "pexchanges": {
+                    "123": "Futures_OKX"
+                },
+                "phash": {
+                    "123": "ca1aca74b9cf7d8624f2af2dac01e36d"
+                },
+                "plabels": {
+                    "123": "OKX Futures"
+                },
+                "priority": 0,
+                "profit": 0,
+                "public": 0,
+                "refresh": 1732244453000,
+                "robot_args": "[]",
+                "start_time": "2024-11-22 11:00:48",
+                "status": 1,
+                "strategy_args": "[]",
+                "strategy_exchange_pairs": "[60,[123],[\"ETH_USDT\"]]",
+                "strategy_id": 123,
+                "strategy_last_modified": "2024-11-21 16:49:25",
+                "strategy_name": "Test",
+                "strategy_public": "0",
+                "uid": "105ed6e51bcc17792a610fdbb7e2a1d6",
+                "username": "abc",
+                "wd": 0
+            }
+        },
+        "error": null
+    }
+}
+```
+
+- charge_time: Next billing time (Unix timestamp in seconds), i.e. the end of the period already paid for.
+- charged: Total billed time in seconds.
+- consumed: Total amount charged in USD, stored as an integer scaled by 1e8; 5375000000 in the example is 53.75 USD.
+- date: Creation date.
+- fixed_id: Docker ID assigned during live trading. If auto-assigned, this value is -1.
+- is_manager: Whether has permission to manage this live trading bot.
+- is_sandbox: Whether it is a simulated trading bot.
+- name: Live trading bot name.
+- node_id: Docker ID.
+- pexchanges: Exchange objects configured for the live trading bot, where 123 is the pid and "Futures_OKX" is the exchange ID (eid).
+- plabels: Label information for the exchange objects configured for the live trading bot.
+- profit: Live trading bot profit data.
+- public: Whether the live trading bot is public.
+- refresh: Last active time.
+- strategy_exchange_pairs: Configured exchange objects and their trading pair information.
+- wd: Whether offline alert is enabled.
 
 Explanation of the ```strategy_exchange_pairs``` attribute, using the following data as an example:
 
@@ -21484,8751 +5964,7 @@ The first data ```60``` indicates that the default K-line period set for the liv
 
 ```[\"BTC_USDT\",\"BTC_USDT\",\"ETH_USDT\",\"ETH_USDT\"]``` are the trading pairs set for the exchange objects configured for the live trading bot (corresponding one-to-one with the pid values in the order they were added).
 
-##### GetAccount
-
-The ```GetAccount``` method is used to retrieve account information for the FMZ Quant Trading Platform account corresponding to the ```API KEY``` in the request.
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: j
-
-Returns: s
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: "
-
-Returns: :
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: b
-
-Returns: a
-
-Returns: l
-
-Returns: a
-
-Returns: n
-
-Returns: c
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 2
-
-Returns: 2
-
-Returns: 9
-
-Returns: 4
-
-Returns: 4
-
-Returns: 7
-
-Returns: 0
-
-Returns: 2
-
-Returns: 4
-
-Returns: 3
-
-Returns: 6
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: o
-
-Returns: n
-
-Returns: c
-
-Returns: u
-
-Returns: r
-
-Returns: r
-
-Returns: e
-
-Returns: n
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: o
-
-Returns: n
-
-Returns: s
-
-Returns: u
-
-Returns: m
-
-Returns: e
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 2
-
-Returns: 1
-
-Returns: 1
-
-Returns: 0
-
-Returns: 9
-
-Returns: 2
-
-Returns: 7
-
-Returns: 1
-
-Returns: 9
-
-Returns: 6
-
-Returns: 5
-
-Returns: 3
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: u
-
-Returns: r
-
-Returns: r
-
-Returns: e
-
-Returns: n
-
-Returns: c
-
-Returns: y
-
-Returns: "
-
-Returns: :
-
-Returns: "
-
-Returns: U
-
-Returns: S
-
-Returns: D
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: m
-
-Returns: a
-
-Returns: i
-
-Returns: l
-
-Returns: "
-
-Returns: :
-
-Returns: "
-
-Returns: 1
-
-Returns: 2
-
-Returns: 3
-
-Returns: @
-
-Returns: q
-
-Returns: q
-
-Returns: .
-
-Returns: c
-
-Returns: o
-
-Returns: m
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: o
-
-Returns: p
-
-Returns: e
-
-Returns: n
-
-Returns: a
-
-Returns: i
-
-Returns: "
-
-Returns: :
-
-Returns: f
-
-Returns: a
-
-Returns: l
-
-Returns: s
-
-Returns: e
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: e
-
-Returns: t
-
-Returns: t
-
-Returns: i
-
-Returns: n
-
-Returns: g
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: n
-
-Returns: u
-
-Returns: l
-
-Returns: l
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: n
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: {
-
-Returns: "
-
-Returns: w
-
-Returns: e
-
-Returns: c
-
-Returns: h
-
-Returns: a
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: t
-
-Returns: r
-
-Returns: u
-
-Returns: e
-
-Returns: }
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: u
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: "
-
-Returns: 1
-
-Returns: 0
-
-Returns: 5
-
-Returns: e
-
-Returns: a
-
-Returns: 6
-
-Returns: e
-
-Returns: 5
-
-Returns: 1
-
-Returns: b
-
-Returns: c
-
-Returns: c
-
-Returns: 1
-
-Returns: 7
-
-Returns: 7
-
-Returns: 9
-
-Returns: 2
-
-Returns: 6
-
-Returns: a
-
-Returns: 1
-
-Returns: 0
-
-Returns: f
-
-Returns: d
-
-Returns: b
-
-Returns: b
-
-Returns: 7
-
-Returns: e
-
-Returns: 2
-
-Returns: a
-
-Returns: 1
-
-Returns: d
-
-Returns: 6
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: u
-
-Returns: s
-
-Returns: e
-
-Returns: r
-
-Returns: n
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: "
-
-Returns: a
-
-Returns: b
-
-Returns: c
-
-Returns: "
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: r
-
-Returns: r
-
-Returns: o
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: n
-
-Returns: u
-
-Returns: l
-
-Returns: l
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: b
-
-Returns: a
-
-Returns: l
-
-Returns: a
-
-Returns: n
-
-Returns: c
-
-Returns: e
-
-Returns: :
-
-Returns: 
-
-Returns: A
-
-Returns: c
-
-Returns: c
-
-Returns: o
-
-Returns: u
-
-Returns: n
-
-Returns: t
-
-Returns: 
-
-Returns: b
-
-Returns: a
-
-Returns: l
-
-Returns: a
-
-Returns: n
-
-Returns: c
-
-Returns: e
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: T
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: v
-
-Returns: a
-
-Returns: l
-
-Returns: u
-
-Returns: e
-
-Returns: 
-
-Returns: h
-
-Returns: e
-
-Returns: r
-
-Returns: e
-
-Returns: 
-
-Returns: i
-
-Returns: s
-
-Returns: 
-
-Returns: r
-
-Returns: e
-
-Returns: p
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: e
-
-Returns: n
-
-Returns: t
-
-Returns: e
-
-Returns: d
-
-Returns: 
-
-Returns: a
-
-Returns: s
-
-Returns: 
-
-Returns: a
-
-Returns: n
-
-Returns: 
-
-Returns: i
-
-Returns: n
-
-Returns: t
-
-Returns: e
-
-Returns: g
-
-Returns: e
-
-Returns: r
-
-Returns: 
-
-Returns: t
-
-Returns: o
-
-Returns: 
-
-Returns: e
-
-Returns: n
-
-Returns: s
-
-Returns: u
-
-Returns: r
-
-Returns: e
-
-Returns: 
-
-Returns: p
-
-Returns: r
-
-Returns: e
-
-Returns: c
-
-Returns: i
-
-Returns: s
-
-Returns: i
-
-Returns: o
-
-Returns: n
-
-Returns: .
-
-Returns: 
-
-Returns: T
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: a
-
-Returns: c
-
-Returns: t
-
-Returns: u
-
-Returns: a
-
-Returns: l
-
-Returns: 
-
-Returns: v
-
-Returns: a
-
-Returns: l
-
-Returns: u
-
-Returns: e
-
-Returns: 
-
-Returns: n
-
-Returns: e
-
-Returns: e
-
-Returns: d
-
-Returns: s
-
-Returns: 
-
-Returns: t
-
-Returns: o
-
-Returns: 
-
-Returns: b
-
-Returns: e
-
-Returns: 
-
-Returns: d
-
-Returns: i
-
-Returns: v
-
-Returns: i
-
-Returns: d
-
-Returns: e
-
-Returns: d
-
-Returns: 
-
-Returns: b
-
-Returns: y
-
-Returns: 
-
-Returns: 1
-
-Returns: e
-
-Returns: 8
-
-Returns: 
-
-Returns: (
-
-Returns: 1
-
-Returns: 0
-
-Returns: 
-
-Returns: t
-
-Returns: o
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: p
-
-Returns: o
-
-Returns: w
-
-Returns: e
-
-Returns: r
-
-Returns: 
-
-Returns: o
-
-Returns: f
-
-Returns: 
-
-Returns: 8
-
-Returns: )
-
-Returns: 
-
-Returns: f
-
-Returns: o
-
-Returns: r
-
-Returns: 
-
-Returns: c
-
-Returns: o
-
-Returns: n
-
-Returns: v
-
-Returns: e
-
-Returns: r
-
-Returns: s
-
-Returns: i
-
-Returns: o
-
-Returns: n
-
-Returns: .
-
-Returns: 
-
-Returns: I
-
-Returns: n
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: i
-
-Returns: s
-
-Returns: 
-
-Returns: e
-
-Returns: x
-
-Returns: a
-
-Returns: m
-
-Returns: p
-
-Returns: l
-
-Returns: e
-
-Returns: ,
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: a
-
-Returns: c
-
-Returns: t
-
-Returns: u
-
-Returns: a
-
-Returns: l
-
-Returns: 
-
-Returns: b
-
-Returns: a
-
-Returns: l
-
-Returns: a
-
-Returns: n
-
-Returns: c
-
-Returns: e
-
-Returns: 
-
-Returns: i
-
-Returns: s
-
-Returns: :
-
-Returns: 
-
-Returns: 2
-
-Returns: 2
-
-Returns: 9
-
-Returns: .
-
-Returns: 4
-
-Returns: 4
-
-Returns: 7
-
-Returns: 0
-
-Returns: 2
-
-Returns: 4
-
-Returns: 3
-
-Returns: 6
-
-##### GetExchangeList
-
-The ```GetExchangeList``` method is used to get the list of exchanges supported by the FMZ quantitative trading platform and their configuration information.
-
-Parameters:
-
-- `isSummary` (bool, required): The ```isSummary``` parameter is used to specify whether the returned data is summary information.
-
-Returns: W
-
-Returns: h
-
-Returns: e
-
-Returns: n
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: i
-
-Returns: s
-
-Returns: S
-
-Returns: u
-
-Returns: m
-
-Returns: m
-
-Returns: a
-
-Returns: r
-
-Returns: y
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 
-
-Returns: p
-
-Returns: a
-
-Returns: r
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: t
-
-Returns: e
-
-Returns: r
-
-Returns: 
-
-Returns: i
-
-Returns: s
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: f
-
-Returns: a
-
-Returns: l
-
-Returns: s
-
-Returns: e
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: ,
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: r
-
-Returns: e
-
-Returns: t
-
-Returns: u
-
-Returns: r
-
-Returns: n
-
-Returns: e
-
-Returns: d
-
-Returns: 
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: :
-
-Returns: 
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: j
-
-Returns: s
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: x
-
-Returns: c
-
-Returns: h
-
-Returns: a
-
-Returns: n
-
-Returns: g
-
-Returns: e
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: [
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: g
-
-Returns: o
-
-Returns: r
-
-Returns: y
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 加
-
-Returns: 密
-
-Returns: 货
-
-Returns: 币
-
-Returns: |
-
-Returns: |
-
-Returns: C
-
-Returns: r
-
-Returns: y
-
-Returns: p
-
-Returns: t
-
-Returns: o
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: F
-
-Returns: u
-
-Returns: t
-
-Returns: u
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: _
-
-Returns: B
-
-Returns: i
-
-Returns: n
-
-Returns: a
-
-Returns: n
-
-Returns: c
-
-Returns: e
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 7
-
-Returns: 4
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: l
-
-Returns: o
-
-Returns: g
-
-Returns: o
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: /
-
-Returns: u
-
-Returns: p
-
-Returns: l
-
-Returns: o
-
-Returns: a
-
-Returns: d
-
-Returns: /
-
-Returns: a
-
-Returns: s
-
-Returns: s
-
-Returns: e
-
-Returns: t
-
-Returns: /
-
-Returns: d
-
-Returns: 8
-
-Returns: d
-
-Returns: 8
-
-Returns: 4
-
-Returns: b
-
-Returns: 2
-
-Returns: 3
-
-Returns: e
-
-Returns: 5
-
-Returns: 7
-
-Returns: 3
-
-Returns: e
-
-Returns: 9
-
-Returns: 3
-
-Returns: 2
-
-Returns: 6
-
-Returns: b
-
-Returns: 9
-
-Returns: 9
-
-Returns: .
-
-Returns: s
-
-Returns: v
-
-Returns: g
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: m
-
-Returns: e
-
-Returns: t
-
-Returns: a
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: [
-
-Returns: {
-
-Returns: \
-
-Returns: "
-
-Returns: d
-
-Returns: e
-
-Returns: s
-
-Returns: c
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: \
-
-Returns: "
-
-Returns: A
-
-Returns: c
-
-Returns: c
-
-Returns: e
-
-Returns: s
-
-Returns: s
-
-Returns: 
-
-Returns: K
-
-Returns: e
-
-Returns: y
-
-Returns: \
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: \
-
-Returns: "
-
-Returns: q
-
-Returns: r
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: \
-
-Returns: "
-
-Returns: a
-
-Returns: p
-
-Returns: i
-
-Returns: K
-
-Returns: e
-
-Returns: y
-
-Returns: \
-
-Returns: "
-
-Returns: ,
-
-Returns: \
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: q
-
-Returns: u
-
-Returns: i
-
-Returns: r
-
-Returns: e
-
-Returns: d
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: t
-
-Returns: r
-
-Returns: u
-
-Returns: e
-
-Returns: ,
-
-Returns: 
-
-Returns: \
-
-Returns: "
-
-Returns: t
-
-Returns: y
-
-Returns: p
-
-Returns: e
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: \
-
-Returns: "
-
-Returns: s
-
-Returns: t
-
-Returns: r
-
-Returns: i
-
-Returns: n
-
-Returns: g
-
-Returns: \
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: \
-
-Returns: "
-
-Returns: n
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: \
-
-Returns: "
-
-Returns: A
-
-Returns: c
-
-Returns: c
-
-Returns: e
-
-Returns: s
-
-Returns: s
-
-Returns: K
-
-Returns: e
-
-Returns: y
-
-Returns: \
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: \
-
-Returns: "
-
-Returns: l
-
-Returns: a
-
-Returns: b
-
-Returns: e
-
-Returns: l
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: \
-
-Returns: "
-
-Returns: A
-
-Returns: c
-
-Returns: c
-
-Returns: e
-
-Returns: s
-
-Returns: s
-
-Returns: 
-
-Returns: K
-
-Returns: e
-
-Returns: y
-
-Returns: \
-
-Returns: "
-
-Returns: }
-
-Returns: ,
-
-Returns: 
-
-Returns: {
-
-Returns: \
-
-Returns: "
-
-Returns: e
-
-Returns: n
-
-Returns: c
-
-Returns: r
-
-Returns: y
-
-Returns: p
-
-Returns: t
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: t
-
-Returns: r
-
-Returns: u
-
-Returns: e
-
-Returns: ,
-
-Returns: 
-
-Returns: \
-
-Returns: "
-
-Returns: q
-
-Returns: r
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: \
-
-Returns: "
-
-Returns: s
-
-Returns: e
-
-Returns: c
-
-Returns: r
-
-Returns: e
-
-Returns: t
-
-Returns: K
-
-Returns: e
-
-Returns: y
-
-Returns: \
-
-Returns: "
-
-Returns: ,
-
-Returns: \
-
-Returns: "
-
-Returns: n
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: \
-
-Returns: "
-
-Returns: S
-
-Returns: e
-
-Returns: c
-
-Returns: r
-
-Returns: e
-
-Returns: t
-
-Returns: K
-
-Returns: e
-
-Returns: y
-
-Returns: \
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: \
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: q
-
-Returns: u
-
-Returns: i
-
-Returns: r
-
-Returns: e
-
-Returns: d
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: t
-
-Returns: r
-
-Returns: u
-
-Returns: e
-
-Returns: ,
-
-Returns: 
-
-Returns: \
-
-Returns: "
-
-Returns: l
-
-Returns: a
-
-Returns: b
-
-Returns: e
-
-Returns: l
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: \
-
-Returns: "
-
-Returns: S
-
-Returns: e
-
-Returns: c
-
-Returns: r
-
-Returns: e
-
-Returns: t
-
-Returns: 
-
-Returns: K
-
-Returns: e
-
-Returns: y
-
-Returns: \
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: \
-
-Returns: "
-
-Returns: t
-
-Returns: y
-
-Returns: p
-
-Returns: e
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: \
-
-Returns: "
-
-Returns: p
-
-Returns: a
-
-Returns: s
-
-Returns: s
-
-Returns: w
-
-Returns: o
-
-Returns: r
-
-Returns: d
-
-Returns: \
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: \
-
-Returns: "
-
-Returns: d
-
-Returns: e
-
-Returns: s
-
-Returns: c
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: \
-
-Returns: "
-
-Returns: S
-
-Returns: e
-
-Returns: c
-
-Returns: r
-
-Returns: e
-
-Returns: t
-
-Returns: 
-
-Returns: K
-
-Returns: e
-
-Returns: y
-
-Returns: \
-
-Returns: "
-
-Returns: }
-
-Returns: ]
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: n
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 币
-
-Returns: 安
-
-Returns: 期
-
-Returns: 货
-
-Returns: |
-
-Returns: F
-
-Returns: u
-
-Returns: t
-
-Returns: u
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: _
-
-Returns: B
-
-Returns: i
-
-Returns: n
-
-Returns: a
-
-Returns: n
-
-Returns: c
-
-Returns: e
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: p
-
-Returns: r
-
-Returns: i
-
-Returns: o
-
-Returns: r
-
-Returns: i
-
-Returns: t
-
-Returns: y
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 2
-
-Returns: 0
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: t
-
-Returns: o
-
-Returns: c
-
-Returns: k
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: B
-
-Returns: T
-
-Returns: C
-
-Returns: _
-
-Returns: U
-
-Returns: S
-
-Returns: D
-
-Returns: T
-
-Returns: ,
-
-Returns: E
-
-Returns: T
-
-Returns: H
-
-Returns: _
-
-Returns: U
-
-Returns: S
-
-Returns: D
-
-Returns: T
-
-Returns: ,
-
-Returns: E
-
-Returns: T
-
-Returns: H
-
-Returns: _
-
-Returns: U
-
-Returns: S
-
-Returns: D
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: w
-
-Returns: e
-
-Returns: b
-
-Returns: s
-
-Returns: i
-
-Returns: t
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: h
-
-Returns: t
-
-Returns: t
-
-Returns: p
-
-Returns: s
-
-Returns: :
-
-Returns: /
-
-Returns: /
-
-Returns: a
-
-Returns: c
-
-Returns: c
-
-Returns: o
-
-Returns: u
-
-Returns: n
-
-Returns: t
-
-Returns: s
-
-Returns: .
-
-Returns: b
-
-Returns: i
-
-Returns: n
-
-Returns: a
-
-Returns: n
-
-Returns: c
-
-Returns: e
-
-Returns: .
-
-Returns: c
-
-Returns: o
-
-Returns: m
-
-Returns: /
-
-Returns: z
-
-Returns: h
-
-Returns: -
-
-Returns: T
-
-Returns: C
-
-Returns: /
-
-Returns: r
-
-Returns: e
-
-Returns: g
-
-Returns: i
-
-Returns: s
-
-Returns: t
-
-Returns: e
-
-Returns: r
-
-Returns: ?
-
-Returns: r
-
-Returns: e
-
-Returns: f
-
-Returns: =
-
-Returns: 4
-
-Returns: 5
-
-Returns: 1
-
-Returns: 1
-
-Returns: 0
-
-Returns: 2
-
-Returns: 7
-
-Returns: 0
-
-Returns: "
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ]
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: r
-
-Returns: r
-
-Returns: o
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: n
-
-Returns: u
-
-Returns: l
-
-Returns: l
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 
-
-Returns: 
-
-Returns: W
-
-Returns: h
-
-Returns: e
-
-Returns: n
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: i
-
-Returns: s
-
-Returns: S
-
-Returns: u
-
-Returns: m
-
-Returns: m
-
-Returns: a
-
-Returns: r
-
-Returns: y
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 
-
-Returns: p
-
-Returns: a
-
-Returns: r
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: t
-
-Returns: e
-
-Returns: r
-
-Returns: 
-
-Returns: i
-
-Returns: s
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: t
-
-Returns: r
-
-Returns: u
-
-Returns: e
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: ,
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: r
-
-Returns: e
-
-Returns: t
-
-Returns: u
-
-Returns: r
-
-Returns: n
-
-Returns: e
-
-Returns: d
-
-Returns: 
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: :
-
-Returns: 
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: j
-
-Returns: s
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: x
-
-Returns: c
-
-Returns: h
-
-Returns: a
-
-Returns: n
-
-Returns: g
-
-Returns: e
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: [
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: g
-
-Returns: o
-
-Returns: r
-
-Returns: y
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 加
-
-Returns: 密
-
-Returns: 货
-
-Returns: 币
-
-Returns: |
-
-Returns: |
-
-Returns: C
-
-Returns: r
-
-Returns: y
-
-Returns: p
-
-Returns: t
-
-Returns: o
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: F
-
-Returns: u
-
-Returns: t
-
-Returns: u
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: _
-
-Returns: B
-
-Returns: i
-
-Returns: n
-
-Returns: a
-
-Returns: n
-
-Returns: c
-
-Returns: e
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 7
-
-Returns: 4
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: l
-
-Returns: o
-
-Returns: g
-
-Returns: o
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: /
-
-Returns: u
-
-Returns: p
-
-Returns: l
-
-Returns: o
-
-Returns: a
-
-Returns: d
-
-Returns: /
-
-Returns: a
-
-Returns: s
-
-Returns: s
-
-Returns: e
-
-Returns: t
-
-Returns: /
-
-Returns: d
-
-Returns: 8
-
-Returns: d
-
-Returns: 8
-
-Returns: 4
-
-Returns: b
-
-Returns: 2
-
-Returns: 3
-
-Returns: e
-
-Returns: 5
-
-Returns: 7
-
-Returns: 3
-
-Returns: e
-
-Returns: 9
-
-Returns: 3
-
-Returns: 2
-
-Returns: 6
-
-Returns: b
-
-Returns: 9
-
-Returns: 9
-
-Returns: .
-
-Returns: s
-
-Returns: v
-
-Returns: g
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: n
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 币
-
-Returns: 安
-
-Returns: 期
-
-Returns: 货
-
-Returns: |
-
-Returns: F
-
-Returns: u
-
-Returns: t
-
-Returns: u
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: _
-
-Returns: B
-
-Returns: i
-
-Returns: n
-
-Returns: a
-
-Returns: n
-
-Returns: c
-
-Returns: e
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: p
-
-Returns: r
-
-Returns: i
-
-Returns: o
-
-Returns: r
-
-Returns: i
-
-Returns: t
-
-Returns: y
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 2
-
-Returns: 0
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: w
-
-Returns: e
-
-Returns: b
-
-Returns: s
-
-Returns: i
-
-Returns: t
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: h
-
-Returns: t
-
-Returns: t
-
-Returns: p
-
-Returns: s
-
-Returns: :
-
-Returns: /
-
-Returns: /
-
-Returns: a
-
-Returns: c
-
-Returns: c
-
-Returns: o
-
-Returns: u
-
-Returns: n
-
-Returns: t
-
-Returns: s
-
-Returns: .
-
-Returns: b
-
-Returns: i
-
-Returns: n
-
-Returns: a
-
-Returns: n
-
-Returns: c
-
-Returns: e
-
-Returns: .
-
-Returns: c
-
-Returns: o
-
-Returns: m
-
-Returns: /
-
-Returns: z
-
-Returns: h
-
-Returns: -
-
-Returns: T
-
-Returns: C
-
-Returns: /
-
-Returns: r
-
-Returns: e
-
-Returns: g
-
-Returns: i
-
-Returns: s
-
-Returns: t
-
-Returns: e
-
-Returns: r
-
-Returns: ?
-
-Returns: r
-
-Returns: e
-
-Returns: f
-
-Returns: =
-
-Returns: 4
-
-Returns: 5
-
-Returns: 1
-
-Returns: 1
-
-Returns: 0
-
-Returns: 2
-
-Returns: 7
-
-Returns: 0
-
-Returns: "
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ]
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: r
-
-Returns: r
-
-Returns: o
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: n
-
-Returns: u
-
-Returns: l
-
-Returns: l
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: m
-
-Returns: e
-
-Returns: t
-
-Returns: a
-
-Returns: :
-
-Returns: 
-
-Returns: E
-
-Returns: x
-
-Returns: c
-
-Returns: h
-
-Returns: a
-
-Returns: n
-
-Returns: g
-
-Returns: e
-
-Returns: 
-
-Returns: c
-
-Returns: o
-
-Returns: n
-
-Returns: f
-
-Returns: i
-
-Returns: g
-
-Returns: u
-
-Returns: r
-
-Returns: a
-
-Returns: t
-
-Returns: i
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: m
-
-Returns: e
-
-Returns: t
-
-Returns: a
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: .
-
-##### DeleteNode
-
-The ```DeleteNode``` method is used to delete a docker node under the FMZ Quant Trading Platform account corresponding to the ```API KEY``` in the request. The docker node ID to be deleted is specified by the ```nid``` parameter.
-
-Parameters:
-
-- `nid` (number, required): The ```nid``` parameter is used to specify the docker ID to be deleted. You can obtain the docker information under the account through the ```GetNodeList``` method.
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: j
-
-Returns: s
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: "
-
-Returns: :
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: t
-
-Returns: r
-
-Returns: u
-
-Returns: e
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: r
-
-Returns: r
-
-Returns: o
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: n
-
-Returns: u
-
-Returns: l
-
-Returns: l
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: :
-
-Returns: 
-
-Returns: W
-
-Returns: h
-
-Returns: e
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: r
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: a
-
-Returns: s
-
-Returns: s
-
-Returns: o
-
-Returns: c
-
-Returns: i
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: d
-
-Returns: 
-
-Returns: d
-
-Returns: o
-
-Returns: c
-
-Returns: k
-
-Returns: e
-
-Returns: r
-
-Returns: 
-
-Returns: p
-
-Returns: r
-
-Returns: o
-
-Returns: g
-
-Returns: r
-
-Returns: a
-
-Returns: m
-
-Returns: 
-
-Returns: w
-
-Returns: a
-
-Returns: s
-
-Returns: 
-
-Returns: s
-
-Returns: u
-
-Returns: c
-
-Returns: c
-
-Returns: e
-
-Returns: s
-
-Returns: s
-
-Returns: f
-
-Returns: u
-
-Returns: l
-
-Returns: l
-
-Returns: y
-
-Returns: 
-
-Returns: d
-
-Returns: e
-
-Returns: l
-
-Returns: e
-
-Returns: t
-
-Returns: e
-
-Returns: d
-
-Returns: .
-
-##### DeleteRobot
-
-The ```DeleteRobot``` method is used to delete a live trading bot under the FMZ Quant Trading Platform account corresponding to the ```API KEY``` in the request. The deleted bot ID is specified by the ```robotId``` parameter.
-
-Parameters:
-
-- `robotId` (number, required): The ```robotId``` parameter is used to specify the ID of the live trading bot to be deleted. You can use the ```GetRobotList``` method to get information about bots under the account, which includes the bot ID.
-- `deleteLogs` (bool, required): The ```deleteLogs``` parameter is used to set whether to delete the bot logs. If a truthy value is passed (e.g., ```true```), the bot logs will be deleted.
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: j
-
-Returns: s
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: "
-
-Returns: :
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: r
-
-Returns: r
-
-Returns: o
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: n
-
-Returns: u
-
-Returns: l
-
-Returns: l
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: :
-
-Returns: 
-
-Returns: F
-
-Returns: e
-
-Returns: e
-
-Returns: d
-
-Returns: b
-
-Returns: a
-
-Returns: c
-
-Returns: k
-
-Returns: 
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: 
-
-Returns: o
-
-Returns: f
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: b
-
-Returns: o
-
-Returns: t
-
-Returns: 
-
-Returns: d
-
-Returns: e
-
-Returns: l
-
-Returns: e
-
-Returns: t
-
-Returns: i
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: o
-
-Returns: p
-
-Returns: e
-
-Returns: r
-
-Returns: a
-
-Returns: t
-
-Returns: i
-
-Returns: o
-
-Returns: n
-
-Returns: .
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: 0
-
-Returns: :
-
-Returns: 
-
-Returns: N
-
-Returns: o
-
-Returns: r
-
-Returns: m
-
-Returns: a
-
-Returns: l
-
-Returns: 
-
-Returns: d
-
-Returns: e
-
-Returns: l
-
-Returns: e
-
-Returns: t
-
-Returns: i
-
-Returns: o
-
-Returns: n
-
-Returns: .
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: -
-
-Returns: 2
-
-Returns: :
-
-Returns: 
-
-Returns: D
-
-Returns: e
-
-Returns: l
-
-Returns: e
-
-Returns: t
-
-Returns: i
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: s
-
-Returns: u
-
-Returns: c
-
-Returns: c
-
-Returns: e
-
-Returns: s
-
-Returns: s
-
-Returns: f
-
-Returns: u
-
-Returns: l
-
-Returns: ,
-
-Returns: 
-
-Returns: b
-
-Returns: u
-
-Returns: t
-
-Returns: 
-
-Returns: u
-
-Returns: n
-
-Returns: a
-
-Returns: b
-
-Returns: l
-
-Returns: e
-
-Returns: 
-
-Returns: t
-
-Returns: o
-
-Returns: 
-
-Returns: c
-
-Returns: o
-
-Returns: n
-
-Returns: t
-
-Returns: a
-
-Returns: c
-
-Returns: t
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: d
-
-Returns: o
-
-Returns: c
-
-Returns: k
-
-Returns: e
-
-Returns: r
-
-Returns: 
-
-Returns: a
-
-Returns: s
-
-Returns: s
-
-Returns: o
-
-Returns: c
-
-Returns: i
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: d
-
-Returns: 
-
-Returns: w
-
-Returns: i
-
-Returns: t
-
-Returns: h
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: b
-
-Returns: o
-
-Returns: t
-
-Returns: ,
-
-Returns: 
-
-Returns: p
-
-Returns: l
-
-Returns: e
-
-Returns: a
-
-Returns: s
-
-Returns: e
-
-Returns: 
-
-Returns: m
-
-Returns: a
-
-Returns: n
-
-Returns: u
-
-Returns: a
-
-Returns: l
-
-Returns: l
-
-Returns: y
-
-Returns: 
-
-Returns: d
-
-Returns: e
-
-Returns: l
-
-Returns: e
-
-Returns: t
-
-Returns: e
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: f
-
-Returns: i
-
-Returns: l
-
-Returns: e
-
-Returns: 
-
-Returns: 1
-
-Returns: 2
-
-Returns: 3
-
-Returns: .
-
-Returns: d
-
-Returns: b
-
-Returns: 3
-
-Returns: !
-
-##### GetStrategyList
-
-The ```GetStrategyList``` method is used to retrieve platform strategy information.
-
-Parameters:
-
-- `offset` (number, required): The ```offset``` parameter is used to set the query offset.
-- `length` (number, required): The ```length``` parameter is used to set the number of data entries returned by the query.
-- `strategyType` (number, required): The ```strategyType``` parameter is used to set the type of strategy to query.
-
-- Set ```strategyType``` parameter to ```0```: Query all strategies.
-
-- Set ```strategyType``` parameter to ```1```: Query published strategies.
-
-- Set ```strategyType``` parameter to ```2```: Query strategies pending review.
-- `category` (number, required): The ```category``` parameter is used to set the strategy category to query.
-
-- Set ```category``` parameter to ```-1```: Query all strategies.
-
-- Set ```category``` parameter to ```0```: Query general strategies.
-- `needArgs` (number, required): The ```needArgs``` parameter is used to set whether the queried strategy requires parameters.
-
-- Set ```needArgs``` parameter to ```0```: Query all strategies.
-- `language` (number, required): The ```language``` parameter is used to set the programming language of the strategy to query.
-
-- Set ```language``` parameter to ```0```: JavaScript language.
-
-- Set ```language``` parameter to ```1```: Python language.
-
-- Set ```language``` parameter to ```2```: C++ language.
-
-- Set ```language``` parameter to ```3```: Visual strategy.
-
-- Set ```language``` parameter to ```4```: My language.
-
-- Set ```language``` parameter to ```5```: PINE language.
-- `kw` (string, required): The ```kw``` parameter is used to set keywords for querying strategies.
-
-- Set to an empty string to not use keyword filtering.
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: j
-
-Returns: s
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: a
-
-Returns: l
-
-Returns: l
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 1
-
-Returns: 2
-
-Returns: 3
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: g
-
-Returns: i
-
-Returns: e
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: [
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: g
-
-Returns: o
-
-Returns: r
-
-Returns: y
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 9
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 2
-
-Returns: 0
-
-Returns: 2
-
-Returns: 4
-
-Returns: -
-
-Returns: 1
-
-Returns: 1
-
-Returns: -
-
-Returns: 1
-
-Returns: 0
-
-Returns: 
-
-Returns: 2
-
-Returns: 0
-
-Returns: :
-
-Returns: 4
-
-Returns: 0
-
-Returns: :
-
-Returns: 0
-
-Returns: 4
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: e
-
-Returns: s
-
-Returns: c
-
-Returns: r
-
-Returns: i
-
-Returns: p
-
-Returns: t
-
-Returns: i
-
-Returns: o
-
-Returns: n
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: f
-
-Returns: o
-
-Returns: r
-
-Returns: k
-
-Returns: e
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: h
-
-Returns: i
-
-Returns: t
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 1
-
-Returns: 2
-
-Returns: 3
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: i
-
-Returns: s
-
-Returns: _
-
-Returns: b
-
-Returns: u
-
-Returns: y
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: f
-
-Returns: a
-
-Returns: l
-
-Returns: s
-
-Returns: e
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: i
-
-Returns: s
-
-Returns: _
-
-Returns: o
-
-Returns: w
-
-Returns: n
-
-Returns: e
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: f
-
-Returns: a
-
-Returns: l
-
-Returns: s
-
-Returns: e
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: l
-
-Returns: a
-
-Returns: n
-
-Returns: g
-
-Returns: u
-
-Returns: a
-
-Returns: g
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 2
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: l
-
-Returns: a
-
-Returns: s
-
-Returns: t
-
-Returns: _
-
-Returns: m
-
-Returns: o
-
-Returns: d
-
-Returns: i
-
-Returns: f
-
-Returns: i
-
-Returns: e
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 2
-
-Returns: 0
-
-Returns: 2
-
-Returns: 4
-
-Returns: -
-
-Returns: 1
-
-Returns: 1
-
-Returns: -
-
-Returns: 1
-
-Returns: 1
-
-Returns: 
-
-Returns: 1
-
-Returns: 7
-
-Returns: :
-
-Returns: 2
-
-Returns: 3
-
-Returns: :
-
-Returns: 5
-
-Returns: 2
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: n
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: H
-
-Returns: e
-
-Returns: d
-
-Returns: g
-
-Returns: e
-
-Returns: G
-
-Returns: r
-
-Returns: i
-
-Returns: d
-
-Returns: S
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: g
-
-Returns: y
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: p
-
-Returns: r
-
-Returns: o
-
-Returns: f
-
-Returns: i
-
-Returns: l
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: a
-
-Returns: v
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: .
-
-Returns: .
-
-Returns: .
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: n
-
-Returns: i
-
-Returns: c
-
-Returns: k
-
-Returns: n
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: a
-
-Returns: b
-
-Returns: c
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: u
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 4
-
-Returns: e
-
-Returns: d
-
-Returns: 2
-
-Returns: 2
-
-Returns: 5
-
-Returns: 4
-
-Returns: 4
-
-Returns: 0
-
-Returns: d
-
-Returns: b
-
-Returns: 1
-
-Returns: e
-
-Returns: d
-
-Returns: a
-
-Returns: 2
-
-Returns: 3
-
-Returns: f
-
-Returns: e
-
-Returns: 0
-
-Returns: 5
-
-Returns: e
-
-Returns: d
-
-Returns: 1
-
-Returns: 0
-
-Returns: 1
-
-Returns: 8
-
-Returns: 4
-
-Returns: 1
-
-Returns: 1
-
-Returns: 3
-
-Returns: e
-
-Returns: "
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: p
-
-Returns: u
-
-Returns: b
-
-Returns: l
-
-Returns: i
-
-Returns: c
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: t
-
-Returns: a
-
-Returns: g
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: u
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: 4
-
-Returns: e
-
-Returns: d
-
-Returns: 2
-
-Returns: 2
-
-Returns: 5
-
-Returns: 4
-
-Returns: 4
-
-Returns: 0
-
-Returns: d
-
-Returns: b
-
-Returns: 1
-
-Returns: e
-
-Returns: d
-
-Returns: a
-
-Returns: 2
-
-Returns: 3
-
-Returns: f
-
-Returns: e
-
-Returns: 0
-
-Returns: 5
-
-Returns: e
-
-Returns: d
-
-Returns: 1
-
-Returns: 0
-
-Returns: 1
-
-Returns: 8
-
-Returns: 4
-
-Returns: 1
-
-Returns: 1
-
-Returns: 3
-
-Returns: e
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: u
-
-Returns: s
-
-Returns: e
-
-Returns: r
-
-Returns: n
-
-Returns: a
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: a
-
-Returns: b
-
-Returns: c
-
-Returns: "
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ]
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: r
-
-Returns: r
-
-Returns: o
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: n
-
-Returns: u
-
-Returns: l
-
-Returns: l
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: a
-
-Returns: l
-
-Returns: l
-
-Returns: :
-
-Returns: 
-
-Returns: T
-
-Returns: o
-
-Returns: t
-
-Returns: a
-
-Returns: l
-
-Returns: 
-
-Returns: n
-
-Returns: u
-
-Returns: m
-
-Returns: b
-
-Returns: e
-
-Returns: r
-
-Returns: 
-
-Returns: o
-
-Returns: f
-
-Returns: 
-
-Returns: s
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: g
-
-Returns: i
-
-Returns: e
-
-Returns: s
-
-Returns: 
-
-Returns: m
-
-Returns: a
-
-Returns: t
-
-Returns: c
-
-Returns: h
-
-Returns: i
-
-Returns: n
-
-Returns: g
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: f
-
-Returns: i
-
-Returns: l
-
-Returns: t
-
-Returns: e
-
-Returns: r
-
-Returns: 
-
-Returns: c
-
-Returns: r
-
-Returns: i
-
-Returns: t
-
-Returns: e
-
-Returns: r
-
-Returns: i
-
-Returns: a
-
-Returns: .
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: s
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: g
-
-Returns: i
-
-Returns: e
-
-Returns: s
-
-Returns: :
-
-Returns: 
-
-Returns: D
-
-Returns: e
-
-Returns: t
-
-Returns: a
-
-Returns: i
-
-Returns: l
-
-Returns: e
-
-Returns: d
-
-Returns: 
-
-Returns: i
-
-Returns: n
-
-Returns: f
-
-Returns: o
-
-Returns: r
-
-Returns: m
-
-Returns: a
-
-Returns: t
-
-Returns: i
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: o
-
-Returns: f
-
-Returns: 
-
-Returns: s
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: g
-
-Returns: i
-
-Returns: e
-
-Returns: s
-
-Returns: 
-
-Returns: r
-
-Returns: e
-
-Returns: t
-
-Returns: u
-
-Returns: r
-
-Returns: n
-
-Returns: e
-
-Returns: d
-
-Returns: 
-
-Returns: b
-
-Returns: y
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: q
-
-Returns: u
-
-Returns: e
-
-Returns: r
-
-Returns: y
-
-Returns: .
-
-##### NewRobot
-
-The ```NewRobot``` method is used to create a live trading bot under the FMZ Quant Trading Platform account corresponding to the ```API KEY``` in the request.
-
-Parameters:
-
-- `settings` (JSON Object, required): Live trading configuration parameters. The ```settings``` parameter format is as follows:
-
-```json
-{
-    "appid":"test",
-    "args":[],
-    "exchanges":[
-        {"pair":"SOL_USDT","pid":123}
-    ],
-    "group":123,
-    "name":"test",
-    "node":123,
-    "period":60,
-    "strategy":123
-}
-```
-
-- group: Specify the live trading group.
-- args: Strategy parameters, empty array if the strategy has no parameters.
-- exchanges: Exchange object configuration, refer to the ```RestartRobot``` interface.
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: j
-
-Returns: s
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: "
-
-Returns: :
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: 5
-
-Returns: 9
-
-Returns: 1
-
-Returns: 9
-
-Returns: 8
-
-Returns: 8
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: r
-
-Returns: r
-
-Returns: o
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: n
-
-Returns: u
-
-Returns: l
-
-Returns: l
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: :
-
-Returns: 
-
-Returns: S
-
-Returns: u
-
-Returns: c
-
-Returns: c
-
-Returns: e
-
-Returns: s
-
-Returns: s
-
-Returns: f
-
-Returns: u
-
-Returns: l
-
-Returns: l
-
-Returns: y
-
-Returns: 
-
-Returns: c
-
-Returns: r
-
-Returns: e
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: d
-
-Returns: ,
-
-Returns: 
-
-Returns: r
-
-Returns: e
-
-Returns: t
-
-Returns: u
-
-Returns: r
-
-Returns: n
-
-Returns: s
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: l
-
-Returns: i
-
-Returns: v
-
-Returns: e
-
-Returns: 
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: d
-
-Returns: i
-
-Returns: n
-
-Returns: g
-
-Returns: 
-
-Returns: I
-
-Returns: D
-
-Returns: .
-
-Sensitive information such as ```"meta":{"AccessKey": "123", "SecretKey": "123"}``` configured in the ```eid``` of the ```settings``` parameter will not be stored by the FMZ Quant Trading Platform. This data will be directly forwarded to the docker program, so this information must be configured each time a live trading bot is created or restarted.
-
-When creating a live trading bot using a general protocol exchange object, the ```exchanges``` property can use the following settings when configuring the ```settings``` parameter:
-```json
-{
-    "eid": "Exchange",
-    "label": "test",
-    "pair": "ETH_BTC",
-    "meta": {
-        "AccessKey": "123",
-        "SecretKey": "123",
-        "Front": "http://127.0.0.1:6666/test"
-    }
-}
-```
-
-The ```label``` property is used to set a label for the current general protocol connected exchange object, which can be retrieved in the strategy using the ```exchange.GetLabel()``` function.
-
-##### PluginRun
-
-The ```PluginRun``` method is used to call the **debugging tool** functionality of the FMZ Quant Trading Platform; only JavaScript language is supported.
-
-Parameters:
-
-- `settings` (JSON object, required): Setting parameters in the debugging tool, the ```settings``` configuration contains test code located in the ```source``` attribute. The ```settings``` parameter format is as follows:
-
-```json
-{
-    "exchanges":[{"pair":"SOL_USDT","pid":123}],
-    "node":123,
-    "period":60,
-    "source":"function main() {Log(\"Hello FMZ\")}"
-}
-```
-
-- source: The code to be debugged.
-- node: Docker ID, specifies which docker to run the live trading on. If this value is -1, it means automatic allocation.
-- exchanges: Exchange object configuration, refer to the ```RestartRobot``` interface.
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: j
-
-Returns: s
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: {
-
-Returns: \
-
-Returns: "
-
-Returns: l
-
-Returns: o
-
-Returns: g
-
-Returns: s
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: [
-
-Returns: {
-
-Returns: \
-
-Returns: "
-
-Returns: P
-
-Returns: l
-
-Returns: a
-
-Returns: t
-
-Returns: f
-
-Returns: o
-
-Returns: r
-
-Returns: m
-
-Returns: I
-
-Returns: d
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: \
-
-Returns: "
-
-Returns: \
-
-Returns: "
-
-Returns: ,
-
-Returns: \
-
-Returns: "
-
-Returns: O
-
-Returns: r
-
-Returns: d
-
-Returns: e
-
-Returns: r
-
-Returns: I
-
-Returns: d
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: \
-
-Returns: "
-
-Returns: 0
-
-Returns: \
-
-Returns: "
-
-Returns: ,
-
-Returns: \
-
-Returns: "
-
-Returns: L
-
-Returns: o
-
-Returns: g
-
-Returns: T
-
-Returns: y
-
-Returns: p
-
-Returns: e
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: 5
-
-Returns: ,
-
-Returns: \
-
-Returns: "
-
-Returns: P
-
-Returns: r
-
-Returns: i
-
-Returns: c
-
-Returns: e
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: 0
-
-Returns: ,
-
-Returns: \
-
-Returns: "
-
-Returns: A
-
-Returns: m
-
-Returns: o
-
-Returns: u
-
-Returns: n
-
-Returns: t
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: 0
-
-Returns: ,
-
-Returns: \
-
-Returns: "
-
-Returns: E
-
-Returns: x
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: \
-
-Returns: "
-
-Returns: H
-
-Returns: e
-
-Returns: l
-
-Returns: l
-
-Returns: o
-
-Returns: 
-
-Returns: F
-
-Returns: M
-
-Returns: Z
-
-Returns: \
-
-Returns: "
-
-Returns: ,
-
-Returns: \
-
-Returns: "
-
-Returns: C
-
-Returns: u
-
-Returns: r
-
-Returns: r
-
-Returns: e
-
-Returns: n
-
-Returns: c
-
-Returns: y
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: \
-
-Returns: "
-
-Returns: \
-
-Returns: "
-
-Returns: ,
-
-Returns: \
-
-Returns: "
-
-Returns: I
-
-Returns: n
-
-Returns: s
-
-Returns: t
-
-Returns: r
-
-Returns: u
-
-Returns: m
-
-Returns: e
-
-Returns: n
-
-Returns: t
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: \
-
-Returns: "
-
-Returns: \
-
-Returns: "
-
-Returns: ,
-
-Returns: \
-
-Returns: "
-
-Returns: D
-
-Returns: i
-
-Returns: r
-
-Returns: e
-
-Returns: c
-
-Returns: t
-
-Returns: i
-
-Returns: o
-
-Returns: n
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: \
-
-Returns: "
-
-Returns: \
-
-Returns: "
-
-Returns: ,
-
-Returns: \
-
-Returns: "
-
-Returns: T
-
-Returns: i
-
-Returns: m
-
-Returns: e
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: 1
-
-Returns: 7
-
-Returns: 3
-
-Returns: 2
-
-Returns: 2
-
-Returns: 6
-
-Returns: 7
-
-Returns: 4
-
-Returns: 7
-
-Returns: 3
-
-Returns: 1
-
-Returns: 0
-
-Returns: 8
-
-Returns: }
-
-Returns: ]
-
-Returns: ,
-
-Returns: \
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: \
-
-Returns: "
-
-Returns: :
-
-Returns: \
-
-Returns: "
-
-Returns: \
-
-Returns: "
-
-Returns: }
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: r
-
-Returns: r
-
-Returns: o
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: n
-
-Returns: u
-
-Returns: l
-
-Returns: l
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: :
-
-Returns: 
-
-Returns: T
-
-Returns: e
-
-Returns: s
-
-Returns: t
-
-Returns: 
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: 
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: 
-
-Returns: r
-
-Returns: e
-
-Returns: t
-
-Returns: u
-
-Returns: r
-
-Returns: n
-
-Returns: e
-
-Returns: d
-
-Returns: 
-
-Returns: a
-
-Returns: f
-
-Returns: t
-
-Returns: e
-
-Returns: r
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: d
-
-Returns: e
-
-Returns: b
-
-Returns: u
-
-Returns: g
-
-Returns: g
-
-Returns: i
-
-Returns: n
-
-Returns: g
-
-Returns: 
-
-Returns: t
-
-Returns: o
-
-Returns: o
-
-Returns: l
-
-Returns: 
-
-Returns: s
-
-Returns: u
-
-Returns: c
-
-Returns: c
-
-Returns: e
-
-Returns: s
-
-Returns: s
-
-Returns: f
-
-Returns: u
-
-Returns: l
-
-Returns: l
-
-Returns: y
-
-Returns: 
-
-Returns: e
-
-Returns: x
-
-Returns: e
-
-Returns: c
-
-Returns: u
-
-Returns: t
-
-Returns: e
-
-Returns: s
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: p
-
-Returns: a
-
-Returns: s
-
-Returns: s
-
-Returns: e
-
-Returns: d
-
-Returns: 
-
-Returns: J
-
-Returns: a
-
-Returns: v
-
-Returns: a
-
-Returns: S
-
-Returns: c
-
-Returns: r
-
-Returns: i
-
-Returns: p
-
-Returns: t
-
-Returns: 
-
-Returns: c
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: .
-
-```{"eid": "OKEX", "pair": "ETH_BTC", "meta" :{"AccessKey": "123", "SecretKey": "123"}}```
-```{"eid": "Huobi", "pair": "BCH_BTC", "meta" :{"AccessKey": "123", "SecretKey": "123"}}```
-
-For the ```exchanges``` attribute in ```settings```, only one needs to be set when calling the ```PluginRun``` method (only one exchange object is supported when using the debugging tool page). Setting 2 exchange objects in ```settings``` will not cause an error, but accessing the second exchange object in the code will cause an error.
-
-##### GetRobotLogs
+###### GetRobotLogs
 
 The ```GetRobotLogs``` method is used to get the live trading log information under the FMZ Quant Trading Platform account corresponding to the ```API KEY``` in the request. The live trading ID for which to get log information is specified by the ```robotId``` parameter.
 
@@ -30252,2465 +5988,68 @@ Parameters:
 - `summaryLimit` (number, required): The ```summaryLimit``` parameter is used to set the number of bytes of status bar data to query. This parameter is an integer used to query the status bar data of live trading.
 
 Setting it to 0 means not querying status bar information; setting it to a non-zero value indicates the number of bytes of status bar information to query (this interface does not limit the amount of data, you can specify a larger summaryLimit parameter to get all status bar information). The status bar data is stored in the ```summary``` field of the returned data.
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: j
-
-Returns: s
-
-Returns: o
-
-Returns: n
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: u
-
-Returns: l
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: h
-
-Returns: a
-
-Returns: r
-
-Returns: t
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: c
-
-Returns: h
-
-Returns: a
-
-Returns: r
-
-Returns: t
-
-Returns: T
-
-Returns: i
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: l
-
-Returns: o
-
-Returns: g
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: [
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: T
-
-Returns: o
-
-Returns: t
-
-Returns: a
-
-Returns: l
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 2
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: M
-
-Returns: a
-
-Returns: x
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 2
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: M
-
-Returns: i
-
-Returns: n
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 1
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: A
-
-Returns: r
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: [
-
-Returns: ]
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ,
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: T
-
-Returns: o
-
-Returns: t
-
-Returns: a
-
-Returns: l
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: M
-
-Returns: a
-
-Returns: x
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: M
-
-Returns: i
-
-Returns: n
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: A
-
-Returns: r
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: [
-
-Returns: ]
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ,
-
-Returns: 
-
-Returns: {
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: T
-
-Returns: o
-
-Returns: t
-
-Returns: a
-
-Returns: l
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: M
-
-Returns: a
-
-Returns: x
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: M
-
-Returns: i
-
-Returns: n
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: A
-
-Returns: r
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: [
-
-Returns: ]
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ]
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: n
-
-Returns: o
-
-Returns: d
-
-Returns: e
-
-Returns: _
-
-Returns: i
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 1
-
-Returns: 2
-
-Returns: 3
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: o
-
-Returns: n
-
-Returns: l
-
-Returns: i
-
-Returns: n
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: t
-
-Returns: r
-
-Returns: u
-
-Returns: e
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: r
-
-Returns: e
-
-Returns: f
-
-Returns: r
-
-Returns: e
-
-Returns: s
-
-Returns: h
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 1
-
-Returns: 7
-
-Returns: 3
-
-Returns: 2
-
-Returns: 2
-
-Returns: 0
-
-Returns: 1
-
-Returns: 5
-
-Returns: 4
-
-Returns: 4
-
-Returns: 0
-
-Returns: 0
-
-Returns: 0
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: t
-
-Returns: a
-
-Returns: t
-
-Returns: u
-
-Returns: s
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 4
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: s
-
-Returns: u
-
-Returns: m
-
-Returns: m
-
-Returns: a
-
-Returns: r
-
-Returns: y
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: "
-
-Returns: .
-
-Returns: .
-
-Returns: .
-
-Returns: "
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: u
-
-Returns: p
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: T
-
-Returns: i
-
-Returns: m
-
-Returns: e
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 1
-
-Returns: 7
-
-Returns: 3
-
-Returns: 2
-
-Returns: 2
-
-Returns: 0
-
-Returns: 1
-
-Returns: 5
-
-Returns: 3
-
-Returns: 2
-
-Returns: 6
-
-Returns: 3
-
-Returns: 6
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: w
-
-Returns: d
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: 0
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: ,
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: "
-
-Returns: e
-
-Returns: r
-
-Returns: r
-
-Returns: o
-
-Returns: r
-
-Returns: "
-
-Returns: :
-
-Returns: 
-
-Returns: n
-
-Returns: u
-
-Returns: l
-
-Returns: l
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: }
-
-Returns: 
-
-Returns: `
-
-Returns: `
-
-Returns: `
-
-Returns: 
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: l
-
-Returns: o
-
-Returns: g
-
-Returns: s
-
-Returns: :
-
-Returns: 
-
-Returns: L
-
-Returns: o
-
-Returns: g
-
-Returns: 
-
-Returns: i
-
-Returns: n
-
-Returns: f
-
-Returns: o
-
-Returns: r
-
-Returns: m
-
-Returns: a
-
-Returns: t
-
-Returns: i
-
-Returns: o
-
-Returns: n
-
-Returns: ;
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: q
-
-Returns: u
-
-Returns: e
-
-Returns: r
-
-Returns: i
-
-Returns: e
-
-Returns: d
-
-Returns: 
-
-Returns: l
-
-Returns: o
-
-Returns: g
-
-Returns: 
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: 
-
-Returns: e
-
-Returns: n
-
-Returns: t
-
-Returns: r
-
-Returns: i
-
-Returns: e
-
-Returns: s
-
-Returns: 
-
-Returns: a
-
-Returns: r
-
-Returns: e
-
-Returns: 
-
-Returns: s
-
-Returns: t
-
-Returns: o
-
-Returns: r
-
-Returns: e
-
-Returns: d
-
-Returns: 
-
-Returns: i
-
-Returns: n
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: A
-
-Returns: r
-
-Returns: r
-
-Returns: 
-
-Returns: f
-
-Returns: i
-
-Returns: e
-
-Returns: l
-
-Returns: d
-
-Returns: .
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: T
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: f
-
-Returns: i
-
-Returns: r
-
-Returns: s
-
-Returns: t
-
-Returns: 
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: 
-
-Returns: s
-
-Returns: t
-
-Returns: r
-
-Returns: u
-
-Returns: c
-
-Returns: t
-
-Returns: u
-
-Returns: r
-
-Returns: e
-
-Returns: 
-
-Returns: i
-
-Returns: n
-
-Returns: 
-
-Returns: l
-
-Returns: o
-
-Returns: g
-
-Returns: s
-
-Returns: 
-
-Returns: c
-
-Returns: o
-
-Returns: n
-
-Returns: t
-
-Returns: a
-
-Returns: i
-
-Returns: n
-
-Returns: s
-
-Returns: 
-
-Returns: l
-
-Returns: o
-
-Returns: g
-
-Returns: 
-
-Returns: r
-
-Returns: e
-
-Returns: c
-
-Returns: o
-
-Returns: r
-
-Returns: d
-
-Returns: s
-
-Returns: 
-
-Returns: f
-
-Returns: r
-
-Returns: o
-
-Returns: m
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: s
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: t
-
-Returns: e
-
-Returns: g
-
-Returns: y
-
-Returns: 
-
-Returns: l
-
-Returns: o
-
-Returns: g
-
-Returns: 
-
-Returns: t
-
-Returns: a
-
-Returns: b
-
-Returns: l
-
-Returns: e
-
-Returns: 
-
-Returns: i
-
-Returns: n
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: l
-
-Returns: i
-
-Returns: v
-
-Returns: e
-
-Returns: 
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: d
-
-Returns: i
-
-Returns: n
-
-Returns: g
-
-Returns: 
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: b
-
-Returns: a
-
-Returns: s
-
-Returns: e
-
-Returns: .
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: T
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: s
-
-Returns: e
-
-Returns: c
-
-Returns: o
-
-Returns: n
-
-Returns: d
-
-Returns: 
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: 
-
-Returns: s
-
-Returns: t
-
-Returns: r
-
-Returns: u
-
-Returns: c
-
-Returns: t
-
-Returns: u
-
-Returns: r
-
-Returns: e
-
-Returns: 
-
-Returns: i
-
-Returns: n
-
-Returns: 
-
-Returns: l
-
-Returns: o
-
-Returns: g
-
-Returns: s
-
-Returns: 
-
-Returns: c
-
-Returns: o
-
-Returns: n
-
-Returns: t
-
-Returns: a
-
-Returns: i
-
-Returns: n
-
-Returns: s
-
-Returns: 
-
-Returns: l
-
-Returns: o
-
-Returns: g
-
-Returns: 
-
-Returns: r
-
-Returns: e
-
-Returns: c
-
-Returns: o
-
-Returns: r
-
-Returns: d
-
-Returns: s
-
-Returns: 
-
-Returns: f
-
-Returns: r
-
-Returns: o
-
-Returns: m
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: p
-
-Returns: r
-
-Returns: o
-
-Returns: f
-
-Returns: i
-
-Returns: t
-
-Returns: 
-
-Returns: l
-
-Returns: o
-
-Returns: g
-
-Returns: 
-
-Returns: t
-
-Returns: a
-
-Returns: b
-
-Returns: l
-
-Returns: e
-
-Returns: 
-
-Returns: i
-
-Returns: n
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: l
-
-Returns: i
-
-Returns: v
-
-Returns: e
-
-Returns: 
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: d
-
-Returns: i
-
-Returns: n
-
-Returns: g
-
-Returns: 
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: b
-
-Returns: a
-
-Returns: s
-
-Returns: e
-
-Returns: .
-
-Returns: 
-
-Returns: 
-
-Returns: 
-
-Returns: T
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: i
-
-Returns: r
-
-Returns: d
-
-Returns: 
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: 
-
-Returns: s
-
-Returns: t
-
-Returns: r
-
-Returns: u
-
-Returns: c
-
-Returns: t
-
-Returns: u
-
-Returns: r
-
-Returns: e
-
-Returns: 
-
-Returns: i
-
-Returns: n
-
-Returns: 
-
-Returns: l
-
-Returns: o
-
-Returns: g
-
-Returns: s
-
-Returns: 
-
-Returns: c
-
-Returns: o
-
-Returns: n
-
-Returns: t
-
-Returns: a
-
-Returns: i
-
-Returns: n
-
-Returns: s
-
-Returns: 
-
-Returns: l
-
-Returns: o
-
-Returns: g
-
-Returns: 
-
-Returns: r
-
-Returns: e
-
-Returns: c
-
-Returns: o
-
-Returns: r
-
-Returns: d
-
-Returns: s
-
-Returns: 
-
-Returns: f
-
-Returns: r
-
-Returns: o
-
-Returns: m
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: c
-
-Returns: h
-
-Returns: a
-
-Returns: r
-
-Returns: t
-
-Returns: 
-
-Returns: l
-
-Returns: o
-
-Returns: g
-
-Returns: 
-
-Returns: t
-
-Returns: a
-
-Returns: b
-
-Returns: l
-
-Returns: e
-
-Returns: 
-
-Returns: i
-
-Returns: n
-
-Returns: 
-
-Returns: t
-
-Returns: h
-
-Returns: e
-
-Returns: 
-
-Returns: l
-
-Returns: i
-
-Returns: v
-
-Returns: e
-
-Returns: 
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: d
-
-Returns: i
-
-Returns: n
-
-Returns: g
-
-Returns: 
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: b
-
-Returns: a
-
-Returns: s
-
-Returns: e
-
-Returns: .
-
-Returns: 
-
-Returns: -
-
-Returns: 
-
-Returns: s
-
-Returns: u
-
-Returns: m
-
-Returns: m
-
-Returns: a
-
-Returns: r
-
-Returns: y
-
-Returns: :
-
-Returns: 
-
-Returns: L
-
-Returns: i
-
-Returns: v
-
-Returns: e
-
-Returns: 
-
-Returns: t
-
-Returns: r
-
-Returns: a
-
-Returns: d
-
-Returns: i
-
-Returns: n
-
-Returns: g
-
-Returns: 
-
-Returns: s
-
-Returns: t
-
-Returns: a
-
-Returns: t
-
-Returns: u
-
-Returns: s
-
-Returns: 
-
-Returns: b
-
-Returns: a
-
-Returns: r
-
-Returns: 
-
-Returns: d
-
-Returns: a
-
-Returns: t
-
-Returns: a
-
-Returns: .
+- `logExchange` (string, optional): Only logs of this exchange object (by label); an empty string means no filter.
+- `logKeyword` (string, optional): Only logs whose content contains this keyword; an empty string means no filter.
+- `logTypes` (string, optional): Only logs of these types, as comma-separated log type numbers, e.g. ```"0,1,2"``` for buy, sell and cancel logs; an empty string means all types.
+
+Returns:
+
+```json
+{
+    "code": 0,
+    "data": {
+        "result": {
+            "chart": "",
+            "chartTime": 0,
+            "logs": [{
+                "Total": 20,
+                "Max": 20,
+                "Min": 1,
+                "Arr": []
+            }, {
+                "Total": 0,
+                "Max": 0,
+                "Min": 0,
+                "Arr": []
+            }, {
+                "Total": 0,
+                "Max": 0,
+                "Min": 0,
+                "Arr": []
+            }],
+            "node_id": 123,
+            "online": true,
+            "refresh": 1732201544000,
+            "status": 4,
+            "summary": "...",
+            "updateTime": 1732201532636,
+            "wd": 0
+        },
+        "error": null
+    }
+}
+```
+
+- logs: Log information; the queried log data entries are stored in the Arr field.
+  The first data structure in logs contains log records from the strategy log table in the live trading database.
+  The second data structure in logs contains log records from the profit log table in the live trading database.
+  The third data structure in logs contains log records from the chart log table in the live trading database.
+- summary: Live trading status bar data.
 
 - Strategy log table in database
   The description of the ```Arr``` attribute value in the first element (log data) of the ```logs``` attribute value (array structure) in the returned data is as follows:
 
   ```plaintext
   "Arr": [
-      [3977, 3, "Futures_OKCoin", "", 0, 0, "Sell(688.9, 2): 20016", 1526954372591, "", ""],
-      [3976, 5, "", "", 0, 0, "OKCoin:this_week Position too large, long: 2", 1526954372410, "", ""]
+      [3977, 3, "Futures_OKX", "", 0, 0, "Sell(688.9, 2): 20016", 1526954372591, "", ""],
+      [3976, 5, "", "", 0, 0, "this_week Position too large, long: 2", 1526954372410, "", ""]
   ],
   ```
 
   | id | logType | eid | orderId | price | amount | extra | date | contractType | direction |
   | - | - | - | - | - | - | - | - | - | - |
-  | 3977 | 3 | "Futures_OKCoin" | "" | 0 | 0 | "Sell(688.9, 2): 20016" | 1526954372591 | "" | "" |
-  | 3976 | 5 | "" | "" | 0 | 0 | "OKCoin:this_week Position too large, long: 2" | 1526954372410 | "" | "" |
+  | 3977 | 3 | "Futures_OKX" | "" | 0 | 0 | "Sell(688.9, 2): 20016" | 1526954372591 | "" | "" |
+  | 3976 | 5 | "" | "" | 0 | 0 | "this_week Position too large, long: 2" | 1526954372410 | "" | "" |
 
   ```extra``` is the additional information for the printed log.
 
@@ -32755,685 +6094,355 @@ Returns: .
 
   ```23637``` is the log ID, ```0``` is the chart data series index, and the final data ```"{\"close\":648,\"high\":650.5,\"low\":647,\"open\":650,\"x\":1575960300000}"``` is the log data, which is the K-line data on the chart.
 
-## MCP Service
-
-MCP (Model Context Protocol) service is a protocol service for model context management, providing a unified interface to manage and exchange context information of AI models. This service supports multiple data formats and communication protocols, ensuring interoperability and data consistency between different AI systems.
-
-For configuration and usage scenarios, please refer to:
-
-[FMZ Platform Claude Intelligent Trading Guide (1)](https://www.fmz.com/digest-topic/10690)
-
-[FMZ Platform Claude Intelligent Trading Guide (2)](https://www.fmz.com/digest-topic/10692)
-
-## Trading Terminal
-
-FMZ Quant Trading Platform provides a modular and customizable [Trading Terminal](https://www.fmz.com/m/trade) page. Users can freely add various data modules, trading function modules, and even write code to develop custom modules (Trading Terminal plugins).
-
-With its highly flexible and free usage approach, it greatly facilitates manual trading and semi-automated trading users. Various modules on the Trading Terminal page support dragging and resizing, can modify settings such as trading pairs and exchanges bound to modules, and can add multiple modules of the same type.
-
-FMZ Quant Trading Platform continuously improves Trading Terminal functionality and has launched the Trading Terminal plugin feature to better support manual trading.
-
-Trading Terminal related data is stored in the running directory of the docker program (robot executable file), specifically at: ```logs/storage/0```. If the exchange object used by the Trading Terminal is configured using API key file path method, the key file needs to be placed in this directory.
-
-### Plugin Principle
-
-The principle is the same as the **Debugging Tool** - it sends a code snippet to the selected docker on the trading terminal page for execution, supporting the return of charts and tables (the debugging tool has also been upgraded to support this feature). Like the **Debugging Tool**, it can only execute for 3 minutes, and this feature is free of charge. It can be used to implement simple functions to assist manual trading, while complex strategies still need to run in live trading.
-
-### Plugin Development
-
-Create trading terminal plugins by setting the strategy type to "Trading Plugin" on the **New Strategy** page. Trading plugins support ```JavaScript```, ```Python```, ```C++```, and ```MyLanguage```.
-
-### Plugin Use Cases
-
-A plugin can run a piece of code to perform some simple operations, such as iceberg orders, placing orders, canceling orders, calculations, and other tasks. Like the debugging tool, a plugin returns results via return, and it can also directly return charts and tables. Below are a few examples; you can explore other features on your own.
-
-- Return a depth snapshot
-  ```js
-  // Return the depth snapshot
-  function main() {
-      var tbl = {
-          type: 'table',
-          title: 'Depth Snapshot @ ' + _D(),
-          cols: ['#', 'Amount', 'Ask', 'Bid', 'Amount'],
-          rows: []
-      }
-      var d = exchange.GetDepth()
-      for (var i = 0; i < Math.min(Math.min(d.Asks.length, d.Bids.length), 15); i++) {
-          tbl.rows.push([i, d.Asks[i].Amount, d.Asks[i].Price+'#ff0000', d.Bids[i].Price+'#0000ff', d.Bids[i].Amount])
-      }
-      return tbl
-  }
-  ```
-
-  ```python
-  def main():
-      tbl = {
-          "type": "table",
-          "title": "Depth Snapshot @ " + _D(),
-          "cols": ["#", "Amount", "Ask", "Bid", "Amount"],
-          "rows": []
-      }
-      d = exchange.GetDepth()
-      for i in range(min(min(len(d["Asks"]), len(d["Bids"])), 15)):
-          tbl["rows"].append([i, d["Asks"][i]["Amount"], str(d["Asks"][i]["Price"]) + "#FF0000", str(d["Bids"][i]["Price"]) + "#0000FF", d["Bids"][i]["Amount"]])
-      return tbl
-  ```
-
-  ```rust
-  fn main() {
-      let d = exchange.GetDepth(None).unwrap();
-      let n = d.Asks.len().min(d.Bids.len()).min(15);
-      let mut rows = Vec::new();
-      for i in 0..n {
-          rows.push(format!(r#"[{}, {}, "{}#ff0000", "{}#0000ff", {}]"#, i, d.Asks[i].Amount, d.Asks[i].Price, d.Bids[i].Price, d.Bids[i].Amount));
-      }
-      let tbl = format!(
-          r##"{{"type": "table", "title": "Depth Snapshot @ {}", "cols": ["#", "Amount", "Ask", "Bid", "Amount"], "rows": [{}]}}"##,
-          _D(None), rows.join(","));
-
-      LogStatus!(format!("`{}`", tbl));
-      // Rust does not support returning json to display a table; you can create a live trading bot to display a status bar table
-  }
-  ```
-
-  ```cpp
-  void main() {
-      json tbl = R"({
-          "type": "table",
-          "title": "abc",
-          "cols": ["#", "Amount", "Ask", "Bid", "Amount"],
-          "rows": []
-      })"_json;
-
-      tbl["title"] = "Depth Snapshot @" + _D();
-      auto d = exchange.GetDepth();
-      for(int i = 0; i < 5; i++) {
-          tbl["rows"].push_back({format("%d", i), format("%f", d.Asks[i].Amount), format("%f #FF0000", d.Asks[i].Price), format("%f #0000FF", d.Bids[i].Price), format("%f", d.Bids[i].Amount)});
-      }
-
-      LogStatus("`" + tbl.dump() + "`");
-      // C++ does not support returning json to display a table; you can create a live trading bot to display a status bar table
-  }
-  ```
-- Plot the calendar spread
-  ```js
-  // Plot the calendar spread
-  var chart = {
-      __isStock: true,
-      title : { text : 'Spread Analysis Chart'},
-      xAxis: { type: 'datetime'},
-      yAxis : {
-          title: {text: 'Spread'},
-          opposite: false
-      },
-      series : [
-          {name : "diff", data : []}
-      ]
-  }
+###### NewRobot
 
-  function main() {
-      exchange.SetContractType('quarter')
-      var recordsA = exchange.GetRecords(PERIOD_M5)
-      exchange.SetContractType('this_week')
-      var recordsB = exchange.GetRecords(PERIOD_M5)
-
-      for(var i = 0; i < Math.min(recordsA.length, recordsB.length); i++){
-          var diff = recordsA[recordsA.length - Math.min(recordsA.length, recordsB.length) + i].Close - recordsB[recordsB.length - Math.min(recordsA.length, recordsB.length) + i].Close
-          chart.series[0].data.push([recordsA[recordsA.length - Math.min(recordsA.length, recordsB.length) + i].Time, diff])
-      }
-      return chart
-  }
-  ```
-
-  ```python
-  chart = {
-      "__isStock": True,
-      "title": {"text": "Spread Analysis Chart"},
-      "xAxis": {"type": "datetime"},
-      "yAxis": {
-          "title": {"text": "Spread"},
-          "opposite": False
-      },
-      "series": [
-          {"name": "diff", "data": []}
-      ]
-  }
-
-  def main():
-      exchange.SetContractType("quarter")
-      recordsA = exchange.GetRecords(PERIOD_M5)
-      exchange.SetContractType("this_week")
-      recordsB = exchange.GetRecords(PERIOD_M5)
-
-      for i in range(min(len(recordsA), len(recordsB))):
-          diff = recordsA[len(recordsA) - min(len(recordsA), len(recordsB)) + i].Close - recordsB[len(recordsB) - min(len(recordsA), len(recordsB)) + i].Close
-          chart["series"][0]["data"].append([recordsA[len(recordsA) - min(len(recordsA), len(recordsB)) + i]["Time"], diff])
-      return chart
-  ```
+The ```NewRobot``` method creates a live trading bot under the platform account of the ```API KEY``` in the request and starts it; like creating a bot on the website, this charges fees.
 
-  ```cpp
-  // C++ does not support returning json structures to plot charts
-  ```
+Parameters:
 
-The **Strategy Square** also contains other examples for reference, such as: tick-by-tick small-volume buying/selling.
+- `settings` (JSON object, required): Live trading configuration; for its fields see "Live trading configuration (settings)" in Extended API Interface Details. For example:
 
-### Usage
+```json
+{
+    "name": "test",
+    "strategy": 123,
+    "args": [],
+    "exchanges": [
+        {"pid": 123, "pair": "SOL_USDT"}
+    ],
+    "period": 60,
+    "node": 123,
+    "group": 123,
+    "appid": "test"
+}
+```
 
-- Add Trading Terminal Plugin Module
-  Open the module addition menu on the trading terminal page. Trading terminal plugins from the current FMZ account's strategy library will automatically appear in the list. Find the plugin you need to add and click to add it.
-  - Run Plugin
-  Click the "Execute" button to start running the trading terminal plugin. The plugin will not display log information, but can return and display data tables.
-- Plugin Runtime
-  The maximum runtime for trading terminal plugins is 3 minutes. Plugins will automatically stop running after 3 minutes.
+Returns:
 
-## Data Explorer
+```json
+{
+    "code":0,
+    "data":{
+        "result":591988,
+        "error":null
+    }
+}
+```
 
-The **datadata** platform, independently developed by FMZ Quant, is a quantitative financial data platform. The [Data Explorer](https://www.fmz.com/m/database) module of FMZ Quant Trading Platform has integrated the services and functions of the **datadata** platform.
+- result: The ID of the new bot on success; a negative number on failure, with the meaning of the abnormal codes in Live Trading Status Codes (e.g. ```-2``` no docker found, ```-5``` insufficient balance).
 
-FMZ Quant users can use it out of the box without registering a separate **datadata** account. This gives users advantages in multi-dimensional data analysis, mining, data visualization, and trading strategy exploration. Analyze massive data through SQL queries, configure via visual interface to generate various charts suitable for data analysis and share with your team, helping you easily grasp market dynamics and precisely capture investment opportunities! For usage examples, please refer to: [Data Explorer Module Topic Articles](https://www.fmz.com/digest-topic/10370).
+When the exchange configuration is passed directly with ```eid```, the platform does not store the keys in ```meta```, so every later ```RestartRobot``` of this bot must pass ```settings``` again.
 
-### Data Sources
+###### RestartRobot
 
-Data sources provided by the DataData platform are continuously updated in real-time, offering multi-dimensional and multi-type data support. Private data can be used as data sources, with support for uploading CSV format files, and data preview is available on the "Data Explorer" page.
+The ```RestartRobot``` method starts (restarts) a live trading bot of the platform account of the ```API KEY``` in the request; the bot is given by ```robotId```. Starting a bot charges fees.
 
-### Data Query
+Parameters:
 
-Supports data querying using SQL statements with configurable query parameters. Supports the following data export formats: CSV files, JSON files.
+- `robotId` (number, required): Live trading bot ID, see the ```GetRobotList``` method.
+- `settings` (JSON object, optional): Live trading configuration; for its fields see "Live trading configuration (settings)" in Extended API Interface Details. When given, the bot's configuration (name, parameters, exchanges, K-line period, docker, group) is updated with it before starting; the strategy cannot be changed.
 
-### Save Exploration Research
+Returns:
 
-To save the current data exploration research content, please click the "Save" button in the upper right corner to save this SQL query record to the resource list of "Data Exploration" in the current FMZ account (the resource list button is located to the left of the save button).
+```json
+{
+    "code":0,
+    "data":{
+        "result":1,
+        "error":null
+    }
+}
+```
 
-### Data Visualization
+- result: Live trading status code, 1 indicates running.
 
-In addition to displaying data in tabular format, the analyzed and queried data can be adapted to various visualization components to present data in a richer and more dynamic way.
+A bot created on the website with exchange accounts referenced by ```pid``` can be started with ```robotId``` alone, using its current configuration. A bot whose exchanges were passed directly with ```eid``` (usually created through the extended API) has no stored keys, so ```settings``` must be passed on every restart.
 
-### Share Research
+###### StopRobot
 
-Supports sharing data exploration research results with multiple sharing formats: public links, embed codes (e.g., embedding in FMZ platform community posts), webpage embedding, data links, and preview image links. Research results from the data exploration module can not only be used for display but also provide data directly to strategies through created "data links", supporting both live trading and backtesting environments.
+The ```StopRobot``` method is used to stop a live trading bot under the FMZ Quant Trading Platform account corresponding to the ```API KEY``` in the request. The bot Id to be stopped is specified by the ```robotId``` parameter.
 
-## Alpha Factor Analysis Tool
+Parameters:
 
-The analysis formulas reference the market calculation methods from ```worldquant```'s publicly available [```alpha101```](https://github.com/yli188/WorldQuant_alpha101_code/blob/master/101%20Formulaic%20Alphas.pdf), with basic compatibility for its syntax (unimplemented features are noted), and have been enhanced. This tool is used for rapid time series computation and validation of trading ideas. [Alpha Factor Analysis Tool Page](https://www.fmz.com/m/alpha).
+- `robotId` (number, required): The ```robotId``` parameter is used to specify the bot Id to be stopped. You can obtain the bot information under the account through the ```GetRobotList``` method, which includes the bot Id.
 
-### Functions and Operators
+Returns:
 
-**The "{}" below represents placeholders, all expressions are case-insensitive, x represents data time series**
+```json
+{
+    "code":0,
+    "data":{
+        "result":2,
+        "error":null
+    }
+}
+```
 
-- ```abs(x), log(x), sign(x)``` Literal meaning, respectively absolute value, logarithm, sign function.
+- result: Bot status code, 2 indicates stopping.
 
-The following operators ``` +, -, *, /, >, < ``` also conform to their standard meanings, ```==```: equality check, ```||```: logical OR, ```x ? y : z```: ternary conditional operator.
+###### CommandRobot
 
-- ```rank(x)``` : Cross-sectional ranking, returns percentile position. Requires specifying candidate universe pool, cannot be calculated for single ticker and will return raw result directly.
-- ```delay(x, d)``` : Returns the value of series x from d periods ago.
-- ```sma(x, d)``` : Calculates the simple moving average of series x over d periods.
-- ```correlation(x, y, d)```: Calculates the correlation coefficient between time series x and y over the past d periods.
-- ```covariance(x, y, d)``` : Calculates the covariance between time series x and y over the past d periods.
-- ```scale(x, a)``` : Normalizes data such that ```sum(abs(x))=a``` (a defaults to 1).
-- ```delta(x, d)``` : Calculates the current value of time series x minus the value from d periods ago.
-- ```signedpower(x, a)``` : ```x^a```.
-- ```decay_linear(x, d)``` : Calculates the d-period weighted moving average of time series x, with weights d,d-1,d-2....1 (normalized).
-- ```indneutralize(x, g)``` : Industry neutralization based on industry classification g, currently not supported.
-- ```ts_{O}(x, d)``` : Performs operation O on the past d periods of time series x (O can specifically represent min, max, etc., see below), d will be converted to integer.
-- ```ts_min(x, d)``` : Minimum value over the past d periods.
-- ```ts_max(x, d)``` : Maximum value over the past d periods.
-- ```ts_argmax(x, d)``` : Position of ```ts_max(x, d)```.
-- ```ts_argmin(x, d)``` : Position of ```ts_min(x, d)```.
-- ```ts_rank(x, d)``` : Ranking of time series x over the past d periods (percentile ranking).
-- ```min(x, d)``` : ```ts_min(x, d)```.
-- ```max(x, d)```: ```ts_max(x, d)```.
-- ```sum(x, d)``` : Cumulative sum over the past d periods.
-- ```product(x, d)``` : Cumulative product over the past d periods.
-- ```stddev(x, d)``` : Standard deviation over the past d periods.
+The ```CommandRobot``` method is used to send interactive commands to a live trading bot under the FMZ Quant Trading Platform account corresponding to the ```API KEY``` in the request. The bot Id that receives the interactive command is specified by the ```robotId``` parameter, and the interactive command is captured and returned by the ```GetCommand()``` function called in the strategy.
 
-### Input Data
+Parameters:
 
-**Input data is case-insensitive. Default data is the instrument selected on the webpage, but can also be specified directly, for example: ```binance.ada_bnb```**
+- `robotId` (number, required): The ```robotId``` parameter is used to specify the bot Id that receives the interactive command. You can use the ```GetRobotList``` method to get information about bots under the account, which includes the bot Id.
+- `cmd` (string, required): The interactive command sent to the bot; the strategy reads it with ```GetCommand()```, see `GetCommand`.
 
-- ```returns```: Close price returns.
-- ```open, close, high, low, volume```: Open price, close price, high price, low price and volume within the period.
-- ```vwap```: Volume-weighted average price (not yet implemented, currently using close price).
-- ```cap```: Total market capitalization (not yet implemented).
-- ```IndClass```: Industry classification (not yet implemented).
+Returns:
 
-### Others
-
-Supports outputting multiple results at once, represented as a list. For example, ```[sma(close, 10), sma(high, 30)]``` will plot two lines on the chart. Besides inputting time series data, it can also be used as a simple calculator.
-
-## General Protocol
-
-For exchange API interfaces that have not yet been encapsulated and integrated by the FMZ Quant Trading Platform, you can access them by writing general protocol plugin programs.
-
-![General Protocol Configuration Screenshot](https://www.fmz.com/upload/asset/2e43b059b3ec9f42ded6e.png)
-
-This general protocol can be used to access any exchange that provides API interfaces, supporting the following two protocols:
-- ```REST``` Protocol: [Reference Documentation](https://www.fmz.com/digest-topic/10518).
-- ```FIX``` Protocol: [Reference Project](https://github.com/fmzquant/fixc).
-
-The difference between ```FIX``` protocol plugin programs and ```REST``` protocol plugin programs lies only in the interaction method between the plugin program and the exchange interface. The interaction method, data format, and other implementation details between the protocol plugin program and the FMZ Quant docker program are exactly the same. For specific implementation, please refer to the examples in the above links.
-
-## Debugging Tool
-
-The [Debugging Tool](https://www.fmz.com/m/debug) page provides a free environment for quickly testing live trading code, currently supporting only the ```JavaScript``` language.
-
-![Debugging Tool](https://www.fmz.com/upload/asset/2e48d6d1bc77e46099058.png)
-
-When using the debugging tool to test code, the code will run directly on the specified docker, with a maximum runtime of 3 minutes. It supports calling all API functions of the FMZ Quant Trading Platform, but only supports a single exchange object.
-
-## Remote Editing
-
-![Remote Editing Screenshot](https://www.fmz.com/upload/asset/2e4e8975d1e32517fd989.png)
-
-Supports remote synchronization of strategy code to FMZ Quant Trading Platform using local editors, including ```Sublime Text```/```Atom```/```Vim```/```VSCode``` editors.
-
-![Supported Editor Plugins for Remote Editing](https://www.fmz.com/upload/asset/2e4da2d2a1fc4bc9bbce5.png)
-
-Click "Remote Editing" on the strategy editing page to expand the plugin download buttons and display the current strategy's remote synchronization token.
-
-- Click "Update Token" to refresh the current strategy's token.
-
-- Click "Delete Token" to remove the current strategy's token.
-
-Click the ```Sublime Text 3 Plugin```/```Atom Plugin```/```Vim Plugin```/```VSCode Plugin``` editor plugin download buttons on the page to navigate to the corresponding plugin projects. Installation methods vary slightly between different editors.
-
-## Import and Export of Complete Strategies
-
-![Strategy Import/Export Screenshot](https://www.fmz.com/upload/asset/2e52ccf44526f396fb795.png)
-
-- Download Source Code
-  Export strategy source code. The exported file type depends on the programming language used by the strategy. ```JavaScript``` strategies are exported as files with ```js``` extension; Python strategies are exported as files with ```py``` extension; C++ strategies are exported as files with ```cpp``` extension; MyLanguage strategies are exported as files with ```txt``` extension.
-  Note: Only exports strategy source code, does not include strategy parameters, template references, or other configuration information.
-
-- Export Strategy
-  Export the complete strategy configuration, including strategy source code, parameter settings, and all other strategy-related information. The exported file format is ```xml```.
-
-- Import Strategy
-  Using the ```xml``` file exported via the "Export Strategy" function, click the "Import Strategy" button on the strategy editing page, select the ```xml``` file to import, and the complete strategy configuration will be imported.
-  After import is complete, you need to click the "Save" button to save the strategy.
-
-## Multi-language Support
-
-Both the strategy name and the descriptions of strategy parameters can be written in the ```Chinese|English``` format, allowing the web page to automatically recognize and display the corresponding language. In other use cases—such as **strategy description**, **usage instructions**, and other ```Markdown```-formatted text—using ```[trans]Chinese|English[/trans]``` or ```[trans]Chinese||English[/trans]``` can likewise achieve automatic language recognition. After switching the language, refresh the web page for it to take effect. In addition, in strategy code, any function that can accept a string also supports language switching, such as the ```Log()``` function, the ```LogStatus()``` function, and so on.
-
+```json
+{
+    "code":0,
+    "data":{
+        "result":true,
+        "error":null
+    }
+}
+```
+
+- result: Whether the interactive command was sent successfully. When sending a command to a bot that is not running, the result in the returned data will be false.
+
+Example of bot strategy (assuming this strategy bot is running with bot Id 123):
 ```js
 function main() {
-    Log("[trans]日志|log[/trans]")
-    var table = {
-        type: "table",
-        title: "[trans]操作|option[/trans]",
-        cols: ["[trans]列1|col1[/trans]", "[trans]列2|col2[/trans]", "[trans]操作|option[/trans]"],
-        rows: [
-            ["[trans]比特币|BTC[/trans]", "[trans]以太坊|ETH[/trans]", {"type": "button", "cmd": "coverAll", "name": "平仓|cover", "description": "描述|description"}]  // Note: there is no need to add the [trans] tag inside buttons
-        ]
+    while (true) {
+        var cmd = GetCommand()
+        if (cmd) {
+            Log(cmd)
+        }
+        Sleep(2000)
     }
-    LogStatus("[trans]信息|message[/trans]", "\n`" + JSON.stringify(table) + "`")
-    throw "[trans]错误|error[/trans]"
 }
 ```
 
-```python
-import json
+Calling ```api("CommandRobot", 123, "test command")``` with ```api()``` from the Python example on the signature authentication page, the bot with Id 123 will receive the interactive command: ```test command```, and output it through the Log function.
 
-def main():
-    Log("[trans]日志|log[/trans]")
-    table = {
-        "type": "table",
-        "title": "[trans]操作|option[/trans]",
-        "cols": ["[trans]列1|col1[/trans]", "[trans]列2|col2[/trans]", "[trans]操作|option[/trans]"],
-        "rows": [
-            ["[trans]比特币|BTC[/trans]", "[trans]以太坊|ETH[/trans]", {"type": "button", "cmd": "coverAll", "name": "平仓|cover", "description": "描述|description"}]
-        ]
+###### DeleteRobot
+
+The ```DeleteRobot``` method deletes a live trading bot of the platform account of the ```API KEY``` in the request; the bot is given by ```robotId```. A running bot must be stopped first. Deletion cannot be undone.
+
+Parameters:
+
+- `robotId` (number, required): ID of the bot to delete, see the ```GetRobotList``` method.
+- `removeLog` (bool, optional): Whether to delete the bot's log data on the docker as well; default ```true```.
+
+Returns:
+
+```json
+{
+    "code":0,
+    "data":{
+        "result":0,
+        "error":null
     }
-    LogStatus("[trans]信息|message[/trans]", "\n`" + json.dumps(table) + "`")
-    raise Exception("[trans]错误|error[/trans]")
-```
-
-```rust
-fn main() {
-    Log!("[trans]日志|log[/trans]");
-    let table = r#"{
-        "type": "table",
-        "title": "[trans]操作|option[/trans]",
-        "cols": ["[trans]列1|col1[/trans]", "[trans]列2|col2[/trans]", "[trans]操作|option[/trans]"],
-        "rows": [
-            ["[trans]比特币|BTC[/trans]", "[trans]以太坊|ETH[/trans]", {"type": "button", "cmd": "coverAll", "name": "平仓|cover", "description": "描述|description"}]
-        ]
-    }"#;
-    LogStatus!("[trans]信息|message[/trans]", format!("\n`{}`", table));
-    Panic!("[trans]错误|error[/trans]");
 }
 ```
 
-```cpp
-void main() {
-    Log("[trans]日志|log[/trans]");
-    json table = R"({
-        "type": "table",
-        "title": "[trans]操作|option[/trans]",
-        "cols": ["[trans]列1|col1[/trans]", "[trans]列2|col2[/trans]", "[trans]操作|option[/trans]"],
-        "rows": [
-            ["[trans]比特币|BTC[/trans]", "[trans]以太坊|ETH[/trans]", {"type": "button", "cmd": "coverAll", "name": "平仓|cover", "description": "描述|description"}]
-        ]
-    })"_json;
-    LogStatus("[trans]信息|message[/trans]", "\n`" + table.dump() + "`");
-    Panic("[trans]错误|error[/trans]");
+- result: Result of the deletion.
+  - 0: deleted.
+  - -1: not deleted: the bot does not exist, or it is still running, starting or stopping.
+  - -2: the bot was deleted, but its docker could not be reached, so the log data was not removed; delete it manually under ```logs/storage/<bot ID>/``` in the docker's directory (e.g. ```123.db3```).
+
+###### PluginRun
+
+The ```PluginRun``` method runs a piece of JavaScript code on a docker and returns the result. It uses the same execution mechanism as the "Debug Tool" among the development tools and trading terminal plugins (see Integrations → Trading Terminal → Plugin Principle and Development). No live trading bot is created and nothing is charged; one run lasts at most 5 minutes.
+
+Parameters:
+
+- `settings` (JSON object, required): Run configuration, for example:
+
+```json
+{
+    "source": "function main() {Log(\"Hello FMZ\")}",
+    "node": 123,
+    "period": 60,
+    "exchanges": [{"pid": 123, "pair": "SOL_USDT"}]
 }
 ```
 
-## Live Trading and Strategy Grouping
+- source: the code to run. The entry point is ```main()```, whose return value is the result.
+- strategy: when ```source``` is not given, run the account's strategy with this ID (e.g. a trading plugin).
+- node: ID of the docker that runs the code; omitted or ```-1``` selects one automatically.
+- exchanges: exchange object configuration, same as "Live trading configuration (settings)" in Extended API Interface Details.
 
-On the FMZ Quant Trading Platform's "Live Trading" page and "Strategy Library" page, you can click the **Group Management** button on the right side to manage strategies and live trading instances by groups.
-For example, when managing strategy groups, you can group **template libraries** into one group, **JavaScript language strategies** into another group, and **test strategies** into another group.
+Returns:
 
-- Strategy Grouping
-  ![Strategy Grouping](https://www.fmz.com/upload/asset/2e482ba9b9aa272085d00.png)
-
-- Live Trading Grouping
-  ![Live Trading Grouping](https://www.fmz.com/upload/asset/2e577d050e817837bbfdf.png)
-
-## Live Trading Display
-
-FMZ Quant Trading Platform provides multiple ways to display the live trading status of strategies.
-
-### Sub-accounts
-
-After logging into the platform, click "Control Center" and "Account Settings" to navigate to the FMZ account [management page](https://www.fmz.com/m/account). Click "Sub-account Group" to see the sub-account creation page. In the **Operation Permissions** control, select the live trading accounts that the created sub-account can access. In the **User Information** control, set the sub-account's **username** and **sub-account login password**. Click the "Create Sub-account" button to create a sub-account. Created sub-accounts will be displayed on the current page, where you can perform "Modify", "Lock/Unlock", and "Delete" operations.
-
-  Sub-accounts have limited permissions and can only view live trading accounts authorized in the **Operation Permissions** settings. For authorized live trading accounts, sub-accounts have permissions to modify parameters, stop live trading, and restart live trading, but cannot modify the exchange objects configured for live trading.
-
-  ![Sub-account Settings](https://www.fmz.com/upload/asset/2e46d725dbe6b471f1b33.png)
-
-  Common use cases for sub-accounts include:
-  - 1. When quantitative trading teams manage multiple live trading strategies, facilitating login and management.
-  - 2. When renting out strategies, used for users' live trading debugging work.
-
-### Live Trading Observation
-
-Click the "Public" button in the live trading list on the [Live Trading Page](https://www.fmz.com/m/robots) of FMZ Quant Trading Platform to publicly display the current live trading instance.
-
-Live trading observation currently supports two methods:
-- 1. Publicly display live trading on the [Live Trading Observation](https://www.fmz.com/live) page of FMZ Quant Trading Platform. Click the "Public" button and select **Public Sharing**.
-- 2. Create a private link for live trading observation.
-  Click the "Public" button and select **Internal Sharing**, set the validity period to generate a private link for accessing the private observation page of this strategy's live trading.
-
-## Strategy Sharing and Renting
-
-On the [Strategy Library](https://www.fmz.com/m/strategies) page, click the "Actions" button on the right side of a strategy to display a menu containing sharing and renting options.
-
-Important Notice: When creating and distributing strategy **registration codes**, please carefully confirm whether it is a "Registration Code" or "Copy Code" to avoid accidentally leaking your strategy.
-
-### Strategy Sharing
-
-![Strategy Sharing](https://www.fmz.com/upload/asset/2e593d57dc36afc004ef6.png)
-
-- Public Sharing
-  After clicking the "Share" button, a dialog box will pop up where you can select "Public Sharing". The strategy will be fully shared to the platform's Strategy Square, where any user can copy the strategy.
-
-- Private Sharing
-  After clicking the "Share" button, a dialog box will pop up where you can select "Private Sharing". After selecting the sharing validity period and sharing limit, a **copy page URL** and **copy code** for the strategy will be generated. These can be distributed to designated FMZ platform users. Users who need the strategy can simply use the **copy page URL** link, log in to the **copy page** and enter the copy code to obtain the strategy. Once obtained, the strategy will automatically appear in their strategy library.
-
-### Strategy Rental
-
-![Strategy Rental](https://www.fmz.com/upload/asset/2e4e78f6c46c9dde1ce90.png)
-
-- Public Sale
-  After clicking the "Rent" button, a dialog box will pop up where you can select "Public Sale". The strategy can then be submitted for listing (requires approval).
-
-- Internal Sale
-  After clicking the "Rent" button, a dialog box will pop up where you can select "Internal Sale". After selecting the number of days, maximum concurrent instances, and number of registration codes, the system will generate a **registration page URL** and **registration codes** for this strategy. You can distribute these to designated FMZ platform users. Users who need this strategy only need to visit the **registration page URL** link, log in to the **registration page**, and enter the registration code to obtain access to the strategy. The strategy will also appear in the strategy library, but users will only have backtesting and live trading permissions, and cannot view the strategy source code or other information. When the number of concurrent live trading instances is set to 0, it means there is no limit on concurrent instances, allowing unlimited creation of live trading bots.
-
-## Live Trading Message Push
-
-You can enable the message push feature on the [Push Settings page](https://www.fmz.com/m/account#push).
-
-![Push Settings](https://www.fmz.com/upload/asset/2e4ad17706aa842c914ce.png)
-
-- Mobile (App)
-  After enabling mobile App push, push messages sent by the live trading program will be delivered to the FMZ Quant mobile App.
-- Email
-  To enable email push, you must first verify your email address. Once verified, you can receive push messages sent by the live trading program.
-- WebHook
-  After enabling WebHook push, you can customize the push address, for example: ```http://abc.com/push.php?data={body}```.
-  When the live trading program sends a push message, the platform will send a request to the configured address ```http://abc.com/push.php?data={body}``` (only the ```GET``` method is supported), and the pushed message content will replace the ```{body}``` placeholder.
-
-Pushing Messages in Strategies
-- JavaScript/TypeScript/Python/Rust/C++ Languages
-  In the strategy code, you can use the ```Log()``` function as well as other functions that output log information in the log area, such as ```exchange.CreateOrder()```, ```exchange.CancelOrder()```, etc.
-  By passing an additional parameter ```"@"``` to these functions (i.e., adding an extra parameter beyond the required ones), for example ```Log("This is a push message", "@")```, the output log information will be pushed, and the platform will push the message according to the "Push Settings". In the Rust language, the corresponding ```Log!``` macro is used the same way: ```Log!("This is a push message", "@");```.
-- PINE Language/My Language
-  In the "Trading Library" parameters integrated into PINE Language/My Language strategies, you can enable trading log push, which will automatically push messages after a trading action is triggered.
-- Blockly Visual
-  In the "Tools" section, select the **Message Push** module to push specified information.
-
-Message push is subject to a frequency limit, with the following rule: within each 20-second cycle of live trading, only the last message is retained and pushed, while all other messages are filtered out and not pushed.
-
-## Common Causes of Live Trading Errors and Abnormal Exits
-
-- Strategy static syntax errors
-
-  ![Syntax error in editor](https://www.fmz.com/upload/asset/2e4daebbb80548adf3927.png)
-
-  Such errors are relatively obvious and can usually be seen as error markers in the strategy editing page, which can be discovered and corrected during backtesting.
-- Strategy runtime errors
-  The most common situation is using function return values directly without validity checking.
-- Excessive memory usage
-  Storing too much content in global variables that cannot be garbage collected, resulting in excessive memory usage.
-- Improper use of ```exchange.Go``` function for concurrent requests
-  When using the asynchronous ```exchange.Go``` function, not properly using ```wait``` to wait for coroutines to finish, resulting in too many coroutines.
-- Function recursive calls
-  Function recursive calls with too deep nesting levels, exceeding the coroutine stack size limit.
-- API business errors, network request errors, etc.
-  Such errors will display relevant exchange object names, function names, error-related messages and reasons. These errors will not cause live trading to stop abnormally (such errors are usually the cause, but not the direct reason; the direct reason is usually **program exceptions caused by using API return values directly without validity checking**).
-- Platform underlying errors
-  Common ones include ```Decrypt: Secret key decrypt failed``` error, which will prevent live trading from starting. The error is caused by changing the FMZ Quant Trading Platform account password, causing all configured ```API KEYs``` to become invalid. You need to reconfigure the ```API KEY``` and restart the docker to resolve it.
-- Python strategy encryption issues
-  When renting out Python strategies, errors caused by incompatibility between the Python version used for platform strategy encryption and the Python version at runtime: ```ValueError: bad marshal data (unknown type code)```. This can be resolved by upgrading or installing the Python environment to any of the supported versions: ```Python 2.7```, ```Python 3.5```, or ```Python 3.6```.
-- ```interrupt``` error
-  This error occurs when the program is performing an operation (such as accessing exchange APIs) and the user clicks the **Stop Live Trading button** on the live trading page, interrupting the current operation. This error has no substantial impact and is merely a log record.
-
-[FAQ Summary](https://www.fmz.com/bbs-topic/1427).
-
-## Exchange-Specific Notes
-
-- Futu Securities
-  Supports Futu Niuniu live trading and simulated (paper) trading. You need to download the [```FutuOpenD```](https://www.futunn.com/download/OpenAPI?lang=zh-CN) software.
-  When using ```FutuOpenD``` to access simulated trading, some stock codes are not supported and therefore cannot be traded; however, the Futu Niuniu mobile APP supports simulated trading.
-  For operations such as configuring the exchange object on the FMZ Quant platform and running the ```FutuOpenD``` software, please refer to the [Futu Securities Configuration Documentation](https://www.fmz.com/bbs-topic/10185).
-
-  - Interface Call Frequency
-    The ```GetOrder```, ```GetOrders```, ```GetPositions```, and ```GetAccount``` functions use **cached data** by default, so there is no call frequency limit.
-    When new data is available, ```FutuOpenD``` will automatically update the data, and the **cached data** will be synchronized accordingly.
-
-    Calling the ```exchange.IO("refresh", true)``` function can disable the cache; after **disabling the cache**, the call frequency is limited to **a maximum of 10 queries within every 30 seconds**, and exceeding this frequency limit will report an error.
-
-  - Stock Codes
-    For example: ```600519.SH```
-    - HK Hong Kong stocks
-    - US US stocks
-    - SH Shanghai stocks
-    - SZ Shenzhen stocks
-
-    Use the ```exchange.SetContractType()``` function in the strategy code to set the stock code, for example:
-
-    ```js
-    function main() {
-        var info = exchange.SetContractType("600519.SH")    // Set to stock 600519.SH (Moutai), account switches to mainland market
-        Log(info)
-        Log(exchange.GetAccount())                          // Current stock is Moutai, calling GetAccount function gets account assets for mainland market
-        Log(exchange.GetTicker())                           // Get current price information for Moutai stock
+```json
+{
+    "code": 0,
+    "data": {
+        "result": "{\"logs\":[{\"PlatformId\":\"\",\"OrderId\":\"0\",\"LogType\":5,\"Price\":0,\"Amount\":0,\"Extra\":\"Hello FMZ\",\"Currency\":\"\",\"Instrument\":\"\",\"Direction\":\"\",\"Time\":1732267473108}],\"result\":\"\"}",
+        "error": null
     }
-    ```
+}
+```
 
-    ```python
-    def main():
-        info = exchange.SetContractType("600519.SH")
-        Log(info)
-        Log(exchange.GetAccount())
-        Log(exchange.GetTicker())
-    ```
+- result: The result as a JSON string: ```logs``` holds the logs written with ```Log()```, ```result``` the JSON text of the value returned by ```main()```.
 
-    ```rust
-    fn main() {
-        let info = exchange.SetContractType("600519.SH");    // Set to stock 600519.SH (Moutai), account switches to mainland market
-        Log!(info);
-        Log!(exchange.GetAccount());                          // Current stock is Moutai, calling GetAccount function gets account assets for mainland market
-        Log!(exchange.GetTicker(None));                       // Get current price information for Moutai stock
+```exchanges``` can also pass the exchange configuration directly instead of referencing an exchange account on the platform, for example:
+
+```plaintext
+{"eid": "Binance", "pair": "ETH_BTC", "meta": {"AccessKey": "...", "SecretKey": "..."}}
+```
+
+The field names of ```meta``` are given by the ```meta``` returned by ```GetExchangeList```. Usually only one exchange object is set in ```exchanges``` (the debug tool page also supports only one); setting two causes no error, but accessing the second exchange object in the code does.
+
+#### Extended API Interface Return Codes
+
+The extended API returns this structure:
+
+```json
+{
+    "code": 0,
+    "data": {
+        "result": null,
+        "error": null
     }
-    ```
+}
+```
 
-    ```cpp
-    void main() {
-        auto info = exchange.SetContractType("600519.SH");
-        Log(info);
-        Log(exchange.GetAccount());
-        Log(exchange.GetTicker());
+```code``` is the status of the request itself:
+
+| Description | Code |
+| - | - |
+| Success | 0 |
+| Invalid API KEY: the ```AccessKey``` does not exist or is disabled; or a wrong ```secret_key``` in direct verification | 1 |
+| Invalid signature | 2 |
+| Nonce error: the ```nonce``` is not greater than the previous one, or differs from server time by more than 1 hour | 3 |
+| Invalid method: the method does not exist, is not public, or this API KEY has no permission for it | 4 |
+| Invalid arguments: ```args``` is not valid JSON, or the call failed | 5 |
+| Internal error | 6 |
+| The request's source IP is not in this API KEY's IP whitelist | 7 |
+
+```code``` 0 only means the request was accepted. The method's result is in ```data.result```; when the method fails, ```data.error``` holds the error message (```null``` on success). For example, with the wrong number of arguments:
+
+```json
+{
+    "code": 0,
+    "data": {
+        "result": null,
+        "error": "Params number mismatch for StopRobot: expected 1, got 0"
     }
-    ```
+}
+```
 
-    The function for setting the trading direction ```exchange.SetDirection```, the order placement functions ```exchange.Buy```/```exchange.Sell```,
-    the order cancellation function ```exchange.CancelOrder```, the order query function ```exchange.GetOrder```, etc., are all used in the same way as in the futures market.
+#### Live Trading Status Codes
 
-  - Account Information Data Format:
-    Use ```TrdMarket``` to define the market, in order to distinguish between the ```Hong Kong market```, ```US market```, and ```Mainland market```.
+The ```status``` field in the data returned by ```GetRobotList```, ```GetRobotDetail```, and ```GetRobotLogs``` interfaces represents: Live Trading Status Code.
 
-    Excerpted from the [```Futu API``` documentation](https://openapi.futunn.com/futu-api-doc/):
-    ```
-    const (
-        TrdMarket_TrdMarket_Unknown TrdMarket = 0 //Unknown market
-        TrdMarket_TrdMarket_HK      TrdMarket = 1 //Hong Kong market
-        TrdMarket_TrdMarket_US      TrdMarket = 2 //US market
-        TrdMarket_TrdMarket_CN      TrdMarket = 3 //Mainland market
-        TrdMarket_TrdMarket_HKCC    TrdMarket = 4 //Hong Kong Stock Connect market
-        TrdMarket_TrdMarket_Futures TrdMarket = 5 //Futures market
-    )
-    ```
+- Normal Start
+  | Status | Code |
+  | - | - |
+  | Idle | 0 |
+  | Running | 1 |
+  | Stopping | 2 |
+  | Exited | 3 |
+  | Stopped | 4 |
+  | Strategy Error | 5 |
+- Exception
+  | Status | Code |
+  | - | - |
+  | Strategy expired, please contact author to repurchase | -1 |
+  | Docker not found | -2 |
+  | Strategy compilation error | -3 |
+  | Live trading already running | -4 |
+  | Insufficient balance | -5 |
+  | Strategy concurrency limit exceeded | -6 |
 
-    To obtain account information data, the ```exchange.GetAccount()``` function returns:
-    ```json
-    {
-        "Info": [{
-            "Header": {
-                ...                 // Omitted
-                "TrdMarket": 1      // Market ID in Info raw data, indicates account assets for Hong Kong market trading
-            },
-            "Funds": {              // Account asset information in this market
-                ...
-            }
-        }, ...],
-        "Stocks": 0,
-        "FrozenStocks": 0,
-        "Balance": 1000000,         // Asset value in current market
-        "FrozenBalance": 0
+### Trading Terminal
+
+The platform provides a modular, customizable [Trading Terminal](https://www.fmz.com/m/trade) page: add market data, trading and other modules freely, drag and resize them, change the exchange and trading pair a module is bound to, and add several modules of the same kind, which makes manual and semi-automated trading convenient.
+
+The trading terminal also supports trading plugins: code you write yourself that runs as a module on a selected docker to assist manual trading.
+
+#### Plugin Principle and Development
+
+**How it works**
+
+A trading plugin is a short piece of code executed on a docker: when you click "Execute" on the trading terminal page, the platform sends the plugin code and the exchange account selected in the module to the selected docker, runs it, and shows the return value in the module. The following entry points share the same execution mechanism:
+
+| Entry point | Code that runs | Notes |
+| - | - | - |
+| Trading terminal plugin | A strategy of type "Trading Plugin" in your strategy library | Added and executed on the trading terminal page |
+| Debug Tool (development tools) | JavaScript code written on the page | For testing API calls |
+| Extended API PluginRun | ```source``` in the request, or an existing strategy of the account | For programs |
+| MCP ```plugin_*``` tools | Built-in functions for market data, orders and so on | For AI assistants, authorized by the ```trade``` permission, see Integrations → AI Integration |
+
+No live trading bot is created and nothing is charged; one run lasts at most 5 minutes and is interrupted on timeout. It suits simple tasks that assist manual trading, such as iceberg orders, placing or cancelling orders in bulk, or calculations; logic that has to run for a long time should be a live trading bot.
+
+**Writing a plugin**
+
+Create a strategy and set its type to "Trading Plugin" on the new-strategy page. Trading plugins, the debugging tool and ```PluginRun``` support JavaScript only.
+
+The plugin's entry point is ```main()```, and its return value is the result: a returned table or chart object is shown as a table or chart in the module (see Integrations → Trading Terminal → Plugin Examples). Logs written with ```Log()``` are not shown in the module.
+
+**Using a plugin**
+
+- Add: open the module menu on the trading terminal page; the trading plugins in your strategy library are listed there. Choose one to add it.
+- Execute: click "Execute" in the plugin module to run it.
+
+**Data directory**
+
+When plugins and the debug tool run on a docker, their working directory is ```logs/storage/p<number>/``` under the docker's running directory (one directory starting with ```p``` per platform account, created on the first run). If an exchange account used by the trading terminal configures its key as a key file path (```file:///xxx.txt```), put the key file in this directory.
+
+#### Plugin Examples
+
+A plugin runs code for a limited time to do simple jobs such as iceberg orders, placing and cancelling orders, or calculations. It returns its result with ```return```; a returned table or chart object is displayed as a table or chart. Two examples follow; more can be found in the **Strategy Square**, e.g. buying or selling in small slices.
+
+**Order book snapshot**
+
+Show the top 15 levels of the current order book as a table:
+
+```js
+// Return an order book snapshot
+function main() {
+    var tbl = {
+        type: 'table',
+        title: 'Depth snapshot @ ' + _D(),
+        cols: ['#', 'Amount', 'Ask', 'Bid', 'Amount'],
+        rows: []
     }
-    ```
-
-  - ```FutuOpenD``` distinguishes regions based on the logged-in **IP** address
-    Accounts logged in with a non-Mainland IP address will be restricted when obtaining market data. For details, please refer to the official ```FutuOpenD``` (Futu) documentation.
-- Interactive Brokers
-  Configure the exchange:
-  To use Interactive Brokers, you need to run the "IB Gateway" or "TWS (Trader Workstation)" software in the system environment where the docker (hosting node) is located. Here we take the "TWS" software as an example. After running "TWS" and logging in, click the configuration button in the upper right corner of the software to open the software configuration interface.
-  - Select: "Configuration" -> "API" -> "Settings", do not check the "Read-Only API" option, and you need to check the "Enable ActiveX and Socket Clients" option; note the "Socket port" in the configuration (the default TWS port is 7496 for live / 7497 for simulation).
-  - On the platform's add exchange page "https://www.fmz.com/m/platforms/add", select **Interactive Brokers**, and configure the parameters. In the "Server Address" configuration item, fill in the address corresponding to the "TWS" software (such as 127.0.0.1 or localhost) and the port, for example: ```localhost:7496```.
-
-  Supported markets:
-  - Currently only the US stock market is supported; other markets such as futures and forex are not yet supported.
-  - Example of US stock market stock code format:
-    The stock code of Apple Inc. on the NASDAQ exchange: ```AAPL.US```.
-    The stock code of Tesla, Inc. on the NASDAQ exchange: ```TSLA.US```.
-- Futures_Binance
-  Supports Binance's Chinese trading pairs:
-
-  ```js
-  function main() {
-      let ticker = exchange.GetTicker("币安人生_USDT.swap")
-      Log("ticker:", ticker)   // {"Info":{...},"Symbol":"币安人生_USDT.swap","Open":0.29622,"High":0.31661, ...}
-  }
-  ```
-
-  For the ```exchange.IO()``` switching functions of Binance Futures (dual-side position mode, isolated/cross margin, unified account, STP mode, etc.), please refer to the `exchange.IO` function documentation.
-- Futures_HuobiDM
-  - Switch address:
-    Use ```exchange.IO("base", "https://xxx.xxx.xxx")``` or ```exchange.SetBase("https://xxx.xxx.xxx")``` to switch the base address of the exchange interface.
-
-  Supports Huobi's Chinese trading pairs:
-
-  ```js
-  function main() {
-      let ticker = exchange.GetTicker("币安人生_USDT.swap")
-      Log("ticker:", ticker)   // {"Info":{...},"Symbol":"币安人生_USDT.swap","Open":0.29622,"High":0.31661, ...}
-  }
-  ```
-
-  For the ```exchange.IO()``` switching functions of Huobi Futures (signHost, isolated/cross margin, one-way/two-way position mode, unified account, etc.), please refer to the `exchange.IO` function documentation.
-- Huobi
-  - Switch special trading pairs:
-    Supports Huobi spot leveraged tokens, for example ```LINK*(-3)```; the code defined by the exchange is ```link3susdt```, and when setting this trading pair on the FMZ Quant trading platform it is written as ```LINK3S_USDT```.
-    You can also switch the trading pair within the strategy:
-
-    ```js
-    function main() {
-        exchange.SetCurrency("LINK3S_USDT")
-        Log(exchange.GetTicker())
+    var d = exchange.GetDepth()
+    var n = Math.min(d.Asks.length, d.Bids.length, 15)
+    for (var i = 0; i < n; i++) {
+        tbl.rows.push([i, d.Asks[i].Amount, d.Asks[i].Price + '#ff0000', d.Bids[i].Price + '#0000ff', d.Bids[i].Amount])
     }
-    ```
+    return tbl
+}
+```
 
-    ```python
-    def main():
-        exchange.SetCurrency("LINK3S_USDT")
-        Log(exchange.GetTicker())
-    ```
+**Calendar spread chart**
 
-    ```rust
-    fn main() {
-        exchange.SetCurrency("LINK3S_USDT");
-        Log!(exchange.GetTicker(None));
+On a futures exchange object, take 5-minute K-lines of the quarterly and the weekly contract and chart the difference of their closes:
+
+```js
+// Chart the calendar spread
+var chart = {
+    __isStock: true,
+    title: {text: 'Spread analysis'},
+    xAxis: {type: 'datetime'},
+    yAxis: {
+        title: {text: 'Spread'},
+        opposite: false
+    },
+    series: [
+        {name: "diff", data: []}
+    ]
+}
+
+function main() {
+    exchange.SetContractType('quarter')
+    var recordsA = exchange.GetRecords(PERIOD_M5)
+    exchange.SetContractType('this_week')
+    var recordsB = exchange.GetRecords(PERIOD_M5)
+
+    var n = Math.min(recordsA.length, recordsB.length)
+    for (var i = 0; i < n; i++) {
+        var a = recordsA[recordsA.length - n + i]
+        var b = recordsB[recordsB.length - n + i]
+        chart.series[0].data.push([a.Time, a.Close - b.Close])
     }
-    ```
-
-    ```cpp
-    void main() {
-        exchange.SetCurrency("LINK3S_USDT");
-        Log(exchange.GetTicker());
-    }
-    ```
-
-  Supports Huobi's Chinese trading pairs:
-
-  ```js
-  function main() {
-      let ticker = exchange.GetTicker("币安人生_USDT")
-      Log("ticker:", ticker)   // {"Info":{...},"Symbol":"币安人生_USDT","Open":0.29622,"High":0.31661, ...}
-  }
-  ```
-
-- Futures_Bibox
-  - Unsupported interfaces:
-    This exchange does not provide interfaces for querying current pending orders or querying market historical trade records, so the ```GetOrders``` and ```GetTrades``` functions are not supported.
-- BitMEX
-  - Market order buy
-    In the BitMEX spot trading order placement interface, the order quantity for a market buy order is not the amount, but the number of coins to trade.
-- Bitfinex
-  - Market order buy
-    In the Bitfinex spot trading order placement interface, the order quantity for a market buy order is not the amount, but the number of coins to trade.
-- AscendEx
-  - Market order buy
-    In the AscendEx spot trading order placement interface, the order quantity for a market buy order is not the amount, but the number of coins to trade.
-- Futures_Phemex
-  - K-line interface
-    The data returned by this exchange's K-line interface does not include the current Bar data.
-  - Switch isolated/cross margin:
-    This exchange does not provide an interface for switching cross/isolated margin; it needs to be set on the exchange side.
-- Futures_Aevo
-  - Order ```Id``` description:
-    This exchange's order ```Id``` consists of the actual ```Id``` and the order timestamp, separated by an English comma, in order to support the ```exchange.GetOrder(Id)``` function for querying orders. Since the order timestamp in the data returned by the exchange changes with the order status, if you need to record information such as the order ```Id``` locally, please separate out the actual order ```Id``` before recording it.
-- Futures_dYdX
-  Currently supports the dYdX v4 version. Please refer to the [dYdX v4 User Guide](https://www.fmz.com/digest-topic/10564).
-- Futures_Hyperliquid
-  Please refer to the [Hyperliquid User Guide](https://www.fmz.com/digest-topic/10574).
-
-  For the ```exchange.IO()``` switching functions of Hyperliquid Futures (isolated/cross margin, mainnet/testnet, vaultAddress, walletAddress, expiresAfter, etc.), please refer to the `exchange.IO` function documentation.
-- Futures_Lighter
-  - Switch test environment:
-    The test environment can be selected and set when configuring the exchange object, or you can use the ```exchange.SetBase()``` function to modify the REST API endpoint to switch to the test environment.
-
-  For the ```exchange.IO()``` switching functions of Futures_Lighter (isolated/cross margin, order expiration time, etc.), please refer to the `exchange.IO` function documentation.
+    return chart
+}
+```

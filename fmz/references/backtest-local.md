@@ -2,7 +2,7 @@
 
 # Local backtesting on your own machine
 
-The platform publishes its backtest engine as a local package, so a JavaScript or Python strategy can be backtested on the machine the agent runs on, in seconds, without a cloud slot. Same engine core, same history data (downloaded from the platform's data server), same result format as the cloud. Use it for the write–run–fix loop and parameter sweeps; use `run_backtest` (cloud) for the confirming run, for Pine / MyLanguage / C++ / Rust, and whenever the user wants the result on the website.
+The platform publishes its backtest engine as a local package, so a JavaScript or Python strategy can be backtested on the machine the agent runs on, in seconds, without a cloud slot. Same engine core, same history data (downloaded from the platform's data server), same result format as the cloud. Use it for the write–run–fix loop and parameter sweeps; use `run_backtest` (cloud) for the confirming run, for Pine / MyLanguage / Rust, and whenever the user wants the result on the website.
 
 | | Local engine | Cloud (`run_backtest`) |
 |---|---|---|

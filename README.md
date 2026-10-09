@@ -19,10 +19,9 @@ fmz/
 ├── SKILL.md                  entry point: connecting, the platform model, every MCP tool, workflows, safety rules,
 │                             and a routing table that says which reference to read for which task
 └── references/
-    ├── javascript.md python.md cpp.md rust.md pine.md mylanguage.md   how to write a strategy in each language
+    ├── javascript.md python.md rust.md pine.md mylanguage.md          how to write a strategy in each language
     ├── fmz.d.ts fmz.zh_CN.d.ts ctx.d.ts events.md selfcheck.js        JavaScript declarations, native event API, self-check
     ├── fmz.pyi fmz.zh_CN.pyi talib.pyi selfcheck.py                   Python
-    ├── fmz.hpp json.hpp TA.hpp talib.hpp selfcheck.cpp                C++
     ├── fmz.rs selfcheck.rs                                            Rust
     ├── pine-builtins.md                                               built-ins the Pine engine implements
     ├── mylanguage-functions.md mylanguage-examples/                   麦语言 dictionary and official templates

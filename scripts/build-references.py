@@ -2,23 +2,28 @@
 """Rebuild the generated reference files in this repository.
 
 Inputs (all public or in the platform's own repositories):
-  - API docs / user guide: the website's SSR data endpoints
-        https://www.fmz.com/lang/en/syntax-guide.data   https://www.fmz.com/lang/zh/syntax-guide.data
-        https://www.fmz.com/lang/en/user-guide.data     https://www.fmz.com/lang/zh/user-guide.data
-    (react-router .data = turbo-stream JSON; the doc tree is the JSON string after the key
-    "syntaxGuide" / "userGuide")  →  fmz/references/api.{en,zh}.md,
-    fmz/references/user-guide.{en,zh}.md, fmz/references/rest-api.md
+  - API docs / user guide, either of
+      * the website's SSR data endpoints
+            https://www.fmz.com/lang/en/syntax-guide.data   https://www.fmz.com/lang/zh/syntax-guide.data
+            https://www.fmz.com/lang/en/user-guide.data     https://www.fmz.com/lang/zh/user-guide.data
+        (react-router .data = turbo-stream JSON; the doc tree is the JSON string after the key
+        "syntaxGuide" / "userGuide"), or
+      * the merged doc-tree JSON the site is built from (a path ending in `.json`, loaded as-is),
+        e.g. doc/docs/fmz/syntax/syntax_{en_US,zh_CN}.json and doc/docs/fmz/guide/guide_{en_US,zh_CN}.json
+    →  fmz/references/api.{en,zh}.md, fmz/references/user-guide.{en,zh}.md,
+       fmz/references/rest-api.md (the English user guide's "Extended API Interface" section)
   - MCP tool table: dumped from the server (`mcpToolTable`, JSON with scope + mcp.Tool)
         → fmz/references/tools.md
   - talib descriptions: botvs misc/helper/talib/api_gen.js (`talibInfo`)   → fmz/references/talib.md
   - Pine built-ins: botvs backtest/pinescript/src/lib_*.js (`scope.register`) → fmz/references/pine-builtins.md
   - MyLanguage dictionary: botvs misc/helper/my/trans_dic.txt            → fmz/references/mylanguage-functions.md
   - Declaration files are copied verbatim from botvs misc/helper/gen_helper/ (js .d.ts, python .pyi,
-    cpp .hpp, rust types.rs) and fmz/client/sdk/docs/typings/js/ (newest .d.ts, ctx.d.ts, EVENTS.md).
+    rust types.rs) and fmz/client/sdk/docs/typings/js/ (newest .d.ts, ctx.d.ts, EVENTS.md).
 
 Usage:
-  build-references.py docs  <syntax-guide.data> <lang> <out.md>      # lang = en | zh
-  build-references.py guide <user-guide.data> <lang> <out.md>
+  build-references.py docs  <syntax-guide.data|syntax_*.json> <lang> <out.md>      # lang = en | zh
+  build-references.py guide <user-guide.data|guide_*.json> <lang> <out.md>
+  build-references.py rest  <user-guide.data|guide_en_US.json> <out.md>             # English guide only
   build-references.py tools <mcp_tools.json> <out.md>
   build-references.py talib <api_gen.js> <out.md>
   build-references.py pine  <pinescript/src dir> <out.md>
@@ -47,43 +52,55 @@ def val(x):
     return clean(x)
 
 def load(path, key):
-    arr = json.load(open(path, encoding="utf-8"))
-    return json.loads(arr[arr.index(key) + 1])
+    data = json.load(open(path, encoding="utf-8"))
+    if path.endswith(".json"):  # merged doc tree: already the array the .data embeds after `key`
+        return data
+    return json.loads(data[data.index(key) + 1])
+
+def para(label, x):
+    """A field that is either a list of items or one string; a string is one paragraph, kept as written."""
+    return [f"{label}:", "", clean(x), ""] if isinstance(x, str) and x.strip() else []
 
 def leaf_md(n, level):
     out = [f"{'#'*level} {clean(n.get('title',''))}", ""]
     if n.get("syntax"):
-        out += ["```", *[val(s) for s in n["syntax"]], "```", ""]
+        out += ["```", *[val(s) for s in aslist(n["syntax"])], "```", ""]
     if n.get("forms"):
-        out += ["Forms:", "", *[f"- `{val(f)}`" for f in n["forms"]], ""]
+        out += ["Forms:", "", *[f"- `{val(f)}`" for f in aslist(n["forms"])], ""]
     for d in aslist(n.get("desc")):
         out += [val(d), ""]
-    if n.get("args"):
+    if isinstance(n.get("args"), str):
+        out += para("Parameters", n["args"])
+    elif n.get("args"):
         out += ["Parameters:", ""]
         for a in n["args"]:
             if not isinstance(a, dict): out += [f"- {val(a)}"]; continue
             req = "required" if a.get("required") else "optional"
             out += [f"- `{a.get('name','')}` ({a.get('type','')}, {req}): {val(a.get('info',''))}"]
         out += [""]
-    if n.get("attrs"):
+    if isinstance(n.get("attrs"), str):
+        out += para("Fields", n["attrs"])
+    elif n.get("attrs"):
         out += ["Fields:", ""]
         for a in n["attrs"]:
             if isinstance(a, dict): out += [f"- `{a.get('name','')}` ({a.get('type','')}): {val(a.get('info',''))}"]
         out += [""]
-    for r in n.get("returns") or []:
+    if isinstance(n.get("returns"), str):
+        out += para("Returns", n["returns"])
+    for r in [] if isinstance(n.get("returns"), str) else n.get("returns") or []:
         if isinstance(r, dict): out += [f"Returns ({clean(r.get('type',''))}): {val(r.get('info',''))}", ""]
         else: out += [f"Returns: {val(r)}", ""]
-    for ex in n.get("examples") or []:
+    for ex in aslist(n.get("examples")):
         if isinstance(ex, dict):
             if ex.get("value"): out += [val(ex["value"]), ""]
             for e in ex.get("examples") or []:
                 if isinstance(e, dict) and e.get("code"):
                     out += [f"```{e.get('lang','')}", e["code"].rstrip(), "```", ""]
         else: out += [val(ex), ""]
-    for r in n.get("remarks") or []:
+    for r in aslist(n.get("remarks")):
         out += [val(r), ""]
     if n.get("seeAlso"):
-        out += ["See also: " + "; ".join(val(s) for s in n["seeAlso"]), ""]
+        out += ["See also: " + "; ".join(val(s) for s in aslist(n["seeAlso"])), ""]
     return out
 
 def walk(n, level, out):
@@ -106,10 +123,33 @@ def convert(path, key, title, intro):
     walk(tree, 2, out)
     return "\n".join(out).replace("\n\n\n", "\n\n")
 
+REST_SECTION = "Extended API Interface"
+REST_INTRO = ("Same API keys as MCP (website: `/m/account#apikey`). For REST the key's privileges are method names or `*` "
+              "(scope names only apply to MCP). Prefer the MCP tools when they are available; this is for scripts, cron jobs "
+              "and older integrations. Below is the user guide's section, verbatim: creating a key, the request format and "
+              "signature, every method, the return codes and the robot status codes.")
+
+def find(n, title):
+    if isinstance(n, list):
+        for c in n:
+            r = find(c, title)
+            if r: return r
+        return None
+    if clean(n.get("title", "")) == title: return n
+    return find(n.get("children") or [], title)
+
+def build_rest(src, dst):
+    sec = find(load(src, "userGuide"), REST_SECTION)
+    if not sec: sys.exit(f"{src}: no section titled {REST_SECTION!r} (English user guide expected)")
+    out = [f"# FMZ extended REST API (generated from the user guide, section \u201c{REST_SECTION}\u201d)", "", REST_INTRO, ""]
+    for d in aslist(sec.get("desc")): out += [val(d), ""]
+    for c in sec.get("children") or []: walk(c, 2, out)
+    open(dst, "w", encoding="utf-8").write("\n".join(out).replace("\n\n\n", "\n\n"))
+
 
 TITLES = {
-    ("docs", "en"): ("FMZ strategy API reference", "Generated from the platform's syntax guide (https://www.fmz.com/syntax-guide). Every built-in function, structure and constant, with examples in JavaScript, Python, C++ and Rust. Search this file by function name (e.g. `exchange.GetTicker`)."),
-    ("docs", "zh"): ("FMZ 策略 API 参考", "由平台语法指南（https://www.fmz.com/syntax-guide）生成：全部内置函数、结构体与常量，示例覆盖 JavaScript、Python、C++、Rust。按函数名（如 `exchange.GetTicker`）在本文件内搜索。"),
+    ("docs", "en"): ("FMZ strategy API reference", "Generated from the platform's syntax guide (https://www.fmz.com/syntax-guide). Every built-in function, structure and constant, with examples in JavaScript, Python and Rust. Search this file by function name (e.g. `exchange.GetTicker`)."),
+    ("docs", "zh"): ("FMZ 策略 API 参考", "由平台语法指南（https://www.fmz.com/syntax-guide）生成：全部内置函数、结构体与常量，示例覆盖 JavaScript、Python、Rust。按函数名（如 `exchange.GetTicker`）在本文件内搜索。"),
     ("guide", "en"): ("FMZ platform user guide", "Generated from https://www.fmz.com/user-guide: how the platform works (nodes, robots, strategies, templates, backtesting, extended API, MCP), as written for people; agents use it for concepts and limits."),
     ("guide", "zh"): ("FMZ 平台使用指南", "由 https://www.fmz.com/user-guide 生成：平台如何运作（托管者、实盘、策略、模板、回测、扩展 API、MCP），面向人写的说明；agent 用它理解概念与限制。"),
 }
@@ -146,7 +186,7 @@ def build_tools(src, dst):
 def build_talib(src, dst):
     m = re.search(r"var talibInfo = (\[[\s\S]*?\]);", open(src, encoding="utf-8").read()); arr = json.loads(m.group(1))
     out = ["# TA-Lib functions available as `talib.*` (generated)", "",
-           "Call as `talib.NAME(records_or_array, params...)` in JavaScript / Python / C++ / Rust (same names). `Records[...]` lists which fields of the K-line records the function reads; parameters show their defaults; the result is an array (or several arrays) aligned with the input, with `NaN`/`null` where the window is not yet full.", "",
+           "Call as `talib.NAME(records_or_array, params...)` in JavaScript / Python (same names; the Rust SDK has no `talib`, use `TA`). `Records[...]` lists which fields of the K-line records the function reads; parameters show their defaults; the result is an array (or several arrays) aligned with the input, with `NaN`/`null` where the window is not yet full.", "",
            "| Function | Description | 中文 | Signature |", "|---|---|---|---|"]
     for e in arr: out.append(f"| `{e['name']}` | {e.get('hint','')} | {e.get('cn','')} | `{e.get('help','')}` |")
     open(dst, "w", encoding="utf-8").write("\n".join(out) + "\n")
@@ -185,6 +225,7 @@ if __name__ == "__main__":
         src, lang, dst = sys.argv[2:5]; title, intro = TITLES[(cmd, lang)]
         key = "syntaxGuide" if cmd == "docs" else "userGuide"
         open(dst, "w", encoding="utf-8").write(convert(src, key, title, intro)); print(dst)
+    elif cmd == "rest": build_rest(*sys.argv[2:4]); print(sys.argv[3])
     elif cmd == "tools": build_tools(*sys.argv[2:4])
     elif cmd == "talib": build_talib(*sys.argv[2:4])
     elif cmd == "pine": build_pine(*sys.argv[2:4])

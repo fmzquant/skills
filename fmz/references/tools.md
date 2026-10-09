@@ -48,7 +48,7 @@ List strategies. scope: mine (default; the user's own plus rented ones, see is_o
 
 - `group_id` (number): Only this strategy group (see list_groups)
 - `keyword` (string): Fuzzy match on the strategy name
-- `language` (string one of javascript/python/cpp/blockly/mylanguage/pine/flow/rust)
+- `language` (string one of javascript/python/blockly/mylanguage/pine/flow/rust)
 - `limit` (number): Default 50, max 200
 - `offset` (number)
 - `scope` (string one of mine/public/official/templates)
@@ -145,7 +145,7 @@ Start a backtest on the cloud cluster, either of a saved strategy (strategy_id) 
   - `fee_taker` (number)
   - `pair` (string, required)
   - `stocks` (number)
-- `language` (string one of javascript/python/cpp/blockly/mylanguage/pine/flow/rust/typescript): Required with source
+- `language` (string one of javascript/python/blockly/mylanguage/pine/flow/rust/typescript): Required with source
 - `net_delay` (number): Simulated network latency in ms, default 200
 - `period` (string one of 1m/5m/15m/30m/1h/4h/1d): Default K-line period the strategy sees, default 1h
 - `slippage` (number): Slip points per order, default 0
@@ -194,9 +194,9 @@ Change a STOPPED robot's configuration: name, exchanges/pairs, parameter values,
 
 ### check_strategy
 
-Static check of strategy source before saving: syntax errors for javascript/typescript, compile errors for pine, mylanguage, flow, cpp and rust (cpp/rust compile on the build cluster and take a while). python and blockly have no static check. Returns {ok, error}.
+Static check of strategy source before saving: syntax errors for javascript/typescript, compile errors for pine, mylanguage, flow and rust (rust compiles on the build cluster and takes a while). python and blockly have no static check. Returns {ok, error}.
 
-- `language` (string one of javascript/python/cpp/blockly/mylanguage/pine/flow/rust/typescript, required)
+- `language` (string one of javascript/python/blockly/mylanguage/pine/flow/rust/typescript, required)
 - `source` (string, required)
 
 ### save_strategy
@@ -206,7 +206,7 @@ Create a strategy (omit strategy_id) or update one of the user's own (pass strat
 - `args` (array of array): Parameter definitions the user can edit when starting a robot: [[name, label, description, default], ...]. Names become global variables in the code, so they must be valid identifiers.
 - `description` (string)
 - `group_id` (number): Strategy group; 0 = none
-- `language` (string one of javascript/python/cpp/blockly/mylanguage/pine/flow/rust/typescript): Required when creating
+- `language` (string one of javascript/python/blockly/mylanguage/pine/flow/rust/typescript): Required when creating
 - `manual` (string): User-facing manual (markdown)
 - `name` (string)
 - `note` (string): Private notes
@@ -353,4 +353,4 @@ These older method names stay callable for existing integrations but are not lis
 
 ## Strategy languages
 
-`language` values: `javascript`, `python`, `cpp`, `blockly`, `mylanguage`, `pine`, `flow`, `rust`, `typescript`.
+`language` values: `javascript`, `python`, `blockly`, `mylanguage`, `pine`, `flow`, `rust`, `typescript`.

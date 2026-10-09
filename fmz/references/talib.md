@@ -1,6 +1,6 @@
 # TA-Lib functions available as `talib.*` (generated)
 
-Call as `talib.NAME(records_or_array, params...)` in JavaScript / Python / C++ / Rust (same names). `Records[...]` lists which fields of the K-line records the function reads; parameters show their defaults; the result is an array (or several arrays) aligned with the input, with `NaN`/`null` where the window is not yet full.
+Call as `talib.NAME(records_or_array, params...)` in JavaScript / Python (same names; the Rust SDK has no `talib`, use `TA`). `Records[...]` lists which fields of the K-line records the function reads; parameters show their defaults; the result is an array (or several arrays) aligned with the input, with `NaN`/`null` where the window is not yet full.
 
 | Function | Description | 中文 | Signature |
 |---|---|---|---|

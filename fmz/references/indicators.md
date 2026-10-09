@@ -4,7 +4,7 @@
 
 Two indicator libraries are available inside every strategy without imports (Python needs `import talib` for talib only):
 
-- **`TA`**: 13 commonly used indicators implemented by FMZ (`ta.js`, ported to Python, C++ and Rust). Simple signatures, defaults, K-line or plain-number input. Exact per-function behaviour is in `references/ta.md`.
+- **`TA`**: 13 commonly used indicators implemented by FMZ (`ta.js`, ported to Python and Rust). Simple signatures, defaults, K-line or plain-number input. Exact per-function behaviour is in `references/ta.md`.
 - **`talib`**: the TA-Lib function set (151 functions). The full generated table (name, description, which record fields it reads, parameter defaults, output arrays) is in `references/talib.md`.
 
 ## 1. The input: K-line records
@@ -25,7 +25,7 @@ Two indicator libraries are available inside every strategy without imports (Pyt
 
 ## 2. `TA.*` at a glance
 
-All functions return a JavaScript array (Python list, C++ `vector<double>`, Rust `Vec<f64>`) **aligned with the input** (`out[i]` belongs to `records[i]`), except `Highest`/`Lowest`, which return one number. Multi-line indicators return an **array of arrays**: `[line0, line1, line2]`.
+All functions return a JavaScript array (Python list, Rust `Vec<f64>`) **aligned with the input** (`out[i]` belongs to `records[i]`), except `Highest`/`Lowest`, which return one number. Multi-line indicators return an **array of arrays**: `[line0, line1, line2]`.
 
 | Call (defaults) | Input | Returns | First valid index |
 |---|---|---|---|
@@ -45,12 +45,12 @@ Input rule: if `records[0].Close` exists the function uses `Close` of each recor
 
 ## 3. `talib.*`
 
-- Table entries read `NAME(Records[fields], params...) = outputs`. `Records[Close]` means the function reads only `Close`; `Records[High,Low,Close]` means it reads those fields. Outputs are arrays aligned with the input; `[Array(a), Array(b)]` means it returns a list of arrays (JS array of arrays, Python tuple, C++ `array<vector<double>, N>`).
+- Table entries read `NAME(Records[fields], params...) = outputs`. `Records[Close]` means the function reads only `Close`; `Records[High,Low,Close]` means it reads those fields. Outputs are arrays aligned with the input; `[Array(a), Array(b)]` means it returns a list of arrays (JS array of arrays, Python tuple).
 - Defaults are the TA-Lib defaults, e.g. `talib.MA(r)` is a **30-period** SMA, `talib.BBANDS(r)` is period **5**, `talib.RSI(r)` is 14, `talib.MACD(r)` is 12/26/9, `talib.STOCH(r)` is 5/3/0/3/0. Pass explicit periods.
 - Multi-output: `talib.MACD` -> `[macd, signal, hist]`; `talib.BBANDS` -> `[upper, middle, lower]`; `talib.STOCH` -> `[slowK, slowD]`; `talib.STOCHF`/`STOCHRSI` -> `[fastK, fastD]`; `talib.AROON` -> `[down, up]`; `talib.MINMAX` -> `[min, max]`.
 - `MA Type` parameters (`optInMAType`, `Slow-K MA`, ...) take TA-Lib's integer codes: 0 SMA, 1 EMA, 2 WMA, 3 DEMA, 4 TEMA, 5 TRIMA, 6 KAMA, 7 MAMA, 8 T3 (the FMZ docs only state the default 0; the codes are TA-Lib's).
 - Candlestick functions (`CDL*`) return integer arrays: 0 none, +100 bullish, -100 bearish pattern on that bar.
-- The leading entries before the lookback window are `NaN` in JavaScript/C++/Rust and `nan` floats in Python.
+- The leading entries before the lookback window are `NaN` in JavaScript/Rust and `nan` floats in Python.
 
 ### Passing data per language
 
@@ -58,12 +58,11 @@ Input rule: if `records[0].Close` exists the function uses `Close` of each recor
 |---|---|---|
 | JavaScript | `TA.MA(records, 20)`, `TA.MA(closes, 20)` | `talib.MA(records, 20)`, `talib.STOCH(records, 9, 3, 0, 3, 0)`, `talib.OBV(records, records)`; a plain number array works where only one price series is read (`talib.ACOS([-1, 0, 1])`) |
 | Python | `TA.MA(records, 20)` | `import talib`; pass the field lists: `talib.MA(records.Close, 20)`, `talib.STOCH(records.High, records.Low, records.Close, 9, 3, 0, 3, 0)`, `talib.CDL2CROWS(records.Open, records.High, records.Low, records.Close)` (`records.Close` etc. are provided on the records object); results come back as lists / tuples of lists (see `references/talib.pyi`) |
-| C++ | `TA.MA(r, 20)` with `Records r`; `TA.Highest(r.Close(), 10)` and `TA.Lowest(...)` take a `vector<double>` from `r.Open()/High()/Low()/Close()/Volume()` and have no `attr` parameter; multi-line results are `array<vector<double>, 3>` (`TA.hpp`) | `talib.MA(r, 20)` or `talib.MA(closes, 20, 0)`; every function has a `Records&` overload and a per-field `vector<double>&` overload (`talib.hpp`) |
 | Rust | `TA.MA(&records, 20)`; period args are `impl Into<Option<usize>>` so `None` means the default; `MACD/BOLL/KDJ/Alligator` return `[Vec<f64>; 3]` (`let [dif, dea, hist] = TA.MACD(&records, 12, 26, 9);`); `TA.Highest(&closes, 10)` takes a `Vec<f64>`/slice, so extract the field first; `TA.BOLL` multiplier is `f64` (`2.0`) (`references/fmz.rs`) | no `talib` binding is listed in the Rust reference; use `TA` or implement the formula |
 
 ### Which library to reach for
 
-- `TA` when the indicator is one of the 13, you want the FMZ defaults (`MA` 9, `BOLL` 20/2, `KDJ` 9/3/3) and identical numbers across JavaScript, Python, C++ and Rust.
+- `TA` when the indicator is one of the 13, you want the FMZ defaults (`MA` 9, `BOLL` 20/2, `KDJ` 9/3/3) and identical numbers across JavaScript, Python and Rust.
 - `talib` for everything else (ADX, CCI, SAR, candlestick patterns, regression, Hilbert transforms) and for Python code that already works on `records.Close` lists. `talib` is not listed for Rust.
 
 ```rust
@@ -123,5 +122,4 @@ Rules the examples encode:
 - `TA.KDJ` sets K = D = 50 and RSV = 0 for the first `n-1` bars internally, then overwrites them with NaN; `TA.RSI` returns an all-NaN array when `records.length < period`.
 - `TA.ATR`, `TA.OBV`, `TA.CMF` never return NaN but their first values are warm-up artefacts (expanding windows); skip at least `period` bars.
 - In backtests every `TA.*` call also reports its name and parameters to the host (used for the indicator chart); it is cheap, but recomputing a 5000-bar indicator on every tick in a `Sleep(0)` loop is the usual cause of slow backtests. Cache per bar.
-- C++: `Records` has `Valid`; check `r.Valid && r.size() > n` before computing (`auto r = exchange.GetRecords(); if (r.Valid && r.size() > 9) { auto ema = TA.EMA(r, 9); }`).
 

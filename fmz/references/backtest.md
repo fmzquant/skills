@@ -2,7 +2,7 @@
 
 # FMZ backtesting
 
-The backtest engine is one C++ program (`backtest.cpp`), compiled to WebAssembly for in-browser runs of JavaScript/C++/Rust strategies and run natively on a node for Python and for cloud runs. It replays history with a virtual clock and a simulated account per exchange. Everything below is what that engine, the MCP tools and the website form actually do; `references/backtest-config.md` has the full key table and worked configurations.
+The backtest engine is one native program, compiled to WebAssembly for in-browser runs of JavaScript/Rust strategies and run natively on a node for Python and for cloud runs. It replays history with a virtual clock and a simulated account per exchange. Everything below is what that engine, the MCP tools and the website form actually do; `references/backtest-config.md` has the full key table and worked configurations.
 
 ## 0. Cloud or local?
 
@@ -19,7 +19,7 @@ Two ways to run a backtest, same engine core and the same history data:
 4. `stop_backtest(task_id)` stops a running task or discards a finished one. Call it once you have read the result: a task holds one of the account's concurrency slots while running **and after finishing until it is collected or stopped**. Results are kept only a few minutes after completion; afterwards `get_backtest` says `not found`.
 4. `list_backtests` lists the tasks still holding a slot (`task_id`, `started`). Use it with `stop_backtest` when `run_backtest` says too many are running.
 
-`run_backtest` takes either `strategy_id` (own, rented or public; its templates are attached automatically and `args` override saved parameter values) or `source` + `language` (raw code). Supported strategy languages on the platform: JavaScript, TypeScript, Python, C++, Rust, Pine, My language, Blockly, Workflow; the tool's `language` enum lists what it accepts.
+`run_backtest` takes either `strategy_id` (own, rented or public; its templates are attached automatically and `args` override saved parameter values) or `source` + `language` (raw code). Supported strategy languages on the platform: JavaScript, TypeScript, Python, Rust, Pine, My language, Blockly, Workflow; the tool's `language` enum lists what it accepts.
 
 ## 2. Configuring a run
 
@@ -56,7 +56,7 @@ args: [["fast",5],["slow",20]]
 */
 ```
 
-Python uses `'''backtest ... '''`; Rust, C++, TypeScript and JavaScript use `/*backtest ... */` (the block is the language's comment start followed immediately by the word `backtest`).
+Python uses `'''backtest ... '''`; Rust, TypeScript and JavaScript use `/*backtest ... */` (the block is the language's comment start followed immediately by the word `backtest`).
 
 | Key | Value format | Notes |
 |---|---|---|

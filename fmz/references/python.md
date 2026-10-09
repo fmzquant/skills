@@ -155,7 +155,7 @@ if cmd:
 ## Network
 
 - `ws = Dial("wss://host/path", timeout_ms=30000)` → connection or `None`. `ws.read(timeout_ms)` returns the next message, a falsy value on timeout, `""` once closed (omit the timeout to block, `-1` to poll); `ws.write(str_or_bytes)`; `ws.close()`. Options after `|`: `"wss://...|compress=gzip_raw&mode=recv&reconnect=true&payload=" + json.dumps(sub)`; headers via a dict second argument `Dial(url, {"headers": {...}})`. Also `tcp://`, `tls://`, `sqlite3://`, `mysql://`, `postgres://`, `kvdb://` (then `.exec(sql, *params)`). Keep the handle in a module global and close it in `onexit()`.
-- `HttpQuery(url, options)`: the api docs mark it JavaScript/C++ only and tell Python to use `urllib.request`; the classic bootstrap does not bind it, while `fmz.pyi` declares it. Safe choice: `urllib.request.urlopen(url, timeout=10).read()`; if you do call `HttpQuery`, guard with `'HttpQuery' in globals()`. In backtest `HttpQuery` is GET-only and cached per URL (max 20).
+- `HttpQuery(url, options)`: the api docs say Python does not support it and use `urllib.request` instead; the classic bootstrap does not bind it, while `fmz.pyi` declares it. Safe choice: `urllib.request.urlopen(url, timeout=10).read()`; if you do call `HttpQuery`, guard with `'HttpQuery' in globals()`. In backtest `HttpQuery` is GET-only and cached per URL (max 20).
 
 ## Indicators
 
@@ -198,5 +198,5 @@ if cmd:
 - `references/talib.pyi` — every `talib.*` signature with defaults (`def MACD`, `def BBANDS`, `def STOCH`, `def CDL...`).
 - `references/selfcheck.py` — known-good strategy exercising the whole surface; copy its idioms (`if t:` guards, `tk, ok = g.wait(0)`, `_D(r["Time"] // 1000)`, KLineChart keyword args, `IsVirtual()` gating of writes, condition-order dicts).
 - `references/api-docs.md` (`references/api.en.md`): grep `#### exchange.Buy`, `#### exchange.GetRecords`, `#### exchange.Go`, `#### _D`, `#### _C`, `#### _G`, `#### LogStatus`, `#### LogStatus-table`, `#### Dial`, `#### Chart`, `#### KLineChart`, `#### EventLoop`, `### Order`, `### Account`, `### Position`, `### Market` (each with a `python` example block).
-- `SKILL.md` (`references/user-guide.en.md`): grep `### Python` (interpreter shebang, encryption, custom modules), `## Strategy Entry Functions`, `## Strategy Parameters`, `## Interactive Controls`, `## Template Library`, `### Local Backtesting Engine`.
+- `SKILL.md` (`references/user-guide.en.md`): grep `#### Python` (interpreter shebang, encryption, custom modules), `### Strategy Structure` (entry functions), `### Strategy Parameters`, `### Interactive Controls`, `### Template Library`, `### Local Backtesting Engine`.
 - `references/backtest.md` — the `'''backtest'''` header, periods, exchanges and reading results. `references/indicators.md` — TA/talib semantics.

@@ -1,11 +1,11 @@
 ---
 name: fmz
-description: "Operate the FMZ Quant trading platform (fmz.com) through its MCP tools and write strategies for it in JavaScript/TypeScript, Python, C++, Rust, Pine Script or MyLanguage (麦语言). Covers getting authorized and connected (device-code flow, API key, Bearer header, scopes), the platform model (exchange accounts, nodes, strategies, templates, robots, backtests, messages), every MCP tool and the REST extended API, the complete strategy API documentation with four-language examples, TA/talib indicators, cloud backtest configuration and result reading, and the safety rules of a real-money platform. Use whenever the fmz MCP server is connected, or when a task mentions FMZ, its robots, strategies, backtests, nodes or API keys, or strategy code for the platform."
+description: "Operate the FMZ Quant trading platform (fmz.com) through its MCP tools and write strategies for it in JavaScript/TypeScript, Python, Rust, Pine Script or MyLanguage (麦语言). Covers getting authorized and connected (device-code flow, API key, Bearer header, scopes), the platform model (exchange accounts, nodes, strategies, templates, robots, backtests, messages), every MCP tool and the REST extended API, the complete strategy API documentation with JavaScript/Python/Rust examples, TA/talib indicators, cloud backtest configuration and result reading, and the safety rules of a real-money platform. Use whenever the fmz MCP server is connected, or when a task mentions FMZ, its robots, strategies, backtests, nodes or API keys, or strategy code for the platform."
 license: MIT
 ---
 # FMZ platform via MCP
 
-FMZ (fmz.com) is a quant trading platform: strategies written in JavaScript, TypeScript, Python, C++, Rust, Pine, MyLanguage (麦语言) or Blockly run as "robots" (实盘) on the user's own nodes (托管者) against the user's exchange accounts. Everything below is done through the `fmz` MCP server. Not connected yet? See "Connecting" below.
+FMZ (fmz.com) is a quant trading platform: strategies written in JavaScript, TypeScript, Python, Rust, Pine, MyLanguage (麦语言) or Blockly run as "robots" (实盘) on the user's own nodes (托管者) against the user's exchange accounts. Everything below is done through the `fmz` MCP server. Not connected yet? See "Connecting" below.
 
 This file is the entry point: the platform model, how to connect, the tool catalog and the safety rules. Everything else — writing code in each language, the full API documentation, indicators, backtesting — lives in `references/` and is listed in "Where to read next" at the end; read only the file the task needs.
 
@@ -39,7 +39,7 @@ Robot `status` values: `queue` (waiting for a node), `running`, `stopping`, `com
 ## Workflow
 
 1. **Orient**: `ping`, `get_account_summary`, `list_platforms`, `list_nodes`. No online node → the user must start one (website: Nodes); nothing you do will run until then.
-2. **Write**: pick the language skill, write the code, run `check_strategy` (`language`, `source`): syntax check for javascript/typescript, compile check for pine/mylanguage/flow/cpp/rust (cpp/rust compile on the build cluster and can take a minute); python and blockly have no static check.
+2. **Write**: pick the language skill, write the code, run `check_strategy` (`language`, `source`): syntax check for javascript/typescript, compile check for pine/mylanguage/flow/rust (rust compiles on the build cluster and can take a minute); python and blockly have no static check.
 3. **Save**: `save_strategy` with `name`, `language`, `source`, `args` (`[[name, label, description, default], ...]`; names become globals in the code), optional `description`, `manual`, `note`, `templates`, `group_id`. Returns `strategy_id`. Updating: pass `strategy_id` and only the changed fields; call `save_strategy_version` first if the old code must stay retrievable (max 20 versions; `delete_strategy_version` when full).
 4. **Backtest**: `run_backtest` with `strategy_id` (or raw `source` + `language`), `begin`, `end`, `period`, `exchanges: [{exchange: eid, pair, balance, stocks, fee_maker, fee_taker}]`, optional `args`, `slippage`, `net_delay` → `task_id`. Then `get_backtest` with `wait` up to 60 and `detail` summary/logs/full → `profit`, `max_drawdown`, order and error counts, `error_lines`, final accounts, `profit_curve`. The profit metrics come from the strategy's own `LogProfit()` calls: a strategy that never calls it shows empty profit/drawdown/curve, so judge it by `final_accounts` (or add `LogProfit`). Always `stop_backtest` when you have what you need; slots are limited. `eid` values come from `list_exchanges`. For the fast write–run–fix loop on a JavaScript/Python strategy, run the local engine on this machine instead (`references/backtest-local.md`, seconds per run, no slot) and use the cloud for the confirming run.
 5. **Go live** (`[trade]`, confirm with the user first): `create_robot` with `name`, `strategy_id`, `exchanges: [{platform_id, pair}]`, optional `args`, `period` (seconds, default 60), `node_id` (omit = least loaded online node), `strategy_version_id` (pin a version), `group_id`. It prepays one hour and starts the robot; the result is the robot after the start attempt. `status: error` → read `error`, `get_robot_output`, `get_robot_logs`.
@@ -64,7 +64,7 @@ A tool missing from `tools/list` means the key lacks that scope; the user can ed
 ## Conventions
 
 - `args` everywhere: `{name: value}` object or `[[name, value], ...]`; omitted parameters keep the strategy defaults. Values are typed by the default (number / string / boolean).
-- Enumerations are words, not numbers: robot `status` queue/running/stopping/complete/stopped/error; strategy `visibility` private/shared/verify/premium/system; `language` javascript/typescript/python/cpp/blockly/mylanguage/pine/flow/rust.
+- Enumerations are words, not numbers: robot `status` queue/running/stopping/complete/stopped/error; strategy `visibility` private/shared/verify/premium/system; `language` javascript/typescript/python/blockly/mylanguage/pine/flow/rust.
 - Times: ISO 8601 or unix seconds in; ISO UTC out. Backtest `period`: 1m/5m/15m/30m/1h/4h/1d. Robot `period` is in seconds.
 - Pairs: `BTC_USDT` (spot). Futures contracts are chosen in code with `exchange.SetContractType("swap" | "quarter" | ...)`, so the robot pair stays `BTC_USDT`.
 - Backtest `exchanges[].exchange` is the `eid` from `list_exchanges` (e.g. `Binance`, `Futures_Binance`, `Futures_CTP`); robots use `platform_id` from `list_platforms` instead.
@@ -101,11 +101,10 @@ Scripts and schedulers can use the signed REST "extended API" with the same key:
 |---|---|
 | Write or review a strategy in JavaScript / TypeScript | `references/javascript.md` (signatures: `references/fmz.d.ts`, Chinese `references/fmz.zh_CN.d.ts`; native event API `references/ctx.d.ts` + `references/events.md`; known-good sample `references/selfcheck.js`) |
 | Python | `references/python.md` (`references/fmz.pyi`, `references/fmz.zh_CN.pyi`, `references/talib.pyi`, `references/selfcheck.py`) |
-| C++ | `references/cpp.md` (`references/fmz.hpp`, `references/json.hpp`, `references/TA.hpp`, `references/talib.hpp`, `references/selfcheck.cpp`) |
 | Rust | `references/rust.md` (`references/fmz.rs`, `references/selfcheck.rs`) |
 | Pine Script | `references/pine.md` (built-ins the engine implements: `references/pine-builtins.md`) |
 | MyLanguage (麦语言) | `references/mylanguage.md` (`references/mylanguage-functions.md`, official templates in `references/mylanguage-examples/`) |
-| Exact signature / return fields / failure behaviour of one API call, structure or constant | `references/api-docs.md` explains how to grep `references/api.en.md` (English, 1 MB, four-language examples) or `references/api.zh.md` |
+| Exact signature / return fields / failure behaviour of one API call, structure or constant | `references/api-docs.md` explains how to grep `references/api.en.md` (English, 1 MB, JavaScript/Python/Rust examples) or `references/api.zh.md` |
 | Indicators (`TA.*`, `talib.*`) | `references/indicators.md` (`references/ta.md`, `references/talib.md`) |
 | Configure, run, debug or interpret a backtest | `references/backtest.md` (every config key: `references/backtest-config.md`) |
 | Backtest locally in seconds on this machine (Python engine; no cloud slot) | `references/backtest-local.md` |

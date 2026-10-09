@@ -1,7 +1,7 @@
 // FMZ Rust SDK — API self-check / integration test.
 //
 // Runs once and logs every SDK call, so a single build exercises the whole
-// surface (kept in parity with the C++ SDK + the canonical TS API). Designed to
+// surface (kept in parity with the canonical TS API). Designed to
 // run BOTH as a backtest and as a live bot:
 //   * read-only calls always run (live + backtest);
 //   * anything that writes exchange state, places orders, or clears persistent
@@ -218,7 +218,7 @@ fn main() {
 
     // ---- chart (works live + backtest) ----
     Log!("=== chart ===");
-    // Match the C++/JS working shape: chart.type + each series carries data:[].
+    // Same shape as the JS self-check: chart.type + each series carries data:[].
     let cfg = r#"{"chart":{"type":"line"},"title":{"text":"self-check"},"series":[{"name":"price","data":[]}]}"#;
     let chart = Chart::new(cfg);
     chart.reset(0);

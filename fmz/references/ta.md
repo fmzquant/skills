@@ -1,8 +1,8 @@
 # `TA.*` reference (extracted from `ta.js`)
 
-The `TA` object is the FMZ-written indicator library. This file follows the JavaScript implementation (`backtest/js/ta.js`); the Python, C++ (`TAHelper`) and Rust (`TAHelper`/`Ticks`) ports expose the same functions with the same defaults and output shapes. Where a port differs in calling convention it is noted.
+The `TA` object is the FMZ-written indicator library. This file follows the JavaScript implementation (`backtest/js/ta.js`); the Python and Rust (`TAHelper`/`Ticks`) ports expose the same functions with the same defaults and output shapes. Where a port differs in calling convention it is noted.
 
-Conventions used below: `r` is the input array, `n = r.length`, `out[i]` is aligned with `r[i]` unless stated, "NaN" means `NaN` (JS/C++/Rust) or `float('nan')` (Python). Every call also reports its name and parameters to the host (`_log`), which the backtest uses to draw indicator charts.
+Conventions used below: `r` is the input array, `n = r.length`, `out[i]` is aligned with `r[i]` unless stated, "NaN" means `NaN` (JS/Rust) or `float('nan')` (Python). Every call also reports its name and parameters to the host (`_log`), which the backtest uses to draw indicator charts.
 
 ## Input handling (`Std._ticks`)
 
@@ -27,7 +27,7 @@ The SMA seed for EMA/SMMA means `TA.EMA` values near the start differ slightly f
 
 ### `TA.Highest(r, n, attr)` / `TA.Lowest(r, n, attr)`
 
-- Input: records with `attr` (`"Open" | "High" | "Low" | "Close" | "Volume" | "OpenInterest"`), or a number array without `attr`. C++ takes a `vector<double>` (`TA.Highest(r.Close(), 10)`), Rust a `&[f64]`/`&Vec<f64>`; neither has `attr`.
+- Input: records with `attr` (`"Open" | "High" | "Low" | "Close" | "Volume" | "OpenInterest"`), or a number array without `attr`. Rust takes a `&[f64]`/`&Vec<f64>` and has no `attr`.
 - Output: **one number**.
 - Window: the `n` elements **before the last one**, i.e. indices `[length-1-n, length-2]`; `n` is clamped to `length-1`; `n = 0` means all elements before the last.
 - Edge: fewer than 2 elements -> `NaN`. The running seed is `Number.MIN_VALUE` (a tiny positive number) for `Highest` and `Number.MAX_VALUE` for `Lowest`, so `Highest` of an all-negative series returns `5e-324`, not the true maximum.
@@ -107,5 +107,4 @@ The SMA seed for EMA/SMMA means `TA.EMA` values near the start differ slightly f
 ## Port notes
 
 - **Python**: same names and argument order (`TA.MACD(r, 12, 26, 9)` returns a list of three lists); `TA.Highest(records, 10, "Open")` supports `attr` like JavaScript.
-- **C++** (`TA.hpp`): `TAHelper TA;` with overloads for `vector<double>&` and `Records&`; `MACD/KDJ/BOLL/Alligator` return `array<vector<double>, 3>`; `Highest/Lowest(vector<double>, size_t n)` only; `BOLL` multiplier is `double`.
 - **Rust** (`fmz.rs`): `TA.MA(&records, 20)` / `TA.MA(&closes, 20)` via the `Ticks` trait (`Vec<Record>`, `[Record]`, `Vec<f64>`, `[f64]`); optional periods take `None`; `MACD/BOLL/KDJ/Alligator` return `[Vec<f64>; 3]`; `KDJ/OBV/ATR/Alligator/CMF` take `&[Record]`; `Highest/Lowest(&T, n: usize)` return `f64`.

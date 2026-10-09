@@ -4,13 +4,13 @@ Three layers describe the same run:
 
 1. the **header** (`/*backtest ... */` in the source; what the website form and the local engines read),
 2. the **MCP `run_backtest` parameters**,
-3. the **engine task JSON** (`Code`, `Exchanges[]`, `Options`) that both of the above are turned into and that `backtest.cpp` reads.
+3. the **engine task JSON** (`Code`, `Exchanges[]`, `Options`) that both of the above are turned into and that the engine reads.
 
 Fee integers: the engine computes `rate = FeeMaker / 10^FeeDenominator`. The MCP tool sends `FeeDenominator: 5` with `percent x 1000` (0.15 % -> 150); the website sends `FeeDenominator: 6` with `percent x 10000` (0.15 % -> 1500). Both yield the same rate.
 
 ## Key table
 
-"Website" = value the website form sends by default; "Engine default" = what `backtest.cpp` assumes when the key is absent. `-` = not available on that path.
+"Website" = value the website form sends by default; "Engine default" = what the engine assumes when the key is absent. `-` = not available on that path.
 
 ### Per-run options (`Options`)
 

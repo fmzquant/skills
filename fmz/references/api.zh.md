@@ -1,6 +1,6 @@
 # FMZ 策略 API 参考
 
-由平台语法指南（https://www.fmz.com/syntax-guide）生成：全部内置函数、结构体与常量，示例覆盖 JavaScript、Python、C++、Rust。按函数名（如 `exchange.GetTicker`）在本文件内搜索。
+由平台语法指南（https://www.fmz.com/syntax-guide）生成：全部内置函数、结构体与常量，示例覆盖 JavaScript、Python、Rust。按函数名（如 `exchange.GetTicker`）在本文件内搜索。
 
 ## 内置函数
 
@@ -33,56 +33,7 @@ fn main() {
 }
 ```
 
-```cpp
-void main() {
-    Log("version:", Version());
-}
-```
-
 系统版本号即托管者程序的版本号。
-
-#### Sleep
-
-```
-Sleep(millisecond)
-```
-
-休眠函数，使程序暂停运行一段指定的时间。
-
-Parameters:
-
-- `millisecond` (number, required): ```millisecond```参数用于设置休眠时长，单位为毫秒。
-
-```javascript
-function main() {
-    Sleep(1000 * 10)   // 等待10秒钟
-    Log("Waited for 10 seconds")
-}
-```
-
-```python
-def main():
-    Sleep(1000 * 10)
-    Log("Waited for 10 seconds")
-```
-
-```rust
-fn main() {
-    Sleep(1000 * 10);   // 等待10秒钟
-    Log!("Waited for 10 seconds");
-}
-```
-
-```cpp
-void main() {
-    Sleep(1000 * 10);
-    Log("Waited for 10 seconds");
-}
-```
-
-例如，执行```Sleep(1000)```函数时，程序将休眠1秒。该函数支持小于1毫秒的休眠操作，例如```Sleep(0.1)```。支持的最小参数为```0.000001```，即纳秒级休眠，1纳秒等于```1e-6```毫秒。
-
-在使用```Python```语言编写策略时，对于轮询间隔、时间等待等操作，应当使用```Sleep(millisecond)```函数，而不建议使用```Python```中```time```库的```time.sleep(second)```函数。因为策略在回测时若使用```time.sleep(second)```函数，会使策略程序实际等待一段时间（而非在回测系统的时间序列上跳过），从而导致回测速度非常缓慢。
 
 #### IsVirtual
 
@@ -122,199 +73,36 @@ fn main() {
 }
 ```
 
-```cpp
-void main() {
-    if (IsVirtual()) {
-        Log("Currently in backtest environment.");
-    } else {
-        Log("Currently in live trading environment.");
-    }
-}
-```
-
 用于判断当前运行环境是否为回测系统，以便兼容回测与实盘环境之间的差异。
 
-#### Mail
+#### GetOS
 
 ```
-Mail(smtpServer, smtpUsername, smtpPassword, mailTo, title, body)
+GetOS()
 ```
 
-发送邮件。
+获取托管者所在设备的操作系统信息。
 
-Parameters:
-
-- `smtpServer` (string, required): 用于指定邮件发送方的```SMTP```服务器地址。
-- `smtpUsername` (string, required): 用于指定邮件发送方的邮箱地址。
-- `smtpPassword` (string, required): 用于指定邮件发送方邮箱的```SMTP```服务密码。
-- `mailTo` (string, required): 用于指定邮件接收方的邮箱地址。
-- `title` (string, required): 邮件标题。
-- `body` (string, required): 邮件正文。
-
-Returns (bool): 邮件发送成功时返回真值，例如```true```；发送失败时返回假值，例如```false```。
+Returns (string): 操作系统信息。
 
 ```javascript
-function main(){
-    Mail("smtp.163.com", "asdf@163.com", "password", "111@163.com", "title", "body")
+function main() {
+    Log("GetOS:", GetOS())
 }
 ```
 
 ```python
 def main():
-    Mail("smtp.163.com", "asdf@163.com", "password", "111@163.com", "title", "body")
+    Log("GetOS:", GetOS())
 ```
 
 ```rust
 fn main() {
-    Mail("smtp.163.com", "asdf@163.com", "password", "111@163.com", "title", "body");
+    Log!("GetOS:", GetOS());
 }
 ```
 
-```cpp
-void main() {
-    Mail("smtp.163.com", "asdf@163.com", "password", "111@163.com", "title", "body");
-}
-```
-
-```smtpPassword```参数设置的是```SMTP```服务的密码，而非邮箱登录密码。
-
-设置```smtpServer```参数时，如需更改端口，可直接在```smtpServer```参数中附加端口号。例如：QQ 邮箱的```smtp.qq.com:587```端口经测试可用。
-
-如果出现报错```unencryped connection```，则需要修改```Mail```函数的```smtpServer```参数，其格式为```ssl://xxx.com:xxx```。例如，QQ 邮箱```SMTP```的```ssl```方式为```ssl://smtp.qq.com:465```，或使用```smtp://xxx.com:xxx```。
-
-该函数在回测系统中不起作用。
-
-See also: `Mail_Go`
-
-#### Mail_Go
-
-```
-Mail_Go(smtpServer, smtpUsername, smtpPassword, mailTo, title, body)
-```
-
-```Mail```函数的异步版本。
-
-Parameters:
-
-- `smtpServer` (string, required): 用于指定邮件发送方的```SMTP```服务器地址。
-- `smtpUsername` (string, required): 用于指定邮件发送方的邮箱地址。
-- `smtpPassword` (string, required): 邮件发送方邮箱的```SMTP```授权密码。
-- `mailTo` (string, required): 用于指定邮件接收方的邮箱地址。
-- `title` (string, required): 邮件标题。
-- `body` (string, required): 邮件正文内容。
-
-Returns (object): ```Mail_Go```函数立即返回一个并发对象，可以使用该并发对象的```wait```方法获取邮件发送结果。邮件发送成功返回真值（例如：```true```），发送失败返回假值（例如：```false```）。
-
-```javascript
-function main() {
-    var r1 = Mail_Go("smtp.163.com", "asdf@163.com", "password", "111@163.com", "title", "body")
-    var r2 = Mail_Go("smtp.163.com", "asdf@163.com", "password", "111@163.com", "title", "body")
-
-    var ret1 = r1.wait()
-    var ret2 = r2.wait()
-
-    Log("ret1:", ret1)
-    Log("ret2:", ret2)
-}
-```
-
-```python
-# 不支持
-```
-
-```cpp
-// 不支持
-```
-
-在回测系统中不起作用。
-
-See also: `Mail`
-
-#### SetErrorFilter
-
-```
-SetErrorFilter(filters)
-```
-
-过滤错误日志。
-
-Parameters:
-
-- `filters` (string, required): 正则表达式字符串。
-
-过滤常见错误。
-
-```javascript
-function main() {
-    SetErrorFilter("502:|503:|tcp|character|unexpected|network|timeout|WSARecv|Connect|GetAddr|no such|reset|http|received|EOF|reused")
-}
-```
-
-```python
-def main():
-    SetErrorFilter("502:|503:|tcp|character|unexpected|network|timeout|WSARecv|Connect|GetAddr|no such|reset|http|received|EOF|reused")
-```
-
-```rust
-fn main() {
-    SetErrorFilter("502:|503:|tcp|character|unexpected|network|timeout|WSARecv|Connect|GetAddr|no such|reset|http|received|EOF|reused");
-}
-```
-
-```cpp
-void main() {
-    SetErrorFilter("502:|503:|tcp|character|unexpected|network|timeout|WSARecv|Connect|GetAddr|no such|reset|http|received|EOF|reused");
-}
-```
-
-过滤指定接口的错误信息。
-
-```javascript
-function main() {
-    // 查询一个不存在的订单（id 为 123），故意触发接口报错
-    var order = exchange.GetOrder("123")
-    Log(order)
-    // 过滤 http 502 错误和 GetOrder 接口错误；设置错误过滤后，第二次调用 GetOrder 将不再报错
-    SetErrorFilter("502:|GetOrder")
-    order = exchange.GetOrder("123")
-    Log(order)
-}
-```
-
-```python
-def main():
-    order = exchange.GetOrder("123")
-    Log(order)
-    SetErrorFilter("502:|GetOrder")
-    order = exchange.GetOrder("123")
-    Log(order)
-```
-
-```rust
-fn main() {
-    // 查询一个不存在的订单（id 为 123），故意触发接口报错
-    let orderId = OrderId { S: "123".to_string(), ..Default::default() };
-    let order = exchange.GetOrder(&orderId);
-    Log!(order);
-    // 过滤 http 502 错误和 GetOrder 接口错误；设置错误过滤后，第二次调用 GetOrder 将不再报错
-    SetErrorFilter("502:|GetOrder");
-    let order = exchange.GetOrder(&orderId);
-    Log!(order);
-}
-```
-
-```cpp
-void main() {
-    TId orderId;
-    Order order = exchange.GetOrder(orderId);
-    Log(order);
-    SetErrorFilter("502:|GetOrder");
-    order = exchange.GetOrder(orderId);
-    Log(order);
-}
-```
-
-与此正则表达式匹配的错误日志将不再上传至日志系统。该函数可多次调用（无次数限制）以设置多个过滤条件，多次设置的正则表达式会累积并同时生效。可传入空字符串以重置用于过滤错误日志的正则表达式：```SetErrorFilter("")```。被过滤的日志将不再写入托管者目录下对应实盘 Id 的数据库文件中，从而防止因频繁报错导致数据库文件膨胀。
+例如，在**Mac OS**操作系统下运行的托管者，调用```GetOS()```函数可能返回：```darwin/amd64```。由于苹果电脑采用多种硬件架构，返回值中会附带具体的架构信息。其中，```darwin```即**Mac OS**系统的内核名称。
 
 #### GetPid
 
@@ -345,219 +133,6 @@ fn main() {
     Log!(id);
 }
 ```
-
-```cpp
-void main() {
-    auto id = GetPid();
-    Log(id);
-}
-```
-
-#### GetLastError
-
-```
-GetLastError()
-```
-
-获取最近一次的错误信息。
-
-Returns (string): 最近一次的错误信息。
-
-```javascript
-function main(){
-    // 由于不存在编号为 123 的订单，因此会触发错误
-    exchange.GetOrder("123")
-    var error = GetLastError()
-    Log(error)
-}
-```
-
-```python
-def main():
-    exchange.GetOrder("123")
-    error = GetLastError()
-    Log(error)
-```
-
-```rust
-fn main() {
-    // 由于不存在编号为 123 的订单，因此会触发错误
-    // Rust 的 GetOrder 接受 &OrderId 参数，字符串 id 需放在 S 字段中
-    let id = OrderId { S: "123".to_string(), ..Default::default() };
-    let _ = exchange.GetOrder(&id);
-    let error = GetLastError();
-    Log!(error);
-}
-```
-
-```cpp
-void main() {
-    // 订单 ID 的类型为 TId，因此不能传入字符串；此处下单一个不符合交易所规范的订单以触发错误
-    exchange.GetOrder(exchange.Buy(1, 1));
-    auto error = GetLastError();
-    Log(error);
-}
-```
-
-该函数在回测系统中不起作用。
-
-#### GetCommand
-
-```
-GetCommand()
-```
-
-获取策略的交互命令。
-
-Returns (string): 返回的命令格式为```ControlName:Data```，其中```ControlName```为控件名称，```Data```为控件中输入的数据。如果交互控件不包含输入框、下拉框等输入组件（例如：不带输入框的按钮控件），则返回的命令格式为```ControlName```，即仅返回控件名称。
-
-检测交互命令，并在检测到交互命令时使用```Log```函数将其输出。
-
-```javascript
-function main(){
-    while(true) {
-        var cmd = GetCommand()
-        if (cmd) {
-            Log(cmd)
-        }
-        Sleep(1000)
-    }
-}
-```
-
-```python
-def main():
-    while True:
-        cmd = GetCommand()
-        if cmd:
-            Log(cmd)
-        Sleep(1000)
-```
-
-```rust
-fn main() {
-    loop {
-        // Rust 的 GetCommand() 需要传入超时参数（毫秒），返回 Option<String>，无命令时为 None
-        if let Some(cmd) = GetCommand(0) {
-            Log!(cmd);
-        }
-        Sleep(1000);
-    }
-}
-```
-
-```cpp
-void main() {
-    while(true) {
-        auto cmd = GetCommand();
-        if(cmd != "") {
-            Log(cmd);
-        }
-        Sleep(1000);
-    }
-}
-```
-
-例如，在策略交互控件中添加一个不带输入框的控件，将其命名为```buy```，控件描述信息为```买入```，这是一个按钮控件；再添加一个带输入框的控件，将其命名为```sell```，控件描述信息为```卖出```，这是一个由按钮和输入框组合而成的交互控件。在策略中编写交互代码，以响应不同的交互控件：
-
-```javascript
-function main() {
-    while (true) {
-        LogStatus(_D())
-        var cmd = GetCommand()
-        if (cmd) {
-            Log("cmd:", cmd)
-            var arr = cmd.split(":")
-            if (arr[0] == "buy") {
-                Log("Buy, this control has no quantity")
-            } else if (arr[0] == "sell") {
-                Log("Sell, this control has quantity:", arr[1])
-            } else {
-                Log("Other control triggered:", arr)
-            }
-        }
-        Sleep(1000)
-    }
-}
-```
-
-```python
-def main():
-    while True:
-        LogStatus(_D())
-        cmd = GetCommand()
-        if cmd:
-            Log("cmd:", cmd)
-            arr = cmd.split(":")
-            if arr[0] == "buy":
-                Log("Buy, this control has no quantity")
-            elif arr[0] == "sell":
-                Log("Sell, this control has quantity:", arr[1])
-            else:
-                Log("Other control triggered:", arr)
-        Sleep(1000)
-```
-
-```rust
-fn main() {
-    loop {
-        LogStatus!(_D(None));
-        if let Some(cmd) = GetCommand(0) {
-            Log!("cmd:", cmd);
-            let arr: Vec<&str> = cmd.split(':').collect();
-            if arr[0] == "buy" {
-                Log!("Buy, this control has no quantity");
-            } else if arr[0] == "sell" {
-                Log!("Sell, this control has quantity:", arr[1]);
-            } else {
-                Log!("Other control triggered:", arr);
-            }
-        }
-        Sleep(1000);
-    }
-}
-```
-
-```cpp
-#include <iostream>
-#include <sstream>
-#include <string>
-#include <vector>
-
-using namespace std;
-
-void split(const string& s,vector<string>& sv,const char flag = ' ') {
-    sv.clear();
-    istringstream iss(s);
-    string temp;
-
-    while (getline(iss, temp, flag)) {
-        sv.push_back(temp);
-    }
-    return;
-}
-
-void main() {
-    while(true) {
-        LogStatus(_D());
-        auto cmd = GetCommand();
-        if (cmd != "") {
-            vector<string> arr;
-            split(cmd, arr, ':');
-            if(arr[0] == "buy") {
-                Log("Buy, this control has no quantity");
-            } else if (arr[0] == "sell") {
-                Log("Sell, this control has quantity:", arr[1]);
-            } else {
-                Log("Other control triggered:", arr);
-            }
-        }
-        Sleep(1000);
-    }
-}
-```
-
-该函数在回测系统中无效。
 
 #### GetMeta
 
@@ -680,40 +255,10470 @@ fn main() {
 }
 ```
 
-```cpp
-void main() {
-    auto maxBaseCurrency = 0.0;
-    auto level = GetMeta();
+应用场景：需要对不同的策略租用者进行资金限制。生成注册码时设置的```Meta```值长度不能超过190个字符。```GetMeta()```函数仅支持实盘，在回测系统中不起作用。如果生成策略注册码时未设置元数据（```Meta```），```GetMeta()```函数将返回空值。
 
-    if (level == "level1") {
-        maxBaseCurrency = -1;
-    } else if (level == "level2") {
-        maxBaseCurrency = 10;
-    } else if (level == "level3") {
-        maxBaseCurrency = 1;
-    } else {
-        maxBaseCurrency = 0.5;
-    }
+#### Sleep
 
-    while(1) {
-        Sleep(1000);
-        auto ticker = exchange.GetTicker();
-        auto acc = exchange.GetAccount();
-        if (maxBaseCurrency != -1 && maxBaseCurrency < acc.Stocks + acc.FrozenStocks) {
-            // 停止执行策略交易逻辑
-            LogStatus(_D(), "level:", level, "Position exceeds registration code limit, strategy trading logic will not execute!");
-            continue;
+```
+Sleep(millisecond)
+```
+
+休眠函数，使程序暂停运行一段指定的时间。
+
+Parameters:
+
+- `millisecond` (number, required): ```millisecond```参数用于设置休眠时长，单位为毫秒。
+
+```javascript
+function main() {
+    Sleep(1000 * 10)   // 等待10秒钟
+    Log("Waited for 10 seconds")
+}
+```
+
+```python
+def main():
+    Sleep(1000 * 10)
+    Log("Waited for 10 seconds")
+```
+
+```rust
+fn main() {
+    Sleep(1000 * 10);   // 等待10秒钟
+    Log!("Waited for 10 seconds");
+}
+```
+
+例如，执行```Sleep(1000)```函数时，程序将休眠1秒。该函数支持小于1毫秒的休眠操作，例如```Sleep(0.1)```。支持的最小参数为```0.000001```，即纳秒级休眠，1纳秒等于```1e-6```毫秒。
+
+在使用```Python```语言编写策略时，对于轮询间隔、时间等待等操作，应当使用```Sleep(millisecond)```函数，而不建议使用```Python```中```time```库的```time.sleep(second)```函数。因为策略在回测时若使用```time.sleep(second)```函数，会使策略程序实际等待一段时间（而非在回测系统的时间序列上跳过），从而导致回测速度非常缓慢。
+
+#### Unix
+
+```
+Unix()
+```
+
+获取当前时刻的秒级时间戳。
+
+Returns (number): 返回秒级时间戳。
+
+```javascript
+function main() {
+    var t = Unix()
+    Log(t)
+}
+```
+
+```python
+def main():
+    t = Unix()
+    Log(t)
+```
+
+```rust
+fn main() {
+    let t = Unix();
+    Log!(t);
+}
+```
+
+See also: `UnixNano`
+
+#### UnixNano
+
+```
+UnixNano()
+```
+
+获取当前时刻的纳秒级时间戳。
+
+Returns (number): ```UnixNano()```函数返回纳秒级时间戳。
+
+如果需要获取毫秒级时间戳，可以使用以下代码：
+
+```javascript
+function main() {
+    var time = UnixNano() / 1000000
+    Log(_N(time, 0))
+}
+```
+
+```python
+def main():
+    time = UnixNano()
+    Log(time)
+```
+
+```rust
+fn main() {
+    let time = UnixNano() / 1000000;
+    Log!(_N(time, 0));
+}
+```
+
+See also: `Unix`
+
+#### _D
+
+```
+_D()
+_D(timestamp)
+_D(timestamp, fmt)
+```
+
+将毫秒级时间戳或```Date```对象转换为时间字符串。
+
+Parameters:
+
+- `timestamp` (number / object, optional): 毫秒级时间戳或```Date```对象。
+- `fmt` (string, optional): 格式化字符串，```JavaScript```语言默认格式：```yyyy-MM-dd hh:mm:ss```；```Python```语言默认格式：```%Y-%m-%d %H:%M:%S```。
+
+Returns (string): 时间字符串。
+
+获取并打印当前时间字符串：
+
+```javascript
+function main(){
+    var time = _D()
+    Log(time)
+}
+```
+
+```python
+def main():
+    strTime = _D()
+    Log(strTime)
+```
+
+```rust
+fn main() {
+    let time = _D(None);
+    Log!(time);
+}
+```
+
+时间戳为1574993606000，使用代码进行转换：
+
+```javascript
+function main() {
+    Log(_D(1574993606000))
+}
+```
+
+```python
+def main():
+    # 在北京时间的服务器上运行结果为：2019-11-29 10:13:26；而在其他地区服务器上的托管者运行此代码，结果则为：2019-11-29 02:13:26
+    Log(_D(1574993606))
+```
+
+```rust
+fn main() {
+    Log!(_D(1574993606000));
+}
+```
+
+使用参数```fmt```进行格式化，```JavaScript```、```Python```语言的格式化字符串有所不同，具体请参看以下示例：
+
+```javascript
+function main() {
+    Log(_D(1574993606000, "yyyy--MM--dd hh--mm--ss"))   // 2019--11--29 10--13--26
+}
+```
+
+```python
+def main():
+    # 1574993606 为秒级时间戳
+    Log(_D(1574993606, "%Y--%m--%d %H--%M--%S"))        #  2019--11--29 10--13--26
+```
+
+```rust
+fn main() {
+    // Rust 的 _D() 函数不支持 fmt 参数，仅支持默认格式：yyyy-MM-dd hh:mm:ss
+    Log!(_D(1574993606000));    // 2019-11-29 10:13:26
+}
+```
+
+若不传入任何参数，则返回当前时间字符串。在```Python```策略中使用```_D()```函数时，需要注意传入的参数为秒级时间戳（JavaScript、Rust策略中为毫秒级时间戳，1秒等于1000毫秒）。在实盘中使用```_D()```函数将时间戳解析为可读时间字符串时，需要注意托管者程序所在操作系统的时区与时间设置，因为```_D()```函数的解析结果取决于托管者系统的时间。
+
+See also: `UnixNano`, `Unix`
+
+#### GetCommand
+
+```
+GetCommand()
+```
+
+获取策略的交互命令。
+
+Returns (string): 返回的命令格式为```ControlName:Data```，其中```ControlName```为控件名称，```Data```为控件中输入的数据。如果交互控件不包含输入框、下拉框等输入组件（例如：不带输入框的按钮控件），则返回的命令格式为```ControlName```，即仅返回控件名称。
+
+检测交互命令，并在检测到交互命令时使用```Log```函数将其输出。
+
+```javascript
+function main(){
+    while(true) {
+        var cmd = GetCommand()
+        if (cmd) {
+            Log(cmd)
         }
-
-        // 其它交易逻辑
-
-        // 正常输出状态栏信息
-        LogStatus(_D(), "level:", level, "Strategy running normally! ticker data:\n", ticker);
+        Sleep(1000)
     }
 }
 ```
 
-应用场景：需要对不同的策略租用者进行资金限制。生成注册码时设置的```Meta```值长度不能超过190个字符。```GetMeta()```函数仅支持实盘，在回测系统中不起作用。如果生成策略注册码时未设置元数据（```Meta```），```GetMeta()```函数将返回空值。
+```python
+def main():
+    while True:
+        cmd = GetCommand()
+        if cmd:
+            Log(cmd)
+        Sleep(1000)
+```
+
+```rust
+fn main() {
+    loop {
+        // Rust 的 GetCommand() 需要传入超时参数（毫秒），返回 Option<String>，无命令时为 None
+        if let Some(cmd) = GetCommand(0) {
+            Log!(cmd);
+        }
+        Sleep(1000);
+    }
+}
+```
+
+例如，在策略交互控件中添加一个不带输入框的控件，将其命名为```buy```，控件描述信息为```买入```，这是一个按钮控件；再添加一个带输入框的控件，将其命名为```sell```，控件描述信息为```卖出```，这是一个由按钮和输入框组合而成的交互控件。在策略中编写交互代码，以响应不同的交互控件：
+
+```javascript
+function main() {
+    while (true) {
+        LogStatus(_D())
+        var cmd = GetCommand()
+        if (cmd) {
+            Log("cmd:", cmd)
+            var arr = cmd.split(":")
+            if (arr[0] == "buy") {
+                Log("Buy, this control has no quantity")
+            } else if (arr[0] == "sell") {
+                Log("Sell, this control has quantity:", arr[1])
+            } else {
+                Log("Other control triggered:", arr)
+            }
+        }
+        Sleep(1000)
+    }
+}
+```
+
+```python
+def main():
+    while True:
+        LogStatus(_D())
+        cmd = GetCommand()
+        if cmd:
+            Log("cmd:", cmd)
+            arr = cmd.split(":")
+            if arr[0] == "buy":
+                Log("Buy, this control has no quantity")
+            elif arr[0] == "sell":
+                Log("Sell, this control has quantity:", arr[1])
+            else:
+                Log("Other control triggered:", arr)
+        Sleep(1000)
+```
+
+```rust
+fn main() {
+    loop {
+        LogStatus!(_D(None));
+        if let Some(cmd) = GetCommand(0) {
+            Log!("cmd:", cmd);
+            let arr: Vec<&str> = cmd.split(':').collect();
+            if arr[0] == "buy" {
+                Log!("Buy, this control has no quantity");
+            } else if arr[0] == "sell" {
+                Log!("Sell, this control has quantity:", arr[1]);
+            } else {
+                Log!("Other control triggered:", arr);
+            }
+        }
+        Sleep(1000);
+    }
+}
+```
+
+该函数在回测系统中无效。
+
+#### GetLastError
+
+```
+GetLastError()
+```
+
+获取最近一次的错误信息。
+
+Returns (string): 最近一次的错误信息。
+
+```javascript
+function main(){
+    // 由于不存在编号为 123 的订单，因此会触发错误
+    exchange.GetOrder("123")
+    var error = GetLastError()
+    Log(error)
+}
+```
+
+```python
+def main():
+    exchange.GetOrder("123")
+    error = GetLastError()
+    Log(error)
+```
+
+```rust
+fn main() {
+    // 由于不存在编号为 123 的订单，因此会触发错误
+    // Rust 的 GetOrder 接受 &OrderId 参数，字符串 id 需放在 S 字段中
+    let id = OrderId { S: "123".to_string(), ..Default::default() };
+    let _ = exchange.GetOrder(&id);
+    let error = GetLastError();
+    Log!(error);
+}
+```
+
+该函数在回测系统中不起作用。
+
+#### SetErrorFilter
+
+```
+SetErrorFilter(filters)
+```
+
+过滤错误日志。
+
+Parameters:
+
+- `filters` (string, required): 正则表达式字符串。
+
+过滤常见错误。
+
+```javascript
+function main() {
+    SetErrorFilter("502:|503:|tcp|character|unexpected|network|timeout|WSARecv|Connect|GetAddr|no such|reset|http|received|EOF|reused")
+}
+```
+
+```python
+def main():
+    SetErrorFilter("502:|503:|tcp|character|unexpected|network|timeout|WSARecv|Connect|GetAddr|no such|reset|http|received|EOF|reused")
+```
+
+```rust
+fn main() {
+    SetErrorFilter("502:|503:|tcp|character|unexpected|network|timeout|WSARecv|Connect|GetAddr|no such|reset|http|received|EOF|reused");
+}
+```
+
+过滤指定接口的错误信息。
+
+```javascript
+function main() {
+    // 查询一个不存在的订单（id 为 123），故意触发接口报错
+    var order = exchange.GetOrder("123")
+    Log(order)
+    // 过滤 http 502 错误和 GetOrder 接口错误；设置错误过滤后，第二次调用 GetOrder 将不再报错
+    SetErrorFilter("502:|GetOrder")
+    order = exchange.GetOrder("123")
+    Log(order)
+}
+```
+
+```python
+def main():
+    order = exchange.GetOrder("123")
+    Log(order)
+    SetErrorFilter("502:|GetOrder")
+    order = exchange.GetOrder("123")
+    Log(order)
+```
+
+```rust
+fn main() {
+    // 查询一个不存在的订单（id 为 123），故意触发接口报错
+    let orderId = OrderId { S: "123".to_string(), ..Default::default() };
+    let order = exchange.GetOrder(&orderId);
+    Log!(order);
+    // 过滤 http 502 错误和 GetOrder 接口错误；设置错误过滤后，第二次调用 GetOrder 将不再报错
+    SetErrorFilter("502:|GetOrder");
+    let order = exchange.GetOrder(&orderId);
+    Log!(order);
+}
+```
+
+与此正则表达式匹配的错误日志将不再上传至日志系统。该函数可多次调用（无次数限制）以设置多个过滤条件，多次设置的正则表达式会累积并同时生效。可传入空字符串以重置用于过滤错误日志的正则表达式：```SetErrorFilter("")```。被过滤的日志将不再写入托管者目录下对应实盘 Id 的数据库文件中，从而防止因频繁报错导致数据库文件膨胀。
+
+#### _N
+
+```
+_N()
+_N(num)
+_N(num, precision)
+```
+
+格式化浮点数。
+
+Parameters:
+
+- `num` (number, required): 待格式化的浮点数。
+- `precision` (number, optional): 用于设置格式化精度，参数```precision```为整数，默认值为4。
+
+Returns (number): 根据精度设置格式化后的浮点数。
+
+例如```_N(3.1415, 2)```会保留```3.1415```小数点后两位，删除其余数位，函数返回```3.14```。
+
+```javascript
+function main(){
+    var i = 3.1415
+    Log(i)
+    var ii = _N(i, 2)
+    Log(ii)
+}
+```
+
+```python
+def main():
+    i = 3.1415
+    Log(i)
+    ii = _N(i, 2)
+    Log(ii)
+```
+
+```rust
+fn main() {
+    let i = 3.1415;
+    Log!(i);
+    let ii = _N(i, 2);
+    Log!(ii);
+}
+```
+
+如果需要将小数点左边的N位数字都置为0，可以这样编写：
+
+```javascript
+function main(){
+    var i = 1300
+    Log(i)
+    var ii = _N(i, -3)
+    // 查看日志得知为1000
+    Log(ii)
+}
+```
+
+```python
+def main():
+    i = 1300
+    Log(i)
+    ii = _N(i, -3)
+    Log(ii)
+```
+
+```rust
+fn main() {
+    let i = 1300;
+    Log!(i);
+    let ii = _N(i, -3);
+    // 查看日志得知为1000
+    Log!(ii);
+}
+```
+
+参数```precision```可以为正整数或负整数。
+
+See also: `exchange.SetPrecision`
+
+#### _C
+
+```
+_C(pfn)
+_C(pfn, ...args)
+```
+
+重试函数，用于对接口调用进行容错处理。
+
+Parameters:
+
+- `pfn` (function, required): 参数```pfn```为函数引用，即一个**回调函数**。
+- `arg` (string / number / bool / object / array / function / any (平台支持的任意类型), optional): **回调函数**的参数，参数```arg```可以有多个。参数```arg```的类型与个数由**回调函数**的参数决定。
+
+Returns (除**假值**和**空值**以外的所有平台支持的类型（any）。): 回调函数执行后的返回值。
+
+对无参数的函数进行容错处理：
+
+```javascript
+function main(){
+    var ticker = _C(exchange.GetTicker)
+    // 调整_C()函数重试时间间隔为2秒
+    _CDelay(2000)
+    var depth = _C(exchange.GetDepth)
+    Log(ticker)
+    Log(depth)
+}
+```
+
+```python
+def main():
+    ticker = _C(exchange.GetTicker)
+    _CDelay(2000)
+    depth = _C(exchange.GetDepth)
+    Log(ticker)
+    Log(depth)
+```
+
+```rust
+fn main() {
+    let ticker = _C!(exchange.GetTicker(None));
+    // 调整_C!()宏重试时间间隔为2秒
+    _CDelay(2000);
+    let depth = _C!(exchange.GetDepth(None));
+    Log!(ticker);
+    Log!(depth);
+}
+```
+
+对带参数的函数进行容错处理：
+
+```javascript
+function main(){
+    var records = _C(exchange.GetRecords, PERIOD_D1)
+    Log(records)
+}
+```
+
+```python
+def main():
+    records = _C(exchange.GetRecords, PERIOD_D1)
+    Log(records)
+```
+
+```rust
+fn main() {
+    let records = _C!(exchange.GetRecords(None, PERIOD_D1, None));
+    Log!(records);
+}
+```
+
+也可用于对自定义函数进行容错处理：
+
+```javascript
+var test = function(a, b){
+    var time = new Date().getTime() / 1000
+    if(time % b == 3){
+        Log("Condition met!", "#FF0000")
+        return true
+    }
+    Log("Retrying!", "#FF0000")
+    return false
+}
+
+function main(){
+    var ret = _C(test, 1, 5)
+    Log(ret)
+}
+```
+
+```python
+import time
+def test(a, b):
+    ts = time.time()
+    if ts % b == 3:
+        Log("Condition met!", "#FF0000")
+        return True
+    Log("Retrying!", "#FF0000")
+    return False
+
+def main():
+    ret = _C(test, 1, 5)
+    Log(ret)
+```
+
+```rust
+fn test(a: i64, b: i64) -> Result<bool> {
+    let time = Unix();
+    if time % b == 3 {
+        Log!("Condition met!", "#FF0000");
+        return Ok(true);
+    }
+    Log!("Retrying!", "#FF0000");
+    Err(Error::Api("retry".to_string()))
+}
+
+fn main() {
+    // Rust 中自定义函数返回 Result 类型即可使用 _C! 宏容错，返回 Err 时会重试
+    let ret = _C!(test(1, 5));
+    Log!(ret);
+}
+```
+
+```_C()```函数会反复调用指定的函数，直到其成功返回为止（当参数```pfn```所引用的函数被调用时返回**空值**或**假值**，则会重试调用```pfn```）。
+
+例如```_C(exchange.GetTicker)```。默认重试间隔为3秒，可调用```_CDelay()```函数来设置重试间隔。
+
+例如```_CDelay(1000)```，表示将```_C()```函数的重试间隔改为1秒。
+
+可以对以下函数进行容错处理（但不限于此）：
+
+- ```exchange.GetTicker()```
+- ```exchange.GetDepth()```
+- ```exchange.GetTrades()```
+- ```exchange.GetRecords()```
+- ```exchange.GetAccount()```
+- ```exchange.GetOrders()```
+- ```exchange.GetOrder()```
+- ```exchange.GetPositions()```
+
+以上函数均可通过```_C()```函数调用以实现容错。```_C()```函数的容错并不局限于上述列出的函数。请注意，参数```pfn```为函数引用而非函数调用，即应写作```_C(exchange.GetTicker)```，而非```_C(exchange.GetTicker())```。
+
+#### _Cross
+
+```
+_Cross(arr1, arr2)
+```
+
+返回数组```arr1```与数组```arr2```的交叉周期数。
+
+Parameters:
+
+- `arr1` (array, required): 元素为```number```类型的数组。
+- `arr2` (array, required): 元素为```number```类型的数组。
+
+Returns (number): 数组```arr1```与数组```arr2```的交叉周期数。
+
+可以模拟一组数据来测试_Cross(Arr1, Arr2)函数：
+
+```javascript
+// 快线指标
+var arr1 = [1,2,3,4,5,6,8,8,9]
+// 慢线指标
+var arr2 = [2,3,4,5,6,7,7,7,7]
+function main(){
+    Log("_Cross(arr1, arr2) : ", _Cross(arr1, arr2))
+    Log("_Cross(arr2, arr1) : ", _Cross(arr2, arr1))
+}
+```
+
+```python
+arr1 = [1,2,3,4,5,6,8,8,9]
+arr2 = [2,3,4,5,6,7,7,7,7]
+def main():
+    Log("_Cross(arr1, arr2) : ", _Cross(arr1, arr2))
+    Log("_Cross(arr2, arr1) : ", _Cross(arr2, arr1))
+```
+
+```rust
+fn main() {
+    // 快线指标
+    let arr1 = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 8.0, 8.0, 9.0];
+    // 慢线指标
+    let arr2 = [2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 7.0, 7.0, 7.0];
+    Log!("_Cross(arr1, arr2) : ", _Cross(&arr1, &arr2));
+    Log!("_Cross(arr2, arr1) : ", _Cross(&arr2, &arr1));
+}
+```
+
+```_Cross()```函数的返回值为正数时表示上穿的周期数，为负数时表示下穿的周期数，为0时表示当前价格相等。详细使用说明请参阅：[内置函数_Cross分析及使用说明](https://www.fmz.com/bbs-topic/1140)。
+
+#### JSON.parse
+
+```
+JSON.parse(s)
+JSON.parse(s, safeStr)
+```
+
+```JSON.parse```函数是**ECMAScript**标准内建对象```JSON```的方法，用于解码（解析）JSON字符串。发明者量化交易平台在此基础上为其扩展了一个参数```safeStr```。
+
+Parameters:
+
+- `s` (string, required): 该参数为需要解码（解析）的```JSON```字符串。
+- `safeStr` (bool, optional): 当该参数设置为```true```时，若解析过程中遇到可能超出精度范围的数值，会将其以字符串形式返回，以避免精度丢失或数值溢出问题。
+
+Returns (object): 返回值为```JSON```对象。
+
+解码（解析）一个包含大数值的```JSON```字符串。
+
+```javascript
+function main() {
+    let s1 = '{"num": 8754613216564987646512354656874651651358}'
+    Log("JSON.parse:", JSON.parse(s1))          // JSON.parse: {"num":8.754613216564987e+39}
+    Log("JSON.parse:", JSON.parse(s1, true))    // JSON.parse: {"num":"8754613216564987646512354656874651651358"}
+
+    let s2 = '{"num": 123}'
+    Log("JSON.parse:", JSON.parse(s2))          // JSON.parse: {"num":123}
+    Log("JSON.parse:", JSON.parse(s2, true))    // JSON.parse: {"num":123}
+}
+```
+
+```python
+# 可以使用Python的第三方库处理大数值数据。
+```
+
+```rust
+fn main() {
+    // Rust 使用 JSONParse() 函数解析JSON字符串，没有 safeStr 参数
+    // 超出精度范围的大数值会被解析为 f64 ，可能丢失精度
+    let s1 = r#"{"num": 8754613216564987646512354656874651651358}"#;
+    Log!("JSONParse:", JSONParse(s1).unwrap()["num"].as_f64().unwrap_or(0.0));    // JSONParse: 8.754613216564987e39
+
+    let s2 = r#"{"num": 123}"#;
+    Log!("JSONParse:", JSONParse(s2).unwrap()["num"].as_f64().unwrap_or(0.0));    // JSONParse: 123
+}
+```
+
+```JSON.parse()```函数能够正确解析包含较大数值的JSON字符串；当```safeStr```参数设置为真值时，会将较大的数值解析为字符串类型。
+
+```safeStr```参数位同样支持传入```reviver```参数，即一个用于转换结果的函数，该函数会针对对象的每个成员调用一次；具体用法可查阅相关资料，此处不再赘述。
+
+仅支持JavaScript语言。
+
+回测系统中不支持```JSON.parse()```函数的```safeStr```参数功能。
+
+#### JSON.stringify
+
+```
+JSON.stringify(obj)
+```
+
+```JSON.stringify```函数是**ECMAScript**标准内置对象```JSON```的方法，用于将JavaScript值转换为JSON字符串。
+
+Parameters:
+
+- `obj` (string / number / bool / object / array / function / any (平台支持的任意类型), required): 需要序列化为JSON字符串的值。
+
+Returns (string): 返回序列化后的```JSON```字符串。
+
+将对象序列化为JSON字符串并输出。
+
+```javascript
+function main() {
+    let s1 = {"num": "8754613216564987646512354656874651651358"}
+    Log("JSON.stringify:", JSON.stringify(s1))
+
+    // JSON.stringify: {"num":"8754613216564987646512354656874651651358"}
+    // JSON.stringify(s1) 返回的变量为一个字符串类型
+}
+```
+
+```python
+// 略
+```
+
+仅支持JavaScript语言。
+
+#### Encode
+
+```
+Encode(algo, inputFormat, outputFormat, data)
+Encode(algo, inputFormat, outputFormat, data, keyFormat, key)
+```
+
+该函数根据传入的参数对数据进行编码。
+
+Parameters:
+
+- `algo` (string, required): 参数```algo```用于指定编码计算时使用的算法，支持设置为以下值之一："raw"（不使用算法）、"sign"、"signTx"、"md4"、"md5"、"sha256"、"sha512"、"sha1"、"keccak256"、"sha3.224"、"sha3.256"、"sha3.384"、"sha3.512"、"sha3.keccak256"、"sha3.keccak512"、"sha512.384"、"sha512.256"、"sha512.224"、"ripemd160"、"blake2b.256"、"blake2b.512"、"blake2s.128"、"blake2s.256"。
+
+参数```algo```还支持"text.encoder.utf8"、"text.decoder.utf8"、"text.encoder.gbk"、"text.decoder.gbk"，用于对字符串进行编码或解码。
+
+参数```algo```同时支持"ed25519"算法，并可搭配不同的哈希算法使用，例如参数```algo```可写为"ed25519.md5"、"ed25519.sha512"等，也支持```ed25519.seed```计算。
+- `inputFormat` (string, required): 用于指定```data```参数的数据格式。```inputFormat```参数支持设置为"raw"、"hex"、"base64"、"string"其中之一。"raw"表示原始数据，"hex"表示```hex```编码数据，"base64"表示```base64```编码数据，"string"表示字符串数据。
+- `outputFormat` (string, required): 用于指定输出的数据格式。```outputFormat```参数支持设置为"raw"、"hex"、"base64"、"string"其中之一。"raw"表示原始数据，"hex"表示```hex```编码数据，"base64"表示```base64```编码数据，"string"表示字符串数据。
+- `data` (string, required): 参数```data```为所要处理的数据。
+- `keyFormat` (string, optional): 用于指定```key```参数的数据格式。```keyFormat```参数支持设置为"raw"、"hex"、"base64"、"string"其中之一。"raw"表示原始数据，"hex"表示```hex```编码数据，"base64"表示```base64```编码数据，"string"表示字符串数据。
+- `key` (string, optional): 参数```key```为```HMAC```加密时使用的密钥。
+
+当参数```algo```设置为"sign"或"signTx"时，需要传入参数```key```。
+
+当参数```algo```设置为"raw"时，不会使用```key```参数进行```HMAC```加密（因为HMAC加密必须指定算法）。
+
+Returns (string): ```Encode```函数返回编码、加密之后的数据。
+
+Encode 函数调用示例。
+
+```javascript
+function main() {
+    Log(Encode("raw", "raw", "hex", "example", "raw", "123"))            // 6578616d706c65
+    Log(Encode("raw", "raw", "hex", "example"))                          // 6578616d706c65
+    Log(Encode("sha256", "raw", "hex", "example", "raw", "123"))         // 698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
+    Log(Encode("sha256", "raw", "hex", "example", "", "123"))            // 50d858e0985ecc7f60418aaf0cc5ab587f42c2570a884095a9e8ccacd0f6545c
+    Log(Encode("sha256", "raw", "hex", "example", null, "123"))          // 50d858e0985ecc7f60418aaf0cc5ab587f42c2570a884095a9e8ccacd0f6545c
+    Log(Encode("sha256", "raw", "hex", "example", "string", "123"))      // 698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
+
+    Log(Encode("raw", "raw", "hex", "123"))           // 313233
+    Log(Encode("raw", "raw", "base64", "123"))        // MTIz
+
+    Log(Encode("sha256", "raw", "hex", "example", "hex", "313233"))      // 698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
+    Log(Encode("sha256", "raw", "hex", "example", "base64", "MTIz"))     // 698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
+}
+```
+
+```python
+def main():
+    Log(Encode("raw", "raw", "hex", "example", "raw", "123"))            # 6578616d706c65
+    Log(Encode("raw", "raw", "hex", "example", "", ""))                  # 6578616d706c65
+    Log(Encode("sha256", "raw", "hex", "example", "raw", "123"))         # 698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
+    Log(Encode("sha256", "raw", "hex", "example", "", "123"))            # 50d858e0985ecc7f60418aaf0cc5ab587f42c2570a884095a9e8ccacd0f6545c
+
+    Log(Encode("sha256", "raw", "hex", "example", "string", "123"))      # 698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
+
+    Log(Encode("raw", "raw", "hex", "123", "", ""))           # 313233
+    Log(Encode("raw", "raw", "base64", "123", "", ""))        # MTIz
+
+    Log(Encode("sha256", "raw", "hex", "example", "hex", "313233"))      # 698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
+    Log(Encode("sha256", "raw", "hex", "example", "base64", "MTIz"))     # 698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
+```
+
+```rust
+fn main() {
+    // Rust 的 Encode() 函数 6 个参数均为必填；不加密时，keyFormat 和 key 传入空字符串即可
+    Log!(Encode("raw", "raw", "hex", "example", "raw", "123"));            // 6578616d706c65
+    Log!(Encode("raw", "raw", "hex", "example", "", ""));                  // 6578616d706c65
+    Log!(Encode("sha256", "raw", "hex", "example", "raw", "123"));         // 698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
+    Log!(Encode("sha256", "raw", "hex", "example", "", "123"));            // 50d858e0985ecc7f60418aaf0cc5ab587f42c2570a884095a9e8ccacd0f6545c
+
+    Log!(Encode("sha256", "raw", "hex", "example", "string", "123"));      // 698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
+
+    Log!(Encode("raw", "raw", "hex", "123", "", ""));           // 313233
+    Log!(Encode("raw", "raw", "base64", "123", "", ""));        // MTIz
+
+    Log!(Encode("sha256", "raw", "hex", "example", "hex", "313233"));      // 698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
+    Log!(Encode("sha256", "raw", "hex", "example", "base64", "MTIz"));     // 698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
+}
+```
+
+参数```algo```还支持以下取值："text.encoder.utf8"、"text.decoder.utf8"、"text.encoder.gbk"、"text.decoder.gbk"，用于对字符串进行编码和解码。
+
+```javascript
+function main(){
+    var ret1 = Encode("text.encoder.utf8", "raw", "hex", "你好")     // e4bda0e5a5bd
+    Log(ret1)
+    var ret2 = Encode("text.decoder.utf8", "hex", "string", ret1)
+    Log(ret2)
+
+    var ret3 = Encode("text.encoder.gbk", "raw", "hex", "你好")      // c4e3bac3
+    Log(ret3)
+    var ret4 = Encode("text.decoder.gbk", "hex", "string", ret3)
+    Log(ret4)
+}
+```
+
+```python
+def main():
+    ret1 = Encode("text.encoder.utf8", "raw", "hex", "你好", "", "")     # e4bda0e5a5bd
+    Log(ret1)
+    ret2 = Encode("text.decoder.utf8", "hex", "string", ret1, "", "")
+    Log(ret2)
+
+    ret3 = Encode("text.encoder.gbk", "raw", "hex", "你好", "", "")      # c4e3bac3
+    Log(ret3)
+    ret4 = Encode("text.decoder.gbk", "hex", "string", ret3, "", "")
+    Log(ret4)
+```
+
+```rust
+fn main() {
+    // Rust 的 Encode() 函数6个参数均为必填，不加密时 keyFormat、key 传入空字符串
+    let ret1 = Encode("text.encoder.utf8", "raw", "hex", "你好", "", "");     // e4bda0e5a5bd
+    Log!(ret1);
+    let ret2 = Encode("text.decoder.utf8", "hex", "string", &ret1, "", "");
+    Log!(ret2);
+
+    let ret3 = Encode("text.encoder.gbk", "raw", "hex", "你好", "", "");      // c4e3bac3
+    Log!(ret3);
+    let ret4 = Encode("text.decoder.gbk", "hex", "string", &ret3, "", "");
+    Log!(ret4);
+}
+```
+
+```Encode()```函数仅支持实盘。若不传入```key```、```keyFormat```参数，则不进行```key```加密。
+
+#### MD5
+
+```
+MD5(data)
+```
+
+计算参数```data```的 MD5 哈希值。
+
+Parameters:
+
+- `data` (string, required): 需要进行 MD5 计算的数据。
+
+Returns (string): MD5 哈希值。
+
+```javascript
+function main() {
+    Log("MD5", MD5("hello world"))
+}
+```
+
+```python
+def main():
+    Log("MD5", MD5("hello world"))
+```
+
+```rust
+fn main() {
+    Log!("MD5", MD5("hello world"));
+}
+```
+
+调用```MD5("hello world")```函数后，返回值为：```5eb63bbbe01eeed093cb22bb8f5acdc3```。
+
+See also: `Encode`
+
+#### UUID
+
+```
+UUID()
+```
+
+创建一个 UUID。
+
+Returns (string): 32 位的 UUID。
+
+```javascript
+function main() {
+    var uuid1 = UUID()
+    var uuid2 = UUID()
+    Log(uuid1, uuid2)
+}
+```
+
+```python
+def main():
+    uuid1 = UUID()
+    uuid2 = UUID()
+    Log(uuid1, uuid2)
+```
+
+```rust
+fn main() {
+    let uuid1 = UUID();
+    let uuid2 = UUID();
+    Log!(uuid1, uuid2);
+}
+```
+
+```UUID()``` 函数仅支持实盘。
+
+### Log
+
+#### Log
+
+```
+Log(...msgs)
+```
+
+```Log()```函数用于输出日志。
+
+Parameters:
+
+- `msg` (string / number / bool / object / array / any (平台支持的任意类型), optional): 参数```msg```为需要输出的内容，可传入多个```msg```参数。
+
+可以传入多个```msg```参数：
+
+```javascript
+function main() {
+    Log("msg1", "msg2", "msg3")
+}
+```
+
+```python
+def main():
+    Log("msg1", "msg2", "msg3")
+```
+
+```rust
+fn main() {
+    Log!("msg1", "msg2", "msg3");
+}
+```
+
+支持设置输出消息的颜色。若需同时设置颜色和推送，需先设置颜色，最后再使用```@```字符设置推送。
+
+```javascript
+function main() {
+    Log("Hello FMZ Quant !@")
+    Sleep(1000 * 5)
+    // 字符串内加入#ff0000，打印日志显示为红色，并且推送消息
+    Log("Hello, #ff0000@")
+}
+```
+
+```python
+def main():
+    Log("Hello FMZ Quant !@")
+    Sleep(1000 * 5)
+    Log("Hello, #ff0000@")
+```
+
+```rust
+fn main() {
+    Log!("Hello FMZ Quant !@");
+    Sleep(1000 * 5);
+    // 字符串内加入#ff0000，打印日志显示为红色，并且推送消息
+    Log!("Hello, #ff0000@");
+}
+```
+
+```Log()```函数支持打印```base64```编码后的图片，内容以``` ` ```开头，以``` ` ```结尾，例如：
+
+```javascript
+function main() {
+    Log("`data:image/png;base64,AAAA`")
+}
+```
+
+```python
+def main():
+    Log("`data:image/png;base64,AAAA`")
+```
+
+```rust
+fn main() {
+    Log!("`data:image/png;base64,AAAA`");
+}
+```
+
+```Log()```函数支持直接打印```Python```的```matplotlib.pyplot```对象，只要该对象包含```savefig```方法，即可直接使用```Log```函数打印，例如：
+
+```python
+import matplotlib.pyplot as plt
+def main():
+    plt.plot([3,6,2,4,7,1])
+    Log(plt)
+```
+
+```Log()```函数支持语言切换，其输出的文本会根据平台页面的语言设置自动切换为对应的语言，例如：
+
+```javascript
+function main() {
+    Log("[trans]中文|abc[/trans]")
+}
+```
+
+```python
+def main():
+    Log("[trans]中文|abc[/trans]")
+```
+
+```rust
+fn main() {
+    Log!("[trans]中文|abc[/trans]");
+}
+```
+
+```Log()```函数会在实盘或回测系统的日志区域输出一条日志信息，实盘运行时日志将保存在实盘的数据库中。若```Log()```函数输出的内容以```@```字符结尾，该条日志会进入消息推送队列，并推送至当前发明者量化交易平台账号在[推送设置](https://www.fmz.com/m/account)中配置的邮箱、WebHook地址等。[调试工具](https://www.fmz.com/m/debug)和回测系统不支持消息推送。消息推送存在频率限制，具体规则如下：在实盘的每个20秒周期内，仅保留并推送最后一条推送消息，其余消息将被过滤而不推送（通过 Log 函数输出的推送日志仍会正常打印显示在日志区域）。
+
+若```Log()```函数输出的内容以```&```字符结尾，该条日志将被标记为私密日志。当实盘公开展示时，该条日志对其他用户隐藏，但在实盘拥有者账户视角下仍然可见。此功能可用于记录API密钥、账户余额等敏感信息。例如：```Log("私密信息", "&")```。
+
+关于```WebHook```推送，可以使用```Golang```编写的服务程序：
+```golang
+package main
+
+import (
+    "fmt"
+    "net/http"
+)
+
+func Handle (w http.ResponseWriter, r *http.Request) {
+    defer func() {
+        fmt.Println("req:", *r)
+    }()
+}
+
+func main () {
+    fmt.Println("listen http://localhost:9090")
+    http.HandleFunc("/data", Handle)
+    http.ListenAndServe(":9090", nil)
+}
+```
+
+在[推送设置](https://www.fmz.com/m/account)中设置```WebHook```：```http://XXX.XX.XXX.XX:9090/data?data=Hello_FMZ```，运行编写好的```Golang```服务程序后，即可开始运行实盘策略。以下为使用```JavaScript```语言编写的策略，策略运行时会执行```Log()```函数并推送消息：
+```js
+function main() {
+    Log("msg", "@")
+}
+```
+
+```Golang```语言编写的服务程序接收到推送后，打印如下信息：
+```log
+listen http://localhost:9090
+
+req: {GET /data?data=Hello_FMZ HTTP/1.1 1 1
+map[User-Agent:[Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3)
+AppleWebKit/537.36 (KHTML, like Gecko) Chrome/xx.x.xxxx.xxx
+Safari/537.36] Accept-Encoding:[gzip]] {} <nil> 0 [] false
+1XX.XX.X.XX:9090 map[] map[] <nil> map[] XXX.XX.XXX.XX:4xxx2
+/data?data=Hello_FMZ <nil> <nil> <nil> 0xc420056300
+```
+
+See also: `LogReset`, `LogVacuum`
+
+#### LogStatus
+
+```
+LogStatus(...msgs)
+```
+
+在回测系统或实盘页面的状态栏中输出信息。
+
+Parameters:
+
+- `msg` (string / number / bool / object / array / any (平台支持的任意类型), optional): 参数```msg```为要输出的内容，可传入多个```msg```参数。
+
+支持设置输出内容的颜色：
+
+```javascript
+function main() {
+    LogStatus('This is a normal status message')
+    LogStatus('This is a red font status message#ff0000')
+    LogStatus('This is a multi-line status message\nI am the second line')
+}
+```
+
+```python
+def main():
+    LogStatus('This is a normal status message')
+    LogStatus('This is a red font status message#ff0000')
+    LogStatus('This is a multi-line status message\nI am the second line')
+```
+
+```rust
+fn main() {
+    LogStatus!("This is a normal status message");
+    LogStatus!("This is a red font status message#ff0000");
+    LogStatus!("This is a multi-line status message\nI am the second line");
+}
+```
+
+状态栏中的数据输出示例：
+
+```javascript
+function main() {
+    var table = {type: 'table', title: 'Position Info', cols: ['Column 1', 'Column 2'], rows: [ ['abc', 'def'], ['ABC', 'support color #ff0000']]}
+    // JSON 序列化后，在字符串两端添加 ` 字符，即可将其识别为复杂消息格式（当前支持表格）
+    LogStatus('`' + JSON.stringify(table) + '`')
+    // 表格信息也可以显示在多行文本中
+    LogStatus('First line message\n`' + JSON.stringify(table) + '`\nThird line message')
+    // 支持同时显示多个表格，将以标签页（TAB）形式归为一组显示
+    LogStatus('`' + JSON.stringify([table, table]) + '`')
+
+    // 也可以在表格中构造按钮，策略通过 GetCommand 接收 cmd 属性的内容
+    var table = {
+        type: 'table',
+        title: 'Position Operation',
+        cols: ['Column 1', 'Column 2', 'Action'],
+        rows: [
+            ['abc', 'def', {'type':'button', 'cmd': 'coverAll', 'name': 'Close All'}]
+        ]
+    }
+    LogStatus('`' + JSON.stringify(table) + '`')
+    // 或者构造一个单独的按钮
+    LogStatus('`' + JSON.stringify({'type':'button', 'cmd': 'coverAll', 'name': 'Close All'}) + '`')
+    // 可以自定义按钮样式（bootstrap 的按钮属性）
+    LogStatus('`' + JSON.stringify({'type':'button', 'class': 'btn btn-xs btn-danger', 'cmd': 'coverAll', 'name': 'Close All'}) + '`')
+}
+```
+
+```python
+import json
+def main():
+    table = {"type": "table", "title": "Position Info", "cols": ["Column 1", "Column 2"], "rows": [["abc", "def"], ["ABC", "support color #ff0000"]]}
+    LogStatus('`' + json.dumps(table) + '`')
+    LogStatus('First line message\n`' + json.dumps(table) + '`\nThird line message')
+    LogStatus('`' + json.dumps([table, table]) + '`')
+
+    table = {
+        "type" : "table",
+        "title" : "Position Operation",
+        "cols" : ["Column 1", "Column 2", "Action"],
+        "rows" : [
+            ["abc", "def", {"type": "button", "cmd": "coverAll", "name": "Close All"}]
+        ]
+    }
+    LogStatus('`' + json.dumps(table) + '`')
+    LogStatus('`' + json.dumps({"type": "button", "cmd": "coverAll", "name": "Close All"}) + '`')
+    LogStatus('`' + json.dumps({"type": "button", "class": "btn btn-xs btn-danger", "cmd": "coverAll", "name": "Close All"}) + '`')
+```
+
+```rust
+fn main() {
+    let table = r#"{"type": "table", "title": "Position Info", "cols": ["Column 1", "Column 2"], "rows": [["abc", "def"], ["ABC", "support color #ff0000"]]}"#;
+    // 在 JSON 字符串两端添加 ` 字符，即可将其识别为复杂消息格式（当前支持表格）
+    LogStatus!(format!("`{}`", table));
+    // 表格信息也可以显示在多行文本中
+    LogStatus!(format!("First line message\n`{}`\nThird line message", table));
+    // 支持同时显示多个表格，将以标签页（TAB）形式归为一组显示
+    LogStatus!(format!("`[{},{}]`", table, table));
+
+    // 也可以在表格中构造按钮，策略通过 GetCommand 接收 cmd 属性的内容
+    let table = String::from(r#"{"type": "table", "title": "Position Operation", "cols": ["Column 1", "Column 2", "Action"], "rows": ["#)
+        + r#"["abc", "def", {"type": "button", "cmd": "coverAll", "name": "Close All"}]"#
+        + r#"]}"#;
+    LogStatus!(format!("`{}`", table));
+    // 或者构造一个单独的按钮
+    LogStatus!(format!("`{}`", r#"{"type": "button", "cmd": "coverAll", "name": "Close All"}"#));
+    // 可以自定义按钮样式（bootstrap 的按钮属性）
+    LogStatus!(format!("`{}`", r#"{"type": "button", "class": "btn btn-xs btn-danger", "cmd": "coverAll", "name": "Close All"}"#));
+}
+```
+
+支持在状态栏中设计按钮控件（旧版按钮结构）：
+
+```javascript
+function main() {
+    var table = {
+        type: "table",
+        title: "Status Bar Button Styles",
+        cols: ["Default", "Primary", "Success", "Info", "Warning", "Danger"],
+        rows: [
+            [
+                {"type":"button", "class": "btn btn-xs btn-default", "name": "Default"},
+                {"type":"button", "class": "btn btn-xs btn-primary", "name": "Primary"},
+                {"type":"button", "class": "btn btn-xs btn-success", "name": "Success"},
+                {"type":"button", "class": "btn btn-xs btn-info", "name": "Info"},
+                {"type":"button", "class": "btn btn-xs btn-warning", "name": "Warning"},
+                {"type":"button", "class": "btn btn-xs btn-danger", "name": "Danger"}
+            ]
+        ]
+    }
+    LogStatus("`" + JSON.stringify(table) + "`")
+}
+```
+
+```python
+import json
+def main():
+    table = {
+        "type": "table",
+        "title": "Status Bar Button Styles",
+        "cols": ["Default", "Primary", "Success", "Info", "Warning", "Danger"],
+        "rows": [
+            [
+                {"type":"button", "class": "btn btn-xs btn-default", "name": "Default"},
+                {"type":"button", "class": "btn btn-xs btn-primary", "name": "Primary"},
+                {"type":"button", "class": "btn btn-xs btn-success", "name": "Success"},
+                {"type":"button", "class": "btn btn-xs btn-info", "name": "Info"},
+                {"type":"button", "class": "btn btn-xs btn-warning", "name": "Warning"},
+                {"type":"button", "class": "btn btn-xs btn-danger", "name": "Danger"}
+            ]
+        ]
+    }
+    LogStatus("`" + json.dumps(table) + "`")
+```
+
+```rust
+fn main() {
+    let table = String::from(r#"{"type": "table", "title": "Status Bar Button Styles", "cols": ["Default", "Primary", "Success", "Info", "Warning", "Danger"], "rows": [["#)
+        + r#"{"type": "button", "class": "btn btn-xs btn-default", "name": "Default"},"#
+        + r#"{"type": "button", "class": "btn btn-xs btn-primary", "name": "Primary"},"#
+        + r#"{"type": "button", "class": "btn btn-xs btn-success", "name": "Success"},"#
+        + r#"{"type": "button", "class": "btn btn-xs btn-info", "name": "Info"},"#
+        + r#"{"type": "button", "class": "btn btn-xs btn-warning", "name": "Warning"},"#
+        + r#"{"type": "button", "class": "btn btn-xs btn-danger", "name": "Danger"}"#
+        + r#"]]}"#;
+    LogStatus!(format!("`{}`", table));
+}
+```
+
+设置状态栏按钮的禁用与描述功能（旧版按钮结构）：
+
+```javascript
+function main() {
+    var table = {
+        type: "table",
+        title: "Status Bar Button Disable and Description Test",
+        cols: ["Column 1", "Column 2", "Column 3"],
+        rows: []
+    }
+    var button1 = {"type": "button", "name": "Button 1", "cmd": "button1", "description": "This is the first button"}
+    var button2 = {"type": "button", "name": "Button 2", "cmd": "button2", "description": "This is the second button, set to disabled", "disabled": true}
+    var button3 = {"type": "button", "name": "Button 3", "cmd": "button3", "description": "This is the third button, set to enabled", "disabled": false}
+    table.rows.push([button1, button2, button3])
+    LogStatus("`" + JSON.stringify(table) + "`")
+}
+```
+
+```python
+import json
+def main():
+    table = {
+        "type": "table",
+        "title": "Status Bar Button Disable and Description Test",
+        "cols": ["Column 1", "Column 2", "Column 3"],
+        "rows": []
+    }
+    button1 = {"type": "button", "name": "Button 1", "cmd": "button1", "description": "This is the first button"}
+    button2 = {"type": "button", "name": "Button 2", "cmd": "button2", "description": "This is the second button, set to disabled", "disabled": True}
+    button3 = {"type": "button", "name": "Button 3", "cmd": "button3", "description": "This is the third button, set to enabled", "disabled": False}
+    table["rows"].append([button1, button2, button3])
+    LogStatus("`" + json.dumps(table) + "`")
+```
+
+```rust
+fn main() {
+    let button1 = r#"{"type": "button", "name": "Button 1", "cmd": "button1", "description": "This is the first button"}"#;
+    let button2 = r#"{"type": "button", "name": "Button 2", "cmd": "button2", "description": "This is the second button, set to disabled", "disabled": true}"#;
+    let button3 = r#"{"type": "button", "name": "Button 3", "cmd": "button3", "description": "This is the third button, set to enabled", "disabled": false}"#;
+    let table = format!(
+        r#"{{"type": "table", "title": "Status Bar Button Disable and Description Test", "cols": ["Column 1", "Column 2", "Column 3"], "rows": [[{}, {}, {}]]}}"#,
+        button1, button2, button3
+    );
+    LogStatus!(format!("`{}`", table));
+}
+```
+
+结合 ```GetCommand()``` 函数，构建状态栏按钮的交互功能（旧版按钮结构）：
+
+```javascript
+function test1() {
+    Log("Calling custom function")
+}
+
+function main() {
+    while (true) {
+        var table = {
+            type: 'table',
+            title: 'Operation',
+            cols: ['Column 1', 'Column 2', 'Action'],
+            rows: [
+                ['a', '1', {
+                    'type': 'button',
+                    'cmd': "CoverAll",
+                    'name': 'Close All'
+                }],
+                ['b', '1', {
+                    'type': 'button',
+                    'cmd': 10,
+                    'name': 'Send Number'
+                }],
+                ['c', '1', {
+                    'type': 'button',
+                    'cmd': _D(),
+                    'name': 'Call Function'
+                }],
+                ['d', '1', {
+                    'type': 'button',
+                    'cmd': 'test1',
+                    'name': 'Call Custom Function'
+                }]
+            ]
+        }
+        LogStatus(_D(), "\n", '`' + JSON.stringify(table) + '`')
+
+        var str_cmd = GetCommand()
+        if (str_cmd) {
+            Log("Received interaction data str_cmd:", "Type:", typeof(str_cmd), "Value:", str_cmd)
+            if(str_cmd == "test1") {
+                test1()
+            }
+        }
+
+        Sleep(500)
+    }
+}
+```
+
+```python
+import json
+def test1():
+    Log("Calling custom function")
+
+def main():
+    while True:
+        table = {
+            "type": "table",
+            "title": "Operation",
+            "cols": ["Column 1", "Column 2", "Action"],
+            "rows": [
+                ["a", "1", {
+                    "type": "button",
+                    "cmd": "CoverAll",
+                    "name": "Close All"
+                }],
+                ["b", "1", {
+                    "type": "button",
+                    "cmd": 10,
+                    "name": "Send Number"
+                }],
+                ["c", "1", {
+                    "type": "button",
+                    "cmd": _D(),
+                    "name": "Call Function"
+                }],
+                ["d", "1", {
+                    "type": "button",
+                    "cmd": "test1",
+                    "name": "Call Custom Function"
+                }]
+            ]
+        }
+
+        LogStatus(_D(), "\n", "`" + json.dumps(table) + "`")
+        str_cmd = GetCommand()
+        if str_cmd:
+            Log("Received interaction data str_cmd", "Type:", type(str_cmd), "Value:", str_cmd)
+            if str_cmd == "test1":
+                test1()
+        Sleep(500)
+```
+
+```rust
+fn test1() {
+    Log!("Calling custom function");
+}
+
+fn main() {
+    loop {
+        let table = String::from(r#"{"type": "table", "title": "Operation", "cols": ["Column 1", "Column 2", "Action"], "rows": ["#)
+            + r#"["a", "1", {"type": "button", "cmd": "CoverAll", "name": "Close All"}],"#
+            + r#"["b", "1", {"type": "button", "cmd": 10, "name": "Send Number"}],"#
+            + &format!(r#"["c", "1", {{"type": "button", "cmd": "{}", "name": "Call Function"}}],"#, _D(None))
+            + r#"["d", "1", {"type": "button", "cmd": "test1", "name": "Call Custom Function"}]"#
+            + r#"]}"#;
+        LogStatus!(_D(None), "\n", format!("`{}`", table));
+
+        if let Some(str_cmd) = GetCommand(0) {
+            Log!("Received interaction data str_cmd:", "Type:", "String", "Value:", &str_cmd);
+            if str_cmd == "test1" {
+                test1();
+            }
+        }
+
+        Sleep(500);
+    }
+}
+```
+
+在构造状态栏按钮进行交互时，同样支持输入数据，交互指令最终由```GetCommand()```函数捕获。
+
+在状态栏按钮控件的数据结构中增加```input```项（旧版按钮结构），例如为```{"type": "button", "cmd": "open", "name": "Open"}```添加```"input": {"name": "Quantity", "type": "number", "defValue": 1}```，即可使按钮在被点击时弹出一个带输入框控件的弹窗（输入框中的默认值为1，即```defValue```所设置的数据），从而可以输入一个数据并与按钮命令一起发送。例如运行以下测试代码时，点击「开仓」按钮后会弹出一个带输入框的弹窗，在输入框中输入111并点击「确定」，```GetCommand()```函数便会捕获消息：```open:111```。
+
+```javascript
+function main() {
+    var tbl = {
+        type: "table",
+        title: "Operation",
+        cols: ["Column 1", "Column 2"],
+        rows: [
+            ["Open Position", {"type": "button", "cmd": "open", "name": "Open", "input": {"name": "Quantity", "type": "number", "defValue": 1}}],
+            ["Close Position", {"type": "button", "cmd": "coverAll", "name": "Close All"}]
+        ]
+    }
+
+    LogStatus(_D(), "\n", "`" + JSON.stringify(tbl) + "`")
+    while (true) {
+        var cmd = GetCommand()
+        if (cmd) {
+            Log("cmd:", cmd)
+        }
+        Sleep(1000)
+    }
+}
+```
+
+```python
+import json
+
+def main():
+    tbl = {
+        "type": "table",
+        "title": "Operation",
+        "cols": ["Column 1", "Column 2"],
+        "rows": [
+            ["Open Position", {"type": "button", "cmd": "open", "name": "Open", "input": {"name": "Quantity", "type": "number", "defValue": 1}}],
+            ["Close Position", {"type": "button", "cmd": "coverAll", "name": "Close All"}]
+        ]
+    }
+
+    LogStatus(_D(), "\n", "`" + json.dumps(tbl) + "`")
+    while True:
+        cmd = GetCommand()
+        if cmd:
+            Log("cmd:", cmd)
+        Sleep(1000)
+```
+
+```rust
+fn main() {
+    let tbl = String::from(r#"{"type": "table", "title": "Operation", "cols": ["Column 1", "Column 2"], "rows": ["#)
+        + r#"["Open Position", {"type": "button", "cmd": "open", "name": "Open", "input": {"name": "Quantity", "type": "number", "defValue": 1}}],"#
+        + r#"["Close Position", {"type": "button", "cmd": "coverAll", "name": "Close All"}]"#
+        + r#"]}"#;
+
+    LogStatus!(_D(None), "\n", format!("`{}`", tbl));
+    loop {
+        if let Some(cmd) = GetCommand(0) {
+            Log!("cmd:", cmd);
+        }
+        Sleep(1000);
+    }
+}
+```
+
+支持分组按钮控件（旧版按钮结构），其功能与**支持输入数据的状态栏按钮**（通过"input"字段设置）一致，交互指令最终均由```GetCommand()```函数捕获。区别在于分组按钮通过```"group"```字段设置：当点击按钮触发交互时，页面弹出的对话框中会显示预先设置好的**一组**输入控件，可一次性输入一组数据。
+关于状态栏按钮控件和分组按钮控件结构中的```"group"```字段，需要注意以下几点：
+- group中```type```属性仅支持以下4种类型，```defValue```属性用于设置默认值。
+  "selected"：下拉框控件，设置下拉框中的各个选项时使用```|```符号分隔。
+  "number"：数值输入框控件。
+  "string"：字符串输入框控件。
+  "boolean"：勾选框控件，勾选表示（布尔值）真，不勾选表示（布尔值）假。
+- 交互输入时的控件支持依赖设置：
+  例如以下例子中的```"name": "tradePrice@orderType==1"```设置，使**交易价格**（```tradePrice```）输入控件仅在**下单方式**（orderType）下拉框控件选择为**挂单**时可用。
+- 交互输入时的控件名称支持双语设置。
+  例如以下例子中的"description": "下单方式|order type"设置，使用```|```符号分隔中英文描述内容。
+- group中的```name```、```description```与按钮结构中的```name```、```description```虽然字段名一致，但定义并不相同。
+  group中的```name```与input中的```name```定义也不相同。
+- 分组按钮控件触发后，发送的交互内容格式为：按钮的cmd字段值加group字段相关数据。例如以下例子测试时```Log("cmd:", cmd)```语句输出的内容为：
+  ```cmd: open:{"orderType":1,"tradePrice":99,"orderAmount":"99","boolean":true}```，即发生交互操作时```GetCommand()```函数返回的内容：```open:{"orderType":1,"tradePrice":99,"orderAmount":"99","boolean":true}```。
+- 按钮控件的```type```属性仅支持```"button"```：
+  支持输入数据的按钮控件，即设置了```input```属性的控件，其```input```字段配置信息中的```type```属性支持多种控件类型。
+
+参考以下例子：
+
+```javascript
+function main() {
+    var tbl = {
+        type: "table",
+        title: "Group Button Control Demo",
+        cols: ["Operation"],
+        rows: []
+    }
+
+    // 创建分组按钮控件结构
+    var groupBtn = {
+        type: "button",
+        cmd: "open",
+        name: "Open",
+        group: [
+            {"name": "orderType", "description": "下单方式|order type", "type": "selected", "defValue": "市价单|挂单"},
+            {"name": "tradePrice@orderType==1", "description": "交易价格|trade price", "type": "number", "defValue": 100},
+            {"name": "orderAmount", "description": "委托数量|order amount", "type": "string", "defValue": 100},
+            {"name": "boolean", "description": "是/否|boolean", "type": "boolean", "defValue": true}
+        ]
+    }
+
+    // 测试按钮1
+    var testBtn1 = {"type": "button", "name": "Button 1", "cmd": "button1", "description": "This is the first button"}
+    var testBtn2 = {"type": "button", "name": "Button 2", "cmd": "button2", "description": "This is the second button", "input": {"name": "Quantity", "type": "number", "defValue": 1}}
+
+    // 在tbl中添加groupBtn
+    tbl.rows.push([groupBtn])
+    // 支持状态栏表格的一个单元格内设置多个按钮，即一个单元格内的数据为一个按钮结构数组：[testBtn1, testBtn2]
+    tbl.rows.push([[testBtn1, testBtn2]])
+
+    while (true) {
+        LogStatus("`" + JSON.stringify(tbl) + "`", "\n", "Group button controls can be set directly on the status bar in addition to status bar tables:", "`" + JSON.stringify(groupBtn) + "`")
+        var cmd = GetCommand()
+        if (cmd) {
+            Log("cmd:", cmd)
+        }
+        Sleep(5000)
+    }
+}
+```
+
+```python
+import json
+
+def main():
+    tbl = {
+        "type": "table",
+        "title": "Group Button Control Demo",
+        "cols": ["Operation"],
+        "rows": []
+    }
+
+    groupBtn = {
+        "type": "button",
+        "cmd": "open",
+        "name": "Open",
+        "group": [
+            {"name": "orderType", "description": "下单方式|order type", "type": "selected", "defValue": "市价单|挂单"},
+            {"name": "tradePrice@orderType==1", "description": "交易价格|trade price", "type": "number", "defValue": 100},
+            {"name": "orderAmount", "description": "委托数量|order amount", "type": "string", "defValue": 100},
+            {"name": "boolean", "description": "是/否|boolean", "type": "boolean", "defValue": True}
+        ]
+    }
+
+    testBtn1 = {"type": "button", "name": "Button 1", "cmd": "button1", "description": "This is the first button"}
+    testBtn2 = {"type": "button", "name": "Button 2", "cmd": "button2", "description": "This is the second button", "input": {"name": "Quantity", "type": "number", "defValue": 1}}
+
+    tbl["rows"].append([groupBtn])
+    tbl["rows"].append([[testBtn1, testBtn2]])
+
+    while True:
+        LogStatus("`" + json.dumps(tbl) + "`", "\n", "Group button controls can be set directly on the status bar in addition to status bar tables:", "`" + json.dumps(groupBtn) + "`")
+        cmd = GetCommand()
+        if cmd:
+            Log("cmd:", cmd)
+        Sleep(5000)
+```
+
+```rust
+fn main() {
+    // 创建分组按钮控件结构
+    let group_btn = String::from(r#"{"type": "button", "cmd": "open", "name": "Open", "group": ["#)
+        + r#"{"name": "orderType", "description": "下单方式|order type", "type": "selected", "defValue": "市价单|挂单"},"#
+        + r#"{"name": "tradePrice@orderType==1", "description": "交易价格|trade price", "type": "number", "defValue": 100},"#
+        + r#"{"name": "orderAmount", "description": "委托数量|order amount", "type": "string", "defValue": 100},"#
+        + r#"{"name": "boolean", "description": "是/否|boolean", "type": "boolean", "defValue": true}"#
+        + r#"]}"#;
+
+    // 测试按钮1、测试按钮2
+    let test_btn1 = r#"{"type": "button", "name": "Button 1", "cmd": "button1", "description": "This is the first button"}"#;
+    let test_btn2 = r#"{"type": "button", "name": "Button 2", "cmd": "button2", "description": "This is the second button", "input": {"name": "Quantity", "type": "number", "defValue": 1}}"#;
+
+    // 在tbl中添加groupBtn；支持状态栏表格的一个单元格内设置多个按钮，即一个单元格内的数据为一个按钮结构数组：[testBtn1, testBtn2]
+    let tbl = format!(
+        r#"{{"type": "table", "title": "Group Button Control Demo", "cols": ["Operation"], "rows": [[{}], [[{}, {}]]]}}"#,
+        group_btn, test_btn1, test_btn2
+    );
+
+    loop {
+        LogStatus!(format!("`{}`", tbl), "\n", "Group button controls can be set directly on the status bar in addition to status bar tables:", format!("`{}`", group_btn));
+        if let Some(cmd) = GetCommand(0) {
+            Log!("cmd:", cmd);
+        }
+        Sleep(5000);
+    }
+}
+```
+
+当状态栏分组按钮控件（通过设置```group```字段实现）与状态栏按钮控件（通过设置```input```字段实现）被点击触发交互时（旧版按钮结构），页面弹出的对话框中的下拉框控件同样支持多选。以下示例演示如何设计包含多选选项的下拉框控件：
+
+```javascript
+function main() {
+    // 状态栏按钮控件（通过设置input字段实现）testBtn1按钮所触发的页面中，下拉框控件使用options字段设置选项，并使用defValue字段设置默认选项。区别于本章其它示例中直接使用defValue设置选项的方式。
+    var testBtn1 = {
+        type: "button",
+        name: "testBtn1",
+        cmd: "cmdTestBtn1",
+        input: {name: "testBtn1ComboBox", type: "selected", options: ["A", "B"], defValue: 1}
+    }
+
+    /*
+      状态栏按钮控件（通过设置input字段实现）testBtn2按钮所触发的页面中，下拉框控件使用options字段设置选项。options字段中的选项不仅支持字符串，
+      也支持使用```{text: "描述", value: "值"}```结构。使用defValue字段设置默认选项，默认选项支持多选（通过数组结构实现）。多选时需额外设置multiple字段为真值（true）。
+    */
+    var testBtn2 = {
+        type: "button",
+        name: "testBtn2",
+        cmd: "cmdTestBtn2",
+        input: {
+            name: "testBtn2MultiComboBox",
+            type: "selected",
+            description: "Implement multi-select dropdown",
+            options: [{text: "Option A", value: "A"}, {text: "Option B", value: "B"}, {text: "Option C", value: "C"}],
+            defValue: ["A", "C"],
+            multiple: true
+        }
+    }
+
+    // 状态栏分组按钮控件（通过设置group字段实现）testBtn3按钮所触发的页面中，下拉框控件使用options字段设置选项，也支持直接使用defValue设置选项。
+    var testBtn3 = {
+        type: "button",
+        name: "testBtn3",
+        cmd: "cmdTestBtn3",
+        group: [
+            {name: "comboBox1", label: "labelComboBox1", description: "Dropdown 1", type: "selected", defValue: 1, options: ["A", "B"]},
+            {name: "comboBox2", label: "labelComboBox2", description: "下拉框2", type: "selected", defValue: "A|B"},
+            {name: "comboBox3", label: "labelComboBox3", description: "Dropdown 3", type: "selected", defValue: [0, 2], multiple: true, options: ["A", "B", "C"]},
+            {
+                name: "comboBox4",
+                label: "labelComboBox4",
+                description: "Dropdown 4",
+                type: "selected",
+                defValue: ["A", "C"],
+                multiple: true,
+                options: [{text: "Option A", value: "A"}, {text: "Option B", value: "B"}, {text: "Option C", value: "C"}, {text: "Option D", value: "D"}]
+            }
+        ]
+    }
+    while (true) {
+        LogStatus("`" + JSON.stringify(testBtn1) + "`\n", "`" + JSON.stringify(testBtn2) + "`\n", "`" + JSON.stringify(testBtn3) + "`\n")
+        var cmd = GetCommand()
+        if (cmd) {
+            Log(cmd)
+        }
+        Sleep(5000)
+    }
+}
+```
+
+```python
+import json
+
+def main():
+    testBtn1 = {
+        "type": "button",
+        "name": "testBtn1",
+        "cmd": "cmdTestBtn1",
+        "input": {"name": "testBtn1ComboBox", "type": "selected", "options": ["A", "B"], "defValue": 1}
+    }
+
+    testBtn2 = {
+        "type": "button",
+        "name": "testBtn2",
+        "cmd": "cmdTestBtn2",
+        "input": {
+            "name": "testBtn2MultiComboBox",
+            "type": "selected",
+            "description": "Implement multi-select dropdown",
+            "options": [{"text": "Option A", "value": "A"}, {"text": "Option B", "value": "B"}, {"text": "Option C", "value": "C"}],
+            "defValue": ["A", "C"],
+            "multiple": True
+        }
+    }
+
+    testBtn3 = {
+        "type": "button",
+        "name": "testBtn3",
+        "cmd": "cmdTestBtn3",
+        "group": [
+            {"name": "comboBox1", "label": "labelComboBox1", "description": "Dropdown 1", "type": "selected", "defValue": 1, "options": ["A", "B"]},
+            {"name": "comboBox2", "label": "labelComboBox2", "description": "Dropdown 2", "type": "selected", "defValue": "A|B"},
+            {"name": "comboBox3", "label": "labelComboBox3", "description": "Dropdown 3", "type": "selected", "defValue": [0, 2], "multiple": True, "options": ["A", "B", "C"]},
+            {
+                "name": "comboBox4",
+                "label": "labelComboBox4",
+                "description": "Dropdown 4",
+                "type": "selected",
+                "defValue": ["A", "C"],
+                "multiple": True,
+                "options": [{"text": "Option A", "value": "A"}, {"text": "Option B", "value": "B"}, {"text": "Option C", "value": "C"}, {"text": "Option D", "value": "D"}]
+            }
+        ]
+    }
+
+    while True:
+        LogStatus("`" + json.dumps(testBtn1) + "`\n", "`" + json.dumps(testBtn2) + "`\n", "`" + json.dumps(testBtn3) + "`\n")
+        cmd = GetCommand()
+        if cmd:
+            Log(cmd)
+        Sleep(5000)
+```
+
+```rust
+fn main() {
+    // 状态栏按钮控件（通过设置input字段实现）testBtn1按钮所触发的页面中，下拉框控件使用options字段设置选项，并使用defValue字段设置默认选项。区别于本章其它示例中直接使用defValue设置选项的方式。
+    let test_btn1 = r#"{"type": "button", "name": "testBtn1", "cmd": "cmdTestBtn1", "input": {"name": "testBtn1ComboBox", "type": "selected", "options": ["A", "B"], "defValue": 1}}"#;
+
+    /*
+      状态栏按钮控件（通过设置input字段实现）testBtn2按钮所触发的页面中，下拉框控件使用options字段设置选项。options字段中的选项不仅支持字符串，
+      也支持使用{"text": "描述", "value": "值"}结构。使用defValue字段设置默认选项，默认选项支持多选（通过数组结构实现）。多选时需额外设置multiple字段为真值（true）。
+    */
+    let test_btn2 = String::from(r#"{"type": "button", "name": "testBtn2", "cmd": "cmdTestBtn2", "input": {"#)
+        + r#""name": "testBtn2MultiComboBox", "type": "selected", "description": "Implement multi-select dropdown","#
+        + r#""options": [{"text": "Option A", "value": "A"}, {"text": "Option B", "value": "B"}, {"text": "Option C", "value": "C"}],"#
+        + r#""defValue": ["A", "C"], "multiple": true}}"#;
+
+    // 状态栏分组按钮控件（通过设置group字段实现）testBtn3按钮所触发的页面中，下拉框控件使用options字段设置选项，也支持直接使用defValue设置选项。
+    let test_btn3 = String::from(r#"{"type": "button", "name": "testBtn3", "cmd": "cmdTestBtn3", "group": ["#)
+        + r#"{"name": "comboBox1", "label": "labelComboBox1", "description": "Dropdown 1", "type": "selected", "defValue": 1, "options": ["A", "B"]},"#
+        + r#"{"name": "comboBox2", "label": "labelComboBox2", "description": "下拉框2", "type": "selected", "defValue": "A|B"},"#
+        + r#"{"name": "comboBox3", "label": "labelComboBox3", "description": "Dropdown 3", "type": "selected", "defValue": [0, 2], "multiple": true, "options": ["A", "B", "C"]},"#
+        + r#"{"name": "comboBox4", "label": "labelComboBox4", "description": "Dropdown 4", "type": "selected", "defValue": ["A", "C"], "multiple": true, "options": [{"text": "Option A", "value": "A"}, {"text": "Option B", "value": "B"}, {"text": "Option C", "value": "C"}, {"text": "Option D", "value": "D"}]}"#
+        + r#"]}"#;
+
+    loop {
+        LogStatus!(format!("`{}`\n", test_btn1), format!("`{}`\n", test_btn2), format!("`{}`\n", test_btn3));
+        if let Some(cmd) = GetCommand(0) {
+            Log!(cmd);
+        }
+        Sleep(5000);
+    }
+}
+```
+
+基于当前最新的按钮结构，构造状态栏表格中的按钮；点击按钮触发交互时，弹出一个包含多个控件的弹窗。
+
+详细内容可参考：[用户指南-状态栏中的交互控件](/user-guide/编写策略/交互控件/状态栏中的交互控件)。
+
+```javascript
+var symbols = ["BTC_USDT.swap", "ETH_USDT.swap", "LTC_USDT.swap", "BNB_USDT.swap", "SOL_USDT.swap"]
+
+function createBtn(tmp, group) {
+    var btn = JSON.parse(JSON.stringify(tmp))
+
+    _.each(group, function(eleByGroup) {
+        btn["group"].unshift(eleByGroup)
+    })
+
+    return btn
+}
+
+function main() {
+    var arrManager = []
+
+    _.each(symbols, function(symbol) {
+        arrManager.push({
+            "symbol": symbol,
+        })
+    })
+
+    // Btn
+    var tmpBtnOpen = {
+        "type": "button",
+        "cmd": "open",
+        "name": "Open Position",
+        "group": [{
+            "type": "selected",
+            "name": "tradeType",
+            "label": "Order Type",
+            "description": "Market order, Limit order",
+            "default": 0,
+            "group": "Trade Settings",
+            "settings": {
+                "options": ["Market Order", "Limit Order"],
+                "required": true,
+            }
+        }, {
+            "type": "selected",
+            "name": "direction",
+            "label": "Trade Direction",
+            "description": "Buy, Sell",
+            "default": "buy",
+            "group": "Trade Settings",
+            "settings": {
+                "render": "segment",
+                "required": true,
+                "options": [{"name": "Buy", "value": "buy"}, {"name": "Sell", "value": "sell"}],
+            }
+        }, {
+            "type": "number",
+            "name": "price",
+            "label": "Price",
+            "description": "Order price",
+            "group": "Trade Settings",
+            "filter": "tradeType==1",
+            "settings": {
+                "required": true,
+            }
+        }, {
+            "type": "number",
+            "name": "amount",
+            "label": "Order Amount",
+            "description": "Order amount",
+            "group": "Trade Settings",
+            "settings": {
+                "required": true,
+            }
+        }],
+    }
+
+    while (true) {
+        var tbl = {"type": "table", "title": "dashboard", "cols": ["symbol", "actionOpen"], "rows": []}
+
+        _.each(arrManager, function(m) {
+            var btnOpen = createBtn(tmpBtnOpen, [{"type": "string", "name": "symbol", "label": "Symbol", "default": m["symbol"], "settings": {"required": true}}])
+            tbl["rows"].push([m["symbol"], btnOpen])
+        })
+
+        var cmd = GetCommand()
+        if (cmd) {
+            Log("Received interaction:", cmd)
+
+            // 解析交互消息: open:{"symbol":"LTC_USDT.swap","tradeType":0,"direction":"buy","amount":111}
+            // 根据第一个冒号:之前的指令判断是哪种按钮模板触发的消息
+            var arrCmd = cmd.split(":", 2)
+            if (arrCmd[0] == "open") {
+                var msg = JSON.parse(cmd.slice(5))
+                Log("Symbol:", msg["symbol"], ", Direction:", msg["direction"], ", Order type:", msg["tradeType"] == 0 ? "Market order" : "Limit order", msg["tradeType"] == 0 ? ", Price: Current market price" : ", Price:" + msg["price"], ", Amount:", msg["amount"])
+            }
+        }
+
+        LogStatus(_D(), "\n", "`" + JSON.stringify(tbl) + "`")
+        Sleep(1000)
+    }
+}
+```
+
+```python
+import json
+
+symbols = ["BTC_USDT.swap", "ETH_USDT.swap", "LTC_USDT.swap", "BNB_USDT.swap", "SOL_USDT.swap"]
+
+def createBtn(tmp, group):
+    btn = json.loads(json.dumps(tmp))
+    for eleByGroup in group:
+        btn["group"].insert(0, eleByGroup)
+    return btn
+
+def main():
+    arrManager = []
+
+    for symbol in symbols:
+        arrManager.append({"symbol": symbol})
+
+    # Btn
+    tmpBtnOpen = {
+        "type": "button",
+        "cmd": "open",
+        "name": "Open Position",
+        "group": [{
+            "type": "selected",
+            "name": "tradeType",
+            "label": "Order Type",
+            "description": "Market order, Limit order",
+            "default": 0,
+            "group": "Trade Settings",
+            "settings": {
+                "options": ["Market Order", "Limit Order"],
+                "required": True,
+            }
+        }, {
+            "type": "selected",
+            "name": "direction",
+            "label": "Trade Direction",
+            "description": "Buy, Sell",
+            "default": "buy",
+            "group": "Trade Settings",
+            "settings": {
+                "render": "segment",
+                "required": True,
+                "options": [{"name": "Buy", "value": "buy"}, {"name": "Sell", "value": "sell"}],
+            }
+        }, {
+            "type": "number",
+            "name": "price",
+            "label": "Price",
+            "description": "Order price",
+            "group": "Trade Settings",
+            "filter": "tradeType==1",
+            "settings": {
+                "required": True,
+            }
+        }, {
+            "type": "number",
+            "name": "amount",
+            "label": "Order Amount",
+            "description": "Order amount",
+            "group": "Trade Settings",
+            "settings": {
+                "required": True,
+            }
+        }],
+    }
+
+    while True:
+        tbl = {"type": "table", "title": "dashboard", "cols": ["symbol", "actionOpen"], "rows": []}
+        for m in arrManager:
+            btnOpen = createBtn(tmpBtnOpen, [{"type": "string", "name": "symbol", "label": "Symbol", "default": m["symbol"], "settings": {"required": True}}])
+            tbl["rows"].append([m["symbol"], btnOpen])
+
+        cmd = GetCommand()
+
+        if cmd != "" and cmd != None:
+            Log("Received interaction:", cmd)
+
+            # 解析交互消息: open:{"symbol":"LTC_USDT.swap","tradeType":0,"direction":"buy","amount":111}
+            # 根据第一个冒号:之前的指令判断是哪种按钮模板触发的消息
+            arrCmd = cmd.split(":")
+            if arrCmd[0] == "open":
+                msg = json.loads(cmd[5:])
+                Log("Symbol:", msg["symbol"], ", Direction:", msg["direction"], ", Order type:", "Market order" if msg["tradeType"] == 0 else "Limit order", ", Price: Current market price" if msg["tradeType"] == 0 else ", Price:" + str(msg["price"]), ", Amount:", msg["amount"])
+
+        # 输出状态栏信息
+        LogStatus(_D(), "\n", "`" + json.dumps(tbl) + "`")
+        Sleep(1000)
+```
+
+```rust
+fn main() {
+    let symbols = ["BTC_USDT.swap", "ETH_USDT.swap", "LTC_USDT.swap", "BNB_USDT.swap", "SOL_USDT.swap"];
+
+    // Btn：按钮模板，"group"的第一个元素为交易品种控件，__SYMBOL__为占位符，构造按钮时替换
+    let tmp_btn_open = String::from(r#"{"type": "button", "cmd": "open", "name": "Open Position", "group": ["#)
+        + r#"{"type": "string", "name": "symbol", "label": "Symbol", "default": "__SYMBOL__", "settings": {"required": true}},"#
+        + r#"{"type": "selected", "name": "tradeType", "label": "Order Type", "description": "Market order, Limit order", "default": 0, "group": "Trade Settings", "settings": {"options": ["Market Order", "Limit Order"], "required": true}},"#
+        + r#"{"type": "selected", "name": "direction", "label": "Trade Direction", "description": "Buy, Sell", "default": "buy", "group": "Trade Settings", "settings": {"render": "segment", "required": true, "options": [{"name": "Buy", "value": "buy"}, {"name": "Sell", "value": "sell"}]}},"#
+        + r#"{"type": "number", "name": "price", "label": "Price", "description": "Order price", "group": "Trade Settings", "filter": "tradeType==1", "settings": {"required": true}},"#
+        + r#"{"type": "number", "name": "amount", "label": "Order Amount", "description": "Order amount", "group": "Trade Settings", "settings": {"required": true}}"#
+        + r#"]}"#;
+
+    loop {
+        let mut rows: Vec<String> = Vec::new();
+        for symbol in &symbols {
+            let btn_open = tmp_btn_open.replace("__SYMBOL__", symbol);
+            rows.push(format!(r#"["{}", {}]"#, symbol, btn_open));
+        }
+        let tbl = format!(r#"{{"type": "table", "title": "dashboard", "cols": ["symbol", "actionOpen"], "rows": [{}]}}"#, rows.join(","));
+
+        if let Some(cmd) = GetCommand(0) {
+            Log!("Received interaction:", &cmd);
+
+            // 解析交互消息: open:{"symbol":"LTC_USDT.swap","tradeType":0,"direction":"buy","amount":111}
+            // 根据第一个冒号:之前的指令判断是哪种按钮模板触发的消息
+            if cmd.starts_with("open:") {
+                let msg = JSONParse(&cmd[5..]).unwrap();
+                let trade_type = msg["tradeType"].as_i64().unwrap_or(0);
+                Log!("Symbol:", msg["symbol"].as_str().unwrap_or(""),
+                    ", Direction:", msg["direction"].as_str().unwrap_or(""),
+                    ", Order type:", if trade_type == 0 { "Market order" } else { "Limit order" },
+                    if trade_type == 0 { ", Price: Current market price".to_string() } else { format!(", Price:{}", msg["price"].as_f64().unwrap_or(0.0)) },
+                    ", Amount:", msg["amount"].as_f64().unwrap_or(0.0));
+            }
+        }
+
+        LogStatus!(_D(None), "\n", format!("`{}`", tbl));
+        Sleep(1000);
+    }
+}
+```
+
+横向合并```LogStatus()```函数绘制的表格中的单元格：
+
+```javascript
+function main() {
+    var table = {
+        type: 'table',
+        title: 'Position Operation',
+        cols: ['Column 1', 'Column 2', 'Action'],
+        rows: [
+            ['abc', 'def', {'type':'button', 'cmd': 'coverAll', 'name': 'Close'}]
+        ]
+    }
+    var ticker = exchange.GetTicker()
+    // 添加一行数据，将第一个和第二个单元格合并，并在合并后的单元格内输出 ticker 变量
+    table.rows.push([{body : JSON.stringify(ticker), colspan : 2}, "abc"])
+    LogStatus('`' + JSON.stringify(table) + '`')
+}
+```
+
+```python
+import json
+def main():
+    table = {
+        "type" : "table",
+        "title" : "Position Operation",
+        "cols" : ["Column 1", "Column 2", "Action"],
+        "rows" : [
+            ["abc", "def", {"type": "button", "cmd": "coverAll", "name": "Close"}]
+        ]
+    }
+    ticker = exchange.GetTicker()
+    table["rows"].append([{"body": json.dumps(ticker), "colspan": 2}, "abc"])
+    LogStatus("`" + json.dumps(table) + "`")
+```
+
+```rust
+fn main() {
+    let table_tpl = String::from(r#"{"type": "table", "title": "Position Operation", "cols": ["Column 1", "Column 2", "Action"], "rows": ["#)
+        + r#"["abc", "def", {"type": "button", "cmd": "coverAll", "name": "Close"}],"#
+        + r#"__ROW2__"#
+        + r#"]}"#;
+
+    let ticker = exchange.GetTicker(None).unwrap();
+    let json_ticker = format!(
+        r#"{{"Buy": {}, "Sell": {}, "High": {}, "Low": {}, "Volume": {}, "Last": {}, "Time": {}}}"#,
+        ticker.Buy, ticker.Sell, ticker.High, ticker.Low, ticker.Volume, ticker.Last, ticker.Time
+    );
+    // 添加一行数据，将第一个和第二个单元格合并，并在合并后的单元格内输出 ticker 数据
+    // body 为字符串（对应 JS 的 JSON.stringify(ticker)），内部引号需转义后嵌入 JSON
+    let row2 = format!(r#"[{{"body": "{}", "colspan": 2}}, "abc"]"#, json_ticker.replace('"', "\\\""));
+    let table = table_tpl.replace("__ROW2__", &row2);
+    LogStatus!(format!("`{}`", table));
+}
+```
+
+纵向合并 ```LogStatus()``` 函数绘制的表格中的单元格：
+
+```javascript
+function main() {
+    var table = {
+        type: 'table',
+        title: 'Table Demo',
+        cols: ['Column A', 'Column B', 'Column C'],
+        rows: [
+            ['A1', 'B1', {'type':'button', 'cmd': 'coverAll', 'name': 'C1'}]
+        ]
+    }
+
+    var ticker = exchange.GetTicker()
+    var name = exchange.GetName()
+
+    table.rows.push([{body : "A2 + B2:" + JSON.stringify(ticker), colspan : 2}, "C2"])
+    table.rows.push([{body : "A3 + A4 + A5:" + name, rowspan : 3}, "B3", "C3"])
+    // A3 被上一行的第一个单元格合并
+    table.rows.push(["B4", "C4"])
+    // A2 被上一行的第一个单元格合并
+    table.rows.push(["B5", "C5"])
+    table.rows.push(["A6", "B6", "C6"])
+    LogStatus('`' + JSON.stringify(table) + '`')
+}
+```
+
+```python
+import json
+def main():
+    table = {
+        "type" : "table",
+        "title" : "Table Demo",
+        "cols" : ["Column A", "Column B", "Column C"],
+        "rows" : [
+            ["A1", "B1", {"type": "button", "cmd": "coverAll", "name": "C1"}]
+        ]
+    }
+
+    ticker = exchange.GetTicker()
+    name = exchange.GetName()
+
+    table["rows"].append([{"body": "A2 + B2:" + json.dumps(ticker), "colspan": 2}, "C2"])
+    table["rows"].append([{"body": "A3 + A4 + A5:" + name, "rowspan": 3}, "B3", "C3"])
+    table["rows"].append(["B4", "C4"])
+    table["rows"].append(["B5", "C5"])
+    table["rows"].append(["A6", "B6", "C6"])
+    LogStatus("`" + json.dumps(table) + "`")
+```
+
+```rust
+fn main() {
+    // 为便于测试，此处使用构造的数据以保持代码简短易读
+    let json_ticker = r#"{"High": 0, "Low": 0, "Buy": 0, "Sell": 0, "Last": 0, "Time": 0, "Volume": 0}"#;
+    let name = exchange.GetName();
+
+    let mut rows: Vec<String> = Vec::new();
+    rows.push(String::from(r#"["A1", "B1", {"type": "button", "cmd": "coverAll", "name": "C1"}]"#));
+    // body 为字符串，其内部的引号需要转义后才能嵌入 JSON
+    let body = format!("A2 + B2:{}", json_ticker).replace('"', "\\\"");
+    rows.push(format!(r#"[{{"body": "{}", "colspan": 2}}, "C2"]"#, body));
+    rows.push(format!(r#"[{{"body": "A3 + A4 + A5:{}", "rowspan": 3}}, "B3", "C3"]"#, name));
+    // A3 被上一行的第一个单元格合并
+    rows.push(String::from(r#"["B4", "C4"]"#));
+    // A2 被上一行的第一个单元格合并
+    rows.push(String::from(r#"["B5", "C5"]"#));
+    rows.push(String::from(r#"["A6", "B6", "C6"]"#));
+
+    let table = format!(r#"{{"type": "table", "title": "Table Demo", "cols": ["Column A", "Column B", "Column C"], "rows": [{}]}}"#, rows.join(","));
+    LogStatus!(format!("`{}`", table));
+}
+```
+
+状态栏中分页显示表格：
+
+```javascript
+function main() {
+    var table1 = {type: 'table', title: 'table1', cols: ['Column 1', 'Column 2'], rows: [ ['abc', 'def'], ['ABC', 'support color #ff0000']]}
+    var table2 = {type: 'table', title: 'table2', cols: ['Column 1', 'Column 2'], rows: [ ['abc', 'def'], ['ABC', 'support color #ff0000']]}
+    LogStatus('`' + JSON.stringify([table1, table2]) + '`')
+}
+```
+
+```python
+import json
+def main():
+    table1 = {"type": "table", "title": "table1", "cols": ["Column 1", "Column 2"], "rows": [ ["abc", "def"], ["ABC", "support color #ff0000"]]}
+    table2 = {"type": "table", "title": "table2", "cols": ["Column 1", "Column 2"], "rows": [ ["abc", "def"], ["ABC", "support color #ff0000"]]}
+    LogStatus("`" + json.dumps([table1, table2]) + "`")
+```
+
+```rust
+fn main() {
+    let table1 = r#"{"type": "table", "title": "table1", "cols": ["Column 1", "Column 2"], "rows": [["abc", "def"], ["ABC", "support color #ff0000"]]}"#;
+    let table2 = r#"{"type": "table", "title": "table2", "cols": ["Column 1", "Column 2"], "rows": [["abc", "def"], ["ABC", "support color #ff0000"]]}"#;
+    LogStatus!(format!("`[{},{}]`", table1, table2));
+}
+```
+
+除了可以分页显示表格之外，还可以将多个表格自上而下排列显示：
+
+```javascript
+function main(){
+    var tab1 = {
+        type : "table",
+        title : "Table 1",
+        cols : ["1", "2"],
+        rows : []
+    }
+    var tab2 = {
+        type : "table",
+        title : "Table 2",
+        cols : ["1", "2", "3"],
+        rows : []
+    }
+    var tab3 = {
+        type : "table",
+        title : "Table 3",
+        cols : ["A", "B", "C"],
+        rows : []
+    }
+
+    tab1.rows.push(["jack", "lucy"])
+    tab2.rows.push(["A", "B", "C"])
+    tab3.rows.push(["A", "B", "C"])
+
+    LogStatus('`' + JSON.stringify(tab1) + '`\n' +
+        '`' + JSON.stringify(tab2) + '`\n' +
+        '`' + JSON.stringify(tab3) + '`')
+
+    Log("exit")
+}
+```
+
+```python
+import json
+def main():
+    tab1 = {
+        "type": "table",
+        "title": "Table 1",
+        "cols": ["1", "2"],
+        "rows": []
+    }
+    tab2 = {
+        "type": "table",
+        "title": "Table 2",
+        "cols": ["1", "2", "3"],
+        "rows": []
+    }
+    tab3 = {
+        "type": "table",
+        "title": "Table 3",
+        "cols": ["A", "B", "C"],
+        "rows": []
+    }
+
+    tab1["rows"].append(["jack", "lucy"])
+    tab2["rows"].append(["A", "B", "C"])
+    tab3["rows"].append(["A", "B", "C"])
+    LogStatus("`" + json.dumps(tab1) + "`\n" +
+        "`" + json.dumps(tab2) + "`\n" +
+        "`" + json.dumps(tab3) + "`")
+```
+
+```rust
+fn main() {
+    // Rust 中直接把行数据写入JSON字符串中
+    let tab1 = r#"{"type": "table", "title": "Table 1", "cols": ["1", "2"], "rows": [["jack", "lucy"]]}"#;
+    let tab2 = r#"{"type": "table", "title": "Table 2", "cols": ["1", "2", "3"], "rows": [["A", "B", "C"]]}"#;
+    let tab3 = r#"{"type": "table", "title": "Table 3", "cols": ["A", "B", "C"], "rows": [["A", "B", "C"]]}"#;
+
+    LogStatus!(format!("`{}`\n`{}`\n`{}`", tab1, tab2, tab3));
+
+    Log!("exit");
+}
+```
+
+支持设置状态栏表格的横向和纵向滚动模式。将```scroll```属性设置为```"auto"```后，当状态栏表格的纵向行数超过 20 行时，内容将自动滚动显示；当横向列数超出页面显示范围时，则进行横向滚动显示。使用```scroll```属性可以缓解实盘运行时因状态栏写入大量数据而导致的卡顿问题。
+
+参考以下测试例子：
+
+```javascript
+function main() {
+    var tbl = {
+        type : "table",
+        title : "test scroll",
+        scroll : "auto",
+        cols : ["col 0", "col 1", "col 2", "col 3", "col 4", "col 5", "col 6", "col 7", "col 8", "col 9", "col 10",
+            "col 11", "col 12", "col 13", "col 14", "col 15", "col 16", "col 17", "col 18", "col 19", "col 20"],
+        rows : []
+    }
+
+    for (var i = 1 ; i < 100 ; i++) {
+        tbl.rows.push([i, "1," + i, "2," + i, "3," + i, "4," + i, "5," + i, "6," + i, "7," + i, "8," + i, "9," + i, "10," + i,
+            "11," + i, "12," + i, "13," + i, "14," + i, "15," + i, "16," + i, "17," + i, "18," + i, "19," + i, "20," + i])
+    }
+
+    LogStatus("`" + JSON.stringify(tbl) + "`")
+}
+```
+
+```python
+import json
+
+def main():
+    tbl = {
+        "type" : "table",
+        "title" : "test scroll",
+        "scroll" : "auto",
+        "cols" : ["col 0", "col 1", "col 2", "col 3", "col 4", "col 5", "col 6", "col 7", "col 8", "col 9", "col 10",
+            "col 11", "col 12", "col 13", "col 14", "col 15", "col 16", "col 17", "col 18", "col 19", "col 20"],
+        "rows" : []
+    }
+
+    for index in range(1, 100):
+        i = str(index)
+        tbl["rows"].append([i, "1," + i, "2," + i, "3," + i, "4," + i, "5," + i, "6," + i, "7," + i, "8," + i, "9," + i, "10," + i,
+            "11," + i, "12," + i, "13," + i, "14," + i, "15," + i, "16," + i, "17," + i, "18," + i, "19," + i, "20," + i])
+
+    LogStatus("`" + json.dumps(tbl) + "`")
+```
+
+```rust
+fn main() {
+    let tbl_tpl = String::from(r#"{"type": "table", "title": "test scroll", "scroll": "auto", "cols": ["#)
+        + r#""col 0", "col 1", "col 2", "col 3", "col 4", "col 5", "col 6", "col 7", "col 8", "col 9", "col 10","#
+        + r#""col 11", "col 12", "col 13", "col 14", "col 15", "col 16", "col 17", "col 18", "col 19", "col 20""#
+        + r#"], "rows": [__ROWS__]}"#;
+
+    let mut rows: Vec<String> = Vec::new();
+    for index in 1..100 {
+        let i = index.to_string();
+        rows.push(format!(
+            r#"[{}, "1,{}", "2,{}", "3,{}", "4,{}", "5,{}", "6,{}", "7,{}", "8,{}", "9,{}", "10,{}", "11,{}", "12,{}", "13,{}", "14,{}", "15,{}", "16,{}", "17,{}", "18,{}", "19,{}", "20,{}"]"#,
+            i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, i
+        ));
+    }
+
+    let tbl = tbl_tpl.replace("__ROWS__", &rows.join(","));
+    LogStatus!(format!("`{}`", tbl));
+}
+```
+
+实盘运行时，```LogStatus()```函数输出的信息不会保存到实盘数据库，仅更新当前实盘的状态栏内容。
+
+```LogStatus()```函数支持打印```base64```编码后的图片，图片字符串以``` ` ```开头，以``` ` ```结尾。例如： ```LogStatus("`data:image/png;base64,AAAA`")```。
+
+```LogStatus()```函数支持直接传入```Python```的```matplotlib.pyplot```对象。只要对象包含```savefig```方法，即可作为参数传入```LogStatus()```函数，例如：
+
+```python
+import matplotlib.pyplot as plt
+
+def main():
+    plt.plot([3,6,2,4,7,1])
+    LogStatus(plt)
+```
+
+策略实盘运行时，在实盘页面翻看历史记录时，状态栏会进入休眠状态，停止更新；只有当日志处于第一页时，状态栏数据才会刷新。状态栏支持输出```base64```编码后的图片，也支持在状态栏显示的表格中输出```base64```编码后的图片。由于编码后的图片字符串数据通常很长，因此此处不再展示示例代码。
+
+See also: `GetCommand`
+
+#### LogProfit
+
+```
+LogProfit(profit)
+LogProfit(profit, ...args)
+```
+
+记录并打印盈亏数值，并根据盈亏数值绘制收益曲线。
+
+Parameters:
+
+- `profit` (number, required): 参数```profit```为收益数据，该数据由策略中设计的算法计算得出。
+- `arg` (string / number / bool / object / array / any (平台支持的任意类型), optional): 扩展参数，用于向该条收益日志中输出附带信息，```arg```参数可传入多个。
+
+调用```LogProfit```函数时，如果最后一个参数为字符```&```，则不会将日志写入数据库，仅更新收益图表。使用```&```参数可以避免频繁的收益记录产生大量日志，从而保持日志整洁。例如：
+
+```javascript
+function main() {
+    // 在收益图表上打印30个点
+    for(var i = 0; i < 30; i++) {
+        LogProfit(i, '&')
+        Sleep(500)
+    }
+}
+```
+
+```python
+def main():
+    for i in range(30):
+        LogProfit(i, '&')
+        Sleep(500)
+```
+
+```rust
+fn main() {
+    // 在收益图表上打印30个点
+    // Rust 中 LogProfit 只接受收益数值参数，不支持 '&' 等扩展参数
+    for i in 0..30 {
+        LogProfit(i);
+        Sleep(500);
+    }
+}
+```
+
+See also: `LogProfitReset`
+
+#### LogProfitReset
+
+```
+LogProfitReset()
+LogProfitReset(remain)
+```
+
+清空所有收益日志及收益图表。
+
+Parameters:
+
+- `remain` (number, optional): ```remain```参数用于指定需要保留的日志条数（整数）。
+
+```javascript
+function main() {
+    // 在收益图表上打印30个数据点，然后重置，仅保留最后10个数据点
+    for(var i = 0; i < 30; i++) {
+        LogProfit(i)
+        Sleep(500)
+    }
+    LogProfitReset(10)
+}
+```
+
+```python
+def main():
+    for i in range(30):
+        LogProfit(i)
+        Sleep(500)
+    LogProfitReset(10)
+```
+
+```rust
+fn main() {
+    // 在收益图表上打印30个数据点，然后重置，仅保留最后10个数据点
+    for i in 0..30 {
+        LogProfit(i);
+        Sleep(500);
+    }
+    LogProfitReset(10);
+}
+```
+
+See also: `LogProfit`
+
+#### LogReset
+
+```
+LogReset(remain)
+```
+
+清除日志。
+
+Parameters:
+
+- `remain` (number, optional): ```remain``` 参数用于设置需要保留的最近日志条数。
+
+```javascript
+function main() {
+    // 保留最近10条日志，清除其余日志
+    LogReset(10)
+}
+```
+
+```python
+def main():
+    LogReset(10)
+```
+
+```rust
+fn main() {
+    // 保留最近10条日志，清除其余日志
+    LogReset(10);
+}
+```
+
+策略实盘每次启动时的启动日志会计为一条，因此如果不传入参数，且策略启动时没有任何日志输出，日志将完全不予显示，需等待托管者回传日志（此为正常现象，并非异常情况）。
+
+See also: `Log`, `LogVacuum`
+
+#### LogVacuum
+
+```
+LogVacuum()
+```
+
+用于在调用 ```LogReset()``` 函数清除日志后，回收 **SQLite** 删除数据时所占用的存储空间。
+
+```javascript
+function main() {
+    LogReset()
+    LogVacuum()
+}
+```
+
+```python
+def main():
+    LogReset()
+    LogVacuum()
+```
+
+```rust
+fn main() {
+    LogReset(0);
+    LogVacuum();
+}
+```
+
+原因在于 ```SQLite``` 删除数据时并不会立即回收所占用的存储空间，需要执行 ```VACUUM``` 命令清理数据表以释放空间。该函数在调用时会触发文件移动操作，延迟较大，建议按合适的时间间隔调用。
+
+See also: `LogReset`
+
+#### EnableLog
+
+```
+EnableLog(enable)
+```
+
+启用或禁用订单信息的日志记录。
+
+Parameters:
+
+- `enable` (bool, required): 当```enable```参数设置为假值（例如```false```）时，将不打印订单日志（即```exchange.Buy()```等函数产生的日志），也不会写入实盘的数据库。
+
+```javascript
+function main() {
+    EnableLog(false)
+}
+```
+
+```python
+def main():
+    EnableLog(False)
+```
+
+```rust
+fn main() {
+    EnableLog(false);
+}
+```
+
+See also: `exchange.Buy`, `exchange.Sell`, `exchange.CancelOrder`
+
+#### Chart
+
+```
+Chart(options)
+```
+
+自定义图表绘图函数。
+
+Parameters:
+
+- `options` (object / object数组, required): ```options```参数为图表配置。```Chart()```函数的参数```options```是可以进行```JSON```序列化的```HighStocks```的```Highcharts.StockChart```参数，相比原生参数增加了一个```__isStock```属性。如果将```__isStock```属性设置为假值（例如```false```），则显示为普通图表，即使用```Highcharts```图表；如果将```__isStock```属性设置为真值（例如```true```），则使用```Highstocks```图表（默认```__isStock```为真值，例如```true```）。详情可查询[HighStocks图表库](http://api.highcharts.com/highstock)。
+
+Returns (object): 图表对象。
+
+多图表绘制配置说明：
+- ```extension.layout``` 属性
+  当此属性设置为 "single" 时，该图表不会与其他图表叠加显示（即不以分页标签方式呈现），而是单独平铺显示。
+- ```extension.height``` 属性
+  此属性用于设置图表的高度，取值可以为数值类型，也可以采用 "300px" 的形式设置。
+- ```extension.col``` 属性
+  此属性用于设置图表的宽度。页面宽度共划分为 12 个单元，设置为 8 即表示该图表占用 8 个单元的宽度。
+
+```javascript
+function main() {
+    var cfgA = {
+        extension: {
+            layout: 'single', // 不参与分组，单独显示，默认为分组 'group'
+            height: 300, // 指定高度
+        },
+        title: {
+            text: 'Order Book Chart'
+        },
+        xAxis: {
+            type: 'datetime'
+        },
+        series: [{
+            name: 'Bid 1',
+            data: [],
+        }, {
+            name: 'Ask 1',
+            data: [],
+        }]
+    }
+    var cfgB = {
+        title: {
+            text: 'Spread Chart'
+        },
+        xAxis: {
+            type: 'datetime'
+        },
+        series: [{
+            name: 'Spread',
+            type: 'column',
+            data: [],
+        }]
+    }
+
+    var cfgC = {
+        __isStock: false,
+        title: {
+            text: 'Pie Chart'
+        },
+        series: [{
+            type: 'pie',
+            name: 'one',
+            data: [
+                ["A", 25],
+                ["B", 25],
+                ["C", 25],
+                ["D", 25],
+            ]  // 指定初始数据后无需使用 add 函数更新，直接修改图表配置即可更新数据序列。
+        }]
+    };
+    var cfgD = {
+        extension: {
+            layout: 'single',
+            col: 8, // 指定宽度所占的单元数，总单元数为 12
+            height: '300px',
+        },
+        title: {
+            text: 'Order Book Chart'
+        },
+        xAxis: {
+            type: 'datetime'
+        },
+        series: [{
+            name: 'Bid 1',
+            data: [],
+        }, {
+            name: 'Ask 1',
+            data: [],
+        }]
+    }
+    var cfgE = {
+        __isStock: false,
+        extension: {
+            layout: 'single',
+            col: 4,
+            height: '300px',
+        },
+        title: {
+            text: 'Pie Chart 2'
+        },
+        series: [{
+            type: 'pie',
+            name: 'one',
+            data: [
+                ["A", 25],
+                ["B", 25],
+                ["C", 25],
+                ["D", 25],
+            ]
+        }]
+    };
+
+    var chart = Chart([cfgA, cfgB, cfgC, cfgD, cfgE]);
+    chart.reset()
+        // 为饼图追加一个数据点，add 只能更新通过 add 方式添加的数据点，内置的数据点无法在后期更新
+    chart.add(3, {
+        name: "ZZ",
+        y: Math.random() * 100
+    });
+    while (true) {
+        Sleep(1000)
+        var ticker = exchange.GetTicker()
+        if (!ticker) {
+            continue;
+        }
+        var diff = ticker.Sell - ticker.Buy
+        cfgA.subtitle = {
+            text: 'Bid ' + ticker.Buy + ', Ask ' + ticker.Sell,
+        };
+        cfgB.subtitle = {
+            text: 'Spread ' + diff,
+        };
+
+        chart.add([0, [new Date().getTime(), ticker.Buy]]);
+        chart.add([1, [new Date().getTime(), ticker.Sell]]);
+        // 相当于更新第二个图表的第一个数据序列
+        chart.add([2, [new Date().getTime(), diff]]);
+        chart.add(4, [new Date().getTime(), ticker.Buy]);
+        chart.add(5, [new Date().getTime(), ticker.Buy]);
+        cfgC.series[0].data[0][1] = Math.random() * 100;
+        cfgE.series[0].data[0][1] = Math.random() * 100;
+        // update 实际上等同于重置图表的配置
+        chart.update([cfgA, cfgB, cfgC, cfgD, cfgE]);
+    }
+}
+```
+
+```python
+import random
+import time
+def main():
+    cfgA = {
+        "extension" : {
+            "layout" : "single",
+            "height" : 300,
+            "col" : 8
+        },
+        "title" : {
+            "text" : "Order Book Chart"
+        },
+        "xAxis" : {
+            "type" : "datetime"
+        },
+        "series" : [{
+            "name" : "Bid 1",
+            "data" : []
+        }, {
+            "name" : "Ask 1",
+            "data" : []
+        }]
+    }
+
+    cfgB = {
+        "title" : {
+            "text" : "Spread Chart"
+        },
+        "xAxis" : {
+            "type" : "datetime",
+        },
+        "series" : [{
+            "name" : "Spread",
+            "type" : "column",
+            "data" : []
+        }]
+    }
+
+    cfgC = {
+        "__isStock" : False,
+        "title" : {
+            "text" : "Pie Chart"
+        },
+        "series" : [{
+            "type" : "pie",
+            "name" : "one",
+            "data" : [
+                ["A", 25],
+                ["B", 25],
+                ["C", 25],
+                ["D", 25],
+            ]
+        }]
+    }
+
+    cfgD = {
+        "extension" : {
+            "layout" : "single",
+            "col" : 8,
+            "height" : "300px"
+        },
+        "title" : {
+            "text" : "Order Book Chart"
+        },
+        "series" : [{
+            "name" : "Bid 1",
+            "data" : []
+        }, {
+            "name" : "Ask 1",
+            "data" : []
+        }]
+    }
+
+    cfgE = {
+        "__isStock" : False,
+        "extension" : {
+            "layout" : "single",
+            "col" : 4,
+            "height" : "300px"
+        },
+        "title" : {
+            "text" : "Pie Chart 2"
+        },
+        "series" : [{
+            "type" : "pie",
+            "name" : "one",
+            "data" : [
+                ["A", 25],
+                ["B", 25],
+                ["C", 25],
+                ["D", 25]
+            ]
+        }]
+    }
+
+    chart = Chart([cfgA, cfgB, cfgC, cfgD, cfgE])
+    chart.reset()
+    chart.add(3, {
+        "name" : "ZZ",
+        "y" : random.random() * 100
+    })
+
+    while True:
+        Sleep(1000)
+        ticker = exchange.GetTicker()
+        if not ticker :
+            continue
+        diff = ticker["Sell"] - ticker["Buy"]
+        cfgA["subtitle"] = {
+            "text" : "Bid " + str(ticker["Buy"]) + " Ask " + str(ticker["Sell"])
+        }
+        cfgB["subtitle"] = {
+            "text" : "Spread " + str(diff)
+        }
+
+        chart.add(0, [time.time() * 1000, ticker["Buy"]])
+        chart.add(1, [time.time() * 1000, ticker["Sell"]])
+        chart.add(2, [time.time() * 1000, diff])
+        chart.add(4, [time.time() * 1000, ticker["Buy"]])
+        chart.add(5, [time.time() * 1000, ticker["Buy"]])
+        cfgC["series"][0]["data"][0][1] = random.random() * 100
+        cfgE["series"][0]["data"][0][1] = random.random() * 100
+```
+
+```rust
+fn main() {
+    // Rust 中图表配置为 JSON 字符串，可变部分使用占位符表示，更新时替换占位符以重新构建配置
+    let cfg_a_tpl = r#"{
+        "extension": {
+            "layout": "single",
+            "height": 300
+        },
+        "title": {"text": "Order Book Chart"},
+        "subtitle": {"text": "__SUBTITLE__"},
+        "xAxis": {"type": "datetime"},
+        "series": [{"name": "Bid 1", "data": []}, {"name": "Ask 1", "data": []}]
+    }"#;
+    let cfg_b_tpl = r#"{
+        "title": {"text": "Spread Chart"},
+        "subtitle": {"text": "__SUBTITLE__"},
+        "xAxis": {"type": "datetime"},
+        "series": [{"name": "Spread", "type": "column", "data": []}]
+    }"#;
+    let cfg_c_tpl = r#"{
+        "__isStock": false,
+        "title": {"text": "Pie Chart"},
+        "series": [{
+            "type": "pie",
+            "name": "one",
+            "data": [["A", __Y__], ["B", 25], ["C", 25], ["D", 25]]
+        }]
+    }"#;
+    let cfg_d = r#"{
+        "extension": {
+            "layout": "single",
+            "col": 8,
+            "height": "300px"
+        },
+        "title": {"text": "Order Book Chart"},
+        "xAxis": {"type": "datetime"},
+        "series": [{"name": "Bid 1", "data": []}, {"name": "Ask 1", "data": []}]
+    }"#;
+    let cfg_e_tpl = r#"{
+        "__isStock": false,
+        "extension": {
+            "layout": "single",
+            "col": 4,
+            "height": "300px"
+        },
+        "title": {"text": "Pie Chart 2"},
+        "series": [{
+            "type": "pie",
+            "name": "one",
+            "data": [["A", __Y__], ["B", 25], ["C", 25], ["D", 25]]
+        }]
+    }"#;
+
+    let cfg_a = cfg_a_tpl.replace("__SUBTITLE__", "");
+    let cfg_b = cfg_b_tpl.replace("__SUBTITLE__", "");
+    let cfg_c = cfg_c_tpl.replace("__Y__", "25");
+    let cfg_e = cfg_e_tpl.replace("__Y__", "25");
+
+    let chart = Chart::new(&format!("[{},{},{},{},{}]", cfg_a, cfg_b, cfg_c, cfg_d, cfg_e));
+    chart.reset(0);
+    // 为饼图追加一个数据点，add 只能更新通过 add 方式添加的数据点，内置的数据点无法在后期更新
+    let y = (UnixNano() % 100) as f64;    // 用时间戳模拟随机数
+    chart.add(3, &format!(r#"{{"name": "ZZ", "y": {}}}"#, y), -1);
+    loop {
+        Sleep(1000);
+        let ticker = match exchange.GetTicker(None) {
+            Ok(t) => t,
+            Err(_) => continue,
+        };
+        let diff = ticker.Sell - ticker.Buy;
+        let cfg_a = cfg_a_tpl.replace("__SUBTITLE__", &format!("Bid {}, Ask {}", ticker.Buy, ticker.Sell));
+        let cfg_b = cfg_b_tpl.replace("__SUBTITLE__", &format!("Spread {}", diff));
+
+        let now = Unix() * 1000;
+        chart.add(0, &format!("[{}, {}]", now, ticker.Buy), -1);
+        chart.add(1, &format!("[{}, {}]", now, ticker.Sell), -1);
+        // 相当于更新第二个图表的第一个数据序列
+        chart.add(2, &format!("[{}, {}]", now, diff), -1);
+        chart.add(4, &format!("[{}, {}]", now, ticker.Buy), -1);
+        chart.add(5, &format!("[{}, {}]", now, ticker.Buy), -1);
+        let cfg_c = cfg_c_tpl.replace("__Y__", &format!("{}", (UnixNano() % 100) as f64));
+        let cfg_e = cfg_e_tpl.replace("__Y__", &format!("{}", (UnixNano() % 100) as f64));
+        // update 实际上等同于重置图表的配置
+        chart.update(&format!("[{},{},{},{},{}]", cfg_a, cfg_b, cfg_c, cfg_d, cfg_e));
+    }
+}
+```
+
+简单的绘图示例：
+
+```javascript
+// 在 JavaScript 中，chart 是一个对象；在调用 Chart 函数之前，我们需要先声明一个用于配置图表的对象变量 chart
+var chart = {
+    // 该字段用于标记图表是否为普通图表，感兴趣的读者可以改为 false 运行查看效果
+    __isStock: true,
+    // 提示框
+    tooltip: {xDateFormat: '%Y-%m-%d %H:%M:%S, %A'},
+    // 标题
+    title : { text : '差价分析图'},
+    // 选择范围
+    rangeSelector: {
+        buttons:  [{type: 'hour',count: 1, text: '1h'}, {type: 'hour',count: 3, text: '3h'}, {type: 'hour', count: 8, text: '8h'}, {type: 'all',text: 'All'}],
+        selected: 0,
+        inputEnabled: false
+    },
+    // 横轴（即 x 轴），当前设置的类型为：时间
+    xAxis: { type: 'datetime'},
+    // 纵轴（即 y 轴），默认数值随数据大小自动调整
+    yAxis : {
+        // 标题
+        title: {text: '差价'},
+        // 是否启用右侧纵轴
+        opposite: false
+    },
+    // 数据系列，该属性保存各个数据系列（折线、K 线图、标签等……）
+    series : [
+        // 索引为 0，data 数组中存放的是该索引系列的数据
+        {name : "line1", id : "Line 1,buy1Price", data : []},
+        // 索引为 1，设置了 dashStyle: 'shortdash'，即将其设置为虚线
+        {name : "line2", id : "Line 2,lastPrice", dashStyle : 'shortdash', data : []}
+    ]
+}
+
+function main(){
+    // 调用 Chart 函数，初始化图表
+    var ObjChart = Chart(chart)
+    // 清空
+    ObjChart.reset()
+    while(true){
+        // 获取本次轮询的时间戳（即毫秒级时间戳），用于确定写入图表的 X 轴位置
+        var nowTime = new Date().getTime()
+        // 获取行情数据
+        var ticker = _C(exchange.GetTicker)
+        // 从行情数据的返回值中取得买一价
+        var buy1Price = ticker.Buy
+        // 取得最新成交价，为避免两条线相互重合，此处将其加 1
+        var lastPrice = ticker.Last + 1
+        // 以时间戳作为 X 值、买一价作为 Y 值，传入索引 0 的数据序列
+        ObjChart.add(0, [nowTime, buy1Price])
+        // 同上
+        ObjChart.add(1, [nowTime, lastPrice])
+        Sleep(2000)
+    }
+}
+```
+
+```python
+import time
+chart = {
+    "__isStock" : True,
+    "tooltip" : {"xDateFormat" : "%Y-%m-%d %H:%M:%S, %A"},
+    "title" : {"text" : "Spread Analysis Chart"},
+    "rangeSelector" : {
+        "buttons" : [{"type": "count", "count": 1, "text": "1h"}, {"type": "hour", "count": 3, "text": "3h"}, {"type": "hour", "count": 8, "text": "8h"}, {"type": "all", "text": "All"}],
+        "selected": 0,
+        "inputEnabled": False
+    },
+    "xAxis": {"type": "datetime"},
+    "yAxis": {
+        "title": {"text": "Spread"},
+        "opposite": False
+    },
+    "series": [{
+        "name": "line1", "id": "Line 1,buy1Price", "data": []
+    }, {
+        "name": "line2", "id": "Line 2,lastPrice", "dashStyle": "shortdash", "data": []
+    }]
+}
+def main():
+    ObjChart = Chart(chart)
+    ObjChart.reset()
+    while True:
+        nowTime = time.time() * 1000
+        ticker = exchange.GetTicker()
+        buy1Price = ticker["Buy"]
+        lastPrice = ticker["Last"] + 1
+        ObjChart.add(0, [nowTime, buy1Price])
+        ObjChart.add(1, [nowTime, lastPrice])
+        Sleep(2000)
+```
+
+```rust
+fn main() {
+    // 在 Rust 中，图表配置为 JSON 字符串；在调用 Chart::new 函数之前，先定义图表配置
+    let chart = r#"{
+        "__isStock": true,
+        "tooltip": {"xDateFormat": "%Y-%m-%d %H:%M:%S, %A"},
+        "title": {"text": "差价分析图"},
+        "rangeSelector": {
+            "buttons": [{"type": "hour", "count": 1, "text": "1h"}, {"type": "hour", "count": 3, "text": "3h"}, {"type": "hour", "count": 8, "text": "8h"}, {"type": "all", "text": "All"}],
+            "selected": 0,
+            "inputEnabled": false
+        },
+        "xAxis": {"type": "datetime"},
+        "yAxis": {
+            "title": {"text": "差价"},
+            "opposite": false
+        },
+        "series": [
+            {"name": "line1", "id": "Line 1,buy1Price", "data": []},
+            {"name": "line2", "id": "Line 2,lastPrice", "dashStyle": "shortdash", "data": []}
+        ]
+    }"#;
+
+    // 调用 Chart::new 函数，初始化图表
+    let obj_chart = Chart::new(chart);
+    // 清空
+    obj_chart.reset(0);
+    loop {
+        // 获取本次轮询的时间戳（即毫秒级时间戳），用于确定写入图表的 X 轴位置
+        let now_time = Unix() * 1000;
+        // 获取行情数据
+        let ticker = _C!(exchange.GetTicker(None));
+        // 从行情数据的返回值中取得买一价
+        let buy1_price = ticker.Buy;
+        // 取得最新成交价，为避免两条线相互重合，此处将其加 1
+        let last_price = ticker.Last + 1.0;
+        // 以时间戳作为 X 值、买一价作为 Y 值，传入索引 0 的数据序列
+        obj_chart.add(0, &format!("[{}, {}]", now_time, buy1_price), -1);
+        // 同上
+        obj_chart.add(1, &format!("[{}, {}]", now_time, last_price), -1);
+        Sleep(2000);
+    }
+}
+```
+
+绘制三角函数曲线的示例：
+
+```javascript
+// 用于初始化图表的配置对象
+var chart = {
+    // 图表标题
+    title: {text: "Line value triggers plotLines value"},
+    // Y 轴相关设置
+    yAxis: {
+        // 垂直于 Y 轴的水平线，用作触发线；这是一个结构体数组，可设置多条触发线
+        plotLines: [{
+            // 触发线的值，该线将显示在对应的数值位置
+            value: 0,
+            // 设置触发线的颜色
+            color: 'red',
+            // 线宽
+            width: 2,
+            // 显示的标签
+            label: {
+                // 标签文本
+                text: 'Trigger Value',
+                // 标签居中对齐
+                align: 'center'
+            }
+        }]
+    },
+    // X 轴相关设置，此处将类型设置为时间轴
+    xAxis: {type: "datetime"},
+    series: [
+        {name: "sin", type: "spline", data: []},
+        // 数据系列，可设置多个，并通过数组索引进行控制
+        {name: "cos", type: "spline", data: []}
+    ]
+}
+function main(){
+    // 圆周率
+    var pi = 3.1415926535897
+    // 用于记录时间戳的变量
+    var time = 0
+    // 角度
+    var angle = 0
+    // 坐标 y 值，用于接收正弦值或余弦值
+    var y = 0
+    // 调用 API 接口，使用 chart 对象初始化图表
+    var objChart = Chart(chart)
+    // 初始化时清空图表
+    objChart.reset()
+    // 将触发线的值设置为 1
+    chart.yAxis.plotLines[0].value = 1
+    // 循环
+    while(true){
+        // 获取当前时刻的时间戳
+        time = new Date().getTime()
+        // 每 500ms 将角度 angle 增加 5 度，并计算正弦值
+        y = Math.sin(angle * 2 * pi / 360)
+        // 将计算得到的 y 值写入图表对应索引的数据系列，add 函数的第一个参数为指定的数据系列索引
+        objChart.add(0, [time, y])
+        // 计算余弦值
+        y = Math.cos(angle * 2 * pi / 360)
+        objChart.add(1, [time, y])
+        // 增加 5 度
+        angle += 5
+        // 暂停 5 秒，避免绘图过于频繁、数据增长过快
+        Sleep(5000)
+    }
+}
+```
+
+```python
+import math
+import time
+chart = {
+    "title": {"text": "Line value triggers plotLines value"},
+    "yAxis": {
+        "plotLines": [{
+            "value": 0,
+            "color": "red",
+            "width": 2,
+            "label": {
+                "text": "Trigger Value",
+                "align": "center"
+            }
+        }]
+    },
+    "xAxis": {"type": "datetime"},
+    "series": [{"name": "sin", "type": "spline", "data": []},
+               {"name": "cos", "type": "spline", "data": []}]
+}
+def main():
+    pi = 3.1415926535897
+    ts = 0
+    angle = 0
+    y = 0
+    objChart = Chart(chart)
+    objChart.reset()
+    chart["yAxis"]["plotLines"][0]["value"] = 1
+    while True:
+        ts = time.time() * 1000
+        y = math.sin(angle * 2 * pi / 360)
+        objChart.add(0, [ts, y])
+        y = math.cos(angle * 2 * pi / 360)
+        objChart.add(1, [ts, y])
+        angle += 5
+        Sleep(5000)
+```
+
+```rust
+fn main() {
+    // 用于初始化图表的 JSON 配置字符串，触发线的值在配置中直接设置为 1
+    let chart = r#"{
+        "title": {"text": "Line value triggers plotLines value"},
+        "yAxis": {
+            "plotLines": [{
+                "value": 1,
+                "color": "red",
+                "width": 2,
+                "label": {
+                    "text": "Trigger Value",
+                    "align": "center"
+                }
+            }]
+        },
+        "xAxis": {"type": "datetime"},
+        "series": [{"name": "sin", "type": "spline", "data": []},
+                   {"name": "cos", "type": "spline", "data": []}]
+    }"#;
+    // 圆周率
+    let pi = 3.1415926535897_f64;
+    // 角度
+    let mut angle = 0.0_f64;
+    // 调用 API 接口，使用 chart 配置初始化图表
+    let obj_chart = Chart::new(chart);
+    // 初始化时清空图表
+    obj_chart.reset(0);
+    // 循环
+    loop {
+        // 获取当前时刻的毫秒时间戳
+        let ts = Unix() * 1000;
+        // 将角度 angle 增加 5 度，并计算正弦值
+        let mut y = (angle * 2.0 * pi / 360.0).sin();
+        // 将计算得到的 y 值写入图表对应索引的数据系列，add 函数的第一个参数为指定的数据系列索引
+        obj_chart.add(0, &format!("[{}, {}]", ts, y), -1);
+        // 计算余弦值
+        y = (angle * 2.0 * pi / 360.0).cos();
+        obj_chart.add(1, &format!("[{}, {}]", ts, y), -1);
+        // 增加 5 度
+        angle += 5.0;
+        // 暂停 5 秒，避免绘图过于频繁、数据增长过快
+        Sleep(5000);
+    }
+}
+```
+
+使用混合图表的复杂示例：
+
+```javascript
+/*backtest
+start: 2020-03-11 00:00:00
+end: 2020-04-09 23:59:00
+period: 1d
+exchanges: [{"eid":"Bitfinex","currency":"BTC_USD"}]
+*/
+
+var chartCfg = {
+    subtitle: {
+        text: "subtitle",
+    },
+    yAxis: [{
+        height: "40%",
+        lineWidth: 2,
+        title: {
+            text: 'PnL',
+        },
+        tickPixelInterval: 20,
+        minorGridLineWidth: 1,
+        minorTickWidth: 0,
+        opposite: true,
+        labels: {
+            align: "right",
+            x: -3,
+        }
+    }, {
+        title: {
+            text: 'Profit',
+        },
+        top: "42%",
+        height: "18%",
+        offset: 0,
+        lineWidth: 2
+    }, {
+        title: {
+            text: 'Vol',
+        },
+        top: '62%',
+        height: '18%',
+        offset: 0,
+        lineWidth: 2
+    }, {
+        title: {
+            text: 'Asset',
+        },
+        top: '82%',
+        height: '18%',
+        offset: 0,
+        lineWidth: 2
+    }],
+    series: [{
+        name: 'PnL',
+        data: [],
+        id: 'primary',
+        tooltip: {
+            xDateFormat: '%Y-%m-%d %H:%M:%S'
+        },
+        yAxis: 0
+    }, {
+        type: 'column',
+        lineWidth: 2,
+        name: 'Profit',
+        data: [],
+        yAxis: 1,
+    }, {
+        type: 'column',
+        name: 'Trade',
+        data: [],
+        yAxis: 2
+    }, {
+        type: 'area',
+        step: true,
+        lineWidth: 0,
+        name: 'Long',
+        data: [],
+        yAxis: 2
+    }, {
+        type: 'area',
+        step: true,
+        lineWidth: 0,
+        name: 'Short',
+        data: [],
+        yAxis: 2
+    }, {
+        type: 'line',
+        step: true,
+        color: '#5b4b00',
+        name: 'Asset',
+        data: [],
+        yAxis: 3
+    }, {
+        type: 'pie',
+        innerSize: '70%',
+        name: 'Random',
+        data: [],
+        center: ['3%', '6%'],
+        size: '15%',
+        dataLabels: {
+            enabled: false
+        },
+        startAngle: -90,
+        endAngle: 90,
+    }],
+};
+
+function main() {
+    let c = Chart(chartCfg);
+    let preTicker = null;
+    while (true) {
+        let t = exchange.GetTicker();
+
+        c.add(0, [t.Time, t.Last]); // PnL
+        c.add(1, [t.Time, preTicker ? t.Last - preTicker.Last : 0]); // profit
+        let r = Math.random();
+        var pos = parseInt(t.Time/86400);
+        c.add(2, [t.Time, pos/2]); // Vol
+        c.add(3, [t.Time, r > 0.8 ? pos : null]); // Long
+        c.add(4, [t.Time, r < 0.8 ? -pos : null]); // Short
+        c.add(5, [t.Time, Math.random() * 100]); // Asset
+        // update pie
+        chartCfg.series[chartCfg.series.length-1].data = [
+            ["A", Math.random()*100],
+            ["B", Math.random()*100],
+         ];
+        c.update(chartCfg)
+        preTicker = t;
+    }
+}
+```
+
+```python
+'''backtest
+start: 2020-03-11 00:00:00
+end: 2020-04-09 23:59:00
+period: 1d
+exchanges: [{"eid":"Bitfinex","currency":"BTC_USD"}]
+'''
+
+import random
+
+chartCfg = {
+    "subtitle": {
+        "text": "subtitle"
+    },
+    "yAxis": [{
+        "height": "40%",
+        "lineWidth": 2,
+        "title": {
+            "text": 'PnL'
+        },
+        "tickPixelInterval": 20,
+        "minorGridLineWidth": 1,
+        "minorTickWidth": 0,
+        "opposite": True,
+        "labels": {
+            "align": "right",
+            "x": -3
+        }
+    }, {
+        "title": {
+            "text": 'Profit'
+        },
+        "top": "42%",
+        "height": "18%",
+        "offset": 0,
+        "lineWidth": 2
+    }, {
+        "title": {
+            "text": 'Vol'
+        },
+        "top": '62%',
+        "height": '18%',
+        "offset": 0,
+        "lineWidth": 2
+    }, {
+        "title": {
+            "text": 'Asset'
+        },
+        "top": '82%',
+        "height": '18%',
+        "offset": 0,
+        "lineWidth": 2
+    }],
+    "series": [{
+        "name": 'PnL',
+        "data": [],
+        "id": 'primary',
+        "tooltip": {
+            "xDateFormat": '%Y-%m-%d %H:%M:%S'
+        },
+        "yAxis": 0
+    }, {
+        "type": 'column',
+        "lineWidth": 2,
+        "name": 'Profit',
+        "data": [],
+        "yAxis": 1
+    }, {
+        "type": 'column',
+        "name": 'Trade',
+        "data": [],
+        "yAxis": 2
+    }, {
+        "type": 'area',
+        "step": True,
+        "lineWidth": 0,
+        "name": 'Long',
+        "data": [],
+        "yAxis": 2
+    }, {
+        "type": 'area',
+        "step": True,
+        "lineWidth": 0,
+        "name": 'Short',
+        "data": [],
+        "yAxis": 2
+    }, {
+        "type": 'line',
+        "step": True,
+        "color": '#5b4b00',
+        "name": 'Asset',
+        "data": [],
+        "yAxis": 3
+    }, {
+        "type": 'pie',
+        "innerSize": '70%',
+        "name": 'Random',
+        "data": [],
+        "center": ['3%', '6%'],
+        "size": '15%',
+        "dataLabels": {
+            "enabled": False
+        },
+        "startAngle": -90,
+        "endAngle": 90
+    }]
+}
+
+def main():
+    c = Chart(chartCfg)
+    preTicker = None
+    while True:
+        t = exchange.GetTicker()
+        c.add(0, [t["Time"], t["Last"]])
+        profit = t["Last"] - preTicker["Last"] if preTicker else 0
+        c.add(1, [t["Time"], profit])
+        r = random.random()
+        pos = t["Time"] / 86400
+        c.add(2, [t["Time"], pos / 2])
+        long = pos if r > 0.8 else None
+        c.add(3, [t["Time"], long])
+        short = -pos if r < 0.8 else None
+        c.add(4, [t["Time"], short])
+        c.add(5, [t["Time"], random.random() * 100])
+
+        # update pie
+        chartCfg["series"][len(chartCfg["series"]) - 1]["data"] = [
+            ["A", random.random() * 100],
+            ["B", random.random() * 100]
+        ]
+        c.update(chartCfg)
+        preTicker = t
+```
+
+```rust
+/*backtest
+start: 2020-03-11 00:00:00
+end: 2020-04-09 23:59:00
+period: 1d
+exchanges: [{"eid":"Bitfinex","currency":"BTC_USD"}]
+*/
+
+fn main() {
+    // 在 Rust 中，图表配置以 JSON 字符串形式表示；饼图数据使用占位符 __PIE_DATA__ 标记，更新时替换该占位符后重建配置
+    let chart_cfg_tpl = r##"{
+        "subtitle": {"text": "subtitle"},
+        "yAxis": [{
+            "height": "40%",
+            "lineWidth": 2,
+            "title": {"text": "PnL"},
+            "tickPixelInterval": 20,
+            "minorGridLineWidth": 1,
+            "minorTickWidth": 0,
+            "opposite": true,
+            "labels": {"align": "right", "x": -3}
+        }, {
+            "title": {"text": "Profit"},
+            "top": "42%",
+            "height": "18%",
+            "offset": 0,
+            "lineWidth": 2
+        }, {
+            "title": {"text": "Vol"},
+            "top": "62%",
+            "height": "18%",
+            "offset": 0,
+            "lineWidth": 2
+        }, {
+            "title": {"text": "Asset"},
+            "top": "82%",
+            "height": "18%",
+            "offset": 0,
+            "lineWidth": 2
+        }],
+        "series": [{
+            "name": "PnL",
+            "data": [],
+            "id": "primary",
+            "tooltip": {"xDateFormat": "%Y-%m-%d %H:%M:%S"},
+            "yAxis": 0
+        }, {
+            "type": "column",
+            "lineWidth": 2,
+            "name": "Profit",
+            "data": [],
+            "yAxis": 1
+        }, {
+            "type": "column",
+            "name": "Trade",
+            "data": [],
+            "yAxis": 2
+        }, {
+            "type": "area",
+            "step": true,
+            "lineWidth": 0,
+            "name": "Long",
+            "data": [],
+            "yAxis": 2
+        }, {
+            "type": "area",
+            "step": true,
+            "lineWidth": 0,
+            "name": "Short",
+            "data": [],
+            "yAxis": 2
+        }, {
+            "type": "line",
+            "step": true,
+            "color": "#5b4b00",
+            "name": "Asset",
+            "data": [],
+            "yAxis": 3
+        }, {
+            "type": "pie",
+            "innerSize": "70%",
+            "name": "Random",
+            "data": __PIE_DATA__,
+            "center": ["3%", "6%"],
+            "size": "15%",
+            "dataLabels": {"enabled": false},
+            "startAngle": -90,
+            "endAngle": 90
+        }]
+    }"##;
+
+    let c = Chart::new(&chart_cfg_tpl.replace("__PIE_DATA__", "[]"));
+    let mut pre_ticker: Option<Ticker> = None;
+    loop {
+        let t = exchange.GetTicker(None).unwrap();
+
+        c.add(0, &format!("[{}, {}]", t.Time, t.Last), -1); // PnL
+        let profit = if let Some(p) = &pre_ticker { t.Last - p.Last } else { 0.0 };
+        c.add(1, &format!("[{}, {}]", t.Time, profit), -1); // profit
+        let r = (UnixNano() % 100) as f64 / 100.0;          // 使用时间戳模拟随机数
+        let pos = (t.Time / 86400) as f64;
+        c.add(2, &format!("[{}, {}]", t.Time, pos / 2.0), -1); // Vol
+        c.add(3, &format!("[{}, {}]", t.Time, if r > 0.8 { pos.to_string() } else { "null".to_string() }), -1); // Long
+        c.add(4, &format!("[{}, {}]", t.Time, if r < 0.8 { (-pos).to_string() } else { "null".to_string() }), -1); // Short
+        c.add(5, &format!("[{}, {}]", t.Time, (UnixNano() % 10000) as f64 / 100.0), -1); // Asset
+        // update pie
+        let pie = format!(r#"[["A", {}], ["B", {}]]"#, (UnixNano() % 100) as f64, (UnixNano() % 100) as f64);
+        c.update(&chart_cfg_tpl.replace("__PIE_DATA__", &pie));
+        pre_ticker = Some(t);
+    }
+}
+```
+
+图表中```pie```类型的图表没有时间轴，因此在更新数据时需要直接更新图表配置。例如，在上述范例的代码中，更新数据后调用```c.update(chartCfg)```即可刷新图表，如下所示：
+
+```javascript
+// update pie
+chartCfg.series[chartCfg.series.length-1].data = [
+    ["A", Math.random()*100],
+    ["B", Math.random()*100],
+];
+c.update(chartCfg)
+```
+
+```python
+# update pie
+chartCfg["series"][len(chartCfg["series"]) - 1]["data"] = [
+    ["A", random.random() * 100],
+    ["B", random.random() * 100]
+]
+c.update(chartCfg)
+```
+
+```rust
+// update pie
+// Rust 中图表配置为 JSON 字符串，重建包含新数据的配置后调用 update 更新图表
+let pie = format!(r#"[["A", {}], ["B", {}]]"#, (UnixNano() % 100) as f64, (UnixNano() % 100) as f64);
+c.update(&chart_cfg_tpl.replace("__PIE_DATA__", &pie));
+```
+
+```Chart()```函数返回一个图表对象，该对象包含4个方法：```add()```、```reset()```、```update()```、```del()```。
+- 1、```update()```方法：
+  ```update()```方法用于更新图表的配置信息，其参数为Chart图表配置对象（JSON）。
+- 2、```del()```方法：
+  ```del()```方法根据传入的series参数，删除指定索引的数据系列。
+- 3、```add()```方法：
+  ```add()```方法用于向图表中写入数据，参数依次为：
+  - ```series```：用于设置数据系列的索引，为整数。
+  - ```data```：用于设置写入的具体数据，为一个数组。
+  - ```index```（可选）：用于设置数据索引，为整数，指定要修改数据的具体索引位置，支持使用负数表示，设置为```-1```表示数据集的最后一个数据。
+    例如画线时，修改线上最后一个点的数据：```chart.add(0, [1574993606000, 13.5], -1)```，即更改图表```series[0].data```中倒数第一个点的数据。不设置```index```参数时，表示向当前数据系列（series）末尾添加数据。
+- 4、```reset()```方法：
+  ```reset()```方法用于清空图表数据，可带一个参数```remain```，用于指定保留数据的条数。不传入参数```remain```时，表示清除全部数据。
+
+See also: `KLineChart`
+
+#### KLineChart
+
+```
+KLineChart(options)
+```
+
+该函数用于采用类似```Pine```语言的绘图方式，在策略运行时进行自定义绘图。
+
+Parameters:
+
+- `options` (object / object数组, required): ```options```参数为图表配置对象，支持以下属性：
+
+- ```overlay```：布尔值，用于设置绘图内容是否叠加输出到主图。设置为```true```时在主图显示，设置为```false```时在副图显示。
+
+- ```pricePrecision```：数字，价格数据精度，用于控制图表中价格数据的小数位数。例如，设置为2表示保留2位小数，设置为0表示不保留小数（四舍五入为整数）。
+
+- ```volumePrecision```：数字，成交量数据精度，用于控制图表中成交量数据的小数位数。例如，设置为2表示保留2位小数，设置为0表示不保留小数（四舍五入为整数）。
+
+Returns (object): 图表对象。
+
+```KLineChart()```函数返回的图表对象包含多个方法，其中需要特别注意```begin(bar)```和```close(bar)```。在遍历K线数据执行绘图操作时，绘图操作必须以```begin(bar)```函数调用作为起始，并以```close(bar)```函数调用作为结束。
+
+如果需要在策略自定义画图区域进行画图，必须先创建图表控制对象，使用```KLineChart()```函数即可创建该对象。```KLineChart()```函数的参数为一个图表配置结构，参考代码中使用的图表配置结构非常简单：```{overlay: true}```。
+
+该图表配置结构仅设置将画图内容输出在图表主图上。如果```overlay```设置为假值（例如```false```），则图表内容将全部输出在副图上；如果需要指定某个画图函数在主图上绘制，也可以在具体的函数调用中将参数```overlay```指定为真值（例如```true```）。
+
+```javascript
+function main() {
+    // 调用KLineChart函数创建图表控制对象c
+    let c = KLineChart({
+        overlay: true
+    })
+
+    // 使用现货交易所对象测试，获取K线数据。如果使用期货交易所对象测试，需要先设置合约
+    let bars = exchange.GetRecords()
+    if (!bars) {
+        return
+    }
+
+    // 遍历K线数据执行画图操作，每次画图操作必须以```c.begin(bar)```函数调用作为起始，以```c.close(bar)```函数调用作为结束。
+    bars.forEach(function(bar, index) {
+        c.begin(bar)
+        c.barcolor(bar.Close > bar.Open ? 'rgba(255, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.2)')
+        if (bar.Close > bar.Open) {
+            c.bgcolor('rgba(0, 255, 0, 0.5)')
+        }
+        let h = c.plot(bar.High, 'high')
+        let l = c.plot(bar.Low, 'low')
+
+        c.fill(h, l, {
+            color: bar.Close > bar.Open ? 'rgba(255, 0, 0, 0.2)' : 'rgba(255, 0, 0, 0.2)'
+        })
+        c.hline(bar.High)
+        c.plotarrow(bar.Close - bar.Open)
+        c.plotshape(bar.Low, {
+            style: 'diamond'
+        })
+        c.plotchar(bar.Close, {
+            char: 'X'
+        })
+        c.plotcandle(bar.Open*0.9, bar.High*0.9, bar.Low*0.9, bar.Close*0.9)
+        if (bar.Close > bar.Open) {
+            // long/short/closelong/closeshort
+            c.signal("long", bar.High, 1.5)
+        } else if (bar.Close < bar.Open) {
+            c.signal("closelong", bar.Low, 1.5)
+        }
+        c.close(bar)
+    })
+}
+```
+
+```python
+def main():
+    # 调用KLineChart函数创建图表控制对象c
+    c = KLineChart({
+        "overlay": True
+    })
+
+    # 使用现货交易所对象测试，获取K线数据。如果使用期货交易所对象测试，需要先设置合约
+    bars = exchange.GetRecords()
+    if not bars:
+        return
+
+    for bar in bars:
+        c.begin(bar)
+        c.barcolor('rgba(255, 0, 0, 0.2)' if bar.Close > bar.Open else 'rgba(0, 0, 0, 0.2)')
+        if bar.Close > bar.Open:
+            c.bgcolor('rgba(0, 255, 0, 0.5)')
+
+        h = c.plot(bar.High, 'high')
+        l = c.plot(bar.Low, 'low')
+
+        c.fill(h, l, 'rgba(255, 0, 0, 0.2)' if bar.Close > bar.Open else 'rgba(255, 0, 0, 0.2)')
+        c.hline(bar.High)
+        c.plotarrow(bar.Close - bar.Open)
+        c.plotshape(bar.Low, style = 'diamond')
+        c.plotchar(bar.Close, char = 'X')
+        c.plotcandle(bar.Open*0.9, bar.High*0.9, bar.Low*0.9, bar.Close*0.9)
+        if bar.Close > bar.Open:
+            # long/short/closelong/closeshort
+            c.signal("long", bar.High, 1.5)
+        elif bar.Close < bar.Open:
+            c.signal("closelong", bar.Low, 1.5)
+
+        c.close(bar)
+```
+
+```rust
+fn main() {
+    // 调用KLineChart::new创建图表控制对象c
+    let mut c = KLineChart::new(r#"{"overlay": true}"#);
+
+    // 使用现货交易所对象测试，获取K线数据。如果使用期货交易所对象测试，需要先设置合约
+    let bars = exchange.GetRecords(None, None, None).unwrap();
+
+    // 遍历K线数据执行画图操作，每次画图操作必须以c.begin(bar)函数调用作为起始，以c.close()函数调用作为结束。
+    for bar in &bars {
+        c.begin(bar);
+        c.barcolor(if bar.Close > bar.Open { "rgba(255, 0, 0, 0.2)" } else { "rgba(0, 0, 0, 0.2)" }, "{}");
+        if bar.Close > bar.Open {
+            c.bgcolor("rgba(0, 255, 0, 0.5)", "{}");
+        }
+        let h = c.plot(bar.High, r#"{"title": "high"}"#);
+        let l = c.plot(bar.Low, r#"{"title": "low"}"#);
+
+        c.fill(h, l, if bar.Close > bar.Open { r#"{"color": "rgba(255, 0, 0, 0.2)"}"# } else { r#"{"color": "rgba(255, 0, 0, 0.2)"}"# });
+        c.hline(bar.High, "{}");
+        c.plotarrow(bar.Close - bar.Open, "{}");
+        c.plotshape(bar.Low > 0.0, r#"{"style": "diamond"}"#);
+        c.plotchar(bar.Close > 0.0, r#"{"char": "X"}"#);
+        c.plotcandle(bar.Open * 0.9, bar.High * 0.9, bar.Low * 0.9, bar.Close * 0.9, "{}");
+        if bar.Close > bar.Open {
+            // long/short/closelong/closeshort
+            c.signal("long", bar.High, 1.5, "long");
+        } else if bar.Close < bar.Open {
+            c.signal("closelong", bar.Low, 1.5, "closelong");
+        }
+        c.close();
+    }
+}
+```
+
+使用 ```pricePrecision``` 和 ```volumePrecision``` 参数控制图表数据的显示精度。可根据实际需求设置价格与成交量的显示精度，例如对于价格波动较大的品种，可将精度设置为 0 以显示整数；对于价格较为精细的品种，可设置为 2 或更高精度。
+
+```javascript
+function main() {
+    // 创建图表控制对象，将价格精度与成交量精度均设置为 0（即显示整数）
+    let c = KLineChart({
+        overlay: true,
+        pricePrecision: 0,   // 价格数据精度，设置为 2 即保留 2 位小数
+        volumePrecision: 0   // 成交量数据精度
+    })
+
+    // 根据交易所类型选择合适的交易对
+    let symbol = exchange.GetName().includes("Futures_") ? "ETH_USDT.swap" : "ETH_USDT"
+    Log("Test symbol:", symbol)
+
+    // 获取 K 线数据
+    let bars = exchange.GetRecords(symbol)
+    if (!bars) {
+        return
+    }
+
+    // 遍历 K 线数据并绘制图表
+    bars.forEach(function(bar, index) {
+        c.begin(bar)
+        c.barcolor(bar.Close > bar.Open ? 'rgba(255, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.2)')
+        c.plot(bar.High, 'high')
+        c.plot(bar.Low, 'low')
+        c.close(bar)
+    })
+}
+```
+
+```python
+def main():
+    # 创建图表控制对象，将价格精度与成交量精度均设置为 0（即显示整数）
+    c = KLineChart({
+        "overlay": True,
+        "pricePrecision": 0,   # 价格数据精度，设置为 2 即保留 2 位小数
+        "volumePrecision": 0   # 成交量数据精度
+    })
+
+    # 根据交易所类型选择合适的交易对
+    exName = exchange.GetName()
+    symbol = "ETH_USDT.swap" if "Futures_" in exName else "ETH_USDT"
+    Log("Test symbol:", symbol)
+
+    # 获取 K 线数据
+    bars = exchange.GetRecords(symbol)
+    if not bars:
+        return
+
+    # 遍历 K 线数据并绘制图表
+    for bar in bars:
+        c.begin(bar)
+        c.barcolor('rgba(255, 0, 0, 0.2)' if bar.Close > bar.Open else 'rgba(0, 0, 0, 0.2)')
+        c.plot(bar.High, 'high')
+        c.plot(bar.Low, 'low')
+        c.close(bar)
+```
+
+```rust
+fn main() {
+    // 创建图表控制对象，将价格精度与成交量精度均设置为 0（即显示整数）
+    // pricePrecision 为价格数据精度，设置为 2 即保留 2 位小数；volumePrecision 为成交量数据精度
+    let mut c = KLineChart::new(r#"{"overlay": true, "pricePrecision": 0, "volumePrecision": 0}"#);
+
+    // 根据交易所类型选择合适的交易对
+    let symbol = if exchange.GetName().contains("Futures_") { "ETH_USDT.swap" } else { "ETH_USDT" };
+    Log!("Test symbol:", symbol);
+
+    // 获取 K 线数据
+    let bars = exchange.GetRecords(symbol, None, None).unwrap();
+
+    // 遍历 K 线数据并绘制图表
+    for bar in &bars {
+        c.begin(bar);
+        c.barcolor(if bar.Close > bar.Open { "rgba(255, 0, 0, 0.2)" } else { "rgba(0, 0, 0, 0.2)" }, "{}");
+        c.plot(bar.High, r#"{"title": "high"}"#);
+        c.plot(bar.Low, r#"{"title": "low"}"#);
+        c.close();
+    }
+}
+```
+
+绘图操作中支持的```Pine```语言绘图接口函数如下：
+
+```barcolor```：设置K线颜色。
+
+> barcolor(color, offset, editable, show_last, title, display)
+
+> display参数的可选值为："none", "all"
+
+```javascript
+c.barcolor(bar.Close > bar.Open ? 'rgba(255, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.2)')   // 用法同上例中的参考代码，此处不再赘述
+```
+
+```python
+c.barcolor('rgba(255, 0, 0, 0.2)' if bar.Close > bar.Open else 'rgba(0, 0, 0, 0.2)')
+```
+
+```rust
+c.barcolor(if bar.Close > bar.Open { "rgba(255, 0, 0, 0.2)" } else { "rgba(0, 0, 0, 0.2)" }, "{}");   // 用法同上例中的参考代码，此处不再赘述
+```
+
+```bgcolor```：使用指定颜色填充K线背景。
+
+> bgcolor(color, offset, editable, show_last, title, display, overlay)
+
+> display参数的可选值为："none", "all"
+
+```javascript
+c.bgcolor('rgba(0, 255, 0, 0.5)')
+```
+
+```python
+c.bgcolor('rgba(0, 255, 0, 0.5)')
+```
+
+```rust
+c.bgcolor("rgba(0, 255, 0, 0.5)", "{}");
+```
+
+```plot```：在图表上绘制一系列数据。
+
+> plot(series, title, color, linewidth, style, trackprice, histbase, offset, join, editable, show_last, display)
+
+> style参数的可选值为："stepline_diamond", "stepline", "cross", "areabr", "area", "circles", "columns", "histogram", "linebr", "line"
+
+> display参数的可选值为："none", "all"
+
+```javascript
+c.plot(bar.High, 'high')
+
+c.plot(bar.Open < bar.Close ? NaN : bar.Close, "Close", {style: "linebr"})  // 支持绘制不连续的数据线
+```
+
+```python
+h = c.plot(bar.High, 'high')
+
+h = c.plot(None if bar.Open < bar.Close else bar.Close, "Close", style = "linebr")  # 支持绘制不连续的数据线
+```
+
+```rust
+let h = c.plot(bar.High, r#"{"title": "high"}"#);
+
+c.plot(if bar.Open < bar.Close { f64::NAN } else { bar.Close }, r#"{"title": "Close", "style": "linebr"}"#);  // 支持绘制不连续的数据线
+```
+
+```fill```，使用指定的颜色填充两个绘图或```hline```之间的背景区域。 > fill(hline1, hline2, color, title, editable, fillgaps, display) > display参数可选："none", "all"
+
+由于```JavaScript```语言无法根据函数形参名称指定传入参数，为解决此问题，可以使用```{key: value}```结构为指定的形参名称传入参数。例如，参考代码中使用```{color: bar.Close > bar.Open ? 'rgba(255, 0, 0, 0.2)' : 'rgba(255, 0, 0, 0.2)'}```为```fill```函数的```color```参数赋值。
+
+如需连续为多个形参名称指定参数，可以使用```{key1: value1, key2: value2, key3: value3}```。
+
+例如，本示例中额外指定了一个```title```参数：```{color: bar.Close > bar.Open ? 'rgba(255, 0, 0, 0.2)' : 'rgba(255, 0, 0, 0.2)', title: 'fill'}```。
+
+颜色值既可以使用```'rgba(255, 0, 0, 0.2)'```方式设置，也可以使用```'#FF0000'```方式设置。
+
+```javascript
+let h = c.plot(bar.High, 'high')
+let l = c.plot(bar.Low, 'low')
+c.fill(h, l, {color: bar.Close > bar.Open ? 'rgba(255, 0, 0, 0.2)' : 'rgba(255, 0, 0, 0.2)'})
+```
+
+```python
+h = c.plot(bar.High, 'high')
+l = c.plot(bar.Low, 'low')
+c.fill(h, l, color = 'rgba(255, 0, 0, 0.2)' if bar.Close > bar.Open else 'rgba(255, 0, 0, 0.2)')
+```
+
+```rust
+let h = c.plot(bar.High, r#"{"title": "high"}"#);
+let l = c.plot(bar.Low, r#"{"title": "low"}"#);
+c.fill(h, l, if bar.Close > bar.Open { r#"{"color": "rgba(255, 0, 0, 0.2)"}"# } else { r#"{"color": "rgba(255, 0, 0, 0.2)"}"# });
+```
+
+```hline```，在给定的固定价格水平上绘制水平线。
+
+> hline(price, title, color, linestyle, linewidth, editable, display)
+
+> linestyle参数可选："dashed", "dotted", "solid"
+
+> display参数可选："none", "all"
+
+```javascript
+c.hline(bar.High)
+```
+
+```python
+c.hline(bar.High)
+```
+
+```rust
+c.hline(bar.High, "{}");
+```
+
+```plotarrow```，在图表上绘制向上和向下的箭头。
+
+> plotarrow(series, title, colorup, colordown, offset, minheight, maxheight, editable, show_last, display)
+
+> display参数可选："none", "all"
+
+```javascript
+c.plotarrow(bar.Close - bar.Open)
+```
+
+```python
+c.plotarrow(bar.Close - bar.Open)
+```
+
+```rust
+c.plotarrow(bar.Close - bar.Open, "{}");
+```
+
+```plotshape```，在图表上绘制可视化形状。
+> plotshape(series, title, style, location, color, offset, text, textcolor, editable, size, show_last, display)
+> style参数可选："diamond", "square", "label_down", "label_up", "arrow_down", "arrow_up", "circle", "flag", "triangle_down", "triangle_up", "cross", "xcross"
+> location参数可选："abovebar", "belowbar", "top", "bottom", "absolute"
+> size参数可选："10px", "14px", "20px", "40px", "80px"，分别对应Pine语言中的size.tiny、size.small、size.normal、size.large、size.huge
+> size.auto等同于size.small。
+> display参数可选："none", "all"
+
+```javascript
+c.plotshape(bar.Low, {style: 'diamond'})
+```
+
+```python
+c.plotshape(bar.Low, style = 'diamond')
+```
+
+```rust
+c.plotshape(bar.Low > 0.0, r#"{"style": "diamond"}"#);
+```
+
+```plotchar```，在图表上使用任意给定的Unicode字符绘制可视化形状。
+> plotchar(series, title, char, location, color, offset, text, textcolor, editable, size, show_last, display)
+> location参数可选："abovebar", "belowbar", "top", "bottom", "absolute"
+> size参数可选："10px", "14px", "20px", "40px", "80px"，分别对应Pine语言中的size.tiny、size.small、size.normal、size.large、size.huge
+> size.auto等同于size.small。
+> display参数可选："none", "all"
+
+```javascript
+c.plotchar(bar.Close, {char: 'X'})
+```
+
+```python
+c.plotchar(bar.Close, char = 'X')
+```
+
+```rust
+c.plotchar(bar.Close > 0.0, r#"{"char": "X"}"#);
+```
+
+```plotcandle```，在图表上绘制K线图。
+> plotcandle(open, high, low, close, title, color, wickcolor, editable, show_last, bordercolor, display)
+> display参数可选："none", "all"
+
+```javascript
+c.plotcandle(bar.Open*0.9, bar.High*0.9, bar.Low*0.9, bar.Close*0.9)
+```
+
+```python
+c.plotcandle(bar.Open*0.9, bar.High*0.9, bar.Low*0.9, bar.Close*0.9)
+```
+
+```rust
+c.plotcandle(bar.Open * 0.9, bar.High * 0.9, bar.Low * 0.9, bar.Close * 0.9, "{}");
+```
+
+```signal```，此为Pine语言中不存在的函数，此处用于绘制买卖信号。
+> signal(direction, price, qty, id)
+
+传入的参数"long"表示交易方向，可选"long"、"closelong"、"short"、"closeshort"。传入的参数```bar.High```表示标记信号在Y轴上的位置。
+传入的参数1.5表示信号的交易数量。可传入第四个参数以替换默认绘制的文本内容；信号标记的默认文本为交易方向，例如："closelong"。
+
+```javascript
+c.signal("long", bar.High, 1.5)
+```
+
+```python
+c.signal("long", bar.High, 1.5)
+```
+
+```rust
+c.signal("long", bar.High, 1.5, "long");
+```
+
+```reset```，此为Pine语言中不存在的函数，用于清空图表数据。
+> reset(remain)
+
+```reset()```方法可接受一个参数```remain```，用于指定保留数据的条数。若不传入```remain```参数，则表示清除全部数据。
+
+```javascript
+c.reset()
+```
+
+```python
+c.reset()
+```
+
+```rust
+c.reset(0);
+```
+
+策略自定义绘图只能选用```KLineChart()```函数或```Chart()```函数两种方式中的一种。有关```KLineChart()```函数调用时所涉及的颜色、样式等设置，请参阅[使用KLineChart函数绘图的专题文章](https://www.fmz.com/bbs-topic/9482)。
+
+```pricePrecision```和```volumePrecision```参数用于控制图表中数据的显示精度。当未设置这些参数时，图表将使用默认精度显示数据。设置精度参数后，图表中的价格和成交量数据将按照指定的小数位数进行四舍五入显示，这有助于简化图表显示、提升可读性。
+
+See also: `Chart`
+
+#### console.log
+
+```
+console.log(...msgs)
+```
+
+用于在实盘页面的「调试信息」栏中输出调试信息。例如，实盘ID为```123456```时，```console.log```函数在实盘页面输出调试信息的同时，会在实盘所属托管者目录```/logs/storage/123456/```下创建一个扩展名为```.log```的日志文件并写入调试信息，文件名前缀为```stdout_```。
+
+Parameters:
+
+- `msg` (string / number / bool / object / array / any (平台支持的任意类型), optional): 参数```msg```为输出的内容，可以传递多个参数。
+
+```javascript
+function main() {
+    console.log("test console.log")
+}
+```
+
+```python
+# 不支持
+```
+
+注意事项：
+- 仅```JavaScript```语言支持此函数。
+- 仅实盘环境支持此函数，「调试工具」和「回测系统」均不支持。
+- 输出对象时会被转换为字符串```[object Object]```，因此建议输出可读的信息。
+
+See also: `console.error`
+
+#### console.error
+
+```
+console.error(...msgs)
+```
+
+用于在实盘页面的「调试信息」栏中输出错误信息。例如，实盘ID为```123456```时，```console.error```函数在实盘页面输出错误信息的同时，会在实盘所属托管者目录```/logs/storage/123456/```下创建一个以```stderr_```为前缀、```.log```为扩展名的日志文件，并将错误信息写入该文件。
+
+Parameters:
+
+- `msg` (string / number / bool / object / array / any (平台支持的任意类型), optional): 参数```msg```为需要输出的内容，可以传入多个参数。
+
+```javascript
+function main() {
+    console.error("test console.error")
+}
+```
+
+```python
+# 不支持
+```
+
+注意事项：
+- 仅```JavaScript```语言支持此函数。
+- 仅实盘环境支持此函数，「调试工具」和「回测系统」不支持。
+- 输出对象时会被转换为字符串```[object Object]```，建议输出可读性强的信息。
+
+See also: `console.log`
+
+#### exchange.Log
+
+```
+exchange.Log(orderType, price, amount)
+exchange.Log(orderType, price, amount, ...args)
+```
+
+```exchange.Log()```函数用于在日志栏区域输出下单、撤单日志。该函数被调用时不会实际下单，仅用于输出并记录交易日志。
+
+Parameters:
+
+- `orderType` (number, required): ```orderType```参数用于设置输出的日志类型，可选值为`LOG_TYPE_BUY`、`LOG_TYPE_SELL`、`LOG_TYPE_CANCEL`。
+- `price` (number, required): ```price```参数用于设置日志中显示的价格。
+- `amount` (number, required): ```amount```参数用于设置日志中显示的下单量。
+- `arg` (string / number / bool / object / array / any (平台支持的任意类型), optional): 扩展参数，用于向该条日志中输出附带信息，```arg```参数可以传入多个。
+
+使用```exchange.Log(orderType, price, amount)```可以进行实盘跟单测试、模拟下单，也可以辅助记录下单信息。
+
+    最常见的使用场景为：通过`exchange.IO`函数访问交易所的创建条件订单接口，但调用```exchange.IO()```函数并不会在实盘日志中输出交易日志信息。
+
+    此时即可使用```exchange.Log()```函数补充输出日志，以便记录下单信息，撤单操作亦是如此。
+
+```javascript
+var id = 123
+function main() {
+    // 下单类型买入，价格999，数量 0.1
+    exchange.Log(LOG_TYPE_BUY, 999, 0.1)
+    // 取消订单
+    exchange.Log(LOG_TYPE_CANCEL, id)
+}
+```
+
+```python
+id = 123
+def main():
+    exchange.Log(LOG_TYPE_BUY, 999, 0.1)
+    exchange.Log(LOG_TYPE_CANCEL, id)
+```
+
+```rust
+fn main() {
+    let id = 123;
+    // 下单类型买入，价格999，数量 0.1
+    exchange.Log(LOG_TYPE_BUY, 999, 0.1);
+    // 取消订单，orderType为LOG_TYPE_CANCEL时price参数为撤单的订单Id（Rust中amount参数必传，可传0）
+    exchange.Log(LOG_TYPE_CANCEL, id, 0);
+}
+```
+
+当```orderType```参数为```LOG_TYPE_CANCEL```时，```price```参数表示撤单的订单Id，用于在直接调用```exchange.IO()```函数撤单时打印撤单日志。
+
+  ```exchange.Log()```函数是`exchange`交易所对象的成员函数，区别于全局函数`Log`。
+
+See also: `Log`, `exchange`, `LOG_TYPE_BUY`, `LOG_TYPE_SELL`, `LOG_TYPE_CANCEL`
+
+### Market
+
+#### exchange.GetTicker
+
+```
+exchange.GetTicker()
+exchange.GetTicker(symbol)
+```
+
+获取当前设置的交易对、合约代码所对应现货或合约的`Ticker`结构，即行情数据。```GetTicker()```函数是交易所对象`exchange`的成员函数，```exchange```对象的成员函数（方法）的用途仅与```exchange```相关，后续文档中不再赘述。
+
+Parameters:
+
+- `symbol` (string, optional): 参数```symbol```用于指定所请求的`Ticker`数据对应的具体交易对、合约代码。若不传该参数，则默认请求当前设置的交易对、合约代码的行情数据。
+
+当调用```exchange.GetTicker(symbol)```函数且```exchange```为现货交易所对象时，若需请求计价币种为USDT、交易币种为BTC的行情数据，则参数```symbol```为：```"BTC_USDT"```，其格式为FMZ平台定义的交易对格式。
+
+当调用```exchange.GetTicker(symbol)```函数且```exchange```为期货交易所对象时，若需请求BTC的U本位永续合约的行情数据，则参数```symbol```为：```"BTC_USDT.swap"```，其格式为FMZ平台定义的**交易对**与**合约代码**的组合，两者之间以字符"."分隔。
+
+当调用```exchange.GetTicker(symbol)```函数且```exchange```为期货交易所对象时，若需请求BTC的U本位期权合约的行情数据，则参数```symbol```为：```"BTC_USDT.BTC-240108-40000-C"```（以币安期权BTC-240108-40000-C为例），其格式为FMZ平台定义的**交易对**与交易所定义的具体期权合约代码的组合，两者之间以字符"."分隔。
+
+Returns (`Ticker` / 空值): ```exchange.GetTicker()```函数请求数据成功时返回`Ticker`结构，请求数据失败时返回空值。
+
+对于期货交易所对象（即```exchange```或```exchanges[0]```），在调用行情函数前需要先使用```exchange.SetContractType()```函数设置合约代码，后续文档中不再赘述。
+
+```javascript
+function main(){
+    // 如果是期货交易所对象，先设置合约代码，例如设置为永续合约
+    // exchange.SetContractType("swap")
+
+    var ticker = exchange.GetTicker()
+    /*
+        可能由于网络原因，访问不到交易所接口（即使托管者程序所在设备能打开交易所网站，但是API接口也可能访问不通）
+        此时ticker为null，当访问ticker.High时，会导致错误，所以在测试该代码时，确保可以访问到交易所接口
+    */
+    Log("Symbol:", ticker.Symbol, "High:", ticker.High, "Low:", ticker.Low, "Sell:", ticker.Sell, "Buy:", ticker.Buy, "Last:", ticker.Last, "Open:", ticker.Open, "Volume:", ticker.Volume)
+}
+```
+
+```python
+def main():
+    ticker = exchange.GetTicker()
+    Log("Symbol:", ticker["Symbol"], "High:", ticker["High"], "Low:", ticker["Low"], "Sell:", ticker["Sell"], "Buy:", ticker["Buy"], "Last:", ticker["Last"], "Open:", ticker["Open"], "Volume:", ticker["Volume"])
+```
+
+```rust
+fn main() {
+    // 如果是期货交易所对象，先设置合约代码，例如设置为永续合约
+    // exchange.SetContractType("swap").unwrap();
+
+    let ticker = exchange.GetTicker(None).unwrap();
+    Log!("Symbol:", ticker.Symbol, "High:", ticker.High, "Low:", ticker.Low, "Sell:", ticker.Sell, "Buy:", ticker.Buy, "Last:", ticker.Last, "Open:", ticker.Open, "Volume:", ticker.Volume);
+}
+```
+
+使用```symbol```参数请求具体品种（现货品种）的行情数据。
+
+```javascript
+function main() {
+    var ticker = exchange.GetTicker("BTC_USDT")
+    Log(ticker)
+}
+```
+
+```python
+def main():
+    ticker = exchange.GetTicker("BTC_USDT")
+    Log(ticker)
+```
+
+```rust
+fn main() {
+    let ticker = exchange.GetTicker("BTC_USDT").unwrap();
+    Log!(ticker);
+}
+```
+
+在回测系统中，```exchange.GetTicker()```函数返回的```Ticker```数据中，```High```、```Low```为模拟值，取自当时盘口的卖一价和买一价。
+
+在实盘中，```exchange.GetTicker()```函数返回的```Ticker```数据中，```High```和```Low```的值根据所封装的交易所```Tick```接口返回的数据确定，这些数据包含一定周期内（通常为24小时周期）的最高价和最低价。
+
+不支持```exchange.GetTicker()```函数的交易所：
+
+| 函数名 | 不支持的现货交易所 | 不支持的期货交易所 |
+| - | - | - |
+| GetTicker | -- | Futures_Aevo |
+
+Uniswap交易所（链上兑换）返回的```Buy```、```Sell```为约1000美元规模的实际可成交价（含池子手续费），```Last```为两者的中间价；链上池子没有24小时统计，```High```、```Low```、```Open```为当前价，```Volume```为0。
+
+See also: `exchange.GetDepth`, `exchange.GetTrades`, `exchange.GetRecords`, `exchange.GetTickers`, `exchange.IO`（API限流控制）
+
+#### exchange.GetTickers
+
+```
+exchange.GetTickers()
+```
+
+```exchange.GetTickers()```函数用于获取交易所的聚合行情数据（`Ticker`结构的数组）。当```exchange```为现货交易所对象时，返回所有交易对的 ticker 行情数据；当```exchange```为期货交易所对象时，返回所有合约的 ticker 行情数据。
+
+Returns (`Ticker`数组 / 空值): ```exchange.GetTickers()```函数在请求数据成功时返回`Ticker`结构数组，请求数据失败时返回空值。
+
+调用 ```exchange.GetTickers()``` 函数，获取聚合行情数据。
+
+```javascript
+function main() {
+    var tickers = exchange.GetTickers()
+    if (tickers && tickers.length > 0) {
+        Log("Number of tradable symbols:", tickers.length)
+    }
+}
+```
+
+```python
+def main():
+    tickers = exchange.GetTickers()
+    if tickers and len(tickers) > 0:
+        Log("Number of tradable symbols:", len(tickers))
+```
+
+```rust
+fn main() {
+    if let Ok(tickers) = exchange.GetTickers() {
+        if tickers.len() > 0 {
+            Log!("Number of tradable symbols:", tickers.len());
+        }
+    }
+}
+```
+
+使用现货交易所对象，在回测系统中调用```exchange.GetTickers()```函数。在调用任何行情函数之前，GetTickers仅返回当前默认交易对的ticker数据；在调用行情函数之后，则会返回所有已请求过的交易对的ticker数据。可参考以下测试示例：
+
+```javascript
+/*backtest
+start: 2024-05-21 00:00:00
+end: 2024-09-05 00:00:00
+period: 5m
+basePeriod: 1m
+exchanges: [{"eid":"Binance","currency":"BTC_USDT"}]
+*/
+
+function main() {
+    var arrSymbol = ["ADA_USDT", "LTC_USDT", "ETH_USDT", "SOL_USDT"]
+
+    // 请求其它交易对行情数据之前，调用GetTickers
+    var tickers1 = exchange.GetTickers()
+    var tbl1 = {type: "table", title: "tickers1", cols: ["Symbol", "High", "Open", "Low", "Last", "Buy", "Sell", "Time", "Volume"], rows: []}
+    for (var ticker of tickers1) {
+        tbl1.rows.push([ticker.Symbol, ticker.High, ticker.Open, ticker.Low, ticker.Last, ticker.Buy, ticker.Sell, ticker.Time, ticker.Volume])
+    }
+
+    // 请求其它交易对行情数据
+    for (var symbol of arrSymbol) {
+        exchange.GetTicker(symbol)
+    }
+
+    // 再次调用GetTickers
+    var tickers2 = exchange.GetTickers()
+    var tbl2 = {type: "table", title: "tickers2", cols: ["Symbol", "High", "Open", "Low", "Last", "Buy", "Sell", "Time", "Volume"], rows: []}
+    for (var ticker of tickers2) {
+        tbl2.rows.push([ticker.Symbol, ticker.High, ticker.Open, ticker.Low, ticker.Last, ticker.Buy, ticker.Sell, ticker.Time, ticker.Volume])
+    }
+
+    LogStatus("`" + JSON.stringify([tbl1, tbl2]) +  "`")
+}
+```
+
+```python
+'''backtest
+start: 2024-05-21 00:00:00
+end: 2024-09-05 00:00:00
+period: 5m
+basePeriod: 1m
+exchanges: [{"eid":"Binance","currency":"BTC_USDT"}]
+'''
+
+import json
+
+def main():
+    arrSymbol = ["ADA_USDT", "LTC_USDT", "ETH_USDT", "SOL_USDT"]
+
+    tickers1 = exchange.GetTickers()
+    tbl1 = {"type": "table", "title": "tickers1", "cols": ["Symbol", "High", "Open", "Low", "Last", "Buy", "Sell", "Time", "Volume"], "rows": []}
+    for ticker in tickers1:
+        tbl1["rows"].append([ticker["Symbol"], ticker["High"], ticker["Open"], ticker["Low"], ticker["Last"], ticker["Buy"], ticker["Sell"], ticker["Time"], ticker["Volume"]])
+
+    for symbol in arrSymbol:
+        exchange.GetTicker(symbol)
+
+    tickers2 = exchange.GetTickers()
+    tbl2 = {"type": "table", "title": "tickers2", "cols": ["Symbol", "High", "Open", "Low", "Last", "Buy", "Sell", "Time", "Volume"], "rows": []}
+    for ticker in tickers2:
+        tbl2["rows"].append([ticker["Symbol"], ticker["High"], ticker["Open"], ticker["Low"], ticker["Last"], ticker["Buy"], ticker["Sell"], ticker["Time"], ticker["Volume"]])
+
+    LogStatus("`" + json.dumps([tbl1, tbl2]) +  "`")
+```
+
+```rust
+/*backtest
+start: 2024-05-21 00:00:00
+end: 2024-09-05 00:00:00
+period: 5m
+basePeriod: 1m
+exchanges: [{"eid":"Binance","currency":"BTC_USDT"}]
+*/
+
+fn tickerToJson(ticker: &Ticker) -> String {
+    format!(r#"["{}", {}, {}, {}, {}, {}, {}, {}, {}]"#, ticker.Symbol, ticker.High, ticker.Open, ticker.Low, ticker.Last, ticker.Buy, ticker.Sell, ticker.Time, ticker.Volume)
+}
+
+fn main() {
+    let arrSymbol = ["ADA_USDT", "LTC_USDT", "ETH_USDT", "SOL_USDT"];
+
+    // 请求其它交易对行情数据之前，调用GetTickers
+    // Rust SDK 没有JSON序列化，使用format!拼接表格的JSON文本
+    let tickers1 = exchange.GetTickers().unwrap();
+    let rows1 = tickers1.iter().map(tickerToJson).collect::<Vec<String>>().join(",");
+    let tbl1 = format!(r#"{{"type": "table", "title": "tickers1", "cols": ["Symbol", "High", "Open", "Low", "Last", "Buy", "Sell", "Time", "Volume"], "rows": [{}]}}"#, rows1);
+
+    // 请求其它交易对行情数据
+    for symbol in arrSymbol {
+        exchange.GetTicker(symbol);
+    }
+
+    // 再次调用GetTickers
+    let tickers2 = exchange.GetTickers().unwrap();
+    let rows2 = tickers2.iter().map(tickerToJson).collect::<Vec<String>>().join(",");
+    let tbl2 = format!(r#"{{"type": "table", "title": "tickers2", "cols": ["Symbol", "High", "Open", "Low", "Last", "Buy", "Sell", "Time", "Volume"], "rows": [{}]}}"#, rows2);
+
+    LogStatus!(format!("`[{},{}]`", tbl1, tbl2));
+}
+```
+
+注意事项：
+
+- 该函数请求交易所的聚合行情接口，调用前无需设置交易对或合约代码，且仅返回交易所已上线交易品种的行情数据。
+
+- 回测系统支持该函数。
+
+- 未提供聚合行情接口的交易所对象不支持该函数。
+
+- 该函数不支持期权合约。
+
+不支持```exchange.GetTickers()```函数的交易所：
+
+| 函数名 | 不支持的现货交易所 | 不支持的期货交易所 |
+| - | - | - |
+| GetTickers | Zaif / WOO / Gemini / Coincheck / BitFlyer / Bibox / Uniswap | Futures_WOO / Futures_dYdX / Futures_Deribit / Futures_Bibox / Futures_Aevo / Futures_edgeX |
+
+See also: `Ticker`, `exchange.GetTicker`
+
+#### exchange.GetDepth
+
+```
+exchange.GetDepth()
+exchange.GetDepth(symbol)
+```
+
+获取当前设置的交易对、合约代码所对应的现货或合约的`Depth`结构，即订单簿数据。
+
+Parameters:
+
+- `symbol` (string, optional): 参数```symbol```用于指定所请求的`Depth`数据对应的具体交易对或合约代码。若不传该参数，则默认请求当前设置的交易对、合约代码的订单簿数据。
+
+当调用```exchange.GetDepth(symbol)```函数时，若```exchange```为现货交易所对象，且需要请求计价币种为USDT、交易币种为BTC的订单簿数据，则参数```symbol```应为```"BTC_USDT"```，其格式为FMZ平台定义的交易对格式。
+
+当调用```exchange.GetDepth(symbol)```函数时，若```exchange```为期货交易所对象，且需要请求BTC的U本位永续合约的订单簿数据，则参数```symbol```应为```"BTC_USDT.swap"```，其格式为FMZ平台定义的**交易对**与**合约代码**的组合，并以字符"."间隔。
+
+当调用```exchange.GetDepth(symbol)```函数时，若```exchange```为期货交易所对象，且需要请求BTC的U本位期权合约的订单簿数据，则参数```symbol```应为```"BTC_USDT.BTC-240108-40000-C"```（以币安期权BTC-240108-40000-C为例），其格式为FMZ平台定义的**交易对**与交易所定义的具体期权合约代码的组合，并以字符"."间隔。
+
+Returns (`Depth` / 空值): ```exchange.GetDepth()```函数在请求数据成功时返回`Depth`结构，请求数据失败时返回空值。
+
+测试```exchange.GetDepth()```函数：
+
+```javascript
+function main(){
+    var depth = exchange.GetDepth()
+    /*
+        可能由于网络原因，访问不到交易所接口（即使托管者程序所在设备能打开交易所网站，但是API接口也可能访问不通）
+        此时depth为null，当访问depth.Asks[1].Price时，会导致错误，所以在测试该代码时，确保可以访问到交易所接口
+    */
+    var price = depth.Asks[1].Price
+    Log("Second ask price:", price)
+}
+```
+
+```python
+def main():
+    depth = exchange.GetDepth()
+    price = depth["Asks"][1]["Price"]
+    Log("Second ask price:", price)
+```
+
+```rust
+fn main() {
+    let depth = exchange.GetDepth(None).unwrap();
+    let price = depth.Asks[1].Price;
+    Log!("Second ask price:", price);
+}
+```
+
+当配置的```exchange```对象为期货交易所对象时，使用```symbol```参数请求指定品种（期货品种）的订单簿数据。
+
+```javascript
+function main() {
+    // BTC的U本位永续合约
+    var depth = exchange.GetDepth("BTC_USDT.swap")
+    Log(depth)
+}
+```
+
+```python
+def main():
+    depth = exchange.GetDepth("BTC_USDT.swap")
+    Log(depth)
+```
+
+```rust
+fn main() {
+    // BTC的U本位永续合约
+    let depth = exchange.GetDepth("BTC_USDT.swap").unwrap();
+    Log!(depth);
+}
+```
+
+回测系统中，使用**模拟级 Tick**回测时，```exchange.GetDepth()```函数返回数据的各档位均为模拟值。
+
+回测系统中，使用**实盘级 Tick**回测时，```exchange.GetDepth()```函数返回的数据为秒级别的深度快照。
+
+Uniswap交易所（链上兑换）没有订单簿，返回的深度由从约1000美元起逐档递增规模的链上询价推算：每档的```Amount```为该档新增的基础币数量，```Price```为该档的边际成交价。
+
+See also: `exchange.GetTicker`, `exchange.GetTrades`, `exchange.GetRecords`
+
+#### exchange.GetTrades
+
+```
+exchange.GetTrades()
+exchange.GetTrades(symbol)
+```
+
+获取当前设置的交易对、合约代码所对应的现货或合约的`Trade`结构数组，即市场的成交数据。
+
+Parameters:
+
+- `symbol` (string, optional): 参数```symbol```用于指定所请求的`Trade`数组数据对应的具体交易对、合约代码。若不传该参数，则默认请求当前设置的交易对、合约代码的最近成交记录数据。
+
+当调用```exchange.GetTrades(symbol)```函数时，若```exchange```为现货交易所对象，需要请求计价币种为USDT、交易币种为BTC的成交数据，则参数```symbol```为：```"BTC_USDT"```，其格式为FMZ平台定义的交易对格式。
+
+当调用```exchange.GetTrades(symbol)```函数时，若```exchange```为期货交易所对象，需要请求BTC的U本位永续合约的成交数据，则参数```symbol```为：```"BTC_USDT.swap"```，其格式为FMZ平台定义的**交易对**与**合约代码**组合，并以字符"."间隔。
+
+当调用```exchange.GetTrades(symbol)```函数时，若```exchange```为期货交易所对象，需要请求BTC的U本位期权合约的成交数据，则参数```symbol```为：```"BTC_USDT.BTC-240108-40000-C"```（以币安期权BTC-240108-40000-C为例），其格式为FMZ平台定义的**交易对**与交易所定义的具体期权合约代码组合，并以字符"."间隔。
+
+Returns (`Trade`数组 / 空值): ```exchange.GetTrades()```函数在请求数据成功时返回`Trade`结构数组，在请求数据失败时返回空值。
+
+测试```exchange.GetTrades()```函数：
+
+```javascript
+function main(){
+    var trades = exchange.GetTrades()
+    /*
+        可能由于网络原因，访问不到交易所接口（即使托管者程序所在设备能打开交易所网站，但是API接口也可能访问不通）
+        此时trades为null，当访问trades[0].Id时，会导致错误，所以在测试该代码时，确保可以访问到交易所接口
+    */
+    Log("id:", trades[0].Id, "time:", trades[0].Time, "Price:", trades[0].Price, "Amount:", trades[0].Amount, "type:", trades[0].Type)
+}
+```
+
+```python
+def main():
+    trades = exchange.GetTrades()
+    Log("id:", trades[0]["Id"], "time:", trades[0]["Time"], "Price:", trades[0]["Price"], "Amount:", trades[0]["Amount"], "type:", trades[0]["Type"])
+```
+
+```rust
+fn main() {
+    let trades = exchange.GetTrades(None).unwrap();
+    Log!("id:", trades[0].Id, "time:", trades[0].Time, "Price:", trades[0].Price, "Amount:", trades[0].Amount, "type:", trades[0].Type);
+}
+```
+
+当配置的```exchange```对象为期货交易所对象时，使用```symbol```参数请求具体品种（期货品种）的市场成交记录数据。
+
+```javascript
+function main() {
+    // BTC的U本位永续合约
+    var trades = exchange.GetTrades("BTC_USDT.swap")
+    Log(trades)
+}
+```
+
+```python
+def main():
+    trades = exchange.GetTrades("BTC_USDT.swap")
+    Log(trades)
+```
+
+```rust
+fn main() {
+    // BTC的U本位永续合约
+    let trades = exchange.GetTrades("BTC_USDT.swap").unwrap();
+    Log!(trades);
+}
+```
+
+```exchange.GetTrades()```函数用于获取当前交易对、合约所对应市场的成交历史（非自身成交）。部分交易所不支持该函数，且具体返回的成交记录范围因交易所而异，需要根据实际情况处理。返回数据为一个数组，其中每个元素的时间顺序与```exchange.GetRecords()```函数的返回数据顺序一致，即数组的最后一个元素为距离当前时间最近的数据。
+
+在回测系统中，使用**模拟级 Tick**回测时，```exchange.GetTrades()```函数返回空数组。
+
+在回测系统中，使用**实盘级 Tick**回测时，```exchange.GetTrades()```函数返回的数据为订单流快照数据，即`Trade`结构数组。
+
+不支持```exchange.GetTrades()```函数的交易所：
+
+| 函数名 | 不支持的现货交易所 | 不支持的期货交易所 |
+| - | - | - |
+| GetTrades | Hyperliquid | Futures_BitMart / Futures_Bibox / Futures_Hyperliquid / Futures_edgeX |
+
+See also: `exchange.GetTicker`, `exchange.GetDepth`, `exchange.GetRecords`
+
+#### exchange.GetRecords
+
+```
+exchange.GetRecords()
+exchange.GetRecords(symbol)
+exchange.GetRecords(symbol, period)
+exchange.GetRecords(symbol, period, limit)
+exchange.GetRecords(period)
+exchange.GetRecords(period, limit)
+```
+
+获取当前设置的交易对、合约代码所对应的现货或合约的`Record`结构数组，即K线数据。
+
+Parameters:
+
+- `symbol` (string, optional): 参数```symbol```用于指定所请求的`Record`数组数据对应的具体交易对、合约代码。若不传该参数，则默认请求当前设置的交易对、合约代码的K线数据。
+
+当调用```exchange.GetRecords(symbol)```函数时，若```exchange```为现货交易所对象，需要请求计价币种为USDT、交易币种为BTC的K线数据，则参数```symbol```为：```"BTC_USDT"```，其格式为FMZ平台定义的交易对格式。
+
+当调用```exchange.GetRecords(symbol)```函数时，若```exchange```为期货交易所对象，需要请求BTC的U本位永续合约K线数据，则参数```symbol```为：```"BTC_USDT.swap"```，其格式为FMZ平台定义的**交易对**与**合约代码**组合，并以字符"."间隔。
+
+当调用```exchange.GetRecords(symbol)```函数时，若```exchange```为期货交易所对象，需要请求BTC的U本位期权合约K线数据，则参数```symbol```为：```"BTC_USDT.BTC-240108-40000-C"```（以币安期权BTC-240108-40000-C为例），其格式为FMZ平台定义的**交易对**与交易所定义的具体期权合约代码组合，并以字符"."间隔。
+- `period` (number, optional): 参数```period```用于指定所请求K线数据的周期，例如：`PERIOD_M1`、`PERIOD_M5`、`PERIOD_M15`等；参数```period```除了可以传入已定义的标准周期外，还可以传入整数数值，单位为秒。若不传该参数，则默认请求的K线数据周期为当前策略实盘/回测所配置的默认K线周期。
+- `limit` (number, optional): 参数```limit```用于指定所请求K线数据的长度，若不传该参数，则默认请求长度为交易所K线接口单次最大请求的K线柱数量；该参数可能会触发对交易所K线数据的分页查询，分页查询时该函数的调用耗时会相应增加。
+
+Returns (`Record`数组 / 空值): ```exchange.GetRecords()```函数请求数据成功时返回`Record`结构数组，请求数据失败时返回空值。
+
+获取自定义周期的 K 线数据。
+
+```javascript
+function main() {
+    // 打印 K 线周期为 120 秒（2 分钟）的 K 线数据
+    Log(exchange.GetRecords(60 * 2))
+    // 打印 K 线周期为 5 分钟的 K 线数据
+    Log(exchange.GetRecords(PERIOD_M5))
+}
+```
+
+```python
+def main():
+    Log(exchange.GetRecords(60 * 2))
+    Log(exchange.GetRecords(PERIOD_M5))
+```
+
+```rust
+fn main() {
+    // 打印 K 线周期为 120 秒（2 分钟）的 K 线数据
+    Log!(exchange.GetRecords(None, 60 * 2, None));
+    // 打印 K 线周期为 5 分钟的 K 线数据
+    Log!(exchange.GetRecords(None, PERIOD_M5, None));
+}
+```
+
+输出 K 线柱数据：
+
+```javascript
+function main() {
+    var records = exchange.GetRecords(PERIOD_H1)
+    /*
+        可能由于网络原因，无法访问交易所接口（即使托管者程序所在设备能够打开交易所网站，API 接口仍可能无法访问）
+        此时 records 为 null，访问 records[0].Time 时会导致错误。因此在测试该代码时，请确保能够正常访问交易所接口
+    */
+    Log("First K-line data: Time:", records[0].Time, "Open:", records[0].Open, "High:", records[0].High)
+    Log("Second K-line data: Time:", records[1].Time ,"Close:", records[1].Close)
+    Log("Current K-line (latest)", records[records.length-1], "Previous K-line", records[records.length-2])
+}
+```
+
+```python
+def main():
+    records = exchange.GetRecords(PERIOD_H1)
+    Log("First K-line data: Time:", records[0]["Time"], "Open:", records[0]["Open"], "High:", records[0]["High"])
+    Log("Second K-line data: Time:", records[1]["Time"], "Close:", records[1]["Close"])
+    Log("Current K-line (latest)", records[-1], "Previous K-line", records[-2])
+```
+
+```rust
+fn main() {
+    let records = exchange.GetRecords(None, PERIOD_H1, None).unwrap();
+    Log!("First K-line data: Time:", records[0].Time, "Open:", records[0].Open, "High:", records[0].High);
+    Log!("Second K-line data: Time:", records[1].Time, "Close:", records[1].Close);
+    Log!("Current K-line (latest)", records[records.len() - 1], "Previous K-line", records[records.len() - 2]);
+}
+```
+
+当配置的```exchange```对象为期货交易所对象时，可使用```symbol```、```period```、```limit```参数请求指定品种（期货品种）的K线数据。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords("BTC_USDT.swap", 60, 100)
+    Log(records)
+}
+```
+
+```python
+def main():
+    records = exchange.GetRecords("BTC_USDT.swap", 60, 100)
+    Log(records)
+```
+
+```rust
+fn main() {
+    let records = exchange.GetRecords("BTC_USDT.swap", 60, 100).unwrap();
+    Log!(records);
+}
+```
+
+默认K线周期可在回测、实盘页面进行设置。调用```exchange.GetRecords()```函数时，如果指定了参数，则获取该参数所指定周期的K线数据；如果未指定参数，则返回回测、实盘参数中所设置周期的K线数据。
+
+返回值为```Record```结构数组。返回的K线数据会随时间不断累积，累积的K线柱数量上限受```exchange.SetMaxBarLen()```函数设置的影响，未设置时默认上限为5000个K线柱。当K线数据达到累积上限后，每新增一根K线柱的同时会删除时间最早的一根K线柱（类似队列的先进先出）。部分交易所未提供K线接口，此时由托管者实时收集市场成交记录数据（```Trade```结构数组）来合成K线。
+
+如果交易所的K线接口支持分页查询，当调用```exchange.SetMaxBarLen()```函数设置较大的K线长度时，系统会发起多次API请求。
+
+初始调用```exchange.GetRecords()```函数时，所获取的K线柱数量在回测和实盘环境下有所不同：
+
+  - 回测系统会预先获取回测时间范围起始时刻之前一定数量的K线柱（默认为5000个，回测系统的相关设置及数据量会影响最终返回的数量），作为初始K线数据。
+
+  - 实盘时具体获取的K线柱数量取决于交易所K线接口所能提供的最大数据量。
+
+将```period```参数设置为5，即表示请求获取以5秒为周期的K线数据。如果```period```参数不能被60整除（即所代表的周期无法以分钟为单位表示），系统底层会使用```exchange.GetTrades()```的相关接口获取成交记录数据，以合成所需的K线数据；如果```period```参数能被60整除，则最小使用1分钟K线数据（并尽可能使用较大的周期）来合成所需的K线数据。
+
+在回测系统的模拟级别回测中，由于需要设置底层K线周期（模拟级别回测时，系统会根据设置的底层K线周期，使用对应的K线数据生成Tick数据），因此需要注意：策略中获取的K线数据周期不能小于底层K线周期。这是因为在模拟级别回测中，各个周期的K线数据均由底层K线周期对应的K线数据合成而来。
+
+不支持```exchange.GetRecords()```函数的交易所：
+
+  | 函数名 | 不支持的现货交易所 | 不支持的期货交易所 |
+  | - | - | - |
+  | GetRecords | Zaif / Coincheck / BitFlyer / Uniswap | Futures_Aevo |
+
+See also: `exchange.GetTicker`, `exchange.GetDepth`, `exchange.GetTrades`, `exchange.SetMaxBarLen`
+
+#### exchange.GetMarkets
+
+```
+exchange.GetMarkets()
+```
+
+```exchange.GetMarkets()```函数用于获取交易所的市场信息。
+
+Returns (object / 空值): 包含`Market`结构体的字典。
+
+期货交易所对象的调用示例：
+
+```javascript
+function main() {
+    var markets = exchange.GetMarkets()
+    var currency = exchange.GetCurrency()
+
+    // 获取当前合约代码也可以使用exchange.GetContractType()函数
+    var ct = "swap"
+
+    var key = currency + "." + ct
+    Log(key, ":", markets[key])
+}
+```
+
+```python
+def main():
+    markets = exchange.GetMarkets()
+    currency = exchange.GetCurrency()
+    ct = "swap"
+
+    key = currency + "." + ct
+    Log(key, ":", markets[key])
+```
+
+```rust
+fn main() {
+    let markets = exchange.GetMarkets();
+    let currency = exchange.GetCurrency();
+
+    // 获取当前合约代码也可以使用exchange.GetContractType()函数
+    let ct = "swap";
+
+    let key = format!("{}.{}", currency, ct);
+    Log!(key, ":", format!("{:?}", markets.get(&key)));
+}
+```
+
+在回测系统中，使用期货交易所对象调用```exchange.GetMarkets()```函数。在调用任何行情函数之前，GetMarkets仅返回当前默认交易对的market数据；在调用行情函数之后，则会返回所有已请求过品种的market数据。可参考以下测试示例：
+
+```javascript
+/*backtest
+start: 2023-05-10 00:00:00
+end: 2023-05-20 00:00:00
+period: 1m
+basePeriod: 1m
+exchanges: [{"eid":"Futures_Binance","currency":"BTC_USDT"}]
+*/
+
+function main() {
+    var arrSymbol = ["SOL_USDT.swap", "BTC_USDT.quarter", "ETH_USDT.swap", "ETH_USDT.quarter"]
+
+    var tbl1 = {
+        type: "table",
+        title: "markets1",
+        cols: ["key", "Symbol", "BaseAsset", "QuoteAsset", "TickSize", "AmountSize", "PricePrecision", "AmountPrecision", "MinQty", "MaxQty", "MinNotional", "MaxNotional", "CtVal"],
+        rows: []
+    }
+
+    var markets1 = exchange.GetMarkets()
+    for (var key in markets1) {
+        var market = markets1[key]
+        tbl1.rows.push([key, market.Symbol, market.BaseAsset, market.QuoteAsset, market.TickSize, market.AmountSize, market.PricePrecision, market.AmountPrecision, market.MinQty, market.MaxQty, market.MinNotional, market.MaxNotional, market.CtVal])
+    }
+
+    for (var symbol of arrSymbol) {
+        exchange.GetTicker(symbol)
+    }
+
+    var tbl2 = {
+        type: "table",
+        title: "markets2",
+        cols: ["key", "Symbol", "BaseAsset", "QuoteAsset", "TickSize", "AmountSize", "PricePrecision", "AmountPrecision", "MinQty", "MaxQty", "MinNotional", "MaxNotional", "CtVal"],
+        rows: []
+    }
+
+    var markets2 = exchange.GetMarkets()
+    for (var key in markets2) {
+        var market = markets2[key]
+        tbl2.rows.push([key, market.Symbol, market.BaseAsset, market.QuoteAsset, market.TickSize, market.AmountSize, market.PricePrecision, market.AmountPrecision, market.MinQty, market.MaxQty, market.MinNotional, market.MaxNotional, market.CtVal])
+    }
+
+    LogStatus("`" + JSON.stringify([tbl1, tbl2]) + "`")
+}
+```
+
+```python
+'''backtest
+start: 2023-05-10 00:00:00
+end: 2023-05-20 00:00:00
+period: 1m
+basePeriod: 1m
+exchanges: [{"eid":"Futures_Binance","currency":"BTC_USDT"}]
+'''
+
+import json
+
+def main():
+    arrSymbol = ["SOL_USDT.swap", "BTC_USDT.quarter", "ETH_USDT.swap", "ETH_USDT.quarter"]
+
+    tbl1 = {
+        "type": "table",
+        "title": "markets1",
+        "cols": ["key", "Symbol", "BaseAsset", "QuoteAsset", "TickSize", "AmountSize", "PricePrecision", "AmountPrecision", "MinQty", "MaxQty", "MinNotional", "MaxNotional", "CtVal"],
+        "rows": []
+    }
+
+    markets1 = exchange.GetMarkets()
+    for key in markets1:
+        market = markets1[key]
+        tbl1["rows"].append([key, market["Symbol"], market["BaseAsset"], market["QuoteAsset"], market["TickSize"], market["AmountSize"], market["PricePrecision"], market["AmountPrecision"], market["MinQty"], market["MaxQty"], market["MinNotional"], market["MaxNotional"], market["CtVal"]])
+
+    for symbol in arrSymbol:
+        exchange.GetTicker(symbol)
+
+    tbl2 = {
+        "type": "table",
+        "title": "markets2",
+        "cols": ["key", "Symbol", "BaseAsset", "QuoteAsset", "TickSize", "AmountSize", "PricePrecision", "AmountPrecision", "MinQty", "MaxQty", "MinNotional", "MaxNotional", "CtVal"],
+        "rows": []
+    }
+
+    markets2 = exchange.GetMarkets()
+    for key in markets2:
+        market = markets2[key]
+        tbl2["rows"].append([key, market["Symbol"], market["BaseAsset"], market["QuoteAsset"], market["TickSize"], market["AmountSize"], market["PricePrecision"], market["AmountPrecision"], market["MinQty"], market["MaxQty"], market["MinNotional"], market["MaxNotional"], market["CtVal"]])
+
+    LogStatus("`" + json.dumps([tbl1, tbl2]) + "`")
+```
+
+```rust
+/*backtest
+start: 2023-05-10 00:00:00
+end: 2023-05-20 00:00:00
+period: 1m
+basePeriod: 1m
+exchanges: [{"eid":"Futures_Binance","currency":"BTC_USDT"}]
+*/
+
+fn marketToJson(key: &str, market: &Market) -> String {
+    format!(r#"["{}", "{}", "{}", "{}", {}, {}, {}, {}, {}, {}, {}, {}, {}]"#, key, market.Symbol, market.BaseAsset, market.QuoteAsset, market.TickSize, market.AmountSize, market.PricePrecision, market.AmountPrecision, market.MinQty, market.MaxQty, market.MinNotional, market.MaxNotional, market.CtVal)
+}
+
+fn main() {
+    let arrSymbol = ["SOL_USDT.swap", "BTC_USDT.quarter", "ETH_USDT.swap", "ETH_USDT.quarter"];
+
+    // Rust SDK 没有JSON序列化功能，此处使用format!拼接表格的JSON文本
+    let markets1 = exchange.GetMarkets();
+    let mut rows1: Vec<String> = Vec::new();
+    for (key, market) in &markets1 {
+        rows1.push(marketToJson(key, market));
+    }
+    let tbl1 = format!(r#"{{"type": "table", "title": "markets1", "cols": ["key", "Symbol", "BaseAsset", "QuoteAsset", "TickSize", "AmountSize", "PricePrecision", "AmountPrecision", "MinQty", "MaxQty", "MinNotional", "MaxNotional", "CtVal"], "rows": [{}]}}"#, rows1.join(","));
+
+    for symbol in arrSymbol {
+        exchange.GetTicker(symbol);
+    }
+
+    let markets2 = exchange.GetMarkets();
+    let mut rows2: Vec<String> = Vec::new();
+    for (key, market) in &markets2 {
+        rows2.push(marketToJson(key, market));
+    }
+    let tbl2 = format!(r#"{{"type": "table", "title": "markets2", "cols": ["key", "Symbol", "BaseAsset", "QuoteAsset", "TickSize", "AmountSize", "PricePrecision", "AmountPrecision", "MinQty", "MaxQty", "MinNotional", "MaxNotional", "CtVal"], "rows": [{}]}}"#, rows2.join(","));
+
+    LogStatus!(format!("`[{},{}]`", tbl1, tbl2));
+}
+```
+
+```exchange.GetMarkets()```函数的返回值为一个字典。对于现货交易所，键名为交易品种名称，格式固定为交易对，例如：
+```json
+{
+    "BTC_USDT" : {...},  // 键值为Market结构
+    "LTC_USDT" : {...},
+    ...
+}
+```
+
+对于期货合约交易所而言，由于同一品种可能存在多个合约，例如```BTC_USDT```交易对包含永续合约、季度合约等，因此```exchange.GetMarkets()```函数返回的字典中，键名为交易对与合约代码的组合，例如：
+```json
+{
+    "BTC_USDT.swap" : {...},     // 键值为Market结构
+    "BTC_USDT.quarter" : {...},
+    "LTC_USDT.swap" : {...},
+    ...
+}
+```
+
+- ```exchange.GetMarkets()```函数支持实盘与回测系统。
+- ```exchange.GetMarkets()```函数仅返回交易所已上线交易品种的市场信息。
+- 期权合约：Futures_Deribit、Futures_Bybit、Futures_GateIO、Futures_Aevo返回的结果包含期权合约（键名形如```ETH_USDT.ETH-25JUN27-2800-C-USDT```）；其它交易所（如Futures_Binance、Futures_OKX、Futures_Kraken）的结果不包含期权合约。
+
+不支持```exchange.GetMarkets()```函数的交易所：
+| 函数名 | 不支持的现货交易所 | 不支持的期货交易所 |
+| - | - | - |
+| GetMarkets | Coincheck / Bithumb / BitFlyer | -- |
+
+See also: `Market`
+
+#### exchange.GetRawJSON
+
+```
+exchange.GetRawJSON()
+```
+
+获取当前交易所对象（`exchange`、`exchanges`）最近一次```rest```请求返回的原始内容。
+
+Returns (string): ```rest```请求的响应数据。
+
+```javascript
+function main(){
+    exchange.GetAccount();
+    var obj = JSON.parse(exchange.GetRawJSON());
+    Log(obj);
+}
+```
+
+```python
+import json
+def main():
+    exchange.GetAccount()
+    obj = json.loads(exchange.GetRawJSON())
+    Log(obj)
+```
+
+```exchange.GetRawJSON()```函数仅支持实盘交易。
+
+See also: `exchange`
+
+#### exchange.SetData
+
+```
+exchange.SetData(key, value)
+```
+
+```exchange.SetData()```函数用于设置策略运行时所加载的数据。
+
+Parameters:
+
+- `key` (string, required): 数据集合的名称。
+- `value` (array, required): ```exchange.SetData()```函数所要加载的数据，其数据结构为数组。该数据结构与```exchange.GetData()```函数请求外部数据时所要求的格式相同，即：```"schema": ["time", "data"]```。
+
+Returns (number): 参数```value```经JSON编码后的字符串长度。
+
+参数```value```所要求的数据格式如同以下例子中的```data```变量。可以看到，时间戳```1579622400000```对应的时间为```2020-01-22 00:00:00```。当策略程序运行时刻超过该时间之后、且在下一条数据的时间戳```1579708800000```（即时间```2020-01-23 00:00:00```）之前，调用```exchange.GetData()```函数获取到的均为```[1579622400000, 123]```这条数据的内容。随着程序继续运行、时间推移，以此类推即可逐条获取数据。
+
+在以下例子中，运行时（回测或实盘）当前时刻到达或超过```1579795200000```这个时间戳时，调用```exchange.GetData()```函数，返回值为：```{"Time":1579795200000,"Data":["abc",123,{"price":123}]}```。其中```"Time":1579795200000```对应数据```[1579795200000, ["abc", 123, {"price": 123}]]```中的```1579795200000```；```"Data":["abc",123,{"price":123}]```对应数据```[1579795200000, ["abc", 123, {"price": 123}]]```中的```["abc", 123, {"price": 123}]```。
+
+```javascript
+/*backtest
+start: 2020-01-21 00:00:00
+end: 2020-02-12 00:00:00
+period: 1d
+basePeriod: 1d
+exchanges: [{"eid":"Bitfinex","currency":"BTC_USD"}]
+*/
+function main() {
+    var data = [
+        [1579536000000, "abc"],
+        [1579622400000, 123],
+        [1579708800000, {"price": 123}],
+        [1579795200000, ["abc", 123, {"price": 123}]]
+    ]
+    exchange.SetData("test", data)
+    while(true) {
+        Log(exchange.GetData("test"))
+        Sleep(1000)
+    }
+}
+```
+
+```python
+'''backtest
+start: 2020-01-21 00:00:00
+end: 2020-02-12 00:00:00
+period: 1d
+basePeriod: 1d
+exchanges: [{"eid":"Bitfinex","currency":"BTC_USD"}]
+'''
+
+def main():
+    data = [
+        [1579536000000, "abc"],
+        [1579622400000, 123],
+        [1579708800000, {"price": 123}],
+        [1579795200000, ["abc", 123, {"price": 123}]]
+    ]
+    exchange.SetData("test", data)
+    while True:
+        Log(exchange.GetData("test"))
+        Sleep(1000)
+```
+
+```rust
+/*backtest
+start: 2020-01-21 00:00:00
+end: 2020-02-12 00:00:00
+period: 1d
+basePeriod: 1d
+exchanges: [{"eid":"Bitfinex","currency":"BTC_USD"}]
+*/
+
+fn main() {
+    // Rust SDK 中SetData的数据参数为JSON字符串
+    let data = r#"[
+        [1579536000000, "abc"],
+        [1579622400000, 123],
+        [1579708800000, {"price": 123}],
+        [1579795200000, ["abc", 123, {"price": 123}]]
+    ]"#;
+    exchange.SetData("test", data);
+    loop {
+        Log!(exchange.GetData("test"));
+        Sleep(1000);
+    }
+}
+```
+
+加载的数据可以是任何经济指标、行业数据、相关指数等，用于在策略中量化评估各类可量化的信息。
+
+See also: `exchange.GetData`
+
+#### exchange.GetData
+
+```
+exchange.GetData(key)
+exchange.GetData(key, timeout)
+```
+
+```exchange.GetData()```函数用于获取由```exchange.SetData()```函数加载的数据，或外部链接提供的数据。
+
+Parameters:
+
+- `key` (string, required): 数据集合的名称，或数据请求链接。
+- `timeout` (number, optional): 用于设置缓存超时时间，单位为毫秒。实盘时默认缓存超时时间为一分钟。
+
+Returns (object / 空值): 数据集合中的记录，或请求返回的数据。
+
+获取直接写入数据的调用方式。
+
+```javascript
+/*backtest
+start: 2020-01-21 00:00:00
+end: 2020-02-12 00:00:00
+period: 1d
+basePeriod: 1d
+exchanges: [{"eid":"Bitfinex","currency":"BTC_USD"}]
+*/
+function main() {
+    exchange.SetData("test", [[1579536000000, _D(1579536000000)], [1579622400000, _D(1579622400000)], [1579708800000, _D(1579708800000)]])
+    while(true) {
+        Log(exchange.GetData("test"))
+        Sleep(1000 * 60 * 60 * 24)
+    }
+}
+```
+
+```python
+'''backtest
+start: 2020-01-21 00:00:00
+end: 2020-02-12 00:00:00
+period: 1d
+basePeriod: 1d
+exchanges: [{"eid":"Bitfinex","currency":"BTC_USD"}]
+'''
+def main():
+    exchange.SetData("test", [[1579536000000, _D(1579536000000/1000)], [1579622400000, _D(1579622400000/1000)], [1579708800000, _D(1579708800000/1000)]])
+    while True:
+        Log(exchange.GetData("test"))
+        Sleep(1000 * 60 * 60 * 24)
+```
+
+```rust
+/*backtest
+start: 2020-01-21 00:00:00
+end: 2020-02-12 00:00:00
+period: 1d
+basePeriod: 1d
+exchanges: [{"eid":"Bitfinex","currency":"BTC_USD"}]
+*/
+fn main() {
+    // Rust SDK 中SetData的数据参数为JSON字符串，使用format!拼接数据
+    let data = format!(r#"[[1579536000000, "{}"], [1579622400000, "{}"], [1579708800000, "{}"]]"#, _D(1579536000000), _D(1579622400000), _D(1579708800000));
+    exchange.SetData("test", &data);
+    loop {
+        Log!(exchange.GetData("test"));
+        Sleep(1000 * 60 * 60 * 24);
+    }
+}
+```
+
+支持通过外部链接请求数据，请求返回的数据格式如下：
+```json
+{
+    "schema":["time","data"],
+    "data":[
+        [1579536000000, "abc"],
+        [1579622400000, 123],
+        [1579708800000, {"price": 123}],
+        [1579795200000, ["abc", 123, {"price": 123}]]
+    ]
+}
+```
+
+其中```schema```定义了数据主体中每条记录的数据格式，该格式固定为```["time","data"]```，与```data```属性中逐条数据的格式一一对应。```data```属性用于存储数据主体，每条数据由毫秒级时间戳和数据内容构成（数据内容可以是任何可JSON编码的数据）。
+
+以下是使用Go语言编写的测试服务程序：
+```golang
+package main
+
+import (
+    "fmt"
+    "net/http"
+    "encoding/json"
+)
+
+func Handle (w http.ResponseWriter, r *http.Request) {
+    defer func() {
+        fmt.Println("req:", *r)
+        ret := map[string]interface{}{
+            "schema": []string{"time","data"},
+            "data": []interface{}{
+                []interface{}{1579536000000, "abc"},
+                []interface{}{1579622400000, 123},
+                []interface{}{1579708800000, map[string]interface{}{"price":123}},
+                []interface{}{1579795200000, []interface{}{"abc", 123, map[string]interface{}{"price":123}}},
+            },
+        }
+        b, _ := json.Marshal(ret)
+        w.Write(b)
+    }()
+}
+
+func main () {
+    fmt.Println("listen http://localhost:9090")
+    http.HandleFunc("/data", Handle)
+    http.ListenAndServe(":9090", nil)
+}
+```
+
+程序接收到请求后返回的应答数据：
+```json
+{
+    "schema":["time","data"],
+    "data":[
+        [1579536000000, "abc"],
+        [1579622400000, 123],
+        [1579708800000, {"price": 123}],
+        [1579795200000, ["abc", 123, {"price": 123}]]
+    ]
+}
+```
+
+测试策略代码如下：
+
+```javascript
+/*backtest
+start: 2020-01-21 00:00:00
+end: 2020-02-12 00:00:00
+period: 1d
+basePeriod: 1d
+exchanges: [{"eid":"Bitfinex","currency":"BTC_USD"}]
+*/
+function main() {
+    while(true) {
+        Log(exchange.GetData("http://xxx.xx.x.xx:9090/data"))
+        Sleep(1000)
+    }
+}
+```
+
+```python
+'''backtest
+start: 2020-01-21 00:00:00
+end: 2020-02-12 00:00:00
+period: 1d
+basePeriod: 1d
+exchanges: [{"eid":"Bitfinex","currency":"BTC_USD"}]
+'''
+
+def main():
+    while True:
+        Log(exchange.GetData("http://xxx.xx.x.xx:9090/data"))
+        Sleep(1000)
+```
+
+```rust
+/*backtest
+start: 2020-01-21 00:00:00
+end: 2020-02-12 00:00:00
+period: 1d
+basePeriod: 1d
+exchanges: [{"eid":"Bitfinex","currency":"BTC_USD"}]
+*/
+
+fn main() {
+    loop {
+        Log!(exchange.GetData("http://xxx.xx.x.xx:9090/data"));
+        Sleep(1000);
+    }
+}
+```
+
+获取外部链接数据的调用方式。
+
+```javascript
+function main() {
+    Log(exchange.GetData("http://xxx.xx.x.xx:9090/data"))
+    Log(exchange.GetData("https://www.fmz.com/upload/asset/32bf73a69fc12d36e76.json"))
+}
+```
+
+```python
+def main():
+    Log(exchange.GetData("http://xxx.xx.x.xx:9090/data"))
+    Log(exchange.GetData("https://www.fmz.com/upload/asset/32bf73a69fc12d36e76.json"))
+```
+
+```rust
+fn main() {
+    Log!(exchange.GetData("http://xxx.xx.x.xx:9090/data"));
+    Log!(exchange.GetData("https://www.fmz.com/upload/asset/32bf73a69fc12d36e76.json"));
+}
+```
+
+请求在[datadata](https://www.datadata.com)平台上创建的查询数据，应答的数据格式需满足以下要求（schema中必须描述time和data字段）：
+```json
+{
+    "data": [],
+    "schema": ["time", "data"]
+}
+```
+
+其中"data"字段为所需的数据内容，且"data"字段中的数据须与"schema"中约定的字段一致。调用```exchange.GetData()```函数时，将返回一个JSON对象，例如：```{"Time":1579795200000, "Data":"..."}```。
+
+```javascript
+function main() {
+    Log(exchange.GetData("https://www.datadata.com/api/v1/query/xxx/data"))   // 链接中xxx部分为查询数据的编码，此处xxx仅为示例
+}
+```
+
+```python
+def main():
+    Log(exchange.GetData("https://www.datadata.com/api/v1/query/xxx/data"))
+```
+
+```rust
+fn main() {
+    Log!(exchange.GetData("https://www.datadata.com/api/v1/query/xxx/data"));   // 链接中xxx部分为查询数据的编码，此处xxx仅为示例
+}
+```
+
+回测时一次性获取数据，实盘时缓存一分钟的数据。在回测系统中，当使用访问接口请求数据的方式时，回测系统会自动为请求添加```from```(时间戳，单位秒)、```to```(时间戳，单位秒)、```period```(底层K线周期，时间戳，单位毫秒)等参数，用于确定要获取数据的时间范围。
+
+See also: `exchange.SetData`
+
+### Trade
+
+#### exchange.Buy
+
+```
+exchange.Buy(price, amount)
+exchange.Buy(price, amount, ...args)
+```
+
+```exchange.Buy()```函数用于下买单。```Buy()```函数是交易所对象`exchange`的成员函数。```Buy()```函数操作交易所对象```exchange```所绑定的交易所账户。```exchange```对象的成员函数（方法）的用途仅与```exchange```相关，本文档后续不再赘述。
+
+Parameters:
+
+- `price` (number, required): ```price```参数用于设置订单价格。
+- `amount` (number, required): ```amount```参数用于设置订单量。
+- `arg` (string / number / bool / object / array / any (平台支持的任意类型), optional): 扩展参数，用于将附带信息输出到该条下单日志中，```arg```参数可传入多个。
+
+Returns (string / 空值): 下单成功返回订单Id，下单失败返回空值。FMZ平台的订单`Order`结构的属性```Id```由交易所品种代码和交易所原始订单Id组成，以英文逗号分隔。例如OKX交易所现货交易对```ETH_USDT```订单的属性```Id```格式为：```ETH-USDT,1547130415509278720```。调用```exchange.Buy()```函数下单时，返回值订单```Id```与订单`Order`结构的```Id```属性一致。
+
+```exchange.Buy()```返回的订单编号，可用于查询订单信息和取消订单。
+
+```javascript
+function main() {
+    var id = exchange.Buy(100, 1);
+    Log("id:", id);
+}
+```
+
+```python
+def main():
+    id = exchange.Buy(100, 1)
+    Log("id:", id)
+```
+
+```rust
+fn main() {
+    let id = exchange.Buy(100, 1).unwrap();
+    Log!("id:", id);
+}
+```
+
+加密货币期货合约下单时必须注意交易方向是否设置正确，如果交易方向与交易函数不匹配将会报错：
+
+    ```log
+
+    direction is sell, invalid order type Buy
+
+    direction is buy, invalid order type Sell
+
+    direction is closebuy, invalid order type Buy
+
+    direction is closesell, invalid order type Sell
+
+    ```
+
+```javascript
+// 以下为错误调用
+function main() {
+    exchange.SetContractType("quarter")
+
+    // 设置做空方向
+    exchange.SetDirection("sell")
+    // 下买单，会报错，做空只能卖出
+    var id = exchange.Buy(50, 1)
+
+    // 设置做多方向
+    exchange.SetDirection("buy")
+    // 下卖单，会报错，做多只能买入
+    var id2 = exchange.Sell(60, 1)
+
+    // 设置平多方向
+    exchange.SetDirection("closebuy")
+    // 下买单，会报错，平多只能卖出
+    var id3 = exchange.Buy(-1, 1)
+
+    // 设置平空方向
+    exchange.SetDirection("closesell")
+    // 下卖单,会报错,平空只能买入
+    var id4 = exchange.Sell(-1, 1)
+}
+```
+
+```python
+# 以下为错误调用
+def main():
+    exchange.SetContractType("quarter")
+    exchange.SetDirection("sell")
+    id = exchange.Buy(50, 1)
+    exchange.SetDirection("buy")
+    id2 = exchange.Sell(60, 1)
+    exchange.SetDirection("closebuy")
+    id3 = exchange.Buy(-1, 1)
+    exchange.SetDirection("closesell")
+    id4 = exchange.Sell(-1, 1)
+```
+
+```rust
+// 以下为错误调用
+fn main() {
+    let _ = exchange.SetContractType("quarter");
+
+    // 设置做空方向
+    let _ = exchange.SetDirection("sell");
+    // 下买单，会报错，做空只能卖出
+    let id = exchange.Buy(50, 1);
+
+    // 设置做多方向
+    let _ = exchange.SetDirection("buy");
+    // 下卖单，会报错，做多只能买入
+    let id2 = exchange.Sell(60, 1);
+
+    // 设置平多方向
+    let _ = exchange.SetDirection("closebuy");
+    // 下买单，会报错，平多只能卖出
+    let id3 = exchange.Buy(-1, 1);
+
+    // 设置平空方向
+    let _ = exchange.SetDirection("closesell");
+    // 下卖单,会报错,平空只能买入
+    let id4 = exchange.Sell(-1, 1);
+}
+```
+
+现货市价单。
+
+```javascript
+// 例如交易对：ETH_BTC ，市价单买入
+function main() {
+    // 下市价单买入，买入0.1个BTC（计价币）金额的ETH币
+    exchange.Buy(-1, 0.1)
+}
+```
+
+```python
+def main():
+    exchange.Buy(-1, 0.1)
+```
+
+```rust
+// 例如交易对：ETH_BTC ，市价单买入
+fn main() {
+    // 下市价单买入，买入0.1个BTC（计价币）金额的ETH币
+    let _ = exchange.Buy(-1, 0.1);
+}
+```
+
+期货合约下单时必须注意交易方向是否设置正确，如果交易方向与交易函数不匹配将会报错。加密货币期货合约交易所的下单量如无特殊说明，则以合约张数为单位。
+
+参数```price```设置为```-1```时用于下市价单，此功能需要交易所的下单接口支持市价单。以市价单方式对加密货币现货下买单时，下单量参数```amount```为以计价币计价的金额数量。以市价单方式对加密货币期货合约下单时，下单量参数```amount```的单位为合约张数。实盘时，有少数加密货币交易所不支持市价单接口。个别现货交易所市价单买单的下单量为交易币数量，具体请查看「用户指南」中的**交易所特殊说明**。
+
+如使用较旧版本的托管者，```exchange.Buy()```函数返回的订单```Id```可能与当前文档中描述的返回值订单```Id```有所差别。
+
+需要注意，以下三家交易所的下单接口较为特殊。对于现货市价单的买单，其下单量为币数，而非金额。
+
+  - ```AscendEx```
+
+  - ```BitMEX```
+
+  - ```Bitfinex```
+
+See also: `exchange.Sell`, `exchange.SetContractType`, `exchange.SetDirection`, `exchange.IO`（API限流控制，Buy函数受CreateOrder限流设置影响）
+
+#### exchange.Sell
+
+```
+exchange.Sell(price, amount)
+exchange.Sell(price, amount, ...args)
+```
+
+```exchange.Sell()```函数用于下达卖单。
+
+Parameters:
+
+- `price` (number, required): ```price```参数用于设置订单价格。
+- `amount` (number, required): ```amount```参数用于设置下单量。
+- `arg` (string / number / bool / object / array / any (平台支持的任意类型), optional): 扩展参数，用于向这条下单日志中输出附带信息，```arg```参数可以传入多个。
+
+Returns (string / 空值): 下单成功时返回订单Id，下单失败时返回空值。FMZ平台的订单`Order`结构的属性```Id```由交易所品种代码和交易所原始订单Id组成，两者以英文逗号间隔。例如OKX交易所现货交易对```ETH_USDT```订单的属性```Id```格式为：```ETH-USDT,1547130415509278720```。调用```exchange.Sell()```函数下单时，返回值订单```Id```与订单`Order`结构的```Id```属性一致。
+
+```exchange.Sell()```返回的订单编号，可用于查询订单信息和取消订单。
+
+```javascript
+function main(){
+    var id = exchange.Sell(100, 1)
+    Log("id:", id)
+}
+```
+
+```python
+def main():
+    id = exchange.Sell(100, 1)
+    Log("id:", id)
+```
+
+```rust
+fn main() {
+    let id = exchange.Sell(100, 1).unwrap();
+    Log!("id:", id);
+}
+```
+
+加密货币期货合约下单时必须注意交易方向是否设置正确，如果交易方向与交易函数不匹配将会报错：
+
+```log
+direction is sell, invalid order type Buy
+direction is buy, invalid order type Sell
+direction is closebuy, invalid order type Buy
+direction is closesell, invalid order type Sell
+```
+
+```javascript
+// 以下为错误调用
+function main() {
+    exchange.SetContractType("quarter")
+
+    // 设置做空方向
+    exchange.SetDirection("sell")
+    // 下买单，会报错，做空只能卖出
+    var id = exchange.Buy(50, 1)
+
+    // 设置做多方向
+    exchange.SetDirection("buy")
+    // 下卖单，会报错，做多只能买入
+    var id2 = exchange.Sell(60, 1)
+
+    // 设置平多方向
+    exchange.SetDirection("closebuy")
+    // 下买单，会报错，平多只能卖出
+    var id3 = exchange.Buy(-1, 1)
+
+    // 设置平空方向
+    exchange.SetDirection("closesell")
+    // 下卖单,会报错,平空只能买入
+    var id4 = exchange.Sell(-1, 1)
+}
+```
+
+```python
+# 以下为错误调用
+def main():
+    exchange.SetContractType("quarter")
+    exchange.SetDirection("sell")
+    id = exchange.Buy(50, 1)
+    exchange.SetDirection("buy")
+    id2 = exchange.Sell(60, 1)
+    exchange.SetDirection("closebuy")
+    id3 = exchange.Buy(-1, 1)
+    exchange.SetDirection("closesell")
+    id4 = exchange.Sell(-1, 1)
+```
+
+```rust
+// 以下为错误调用
+fn main() {
+    let _ = exchange.SetContractType("quarter");
+
+    // 设置做空方向
+    let _ = exchange.SetDirection("sell");
+    // 下买单，会报错，做空只能卖出
+    let id = exchange.Buy(50, 1);
+
+    // 设置做多方向
+    let _ = exchange.SetDirection("buy");
+    // 下卖单，会报错，做多只能买入
+    let id2 = exchange.Sell(60, 1);
+
+    // 设置平多方向
+    let _ = exchange.SetDirection("closebuy");
+    // 下买单，会报错，平多只能卖出
+    let id3 = exchange.Buy(-1, 1);
+
+    // 设置平空方向
+    let _ = exchange.SetDirection("closesell");
+    // 下卖单,会报错,平空只能买入
+    let id4 = exchange.Sell(-1, 1);
+}
+```
+
+现货市价单。
+
+```javascript
+// 例如交易对：ETH_BTC,市价单卖出
+function main() {
+    // 注意：下市价单卖出，卖出0.2个ETH
+    exchange.Sell(-1, 0.2)
+}
+```
+
+```python
+def main():
+    exchange.Sell(-1, 0.2)
+```
+
+```rust
+// 例如交易对：ETH_BTC,市价单卖出
+fn main() {
+    // 注意：下市价单卖出，卖出0.2个ETH
+    let _ = exchange.Sell(-1, 0.2);
+}
+```
+
+期货合约下单时必须注意交易方向是否设置正确，如果交易方向与交易函数不匹配将会报错。加密货币期货合约交易所的下单量如无特殊说明则以合约张数为单位。
+
+参数```price```设置为```-1```时用于下达市价单，需要交易所的下单接口支持市价单。以市价单方式交易加密货币现货时，下卖单时，下单量参数```amount```以交易币为单位。以市价单方式交易加密货币期货合约时，下单量参数```amount```以合约张数为单位。实盘时，有少数加密货币交易所不支持市价单接口。
+
+如使用较旧版本的托管者，```exchange.Sell()```函数返回的订单```Id```可能与当前文档中描述的返回值订单```Id```有所差别。
+
+See also: `exchange.Buy`, `exchange.SetContractType`, `exchange.SetDirection`, `exchange.IO`（API限流控制，Sell函数受CreateOrder限流设置影响）
+
+#### exchange.CreateOrder
+
+```
+exchange.CreateOrder(symbol, side, price, amount)
+exchange.CreateOrder(symbol, side, price, amount, ...args)
+```
+
+```exchange.CreateOrder()```函数用于下单。
+
+Parameters:
+
+- `symbol` (string, required): 参数```symbol```用于指定订单对应的交易对、合约代码。
+
+当调用```exchange.CreateOrder(symbol, side, price, amount)```函数下单时，若```exchange```为现货交易所对象，且订单的计价币种为USDT、交易币种为BTC，则参数```symbol```为：```"BTC_USDT"```，采用FMZ平台定义的交易对格式。
+
+当调用```exchange.CreateOrder(symbol, side, price, amount)```函数下单时，若```exchange```为期货交易所对象，且订单为BTC的U本位永续合约订单，则参数```symbol```为：```"BTC_USDT.swap"```，采用FMZ平台定义的**交易对**与**合约代码**组合的格式，两者之间以字符"."分隔。
+
+当调用```exchange.CreateOrder(symbol, side, price, amount)```函数下单时，若```exchange```为期货交易所对象，且订单为BTC的U本位期权合约订单，则参数```symbol```为：```"BTC_USDT.BTC-240108-40000-C"```（以币安期权BTC-240108-40000-C为例），采用FMZ平台定义的**交易对**与交易所定义的具体期权合约代码组合的格式，两者之间以字符"."分隔。
+- `side` (string, required): 参数```side```用于指定订单的交易方向。
+
+对于现货交易所对象，```side```参数的可选值为：```buy```、```sell```。其中```buy```表示买入，```sell```表示卖出。
+
+对于期货交易所对象，```side```参数的可选值为：```buy```、```closebuy```、```sell```、```closesell```。其中```buy```表示开多仓，```closebuy```表示平多仓，```sell```表示开空仓，```closesell```表示平空仓。
+
+**支持附加参数（option）**：可以通过```side```参数传递附加参数，格式为：```"side;{JSON对象}"```或```"side;key=value&key=value"```。
+
+例如：```'buy;{"type":"TRAILING_STOP_MARKET","activationPrice":"2300"}'```或```"buy;type=TRAILING_STOP_MARKET&activationPrice=2300"```。
+
+附加参数用于传递交易所特定的参数（如订单类型、生效规则等），具体支持的参数取决于交易所API。
+- `price` (number, required): 参数```price```用于设置订单的价格。当价格为-1时，表示该订单为市价单。
+- `amount` (number, required): 参数```amount```用于设置订单的下单量。需要注意，当订单为**现货市价买单**时，下单量表示买入金额；个别现货交易所的市价买单下单量为交易币数量，具体请查看「用户指南」中的**交易所特殊说明**。对于期货交易所对象，使用```CreateOrder()```/```Buy()```/```Sell()```函数下单时，如无特殊说明，下单量参数```amount```均以合约张数为单位。
+- `arg` (string / number / bool / object / array / any (平台支持的任意类型), optional): 扩展参数，用于将附带信息输出到本次下单日志中，```arg```参数可以传入多个。
+
+Returns (string / 空值): 下单成功时返回订单Id，下单失败时返回空值。FMZ平台的订单`Order`结构的属性```Id```由交易所品种代码和交易所原始订单Id组成，两者以英文逗号分隔。例如OKX交易所现货交易对```ETH_USDT```订单的属性```Id```格式为：```ETH-USDT,1547130415509278720```。
+
+调用```exchange.CreateOrder(symbol, side, price, amount)```函数下单时，返回值订单```Id```与订单`Order`结构的```Id```属性一致。
+
+现货交易所对象与期货交易所对象均通过调用```exchange.CreateOrder()```函数进行下单。
+
+```javascript
+function main() {
+    var id = exchange.CreateOrder("BTC_USDT", "buy", 60000, 0.01)           // 现货交易所对象下单，交易BTC_USDT币币交易对
+    // var id = exchange.CreateOrder("BTC_USDT.swap", "buy", 60000, 0.01)   // 期货交易所对象下单，交易BTC的U本位永续合约
+    Log("Order Id:", id)
+}
+```
+
+```python
+def main():
+    id = exchange.CreateOrder("BTC_USDT", "buy", 60000, 0.01)          # 现货交易所对象下单，交易BTC_USDT币币交易对
+    # id = exchange.CreateOrder("BTC_USDT.swap", "buy", 60000, 0.01)   # 期货交易所对象下单，交易BTC的U本位永续合约
+    Log("Order Id:", id)
+```
+
+```rust
+fn main() {
+    let id = exchange.CreateOrder("BTC_USDT", "buy", 60000, 0.01);           // 现货交易所对象下单，交易BTC_USDT币币交易对
+    // let id = exchange.CreateOrder("BTC_USDT.swap", "buy", 60000, 0.01);   // 期货交易所对象下单，交易BTC的U本位永续合约
+    Log!("Order Id:", id);
+}
+```
+
+通过附加参数（option）下单，用于传递交易所的特定参数。
+
+```javascript
+function main() {
+    // 使用JSON格式传递option参数
+    var option = {
+        "type": "TRAILING_STOP_MARKET",
+        "activationPrice": "2300",
+        "callbackRate": "0.1"
+    }
+    var sideWithOption = "buy;" + JSON.stringify(option)
+    var id = exchange.CreateOrder("SOL_USDT.swap", sideWithOption, -1, 1)
+    Log("Order Id:", id)
+
+    Sleep(2000)
+    Log(exchange.GetOrder(id))
+}
+```
+
+```python
+import json
+
+def main():
+    # 使用JSON格式传递option参数
+    option = {
+        "type": "TRAILING_STOP_MARKET",
+        "activationPrice": "2300",
+        "callbackRate": "0.1"
+    }
+    sideWithOption = "buy;" + json.dumps(option)
+    id = exchange.CreateOrder("SOL_USDT.swap", sideWithOption, -1, 1)
+    Log("Order Id:", id)
+
+    Sleep(2000)
+    Log(exchange.GetOrder(id))
+```
+
+```rust
+fn main() {
+    // 使用JSON格式传递option参数（Rust不支持JSON.stringify，直接使用原始字符串构造JSON文本）
+    let option = r#"{"type": "TRAILING_STOP_MARKET", "activationPrice": "2300", "callbackRate": "0.1"}"#;
+    let sideWithOption = format!("buy;{}", option);
+    let id = exchange.CreateOrder("SOL_USDT.swap", &sideWithOption, -1, 1).unwrap();
+    Log!("Order Id:", id);
+
+    Sleep(2000);
+    Log!(exchange.GetOrder(&id));
+}
+```
+
+支持通过```side```参数传递附加参数（option），用于指定交易所特定的参数。附加参数需与```side```参数合并传入，格式为```"side;{JSON对象}"```（推荐）或```"side;key=value&key=value"```（URL编码格式）。例如：```"buy;{\"type\":\"TRAILING_STOP_MARKET\"}"```。
+
+不同交易所支持的option参数各不相同，具体支持的参数以交易所API文档为准。常见参数包括：订单类型（type）、生效规则（timeInForce）、触发价格（activationPrice）、回调比率（callbackRate）等。
+
+使用option参数时，仍需提供```price```和```amount```参数。若某些参数已通过option传递，则这些基础参数可能会被option中的对应参数覆盖，具体行为取决于交易所API的实现。
+
+Uniswap交易所（链上兑换）：下单即在链上立即兑换，不会挂单等待。限价单的```price```是最差可接受成交价，写入链上交易强制执行，当前报价已经达不到时直接报错、不发交易；市价单（```price```为-1）按```exchange.IO("slippage", ...)```设置的滑点保护。市价买入时```amount```为要花费的计价币数量，其他情况为基础币数量。订单ID是交易哈希，撤单是发送同nonce的替换交易，交易已上链则无法撤单。附加参数支持```slippage```（本单滑点）和```route```（```v2```、```v3```、```hop```、```direct```，限定路径类型），例如```"sell;{\"route\":\"v2\"}"```。
+
+See also: `exchange.Buy`, `exchange.Sell`,
+  `exchange.ModifyOrder`
+
+#### exchange.ModifyOrder
+
+```
+exchange.ModifyOrder(orderId, side, price, amount)
+```
+
+```exchange.ModifyOrder()```函数用于修改现有的普通订单，可修改订单的价格和数量。该函数支持通过附加参数修改订单的其它属性（具体取决于交易所 API 的支持情况）。
+
+Parameters:
+
+- `orderId` (string, required): 参数```orderId```用于指定待修改的原订单 ID。订单 ID 的格式与`exchange.CreateOrder`函数返回的订单 ID 一致，由交易所品种代码和交易所原始订单 ID 组成，两者以英文逗号分隔。例如：```"ETH-USDT,1547130415509278720"```。
+- `side` (string, required): 参数```side```用于指定订单的交易方向。
+
+对于现货交易所对象，```side```参数的可选值为：```buy```、```sell```。其中```buy```表示买入，```sell```表示卖出。
+
+对于期货交易所对象，```side```参数的可选值为：```buy```、```closebuy```、```sell```、```closesell```。其中```buy```表示开多仓，```closebuy```表示平多仓，```sell```表示开空仓，```closesell```表示平空仓。
+
+**支持附加参数（option）**：可通过```side```参数传递附加参数，格式为```"side;{JSON对象}"```或```"side;key=value&key=value"```。
+
+例如：```"buy;{\"priceMatch\":\"QUEUE_20\"}"```或```"buy;priceMatch=QUEUE_20"```。
+
+附加参数用于修改订单的其它属性（如价格匹配模式等），具体支持的参数取决于交易所 API。
+- `price` (number, required): 参数```price```用于设置订单的新价格。当价格为 -1 时表示不修改价格，或根据交易所 API 的实现，可能转为市价单。
+- `amount` (number, required): 参数```amount```用于设置订单的新下单量。当数量为 -1 时表示不修改数量。需要注意的是，当订单为**现货市价买单**时，下单量表示买入金额；个别现货交易所的市价买单，其下单量为交易币的数量。
+
+Returns (string / 空值): 修改订单成功时返回订单 ID，修改失败时返回空值。返回的订单 ID 可能与原订单 ID 相同，也可能不同，这取决于交易所 API 的实现方式。某些交易所在修改订单后会返回新的订单 ID，而有些交易所则保持订单 ID 不变。
+
+修改普通订单的价格和数量。
+
+```javascript
+function main() {
+    // 创建一个限价买单
+    var id = exchange.CreateOrder("SOL_USDT.swap", "buy", 88, 1)
+    Log("Original Order ID:", id)
+    Sleep(2000)
+
+    // 查询原始订单信息
+    var order = exchange.GetOrder(id)
+    Log("Original Order Info:", order)
+    Sleep(1000)
+
+    // 修改订单的价格和数量
+    var newId = exchange.ModifyOrder(id, "buy", 77, 2)
+    Log("Modified Order ID:", newId)
+    Sleep(2000)
+
+    // 查询修改后的订单信息
+    var newOrder = exchange.GetOrder(newId)
+    Log("Modified Order Info:", newOrder)
+
+    // 取消订单
+    exchange.CancelOrder(newId)
+}
+```
+
+```python
+def main():
+    # 创建一个限价买单
+    id = exchange.CreateOrder("SOL_USDT.swap", "buy", 88, 1)
+    Log("Original Order ID:", id)
+    Sleep(2000)
+
+    # 查询原始订单信息
+    order = exchange.GetOrder(id)
+    Log("Original Order Info:", order)
+    Sleep(1000)
+
+    # 修改订单的价格和数量
+    newId = exchange.ModifyOrder(id, "buy", 77, 2)
+    Log("Modified Order ID:", newId)
+    Sleep(2000)
+
+    # 查询修改后的订单信息
+    newOrder = exchange.GetOrder(newId)
+    Log("Modified Order Info:", newOrder)
+
+    # 取消订单
+    exchange.CancelOrder(newId)
+```
+
+```rust
+fn main() {
+    // 创建一个限价买单
+    let id = exchange.CreateOrder("SOL_USDT.swap", "buy", 88, 1).unwrap();
+    Log!("Original Order ID:", id);
+    Sleep(2000);
+
+    // 查询原始订单信息
+    let order = exchange.GetOrder(&id).unwrap();
+    Log!("Original Order Info:", order);
+    Sleep(1000);
+
+    // 修改订单的价格和数量
+    let newId = exchange.ModifyOrder(&id, "buy", 77, 2).unwrap();
+    Log!("Modified Order ID:", newId);
+    Sleep(2000);
+
+    // 查询修改后的订单信息
+    let newOrder = exchange.GetOrder(&newId).unwrap();
+    Log!("Modified Order Info:", newOrder);
+
+    // 取消订单
+    let _ = exchange.CancelOrder(&newId);
+}
+```
+
+使用附加参数（option）修改订单的价格匹配模式。
+
+```javascript
+function main() {
+    // 创建一个限价买单
+    var id = exchange.CreateOrder("SOL_USDT.swap", "buy", 77, 1)
+    Log("Original Order ID:", id)
+    Sleep(2000)
+
+    // 修改订单，并将价格匹配模式设置为 QUEUE_20
+    // 通过 side 参数传递附加参数（JSON 格式）
+    var option = {"priceMatch": "QUEUE_20"}
+    var sideWithOption = "buy;" + JSON.stringify(option)
+
+    var newId = exchange.ModifyOrder(id, sideWithOption, -1, 2)
+    Log("Modified Order ID:", newId)
+    Sleep(2000)
+
+    // 查询修改后的订单信息
+    var newOrder = exchange.GetOrder(newId)
+    Log("Modified Order Info:", newOrder)
+
+    // 撤销订单
+    exchange.CancelOrder(newId)
+}
+```
+
+```python
+import json
+
+def main():
+    # 创建一个限价买单
+    id = exchange.CreateOrder("SOL_USDT.swap", "buy", 77, 1)
+    Log("Original Order ID:", id)
+    Sleep(2000)
+
+    # 修改订单，并将价格匹配模式设置为 QUEUE_20
+    # 通过 side 参数传递附加参数（JSON 格式）
+    option = {"priceMatch": "QUEUE_20"}
+    sideWithOption = "buy;" + json.dumps(option)
+
+    newId = exchange.ModifyOrder(id, sideWithOption, -1, 2)
+    Log("Modified Order ID:", newId)
+    Sleep(2000)
+
+    # 查询修改后的订单信息
+    newOrder = exchange.GetOrder(newId)
+    Log("Modified Order Info:", newOrder)
+
+    # 撤销订单
+    exchange.CancelOrder(newId)
+```
+
+```rust
+fn main() {
+    // 创建一个限价买单
+    let id = exchange.CreateOrder("SOL_USDT.swap", "buy", 77, 1).unwrap();
+    Log!("Original Order ID:", id);
+    Sleep(2000);
+
+    // 修改订单，并将价格匹配模式设置为 QUEUE_20
+    // 通过 side 参数传递附加参数（JSON 格式）；Rust 不支持 JSON.stringify，因此直接使用原始字符串构造 JSON 文本
+    let option = r#"{"priceMatch": "QUEUE_20"}"#;
+    let sideWithOption = format!("buy;{}", option);
+
+    let newId = exchange.ModifyOrder(&id, &sideWithOption, -1, 2).unwrap();
+    Log!("Modified Order ID:", newId);
+    Sleep(2000);
+
+    // 查询修改后的订单信息
+    let newOrder = exchange.GetOrder(&newId).unwrap();
+    Log!("Modified Order Info:", newOrder);
+
+    // 撤销订单
+    let _ = exchange.CancelOrder(&newId);
+}
+```
+
+```exchange.ModifyOrder()```函数返回的订单 ID 因交易所 API 的实现不同而可能有不同的行为。有些交易所 API 返回的订单 ID 会更新，有些则保持不变。建议使用返回的新订单 ID 进行后续操作。
+
+```exchange.ModifyOrder()```函数不会依据交易所接口规则校验参数的有效性，而是将参数直接提交给交易所 API。传入无效参数时（如价格或数量为 -1），参数可能会被交易所忽略，订单将保持原有属性不变。
+
+支持通过```side```参数传递附加参数（option），用于修改订单的其它属性。附加参数需与```side```参数合并后传入，格式为```"side;{JSON对象}"```（推荐）或```"side;key=value"```（URL 编码格式）。例如，修改价格匹配模式：```"buy;{\"priceMatch\":\"QUEUE_20\"}"```。
+
+对于普通订单的市价单修改，需具体查看交易所 API 是否支持。有些交易所不支持对市价单进行修改操作。
+
+修改订单时，订单的其它属性（如订单类型、持仓模式、账户模式、杠杆、订单生效规则等）通常会保留原订单的设置。如需修改这些属性，可通过附加参数（option）传入，前提是交易所 API 支持。
+
+个别交易所 API 在未接收到价格参数时（price 为 -1 或 null），可能会将订单转为市价单。对于现货市价买单，需要注意其下单量单位可能是金额而非币数。
+
+修改订单功能的支持情况取决于具体交易所，部分交易所可能不支持修改订单功能，或仅支持修改部分参数。使用前请查阅对应交易所的 API 文档。
+
+See also: `exchange.CreateOrder`, `exchange.CancelOrder`, `exchange.GetOrder`, `exchange.GetOrders`
+
+#### exchange.CancelOrder
+
+```
+exchange.CancelOrder(orderId)
+exchange.CancelOrder(orderId, ...args)
+```
+
+```exchange.CancelOrder()```函数用于取消订单。FMZ平台的订单`Order`结构中，属性```Id```由交易所品种代码和交易所原始订单Id组成，两者之间以英文逗号分隔。例如，OKX交易所现货交易对```ETH_USDT```的订单，其属性```Id```的格式为：```ETH-USDT,1547130415509278720```。
+
+调用```exchange.CancelOrder()```函数撤销订单时，传入的参数```orderId```与订单`Order`结构的```Id```属性一致。
+
+Parameters:
+
+- `orderId` (string, required): 参数```orderId```用于指定所要取消的订单。
+- `arg` (string / number / bool / object / array / any (平台支持的任意类型), optional): 扩展参数，用于将附带信息输出到本条撤单日志中；```arg```参数可以传入多个。
+
+Returns (bool): ```exchange.CancelOrder()```函数返回真值（例如```true```）表示取消订单请求发送成功，返回假值（例如```false```）表示取消订单请求发送失败。返回值仅代表请求发送成功或失败；若要判断交易所是否已取消订单，可以调用```exchange.GetOrders()```进行判断。
+
+撤销订单。
+
+```javascript
+function main(){
+    var id = exchange.Sell(99999, 1)
+    exchange.CancelOrder(id)
+}
+```
+
+```python
+def main():
+    id = exchange.Sell(99999, 1)
+    exchange.CancelOrder(id)
+```
+
+```rust
+fn main() {
+    let id = exchange.Sell(99999, 1).unwrap();
+    let _ = exchange.CancelOrder(&id);
+}
+```
+
+FMZ的API函数中，能够产生日志输出的函数（例如```Log()```、```exchange.Buy()```、```exchange.CancelOrder()```等）都可以在必要参数之后附带一些输出参数。
+
+例如：```exchange.CancelOrder(orders[i].Id, orders[i])```，即在取消Id为```orders[i].Id```的订单时，附带输出该订单的信息，也就是```orders[i]```这个`Order`结构。
+
+```javascript
+function main() {
+    if (exchange.GetName().includes("Futures_")) {
+        Log("Set contract to: perpetual swap, set direction to: open long.")
+        exchange.SetContractType("swap")
+        exchange.SetDirection("buy")
+    }
+
+    var ticker = exchange.GetTicker()
+    exchange.Buy(ticker.Last * 0.5, 0.1)
+
+    var orders = exchange.GetOrders()
+    for (var i = 0 ; i < orders.length ; i++) {
+        exchange.CancelOrder(orders[i].Id, "Canceled order:", orders[i])
+        Sleep(500)
+    }
+}
+```
+
+```python
+def main():
+    if exchange.GetName().find("Futures_") != -1:
+        Log("Set contract to: perpetual swap, set direction to: open long.")
+        exchange.SetContractType("swap")
+        exchange.SetDirection("buy")
+
+    ticker = exchange.GetTicker()
+    exchange.Buy(ticker["Last"] * 0.5, 0.1)
+
+    orders = exchange.GetOrders()
+    for i in range(len(orders)):
+        exchange.CancelOrder(orders[i]["Id"], "Canceled order:", orders[i])
+        Sleep(500)
+```
+
+```rust
+fn main() {
+    if exchange.GetName().contains("Futures_") {
+        Log!("Set contract to: perpetual swap, set direction to: open long.");
+        let _ = exchange.SetContractType("swap");
+        let _ = exchange.SetDirection("buy");
+    }
+
+    let ticker = exchange.GetTicker(None).unwrap();
+    let _ = exchange.Buy(ticker.Last * 0.5, 0.1);
+
+    let orders = exchange.GetOrders(None).unwrap();
+    for i in 0..orders.len() {
+        // Rust不支持在CancelOrder的必要参数后附带输出参数，撤单后单独调用Log!宏输出附带信息
+        let _ = exchange.CancelOrder(&orders[i].Id);
+        Log!("Canceled order:", orders[i]);
+        Sleep(500);
+    }
+}
+```
+
+如果使用较旧版本的托管者，```exchange.CancelOrder()```函数的参数```orderId```可能与当前文档中描述的```orderId```有所差别。
+
+See also: `exchange.Buy`, `exchange.Sell`, `exchange.GetOrders`, `exchange.ModifyOrder`
+
+#### exchange.GetOrder
+
+```
+exchange.GetOrder(orderId)
+```
+
+```exchange.GetOrder()```函数用于获取订单信息。
+
+Parameters:
+
+- `orderId` (string, required): ```orderId```参数用于指定要查询的订单。FMZ平台订单`Order`结构的```Id```属性由交易所品种代码和交易所原始订单Id组成，以英文逗号分隔。例如，OKX交易所现货交易对```ETH_USDT```订单的```Id```属性格式为：```ETH-USDT,1547130415509278720```。
+
+调用```exchange.GetOrder()```函数查询订单时，传入的参数```orderId```与订单`Order`结构的```Id```属性一致。
+
+Returns (`Order` / 空值): 根据订单号查询订单详情，查询成功时返回`Order`结构，查询失败时返回空值。
+
+```javascript
+function main(){
+    var id = exchange.Sell(1000, 1)
+    // 参数id为订单号码，需填入你想要查询的订单的号码
+    var order = exchange.GetOrder(id)
+    Log("Id:", order.Id, "Price:", order.Price, "Amount:", order.Amount, "DealAmount:",
+        order.DealAmount, "Status:", order.Status, "Type:", order.Type)
+}
+```
+
+```python
+def main():
+    id = exchange.Sell(1000, 1)
+    order = exchange.GetOrder(id)
+    Log("Id:", order["Id"], "Price:", order["Price"], "Amount:", order["Amount"], "DealAmount:",
+        order["DealAmount"], "Status:", order["Status"], "Type:", order["Type"])
+```
+
+```rust
+fn main() {
+    let id = exchange.Sell(1000, 1).unwrap();
+    // 参数id为订单号码，需填入你想要查询的订单的号码
+    let order = exchange.GetOrder(&id).unwrap();
+    Log!("Id:", order.Id, "Price:", order.Price, "Amount:", order.Amount, "DealAmount:",
+        order.DealAmount, "Status:", order.Status, "Type:", order.Type);
+}
+```
+
+部分交易所不支持```exchange.GetOrder()```函数。返回值`Order`结构中的```AvgPrice```属性为成交均价，部分交易所不支持该字段，若不支持则将其设置为0。
+
+如果使用较旧版本的托管者，```exchange.GetOrder()```函数的参数```orderId```可能与当前文档中描述的```orderId```存在差异。
+
+不支持```exchange.GetOrder()```函数的交易所：
+
+  | 函数名 | 不支持的现货交易所 | 不支持的期货交易所 |
+  | - | - | - |
+  | GetOrder | Zaif / Coincheck / Bitstamp | -- |
+
+See also: `Order`, `exchange.GetOrders`, `exchange.GetHistoryOrders`, `exchange.ModifyOrder`
+
+#### exchange.GetOrders
+
+```
+exchange.GetOrders()
+exchange.GetOrders(symbol)
+```
+
+```exchange.GetOrders()```函数用于获取当前未完成的订单。
+
+Parameters:
+
+- `symbol` (string, optional): 参数```symbol```用于指定所要查询的**交易品种**或**交易品种范围**。
+
+对于现货交易所对象，若不传入```symbol```参数，则请求所有现货品种的未完成订单数据。
+
+对于期货交易所对象，若不传入```symbol```参数，则默认以当前交易对、合约代码所在的维度范围，请求该范围内所有品种的未完成订单数据。
+
+Returns (`Order`数组 / 空值): ```exchange.GetOrders()```函数请求数据成功时返回`Order`结构数组，请求数据失败时返回空值。
+
+使用现货交易所对象，针对多个不同的交易对，以当前价格的一半作为下单价格挂出买单，随后查询未成交订单的信息。
+
+```javascript
+/*backtest
+start: 2024-05-21 00:00:00
+end: 2024-09-05 00:00:00
+period: 5m
+basePeriod: 1m
+exchanges: [{"eid":"Binance","currency":"BTC_USDT"}]
+*/
+
+function main() {
+    var arrSymbol = ["ETH_USDT", "BTC_USDT", "LTC_USDT", "SOL_USDT"]
+
+    for (var symbol of arrSymbol) {
+        var t = exchange.GetTicker(symbol)
+        exchange.CreateOrder(symbol, "buy", t.Last / 2, 0.01)
+    }
+
+    var spotOrders = exchange.GetOrders()
+
+    var tbls = []
+    for (var orders of [spotOrders]) {
+        var tbl = {type: "table", title: "test GetOrders", cols: ["Symbol", "Id", "Price", "Amount", "DealAmount", "AvgPrice", "Status", "Type", "Offset", "ContractType"], rows: []}
+        for (var order of orders) {
+            tbl.rows.push([order.Symbol, order.Id, order.Price, order.Amount, order.DealAmount, order.AvgPrice, order.Status, order.Type, order.Offset, order.ContractType])
+        }
+        tbls.push(tbl)
+    }
+
+    LogStatus("`" + JSON.stringify(tbls) +  "`")
+
+    // 打印输出一次信息后返回，防止后续回测时订单成交，影响数据观察
+    return
+}
+```
+
+```python
+'''backtest
+start: 2024-05-21 00:00:00
+end: 2024-09-05 00:00:00
+period: 5m
+basePeriod: 1m
+exchanges: [{"eid":"Binance","currency":"BTC_USDT"}]
+'''
+
+import json
+
+def main():
+    arrSymbol = ["ETH_USDT", "BTC_USDT", "LTC_USDT", "SOL_USDT"]
+
+    for symbol in arrSymbol:
+        t = exchange.GetTicker(symbol)
+        exchange.CreateOrder(symbol, "buy", t["Last"] / 2, 0.01)
+
+    spotOrders = exchange.GetOrders()
+
+    tbls = []
+    for orders in [spotOrders]:
+        tbl = {"type": "table", "title": "test GetOrders", "cols": ["Symbol", "Id", "Price", "Amount", "DealAmount", "AvgPrice", "Status", "Type", "Offset", "ContractType"], "rows": []}
+        for order in orders:
+            tbl["rows"].append([order.Symbol, order.Id, order.Price, order.Amount, order.DealAmount, order.AvgPrice, order.Status, order.Type, order.Offset, order.ContractType])
+        tbls.append(tbl)
+
+    LogStatus("`" + json.dumps(tbls) +  "`")
+
+    return
+```
+
+```rust
+/*backtest
+start: 2024-05-21 00:00:00
+end: 2024-09-05 00:00:00
+period: 5m
+basePeriod: 1m
+exchanges: [{"eid":"Binance","currency":"BTC_USDT"}]
+*/
+
+fn main() {
+    let arrSymbol = ["ETH_USDT", "BTC_USDT", "LTC_USDT", "SOL_USDT"];
+
+    for symbol in arrSymbol {
+        let t = exchange.GetTicker(symbol).unwrap();
+        let _ = exchange.CreateOrder(symbol, "buy", t.Last / 2.0, 0.01);
+    }
+
+    let spotOrders = exchange.GetOrders(None).unwrap();
+
+    // Rust不支持JSON.stringify，使用format!拼接表格的JSON文本
+    let mut tbls = Vec::new();
+    for orders in [&spotOrders] {
+        let mut rows = Vec::new();
+        for order in orders {
+            rows.push(format!(r#"["{}", "{}", {}, {}, {}, {}, {}, {}, {}, "{}"]"#,
+                order.Symbol, order.Id, order.Price, order.Amount, order.DealAmount, order.AvgPrice, order.Status, order.Type, order.Offset, order.ContractType));
+        }
+        let tbl = format!(r#"{{"type": "table", "title": "test GetOrders", "cols": ["Symbol", "Id", "Price", "Amount", "DealAmount", "AvgPrice", "Status", "Type", "Offset", "ContractType"], "rows": [{}]}}"#,
+            rows.join(","));
+        tbls.push(tbl);
+    }
+
+    LogStatus!(format!("`[{}]`", tbls.join(",")));
+
+    // 打印输出一次信息后返回，防止后续回测时订单成交，影响数据观察
+    return;
+}
+```
+
+使用期货交易所对象，对多个不同交易对、不同合约代码的品种进行下单。下单价格远离盘口对手价，使订单保持未成交状态，并按多种方式查询订单。
+
+```javascript
+/*backtest
+start: 2024-05-21 00:00:00
+end: 2024-09-05 00:00:00
+period: 5m
+basePeriod: 1m
+exchanges: [{"eid":"Futures_Binance","currency":"BTC_USDT"}]
+*/
+
+function main() {
+    var arrSymbol = ["BTC_USDT.swap", "BTC_USDT.quarter", "ETH_USDT.swap", "ETH_USDT.quarter"]
+
+    for (var symbol of arrSymbol) {
+        var t = exchange.GetTicker(symbol)
+        exchange.CreateOrder(symbol, "buy", t.Last / 2, 1)
+        exchange.CreateOrder(symbol, "sell", t.Last * 2, 1)
+    }
+
+    var defaultOrders = exchange.GetOrders()
+    var swapOrders = exchange.GetOrders("USDT.swap")
+    var futuresOrders = exchange.GetOrders("USDT.futures")
+    var btcUsdtSwapOrders = exchange.GetOrders("BTC_USDT.swap")
+
+    var tbls = []
+    var arr = [defaultOrders, swapOrders, futuresOrders, btcUsdtSwapOrders]
+    var tblDesc = ["defaultOrders", "swapOrders", "futuresOrders", "btcUsdtSwapOrders"]
+    for (var index in arr) {
+        var orders = arr[index]
+        var tbl = {type: "table", title: tblDesc[index], cols: ["Symbol", "Id", "Price", "Amount", "DealAmount", "AvgPrice", "Status", "Type", "Offset", "ContractType"], rows: []}
+        for (var order of orders) {
+            tbl.rows.push([order.Symbol, order.Id, order.Price, order.Amount, order.DealAmount, order.AvgPrice, order.Status, order.Type, order.Offset, order.ContractType])
+        }
+        tbls.push(tbl)
+    }
+
+    LogStatus("`" + JSON.stringify(tbls) +  "`")
+
+    // 打印输出一次信息后立即返回，防止后续回测过程中订单成交而影响数据观察
+    return
+}
+```
+
+```python
+'''backtest
+start: 2024-05-21 00:00:00
+end: 2024-09-05 00:00:00
+period: 5m
+basePeriod: 1m
+exchanges: [{"eid":"Futures_Binance","currency":"BTC_USDT"}]
+'''
+
+import json
+
+def main():
+    arrSymbol = ["BTC_USDT.swap", "BTC_USDT.quarter", "ETH_USDT.swap", "ETH_USDT.quarter"]
+
+    for symbol in arrSymbol:
+        t = exchange.GetTicker(symbol)
+        exchange.CreateOrder(symbol, "buy", t["Last"] / 2, 1)
+        exchange.CreateOrder(symbol, "sell", t["Last"] * 2, 1)
+
+    defaultOrders = exchange.GetOrders()
+    swapOrders = exchange.GetOrders("USDT.swap")
+    futuresOrders = exchange.GetOrders("USDT.futures")
+    btcUsdtSwapOrders = exchange.GetOrders("BTC_USDT.swap")
+
+    tbls = []
+    arr = [defaultOrders, swapOrders, futuresOrders, btcUsdtSwapOrders]
+    tblDesc = ["defaultOrders", "swapOrders", "futuresOrders", "btcUsdtSwapOrders"]
+    for index in range(len(arr)):
+        orders = arr[index]
+        tbl = {"type": "table", "title": tblDesc[index], "cols": ["Symbol", "Id", "Price", "Amount", "DealAmount", "AvgPrice", "Status", "Type", "Offset", "ContractType"], "rows": []}
+        for order in orders:
+            tbl["rows"].append([order["Symbol"], order["Id"], order["Price"], order["Amount"], order["DealAmount"], order["AvgPrice"], order["Status"], order["Type"], order["Offset"], order["ContractType"]])
+        tbls.append(tbl)
+
+    LogStatus("`" + json.dumps(tbls) +  "`")
+
+    return
+```
+
+```rust
+/*backtest
+start: 2024-05-21 00:00:00
+end: 2024-09-05 00:00:00
+period: 5m
+basePeriod: 1m
+exchanges: [{"eid":"Futures_Binance","currency":"BTC_USDT"}]
+*/
+
+fn main() {
+    let arrSymbol = ["BTC_USDT.swap", "BTC_USDT.quarter", "ETH_USDT.swap", "ETH_USDT.quarter"];
+
+    for symbol in arrSymbol {
+        let t = exchange.GetTicker(symbol).unwrap();
+        let _ = exchange.CreateOrder(symbol, "buy", t.Last / 2.0, 1);
+        let _ = exchange.CreateOrder(symbol, "sell", t.Last * 2.0, 1);
+    }
+
+    let defaultOrders = exchange.GetOrders(None).unwrap();
+    let swapOrders = exchange.GetOrders("USDT.swap").unwrap();
+    let futuresOrders = exchange.GetOrders("USDT.futures").unwrap();
+    let btcUsdtSwapOrders = exchange.GetOrders("BTC_USDT.swap").unwrap();
+
+    // Rust 不支持 JSON.stringify，此处使用 format! 拼接表格的 JSON 文本
+    let mut tbls = Vec::new();
+    let arr = [&defaultOrders, &swapOrders, &futuresOrders, &btcUsdtSwapOrders];
+    let tblDesc = ["defaultOrders", "swapOrders", "futuresOrders", "btcUsdtSwapOrders"];
+    for index in 0..arr.len() {
+        let orders = arr[index];
+        let mut rows = Vec::new();
+        for order in orders {
+            rows.push(format!(r#"["{}", "{}", {}, {}, {}, {}, {}, {}, {}, "{}"]"#,
+                order.Symbol, order.Id, order.Price, order.Amount, order.DealAmount, order.AvgPrice, order.Status, order.Type, order.Offset, order.ContractType));
+        }
+        let tbl = format!(r#"{{"type": "table", "title": "{}", "cols": ["Symbol", "Id", "Price", "Amount", "DealAmount", "AvgPrice", "Status", "Type", "Offset", "ContractType"], "rows": [{}]}}"#,
+            tblDesc[index], rows.join(","));
+        tbls.push(tbl);
+    }
+
+    LogStatus!(format!("`[{}]`", tbls.join(",")));
+
+    // 打印输出一次信息后立即返回，防止后续回测过程中订单成交而影响数据观察
+    return;
+}
+```
+
+调用```exchange.GetOrders()```函数时，可传入```Symbol```参数以指定请求特定交易对或合约代码的订单数据。
+
+```javascript
+function main() {
+    var orders = exchange.GetOrders("BTC_USDT")           // 现货品种示例
+    // var orders = exchange.GetOrders("BTC_USDT.swap")   // 期货品种示例
+    Log("orders:", orders)
+}
+```
+
+```python
+def main():
+    orders = exchange.GetOrders("BTC_USDT")          # 现货品种示例
+    # orders = exchange.GetOrders("BTC_USDT.swap")   # 期货品种示例
+    Log("orders:", orders)
+```
+
+```rust
+fn main() {
+    let orders = exchange.GetOrders("BTC_USDT");           // 现货品种示例
+    // let orders = exchange.GetOrders("BTC_USDT.swap");   // 期货品种示例
+    Log!("orders:", orders);
+}
+```
+
+在```GetOrders```函数中，symbol参数的使用场景归纳如下：
+
+| 交易所对象分类 | symbol参数 | 查询范围 | 备注 |
+| - | - | - | - |
+| 现货 | 不传symbol参数 | 查询所有现货交易对 | 适用于所有调用场景；若交易所接口不支持，则报错返回空值，以下不再赘述 |
+| 现货 | 指定交易品种，symbol参数为："BTC_USDT" | 查询指定的BTC_USDT交易对 | 对于现货交易所对象，参数symbol的格式为："BTC_USDT" |
+| 期货 | 不传symbol参数 | 查询当前交易对、合约代码维度范围内的所有交易品种 | 假如当前交易对为BTC_USDT，合约代码为swap，即查询所有USDT本位永续合约。等价于调用```GetOrders("USDT.swap")``` |
+| 期货 | 指定交易品种，symbol参数为："BTC_USDT.swap" | 查询指定的BTC的USDT本位永续合约 | 对于期货交易所对象，参数symbol的格式为：FMZ平台定义的**交易对**与**合约代码**的组合，以字符```"."```间隔。 |
+| 期货 | 指定交易品种范围，symbol参数为："USDT.swap" | 查询所有USDT本位永续合约 | - |
+| 支持期权的期货交易所 | 不传symbol参数 | 查询当前交易对维度范围内的所有期权合约 | 假如当前交易对为BTC_USDT，且合约设置为期权合约，例如币安期权合约：BTC-240108-40000-C |
+| 支持期权的期货交易所 | 指定具体交易品种 | 查询指定的期权合约 | 例如对于币安期货交易所，symbol参数为：BTC_USDT.BTC-240108-40000-C |
+| 支持期权的期货交易所 | 指定交易品种范围，symbol参数为："USDT.option" | 查询所有USDT本位期权合约 | - |
+
+在```GetOrders```函数中，期货交易所对象的查询维度范围归纳如下：
+
+| symbol参数 | 请求范围定义 | 备注 |
+| - | - | - |
+| USDT.swap          | USDT本位永续合约范围。  | 对于交易所API接口不支持的维度，调用时会报错返回空值。 |
+| USDT.futures       | USDT本位交割合约范围。  | - |
+| USD.swap           | 币本位永续合约范围。    | - |
+| USD.futures        | 币本位交割合约范围。    | - |
+| USDT.option        | USDT本位期权合约范围。  | - |
+| USD.option         | 币本位期权合约范围。    | - |
+| USDT.futures_combo | 差价组合合约范围。      | Futures_Deribit交易所 |
+| USD.futures_ff     | 混合保证金交割合约范围。 | Futures_Kraken交易所 |
+| USD.swap_pf        | 混合保证金永续合约范围。 | Futures_Kraken交易所 |
+
+当交易所对象```exchange```所代表的账户在**查询范围内**或**指定的交易品种**上没有挂单（即处于未成交状态的活动订单）时，调用该函数将返回空数组，即：```[]```。
+
+以下交易所查询当前未完成订单的接口必须传入品种参数。使用这些交易所调用GetOrders函数时，若未传入symbol参数，则仅请求当前品种的未完成订单，而非所有品种的未完成订单（因为交易所接口不支持）。
+
+Zaif、MEXC、LBank、Korbit、Coinw、BitMart、Bithumb、BitFlyer、BigONE。
+
+不支持```exchange.GetOrders()```函数的交易所：
+
+| 函数名 | 不支持的现货交易所 | 不支持的期货交易所 |
+| - | - | - |
+| GetOrders | -- | Futures_Bibox |
+
+See also: `Order`, `exchange.GetOrder`, `exchange.GetHistoryOrders`
+
+#### exchange.GetHistoryOrders
+
+```
+exchange.GetHistoryOrders()
+exchange.GetHistoryOrders(symbol)
+exchange.GetHistoryOrders(symbol, since)
+exchange.GetHistoryOrders(symbol, since, limit)
+exchange.GetHistoryOrders(since)
+exchange.GetHistoryOrders(since, limit)
+```
+
+```exchange.GetHistoryOrders()```函数用于获取当前交易对、合约的历史订单，并支持指定具体的交易品种。
+
+Parameters:
+
+- `symbol` (string, optional): ```symbol```参数用于指定交易品种。以```BTC_USDT```交易对为例：当```exchange```为现货交易所对象时，```symbol```参数格式为```BTC_USDT```；当```exchange```为期货交易所对象时，以永续合约为例，```symbol```参数格式为```BTC_USDT.swap```。
+
+如果查询的是期权合约的订单数据，参数```symbol```需设置为```"BTC_USDT.BTC-240108-40000-C"```（以币安期权BTC-240108-40000-C为例），其格式为FMZ平台定义的**交易对**与交易所定义的具体期权合约代码的组合，两者之间以字符"."间隔。若不传该参数，则默认请求当前设置的交易对、合约代码的订单数据。
+- `since` (number, optional): ```since```参数用于指定查询的起始时间戳，单位为毫秒。
+- `limit` (number, optional): ```limit```参数用于指定查询的订单数量。
+
+Returns (`Order`数组 / 空值): ```exchange.GetHistoryOrders()```函数在请求数据成功时返回`Order`结构数组，请求数据失败时返回空值。
+
+```javascript
+function main() {
+    var historyOrders = exchange.GetHistoryOrders()
+    Log(historyOrders)
+}
+```
+
+```python
+def main():
+    historyOrders = exchange.GetHistoryOrders()
+    Log(historyOrders)
+```
+
+```rust
+fn main() {
+    let historyOrders = exchange.GetHistoryOrders(None, None, None);
+    Log!(historyOrders);
+}
+```
+
+- 未指定```symbol```、```since```、```limit```参数时，默认查询当前交易对、合约的历史订单，即查询距当前时间最近的一定范围内的历史订单，具体查询范围取决于交易所接口的单次查询范围。
+
+- 指定```symbol```参数时，查询所设置交易品种的历史订单。
+
+- 指定```since```参数时，以```since```时间戳为起始时间，向当前时间方向查询。
+
+- 指定```limit```参数时，查询到足够条数后返回。
+
+- 该函数仅支持提供历史订单查询接口的交易所。
+
+不支持```exchange.GetHistoryOrders()```函数的交易所：
+
+| 函数名 | 不支持的现货交易所 | 不支持的期货交易所 |
+| - | - | - |
+| GetHistoryOrders | Zaif / Upbit / Coincheck / Bitstamp / Bithumb / BitFlyer / BigONE / Uniswap | Futures_Bibox / Futures_ApolloX |
+
+See also: `Order`, `exchange.GetOrder`, `exchange.GetOrders`
+
+#### exchange.CreateConditionOrder
+
+```
+exchange.CreateConditionOrder(symbol, side, amount, condition)
+exchange.CreateConditionOrder(symbol, side, amount, condition, ...args)
+```
+
+```exchange.CreateConditionOrder()```函数用于创建条件单。条件单是一种在满足特定触发条件时自动执行的订单类型。
+
+Parameters:
+
+- `symbol` (string, required): 参数```symbol```用于指定条件单对应的交易对或合约代码。
+
+当调用```exchange.CreateConditionOrder(symbol, side, amount, condition)```函数下条件单时，若```exchange```为现货交易所对象，且订单的计价币种为USDT、交易币种为BTC，则参数```symbol```为：```"BTC_USDT"```，其格式为FMZ平台定义的交易对格式。
+
+当调用```exchange.CreateConditionOrder(symbol, side, amount, condition)```函数下条件单时，若```exchange```为期货交易所对象，且订单为BTC的U本位永续合约订单，则参数```symbol```为：```"BTC_USDT.swap"```，其格式为FMZ平台定义的**交易对**与**合约代码**的组合，两者之间以字符"."分隔。
+
+当调用```exchange.CreateConditionOrder(symbol, side, amount, condition)```函数下条件单时，若```exchange```为期货交易所对象，且订单为BTC的U本位期权合约订单，则参数```symbol```为：```"BTC_USDT.BTC-240108-40000-C"```（以币安期权BTC-240108-40000-C为例），其格式为FMZ平台定义的**交易对**与交易所定义的具体期权合约代码的组合，两者之间以字符"."分隔。
+- `side` (string, required): 参数```side```用于指定条件单的交易方向。
+
+对于现货交易所对象，```side```参数的可选值为：```buy```、```sell```。```buy```表示买入，```sell```表示卖出。
+
+对于期货交易所对象，```side```参数的可选值为：```buy```、```closebuy```、```sell```、```closesell```。其中```buy```表示开多仓，```closebuy```表示平多仓，```sell```表示开空仓，```closesell```表示平空仓。
+
+**支持附加参数（option）**：可以通过```side```参数传递附加参数，格式为：```"side;{JSON对象}"```或```"side;key=value&key=value"```。
+
+例如：```"buy;{\"type\":\"TRAILING_STOP_MARKET\",\"activatePrice\":\"300\"}"```或```"buy;type=TRAILING_STOP_MARKET&activatePrice=300"```。
+
+附加参数用于传递交易所特定的参数（如订单类型、生效规则等），具体支持的参数取决于交易所API。
+- `amount` (number, required): 参数```amount```用于设置条件单的下单量。需要注意的是，当订单为**现货市价买单**时，下单量表示买入金额；个别现货交易所的市价买单下单量为交易币数量，具体请查看「用户指南」中的**交易所特殊说明**。对于期货交易所对象，下单量参数```amount```均以合约张数为单位。
+- `condition` (object, required): 参数```condition```是一个对象，用于设置条件单的触发条件和执行价格。该对象的结构参考`Condition`结构，包含以下属性：
+
+- ```ConditionType```（number）：条件类型，参考`ORDER_CONDITION_TYPE_OCO`、`ORDER_CONDITION_TYPE_TP`、`ORDER_CONDITION_TYPE_SL`、`ORDER_CONDITION_TYPE_GENERIC`。
+
+- ```TpTriggerPrice```（number）：止盈触发价格。
+
+- ```TpOrderPrice```（number）：止盈执行价格，-1表示市价单。
+
+- ```SlTriggerPrice```（number）：止损触发价格。
+
+- ```SlOrderPrice```（number）：止损执行价格，-1表示市价单。
+- `arg` (string / number / bool / object / array / any (平台支持的任意类型), optional): 扩展参数，用于将附带信息输出到该条条件单的日志中，```arg```参数可以传入多个。
+
+Returns (string / 空值): 创建条件单成功时返回条件单Id，创建失败时返回空值。条件单Id的格式与普通订单Id类似，由交易所品种代码和交易所原始条件单Id组成，两者之间以英文逗号分隔。
+
+创建止盈单（TP）：当价格上涨至目标价位时自动卖出。
+
+```javascript
+function main() {
+    // 创建止盈单：当BTC_USDT价格上涨至65000时，以65000的价格卖出0.01个BTC
+    var condition = {
+        ConditionType: ORDER_CONDITION_TYPE_TP,  // 止盈单
+        TpTriggerPrice: 65000,   // 触发价格
+        TpOrderPrice: 65000      // 执行价格，也可设置为-1表示市价单
+    }
+    var id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition)
+    Log("TP order Id:", id)
+}
+```
+
+```python
+def main():
+    # 创建止盈单：当BTC_USDT价格上涨至65000时，以65000的价格卖出0.01个BTC
+    condition = {
+        "ConditionType": ORDER_CONDITION_TYPE_TP,  # 止盈单
+        "TpTriggerPrice": 65000,   # 触发价格
+        "TpOrderPrice": 65000      # 执行价格，也可设置为-1表示市价单
+    }
+    id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition)
+    Log("TP order Id:", id)
+```
+
+```rust
+fn main() {
+    // 创建止盈单：当BTC_USDT价格上涨至65000时，以65000的价格卖出0.01个BTC
+    let condition = OrderCondition {
+        ConditionType: ORDER_CONDITION_TYPE_TP,  // 止盈单
+        TpTriggerPrice: 65000.0,   // 触发价格
+        TpOrderPrice: 65000.0,     // 执行价格，也可设置为-1表示市价单
+        ..Default::default()
+    };
+    let id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, &condition);
+    Log!("TP order Id:", id);
+}
+```
+
+创建止损单（SL）：当价格下跌至止损触发价位时，自动以设定方式卖出。
+
+```javascript
+function main() {
+    // 创建止损单：当BTC_USDT价格下跌至58000时，以市价卖出0.01个BTC
+    var condition = {
+        ConditionType: ORDER_CONDITION_TYPE_SL,  // 止损单
+        SlTriggerPrice: 58000,   // 触发价格
+        SlOrderPrice: -1         // -1表示市价单
+    }
+    var id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition)
+    Log("SL order Id:", id)
+}
+```
+
+```python
+def main():
+    # 创建止损单：当BTC_USDT价格下跌至58000时，以市价卖出0.01个BTC
+    condition = {
+        "ConditionType": ORDER_CONDITION_TYPE_SL,  # 止损单
+        "SlTriggerPrice": 58000,   # 触发价格
+        "SlOrderPrice": -1         # -1表示市价单
+    }
+    id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition)
+    Log("SL order Id:", id)
+```
+
+```rust
+fn main() {
+    // 创建止损单：当BTC_USDT价格下跌至58000时，以市价卖出0.01个BTC
+    let condition = OrderCondition {
+        ConditionType: ORDER_CONDITION_TYPE_SL,  // 止损单
+        SlTriggerPrice: 58000.0,   // 触发价格
+        SlOrderPrice: -1.0,        // -1表示市价单
+        ..Default::default()
+    };
+    let id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, &condition);
+    Log!("SL order Id:", id);
+}
+```
+
+创建 OCO 订单：同时设置止盈和止损，任意一个触发后，另一个将自动取消。
+
+```javascript
+function main() {
+    // 创建 OCO 订单：止盈价 65000，止损价 58000
+    var condition = {
+        ConditionType: ORDER_CONDITION_TYPE_OCO,  // OCO 订单
+        TpTriggerPrice: 65000,   // 止盈触发价格
+        TpOrderPrice: 65000,     // 止盈执行价格
+        SlTriggerPrice: 58000,   // 止损触发价格
+        SlOrderPrice: 58000      // 止损执行价格
+    }
+    var id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition)
+    Log("OCO order Id:", id)
+}
+```
+
+```python
+def main():
+    # 创建 OCO 订单：止盈价 65000，止损价 58000
+    condition = {
+        "ConditionType": ORDER_CONDITION_TYPE_OCO,  # OCO 订单
+        "TpTriggerPrice": 65000,   # 止盈触发价格
+        "TpOrderPrice": 65000,     # 止盈执行价格
+        "SlTriggerPrice": 58000,   # 止损触发价格
+        "SlOrderPrice": 58000      # 止损执行价格
+    }
+    id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition)
+    Log("OCO order Id:", id)
+```
+
+```rust
+fn main() {
+    // 创建 OCO 订单：止盈价 65000，止损价 58000
+    let condition = OrderCondition {
+        ConditionType: ORDER_CONDITION_TYPE_OCO,  // OCO 订单
+        TpTriggerPrice: 65000.0,   // 止盈触发价格
+        TpOrderPrice: 65000.0,     // 止盈执行价格
+        SlTriggerPrice: 58000.0,   // 止损触发价格
+        SlOrderPrice: 58000.0      // 止损执行价格
+    };
+    let id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, &condition);
+    Log!("OCO order Id:", id);
+}
+```
+
+使用附加参数（option）创建条件单，用于传递交易所特定的参数。
+
+```javascript
+function main() {
+    // 以 JSON 格式传递 option 参数
+    var option = {
+        "type": "TRAILING_STOP_MARKET",
+        "activatePrice": "300",
+        "callbackRate": "0.1"
+    }
+    var sideWithOption = "buy;" + JSON.stringify(option)
+    var condition = {
+        ConditionType: ORDER_CONDITION_TYPE_TP,
+        TpTriggerPrice: 77,
+        TpOrderPrice: 71
+    }
+    var id = exchange.CreateConditionOrder("SOL_USDT.swap", sideWithOption, 1, condition)
+    Log("Condition Order Id:", id)
+
+    Sleep(2000)
+    Log(exchange.GetConditionOrder(id))
+}
+```
+
+```python
+import json
+
+def main():
+    # 以 JSON 格式传递 option 参数
+    option = {
+        "type": "TRAILING_STOP_MARKET",
+        "activatePrice": "300",
+        "callbackRate": "0.1"
+    }
+    sideWithOption = "buy;" + json.dumps(option)
+    condition = {
+        "ConditionType": ORDER_CONDITION_TYPE_TP,
+        "TpTriggerPrice": 77,
+        "TpOrderPrice": 71
+    }
+    id = exchange.CreateConditionOrder("SOL_USDT.swap", sideWithOption, 1, condition)
+    Log("Condition Order Id:", id)
+
+    Sleep(2000)
+    Log(exchange.GetConditionOrder(id))
+```
+
+```rust
+fn main() {
+    // 以 JSON 格式传递 option 参数（Rust 无 JSON 序列化功能，此处直接使用原始字符串构造）
+    let option = r#"{"type": "TRAILING_STOP_MARKET", "activatePrice": "300", "callbackRate": "0.1"}"#;
+    let sideWithOption = format!("buy;{}", option);
+    let condition = OrderCondition {
+        ConditionType: ORDER_CONDITION_TYPE_TP,
+        TpTriggerPrice: 77.0,
+        TpOrderPrice: 71.0,
+        ..Default::default()
+    };
+    let id = exchange.CreateConditionOrder("SOL_USDT.swap", &sideWithOption, 1, &condition).unwrap();
+    Log!("Condition Order Id:", id);
+
+    Sleep(2000);
+    Log!(exchange.GetConditionOrder(&id));
+}
+```
+
+条件单功能的支持情况取决于具体交易所，部分交易所可能不支持条件单功能。
+
+条件单在触发前不会占用账户资金，仅在触发后才会实际下单并占用资金。
+
+不同交易所对条件单的支持程度及具体参数可能有所差异，使用前请查阅对应交易所的 API 文档。
+
+支持通过```side```参数传递附加参数（option），用于传递交易所特定的参数。附加参数需与```side```参数合并传入，格式为```"side;{JSON对象}"```（推荐）或```"side;key=value&key=value"```（URL 编码格式）。例如：```"buy;{\"type\":\"TRAILING_STOP_MARKET\"}"```。
+
+不同交易所支持的 option 参数各不相同，具体支持的参数取决于交易所 API 文档。常见参数包括：订单类型（type）、生效规则（timeInForce）、触发价格（activatePrice）、回调比率（callbackRate）等。
+
+使用 option 参数时，仍需提供```amount```和```condition```参数。如果交易所 API 中的某些参数已通过 option 传递，这些基础参数可能会被 option 中的对应参数覆盖，具体行为取决于交易所 API 的实现。
+
+See also: `Condition`, `exchange.CancelConditionOrder`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`, `exchange.ModifyConditionOrder`
+
+#### exchange.ModifyConditionOrder
+
+```
+exchange.ModifyConditionOrder(orderId, side, amount, condition)
+```
+
+```exchange.ModifyConditionOrder()```函数用于修改现有的条件单，可修改条件单的下单量、触发条件和执行价格。支持通过附加参数修改条件单的其它属性（具体取决于交易所API的支持情况）。
+
+Parameters:
+
+- `orderId` (string, required): 参数```orderId```用于指定待修改的原条件单ID。条件单ID的格式与`exchange.CreateConditionOrder`函数返回的条件单ID一致，由交易所品种代码和交易所原始条件单ID组成，两者以英文逗号分隔。例如：```"SOL-USDT-SWAP,3196255845130256384"```。
+- `side` (string, required): 参数```side```用于指定条件单的交易方向。
+对于现货交易所对象，```side```参数的可选值为：```buy```、```sell```。```buy```表示买入，```sell```表示卖出。
+对于期货交易所对象，```side```参数的可选值为：```buy```、```closebuy```、```sell```、```closesell```。```buy```表示开多仓，```closebuy```表示平多仓，```sell```表示开空仓，```closesell```表示平空仓。
+
+**支持附加参数（option）**：可以通过```side```参数传递附加参数，格式为：```"side;{JSON对象}"```或```"side;key=value&key=value"```。
+例如：```"buy;{\"newTpTriggerPxType\":\"index\"}"```或```"buy;newTpTriggerPxType=index"```。
+附加参数用于修改条件单的其它属性（如触发价格类型等），具体支持的参数取决于交易所API。
+- `amount` (number, required): 参数```amount```用于设置条件单的新下单量。当数量为-1时表示不修改下单量。对于期货交易所对象，下单量参数```amount```均以合约张数为单位。
+- `condition` (object, required): 参数```condition```是一个对象，用于设置条件单的新触发条件和执行价格。该对象的结构参考`Condition`结构，包含以下属性：
+- ```ConditionType```（number）：条件类型，参考`ORDER_CONDITION_TYPE_OCO`、`ORDER_CONDITION_TYPE_TP`、`ORDER_CONDITION_TYPE_SL`、`ORDER_CONDITION_TYPE_GENERIC`。
+- ```TpTriggerPrice```（number）：止盈触发价格。
+- ```TpOrderPrice```（number）：止盈执行价格，-1表示市价单。
+- ```SlTriggerPrice```（number）：止损触发价格。
+- ```SlOrderPrice```（number）：止损执行价格，-1表示市价单。
+
+Returns (string / 空值): 修改条件单成功时返回条件单ID，修改失败时返回空值。返回的条件单ID可能与原条件单ID相同，也可能不同，这取决于交易所API的具体实现方式。某些交易所在修改条件单后会返回新的条件单ID，而有些交易所则保持条件单ID不变。
+
+修改条件单的数量和触发条件。
+
+```javascript
+function main() {
+    // 创建一个止盈条件单
+    var condition = {
+        ConditionType: ORDER_CONDITION_TYPE_TP,
+        TpTriggerPrice: 77,
+        TpOrderPrice: 76
+    }
+    var id = exchange.CreateConditionOrder("SOL_USDT.swap", "buy", 1, condition)
+    Log("Original Condition Order ID:", id)
+    Sleep(2000)
+
+    // 查询原始条件单信息
+    var order = exchange.GetConditionOrder(id)
+    Log("Original Condition Order Info:", order)
+    Sleep(1000)
+
+    // 修改条件单的数量和触发条件
+    var newCondition = {
+        ConditionType: ORDER_CONDITION_TYPE_TP,
+        TpTriggerPrice: 75,
+        TpOrderPrice: 71
+    }
+    var newId = exchange.ModifyConditionOrder(id, "buy", 2, newCondition)
+    Log("Modified Condition Order ID:", newId)
+    Sleep(2000)
+
+    // 查询修改后的条件单信息
+    var newOrder = exchange.GetConditionOrder(newId)
+    Log("Modified Condition Order Info:", newOrder)
+
+    // 取消条件单
+    exchange.CancelConditionOrder(newId)
+}
+```
+
+```python
+def main():
+    # 创建一个止盈条件单
+    condition = {
+        "ConditionType": ORDER_CONDITION_TYPE_TP,
+        "TpTriggerPrice": 77,
+        "TpOrderPrice": 76
+    }
+    id = exchange.CreateConditionOrder("SOL_USDT.swap", "buy", 1, condition)
+    Log("Original Condition Order ID:", id)
+    Sleep(2000)
+
+    # 查询原始条件单信息
+    order = exchange.GetConditionOrder(id)
+    Log("Original Condition Order Info:", order)
+    Sleep(1000)
+
+    # 修改条件单的数量和触发条件
+    newCondition = {
+        "ConditionType": ORDER_CONDITION_TYPE_TP,
+        "TpTriggerPrice": 75,
+        "TpOrderPrice": 71
+    }
+    newId = exchange.ModifyConditionOrder(id, "buy", 2, newCondition)
+    Log("Modified Condition Order ID:", newId)
+    Sleep(2000)
+
+    # 查询修改后的条件单信息
+    newOrder = exchange.GetConditionOrder(newId)
+    Log("Modified Condition Order Info:", newOrder)
+
+    # 取消条件单
+    exchange.CancelConditionOrder(newId)
+```
+
+```rust
+fn main() {
+    // 创建一个止盈条件单
+    let condition = OrderCondition {
+        ConditionType: ORDER_CONDITION_TYPE_TP,
+        TpTriggerPrice: 77.0,
+        TpOrderPrice: 76.0,
+        ..Default::default()
+    };
+    let id = exchange.CreateConditionOrder("SOL_USDT.swap", "buy", 1, &condition).unwrap();
+    Log!("Original Condition Order ID:", id);
+    Sleep(2000);
+
+    // 查询原始条件单信息
+    let order = exchange.GetConditionOrder(&id);
+    Log!("Original Condition Order Info:", order);
+    Sleep(1000);
+
+    // 修改条件单的数量和触发条件
+    let newCondition = OrderCondition {
+        ConditionType: ORDER_CONDITION_TYPE_TP,
+        TpTriggerPrice: 75.0,
+        TpOrderPrice: 71.0,
+        ..Default::default()
+    };
+    let newId = exchange.ModifyConditionOrder(&id, "buy", 2, &newCondition).unwrap();
+    Log!("Modified Condition Order ID:", newId);
+    Sleep(2000);
+
+    // 查询修改后的条件单信息
+    let newOrder = exchange.GetConditionOrder(&newId);
+    Log!("Modified Condition Order Info:", newOrder);
+
+    // 取消条件单
+    let _ = exchange.CancelConditionOrder(&newId);
+}
+```
+
+使用附加参数（option）修改条件单的触发价格类型。
+
+```javascript
+function main() {
+    // 创建一个止盈条件单
+    var condition = {
+        ConditionType: ORDER_CONDITION_TYPE_TP,
+        TpTriggerPrice: 77,
+        TpOrderPrice: 76
+    }
+    var id = exchange.CreateConditionOrder("SOL_USDT.swap", "buy", 1, condition)
+    Log("Original Condition Order ID:", id)
+    Sleep(2000)
+
+    // 修改条件单，并将触发价格类型设置为指数价格（index）
+    // 通过 side 参数传递附加参数（JSON 格式）
+    var option = {"newTpTriggerPxType": "index"}
+    var sideWithOption = "buy;" + JSON.stringify(option)
+
+    var newCondition = {
+        ConditionType: ORDER_CONDITION_TYPE_TP,
+        TpTriggerPrice: 75,
+        TpOrderPrice: 71
+    }
+    var newId = exchange.ModifyConditionOrder(id, sideWithOption, 2, newCondition)
+    Log("Modified Condition Order ID:", newId)
+    Sleep(2000)
+
+    // 查询修改后的条件单信息
+    var newOrder = exchange.GetConditionOrder(newId)
+    Log("Modified Condition Order Info:", newOrder)
+
+    // 取消条件单
+    exchange.CancelConditionOrder(newId)
+}
+```
+
+```python
+import json
+
+def main():
+    # 创建一个止盈条件单
+    condition = {
+        "ConditionType": ORDER_CONDITION_TYPE_TP,
+        "TpTriggerPrice": 77,
+        "TpOrderPrice": 76
+    }
+    id = exchange.CreateConditionOrder("SOL_USDT.swap", "buy", 1, condition)
+    Log("Original Condition Order ID:", id)
+    Sleep(2000)
+
+    # 修改条件单，并将触发价格类型设置为指数价格（index）
+    # 通过 side 参数传递附加参数（JSON 格式）
+    option = {"newTpTriggerPxType": "index"}
+    sideWithOption = "buy;" + json.dumps(option)
+
+    newCondition = {
+        "ConditionType": ORDER_CONDITION_TYPE_TP,
+        "TpTriggerPrice": 75,
+        "TpOrderPrice": 71
+    }
+    newId = exchange.ModifyConditionOrder(id, sideWithOption, 2, newCondition)
+    Log("Modified Condition Order ID:", newId)
+    Sleep(2000)
+
+    # 查询修改后的条件单信息
+    newOrder = exchange.GetConditionOrder(newId)
+    Log("Modified Condition Order Info:", newOrder)
+
+    # 取消条件单
+    exchange.CancelConditionOrder(newId)
+```
+
+```rust
+fn main() {
+    // 创建一个止盈条件单
+    let condition = OrderCondition {
+        ConditionType: ORDER_CONDITION_TYPE_TP,
+        TpTriggerPrice: 77.0,
+        TpOrderPrice: 76.0,
+        ..Default::default()
+    };
+    let id = exchange.CreateConditionOrder("SOL_USDT.swap", "buy", 1, &condition).unwrap();
+    Log!("Original Condition Order ID:", id);
+    Sleep(2000);
+
+    // 修改条件单，并将触发价格类型设置为指数价格（index）
+    // 通过 side 参数传递附加参数（JSON 格式；Rust 无 JSON 序列化，故直接使用原始字符串构造）
+    let sideWithOption = r#"buy;{"newTpTriggerPxType": "index"}"#;
+
+    let newCondition = OrderCondition {
+        ConditionType: ORDER_CONDITION_TYPE_TP,
+        TpTriggerPrice: 75.0,
+        TpOrderPrice: 71.0,
+        ..Default::default()
+    };
+    let newId = exchange.ModifyConditionOrder(&id, sideWithOption, 2, &newCondition).unwrap();
+    Log!("Modified Condition Order ID:", newId);
+    Sleep(2000);
+
+    // 查询修改后的条件单信息
+    let newOrder = exchange.GetConditionOrder(&newId);
+    Log!("Modified Condition Order Info:", newOrder);
+
+    // 取消条件单
+    let _ = exchange.CancelConditionOrder(&newId);
+}
+```
+
+```exchange.ModifyConditionOrder()```函数返回的条件单ID因交易所API实现的不同而可能表现出不同行为。有些交易所API返回的条件单ID会更新，有些则保持不变。建议使用返回的新条件单ID进行后续操作。
+
+```exchange.ModifyConditionOrder()```函数不会依据交易所接口规则校验参数的有效性，而是将参数直接提交给交易所API。传入无效参数时（如数量为-1），该参数可能会被交易所忽略，条件单保持原有属性不变。
+
+支持通过```side```参数传递附加参数（option），用于修改条件单的其它属性。附加参数需要与```side```参数合并传入，格式为```"side;{JSON对象}"```（推荐）或```"side;key=value"```（URL编码格式）。例如修改触发价格类型：```"buy;{\"newTpTriggerPxType\":\"index\"}"```。
+
+对于条件单的市价单修改，需要具体查看交易所API是否支持。将```condition```参数中的```TpOrderPrice```或```SlOrderPrice```设置为-1表示市价单。
+
+修改条件单时，条件单的其它属性（如条件类型、持仓模式、账户模式、杠杆等）通常会保留原条件单的设置。如需修改这些属性，可以通过附加参数（option）传入，前提是交易所API支持。
+
+可以通过附加参数修改触发价格类型，例如将触发价格类型从最新价（last）修改为指数价格（index）或标记价格（mark）。具体的参数名称和支持情况取决于交易所API文档。
+
+修改条件单功能的支持情况取决于具体交易所，部分交易所可能不支持修改条件单功能，或仅支持修改部分参数。使用前请查阅对应交易所的API文档。
+
+See also: `Condition`, `exchange.CreateConditionOrder`, `exchange.CancelConditionOrder`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`
+
+#### exchange.CancelConditionOrder
+
+```
+exchange.CancelConditionOrder(conditionOrderId)
+exchange.CancelConditionOrder(conditionOrderId, ...args)
+```
+
+```exchange.CancelConditionOrder()```函数用于取消条件单。条件单Id的格式与普通订单Id类似，由交易所品种代码和交易所原始条件单Id组成，两者以英文逗号分隔。
+
+调用```exchange.CancelConditionOrder()```函数撤销条件单时，传入的```conditionOrderId```参数与条件单结构的```Id```属性一致。
+
+Parameters:
+
+- `conditionOrderId` (string, required): ```conditionOrderId```参数用于指定要取消的条件单。
+- `arg` (string / number / bool / object / array / any (平台支持的任意类型), optional): 扩展参数，用于向该条撤销条件单的日志中输出附带信息，```arg```参数可以传入多个。
+
+Returns (bool): ```exchange.CancelConditionOrder()```函数返回真值（例如```true```）表示撤销条件单的请求发送成功，返回假值（例如```false```）表示撤销条件单的请求发送失败。
+
+撤销条件单。
+
+```javascript
+function main(){
+    // 创建止损条件单
+    var condition = {
+        ConditionType: ORDER_CONDITION_TYPE_SL,
+        SlTriggerPrice: 58000,
+        SlOrderPrice: -1  // 市价单
+    }
+    var id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition)
+    Sleep(1000)
+    exchange.CancelConditionOrder(id)
+}
+```
+
+```python
+def main():
+    # 创建止损条件单
+    condition = {
+        "ConditionType": ORDER_CONDITION_TYPE_SL,
+        "SlTriggerPrice": 58000,
+        "SlOrderPrice": -1  # 市价单
+    }
+    id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition)
+    Sleep(1000)
+    exchange.CancelConditionOrder(id)
+```
+
+```rust
+fn main() {
+    // 创建止损条件单
+    let condition = OrderCondition {
+        ConditionType: ORDER_CONDITION_TYPE_SL,
+        SlTriggerPrice: 58000.0,
+        SlOrderPrice: -1.0,  // 市价单
+        ..Default::default()
+    };
+    let id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, &condition).unwrap();
+    Sleep(1000);
+    let _ = exchange.CancelConditionOrder(&id);
+}
+```
+
+批量取消条件单，并附带输出条件单信息。
+
+```javascript
+function main() {
+    // 创建几个条件单
+    var condition1 = {
+        ConditionType: ORDER_CONDITION_TYPE_TP,
+        TpTriggerPrice: 65000,
+        TpOrderPrice: 65000
+    }
+    exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition1)
+
+    var condition2 = {
+        ConditionType: ORDER_CONDITION_TYPE_SL,
+        SlTriggerPrice: 58000,
+        SlOrderPrice: 58000
+    }
+    exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition2)
+    Sleep(1000)
+
+    var orders = exchange.GetConditionOrders()
+    for (var i = 0 ; i < orders.length ; i++) {
+        exchange.CancelConditionOrder(orders[i].Id, "Canceled condition order:", orders[i])
+        Sleep(500)
+    }
+}
+```
+
+```python
+def main():
+    # 创建几个条件单
+    condition1 = {
+        "ConditionType": ORDER_CONDITION_TYPE_TP,
+        "TpTriggerPrice": 65000,
+        "TpOrderPrice": 65000
+    }
+    exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition1)
+
+    condition2 = {
+        "ConditionType": ORDER_CONDITION_TYPE_SL,
+        "SlTriggerPrice": 58000,
+        "SlOrderPrice": 58000
+    }
+    exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition2)
+    Sleep(1000)
+
+    orders = exchange.GetConditionOrders()
+    for i in range(len(orders)):
+        exchange.CancelConditionOrder(orders[i]["Id"], "Canceled condition order:", orders[i])
+        Sleep(500)
+```
+
+```rust
+fn main() {
+    // 创建几个条件单
+    let condition1 = OrderCondition {
+        ConditionType: ORDER_CONDITION_TYPE_TP,
+        TpTriggerPrice: 65000.0,
+        TpOrderPrice: 65000.0,
+        ..Default::default()
+    };
+    let _ = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, &condition1);
+
+    let condition2 = OrderCondition {
+        ConditionType: ORDER_CONDITION_TYPE_SL,
+        SlTriggerPrice: 58000.0,
+        SlOrderPrice: 58000.0,
+        ..Default::default()
+    };
+    let _ = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, &condition2);
+    Sleep(1000);
+
+    let orders = exchange.GetConditionOrders(None).unwrap();
+    for i in 0..orders.len() {
+        // Rust中CancelConditionOrder不支持扩展参数，附带信息用Log输出
+        let _ = exchange.CancelConditionOrder(&orders[i].Id);
+        Log!("Canceled condition order:", orders[i]);
+        Sleep(500);
+    }
+}
+```
+
+```exchange.CancelConditionOrder()```函数的返回值仅代表撤销请求发送成功或失败。如需判断交易所是否已取消该条件单，可以调用```exchange.GetConditionOrders()```函数进行确认。
+
+只有未触发的条件单可以被取消；已经触发并转为普通订单的条件单无法通过此函数取消。
+
+See also: `exchange.CreateConditionOrder`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`, `exchange.ModifyConditionOrder`
+
+#### exchange.GetConditionOrder
+
+```
+exchange.GetConditionOrder(conditionOrderId)
+```
+
+```exchange.GetConditionOrder()```函数用于获取指定条件单的信息。
+
+Parameters:
+
+- `conditionOrderId` (string, required): ```conditionOrderId```参数用于指定所要查询的条件单。条件单Id的格式与普通订单Id类似，由交易所品种代码和交易所原始条件单Id组成，两者之间以英文逗号分隔。
+
+调用```exchange.GetConditionOrder()```函数查询条件单时传入的```conditionOrderId```参数与条件单结构的```Id```属性一致。
+
+Returns (`Order` / 空值): 根据条件单号查询条件单详情，查询成功时返回`Order`结构，查询失败时返回空值。
+
+返回的Order结构中包含`Condition`字段，该字段包含条件单的详细配置信息（触发价格、执行价格、条件类型等）。
+
+```javascript
+function main(){
+    // 创建止盈条件单
+    var condition = {
+        ConditionType: ORDER_CONDITION_TYPE_TP,
+        TpTriggerPrice: 65000,
+        TpOrderPrice: 65000
+    }
+    var id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition)
+    Sleep(1000)
+
+    // 参数id为条件单号码，需填入你想要查询的条件单的号码
+    var order = exchange.GetConditionOrder(id)
+    Log("Id:", order.Id, "Price:", order.Price, "Amount:", order.Amount,
+        "Status:", order.Status, "Type:", order.Type, "Condition:", order.Condition)
+}
+```
+
+```python
+def main():
+    # 创建止盈条件单
+    condition = {
+        "ConditionType": ORDER_CONDITION_TYPE_TP,
+        "TpTriggerPrice": 65000,
+        "TpOrderPrice": 65000
+    }
+    id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition)
+    Sleep(1000)
+
+    order = exchange.GetConditionOrder(id)
+    Log("Id:", order["Id"], "Price:", order["Price"], "Amount:", order["Amount"],
+        "Status:", order["Status"], "Type:", order["Type"], "Condition:", order["Condition"])
+```
+
+```rust
+fn main() {
+    // 创建止盈条件单
+    let condition = OrderCondition {
+        ConditionType: ORDER_CONDITION_TYPE_TP,
+        TpTriggerPrice: 65000.0,
+        TpOrderPrice: 65000.0,
+        ..Default::default()
+    };
+    let id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, &condition).unwrap();
+    Sleep(1000);
+
+    // 参数id为条件单号码，需填入你想要查询的条件单的号码
+    let order = exchange.GetConditionOrder(&id).unwrap();
+    Log!("Id:", order.Id, "Price:", order.Price, "Amount:", order.Amount,
+        "Status:", order.Status, "Type:", order.Type, "Condition:", order.Condition);
+}
+```
+
+部分交易所不支持```exchange.GetConditionOrder()```函数。
+
+返回的条件单结构包含触发条件、触发价格、订单状态等信息。
+
+条件单状态包括：未触发、已触发、已取消等，具体的状态值由交易所而定。
+
+See also: `Order`, `exchange.GetConditionOrders`, `exchange.GetHistoryConditionOrders`, `exchange.ModifyConditionOrder`
+
+#### exchange.GetConditionOrders
+
+```
+exchange.GetConditionOrders()
+exchange.GetConditionOrders(symbol)
+```
+
+```exchange.GetConditionOrders()```函数用于获取未完成的条件单（尚未触发或尚未取消的条件单）。
+
+Parameters:
+
+- `symbol` (string, optional): 参数```symbol```用于指定所要查询的**交易品种**或**交易品种范围**。
+
+对于现货交易所对象，未传入```symbol```参数时，将请求所有现货品种的未完成条件单数据。
+
+对于期货交易所对象，未传入```symbol```参数时，默认按当前交易对、合约代码所在的维度范围，请求该范围内所有品种的未完成条件单数据。
+
+Returns (`Order`数组 / 空值): ```exchange.GetConditionOrders()```函数在请求数据成功时返回`Order`结构数组，在请求数据失败时返回空值。
+
+返回的Order结构中包含`Condition`字段，该字段包含条件单的详细配置信息（触发价格、执行价格、条件类型等）。
+
+使用现货交易所对象创建多个条件单，然后查询未完成的条件单信息。
+
+```javascript
+function main() {
+    // 创建多个条件单
+    var condition1 = {
+        ConditionType: ORDER_CONDITION_TYPE_TP,
+        TpTriggerPrice: 65000,
+        TpOrderPrice: 65000
+    }
+    exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition1)
+
+    var condition2 = {
+        ConditionType: ORDER_CONDITION_TYPE_TP,
+        TpTriggerPrice: 3200,
+        TpOrderPrice: 3200
+    }
+    exchange.CreateConditionOrder("ETH_USDT", "sell", 0.1, condition2)
+    Sleep(1000)
+
+    // 查询所有未完成条件单
+    var orders = exchange.GetConditionOrders()
+    Log("Pending condition orders count:", orders.length)
+    for (var i = 0; i < orders.length; i++) {
+        Log("Condition order", i+1, ":", orders[i])
+    }
+}
+```
+
+```python
+def main():
+    # 创建多个条件单
+    condition1 = {
+        "ConditionType": ORDER_CONDITION_TYPE_TP,
+        "TpTriggerPrice": 65000,
+        "TpOrderPrice": 65000
+    }
+    exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition1)
+
+    condition2 = {
+        "ConditionType": ORDER_CONDITION_TYPE_TP,
+        "TpTriggerPrice": 3200,
+        "TpOrderPrice": 3200
+    }
+    exchange.CreateConditionOrder("ETH_USDT", "sell", 0.1, condition2)
+    Sleep(1000)
+
+    # 查询所有未完成条件单
+    orders = exchange.GetConditionOrders()
+    Log("Pending condition orders count:", len(orders))
+    for i in range(len(orders)):
+        Log("Condition order", i+1, ":", orders[i])
+```
+
+```rust
+fn main() {
+    // 创建多个条件单
+    let condition1 = OrderCondition {
+        ConditionType: ORDER_CONDITION_TYPE_TP,
+        TpTriggerPrice: 65000.0,
+        TpOrderPrice: 65000.0,
+        ..Default::default()
+    };
+    let _ = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, &condition1);
+
+    let condition2 = OrderCondition {
+        ConditionType: ORDER_CONDITION_TYPE_TP,
+        TpTriggerPrice: 3200.0,
+        TpOrderPrice: 3200.0,
+        ..Default::default()
+    };
+    let _ = exchange.CreateConditionOrder("ETH_USDT", "sell", 0.1, &condition2);
+    Sleep(1000);
+
+    // 查询所有未完成条件单
+    let orders = exchange.GetConditionOrders(None).unwrap();
+    Log!("Pending condition orders count:", orders.len());
+    for i in 0..orders.len() {
+        Log!("Condition order", i + 1, ":", orders[i]);
+    }
+}
+```
+
+查询指定交易对的未成交条件单。
+
+```javascript
+function main() {
+    // 查询 BTC_USDT 交易对的未成交条件单
+    var orders = exchange.GetConditionOrders("BTC_USDT")
+    Log("BTC_USDT pending condition orders:", orders)
+}
+```
+
+```python
+def main():
+    # 查询 BTC_USDT 交易对的未成交条件单
+    orders = exchange.GetConditionOrders("BTC_USDT")
+    Log("BTC_USDT pending condition orders:", orders)
+```
+
+```rust
+fn main() {
+    // 查询 BTC_USDT 交易对的未成交条件单
+    let orders = exchange.GetConditionOrders("BTC_USDT");
+    Log!("BTC_USDT pending condition orders:", orders);
+}
+```
+
+在```GetConditionOrders```函数中，symbol参数的使用场景归纳如下：
+| 交易所对象分类 | symbol参数 | 查询范围 | 备注 |
+| - | - | - | - |
+| 现货 | 不传symbol参数 | 查询所有现货交易对 | 适用于所有调用场景；若交易所接口不支持则报错并返回空值，以下不再赘述 |
+| 现货 | 指定交易品种，symbol参数为："BTC_USDT" | 查询指定的BTC_USDT交易对 | 对于现货交易所对象，参数symbol的格式为："BTC_USDT" |
+| 期货 | 不传symbol参数 | 查询当前交易对、合约代码维度范围内的所有交易品种 | 假如当前交易对为BTC_USDT，合约代码为swap，即查询所有USDT本位永续合约。等价于调用```GetConditionOrders("USDT.swap")``` |
+| 期货 | 指定交易品种，symbol参数为："BTC_USDT.swap" | 查询指定的BTC的USDT本位永续合约 | 对于期货交易所对象，参数symbol的格式为：FMZ平台定义的**交易对**与**合约代码**组合，两者以字符```"."```间隔。 |
+| 期货 | 指定交易品种范围，symbol参数为："USDT.swap" | 查询所有USDT本位永续合约 | - |
+| 支持期权的期货交易所 | 不传symbol参数 | 查询当前交易对维度范围内的所有期权合约 | 假如当前交易对为BTC_USDT，且合约设置为期权合约，例如币安期权合约：BTC-240108-40000-C |
+| 支持期权的期货交易所 | 指定具体交易品种 | 查询指定的期权合约 | 例如对于币安期货交易所，symbol参数为：BTC_USDT.BTC-240108-40000-C |
+| 支持期权的期货交易所 | 指定交易品种范围，symbol参数为："USDT.option" | 查询所有USDT本位期权合约 | - |
+
+在```GetConditionOrders```函数中，期货交易所对象的查询维度范围归纳如下：
+| symbol参数 | 请求范围定义 | 备注 |
+| - | - | - |
+| USDT.swap          | USDT本位永续合约范围。  | 对于交易所API接口不支持的维度，调用时会报错并返回空值。 |
+| USDT.futures       | USDT本位交割合约范围。  | - |
+| USD.swap           | 币本位永续合约范围。    | - |
+| USD.futures        | 币本位交割合约范围。    | - |
+| USDT.option        | USDT本位期权合约范围。  | - |
+| USD.option         | 币本位期权合约范围。    | - |
+| USDT.futures_combo | 差价组合合约范围。      | Futures_Deribit交易所 |
+| USD.futures_ff     | 混合保证金交割合约范围。 | Futures_Kraken交易所 |
+| USD.swap_pf        | 混合保证金永续合约范围。 | Futures_Kraken交易所 |
+
+当交易所对象```exchange```所代表的账户在**查询范围内**或**指定的交易品种**上没有未完成条件单时，调用该函数将返回空数组，即：```[]```。
+
+条件单功能的支持情况取决于具体交易所，部分交易所可能不支持条件单功能。
+
+See also: `Order`, `exchange.GetConditionOrder`, `exchange.GetHistoryConditionOrders`
+
+#### exchange.GetHistoryConditionOrders
+
+```
+exchange.GetHistoryConditionOrders()
+exchange.GetHistoryConditionOrders(symbol)
+exchange.GetHistoryConditionOrders(symbol, since)
+exchange.GetHistoryConditionOrders(symbol, since, limit)
+exchange.GetHistoryConditionOrders(since)
+exchange.GetHistoryConditionOrders(since, limit)
+```
+
+```exchange.GetHistoryConditionOrders()```函数用于获取当前交易对、合约的历史条件单（包括已触发、已取消、已过期的条件单），并支持指定具体的交易品种。
+
+Parameters:
+
+- `symbol` (string, optional): ```symbol```参数用于指定交易品种。以```BTC_USDT```交易对为例，当```exchange```为现货交易所对象时，```symbol```参数的格式为：```BTC_USDT```；如果为期货交易所对象，以永续合约为例，```symbol```参数的格式为：```BTC_USDT.swap```。
+
+如果查询的是期权合约的条件单数据，则将```symbol```参数设置为```"BTC_USDT.BTC-240108-40000-C"```（以币安期权BTC-240108-40000-C为例），其格式为FMZ平台定义的**交易对**与交易所定义的具体期权合约代码的组合，两者之间以字符"."间隔。若不传入该参数，则默认请求当前所设置交易对、合约代码的条件单数据。
+- `since` (number, optional): ```since```参数用于指定查询的起始时间戳，单位为毫秒。
+- `limit` (number, optional): ```limit```参数用于指定查询的条件单数量。
+
+Returns (`Order`数组 / 空值): ```exchange.GetHistoryConditionOrders()```函数在请求数据成功时返回`Order`结构数组，在请求数据失败时返回空值。
+
+返回的Order结构中包含`Condition`字段，该字段包含条件单的详细配置信息（触发价格、执行价格、条件类型等）。
+
+查询历史条件单，返回的结果按时间升序排列。
+
+```javascript
+function main() {
+    var historyConditionOrders = exchange.GetHistoryConditionOrders()
+    Log("Historical condition orders count:", historyConditionOrders.length)
+
+    // 遍历并显示，订单按 Time 属性升序排列
+    for (var i = 0; i < historyConditionOrders.length; i++) {
+        Log("Order", i+1, "Created at:", historyConditionOrders[i].Time,
+            "ID:", historyConditionOrders[i].Id,
+            "Status:", historyConditionOrders[i].Status)
+    }
+}
+```
+
+```python
+def main():
+    historyConditionOrders = exchange.GetHistoryConditionOrders()
+    Log("Historical condition orders count:", len(historyConditionOrders))
+
+    # 遍历并显示，订单按 Time 属性升序排列
+    for i in range(len(historyConditionOrders)):
+        Log("Order", i+1, "Created at:", historyConditionOrders[i]["Time"],
+            "ID:", historyConditionOrders[i]["Id"],
+            "Status:", historyConditionOrders[i]["Status"])
+```
+
+```rust
+fn main() {
+    let historyConditionOrders = exchange.GetHistoryConditionOrders(None, None, None).unwrap();
+    Log!("Historical condition orders count:", historyConditionOrders.len());
+
+    // 遍历并显示，订单按 Time 属性升序排列
+    for i in 0..historyConditionOrders.len() {
+        Log!("Order", i + 1, "Created at:", historyConditionOrders[i].Time,
+            "ID:", historyConditionOrders[i].Id,
+            "Status:", historyConditionOrders[i].Status);
+    }
+}
+```
+
+查询指定交易对的历史条件单，并限制返回的数量。
+
+```javascript
+function main() {
+    // 查询BTC_USDT交易对最近的10条历史条件单
+    var historyConditionOrders = exchange.GetHistoryConditionOrders("BTC_USDT", 0, 10)
+    Log("BTC_USDT historical condition orders:", historyConditionOrders)
+}
+```
+
+```python
+def main():
+    # 查询BTC_USDT交易对最近的10条历史条件单
+    historyConditionOrders = exchange.GetHistoryConditionOrders("BTC_USDT", 0, 10)
+    Log("BTC_USDT historical condition orders:", historyConditionOrders)
+```
+
+```rust
+fn main() {
+    // 查询BTC_USDT交易对最近的10条历史条件单
+    let historyConditionOrders = exchange.GetHistoryConditionOrders("BTC_USDT", 0, 10);
+    Log!("BTC_USDT historical condition orders:", historyConditionOrders);
+}
+```
+
+按时间范围查询历史条件单。
+
+```javascript
+function main() {
+    // 查询从指定时间戳开始的历史条件单
+    var startTime = new Date("2024-01-01").getTime()
+    var historyConditionOrders = exchange.GetHistoryConditionOrders(startTime, 50)
+    Log("Historical condition orders since:", historyConditionOrders)
+}
+```
+
+```python
+def main():
+    # 查询从指定时间戳开始的历史条件单
+    import time
+    startTime = int(time.mktime(time.strptime("2024-01-01", "%Y-%m-%d")) * 1000)
+    historyConditionOrders = exchange.GetHistoryConditionOrders(startTime, 50)
+    Log("Historical condition orders since:", historyConditionOrders)
+```
+
+```rust
+fn main() {
+    // 查询从指定时间戳开始的历史条件单
+    let startTime: i64 = 1704067200000;  // 2024-01-01的时间戳
+    // Rust中symbol参数传None表示当前交易对
+    let historyConditionOrders = exchange.GetHistoryConditionOrders(None, startTime, 50);
+    Log!("Historical condition orders since:", historyConditionOrders);
+}
+```
+
+- 不指定```symbol```、```since```、```limit```参数时，默认查询当前交易对、合约的历史条件单，即查询距离当前时间最近的一定范围内的历史条件单，查询范围取决于交易所接口的单次查询范围。
+
+- 指定```symbol```参数时，查询所设置交易品种的历史条件单。
+
+- 指定```since```参数时，以```since```时间戳为起始时间，向当前时间方向查询。
+
+- 指定```limit```参数时，在查询到足够条数后返回。
+
+- 该函数仅支持提供历史条件单查询接口的交易所。
+
+历史条件单包括：已触发（转为普通订单）、已取消、已过期等状态的条件单。
+
+返回的历史条件单数组按订单创建时间（```Time```属性）升序排列，即时间最早的订单位于数组前面，时间最晚的订单位于数组后面。
+
+对条件单功能的支持情况取决于具体的交易所，部分交易所可能不支持条件单功能或历史条件单查询功能。
+
+See also: `Order`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`
+
+### Account
+
+#### exchange.GetAccount
+
+```
+exchange.GetAccount()
+```
+
+```exchange.GetAccount()```函数用于请求交易所账户信息。```GetAccount()```函数是交易所对象`exchange`的成员函数，```exchange```对象的成员函数（方法）仅与```exchange```相关，后续文档不再赘述。
+
+Returns (`Account` / 空值): 查询账户资产信息，查询成功时返回`Account`结构，查询失败时返回空值。
+
+设置交易对与合约代码，获取当前账户信息。
+
+```javascript
+function main(){
+    // 切换交易对
+    exchange.IO("currency", "BTC_USDT")
+    // 以OKX期货为例，设置合约为当周合约，当前交易对为BTC_USDT，所以当前合约为BTC的U本位当周合约
+    exchange.SetContractType("this_week")
+    // 获取当前账户资产数据
+    var account = exchange.GetAccount()
+    // USDT作为保证金的可用余额
+    Log(account.Balance)
+    // USDT作为保证金的冻结金额
+    Log(account.FrozenBalance)
+    // 当前资产权益
+    Log(account.Equity)
+    // 当前资产作为保证金的所有持仓的未实现盈亏
+    Log(account.UPnL)
+}
+```
+
+```python
+def main():
+    exchange.IO("currency", "BTC_USDT")
+    exchange.SetContractType("this_week")
+    account = exchange.GetAccount()
+    Log(account["Balance"])
+    Log(account["FrozenBalance"])
+    Log(account["Equity"])
+    Log(account["UPnL"])
+```
+
+```rust
+fn main() {
+    // 切换交易对
+    exchange.IO(("currency", "BTC_USDT")).unwrap();
+    // 以OKX期货为例，设置合约为当周合约，当前交易对为BTC_USDT，所以当前合约为BTC的U本位当周合约
+    exchange.SetContractType("this_week").unwrap();
+    // 获取当前账户资产数据
+    let account = exchange.GetAccount().unwrap();
+    // USDT作为保证金的可用余额
+    Log!(account.Balance);
+    // USDT作为保证金的冻结金额
+    Log!(account.FrozenBalance);
+    // 当前资产权益
+    Log!(account.Equity);
+    // 当前资产作为保证金的所有持仓的未实现盈亏
+    Log!(account.UPnL);
+}
+```
+
+如果交易所对象设置为加密货币期货合约交易所，并且切换为以```USDT```作为保证金的合约（切换方法请参阅`exchange.SetCurrency`、`exchange.SetContractType`函数），此时资产以```USDT```作为保证金，记录在`Account`结构的```Balance```、```FrozenBalance```属性中。
+
+如果交易所对象设置为加密货币期货合约交易所，并且切换为币本位合约，此时资产以币作为保证金，记录在`Account`结构的```Stocks```、```FrozenStocks```属性中。
+
+使用币安期货统一账户时，调用```exchange.GetAccount()```函数请求账户信息，封装的数据为所有资产折算为**USD**后的金额，显示在`Account`结构的```Balance```字段中。如需计算其它资产的折算金额，可将USD折算金额除以（待折算资产的）指数价格，再除以（待折算资产的）质押率即可算出。
+
+See also: `Account`, `exchange.SetCurrency`, `exchange.SetContractType`
+
+#### exchange.GetAssets
+
+```
+exchange.GetAssets()
+```
+
+```exchange.GetAssets```函数用于请求交易所账户的资产信息。
+
+Returns (`Asset`数组 / 空值): ```exchange.GetAssets()```函数请求数据成功时返回`Asset`结构体数组，请求数据失败时返回空值。
+
+获取交易所账户的资产信息，```exchange.GetAssets()```函数返回一个以Asset结构体为元素的数组。
+
+```javascript
+function main() {
+    // exchange.SetCurrency("BTC_USDT")  // 可以设置交易对
+    // exchange.SetContractType("swap")  // 可以设置合约
+    var assets = exchange.GetAssets()
+    Log(assets)
+}
+```
+
+```python
+def main():
+    # exchange.SetCurrency("BTC_USDT")  # 可以设置交易对
+    # exchange.SetContractType("swap")  # 可以设置合约
+    assets = exchange.GetAssets()
+    Log(assets)
+```
+
+```rust
+fn main() {
+    // exchange.SetCurrency("BTC_USDT");  // 可以设置交易对
+    // exchange.SetContractType("swap").unwrap();  // 可以设置合约
+    let assets = exchange.GetAssets().unwrap();
+    Log!(assets);
+}
+```
+
+期货交易所对象的```GetAssets()```函数返回当前交易对（币本位、USDT本位、USDC本位等）下的保证金资产。
+
+See also: `Asset`
+
+### Futures
+
+#### exchange.SetContractType
+
+```
+exchange.SetContractType(symbol)
+```
+
+```exchange.SetContractType()```函数用于设置`exchange`交易所对象当前的合约代码。
+
+Parameters:
+
+- `symbol` (string, required): ```symbol```参数用于设置合约代码，可选值为：```"this_week"```、```"next_week"```、```"quarter"```、```"next_quarter"```、```"swap"```等。
+
+加密货币期货合约中的**交割合约**代码如无特殊说明，一般包括：
+
+- ```this_week```：当周合约。
+
+- ```next_week```：次周合约。
+
+- ```quarter```：当季合约。
+
+- ```next_quarter```：次季合约。
+
+加密货币期货合约中的**永续合约**代码如无特殊说明，一般包括：
+
+- ```swap```：永续合约。
+
+Returns (object): ```exchange.SetContractType()```函数返回一个结构体，其中包含当前合约代码对应的交易所合约代码。例如，在币安期货合约交易所中，当前合约代码为```quarter```时，该函数的返回值结构为：```{"InstrumentID":"BTCUSD_230630","instrument":"BTCUSD_230630"}```。
+
+将当前合约设置为当周合约：
+
+```javascript
+function main() {
+    // 设置为当周合约
+    exchange.SetContractType("this_week")
+}
+```
+
+```python
+def main():
+    exchange.SetContractType("this_week")
+```
+
+```rust
+fn main() {
+    // 设置为当周合约
+    exchange.SetContractType("this_week").unwrap();
+}
+```
+
+在设置以```USDT```作为保证金的合约时，需要在代码中切换交易对（也可以在添加交易所对象时直接设置交易对）：
+
+```javascript
+function main() {
+    // 默认交易对为BTC_USD，设置合约为当周，合约为币本位合约
+    exchange.SetContractType("this_week")
+    Log("ticker:", exchange.GetTicker())
+
+    // 切换交易对，然后设置合约，切换成USDT作为保证金的合约，区别于币本位合约
+    exchange.IO("currency", "BTC_USDT")
+    exchange.SetContractType("swap")
+    Log("ticker:", exchange.GetTicker())
+}
+```
+
+```python
+def main():
+    exchange.SetContractType("this_week")
+    Log("ticker:", exchange.GetTicker())
+    exchange.IO("currency", "BTC_USDT")
+    exchange.SetContractType("swap")
+    Log("ticker:", exchange.GetTicker())
+```
+
+```rust
+fn main() {
+    // 默认交易对为BTC_USD，设置合约为当周，合约为币本位合约
+    exchange.SetContractType("this_week").unwrap();
+    Log!("ticker:", exchange.GetTicker(None));
+
+    // 切换交易对，然后设置合约，切换成USDT作为保证金的合约，区别于币本位合约
+    exchange.IO(("currency", "BTC_USDT")).unwrap();
+    exchange.SetContractType("swap").unwrap();
+    Log!("ticker:", exchange.GetTicker(None));
+}
+```
+
+打印```exchange.SetContractType()```函数的返回值：
+
+```javascript
+function main(){
+    // 设置合约为当周
+    var ret = exchange.SetContractType("this_week")
+    // 返回当周合约的信息
+    Log(ret)
+}
+```
+
+```python
+def main():
+    ret = exchange.SetContractType("this_week")
+    Log(ret)
+```
+
+```rust
+fn main() {
+    // 设置合约为当周
+    let ret = exchange.SetContractType("this_week").unwrap();
+    // 返回当周合约的信息
+    Log!(ret);
+}
+```
+
+在加密货币期货合约策略中，以切换至```BTC_USDT```交易对为例：
+
+当使用```exchange.SetCurrency("BTC_USDT")```或```exchange.IO("currency", "BTC_USDT")```函数切换交易对后，需要再次调用```exchange.SetContractType()```函数重新设置合约，才能在新的交易对下确定当前需要操作的合约。系统会根据交易对来判定该合约为**币本位合约**还是**USDT本位合约**。
+
+例如：当交易对设置为```BTC_USDT```时，使用```exchange.SetContractType("swap")```函数将合约代码设置为```swap```，此时即设置为```BTC```的**USDT本位**永续合约。若交易对为```BTC_USD```，使用```exchange.SetContractType("swap")```函数将合约代码设置为```swap```，此时则设置为```BTC```的**币本位**永续合约。
+
+详细介绍平台支持的加密货币期货合约交易所，各交易所的合约命名方式如下：
+- Futures_OKCoin（OKX）
+  设置为永续合约：```exchange.SetContractType("swap")```
+  设置为当周合约：```exchange.SetContractType("this_week")```
+  设置为次周合约：```exchange.SetContractType("next_week")```
+  设置为月度合约：```exchange.SetContractType("month")```
+  设置为次月合约：```exchange.SetContractType("next_month")```
+  设置为季度合约：```exchange.SetContractType("quarter")```
+  设置为次季合约：```exchange.SetContractType("next_quarter")```
+
+  OKX提供盘前交易合约，此类合约的交割日期为固定时间。以交易所定义的合约代码```HMSTR-USDT-250207```为例，先在发明者平台将交易对设置为```HMSTR_USDT```，然后使用```exchange.SetContractType("HMSTR-USDT-250207")```设置该合约。
+  对于支持```symbol```参数的函数（例如```exchange.GetTicker()```、```exchange.CreateOrder()```等），可以将```symbol```参数指定为```HMSTR_USDT.HMSTR-USDT-250207```，以获取该合约的行情数据或进行下单等操作。
+- Futures_HuobiDM（火币期货）
+  设置为当周合约：```exchange.SetContractType("this_week")```。
+  设置为次周合约：```exchange.SetContractType("next_week")```。
+  设置为季度合约：```exchange.SetContractType("quarter")```。
+  设置为次季合约：```exchange.SetContractType("next_quarter")```。
+  设置为永续合约：```exchange.SetContractType("swap")```。
+  支持以```USDT```作为保证金的合约。以```BTC```合约为例：调用```exchange.IO("currency", "BTC_USDT")```即可切换为以```USDT```作为保证金的合约，
+  或在配置实盘参数、添加交易所对象时直接将当前交易对设置为```BTC_USDT```。切换交易对后需重新调用```exchange.SetContractType()```函数设置合约。
+- Futures_BitMEX（BitMEX）
+  设置为永续合约：```exchange.SetContractType("swap")```。
+  Futures_BitMEX交易所的交割合约为月度合约，合约代码如下（一月至十二月）：
+  ```code
+  "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
+  ```
+  设置交割合约：```exchange.SetContractType("December")```。例如，将交易对设置为```XBT_USDT```时，调用```exchange.SetContractType("December")```函数即可设置BTC的USDT本位十二月交割合约（对应的实际合约代码为```XBTUSDTZ23```）。
+
+  Futures_BitMEX合约信息汇总
+  |Futures_BitMEX定义的合约代码|在FMZ对应的交易对|在FMZ对应的合约代码|备注|
+  | - | - | - | - |
+  | DOGEUSD | DOGE_USD | swap | 美元计价，XBT结算。XBT即BTC。 |
+  | DOGEUSDT | DOGE_USDT | swap | USDT计价，USDT结算。 |
+  | XBTETH | XBT_ETH | swap | ETH计价，XBT结算。 |
+  | XBTEUR | XBT_EUR | swap | 欧元计价（EUR），XBT结算。 |
+  | USDTUSDC | USDT_USDC | swap | USDC计价，XBT结算。 |
+  | ETHUSD_ETH | ETH_USD_ETH | swap | 美元计价，ETH结算。 |
+  | XBTH24 | XBT_USD | March | 到期日：24年3月，月份代码为H；美元计价，XBT结算。 |
+  | ETHUSDZ23 | ETH_USD | December | 到期日：23年12月，月份代码为Z；美元计价，XBT结算。 |
+  | XBTUSDTZ23 | XBT_USDT | December | 到期日：23年12月，月份代码为Z；USDT计价，USDT结算。 |
+  | ADAZ23 | ADA_XBT | December | 到期日：23年12月，月份代码为Z；XBT计价，XBT结算。 |
+  | P_XBTETFX23 | USDT_XXX | P_XBTETFX23 | 到期日：23年11月；以百分比计价，USDT结算。 |
+- Futures_GateIO
+  设置为当周合约：```exchange.SetContractType("this_week")```。
+  设置为次周合约：```exchange.SetContractType("next_week")```。
+  设置为季度合约：```exchange.SetContractType("quarter")```。
+  设置为次季合约：```exchange.SetContractType("next_quarter")```。
+  设置为永续合约：```exchange.SetContractType("swap")```。
+  支持以```USDT```作为保证金的合约。以```BTC```合约为例，调用```exchange.IO("currency", "BTC_USDT")```即可切换为以```USDT```作为保证金的合约，
+  或在配置实盘参数、添加交易所对象时直接将当前交易对设置为```BTC_USDT```。切换交易对后需重新调用```exchange.SetContractType()```函数设置合约。
+- Futures_Deribit
+  设置为永续合约：```exchange.SetContractType("swap")```。
+  支持Deribit的```USDC```合约。
+  交割合约有：```"this_week"```, ```"next_week"```, ```"month"```, ```"quarter"```, ```"next_quarter"```, ```"third_quarter"```, ```"fourth_quarter"```。
+  差价合约（future_combo）：```"this_week,swap"```, ```"next_week,swap"```, ```"next_quarter,this_week"```, ```"third_quarter,this_week"```, ```"month,next_week"```等多种组合。
+  对于期权合约，需要传入交易所定义的具体期权合约代码，详情请参阅Deribit官网。
+- Futures_KuCoin
+  币本位合约：例如将交易对设置为```BTC_USD```，再设置合约代码，即为币本位合约。
+  设置为永续合约：```exchange.SetContractType("swap")```。
+  设置为当季合约：```exchange.SetContractType("quarter")```。
+  设置为次季合约：```exchange.SetContractType("next_quarter")```。
+
+  以USDT作为保证金的合约：
+  例如将交易对设置为```BTC_USDT```，再设置合约代码，即为以USDT作为保证金的合约。
+  设置为永续合约：```exchange.SetContractType("swap")```。
+- Futures_Binance
+  币安期货交易所默认为当前交易对的永续合约，合约代码：```swap```。
+  设置为永续合约：```exchange.SetContractType("swap")```。币安的永续合约支持以```USDT```作为保证金，例如```BTC```的```USDT```本位永续合约，需将交易对设置为```BTC_USDT```；币安也支持以币作为保证金的永续合约，例如```BTC```的币本位永续合约，需将交易对设置为```BTC_USD```。
+  设置为季度合约：```exchange.SetContractType("quarter")```。交割合约包含币本位合约（即以币作为保证金），例如设置```BTC```的季度合约时，将交易对设置为```BTC_USD```，再调用```exchange.SetContractType("quarter")```，即可设置为```BTC```的币本位季度合约。
+  设置为次季合约：```exchange.SetContractType("next_quarter")```。例如设置```BTC```的币本位次季度合约时，将交易对设置为```BTC_USD```，再调用```exchange.SetContractType("next_quarter")```。
+  币安支持部分以```USDT```作为保证金的交割合约，以```BTC```为例，将交易对设置为```BTC_USDT```，再设置合约代码即可。
+
+  支持币安期权合约：
+  期权合约代码格式以交易所定义的为准，例如```BTC-241227-15000-C```、```XRP-240112-0.5-C```、```BTC-241227-15000-P```。以币安期权合约代码```BTC-241227-15000-P```为例：BTC为期权币种代码，241227为行权日期，15000为行权价格，P表示看跌期权，C表示看涨期权。
+  期权的具体类型（欧式期权或美式期权）可查阅交易所期权合约的相关资料。
+  交易所可能对期权卖方有所限制，需单独申请资格。币安期权即需要申请卖方资格。
+- Futures_Bibox
+  Bibox永续合约的合约代码：```swap```。
+  设置为永续合约：```exchange.SetContractType("swap")```。
+- Futures_Bybit
+  默认为当前交易对的永续合约，合约代码：```swap```。
+  当周合约代码：```this_week```。
+  次周合约代码：```next_week```。
+  第三周合约代码：```third_week```。
+  月度合约代码：```month```。
+  次月合约代码：```next_month```。
+  季度合约代码：```quarter```。
+  次季度合约代码：```next_quarter```。
+  第三季度合约代码：```third_quarter```。
+  直接使用交易所的合约命名：例如```ETHUSDT-04APR25```。由于bybit交易所的部分合约品种并无明确的周期性，因此直接使用交易所定义的合约代码进行命名。
+- Futures_Kraken
+  默认为当前交易对的永续合约，合约代码：```swap```。
+  ```swap```：永续合约。
+  ```month```：当月合约。
+  ```quarter```：季度合约。
+  ```next_quarter```：次季合约。
+  ```third_quarter```：第三季度合约。
+  ```swap_pf```：混合保证金永续合约。
+  ```quarter_ff```：混合保证金季度合约。
+  ```month_ff```：混合保证金当月合约。
+  ```next_quarter_ff```：混合保证金次季度合约。
+  ```third_quarter_ff```：混合保证金第三季度合约。
+  直接使用交易所的合约命名：例如```FF_ETHUSD_250307```。由于Kraken交易所的部分合约品种并无明确的周期性，因此直接使用交易所定义的合约代码进行命名。
+  期权合约：直接使用交易所的期权合约代码，形如```OF_ETHUSD_261225_4000_C```（交易对为```ETH_USD```）。
+- Futures_Bitfinex
+  默认为当前交易对的永续合约，合约代码：```swap```。
+- Futures_Bitget
+  默认为当前交易对的永续合约，合约代码：```swap```。
+  将交易对设置为```BTC_USD```即为币本位合约，将交易对设置为```BTC_USDT```即为```USDT```结算的合约。模拟合约可将交易对设置为```SBTC_USD```、```BTC_SUSDT```。
+- Futures_dYdX (v4)
+  dYdX永续合约的合约代码：```swap```。
+  设置为永续合约：```exchange.SetContractType("swap")```。dYdX仅有```USD.swap```品种维度，使用的保证金为USDC。
+- Futures_MEXC
+  MEXC（抹茶）永续合约的合约代码：```swap```。
+  设置为永续合约：```exchange.SetContractType("swap")```。将交易对设置为```BTC_USD```即为币本位合约，将交易对设置为```BTC_USDT```即为```USDT```结算的合约。
+- Futures_Crypto
+  crypto.com交易所账户中的代币可折算为以USD计价的额度，用作合约交易的保证金。
+  设置为永续合约：```exchange.SetContractType("swap")```。例如，将交易对设置为```BTC_USD```时，调用```exchange.SetContractType("swap")```函数即可设置BTC的永续合约。
+  crypto.com交易所的交割合约为月度合约，合约代码如下（一月至十二月）：
+  ```code
+  "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
+  ```
+  设置交割合约：```exchange.SetContractType("October")```。例如，将交易对设置为```BTC_USD```时，调用```exchange.SetContractType("October")```函数即可设置BTC的十月交割合约。
+  当前时刻对应的合约代码为```BTCUSD-231027```。
+- Futures_WOO
+  Futures_WOO交易所支持```USDT```本位合约，永续合约代码为```swap```。例如，将交易对设置为```BTC_USDT```时，调用```exchange.SetContractType("swap")```函数即可将当前合约设置为BTC的USDT本位永续合约。
+- Futures_Hyperliquid
+  Futures_Hyperliquid交易所支持```USDC```本位合约，永续合约代码为```swap```。例如，将交易对设置为```ETH_USD```时，调用```exchange.SetContractType("swap")```函数即可将当前合约设置为ETH的USDC本位永续合约。
+  Futures_Hyperliquid仅有```USD.swap```品种维度，使用的保证金为USDC。
+  Futures_Hyperliquid支持HIP-3品种。
+- Futures_Lighter
+  Futures_Lighter交易所支持```USDC```本位合约，永续合约代码为```swap```。例如，将交易对设置为```BTC_USDC```时，调用```exchange.SetContractType("swap")```函数即可将当前合约设置为BTC的USDC本位永续合约。
+  Futures_Lighter仅支持永续合约。
+- Futures_Backpack
+  Futures_Backpack交易所支持```USDC```本位合约，永续合约代码为```swap```。例如，将交易对设置为```ETH_USDC```时，调用```exchange.SetContractType("swap")```函数即可将当前合约设置为ETH的USDC本位永续合约。
+- Futures_edgeX
+  Futures_edgeX交易所支持```USDC```本位合约，永续合约代码为```swap```。例如，将交易对设置为```BTC_USDC```时，调用```exchange.SetContractType("swap")```函数即可将当前合约设置为BTC的USDC本位永续合约，完整代码为```BTC_USDC.swap```。
+- Futures_WOOFI
+  Futures_WOOFI交易所支持```USDC```本位合约，永续合约代码为```swap```。例如，将交易对设置为```ETH_USDC```时，调用```exchange.SetContractType("swap")```函数即可将当前合约设置为ETH的USDC本位永续合约。
+- Futures_Coinw
+  Futures_Coinw交易所支持```USDT```本位合约，永续合约代码为```swap```。例如，将交易对设置为```ETH_USDT```时，调用```exchange.SetContractType("swap")```函数即可将当前合约设置为ETH的USDT本位永续合约。
+- Futures_Aster
+  Futures_Aster交易所支持```USDT```本位合约，永续合约代码为```swap```。例如，将交易对设置为```ETH_USDT```时，调用```exchange.SetContractType("swap")```函数即可将当前合约设置为ETH的USDT本位永续合约。
+- Futures_DeepCoin
+  币本位合约：例如将交易对设置为```BTC_USD```，再设置合约代码，即为币本位合约。
+  设置为永续合约：```exchange.SetContractType("swap")```。
+
+  以USDT作为保证金的合约：
+  例如将交易对设置为```BTC_USDT```，再设置合约代码，即为以USDT作为保证金的合约。
+  设置为永续合约：```exchange.SetContractType("swap")```。
+
+See also: `exchange.GetContractType`, `exchange.SetCurrency`
+
+#### exchange.GetContractType
+
+```
+exchange.GetContractType()
+```
+
+```exchange.GetContractType()```函数用于获取`exchange`交易所对象当前设置的合约代码。
+
+Returns (string): ```exchange.GetContractType()```函数返回由FMZ平台定义的合约代码，例如：```this_week```、```swap```等。
+
+```javascript
+function main () {
+    Log(exchange.SetContractType("this_week"))
+    Log(exchange.GetContractType())
+}
+```
+
+```python
+def main():
+    Log(exchange.SetContractType("this_week"))
+    Log(exchange.GetContractType())
+```
+
+```rust
+fn main() {
+    Log!(exchange.SetContractType("this_week"));
+    Log!(exchange.GetContractType());
+}
+```
+
+See also: `exchange.SetContractType`
+
+#### exchange.SetDirection
+
+```
+exchange.SetDirection(direction)
+```
+
+```exchange.SetDirection()```函数用于设置调用`exchange.Buy`函数、`exchange.Sell`函数进行期货合约下单时的订单方向。
+
+Parameters:
+
+- `direction` (string, required): ```direction```参数用于设置期货合约下单时的方向，可选值为：```"buy"```、```"closesell"```、```"sell"```、```"closebuy"```。
+
+```javascript
+function main(){
+    // 举例设置为OKX期货当周合约
+    exchange.SetContractType("this_week")
+    // 设置杠杆为5倍
+    exchange.SetMarginLevel(5)
+    // 设置下单方向为做多
+    exchange.SetDirection("buy")
+    // 以10000的价格、2张合约数量下单
+    exchange.Buy(10000, 2)
+    exchange.SetMarginLevel(5)
+    exchange.SetDirection("closebuy")
+    exchange.Sell(1000, 2)
+}
+```
+
+```python
+def main():
+    exchange.SetContractType("this_week")
+    exchange.SetMarginLevel(5)
+    exchange.SetDirection("buy")
+    exchange.Buy(10000, 2)
+    exchange.SetMarginLevel(5)
+    exchange.SetDirection("closebuy")
+    exchange.Sell(1000, 2)
+```
+
+```rust
+fn main() {
+    // 注意：Rust SDK 中不推荐使用SetDirection、Buy、Sell函数，建议优先使用CreateOrder函数，
+    // CreateOrder可直接指定side参数（"buy"、"sell"、"closebuy"、"closesell"），无需先调用SetDirection
+    // 举例设置为OKX期货当周合约
+    exchange.SetContractType("this_week").unwrap();
+    // 设置杠杆为5倍
+    exchange.SetMarginLevel(5);
+    // 设置下单方向为做多
+    exchange.SetDirection("buy").unwrap();
+    // 以10000的价格、2张合约数量下单
+    exchange.Buy(10000, 2).unwrap();
+    exchange.SetMarginLevel(5);
+    exchange.SetDirection("closebuy").unwrap();
+    exchange.Sell(1000, 2).unwrap();
+}
+```
+
+```exchange.SetDirection()```函数用于设置期货合约交易方向与下单函数之间的对应关系：
+
+|下单函数|SetDirection函数设置的方向|备注|
+|-|-|-|
+|exchange.Buy|"buy"|买入开多仓|
+|exchange.Buy|"closesell"|买入平空仓|
+|exchange.Sell|"sell"|卖出开空仓|
+|exchange.Sell|"closebuy"|卖出平多仓|
+
+```exchange.SetDirection()```只用于期货交易所对象。现货交易所对象不需要也不应调用它：现货的买卖方向由```exchange.Buy()```（买入）、```exchange.Sell()```（卖出）本身决定。
+
+See also: `exchange.Buy`, `exchange.Sell`
+
+#### exchange.SetMarginLevel
+
+```
+exchange.SetMarginLevel(symbol, marginLevel)
+exchange.SetMarginLevel(marginLevel)
+```
+
+```exchange.SetMarginLevel()```函数用于设置```symbol```参数所指定的交易对、合约的杠杆值。同时兼容仅传入```marginLevel```参数的调用方式，用于设置`exchange`交易所对象当前交易对、合约的杠杆值。
+
+Parameters:
+
+- `symbol` (string, optional): ```symbol```参数用于指定需要调整杠杆值的交易对、合约。```SetMarginLevel()```函数中```symbol```参数的格式与```GetTicker()```函数中```symbol```参数的格式一致。
+- `marginLevel` (number, required): ```marginLevel```参数用于设置杠杆值。交易所的杠杆值通常为整数，部分交易所也支持浮点数形式的杠杆值设置。
+
+```javascript
+function main() {
+    exchange.SetMarginLevel(10)
+    // 设置BTC的USDT本位永续合约的杠杆为15
+    exchange.SetMarginLevel("BTC_USDT.swap", 15)
+}
+```
+
+```python
+def main():
+    exchange.SetMarginLevel(10)
+    exchange.SetMarginLevel("BTC_USDT.swap", 15)
+```
+
+```rust
+fn main() {
+    exchange.SetMarginLevel(10);
+    // Rust SDK 中SetMarginLevel函数不支持symbol参数，仅设置当前交易对、合约的杠杆值
+    // 如需设置BTC_USDT.swap品种的杠杆为15，需先切换到该交易对、合约后再调用exchange.SetMarginLevel(15)
+}
+```
+
+```exchange.SetMarginLevel()```函数仅支持加密货币期货合约交易所对象。回测系统支持调用```exchange.SetMarginLevel()```函数来设置杠杆值。
+
+对于加密货币期货合约而言，由于各加密货币期货合约交易所的杠杆机制并不统一。
+
+在某些交易所中，期货合约的杠杆值是下单接口中的一个参数，此时调用```exchange.SetMarginLevel()```函数并不会产生网络请求，仅设置FMZ系统底层中的杠杆变量（用于下单接口传参）。
+
+在另一些交易所中，期货合约的杠杆值是交易所的一项独立设置，需要通过交易所网站页面或API接口进行设置。此时调用```exchange.SetMarginLevel()```函数则会产生网络请求，并且有可能设置失败。失败原因可能有多种，例如：当前存在持仓或挂单，导致该交易对、合约无法再设置新的杠杆值。
+
+不支持```exchange.SetMarginLevel()```函数的交易所：
+
+| 函数名 | 不支持的现货交易所 | 不支持的期货交易所 |
+| - | - | - |
+| SetMarginLevel | -- | Futures_dYdX / Futures_Deribit / Futures_edgeX |
+
+See also: `exchange`
+
+#### exchange.GetPositions
+
+```
+exchange.GetPositions()
+exchange.GetPositions(symbol)
+```
+
+```exchange.GetPositions()```函数用于获取持仓信息；```GetPositions()```函数是交易所对象`exchange`的成员函数。
+
+```GetPositions()```函数用于获取交易所对象```exchange```所绑定的交易所账户的持仓信息。```exchange```对象的成员函数（方法）的用途仅与```exchange```相关，本文档之后不再赘述。
+
+Parameters:
+
+- `symbol` (string, optional): 参数```symbol```用于指定所要查询的**交易品种**或**交易品种范围**。
+
+未传入```symbol```参数时，默认以当前交易对、合约代码所在的维度范围请求所有品种的持仓数据。
+
+Returns (`Position`数组 / 空值): ```exchange.GetPositions()```函数在请求数据成功时返回`Position`结构数组，在请求数据失败时返回空值。
+
+使用期货交易所对象，对多个不同交易对、不同合约代码的品种下市价单，并通过多种方式查询持仓信息。
+
+```javascript
+/*backtest
+start: 2024-05-21 00:00:00
+end: 2024-09-05 00:00:00
+period: 5m
+basePeriod: 1m
+exchanges: [{"eid":"Futures_Binance","currency":"BTC_USDT"}]
+*/
+
+function main() {
+    var arrSymbol = ["BTC_USDT.swap", "BTC_USDT.quarter", "ETH_USDT.swap", "ETH_USDT.quarter"]
+
+    for (var symbol of arrSymbol) {
+        exchange.CreateOrder(symbol, "buy", -1, 1)
+        exchange.CreateOrder(symbol, "sell", -1, 1)
+    }
+
+    var defaultPositions = exchange.GetPositions()
+    var swapPositions = exchange.GetPositions("USDT.swap")
+    var futuresPositions = exchange.GetPositions("USDT.futures")
+    var btcUsdtSwapPositions = exchange.GetPositions("BTC_USDT.swap")
+
+    var tbls = []
+    var arr = [defaultPositions, swapPositions, futuresPositions, btcUsdtSwapPositions]
+    var tblDesc = ["defaultPositions", "swapPositions", "futuresPositions", "btcUsdtSwapPositions"]
+    for (var index in arr) {
+        var positions = arr[index]
+        var tbl = {type: "table", title: tblDesc[index], cols: ["Symbol", "MarginLevel", "Amount", "FrozenAmount", "Price", "Profit", "Type", "ContractType", "Margin"], rows: [] }
+        for (var pos of positions) {
+            tbl.rows.push([pos.Symbol, pos.MarginLevel, pos.Amount, pos.FrozenAmount, pos.Price, pos.Profit, pos.Type, pos.ContractType, pos.Margin])
+        }
+        tbls.push(tbl)
+    }
+
+    LogStatus("`" + JSON.stringify(tbls) + "`")
+
+    // 打印输出一次信息后返回，防止后续回测时订单成交，影响数据观察
+    return
+}
+```
+
+```python
+'''backtest
+start: 2024-05-21 00:00:00
+end: 2024-09-05 00:00:00
+period: 5m
+basePeriod: 1m
+exchanges: [{"eid":"Futures_Binance","currency":"BTC_USDT"}]
+'''
+
+import json
+
+def main():
+    arrSymbol = ["BTC_USDT.swap", "BTC_USDT.quarter", "ETH_USDT.swap", "ETH_USDT.quarter"]
+
+    for symbol in arrSymbol:
+        exchange.CreateOrder(symbol, "buy", -1, 1)
+        exchange.CreateOrder(symbol, "sell", -1, 1)
+
+    defaultPositions = exchange.GetPositions()
+    swapPositions = exchange.GetPositions("USDT.swap")
+    futuresPositions = exchange.GetPositions("USDT.futures")
+    btcUsdtSwapPositions = exchange.GetPositions("BTC_USDT.swap")
+
+    tbls = []
+    arr = [defaultPositions, swapPositions, futuresPositions, btcUsdtSwapPositions]
+    tblDesc = ["defaultPositions", "swapPositions", "futuresPositions", "btcUsdtSwapPositions"]
+    for index in range(len(arr)):
+        positions = arr[index]
+        tbl = {"type": "table", "title": tblDesc[index], "cols": ["Symbol", "MarginLevel", "Amount", "FrozenAmount", "Price", "Profit", "Type", "ContractType", "Margin"], "rows": []}
+        for pos in positions:
+            tbl["rows"].append([pos["Symbol"], pos["MarginLevel"], pos["Amount"], pos["FrozenAmount"], pos["Price"], pos["Profit"], pos["Type"], pos["ContractType"], pos["Margin"]])
+
+        tbls.append(tbl)
+
+    LogStatus("`" + json.dumps(tbls) + "`")
+
+    return
+```
+
+```rust
+/*backtest
+start: 2024-05-21 00:00:00
+end: 2024-09-05 00:00:00
+period: 5m
+basePeriod: 1m
+exchanges: [{"eid":"Futures_Binance","currency":"BTC_USDT"}]
+*/
+
+fn main() {
+    let arrSymbol = ["BTC_USDT.swap", "BTC_USDT.quarter", "ETH_USDT.swap", "ETH_USDT.quarter"];
+
+    for symbol in arrSymbol {
+        exchange.CreateOrder(symbol, "buy", -1, 1);
+        exchange.CreateOrder(symbol, "sell", -1, 1);
+    }
+
+    let defaultPositions = exchange.GetPositions(None).unwrap();
+    let swapPositions = exchange.GetPositions("USDT.swap").unwrap();
+    let futuresPositions = exchange.GetPositions("USDT.futures").unwrap();
+    let btcUsdtSwapPositions = exchange.GetPositions("BTC_USDT.swap").unwrap();
+
+    // Rust SDK 没有JSON序列化，使用format!拼接表格的JSON文本
+    let mut tbls: Vec<String> = Vec::new();
+    let arr = [defaultPositions, swapPositions, futuresPositions, btcUsdtSwapPositions];
+    let tblDesc = ["defaultPositions", "swapPositions", "futuresPositions", "btcUsdtSwapPositions"];
+    for (index, positions) in arr.iter().enumerate() {
+        let mut rows: Vec<String> = Vec::new();
+        for pos in positions {
+            rows.push(format!(r#"["{}", {}, {}, {}, {}, {}, {}, "{}", {}]"#, pos.Symbol, pos.MarginLevel, pos.Amount, pos.FrozenAmount, pos.Price, pos.Profit, pos.Type, pos.ContractType, pos.Margin));
+        }
+        let tbl = format!(r#"{{"type": "table", "title": "{}", "cols": ["Symbol", "MarginLevel", "Amount", "FrozenAmount", "Price", "Profit", "Type", "ContractType", "Margin"], "rows": [{}]}}"#, tblDesc[index], rows.join(","));
+        tbls.push(tbl);
+    }
+
+    LogStatus!(format!("`[{}]`", tbls.join(",")));
+
+    // 打印输出一次信息后返回，防止后续回测时订单成交，影响数据观察
+    return;
+}
+```
+
+加密货币期货合约与加密货币现货不同，现货仅有逻辑上的持仓概念。在FMZ量化交易平台的系统中，加密货币期货合约的具体品种由**交易对**、**合约代码**共同标识。可参阅`exchange.SetCurrency`、`exchange.SetContractType`函数。
+
+在```GetPositions```函数中，symbol参数的使用场景归纳如下：
+
+| 交易所对象分类 | symbol参数 | 查询范围 | 备注 |
+| - | - | - | - |
+| 期货 | 不传symbol参数 | 查询当前交易对、合约代码维度范围内的所有交易品种 | 若当前交易对为BTC_USDT，合约代码为swap，则查询所有USDT本位永续合约。等价于调用```GetPositions("USDT.swap")``` |
+| 期货 | 指定交易品种，symbol参数为："BTC_USDT.swap" | 查询指定的BTC USDT本位永续合约 | 对于期货交易所对象，symbol参数的格式为：FMZ平台定义的**交易对**与**合约代码**的组合，以字符```"."```分隔。 |
+| 期货 | 指定交易品种范围，symbol参数为："USDT.swap" | 查询所有USDT本位永续合约 | - |
+| 支持期权的期货交易所 | 不传symbol参数 | 查询当前交易对维度范围内的所有期权合约 | 若当前交易对为BTC_USDT，且合约设置为期权合约，例如币安期权合约：BTC-240108-40000-C |
+| 支持期权的期货交易所 | 指定具体交易品种 | 查询指定的期权合约 | 例如对于币安期货交易所，symbol参数为：BTC_USDT.BTC-240108-40000-C |
+| 支持期权的期货交易所 | 指定交易品种范围，symbol参数为："USDT.option" | 查询所有USDT本位期权合约 | - |
+
+在```GetPositions```函数中，期货交易所对象的查询维度范围归纳如下：
+
+| symbol参数 | 请求范围定义 | 备注 |
+| - | - | - |
+| USDT.swap          | USDT本位永续合约范围。  | 对于交易所API接口不支持的维度，调用时会报错并返回空值。 |
+| USDT.futures       | USDT本位交割合约范围。  | - |
+| USD.swap           | 币本位永续合约范围。    | - |
+| USD.futures        | 币本位交割合约范围。    | - |
+| USDT.option        | USDT本位期权合约范围。  | - |
+| USD.option         | 币本位期权合约范围。    | - |
+| USDT.futures_combo | 差价组合合约范围。      | Futures_Deribit交易所 |
+| USD.futures_ff     | 混合保证金交割合约范围。 | Futures_Kraken交易所 |
+| USD.swap_pf        | 混合保证金永续合约范围。 | Futures_Kraken交易所 |
+
+兼容```exchange.GetPosition()```调用，```GetPosition```与```GetPositions```的用法完全一致。
+
+当交易所对象```exchange```所代表的账户在**查询范围内**或**指定的交易品种**上没有持仓时，```exchange.GetPositions()```函数返回空数组，例如：```[]```。
+
+See also: `Position`, `exchange.SetCurrency`, `exchange.SetContractType`
+
+#### exchange.GetFundings
+
+```
+exchange.GetFundings()
+exchange.GetFundings(symbol)
+```
+
+```exchange.GetFundings()```函数用于获取当前周期的资金费率数据。
+
+Parameters:
+
+- `symbol` (string, optional): 参数```symbol```用于指定所要查询的**交易品种**或**交易品种范围**。若不传入```symbol```参数，则默认以当前交易对、合约代码所在的维度范围，请求所有品种的当期资金费率数据。
+
+Returns (`Funding`数组 / 空值): ```exchange.GetFundings()```函数请求数据成功时返回`Funding`结构数组，请求数据失败时返回空值。
+
+使用期货交易所对象，在回测系统中调用```exchange.GetFundings()```函数。在调用任何行情函数之前，GetFundings 仅返回当前默认交易对的 Funding 数据；在调用行情函数之后，则会返回所有已请求过的品种的 Funding 数据。可参考以下测试示例：
+
+```javascript
+/*backtest
+start: 2024-10-01 00:00:00
+end: 2024-10-23 00:05:00
+period: 1m
+basePeriod: 1m
+exchanges: [{"eid":"Futures_Binance","currency":"SOL_USDC"}]
+*/
+
+function main() {
+    // LPT_USDT.swap 4小时周期
+    var symbols = ["SOL_USDT.swap", "ETH_USDT.swap", "LTC_USDT.swap", "SOL_USDC.swap", "ETH_USDC.swap", "BTC_USD.swap", "BTC_USDT.quarter", "LPT_USDT.swap"]
+    for (var symbol of symbols) {
+        exchange.GetTicker(symbol)
+    }
+
+    var arr = []
+    var arrParams = ["no param", "LTC_USDT.swap", "USDT.swap", "USD.swap", "USDC.swap", "USDT.futures", "BTC_USDT.quarter"]
+    for (var p of arrParams) {
+        if (p == "no param") {
+            arr.push(exchange.GetFundings())
+        } else {
+            arr.push(exchange.GetFundings(p))
+        }
+    }
+
+    var tbls = []
+    var index = 0
+    for (var fundings of arr) {
+        var tbl = {
+            "type": "table",
+            "title": arrParams[index],
+            "cols": ["Symbol", "Interval", "Time", "Rate"],
+            "rows": [],
+        }
+
+        for (var f of fundings) {
+            tbl["rows"].push([f.Symbol, f.Interval / 3600000, _D(f.Time), f.Rate * 100 + " %"])
+        }
+        tbls.push(tbl)
+        index++
+    }
+
+    LogStatus(_D(), "\n Requested symbols:", symbols, "\n`" + JSON.stringify(tbls) + "`")
+}
+```
+
+```python
+'''backtest
+start: 2024-10-01 00:00:00
+end: 2024-10-23 00:05:00
+period: 1m
+basePeriod: 1m
+exchanges: [{"eid":"Futures_Binance","currency":"SOL_USDC"}]
+'''
+
+import json
+
+def main():
+    # LPT_USDT.swap 4小时周期
+    symbols = ["SOL_USDT.swap", "ETH_USDT.swap", "LTC_USDT.swap", "SOL_USDC.swap", "ETH_USDC.swap", "BTC_USD.swap", "BTC_USDT.quarter", "LPT_USDT.swap"]
+    for symbol in symbols:
+        exchange.GetTicker(symbol)
+
+    arr = []
+    arrParams = ["no param", "LTC_USDT.swap", "USDT.swap", "USD.swap", "USDC.swap", "USDT.futures", "BTC_USDT.quarter"]
+    for p in arrParams:
+        if p == "no param":
+            arr.append(exchange.GetFundings())
+        else:
+            arr.append(exchange.GetFundings(p))
+
+    tbls = []
+    index = 0
+    for fundings in arr:
+        tbl = {
+            "type": "table",
+            "title": arrParams[index],
+            "cols": ["Symbol", "Interval", "Time", "Rate"],
+            "rows": [],
+        }
+
+        for f in fundings:
+            tbl["rows"].append([f["Symbol"], f["Interval"] / 3600000, _D(f["Time"]), str(f["Rate"] * 100) + " %"])
+
+        tbls.append(tbl)
+        index += 1
+
+    LogStatus(_D(), "\n Requested symbols:", symbols, "\n`" + json.dumps(tbls) + "`")
+```
+
+```rust
+/*backtest
+start: 2024-10-01 00:00:00
+end: 2024-10-23 00:05:00
+period: 1m
+basePeriod: 1m
+exchanges: [{"eid":"Futures_Binance","currency":"SOL_USDC"}]
+*/
+
+fn main() {
+    // LPT_USDT.swap 4小时周期
+    let symbols = ["SOL_USDT.swap", "ETH_USDT.swap", "LTC_USDT.swap", "SOL_USDC.swap", "ETH_USDC.swap", "BTC_USD.swap", "BTC_USDT.quarter", "LPT_USDT.swap"];
+    for symbol in symbols {
+        exchange.GetTicker(symbol);
+    }
+
+    let mut arr: Vec<Vec<Funding>> = Vec::new();
+    let arrParams = ["no param", "LTC_USDT.swap", "USDT.swap", "USD.swap", "USDC.swap", "USDT.futures", "BTC_USDT.quarter"];
+    for p in arrParams {
+        if p == "no param" {
+            arr.push(exchange.GetFundings(None).unwrap());
+        } else {
+            arr.push(exchange.GetFundings(p).unwrap());
+        }
+    }
+
+    // Rust SDK 没有JSON序列化，使用format!拼接表格的JSON文本
+    let mut tbls: Vec<String> = Vec::new();
+    for (index, fundings) in arr.iter().enumerate() {
+        let mut rows: Vec<String> = Vec::new();
+        for f in fundings {
+            rows.push(format!(r#"["{}", {}, "{}", "{} %"]"#, f.Symbol, f.Interval as f64 / 3600000.0, _D(f.Time), f.Rate * 100.0));
+        }
+        let tbl = format!(r#"{{"type": "table", "title": "{}", "cols": ["Symbol", "Interval", "Time", "Rate"], "rows": [{}]}}"#, arrParams[index], rows.join(","));
+        tbls.push(tbl);
+    }
+
+    LogStatus!(_D(None), "\n Requested symbols:", format!("{:?}", symbols), format!("\n`[{}]`", tbls.join(",")));
+}
+```
+
+对于不支持批量查询资金费率数据的期货交易所，若将```symbol```参数指定为查询范围（例如```USDT.swap```）或不传入```symbol```参数，接口将会报错。使用这类期货交易所对象调用```GetFundings()```函数时，必须将```symbol```参数指定为具体的某个永续合约品种，才能查询到该品种的当期资金费率数据。
+
+```exchange.GetFundings()```函数支持实盘与回测系统。
+
+不支持批量获取资金费率数据的交易所：Futures_Bitget、Futures_OKX、Futures_MEXC、Futures_Deribit、Futures_Crypto。调用时需传入```symbol```参数指定具体的品种代码，例如：```ETH_USDT.swap```。
+
+不支持```exchange.GetFundings()```函数的交易所：
+
+  | 函数名 | 不支持的现货交易所 | 不支持的期货交易所 |
+  | - | - | - |
+  | GetFundings | -- | Futures_DigiFinex |
+
+See also: `Funding`
+
+### Exchange
+
+交易所对象（```exchange```、```exchanges[n]```）的属性与设置：名称和标签、当前交易对与计价币、K线周期、下单精度、汇率、接口基地址、代理与超时，以及按交易所规则签名编码。
+
+#### exchange.GetName
+
+```
+exchange.GetName()
+```
+
+```exchange.GetName()```函数用于获取当前交易所对象所绑定的交易所名称。
+
+Returns (string): ```exchange.GetName()```函数返回由FMZ量化交易平台定义的交易所名称。
+
+```javascript
+function main() {
+    Log("Check if exchange object is Binance spot, result:", exchange.GetName() == "Binance")
+}
+```
+
+```python
+def main():
+    Log("Check if exchange object is Binance spot, result:", exchange.GetName() == "Binance")
+```
+
+```rust
+fn main() {
+    Log!("Check if exchange object is Binance spot, result:", exchange.GetName() == "Binance");
+}
+```
+
+```exchange.GetName()```函数通常用于识别策略代码中的```exchange```或```exchanges[1]```、```exchanges[2]```等交易所对象。加密货币期货合约交易所的名称带有固定前缀```Futures_```。
+
+See also: `exchange.GetLabel`
+
+#### exchange.GetLabel
+
+```
+exchange.GetLabel()
+```
+
+```exchange.GetLabel()```函数用于获取配置交易所对象时设置的自定义标签。
+
+Returns (string): ```exchange.GetLabel()```函数返回配置交易所对象时设置的自定义标签。
+
+```javascript
+function main() {
+    Log("exchange label:", exchange.GetLabel())
+}
+```
+
+```python
+def main():
+    Log("exchange label:", exchange.GetLabel())
+```
+
+```rust
+fn main() {
+    Log!("exchange label:", exchange.GetLabel());
+}
+```
+
+通过设置的标签，可在策略代码中识别```exchange```或```exchanges[1]```、```exchanges[2]```等交易所对象。
+
+See also: `exchange`
+
+#### exchange.GetCurrency
+
+```
+exchange.GetCurrency()
+```
+
+```exchange.GetCurrency()```函数用于获取当前设置的交易对。
+
+Returns (string): ```exchange.GetCurrency()```函数返回当前`exchange`交易所对象所设置的交易对。
+
+```javascript
+function main() {
+    Log("Current trading pair:", exchange.GetCurrency())
+}
+```
+
+```python
+def main():
+    Log("Current trading pair:", exchange.GetCurrency())
+```
+
+```rust
+fn main() {
+    Log!("Current trading pair:", exchange.GetCurrency());
+}
+```
+
+交易对格式统一采用大写形式，并使用下划线分隔```baseCurrency```与```quoteCurrency```，例如：```BTC_USDT```。
+
+See also: `exchange.SetCurrency`
+
+#### exchange.SetCurrency
+
+```
+exchange.SetCurrency(currency)
+```
+
+```exchange.SetCurrency()```函数用于切换交易所对象`exchange`当前的交易对。
+
+Parameters:
+
+- `currency` (string, required): ```currency```参数用于指定要切换的交易对。交易对格式统一为大写，并使用下划线分隔```baseCurrency```与```quoteCurrency```，例如：```BTC_USDT```。
+
+```javascript
+function main() {
+    var ticker = exchange.GetTicker()
+    Log(ticker)
+    Log(exchange.GetAccount())
+    // 切换交易对，注意切换后行情数据、账户信息的变化
+    exchange.SetCurrency("LTC_USDT")
+    Log("Switched to LTC_USDT")
+    ticker = exchange.GetTicker()
+    Log(ticker)
+    Log(exchange.GetAccount())
+}
+```
+
+```python
+def main():
+    ticker = exchange.GetTicker()
+    Log(ticker)
+    Log(exchange.GetAccount())
+    exchange.SetCurrency("LTC_USDT")
+    Log("Switched to LTC_USDT")
+    ticker = exchange.GetTicker()
+    Log(ticker)
+    Log(exchange.GetAccount())
+```
+
+```rust
+fn main() {
+    let ticker = exchange.GetTicker(None).unwrap();
+    Log!(ticker);
+    Log!(exchange.GetAccount());
+    // 切换交易对，注意切换后行情数据、账户信息的变化
+    exchange.SetCurrency("LTC_USDT");
+    Log!("Switched to LTC_USDT");
+    let ticker = exchange.GetTicker(None).unwrap();
+    Log!(ticker);
+    Log!(exchange.GetAccount());
+}
+```
+
+1、兼容```exchange.IO("currency", "BTC_USDT")```的切换方式，详见`exchange.IO`。
+
+  2、支持在回测系统中切换交易对，但回测系统中切换交易对时，计价币的名称不能改变。例如：```BTC_USDT```可以切换为```LTC_USDT```，但不能切换为```LTC_BTC```。
+
+  3、切换为非回测页面初始设置的交易对后，交易币的数量为0。例如：回测时回测页面上初始设置的交易对为```BTC_USDT```，```BTC```数量为3个，```USDT```数量为10000。此时立即切换为```LTC_USDT```，切换后交易币数量为0，即账户中```LTC```数量为0；切换后的交易对共享```USDT```数量，即数量仍为10000。
+
+See also: `exchange.GetCurrency`
+
+#### exchange.GetQuoteCurrency
+
+```
+exchange.GetQuoteCurrency()
+```
+
+```exchange.GetQuoteCurrency()```函数用于获取当前交易对的计价币名称，即```quoteCurrency```。
+
+Returns (string): ```exchange.GetQuoteCurrency()```函数返回当前交易对的计价币名称。
+
+```javascript
+function main() {
+    exchange.SetCurrency("BTC_USDT")
+    Log("Quote currency for BTC_USDT:", exchange.GetQuoteCurrency())
+    // exchange.SetCurrency("ETH_BTC")
+    // Log("Quote currency for ETH_BTC:", exchange.GetQuoteCurrency())
+}
+```
+
+```python
+def main():
+    exchange.SetCurrency("BTC_USDT")
+    Log("Quote currency for BTC_USDT:", exchange.GetQuoteCurrency())
+    # exchange.SetCurrency("ETH_BTC")
+    # Log("Quote currency for ETH_BTC:", exchange.GetQuoteCurrency())
+```
+
+```rust
+fn main() {
+    exchange.SetCurrency("BTC_USDT");
+    Log!("Quote currency for BTC_USDT:", exchange.GetQuoteCurrency());
+    // exchange.SetCurrency("ETH_BTC");
+    // Log!("Quote currency for ETH_BTC:", exchange.GetQuoteCurrency());
+}
+```
+
+例如：`exchange`交易所对象当前的交易对为```BTC_USDT```时，```exchange.GetQuoteCurrency()```函数返回```USDT```；如果当前交易对为```ETH_BTC```，则```exchange.GetQuoteCurrency()```函数返回```BTC```。
+
+See also: `exchange.GetCurrency`, `exchange.SetCurrency`
+
+#### exchange.GetPeriod
+
+```
+exchange.GetPeriod()
+```
+
+获取回测或实盘运行策略时，在发明者量化交易平台网站页面上所设置的 K 线周期，即调用 ```exchange.GetRecords()``` 函数且不传入参数时使用的默认 K 线周期。
+
+Returns (number): K 线周期的秒数，为整数数值，单位为秒。
+
+```javascript
+function main() {
+    // 例如，回测或实盘时在发明者量化交易平台网站页面上设置的 K 线周期为 1 小时
+    var period = exchange.GetPeriod()
+    Log("K-line period:", period / (60 * 60), "hours")
+}
+```
+
+```python
+def main():
+    period = exchange.GetPeriod()
+    Log("K-line period:", period / (60 * 60), "hours")
+```
+
+```rust
+fn main() {
+    // 例如，回测或实盘时在发明者量化交易平台网站页面上设置的 K 线周期为 1 小时
+    let period = exchange.GetPeriod();
+    Log!("K-line period:", period as f64 / (60.0 * 60.0), "hours");
+}
+```
+
+See also: `exchange.GetRecords`
+
+#### exchange.SetMaxBarLen
+
+```
+exchange.SetMaxBarLen(len)
+```
+
+设置K线的最大长度。
+
+Parameters:
+
+- `len` (number, required): 参数```len```用于指定K线的最大长度。
+
+```javascript
+function main() {
+    exchange.SetMaxBarLen(50)
+    var records = exchange.GetRecords()
+    Log(records.length, records)
+}
+```
+
+```python
+def main():
+    exchange.SetMaxBarLen(50)
+    r = exchange.GetRecords()
+    Log(len(r), r)
+```
+
+```rust
+fn main() {
+    exchange.SetMaxBarLen(50);
+    let records = exchange.GetRecords(None, None, None).unwrap();
+    Log!(records.len(), records);
+}
+```
+
+```exchange.SetMaxBarLen()```函数在加密货币策略运行时会影响以下两个方面：
+
+- 影响首次调用时获取的K线线柱（Bar）数量。
+
+- 影响K线线柱（Bar）数量的上限。
+
+See also: `exchange.GetRecords`
+
+#### exchange.SetPrecision
+
+```
+exchange.SetPrecision(pricePrecision, amountPrecision)
+```
+
+```exchange.SetPrecision()```函数用于设置```exchange```交易所对象的**价格**与**下单量**的精度，设置后系统会自动忽略数据中超出精度的多余部分。
+
+Parameters:
+
+- `pricePrecision` (number, required): ```pricePrecision```参数用于设置价格数据的精度。
+- `amountPrecision` (number, required): ```amountPrecision```参数用于设置下单量数据的精度。
+
+```javascript
+function main(){
+    // 设置价格小数位精度为2位，下单量小数位精度为3位
+    exchange.SetPrecision(2, 3)
+}
+```
+
+```python
+def main():
+    exchange.SetPrecision(2, 3)
+```
+
+```rust
+fn main() {
+    // 设置价格小数位精度为2位，下单量小数位精度为3位
+    exchange.SetPrecision(2, 3);
+}
+```
+
+回测系统不支持该函数，回测系统的数值精度由系统自动处理。
+
+See also: `exchange.Buy`, `exchange.Sell`
+
+#### exchange.GetRate
+
+```
+exchange.GetRate()
+```
+
+获取交易所对象当前设置的汇率。
+
+Returns (number): 交易所对象当前的汇率值。
+
+```javascript
+function main(){
+    Log(exchange.GetTicker())
+    // 设置汇率转换
+    exchange.SetRate(7)
+    Log(exchange.GetTicker())
+    Log("Current rate:", exchange.GetRate())
+}
+```
+
+```python
+def main():
+    Log(exchange.GetTicker())
+    exchange.SetRate(7)
+    Log(exchange.GetTicker())
+    Log("Current rate:", exchange.GetRate())
+```
+
+```rust
+fn main() {
+    Log!(exchange.GetTicker(None));
+    // 设置汇率转换
+    exchange.SetRate(7);
+    Log!(exchange.GetTicker(None));
+    Log!("Current rate:", exchange.GetRate());
+}
+```
+
+如果未调用```exchange.SetRate()```设置过转换汇率，```exchange.GetRate()```函数将返回默认汇率值```1```，即当前显示的计价货币（quoteCurrency）相关数据未经过汇率转换。
+
+如果已使用```exchange.SetRate()```设置过汇率值，例如```exchange.SetRate(7)```，那么通过```exchange```交易所对象获取的行情、深度、下单价格等所有价格信息，都会乘以所设置的汇率```7```进行转换。
+
+如果```exchange```对应的是以美元为计价货币的交易所，在调用```exchange.SetRate(7)```后，实盘中的所有价格都会乘以```7```，转换为接近人民币（CNY）的价格。此时通过```exchange.GetRate()```获取的汇率值即为```7```。
+
+See also: `exchange.SetRate`
+
+#### exchange.SetRate
+
+```
+exchange.SetRate(rate)
+```
+
+设置交易所对象当前的汇率。
+
+Parameters:
+
+- `rate` (number, required): ```rate``` 参数用于指定转换汇率。
+
+```javascript
+function main(){
+    Log(exchange.GetTicker())
+    // 设置汇率转换
+    exchange.SetRate(7)
+    Log(exchange.GetTicker())
+    // 设置为 1，不转换
+    exchange.SetRate(1)
+}
+```
+
+```python
+def main():
+    Log(exchange.GetTicker())
+    exchange.SetRate(7)
+    Log(exchange.GetTicker())
+    exchange.SetRate(1)
+```
+
+```rust
+fn main() {
+    Log!(exchange.GetTicker(None));
+    // 设置汇率转换
+    exchange.SetRate(7);
+    Log!(exchange.GetTicker(None));
+    // 设置为 1，不转换
+    exchange.SetRate(1);
+}
+```
+
+如果使用 ```exchange.SetRate()``` 函数设置了汇率值（例如设置为 7），那么当前 ```exchange``` 交易所对象所代表交易所的行情、深度、下单价格等所有价格信息，都会被乘以所设置的汇率 7 进行转换。
+
+例如，```exchange``` 是以美元为计价货币的交易所。执行 ```exchange.SetRate(7)``` 之后，实盘中的所有价格都会被乘以 7，转换为接近 **CNY** 计价的价格。
+
+See also: `exchange.GetRate`
+
+#### exchange.SetBase
+
+```
+exchange.SetBase(s)
+```
+
+```exchange.SetBase()```函数用于设置`exchange`交易所对象所使用的交易所API接口基地址。
+
+Parameters:
+
+- `s` (string, required): ```s```参数用于指定交易所API接口的基地址。
+
+```javascript
+function main() {
+    // 使用默认基地址
+    Log(exchange.GetTicker())
+    // 切换为https://aws.okx.com
+    exchange.SetBase("https://aws.okx.com")
+    Log(exchange.GetTicker())
+}
+```
+
+```python
+def main():
+    Log(exchange.GetTicker())
+    exchange.SetBase("https://aws.okx.com")
+    Log(exchange.GetTicker())
+```
+
+```rust
+fn main() {
+    // 使用默认基地址
+    Log!(exchange.GetTicker(None));
+    // 切换为https://aws.okx.com
+    exchange.SetBase("https://aws.okx.com");
+    Log!(exchange.GetTicker(None));
+}
+```
+
+回测系统不支持切换交易所API接口基地址，因为回测系统是一个沙盒模拟环境，不会真正访问交易所的API接口。
+
+See also: `exchange.IO`
+
+#### exchange.GetBase
+
+```
+exchange.GetBase()
+```
+
+```exchange.GetBase()``` 函数用于获取当前交易所 API 接口的基础地址。
+
+Returns (string): 当前交易所 API 接口的基础地址。
+
+```javascript
+function main() {
+    Log(exchange.GetBase())
+}
+```
+
+```python
+def main():
+    Log(exchange.GetBase())
+```
+
+```rust
+fn main() {
+    Log!(exchange.GetBase());
+}
+```
+
+See also: `exchange.SetBase`
+
+#### exchange.SetProxy
+
+```
+exchange.SetProxy(proxy)
+```
+
+```exchange.SetProxy()```函数用于设置`exchange`交易所对象的代理配置。
+
+Parameters:
+
+- `proxy` (string, required): ```proxy```参数用于指定代理配置。
+
+为`exchange`交易所对象配置```socks5```代理：
+
+```javascript
+function main() {
+    exchange.SetProxy("socks5://192.168.1.10:8080")
+    // 如果无法访问交易所行情接口，设置一个可用的socks5代理即可访问行情接口
+    Log(exchange.GetTicker())
+}
+```
+
+```python
+def main():
+    exchange.SetProxy("socks5://192.168.1.10:8080")
+    Log(exchange.GetTicker())
+```
+
+```rust
+fn main() {
+    exchange.SetProxy("socks5://192.168.1.10:8080");
+    // 如果无法访问交易所行情接口，设置一个可用的socks5代理即可访问行情接口
+    Log!(exchange.GetTicker(None));
+}
+```
+
+除了**全局指定**`exchange`交易所对象发出请求所使用的IP地址外，也支持基于`exchange`单独指定IP地址：
+
+```javascript
+function main(){
+    exchange.SetProxy("ip://10.0.3.15")
+    // 发出请求的IP地址为10.0.3.15
+    exchange.GetTicker()
+}
+```
+
+```python
+def main():
+    exchange.SetProxy("ip://10.0.3.15")
+    exchange.GetTicker()
+```
+
+```rust
+fn main() {
+    exchange.SetProxy("ip://10.0.3.15");
+    // 发出请求的IP地址为10.0.3.15
+    let _ = exchange.GetTicker(None);
+}
+```
+
+如果代理设置失败，调用```exchange.SetProxy()```函数时将返回空值。
+
+```exchange.SetProxy()```函数的代理设置功能仅支持```rest```协议。每个`exchange`交易所对象可以设置一个代理，设置代理后，对该`exchange`交易所对象所绑定交易所接口的访问都会通过该代理进行。
+
+支持设置```socks5```代理，以第一个添加的交易所对象`exchange`（即```exchanges[0]```）为例：
+
+- 设置代理，无用户名、无密码：```exchange.SetProxy("socks5://127.0.0.1:8889")```。
+
+- 设置代理，指定用户名和密码：```exchange.SetProxy("socks5://username:password@127.0.0.1:8889")```，其中```username```为用户名，```password```为密码。
+
+- 切换为正常模式，不使用代理：```exchange.SetProxy("")```。
+
+支持指定`exchange`交易所对象发出请求所使用的IP地址，详见[全局指定](/user-guide/平台基础/托管者/命令行参数)。
+
+See also: `exchange`
+
+#### exchange.SetTimeout
+
+```
+exchange.SetTimeout(timeout)
+```
+
+```exchange.SetTimeout()```函数用于设置`exchange`交易所对象```rest```请求的超时时间。
+
+Parameters:
+
+- `timeout` (number, required): ```timeout```参数用于指定超时时间的毫秒数。
+
+```javascript
+function main() {
+    exchange.SetTimeout(3000)
+    Log(exchange.GetTicker())
+}
+```
+
+```python
+def main():
+    exchange.SetTimeout(3000)
+    Log(exchange.GetTicker())
+```
+
+```rust
+fn main() {
+    exchange.SetTimeout(3000);
+    Log!(exchange.GetTicker(None));
+}
+```
+
+参数```timeout```为毫秒数值，1000毫秒等于1秒。该设置仅适用于```rest```协议，用于设置```rest```请求的超时时间，只需设置一次即可生效。例如：```exchange.SetTimeout(3000)```，将```exchange```交易所对象的```rest```请求超时时间设置为3秒；调用```exchange.GetTicker()```等涉及网络请求的函数时，若超过3秒未收到应答则判定为超时，发生超时的函数调用将返回空值。
+
+```SetTimeout()```不是全局函数，而是`exchange`交易所对象的方法。
+
+See also: `exchange`
+
+#### exchange.Encode
+
+```
+exchange.Encode(algo, inputFormat, outputFormat, data)
+exchange.Encode(algo, inputFormat, outputFormat, data, keyFormat, key)
+```
+
+```exchange.Encode()```函数用于执行签名与加密计算。
+
+Parameters:
+
+- `algo` (string, required): 参数```algo```用于指定编码计算时所使用的算法。
+支持设置为："raw"（不使用算法）、"sign"、"signTx"、"md4"、"md5"、"sha256"、"sha512"、"sha1"、"keccak256"、"sha3.224"、"sha3.256"、"sha3.384"、"sha3.512"、"sha3.keccak256"、"sha3.keccak512"、"sha512.384"、"sha512.256"、"sha512.224"、"ripemd160"、"blake2b.256"、"blake2b.512"、"blake2s.128"、"blake2s.256"。
+
+参数```algo```还支持："text.encoder.utf8"、"text.decoder.utf8"、"text.encoder.gbk"、"text.decoder.gbk"，用于对字符串进行编码、解码。
+参数```algo```也支持"ed25519"算法，并可搭配不同的哈希算法使用，例如参数```algo```可写为"ed25519.md5"、"ed25519.sha512"等，同时支持```ed25519.seed```计算。
+- `inputFormat` (string, required): 用于指定```data```参数的数据格式。```inputFormat```参数支持设置为："raw"、"hex"、"base64"、"string"其中之一。"raw"表示原始数据，"hex"表示```hex```编码数据，"base64"表示```base64```编码数据，"string"表示字符串数据。
+- `outputFormat` (string, required): 用于指定输出的数据格式。```outputFormat```参数支持设置为："raw"、"hex"、"base64"、"string"其中之一。"raw"表示原始数据，"hex"表示```hex```编码数据，"base64"表示```base64```编码数据，"string"表示字符串数据。
+- `data` (string, required): 参数```data```为所要处理的数据。
+- `keyFormat` (string, optional): 用于指定```key```参数的数据格式。```keyFormat```参数支持设置为："raw"、"hex"、"base64"、"string"其中之一。"raw"表示原始数据，"hex"表示```hex```编码数据，"base64"表示```base64```编码数据，"string"表示字符串数据。
+- `key` (string, optional): ```key```参数用于指定签名计算时使用的密钥，可以使用明文字符串，也可以使用```"{{accesskey}}"```、```"{{secretkey}}"```分别代指`exchange`交易所对象中配置的```accessKey```和```secretKey```。
+
+Returns (string): ```exchange.Encode()```函数返回计算得到的哈希值编码。
+
+BitMEX仓位变化推送（wss协议）示例：
+
+```javascript
+function main() {
+    var APIKEY = "your Access Key(Bitmex API ID)"
+    var expires = parseInt(Date.now() / 1000) + 10
+    var signature = exchange.Encode("sha256", "string", "hex", "GET/realtime" + expires, "hex", "{{secretkey}}")
+    var client = Dial("wss://www.bitmex.com/realtime", 60)
+    var auth = JSON.stringify({args: [APIKEY, expires, signature], op: "authKeyExpires"})
+    var pos = 0
+    client.write(auth)
+    client.write('{"op": "subscribe", "args": "position"}')
+    while (true) {
+        var bitmexData = JSON.parse(client.read())
+        if(bitmexData.table == 'position' && pos != parseInt(bitmexData.data[0].currentQty)){
+            Log('position change', pos, parseInt(bitmexData.data[0].currentQty), '@')
+            pos = parseInt(bitmexData.data[0].currentQty)
+        }
+    }
+}
+```
+
+```python
+import time
+def main():
+    APIKEY = "your Access Key(Bitmex API ID)"
+    expires = int(time.time() + 10)
+    signature = exchange.Encode("sha256", "string", "hex", "GET/realtime" + expires, "hex", "{{secretkey}}")
+    client = Dial("wss://www.bitmex.com/realtime", 60)
+    auth = json.dumps({"args": [APIKEY, expires, signature], "op": "authKeyExpires"})
+    pos = 0
+    client.write(auth)
+    client.write('{"op": "subscribe", "args": "position"}')
+    while True:
+        bitmexData = json.loads(client.read())
+        if "table" in bitmexData and bitmexData["table"] == "position" and len(bitmexData["data"]) != 0 and pos != bitmexData["data"][0]["currentQty"]:
+            Log("position change", pos, bitmexData["data"][0]["currentQty"], "@")
+            pos = bitmexData["data"][0]["currentQty"]
+```
+
+仅实盘支持调用```exchange.Encode()```函数。```"{{accesskey}}"```、```"{{secretkey}}"```的引用方式仅在调用```exchange.Encode()```函数时有效。
+
+See also: `exchange`, `Encode`
+
+### IO
+
+```exchange.IO()```调用交易所对象的扩展功能，第一个参数是指令名。先看`exchange.IO`了解全部指令以及各交易所特有的指令，再按需查看各指令的详细说明。Web3、Uniswap交易所对象的指令另见Web3、Uniswap分类。
+
+#### exchange.IO
+
+```
+exchange.IO(k, ...args)
+```
+
+```exchange.IO()```函数用于调用交易所对象相关的其它接口。
+
+Parameters:
+
+- `k` (string, required): 调用类型标识符，不同的取值对应不同的功能，具体请参见下方各章节的说明。
+- `arg` (string / number / bool / object / array / any, required): 扩展参数，根据```k```值的不同需要传入不同的参数，其个数和类型均不固定。
+
+Returns (string / number / bool / object / array / any): ```exchange.IO()```函数用于调用交易所对象的其它相关接口，调用成功时返回请求的应答数据，调用失败时返回空值。
+
+Futures_edgeX计算订单Hash并签名：
+
+```javascript
+function main() {
+    var strJson = `{
+        "assetIdSynthetic":    "0x4554482d3900000000000000000000",
+        "assetIdCollateral":   "0x2ce625e94458d39dd0bf3b45a843544dd4a14b8169045a3a3d15aa564b936c5",
+        "assetIdFee":          "0x2ce625e94458d39dd0bf3b45a843544dd4a14b8169045a3a3d15aa564b936c5",
+        "isBuyingSynthetic":   true,
+        "amountSynthetic":     10000000,
+        "amountCollateral":    13020000,
+        "amountFee":           6250,
+        "nonce":               676432751,
+        "accountID":           601416704693633632,
+        "expirationTimestamp": 484831
+    }`
+    var signature = exchange.IO("calcOrderHashAndSign", strJson)
+    Log(signature)
+}
+```
+
+```python
+import json
+def main():
+    params = {
+        "assetIdSynthetic":    "0x4554482d3900000000000000000000",
+        "assetIdCollateral":   "0x2ce625e94458d39dd0bf3b45a843544dd4a14b8169045a3a3d15aa564b936c5",
+        "assetIdFee":          "0x2ce625e94458d39dd0bf3b45a843544dd4a14b8169045a3a3d15aa564b936c5",
+        "isBuyingSynthetic":   True,
+        "amountSynthetic":     10000000,
+        "amountCollateral":    13020000,
+        "amountFee":           6250,
+        "nonce":               676432751,
+        "accountID":           601416704693633632,
+        "expirationTimestamp": 484831
+    }
+    signature = exchange.IO("calcOrderHashAndSign", json.dumps(params))
+    Log(signature)
+```
+
+```rust
+fn main() {
+    let strJson = r#"{
+        "assetIdSynthetic":    "0x4554482d3900000000000000000000",
+        "assetIdCollateral":   "0x2ce625e94458d39dd0bf3b45a843544dd4a14b8169045a3a3d15aa564b936c5",
+        "assetIdFee":          "0x2ce625e94458d39dd0bf3b45a843544dd4a14b8169045a3a3d15aa564b936c5",
+        "isBuyingSynthetic":   true,
+        "amountSynthetic":     10000000,
+        "amountCollateral":    13020000,
+        "amountFee":           6250,
+        "nonce":               676432751,
+        "accountID":           601416704693633632,
+        "expirationTimestamp": 484831
+    }"#;
+    let signature = exchange.IO(("calcOrderHashAndSign", strJson));
+    Log!(signature);
+}
+```
+
+**指令一览**
+
+| 指令 | 说明 |
+| - | - |
+| ```"api"``` | 调用交易所未封装的原始接口 |
+| ```"currency"``` | 运行时切换交易对 |
+| ```"base"``` / ```"mbase"``` | 切换交易 / 行情接口基地址 |
+| ```"simulate"```、```"cross"```、```"dual"```、```"unified"```等 | 切换交易模式，见```exchange.IO(mode, value)``` |
+| ```"rate"``` / ```"quota"``` | API调用限流 |
+
+各指令的详细说明见本分类下的各个页面；下面列出各交易所特有的指令。
+
+**各交易所IO指令**
+
+所有交易所均支持```"api"```和```"currency"```指令，下方仅列出各交易所的特有指令。
+
+---
+
+#### 现货交易所
+
+**Binance（币安）**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```trade_margin``` | 无 | 切换至逐仓杠杆模式 |
+| ```trade_super_margin``` | 无 | 切换至全仓杠杆模式 |
+| ```trade_normal``` | 无 | 切换回普通现货模式 |
+| ```unified``` | bool | 统一账户模式 |
+| ```selfTradePreventionMode``` | string | 自成交防护，可选：```EXPIRE_TAKER```/```EXPIRE_MAKER```/```EXPIRE_BOTH```/```NONE``` |
+
+**OKX（欧易）**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```simulate``` | bool | 模拟盘/实盘切换 |
+| ```trade_margin``` | 无 | 逐仓杠杆（tdMode=isolated） |
+| ```trade_super_margin``` | 无 | 全仓杠杆（tdMode=cross） |
+| ```trade_normal``` | 无 | 切换回普通现货模式 |
+| ```tdMode``` | string | 直接设置交易模式，组合保证金模式下须使用全仓 |
+
+**Huobi（火币）**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```trade_margin``` | 无 | 切换至逐仓杠杆模式 |
+| ```trade_super_margin``` | 无 | 切换至全仓杠杆模式 |
+| ```trade_normal``` | 无 | 切换回普通现货模式 |
+
+**Bybit**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```trade_margin``` | 无 | 切换至杠杆模式 |
+| ```trade_normal``` | 无 | 切换回普通现货模式 |
+
+**Gate.io**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```trade_margin``` | 无 | 切换至逐仓杠杆模式 |
+| ```trade_super_margin``` | 无 | 切换至全仓杠杆模式 |
+| ```trade_normal``` | 无 | 切换回普通现货模式 |
+| ```unified``` | bool | 统一账户模式 |
+
+**Bitget**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```simulate``` | bool | 模拟盘/实盘切换 |
+
+**CoinEx**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```trade_margin``` | 无 | 切换至杠杆模式 |
+| ```trade_normal``` | 无 | 切换回普通模式 |
+
+**WOO**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```trade_margin``` | 无 | 切换至杠杆模式 |
+| ```trade_normal``` | 无 | 切换回普通模式 |
+
+**Crypto.com**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```trade_margin``` | 无 | 切换至杠杆模式 |
+| ```trade_normal``` | 无 | 切换回普通模式 |
+
+**AscendEx**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```trade_margin``` | 无 | 切换至杠杆模式 |
+| ```trade_normal``` | 无 | 切换回普通模式 |
+
+**Gemini**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```subAccount``` | string | 设置子账户名称 |
+
+**Poloniex**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```accountId``` | string | 设置账户ID |
+
+**Bitfinex**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```version``` | 无 | 获取当前API版本号 |
+
+**Backpack**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```selfTradePreventionMode``` | string | 自成交防护，可选：```Allow```/```RejectTaker```/```RejectMaker```/```RejectBoth```/```Ban``` |
+
+**Hyperliquid（现货）**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```source``` | "a"/"b" | 切换API数据源 |
+| ```vaultAddress``` | string | 设置金库地址，传入空字符串则禁用 |
+| ```walletAddress``` | string | 设置钱包地址 |
+| ```expiresAfter``` | number | 订单过期时间（毫秒），设为0则禁用 |
+
+---
+
+#### 合约交易所
+
+**Futures_Binance（币安合约）**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```cross``` | bool | 全仓/逐仓 |
+| ```dual``` | bool | 双向/单向持仓 |
+| ```unified``` | bool | 统一账户（切换后使用papi.binance.com） |
+| ```selfTradePreventionMode``` | string | 自成交防护，可选：```EXPIRE_TAKER```/```EXPIRE_MAKER```/```EXPIRE_BOTH```/```NONE``` |
+| ```extend_key``` | string | 设置API响应扩展字段（以逗号分隔） |
+
+**Futures_OKX（欧易合约）**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```simulate``` | bool | 模拟盘/实盘切换 |
+| ```cross``` | bool | 全仓/逐仓，默认全仓 |
+| ```dual``` | bool | 双向(long_short_mode)/单向(net_mode)持仓 |
+
+**Futures_HuobiDM（火币合约）**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```cross``` | bool | 全仓/逐仓，默认逐仓。仅```XXX_USDT```永续合约(swap)支持 |
+| ```dual``` | bool | 双向(dual_side)/单向(single_side)持仓 |
+| ```unified``` | bool | 统一账户模式 |
+| ```signHost``` | string | 设置API签名Host地址，传入空字符串则禁用 |
+
+**Futures_Bybit**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```cross``` | bool | 全仓/逐仓 |
+| ```dual``` | bool | 双向/单向持仓 |
+
+**Futures_KuCoin**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```cross``` | bool | 全仓/逐仓 |
+
+**Futures_GateIO**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```cross``` | bool | 全仓/逐仓 |
+| ```dual``` | bool | 双向/单向持仓 |
+| ```unified``` | bool | 统一账户模式 |
+
+**Futures_Bitget**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```simulate``` | bool | 模拟盘/实盘切换 |
+| ```cross``` | bool | 全仓(crossed)/逐仓(isolated) |
+| ```dual``` | bool | 双向(hedge_mode)/单向(one_way_mode)持仓 |
+
+**Futures_MEXC**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```cross``` | bool | 全仓/逐仓 |
+
+**Futures_BitMEX**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```cross``` | bool | 全仓/逐仓 |
+
+**Futures_CoinEx**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```cross``` | bool | 全仓/逐仓 |
+
+**Futures_WOO**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```cross``` | bool | 全仓/逐仓 |
+| ```dual``` | bool | 双向/单向持仓 |
+
+**Futures_Kraken**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```cross``` | bool | 全仓/逐仓（仅multi-collateral账户支持） |
+
+**Futures_Aevo**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```signingKey``` | string | 设置签名密钥，返回公钥。需从交易所API Key页面获取，请注意其存在时效性 |
+
+**Futures_Hyperliquid**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```cross``` | bool | 全仓/逐仓 |
+| ```source``` | "a"/"b" | 切换API数据源 |
+| ```vaultAddress``` | string | 设置金库地址，传入空字符串则禁用 |
+| ```walletAddress``` | string | 设置钱包地址 |
+| ```expiresAfter``` | number | 订单过期时间（毫秒），设为0则禁用 |
+
+**Futures_Deepcoin**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```cross``` | bool | 全仓/逐仓 |
+| ```merge``` | bool | 合并持仓(true)/拆分持仓(false) |
+
+**Futures_DigiFinex**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```simulate``` | bool | 模拟盘/实盘切换 |
+| ```cross``` | bool | 全仓/逐仓 |
+
+**Futures_ApolloX**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```cross``` | bool | 全仓/逐仓 |
+
+**Futures_Aster**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```cross``` | bool | 全仓/逐仓 |
+| ```dual``` | bool | 双向/单向持仓 |
+
+**Futures_CoinW**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```cross``` | bool | 全仓/逐仓 |
+
+**Futures_BitMart**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```cross``` | bool | 全仓/逐仓 |
+
+**Futures_Backpack**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```selfTradePreventionMode``` | string | 自成交防护，可选：```Allow```/```RejectTaker```/```RejectMaker```/```RejectBoth```/```Ban``` |
+
+**Futures_Lighter**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```cross``` | bool | 全仓/逐仓 |
+| ```expiry``` | number | 订单过期时间戳（毫秒），默认29天，最小4分钟 |
+
+**Futures_Crypto.com**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```accountId``` | string | 设置交易账户ID |
+
+**Futures_Bitfinex**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```mbase``` | string | 设置行情API基础地址 |
+
+**Futures_edgeX**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```calcOrderHashAndSign``` | string(JSON) | 计算订单哈希并签名，返回签名字符串 |
+
+**Futures_Bibox**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```cross``` | bool | 全仓/逐仓，默认全仓 |
+
+**Futures_Pionex**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```cross``` | bool | 全仓/逐仓 |
+| ```dual``` | bool | 双向/单向持仓 |
+
+**Futures_Phemex**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```dual``` | bool | 双向/单向持仓。全仓/逐仓需在交易所网页端设置 |
+
+**Futures_WooFi**
+
+> 仅支持通用指令```"api"```和```"currency"```，无特有指令。
+
+**特殊平台IO指令**
+
+**Polymarket（预测市场）**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```nonce``` | [number] | 获取或设置订单的 nonce 值。不传参数时返回当前 nonce，传入数值时设置新的 nonce |
+| ```proxyWalletAddress``` | 无 | 获取代理钱包地址 |
+| ```redeem``` | symbol, [wait] | 赎回已结算头寸（通过 Relayer 免 Gas）。wait 默认为 true，等待交易确认；wait 为 false 时立即返回```{"transactionID": "..."}``` |
+| ```merge``` | symbol, [amount], [wait] | 将 YES+NO 代币合并赎回为 USDC（通过 Relayer 免 Gas）。amount 为 0 或不传时，自动取两个 outcome 中较小的持仓量。wait 默认为 true，等待交易确认 |
+| ```l2_credentials``` | 无 | 获取 L2 认证信息，返回```{"apiKey":"","secret":"","passphrase":""}```，用于 WebSocket 连接等场景 |
+| ```batchOrders``` | array | 批量下单，参数为订单对象数组，每个对象包含```symbol```、```side```、```price```、```amount```字段，以及可选的```option```字段 |
+
+**Web3（区块链）**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```abi``` | 合约地址, ABI字符串 | 注册合约 ABI |
+| ```address``` | [私钥] | 获取钱包地址 |
+| ```encode``` / ```pack``` | 类型, 数据... | ABI 编码数据 |
+| ```encodePacked``` | 类型, 数据... | ABI 紧密编码数据 |
+| ```hash``` | 参数1-4 | 计算哈希值 |
+| ```decode``` / ```unpack``` | 类型, 数据... | ABI 解码数据 |
+| ```key``` | string | 切换操作所使用的私钥 |
+
+**IB（盈透证券）**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```status``` | 无 | 获取连接状态 |
+| ```time``` | 无 | 获取 IB 服务器时间 |
+| ```reqId``` | 无 | 强制获取新的请求 ID |
+| ```orderId``` | 无 | 获取下一个可用的订单 ID |
+| ```ignore``` | string(数组) | 忽略指定的错误码 |
+| ```scan``` | string(JSON) | 执行市场扫描器 |
+| ```wait``` | [number] | 等待行情事件，可设置超时秒数 |
+| ```debug``` | bool | 调试模式：开启后把与TWS/IB Gateway收发的每一帧按网关API日志的格式输出到日志 |
+| ```marketDataType``` | number | 行情数据类型（1 实时 / 2 冻结 / 3 延迟 / 4 延迟冻结） |
+
+**Futu（富途证券）**
+
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```refresh``` | bool | 缓存刷新，禁用缓存后频率限制为每 30 秒最多 10 次 |
+| ```accounts``` | 无 | 获取所有账户列表 |
+| ```status``` | 无 | 获取连接状态 |
+| ```lock``` | 无 | 锁定交易 |
+| ```unlock``` | 无 | 解锁交易 |
+| ```wait``` | 无 | 等待行情事件 |
+
+See also: `exchange.SetBase`, `exchange.SetCurrency`
+
+#### exchange.IO("api", ...)
+
+```
+exchange.IO(k, httpMethod, resource)
+exchange.IO(k, httpMethod, resource, params)
+exchange.IO(k, httpMethod, resource, params, raw)
+```
+
+Forms:
+
+- `exchange.IO("api", ...)`
+
+```exchange.IO("api", ...)```调用交易所未封装的原始REST接口，签名由平台自动处理。
+
+Parameters:
+
+- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"api"```表示调用交易所原始接口。
+- `httpMethod` (string, required): ```httpMethod```参数为请求方法，例如```GET```、```POST```、```DELETE```。
+- `resource` (string, required): ```resource```参数为接口路径，也可以写完整URL（主机部分替换当前基地址）。
+- `params` (string, optional): ```params```参数为URL编码格式的请求参数。
+- `raw` (string, optional): ```raw```参数为原始请求体，例如JSON字符串。
+
+Returns (object / array / 空值): 返回交易所接口的完整应答，调用失败时返回空值。仅实盘支持。
+
+使用 ```"api"``` 模式调用 OKX 期货批量下单接口，并通过 ```raw``` 参数传递 JSON 格式的订单数据：
+
+```javascript
+function main() {
+    var arrOrders = [
+        {"instId":"BTC-USDT-SWAP","tdMode":"cross","side":"buy","ordType":"limit","px":"16000","sz":"1","posSide":"long"},
+        {"instId":"BTC-USDT-SWAP","tdMode":"cross","side":"buy","ordType":"limit","px":"16000","sz":"2","posSide":"long"}
+    ]
+
+    // 调用 exchange.IO 直接访问交易所批量下单接口
+    var ret = exchange.IO("api", "POST", "/api/v5/trade/batch-orders", "", JSON.stringify(arrOrders))
+    Log(ret)
+}
+```
+
+```python
+import json
+def main():
+    arrOrders = [
+        {"instId":"BTC-USDT-SWAP","tdMode":"cross","side":"buy","ordType":"limit","px":"16000","sz":"1","posSide":"long"},
+        {"instId":"BTC-USDT-SWAP","tdMode":"cross","side":"buy","ordType":"limit","px":"16000","sz":"2","posSide":"long"}
+    ]
+    ret = exchange.IO("api", "POST", "/api/v5/trade/batch-orders", "", json.dumps(arrOrders))
+    Log(ret)
+```
+
+```rust
+fn main() {
+    // Rust无JSON序列化，直接用原始字符串构造订单数组
+    let arrOrders = r#"[
+        {"instId":"BTC-USDT-SWAP","tdMode":"cross","side":"buy","ordType":"limit","px":"16000","sz":"1","posSide":"long"},
+        {"instId":"BTC-USDT-SWAP","tdMode":"cross","side":"buy","ordType":"limit","px":"16000","sz":"2","posSide":"long"}
+    ]"#;
+
+    // 调用 exchange.IO 直接访问交易所批量下单接口，多参数以元组传入
+    let ret = exchange.IO(("api", "POST", "/api/v5/trade/batch-orders", "", arrOrders));
+    Log!(ret);
+}
+```
+
+```params```参数中的键值为字符串类型时，需要使用单引号将参数值包裹起来：
+
+```javascript
+var amount = 1
+var price = 10
+var basecurrency = "ltc"
+function main () {
+    // 注意 amount.toString() 和 price.toString() 左边右边都有一个 ' 字符
+    var message = "symbol=" + basecurrency + "&amount='" + amount.toString() + "'&price='" + price.toString() + "'&side=buy" + "&type=limit"
+    var id = exchange.IO("api", "POST", "/v1/order/new", message)
+}
+```
+
+```python
+amount = 1
+price = 10
+basecurrency = "ltc"
+def main():
+    message = "symbol=" + basecurrency + "&amount='" + str(amount) + "'&price='" + str(price) + "'&side=buy" + "&type=limit"
+    id = exchange.IO("api", "POST", "/v1/order/new", message)
+```
+
+```rust
+fn main() {
+    let amount = 1;
+    let price = 10;
+    let basecurrency = "ltc";
+    // 注意 amount 和 price 参数值的左边右边都有一个 ' 字符
+    let message = format!("symbol={}&amount='{}'&price='{}'&side=buy&type=limit", basecurrency, amount, price);
+    let id = exchange.IO(("api", "POST", "/v1/order/new", message));
+}
+```
+
+```resource```参数支持传入完整的URL：
+
+```javascript
+function main() {
+    var ret = exchange.IO("api", "GET", "https://www.okx.com/api/v5/account/max-withdrawal", "ccy=BTC")
+    Log(ret)
+}
+```
+
+```python
+def main():
+    ret = exchange.IO("api", "GET", "https://www.okx.com/api/v5/account/max-withdrawal", "ccy=BTC")
+    Log(ret)
+```
+
+```rust
+fn main() {
+    let ret = exchange.IO(("api", "GET", "https://www.okx.com/api/v5/account/max-withdrawal", "ccy=BTC"));
+    Log!(ret);
+}
+```
+
+不使用```raw```参数的GET请求：
+
+```javascript
+function main(){
+    var ret = exchange.IO("api", "GET", "/api/v5/trade/orders-pending", "instType=SPOT")
+    Log(ret)
+}
+```
+
+```python
+def main():
+    ret = exchange.IO("api", "GET", "/api/v5/trade/orders-pending", "instType=SPOT")
+    Log(ret)
+```
+
+```rust
+fn main() {
+    let ret = exchange.IO(("api", "GET", "/api/v5/trade/orders-pending", "instType=SPOT"));
+    Log!(ret);
+}
+```
+
+**直接调用交易所API（```"api"```模式）**
+
+```javascript
+exchange.IO("api", httpMethod, resource, params, raw)
+```
+
+用于调用交易所未封装的原生API接口。FMZ会自动处理签名验证，您只需填写请求参数即可。
+
+| 参数 | 类型 | 必填 | 说明 |
+| - | - | - | - |
+| httpMethod | string | 是 | ```GET```、```POST```等 |
+| resource | string | 是 | 请求路径或完整URL |
+| params | string | 否 | URL编码格式的请求参数 |
+| raw | string | 否 | 原始请求体（JSON等） |
+
+调用失败时返回空值，且该模式仅支持实盘。
+
+See also: `exchange.IO`
+
+#### exchange.IO("currency", ...)
+
+```
+exchange.IO(k, symbol)
+```
+
+Forms:
+
+- `exchange.IO("currency", ...)`
+
+```exchange.IO("currency", ...)```在运行时切换交易所对象的当前交易对。
+
+Parameters:
+
+- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"currency"```表示切换交易对。
+- `symbol` (string, required): ```symbol```参数为交易对，大写、下划线分隔，例如```ETH_USDT```。
+
+Returns (string / number / bool / object / array / any): 调用成功时返回指令的结果，调用失败时返回空值。
+
+运行时切换交易对：
+
+```javascript
+function main() {
+    // 例如，实盘启动时交易所对象当前的交易对为BTC_USDT，打印当前交易对的行情
+    Log(exchange.GetTicker())
+    // 将交易对切换为LTC_BTC
+    exchange.IO("currency", "LTC_BTC")
+    Log(exchange.GetTicker())
+}
+```
+
+```python
+def main():
+    Log(exchange.GetTicker())
+    exchange.IO("currency", "LTC_BTC")
+    Log(exchange.GetTicker())
+```
+
+```rust
+fn main() {
+    // 例如，实盘启动时交易所对象当前的交易对为BTC_USDT，打印当前交易对的行情
+    Log!(exchange.GetTicker(None));
+    // 将交易对切换为LTC_BTC
+    let _ = exchange.IO(("currency", "LTC_BTC"));
+    Log!(exchange.GetTicker(None));
+}
+```
+
+**运行时切换交易对（```"currency"```模式）**
+
+```javascript
+exchange.IO("currency", "ETH_USDT")
+```
+
+用于在运行时动态切换交易对，交易对格式为大写字母加下划线分隔。此指令等同于`exchange.SetCurrency`。
+
+> 回测模式下仅支持现货，且只能切换至相同计价币种的交易对。期货切换交易对后，需再次调用```exchange.SetContractType()```。
+
+See also: `exchange.IO`
+
+#### exchange.IO("base", ...)
+
+```
+exchange.IO(k, address)
+```
+
+Forms:
+
+- `exchange.IO("base", ...)`
+
+```exchange.IO("base", ...)```切换交易接口的基地址，```exchange.IO("mbase", ...)```切换行情接口的基地址。
+
+Parameters:
+
+- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"base"```表示切换交易接口基地址（```"mbase"```切换行情接口基地址）。
+- `address` (string, required): ```address```参数为新的基地址，例如```https://api.example.com```。
+
+Returns (string / number / bool / object / array / any): 调用成功时返回指令的结果，调用失败时返回空值。
+
+切换交易所接口基地址：
+
+```javascript
+function main () {
+    // exchanges[0]即实盘创建时添加的第一个交易所对象
+    exchanges[0].IO("base", "https://api.huobi.pro")
+}
+```
+
+```python
+def main():
+    exchanges[0].IO("base", "https://api.huobi.pro")
+```
+
+```rust
+fn main() {
+    // exchanges[0]即实盘创建时添加的第一个交易所对象
+    let _ = exchanges[0].IO(("base", "https://api.huobi.pro"));
+}
+```
+
+通过```"mbase"```切换行情接口基地址（以Bitfinex为例）：
+
+```javascript
+function main() {
+    exchange.SetBase("https://api.bitfinex.com")
+    exchange.IO("mbase", "https://api-pub.bitfinex.com")
+}
+```
+
+```python
+def main():
+    exchange.SetBase("https://api.bitfinex.com")
+    exchange.IO("mbase", "https://api-pub.bitfinex.com")
+```
+
+```rust
+fn main() {
+    exchange.SetBase("https://api.bitfinex.com");
+    let _ = exchange.IO(("mbase", "https://api-pub.bitfinex.com"));
+}
+```
+
+**切换基地址（```"base"``` / ```"mbase"```模式）**
+
+- ```"base"```：切换交易接口的基地址，等同于```exchange.SetBase()```。
+- ```"mbase"```：切换行情接口的基地址，适用于行情与交易采用不同域名的交易所。
+
+See also: `exchange.IO`
+
+#### exchange.IO(mode, value)
+
+```
+exchange.IO(mode)
+exchange.IO(mode, value)
+```
+
+Forms:
+
+- `exchange.IO(mode, value)`
+
+```exchange.IO(mode, value)```切换交易所的交易模式：模拟盘/实盘、全仓/逐仓、双向/单向持仓、统一账户、杠杆模式、自成交预防等。
+
+Parameters:
+
+- `mode` (string, required): ```mode```参数为模式指令，例如```"simulate"```、```"cross"```、```"dual"```，全部指令见下表。
+- `value` (bool / string, optional): ```value```参数为模式的取值，类型和含义见下表；部分指令不需要。
+
+Returns (string / number / bool / object / array / any): 调用成功时返回指令的结果，调用失败时返回空值。
+
+切换模拟盘/实盘环境（以OKX期货为例）：
+
+```javascript
+function main() {
+    exchange.IO("simulate", true)    // Switch to demo trading environment
+    // ... trading logic ...
+    exchange.IO("simulate", false)   // Switch back to live trading environment
+}
+```
+
+```python
+def main():
+    exchange.IO("simulate", True)
+    # ... trading logic ...
+    exchange.IO("simulate", False)
+```
+
+```rust
+fn main() {
+    let _ = exchange.IO(("simulate", true));    // Switch to demo trading environment
+    // ... trading logic ...
+    let _ = exchange.IO(("simulate", false));   // Switch back to live trading environment
+}
+```
+
+切换合约保证金模式与持仓模式（以币安期货为例）：
+
+```javascript
+function main() {
+    exchange.IO("dual", true)    // Switch to hedge mode (dual position)
+    exchange.IO("dual", false)   // Switch to one-way mode
+
+    exchange.SetContractType("swap")
+    exchange.IO("cross", true)    // Switch to cross margin
+    exchange.IO("cross", false)   // Switch to isolated margin
+}
+```
+
+```python
+def main():
+    exchange.IO("dual", True)
+    exchange.IO("dual", False)
+
+    exchange.SetContractType("swap")
+    exchange.IO("cross", True)
+    exchange.IO("cross", False)
+```
+
+```rust
+fn main() {
+    let _ = exchange.IO(("dual", true));    // Switch to hedge mode (dual position)
+    let _ = exchange.IO(("dual", false));   // Switch to one-way mode
+
+    let _ = exchange.SetContractType("swap");
+    let _ = exchange.IO(("cross", true));    // Switch to cross margin
+    let _ = exchange.IO(("cross", false));   // Switch to isolated margin
+}
+```
+
+切换统一账户模式（以币安期货为例）：
+
+```javascript
+function main() {
+    exchange.IO("unified", true)   // Switch to unified account mode
+    exchange.IO("unified", false)  // Switch to normal mode
+}
+```
+
+```python
+def main():
+    exchange.IO("unified", True)
+    exchange.IO("unified", False)
+```
+
+```rust
+fn main() {
+    let _ = exchange.IO(("unified", true));   // Switch to unified account mode
+    let _ = exchange.IO(("unified", false));  // Switch to normal mode
+}
+```
+
+设置自成交预防模式（以币安为例）：
+
+```javascript
+function main() {
+    // "NONE" means disable STP mode, other parameters: "EXPIRE_TAKER", "EXPIRE_MAKER", "EXPIRE_BOTH"
+    exchange.IO("selfTradePreventionMode", "NONE")
+}
+```
+
+```python
+def main():
+    exchange.IO("selfTradePreventionMode", "NONE")
+```
+
+```rust
+fn main() {
+    // "NONE" means disable STP mode, other parameters: "EXPIRE_TAKER", "EXPIRE_MAKER", "EXPIRE_BOTH"
+    let _ = exchange.IO(("selfTradePreventionMode", "NONE"));
+}
+```
+
+**通用交易模式指令**
+
+以下指令在多个交易所中通用，各交易所的具体支持情况请参见`exchange.IO`。
+
+| 指令 | 参数 | 功能 |
+| - | - | - |
+| ```simulate``` | bool | 模拟盘(true)/实盘(false) |
+| ```cross``` | bool | 全仓(true)/逐仓(false) |
+| ```dual``` | bool | 双向持仓(true)/单向持仓(false) |
+| ```unified``` | bool | 统一账户(true)/普通账户(false) |
+| ```trade_margin``` | 无 | 切换至逐仓杠杆模式 |
+| ```trade_super_margin``` | 无 | 切换至全仓杠杆模式 |
+| ```trade_normal``` | 无 | 切换回普通现货模式 |
+| ```selfTradePreventionMode``` | string | 自成交预防（STP）模式 |
+
+See also: `exchange.IO`
+
+#### exchange.IO("rate", ...)
+
+```
+exchange.IO(k, functionNames, maxCalls, period)
+exchange.IO(k, functionNames, maxCalls, period, behavior)
+```
+
+Forms:
+
+- `exchange.IO("rate", ...)`
+
+```exchange.IO("rate", ...)```与```exchange.IO("quota", ...)```限制API函数的调用频率。
+
+Parameters:
+
+- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能：```"rate"```为平滑限流（令牌桶，允许短时突发），```"quota"```为额度限流（按时间窗口计数，窗口按整点对齐）。
+- `functionNames` (string, required): ```functionNames```参数为API函数名（如```GetTicker```、```CreateOrder```、```GetAccount```），多个用逗号分隔共用一条规则；```*```为兜底规则，只作用于没有单独设置规则的函数；```IO/api```对应```exchange.IO("api", ...)```。传空字符串清空全部规则。
+- `maxCalls` (number, required): ```maxCalls```参数为一个周期内允许的最大调用次数，小于等于0时删除```functionNames```的规则。```"rate"```模式可以写成字符串```"次数/突发"```，例如```"10/5"```表示每周期10次、最多连续突发5次；不写突发时突发量等于次数。
+- `period` (string, required): ```period```参数为周期，写法同Go语言的时间长度：```"500ms"```、```"1s"```、```"1m"```、```"1h30m"```（单位ns、us、ms、s、m、h），也可以写```"1d"```；或者每日重置时间点```"@HHMM"```、```"@HHMMSS"```（北京时间），例如```"@0815"```。
+- `behavior` (string, optional): ```behavior```参数为超限时的行为：```"delay"```等待后执行，默认返回空值。
+
+Returns (string / number / bool / object / array / any): 调用成功时返回指令的结果，调用失败时返回空值。
+
+rate模式限流 - 限制GetTicker每秒最多调用10次，超限返回null：
+
+```javascript
+function main() {
+    exchange.IO("rate", "GetTicker", 10, "1s")
+
+    for (var i = 0; i < 20; i++) {
+        var ticker = exchange.GetTicker("BTC_USDT")
+        if (ticker) {
+            Log("Ticker:", ticker.Last)
+        } else {
+            Log("Rate limit exceeded")
+        }
+    }
+}
+```
+
+```python
+def main():
+    exchange.IO("rate", "GetTicker", 10, "1s")
+
+    for i in range(20):
+        ticker = exchange.GetTicker("BTC_USDT")
+        if ticker:
+            Log("Ticker:", ticker["Last"])
+        else:
+            Log("Rate limit exceeded")
+```
+
+```rust
+fn main() {
+    let _ = exchange.IO(("rate", "GetTicker", 10, "1s"));
+
+    for _i in 0..20 {
+        // 超限时GetTicker返回Err
+        match exchange.GetTicker("BTC_USDT") {
+            Ok(ticker) => Log!("Ticker:", ticker.Last),
+            Err(_) => Log!("Rate limit exceeded"),
+        }
+    }
+}
+```
+
+rate模式限流 - 使用```"delay"```参数，超限时自动等待而非返回null：
+
+```javascript
+function main() {
+    exchange.IO("rate", "GetTicker", 10, "1s", "delay")
+
+    for (var i = 0; i < 20; i++) {
+        var ticker = exchange.GetTicker("BTC_USDT")
+        Log("Call", i+1, "Ticker:", ticker.Last)
+    }
+}
+```
+
+```python
+def main():
+    exchange.IO("rate", "GetTicker", 10, "1s", "delay")
+
+    for i in range(20):
+        ticker = exchange.GetTicker("BTC_USDT")
+        Log("Call", i+1, "Ticker:", ticker["Last"])
+```
+
+```rust
+fn main() {
+    let _ = exchange.IO(("rate", "GetTicker", 10, "1s", "delay"));
+
+    for i in 0..20 {
+        let ticker = exchange.GetTicker("BTC_USDT").unwrap();
+        Log!("Call", i + 1, "Ticker:", ticker.Last);
+    }
+}
+```
+
+多个函数共享限流额度：
+
+```javascript
+function main() {
+    // GetTicker和GetDepth共享限制，合计每秒最多10次
+    exchange.IO("rate", "GetTicker,GetDepth", 10, "1s")
+
+    for (var i = 0; i < 20; i++) {
+        if (i % 2 == 0) {
+            Log("Ticker:", exchange.GetTicker("BTC_USDT"))
+        } else {
+            Log("Depth:", exchange.GetDepth("BTC_USDT"))
+        }
+    }
+}
+```
+
+```python
+def main():
+    exchange.IO("rate", "GetTicker,GetDepth", 10, "1s")
+
+    for i in range(20):
+        if i % 2 == 0:
+            Log("Ticker:", exchange.GetTicker("BTC_USDT"))
+        else:
+            Log("Depth:", exchange.GetDepth("BTC_USDT"))
+```
+
+```rust
+fn main() {
+    // GetTicker和GetDepth共享限制，合计每秒最多10次
+    let _ = exchange.IO(("rate", "GetTicker,GetDepth", 10, "1s"));
+
+    for i in 0..20 {
+        if i % 2 == 0 {
+            Log!("Ticker:", exchange.GetTicker("BTC_USDT"));
+        } else {
+            Log!("Depth:", exchange.GetDepth("BTC_USDT"));
+        }
+    }
+}
+```
+
+使用通配符限制所有API调用频率：
+
+```javascript
+function main() {
+    exchange.IO("rate", "*", 100, "1m")
+
+    for (var i = 0; i < 10; i++) {
+        exchange.GetTicker("BTC_USDT")
+        exchange.GetDepth("BTC_USDT")
+        exchange.GetAccount()
+        Log("Round", i+1, "completed")
+        Sleep(1000)
+    }
+}
+```
+
+```python
+def main():
+    exchange.IO("rate", "*", 100, "1m")
+
+    for i in range(10):
+        exchange.GetTicker("BTC_USDT")
+        exchange.GetDepth("BTC_USDT")
+        exchange.GetAccount()
+        Log("Round", i+1, "completed")
+        Sleep(1000)
+```
+
+```rust
+fn main() {
+    let _ = exchange.IO(("rate", "*", 100, "1m"));
+
+    for i in 0..10 {
+        let _ = exchange.GetTicker("BTC_USDT");
+        let _ = exchange.GetDepth("BTC_USDT");
+        let _ = exchange.GetAccount();
+        Log!("Round", i + 1, "completed");
+        Sleep(1000);
+    }
+}
+```
+
+quota模式 - 严格时间窗口对齐限流：
+
+```javascript
+function main() {
+    exchange.IO("quota", "GetTicker", 3, "1s")
+
+    for (var i = 0; i < 10; i++) {
+        var ticker = exchange.GetTicker("BTC_USDT")
+        if (ticker) {
+            Log(_D(), "Ticker:", ticker.Last)
+        } else {
+            Log(_D(), "Quota exceeded, waiting for next window")
+        }
+        Sleep(100)
+    }
+}
+```
+
+```python
+def main():
+    exchange.IO("quota", "GetTicker", 3, "1s")
+
+    for i in range(10):
+        ticker = exchange.GetTicker("BTC_USDT")
+        if ticker:
+            Log(_D(), "Ticker:", ticker["Last"])
+        else:
+            Log(_D(), "Quota exceeded, waiting for next window")
+        Sleep(100)
+```
+
+```rust
+fn main() {
+    let _ = exchange.IO(("quota", "GetTicker", 3, "1s"));
+
+    for _i in 0..10 {
+        match exchange.GetTicker("BTC_USDT") {
+            Ok(ticker) => Log!(_D(None), "Ticker:", ticker.Last),
+            Err(_) => Log!(_D(None), "Quota exceeded, waiting for next window"),
+        }
+        Sleep(100);
+    }
+}
+```
+
+quota模式 - 日内配额，每天指定时间重置：
+
+```javascript
+function main() {
+    exchange.IO("quota", "GetTicker", 1000, "@0815")
+
+    var count = 0
+    while (true) {
+        var ticker = exchange.GetTicker("BTC_USDT")
+        if (ticker) {
+            count++
+            Log("Call count:", count, "Ticker:", ticker.Last)
+        } else {
+            Log("Daily quota exceeded, waiting for reset at 08:15")
+            Sleep(60000)  // Wait 1 minute
+        }
+        Sleep(1000)
+    }
+}
+```
+
+```python
+def main():
+    exchange.IO("quota", "GetTicker", 1000, "@0815")
+
+    count = 0
+    while True:
+        ticker = exchange.GetTicker("BTC_USDT")
+        if ticker:
+            count += 1
+            Log("Call count:", count, "Ticker:", ticker["Last"])
+        else:
+            Log("Daily quota exceeded, waiting for reset at 08:15")
+            Sleep(60000)  # Wait 1 minute
+        Sleep(1000)
+```
+
+```rust
+fn main() {
+    let _ = exchange.IO(("quota", "GetTicker", 1000, "@0815"));
+
+    let mut count = 0;
+    loop {
+        match exchange.GetTicker("BTC_USDT") {
+            Ok(ticker) => {
+                count += 1;
+                Log!("Call count:", count, "Ticker:", ticker.Last);
+            }
+            Err(_) => {
+                Log!("Daily quota exceeded, waiting for reset at 08:15");
+                Sleep(60000);  // Wait 1 minute
+            }
+        }
+        Sleep(1000);
+    }
+}
+```
+
+组合使用多个限流规则：
+
+```javascript
+function main() {
+    exchange.IO("rate", "GetTicker", 10, "1s")      // GetTicker每秒10次
+    exchange.IO("rate", "GetDepth", 5, "1s")        // GetDepth每秒5次
+    exchange.IO("rate", "CreateOrder", 2, "1s")     // CreateOrder每秒2次
+    exchange.IO("quota", "*", 1000, "@0000")        // 所有API每天00:00重置，限1000次
+
+    Log("Rate limits configured successfully")
+
+    for (var i = 0; i < 5; i++) {
+        exchange.GetTicker("BTC_USDT")
+        exchange.GetDepth("BTC_USDT")
+        Sleep(200)
+    }
+}
+```
+
+```python
+def main():
+    exchange.IO("rate", "GetTicker", 10, "1s")      # GetTicker每秒10次
+    exchange.IO("rate", "GetDepth", 5, "1s")        # GetDepth每秒5次
+    exchange.IO("rate", "CreateOrder", 2, "1s")     # CreateOrder每秒2次
+    exchange.IO("quota", "*", 1000, "@0000")        # 所有API每天00:00重置，限1000次
+
+    Log("Rate limits configured successfully")
+
+    for i in range(5):
+        exchange.GetTicker("BTC_USDT")
+        exchange.GetDepth("BTC_USDT")
+        Sleep(200)
+```
+
+```rust
+fn main() {
+    let _ = exchange.IO(("rate", "GetTicker", 10, "1s"));      // GetTicker每秒10次
+    let _ = exchange.IO(("rate", "GetDepth", 5, "1s"));        // GetDepth每秒5次
+    let _ = exchange.IO(("rate", "CreateOrder", 2, "1s"));     // CreateOrder每秒2次
+    let _ = exchange.IO(("quota", "*", 1000, "@0000"));        // 所有API每天00:00重置，限1000次
+
+    Log!("Rate limits configured successfully");
+
+    for _i in 0..5 {
+        let _ = exchange.GetTicker("BTC_USDT");
+        let _ = exchange.GetDepth("BTC_USDT");
+        Sleep(200);
+    }
+}
+```
+
+**API限流控制（```"rate"``` / ```"quota"```模式）**
+
+```javascript
+exchange.IO("rate", functionNames, maxCalls, period, [behavior])
+exchange.IO("quota", functionNames, maxCalls, period, [behavior])
+```
+
+- **rate**：平滑限流（令牌桶）。桶容量为突发量，按「次数/周期」的速度补充，开始时是满的。
+- **quota**：额度限流。每个周期最多调用指定次数，周期按整点对齐（例如```"1m"```在每分钟0秒重置，```"1d"```在UTC零点即北京时间8点重置）。
+
+| 参数 | 类型 | 说明 |
+| - | - | - |
+| functionNames | string | 函数名，逗号分隔多个；```*```为兜底规则，只作用于没有单独规则的函数 |
+| maxCalls | number / string | 时间周期内最大调用次数；```"rate"```可写```"次数/突发"```；小于等于0删除规则 |
+| period | string | 时间周期（```"500ms"```/```"1s"```/```"1h30m"```/```"1d"```）或每日重置时间点（```"@0815"```，北京时间） |
+| behavior | string | 可选，```"delay"```超限时等待，默认返回null |
+
+> ```Buy```/```Sell```的限流遵循```CreateOrder```的设置。```Go```遵循实际并发函数的设置。```IO/api```仅对```exchange.IO("api", ...)```生效。
+
+  规则按交易所对象分别设置，只在本次运行中有效。超限时默认报错并返回空值，错误信息形如```rate limit exceeded: GetTicker 10/1s```；设置```"delay"```时等待到可以调用为止，停止实盘时等待会被打断。```GetAccount```与```GetAssets```是同一个请求，为其中任一个名字设置的规则对两者都生效。
+
+See also: `exchange.IO`
+
+### Network
+
+网络请求与服务：HTTP请求、WebSocket/TCP等长连接、在策略内提供HTTP/TCP服务（`threading.Serve`）、发送邮件。函数名带```_Go```后缀的是并发版本，配合`EventLoop`等待结果。
+
+#### HttpQuery
+
+```
+HttpQuery(url)
+HttpQuery(url, options)
+```
+
+发送HTTP请求。
+
+Parameters:
+
+- `url` (string, required): HTTP请求的URL地址。
+- `options` (object, optional): HTTP请求的相关设置，例如可以采用以下结构：
+```json
+{
+    method: "POST",
+    body: "a=10&b=20&c=30",
+    charset: "UTF-8",
+    cookie: "session_id=12345; lang=en",
+    debug: false,
+    headers: {"TEST-HTTP-QUERY": "123"},
+    timeout: 1000
+}
+```
+
+- method: 用于设置请求方法。
+- body: 用于设置请求体内容，通常用于 POST、PUT 等请求。
+- cookie: 用于设置请求中的 Cookie，一般用于携带身份验证信息或会话标识。
+- headers: 用于设置请求头信息，可用于指定内容类型、身份验证信息等。
+- debug: 设置为```true```时，此次```HttpQuery```函数调用返回完整的应答报文；设置为```false```时，仅返回应答报文```Body```中的数据。
+- timeout: 用于设置超时时间，单位为毫秒，例如设置为1000表示超时时间为1秒。
+- charset: 用于对请求的应答数据进行转码，例如：GB18030。支持常用编码。
+
+此结构中的所有字段均为可选字段，例如可以不设置```headers```字段。
+
+Returns (string / object): 返回请求的应答数据。如果返回值为```JSON```字符串，在```JavaScript```语言的策略中可以使用```JSON.parse()```函数解析，在```Rust```语言的策略中可以使用```JSONParse()```函数解析。参数```options```结构中的```debug```设置为true时，返回值为对象（JSON）；```debug```设置为false时，返回值为字符串。
+
+请求失败（未收到应答，例如连接被拒绝、DNS解析失败、超时、代理失败）时不会返回```null```，并且会在日志中记录包含请求方法和URL的错误信息：```debug```设置为false时返回空字符串；```debug```设置为true时返回```StatusCode```为0且带有```Error```字段（失败原因）的结构，结构说明参见```HttpQuery-return```。HTTP状态码为4xx、5xx的应答不属于请求失败。
+
+访问OKX公共行情API接口的示例。
+
+```javascript
+function main(){
+    // GET请求不带参数的示例
+    var info = JSON.parse(HttpQuery("https://www.okx.com/api/v5/public/time"))
+    Log(info)
+    // GET请求带参数的示例
+    var ticker = JSON.parse(HttpQuery("https://www.okx.com/api/v5/market/books?instId=BTC-USDT"))
+    Log(ticker)
+}
+```
+
+```python
+import json
+import urllib.request
+def main():
+    # HttpQuery不支持Python，可以使用urllib/urllib2库代替
+    info = json.loads(urllib.request.urlopen("https://www.okx.com/api/v5/public/time").read().decode('utf-8'))
+    Log(info)
+    ticker = json.loads(urllib.request.urlopen("https://www.okx.com/api/v5/market/books?instId=BTC-USDT").read().decode('utf-8'))
+    Log(ticker)
+```
+
+```rust
+fn main() {
+    // GET请求不带参数的示例，Rust 中由返回值的类型注解决定返回 Body 字符串（String）还是完整应答（HttpRet）
+    let body: String = HttpQuery("https://www.okx.com/api/v5/public/time", None);
+    let info = JSONParse(&body).unwrap();
+    Log!(info);
+    // GET请求带参数的示例
+    let body2: String = HttpQuery("https://www.okx.com/api/v5/market/books?instId=BTC-USDT", None);
+    let ticker = JSONParse(&body2).unwrap();
+    Log!(ticker);
+}
+```
+
+HttpQuery函数使用代理设置的示例。
+
+```javascript
+function main() {
+    // 本次调用设置代理并发送HTTP请求，不使用用户名和密码，此次HTTP请求将通过代理发送
+    HttpQuery("socks5://127.0.0.1:8889/http://www.baidu.com/")
+
+    // 本次调用设置代理并发送HTTP请求，使用用户名和密码，代理设置仅对当前HttpQuery调用生效，之后再次调用HttpQuery("http://www.baidu.com")时不会使用代理
+    HttpQuery("socks5://username:password@127.0.0.1:8889/http://www.baidu.com/")
+}
+```
+
+```python
+# HttpQuery不支持Python，可以使用Python的urllib2库
+```
+
+```rust
+fn main() {
+    // 本次调用设置代理并发送HTTP请求，不使用用户名和密码，此次HTTP请求将通过代理发送
+    let ret1: String = HttpQuery("socks5://127.0.0.1:8889/http://www.baidu.com/", None);
+
+    // 本次调用设置代理并发送HTTP请求，使用用户名和密码，代理设置仅对当前HttpQuery调用生效，之后再次调用HttpQuery("http://www.baidu.com")时不会使用代理
+    let ret2: String = HttpQuery("socks5://username:password@127.0.0.1:8889/http://www.baidu.com/", None);
+}
+```
+
+```HttpQuery()```函数支持```JavaScript```、```Rust```语言，```Python```语言可以使用```urllib```库直接发送HTTP请求。```HttpQuery()```主要用于访问交易所无需签名的接口，例如行情信息等公共接口。
+回测系统中可以使用```HttpQuery()```发送请求（仅支持```GET```请求）获取数据。回测时最多允许访问20个不同的```URL```，并且```HttpQuery()```会缓存访问数据：再次访问相同的```URL```时，```HttpQuery()```函数直接返回缓存数据，不再发起实际的网络请求。
+
+See also: `HttpQuery_Go`
+
+#### HttpQuery_Go
+
+```
+HttpQuery_Go(url)
+HttpQuery_Go(url, options)
+```
+
+发送Http请求，是```HttpQuery```函数的异步版本。
+
+Parameters:
+
+- `url` (string, required): Http请求的URL地址。
+- `options` (object, optional): Http请求的相关设置，例如可以采用以下结构：
+```json
+{
+    method: "POST",
+    body: "a=10&b=20&c=30",
+    charset: "UTF-8",
+    cookie: "session_id=12345; lang=en",
+    debug: false,
+    headers: {"TEST-HTTP-QUERY": "123"},
+    timeout: 1000
+}
+```
+
+- debug：设置为```true```时，此次```HttpQuery_Go```函数调用返回完整的应答报文；设置为```false```时，仅返回应答报文```Body```中的数据。
+- timeout：超时设置，单位为毫秒，例如设置为1000表示超时时间为1秒。
+
+此结构中的所有字段均为可选字段，例如可以不设置```headers```字段。
+```HttpQuery_Go```函数的```options```参数与```HttpQuery```函数的```options```参数一致，此处不再赘述。
+
+Returns (object): ```HttpQuery_Go()```函数会立即返回一个并发对象，可以调用该并发对象的```wait```方法获取Http请求的结果，在```JavaScript```语言的策略中可以使用```JSON.parse()```函数解析该结果。```wait```方法获取的结果与```HttpQuery```函数的返回值相同，请求失败时的返回值也相同（```debug```为false时返回空字符串，为true时返回```StatusCode```为0且包含```Error```字段的结构）。
+
+异步访问交易所公共接口，获取聚合行情数据。
+
+```javascript
+function main() {
+    // 创建第一个异步线程
+    var r1 = HttpQuery_Go("https://www.okx.com/api/v5/market/tickers?instType=SPOT")
+    // 创建第二个异步线程
+    var r2 = HttpQuery_Go("https://api.huobi.pro/market/tickers")
+
+    // 获取第一个异步线程调用的返回值
+    var tickers1 = r1.wait()
+    // 获取第二个异步线程调用的返回值
+    var tickers2 = r2.wait()
+
+    // 打印结果
+    Log("tickers1:", tickers1)
+    Log("tickers2:", tickers2)
+}
+```
+
+```python
+# 不支持
+```
+
+```HttpQuery_Go()```函数仅支持```JavaScript```语言，```Python```语言可以使用```urllib```库直接发送Http请求。```HttpQuery_Go()```函数主要用于访问交易所无需签名的接口，例如行情信息等公共接口。回测系统不支持```HttpQuery_Go```函数。
+
+See also: `HttpQuery`
 
 #### Dial
 
@@ -782,23 +10787,6 @@ fn main() {
                 break;
             }
             Log!(buf);
-        }
-        client.close();
-    }
-}
-```
-
-```cpp
-void main() {
-    auto client = Dial("tls://www.baidu.com:443");
-    if(client.Valid) {
-        client.write("GET / HTTP/1.1\nConnection: Closed\n\n");
-        while(true) {
-            auto buf = client.read();
-            if(buf == "") {
-                break;
-            }
-            Log(buf);
         }
         client.close();
     }
@@ -903,37 +10891,6 @@ fn main() {
 }
 ```
 
-```cpp
-void main() {
-    LogStatus("Connecting...");
-    auto client = Dial("wss://stream.binance.com:9443/ws/!ticker@arr");
-    if(!client.Valid) {
-        Log("Connection failed, exiting");
-        return;
-    }
-
-    while(true) {
-        auto buf = client.read();
-        if(buf == "") {
-            break;
-        }
-        json table = R"({
-            "type" : "table",
-            "title" : "行情图表",
-            "cols" : ["币种", "最高", "最低", "买一", "卖一", "最后成交价", "成交量", "更新时间"],
-            "rows" : []
-        })"_json;
-        json obj = json::parse(buf);
-        for(auto& ele : obj.items()) {
-            table["rows"].push_back({ele.value()["s"], ele.value()["h"], ele.value()["l"], ele.value()["b"], ele.value()["a"], ele.value()["c"],
-                ele.value()["q"], _D(ele.value()["E"])});
-        }
-        LogStatus("`" + table.dump() + "`");
-    }
-    client.close();
-}
-```
-
 访问币安（Binance）的 WebSocket 接口，并设置 wss 请求头。
 
 ```javascript
@@ -998,10 +10955,6 @@ fn main() {
         Log!(ret);
     }
 }
-```
-
-```cpp
-// 暂不支持
 ```
 
 访问 OKX 的 WebSocket 行情接口：
@@ -1101,43 +11054,6 @@ fn main() {
 }
 ```
 
-```cpp
-auto objWS = Dial("wss://ws.okx.com:8443/ws/v5/public|compress=gzip_raw&mode=recv&reconnect=true");
-
-void main() {
-    json param = R"({
-        "op": "subscribe",
-        "args": [{
-            "channel": "tickers",
-            "instId": "BTC-USDT"
-        }]
-    })"_json;
-
-    objWS.write(param.dump());
-    if(objWS.Valid) {
-        uint64_t pingCyc = 1000 * 20;
-        uint64_t lastPingTime = Unix() * 1000;
-        while(true) {
-            uint64_t nowTime = Unix() * 1000;
-            auto ret = objWS.read();
-            Log("ret:", ret);
-            if(nowTime - lastPingTime > pingCyc) {
-                auto retPing = objWS.write("ping");
-                lastPingTime = nowTime;
-                Log("Sending: ping", "#FF0000");
-            }
-            LogStatus("Current time:", _D());
-            Sleep(1000);
-        }
-    }
-}
-
-void onexit() {
-    objWS.close();
-    Log("Exiting");
-}
-```
-
 访问火币交易所的 WebSocket 行情接口：
 
 ```javascript
@@ -1226,44 +11142,6 @@ fn main() {
         }
     }
     // Rust 中连接对象在离开作用域时自动关闭，也可以显式调用 ws.close()
-}
-```
-
-```cpp
-using namespace std;
-
-void main() {
-    json param = R"({"sub" : "market.btcusdt.detail", "id" : "id1"})"_json;
-    auto ws = Dial("wss://api.huobi.pro/ws|compress=gzip&mode=recv&reconnect=true&payload=" + param.dump());
-    if(ws.Valid) {
-        while(true) {
-            auto ret = ws.read();
-            Log("ret:", ret);
-            // 响应心跳包操作
-            try
-            {
-                auto jsonRet = json::parse(ret);
-                if(jsonRet["ping"].is_number()) {
-                    json pong = R"({"pong" : 0})"_json;
-                    pong["pong"] = jsonRet["ping"];
-                    auto strPong = pong.dump();
-                    ws.write(strPong);
-                    Log("Responding to ping, sending pong:", strPong, "#FF0000");
-                }
-            } catch(exception &e)
-            {
-                Log("e:", e.what());
-            }
-
-            LogStatus("Current time:", _D());
-            Sleep(1000);
-        }
-    }
-}
-
-void onexit() {
-    // ws.close();
-    Log("Executing ws.close()");
 }
 ```
 
@@ -1456,80 +11334,6 @@ fn main() {
 }
 ```
 
-```cpp
-auto client_private = Dial("wss://ws.okx.com:8443/ws/v5/private");
-
-json getLogin(string pAccessKey, string pSecretKey, string
-pPassphrase) {
-    auto ts = std::to_string(Unix());
-    json login = R"({
-        "op": "login",
-        "args": [{
-            "apiKey": "",
-            "passphrase": "",
-            "timestamp": "",
-            "sign": ""
-        }]
-    })"_json;
-    login["args"][0]["apiKey"] = pAccessKey;
-    login["args"][0]["passphrase"] = pPassphrase;
-    login["args"][0]["timestamp"] = ts;
-    login["args"][0]["sign"] = exchange.Encode("sha256", "string", "base64", ts + "GET" + "/users/self/verify", "string", pSecretKey);
-    return login;
-}
-
-void main() {
-    SetErrorFilter("timeout");
-    json posSubscribe = R"({
-        "op": "subscribe",
-        "args": [{
-            "channel": "positions",
-            "instType": "ANY"
-        }]
-    })"_json;
-
-    auto accessKey = "xxx";
-    auto secretKey = "xxx";
-    auto passphrase = "xxx";
-
-    client_private.write(getLogin(accessKey, secretKey, passphrase).dump());
-    Sleep(3000);
-    client_private.write(posSubscribe.dump());
-
-    if (client_private.Valid) {
-        uint64_t lastPingTS = Unix() * 1000;
-
-        while (true) {
-            auto buf = client_private.read(-1);
-            if (buf != "") {
-                Log(buf);
-            }
-            if (buf == "") {
-                if (client_private.write(posSubscribe.dump()) == 0) {
-                    Log("Detected disconnection, closing connection, reconnecting");
-                    client_private.close();
-                    client_private = Dial("wss://ws.okx.com:8443/ws/v5/private");
-                    client_private.write(getLogin(accessKey, secretKey, passphrase).dump());
-                    Sleep(3000);
-                    client_private.write(posSubscribe.dump());
-                }
-            }
-
-            uint64_t nowPingTS = Unix() * 1000;
-            if (nowPingTS - lastPingTS > 10 * 1000) {
-                client_private.write("ping");
-                lastPingTS = nowPingTS;
-            }
-        }
-    }
-}
-
-void onexit() {
-    client_private.close();
-    Log("Exiting");
-}
-```
-
 访问 CoinEx 的 WebSocket 验证接口：
 
 ```javascript
@@ -1613,10 +11417,6 @@ fn main() {
 }
 ```
 
-```cpp
-// 略
-```
-
 以下示例演示如何访问 MEXC 交易所的```Websocket```接口，订阅```public.aggre.deals.v3.api.pb```频道，并使用```protobuf.js```解码二进制数据：
 
 ```javascript
@@ -1698,10 +11498,6 @@ function main() {
 # 可以使用 Python 中相应的库实现编码与解码。
 ```
 
-```cpp
-// 略
-```
-
 Dial函数连接数据库时返回的连接对象具有2个独有的方法函数：
 
 - ```exec(sqlString)```：用于执行SQL语句，用法与```DBExec()```函数类似。
@@ -1751,10 +11547,6 @@ fn main() {
 }
 ```
 
-```cpp
-// 不支持
-```
-
 ```address```参数的详细说明：在标准地址```wss://ws.okx.com:8443/ws/v5/public```之后，使用```|```符号进行分隔。如果参数字符串中包含```|```字符，则使用```||```作为分隔符。分隔符之后的部分为功能参数设置，各参数之间使用```&```字符连接。
 
 例如，同时设置```ss5```代理和压缩参数时，可以写作：
@@ -1770,6 +11562,8 @@ fn main() {
 | WebSocket协议设置底层自动重连相关的参数：interval=参数值 | interval为重试的时间间隔，单位为毫秒。例如interval=10000表示重试间隔为10秒；未设置时默认为1秒，即interval=1000。 |
 | WebSocket协议设置底层自动重连相关的参数：payload=参数值 | payload为WebSocket重连时需要发送的订阅消息，例如：payload=okok。 |
 | socks5代理的相关参数：proxy=参数值 | proxy用于设置ss5代理，参数值格式为：socks5://name:pwd@192.168.0.1:1080。其中name为ss5服务端的用户名，pwd为ss5服务端的登录密码，1080为ss5服务的端口。 |
+| WebSocket接收缓冲区上限：qsize=参数值 | qsize为接收缓冲区最多保存的消息条数，不设置时默认4096。 |
+| WebSocket接收缓冲区上限：qbytes=参数值 | qbytes为接收缓冲区最多保存的字节数，不设置时默认16777216（16MB）。 |
 
 ```Dial()```函数仅支持实盘。
 
@@ -1884,179 +11678,81 @@ function onexit() {
 
 详细介绍请参考文档：[探索FMZ：交易策略实盘间通信协议实践](https://www.fmz.com/bbs-topic/10479)
 
-#### HttpQuery
+#### Mail
 
 ```
-HttpQuery(url)
-HttpQuery(url, options)
+Mail(smtpServer, smtpUsername, smtpPassword, mailTo, title, body)
 ```
 
-发送HTTP请求。
+发送邮件。
 
 Parameters:
 
-- `url` (string, required): HTTP请求的URL地址。
-- `options` (object, optional): HTTP请求的相关设置，例如可以采用以下结构：
-```json
-{
-    method: "POST",
-    body: "a=10&b=20&c=30",
-    charset: "UTF-8",
-    cookie: "session_id=12345; lang=en",
-    debug: false,
-    headers: {"TEST-HTTP-QUERY": "123"},
-    timeout: 1000
-}
-```
+- `smtpServer` (string, required): 用于指定邮件发送方的```SMTP```服务器地址。
+- `smtpUsername` (string, required): 用于指定邮件发送方的邮箱地址。
+- `smtpPassword` (string, required): 用于指定邮件发送方邮箱的```SMTP```服务密码。
+- `mailTo` (string, required): 用于指定邮件接收方的邮箱地址。
+- `title` (string, required): 邮件标题。
+- `body` (string, required): 邮件正文。
 
-- method: 用于设置请求方法。
-- body: 用于设置请求体内容，通常用于 POST、PUT 等请求。
-- cookie: 用于设置请求中的 Cookie，一般用于携带身份验证信息或会话标识。
-- headers: 用于设置请求头信息，可用于指定内容类型、身份验证信息等。
-- debug: 设置为```true```时，此次```HttpQuery```函数调用返回完整的应答报文；设置为```false```时，仅返回应答报文```Body```中的数据。
-- timeout: 用于设置超时时间，单位为毫秒，例如设置为1000表示超时时间为1秒。
-- charset: 用于对请求的应答数据进行转码，例如：GB18030。支持常用编码。
-
-此结构中的所有字段均为可选字段，例如可以不设置```headers```字段。
-
-Returns (string / object): 返回请求的应答数据。如果返回值为```JSON```字符串，在```JavaScript```语言的策略中可以使用```JSON.parse()```函数解析，在```C++```语言的策略中可以使用```json::parse()```函数解析。参数```options```结构中的```debug```设置为true时，返回值为对象（JSON）；```debug```设置为false时，返回值为字符串。
-
-请求失败（未收到应答，例如连接被拒绝、DNS解析失败、超时、代理失败）时不会返回```null```，并且会在日志中记录包含请求方法和URL的错误信息：```debug```设置为false时返回空字符串；```debug```设置为true时返回```StatusCode```为0且带有```Error```字段（失败原因）的结构，结构说明参见```HttpQuery-return```。HTTP状态码为4xx、5xx的应答不属于请求失败。
-
-访问OKX公共行情API接口的示例。
+Returns (bool): 邮件发送成功时返回真值，例如```true```；发送失败时返回假值，例如```false```。
 
 ```javascript
 function main(){
-    // GET请求不带参数的示例
-    var info = JSON.parse(HttpQuery("https://www.okx.com/api/v5/public/time"))
-    Log(info)
-    // GET请求带参数的示例
-    var ticker = JSON.parse(HttpQuery("https://www.okx.com/api/v5/market/books?instId=BTC-USDT"))
-    Log(ticker)
+    Mail("smtp.163.com", "asdf@163.com", "password", "111@163.com", "title", "body")
 }
 ```
 
 ```python
-import json
-import urllib.request
 def main():
-    # HttpQuery不支持Python，可以使用urllib/urllib2库代替
-    info = json.loads(urllib.request.urlopen("https://www.okx.com/api/v5/public/time").read().decode('utf-8'))
-    Log(info)
-    ticker = json.loads(urllib.request.urlopen("https://www.okx.com/api/v5/market/books?instId=BTC-USDT").read().decode('utf-8'))
-    Log(ticker)
+    Mail("smtp.163.com", "asdf@163.com", "password", "111@163.com", "title", "body")
 ```
 
 ```rust
 fn main() {
-    // GET请求不带参数的示例，Rust 中由返回值的类型注解决定返回 Body 字符串（String）还是完整应答（HttpRet）
-    let body: String = HttpQuery("https://www.okx.com/api/v5/public/time", None);
-    let info = JSONParse(&body).unwrap();
-    Log!(info);
-    // GET请求带参数的示例
-    let body2: String = HttpQuery("https://www.okx.com/api/v5/market/books?instId=BTC-USDT", None);
-    let ticker = JSONParse(&body2).unwrap();
-    Log!(ticker);
+    Mail("smtp.163.com", "asdf@163.com", "password", "111@163.com", "title", "body");
 }
 ```
 
-```cpp
-void main() {
-    auto info = json::parse(HttpQuery("https://www.okx.com/api/v5/public/time"));
-    Log(info);
-    auto ticker = json::parse(HttpQuery("https://www.okx.com/api/v5/market/books?instId=BTC-USDT"));
-    Log(ticker);
-}
-```
+```smtpPassword```参数设置的是```SMTP```服务的密码，而非邮箱登录密码。
 
-HttpQuery函数使用代理设置的示例。
+设置```smtpServer```参数时，如需更改端口，可直接在```smtpServer```参数中附加端口号。例如：QQ 邮箱的```smtp.qq.com:587```端口经测试可用。
 
-```javascript
-function main() {
-    // 本次调用设置代理并发送HTTP请求，不使用用户名和密码，此次HTTP请求将通过代理发送
-    HttpQuery("socks5://127.0.0.1:8889/http://www.baidu.com/")
+如果出现报错```unencryped connection```，则需要修改```Mail```函数的```smtpServer```参数，其格式为```ssl://xxx.com:xxx```。例如，QQ 邮箱```SMTP```的```ssl```方式为```ssl://smtp.qq.com:465```，或使用```smtp://xxx.com:xxx```。
 
-    // 本次调用设置代理并发送HTTP请求，使用用户名和密码，代理设置仅对当前HttpQuery调用生效，之后再次调用HttpQuery("http://www.baidu.com")时不会使用代理
-    HttpQuery("socks5://username:password@127.0.0.1:8889/http://www.baidu.com/")
-}
-```
+该函数在回测系统中不起作用。
 
-```python
-# HttpQuery不支持Python，可以使用Python的urllib2库
-```
+See also: `Mail_Go`
 
-```rust
-fn main() {
-    // 本次调用设置代理并发送HTTP请求，不使用用户名和密码，此次HTTP请求将通过代理发送
-    let ret1: String = HttpQuery("socks5://127.0.0.1:8889/http://www.baidu.com/", None);
-
-    // 本次调用设置代理并发送HTTP请求，使用用户名和密码，代理设置仅对当前HttpQuery调用生效，之后再次调用HttpQuery("http://www.baidu.com")时不会使用代理
-    let ret2: String = HttpQuery("socks5://username:password@127.0.0.1:8889/http://www.baidu.com/", None);
-}
-```
-
-```cpp
-void main() {
-    HttpQuery("socks5://127.0.0.1:8889/http://www.baidu.com/");
-    HttpQuery("socks5://username:password@127.0.0.1:8889/http://www.baidu.com/");
-}
-```
-
-```HttpQuery()```函数仅支持```JavaScript```、```C++```语言，```Python```语言可以使用```urllib```库直接发送HTTP请求。```HttpQuery()```主要用于访问交易所无需签名的接口，例如行情信息等公共接口。
-回测系统中可以使用```HttpQuery()```发送请求（仅支持```GET```请求）获取数据。回测时最多允许访问20个不同的```URL```，并且```HttpQuery()```会缓存访问数据：再次访问相同的```URL```时，```HttpQuery()```函数直接返回缓存数据，不再发起实际的网络请求。
-
-See also: `HttpQuery_Go`
-
-#### HttpQuery_Go
+#### Mail_Go
 
 ```
-HttpQuery_Go(url)
-HttpQuery_Go(url, options)
+Mail_Go(smtpServer, smtpUsername, smtpPassword, mailTo, title, body)
 ```
 
-发送Http请求，是```HttpQuery```函数的异步版本。
+```Mail```函数的异步版本。
 
 Parameters:
 
-- `url` (string, required): Http请求的URL地址。
-- `options` (object, optional): Http请求的相关设置，例如可以采用以下结构：
-```json
-{
-    method: "POST",
-    body: "a=10&b=20&c=30",
-    charset: "UTF-8",
-    cookie: "session_id=12345; lang=en",
-    debug: false,
-    headers: {"TEST-HTTP-QUERY": "123"},
-    timeout: 1000
-}
-```
+- `smtpServer` (string, required): 用于指定邮件发送方的```SMTP```服务器地址。
+- `smtpUsername` (string, required): 用于指定邮件发送方的邮箱地址。
+- `smtpPassword` (string, required): 邮件发送方邮箱的```SMTP```授权密码。
+- `mailTo` (string, required): 用于指定邮件接收方的邮箱地址。
+- `title` (string, required): 邮件标题。
+- `body` (string, required): 邮件正文内容。
 
-- debug：设置为```true```时，此次```HttpQuery_Go```函数调用返回完整的应答报文；设置为```false```时，仅返回应答报文```Body```中的数据。
-- timeout：超时设置，单位为毫秒，例如设置为1000表示超时时间为1秒。
-
-此结构中的所有字段均为可选字段，例如可以不设置```headers```字段。
-```HttpQuery_Go```函数的```options```参数与```HttpQuery```函数的```options```参数一致，此处不再赘述。
-
-Returns (object): ```HttpQuery_Go()```函数会立即返回一个并发对象，可以调用该并发对象的```wait```方法获取Http请求的结果，在```JavaScript```语言的策略中可以使用```JSON.parse()```函数解析该结果。```wait```方法获取的结果与```HttpQuery```函数的返回值相同，请求失败时的返回值也相同（```debug```为false时返回空字符串，为true时返回```StatusCode```为0且包含```Error```字段的结构）。
-
-异步访问交易所公共接口，获取聚合行情数据。
+Returns (object): ```Mail_Go```函数立即返回一个并发对象，可以使用该并发对象的```wait```方法获取邮件发送结果。邮件发送成功返回真值（例如：```true```），发送失败返回假值（例如：```false```）。
 
 ```javascript
 function main() {
-    // 创建第一个异步线程
-    var r1 = HttpQuery_Go("https://www.okx.com/api/v5/market/tickers?instType=SPOT")
-    // 创建第二个异步线程
-    var r2 = HttpQuery_Go("https://api.huobi.pro/market/tickers")
+    var r1 = Mail_Go("smtp.163.com", "asdf@163.com", "password", "111@163.com", "title", "body")
+    var r2 = Mail_Go("smtp.163.com", "asdf@163.com", "password", "111@163.com", "title", "body")
 
-    // 获取第一个异步线程调用的返回值
-    var tickers1 = r1.wait()
-    // 获取第二个异步线程调用的返回值
-    var tickers2 = r2.wait()
+    var ret1 = r1.wait()
+    var ret2 = r2.wait()
 
-    // 打印结果
-    Log("tickers1:", tickers1)
-    Log("tickers2:", tickers2)
+    Log("ret1:", ret1)
+    Log("ret2:", ret2)
 }
 ```
 
@@ -2064,327 +11760,89 @@ function main() {
 # 不支持
 ```
 
-```cpp
-// 不支持
+在回测系统中不起作用。
+
+See also: `Mail`
+
+### Storage
+
+数据持久化与实盘间通信：`_G`键值存储、`DBExec`内置数据库、`SetChannelData`与`GetChannelData`在实盘之间广播数据。
+
+#### _G
+
+```
+_G()
+_G(k)
+_G(k, v)
 ```
 
-```HttpQuery_Go()```函数仅支持```JavaScript```语言，```Python```语言可以使用```urllib```库直接发送Http请求。```HttpQuery_Go()```函数主要用于访问交易所无需签名的接口，例如行情信息等公共接口。回测系统不支持```HttpQuery_Go```函数。
-
-See also: `HttpQuery`
-
-#### Encode
-
-```
-Encode(algo, inputFormat, outputFormat, data)
-Encode(algo, inputFormat, outputFormat, data, keyFormat, key)
-```
-
-该函数根据传入的参数对数据进行编码。
+持久化保存数据。该函数实现了一个可持久化保存的全局字典功能，数据以键值对（KV）表的结构永久保存在托管者的本地数据库文件中。
 
 Parameters:
 
-- `algo` (string, required): 参数```algo```用于指定编码计算时使用的算法，支持设置为以下值之一："raw"（不使用算法）、"sign"、"signTx"、"md4"、"md5"、"sha256"、"sha512"、"sha1"、"keccak256"、"sha3.224"、"sha3.256"、"sha3.384"、"sha3.512"、"sha3.keccak256"、"sha3.keccak512"、"sha512.384"、"sha512.256"、"sha512.224"、"ripemd160"、"blake2b.256"、"blake2b.512"、"blake2s.128"、"blake2s.256"。
+- `k` (string / 空值, optional): 参数```k```为所保存键值对中的键名，不区分大小写。
+- `v` (string / number / bool / object / array / 空值, optional): 参数```v```为所保存键值对中的键值，可以是任何能够进行```JSON```序列化的数据。
 
-参数```algo```还支持"text.encoder.utf8"、"text.decoder.utf8"、"text.encoder.gbk"、"text.decoder.gbk"，用于对字符串进行编码或解码。
-
-参数```algo```同时支持"ed25519"算法，并可搭配不同的哈希算法使用，例如参数```algo```可写为"ed25519.md5"、"ed25519.sha512"等，也支持```ed25519.seed```计算。
-- `inputFormat` (string, required): 用于指定```data```参数的数据格式。```inputFormat```参数支持设置为"raw"、"hex"、"base64"、"string"其中之一。"raw"表示原始数据，"hex"表示```hex```编码数据，"base64"表示```base64```编码数据，"string"表示字符串数据。
-- `outputFormat` (string, required): 用于指定输出的数据格式。```outputFormat```参数支持设置为"raw"、"hex"、"base64"、"string"其中之一。"raw"表示原始数据，"hex"表示```hex```编码数据，"base64"表示```base64```编码数据，"string"表示字符串数据。
-- `data` (string, required): 参数```data```为所要处理的数据。
-- `keyFormat` (string, optional): 用于指定```key```参数的数据格式。```keyFormat```参数支持设置为"raw"、"hex"、"base64"、"string"其中之一。"raw"表示原始数据，"hex"表示```hex```编码数据，"base64"表示```base64```编码数据，"string"表示字符串数据。
-- `key` (string, optional): 参数```key```为```HMAC```加密时使用的密钥。
-
-当参数```algo```设置为"sign"或"signTx"时，需要传入参数```key```。
-
-当参数```algo```设置为"raw"时，不会使用```key```参数进行```HMAC```加密（因为HMAC加密必须指定算法）。
-
-Returns (string): ```Encode```函数返回编码、加密之后的数据。
-
-Encode 函数调用示例。
-
-```javascript
-function main() {
-    Log(Encode("raw", "raw", "hex", "example", "raw", "123"))            // 6578616d706c65
-    Log(Encode("raw", "raw", "hex", "example"))                          // 6578616d706c65
-    Log(Encode("sha256", "raw", "hex", "example", "raw", "123"))         // 698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
-    Log(Encode("sha256", "raw", "hex", "example", "", "123"))            // 50d858e0985ecc7f60418aaf0cc5ab587f42c2570a884095a9e8ccacd0f6545c
-    Log(Encode("sha256", "raw", "hex", "example", null, "123"))          // 50d858e0985ecc7f60418aaf0cc5ab587f42c2570a884095a9e8ccacd0f6545c
-    Log(Encode("sha256", "raw", "hex", "example", "string", "123"))      // 698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
-
-    Log(Encode("raw", "raw", "hex", "123"))           // 313233
-    Log(Encode("raw", "raw", "base64", "123"))        // MTIz
-
-    Log(Encode("sha256", "raw", "hex", "example", "hex", "313233"))      // 698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
-    Log(Encode("sha256", "raw", "hex", "example", "base64", "MTIz"))     // 698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
-}
-```
-
-```python
-def main():
-    Log(Encode("raw", "raw", "hex", "example", "raw", "123"))            # 6578616d706c65
-    Log(Encode("raw", "raw", "hex", "example", "", ""))                  # 6578616d706c65
-    Log(Encode("sha256", "raw", "hex", "example", "raw", "123"))         # 698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
-    Log(Encode("sha256", "raw", "hex", "example", "", "123"))            # 50d858e0985ecc7f60418aaf0cc5ab587f42c2570a884095a9e8ccacd0f6545c
-
-    Log(Encode("sha256", "raw", "hex", "example", "string", "123"))      # 698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
-
-    Log(Encode("raw", "raw", "hex", "123", "", ""))           # 313233
-    Log(Encode("raw", "raw", "base64", "123", "", ""))        # MTIz
-
-    Log(Encode("sha256", "raw", "hex", "example", "hex", "313233"))      # 698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
-    Log(Encode("sha256", "raw", "hex", "example", "base64", "MTIz"))     # 698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
-```
-
-```rust
-fn main() {
-    // Rust 的 Encode() 函数 6 个参数均为必填；不加密时，keyFormat 和 key 传入空字符串即可
-    Log!(Encode("raw", "raw", "hex", "example", "raw", "123"));            // 6578616d706c65
-    Log!(Encode("raw", "raw", "hex", "example", "", ""));                  // 6578616d706c65
-    Log!(Encode("sha256", "raw", "hex", "example", "raw", "123"));         // 698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
-    Log!(Encode("sha256", "raw", "hex", "example", "", "123"));            // 50d858e0985ecc7f60418aaf0cc5ab587f42c2570a884095a9e8ccacd0f6545c
-
-    Log!(Encode("sha256", "raw", "hex", "example", "string", "123"));      // 698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
-
-    Log!(Encode("raw", "raw", "hex", "123", "", ""));           // 313233
-    Log!(Encode("raw", "raw", "base64", "123", "", ""));        // MTIz
-
-    Log!(Encode("sha256", "raw", "hex", "example", "hex", "313233"));      // 698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
-    Log!(Encode("sha256", "raw", "hex", "example", "base64", "MTIz"));     // 698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
-}
-```
-
-```cpp
-void main() {
-    Log(Encode("raw", "raw", "hex", "example", "raw", "123"));            // 6578616d706c65
-    Log(Encode("raw", "raw", "hex", "example"));                          // 6578616d706c65
-    Log(Encode("sha256", "raw", "hex", "example", "raw", "123"));         // 698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
-    Log(Encode("sha256", "raw", "hex", "example", "", "123"));            // 50d858e0985ecc7f60418aaf0cc5ab587f42c2570a884095a9e8ccacd0f6545c
-
-    Log(Encode("sha256", "raw", "hex", "example", "string", "123"));      // 698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
-
-    Log(Encode("raw", "raw", "hex", "123"));           // 313233
-    Log(Encode("raw", "raw", "base64", "123"));        // MTIz
-
-    Log(Encode("sha256", "raw", "hex", "example", "hex", "313233"));      // 698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
-    Log(Encode("sha256", "raw", "hex", "example", "base64", "MTIz"));     // 698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
-}
-```
-
-参数```algo```还支持以下取值："text.encoder.utf8"、"text.decoder.utf8"、"text.encoder.gbk"、"text.decoder.gbk"，用于对字符串进行编码和解码。
+Returns (string / number / bool / object / array / 空值): 持久化保存的```k-v```键值对中的键值数据。
 
 ```javascript
 function main(){
-    var ret1 = Encode("text.encoder.utf8", "raw", "hex", "你好")     // e4bda0e5a5bd
-    Log(ret1)
-    var ret2 = Encode("text.decoder.utf8", "hex", "string", ret1)
-    Log(ret2)
-
-    var ret3 = Encode("text.encoder.gbk", "raw", "hex", "你好")      // c4e3bac3
-    Log(ret3)
-    var ret4 = Encode("text.decoder.gbk", "hex", "string", ret3)
-    Log(ret4)
+    // 设置一个全局变量num，值为1
+    _G("num", 1)
+    // 更改一个全局变量num，值为字符串ok
+    _G("num", "ok")
+    // 删除全局变量num
+    _G("num", null)
+    // 返回全局变量num的值
+    Log(_G("num"))
+    // 删除所有全局变量
+    _G(null)
+    // 返回实盘ID
+    var robotId = _G()
 }
 ```
 
 ```python
 def main():
-    ret1 = Encode("text.encoder.utf8", "raw", "hex", "你好", "", "")     # e4bda0e5a5bd
-    Log(ret1)
-    ret2 = Encode("text.decoder.utf8", "hex", "string", ret1, "", "")
-    Log(ret2)
-
-    ret3 = Encode("text.encoder.gbk", "raw", "hex", "你好", "", "")      # c4e3bac3
-    Log(ret3)
-    ret4 = Encode("text.decoder.gbk", "hex", "string", ret3, "", "")
-    Log(ret4)
+    _G("num", 1)
+    _G("num", "ok")
+    _G("num", None)
+    Log(_G("num"))
+    _G(None)
+    robotId = _G()
 ```
 
 ```rust
 fn main() {
-    // Rust 的 Encode() 函数6个参数均为必填，不加密时 keyFormat、key 传入空字符串
-    let ret1 = Encode("text.encoder.utf8", "raw", "hex", "你好", "", "");     // e4bda0e5a5bd
-    Log!(ret1);
-    let ret2 = Encode("text.decoder.utf8", "hex", "string", &ret1, "", "");
-    Log!(ret2);
-
-    let ret3 = Encode("text.encoder.gbk", "raw", "hex", "你好", "", "");      // c4e3bac3
-    Log!(ret3);
-    let ret4 = Encode("text.decoder.gbk", "hex", "string", &ret3, "", "");
-    Log!(ret4);
+    // 设置一个全局变量num，值为1
+    _G!("num", 1);
+    // 更改一个全局变量num，值为字符串ok
+    _G!("num", "ok");
+    // 删除全局变量num
+    _G!("num", null);
+    // 返回全局变量num的值
+    Log!(_G!("num"));
+    // Rust 不支持 _G!(null) 删除所有全局变量的形式
+    // 返回实盘ID
+    let robotId = _G!();
 }
 ```
 
-```cpp
-void main(){
-    auto ret1 = Encode("text.encoder.utf8", "raw", "hex", "你好");     // e4bda0e5a5bd
-    Log(ret1);
-    auto ret2 = Encode("text.decoder.utf8", "hex", "string", ret1);
-    Log(ret2);
+每个实盘单独对应一个数据库。策略重启或托管者停止运行后，```_G()```函数保存的数据依然会持续存在。但回测结束后，```_G()```函数在回测系统中保存的数据将被清除。使用```_G()```函数持久化保存数据时，应根据硬件设备的内存与硬盘空间合理使用，切勿滥用。
 
-    auto ret3 = Encode("text.encoder.gbk", "raw", "hex", "你好");      // c4e3bac3
-    Log(ret3);
-    auto ret4 = Encode("text.decoder.gbk", "hex", "string", ret3);
-    Log(ret4);
-}
-```
+在实盘运行中，当调用```_G()```函数且不传入任何参数时，```_G()```函数返回当前实盘的```Id```。
 
-```Encode()```函数仅支持实盘。若不传入```key```、```keyFormat```参数，则不进行```key```加密。
+调用```_G()```函数时，参数```v```传入空值表示删除对应的```k-v```键值对。
 
-#### UnixNano
+调用```_G()```函数时，若仅参数```k```传入字符串，则```_G()```函数返回参数```k```对应的已保存键值。
 
-```
-UnixNano()
-```
+调用```_G()```函数时，若仅参数```k```传入空值，则表示删除所有已记录的```k-v```键值对。
 
-获取当前时刻的纳秒级时间戳。
+当```k-v```键值对已持久化保存后，再次调用```_G()```函数，并传入已持久化保存的键名作为参数```k```、新的键值作为参数```v```，即可更新该```k-v```键值对。
 
-Returns (number): ```UnixNano()```函数返回纳秒级时间戳。
+以实盘Id为```123456```为例，使用```_G()```函数持久化保存的K-V键值数据存储在该实盘（即策略实例程序）所属托管者目录下的```/logs/storage/123456/123456.db3```数据库文件中，数据记录在```kvdb```表内。
 
-如果需要获取毫秒级时间戳，可以使用以下代码：
-
-```javascript
-function main() {
-    var time = UnixNano() / 1000000
-    Log(_N(time, 0))
-}
-```
-
-```python
-def main():
-    time = UnixNano()
-    Log(time)
-```
-
-```rust
-fn main() {
-    let time = UnixNano() / 1000000;
-    Log!(_N(time, 0));
-}
-```
-
-```cpp
-void main() {
-    auto time = UnixNano();
-    Log(time);
-}
-```
-
-See also: `Unix`
-
-#### Unix
-
-```
-Unix()
-```
-
-获取当前时刻的秒级时间戳。
-
-Returns (number): 返回秒级时间戳。
-
-```javascript
-function main() {
-    var t = Unix()
-    Log(t)
-}
-```
-
-```python
-def main():
-    t = Unix()
-    Log(t)
-```
-
-```rust
-fn main() {
-    let t = Unix();
-    Log!(t);
-}
-```
-
-```cpp
-void main() {
-    auto t = Unix();
-    Log(t);
-}
-```
-
-See also: `UnixNano`
-
-#### GetOS
-
-```
-GetOS()
-```
-
-获取托管者所在设备的操作系统信息。
-
-Returns (string): 操作系统信息。
-
-```javascript
-function main() {
-    Log("GetOS:", GetOS())
-}
-```
-
-```python
-def main():
-    Log("GetOS:", GetOS())
-```
-
-```rust
-fn main() {
-    Log!("GetOS:", GetOS());
-}
-```
-
-```cpp
-void main() {
-    Log("GetOS:", GetOS());
-}
-```
-
-例如，在**Mac OS**操作系统下运行的托管者，调用```GetOS()```函数可能返回：```darwin/amd64```。由于苹果电脑采用多种硬件架构，返回值中会附带具体的架构信息。其中，```darwin```即**Mac OS**系统的内核名称。
-
-#### MD5
-
-```
-MD5(data)
-```
-
-计算参数```data```的 MD5 哈希值。
-
-Parameters:
-
-- `data` (string, required): 需要进行 MD5 计算的数据。
-
-Returns (string): MD5 哈希值。
-
-```javascript
-function main() {
-    Log("MD5", MD5("hello world"))
-}
-```
-
-```python
-def main():
-    Log("MD5", MD5("hello world"))
-```
-
-```rust
-fn main() {
-    Log!("MD5", MD5("hello world"));
-}
-```
-
-```cpp
-void main() {
-    Log("MD5", MD5("hello world"));
-}
-```
-
-调用```MD5("hello world")```函数后，返回值为：```5eb63bbbe01eeed093cb22bb8f5acdc3```。
-
-See also: `Encode`
+See also: `DBExec`
 
 #### DBExec
 
@@ -2477,26 +11935,6 @@ fn main() {
 }
 ```
 
-```cpp
-void main() {
-    string strSql = ":CREATE TABLE TEST_TABLE(\
-        TS INT PRIMARY KEY NOT NULL,\
-        HIGH REAL NOT NULL,\
-        OPEN REAL NOT NULL,\
-        LOW REAL NOT NULL,\
-        CLOSE REAL NOT NULL,\
-        VOLUME REAL NOT NULL)";
-    auto ret = DBExec(strSql);
-    Log(ret);
-
-    // 增加一条数据
-    Log(DBExec(":INSERT INTO TEST_TABLE (TS, HIGH, OPEN, LOW, CLOSE, VOLUME) VALUES (1518970320000, 100, 99.1, 90, 100, 12345.6);"));
-
-    // 查询数据
-    Log(DBExec(":SELECT * FROM TEST_TABLE;"));
-}
-```
-
 使用 ```DBExec()``` 函数创建数据表。
 
 ```javascript
@@ -2547,20 +11985,6 @@ fn main() {
     let strSql = arr.join("");
     let ret = DBExec(&strSql);
     Log!(format!("{:?}", ret));
-}
-```
-
-```cpp
-void main() {
-    string strSql = "CREATE TABLE TEST_TABLE(\
-        TS INT PRIMARY KEY NOT NULL,\
-        HIGH REAL NOT NULL,\
-        OPEN REAL NOT NULL,\
-        LOW REAL NOT NULL,\
-        CLOSE REAL NOT NULL,\
-        VOLUME REAL NOT NULL)";
-    auto ret = DBExec(strSql);
-    Log(ret);
 }
 ```
 
@@ -2650,31 +12074,6 @@ fn main() {
 }
 ```
 
-```cpp
-void main() {
-    string strSql = "CREATE TABLE TEST_TABLE(\
-        TS INT PRIMARY KEY NOT NULL,\
-        HIGH REAL NOT NULL,\
-        OPEN REAL NOT NULL,\
-        LOW REAL NOT NULL,\
-        CLOSE REAL NOT NULL,\
-        VOLUME REAL NOT NULL)";
-    Log(DBExec(strSql));
-
-    // 增加一条数据
-    Log(DBExec("INSERT INTO TEST_TABLE (TS, HIGH, OPEN, LOW, CLOSE, VOLUME) VALUES (1518970320000, 100, 99.1, 90, 100, 12345.6);"));
-
-    // 查询数据
-    Log(DBExec("SELECT * FROM TEST_TABLE;"));
-
-    // 修改数据
-    Log(DBExec("UPDATE TEST_TABLE SET HIGH=? WHERE TS=?", 110, 1518970320000));
-
-    // 删除数据
-    Log(DBExec("DELETE FROM TEST_TABLE WHERE HIGH=?", 110));
-}
-```
-
 - 通过向函数```DBExec()```传入参数，可对实盘数据库（SQLite 数据库）进行操作。
 
   - 可实现对实盘数据库中数据的增、删、查、改等操作，并支持**SQLite**语法。
@@ -2686,961 +12085,6 @@ void main() {
   - ```DBExec()```函数仅支持实盘。
 
 See also: `_G`
-
-#### UUID
-
-```
-UUID()
-```
-
-创建一个 UUID。
-
-Returns (string): 32 位的 UUID。
-
-```javascript
-function main() {
-    var uuid1 = UUID()
-    var uuid2 = UUID()
-    Log(uuid1, uuid2)
-}
-```
-
-```python
-def main():
-    uuid1 = UUID()
-    uuid2 = UUID()
-    Log(uuid1, uuid2)
-```
-
-```rust
-fn main() {
-    let uuid1 = UUID();
-    let uuid2 = UUID();
-    Log!(uuid1, uuid2);
-}
-```
-
-```cpp
-void main() {
-    auto uuid1 = UUID();
-    auto uuid2 = UUID();
-    Log(uuid1, uuid2);
-}
-```
-
-```UUID()``` 函数仅支持实盘。
-
-#### EventLoop
-
-```
-EventLoop()
-EventLoop(timeout)
-```
-
-监听事件，当任意```WebSocket```有可读数据，或```exchange.Go()```、```HttpQuery_Go()```等并发任务完成后返回。
-
-Parameters:
-
-- `timeout` (number, optional): 参数```timeout```用于设置超时时间，单位为毫秒。
-当```timeout```设置为0时，函数会一直等待，直到有事件发生才返回；当```timeout```大于0时，表示设置事件等待的超时时间；当```timeout```小于0时，则立即返回最近的事件。
-
-Returns (object): 如果返回的对象不为空值，则返回内容中的```Event```字段表示事件的触发类型。例如以下返回值结构：
-
-```json
-
-{"Seq":1,"Event":"Exchange_GetTrades","ThreadId":0,"Index":3,"Nano":1682068771309583400}
-
-```
-
-```javascript
-function main() {
-    var routine_getTicker = exchange.Go("GetTicker")
-    var routine_getDepth = exchange.Go("GetDepth")
-    var routine_getTrades = exchange.Go("GetTrades")
-
-    // Sleep(2000)，如果这里使用Sleep语句，会导致之后的EventLoop函数错过之前的事件。因为等待了2秒，并发的函数已经收到了数据，之后才开始EventLoop监听机制，就会错过这些事件
-    // 除非在第一行代码就开始调用EventLoop(-1)，先初始化EventLoop的监听机制，才不会错过这些事件
-
-    // Log("GetDepth:", routine_getDepth.wait()) 如果这里提前调用wait函数取出GetDepth函数并发调用的结果，本次GetDepth函数收到请求结果的事件便不会在EventLoop函数中返回
-    var ts1 = new Date().getTime()
-    var ret1 = EventLoop(0)
-
-    var ts2 = new Date().getTime()
-    var ret2 = EventLoop(0)
-
-    var ts3 = new Date().getTime()
-    var ret3 = EventLoop(0)
-
-    Log("First concurrent task completed:", _D(ts1), ret1)
-    Log("Second concurrent task completed:", _D(ts2), ret2)
-    Log("Third concurrent task completed:", _D(ts3), ret3)
-
-    Log("GetTicker:", routine_getTicker.wait())
-    Log("GetDepth:", routine_getDepth.wait())
-    Log("GetTrades:", routine_getTrades.wait())
-}
-```
-
-```python
-import time
-def main():
-    routine_getTicker = exchange.Go("GetTicker")
-    routine_getDepth = exchange.Go("GetDepth")
-    routine_getTrades = exchange.Go("GetTrades")
-
-    ts1 = time.time()
-    ret1 = EventLoop(0)
-
-    ts2 = time.time()
-    ret2 = EventLoop(0)
-
-    ts3 = time.time()
-    ret3 = EventLoop(0)
-
-    Log("First concurrent task completed:", _D(ts1), ret1)
-    Log("Second concurrent task completed:", _D(ts2), ret2)
-    Log("Third concurrent task completed:", _D(ts3), ret3)
-
-    Log("GetTicker:", routine_getTicker.wait())
-    Log("GetDepth:", routine_getDepth.wait())
-    Log("GetTrades:", routine_getTrades.wait())
-```
-
-```rust
-fn main() {
-    // Rust 中 exchange.Go 使用类型化 token（如 Go::GetTicker）而非方法名字符串，无参时传 ()
-    let routine_getTicker = exchange.Go(Go::GetTicker, ());
-    let routine_getDepth = exchange.Go(Go::GetDepth, ());
-    let routine_getTrades = exchange.Go(Go::GetTrades, ());
-
-    // Sleep(2000)，如果这里使用Sleep语句，会导致之后的EventLoop函数错过之前的事件。因为等待了2秒，并发的函数已经收到了数据，之后才开始EventLoop监听机制，就会错过这些事件
-    // 除非在第一行代码就开始调用EventLoop(-1)，先初始化EventLoop的监听机制，才不会错过这些事件
-
-    // Log!("GetDepth:", routine_getDepth.wait(0)) 如果这里提前调用wait函数取出GetDepth函数并发调用的结果，本次GetDepth函数收到请求结果的事件便不会在EventLoop函数中返回
-    let ts1 = Unix() * 1000;
-    let ret1 = EventLoop(0);
-
-    let ts2 = Unix() * 1000;
-    let ret2 = EventLoop(0);
-
-    let ts3 = Unix() * 1000;
-    let ret3 = EventLoop(0);
-
-    Log!("First concurrent task completed:", _D(ts1), ret1);
-    Log!("Second concurrent task completed:", _D(ts2), ret2);
-    Log!("Third concurrent task completed:", _D(ts3), ret3);
-
-    Log!("GetTicker:", routine_getTicker.wait(0).unwrap());
-    Log!("GetDepth:", routine_getDepth.wait(0).unwrap());
-    Log!("GetTrades:", routine_getTrades.wait(0).unwrap());
-}
-```
-
-```cpp
-void main() {
-    auto routine_getTicker = exchange.Go("GetTicker");
-    auto routine_getDepth = exchange.Go("GetDepth");
-    auto routine_getTrades = exchange.Go("GetTrades");
-
-    auto ts1 = Unix() * 1000;
-    auto ret1 = EventLoop(0);
-
-    auto ts2 = Unix() * 1000;
-    auto ret2 = EventLoop(0);
-
-    auto ts3 = Unix() * 1000;
-    auto ret3 = EventLoop(0);
-
-    Log("First concurrent task completed:", _D(ts1), ret1);
-    Log("Second concurrent task completed:", _D(ts2), ret2);
-    Log("Third concurrent task completed:", _D(ts3), ret3);
-
-    Ticker ticker;
-    Depth depth;
-    Trades trades;
-    routine_getTicker.wait(ticker);
-    routine_getDepth.wait(depth);
-    routine_getTrades.wait(trades);
-
-    Log("GetTicker:", ticker);
-    Log("GetDepth:", depth);
-    Log("GetTrades:", trades);
-}
-```
-
-代码中首次调用```EventLoop()```函数时，才会初始化该事件监听机制。如果在事件回调发生之后才首次调用```EventLoop()```，则会错过此前的事件。系统底层封装的队列结构最多可缓存500个事件回调，如果程序运行过程中没有及时调用```EventLoop()```函数取出，超出500个缓存上限的较晚事件回调将会丢失。
-
-```EventLoop()```函数的调用不会影响系统底层WebSocket的缓存队列，也不会影响```exchange.Go()```等并发函数的缓存，这些缓存中的数据仍需使用各自的方法取出。对于在```EventLoop()```函数返回之前已经取出的数据，不会在```EventLoop()```函数中再次产生返回事件。
-
-```EventLoop()```函数的主要用途是通知策略层：系统底层已接收到新的网络数据，从而以事件驱动整个策略。当```EventLoop()```函数返回事件时，只需遍历所有数据来源（例如WebSocket连接、```exchange.Go()```创建的对象）尝试获取数据即可。
-
-```EventLoop()```函数仅支持实盘。
-
-在主函数```main()```中调用时，监听主线程的事件。在使用```JavaScript```语言编写的策略中，也可以在```threading.Thread()```函数创建的线程的执行函数中调用，用于监听当前线程的事件。
-
-See also: `Dial`, `exchange.Go`, `HttpQuery_Go`
-
-#### __Serve
-
-```
-__Serve(serveURI, handler)
-__Serve(serveURI, handler, ...args)
-```
-
-```__Serve```函数用于创建HTTP服务、TCP服务、WebSocket服务（基于HTTP协议）。
-
-Parameters:
-
-- `serveURI` (string, required): ```serveURI```参数用于配置服务绑定的协议、IP地址、端口等设置，例如：```http://0.0.0.0:8088?gzip=true```，即：```http://:8088?gzip=true```。
-- TCP协议
-  ```serveURI```参数设置例如：```tcp://127.0.0.1:6666?tls=true```；可以添加证书、私钥例如：```tls=true&cert_pem=xxxx&cert_key_pem=xxxx```。
-- HTTP协议
-  ```serveURI```参数设置例如：```http://127.0.0.1:6666?gzip=true```；可以设置压缩设置：```gzip=true```。
-  ```serveURI```参数用于HTTPS例如：```https://127.0.0.1:6666?tls=true&gzip=true```；可以加入```cert_pem```和```cert_key_pem```参数来加载证书。
-- `handler` (function, required): ```handler```参数用于传入路由处理函数（HTTP协议）、消息处理函数（TCP协议）、Stream处理函数（WebSocket）。
-
-参数```handler```传入的回调函数可以定义多个参数，第一个参数为ctx对象（上下文对象）。
-- `arg` (string / number / bool / object / array / function / any (平台支持的任意类型), optional): 作为参数```handler```传入的**回调函数**的参数的实参，参数```arg```可能有多个，例如：
-```js
-__Serve("http://:8088", function(ctx, a, b, c) {
-    Log(`ctx.host():`, ctx.host(), ", a=", a, ", b=", b, ", c=", c)
-}, 1, 2, 3)
-```
-调用```__Serve()```函数时传入的参数```1```、```2```、```3```对应传入回调函数的参数```a```、```b```、```c```。
-
-Returns (string): 返回一个字符串，记录创建的服务的IP地址、端口。例如：```127.0.0.1:8088```、```[::]:8089```。
-
-```javascript
-function main() {
-    let httpServer = __Serve("http://:8088?gzip=true", function (ctx) {
-        Log("http connect from: ", ctx.remoteAddr(), "->", ctx.localAddr())
-        let path = ctx.path()
-        if (path == "/") {
-            ctx.write(JSON.stringify({
-                path: ctx.path(),
-                method: ctx.method(),
-                headers: ctx.headers(),
-                cookie: ctx.header("Cookie"),
-                remote: ctx.remoteAddr(),
-                query: ctx.rawQuery()
-            }))
-        } else if (path == "/tickers") {
-            let ret = exchange.GetTickers()
-            if (!ret) {
-                ctx.setStatus(500)
-                ctx.write(GetLastError())
-            } else {
-                ctx.write(JSON.stringify(ret))
-            }
-        } else if (path == "/wss") {
-            if (ctx.upgrade("websocket")) { // upgrade to websocket
-                while (true) {
-                    let r = ctx.read(10)
-                    if (r == "") {
-                        break
-                    } else if (r) {
-                        if (r == "ticker") {
-                            ctx.write(JSON.stringify(exchange.GetTicker()))
-                        } else {
-                            ctx.write("not support")
-                        }
-                    }
-                }
-                Log("websocket closed", ctx.remoteAddr())
-            }
-        } else {
-            ctx.setStatus(404)
-        }
-    })
-    let echoServer = __Serve("tcp://:8089", function (ctx) {
-        Log("tcp connect from: ", ctx.remoteAddr(), "->", ctx.localAddr())
-        while (true) {
-            let d = ctx.read()
-            if (!d) {
-                break
-            }
-            ctx.write(d)
-        }
-        Log("connect closed")
-    })
-    Log("http serve on", httpServer, "tcp serve on", echoServer)
-
-    for (var i = 0; i < 5; i++) {
-        if (i == 2) {
-            // test Http
-            var retHttp = HttpQuery("http://127.0.0.1:8088?num=123&limit=100", {"debug": true})
-            Log("retHttp:", retHttp)
-        } else if (i == 3) {
-            // test TCP
-            var tcpConn = Dial("tcp://127.0.0.1:8089")
-            tcpConn.write("Hello TCP Server")
-            var retTCP = tcpConn.read()
-            Log("retTCP:", retTCP)
-        } else if (i == 4) {
-            // test Websocket
-            var wsConn = Dial("ws://127.0.0.1:8088/wss|compress=gzip")
-            wsConn.write("ticker")
-            var retWS = wsConn.read(1000)
-            Log("retWS:", retWS)
-            // no depth
-            wsConn.write("depth")
-            retWS = wsConn.read(1000)
-            Log("retWS:", retWS)
-        }
-        Sleep(1000)
-    }
-}
-```
-
-```python
-# 不支持
-```
-
-```cpp
-// 不支持
-```
-
-- 该函数仅支持JavaScript语言策略。
-- 服务线程与全局作用域隔离，因此不支持闭包或引用外部变量、自定义函数等；但是可以调用平台所有的API函数。
-- ```WebSocket```服务基于HTTP协议实现，可以在path中设置一个路由分支，设计```WebSocket```消息订阅/推送的实现代码，可以参考本节示例代码。
-
-参数```handler```传入的回调处理函数接收一个```ctx```参数。```ctx```参数为一个上下文对象，用于获取数据和写入数据，具有以下方法：
-- ctx.proto()
-  应用于HTTP/TCP协议，调用时返回协议名称。例如：```HTTP/1.1```、```tcp```。
-- ctx.host()
-  应用于HTTP协议，调用时返回主机信息：IP地址、端口。
-- ctx.path()
-  应用于HTTP协议，调用时返回请求路径。
-- ctx.query(key)
-  应用于HTTP协议，调用时返回请求中query查询中key对应的值。例如发送的请求为：```http://127.0.0.1:8088?num=123```，参数```handler```传入的回调处理函数中```ctx.query("num")```调用时返回```"123"```。
-- ctx.rawQuery()
-  应用于HTTP协议，调用时返回请求中的原始查询（HTTP请求的query）。
-- ctx.headers()
-  应用于HTTP协议，调用时返回请求中的请求头信息。
-- ctx.header(key)
-  应用于HTTP协议，调用时返回指定的请求头中的某个key对应的值。例如获取当前请求的headers中的```User-Agent```：```ctx.header("User-Agent")```。
-- ctx.method()
-  应用于HTTP协议，调用时返回请求方法，例如```GET```、```POST```等。
-- ctx.body()
-  应用于HTTP协议的POST请求，调用时返回请求的正文。
-- ctx.setHeader(key, value)
-  应用于HTTP协议，设置响应报文的请求头信息。
-- ctx.setStatus(code)
-  应用于HTTP协议，设置HTTP报文状态码，通常在路由分支最后设置HTTP状态码，默认为200。
-- ctx.remoteAddr()
-  应用于HTTP/TCP协议，调用时返回请求中的远程客户端地址、端口。
-- ctx.localAddr()
-  应用于HTTP/TCP协议，调用时返回服务本地地址、端口。
-- ctx.upgrade("websocket")
-  应用于基于HTTP协议的WebSocket协议实现，切换```ctx```上下文对象为WebSocket协议；切换成功返回布尔值（真），失败返回布尔值（假）。
-- ctx.read(timeout_ms)
-  应用于基于HTTP协议的WebSocket协议实现/TCP协议，读取WebSocket连接的数据，TCP连接的数据，普通HTTP协议中不支持使用该```read```方法；可以指定超时时间参数```timeout_ms```，单位毫秒。
-- ctx.write(s)
-  应用于HTTP/TCP协议，用于写入字符串数据，可以使用```JSON.stringify()```编码JSON对象为字符串之后写入。对于```WebSocket```协议，可以使用该方法将编码后的字符串传递给客户端。
-
-See also: `HttpQuery`, `HttpQuery_Go`
-
-#### _G
-
-```
-_G()
-_G(k)
-_G(k, v)
-```
-
-持久化保存数据。该函数实现了一个可持久化保存的全局字典功能，数据以键值对（KV）表的结构永久保存在托管者的本地数据库文件中。
-
-Parameters:
-
-- `k` (string / 空值, optional): 参数```k```为所保存键值对中的键名，不区分大小写。
-- `v` (string / number / bool / object / array / 空值, optional): 参数```v```为所保存键值对中的键值，可以是任何能够进行```JSON```序列化的数据。
-
-Returns (string / number / bool / object / array / 空值): 持久化保存的```k-v```键值对中的键值数据。
-
-```javascript
-function main(){
-    // 设置一个全局变量num，值为1
-    _G("num", 1)
-    // 更改一个全局变量num，值为字符串ok
-    _G("num", "ok")
-    // 删除全局变量num
-    _G("num", null)
-    // 返回全局变量num的值
-    Log(_G("num"))
-    // 删除所有全局变量
-    _G(null)
-    // 返回实盘ID
-    var robotId = _G()
-}
-```
-
-```python
-def main():
-    _G("num", 1)
-    _G("num", "ok")
-    _G("num", None)
-    Log(_G("num"))
-    _G(None)
-    robotId = _G()
-```
-
-```rust
-fn main() {
-    // 设置一个全局变量num，值为1
-    _G!("num", 1);
-    // 更改一个全局变量num，值为字符串ok
-    _G!("num", "ok");
-    // 删除全局变量num
-    _G!("num", null);
-    // 返回全局变量num的值
-    Log!(_G!("num"));
-    // Rust 不支持 _G!(null) 删除所有全局变量的形式
-    // 返回实盘ID
-    let robotId = _G!();
-}
-```
-
-```cpp
-void main() {
-    _G("num", 1);
-    _G("num", "ok");
-    _G("num", NULL);
-    Log(_G("num"));
-    _G(NULL);
-    // 不支持 auto robotId = _G();
-}
-```
-
-每个实盘单独对应一个数据库。策略重启或托管者停止运行后，```_G()```函数保存的数据依然会持续存在。但回测结束后，```_G()```函数在回测系统中保存的数据将被清除。使用```_G()```函数持久化保存数据时，应根据硬件设备的内存与硬盘空间合理使用，切勿滥用。
-
-在实盘运行中，当调用```_G()```函数且不传入任何参数时，```_G()```函数返回当前实盘的```Id```。
-
-调用```_G()```函数时，参数```v```传入空值表示删除对应的```k-v```键值对。
-
-调用```_G()```函数时，若仅参数```k```传入字符串，则```_G()```函数返回参数```k```对应的已保存键值。
-
-调用```_G()```函数时，若仅参数```k```传入空值，则表示删除所有已记录的```k-v```键值对。
-
-当```k-v```键值对已持久化保存后，再次调用```_G()```函数，并传入已持久化保存的键名作为参数```k```、新的键值作为参数```v```，即可更新该```k-v```键值对。
-
-以实盘Id为```123456```为例，使用```_G()```函数持久化保存的K-V键值数据存储在该实盘（即策略实例程序）所属托管者目录下的```/logs/storage/123456/123456.db3```数据库文件中，数据记录在```kvdb```表内。
-
-See also: `DBExec`
-
-#### _D
-
-```
-_D()
-_D(timestamp)
-_D(timestamp, fmt)
-```
-
-将毫秒级时间戳或```Date```对象转换为时间字符串。
-
-Parameters:
-
-- `timestamp` (number / object, optional): 毫秒级时间戳或```Date```对象。
-- `fmt` (string, optional): 格式化字符串，```JavaScript```语言默认格式：```yyyy-MM-dd hh:mm:ss```；```Python```语言默认格式：```%Y-%m-%d %H:%M:%S```；```C++```语言默认格式：```%Y-%m-%d %H:%M:%S```。
-
-Returns (string): 时间字符串。
-
-获取并打印当前时间字符串：
-
-```javascript
-function main(){
-    var time = _D()
-    Log(time)
-}
-```
-
-```python
-def main():
-    strTime = _D()
-    Log(strTime)
-```
-
-```rust
-fn main() {
-    let time = _D(None);
-    Log!(time);
-}
-```
-
-```cpp
-void main() {
-    auto strTime = _D();
-    Log(strTime);
-}
-```
-
-时间戳为1574993606000，使用代码进行转换：
-
-```javascript
-function main() {
-    Log(_D(1574993606000))
-}
-```
-
-```python
-def main():
-    # 在北京时间的服务器上运行结果为：2019-11-29 10:13:26；而在其他地区服务器上的托管者运行此代码，结果则为：2019-11-29 02:13:26
-    Log(_D(1574993606))
-```
-
-```rust
-fn main() {
-    Log!(_D(1574993606000));
-}
-```
-
-```cpp
-void main() {
-    Log(_D(1574993606000));
-}
-```
-
-使用参数```fmt```进行格式化，```JavaScript```、```Python```、```C++```语言的格式化字符串有所不同，具体请参看以下示例：
-
-```javascript
-function main() {
-    Log(_D(1574993606000, "yyyy--MM--dd hh--mm--ss"))   // 2019--11--29 10--13--26
-}
-```
-
-```python
-def main():
-    # 1574993606 为秒级时间戳
-    Log(_D(1574993606, "%Y--%m--%d %H--%M--%S"))        #  2019--11--29 10--13--26
-```
-
-```rust
-fn main() {
-    // Rust 的 _D() 函数不支持 fmt 参数，仅支持默认格式：yyyy-MM-dd hh:mm:ss
-    Log!(_D(1574993606000));    // 2019-11-29 10:13:26
-}
-```
-
-```cpp
-void main() {
-    Log(_D(1574993606000, "%Y--%m--%d %H--%M--%S"));    // 2019--11--29 10--13--26
-}
-```
-
-若不传入任何参数，则返回当前时间字符串。在```Python```策略中使用```_D()```函数时，需要注意传入的参数为秒级时间戳（JavaScript、C++策略中为毫秒级时间戳，1秒等于1000毫秒）。在实盘中使用```_D()```函数将时间戳解析为可读时间字符串时，需要注意托管者程序所在操作系统的时区与时间设置，因为```_D()```函数的解析结果取决于托管者系统的时间。
-
-See also: `UnixNano`, `Unix`
-
-#### _N
-
-```
-_N()
-_N(num)
-_N(num, precision)
-```
-
-格式化浮点数。
-
-Parameters:
-
-- `num` (number, required): 待格式化的浮点数。
-- `precision` (number, optional): 用于设置格式化精度，参数```precision```为整数，默认值为4。
-
-Returns (number): 根据精度设置格式化后的浮点数。
-
-例如```_N(3.1415, 2)```会保留```3.1415```小数点后两位，删除其余数位，函数返回```3.14```。
-
-```javascript
-function main(){
-    var i = 3.1415
-    Log(i)
-    var ii = _N(i, 2)
-    Log(ii)
-}
-```
-
-```python
-def main():
-    i = 3.1415
-    Log(i)
-    ii = _N(i, 2)
-    Log(ii)
-```
-
-```rust
-fn main() {
-    let i = 3.1415;
-    Log!(i);
-    let ii = _N(i, 2);
-    Log!(ii);
-}
-```
-
-```cpp
-void main() {
-    auto i = 3.1415;
-    Log(i);
-    auto ii = _N(i, 2);
-    Log(ii);
-}
-```
-
-如果需要将小数点左边的N位数字都置为0，可以这样编写：
-
-```javascript
-function main(){
-    var i = 1300
-    Log(i)
-    var ii = _N(i, -3)
-    // 查看日志得知为1000
-    Log(ii)
-}
-```
-
-```python
-def main():
-    i = 1300
-    Log(i)
-    ii = _N(i, -3)
-    Log(ii)
-```
-
-```rust
-fn main() {
-    let i = 1300;
-    Log!(i);
-    let ii = _N(i, -3);
-    // 查看日志得知为1000
-    Log!(ii);
-}
-```
-
-```cpp
-void main() {
-    auto i = 1300;
-    Log(i);
-    auto ii = _N(i, -3);
-    Log(ii);
-}
-```
-
-参数```precision```可以为正整数或负整数。
-
-See also: `exchange.SetPrecision`
-
-#### _C
-
-```
-_C(pfn)
-_C(pfn, ...args)
-```
-
-重试函数，用于对接口调用进行容错处理。
-
-Parameters:
-
-- `pfn` (function, required): 参数```pfn```为函数引用，即一个**回调函数**。
-- `arg` (string / number / bool / object / array / function / any (平台支持的任意类型), optional): **回调函数**的参数，参数```arg```可以有多个。参数```arg```的类型与个数由**回调函数**的参数决定。
-
-Returns (除**假值**和**空值**以外的所有平台支持的类型（any）。): 回调函数执行后的返回值。
-
-对无参数的函数进行容错处理：
-
-```javascript
-function main(){
-    var ticker = _C(exchange.GetTicker)
-    // 调整_C()函数重试时间间隔为2秒
-    _CDelay(2000)
-    var depth = _C(exchange.GetDepth)
-    Log(ticker)
-    Log(depth)
-}
-```
-
-```python
-def main():
-    ticker = _C(exchange.GetTicker)
-    _CDelay(2000)
-    depth = _C(exchange.GetDepth)
-    Log(ticker)
-    Log(depth)
-```
-
-```rust
-fn main() {
-    let ticker = _C!(exchange.GetTicker(None));
-    // 调整_C!()宏重试时间间隔为2秒
-    _CDelay(2000);
-    let depth = _C!(exchange.GetDepth(None));
-    Log!(ticker);
-    Log!(depth);
-}
-```
-
-```cpp
-void main() {
-    auto ticker = _C(exchange.GetTicker);
-    _CDelay(2000);
-    auto depth = _C(exchange.GetDepth);
-    Log(ticker);
-    Log(depth);
-}
-```
-
-对带参数的函数进行容错处理：
-
-```javascript
-function main(){
-    var records = _C(exchange.GetRecords, PERIOD_D1)
-    Log(records)
-}
-```
-
-```python
-def main():
-    records = _C(exchange.GetRecords, PERIOD_D1)
-    Log(records)
-```
-
-```rust
-fn main() {
-    let records = _C!(exchange.GetRecords(None, PERIOD_D1, None));
-    Log!(records);
-}
-```
-
-```cpp
-void main() {
-    auto records = _C(exchange.GetRecords, PERIOD_D1);
-    Log(records);
-}
-```
-
-也可用于对自定义函数进行容错处理：
-
-```javascript
-var test = function(a, b){
-    var time = new Date().getTime() / 1000
-    if(time % b == 3){
-        Log("Condition met!", "#FF0000")
-        return true
-    }
-    Log("Retrying!", "#FF0000")
-    return false
-}
-
-function main(){
-    var ret = _C(test, 1, 5)
-    Log(ret)
-}
-```
-
-```python
-import time
-def test(a, b):
-    ts = time.time()
-    if ts % b == 3:
-        Log("Condition met!", "#FF0000")
-        return True
-    Log("Retrying!", "#FF0000")
-    return False
-
-def main():
-    ret = _C(test, 1, 5)
-    Log(ret)
-```
-
-```rust
-fn test(a: i64, b: i64) -> Result<bool> {
-    let time = Unix();
-    if time % b == 3 {
-        Log!("Condition met!", "#FF0000");
-        return Ok(true);
-    }
-    Log!("Retrying!", "#FF0000");
-    Err(Error::Api("retry".to_string()))
-}
-
-fn main() {
-    // Rust 中自定义函数返回 Result 类型即可使用 _C! 宏容错，返回 Err 时会重试
-    let ret = _C!(test(1, 5));
-    Log!(ret);
-}
-```
-
-```cpp
-// C++ 不支持这种方式对于自定义函数容错
-```
-
-```_C()```函数会反复调用指定的函数，直到其成功返回为止（当参数```pfn```所引用的函数被调用时返回**空值**或**假值**，则会重试调用```pfn```）。
-
-例如```_C(exchange.GetTicker)```。默认重试间隔为3秒，可调用```_CDelay()```函数来设置重试间隔。
-
-例如```_CDelay(1000)```，表示将```_C()```函数的重试间隔改为1秒。
-
-可以对以下函数进行容错处理（但不限于此）：
-
-- ```exchange.GetTicker()```
-- ```exchange.GetDepth()```
-- ```exchange.GetTrades()```
-- ```exchange.GetRecords()```
-- ```exchange.GetAccount()```
-- ```exchange.GetOrders()```
-- ```exchange.GetOrder()```
-- ```exchange.GetPositions()```
-
-以上函数均可通过```_C()```函数调用以实现容错。```_C()```函数的容错并不局限于上述列出的函数。请注意，参数```pfn```为函数引用而非函数调用，即应写作```_C(exchange.GetTicker)```，而非```_C(exchange.GetTicker())```。
-
-#### _Cross
-
-```
-_Cross(arr1, arr2)
-```
-
-返回数组```arr1```与数组```arr2```的交叉周期数。
-
-Parameters:
-
-- `arr1` (array, required): 元素为```number```类型的数组。
-- `arr2` (array, required): 元素为```number```类型的数组。
-
-Returns (number): 数组```arr1```与数组```arr2```的交叉周期数。
-
-可以模拟一组数据来测试_Cross(Arr1, Arr2)函数：
-
-```javascript
-// 快线指标
-var arr1 = [1,2,3,4,5,6,8,8,9]
-// 慢线指标
-var arr2 = [2,3,4,5,6,7,7,7,7]
-function main(){
-    Log("_Cross(arr1, arr2) : ", _Cross(arr1, arr2))
-    Log("_Cross(arr2, arr1) : ", _Cross(arr2, arr1))
-}
-```
-
-```python
-arr1 = [1,2,3,4,5,6,8,8,9]
-arr2 = [2,3,4,5,6,7,7,7,7]
-def main():
-    Log("_Cross(arr1, arr2) : ", _Cross(arr1, arr2))
-    Log("_Cross(arr2, arr1) : ", _Cross(arr2, arr1))
-```
-
-```rust
-fn main() {
-    // 快线指标
-    let arr1 = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 8.0, 8.0, 9.0];
-    // 慢线指标
-    let arr2 = [2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 7.0, 7.0, 7.0];
-    Log!("_Cross(arr1, arr2) : ", _Cross(&arr1, &arr2));
-    Log!("_Cross(arr2, arr1) : ", _Cross(&arr2, &arr1));
-}
-```
-
-```cpp
-void main() {
-    vector<double> arr1 = {1,2,3,4,5,6,8,8,9};
-    vector<double> arr2 = {2,3,4,5,6,7,7,7,7};
-    Log("_Cross(arr1, arr2) : ", _Cross(arr1, arr2));
-    Log("_Cross(arr2, arr1) : ", _Cross(arr2, arr1));
-}
-```
-
-```_Cross()```函数的返回值为正数时表示上穿的周期数，为负数时表示下穿的周期数，为0时表示当前价格相等。详细使用说明请参阅：[内置函数_Cross分析及使用说明](https://www.fmz.com/bbs-topic/1140)。
-
-#### JSON.parse
-
-```
-JSON.parse(s)
-JSON.parse(s, safeStr)
-```
-
-```JSON.parse```函数是**ECMAScript**标准内建对象```JSON```的方法，用于解码（解析）JSON字符串。发明者量化交易平台在此基础上为其扩展了一个参数```safeStr```。
-
-Parameters:
-
-- `s` (string, required): 该参数为需要解码（解析）的```JSON```字符串。
-- `safeStr` (bool, optional): 当该参数设置为```true```时，若解析过程中遇到可能超出精度范围的数值，会将其以字符串形式返回，以避免精度丢失或数值溢出问题。
-
-Returns (object): 返回值为```JSON```对象。
-
-解码（解析）一个包含大数值的```JSON```字符串。
-
-```javascript
-function main() {
-    let s1 = '{"num": 8754613216564987646512354656874651651358}'
-    Log("JSON.parse:", JSON.parse(s1))          // JSON.parse: {"num":8.754613216564987e+39}
-    Log("JSON.parse:", JSON.parse(s1, true))    // JSON.parse: {"num":"8754613216564987646512354656874651651358"}
-
-    let s2 = '{"num": 123}'
-    Log("JSON.parse:", JSON.parse(s2))          // JSON.parse: {"num":123}
-    Log("JSON.parse:", JSON.parse(s2, true))    // JSON.parse: {"num":123}
-}
-```
-
-```python
-# 可以使用Python的第三方库处理大数值数据。
-```
-
-```rust
-fn main() {
-    // Rust 使用 JSONParse() 函数解析JSON字符串，没有 safeStr 参数
-    // 超出精度范围的大数值会被解析为 f64 ，可能丢失精度
-    let s1 = r#"{"num": 8754613216564987646512354656874651651358}"#;
-    Log!("JSONParse:", JSONParse(s1).unwrap()["num"].as_f64().unwrap_or(0.0));    // JSONParse: 8.754613216564987e39
-
-    let s2 = r#"{"num": 123}"#;
-    Log!("JSONParse:", JSONParse(s2).unwrap()["num"].as_f64().unwrap_or(0.0));    // JSONParse: 123
-}
-```
-
-```cpp
-// 可以使用其它方案处理。
-```
-
-```JSON.parse()```函数能够正确解析包含较大数值的JSON字符串；当```safeStr```参数设置为真值时，会将较大的数值解析为字符串类型。
-
-```safeStr```参数位同样支持传入```reviver```参数，即一个用于转换结果的函数，该函数会针对对象的每个成员调用一次；具体用法可查阅相关资料，此处不再赘述。
-
-仅支持JavaScript语言。
-
-回测系统中不支持```JSON.parse()```函数的```safeStr```参数功能。
-
-#### JSON.stringify
-
-```
-JSON.stringify(obj)
-```
-
-```JSON.stringify```函数是**ECMAScript**标准内置对象```JSON```的方法，用于将JavaScript值转换为JSON字符串。
-
-Parameters:
-
-- `obj` (string / number / bool / object / array / function / any (平台支持的任意类型), required): 需要序列化为JSON字符串的值。
-
-Returns (string): 返回序列化后的```JSON```字符串。
-
-将对象序列化为JSON字符串并输出。
-
-```javascript
-function main() {
-    let s1 = {"num": "8754613216564987646512354656874651651358"}
-    Log("JSON.stringify:", JSON.stringify(s1))
-
-    // JSON.stringify: {"num":"8754613216564987646512354656874651651358"}
-    // JSON.stringify(s1) 返回的变量为一个字符串类型
-}
-```
-
-```python
-// 略
-```
-
-```cpp
-// 略
-```
-
-仅支持JavaScript语言。
 
 #### SetChannelData
 
@@ -4121,9784 +12565,21 @@ fn main() {
 
 See also: `SetChannelData`; `_G`
 
-### Log
+### Threads
 
-#### Log
+并发相关的函数都在这里。`exchange.Go`把耗时的调用放到后台执行，`EventLoop`等待并发调用的结果和事件，这两个函数所有编程语言都可以使用；下面的多线程对象仅支持```JavaScript```。
 
-```
-Log(...msgs)
-```
+发明者量化交易平台从系统底层真正支持```JavaScript```语言策略的多线程功能，实现了以下对象：
 
-```Log()```函数用于输出日志。
-
-Parameters:
-
-- `msg` (string / number / bool / object / array / any (平台支持的任意类型), optional): 参数```msg```为需要输出的内容，可传入多个```msg```参数。
-
-可以传入多个```msg```参数：
-
-```javascript
-function main() {
-    Log("msg1", "msg2", "msg3")
-}
-```
-
-```python
-def main():
-    Log("msg1", "msg2", "msg3")
-```
-
-```rust
-fn main() {
-    Log!("msg1", "msg2", "msg3");
-}
-```
-
-```cpp
-void main() {
-    Log("msg1", "msg2", "msg3");
-}
-```
-
-支持设置输出消息的颜色。若需同时设置颜色和推送，需先设置颜色，最后再使用```@```字符设置推送。
-
-```javascript
-function main() {
-    Log("Hello FMZ Quant !@")
-    Sleep(1000 * 5)
-    // 字符串内加入#ff0000，打印日志显示为红色，并且推送消息
-    Log("Hello, #ff0000@")
-}
-```
-
-```python
-def main():
-    Log("Hello FMZ Quant !@")
-    Sleep(1000 * 5)
-    Log("Hello, #ff0000@")
-```
-
-```rust
-fn main() {
-    Log!("Hello FMZ Quant !@");
-    Sleep(1000 * 5);
-    // 字符串内加入#ff0000，打印日志显示为红色，并且推送消息
-    Log!("Hello, #ff0000@");
-}
-```
-
-```cpp
-void main() {
-    Log("Hello FMZ Quant !@");
-    Sleep(1000 * 5);
-    Log("Hello, #ff0000@");
-}
-```
-
-```Log()```函数支持打印```base64```编码后的图片，内容以``` ` ```开头，以``` ` ```结尾，例如：
-
-```javascript
-function main() {
-    Log("`data:image/png;base64,AAAA`")
-}
-```
-
-```python
-def main():
-    Log("`data:image/png;base64,AAAA`")
-```
-
-```rust
-fn main() {
-    Log!("`data:image/png;base64,AAAA`");
-}
-```
-
-```cpp
-void main() {
-    Log("`data:image/png;base64,AAAA`");
-}
-```
-
-```Log()```函数支持直接打印```Python```的```matplotlib.pyplot```对象，只要该对象包含```savefig```方法，即可直接使用```Log```函数打印，例如：
-
-```python
-import matplotlib.pyplot as plt
-def main():
-    plt.plot([3,6,2,4,7,1])
-    Log(plt)
-```
-
-```Log()```函数支持语言切换，其输出的文本会根据平台页面的语言设置自动切换为对应的语言，例如：
-
-```javascript
-function main() {
-    Log("[trans]中文|abc[/trans]")
-}
-```
-
-```python
-def main():
-    Log("[trans]中文|abc[/trans]")
-```
-
-```rust
-fn main() {
-    Log!("[trans]中文|abc[/trans]");
-}
-```
-
-```cpp
-void main() {
-    Log("[trans]中文|abc[/trans]");
-}
-```
-
-```Log()```函数会在实盘或回测系统的日志区域输出一条日志信息，实盘运行时日志将保存在实盘的数据库中。若```Log()```函数输出的内容以```@```字符结尾，该条日志会进入消息推送队列，并推送至当前发明者量化交易平台账号在[推送设置](https://www.fmz.com/m/account)中配置的邮箱、WebHook地址等。[调试工具](https://www.fmz.com/m/debug)和回测系统不支持消息推送。消息推送存在频率限制，具体规则如下：在实盘的每个20秒周期内，仅保留并推送最后一条推送消息，其余消息将被过滤而不推送（通过 Log 函数输出的推送日志仍会正常打印显示在日志区域）。
-
-若```Log()```函数输出的内容以```&```字符结尾，该条日志将被标记为私密日志。当实盘公开展示时，该条日志对其他用户隐藏，但在实盘拥有者账户视角下仍然可见。此功能可用于记录API密钥、账户余额等敏感信息。例如：```Log("私密信息", "&")```。
-
-关于```WebHook```推送，可以使用```Golang```编写的服务程序：
-```golang
-package main
-
-import (
-    "fmt"
-    "net/http"
-)
-
-func Handle (w http.ResponseWriter, r *http.Request) {
-    defer func() {
-        fmt.Println("req:", *r)
-    }()
-}
-
-func main () {
-    fmt.Println("listen http://localhost:9090")
-    http.HandleFunc("/data", Handle)
-    http.ListenAndServe(":9090", nil)
-}
-```
-
-在[推送设置](https://www.fmz.com/m/account)中设置```WebHook```：```http://XXX.XX.XXX.XX:9090/data?data=Hello_FMZ```，运行编写好的```Golang```服务程序后，即可开始运行实盘策略。以下为使用```JavaScript```语言编写的策略，策略运行时会执行```Log()```函数并推送消息：
-```js
-function main() {
-    Log("msg", "@")
-}
-```
-
-```Golang```语言编写的服务程序接收到推送后，打印如下信息：
-```log
-listen http://localhost:9090
-
-req: {GET /data?data=Hello_FMZ HTTP/1.1 1 1
-map[User-Agent:[Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3)
-AppleWebKit/537.36 (KHTML, like Gecko) Chrome/xx.x.xxxx.xxx
-Safari/537.36] Accept-Encoding:[gzip]] {} <nil> 0 [] false
-1XX.XX.X.XX:9090 map[] map[] <nil> map[] XXX.XX.XXX.XX:4xxx2
-/data?data=Hello_FMZ <nil> <nil> <nil> 0xc420056300
-```
-
-See also: `LogReset`, `LogVacuum`
-
-#### LogProfit
-
-```
-LogProfit(profit)
-LogProfit(profit, ...args)
-```
-
-记录并打印盈亏数值，并根据盈亏数值绘制收益曲线。
-
-Parameters:
-
-- `profit` (number, required): 参数```profit```为收益数据，该数据由策略中设计的算法计算得出。
-- `arg` (string / number / bool / object / array / any (平台支持的任意类型), optional): 扩展参数，用于向该条收益日志中输出附带信息，```arg```参数可传入多个。
-
-调用```LogProfit```函数时，如果最后一个参数为字符```&```，则不会将日志写入数据库，仅更新收益图表。使用```&```参数可以避免频繁的收益记录产生大量日志，从而保持日志整洁。例如：
-
-```javascript
-function main() {
-    // 在收益图表上打印30个点
-    for(var i = 0; i < 30; i++) {
-        LogProfit(i, '&')
-        Sleep(500)
-    }
-}
-```
-
-```python
-def main():
-    for i in range(30):
-        LogProfit(i, '&')
-        Sleep(500)
-```
-
-```rust
-fn main() {
-    // 在收益图表上打印30个点
-    // Rust 中 LogProfit 只接受收益数值参数，不支持 '&' 等扩展参数
-    for i in 0..30 {
-        LogProfit(i);
-        Sleep(500);
-    }
-}
-```
-
-```cpp
-void main() {
-    for(int i = 0; i < 30; i++) {
-        LogProfit(i, '&');
-        Sleep(500);
-    }
-}
-```
-
-See also: `LogProfitReset`
-
-#### LogProfitReset
-
-```
-LogProfitReset()
-LogProfitReset(remain)
-```
-
-清空所有收益日志及收益图表。
-
-Parameters:
-
-- `remain` (number, optional): ```remain```参数用于指定需要保留的日志条数（整数）。
-
-```javascript
-function main() {
-    // 在收益图表上打印30个数据点，然后重置，仅保留最后10个数据点
-    for(var i = 0; i < 30; i++) {
-        LogProfit(i)
-        Sleep(500)
-    }
-    LogProfitReset(10)
-}
-```
-
-```python
-def main():
-    for i in range(30):
-        LogProfit(i)
-        Sleep(500)
-    LogProfitReset(10)
-```
-
-```rust
-fn main() {
-    // 在收益图表上打印30个数据点，然后重置，仅保留最后10个数据点
-    for i in 0..30 {
-        LogProfit(i);
-        Sleep(500);
-    }
-    LogProfitReset(10);
-}
-```
-
-```cpp
-void main() {
-    for(int i = 0; i < 30; i++) {
-        LogProfit(i);
-        Sleep(500);
-    }
-    LogProfitReset(10);
-}
-```
-
-See also: `LogProfit`
-
-#### LogStatus
-
-```
-LogStatus(...msgs)
-```
-
-在回测系统或实盘页面的状态栏中输出信息。
-
-Parameters:
-
-- `msg` (string / number / bool / object / array / any (平台支持的任意类型), optional): 参数```msg```为要输出的内容，可传入多个```msg```参数。
-
-支持设置输出内容的颜色：
-
-```javascript
-function main() {
-    LogStatus('This is a normal status message')
-    LogStatus('This is a red font status message#ff0000')
-    LogStatus('This is a multi-line status message\nI am the second line')
-}
-```
-
-```python
-def main():
-    LogStatus('This is a normal status message')
-    LogStatus('This is a red font status message#ff0000')
-    LogStatus('This is a multi-line status message\nI am the second line')
-```
-
-```rust
-fn main() {
-    LogStatus!("This is a normal status message");
-    LogStatus!("This is a red font status message#ff0000");
-    LogStatus!("This is a multi-line status message\nI am the second line");
-}
-```
-
-```cpp
-void main() {
-    LogStatus("This is a normal status message");
-    LogStatus("This is a red font status message#ff0000");
-    LogStatus("This is a multi-line status message\nI am the second line");
-}
-```
-
-状态栏中的数据输出示例：
-
-```javascript
-function main() {
-    var table = {type: 'table', title: 'Position Info', cols: ['Column 1', 'Column 2'], rows: [ ['abc', 'def'], ['ABC', 'support color #ff0000']]}
-    // JSON 序列化后，在字符串两端添加 ` 字符，即可将其识别为复杂消息格式（当前支持表格）
-    LogStatus('`' + JSON.stringify(table) + '`')
-    // 表格信息也可以显示在多行文本中
-    LogStatus('First line message\n`' + JSON.stringify(table) + '`\nThird line message')
-    // 支持同时显示多个表格，将以标签页（TAB）形式归为一组显示
-    LogStatus('`' + JSON.stringify([table, table]) + '`')
-
-    // 也可以在表格中构造按钮，策略通过 GetCommand 接收 cmd 属性的内容
-    var table = {
-        type: 'table',
-        title: 'Position Operation',
-        cols: ['Column 1', 'Column 2', 'Action'],
-        rows: [
-            ['abc', 'def', {'type':'button', 'cmd': 'coverAll', 'name': 'Close All'}]
-        ]
-    }
-    LogStatus('`' + JSON.stringify(table) + '`')
-    // 或者构造一个单独的按钮
-    LogStatus('`' + JSON.stringify({'type':'button', 'cmd': 'coverAll', 'name': 'Close All'}) + '`')
-    // 可以自定义按钮样式（bootstrap 的按钮属性）
-    LogStatus('`' + JSON.stringify({'type':'button', 'class': 'btn btn-xs btn-danger', 'cmd': 'coverAll', 'name': 'Close All'}) + '`')
-}
-```
-
-```python
-import json
-def main():
-    table = {"type": "table", "title": "Position Info", "cols": ["Column 1", "Column 2"], "rows": [["abc", "def"], ["ABC", "support color #ff0000"]]}
-    LogStatus('`' + json.dumps(table) + '`')
-    LogStatus('First line message\n`' + json.dumps(table) + '`\nThird line message')
-    LogStatus('`' + json.dumps([table, table]) + '`')
-
-    table = {
-        "type" : "table",
-        "title" : "Position Operation",
-        "cols" : ["Column 1", "Column 2", "Action"],
-        "rows" : [
-            ["abc", "def", {"type": "button", "cmd": "coverAll", "name": "Close All"}]
-        ]
-    }
-    LogStatus('`' + json.dumps(table) + '`')
-    LogStatus('`' + json.dumps({"type": "button", "cmd": "coverAll", "name": "Close All"}) + '`')
-    LogStatus('`' + json.dumps({"type": "button", "class": "btn btn-xs btn-danger", "cmd": "coverAll", "name": "Close All"}) + '`')
-```
-
-```rust
-fn main() {
-    let table = r#"{"type": "table", "title": "Position Info", "cols": ["Column 1", "Column 2"], "rows": [["abc", "def"], ["ABC", "support color #ff0000"]]}"#;
-    // 在 JSON 字符串两端添加 ` 字符，即可将其识别为复杂消息格式（当前支持表格）
-    LogStatus!(format!("`{}`", table));
-    // 表格信息也可以显示在多行文本中
-    LogStatus!(format!("First line message\n`{}`\nThird line message", table));
-    // 支持同时显示多个表格，将以标签页（TAB）形式归为一组显示
-    LogStatus!(format!("`[{},{}]`", table, table));
-
-    // 也可以在表格中构造按钮，策略通过 GetCommand 接收 cmd 属性的内容
-    let table = String::from(r#"{"type": "table", "title": "Position Operation", "cols": ["Column 1", "Column 2", "Action"], "rows": ["#)
-        + r#"["abc", "def", {"type": "button", "cmd": "coverAll", "name": "Close All"}]"#
-        + r#"]}"#;
-    LogStatus!(format!("`{}`", table));
-    // 或者构造一个单独的按钮
-    LogStatus!(format!("`{}`", r#"{"type": "button", "cmd": "coverAll", "name": "Close All"}"#));
-    // 可以自定义按钮样式（bootstrap 的按钮属性）
-    LogStatus!(format!("`{}`", r#"{"type": "button", "class": "btn btn-xs btn-danger", "cmd": "coverAll", "name": "Close All"}"#));
-}
-```
-
-```cpp
-void main() {
-    json table = R"({"type": "table", "title": "Position Info", "cols": ["Column 1", "Column 2"], "rows": [["abc", "def"], ["ABC", "support color #ff0000"]]})"_json;
-    LogStatus("`" + table.dump() + "`");
-    LogStatus("First line message\n`" + table.dump() + "`\nThird line message");
-    json arr = R"([])"_json;
-    arr.push_back(table);
-    arr.push_back(table);
-    LogStatus("`" + arr.dump() + "`");
-
-    table = R"({
-        "type" : "table",
-        "title" : "Position Operation",
-        "cols" : ["Column 1", "Column 2", "Action"],
-        "rows" : [
-            ["abc", "def", {"type": "button", "cmd": "coverAll", "name": "Close All"}]
-        ]
-    })"_json;
-    LogStatus("`" + table.dump() + "`");
-    LogStatus("`" + R"({"type": "button", "cmd": "coverAll", "name": "Close All"})"_json.dump() + "`");
-    LogStatus("`" + R"({"type": "button", "class": "btn btn-xs btn-danger", "cmd": "coverAll", "name": "Close All"})"_json.dump() + "`");
-}
-```
-
-支持在状态栏中设计按钮控件（旧版按钮结构）：
-
-```javascript
-function main() {
-    var table = {
-        type: "table",
-        title: "Status Bar Button Styles",
-        cols: ["Default", "Primary", "Success", "Info", "Warning", "Danger"],
-        rows: [
-            [
-                {"type":"button", "class": "btn btn-xs btn-default", "name": "Default"},
-                {"type":"button", "class": "btn btn-xs btn-primary", "name": "Primary"},
-                {"type":"button", "class": "btn btn-xs btn-success", "name": "Success"},
-                {"type":"button", "class": "btn btn-xs btn-info", "name": "Info"},
-                {"type":"button", "class": "btn btn-xs btn-warning", "name": "Warning"},
-                {"type":"button", "class": "btn btn-xs btn-danger", "name": "Danger"}
-            ]
-        ]
-    }
-    LogStatus("`" + JSON.stringify(table) + "`")
-}
-```
-
-```python
-import json
-def main():
-    table = {
-        "type": "table",
-        "title": "Status Bar Button Styles",
-        "cols": ["Default", "Primary", "Success", "Info", "Warning", "Danger"],
-        "rows": [
-            [
-                {"type":"button", "class": "btn btn-xs btn-default", "name": "Default"},
-                {"type":"button", "class": "btn btn-xs btn-primary", "name": "Primary"},
-                {"type":"button", "class": "btn btn-xs btn-success", "name": "Success"},
-                {"type":"button", "class": "btn btn-xs btn-info", "name": "Info"},
-                {"type":"button", "class": "btn btn-xs btn-warning", "name": "Warning"},
-                {"type":"button", "class": "btn btn-xs btn-danger", "name": "Danger"}
-            ]
-        ]
-    }
-    LogStatus("`" + json.dumps(table) + "`")
-```
-
-```rust
-fn main() {
-    let table = String::from(r#"{"type": "table", "title": "Status Bar Button Styles", "cols": ["Default", "Primary", "Success", "Info", "Warning", "Danger"], "rows": [["#)
-        + r#"{"type": "button", "class": "btn btn-xs btn-default", "name": "Default"},"#
-        + r#"{"type": "button", "class": "btn btn-xs btn-primary", "name": "Primary"},"#
-        + r#"{"type": "button", "class": "btn btn-xs btn-success", "name": "Success"},"#
-        + r#"{"type": "button", "class": "btn btn-xs btn-info", "name": "Info"},"#
-        + r#"{"type": "button", "class": "btn btn-xs btn-warning", "name": "Warning"},"#
-        + r#"{"type": "button", "class": "btn btn-xs btn-danger", "name": "Danger"}"#
-        + r#"]]}"#;
-    LogStatus!(format!("`{}`", table));
-}
-```
-
-```cpp
-void main() {
-    json table = R"({
-        "type": "table",
-        "title": "Status Bar Button Styles",
-        "cols": ["Default", "Primary", "Success", "Info", "Warning", "Danger"],
-        "rows": [
-            [
-                {"type":"button", "class": "btn btn-xs btn-default", "name": "Default"},
-                {"type":"button", "class": "btn btn-xs btn-primary", "name": "Primary"},
-                {"type":"button", "class": "btn btn-xs btn-success", "name": "Success"},
-                {"type":"button", "class": "btn btn-xs btn-info", "name": "Info"},
-                {"type":"button", "class": "btn btn-xs btn-warning", "name": "Warning"},
-                {"type":"button", "class": "btn btn-xs btn-danger", "name": "Danger"}
-            ]
-        ]
-    })"_json;
-    LogStatus("`" + table.dump() + "`");
-}
-```
-
-设置状态栏按钮的禁用与描述功能（旧版按钮结构）：
-
-```javascript
-function main() {
-    var table = {
-        type: "table",
-        title: "Status Bar Button Disable and Description Test",
-        cols: ["Column 1", "Column 2", "Column 3"],
-        rows: []
-    }
-    var button1 = {"type": "button", "name": "Button 1", "cmd": "button1", "description": "This is the first button"}
-    var button2 = {"type": "button", "name": "Button 2", "cmd": "button2", "description": "This is the second button, set to disabled", "disabled": true}
-    var button3 = {"type": "button", "name": "Button 3", "cmd": "button3", "description": "This is the third button, set to enabled", "disabled": false}
-    table.rows.push([button1, button2, button3])
-    LogStatus("`" + JSON.stringify(table) + "`")
-}
-```
-
-```python
-import json
-def main():
-    table = {
-        "type": "table",
-        "title": "Status Bar Button Disable and Description Test",
-        "cols": ["Column 1", "Column 2", "Column 3"],
-        "rows": []
-    }
-    button1 = {"type": "button", "name": "Button 1", "cmd": "button1", "description": "This is the first button"}
-    button2 = {"type": "button", "name": "Button 2", "cmd": "button2", "description": "This is the second button, set to disabled", "disabled": True}
-    button3 = {"type": "button", "name": "Button 3", "cmd": "button3", "description": "This is the third button, set to enabled", "disabled": False}
-    table["rows"].append([button1, button2, button3])
-    LogStatus("`" + json.dumps(table) + "`")
-```
-
-```rust
-fn main() {
-    let button1 = r#"{"type": "button", "name": "Button 1", "cmd": "button1", "description": "This is the first button"}"#;
-    let button2 = r#"{"type": "button", "name": "Button 2", "cmd": "button2", "description": "This is the second button, set to disabled", "disabled": true}"#;
-    let button3 = r#"{"type": "button", "name": "Button 3", "cmd": "button3", "description": "This is the third button, set to enabled", "disabled": false}"#;
-    let table = format!(
-        r#"{{"type": "table", "title": "Status Bar Button Disable and Description Test", "cols": ["Column 1", "Column 2", "Column 3"], "rows": [[{}, {}, {}]]}}"#,
-        button1, button2, button3
-    );
-    LogStatus!(format!("`{}`", table));
-}
-```
-
-```cpp
-void main() {
-    json table = R"({
-        "type": "table",
-        "title": "Status Bar Button Disable and Description Test",
-        "cols": ["Column 1", "Column 2", "Column 3"],
-        "rows": []
-    })"_json;
-    json button1 = R"({"type": "button", "name": "Button 1", "cmd": "button1", "description": "This is the first button"})"_json;
-    json button2 = R"({"type": "button", "name": "Button 2", "cmd": "button2", "description": "This is the second button, set to disabled", "disabled": true})"_json;
-    json button3 = R"({"type": "button", "name": "Button 3", "cmd": "button3", "description": "This is the third button, set to enabled", "disabled": false})"_json;
-    json arr = R"([])"_json;
-    arr.push_back(button1);
-    arr.push_back(button2);
-    arr.push_back(button3);
-    table["rows"].push_back(arr);
-    LogStatus("`" + table.dump() + "`");
-}
-```
-
-结合 ```GetCommand()``` 函数，构建状态栏按钮的交互功能（旧版按钮结构）：
-
-```javascript
-function test1() {
-    Log("Calling custom function")
-}
-
-function main() {
-    while (true) {
-        var table = {
-            type: 'table',
-            title: 'Operation',
-            cols: ['Column 1', 'Column 2', 'Action'],
-            rows: [
-                ['a', '1', {
-                    'type': 'button',
-                    'cmd': "CoverAll",
-                    'name': 'Close All'
-                }],
-                ['b', '1', {
-                    'type': 'button',
-                    'cmd': 10,
-                    'name': 'Send Number'
-                }],
-                ['c', '1', {
-                    'type': 'button',
-                    'cmd': _D(),
-                    'name': 'Call Function'
-                }],
-                ['d', '1', {
-                    'type': 'button',
-                    'cmd': 'test1',
-                    'name': 'Call Custom Function'
-                }]
-            ]
-        }
-        LogStatus(_D(), "\n", '`' + JSON.stringify(table) + '`')
-
-        var str_cmd = GetCommand()
-        if (str_cmd) {
-            Log("Received interaction data str_cmd:", "Type:", typeof(str_cmd), "Value:", str_cmd)
-            if(str_cmd == "test1") {
-                test1()
-            }
-        }
-
-        Sleep(500)
-    }
-}
-```
-
-```python
-import json
-def test1():
-    Log("Calling custom function")
-
-def main():
-    while True:
-        table = {
-            "type": "table",
-            "title": "Operation",
-            "cols": ["Column 1", "Column 2", "Action"],
-            "rows": [
-                ["a", "1", {
-                    "type": "button",
-                    "cmd": "CoverAll",
-                    "name": "Close All"
-                }],
-                ["b", "1", {
-                    "type": "button",
-                    "cmd": 10,
-                    "name": "Send Number"
-                }],
-                ["c", "1", {
-                    "type": "button",
-                    "cmd": _D(),
-                    "name": "Call Function"
-                }],
-                ["d", "1", {
-                    "type": "button",
-                    "cmd": "test1",
-                    "name": "Call Custom Function"
-                }]
-            ]
-        }
-
-        LogStatus(_D(), "\n", "`" + json.dumps(table) + "`")
-        str_cmd = GetCommand()
-        if str_cmd:
-            Log("Received interaction data str_cmd", "Type:", type(str_cmd), "Value:", str_cmd)
-            if str_cmd == "test1":
-                test1()
-        Sleep(500)
-```
-
-```rust
-fn test1() {
-    Log!("Calling custom function");
-}
-
-fn main() {
-    loop {
-        let table = String::from(r#"{"type": "table", "title": "Operation", "cols": ["Column 1", "Column 2", "Action"], "rows": ["#)
-            + r#"["a", "1", {"type": "button", "cmd": "CoverAll", "name": "Close All"}],"#
-            + r#"["b", "1", {"type": "button", "cmd": 10, "name": "Send Number"}],"#
-            + &format!(r#"["c", "1", {{"type": "button", "cmd": "{}", "name": "Call Function"}}],"#, _D(None))
-            + r#"["d", "1", {"type": "button", "cmd": "test1", "name": "Call Custom Function"}]"#
-            + r#"]}"#;
-        LogStatus!(_D(None), "\n", format!("`{}`", table));
-
-        if let Some(str_cmd) = GetCommand(0) {
-            Log!("Received interaction data str_cmd:", "Type:", "String", "Value:", &str_cmd);
-            if str_cmd == "test1" {
-                test1();
-            }
-        }
-
-        Sleep(500);
-    }
-}
-```
-
-```cpp
-void test1() {
-    Log("Calling custom function");
-}
-
-void main() {
-    while(true) {
-        json table = R"({
-            "type": "table",
-            "title": "Operation",
-            "cols": ["Column 1", "Column 2", "Action"],
-            "rows": [
-                ["a", "1", {
-                    "type": "button",
-                    "cmd": "CoverAll",
-                    "name": "Close All"
-                }],
-                ["b", "1", {
-                    "type": "button",
-                    "cmd": 10,
-                    "name": "Send Number"
-                }],
-                ["c", "1", {
-                    "type": "button",
-                    "cmd": "",
-                    "name": "Call Function"
-                }],
-                ["d", "1", {
-                    "type": "button",
-                    "cmd": "test1",
-                    "name": "Call Custom Function"
-                }]
-            ]
-        })"_json;
-        table["rows"][2][2]["cmd"] = _D();
-        LogStatus(_D(), "\n", "`" + table.dump() + "`");
-        auto str_cmd = GetCommand();
-        if(str_cmd != "") {
-            Log("Received interaction data str_cmd", "Type:", typeid(str_cmd).name(), "Value:", str_cmd);
-            if(str_cmd == "test1") {
-                test1();
-            }
-        }
-        Sleep(500);
-    }
-}
-```
-
-在构造状态栏按钮进行交互时，同样支持输入数据，交互指令最终由```GetCommand()```函数捕获。
-
-在状态栏按钮控件的数据结构中增加```input```项（旧版按钮结构），例如为```{"type": "button", "cmd": "open", "name": "Open"}```添加```"input": {"name": "Quantity", "type": "number", "defValue": 1}```，即可使按钮在被点击时弹出一个带输入框控件的弹窗（输入框中的默认值为1，即```defValue```所设置的数据），从而可以输入一个数据并与按钮命令一起发送。例如运行以下测试代码时，点击「开仓」按钮后会弹出一个带输入框的弹窗，在输入框中输入111并点击「确定」，```GetCommand()```函数便会捕获消息：```open:111```。
-
-```javascript
-function main() {
-    var tbl = {
-        type: "table",
-        title: "Operation",
-        cols: ["Column 1", "Column 2"],
-        rows: [
-            ["Open Position", {"type": "button", "cmd": "open", "name": "Open", "input": {"name": "Quantity", "type": "number", "defValue": 1}}],
-            ["Close Position", {"type": "button", "cmd": "coverAll", "name": "Close All"}]
-        ]
-    }
-
-    LogStatus(_D(), "\n", "`" + JSON.stringify(tbl) + "`")
-    while (true) {
-        var cmd = GetCommand()
-        if (cmd) {
-            Log("cmd:", cmd)
-        }
-        Sleep(1000)
-    }
-}
-```
-
-```python
-import json
-
-def main():
-    tbl = {
-        "type": "table",
-        "title": "Operation",
-        "cols": ["Column 1", "Column 2"],
-        "rows": [
-            ["Open Position", {"type": "button", "cmd": "open", "name": "Open", "input": {"name": "Quantity", "type": "number", "defValue": 1}}],
-            ["Close Position", {"type": "button", "cmd": "coverAll", "name": "Close All"}]
-        ]
-    }
-
-    LogStatus(_D(), "\n", "`" + json.dumps(tbl) + "`")
-    while True:
-        cmd = GetCommand()
-        if cmd:
-            Log("cmd:", cmd)
-        Sleep(1000)
-```
-
-```rust
-fn main() {
-    let tbl = String::from(r#"{"type": "table", "title": "Operation", "cols": ["Column 1", "Column 2"], "rows": ["#)
-        + r#"["Open Position", {"type": "button", "cmd": "open", "name": "Open", "input": {"name": "Quantity", "type": "number", "defValue": 1}}],"#
-        + r#"["Close Position", {"type": "button", "cmd": "coverAll", "name": "Close All"}]"#
-        + r#"]}"#;
-
-    LogStatus!(_D(None), "\n", format!("`{}`", tbl));
-    loop {
-        if let Some(cmd) = GetCommand(0) {
-            Log!("cmd:", cmd);
-        }
-        Sleep(1000);
-    }
-}
-```
-
-```cpp
-void main() {
-    json tbl = R"({
-        "type": "table",
-        "title": "Operation",
-        "cols": ["Column 1", "Column 2"],
-        "rows": [
-            ["Open Position", {"type": "button", "cmd": "open", "name": "Open", "input": {"name": "Quantity", "type": "number", "defValue": 1}}],
-            ["Close Position", {"type": "button", "cmd": "coverAll", "name": "Close All"}]
-        ]
-    })"_json;
-
-    LogStatus(_D(), "\n", "`" + tbl.dump() + "`");
-    while(true) {
-        auto cmd = GetCommand();
-        if(cmd != "") {
-            Log("cmd:", cmd);
-        }
-        Sleep(1000);
-    }
-}
-```
-
-支持分组按钮控件（旧版按钮结构），其功能与**支持输入数据的状态栏按钮**（通过"input"字段设置）一致，交互指令最终均由```GetCommand()```函数捕获。区别在于分组按钮通过```"group"```字段设置：当点击按钮触发交互时，页面弹出的对话框中会显示预先设置好的**一组**输入控件，可一次性输入一组数据。
-关于状态栏按钮控件和分组按钮控件结构中的```"group"```字段，需要注意以下几点：
-- group中```type```属性仅支持以下4种类型，```defValue```属性用于设置默认值。
-  "selected"：下拉框控件，设置下拉框中的各个选项时使用```|```符号分隔。
-  "number"：数值输入框控件。
-  "string"：字符串输入框控件。
-  "boolean"：勾选框控件，勾选表示（布尔值）真，不勾选表示（布尔值）假。
-- 交互输入时的控件支持依赖设置：
-  例如以下例子中的```"name": "tradePrice@orderType==1"```设置，使**交易价格**（```tradePrice```）输入控件仅在**下单方式**（orderType）下拉框控件选择为**挂单**时可用。
-- 交互输入时的控件名称支持双语设置。
-  例如以下例子中的"description": "下单方式|order type"设置，使用```|```符号分隔中英文描述内容。
-- group中的```name```、```description```与按钮结构中的```name```、```description```虽然字段名一致，但定义并不相同。
-  group中的```name```与input中的```name```定义也不相同。
-- 分组按钮控件触发后，发送的交互内容格式为：按钮的cmd字段值加group字段相关数据。例如以下例子测试时```Log("cmd:", cmd)```语句输出的内容为：
-  ```cmd: open:{"orderType":1,"tradePrice":99,"orderAmount":"99","boolean":true}```，即发生交互操作时```GetCommand()```函数返回的内容：```open:{"orderType":1,"tradePrice":99,"orderAmount":"99","boolean":true}```。
-- 按钮控件的```type```属性仅支持```"button"```：
-  支持输入数据的按钮控件，即设置了```input```属性的控件，其```input```字段配置信息中的```type```属性支持多种控件类型。
-
-参考以下例子：
-
-```javascript
-function main() {
-    var tbl = {
-        type: "table",
-        title: "Group Button Control Demo",
-        cols: ["Operation"],
-        rows: []
-    }
-
-    // 创建分组按钮控件结构
-    var groupBtn = {
-        type: "button",
-        cmd: "open",
-        name: "Open",
-        group: [
-            {"name": "orderType", "description": "下单方式|order type", "type": "selected", "defValue": "市价单|挂单"},
-            {"name": "tradePrice@orderType==1", "description": "交易价格|trade price", "type": "number", "defValue": 100},
-            {"name": "orderAmount", "description": "委托数量|order amount", "type": "string", "defValue": 100},
-            {"name": "boolean", "description": "是/否|boolean", "type": "boolean", "defValue": true}
-        ]
-    }
-
-    // 测试按钮1
-    var testBtn1 = {"type": "button", "name": "Button 1", "cmd": "button1", "description": "This is the first button"}
-    var testBtn2 = {"type": "button", "name": "Button 2", "cmd": "button2", "description": "This is the second button", "input": {"name": "Quantity", "type": "number", "defValue": 1}}
-
-    // 在tbl中添加groupBtn
-    tbl.rows.push([groupBtn])
-    // 支持状态栏表格的一个单元格内设置多个按钮，即一个单元格内的数据为一个按钮结构数组：[testBtn1, testBtn2]
-    tbl.rows.push([[testBtn1, testBtn2]])
-
-    while (true) {
-        LogStatus("`" + JSON.stringify(tbl) + "`", "\n", "Group button controls can be set directly on the status bar in addition to status bar tables:", "`" + JSON.stringify(groupBtn) + "`")
-        var cmd = GetCommand()
-        if (cmd) {
-            Log("cmd:", cmd)
-        }
-        Sleep(5000)
-    }
-}
-```
-
-```python
-import json
-
-def main():
-    tbl = {
-        "type": "table",
-        "title": "Group Button Control Demo",
-        "cols": ["Operation"],
-        "rows": []
-    }
-
-    groupBtn = {
-        "type": "button",
-        "cmd": "open",
-        "name": "Open",
-        "group": [
-            {"name": "orderType", "description": "下单方式|order type", "type": "selected", "defValue": "市价单|挂单"},
-            {"name": "tradePrice@orderType==1", "description": "交易价格|trade price", "type": "number", "defValue": 100},
-            {"name": "orderAmount", "description": "委托数量|order amount", "type": "string", "defValue": 100},
-            {"name": "boolean", "description": "是/否|boolean", "type": "boolean", "defValue": True}
-        ]
-    }
-
-    testBtn1 = {"type": "button", "name": "Button 1", "cmd": "button1", "description": "This is the first button"}
-    testBtn2 = {"type": "button", "name": "Button 2", "cmd": "button2", "description": "This is the second button", "input": {"name": "Quantity", "type": "number", "defValue": 1}}
-
-    tbl["rows"].append([groupBtn])
-    tbl["rows"].append([[testBtn1, testBtn2]])
-
-    while True:
-        LogStatus("`" + json.dumps(tbl) + "`", "\n", "Group button controls can be set directly on the status bar in addition to status bar tables:", "`" + json.dumps(groupBtn) + "`")
-        cmd = GetCommand()
-        if cmd:
-            Log("cmd:", cmd)
-        Sleep(5000)
-```
-
-```rust
-fn main() {
-    // 创建分组按钮控件结构
-    let group_btn = String::from(r#"{"type": "button", "cmd": "open", "name": "Open", "group": ["#)
-        + r#"{"name": "orderType", "description": "下单方式|order type", "type": "selected", "defValue": "市价单|挂单"},"#
-        + r#"{"name": "tradePrice@orderType==1", "description": "交易价格|trade price", "type": "number", "defValue": 100},"#
-        + r#"{"name": "orderAmount", "description": "委托数量|order amount", "type": "string", "defValue": 100},"#
-        + r#"{"name": "boolean", "description": "是/否|boolean", "type": "boolean", "defValue": true}"#
-        + r#"]}"#;
-
-    // 测试按钮1、测试按钮2
-    let test_btn1 = r#"{"type": "button", "name": "Button 1", "cmd": "button1", "description": "This is the first button"}"#;
-    let test_btn2 = r#"{"type": "button", "name": "Button 2", "cmd": "button2", "description": "This is the second button", "input": {"name": "Quantity", "type": "number", "defValue": 1}}"#;
-
-    // 在tbl中添加groupBtn；支持状态栏表格的一个单元格内设置多个按钮，即一个单元格内的数据为一个按钮结构数组：[testBtn1, testBtn2]
-    let tbl = format!(
-        r#"{{"type": "table", "title": "Group Button Control Demo", "cols": ["Operation"], "rows": [[{}], [[{}, {}]]]}}"#,
-        group_btn, test_btn1, test_btn2
-    );
-
-    loop {
-        LogStatus!(format!("`{}`", tbl), "\n", "Group button controls can be set directly on the status bar in addition to status bar tables:", format!("`{}`", group_btn));
-        if let Some(cmd) = GetCommand(0) {
-            Log!("cmd:", cmd);
-        }
-        Sleep(5000);
-    }
-}
-```
-
-```cpp
-void main() {
-    json tbl = R"({
-        "type": "table",
-        "title": "Group Button Control Demo",
-        "cols": ["Operation"],
-        "rows": []
-    })"_json;
-
-    json groupBtn = R"({
-        "type": "button",
-        "name": "Open",
-        "cmd": "open",
-        "group": [
-            {"name": "orderType", "description": "下单方式|order type", "type": "selected", "defValue": "市价单|挂单"},
-            {"name": "tradePrice@orderType==1", "description": "交易价格|trade price", "type": "number", "defValue": 100},
-            {"name": "orderAmount", "description": "委托数量|order amount", "type": "string", "defValue": 100},
-            {"name": "boolean", "description": "是/否|boolean", "type": "boolean", "defValue": true}
-    ]})"_json;
-
-    json testBtn1 = R"({"type": "button", "name": "Button 1", "cmd": "button1", "description": "This is the first button"})"_json;
-    json testBtn2 = R"({"type": "button", "name": "Button 2", "cmd": "button2", "description": "This is the second button", "input": {"name": "Quantity", "type": "number", "defValue": 1}})"_json;
-
-    tbl["rows"].push_back({groupBtn});
-    tbl["rows"].push_back({{testBtn1, testBtn2}});
-
-    while(true) {
-        LogStatus("`" + tbl.dump() + "`", "\n", "Group button controls can be set directly on the status bar in addition to status bar tables:", "`" + groupBtn.dump() + "`");
-        auto cmd = GetCommand();
-        if(cmd != "") {
-            Log("cmd:", cmd);
-        }
-        Sleep(5000);
-    }
-}
-```
-
-当状态栏分组按钮控件（通过设置```group```字段实现）与状态栏按钮控件（通过设置```input```字段实现）被点击触发交互时（旧版按钮结构），页面弹出的对话框中的下拉框控件同样支持多选。以下示例演示如何设计包含多选选项的下拉框控件：
-
-```javascript
-function main() {
-    // 状态栏按钮控件（通过设置input字段实现）testBtn1按钮所触发的页面中，下拉框控件使用options字段设置选项，并使用defValue字段设置默认选项。区别于本章其它示例中直接使用defValue设置选项的方式。
-    var testBtn1 = {
-        type: "button",
-        name: "testBtn1",
-        cmd: "cmdTestBtn1",
-        input: {name: "testBtn1ComboBox", type: "selected", options: ["A", "B"], defValue: 1}
-    }
-
-    /*
-      状态栏按钮控件（通过设置input字段实现）testBtn2按钮所触发的页面中，下拉框控件使用options字段设置选项。options字段中的选项不仅支持字符串，
-      也支持使用```{text: "描述", value: "值"}```结构。使用defValue字段设置默认选项，默认选项支持多选（通过数组结构实现）。多选时需额外设置multiple字段为真值（true）。
-    */
-    var testBtn2 = {
-        type: "button",
-        name: "testBtn2",
-        cmd: "cmdTestBtn2",
-        input: {
-            name: "testBtn2MultiComboBox",
-            type: "selected",
-            description: "Implement multi-select dropdown",
-            options: [{text: "Option A", value: "A"}, {text: "Option B", value: "B"}, {text: "Option C", value: "C"}],
-            defValue: ["A", "C"],
-            multiple: true
-        }
-    }
-
-    // 状态栏分组按钮控件（通过设置group字段实现）testBtn3按钮所触发的页面中，下拉框控件使用options字段设置选项，也支持直接使用defValue设置选项。
-    var testBtn3 = {
-        type: "button",
-        name: "testBtn3",
-        cmd: "cmdTestBtn3",
-        group: [
-            {name: "comboBox1", label: "labelComboBox1", description: "Dropdown 1", type: "selected", defValue: 1, options: ["A", "B"]},
-            {name: "comboBox2", label: "labelComboBox2", description: "下拉框2", type: "selected", defValue: "A|B"},
-            {name: "comboBox3", label: "labelComboBox3", description: "Dropdown 3", type: "selected", defValue: [0, 2], multiple: true, options: ["A", "B", "C"]},
-            {
-                name: "comboBox4",
-                label: "labelComboBox4",
-                description: "Dropdown 4",
-                type: "selected",
-                defValue: ["A", "C"],
-                multiple: true,
-                options: [{text: "Option A", value: "A"}, {text: "Option B", value: "B"}, {text: "Option C", value: "C"}, {text: "Option D", value: "D"}]
-            }
-        ]
-    }
-    while (true) {
-        LogStatus("`" + JSON.stringify(testBtn1) + "`\n", "`" + JSON.stringify(testBtn2) + "`\n", "`" + JSON.stringify(testBtn3) + "`\n")
-        var cmd = GetCommand()
-        if (cmd) {
-            Log(cmd)
-        }
-        Sleep(5000)
-    }
-}
-```
-
-```python
-import json
-
-def main():
-    testBtn1 = {
-        "type": "button",
-        "name": "testBtn1",
-        "cmd": "cmdTestBtn1",
-        "input": {"name": "testBtn1ComboBox", "type": "selected", "options": ["A", "B"], "defValue": 1}
-    }
-
-    testBtn2 = {
-        "type": "button",
-        "name": "testBtn2",
-        "cmd": "cmdTestBtn2",
-        "input": {
-            "name": "testBtn2MultiComboBox",
-            "type": "selected",
-            "description": "Implement multi-select dropdown",
-            "options": [{"text": "Option A", "value": "A"}, {"text": "Option B", "value": "B"}, {"text": "Option C", "value": "C"}],
-            "defValue": ["A", "C"],
-            "multiple": True
-        }
-    }
-
-    testBtn3 = {
-        "type": "button",
-        "name": "testBtn3",
-        "cmd": "cmdTestBtn3",
-        "group": [
-            {"name": "comboBox1", "label": "labelComboBox1", "description": "Dropdown 1", "type": "selected", "defValue": 1, "options": ["A", "B"]},
-            {"name": "comboBox2", "label": "labelComboBox2", "description": "Dropdown 2", "type": "selected", "defValue": "A|B"},
-            {"name": "comboBox3", "label": "labelComboBox3", "description": "Dropdown 3", "type": "selected", "defValue": [0, 2], "multiple": True, "options": ["A", "B", "C"]},
-            {
-                "name": "comboBox4",
-                "label": "labelComboBox4",
-                "description": "Dropdown 4",
-                "type": "selected",
-                "defValue": ["A", "C"],
-                "multiple": True,
-                "options": [{"text": "Option A", "value": "A"}, {"text": "Option B", "value": "B"}, {"text": "Option C", "value": "C"}, {"text": "Option D", "value": "D"}]
-            }
-        ]
-    }
-
-    while True:
-        LogStatus("`" + json.dumps(testBtn1) + "`\n", "`" + json.dumps(testBtn2) + "`\n", "`" + json.dumps(testBtn3) + "`\n")
-        cmd = GetCommand()
-        if cmd:
-            Log(cmd)
-        Sleep(5000)
-```
-
-```rust
-fn main() {
-    // 状态栏按钮控件（通过设置input字段实现）testBtn1按钮所触发的页面中，下拉框控件使用options字段设置选项，并使用defValue字段设置默认选项。区别于本章其它示例中直接使用defValue设置选项的方式。
-    let test_btn1 = r#"{"type": "button", "name": "testBtn1", "cmd": "cmdTestBtn1", "input": {"name": "testBtn1ComboBox", "type": "selected", "options": ["A", "B"], "defValue": 1}}"#;
-
-    /*
-      状态栏按钮控件（通过设置input字段实现）testBtn2按钮所触发的页面中，下拉框控件使用options字段设置选项。options字段中的选项不仅支持字符串，
-      也支持使用{"text": "描述", "value": "值"}结构。使用defValue字段设置默认选项，默认选项支持多选（通过数组结构实现）。多选时需额外设置multiple字段为真值（true）。
-    */
-    let test_btn2 = String::from(r#"{"type": "button", "name": "testBtn2", "cmd": "cmdTestBtn2", "input": {"#)
-        + r#""name": "testBtn2MultiComboBox", "type": "selected", "description": "Implement multi-select dropdown","#
-        + r#""options": [{"text": "Option A", "value": "A"}, {"text": "Option B", "value": "B"}, {"text": "Option C", "value": "C"}],"#
-        + r#""defValue": ["A", "C"], "multiple": true}}"#;
-
-    // 状态栏分组按钮控件（通过设置group字段实现）testBtn3按钮所触发的页面中，下拉框控件使用options字段设置选项，也支持直接使用defValue设置选项。
-    let test_btn3 = String::from(r#"{"type": "button", "name": "testBtn3", "cmd": "cmdTestBtn3", "group": ["#)
-        + r#"{"name": "comboBox1", "label": "labelComboBox1", "description": "Dropdown 1", "type": "selected", "defValue": 1, "options": ["A", "B"]},"#
-        + r#"{"name": "comboBox2", "label": "labelComboBox2", "description": "下拉框2", "type": "selected", "defValue": "A|B"},"#
-        + r#"{"name": "comboBox3", "label": "labelComboBox3", "description": "Dropdown 3", "type": "selected", "defValue": [0, 2], "multiple": true, "options": ["A", "B", "C"]},"#
-        + r#"{"name": "comboBox4", "label": "labelComboBox4", "description": "Dropdown 4", "type": "selected", "defValue": ["A", "C"], "multiple": true, "options": [{"text": "Option A", "value": "A"}, {"text": "Option B", "value": "B"}, {"text": "Option C", "value": "C"}, {"text": "Option D", "value": "D"}]}"#
-        + r#"]}"#;
-
-    loop {
-        LogStatus!(format!("`{}`\n", test_btn1), format!("`{}`\n", test_btn2), format!("`{}`\n", test_btn3));
-        if let Some(cmd) = GetCommand(0) {
-            Log!(cmd);
-        }
-        Sleep(5000);
-    }
-}
-```
-
-```cpp
-void main() {
-    json testBtn1 = R"({
-        "type": "button",
-        "name": "testBtn1",
-        "cmd": "cmdTestBtn1",
-        "input": {"name": "testBtn1ComboBox", "type": "selected", "options": ["A", "B"], "defValue": 1}
-    })"_json;
-
-    json testBtn2 = R"({
-        "type": "button",
-        "name": "testBtn2",
-        "cmd": "cmdTestBtn2",
-        "input": {
-            "name": "testBtn2MultiComboBox",
-            "type": "selected",
-            "description": "Implement multi-select dropdown",
-            "options": [{"text": "Option A", "value": "A"}, {"text": "Option B", "value": "B"}, {"text": "Option C", "value": "C"}],
-            "defValue": ["A", "C"],
-            "multiple": true
-        }
-    })"_json;
-
-    json testBtn3 = R"({
-        "type": "button",
-        "name": "testBtn3",
-        "cmd": "cmdTestBtn3",
-        "group": [
-            {"name": "comboBox1", "label": "labelComboBox1", "description": "Dropdown 1", "type": "selected", "defValue": 1, "options": ["A", "B"]},
-            {"name": "comboBox2", "label": "labelComboBox2", "description": "Dropdown 2", "type": "selected", "defValue": "A|B"},
-            {"name": "comboBox3", "label": "labelComboBox3", "description": "Dropdown 3", "type": "selected", "defValue": [0, 2], "multiple": true, "options": ["A", "B", "C"]},
-            {
-                "name": "comboBox4",
-                "label": "labelComboBox4",
-                "description": "Dropdown 4",
-                "type": "selected",
-                "defValue": ["A", "C"],
-                "multiple": true,
-                "options": [{"text": "Option A", "value": "A"}, {"text": "Option B", "value": "B"}, {"text": "Option C", "value": "C"}, {"text": "Option D", "value": "D"}]
-            }
-        ]
-    })"_json;
-
-    while (true) {
-        LogStatus("`" + testBtn1.dump() + "`\n", "`" + testBtn2.dump() + "`\n", "`" + testBtn3.dump() + "`\n");
-        auto cmd = GetCommand();
-        if (cmd != "") {
-            Log(cmd);
-        }
-        Sleep(5000);
-    }
-}
-```
-
-基于当前最新的按钮结构，构造状态栏表格中的按钮；点击按钮触发交互时，弹出一个包含多个控件的弹窗。
-
-详细内容可参考：[用户指南-状态栏中的交互控件](https://www.fmz.com/user-guide#%E7%8A%B6%E6%80%81%E6%A0%8F%E4%B8%AD%E7%9A%84%E4%BA%A4%E4%BA%92%E6%8E%A7%E4%BB%B6)。
-
-```javascript
-var symbols = ["BTC_USDT.swap", "ETH_USDT.swap", "LTC_USDT.swap", "BNB_USDT.swap", "SOL_USDT.swap"]
-
-function createBtn(tmp, group) {
-    var btn = JSON.parse(JSON.stringify(tmp))
-
-    _.each(group, function(eleByGroup) {
-        btn["group"].unshift(eleByGroup)
-    })
-
-    return btn
-}
-
-function main() {
-    var arrManager = []
-
-    _.each(symbols, function(symbol) {
-        arrManager.push({
-            "symbol": symbol,
-        })
-    })
-
-    // Btn
-    var tmpBtnOpen = {
-        "type": "button",
-        "cmd": "open",
-        "name": "Open Position",
-        "group": [{
-            "type": "selected",
-            "name": "tradeType",
-            "label": "Order Type",
-            "description": "Market order, Limit order",
-            "default": 0,
-            "group": "Trade Settings",
-            "settings": {
-                "options": ["Market Order", "Limit Order"],
-                "required": true,
-            }
-        }, {
-            "type": "selected",
-            "name": "direction",
-            "label": "Trade Direction",
-            "description": "Buy, Sell",
-            "default": "buy",
-            "group": "Trade Settings",
-            "settings": {
-                "render": "segment",
-                "required": true,
-                "options": [{"name": "Buy", "value": "buy"}, {"name": "Sell", "value": "sell"}],
-            }
-        }, {
-            "type": "number",
-            "name": "price",
-            "label": "Price",
-            "description": "Order price",
-            "group": "Trade Settings",
-            "filter": "tradeType==1",
-            "settings": {
-                "required": true,
-            }
-        }, {
-            "type": "number",
-            "name": "amount",
-            "label": "Order Amount",
-            "description": "Order amount",
-            "group": "Trade Settings",
-            "settings": {
-                "required": true,
-            }
-        }],
-    }
-
-    while (true) {
-        var tbl = {"type": "table", "title": "dashboard", "cols": ["symbol", "actionOpen"], "rows": []}
-
-        _.each(arrManager, function(m) {
-            var btnOpen = createBtn(tmpBtnOpen, [{"type": "string", "name": "symbol", "label": "Symbol", "default": m["symbol"], "settings": {"required": true}}])
-            tbl["rows"].push([m["symbol"], btnOpen])
-        })
-
-        var cmd = GetCommand()
-        if (cmd) {
-            Log("Received interaction:", cmd)
-
-            // 解析交互消息: open:{"symbol":"LTC_USDT.swap","tradeType":0,"direction":"buy","amount":111}
-            // 根据第一个冒号:之前的指令判断是哪种按钮模板触发的消息
-            var arrCmd = cmd.split(":", 2)
-            if (arrCmd[0] == "open") {
-                var msg = JSON.parse(cmd.slice(5))
-                Log("Symbol:", msg["symbol"], ", Direction:", msg["direction"], ", Order type:", msg["tradeType"] == 0 ? "Market order" : "Limit order", msg["tradeType"] == 0 ? ", Price: Current market price" : ", Price:" + msg["price"], ", Amount:", msg["amount"])
-            }
-        }
-
-        LogStatus(_D(), "\n", "`" + JSON.stringify(tbl) + "`")
-        Sleep(1000)
-    }
-}
-```
-
-```python
-import json
-
-symbols = ["BTC_USDT.swap", "ETH_USDT.swap", "LTC_USDT.swap", "BNB_USDT.swap", "SOL_USDT.swap"]
-
-def createBtn(tmp, group):
-    btn = json.loads(json.dumps(tmp))
-    for eleByGroup in group:
-        btn["group"].insert(0, eleByGroup)
-    return btn
-
-def main():
-    arrManager = []
-
-    for symbol in symbols:
-        arrManager.append({"symbol": symbol})
-
-    # Btn
-    tmpBtnOpen = {
-        "type": "button",
-        "cmd": "open",
-        "name": "Open Position",
-        "group": [{
-            "type": "selected",
-            "name": "tradeType",
-            "label": "Order Type",
-            "description": "Market order, Limit order",
-            "default": 0,
-            "group": "Trade Settings",
-            "settings": {
-                "options": ["Market Order", "Limit Order"],
-                "required": True,
-            }
-        }, {
-            "type": "selected",
-            "name": "direction",
-            "label": "Trade Direction",
-            "description": "Buy, Sell",
-            "default": "buy",
-            "group": "Trade Settings",
-            "settings": {
-                "render": "segment",
-                "required": True,
-                "options": [{"name": "Buy", "value": "buy"}, {"name": "Sell", "value": "sell"}],
-            }
-        }, {
-            "type": "number",
-            "name": "price",
-            "label": "Price",
-            "description": "Order price",
-            "group": "Trade Settings",
-            "filter": "tradeType==1",
-            "settings": {
-                "required": True,
-            }
-        }, {
-            "type": "number",
-            "name": "amount",
-            "label": "Order Amount",
-            "description": "Order amount",
-            "group": "Trade Settings",
-            "settings": {
-                "required": True,
-            }
-        }],
-    }
-
-    while True:
-        tbl = {"type": "table", "title": "dashboard", "cols": ["symbol", "actionOpen"], "rows": []}
-        for m in arrManager:
-            btnOpen = createBtn(tmpBtnOpen, [{"type": "string", "name": "symbol", "label": "Symbol", "default": m["symbol"], "settings": {"required": True}}])
-            tbl["rows"].append([m["symbol"], btnOpen])
-
-        cmd = GetCommand()
-
-        if cmd != "" and cmd != None:
-            Log("Received interaction:", cmd)
-
-            # 解析交互消息: open:{"symbol":"LTC_USDT.swap","tradeType":0,"direction":"buy","amount":111}
-            # 根据第一个冒号:之前的指令判断是哪种按钮模板触发的消息
-            arrCmd = cmd.split(":")
-            if arrCmd[0] == "open":
-                msg = json.loads(cmd[5:])
-                Log("Symbol:", msg["symbol"], ", Direction:", msg["direction"], ", Order type:", "Market order" if msg["tradeType"] == 0 else "Limit order", ", Price: Current market price" if msg["tradeType"] == 0 else ", Price:" + str(msg["price"]), ", Amount:", msg["amount"])
-
-        # 输出状态栏信息
-        LogStatus(_D(), "\n", "`" + json.dumps(tbl) + "`")
-        Sleep(1000)
-```
-
-```rust
-fn main() {
-    let symbols = ["BTC_USDT.swap", "ETH_USDT.swap", "LTC_USDT.swap", "BNB_USDT.swap", "SOL_USDT.swap"];
-
-    // Btn：按钮模板，"group"的第一个元素为交易品种控件，__SYMBOL__为占位符，构造按钮时替换
-    let tmp_btn_open = String::from(r#"{"type": "button", "cmd": "open", "name": "Open Position", "group": ["#)
-        + r#"{"type": "string", "name": "symbol", "label": "Symbol", "default": "__SYMBOL__", "settings": {"required": true}},"#
-        + r#"{"type": "selected", "name": "tradeType", "label": "Order Type", "description": "Market order, Limit order", "default": 0, "group": "Trade Settings", "settings": {"options": ["Market Order", "Limit Order"], "required": true}},"#
-        + r#"{"type": "selected", "name": "direction", "label": "Trade Direction", "description": "Buy, Sell", "default": "buy", "group": "Trade Settings", "settings": {"render": "segment", "required": true, "options": [{"name": "Buy", "value": "buy"}, {"name": "Sell", "value": "sell"}]}},"#
-        + r#"{"type": "number", "name": "price", "label": "Price", "description": "Order price", "group": "Trade Settings", "filter": "tradeType==1", "settings": {"required": true}},"#
-        + r#"{"type": "number", "name": "amount", "label": "Order Amount", "description": "Order amount", "group": "Trade Settings", "settings": {"required": true}}"#
-        + r#"]}"#;
-
-    loop {
-        let mut rows: Vec<String> = Vec::new();
-        for symbol in &symbols {
-            let btn_open = tmp_btn_open.replace("__SYMBOL__", symbol);
-            rows.push(format!(r#"["{}", {}]"#, symbol, btn_open));
-        }
-        let tbl = format!(r#"{{"type": "table", "title": "dashboard", "cols": ["symbol", "actionOpen"], "rows": [{}]}}"#, rows.join(","));
-
-        if let Some(cmd) = GetCommand(0) {
-            Log!("Received interaction:", &cmd);
-
-            // 解析交互消息: open:{"symbol":"LTC_USDT.swap","tradeType":0,"direction":"buy","amount":111}
-            // 根据第一个冒号:之前的指令判断是哪种按钮模板触发的消息
-            if cmd.starts_with("open:") {
-                let msg = JSONParse(&cmd[5..]).unwrap();
-                let trade_type = msg["tradeType"].as_i64().unwrap_or(0);
-                Log!("Symbol:", msg["symbol"].as_str().unwrap_or(""),
-                    ", Direction:", msg["direction"].as_str().unwrap_or(""),
-                    ", Order type:", if trade_type == 0 { "Market order" } else { "Limit order" },
-                    if trade_type == 0 { ", Price: Current market price".to_string() } else { format!(", Price:{}", msg["price"].as_f64().unwrap_or(0.0)) },
-                    ", Amount:", msg["amount"].as_f64().unwrap_or(0.0));
-            }
-        }
-
-        LogStatus!(_D(None), "\n", format!("`{}`", tbl));
-        Sleep(1000);
-    }
-}
-```
-
-```cpp
-// 略...
-```
-
-横向合并```LogStatus()```函数绘制的表格中的单元格：
-
-```javascript
-function main() {
-    var table = {
-        type: 'table',
-        title: 'Position Operation',
-        cols: ['Column 1', 'Column 2', 'Action'],
-        rows: [
-            ['abc', 'def', {'type':'button', 'cmd': 'coverAll', 'name': 'Close'}]
-        ]
-    }
-    var ticker = exchange.GetTicker()
-    // 添加一行数据，将第一个和第二个单元格合并，并在合并后的单元格内输出 ticker 变量
-    table.rows.push([{body : JSON.stringify(ticker), colspan : 2}, "abc"])
-    LogStatus('`' + JSON.stringify(table) + '`')
-}
-```
-
-```python
-import json
-def main():
-    table = {
-        "type" : "table",
-        "title" : "Position Operation",
-        "cols" : ["Column 1", "Column 2", "Action"],
-        "rows" : [
-            ["abc", "def", {"type": "button", "cmd": "coverAll", "name": "Close"}]
-        ]
-    }
-    ticker = exchange.GetTicker()
-    table["rows"].append([{"body": json.dumps(ticker), "colspan": 2}, "abc"])
-    LogStatus("`" + json.dumps(table) + "`")
-```
-
-```rust
-fn main() {
-    let table_tpl = String::from(r#"{"type": "table", "title": "Position Operation", "cols": ["Column 1", "Column 2", "Action"], "rows": ["#)
-        + r#"["abc", "def", {"type": "button", "cmd": "coverAll", "name": "Close"}],"#
-        + r#"__ROW2__"#
-        + r#"]}"#;
-
-    let ticker = exchange.GetTicker(None).unwrap();
-    let json_ticker = format!(
-        r#"{{"Buy": {}, "Sell": {}, "High": {}, "Low": {}, "Volume": {}, "Last": {}, "Time": {}}}"#,
-        ticker.Buy, ticker.Sell, ticker.High, ticker.Low, ticker.Volume, ticker.Last, ticker.Time
-    );
-    // 添加一行数据，将第一个和第二个单元格合并，并在合并后的单元格内输出 ticker 数据
-    // body 为字符串（对应 JS 的 JSON.stringify(ticker)），内部引号需转义后嵌入 JSON
-    let row2 = format!(r#"[{{"body": "{}", "colspan": 2}}, "abc"]"#, json_ticker.replace('"', "\\\""));
-    let table = table_tpl.replace("__ROW2__", &row2);
-    LogStatus!(format!("`{}`", table));
-}
-```
-
-```cpp
-void main() {
-    json table = R"({
-        "type" : "table",
-        "title" : "Position Operation",
-        "cols" : ["Column 1", "Column 2", "Action"],
-        "rows" : [
-            ["abc", "def", {"type": "button", "cmd": "coverAll", "name": "Close"}]
-        ]
-    })"_json;
-
-    auto ticker = exchange.GetTicker();
-    json jsonTicker = R"({"Buy": 0, "Sell": 0, "High": 0, "Low": 0, "Volume": 0, "Last": 0, "Time": 0})"_json;
-    jsonTicker["Buy"] = ticker.Buy;
-    jsonTicker["Sell"] = ticker.Sell;
-    jsonTicker["Last"] = ticker.Last;
-    jsonTicker["Volume"] = ticker.Volume;
-    jsonTicker["Time"] = ticker.Time;
-    jsonTicker["High"] = ticker.High;
-    jsonTicker["Low"] = ticker.Low;
-
-    json arr = R"([{"body": {}, "colspan": 2}, "abc"])"_json;
-    arr[0]["body"] = jsonTicker;
-    table["rows"].push_back(arr);
-    LogStatus("`" + table.dump() + "`");
-}
-```
-
-纵向合并 ```LogStatus()``` 函数绘制的表格中的单元格：
-
-```javascript
-function main() {
-    var table = {
-        type: 'table',
-        title: 'Table Demo',
-        cols: ['Column A', 'Column B', 'Column C'],
-        rows: [
-            ['A1', 'B1', {'type':'button', 'cmd': 'coverAll', 'name': 'C1'}]
-        ]
-    }
-
-    var ticker = exchange.GetTicker()
-    var name = exchange.GetName()
-
-    table.rows.push([{body : "A2 + B2:" + JSON.stringify(ticker), colspan : 2}, "C2"])
-    table.rows.push([{body : "A3 + A4 + A5:" + name, rowspan : 3}, "B3", "C3"])
-    // A3 被上一行的第一个单元格合并
-    table.rows.push(["B4", "C4"])
-    // A2 被上一行的第一个单元格合并
-    table.rows.push(["B5", "C5"])
-    table.rows.push(["A6", "B6", "C6"])
-    LogStatus('`' + JSON.stringify(table) + '`')
-}
-```
-
-```python
-import json
-def main():
-    table = {
-        "type" : "table",
-        "title" : "Table Demo",
-        "cols" : ["Column A", "Column B", "Column C"],
-        "rows" : [
-            ["A1", "B1", {"type": "button", "cmd": "coverAll", "name": "C1"}]
-        ]
-    }
-
-    ticker = exchange.GetTicker()
-    name = exchange.GetName()
-
-    table["rows"].append([{"body": "A2 + B2:" + json.dumps(ticker), "colspan": 2}, "C2"])
-    table["rows"].append([{"body": "A3 + A4 + A5:" + name, "rowspan": 3}, "B3", "C3"])
-    table["rows"].append(["B4", "C4"])
-    table["rows"].append(["B5", "C5"])
-    table["rows"].append(["A6", "B6", "C6"])
-    LogStatus("`" + json.dumps(table) + "`")
-```
-
-```rust
-fn main() {
-    // 为便于测试，此处使用构造的数据以保持代码简短易读
-    let json_ticker = r#"{"High": 0, "Low": 0, "Buy": 0, "Sell": 0, "Last": 0, "Time": 0, "Volume": 0}"#;
-    let name = exchange.GetName();
-
-    let mut rows: Vec<String> = Vec::new();
-    rows.push(String::from(r#"["A1", "B1", {"type": "button", "cmd": "coverAll", "name": "C1"}]"#));
-    // body 为字符串，其内部的引号需要转义后才能嵌入 JSON
-    let body = format!("A2 + B2:{}", json_ticker).replace('"', "\\\"");
-    rows.push(format!(r#"[{{"body": "{}", "colspan": 2}}, "C2"]"#, body));
-    rows.push(format!(r#"[{{"body": "A3 + A4 + A5:{}", "rowspan": 3}}, "B3", "C3"]"#, name));
-    // A3 被上一行的第一个单元格合并
-    rows.push(String::from(r#"["B4", "C4"]"#));
-    // A2 被上一行的第一个单元格合并
-    rows.push(String::from(r#"["B5", "C5"]"#));
-    rows.push(String::from(r#"["A6", "B6", "C6"]"#));
-
-    let table = format!(r#"{{"type": "table", "title": "Table Demo", "cols": ["Column A", "Column B", "Column C"], "rows": [{}]}}"#, rows.join(","));
-    LogStatus!(format!("`{}`", table));
-}
-```
-
-```cpp
-void main() {
-    json table = R"({
-        "type" : "table",
-        "title" : "Table Demo",
-        "cols" : ["Column A", "Column B", "Column C"],
-        "rows" : [
-            ["A1", "B1", {"type": "button", "cmd": "coverAll", "name": "C1"}]
-        ]
-    })"_json;
-    // 为便于测试，此处使用构造的数据以保持代码简短易读
-    json jsonTicker = R"({"High": 0, "Low": 0, "Buy": 0, "Sell": 0, "Last": 0, "Time": 0, "Volume": 0})"_json;
-    auto name = exchange.GetName();
-    json arr1 = R"([{"body": "", "colspan": 2}, "C2"])"_json;
-    arr1[0]["body"] = "A2 + B2:" + jsonTicker.dump();
-    json arr2 = R"([{"body": "", "rowspan": 3}, "B3", "C3"])"_json;
-    arr2[0]["body"] = "A3 + A4 + A5:" + name;
-    table["rows"].push_back(arr1);
-    table["rows"].push_back(arr2);
-    table["rows"].push_back(R"(["B4", "C4"])"_json);
-    table["rows"].push_back(R"(["B5", "C5"])"_json);
-    table["rows"].push_back(R"(["A6", "B6", "C6"])"_json);
-    LogStatus("`" + table.dump() + "`");
-}
-```
-
-状态栏中分页显示表格：
-
-```javascript
-function main() {
-    var table1 = {type: 'table', title: 'table1', cols: ['Column 1', 'Column 2'], rows: [ ['abc', 'def'], ['ABC', 'support color #ff0000']]}
-    var table2 = {type: 'table', title: 'table2', cols: ['Column 1', 'Column 2'], rows: [ ['abc', 'def'], ['ABC', 'support color #ff0000']]}
-    LogStatus('`' + JSON.stringify([table1, table2]) + '`')
-}
-```
-
-```python
-import json
-def main():
-    table1 = {"type": "table", "title": "table1", "cols": ["Column 1", "Column 2"], "rows": [ ["abc", "def"], ["ABC", "support color #ff0000"]]}
-    table2 = {"type": "table", "title": "table2", "cols": ["Column 1", "Column 2"], "rows": [ ["abc", "def"], ["ABC", "support color #ff0000"]]}
-    LogStatus("`" + json.dumps([table1, table2]) + "`")
-```
-
-```rust
-fn main() {
-    let table1 = r#"{"type": "table", "title": "table1", "cols": ["Column 1", "Column 2"], "rows": [["abc", "def"], ["ABC", "support color #ff0000"]]}"#;
-    let table2 = r#"{"type": "table", "title": "table2", "cols": ["Column 1", "Column 2"], "rows": [["abc", "def"], ["ABC", "support color #ff0000"]]}"#;
-    LogStatus!(format!("`[{},{}]`", table1, table2));
-}
-```
-
-```cpp
-void main() {
-    json table1 = R"({"type": "table", "title": "table1", "cols": ["Column 1", "Column 2"], "rows": [ ["abc", "def"], ["ABC", "support color #ff0000"]]})"_json;
-    json table2 = R"({"type": "table", "title": "table2", "cols": ["Column 1", "Column 2"], "rows": [ ["abc", "def"], ["ABC", "support color #ff0000"]]})"_json;
-    json arr = R"([])"_json;
-    arr.push_back(table1);
-    arr.push_back(table2);
-    LogStatus("`" + arr.dump() + "`");
-}
-```
-
-除了可以分页显示表格之外，还可以将多个表格自上而下排列显示：
-
-```javascript
-function main(){
-    var tab1 = {
-        type : "table",
-        title : "Table 1",
-        cols : ["1", "2"],
-        rows : []
-    }
-    var tab2 = {
-        type : "table",
-        title : "Table 2",
-        cols : ["1", "2", "3"],
-        rows : []
-    }
-    var tab3 = {
-        type : "table",
-        title : "Table 3",
-        cols : ["A", "B", "C"],
-        rows : []
-    }
-
-    tab1.rows.push(["jack", "lucy"])
-    tab2.rows.push(["A", "B", "C"])
-    tab3.rows.push(["A", "B", "C"])
-
-    LogStatus('`' + JSON.stringify(tab1) + '`\n' +
-        '`' + JSON.stringify(tab2) + '`\n' +
-        '`' + JSON.stringify(tab3) + '`')
-
-    Log("exit")
-}
-```
-
-```python
-import json
-def main():
-    tab1 = {
-        "type": "table",
-        "title": "Table 1",
-        "cols": ["1", "2"],
-        "rows": []
-    }
-    tab2 = {
-        "type": "table",
-        "title": "Table 2",
-        "cols": ["1", "2", "3"],
-        "rows": []
-    }
-    tab3 = {
-        "type": "table",
-        "title": "Table 3",
-        "cols": ["A", "B", "C"],
-        "rows": []
-    }
-
-    tab1["rows"].append(["jack", "lucy"])
-    tab2["rows"].append(["A", "B", "C"])
-    tab3["rows"].append(["A", "B", "C"])
-    LogStatus("`" + json.dumps(tab1) + "`\n" +
-        "`" + json.dumps(tab2) + "`\n" +
-        "`" + json.dumps(tab3) + "`")
-```
-
-```rust
-fn main() {
-    // Rust 中直接把行数据写入JSON字符串中
-    let tab1 = r#"{"type": "table", "title": "Table 1", "cols": ["1", "2"], "rows": [["jack", "lucy"]]}"#;
-    let tab2 = r#"{"type": "table", "title": "Table 2", "cols": ["1", "2", "3"], "rows": [["A", "B", "C"]]}"#;
-    let tab3 = r#"{"type": "table", "title": "Table 3", "cols": ["A", "B", "C"], "rows": [["A", "B", "C"]]}"#;
-
-    LogStatus!(format!("`{}`\n`{}`\n`{}`", tab1, tab2, tab3));
-
-    Log!("exit");
-}
-```
-
-```cpp
-void main() {
-    json tab1 = R"({
-        "type": "table",
-        "title": "Table 1",
-        "cols": ["1", "2"],
-        "rows": []
-    })"_json;
-    json tab2 = R"({
-        "type": "table",
-        "title": "Table 2",
-        "cols": ["1", "2", "3"],
-        "rows": []
-    })"_json;
-    json tab3 = R"({
-        "type": "table",
-        "title": "Table 3",
-        "cols": ["A", "B", "C"],
-        "rows": []
-    })"_json;
-    tab1["rows"].push_back(R"(["jack", "lucy"])"_json);
-    tab2["rows"].push_back(R"(["A", "B", "C"])"_json);
-    tab3["rows"].push_back(R"(["A", "B", "C"])"_json);
-    LogStatus("`" + tab1.dump() + "`\n" +
-        "`" + tab2.dump() + "`\n" +
-        "`" + tab3.dump() + "`");
-}
-```
-
-支持设置状态栏表格的横向和纵向滚动模式。将```scroll```属性设置为```"auto"```后，当状态栏表格的纵向行数超过 20 行时，内容将自动滚动显示；当横向列数超出页面显示范围时，则进行横向滚动显示。使用```scroll```属性可以缓解实盘运行时因状态栏写入大量数据而导致的卡顿问题。
-
-参考以下测试例子：
-
-```javascript
-function main() {
-    var tbl = {
-        type : "table",
-        title : "test scroll",
-        scroll : "auto",
-        cols : ["col 0", "col 1", "col 2", "col 3", "col 4", "col 5", "col 6", "col 7", "col 8", "col 9", "col 10",
-            "col 11", "col 12", "col 13", "col 14", "col 15", "col 16", "col 17", "col 18", "col 19", "col 20"],
-        rows : []
-    }
-
-    for (var i = 1 ; i < 100 ; i++) {
-        tbl.rows.push([i, "1," + i, "2," + i, "3," + i, "4," + i, "5," + i, "6," + i, "7," + i, "8," + i, "9," + i, "10," + i,
-            "11," + i, "12," + i, "13," + i, "14," + i, "15," + i, "16," + i, "17," + i, "18," + i, "19," + i, "20," + i])
-    }
-
-    LogStatus("`" + JSON.stringify(tbl) + "`")
-}
-```
-
-```python
-import json
-
-def main():
-    tbl = {
-        "type" : "table",
-        "title" : "test scroll",
-        "scroll" : "auto",
-        "cols" : ["col 0", "col 1", "col 2", "col 3", "col 4", "col 5", "col 6", "col 7", "col 8", "col 9", "col 10",
-            "col 11", "col 12", "col 13", "col 14", "col 15", "col 16", "col 17", "col 18", "col 19", "col 20"],
-        "rows" : []
-    }
-
-    for index in range(1, 100):
-        i = str(index)
-        tbl["rows"].append([i, "1," + i, "2," + i, "3," + i, "4," + i, "5," + i, "6," + i, "7," + i, "8," + i, "9," + i, "10," + i,
-            "11," + i, "12," + i, "13," + i, "14," + i, "15," + i, "16," + i, "17," + i, "18," + i, "19," + i, "20," + i])
-
-    LogStatus("`" + json.dumps(tbl) + "`")
-```
-
-```rust
-fn main() {
-    let tbl_tpl = String::from(r#"{"type": "table", "title": "test scroll", "scroll": "auto", "cols": ["#)
-        + r#""col 0", "col 1", "col 2", "col 3", "col 4", "col 5", "col 6", "col 7", "col 8", "col 9", "col 10","#
-        + r#""col 11", "col 12", "col 13", "col 14", "col 15", "col 16", "col 17", "col 18", "col 19", "col 20""#
-        + r#"], "rows": [__ROWS__]}"#;
-
-    let mut rows: Vec<String> = Vec::new();
-    for index in 1..100 {
-        let i = index.to_string();
-        rows.push(format!(
-            r#"[{}, "1,{}", "2,{}", "3,{}", "4,{}", "5,{}", "6,{}", "7,{}", "8,{}", "9,{}", "10,{}", "11,{}", "12,{}", "13,{}", "14,{}", "15,{}", "16,{}", "17,{}", "18,{}", "19,{}", "20,{}"]"#,
-            i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, i
-        ));
-    }
-
-    let tbl = tbl_tpl.replace("__ROWS__", &rows.join(","));
-    LogStatus!(format!("`{}`", tbl));
-}
-```
-
-```cpp
-void main() {
-    json table = R"({
-        "type" : "table",
-        "title" : "test scroll",
-        "scroll" : "auto",
-        "cols" : ["col 0", "col 1", "col 2", "col 3", "col 4", "col 5", "col 6", "col 7", "col 8", "col 9", "col 10",
-            "col 11", "col 12", "col 13", "col 14", "col 15", "col 16", "col 17", "col 18", "col 19", "col 20"],
-        "rows" : []
-    })"_json;
-
-    for (int index = 1; index < 100; ++index) {
-        std::string i = std::to_string(index);
-        table["rows"].push_back({i, "1," + i, "2," + i, "3," + i, "4," + i, "5," + i, "6," + i, "7," + i, "8," + i, "9," + i, "10," + i,
-            "11," + i, "12," + i, "13," + i, "14," + i, "15," + i, "16," + i, "17," + i, "18," + i, "19," + i, "20," + i});
-    }
-
-    LogStatus("`" + table.dump() + "`");
-}
-```
-
-实盘运行时，```LogStatus()```函数输出的信息不会保存到实盘数据库，仅更新当前实盘的状态栏内容。
-
-```LogStatus()```函数支持打印```base64```编码后的图片，图片字符串以``` ` ```开头，以``` ` ```结尾。例如： ```LogStatus("`data:image/png;base64,AAAA`")```。
-
-```LogStatus()```函数支持直接传入```Python```的```matplotlib.pyplot```对象。只要对象包含```savefig```方法，即可作为参数传入```LogStatus()```函数，例如：
-
-```python
-import matplotlib.pyplot as plt
-
-def main():
-    plt.plot([3,6,2,4,7,1])
-    LogStatus(plt)
-```
-
-策略实盘运行时，在实盘页面翻看历史记录时，状态栏会进入休眠状态，停止更新；只有当日志处于第一页时，状态栏数据才会刷新。状态栏支持输出```base64```编码后的图片，也支持在状态栏显示的表格中输出```base64```编码后的图片。由于编码后的图片字符串数据通常很长，因此此处不再展示示例代码。
-
-See also: `GetCommand`
-
-#### EnableLog
-
-```
-EnableLog(enable)
-```
-
-启用或禁用订单信息的日志记录。
-
-Parameters:
-
-- `enable` (bool, required): 当```enable```参数设置为假值（例如```false```）时，将不打印订单日志（即```exchange.Buy()```等函数产生的日志），也不会写入实盘的数据库。
-
-```javascript
-function main() {
-    EnableLog(false)
-}
-```
-
-```python
-def main():
-    EnableLog(False)
-```
-
-```rust
-fn main() {
-    EnableLog(false);
-}
-```
-
-```cpp
-void main() {
-    EnableLog(false);
-}
-```
-
-See also: `exchange.Buy`, `exchange.Sell`, `exchange.CancelOrder`
-
-#### Chart
-
-```
-Chart(options)
-```
-
-自定义图表绘图函数。
-
-Parameters:
-
-- `options` (object / object数组, required): ```options```参数为图表配置。```Chart()```函数的参数```options```是可以进行```JSON```序列化的```HighStocks```的```Highcharts.StockChart```参数，相比原生参数增加了一个```__isStock```属性。如果将```__isStock```属性设置为假值（例如```false```），则显示为普通图表，即使用```Highcharts```图表；如果将```__isStock```属性设置为真值（例如```true```），则使用```Highstocks```图表（默认```__isStock```为真值，例如```true```）。详情可查询[HighStocks图表库](http://api.highcharts.com/highstock)。
-
-Returns (object): 图表对象。
-
-多图表绘制配置说明：
-- ```extension.layout``` 属性
-  当此属性设置为 "single" 时，该图表不会与其他图表叠加显示（即不以分页标签方式呈现），而是单独平铺显示。
-- ```extension.height``` 属性
-  此属性用于设置图表的高度，取值可以为数值类型，也可以采用 "300px" 的形式设置。
-- ```extension.col``` 属性
-  此属性用于设置图表的宽度。页面宽度共划分为 12 个单元，设置为 8 即表示该图表占用 8 个单元的宽度。
-
-```javascript
-function main() {
-    var cfgA = {
-        extension: {
-            layout: 'single', // 不参与分组，单独显示，默认为分组 'group'
-            height: 300, // 指定高度
-        },
-        title: {
-            text: 'Order Book Chart'
-        },
-        xAxis: {
-            type: 'datetime'
-        },
-        series: [{
-            name: 'Bid 1',
-            data: [],
-        }, {
-            name: 'Ask 1',
-            data: [],
-        }]
-    }
-    var cfgB = {
-        title: {
-            text: 'Spread Chart'
-        },
-        xAxis: {
-            type: 'datetime'
-        },
-        series: [{
-            name: 'Spread',
-            type: 'column',
-            data: [],
-        }]
-    }
-
-    var cfgC = {
-        __isStock: false,
-        title: {
-            text: 'Pie Chart'
-        },
-        series: [{
-            type: 'pie',
-            name: 'one',
-            data: [
-                ["A", 25],
-                ["B", 25],
-                ["C", 25],
-                ["D", 25],
-            ]  // 指定初始数据后无需使用 add 函数更新，直接修改图表配置即可更新数据序列。
-        }]
-    };
-    var cfgD = {
-        extension: {
-            layout: 'single',
-            col: 8, // 指定宽度所占的单元数，总单元数为 12
-            height: '300px',
-        },
-        title: {
-            text: 'Order Book Chart'
-        },
-        xAxis: {
-            type: 'datetime'
-        },
-        series: [{
-            name: 'Bid 1',
-            data: [],
-        }, {
-            name: 'Ask 1',
-            data: [],
-        }]
-    }
-    var cfgE = {
-        __isStock: false,
-        extension: {
-            layout: 'single',
-            col: 4,
-            height: '300px',
-        },
-        title: {
-            text: 'Pie Chart 2'
-        },
-        series: [{
-            type: 'pie',
-            name: 'one',
-            data: [
-                ["A", 25],
-                ["B", 25],
-                ["C", 25],
-                ["D", 25],
-            ]
-        }]
-    };
-
-    var chart = Chart([cfgA, cfgB, cfgC, cfgD, cfgE]);
-    chart.reset()
-        // 为饼图追加一个数据点，add 只能更新通过 add 方式添加的数据点，内置的数据点无法在后期更新
-    chart.add(3, {
-        name: "ZZ",
-        y: Math.random() * 100
-    });
-    while (true) {
-        Sleep(1000)
-        var ticker = exchange.GetTicker()
-        if (!ticker) {
-            continue;
-        }
-        var diff = ticker.Sell - ticker.Buy
-        cfgA.subtitle = {
-            text: 'Bid ' + ticker.Buy + ', Ask ' + ticker.Sell,
-        };
-        cfgB.subtitle = {
-            text: 'Spread ' + diff,
-        };
-
-        chart.add([0, [new Date().getTime(), ticker.Buy]]);
-        chart.add([1, [new Date().getTime(), ticker.Sell]]);
-        // 相当于更新第二个图表的第一个数据序列
-        chart.add([2, [new Date().getTime(), diff]]);
-        chart.add(4, [new Date().getTime(), ticker.Buy]);
-        chart.add(5, [new Date().getTime(), ticker.Buy]);
-        cfgC.series[0].data[0][1] = Math.random() * 100;
-        cfgE.series[0].data[0][1] = Math.random() * 100;
-        // update 实际上等同于重置图表的配置
-        chart.update([cfgA, cfgB, cfgC, cfgD, cfgE]);
-    }
-}
-```
-
-```python
-import random
-import time
-def main():
-    cfgA = {
-        "extension" : {
-            "layout" : "single",
-            "height" : 300,
-            "col" : 8
-        },
-        "title" : {
-            "text" : "Order Book Chart"
-        },
-        "xAxis" : {
-            "type" : "datetime"
-        },
-        "series" : [{
-            "name" : "Bid 1",
-            "data" : []
-        }, {
-            "name" : "Ask 1",
-            "data" : []
-        }]
-    }
-
-    cfgB = {
-        "title" : {
-            "text" : "Spread Chart"
-        },
-        "xAxis" : {
-            "type" : "datetime",
-        },
-        "series" : [{
-            "name" : "Spread",
-            "type" : "column",
-            "data" : []
-        }]
-    }
-
-    cfgC = {
-        "__isStock" : False,
-        "title" : {
-            "text" : "Pie Chart"
-        },
-        "series" : [{
-            "type" : "pie",
-            "name" : "one",
-            "data" : [
-                ["A", 25],
-                ["B", 25],
-                ["C", 25],
-                ["D", 25],
-            ]
-        }]
-    }
-
-    cfgD = {
-        "extension" : {
-            "layout" : "single",
-            "col" : 8,
-            "height" : "300px"
-        },
-        "title" : {
-            "text" : "Order Book Chart"
-        },
-        "series" : [{
-            "name" : "Bid 1",
-            "data" : []
-        }, {
-            "name" : "Ask 1",
-            "data" : []
-        }]
-    }
-
-    cfgE = {
-        "__isStock" : False,
-        "extension" : {
-            "layout" : "single",
-            "col" : 4,
-            "height" : "300px"
-        },
-        "title" : {
-            "text" : "Pie Chart 2"
-        },
-        "series" : [{
-            "type" : "pie",
-            "name" : "one",
-            "data" : [
-                ["A", 25],
-                ["B", 25],
-                ["C", 25],
-                ["D", 25]
-            ]
-        }]
-    }
-
-    chart = Chart([cfgA, cfgB, cfgC, cfgD, cfgE])
-    chart.reset()
-    chart.add(3, {
-        "name" : "ZZ",
-        "y" : random.random() * 100
-    })
-
-    while True:
-        Sleep(1000)
-        ticker = exchange.GetTicker()
-        if not ticker :
-            continue
-        diff = ticker["Sell"] - ticker["Buy"]
-        cfgA["subtitle"] = {
-            "text" : "Bid " + str(ticker["Buy"]) + " Ask " + str(ticker["Sell"])
-        }
-        cfgB["subtitle"] = {
-            "text" : "Spread " + str(diff)
-        }
-
-        chart.add(0, [time.time() * 1000, ticker["Buy"]])
-        chart.add(1, [time.time() * 1000, ticker["Sell"]])
-        chart.add(2, [time.time() * 1000, diff])
-        chart.add(4, [time.time() * 1000, ticker["Buy"]])
-        chart.add(5, [time.time() * 1000, ticker["Buy"]])
-        cfgC["series"][0]["data"][0][1] = random.random() * 100
-        cfgE["series"][0]["data"][0][1] = random.random() * 100
-```
-
-```rust
-fn main() {
-    // Rust 中图表配置为 JSON 字符串，可变部分使用占位符表示，更新时替换占位符以重新构建配置
-    let cfg_a_tpl = r#"{
-        "extension": {
-            "layout": "single",
-            "height": 300
-        },
-        "title": {"text": "Order Book Chart"},
-        "subtitle": {"text": "__SUBTITLE__"},
-        "xAxis": {"type": "datetime"},
-        "series": [{"name": "Bid 1", "data": []}, {"name": "Ask 1", "data": []}]
-    }"#;
-    let cfg_b_tpl = r#"{
-        "title": {"text": "Spread Chart"},
-        "subtitle": {"text": "__SUBTITLE__"},
-        "xAxis": {"type": "datetime"},
-        "series": [{"name": "Spread", "type": "column", "data": []}]
-    }"#;
-    let cfg_c_tpl = r#"{
-        "__isStock": false,
-        "title": {"text": "Pie Chart"},
-        "series": [{
-            "type": "pie",
-            "name": "one",
-            "data": [["A", __Y__], ["B", 25], ["C", 25], ["D", 25]]
-        }]
-    }"#;
-    let cfg_d = r#"{
-        "extension": {
-            "layout": "single",
-            "col": 8,
-            "height": "300px"
-        },
-        "title": {"text": "Order Book Chart"},
-        "xAxis": {"type": "datetime"},
-        "series": [{"name": "Bid 1", "data": []}, {"name": "Ask 1", "data": []}]
-    }"#;
-    let cfg_e_tpl = r#"{
-        "__isStock": false,
-        "extension": {
-            "layout": "single",
-            "col": 4,
-            "height": "300px"
-        },
-        "title": {"text": "Pie Chart 2"},
-        "series": [{
-            "type": "pie",
-            "name": "one",
-            "data": [["A", __Y__], ["B", 25], ["C", 25], ["D", 25]]
-        }]
-    }"#;
-
-    let cfg_a = cfg_a_tpl.replace("__SUBTITLE__", "");
-    let cfg_b = cfg_b_tpl.replace("__SUBTITLE__", "");
-    let cfg_c = cfg_c_tpl.replace("__Y__", "25");
-    let cfg_e = cfg_e_tpl.replace("__Y__", "25");
-
-    let chart = Chart::new(&format!("[{},{},{},{},{}]", cfg_a, cfg_b, cfg_c, cfg_d, cfg_e));
-    chart.reset(0);
-    // 为饼图追加一个数据点，add 只能更新通过 add 方式添加的数据点，内置的数据点无法在后期更新
-    let y = (UnixNano() % 100) as f64;    // 用时间戳模拟随机数
-    chart.add(3, &format!(r#"{{"name": "ZZ", "y": {}}}"#, y), -1);
-    loop {
-        Sleep(1000);
-        let ticker = match exchange.GetTicker(None) {
-            Ok(t) => t,
-            Err(_) => continue,
-        };
-        let diff = ticker.Sell - ticker.Buy;
-        let cfg_a = cfg_a_tpl.replace("__SUBTITLE__", &format!("Bid {}, Ask {}", ticker.Buy, ticker.Sell));
-        let cfg_b = cfg_b_tpl.replace("__SUBTITLE__", &format!("Spread {}", diff));
-
-        let now = Unix() * 1000;
-        chart.add(0, &format!("[{}, {}]", now, ticker.Buy), -1);
-        chart.add(1, &format!("[{}, {}]", now, ticker.Sell), -1);
-        // 相当于更新第二个图表的第一个数据序列
-        chart.add(2, &format!("[{}, {}]", now, diff), -1);
-        chart.add(4, &format!("[{}, {}]", now, ticker.Buy), -1);
-        chart.add(5, &format!("[{}, {}]", now, ticker.Buy), -1);
-        let cfg_c = cfg_c_tpl.replace("__Y__", &format!("{}", (UnixNano() % 100) as f64));
-        let cfg_e = cfg_e_tpl.replace("__Y__", &format!("{}", (UnixNano() % 100) as f64));
-        // update 实际上等同于重置图表的配置
-        chart.update(&format!("[{},{},{},{},{}]", cfg_a, cfg_b, cfg_c, cfg_d, cfg_e));
-    }
-}
-```
-
-```cpp
-void main() {
-    json cfgA = R"({
-        "extension" : {
-            "layout" : "single",
-            "height" : 300,
-            "col" : 8
-        },
-        "title" : {
-            "text" : "Order Book Chart"
-        },
-        "xAxis" : {
-            "type" : "datetime"
-        },
-        "series" : [{
-            "name" : "Bid 1",
-            "data" : []
-        }, {
-            "name" : "Ask 1",
-            "data" : []
-        }]
-    })"_json;
-
-    json cfgB = R"({
-        "title" : {
-            "text" : "Spread Chart"
-        },
-        "xAxis" : {
-            "type" : "datetime"
-        },
-        "series" : [{
-            "name" : "Spread",
-            "type" : "column",
-            "data" : []
-        }]
-    })"_json;
-
-    json cfgC = R"({
-        "__isStock" : false,
-        "title" : {
-            "text" : "Pie Chart"
-        },
-        "series" : [{
-            "type" : "pie",
-            "name" : "one",
-            "data" : [
-                ["A", 25],
-                ["B", 25],
-                ["C", 25],
-                ["D", 25]
-            ]
-        }]
-    })"_json;
-
-    json cfgD = R"({
-        "extension" : {
-            "layout" : "single",
-            "col" : 8,
-            "height" : "300px"
-        },
-        "title" : {
-            "text" : "Order Book Chart"
-        },
-        "series" : [{
-            "name" : "Bid 1",
-            "data" : []
-        }, {
-            "name" : "Ask 1",
-            "data" : []
-        }]
-    })"_json;
-
-    json cfgE = R"({
-        "__isStock" : false,
-        "extension" : {
-            "layout" : "single",
-            "col" : 4,
-            "height" : "300px"
-        },
-        "title" : {
-            "text" : "Pie Chart 2"
-        },
-        "series" : [{
-            "type" : "pie",
-            "name" : "one",
-            "data" : [
-                ["A", 25],
-                ["B", 25],
-                ["C", 25],
-                ["D", 25]
-            ]
-        }]
-    })"_json;
-
-    auto chart = Chart({cfgA, cfgB, cfgC, cfgD, cfgE});
-    chart.reset();
-    json zz = R"({
-        "name" : "ZZ",
-        "y" : 0
-    })"_json;
-    zz["y"] = rand() % 100;
-    chart.add(3, zz);
-
-    while(true) {
-        Sleep(1000);
-        auto ticker = exchange.GetTicker();
-        if(!ticker.Valid) {
-            continue;
-        }
-        auto diff = ticker.Sell - ticker.Buy;
-        json cfgASubTitle = R"({"text" : ""})"_json;
-        cfgASubTitle["text"] = str_format("买一 %f , 卖一 %f", ticker.Buy, ticker.Sell);
-        cfgA["subtitle"] = cfgASubTitle;
-
-        json cfgBSubTitle = R"({"text" : ""})"_json;
-        cfgBSubTitle["text"] = str_format("价差 %f", diff);
-        cfgB["subtitle"] = cfgBSubTitle;
-
-        chart.add(0, {Unix() * 1000, ticker.Buy});
-        chart.add(1, {Unix() * 1000, ticker.Sell});
-        chart.add(2, {Unix() * 1000, diff});
-        chart.add(4, {Unix() * 1000, ticker.Buy});
-        chart.add(5, {Unix() * 1000, ticker.Buy});
-        cfgC["series"][0]["data"][0][1] = rand() % 100;
-        cfgE["series"][0]["data"][0][1] = rand() % 100;
-        chart.update({cfgA, cfgB, cfgC, cfgD, cfgE});
-    }
-}
-```
-
-简单的绘图示例：
-
-```javascript
-// 在 JavaScript 中，chart 是一个对象；在调用 Chart 函数之前，我们需要先声明一个用于配置图表的对象变量 chart
-var chart = {
-    // 该字段用于标记图表是否为普通图表，感兴趣的读者可以改为 false 运行查看效果
-    __isStock: true,
-    // 提示框
-    tooltip: {xDateFormat: '%Y-%m-%d %H:%M:%S, %A'},
-    // 标题
-    title : { text : '差价分析图'},
-    // 选择范围
-    rangeSelector: {
-        buttons:  [{type: 'hour',count: 1, text: '1h'}, {type: 'hour',count: 3, text: '3h'}, {type: 'hour', count: 8, text: '8h'}, {type: 'all',text: 'All'}],
-        selected: 0,
-        inputEnabled: false
-    },
-    // 横轴（即 x 轴），当前设置的类型为：时间
-    xAxis: { type: 'datetime'},
-    // 纵轴（即 y 轴），默认数值随数据大小自动调整
-    yAxis : {
-        // 标题
-        title: {text: '差价'},
-        // 是否启用右侧纵轴
-        opposite: false
-    },
-    // 数据系列，该属性保存各个数据系列（折线、K 线图、标签等……）
-    series : [
-        // 索引为 0，data 数组中存放的是该索引系列的数据
-        {name : "line1", id : "Line 1,buy1Price", data : []},
-        // 索引为 1，设置了 dashStyle: 'shortdash'，即将其设置为虚线
-        {name : "line2", id : "Line 2,lastPrice", dashStyle : 'shortdash', data : []}
-    ]
-}
-
-function main(){
-    // 调用 Chart 函数，初始化图表
-    var ObjChart = Chart(chart)
-    // 清空
-    ObjChart.reset()
-    while(true){
-        // 获取本次轮询的时间戳（即毫秒级时间戳），用于确定写入图表的 X 轴位置
-        var nowTime = new Date().getTime()
-        // 获取行情数据
-        var ticker = _C(exchange.GetTicker)
-        // 从行情数据的返回值中取得买一价
-        var buy1Price = ticker.Buy
-        // 取得最新成交价，为避免两条线相互重合，此处将其加 1
-        var lastPrice = ticker.Last + 1
-        // 以时间戳作为 X 值、买一价作为 Y 值，传入索引 0 的数据序列
-        ObjChart.add(0, [nowTime, buy1Price])
-        // 同上
-        ObjChart.add(1, [nowTime, lastPrice])
-        Sleep(2000)
-    }
-}
-```
-
-```python
-import time
-chart = {
-    "__isStock" : True,
-    "tooltip" : {"xDateFormat" : "%Y-%m-%d %H:%M:%S, %A"},
-    "title" : {"text" : "Spread Analysis Chart"},
-    "rangeSelector" : {
-        "buttons" : [{"type": "count", "count": 1, "text": "1h"}, {"type": "hour", "count": 3, "text": "3h"}, {"type": "hour", "count": 8, "text": "8h"}, {"type": "all", "text": "All"}],
-        "selected": 0,
-        "inputEnabled": False
-    },
-    "xAxis": {"type": "datetime"},
-    "yAxis": {
-        "title": {"text": "Spread"},
-        "opposite": False
-    },
-    "series": [{
-        "name": "line1", "id": "Line 1,buy1Price", "data": []
-    }, {
-        "name": "line2", "id": "Line 2,lastPrice", "dashStyle": "shortdash", "data": []
-    }]
-}
-def main():
-    ObjChart = Chart(chart)
-    ObjChart.reset()
-    while True:
-        nowTime = time.time() * 1000
-        ticker = exchange.GetTicker()
-        buy1Price = ticker["Buy"]
-        lastPrice = ticker["Last"] + 1
-        ObjChart.add(0, [nowTime, buy1Price])
-        ObjChart.add(1, [nowTime, lastPrice])
-        Sleep(2000)
-```
-
-```rust
-fn main() {
-    // 在 Rust 中，图表配置为 JSON 字符串；在调用 Chart::new 函数之前，先定义图表配置
-    let chart = r#"{
-        "__isStock": true,
-        "tooltip": {"xDateFormat": "%Y-%m-%d %H:%M:%S, %A"},
-        "title": {"text": "差价分析图"},
-        "rangeSelector": {
-            "buttons": [{"type": "hour", "count": 1, "text": "1h"}, {"type": "hour", "count": 3, "text": "3h"}, {"type": "hour", "count": 8, "text": "8h"}, {"type": "all", "text": "All"}],
-            "selected": 0,
-            "inputEnabled": false
-        },
-        "xAxis": {"type": "datetime"},
-        "yAxis": {
-            "title": {"text": "差价"},
-            "opposite": false
-        },
-        "series": [
-            {"name": "line1", "id": "Line 1,buy1Price", "data": []},
-            {"name": "line2", "id": "Line 2,lastPrice", "dashStyle": "shortdash", "data": []}
-        ]
-    }"#;
-
-    // 调用 Chart::new 函数，初始化图表
-    let obj_chart = Chart::new(chart);
-    // 清空
-    obj_chart.reset(0);
-    loop {
-        // 获取本次轮询的时间戳（即毫秒级时间戳），用于确定写入图表的 X 轴位置
-        let now_time = Unix() * 1000;
-        // 获取行情数据
-        let ticker = _C!(exchange.GetTicker(None));
-        // 从行情数据的返回值中取得买一价
-        let buy1_price = ticker.Buy;
-        // 取得最新成交价，为避免两条线相互重合，此处将其加 1
-        let last_price = ticker.Last + 1.0;
-        // 以时间戳作为 X 值、买一价作为 Y 值，传入索引 0 的数据序列
-        obj_chart.add(0, &format!("[{}, {}]", now_time, buy1_price), -1);
-        // 同上
-        obj_chart.add(1, &format!("[{}, {}]", now_time, last_price), -1);
-        Sleep(2000);
-    }
-}
-```
-
-```cpp
-void main() {
-    // 使用 C++ 编写策略时，尽量不要声明非基础类型的全局变量，因此将图表配置对象声明在 main 函数内
-    json chart = R"({
-        "__isStock" : true,
-        "tooltip" : {"xDateFormat" : "%Y-%m-%d %H:%M:%S, %A"},
-        "title" : {"text" : "Spread Analysis Chart"},
-        "rangeSelector" : {
-            "buttons" : [{"type": "count", "count": 1, "text": "1h"}, {"type": "hour", "count": 3, "text": "3h"}, {"type": "hour", "count": 8, "text": "8h"}, {"type": "all", "text": "All"}],
-            "selected": 0,
-            "inputEnabled": false
-        },
-        "xAxis": {"type": "datetime"},
-        "yAxis": {
-            "title": {"text": "Spread"},
-            "opposite": false
-        },
-        "series": [{
-            "name": "line1", "id": "Line 1,buy1Price", "data": []
-        }, {
-            "name": "line2", "id": "Line 2,lastPrice", "dashStyle": "shortdash", "data": []
-        }]
-    })"_json;
-    auto ObjChart = Chart(chart);
-    ObjChart.reset();
-    while(true) {
-        auto nowTime = Unix() * 1000;
-        auto ticker = exchange.GetTicker();
-        auto buy1Price = ticker.Buy;
-        auto lastPrice = ticker.Last + 1.0;
-        ObjChart.add(0, {nowTime, buy1Price});
-        ObjChart.add(1, {nowTime, lastPrice});
-        Sleep(2000);
-    }
-}
-```
-
-绘制三角函数曲线的示例：
-
-```javascript
-// 用于初始化图表的配置对象
-var chart = {
-    // 图表标题
-    title: {text: "Line value triggers plotLines value"},
-    // Y 轴相关设置
-    yAxis: {
-        // 垂直于 Y 轴的水平线，用作触发线；这是一个结构体数组，可设置多条触发线
-        plotLines: [{
-            // 触发线的值，该线将显示在对应的数值位置
-            value: 0,
-            // 设置触发线的颜色
-            color: 'red',
-            // 线宽
-            width: 2,
-            // 显示的标签
-            label: {
-                // 标签文本
-                text: 'Trigger Value',
-                // 标签居中对齐
-                align: 'center'
-            }
-        }]
-    },
-    // X 轴相关设置，此处将类型设置为时间轴
-    xAxis: {type: "datetime"},
-    series: [
-        {name: "sin", type: "spline", data: []},
-        // 数据系列，可设置多个，并通过数组索引进行控制
-        {name: "cos", type: "spline", data: []}
-    ]
-}
-function main(){
-    // 圆周率
-    var pi = 3.1415926535897
-    // 用于记录时间戳的变量
-    var time = 0
-    // 角度
-    var angle = 0
-    // 坐标 y 值，用于接收正弦值或余弦值
-    var y = 0
-    // 调用 API 接口，使用 chart 对象初始化图表
-    var objChart = Chart(chart)
-    // 初始化时清空图表
-    objChart.reset()
-    // 将触发线的值设置为 1
-    chart.yAxis.plotLines[0].value = 1
-    // 循环
-    while(true){
-        // 获取当前时刻的时间戳
-        time = new Date().getTime()
-        // 每 500ms 将角度 angle 增加 5 度，并计算正弦值
-        y = Math.sin(angle * 2 * pi / 360)
-        // 将计算得到的 y 值写入图表对应索引的数据系列，add 函数的第一个参数为指定的数据系列索引
-        objChart.add(0, [time, y])
-        // 计算余弦值
-        y = Math.cos(angle * 2 * pi / 360)
-        objChart.add(1, [time, y])
-        // 增加 5 度
-        angle += 5
-        // 暂停 5 秒，避免绘图过于频繁、数据增长过快
-        Sleep(5000)
-    }
-}
-```
-
-```python
-import math
-import time
-chart = {
-    "title": {"text": "Line value triggers plotLines value"},
-    "yAxis": {
-        "plotLines": [{
-            "value": 0,
-            "color": "red",
-            "width": 2,
-            "label": {
-                "text": "Trigger Value",
-                "align": "center"
-            }
-        }]
-    },
-    "xAxis": {"type": "datetime"},
-    "series": [{"name": "sin", "type": "spline", "data": []},
-               {"name": "cos", "type": "spline", "data": []}]
-}
-def main():
-    pi = 3.1415926535897
-    ts = 0
-    angle = 0
-    y = 0
-    objChart = Chart(chart)
-    objChart.reset()
-    chart["yAxis"]["plotLines"][0]["value"] = 1
-    while True:
-        ts = time.time() * 1000
-        y = math.sin(angle * 2 * pi / 360)
-        objChart.add(0, [ts, y])
-        y = math.cos(angle * 2 * pi / 360)
-        objChart.add(1, [ts, y])
-        angle += 5
-        Sleep(5000)
-```
-
-```rust
-fn main() {
-    // 用于初始化图表的 JSON 配置字符串，触发线的值在配置中直接设置为 1
-    let chart = r#"{
-        "title": {"text": "Line value triggers plotLines value"},
-        "yAxis": {
-            "plotLines": [{
-                "value": 1,
-                "color": "red",
-                "width": 2,
-                "label": {
-                    "text": "Trigger Value",
-                    "align": "center"
-                }
-            }]
-        },
-        "xAxis": {"type": "datetime"},
-        "series": [{"name": "sin", "type": "spline", "data": []},
-                   {"name": "cos", "type": "spline", "data": []}]
-    }"#;
-    // 圆周率
-    let pi = 3.1415926535897_f64;
-    // 角度
-    let mut angle = 0.0_f64;
-    // 调用 API 接口，使用 chart 配置初始化图表
-    let obj_chart = Chart::new(chart);
-    // 初始化时清空图表
-    obj_chart.reset(0);
-    // 循环
-    loop {
-        // 获取当前时刻的毫秒时间戳
-        let ts = Unix() * 1000;
-        // 将角度 angle 增加 5 度，并计算正弦值
-        let mut y = (angle * 2.0 * pi / 360.0).sin();
-        // 将计算得到的 y 值写入图表对应索引的数据系列，add 函数的第一个参数为指定的数据系列索引
-        obj_chart.add(0, &format!("[{}, {}]", ts, y), -1);
-        // 计算余弦值
-        y = (angle * 2.0 * pi / 360.0).cos();
-        obj_chart.add(1, &format!("[{}, {}]", ts, y), -1);
-        // 增加 5 度
-        angle += 5.0;
-        // 暂停 5 秒，避免绘图过于频繁、数据增长过快
-        Sleep(5000);
-    }
-}
-```
-
-```cpp
-void main() {
-    json chart = R"({
-        "title": {"text": "Line value triggers plotLines value"},
-        "yAxis": {
-            "plotLines": [{
-                "value": 0,
-                "color": "red",
-                "width": 2,
-                "label": {
-                    "text": "Trigger Value",
-                    "align": "center"
-                }
-            }]
-        },
-        "xAxis": {"type": "datetime"},
-        "series": [{"name": "sin", "type": "spline", "data": []},
-                   {"name": "cos", "type": "spline", "data": []}]
-    })"_json;
-
-    auto pi = 3.1415926535897;
-    auto ts = 0;
-    auto angle = 0.0;
-    auto y = 0.0;
-    auto objChart = Chart(chart);
-    objChart.reset();
-    chart["yAxis"]["plotLines"][0]["value"] = 1;
-    while(true) {
-        ts = Unix() * 1000;
-        y = sin(angle * 2 * pi / 360);
-        objChart.add(0, {ts, y});
-        y = cos(angle * 2 * pi / 360);
-        objChart.add(1, {ts, y});
-        angle += 5;
-        Sleep(5000);
-    }
-}
-```
-
-使用混合图表的复杂示例：
-
-```javascript
-/*backtest
-start: 2020-03-11 00:00:00
-end: 2020-04-09 23:59:00
-period: 1d
-exchanges: [{"eid":"Bitfinex","currency":"BTC_USD"}]
-*/
-
-var chartCfg = {
-    subtitle: {
-        text: "subtitle",
-    },
-    yAxis: [{
-        height: "40%",
-        lineWidth: 2,
-        title: {
-            text: 'PnL',
-        },
-        tickPixelInterval: 20,
-        minorGridLineWidth: 1,
-        minorTickWidth: 0,
-        opposite: true,
-        labels: {
-            align: "right",
-            x: -3,
-        }
-    }, {
-        title: {
-            text: 'Profit',
-        },
-        top: "42%",
-        height: "18%",
-        offset: 0,
-        lineWidth: 2
-    }, {
-        title: {
-            text: 'Vol',
-        },
-        top: '62%',
-        height: '18%',
-        offset: 0,
-        lineWidth: 2
-    }, {
-        title: {
-            text: 'Asset',
-        },
-        top: '82%',
-        height: '18%',
-        offset: 0,
-        lineWidth: 2
-    }],
-    series: [{
-        name: 'PnL',
-        data: [],
-        id: 'primary',
-        tooltip: {
-            xDateFormat: '%Y-%m-%d %H:%M:%S'
-        },
-        yAxis: 0
-    }, {
-        type: 'column',
-        lineWidth: 2,
-        name: 'Profit',
-        data: [],
-        yAxis: 1,
-    }, {
-        type: 'column',
-        name: 'Trade',
-        data: [],
-        yAxis: 2
-    }, {
-        type: 'area',
-        step: true,
-        lineWidth: 0,
-        name: 'Long',
-        data: [],
-        yAxis: 2
-    }, {
-        type: 'area',
-        step: true,
-        lineWidth: 0,
-        name: 'Short',
-        data: [],
-        yAxis: 2
-    }, {
-        type: 'line',
-        step: true,
-        color: '#5b4b00',
-        name: 'Asset',
-        data: [],
-        yAxis: 3
-    }, {
-        type: 'pie',
-        innerSize: '70%',
-        name: 'Random',
-        data: [],
-        center: ['3%', '6%'],
-        size: '15%',
-        dataLabels: {
-            enabled: false
-        },
-        startAngle: -90,
-        endAngle: 90,
-    }],
-};
-
-function main() {
-    let c = Chart(chartCfg);
-    let preTicker = null;
-    while (true) {
-        let t = exchange.GetTicker();
-
-        c.add(0, [t.Time, t.Last]); // PnL
-        c.add(1, [t.Time, preTicker ? t.Last - preTicker.Last : 0]); // profit
-        let r = Math.random();
-        var pos = parseInt(t.Time/86400);
-        c.add(2, [t.Time, pos/2]); // Vol
-        c.add(3, [t.Time, r > 0.8 ? pos : null]); // Long
-        c.add(4, [t.Time, r < 0.8 ? -pos : null]); // Short
-        c.add(5, [t.Time, Math.random() * 100]); // Asset
-        // update pie
-        chartCfg.series[chartCfg.series.length-1].data = [
-            ["A", Math.random()*100],
-            ["B", Math.random()*100],
-         ];
-        c.update(chartCfg)
-        preTicker = t;
-    }
-}
-```
-
-```python
-'''backtest
-start: 2020-03-11 00:00:00
-end: 2020-04-09 23:59:00
-period: 1d
-exchanges: [{"eid":"Bitfinex","currency":"BTC_USD"}]
-'''
-
-import random
-
-chartCfg = {
-    "subtitle": {
-        "text": "subtitle"
-    },
-    "yAxis": [{
-        "height": "40%",
-        "lineWidth": 2,
-        "title": {
-            "text": 'PnL'
-        },
-        "tickPixelInterval": 20,
-        "minorGridLineWidth": 1,
-        "minorTickWidth": 0,
-        "opposite": True,
-        "labels": {
-            "align": "right",
-            "x": -3
-        }
-    }, {
-        "title": {
-            "text": 'Profit'
-        },
-        "top": "42%",
-        "height": "18%",
-        "offset": 0,
-        "lineWidth": 2
-    }, {
-        "title": {
-            "text": 'Vol'
-        },
-        "top": '62%',
-        "height": '18%',
-        "offset": 0,
-        "lineWidth": 2
-    }, {
-        "title": {
-            "text": 'Asset'
-        },
-        "top": '82%',
-        "height": '18%',
-        "offset": 0,
-        "lineWidth": 2
-    }],
-    "series": [{
-        "name": 'PnL',
-        "data": [],
-        "id": 'primary',
-        "tooltip": {
-            "xDateFormat": '%Y-%m-%d %H:%M:%S'
-        },
-        "yAxis": 0
-    }, {
-        "type": 'column',
-        "lineWidth": 2,
-        "name": 'Profit',
-        "data": [],
-        "yAxis": 1
-    }, {
-        "type": 'column',
-        "name": 'Trade',
-        "data": [],
-        "yAxis": 2
-    }, {
-        "type": 'area',
-        "step": True,
-        "lineWidth": 0,
-        "name": 'Long',
-        "data": [],
-        "yAxis": 2
-    }, {
-        "type": 'area',
-        "step": True,
-        "lineWidth": 0,
-        "name": 'Short',
-        "data": [],
-        "yAxis": 2
-    }, {
-        "type": 'line',
-        "step": True,
-        "color": '#5b4b00',
-        "name": 'Asset',
-        "data": [],
-        "yAxis": 3
-    }, {
-        "type": 'pie',
-        "innerSize": '70%',
-        "name": 'Random',
-        "data": [],
-        "center": ['3%', '6%'],
-        "size": '15%',
-        "dataLabels": {
-            "enabled": False
-        },
-        "startAngle": -90,
-        "endAngle": 90
-    }]
-}
-
-def main():
-    c = Chart(chartCfg)
-    preTicker = None
-    while True:
-        t = exchange.GetTicker()
-        c.add(0, [t["Time"], t["Last"]])
-        profit = t["Last"] - preTicker["Last"] if preTicker else 0
-        c.add(1, [t["Time"], profit])
-        r = random.random()
-        pos = t["Time"] / 86400
-        c.add(2, [t["Time"], pos / 2])
-        long = pos if r > 0.8 else None
-        c.add(3, [t["Time"], long])
-        short = -pos if r < 0.8 else None
-        c.add(4, [t["Time"], short])
-        c.add(5, [t["Time"], random.random() * 100])
-
-        # update pie
-        chartCfg["series"][len(chartCfg["series"]) - 1]["data"] = [
-            ["A", random.random() * 100],
-            ["B", random.random() * 100]
-        ]
-        c.update(chartCfg)
-        preTicker = t
-```
-
-```rust
-/*backtest
-start: 2020-03-11 00:00:00
-end: 2020-04-09 23:59:00
-period: 1d
-exchanges: [{"eid":"Bitfinex","currency":"BTC_USD"}]
-*/
-
-fn main() {
-    // 在 Rust 中，图表配置以 JSON 字符串形式表示；饼图数据使用占位符 __PIE_DATA__ 标记，更新时替换该占位符后重建配置
-    let chart_cfg_tpl = r##"{
-        "subtitle": {"text": "subtitle"},
-        "yAxis": [{
-            "height": "40%",
-            "lineWidth": 2,
-            "title": {"text": "PnL"},
-            "tickPixelInterval": 20,
-            "minorGridLineWidth": 1,
-            "minorTickWidth": 0,
-            "opposite": true,
-            "labels": {"align": "right", "x": -3}
-        }, {
-            "title": {"text": "Profit"},
-            "top": "42%",
-            "height": "18%",
-            "offset": 0,
-            "lineWidth": 2
-        }, {
-            "title": {"text": "Vol"},
-            "top": "62%",
-            "height": "18%",
-            "offset": 0,
-            "lineWidth": 2
-        }, {
-            "title": {"text": "Asset"},
-            "top": "82%",
-            "height": "18%",
-            "offset": 0,
-            "lineWidth": 2
-        }],
-        "series": [{
-            "name": "PnL",
-            "data": [],
-            "id": "primary",
-            "tooltip": {"xDateFormat": "%Y-%m-%d %H:%M:%S"},
-            "yAxis": 0
-        }, {
-            "type": "column",
-            "lineWidth": 2,
-            "name": "Profit",
-            "data": [],
-            "yAxis": 1
-        }, {
-            "type": "column",
-            "name": "Trade",
-            "data": [],
-            "yAxis": 2
-        }, {
-            "type": "area",
-            "step": true,
-            "lineWidth": 0,
-            "name": "Long",
-            "data": [],
-            "yAxis": 2
-        }, {
-            "type": "area",
-            "step": true,
-            "lineWidth": 0,
-            "name": "Short",
-            "data": [],
-            "yAxis": 2
-        }, {
-            "type": "line",
-            "step": true,
-            "color": "#5b4b00",
-            "name": "Asset",
-            "data": [],
-            "yAxis": 3
-        }, {
-            "type": "pie",
-            "innerSize": "70%",
-            "name": "Random",
-            "data": __PIE_DATA__,
-            "center": ["3%", "6%"],
-            "size": "15%",
-            "dataLabels": {"enabled": false},
-            "startAngle": -90,
-            "endAngle": 90
-        }]
-    }"##;
-
-    let c = Chart::new(&chart_cfg_tpl.replace("__PIE_DATA__", "[]"));
-    let mut pre_ticker: Option<Ticker> = None;
-    loop {
-        let t = exchange.GetTicker(None).unwrap();
-
-        c.add(0, &format!("[{}, {}]", t.Time, t.Last), -1); // PnL
-        let profit = if let Some(p) = &pre_ticker { t.Last - p.Last } else { 0.0 };
-        c.add(1, &format!("[{}, {}]", t.Time, profit), -1); // profit
-        let r = (UnixNano() % 100) as f64 / 100.0;          // 使用时间戳模拟随机数
-        let pos = (t.Time / 86400) as f64;
-        c.add(2, &format!("[{}, {}]", t.Time, pos / 2.0), -1); // Vol
-        c.add(3, &format!("[{}, {}]", t.Time, if r > 0.8 { pos.to_string() } else { "null".to_string() }), -1); // Long
-        c.add(4, &format!("[{}, {}]", t.Time, if r < 0.8 { (-pos).to_string() } else { "null".to_string() }), -1); // Short
-        c.add(5, &format!("[{}, {}]", t.Time, (UnixNano() % 10000) as f64 / 100.0), -1); // Asset
-        // update pie
-        let pie = format!(r#"[["A", {}], ["B", {}]]"#, (UnixNano() % 100) as f64, (UnixNano() % 100) as f64);
-        c.update(&chart_cfg_tpl.replace("__PIE_DATA__", &pie));
-        pre_ticker = Some(t);
-    }
-}
-```
-
-```cpp
-/*backtest
-start: 2020-03-11 00:00:00
-end: 2020-04-09 23:59:00
-period: 1d
-exchanges: [{"eid":"Bitfinex","currency":"BTC_USD"}]
-*/
-
-void main() {
-    json chartCfg = R"({
-        "subtitle": {
-            "text": "subtitle"
-        },
-        "yAxis": [{
-            "height": "40%",
-            "lineWidth": 2,
-            "title": {
-                "text": "PnL"
-            },
-            "tickPixelInterval": 20,
-            "minorGridLineWidth": 1,
-            "minorTickWidth": 0,
-            "opposite": true,
-            "labels": {
-                "align": "right",
-                "x": -3
-            }
-        }, {
-            "title": {
-                "text": "Profit"
-            },
-            "top": "42%",
-            "height": "18%",
-            "offset": 0,
-            "lineWidth": 2
-        }, {
-            "title": {
-                "text": "Vol"
-            },
-            "top": "62%",
-            "height": "18%",
-            "offset": 0,
-            "lineWidth": 2
-        }, {
-            "title": {
-                "text": "Asset"
-            },
-            "top": "82%",
-            "height": "18%",
-            "offset": 0,
-            "lineWidth": 2
-        }],
-        "series": [{
-            "name": "PnL",
-            "data": [],
-            "id": "primary",
-            "tooltip": {
-                "xDateFormat": "%Y-%m-%d %H:%M:%S"
-            },
-            "yAxis": 0
-        }, {
-            "type": "column",
-            "lineWidth": 2,
-            "name": "Profit",
-            "data": [],
-            "yAxis": 1
-        }, {
-            "type": "column",
-            "name": "Trade",
-            "data": [],
-            "yAxis": 2
-        }, {
-            "type": "area",
-            "step": true,
-            "lineWidth": 0,
-            "name": "Long",
-            "data": [],
-            "yAxis": 2
-        }, {
-            "type": "area",
-            "step": true,
-            "lineWidth": 0,
-            "name": "Short",
-            "data": [],
-            "yAxis": 2
-        }, {
-            "type": "line",
-            "step": true,
-            "color": "#5b4b00",
-            "name": "Asset",
-            "data": [],
-            "yAxis": 3
-        }, {
-            "type": "pie",
-            "innerSize": "70%",
-            "name": "Random",
-            "data": [],
-            "center": ["3%", "6%"],
-            "size": "15%",
-            "dataLabels": {
-                "enabled": false
-            },
-            "startAngle": -90,
-            "endAngle": 90
-        }]
-    })"_json;
-
-    Chart c = Chart(chartCfg);
-    Ticker preTicker;
-    while(true) {
-        auto t = exchange.GetTicker();
-        c.add(0, {t.Time, t.Last});
-        auto profit = preTicker.Valid ? t.Last - preTicker.Last : 0;
-        c.add(1, {t.Time, profit});
-        auto r = rand() % 100;
-        auto pos = t.Time / 86400.0;
-        c.add(2, {t.Time, pos / 2.0});
-        auto longPos = r > 0.8 ? pos : NULL;
-        c.add(3, {t.Time, longPos});
-        auto shortPos = r < 0.8 ? -pos : NULL;
-        c.add(4, {t.Time, shortPos});
-        c.add(5, {t.Time, rand() % 100});
-
-        // update pie
-        json pie = R"([["A", 0], ["B", 0]])"_json;
-        pie[0][1] = rand() % 100;
-        pie[1][1] = rand() % 100;
-        chartCfg["series"][chartCfg["series"].size() - 1]["data"] = pie;
-
-        c.update(chartCfg);
-        preTicker = t;
-    }
-}
-```
-
-图表中```pie```类型的图表没有时间轴，因此在更新数据时需要直接更新图表配置。例如，在上述范例的代码中，更新数据后调用```c.update(chartCfg)```即可刷新图表，如下所示：
-
-```javascript
-// update pie
-chartCfg.series[chartCfg.series.length-1].data = [
-    ["A", Math.random()*100],
-    ["B", Math.random()*100],
-];
-c.update(chartCfg)
-```
-
-```python
-# update pie
-chartCfg["series"][len(chartCfg["series"]) - 1]["data"] = [
-    ["A", random.random() * 100],
-    ["B", random.random() * 100]
-]
-c.update(chartCfg)
-```
-
-```rust
-// update pie
-// Rust 中图表配置为 JSON 字符串，重建包含新数据的配置后调用 update 更新图表
-let pie = format!(r#"[["A", {}], ["B", {}]]"#, (UnixNano() % 100) as f64, (UnixNano() % 100) as f64);
-c.update(&chart_cfg_tpl.replace("__PIE_DATA__", &pie));
-```
-
-```cpp
-// update pie
-json pie = R"([["A", 0], ["B", 0]])"_json;
-pie[0][1] = rand() % 100;
-pie[1][1] = rand() % 100;
-chartCfg["series"][chartCfg["series"].size() - 1]["data"] = pie;
-c.update(chartCfg);
-```
-
-```Chart()```函数返回一个图表对象，该对象包含4个方法：```add()```、```reset()```、```update()```、```del()```。
-- 1、```update()```方法：
-  ```update()```方法用于更新图表的配置信息，其参数为Chart图表配置对象（JSON）。
-- 2、```del()```方法：
-  ```del()```方法根据传入的series参数，删除指定索引的数据系列。
-- 3、```add()```方法：
-  ```add()```方法用于向图表中写入数据，参数依次为：
-  - ```series```：用于设置数据系列的索引，为整数。
-  - ```data```：用于设置写入的具体数据，为一个数组。
-  - ```index```（可选）：用于设置数据索引，为整数，指定要修改数据的具体索引位置，支持使用负数表示，设置为```-1```表示数据集的最后一个数据。
-    例如画线时，修改线上最后一个点的数据：```chart.add(0, [1574993606000, 13.5], -1)```，即更改图表```series[0].data```中倒数第一个点的数据。不设置```index```参数时，表示向当前数据系列（series）末尾添加数据。
-- 4、```reset()```方法：
-  ```reset()```方法用于清空图表数据，可带一个参数```remain```，用于指定保留数据的条数。不传入参数```remain```时，表示清除全部数据。
-
-See also: `KLineChart`
-
-#### KLineChart
-
-```
-KLineChart(options)
-```
-
-该函数用于采用类似```Pine```语言的绘图方式，在策略运行时进行自定义绘图。
-
-Parameters:
-
-- `options` (object / object数组, required): ```options```参数为图表配置对象，支持以下属性：
-
-- ```overlay```：布尔值，用于设置绘图内容是否叠加输出到主图。设置为```true```时在主图显示，设置为```false```时在副图显示。
-
-- ```pricePrecision```：数字，价格数据精度，用于控制图表中价格数据的小数位数。例如，设置为2表示保留2位小数，设置为0表示不保留小数（四舍五入为整数）。
-
-- ```volumePrecision```：数字，成交量数据精度，用于控制图表中成交量数据的小数位数。例如，设置为2表示保留2位小数，设置为0表示不保留小数（四舍五入为整数）。
-
-Returns (object): 图表对象。
-
-```KLineChart()```函数返回的图表对象包含多个方法，其中需要特别注意```begin(bar)```和```close(bar)```。在遍历K线数据执行绘图操作时，绘图操作必须以```begin(bar)```函数调用作为起始，并以```close(bar)```函数调用作为结束。
-
-如果需要在策略自定义画图区域进行画图，必须先创建图表控制对象，使用```KLineChart()```函数即可创建该对象。```KLineChart()```函数的参数为一个图表配置结构，参考代码中使用的图表配置结构非常简单：```{overlay: true}```。
-
-该图表配置结构仅设置将画图内容输出在图表主图上。如果```overlay```设置为假值（例如```false```），则图表内容将全部输出在副图上；如果需要指定某个画图函数在主图上绘制，也可以在具体的函数调用中将参数```overlay```指定为真值（例如```true```）。
-
-```javascript
-function main() {
-    // 调用KLineChart函数创建图表控制对象c
-    let c = KLineChart({
-        overlay: true
-    })
-
-    // 使用现货交易所对象测试，获取K线数据。如果使用期货交易所对象测试，需要先设置合约
-    let bars = exchange.GetRecords()
-    if (!bars) {
-        return
-    }
-
-    // 遍历K线数据执行画图操作，每次画图操作必须以```c.begin(bar)```函数调用作为起始，以```c.close(bar)```函数调用作为结束。
-    bars.forEach(function(bar, index) {
-        c.begin(bar)
-        c.barcolor(bar.Close > bar.Open ? 'rgba(255, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.2)')
-        if (bar.Close > bar.Open) {
-            c.bgcolor('rgba(0, 255, 0, 0.5)')
-        }
-        let h = c.plot(bar.High, 'high')
-        let l = c.plot(bar.Low, 'low')
-
-        c.fill(h, l, {
-            color: bar.Close > bar.Open ? 'rgba(255, 0, 0, 0.2)' : 'rgba(255, 0, 0, 0.2)'
-        })
-        c.hline(bar.High)
-        c.plotarrow(bar.Close - bar.Open)
-        c.plotshape(bar.Low, {
-            style: 'diamond'
-        })
-        c.plotchar(bar.Close, {
-            char: 'X'
-        })
-        c.plotcandle(bar.Open*0.9, bar.High*0.9, bar.Low*0.9, bar.Close*0.9)
-        if (bar.Close > bar.Open) {
-            // long/short/closelong/closeshort
-            c.signal("long", bar.High, 1.5)
-        } else if (bar.Close < bar.Open) {
-            c.signal("closelong", bar.Low, 1.5)
-        }
-        c.close(bar)
-    })
-}
-```
-
-```python
-def main():
-    # 调用KLineChart函数创建图表控制对象c
-    c = KLineChart({
-        "overlay": True
-    })
-
-    # 使用现货交易所对象测试，获取K线数据。如果使用期货交易所对象测试，需要先设置合约
-    bars = exchange.GetRecords()
-    if not bars:
-        return
-
-    for bar in bars:
-        c.begin(bar)
-        c.barcolor('rgba(255, 0, 0, 0.2)' if bar.Close > bar.Open else 'rgba(0, 0, 0, 0.2)')
-        if bar.Close > bar.Open:
-            c.bgcolor('rgba(0, 255, 0, 0.5)')
-
-        h = c.plot(bar.High, 'high')
-        l = c.plot(bar.Low, 'low')
-
-        c.fill(h, l, 'rgba(255, 0, 0, 0.2)' if bar.Close > bar.Open else 'rgba(255, 0, 0, 0.2)')
-        c.hline(bar.High)
-        c.plotarrow(bar.Close - bar.Open)
-        c.plotshape(bar.Low, style = 'diamond')
-        c.plotchar(bar.Close, char = 'X')
-        c.plotcandle(bar.Open*0.9, bar.High*0.9, bar.Low*0.9, bar.Close*0.9)
-        if bar.Close > bar.Open:
-            # long/short/closelong/closeshort
-            c.signal("long", bar.High, 1.5)
-        elif bar.Close < bar.Open:
-            c.signal("closelong", bar.Low, 1.5)
-
-        c.close(bar)
-```
-
-```rust
-fn main() {
-    // 调用KLineChart::new创建图表控制对象c
-    let mut c = KLineChart::new(r#"{"overlay": true}"#);
-
-    // 使用现货交易所对象测试，获取K线数据。如果使用期货交易所对象测试，需要先设置合约
-    let bars = exchange.GetRecords(None, None, None).unwrap();
-
-    // 遍历K线数据执行画图操作，每次画图操作必须以c.begin(bar)函数调用作为起始，以c.close()函数调用作为结束。
-    for bar in &bars {
-        c.begin(bar);
-        c.barcolor(if bar.Close > bar.Open { "rgba(255, 0, 0, 0.2)" } else { "rgba(0, 0, 0, 0.2)" }, "{}");
-        if bar.Close > bar.Open {
-            c.bgcolor("rgba(0, 255, 0, 0.5)", "{}");
-        }
-        let h = c.plot(bar.High, r#"{"title": "high"}"#);
-        let l = c.plot(bar.Low, r#"{"title": "low"}"#);
-
-        c.fill(h, l, if bar.Close > bar.Open { r#"{"color": "rgba(255, 0, 0, 0.2)"}"# } else { r#"{"color": "rgba(255, 0, 0, 0.2)"}"# });
-        c.hline(bar.High, "{}");
-        c.plotarrow(bar.Close - bar.Open, "{}");
-        c.plotshape(bar.Low > 0.0, r#"{"style": "diamond"}"#);
-        c.plotchar(bar.Close > 0.0, r#"{"char": "X"}"#);
-        c.plotcandle(bar.Open * 0.9, bar.High * 0.9, bar.Low * 0.9, bar.Close * 0.9, "{}");
-        if bar.Close > bar.Open {
-            // long/short/closelong/closeshort
-            c.signal("long", bar.High, 1.5, "long");
-        } else if bar.Close < bar.Open {
-            c.signal("closelong", bar.Low, 1.5, "closelong");
-        }
-        c.close();
-    }
-}
-```
-
-```cpp
-// 暂不支持
-```
-
-使用 ```pricePrecision``` 和 ```volumePrecision``` 参数控制图表数据的显示精度。可根据实际需求设置价格与成交量的显示精度，例如对于价格波动较大的品种，可将精度设置为 0 以显示整数；对于价格较为精细的品种，可设置为 2 或更高精度。
-
-```javascript
-function main() {
-    // 创建图表控制对象，将价格精度与成交量精度均设置为 0（即显示整数）
-    let c = KLineChart({
-        overlay: true,
-        pricePrecision: 0,   // 价格数据精度，设置为 2 即保留 2 位小数
-        volumePrecision: 0   // 成交量数据精度
-    })
-
-    // 根据交易所类型选择合适的交易对
-    let symbol = exchange.GetName().includes("Futures_") ? "ETH_USDT.swap" : "ETH_USDT"
-    Log("Test symbol:", symbol)
-
-    // 获取 K 线数据
-    let bars = exchange.GetRecords(symbol)
-    if (!bars) {
-        return
-    }
-
-    // 遍历 K 线数据并绘制图表
-    bars.forEach(function(bar, index) {
-        c.begin(bar)
-        c.barcolor(bar.Close > bar.Open ? 'rgba(255, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.2)')
-        c.plot(bar.High, 'high')
-        c.plot(bar.Low, 'low')
-        c.close(bar)
-    })
-}
-```
-
-```python
-def main():
-    # 创建图表控制对象，将价格精度与成交量精度均设置为 0（即显示整数）
-    c = KLineChart({
-        "overlay": True,
-        "pricePrecision": 0,   # 价格数据精度，设置为 2 即保留 2 位小数
-        "volumePrecision": 0   # 成交量数据精度
-    })
-
-    # 根据交易所类型选择合适的交易对
-    exName = exchange.GetName()
-    symbol = "ETH_USDT.swap" if "Futures_" in exName else "ETH_USDT"
-    Log("Test symbol:", symbol)
-
-    # 获取 K 线数据
-    bars = exchange.GetRecords(symbol)
-    if not bars:
-        return
-
-    # 遍历 K 线数据并绘制图表
-    for bar in bars:
-        c.begin(bar)
-        c.barcolor('rgba(255, 0, 0, 0.2)' if bar.Close > bar.Open else 'rgba(0, 0, 0, 0.2)')
-        c.plot(bar.High, 'high')
-        c.plot(bar.Low, 'low')
-        c.close(bar)
-```
-
-```rust
-fn main() {
-    // 创建图表控制对象，将价格精度与成交量精度均设置为 0（即显示整数）
-    // pricePrecision 为价格数据精度，设置为 2 即保留 2 位小数；volumePrecision 为成交量数据精度
-    let mut c = KLineChart::new(r#"{"overlay": true, "pricePrecision": 0, "volumePrecision": 0}"#);
-
-    // 根据交易所类型选择合适的交易对
-    let symbol = if exchange.GetName().contains("Futures_") { "ETH_USDT.swap" } else { "ETH_USDT" };
-    Log!("Test symbol:", symbol);
-
-    // 获取 K 线数据
-    let bars = exchange.GetRecords(symbol, None, None).unwrap();
-
-    // 遍历 K 线数据并绘制图表
-    for bar in &bars {
-        c.begin(bar);
-        c.barcolor(if bar.Close > bar.Open { "rgba(255, 0, 0, 0.2)" } else { "rgba(0, 0, 0, 0.2)" }, "{}");
-        c.plot(bar.High, r#"{"title": "high"}"#);
-        c.plot(bar.Low, r#"{"title": "low"}"#);
-        c.close();
-    }
-}
-```
-
-```cpp
-// 暂不支持
-```
-
-绘图操作中支持的```Pine```语言绘图接口函数如下：
-
-```barcolor```：设置K线颜色。
-
-> barcolor(color, offset, editable, show_last, title, display)
-
-> display参数的可选值为："none", "all"
-
-```javascript
-c.barcolor(bar.Close > bar.Open ? 'rgba(255, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.2)')   // 用法同上例中的参考代码，此处不再赘述
-```
-
-```python
-c.barcolor('rgba(255, 0, 0, 0.2)' if bar.Close > bar.Open else 'rgba(0, 0, 0, 0.2)')
-```
-
-```rust
-c.barcolor(if bar.Close > bar.Open { "rgba(255, 0, 0, 0.2)" } else { "rgba(0, 0, 0, 0.2)" }, "{}");   // 用法同上例中的参考代码，此处不再赘述
-```
-
-```cpp
-//  暂不支持
-```
-
-```bgcolor```：使用指定颜色填充K线背景。
-
-> bgcolor(color, offset, editable, show_last, title, display, overlay)
-
-> display参数的可选值为："none", "all"
-
-```javascript
-c.bgcolor('rgba(0, 255, 0, 0.5)')
-```
-
-```python
-c.bgcolor('rgba(0, 255, 0, 0.5)')
-```
-
-```rust
-c.bgcolor("rgba(0, 255, 0, 0.5)", "{}");
-```
-
-```cpp
-// 暂不支持
-```
-
-```plot```：在图表上绘制一系列数据。
-
-> plot(series, title, color, linewidth, style, trackprice, histbase, offset, join, editable, show_last, display)
-
-> style参数的可选值为："stepline_diamond", "stepline", "cross", "areabr", "area", "circles", "columns", "histogram", "linebr", "line"
-
-> display参数的可选值为："none", "all"
-
-```javascript
-c.plot(bar.High, 'high')
-
-c.plot(bar.Open < bar.Close ? NaN : bar.Close, "Close", {style: "linebr"})  // 支持绘制不连续的数据线
-```
-
-```python
-h = c.plot(bar.High, 'high')
-
-h = c.plot(None if bar.Open < bar.Close else bar.Close, "Close", style = "linebr")  # 支持绘制不连续的数据线
-```
-
-```rust
-let h = c.plot(bar.High, r#"{"title": "high"}"#);
-
-c.plot(if bar.Open < bar.Close { f64::NAN } else { bar.Close }, r#"{"title": "Close", "style": "linebr"}"#);  // 支持绘制不连续的数据线
-```
-
-```cpp
-// 暂不支持
-```
-
-```fill```，使用指定的颜色填充两个绘图或```hline```之间的背景区域。 > fill(hline1, hline2, color, title, editable, fillgaps, display) > display参数可选："none", "all"
-
-由于```JavaScript```语言无法根据函数形参名称指定传入参数，为解决此问题，可以使用```{key: value}```结构为指定的形参名称传入参数。例如，参考代码中使用```{color: bar.Close > bar.Open ? 'rgba(255, 0, 0, 0.2)' : 'rgba(255, 0, 0, 0.2)'}```为```fill```函数的```color```参数赋值。
-
-如需连续为多个形参名称指定参数，可以使用```{key1: value1, key2: value2, key3: value3}```。
-
-例如，本示例中额外指定了一个```title```参数：```{color: bar.Close > bar.Open ? 'rgba(255, 0, 0, 0.2)' : 'rgba(255, 0, 0, 0.2)', title: 'fill'}```。
-
-颜色值既可以使用```'rgba(255, 0, 0, 0.2)'```方式设置，也可以使用```'#FF0000'```方式设置。
-
-```javascript
-let h = c.plot(bar.High, 'high')
-let l = c.plot(bar.Low, 'low')
-c.fill(h, l, {color: bar.Close > bar.Open ? 'rgba(255, 0, 0, 0.2)' : 'rgba(255, 0, 0, 0.2)'})
-```
-
-```python
-h = c.plot(bar.High, 'high')
-l = c.plot(bar.Low, 'low')
-c.fill(h, l, color = 'rgba(255, 0, 0, 0.2)' if bar.Close > bar.Open else 'rgba(255, 0, 0, 0.2)')
-```
-
-```rust
-let h = c.plot(bar.High, r#"{"title": "high"}"#);
-let l = c.plot(bar.Low, r#"{"title": "low"}"#);
-c.fill(h, l, if bar.Close > bar.Open { r#"{"color": "rgba(255, 0, 0, 0.2)"}"# } else { r#"{"color": "rgba(255, 0, 0, 0.2)"}"# });
-```
-
-```cpp
-// 暂不支持
-```
-
-```hline```，在给定的固定价格水平上绘制水平线。
-
-> hline(price, title, color, linestyle, linewidth, editable, display)
-
-> linestyle参数可选："dashed", "dotted", "solid"
-
-> display参数可选："none", "all"
-
-```javascript
-c.hline(bar.High)
-```
-
-```python
-c.hline(bar.High)
-```
-
-```rust
-c.hline(bar.High, "{}");
-```
-
-```cpp
-// 暂不支持
-```
-
-```plotarrow```，在图表上绘制向上和向下的箭头。
-
-> plotarrow(series, title, colorup, colordown, offset, minheight, maxheight, editable, show_last, display)
-
-> display参数可选："none", "all"
-
-```javascript
-c.plotarrow(bar.Close - bar.Open)
-```
-
-```python
-c.plotarrow(bar.Close - bar.Open)
-```
-
-```rust
-c.plotarrow(bar.Close - bar.Open, "{}");
-```
-
-```cpp
-// 暂不支持
-```
-
-```plotshape```，在图表上绘制可视化形状。
-> plotshape(series, title, style, location, color, offset, text, textcolor, editable, size, show_last, display)
-> style参数可选："diamond", "square", "label_down", "label_up", "arrow_down", "arrow_up", "circle", "flag", "triangle_down", "triangle_up", "cross", "xcross"
-> location参数可选："abovebar", "belowbar", "top", "bottom", "absolute"
-> size参数可选："10px", "14px", "20px", "40px", "80px"，分别对应Pine语言中的size.tiny、size.small、size.normal、size.large、size.huge
-> size.auto等同于size.small。
-> display参数可选："none", "all"
-
-```javascript
-c.plotshape(bar.Low, {style: 'diamond'})
-```
-
-```python
-c.plotshape(bar.Low, style = 'diamond')
-```
-
-```rust
-c.plotshape(bar.Low > 0.0, r#"{"style": "diamond"}"#);
-```
-
-```cpp
-// 暂不支持
-```
-
-```plotchar```，在图表上使用任意给定的Unicode字符绘制可视化形状。
-> plotchar(series, title, char, location, color, offset, text, textcolor, editable, size, show_last, display)
-> location参数可选："abovebar", "belowbar", "top", "bottom", "absolute"
-> size参数可选："10px", "14px", "20px", "40px", "80px"，分别对应Pine语言中的size.tiny、size.small、size.normal、size.large、size.huge
-> size.auto等同于size.small。
-> display参数可选："none", "all"
-
-```javascript
-c.plotchar(bar.Close, {char: 'X'})
-```
-
-```python
-c.plotchar(bar.Close, char = 'X')
-```
-
-```rust
-c.plotchar(bar.Close > 0.0, r#"{"char": "X"}"#);
-```
-
-```cpp
-// 暂不支持
-```
-
-```plotcandle```，在图表上绘制K线图。
-> plotcandle(open, high, low, close, title, color, wickcolor, editable, show_last, bordercolor, display)
-> display参数可选："none", "all"
-
-```javascript
-c.plotcandle(bar.Open*0.9, bar.High*0.9, bar.Low*0.9, bar.Close*0.9)
-```
-
-```python
-c.plotcandle(bar.Open*0.9, bar.High*0.9, bar.Low*0.9, bar.Close*0.9)
-```
-
-```rust
-c.plotcandle(bar.Open * 0.9, bar.High * 0.9, bar.Low * 0.9, bar.Close * 0.9, "{}");
-```
-
-```cpp
-// 暂不支持
-```
-
-```signal```，此为Pine语言中不存在的函数，此处用于绘制买卖信号。
-> signal(direction, price, qty, id)
-
-传入的参数"long"表示交易方向，可选"long"、"closelong"、"short"、"closeshort"。传入的参数```bar.High```表示标记信号在Y轴上的位置。
-传入的参数1.5表示信号的交易数量。可传入第四个参数以替换默认绘制的文本内容；信号标记的默认文本为交易方向，例如："closelong"。
-
-```javascript
-c.signal("long", bar.High, 1.5)
-```
-
-```python
-c.signal("long", bar.High, 1.5)
-```
-
-```rust
-c.signal("long", bar.High, 1.5, "long");
-```
-
-```cpp
-// 暂不支持
-```
-
-```reset```，此为Pine语言中不存在的函数，用于清空图表数据。
-> reset(remain)
-
-```reset()```方法可接受一个参数```remain```，用于指定保留数据的条数。若不传入```remain```参数，则表示清除全部数据。
-
-```javascript
-c.reset()
-```
-
-```python
-c.reset()
-```
-
-```rust
-c.reset(0);
-```
-
-```cpp
-// 暂不支持
-```
-
-策略自定义绘图只能选用```KLineChart()```函数或```Chart()```函数两种方式中的一种。有关```KLineChart()```函数调用时所涉及的颜色、样式等设置，请参阅[使用KLineChart函数绘图的专题文章](https://www.fmz.com/bbs-topic/9482)。
-
-```pricePrecision```和```volumePrecision```参数用于控制图表中数据的显示精度。当未设置这些参数时，图表将使用默认精度显示数据。设置精度参数后，图表中的价格和成交量数据将按照指定的小数位数进行四舍五入显示，这有助于简化图表显示、提升可读性。
-
-See also: `Chart`
-
-#### LogReset
-
-```
-LogReset(remain)
-```
-
-清除日志。
-
-Parameters:
-
-- `remain` (number, optional): ```remain``` 参数用于设置需要保留的最近日志条数。
-
-```javascript
-function main() {
-    // 保留最近10条日志，清除其余日志
-    LogReset(10)
-}
-```
-
-```python
-def main():
-    LogReset(10)
-```
-
-```rust
-fn main() {
-    // 保留最近10条日志，清除其余日志
-    LogReset(10);
-}
-```
-
-```cpp
-void main() {
-    LogReset(10);
-}
-```
-
-策略实盘每次启动时的启动日志会计为一条，因此如果不传入参数，且策略启动时没有任何日志输出，日志将完全不予显示，需等待托管者回传日志（此为正常现象，并非异常情况）。
-
-See also: `Log`, `LogVacuum`
-
-#### LogVacuum
-
-```
-LogVacuum()
-```
-
-用于在调用 ```LogReset()``` 函数清除日志后，回收 **SQLite** 删除数据时所占用的存储空间。
-
-```javascript
-function main() {
-    LogReset()
-    LogVacuum()
-}
-```
-
-```python
-def main():
-    LogReset()
-    LogVacuum()
-```
-
-```rust
-fn main() {
-    LogReset(0);
-    LogVacuum();
-}
-```
-
-```cpp
-void main() {
-    LogReset();
-    LogVacuum();
-}
-```
-
-原因在于 ```SQLite``` 删除数据时并不会立即回收所占用的存储空间，需要执行 ```VACUUM``` 命令清理数据表以释放空间。该函数在调用时会触发文件移动操作，延迟较大，建议按合适的时间间隔调用。
-
-See also: `LogReset`
-
-#### console.log
-
-```
-console.log(...msgs)
-```
-
-用于在实盘页面的「调试信息」栏中输出调试信息。例如，实盘ID为```123456```时，```console.log```函数在实盘页面输出调试信息的同时，会在实盘所属托管者目录```/logs/storage/123456/```下创建一个扩展名为```.log```的日志文件并写入调试信息，文件名前缀为```stdout_```。
-
-Parameters:
-
-- `msg` (string / number / bool / object / array / any (平台支持的任意类型), optional): 参数```msg```为输出的内容，可以传递多个参数。
-
-```javascript
-function main() {
-    console.log("test console.log")
-}
-```
-
-```python
-# 不支持
-```
-
-```cpp
-// 不支持
-```
-
-注意事项：
-- 仅```JavaScript```语言支持此函数。
-- 仅实盘环境支持此函数，「调试工具」和「回测系统」均不支持。
-- 输出对象时会被转换为字符串```[object Object]```，因此建议输出可读的信息。
-
-See also: `console.error`
-
-#### console.error
-
-```
-console.error(...msgs)
-```
-
-用于在实盘页面的「调试信息」栏中输出错误信息。例如，实盘ID为```123456```时，```console.error```函数在实盘页面输出错误信息的同时，会在实盘所属托管者目录```/logs/storage/123456/```下创建一个以```stderr_```为前缀、```.log```为扩展名的日志文件，并将错误信息写入该文件。
-
-Parameters:
-
-- `msg` (string / number / bool / object / array / any (平台支持的任意类型), optional): 参数```msg```为需要输出的内容，可以传入多个参数。
-
-```javascript
-function main() {
-    console.error("test console.error")
-}
-```
-
-```python
-# 不支持
-```
-
-```cpp
-// 不支持
-```
-
-注意事项：
-- 仅```JavaScript```语言支持此函数。
-- 仅实盘环境支持此函数，「调试工具」和「回测系统」不支持。
-- 输出对象时会被转换为字符串```[object Object]```，建议输出可读性强的信息。
-
-See also: `console.log`
-
-### Market
-
-#### exchange.GetTicker
-
-```
-exchange.GetTicker()
-exchange.GetTicker(symbol)
-```
-
-获取当前设置的交易对、合约代码所对应现货或合约的`Ticker`结构，即行情数据。```GetTicker()```函数是交易所对象`exchange`的成员函数，```exchange```对象的成员函数（方法）的用途仅与```exchange```相关，后续文档中不再赘述。
-
-Parameters:
-
-- `symbol` (string, optional): 参数```symbol```用于指定所请求的`Ticker`数据对应的具体交易对、合约代码。若不传该参数，则默认请求当前设置的交易对、合约代码的行情数据。
-
-当调用```exchange.GetTicker(symbol)```函数且```exchange```为现货交易所对象时，若需请求计价币种为USDT、交易币种为BTC的行情数据，则参数```symbol```为：```"BTC_USDT"```，其格式为FMZ平台定义的交易对格式。
-
-当调用```exchange.GetTicker(symbol)```函数且```exchange```为期货交易所对象时，若需请求BTC的U本位永续合约的行情数据，则参数```symbol```为：```"BTC_USDT.swap"```，其格式为FMZ平台定义的**交易对**与**合约代码**的组合，两者之间以字符"."分隔。
-
-当调用```exchange.GetTicker(symbol)```函数且```exchange```为期货交易所对象时，若需请求BTC的U本位期权合约的行情数据，则参数```symbol```为：```"BTC_USDT.BTC-240108-40000-C"```（以币安期权BTC-240108-40000-C为例），其格式为FMZ平台定义的**交易对**与交易所定义的具体期权合约代码的组合，两者之间以字符"."分隔。
-
-Returns (`Ticker` / 空值): ```exchange.GetTicker()```函数请求数据成功时返回`Ticker`结构，请求数据失败时返回空值。
-
-对于期货交易所对象（即```exchange```或```exchanges[0]```），在调用行情函数前需要先使用```exchange.SetContractType()```函数设置合约代码，后续文档中不再赘述。
-
-```javascript
-function main(){
-    // 如果是期货交易所对象，先设置合约代码，例如设置为永续合约
-    // exchange.SetContractType("swap")
-
-    var ticker = exchange.GetTicker()
-    /*
-        可能由于网络原因，访问不到交易所接口（即使托管者程序所在设备能打开交易所网站，但是API接口也可能访问不通）
-        此时ticker为null，当访问ticker.High时，会导致错误，所以在测试该代码时，确保可以访问到交易所接口
-    */
-    Log("Symbol:", ticker.Symbol, "High:", ticker.High, "Low:", ticker.Low, "Sell:", ticker.Sell, "Buy:", ticker.Buy, "Last:", ticker.Last, "Open:", ticker.Open, "Volume:", ticker.Volume)
-}
-```
-
-```python
-def main():
-    ticker = exchange.GetTicker()
-    Log("Symbol:", ticker["Symbol"], "High:", ticker["High"], "Low:", ticker["Low"], "Sell:", ticker["Sell"], "Buy:", ticker["Buy"], "Last:", ticker["Last"], "Open:", ticker["Open"], "Volume:", ticker["Volume"])
-```
-
-```rust
-fn main() {
-    // 如果是期货交易所对象，先设置合约代码，例如设置为永续合约
-    // exchange.SetContractType("swap").unwrap();
-
-    let ticker = exchange.GetTicker(None).unwrap();
-    Log!("Symbol:", ticker.Symbol, "High:", ticker.High, "Low:", ticker.Low, "Sell:", ticker.Sell, "Buy:", ticker.Buy, "Last:", ticker.Last, "Open:", ticker.Open, "Volume:", ticker.Volume);
-}
-```
-
-```cpp
-void main() {
-    auto ticker = exchange.GetTicker();
-    Log("Symbol:", ticker.Symbol, "High:", ticker.High, "Low:", ticker.Low, "Sell:", ticker.Sell, "Buy:", ticker.Buy, "Last:", ticker.Last, "Open:", ticker.Open, "Volume:", ticker.Volume);
-}
-```
-
-使用```symbol```参数请求具体品种（现货品种）的行情数据。
-
-```javascript
-function main() {
-    var ticker = exchange.GetTicker("BTC_USDT")
-    Log(ticker)
-}
-```
-
-```python
-def main():
-    ticker = exchange.GetTicker("BTC_USDT")
-    Log(ticker)
-```
-
-```rust
-fn main() {
-    let ticker = exchange.GetTicker("BTC_USDT").unwrap();
-    Log!(ticker);
-}
-```
-
-```cpp
-void main() {
-    auto ticker = exchange.GetTicker("BTC_USDT");
-    Log(ticker);
-}
-```
-
-在回测系统中，```exchange.GetTicker()```函数返回的```Ticker```数据中，```High```、```Low```为模拟值，取自当时盘口的卖一价和买一价。
-
-在实盘中，```exchange.GetTicker()```函数返回的```Ticker```数据中，```High```和```Low```的值根据所封装的交易所```Tick```接口返回的数据确定，这些数据包含一定周期内（通常为24小时周期）的最高价和最低价。
-
-不支持```exchange.GetTicker()```函数的交易所：
-
-| 函数名 | 不支持的现货交易所 | 不支持的期货交易所 |
+| 对象 | 说明 | 备注 |
 | - | - | - |
-| GetTicker | -- | Futures_Aevo |
-
-See also: `exchange.GetDepth`, `exchange.GetTrades`, `exchange.GetRecords`, `exchange.GetTickers`, `exchange.IO`（API限流控制）
-
-#### exchange.GetDepth
-
-```
-exchange.GetDepth()
-exchange.GetDepth(symbol)
-```
-
-获取当前设置的交易对、合约代码所对应的现货或合约的`Depth`结构，即订单簿数据。
-
-Parameters:
-
-- `symbol` (string, optional): 参数```symbol```用于指定所请求的`Depth`数据对应的具体交易对或合约代码。若不传该参数，则默认请求当前设置的交易对、合约代码的订单簿数据。
-
-当调用```exchange.GetDepth(symbol)```函数时，若```exchange```为现货交易所对象，且需要请求计价币种为USDT、交易币种为BTC的订单簿数据，则参数```symbol```应为```"BTC_USDT"```，其格式为FMZ平台定义的交易对格式。
-
-当调用```exchange.GetDepth(symbol)```函数时，若```exchange```为期货交易所对象，且需要请求BTC的U本位永续合约的订单簿数据，则参数```symbol```应为```"BTC_USDT.swap"```，其格式为FMZ平台定义的**交易对**与**合约代码**的组合，并以字符"."间隔。
-
-当调用```exchange.GetDepth(symbol)```函数时，若```exchange```为期货交易所对象，且需要请求BTC的U本位期权合约的订单簿数据，则参数```symbol```应为```"BTC_USDT.BTC-240108-40000-C"```（以币安期权BTC-240108-40000-C为例），其格式为FMZ平台定义的**交易对**与交易所定义的具体期权合约代码的组合，并以字符"."间隔。
-
-Returns (`Depth` / 空值): ```exchange.GetDepth()```函数在请求数据成功时返回`Depth`结构，请求数据失败时返回空值。
-
-测试```exchange.GetDepth()```函数：
-
-```javascript
-function main(){
-    var depth = exchange.GetDepth()
-    /*
-        可能由于网络原因，访问不到交易所接口（即使托管者程序所在设备能打开交易所网站，但是API接口也可能访问不通）
-        此时depth为null，当访问depth.Asks[1].Price时，会导致错误，所以在测试该代码时，确保可以访问到交易所接口
-    */
-    var price = depth.Asks[1].Price
-    Log("Second ask price:", price)
-}
-```
-
-```python
-def main():
-    depth = exchange.GetDepth()
-    price = depth["Asks"][1]["Price"]
-    Log("Second ask price:", price)
-```
-
-```rust
-fn main() {
-    let depth = exchange.GetDepth(None).unwrap();
-    let price = depth.Asks[1].Price;
-    Log!("Second ask price:", price);
-}
-```
-
-```cpp
-void main() {
-    auto depth = exchange.GetDepth();
-    auto price = depth.Asks[1].Price;
-    Log("Second ask price:", price);
-}
-```
-
-当配置的```exchange```对象为期货交易所对象时，使用```symbol```参数请求指定品种（期货品种）的订单簿数据。
-
-```javascript
-function main() {
-    // BTC的U本位永续合约
-    var depth = exchange.GetDepth("BTC_USDT.swap")
-    Log(depth)
-}
-```
-
-```python
-def main():
-    depth = exchange.GetDepth("BTC_USDT.swap")
-    Log(depth)
-```
-
-```rust
-fn main() {
-    // BTC的U本位永续合约
-    let depth = exchange.GetDepth("BTC_USDT.swap").unwrap();
-    Log!(depth);
-}
-```
-
-```cpp
-void main() {
-    auto depth = exchange.GetDepth("BTC_USDT.swap");
-    Log(depth);
-}
-```
-
-回测系统中，使用**模拟级 Tick**回测时，```exchange.GetDepth()```函数返回数据的各档位均为模拟值。
-
-回测系统中，使用**实盘级 Tick**回测时，```exchange.GetDepth()```函数返回的数据为秒级别的深度快照。
-
-See also: `exchange.GetTicker`, `exchange.GetTrades`, `exchange.GetRecords`
-
-#### exchange.GetTrades
-
-```
-exchange.GetTrades()
-exchange.GetTrades(symbol)
-```
-
-获取当前设置的交易对、合约代码所对应的现货或合约的`Trade`结构数组，即市场的成交数据。
-
-Parameters:
-
-- `symbol` (string, optional): 参数```symbol```用于指定所请求的`Trade`数组数据对应的具体交易对、合约代码。若不传该参数，则默认请求当前设置的交易对、合约代码的最近成交记录数据。
-
-当调用```exchange.GetTrades(symbol)```函数时，若```exchange```为现货交易所对象，需要请求计价币种为USDT、交易币种为BTC的成交数据，则参数```symbol```为：```"BTC_USDT"```，其格式为FMZ平台定义的交易对格式。
-
-当调用```exchange.GetTrades(symbol)```函数时，若```exchange```为期货交易所对象，需要请求BTC的U本位永续合约的成交数据，则参数```symbol```为：```"BTC_USDT.swap"```，其格式为FMZ平台定义的**交易对**与**合约代码**组合，并以字符"."间隔。
-
-当调用```exchange.GetTrades(symbol)```函数时，若```exchange```为期货交易所对象，需要请求BTC的U本位期权合约的成交数据，则参数```symbol```为：```"BTC_USDT.BTC-240108-40000-C"```（以币安期权BTC-240108-40000-C为例），其格式为FMZ平台定义的**交易对**与交易所定义的具体期权合约代码组合，并以字符"."间隔。
-
-Returns (`Trade`数组 / 空值): ```exchange.GetTrades()```函数在请求数据成功时返回`Trade`结构数组，在请求数据失败时返回空值。
-
-测试```exchange.GetTrades()```函数：
-
-```javascript
-function main(){
-    var trades = exchange.GetTrades()
-    /*
-        可能由于网络原因，访问不到交易所接口（即使托管者程序所在设备能打开交易所网站，但是API接口也可能访问不通）
-        此时trades为null，当访问trades[0].Id时，会导致错误，所以在测试该代码时，确保可以访问到交易所接口
-    */
-    Log("id:", trades[0].Id, "time:", trades[0].Time, "Price:", trades[0].Price, "Amount:", trades[0].Amount, "type:", trades[0].Type)
-}
-```
-
-```python
-def main():
-    trades = exchange.GetTrades()
-    Log("id:", trades[0]["Id"], "time:", trades[0]["Time"], "Price:", trades[0]["Price"], "Amount:", trades[0]["Amount"], "type:", trades[0]["Type"])
-```
-
-```rust
-fn main() {
-    let trades = exchange.GetTrades(None).unwrap();
-    Log!("id:", trades[0].Id, "time:", trades[0].Time, "Price:", trades[0].Price, "Amount:", trades[0].Amount, "type:", trades[0].Type);
-}
-```
-
-```cpp
-void main() {
-    auto trades = exchange.GetTrades();
-    Log("id:", trades[0].Id, "time:", trades[0].Time, "Price:", trades[0].Price, "Amount:", trades[0].Amount, "type:", trades[0].Type);
-}
-```
-
-当配置的```exchange```对象为期货交易所对象时，使用```symbol```参数请求具体品种（期货品种）的市场成交记录数据。
-
-```javascript
-function main() {
-    // BTC的U本位永续合约
-    var trades = exchange.GetTrades("BTC_USDT.swap")
-    Log(trades)
-}
-```
-
-```python
-def main():
-    trades = exchange.GetTrades("BTC_USDT.swap")
-    Log(trades)
-```
-
-```rust
-fn main() {
-    // BTC的U本位永续合约
-    let trades = exchange.GetTrades("BTC_USDT.swap").unwrap();
-    Log!(trades);
-}
-```
-
-```cpp
-void main() {
-    auto trades = exchange.GetTrades("BTC_USDT.swap");
-    Log(trades);
-}
-```
-
-```exchange.GetTrades()```函数用于获取当前交易对、合约所对应市场的成交历史（非自身成交）。部分交易所不支持该函数，且具体返回的成交记录范围因交易所而异，需要根据实际情况处理。返回数据为一个数组，其中每个元素的时间顺序与```exchange.GetRecords()```函数的返回数据顺序一致，即数组的最后一个元素为距离当前时间最近的数据。
-
-在回测系统中，使用**模拟级 Tick**回测时，```exchange.GetTrades()```函数返回空数组。
-
-在回测系统中，使用**实盘级 Tick**回测时，```exchange.GetTrades()```函数返回的数据为订单流快照数据，即`Trade`结构数组。
-
-不支持```exchange.GetTrades()```函数的交易所：
-
-| 函数名 | 不支持的现货交易所 | 不支持的期货交易所 |
-| - | - | - |
-| GetTrades | Hyperliquid | Futures_BitMart / Futures_Bibox / Futures_Hyperliquid / Futures_edgeX |
-
-See also: `exchange.GetTicker`, `exchange.GetDepth`, `exchange.GetRecords`
-
-#### exchange.GetRecords
-
-```
-exchange.GetRecords()
-exchange.GetRecords(symbol)
-exchange.GetRecords(symbol, period)
-exchange.GetRecords(symbol, period, limit)
-exchange.GetRecords(period)
-exchange.GetRecords(period, limit)
-```
-
-获取当前设置的交易对、合约代码所对应的现货或合约的`Record`结构数组，即K线数据。
-
-Parameters:
-
-- `symbol` (string, optional): 参数```symbol```用于指定所请求的`Record`数组数据对应的具体交易对、合约代码。若不传该参数，则默认请求当前设置的交易对、合约代码的K线数据。
-
-当调用```exchange.GetRecords(symbol)```函数时，若```exchange```为现货交易所对象，需要请求计价币种为USDT、交易币种为BTC的K线数据，则参数```symbol```为：```"BTC_USDT"```，其格式为FMZ平台定义的交易对格式。
-
-当调用```exchange.GetRecords(symbol)```函数时，若```exchange```为期货交易所对象，需要请求BTC的U本位永续合约K线数据，则参数```symbol```为：```"BTC_USDT.swap"```，其格式为FMZ平台定义的**交易对**与**合约代码**组合，并以字符"."间隔。
-
-当调用```exchange.GetRecords(symbol)```函数时，若```exchange```为期货交易所对象，需要请求BTC的U本位期权合约K线数据，则参数```symbol```为：```"BTC_USDT.BTC-240108-40000-C"```（以币安期权BTC-240108-40000-C为例），其格式为FMZ平台定义的**交易对**与交易所定义的具体期权合约代码组合，并以字符"."间隔。
-- `period` (number, optional): 参数```period```用于指定所请求K线数据的周期，例如：`PERIOD_M1`、`PERIOD_M5`、`PERIOD_M15`等；参数```period```除了可以传入已定义的标准周期外，还可以传入整数数值，单位为秒。若不传该参数，则默认请求的K线数据周期为当前策略实盘/回测所配置的默认K线周期。
-- `limit` (number, optional): 参数```limit```用于指定所请求K线数据的长度，若不传该参数，则默认请求长度为交易所K线接口单次最大请求的K线柱数量；该参数可能会触发对交易所K线数据的分页查询，分页查询时该函数的调用耗时会相应增加。
-
-Returns (`Record`数组 / 空值): ```exchange.GetRecords()```函数请求数据成功时返回`Record`结构数组，请求数据失败时返回空值。
-
-获取自定义周期的 K 线数据。
-
-```javascript
-function main() {
-    // 打印 K 线周期为 120 秒（2 分钟）的 K 线数据
-    Log(exchange.GetRecords(60 * 2))
-    // 打印 K 线周期为 5 分钟的 K 线数据
-    Log(exchange.GetRecords(PERIOD_M5))
-}
-```
-
-```python
-def main():
-    Log(exchange.GetRecords(60 * 2))
-    Log(exchange.GetRecords(PERIOD_M5))
-```
-
-```rust
-fn main() {
-    // 打印 K 线周期为 120 秒（2 分钟）的 K 线数据
-    Log!(exchange.GetRecords(None, 60 * 2, None));
-    // 打印 K 线周期为 5 分钟的 K 线数据
-    Log!(exchange.GetRecords(None, PERIOD_M5, None));
-}
-```
-
-```cpp
-void main() {
-    Log(exchange.GetRecords(60 * 2)[0]);
-    Log(exchange.GetRecords(PERIOD_M5)[0]);
-}
-```
-
-输出 K 线柱数据：
-
-```javascript
-function main() {
-    var records = exchange.GetRecords(PERIOD_H1)
-    /*
-        可能由于网络原因，无法访问交易所接口（即使托管者程序所在设备能够打开交易所网站，API 接口仍可能无法访问）
-        此时 records 为 null，访问 records[0].Time 时会导致错误。因此在测试该代码时，请确保能够正常访问交易所接口
-    */
-    Log("First K-line data: Time:", records[0].Time, "Open:", records[0].Open, "High:", records[0].High)
-    Log("Second K-line data: Time:", records[1].Time ,"Close:", records[1].Close)
-    Log("Current K-line (latest)", records[records.length-1], "Previous K-line", records[records.length-2])
-}
-```
-
-```python
-def main():
-    records = exchange.GetRecords(PERIOD_H1)
-    Log("First K-line data: Time:", records[0]["Time"], "Open:", records[0]["Open"], "High:", records[0]["High"])
-    Log("Second K-line data: Time:", records[1]["Time"], "Close:", records[1]["Close"])
-    Log("Current K-line (latest)", records[-1], "Previous K-line", records[-2])
-```
-
-```rust
-fn main() {
-    let records = exchange.GetRecords(None, PERIOD_H1, None).unwrap();
-    Log!("First K-line data: Time:", records[0].Time, "Open:", records[0].Open, "High:", records[0].High);
-    Log!("Second K-line data: Time:", records[1].Time, "Close:", records[1].Close);
-    Log!("Current K-line (latest)", records[records.len() - 1], "Previous K-line", records[records.len() - 2]);
-}
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords(PERIOD_H1);
-    Log("First K-line data: Time:", records[0].Time, "Open:", records[0].Open, "High:", records[0].High);
-    Log("Second K-line data: Time:", records[1].Time, "Close:", records[1].Close);
-    Log("Current K-line (latest)", records[records.size() - 1], "Previous K-line", records[records.size() - 2]);
-}
-```
-
-当配置的```exchange```对象为期货交易所对象时，可使用```symbol```、```period```、```limit```参数请求指定品种（期货品种）的K线数据。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords("BTC_USDT.swap", 60, 100)
-    Log(records)
-}
-```
-
-```python
-def main():
-    records = exchange.GetRecords("BTC_USDT.swap", 60, 100)
-    Log(records)
-```
-
-```rust
-fn main() {
-    let records = exchange.GetRecords("BTC_USDT.swap", 60, 100).unwrap();
-    Log!(records);
-}
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords("BTC_USDT.swap", 60, 100);
-    Log(records);
-}
-```
-
-默认K线周期可在回测、实盘页面进行设置。调用```exchange.GetRecords()```函数时，如果指定了参数，则获取该参数所指定周期的K线数据；如果未指定参数，则返回回测、实盘参数中所设置周期的K线数据。
-
-返回值为```Record```结构数组。返回的K线数据会随时间不断累积，累积的K线柱数量上限受```exchange.SetMaxBarLen()```函数设置的影响，未设置时默认上限为5000个K线柱。当K线数据达到累积上限后，每新增一根K线柱的同时会删除时间最早的一根K线柱（类似队列的先进先出）。部分交易所未提供K线接口，此时由托管者实时收集市场成交记录数据（```Trade```结构数组）来合成K线。
-
-如果交易所的K线接口支持分页查询，当调用```exchange.SetMaxBarLen()```函数设置较大的K线长度时，系统会发起多次API请求。
-
-初始调用```exchange.GetRecords()```函数时，所获取的K线柱数量在回测和实盘环境下有所不同：
-
-  - 回测系统会预先获取回测时间范围起始时刻之前一定数量的K线柱（默认为5000个，回测系统的相关设置及数据量会影响最终返回的数量），作为初始K线数据。
-
-  - 实盘时具体获取的K线柱数量取决于交易所K线接口所能提供的最大数据量。
-
-将```period```参数设置为5，即表示请求获取以5秒为周期的K线数据。如果```period```参数不能被60整除（即所代表的周期无法以分钟为单位表示），系统底层会使用```exchange.GetTrades()```的相关接口获取成交记录数据，以合成所需的K线数据；如果```period```参数能被60整除，则最小使用1分钟K线数据（并尽可能使用较大的周期）来合成所需的K线数据。
-
-在回测系统的模拟级别回测中，由于需要设置底层K线周期（模拟级别回测时，系统会根据设置的底层K线周期，使用对应的K线数据生成Tick数据），因此需要注意：策略中获取的K线数据周期不能小于底层K线周期。这是因为在模拟级别回测中，各个周期的K线数据均由底层K线周期对应的K线数据合成而来。
-
-```C++```语言中如果需要自行构造K线数据，可参考以下代码范例：
-
-```cpp
-#include <sstream>
-void main() {
-    Records r;
-    r.Valid = true;
-    for (auto i = 0; i < 10; i++) {
-        Record ele;
-        ele.Time = i * 100000;
-        ele.High = i * 10000;
-        ele.Low = i * 1000;
-        ele.Close = i * 100;
-        ele.Open = i * 10;
-        ele.Volume = i * 1;
-        r.push_back(ele);
-    }
-    // 输出显示：Records[10]
-    Log(r);
-    auto ma = TA.MA(r,10);
-    // 输出显示：[nan,nan,nan,nan,nan,nan,nan,nan,nan,450]
-    Log(ma);
-}
-```
-
-不支持```exchange.GetRecords()```函数的交易所：
-
-  | 函数名 | 不支持的现货交易所 | 不支持的期货交易所 |
-  | - | - | - |
-  | GetRecords | Zaif / Coincheck / BitFlyer | Futures_Aevo |
-
-See also: `exchange.GetTicker`, `exchange.GetDepth`, `exchange.GetTrades`, `exchange.SetMaxBarLen`
-
-#### exchange.GetPeriod
-
-```
-exchange.GetPeriod()
-```
-
-获取回测或实盘运行策略时，在发明者量化交易平台网站页面上所设置的 K 线周期，即调用 ```exchange.GetRecords()``` 函数且不传入参数时使用的默认 K 线周期。
-
-Returns (number): K 线周期的秒数，为整数数值，单位为秒。
-
-```javascript
-function main() {
-    // 例如，回测或实盘时在发明者量化交易平台网站页面上设置的 K 线周期为 1 小时
-    var period = exchange.GetPeriod()
-    Log("K-line period:", period / (60 * 60), "hours")
-}
-```
-
-```python
-def main():
-    period = exchange.GetPeriod()
-    Log("K-line period:", period / (60 * 60), "hours")
-```
-
-```rust
-fn main() {
-    // 例如，回测或实盘时在发明者量化交易平台网站页面上设置的 K 线周期为 1 小时
-    let period = exchange.GetPeriod();
-    Log!("K-line period:", period as f64 / (60.0 * 60.0), "hours");
-}
-```
-
-```cpp
-void main() {
-    auto period = exchange.GetPeriod();
-    Log("K-line period:", period / (60 * 60.0), "hours");
-}
-```
-
-See also: `exchange.GetRecords`
-
-#### exchange.SetMaxBarLen
-
-```
-exchange.SetMaxBarLen(len)
-```
-
-设置K线的最大长度。
-
-Parameters:
-
-- `len` (number, required): 参数```len```用于指定K线的最大长度。
-
-```javascript
-function main() {
-    exchange.SetMaxBarLen(50)
-    var records = exchange.GetRecords()
-    Log(records.length, records)
-}
-```
-
-```python
-def main():
-    exchange.SetMaxBarLen(50)
-    r = exchange.GetRecords()
-    Log(len(r), r)
-```
-
-```rust
-fn main() {
-    exchange.SetMaxBarLen(50);
-    let records = exchange.GetRecords(None, None, None).unwrap();
-    Log!(records.len(), records);
-}
-```
-
-```cpp
-void main() {
-    exchange.SetMaxBarLen(50);
-    auto r = exchange.GetRecords();
-    Log(r.size(), r[0]);
-}
-```
-
-```exchange.SetMaxBarLen()```函数在加密货币策略运行时会影响以下两个方面：
-
-- 影响首次调用时获取的K线线柱（Bar）数量。
-
-- 影响K线线柱（Bar）数量的上限。
-
-See also: `exchange.GetRecords`
-
-#### exchange.GetRawJSON
-
-```
-exchange.GetRawJSON()
-```
-
-获取当前交易所对象（`exchange`、`exchanges`）最近一次```rest```请求返回的原始内容。
-
-Returns (string): ```rest```请求的响应数据。
-
-```javascript
-function main(){
-    exchange.GetAccount();
-    var obj = JSON.parse(exchange.GetRawJSON());
-    Log(obj);
-}
-```
-
-```python
-import json
-def main():
-    exchange.GetAccount()
-    obj = json.loads(exchange.GetRawJSON())
-    Log(obj)
-```
-
-```cpp
-void main() {
-    auto obj = exchange.GetAccount();
-    // C++ 不支持GetRawJSON函数
-    Log(obj);
-}
-```
-
-```exchange.GetRawJSON()```函数仅支持实盘交易。```C++```语言的策略不支持此函数。
-
-See also: `exchange`
-
-#### exchange.GetRate
-
-```
-exchange.GetRate()
-```
-
-获取交易所对象当前设置的汇率。
-
-Returns (number): 交易所对象当前的汇率值。
-
-```javascript
-function main(){
-    Log(exchange.GetTicker())
-    // 设置汇率转换
-    exchange.SetRate(7)
-    Log(exchange.GetTicker())
-    Log("Current rate:", exchange.GetRate())
-}
-```
-
-```python
-def main():
-    Log(exchange.GetTicker())
-    exchange.SetRate(7)
-    Log(exchange.GetTicker())
-    Log("Current rate:", exchange.GetRate())
-```
-
-```rust
-fn main() {
-    Log!(exchange.GetTicker(None));
-    // 设置汇率转换
-    exchange.SetRate(7);
-    Log!(exchange.GetTicker(None));
-    Log!("Current rate:", exchange.GetRate());
-}
-```
-
-```cpp
-void main() {
-    Log(exchange.GetTicker());
-    exchange.SetRate(7);
-    Log(exchange.GetTicker());
-    Log("Current rate:", exchange.GetRate());
-}
-```
-
-如果未调用```exchange.SetRate()```设置过转换汇率，```exchange.GetRate()```函数将返回默认汇率值```1```，即当前显示的计价货币（quoteCurrency）相关数据未经过汇率转换。
-
-如果已使用```exchange.SetRate()```设置过汇率值，例如```exchange.SetRate(7)```，那么通过```exchange```交易所对象获取的行情、深度、下单价格等所有价格信息，都会乘以所设置的汇率```7```进行转换。
-
-如果```exchange```对应的是以美元为计价货币的交易所，在调用```exchange.SetRate(7)```后，实盘中的所有价格都会乘以```7```，转换为接近人民币（CNY）的价格。此时通过```exchange.GetRate()```获取的汇率值即为```7```。
-
-See also: `exchange.SetRate`
-
-#### exchange.SetData
-
-```
-exchange.SetData(key, value)
-```
-
-```exchange.SetData()```函数用于设置策略运行时所加载的数据。
-
-Parameters:
-
-- `key` (string, required): 数据集合的名称。
-- `value` (array, required): ```exchange.SetData()```函数所要加载的数据，其数据结构为数组。该数据结构与```exchange.GetData()```函数请求外部数据时所要求的格式相同，即：```"schema": ["time", "data"]```。
-
-Returns (number): 参数```value```经JSON编码后的字符串长度。
-
-参数```value```所要求的数据格式如同以下例子中的```data```变量。可以看到，时间戳```1579622400000```对应的时间为```2020-01-22 00:00:00```。当策略程序运行时刻超过该时间之后、且在下一条数据的时间戳```1579708800000```（即时间```2020-01-23 00:00:00```）之前，调用```exchange.GetData()```函数获取到的均为```[1579622400000, 123]```这条数据的内容。随着程序继续运行、时间推移，以此类推即可逐条获取数据。
-
-在以下例子中，运行时（回测或实盘）当前时刻到达或超过```1579795200000```这个时间戳时，调用```exchange.GetData()```函数，返回值为：```{"Time":1579795200000,"Data":["abc",123,{"price":123}]}```。其中```"Time":1579795200000```对应数据```[1579795200000, ["abc", 123, {"price": 123}]]```中的```1579795200000```；```"Data":["abc",123,{"price":123}]```对应数据```[1579795200000, ["abc", 123, {"price": 123}]]```中的```["abc", 123, {"price": 123}]```。
-
-```javascript
-/*backtest
-start: 2020-01-21 00:00:00
-end: 2020-02-12 00:00:00
-period: 1d
-basePeriod: 1d
-exchanges: [{"eid":"Bitfinex","currency":"BTC_USD"}]
-*/
-function main() {
-    var data = [
-        [1579536000000, "abc"],
-        [1579622400000, 123],
-        [1579708800000, {"price": 123}],
-        [1579795200000, ["abc", 123, {"price": 123}]]
-    ]
-    exchange.SetData("test", data)
-    while(true) {
-        Log(exchange.GetData("test"))
-        Sleep(1000)
-    }
-}
-```
-
-```python
-'''backtest
-start: 2020-01-21 00:00:00
-end: 2020-02-12 00:00:00
-period: 1d
-basePeriod: 1d
-exchanges: [{"eid":"Bitfinex","currency":"BTC_USD"}]
-'''
-
-def main():
-    data = [
-        [1579536000000, "abc"],
-        [1579622400000, 123],
-        [1579708800000, {"price": 123}],
-        [1579795200000, ["abc", 123, {"price": 123}]]
-    ]
-    exchange.SetData("test", data)
-    while True:
-        Log(exchange.GetData("test"))
-        Sleep(1000)
-```
-
-```rust
-/*backtest
-start: 2020-01-21 00:00:00
-end: 2020-02-12 00:00:00
-period: 1d
-basePeriod: 1d
-exchanges: [{"eid":"Bitfinex","currency":"BTC_USD"}]
-*/
-
-fn main() {
-    // Rust SDK 中SetData的数据参数为JSON字符串
-    let data = r#"[
-        [1579536000000, "abc"],
-        [1579622400000, 123],
-        [1579708800000, {"price": 123}],
-        [1579795200000, ["abc", 123, {"price": 123}]]
-    ]"#;
-    exchange.SetData("test", data);
-    loop {
-        Log!(exchange.GetData("test"));
-        Sleep(1000);
-    }
-}
-```
-
-```cpp
-/*backtest
-start: 2020-01-21 00:00:00
-end: 2020-02-12 00:00:00
-period: 1d
-basePeriod: 1d
-exchanges: [{"eid":"Bitfinex","currency":"BTC_USD"}]
-*/
-
-void main() {
-    json data = R"([
-        [1579536000000, "abc"],
-        [1579622400000, 123],
-        [1579708800000, {"price": 123}],
-        [1579795200000, ["abc", 123, {"price": 123}]]
-    ])"_json;
-
-    exchange.SetData("test", data);
-    while(true) {
-        Log(exchange.GetData("test"));
-        Sleep(1000);
-    }
-}
-```
-
-加载的数据可以是任何经济指标、行业数据、相关指数等，用于在策略中量化评估各类可量化的信息。
-
-See also: `exchange.GetData`
-
-#### exchange.GetData
-
-```
-exchange.GetData(key)
-exchange.GetData(key, timeout)
-```
-
-```exchange.GetData()```函数用于获取由```exchange.SetData()```函数加载的数据，或外部链接提供的数据。
-
-Parameters:
-
-- `key` (string, required): 数据集合的名称，或数据请求链接。
-- `timeout` (number, optional): 用于设置缓存超时时间，单位为毫秒。实盘时默认缓存超时时间为一分钟。
-
-Returns (object / 空值): 数据集合中的记录，或请求返回的数据。
-
-获取直接写入数据的调用方式。
-
-```javascript
-/*backtest
-start: 2020-01-21 00:00:00
-end: 2020-02-12 00:00:00
-period: 1d
-basePeriod: 1d
-exchanges: [{"eid":"Bitfinex","currency":"BTC_USD"}]
-*/
-function main() {
-    exchange.SetData("test", [[1579536000000, _D(1579536000000)], [1579622400000, _D(1579622400000)], [1579708800000, _D(1579708800000)]])
-    while(true) {
-        Log(exchange.GetData("test"))
-        Sleep(1000 * 60 * 60 * 24)
-    }
-}
-```
-
-```python
-'''backtest
-start: 2020-01-21 00:00:00
-end: 2020-02-12 00:00:00
-period: 1d
-basePeriod: 1d
-exchanges: [{"eid":"Bitfinex","currency":"BTC_USD"}]
-'''
-def main():
-    exchange.SetData("test", [[1579536000000, _D(1579536000000/1000)], [1579622400000, _D(1579622400000/1000)], [1579708800000, _D(1579708800000/1000)]])
-    while True:
-        Log(exchange.GetData("test"))
-        Sleep(1000 * 60 * 60 * 24)
-```
-
-```rust
-/*backtest
-start: 2020-01-21 00:00:00
-end: 2020-02-12 00:00:00
-period: 1d
-basePeriod: 1d
-exchanges: [{"eid":"Bitfinex","currency":"BTC_USD"}]
-*/
-fn main() {
-    // Rust SDK 中SetData的数据参数为JSON字符串，使用format!拼接数据
-    let data = format!(r#"[[1579536000000, "{}"], [1579622400000, "{}"], [1579708800000, "{}"]]"#, _D(1579536000000), _D(1579622400000), _D(1579708800000));
-    exchange.SetData("test", &data);
-    loop {
-        Log!(exchange.GetData("test"));
-        Sleep(1000 * 60 * 60 * 24);
-    }
-}
-```
-
-```cpp
-/*backtest
-start: 2020-01-21 00:00:00
-end: 2020-02-12 00:00:00
-period: 1d
-basePeriod: 1d
-exchanges: [{"eid":"Bitfinex","currency":"BTC_USD"}]
-*/
-void main() {
-    json arr = R"([[1579536000000, ""], [1579622400000, ""], [1579708800000, ""]])"_json;
-    arr[0][1] = _D(1579536000000);
-    arr[1][1] = _D(1579622400000);
-    arr[2][1] = _D(1579708800000);
-    exchange.SetData("test", arr);
-    while(true) {
-        Log(exchange.GetData("test"));
-        Sleep(1000 * 60 * 60 * 24);
-    }
-}
-```
-
-支持通过外部链接请求数据，请求返回的数据格式如下：
-```json
-{
-    "schema":["time","data"],
-    "data":[
-        [1579536000000, "abc"],
-        [1579622400000, 123],
-        [1579708800000, {"price": 123}],
-        [1579795200000, ["abc", 123, {"price": 123}]]
-    ]
-}
-```
-
-其中```schema```定义了数据主体中每条记录的数据格式，该格式固定为```["time","data"]```，与```data```属性中逐条数据的格式一一对应。```data```属性用于存储数据主体，每条数据由毫秒级时间戳和数据内容构成（数据内容可以是任何可JSON编码的数据）。
-
-以下是使用Go语言编写的测试服务程序：
-```golang
-package main
-
-import (
-    "fmt"
-    "net/http"
-    "encoding/json"
-)
-
-func Handle (w http.ResponseWriter, r *http.Request) {
-    defer func() {
-        fmt.Println("req:", *r)
-        ret := map[string]interface{}{
-            "schema": []string{"time","data"},
-            "data": []interface{}{
-                []interface{}{1579536000000, "abc"},
-                []interface{}{1579622400000, 123},
-                []interface{}{1579708800000, map[string]interface{}{"price":123}},
-                []interface{}{1579795200000, []interface{}{"abc", 123, map[string]interface{}{"price":123}}},
-            },
-        }
-        b, _ := json.Marshal(ret)
-        w.Write(b)
-    }()
-}
-
-func main () {
-    fmt.Println("listen http://localhost:9090")
-    http.HandleFunc("/data", Handle)
-    http.ListenAndServe(":9090", nil)
-}
-```
-
-程序接收到请求后返回的应答数据：
-```json
-{
-    "schema":["time","data"],
-    "data":[
-        [1579536000000, "abc"],
-        [1579622400000, 123],
-        [1579708800000, {"price": 123}],
-        [1579795200000, ["abc", 123, {"price": 123}]]
-    ]
-}
-```
-
-测试策略代码如下：
-
-```javascript
-/*backtest
-start: 2020-01-21 00:00:00
-end: 2020-02-12 00:00:00
-period: 1d
-basePeriod: 1d
-exchanges: [{"eid":"Bitfinex","currency":"BTC_USD"}]
-*/
-function main() {
-    while(true) {
-        Log(exchange.GetData("http://xxx.xx.x.xx:9090/data"))
-        Sleep(1000)
-    }
-}
-```
-
-```python
-'''backtest
-start: 2020-01-21 00:00:00
-end: 2020-02-12 00:00:00
-period: 1d
-basePeriod: 1d
-exchanges: [{"eid":"Bitfinex","currency":"BTC_USD"}]
-'''
-
-def main():
-    while True:
-        Log(exchange.GetData("http://xxx.xx.x.xx:9090/data"))
-        Sleep(1000)
-```
-
-```rust
-/*backtest
-start: 2020-01-21 00:00:00
-end: 2020-02-12 00:00:00
-period: 1d
-basePeriod: 1d
-exchanges: [{"eid":"Bitfinex","currency":"BTC_USD"}]
-*/
-
-fn main() {
-    loop {
-        Log!(exchange.GetData("http://xxx.xx.x.xx:9090/data"));
-        Sleep(1000);
-    }
-}
-```
-
-```cpp
-/*backtest
-start: 2020-01-21 00:00:00
-end: 2020-02-12 00:00:00
-period: 1d
-basePeriod: 1d
-exchanges: [{"eid":"Bitfinex","currency":"BTC_USD"}]
-*/
-
-void main() {
-    while(true) {
-        Log(exchange.GetData("http://xxx.xx.x.xx:9090/data"));
-        Sleep(1000);
-    }
-}
-```
-
-获取外部链接数据的调用方式。
-
-```javascript
-function main() {
-    Log(exchange.GetData("http://xxx.xx.x.xx:9090/data"))
-    Log(exchange.GetData("https://www.fmz.com/upload/asset/32bf73a69fc12d36e76.json"))
-}
-```
-
-```python
-def main():
-    Log(exchange.GetData("http://xxx.xx.x.xx:9090/data"))
-    Log(exchange.GetData("https://www.fmz.com/upload/asset/32bf73a69fc12d36e76.json"))
-```
-
-```rust
-fn main() {
-    Log!(exchange.GetData("http://xxx.xx.x.xx:9090/data"));
-    Log!(exchange.GetData("https://www.fmz.com/upload/asset/32bf73a69fc12d36e76.json"));
-}
-```
-
-```cpp
-void main() {
-    Log(exchange.GetData("http://xxx.xx.x.xx:9090/data"));
-    Log(exchange.GetData("https://www.fmz.com/upload/asset/32bf73a69fc12d36e76.json"));
-}
-```
-
-请求在[datadata](https://www.datadata.com)平台上创建的查询数据，应答的数据格式需满足以下要求（schema中必须描述time和data字段）：
-```json
-{
-    "data": [],
-    "schema": ["time", "data"]
-}
-```
-
-其中"data"字段为所需的数据内容，且"data"字段中的数据须与"schema"中约定的字段一致。调用```exchange.GetData()```函数时，将返回一个JSON对象，例如：```{"Time":1579795200000, "Data":"..."}```。
-
-```javascript
-function main() {
-    Log(exchange.GetData("https://www.datadata.com/api/v1/query/xxx/data"))   // 链接中xxx部分为查询数据的编码，此处xxx仅为示例
-}
-```
-
-```python
-def main():
-    Log(exchange.GetData("https://www.datadata.com/api/v1/query/xxx/data"))
-```
-
-```rust
-fn main() {
-    Log!(exchange.GetData("https://www.datadata.com/api/v1/query/xxx/data"));   // 链接中xxx部分为查询数据的编码，此处xxx仅为示例
-}
-```
-
-```cpp
-void main() {
-    Log(exchange.GetData("https://www.datadata.com/api/v1/query/xxx/data"));
-}
-```
-
-回测时一次性获取数据，实盘时缓存一分钟的数据。在回测系统中，当使用访问接口请求数据的方式时，回测系统会自动为请求添加```from```(时间戳，单位秒)、```to```(时间戳，单位秒)、```period```(底层K线周期，时间戳，单位毫秒)等参数，用于确定要获取数据的时间范围。
-
-See also: `exchange.SetData`
-
-#### exchange.GetMarkets
-
-```
-exchange.GetMarkets()
-```
-
-```exchange.GetMarkets()```函数用于获取交易所的市场信息。
-
-Returns (object / 空值): 包含`Market`结构体的字典。
-
-期货交易所对象的调用示例：
-
-```javascript
-function main() {
-    var markets = exchange.GetMarkets()
-    var currency = exchange.GetCurrency()
-
-    // 获取当前合约代码也可以使用exchange.GetContractType()函数
-    var ct = "swap"
-
-    var key = currency + "." + ct
-    Log(key, ":", markets[key])
-}
-```
-
-```python
-def main():
-    markets = exchange.GetMarkets()
-    currency = exchange.GetCurrency()
-    ct = "swap"
-
-    key = currency + "." + ct
-    Log(key, ":", markets[key])
-```
-
-```rust
-fn main() {
-    let markets = exchange.GetMarkets();
-    let currency = exchange.GetCurrency();
-
-    // 获取当前合约代码也可以使用exchange.GetContractType()函数
-    let ct = "swap";
-
-    let key = format!("{}.{}", currency, ct);
-    Log!(key, ":", format!("{:?}", markets.get(&key)));
-}
-```
-
-```cpp
-void main() {
-    auto markets = exchange.GetMarkets();
-    auto currency = exchange.GetCurrency();
-
-    auto ct = "swap";
-    auto key = currency + "." + ct;
-    Log(key, ":", markets[key]);
-}
-```
-
-在回测系统中，使用期货交易所对象调用```exchange.GetMarkets()```函数。在调用任何行情函数之前，GetMarkets仅返回当前默认交易对的market数据；在调用行情函数之后，则会返回所有已请求过品种的market数据。可参考以下测试示例：
-
-```javascript
-/*backtest
-start: 2023-05-10 00:00:00
-end: 2023-05-20 00:00:00
-period: 1m
-basePeriod: 1m
-exchanges: [{"eid":"Futures_Binance","currency":"BTC_USDT"}]
-*/
-
-function main() {
-    var arrSymbol = ["SOL_USDT.swap", "BTC_USDT.quarter", "ETH_USDT.swap", "ETH_USDT.quarter"]
-
-    var tbl1 = {
-        type: "table",
-        title: "markets1",
-        cols: ["key", "Symbol", "BaseAsset", "QuoteAsset", "TickSize", "AmountSize", "PricePrecision", "AmountPrecision", "MinQty", "MaxQty", "MinNotional", "MaxNotional", "CtVal"],
-        rows: []
-    }
-
-    var markets1 = exchange.GetMarkets()
-    for (var key in markets1) {
-        var market = markets1[key]
-        tbl1.rows.push([key, market.Symbol, market.BaseAsset, market.QuoteAsset, market.TickSize, market.AmountSize, market.PricePrecision, market.AmountPrecision, market.MinQty, market.MaxQty, market.MinNotional, market.MaxNotional, market.CtVal])
-    }
-
-    for (var symbol of arrSymbol) {
-        exchange.GetTicker(symbol)
-    }
-
-    var tbl2 = {
-        type: "table",
-        title: "markets2",
-        cols: ["key", "Symbol", "BaseAsset", "QuoteAsset", "TickSize", "AmountSize", "PricePrecision", "AmountPrecision", "MinQty", "MaxQty", "MinNotional", "MaxNotional", "CtVal"],
-        rows: []
-    }
-
-    var markets2 = exchange.GetMarkets()
-    for (var key in markets2) {
-        var market = markets2[key]
-        tbl2.rows.push([key, market.Symbol, market.BaseAsset, market.QuoteAsset, market.TickSize, market.AmountSize, market.PricePrecision, market.AmountPrecision, market.MinQty, market.MaxQty, market.MinNotional, market.MaxNotional, market.CtVal])
-    }
-
-    LogStatus("`" + JSON.stringify([tbl1, tbl2]) + "`")
-}
-```
-
-```python
-'''backtest
-start: 2023-05-10 00:00:00
-end: 2023-05-20 00:00:00
-period: 1m
-basePeriod: 1m
-exchanges: [{"eid":"Futures_Binance","currency":"BTC_USDT"}]
-'''
-
-import json
-
-def main():
-    arrSymbol = ["SOL_USDT.swap", "BTC_USDT.quarter", "ETH_USDT.swap", "ETH_USDT.quarter"]
-
-    tbl1 = {
-        "type": "table",
-        "title": "markets1",
-        "cols": ["key", "Symbol", "BaseAsset", "QuoteAsset", "TickSize", "AmountSize", "PricePrecision", "AmountPrecision", "MinQty", "MaxQty", "MinNotional", "MaxNotional", "CtVal"],
-        "rows": []
-    }
-
-    markets1 = exchange.GetMarkets()
-    for key in markets1:
-        market = markets1[key]
-        tbl1["rows"].append([key, market["Symbol"], market["BaseAsset"], market["QuoteAsset"], market["TickSize"], market["AmountSize"], market["PricePrecision"], market["AmountPrecision"], market["MinQty"], market["MaxQty"], market["MinNotional"], market["MaxNotional"], market["CtVal"]])
-
-    for symbol in arrSymbol:
-        exchange.GetTicker(symbol)
-
-    tbl2 = {
-        "type": "table",
-        "title": "markets2",
-        "cols": ["key", "Symbol", "BaseAsset", "QuoteAsset", "TickSize", "AmountSize", "PricePrecision", "AmountPrecision", "MinQty", "MaxQty", "MinNotional", "MaxNotional", "CtVal"],
-        "rows": []
-    }
-
-    markets2 = exchange.GetMarkets()
-    for key in markets2:
-        market = markets2[key]
-        tbl2["rows"].append([key, market["Symbol"], market["BaseAsset"], market["QuoteAsset"], market["TickSize"], market["AmountSize"], market["PricePrecision"], market["AmountPrecision"], market["MinQty"], market["MaxQty"], market["MinNotional"], market["MaxNotional"], market["CtVal"]])
-
-    LogStatus("`" + json.dumps([tbl1, tbl2]) + "`")
-```
-
-```rust
-/*backtest
-start: 2023-05-10 00:00:00
-end: 2023-05-20 00:00:00
-period: 1m
-basePeriod: 1m
-exchanges: [{"eid":"Futures_Binance","currency":"BTC_USDT"}]
-*/
-
-fn marketToJson(key: &str, market: &Market) -> String {
-    format!(r#"["{}", "{}", "{}", "{}", {}, {}, {}, {}, {}, {}, {}, {}, {}]"#, key, market.Symbol, market.BaseAsset, market.QuoteAsset, market.TickSize, market.AmountSize, market.PricePrecision, market.AmountPrecision, market.MinQty, market.MaxQty, market.MinNotional, market.MaxNotional, market.CtVal)
-}
-
-fn main() {
-    let arrSymbol = ["SOL_USDT.swap", "BTC_USDT.quarter", "ETH_USDT.swap", "ETH_USDT.quarter"];
-
-    // Rust SDK 没有JSON序列化功能，此处使用format!拼接表格的JSON文本
-    let markets1 = exchange.GetMarkets();
-    let mut rows1: Vec<String> = Vec::new();
-    for (key, market) in &markets1 {
-        rows1.push(marketToJson(key, market));
-    }
-    let tbl1 = format!(r#"{{"type": "table", "title": "markets1", "cols": ["key", "Symbol", "BaseAsset", "QuoteAsset", "TickSize", "AmountSize", "PricePrecision", "AmountPrecision", "MinQty", "MaxQty", "MinNotional", "MaxNotional", "CtVal"], "rows": [{}]}}"#, rows1.join(","));
-
-    for symbol in arrSymbol {
-        exchange.GetTicker(symbol);
-    }
-
-    let markets2 = exchange.GetMarkets();
-    let mut rows2: Vec<String> = Vec::new();
-    for (key, market) in &markets2 {
-        rows2.push(marketToJson(key, market));
-    }
-    let tbl2 = format!(r#"{{"type": "table", "title": "markets2", "cols": ["key", "Symbol", "BaseAsset", "QuoteAsset", "TickSize", "AmountSize", "PricePrecision", "AmountPrecision", "MinQty", "MaxQty", "MinNotional", "MaxNotional", "CtVal"], "rows": [{}]}}"#, rows2.join(","));
-
-    LogStatus!(format!("`[{},{}]`", tbl1, tbl2));
-}
-```
-
-```cpp
-/*backtest
-start: 2023-05-10 00:00:00
-end: 2023-05-20 00:00:00
-period: 1m
-basePeriod: 1m
-exchanges: [{"eid":"Futures_Binance","currency":"BTC_USDT"}]
-*/
-
-void main() {
-    auto arrSymbol = {"SOL_USDT.swap", "BTC_USDT.quarter", "ETH_USDT.swap", "ETH_USDT.quarter"};
-
-    json tbl1 = R"({
-        "type": "table",
-        "title": "markets1",
-        "cols": ["key", "Symbol", "BaseAsset", "QuoteAsset", "TickSize", "AmountSize", "PricePrecision", "AmountPrecision", "MinQty", "MaxQty", "MinNotional", "MaxNotional", "CtVal"],
-        "rows": []
-    })"_json;
-
-    auto markets1 = exchange.GetMarkets();
-    for (auto& [key, market] : markets1.items()) {
-        json arrJson = {key, market["Symbol"], market["BaseAsset"], market["QuoteAsset"], market["TickSize"], market["AmountSize"], market["PricePrecision"], market["AmountPrecision"], market["MinQty"], market["MaxQty"], market["MinNotional"], market["MaxNotional"], market["CtVal"]};
-        tbl1["rows"].push_back(arrJson);
-    }
-
-    for (const auto& symbol : arrSymbol) {
-        exchange.GetTicker(symbol);
-    }
-
-    json tbl2 = R"({
-        "type": "table",
-        "title": "markets2",
-        "cols": ["key", "Symbol", "BaseAsset", "QuoteAsset", "TickSize", "AmountSize", "PricePrecision", "AmountPrecision", "MinQty", "MaxQty", "MinNotional", "MaxNotional", "CtVal"],
-        "rows": []
-    })"_json;
-
-    auto markets2 = exchange.GetMarkets();
-    for (auto& [key, market] : markets2.items()) {
-        json arrJson = {key, market["Symbol"], market["BaseAsset"], market["QuoteAsset"], market["TickSize"], market["AmountSize"], market["PricePrecision"], market["AmountPrecision"], market["MinQty"], market["MaxQty"], market["MinNotional"], market["MaxNotional"], market["CtVal"]};
-        tbl2["rows"].push_back(arrJson);
-    }
-
-    json tbls = R"([])"_json;
-    tbls.push_back(tbl1);
-    tbls.push_back(tbl2);
-    LogStatus("`" + tbls.dump() + "`");
-}
-```
-
-```exchange.GetMarkets()```函数的返回值为一个字典。对于现货交易所，键名为交易品种名称，格式固定为交易对，例如：
-```json
-{
-    "BTC_USDT" : {...},  // 键值为Market结构
-    "LTC_USDT" : {...},
-    ...
-}
-```
-
-对于期货合约交易所而言，由于同一品种可能存在多个合约，例如```BTC_USDT```交易对包含永续合约、季度合约等，因此```exchange.GetMarkets()```函数返回的字典中，键名为交易对与合约代码的组合，例如：
-```json
-{
-    "BTC_USDT.swap" : {...},     // 键值为Market结构
-    "BTC_USDT.quarter" : {...},
-    "LTC_USDT.swap" : {...},
-    ...
-}
-```
-
-- ```exchange.GetMarkets()```函数支持实盘与回测系统。
-- ```exchange.GetMarkets()```函数仅返回交易所已上线交易品种的市场信息。
-- ```exchange.GetMarkets()```函数不支持期权合约。
-
-不支持```exchange.GetMarkets()```函数的交易所：
-| 函数名 | 不支持的现货交易所 | 不支持的期货交易所 |
-| - | - | - |
-| GetMarkets | Coincheck / Bithumb / BitFlyer | -- |
-
-See also: `Market`
-
-#### exchange.GetTickers
-
-```
-exchange.GetTickers()
-```
-
-```exchange.GetTickers()```函数用于获取交易所的聚合行情数据（`Ticker`结构的数组）。当```exchange```为现货交易所对象时，返回所有交易对的 ticker 行情数据；当```exchange```为期货交易所对象时，返回所有合约的 ticker 行情数据。
-
-Returns (`Ticker`数组 / 空值): ```exchange.GetTickers()```函数在请求数据成功时返回`Ticker`结构数组，请求数据失败时返回空值。
-
-调用 ```exchange.GetTickers()``` 函数，获取聚合行情数据。
-
-```javascript
-function main() {
-    var tickers = exchange.GetTickers()
-    if (tickers && tickers.length > 0) {
-        Log("Number of tradable symbols:", tickers.length)
-    }
-}
-```
-
-```python
-def main():
-    tickers = exchange.GetTickers()
-    if tickers and len(tickers) > 0:
-        Log("Number of tradable symbols:", len(tickers))
-```
-
-```rust
-fn main() {
-    if let Ok(tickers) = exchange.GetTickers() {
-        if tickers.len() > 0 {
-            Log!("Number of tradable symbols:", tickers.len());
-        }
-    }
-}
-```
-
-```cpp
-void main() {
-    auto tickers = exchange.GetTickers();
-    if (tickers.Valid && tickers.size() > 0) {
-        Log("Number of tradable symbols:", tickers.size());
-    }
-}
-```
-
-使用现货交易所对象，在回测系统中调用```exchange.GetTickers()```函数。在调用任何行情函数之前，GetTickers仅返回当前默认交易对的ticker数据；在调用行情函数之后，则会返回所有已请求过的交易对的ticker数据。可参考以下测试示例：
-
-```javascript
-/*backtest
-start: 2024-05-21 00:00:00
-end: 2024-09-05 00:00:00
-period: 5m
-basePeriod: 1m
-exchanges: [{"eid":"Binance","currency":"BTC_USDT"}]
-*/
-
-function main() {
-    var arrSymbol = ["ADA_USDT", "LTC_USDT", "ETH_USDT", "SOL_USDT"]
-
-    // 请求其它交易对行情数据之前，调用GetTickers
-    var tickers1 = exchange.GetTickers()
-    var tbl1 = {type: "table", title: "tickers1", cols: ["Symbol", "High", "Open", "Low", "Last", "Buy", "Sell", "Time", "Volume"], rows: []}
-    for (var ticker of tickers1) {
-        tbl1.rows.push([ticker.Symbol, ticker.High, ticker.Open, ticker.Low, ticker.Last, ticker.Buy, ticker.Sell, ticker.Time, ticker.Volume])
-    }
-
-    // 请求其它交易对行情数据
-    for (var symbol of arrSymbol) {
-        exchange.GetTicker(symbol)
-    }
-
-    // 再次调用GetTickers
-    var tickers2 = exchange.GetTickers()
-    var tbl2 = {type: "table", title: "tickers2", cols: ["Symbol", "High", "Open", "Low", "Last", "Buy", "Sell", "Time", "Volume"], rows: []}
-    for (var ticker of tickers2) {
-        tbl2.rows.push([ticker.Symbol, ticker.High, ticker.Open, ticker.Low, ticker.Last, ticker.Buy, ticker.Sell, ticker.Time, ticker.Volume])
-    }
-
-    LogStatus("`" + JSON.stringify([tbl1, tbl2]) +  "`")
-}
-```
-
-```python
-'''backtest
-start: 2024-05-21 00:00:00
-end: 2024-09-05 00:00:00
-period: 5m
-basePeriod: 1m
-exchanges: [{"eid":"Binance","currency":"BTC_USDT"}]
-'''
-
-import json
-
-def main():
-    arrSymbol = ["ADA_USDT", "LTC_USDT", "ETH_USDT", "SOL_USDT"]
-
-    tickers1 = exchange.GetTickers()
-    tbl1 = {"type": "table", "title": "tickers1", "cols": ["Symbol", "High", "Open", "Low", "Last", "Buy", "Sell", "Time", "Volume"], "rows": []}
-    for ticker in tickers1:
-        tbl1["rows"].append([ticker["Symbol"], ticker["High"], ticker["Open"], ticker["Low"], ticker["Last"], ticker["Buy"], ticker["Sell"], ticker["Time"], ticker["Volume"]])
-
-    for symbol in arrSymbol:
-        exchange.GetTicker(symbol)
-
-    tickers2 = exchange.GetTickers()
-    tbl2 = {"type": "table", "title": "tickers2", "cols": ["Symbol", "High", "Open", "Low", "Last", "Buy", "Sell", "Time", "Volume"], "rows": []}
-    for ticker in tickers2:
-        tbl2["rows"].append([ticker["Symbol"], ticker["High"], ticker["Open"], ticker["Low"], ticker["Last"], ticker["Buy"], ticker["Sell"], ticker["Time"], ticker["Volume"]])
-
-    LogStatus("`" + json.dumps([tbl1, tbl2]) +  "`")
-```
-
-```rust
-/*backtest
-start: 2024-05-21 00:00:00
-end: 2024-09-05 00:00:00
-period: 5m
-basePeriod: 1m
-exchanges: [{"eid":"Binance","currency":"BTC_USDT"}]
-*/
-
-fn tickerToJson(ticker: &Ticker) -> String {
-    format!(r#"["{}", {}, {}, {}, {}, {}, {}, {}, {}]"#, ticker.Symbol, ticker.High, ticker.Open, ticker.Low, ticker.Last, ticker.Buy, ticker.Sell, ticker.Time, ticker.Volume)
-}
-
-fn main() {
-    let arrSymbol = ["ADA_USDT", "LTC_USDT", "ETH_USDT", "SOL_USDT"];
-
-    // 请求其它交易对行情数据之前，调用GetTickers
-    // Rust SDK 没有JSON序列化，使用format!拼接表格的JSON文本
-    let tickers1 = exchange.GetTickers().unwrap();
-    let rows1 = tickers1.iter().map(tickerToJson).collect::<Vec<String>>().join(",");
-    let tbl1 = format!(r#"{{"type": "table", "title": "tickers1", "cols": ["Symbol", "High", "Open", "Low", "Last", "Buy", "Sell", "Time", "Volume"], "rows": [{}]}}"#, rows1);
-
-    // 请求其它交易对行情数据
-    for symbol in arrSymbol {
-        exchange.GetTicker(symbol);
-    }
-
-    // 再次调用GetTickers
-    let tickers2 = exchange.GetTickers().unwrap();
-    let rows2 = tickers2.iter().map(tickerToJson).collect::<Vec<String>>().join(",");
-    let tbl2 = format!(r#"{{"type": "table", "title": "tickers2", "cols": ["Symbol", "High", "Open", "Low", "Last", "Buy", "Sell", "Time", "Volume"], "rows": [{}]}}"#, rows2);
-
-    LogStatus!(format!("`[{},{}]`", tbl1, tbl2));
-}
-```
-
-```cpp
-/*backtest
-start: 2024-05-21 00:00:00
-end: 2024-09-05 00:00:00
-period: 5m
-basePeriod: 1m
-exchanges: [{"eid":"Binance","currency":"BTC_USDT"}]
-*/
-
-json tickerToJson(const Ticker& ticker) {
-    json arrJson;
-
-    arrJson.push_back(ticker.Symbol);
-    arrJson.push_back(ticker.High);
-    arrJson.push_back(ticker.Open);
-    arrJson.push_back(ticker.Low);
-    arrJson.push_back(ticker.Last);
-    arrJson.push_back(ticker.Buy);
-    arrJson.push_back(ticker.Sell);
-    arrJson.push_back(ticker.Time);
-    arrJson.push_back(ticker.Volume);
-
-    return arrJson;
-}
-
-void main() {
-    std::string arrSymbol[] = {"ADA_USDT", "LTC_USDT", "ETH_USDT", "SOL_USDT"};
-
-    auto tickers1 = exchange.GetTickers();
-    json tbl1 = R"({
-        "type": "table",
-        "cols": ["Symbol", "High", "Open", "Low", "Last", "Buy", "Sell", "Time", "Volume"],
-        "rows": []
-    })"_json;
-    tbl1["title"] = "tickers1";
-
-    for (const auto& ticker : tickers1) {
-        json arrJson = tickerToJson(ticker);
-        tbl1["rows"].push_back(arrJson);
-    }
-
-    for (const std::string& symbol : arrSymbol) {
-        exchange.GetTicker(symbol);
-    }
-
-    auto tickers2 = exchange.GetTickers();
-    json tbl2 = R"({
-        "type": "table",
-        "cols": ["Symbol", "High", "Open", "Low", "Last", "Buy", "Sell", "Time", "Volume"],
-        "rows": []
-    })"_json;
-    tbl2["title"] = "tickers2";
-
-    for (const auto& ticker : tickers2) {
-        json arrJson = tickerToJson(ticker);
-        tbl2["rows"].push_back(arrJson);
-    }
-
-    json tbls = R"([])"_json;
-    tbls.push_back(tbl1);
-    tbls.push_back(tbl2);
-    LogStatus("`" + tbls.dump() + "`");
-}
-```
-
-注意事项：
-
-- 该函数请求交易所的聚合行情接口，调用前无需设置交易对或合约代码，且仅返回交易所已上线交易品种的行情数据。
-
-- 回测系统支持该函数。
-
-- 未提供聚合行情接口的交易所对象不支持该函数。
-
-- 该函数不支持期权合约。
-
-不支持```exchange.GetTickers()```函数的交易所：
-
-| 函数名 | 不支持的现货交易所 | 不支持的期货交易所 |
-| - | - | - |
-| GetTickers | Zaif / WOO / Gemini / Coincheck / BitFlyer / Bibox | Futures_WOO / Futures_dYdX / Futures_Deribit / Futures_Bibox / Futures_Aevo / Futures_edgeX |
-
-See also: `Ticker`, `exchange.GetTicker`
-
-### Trade
-
-#### exchange.Buy
-
-```
-exchange.Buy(price, amount)
-exchange.Buy(price, amount, ...args)
-```
-
-```exchange.Buy()```函数用于下买单。```Buy()```函数是交易所对象`exchange`的成员函数。```Buy()```函数操作交易所对象```exchange```所绑定的交易所账户。```exchange```对象的成员函数（方法）的用途仅与```exchange```相关，本文档后续不再赘述。
-
-Parameters:
-
-- `price` (number, required): ```price```参数用于设置订单价格。
-- `amount` (number, required): ```amount```参数用于设置订单量。
-- `arg` (string / number / bool / object / array / any (平台支持的任意类型), optional): 扩展参数，用于将附带信息输出到该条下单日志中，```arg```参数可传入多个。
-
-Returns (string / 空值): 下单成功返回订单Id，下单失败返回空值。FMZ平台的订单`Order`结构的属性```Id```由交易所品种代码和交易所原始订单Id组成，以英文逗号分隔。例如OKX交易所现货交易对```ETH_USDT```订单的属性```Id```格式为：```ETH-USDT,1547130415509278720```。调用```exchange.Buy()```函数下单时，返回值订单```Id```与订单`Order`结构的```Id```属性一致。
-
-```exchange.Buy()```返回的订单编号，可用于查询订单信息和取消订单。
-
-```javascript
-function main() {
-    var id = exchange.Buy(100, 1);
-    Log("id:", id);
-}
-```
-
-```python
-def main():
-    id = exchange.Buy(100, 1)
-    Log("id:", id)
-```
-
-```rust
-fn main() {
-    let id = exchange.Buy(100, 1).unwrap();
-    Log!("id:", id);
-}
-```
-
-```cpp
-void main() {
-    auto id = exchange.Buy(100, 1);
-    Log("id:", id);
-}
-```
-
-加密货币期货合约下单时必须注意交易方向是否设置正确，如果交易方向与交易函数不匹配将会报错：
-
-    ```log
-
-    direction is sell, invalid order type Buy
-
-    direction is buy, invalid order type Sell
-
-    direction is closebuy, invalid order type Buy
-
-    direction is closesell, invalid order type Sell
-
-    ```
-
-```javascript
-// 以下为错误调用
-function main() {
-    exchange.SetContractType("quarter")
-
-    // 设置做空方向
-    exchange.SetDirection("sell")
-    // 下买单，会报错，做空只能卖出
-    var id = exchange.Buy(50, 1)
-
-    // 设置做多方向
-    exchange.SetDirection("buy")
-    // 下卖单，会报错，做多只能买入
-    var id2 = exchange.Sell(60, 1)
-
-    // 设置平多方向
-    exchange.SetDirection("closebuy")
-    // 下买单，会报错，平多只能卖出
-    var id3 = exchange.Buy(-1, 1)
-
-    // 设置平空方向
-    exchange.SetDirection("closesell")
-    // 下卖单,会报错,平空只能买入
-    var id4 = exchange.Sell(-1, 1)
-}
-```
-
-```python
-# 以下为错误调用
-def main():
-    exchange.SetContractType("quarter")
-    exchange.SetDirection("sell")
-    id = exchange.Buy(50, 1)
-    exchange.SetDirection("buy")
-    id2 = exchange.Sell(60, 1)
-    exchange.SetDirection("closebuy")
-    id3 = exchange.Buy(-1, 1)
-    exchange.SetDirection("closesell")
-    id4 = exchange.Sell(-1, 1)
-```
-
-```rust
-// 以下为错误调用
-fn main() {
-    let _ = exchange.SetContractType("quarter");
-
-    // 设置做空方向
-    let _ = exchange.SetDirection("sell");
-    // 下买单，会报错，做空只能卖出
-    let id = exchange.Buy(50, 1);
-
-    // 设置做多方向
-    let _ = exchange.SetDirection("buy");
-    // 下卖单，会报错，做多只能买入
-    let id2 = exchange.Sell(60, 1);
-
-    // 设置平多方向
-    let _ = exchange.SetDirection("closebuy");
-    // 下买单，会报错，平多只能卖出
-    let id3 = exchange.Buy(-1, 1);
-
-    // 设置平空方向
-    let _ = exchange.SetDirection("closesell");
-    // 下卖单,会报错,平空只能买入
-    let id4 = exchange.Sell(-1, 1);
-}
-```
-
-```cpp
-// 以下为错误调用
-void main() {
-    exchange.SetContractType("quarter");
-    exchange.SetDirection("sell");
-    auto id = exchange.Buy(50, 1);
-    exchange.SetDirection("buy");
-    auto id2 = exchange.Sell(60, 1);
-    exchange.SetDirection("closebuy");
-    auto id3 = exchange.Buy(-1, 1);
-    exchange.SetDirection("closesell");
-    auto id4 = exchange.Sell(-1, 1);
-}
-```
-
-现货市价单。
-
-```javascript
-// 例如交易对：ETH_BTC ，市价单买入
-function main() {
-    // 下市价单买入，买入0.1个BTC（计价币）金额的ETH币
-    exchange.Buy(-1, 0.1)
-}
-```
-
-```python
-def main():
-    exchange.Buy(-1, 0.1)
-```
-
-```rust
-// 例如交易对：ETH_BTC ，市价单买入
-fn main() {
-    // 下市价单买入，买入0.1个BTC（计价币）金额的ETH币
-    let _ = exchange.Buy(-1, 0.1);
-}
-```
-
-```cpp
-void main() {
-    exchange.Buy(-1, 0.1);
-}
-```
-
-期货合约下单时必须注意交易方向是否设置正确，如果交易方向与交易函数不匹配将会报错。加密货币期货合约交易所的下单量如无特殊说明，则以合约张数为单位。
-
-参数```price```设置为```-1```时用于下市价单，此功能需要交易所的下单接口支持市价单。以市价单方式对加密货币现货下买单时，下单量参数```amount```为以计价币计价的金额数量。以市价单方式对加密货币期货合约下单时，下单量参数```amount```的单位为合约张数。实盘时，有少数加密货币交易所不支持市价单接口。个别现货交易所市价单买单的下单量为交易币数量，具体请查看「用户指南」中的**交易所特殊说明**。
-
-如使用较旧版本的托管者，```exchange.Buy()```函数返回的订单```Id```可能与当前文档中描述的返回值订单```Id```有所差别。
-
-需要注意，以下三家交易所的下单接口较为特殊。对于现货市价单的买单，其下单量为币数，而非金额。
-
-  - ```AscendEx```
-
-  - ```BitMEX```
-
-  - ```Bitfinex```
-
-See also: `exchange.Sell`, `exchange.SetContractType`, `exchange.SetDirection`, `exchange.IO`（API限流控制，Buy函数受CreateOrder限流设置影响）
-
-#### exchange.Sell
-
-```
-exchange.Sell(price, amount)
-exchange.Sell(price, amount, ...args)
-```
-
-```exchange.Sell()```函数用于下达卖单。
-
-Parameters:
-
-- `price` (number, required): ```price```参数用于设置订单价格。
-- `amount` (number, required): ```amount```参数用于设置下单量。
-- `arg` (string / number / bool / object / array / any (平台支持的任意类型), optional): 扩展参数，用于向这条下单日志中输出附带信息，```arg```参数可以传入多个。
-
-Returns (string / 空值): 下单成功时返回订单Id，下单失败时返回空值。FMZ平台的订单`Order`结构的属性```Id```由交易所品种代码和交易所原始订单Id组成，两者以英文逗号间隔。例如OKX交易所现货交易对```ETH_USDT```订单的属性```Id```格式为：```ETH-USDT,1547130415509278720```。调用```exchange.Sell()```函数下单时，返回值订单```Id```与订单`Order`结构的```Id```属性一致。
-
-```exchange.Sell()```返回的订单编号，可用于查询订单信息和取消订单。
-
-```javascript
-function main(){
-    var id = exchange.Sell(100, 1)
-    Log("id:", id)
-}
-```
-
-```python
-def main():
-    id = exchange.Sell(100, 1)
-    Log("id:", id)
-```
-
-```rust
-fn main() {
-    let id = exchange.Sell(100, 1).unwrap();
-    Log!("id:", id);
-}
-```
-
-```cpp
-void main() {
-    auto id = exchange.Sell(100, 1);
-    Log("id:", id);
-}
-```
-
-加密货币期货合约下单时必须注意交易方向是否设置正确，如果交易方向与交易函数不匹配将会报错：
-
-```log
-direction is sell, invalid order type Buy
-direction is buy, invalid order type Sell
-direction is closebuy, invalid order type Buy
-direction is closesell, invalid order type Sell
-```
-
-```javascript
-// 以下为错误调用
-function main() {
-    exchange.SetContractType("quarter")
-
-    // 设置做空方向
-    exchange.SetDirection("sell")
-    // 下买单，会报错，做空只能卖出
-    var id = exchange.Buy(50, 1)
-
-    // 设置做多方向
-    exchange.SetDirection("buy")
-    // 下卖单，会报错，做多只能买入
-    var id2 = exchange.Sell(60, 1)
-
-    // 设置平多方向
-    exchange.SetDirection("closebuy")
-    // 下买单，会报错，平多只能卖出
-    var id3 = exchange.Buy(-1, 1)
-
-    // 设置平空方向
-    exchange.SetDirection("closesell")
-    // 下卖单,会报错,平空只能买入
-    var id4 = exchange.Sell(-1, 1)
-}
-```
-
-```python
-# 以下为错误调用
-def main():
-    exchange.SetContractType("quarter")
-    exchange.SetDirection("sell")
-    id = exchange.Buy(50, 1)
-    exchange.SetDirection("buy")
-    id2 = exchange.Sell(60, 1)
-    exchange.SetDirection("closebuy")
-    id3 = exchange.Buy(-1, 1)
-    exchange.SetDirection("closesell")
-    id4 = exchange.Sell(-1, 1)
-```
-
-```rust
-// 以下为错误调用
-fn main() {
-    let _ = exchange.SetContractType("quarter");
-
-    // 设置做空方向
-    let _ = exchange.SetDirection("sell");
-    // 下买单，会报错，做空只能卖出
-    let id = exchange.Buy(50, 1);
-
-    // 设置做多方向
-    let _ = exchange.SetDirection("buy");
-    // 下卖单，会报错，做多只能买入
-    let id2 = exchange.Sell(60, 1);
-
-    // 设置平多方向
-    let _ = exchange.SetDirection("closebuy");
-    // 下买单，会报错，平多只能卖出
-    let id3 = exchange.Buy(-1, 1);
-
-    // 设置平空方向
-    let _ = exchange.SetDirection("closesell");
-    // 下卖单,会报错,平空只能买入
-    let id4 = exchange.Sell(-1, 1);
-}
-```
-
-```cpp
-// 以下为错误调用
-void main() {
-    exchange.SetContractType("quarter");
-    exchange.SetDirection("sell");
-    auto id = exchange.Buy(50, 1);
-    exchange.SetDirection("buy");
-    auto id2 = exchange.Sell(60, 1);
-    exchange.SetDirection("closebuy");
-    auto id3 = exchange.Buy(-1, 1);
-    exchange.SetDirection("closesell");
-    auto id4 = exchange.Sell(-1, 1);
-}
-```
-
-现货市价单。
-
-```javascript
-// 例如交易对：ETH_BTC,市价单卖出
-function main() {
-    // 注意：下市价单卖出，卖出0.2个ETH
-    exchange.Sell(-1, 0.2)
-}
-```
-
-```python
-def main():
-    exchange.Sell(-1, 0.2)
-```
-
-```rust
-// 例如交易对：ETH_BTC,市价单卖出
-fn main() {
-    // 注意：下市价单卖出，卖出0.2个ETH
-    let _ = exchange.Sell(-1, 0.2);
-}
-```
-
-```cpp
-void main() {
-    exchange.Sell(-1, 0.2);
-}
-```
-
-期货合约下单时必须注意交易方向是否设置正确，如果交易方向与交易函数不匹配将会报错。加密货币期货合约交易所的下单量如无特殊说明则以合约张数为单位。
-
-参数```price```设置为```-1```时用于下达市价单，需要交易所的下单接口支持市价单。以市价单方式交易加密货币现货时，下卖单时，下单量参数```amount```以交易币为单位。以市价单方式交易加密货币期货合约时，下单量参数```amount```以合约张数为单位。实盘时，有少数加密货币交易所不支持市价单接口。
-
-如使用较旧版本的托管者，```exchange.Sell()```函数返回的订单```Id```可能与当前文档中描述的返回值订单```Id```有所差别。
-
-See also: `exchange.Buy`, `exchange.SetContractType`, `exchange.SetDirection`, `exchange.IO`（API限流控制，Sell函数受CreateOrder限流设置影响）
-
-#### exchange.CreateOrder
-
-```
-exchange.CreateOrder(symbol, side, price, amount)
-exchange.CreateOrder(symbol, side, price, amount, ...args)
-```
-
-```exchange.CreateOrder()```函数用于下单。
-
-Parameters:
-
-- `symbol` (string, required): 参数```symbol```用于指定订单对应的交易对、合约代码。
-
-当调用```exchange.CreateOrder(symbol, side, price, amount)```函数下单时，若```exchange```为现货交易所对象，且订单的计价币种为USDT、交易币种为BTC，则参数```symbol```为：```"BTC_USDT"```，采用FMZ平台定义的交易对格式。
-
-当调用```exchange.CreateOrder(symbol, side, price, amount)```函数下单时，若```exchange```为期货交易所对象，且订单为BTC的U本位永续合约订单，则参数```symbol```为：```"BTC_USDT.swap"```，采用FMZ平台定义的**交易对**与**合约代码**组合的格式，两者之间以字符"."分隔。
-
-当调用```exchange.CreateOrder(symbol, side, price, amount)```函数下单时，若```exchange```为期货交易所对象，且订单为BTC的U本位期权合约订单，则参数```symbol```为：```"BTC_USDT.BTC-240108-40000-C"```（以币安期权BTC-240108-40000-C为例），采用FMZ平台定义的**交易对**与交易所定义的具体期权合约代码组合的格式，两者之间以字符"."分隔。
-- `side` (string, required): 参数```side```用于指定订单的交易方向。
-
-对于现货交易所对象，```side```参数的可选值为：```buy```、```sell```。其中```buy```表示买入，```sell```表示卖出。
-
-对于期货交易所对象，```side```参数的可选值为：```buy```、```closebuy```、```sell```、```closesell```。其中```buy```表示开多仓，```closebuy```表示平多仓，```sell```表示开空仓，```closesell```表示平空仓。
-
-**支持附加参数（option）**：可以通过```side```参数传递附加参数，格式为：```"side;{JSON对象}"```或```"side;key=value&key=value"```。
-
-例如：```'buy;{"type":"TRAILING_STOP_MARKET","activationPrice":"2300"}'```或```"buy;type=TRAILING_STOP_MARKET&activationPrice=2300"```。
-
-附加参数用于传递交易所特定的参数（如订单类型、生效规则等），具体支持的参数取决于交易所API。
-- `price` (number, required): 参数```price```用于设置订单的价格。当价格为-1时，表示该订单为市价单。
-- `amount` (number, required): 参数```amount```用于设置订单的下单量。需要注意，当订单为**现货市价买单**时，下单量表示买入金额；个别现货交易所的市价买单下单量为交易币数量，具体请查看「用户指南」中的**交易所特殊说明**。对于期货交易所对象，使用```CreateOrder()```/```Buy()```/```Sell()```函数下单时，如无特殊说明，下单量参数```amount```均以合约张数为单位。
-- `arg` (string / number / bool / object / array / any (平台支持的任意类型), optional): 扩展参数，用于将附带信息输出到本次下单日志中，```arg```参数可以传入多个。
-
-Returns (string / 空值): 下单成功时返回订单Id，下单失败时返回空值。FMZ平台的订单`Order`结构的属性```Id```由交易所品种代码和交易所原始订单Id组成，两者以英文逗号分隔。例如OKX交易所现货交易对```ETH_USDT```订单的属性```Id```格式为：```ETH-USDT,1547130415509278720```。
-
-调用```exchange.CreateOrder(symbol, side, price, amount)```函数下单时，返回值订单```Id```与订单`Order`结构的```Id```属性一致。
-
-现货交易所对象与期货交易所对象均通过调用```exchange.CreateOrder()```函数进行下单。
-
-```javascript
-function main() {
-    var id = exchange.CreateOrder("BTC_USDT", "buy", 60000, 0.01)           // 现货交易所对象下单，交易BTC_USDT币币交易对
-    // var id = exchange.CreateOrder("BTC_USDT.swap", "buy", 60000, 0.01)   // 期货交易所对象下单，交易BTC的U本位永续合约
-    Log("Order Id:", id)
-}
-```
-
-```python
-def main():
-    id = exchange.CreateOrder("BTC_USDT", "buy", 60000, 0.01)          # 现货交易所对象下单，交易BTC_USDT币币交易对
-    # id = exchange.CreateOrder("BTC_USDT.swap", "buy", 60000, 0.01)   # 期货交易所对象下单，交易BTC的U本位永续合约
-    Log("Order Id:", id)
-```
-
-```rust
-fn main() {
-    let id = exchange.CreateOrder("BTC_USDT", "buy", 60000, 0.01);           // 现货交易所对象下单，交易BTC_USDT币币交易对
-    // let id = exchange.CreateOrder("BTC_USDT.swap", "buy", 60000, 0.01);   // 期货交易所对象下单，交易BTC的U本位永续合约
-    Log!("Order Id:", id);
-}
-```
-
-```cpp
-void main() {
-    auto id = exchange.CreateOrder("BTC_USDT", "buy", 60000, 0.01);           // 现货交易所对象下单，交易BTC_USDT币币交易对
-    // auto id = exchange.CreateOrder("BTC_USDT.swap", "buy", 60000, 0.01);   // 期货交易所对象下单，交易BTC的U本位永续合约
-    Log("Order Id:", id);
-}
-```
-
-通过附加参数（option）下单，用于传递交易所的特定参数。
-
-```javascript
-function main() {
-    // 使用JSON格式传递option参数
-    var option = {
-        "type": "TRAILING_STOP_MARKET",
-        "activationPrice": "2300",
-        "callbackRate": "0.1"
-    }
-    var sideWithOption = "buy;" + JSON.stringify(option)
-    var id = exchange.CreateOrder("SOL_USDT.swap", sideWithOption, -1, 1)
-    Log("Order Id:", id)
-
-    Sleep(2000)
-    Log(exchange.GetOrder(id))
-}
-```
-
-```python
-import json
-
-def main():
-    # 使用JSON格式传递option参数
-    option = {
-        "type": "TRAILING_STOP_MARKET",
-        "activationPrice": "2300",
-        "callbackRate": "0.1"
-    }
-    sideWithOption = "buy;" + json.dumps(option)
-    id = exchange.CreateOrder("SOL_USDT.swap", sideWithOption, -1, 1)
-    Log("Order Id:", id)
-
-    Sleep(2000)
-    Log(exchange.GetOrder(id))
-```
-
-```rust
-fn main() {
-    // 使用JSON格式传递option参数（Rust不支持JSON.stringify，直接使用原始字符串构造JSON文本）
-    let option = r#"{"type": "TRAILING_STOP_MARKET", "activationPrice": "2300", "callbackRate": "0.1"}"#;
-    let sideWithOption = format!("buy;{}", option);
-    let id = exchange.CreateOrder("SOL_USDT.swap", &sideWithOption, -1, 1).unwrap();
-    Log!("Order Id:", id);
-
-    Sleep(2000);
-    Log!(exchange.GetOrder(&id));
-}
-```
-
-```cpp
-void main() {
-    // 使用JSON格式传递option参数
-    json option = R"({
-        "type": "TRAILING_STOP_MARKET",
-        "activationPrice": "2300",
-        "callbackRate": "0.1"
-    })"_json;
-    string sideWithOption = "buy;" + option.dump();
-    auto id = exchange.CreateOrder("SOL_USDT.swap", sideWithOption, -1, 1);
-    Log("Order Id:", id);
-
-    Sleep(2000);
-    Log(exchange.GetOrder(id));
-}
-```
-
-支持通过```side```参数传递附加参数（option），用于指定交易所特定的参数。附加参数需与```side```参数合并传入，格式为```"side;{JSON对象}"```（推荐）或```"side;key=value&key=value"```（URL编码格式）。例如：```"buy;{\"type\":\"TRAILING_STOP_MARKET\"}"```。
-
-不同交易所支持的option参数各不相同，具体支持的参数以交易所API文档为准。常见参数包括：订单类型（type）、生效规则（timeInForce）、触发价格（activationPrice）、回调比率（callbackRate）等。
-
-使用option参数时，仍需提供```price```和```amount```参数。若某些参数已通过option传递，则这些基础参数可能会被option中的对应参数覆盖，具体行为取决于交易所API的实现。
-
-See also: `exchange.Buy`, `exchange.Sell`,
-  `exchange.ModifyOrder`
-
-#### exchange.CancelOrder
-
-```
-exchange.CancelOrder(orderId)
-exchange.CancelOrder(orderId, ...args)
-```
-
-```exchange.CancelOrder()```函数用于取消订单。FMZ平台的订单`Order`结构中，属性```Id```由交易所品种代码和交易所原始订单Id组成，两者之间以英文逗号分隔。例如，OKX交易所现货交易对```ETH_USDT```的订单，其属性```Id```的格式为：```ETH-USDT,1547130415509278720```。
-
-调用```exchange.CancelOrder()```函数撤销订单时，传入的参数```orderId```与订单`Order`结构的```Id```属性一致。
-
-Parameters:
-
-- `orderId` (string, required): 参数```orderId```用于指定所要取消的订单。
-- `arg` (string / number / bool / object / array / any (平台支持的任意类型), optional): 扩展参数，用于将附带信息输出到本条撤单日志中；```arg```参数可以传入多个。
-
-Returns (bool): ```exchange.CancelOrder()```函数返回真值（例如```true```）表示取消订单请求发送成功，返回假值（例如```false```）表示取消订单请求发送失败。返回值仅代表请求发送成功或失败；若要判断交易所是否已取消订单，可以调用```exchange.GetOrders()```进行判断。
-
-撤销订单。
-
-```javascript
-function main(){
-    var id = exchange.Sell(99999, 1)
-    exchange.CancelOrder(id)
-}
-```
-
-```python
-def main():
-    id = exchange.Sell(99999, 1)
-    exchange.CancelOrder(id)
-```
-
-```rust
-fn main() {
-    let id = exchange.Sell(99999, 1).unwrap();
-    let _ = exchange.CancelOrder(&id);
-}
-```
-
-```cpp
-void main() {
-    auto id = exchange.Sell(99999, 1);
-    exchange.CancelOrder(id);
-}
-```
-
-FMZ的API函数中，能够产生日志输出的函数（例如```Log()```、```exchange.Buy()```、```exchange.CancelOrder()```等）都可以在必要参数之后附带一些输出参数。
-
-例如：```exchange.CancelOrder(orders[i].Id, orders[i])```，即在取消Id为```orders[i].Id```的订单时，附带输出该订单的信息，也就是```orders[i]```这个`Order`结构。
-
-```javascript
-function main() {
-    if (exchange.GetName().includes("Futures_")) {
-        Log("Set contract to: perpetual swap, set direction to: open long.")
-        exchange.SetContractType("swap")
-        exchange.SetDirection("buy")
-    }
-
-    var ticker = exchange.GetTicker()
-    exchange.Buy(ticker.Last * 0.5, 0.1)
-
-    var orders = exchange.GetOrders()
-    for (var i = 0 ; i < orders.length ; i++) {
-        exchange.CancelOrder(orders[i].Id, "Canceled order:", orders[i])
-        Sleep(500)
-    }
-}
-```
-
-```python
-def main():
-    if exchange.GetName().find("Futures_") != -1:
-        Log("Set contract to: perpetual swap, set direction to: open long.")
-        exchange.SetContractType("swap")
-        exchange.SetDirection("buy")
-
-    ticker = exchange.GetTicker()
-    exchange.Buy(ticker["Last"] * 0.5, 0.1)
-
-    orders = exchange.GetOrders()
-    for i in range(len(orders)):
-        exchange.CancelOrder(orders[i]["Id"], "Canceled order:", orders[i])
-        Sleep(500)
-```
-
-```rust
-fn main() {
-    if exchange.GetName().contains("Futures_") {
-        Log!("Set contract to: perpetual swap, set direction to: open long.");
-        let _ = exchange.SetContractType("swap");
-        let _ = exchange.SetDirection("buy");
-    }
-
-    let ticker = exchange.GetTicker(None).unwrap();
-    let _ = exchange.Buy(ticker.Last * 0.5, 0.1);
-
-    let orders = exchange.GetOrders(None).unwrap();
-    for i in 0..orders.len() {
-        // Rust不支持在CancelOrder的必要参数后附带输出参数，撤单后单独调用Log!宏输出附带信息
-        let _ = exchange.CancelOrder(&orders[i].Id);
-        Log!("Canceled order:", orders[i]);
-        Sleep(500);
-    }
-}
-```
-
-```cpp
-void main() {
-    if (exchange.GetName().find("Futures_") != std::string::npos) {
-        Log("Set contract to: perpetual swap, set direction to: open long.");
-        exchange.SetContractType("swap");
-        exchange.SetDirection("buy");
-    }
-
-    auto ticker = exchange.GetTicker();
-    exchange.Buy(ticker.Last * 0.5, 0.1);
-
-    auto orders = exchange.GetOrders();
-    for (int i = 0 ; i < orders.size() ; i++) {
-        exchange.CancelOrder(orders[i].Id, "Canceled order:", orders[i]);
-        Sleep(500);
-    }
-}
-```
-
-如果使用较旧版本的托管者，```exchange.CancelOrder()```函数的参数```orderId```可能与当前文档中描述的```orderId```有所差别。
-
-See also: `exchange.Buy`, `exchange.Sell`, `exchange.GetOrders`, `exchange.ModifyOrder`
-
-#### exchange.GetOrder
-
-```
-exchange.GetOrder(orderId)
-```
-
-```exchange.GetOrder()```函数用于获取订单信息。
-
-Parameters:
-
-- `orderId` (string, required): ```orderId```参数用于指定要查询的订单。FMZ平台订单`Order`结构的```Id```属性由交易所品种代码和交易所原始订单Id组成，以英文逗号分隔。例如，OKX交易所现货交易对```ETH_USDT```订单的```Id```属性格式为：```ETH-USDT,1547130415509278720```。
-
-调用```exchange.GetOrder()```函数查询订单时，传入的参数```orderId```与订单`Order`结构的```Id```属性一致。
-
-Returns (`Order` / 空值): 根据订单号查询订单详情，查询成功时返回`Order`结构，查询失败时返回空值。
-
-```javascript
-function main(){
-    var id = exchange.Sell(1000, 1)
-    // 参数id为订单号码，需填入你想要查询的订单的号码
-    var order = exchange.GetOrder(id)
-    Log("Id:", order.Id, "Price:", order.Price, "Amount:", order.Amount, "DealAmount:",
-        order.DealAmount, "Status:", order.Status, "Type:", order.Type)
-}
-```
-
-```python
-def main():
-    id = exchange.Sell(1000, 1)
-    order = exchange.GetOrder(id)
-    Log("Id:", order["Id"], "Price:", order["Price"], "Amount:", order["Amount"], "DealAmount:",
-        order["DealAmount"], "Status:", order["Status"], "Type:", order["Type"])
-```
-
-```rust
-fn main() {
-    let id = exchange.Sell(1000, 1).unwrap();
-    // 参数id为订单号码，需填入你想要查询的订单的号码
-    let order = exchange.GetOrder(&id).unwrap();
-    Log!("Id:", order.Id, "Price:", order.Price, "Amount:", order.Amount, "DealAmount:",
-        order.DealAmount, "Status:", order.Status, "Type:", order.Type);
-}
-```
-
-```cpp
-void main() {
-    auto id = exchange.Sell(1000, 1);
-    auto order = exchange.GetOrder(id);
-    Log("Id:", order.Id, "Price:", order.Price, "Amount:", order.Amount, "DealAmount:",
-        order.DealAmount, "Status:", order.Status, "Type:", order.Type);
-}
-```
-
-部分交易所不支持```exchange.GetOrder()```函数。返回值`Order`结构中的```AvgPrice```属性为成交均价，部分交易所不支持该字段，若不支持则将其设置为0。
-
-如果使用较旧版本的托管者，```exchange.GetOrder()```函数的参数```orderId```可能与当前文档中描述的```orderId```存在差异。
-
-不支持```exchange.GetOrder()```函数的交易所：
-
-  | 函数名 | 不支持的现货交易所 | 不支持的期货交易所 |
-  | - | - | - |
-  | GetOrder | Zaif / Coincheck / Bitstamp | -- |
-
-See also: `Order`, `exchange.GetOrders`, `exchange.GetHistoryOrders`, `exchange.ModifyOrder`
-
-#### exchange.GetOrders
-
-```
-exchange.GetOrders()
-exchange.GetOrders(symbol)
-```
-
-```exchange.GetOrders()```函数用于获取当前未完成的订单。
-
-Parameters:
-
-- `symbol` (string, optional): 参数```symbol```用于指定所要查询的**交易品种**或**交易品种范围**。
-
-对于现货交易所对象，若不传入```symbol```参数，则请求所有现货品种的未完成订单数据。
-
-对于期货交易所对象，若不传入```symbol```参数，则默认以当前交易对、合约代码所在的维度范围，请求该范围内所有品种的未完成订单数据。
-
-Returns (`Order`数组 / 空值): ```exchange.GetOrders()```函数请求数据成功时返回`Order`结构数组，请求数据失败时返回空值。
-
-使用现货交易所对象，针对多个不同的交易对，以当前价格的一半作为下单价格挂出买单，随后查询未成交订单的信息。
-
-```javascript
-/*backtest
-start: 2024-05-21 00:00:00
-end: 2024-09-05 00:00:00
-period: 5m
-basePeriod: 1m
-exchanges: [{"eid":"Binance","currency":"BTC_USDT"}]
-*/
-
-function main() {
-    var arrSymbol = ["ETH_USDT", "BTC_USDT", "LTC_USDT", "SOL_USDT"]
-
-    for (var symbol of arrSymbol) {
-        var t = exchange.GetTicker(symbol)
-        exchange.CreateOrder(symbol, "buy", t.Last / 2, 0.01)
-    }
-
-    var spotOrders = exchange.GetOrders()
-
-    var tbls = []
-    for (var orders of [spotOrders]) {
-        var tbl = {type: "table", title: "test GetOrders", cols: ["Symbol", "Id", "Price", "Amount", "DealAmount", "AvgPrice", "Status", "Type", "Offset", "ContractType"], rows: []}
-        for (var order of orders) {
-            tbl.rows.push([order.Symbol, order.Id, order.Price, order.Amount, order.DealAmount, order.AvgPrice, order.Status, order.Type, order.Offset, order.ContractType])
-        }
-        tbls.push(tbl)
-    }
-
-    LogStatus("`" + JSON.stringify(tbls) +  "`")
-
-    // 打印输出一次信息后返回，防止后续回测时订单成交，影响数据观察
-    return
-}
-```
-
-```python
-'''backtest
-start: 2024-05-21 00:00:00
-end: 2024-09-05 00:00:00
-period: 5m
-basePeriod: 1m
-exchanges: [{"eid":"Binance","currency":"BTC_USDT"}]
-'''
-
-import json
-
-def main():
-    arrSymbol = ["ETH_USDT", "BTC_USDT", "LTC_USDT", "SOL_USDT"]
-
-    for symbol in arrSymbol:
-        t = exchange.GetTicker(symbol)
-        exchange.CreateOrder(symbol, "buy", t["Last"] / 2, 0.01)
-
-    spotOrders = exchange.GetOrders()
-
-    tbls = []
-    for orders in [spotOrders]:
-        tbl = {"type": "table", "title": "test GetOrders", "cols": ["Symbol", "Id", "Price", "Amount", "DealAmount", "AvgPrice", "Status", "Type", "Offset", "ContractType"], "rows": []}
-        for order in orders:
-            tbl["rows"].append([order.Symbol, order.Id, order.Price, order.Amount, order.DealAmount, order.AvgPrice, order.Status, order.Type, order.Offset, order.ContractType])
-        tbls.append(tbl)
-
-    LogStatus("`" + json.dumps(tbls) +  "`")
-
-    return
-```
-
-```rust
-/*backtest
-start: 2024-05-21 00:00:00
-end: 2024-09-05 00:00:00
-period: 5m
-basePeriod: 1m
-exchanges: [{"eid":"Binance","currency":"BTC_USDT"}]
-*/
-
-fn main() {
-    let arrSymbol = ["ETH_USDT", "BTC_USDT", "LTC_USDT", "SOL_USDT"];
-
-    for symbol in arrSymbol {
-        let t = exchange.GetTicker(symbol).unwrap();
-        let _ = exchange.CreateOrder(symbol, "buy", t.Last / 2.0, 0.01);
-    }
-
-    let spotOrders = exchange.GetOrders(None).unwrap();
-
-    // Rust不支持JSON.stringify，使用format!拼接表格的JSON文本
-    let mut tbls = Vec::new();
-    for orders in [&spotOrders] {
-        let mut rows = Vec::new();
-        for order in orders {
-            rows.push(format!(r#"["{}", "{}", {}, {}, {}, {}, {}, {}, {}, "{}"]"#,
-                order.Symbol, order.Id, order.Price, order.Amount, order.DealAmount, order.AvgPrice, order.Status, order.Type, order.Offset, order.ContractType));
-        }
-        let tbl = format!(r#"{{"type": "table", "title": "test GetOrders", "cols": ["Symbol", "Id", "Price", "Amount", "DealAmount", "AvgPrice", "Status", "Type", "Offset", "ContractType"], "rows": [{}]}}"#,
-            rows.join(","));
-        tbls.push(tbl);
-    }
-
-    LogStatus!(format!("`[{}]`", tbls.join(",")));
-
-    // 打印输出一次信息后返回，防止后续回测时订单成交，影响数据观察
-    return;
-}
-```
-
-```cpp
-/*backtest
-start: 2024-05-21 00:00:00
-end: 2024-09-05 00:00:00
-period: 5m
-basePeriod: 1m
-exchanges: [{"eid":"Binance","currency":"BTC_USDT"}]
-*/
-
-void main() {
-    auto arrSymbol = {"ETH_USDT", "BTC_USDT", "LTC_USDT", "SOL_USDT"};
-
-    for (const auto& symbol : arrSymbol) {
-        auto t = exchange.GetTicker(symbol);
-        exchange.CreateOrder(symbol, "buy", t.Last / 2, 0.01);
-    }
-
-    auto spotOrders = exchange.GetOrders();
-
-    json tbls = R"([])"_json;
-    std::vector<std::vector<Order>> arr = {spotOrders};
-    for (const auto& orders : arr) {
-        json tbl = R"({
-            "type": "table",
-            "title": "test GetOrders",
-            "cols": ["Symbol", "Id", "Price", "Amount", "DealAmount", "AvgPrice", "Status", "Type", "Offset", "ContractType"],
-            "rows": []
-        })"_json;
-
-        for (const auto& order : orders) {
-            json arrJson = R"([])"_json;
-
-            arrJson.push_back("Symbol");
-            arrJson.push_back("Id");
-            arrJson.push_back(order.Price);
-            arrJson.push_back(order.Amount);
-            arrJson.push_back(order.DealAmount);
-            arrJson.push_back(order.AvgPrice);
-            arrJson.push_back(order.Status);
-            arrJson.push_back(order.Type);
-            arrJson.push_back(order.Offset);
-            arrJson.push_back(order.ContractType);
-
-            tbl["rows"].push_back(arrJson);
-        }
-
-        tbls.push_back(tbl);
-    }
-
-    LogStatus(_D(), "\n", "`" + tbls.dump() + "`");
-
-    return;
-}
-```
-
-使用期货交易所对象，对多个不同交易对、不同合约代码的品种进行下单。下单价格远离盘口对手价，使订单保持未成交状态，并按多种方式查询订单。
-
-```javascript
-/*backtest
-start: 2024-05-21 00:00:00
-end: 2024-09-05 00:00:00
-period: 5m
-basePeriod: 1m
-exchanges: [{"eid":"Futures_Binance","currency":"BTC_USDT"}]
-*/
-
-function main() {
-    var arrSymbol = ["BTC_USDT.swap", "BTC_USDT.quarter", "ETH_USDT.swap", "ETH_USDT.quarter"]
-
-    for (var symbol of arrSymbol) {
-        var t = exchange.GetTicker(symbol)
-        exchange.CreateOrder(symbol, "buy", t.Last / 2, 1)
-        exchange.CreateOrder(symbol, "sell", t.Last * 2, 1)
-    }
-
-    var defaultOrders = exchange.GetOrders()
-    var swapOrders = exchange.GetOrders("USDT.swap")
-    var futuresOrders = exchange.GetOrders("USDT.futures")
-    var btcUsdtSwapOrders = exchange.GetOrders("BTC_USDT.swap")
-
-    var tbls = []
-    var arr = [defaultOrders, swapOrders, futuresOrders, btcUsdtSwapOrders]
-    var tblDesc = ["defaultOrders", "swapOrders", "futuresOrders", "btcUsdtSwapOrders"]
-    for (var index in arr) {
-        var orders = arr[index]
-        var tbl = {type: "table", title: tblDesc[index], cols: ["Symbol", "Id", "Price", "Amount", "DealAmount", "AvgPrice", "Status", "Type", "Offset", "ContractType"], rows: []}
-        for (var order of orders) {
-            tbl.rows.push([order.Symbol, order.Id, order.Price, order.Amount, order.DealAmount, order.AvgPrice, order.Status, order.Type, order.Offset, order.ContractType])
-        }
-        tbls.push(tbl)
-    }
-
-    LogStatus("`" + JSON.stringify(tbls) +  "`")
-
-    // 打印输出一次信息后立即返回，防止后续回测过程中订单成交而影响数据观察
-    return
-}
-```
-
-```python
-'''backtest
-start: 2024-05-21 00:00:00
-end: 2024-09-05 00:00:00
-period: 5m
-basePeriod: 1m
-exchanges: [{"eid":"Futures_Binance","currency":"BTC_USDT"}]
-'''
-
-import json
-
-def main():
-    arrSymbol = ["BTC_USDT.swap", "BTC_USDT.quarter", "ETH_USDT.swap", "ETH_USDT.quarter"]
-
-    for symbol in arrSymbol:
-        t = exchange.GetTicker(symbol)
-        exchange.CreateOrder(symbol, "buy", t["Last"] / 2, 1)
-        exchange.CreateOrder(symbol, "sell", t["Last"] * 2, 1)
-
-    defaultOrders = exchange.GetOrders()
-    swapOrders = exchange.GetOrders("USDT.swap")
-    futuresOrders = exchange.GetOrders("USDT.futures")
-    btcUsdtSwapOrders = exchange.GetOrders("BTC_USDT.swap")
-
-    tbls = []
-    arr = [defaultOrders, swapOrders, futuresOrders, btcUsdtSwapOrders]
-    tblDesc = ["defaultOrders", "swapOrders", "futuresOrders", "btcUsdtSwapOrders"]
-    for index in range(len(arr)):
-        orders = arr[index]
-        tbl = {"type": "table", "title": tblDesc[index], "cols": ["Symbol", "Id", "Price", "Amount", "DealAmount", "AvgPrice", "Status", "Type", "Offset", "ContractType"], "rows": []}
-        for order in orders:
-            tbl["rows"].append([order["Symbol"], order["Id"], order["Price"], order["Amount"], order["DealAmount"], order["AvgPrice"], order["Status"], order["Type"], order["Offset"], order["ContractType"]])
-        tbls.append(tbl)
-
-    LogStatus("`" + json.dumps(tbls) +  "`")
-
-    return
-```
-
-```rust
-/*backtest
-start: 2024-05-21 00:00:00
-end: 2024-09-05 00:00:00
-period: 5m
-basePeriod: 1m
-exchanges: [{"eid":"Futures_Binance","currency":"BTC_USDT"}]
-*/
-
-fn main() {
-    let arrSymbol = ["BTC_USDT.swap", "BTC_USDT.quarter", "ETH_USDT.swap", "ETH_USDT.quarter"];
-
-    for symbol in arrSymbol {
-        let t = exchange.GetTicker(symbol).unwrap();
-        let _ = exchange.CreateOrder(symbol, "buy", t.Last / 2.0, 1);
-        let _ = exchange.CreateOrder(symbol, "sell", t.Last * 2.0, 1);
-    }
-
-    let defaultOrders = exchange.GetOrders(None).unwrap();
-    let swapOrders = exchange.GetOrders("USDT.swap").unwrap();
-    let futuresOrders = exchange.GetOrders("USDT.futures").unwrap();
-    let btcUsdtSwapOrders = exchange.GetOrders("BTC_USDT.swap").unwrap();
-
-    // Rust 不支持 JSON.stringify，此处使用 format! 拼接表格的 JSON 文本
-    let mut tbls = Vec::new();
-    let arr = [&defaultOrders, &swapOrders, &futuresOrders, &btcUsdtSwapOrders];
-    let tblDesc = ["defaultOrders", "swapOrders", "futuresOrders", "btcUsdtSwapOrders"];
-    for index in 0..arr.len() {
-        let orders = arr[index];
-        let mut rows = Vec::new();
-        for order in orders {
-            rows.push(format!(r#"["{}", "{}", {}, {}, {}, {}, {}, {}, {}, "{}"]"#,
-                order.Symbol, order.Id, order.Price, order.Amount, order.DealAmount, order.AvgPrice, order.Status, order.Type, order.Offset, order.ContractType));
-        }
-        let tbl = format!(r#"{{"type": "table", "title": "{}", "cols": ["Symbol", "Id", "Price", "Amount", "DealAmount", "AvgPrice", "Status", "Type", "Offset", "ContractType"], "rows": [{}]}}"#,
-            tblDesc[index], rows.join(","));
-        tbls.push(tbl);
-    }
-
-    LogStatus!(format!("`[{}]`", tbls.join(",")));
-
-    // 打印输出一次信息后立即返回，防止后续回测过程中订单成交而影响数据观察
-    return;
-}
-```
-
-```cpp
-/*backtest
-start: 2024-05-21 00:00:00
-end: 2024-09-05 00:00:00
-period: 5m
-basePeriod: 1m
-exchanges: [{"eid":"Futures_Binance","currency":"BTC_USDT"}]
-*/
-
-void main() {
-    auto arrSymbol = {"BTC_USDT.swap", "BTC_USDT.quarter", "ETH_USDT.swap", "ETH_USDT.quarter"};
-
-    for (const auto& symbol : arrSymbol) {
-        auto t = exchange.GetTicker(symbol);
-        exchange.CreateOrder(symbol, "buy", t.Last / 2, 1);
-        exchange.CreateOrder(symbol, "sell", t.Last * 2, 1);
-    }
-
-    auto defaultOrders = exchange.GetOrders();
-    auto swapOrders = exchange.GetOrders("USDT.swap");
-    auto futuresOrders = exchange.GetOrders("USDT.futures");
-    auto btcUsdtSwapOrders = exchange.GetOrders("BTC_USDT.swap");
-
-    json tbls = R"([])"_json;
-    std::vector<std::vector<Order>> arr = {defaultOrders, swapOrders, futuresOrders, btcUsdtSwapOrders};
-    std::string tblDesc[] = {"defaultOrders", "swapOrders", "futuresOrders", "btcUsdtSwapOrders"};
-    for (int index = 0; index < arr.size(); index++) {
-        auto orders = arr[index];
-        json tbl = R"({
-            "type": "table",
-            "cols": ["Symbol", "Id", "Price", "Amount", "DealAmount", "AvgPrice", "Status", "Type", "Offset", "ContractType"],
-            "rows": []
-        })"_json;
-        tbl["title"] = tblDesc[index];
-
-        for (const auto& order : orders) {
-            json arrJson = R"([])"_json;
-
-            arrJson.push_back(order.Symbol);
-            arrJson.push_back(to_string(order.Id));    // Order 订单结构中的 Id 属性类型为 TId，此处使用 FMZ 平台内置的 C++ 函数 to_string 进行编码
-            arrJson.push_back(order.Price);
-            arrJson.push_back(order.Amount);
-            arrJson.push_back(order.DealAmount);
-            arrJson.push_back(order.AvgPrice);
-            arrJson.push_back(order.Status);
-            arrJson.push_back(order.Type);
-            arrJson.push_back(order.Offset);
-            arrJson.push_back(order.ContractType);
-
-            tbl["rows"].push_back(arrJson);
-        }
-
-        tbls.push_back(tbl);
-    }
-
-    LogStatus(_D(), "\n", "`" + tbls.dump() + "`");
-
-    return;
-}
-```
-
-调用```exchange.GetOrders()```函数时，可传入```Symbol```参数以指定请求特定交易对或合约代码的订单数据。
-
-```javascript
-function main() {
-    var orders = exchange.GetOrders("BTC_USDT")           // 现货品种示例
-    // var orders = exchange.GetOrders("BTC_USDT.swap")   // 期货品种示例
-    Log("orders:", orders)
-}
-```
-
-```python
-def main():
-    orders = exchange.GetOrders("BTC_USDT")          # 现货品种示例
-    # orders = exchange.GetOrders("BTC_USDT.swap")   # 期货品种示例
-    Log("orders:", orders)
-```
-
-```rust
-fn main() {
-    let orders = exchange.GetOrders("BTC_USDT");           // 现货品种示例
-    // let orders = exchange.GetOrders("BTC_USDT.swap");   // 期货品种示例
-    Log!("orders:", orders);
-}
-```
-
-```cpp
-void main() {
-    auto orders = exchange.GetOrders("BTC_USDT");           // 现货品种示例
-    // auto orders = exchange.GetOrders("BTC_USDT.swap");   // 期货品种示例
-    Log("orders:", orders);
-}
-```
-
-在```GetOrders```函数中，symbol参数的使用场景归纳如下：
-
-| 交易所对象分类 | symbol参数 | 查询范围 | 备注 |
-| - | - | - | - |
-| 现货 | 不传symbol参数 | 查询所有现货交易对 | 适用于所有调用场景；若交易所接口不支持，则报错返回空值，以下不再赘述 |
-| 现货 | 指定交易品种，symbol参数为："BTC_USDT" | 查询指定的BTC_USDT交易对 | 对于现货交易所对象，参数symbol的格式为："BTC_USDT" |
-| 期货 | 不传symbol参数 | 查询当前交易对、合约代码维度范围内的所有交易品种 | 假如当前交易对为BTC_USDT，合约代码为swap，即查询所有USDT本位永续合约。等价于调用```GetOrders("USDT.swap")``` |
-| 期货 | 指定交易品种，symbol参数为："BTC_USDT.swap" | 查询指定的BTC的USDT本位永续合约 | 对于期货交易所对象，参数symbol的格式为：FMZ平台定义的**交易对**与**合约代码**的组合，以字符```"."```间隔。 |
-| 期货 | 指定交易品种范围，symbol参数为："USDT.swap" | 查询所有USDT本位永续合约 | - |
-| 支持期权的期货交易所 | 不传symbol参数 | 查询当前交易对维度范围内的所有期权合约 | 假如当前交易对为BTC_USDT，且合约设置为期权合约，例如币安期权合约：BTC-240108-40000-C |
-| 支持期权的期货交易所 | 指定具体交易品种 | 查询指定的期权合约 | 例如对于币安期货交易所，symbol参数为：BTC_USDT.BTC-240108-40000-C |
-| 支持期权的期货交易所 | 指定交易品种范围，symbol参数为："USDT.option" | 查询所有USDT本位期权合约 | - |
-
-在```GetOrders```函数中，期货交易所对象的查询维度范围归纳如下：
-
-| symbol参数 | 请求范围定义 | 备注 |
-| - | - | - |
-| USDT.swap          | USDT本位永续合约范围。  | 对于交易所API接口不支持的维度，调用时会报错返回空值。 |
-| USDT.futures       | USDT本位交割合约范围。  | - |
-| USD.swap           | 币本位永续合约范围。    | - |
-| USD.futures        | 币本位交割合约范围。    | - |
-| USDT.option        | USDT本位期权合约范围。  | - |
-| USD.option         | 币本位期权合约范围。    | - |
-| USDT.futures_combo | 差价组合合约范围。      | Futures_Deribit交易所 |
-| USD.futures_ff     | 混合保证金交割合约范围。 | Futures_Kraken交易所 |
-| USD.swap_pf        | 混合保证金永续合约范围。 | Futures_Kraken交易所 |
-
-当交易所对象```exchange```所代表的账户在**查询范围内**或**指定的交易品种**上没有挂单（即处于未成交状态的活动订单）时，调用该函数将返回空数组，即：```[]```。
-
-以下交易所查询当前未完成订单的接口必须传入品种参数。使用这些交易所调用GetOrders函数时，若未传入symbol参数，则仅请求当前品种的未完成订单，而非所有品种的未完成订单（因为交易所接口不支持）。
-
-Zaif、MEXC、LBank、Korbit、Coinw、BitMart、Bithumb、BitFlyer、BigONE。
-
-不支持```exchange.GetOrders()```函数的交易所：
-
-| 函数名 | 不支持的现货交易所 | 不支持的期货交易所 |
-| - | - | - |
-| GetOrders | -- | Futures_Bibox |
-
-See also: `Order`, `exchange.GetOrder`, `exchange.GetHistoryOrders`
-
-#### exchange.GetHistoryOrders
-
-```
-exchange.GetHistoryOrders()
-exchange.GetHistoryOrders(symbol)
-exchange.GetHistoryOrders(symbol, since)
-exchange.GetHistoryOrders(symbol, since, limit)
-exchange.GetHistoryOrders(since)
-exchange.GetHistoryOrders(since, limit)
-```
-
-```exchange.GetHistoryOrders()```函数用于获取当前交易对、合约的历史订单，并支持指定具体的交易品种。
-
-Parameters:
-
-- `symbol` (string, optional): ```symbol```参数用于指定交易品种。以```BTC_USDT```交易对为例：当```exchange```为现货交易所对象时，```symbol```参数格式为```BTC_USDT```；当```exchange```为期货交易所对象时，以永续合约为例，```symbol```参数格式为```BTC_USDT.swap```。
-
-如果查询的是期权合约的订单数据，参数```symbol```需设置为```"BTC_USDT.BTC-240108-40000-C"```（以币安期权BTC-240108-40000-C为例），其格式为FMZ平台定义的**交易对**与交易所定义的具体期权合约代码的组合，两者之间以字符"."间隔。若不传该参数，则默认请求当前设置的交易对、合约代码的订单数据。
-- `since` (number, optional): ```since```参数用于指定查询的起始时间戳，单位为毫秒。
-- `limit` (number, optional): ```limit```参数用于指定查询的订单数量。
-
-Returns (`Order`数组 / 空值): ```exchange.GetHistoryOrders()```函数在请求数据成功时返回`Order`结构数组，请求数据失败时返回空值。
-
-```javascript
-function main() {
-    var historyOrders = exchange.GetHistoryOrders()
-    Log(historyOrders)
-}
-```
-
-```python
-def main():
-    historyOrders = exchange.GetHistoryOrders()
-    Log(historyOrders)
-```
-
-```rust
-fn main() {
-    let historyOrders = exchange.GetHistoryOrders(None, None, None);
-    Log!(historyOrders);
-}
-```
-
-```cpp
-void main() {
-    auto historyOrders = exchange.GetHistoryOrders();
-    Log(historyOrders);
-}
-```
-
-- 未指定```symbol```、```since```、```limit```参数时，默认查询当前交易对、合约的历史订单，即查询距当前时间最近的一定范围内的历史订单，具体查询范围取决于交易所接口的单次查询范围。
-
-- 指定```symbol```参数时，查询所设置交易品种的历史订单。
-
-- 指定```since```参数时，以```since```时间戳为起始时间，向当前时间方向查询。
-
-- 指定```limit```参数时，查询到足够条数后返回。
-
-- 该函数仅支持提供历史订单查询接口的交易所。
-
-不支持```exchange.GetHistoryOrders()```函数的交易所：
-
-| 函数名 | 不支持的现货交易所 | 不支持的期货交易所 |
-| - | - | - |
-| GetHistoryOrders | Zaif / Upbit / Coincheck / Bitstamp / Bithumb / BitFlyer / BigONE | Futures_Bibox / Futures_ApolloX |
-
-See also: `Order`, `exchange.GetOrder`, `exchange.GetOrders`
-
-#### exchange.CreateConditionOrder
-
-```
-exchange.CreateConditionOrder(symbol, side, amount, condition)
-exchange.CreateConditionOrder(symbol, side, amount, condition, ...args)
-```
-
-```exchange.CreateConditionOrder()```函数用于创建条件单。条件单是一种在满足特定触发条件时自动执行的订单类型。
-
-Parameters:
-
-- `symbol` (string, required): 参数```symbol```用于指定条件单对应的交易对或合约代码。
-
-当调用```exchange.CreateConditionOrder(symbol, side, amount, condition)```函数下条件单时，若```exchange```为现货交易所对象，且订单的计价币种为USDT、交易币种为BTC，则参数```symbol```为：```"BTC_USDT"```，其格式为FMZ平台定义的交易对格式。
-
-当调用```exchange.CreateConditionOrder(symbol, side, amount, condition)```函数下条件单时，若```exchange```为期货交易所对象，且订单为BTC的U本位永续合约订单，则参数```symbol```为：```"BTC_USDT.swap"```，其格式为FMZ平台定义的**交易对**与**合约代码**的组合，两者之间以字符"."分隔。
-
-当调用```exchange.CreateConditionOrder(symbol, side, amount, condition)```函数下条件单时，若```exchange```为期货交易所对象，且订单为BTC的U本位期权合约订单，则参数```symbol```为：```"BTC_USDT.BTC-240108-40000-C"```（以币安期权BTC-240108-40000-C为例），其格式为FMZ平台定义的**交易对**与交易所定义的具体期权合约代码的组合，两者之间以字符"."分隔。
-- `side` (string, required): 参数```side```用于指定条件单的交易方向。
-
-对于现货交易所对象，```side```参数的可选值为：```buy```、```sell```。```buy```表示买入，```sell```表示卖出。
-
-对于期货交易所对象，```side```参数的可选值为：```buy```、```closebuy```、```sell```、```closesell```。其中```buy```表示开多仓，```closebuy```表示平多仓，```sell```表示开空仓，```closesell```表示平空仓。
-
-**支持附加参数（option）**：可以通过```side```参数传递附加参数，格式为：```"side;{JSON对象}"```或```"side;key=value&key=value"```。
-
-例如：```"buy;{\"type\":\"TRAILING_STOP_MARKET\",\"activatePrice\":\"300\"}"```或```"buy;type=TRAILING_STOP_MARKET&activatePrice=300"```。
-
-附加参数用于传递交易所特定的参数（如订单类型、生效规则等），具体支持的参数取决于交易所API。
-- `amount` (number, required): 参数```amount```用于设置条件单的下单量。需要注意的是，当订单为**现货市价买单**时，下单量表示买入金额；个别现货交易所的市价买单下单量为交易币数量，具体请查看「用户指南」中的**交易所特殊说明**。对于期货交易所对象，下单量参数```amount```均以合约张数为单位。
-- `condition` (object, required): 参数```condition```是一个对象，用于设置条件单的触发条件和执行价格。该对象的结构参考`Condition`结构，包含以下属性：
-
-- ```ConditionType```（number）：条件类型，参考`ORDER_CONDITION_TYPE_OCO`、`ORDER_CONDITION_TYPE_TP`、`ORDER_CONDITION_TYPE_SL`、`ORDER_CONDITION_TYPE_GENERIC`。
-
-- ```TpTriggerPrice```（number）：止盈触发价格。
-
-- ```TpOrderPrice```（number）：止盈执行价格，-1表示市价单。
-
-- ```SlTriggerPrice```（number）：止损触发价格。
-
-- ```SlOrderPrice```（number）：止损执行价格，-1表示市价单。
-- `arg` (string / number / bool / object / array / any (平台支持的任意类型), optional): 扩展参数，用于将附带信息输出到该条条件单的日志中，```arg```参数可以传入多个。
-
-Returns (string / 空值): 创建条件单成功时返回条件单Id，创建失败时返回空值。条件单Id的格式与普通订单Id类似，由交易所品种代码和交易所原始条件单Id组成，两者之间以英文逗号分隔。
-
-创建止盈单（TP）：当价格上涨至目标价位时自动卖出。
-
-```javascript
-function main() {
-    // 创建止盈单：当BTC_USDT价格上涨至65000时，以65000的价格卖出0.01个BTC
-    var condition = {
-        ConditionType: ORDER_CONDITION_TYPE_TP,  // 止盈单
-        TpTriggerPrice: 65000,   // 触发价格
-        TpOrderPrice: 65000      // 执行价格，也可设置为-1表示市价单
-    }
-    var id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition)
-    Log("TP order Id:", id)
-}
-```
-
-```python
-def main():
-    # 创建止盈单：当BTC_USDT价格上涨至65000时，以65000的价格卖出0.01个BTC
-    condition = {
-        "ConditionType": ORDER_CONDITION_TYPE_TP,  # 止盈单
-        "TpTriggerPrice": 65000,   # 触发价格
-        "TpOrderPrice": 65000      # 执行价格，也可设置为-1表示市价单
-    }
-    id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition)
-    Log("TP order Id:", id)
-```
-
-```rust
-fn main() {
-    // 创建止盈单：当BTC_USDT价格上涨至65000时，以65000的价格卖出0.01个BTC
-    let condition = OrderCondition {
-        ConditionType: ORDER_CONDITION_TYPE_TP,  // 止盈单
-        TpTriggerPrice: 65000.0,   // 触发价格
-        TpOrderPrice: 65000.0,     // 执行价格，也可设置为-1表示市价单
-        ..Default::default()
-    };
-    let id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, &condition);
-    Log!("TP order Id:", id);
-}
-```
-
-```cpp
-void main() {
-    // 创建止盈单：当BTC_USDT价格上涨至65000时，以65000的价格卖出0.01个BTC
-    OrderCondition condition = {.ConditionType = ORDER_CONDITION_TYPE_TP, .TpTriggerPrice = 65000, .TpOrderPrice = 65000};
-    auto id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition);
-    Log("TP order Id:", id);
-}
-```
-
-创建止损单（SL）：当价格下跌至止损触发价位时，自动以设定方式卖出。
-
-```javascript
-function main() {
-    // 创建止损单：当BTC_USDT价格下跌至58000时，以市价卖出0.01个BTC
-    var condition = {
-        ConditionType: ORDER_CONDITION_TYPE_SL,  // 止损单
-        SlTriggerPrice: 58000,   // 触发价格
-        SlOrderPrice: -1         // -1表示市价单
-    }
-    var id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition)
-    Log("SL order Id:", id)
-}
-```
-
-```python
-def main():
-    # 创建止损单：当BTC_USDT价格下跌至58000时，以市价卖出0.01个BTC
-    condition = {
-        "ConditionType": ORDER_CONDITION_TYPE_SL,  # 止损单
-        "SlTriggerPrice": 58000,   # 触发价格
-        "SlOrderPrice": -1         # -1表示市价单
-    }
-    id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition)
-    Log("SL order Id:", id)
-```
-
-```rust
-fn main() {
-    // 创建止损单：当BTC_USDT价格下跌至58000时，以市价卖出0.01个BTC
-    let condition = OrderCondition {
-        ConditionType: ORDER_CONDITION_TYPE_SL,  // 止损单
-        SlTriggerPrice: 58000.0,   // 触发价格
-        SlOrderPrice: -1.0,        // -1表示市价单
-        ..Default::default()
-    };
-    let id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, &condition);
-    Log!("SL order Id:", id);
-}
-```
-
-```cpp
-void main() {
-    // 创建止损单：当BTC_USDT价格下跌至58000时，以市价卖出0.01个BTC
-    OrderCondition condition = {.ConditionType = ORDER_CONDITION_TYPE_SL, .SlTriggerPrice = 58000, .SlOrderPrice = -1};
-    auto id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition);
-    Log("SL order Id:", id);
-}
-```
-
-创建 OCO 订单：同时设置止盈和止损，任意一个触发后，另一个将自动取消。
-
-```javascript
-function main() {
-    // 创建 OCO 订单：止盈价 65000，止损价 58000
-    var condition = {
-        ConditionType: ORDER_CONDITION_TYPE_OCO,  // OCO 订单
-        TpTriggerPrice: 65000,   // 止盈触发价格
-        TpOrderPrice: 65000,     // 止盈执行价格
-        SlTriggerPrice: 58000,   // 止损触发价格
-        SlOrderPrice: 58000      // 止损执行价格
-    }
-    var id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition)
-    Log("OCO order Id:", id)
-}
-```
-
-```python
-def main():
-    # 创建 OCO 订单：止盈价 65000，止损价 58000
-    condition = {
-        "ConditionType": ORDER_CONDITION_TYPE_OCO,  # OCO 订单
-        "TpTriggerPrice": 65000,   # 止盈触发价格
-        "TpOrderPrice": 65000,     # 止盈执行价格
-        "SlTriggerPrice": 58000,   # 止损触发价格
-        "SlOrderPrice": 58000      # 止损执行价格
-    }
-    id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition)
-    Log("OCO order Id:", id)
-```
-
-```rust
-fn main() {
-    // 创建 OCO 订单：止盈价 65000，止损价 58000
-    let condition = OrderCondition {
-        ConditionType: ORDER_CONDITION_TYPE_OCO,  // OCO 订单
-        TpTriggerPrice: 65000.0,   // 止盈触发价格
-        TpOrderPrice: 65000.0,     // 止盈执行价格
-        SlTriggerPrice: 58000.0,   // 止损触发价格
-        SlOrderPrice: 58000.0      // 止损执行价格
-    };
-    let id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, &condition);
-    Log!("OCO order Id:", id);
-}
-```
-
-```cpp
-void main() {
-    // 创建 OCO 订单：止盈价 65000，止损价 58000
-    OrderCondition condition = {.ConditionType = ORDER_CONDITION_TYPE_OCO, .TpTriggerPrice = 65000, .TpOrderPrice = 65000, .SlTriggerPrice = 58000, .SlOrderPrice = 58000};
-    auto id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition);
-    Log("OCO order Id:", id);
-}
-```
-
-使用附加参数（option）创建条件单，用于传递交易所特定的参数。
-
-```javascript
-function main() {
-    // 以 JSON 格式传递 option 参数
-    var option = {
-        "type": "TRAILING_STOP_MARKET",
-        "activatePrice": "300",
-        "callbackRate": "0.1"
-    }
-    var sideWithOption = "buy;" + JSON.stringify(option)
-    var condition = {
-        ConditionType: ORDER_CONDITION_TYPE_TP,
-        TpTriggerPrice: 77,
-        TpOrderPrice: 71
-    }
-    var id = exchange.CreateConditionOrder("SOL_USDT.swap", sideWithOption, 1, condition)
-    Log("Condition Order Id:", id)
-
-    Sleep(2000)
-    Log(exchange.GetConditionOrder(id))
-}
-```
-
-```python
-import json
-
-def main():
-    # 以 JSON 格式传递 option 参数
-    option = {
-        "type": "TRAILING_STOP_MARKET",
-        "activatePrice": "300",
-        "callbackRate": "0.1"
-    }
-    sideWithOption = "buy;" + json.dumps(option)
-    condition = {
-        "ConditionType": ORDER_CONDITION_TYPE_TP,
-        "TpTriggerPrice": 77,
-        "TpOrderPrice": 71
-    }
-    id = exchange.CreateConditionOrder("SOL_USDT.swap", sideWithOption, 1, condition)
-    Log("Condition Order Id:", id)
-
-    Sleep(2000)
-    Log(exchange.GetConditionOrder(id))
-```
-
-```rust
-fn main() {
-    // 以 JSON 格式传递 option 参数（Rust 无 JSON 序列化功能，此处直接使用原始字符串构造）
-    let option = r#"{"type": "TRAILING_STOP_MARKET", "activatePrice": "300", "callbackRate": "0.1"}"#;
-    let sideWithOption = format!("buy;{}", option);
-    let condition = OrderCondition {
-        ConditionType: ORDER_CONDITION_TYPE_TP,
-        TpTriggerPrice: 77.0,
-        TpOrderPrice: 71.0,
-        ..Default::default()
-    };
-    let id = exchange.CreateConditionOrder("SOL_USDT.swap", &sideWithOption, 1, &condition).unwrap();
-    Log!("Condition Order Id:", id);
-
-    Sleep(2000);
-    Log!(exchange.GetConditionOrder(&id));
-}
-```
-
-```cpp
-void main() {
-    // 以 JSON 格式传递 option 参数
-    json option = R"({
-        "type": "TRAILING_STOP_MARKET",
-        "activatePrice": "300",
-        "callbackRate": "0.1"
-    })"_json;
-    string sideWithOption = "buy;" + option.dump();
-    OrderCondition condition = {.ConditionType = ORDER_CONDITION_TYPE_TP, .TpTriggerPrice = 77, .TpOrderPrice = 71};
-    auto id = exchange.CreateConditionOrder("SOL_USDT.swap", sideWithOption, 1, condition);
-    Log("Condition Order Id:", id);
-
-    Sleep(2000);
-    Log(exchange.GetConditionOrder(id));
-}
-```
-
-条件单功能的支持情况取决于具体交易所，部分交易所可能不支持条件单功能。
-
-条件单在触发前不会占用账户资金，仅在触发后才会实际下单并占用资金。
-
-不同交易所对条件单的支持程度及具体参数可能有所差异，使用前请查阅对应交易所的 API 文档。
-
-支持通过```side```参数传递附加参数（option），用于传递交易所特定的参数。附加参数需与```side```参数合并传入，格式为```"side;{JSON对象}"```（推荐）或```"side;key=value&key=value"```（URL 编码格式）。例如：```"buy;{\"type\":\"TRAILING_STOP_MARKET\"}"```。
-
-不同交易所支持的 option 参数各不相同，具体支持的参数取决于交易所 API 文档。常见参数包括：订单类型（type）、生效规则（timeInForce）、触发价格（activatePrice）、回调比率（callbackRate）等。
-
-使用 option 参数时，仍需提供```amount```和```condition```参数。如果交易所 API 中的某些参数已通过 option 传递，这些基础参数可能会被 option 中的对应参数覆盖，具体行为取决于交易所 API 的实现。
-
-See also: `Condition`, `exchange.CancelConditionOrder`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`, `exchange.ModifyConditionOrder`
-
-#### exchange.ModifyOrder
-
-```
-exchange.ModifyOrder(orderId, side, price, amount)
-```
-
-```exchange.ModifyOrder()```函数用于修改现有的普通订单，可修改订单的价格和数量。该函数支持通过附加参数修改订单的其它属性（具体取决于交易所 API 的支持情况）。
-
-Parameters:
-
-- `orderId` (string, required): 参数```orderId```用于指定待修改的原订单 ID。订单 ID 的格式与`exchange.CreateOrder`函数返回的订单 ID 一致，由交易所品种代码和交易所原始订单 ID 组成，两者以英文逗号分隔。例如：```"ETH-USDT,1547130415509278720"```。
-- `side` (string, required): 参数```side```用于指定订单的交易方向。
-
-对于现货交易所对象，```side```参数的可选值为：```buy```、```sell```。其中```buy```表示买入，```sell```表示卖出。
-
-对于期货交易所对象，```side```参数的可选值为：```buy```、```closebuy```、```sell```、```closesell```。其中```buy```表示开多仓，```closebuy```表示平多仓，```sell```表示开空仓，```closesell```表示平空仓。
-
-**支持附加参数（option）**：可通过```side```参数传递附加参数，格式为```"side;{JSON对象}"```或```"side;key=value&key=value"```。
-
-例如：```"buy;{\"priceMatch\":\"QUEUE_20\"}"```或```"buy;priceMatch=QUEUE_20"```。
-
-附加参数用于修改订单的其它属性（如价格匹配模式等），具体支持的参数取决于交易所 API。
-- `price` (number, required): 参数```price```用于设置订单的新价格。当价格为 -1 时表示不修改价格，或根据交易所 API 的实现，可能转为市价单。
-- `amount` (number, required): 参数```amount```用于设置订单的新下单量。当数量为 -1 时表示不修改数量。需要注意的是，当订单为**现货市价买单**时，下单量表示买入金额；个别现货交易所的市价买单，其下单量为交易币的数量。
-
-Returns (string / 空值): 修改订单成功时返回订单 ID，修改失败时返回空值。返回的订单 ID 可能与原订单 ID 相同，也可能不同，这取决于交易所 API 的实现方式。某些交易所在修改订单后会返回新的订单 ID，而有些交易所则保持订单 ID 不变。
-
-修改普通订单的价格和数量。
-
-```javascript
-function main() {
-    // 创建一个限价买单
-    var id = exchange.CreateOrder("SOL_USDT.swap", "buy", 88, 1)
-    Log("Original Order ID:", id)
-    Sleep(2000)
-
-    // 查询原始订单信息
-    var order = exchange.GetOrder(id)
-    Log("Original Order Info:", order)
-    Sleep(1000)
-
-    // 修改订单的价格和数量
-    var newId = exchange.ModifyOrder(id, "buy", 77, 2)
-    Log("Modified Order ID:", newId)
-    Sleep(2000)
-
-    // 查询修改后的订单信息
-    var newOrder = exchange.GetOrder(newId)
-    Log("Modified Order Info:", newOrder)
-
-    // 取消订单
-    exchange.CancelOrder(newId)
-}
-```
-
-```python
-def main():
-    # 创建一个限价买单
-    id = exchange.CreateOrder("SOL_USDT.swap", "buy", 88, 1)
-    Log("Original Order ID:", id)
-    Sleep(2000)
-
-    # 查询原始订单信息
-    order = exchange.GetOrder(id)
-    Log("Original Order Info:", order)
-    Sleep(1000)
-
-    # 修改订单的价格和数量
-    newId = exchange.ModifyOrder(id, "buy", 77, 2)
-    Log("Modified Order ID:", newId)
-    Sleep(2000)
-
-    # 查询修改后的订单信息
-    newOrder = exchange.GetOrder(newId)
-    Log("Modified Order Info:", newOrder)
-
-    # 取消订单
-    exchange.CancelOrder(newId)
-```
-
-```rust
-fn main() {
-    // 创建一个限价买单
-    let id = exchange.CreateOrder("SOL_USDT.swap", "buy", 88, 1).unwrap();
-    Log!("Original Order ID:", id);
-    Sleep(2000);
-
-    // 查询原始订单信息
-    let order = exchange.GetOrder(&id).unwrap();
-    Log!("Original Order Info:", order);
-    Sleep(1000);
-
-    // 修改订单的价格和数量
-    let newId = exchange.ModifyOrder(&id, "buy", 77, 2).unwrap();
-    Log!("Modified Order ID:", newId);
-    Sleep(2000);
-
-    // 查询修改后的订单信息
-    let newOrder = exchange.GetOrder(&newId).unwrap();
-    Log!("Modified Order Info:", newOrder);
-
-    // 取消订单
-    let _ = exchange.CancelOrder(&newId);
-}
-```
-
-```cpp
-void main() {
-    // 创建一个限价买单
-    auto id = exchange.CreateOrder("SOL_USDT.swap", "buy", 88, 1);
-    Log("Original Order ID:", id);
-    Sleep(2000);
-
-    // 查询原始订单信息
-    auto order = exchange.GetOrder(id);
-    Log("Original Order Info:", order);
-    Sleep(1000);
-
-    // 修改订单的价格和数量
-    auto newId = exchange.ModifyOrder(id, "buy", 77, 2);
-    Log("Modified Order ID:", newId);
-    Sleep(2000);
-
-    // 查询修改后的订单信息
-    auto newOrder = exchange.GetOrder(newId);
-    Log("Modified Order Info:", newOrder);
-
-    // 取消订单
-    exchange.CancelOrder(newId);
-}
-```
-
-使用附加参数（option）修改订单的价格匹配模式。
-
-```javascript
-function main() {
-    // 创建一个限价买单
-    var id = exchange.CreateOrder("SOL_USDT.swap", "buy", 77, 1)
-    Log("Original Order ID:", id)
-    Sleep(2000)
-
-    // 修改订单，并将价格匹配模式设置为 QUEUE_20
-    // 通过 side 参数传递附加参数（JSON 格式）
-    var option = {"priceMatch": "QUEUE_20"}
-    var sideWithOption = "buy;" + JSON.stringify(option)
-
-    var newId = exchange.ModifyOrder(id, sideWithOption, -1, 2)
-    Log("Modified Order ID:", newId)
-    Sleep(2000)
-
-    // 查询修改后的订单信息
-    var newOrder = exchange.GetOrder(newId)
-    Log("Modified Order Info:", newOrder)
-
-    // 撤销订单
-    exchange.CancelOrder(newId)
-}
-```
-
-```python
-import json
-
-def main():
-    # 创建一个限价买单
-    id = exchange.CreateOrder("SOL_USDT.swap", "buy", 77, 1)
-    Log("Original Order ID:", id)
-    Sleep(2000)
-
-    # 修改订单，并将价格匹配模式设置为 QUEUE_20
-    # 通过 side 参数传递附加参数（JSON 格式）
-    option = {"priceMatch": "QUEUE_20"}
-    sideWithOption = "buy;" + json.dumps(option)
-
-    newId = exchange.ModifyOrder(id, sideWithOption, -1, 2)
-    Log("Modified Order ID:", newId)
-    Sleep(2000)
-
-    # 查询修改后的订单信息
-    newOrder = exchange.GetOrder(newId)
-    Log("Modified Order Info:", newOrder)
-
-    # 撤销订单
-    exchange.CancelOrder(newId)
-```
-
-```rust
-fn main() {
-    // 创建一个限价买单
-    let id = exchange.CreateOrder("SOL_USDT.swap", "buy", 77, 1).unwrap();
-    Log!("Original Order ID:", id);
-    Sleep(2000);
-
-    // 修改订单，并将价格匹配模式设置为 QUEUE_20
-    // 通过 side 参数传递附加参数（JSON 格式）；Rust 不支持 JSON.stringify，因此直接使用原始字符串构造 JSON 文本
-    let option = r#"{"priceMatch": "QUEUE_20"}"#;
-    let sideWithOption = format!("buy;{}", option);
-
-    let newId = exchange.ModifyOrder(&id, &sideWithOption, -1, 2).unwrap();
-    Log!("Modified Order ID:", newId);
-    Sleep(2000);
-
-    // 查询修改后的订单信息
-    let newOrder = exchange.GetOrder(&newId).unwrap();
-    Log!("Modified Order Info:", newOrder);
-
-    // 撤销订单
-    let _ = exchange.CancelOrder(&newId);
-}
-```
-
-```cpp
-void main() {
-    // 创建一个限价买单
-    auto id = exchange.CreateOrder("SOL_USDT.swap", "buy", 77, 1);
-    Log("Original Order ID:", id);
-    Sleep(2000);
-
-    // 修改订单，并将价格匹配模式设置为 QUEUE_20
-    // 通过 side 参数传递附加参数（JSON 格式）
-    json option = R"({"priceMatch": "QUEUE_20"})"_json;
-    string sideWithOption = "buy;" + option.dump();
-
-    auto newId = exchange.ModifyOrder(id, sideWithOption, -1, 2);
-    Log("Modified Order ID:", newId);
-    Sleep(2000);
-
-    // 查询修改后的订单信息
-    auto newOrder = exchange.GetOrder(newId);
-    Log("Modified Order Info:", newOrder);
-
-    // 撤销订单
-    exchange.CancelOrder(newId);
-}
-```
-
-```exchange.ModifyOrder()```函数返回的订单 ID 因交易所 API 的实现不同而可能有不同的行为。有些交易所 API 返回的订单 ID 会更新，有些则保持不变。建议使用返回的新订单 ID 进行后续操作。
-
-```exchange.ModifyOrder()```函数不会依据交易所接口规则校验参数的有效性，而是将参数直接提交给交易所 API。传入无效参数时（如价格或数量为 -1），参数可能会被交易所忽略，订单将保持原有属性不变。
-
-支持通过```side```参数传递附加参数（option），用于修改订单的其它属性。附加参数需与```side```参数合并后传入，格式为```"side;{JSON对象}"```（推荐）或```"side;key=value"```（URL 编码格式）。例如，修改价格匹配模式：```"buy;{\"priceMatch\":\"QUEUE_20\"}"```。
-
-对于普通订单的市价单修改，需具体查看交易所 API 是否支持。有些交易所不支持对市价单进行修改操作。
-
-修改订单时，订单的其它属性（如订单类型、持仓模式、账户模式、杠杆、订单生效规则等）通常会保留原订单的设置。如需修改这些属性，可通过附加参数（option）传入，前提是交易所 API 支持。
-
-个别交易所 API 在未接收到价格参数时（price 为 -1 或 null），可能会将订单转为市价单。对于现货市价买单，需要注意其下单量单位可能是金额而非币数。
-
-修改订单功能的支持情况取决于具体交易所，部分交易所可能不支持修改订单功能，或仅支持修改部分参数。使用前请查阅对应交易所的 API 文档。
-
-See also: `exchange.CreateOrder`, `exchange.CancelOrder`, `exchange.GetOrder`, `exchange.GetOrders`
-
-#### exchange.ModifyConditionOrder
-
-```
-exchange.ModifyConditionOrder(orderId, side, amount, condition)
-```
-
-```exchange.ModifyConditionOrder()```函数用于修改现有的条件单，可修改条件单的下单量、触发条件和执行价格。支持通过附加参数修改条件单的其它属性（具体取决于交易所API的支持情况）。
-
-Parameters:
-
-- `orderId` (string, required): 参数```orderId```用于指定待修改的原条件单ID。条件单ID的格式与`exchange.CreateConditionOrder`函数返回的条件单ID一致，由交易所品种代码和交易所原始条件单ID组成，两者以英文逗号分隔。例如：```"SOL-USDT-SWAP,3196255845130256384"```。
-- `side` (string, required): 参数```side```用于指定条件单的交易方向。
-对于现货交易所对象，```side```参数的可选值为：```buy```、```sell```。```buy```表示买入，```sell```表示卖出。
-对于期货交易所对象，```side```参数的可选值为：```buy```、```closebuy```、```sell```、```closesell```。```buy```表示开多仓，```closebuy```表示平多仓，```sell```表示开空仓，```closesell```表示平空仓。
-
-**支持附加参数（option）**：可以通过```side```参数传递附加参数，格式为：```"side;{JSON对象}"```或```"side;key=value&key=value"```。
-例如：```"buy;{\"newTpTriggerPxType\":\"index\"}"```或```"buy;newTpTriggerPxType=index"```。
-附加参数用于修改条件单的其它属性（如触发价格类型等），具体支持的参数取决于交易所API。
-- `amount` (number, required): 参数```amount```用于设置条件单的新下单量。当数量为-1时表示不修改下单量。对于期货交易所对象，下单量参数```amount```均以合约张数为单位。
-- `condition` (object, required): 参数```condition```是一个对象，用于设置条件单的新触发条件和执行价格。该对象的结构参考`Condition`结构，包含以下属性：
-- ```ConditionType```（number）：条件类型，参考`ORDER_CONDITION_TYPE_OCO`、`ORDER_CONDITION_TYPE_TP`、`ORDER_CONDITION_TYPE_SL`、`ORDER_CONDITION_TYPE_GENERIC`。
-- ```TpTriggerPrice```（number）：止盈触发价格。
-- ```TpOrderPrice```（number）：止盈执行价格，-1表示市价单。
-- ```SlTriggerPrice```（number）：止损触发价格。
-- ```SlOrderPrice```（number）：止损执行价格，-1表示市价单。
-
-Returns (string / 空值): 修改条件单成功时返回条件单ID，修改失败时返回空值。返回的条件单ID可能与原条件单ID相同，也可能不同，这取决于交易所API的具体实现方式。某些交易所在修改条件单后会返回新的条件单ID，而有些交易所则保持条件单ID不变。
-
-修改条件单的数量和触发条件。
-
-```javascript
-function main() {
-    // 创建一个止盈条件单
-    var condition = {
-        ConditionType: ORDER_CONDITION_TYPE_TP,
-        TpTriggerPrice: 77,
-        TpOrderPrice: 76
-    }
-    var id = exchange.CreateConditionOrder("SOL_USDT.swap", "buy", 1, condition)
-    Log("Original Condition Order ID:", id)
-    Sleep(2000)
-
-    // 查询原始条件单信息
-    var order = exchange.GetConditionOrder(id)
-    Log("Original Condition Order Info:", order)
-    Sleep(1000)
-
-    // 修改条件单的数量和触发条件
-    var newCondition = {
-        ConditionType: ORDER_CONDITION_TYPE_TP,
-        TpTriggerPrice: 75,
-        TpOrderPrice: 71
-    }
-    var newId = exchange.ModifyConditionOrder(id, "buy", 2, newCondition)
-    Log("Modified Condition Order ID:", newId)
-    Sleep(2000)
-
-    // 查询修改后的条件单信息
-    var newOrder = exchange.GetConditionOrder(newId)
-    Log("Modified Condition Order Info:", newOrder)
-
-    // 取消条件单
-    exchange.CancelConditionOrder(newId)
-}
-```
-
-```python
-def main():
-    # 创建一个止盈条件单
-    condition = {
-        "ConditionType": ORDER_CONDITION_TYPE_TP,
-        "TpTriggerPrice": 77,
-        "TpOrderPrice": 76
-    }
-    id = exchange.CreateConditionOrder("SOL_USDT.swap", "buy", 1, condition)
-    Log("Original Condition Order ID:", id)
-    Sleep(2000)
-
-    # 查询原始条件单信息
-    order = exchange.GetConditionOrder(id)
-    Log("Original Condition Order Info:", order)
-    Sleep(1000)
-
-    # 修改条件单的数量和触发条件
-    newCondition = {
-        "ConditionType": ORDER_CONDITION_TYPE_TP,
-        "TpTriggerPrice": 75,
-        "TpOrderPrice": 71
-    }
-    newId = exchange.ModifyConditionOrder(id, "buy", 2, newCondition)
-    Log("Modified Condition Order ID:", newId)
-    Sleep(2000)
-
-    # 查询修改后的条件单信息
-    newOrder = exchange.GetConditionOrder(newId)
-    Log("Modified Condition Order Info:", newOrder)
-
-    # 取消条件单
-    exchange.CancelConditionOrder(newId)
-```
-
-```rust
-fn main() {
-    // 创建一个止盈条件单
-    let condition = OrderCondition {
-        ConditionType: ORDER_CONDITION_TYPE_TP,
-        TpTriggerPrice: 77.0,
-        TpOrderPrice: 76.0,
-        ..Default::default()
-    };
-    let id = exchange.CreateConditionOrder("SOL_USDT.swap", "buy", 1, &condition).unwrap();
-    Log!("Original Condition Order ID:", id);
-    Sleep(2000);
-
-    // 查询原始条件单信息
-    let order = exchange.GetConditionOrder(&id);
-    Log!("Original Condition Order Info:", order);
-    Sleep(1000);
-
-    // 修改条件单的数量和触发条件
-    let newCondition = OrderCondition {
-        ConditionType: ORDER_CONDITION_TYPE_TP,
-        TpTriggerPrice: 75.0,
-        TpOrderPrice: 71.0,
-        ..Default::default()
-    };
-    let newId = exchange.ModifyConditionOrder(&id, "buy", 2, &newCondition).unwrap();
-    Log!("Modified Condition Order ID:", newId);
-    Sleep(2000);
-
-    // 查询修改后的条件单信息
-    let newOrder = exchange.GetConditionOrder(&newId);
-    Log!("Modified Condition Order Info:", newOrder);
-
-    // 取消条件单
-    let _ = exchange.CancelConditionOrder(&newId);
-}
-```
-
-```cpp
-void main() {
-    // 创建一个止盈条件单
-    OrderCondition condition = {.ConditionType = ORDER_CONDITION_TYPE_TP, .TpTriggerPrice = 77, .TpOrderPrice = 76};
-    auto id = exchange.CreateConditionOrder("SOL_USDT.swap", "buy", 1, condition);
-    Log("Original Condition Order ID:", id);
-    Sleep(2000);
-
-    // 查询原始条件单信息
-    auto order = exchange.GetConditionOrder(id);
-    Log("Original Condition Order Info:", order);
-    Sleep(1000);
-
-    // 修改条件单的数量和触发条件
-    OrderCondition newCondition = {.ConditionType = ORDER_CONDITION_TYPE_TP, .TpTriggerPrice = 75, .TpOrderPrice = 71};
-    auto newId = exchange.ModifyConditionOrder(id, "buy", 2, newCondition);
-    Log("Modified Condition Order ID:", newId);
-    Sleep(2000);
-
-    // 查询修改后的条件单信息
-    auto newOrder = exchange.GetConditionOrder(newId);
-    Log("Modified Condition Order Info:", newOrder);
-
-    // 取消条件单
-    exchange.CancelConditionOrder(newId);
-}
-```
-
-使用附加参数（option）修改条件单的触发价格类型。
-
-```javascript
-function main() {
-    // 创建一个止盈条件单
-    var condition = {
-        ConditionType: ORDER_CONDITION_TYPE_TP,
-        TpTriggerPrice: 77,
-        TpOrderPrice: 76
-    }
-    var id = exchange.CreateConditionOrder("SOL_USDT.swap", "buy", 1, condition)
-    Log("Original Condition Order ID:", id)
-    Sleep(2000)
-
-    // 修改条件单，并将触发价格类型设置为指数价格（index）
-    // 通过 side 参数传递附加参数（JSON 格式）
-    var option = {"newTpTriggerPxType": "index"}
-    var sideWithOption = "buy;" + JSON.stringify(option)
-
-    var newCondition = {
-        ConditionType: ORDER_CONDITION_TYPE_TP,
-        TpTriggerPrice: 75,
-        TpOrderPrice: 71
-    }
-    var newId = exchange.ModifyConditionOrder(id, sideWithOption, 2, newCondition)
-    Log("Modified Condition Order ID:", newId)
-    Sleep(2000)
-
-    // 查询修改后的条件单信息
-    var newOrder = exchange.GetConditionOrder(newId)
-    Log("Modified Condition Order Info:", newOrder)
-
-    // 取消条件单
-    exchange.CancelConditionOrder(newId)
-}
-```
-
-```python
-import json
-
-def main():
-    # 创建一个止盈条件单
-    condition = {
-        "ConditionType": ORDER_CONDITION_TYPE_TP,
-        "TpTriggerPrice": 77,
-        "TpOrderPrice": 76
-    }
-    id = exchange.CreateConditionOrder("SOL_USDT.swap", "buy", 1, condition)
-    Log("Original Condition Order ID:", id)
-    Sleep(2000)
-
-    # 修改条件单，并将触发价格类型设置为指数价格（index）
-    # 通过 side 参数传递附加参数（JSON 格式）
-    option = {"newTpTriggerPxType": "index"}
-    sideWithOption = "buy;" + json.dumps(option)
-
-    newCondition = {
-        "ConditionType": ORDER_CONDITION_TYPE_TP,
-        "TpTriggerPrice": 75,
-        "TpOrderPrice": 71
-    }
-    newId = exchange.ModifyConditionOrder(id, sideWithOption, 2, newCondition)
-    Log("Modified Condition Order ID:", newId)
-    Sleep(2000)
-
-    # 查询修改后的条件单信息
-    newOrder = exchange.GetConditionOrder(newId)
-    Log("Modified Condition Order Info:", newOrder)
-
-    # 取消条件单
-    exchange.CancelConditionOrder(newId)
-```
-
-```rust
-fn main() {
-    // 创建一个止盈条件单
-    let condition = OrderCondition {
-        ConditionType: ORDER_CONDITION_TYPE_TP,
-        TpTriggerPrice: 77.0,
-        TpOrderPrice: 76.0,
-        ..Default::default()
-    };
-    let id = exchange.CreateConditionOrder("SOL_USDT.swap", "buy", 1, &condition).unwrap();
-    Log!("Original Condition Order ID:", id);
-    Sleep(2000);
-
-    // 修改条件单，并将触发价格类型设置为指数价格（index）
-    // 通过 side 参数传递附加参数（JSON 格式；Rust 无 JSON 序列化，故直接使用原始字符串构造）
-    let sideWithOption = r#"buy;{"newTpTriggerPxType": "index"}"#;
-
-    let newCondition = OrderCondition {
-        ConditionType: ORDER_CONDITION_TYPE_TP,
-        TpTriggerPrice: 75.0,
-        TpOrderPrice: 71.0,
-        ..Default::default()
-    };
-    let newId = exchange.ModifyConditionOrder(&id, sideWithOption, 2, &newCondition).unwrap();
-    Log!("Modified Condition Order ID:", newId);
-    Sleep(2000);
-
-    // 查询修改后的条件单信息
-    let newOrder = exchange.GetConditionOrder(&newId);
-    Log!("Modified Condition Order Info:", newOrder);
-
-    // 取消条件单
-    let _ = exchange.CancelConditionOrder(&newId);
-}
-```
-
-```cpp
-void main() {
-    // 创建一个止盈条件单
-    OrderCondition condition = {.ConditionType = ORDER_CONDITION_TYPE_TP, .TpTriggerPrice = 77, .TpOrderPrice = 76};
-    auto id = exchange.CreateConditionOrder("SOL_USDT.swap", "buy", 1, condition);
-    Log("Original Condition Order ID:", id);
-    Sleep(2000);
-
-    // 修改条件单，并将触发价格类型设置为指数价格（index）
-    // 通过 side 参数传递附加参数（JSON 格式）
-    json option = R"({"newTpTriggerPxType": "index"})"_json;
-    string sideWithOption = "buy;" + option.dump();
-
-    OrderCondition newCondition = {.ConditionType = ORDER_CONDITION_TYPE_TP, .TpTriggerPrice = 75, .TpOrderPrice = 71};
-    auto newId = exchange.ModifyConditionOrder(id, sideWithOption, 2, newCondition);
-    Log("Modified Condition Order ID:", newId);
-    Sleep(2000);
-
-    // 查询修改后的条件单信息
-    auto newOrder = exchange.GetConditionOrder(newId);
-    Log("Modified Condition Order Info:", newOrder);
-
-    // 取消条件单
-    exchange.CancelConditionOrder(newId);
-}
-```
-
-```exchange.ModifyConditionOrder()```函数返回的条件单ID因交易所API实现的不同而可能表现出不同行为。有些交易所API返回的条件单ID会更新，有些则保持不变。建议使用返回的新条件单ID进行后续操作。
-
-```exchange.ModifyConditionOrder()```函数不会依据交易所接口规则校验参数的有效性，而是将参数直接提交给交易所API。传入无效参数时（如数量为-1），该参数可能会被交易所忽略，条件单保持原有属性不变。
-
-支持通过```side```参数传递附加参数（option），用于修改条件单的其它属性。附加参数需要与```side```参数合并传入，格式为```"side;{JSON对象}"```（推荐）或```"side;key=value"```（URL编码格式）。例如修改触发价格类型：```"buy;{\"newTpTriggerPxType\":\"index\"}"```。
-
-对于条件单的市价单修改，需要具体查看交易所API是否支持。将```condition```参数中的```TpOrderPrice```或```SlOrderPrice```设置为-1表示市价单。
-
-修改条件单时，条件单的其它属性（如条件类型、持仓模式、账户模式、杠杆等）通常会保留原条件单的设置。如需修改这些属性，可以通过附加参数（option）传入，前提是交易所API支持。
-
-可以通过附加参数修改触发价格类型，例如将触发价格类型从最新价（last）修改为指数价格（index）或标记价格（mark）。具体的参数名称和支持情况取决于交易所API文档。
-
-修改条件单功能的支持情况取决于具体交易所，部分交易所可能不支持修改条件单功能，或仅支持修改部分参数。使用前请查阅对应交易所的API文档。
-
-See also: `Condition`, `exchange.CreateConditionOrder`, `exchange.CancelConditionOrder`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`
-
-#### exchange.CancelConditionOrder
-
-```
-exchange.CancelConditionOrder(conditionOrderId)
-exchange.CancelConditionOrder(conditionOrderId, ...args)
-```
-
-```exchange.CancelConditionOrder()```函数用于取消条件单。条件单Id的格式与普通订单Id类似，由交易所品种代码和交易所原始条件单Id组成，两者以英文逗号分隔。
-
-调用```exchange.CancelConditionOrder()```函数撤销条件单时，传入的```conditionOrderId```参数与条件单结构的```Id```属性一致。
-
-Parameters:
-
-- `conditionOrderId` (string, required): ```conditionOrderId```参数用于指定要取消的条件单。
-- `arg` (string / number / bool / object / array / any (平台支持的任意类型), optional): 扩展参数，用于向该条撤销条件单的日志中输出附带信息，```arg```参数可以传入多个。
-
-Returns (bool): ```exchange.CancelConditionOrder()```函数返回真值（例如```true```）表示撤销条件单的请求发送成功，返回假值（例如```false```）表示撤销条件单的请求发送失败。
-
-撤销条件单。
-
-```javascript
-function main(){
-    // 创建止损条件单
-    var condition = {
-        ConditionType: ORDER_CONDITION_TYPE_SL,
-        SlTriggerPrice: 58000,
-        SlOrderPrice: -1  // 市价单
-    }
-    var id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition)
-    Sleep(1000)
-    exchange.CancelConditionOrder(id)
-}
-```
-
-```python
-def main():
-    # 创建止损条件单
-    condition = {
-        "ConditionType": ORDER_CONDITION_TYPE_SL,
-        "SlTriggerPrice": 58000,
-        "SlOrderPrice": -1  # 市价单
-    }
-    id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition)
-    Sleep(1000)
-    exchange.CancelConditionOrder(id)
-```
-
-```rust
-fn main() {
-    // 创建止损条件单
-    let condition = OrderCondition {
-        ConditionType: ORDER_CONDITION_TYPE_SL,
-        SlTriggerPrice: 58000.0,
-        SlOrderPrice: -1.0,  // 市价单
-        ..Default::default()
-    };
-    let id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, &condition).unwrap();
-    Sleep(1000);
-    let _ = exchange.CancelConditionOrder(&id);
-}
-```
-
-```cpp
-void main() {
-    // 创建止损条件单
-    OrderCondition condition = {.ConditionType = ORDER_CONDITION_TYPE_SL, .SlTriggerPrice = 58000, .SlOrderPrice = -1};
-    auto id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition);
-    Sleep(1000);
-    exchange.CancelConditionOrder(id);
-}
-```
-
-批量取消条件单，并附带输出条件单信息。
-
-```javascript
-function main() {
-    // 创建几个条件单
-    var condition1 = {
-        ConditionType: ORDER_CONDITION_TYPE_TP,
-        TpTriggerPrice: 65000,
-        TpOrderPrice: 65000
-    }
-    exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition1)
-
-    var condition2 = {
-        ConditionType: ORDER_CONDITION_TYPE_SL,
-        SlTriggerPrice: 58000,
-        SlOrderPrice: 58000
-    }
-    exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition2)
-    Sleep(1000)
-
-    var orders = exchange.GetConditionOrders()
-    for (var i = 0 ; i < orders.length ; i++) {
-        exchange.CancelConditionOrder(orders[i].Id, "Canceled condition order:", orders[i])
-        Sleep(500)
-    }
-}
-```
-
-```python
-def main():
-    # 创建几个条件单
-    condition1 = {
-        "ConditionType": ORDER_CONDITION_TYPE_TP,
-        "TpTriggerPrice": 65000,
-        "TpOrderPrice": 65000
-    }
-    exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition1)
-
-    condition2 = {
-        "ConditionType": ORDER_CONDITION_TYPE_SL,
-        "SlTriggerPrice": 58000,
-        "SlOrderPrice": 58000
-    }
-    exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition2)
-    Sleep(1000)
-
-    orders = exchange.GetConditionOrders()
-    for i in range(len(orders)):
-        exchange.CancelConditionOrder(orders[i]["Id"], "Canceled condition order:", orders[i])
-        Sleep(500)
-```
-
-```rust
-fn main() {
-    // 创建几个条件单
-    let condition1 = OrderCondition {
-        ConditionType: ORDER_CONDITION_TYPE_TP,
-        TpTriggerPrice: 65000.0,
-        TpOrderPrice: 65000.0,
-        ..Default::default()
-    };
-    let _ = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, &condition1);
-
-    let condition2 = OrderCondition {
-        ConditionType: ORDER_CONDITION_TYPE_SL,
-        SlTriggerPrice: 58000.0,
-        SlOrderPrice: 58000.0,
-        ..Default::default()
-    };
-    let _ = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, &condition2);
-    Sleep(1000);
-
-    let orders = exchange.GetConditionOrders(None).unwrap();
-    for i in 0..orders.len() {
-        // Rust中CancelConditionOrder不支持扩展参数，附带信息用Log输出
-        let _ = exchange.CancelConditionOrder(&orders[i].Id);
-        Log!("Canceled condition order:", orders[i]);
-        Sleep(500);
-    }
-}
-```
-
-```cpp
-void main() {
-    // 创建几个条件单
-    OrderCondition condition1 = {.ConditionType = ORDER_CONDITION_TYPE_TP, .TpTriggerPrice = 65000, .TpOrderPrice = 65000};
-    exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition1);
-
-    OrderCondition condition2 = {.ConditionType = ORDER_CONDITION_TYPE_SL, .SlTriggerPrice = 58000, .SlOrderPrice = 58000};
-    exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition2);
-    Sleep(1000);
-
-    auto orders = exchange.GetConditionOrders();
-    for (int i = 0 ; i < orders.size() ; i++) {
-        exchange.CancelConditionOrder(orders[i].Id, "Canceled condition order:", orders[i]);
-        Sleep(500);
-    }
-}
-```
-
-```exchange.CancelConditionOrder()```函数的返回值仅代表撤销请求发送成功或失败。如需判断交易所是否已取消该条件单，可以调用```exchange.GetConditionOrders()```函数进行确认。
-
-只有未触发的条件单可以被取消；已经触发并转为普通订单的条件单无法通过此函数取消。
-
-See also: `exchange.CreateConditionOrder`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`, `exchange.ModifyConditionOrder`
-
-#### exchange.GetConditionOrder
-
-```
-exchange.GetConditionOrder(conditionOrderId)
-```
-
-```exchange.GetConditionOrder()```函数用于获取指定条件单的信息。
-
-Parameters:
-
-- `conditionOrderId` (string, required): ```conditionOrderId```参数用于指定所要查询的条件单。条件单Id的格式与普通订单Id类似，由交易所品种代码和交易所原始条件单Id组成，两者之间以英文逗号分隔。
-
-调用```exchange.GetConditionOrder()```函数查询条件单时传入的```conditionOrderId```参数与条件单结构的```Id```属性一致。
-
-Returns (`Order` / 空值): 根据条件单号查询条件单详情，查询成功时返回`Order`结构，查询失败时返回空值。
-
-返回的Order结构中包含`Condition`字段，该字段包含条件单的详细配置信息（触发价格、执行价格、条件类型等）。
-
-```javascript
-function main(){
-    // 创建止盈条件单
-    var condition = {
-        ConditionType: ORDER_CONDITION_TYPE_TP,
-        TpTriggerPrice: 65000,
-        TpOrderPrice: 65000
-    }
-    var id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition)
-    Sleep(1000)
-
-    // 参数id为条件单号码，需填入你想要查询的条件单的号码
-    var order = exchange.GetConditionOrder(id)
-    Log("Id:", order.Id, "Price:", order.Price, "Amount:", order.Amount,
-        "Status:", order.Status, "Type:", order.Type, "Condition:", order.Condition)
-}
-```
-
-```python
-def main():
-    # 创建止盈条件单
-    condition = {
-        "ConditionType": ORDER_CONDITION_TYPE_TP,
-        "TpTriggerPrice": 65000,
-        "TpOrderPrice": 65000
-    }
-    id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition)
-    Sleep(1000)
-
-    order = exchange.GetConditionOrder(id)
-    Log("Id:", order["Id"], "Price:", order["Price"], "Amount:", order["Amount"],
-        "Status:", order["Status"], "Type:", order["Type"], "Condition:", order["Condition"])
-```
-
-```rust
-fn main() {
-    // 创建止盈条件单
-    let condition = OrderCondition {
-        ConditionType: ORDER_CONDITION_TYPE_TP,
-        TpTriggerPrice: 65000.0,
-        TpOrderPrice: 65000.0,
-        ..Default::default()
-    };
-    let id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, &condition).unwrap();
-    Sleep(1000);
-
-    // 参数id为条件单号码，需填入你想要查询的条件单的号码
-    let order = exchange.GetConditionOrder(&id).unwrap();
-    Log!("Id:", order.Id, "Price:", order.Price, "Amount:", order.Amount,
-        "Status:", order.Status, "Type:", order.Type, "Condition:", order.Condition);
-}
-```
-
-```cpp
-void main() {
-    // 创建止盈条件单
-    OrderCondition condition = {.ConditionType = ORDER_CONDITION_TYPE_TP, .TpTriggerPrice = 65000, .TpOrderPrice = 65000};
-    auto id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition);
-    Sleep(1000);
-
-    auto order = exchange.GetConditionOrder(id);
-    Log("Id:", order.Id, "Price:", order.Price, "Amount:", order.Amount,
-        "Status:", order.Status, "Type:", order.Type);
-}
-```
-
-部分交易所不支持```exchange.GetConditionOrder()```函数。
-
-返回的条件单结构包含触发条件、触发价格、订单状态等信息。
-
-条件单状态包括：未触发、已触发、已取消等，具体的状态值由交易所而定。
-
-See also: `Order`, `exchange.GetConditionOrders`, `exchange.GetHistoryConditionOrders`, `exchange.ModifyConditionOrder`
-
-#### exchange.GetConditionOrders
-
-```
-exchange.GetConditionOrders()
-exchange.GetConditionOrders(symbol)
-```
-
-```exchange.GetConditionOrders()```函数用于获取未完成的条件单（尚未触发或尚未取消的条件单）。
-
-Parameters:
-
-- `symbol` (string, optional): 参数```symbol```用于指定所要查询的**交易品种**或**交易品种范围**。
-
-对于现货交易所对象，未传入```symbol```参数时，将请求所有现货品种的未完成条件单数据。
-
-对于期货交易所对象，未传入```symbol```参数时，默认按当前交易对、合约代码所在的维度范围，请求该范围内所有品种的未完成条件单数据。
-
-Returns (`Order`数组 / 空值): ```exchange.GetConditionOrders()```函数在请求数据成功时返回`Order`结构数组，在请求数据失败时返回空值。
-
-返回的Order结构中包含`Condition`字段，该字段包含条件单的详细配置信息（触发价格、执行价格、条件类型等）。
-
-使用现货交易所对象创建多个条件单，然后查询未完成的条件单信息。
-
-```javascript
-function main() {
-    // 创建多个条件单
-    var condition1 = {
-        ConditionType: ORDER_CONDITION_TYPE_TP,
-        TpTriggerPrice: 65000,
-        TpOrderPrice: 65000
-    }
-    exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition1)
-
-    var condition2 = {
-        ConditionType: ORDER_CONDITION_TYPE_TP,
-        TpTriggerPrice: 3200,
-        TpOrderPrice: 3200
-    }
-    exchange.CreateConditionOrder("ETH_USDT", "sell", 0.1, condition2)
-    Sleep(1000)
-
-    // 查询所有未完成条件单
-    var orders = exchange.GetConditionOrders()
-    Log("Pending condition orders count:", orders.length)
-    for (var i = 0; i < orders.length; i++) {
-        Log("Condition order", i+1, ":", orders[i])
-    }
-}
-```
-
-```python
-def main():
-    # 创建多个条件单
-    condition1 = {
-        "ConditionType": ORDER_CONDITION_TYPE_TP,
-        "TpTriggerPrice": 65000,
-        "TpOrderPrice": 65000
-    }
-    exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition1)
-
-    condition2 = {
-        "ConditionType": ORDER_CONDITION_TYPE_TP,
-        "TpTriggerPrice": 3200,
-        "TpOrderPrice": 3200
-    }
-    exchange.CreateConditionOrder("ETH_USDT", "sell", 0.1, condition2)
-    Sleep(1000)
-
-    # 查询所有未完成条件单
-    orders = exchange.GetConditionOrders()
-    Log("Pending condition orders count:", len(orders))
-    for i in range(len(orders)):
-        Log("Condition order", i+1, ":", orders[i])
-```
-
-```rust
-fn main() {
-    // 创建多个条件单
-    let condition1 = OrderCondition {
-        ConditionType: ORDER_CONDITION_TYPE_TP,
-        TpTriggerPrice: 65000.0,
-        TpOrderPrice: 65000.0,
-        ..Default::default()
-    };
-    let _ = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, &condition1);
-
-    let condition2 = OrderCondition {
-        ConditionType: ORDER_CONDITION_TYPE_TP,
-        TpTriggerPrice: 3200.0,
-        TpOrderPrice: 3200.0,
-        ..Default::default()
-    };
-    let _ = exchange.CreateConditionOrder("ETH_USDT", "sell", 0.1, &condition2);
-    Sleep(1000);
-
-    // 查询所有未完成条件单
-    let orders = exchange.GetConditionOrders(None).unwrap();
-    Log!("Pending condition orders count:", orders.len());
-    for i in 0..orders.len() {
-        Log!("Condition order", i + 1, ":", orders[i]);
-    }
-}
-```
-
-```cpp
-void main() {
-    // 创建多个条件单
-    OrderCondition condition1 = {.ConditionType = ORDER_CONDITION_TYPE_TP, .TpTriggerPrice = 65000, .TpOrderPrice = 65000};
-    exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition1);
-
-    OrderCondition condition2 = {.ConditionType = ORDER_CONDITION_TYPE_TP, .TpTriggerPrice = 3200, .TpOrderPrice = 3200};
-    exchange.CreateConditionOrder("ETH_USDT", "sell", 0.1, condition2);
-    Sleep(1000);
-
-    // 查询所有未完成条件单
-    auto orders = exchange.GetConditionOrders();
-    Log("Pending condition orders count:", orders.size());
-    for (int i = 0; i < orders.size(); i++) {
-        Log("Condition order", i+1, ":", orders[i]);
-    }
-}
-```
-
-查询指定交易对的未成交条件单。
-
-```javascript
-function main() {
-    // 查询 BTC_USDT 交易对的未成交条件单
-    var orders = exchange.GetConditionOrders("BTC_USDT")
-    Log("BTC_USDT pending condition orders:", orders)
-}
-```
-
-```python
-def main():
-    # 查询 BTC_USDT 交易对的未成交条件单
-    orders = exchange.GetConditionOrders("BTC_USDT")
-    Log("BTC_USDT pending condition orders:", orders)
-```
-
-```rust
-fn main() {
-    // 查询 BTC_USDT 交易对的未成交条件单
-    let orders = exchange.GetConditionOrders("BTC_USDT");
-    Log!("BTC_USDT pending condition orders:", orders);
-}
-```
-
-```cpp
-void main() {
-    // 查询 BTC_USDT 交易对的未成交条件单
-    auto orders = exchange.GetConditionOrders("BTC_USDT");
-    Log("BTC_USDT pending condition orders:", orders);
-}
-```
-
-在```GetConditionOrders```函数中，symbol参数的使用场景归纳如下：
-| 交易所对象分类 | symbol参数 | 查询范围 | 备注 |
-| - | - | - | - |
-| 现货 | 不传symbol参数 | 查询所有现货交易对 | 适用于所有调用场景；若交易所接口不支持则报错并返回空值，以下不再赘述 |
-| 现货 | 指定交易品种，symbol参数为："BTC_USDT" | 查询指定的BTC_USDT交易对 | 对于现货交易所对象，参数symbol的格式为："BTC_USDT" |
-| 期货 | 不传symbol参数 | 查询当前交易对、合约代码维度范围内的所有交易品种 | 假如当前交易对为BTC_USDT，合约代码为swap，即查询所有USDT本位永续合约。等价于调用```GetConditionOrders("USDT.swap")``` |
-| 期货 | 指定交易品种，symbol参数为："BTC_USDT.swap" | 查询指定的BTC的USDT本位永续合约 | 对于期货交易所对象，参数symbol的格式为：FMZ平台定义的**交易对**与**合约代码**组合，两者以字符```"."```间隔。 |
-| 期货 | 指定交易品种范围，symbol参数为："USDT.swap" | 查询所有USDT本位永续合约 | - |
-| 支持期权的期货交易所 | 不传symbol参数 | 查询当前交易对维度范围内的所有期权合约 | 假如当前交易对为BTC_USDT，且合约设置为期权合约，例如币安期权合约：BTC-240108-40000-C |
-| 支持期权的期货交易所 | 指定具体交易品种 | 查询指定的期权合约 | 例如对于币安期货交易所，symbol参数为：BTC_USDT.BTC-240108-40000-C |
-| 支持期权的期货交易所 | 指定交易品种范围，symbol参数为："USDT.option" | 查询所有USDT本位期权合约 | - |
-
-在```GetConditionOrders```函数中，期货交易所对象的查询维度范围归纳如下：
-| symbol参数 | 请求范围定义 | 备注 |
-| - | - | - |
-| USDT.swap          | USDT本位永续合约范围。  | 对于交易所API接口不支持的维度，调用时会报错并返回空值。 |
-| USDT.futures       | USDT本位交割合约范围。  | - |
-| USD.swap           | 币本位永续合约范围。    | - |
-| USD.futures        | 币本位交割合约范围。    | - |
-| USDT.option        | USDT本位期权合约范围。  | - |
-| USD.option         | 币本位期权合约范围。    | - |
-| USDT.futures_combo | 差价组合合约范围。      | Futures_Deribit交易所 |
-| USD.futures_ff     | 混合保证金交割合约范围。 | Futures_Kraken交易所 |
-| USD.swap_pf        | 混合保证金永续合约范围。 | Futures_Kraken交易所 |
-
-当交易所对象```exchange```所代表的账户在**查询范围内**或**指定的交易品种**上没有未完成条件单时，调用该函数将返回空数组，即：```[]```。
-
-条件单功能的支持情况取决于具体交易所，部分交易所可能不支持条件单功能。
-
-See also: `Order`, `exchange.GetConditionOrder`, `exchange.GetHistoryConditionOrders`
-
-#### exchange.GetHistoryConditionOrders
-
-```
-exchange.GetHistoryConditionOrders()
-exchange.GetHistoryConditionOrders(symbol)
-exchange.GetHistoryConditionOrders(symbol, since)
-exchange.GetHistoryConditionOrders(symbol, since, limit)
-exchange.GetHistoryConditionOrders(since)
-exchange.GetHistoryConditionOrders(since, limit)
-```
-
-```exchange.GetHistoryConditionOrders()```函数用于获取当前交易对、合约的历史条件单（包括已触发、已取消、已过期的条件单），并支持指定具体的交易品种。
-
-Parameters:
-
-- `symbol` (string, optional): ```symbol```参数用于指定交易品种。以```BTC_USDT```交易对为例，当```exchange```为现货交易所对象时，```symbol```参数的格式为：```BTC_USDT```；如果为期货交易所对象，以永续合约为例，```symbol```参数的格式为：```BTC_USDT.swap```。
-
-如果查询的是期权合约的条件单数据，则将```symbol```参数设置为```"BTC_USDT.BTC-240108-40000-C"```（以币安期权BTC-240108-40000-C为例），其格式为FMZ平台定义的**交易对**与交易所定义的具体期权合约代码的组合，两者之间以字符"."间隔。若不传入该参数，则默认请求当前所设置交易对、合约代码的条件单数据。
-- `since` (number, optional): ```since```参数用于指定查询的起始时间戳，单位为毫秒。
-- `limit` (number, optional): ```limit```参数用于指定查询的条件单数量。
-
-Returns (`Order`数组 / 空值): ```exchange.GetHistoryConditionOrders()```函数在请求数据成功时返回`Order`结构数组，在请求数据失败时返回空值。
-
-返回的Order结构中包含`Condition`字段，该字段包含条件单的详细配置信息（触发价格、执行价格、条件类型等）。
-
-查询历史条件单，返回的结果按时间升序排列。
-
-```javascript
-function main() {
-    var historyConditionOrders = exchange.GetHistoryConditionOrders()
-    Log("Historical condition orders count:", historyConditionOrders.length)
-
-    // 遍历并显示，订单按 Time 属性升序排列
-    for (var i = 0; i < historyConditionOrders.length; i++) {
-        Log("Order", i+1, "Created at:", historyConditionOrders[i].Time,
-            "ID:", historyConditionOrders[i].Id,
-            "Status:", historyConditionOrders[i].Status)
-    }
-}
-```
-
-```python
-def main():
-    historyConditionOrders = exchange.GetHistoryConditionOrders()
-    Log("Historical condition orders count:", len(historyConditionOrders))
-
-    # 遍历并显示，订单按 Time 属性升序排列
-    for i in range(len(historyConditionOrders)):
-        Log("Order", i+1, "Created at:", historyConditionOrders[i]["Time"],
-            "ID:", historyConditionOrders[i]["Id"],
-            "Status:", historyConditionOrders[i]["Status"])
-```
-
-```rust
-fn main() {
-    let historyConditionOrders = exchange.GetHistoryConditionOrders(None, None, None).unwrap();
-    Log!("Historical condition orders count:", historyConditionOrders.len());
-
-    // 遍历并显示，订单按 Time 属性升序排列
-    for i in 0..historyConditionOrders.len() {
-        Log!("Order", i + 1, "Created at:", historyConditionOrders[i].Time,
-            "ID:", historyConditionOrders[i].Id,
-            "Status:", historyConditionOrders[i].Status);
-    }
-}
-```
-
-```cpp
-void main() {
-    auto historyConditionOrders = exchange.GetHistoryConditionOrders();
-    Log("Historical condition orders count:", historyConditionOrders.size());
-
-    // 遍历并显示，订单按 Time 属性升序排列
-    for (int i = 0; i < historyConditionOrders.size(); i++) {
-        Log("Order", i+1, "Created at:", historyConditionOrders[i].Time,
-            "ID:", historyConditionOrders[i].Id,
-            "Status:", historyConditionOrders[i].Status);
-    }
-}
-```
-
-查询指定交易对的历史条件单，并限制返回的数量。
-
-```javascript
-function main() {
-    // 查询BTC_USDT交易对最近的10条历史条件单
-    var historyConditionOrders = exchange.GetHistoryConditionOrders("BTC_USDT", 0, 10)
-    Log("BTC_USDT historical condition orders:", historyConditionOrders)
-}
-```
-
-```python
-def main():
-    # 查询BTC_USDT交易对最近的10条历史条件单
-    historyConditionOrders = exchange.GetHistoryConditionOrders("BTC_USDT", 0, 10)
-    Log("BTC_USDT historical condition orders:", historyConditionOrders)
-```
-
-```rust
-fn main() {
-    // 查询BTC_USDT交易对最近的10条历史条件单
-    let historyConditionOrders = exchange.GetHistoryConditionOrders("BTC_USDT", 0, 10);
-    Log!("BTC_USDT historical condition orders:", historyConditionOrders);
-}
-```
-
-```cpp
-void main() {
-    // 查询BTC_USDT交易对最近的10条历史条件单
-    auto historyConditionOrders = exchange.GetHistoryConditionOrders("BTC_USDT", 0, 10);
-    Log("BTC_USDT historical condition orders:", historyConditionOrders);
-}
-```
-
-按时间范围查询历史条件单。
-
-```javascript
-function main() {
-    // 查询从指定时间戳开始的历史条件单
-    var startTime = new Date("2024-01-01").getTime()
-    var historyConditionOrders = exchange.GetHistoryConditionOrders(startTime, 50)
-    Log("Historical condition orders since:", historyConditionOrders)
-}
-```
-
-```python
-def main():
-    # 查询从指定时间戳开始的历史条件单
-    import time
-    startTime = int(time.mktime(time.strptime("2024-01-01", "%Y-%m-%d")) * 1000)
-    historyConditionOrders = exchange.GetHistoryConditionOrders(startTime, 50)
-    Log("Historical condition orders since:", historyConditionOrders)
-```
-
-```rust
-fn main() {
-    // 查询从指定时间戳开始的历史条件单
-    let startTime: i64 = 1704067200000;  // 2024-01-01的时间戳
-    // Rust中symbol参数传None表示当前交易对
-    let historyConditionOrders = exchange.GetHistoryConditionOrders(None, startTime, 50);
-    Log!("Historical condition orders since:", historyConditionOrders);
-}
-```
-
-```cpp
-void main() {
-    // 查询从指定时间戳开始的历史条件单
-    auto startTime = 1704067200000;  // 2024-01-01的时间戳
-    // C++ 中 symbol 参数不可省略，传 "" 表示当前交易对
-    auto historyConditionOrders = exchange.GetHistoryConditionOrders("", startTime, 50);
-    Log("Historical condition orders since:", historyConditionOrders);
-}
-```
-
-- 不指定```symbol```、```since```、```limit```参数时，默认查询当前交易对、合约的历史条件单，即查询距离当前时间最近的一定范围内的历史条件单，查询范围取决于交易所接口的单次查询范围。
-
-- 指定```symbol```参数时，查询所设置交易品种的历史条件单。
-
-- 指定```since```参数时，以```since```时间戳为起始时间，向当前时间方向查询。
-
-- 指定```limit```参数时，在查询到足够条数后返回。
-
-- 该函数仅支持提供历史条件单查询接口的交易所。
-
-历史条件单包括：已触发（转为普通订单）、已取消、已过期等状态的条件单。
-
-返回的历史条件单数组按订单创建时间（```Time```属性）升序排列，即时间最早的订单位于数组前面，时间最晚的订单位于数组后面。
-
-对条件单功能的支持情况取决于具体的交易所，部分交易所可能不支持条件单功能或历史条件单查询功能。
-
-See also: `Order`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`
-
-#### exchange.SetPrecision
-
-```
-exchange.SetPrecision(pricePrecision, amountPrecision)
-```
-
-```exchange.SetPrecision()```函数用于设置```exchange```交易所对象的**价格**与**下单量**的精度，设置后系统会自动忽略数据中超出精度的多余部分。
-
-Parameters:
-
-- `pricePrecision` (number, required): ```pricePrecision```参数用于设置价格数据的精度。
-- `amountPrecision` (number, required): ```amountPrecision```参数用于设置下单量数据的精度。
-
-```javascript
-function main(){
-    // 设置价格小数位精度为2位，下单量小数位精度为3位
-    exchange.SetPrecision(2, 3)
-}
-```
-
-```python
-def main():
-    exchange.SetPrecision(2, 3)
-```
-
-```rust
-fn main() {
-    // 设置价格小数位精度为2位，下单量小数位精度为3位
-    exchange.SetPrecision(2, 3);
-}
-```
-
-```cpp
-void main() {
-    exchange.SetPrecision(2, 3);
-}
-```
-
-回测系统不支持该函数，回测系统的数值精度由系统自动处理。
-
-See also: `exchange.Buy`, `exchange.Sell`
-
-#### exchange.SetRate
-
-```
-exchange.SetRate(rate)
-```
-
-设置交易所对象当前的汇率。
-
-Parameters:
-
-- `rate` (number, required): ```rate``` 参数用于指定转换汇率。
-
-```javascript
-function main(){
-    Log(exchange.GetTicker())
-    // 设置汇率转换
-    exchange.SetRate(7)
-    Log(exchange.GetTicker())
-    // 设置为 1，不转换
-    exchange.SetRate(1)
-}
-```
-
-```python
-def main():
-    Log(exchange.GetTicker())
-    exchange.SetRate(7)
-    Log(exchange.GetTicker())
-    exchange.SetRate(1)
-```
-
-```rust
-fn main() {
-    Log!(exchange.GetTicker(None));
-    // 设置汇率转换
-    exchange.SetRate(7);
-    Log!(exchange.GetTicker(None));
-    // 设置为 1，不转换
-    exchange.SetRate(1);
-}
-```
-
-```cpp
-void main() {
-    Log(exchange.GetTicker());
-    exchange.SetRate(7);
-    Log(exchange.GetTicker());
-    exchange.SetRate(1);
-}
-```
-
-如果使用 ```exchange.SetRate()``` 函数设置了汇率值（例如设置为 7），那么当前 ```exchange``` 交易所对象所代表交易所的行情、深度、下单价格等所有价格信息，都会被乘以所设置的汇率 7 进行转换。
-
-例如，```exchange``` 是以美元为计价货币的交易所。执行 ```exchange.SetRate(7)``` 之后，实盘中的所有价格都会被乘以 7，转换为接近 **CNY** 计价的价格。
-
-See also: `exchange.GetRate`
-
-#### exchange.IO
-
-```
-exchange.IO(k, ...args)
-```
-
-```exchange.IO()```函数用于调用交易所对象相关的其它接口。
-
-Parameters:
-
-- `k` (string, required): 调用类型标识符，不同的取值对应不同的功能，具体请参见下方各章节的说明。
-- `arg` (string / number / bool / object / array / any, required): 扩展参数，根据```k```值的不同需要传入不同的参数，其个数和类型均不固定。
-
-Returns (string / number / bool / object / array / any): ```exchange.IO()```函数用于调用交易所对象的其它相关接口，调用成功时返回请求的应答数据，调用失败时返回空值。
-
-使用 ```"api"``` 模式调用 OKX 期货批量下单接口，并通过 ```raw``` 参数传递 JSON 格式的订单数据：
-
-```javascript
-function main() {
-    var arrOrders = [
-        {"instId":"BTC-USDT-SWAP","tdMode":"cross","side":"buy","ordType":"limit","px":"16000","sz":"1","posSide":"long"},
-        {"instId":"BTC-USDT-SWAP","tdMode":"cross","side":"buy","ordType":"limit","px":"16000","sz":"2","posSide":"long"}
-    ]
-
-    // 调用 exchange.IO 直接访问交易所批量下单接口
-    var ret = exchange.IO("api", "POST", "/api/v5/trade/batch-orders", "", JSON.stringify(arrOrders))
-    Log(ret)
-}
-```
-
-```python
-import json
-def main():
-    arrOrders = [
-        {"instId":"BTC-USDT-SWAP","tdMode":"cross","side":"buy","ordType":"limit","px":"16000","sz":"1","posSide":"long"},
-        {"instId":"BTC-USDT-SWAP","tdMode":"cross","side":"buy","ordType":"limit","px":"16000","sz":"2","posSide":"long"}
-    ]
-    ret = exchange.IO("api", "POST", "/api/v5/trade/batch-orders", "", json.dumps(arrOrders))
-    Log(ret)
-```
-
-```rust
-fn main() {
-    // Rust无JSON序列化，直接用原始字符串构造订单数组
-    let arrOrders = r#"[
-        {"instId":"BTC-USDT-SWAP","tdMode":"cross","side":"buy","ordType":"limit","px":"16000","sz":"1","posSide":"long"},
-        {"instId":"BTC-USDT-SWAP","tdMode":"cross","side":"buy","ordType":"limit","px":"16000","sz":"2","posSide":"long"}
-    ]"#;
-
-    // 调用 exchange.IO 直接访问交易所批量下单接口，多参数以元组传入
-    let ret = exchange.IO(("api", "POST", "/api/v5/trade/batch-orders", "", arrOrders));
-    Log!(ret);
-}
-```
-
-```cpp
-void main() {
-    json arrOrders = R"([
-        {"instId":"BTC-USDT-SWAP","tdMode":"cross","side":"buy","ordType":"limit","px":"16000","sz":"1","posSide":"long"},
-        {"instId":"BTC-USDT-SWAP","tdMode":"cross","side":"buy","ordType":"limit","px":"16000","sz":"2","posSide":"long"}
-    ])"_json;
-    auto ret = exchange.IO("api", "POST", "/api/v5/trade/batch-orders", "", arrOrders.dump());
-    Log(ret);
-}
-```
-
-```params```参数中的键值为字符串类型时，需要使用单引号将参数值包裹起来：
-
-```javascript
-var amount = 1
-var price = 10
-var basecurrency = "ltc"
-function main () {
-    // 注意 amount.toString() 和 price.toString() 左边右边都有一个 ' 字符
-    var message = "symbol=" + basecurrency + "&amount='" + amount.toString() + "'&price='" + price.toString() + "'&side=buy" + "&type=limit"
-    var id = exchange.IO("api", "POST", "/v1/order/new", message)
-}
-```
-
-```python
-amount = 1
-price = 10
-basecurrency = "ltc"
-def main():
-    message = "symbol=" + basecurrency + "&amount='" + str(amount) + "'&price='" + str(price) + "'&side=buy" + "&type=limit"
-    id = exchange.IO("api", "POST", "/v1/order/new", message)
-```
-
-```rust
-fn main() {
-    let amount = 1;
-    let price = 10;
-    let basecurrency = "ltc";
-    // 注意 amount 和 price 参数值的左边右边都有一个 ' 字符
-    let message = format!("symbol={}&amount='{}'&price='{}'&side=buy&type=limit", basecurrency, amount, price);
-    let id = exchange.IO(("api", "POST", "/v1/order/new", message));
-}
-```
-
-```cpp
-void main() {
-    auto amount = 1.0;
-    auto price = 10.0;
-    auto basecurrency = "ltc";
-    string message = str_format("symbol=%s&amount=\"%.1f\"&price=\"%.1f\"&side=buy&type=limit", basecurrency, amount, price);
-    auto id = exchange.IO("api", "POST", "/v1/order/new", message);
-}
-```
-
-```resource```参数支持传入完整的URL：
-
-```javascript
-function main() {
-    var ret = exchange.IO("api", "GET", "https://www.okx.com/api/v5/account/max-withdrawal", "ccy=BTC")
-    Log(ret)
-}
-```
-
-```python
-def main():
-    ret = exchange.IO("api", "GET", "https://www.okx.com/api/v5/account/max-withdrawal", "ccy=BTC")
-    Log(ret)
-```
-
-```rust
-fn main() {
-    let ret = exchange.IO(("api", "GET", "https://www.okx.com/api/v5/account/max-withdrawal", "ccy=BTC"));
-    Log!(ret);
-}
-```
-
-```cpp
-void main() {
-    auto ret = exchange.IO("api", "GET", "https://www.okx.com/api/v5/account/max-withdrawal", "ccy=BTC");
-    Log(ret);
-}
-```
-
-不使用```raw```参数的GET请求：
-
-```javascript
-function main(){
-    var ret = exchange.IO("api", "GET", "/api/v5/trade/orders-pending", "instType=SPOT")
-    Log(ret)
-}
-```
-
-```python
-def main():
-    ret = exchange.IO("api", "GET", "/api/v5/trade/orders-pending", "instType=SPOT")
-    Log(ret)
-```
-
-```rust
-fn main() {
-    let ret = exchange.IO(("api", "GET", "/api/v5/trade/orders-pending", "instType=SPOT"));
-    Log!(ret);
-}
-```
-
-```cpp
-void main() {
-    auto ret = exchange.IO("api", "GET", "/api/v5/trade/orders-pending", "instType=SPOT");
-    Log(ret);
-}
-```
-
-运行时切换交易对：
-
-```javascript
-function main() {
-    // 例如，实盘启动时交易所对象当前的交易对为BTC_USDT，打印当前交易对的行情
-    Log(exchange.GetTicker())
-    // 将交易对切换为LTC_BTC
-    exchange.IO("currency", "LTC_BTC")
-    Log(exchange.GetTicker())
-}
-```
-
-```python
-def main():
-    Log(exchange.GetTicker())
-    exchange.IO("currency", "LTC_BTC")
-    Log(exchange.GetTicker())
-```
-
-```rust
-fn main() {
-    // 例如，实盘启动时交易所对象当前的交易对为BTC_USDT，打印当前交易对的行情
-    Log!(exchange.GetTicker(None));
-    // 将交易对切换为LTC_BTC
-    let _ = exchange.IO(("currency", "LTC_BTC"));
-    Log!(exchange.GetTicker(None));
-}
-```
-
-```cpp
-void main() {
-    Log(exchange.GetTicker());
-    exchange.IO("currency", "LTC_BTC");
-    Log(exchange.GetTicker());
-}
-```
-
-切换交易所接口基地址：
-
-```javascript
-function main () {
-    // exchanges[0]即实盘创建时添加的第一个交易所对象
-    exchanges[0].IO("base", "https://api.huobi.pro")
-}
-```
-
-```python
-def main():
-    exchanges[0].IO("base", "https://api.huobi.pro")
-```
-
-```rust
-fn main() {
-    // exchanges[0]即实盘创建时添加的第一个交易所对象
-    let _ = exchanges[0].IO(("base", "https://api.huobi.pro"));
-}
-```
-
-```cpp
-void main() {
-    exchanges[0].IO("base", "https://api.huobi.pro");
-}
-```
-
-通过```"mbase"```切换行情接口基地址（以Bitfinex为例）：
-
-```javascript
-function main() {
-    exchange.SetBase("https://api.bitfinex.com")
-    exchange.IO("mbase", "https://api-pub.bitfinex.com")
-}
-```
-
-```python
-def main():
-    exchange.SetBase("https://api.bitfinex.com")
-    exchange.IO("mbase", "https://api-pub.bitfinex.com")
-```
-
-```rust
-fn main() {
-    exchange.SetBase("https://api.bitfinex.com");
-    let _ = exchange.IO(("mbase", "https://api-pub.bitfinex.com"));
-}
-```
-
-```cpp
-void main() {
-    exchange.SetBase("https://api.bitfinex.com");
-    exchange.IO("mbase", "https://api-pub.bitfinex.com");
-}
-```
-
-切换模拟盘/实盘环境（以OKX期货为例）：
-
-```javascript
-function main() {
-    exchange.IO("simulate", true)    // Switch to demo trading environment
-    // ... trading logic ...
-    exchange.IO("simulate", false)   // Switch back to live trading environment
-}
-```
-
-```python
-def main():
-    exchange.IO("simulate", True)
-    # ... trading logic ...
-    exchange.IO("simulate", False)
-```
-
-```rust
-fn main() {
-    let _ = exchange.IO(("simulate", true));    // Switch to demo trading environment
-    // ... trading logic ...
-    let _ = exchange.IO(("simulate", false));   // Switch back to live trading environment
-}
-```
-
-```cpp
-void main() {
-    exchange.IO("simulate", true);
-    // ... trading logic ...
-    exchange.IO("simulate", false);
-}
-```
-
-切换合约保证金模式与持仓模式（以币安期货为例）：
-
-```javascript
-function main() {
-    exchange.IO("dual", true)    // Switch to hedge mode (dual position)
-    exchange.IO("dual", false)   // Switch to one-way mode
-
-    exchange.SetContractType("swap")
-    exchange.IO("cross", true)    // Switch to cross margin
-    exchange.IO("cross", false)   // Switch to isolated margin
-}
-```
-
-```python
-def main():
-    exchange.IO("dual", True)
-    exchange.IO("dual", False)
-
-    exchange.SetContractType("swap")
-    exchange.IO("cross", True)
-    exchange.IO("cross", False)
-```
-
-```rust
-fn main() {
-    let _ = exchange.IO(("dual", true));    // Switch to hedge mode (dual position)
-    let _ = exchange.IO(("dual", false));   // Switch to one-way mode
-
-    let _ = exchange.SetContractType("swap");
-    let _ = exchange.IO(("cross", true));    // Switch to cross margin
-    let _ = exchange.IO(("cross", false));   // Switch to isolated margin
-}
-```
-
-```cpp
-void main() {
-    exchange.IO("dual", true);
-    exchange.IO("dual", false);
-
-    exchange.SetContractType("swap");
-    exchange.IO("cross", true);
-    exchange.IO("cross", false);
-}
-```
-
-切换统一账户模式（以币安期货为例）：
-
-```javascript
-function main() {
-    exchange.IO("unified", true)   // Switch to unified account mode
-    exchange.IO("unified", false)  // Switch to normal mode
-}
-```
-
-```python
-def main():
-    exchange.IO("unified", True)
-    exchange.IO("unified", False)
-```
-
-```rust
-fn main() {
-    let _ = exchange.IO(("unified", true));   // Switch to unified account mode
-    let _ = exchange.IO(("unified", false));  // Switch to normal mode
-}
-```
-
-```cpp
-void main() {
-    exchange.IO("unified", true);
-    exchange.IO("unified", false);
-}
-```
-
-设置自成交预防模式（以币安为例）：
-
-```javascript
-function main() {
-    // "NONE" means disable STP mode, other parameters: "EXPIRE_TAKER", "EXPIRE_MAKER", "EXPIRE_BOTH"
-    exchange.IO("selfTradePreventionMode", "NONE")
-}
-```
-
-```python
-def main():
-    exchange.IO("selfTradePreventionMode", "NONE")
-```
-
-```rust
-fn main() {
-    // "NONE" means disable STP mode, other parameters: "EXPIRE_TAKER", "EXPIRE_MAKER", "EXPIRE_BOTH"
-    let _ = exchange.IO(("selfTradePreventionMode", "NONE"));
-}
-```
-
-```cpp
-void main() {
-    exchange.IO("selfTradePreventionMode", "NONE");
-}
-```
-
-Futures_edgeX计算订单Hash并签名：
-
-```javascript
-function main() {
-    var strJson = `{
-        "assetIdSynthetic":    "0x4554482d3900000000000000000000",
-        "assetIdCollateral":   "0x2ce625e94458d39dd0bf3b45a843544dd4a14b8169045a3a3d15aa564b936c5",
-        "assetIdFee":          "0x2ce625e94458d39dd0bf3b45a843544dd4a14b8169045a3a3d15aa564b936c5",
-        "isBuyingSynthetic":   true,
-        "amountSynthetic":     10000000,
-        "amountCollateral":    13020000,
-        "amountFee":           6250,
-        "nonce":               676432751,
-        "accountID":           601416704693633632,
-        "expirationTimestamp": 484831
-    }`
-    var signature = exchange.IO("calcOrderHashAndSign", strJson)
-    Log(signature)
-}
-```
-
-```python
-import json
-def main():
-    params = {
-        "assetIdSynthetic":    "0x4554482d3900000000000000000000",
-        "assetIdCollateral":   "0x2ce625e94458d39dd0bf3b45a843544dd4a14b8169045a3a3d15aa564b936c5",
-        "assetIdFee":          "0x2ce625e94458d39dd0bf3b45a843544dd4a14b8169045a3a3d15aa564b936c5",
-        "isBuyingSynthetic":   True,
-        "amountSynthetic":     10000000,
-        "amountCollateral":    13020000,
-        "amountFee":           6250,
-        "nonce":               676432751,
-        "accountID":           601416704693633632,
-        "expirationTimestamp": 484831
-    }
-    signature = exchange.IO("calcOrderHashAndSign", json.dumps(params))
-    Log(signature)
-```
-
-```rust
-fn main() {
-    let strJson = r#"{
-        "assetIdSynthetic":    "0x4554482d3900000000000000000000",
-        "assetIdCollateral":   "0x2ce625e94458d39dd0bf3b45a843544dd4a14b8169045a3a3d15aa564b936c5",
-        "assetIdFee":          "0x2ce625e94458d39dd0bf3b45a843544dd4a14b8169045a3a3d15aa564b936c5",
-        "isBuyingSynthetic":   true,
-        "amountSynthetic":     10000000,
-        "amountCollateral":    13020000,
-        "amountFee":           6250,
-        "nonce":               676432751,
-        "accountID":           601416704693633632,
-        "expirationTimestamp": 484831
-    }"#;
-    let signature = exchange.IO(("calcOrderHashAndSign", strJson));
-    Log!(signature);
-}
-```
-
-```cpp
-void main() {
-    json params = R"({
-        "assetIdSynthetic":    "0x4554482d3900000000000000000000",
-        "assetIdCollateral":   "0x2ce625e94458d39dd0bf3b45a843544dd4a14b8169045a3a3d15aa564b936c5",
-        "assetIdFee":          "0x2ce625e94458d39dd0bf3b45a843544dd4a14b8169045a3a3d15aa564b936c5",
-        "isBuyingSynthetic":   true,
-        "amountSynthetic":     10000000,
-        "amountCollateral":    13020000,
-        "amountFee":           6250,
-        "nonce":               676432751,
-        "accountID":           601416704693633632,
-        "expirationTimestamp": 484831
-    })"_json;
-    auto signature = exchange.IO("calcOrderHashAndSign", params.dump());
-    Log(signature);
-}
-```
-
-rate模式限流 - 限制GetTicker每秒最多调用10次，超出限制时返回null：
-
-```javascript
-function main() {
-    exchange.IO("rate", "GetTicker", 10, "1s")
-
-    for (var i = 0; i < 20; i++) {
-        var ticker = exchange.GetTicker("BTC_USDT")
-        if (ticker) {
-            Log("Ticker:", ticker.Last)
-        } else {
-            Log("Rate limit exceeded")
-        }
-    }
-}
-```
-
-```python
-def main():
-    exchange.IO("rate", "GetTicker", 10, "1s")
-
-    for i in range(20):
-        ticker = exchange.GetTicker("BTC_USDT")
-        if ticker:
-            Log("Ticker:", ticker["Last"])
-        else:
-            Log("Rate limit exceeded")
-```
-
-```rust
-fn main() {
-    let _ = exchange.IO(("rate", "GetTicker", 10, "1s"));
-
-    for _i in 0..20 {
-        // 超出限制时GetTicker返回Err
-        match exchange.GetTicker("BTC_USDT") {
-            Ok(ticker) => Log!("Ticker:", ticker.Last),
-            Err(_) => Log!("Rate limit exceeded"),
-        }
-    }
-}
-```
-
-```cpp
-// C++暂不支持
-```
-
-rate模式限流 - 使用```"delay"```参数，超出限制时自动等待而非返回null：
-
-```javascript
-function main() {
-    exchange.IO("rate", "GetTicker", 10, "1s", "delay")
-
-    for (var i = 0; i < 20; i++) {
-        var ticker = exchange.GetTicker("BTC_USDT")
-        Log("Call", i+1, "Ticker:", ticker.Last)
-    }
-}
-```
-
-```python
-def main():
-    exchange.IO("rate", "GetTicker", 10, "1s", "delay")
-
-    for i in range(20):
-        ticker = exchange.GetTicker("BTC_USDT")
-        Log("Call", i+1, "Ticker:", ticker["Last"])
-```
-
-```rust
-fn main() {
-    let _ = exchange.IO(("rate", "GetTicker", 10, "1s", "delay"));
-
-    for i in 0..20 {
-        let ticker = exchange.GetTicker("BTC_USDT").unwrap();
-        Log!("Call", i + 1, "Ticker:", ticker.Last);
-    }
-}
-```
-
-```cpp
-// C++暂不支持
-```
-
-多个函数共享限流额度：
-
-```javascript
-function main() {
-    // GetTicker 和 GetDepth 共享限流额度，合计每秒最多调用 10 次
-    exchange.IO("rate", "GetTicker,GetDepth", 10, "1s")
-
-    for (var i = 0; i < 20; i++) {
-        if (i % 2 == 0) {
-            Log("Ticker:", exchange.GetTicker("BTC_USDT"))
-        } else {
-            Log("Depth:", exchange.GetDepth("BTC_USDT"))
-        }
-    }
-}
-```
-
-```python
-def main():
-    exchange.IO("rate", "GetTicker,GetDepth", 10, "1s")
-
-    for i in range(20):
-        if i % 2 == 0:
-            Log("Ticker:", exchange.GetTicker("BTC_USDT"))
-        else:
-            Log("Depth:", exchange.GetDepth("BTC_USDT"))
-```
-
-```rust
-fn main() {
-    // GetTicker 和 GetDepth 共享限流额度，合计每秒最多调用 10 次
-    let _ = exchange.IO(("rate", "GetTicker,GetDepth", 10, "1s"));
-
-    for i in 0..20 {
-        if i % 2 == 0 {
-            Log!("Ticker:", exchange.GetTicker("BTC_USDT"));
-        } else {
-            Log!("Depth:", exchange.GetDepth("BTC_USDT"));
-        }
-    }
-}
-```
-
-```cpp
-// C++暂不支持
-```
-
-使用通配符统一限制所有 API 的调用频率：
-
-```javascript
-function main() {
-    exchange.IO("rate", "*", 100, "1m")
-
-    for (var i = 0; i < 10; i++) {
-        exchange.GetTicker("BTC_USDT")
-        exchange.GetDepth("BTC_USDT")
-        exchange.GetAccount()
-        Log("Round", i+1, "completed")
-        Sleep(1000)
-    }
-}
-```
-
-```python
-def main():
-    exchange.IO("rate", "*", 100, "1m")
-
-    for i in range(10):
-        exchange.GetTicker("BTC_USDT")
-        exchange.GetDepth("BTC_USDT")
-        exchange.GetAccount()
-        Log("Round", i+1, "completed")
-        Sleep(1000)
-```
-
-```rust
-fn main() {
-    let _ = exchange.IO(("rate", "*", 100, "1m"));
-
-    for i in 0..10 {
-        let _ = exchange.GetTicker("BTC_USDT");
-        let _ = exchange.GetDepth("BTC_USDT");
-        let _ = exchange.GetAccount();
-        Log!("Round", i + 1, "completed");
-        Sleep(1000);
-    }
-}
-```
-
-```cpp
-// C++暂不支持
-```
-
-quota 模式 - 严格按时间窗口对齐限流：
-
-```javascript
-function main() {
-    exchange.IO("quota", "GetTicker", 3, "1s")
-
-    for (var i = 0; i < 10; i++) {
-        var ticker = exchange.GetTicker("BTC_USDT")
-        if (ticker) {
-            Log(_D(), "Ticker:", ticker.Last)
-        } else {
-            Log(_D(), "Quota exceeded, waiting for next window")
-        }
-        Sleep(100)
-    }
-}
-```
-
-```python
-def main():
-    exchange.IO("quota", "GetTicker", 3, "1s")
-
-    for i in range(10):
-        ticker = exchange.GetTicker("BTC_USDT")
-        if ticker:
-            Log(_D(), "Ticker:", ticker["Last"])
-        else:
-            Log(_D(), "Quota exceeded, waiting for next window")
-        Sleep(100)
-```
-
-```rust
-fn main() {
-    let _ = exchange.IO(("quota", "GetTicker", 3, "1s"));
-
-    for _i in 0..10 {
-        match exchange.GetTicker("BTC_USDT") {
-            Ok(ticker) => Log!(_D(None), "Ticker:", ticker.Last),
-            Err(_) => Log!(_D(None), "Quota exceeded, waiting for next window"),
-        }
-        Sleep(100);
-    }
-}
-```
-
-```cpp
-// C++暂不支持
-```
-
-quota 模式 - 日内配额，每天于指定时间重置：
-
-```javascript
-function main() {
-    exchange.IO("quota", "GetTicker", 1000, "@0815")
-
-    var count = 0
-    while (true) {
-        var ticker = exchange.GetTicker("BTC_USDT")
-        if (ticker) {
-            count++
-            Log("Call count:", count, "Ticker:", ticker.Last)
-        } else {
-            Log("Daily quota exceeded, waiting for reset at 08:15")
-            Sleep(60000)  // Wait 1 minute
-        }
-        Sleep(1000)
-    }
-}
-```
-
-```python
-def main():
-    exchange.IO("quota", "GetTicker", 1000, "@0815")
-
-    count = 0
-    while True:
-        ticker = exchange.GetTicker("BTC_USDT")
-        if ticker:
-            count += 1
-            Log("Call count:", count, "Ticker:", ticker["Last"])
-        else:
-            Log("Daily quota exceeded, waiting for reset at 08:15")
-            Sleep(60000)  # Wait 1 minute
-        Sleep(1000)
-```
-
-```rust
-fn main() {
-    let _ = exchange.IO(("quota", "GetTicker", 1000, "@0815"));
-
-    let mut count = 0;
-    loop {
-        match exchange.GetTicker("BTC_USDT") {
-            Ok(ticker) => {
-                count += 1;
-                Log!("Call count:", count, "Ticker:", ticker.Last);
-            }
-            Err(_) => {
-                Log!("Daily quota exceeded, waiting for reset at 08:15");
-                Sleep(60000);  // Wait 1 minute
-            }
-        }
-        Sleep(1000);
-    }
-}
-```
-
-```cpp
-// C++暂不支持
-```
-
-组合使用多个限流规则：
-
-```javascript
-function main() {
-    exchange.IO("rate", "GetTicker", 10, "1s")      // GetTicker 每秒 10 次
-    exchange.IO("rate", "GetDepth", 5, "1s")        // GetDepth 每秒 5 次
-    exchange.IO("rate", "CreateOrder", 2, "1s")     // CreateOrder 每秒 2 次
-    exchange.IO("quota", "*", 1000, "@0000")        // 所有 API 每天 00:00 重置，上限 1000 次
-
-    Log("Rate limits configured successfully")
-
-    for (var i = 0; i < 5; i++) {
-        exchange.GetTicker("BTC_USDT")
-        exchange.GetDepth("BTC_USDT")
-        Sleep(200)
-    }
-}
-```
-
-```python
-def main():
-    exchange.IO("rate", "GetTicker", 10, "1s")      # GetTicker 每秒 10 次
-    exchange.IO("rate", "GetDepth", 5, "1s")        # GetDepth 每秒 5 次
-    exchange.IO("rate", "CreateOrder", 2, "1s")     # CreateOrder 每秒 2 次
-    exchange.IO("quota", "*", 1000, "@0000")        # 所有 API 每天 00:00 重置，上限 1000 次
-
-    Log("Rate limits configured successfully")
-
-    for i in range(5):
-        exchange.GetTicker("BTC_USDT")
-        exchange.GetDepth("BTC_USDT")
-        Sleep(200)
-```
-
-```rust
-fn main() {
-    let _ = exchange.IO(("rate", "GetTicker", 10, "1s"));      // GetTicker 每秒 10 次
-    let _ = exchange.IO(("rate", "GetDepth", 5, "1s"));        // GetDepth 每秒 5 次
-    let _ = exchange.IO(("rate", "CreateOrder", 2, "1s"));     // CreateOrder 每秒 2 次
-    let _ = exchange.IO(("quota", "*", 1000, "@0000"));        // 所有 API 每天 00:00 重置，上限 1000 次
-
-    Log!("Rate limits configured successfully");
-
-    for _i in 0..5 {
-        let _ = exchange.GetTicker("BTC_USDT");
-        let _ = exchange.GetDepth("BTC_USDT");
-        Sleep(200);
-    }
-}
-```
-
-```cpp
-// C++ 暂不支持
-```
-
-**一、直接调用交易所API（```"api"```模式）**
-
-```javascript
-exchange.IO("api", httpMethod, resource, params, raw)
-```
-
-用于调用交易所未封装的原生API接口。FMZ会自动处理签名验证，您只需填写请求参数即可。
-
-| 参数 | 类型 | 必填 | 说明 |
-| - | - | - | - |
-| httpMethod | string | 是 | ```GET```、```POST```等 |
-| resource | string | 是 | 请求路径或完整URL |
-| params | string | 否 | URL编码格式的请求参数 |
-| raw | string | 否 | 原始请求体（JSON等） |
-
-调用失败时返回空值，且该模式仅支持实盘。
-
-**二、运行时切换交易对（```"currency"```模式）**
-
-```javascript
-exchange.IO("currency", "ETH_USDT")
-```
-
-用于在运行时动态切换交易对，交易对格式为大写字母加下划线分隔。此指令等同于`exchange.SetCurrency`。
-
-> 回测模式下仅支持现货，且只能切换至相同计价币种的交易对。期货切换交易对后，需再次调用```exchange.SetContractType()```。
-
-**三、切换基地址（```"base"``` / ```"mbase"```模式）**
-
-- ```"base"```：切换交易接口的基地址，等同于```exchange.SetBase()```。
-- ```"mbase"```：切换行情接口的基地址，适用于行情与交易采用不同域名的交易所。
-
-**四、通用交易模式指令**
-
-以下指令在多个交易所中通用，各交易所的具体支持情况请参见第五节的说明。
-
-| 指令 | 参数 | 功能 |
-| - | - | - |
-| ```simulate``` | bool | 模拟盘(true)/实盘(false) |
-| ```cross``` | bool | 全仓(true)/逐仓(false) |
-| ```dual``` | bool | 双向持仓(true)/单向持仓(false) |
-| ```unified``` | bool | 统一账户(true)/普通账户(false) |
-| ```trade_margin``` | 无 | 切换至逐仓杠杆模式 |
-| ```trade_super_margin``` | 无 | 切换至全仓杠杆模式 |
-| ```trade_normal``` | 无 | 切换回普通现货模式 |
-| ```selfTradePreventionMode``` | string | 自成交预防（STP）模式 |
-
-**五、各交易所IO指令**
-
-所有交易所均支持```"api"```和```"currency"```指令，下方仅列出各交易所的特有指令。
-
----
-
-#### 现货交易所
-
-**Binance（币安）**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```trade_margin``` | 无 | 切换至逐仓杠杆模式 |
-| ```trade_super_margin``` | 无 | 切换至全仓杠杆模式 |
-| ```trade_normal``` | 无 | 切换回普通现货模式 |
-| ```unified``` | bool | 统一账户模式 |
-| ```selfTradePreventionMode``` | string | 自成交防护，可选：```EXPIRE_TAKER```/```EXPIRE_MAKER```/```EXPIRE_BOTH```/```NONE``` |
-
-**OKX（欧易）**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```simulate``` | bool | 模拟盘/实盘切换 |
-| ```trade_margin``` | 无 | 逐仓杠杆（tdMode=isolated） |
-| ```trade_super_margin``` | 无 | 全仓杠杆（tdMode=cross） |
-| ```trade_normal``` | 无 | 切换回普通现货模式 |
-| ```tdMode``` | string | 直接设置交易模式，组合保证金模式下须使用全仓 |
-
-**Huobi（火币）**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```trade_margin``` | 无 | 切换至逐仓杠杆模式 |
-| ```trade_super_margin``` | 无 | 切换至全仓杠杆模式 |
-| ```trade_normal``` | 无 | 切换回普通现货模式 |
-
-**Bybit**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```trade_margin``` | 无 | 切换至杠杆模式 |
-| ```trade_normal``` | 无 | 切换回普通现货模式 |
-
-**Gate.io**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```trade_margin``` | 无 | 切换至逐仓杠杆模式 |
-| ```trade_super_margin``` | 无 | 切换至全仓杠杆模式 |
-| ```trade_normal``` | 无 | 切换回普通现货模式 |
-| ```unified``` | bool | 统一账户模式 |
-
-**Bitget**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```simulate``` | bool | 模拟盘/实盘切换 |
-
-**CoinEx**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```trade_margin``` | 无 | 切换至杠杆模式 |
-| ```trade_normal``` | 无 | 切换回普通模式 |
-
-**WOO**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```trade_margin``` | 无 | 切换至杠杆模式 |
-| ```trade_normal``` | 无 | 切换回普通模式 |
-
-**Crypto.com**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```trade_margin``` | 无 | 切换至杠杆模式 |
-| ```trade_normal``` | 无 | 切换回普通模式 |
-
-**AscendEx**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```trade_margin``` | 无 | 切换至杠杆模式 |
-| ```trade_normal``` | 无 | 切换回普通模式 |
-
-**Gemini**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```subAccount``` | string | 设置子账户名称 |
-
-**Poloniex**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```accountId``` | string | 设置账户ID |
-
-**Bitfinex**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```version``` | 无 | 获取当前API版本号 |
-
-**Backpack**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```selfTradePreventionMode``` | string | 自成交防护，可选：```Allow```/```RejectTaker```/```RejectMaker```/```RejectBoth```/```Ban``` |
-
-**Hyperliquid（现货）**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```source``` | "a"/"b" | 切换API数据源 |
-| ```vaultAddress``` | string | 设置金库地址，传入空字符串则禁用 |
-| ```walletAddress``` | string | 设置钱包地址 |
-| ```expiresAfter``` | number | 订单过期时间（毫秒），设为0则禁用 |
-
----
-
-#### 合约交易所
-
-**Futures_Binance（币安合约）**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```cross``` | bool | 全仓/逐仓 |
-| ```dual``` | bool | 双向/单向持仓 |
-| ```unified``` | bool | 统一账户（切换后使用papi.binance.com） |
-| ```selfTradePreventionMode``` | string | 自成交防护，可选：```EXPIRE_TAKER```/```EXPIRE_MAKER```/```EXPIRE_BOTH```/```NONE``` |
-| ```extend_key``` | string | 设置API响应扩展字段（以逗号分隔） |
-
-**Futures_OKX（欧易合约）**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```simulate``` | bool | 模拟盘/实盘切换 |
-| ```cross``` | bool | 全仓/逐仓，默认全仓 |
-| ```dual``` | bool | 双向(long_short_mode)/单向(net_mode)持仓 |
-
-**Futures_HuobiDM（火币合约）**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```cross``` | bool | 全仓/逐仓，默认逐仓。仅```XXX_USDT```永续合约(swap)支持 |
-| ```dual``` | bool | 双向(dual_side)/单向(single_side)持仓 |
-| ```unified``` | bool | 统一账户模式 |
-| ```signHost``` | string | 设置API签名Host地址，传入空字符串则禁用 |
-
-**Futures_Bybit**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```cross``` | bool | 全仓/逐仓 |
-| ```dual``` | bool | 双向/单向持仓 |
-
-**Futures_KuCoin**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```cross``` | bool | 全仓/逐仓 |
-
-**Futures_GateIO**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```cross``` | bool | 全仓/逐仓 |
-| ```dual``` | bool | 双向/单向持仓 |
-| ```unified``` | bool | 统一账户模式 |
-
-**Futures_Bitget**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```simulate``` | bool | 模拟盘/实盘切换 |
-| ```cross``` | bool | 全仓(crossed)/逐仓(isolated) |
-| ```dual``` | bool | 双向(hedge_mode)/单向(one_way_mode)持仓 |
-
-**Futures_MEXC**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```cross``` | bool | 全仓/逐仓 |
-
-**Futures_BitMEX**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```cross``` | bool | 全仓/逐仓 |
-
-**Futures_CoinEx**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```cross``` | bool | 全仓/逐仓 |
-
-**Futures_WOO**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```cross``` | bool | 全仓/逐仓 |
-| ```dual``` | bool | 双向/单向持仓 |
-
-**Futures_Kraken**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```cross``` | bool | 全仓/逐仓（仅multi-collateral账户支持） |
-
-**Futures_Aevo**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```signingKey``` | string | 设置签名密钥，返回公钥。需从交易所API Key页面获取，请注意其存在时效性 |
-
-**Futures_Hyperliquid**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```cross``` | bool | 全仓/逐仓 |
-| ```source``` | "a"/"b" | 切换API数据源 |
-| ```vaultAddress``` | string | 设置金库地址，传入空字符串则禁用 |
-| ```walletAddress``` | string | 设置钱包地址 |
-| ```expiresAfter``` | number | 订单过期时间（毫秒），设为0则禁用 |
-
-**Futures_Deepcoin**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```cross``` | bool | 全仓/逐仓 |
-| ```merge``` | bool | 合并持仓(true)/拆分持仓(false) |
-
-**Futures_DigiFinex**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```simulate``` | bool | 模拟盘/实盘切换 |
-| ```cross``` | bool | 全仓/逐仓 |
-
-**Futures_ApolloX**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```cross``` | bool | 全仓/逐仓 |
-
-**Futures_Aster**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```cross``` | bool | 全仓/逐仓 |
-| ```dual``` | bool | 双向/单向持仓 |
-
-**Futures_CoinW**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```cross``` | bool | 全仓/逐仓 |
-
-**Futures_BitMart**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```cross``` | bool | 全仓/逐仓 |
-
-**Futures_Backpack**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```selfTradePreventionMode``` | string | 自成交防护，可选：```Allow```/```RejectTaker```/```RejectMaker```/```RejectBoth```/```Ban``` |
-
-**Futures_Lighter**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```cross``` | bool | 全仓/逐仓 |
-| ```expiry``` | number | 订单过期时间戳（毫秒），默认29天，最小4分钟 |
-
-**Futures_Crypto.com**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```accountId``` | string | 设置交易账户ID |
-
-**Futures_Bitfinex**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```mbase``` | string | 设置行情API基础地址 |
-
-**Futures_edgeX**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```calcOrderHashAndSign``` | string(JSON) | 计算订单哈希并签名，返回签名字符串 |
-
-**Futures_Bibox**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```cross``` | bool | 全仓/逐仓，默认全仓 |
-
-**Futures_Pionex**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```cross``` | bool | 全仓/逐仓 |
-| ```dual``` | bool | 双向/单向持仓 |
-
-**Futures_Phemex**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```dual``` | bool | 双向/单向持仓。全仓/逐仓需在交易所网页端设置 |
-
-**Futures_WooFi**
-
-> 仅支持通用指令```"api"```和```"currency"```，无特有指令。
-
-**六、特殊平台IO指令**
-
-**Polymarket（预测市场）**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```nonce``` | [number] | 获取或设置订单的 nonce 值。不传参数时返回当前 nonce，传入数值时设置新的 nonce |
-| ```proxyWalletAddress``` | 无 | 获取代理钱包地址 |
-| ```redeem``` | symbol, [wait] | 赎回已结算头寸（通过 Relayer 免 Gas）。wait 默认为 true，等待交易确认；wait 为 false 时立即返回```{"transactionID": "..."}``` |
-| ```merge``` | symbol, [amount], [wait] | 将 YES+NO 代币合并赎回为 USDC（通过 Relayer 免 Gas）。amount 为 0 或不传时，自动取两个 outcome 中较小的持仓量。wait 默认为 true，等待交易确认 |
-| ```l2_credentials``` | 无 | 获取 L2 认证信息，返回```{"apiKey":"","secret":"","passphrase":""}```，用于 WebSocket 连接等场景 |
-| ```batchOrders``` | array | 批量下单，参数为订单对象数组，每个对象包含```symbol```、```side```、```price```、```amount```字段，以及可选的```option```字段 |
-
-**Web3（区块链）**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```abi``` | 合约地址, ABI字符串 | 注册合约 ABI |
-| ```address``` | [私钥] | 获取钱包地址 |
-| ```encode``` / ```pack``` | 类型, 数据... | ABI 编码数据 |
-| ```encodePacked``` | 类型, 数据... | ABI 紧密编码数据 |
-| ```hash``` | 参数1-4 | 计算哈希值 |
-| ```decode``` / ```unpack``` | 类型, 数据... | ABI 解码数据 |
-| ```key``` | string | 切换操作所使用的私钥 |
-
-**IB（盈透证券）**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```status``` | 无 | 获取连接状态 |
-| ```time``` | 无 | 获取 IB 服务器时间 |
-| ```reqId``` | 无 | 强制获取新的请求 ID |
-| ```orderId``` | 无 | 获取下一个可用的订单 ID |
-| ```ignore``` | string(数组) | 忽略指定的错误码 |
-| ```scan``` | string(JSON) | 执行市场扫描器 |
-| ```wait``` | [number] | 等待行情事件，可设置超时秒数 |
-| ```debug``` | bool | 调试模式 |
-| ```marketDataType``` | number | 行情数据类型（1 实时 / 2 冻结 / 3 延迟 / 4 延迟冻结） |
-
-**Futu（富途证券）**
-
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```refresh``` | bool | 缓存刷新，禁用缓存后频率限制为每 30 秒最多 10 次 |
-| ```accounts``` | 无 | 获取所有账户列表 |
-| ```status``` | 无 | 获取连接状态 |
-| ```lock``` | 无 | 锁定交易 |
-| ```unlock``` | 无 | 解锁交易 |
-| ```wait``` | 无 | 等待行情事件 |
-
-**七、API限流控制（```"rate"``` / ```"quota"```模式）**
-
-```javascript
-exchange.IO("rate", functionNames, maxCalls, period, [behavior])
-exchange.IO("quota", functionNames, maxCalls, period, [behavior])
-```
-
-- **rate**：平滑限流，不严格对齐时间窗口。
-- **quota**：额度限流，严格对齐时间窗口。
-
-| 参数 | 类型 | 说明 |
-| - | - | - |
-| functionNames | string | 函数名，多个之间以逗号分隔，```*```表示全部 |
-| maxCalls | number | 单个时间周期内的最大调用次数 |
-| period | string | 时间周期（```"1s"```/```"1m"```/```"1h"```）或重置时间点（```"@0815"```） |
-| behavior | string | 可选，```"delay"```表示超限时等待，默认返回 null |
-
-> ```Buy```/```Sell```的限流遵循```CreateOrder```的设置；```Go```遵循实际并发函数的设置；```IO/api```仅对```exchange.IO("api", ...)```生效。
-
-See also: `exchange.SetBase`, `exchange.SetCurrency`, `EXCHANGE_OP_IO_CONTROL`
-
-#### exchange.Log
-
-```
-exchange.Log(orderType, price, amount)
-exchange.Log(orderType, price, amount, ...args)
-```
-
-```exchange.Log()```函数用于在日志栏区域输出下单、撤单日志。该函数被调用时不会实际下单，仅用于输出并记录交易日志。
-
-Parameters:
-
-- `orderType` (number, required): ```orderType```参数用于设置输出的日志类型，可选值为`LOG_TYPE_BUY`、`LOG_TYPE_SELL`、`LOG_TYPE_CANCEL`。
-- `price` (number, required): ```price```参数用于设置日志中显示的价格。
-- `amount` (number, required): ```amount```参数用于设置日志中显示的下单量。
-- `arg` (string / number / bool / object / array / any (平台支持的任意类型), optional): 扩展参数，用于向该条日志中输出附带信息，```arg```参数可以传入多个。
-
-使用```exchange.Log(orderType, price, amount)```可以进行实盘跟单测试、模拟下单，也可以辅助记录下单信息。
-
-    最常见的使用场景为：通过`exchange.IO`函数访问交易所的创建条件订单接口，但调用```exchange.IO()```函数并不会在实盘日志中输出交易日志信息。
-
-    此时即可使用```exchange.Log()```函数补充输出日志，以便记录下单信息，撤单操作亦是如此。
-
-```javascript
-var id = 123
-function main() {
-    // 下单类型买入，价格999，数量 0.1
-    exchange.Log(LOG_TYPE_BUY, 999, 0.1)
-    // 取消订单
-    exchange.Log(LOG_TYPE_CANCEL, id)
-}
-```
-
-```python
-id = 123
-def main():
-    exchange.Log(LOG_TYPE_BUY, 999, 0.1)
-    exchange.Log(LOG_TYPE_CANCEL, id)
-```
-
-```rust
-fn main() {
-    let id = 123;
-    // 下单类型买入，价格999，数量 0.1
-    exchange.Log(LOG_TYPE_BUY, 999, 0.1);
-    // 取消订单，orderType为LOG_TYPE_CANCEL时price参数为撤单的订单Id（Rust中amount参数必传，可传0）
-    exchange.Log(LOG_TYPE_CANCEL, id, 0);
-}
-```
-
-```cpp
-void main() {
-    auto id = 123;
-    exchange.Log(LOG_TYPE_BUY, 999, 0.1);
-    exchange.Log(LOG_TYPE_CANCEL, id);
-}
-```
-
-当```orderType```参数为```LOG_TYPE_CANCEL```时，```price```参数表示撤单的订单Id，用于在直接调用```exchange.IO()```函数撤单时打印撤单日志。
-
-  ```exchange.Log()```函数是`exchange`交易所对象的成员函数，区别于全局函数`Log`。
-
-See also: `Log`, `exchange`, `LOG_TYPE_BUY`, `LOG_TYPE_SELL`, `LOG_TYPE_CANCEL`
-
-#### exchange.Encode
-
-```
-exchange.Encode(algo, inputFormat, outputFormat, data)
-exchange.Encode(algo, inputFormat, outputFormat, data, keyFormat, key)
-```
-
-```exchange.Encode()```函数用于执行签名与加密计算。
-
-Parameters:
-
-- `algo` (string, required): 参数```algo```用于指定编码计算时所使用的算法。
-支持设置为："raw"（不使用算法）、"sign"、"signTx"、"md4"、"md5"、"sha256"、"sha512"、"sha1"、"keccak256"、"sha3.224"、"sha3.256"、"sha3.384"、"sha3.512"、"sha3.keccak256"、"sha3.keccak512"、"sha512.384"、"sha512.256"、"sha512.224"、"ripemd160"、"blake2b.256"、"blake2b.512"、"blake2s.128"、"blake2s.256"。
-
-参数```algo```还支持："text.encoder.utf8"、"text.decoder.utf8"、"text.encoder.gbk"、"text.decoder.gbk"，用于对字符串进行编码、解码。
-参数```algo```也支持"ed25519"算法，并可搭配不同的哈希算法使用，例如参数```algo```可写为"ed25519.md5"、"ed25519.sha512"等，同时支持```ed25519.seed```计算。
-- `inputFormat` (string, required): 用于指定```data```参数的数据格式。```inputFormat```参数支持设置为："raw"、"hex"、"base64"、"string"其中之一。"raw"表示原始数据，"hex"表示```hex```编码数据，"base64"表示```base64```编码数据，"string"表示字符串数据。
-- `outputFormat` (string, required): 用于指定输出的数据格式。```outputFormat```参数支持设置为："raw"、"hex"、"base64"、"string"其中之一。"raw"表示原始数据，"hex"表示```hex```编码数据，"base64"表示```base64```编码数据，"string"表示字符串数据。
-- `data` (string, required): 参数```data```为所要处理的数据。
-- `keyFormat` (string, optional): 用于指定```key```参数的数据格式。```keyFormat```参数支持设置为："raw"、"hex"、"base64"、"string"其中之一。"raw"表示原始数据，"hex"表示```hex```编码数据，"base64"表示```base64```编码数据，"string"表示字符串数据。
-- `key` (string, optional): ```key```参数用于指定签名计算时使用的密钥，可以使用明文字符串，也可以使用```"{{accesskey}}"```、```"{{secretkey}}"```分别代指`exchange`交易所对象中配置的```accessKey```和```secretKey```。
-
-Returns (string): ```exchange.Encode()```函数返回计算得到的哈希值编码。
-
-BitMEX仓位变化推送（wss协议）示例：
-
-```javascript
-function main() {
-    var APIKEY = "your Access Key(Bitmex API ID)"
-    var expires = parseInt(Date.now() / 1000) + 10
-    var signature = exchange.Encode("sha256", "string", "hex", "GET/realtime" + expires, "hex", "{{secretkey}}")
-    var client = Dial("wss://www.bitmex.com/realtime", 60)
-    var auth = JSON.stringify({args: [APIKEY, expires, signature], op: "authKeyExpires"})
-    var pos = 0
-    client.write(auth)
-    client.write('{"op": "subscribe", "args": "position"}')
-    while (true) {
-        var bitmexData = JSON.parse(client.read())
-        if(bitmexData.table == 'position' && pos != parseInt(bitmexData.data[0].currentQty)){
-            Log('position change', pos, parseInt(bitmexData.data[0].currentQty), '@')
-            pos = parseInt(bitmexData.data[0].currentQty)
-        }
-    }
-}
-```
-
-```python
-import time
-def main():
-    APIKEY = "your Access Key(Bitmex API ID)"
-    expires = int(time.time() + 10)
-    signature = exchange.Encode("sha256", "string", "hex", "GET/realtime" + expires, "hex", "{{secretkey}}")
-    client = Dial("wss://www.bitmex.com/realtime", 60)
-    auth = json.dumps({"args": [APIKEY, expires, signature], "op": "authKeyExpires"})
-    pos = 0
-    client.write(auth)
-    client.write('{"op": "subscribe", "args": "position"}')
-    while True:
-        bitmexData = json.loads(client.read())
-        if "table" in bitmexData and bitmexData["table"] == "position" and len(bitmexData["data"]) != 0 and pos != bitmexData["data"][0]["currentQty"]:
-            Log("position change", pos, bitmexData["data"][0]["currentQty"], "@")
-            pos = bitmexData["data"][0]["currentQty"]
-```
-
-```cpp
-void main() {
-    auto APIKEY = "your Access Key(Bitmex API ID)";
-    auto expires = Unix() + 10;
-    auto signature = exchange.Encode("sha256", "string", "hex", str_format("GET/realtime%d", expires), "hex", "{{secretkey}}");
-
-    auto client = Dial("wss://www.bitmex.com/realtime", 60);
-    json auth = R"({"args": [], "op": "authKeyExpires"})"_json;
-
-    auth["args"].push_back(APIKEY);
-    auth["args"].push_back(expires);
-    auth["args"].push_back(signature);
-    auto pos = 0;
-    client.write(auth.dump());
-    client.write("{\"op\": \"subscribe\", \"args\": \"position\"}");
-    while(true) {
-        auto bitmexData = json::parse(client.read());
-        if(bitmexData["table"] == "position" && bitmexData["data"][0].find("currentQty") != bitmexData["data"][0].end() && pos != bitmexData["data"][0]["currentQty"]) {
-            Log("Test");
-            Log("position change", pos, bitmexData["data"][0]["currentQty"], "@");
-            pos = bitmexData["data"][0]["currentQty"];
-        }
-    }
-}
-```
-
-仅实盘支持调用```exchange.Encode()```函数。```"{{accesskey}}"```、```"{{secretkey}}"```的引用方式仅在调用```exchange.Encode()```函数时有效。
-
-See also: `exchange`, `Encode`
+| threading | 多线程全局对象 | 成员函数：```Thread```、```getThread```、```mainThread```等。 |
+| Thread | 线程对象 | 成员函数：```peekMessage```、```postMessage```、```join```等。 |
+| ThreadLock | 线程锁对象 | 成员函数：```acquire```、```release```。可作为线程执行函数的参数传入线程环境。 |
+| ThreadEvent | 事件对象 | 成员函数：```set```、```clear```、```wait```、```isSet```。可作为线程执行函数的参数传入线程环境。 |
+| ThreadCondition | 条件对象 | 成员函数：```notify```、```notifyAll```、```wait```、```acquire```、```release```。可作为线程执行函数的参数传入线程环境。 |
+| ThreadDict | 字典对象 | 成员函数：```get```、```set```。可作为线程执行函数的参数传入线程环境。 |
+| Server | 服务对象 | 由```threading.Serve()```返回。成员函数：```addr```、```close```、```stop```、```join```、```pending```。可作为线程执行函数的参数传入线程环境。 |
 
 #### exchange.Go
 
@@ -13980,26 +12661,6 @@ fn main() {
 }
 ```
 
-```cpp
-void main() {
-    auto a = exchange.Go("GetTicker");
-    auto b = exchange.Go("GetDepth");
-    auto c = exchange.Go("Buy", 1000, 0.1);
-    auto d = exchange.Go("GetRecords", PERIOD_H1);
-
-    Ticker ticker;
-    Depth depth;
-    Records records;
-    TId orderId;
-    a.wait(ticker);
-    b.wait(depth);
-    if(!c.wait(orderId, 300)) {
-        c.wait(orderId);
-    }
-    d.wait(records);
-}
-```
-
 对已释放的并发对象调用其```wait()```方法会报错：
 
 ```javascript
@@ -14027,16 +12688,6 @@ fn main() {
     let records = d.wait(0);
     // 此处对已经 wait 过且已结束的异步操作再次调用 wait，将返回 Err，并记录错误信息
     let ret = d.wait(0);
-}
-```
-
-```cpp
-void main() {
-    auto d = exchange.Go("GetRecords", PERIOD_H1);
-    Records records;
-    d.wait(records);
-    Records ret;
-    d.wait(ret);
 }
 ```
 
@@ -14145,53 +12796,6 @@ fn main() {
 }
 ```
 
-```cpp
-void main() {
-    while(true) {
-        int length = exchanges.size();
-        auto beginTS = UnixNano() / 1000000;
-        vector<Ticker> arrTicker(length);
-        vector<string> arrName(length);
-
-        // 注意，添加几个交易所对象，这里要执行几次exchanges[n].Go 函数，这个例子是需要添加四个交易所对象，具体可以修改
-        auto r0 = exchanges[0].Go("GetTicker");
-        auto r1 = exchanges[1].Go("GetTicker");
-        auto r2 = exchanges[2].Go("GetTicker");
-        auto r3 = exchanges[3].Go("GetTicker");
-        vector<GoObj*> arrRoutine = {&r0, &r1, &r2, &r3};
-
-        for(int i = 0; i < length; i++) {
-            arrName[i] = exchanges[i].GetName();
-        }
-
-        for(int i = 0; i < length; i++) {
-            Ticker ticker;
-            arrRoutine[i]->wait(ticker);
-            arrTicker[i] = ticker;
-        }
-        auto endTS = UnixNano() / 1000000;
-
-        json tbl = R"({
-            "type": "table",
-            "title": "行情",
-            "cols": ["索引", "名称", "最新成交价"],
-            "rows": []
-        })"_json;
-
-        for(int i = 0; i < length; i++) {
-            json arr = R"(["", "", ""])"_json;
-            arr[0] = str_format("%d", i);
-            arr[1] = arrName[i];
-            arr[2] = str_format("%f", arrTicker[i].Last);
-            tbl["rows"].push_back(arr);
-        }
-
-        LogStatus(_D(), "Total time for concurrent ticker retrieval:", str_format("%d", endTS - beginTS), "ms", "\n", "`" + tbl.dump() + "`");
-        Sleep(500);
-    }
-}
-```
-
 并发调用```exchange.IO("api", ...)```函数：
 
 ```javascript
@@ -14264,30 +12868,6 @@ fn main() {
     Log!("id2:", id2);
     Log!("id3:", id3);
     Log!("Concurrent order time:", endTS - beginTS, "ms");
-}
-```
-
-```cpp
-void main() {
-    auto beginTS = UnixNano() / 1000000;
-    json param = R"({"instId":"BTC-USDT-SWAP","tdMode":"cross","side":"buy","ordType":"limit","px":"16000","sz":"1","posSide":"long"})"_json;
-    auto ret1 = exchange.Go("IO", "api", "POST", "/api/v5/trade/order", "", param.dump());
-    auto ret2 = exchange.Go("IO", "api", "POST", "/api/v5/trade/order", "", param.dump());
-    auto ret3 = exchange.Go("IO", "api", "POST", "/api/v5/trade/order", "", param.dump());
-
-    json id1 = R"({})"_json;
-    json id2 = R"({})"_json;
-    json id3 = R"({})"_json;
-
-    ret1.wait(id1);
-    ret2.wait(id2);
-    ret3.wait(id3);
-    auto endTS = UnixNano() / 1000000;
-
-    Log("id1:", id1);
-    Log("id2:", id2);
-    Log("id3:", id3);
-    Log("Concurrent order time:", endTS - beginTS, "ms");
 }
 ```
 
@@ -14367,1533 +12947,123 @@ def main():
 
 See also: `Mail_Go`, `HttpQuery_Go`, `EventLoop`, `exchange.IO`（API 限流控制）
 
-### Account
-
-#### exchange.GetAccount
+#### EventLoop
 
 ```
-exchange.GetAccount()
+EventLoop()
+EventLoop(timeout)
 ```
 
-```exchange.GetAccount()```函数用于请求交易所账户信息。```GetAccount()```函数是交易所对象`exchange`的成员函数，```exchange```对象的成员函数（方法）仅与```exchange```相关，后续文档不再赘述。
-
-Returns (`Account` / 空值): 查询账户资产信息，查询成功时返回`Account`结构，查询失败时返回空值。
-
-设置交易对与合约代码，获取当前账户信息。
-
-```javascript
-function main(){
-    // 切换交易对
-    exchange.IO("currency", "BTC_USDT")
-    // 以OKX期货为例，设置合约为当周合约，当前交易对为BTC_USDT，所以当前合约为BTC的U本位当周合约
-    exchange.SetContractType("this_week")
-    // 获取当前账户资产数据
-    var account = exchange.GetAccount()
-    // USDT作为保证金的可用余额
-    Log(account.Balance)
-    // USDT作为保证金的冻结金额
-    Log(account.FrozenBalance)
-    // 当前资产权益
-    Log(account.Equity)
-    // 当前资产作为保证金的所有持仓的未实现盈亏
-    Log(account.UPnL)
-}
-```
-
-```python
-def main():
-    exchange.IO("currency", "BTC_USDT")
-    exchange.SetContractType("this_week")
-    account = exchange.GetAccount()
-    Log(account["Balance"])
-    Log(account["FrozenBalance"])
-    Log(account["Equity"])
-    Log(account["UPnL"])
-```
-
-```rust
-fn main() {
-    // 切换交易对
-    exchange.IO(("currency", "BTC_USDT")).unwrap();
-    // 以OKX期货为例，设置合约为当周合约，当前交易对为BTC_USDT，所以当前合约为BTC的U本位当周合约
-    exchange.SetContractType("this_week").unwrap();
-    // 获取当前账户资产数据
-    let account = exchange.GetAccount().unwrap();
-    // USDT作为保证金的可用余额
-    Log!(account.Balance);
-    // USDT作为保证金的冻结金额
-    Log!(account.FrozenBalance);
-    // 当前资产权益
-    Log!(account.Equity);
-    // 当前资产作为保证金的所有持仓的未实现盈亏
-    Log!(account.UPnL);
-}
-```
-
-```cpp
-void main() {
-    exchange.IO("currency", "BTC_USDT");
-    exchange.SetContractType("this_week");
-    auto account = exchange.GetAccount();
-    Log(account.Balance);
-    Log(account.FrozenBalance);
-    Log(account.Equity);
-    Log(account.UPnL);
-}
-```
-
-如果交易所对象设置为加密货币期货合约交易所，并且切换为以```USDT```作为保证金的合约（切换方法请参阅`exchange.SetCurrency`、`exchange.SetContractType`函数），此时资产以```USDT```作为保证金，记录在`Account`结构的```Balance```、```FrozenBalance```属性中。
-
-如果交易所对象设置为加密货币期货合约交易所，并且切换为币本位合约，此时资产以币作为保证金，记录在`Account`结构的```Stocks```、```FrozenStocks```属性中。
-
-使用币安期货统一账户时，调用```exchange.GetAccount()```函数请求账户信息，封装的数据为所有资产折算为**USD**后的金额，显示在`Account`结构的```Balance```字段中。如需计算其它资产的折算金额，可将USD折算金额除以（待折算资产的）指数价格，再除以（待折算资产的）质押率即可算出。
-
-See also: `Account`, `exchange.SetCurrency`, `exchange.SetContractType`
-
-#### exchange.GetAssets
-
-```
-exchange.GetAssets()
-```
-
-```exchange.GetAssets```函数用于请求交易所账户的资产信息。
-
-Returns (`Asset`数组 / 空值): ```exchange.GetAssets()```函数请求数据成功时返回`Asset`结构体数组，请求数据失败时返回空值。
-
-获取交易所账户的资产信息，```exchange.GetAssets()```函数返回一个以Asset结构体为元素的数组。
-
-```javascript
-function main() {
-    // exchange.SetCurrency("BTC_USDT")  // 可以设置交易对
-    // exchange.SetContractType("swap")  // 可以设置合约
-    var assets = exchange.GetAssets()
-    Log(assets)
-}
-```
-
-```python
-def main():
-    # exchange.SetCurrency("BTC_USDT")  # 可以设置交易对
-    # exchange.SetContractType("swap")  # 可以设置合约
-    assets = exchange.GetAssets()
-    Log(assets)
-```
-
-```rust
-fn main() {
-    // exchange.SetCurrency("BTC_USDT");  // 可以设置交易对
-    // exchange.SetContractType("swap").unwrap();  // 可以设置合约
-    let assets = exchange.GetAssets().unwrap();
-    Log!(assets);
-}
-```
-
-```cpp
-void main() {
-    // exchange.SetCurrency("BTC_USDT");  // 可以设置交易对
-    // exchange.SetContractType("swap");  // 可以设置合约
-    auto assets = exchange.GetAssets();
-    Log(assets);
-}
-```
-
-期货交易所对象的```GetAssets()```函数返回当前交易对（币本位、USDT本位、USDC本位等）下的保证金资产。
-
-See also: `Asset`
-
-#### exchange.GetName
-
-```
-exchange.GetName()
-```
-
-```exchange.GetName()```函数用于获取当前交易所对象所绑定的交易所名称。
-
-Returns (string): ```exchange.GetName()```函数返回由FMZ量化交易平台定义的交易所名称。
-
-```javascript
-function main() {
-    Log("Check if exchange object is Binance spot, result:", exchange.GetName() == "Binance")
-}
-```
-
-```python
-def main():
-    Log("Check if exchange object is Binance spot, result:", exchange.GetName() == "Binance")
-```
-
-```rust
-fn main() {
-    Log!("Check if exchange object is Binance spot, result:", exchange.GetName() == "Binance");
-}
-```
-
-```cpp
-void main() {
-    Log("Check if exchange object is Binance spot, result:", exchange.GetName() == "Binance");
-}
-```
-
-```exchange.GetName()```函数通常用于识别策略代码中的```exchange```或```exchanges[1]```、```exchanges[2]```等交易所对象。加密货币期货合约交易所的名称带有固定前缀```Futures_```。
-
-See also: `exchange.GetLabel`
-
-#### exchange.GetLabel
-
-```
-exchange.GetLabel()
-```
-
-```exchange.GetLabel()```函数用于获取配置交易所对象时设置的自定义标签。
-
-Returns (string): ```exchange.GetLabel()```函数返回配置交易所对象时设置的自定义标签。
-
-```javascript
-function main() {
-    Log("exchange label:", exchange.GetLabel())
-}
-```
-
-```python
-def main():
-    Log("exchange label:", exchange.GetLabel())
-```
-
-```rust
-fn main() {
-    Log!("exchange label:", exchange.GetLabel());
-}
-```
-
-```cpp
-void main() {
-    Log("exchange label:", exchange.GetLabel());
-}
-```
-
-通过设置的标签，可在策略代码中识别```exchange```或```exchanges[1]```、```exchanges[2]```等交易所对象。
-
-See also: `exchange`
-
-#### exchange.GetCurrency
-
-```
-exchange.GetCurrency()
-```
-
-```exchange.GetCurrency()```函数用于获取当前设置的交易对。
-
-Returns (string): ```exchange.GetCurrency()```函数返回当前`exchange`交易所对象所设置的交易对。
-
-```javascript
-function main() {
-    Log("Current trading pair:", exchange.GetCurrency())
-}
-```
-
-```python
-def main():
-    Log("Current trading pair:", exchange.GetCurrency())
-```
-
-```rust
-fn main() {
-    Log!("Current trading pair:", exchange.GetCurrency());
-}
-```
-
-```cpp
-void main() {
-    Log("Current trading pair:", exchange.GetCurrency());
-}
-```
-
-交易对格式统一采用大写形式，并使用下划线分隔```baseCurrency```与```quoteCurrency```，例如：```BTC_USDT```。
-
-See also: `exchange.SetCurrency`
-
-#### exchange.SetCurrency
-
-```
-exchange.SetCurrency(currency)
-```
-
-```exchange.SetCurrency()```函数用于切换交易所对象`exchange`当前的交易对。
+监听事件，当任意```WebSocket```有可读数据，或```exchange.Go()```、```HttpQuery_Go()```等并发任务完成后返回。
 
 Parameters:
 
-- `currency` (string, required): ```currency```参数用于指定要切换的交易对。交易对格式统一为大写，并使用下划线分隔```baseCurrency```与```quoteCurrency```，例如：```BTC_USDT```。
+- `timeout` (number, optional): 参数```timeout```用于设置超时时间，单位为毫秒。
+当```timeout```设置为0时，函数会一直等待，直到有事件发生才返回；当```timeout```大于0时，表示设置事件等待的超时时间；当```timeout```小于0时，则立即返回最近的事件。
+
+Returns (object): 如果返回的对象不为空值，则返回内容中的```Event```字段表示事件的触发类型。例如以下返回值结构：
+
+```json
+
+{"Seq":1,"Event":"Exchange_GetTrades","ThreadId":0,"Index":3,"Nano":1682068771309583400}
+
+```
 
 ```javascript
 function main() {
-    var ticker = exchange.GetTicker()
-    Log(ticker)
-    Log(exchange.GetAccount())
-    // 切换交易对，注意切换后行情数据、账户信息的变化
-    exchange.SetCurrency("LTC_USDT")
-    Log("Switched to LTC_USDT")
-    ticker = exchange.GetTicker()
-    Log(ticker)
-    Log(exchange.GetAccount())
+    var routine_getTicker = exchange.Go("GetTicker")
+    var routine_getDepth = exchange.Go("GetDepth")
+    var routine_getTrades = exchange.Go("GetTrades")
+
+    // Sleep(2000)，如果这里使用Sleep语句，会导致之后的EventLoop函数错过之前的事件。因为等待了2秒，并发的函数已经收到了数据，之后才开始EventLoop监听机制，就会错过这些事件
+    // 除非在第一行代码就开始调用EventLoop(-1)，先初始化EventLoop的监听机制，才不会错过这些事件
+
+    // Log("GetDepth:", routine_getDepth.wait()) 如果这里提前调用wait函数取出GetDepth函数并发调用的结果，本次GetDepth函数收到请求结果的事件便不会在EventLoop函数中返回
+    var ts1 = new Date().getTime()
+    var ret1 = EventLoop(0)
+
+    var ts2 = new Date().getTime()
+    var ret2 = EventLoop(0)
+
+    var ts3 = new Date().getTime()
+    var ret3 = EventLoop(0)
+
+    Log("First concurrent task completed:", _D(ts1), ret1)
+    Log("Second concurrent task completed:", _D(ts2), ret2)
+    Log("Third concurrent task completed:", _D(ts3), ret3)
+
+    Log("GetTicker:", routine_getTicker.wait())
+    Log("GetDepth:", routine_getDepth.wait())
+    Log("GetTrades:", routine_getTrades.wait())
 }
 ```
 
 ```python
+import time
 def main():
-    ticker = exchange.GetTicker()
-    Log(ticker)
-    Log(exchange.GetAccount())
-    exchange.SetCurrency("LTC_USDT")
-    Log("Switched to LTC_USDT")
-    ticker = exchange.GetTicker()
-    Log(ticker)
-    Log(exchange.GetAccount())
+    routine_getTicker = exchange.Go("GetTicker")
+    routine_getDepth = exchange.Go("GetDepth")
+    routine_getTrades = exchange.Go("GetTrades")
+
+    ts1 = time.time()
+    ret1 = EventLoop(0)
+
+    ts2 = time.time()
+    ret2 = EventLoop(0)
+
+    ts3 = time.time()
+    ret3 = EventLoop(0)
+
+    Log("First concurrent task completed:", _D(ts1), ret1)
+    Log("Second concurrent task completed:", _D(ts2), ret2)
+    Log("Third concurrent task completed:", _D(ts3), ret3)
+
+    Log("GetTicker:", routine_getTicker.wait())
+    Log("GetDepth:", routine_getDepth.wait())
+    Log("GetTrades:", routine_getTrades.wait())
 ```
 
 ```rust
 fn main() {
-    let ticker = exchange.GetTicker(None).unwrap();
-    Log!(ticker);
-    Log!(exchange.GetAccount());
-    // 切换交易对，注意切换后行情数据、账户信息的变化
-    exchange.SetCurrency("LTC_USDT");
-    Log!("Switched to LTC_USDT");
-    let ticker = exchange.GetTicker(None).unwrap();
-    Log!(ticker);
-    Log!(exchange.GetAccount());
+    // Rust 中 exchange.Go 使用类型化 token（如 Go::GetTicker）而非方法名字符串，无参时传 ()
+    let routine_getTicker = exchange.Go(Go::GetTicker, ());
+    let routine_getDepth = exchange.Go(Go::GetDepth, ());
+    let routine_getTrades = exchange.Go(Go::GetTrades, ());
+
+    // Sleep(2000)，如果这里使用Sleep语句，会导致之后的EventLoop函数错过之前的事件。因为等待了2秒，并发的函数已经收到了数据，之后才开始EventLoop监听机制，就会错过这些事件
+    // 除非在第一行代码就开始调用EventLoop(-1)，先初始化EventLoop的监听机制，才不会错过这些事件
+
+    // Log!("GetDepth:", routine_getDepth.wait(0)) 如果这里提前调用wait函数取出GetDepth函数并发调用的结果，本次GetDepth函数收到请求结果的事件便不会在EventLoop函数中返回
+    let ts1 = Unix() * 1000;
+    let ret1 = EventLoop(0);
+
+    let ts2 = Unix() * 1000;
+    let ret2 = EventLoop(0);
+
+    let ts3 = Unix() * 1000;
+    let ret3 = EventLoop(0);
+
+    Log!("First concurrent task completed:", _D(ts1), ret1);
+    Log!("Second concurrent task completed:", _D(ts2), ret2);
+    Log!("Third concurrent task completed:", _D(ts3), ret3);
+
+    Log!("GetTicker:", routine_getTicker.wait(0).unwrap());
+    Log!("GetDepth:", routine_getDepth.wait(0).unwrap());
+    Log!("GetTrades:", routine_getTrades.wait(0).unwrap());
 }
 ```
 
-```cpp
-void main() {
-    auto ticker = exchange.GetTicker();
-    Log(ticker);
-    Log(exchange.GetAccount());
-    exchange.SetCurrency("LTC_USDT");
-    Log("Switched to LTC_USDT");
-    ticker = exchange.GetTicker();
-    Log(ticker);
-    Log(exchange.GetAccount());
-}
-```
+代码中首次调用```EventLoop()```函数时，才会初始化该事件监听机制。如果在事件回调发生之后才首次调用```EventLoop()```，则会错过此前的事件。系统底层封装的队列结构最多可缓存500个事件回调，如果程序运行过程中没有及时调用```EventLoop()```函数取出，超出500个缓存上限的较晚事件回调将会丢失。
 
-1、兼容```exchange.IO("currency", "BTC_USDT")```的切换方式，详见`excahnge.IO`。
+```EventLoop()```函数的调用不会影响系统底层WebSocket的缓存队列，也不会影响```exchange.Go()```等并发函数的缓存，这些缓存中的数据仍需使用各自的方法取出。对于在```EventLoop()```函数返回之前已经取出的数据，不会在```EventLoop()```函数中再次产生返回事件。
 
-  2、支持在回测系统中切换交易对，但回测系统中切换交易对时，计价币的名称不能改变。例如：```BTC_USDT```可以切换为```LTC_USDT```，但不能切换为```LTC_BTC```。
+```EventLoop()```函数的主要用途是通知策略层：系统底层已接收到新的网络数据，从而以事件驱动整个策略。当```EventLoop()```函数返回事件时，只需遍历所有数据来源（例如WebSocket连接、```exchange.Go()```创建的对象）尝试获取数据即可。
 
-  3、切换为非回测页面初始设置的交易对后，交易币的数量为0。例如：回测时回测页面上初始设置的交易对为```BTC_USDT```，```BTC```数量为3个，```USDT```数量为10000。此时立即切换为```LTC_USDT```，切换后交易币数量为0，即账户中```LTC```数量为0；切换后的交易对共享```USDT```数量，即数量仍为10000。
+```EventLoop()```函数仅支持实盘。
 
-See also: `exchange.GetCurrency`
+在主函数```main()```中调用时，监听主线程的事件。在使用```JavaScript```语言编写的策略中，也可以在```threading.Thread()```函数创建的线程的执行函数中调用，用于监听当前线程的事件。
 
-#### exchange.GetQuoteCurrency
-
-```
-exchange.GetQuoteCurrency()
-```
-
-```exchange.GetQuoteCurrency()```函数用于获取当前交易对的计价币名称，即```quoteCurrency```。
-
-Returns (string): ```exchange.GetQuoteCurrency()```函数返回当前交易对的计价币名称。
-
-```javascript
-function main() {
-    exchange.SetCurrency("BTC_USDT")
-    Log("Quote currency for BTC_USDT:", exchange.GetQuoteCurrency())
-    // exchange.SetCurrency("ETH_BTC")
-    // Log("Quote currency for ETH_BTC:", exchange.GetQuoteCurrency())
-}
-```
-
-```python
-def main():
-    exchange.SetCurrency("BTC_USDT")
-    Log("Quote currency for BTC_USDT:", exchange.GetQuoteCurrency())
-    # exchange.SetCurrency("ETH_BTC")
-    # Log("Quote currency for ETH_BTC:", exchange.GetQuoteCurrency())
-```
-
-```rust
-fn main() {
-    exchange.SetCurrency("BTC_USDT");
-    Log!("Quote currency for BTC_USDT:", exchange.GetQuoteCurrency());
-    // exchange.SetCurrency("ETH_BTC");
-    // Log!("Quote currency for ETH_BTC:", exchange.GetQuoteCurrency());
-}
-```
-
-```cpp
-void main() {
-    exchange.SetCurrency("BTC_USDT");
-    Log("Quote currency for BTC_USDT:", exchange.GetQuoteCurrency());
-    // exchange.SetCurrency("ETH_BTC")
-    // Log("Quote currency for ETH_BTC:", exchange.GetQuoteCurrency())
-}
-```
-
-例如：`exchange`交易所对象当前的交易对为```BTC_USDT```时，```exchange.GetQuoteCurrency()```函数返回```USDT```；如果当前交易对为```ETH_BTC```，则```exchange.GetQuoteCurrency()```函数返回```BTC```。
-
-See also: `exchange.GetCurrency`, `exchange.SetCurrency`
-
-### Futures
-
-#### exchange.GetPositions
-
-```
-exchange.GetPositions()
-exchange.GetPositions(symbol)
-```
-
-```exchange.GetPositions()```函数用于获取持仓信息；```GetPositions()```函数是交易所对象`exchange`的成员函数。
-
-```GetPositions()```函数用于获取交易所对象```exchange```所绑定的交易所账户的持仓信息。```exchange```对象的成员函数（方法）的用途仅与```exchange```相关，本文档之后不再赘述。
-
-Parameters:
-
-- `symbol` (string, optional): 参数```symbol```用于指定所要查询的**交易品种**或**交易品种范围**。
-
-未传入```symbol```参数时，默认以当前交易对、合约代码所在的维度范围请求所有品种的持仓数据。
-
-Returns (`Position`数组 / 空值): ```exchange.GetPositions()```函数在请求数据成功时返回`Position`结构数组，在请求数据失败时返回空值。
-
-使用期货交易所对象，对多个不同交易对、不同合约代码的品种下市价单，并通过多种方式查询持仓信息。
-
-```javascript
-/*backtest
-start: 2024-05-21 00:00:00
-end: 2024-09-05 00:00:00
-period: 5m
-basePeriod: 1m
-exchanges: [{"eid":"Futures_Binance","currency":"BTC_USDT"}]
-*/
-
-function main() {
-    var arrSymbol = ["BTC_USDT.swap", "BTC_USDT.quarter", "ETH_USDT.swap", "ETH_USDT.quarter"]
-
-    for (var symbol of arrSymbol) {
-        exchange.CreateOrder(symbol, "buy", -1, 1)
-        exchange.CreateOrder(symbol, "sell", -1, 1)
-    }
-
-    var defaultPositions = exchange.GetPositions()
-    var swapPositions = exchange.GetPositions("USDT.swap")
-    var futuresPositions = exchange.GetPositions("USDT.futures")
-    var btcUsdtSwapPositions = exchange.GetPositions("BTC_USDT.swap")
-
-    var tbls = []
-    var arr = [defaultPositions, swapPositions, futuresPositions, btcUsdtSwapPositions]
-    var tblDesc = ["defaultPositions", "swapPositions", "futuresPositions", "btcUsdtSwapPositions"]
-    for (var index in arr) {
-        var positions = arr[index]
-        var tbl = {type: "table", title: tblDesc[index], cols: ["Symbol", "MarginLevel", "Amount", "FrozenAmount", "Price", "Profit", "Type", "ContractType", "Margin"], rows: [] }
-        for (var pos of positions) {
-            tbl.rows.push([pos.Symbol, pos.MarginLevel, pos.Amount, pos.FrozenAmount, pos.Price, pos.Profit, pos.Type, pos.ContractType, pos.Margin])
-        }
-        tbls.push(tbl)
-    }
-
-    LogStatus("`" + JSON.stringify(tbls) + "`")
-
-    // 打印输出一次信息后返回，防止后续回测时订单成交，影响数据观察
-    return
-}
-```
-
-```python
-'''backtest
-start: 2024-05-21 00:00:00
-end: 2024-09-05 00:00:00
-period: 5m
-basePeriod: 1m
-exchanges: [{"eid":"Futures_Binance","currency":"BTC_USDT"}]
-'''
-
-import json
-
-def main():
-    arrSymbol = ["BTC_USDT.swap", "BTC_USDT.quarter", "ETH_USDT.swap", "ETH_USDT.quarter"]
-
-    for symbol in arrSymbol:
-        exchange.CreateOrder(symbol, "buy", -1, 1)
-        exchange.CreateOrder(symbol, "sell", -1, 1)
-
-    defaultPositions = exchange.GetPositions()
-    swapPositions = exchange.GetPositions("USDT.swap")
-    futuresPositions = exchange.GetPositions("USDT.futures")
-    btcUsdtSwapPositions = exchange.GetPositions("BTC_USDT.swap")
-
-    tbls = []
-    arr = [defaultPositions, swapPositions, futuresPositions, btcUsdtSwapPositions]
-    tblDesc = ["defaultPositions", "swapPositions", "futuresPositions", "btcUsdtSwapPositions"]
-    for index in range(len(arr)):
-        positions = arr[index]
-        tbl = {"type": "table", "title": tblDesc[index], "cols": ["Symbol", "MarginLevel", "Amount", "FrozenAmount", "Price", "Profit", "Type", "ContractType", "Margin"], "rows": []}
-        for pos in positions:
-            tbl["rows"].append([pos["Symbol"], pos["MarginLevel"], pos["Amount"], pos["FrozenAmount"], pos["Price"], pos["Profit"], pos["Type"], pos["ContractType"], pos["Margin"]])
-
-        tbls.append(tbl)
-
-    LogStatus("`" + json.dumps(tbls) + "`")
-
-    return
-```
-
-```rust
-/*backtest
-start: 2024-05-21 00:00:00
-end: 2024-09-05 00:00:00
-period: 5m
-basePeriod: 1m
-exchanges: [{"eid":"Futures_Binance","currency":"BTC_USDT"}]
-*/
-
-fn main() {
-    let arrSymbol = ["BTC_USDT.swap", "BTC_USDT.quarter", "ETH_USDT.swap", "ETH_USDT.quarter"];
-
-    for symbol in arrSymbol {
-        exchange.CreateOrder(symbol, "buy", -1, 1);
-        exchange.CreateOrder(symbol, "sell", -1, 1);
-    }
-
-    let defaultPositions = exchange.GetPositions(None).unwrap();
-    let swapPositions = exchange.GetPositions("USDT.swap").unwrap();
-    let futuresPositions = exchange.GetPositions("USDT.futures").unwrap();
-    let btcUsdtSwapPositions = exchange.GetPositions("BTC_USDT.swap").unwrap();
-
-    // Rust SDK 没有JSON序列化，使用format!拼接表格的JSON文本
-    let mut tbls: Vec<String> = Vec::new();
-    let arr = [defaultPositions, swapPositions, futuresPositions, btcUsdtSwapPositions];
-    let tblDesc = ["defaultPositions", "swapPositions", "futuresPositions", "btcUsdtSwapPositions"];
-    for (index, positions) in arr.iter().enumerate() {
-        let mut rows: Vec<String> = Vec::new();
-        for pos in positions {
-            rows.push(format!(r#"["{}", {}, {}, {}, {}, {}, {}, "{}", {}]"#, pos.Symbol, pos.MarginLevel, pos.Amount, pos.FrozenAmount, pos.Price, pos.Profit, pos.Type, pos.ContractType, pos.Margin));
-        }
-        let tbl = format!(r#"{{"type": "table", "title": "{}", "cols": ["Symbol", "MarginLevel", "Amount", "FrozenAmount", "Price", "Profit", "Type", "ContractType", "Margin"], "rows": [{}]}}"#, tblDesc[index], rows.join(","));
-        tbls.push(tbl);
-    }
-
-    LogStatus!(format!("`[{}]`", tbls.join(",")));
-
-    // 打印输出一次信息后返回，防止后续回测时订单成交，影响数据观察
-    return;
-}
-```
-
-```cpp
-/*backtest
-start: 2024-05-21 00:00:00
-end: 2024-09-05 00:00:00
-period: 5m
-basePeriod: 1m
-exchanges: [{"eid":"Futures_Binance","currency":"BTC_USDT"}]
-*/
-
-void main() {
-    auto arrSymbol = {"BTC_USDT.swap", "BTC_USDT.quarter", "ETH_USDT.swap", "ETH_USDT.quarter"};
-
-    for (const auto& symbol : arrSymbol) {
-        exchange.CreateOrder(symbol, "buy", -1, 1);
-        exchange.CreateOrder(symbol, "sell", -1, 1);
-    }
-
-    auto defaultPositions = exchange.GetPositions();
-    auto swapPositions = exchange.GetPositions("USDT.swap");
-    auto futuresPositions = exchange.GetPositions("USDT.futures");
-    auto btcUsdtSwapPositions = exchange.GetPositions("BTC_USDT.swap");
-
-    json tbls = R"([])"_json;
-    std::vector<std::vector<Position>> arr = {defaultPositions, swapPositions, futuresPositions, btcUsdtSwapPositions};
-    std::string tblDesc[] = {"defaultPositions", "swapPositions", "futuresPositions", "btcUsdtSwapPositions"};
-    for (int index = 0; index < arr.size(); index++) {
-        auto positions = arr[index];
-        json tbl = R"({
-            "type": "table",
-            "cols": ["Symbol", "MarginLevel", "Amount", "FrozenAmount", "Price", "Profit", "Type", "ContractType", "Margin"],
-            "rows": []
-        })"_json;
-        tbl["title"] = tblDesc[index];
-
-        for (const auto& pos : positions) {
-            json arrJson = R"([])"_json;
-
-            arrJson.push_back(pos.Symbol);
-            arrJson.push_back(pos.MarginLevel);
-            arrJson.push_back(pos.Amount);
-            arrJson.push_back(pos.FrozenAmount);
-            arrJson.push_back(pos.Price);
-            arrJson.push_back(pos.Profit);
-            arrJson.push_back(pos.Type);
-            arrJson.push_back(pos.ContractType);
-            arrJson.push_back(pos.Margin);
-
-            tbl["rows"].push_back(arrJson);
-        }
-
-        tbls.push_back(tbl);
-    }
-
-    LogStatus(_D(), "\n", "`" + tbls.dump() + "`");
-
-    return;
-}
-```
-
-加密货币期货合约与加密货币现货不同，现货仅有逻辑上的持仓概念。在FMZ量化交易平台的系统中，加密货币期货合约的具体品种由**交易对**、**合约代码**共同标识。可参阅`exchange.SetCurrency`、`exchange.SetContractType`函数。
-
-在```GetPositions```函数中，symbol参数的使用场景归纳如下：
-
-| 交易所对象分类 | symbol参数 | 查询范围 | 备注 |
-| - | - | - | - |
-| 期货 | 不传symbol参数 | 查询当前交易对、合约代码维度范围内的所有交易品种 | 若当前交易对为BTC_USDT，合约代码为swap，则查询所有USDT本位永续合约。等价于调用```GetPositions("USDT.swap")``` |
-| 期货 | 指定交易品种，symbol参数为："BTC_USDT.swap" | 查询指定的BTC USDT本位永续合约 | 对于期货交易所对象，symbol参数的格式为：FMZ平台定义的**交易对**与**合约代码**的组合，以字符```"."```分隔。 |
-| 期货 | 指定交易品种范围，symbol参数为："USDT.swap" | 查询所有USDT本位永续合约 | - |
-| 支持期权的期货交易所 | 不传symbol参数 | 查询当前交易对维度范围内的所有期权合约 | 若当前交易对为BTC_USDT，且合约设置为期权合约，例如币安期权合约：BTC-240108-40000-C |
-| 支持期权的期货交易所 | 指定具体交易品种 | 查询指定的期权合约 | 例如对于币安期货交易所，symbol参数为：BTC_USDT.BTC-240108-40000-C |
-| 支持期权的期货交易所 | 指定交易品种范围，symbol参数为："USDT.option" | 查询所有USDT本位期权合约 | - |
-
-在```GetPositions```函数中，期货交易所对象的查询维度范围归纳如下：
-
-| symbol参数 | 请求范围定义 | 备注 |
-| - | - | - |
-| USDT.swap          | USDT本位永续合约范围。  | 对于交易所API接口不支持的维度，调用时会报错并返回空值。 |
-| USDT.futures       | USDT本位交割合约范围。  | - |
-| USD.swap           | 币本位永续合约范围。    | - |
-| USD.futures        | 币本位交割合约范围。    | - |
-| USDT.option        | USDT本位期权合约范围。  | - |
-| USD.option         | 币本位期权合约范围。    | - |
-| USDT.futures_combo | 差价组合合约范围。      | Futures_Deribit交易所 |
-| USD.futures_ff     | 混合保证金交割合约范围。 | Futures_Kraken交易所 |
-| USD.swap_pf        | 混合保证金永续合约范围。 | Futures_Kraken交易所 |
-
-兼容```exchange.GetPosition()```调用，```GetPosition```与```GetPositions```的用法完全一致。
-
-当交易所对象```exchange```所代表的账户在**查询范围内**或**指定的交易品种**上没有持仓时，```exchange.GetPositions()```函数返回空数组，例如：```[]```。
-
-See also: `Position`, `exchange.SetCurrency`, `exchange.SetContractType`
-
-#### exchange.SetMarginLevel
-
-```
-exchange.SetMarginLevel(symbol, marginLevel)
-exchange.SetMarginLevel(marginLevel)
-```
-
-```exchange.SetMarginLevel()```函数用于设置```symbol```参数所指定的交易对、合约的杠杆值。同时兼容仅传入```marginLevel```参数的调用方式，用于设置`exchange`交易所对象当前交易对、合约的杠杆值。
-
-Parameters:
-
-- `symbol` (string, optional): ```symbol```参数用于指定需要调整杠杆值的交易对、合约。```SetMarginLevel()```函数中```symbol```参数的格式与```GetTicker()```函数中```symbol```参数的格式一致。
-- `marginLevel` (number, required): ```marginLevel```参数用于设置杠杆值。交易所的杠杆值通常为整数，部分交易所也支持浮点数形式的杠杆值设置。
-
-```javascript
-function main() {
-    exchange.SetMarginLevel(10)
-    // 设置BTC的USDT本位永续合约的杠杆为15
-    exchange.SetMarginLevel("BTC_USDT.swap", 15)
-}
-```
-
-```python
-def main():
-    exchange.SetMarginLevel(10)
-    exchange.SetMarginLevel("BTC_USDT.swap", 15)
-```
-
-```rust
-fn main() {
-    exchange.SetMarginLevel(10);
-    // Rust SDK 中SetMarginLevel函数不支持symbol参数，仅设置当前交易对、合约的杠杆值
-    // 如需设置BTC_USDT.swap品种的杠杆为15，需先切换到该交易对、合约后再调用exchange.SetMarginLevel(15)
-}
-```
-
-```cpp
-void main() {
-    exchange.SetMarginLevel(10);
-    exchange.SetMarginLevel("BTC_USDT.swap", 15);
-}
-```
-
-```exchange.SetMarginLevel()```函数仅支持加密货币期货合约交易所对象。回测系统支持调用```exchange.SetMarginLevel()```函数来设置杠杆值。
-
-对于加密货币期货合约而言，由于各加密货币期货合约交易所的杠杆机制并不统一。
-
-在某些交易所中，期货合约的杠杆值是下单接口中的一个参数，此时调用```exchange.SetMarginLevel()```函数并不会产生网络请求，仅设置FMZ系统底层中的杠杆变量（用于下单接口传参）。
-
-在另一些交易所中，期货合约的杠杆值是交易所的一项独立设置，需要通过交易所网站页面或API接口进行设置。此时调用```exchange.SetMarginLevel()```函数则会产生网络请求，并且有可能设置失败。失败原因可能有多种，例如：当前存在持仓或挂单，导致该交易对、合约无法再设置新的杠杆值。
-
-不支持```exchange.SetMarginLevel()```函数的交易所：
-
-| 函数名 | 不支持的现货交易所 | 不支持的期货交易所 |
-| - | - | - |
-| SetMarginLevel | -- | Futures_dYdX / Futures_Deribit / Futures_edgeX |
-
-See also: `exchange`
-
-#### exchange.SetDirection
-
-```
-exchange.SetDirection(direction)
-```
-
-```exchange.SetDirection()```函数用于设置调用`exchange.Buy`函数、`exchange.Sell`函数进行期货合约下单时的订单方向。
-
-Parameters:
-
-- `direction` (string, required): ```direction```参数用于设置期货合约下单时的方向，可选值为：```"buy"```、```"closesell"```、```"sell"```、```"closebuy"```。
-
-```javascript
-function main(){
-    // 举例设置为OKX期货当周合约
-    exchange.SetContractType("this_week")
-    // 设置杠杆为5倍
-    exchange.SetMarginLevel(5)
-    // 设置下单方向为做多
-    exchange.SetDirection("buy")
-    // 以10000的价格、2张合约数量下单
-    exchange.Buy(10000, 2)
-    exchange.SetMarginLevel(5)
-    exchange.SetDirection("closebuy")
-    exchange.Sell(1000, 2)
-}
-```
-
-```python
-def main():
-    exchange.SetContractType("this_week")
-    exchange.SetMarginLevel(5)
-    exchange.SetDirection("buy")
-    exchange.Buy(10000, 2)
-    exchange.SetMarginLevel(5)
-    exchange.SetDirection("closebuy")
-    exchange.Sell(1000, 2)
-```
-
-```rust
-fn main() {
-    // 注意：Rust SDK 中不推荐使用SetDirection、Buy、Sell函数，建议优先使用CreateOrder函数，
-    // CreateOrder可直接指定side参数（"buy"、"sell"、"closebuy"、"closesell"），无需先调用SetDirection
-    // 举例设置为OKX期货当周合约
-    exchange.SetContractType("this_week").unwrap();
-    // 设置杠杆为5倍
-    exchange.SetMarginLevel(5);
-    // 设置下单方向为做多
-    exchange.SetDirection("buy").unwrap();
-    // 以10000的价格、2张合约数量下单
-    exchange.Buy(10000, 2).unwrap();
-    exchange.SetMarginLevel(5);
-    exchange.SetDirection("closebuy").unwrap();
-    exchange.Sell(1000, 2).unwrap();
-}
-```
-
-```cpp
-void main() {
-    exchange.SetContractType("this_week");
-    exchange.SetMarginLevel(5);
-    exchange.SetDirection("buy");
-    exchange.Buy(10000, 2);
-    exchange.SetMarginLevel(5);
-    exchange.SetDirection("closebuy");
-    exchange.Sell(1000, 2);
-}
-```
-
-```exchange.SetDirection()```函数用于设置期货合约交易方向与下单函数之间的对应关系：
-
-|下单函数|SetDirection函数设置的方向|备注|
-|-|-|-|
-|exchange.Buy|"buy"|买入开多仓|
-|exchange.Buy|"closesell"|买入平空仓|
-|exchange.Sell|"sell"|卖出开空仓|
-|exchange.Sell|"closebuy"|卖出平多仓|
-
-See also: `exchange.Buy`, `exchange.Sell`
-
-#### exchange.SetContractType
-
-```
-exchange.SetContractType(symbol)
-```
-
-```exchange.SetContractType()```函数用于设置`exchange`交易所对象当前的合约代码。
-
-Parameters:
-
-- `symbol` (string, required): ```symbol```参数用于设置合约代码，可选值为：```"this_week"```、```"next_week"```、```"quarter"```、```"next_quarter"```、```"swap"```等。
-
-加密货币期货合约中的**交割合约**代码如无特殊说明，一般包括：
-
-- ```this_week```：当周合约。
-
-- ```next_week```：次周合约。
-
-- ```quarter```：当季合约。
-
-- ```next_quarter```：次季合约。
-
-加密货币期货合约中的**永续合约**代码如无特殊说明，一般包括：
-
-- ```swap```：永续合约。
-
-Returns (object): ```exchange.SetContractType()```函数返回一个结构体，其中包含当前合约代码对应的交易所合约代码。例如，在币安期货合约交易所中，当前合约代码为```quarter```时，该函数的返回值结构为：```{"InstrumentID":"BTCUSD_230630","instrument":"BTCUSD_230630"}```。
-
-将当前合约设置为当周合约：
-
-```javascript
-function main() {
-    // 设置为当周合约
-    exchange.SetContractType("this_week")
-}
-```
-
-```python
-def main():
-    exchange.SetContractType("this_week")
-```
-
-```rust
-fn main() {
-    // 设置为当周合约
-    exchange.SetContractType("this_week").unwrap();
-}
-```
-
-```cpp
-void main() {
-    exchange.SetContractType("this_week");
-}
-```
-
-在设置以```USDT```作为保证金的合约时，需要在代码中切换交易对（也可以在添加交易所对象时直接设置交易对）：
-
-```javascript
-function main() {
-    // 默认交易对为BTC_USD，设置合约为当周，合约为币本位合约
-    exchange.SetContractType("this_week")
-    Log("ticker:", exchange.GetTicker())
-
-    // 切换交易对，然后设置合约，切换成USDT作为保证金的合约，区别于币本位合约
-    exchange.IO("currency", "BTC_USDT")
-    exchange.SetContractType("swap")
-    Log("ticker:", exchange.GetTicker())
-}
-```
-
-```python
-def main():
-    exchange.SetContractType("this_week")
-    Log("ticker:", exchange.GetTicker())
-    exchange.IO("currency", "BTC_USDT")
-    exchange.SetContractType("swap")
-    Log("ticker:", exchange.GetTicker())
-```
-
-```rust
-fn main() {
-    // 默认交易对为BTC_USD，设置合约为当周，合约为币本位合约
-    exchange.SetContractType("this_week").unwrap();
-    Log!("ticker:", exchange.GetTicker(None));
-
-    // 切换交易对，然后设置合约，切换成USDT作为保证金的合约，区别于币本位合约
-    exchange.IO(("currency", "BTC_USDT")).unwrap();
-    exchange.SetContractType("swap").unwrap();
-    Log!("ticker:", exchange.GetTicker(None));
-}
-```
-
-```cpp
-void main() {
-    exchange.SetContractType("this_week");
-    Log("ticker:", exchange.GetTicker());
-    exchange.IO("currency", "BTC_USDT");
-    exchange.SetContractType("swap");
-    Log("ticker:", exchange.GetTicker());
-}
-```
-
-打印```exchange.SetContractType()```函数的返回值：
-
-```javascript
-function main(){
-    // 设置合约为当周
-    var ret = exchange.SetContractType("this_week")
-    // 返回当周合约的信息
-    Log(ret)
-}
-```
-
-```python
-def main():
-    ret = exchange.SetContractType("this_week")
-    Log(ret)
-```
-
-```rust
-fn main() {
-    // 设置合约为当周
-    let ret = exchange.SetContractType("this_week").unwrap();
-    // 返回当周合约的信息
-    Log!(ret);
-}
-```
-
-```cpp
-void main() {
-    auto ret = exchange.SetContractType("this_week");
-    Log(ret);
-}
-```
-
-在加密货币期货合约策略中，以切换至```BTC_USDT```交易对为例：
-
-当使用```exchange.SetCurrency("BTC_USDT")```或```exchange.IO("currency", "BTC_USDT")```函数切换交易对后，需要再次调用```exchange.SetContractType()```函数重新设置合约，才能在新的交易对下确定当前需要操作的合约。系统会根据交易对来判定该合约为**币本位合约**还是**USDT本位合约**。
-
-例如：当交易对设置为```BTC_USDT```时，使用```exchange.SetContractType("swap")```函数将合约代码设置为```swap```，此时即设置为```BTC```的**USDT本位**永续合约。若交易对为```BTC_USD```，使用```exchange.SetContractType("swap")```函数将合约代码设置为```swap```，此时则设置为```BTC```的**币本位**永续合约。
-
-详细介绍平台支持的加密货币期货合约交易所，各交易所的合约命名方式如下：
-- Futures_OKCoin（OKX）
-  设置为永续合约：```exchange.SetContractType("swap")```
-  设置为当周合约：```exchange.SetContractType("this_week")```
-  设置为次周合约：```exchange.SetContractType("next_week")```
-  设置为月度合约：```exchange.SetContractType("month")```
-  设置为次月合约：```exchange.SetContractType("next_month")```
-  设置为季度合约：```exchange.SetContractType("quarter")```
-  设置为次季合约：```exchange.SetContractType("next_quarter")```
-
-  OKX提供盘前交易合约，此类合约的交割日期为固定时间。以交易所定义的合约代码```HMSTR-USDT-250207```为例，先在发明者平台将交易对设置为```HMSTR_USDT```，然后使用```exchange.SetContractType("HMSTR-USDT-250207")```设置该合约。
-  对于支持```symbol```参数的函数（例如```exchange.GetTicker()```、```exchange.CreateOrder()```等），可以将```symbol```参数指定为```HMSTR_USDT.HMSTR-USDT-250207```，以获取该合约的行情数据或进行下单等操作。
-- Futures_HuobiDM（火币期货）
-  设置为当周合约：```exchange.SetContractType("this_week")```。
-  设置为次周合约：```exchange.SetContractType("next_week")```。
-  设置为季度合约：```exchange.SetContractType("quarter")```。
-  设置为次季合约：```exchange.SetContractType("next_quarter")```。
-  设置为永续合约：```exchange.SetContractType("swap")```。
-  支持以```USDT```作为保证金的合约。以```BTC```合约为例：调用```exchange.IO("currency", "BTC_USDT")```即可切换为以```USDT```作为保证金的合约，
-  或在配置实盘参数、添加交易所对象时直接将当前交易对设置为```BTC_USDT```。切换交易对后需重新调用```exchange.SetContractType()```函数设置合约。
-- Futures_BitMEX（BitMEX）
-  设置为永续合约：```exchange.SetContractType("swap")```。
-  Futures_BitMEX交易所的交割合约为月度合约，合约代码如下（一月至十二月）：
-  ```code
-  "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
-  ```
-  设置交割合约：```exchange.SetContractType("December")```。例如，将交易对设置为```XBT_USDT```时，调用```exchange.SetContractType("December")```函数即可设置BTC的USDT本位十二月交割合约（对应的实际合约代码为```XBTUSDTZ23```）。
-
-  Futures_BitMEX合约信息汇总
-  |Futures_BitMEX定义的合约代码|在FMZ对应的交易对|在FMZ对应的合约代码|备注|
-  | - | - | - | - |
-  | DOGEUSD | DOGE_USD | swap | 美元计价，XBT结算。XBT即BTC。 |
-  | DOGEUSDT | DOGE_USDT | swap | USDT计价，USDT结算。 |
-  | XBTETH | XBT_ETH | swap | ETH计价，XBT结算。 |
-  | XBTEUR | XBT_EUR | swap | 欧元计价（EUR），XBT结算。 |
-  | USDTUSDC | USDT_USDC | swap | USDC计价，XBT结算。 |
-  | ETHUSD_ETH | ETH_USD_ETH | swap | 美元计价，ETH结算。 |
-  | XBTH24 | XBT_USD | March | 到期日：24年3月，月份代码为H；美元计价，XBT结算。 |
-  | ETHUSDZ23 | ETH_USD | December | 到期日：23年12月，月份代码为Z；美元计价，XBT结算。 |
-  | XBTUSDTZ23 | XBT_USDT | December | 到期日：23年12月，月份代码为Z；USDT计价，USDT结算。 |
-  | ADAZ23 | ADA_XBT | December | 到期日：23年12月，月份代码为Z；XBT计价，XBT结算。 |
-  | P_XBTETFX23 | USDT_XXX | P_XBTETFX23 | 到期日：23年11月；以百分比计价，USDT结算。 |
-- Futures_GateIO
-  设置为当周合约：```exchange.SetContractType("this_week")```。
-  设置为次周合约：```exchange.SetContractType("next_week")```。
-  设置为季度合约：```exchange.SetContractType("quarter")```。
-  设置为次季合约：```exchange.SetContractType("next_quarter")```。
-  设置为永续合约：```exchange.SetContractType("swap")```。
-  支持以```USDT```作为保证金的合约。以```BTC```合约为例，调用```exchange.IO("currency", "BTC_USDT")```即可切换为以```USDT```作为保证金的合约，
-  或在配置实盘参数、添加交易所对象时直接将当前交易对设置为```BTC_USDT```。切换交易对后需重新调用```exchange.SetContractType()```函数设置合约。
-- Futures_Deribit
-  设置为永续合约：```exchange.SetContractType("swap")```。
-  支持Deribit的```USDC```合约。
-  交割合约有：```"this_week"```, ```"next_week"```, ```"month"```, ```"quarter"```, ```"next_quarter"```, ```"third_quarter"```, ```"fourth_quarter"```。
-  差价合约（future_combo）：```"this_week,swap"```, ```"next_week,swap"```, ```"next_quarter,this_week"```, ```"third_quarter,this_week"```, ```"month,next_week"```等多种组合。
-  对于期权合约，需要传入交易所定义的具体期权合约代码，详情请参阅Deribit官网。
-- Futures_KuCoin
-  币本位合约：例如将交易对设置为```BTC_USD```，再设置合约代码，即为币本位合约。
-  设置为永续合约：```exchange.SetContractType("swap")```。
-  设置为当季合约：```exchange.SetContractType("quarter")```。
-  设置为次季合约：```exchange.SetContractType("next_quarter")```。
-
-  以USDT作为保证金的合约：
-  例如将交易对设置为```BTC_USDT```，再设置合约代码，即为以USDT作为保证金的合约。
-  设置为永续合约：```exchange.SetContractType("swap")```。
-- Futures_Binance
-  币安期货交易所默认为当前交易对的永续合约，合约代码：```swap```。
-  设置为永续合约：```exchange.SetContractType("swap")```。币安的永续合约支持以```USDT```作为保证金，例如```BTC```的```USDT```本位永续合约，需将交易对设置为```BTC_USDT```；币安也支持以币作为保证金的永续合约，例如```BTC```的币本位永续合约，需将交易对设置为```BTC_USD```。
-  设置为季度合约：```exchange.SetContractType("quarter")```。交割合约包含币本位合约（即以币作为保证金），例如设置```BTC```的季度合约时，将交易对设置为```BTC_USD```，再调用```exchange.SetContractType("quarter")```，即可设置为```BTC```的币本位季度合约。
-  设置为次季合约：```exchange.SetContractType("next_quarter")```。例如设置```BTC```的币本位次季度合约时，将交易对设置为```BTC_USD```，再调用```exchange.SetContractType("next_quarter")```。
-  币安支持部分以```USDT```作为保证金的交割合约，以```BTC```为例，将交易对设置为```BTC_USDT```，再设置合约代码即可。
-
-  支持币安期权合约：
-  期权合约代码格式以交易所定义的为准，例如```BTC-241227-15000-C```、```XRP-240112-0.5-C```、```BTC-241227-15000-P```。以币安期权合约代码```BTC-241227-15000-P```为例：BTC为期权币种代码，241227为行权日期，15000为行权价格，P表示看跌期权，C表示看涨期权。
-  期权的具体类型（欧式期权或美式期权）可查阅交易所期权合约的相关资料。
-  交易所可能对期权卖方有所限制，需单独申请资格。币安期权即需要申请卖方资格。
-- Futures_Bibox
-  Bibox永续合约的合约代码：```swap```。
-  设置为永续合约：```exchange.SetContractType("swap")```。
-- Futures_Bybit
-  默认为当前交易对的永续合约，合约代码：```swap```。
-  当周合约代码：```this_week```。
-  次周合约代码：```next_week```。
-  第三周合约代码：```third_week```。
-  月度合约代码：```month```。
-  次月合约代码：```next_month```。
-  季度合约代码：```quarter```。
-  次季度合约代码：```next_quarter```。
-  第三季度合约代码：```third_quarter```。
-  直接使用交易所的合约命名：例如```ETHUSDT-04APR25```。由于bybit交易所的部分合约品种并无明确的周期性，因此直接使用交易所定义的合约代码进行命名。
-- Futures_Kraken
-  默认为当前交易对的永续合约，合约代码：```swap```。
-  ```swap```：永续合约。
-  ```month```：当月合约。
-  ```quarter```：季度合约。
-  ```next_quarter```：次季合约。
-  ```third_quarter```：第三季度合约。
-  ```swap_pf```：混合保证金永续合约。
-  ```quarter_ff```：混合保证金季度合约。
-  ```month_ff```：混合保证金当月合约。
-  ```next_quarter_ff```：混合保证金次季度合约。
-  ```third_quarter_ff```：混合保证金第三季度合约。
-  直接使用交易所的合约命名：例如```FF_ETHUSD_250307```。由于Kraken交易所的部分合约品种并无明确的周期性，因此直接使用交易所定义的合约代码进行命名。
-- Futures_Bitfinex
-  默认为当前交易对的永续合约，合约代码：```swap```。
-- Futures_Bitget
-  默认为当前交易对的永续合约，合约代码：```swap```。
-  将交易对设置为```BTC_USD```即为币本位合约，将交易对设置为```BTC_USDT```即为```USDT```结算的合约。模拟合约可将交易对设置为```SBTC_USD```、```BTC_SUSDT```。
-- Futures_dYdX (v4)
-  dYdX永续合约的合约代码：```swap```。
-  设置为永续合约：```exchange.SetContractType("swap")```。dYdX仅有```USD.swap```品种维度，使用的保证金为USDC。
-- Futures_MEXC
-  MEXC（抹茶）永续合约的合约代码：```swap```。
-  设置为永续合约：```exchange.SetContractType("swap")```。将交易对设置为```BTC_USD```即为币本位合约，将交易对设置为```BTC_USDT```即为```USDT```结算的合约。
-- Futures_Crypto
-  crypto.com交易所账户中的代币可折算为以USD计价的额度，用作合约交易的保证金。
-  设置为永续合约：```exchange.SetContractType("swap")```。例如，将交易对设置为```BTC_USD```时，调用```exchange.SetContractType("swap")```函数即可设置BTC的永续合约。
-  crypto.com交易所的交割合约为月度合约，合约代码如下（一月至十二月）：
-  ```code
-  "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
-  ```
-  设置交割合约：```exchange.SetContractType("October")```。例如，将交易对设置为```BTC_USD```时，调用```exchange.SetContractType("October")```函数即可设置BTC的十月交割合约。
-  当前时刻对应的合约代码为```BTCUSD-231027```。
-- Futures_WOO
-  Futures_WOO交易所支持```USDT```本位合约，永续合约代码为```swap```。例如，将交易对设置为```BTC_USDT```时，调用```exchange.SetContractType("swap")```函数即可将当前合约设置为BTC的USDT本位永续合约。
-- Futures_Hyperliquid
-  Futures_Hyperliquid交易所支持```USDC```本位合约，永续合约代码为```swap```。例如，将交易对设置为```ETH_USD```时，调用```exchange.SetContractType("swap")```函数即可将当前合约设置为ETH的USDC本位永续合约。
-  Futures_Hyperliquid仅有```USD.swap```品种维度，使用的保证金为USDC。
-  Futures_Hyperliquid支持HIP-3品种。
-- Futures_Lighter
-  Futures_Lighter交易所支持```USDC```本位合约，永续合约代码为```swap```。例如，将交易对设置为```BTC_USDC```时，调用```exchange.SetContractType("swap")```函数即可将当前合约设置为BTC的USDC本位永续合约。
-  Futures_Lighter仅支持永续合约。
-- Futures_Backpack
-  Futures_Backpack交易所支持```USDC```本位合约，永续合约代码为```swap```。例如，将交易对设置为```ETH_USDC```时，调用```exchange.SetContractType("swap")```函数即可将当前合约设置为ETH的USDC本位永续合约。
-- Futures_edgeX
-  Futures_edgeX交易所支持```USDT```本位合约，永续合约代码为```swap```。例如，将交易对设置为```BTC_USDT```时，调用```exchange.SetContractType("swap")```函数即可将当前合约设置为BTC的USDT本位永续合约。
-- Futures_WOOFI
-  Futures_WOOFI交易所支持```USDC```本位合约，永续合约代码为```swap```。例如，将交易对设置为```ETH_USDC```时，调用```exchange.SetContractType("swap")```函数即可将当前合约设置为ETH的USDC本位永续合约。
-- Futures_Coinw
-  Futures_Coinw交易所支持```USDT```本位合约，永续合约代码为```swap```。例如，将交易对设置为```ETH_USDT```时，调用```exchange.SetContractType("swap")```函数即可将当前合约设置为ETH的USDT本位永续合约。
-- Futures_Aster
-  Futures_Aster交易所支持```USDT```本位合约，永续合约代码为```swap```。例如，将交易对设置为```ETH_USDT```时，调用```exchange.SetContractType("swap")```函数即可将当前合约设置为ETH的USDT本位永续合约。
-- Futures_DeepCoin
-  币本位合约：例如将交易对设置为```BTC_USD```，再设置合约代码，即为币本位合约。
-  设置为永续合约：```exchange.SetContractType("swap")```。
-
-  以USDT作为保证金的合约：
-  例如将交易对设置为```BTC_USDT```，再设置合约代码，即为以USDT作为保证金的合约。
-  设置为永续合约：```exchange.SetContractType("swap")```。
-
-See also: `exchange.GetContractType`, `exchange.SetCurrency`
-
-#### exchange.GetContractType
-
-```
-exchange.GetContractType()
-```
-
-```exchange.GetContractType()```函数用于获取`exchange`交易所对象当前设置的合约代码。
-
-Returns (string): ```exchange.GetContractType()```函数返回由FMZ平台定义的合约代码，例如：```this_week```、```swap```等。
-
-```javascript
-function main () {
-    Log(exchange.SetContractType("this_week"))
-    Log(exchange.GetContractType())
-}
-```
-
-```python
-def main():
-    Log(exchange.SetContractType("this_week"))
-    Log(exchange.GetContractType())
-```
-
-```rust
-fn main() {
-    Log!(exchange.SetContractType("this_week"));
-    Log!(exchange.GetContractType());
-}
-```
-
-```cpp
-void main() {
-    Log(exchange.SetContractType("this_week"));
-    Log(exchange.GetContractType());
-}
-```
-
-See also: `exchange.SetContractType`
-
-#### exchange.GetFundings
-
-```
-exchange.GetFundings()
-exchange.GetFundings(symbol)
-```
-
-```exchange.GetFundings()```函数用于获取当前周期的资金费率数据。
-
-Parameters:
-
-- `symbol` (string, optional): 参数```symbol```用于指定所要查询的**交易品种**或**交易品种范围**。若不传入```symbol```参数，则默认以当前交易对、合约代码所在的维度范围，请求所有品种的当期资金费率数据。
-
-Returns (`Funding`数组 / 空值): ```exchange.GetFundings()```函数请求数据成功时返回`Funding`结构数组，请求数据失败时返回空值。
-
-使用期货交易所对象，在回测系统中调用```exchange.GetFundings()```函数。在调用任何行情函数之前，GetFundings 仅返回当前默认交易对的 Funding 数据；在调用行情函数之后，则会返回所有已请求过的品种的 Funding 数据。可参考以下测试示例：
-
-```javascript
-/*backtest
-start: 2024-10-01 00:00:00
-end: 2024-10-23 00:05:00
-period: 1m
-basePeriod: 1m
-exchanges: [{"eid":"Futures_Binance","currency":"SOL_USDC"}]
-*/
-
-function main() {
-    // LPT_USDT.swap 4小时周期
-    var symbols = ["SOL_USDT.swap", "ETH_USDT.swap", "LTC_USDT.swap", "SOL_USDC.swap", "ETH_USDC.swap", "BTC_USD.swap", "BTC_USDT.quarter", "LPT_USDT.swap"]
-    for (var symbol of symbols) {
-        exchange.GetTicker(symbol)
-    }
-
-    var arr = []
-    var arrParams = ["no param", "LTC_USDT.swap", "USDT.swap", "USD.swap", "USDC.swap", "USDT.futures", "BTC_USDT.quarter"]
-    for (var p of arrParams) {
-        if (p == "no param") {
-            arr.push(exchange.GetFundings())
-        } else {
-            arr.push(exchange.GetFundings(p))
-        }
-    }
-
-    var tbls = []
-    var index = 0
-    for (var fundings of arr) {
-        var tbl = {
-            "type": "table",
-            "title": arrParams[index],
-            "cols": ["Symbol", "Interval", "Time", "Rate"],
-            "rows": [],
-        }
-
-        for (var f of fundings) {
-            tbl["rows"].push([f.Symbol, f.Interval / 3600000, _D(f.Time), f.Rate * 100 + " %"])
-        }
-        tbls.push(tbl)
-        index++
-    }
-
-    LogStatus(_D(), "\n Requested symbols:", symbols, "\n`" + JSON.stringify(tbls) + "`")
-}
-```
-
-```python
-'''backtest
-start: 2024-10-01 00:00:00
-end: 2024-10-23 00:05:00
-period: 1m
-basePeriod: 1m
-exchanges: [{"eid":"Futures_Binance","currency":"SOL_USDC"}]
-'''
-
-import json
-
-def main():
-    # LPT_USDT.swap 4小时周期
-    symbols = ["SOL_USDT.swap", "ETH_USDT.swap", "LTC_USDT.swap", "SOL_USDC.swap", "ETH_USDC.swap", "BTC_USD.swap", "BTC_USDT.quarter", "LPT_USDT.swap"]
-    for symbol in symbols:
-        exchange.GetTicker(symbol)
-
-    arr = []
-    arrParams = ["no param", "LTC_USDT.swap", "USDT.swap", "USD.swap", "USDC.swap", "USDT.futures", "BTC_USDT.quarter"]
-    for p in arrParams:
-        if p == "no param":
-            arr.append(exchange.GetFundings())
-        else:
-            arr.append(exchange.GetFundings(p))
-
-    tbls = []
-    index = 0
-    for fundings in arr:
-        tbl = {
-            "type": "table",
-            "title": arrParams[index],
-            "cols": ["Symbol", "Interval", "Time", "Rate"],
-            "rows": [],
-        }
-
-        for f in fundings:
-            tbl["rows"].append([f["Symbol"], f["Interval"] / 3600000, _D(f["Time"]), str(f["Rate"] * 100) + " %"])
-
-        tbls.append(tbl)
-        index += 1
-
-    LogStatus(_D(), "\n Requested symbols:", symbols, "\n`" + json.dumps(tbls) + "`")
-```
-
-```rust
-/*backtest
-start: 2024-10-01 00:00:00
-end: 2024-10-23 00:05:00
-period: 1m
-basePeriod: 1m
-exchanges: [{"eid":"Futures_Binance","currency":"SOL_USDC"}]
-*/
-
-fn main() {
-    // LPT_USDT.swap 4小时周期
-    let symbols = ["SOL_USDT.swap", "ETH_USDT.swap", "LTC_USDT.swap", "SOL_USDC.swap", "ETH_USDC.swap", "BTC_USD.swap", "BTC_USDT.quarter", "LPT_USDT.swap"];
-    for symbol in symbols {
-        exchange.GetTicker(symbol);
-    }
-
-    let mut arr: Vec<Vec<Funding>> = Vec::new();
-    let arrParams = ["no param", "LTC_USDT.swap", "USDT.swap", "USD.swap", "USDC.swap", "USDT.futures", "BTC_USDT.quarter"];
-    for p in arrParams {
-        if p == "no param" {
-            arr.push(exchange.GetFundings(None).unwrap());
-        } else {
-            arr.push(exchange.GetFundings(p).unwrap());
-        }
-    }
-
-    // Rust SDK 没有JSON序列化，使用format!拼接表格的JSON文本
-    let mut tbls: Vec<String> = Vec::new();
-    for (index, fundings) in arr.iter().enumerate() {
-        let mut rows: Vec<String> = Vec::new();
-        for f in fundings {
-            rows.push(format!(r#"["{}", {}, "{}", "{} %"]"#, f.Symbol, f.Interval as f64 / 3600000.0, _D(f.Time), f.Rate * 100.0));
-        }
-        let tbl = format!(r#"{{"type": "table", "title": "{}", "cols": ["Symbol", "Interval", "Time", "Rate"], "rows": [{}]}}"#, arrParams[index], rows.join(","));
-        tbls.push(tbl);
-    }
-
-    LogStatus!(_D(None), "\n Requested symbols:", format!("{:?}", symbols), format!("\n`[{}]`", tbls.join(",")));
-}
-```
-
-```cpp
-/*backtest
-start: 2024-10-01 00:00:00
-end: 2024-10-23 00:05:00
-period: 1m
-basePeriod: 1m
-exchanges: [{"eid":"Futures_Binance","currency":"SOL_USDC"}]
-*/
-
-void main() {
-    // LPT_USDT.swap 4小时周期
-    json arrSymbol = R"([])"_json;
-    std::string symbols[] = {"SOL_USDT.swap", "ETH_USDT.swap", "LTC_USDT.swap", "SOL_USDC.swap", "ETH_USDC.swap", "BTC_USD.swap", "BTC_USDT.quarter", "LPT_USDT.swap"};
-    for (const std::string& symbol : symbols) {
-        exchange.GetTicker(symbol);
-        arrSymbol.push_back(symbol);
-    }
-
-    std::vector<std::vector<Funding>> arr = {};
-    std::string arrParams[] = {"no param", "LTC_USDT.swap", "USDT.swap", "USD.swap", "USDC.swap", "USDT.futures", "BTC_USDT.quarter"};
-    for (const std::string& p : arrParams) {
-        if (p == "no param") {
-            arr.push_back(exchange.GetFundings());
-        } else {
-            arr.push_back(exchange.GetFundings(p));
-        }
-    }
-
-    json tbls = R"([])"_json;
-    int index = 0;
-    for (int i = 0; i < arr.size(); i++) {
-        auto fundings = arr[i];
-
-        json tbl = R"({
-            "type": "table",
-            "cols": ["Symbol", "Interval", "Time", "Rate"],
-            "rows": []
-        })"_json;
-        tbl["title"] = arrParams[index];
-
-        for (int j = 0; j < fundings.size(); j++) {
-            auto f = fundings[j];
-            // json arrJson = {f.Symbol, f.Interval / 3600000, _D(f.Time), string(f.Rate * 100) + " %"};
-            json arrJson = {f.Symbol, f.Interval / 3600000, _D(f.Time), f.Rate};
-            tbl["rows"].push_back(arrJson);
-        }
-        tbls.push_back(tbl);
-        index++;
-    }
-
-    LogStatus(_D(), "\n Requested symbols:", arrSymbol.dump(), "\n`" + tbls.dump() + "`");
-}
-```
-
-对于不支持批量查询资金费率数据的期货交易所，若将```symbol```参数指定为查询范围（例如```USDT.swap```）或不传入```symbol```参数，接口将会报错。使用这类期货交易所对象调用```GetFundings()```函数时，必须将```symbol```参数指定为具体的某个永续合约品种，才能查询到该品种的当期资金费率数据。
-
-```exchange.GetFundings()```函数支持实盘与回测系统。
-
-不支持批量获取资金费率数据的交易所：Futures_Bitget、Futures_OKX、Futures_MEXC、Futures_Deribit、Futures_Crypto。调用时需传入```symbol```参数指定具体的品种代码，例如：```ETH_USDT.swap```。
-
-不支持```exchange.GetFundings()```函数的交易所：
-
-  | 函数名 | 不支持的现货交易所 | 不支持的期货交易所 |
-  | - | - | - |
-  | GetFundings | -- | Futures_DigiFinex |
-
-See also: `Funding`
-
-### NetSettings
-
-#### exchange.SetBase
-
-```
-exchange.SetBase(s)
-```
-
-```exchange.SetBase()```函数用于设置`exchange`交易所对象所使用的交易所API接口基地址。
-
-Parameters:
-
-- `s` (string, required): ```s```参数用于指定交易所API接口的基地址。
-
-```javascript
-function main() {
-    // 使用默认基地址
-    Log(exchange.GetTicker())
-    // 切换为https://aws.okx.com
-    exchange.SetBase("https://aws.okx.com")
-    Log(exchange.GetTicker())
-}
-```
-
-```python
-def main():
-    Log(exchange.GetTicker())
-    exchange.SetBase("https://aws.okx.com")
-    Log(exchange.GetTicker())
-```
-
-```rust
-fn main() {
-    // 使用默认基地址
-    Log!(exchange.GetTicker(None));
-    // 切换为https://aws.okx.com
-    exchange.SetBase("https://aws.okx.com");
-    Log!(exchange.GetTicker(None));
-}
-```
-
-```cpp
-void main() {
-    Log(exchange.GetTicker());
-    exchange.SetBase("https://aws.okx.com");
-    Log(exchange.GetTicker());
-}
-```
-
-回测系统不支持切换交易所API接口基地址，因为回测系统是一个沙盒模拟环境，不会真正访问交易所的API接口。
-
-See also: `exchange.IO`
-
-#### exchange.GetBase
-
-```
-exchange.GetBase()
-```
-
-```exchange.GetBase()``` 函数用于获取当前交易所 API 接口的基础地址。
-
-Returns (string): 当前交易所 API 接口的基础地址。
-
-```javascript
-function main() {
-    Log(exchange.GetBase())
-}
-```
-
-```python
-def main():
-    Log(exchange.GetBase())
-```
-
-```rust
-fn main() {
-    Log!(exchange.GetBase());
-}
-```
-
-```cpp
-void main() {
-    Log(exchange.GetBase());
-}
-```
-
-See also: `exchange.SetBase`
-
-#### exchange.SetProxy
-
-```
-exchange.SetProxy(proxy)
-```
-
-```exchange.SetProxy()```函数用于设置`exchange`交易所对象的代理配置。
-
-Parameters:
-
-- `proxy` (string, required): ```proxy```参数用于指定代理配置。
-
-为`exchange`交易所对象配置```socks5```代理：
-
-```javascript
-function main() {
-    exchange.SetProxy("socks5://192.168.1.10:8080")
-    // 如果无法访问交易所行情接口，设置一个可用的socks5代理即可访问行情接口
-    Log(exchange.GetTicker())
-}
-```
-
-```python
-def main():
-    exchange.SetProxy("socks5://192.168.1.10:8080")
-    Log(exchange.GetTicker())
-```
-
-```rust
-fn main() {
-    exchange.SetProxy("socks5://192.168.1.10:8080");
-    // 如果无法访问交易所行情接口，设置一个可用的socks5代理即可访问行情接口
-    Log!(exchange.GetTicker(None));
-}
-```
-
-```cpp
-void main() {
-    exchange.SetProxy("socks5://192.168.1.10:8080");
-    Log(exchange.GetTicker());
-}
-```
-
-除了**全局指定**`exchange`交易所对象发出请求所使用的IP地址外，也支持基于`exchange`单独指定IP地址：
-
-```javascript
-function main(){
-    exchange.SetProxy("ip://10.0.3.15")
-    // 发出请求的IP地址为10.0.3.15
-    exchange.GetTicker()
-}
-```
-
-```python
-def main():
-    exchange.SetProxy("ip://10.0.3.15")
-    exchange.GetTicker()
-```
-
-```rust
-fn main() {
-    exchange.SetProxy("ip://10.0.3.15");
-    // 发出请求的IP地址为10.0.3.15
-    let _ = exchange.GetTicker(None);
-}
-```
-
-```cpp
-void main() {
-    exchange.SetProxy("ip://10.0.3.15");
-    exchange.GetTicker();
-}
-```
-
-如果代理设置失败，调用```exchange.SetProxy()```函数时将返回空值。
-
-```exchange.SetProxy()```函数的代理设置功能仅支持```rest```协议。每个`exchange`交易所对象可以设置一个代理，设置代理后，对该`exchange`交易所对象所绑定交易所接口的访问都会通过该代理进行。
-
-支持设置```socks5```代理，以第一个添加的交易所对象`exchange`（即```exchanges[0]```）为例：
-
-- 设置代理，无用户名、无密码：```exchange.SetProxy("socks5://127.0.0.1:8889")```。
-
-- 设置代理，指定用户名和密码：```exchange.SetProxy("socks5://username:password@127.0.0.1:8889")```，其中```username```为用户名，```password```为密码。
-
-- 切换为正常模式，不使用代理：```exchange.SetProxy("")```。
-
-支持指定`exchange`交易所对象发出请求所使用的IP地址，详见[全局指定](https://www.fmz.com/user-guide#全局指定ip地址)。
-
-See also: `exchange`
-
-#### exchange.SetTimeout
-
-```
-exchange.SetTimeout(timeout)
-```
-
-```exchange.SetTimeout()```函数用于设置`exchange`交易所对象```rest```请求的超时时间。
-
-Parameters:
-
-- `timeout` (number, required): ```timeout```参数用于指定超时时间的毫秒数。
-
-```javascript
-function main() {
-    exchange.SetTimeout(3000)
-    Log(exchange.GetTicker())
-}
-```
-
-```python
-def main():
-    exchange.SetTimeout(3000)
-    Log(exchange.GetTicker())
-```
-
-```rust
-fn main() {
-    exchange.SetTimeout(3000);
-    Log!(exchange.GetTicker(None));
-}
-```
-
-```cpp
-void main() {
-    exchange.SetTimeout(3000);
-    Log(exchange.GetTicker());
-}
-```
-
-参数```timeout```为毫秒数值，1000毫秒等于1秒。该设置仅适用于```rest```协议，用于设置```rest```请求的超时时间，只需设置一次即可生效。例如：```exchange.SetTimeout(3000)```，将```exchange```交易所对象的```rest```请求超时时间设置为3秒；调用```exchange.GetTicker()```等涉及网络请求的函数时，若超过3秒未收到应答则判定为超时，发生超时的函数调用将返回空值。
-
-```SetTimeout()```不是全局函数，而是`exchange`交易所对象的方法。
-
-See also: `exchange`
-
-### Threads
-
-发明者量化交易平台从系统底层真正支持```JavaScript```语言策略的多线程功能，实现了以下对象：
-
-| 对象 | 说明 | 备注 |
-| - | - | - |
-| threading | 多线程全局对象 | 成员函数：```Thread```、```getThread```、```mainThread```等。 |
-| Thread | 线程对象 | 成员函数：```peekMessage```、```postMessage```、```join```等。 |
-| ThreadLock | 线程锁对象 | 成员函数：```acquire```、```release```。可作为线程执行函数的参数传入线程环境。 |
-| ThreadEvent | 事件对象 | 成员函数：```set```、```clear```、```wait```、```isSet```。可作为线程执行函数的参数传入线程环境。 |
-| ThreadCondition | 条件对象 | 成员函数：```notify```、```notifyAll```、```wait```、```acquire```、```release```。可作为线程执行函数的参数传入线程环境。 |
-| ThreadDict | 字典对象 | 成员函数：```get```、```set```。可作为线程执行函数的参数传入线程环境。 |
+See also: `Dial`, `exchange.Go`, `HttpQuery_Go`
 
 #### threading
 
@@ -16342,6 +13512,170 @@ function main() {
 
 See also: `getThread`, `mainThread`, `currentThread`, `Lock`,  `Condition`, `Event`, `Thread`, `pending`,  `eventLoop`
 
+##### Serve
+
+```
+Serve(serveURI, handler)
+Serve(serveURI, handler, ...args)
+```
+
+```Serve()```函数在策略进程内创建Http服务、TCP服务、Websocket服务（基于Http协议），返回`Server`对象。
+
+Parameters:
+
+- `serveURI` (string, required): ```serveURI```参数配置服务的协议、绑定地址、端口以及可选的设置，例如：```http://0.0.0.0:8088?gzip=true```，可以省略IP写成```http://:8088?gzip=true```（监听所有网卡）；端口写```0```时随机分配空闲端口，实际地址用返回对象的```addr()```获取。
+- TCP协议
+  ```serveURI```参数设置例如：```tcp://127.0.0.1:6666```。
+- Http协议
+  ```serveURI```参数设置例如：```http://127.0.0.1:6666```。Websocket服务也使用Http协议，在处理函数中调用```ctx.upgrade("websocket")```切换。
+
+可以在```?```后面加入以下设置：
+- ```gzip=true```：启用gzip压缩。
+- ```tls=true```：启用TLS加密（Https、wss、TLS加密的TCP），必须同时用```cert_pem```和```cert_key_pem```传入PEM格式的证书和私钥（内容需要URL编码），例如：```http://:8443?tls=true&cert_pem=xxxx&cert_key_pem=xxxx```。协议前缀只支持```tcp://```和```http://```，Https服务写成```http://```加```tls=true```。
+- `handler` (function, required): ```handler```参数用于传入路由处理函数（Http协议）、消息处理函数（TCP协议）、Stream处理函数（Websocket）。每个TCP连接、每个Http请求都在独立的线程中调用一次该函数。
+参数```handler```传入的回调函数可以定义多个参数，第一个参数为ctx对象（上下文对象）。
+- `arg` (string / number / bool / object / array / function / any (平台支持的任意类型), optional): 作为参数```handler```传入的**回调函数**的参数的实参，参数```arg```可能有多个，例如：
+```js
+threading.Serve("http://:8088", function(ctx, a, b, c) {
+    Log(`ctx.host():`, ctx.host(), ", a=", a, ", b=", b, ", c=", c)
+}, 1, 2, 3)
+```
+调用```Serve()```函数时传入的参数```1```, ```2```, ```3```对应传入回调函数的参数```a```, ```b```, ```c```。
+
+Returns (Server对象): 返回`Server`对象。用```addr()```获取实际监听的IP地址、端口，例如：```127.0.0.1:8088```、```[::]:8089```；用```close()```、```stop()```关闭服务。
+
+```javascript
+function main() {
+    let httpServer = threading.Serve("http://:8088?gzip=true", function (ctx) {
+        Log("http connect from: ", ctx.remoteAddr(), "->", ctx.localAddr())
+        let path = ctx.path()
+        if (path == "/") {
+            ctx.write(JSON.stringify({
+                path: ctx.path(),
+                method: ctx.method(),
+                headers: ctx.headers(),
+                cookie: ctx.header("Cookie"),
+                remote: ctx.remoteAddr(),
+                query: ctx.rawQuery()
+            }))
+        } else if (path == "/tickers") {
+            let ret = exchange.GetTickers()
+            if (!ret) {
+                ctx.setStatus(500)
+                ctx.write(GetLastError())
+            } else {
+                ctx.write(JSON.stringify(ret))
+            }
+        } else if (path == "/wss") {
+            if (ctx.upgrade("websocket")) { // upgrade to websocket
+                while (true) {
+                    let r = ctx.read(10)
+                    if (r == "") {
+                        break
+                    } else if (r) {
+                        if (r == "ticker") {
+                            ctx.write(JSON.stringify(exchange.GetTicker()))
+                        } else {
+                            ctx.write("not support")
+                        }
+                    }
+                }
+                Log("websocket closed", ctx.remoteAddr())
+            }
+        } else {
+            ctx.setStatus(404)
+        }
+    })
+    let echoServer = threading.Serve("tcp://:8089", function (ctx) {
+        Log("tcp connect from: ", ctx.remoteAddr(), "->", ctx.localAddr())
+        while (true) {
+            let d = ctx.read()
+            if (!d) {
+                break
+            }
+            ctx.write(d)
+        }
+        Log("connect closed")
+    })
+    Log("http serve on", httpServer.addr(), "tcp serve on", echoServer.addr())
+
+    for (var i = 0; i < 5; i++) {
+        if (i == 2) {
+            // test Http
+            var retHttp = HttpQuery("http://127.0.0.1:8088?num=123&limit=100", {"debug": true})
+            Log("retHttp:", retHttp)
+        } else if (i == 3) {
+            // test TCP
+            var tcpConn = Dial("tcp://127.0.0.1:8089")
+            tcpConn.write("Hello TCP Server")
+            var retTCP = tcpConn.read()
+            Log("retTCP:", retTCP)
+        } else if (i == 4) {
+            // test Websocket
+            var wsConn = Dial("ws://127.0.0.1:8088/wss|compress=gzip")
+            wsConn.write("ticker")
+            var retWS = wsConn.read(1000)
+            Log("retWS:", retWS)
+            // no depth
+            wsConn.write("depth")
+            retWS = wsConn.read(1000)
+            Log("retWS:", retWS)
+        }
+        Sleep(1000)
+    }
+    httpServer.close()
+    echoServer.close()
+}
+```
+
+```python
+# 不支持
+```
+
+- 该函数仅支持JavaScript语言策略。
+- 处理函数与`Thread`创建的线程一样运行在隔离环境中，不能引用外部变量、闭包或自定义函数，需要的数据通过```...args```传入；可以调用平台所有的API函数。`ThreadDict`、`ThreadLock`等对象也可以作为参数传入，与其它线程共享数据。
+- Http服务每个连接只处理一个请求，处理函数中```ctx.write()```写入的内容在函数返回后一次性发送。
+- 每个服务同时执行的处理函数最多64个，超出时Http请求返回```503```，TCP连接直接断开。
+- 策略停止时服务自动关闭；需要提前关闭时调用返回对象的```close()```或```stop()```。
+- ```Websocket```服务基于Http协议实现，可以在path中设置一个路由分支，设计```Websocket```消息订阅/推送的实现代码，可以参考本节范例代码。
+- 旧的全局函数```__Serve()```仍然可以使用，参数相同，返回值是监听地址字符串，相当于```threading.Serve(...).addr()```；新代码请使用```threading.Serve()```。
+
+参数```handler```传入的回调处理函数接收一个```ctx```参数。```ctx```参数为一个上下文对象，用于获取数据和写入数据，有以下方法：
+- ctx.proto()
+  应用于Http/TCP协议，调用时返回协议名称。例如：```HTTP/1.1```、```tcp```。
+- ctx.host()
+  应用于Http协议，调用时返回主机信息：IP地址、端口。
+- ctx.path()
+  应用于Http协议，调用时返回请求路径。
+- ctx.query(key)
+  应用于Http协议，调用时返回请求中query查询中key对应的值。例如发送的请求为：```http://127.0.0.1:8088?num=123```，参数```handler```传入的回调处理函数中```ctx.query("num")```调用时返回```"123"```。
+- ctx.rawQuery()
+  应用于Http协议，调用时返回请求中的原始查询（Http请求的query）。
+- ctx.headers()
+  应用于Http协议，调用时返回请求中的请求头信息。
+- ctx.header(key)
+  应用于Http协议，调用时返回指定的请求头中的某个key对应的值。例如获取当前请求的headers中的```User-Agent```：```ctx.header("User-Agent")```。
+- ctx.method()
+  应用于Http协议，调用时返回请求方法，例如```GET```、```POST```等。
+- ctx.body()
+  应用于Http协议的POST请求，调用时返回请求的正文。
+- ctx.setHeader(key, value)
+  应用于Http协议，设置应答报文的请求头信息。
+- ctx.setStatus(code)
+  应用于Http协议，设置Http报文状态码，通常在路由分支最后设置Http状态码，默认为200。
+- ctx.remoteAddr()
+  应用于Http/TCP协议，调用时返回请求中的远程客户端地址、端口。
+- ctx.localAddr()
+  应用于Http/TCP协议，调用时返回服务本地地址、端口。
+- ctx.upgrade("websocket")
+  应用于基于Http协议的Websocket协议实现，切换```ctx```上下文对象为Websocket协议；切换成功返回布尔值（真），失败返回布尔值（假）。
+- ctx.read(timeout_ms)
+  应用于基于Http协议的Websocket协议实现/TCP协议，读取Websocket连接的数据，TCP连接的数据，普通Http协议中不支持使用该```read```方法；可以指定超时时间参数```timeout_ms```，单位毫秒。超时返回```null```，对方关闭连接返回空字符串```""```。
+- ctx.write(s)
+  应用于Http/TCP协议，用于写入字符串数据，可以使用```JSON.stringify()```编码JSON对象为字符串之后写入。对于```WebSocket```协议，可以使用该方法将编码后的字符串传递给客户端。
+
+See also: `Server`, `Dial`, `HttpQuery`, `Thread`
+
 ##### pending
 
 ```
@@ -16483,6 +13817,8 @@ function main() {
 
 当线程的执行函数中调用```postMessage()```函数发送信号或数据时，会产生消息事件。可以使用```eventLoop()```函数接收消息通知。
 
+每个线程的消息队列最多保存10240条消息、合计32MB，任一上限到达时丢弃最旧的消息并输出一条警告。接收消息的线程应及时调用```peekMessage()```取走消息。
+
 See also: `peekMessage`, `join`, `terminate`, `getData`, `setData`, `id`, `name`, `eventLoop`
 
 ##### join
@@ -16498,7 +13834,7 @@ Parameters:
 
 - `timeout` (number, optional): ```timeout```参数用于设置等待线程结束的超时时间，单位为毫秒。当```timeout```参数设置为0或不设置```timeout```参数时，```join()```函数会阻塞，直到线程执行结束。当```timeout```参数设置为-1时，```join()```函数会立即返回。
 
-Returns (```ThreadRet```对象): [```ThreadRet```对象](https://www.fmz.com/syntax-guide/struct/otherstruct/Thread.join-return)包含执行结果的相关数据，包含以下属性：
+Returns (```ThreadRet```对象): [```ThreadRet```对象](/syntax-guide/struct/otherstruct/thread.join-return)包含执行结果的相关数据，包含以下属性：
 
 - id: 线程ID。
 - terminated: 线程是否被强制终止。
@@ -16712,7 +14048,7 @@ Parameters:
 
 - `timeout` (number, optional): 参数 ```timeout``` 用于设置超时时间，单位为毫秒。若 ```timeout``` 设置为 0，则一直阻塞等待，直到有事件发生才返回；若大于 0，则设置事件等待的超时时间；若小于 0，则立即返回最近的事件。
 
-Returns (object / 空值): ```eventLoop()``` 函数返回当前线程接收到的事件信息，详见[事件信息结构](https://www.fmz.com/syntax-guide/struct/otherstruct/eventloop-return)。
+Returns (object / 空值): ```eventLoop()``` 函数返回当前线程接收到的事件信息，详见[事件信息结构](/syntax-guide/struct/otherstruct/eventloop-return)。
 
 并发执行 3 个线程，输出接收到的事件信息；当超时或立即返回时，输出的是空值。
 
@@ -17120,7 +14456,187 @@ function main() {
 
 See also: `get`
 
+#### Server
+
+```Server```对象由`threading.Serve()`返回，代表一个正在运行的服务。可以作为线程执行函数的参数传入其它线程，在其它线程中查询或关闭服务。
+
+##### addr
+
+```
+addr()
+```
+
+```addr()```函数返回服务实际监听的地址和端口。
+
+Returns (string): 监听地址，例如```127.0.0.1:8088```、```[::]:8089```。端口写```0```时返回系统分配的端口。
+
+```javascript
+function main() {
+    // 端口写 0 表示随机分配空闲端口，实际地址用 addr() 获取
+    var server = threading.Serve("http://127.0.0.1:0", function (ctx) {
+        Sleep(1000)
+        ctx.write("done")
+    })
+    Log("listen on", server.addr())
+
+    // 在另一个线程里发起请求，主线程观察服务状态
+    threading.Thread(function (addr) {
+        Log("response:", HttpQuery("http://" + addr + "/"))
+    }, server.addr())
+    Sleep(200)
+    Log("pending:", server.pending())  // 1：有一个请求正在处理
+
+    server.close()                      // 不再接收新连接，正在处理的请求继续执行
+    Log("idle:", server.join(5000))     // true：服务已关闭且请求都处理完了
+}
+```
+
+See also: `close`, `stop`, `join`, `pending`, `Serve`
+
+##### close
+
+```
+close()
+```
+
+```close()```函数停止接收新连接，正在执行的处理函数继续执行完（优雅关闭）。
+
+```javascript
+function main() {
+    // 端口写 0 表示随机分配空闲端口，实际地址用 addr() 获取
+    var server = threading.Serve("http://127.0.0.1:0", function (ctx) {
+        Sleep(1000)
+        ctx.write("done")
+    })
+    Log("listen on", server.addr())
+
+    // 在另一个线程里发起请求，主线程观察服务状态
+    threading.Thread(function (addr) {
+        Log("response:", HttpQuery("http://" + addr + "/"))
+    }, server.addr())
+    Sleep(200)
+    Log("pending:", server.pending())  // 1：有一个请求正在处理
+
+    server.close()                      // 不再接收新连接，正在处理的请求继续执行
+    Log("idle:", server.join(5000))     // true：服务已关闭且请求都处理完了
+}
+```
+
+重复调用没有影响。需要等待正在执行的处理函数结束时，接着调用```join()```。
+
+See also: `addr`, `stop`, `join`, `pending`, `Serve`
+
+##### stop
+
+```
+stop()
+```
+
+```stop()```函数先关闭服务（同```close()```），再强制结束所有正在执行的处理函数线程。
+
+```javascript
+function main() {
+    // 端口写 0 表示随机分配空闲端口，实际地址用 addr() 获取
+    var server = threading.Serve("http://127.0.0.1:0", function (ctx) {
+        Sleep(1000)
+        ctx.write("done")
+    })
+    Log("listen on", server.addr())
+
+    // 在另一个线程里发起请求，主线程观察服务状态
+    threading.Thread(function (addr) {
+        Log("response:", HttpQuery("http://" + addr + "/"))
+    }, server.addr())
+    Sleep(200)
+    Log("pending:", server.pending())  // 1：有一个请求正在处理
+
+    server.close()                      // 不再接收新连接，正在处理的请求继续执行
+    Log("idle:", server.join(5000))     // true：服务已关闭且请求都处理完了
+}
+```
+
+强制结束的效果与`terminate`相同，处理函数中未发送的应答会丢失。
+
+See also: `addr`, `close`, `join`, `pending`, `Serve`
+
+##### join
+
+```
+join()
+join(timeout)
+```
+
+```join()```函数等待服务关闭且所有处理函数执行完毕。
+
+Parameters:
+
+- `timeout` (number, optional): 等待的超时时间，单位毫秒。省略或者为```0```时一直等待（策略停止时返回）。
+
+Returns (bool): 服务已关闭且没有正在执行的处理函数时返回```true```，超时返回```false```。
+
+```javascript
+function main() {
+    // 端口写 0 表示随机分配空闲端口，实际地址用 addr() 获取
+    var server = threading.Serve("http://127.0.0.1:0", function (ctx) {
+        Sleep(1000)
+        ctx.write("done")
+    })
+    Log("listen on", server.addr())
+
+    // 在另一个线程里发起请求，主线程观察服务状态
+    threading.Thread(function (addr) {
+        Log("response:", HttpQuery("http://" + addr + "/"))
+    }, server.addr())
+    Sleep(200)
+    Log("pending:", server.pending())  // 1：有一个请求正在处理
+
+    server.close()                      // 不再接收新连接，正在处理的请求继续执行
+    Log("idle:", server.join(5000))     // true：服务已关闭且请求都处理完了
+}
+```
+
+服务没有关闭时```join()```会一直等到它被关闭，通常先调用```close()```再调用```join()```。
+
+See also: `addr`, `close`, `stop`, `pending`, `Serve`
+
+##### pending
+
+```
+pending()
+```
+
+```pending()```函数返回当前正在执行的处理函数数量，即正在处理的连接或请求数。
+
+Returns (number): 正在执行的处理函数数量。
+
+```javascript
+function main() {
+    // 端口写 0 表示随机分配空闲端口，实际地址用 addr() 获取
+    var server = threading.Serve("http://127.0.0.1:0", function (ctx) {
+        Sleep(1000)
+        ctx.write("done")
+    })
+    Log("listen on", server.addr())
+
+    // 在另一个线程里发起请求，主线程观察服务状态
+    threading.Thread(function (addr) {
+        Log("response:", HttpQuery("http://" + addr + "/"))
+    }, server.addr())
+    Sleep(200)
+    Log("pending:", server.pending())  // 1：有一个请求正在处理
+
+    server.close()                      // 不再接收新连接，正在处理的请求继续执行
+    Log("idle:", server.join(5000))     // true：服务已关闭且请求都处理完了
+}
+```
+
+See also: `addr`, `close`, `stop`, `join`, `Serve`
+
 ### Web3
+
+Web3交易所对象连接EVM链或TRON链的节点，通过```exchange.IO()```的各个指令读写链上数据：注册ABI后调用合约、编码解码、签名、批量查询、事件日志、发送交易和管理nonce等。本分类的文档用```exchange.IO("指令", ...)```表示每个指令，第一个参数是指令名。
+
+在去中心化交易所兑换代币请使用Uniswap交易所对象（见Uniswap分类）：它可以直接使用```exchange.GetTicker()```、```exchange.CreateOrder()```等标准函数。
 
 #### exchange.IO("abi", ...)
 
@@ -17130,29 +14646,7 @@ exchange.IO(k, address, abiContent)
 
 Forms:
 
-- `e`
-- `x`
-- `c`
-- `h`
-- `a`
-- `n`
-- `g`
-- `e`
-- `.`
-- `I`
-- `O`
-- `(`
-- `"`
-- `a`
-- `b`
-- `i`
-- `"`
-- `,`
-- ``
-- `.`
-- `.`
-- `.`
-- `)`
+- `exchange.IO("abi", ...)`
 
 在发明者量化交易平台中，区块链相关的各种功能和调用主要通过```exchange.IO()```函数实现。以下文档按照功能对```exchange.IO()```函数的各种调用方式分别进行描述。 ```exchange.IO("abi", ...)```这一调用方式用于注册ABI。
 
@@ -17164,7 +14658,7 @@ Parameters:
 
 - `k` (string, required): ```k```参数用于指定```exchange.IO()```函数的功能，设置为```"abi"```时表示该函数用于注册```ABI```。
 - `address` (string, required): ```address```参数用于指定智能合约的地址。
-- `abiContent` (string, required): ```abiContent```参数用于指定智能合约的```ABI```内容。也可以传入内置模板名称：```"weth"```、```"uniswapV3Pool"```、```"uniswapV3Factory"```、```"uniswapV3QuoterV2"```、```"uniswapV3SwapRouter02"```、```"uniswapV3PositionManager"```、```"permit2"```（PancakeSwap V3对应的合约使用相同的模板，也可以使用```"pancakeV3Pool"```等别名）。
+- `abiContent` (string, required): ```abiContent```参数用于指定智能合约的```ABI```（JSON字符串）。也可以传入内置模板名：```"weth"```（包装币的```deposit```、```withdraw```方法，别名```"wbnb"```、```"wrappedNative"```）、```"uniswapV3Pool"```、```"uniswapV3Factory"```、```"uniswapV3QuoterV2"```、```"uniswapV3SwapRouter02"```、```"uniswapV3PositionManager"```、```"permit2"```。PancakeSwap V3对应的合约使用相同模板，也可以写```"pancakeV3Pool"```、```"pancakeV3Factory"```、```"pancakeV3QuoterV2"```、```"pancakeV3SmartRouter"```、```"pancakeV3PositionManager"```，或通用别名```"v3Pool"```、```"v3Factory"```、```"v3QuoterV2"```、```"v3Router"```、```"v3PositionManager"```。模板名不存在时报错。
 
 ```javascript
 function main() {
@@ -17197,14 +14691,16 @@ function main() {
 
 如果调用的智能合约方法是标准的ERC20方法，则无需注册ABI。
 
-合约的```ABI```内容可以通过以下URL获取，只需取其中的```result```字段，例如：
+合约的```ABI```内容可以通过Etherscan的V2接口获取（需要Etherscan的API Key，```chainid```为链ID），只需取其中的```result```字段，例如：
 ```url
-https://api.etherscan.io/api?module=contract&action=getabi&address=0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45
+https://api.etherscan.io/v2/api?chainid=1&module=contract&action=getabi&address=0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45&apikey=YourApiKey
 ```
 
 通过方法名调用时，优先匹配该地址所注册ABI中的方法，其次匹配内置的ERC20方法；对于同名的重载方法，需要使用完整的方法签名加以区分，例如```"permit(address,((address,uint160,uint48,uint48),address,uint256),bytes)"```。
 
 内置模板包含常用的函数和事件定义，其中的事件定义可配合```exchange.IO("logs", ...)```、```exchange.IO("waitReceipt", ...)```进行解码；常用合约的地址可以通过```exchange.IO("contracts", ...)```获取。
+
+波场（TRON）上调用没有注册ABI的合约方法时，会自动从链上读取该合约的ABI并缓存；链上读取不到时报错，需要用```exchange.IO("abi", ...)```手动注册。
 
 #### exchange.IO("api", blockChain, ...)
 
@@ -17215,36 +14711,7 @@ exchange.IO(k, blockChain, rpcMethod, ...args)
 
 Forms:
 
-- `e`
-- `x`
-- `c`
-- `h`
-- `a`
-- `n`
-- `g`
-- `e`
-- `.`
-- `I`
-- `O`
-- `(`
-- `"`
-- `a`
-- `p`
-- `i`
-- `"`
-- `,`
-- ``
-- `"`
-- `e`
-- `t`
-- `h`
-- `"`
-- `,`
-- ``
-- `.`
-- `.`
-- `.`
-- `)`
+- `exchange.IO("api", "eth", ...)`
 
 ```exchange.IO("api", "eth", ...)```调用方式用于调用以太坊RPC方法（配置Web3交易所对象时需选择eth）。
 ```exchange.IO("api", "tron", ...)```调用方式用于调用波场RPC方法（配置Web3交易所对象时需选择tron）。
@@ -17289,7 +14756,7 @@ function main() {
 }
 ```
 
-ETH转账时，可以根据具体需求设置```{gasPrice: 11, gasLimit: 111, nonce: 111}```参数，该参数作为```exchange.IO()```函数的最后一个参数传入。可以省略其中的```nonce```以使用系统默认值，也可以不设置```gasLimit/gasPrice/nonce```，全部使用系统默认值。
+ETH转账时，可以根据具体需求设置```{gasPrice: 11, gasLimit: 111, nonce: 111}```参数，该参数作为```exchange.IO()```函数的最后一个参数传入。不需要的选项可以省略。注意普通转账不设置```gasPrice```时按固定的100 Gwei出价、```gasLimit```默认为21000，建议先用```eth_gasPrice```查询gas价格后传入。
 
 该参数还支持```data```和```dryRun```字段：```data```为任意调用数据（以```0x```开头的十六进制字符串），用于直接发送聚合器、Pendle等API返回的交易```{to, data, value}```；设置```data```时，gas价格和gasLimit按合约调用的方式由节点估算。```dryRun```设置为```true```时仅签名、不广播，返回包含```hash```、```raw```（签名后的交易）、```nonce```、```gasLimit```等字段的对象，可用于检查交易内容或交由其它渠道发送。例如：```exchange.IO("api", "eth", "send", router, value, {data: calldata, dryRun: true})```。发送前可以先使用```exchange.IO("call", router, calldata, {value: value})```进行模拟调用。未设置```nonce```时，系统会自动分配nonce并与链上保持同步，连续发送交易不会重复使用nonce，详见```exchange.IO("nonce", ...)```；交易长时间未上链时，可以使用```exchange.IO("speedUp", ...)```提高gas价格重新发送，或使用```exchange.IO("cancelTx", ...)```取消交易。
 
@@ -17387,7 +14854,11 @@ function main() {
 
 当```exchange.IO()```函数的第二个参数设置为```"eth"```时，可以直接调用以太坊节点服务器支持的RPC方法。
 
-See also: `BigInt`
+调用节点方法时原样返回节点给出的```result```。节点返回```null```时（例如交易还未上链时的```eth_getTransactionReceipt```）返回空值，不报错；节点返回错误时返回空值，```GetLastError()```中有错误信息，合约revert的原因会解码为可读文本。
+
+```exchange.IO("api", "eth", "send", toAddress, value[, options])```从当前钱包转出原生币，```value```为链上整数（wei），返回交易哈希。不带```data```的普通转账发送传统（legacy）交易：不设置```gasPrice```时固定按100 Gwei（附加一个很小的随机值）出价，不设置```gasLimit```时为21000，在以太坊主网上通常偏高，建议先用```eth_gasPrice```查询后传入。设置```data```时按合约调用处理：gas上限由节点估算，gas价格与合约写方法相同（支持EIP-1559的链发送EIP-1559交易，参看```exchange.IO("api", ...)```）。
+
+波场（TRON）上第二个参数写```"tron"```，方法名不区分大小写，例如```GetNowBlock```、```GetAccount```、```GetTransactionInfoByID```、```TRC20ContractBalance```。```send```的参数为收款地址和TRX数量（单位sun，1 TRX = 1000000 sun），返回不带```0x```的交易ID。需要签名的方法（转账、触发合约等）会自动签名并广播。未内置的全节点接口可以直接传路径和请求体：```exchange.IO("api", "tron", "/wallet/接口名", {请求体})```。
 
 #### exchange.IO("encode", ...)
 
@@ -17399,32 +14870,7 @@ exchange.IO(k, address, dataFormat, ...args)
 
 Forms:
 
-- `e`
-- `x`
-- `c`
-- `h`
-- `a`
-- `n`
-- `g`
-- `e`
-- `.`
-- `I`
-- `O`
-- `(`
-- `"`
-- `e`
-- `n`
-- `c`
-- `o`
-- `d`
-- `e`
-- `"`
-- `,`
-- ``
-- `.`
-- `.`
-- `.`
-- `)`
+- `exchange.IO("encode", ...)`
 
 ```exchange.IO("encode", ...)```函数的这种调用方式用于数据编码。
 
@@ -17504,9 +14950,13 @@ function main() {
 }
 ```
 
-```exchange.IO()```函数封装了```encode```方法，可以将函数调用编码为```hex```字符串格式并返回。具体用法可以参考平台公开的[「Uniswap V3 交易类库」模板](https://www.fmz.com/strategy/397260)。
+```exchange.IO()```函数封装了```encode```方法，可以将函数调用编码为```hex```字符串格式并返回。在Uniswap / PancakeSwap上兑换可以直接使用`Uniswap`交易所对象，不需要自己编码调用。
 
-对智能合约的方法调用进行编码时，需要先注册对应的ABI。
+编码智能合约上的方法调用时，方法可以写方法名、完整的方法签名或方法选择器；标准ERC20方法已内置，其它方法需要先注册对应的ABI。
+
+返回不带```0x```前缀的十六进制字符串。```bytesN```类型的值可以传十六进制字符串（```0x```前缀可选）或字节数值数组；```address```类型可以传波场```T```开头的地址。
+
+```exchange.IO("pack", ...)```是```exchange.IO("encode", ...)```的别名。
 
 #### exchange.IO("encodePacked", ...)
 
@@ -17516,38 +14966,7 @@ exchange.IO(k, dataFormat, ...args)
 
 Forms:
 
-- `e`
-- `x`
-- `c`
-- `h`
-- `a`
-- `n`
-- `g`
-- `e`
-- `.`
-- `I`
-- `O`
-- `(`
-- `"`
-- `e`
-- `n`
-- `c`
-- `o`
-- `d`
-- `e`
-- `P`
-- `a`
-- `c`
-- `k`
-- `e`
-- `d`
-- `"`
-- `,`
-- ``
-- `.`
-- `.`
-- `.`
-- `)`
+- `exchange.IO("encodePacked", ...)`
 
 ```exchange.IO("encodePacked", ...)```函数用于执行```encodePacked```编码操作。
 
@@ -17582,32 +15001,7 @@ exchange.IO(k, dataFormat, data)
 
 Forms:
 
-- `e`
-- `x`
-- `c`
-- `h`
-- `a`
-- `n`
-- `g`
-- `e`
-- `.`
-- `I`
-- `O`
-- `(`
-- `"`
-- `d`
-- `e`
-- `c`
-- `o`
-- `d`
-- `e`
-- `"`
-- `,`
-- ``
-- `.`
-- `.`
-- `.`
-- `)`
+- `exchange.IO("decode", ...)`
 
 ```exchange.IO("decode", ...)```调用方式用于对数据进行解码。
 
@@ -17615,9 +15009,9 @@ Parameters:
 
 - `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"decode"```时表示该函数用于数据解码。
 - `dataFormat` (string, required): ```dataFormat```参数用于指定待解码数据的类型和顺序。
-- `data` (string, required): ```data```参数用于设置待解码的数据。
+- `data` (string, required): ```data```参数为要解码的数据，十六进制字符串，```0x```前缀可选。
 
-Returns (array / string): ```exchange.IO("decode", ...)```函数返回解码后的数据。当```dataFormat```参数仅指定一项数据时，返回一个字符串；当```dataFormat```参数指定多项数据时，返回一个数组。
+Returns (string / number / bool / object / array): ```dataFormat```只有一个类型时直接返回解码后的值，有多个类型时返回数组。整数中```uint64```、```int64```及以下位宽为数字，更大位宽为十进制字符串；```address```为```0x```开头的小写地址（波场上同样返回```0x```格式）；```bytes```为不带```0x```的十六进制字符串；```bytes32```等定长```bytesN```为字节数值数组；字面元组为以```Field1```、```Field2```……为键的对象。
 
 ```exchange.IO("encode", ...)```函数的逆向操作：
 
@@ -17675,6 +15069,86 @@ function main() {
 
 在数据处理方面，```exchange.IO()```函数不仅支持编码（encode），也支持解码（decode）。
 
+```exchange.IO("unpack", ...)```是```exchange.IO("decode", ...)```的别名。
+
+#### exchange.IO("hash", ...)
+
+```
+exchange.IO(k, algo, inputFormat, outputFormat, data)
+exchange.IO(k, algo, inputFormat, outputFormat, data, keyFormat, key)
+```
+
+Forms:
+
+- `exchange.IO("hash", ...)`
+
+```exchange.IO("hash", ...)```函数的调用方式用于计算哈希摘要、HMAC，以及使用交易所对象配置的私钥签名等，参数与`Encode`函数相同。在Web3交易所对象上常用于计算```keccak256```哈希，例如方法选择器、EIP-712摘要。
+
+Parameters:
+
+- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"hash"```表示该函数用于哈希、签名等计算。
+- `algo` (string, required): ```algo```参数为算法：
+- 摘要：```"md4"```、```"md5"```、```"sha1"```、```"sha224"```、```"sha256"```、```"sha384"```（同```"sha512.384"```）、```"sha512"```、```"sha512.224"```、```"sha512.256"```、```"keccak256"```（同```"sha3.keccak256"```）、```"sha3.keccak512"```、```"sha3.224"```、```"sha3.256"```、```"sha3.384"```、```"sha3.512"```、```"ripemd160"```、```"blake2b.256"```、```"blake2b.512"```、```"blake2s.128"```、```"blake2s.256"```。传入```keyFormat```和```key```时计算HMAC（blake2s为带密钥的MAC）。
+- ```"raw"```、```"string"```：不计算，只做格式转换。
+- ```"sign"```：用secp256k1私钥对32字节的```data```签名，返回65字节的```r‖s‖v```，其中v为0或1；不传```key```时使用交易所对象配置的私钥。
+- ```"signTx"```：```data```为传统（legacy）交易的JSON，字段为```Nonce```、```GasPrice```、```GasLimit```、```To```、```Value```、```Data```、```ChainId```（字段名不区分大小写，缺少的数值按0处理），可以带```Key```字段指定私钥；返回签名后的交易。
+- ```"abi.类型"```：按ABI编码一个值，例如```"abi.uint256"```、```"abi.address"```。
+- 另外支持```"ed25519"```（及```"ed25519.seed"```、```"ed25519.sha512"```）签名，```"text.encoder.字符集"```、```"text.decoder.字符集"```字符集转换，```"aes.encrypt"```、```"aes.decrypt"```（可加```.cbc```、```.ecb```、```.cfb```，默认cbc），```"zlib"```、```"gzip"```、```"flate"```、```"br"```、```"zstd"```、```"lz4"```加```.deflate```（压缩）或```.inflate```（解压），以及```"unzip"```（返回以文件名为键的对象）。
+- `inputFormat` (string, required): ```data```的格式：```"raw"```、```"string"```（按字符串的字节）、```"hex"```（```0x```前缀可选）、```"base64"```、```"base64.url"```、```"base64.rawurl"```。
+- `outputFormat` (string, required): 输出格式：```"hex"```（不带```0x```）、```"base64"```、```"base64.url"```、```"base64.rawurl"```、```"raw"```、```"string"```（输出必须是有效的UTF-8文本）。
+- `data` (string, required): 要处理的数据，按```inputFormat```解析。
+- `keyFormat` (string, optional): ```key```的格式，取值同```inputFormat```。
+- `key` (string, optional): 密钥：HMAC的密钥、```"sign"```使用的私钥（例如```keyFormat```为```"hex"```时传私钥的十六进制）、ed25519和AES的密钥。```"ed25519"```、```"aes.*"```必须传入。AES的密钥为16、24或32字节，初始向量取密钥的前16字节，不做填充（cbc、ecb要求数据长度为16的整数倍）。
+
+Returns (string / object): 返回按```outputFormat```编码的结果；```"unzip"```返回以文件名为键的对象。调用失败返回空值，```GetLastError()```中有错误信息。
+
+计算方法选择器、HMAC、ABI编码，以及用配置的私钥对哈希签名。
+
+```javascript
+function main() {
+    // 方法选择器：keccak256("transfer(address,uint256)") 的前 4 字节
+    var h = exchange.IO("hash", "keccak256", "raw", "hex", "transfer(address,uint256)")
+    Log("selector:", "0x" + h.slice(0, 8))      // 0xa9059cbb
+
+    // 对十六进制数据求哈希，输出不带 0x
+    Log(exchange.IO("hash", "keccak256", "hex", "hex", "0x1234"))
+
+    // HMAC-SHA256：最后两个参数为密钥的格式和密钥
+    Log(exchange.IO("hash", "sha256", "string", "base64", "message", "string", "secret"))
+
+    // 按 ABI 编码一个 uint256
+    Log(exchange.IO("hash", "abi.uint256", "string", "hex", "1000"))
+
+    // 用配置的私钥对 32 字节哈希签名：65 字节 r‖s‖v，v 为 0 或 1
+    Log(exchange.IO("hash", "sign", "hex", "hex", h))
+}
+```
+
+```python
+def main():
+    # 方法选择器：keccak256("transfer(address,uint256)") 的前 4 字节
+    h = exchange.IO("hash", "keccak256", "raw", "hex", "transfer(address,uint256)")
+    Log("selector:", "0x" + h[:8])      # 0xa9059cbb
+
+    # 对十六进制数据求哈希，输出不带 0x
+    Log(exchange.IO("hash", "keccak256", "hex", "hex", "0x1234"))
+
+    # HMAC-SHA256：最后两个参数为密钥的格式和密钥
+    Log(exchange.IO("hash", "sha256", "string", "base64", "message", "string", "secret"))
+
+    # 按 ABI 编码一个 uint256
+    Log(exchange.IO("hash", "abi.uint256", "string", "hex", "1000"))
+
+    # 用配置的私钥对 32 字节哈希签名：65 字节 r‖s‖v，v 为 0 或 1
+    Log(exchange.IO("hash", "sign", "hex", "hex", h))
+```
+
+参数个数必须是4个或6个（不含```"hash"```）。
+
+```"sign"```返回的签名v为0或1，与旧版本一致；需要分别取得```r```、```s```、```v```（v为27或28）或EIP-2098紧凑签名用于合约校验时，使用```exchange.IO("sign", ...)```。
+
+以太坊（EVM）和波场（TRON）的交易所对象都可以使用。
+
 #### exchange.IO("key", ...)
 
 ```
@@ -17683,29 +15157,7 @@ exchange.IO(k, key)
 
 Forms:
 
-- `e`
-- `x`
-- `c`
-- `h`
-- `a`
-- `n`
-- `g`
-- `e`
-- `.`
-- `I`
-- `O`
-- `(`
-- `"`
-- `k`
-- `e`
-- `y`
-- `"`
-- `,`
-- ``
-- `.`
-- `.`
-- `.`
-- `)`
+- `exchange.IO("key", ...)`
 
 ```exchange.IO("key", ...)```函数用于切换私钥的调用方式。
 
@@ -17724,6 +15176,8 @@ function main() {
 
 对于切换私钥的操作：```exchange.IO("key", "xxx")```，不能使用并发方式进行切换。
 
+私钥为十六进制字符串，```0x```前缀可选。私钥无效时报错，不会切换。私钥只保存在内存中，不会写入日志；切换后，获取地址、签名和发送交易都使用新的私钥。
+
 #### exchange.IO("sign", ...)
 
 ```
@@ -17733,30 +15187,7 @@ exchange.IO(k, hash, key)
 
 Forms:
 
-- `e`
-- `x`
-- `c`
-- `h`
-- `a`
-- `n`
-- `g`
-- `e`
-- `.`
-- `I`
-- `O`
-- `(`
-- `"`
-- `s`
-- `i`
-- `g`
-- `n`
-- `"`
-- `,`
-- ``
-- `.`
-- `.`
-- `.`
-- `)`
+- `exchange.IO("sign", ...)`
 
 ```exchange.IO("sign", ...)```调用方式用于使用secp256k1私钥对32字节哈希进行签名，返回r、s、v等签名数据，适用于EIP-712结构化数据签名（如ERC-20 Permit授权、1inch限价单）等需要链下签名的场景。
 
@@ -17849,13 +15280,15 @@ function main() {
 }
 ```
 
-EIP-712签名可以直接使用，传入domain、types、message即可，无需自行计算摘要；EIP-191消息签名使用。
+EIP-712结构化数据签名可以直接使用```exchange.IO("signTypedData", ...)```，传入domain、types、message即可，不需要自己计算摘要；EIP-191消息签名使用```exchange.IO("signMessage", ...)```。
 
 返回的```s```均为低位值（不大于曲线阶的一半），符合EIP-2规范，可直接用于OpenZeppelin ```ECDSA.recover```等校验场景。
 
 合约接收```(v, r, s)```三个参数时（如ERC-20 Permit的```permit(owner, spender, value, deadline, v, r, s)```），使用```v```、```r```、```s```字段；接收```bytes signature```时，使用```signature```字段；接收EIP-2098紧凑签名```(r, vs)```时（如1inch限价单协议），使用```r```、```vs```字段。
 
 ```exchange.IO("hash", "sign", ...)```同样可以对32字节哈希进行签名，但其返回的是拼接后的65字节数据，且v为0或1，与旧版本行为保持一致；对于EIP-712等链上校验场景，建议使用```exchange.IO("sign", ...)```。
+
+```hash```不是32字节时报错。签名与链无关，波场（TRON）的交易所对象同样可用。
 
 #### exchange.IO("signTypedData", ...)
 
@@ -17868,39 +15301,7 @@ exchange.IO(k, domain, types, message, key)
 
 Forms:
 
-- `e`
-- `x`
-- `c`
-- `h`
-- `a`
-- `n`
-- `g`
-- `e`
-- `.`
-- `I`
-- `O`
-- `(`
-- `"`
-- `s`
-- `i`
-- `g`
-- `n`
-- `T`
-- `y`
-- `p`
-- `e`
-- `d`
-- `D`
-- `a`
-- `t`
-- `a`
-- `"`
-- `,`
-- ``
-- `.`
-- `.`
-- `.`
-- `)`
+- `exchange.IO("signTypedData", ...)`
 
 ```exchange.IO("signTypedData", ...)```函数的调用方式用于按照EIP-712标准对结构化数据进行签名，一次调用即可完成类型哈希、域分隔符、结构体哈希和摘要的计算并签名，适用于ERC-20 Permit、Permit2、UniswapX、CoW、1inch限价单等场景。
 
@@ -17963,37 +15364,7 @@ exchange.IO(k, message, key)
 
 Forms:
 
-- `e`
-- `x`
-- `c`
-- `h`
-- `a`
-- `n`
-- `g`
-- `e`
-- `.`
-- `I`
-- `O`
-- `(`
-- `"`
-- `s`
-- `i`
-- `g`
-- `n`
-- `M`
-- `e`
-- `s`
-- `s`
-- `a`
-- `g`
-- `e`
-- `"`
-- `,`
-- ``
-- `.`
-- `.`
-- `.`
-- `)`
+- `exchange.IO("signMessage", ...)`
 
 ```exchange.IO("signMessage", ...)```调用方式用于按照EIP-191标准（```personal_sign```）对消息进行签名，签名结果与ethers的```signMessage```、钱包的```personal_sign```一致，常用于DApp登录、链下鉴权等场景。
 
@@ -18030,33 +15401,12 @@ function main() {
 exchange.IO(k, address, method)
 exchange.IO(k, address, method, ...args)
 exchange.IO(k, address, method, value, ...args)
+exchange.IO(k, address, method, ...args, options)
 ```
 
 Forms:
 
-- `e`
-- `x`
-- `c`
-- `h`
-- `a`
-- `n`
-- `g`
-- `e`
-- `.`
-- `I`
-- `O`
-- `(`
-- `"`
-- `a`
-- `p`
-- `i`
-- `"`
-- `,`
-- ``
-- `.`
-- `.`
-- `.`
-- `)`
+- `exchange.IO("api", ...)`
 
 ```exchange.IO("api", ...)```调用方式用于调用智能合约的方法。
 
@@ -18065,11 +15415,14 @@ Parameters:
 - `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"api"```时表示该函数用于扩展调用请求。
 - `address` (string, required): ```address```参数用于指定智能合约的地址。
 - `method` (string, required): ```method```参数用于指定所要调用的智能合约方法。
-- `value` (number / string, optional): ```value```参数用于设置发送的ETH数量。如果所要执行的智能合约方法的```stateMutability```属性为```payable```，则需要传入```value```参数。```"stateMutability":"payable"```属性可以在ABI中查看，```exchange.IO()```函数会根据已注册ABI中的```stateMutability```属性判断所需的参数；如果```stateMutability```属性为```nonpayable```，则不需要传入```value```参数。
+- `value` (number / string, optional): ```value```参数为调用时附带的原生币数量（链上整数，以太坊为wei，波场为sun）。只有方法的```stateMutability```为```payable```时才需要传，并且放在方法参数之前；```exchange.IO()```函数根据已注册ABI中的```stateMutability```判断是否需要该参数，```nonpayable```、```view```等方法不传```value```参数。```stateMutability```属性可以从ABI中查看。
 - `arg` (string / number / bool / any (平台支持的任意类型), optional): ```arg```参数用于指定所要调用的智能合约方法的参数。
 ```arg```参数可能有多个，其类型与个数取决于所要调用的智能合约方法。
+- `options` (object, optional): ```options```参数为发送交易的选项，只对写方法有效，作为最后一个参数传入（参数个数比方法参数多一个时识别为选项）：```gasLimit```为gas上限，不设置时由节点估算（```eth_estimateGas```）；```gasPrice```为gas价格，设置后发送传统（legacy）交易；```nonce```指定nonce，不设置时自动分配；```dryRun```为```true```时只签名不广播。波场（TRON）只支持```gasLimit```，表示手续费上限feeLimit（单位sun）。
 
-Returns (string / number / bool / object / array / any (平台支持的任意类型)): ```exchange.IO("api", ...)```函数返回所调用的智能合约方法的返回值。
+Returns (string / number / bool / object / array): 调用只读方法（```view```、```pure```）时返回解码后的返回值：只有一个返回值时直接返回该值；有多个返回值时返回以输出参数名为键的对象，没有名字的输出依次为```ret0```、```ret1```……。```uint64```及以下位宽的整数为数字，更大的整数为十进制字符串；```address```为```0x```开头的小写地址（波场为```T```开头的地址）；```bytes```为不带```0x```的十六进制字符串；```bytes32```等定长```bytesN```为字节数值数组（例如```[17, 17, ...]```）。
+
+调用写方法时返回交易哈希（以太坊为```0x```开头的字符串，波场为不带```0x```的交易ID）；设置```dryRun```时返回包含```hash```、```raw```（签名后的交易）、```from```、```to```、```value```、```data```、```nonce```、```gasLimit```、```chainId```、```type```、```gasPrice```、```maxFeePerGas```、```maxPriorityFeePerGas```的对象。调用失败返回空值，```GetLastError()```中有错误信息。
 
 ```decimals```方法是ERC20的一个```constant```方法，不会产生gas消耗，可用于查询某个token的精度数据。
 ```decimals```方法没有参数。返回值：token的精度数据。
@@ -18100,7 +15453,7 @@ function main(){
 ```approve```方法需要传入2个参数，第一个参数为被授权的地址，第二个参数为授权的额度。返回值：txid。
 ```spender```：被授权的合约地址，例子中以字符串"spender"代替，实际使用时需要填写具体地址，例如可以是```Uniswap V3 router v1```地址。
 ```0xde0b6b3a7640000```：授权数量，此处使用十六进制字符串表示，对应的十进制数值为1e18，除以例子中的token精度单位（即1e18），即授权了1个token。
-```exchange.IO()```函数的第三个参数传入方法名```approve```，也可以写为methodId的形式，例如："0x571ac8b0"；还可以写为完整的标准方法名，例如："approve(address,uint256)"。
+```exchange.IO()```函数的第三个参数传入方法名```approve```，也可以写为methodId的形式，例如："0x095ea7b3"；还可以写为完整的标准方法名，例如："approve(address,uint256)"。
 
 ```javascript
 function main(){
@@ -18114,7 +15467,7 @@ function main(){
 
 ```multicall```方法是```Uniswap V3```的一个非```constant```方法，会产生gas消耗，用于多路径兑换代币。
 ```multicall```方法可能有多种传参方式，具体可以查询包含该方法的ABI，调用该方法之前需要先注册ABI。返回值：txid。
-具体的```multicall```方法调用例子，可以参考平台公开的[「Uniswap V3 交易类库」模板](https://www.fmz.com/strategy/397260)
+在Uniswap / PancakeSwap上兑换可以直接使用`Uniswap`交易所对象，不需要自己编码调用。
 
 以下使用伪代码来描述一些细节：
 ```
@@ -18127,7 +15480,7 @@ exchange.IO("api", ContractV3SwapRouterV2, "multicall(uint256,bytes[])", value, 
 ```data```：```data```是```multicall```方法的参数，即需要执行的打包操作数据。与```exchange.IO("api", "eth", "send", "toAddress", toAmount)```类似，调用```multicall```方法时也可以指定方法调用的```gasLimit/gasPrice/nonce```设置，同样使用伪代码来描述：
 
 ```
-exchange.IO("api", ContractV3SwapRouterV2, "multicall(uint256,bytes[])", value, deadline, data, {gasPrice: 123456, gasLimit: 21000})
+exchange.IO("api", ContractV3SwapRouterV2, "multicall(uint256,bytes[])", value, deadline, data, {gasPrice: 123456, gasLimit: 300000})
 ```
 
 可以根据具体需求设置```{gasPrice: 11, gasLimit: 111, nonce: 111}```参数，该参数作为```exchange.IO()```函数的最后一个参数传入。
@@ -18140,11 +15493,19 @@ function main() {
     var ContractV3SwapRouterV2 = "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45"
     var tokenInName = "ETH"
     var amountIn = 0.01
-    var options = {gasPrice: 5000000000, gasLimit: 21000, nonce: 100}   // 此处仅为示例，具体需根据实际场景设置
+    var options = {gasPrice: 5000000000, gasLimit: 300000, nonce: 100}   // 此处仅为示例，具体需根据实际场景设置
     var data = ""                                                       // 编码后的数据，此处为空字符串，具体需根据实际场景设置
     var tx = exchange.IO("api", ContractV3SwapRouterV2, "multicall(uint256,bytes[])", (tokenInName == 'ETH' ? amountIn : 0), (new Date().getTime() / 1000) + 3600, data, options || {})
 }
 ```
+
+只读方法通过```eth_call```在最新区块上执行，不签名、不消耗gas。
+
+写方法用配置的私钥签名后广播。不设置```gasPrice```时，支持EIP-1559的链发送EIP-1559（type 2）交易：小费取节点建议值（```eth_maxPriorityFeePerGas```）与最近20个区块实际小费中位数（```eth_feeHistory```）中的较大者，最高费用为```2 × baseFee + 小费```；不支持EIP-1559的链按节点的```eth_gasPrice```出价。
+
+不设置```nonce```时自动分配并与链上待处理计数同步，连续发送不会重复使用nonce，参看```exchange.IO("nonce", ...)```。交易发送后可以用```exchange.IO("waitReceipt", ...)```等待上链，长时间未上链时可以用```exchange.IO("speedUp", ...)```加价重发或用```exchange.IO("cancelTx", ...)```取消。
+
+声明为```nonpayable```的询价方法（如Uniswap QuoterV2）会被当作写方法签名并发送交易。只想取得返回值或预演写操作时，使用```exchange.IO("call", ...)```模拟执行。
 
 #### exchange.IO("call", ...)
 
@@ -18156,30 +15517,7 @@ exchange.IO(k, address, calldata, options)
 
 Forms:
 
-- `e`
-- `x`
-- `c`
-- `h`
-- `a`
-- `n`
-- `g`
-- `e`
-- `.`
-- `I`
-- `O`
-- `(`
-- `"`
-- `c`
-- `a`
-- `l`
-- `l`
-- `"`
-- `,`
-- ``
-- `.`
-- `.`
-- `.`
-- `)`
+- `exchange.IO("call", ...)`
 
 ```exchange.IO("call", ...)```调用方式通过```eth_call```模拟执行智能合约的任意方法（包括会修改链上状态的写入方法），该过程不签名、不广播交易、不消耗gas，适用于链上询价、交易预演以及检查交易能否成功执行。
 
@@ -18189,7 +15527,7 @@ Parameters:
 - `address` (string, required): ```address```参数用于指定智能合约的地址。
 - `method` (string, optional): ```method```参数用于指定要模拟执行的方法，可以是方法名、完整的方法签名（例如```"transfer(address,uint256)"```，用于区分重载方法）或方法选择器。使用方法名时，需要先通过```exchange.IO("abi", ...)```注册合约ABI（ERC20标准方法已内置，无需注册）。
 - `calldata` (string, optional): ```calldata```参数为完整的调用数据（以```0x```开头的十六进制字符串，由方法选择器和编码后的参数组成），例如聚合器API返回的交易```data```。传入```calldata```时无需注册ABI，函数返回原始返回数据。
-- `args` (string, number, bool, object, array, any (platform supported type), optional): ```args```参数为方法的参数，排列方式与使用```exchange.IO("api", ...)```调用合约方法时完全相同（调用```payable```方法时，第一个参数为附带的原生币数量），将```"api"```替换为```"call"```即可预演同一笔调用。最后一个参数可以是选项对象```{from, value, block, gasLimit}```：```from```用于指定执行调用的地址身份（默认为配置的钱包地址），```value```为附带的原生币数量，```block```为执行时所在的区块（默认为```"latest"```，可设置为区块高度或```"pending"```等标签），```gasLimit```为执行的gas上限。
+- `args` (string, number, bool, object, array, any (platform supported type), optional): ```args```参数为方法的参数，排列方式与```exchange.IO("api", ...)```调用合约方法时完全相同（```payable```方法第一个参数为附带的原生币数量），把```"api"```换成```"call"```即可预演同一笔调用。最后一个参数可以是选项对象```{from, value, block, gasLimit}```：```from```指定以哪个地址的身份执行（默认为配置的钱包地址，没有配置私钥时为零地址），```value```为附带的原生币数量，```block```为执行时的区块（默认```"latest"```，可设置区块高度或```"pending"```等标签），```gasLimit```为执行的gas上限。
 
 Returns (string, number, bool, object, array): 使用方法名调用时，返回按ABI解码后的返回值（有多个返回值时为对象）；方法没有返回值时，执行成功返回```true```。使用```calldata```调用时，返回原始返回数据（以```0x```开头的十六进制字符串），可以使用```exchange.IO("decode", ...)```进行解码。执行失败（合约revert）时返回空值，可以通过```GetLastError()```获取合约给出的失败原因。
 
@@ -18323,35 +15661,7 @@ exchange.IO(k, calls, options)
 
 Forms:
 
-- `e`
-- `x`
-- `c`
-- `h`
-- `a`
-- `n`
-- `g`
-- `e`
-- `.`
-- `I`
-- `O`
-- `(`
-- `"`
-- `m`
-- `u`
-- `l`
-- `t`
-- `i`
-- `c`
-- `a`
-- `l`
-- `l`
-- `"`
-- `,`
-- ``
-- `.`
-- `.`
-- `.`
-- `)`
+- `exchange.IO("multicall", ...)`
 
 ```exchange.IO("multicall", ...)```调用方式用于通过Multicall3合约在一次请求中批量读取多个合约调用的结果，适用于批量查询余额、流动池状态、报价等数据，可有效减少RPC请求次数。
 
@@ -18408,30 +15718,7 @@ exchange.IO(k, query)
 
 Forms:
 
-- `e`
-- `x`
-- `c`
-- `h`
-- `a`
-- `n`
-- `g`
-- `e`
-- `.`
-- `I`
-- `O`
-- `(`
-- `"`
-- `l`
-- `o`
-- `g`
-- `s`
-- `"`
-- `,`
-- ``
-- `.`
-- `.`
-- `.`
-- `)`
+- `exchange.IO("logs", ...)`
 
 ```exchange.IO("logs", ...)```调用方式用于查询合约的事件日志（```eth_getLogs```），并按ABI进行解码。支持按区块范围和事件的indexed参数进行过滤，可用于监控成交、到账、流动性池变化等链上事件。
 
@@ -18440,7 +15727,7 @@ Parameters:
 - `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"logs"```时表示该函数用于查询事件日志。
 - `query` (object, required): ```query```参数用于设置查询条件：```address```为合约地址（字符串或数组）；```event```为事件名称或完整的事件签名（例如```"Transfer(address,address,uint256)"```）；```filter```为按indexed参数名进行过滤的对象，值为数组时表示匹配其中任意一个值；```fromBlock```、```toBlock```用于指定区块范围（可为数字或```"latest"```等标签，负数表示相对于最新区块的偏移，默认均为```"latest"```）；也可以直接设置```topics```或```blockHash```。
 
-Returns (array): 返回日志数组，每个元素包含```address```、```blockNumber```、```transactionHash```、```logIndex```、```topics```、```data```字段；若能够按ABI解码，则还包含```event```（事件名称）和```args```（事件参数）字段。
+Returns (array): 返回日志数组，每项包含```address```（小写）、```blockNumber```、```logIndex```、```transactionIndex```（数字）、```transactionHash```、```blockHash```、```topics```、```data```、```removed```，能按ABI解码时另有```event```（事件名）和```args```（参数）。
 
 查询USDC转账事件和Uniswap流动性池的Swap事件。
 
@@ -18488,37 +15775,7 @@ exchange.IO(k, txHash, options)
 
 Forms:
 
-- `e`
-- `x`
-- `c`
-- `h`
-- `a`
-- `n`
-- `g`
-- `e`
-- `.`
-- `I`
-- `O`
-- `(`
-- `"`
-- `w`
-- `a`
-- `i`
-- `t`
-- `R`
-- `e`
-- `c`
-- `e`
-- `i`
-- `p`
-- `t`
-- `"`
-- `,`
-- ``
-- `.`
-- `.`
-- `.`
-- `)`
+- `exchange.IO("waitReceipt", ...)`
 
 ```exchange.IO("waitReceipt", ...)```调用方式用于等待交易上链并达到指定的确认数，返回交易回执及解码后的事件日志。
 
@@ -18526,7 +15783,7 @@ Parameters:
 
 - `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"waitReceipt"```时表示该函数用于等待交易回执。
 - `txHash` (string, required): ```txHash```参数为交易哈希（以```0x```开头的32字节十六进制字符串），即发送交易时```exchange.IO("api", ...)```返回的值。
-- `options` (object, optional): ```options```参数为可选的设置项```{timeout, confirmations, interval}```：```timeout```为最长等待时间（单位：毫秒，默认值为120000，最大值为600000）；```confirmations```为所需的确认数（默认值为1）；```interval```为查询间隔（单位：毫秒，默认值为1500）。
+- `options` (object, optional): ```options```参数为可选设置```{timeout, confirmations, interval}```：```timeout```为最长等待时间（毫秒，默认120000，范围1000～600000），```confirmations```为需要的确认数（默认1），```interval```为查询间隔（毫秒，默认1500，范围200～60000）。
 
 Returns (object): 返回交易回执，保留节点返回的原始字段，并做如下处理：```status```为数值（1表示成功，0表示失败），```blockNumber```为数值，```gasUsed```、```effectiveGasPrice```等字段为十进制字符串；```events```为解码后的事件数组，每个元素包含```address```、```event```、```args```、```logIndex```字段；交易执行失败时，```revertReason```为失败原因。若超时仍未上链，则返回空值，可通过```GetLastError()```获取具体的错误信息。
 
@@ -18570,31 +15827,7 @@ exchange.IO(k, nonce)
 
 Forms:
 
-- `e`
-- `x`
-- `c`
-- `h`
-- `a`
-- `n`
-- `g`
-- `e`
-- `.`
-- `I`
-- `O`
-- `(`
-- `"`
-- `n`
-- `o`
-- `n`
-- `c`
-- `e`
-- `"`
-- `,`
-- ``
-- `.`
-- `.`
-- `.`
-- `)`
+- `exchange.IO("nonce", ...)`
 
 ```exchange.IO("nonce", ...)```函数的调用方式用于查看、同步或设置发送交易时使用的nonce计数。
 
@@ -18638,33 +15871,7 @@ exchange.IO(k, txHash, options)
 
 Forms:
 
-- `e`
-- `x`
-- `c`
-- `h`
-- `a`
-- `n`
-- `g`
-- `e`
-- `.`
-- `I`
-- `O`
-- `(`
-- `"`
-- `s`
-- `p`
-- `e`
-- `e`
-- `d`
-- `U`
-- `p`
-- `"`
-- `,`
-- ``
-- `.`
-- `.`
-- `.`
-- `)`
+- `exchange.IO("speedUp", ...)`
 
 ```exchange.IO("speedUp", ...)```调用方式用于对卡住（长时间未上链）的交易进行加价重发：保持接收地址、金额、调用数据和gas上限不变，仅提高手续费。
 
@@ -18672,7 +15879,7 @@ Parameters:
 
 - `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"speedUp"```表示该函数用于加价重发交易。
 - `txHash` (string, required): ```txHash```参数为待替换的、尚未上链的交易哈希，该交易必须由当前钱包发出。
-- `options` (object, optional): ```options```参数为可选配置项：```multiplier```为手续费放大倍数；```dryRun```设置为```true```时仅签名不发送，并返回替换交易的内容。
+- `options` (object, optional): ```options```参数为可选设置：```multiplier```为手续费放大倍数，范围1.1～10，默认1.125；```dryRun```为```true```时只签名不发送，返回替换交易的内容（字段与```exchange.IO("api", ...)```设置```dryRun```时相同，另有```replaces```为被替换的交易哈希）。
 
 Returns (string, object): 返回替换交易的哈希；```dryRun```为```true```时返回替换交易的内容。
 
@@ -18701,6 +15908,10 @@ function main() {
 
 目前仅支持以太坊（EVM）链，暂不支持波场（TRON）。
 
+手续费的计算：原交易为EIP-1559交易时，小费取原小费×```multiplier```与当前建议小费中的较大者，最高费用取原最高费用×```multiplier```与```2 × baseFee + 小费```中的较大者；原交易为传统交易时，gas价格取原gas价格×```multiplier```与节点```eth_gasPrice```中的较大者。接收地址、金额、调用数据和gas上限与原交易相同。
+
+原交易在交易所对象配置的节点上查询；设置了```exchange.IO("sendBase", ...)```时，替换交易从该节点广播。
+
 #### exchange.IO("cancelTx", ...)
 
 ```
@@ -18710,34 +15921,7 @@ exchange.IO(k, txHash, options)
 
 Forms:
 
-- `e`
-- `x`
-- `c`
-- `h`
-- `a`
-- `n`
-- `g`
-- `e`
-- `.`
-- `I`
-- `O`
-- `(`
-- `"`
-- `c`
-- `a`
-- `n`
-- `c`
-- `e`
-- `l`
-- `T`
-- `x`
-- `"`
-- `,`
-- ``
-- `.`
-- `.`
-- `.`
-- `)`
+- `exchange.IO("cancelTx", ...)`
 
 ```exchange.IO("cancelTx", ...)```调用方式用于取消尚未上链的交易：使用与原交易相同的nonce，以更高的手续费发送一笔转给自己的0金额交易；该交易先上链后，原交易即失效。
 
@@ -18745,7 +15929,7 @@ Parameters:
 
 - `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"cancelTx"```时表示该函数用于取消交易。
 - `txHash` (string, required): ```txHash```参数为待替换的、尚未上链的交易哈希，该交易必须由当前钱包发出。
-- `options` (object, optional): ```options```参数为可选配置项：```multiplier```为手续费放大倍数；```dryRun```为```true```时仅签名、不发送，并返回替换交易的内容。
+- `options` (object, optional): ```options```参数为可选设置：```multiplier```为手续费放大倍数，范围1.1～10，默认1.125；```dryRun```为```true```时只签名不发送，返回替换交易的内容（字段与```exchange.IO("api", ...)```设置```dryRun```时相同，另有```replaces```为被替换的交易哈希）。
 
 Returns (string, object): 返回取消交易的哈希；启用```dryRun```时返回取消交易的内容。
 
@@ -18773,6 +15957,10 @@ function main() {
 
 目前仅支持以太坊（EVM）链，暂不支持波场（TRON）。
 
+手续费的计算：原交易为EIP-1559交易时，小费取原小费×```multiplier```与当前建议小费中的较大者，最高费用取原最高费用×```multiplier```与```2 × baseFee + 小费```中的较大者；原交易为传统交易时，gas价格取原gas价格×```multiplier```与节点```eth_gasPrice```中的较大者。取消交易的gas上限为21000。
+
+原交易在交易所对象配置的节点上查询；设置了```exchange.IO("sendBase", ...)```时，替换交易从该节点广播。
+
 #### exchange.IO("toUnits", ...)
 
 ```
@@ -18781,33 +15969,7 @@ exchange.IO(k, amount, decimals)
 
 Forms:
 
-- `e`
-- `x`
-- `c`
-- `h`
-- `a`
-- `n`
-- `g`
-- `e`
-- `.`
-- `I`
-- `O`
-- `(`
-- `"`
-- `t`
-- `o`
-- `U`
-- `n`
-- `i`
-- `t`
-- `s`
-- `"`
-- `,`
-- ``
-- `.`
-- `.`
-- `.`
-- `)`
+- `exchange.IO("toUnits", ...)`
 
 ```exchange.IO("toUnits", ...)```函数的调用方式用于将可读数量换算为链上整数。换算全程以字符串形式进行精确计算，不经过浮点数运算。
 
@@ -18847,35 +16009,7 @@ exchange.IO(k, amount, decimals)
 
 Forms:
 
-- `e`
-- `x`
-- `c`
-- `h`
-- `a`
-- `n`
-- `g`
-- `e`
-- `.`
-- `I`
-- `O`
-- `(`
-- `"`
-- `f`
-- `r`
-- `o`
-- `m`
-- `U`
-- `n`
-- `i`
-- `t`
-- `s`
-- `"`
-- `,`
-- ``
-- `.`
-- `.`
-- `.`
-- `)`
+- `exchange.IO("fromUnits", ...)`
 
 ```exchange.IO("fromUnits", ...)```调用方式用于将链上整数值换算为可读数量，整个换算过程基于字符串进行精确计算，不经过浮点数运算，避免精度损失。
 
@@ -18915,35 +16049,7 @@ exchange.IO(k, fn, ...args)
 
 Forms:
 
-- `e`
-- `x`
-- `c`
-- `h`
-- `a`
-- `n`
-- `g`
-- `e`
-- `.`
-- `I`
-- `O`
-- `(`
-- `"`
-- `u`
-- `n`
-- `i`
-- `s`
-- `w`
-- `a`
-- `p`
-- `V`
-- `3`
-- `"`
-- `,`
-- ``
-- `.`
-- `.`
-- `.`
-- `)`
+- `exchange.IO("uniswapV3", ...)`
 
 ```exchange.IO("uniswapV3", ...)```调用方式用于集中流动性（Uniswap V3）相关的计算，包括tick、价格与sqrtPriceX96之间的换算，以及流动性与代币数量之间的换算。适用于Uniswap v3/v4、PancakeSwap v3、Aerodrome Slipstream、SushiSwap v3等采用相同公式的协议。
 
@@ -19002,35 +16108,7 @@ exchange.IO(k, chainId)
 
 Forms:
 
-- `e`
-- `x`
-- `c`
-- `h`
-- `a`
-- `n`
-- `g`
-- `e`
-- `.`
-- `I`
-- `O`
-- `(`
-- `"`
-- `c`
-- `o`
-- `n`
-- `t`
-- `r`
-- `a`
-- `c`
-- `t`
-- `s`
-- `"`
-- `,`
-- ``
-- `.`
-- `.`
-- `.`
-- `)`
+- `exchange.IO("contracts", ...)`
 
 ```exchange.IO("contracts", ...)```调用方式用于获取当前链（或指定链）的常用合约地址，包括主流代币、Multicall3、Permit2，以及Uniswap V3、PancakeSwap V3的Factory、路由、QuoterV2和头寸管理合约。
 
@@ -19039,7 +16117,7 @@ Parameters:
 - `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"contracts"```时表示该函数用于获取常用合约地址。
 - `chainId` (number, optional): ```chainId```参数用于指定链ID，未传入时默认使用当前节点所在的链。目前支持的链：以太坊（1）、BNB Smart Chain（56）、Base（8453）、Arbitrum One（42161）。
 
-Returns (object): 返回对象的结构为```{chainId, name, wrappedNative, tokens, multicall3, permit2, uniswapV3, pancakeV3}```。其中，```tokens```中的每一项为```{address, decimals}```；```uniswapV3```和```pancakeV3```均包含```factory```、```router```（Uniswap为SwapRouter02，PancakeSwap为SmartRouter）、```quoterV2```、```positionManager```。对于不支持的链，函数返回空值并报错。
+Returns (object): 返回```{chainId, name, wrappedNative, tokens, multicall3, permit2, uniswapV3, pancakeV3}```：```name```为链名称；```wrappedNative```为包装币在```tokens```中的名称（如```"WETH"```、```"WBNB"```）；```tokens```的每一项为```{address, decimals}```；```uniswapV3```、```pancakeV3```包含```factory```、```router```（Uniswap为SwapRouter02，PancakeSwap为SmartRouter）、```quoterV2```、```positionManager```。不支持的链返回空值并报错。
 
 查看当前链的常用合约地址，并使用QuoterV2进行询价。
 
@@ -19069,44 +16147,27 @@ function main() {
 
 配合```exchange.IO("abi", ...)```的内置模板使用，无需手动编写ABI即可直接调用这些合约。
 
+目前仅支持以太坊（EVM）链，波场（TRON）不支持。
+
 #### exchange.IO("address")
 
 ```
 exchange.IO(k)
+exchange.IO(k, key)
 ```
 
 Forms:
 
-- `e`
-- `x`
-- `c`
-- `h`
-- `a`
-- `n`
-- `g`
-- `e`
-- `.`
-- `I`
-- `O`
-- `(`
-- `"`
-- `a`
-- `d`
-- `d`
-- `r`
-- `e`
-- `s`
-- `s`
-- `"`
-- `)`
+- `exchange.IO("address")`
 
-```exchange.IO("address")```函数用于获取`exchange`交易所对象所配置钱包的地址。
+```exchange.IO("address")```函数的调用方式用于获取`exchange`交易所对象配置的钱包的地址。传入私钥时返回该私钥对应的钱包地址。
 
 Parameters:
 
 - `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能。当设置为```"address"```时，表示该函数用于获取已配置的钱包地址。
+- `key` (string, optional): ```key```参数为私钥（十六进制字符串，```0x```前缀可选），返回该私钥对应的钱包地址，不会切换交易所对象使用的私钥（切换请使用```exchange.IO("key", ...)```）。不传时使用配置的私钥。
 
-Returns (string): ```exchange.IO("address")```函数返回已配置的钱包地址。
+Returns (string): 返回钱包地址：以太坊（EVM）为```0x```开头的小写地址，波场（TRON）为```T```开头的地址。私钥无效时返回空值。
 
 ```javascript
 function main() {
@@ -19117,44 +16178,22 @@ function main() {
 #### exchange.IO("base", ...)
 
 ```
+exchange.IO(k)
 exchange.IO(k, address)
 ```
 
 Forms:
 
-- `e`
-- `x`
-- `c`
-- `h`
-- `a`
-- `n`
-- `g`
-- `e`
-- `.`
-- `I`
-- `O`
-- `(`
-- `"`
-- `b`
-- `a`
-- `s`
-- `e`
-- `"`
-- `,`
-- ``
-- `.`
-- `.`
-- `.`
-- `)`
+- `exchange.IO("base", ...)`
 
 ```exchange.IO("base", ...)```调用方式用于设置RPC节点地址，支持设置多个节点互为备用。
 
 Parameters:
 
 - `k` (string, required): ```k```参数用于指定```exchange.IO()```函数的功能，设置为```"base"```时表示该函数用于切换RPC节点。
-- `address` (string, array, required): ```address```参数用于设置RPC节点地址。设置多个节点时，可传入地址数组或以逗号分隔的字符串。
+- `address` (string, array, optional): ```address```参数为节点地址。以太坊（EVM）支持```http(s)://```和```ws(s)://```地址；设置多个节点时传入地址数组，或用逗号（也可以是空格、换行）分隔的字符串。波场（TRON）只支持一个全节点HTTP地址，旧的gRPC地址```grpc.trongrid.io:50051```、```grpc.nile.trongrid.io:50051```、```grpc.shasta.trongrid.io:50051```会换成对应的HTTP地址，其它非HTTP地址报错。不传时只查询当前的节点地址。
 
-Returns (string): 返回设置前的节点地址（设置了多个节点时，返回以逗号分隔的字符串）。
+Returns (string): 设置时返回设置前的节点地址（多个节点时为逗号分隔的字符串）；不传```address```时返回当前的节点地址。
 
 ```javascript
 function main() {
@@ -19178,6 +16217,8 @@ function main() {
 
 每个节点首次使用时会校验chainId，与第一个可用节点所在链不一致的节点将不会被使用，以避免将交易发送到其他链。日志中的节点地址仅显示协议和域名，不包含路径中的API Key。
 
+切换节点后重新获取链ID。多个节点互为备用只适用于以太坊（EVM），波场（TRON）不支持。
+
 #### exchange.IO("sendBase", ...)
 
 ```
@@ -19187,34 +16228,7 @@ exchange.IO(k, url)
 
 Forms:
 
-- `e`
-- `x`
-- `c`
-- `h`
-- `a`
-- `n`
-- `g`
-- `e`
-- `.`
-- `I`
-- `O`
-- `(`
-- `"`
-- `s`
-- `e`
-- `n`
-- `d`
-- `B`
-- `a`
-- `s`
-- `e`
-- `"`
-- `,`
-- ``
-- `.`
-- `.`
-- `.`
-- `)`
+- `exchange.IO("sendBase", ...)`
 
 ```exchange.IO("sendBase", ...)```调用方式用于设置仅用于广播交易的节点。设置后，读取数据、查询nonce、估算gas等请求仍使用交易所对象配置的节点，而签名后的交易仅发送至该节点。该功能适用于Flashbots Protect、MEV Blocker等私有交易通道，可避免交易进入公开交易池后遭到抢跑或三明治攻击。
 
@@ -19243,9 +16257,437 @@ function main() {
 
 发送至该节点的请求不会携带交易所对象所配置节点的鉴权信息（ApiKey）。
 
-该设置仅影响通过```exchange.IO("api", ...)```发送的交易（转账和合约写入操作）；使用```dryRun```时不会实际发送交易。
+影响```exchange.IO("api", ...)```发送的交易（转账和合约写操作）以及```exchange.IO("speedUp", ...)```、```exchange.IO("cancelTx", ...)```的替换交易，```dryRun```时不会发送。
 
 目前仅支持以太坊（EVM）链，暂不支持波场（TRON）。
+
+### Uniswap
+
+Uniswap交易所对象在一条链上（Ethereum、Arbitrum、Base、BNB Chain）连接Uniswap或PancakeSwap的V2、V3池子，把链上兑换映射为现货交易函数：
+
+| 函数 | Uniswap交易所的行为 |
+| - | - |
+| exchange.GetTicker() | 买一、卖一为约1000美元规模的实际可成交价；链上没有24小时统计 |
+| exchange.GetDepth() | 由逐档递增规模的链上询价推算 |
+| exchange.GetTrades() | 该交易对各个池子最近的链上成交 |
+| exchange.GetAssets() | 原生币和代币表中各代币的钱包余额 |
+| exchange.CreateOrder() | 立即在链上兑换：限价为最差成交价，市价按滑点保护；市价买入时数量为要花费的计价币 |
+| exchange.GetOrder() | 订单ID是交易哈希，状态来自交易回执 |
+| exchange.CancelOrder() | 发送同nonce的替换交易；交易上链后无法撤单 |
+
+不支持```exchange.GetRecords()```、```exchange.GetHistoryOrders()```、```exchange.GetTickers()```。交易对写作```ETH_USDC```，原生币（ETH、BNB）与包装币（WETH、WBNB）是两个不同的资产。下面的```exchange.IO()```指令用于转账、询价、模拟下单和兑换参数设置。
+
+#### exchange.IO("transfer", ...)
+
+```
+exchange.IO(k, to, amount)
+exchange.IO(k, to, amount, token)
+```
+
+Forms:
+
+- `exchange.IO("transfer", ...)`
+
+```exchange.IO("transfer", ...)```调用方式用于从Uniswap交易所对象所配置的钱包中转出链上原生币（如ETH、BNB）或ERC20代币。
+
+Parameters:
+
+- `k` (string, required): ```k```参数用于指定```exchange.IO()```函数的功能。设置为```"transfer"```时，该函数用于执行转账。
+- `to` (string, required): ```to```参数为收款地址，即以```0x```开头的20字节十六进制地址，且必须是交易所对象所在链上的地址。
+- `amount` (string / number, required): ```amount```参数为转账数量，采用可读单位（例如```"0.05"```表示0.05个ETH）。建议以字符串形式传入，函数会按代币精度进行精确换算；若小数位数超出代币精度则直接报错，不会静默截断。设置为```"all"```表示全部转出：转原生币时，按本次交易手续费上限预留后转出剩余全部余额；转代币时，转出全部代币余额。
+- `token` (string, optional): ```token```参数用于指定要转出的代币，可以是代币名称（如```"USDC"```，须为内置代币或已通过```exchange.IO("token", ...)```登记的代币），也可以是代币合约地址。不传入该参数时表示转出原生币。
+
+Returns (object / 空值): 交易广播成功时返回```{txHash, from, to, token, tokenAddress, amount, raw}```：其中```txHash```为交易哈希；```amount```为转出数量（可读单位）；```raw```为以最小单位表示的十进制字符串；转出原生币时```tokenAddress```为```null```。该函数仅等待交易广播完成，不等待交易上链确认；上链结果需通过```exchange.IO("receipt", ...)```查询。调用失败时返回空值，可通过```GetLastError()```获取失败原因。
+
+转出ETH和USDC，并等待交易上链。
+
+```javascript
+function main() {
+    var TO = "0x收款地址"
+    // 转0.05个ETH；转出全部用 "all"
+    var r = exchange.IO("transfer", TO, "0.05")
+    if (!r) {
+        Log("转账失败:", GetLastError())
+        return
+    }
+    Log("已发出", r.amount, r.token, "交易:", r.txHash)
+
+    // 最多等3分钟上链
+    var rc = exchange.IO("receipt", r.txHash, 180000)
+    if (rc.pending) {
+        Log("尚未上链")
+    } else {
+        Log("结果:", rc.status, "区块:", rc.blockNumber, "手续费:", rc.fee)
+    }
+
+    // 转10个USDC
+    var r2 = exchange.IO("transfer", TO, "10", "USDC")
+    Log(r2 ? r2.txHash : GetLastError())
+}
+```
+
+出现以下情况时，函数会在签名前直接报错，不会发出交易：地址格式错误、收款地址为零地址、收款地址为钱包自身、转账数量为0、转账数量超过余额、代币未登记。
+
+原生币全部转出（```"all"```）时，在EIP-1559链上会按本次报价的最高手续费进行预留。由于实际扣除的手续费低于预留值，钱包中会剩余极少量零头。
+
+优先费（小费）取节点建议值与最近区块实际优先费中位数两者中的较大值，以避免节点建议值为0时交易长时间无法上链。
+
+转账为链上真实交易，一经发出无法撤回。向交易所充值地址转账前，请确认对方支持该链上的充值。
+
+#### exchange.IO("receipt", ...)
+
+```
+exchange.IO(k, txHash)
+exchange.IO(k, txHash, waitMs)
+```
+
+Forms:
+
+- `exchange.IO("receipt", ...)`
+
+以```exchange.IO("receipt", ...)```方式调用该函数，可查询Uniswap交易所对象所发出交易（如下单、转账等）的回执，也可等待交易上链。
+
+Parameters:
+
+- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能。设置为```"receipt"```时，该函数用于查询交易回执。
+- `txHash` (string, required): ```txHash```参数为交易哈希，即以```0x```开头、长度为32字节的十六进制字符串，例如```exchange.IO("transfer", ...)```返回的```txHash```。
+- `waitMs` (number, optional): ```waitMs```参数为最长等待时间，单位为毫秒。交易未上链时，每1.5秒查询一次，最长等待10分钟。未传入该参数或传入0时，仅查询一次。
+
+Returns (object): 交易已上链时，返回```{txHash, status, blockNumber, gasUsed, fee}```。其中，```status```的值为```"success"```或```"reverted"```；```fee```为实际支付的手续费，以原生币计价，采用可读单位。等待时间内交易仍未上链时，返回```{txHash, pending: true, known}```。其中，```known```表示节点能否查询到该笔交易；如果查询不到，通常是因为交易已被丢弃或交易哈希有误。
+
+等待一笔交易上链。
+
+```javascript
+function main() {
+    var txHash = "TX_HASH"     // 待查询的交易哈希
+    var rc = exchange.IO("receipt", txHash, 120000)
+    if (rc.pending) {
+        Log("2分钟内未上链，节点", rc.known ? "可以查询到" : "无法查询到", "该笔交易")
+        return
+    }
+    Log("状态:", rc.status, "区块:", rc.blockNumber, "gasUsed:", rc.gasUsed, "手续费:", rc.fee)
+}
+```
+
+查询订单成交情况时，使用```exchange.GetOrder()```即可。```exchange.IO("receipt", ...)```主要用于查询转账等非下单类交易。
+
+#### exchange.IO("route", ...)
+
+```
+exchange.IO(k, symbol, side, qty)
+```
+
+Forms:
+
+- `exchange.IO("route", ...)`
+
+```exchange.IO("route", ...)```调用用于在Uniswap交易所对象上询价：列出一笔兑换在各条候选路径上的报价以及最优路径，不会实际下单。
+
+Parameters:
+
+- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"route"```时，该函数用于询价。
+- `symbol` (string, required): ```symbol```参数为交易对，例如```"ETH_USDC"```。
+- `side` (string, required): ```side```参数为交易方向：```"sell"```表示卖出```qty```个基础币，```"buy"```表示买入```qty```个基础币。
+- `qty` (number, required): ```qty```参数为基础币的数量。
+
+Returns (object / 空值): 返回```{symbol, side, qty, best, quote, price, candidates}```。其中，```best```为最优路径；```quote```为最优报价（卖出时为可获得的计价币数量，买入时为需支付的计价币数量）；```price```为对应的平均成交价格；```candidates```为各条候选路径的报价，每项格式为```{route, quote}```（无法报价的路径，其```quote```为```null```）。没有可用的流动性池时返回空值。
+
+比较卖出1个ETH时各条路径的报价。
+
+```javascript
+function main() {
+    var r = exchange.IO("route", "ETH_USDC", "sell", 1)
+    Log("最优路径:", r.best, "可得:", r.quote, "USDC")
+    r.candidates.forEach(function (c) {
+        Log(c.route, c.quote)
+    })
+}
+```
+
+候选路径包括：V3各费率档位的直连池、V2池，以及经由包装币（如WETH）或USDC/USDT中转的两跳路径。路径的表示形式如```v3:WETH-500-USDC```（V3池，费率500即0.05%）、```v2:WETH-USDC```、```v3:UNI-3000-USDT-100-USDC```（两跳路径）。
+
+V3路径通过链上QuoterV2合约询价（对整笔兑换进行完整模拟），V2路径根据池子储备在本地计算。报价均不含gas费用。
+
+#### exchange.IO("simulate", ...)
+
+```
+exchange.IO(k, symbol, side, qty)
+exchange.IO(k, symbol, side, qty, price)
+exchange.IO(k, symbol, side, qty, price, stateOverride)
+exchange.IO(k, symbol, side, qty, price, stateOverride, route)
+```
+
+Forms:
+
+- `exchange.IO("simulate", ...)`
+
+```exchange.IO("simulate", ...)```调用方式按照Uniswap交易所对象的下单逻辑（路径选择、询价、价格保护）构造兑换交易，仅在链上进行模拟执行（```eth_call```），不签名、不广播，也不消耗gas。
+
+Parameters:
+
+- `k` (string, required): ```k```参数用于指定```exchange.IO()```函数的功能，设置为```"simulate"```时表示模拟下单。
+- `symbol` (string, required): ```symbol```参数为交易对，例如```"ETH_USDC"```。
+- `side` (string, required): ```side```参数为交易方向，取值为```"buy"```或```"sell"```。
+- `qty` (number, required): ```qty```参数为下单数量，含义与```exchange.CreateOrder()```中的数量参数相同（市价买入时为要花费的计价币数量）。
+- `price` (number, optional): ```price```参数为限价价格，不传或传入```null```时表示市价单。
+- `stateOverride` (object, optional): ```stateOverride```参数为节点```eth_call```调用的状态覆盖（即geth的state override set），用于在模拟时为钱包临时补充余额或授权额度，例如```{"0x钱包地址": {"balance": "0x56bc75e2d63100000"}}```。该覆盖仅在本次模拟中生效。
+- `route` (string, optional): ```route```参数用于限定路径类型，可选值为```"v2"```、```"v3"```、```"hop"```（两跳）或```"direct"```（直连）。不传时在所有路径中选择最优路径。
+
+Returns (object / 空值): 返回```{route, exactIn, amountIn, amountOut, quoted, executed, value, calls}```。其中，```quoted```为下单时的报价数量，```executed```为模拟执行得到的实际数量（精确输入时为实际获得的数量，精确输出时为实际花费的数量），两者均为以最小单位表示的十进制字符串。当限价无法满足，或余额、授权不足（且未通过状态覆盖补足）时，返回空值并输出错误信息。
+
+为钱包临时补充100个ETH，模拟卖出1个ETH。
+
+```javascript
+function main() {
+    var ov = {}
+    ov[exchange.IO("address")] = { balance: "0x56bc75e2d63100000" }
+    var r = exchange.IO("simulate", "ETH_USDC", "sell", 1, null, ov)
+    Log("路径:", r.route, "报价:", r.quoted, "模拟执行:", r.executed)
+}
+```
+
+模拟基于最新区块状态执行，与真实下单相比，唯一的差异在于交易实际上链前价格可能发生变化。
+
+当钱包余额不足或代币未授权时，模拟会因路由合约转账失败而报错，此时可以使用```stateOverride```参数进行状态覆盖。
+
+#### exchange.IO("token", ...)
+
+```
+exchange.IO(k)
+exchange.IO(k, name, address)
+```
+
+Forms:
+
+- `exchange.IO("token", ...)`
+
+```exchange.IO("token", ...)```函数的调用方式用于在Uniswap交易所对象上登记代币，或者列出代币表。登记后的代币可以直接写在交易对里使用。
+
+Parameters:
+
+- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"token"```表示该函数用于代币登记。
+- `name` (string, optional): ```name```参数为代币在交易对中使用的名字，例如```"UNI"```。
+- `address` (string, optional): ```address```参数为代币合约地址，精度从链上读取。
+
+Returns (object / array / 空值): 登记时返回```{symbol, address, decimals}```；不传参数时返回代币表数组，每项为```{symbol, address, decimals, native}```（```native```为```true```的是链上原生币）。地址不是ERC20代币时返回空值。
+
+登记UNI后查询UNI_USDC行情。
+
+```javascript
+function main() {
+    exchange.IO("token", "UNI", "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984")
+    var t = exchange.GetTicker("UNI_USDC")
+    Log("买一:", t.Buy, "卖一:", t.Sell)
+}
+```
+
+按名字解析代币的顺序：①人工核对过的内置代币（原生币、包装币、USDC、USDT、该链的BTC等）；②```exchange.IO("token", ...)```登记过的代币；③官方代币列表：以太坊、Arbitrum、Base使用Uniswap Labs默认列表（tokens.uniswap.org），BNB链使用PancakeSwap列表（tokens.pancakeswap.finance，Base也会参考）。连接器内置一份列表快照，名字在快照里找不到时再拉取一次最新列表（24小时内只拉一次）。
+
+官方列表中同一条链上有多个同名代币（例如桥接版与原生版）时，名字不能直接使用，报错信息会列出各个候选地址，请用合约地址指定。列表中代币的精度以链上合约为准，与列表不一致时拒绝使用。
+
+不在代币表中的代币也可以直接用合约地址作为交易对的一部分，例如```"0x1f9840a85d5af5bf1d1762f925bdaddc4201f984_USDC"```。
+
+```exchange.GetMarkets()```只列出内置代币之间、以及流动性排名靠前的常用币与包装币/USDC/USDT之间的交易对；列表里的其他代币同样可以直接交易。
+
+原生币（ETH、BNB）与包装币（WETH、WBNB）是两个不同的资产：交易原生币时由路由合约自动包装和解包。
+
+#### exchange.IO("wrap", ...)
+
+```
+exchange.IO(k, amount)
+```
+
+Forms:
+
+- `exchange.IO("wrap", ...)`
+
+```exchange.IO("wrap", ...)```函数的调用方式用于在Uniswap交易所对象上把原生币（ETH、BNB）包装成包装币（WETH、WBNB），1:1兑换，没有滑点，只花gas。
+
+Parameters:
+
+- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"wrap"```表示该函数用于包装原生币。
+- `amount` (string / number, required): ```amount```参数为要包装的原生币数量（可读单位，建议写成字符串，例如```"0.01"```）。不支持```"all"```：原生币还要留着支付gas。
+
+Returns (object / 空值): 交易广播成功返回```{txHash, action, from, to, amount, raw}```，```from```、```to```为兑换前后的币种名。只等交易广播，不等上链，上链结果用```exchange.IO("receipt", ...)```查询。余额不足等情况返回空值并报错。
+
+把0.01个ETH包装成WETH。
+
+```javascript
+function main() {
+    var r = exchange.IO("wrap", "0.01")
+    if (!r) {
+        Log("包装失败:", GetLastError())
+        return
+    }
+    var rc = exchange.IO("receipt", r.txHash, 120000)
+    Log(r.from, "→", r.to, r.amount, "结果:", rc.status)
+}
+```
+
+直接调用包装币合约的```deposit()```，不经过Uniswap路由和资金池。```ETH_WETH```这样的交易对不能下单，原生币与包装币之间的转换请用```exchange.IO("wrap", ...)```和```exchange.IO("unwrap", ...)```。
+
+#### exchange.IO("unwrap", ...)
+
+```
+exchange.IO(k, amount)
+```
+
+Forms:
+
+- `exchange.IO("unwrap", ...)`
+
+```exchange.IO("unwrap", ...)```函数的调用方式用于在Uniswap交易所对象上把包装币（WETH、WBNB）解包成原生币（ETH、BNB），1:1兑换，没有滑点，只花gas。
+
+Parameters:
+
+- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"unwrap"```表示该函数用于解包包装币。
+- `amount` (string / number, required): ```amount```参数为要解包的包装币数量（可读单位，建议写成字符串）；设置为```"all"```表示解包全部包装币。
+
+Returns (object / 空值): 交易广播成功返回```{txHash, action, from, to, amount, raw}```。包装币余额不足或为0时返回空值并报错。
+
+把全部WETH换回ETH。
+
+```javascript
+function main() {
+    var r = exchange.IO("unwrap", "all")
+    if (!r) {
+        Log("解包失败:", GetLastError())
+        return
+    }
+    var rc = exchange.IO("receipt", r.txHash, 120000)
+    Log(r.from, "→", r.to, r.amount, "结果:", rc.status)
+}
+```
+
+直接调用包装币合约的```withdraw(uint256)```，不经过Uniswap路由和资金池。
+
+#### exchange.IO("approve", ...)
+
+```
+exchange.IO(k)
+exchange.IO(k, mode)
+```
+
+Forms:
+
+- `exchange.IO("approve", ...)`
+
+以```exchange.IO("approve", ...)```方式调用该函数，可在Uniswap交易所对象上设置代币授权模式。
+
+Parameters:
+
+- `k` (string, required): ```k```参数用于指定```exchange.IO()```函数的功能。设置为```"approve"```时，表示该函数用于设置代币授权模式。
+- `mode` (string, optional): ```mode```参数为授权模式：```"exact"```（默认）表示每次仅授权本次兑换所需的数量；```"max"```表示授权无限额度，此后同一代币无需再次授权。不传入该参数时，表示查询当前授权模式。
+
+Returns (string): 返回当前的授权模式：```"exact"```或```"max"```。
+
+设置代币授权模式。
+
+```javascript
+function main() {
+    exchange.IO("approve", "max")
+    Log("当前授权模式:", exchange.IO("approve"))
+}
+```
+
+卖出代币（输入为ERC20代币）前，连接器会检查路由合约的授权额度。若额度不足，会先发送授权交易并等待其上链确认，再发送兑换交易。若现有授权额度不为0但仍不足，则先将额度清零再重新授权（USDT等代币有此要求）。
+
+```"max"```模式可省去后续的授权交易及相应的gas费用，但路由合约将有权动用该代币的全部余额，请根据实际需要选择。
+
+#### exchange.IO("slippage", ...)
+
+```
+exchange.IO(k)
+exchange.IO(k, ratio)
+```
+
+Forms:
+
+- `exchange.IO("slippage", ...)`
+
+```exchange.IO("slippage", ...)```函数的此种调用方式用于为Uniswap交易所对象设置市价单的滑点保护。
+
+Parameters:
+
+- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能。设置为```"slippage"```时，表示该函数用于设置市价单的滑点保护。
+- `ratio` (number, optional): ```ratio```参数为滑点比例，取值范围为```[0, 0.5)```，默认值为```0.005```（即0.5%）。不传入该参数时，表示查询当前的滑点比例。
+
+Returns (number): 返回当前的滑点比例。
+
+设置市价单的滑点保护。
+
+```javascript
+function main() {
+    exchange.IO("slippage", 0.01)     // 1%
+    Log("滑点:", exchange.IO("slippage"))
+}
+```
+
+市价单以下单时的报价扣除滑点，计算出最少可得数量，并将其写入链上交易。如果成交时价格的变动幅度超过了滑点比例，整笔交易将会回滚（仅损失gas费用）。
+
+也可以在```exchange.CreateOrder()```函数的方向参数后附加```;{"slippage":0.01}```，为单笔订单单独指定滑点。限价单不使用滑点，因为限价本身就是最差成交价。
+
+#### exchange.IO("deadline", ...)
+
+```
+exchange.IO(k)
+exchange.IO(k, seconds)
+```
+
+Forms:
+
+- `exchange.IO("deadline", ...)`
+
+```exchange.IO("deadline", ...)```调用方式用于在Uniswap交易所对象上设置交易的截止时间。
+
+Parameters:
+
+- `k` (string, required): ```k```参数用于指定```exchange.IO()```函数的功能，设置为```"deadline"```时，表示该函数用于设置交易的截止时间。
+- `seconds` (number, optional): ```seconds```参数为交易有效期，单位为秒，取值范围为10至86400，默认值为120。不传入该参数时，表示查询当前设置值。
+
+Returns (number): 返回当前设置的交易截止时间，单位为秒。
+
+设置交易的截止时间。
+
+```javascript
+function main() {
+    exchange.IO("deadline", 300)
+    Log("截止时间:", exchange.IO("deadline"), "秒")
+}
+```
+
+兑换交易发出后，若超过截止时间仍未上链，执行时将被回滚。这样可以避免长时间挂起的交易在价格大幅波动后才成交。
+
+#### exchange.IO("gasMultiplier", ...)
+
+```
+exchange.IO(k)
+exchange.IO(k, x)
+```
+
+Forms:
+
+- `exchange.IO("gasMultiplier", ...)`
+
+```exchange.IO("gasMultiplier", ...)```调用方式用于在Uniswap交易所对象上设置gas上限倍数。
+
+Parameters:
+
+- `k` (string, required): ```k```参数用于指定```exchange.IO()```函数的功能，设置为```"gasMultiplier"```时，表示该函数用于设置gas上限倍数。
+- `x` (number, optional): ```x```参数为gas上限倍数，取值范围为1到5，默认值为1.2。交易的gasLimit等于节点估算的gas用量乘以该倍数。不传入该参数时，表示查询当前倍数。
+
+Returns (number): 返回当前的gas上限倍数。
+
+设置gas上限倍数。
+
+```javascript
+function main() {
+    exchange.IO("gasMultiplier", 1.5)
+    Log("gas倍数:", exchange.IO("gasMultiplier"))
+}
+```
+
+gasLimit仅为gas用量上限，实际手续费按实际消耗的gas计算，因此适当调高倍数不会增加实际花费；但钱包余额需足以覆盖gasLimit对应的最高手续费，否则交易可能无法发送。
 
 ### TA
 
@@ -19294,15 +16736,7 @@ fn main() {
 }
 ```
 
-```cpp
-void main() {
-    auto r = exchange.GetRecords(PERIOD_M15);
-    auto macd = TA.MACD(r, 12, 26, 9);
-    Log("DIF:", macd[0], "DEA:", macd[1], "MACD:", macd[2]);
-}
-```
-
-发明者量化的```TA```指标库对常用指标算法进行了优化，支持```JavaScript```、```Python```、```C++```语言策略的调用，详见[开源TA库代码](https://www.fmz.com/bbs-topic/409)。
+发明者量化的```TA```指标库对常用指标算法进行了优化，支持```JavaScript```、```Python```、```Rust```语言策略的调用，详见[开源TA库代码](https://www.fmz.com/bbs-topic/409)。
 
 ```TA.MACD()```函数的```optInFastPeriod```、```optInSlowPeriod```、```optInSignalPeriod```参数默认值分别为：```12```、```26```、```9```。
 
@@ -19349,14 +16783,6 @@ fn main() {
 }
 ```
 
-```cpp
-void main() {
-    auto r = exchange.GetRecords();
-    auto kdj = TA.KDJ(r, 9, 3, 3);
-    Log("k:", kdj[0], "d:", kdj[1], "j:", kdj[2]);
-}
-```
-
 ```TA.KDJ()```函数的```period```、```kPeriod```、```dPeriod```参数的默认值分别为：```9```、```3```、```3```。
 
 See also: `TA.MACD`, `TA.RSI`, `TA.ATR`, `TA.OBV`,  `TA.MA`, `TA.EMA`, `TA.BOLL`, `TA.Alligator`, `TA.CMF`, `TA.Highest`, `TA.Lowest`
@@ -19397,14 +16823,6 @@ fn main() {
     let records = exchange.GetRecords(None, PERIOD_M30, None).unwrap();
     let rsi = TA.RSI(&records, 14);
     Log!(rsi);
-}
-```
-
-```cpp
-void main() {
-    auto r = exchange.GetRecords(PERIOD_M30);
-    auto rsi = TA.RSI(r, 14);
-    Log(rsi);
 }
 ```
 
@@ -19451,14 +16869,6 @@ fn main() {
 }
 ```
 
-```cpp
-void main() {
-    auto r = exchange.GetRecords(PERIOD_M30);
-    auto atr = TA.ATR(r, 14);
-    Log(atr);
-}
-```
-
 ```TA.ATR()```函数的```optInTimePeriod```参数默认值为：```14```。
 
 See also: `TA.MACD`, `TA.KDJ`, `TA.RSI`, `TA.OBV`,  `TA.MA`, `TA.EMA`, `TA.BOLL`, `TA.Alligator`, `TA.CMF`, `TA.Highest`, `TA.Lowest`
@@ -19500,14 +16910,6 @@ fn main() {
 }
 ```
 
-```cpp
-void main() {
-    auto r = exchange.GetRecords(PERIOD_M30);
-    auto obv = TA.OBV(r);
-    Log(obv);
-}
-```
-
 See also: `TA.MACD`, `TA.KDJ`, `TA.RSI`, `TA.ATR`,  `TA.MA`, `TA.EMA`, `TA.BOLL`, `TA.Alligator`, `TA.CMF`, `TA.Highest`, `TA.Lowest`
 
 #### TA.MA
@@ -19546,14 +16948,6 @@ fn main() {
     let records = exchange.GetRecords(None, PERIOD_M30, None).unwrap();
     let ma = TA.MA(&records, 14);
     Log!(ma);
-}
-```
-
-```cpp
-void main() {
-    auto r = exchange.GetRecords(PERIOD_M30);
-    auto ma = TA.MA(r, 14);
-    Log(ma);
 }
 ```
 
@@ -19603,16 +16997,6 @@ fn main() {
     if records.len() > 9 {
         let ema = TA.EMA(&records, 9);
         Log!(ema);
-    }
-}
-```
-
-```cpp
-void main() {
-    auto r = exchange.GetRecords();
-    if(r.Valid && r.size() > 9) {
-        auto ema = TA.EMA(r, 9);
-        Log(ema);
     }
 }
 ```
@@ -19679,21 +17063,6 @@ fn main() {
 }
 ```
 
-```cpp
-void main() {
-    auto r = exchange.GetRecords();
-    if(r.Valid && r.size() > 20) {
-        auto boll = TA.BOLL(r, 20, 2);
-        auto upLine = boll[0];
-        auto midLine = boll[1];
-        auto downLine = boll[2];
-        Log(upLine);
-        Log(midLine);
-        Log(downLine);
-    }
-}
-```
-
 ```TA.BOLL()```函数的```period```、```multiplier```参数的默认值分别为```20```和```2```。
 
 See also: `TA.MACD`, `TA.KDJ`, `TA.RSI`, `TA.ATR`, `TA.OBV`,  `TA.MA`, `TA.EMA`, `TA.Alligator`, `TA.CMF`, `TA.Highest`, `TA.Lowest`
@@ -19745,16 +17114,6 @@ fn main() {
 }
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto alligator = TA.Alligator(records);
-    Log("jawLine:", alligator[0]);
-    Log("teethLine:", alligator[1]);
-    Log("lipsLine:", alligator[2]);
-}
-```
-
 ```TA.Alligator()```函数的```jawLength```、```teethLength```、```lipsLength```参数默认值分别为：```13```、```8```、```5```。
 
 See also: `TA.MACD`, `TA.KDJ`, `TA.RSI`, `TA.ATR`, `TA.OBV`,  `TA.MA`, `TA.EMA`, `TA.BOLL`, `TA.CMF`, `TA.Highest`, `TA.Lowest`
@@ -19795,14 +17154,6 @@ fn main() {
     let records = exchange.GetRecords(None, None, None).unwrap();
     let cmf = TA.CMF(&records, None);
     Log!(cmf);
-}
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto cmf = TA.CMF(records);
-    Log(cmf);
 }
 ```
 
@@ -19847,14 +17198,6 @@ fn main() {
     let opens: Vec<f64> = records.iter().map(|r| r.Open).collect();
     let highestForOpen = TA.Highest(&opens, 10);
     Log!(highestForOpen);
-}
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto highestForOpen = TA.Highest(records.Open(), 10);
-    Log(highestForOpen);
 }
 ```
 
@@ -19904,43 +17247,7 @@ fn main() {
 }
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto lowestForOpen = TA.Lowest(records.Open(), 10);
-    Log(lowestForOpen);
-}
-```
-
 例如调用```TA.Lowest(records, 30, "Low")```函数：如果周期参数```period```设置为```0```，则表示计算```inReal```参数传入的K线数据的所有```Bar```；如果不指定属性参数```attr```，则视```inReal```参数传入的K线数据为普通数组。
-
-在```C++```策略中使用```TA.Highest()```、```TA.Lowest()```函数时需要注意：```Highest()```、```Lowest()```函数各自只有2个参数，并且第一个参数传入的不是```auto r = exchange.GetRecords()```函数调用时获取的K线数据```r```，而是需要调用```r```的方法，传入具体的属性数据。例如传入```r.Close()```收盘价数据。```Close```、```High```、```Low```、```Open```、```Volume```的调用方式与```r.Close()```相同。
-
-```C++```语言策略的测试范例：
-```cpp
-void main() {
-    Records r;
-    r.Valid = true;
-    for (auto i = 0; i < 10; i++) {
-        Record ele;
-        ele.Time = i * 100000;
-        ele.High = i * 10000;
-        ele.Low = i * 1000;
-        ele.Close = i * 100;
-        ele.Open = i * 10;
-        ele.Volume = i * 1;
-        r.push_back(ele);
-    }
-
-    for(int j = 0; j < r.size(); j++){
-        Log(r[j]);
-    }
-
-    // 注意：第一个参数传入的不是r，需要调用r.Close()
-    auto highest = TA.Highest(r.Close(), 8);
-    Log(highest);
-}
-```
 
 See also: `TA.MACD`, `TA.KDJ`, `TA.RSI`, `TA.ATR`, `TA.OBV`,  `TA.MA`, `TA.EMA`, `TA.BOLL`, `TA.Alligator`, `TA.CMF`, `TA.Highest`
 
@@ -19983,3853 +17290,17 @@ fn main() {
 }
 ```
 
-```cpp
-void main() {
-    auto r = exchange.GetRecords(PERIOD_M30);
-    auto sma = TA.SMA(r, 14);
-    Log(sma);
-}
-```
-
 ```TA.SMA()```函数的```optInTimePeriod```参数默认值为：```9```。
 
 See also: `TA.MACD`, `TA.KDJ`, `TA.RSI`, `TA.ATR`, `TA.OBV`,  `TA.MA`, `TA.EMA`, `TA.BOLL`, `TA.Alligator`, `TA.CMF`, `TA.Highest`, `TA.Lowest`
 
 ### Talib
 
-#### talib.CDL2CROWS
+#### OverlapStudies
 
-```
-talib.CDL2CROWS(inPriceOHLC)
-```
+均线与通道类指标（重叠研究）：移动平均、布林带、抛物线SAR等。
 
-```talib.CDL2CROWS()```函数用于计算**Two Crows（K线形态--两只乌鸦）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDL2CROWS()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDL2CROWS(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDL2CROWS(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDL2CROWS(records);
-    Log(ret);
-}
-```
-
-```CDL2CROWS()```函数在talib库文档中的描述为：```CDL2CROWS(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-对于```Python```语言中的调用，传参方式有所不同，需要根据上述描述中的：```Records[Open,High,Low,Close]```进行传参。
-
-例如，将一个变量```records```（即参数```inPriceOHLC```，类型为`Record`结构数组）拆分为：
-
-```Open```列表：在Python中表示为```records.Open```。
-
-```High```列表：在Python中表示为```records.High```。
-
-```Low```列表：在Python中表示为```records.Low```。
-
-```Close```列表：在Python中表示为```records.Close```。
-
-Python策略代码中的调用方式：
-
-```
-
-talib.CDL2CROWS(records.Open, records.High, records.Low, records.Close)
-
-```
-
-其他```talib```指标的调用方式与此类似，不再赘述。
-
-#### talib.CDL3BLACKCROWS
-
-```
-talib.CDL3BLACKCROWS(inPriceOHLC)
-```
-
-```talib.CDL3BLACKCROWS()```函数用于计算**Three Black Crows（K线图形态--三只黑乌鸦）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDL3BLACKCROWS()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDL3BLACKCROWS(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDL3BLACKCROWS(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDL3BLACKCROWS(records);
-    Log(ret);
-}
-```
-
-```CDL3BLACKCROWS()```函数在talib库文档中的描述为：```CDL3BLACKCROWS(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDL3INSIDE
-
-```
-talib.CDL3INSIDE(inPriceOHLC)
-```
-
-```talib.CDL3INSIDE()```函数用于计算**Three Inside Up/Down（K线形态：三内上下震荡）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDL3INSIDE()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDL3INSIDE(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDL3INSIDE(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDL3INSIDE(records);
-    Log(ret);
-}
-```
-
-```CDL3INSIDE()```函数在talib库文档中的描述为：```CDL3INSIDE(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDL3LINESTRIKE
-
-```
-talib.CDL3LINESTRIKE(inPriceOHLC)
-```
-
-```talib.CDL3LINESTRIKE()```函数用于计算**Three-Line Strike（K线图：三线震荡）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDL3LINESTRIKE()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDL3LINESTRIKE(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDL3LINESTRIKE(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDL3LINESTRIKE(records);
-    Log(ret);
-}
-```
-
-```CDL3LINESTRIKE()```函数在talib库文档中的描述为：```CDL3LINESTRIKE(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDL3OUTSIDE
-
-```
-talib.CDL3OUTSIDE(inPriceOHLC)
-```
-
-```talib.CDL3OUTSIDE()```函数用于计算**Three Outside Up/Down（K线形态：三外包线）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDL3OUTSIDE()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDL3OUTSIDE(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDL3OUTSIDE(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDL3OUTSIDE(records);
-    Log(ret);
-}
-```
-
-```CDL3OUTSIDE()```函数在talib库文档中的描述为：```CDL3OUTSIDE(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDL3STARSINSOUTH
-
-```
-talib.CDL3STARSINSOUTH(inPriceOHLC)
-```
-
-```talib.CDL3STARSINSOUTH()```函数用于计算**Three Stars In The South（K线形态：南方三星）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDL3STARSINSOUTH()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDL3STARSINSOUTH(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDL3STARSINSOUTH(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDL3STARSINSOUTH(records);
-    Log(ret);
-}
-```
-
-```CDL3STARSINSOUTH()```函数在talib库文档中的描述为：```CDL3STARSINSOUTH(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDL3WHITESOLDIERS
-
-```
-talib.CDL3WHITESOLDIERS(inPriceOHLC)
-```
-
-```talib.CDL3WHITESOLDIERS()```函数用于计算**Three Advancing White Soldiers（K线形态：三白兵）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDL3WHITESOLDIERS()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDL3WHITESOLDIERS(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDL3WHITESOLDIERS(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDL3WHITESOLDIERS(records);
-    Log(ret);
-}
-```
-
-```CDL3WHITESOLDIERS()```函数在talib库文档中的描述为：```CDL3WHITESOLDIERS(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLABANDONEDBABY
-
-```
-talib.CDLABANDONEDBABY(inPriceOHLC)
-talib.CDLABANDONEDBABY(inPriceOHLC, optInPenetration)
-```
-
-```talib.CDLABANDONEDBABY()```函数用于计算**弃婴形态（K线图：Abandoned Baby）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-- `optInPenetration` (number, optional): ```optInPenetration```参数用于设置穿透度，默认值为0.3。
-
-Returns (array): ```talib.CDLABANDONEDBABY()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLABANDONEDBABY(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLABANDONEDBABY(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLABANDONEDBABY(records);
-    Log(ret);
-}
-```
-
-```CDLABANDONEDBABY()```函数在talib库文档中的描述为：```CDLABANDONEDBABY(Records[Open,High,Low,Close],Penetration = 0.3) = Array(outInteger)```
-
-#### talib.CDLADVANCEBLOCK
-
-```
-talib.CDLADVANCEBLOCK(inPriceOHLC)
-```
-
-```talib.CDLADVANCEBLOCK()```函数用于计算**Advance Block（K线形态：推进阻挡）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLADVANCEBLOCK()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLADVANCEBLOCK(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLADVANCEBLOCK(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLADVANCEBLOCK(records);
-    Log(ret);
-}
-```
-
-```CDLADVANCEBLOCK()```函数在talib库文档中的描述为：```CDLADVANCEBLOCK(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLBELTHOLD
-
-```
-talib.CDLBELTHOLD(inPriceOHLC)
-```
-
-```talib.CDLBELTHOLD()```函数用于计算**Belt-hold（K线形态：腰带线）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLBELTHOLD()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLBELTHOLD(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLBELTHOLD(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLBELTHOLD(records);
-    Log(ret);
-}
-```
-
-```CDLBELTHOLD()```函数在talib库文档中的描述为：```CDLBELTHOLD(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLBREAKAWAY
-
-```
-talib.CDLBREAKAWAY(inPriceOHLC)
-```
-
-```talib.CDLBREAKAWAY()```函数用于计算**Breakaway（K线形态：分离形态）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLBREAKAWAY()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLBREAKAWAY(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLBREAKAWAY(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLBREAKAWAY(records);
-    Log(ret);
-}
-```
-
-```CDLBREAKAWAY()```函数在talib库文档中的描述为：```CDLBREAKAWAY(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLCLOSINGMARUBOZU
-
-```
-talib.CDLCLOSINGMARUBOZU(inPriceOHLC)
-```
-
-```talib.CDLCLOSINGMARUBOZU()```函数用于计算**收盘光头光脚线（Closing Marubozu）**K线形态。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLCLOSINGMARUBOZU()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLCLOSINGMARUBOZU(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLCLOSINGMARUBOZU(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLCLOSINGMARUBOZU(records);
-    Log(ret);
-}
-```
-
-```CDLCLOSINGMARUBOZU()```函数在talib库文档中的描述为：```CDLCLOSINGMARUBOZU(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLCONCEALBABYSWALL
-
-```
-talib.CDLCONCEALBABYSWALL(inPriceOHLC)
-```
-
-```talib.CDLCONCEALBABYSWALL()```函数用于计算**Concealing Baby Swallow（K线图：藏婴吞没形态）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLCONCEALBABYSWALL()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLCONCEALBABYSWALL(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLCONCEALBABYSWALL(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLCONCEALBABYSWALL(records);
-    Log(ret);
-}
-```
-
-```CDLCONCEALBABYSWALL()```函数在talib库文档中的描述为：```CDLCONCEALBABYSWALL(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLCOUNTERATTACK
-
-```
-talib.CDLCOUNTERATTACK(inPriceOHLC)
-```
-
-```talib.CDLCOUNTERATTACK()```函数用于计算**反击线形态（K线图：反击）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLCOUNTERATTACK()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLCOUNTERATTACK(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLCOUNTERATTACK(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLCOUNTERATTACK(records);
-    Log(ret);
-}
-```
-
-```CDLCOUNTERATTACK()```函数在talib库文档中的描述为：```CDLCOUNTERATTACK(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLDARKCLOUDCOVER
-
-```
-talib.CDLDARKCLOUDCOVER(inPriceOHLC)
-talib.CDLDARKCLOUDCOVER(inPriceOHLC, optInPenetration)
-```
-
-```talib.CDLDARKCLOUDCOVER()```函数用于计算**乌云盖顶（Dark Cloud Cover）K线形态**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-- `optInPenetration` (number, optional): ```optInPenetration```参数用于设置穿透比例，默认值为0.5。
-
-Returns (array): ```talib.CDLDARKCLOUDCOVER()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLDARKCLOUDCOVER(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLDARKCLOUDCOVER(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLDARKCLOUDCOVER(records);
-    Log(ret);
-}
-```
-
-```CDLDARKCLOUDCOVER()```函数在talib库文档中的描述为：```CDLDARKCLOUDCOVER(Records[Open,High,Low,Close],Penetration = 0.5) = Array(outInteger)```
-
-#### talib.CDLDOJI
-
-```
-talib.CDLDOJI(inPriceOHLC)
-```
-
-```talib.CDLDOJI()```函数用于计算**Doji（K线图：十字星）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLDOJI()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLDOJI(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLDOJI(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLDOJI(records);
-    Log(ret);
-}
-```
-
-```CDLDOJI()```函数在talib库文档中的描述为：```CDLDOJI(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLDOJISTAR
-
-```
-talib.CDLDOJISTAR(inPriceOHLC)
-```
-
-```talib.CDLDOJISTAR()```函数用于计算**Doji Star（K线图：十字星）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLDOJISTAR()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLDOJISTAR(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLDOJISTAR(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLDOJISTAR(records);
-    Log(ret);
-}
-```
-
-```CDLDOJISTAR()```函数在talib库文档中的描述为：```CDLDOJISTAR(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLDRAGONFLYDOJI
-
-```
-talib.CDLDRAGONFLYDOJI(inPriceOHLC)
-```
-
-```talib.CDLDRAGONFLYDOJI()```函数用于计算**Dragonfly Doji（K线形态：蜻蜓十字星）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLDRAGONFLYDOJI()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLDRAGONFLYDOJI(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLDRAGONFLYDOJI(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLDRAGONFLYDOJI(records);
-    Log(ret);
-}
-```
-
-```CDLDRAGONFLYDOJI()```函数在talib库文档中的描述为：```CDLDRAGONFLYDOJI(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLENGULFING
-
-```
-talib.CDLENGULFING(inPriceOHLC)
-```
-
-```talib.CDLENGULFING()```函数用于计算**吞没形态（Engulfing Pattern）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLENGULFING()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLENGULFING(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLENGULFING(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLENGULFING(records);
-    Log(ret);
-}
-```
-
-```CDLENGULFING()```函数在talib库文档中的描述为：```CDLENGULFING(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLEVENINGDOJISTAR
-
-```
-talib.CDLEVENINGDOJISTAR(inPriceOHLC)
-talib.CDLEVENINGDOJISTAR(inPriceOHLC, optInPenetration)
-```
-
-```talib.CDLEVENINGDOJISTAR()```函数用于计算**Evening Doji Star（K线形态：黄昏十字星）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-- `optInPenetration` (number, optional): ```optInPenetration```参数用于设置穿透率，默认值为0.3。
-
-Returns (array): ```talib.CDLEVENINGDOJISTAR()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLEVENINGDOJISTAR(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLEVENINGDOJISTAR(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLEVENINGDOJISTAR(records);
-    Log(ret);
-}
-```
-
-```CDLEVENINGDOJISTAR()```函数在talib库文档中的描述为：```CDLEVENINGDOJISTAR(Records[Open,High,Low,Close],Penetration = 0.3) = Array(outInteger)```
-
-#### talib.CDLEVENINGSTAR
-
-```
-talib.CDLEVENINGSTAR(inPriceOHLC)
-talib.CDLEVENINGSTAR(inPriceOHLC, optInPenetration)
-```
-
-```talib.CDLEVENINGSTAR()```函数用于计算**Evening Star（K线图：黄昏之星）**形态。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-- `optInPenetration` (number, optional): ```optInPenetration```参数用于设置穿透度（Penetration），默认值为0.3。
-
-Returns (array): ```talib.CDLEVENINGSTAR()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLEVENINGSTAR(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLEVENINGSTAR(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLEVENINGSTAR(records);
-    Log(ret);
-}
-```
-
-```CDLEVENINGSTAR()```函数在talib库文档中的描述为：```CDLEVENINGSTAR(Records[Open,High,Low,Close],Penetration = 0.3) = Array(outInteger)```
-
-#### talib.CDLGAPSIDESIDEWHITE
-
-```
-talib.CDLGAPSIDESIDEWHITE(inPriceOHLC)
-```
-
-```talib.CDLGAPSIDESIDEWHITE()```函数用于计算**Up/Down-gap side-by-side white lines (K线图：上/下间隙并排白色线条)**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLGAPSIDESIDEWHITE()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLGAPSIDESIDEWHITE(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLGAPSIDESIDEWHITE(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLGAPSIDESIDEWHITE(records);
-    Log(ret);
-}
-```
-
-```CDLGAPSIDESIDEWHITE()```函数在talib库文档中的描述为：```CDLGAPSIDESIDEWHITE(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLGRAVESTONEDOJI
-
-```
-talib.CDLGRAVESTONEDOJI(inPriceOHLC)
-```
-
-```talib.CDLGRAVESTONEDOJI()```函数用于计算**墓碑十字线（Gravestone Doji）**K线形态。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLGRAVESTONEDOJI()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLGRAVESTONEDOJI(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLGRAVESTONEDOJI(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLGRAVESTONEDOJI(records);
-    Log(ret);
-}
-```
-
-```CDLGRAVESTONEDOJI()```函数在talib库文档中的描述为：```CDLGRAVESTONEDOJI(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLHAMMER
-
-```
-talib.CDLHAMMER(inPriceOHLC)
-```
-
-```talib.CDLHAMMER()```函数用于计算**锤子线（K线形态：锤子）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLHAMMER()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLHAMMER(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLHAMMER(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLHAMMER(records);
-    Log(ret);
-}
-```
-
-```CDLHAMMER()```函数在talib库文档中的描述为：```CDLHAMMER(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLHANGINGMAN
-
-```
-talib.CDLHANGINGMAN(inPriceOHLC)
-```
-
-```talib.CDLHANGINGMAN()```函数用于计算**Hanging Man（K线形态：吊人线）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLHANGINGMAN()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLHANGINGMAN(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLHANGINGMAN(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLHANGINGMAN(records);
-    Log(ret);
-}
-```
-
-```CDLHANGINGMAN()```函数在talib库文档中的描述为：```CDLHANGINGMAN(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLHARAMI
-
-```
-talib.CDLHARAMI(inPriceOHLC)
-```
-
-```talib.CDLHARAMI()```函数用于计算**Harami Pattern（K线图：阴阳线模式）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLHARAMI()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLHARAMI(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLHARAMI(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLHARAMI(records);
-    Log(ret);
-}
-```
-
-```CDLHARAMI()```函数在talib库文档中的描述为：```CDLHARAMI(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLHARAMICROSS
-
-```
-talib.CDLHARAMICROSS(inPriceOHLC)
-```
-
-```talib.CDLHARAMICROSS()```函数用于计算**Harami Cross Pattern（K线图：十字星孕线形态）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLHARAMICROSS()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLHARAMICROSS(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLHARAMICROSS(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLHARAMICROSS(records);
-    Log(ret);
-}
-```
-
-```CDLHARAMICROSS()```函数在talib库文档中的描述为：```CDLHARAMICROSS(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLHIGHWAVE
-
-```
-talib.CDLHIGHWAVE(inPriceOHLC)
-```
-
-```talib.CDLHIGHWAVE()```函数用于计算**High-Wave Candle（K线图：长脚十字线）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLHIGHWAVE()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLHIGHWAVE(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLHIGHWAVE(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLHIGHWAVE(records);
-    Log(ret);
-}
-```
-
-```CDLHIGHWAVE()```函数在talib库文档中的描述为：```CDLHIGHWAVE(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLHIKKAKE
-
-```
-talib.CDLHIKKAKE(inPriceOHLC)
-```
-
-```talib.CDLHIKKAKE()```函数用于计算**Hikkake Pattern（K线图：陷阱模式）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLHIKKAKE()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLHIKKAKE(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLHIKKAKE(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLHIKKAKE(records);
-    Log(ret);
-}
-```
-
-```CDLHIKKAKE()```函数在talib库文档中的描述为：```CDLHIKKAKE(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLHIKKAKEMOD
-
-```
-talib.CDLHIKKAKEMOD(inPriceOHLC)
-```
-
-```talib.CDLHIKKAKEMOD()```函数用于计算**Modified Hikkake Pattern（K线图：改良陷阱模式）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLHIKKAKEMOD()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLHIKKAKEMOD(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLHIKKAKEMOD(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLHIKKAKEMOD(records);
-    Log(ret);
-}
-```
-
-```CDLHIKKAKEMOD()```函数在talib库文档中的描述为：```CDLHIKKAKEMOD(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLHOMINGPIGEON
-
-```
-talib.CDLHOMINGPIGEON(inPriceOHLC)
-```
-
-```talib.CDLHOMINGPIGEON()```函数用于计算**Homing Pigeon（K线形态：信鸽形态）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLHOMINGPIGEON()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLHOMINGPIGEON(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLHOMINGPIGEON(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLHOMINGPIGEON(records);
-    Log(ret);
-}
-```
-
-```CDLHOMINGPIGEON()```函数在talib库文档中的描述为：```CDLHOMINGPIGEON(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLIDENTICAL3CROWS
-
-```
-talib.CDLIDENTICAL3CROWS(inPriceOHLC)
-```
-
-```talib.CDLIDENTICAL3CROWS()```函数用于计算**Identical Three Crows（K线形态：相同三只乌鸦）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLIDENTICAL3CROWS()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLIDENTICAL3CROWS(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLIDENTICAL3CROWS(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLIDENTICAL3CROWS(records);
-    Log(ret);
-}
-```
-
-```CDLIDENTICAL3CROWS()```函数在talib库文档中的描述为：```CDLIDENTICAL3CROWS(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLINNECK
-
-```
-talib.CDLINNECK(inPriceOHLC)
-```
-
-```talib.CDLINNECK()```函数用于计算**颈内线形态（K线图：颈内线）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLINNECK()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLINNECK(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLINNECK(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLINNECK(records);
-    Log(ret);
-}
-```
-
-```CDLINNECK()```函数在talib库文档中的描述为：```CDLINNECK(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLINVERTEDHAMMER
-
-```
-talib.CDLINVERTEDHAMMER(inPriceOHLC)
-```
-
-```talib.CDLINVERTEDHAMMER()```函数用于计算**倒锤形态（K线图：倒锤）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLINVERTEDHAMMER()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLINVERTEDHAMMER(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLINVERTEDHAMMER(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLINVERTEDHAMMER(records);
-    Log(ret);
-}
-```
-
-```CDLINVERTEDHAMMER()```函数在talib库文档中的描述为：```CDLINVERTEDHAMMER(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLKICKING
-
-```
-talib.CDLKICKING(inPriceOHLC)
-```
-
-```talib.CDLKICKING()```函数用于计算**Kicking（K线形态：踢腿形态）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLKICKING()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLKICKING(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLKICKING(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLKICKING(records);
-    Log(ret);
-}
-```
-
-```CDLKICKING()```函数在talib库文档中的描述为：```CDLKICKING(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLKICKINGBYLENGTH
-
-```
-talib.CDLKICKINGBYLENGTH(inPriceOHLC)
-```
-
-```talib.CDLKICKINGBYLENGTH()```函数用于计算**Kicking - bull/bear determined by the longer marubozu (K线图：踢牛/踢熊)**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLKICKINGBYLENGTH()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLKICKINGBYLENGTH(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLKICKINGBYLENGTH(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLKICKINGBYLENGTH(records);
-    Log(ret);
-}
-```
-
-```CDLKICKINGBYLENGTH()```函数在talib库文档中的描述为：```CDLKICKINGBYLENGTH(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLLADDERBOTTOM
-
-```
-talib.CDLLADDERBOTTOM(inPriceOHLC)
-```
-
-```talib.CDLLADDERBOTTOM()```函数用于计算**Ladder Bottom（K线形态：梯底）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLLADDERBOTTOM()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLLADDERBOTTOM(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLLADDERBOTTOM(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLLADDERBOTTOM(records);
-    Log(ret);
-}
-```
-
-```CDLLADDERBOTTOM()```函数在talib库文档中的描述为：```CDLLADDERBOTTOM(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLLONGLEGGEDDOJI
-
-```
-talib.CDLLONGLEGGEDDOJI(inPriceOHLC)
-```
-
-```talib.CDLLONGLEGGEDDOJI()```函数用于计算**长腿十字线（K线形态：Long Legged Doji）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLLONGLEGGEDDOJI()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLLONGLEGGEDDOJI(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLLONGLEGGEDDOJI(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLLONGLEGGEDDOJI(records);
-    Log(ret);
-}
-```
-
-```CDLLONGLEGGEDDOJI()```函数在talib库文档中的描述为：```CDLLONGLEGGEDDOJI(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLLONGLINE
-
-```
-talib.CDLLONGLINE(inPriceOHLC)
-```
-
-```talib.CDLLONGLINE()```函数用于计算**长线蜡烛形态（K线图：长线）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLLONGLINE()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLLONGLINE(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLLONGLINE(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLLONGLINE(records);
-    Log(ret);
-}
-```
-
-```CDLLONGLINE()```函数在talib库文档中的描述为：```CDLLONGLINE(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLMARUBOZU
-
-```
-talib.CDLMARUBOZU(inPriceOHLC)
-```
-
-```talib.CDLMARUBOZU()```函数用于计算**Marubozu（K线图：光头光脚）**模式。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLMARUBOZU()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLMARUBOZU(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLMARUBOZU(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLMARUBOZU(records);
-    Log(ret);
-}
-```
-
-```CDLMARUBOZU()```函数在talib库文档中的描述为：```CDLMARUBOZU(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLMATCHINGLOW
-
-```
-talib.CDLMATCHINGLOW(inPriceOHLC)
-```
-
-```talib.CDLMATCHINGLOW()```函数用于计算**Matching Low（K线图：匹配低点）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLMATCHINGLOW()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLMATCHINGLOW(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLMATCHINGLOW(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLMATCHINGLOW(records);
-    Log(ret);
-}
-```
-
-```CDLMATCHINGLOW()```函数在talib库文档中的描述为：```CDLMATCHINGLOW(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLMATHOLD
-
-```
-talib.CDLMATHOLD(inPriceOHLC)
-talib.CDLMATHOLD(inPriceOHLC, optInPenetration)
-```
-
-```talib.CDLMATHOLD()```函数用于计算**Mat Hold（K线形态：垫住）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-- `optInPenetration` (number, optional): ```optInPenetration```参数为可选参数，用于指定上升/下降趋势线的穿透比例，默认值为0.5。
-
-Returns (array): ```talib.CDLMATHOLD()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLMATHOLD(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLMATHOLD(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLMATHOLD(records);
-    Log(ret);
-}
-```
-
-```CDLMATHOLD()```函数在talib库文档中的描述为：```CDLMATHOLD(Records[Open,High,Low,Close],Penetration = 0.5) = Array(outInteger)```
-
-#### talib.CDLMORNINGDOJISTAR
-
-```
-talib.CDLMORNINGDOJISTAR(inPriceOHLC)
-talib.CDLMORNINGDOJISTAR(inPriceOHLC, optInPenetration)
-```
-
-```talib.CDLMORNINGDOJISTAR()```函数用于计算**Morning Doji Star（K线形态：早晨十字星）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-- `optInPenetration` (number, optional): ```optInPenetration```参数用于指定验证开盘价与实体部分重合的程度，默认值为0.3。
-
-Returns (array): ```talib.CDLMORNINGDOJISTAR()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLMORNINGDOJISTAR(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLMORNINGDOJISTAR(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLMORNINGDOJISTAR(records);
-    Log(ret);
-}
-```
-
-```CDLMORNINGDOJISTAR()```函数在talib库文档中的描述为：```CDLMORNINGDOJISTAR(Records[Open,High,Low,Close],Penetration = 0.3) = Array(outInteger)```
-
-#### talib.CDLMORNINGSTAR
-
-```
-talib.CDLMORNINGSTAR(inPriceOHLC)
-talib.CDLMORNINGSTAR(inPriceOHLC, optInPenetration)
-```
-
-```talib.CDLMORNINGSTAR()```函数用于计算**Morning Star（K线形态：晨星）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-- `optInPenetration` (number, optional): ```optInPenetration```参数为趋势确认所需的价格穿透百分比阈值，取值范围为[0,1]，默认值为0.3。
-
-Returns (array): ```talib.CDLMORNINGSTAR()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLMORNINGSTAR(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLMORNINGSTAR(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLMORNINGSTAR(records);
-    Log(ret);
-}
-```
-
-```CDLMORNINGSTAR()```函数在talib库文档中的描述为：```CDLMORNINGSTAR(Records[Open,High,Low,Close],Penetration=0.3) = Array(outInteger)```
-
-#### talib.CDLONNECK
-
-```
-talib.CDLONNECK(inPriceOHLC)
-```
-
-```talib.CDLONNECK()```函数用于计算**On-Neck Pattern（K线图：颈上线形态）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLONNECK()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLONNECK(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLONNECK(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLONNECK(records);
-    Log(ret);
-}
-```
-
-```CDLONNECK()```函数在talib库文档中的描述为：```CDLONNECK(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLPIERCING
-
-```
-talib.CDLPIERCING(inPriceOHLC)
-```
-
-```talib.CDLPIERCING()```函数用于计算**Piercing Pattern（K线图：穿透形态）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLPIERCING()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLPIERCING(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLPIERCING(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLPIERCING(records);
-    Log(ret);
-}
-```
-
-```CDLPIERCING()```函数在talib库文档中的描述为：```CDLPIERCING(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLRICKSHAWMAN
-
-```
-talib.CDLRICKSHAWMAN(inPriceOHLC)
-```
-
-```talib.CDLRICKSHAWMAN()```函数用于计算**Rickshaw Man（K线形态：车夫线）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLRICKSHAWMAN()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLRICKSHAWMAN(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLRICKSHAWMAN(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLRICKSHAWMAN(records);
-    Log(ret);
-}
-```
-
-```CDLRICKSHAWMAN()```函数在talib库文档中的描述为：```CDLRICKSHAWMAN(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLRISEFALL3METHODS
-
-```
-talib.CDLRISEFALL3METHODS(inPriceOHLC)
-```
-
-```talib.CDLRISEFALL3METHODS()```函数用于计算**Rising/Falling Three Methods（K线形态：上升/下降三法）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLRISEFALL3METHODS()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLRISEFALL3METHODS(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLRISEFALL3METHODS(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLRISEFALL3METHODS(records);
-    Log(ret);
-}
-```
-
-```CDLRISEFALL3METHODS()```函数在talib库文档中的描述为：```CDLRISEFALL3METHODS(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLSEPARATINGLINES
-
-```
-talib.CDLSEPARATINGLINES(inPriceOHLC)
-```
-
-```talib.CDLSEPARATINGLINES()```函数用于计算**分离线形态（K线图：分离线）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLSEPARATINGLINES()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLSEPARATINGLINES(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLSEPARATINGLINES(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLSEPARATINGLINES(records);
-    Log(ret);
-}
-```
-
-```CDLSEPARATINGLINES()```函数在talib库文档中的描述为：```CDLSEPARATINGLINES(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLSHOOTINGSTAR
-
-```
-talib.CDLSHOOTINGSTAR(inPriceOHLC)
-```
-
-```talib.CDLSHOOTINGSTAR()```函数用于计算**Shooting Star（K线形态：流星）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLSHOOTINGSTAR()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLSHOOTINGSTAR(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLSHOOTINGSTAR(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLSHOOTINGSTAR(records);
-    Log(ret);
-}
-```
-
-```CDLSHOOTINGSTAR()```函数在talib库文档中的描述为：```CDLSHOOTINGSTAR(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLSHORTLINE
-
-```
-talib.CDLSHORTLINE(inPriceOHLC)
-```
-
-```talib.CDLSHORTLINE()```函数用于计算**短线蜡烛图形态（K线图：短线）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线价格数据。
-
-Returns (array): ```talib.CDLSHORTLINE()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLSHORTLINE(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLSHORTLINE(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLSHORTLINE(records);
-    Log(ret);
-}
-```
-
-```CDLSHORTLINE()```函数在talib库文档中的描述为：```CDLSHORTLINE(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLSPINNINGTOP
-
-```
-talib.CDLSPINNINGTOP(inPriceOHLC)
-```
-
-```talib.CDLSPINNINGTOP()```函数用于计算**Spinning Top（K线形态：陀螺）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLSPINNINGTOP()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLSPINNINGTOP(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLSPINNINGTOP(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLSPINNINGTOP(records);
-    Log(ret);
-}
-```
-
-```CDLSPINNINGTOP()```函数在talib库文档中的描述为：```CDLSPINNINGTOP(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLSTALLEDPATTERN
-
-```
-talib.CDLSTALLEDPATTERN(inPriceOHLC)
-```
-
-```talib.CDLSTALLEDPATTERN()```函数用于计算**Stalled Pattern（K线图：停滞模式）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLSTALLEDPATTERN()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLSTALLEDPATTERN(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLSTALLEDPATTERN(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLSTALLEDPATTERN(records);
-    Log(ret);
-}
-```
-
-```CDLSTALLEDPATTERN()```函数在talib库文档中的描述为：```CDLSTALLEDPATTERN(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLSTICKSANDWICH
-
-```
-talib.CDLSTICKSANDWICH(inPriceOHLC)
-```
-
-```talib.CDLSTICKSANDWICH()```函数用于计算**Stick Sandwich（K线形态：棍子三明治）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLSTICKSANDWICH()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLSTICKSANDWICH(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLSTICKSANDWICH(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLSTICKSANDWICH(records);
-    Log(ret);
-}
-```
-
-```CDLSTICKSANDWICH()```函数在talib库文档中的描述为：```CDLSTICKSANDWICH(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLTAKURI
-
-```
-talib.CDLTAKURI(inPriceOHLC)
-```
-
-```talib.CDLTAKURI()```函数用于计算**Takuri (Dragonfly Doji with very long lower shadow) (K线图:托里)**蜡烛图形态。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLTAKURI()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLTAKURI(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLTAKURI(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLTAKURI(records);
-    Log(ret);
-}
-```
-
-```CDLTAKURI()```函数在talib库文档中的描述为：```CDLTAKURI(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLTASUKIGAP
-
-```
-talib.CDLTASUKIGAP(inPriceOHLC)
-```
-
-```talib.CDLTASUKIGAP()```函数用于计算**Tasuki Gap（K线图：翼隙）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLTASUKIGAP()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLTASUKIGAP(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLTASUKIGAP(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLTASUKIGAP(records);
-    Log(ret);
-}
-```
-
-```CDLTASUKIGAP()```函数在talib库文档中的描述为：```CDLTASUKIGAP(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLTHRUSTING
-
-```
-talib.CDLTHRUSTING(inPriceOHLC)
-```
-
-```talib.CDLTHRUSTING()```函数用于计算**Thrusting Pattern（K线图：推进模式）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLTHRUSTING()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLTHRUSTING(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLTHRUSTING(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLTHRUSTING(records);
-    Log(ret);
-}
-```
-
-```CDLTHRUSTING()```函数在talib库文档中的描述为：```CDLTHRUSTING(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLTRISTAR
-
-```
-talib.CDLTRISTAR(inPriceOHLC)
-```
-
-```talib.CDLTRISTAR()```函数用于计算**三星形态（K线图：三星模式）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLTRISTAR()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLTRISTAR(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLTRISTAR(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLTRISTAR(records);
-    Log(ret);
-}
-```
-
-```CDLTRISTAR()```函数在talib库文档中的描述为：```CDLTRISTAR(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLUNIQUE3RIVER
-
-```
-talib.CDLUNIQUE3RIVER(inPriceOHLC)
-```
-
-```talib.CDLUNIQUE3RIVER()```函数用于计算**Unique 3 River（K线形态：独特三河）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLUNIQUE3RIVER()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLUNIQUE3RIVER(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLUNIQUE3RIVER(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLUNIQUE3RIVER(records);
-    Log(ret);
-}
-```
-
-```CDLUNIQUE3RIVER()```函数在talib库文档中的描述为：```CDLUNIQUE3RIVER(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLUPSIDEGAP2CROWS
-
-```
-talib.CDLUPSIDEGAP2CROWS(inPriceOHLC)
-```
-
-```talib.CDLUPSIDEGAP2CROWS()```函数用于计算**向上跳空双乌鸦形态（K线图：双飞乌鸦）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLUPSIDEGAP2CROWS()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLUPSIDEGAP2CROWS(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLUPSIDEGAP2CROWS(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLUPSIDEGAP2CROWS(records);
-    Log(ret);
-}
-```
-
-```CDLUPSIDEGAP2CROWS()```函数在talib库文档中的描述为：```CDLUPSIDEGAP2CROWS(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.CDLXSIDEGAP3METHODS
-
-```
-talib.CDLXSIDEGAP3METHODS(inPriceOHLC)
-```
-
-```talib.CDLXSIDEGAP3METHODS()```函数用于计算**上行/下行缺口三方法（K线形态识别）**。
-
-Parameters:
-
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.CDLXSIDEGAP3METHODS()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CDLXSIDEGAP3METHODS(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CDLXSIDEGAP3METHODS(records.Open, records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CDLXSIDEGAP3METHODS(records);
-    Log(ret);
-}
-```
-
-```CDLXSIDEGAP3METHODS()```函数在talib库文档中的描述为：```CDLXSIDEGAP3METHODS(Records[Open,High,Low,Close]) = Array(outInteger)```
-
-#### talib.AD
-
-```
-talib.AD(inPriceHLCV)
-```
-
-```talib.AD()```函数用于计算**Chaikin A/D Line（累积/派发线指标）**。
-
-Parameters:
-
-- `inPriceHLCV` ({@struct/Record Record}结构数组, required): ```inPriceHLCV```参数用于指定K线数据。
-
-Returns (array): ```talib.AD()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.AD(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.AD(records.High, records.Low, records.Close, records.Volume)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.AD(records);
-    Log(ret);
-}
-```
-
-```AD()```函数在talib库文档中的描述为：```AD(Records[High,Low,Close,Volume]) = Array(outReal)```
-
-#### talib.ADOSC
-
-```
-talib.ADOSC(inPriceHLCV)
-talib.ADOSC(inPriceHLCV, optInFastPeriod, optInSlowPeriod)
-```
-
-```talib.ADOSC()```函数用于计算**Chaikin A/D Oscillator（佳庆指标）**。
-
-Parameters:
-
-- `inPriceHLCV` ({@struct/Record Record}结构数组, required): ```inPriceHLCV```参数用于指定K线数据。
-- `optInFastPeriod` (number, optional): ```optInFastPeriod```参数用于设置快速周期。
-- `optInSlowPeriod` (number, optional): ```optInSlowPeriod```参数用于设置慢速周期。
-
-Returns (array): ```talib.ADOSC()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.ADOSC(records, 3, 10)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.ADOSC(records.High, records.Low, records.Close, records.Volume, 3, 10)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.ADOSC(records, 3, 10);
-    Log(ret);
-}
-```
-
-```ADOSC()```函数在talib库文档中的描述为：```ADOSC(Records[High,Low,Close,Volume],Fast Period = 3,Slow Period = 10) = Array(outReal)```
-
-#### talib.OBV
-
-```
-talib.OBV(inReal)
-talib.OBV(inReal, inPriceV)
-```
-
-```talib.OBV()```函数用于计算**On Balance Volume（能量潮指标）**。
-
-Parameters:
-
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `inPriceV` ({@struct/Record Record}结构数组, optional): ```inPriceV```参数用于指定K线数据。
-
-Returns (array): ```talib.OBV()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.OBV(records, records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.OBV(records.Close, records.Volume)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.OBV(records);
-    Log(ret);
-}
-```
-
-```OBV()```函数在talib库文档中的描述为：```OBV(Records[Close],Records[Volume]) = Array(outReal)```
-
-#### talib.ACOS
-
-```
-talib.ACOS(inReal)
-```
-
-```talib.ACOS()```函数用于计算**向量三角反余弦函数（Vector Trigonometric ACos）**。
-
-Parameters:
-
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的实数数据。
-
-Returns (array): ```talib.ACOS()```函数返回一维数组，包含计算得出的反余弦值。
-
-```javascript
-function main() {
-    var data = [-1, 0, 1]
-    var ret = talib.ACOS(data)
-    Log(ret)
-}
-```
-
-```python
-import talib
-import numpy as np
-def main():
-    data = [-1.0, 0, 1.0]
-    ret = talib.ACOS(np.array(data))
-    Log(ret)
-```
-
-```cpp
-void main() {
-    std::vector<double> data = {-1, 0, 1};
-    auto ret = talib.ACOS(data);
-    Log(ret);
-}
-```
-
-```ACOS()```函数在talib库文档中的描述为：```ACOS(Records[Close]) = Array(outReal)```
-
-#### talib.ASIN
-
-```
-talib.ASIN(inReal)
-```
-
-```talib.ASIN()```函数用于计算**向量三角反正弦函数（Vector Trigonometric ASin）**。
-
-Parameters:
-
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的实数数据。
-
-Returns (array): ```talib.ASIN()```函数返回一维数组，包含计算得出的反正弦值。
-
-```javascript
-function main() {
-    var data = [-1, 0, 1]
-    var ret = talib.ASIN(data)
-    Log(ret)
-}
-```
-
-```python
-import talib
-import numpy as np
-def main():
-    data = [-1.0, 0, 1.0]
-    ret = talib.ASIN(np.array(data))
-    Log(ret)
-```
-
-```cpp
-void main() {
-    std::vector<double> data = {-1, 0, 1};
-    auto ret = talib.ASIN(data);
-    Log(ret);
-}
-```
-
-```ASIN()```函数在talib库文档中的描述为：```ASIN(Records[Close]) = Array(outReal)```
-
-#### talib.ATAN
-
-```
-talib.ATAN(inReal)
-```
-
-```talib.ATAN()```函数用于计算**向量三角反正切函数（Vector Trigonometric ATan）**。
-
-Parameters:
-
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的实数数据。
-
-Returns (array): ```talib.ATAN()```函数返回一维数组，包含计算得出的反正切值。
-
-```javascript
-function main() {
-    var data = [-3.14/2, 0, 3.14/2]
-    var ret = talib.ATAN(data)
-    Log(ret)
-}
-```
-
-```python
-import talib
-import numpy as np
-def main():
-    data = [-3.14/2, 0, 3.14/2]
-    ret = talib.ATAN(np.array(data))
-    Log(ret)
-```
-
-```cpp
-void main() {
-    std::vector<double> data = {-3.14/2, 0, 3.14/2};
-    auto ret = talib.ATAN(data);
-    Log(ret);
-}
-```
-
-```ATAN()```函数在talib库文档中的描述为：```ATAN(Records[Close]) = Array(outReal)```
-
-#### talib.CEIL
-
-```
-talib.CEIL(inReal)
-```
-
-```talib.CEIL()```函数用于计算**向上取整（Vector Ceil）**。
-
-Parameters:
-
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的K线数据。
-
-Returns (array): ```talib.CEIL()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.CEIL(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.CEIL(records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CEIL(records);
-    Log(ret);
-}
-```
-
-```CEIL()```函数在talib库文档中的描述为：```CEIL(Records[Close]) = Array(outReal)```
-
-#### talib.COS
-
-```
-talib.COS(inReal)
-```
-
-```talib.COS()```函数用于计算**Vector Trigonometric Cos（向量三角余弦函数）**。
-
-Parameters:
-
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的实数数据序列。
-
-Returns (array): ```talib.COS()```函数返回一个包含余弦计算结果的一维数组。
-
-```javascript
-function main() {
-    var data = [-3.14, 0, 3.14]
-    var ret = talib.COS(data)
-    Log(ret)
-}
-```
-
-```python
-import talib
-import numpy as np
-def main():
-    data = [-3.14, 0, 3.14]
-    ret = talib.COS(np.array(data))
-    Log(ret)
-```
-
-```cpp
-void main() {
-    std::vector<double> data = {-3.14, 0, 3.14};
-    auto ret = talib.COS(data);
-    Log(ret);
-}
-```
-
-```COS()```函数在talib库文档中的描述为：```COS(Records[Close]) = Array(outReal)```
-
-#### talib.COSH
-
-```
-talib.COSH(inReal)
-```
-
-```talib.COSH()```函数用于计算**向量三角双曲余弦值（Vector Trigonometric Cosh）**。
-
-Parameters:
-
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的K线数据。
-
-Returns (array): ```talib.COSH()```函数返回一维数组，包含计算得出的双曲余弦值。
-
-```javascript
-function main() {
-    var data = [-1, 0, 1]
-    var ret = talib.COSH(data)
-    Log(ret)
-}
-```
-
-```python
-import talib
-import numpy as np
-def main():
-    data = [-1.0, 0, 1.0]
-    ret = talib.COSH(np.array(data))
-    Log(ret)
-```
-
-```cpp
-void main() {
-    std::vector<double> data = {-1, 0, 1};
-    auto ret = talib.COSH(data);
-    Log(ret);
-}
-```
-
-```COSH()```函数在talib库文档中的描述为：```COSH(Records[Close]) = Array(outReal)```
-
-#### talib.EXP
-
-```
-talib.EXP(inReal)
-```
-
-```talib.EXP()```函数用于计算**向量算术指数函数（Vector Arithmetic Exp）**。
-
-Parameters:
-
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的实数数据。
-
-Returns (array): ```talib.EXP()```函数返回一维数组，包含输入数据的指数计算结果。
-
-```javascript
-function main() {
-    var data = [0, 1, 2]
-    var ret = talib.EXP(data)    // e^0, e^1, e^2
-    Log(ret)
-}
-```
-
-```python
-import talib
-import numpy as np
-def main():
-    data = [0, 1.0, 2.0]
-    ret = talib.EXP(np.array(data))
-    Log(ret)
-```
-
-```cpp
-void main() {
-    std::vector<double> data = {0, 1.0, 2.0};
-    auto ret = talib.EXP(data);
-    Log(ret);
-}
-```
-
-```EXP()```函数在talib库文档中的描述为：```EXP(Records[Close]) = Array(outReal)```
-
-#### talib.FLOOR
-
-```
-talib.FLOOR(inReal)
-```
-
-```talib.FLOOR()```函数用于计算**向量向下取整（Vector Floor）**。
-
-Parameters:
-
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的K线数据。
-
-Returns (array): ```talib.FLOOR()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.FLOOR(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.FLOOR(records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.FLOOR(records);
-    Log(ret);
-}
-```
-
-```FLOOR()```函数在talib库文档中的描述为：```FLOOR(Records[Close]) = Array(outReal)```
-
-#### talib.LN
-
-```
-talib.LN(inReal)
-```
-
-```talib.LN()```函数用于计算**向量自然对数（Vector Log Natural）**。
-
-Parameters:
-
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的K线数据。
-
-Returns (array): ```talib.LN()```函数返回一维数组。
-
-```javascript
-function main() {
-    var data = [1, 2, 3]
-    var ret = talib.LN(data)
-    Log(ret)
-}
-```
-
-```python
-import talib
-import numpy as np
-def main():
-    data = [1.0, 2.0, 3.0]
-    ret = talib.LN(np.array(data))
-    Log(ret)
-```
-
-```cpp
-void main() {
-    std::vector<double> data = {1, 2, 3};
-    auto ret = talib.LN(data);
-    Log(ret);
-}
-```
-
-```LN()```函数在talib库文档中的描述为：```LN(Records[Close]) = Array(outReal)```
-
-#### talib.LOG10
-
-```
-talib.LOG10(inReal)
-```
-
-```talib.LOG10()```函数用于计算**Vector Log10（对数函数）**。
-
-Parameters:
-
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-
-Returns (array): ```talib.LOG10()```函数的返回值为一维数组。
-
-```javascript
-function main() {
-    var data = [10, 100, 1000]
-    var ret = talib.LOG10(data)
-    Log(ret)
-}
-```
-
-```python
-import talib
-import numpy as np
-def main():
-    data = [10.0, 100.0, 1000.0]
-    ret = talib.LOG10(np.array(data))
-    Log(ret)
-```
-
-```cpp
-void main() {
-    std::vector<double> data = {10, 100, 1000};
-    auto ret = talib.LOG10(data);
-    Log(ret);
-}
-```
-
-```LOG10()```函数在talib库文档中的描述为：```LOG10(Records[Close]) = Array(outReal)```
-
-#### talib.SIN
-
-```
-talib.SIN(inReal)
-```
-
-```talib.SIN()```函数用于计算**Vector Trigonometric Sin（正弦值）**。
-
-Parameters:
-
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-
-Returns (array): ```talib.SIN()```函数返回一维数组。
-
-```javascript
-function main() {
-    var data = [-3.14/2, 0, 3.14/2]
-    var ret = talib.SIN(data)
-    Log(ret)
-}
-```
-
-```python
-import talib
-import numpy as np
-def main():
-    data = [-3.14/2, 0, 3.14/2]
-    ret = talib.SIN(np.array(data))
-    Log(ret)
-```
-
-```cpp
-void main() {
-    std::vector<double> data = {-3.14/2, 0, 3.14/2};
-    auto ret = talib.SIN(data);
-    Log(ret);
-}
-```
-
-```SIN()```函数在talib库文档中的描述为：```SIN(Records[Close]) = Array(outReal)```
-
-#### talib.SINH
-
-```
-talib.SINH(inReal)
-```
-
-```talib.SINH()```函数用于计算**向量三角双曲正弦函数（Vector Trigonometric Sinh）**。
-
-Parameters:
-
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的实数数据。
-
-Returns (array): ```talib.SINH()```函数返回一维数组，包含计算得出的双曲正弦值。
-
-```javascript
-function main() {
-    var data = [-1, 0, 1]
-    var ret = talib.SINH(data)
-    Log(ret)
-}
-```
-
-```python
-import talib
-import numpy as np
-def main():
-    data = [-1.0, 0, 1.0]
-    ret = talib.SINH(np.array(data))
-    Log(ret)
-```
-
-```cpp
-void main() {
-    std::vector<double> data = {-1, 0, 1};
-    auto ret = talib.SINH(data);
-    Log(ret);
-}
-```
-
-```SINH()```函数在talib库文档中的描述为：```SINH(Records[Close]) = Array(outReal)```
-
-#### talib.SQRT
-
-```
-talib.SQRT(inReal)
-```
-
-```talib.SQRT()```函数用于计算**向量平方根（Vector Square Root）**。
-
-Parameters:
-
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的数值数据。
-
-Returns (array): ```talib.SQRT()```函数返回一维数组，包含输入数据的平方根值。
-
-```javascript
-function main() {
-    var data = [4, 64, 100]
-    var ret = talib.SQRT(data)
-    Log(ret)
-}
-```
-
-```python
-import talib
-import numpy as np
-def main():
-    data = [4.0, 64.0, 100.0]
-    ret = talib.SQRT(np.array(data))
-    Log(ret)
-```
-
-```cpp
-void main() {
-    std::vector<double> data = {4, 64, 100};
-    auto ret = talib.SQRT(data);
-    Log(ret);
-}
-```
-
-```SQRT()```函数在talib库文档中的描述为：```SQRT(Records[Close]) = Array(outReal)```
-
-#### talib.TAN
-
-```
-talib.TAN(inReal)
-```
-
-```talib.TAN()```函数用于计算**向量三角正切值（Vector Trigonometric Tan）**。
-
-Parameters:
-
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的K线数据。
-
-Returns (array): ```talib.TAN()```函数返回一维数组。
-
-```javascript
-function main() {
-    var data = [-1, 0, 1]
-    var ret = talib.TAN(data)
-    Log(ret)
-}
-```
-
-```python
-import talib
-import numpy as np
-def main():
-    data = [-1.0, 0, 1.0]
-    ret = talib.TAN(np.array(data))
-    Log(ret)
-```
-
-```cpp
-void main() {
-    std::vector<double> data = {-1, 0, 1};
-    auto ret = talib.TAN(data);
-    Log(ret);
-}
-```
-
-```TAN()```函数在talib库文档中的描述为：```TAN(Records[Close]) = Array(outReal)```
-
-#### talib.TANH
-
-```
-talib.TANH(inReal)
-```
-
-```talib.TANH()```函数用于计算**向量三角双曲正切函数（Vector Trigonometric Tanh）**。
-
-Parameters:
-
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的实数数据序列。
-
-Returns (array): ```talib.TANH()```函数返回一个包含双曲正切计算结果的一维数组。
-
-```javascript
-function main() {
-    var data = [-1, 0, 1]
-    var ret = talib.TANH(data)
-    Log(ret)
-}
-```
-
-```python
-import talib
-import numpy as np
-def main():
-    data = [-1.0, 0, 1.0]
-    ret = talib.TANH(np.array(data))
-    Log(ret)
-```
-
-```cpp
-void main() {
-    std::vector<double> data = {-1, 0, 1};
-    auto ret = talib.TANH(data);
-    Log(ret);
-}
-```
-
-```TANH()```函数在talib库文档中的描述为：```TANH(Records[Close]) = Array(outReal)```
-
-#### talib.MAX
-
-```
-talib.MAX(inReal)
-talib.MAX(inReal, optInTimePeriod)
-```
-
-```talib.MAX()```函数用于计算**指定周期内的最大值（Highest value over a specified period）**。
-
-Parameters:
-
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为30。
-
-Returns (array): ```talib.MAX()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.MAX(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.MAX(records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.MAX(records);
-    Log(ret);
-}
-```
-
-```MAX()```函数在talib库文档中的描述为：```MAX(Records[Close],Time Period = 30) = Array(outReal)```
-
-#### talib.MAXINDEX
-
-```
-talib.MAXINDEX(inReal)
-talib.MAXINDEX(inReal, optInTimePeriod)
-```
-
-```talib.MAXINDEX()```函数用于计算**指定周期内最大值的索引位置（Index of highest value over a specified period）**。
-
-Parameters:
-
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为30。
-
-Returns (array): ```talib.MAXINDEX()```函数返回一个一维数组，包含指定周期内最大值的索引位置。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.MAXINDEX(records, 5)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.MAXINDEX(records.Close, 5)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.MAXINDEX(records, 5);
-    Log(ret);
-}
-```
-
-```MAXINDEX()```函数在talib库文档中的描述为：```MAXINDEX(Records[Close],Time Period = 30) = Array(outInteger)```
-
-#### talib.MIN
-
-```
-talib.MIN(inReal)
-talib.MIN(inReal, optInTimePeriod)
-```
-
-```talib.MIN()```函数用于计算**指定周期内的最小值（Lowest value over a specified period）**。
-
-Parameters:
-
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为30。
-
-Returns (array): ```talib.MIN()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.MIN(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.MIN(records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.MIN(records);
-    Log(ret);
-}
-```
-
-```MIN()```函数在talib库文档中的描述为：```MIN(Records[Close],Time Period = 30) = Array(outReal)```
-
-#### talib.MININDEX
-
-```
-talib.MININDEX(inReal)
-talib.MININDEX(inReal, optInTimePeriod)
-```
-
-```talib.MININDEX()```函数用于计算**指定周期内最小值的索引位置（Index of lowest value over a specified period）**。
-
-Parameters:
-
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为30。
-
-Returns (array): ```talib.MININDEX()```函数返回一个一维数组，包含指定周期内最小值的索引位置。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.MININDEX(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.MININDEX(records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.MININDEX(records);
-    Log(ret);
-}
-```
-
-```MININDEX()```函数在talib库文档中的描述为：```MININDEX(Records[Close],Time Period = 30) = Array(outInteger)```
-
-#### talib.MINMAX
-
-```
-talib.MINMAX(inReal)
-talib.MINMAX(inReal, optInTimePeriod)
-```
-
-```talib.MINMAX()```函数用于计算**指定周期内的最小值和最大值（Lowest and highest values over a specified period）**。
-
-Parameters:
-
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为30。
-
-Returns (array): ```talib.MINMAX()```函数返回一个二维数组。该二维数组的第一个元素为最小值数组，第二个元素为最大值数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.MINMAX(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.MINMAX(records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.MINMAX(records);
-    Log(ret);
-}
-```
-
-```MINMAX()```函数在talib库文档中的描述为：```MINMAX(Records[Close],Time Period = 30) = [Array(outMin),Array(outMax)]```
-
-#### talib.MINMAXINDEX
-
-```
-talib.MINMAXINDEX(inReal)
-talib.MINMAXINDEX(inReal, optInTimePeriod)
-```
-
-```talib.MINMAXINDEX()```函数用于计算**指定周期内最低值和最高值的索引位置（Indexes of lowest and highest values over a specified period）**。
-
-Parameters:
-
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为30。
-
-Returns (array): ```talib.MINMAXINDEX()```函数返回一个二维数组。该数组的第一个元素为最小值索引数组，第二个元素为最大值索引数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.MINMAXINDEX(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.MINMAXINDEX(records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.MINMAXINDEX(records);
-    Log(ret);
-}
-```
-
-```MINMAXINDEX()```函数在talib库文档中的描述为：```MINMAXINDEX(Records[Close],Time Period = 30) = [Array(outMinIdx),Array(outMaxIdx)]```
-
-#### talib.SUM
-
-```
-talib.SUM(inReal)
-talib.SUM(inReal, optInTimePeriod)
-```
-
-```talib.SUM()```函数用于计算**求和（Summation）**。
-
-Parameters:
-
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为30。
-
-Returns (array): ```talib.SUM()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.SUM(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.SUM(records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.SUM(records);
-    Log(ret);
-}
-```
-
-```SUM()```函数在talib库文档中的描述为：```SUM(Records[Close],Time Period = 30) = Array(outReal)```
-
-#### talib.HT_DCPERIOD
-
-```
-talib.HT_DCPERIOD(inReal)
-```
-
-```talib.HT_DCPERIOD()```函数用于计算**Hilbert Transform - Dominant Cycle Period（希尔伯特变换主导周期）**。
-
-Parameters:
-
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-
-Returns (array): ```talib.HT_DCPERIOD()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.HT_DCPERIOD(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.HT_DCPERIOD(records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.HT_DCPERIOD(records);
-    Log(ret);
-}
-```
-
-```HT_DCPERIOD()```函数在talib库文档中的描述为：```HT_DCPERIOD(Records[Close]) = Array(outReal)```
-
-#### talib.HT_DCPHASE
-
-```
-talib.HT_DCPHASE(inReal)
-```
-
-```talib.HT_DCPHASE()```函数用于计算**希尔伯特变换主周期相位（Hilbert Transform - Dominant Cycle Phase）**。
-
-Parameters:
-
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的K线数据。
-
-Returns (array): ```talib.HT_DCPHASE()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.HT_DCPHASE(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.HT_DCPHASE(records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.HT_DCPHASE(records);
-    Log(ret);
-}
-```
-
-```HT_DCPHASE()```函数在talib库文档中的描述为：```HT_DCPHASE(Records[Close]) = Array(outReal)```
-
-#### talib.HT_PHASOR
-
-```
-talib.HT_PHASOR(inReal)
-```
-
-```talib.HT_PHASOR()```函数用于计算**Hilbert Transform - Phasor Components（希尔伯特变换-相量分量）**。
-
-Parameters:
-
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的K线数据。
-
-Returns (array): ```talib.HT_PHASOR()```函数返回一个二维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.HT_PHASOR(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.HT_PHASOR(records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.HT_PHASOR(records);
-    Log(ret);
-}
-```
-
-```HT_PHASOR()```函数在talib库文档中的描述为：```HT_PHASOR(Records[Close]) = [Array(outInPhase),Array(outQuadrature)]```
-
-#### talib.HT_SINE
-
-```
-talib.HT_SINE(inReal)
-```
-
-```talib.HT_SINE()```函数用于计算**Hilbert Transform - SineWave（希尔伯特变换 - 正弦波）**。
-
-Parameters:
-
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-
-Returns (array): ```talib.HT_SINE()```函数返回二维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.HT_SINE(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.HT_SINE(records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.HT_SINE(records);
-    Log(ret);
-}
-```
-
-```HT_SINE()```函数在talib库文档中的描述为：```HT_SINE(Records[Close]) = [Array(outSine),Array(outLeadSine)]```
-
-#### talib.HT_TRENDMODE
-
-```
-talib.HT_TRENDMODE(inReal)
-```
-
-```talib.HT_TRENDMODE()```函数用于计算**Hilbert Transform - Trend vs Cycle Mode（希尔伯特变换 - 趋势与周期模式）**。
-
-Parameters:
-
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-
-Returns (array): ```talib.HT_TRENDMODE()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.HT_TRENDMODE(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.HT_TRENDMODE(records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.HT_TRENDMODE(records);
-    Log(ret);
-}
-```
-
-```HT_TRENDMODE()```函数在talib库文档中的描述为：```HT_TRENDMODE(Records[Close]) = Array(outInteger)```
-
-#### talib.ATR
-
-```
-talib.ATR(inPriceHLC)
-talib.ATR(inPriceHLC, optInTimePeriod)
-```
-
-```talib.ATR()```函数用于计算**Average True Range（平均真实波幅）**指标。
-
-Parameters:
-
-- `inPriceHLC` ({@struct/Record Record}结构数组, required): ```inPriceHLC```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为14。
-
-Returns (array): ```talib.ATR()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.ATR(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.ATR(records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.ATR(records);
-    Log(ret);
-}
-```
-
-```ATR()```函数在talib库文档中的描述为：```ATR(Records[High,Low,Close],Time Period = 14) = Array(outReal)```
-
-#### talib.NATR
-
-```
-talib.NATR(inPriceHLC)
-talib.NATR(inPriceHLC, optInTimePeriod)
-```
-
-```talib.NATR()```函数用于计算**Normalized Average True Range（归一化平均真实范围）**。
-
-Parameters:
-
-- `inPriceHLC` ({@struct/Record Record}结构数组, required): ```inPriceHLC```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为14。
-
-Returns (array): ```talib.NATR()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.NATR(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.NATR(records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.NATR(records);
-    Log(ret);
-}
-```
-
-```NATR()```函数在talib库文档中的描述为：```NATR(Records[High,Low,Close],Time Period = 14) = Array(outReal)```
-
-#### talib.TRANGE
-
-```
-talib.TRANGE(inPriceHLC)
-```
-
-```talib.TRANGE()```函数用于计算**True Range（真实范围）**指标。
-
-Parameters:
-
-- `inPriceHLC` ({@struct/Record Record}结构数组, required): ```inPriceHLC```参数用于指定K线数据。
-
-Returns (array): ```talib.TRANGE()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.TRANGE(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.TRANGE(records.High, records.Low, records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.TRANGE(records);
-    Log(ret);
-}
-```
-
-```TRANGE()```函数在talib库文档中的描述为：```TRANGE(Records[High,Low,Close]) = Array(outReal)```
-
-#### talib.BBANDS
+##### talib.BBANDS
 
 ```
 talib.BBANDS(inReal)
@@ -23867,17 +17338,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.BBANDS(records);
-    Log(ret);
-}
-```
-
 ```BBANDS()```函数在talib库文档中的描述为：```BBANDS(Records[Close],Time Period = 5,Deviations up = 2,Deviations down = 2,MA Type = 0) = [Array(outRealUpperBand),Array(outRealMiddleBand),Array(outRealLowerBand)]```
 
-#### talib.DEMA
+##### talib.DEMA
 
 ```
 talib.DEMA(inReal)
@@ -23909,17 +17372,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.DEMA(records);
-    Log(ret);
-}
-```
-
 ```DEMA()```函数在talib库文档中的描述为：```DEMA(Records[Close],Time Period = 30) = Array(outReal)```
 
-#### talib.EMA
+##### talib.EMA
 
 ```
 talib.EMA(inReal)
@@ -23951,17 +17406,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.EMA(records);
-    Log(ret);
-}
-```
-
 ```EMA()```函数在talib库文档中的描述为：```EMA(Records[Close],Time Period = 30) = Array(outReal)```
 
-#### talib.HT_TRENDLINE
+##### talib.HT_TRENDLINE
 
 ```
 talib.HT_TRENDLINE(inReal)
@@ -23991,17 +17438,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.HT_TRENDLINE(records);
-    Log(ret);
-}
-```
-
 ```HT_TRENDLINE()```函数在talib库文档中的描述为：```HT_TRENDLINE(Records[Close]) = Array(outReal)```
 
-#### talib.KAMA
+##### talib.KAMA
 
 ```
 talib.KAMA(inReal)
@@ -24033,17 +17472,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.KAMA(records);
-    Log(ret);
-}
-```
-
 ```KAMA()```函数在talib库文档中的描述为：```KAMA(Records[Close],Time Period = 30) = Array(outReal)```
 
-#### talib.MA
+##### talib.MA
 
 ```
 talib.MA(inReal)
@@ -24077,17 +17508,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.MA(records);
-    Log(ret);
-}
-```
-
 ```MA()```函数在talib库文档中的描述为：```MA(Records[Close],Time Period = 30,MA Type = 0) = Array(outReal)```
 
-#### talib.MAMA
+##### talib.MAMA
 
 ```
 talib.MAMA(inReal)
@@ -24121,17 +17544,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.MAMA(records);
-    Log(ret);
-}
-```
-
 ```MAMA()```函数在talib库文档中的描述为：```MAMA(Records[Close],Fast Limit = 0.5,Slow Limit = 0.05) = [Array(outMAMA),Array(outFAMA)]```
 
-#### talib.MIDPOINT
+##### talib.MIDPOINT
 
 ```
 talib.MIDPOINT(inReal)
@@ -24163,17 +17578,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.MIDPOINT(records);
-    Log(ret);
-}
-```
-
 ```MIDPOINT()```函数在talib库文档中的描述为：```MIDPOINT(Records[Close],Time Period = 14) = Array(outReal)```
 
-#### talib.MIDPRICE
+##### talib.MIDPRICE
 
 ```
 talib.MIDPRICE(inPriceHL)
@@ -24205,17 +17612,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.MIDPRICE(records);
-    Log(ret);
-}
-```
-
 ```MIDPRICE()```函数在talib库文档中的描述为：```MIDPRICE(Records[High,Low],Time Period = 14) = Array(outReal)```
 
-#### talib.SAR
+##### talib.SAR
 
 ```
 talib.SAR(inPriceHL)
@@ -24249,17 +17648,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.SAR(records);
-    Log(ret);
-}
-```
-
 ```SAR()```函数在talib库文档中的描述为：```SAR(Records[High,Low],Acceleration Factor = 0.02,AF Maximum = 0.2) = Array(outReal)```
 
-#### talib.SAREXT
+##### talib.SAREXT
 
 ```
 talib.SAREXT(inPriceHL)
@@ -24305,17 +17696,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.SAREXT(records);
-    Log(ret);
-}
-```
-
 ```SAREXT()```函数在talib库文档中的描述为：```SAREXT(Records[High,Low],Start Value = 0,Offset on Reverse = 0,AF Init Long = 0.02,AF Long = 0.02,AF Max Long = 0.2,AF Init Short = 0.02,AF Short = 0.02,AF Max Short = 0.2) = Array(outReal)```
 
-#### talib.SMA
+##### talib.SMA
 
 ```
 talib.SMA(inReal)
@@ -24347,17 +17730,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.SMA(records);
-    Log(ret);
-}
-```
-
 ```SMA()```函数在talib库文档中的描述为：```SMA(Records[Close],Time Period = 30) = Array(outReal)```
 
-#### talib.T3
+##### talib.T3
 
 ```
 talib.T3(inReal)
@@ -24391,17 +17766,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.T3(records);
-    Log(ret);
-}
-```
-
 ```T3()```函数在talib库文档中的描述为：```T3(Records[Close],Time Period = 5,Volume Factor = 0.7) = Array(outReal)```
 
-#### talib.TEMA
+##### talib.TEMA
 
 ```
 talib.TEMA(inReal)
@@ -24433,17 +17800,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.TEMA(records);
-    Log(ret);
-}
-```
-
 ```TEMA()```函数在talib库文档中的描述为：```TEMA(Records[Close],Time Period = 30) = Array(outReal)```
 
-#### talib.TRIMA
+##### talib.TRIMA
 
 ```
 talib.TRIMA(inReal)
@@ -24475,17 +17834,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.TRIMA(records);
-    Log(ret);
-}
-```
-
 ```TRIMA()```函数在talib库文档中的描述为：```TRIMA(Records[Close],Time Period = 30) = Array(outReal)```
 
-#### talib.WMA
+##### talib.WMA
 
 ```
 talib.WMA(inReal)
@@ -24517,315 +17868,13 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.WMA(records);
-    Log(ret);
-}
-```
-
 ```WMA()```函数在talib库文档中的描述为：```WMA(Records[Close],Time Period = 30) = Array(outReal)```
 
-#### talib.LINEARREG
+#### MomentumIndicators
 
-```
-talib.LINEARREG(inReal)
-talib.LINEARREG(inReal, optInTimePeriod)
-```
+动量类指标：MACD、RSI、随机指标（STOCH）、ADX、CCI等。
 
-```talib.LINEARREG()```函数用于计算**Linear Regression（线性回归）**指标。
-
-Parameters:
-
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为14。
-
-Returns (array): ```talib.LINEARREG()```函数返回一维数组，包含线性回归计算结果。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.LINEARREG(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.LINEARREG(records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.LINEARREG(records);
-    Log(ret);
-}
-```
-
-```LINEARREG()```函数在talib库文档中的描述为：```LINEARREG(Records[Close],Time Period = 14) = Array(outReal)```
-
-#### talib.LINEARREG_ANGLE
-
-```
-talib.LINEARREG_ANGLE(inReal)
-talib.LINEARREG_ANGLE(inReal, optInTimePeriod)
-```
-
-```talib.LINEARREG_ANGLE()```函数用于计算**Linear Regression Angle（线性回归角度）**。
-
-Parameters:
-
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为14。
-
-Returns (array): ```talib.LINEARREG_ANGLE()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.LINEARREG_ANGLE(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.LINEARREG_ANGLE(records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.LINEARREG_ANGLE(records);
-    Log(ret);
-}
-```
-
-```LINEARREG_ANGLE()```函数在talib库文档中的描述为：```LINEARREG_ANGLE(Records[Close],Time Period = 14) = Array(outReal)```
-
-#### talib.LINEARREG_INTERCEPT
-
-```
-talib.LINEARREG_INTERCEPT(inReal)
-talib.LINEARREG_INTERCEPT(inReal, optInTimePeriod)
-```
-
-```talib.LINEARREG_INTERCEPT()```函数用于计算**线性回归截距（Linear Regression Intercept）**。
-
-Parameters:
-
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为14。
-
-Returns (array): ```talib.LINEARREG_INTERCEPT()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.LINEARREG_INTERCEPT(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.LINEARREG_INTERCEPT(records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.LINEARREG_INTERCEPT(records);
-    Log(ret);
-}
-```
-
-```LINEARREG_INTERCEPT()```函数在talib库文档中的描述为：```LINEARREG_INTERCEPT(Records[Close],Time Period = 14) = Array(outReal)```
-
-#### talib.LINEARREG_SLOPE
-
-```
-talib.LINEARREG_SLOPE(inReal)
-talib.LINEARREG_SLOPE(inReal, optInTimePeriod)
-```
-
-```talib.LINEARREG_SLOPE()```函数用于计算**Linear Regression Slope（线性回归斜率）**。
-
-Parameters:
-
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为14。
-
-Returns (array): ```talib.LINEARREG_SLOPE()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.LINEARREG_SLOPE(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.LINEARREG_SLOPE(records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.LINEARREG_SLOPE(records);
-    Log(ret);
-}
-```
-
-```LINEARREG_SLOPE()```函数在talib库文档中的描述为：```LINEARREG_SLOPE(Records[Close],Time Period = 14) = Array(outReal)```
-
-#### talib.STDDEV
-
-```
-talib.STDDEV(inReal)
-talib.STDDEV(inReal, optInTimePeriod)
-talib.STDDEV(inReal, optInTimePeriod, optInNbDev)
-```
-
-```talib.STDDEV()```函数用于计算**标准偏差（Standard Deviation）**。
-
-Parameters:
-
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为5。
-- `optInNbDev` (number, optional): ```optInNbDev```参数用于设置偏差倍数，默认值为1。
-
-Returns (array): ```talib.STDDEV()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.STDDEV(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.STDDEV(records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.STDDEV(records);
-    Log(ret);
-}
-```
-
-```STDDEV()```函数在talib库文档中的描述为：```STDDEV(Records[Close],Time Period = 5,Deviations = 1) = Array(outReal)```
-
-#### talib.TSF
-
-```
-talib.TSF(inReal)
-talib.TSF(inReal, optInTimePeriod)
-```
-
-```talib.TSF()```函数用于计算**Time Series Forecast（时间序列预测）**。
-
-Parameters:
-
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为14。
-
-Returns (array): ```talib.TSF()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.TSF(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.TSF(records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.TSF(records);
-    Log(ret);
-}
-```
-
-```TSF()```函数在talib库文档中的描述为：```TSF(Records[Close],Time Period = 14) = Array(outReal)```
-
-#### talib.VAR
-
-```
-talib.VAR(inReal)
-talib.VAR(inReal, optInTimePeriod)
-talib.VAR(inReal, optInTimePeriod, optInNbDev)
-```
-
-```talib.VAR()```函数用于计算**方差（Variance）**。
-
-Parameters:
-
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为5。
-- `optInNbDev` (number, optional): ```optInNbDev```参数用于设置标准差倍数，默认值为1。
-
-Returns (array): ```talib.VAR()```函数返回一维数组。
-
-```javascript
-function main() {
-    var records = exchange.GetRecords()
-    var ret = talib.VAR(records)
-    Log(ret)
-}
-```
-
-```python
-import talib
-def main():
-    records = exchange.GetRecords()
-    ret = talib.VAR(records.Close)
-    Log(ret)
-```
-
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.VAR(records);
-    Log(ret);
-}
-```
-
-```VAR()```函数在talib库文档中的描述为：```VAR(Records[Close],Time Period = 5,Deviations = 1) = Array(outReal)```
-
-#### talib.ADX
+##### talib.ADX
 
 ```
 talib.ADX(inPriceHLC)
@@ -24857,17 +17906,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.ADX(records);
-    Log(ret);
-}
-```
-
 ```ADX()```函数在talib库文档中的描述为：```ADX(Records[High,Low,Close],Time Period = 14) = Array(outReal)```
 
-#### talib.ADXR
+##### talib.ADXR
 
 ```
 talib.ADXR(inPriceHLC)
@@ -24899,17 +17940,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.ADXR(records);
-    Log(ret);
-}
-```
-
 ```ADXR()```函数在talib库文档中的描述为：```ADXR(Records[High,Low,Close],Time Period = 14) = Array(outReal)```
 
-#### talib.APO
+##### talib.APO
 
 ```
 talib.APO(inReal)
@@ -24945,17 +17978,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.APO(records);
-    Log(ret);
-}
-```
-
 ```APO()```函数在talib库文档中的描述为：```APO(Records[Close],Fast Period = 12,Slow Period = 26,MA Type = 0) = Array(outReal)```
 
-#### talib.AROON
+##### talib.AROON
 
 ```
 talib.AROON(inPriceHL)
@@ -24987,17 +18012,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.AROON(records);
-    Log(ret);
-}
-```
-
 ```AROON()```函数在talib库文档中的描述为：```AROON(Records[High,Low],Time Period = 14) = [Array(outAroonDown),Array(outAroonUp)]```
 
-#### talib.AROONOSC
+##### talib.AROONOSC
 
 ```
 talib.AROONOSC(inPriceHL)
@@ -25029,17 +18046,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.AROONOSC(records);
-    Log(ret);
-}
-```
-
 ```AROONOSC()```函数在talib库文档中的描述为：```AROONOSC(Records[High,Low],Time Period = 14) = Array(outReal)```
 
-#### talib.BOP
+##### talib.BOP
 
 ```
 talib.BOP(inPriceOHLC)
@@ -25069,17 +18078,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.BOP(records);
-    Log(ret);
-}
-```
-
 ```BOP()```函数在talib库文档中的描述为：```BOP(Records[Open,High,Low,Close]) = Array(outReal)```
 
-#### talib.CCI
+##### talib.CCI
 
 ```
 talib.CCI(inPriceHLC)
@@ -25111,17 +18112,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CCI(records);
-    Log(ret);
-}
-```
-
 ```CCI()```函数在talib库文档中的描述为：```CCI(Records[High,Low,Close],Time Period = 14) = Array(outReal)```
 
-#### talib.CMO
+##### talib.CMO
 
 ```
 talib.CMO(inReal)
@@ -25153,17 +18146,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.CMO(records);
-    Log(ret);
-}
-```
-
 ```CMO()```函数在talib库文档中的描述为：```CMO(Records[Close],Time Period = 14) = Array(outReal)```
 
-#### talib.DX
+##### talib.DX
 
 ```
 talib.DX(inPriceHLC)
@@ -25195,17 +18180,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.DX(records);
-    Log(ret);
-}
-```
-
 ```DX()```函数在talib库文档中的描述为：```DX(Records[High,Low,Close],Time Period = 14) = Array(outReal)```
 
-#### talib.MACD
+##### talib.MACD
 
 ```
 talib.MACD(inReal)
@@ -25241,17 +18218,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.MACD(records);
-    Log(ret);
-}
-```
-
 ```MACD()```函数在talib库文档中的描述为：```MACD(Records[Close],Fast Period = 12,Slow Period = 26,Signal Period = 9) = [Array(outMACD),Array(outMACDSignal),Array(outMACDHist)]```
 
-#### talib.MACDEXT
+##### talib.MACDEXT
 
 ```
 talib.MACDEXT(inReal)
@@ -25293,17 +18262,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.MACDEXT(records);
-    Log(ret);
-}
-```
-
 ```MACDEXT()```函数在talib库文档中的描述为：```MACDEXT(Records[Close],Fast Period = 12,Fast MA = 0,Slow Period = 26,Slow MA = 0,Signal Period = 9,Signal MA = 0) = [Array(outMACD),Array(outMACDSignal),Array(outMACDHist)]```
 
-#### talib.MACDFIX
+##### talib.MACDFIX
 
 ```
 talib.MACDFIX(inReal)
@@ -25335,17 +18296,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.MACDFIX(records);
-    Log(ret);
-}
-```
-
 ```MACDFIX()```函数在talib库文档中的描述为：```MACDFIX(Records[Close],Signal Period = 9) = [Array(outMACD),Array(outMACDSignal),Array(outMACDHist)]```
 
-#### talib.MFI
+##### talib.MFI
 
 ```
 talib.MFI(inPriceHLCV)
@@ -25377,17 +18330,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.MFI(records);
-    Log(ret);
-}
-```
-
 ```MFI()```函数在talib库文档中的描述为：```MFI(Records[High,Low,Close,Volume],Time Period = 14) = Array(outReal)```
 
-#### talib.MINUS_DI
+##### talib.MINUS_DI
 
 ```
 talib.MINUS_DI(inPriceHLC)
@@ -25419,17 +18364,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.MINUS_DI(records);
-    Log(ret);
-}
-```
-
 ```MINUS_DI()```函数在talib库文档中的描述为：```MINUS_DI(Records[High,Low,Close],Time Period = 14) = Array(outReal)```
 
-#### talib.MINUS_DM
+##### talib.MINUS_DM
 
 ```
 talib.MINUS_DM(inPriceHL)
@@ -25461,17 +18398,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.MINUS_DM(records);
-    Log(ret);
-}
-```
-
 ```MINUS_DM()```函数在talib库文档中的描述为：```MINUS_DM(Records[High,Low],Time Period = 14) = Array(outReal)```
 
-#### talib.MOM
+##### talib.MOM
 
 ```
 talib.MOM(inReal)
@@ -25503,17 +18432,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.MOM(records);
-    Log(ret);
-}
-```
-
 ```MOM()```函数在talib库文档中的描述为：```MOM(Records[Close],Time Period = 10) = Array(outReal)```
 
-#### talib.PLUS_DI
+##### talib.PLUS_DI
 
 ```
 talib.PLUS_DI(inPriceHLC)
@@ -25545,17 +18466,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.PLUS_DI(records);
-    Log(ret);
-}
-```
-
 ```PLUS_DI()```函数在talib库文档中的描述为：```PLUS_DI(Records[High,Low,Close],Time Period = 14) = Array(outReal)```
 
-#### talib.PLUS_DM
+##### talib.PLUS_DM
 
 ```
 talib.PLUS_DM(inPriceHL)
@@ -25587,17 +18500,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.PLUS_DM(records);
-    Log(ret);
-}
-```
-
 ```PLUS_DM()```函数在talib库文档中的描述为：```PLUS_DM(Records[High,Low],Time Period = 14) = Array(outReal)```
 
-#### talib.PPO
+##### talib.PPO
 
 ```
 talib.PPO(inReal)
@@ -25633,17 +18538,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.PPO(records);
-    Log(ret);
-}
-```
-
 ```PPO()```函数在talib库文档中的描述为：```PPO(Records[Close],Fast Period = 12,Slow Period = 26,MA Type = 0) = Array(outReal)```
 
-#### talib.ROC
+##### talib.ROC
 
 ```
 talib.ROC(inReal)
@@ -25675,17 +18572,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.ROC(records);
-    Log(ret);
-}
-```
-
 ```ROC()```函数在talib库文档中的描述为：```ROC(Records[Close],Time Period = 10) = Array(outReal)```
 
-#### talib.ROCP
+##### talib.ROCP
 
 ```
 talib.ROCP(inReal)
@@ -25717,17 +18606,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.ROCP(records);
-    Log(ret);
-}
-```
-
 ```ROCP()```函数在talib库文档中的描述为：```ROCP(Records[Close],Time Period = 10) = Array(outReal)```
 
-#### talib.ROCR
+##### talib.ROCR
 
 ```
 talib.ROCR(inReal)
@@ -25759,17 +18640,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.ROCR(records);
-    Log(ret);
-}
-```
-
 ```ROCR()```函数在talib库文档中的描述为：```ROCR(Records[Close],Time Period = 10) = Array(outReal)```
 
-#### talib.ROCR100
+##### talib.ROCR100
 
 ```
 talib.ROCR100(inReal)
@@ -25801,17 +18674,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.ROCR100(records);
-    Log(ret);
-}
-```
-
 ```ROCR100()```函数在talib库文档中的描述为：```ROCR100(Records[Close],Time Period = 10) = Array(outReal)```
 
-#### talib.RSI
+##### talib.RSI
 
 ```
 talib.RSI(inReal)
@@ -25843,17 +18708,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.RSI(records);
-    Log(ret);
-}
-```
-
 ```RSI()```函数在talib库文档中的描述为：```RSI(Records[Close],Time Period = 14) = Array(outReal)```
 
-#### talib.STOCH
+##### talib.STOCH
 
 ```
 talib.STOCH(inPriceHLC)
@@ -25893,17 +18750,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.STOCH(records);
-    Log(ret);
-}
-```
-
 ```STOCH()```函数在talib库文档中的描述为：```STOCH(Records[High,Low,Close],Fast-K Period = 5,Slow-K Period = 3,Slow-K MA = 0,Slow-D Period = 3,Slow-D MA = 0) = [Array(outSlowK),Array(outSlowD)]```
 
-#### talib.STOCHF
+##### talib.STOCHF
 
 ```
 talib.STOCHF(inPriceHLC)
@@ -25939,17 +18788,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.STOCHF(records);
-    Log(ret);
-}
-```
-
 ```STOCHF()```函数在talib库文档中的描述为：```STOCHF(Records[High,Low,Close],Fast-K Period = 5,Fast-D Period = 3,Fast-D MA = 0) = [Array(outFastK),Array(outFastD)]```
 
-#### talib.STOCHRSI
+##### talib.STOCHRSI
 
 ```
 talib.STOCHRSI(inReal)
@@ -25987,17 +18828,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.STOCHRSI(records);
-    Log(ret);
-}
-```
-
 ```STOCHRSI()```函数在talib库文档中的描述为：```STOCHRSI(Records[Close],Time Period = 14,Fast-K Period = 5,Fast-D Period = 3,Fast-D MA = 0) = [Array(outFastK),Array(outFastD)]```
 
-#### talib.TRIX
+##### talib.TRIX
 
 ```
 talib.TRIX(inReal)
@@ -26029,17 +18862,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.TRIX(records);
-    Log(ret);
-}
-```
-
 ```TRIX()```函数在talib库文档中的描述为：```TRIX(Records[Close],Time Period = 30) = Array(outReal)```
 
-#### talib.ULTOSC
+##### talib.ULTOSC
 
 ```
 talib.ULTOSC(inPriceHLC)
@@ -26075,17 +18900,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.ULTOSC(records);
-    Log(ret);
-}
-```
-
 ```ULTOSC()```函数在talib库文档中的描述为：```ULTOSC(Records[High,Low,Close],First Period = 7,Second Period = 14,Third Period = 28) = Array(outReal)```
 
-#### talib.WILLR
+##### talib.WILLR
 
 ```
 talib.WILLR(inPriceHLC)
@@ -26117,17 +18934,386 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.WILLR(records);
-    Log(ret);
+```WILLR()```函数在talib库文档中的描述为：```WILLR(Records[High,Low,Close],Time Period = 14) = Array(outReal)```
+
+#### VolumeIndicators
+
+成交量类指标：AD、ADOSC、OBV。
+
+##### talib.AD
+
+```
+talib.AD(inPriceHLCV)
+```
+
+```talib.AD()```函数用于计算**Chaikin A/D Line（累积/派发线指标）**。
+
+Parameters:
+
+- `inPriceHLCV` ({@struct/Record Record}结构数组, required): ```inPriceHLCV```参数用于指定K线数据。
+
+Returns (array): ```talib.AD()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.AD(records)
+    Log(ret)
 }
 ```
 
-```WILLR()```函数在talib库文档中的描述为：```WILLR(Records[High,Low,Close],Time Period = 14) = Array(outReal)```
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.AD(records.High, records.Low, records.Close, records.Volume)
+    Log(ret)
+```
 
-#### talib.AVGPRICE
+```AD()```函数在talib库文档中的描述为：```AD(Records[High,Low,Close,Volume]) = Array(outReal)```
+
+##### talib.ADOSC
+
+```
+talib.ADOSC(inPriceHLCV)
+talib.ADOSC(inPriceHLCV, optInFastPeriod, optInSlowPeriod)
+```
+
+```talib.ADOSC()```函数用于计算**Chaikin A/D Oscillator（佳庆指标）**。
+
+Parameters:
+
+- `inPriceHLCV` ({@struct/Record Record}结构数组, required): ```inPriceHLCV```参数用于指定K线数据。
+- `optInFastPeriod` (number, optional): ```optInFastPeriod```参数用于设置快速周期。
+- `optInSlowPeriod` (number, optional): ```optInSlowPeriod```参数用于设置慢速周期。
+
+Returns (array): ```talib.ADOSC()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.ADOSC(records, 3, 10)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.ADOSC(records.High, records.Low, records.Close, records.Volume, 3, 10)
+    Log(ret)
+```
+
+```ADOSC()```函数在talib库文档中的描述为：```ADOSC(Records[High,Low,Close,Volume],Fast Period = 3,Slow Period = 10) = Array(outReal)```
+
+##### talib.OBV
+
+```
+talib.OBV(inReal)
+talib.OBV(inReal, inPriceV)
+```
+
+```talib.OBV()```函数用于计算**On Balance Volume（能量潮指标）**。
+
+Parameters:
+
+- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
+- `inPriceV` ({@struct/Record Record}结构数组, optional): ```inPriceV```参数用于指定K线数据。
+
+Returns (array): ```talib.OBV()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.OBV(records, records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.OBV(records.Close, records.Volume)
+    Log(ret)
+```
+
+```OBV()```函数在talib库文档中的描述为：```OBV(Records[Close],Records[Volume]) = Array(outReal)```
+
+#### VolatilityIndicators
+
+波动率类指标：ATR、NATR、TRANGE。
+
+##### talib.ATR
+
+```
+talib.ATR(inPriceHLC)
+talib.ATR(inPriceHLC, optInTimePeriod)
+```
+
+```talib.ATR()```函数用于计算**Average True Range（平均真实波幅）**指标。
+
+Parameters:
+
+- `inPriceHLC` ({@struct/Record Record}结构数组, required): ```inPriceHLC```参数用于指定K线数据。
+- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为14。
+
+Returns (array): ```talib.ATR()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.ATR(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.ATR(records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```ATR()```函数在talib库文档中的描述为：```ATR(Records[High,Low,Close],Time Period = 14) = Array(outReal)```
+
+##### talib.NATR
+
+```
+talib.NATR(inPriceHLC)
+talib.NATR(inPriceHLC, optInTimePeriod)
+```
+
+```talib.NATR()```函数用于计算**Normalized Average True Range（归一化平均真实范围）**。
+
+Parameters:
+
+- `inPriceHLC` ({@struct/Record Record}结构数组, required): ```inPriceHLC```参数用于指定K线数据。
+- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为14。
+
+Returns (array): ```talib.NATR()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.NATR(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.NATR(records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```NATR()```函数在talib库文档中的描述为：```NATR(Records[High,Low,Close],Time Period = 14) = Array(outReal)```
+
+##### talib.TRANGE
+
+```
+talib.TRANGE(inPriceHLC)
+```
+
+```talib.TRANGE()```函数用于计算**True Range（真实范围）**指标。
+
+Parameters:
+
+- `inPriceHLC` ({@struct/Record Record}结构数组, required): ```inPriceHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.TRANGE()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.TRANGE(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.TRANGE(records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```TRANGE()```函数在talib库文档中的描述为：```TRANGE(Records[High,Low,Close]) = Array(outReal)```
+
+#### CycleIndicators
+
+周期类指标（希尔伯特变换）。
+
+##### talib.HT_DCPERIOD
+
+```
+talib.HT_DCPERIOD(inReal)
+```
+
+```talib.HT_DCPERIOD()```函数用于计算**Hilbert Transform - Dominant Cycle Period（希尔伯特变换主导周期）**。
+
+Parameters:
+
+- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
+
+Returns (array): ```talib.HT_DCPERIOD()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.HT_DCPERIOD(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.HT_DCPERIOD(records.Close)
+    Log(ret)
+```
+
+```HT_DCPERIOD()```函数在talib库文档中的描述为：```HT_DCPERIOD(Records[Close]) = Array(outReal)```
+
+##### talib.HT_DCPHASE
+
+```
+talib.HT_DCPHASE(inReal)
+```
+
+```talib.HT_DCPHASE()```函数用于计算**希尔伯特变换主周期相位（Hilbert Transform - Dominant Cycle Phase）**。
+
+Parameters:
+
+- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的K线数据。
+
+Returns (array): ```talib.HT_DCPHASE()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.HT_DCPHASE(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.HT_DCPHASE(records.Close)
+    Log(ret)
+```
+
+```HT_DCPHASE()```函数在talib库文档中的描述为：```HT_DCPHASE(Records[Close]) = Array(outReal)```
+
+##### talib.HT_PHASOR
+
+```
+talib.HT_PHASOR(inReal)
+```
+
+```talib.HT_PHASOR()```函数用于计算**Hilbert Transform - Phasor Components（希尔伯特变换-相量分量）**。
+
+Parameters:
+
+- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的K线数据。
+
+Returns (array): ```talib.HT_PHASOR()```函数返回一个二维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.HT_PHASOR(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.HT_PHASOR(records.Close)
+    Log(ret)
+```
+
+```HT_PHASOR()```函数在talib库文档中的描述为：```HT_PHASOR(Records[Close]) = [Array(outInPhase),Array(outQuadrature)]```
+
+##### talib.HT_SINE
+
+```
+talib.HT_SINE(inReal)
+```
+
+```talib.HT_SINE()```函数用于计算**Hilbert Transform - SineWave（希尔伯特变换 - 正弦波）**。
+
+Parameters:
+
+- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
+
+Returns (array): ```talib.HT_SINE()```函数返回二维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.HT_SINE(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.HT_SINE(records.Close)
+    Log(ret)
+```
+
+```HT_SINE()```函数在talib库文档中的描述为：```HT_SINE(Records[Close]) = [Array(outSine),Array(outLeadSine)]```
+
+##### talib.HT_TRENDMODE
+
+```
+talib.HT_TRENDMODE(inReal)
+```
+
+```talib.HT_TRENDMODE()```函数用于计算**Hilbert Transform - Trend vs Cycle Mode（希尔伯特变换 - 趋势与周期模式）**。
+
+Parameters:
+
+- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
+
+Returns (array): ```talib.HT_TRENDMODE()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.HT_TRENDMODE(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.HT_TRENDMODE(records.Close)
+    Log(ret)
+```
+
+```HT_TRENDMODE()```函数在talib库文档中的描述为：```HT_TRENDMODE(Records[Close]) = Array(outInteger)```
+
+#### PriceTransform
+
+价格变换：平均价、中间价、典型价、加权收盘价。
+
+##### talib.AVGPRICE
 
 ```
 talib.AVGPRICE(inPriceOHLC)
@@ -26157,17 +19343,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.AVGPRICE(records);
-    Log(ret);
-}
-```
-
 ```AVGPRICE()```函数在talib库文档中的描述为：```AVGPRICE(Records[Open,High,Low,Close]) = Array(outReal)```
 
-#### talib.MEDPRICE
+##### talib.MEDPRICE
 
 ```
 talib.MEDPRICE(inPriceHL)
@@ -26197,17 +19375,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.MEDPRICE(records);
-    Log(ret);
-}
-```
-
 ```MEDPRICE()```函数在talib库文档中的描述为：```MEDPRICE(Records[High,Low]) = Array(outReal)```
 
-#### talib.TYPPRICE
+##### talib.TYPPRICE
 
 ```
 talib.TYPPRICE(inPriceHLC)
@@ -26237,17 +19407,9 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.TYPPRICE(records);
-    Log(ret);
-}
-```
-
 ```TYPPRICE()```函数在talib库文档中的描述为：```TYPPRICE(Records[High,Low,Close]) = Array(outReal)```
 
-#### talib.WCLPRICE
+##### talib.WCLPRICE
 
 ```
 talib.WCLPRICE(inPriceHLC)
@@ -26277,15 +19439,2984 @@ def main():
     Log(ret)
 ```
 
-```cpp
-void main() {
-    auto records = exchange.GetRecords();
-    auto ret = talib.WCLPRICE(records);
-    Log(ret);
+```WCLPRICE()```函数在talib库文档中的描述为：```WCLPRICE(Records[High,Low,Close]) = Array(outReal)```
+
+#### StatisticFunctions
+
+统计函数：线性回归、标准差、方差、时间序列预测。
+
+##### talib.LINEARREG
+
+```
+talib.LINEARREG(inReal)
+talib.LINEARREG(inReal, optInTimePeriod)
+```
+
+```talib.LINEARREG()```函数用于计算**Linear Regression（线性回归）**指标。
+
+Parameters:
+
+- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的K线数据。
+- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为14。
+
+Returns (array): ```talib.LINEARREG()```函数返回一维数组，包含线性回归计算结果。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.LINEARREG(records)
+    Log(ret)
 }
 ```
 
-```WCLPRICE()```函数在talib库文档中的描述为：```WCLPRICE(Records[High,Low,Close]) = Array(outReal)```
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.LINEARREG(records.Close)
+    Log(ret)
+```
+
+```LINEARREG()```函数在talib库文档中的描述为：```LINEARREG(Records[Close],Time Period = 14) = Array(outReal)```
+
+##### talib.LINEARREG_ANGLE
+
+```
+talib.LINEARREG_ANGLE(inReal)
+talib.LINEARREG_ANGLE(inReal, optInTimePeriod)
+```
+
+```talib.LINEARREG_ANGLE()```函数用于计算**Linear Regression Angle（线性回归角度）**。
+
+Parameters:
+
+- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
+- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为14。
+
+Returns (array): ```talib.LINEARREG_ANGLE()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.LINEARREG_ANGLE(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.LINEARREG_ANGLE(records.Close)
+    Log(ret)
+```
+
+```LINEARREG_ANGLE()```函数在talib库文档中的描述为：```LINEARREG_ANGLE(Records[Close],Time Period = 14) = Array(outReal)```
+
+##### talib.LINEARREG_INTERCEPT
+
+```
+talib.LINEARREG_INTERCEPT(inReal)
+talib.LINEARREG_INTERCEPT(inReal, optInTimePeriod)
+```
+
+```talib.LINEARREG_INTERCEPT()```函数用于计算**线性回归截距（Linear Regression Intercept）**。
+
+Parameters:
+
+- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
+- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为14。
+
+Returns (array): ```talib.LINEARREG_INTERCEPT()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.LINEARREG_INTERCEPT(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.LINEARREG_INTERCEPT(records.Close)
+    Log(ret)
+```
+
+```LINEARREG_INTERCEPT()```函数在talib库文档中的描述为：```LINEARREG_INTERCEPT(Records[Close],Time Period = 14) = Array(outReal)```
+
+##### talib.LINEARREG_SLOPE
+
+```
+talib.LINEARREG_SLOPE(inReal)
+talib.LINEARREG_SLOPE(inReal, optInTimePeriod)
+```
+
+```talib.LINEARREG_SLOPE()```函数用于计算**Linear Regression Slope（线性回归斜率）**。
+
+Parameters:
+
+- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
+- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为14。
+
+Returns (array): ```talib.LINEARREG_SLOPE()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.LINEARREG_SLOPE(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.LINEARREG_SLOPE(records.Close)
+    Log(ret)
+```
+
+```LINEARREG_SLOPE()```函数在talib库文档中的描述为：```LINEARREG_SLOPE(Records[Close],Time Period = 14) = Array(outReal)```
+
+##### talib.STDDEV
+
+```
+talib.STDDEV(inReal)
+talib.STDDEV(inReal, optInTimePeriod)
+talib.STDDEV(inReal, optInTimePeriod, optInNbDev)
+```
+
+```talib.STDDEV()```函数用于计算**标准偏差（Standard Deviation）**。
+
+Parameters:
+
+- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
+- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为5。
+- `optInNbDev` (number, optional): ```optInNbDev```参数用于设置偏差倍数，默认值为1。
+
+Returns (array): ```talib.STDDEV()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.STDDEV(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.STDDEV(records.Close)
+    Log(ret)
+```
+
+```STDDEV()```函数在talib库文档中的描述为：```STDDEV(Records[Close],Time Period = 5,Deviations = 1) = Array(outReal)```
+
+##### talib.TSF
+
+```
+talib.TSF(inReal)
+talib.TSF(inReal, optInTimePeriod)
+```
+
+```talib.TSF()```函数用于计算**Time Series Forecast（时间序列预测）**。
+
+Parameters:
+
+- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
+- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为14。
+
+Returns (array): ```talib.TSF()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.TSF(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.TSF(records.Close)
+    Log(ret)
+```
+
+```TSF()```函数在talib库文档中的描述为：```TSF(Records[Close],Time Period = 14) = Array(outReal)```
+
+##### talib.VAR
+
+```
+talib.VAR(inReal)
+talib.VAR(inReal, optInTimePeriod)
+talib.VAR(inReal, optInTimePeriod, optInNbDev)
+```
+
+```talib.VAR()```函数用于计算**方差（Variance）**。
+
+Parameters:
+
+- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
+- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为5。
+- `optInNbDev` (number, optional): ```optInNbDev```参数用于设置标准差倍数，默认值为1。
+
+Returns (array): ```talib.VAR()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.VAR(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.VAR(records.Close)
+    Log(ret)
+```
+
+```VAR()```函数在talib库文档中的描述为：```VAR(Records[Close],Time Period = 5,Deviations = 1) = Array(outReal)```
+
+#### MathTransform
+
+数学变换：三角函数、指数、对数、取整、开方。
+
+##### talib.ACOS
+
+```
+talib.ACOS(inReal)
+```
+
+```talib.ACOS()```函数用于计算**向量三角反余弦函数（Vector Trigonometric ACos）**。
+
+Parameters:
+
+- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的实数数据。
+
+Returns (array): ```talib.ACOS()```函数返回一维数组，包含计算得出的反余弦值。
+
+```javascript
+function main() {
+    var data = [-1, 0, 1]
+    var ret = talib.ACOS(data)
+    Log(ret)
+}
+```
+
+```python
+import talib
+import numpy as np
+def main():
+    data = [-1.0, 0, 1.0]
+    ret = talib.ACOS(np.array(data))
+    Log(ret)
+```
+
+```ACOS()```函数在talib库文档中的描述为：```ACOS(Records[Close]) = Array(outReal)```
+
+##### talib.ASIN
+
+```
+talib.ASIN(inReal)
+```
+
+```talib.ASIN()```函数用于计算**向量三角反正弦函数（Vector Trigonometric ASin）**。
+
+Parameters:
+
+- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的实数数据。
+
+Returns (array): ```talib.ASIN()```函数返回一维数组，包含计算得出的反正弦值。
+
+```javascript
+function main() {
+    var data = [-1, 0, 1]
+    var ret = talib.ASIN(data)
+    Log(ret)
+}
+```
+
+```python
+import talib
+import numpy as np
+def main():
+    data = [-1.0, 0, 1.0]
+    ret = talib.ASIN(np.array(data))
+    Log(ret)
+```
+
+```ASIN()```函数在talib库文档中的描述为：```ASIN(Records[Close]) = Array(outReal)```
+
+##### talib.ATAN
+
+```
+talib.ATAN(inReal)
+```
+
+```talib.ATAN()```函数用于计算**向量三角反正切函数（Vector Trigonometric ATan）**。
+
+Parameters:
+
+- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的实数数据。
+
+Returns (array): ```talib.ATAN()```函数返回一维数组，包含计算得出的反正切值。
+
+```javascript
+function main() {
+    var data = [-3.14/2, 0, 3.14/2]
+    var ret = talib.ATAN(data)
+    Log(ret)
+}
+```
+
+```python
+import talib
+import numpy as np
+def main():
+    data = [-3.14/2, 0, 3.14/2]
+    ret = talib.ATAN(np.array(data))
+    Log(ret)
+```
+
+```ATAN()```函数在talib库文档中的描述为：```ATAN(Records[Close]) = Array(outReal)```
+
+##### talib.CEIL
+
+```
+talib.CEIL(inReal)
+```
+
+```talib.CEIL()```函数用于计算**向上取整（Vector Ceil）**。
+
+Parameters:
+
+- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的K线数据。
+
+Returns (array): ```talib.CEIL()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CEIL(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CEIL(records.Close)
+    Log(ret)
+```
+
+```CEIL()```函数在talib库文档中的描述为：```CEIL(Records[Close]) = Array(outReal)```
+
+##### talib.COS
+
+```
+talib.COS(inReal)
+```
+
+```talib.COS()```函数用于计算**Vector Trigonometric Cos（向量三角余弦函数）**。
+
+Parameters:
+
+- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的实数数据序列。
+
+Returns (array): ```talib.COS()```函数返回一个包含余弦计算结果的一维数组。
+
+```javascript
+function main() {
+    var data = [-3.14, 0, 3.14]
+    var ret = talib.COS(data)
+    Log(ret)
+}
+```
+
+```python
+import talib
+import numpy as np
+def main():
+    data = [-3.14, 0, 3.14]
+    ret = talib.COS(np.array(data))
+    Log(ret)
+```
+
+```COS()```函数在talib库文档中的描述为：```COS(Records[Close]) = Array(outReal)```
+
+##### talib.COSH
+
+```
+talib.COSH(inReal)
+```
+
+```talib.COSH()```函数用于计算**向量三角双曲余弦值（Vector Trigonometric Cosh）**。
+
+Parameters:
+
+- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的K线数据。
+
+Returns (array): ```talib.COSH()```函数返回一维数组，包含计算得出的双曲余弦值。
+
+```javascript
+function main() {
+    var data = [-1, 0, 1]
+    var ret = talib.COSH(data)
+    Log(ret)
+}
+```
+
+```python
+import talib
+import numpy as np
+def main():
+    data = [-1.0, 0, 1.0]
+    ret = talib.COSH(np.array(data))
+    Log(ret)
+```
+
+```COSH()```函数在talib库文档中的描述为：```COSH(Records[Close]) = Array(outReal)```
+
+##### talib.EXP
+
+```
+talib.EXP(inReal)
+```
+
+```talib.EXP()```函数用于计算**向量算术指数函数（Vector Arithmetic Exp）**。
+
+Parameters:
+
+- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的实数数据。
+
+Returns (array): ```talib.EXP()```函数返回一维数组，包含输入数据的指数计算结果。
+
+```javascript
+function main() {
+    var data = [0, 1, 2]
+    var ret = talib.EXP(data)    // e^0, e^1, e^2
+    Log(ret)
+}
+```
+
+```python
+import talib
+import numpy as np
+def main():
+    data = [0, 1.0, 2.0]
+    ret = talib.EXP(np.array(data))
+    Log(ret)
+```
+
+```EXP()```函数在talib库文档中的描述为：```EXP(Records[Close]) = Array(outReal)```
+
+##### talib.FLOOR
+
+```
+talib.FLOOR(inReal)
+```
+
+```talib.FLOOR()```函数用于计算**向量向下取整（Vector Floor）**。
+
+Parameters:
+
+- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的K线数据。
+
+Returns (array): ```talib.FLOOR()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.FLOOR(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.FLOOR(records.Close)
+    Log(ret)
+```
+
+```FLOOR()```函数在talib库文档中的描述为：```FLOOR(Records[Close]) = Array(outReal)```
+
+##### talib.LN
+
+```
+talib.LN(inReal)
+```
+
+```talib.LN()```函数用于计算**向量自然对数（Vector Log Natural）**。
+
+Parameters:
+
+- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的K线数据。
+
+Returns (array): ```talib.LN()```函数返回一维数组。
+
+```javascript
+function main() {
+    var data = [1, 2, 3]
+    var ret = talib.LN(data)
+    Log(ret)
+}
+```
+
+```python
+import talib
+import numpy as np
+def main():
+    data = [1.0, 2.0, 3.0]
+    ret = talib.LN(np.array(data))
+    Log(ret)
+```
+
+```LN()```函数在talib库文档中的描述为：```LN(Records[Close]) = Array(outReal)```
+
+##### talib.LOG10
+
+```
+talib.LOG10(inReal)
+```
+
+```talib.LOG10()```函数用于计算**Vector Log10（对数函数）**。
+
+Parameters:
+
+- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
+
+Returns (array): ```talib.LOG10()```函数的返回值为一维数组。
+
+```javascript
+function main() {
+    var data = [10, 100, 1000]
+    var ret = talib.LOG10(data)
+    Log(ret)
+}
+```
+
+```python
+import talib
+import numpy as np
+def main():
+    data = [10.0, 100.0, 1000.0]
+    ret = talib.LOG10(np.array(data))
+    Log(ret)
+```
+
+```LOG10()```函数在talib库文档中的描述为：```LOG10(Records[Close]) = Array(outReal)```
+
+##### talib.SIN
+
+```
+talib.SIN(inReal)
+```
+
+```talib.SIN()```函数用于计算**Vector Trigonometric Sin（正弦值）**。
+
+Parameters:
+
+- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
+
+Returns (array): ```talib.SIN()```函数返回一维数组。
+
+```javascript
+function main() {
+    var data = [-3.14/2, 0, 3.14/2]
+    var ret = talib.SIN(data)
+    Log(ret)
+}
+```
+
+```python
+import talib
+import numpy as np
+def main():
+    data = [-3.14/2, 0, 3.14/2]
+    ret = talib.SIN(np.array(data))
+    Log(ret)
+```
+
+```SIN()```函数在talib库文档中的描述为：```SIN(Records[Close]) = Array(outReal)```
+
+##### talib.SINH
+
+```
+talib.SINH(inReal)
+```
+
+```talib.SINH()```函数用于计算**向量三角双曲正弦函数（Vector Trigonometric Sinh）**。
+
+Parameters:
+
+- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的实数数据。
+
+Returns (array): ```talib.SINH()```函数返回一维数组，包含计算得出的双曲正弦值。
+
+```javascript
+function main() {
+    var data = [-1, 0, 1]
+    var ret = talib.SINH(data)
+    Log(ret)
+}
+```
+
+```python
+import talib
+import numpy as np
+def main():
+    data = [-1.0, 0, 1.0]
+    ret = talib.SINH(np.array(data))
+    Log(ret)
+```
+
+```SINH()```函数在talib库文档中的描述为：```SINH(Records[Close]) = Array(outReal)```
+
+##### talib.SQRT
+
+```
+talib.SQRT(inReal)
+```
+
+```talib.SQRT()```函数用于计算**向量平方根（Vector Square Root）**。
+
+Parameters:
+
+- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的数值数据。
+
+Returns (array): ```talib.SQRT()```函数返回一维数组，包含输入数据的平方根值。
+
+```javascript
+function main() {
+    var data = [4, 64, 100]
+    var ret = talib.SQRT(data)
+    Log(ret)
+}
+```
+
+```python
+import talib
+import numpy as np
+def main():
+    data = [4.0, 64.0, 100.0]
+    ret = talib.SQRT(np.array(data))
+    Log(ret)
+```
+
+```SQRT()```函数在talib库文档中的描述为：```SQRT(Records[Close]) = Array(outReal)```
+
+##### talib.TAN
+
+```
+talib.TAN(inReal)
+```
+
+```talib.TAN()```函数用于计算**向量三角正切值（Vector Trigonometric Tan）**。
+
+Parameters:
+
+- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的K线数据。
+
+Returns (array): ```talib.TAN()```函数返回一维数组。
+
+```javascript
+function main() {
+    var data = [-1, 0, 1]
+    var ret = talib.TAN(data)
+    Log(ret)
+}
+```
+
+```python
+import talib
+import numpy as np
+def main():
+    data = [-1.0, 0, 1.0]
+    ret = talib.TAN(np.array(data))
+    Log(ret)
+```
+
+```TAN()```函数在talib库文档中的描述为：```TAN(Records[Close]) = Array(outReal)```
+
+##### talib.TANH
+
+```
+talib.TANH(inReal)
+```
+
+```talib.TANH()```函数用于计算**向量三角双曲正切函数（Vector Trigonometric Tanh）**。
+
+Parameters:
+
+- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的实数数据序列。
+
+Returns (array): ```talib.TANH()```函数返回一个包含双曲正切计算结果的一维数组。
+
+```javascript
+function main() {
+    var data = [-1, 0, 1]
+    var ret = talib.TANH(data)
+    Log(ret)
+}
+```
+
+```python
+import talib
+import numpy as np
+def main():
+    data = [-1.0, 0, 1.0]
+    ret = talib.TANH(np.array(data))
+    Log(ret)
+```
+
+```TANH()```函数在talib库文档中的描述为：```TANH(Records[Close]) = Array(outReal)```
+
+#### MathOperators
+
+数学运算：区间最大值、最小值及其位置、求和。
+
+##### talib.MAX
+
+```
+talib.MAX(inReal)
+talib.MAX(inReal, optInTimePeriod)
+```
+
+```talib.MAX()```函数用于计算**指定周期内的最大值（Highest value over a specified period）**。
+
+Parameters:
+
+- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
+- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为30。
+
+Returns (array): ```talib.MAX()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.MAX(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.MAX(records.Close)
+    Log(ret)
+```
+
+```MAX()```函数在talib库文档中的描述为：```MAX(Records[Close],Time Period = 30) = Array(outReal)```
+
+##### talib.MAXINDEX
+
+```
+talib.MAXINDEX(inReal)
+talib.MAXINDEX(inReal, optInTimePeriod)
+```
+
+```talib.MAXINDEX()```函数用于计算**指定周期内最大值的索引位置（Index of highest value over a specified period）**。
+
+Parameters:
+
+- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的K线数据。
+- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为30。
+
+Returns (array): ```talib.MAXINDEX()```函数返回一个一维数组，包含指定周期内最大值的索引位置。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.MAXINDEX(records, 5)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.MAXINDEX(records.Close, 5)
+    Log(ret)
+```
+
+```MAXINDEX()```函数在talib库文档中的描述为：```MAXINDEX(Records[Close],Time Period = 30) = Array(outInteger)```
+
+##### talib.MIN
+
+```
+talib.MIN(inReal)
+talib.MIN(inReal, optInTimePeriod)
+```
+
+```talib.MIN()```函数用于计算**指定周期内的最小值（Lowest value over a specified period）**。
+
+Parameters:
+
+- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
+- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为30。
+
+Returns (array): ```talib.MIN()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.MIN(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.MIN(records.Close)
+    Log(ret)
+```
+
+```MIN()```函数在talib库文档中的描述为：```MIN(Records[Close],Time Period = 30) = Array(outReal)```
+
+##### talib.MININDEX
+
+```
+talib.MININDEX(inReal)
+talib.MININDEX(inReal, optInTimePeriod)
+```
+
+```talib.MININDEX()```函数用于计算**指定周期内最小值的索引位置（Index of lowest value over a specified period）**。
+
+Parameters:
+
+- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的K线数据。
+- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为30。
+
+Returns (array): ```talib.MININDEX()```函数返回一个一维数组，包含指定周期内最小值的索引位置。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.MININDEX(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.MININDEX(records.Close)
+    Log(ret)
+```
+
+```MININDEX()```函数在talib库文档中的描述为：```MININDEX(Records[Close],Time Period = 30) = Array(outInteger)```
+
+##### talib.MINMAX
+
+```
+talib.MINMAX(inReal)
+talib.MINMAX(inReal, optInTimePeriod)
+```
+
+```talib.MINMAX()```函数用于计算**指定周期内的最小值和最大值（Lowest and highest values over a specified period）**。
+
+Parameters:
+
+- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的K线数据。
+- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为30。
+
+Returns (array): ```talib.MINMAX()```函数返回一个二维数组。该二维数组的第一个元素为最小值数组，第二个元素为最大值数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.MINMAX(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.MINMAX(records.Close)
+    Log(ret)
+```
+
+```MINMAX()```函数在talib库文档中的描述为：```MINMAX(Records[Close],Time Period = 30) = [Array(outMin),Array(outMax)]```
+
+##### talib.MINMAXINDEX
+
+```
+talib.MINMAXINDEX(inReal)
+talib.MINMAXINDEX(inReal, optInTimePeriod)
+```
+
+```talib.MINMAXINDEX()```函数用于计算**指定周期内最低值和最高值的索引位置（Indexes of lowest and highest values over a specified period）**。
+
+Parameters:
+
+- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的K线数据。
+- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为30。
+
+Returns (array): ```talib.MINMAXINDEX()```函数返回一个二维数组。该数组的第一个元素为最小值索引数组，第二个元素为最大值索引数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.MINMAXINDEX(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.MINMAXINDEX(records.Close)
+    Log(ret)
+```
+
+```MINMAXINDEX()```函数在talib库文档中的描述为：```MINMAXINDEX(Records[Close],Time Period = 30) = [Array(outMinIdx),Array(outMaxIdx)]```
+
+##### talib.SUM
+
+```
+talib.SUM(inReal)
+talib.SUM(inReal, optInTimePeriod)
+```
+
+```talib.SUM()```函数用于计算**求和（Summation）**。
+
+Parameters:
+
+- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
+- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为30。
+
+Returns (array): ```talib.SUM()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.SUM(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.SUM(records.Close)
+    Log(ret)
+```
+
+```SUM()```函数在talib库文档中的描述为：```SUM(Records[Close],Time Period = 30) = Array(outReal)```
+
+#### PatternRecognition
+
+K线形态识别：出现形态时返回非零值（正数为看涨形态、负数为看跌形态），否则返回0。
+
+##### talib.CDL2CROWS
+
+```
+talib.CDL2CROWS(inPriceOHLC)
+```
+
+```talib.CDL2CROWS()```函数用于计算**Two Crows（K线形态--两只乌鸦）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDL2CROWS()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDL2CROWS(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDL2CROWS(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDL2CROWS()```函数在talib库文档中的描述为：```CDL2CROWS(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+对于```Python```语言中的调用，传参方式有所不同，需要根据上述描述中的：```Records[Open,High,Low,Close]```进行传参。
+
+例如，将一个变量```records```（即参数```inPriceOHLC```，类型为`Record`结构数组）拆分为：
+
+```Open```列表：在Python中表示为```records.Open```。
+
+```High```列表：在Python中表示为```records.High```。
+
+```Low```列表：在Python中表示为```records.Low```。
+
+```Close```列表：在Python中表示为```records.Close```。
+
+Python策略代码中的调用方式：
+
+```
+
+talib.CDL2CROWS(records.Open, records.High, records.Low, records.Close)
+
+```
+
+其他```talib```指标的调用方式与此类似，不再赘述。
+
+##### talib.CDL3BLACKCROWS
+
+```
+talib.CDL3BLACKCROWS(inPriceOHLC)
+```
+
+```talib.CDL3BLACKCROWS()```函数用于计算**Three Black Crows（K线图形态--三只黑乌鸦）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDL3BLACKCROWS()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDL3BLACKCROWS(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDL3BLACKCROWS(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDL3BLACKCROWS()```函数在talib库文档中的描述为：```CDL3BLACKCROWS(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDL3INSIDE
+
+```
+talib.CDL3INSIDE(inPriceOHLC)
+```
+
+```talib.CDL3INSIDE()```函数用于计算**Three Inside Up/Down（K线形态：三内上下震荡）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDL3INSIDE()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDL3INSIDE(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDL3INSIDE(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDL3INSIDE()```函数在talib库文档中的描述为：```CDL3INSIDE(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDL3LINESTRIKE
+
+```
+talib.CDL3LINESTRIKE(inPriceOHLC)
+```
+
+```talib.CDL3LINESTRIKE()```函数用于计算**Three-Line Strike（K线图：三线震荡）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDL3LINESTRIKE()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDL3LINESTRIKE(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDL3LINESTRIKE(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDL3LINESTRIKE()```函数在talib库文档中的描述为：```CDL3LINESTRIKE(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDL3OUTSIDE
+
+```
+talib.CDL3OUTSIDE(inPriceOHLC)
+```
+
+```talib.CDL3OUTSIDE()```函数用于计算**Three Outside Up/Down（K线形态：三外包线）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDL3OUTSIDE()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDL3OUTSIDE(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDL3OUTSIDE(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDL3OUTSIDE()```函数在talib库文档中的描述为：```CDL3OUTSIDE(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDL3STARSINSOUTH
+
+```
+talib.CDL3STARSINSOUTH(inPriceOHLC)
+```
+
+```talib.CDL3STARSINSOUTH()```函数用于计算**Three Stars In The South（K线形态：南方三星）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDL3STARSINSOUTH()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDL3STARSINSOUTH(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDL3STARSINSOUTH(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDL3STARSINSOUTH()```函数在talib库文档中的描述为：```CDL3STARSINSOUTH(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDL3WHITESOLDIERS
+
+```
+talib.CDL3WHITESOLDIERS(inPriceOHLC)
+```
+
+```talib.CDL3WHITESOLDIERS()```函数用于计算**Three Advancing White Soldiers（K线形态：三白兵）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDL3WHITESOLDIERS()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDL3WHITESOLDIERS(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDL3WHITESOLDIERS(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDL3WHITESOLDIERS()```函数在talib库文档中的描述为：```CDL3WHITESOLDIERS(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLABANDONEDBABY
+
+```
+talib.CDLABANDONEDBABY(inPriceOHLC)
+talib.CDLABANDONEDBABY(inPriceOHLC, optInPenetration)
+```
+
+```talib.CDLABANDONEDBABY()```函数用于计算**弃婴形态（K线图：Abandoned Baby）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `optInPenetration` (number, optional): ```optInPenetration```参数用于设置穿透度，默认值为0.3。
+
+Returns (array): ```talib.CDLABANDONEDBABY()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLABANDONEDBABY(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLABANDONEDBABY(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLABANDONEDBABY()```函数在talib库文档中的描述为：```CDLABANDONEDBABY(Records[Open,High,Low,Close],Penetration = 0.3) = Array(outInteger)```
+
+##### talib.CDLADVANCEBLOCK
+
+```
+talib.CDLADVANCEBLOCK(inPriceOHLC)
+```
+
+```talib.CDLADVANCEBLOCK()```函数用于计算**Advance Block（K线形态：推进阻挡）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLADVANCEBLOCK()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLADVANCEBLOCK(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLADVANCEBLOCK(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLADVANCEBLOCK()```函数在talib库文档中的描述为：```CDLADVANCEBLOCK(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLBELTHOLD
+
+```
+talib.CDLBELTHOLD(inPriceOHLC)
+```
+
+```talib.CDLBELTHOLD()```函数用于计算**Belt-hold（K线形态：腰带线）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLBELTHOLD()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLBELTHOLD(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLBELTHOLD(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLBELTHOLD()```函数在talib库文档中的描述为：```CDLBELTHOLD(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLBREAKAWAY
+
+```
+talib.CDLBREAKAWAY(inPriceOHLC)
+```
+
+```talib.CDLBREAKAWAY()```函数用于计算**Breakaway（K线形态：分离形态）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLBREAKAWAY()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLBREAKAWAY(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLBREAKAWAY(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLBREAKAWAY()```函数在talib库文档中的描述为：```CDLBREAKAWAY(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLCLOSINGMARUBOZU
+
+```
+talib.CDLCLOSINGMARUBOZU(inPriceOHLC)
+```
+
+```talib.CDLCLOSINGMARUBOZU()```函数用于计算**收盘光头光脚线（Closing Marubozu）**K线形态。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLCLOSINGMARUBOZU()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLCLOSINGMARUBOZU(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLCLOSINGMARUBOZU(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLCLOSINGMARUBOZU()```函数在talib库文档中的描述为：```CDLCLOSINGMARUBOZU(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLCONCEALBABYSWALL
+
+```
+talib.CDLCONCEALBABYSWALL(inPriceOHLC)
+```
+
+```talib.CDLCONCEALBABYSWALL()```函数用于计算**Concealing Baby Swallow（K线图：藏婴吞没形态）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLCONCEALBABYSWALL()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLCONCEALBABYSWALL(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLCONCEALBABYSWALL(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLCONCEALBABYSWALL()```函数在talib库文档中的描述为：```CDLCONCEALBABYSWALL(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLCOUNTERATTACK
+
+```
+talib.CDLCOUNTERATTACK(inPriceOHLC)
+```
+
+```talib.CDLCOUNTERATTACK()```函数用于计算**反击线形态（K线图：反击）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLCOUNTERATTACK()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLCOUNTERATTACK(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLCOUNTERATTACK(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLCOUNTERATTACK()```函数在talib库文档中的描述为：```CDLCOUNTERATTACK(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLDARKCLOUDCOVER
+
+```
+talib.CDLDARKCLOUDCOVER(inPriceOHLC)
+talib.CDLDARKCLOUDCOVER(inPriceOHLC, optInPenetration)
+```
+
+```talib.CDLDARKCLOUDCOVER()```函数用于计算**乌云盖顶（Dark Cloud Cover）K线形态**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `optInPenetration` (number, optional): ```optInPenetration```参数用于设置穿透比例，默认值为0.5。
+
+Returns (array): ```talib.CDLDARKCLOUDCOVER()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLDARKCLOUDCOVER(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLDARKCLOUDCOVER(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLDARKCLOUDCOVER()```函数在talib库文档中的描述为：```CDLDARKCLOUDCOVER(Records[Open,High,Low,Close],Penetration = 0.5) = Array(outInteger)```
+
+##### talib.CDLDOJI
+
+```
+talib.CDLDOJI(inPriceOHLC)
+```
+
+```talib.CDLDOJI()```函数用于计算**Doji（K线图：十字星）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLDOJI()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLDOJI(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLDOJI(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLDOJI()```函数在talib库文档中的描述为：```CDLDOJI(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLDOJISTAR
+
+```
+talib.CDLDOJISTAR(inPriceOHLC)
+```
+
+```talib.CDLDOJISTAR()```函数用于计算**Doji Star（K线图：十字星）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLDOJISTAR()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLDOJISTAR(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLDOJISTAR(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLDOJISTAR()```函数在talib库文档中的描述为：```CDLDOJISTAR(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLDRAGONFLYDOJI
+
+```
+talib.CDLDRAGONFLYDOJI(inPriceOHLC)
+```
+
+```talib.CDLDRAGONFLYDOJI()```函数用于计算**Dragonfly Doji（K线形态：蜻蜓十字星）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLDRAGONFLYDOJI()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLDRAGONFLYDOJI(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLDRAGONFLYDOJI(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLDRAGONFLYDOJI()```函数在talib库文档中的描述为：```CDLDRAGONFLYDOJI(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLENGULFING
+
+```
+talib.CDLENGULFING(inPriceOHLC)
+```
+
+```talib.CDLENGULFING()```函数用于计算**吞没形态（Engulfing Pattern）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLENGULFING()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLENGULFING(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLENGULFING(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLENGULFING()```函数在talib库文档中的描述为：```CDLENGULFING(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLEVENINGDOJISTAR
+
+```
+talib.CDLEVENINGDOJISTAR(inPriceOHLC)
+talib.CDLEVENINGDOJISTAR(inPriceOHLC, optInPenetration)
+```
+
+```talib.CDLEVENINGDOJISTAR()```函数用于计算**Evening Doji Star（K线形态：黄昏十字星）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `optInPenetration` (number, optional): ```optInPenetration```参数用于设置穿透率，默认值为0.3。
+
+Returns (array): ```talib.CDLEVENINGDOJISTAR()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLEVENINGDOJISTAR(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLEVENINGDOJISTAR(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLEVENINGDOJISTAR()```函数在talib库文档中的描述为：```CDLEVENINGDOJISTAR(Records[Open,High,Low,Close],Penetration = 0.3) = Array(outInteger)```
+
+##### talib.CDLEVENINGSTAR
+
+```
+talib.CDLEVENINGSTAR(inPriceOHLC)
+talib.CDLEVENINGSTAR(inPriceOHLC, optInPenetration)
+```
+
+```talib.CDLEVENINGSTAR()```函数用于计算**Evening Star（K线图：黄昏之星）**形态。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `optInPenetration` (number, optional): ```optInPenetration```参数用于设置穿透度（Penetration），默认值为0.3。
+
+Returns (array): ```talib.CDLEVENINGSTAR()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLEVENINGSTAR(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLEVENINGSTAR(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLEVENINGSTAR()```函数在talib库文档中的描述为：```CDLEVENINGSTAR(Records[Open,High,Low,Close],Penetration = 0.3) = Array(outInteger)```
+
+##### talib.CDLGAPSIDESIDEWHITE
+
+```
+talib.CDLGAPSIDESIDEWHITE(inPriceOHLC)
+```
+
+```talib.CDLGAPSIDESIDEWHITE()```函数用于计算**Up/Down-gap side-by-side white lines (K线图：上/下间隙并排白色线条)**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLGAPSIDESIDEWHITE()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLGAPSIDESIDEWHITE(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLGAPSIDESIDEWHITE(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLGAPSIDESIDEWHITE()```函数在talib库文档中的描述为：```CDLGAPSIDESIDEWHITE(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLGRAVESTONEDOJI
+
+```
+talib.CDLGRAVESTONEDOJI(inPriceOHLC)
+```
+
+```talib.CDLGRAVESTONEDOJI()```函数用于计算**墓碑十字线（Gravestone Doji）**K线形态。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLGRAVESTONEDOJI()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLGRAVESTONEDOJI(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLGRAVESTONEDOJI(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLGRAVESTONEDOJI()```函数在talib库文档中的描述为：```CDLGRAVESTONEDOJI(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLHAMMER
+
+```
+talib.CDLHAMMER(inPriceOHLC)
+```
+
+```talib.CDLHAMMER()```函数用于计算**锤子线（K线形态：锤子）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLHAMMER()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLHAMMER(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLHAMMER(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLHAMMER()```函数在talib库文档中的描述为：```CDLHAMMER(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLHANGINGMAN
+
+```
+talib.CDLHANGINGMAN(inPriceOHLC)
+```
+
+```talib.CDLHANGINGMAN()```函数用于计算**Hanging Man（K线形态：吊人线）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLHANGINGMAN()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLHANGINGMAN(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLHANGINGMAN(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLHANGINGMAN()```函数在talib库文档中的描述为：```CDLHANGINGMAN(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLHARAMI
+
+```
+talib.CDLHARAMI(inPriceOHLC)
+```
+
+```talib.CDLHARAMI()```函数用于计算**Harami Pattern（K线图：阴阳线模式）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLHARAMI()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLHARAMI(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLHARAMI(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLHARAMI()```函数在talib库文档中的描述为：```CDLHARAMI(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLHARAMICROSS
+
+```
+talib.CDLHARAMICROSS(inPriceOHLC)
+```
+
+```talib.CDLHARAMICROSS()```函数用于计算**Harami Cross Pattern（K线图：十字星孕线形态）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLHARAMICROSS()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLHARAMICROSS(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLHARAMICROSS(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLHARAMICROSS()```函数在talib库文档中的描述为：```CDLHARAMICROSS(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLHIGHWAVE
+
+```
+talib.CDLHIGHWAVE(inPriceOHLC)
+```
+
+```talib.CDLHIGHWAVE()```函数用于计算**High-Wave Candle（K线图：长脚十字线）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLHIGHWAVE()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLHIGHWAVE(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLHIGHWAVE(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLHIGHWAVE()```函数在talib库文档中的描述为：```CDLHIGHWAVE(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLHIKKAKE
+
+```
+talib.CDLHIKKAKE(inPriceOHLC)
+```
+
+```talib.CDLHIKKAKE()```函数用于计算**Hikkake Pattern（K线图：陷阱模式）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLHIKKAKE()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLHIKKAKE(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLHIKKAKE(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLHIKKAKE()```函数在talib库文档中的描述为：```CDLHIKKAKE(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLHIKKAKEMOD
+
+```
+talib.CDLHIKKAKEMOD(inPriceOHLC)
+```
+
+```talib.CDLHIKKAKEMOD()```函数用于计算**Modified Hikkake Pattern（K线图：改良陷阱模式）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLHIKKAKEMOD()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLHIKKAKEMOD(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLHIKKAKEMOD(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLHIKKAKEMOD()```函数在talib库文档中的描述为：```CDLHIKKAKEMOD(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLHOMINGPIGEON
+
+```
+talib.CDLHOMINGPIGEON(inPriceOHLC)
+```
+
+```talib.CDLHOMINGPIGEON()```函数用于计算**Homing Pigeon（K线形态：信鸽形态）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLHOMINGPIGEON()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLHOMINGPIGEON(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLHOMINGPIGEON(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLHOMINGPIGEON()```函数在talib库文档中的描述为：```CDLHOMINGPIGEON(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLIDENTICAL3CROWS
+
+```
+talib.CDLIDENTICAL3CROWS(inPriceOHLC)
+```
+
+```talib.CDLIDENTICAL3CROWS()```函数用于计算**Identical Three Crows（K线形态：相同三只乌鸦）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLIDENTICAL3CROWS()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLIDENTICAL3CROWS(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLIDENTICAL3CROWS(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLIDENTICAL3CROWS()```函数在talib库文档中的描述为：```CDLIDENTICAL3CROWS(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLINNECK
+
+```
+talib.CDLINNECK(inPriceOHLC)
+```
+
+```talib.CDLINNECK()```函数用于计算**颈内线形态（K线图：颈内线）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLINNECK()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLINNECK(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLINNECK(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLINNECK()```函数在talib库文档中的描述为：```CDLINNECK(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLINVERTEDHAMMER
+
+```
+talib.CDLINVERTEDHAMMER(inPriceOHLC)
+```
+
+```talib.CDLINVERTEDHAMMER()```函数用于计算**倒锤形态（K线图：倒锤）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLINVERTEDHAMMER()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLINVERTEDHAMMER(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLINVERTEDHAMMER(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLINVERTEDHAMMER()```函数在talib库文档中的描述为：```CDLINVERTEDHAMMER(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLKICKING
+
+```
+talib.CDLKICKING(inPriceOHLC)
+```
+
+```talib.CDLKICKING()```函数用于计算**Kicking（K线形态：踢腿形态）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLKICKING()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLKICKING(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLKICKING(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLKICKING()```函数在talib库文档中的描述为：```CDLKICKING(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLKICKINGBYLENGTH
+
+```
+talib.CDLKICKINGBYLENGTH(inPriceOHLC)
+```
+
+```talib.CDLKICKINGBYLENGTH()```函数用于计算**Kicking - bull/bear determined by the longer marubozu (K线图：踢牛/踢熊)**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLKICKINGBYLENGTH()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLKICKINGBYLENGTH(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLKICKINGBYLENGTH(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLKICKINGBYLENGTH()```函数在talib库文档中的描述为：```CDLKICKINGBYLENGTH(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLLADDERBOTTOM
+
+```
+talib.CDLLADDERBOTTOM(inPriceOHLC)
+```
+
+```talib.CDLLADDERBOTTOM()```函数用于计算**Ladder Bottom（K线形态：梯底）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLLADDERBOTTOM()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLLADDERBOTTOM(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLLADDERBOTTOM(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLLADDERBOTTOM()```函数在talib库文档中的描述为：```CDLLADDERBOTTOM(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLLONGLEGGEDDOJI
+
+```
+talib.CDLLONGLEGGEDDOJI(inPriceOHLC)
+```
+
+```talib.CDLLONGLEGGEDDOJI()```函数用于计算**长腿十字线（K线形态：Long Legged Doji）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLLONGLEGGEDDOJI()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLLONGLEGGEDDOJI(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLLONGLEGGEDDOJI(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLLONGLEGGEDDOJI()```函数在talib库文档中的描述为：```CDLLONGLEGGEDDOJI(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLLONGLINE
+
+```
+talib.CDLLONGLINE(inPriceOHLC)
+```
+
+```talib.CDLLONGLINE()```函数用于计算**长线蜡烛形态（K线图：长线）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLLONGLINE()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLLONGLINE(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLLONGLINE(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLLONGLINE()```函数在talib库文档中的描述为：```CDLLONGLINE(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLMARUBOZU
+
+```
+talib.CDLMARUBOZU(inPriceOHLC)
+```
+
+```talib.CDLMARUBOZU()```函数用于计算**Marubozu（K线图：光头光脚）**模式。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLMARUBOZU()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLMARUBOZU(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLMARUBOZU(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLMARUBOZU()```函数在talib库文档中的描述为：```CDLMARUBOZU(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLMATCHINGLOW
+
+```
+talib.CDLMATCHINGLOW(inPriceOHLC)
+```
+
+```talib.CDLMATCHINGLOW()```函数用于计算**Matching Low（K线图：匹配低点）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLMATCHINGLOW()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLMATCHINGLOW(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLMATCHINGLOW(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLMATCHINGLOW()```函数在talib库文档中的描述为：```CDLMATCHINGLOW(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLMATHOLD
+
+```
+talib.CDLMATHOLD(inPriceOHLC)
+talib.CDLMATHOLD(inPriceOHLC, optInPenetration)
+```
+
+```talib.CDLMATHOLD()```函数用于计算**Mat Hold（K线形态：垫住）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `optInPenetration` (number, optional): ```optInPenetration```参数为可选参数，用于指定上升/下降趋势线的穿透比例，默认值为0.5。
+
+Returns (array): ```talib.CDLMATHOLD()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLMATHOLD(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLMATHOLD(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLMATHOLD()```函数在talib库文档中的描述为：```CDLMATHOLD(Records[Open,High,Low,Close],Penetration = 0.5) = Array(outInteger)```
+
+##### talib.CDLMORNINGDOJISTAR
+
+```
+talib.CDLMORNINGDOJISTAR(inPriceOHLC)
+talib.CDLMORNINGDOJISTAR(inPriceOHLC, optInPenetration)
+```
+
+```talib.CDLMORNINGDOJISTAR()```函数用于计算**Morning Doji Star（K线形态：早晨十字星）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `optInPenetration` (number, optional): ```optInPenetration```参数用于指定验证开盘价与实体部分重合的程度，默认值为0.3。
+
+Returns (array): ```talib.CDLMORNINGDOJISTAR()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLMORNINGDOJISTAR(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLMORNINGDOJISTAR(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLMORNINGDOJISTAR()```函数在talib库文档中的描述为：```CDLMORNINGDOJISTAR(Records[Open,High,Low,Close],Penetration = 0.3) = Array(outInteger)```
+
+##### talib.CDLMORNINGSTAR
+
+```
+talib.CDLMORNINGSTAR(inPriceOHLC)
+talib.CDLMORNINGSTAR(inPriceOHLC, optInPenetration)
+```
+
+```talib.CDLMORNINGSTAR()```函数用于计算**Morning Star（K线形态：晨星）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `optInPenetration` (number, optional): ```optInPenetration```参数为趋势确认所需的价格穿透百分比阈值，取值范围为[0,1]，默认值为0.3。
+
+Returns (array): ```talib.CDLMORNINGSTAR()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLMORNINGSTAR(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLMORNINGSTAR(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLMORNINGSTAR()```函数在talib库文档中的描述为：```CDLMORNINGSTAR(Records[Open,High,Low,Close],Penetration=0.3) = Array(outInteger)```
+
+##### talib.CDLONNECK
+
+```
+talib.CDLONNECK(inPriceOHLC)
+```
+
+```talib.CDLONNECK()```函数用于计算**On-Neck Pattern（K线图：颈上线形态）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLONNECK()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLONNECK(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLONNECK(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLONNECK()```函数在talib库文档中的描述为：```CDLONNECK(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLPIERCING
+
+```
+talib.CDLPIERCING(inPriceOHLC)
+```
+
+```talib.CDLPIERCING()```函数用于计算**Piercing Pattern（K线图：穿透形态）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLPIERCING()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLPIERCING(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLPIERCING(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLPIERCING()```函数在talib库文档中的描述为：```CDLPIERCING(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLRICKSHAWMAN
+
+```
+talib.CDLRICKSHAWMAN(inPriceOHLC)
+```
+
+```talib.CDLRICKSHAWMAN()```函数用于计算**Rickshaw Man（K线形态：车夫线）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLRICKSHAWMAN()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLRICKSHAWMAN(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLRICKSHAWMAN(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLRICKSHAWMAN()```函数在talib库文档中的描述为：```CDLRICKSHAWMAN(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLRISEFALL3METHODS
+
+```
+talib.CDLRISEFALL3METHODS(inPriceOHLC)
+```
+
+```talib.CDLRISEFALL3METHODS()```函数用于计算**Rising/Falling Three Methods（K线形态：上升/下降三法）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLRISEFALL3METHODS()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLRISEFALL3METHODS(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLRISEFALL3METHODS(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLRISEFALL3METHODS()```函数在talib库文档中的描述为：```CDLRISEFALL3METHODS(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLSEPARATINGLINES
+
+```
+talib.CDLSEPARATINGLINES(inPriceOHLC)
+```
+
+```talib.CDLSEPARATINGLINES()```函数用于计算**分离线形态（K线图：分离线）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLSEPARATINGLINES()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLSEPARATINGLINES(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLSEPARATINGLINES(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLSEPARATINGLINES()```函数在talib库文档中的描述为：```CDLSEPARATINGLINES(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLSHOOTINGSTAR
+
+```
+talib.CDLSHOOTINGSTAR(inPriceOHLC)
+```
+
+```talib.CDLSHOOTINGSTAR()```函数用于计算**Shooting Star（K线形态：流星）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLSHOOTINGSTAR()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLSHOOTINGSTAR(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLSHOOTINGSTAR(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLSHOOTINGSTAR()```函数在talib库文档中的描述为：```CDLSHOOTINGSTAR(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLSHORTLINE
+
+```
+talib.CDLSHORTLINE(inPriceOHLC)
+```
+
+```talib.CDLSHORTLINE()```函数用于计算**短线蜡烛图形态（K线图：短线）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线价格数据。
+
+Returns (array): ```talib.CDLSHORTLINE()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLSHORTLINE(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLSHORTLINE(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLSHORTLINE()```函数在talib库文档中的描述为：```CDLSHORTLINE(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLSPINNINGTOP
+
+```
+talib.CDLSPINNINGTOP(inPriceOHLC)
+```
+
+```talib.CDLSPINNINGTOP()```函数用于计算**Spinning Top（K线形态：陀螺）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLSPINNINGTOP()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLSPINNINGTOP(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLSPINNINGTOP(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLSPINNINGTOP()```函数在talib库文档中的描述为：```CDLSPINNINGTOP(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLSTALLEDPATTERN
+
+```
+talib.CDLSTALLEDPATTERN(inPriceOHLC)
+```
+
+```talib.CDLSTALLEDPATTERN()```函数用于计算**Stalled Pattern（K线图：停滞模式）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLSTALLEDPATTERN()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLSTALLEDPATTERN(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLSTALLEDPATTERN(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLSTALLEDPATTERN()```函数在talib库文档中的描述为：```CDLSTALLEDPATTERN(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLSTICKSANDWICH
+
+```
+talib.CDLSTICKSANDWICH(inPriceOHLC)
+```
+
+```talib.CDLSTICKSANDWICH()```函数用于计算**Stick Sandwich（K线形态：棍子三明治）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLSTICKSANDWICH()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLSTICKSANDWICH(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLSTICKSANDWICH(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLSTICKSANDWICH()```函数在talib库文档中的描述为：```CDLSTICKSANDWICH(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLTAKURI
+
+```
+talib.CDLTAKURI(inPriceOHLC)
+```
+
+```talib.CDLTAKURI()```函数用于计算**Takuri (Dragonfly Doji with very long lower shadow) (K线图:托里)**蜡烛图形态。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLTAKURI()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLTAKURI(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLTAKURI(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLTAKURI()```函数在talib库文档中的描述为：```CDLTAKURI(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLTASUKIGAP
+
+```
+talib.CDLTASUKIGAP(inPriceOHLC)
+```
+
+```talib.CDLTASUKIGAP()```函数用于计算**Tasuki Gap（K线图：翼隙）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLTASUKIGAP()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLTASUKIGAP(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLTASUKIGAP(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLTASUKIGAP()```函数在talib库文档中的描述为：```CDLTASUKIGAP(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLTHRUSTING
+
+```
+talib.CDLTHRUSTING(inPriceOHLC)
+```
+
+```talib.CDLTHRUSTING()```函数用于计算**Thrusting Pattern（K线图：推进模式）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLTHRUSTING()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLTHRUSTING(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLTHRUSTING(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLTHRUSTING()```函数在talib库文档中的描述为：```CDLTHRUSTING(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLTRISTAR
+
+```
+talib.CDLTRISTAR(inPriceOHLC)
+```
+
+```talib.CDLTRISTAR()```函数用于计算**三星形态（K线图：三星模式）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLTRISTAR()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLTRISTAR(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLTRISTAR(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLTRISTAR()```函数在talib库文档中的描述为：```CDLTRISTAR(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLUNIQUE3RIVER
+
+```
+talib.CDLUNIQUE3RIVER(inPriceOHLC)
+```
+
+```talib.CDLUNIQUE3RIVER()```函数用于计算**Unique 3 River（K线形态：独特三河）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLUNIQUE3RIVER()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLUNIQUE3RIVER(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLUNIQUE3RIVER(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLUNIQUE3RIVER()```函数在talib库文档中的描述为：```CDLUNIQUE3RIVER(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLUPSIDEGAP2CROWS
+
+```
+talib.CDLUPSIDEGAP2CROWS(inPriceOHLC)
+```
+
+```talib.CDLUPSIDEGAP2CROWS()```函数用于计算**向上跳空双乌鸦形态（K线图：双飞乌鸦）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLUPSIDEGAP2CROWS()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLUPSIDEGAP2CROWS(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLUPSIDEGAP2CROWS(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLUPSIDEGAP2CROWS()```函数在talib库文档中的描述为：```CDLUPSIDEGAP2CROWS(Records[Open,High,Low,Close]) = Array(outInteger)```
+
+##### talib.CDLXSIDEGAP3METHODS
+
+```
+talib.CDLXSIDEGAP3METHODS(inPriceOHLC)
+```
+
+```talib.CDLXSIDEGAP3METHODS()```函数用于计算**上行/下行缺口三方法（K线形态识别）**。
+
+Parameters:
+
+- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+
+Returns (array): ```talib.CDLXSIDEGAP3METHODS()```函数返回一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.CDLXSIDEGAP3METHODS(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.CDLXSIDEGAP3METHODS(records.Open, records.High, records.Low, records.Close)
+    Log(ret)
+```
+
+```CDLXSIDEGAP3METHODS()```函数在talib库文档中的描述为：```CDLXSIDEGAP3METHODS(Records[Open,High,Low,Close]) = Array(outInteger)```
 
 ### OS
 
@@ -27155,22 +23286,6 @@ See also: `File`, `os`, `ListFilesResult`
 
 ## 结构体
 
-### Trade
-
-市场成交记录的数据结构。
-
-Fields:
-
-- `Id` (string): 市场成交记录的唯一标识符，若交易所接口未提供Id则使用时间戳填充。
-- `Time` (number): 毫秒级时间戳。
-- `Price` (number): 成交价格。
-- `Amount` (number): 成交数量。
-- `Type` (number): 订单类型，参考`ORDER_TYPE_BUY`、`ORDER_TYPE_SELL`。
-
-exchange.GetTrades()函数返回Trade数组或空数组。
-
-See also: `exchange.GetTrades`
-
 ### Ticker
 
 市场行情数据结构。
@@ -27197,9 +23312,52 @@ Fields:
 
 exchange.GetTicker()函数返回一个Ticker结构。
 
-对于期权合约，```exchange.GetTicker()```函数调用容易报错。因为期权合约盘口通常流动性较差，经常出现买一、卖一无挂单的情况，此时FMZ底层检测到```Ticker```结构字段```Buy```或```Sell```为0时会触发错误提示。
+对于期权合约，盘口流动性通常较差，经常出现买一、卖一没有挂单的情况，此时```Ticker```结构的```Buy```、```Sell```字段为0；从未成交的期权合约```Last```也可能为0。Futures_Aevo的期权```Last```为标记价格，Futures_OKX、Futures_Kraken在期权没有最新成交价时以标记价格作为```Last```。使用期权行情前应检查这些字段。
 
 See also: `exchange.GetTicker`, `exchange.GetTickers`
+
+### Depth
+
+市场深度数据结构。
+
+Fields:
+
+- `Asks` (array): 卖单数组，即 OrderBook 数组，按价格从低到高排序，数组中第一个 OrderBook 结构的价格最低。
+- `Bids` (array): 买单数组，即 OrderBook 数组，按价格从高到低排序，数组中第一个 OrderBook 结构的价格最高。
+- `Time` (number): 毫秒级时间戳。
+
+exchange.GetDepth() 函数返回一个 Depth 结构。
+
+See also: `exchange.GetDepth`, `OrderBook`
+
+### OrderBook
+
+市场深度中的订单结构。
+
+Fields:
+
+- `Price` (number): 订单价格。
+- `Amount` (number): 订单数量。
+
+exchange.GetDepth()函数返回的数据结构中，Bids和Asks的属性值为OrderBook数组。
+
+See also: `exchange.GetDepth`, `Depth`
+
+### Trade
+
+市场成交记录的数据结构。
+
+Fields:
+
+- `Id` (string): 市场成交记录的唯一标识符，若交易所接口未提供Id则使用时间戳填充。
+- `Time` (number): 毫秒级时间戳。
+- `Price` (number): 成交价格。
+- `Amount` (number): 成交数量。
+- `Type` (number): 订单类型，参考`ORDER_TYPE_BUY`、`ORDER_TYPE_SELL`。
+
+exchange.GetTrades()函数返回Trade数组或空数组。
+
+See also: `exchange.GetTrades`
 
 ### Record
 
@@ -27226,6 +23384,33 @@ pandas.DataFrame(records)  // 可能需要调整为：pandas.DataFrame(list(reco
 相关报错信息：```in getattr KeyError: 'dtype'```。
 
 See also: `exchange.GetRecords`
+
+### Market
+
+交易品种市场信息的数据结构。
+
+Fields:
+
+- `Symbol` (string): 取值例如：```"btcusdt"```，```Symbol```字段记录该交易品种在交易所的原始名称。需要注意该属性的格式、定义与`Ticker`结构的```Symbol```字段不同。
+- `BaseAsset` (string): 取值例如：```"BTC"```，```BaseAsset```字段记录交易币名称（即：baseCurrency），统一为大写字母。
+- `QuoteAsset` (string): 取值例如：```"USDT"```，```QuoteAsset```字段记录计价币名称（即：quoteCurrency），统一为大写字母。
+- `TickSize` (number): 取值例如：```0.01```，```TickSize```字段记录该交易品种在交易所的价格最小变动单位。
+- `AmountSize` (number): 取值例如：```0.01```，```AmountSize```字段记录该交易品种在交易所的下单量最小变动单位。
+- `PricePrecision` (number): 取值例如：```2```，```PricePrecision```字段记录该交易品种在交易所的价格精度，表示价格精确到2位小数。
+- `AmountPrecision` (number): 取值例如：```3```，```AmountPrecision```字段记录该交易品种在交易所的下单量精度，表示下单量精确到3位小数。
+- `MinQty` (number): 取值例如：```0.001```，```MinQty```字段记录该交易品种在交易所的最小下单量。
+- `MaxQty` (number): 取值例如：```1000```，```MaxQty```字段记录该交易品种在交易所的最大下单量。
+- `MinNotional` (number): 取值例如：```5```，```MinNotional```字段记录该交易品种在交易所的最小下单金额。
+- `MaxNotional` (number): 取值例如：```9999999```，```MaxNotional```字段记录该交易品种在交易所的最大下单金额。
+- `CtVal` (number): ```CtVal```字段记录该交易品种在交易所的单张合约对应的价值，单位为```CtValCcy```字段记录的币种。例如：```CtVal```为0.01，```CtValCcy```为```"BTC"```表示单张合约价值0.01个BTC。
+- `CtValCcy` (number): ```CtValCcy```字段记录单张合约的价值单位，单张合约的价值单位可能是：```BTC```、```USD```、```ETH```等。
+- `Info` (object): ```Info```字段记录交易所市场信息接口返回的该品种的原始数据。
+
+exchange.GetMarkets()函数返回包含此```Market```结构的字典。
+
+由于各个交易所对于市场信息数据支持程度不同，对于交易所不支持的字段会被忽略。以上各个字段数据取值均来自于交易所接口原始数据，具体也可以查询```Info```字段内容。
+
+See also: `exchange.GetMarkets`
 
 ### Order
 
@@ -27284,53 +23469,7 @@ Fields:
 
 条件单功能的支持情况取决于具体交易所，部分交易所可能不支持某些类型的条件单。
 
-**C++语言中Condition结构的特殊使用方式**：
-在C++策略中，Condition结构需要使用```OrderCondition```结构体类型，而非JSON对象。
-
-JavaScript/Python示例（使用对象/字典）：
-```javascript
-var condition = {
-    ConditionType: ORDER_CONDITION_TYPE_TP,
-    TpTriggerPrice: 65000,
-    TpOrderPrice: 65000
-}
-```
-
-C++示例（使用OrderCondition结构体）：
-```cpp
-OrderCondition condition = {.ConditionType = ORDER_CONDITION_TYPE_TP, .TpTriggerPrice = 65000, .TpOrderPrice = 65000};
-```
-
-注意：在C++中不应使用```json condition = R"({...})"_json;```的JSON字符串方式，应直接使用```OrderCondition```结构体的初始化语法。
-
 See also: `Order`, `exchange.CreateConditionOrder`, `exchange.GetConditionOrder`
-
-### OrderBook
-
-市场深度中的订单结构。
-
-Fields:
-
-- `Price` (number): 订单价格。
-- `Amount` (number): 订单数量。
-
-exchange.GetDepth()函数返回的数据结构中，Bids和Asks的属性值为OrderBook数组。
-
-See also: `exchange.GetDepth`, `Depth`
-
-### Depth
-
-市场深度数据结构。
-
-Fields:
-
-- `Asks` (array): 卖单数组，即 OrderBook 数组，按价格从低到高排序，数组中第一个 OrderBook 结构的价格最低。
-- `Bids` (array): 买单数组，即 OrderBook 数组，按价格从高到低排序，数组中第一个 OrderBook 结构的价格最高。
-- `Time` (number): 毫秒级时间戳。
-
-exchange.GetDepth() 函数返回一个 Depth 结构。
-
-See also: `exchange.GetDepth`, `OrderBook`
 
 ### Account
 
@@ -27392,33 +23531,6 @@ exchange.GetPositions()函数返回一个Position数组或空数组。
 例如，某些交易所持仓数据中无仓位冻结数据，此时FrozenAmount为0。如需计算特定数据，可使用Info属性中的原始数据进行计算分析。
 
 See also: `exchange.GetPositions`
-
-### Market
-
-交易品种市场信息的数据结构。
-
-Fields:
-
-- `Symbol` (string): 取值例如：```"btcusdt"```，```Symbol```字段记录该交易品种在交易所的原始名称。需要注意该属性的格式、定义与`Ticker`结构的```Symbol```字段不同。
-- `BaseAsset` (string): 取值例如：```"BTC"```，```BaseAsset```字段记录交易币名称（即：baseCurrency），统一为大写字母。
-- `QuoteAsset` (string): 取值例如：```"USDT"```，```QuoteAsset```字段记录计价币名称（即：quoteCurrency），统一为大写字母。
-- `TickSize` (number): 取值例如：```0.01```，```TickSize```字段记录该交易品种在交易所的价格最小变动单位。
-- `AmountSize` (number): 取值例如：```0.01```，```AmountSize```字段记录该交易品种在交易所的下单量最小变动单位。
-- `PricePrecision` (number): 取值例如：```2```，```PricePrecision```字段记录该交易品种在交易所的价格精度，表示价格精确到2位小数。
-- `AmountPrecision` (number): 取值例如：```3```，```AmountPrecision```字段记录该交易品种在交易所的下单量精度，表示下单量精确到3位小数。
-- `MinQty` (number): 取值例如：```0.001```，```MinQty```字段记录该交易品种在交易所的最小下单量。
-- `MaxQty` (number): 取值例如：```1000```，```MaxQty```字段记录该交易品种在交易所的最大下单量。
-- `MinNotional` (number): 取值例如：```5```，```MinNotional```字段记录该交易品种在交易所的最小下单金额。
-- `MaxNotional` (number): 取值例如：```9999999```，```MaxNotional```字段记录该交易品种在交易所的最大下单金额。
-- `CtVal` (number): ```CtVal```字段记录该交易品种在交易所的单张合约对应的价值，单位为```CtValCcy```字段记录的币种。例如：```CtVal```为0.01，```CtValCcy```为```"BTC"```表示单张合约价值0.01个BTC。
-- `CtValCcy` (number): ```CtValCcy```字段记录单张合约的价值单位，单张合约的价值单位可能是：```BTC```、```USD```、```ETH```等。
-- `Info` (object): ```Info```字段记录交易所市场信息接口返回的该品种的原始数据。
-
-exchange.GetMarkets()函数返回包含此```Market```结构的字典。
-
-由于各个交易所对于市场信息数据支持程度不同，对于交易所不支持的字段会被忽略。以上各个字段数据取值均来自于交易所接口原始数据，具体也可以查询```Info```字段内容。
-
-See also: `exchange.GetMarkets`
 
 ### Funding
 
@@ -27990,7 +24102,7 @@ function main() {
 }
 ```
 
-See also: `SetData`, `GetData`
+See also: `exchange.SetData`, `exchange.GetData`
 
 #### EventLoop-return
 
@@ -28104,12 +24216,6 @@ fn main() {
 }
 ```
 
-```cpp
-void main() {
-    Log("First exchange object name:", exchange.GetName(), ", Label:", exchange.GetLabel());
-}
-```
-
 See also: `exchanges`, `exchange.GetName`, `exchange.GetLabel`
 
 #### exchanges
@@ -28136,14 +24242,6 @@ def main():
 fn main() {
     for i in 0..exchanges.len() {
         Log!("Exchange index:", i, "Name:", exchanges[i].GetName(), "Label:", exchanges[i].GetLabel());
-    }
-}
-```
-
-```cpp
-void main() {
-    for(int i = 0; i < exchanges.size(); i++) {
-        Log("Exchange index:", i, "Name:", exchanges[i].GetName(), "Label:", exchanges[i].GetLabel());
     }
 }
 ```

@@ -2,7 +2,7 @@
 //
 // Ported from the canonical Rust self-check (backtest/rust/src/strategy.rs).
 // Runs ONCE and logs every SDK call, so a single run exercises the whole
-// surface (kept in parity with the C++ SDK + the canonical TS API). Designed
+// surface (kept in parity with the canonical TS API). Designed
 // to run BOTH as a backtest and as a live bot:
 //   * read-only calls always run (live + backtest);
 //   * anything that writes exchange state, places orders, or clears persistent
@@ -232,7 +232,7 @@ function main() {
 
     // ---- chart (works live + backtest) ----
     Log("=== chart ===");
-    // Match the C++/JS working shape: chart.type + each series carries data:[].
+    // Working chart shape: chart.type + each series carries data:[].
     var cfg = { chart: { type: "line" }, title: { text: "self-check" }, series: [{ name: "price", data: [] }] };
     var chart = Chart(cfg);
     chart.reset(0);
