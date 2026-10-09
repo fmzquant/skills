@@ -113,7 +113,6 @@ Placement rules (api.en.md `#### exchange.Buy`, `#### exchange.CreateOrder`):
 | `IO("currency", "ETH_USDT")` | same as `SetCurrency` |
 | `IO("cross", bool)`, `IO("dual", bool)`, `IO("unified", bool)`, `IO("simulate", bool)`, `IO("trade_margin")` / `IO("trade_super_margin")` / `IO("trade_normal")`, `IO("selfTradePreventionMode", s)` | cross/isolated margin, hedge/one-way, unified account, demo trading, spot margin modes, STP — availability per exchange is tabulated under `#### Spot Exchanges` / `#### Futures Exchanges` in api.en.md |
 | `IO("rate", "GetTicker", 10, "1s")`, `IO("rate", "GetTicker,GetDepth", 10, "1s", "delay")` | client-side rate limit: default mode makes the limited function return `null` when exceeded, `"delay"` mode waits; wildcards allowed (`#### exchange.IO`, user-guide "API Rate Limiting Control") |
-| `IO("extend", rules)` | inject query/body parameters before signing (brokerId tags); `IO("extend")` echoes rules and hit counts |
 | `IO("wait", ms)` | domestic futures counters (CTP): next tick or order update as `{Event: "tick"\|"order", ...}` |
 
 ## Concurrency and IO

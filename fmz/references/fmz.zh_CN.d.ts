@@ -930,9 +930,6 @@ interface IExchange {
      *   - "api": 通用API调用
      *   - "currency": 切换交易对
      *   - "base": 切换API基础地址
-     *   - "extend" / "extend!": 按 URL 给请求注入参数（brokerId、合作方标识之类）；
-     *     `extend!` 等价于整份规则都带 `force`。注入发生在**签名之前**，所以对
-     *     需要签名的端点同样有效。不带参数调用则回显当前规则与每条的命中次数。
      *   - 其他自定义IO指令
      * @param args - 请求参数
      * @returns API返回结果（已解析为对象）
@@ -941,16 +938,6 @@ interface IExchange {
      * var ret = exchange.IO("api", "GET", "/api/v5/account/balance");
      * // 切换交易对
      * exchange.IO("currency", "ETH_USDT");
-     * // 给下单端点注入 brokerId（match 匹配的是 "方法+路径"）
-     * exchange.IO("extend", [{
-     *     match: ["POST/api/v3/order", "POST/api/v3/order/test"],
-     *     query: {brokerId: "ACME"},        // 目标可为 query / body（旧 API 无 headers 注入）
-     *     force: false                      // 缺省：只填缺失或为空的值，绝不覆盖已有参数
-     * }]);
-     * // 值里可用 {{uuid}}（每次调用新生成）与 {{ts}}（毫秒时间戳）
-     * exchange.IO("extend", [{match: "^POST/", query: {reqId: "{{uuid}}"}}]);
-     * // 不带参数 = 回显规则与命中次数，正则写错时靠它自查
-     * Log(exchange.IO("extend"));
      * // 国内期货柜台（CTP）：直发柜台请求，请求名以 Req 开头。等应答时返回
      * // [[{Name: 柜台结构名, Value: 行}, …]]（外层恒 1 项，空结果 [[]]）；第三参 false
      * // 表示不等应答，返回 ""；柜台拒绝返回 null（GetLastError 可读）

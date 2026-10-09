@@ -934,10 +934,6 @@ interface IExchange {
      *   - "api": Generic API call
      *   - "currency": Switch trading pair
      *   - "base": Switch API base address
-     *   - "extend" / "extend!": inject parameters into requests by URL (brokerId,
-     *     partner tags, ...); `extend!` is the same but marks every rule `force`.
-     *     Injection happens **before signing**, so it works on signed endpoints too.
-     *     Called with no argument it echoes the current rules and per-rule hit counts.
      *   - Other custom IO commands
      * @param args - Request parameters
      * @returns API response result (parsed as object)
@@ -946,16 +942,6 @@ interface IExchange {
      * var ret = exchange.IO("api", "GET", "/api/v5/account/balance");
      * // Switch trading pair
      * exchange.IO("currency", "ETH_USDT");
-     * // Inject brokerId into the order endpoint (match tests "METHOD+path")
-     * exchange.IO("extend", [{
-     *     match: ["POST/api/v3/order", "POST/api/v3/order/test"],
-     *     query: {brokerId: "ACME"},        // target: query / body (legacy API had no header injection)
-     *     force: false                      // default: fill only missing/empty, never overwrite
-     * }]);
-     * // Values support {{uuid}} (fresh per call) and {{ts}} (epoch ms)
-     * exchange.IO("extend", [{match: "^POST/", query: {reqId: "{{uuid}}"}}]);
-     * // No argument = echo rules with hit counts; the only way to catch a bad regex
-     * Log(exchange.IO("extend"));
      * // Domestic futures counters (CTP): send a counter request directly; the name starts
      * // with Req. When waiting for the reply the result is [[{Name: struct name, Value: row}, …]]
      * // (the outer array always has one item; an empty result is [[]]); passing false as the
