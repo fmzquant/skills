@@ -2052,7 +2052,7 @@ var symbols = ["BTC_USDT.swap", "ETH_USDT.swap", "LTC_USDT.swap", "BNB_USDT.swap
 function createBtn(tmp, group) {
     var btn = JSON.parse(JSON.stringify(tmp))
 
-    _.each(group, function(eleByGroup) {
+    Object.values(group).forEach(function(eleByGroup) {
         btn["group"].unshift(eleByGroup)
     })
 
@@ -2062,7 +2062,7 @@ function createBtn(tmp, group) {
 function main() {
     var arrManager = []
 
-    _.each(symbols, function(symbol) {
+    Object.values(symbols).forEach(function(symbol) {
         arrManager.push({
             "symbol": symbol,
         })
@@ -2121,7 +2121,7 @@ function main() {
     while (true) {
         var tbl = {"type": "table", "title": "dashboard", "cols": ["symbol", "actionOpen"], "rows": []}
 
-        _.each(arrManager, function(m) {
+        Object.values(arrManager).forEach(function(m) {
             var btnOpen = createBtn(tmpBtnOpen, [{"type": "string", "name": "symbol", "label": "Symbol", "default": m["symbol"], "settings": {"required": true}}])
             tbl["rows"].push([m["symbol"], btnOpen])
         })
@@ -10868,7 +10868,7 @@ function main() {
             rows: []
         }
         var obj = JSON.parse(buf)
-        _.each(obj, function(ticker) {
+        Object.values(obj).forEach(function(ticker) {
             table.rows.push([ticker.s, ticker.h, ticker.l, ticker.b, ticker.a, ticker.c, ticker.q, _D(ticker.E)])
         })
         LogStatus('`' + JSON.stringify(table) + '`')
