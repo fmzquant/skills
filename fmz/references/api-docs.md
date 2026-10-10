@@ -10,7 +10,7 @@ This skill is a lookup table, not a tutorial. The language skills (`references/j
 - `references/api.en.md` — English, ~1 MB. Generated from the platform's syntax guide (https://www.fmz.com/syntax-guide).
 - `references/api.zh.md` — the same in Chinese (https://www.fmz.com/syntax-guide in zh-CN).
 - `references/ta.md` — exact `TA.*` reference (signature, inputs, outputs, edge behaviour) extracted from the engine source.
-- `references/talib.md` — generated table of all 151 `talib.*` functions (name, description, 中文, which record fields it reads, parameter defaults, outputs).
+- `references/talib.md` — generated table of all 161 `talib.*` functions (name, description, 中文, which record fields it reads, parameter defaults, outputs).
 
 Each function entry has: the syntax line(s), description, parameters (name, type, required/optional, meaning), return value, examples (one code block per language, tagged ```javascript / ```python / ```rust), remarks (backtest differences), a generated line "Exchanges that do not support this function: ..." where it applies, and "See also". What differs between exchanges (names, configuration, contract codes, exchange-specific `exchange.IO` commands, margin/account modes, unsupported functions) is not on the function pages: it is in the `## Exchanges` chapter, one page per brand. What is common to all functions (how `symbol` is written, query ranges, what a failed or unsupported call returns) is in `## Conventions`.
 

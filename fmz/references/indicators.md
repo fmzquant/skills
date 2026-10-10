@@ -5,7 +5,7 @@
 Two indicator libraries are available inside every strategy without imports (Python needs `import talib` for talib only):
 
 - **`TA`**: 13 commonly used indicators implemented by FMZ (`ta.js`, ported to Python and Rust). Simple signatures, defaults, K-line or plain-number input. Exact per-function behaviour is in `references/ta.md`.
-- **`talib`**: the TA-Lib function set (151 functions). The full generated table (name, description, which record fields it reads, parameter defaults, output arrays) is in `references/talib.md`.
+- **`talib`**: the TA-Lib function set (161 functions). The full generated table (name, description, which record fields it reads, parameter defaults, output arrays) is in `references/talib.md`.
 
 ## 1. The input: K-line records
 

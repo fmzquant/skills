@@ -403,7 +403,7 @@ declare interface IRecord {
  * ```
  */
 declare interface IMarket {
-    /** 交易对符号，如 "BTC_USDT"，期货为 "BTC_USDT.swap" */
+    /** 交易所原生的交易对/合约名称，如币安现货 "BTCUSDT"、OKX 永续 "BTC-USDT-SWAP"；平台统一格式（"BTC_USDT"、"BTC_USDT.swap"）是 GetMarkets() 返回对象的键。交易所给不出原生名称时退回统一格式 */
     Symbol: string;
     /** 基础货币（交易货币），如 "BTC" */
     BaseAsset: string;
@@ -1018,7 +1018,7 @@ interface IExchange {
     GetUSDCNY(): number;
 
     /**
-     * 获取交易所自定义标签名（在FMZ平台配置交易所时设置）
+     * 获取交易所自定义标签名（在平台配置交易所时设置）
      * @returns 标签字符串
      * ```js
      * Log(exchange.GetLabel());  // "我的币安账户"
@@ -1258,9 +1258,15 @@ interface Italib {
     MA(inReal: number[] | IRecord[], optInTimePeriod?: number, optInMAType?: number): number[];
 
     /**
-     * MAVP - 可变周期移动平均线 (Moving Average with Variable Period)
-     * 注意: 该函数需要两个输入数组，暂不支持
+     * MAVP - 可变周期移动平均 (Moving Average with Variable Period)
+     * @param inReal - 输入数据（数值数组）
+     * @param inPeriods - 每根 Bar 的周期（与 inReal 等长的数值数组），超出 [optInMinPeriod, optInMaxPeriod] 时截到边界
+     * @param optInMinPeriod - 最小周期，默认 2
+     * @param optInMaxPeriod - 最大周期，默认 30（预热期为 optInMaxPeriod - 1）
+     * @param optInMAType - 移动平均类型: 0=SMA, 1=EMA, 2=WMA, 3=DEMA, 4=TEMA, 5=TRIMA, 6=KAMA, 7=MAMA, 8=T3，默认 0
+     * @returns MAVP数组
      */
+    MAVP(inReal: number[], inPeriods: number[], optInMinPeriod?: number, optInMaxPeriod?: number, optInMAType?: number): number[];
 
     /**
      * T3 - T3移动平均线 (Triple Exponential Moving Average T3)
@@ -1540,6 +1546,14 @@ interface Italib {
      */
     ULTOSC(inPriceHLC: IRecord[], optInTimePeriod1?: number, optInTimePeriod2?: number, optInTimePeriod3?: number): number[];
 
+    /**
+     * IMI - 日内动量指标 (Intraday Momentum Index)
+     * @param inPriceOC - K线数据（取 Open、Close）
+     * @param optInTimePeriod - 计算周期，默认 14
+     * @returns IMI数组（0~100）
+     */
+    IMI(inPriceOC: IRecord[], optInTimePeriod?: number): number[];
+
     // ==================== 随机/KDJ指标 ====================
 
     /**
@@ -1598,6 +1612,14 @@ interface Italib {
     BBANDS(inReal: number[] | IRecord[], optInTimePeriod?: number, optInNbDevUp?: number, optInNbDevDn?: number, optInMAType?: number): [number[], number[], number[]];
 
     /**
+     * ACCBANDS - 加速带 (Acceleration Bands)
+     * @param inPriceHLC - K线数据
+     * @param optInTimePeriod - 计算周期，默认 20
+     * @returns [上轨数组, 中轨数组, 下轨数组]
+     */
+    ACCBANDS(inPriceHLC: IRecord[], optInTimePeriod?: number): [number[], number[], number[]];
+
+    /**
      * ATR - 平均真实波幅 (Average True Range)
      * @param inPriceHLC - K线数据
      * @param optInTimePeriod - 计算周期，默认 14
@@ -1642,18 +1664,26 @@ interface Italib {
      */
     VAR(inReal: number[] | IRecord[], optInTimePeriod?: number, optInNbDev?: number): number[];
 
+    /**
+     * AVGDEV - 平均绝对偏差 (Average Deviation)
+     * @param inReal - 输入数据
+     * @param optInTimePeriod - 计算周期，默认 14
+     * @returns 平均偏差数组
+     */
+    AVGDEV(inReal: number[] | IRecord[], optInTimePeriod?: number): number[];
+
     // ==================== 成交量指标 ====================
 
     /**
      * OBV - 能量潮指标 (On Balance Volume)
      * @param inReal - 收盘价数组或K线数组
-     * @param inPriceV - 包含Volume的K线数组
+     * @param inPriceV - 成交量：inReal 为K线数组时不传；inReal 为收盘价数组时传K线数组（取 Volume）或成交量数组
      * @returns OBV数组
      * ```js
-     * var obv = talib.OBV(records, records);
+     * var obv = talib.OBV(records);
      * ```
      */
-    OBV(inReal: number[] | IRecord[], inPriceV: IRecord[]): number[];
+    OBV(inReal: number[] | IRecord[], inPriceV?: number[] | IRecord[]): number[];
 
     /**
      * AD - 积累/分布指标 (Chaikin A/D Line)
@@ -1718,6 +1748,21 @@ interface Italib {
      * @returns TSF数组
      */
     TSF(inReal: number[] | IRecord[], optInTimePeriod?: number): number[];
+
+    /**
+     * BETA - 贝塔系数：以 inReal0 逐根涨跌幅为自变量、inReal1 逐根涨跌幅为因变量做线性回归的斜率
+     * @param inReal0 - 第一组价格（基准），数值数组
+     * @param inReal1 - 第二组价格，数值数组，长度须与 inReal0 相同
+     * @param optInTimePeriod - 计算周期，默认 5
+     */
+    BETA(inReal0: number[], inReal1: number[], optInTimePeriod?: number): number[];
+    /**
+     * CORREL - 皮尔逊相关系数 (Pearson's Correlation Coefficient)
+     * @param inReal0 - 第一组数据，数值数组
+     * @param inReal1 - 第二组数据，数值数组，长度须与 inReal0 相同
+     * @param optInTimePeriod - 计算周期，默认 30
+     */
+    CORREL(inReal0: number[], inReal1: number[], optInTimePeriod?: number): number[];
 
     // ==================== 希尔伯特变换指标 ====================
 
@@ -1798,6 +1843,15 @@ interface Italib {
      * @param optInTimePeriod - 计算周期，默认 30
      */
     SUM(inReal: number[] | IRecord[], optInTimePeriod?: number): number[];
+
+    /** ADD - 向量加法：inReal0[i] + inReal1[i]（两个等长数值数组） */
+    ADD(inReal0: number[], inReal1: number[]): number[];
+    /** SUB - 向量减法：inReal0[i] - inReal1[i]（两个等长数值数组） */
+    SUB(inReal0: number[], inReal1: number[]): number[];
+    /** MULT - 向量乘法：inReal0[i] * inReal1[i]（两个等长数值数组） */
+    MULT(inReal0: number[], inReal1: number[]): number[];
+    /** DIV - 向量除法：inReal0[i] / inReal1[i]（两个等长数值数组） */
+    DIV(inReal0: number[], inReal1: number[]): number[];
 
     // ==================== 其他指标 ====================
 
@@ -1936,9 +1990,9 @@ interface Italib {
     CDL2CROWS(inPriceOHLC: IRecord[]): number[];
 }
 
-// ==================== FMZ内置TA指标库 ====================
+// ==================== 内置TA指标库 ====================
 /**
- * FMZ平台内置技术分析指标库（简化版），相比talib更常用易用
+ * 平台内置技术分析指标库（简化版），相比talib更常用易用
  * 通过全局变量 `TA` 访问
  *
  * ```js
@@ -2056,7 +2110,7 @@ interface ITA {
     /**
      * Highest - 获取周期内最高值
      * @param inReal - 输入数据
-     * @param period - 计算周期，不传则计算全部数据
+     * @param period - 计算周期（必填），0 表示当前Bar之前的全部数据
      * @param attr - K线属性名（当传入K线数组时），如 "High", "Low", "Close", "Volume"
      * @returns 最高值（单个数字）
      * ```js
@@ -2064,19 +2118,19 @@ interface ITA {
      * var highestClose = TA.Highest(records, 10, "Close");
      * ```
      */
-    Highest(inReal: number[] | IRecord[], period?: number, attr?: string): number;
+    Highest(inReal: number[] | IRecord[], period: number, attr?: string): number;
 
     /**
      * Lowest - 获取周期内最低值
      * @param inReal - 输入数据
-     * @param period - 计算周期，不传则计算全部数据
+     * @param period - 计算周期（必填），0 表示当前Bar之前的全部数据
      * @param attr - K线属性名，如 "High", "Low", "Close", "Volume"
      * @returns 最低值（单个数字）
      * ```js
      * var lowestLow = TA.Lowest(records, 20, "Low");
      * ```
      */
-    Lowest(inReal: number[] | IRecord[], period?: number, attr?: string): number;
+    Lowest(inReal: number[] | IRecord[], period: number, attr?: string): number;
 }
 
 /**
@@ -2147,10 +2201,21 @@ interface IDial {
     exec(sql: string, ...extra: any[]): IDBExecRet | null;
 
     /**
-     * 获取连接的文件描述符编号
-     * @returns 文件描述符编号
+     * 返回指向同一连接的句柄（socket 与数据库连接都可以）。句柄可以传给其他线程
+     * （threading.Thread 参数、threading.Dict、postMessage），在那里 `Dial(handle)` 复用同一连接；
+     * 已 close() 的连接不能复用。仅 JavaScript 支持。
+     * ```js
+     * var c = Dial("wss://example.com/ws");
+     * var t = threading.Thread(function (h) { var conn = Dial(h); Log(conn.read(1000)); }, c.fd());
+     * ```
+     * @returns 同一连接的句柄；其 valueOf() 为连接编号
      */
-    fd(): number;
+    fd(): IDial;
+
+    /**
+     * 连接编号（用于日志、排错与数值比较）
+     */
+    valueOf(): number;
 
     /**
      * 关闭连接，释放资源
@@ -2479,7 +2544,7 @@ declare interface IHttpRet {
 /** TA-Lib 技术分析库全局实例，包含100+技术指标函数 */
 declare const talib: Italib;
 
-/** FMZ内置技术分析库，包含常用指标（KDJ, BOLL, MACD等）的简化版本 */
+/** 内置技术分析库，包含常用指标（KDJ, BOLL, MACD等）的简化版本 */
 declare const TA: ITA;
 
 /** 多线程管理对象，用于创建和管理工作线程 */
@@ -2609,7 +2674,7 @@ declare function GetPid(): number;
 declare function GetLastError(): string | null;
 
 /**
- * 获取策略交互命令。用于读取用户在FMZ平台策略页面发送的交互命令。
+ * 获取策略交互命令。用于读取用户在实盘页面发送的交互命令。
  * @returns 命令字符串（格式为 "按钮名:参数"），无命令时返回 null
  * ```js
  * var cmd = GetCommand();
@@ -2633,16 +2698,25 @@ declare function GetMeta(): string | null;
  * @param address - 连接地址，支持多种协议:
  *   - WebSocket: "wss://stream.binance.com:9443/ws/btcusdt@ticker"
  *   - TCP: "tcp://host:port"
- *   - SQLite: "sqlite3:///path/to/db.sqlite3"
- *   - MySQL: "mysql://user:pass@host:port/dbname"
- *   - PostgreSQL: "postgres://user:pass@host:port/dbname?sslmode=disable"
- *   - ClickHouse: "clickhouse://user:pass@host:9000/db"（原生 TCP 协议，与旧托管者相同；
- *     9440 或 ?secure=true 为 TLS，?insecure=true 跳过证书校验）；
+ *   - SQLite: "sqlite3://test.db"（相对路径在实盘目录下）、"sqlite3:///path/to/db.sqlite3"（绝对路径）、
+ *     "sqlite3://:memory:"（内存库）
+ *   - MySQL（Go 驱动 DSN）: "mysql://user:pass@tcp(host:3306)/dbname?charset=utf8mb4&parseTime=true"；
+ *     charset/collation、timeout/readTimeout/writeTimeout、tls/ssl-mode 等生效，parseTime/loc 只校验不生效，
+ *     不支持自定义 TLS 配置名，其余未知参数作为会话变量 SET；也可写 "mysql://user:pass@host:3306/dbname"
+ *   - PostgreSQL（libpq 键值）: "postgres://user=u password=p host=h port=5432 dbname=d sslmode=disable"；
+ *     sslmode 按 libpq 语义（只有 verify-ca/verify-full 校验证书），sslrootcert/passfile/service 等文件类参数不支持；
+ *     也可写 "postgres://user:pass@host:5432/dbname?sslmode=disable"
+ *   - ClickHouse（clickhouse-go DSN）: "clickhouse://tcp://host:9000?username=u&password=p&database=d"
+ *     （也可 http:// / https:// 走 HTTP 接口；secure / skip_verify；其余参数作为 settings）；
+ *     也可写 "clickhouse://user:pass@host:9000/db"（原生 TCP，9440 或 ?secure=true 为 TLS），
  *     "clickhouse+http://host:8123/db" / "clickhouse+https://host:8443/db" 走 HTTP 接口
+ *   - 也可传 IDial.fd() 返回的句柄：返回同一连接
  *
  *   地址末尾可用 `|` 分隔追加选项（同名键覆盖第二参），如:
  *   "wss://....|compress=gzip_raw&mode=recv"
- * @param timeoutMs - 连接超时时间（毫秒），默认 30000；也可传选项对象（或其 JSON 串）：
+ * @param timeout - 连接超时：ws/wss 单位毫秒（小于 100 视为秒），tcp/tls 单位秒，0 用默认超时；
+ *   不传时为 30（即 30 秒）。也可传选项对象（或其 JSON 串；JSON 串合并在缺省 {timeout: 30} 之上，
+ *   选项对象整个替换缺省，不含 timeout 时用默认超时）：timeout 同上；
  *   headers 请求头；reconnect 自动重连；retry 最大重试次数（0 表示不限）；
  *   interval 重试间隔（毫秒，默认 1000）；payload 每次连接成功后发送的数据；
  *   compress 收到的二进制帧自动解压（gzip / gzip_raw / flate / zlib / deflate；mode 只支持 recv）；
@@ -2659,14 +2733,14 @@ declare function GetMeta(): string | null;
  *     }
  *     ws.close();
  * }
- * // 连接中断后由原生运行时重连；ws.fd() 始终返回同一个 fd
+ * // 连接中断后由原生运行时重连；连接编号 ws.fd().valueOf() 不变
  * var ws = Dial("wss://example.com/ws", {reconnect: true, retry: 0, interval: 1000});
  * // SQLite数据库
- * var db = Dial("sqlite3:///strategy.db");
+ * var db = Dial("sqlite3://strategy.db");
  * db.exec("CREATE TABLE IF NOT EXISTS logs(time TEXT, msg TEXT)");
  * ```
  */
-declare function Dial(address: string|number, timeoutMs?: number | { [key: string]: any }): IDial | null;
+declare function Dial(address: string | IDial, timeout?: number | string | { [key: string]: any }): IDial | null;
 
 /**
  * 发送HTTP请求（简单用法）
@@ -2984,7 +3058,7 @@ declare function _Cross(arr1: number[], arr2: number[]): boolean;
 declare function JSONParse(s: string): object;
 
 /**
- * FMZ 扩展：JSON.parse 的第二个参数支持传布尔值 safeStr
+ * 平台扩展：JSON.parse 的第二个参数支持传布尔值 safeStr
  * safeStr 为 true 时以安全模式解析，大数字自动转为字符串，避免精度丢失
  *
  * ```js
@@ -3183,7 +3257,7 @@ declare interface IThread {
      * Log("耗时:", result.elapsed / 1e6, "ms");
      * ```
      */
-    join(timeoutMs?: number): IThreadRet | null;
+    join(timeoutMs?: number): IThreadRet | undefined;
 
     /**
      * 强制终止线程
@@ -3448,7 +3522,7 @@ declare function __threadPostMessage(threadId: number, msg: any): void;
  * @deprecated 已废弃，请使用 `thread.join` 替代
  * 等待线程完成并获取结果
  */
-declare function __threadJoin(threadId: number, timeoutMs?: number): IThreadRet | null;
+declare function __threadJoin(threadId: number, timeoutMs?: number): IThreadRet | undefined;
 
 /**
  * @deprecated 已废弃，请使用 `thread.terminate` 替代
@@ -3483,10 +3557,10 @@ declare function __threadPending(running?:boolean): number;
 
 /**
  * HTTP/TCP服务器请求上下文，提供请求信息和响应方法
- * 在 __Serve 的处理函数中使用
+ * 在 threading.Serve 的处理函数中使用
  *
  * ```js
- * __Serve("http://0.0.0.0:8080", function(ctx) {
+ * threading.Serve("http://0.0.0.0:8080", function(ctx) {
  *     if (ctx.method() === "POST") {
  *         var body = ctx.body();
  *         Log("收到POST:", body);
@@ -3578,16 +3652,18 @@ interface IServeContext {
  *     }
  * });
  * ```
+ * @deprecated 旧写法，请用 threading.Serve（返回 Server 对象，addr() 取地址）
  */
-declare function __Serve(uri: string, handler: (ctx: IServeContext, ...args: any[]) => void): any;
+declare function __Serve(uri: string, handler: (ctx: IServeContext, ...args: any[]) => void): string;
 
-declare namespace threading {
+// 接口合并：threading 声明为 const threading: IThreading，namespace 不会与 const 合并
+declare interface IThreading {
     /**
      * 与 __Serve 同一实现（__Serve 是它的别名，只返回地址串）：在策略进程内起 TCP / HTTP(S) / WebSocket
      * 服务，每个连接或请求在独立线程里调用 handler(ctx, ...args)。返回 Server 对象。
      * 不支持 pprof=true（忽略）；tls=true 必须同时给 cert_pem 与 cert_key_pem。
      */
-    function Serve(uri: string, handler: (ctx: IServeContext, ...args: any[]) => void, ...args: any[]): IServer;
+    Serve(uri: string, handler: (ctx: IServeContext, ...args: any[]) => void, ...args: any[]): IServer;
 }
 
 /** threading.Serve 返回的服务对象（可作为 Thread 参数跨线程传递） */
@@ -3712,7 +3788,7 @@ interface TextDecoder {
   readonly fatal: boolean;
   readonly ignoreBOM: boolean;
   
-  decode(input?: BufferSource, options?: TextDecodeOptions): string;
+  decode(input?: ArrayBuffer | ArrayBufferView, options?: TextDecodeOptions): string;
 }
 
 interface TextDecoderOptions {
@@ -3816,7 +3892,6 @@ declare function SetChannelData(v : any): void;
 declare function GetChannelData(token: any): any;
 
 // Type definitions for Trader class
-// For FMZ Quant Trading Platform
 
 /**
  * Trade position information

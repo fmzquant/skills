@@ -483,28 +483,50 @@ class IGo:
         # 并发获取行情和深度
         go_ticker = exchange.Go("GetTicker")
         go_depth = exchange.Go("GetDepth")
-        ticker = go_ticker.wait()   # 等待行情结果
-        depth = go_depth.wait()     # 等待深度结果
+        ticker, ok = go_ticker.wait()   # 等待行情结果
+        depth, ok = go_depth.wait()     # 等待深度结果
     """
-    def wait(self, timeout: Optional[int] = None) -> object:
+    def wait(self, timeout: Optional[int] = None) -> tuple[object, bool]:
         """等待并发任务完成并返回结果。
 
         参数:
             timeout: 超时时间,单位毫秒。
 
                 - 不传或传 0:阻塞等待直到返回结果。
-                - 正数:等待指定毫秒数,超时返回 ``None``。
-                - 负数 (-1):立即返回,无结果时返回 ``None``。
+                - 正数:最多等待指定毫秒数,任务未完成返回 ``(None, False)``,之后可以再次 ``wait()``。
+                - 负数 (-1):不等待,任务未完成立即返回 ``(None, False)``。
 
         返回:
-            对应函数的返回值,失败或超时返回 ``None``。
+            ``(结果, ok)`` 元组:成功为 ``(对应函数的返回值, True)``;调用失败、无数据或超时为
+            ``(None, False)``。结果被取走后再次 ``wait()`` 会记录错误
+            ``routine N already finished`` 并返回 ``(None, False)``。
 
         示例::
 
             go = exchange.Go("GetTicker")
-            ticker = go.wait(2000)  # 最多等待 2 秒
+            ticker, ok = go.wait(2000)  # 最多等待 2 秒
+            if not ok:
+                ticker, ok = go.wait()  # 超时后可以继续等待
         """
         ...
+
+class IHttpQueryGo:
+    """``HttpQuery_Go()`` 返回的并发对象。"""
+    def wait(self, timeout: Optional[int] = None) -> Optional[Union[str, "IHttpRet"]]:
+        """等待 HTTP 请求完成,返回值与同步 ``HttpQuery()`` 相同。
+
+        参数:
+            timeout: 超时时间(毫秒)。不传或 0 一直等待;-1 不等待;正数最多等待该毫秒数。
+                未完成时返回 ``None``,之后可以再次 ``wait()``;结果取到后重复 ``wait()`` 返回同一份结果。
+        """
+        ...
+
+class IData:
+    """``exchange.GetData()`` 的返回值。"""
+    Time: int
+    """命中记录的时间戳(毫秒);没有记录时为 offset(或下一行的时间)。"""
+    Data: object
+    """命中记录的数据;没有记录、拉取失败或数据源不可用时为 ``None``(原因可用 ``GetLastError()`` 读取)。"""
 
 class IExchange:
     """交易所操作接口,封装所有交易所 API 调用方法。
@@ -1142,11 +1164,14 @@ class IExchange:
         """
         ...
 
-    def SetRate(self, n: float) -> None:
+    def SetRate(self, n: float = 1) -> float:
         """设置汇率转换。所有价格将自动乘以该汇率。
 
         参数:
-            n: 汇率值。``1`` 表示不转换。
+            n: 汇率值。``1`` 表示不转换;不传或传非正数等同于 ``1``。
+
+        返回:
+            设置之前的汇率值。
 
         示例::
 
@@ -1163,6 +1188,47 @@ class IExchange:
         """
         ...
 
+    def SetData(self, key: str, value: object) -> int:
+        """写入数据集合,供 ``exchange.GetData()`` 读取(常用于加载自定义数据)。
+
+        参数:
+            key: 数据集合名称。
+            value: ``[[时间戳, 数据], ...]`` 列表(或其 JSON 字符串),也可以是 ``{"schema": [...], "data": [...]}``。
+
+        返回:
+            数据 JSON 编码后的长度;格式不对时返回 ``0`` 并记录 ``GetLastError()``。
+
+        示例::
+
+            exchange.SetData("test", [[1579536000000, 123], [1579622400000, 456]])
+            Log(exchange.GetData("test"))
+        """
+        ...
+
+    def GetData(self, key: str, timeout: Optional[int] = None, offset: int = 0) -> IData:
+        """获取 ``exchange.SetData()`` 写入的数据集合或外部链接提供的数据。
+
+        http/https 链接由本机拉取,响应须是 ``[[time, data], ...]`` 或 ``{"schema": [...], "data": [...]}``,
+        按 ``timeout`` 缓存、过期重拉;SetData 写入的本地集合不过期。``ext.`` 前缀的服务端数据源在当前运行时不可用。
+
+        参数:
+            key: 数据集合名称或请求链接(http/https URL)。
+            timeout: 缓存超时时间(毫秒),不传为 60000,下限 5000。
+            offset: 取 ``time <= offset`` 的最后一行;``0`` 或不传表示当前时间。
+
+        返回:
+            ``IData`` 对象(``Time``、``Data``)。任何情况下都返回对象:没有记录、拉取失败或数据源不可用时
+            ``Data`` 为 ``None``,原因可用 ``GetLastError()`` 读取。
+
+        示例::
+
+            data = exchange.GetData("test")
+            extern = exchange.GetData("https://www.example.com/data.json")
+            if extern.Data is None:
+                Log("no data:", GetLastError())
+        """
+        ...
+
     def GetUSDCNY(self) -> float:
         """获取美元兑人民币汇率。
 
@@ -1172,7 +1238,7 @@ class IExchange:
         ...
 
     def GetLabel(self) -> str:
-        """获取交易所自定义标签名称(在 FMZ 平台配置交易所时设置)。
+        """获取交易所自定义标签名称(在平台配置交易所时设置)。
 
         返回:
             标签字符串。
@@ -1243,7 +1309,7 @@ t_TAInput = Union[list[float], IRecordList]
 # ==================== Built-in TA Indicator Library ====================
 
 class ITA:
-    """FMZ平台内置技术分析指标库(简化版)。
+    """平台内置技术分析指标库(简化版)。
 
     比talib更常用且更易使用。通过全局变量 ``TA`` 访问。
 
@@ -1416,12 +1482,12 @@ class ITA:
         """
         ...
 
-    def Highest(self, inReal: t_TAInput, period: Optional[int] = None, attr: Optional[str] = None) -> float:
-        """获取周期内的最高值。
+    def Highest(self, inReal: t_TAInput, period: int, attr: Optional[str] = None) -> float:
+        """获取周期内的最高值(不含当前 Bar)。
 
         参数:
             inReal: 输入数据。
-            period: 计算周期。如果未提供,计算所有数据。
+            period: 计算周期(必填),``0`` 表示当前 Bar 之前的全部数据。
             attr: 传入K线数组时的K线属性名,
                 例如 ``"High"``, ``"Low"``, ``"Close"``, ``"Volume"``。
 
@@ -1435,12 +1501,12 @@ class ITA:
         """
         ...
 
-    def Lowest(self, inReal: t_TAInput, period: Optional[int] = None, attr: Optional[str] = None) -> float:
-        """获取周期内的最低值。
+    def Lowest(self, inReal: t_TAInput, period: int, attr: Optional[str] = None) -> float:
+        """获取周期内的最低值(不含当前 Bar)。
 
         参数:
             inReal: 输入数据。
-            period: 计算周期。如果未提供,计算所有数据。
+            period: 计算周期(必填),``0`` 表示当前 Bar 之前的全部数据。
             attr: K线属性名,例如 ``"High"``, ``"Low"``, ``"Close"``, ``"Volume"``。
 
         返回:
@@ -1558,7 +1624,7 @@ class IEventMsg:
 class IChart:
     """图表对象，用于在策略页面绘制自定义图表。
 
-    通过 ``Chart()`` 或 ``KLineChart()`` 创建。
+    通过 ``Chart()`` 创建(``KLineChart()`` 返回 ``IKLineChart``)。
 
     示例::
 
@@ -1596,8 +1662,80 @@ class IChart:
         """
         ...
 
+class IKLineChart:
+    """Pine 风格 K 线图对象,由 ``KLineChart()`` 创建。
+
+    每根 K 线以 ``begin(bar)`` 开始,调用 plot 等画图函数,再以 ``close()`` 输出到图表。
+    画图函数的可选参数与 Pine 同名(``title``、``color``、``linewidth``、``style``、``overlay`` 等),用关键字参数传入。
+
+    示例::
+
+        c = KLineChart({"overlay": True})
+        for bar in exchange.GetRecords():
+            c.begin(bar)
+            c.plot(bar.Close, "Close")
+            c.close()
+    """
+    def begin(self, bar: IRecord) -> None:
+        """开始处理一根 K 线,必须作为每根 K 线画图操作的起始调用。"""
+        ...
+
+    def close(self, bar: Optional[IRecord] = None) -> None:
+        """结束当前 K 线的画图操作并输出到图表。
+
+        参数:
+            bar: 可选,直接传入这根 K 线(等同先 ``begin(bar)``);不传则使用 ``begin()`` 记下的那根。
+                同一时间戳的 K 线重复 ``close()`` 会替换上一根(可对未完成的 K 线反复更新)。
+        """
+        ...
+
+    def reset(self, remain: int = 0) -> None:
+        """重置图表数据。``remain`` 为保留最近的 K 线数量,默认 0(全部清除)。"""
+        ...
+
+    def plot(self, series: Optional[float] = None, title: Optional[str] = None, **options: object) -> Optional[int]:
+        """画线(类似 Pine 的 ``plot``)。返回绘图对象索引(可传给 ``fill``),跳过时返回 ``None``。"""
+        ...
+
+    def hline(self, price: float, title: Optional[str] = None, **options: object) -> Optional[int]:
+        """在 ``price`` 处画水平线。返回绘图对象索引。"""
+        ...
+
+    def plotshape(self, series: object, title: Optional[str] = None, **options: object) -> None:
+        """``series`` 为真时画形状标记(``style``、``location``、``text`` 等)。"""
+        ...
+
+    def plotchar(self, series: object, title: Optional[str] = None, char: Optional[str] = None, **options: object) -> None:
+        """``series`` 为真时画单个字符(``char`` 必填)。"""
+        ...
+
+    def plotarrow(self, series: float, title: Optional[str] = None, **options: object) -> None:
+        """按 ``series`` 的正负与大小画上/下箭头。"""
+        ...
+
+    def plotcandle(self, open: float, high: float, low: float, close: float, title: Optional[str] = None, **options: object) -> None:
+        """用给定 OHLC 额外画一根蜡烛。"""
+        ...
+
+    def barcolor(self, color: str, **options: object) -> None:
+        """给当前价格 K 线上色。"""
+        ...
+
+    def bgcolor(self, color: str, **options: object) -> None:
+        """给当前 K 线背景上色。"""
+        ...
+
+    def fill(self, plot1: int, plot2: int, color: Optional[str] = None, **options: object) -> None:
+        """填充两个绘图对象(``plot``/``hline`` 返回的索引)之间的区域。"""
+        ...
+
+    def signal(self, direction: str, price: float, qty: float, id: Optional[str] = None) -> None:
+        """画交易信号标记。``direction``:``"buy"``/``"long"``、``"sell"``/``"short"``、
+        ``"closebuy"``/``"closelong"``、``"closesell"``/``"closeshort"``;``id`` 不传时用 ``direction``。"""
+        ...
+
 class IHttpOptions:
-    """``HttpQuery()`` 的 HTTP 请求选项。
+    """``HttpQuery()`` 的 HTTP 请求选项(作为第二个参数传入的字典)。
 
     示例::
 
@@ -1613,6 +1751,8 @@ class IHttpOptions:
     """HTTP 方法: ``"GET"``、``"POST"``、``"PUT"``、``"DELETE"`` 等。默认 ``"GET"``。"""
     body: Optional[Union[str, bytes]]
     """请求体（用于 POST 和其他方法）。"""
+    proxy: Optional[str]
+    """本次请求使用的代理地址,如 ``"socks5://127.0.0.1:1080"``。"""
     charset: Optional[str]
     """响应字符编码转换（例如 ``"gbk"``）。"""
     cookie: Optional[str]
@@ -1628,18 +1768,24 @@ class IHttpOptions:
     headers: Optional[dict[str, object]]
     """自定义请求头。"""
     timeout: Optional[int]
-    """请求超时时间（毫秒）。"""
+    """请求超时时间（毫秒），默认 300000（5 分钟）。"""
 
 class IHttpRet:
     """在调试模式下由 ``HttpQuery()`` 返回的完整 HTTP 响应结构。"""
     StatusCode: int
-    """HTTP 状态码，例如 200、404、500。"""
+    """HTTP 状态码，例如 200、404、500;请求没拿到应答(拒绝连接、DNS、超时、代理失败)时为 0。"""
     Trace: Optional[object]
     """请求跟踪信息（在调试模式下可用）。"""
     Header: dict[str, list[str]]
     """响应头字典。每个键映射到一个字符串列表。"""
+    Cookies: Optional[list[object]]
+    """Cookies 信息(调试模式下可用)。"""
+    Length: Optional[int]
+    """报文长度。"""
     Body: Optional[Union[str, bytes]]
-    """响应体内容。请求失败时为 ``None``。"""
+    """响应体内容,请求失败时为空字符串。"""
+    Error: Optional[str]
+    """请求失败原因(方法 + URL + 底层错误),只在 ``StatusCode`` 为 0 时出现。"""
 
 # ==================== Global Variables ====================
 
@@ -1647,7 +1793,7 @@ ext = object()
 """模板类库域。用于访问模板库函数。"""
 
 TA = ITA()
-"""FMZ 内置技术分析库，包含常用指标的简化版本
+"""内置技术分析库，包含常用指标的简化版本
 （KDJ、BOLL、MACD、EMA、SMA、RSI 等）。"""
 
 exchanges: list[IExchange] = [IExchange()]
@@ -1762,7 +1908,7 @@ def GetLastError() -> Optional[str]:
 def GetCommand() -> Optional[str]:
     """获取策略交互命令。
 
-    用于读取用户在 FMZ 平台策略页面发送的交互命令。
+    用于读取用户在实盘页面发送的交互命令。
 
     返回:
         命令字符串(格式: ``"按钮名称:参数"``),没有命令时返回 ``None``。
@@ -1778,13 +1924,13 @@ def GetCommand() -> Optional[str]:
     """
     ...
 
-def GetChannelData(token: str) -> Optional[str]:
+def GetChannelData(token: Union[str, int] = "") -> Optional[str]:
     """获取跨策略通信的通道数据。
 
     读取其他策略通过 ``SetChannelData()`` 发布的数据。
 
     参数:
-        token: 通道令牌(用于标识数据源)。
+        token: 通道令牌(用于标识数据源),实盘 ID(字符串或数字)或 UUID。
 
     返回:
         来自通道的数据,没有可用数据时返回 ``None``。
@@ -1817,15 +1963,16 @@ def Dial(address: Union[str, int], timeout: Union[int, dict] = None) -> Optional
 
             - WebSocket: ``"wss://stream.binance.com:9443/ws/btcusdt@ticker"``
             - TCP: ``"tcp://host:port"``
-            - SQLite: ``"sqlite3:///path/to/db.sqlite3"``
-            - MySQL: ``"mysql://user:pass@host:port/dbname"``
-            - PostgreSQL: ``"postgres://user:pass@host:port/dbname?sslmode=disable"``
-            - KVDB (Pebble): ``"kvdb://"`` 或 ``"kvdb:///path/to/db"``
+            - SQLite: ``"sqlite3://test.db"``(相对路径在实盘目录下)、``"sqlite3:///path/to/db.sqlite3"``(绝对路径)、``"sqlite3://:memory:"``(内存库)
+            - MySQL: ``"mysql://user:pass@tcp(host:3306)/dbname?charset=utf8mb4&parseTime=true"``(Go 驱动 DSN),也可写 ``"mysql://user:pass@host:3306/dbname"``
+            - PostgreSQL: ``"postgres://user=u password=p host=h port=5432 dbname=d sslmode=disable"``(libpq 键值),也可写 ``"postgres://user:pass@host:5432/dbname?sslmode=disable"``
+            - ClickHouse: ``"clickhouse://tcp://host:9000?username=u&password=p&database=d"``(clickhouse-go DSN),也可写 ``"clickhouse://user:pass@host:9000/db"``
 
             选项可以在末尾用 ``|`` 分隔添加,例如:
             ``"wss://....|compress=gzip_raw&mode=recv"``
 
-        timeout: 连接超时时间(毫秒),默认 30000。
+        timeout: 连接超时:ws/wss 单位毫秒(小于 100 视为秒),tcp/tls 单位秒,0 用默认超时;不传时为 30(即 30 秒)。
+            也可传选项字典(如 ``{"timeout": 10, "headers": {...}}``),不含 timeout 时用默认超时。
 
     返回:
         IDial 连接对象,连接失败时返回 ``None``。
@@ -1839,27 +1986,29 @@ def Dial(address: Union[str, int], timeout: Union[int, dict] = None) -> Optional
                 Log(msg)
             ws.close()
 
-        db = Dial("sqlite3:///strategy.db")
+        db = Dial("sqlite3://strategy.db")
         db.exec("CREATE TABLE IF NOT EXISTS logs(time TEXT, msg TEXT)")
     """
     ...
 
-def HttpQuery(url: str, postData: Optional[Union[str, bytes]] = None, cookies: Optional[str] = None, headers: Optional[Union[str, dict[str, str]]] = None) -> Optional[str]:
+def HttpQuery(url: str, postData: Optional[Union[str, bytes, IHttpOptions, dict]] = None, cookies: Optional[str] = None, headers: Optional[Union[str, dict[str, str]]] = None) -> Optional[Union[str, IHttpRet]]:
     """发送 HTTP 请求。
 
-    当第二个参数传入包含 ``debug: True`` 的字典时,
-    返回完整的 IHttpRet 响应对象而不仅仅是正文字符串。
+    第二个参数可以是 POST 数据(非空字符串时自动变为 POST 请求),也可以是 IHttpOptions 选项字典
+    (``method``、``body``、``headers``、``cookie``、``timeout``、``proxy``、``charset``、``format``、``debug`` 等)。
+    选项中 ``debug`` 为 ``True`` 时返回完整的 IHttpRet 响应对象而不仅仅是正文字符串。
+    URL 也可以带代理前缀,如 ``"socks5://127.0.0.1:1080/https://api.example.com"``
+    (选项里显式给出的 ``proxy`` 优先)。
 
     参数:
         url: 请求 URL。
-        postData: POST 数据(非空时自动变为 POST 请求)。
-            也可以是用于高级用法的 IHttpOptions 字典。
-        cookies: Cookie 字符串。
-        headers: 请求头,支持字符串(换行分隔)或字典。
+        postData: POST 数据,或 IHttpOptions 选项字典。
+        cookies: Cookie 字符串(旧式调用形式)。
+        headers: 请求头,支持字符串(换行分隔)或字典(旧式调用形式)。
 
     返回:
         响应正文字符串,失败时返回 ``None``。如果选项中有 ``debug=True``,
-        返回包含 ``StatusCode``、``Header``、``Body`` 字段的字典。
+        返回包含 ``StatusCode``、``Header``、``Body`` 字段的对象(失败时 ``StatusCode`` 为 0,``Error`` 为原因)。
 
     示例::
 
@@ -1874,6 +2023,22 @@ def HttpQuery(url: str, postData: Optional[Union[str, bytes]] = None, cookies: O
             "headers": {"Content-Type": "application/json"},
             "debug": True
         })
+    """
+    ...
+
+def HttpQuery_Go(url: str, postData: Optional[Union[str, bytes, IHttpOptions, dict]] = None, cookies: Optional[str] = None, headers: Optional[Union[str, dict[str, str]]] = None) -> IHttpQueryGo:
+    """``HttpQuery()`` 的异步版本,立即返回并发对象,不阻塞当前线程。参数同 ``HttpQuery()``。
+
+    返回:
+        并发对象,调用其 ``wait(timeout)`` 获取与同步 ``HttpQuery()`` 相同的结果。
+        请求完成时 ``EventLoop()`` 收到 ``Event`` 为 ``"HttpQuery"`` 的事件(``Index`` 为票据号)。
+
+    示例::
+
+        r1 = HttpQuery_Go("https://api.example.com/tickerA")
+        r2 = HttpQuery_Go("https://api.example.com/tickerB")
+        tickerA = json.loads(r1.wait())
+        tickerB = json.loads(r2.wait())
     """
     ...
 
@@ -2229,7 +2394,7 @@ def Chart(options: Union[dict, list[dict]]) -> IChart:
     """
     ...
 
-def KLineChart(options: Union[dict, list[dict]]) -> IChart:
+def KLineChart(options: Optional[dict] = None) -> IKLineChart:
     """创建 K 线图表(自定义蜡烛图),配置类似 Pine Script。
 
     【专用】仅用于绘制 K 线/蜡烛图;一般绘图请优先使用 Chart(类型更全面)。
@@ -2238,7 +2403,7 @@ def KLineChart(options: Union[dict, list[dict]]) -> IChart:
         options: K 线图表配置对象。
 
     返回:
-        IChart 图表对象。
+        IKLineChart 图表对象(``begin``/``close`` 加 Pine 风格画图函数)。
 
     示例::
 

@@ -406,7 +406,7 @@ declare interface IRecord {
  * ```
  */
 declare interface IMarket {
-    /** Trading pair symbol, e.g. "BTC_USDT", for futures "BTC_USDT.swap" */
+    /** The exchange's native instrument name, e.g. "BTCUSDT" on Binance spot, "BTC-USDT-SWAP" for an OKX perpetual; the platform unified symbol ("BTC_USDT", "BTC_USDT.swap") is the key of the object GetMarkets() returns. Falls back to the unified symbol when the exchange provides no native name */
     Symbol: string;
     /** Base asset (trading currency), e.g. "BTC" */
     BaseAsset: string;
@@ -1028,7 +1028,7 @@ interface IExchange {
     GetUSDCNY(): number;
 
     /**
-     * Get exchange custom label name (set when configuring exchange on FMZ platform)
+     * Get exchange custom label name (set when configuring the exchange on the platform)
      * @returns Label string
      * ```js
      * Log(exchange.GetLabel());  // "My Binance Account"
@@ -1272,8 +1272,14 @@ interface Italib {
 
     /**
      * MAVP - Moving Average with Variable Period
-     * Note: This function requires two input arrays, currently not supported
+     * @param inReal - Input data (numeric array)
+     * @param inPeriods - Period for each bar (numeric array of the same length as inReal), clamped to [optInMinPeriod, optInMaxPeriod]
+     * @param optInMinPeriod - Minimum period, default 2
+     * @param optInMaxPeriod - Maximum period, default 30 (warm-up is optInMaxPeriod - 1)
+     * @param optInMAType - Moving average type: 0=SMA, 1=EMA, 2=WMA, 3=DEMA, 4=TEMA, 5=TRIMA, 6=KAMA, 7=MAMA, 8=T3, default 0
+     * @returns MAVP array
      */
+    MAVP(inReal: number[], inPeriods: number[], optInMinPeriod?: number, optInMaxPeriod?: number, optInMAType?: number): number[];
 
     /**
      * T3 - Triple Exponential Moving Average T3
@@ -1553,6 +1559,14 @@ interface Italib {
      */
     ULTOSC(inPriceHLC: IRecord[], optInTimePeriod1?: number, optInTimePeriod2?: number, optInTimePeriod3?: number): number[];
 
+    /**
+     * IMI - Intraday Momentum Index
+     * @param inPriceOC - Candlestick data (uses Open and Close)
+     * @param optInTimePeriod - Calculation period, default 14
+     * @returns IMI array (0~100)
+     */
+    IMI(inPriceOC: IRecord[], optInTimePeriod?: number): number[];
+
     // ==================== Stochastic/KDJ Indicators ====================
 
     /**
@@ -1611,6 +1625,14 @@ interface Italib {
     BBANDS(inReal: number[] | IRecord[], optInTimePeriod?: number, optInNbDevUp?: number, optInNbDevDn?: number, optInMAType?: number): [number[], number[], number[]];
 
     /**
+     * ACCBANDS - Acceleration Bands
+     * @param inPriceHLC - Candlestick data
+     * @param optInTimePeriod - Calculation period, default 20
+     * @returns [upper band array, middle band array, lower band array]
+     */
+    ACCBANDS(inPriceHLC: IRecord[], optInTimePeriod?: number): [number[], number[], number[]];
+
+    /**
      * ATR - Average True Range
      * @param inPriceHLC - Candlestick data
      * @param optInTimePeriod - Calculation period, default 14
@@ -1655,18 +1677,26 @@ interface Italib {
      */
     VAR(inReal: number[] | IRecord[], optInTimePeriod?: number, optInNbDev?: number): number[];
 
+    /**
+     * AVGDEV - Average Deviation
+     * @param inReal - Input data
+     * @param optInTimePeriod - Calculation period, default 14
+     * @returns Average deviation array
+     */
+    AVGDEV(inReal: number[] | IRecord[], optInTimePeriod?: number): number[];
+
     // ==================== Volume Indicators ====================
 
     /**
      * OBV - On Balance Volume
      * @param inReal - Close price array or candlestick array
-     * @param inPriceV - Candlestick array containing Volume
+     * @param inPriceV - Volume: omit when inReal is a candlestick array; when inReal is a close-price array, pass a candlestick array (Volume is used) or a volume array
      * @returns OBV array
      * ```js
-     * var obv = talib.OBV(records, records);
+     * var obv = talib.OBV(records);
      * ```
      */
-    OBV(inReal: number[] | IRecord[], inPriceV: IRecord[]): number[];
+    OBV(inReal: number[] | IRecord[], inPriceV?: number[] | IRecord[]): number[];
 
     /**
      * AD - Chaikin A/D Line
@@ -1731,6 +1761,21 @@ interface Italib {
      * @returns TSF array
      */
     TSF(inReal: number[] | IRecord[], optInTimePeriod?: number): number[];
+
+    /**
+     * BETA - Beta: slope of the regression of inReal1's bar-by-bar change on inReal0's
+     * @param inReal0 - First price series (the benchmark), numeric array
+     * @param inReal1 - Second price series, numeric array of the same length as inReal0
+     * @param optInTimePeriod - Calculation period, default 5
+     */
+    BETA(inReal0: number[], inReal1: number[], optInTimePeriod?: number): number[];
+    /**
+     * CORREL - Pearson's Correlation Coefficient (r)
+     * @param inReal0 - First series, numeric array
+     * @param inReal1 - Second series, numeric array of the same length as inReal0
+     * @param optInTimePeriod - Calculation period, default 30
+     */
+    CORREL(inReal0: number[], inReal1: number[], optInTimePeriod?: number): number[];
 
     // ==================== Hilbert Transform Indicators ====================
 
@@ -1811,6 +1856,15 @@ interface Italib {
      * @param optInTimePeriod - Calculation period, default 30
      */
     SUM(inReal: number[] | IRecord[], optInTimePeriod?: number): number[];
+
+    /** ADD - Vector addition: inReal0[i] + inReal1[i] (two numeric arrays of equal length) */
+    ADD(inReal0: number[], inReal1: number[]): number[];
+    /** SUB - Vector subtraction: inReal0[i] - inReal1[i] (two numeric arrays of equal length) */
+    SUB(inReal0: number[], inReal1: number[]): number[];
+    /** MULT - Vector multiplication: inReal0[i] * inReal1[i] (two numeric arrays of equal length) */
+    MULT(inReal0: number[], inReal1: number[]): number[];
+    /** DIV - Vector division: inReal0[i] / inReal1[i] (two numeric arrays of equal length) */
+    DIV(inReal0: number[], inReal1: number[]): number[];
 
     // ==================== Other Indicators ====================
 
@@ -1949,9 +2003,9 @@ interface Italib {
     CDL2CROWS(inPriceOHLC: IRecord[]): number[];
 }
 
-// ==================== FMZ Built-in TA Indicator Library ====================
+// ==================== Built-in TA Indicator Library ====================
 /**
- * FMZ Platform built-in technical analysis indicator library (simplified version), more commonly used and easier than talib
+ * Platform built-in technical analysis indicator library (simplified version), more commonly used and easier than talib
  * Access via global variable `TA`
  *
  * ```js
@@ -2069,7 +2123,7 @@ interface ITA {
     /**
      * Highest - Get the highest value within a period
      * @param inReal - Input data
-     * @param period - Calculation period, if not provided, calculates all data
+     * @param period - Calculation period (required); 0 means all data before the current Bar
      * @param attr - Candlestick attribute name (when passing candlestick array), such as "High", "Low", "Close", "Volume"
      * @returns Highest value (single number)
      * ```js
@@ -2077,19 +2131,19 @@ interface ITA {
      * var highestClose = TA.Highest(records, 10, "Close");
      * ```
      */
-    Highest(inReal: number[] | IRecord[], period?: number, attr?: string): number;
+    Highest(inReal: number[] | IRecord[], period: number, attr?: string): number;
 
     /**
      * Lowest - Get the lowest value within a period
      * @param inReal - Input data
-     * @param period - Calculation period, if not provided, calculates all data
+     * @param period - Calculation period (required); 0 means all data before the current Bar
      * @param attr - Candlestick attribute name, such as "High", "Low", "Close", "Volume"
      * @returns Lowest value (single number)
      * ```js
      * var lowestLow = TA.Lowest(records, 20, "Low");
      * ```
      */
-    Lowest(inReal: number[] | IRecord[], period?: number, attr?: string): number;
+    Lowest(inReal: number[] | IRecord[], period: number, attr?: string): number;
 }
 
 /**
@@ -2162,10 +2216,22 @@ interface IDial {
     exec(sql: string, ...extra: any[]): IDBExecRet | null;
 
     /**
-     * Get the file descriptor number of the connection
-     * @returns File descriptor number
+     * Return a handle to the same connection (socket or database). The handle can be passed to
+     * another thread (threading.Thread argument, threading.Dict, postMessage), where `Dial(handle)`
+     * reuses the same connection; a connection that has been close()d cannot be reused.
+     * JavaScript only.
+     * ```js
+     * var c = Dial("wss://example.com/ws");
+     * var t = threading.Thread(function (h) { var conn = Dial(h); Log(conn.read(1000)); }, c.fd());
+     * ```
+     * @returns a handle to the same connection; its valueOf() is the connection number
      */
-    fd(): number;
+    fd(): IDial;
+
+    /**
+     * Connection number (for logging, troubleshooting and numeric comparison)
+     */
+    valueOf(): number;
 
     /**
      * Close the connection and release resources
@@ -2496,7 +2562,7 @@ declare interface IHttpRet {
 /** TA-Lib technical analysis library global instance, containing 100+ technical indicator functions */
 declare const talib: Italib;
 
-/** FMZ built-in technical analysis library, containing simplified versions of common indicators (KDJ, BOLL, MACD, etc.) */
+/** Built-in technical analysis library, containing simplified versions of common indicators (KDJ, BOLL, MACD, etc.) */
 declare const TA: ITA;
 
 /** Multi-threading management object for creating and managing worker threads */
@@ -2627,7 +2693,7 @@ declare function GetPid(): number;
 declare function GetLastError(): string | null;
 
 /**
- * Get strategy interaction command. Used to read interaction commands sent by users on the FMZ platform strategy page.
+ * Get strategy interaction command. Used to read interaction commands sent by users on the live trading page.
  * @returns Command string (format: "button_name:parameter"), returns null when there is no command
  * ```js
  * var cmd = GetCommand();
@@ -2651,16 +2717,27 @@ declare function GetMeta(): string | null;
  * @param address - Connection address, supports multiple protocols:
  *   - WebSocket: "wss://stream.binance.com:9443/ws/btcusdt@ticker"
  *   - TCP: "tcp://host:port"
- *   - SQLite: "sqlite3:///path/to/db.sqlite3"
- *   - MySQL: "mysql://user:pass@host:port/dbname"
- *   - PostgreSQL: "postgres://user:pass@host:port/dbname?sslmode=disable"
- *   - ClickHouse: "clickhouse://user:pass@host:9000/db" (native TCP protocol, as the old
- *     runtime; 9440 or ?secure=true for TLS, ?insecure=true skips certificate checks);
+ *   - SQLite: "sqlite3://test.db" (relative paths are under the live trading directory),
+ *     "sqlite3:///path/to/db.sqlite3" (absolute path), "sqlite3://:memory:" (in-memory database)
+ *   - MySQL (Go driver DSN): "mysql://user:pass@tcp(host:3306)/dbname?charset=utf8mb4&parseTime=true";
+ *     charset/collation, timeout/readTimeout/writeTimeout, tls/ssl-mode etc. take effect, parseTime/loc are
+ *     validated but have no effect, custom TLS config names are not supported, other unknown parameters
+ *     are SET as session variables; "mysql://user:pass@host:3306/dbname" also works
+ *   - PostgreSQL (libpq key-value): "postgres://user=u password=p host=h port=5432 dbname=d sslmode=disable";
+ *     sslmode follows libpq (only verify-ca/verify-full check the certificate), file-based keys such as
+ *     sslrootcert/passfile/service are not supported; "postgres://user:pass@host:5432/dbname?sslmode=disable" also works
+ *   - ClickHouse (clickhouse-go DSN): "clickhouse://tcp://host:9000?username=u&password=p&database=d"
+ *     (http:// / https:// for the HTTP interface; secure / skip_verify; other parameters become settings);
+ *     "clickhouse://user:pass@host:9000/db" also works (native TCP, 9440 or ?secure=true for TLS), and
  *     "clickhouse+http://host:8123/db" / "clickhouse+https://host:8443/db" use the HTTP interface
+ *   - A handle returned by IDial.fd() is also accepted: the same connection is returned
  *
  *   Options can be appended after `|` (keys there override the second argument), e.g.:
  *   "wss://....|compress=gzip_raw&mode=recv"
- * @param timeoutMs - connect timeout in ms (default 30000); or an options object (or its JSON string):
+ * @param timeout - connect timeout: ws/wss in milliseconds (below 100 = seconds), tcp/tls in seconds,
+ *   0 = default timeout; 30 (i.e. 30 seconds) when omitted. Or an options object (or its JSON string; a JSON
+ *   string merges over the default {timeout: 30}, an options object replaces it, and without timeout the
+ *   default timeout applies): timeout as above;
  *   headers request headers; reconnect auto reconnect; retry max attempts (0 = unlimited);
  *   interval retry interval in ms (default 1000); payload data sent after every successful connect;
  *   compress auto-inflate incoming binary frames (gzip / gzip_raw / flate / zlib / deflate; mode must be recv);
@@ -2677,14 +2754,14 @@ declare function GetMeta(): string | null;
  *     }
  *     ws.close();
  * }
- * // The native runtime reconnects in place; ws.fd() remains unchanged
+ * // The native runtime reconnects in place; the connection number ws.fd().valueOf() stays the same
  * var ws = Dial("wss://example.com/ws", {reconnect: true, retry: 0, interval: 1000});
  * // SQLite database
- * var db = Dial("sqlite3:///strategy.db");
+ * var db = Dial("sqlite3://strategy.db");
  * db.exec("CREATE TABLE IF NOT EXISTS logs(time TEXT, msg TEXT)");
  * ```
  */
-declare function Dial(address: string|number, timeoutMs?: number | { [key: string]: any }): IDial | null;
+declare function Dial(address: string | IDial, timeout?: number | string | { [key: string]: any }): IDial | null;
 
 /**
  * Send HTTP request (simple usage)
@@ -3004,7 +3081,7 @@ declare function _Cross(arr1: number[], arr2: number[]): boolean;
 declare function JSONParse(s: string): object;
 
 /**
- * FMZ extension: the second parameter of JSON.parse supports a boolean safeStr
+ * Platform extension: the second parameter of JSON.parse supports a boolean safeStr
  * When safeStr is true, parsing runs in safe mode and large numbers are automatically converted to strings to avoid precision loss
  *
  * ```js
@@ -3204,7 +3281,7 @@ declare interface IThread {
      * Log("Elapsed:", result.elapsed / 1e6, "ms");
      * ```
      */
-    join(timeoutMs?: number): IThreadRet | null;
+    join(timeoutMs?: number): IThreadRet | undefined;
 
     /**
      * Forcibly terminate the thread
@@ -3469,7 +3546,7 @@ declare function __threadPostMessage(threadId: number, msg: any): void;
  * @deprecated Deprecated, please use `thread.join` instead
  * Wait for thread to complete and get result
  */
-declare function __threadJoin(threadId: number, timeoutMs?: number): IThreadRet | null;
+declare function __threadJoin(threadId: number, timeoutMs?: number): IThreadRet | undefined;
 
 /**
  * @deprecated Deprecated, please use `thread.terminate` instead
@@ -3504,10 +3581,10 @@ declare function __threadPending(running?:boolean): number;
 
 /**
  * HTTP/TCP server request context, provides request information and response methods
- * Used in __Serve handler functions
+ * Used in threading.Serve handler functions
  *
  * ```js
- * __Serve("http://0.0.0.0:8080", function(ctx) {
+ * threading.Serve("http://0.0.0.0:8080", function(ctx) {
  *     if (ctx.method() === "POST") {
  *         var body = ctx.body();
  *         Log("Received POST:", body);
@@ -3600,16 +3677,18 @@ interface IServeContext {
  *     }
  * });
  * ```
+ * @deprecated Legacy form; use threading.Serve (returns a Server object, addr() gives the address)
  */
-declare function __Serve(uri: string, handler: (ctx: IServeContext, ...args: any[]) => void): any;
+declare function __Serve(uri: string, handler: (ctx: IServeContext, ...args: any[]) => void): string;
 
-declare namespace threading {
+// 接口合并：threading 声明为 const threading: IThreading，namespace 不会与 const 合并
+declare interface IThreading {
     /**
      * Same implementation as __Serve (which is an alias returning only the address): start a TCP / HTTP(S) /
      * WebSocket server inside the strategy process; every connection or request runs handler(ctx, ...args) on
      * its own thread. Returns a Server object. pprof=true is ignored; tls=true requires cert_pem and cert_key_pem.
      */
-    function Serve(uri: string, handler: (ctx: IServeContext, ...args: any[]) => void, ...args: any[]): IServer;
+    Serve(uri: string, handler: (ctx: IServeContext, ...args: any[]) => void, ...args: any[]): IServer;
 }
 
 /** The server object returned by threading.Serve (can be passed to Threads) */
@@ -3735,7 +3814,7 @@ interface TextDecoder {
   readonly fatal: boolean;
   readonly ignoreBOM: boolean;
   
-  decode(input?: BufferSource, options?: TextDecodeOptions): string;
+  decode(input?: ArrayBuffer | ArrayBufferView, options?: TextDecodeOptions): string;
 }
 
 interface TextDecoderOptions {
@@ -3840,7 +3919,6 @@ declare function SetChannelData(v : any): void;
 declare function GetChannelData(token: any): any;
 
 // Type definitions for Trader class
-// For FMZ Quant Trading Platform
 
 /**
  * Trade position information

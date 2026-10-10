@@ -4,8 +4,10 @@ Call as `talib.NAME(records_or_array, params...)` in JavaScript / Python (same n
 
 | Function | Description | 中文 | Signature |
 |---|---|---|---|
+| `ACCBANDS` | Acceleration Bands | 加速带 | `ACCBANDS(Records[High,Low,Close],Time Period = 20) = [Array(outRealUpperBand),Array(outRealMiddleBand),Array(outRealLowerBand)]` |
 | `ACOS` | Vector Trigonometric ACos | 反余弦函数 | `ACOS(Records[Close]) = Array(outReal)` |
-| `AD` | Chaikin A/D Line | 线随机指标 | `AD(Records[High,Low,Close,Volume]) = Array(outReal)` |
+| `AD` | Chaikin A/D Line | 蔡金累积/派发线 | `AD(Records[High,Low,Close,Volume]) = Array(outReal)` |
+| `ADD` | Vector Arithmetic Add | 向量加法 | `ADD(Array(inReal0),Array(inReal1)) = Array(outReal)` |
 | `ADOSC` | Chaikin A/D Oscillator | 佳庆指标 | `ADOSC(Records[High,Low,Close,Volume],Fast Period = 3,Slow Period = 10) = Array(outReal)` |
 | `ADX` | Average Directional Movement Index | 平均趋向指数 | `ADX(Records[High,Low,Close],Time Period = 14) = Array(outReal)` |
 | `ADXR` | Average Directional Movement Index Rating | 评估指数 | `ADXR(Records[High,Low,Close],Time Period = 14) = Array(outReal)` |
@@ -15,15 +17,17 @@ Call as `talib.NAME(records_or_array, params...)` in JavaScript / Python (same n
 | `ASIN` | Vector Trigonometric ASin | 反正弦函数 | `ASIN(Records[Close]) = Array(outReal)` |
 | `ATAN` | Vector Trigonometric ATan | 反正切函数 | `ATAN(Records[Close]) = Array(outReal)` |
 | `ATR` | Average True Range | 平均真实波幅 | `ATR(Records[High,Low,Close],Time Period = 14) = Array(outReal)` |
+| `AVGDEV` | Average Deviation | 平均绝对偏差 | `AVGDEV(Records[Close],Time Period = 14) = Array(outReal)` |
 | `AVGPRICE` | Average Price | 平均价格 | `AVGPRICE(Records[Open,High,Low,Close]) = Array(outReal)` |
 | `BBANDS` | Bollinger Bands | 布林带 | `BBANDS(Records[Close],Time Period = 5,Deviations up = 2,Deviations down = 2,MA Type = 0) = [Array(outRealUpperBand),Array(outRealMiddleBand),Array(outRealLowerBand)]` |
+| `BETA` | Beta | 贝塔系数 | `BETA(Array(inReal0),Array(inReal1),Time Period = 5) = Array(outReal)` |
 | `BOP` | Balance Of Power | 均势指标 | `BOP(Records[Open,High,Low,Close]) = Array(outReal)` |
 | `CCI` | Commodity Channel Index | 顺势指标 | `CCI(Records[High,Low,Close],Time Period = 14) = Array(outReal)` |
 | `CDL2CROWS` | Two Crows | K线图--两只乌鸦 | `CDL2CROWS(Records[Open,High,Low,Close]) = Array(outInteger)` |
 | `CDL3BLACKCROWS` | Three Black Crows | K线图--3只黑乌鸦 | `CDL3BLACKCROWS(Records[Open,High,Low,Close]) = Array(outInteger)` |
-| `CDL3INSIDE` | Three Inside Up/Down | K线图:3内上下震荡 | `CDL3INSIDE(Records[Open,High,Low,Close]) = Array(outInteger)` |
-| `CDL3LINESTRIKE` | Three-Line Strike  | K线图:3线震荡 | `CDL3LINESTRIKE(Records[Open,High,Low,Close]) = Array(outInteger)` |
-| `CDL3OUTSIDE` | Three Outside Up/Down | K线图:3外下震荡 | `CDL3OUTSIDE(Records[Open,High,Low,Close]) = Array(outInteger)` |
+| `CDL3INSIDE` | Three Inside Up/Down | K线图:三内部上涨/下跌 | `CDL3INSIDE(Records[Open,High,Low,Close]) = Array(outInteger)` |
+| `CDL3LINESTRIKE` | Three-Line Strike | K线图:三线打击 | `CDL3LINESTRIKE(Records[Open,High,Low,Close]) = Array(outInteger)` |
+| `CDL3OUTSIDE` | Three Outside Up/Down | K线图:三外部上涨/下跌 | `CDL3OUTSIDE(Records[Open,High,Low,Close]) = Array(outInteger)` |
 | `CDL3STARSINSOUTH` | Three Stars In The South | K线图:南方三星 | `CDL3STARSINSOUTH(Records[Open,High,Low,Close]) = Array(outInteger)` |
 | `CDL3WHITESOLDIERS` | Three Advancing White Soldiers | K线图:三白兵 | `CDL3WHITESOLDIERS(Records[Open,High,Low,Close]) = Array(outInteger)` |
 | `CDLABANDONEDBABY` | Abandoned Baby | K线图:弃婴 | `CDLABANDONEDBABY(Records[Open,High,Low,Close],Penetration = 0.3) = Array(outInteger)` |
@@ -34,8 +38,8 @@ Call as `talib.NAME(records_or_array, params...)` in JavaScript / Python (same n
 | `CDLCONCEALBABYSWALL` | Concealing Baby Swallow | K线图:藏婴吞没形态 | `CDLCONCEALBABYSWALL(Records[Open,High,Low,Close]) = Array(outInteger)` |
 | `CDLCOUNTERATTACK` | Counterattack | K线图:反击 | `CDLCOUNTERATTACK(Records[Open,High,Low,Close]) = Array(outInteger)` |
 | `CDLDARKCLOUDCOVER` | Dark Cloud Cover | K线图:乌云盖 | `CDLDARKCLOUDCOVER(Records[Open,High,Low,Close],Penetration = 0.5) = Array(outInteger)` |
-| `CDLDOJI` | Doji | K线图:十字星  | `CDLDOJI(Records[Open,High,Low,Close]) = Array(outInteger)` |
-| `CDLDOJISTAR` | Doji Star | K线图:十字星 | `CDLDOJISTAR(Records[Open,High,Low,Close]) = Array(outInteger)` |
+| `CDLDOJI` | Doji | K线图:十字线 | `CDLDOJI(Records[Open,High,Low,Close]) = Array(outInteger)` |
+| `CDLDOJISTAR` | Doji Star | K线图:跳空十字星 | `CDLDOJISTAR(Records[Open,High,Low,Close]) = Array(outInteger)` |
 | `CDLDRAGONFLYDOJI` | Dragonfly Doji | K线图:蜻蜓十字星 | `CDLDRAGONFLYDOJI(Records[Open,High,Low,Close]) = Array(outInteger)` |
 | `CDLENGULFING` | Engulfing Pattern | K线图:吞没 | `CDLENGULFING(Records[Open,High,Low,Close]) = Array(outInteger)` |
 | `CDLEVENINGDOJISTAR` | Evening Doji Star | K线图:黄昏十字星 | `CDLEVENINGDOJISTAR(Records[Open,High,Low,Close],Penetration = 0.3) = Array(outInteger)` |
@@ -46,7 +50,7 @@ Call as `talib.NAME(records_or_array, params...)` in JavaScript / Python (same n
 | `CDLHANGINGMAN` | Hanging Man | K线图:吊人 | `CDLHANGINGMAN(Records[Open,High,Low,Close]) = Array(outInteger)` |
 | `CDLHARAMI` | Harami Pattern | K线图:阴阳线 | `CDLHARAMI(Records[Open,High,Low,Close]) = Array(outInteger)` |
 | `CDLHARAMICROSS` | Harami Cross Pattern | K线图:交叉阴阳线 | `CDLHARAMICROSS(Records[Open,High,Low,Close]) = Array(outInteger)` |
-| `CDLHIGHWAVE` | High-Wave Candle | K线图:长脚十字线  | `CDLHIGHWAVE(Records[Open,High,Low,Close]) = Array(outInteger)` |
+| `CDLHIGHWAVE` | High-Wave Candle | K线图:风高浪大线 | `CDLHIGHWAVE(Records[Open,High,Low,Close]) = Array(outInteger)` |
 | `CDLHIKKAKE` | Hikkake Pattern | K线图:陷阱 | `CDLHIKKAKE(Records[Open,High,Low,Close]) = Array(outInteger)` |
 | `CDLHIKKAKEMOD` | Modified Hikkake Pattern | K线图:改良的陷阱 | `CDLHIKKAKEMOD(Records[Open,High,Low,Close]) = Array(outInteger)` |
 | `CDLHOMINGPIGEON` | Homing Pigeon | K线图:信鸽 | `CDLHOMINGPIGEON(Records[Open,High,Low,Close]) = Array(outInteger)` |
@@ -58,11 +62,11 @@ Call as `talib.NAME(records_or_array, params...)` in JavaScript / Python (same n
 | `CDLLADDERBOTTOM` | Ladder Bottom | K线图:梯底 | `CDLLADDERBOTTOM(Records[Open,High,Low,Close]) = Array(outInteger)` |
 | `CDLLONGLEGGEDDOJI` | Long Legged Doji | K线图:长腿十字线 | `CDLLONGLEGGEDDOJI(Records[Open,High,Low,Close]) = Array(outInteger)` |
 | `CDLLONGLINE` | Long Line Candle | K线图:长线 | `CDLLONGLINE(Records[Open,High,Low,Close]) = Array(outInteger)` |
-| `CDLMARUBOZU` | Marubozu | K线图:光头光脚  | `CDLMARUBOZU(Records[Open,High,Low,Close]) = Array(outInteger)` |
+| `CDLMARUBOZU` | Marubozu | K线图:光头光脚 | `CDLMARUBOZU(Records[Open,High,Low,Close]) = Array(outInteger)` |
 | `CDLMATCHINGLOW` | Matching Low | K线图:匹配低 | `CDLMATCHINGLOW(Records[Open,High,Low,Close]) = Array(outInteger)` |
 | `CDLMATHOLD` | Mat Hold | K线图:垫住 | `CDLMATHOLD(Records[Open,High,Low,Close],Penetration = 0.5) = Array(outInteger)` |
 | `CDLMORNINGDOJISTAR` | Morning Doji Star | K线图:早晨十字星 | `CDLMORNINGDOJISTAR(Records[Open,High,Low,Close],Penetration = 0.3) = Array(outInteger)` |
-| `CDLMORNINGSTAR` | Morning Star | K线图:晨星 | `CDLMORNINGSTAR(Records[Open,High,Low,Close],Penetration = 0.3) = Array(outInteger)` |
+| `CDLMORNINGSTAR` | Morning Star | K线图:晨星 | `CDLMORNINGSTAR(Records[Open,High,Low,Close],Penetration=0.3) = Array(outInteger)` |
 | `CDLONNECK` | On-Neck Pattern | K线图:颈型 | `CDLONNECK(Records[Open,High,Low,Close]) = Array(outInteger)` |
 | `CDLPIERCING` | Piercing Pattern | K线图:穿孔模式 | `CDLPIERCING(Records[Open,High,Low,Close]) = Array(outInteger)` |
 | `CDLRICKSHAWMAN` | Rickshaw Man | K线图:车夫 | `CDLRICKSHAWMAN(Records[Open,High,Low,Close]) = Array(outInteger)` |
@@ -80,11 +84,13 @@ Call as `talib.NAME(records_or_array, params...)` in JavaScript / Python (same n
 | `CDLUNIQUE3RIVER` | Unique 3 River | K线图:独特的3河 | `CDLUNIQUE3RIVER(Records[Open,High,Low,Close]) = Array(outInteger)` |
 | `CDLUPSIDEGAP2CROWS` | Upside Gap Two Crows | K线图:双飞乌鸦 | `CDLUPSIDEGAP2CROWS(Records[Open,High,Low,Close]) = Array(outInteger)` |
 | `CDLXSIDEGAP3METHODS` | Upside/Downside Gap Three Methods | K线图:上行/下行缺口三方法 | `CDLXSIDEGAP3METHODS(Records[Open,High,Low,Close]) = Array(outInteger)` |
-| `CEIL` | Vector Ceil | 取整函数 | `CEIL(Records[Close]) = Array(outReal)` |
+| `CEIL` | Vector Ceil | 向上取整 | `CEIL(Records[Close]) = Array(outReal)` |
 | `CMO` | Chande Momentum Oscillator | 钱德动量摆动指标 | `CMO(Records[Close],Time Period = 14) = Array(outReal)` |
+| `CORREL` | Pearson's Correlation Coefficient (r) | 皮尔逊相关系数 | `CORREL(Array(inReal0),Array(inReal1),Time Period = 30) = Array(outReal)` |
 | `COS` | Vector Trigonometric Cos | 余弦函数 | `COS(Records[Close]) = Array(outReal)` |
 | `COSH` | Vector Trigonometric Cosh | 双曲余弦值 | `COSH(Records[Close]) = Array(outReal)` |
 | `DEMA` | Double Exponential Moving Average | 双指数移动平均线 | `DEMA(Records[Close],Time Period = 30) = Array(outReal)` |
+| `DIV` | Vector Arithmetic Div | 向量除法 | `DIV(Array(inReal0),Array(inReal1)) = Array(outReal)` |
 | `DX` | Directional Movement Index | 动向指数 | `DX(Records[High,Low,Close],Time Period = 14) = Array(outReal)` |
 | `EMA` | Exponential Moving Average | 指数移动平均线 | `EMA(Records[Close],Time Period = 30) = Array(outReal)` |
 | `EXP` | Vector Arithmetic Exp | 指数函数 | `EXP(Records[Close]) = Array(outReal)` |
@@ -95,18 +101,20 @@ Call as `talib.NAME(records_or_array, params...)` in JavaScript / Python (same n
 | `HT_SINE` | Hilbert Transform - SineWave | 希尔伯特变换,正弦波 | `HT_SINE(Records[Close]) = [Array(outSine),Array(outLeadSine)]` |
 | `HT_TRENDLINE` | Hilbert Transform - Instantaneous Trendline | 希尔伯特变换,瞬时趋势 | `HT_TRENDLINE(Records[Close]) = Array(outReal)` |
 | `HT_TRENDMODE` | Hilbert Transform - Trend vs Cycle Mode | 希尔伯特变换-趋势与周期模式 | `HT_TRENDMODE(Records[Close]) = Array(outInteger)` |
+| `IMI` | Intraday Momentum Index | 日内动量指标 | `IMI(Records[Open,Close],Time Period = 14) = Array(outReal)` |
 | `KAMA` | Kaufman Adaptive Moving Average | 适应性移动平均线 | `KAMA(Records[Close],Time Period = 30) = Array(outReal)` |
 | `LINEARREG` | Linear Regression | 线性回归 | `LINEARREG(Records[Close],Time Period = 14) = Array(outReal)` |
 | `LINEARREG_ANGLE` | Linear Regression Angle | 线性回归的角度 | `LINEARREG_ANGLE(Records[Close],Time Period = 14) = Array(outReal)` |
 | `LINEARREG_INTERCEPT` | Linear Regression Intercept | 线性回归截距 | `LINEARREG_INTERCEPT(Records[Close],Time Period = 14) = Array(outReal)` |
 | `LINEARREG_SLOPE` | Linear Regression Slope | 线性回归斜率 | `LINEARREG_SLOPE(Records[Close],Time Period = 14) = Array(outReal)` |
 | `LN` | Vector Log Natural | 自然对数 | `LN(Records[Close]) = Array(outReal)` |
-| `LOG10` | Vector Log10 | 对数函数 | `LOG10(Records[Close]) = Array(outReal)` |
+| `LOG10` | Vector Log10 | 常用对数，以10为底 | `LOG10(Records[Close]) = Array(outReal)` |
 | `MA` | Moving average | 移动平均线 | `MA(Records[Close],Time Period = 30,MA Type = 0) = Array(outReal)` |
 | `MACD` | Moving Average Convergence/Divergence | 指数平滑移动平均线 | `MACD(Records[Close],Fast Period = 12,Slow Period = 26,Signal Period = 9) = [Array(outMACD),Array(outMACDSignal),Array(outMACDHist)]` |
 | `MACDEXT` | MACD with controllable MA type | MA型可控 MACD | `MACDEXT(Records[Close],Fast Period = 12,Fast MA = 0,Slow Period = 26,Slow MA = 0,Signal Period = 9,Signal MA = 0) = [Array(outMACD),Array(outMACDSignal),Array(outMACDHist)]` |
-| `MACDFIX` | Moving Average Convergence/Divergence Fix 12/26 | 移动平均收敛/发散修复12/26 | `MACDFIX(Records[Close],Signal Period = 9) = [Array(outMACD),Array(outMACDSignal),Array(outMACDHist)]` |
+| `MACDFIX` | Moving Average Convergence/Divergence Fix 12/26 | 快慢周期固定为12/26的MACD | `MACDFIX(Records[Close],Signal Period = 9) = [Array(outMACD),Array(outMACDSignal),Array(outMACDHist)]` |
 | `MAMA` | MESA Adaptive Moving Average | MESA 移动平均线 | `MAMA(Records[Close],Fast Limit = 0.5,Slow Limit = 0.05) = [Array(outMAMA),Array(outFAMA)]` |
+| `MAVP` | Moving Average with Variable Period | 可变周期移动平均 | `MAVP(Array(inReal),Array(inPeriods),Min Period = 2,Max Period = 30,MA Type = 0) = Array(outReal)` |
 | `MAX` | Highest value over a specified period | 最大值 | `MAX(Records[Close],Time Period = 30) = Array(outReal)` |
 | `MAXINDEX` | Index of highest value over a specified period | 最大值索引 | `MAXINDEX(Records[Close],Time Period = 30) = Array(outInteger)` |
 | `MEDPRICE` | Median Price | 中位数价格 | `MEDPRICE(Records[High,Low]) = Array(outReal)` |
@@ -120,10 +128,11 @@ Call as `talib.NAME(records_or_array, params...)` in JavaScript / Python (same n
 | `MINUS_DI` | Minus Directional Indicator | 负向指标 | `MINUS_DI(Records[High,Low,Close],Time Period = 14) = Array(outReal)` |
 | `MINUS_DM` | Minus Directional Movement | 负向运动 | `MINUS_DM(Records[High,Low],Time Period = 14) = Array(outReal)` |
 | `MOM` | Momentum | 动量 | `MOM(Records[Close],Time Period = 10) = Array(outReal)` |
-| `NATR` | Normalized Average True Range | 归一化平均值范围 | `NATR(Records[High,Low,Close],Time Period = 14) = Array(outReal)` |
+| `MULT` | Vector Arithmetic Mult | 向量乘法 | `MULT(Array(inReal0),Array(inReal1)) = Array(outReal)` |
+| `NATR` | Normalized Average True Range | 归一化平均真实波幅 | `NATR(Records[High,Low,Close],Time Period = 14) = Array(outReal)` |
 | `OBV` | On Balance Volume | 能量潮 | `OBV(Records[Close],Records[Volume]) = Array(outReal)` |
-| `PLUS_DI` | Plus Directional Indicator | 更向指示器 | `PLUS_DI(Records[High,Low,Close],Time Period = 14) = Array(outReal)` |
-| `PLUS_DM` | Plus Directional Movement | 定向运动 | `PLUS_DM(Records[High,Low],Time Period = 14) = Array(outReal)` |
+| `PLUS_DI` | Plus Directional Indicator | 正向指标 | `PLUS_DI(Records[High,Low,Close],Time Period = 14) = Array(outReal)` |
+| `PLUS_DM` | Plus Directional Movement | 正向运动 | `PLUS_DM(Records[High,Low],Time Period = 14) = Array(outReal)` |
 | `PPO` | Percentage Price Oscillator | 价格振荡百分比 | `PPO(Records[Close],Fast Period = 12,Slow Period = 26,MA Type = 0) = Array(outReal)` |
 | `ROC` | Rate of change : ((price/prevPrice)-1)*100 | 变动率指标 | `ROC(Records[Close],Time Period = 10) = Array(outReal)` |
 | `ROCP` | Rate of change Percentage: (price-prevPrice)/prevPrice | 价格变化率 | `ROCP(Records[Close],Time Period = 10) = Array(outReal)` |
@@ -140,18 +149,19 @@ Call as `talib.NAME(records_or_array, params...)` in JavaScript / Python (same n
 | `STOCH` | Stochastic | STOCH指标 | `STOCH(Records[High,Low,Close],Fast-K Period = 5,Slow-K Period = 3,Slow-K MA = 0,Slow-D Period = 3,Slow-D MA = 0) = [Array(outSlowK),Array(outSlowD)]` |
 | `STOCHF` | Stochastic Fast | 快速STOCH指标 | `STOCHF(Records[High,Low,Close],Fast-K Period = 5,Fast-D Period = 3,Fast-D MA = 0) = [Array(outFastK),Array(outFastD)]` |
 | `STOCHRSI` | Stochastic Relative Strength Index | 随机强弱指数 | `STOCHRSI(Records[Close],Time Period = 14,Fast-K Period = 5,Fast-D Period = 3,Fast-D MA = 0) = [Array(outFastK),Array(outFastD)]` |
+| `SUB` | Vector Arithmetic Subtraction | 向量减法 | `SUB(Array(inReal0),Array(inReal1)) = Array(outReal)` |
 | `SUM` | Summation | 求和 | `SUM(Records[Close],Time Period = 30) = Array(outReal)` |
 | `T3` | Triple Exponential Moving Average (T3) | 三指数移动平均 | `T3(Records[Close],Time Period = 5,Volume Factor = 0.7) = Array(outReal)` |
 | `TAN` | Vector Trigonometric Tan | 正切 | `TAN(Records[Close]) = Array(outReal)` |
 | `TANH` | Vector Trigonometric Tanh | 双曲正切函数 | `TANH(Records[Close]) = Array(outReal)` |
 | `TEMA` | Triple Exponential Moving Average | 三指数移动平均 | `TEMA(Records[Close],Time Period = 30) = Array(outReal)` |
 | `TRANGE` | True Range | 真实范围 | `TRANGE(Records[High,Low,Close]) = Array(outReal)` |
-| `TRIMA` | Triangular Moving Average | 三指数移动平均 | `TRIMA(Records[Close],Time Period = 30) = Array(outReal)` |
+| `TRIMA` | Triangular Moving Average | 三角移动平均线 | `TRIMA(Records[Close],Time Period = 30) = Array(outReal)` |
 | `TRIX` | 1-day Rate-Of-Change (ROC) of a Triple Smooth EMA | 三重指数平滑平均线 | `TRIX(Records[Close],Time Period = 30) = Array(outReal)` |
 | `TSF` | Time Series Forecast | 时间序列预测 | `TSF(Records[Close],Time Period = 14) = Array(outReal)` |
 | `TYPPRICE` | Typical Price | 典型价格 | `TYPPRICE(Records[High,Low,Close]) = Array(outReal)` |
 | `ULTOSC` | Ultimate Oscillator | 极限振子 | `ULTOSC(Records[High,Low,Close],First Period = 7,Second Period = 14,Third Period = 28) = Array(outReal)` |
-| `VAR` | Variance | 变量定义 | `VAR(Records[Close],Time Period = 5,Deviations = 1) = Array(outReal)` |
+| `VAR` | Variance | 方差 | `VAR(Records[Close],Time Period = 5,Deviations = 1) = Array(outReal)` |
 | `WCLPRICE` | Weighted Close Price | 加权收盘价 | `WCLPRICE(Records[High,Low,Close]) = Array(outReal)` |
 | `WILLR` | Williams' %R | 威廉指标 | `WILLR(Records[High,Low,Close],Time Period = 14) = Array(outReal)` |
 | `WMA` | Weighted Moving Average | 加权移动平均 | `WMA(Records[Close],Time Period = 30) = Array(outReal)` |

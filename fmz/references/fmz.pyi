@@ -485,28 +485,53 @@ class IGo:
         # Concurrently fetch ticker and depth
         go_ticker = exchange.Go("GetTicker")
         go_depth = exchange.Go("GetDepth")
-        ticker = go_ticker.wait()   # Wait for ticker result
-        depth = go_depth.wait()     # Wait for depth result
+        ticker, ok = go_ticker.wait()   # Wait for ticker result
+        depth, ok = go_depth.wait()     # Wait for depth result
     """
-    def wait(self, timeout: Optional[int] = None) -> object:
+    def wait(self, timeout: Optional[int] = None) -> tuple[object, bool]:
         """Wait for the concurrent task to complete and return the result.
 
         Args:
             timeout: Timeout duration in milliseconds.
 
-                - Not passed or 0: Block until result is returned.
-                - Positive number: Wait for specified ms, return ``None`` on timeout.
-                - Negative number (-1): Return immediately, return ``None`` if no result.
+                - Not passed or 0: Block until the result is returned.
+                - Positive number: Wait at most that many ms; if the task has not finished, return
+                  ``(None, False)`` — you can call ``wait()`` again later.
+                - Negative number (-1): Do not wait; return ``(None, False)`` immediately if not finished.
 
         Returns:
-            The return value of the corresponding function, ``None`` on failure or timeout.
+            A ``(result, ok)`` tuple: ``(return value of the function, True)`` on success;
+            ``(None, False)`` on failure, no data or timeout. Calling ``wait()`` again after the result
+            was taken logs the error ``routine N already finished`` and returns ``(None, False)``.
 
         Example::
 
             go = exchange.Go("GetTicker")
-            ticker = go.wait(2000)  # Wait at most 2 seconds
+            ticker, ok = go.wait(2000)  # Wait at most 2 seconds
+            if not ok:
+                ticker, ok = go.wait()  # Keep waiting after a timeout
         """
         ...
+
+class IHttpQueryGo:
+    """Concurrent object returned by ``HttpQuery_Go()``."""
+    def wait(self, timeout: Optional[int] = None) -> Optional[Union[str, "IHttpRet"]]:
+        """Wait for the HTTP request; returns the same value as the synchronous ``HttpQuery()``.
+
+        Args:
+            timeout: Timeout in milliseconds. Not passed or 0 waits until done; -1 does not wait; a positive
+                number waits at most that long. Returns ``None`` while unfinished (``wait()`` can be called
+                again); once the result is in, repeated ``wait()`` calls return the same result.
+        """
+        ...
+
+class IData:
+    """Return value of ``exchange.GetData()``."""
+    Time: int
+    """Timestamp (ms) of the matched row; offset (or the next row's time) when there is none."""
+    Data: object
+    """Data of the matched row; ``None`` when there is no row, the fetch failed or the source is unavailable
+    (read the reason with ``GetLastError()``)."""
 
 class IExchange:
     """Exchange operation interface, encapsulates all exchange API call methods.
@@ -1146,11 +1171,14 @@ class IExchange:
         """
         ...
 
-    def SetRate(self, n: float) -> None:
+    def SetRate(self, n: float = 1) -> float:
         """Set exchange rate conversion. All prices will be automatically multiplied by this rate.
 
         Args:
-            n: Exchange rate value. ``1`` means no conversion.
+            n: Exchange rate value. ``1`` means no conversion; omitted or non-positive means ``1``.
+
+        Returns:
+            The rate in effect before this call.
 
         Example::
 
@@ -1167,6 +1195,48 @@ class IExchange:
         """
         ...
 
+    def SetData(self, key: str, value: object) -> int:
+        """Write a data set for ``exchange.GetData()`` to read (commonly used to load custom data).
+
+        Args:
+            key: Data set name.
+            value: A ``[[timestamp, data], ...]`` list (or its JSON string), or ``{"schema": [...], "data": [...]}``.
+
+        Returns:
+            Length of the JSON-encoded data; ``0`` (and ``GetLastError()`` set) when the format is wrong.
+
+        Example::
+
+            exchange.SetData("test", [[1579536000000, 123], [1579622400000, 456]])
+            Log(exchange.GetData("test"))
+        """
+        ...
+
+    def GetData(self, key: str, timeout: Optional[int] = None, offset: int = 0) -> IData:
+        """Get a data set written by ``exchange.SetData()`` or provided by an external link.
+
+        http/https links are fetched by this node; the response must be ``[[time, data], ...]`` or
+        ``{"schema": [...], "data": [...]}``, cached for ``timeout`` and refetched when expired. Local data
+        written by SetData never expires. Server-side ``ext.`` data sources are unavailable on this runtime.
+
+        Args:
+            key: Data set name or request link (http/https URL).
+            timeout: Cache timeout in milliseconds, 60000 when omitted, minimum 5000.
+            offset: Take the last row with ``time <= offset``; ``0`` or omitted means the current time.
+
+        Returns:
+            An ``IData`` object (``Time``, ``Data``). Always an object: when there is no row, the fetch failed or
+            the source is unavailable, ``Data`` is ``None`` and ``GetLastError()`` has the reason.
+
+        Example::
+
+            data = exchange.GetData("test")
+            extern = exchange.GetData("https://www.example.com/data.json")
+            if extern.Data is None:
+                Log("no data:", GetLastError())
+        """
+        ...
+
     def GetUSDCNY(self) -> float:
         """Get USD to CNY exchange rate.
 
@@ -1176,7 +1246,7 @@ class IExchange:
         ...
 
     def GetLabel(self) -> str:
-        """Get exchange custom label name (set when configuring exchange on FMZ platform).
+        """Get exchange custom label name (set when configuring the exchange on the platform).
 
         Returns:
             Label string.
@@ -1249,7 +1319,7 @@ or an IRecordList (candlestick array, automatically uses Close field)."""
 # ==================== Built-in TA Indicator Library ====================
 
 class ITA:
-    """FMZ Platform built-in technical analysis indicator library (simplified version).
+    """Platform built-in technical analysis indicator library (simplified version).
 
     More commonly used and easier to use than talib. Access via global variable ``TA``.
 
@@ -1422,12 +1492,12 @@ class ITA:
         """
         ...
 
-    def Highest(self, inReal: t_TAInput, period: Optional[int] = None, attr: Optional[str] = None) -> float:
-        """Get the highest value within a period.
+    def Highest(self, inReal: t_TAInput, period: int, attr: Optional[str] = None) -> float:
+        """Get the highest value within a period (the current Bar excluded).
 
         Args:
             inReal: Input data.
-            period: Calculation period. If not provided, calculates all data.
+            period: Calculation period (required); ``0`` means all data before the current Bar.
             attr: Candlestick attribute name when passing candlestick array,
                 e.g. ``"High"``, ``"Low"``, ``"Close"``, ``"Volume"``.
 
@@ -1441,12 +1511,12 @@ class ITA:
         """
         ...
 
-    def Lowest(self, inReal: t_TAInput, period: Optional[int] = None, attr: Optional[str] = None) -> float:
-        """Get the lowest value within a period.
+    def Lowest(self, inReal: t_TAInput, period: int, attr: Optional[str] = None) -> float:
+        """Get the lowest value within a period (the current Bar excluded).
 
         Args:
             inReal: Input data.
-            period: Calculation period. If not provided, calculates all data.
+            period: Calculation period (required); ``0`` means all data before the current Bar.
             attr: Candlestick attribute name, e.g. ``"High"``, ``"Low"``, ``"Close"``, ``"Volume"``.
 
         Returns:
@@ -1566,7 +1636,7 @@ class IEventMsg:
 class IChart:
     """Chart object for drawing custom charts on the strategy page.
 
-    Created via ``Chart()`` or ``KLineChart()``.
+    Created via ``Chart()`` (``KLineChart()`` returns an ``IKLineChart``).
 
     Example::
 
@@ -1604,8 +1674,82 @@ class IChart:
         """
         ...
 
+class IKLineChart:
+    """Pine-style K-line chart object, created by ``KLineChart()``.
+
+    Each bar starts with ``begin(bar)``, then the plot functions, then ``close()`` outputs it to the chart.
+    Optional plot arguments use the Pine names (``title``, ``color``, ``linewidth``, ``style``, ``overlay``, ...)
+    and are passed as keyword arguments.
+
+    Example::
+
+        c = KLineChart({"overlay": True})
+        for bar in exchange.GetRecords():
+            c.begin(bar)
+            c.plot(bar.Close, "Close")
+            c.close()
+    """
+    def begin(self, bar: IRecord) -> None:
+        """Start a bar; must be the first call of each bar's drawing."""
+        ...
+
+    def close(self, bar: Optional[IRecord] = None) -> None:
+        """Finish the current bar's drawing and output it to the chart.
+
+        Args:
+            bar: Optional; pass the bar directly (same as calling ``begin(bar)`` first). When omitted the bar
+                recorded by ``begin()`` is used. Closing a bar with the same timestamp again replaces the previous
+                one (an unfinished bar can be updated repeatedly).
+        """
+        ...
+
+    def reset(self, remain: int = 0) -> None:
+        """Reset chart data. ``remain`` is the number of latest bars to keep, default 0 (clear all)."""
+        ...
+
+    def plot(self, series: Optional[float] = None, title: Optional[str] = None, **options: object) -> Optional[int]:
+        """Draw a line (like Pine ``plot``). Returns the plot index (usable by ``fill``), ``None`` when skipped."""
+        ...
+
+    def hline(self, price: float, title: Optional[str] = None, **options: object) -> Optional[int]:
+        """Draw a horizontal line at ``price``. Returns the plot index."""
+        ...
+
+    def plotshape(self, series: object, title: Optional[str] = None, **options: object) -> None:
+        """Draw a shape marker where ``series`` is truthy (``style``, ``location``, ``text``, ...)."""
+        ...
+
+    def plotchar(self, series: object, title: Optional[str] = None, char: Optional[str] = None, **options: object) -> None:
+        """Draw a single character where ``series`` is truthy (``char`` is required)."""
+        ...
+
+    def plotarrow(self, series: float, title: Optional[str] = None, **options: object) -> None:
+        """Draw an up/down arrow by the sign and size of ``series``."""
+        ...
+
+    def plotcandle(self, open: float, high: float, low: float, close: float, title: Optional[str] = None, **options: object) -> None:
+        """Draw an extra candle from explicit OHLC."""
+        ...
+
+    def barcolor(self, color: str, **options: object) -> None:
+        """Color the current price bar."""
+        ...
+
+    def bgcolor(self, color: str, **options: object) -> None:
+        """Color the current bar's background."""
+        ...
+
+    def fill(self, plot1: int, plot2: int, color: Optional[str] = None, **options: object) -> None:
+        """Fill the area between two plots (indices returned by ``plot``/``hline``)."""
+        ...
+
+    def signal(self, direction: str, price: float, qty: float, id: Optional[str] = None) -> None:
+        """Draw a trade signal marker. ``direction``: ``"buy"``/``"long"``, ``"sell"``/``"short"``,
+        ``"closebuy"``/``"closelong"``, ``"closesell"``/``"closeshort"``; ``id`` defaults to ``direction``."""
+        ...
+
 class IHttpOptions:
-    """HTTP request options for ``HttpQuery()``.
+    """HTTP request options for ``HttpQuery()`` (a dict passed as the second argument).
 
     Example::
 
@@ -1621,6 +1765,8 @@ class IHttpOptions:
     """HTTP method: ``"GET"``, ``"POST"``, ``"PUT"``, ``"DELETE"``, etc. Default ``"GET"``."""
     body: Optional[Union[str, bytes]]
     """Request body (used for POST and other methods)."""
+    proxy: Optional[str]
+    """Proxy for this request, e.g. ``"socks5://127.0.0.1:1080"``."""
     charset: Optional[str]
     """Response character encoding conversion (e.g. ``"gbk"``)."""
     cookie: Optional[str]
@@ -1636,18 +1782,24 @@ class IHttpOptions:
     headers: Optional[dict[str, object]]
     """Custom request headers."""
     timeout: Optional[int]
-    """Request timeout in milliseconds."""
+    """Request timeout in milliseconds, default 300000 (5 minutes)."""
 
 class IHttpRet:
     """Full HTTP response structure returned by ``HttpQuery()`` in debug mode."""
     StatusCode: int
-    """HTTP status code, such as 200, 404, 500."""
+    """HTTP status code, such as 200, 404, 500; 0 when no response was received (refused, DNS, timeout, proxy failure)."""
     Trace: Optional[object]
     """Request trace information (available in debug mode)."""
     Header: dict[str, list[str]]
     """Response headers dict. Each key maps to a list of strings."""
+    Cookies: Optional[list[object]]
+    """Cookies (available in debug mode)."""
+    Length: Optional[int]
+    """Message length."""
     Body: Optional[Union[str, bytes]]
-    """Response body content. ``None`` when request fails."""
+    """Response body content; an empty string when the request fails."""
+    Error: Optional[str]
+    """Failure reason (method + URL + underlying error); present only when ``StatusCode`` is 0."""
 
 # ==================== Global Variables ====================
 
@@ -1655,7 +1807,7 @@ ext = object()
 """Template class library domain. Used for accessing template library functions."""
 
 TA = ITA()
-"""FMZ built-in technical analysis library, containing simplified versions of common indicators
+"""Built-in technical analysis library, containing simplified versions of common indicators
 (KDJ, BOLL, MACD, EMA, SMA, RSI, etc.)."""
 
 exchanges: list[IExchange] = [IExchange()]
@@ -1773,7 +1925,7 @@ def GetLastError() -> Optional[str]:
 def GetCommand() -> Optional[str]:
     """Get strategy interaction command.
 
-    Used to read interaction commands sent by users on the FMZ platform strategy page.
+    Used to read interaction commands sent by users on the live trading page.
 
     Returns:
         Command string (format: ``"button_name:parameter"``), ``None`` when there is no command.
@@ -1789,13 +1941,13 @@ def GetCommand() -> Optional[str]:
     """
     ...
 
-def GetChannelData(token: str) -> Optional[str]:
+def GetChannelData(token: Union[str, int] = "") -> Optional[str]:
     """Get channel data for cross-strategy communication.
 
     Read data published by other strategies via ``SetChannelData()``.
 
     Args:
-        token: Channel token (used to identify data source).
+        token: Channel token (used to identify data source): a live robot ID (string or number) or a UUID.
 
     Returns:
         Data from the channel, ``None`` if no data available.
@@ -1828,15 +1980,16 @@ def Dial(address: Union[str, int], timeout: Union[int, dict] = None) -> Optional
 
             - WebSocket: ``"wss://stream.binance.com:9443/ws/btcusdt@ticker"``
             - TCP: ``"tcp://host:port"``
-            - SQLite: ``"sqlite3:///path/to/db.sqlite3"``
-            - MySQL: ``"mysql://user:pass@host:port/dbname"``
-            - PostgreSQL: ``"postgres://user:pass@host:port/dbname?sslmode=disable"``
-            - KVDB (Pebble): ``"kvdb://"`` or ``"kvdb:///path/to/db"``
+            - SQLite: ``"sqlite3://test.db"`` (relative paths are under the live trading directory), ``"sqlite3:///path/to/db.sqlite3"`` (absolute path), ``"sqlite3://:memory:"`` (in-memory database)
+            - MySQL: ``"mysql://user:pass@tcp(host:3306)/dbname?charset=utf8mb4&parseTime=true"`` (Go driver DSN); ``"mysql://user:pass@host:3306/dbname"`` also works
+            - PostgreSQL: ``"postgres://user=u password=p host=h port=5432 dbname=d sslmode=disable"`` (libpq key-value); ``"postgres://user:pass@host:5432/dbname?sslmode=disable"`` also works
+            - ClickHouse: ``"clickhouse://tcp://host:9000?username=u&password=p&database=d"`` (clickhouse-go DSN); ``"clickhouse://user:pass@host:9000/db"`` also works
 
             Options can be appended at the end separated by ``|``, e.g.:
             ``"wss://....|compress=gzip_raw&mode=recv"``
 
-        timeout: Connection timeout (milliseconds), default 30000.
+        timeout: Connection timeout: ws/wss in milliseconds (below 100 = seconds), tcp/tls in seconds, 0 = default timeout; 30 (i.e. 30 seconds) when omitted.
+            An options dict (e.g. ``{"timeout": 10, "headers": {...}}``) is also accepted; without timeout the default timeout applies.
 
     Returns:
         IDial connection object, ``None`` on connection failure.
@@ -1850,27 +2003,29 @@ def Dial(address: Union[str, int], timeout: Union[int, dict] = None) -> Optional
                 Log(msg)
             ws.close()
 
-        db = Dial("sqlite3:///strategy.db")
+        db = Dial("sqlite3://strategy.db")
         db.exec("CREATE TABLE IF NOT EXISTS logs(time TEXT, msg TEXT)")
     """
     ...
 
-def HttpQuery(url: str, postData: Optional[Union[str, bytes]] = None, cookies: Optional[str] = None, headers: Optional[Union[str, dict[str, str]]] = None) -> Optional[str]:
+def HttpQuery(url: str, postData: Optional[Union[str, bytes, IHttpOptions, dict]] = None, cookies: Optional[str] = None, headers: Optional[Union[str, dict[str, str]]] = None) -> Optional[Union[str, IHttpRet]]:
     """Send HTTP request.
 
-    When called with a dict as the second argument containing ``debug: True``,
-    returns a full IHttpRet response object instead of just the body string.
+    The second argument is either POST data (a non-empty string turns the request into a POST) or an
+    IHttpOptions dict (``method``, ``body``, ``headers``, ``cookie``, ``timeout``, ``proxy``, ``charset``,
+    ``format``, ``debug``, ...). With ``debug: True`` in the options a full IHttpRet response object is returned
+    instead of just the body string. The URL may also carry a proxy prefix, e.g.
+    ``"socks5://127.0.0.1:1080/https://api.example.com"`` (an explicit ``proxy`` option wins).
 
     Args:
         url: Request URL.
-        postData: POST data (automatically becomes POST request when non-empty).
-            Can also be a dict of IHttpOptions for advanced usage.
-        cookies: Cookie string.
-        headers: Request headers, supports string (newline-separated) or dict.
+        postData: POST data, or an IHttpOptions dict.
+        cookies: Cookie string (legacy call form).
+        headers: Request headers, string (newline-separated) or dict (legacy call form).
 
     Returns:
-        Response body string, ``None`` on failure. If ``debug=True`` in options,
-        returns a dict with ``StatusCode``, ``Header``, ``Body`` fields.
+        Response body string, ``None`` on failure. If ``debug=True`` in options, returns an object with
+        ``StatusCode``, ``Header``, ``Body`` fields (on failure ``StatusCode`` is 0 and ``Error`` holds the reason).
 
     Example::
 
@@ -1885,6 +2040,22 @@ def HttpQuery(url: str, postData: Optional[Union[str, bytes]] = None, cookies: O
             "headers": {"Content-Type": "application/json"},
             "debug": True
         })
+    """
+    ...
+
+def HttpQuery_Go(url: str, postData: Optional[Union[str, bytes, IHttpOptions, dict]] = None, cookies: Optional[str] = None, headers: Optional[Union[str, dict[str, str]]] = None) -> IHttpQueryGo:
+    """Asynchronous ``HttpQuery()``: returns a concurrent object immediately without blocking. Arguments as ``HttpQuery()``.
+
+    Returns:
+        A concurrent object; its ``wait(timeout)`` yields the same result as the synchronous ``HttpQuery()``.
+        On completion ``EventLoop()`` receives an event with ``Event`` ``"HttpQuery"`` (``Index`` = ticket number).
+
+    Example::
+
+        r1 = HttpQuery_Go("https://api.example.com/tickerA")
+        r2 = HttpQuery_Go("https://api.example.com/tickerB")
+        tickerA = json.loads(r1.wait())
+        tickerB = json.loads(r2.wait())
     """
     ...
 
@@ -2242,7 +2413,7 @@ def Chart(options: Union[dict, list[dict]]) -> IChart:
     """
     ...
 
-def KLineChart(options: Union[dict, list[dict]]) -> IChart:
+def KLineChart(options: Optional[dict] = None) -> IKLineChart:
     """Create K-line chart (custom candlestick chart), configuration similar to Pine Script.
 
     Specialized for K-line (candlestick) charts only — prefer Chart for general
@@ -2252,7 +2423,7 @@ def KLineChart(options: Union[dict, list[dict]]) -> IChart:
         options: K-line chart configuration object.
 
     Returns:
-        IChart chart object.
+        IKLineChart chart object (``begin``/``close`` plus Pine-style plot functions).
 
     Example::
 
