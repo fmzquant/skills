@@ -103,6 +103,26 @@ def leaf_md(n, level):
         out += ["See also: " + "; ".join(val(s) for s in aslist(n["seeAlso"])), ""]
     return out
 
+HEADING = re.compile(r"^(#{1,6})(\s.*)$")
+
+def nest(lines, level):
+    """Shift markdown headings embedded in page text (outside code fences) so the shallowest becomes
+    level+1: a page's own `##` sections then sit under its heading instead of breaking the outline."""
+    fence, found = None, []
+    for i, l in enumerate(lines):
+        t = l.lstrip()
+        if fence:
+            if t.startswith(fence) and not t.strip(fence[0]).strip(): fence = None
+            continue
+        if t[:3] in ("```", "~~~") and t[:3] not in t[3:]: fence = t[:3]; continue  # not inline ```code```
+        m = HEADING.match(l)
+        if m: found.append((i, len(m.group(1)), m.group(2)))
+    if not found: return lines
+    shift = max(0, level + 1 - min(f[1] for f in found))
+    out = list(lines)
+    for i, n, rest in found: out[i] = "#" * min(n + shift, 6) + rest
+    return out
+
 def walk(n, level, out):
     if isinstance(n, list):
         for c in n: walk(c, level, out)
@@ -112,10 +132,13 @@ def walk(n, level, out):
         level = min(level + 1, 6)
     if kids:
         out += [f"{'#'*level} {clean(n.get('title',''))}", ""]
-        for d in aslist(n.get("desc")): out += [val(d), ""]
+        body = []
+        for d in aslist(n.get("desc")): body += [val(d), ""]
+        out += nest("\n".join(body).split("\n"), level) if body else []
         for c in kids: walk(c, min(level + 1, 6), out)
     else:
-        out += leaf_md(n, min(level, 6))
+        lv = min(level, 6); md = leaf_md(n, lv)
+        out += md[:1] + nest("\n".join(md[1:]).split("\n"), lv)
 
 def convert(path, key, title, intro):
     tree = load(path, key)
@@ -142,14 +165,16 @@ def build_rest(src, dst):
     sec = find(load(src, "userGuide"), REST_SECTION)
     if not sec: sys.exit(f"{src}: no section titled {REST_SECTION!r} (English user guide expected)")
     out = [f"# FMZ extended REST API (generated from the user guide, section \u201c{REST_SECTION}\u201d)", "", REST_INTRO, ""]
-    for d in aslist(sec.get("desc")): out += [val(d), ""]
+    body = []
+    for d in aslist(sec.get("desc")): body += [val(d), ""]
+    out += nest("\n".join(body).split("\n"), 1) if body else []
     for c in sec.get("children") or []: walk(c, 2, out)
     open(dst, "w", encoding="utf-8").write("\n".join(out).replace("\n\n\n", "\n\n"))
 
 
 TITLES = {
-    ("docs", "en"): ("FMZ strategy API reference", "Generated from the platform's syntax guide (https://www.fmz.com/syntax-guide). Every built-in function, structure and constant, with examples in JavaScript, Python and Rust. Search this file by function name (e.g. `exchange.GetTicker`)."),
-    ("docs", "zh"): ("FMZ 策略 API 参考", "由平台语法指南（https://www.fmz.com/syntax-guide）生成：全部内置函数、结构体与常量，示例覆盖 JavaScript、Python、Rust。按函数名（如 `exchange.GetTicker`）在本文件内搜索。"),
+    ("docs", "en"): ("FMZ strategy API reference", "Generated from the platform's syntax guide (https://www.fmz.com/syntax-guide). Every built-in function, structure and constant, with examples in JavaScript, Python and Rust, then the shared conventions (`## Conventions`: symbols, failures and null values) and the exchange reference (`## Exchanges`: capability matrix and one `####` page per brand). Search this file by function name (e.g. `exchange.GetTicker`) or brand (e.g. `#### Binance`)."),
+    ("docs", "zh"): ("FMZ 策略 API 参考", "由平台语法指南（https://www.fmz.com/syntax-guide）生成：全部内置函数、结构体与常量，示例覆盖 JavaScript、Python、Rust；其后是通用约定（`## 通用约定`：品种代码、失败与空值）与交易所参考（`## 交易所`：能力矩阵与每个品牌一页 `####`）。按函数名（如 `exchange.GetTicker`）或品牌（如 `#### 币安`）在本文件内搜索。"),
     ("guide", "en"): ("FMZ platform user guide", "Generated from https://www.fmz.com/user-guide: how the platform works (nodes, robots, strategies, templates, backtesting, extended API, MCP), as written for people; agents use it for concepts and limits."),
     ("guide", "zh"): ("FMZ 平台使用指南", "由 https://www.fmz.com/user-guide 生成：平台如何运作（托管者、实盘、策略、模板、回测、扩展 API、MCP），面向人写的说明；agent 用它理解概念与限制。"),
 }

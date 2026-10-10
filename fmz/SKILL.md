@@ -66,7 +66,7 @@ A tool missing from `tools/list` means the key lacks that scope; the user can ed
 - `args` everywhere: `{name: value}` object or `[[name, value], ...]`; omitted parameters keep the strategy defaults. Values are typed by the default (number / string / boolean).
 - Enumerations are words, not numbers: robot `status` queue/running/stopping/complete/stopped/error; strategy `visibility` private/shared/verify/premium/system; `language` javascript/typescript/python/blockly/mylanguage/pine/flow/rust.
 - Times: ISO 8601 or unix seconds in; ISO UTC out. Backtest `period`: 1m/5m/15m/30m/1h/4h/1d. Robot `period` is in seconds.
-- Pairs: `BTC_USDT` (spot). Futures contracts are chosen in code with `exchange.SetContractType("swap" | "quarter" | ...)`, so the robot pair stays `BTC_USDT`.
+- Pairs: `BTC_USDT` (spot). Futures contracts are chosen in code with `exchange.SetContractType("swap" | "quarter" | ...)`, so the robot pair stays `BTC_USDT`. The full symbol notation and the failure/null rules of every API call are the `## Conventions` chapter of `references/api.en.md`.
 - Backtest `exchanges[].exchange` is the `eid` from `list_exchanges` (e.g. `Binance`, `Futures_Binance`, `Futures_CTP`); robots use `platform_id` from `list_platforms` instead.
 - All list tools paginate with `offset` / `limit` (max 200). Results never contain secrets.
 
@@ -105,11 +105,12 @@ Scripts and schedulers can use the signed REST "extended API" with the same key:
 | Pine Script | `references/pine.md` (built-ins the engine implements: `references/pine-builtins.md`) |
 | MyLanguage (麦语言) | `references/mylanguage.md` (`references/mylanguage-functions.md`, official templates in `references/mylanguage-examples/`) |
 | Exact signature / return fields / failure behaviour of one API call, structure or constant | `references/api-docs.md` explains how to grep `references/api.en.md` (English, 1 MB, JavaScript/Python/Rust examples) or `references/api.zh.md` |
+| What differs between exchanges: supported functions, contract/option codes, exchange-specific `exchange.IO` commands, margin and demo modes, DEX/Web3 commands | `## Exchanges` in `references/api.en.md`: `### Capability Matrix`, then the brand page (`#### Binance`, `#### OKX`, `#### Hyperliquid`, `#### Uniswap`, `#### Web3`, ...); how to grep it is in `references/api-docs.md` |
 | Indicators (`TA.*`, `talib.*`) | `references/indicators.md` (`references/ta.md`, `references/talib.md`) |
 | Configure, run, debug or interpret a backtest | `references/backtest.md` (every config key: `references/backtest-config.md`) |
 | Backtest locally in seconds on this machine (Python engine; no cloud slot) | `references/backtest-local.md` |
 | Exact parameters of an MCP tool | `references/tools.md` (generated from the server) |
 | Scripts that call the platform without MCP | `references/rest-api.md` |
-| Platform concepts as written for people (nodes, robots, templates, parameters, interactive controls, options, debugging tool...) | `references/user-guide.en.md` / `references/user-guide.zh.md` (grep the `## ` section titles) |
+| Platform concepts as written for people (nodes, robots, templates, parameters, interactive controls, options, debugging tool...) | `references/user-guide.en.md` / `references/user-guide.zh.md` (grep the `## ` chapter and `### ` page titles) |
 
 Read one language file plus `references/api-docs.md` for a coding task; `references/backtest.md` before the first backtest; nothing else unless the task calls for it.

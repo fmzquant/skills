@@ -24,7 +24,7 @@ function main() {
 function onexit() { Log("exit"); }              // optional, runs when the robot stops
 ```
 
-## Entry functions (user-guide "Strategy Entry Functions")
+## Entry functions (user-guide "### Strategy Structure")
 
 | Function | When | Notes |
 |---|---|---|
@@ -53,8 +53,10 @@ TypeScript:
 | `BTC_USDT` | spot pair, upper case, underscore between base and quote |
 | `BTC_USDT.swap` / `BTC_USD.swap` | USDT-margined / coin-margined perpetual |
 | `BTC_USDT.quarter`, `.next_quarter`, `.this_week`, `.next_week` | delivery contracts |
-| `BTC_USDT.BTC-240108-40000-C` | option = pair + "." + the exchange's own option code (formats differ per exchange, user-guide "Options Trading") |
+| `BTC_USDT.BTC-240108-40000-C` | option = pair + "." + the exchange's own option code (formats differ per exchange: the brand page under `## Exchanges` in api.en.md, user-guide "Options Trading") |
 | `"USDT.swap"`, `"USDT.futures"`, `"USD.swap"`, `"USD.futures"`, `"USDT.option"`, `"USD.option"` | range filters accepted by `GetPositions`/`GetOrders`/`GetFundings` on futures objects |
+
+The full notation (omitted symbol, native codes, query ranges) is `### Symbols` under `## Conventions` in api.en.md; each exchange's own contract, delivery and option codes are on its brand page (`#### Binance`, `#### OKX`, ...) under `## Exchanges`.
 
 Two ways to address an instrument:
 - Per call: `GetTicker/GetDepth/GetTrades/GetRecords/GetOrders/GetHistoryOrders/GetFundings/GetPositions(symbol)` and `CreateOrder(symbol, ...)` accept a full symbol and leave the exchange object's state unchanged.
@@ -111,7 +113,7 @@ Placement rules (api.en.md `#### exchange.Buy`, `#### exchange.CreateOrder`):
 |---|---|
 | `IO("api", "GET"\|"POST", "/path" or full URL, "k=v&k2=v2", rawBody?)` | signed request to any endpoint of the account's exchange; returns the parsed response or `null`. String values inside the query need single quotes (`"amount='1'"`). |
 | `IO("currency", "ETH_USDT")` | same as `SetCurrency` |
-| `IO("cross", bool)`, `IO("dual", bool)`, `IO("unified", bool)`, `IO("simulate", bool)`, `IO("trade_margin")` / `IO("trade_super_margin")` / `IO("trade_normal")`, `IO("selfTradePreventionMode", s)` | cross/isolated margin, hedge/one-way, unified account, demo trading, spot margin modes, STP — availability per exchange is tabulated under `#### Spot Exchanges` / `#### Futures Exchanges` in api.en.md |
+| `IO("cross", bool)`, `IO("dual", bool)`, `IO("unified", bool)`, `IO("simulate", bool)`, `IO("trade_margin")` / `IO("trade_super_margin")` / `IO("trade_normal")`, `IO("selfTradePreventionMode", s)` | cross/isolated margin, hedge/one-way, unified account, demo trading, spot margin modes, STP — availability per exchange: `### Capability Matrix` and the brand pages (Exchange-specific IO Commands) under `## Exchanges` in api.en.md |
 | `IO("rate", "GetTicker", 10, "1s")`, `IO("rate", "GetTicker,GetDepth", 10, "1s", "delay")` | client-side rate limit: default mode makes the limited function return `null` when exceeded, `"delay"` mode waits; wildcards allowed (`#### exchange.IO`, user-guide "API Rate Limiting Control") |
 | `IO("wait", ms)` | domestic futures counters (CTP): next tick or order update as `{Event: "tick"\|"order", ...}` |
 
@@ -252,7 +254,7 @@ if (id instanceof Error) { ctx.log("rejected", id.message); }
 - **Numbers.** Exchange ids and big integers exceed `Number` precision: keep `Id` as received, use `JSON.parse(s, true)` or `BigInt` for raw payloads, and `Info` for unnormalised fields.
 - **Threads are sandboxes.** A `threading.Thread` body cannot use closures or outer functions; pass what it needs as arguments.
 - **`wait()` semantics.** `undefined` = timed out (call `wait` again), `null` = the call failed; waiting on a consumed object errors.
-- **Strings.** Byte strings that cannot be encoded come back as `ArrayBuffer`; every string parameter accepts `ArrayBuffer` too (user-guide "JavaScript Strategy Writing Guide").
+- **Strings.** Byte strings that cannot be encoded come back as `ArrayBuffer`; every string parameter accepts `ArrayBuffer` too (user-guide `#### JavaScript` under "### Programming Languages").
 - Before saving run `check_strategy`; before going live run `run_backtest` and read `error_lines`; test with a sandbox account or a tiny amount first (`SKILL.md`).
 - Fast local iteration: the platform's local engine (`references/backtest-local.md`) runs a JavaScript strategy on this machine in seconds (`npm install git+https://github.com/fmzquant/backtest_javascript.git`); confirm on the cloud with `run_backtest` before going live.
 
@@ -261,6 +263,6 @@ if (id instanceof Error) { ctx.log("rejected", id.message); }
 - `references/fmz.d.ts` — every global, `IExchange` method, structure and constant with JSDoc. Grep `GetRecords(`, `CreateOrder(`, `interface IOrder`, `interface IMarket`, `IO(k:`, `interface IDial`, `interface IThreading`, `interface IKLineChart`, `declare function HttpQuery`, `interface IHttpOptions`, `ORDER_STATE_`, `declare namespace os`, `class Trader` (a `Trader` helper class declared here but not covered by the platform docs). `references/fmz.zh_CN.d.ts` is the Chinese copy.
 - `references/ctx.d.ts` and `references/events.md` — the native `ctx` API: `ISubOpts`, `IOrderOpts`, `ICondOpts`, `ICtx`, event field tables, delivery modes, `ctx.rest` method names.
 - `references/selfcheck.js` — a known-good strategy that calls the whole classic API once (meta, `_G`, DB, HTTP, markets, market data, account, `Go`, `Chart`, `KLineChart`, orders and conditional orders gated by `IsVirtual()`). Copy its idioms and null checks.
-- `references/api-docs.md` — `references/api.en.md`; grep `#### exchange.GetTicker`, `#### exchange.Buy`, `#### exchange.CreateOrder`, `#### exchange.GetPositions`, `#### exchange.SetContractType`, `#### exchange.SetDirection`, `#### exchange.IO`, `#### Spot Exchanges`, `#### Futures Exchanges`, `#### exchange.Go`, `#### threading`, `#### Dial`, `#### DBExec`, `#### Log`, `#### LogStatus`, `#### LogStatus-btnTypeTwo`, `#### Chart`, `#### KLineChart`, `#### GetCommand`, `#### EventLoop`, `#### Server` (`threading.Serve`), `#### _G`, `#### _C`, `## Structures`.
-- `SKILL.md` — `references/user-guide.en.md`: "Strategy Entry Functions", "Strategy Parameters", "Interactive Controls", "Template Library", "Built-in Libraries", "JavaScript Strategy Writing Guide", "### TypeScript", "API Rate Limiting Control", "Options Trading", "Common Causes of Live Trading Errors"; `references/tools.md` for `save_strategy`, `run_backtest`, `send_robot_command`.
+- `references/api-docs.md` — `references/api.en.md`; grep `#### exchange.GetTicker`, `#### exchange.Buy`, `#### exchange.CreateOrder`, `#### exchange.GetPositions`, `#### exchange.SetContractType`, `#### exchange.SetDirection`, `#### exchange.IO`, `#### exchange.Go`, `#### threading`, `#### Dial`, `#### DBExec`, `#### Log`, `#### LogStatus`, `#### LogStatus-btnTypeTwo`, `#### Chart`, `#### KLineChart`, `#### GetCommand`, `#### EventLoop`, `#### Server` (`threading.Serve`), `#### _G`, `#### _C`, `## Structures`; `### Symbols` and `### Failures and null values` (under `## Conventions`) for symbol notation and the null-on-failure rule; `### Capability Matrix` and brand pages such as `#### Binance` (under `## Exchanges`) for per-exchange support, contract codes and IO commands.
+- `SKILL.md` — `references/user-guide.en.md`: "### Strategy Structure" (entry functions), "### Strategy Parameters", "### Interactive Controls", "### Template Library", "### Built-in Libraries", "#### JavaScript", "#### TypeScript", "### API Rate Limiting Control", "### Options Trading", "#### Common Causes of Live Trading Errors and Abnormal Exits"; `references/tools.md` for `save_strategy`, `run_backtest`, `send_robot_command`.
 - `references/backtest.md` — backtest header comment, exchanges, data granularity. `references/indicators.md` — `talib`/`TA` argument and output details.
