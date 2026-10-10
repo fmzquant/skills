@@ -141,7 +141,7 @@ The [Exchange](https://www.fmz.com/m/platforms) page manages the exchange accoun
 1. **Create an API key on the exchange**: enable only read and trade permissions, never withdrawal; if the exchange supports an IP whitelist, bind the outbound IP of the docker that will run the robot (see the checklist in Getting Started → Key Security).
 2. **Open the add page**: click "Add Exchange" on the Exchange page to open the [add exchange page](https://www.fmz.com/m/add-platform).
 3. **Choose the protocol**: pick the exchange by category, or search by exchange name or ID. Spot and futures (contracts) are two different exchange objects and are added separately; futures exchanges carry a "Futures" tag. For example Binance spot is ```Binance``` and Binance futures is ```Futures_Binance```.
-4. **Fill in the configuration**: "Label" is the account's name on the platform (the exchange name by default) and tells several accounts on the same exchange apart. The other fields depend on the exchange; the common ones are listed below, and the full list for each exchange is on its exchange page in the syntax manual (all exchanges are listed in `Capabilities`). Fields not marked optional are required.
+4. **Fill in the configuration**: "Label" is the account's name on the platform (the exchange name by default) and tells several accounts on the same exchange apart. The other fields depend on the exchange; the common ones are listed below, and the full list for each exchange is on its exchange page in the syntax manual (all exchanges are listed in `Capability-Matrix`). Fields not marked optional are required.
 5. **Confirm**: click the confirm button and enter your platform account password. Encrypted fields such as keys are encrypted in the browser with the account password before upload, so the platform never stores them in plain text.
 6. **Use it**: select the exchange account when creating a live robot or a backtest. If you use the platform's public dockers, their IPs are listed at the bottom of the add page; add them to the exchange's IP whitelist.
 
@@ -176,13 +176,13 @@ function main() {
 ```
 
 The rest of this chapter:
-- Configuration fields, contract codes, exchange-specific commands and notes of each exchange: see the "Exchanges" chapter of the syntax manual, starting from `Capabilities` or a group page (`Centralized Exchanges`, `Decentralized Exchanges`, `Prediction Markets`, `Securities and Futures`, `On-chain & Custom`).
+- Configuration fields, contract codes, exchange-specific commands and notes of each exchange: see the "Exchanges" chapter of the syntax manual, starting from `Capability-Matrix` or a group page (`Centralized Exchanges`, `Decentralized Exchanges`, `Prediction Markets`, `Securities and Futures`, `On-chain & Custom`).
 - Local Credential Files: keep private keys and other secrets only on the docker's machine.
 - General Protocol: connect an exchange the platform has not integrated yet.
 
 #### Exchange-Specific Notes
 
-The configuration, contract codes, exchange-specific commands and notes of each exchange have moved to the "Exchanges" chapter of the syntax manual. Function and trading-mode command support of all exchanges is in `Capabilities`; the exchange pages are grouped under `Centralized Exchanges`, `Decentralized Exchanges`, `Prediction Markets`, `Securities and Futures` and `On-chain & Custom`.
+The configuration, contract codes, exchange-specific commands and notes of each exchange have moved to the "Exchanges" chapter of the syntax manual. Function and trading-mode command support of all exchanges is in `Capability-Matrix`; the exchange pages are grouped under `Centralized Exchanges`, `Decentralized Exchanges`, `Prediction Markets`, `Securities and Futures` and `On-chain & Custom`.
 
 #### Local Credential Files
 

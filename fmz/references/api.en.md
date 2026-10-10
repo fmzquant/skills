@@ -3825,7 +3825,7 @@ In live trading, in the ```Ticker``` data returned by the ```exchange.GetTicker(
 
 On-chain swap exchanges (such as Uniswap and Jupiter) have no order book and no 24h statistics: ```Buy``` and ```Sell``` are executable quotes for a certain size (about $1000) and ```Last``` is their midpoint; the values of ```High```, ```Low```, ```Volume``` and the other fields are given on the exchange pages, for example `Uniswap` and `Jupiter`.
 
-Exchanges that do not support this function: `Web3`. The call fails with an error and returns null; for all exchanges see `Capabilities`.
+Exchanges that do not support this function: `Web3`. The call fails with an error and returns null; for all exchanges see `Capability-Matrix`.
 
 See also: `exchange.GetDepth`, `exchange.GetTrades`, `exchange.GetRecords`, `exchange.GetTickers`, `exchange.IO` (API rate limiting control)
 
@@ -3980,7 +3980,7 @@ Notes:
 
 - This function does not support options contracts.
 
-Exchanges that do not support this function: `BitFlyer`, `Coincheck`, `Gemini`, `WOO`, `Futures_WOO`, `Zaif`, `Futures_EdgeX`, `Futures_Aevo`, `Uniswap`, `Jupiter`, `KyberSwap`, `OneInch`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capabilities`.
+Exchanges that do not support this function: `BitFlyer`, `Coincheck`, `Gemini`, `WOO`, `Futures_WOO`, `Zaif`, `Futures_EdgeX`, `Futures_Aevo`, `Uniswap`, `Jupiter`, `KyberSwap`, `OneInch`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability-Matrix`.
 
 See also: `Ticker`, `exchange.GetTicker`
 
@@ -4058,7 +4058,7 @@ In the backtesting system, when backtesting with **Live-level Tick**, the data r
 
 On-chain swap exchanges (such as Uniswap and Jupiter) have no order book; the depth is derived from quotes at increasing sizes: each level's ```Amount``` is the base currency added at that level and its ```Price``` is the marginal fill price of that level. Quote sizes and the number of requests are given on the exchange pages, for example `Uniswap` and `Jupiter`.
 
-Exchanges that do not support this function: `OKX_DEX`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capabilities`.
+Exchanges that do not support this function: `OKX_DEX`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability-Matrix`.
 
 See also: `exchange.GetTicker`, `exchange.GetTrades`, `exchange.GetRecords`
 
@@ -4133,7 +4133,7 @@ In the backtesting system, when backtesting with **simulation-level Tick**, the 
 
 In the backtesting system, when backtesting with **live-trading-level Tick**, the data returned by the ```exchange.GetTrades()``` function is order flow snapshot data, i.e. the `Trade` structure array.
 
-Exchanges that do not support this function: `Futures_EdgeX`, `Jupiter`, `KyberSwap`, `OneInch`, `Futures_IB`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capabilities`.
+Exchanges that do not support this function: `Futures_EdgeX`, `Jupiter`, `KyberSwap`, `OneInch`, `Futures_IB`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability-Matrix`.
 
 See also: `exchange.GetTicker`, `exchange.GetDepth`, `exchange.GetRecords`
 
@@ -4254,7 +4254,7 @@ Setting the ```period``` parameter to 5 means requesting K-line data with a peri
 
 In the simulation-level backtesting of the backtesting system, because the underlying K-line period must be set (during simulation-level backtesting, the system uses the corresponding K-line data to generate Tick data based on the configured underlying K-line period), the following must be noted: the K-line data period obtained in the strategy cannot be smaller than the underlying K-line period. This is because in simulation-level backtesting, the K-line data of each period is synthesized from the K-line data corresponding to the underlying K-line period.
 
-Exchanges that do not support this function: `Uniswap`, `Jupiter`, `KyberSwap`, `OneInch`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capabilities`.
+Exchanges that do not support this function: `Uniswap`, `Jupiter`, `KyberSwap`, `OneInch`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability-Matrix`.
 
 Exchanges that serve this function through a fallback: the exchange's API does not fully provide this function, and the docker fills the gap.
 
@@ -4516,7 +4516,7 @@ For futures contract exchanges, since the same instrument may have multiple cont
 
 - Options: on some futures exchanges that trade options the result includes option contracts, keyed by the pair plus the exchange's option code (such as ```ETH_USDT.ETH-25JUN27-2800-C-USDT```; the format differs by exchange); whether options are included and the exact key format are given in the "Options" section of each exchange page.
 
-Exchanges that do not support this function: `Coincheck`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capabilities`.
+Exchanges that do not support this function: `Coincheck`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability-Matrix`.
 
 See also: `Market`
 
@@ -5011,7 +5011,7 @@ When the ```price``` parameter is set to ```-1```, it is used to place a market 
 
 If you are using an older version of the docker, the order ```Id``` returned by the ```exchange.Buy()``` function may differ from the return value order ```Id``` described in the current document.
 
-Exchanges that do not support this function: `Web3`. The call fails with an error and returns null; for all exchanges see `Capabilities`.
+Exchanges that do not support this function: `Web3`. The call fails with an error and returns null; for all exchanges see `Capability-Matrix`.
 
 See also: `exchange.Sell`, `exchange.SetContractType`, `exchange.SetDirection`, `exchange.IO` (API rate limit control; the Buy function is affected by the CreateOrder rate limit setting)
 
@@ -5143,7 +5143,7 @@ When the ```price``` parameter is set to ```-1```, it is used to place a market 
 
 If you are using an older version of the docker, the order ```Id``` returned by the ```exchange.Sell()``` function may differ from the returned order ```Id``` described in the current documentation.
 
-Exchanges that do not support this function: `Web3`. The call fails with an error and returns null; for all exchanges see `Capabilities`.
+Exchanges that do not support this function: `Web3`. The call fails with an error and returns null; for all exchanges see `Capability-Matrix`.
 
 See also: `exchange.Buy`, `exchange.SetContractType`, `exchange.SetDirection`, `exchange.IO` (API rate limit control; the Sell function is affected by the CreateOrder rate limit setting)
 
@@ -5262,7 +5262,7 @@ When using the option parameters, you still need to provide the ```price``` and 
 
 On-chain swap exchanges (such as Uniswap and Jupiter) swap immediately when an order is placed; nothing rests on a book. For a limit order ```price``` is the worst acceptable fill price, enforced on chain, and the call fails without sending a transaction if the current quote cannot reach it; market orders (```price``` of -1) are protected by the slippage setting, and for a market buy ```amount``` is the quote currency to spend. Order IDs, cancelation and the supported order options are described on the exchange pages, for example `Uniswap` and `Jupiter`.
 
-Exchanges that do not support this function: `Web3`. The call fails with an error and returns null; for all exchanges see `Capabilities`.
+Exchanges that do not support this function: `Web3`. The call fails with an error and returns null; for all exchanges see `Capability-Matrix`.
 
 See also: `exchange.Buy`, `exchange.Sell`,
   `exchange.ModifyOrder`
@@ -5466,7 +5466,7 @@ For spot market buy orders, note that the unit of the order quantity may be the 
 
 Support for the order modification feature depends on the specific exchange; some exchanges may not support the order modification feature, or may only support modifying certain parameters. Please consult the API documentation of the corresponding exchange before use.
 
-Exchanges that do not support this function: `AscendEx`, `Backpack`, `Futures_Backpack`, `BigONE`, `BitFlyer`, `Bithumb`, `Bitstamp`, `Coincheck`, `Coinone`, `Coinw`, `Futures_Coinw`, `DeepCoin`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Huobi`, `Futures_HuobiDM`, `Korbit`, `Futures_KuCoin`, `LBank`, `MEXC`, `WEEX`, `Futures_WEEX`, `Zaif`, `Futures_EdgeX`, `Aster`, `Futures_ApolloX`, `Futures_Aster`, `Uniswap`, `Jupiter`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Futures_Polymarket`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capabilities`.
+Exchanges that do not support this function: `AscendEx`, `Backpack`, `Futures_Backpack`, `BigONE`, `BitFlyer`, `Bithumb`, `Bitstamp`, `Coincheck`, `Coinone`, `Coinw`, `Futures_Coinw`, `DeepCoin`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Huobi`, `Futures_HuobiDM`, `Korbit`, `Futures_KuCoin`, `LBank`, `MEXC`, `WEEX`, `Futures_WEEX`, `Zaif`, `Futures_EdgeX`, `Aster`, `Futures_ApolloX`, `Futures_Aster`, `Uniswap`, `Jupiter`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Futures_Polymarket`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability-Matrix`.
 
 See also: `exchange.CreateOrder`, `exchange.CancelOrder`, `exchange.GetOrder`, `exchange.GetOrders`
 
@@ -5572,7 +5572,7 @@ fn main() {
 
 If you are using an older version of the docker (hosting agent), the parameter ```orderId``` of the ```exchange.CancelOrder()``` function may differ from the ```orderId``` described in the current documentation.
 
-Exchanges that do not support this function: `Jupiter`, `OKX_DEX`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capabilities`.
+Exchanges that do not support this function: `Jupiter`, `OKX_DEX`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability-Matrix`.
 
 See also: `exchange.Buy`, `exchange.Sell`, `exchange.GetOrders`, `exchange.ModifyOrder`
 
@@ -5624,7 +5624,7 @@ Some exchanges do not support the ```exchange.GetOrder()``` function. The ```Avg
 
 If you are using an older version of the docker, the ```orderId``` parameter of the ```exchange.GetOrder()``` function may differ from the ```orderId``` described in the current documentation.
 
-Exchanges that do not support this function: `Web3`. The call fails with an error and returns null; for all exchanges see `Capabilities`.
+Exchanges that do not support this function: `Web3`. The call fails with an error and returns null; for all exchanges see `Capability-Matrix`.
 
 Exchanges that serve this function through a fallback: the exchange's API does not fully provide this function, and the docker fills the gap.
 
@@ -5916,9 +5916,9 @@ Range notation (```USDT.swap```, ```USD.futures```, ```USDT.option```, etc.) and
 
 When the account represented by the exchange object ```exchange``` has no open orders (i.e., active orders in an unfilled state) **within the query range** or on the **specified trading instrument**, calling this function will return an empty array, that is: ```[]```.
 
-On a few exchanges the open-order endpoint requires a symbol: there, calling without ```symbol``` only queries the open orders of the current instrument, not the whole range. Which exchanges behave like this is noted on each exchange page (all exchanges are listed in `Capabilities`).
+On a few exchanges the open-order endpoint requires a symbol: there, calling without ```symbol``` only queries the open orders of the current instrument, not the whole range. Which exchanges behave like this is noted on each exchange page (all exchanges are listed in `Capability-Matrix`).
 
-Exchanges that do not support this function: `OKX_DEX`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capabilities`.
+Exchanges that do not support this function: `OKX_DEX`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability-Matrix`.
 
 See also: `Order`, `exchange.GetOrder`, `exchange.GetHistoryOrders`
 
@@ -5973,7 +5973,7 @@ fn main() {
 
 - This function is only supported by exchanges that provide a historical order query interface.
 
-Exchanges that do not support this function: `Bitstamp`, `Coincheck`, `Uniswap`, `Jupiter`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Futures_IB`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capabilities`.
+Exchanges that do not support this function: `Bitstamp`, `Coincheck`, `Uniswap`, `Jupiter`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Futures_IB`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability-Matrix`.
 
 See also: `Order`, `exchange.GetOrder`, `exchange.GetOrders`
 
@@ -6224,7 +6224,7 @@ The option parameters supported vary from exchange to exchange; the specific sup
 
 When using option parameters, you still need to provide the ```amount``` and ```condition``` parameters. If certain parameters in the exchange API have already been passed via option, these base parameters may be overridden by the corresponding parameters in option; the exact behavior depends on the exchange API's implementation.
 
-Exchanges that do not support this function: `AscendEx`, `Bithumb`, `Bitstamp`, `Coinw`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Korbit`, `LBank`, `MEXC`, `Upbit`, `WEEX`, `Zaif`, `Hyperliquid`, `Uniswap`, `Jupiter`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Futures_Polymarket`, `Futures_Futu`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capabilities`.
+Exchanges that do not support this function: `AscendEx`, `Bithumb`, `Bitstamp`, `Coinw`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Korbit`, `LBank`, `MEXC`, `Upbit`, `WEEX`, `Zaif`, `Hyperliquid`, `Uniswap`, `Jupiter`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Futures_Polymarket`, `Futures_Futu`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability-Matrix`.
 
 See also: `Condition`, `exchange.CancelConditionOrder`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`, `exchange.ModifyConditionOrder`
 
@@ -6499,9 +6499,9 @@ When modifying a conditional order, other properties of the conditional order (s
 
 The trigger price type can be modified through additional parameters, for example, changing the trigger price type from the last price (last) to the index price (index) or the mark price (mark). The specific parameter names and support status depend on the exchange API documentation.
 
-Not every exchange can modify conditional orders: on those that cannot, the call fails with an error and returns a null value, and the conditional order has to be canceled and created again; exchanges that can modify them may support only some parameters (for example only one contract type or account mode). The unsupported exchanges are listed on this page under "Exchanges that do not support this function", all exchanges are compared in `Capabilities`, and the restrictions are given on each exchange page.
+Not every exchange can modify conditional orders: on those that cannot, the call fails with an error and returns a null value, and the conditional order has to be canceled and created again; exchanges that can modify them may support only some parameters (for example only one contract type or account mode). The unsupported exchanges are listed on this page under "Exchanges that do not support this function", all exchanges are compared in `Capability-Matrix`, and the restrictions are given on each exchange page.
 
-Exchanges that do not support this function: `AscendEx`, `Backpack`, `Futures_Backpack`, `BigONE`, `Futures_Binance`, `BitFlyer`, `Bithumb`, `Bitstamp`, `Coincheck`, `Coinone`, `Coinw`, `Futures_Coinw`, `DigiFinex`, `Futures_DigiFinex`, `GateIO`, `Gemini`, `HashKey`, `Huobi`, `Futures_HuobiDM`, `Korbit`, `KuCoin`, `Futures_KuCoin`, `LBank`, `MEXC`, `Futures_MEXC`, `Poloniex`, `Upbit`, `WEEX`, `Futures_WEEX`, `Zaif`, `Hyperliquid`, `Futures_EdgeX`, `Aster`, `Futures_ApolloX`, `Futures_Aster`, `Uniswap`, `Jupiter`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Futures_Polymarket`, `Futures_Futu`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capabilities`.
+Exchanges that do not support this function: `AscendEx`, `Backpack`, `Futures_Backpack`, `BigONE`, `Futures_Binance`, `BitFlyer`, `Bithumb`, `Bitstamp`, `Coincheck`, `Coinone`, `Coinw`, `Futures_Coinw`, `DigiFinex`, `Futures_DigiFinex`, `GateIO`, `Gemini`, `HashKey`, `Huobi`, `Futures_HuobiDM`, `Korbit`, `KuCoin`, `Futures_KuCoin`, `LBank`, `MEXC`, `Futures_MEXC`, `Poloniex`, `Upbit`, `WEEX`, `Futures_WEEX`, `Zaif`, `Hyperliquid`, `Futures_EdgeX`, `Aster`, `Futures_ApolloX`, `Futures_Aster`, `Uniswap`, `Jupiter`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Futures_Polymarket`, `Futures_Futu`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability-Matrix`.
 
 See also: `Condition`, `exchange.CreateConditionOrder`, `exchange.CancelConditionOrder`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`
 
@@ -6653,7 +6653,7 @@ The return value of the ```exchange.CancelConditionOrder()``` function only indi
 
 Only untriggered conditional orders can be canceled; conditional orders that have already been triggered and converted into regular orders cannot be canceled through this function.
 
-Exchanges that do not support this function: `AscendEx`, `Bithumb`, `Bitstamp`, `Coinw`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Korbit`, `LBank`, `MEXC`, `Upbit`, `WEEX`, `Zaif`, `Hyperliquid`, `Uniswap`, `Jupiter`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Futures_Polymarket`, `Futures_Futu`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capabilities`.
+Exchanges that do not support this function: `AscendEx`, `Bithumb`, `Bitstamp`, `Coinw`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Korbit`, `LBank`, `MEXC`, `Upbit`, `WEEX`, `Zaif`, `Hyperliquid`, `Uniswap`, `Jupiter`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Futures_Polymarket`, `Futures_Futu`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability-Matrix`.
 
 See also: `exchange.CreateConditionOrder`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`, `exchange.ModifyConditionOrder`
 
@@ -6734,7 +6734,7 @@ The returned conditional order structure contains information such as the trigge
 
 Conditional order statuses include: not triggered, triggered, canceled, etc. The specific status values are determined by the exchange.
 
-Exchanges that do not support this function: `AscendEx`, `Bithumb`, `Bitstamp`, `Coinw`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Korbit`, `LBank`, `MEXC`, `Upbit`, `WEEX`, `Zaif`, `Hyperliquid`, `Uniswap`, `Jupiter`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Futures_Polymarket`, `Futures_Futu`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capabilities`.
+Exchanges that do not support this function: `AscendEx`, `Bithumb`, `Bitstamp`, `Coinw`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Korbit`, `LBank`, `MEXC`, `Upbit`, `WEEX`, `Zaif`, `Hyperliquid`, `Uniswap`, `Jupiter`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Futures_Polymarket`, `Futures_Futu`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability-Matrix`.
 
 See also: `Order`, `exchange.GetConditionOrders`, `exchange.GetHistoryConditionOrders`, `exchange.ModifyConditionOrder`
 
@@ -6867,11 +6867,11 @@ Range notation (```USDT.swap```, ```USD.futures```, ```USDT.option```, etc.) and
 
 When the account represented by the exchange object ```exchange``` has no unfinished conditional orders **within the query scope** or on the **specified trading instrument**, calling this function will return an empty array, i.e.: ```[]```.
 
-On a few exchanges the open conditional-order endpoint requires a symbol: there, calling without ```symbol``` only queries the open conditional orders of the current instrument, not the whole range. Which exchanges behave like this is noted on each exchange page (all exchanges are listed in `Capabilities`).
+On a few exchanges the open conditional-order endpoint requires a symbol: there, calling without ```symbol``` only queries the open conditional orders of the current instrument, not the whole range. Which exchanges behave like this is noted on each exchange page (all exchanges are listed in `Capability-Matrix`).
 
 Support for the conditional order feature depends on the specific exchange; some exchanges may not support the conditional order feature.
 
-Exchanges that do not support this function: `AscendEx`, `Bithumb`, `Bitstamp`, `Coinw`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Korbit`, `LBank`, `MEXC`, `Upbit`, `WEEX`, `Zaif`, `Hyperliquid`, `Uniswap`, `Jupiter`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Futures_Polymarket`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capabilities`.
+Exchanges that do not support this function: `AscendEx`, `Bithumb`, `Bitstamp`, `Coinw`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Korbit`, `LBank`, `MEXC`, `Upbit`, `WEEX`, `Zaif`, `Hyperliquid`, `Uniswap`, `Jupiter`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Futures_Polymarket`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability-Matrix`.
 
 See also: `Order`, `exchange.GetConditionOrder`, `exchange.GetHistoryConditionOrders`
 
@@ -7011,7 +7011,7 @@ The returned array of historical conditional orders is sorted in ascending order
 
 Support for the conditional order feature depends on the specific exchange. Some exchanges may not support the conditional order feature or the historical conditional order query feature.
 
-Exchanges that do not support this function: `AscendEx`, `Bithumb`, `Bitstamp`, `Coincheck`, `Coinone`, `Coinw`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Korbit`, `LBank`, `MEXC`, `Upbit`, `WEEX`, `Zaif`, `Hyperliquid`, `Uniswap`, `Jupiter`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Futures_Polymarket`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capabilities`.
+Exchanges that do not support this function: `AscendEx`, `Bithumb`, `Bitstamp`, `Coincheck`, `Coinone`, `Coinw`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Korbit`, `LBank`, `MEXC`, `Upbit`, `WEEX`, `Zaif`, `Hyperliquid`, `Uniswap`, `Jupiter`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Futures_Polymarket`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability-Matrix`.
 
 See also: `Order`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`
 
@@ -7429,7 +7429,7 @@ On some exchanges, the leverage value of a futures contract is a parameter in th
 
 On other exchanges, the leverage value of a futures contract is an independent setting of the exchange, which needs to be set through the exchange's website page or API interface. In this case, calling the ```exchange.SetMarginLevel()``` function will generate a network request and may fail to set the value. There can be various reasons for failure, for example: there are currently open positions or pending orders, which prevents a new leverage value from being set for that trading pair or contract.
 
-Exchanges that do not support this function: `Futures_Deribit`, `Futures_EdgeX`, `Futures_Polymarket`, `Futures_Futu`, `Futures_IB`. The call fails with an error and returns null; for all exchanges see `Capabilities`.
+Exchanges that do not support this function: `Futures_Deribit`, `Futures_EdgeX`, `Futures_Polymarket`, `Futures_Futu`, `Futures_IB`. The call fails with an error and returns null; for all exchanges see `Capability-Matrix`.
 
 See also: `exchange`
 
@@ -7735,9 +7735,9 @@ For futures exchanges that do not support batch querying of funding rate data, i
 
 The ```exchange.GetFundings()``` function supports both live trading and the backtesting system.
 
-Which futures exchanges cannot query funding rates in batch and need a concrete symbol (for example ```ETH_USDT.swap```) is noted on each exchange page (all exchanges are listed in `Capabilities`).
+Which futures exchanges cannot query funding rates in batch and need a concrete symbol (for example ```ETH_USDT.swap```) is noted on each exchange page (all exchanges are listed in `Capability-Matrix`).
 
-Exchanges that do not support this function: `Futures_Polymarket`, `Futures_Futu`, `Futures_IB`. The call fails with an error and returns null; for all exchanges see `Capabilities`.
+Exchanges that do not support this function: `Futures_Polymarket`, `Futures_Futu`, `Futures_IB`. The call fails with an error and returns null; for all exchanges see `Capability-Matrix`.
 
 See also: `Funding`
 
@@ -8443,7 +8443,7 @@ fn main() {
 | ```"simulate"```, ```"cross"```, ```"dual"```, ```"unified"``` and more | Switch trading modes, see ```exchange.IO(mode, value)``` |
 | ```"rate"``` / ```"quota"``` | Rate-limit API calls |
 
-Each command has its own page in this category; commands specific to an exchange object are indexed below and documented on the exchange pages (see `Capabilities`).
+Each command has its own page in this category; commands specific to an exchange object are indexed below and documented on the exchange pages (see `Capability-Matrix`).
 
 **Return values and error checking**
 
@@ -8843,7 +8843,7 @@ fn main() {
 - ```exchange.IO("base", address)```: switches the exchange API base address, equivalent to `exchange.SetBase`.
 - ```exchange.IO("base")```: queries the current base address; if it has never been switched, the exchange's default API address is returned. Equivalent to `exchange.GetBase`.
 
-A few exchanges have separate base address commands (for example for coin-margined contracts, options or the market data API); see the IO command table of the exchange page (all exchanges are listed in `Capabilities`).
+A few exchanges have separate base address commands (for example for coin-margined contracts, options or the market data API); see the IO command table of the exchange page (all exchanges are listed in `Capability-Matrix`).
 
 See also: `exchange.IO`, `exchange.SetBase`, `exchange.GetBase`
 
@@ -8971,7 +8971,7 @@ fn main() {
 
 **Common Trading Mode Instructions**
 
-The following commands are shared by several exchanges. Which exchanges support which command is shown in `Capabilities`; differences in values, per-contract scope and return values are given on each exchange page.
+The following commands are shared by several exchanges. Which exchanges support which command is shown in `Capability-Matrix`; differences in values, per-contract scope and return values are given on each exchange page.
 
 | Instruction | Parameter | Function |
 | - | - | - |
@@ -21147,7 +21147,7 @@ fn main() {
 
 ## Exchanges
 
-This chapter is the reference for the exchange objects: one page per brand, with the spot and futures exchange objects of a brand on the same page. Each page gives the names (the ```exchange.GetName()``` value and aliases), the configuration fields, trading pairs and contract codes, exchange-specific IO commands, unsupported and fallback functions, margin, account and simulation, options and notes. Function pages describe the common semantics; differences between exchanges are documented here. Function support and trading-mode commands of all exchanges are summarized in `Capabilities`.
+This chapter is the reference for the exchange objects: one page per brand, with the spot and futures exchange objects of a brand on the same page. Each page gives the names (the ```exchange.GetName()``` value and aliases), the configuration fields, trading pairs and contract codes, exchange-specific IO commands, unsupported and fallback functions, margin, account and simulation, options and notes. Function pages describe the common semantics; differences between exchanges are documented here. Function support and trading-mode commands of all exchanges are summarized in `Capability-Matrix`.
 
 This chapter is generated by ```doc_tools/gen_exchange_docs.py``` from the connectors' documentation metadata; do not edit it by hand.
 
@@ -21609,7 +21609,7 @@ Served through a fallback:
 
 - `exchange.GetRecords`: Native periods are 1m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 12h, 1d, 1w, 1M; other periods are synthesized by the docker.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Notes**
 
@@ -21686,7 +21686,7 @@ Served through a fallback:
 
 - `exchange.GetRecords`: Native periods are 1m, 3m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 8h, 12h, 1d, 3d, 1w, 1M; other periods are synthesized by the docker.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Margin, Account and Simulation**
 
@@ -21751,7 +21751,7 @@ Served through a fallback:
 
 - `exchange.GetRecords`: Native periods are 1m, 5m, 15m, 30m, 1h, 3h, 4h, 6h, 12h, 1d, 1w, 1M; other periods are synthesized by the docker.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Notes**
 
@@ -21858,7 +21858,7 @@ Served through a fallback:
 
 - `exchange.GetRecords`: Native periods are 1m, 3m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 8h, 12h, 1d, 3d, 1w, 1M; other periods are synthesized by the docker.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Margin, Account and Simulation**
 
@@ -21974,7 +21974,7 @@ Served through a fallback:
 
 - `exchange.GetRecords`: Native periods are 1m, 5m, 15m, 30m, 1h, 3h, 6h, 12h, 1d, 1w, 14d, 1M; other periods are synthesized by the docker.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Margin, Account and Simulation**
 
@@ -22033,7 +22033,7 @@ Served through a fallback:
 
 - `exchange.GetRecords`: The exchange has no K-line endpoint; bars are synthesized by the docker from trades. The first call covers only the few bars spanned by recent trades, and more accumulate with later calls.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Notes**
 
@@ -22132,7 +22132,7 @@ Served through a fallback:
 
 - `exchange.GetRecords`: Native periods are 1m, 3m, 5m, 15m, 30m, 1h, 4h, 6h, 12h, 1d, 3d, 1w, 1M; other periods are synthesized by the docker. Coin-margined delivery contracts on a unified account (v3) have no 3d period.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Margin, Account and Simulation**
 
@@ -22200,7 +22200,7 @@ Served through a fallback:
 
 - `exchange.GetRecords`: Native periods are 1m, 3m, 5m, 10m, 15m, 30m, 1h, 4h, 1d, 1w, 1M; other periods are synthesized by the docker.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Notes**
 
@@ -22243,7 +22243,7 @@ Served through a fallback:
 
 - `exchange.GetRecords`: Native periods are 1m, 3m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 12h, 1d, 3d; other periods are synthesized by the docker.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Notes**
 
@@ -22349,7 +22349,7 @@ Served through a fallback:
 
 - `exchange.GetRecords`: Native periods are 1m, 3m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 12h, 1d, 1w, 1M; other periods are synthesized by the docker. Options have no K-line endpoint; their bars are synthesized by the docker from trades.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Margin, Account and Simulation**
 
@@ -22428,7 +22428,7 @@ Served through a fallback:
 - `exchange.GetRecords`: The exchange has no K-line endpoint; bars are synthesized by the docker from trades. The first call covers only the few bars spanned by recent trades, and more accumulate with later calls.
 - `exchange.GetOrder`: The exchange has no single-order query interface, so the order is looked up among the current open orders; the exchange provides no historical order query, so filled or canceled orders cannot be found (null is returned).
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Notes**
 
@@ -22471,7 +22471,7 @@ Served through a fallback:
 
 - `exchange.GetRecords`: Native periods are 1m, 3m, 5m, 10m, 15m, 30m, 1h, 2h, 4h, 6h, 1d, 1w, 1M; other periods are synthesized by the docker.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Notes**
 
@@ -22557,7 +22557,7 @@ Served through a fallback:
 
 - `exchange.GetRecords`: Native periods are 1m, 3m, 5m, 15m, 30m, 1h, 4h, 1d, 1w, 1M; other periods are synthesized by the docker. At most 300 bars per call.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Margin, Account and Simulation**
 
@@ -22668,7 +22668,7 @@ Served through a fallback:
 
 - `exchange.GetRecords`: Native periods are 1m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 12h, 1d, 1w, 14d, 1M; other periods are synthesized by the docker.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Margin, Account and Simulation**
 
@@ -22766,7 +22766,7 @@ Not supported (the call fails with an error and returns null): `exchange.ModifyO
 
 No unsupported standard functions.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Margin, Account and Simulation**
 
@@ -22850,7 +22850,7 @@ Served through a fallback:
 
 - `exchange.GetRecords`: Native periods are 1m, 3m, 5m, 10m, 15m, 30m, 1h, 2h, 3h, 6h, 12h, 1d; other periods are synthesized by the docker.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Margin, Account and Simulation**
 
@@ -22953,7 +22953,7 @@ Served through a fallback:
 
 - `exchange.GetRecords`: Native periods are 1m, 5m, 15m, 30m, 1h, 4h, 12h, 1d, 1w; other periods are synthesized by the docker.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Margin, Account and Simulation**
 
@@ -23063,7 +23063,7 @@ Served through a fallback:
 
 - `exchange.GetRecords`: Native periods are 10s, 30s, 1m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 8h, 12h, 1d, 1w, 1M; other periods are synthesized by the docker.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Margin, Account and Simulation**
 
@@ -23144,7 +23144,7 @@ Served through a fallback:
 
 - `exchange.GetRecords`: Native periods are 1m, 5m, 15m, 30m, 1h, 6h, 1d; other periods are synthesized by the docker.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Notes**
 
@@ -23187,7 +23187,7 @@ Served through a fallback:
 
 - `exchange.GetRecords`: Native periods are 1m, 3m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 8h, 12h, 1d, 1w, 1M; other periods are synthesized by the docker.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Notes**
 
@@ -23228,7 +23228,7 @@ Served through a fallback:
 
 - `exchange.GetRecords`: Native periods are 1m, 3m, 5m, 15m, 30m, 1h, 4h, 1d, 1w, 1M; other periods are synthesized by the docker.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Notes**
 
@@ -23330,7 +23330,7 @@ Served through a fallback:
 
 - `exchange.GetRecords`: Native periods are 1m, 5m, 15m, 30m, 1h, 4h, 1d, 1w, 1M; other periods are synthesized by the docker.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Margin, Account and Simulation**
 
@@ -23391,7 +23391,7 @@ Served through a fallback:
 
 - `exchange.GetRecords`: Native periods are 1m, 5m, 15m, 30m, 1h, 4h, 1d, 1w; other periods are synthesized by the docker.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Notes**
 
@@ -23489,7 +23489,7 @@ Served through a fallback:
 
 - `exchange.GetRecords`: Native periods are 1m, 5m, 15m, 30m, 1h, 4h, 12h, 1d, 1w; other periods are synthesized by the docker.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Margin, Account and Simulation**
 
@@ -23612,7 +23612,7 @@ Served through a fallback:
 
 - `exchange.GetRecords`: Native periods are 1m, 5m, 15m, 30m, 1h, 2h, 4h, 8h, 12h, 1d, 1w; other periods are synthesized by the docker.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Margin, Account and Simulation**
 
@@ -23670,7 +23670,7 @@ Served through a fallback:
 
 - `exchange.GetRecords`: Native periods are 1m, 5m, 15m, 30m, 1h, 4h, 8h, 12h, 1d, 1w, 1M; other periods are synthesized by the docker.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Notes**
 
@@ -23758,7 +23758,7 @@ Served through a fallback:
 
 - `exchange.GetRecords`: Native periods are 1m, 5m, 15m, 30m, 1h, 4h, 8h, 1d, 1w, 1M; other periods are synthesized by the docker.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Margin, Account and Simulation**
 
@@ -23872,7 +23872,7 @@ Served through a fallback:
 
 - `exchange.GetRecords`: Native periods are 1m, 3m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 12h, 1d, 3d, 1w, 1M, 3M; other periods are synthesized by the docker.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Margin, Account and Simulation**
 
@@ -23950,7 +23950,7 @@ Served through a fallback:
 
 - `exchange.GetRecords`: Native periods are 1m, 5m, 10m, 15m, 30m, 1h, 2h, 4h, 6h, 12h, 1d, 3d, 1w, 1M; other periods are synthesized by the docker.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Notes**
 
@@ -23993,7 +23993,7 @@ Served through a fallback:
 
 - `exchange.GetRecords`: Native periods are 1s, 1m, 3m, 5m, 10m, 15m, 30m, 1h, 4h, 1d, 1w, 1M, 1y; other periods are synthesized by the docker.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Notes**
 
@@ -24067,7 +24067,7 @@ Served through a fallback:
 
 - `exchange.GetRecords`: Native periods are 1m, 5m, 15m, 30m, 1h, 4h, 12h, 1d, 1w; other periods are synthesized by the docker.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Margin, Account and Simulation**
 
@@ -24174,7 +24174,7 @@ Served through a fallback:
 
 - `exchange.GetRecords`: Native periods are 1m, 5m, 15m, 30m, 1h, 4h, 12h, 1d, 1w, 1M, 1y; other periods are synthesized by the docker.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Margin, Account and Simulation**
 
@@ -24233,7 +24233,7 @@ Served through a fallback:
 - `exchange.GetRecords`: The exchange has no K-line endpoint; bars are synthesized by the docker from trades. The first call covers only the few bars spanned by recent trades, and more accumulate with later calls.
 - `exchange.GetOrder`: The exchange has no single-order query interface, so the order is looked up among the current open orders and the historical orders.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Notes**
 
@@ -24354,7 +24354,7 @@ Served through a fallback:
 
 - `exchange.GetRecords`: Native periods are 1m, 3m, 5m, 15m, 30m, 1h, 2h, 4h, 8h, 12h, 1d, 3d, 1w; other periods are synthesized by the docker. Outcome instruments have no bars.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Margin, Account and Simulation**
 
@@ -24433,7 +24433,7 @@ Served through a fallback:
 
 - `exchange.GetRecords`: Native periods are 1m, 5m, 15m, 30m, 1h, 4h, 12h, 1d, 1w; other periods are synthesized by the docker.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Margin, Account and Simulation**
 
@@ -24509,7 +24509,7 @@ Served through a fallback:
 
 - `exchange.GetRecords`: Native periods are 1m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 8h, 12h, 1d, 1w, 1M; other periods that are a multiple of 60 seconds are synthesized by the docker from native bars, and the rest (such as second-level periods) are not available (the exchange has no trades endpoint).
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Margin, Account and Simulation**
 
@@ -24629,7 +24629,7 @@ Served through a fallback:
 
 - `exchange.GetRecords`: Native periods are 1s, 1m, 3m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 8h, 12h, 1d, 3d, 1w, 1M; other periods are synthesized by the docker.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Margin, Account and Simulation**
 
@@ -24711,7 +24711,7 @@ Served through a fallback:
 
 - `exchange.GetRecords`: The exchange has no K-line endpoint; bars are synthesized by the docker from trades. The first call covers only the few bars spanned by recent trades, and more accumulate with later calls. The result is empty while the contract has no trades.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Margin, Account and Simulation**
 
@@ -24784,7 +24784,7 @@ Served through a fallback:
 
 - `exchange.GetRecords`: Native periods are 1m, 5m, 15m, 30m, 1h, 4h, 12h, 1d, 1w, 1M, 1y; other periods are synthesized by the docker. At most 1000 bars per call.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Margin, Account and Simulation**
 
@@ -24856,7 +24856,7 @@ For the common commands ```api``` and ```currency``` see `exchange.IO`.
 
 Not supported (the call fails with an error and returns null): `exchange.GetTickers`, `exchange.GetRecords`, `exchange.GetHistoryOrders`, `exchange.ModifyOrder`, `exchange.CreateConditionOrder`, `exchange.ModifyConditionOrder`, `exchange.CancelConditionOrder`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`, `exchange.GetHistoryConditionOrders`.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Notes**
 
@@ -25375,7 +25375,7 @@ For the common commands ```api``` and ```currency``` see `exchange.IO`.
 
 Not supported (the call fails with an error and returns null): `exchange.GetTickers`, `exchange.GetRecords`, `exchange.GetTrades`, `exchange.GetHistoryOrders`, `exchange.CancelOrder`, `exchange.ModifyOrder`, `exchange.CreateConditionOrder`, `exchange.ModifyConditionOrder`, `exchange.CancelConditionOrder`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`, `exchange.GetHistoryConditionOrders`.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Notes**
 
@@ -25717,7 +25717,7 @@ For the common commands ```api``` and ```currency``` see `exchange.IO`.
 
 Not supported (the call fails with an error and returns null): `exchange.GetTickers`, `exchange.GetRecords`, `exchange.GetTrades`, `exchange.GetHistoryOrders`, `exchange.ModifyOrder`, `exchange.CreateConditionOrder`, `exchange.ModifyConditionOrder`, `exchange.CancelConditionOrder`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`, `exchange.GetHistoryConditionOrders`.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Notes**
 
@@ -25784,7 +25784,7 @@ For the common commands ```api``` and ```currency``` see `exchange.IO`.
 
 Not supported (the call fails with an error and returns null): `exchange.GetTickers`, `exchange.GetRecords`, `exchange.GetTrades`, `exchange.GetHistoryOrders`, `exchange.ModifyOrder`, `exchange.CreateConditionOrder`, `exchange.ModifyConditionOrder`, `exchange.CancelConditionOrder`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`, `exchange.GetHistoryConditionOrders`.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Notes**
 
@@ -25860,7 +25860,7 @@ Served through a fallback:
 
 - `exchange.GetRecords`: Native periods are 1m, 3m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 12h, 1d, 3d, 1w, 1M, 3M; other periods are synthesized by the docker.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Notes**
 
@@ -25942,7 +25942,7 @@ Served through a fallback:
 
 - `exchange.GetRecords`: The exchange has no K-line endpoint; bars are synthesized by the docker from trades. The first call covers only the few bars spanned by recent trades, and more accumulate with later calls.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Margin, Account and Simulation**
 
@@ -26017,7 +26017,7 @@ Served through a fallback:
 
 - `exchange.GetRecords`: Native periods are 1m, 3m, 5m, 15m, 30m, 1h, 1d, 1w, 1M; other periods are synthesized by the docker.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Margin, Account and Simulation**
 
@@ -26088,7 +26088,7 @@ Served through a fallback:
 
 - `exchange.GetRecords`: Native periods are 1m, 3m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 1d, 1w; other periods that are a multiple of 60 seconds are synthesized by the docker from native bars, and the rest (such as second-level periods) are not available (this exchange object does not support ```exchange.GetTrades()```).
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Notes**
 
@@ -26157,7 +26157,7 @@ Served through a fallback:
 
 - `exchange.GetRecords`: The gateway's ```records``` takes only the 1m, 3m, 5m, 15m, 30m, 1h and 1d periods; other periods are synthesized by the docker, and a start time cannot be specified.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Notes**
 
@@ -26227,7 +26227,7 @@ For the common command ```currency``` see `exchange.IO`.
 
 Not supported (the call fails with an error and returns null): `exchange.GetTicker`, `exchange.GetTickers`, `exchange.GetDepth`, `exchange.GetTrades`, `exchange.GetRecords`, `exchange.GetMarkets`, `exchange.CreateOrder`, `exchange.Buy`, `exchange.Sell`, `exchange.CancelOrder`, `exchange.ModifyOrder`, `exchange.GetOrder`, `exchange.GetOrders`, `exchange.GetHistoryOrders`, `exchange.CreateConditionOrder`, `exchange.ModifyConditionOrder`, `exchange.CancelConditionOrder`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`, `exchange.GetHistoryConditionOrders`.
 
-For all exchanges see `Capabilities`.
+For all exchanges see `Capability-Matrix`.
 
 **Notes**
 
