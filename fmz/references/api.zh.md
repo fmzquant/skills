@@ -6476,7 +6476,7 @@ fn main() {
 
 支持通过```side```参数传递附加参数（option），用于修改条件单的其它属性。附加参数需要与```side```参数合并传入，格式为```"side;{JSON对象}"```（推荐）或```"side;key=value"```（URL编码格式）。例如修改触发价格类型：```"buy;{\"newTpTriggerPxType\":\"index\"}"```。
 
-对于条件单的市价单修改，需要具体查看交易所API是否支持。将```condition```参数中的```TpOrderPrice```或```SlOrderPrice```设置为-1表示市价单。
+```condition```参数中的```TpOrderPrice```或```SlOrderPrice```设置为-1表示触发后以市价执行。能否通过修改在限价与市价之间切换取决于交易所：有些交易所（例如`Lighter`）不能改变限价/市价类型，限价条件单传-1或市价条件单传正数执行价格时报错，需要撤销后重新创建，具体见各交易所页。
 
 修改条件单时，条件单的其它属性（如条件类型、持仓模式、账户模式、杠杆等）通常会保留原条件单的设置。如需修改这些属性，可以通过附加参数（option）传入，前提是交易所API支持。
 
@@ -8312,23 +8312,50 @@ Parameters:
 
 Returns (string): ```exchange.Encode()```函数返回计算得到的哈希值编码。
 
-BitMEX仓位变化推送（wss协议）示例：
+Bybit v5私有WebSocket鉴权并订阅仓位推送（wss协议）示例：传入```key```时按HMAC计算，签名为```HMAC_SHA256(secretKey, "GET/realtime" + expires)```的hex编码，```expires```为毫秒时间戳；```"{{secretkey}}"```引用交易所对象中配置的```secretKey```（按字符串使用，所以```keyFormat```为```"string"```），策略代码中不出现明文密钥。
 
 ```javascript
 function main() {
-    var APIKEY = "your Access Key(Bitmex API ID)"
-    var expires = parseInt(Date.now() / 1000) + 10
-    var signature = exchange.Encode("sha256", "string", "hex", "GET/realtime" + expires, "hex", "{{secretkey}}")
-    var client = Dial("wss://www.bitmex.com/realtime", 60)
-    var auth = JSON.stringify({args: [APIKEY, expires, signature], op: "authKeyExpires"})
-    var pos = 0
-    client.write(auth)
-    client.write('{"op": "subscribe", "args": "position"}')
+    var APIKEY = "your Bybit API Key"
+    // expires为毫秒时间戳；签名 = HMAC_SHA256(secretKey, "GET/realtime" + expires)，hex编码
+    var expires = Date.now() + 10000
+    var signature = exchange.Encode("sha256", "string", "hex", "GET/realtime" + expires, "string", "{{secretkey}}")
+    var client = Dial("wss://stream.bybit.com/v5/private", 60)
+    if (!client) {
+        Log("连接失败")
+        return
+    }
+    client.write(JSON.stringify({op: "auth", args: [APIKEY, expires, signature]}))
+    client.write(JSON.stringify({op: "subscribe", args: ["position"]}))
+    var positions = {}
+    var lastPing = Date.now()
     while (true) {
-        var bitmexData = JSON.parse(client.read())
-        if(bitmexData.table == 'position' && pos != parseInt(bitmexData.data[0].currentQty)){
-            Log('position change', pos, parseInt(bitmexData.data[0].currentQty), '@')
-            pos = parseInt(bitmexData.data[0].currentQty)
+        // Bybit建议每20秒发送一次心跳
+        if (Date.now() - lastPing >= 20000) {
+            client.write(JSON.stringify({op: "ping"}))
+            lastPing = Date.now()
+        }
+        var buf = client.read(1000)
+        if (buf === "") {
+            break    // 连接已断开
+        }
+        if (!buf) {
+            continue
+        }
+        var msg = JSON.parse(buf)
+        if (msg.op == "auth" && !msg.success) {
+            Log("auth failed", msg.ret_msg)
+            break
+        }
+        if (msg.topic == "position") {
+            msg.data.forEach(function(p) {
+                var key = p.symbol + "/" + p.positionIdx
+                var now = p.side + " " + p.size
+                if (positions[key] !== now) {
+                    Log("position change", key, positions[key], "->", now, "@")
+                    positions[key] = now
+                }
+            })
         }
     }
 }
@@ -8338,19 +8365,91 @@ function main() {
 import time
 import json
 def main():
-    APIKEY = "your Access Key(Bitmex API ID)"
-    expires = int(time.time() + 10)
-    signature = exchange.Encode("sha256", "string", "hex", "GET/realtime" + str(expires), "hex", "{{secretkey}}")
-    client = Dial("wss://www.bitmex.com/realtime", 60)
-    auth = json.dumps({"args": [APIKEY, expires, signature], "op": "authKeyExpires"})
-    pos = 0
-    client.write(auth)
-    client.write('{"op": "subscribe", "args": "position"}')
+    APIKEY = "your Bybit API Key"
+    # expires为毫秒时间戳；签名 = HMAC_SHA256(secretKey, "GET/realtime" + expires)，hex编码
+    expires = int(time.time() * 1000) + 10000
+    signature = exchange.Encode("sha256", "string", "hex", "GET/realtime" + str(expires), "string", "{{secretkey}}")
+    client = Dial("wss://stream.bybit.com/v5/private", 60)
+    if not client:
+        Log("连接失败")
+        return
+    client.write(json.dumps({"op": "auth", "args": [APIKEY, expires, signature]}))
+    client.write(json.dumps({"op": "subscribe", "args": ["position"]}))
+    positions = {}
+    lastPing = time.time()
     while True:
-        bitmexData = json.loads(client.read())
-        if "table" in bitmexData and bitmexData["table"] == "position" and len(bitmexData["data"]) != 0 and pos != bitmexData["data"][0]["currentQty"]:
-            Log("position change", pos, bitmexData["data"][0]["currentQty"], "@")
-            pos = bitmexData["data"][0]["currentQty"]
+        # Bybit建议每20秒发送一次心跳
+        if time.time() - lastPing >= 20:
+            client.write(json.dumps({"op": "ping"}))
+            lastPing = time.time()
+        buf = client.read(1000)
+        if buf == "":
+            break    # 连接已断开
+        if not buf:
+            continue
+        msg = json.loads(buf)
+        if msg.get("op") == "auth" and not msg.get("success"):
+            Log("auth failed", msg.get("ret_msg"))
+            break
+        if msg.get("topic") == "position":
+            for p in msg["data"]:
+                key = "%s/%s" % (p["symbol"], p["positionIdx"])
+                now = p["side"] + " " + p["size"]
+                if positions.get(key) != now:
+                    Log("position change", key, positions.get(key), "->", now, "@")
+                    positions[key] = now
+```
+
+```rust
+use std::collections::HashMap;
+
+fn main() {
+    let apikey = "your Bybit API Key";
+    // expires为毫秒时间戳；签名 = HMAC_SHA256(secretKey, "GET/realtime" + expires)，hex编码
+    let expires = Unix() * 1000 + 10000;
+    let signature = exchange.Encode("sha256", "string", "hex", &format!("GET/realtime{}", expires), "string", "{{secretkey}}");
+    let mut client = Dial::new("wss://stream.bybit.com/v5/private", 60);
+    if !client.Valid() {
+        Log!("连接失败");
+        return;
+    }
+    // Rust SDK没有JSON序列化功能，用字符串拼接构造请求
+    client.write(&format!(r#"{{"op":"auth","args":["{}",{},"{}"]}}"#, apikey, expires, signature), 0);
+    client.write(r#"{"op":"subscribe","args":["position"]}"#, 0);
+    let mut positions: HashMap<String, String> = HashMap::new();
+    let mut last_ping = Unix();
+    while !client.IsClosed() {
+        // Bybit建议每20秒发送一次心跳
+        if Unix() - last_ping >= 20 {
+            client.write(r#"{"op":"ping"}"#, 0);
+            last_ping = Unix();
+        }
+        let buf = client.read(1000);
+        if buf == "" {
+            continue;
+        }
+        let msg = match JSONParse(&buf) {
+            Some(v) => v,
+            None => continue,
+        };
+        if msg["op"].as_str() == Some("auth") && msg["success"].as_bool() != Some(true) {
+            Log!("auth failed", msg["ret_msg"].as_str().unwrap_or(""));
+            break;
+        }
+        if msg["topic"].as_str() == Some("position") {
+            if let Some(arr) = msg["data"].as_array() {
+                for p in arr {
+                    let key = format!("{}/{}", p["symbol"].as_str().unwrap_or(""), p["positionIdx"].as_i64().unwrap_or(0));
+                    let now = format!("{} {}", p["side"].as_str().unwrap_or(""), p["size"].as_str().unwrap_or("0"));
+                    if positions.get(&key) != Some(&now) {
+                        Log!("position change", &key, &now, "@");
+                        positions.insert(key, now);
+                    }
+                }
+            }
+        }
+    }
+}
 ```
 
 仅实盘支持调用```exchange.Encode()```函数。```"{{accesskey}}"```、```"{{secretkey}}"```的引用方式仅在调用```exchange.Encode()```函数时有效。
@@ -8438,7 +8537,7 @@ fn main() {
 | 指令 | 交易所 |
 | - | - |
 | ```"abi"``` | `Web3` |
-| ```"accountId"``` | `Futures_Crypto` |
+| ```"accountId"``` | `Futures_Crypto`、`Poloniex` |
 | ```"accounts"``` | `Futures_Futu`、`Futures_IB` |
 | ```"accountType"``` | `Bybit`、`Futures_Bybit` |
 | ```"address"``` | `Uniswap`、`Jupiter`、`KyberSwap`、`OneInch`、`OKX_DEX`、`Web3` |
@@ -13588,6 +13687,44 @@ See also: `TA.MACD`, `TA.KDJ`, `TA.RSI`, `TA.ATR`, `TA.OBV`,  `TA.MA`, `TA.EMA`,
 
 均线与通道类指标（重叠研究）：移动平均、布林带、抛物线SAR等。
 
+##### talib.ACCBANDS
+
+```
+talib.ACCBANDS(inPriceHLC)
+talib.ACCBANDS(inPriceHLC, optInTimePeriod)
+```
+
+```talib.ACCBANDS()```函数用于计算**Acceleration Bands (加速带)**。
+
+Parameters:
+
+- `inPriceHLC` ({@struct/Record Record}结构数组, required): ```inPriceHLC```参数用于指定K线数据。
+- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置周期，默认值为20。
+
+Returns (array): ```talib.ACCBANDS()```函数的返回值为：二维数组。该数组包含三个元素分别是：上轨数组、中轨数组、下轨数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.ACCBANDS(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    upper, middle, lower = talib.ACCBANDS(records.High, records.Low, records.Close)
+    Log(upper, middle, lower)
+```
+
+```ACCBANDS()```函数在talib库文档中的描述为：```ACCBANDS(Records[High,Low,Close],Time Period = 20) = [Array(outRealUpperBand),Array(outRealMiddleBand),Array(outRealLowerBand)]```
+
+上轨为```High * (1 + 4 * (High - Low) / (High + Low))```的简单移动平均，中轨为收盘价的简单移动平均，下轨为```Low * (1 - 4 * (High - Low) / (High + Low))```的简单移动平均，周期都是```optInTimePeriod```。
+
+```Python```的TA-Lib从0.6版本（C库与Python包都要0.6及以上）开始提供此函数，旧版本调用会报属性不存在的错误。
+
 ##### talib.BBANDS
 
 ```
@@ -13833,6 +13970,57 @@ def main():
 ```
 
 ```MAMA()```函数在talib库文档中的描述为：```MAMA(Records[Close],Fast Limit = 0.5,Slow Limit = 0.05) = [Array(outMAMA),Array(outFAMA)]```
+
+##### talib.MAVP
+
+```
+talib.MAVP(inReal, inPeriods)
+talib.MAVP(inReal, inPeriods, optInMinPeriod)
+talib.MAVP(inReal, inPeriods, optInMinPeriod, optInMaxPeriod)
+talib.MAVP(inReal, inPeriods, optInMinPeriod, optInMaxPeriod, optInMAType)
+```
+
+```talib.MAVP()```函数用于计算**Moving Average with Variable Period (可变周期移动平均)**。
+
+Parameters:
+
+- `inReal` (数值数组, required): ```inReal```参数用于指定要计算均线的数据。
+- `inPeriods` (数值数组, required): ```inPeriods```参数用于指定每根K线使用的周期，长度必须与```inReal```相同；超出```[optInMinPeriod, optInMaxPeriod]```的值按边界计算。
+- `optInMinPeriod` (number, optional): ```optInMinPeriod```参数用于设置最小周期，默认值为2。
+- `optInMaxPeriod` (number, optional): ```optInMaxPeriod```参数用于设置最大周期，默认值为30。
+- `optInMAType` (number, optional): ```optInMAType```参数用于设置均线类型，默认值为0。
+
+Returns (array): ```talib.MAVP()```函数的返回值为：一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var closes = records.map(function(r) { return r.Close })
+    // 每根K线的周期：阳线用10，阴线用20（仅作示例）
+    var periods = records.map(function(r) { return r.Close > r.Open ? 10 : 20 })
+    var ret = talib.MAVP(closes, periods, 10, 20)
+    Log(ret)
+}
+```
+
+```python
+import talib
+import numpy as np
+def main():
+    records = exchange.GetRecords()
+    # 每根K线的周期：阳线用10，阴线用20（仅作示例）
+    periods = np.array([10.0 if r["Close"] > r["Open"] else 20.0 for r in records])
+    ret = talib.MAVP(records.Close, periods, 10, 20)
+    Log(ret)
+```
+
+```MAVP()```函数在talib库文档中的描述为：```MAVP(Array(inReal),Array(inPeriods),Min Period = 2,Max Period = 30,MA Type = 0) = Array(outReal)```
+
+第```i```个值是```inReal```截至第```i```个元素、周期为```inPeriods[i]```的移动平均；开头```optInMaxPeriod - 1```个值为```NaN```（与```inPeriods```的实际取值无关）。
+
+两个输入都必须是数值数组：```JavaScript```中先用```map```从K线中取出字段，传入K线数组时两个输入都会取同一份K线的收盘价，结果没有意义；两个数组长度不同会报错。```Python```中两个输入都要是```float64```类型的numpy数组。
+
+```optInMAType```的取值：0=SMA、1=EMA、2=WMA、3=DEMA、4=TEMA、5=TRIMA、6=KAMA、7=MAMA、8=T3。
 
 ##### talib.MIDPOINT
 
@@ -14469,6 +14657,44 @@ def main():
 ```
 
 ```DX()```函数在talib库文档中的描述为：```DX(Records[High,Low,Close],Time Period = 14) = Array(outReal)```
+
+##### talib.IMI
+
+```
+talib.IMI(inPriceOC)
+talib.IMI(inPriceOC, optInTimePeriod)
+```
+
+```talib.IMI()```函数用于计算**Intraday Momentum Index (日内动量指标)**。
+
+Parameters:
+
+- `inPriceOC` ({@struct/Record Record}结构数组, required): ```inPriceOC```参数用于指定K线数据。
+- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置周期，默认值为14。
+
+Returns (array): ```talib.IMI()```函数的返回值为：一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.IMI(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.IMI(records.Open, records.Close)
+    Log(ret)
+```
+
+```IMI()```函数在talib库文档中的描述为：```IMI(Records[Open,Close],Time Period = 14) = Array(outReal)```
+
+最近```optInTimePeriod```根K线中，阳线实体（```Close - Open```）之和占全部实体长度之和的百分比，取值0~100。
+
+```Python```的TA-Lib从0.6版本（C库与Python包都要0.6及以上）开始提供此函数，旧版本调用会报属性不存在的错误。
 
 ##### talib.MACD
 
@@ -15600,7 +15826,45 @@ def main():
 
 #### PriceTransform
 
-价格变换：平均价、中间价、典型价、加权收盘价。
+价格变换：平均价、中间价、典型价、加权收盘价，以及平均绝对偏差。
+
+##### talib.AVGDEV
+
+```
+talib.AVGDEV(inReal)
+talib.AVGDEV(inReal, optInTimePeriod)
+```
+
+```talib.AVGDEV()```函数用于计算**Average Deviation (平均绝对偏差)**。
+
+Parameters:
+
+- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
+- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置周期，默认值为14。
+
+Returns (array): ```talib.AVGDEV()```函数的返回值为：一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.AVGDEV(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.AVGDEV(records.Close)
+    Log(ret)
+```
+
+```AVGDEV()```函数在talib库文档中的描述为：```AVGDEV(Records[Close],Time Period = 14) = Array(outReal)```
+
+每个值是最近```optInTimePeriod```个数据与它们的平均值之差的绝对值的平均。
+
+```Python```的TA-Lib从0.6版本（C库与Python包都要0.6及以上）开始提供此函数，旧版本调用会报属性不存在的错误。
 
 ##### talib.AVGPRICE
 
@@ -16563,7 +16827,48 @@ def main():
 
 #### MathOperators
 
-数学运算：向量减法、乘法、除法，区间最大值、最小值及其位置、求和。
+数学运算：向量加法、减法、乘法、除法，区间最大值、最小值及其位置、求和。
+
+##### talib.ADD
+
+```
+talib.ADD(inReal0, inReal1)
+```
+
+```talib.ADD()```函数用于计算**Vector Arithmetic Add (向量加法)**。
+
+Parameters:
+
+- `inReal0` (数值数组, required): ```inReal0```参数用于指定第一组数据。
+- `inReal1` (数值数组, required): ```inReal1```参数用于指定第二组数据，长度必须与```inReal0```相同。
+
+Returns (array): ```talib.ADD()```函数的返回值为：一维数组。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    // 最高价加最低价
+    var highs = records.map(function(r) { return r.High })
+    var lows = records.map(function(r) { return r.Low })
+    var ret = talib.ADD(highs, lows)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    # 最高价加最低价
+    ret = talib.ADD(records.High, records.Low)
+    Log(ret)
+```
+
+```ADD()```函数在talib库文档中的描述为：```ADD(Array(inReal0),Array(inReal1)) = Array(outReal)```
+
+逐个元素计算```inReal0[i] + inReal1[i]```。
+
+```JavaScript```中两个输入都要传数值数组（可先用```map```从K线中取出字段）：传入K线数组时两个输入都会取同一份K线的收盘价，结果没有意义；两个数组长度不同会报错。
 
 ##### talib.DIV
 
@@ -21030,7 +21335,7 @@ See also: `LOG_TYPE_BUY`, `LOG_TYPE_SELL`
 **不传```symbol```或传空字符串```""```时的缺省范围：**
 
 - 现货交易所对象：查询全部品种。
-- 加密货币期货交易所对象：查询「当前计价币种 + 当前合约所属的合约类型」。当前合约是期权时为```option```；是```swap_pf```时为```swap_pf```；以```_ff```结尾时为```futures_ff```；其它含```swap```的为```swap```，否则为```futures```；没有设置合约时按```swap```。例如当前品种为```BTC_USDT.swap```时等价于传```"USDT.swap"```，为```BTC_USD.quarter```时等价于传```"USD.futures"```。
+- 加密货币期货交易所对象：查询「当前计价币种 + 当前合约所属的合约类型」。当前合约是组合合约（合约代码含英文逗号，如```quarter,swap```，或为Deribit原生组合代码，如```BTC-FS-26DEC25_PERP```）时为```futures_combo```；是期权时为```option```；是```swap_pf```时为```swap_pf```；以```_ff```结尾时为```futures_ff```；其它含```swap```的为```swap```，否则为```futures```；没有设置合约时按```swap```。例如当前品种为```BTC_USDT.swap```时等价于传```"USDT.swap"```，为```BTC_USD.quarter```时等价于传```"USD.futures"```，为```BTC_USD.quarter,swap```时等价于传```"USD.futures_combo"```。
 - 没有「计价币种 + 合约类型」划分的期货交易所对象（```Futures_CTP```、```Futures_Futu```、```Futures_IB```、```Futures_Polymarket```）：查询全部品种。
 - 少数交易所的查询接口必须指定品种，这些交易所上```GetOrders```、```GetConditionOrders```不传```symbol```时只查询当前交易对。
 
@@ -21673,13 +21978,14 @@ Backpack只有永续合约，其它合约代码都会报错。
 
 全部交易所对象
 
+- 客户端订单号```clientId```必须是0～4294967295之间的整数，其它值报错，订单不会发出。
 - ```exchange.GetTickers()```的批量行情没有盘口，```Buy```、```Sell```取最新成交价；需要真实买一、卖一时用```exchange.GetTicker()```。
 - 条件单只支持止盈、止损单，不支持OCO；Backpack的触发单不区分止盈、止损，查询时按触发价与当前最新价的关系判定类型。委托价为0时触发后以市价成交。不支持修改条件单，需要先撤销再重新创建。
 - ```exchange.GetHistoryOrders()```、```exchange.GetHistoryConditionOrders()```只能按单个品种查询，不支持```since```参数（交易所的历史订单接口没有时间范围），传入大于0的```since```或空字符串品种会报错。
 
 ```Backpack```（现货）
 
-- 市价买单的下单量是要花费的计价币金额（按Backpack的```quoteQuantity```下单），市价卖单为交易币数量。
+- 市价买单的下单量是要花费的计价币金额（按Backpack的```quoteQuantity```下单），市价卖单为交易币数量。按计价币金额下的市价买单在订单查询中没有委托价，```Price```为0。
 - ```exchange.GetAccount()```、```exchange.GetAssets()```只统计可用与冻结数量，不包含质押中的数量。
 
 ```Futures_Backpack```（期货）
@@ -21958,6 +22264,7 @@ Bitfinex只有永续合约，其它合约代码会报错。
 全部交易所对象
 
 - 条件单只支持止盈、止损单，不支持OCO。
+- 下单的```clientId```只接受正整数（Bitfinex的```cid```），其它值报错。限价单支持```tif```的IOC、FOK与只做Maker（```postOnly```）；市价单不支持FOK与只做Maker，条件单不支持IOC、FOK，传入时报错。
 
 ```Bitfinex```（现货）
 
@@ -22403,7 +22710,7 @@ Coincheck（日本）现货。
 
 **注意事项**
 
-- 下单不支持```tif```（IOC、FOK）与只做Maker（```postOnly```）选项。
+- 下单支持只做Maker（```postOnly```，仅限价单），不支持```tif```（IOC、FOK）选项，传入时报错。
 - 条件单通过Coincheck下单接口的```stop_loss_rate```（触发价）实现，支持止盈、止损（不填委托价为触发后市价成交），不支持OCO；撤销条件单与撤销普通订单使用同一接口。
 - ```exchange.GetConditionOrders()```不传```symbol```参数时，无法按现价区分条件单是止盈还是止损，返回的条件单类型为通用类型。
 
@@ -22447,7 +22754,7 @@ Coinone（韩国）现货，KRW市场。
 **注意事项**
 
 - ```exchange.GetTickers()```返回KRW市场全部交易对的行情。
-- 下单支持只做Maker（```postOnly```），不支持```tif```（IOC、FOK）选项。
+- 下单支持只做Maker（```postOnly```，仅限价单），不支持```tif```（IOC、FOK）选项，传入时报错。
 - 条件单使用Coinone的```STOP_LIMIT```订单，支持止盈、止损，必须填写触发后的委托价（不支持触发后市价成交），不支持OCO；撤销条件单与撤销普通订单使用同一接口。
 - ```exchange.GetOrders()```返回的未完成订单包含未触发的条件单（```STOP_LIMIT```）。
 - 交易所的已完成订单不带订单类型，无法查询历史条件单。
@@ -22606,7 +22913,7 @@ Crypto.com Exchange衍生品：永续合约与交割合约。账户中的代币�
 
 不可用的通用合约代码：```this_week```、```next_week```、```quarter```、```next_quarter```。
 
-交割合约以到期月份的英文名为合约代码，例如交易对```BTC_USD```、合约代码```October```。`exchange.GetMarkets`中的交割合约也以月份名为合约代码，```exchange.SetContractType()```按它校验，因此```this_week```、```next_week```、```quarter```、```next_quarter```不能用作合约代码。
+交割合约以到期月份的英文名为合约代码，例如交易对```BTC_USD```、合约代码```October```，指最近一个该月份里到期最晚的交割合约（月度合约）。同月如果还有其它交割合约（例如周度合约），它们以原生合约代码为合约代码，例如```BTC_USD.BTCUSD-261009```。`exchange.GetMarkets`中的交割合约也按这一规则命名，每张合约只出现一次，```exchange.SetContractType()```按它校验，因此```this_week```、```next_week```、```quarter```、```next_quarter```不能用作合约代码。
 
 原生合约代码示例：```BTCUSD-261030```
 
@@ -22659,7 +22966,7 @@ Crypto.com Exchange衍生品：永续合约与交割合约。账户中的代币�
 
 ```Futures_Crypto```（期货）
 
-- `exchange.GetFundings`不支持批量查询，需要传入具体的永续合约品种代码，例如```BTC_USD.swap```。
+- `exchange.GetFundings`不支持批量查询，不传参数或传入范围（如```USD.swap```）时报错并返回空值，需要传入具体的永续合约品种代码，例如```BTC_USD.swap```。
 
 #### DeepCoin
 
@@ -22757,7 +23064,7 @@ DeepCoin只有永续合约，其它合约代码会报错。下单数量单位为
 
 - 不支持改单（```exchange.ModifyOrder()```），需要先撤单再重新下单；未触发的条件单可以用```exchange.ModifyConditionOrder()```修改。
 - 条件单只支持止盈、止损单，不支持OCO（需要分成止盈、止损两张条件单下单）。
-- ```exchange.GetOrders()```、```exchange.GetConditionOrders()```必须传入具体交易对（例如```"BTC_USDT"```），不传或传空字符串时报错。
+- ```exchange.GetOrders()```、```exchange.GetConditionOrders()```只能按交易对查询：不传或传空字符串时查询当前交易对。
 
 ```Futures_DeepCoin```（期货）
 
@@ -22803,7 +23110,7 @@ Deribit的币本位（反向）永续与交割合约、USDC线性永续与交割
 
 交割合约代码不在本地按日期推算，而是按Deribit合约列表的到期周期（日、周、月）和到期时间排序选取（列表缓存10分钟）；该周期没有挂出对应序号的合约时报错。
 
-差价组合合约（future_combo）写成「远期,近期」两个代码，以英文逗号分隔，例如```"quarter,swap"```、```"next_week,swap"```、```"next_quarter,this_week"```、```"month,next_week"```；远期一腿必须是交割代码，近期一腿可以是交割代码或```swap```，对应Deribit的```BTC-FS-25DEC26_PERP```一类组合合约。组合合约只用于币本位交易对（```BTC_USD```、```ETH_USD```）。
+差价组合合约（future_combo）写成「远期,近期」两个代码，以英文逗号分隔，例如```"quarter,swap"```、```"next_week,swap"```、```"next_quarter,this_week"```、```"month,next_week"```；远期一腿必须是交割代码，近期一腿可以是交割代码或```swap```，对应Deribit的```BTC-FS-25DEC26_PERP```一类组合合约。组合合约只用于币本位交易对（```BTC_USD```、```ETH_USD```），在USDC等线性交易对上写组合代码会报错。
 
 原生合约代码示例：```BTC-30JUL26```、```BTC_USDC-30JUL26```、```BTC-FS-25DEC26_PERP```
 
@@ -22849,10 +23156,10 @@ Deribit的币本位（反向）永续与交割合约、USDC线性永续与交割
 **注意事项**
 
 - 下单量单位：币本位（反向）合约是USD金额（```BTC-PERPETUAL```最小10且为10的倍数），USDC线性合约与期权是币数。```exchange.GetMarkets()```的```CtVal```恒为1，最小下单量与精度以```MinQty```、```AmountPrecision```为准。
-- ```exchange.GetFundings()```必须传入具体的永续合约品种（如```BTC_USD.swap```），不传参数或传交割合约会报错；结果只有当前一条，费率取Deribit按8小时折算的```current_interest```。
+- ```exchange.GetFundings()```传具体永续合约品种（如```BTC_USD.swap```）返回该合约当前一条；不传参数时按当前合约的计价币查询该计价币的全部永续（如```USD.swap```为BTC、ETH币本位永续，```USDC.swap```为全部USDC线性永续），也可直接传这类范围。费率取Deribit按8小时折算的```current_interest```。Deribit没有批量资金费率接口，范围查询每个永续发一次请求，```USDC.swap```有一百多个永续、耗时十几秒，频繁调用请传具体品种。交割合约、期权与组合合约没有资金费率，传入会报错。
 - 条件单只支持止盈、止损单，不支持OCO；支持```exchange.ModifyConditionOrder()```。触发价默认按最新成交价，可在附加参数中传```trigger```（```mark_price```、```index_price```）改用标记价格或指数价格。
 - ```exchange.GetHistoryOrders()```、```exchange.GetHistoryConditionOrders()```按品种查询，不支持```since```参数（传了会报错），返回最近的记录。
-- 范围查询```USD.swap```、```USD.futures```等的```USD```覆盖BTC、ETH币本位合约；差价组合合约的范围是```USD.futures_combo```。
+- 范围查询```USD.swap```、```USD.futures```等的```USD```覆盖BTC、ETH币本位合约；差价组合合约的范围是```USD.futures_combo```。当前合约为组合合约时，不传参数默认```USD.futures_combo```（含以原生代码返回的远月组合）；```USD.futures```不含组合合约。
 
 #### DigiFinex
 
@@ -23162,7 +23469,7 @@ HashKey现货（接口地址```https://api-pro.hashkey.com```）。
 
 **注意事项**
 
-- 限价单支持IOC、FOK，不支持只做Maker（```postOnly```）。
+- 限价单支持IOC、FOK与只做Maker（```postOnly```，对应HashKey的```LIMIT_MAKER```）；市价单不支持只做Maker与FOK，传入时报错。
 
 #### HitBTC
 
@@ -23490,12 +23797,14 @@ Kraken只挂月度和季度交割合约，```this_week```、```month```都指最
 
 - 现货市价买单的下单量是交易币数（Kraken的```volume```），不是计价币金额。
 - 条件单只支持止盈、止损单，不支持OCO。
+- 下单支持```tif```的IOC与只做Maker（```postOnly```，仅限价委托），不支持FOK，传入时报错。
 
 ```Futures_Kraken```（期货）
 
 - 下单量为Kraken的合约数量：反向合约每张1 USD，多币种抵押合约以标的币数计（见`exchange.GetMarkets`的```CtVal```、```CtValCcy```）。
 - Kraken的资金费率原始值是每张合约的绝对金额，```exchange.GetFundings()```已换算为相对费率；永续合约每小时结算一次。
 - 条件单只支持止盈、止损单，不支持OCO；条件单以最新成交价触发。
+- 限价单支持```tif```的IOC与只做Maker（```postOnly```），不支持FOK；市价单与条件单不支持这些选项，传入时报错。
 
 #### 库币
 
@@ -23604,6 +23913,7 @@ KuCoin合约：USDT、USDC保证金永续合约，币本位永续与交割合约
 ```Futures_KuCoin```（期货）
 
 - 下单量为合约张数，必须是正整数。
+- 限价单支持```tif```的IOC与只做Maker（```postOnly```），不支持FOK；市价单不支持这些选项，传入时报错。
 - 条件单只支持止盈、止损单，不支持OCO（KuCoin合约没有OCO接口）；条件单以最新成交价触发。
 
 #### LBank
@@ -23645,7 +23955,7 @@ LBank现货。
 
 **注意事项**
 
-- 下单支持只做Maker（```postOnly```），不支持```tif```（IOC、FOK）选项。
+- 限价单支持只做Maker（```postOnly```）与```tif```（IOC、FOK）选项；市价单不支持这些选项，传入时报错。
 - 查询未完成订单的接口必须指定交易对：```exchange.GetOrders()```不传```symbol```参数时只查询当前交易对。
 - ```exchange.GetHistoryOrders()```不支持```since```参数（交易所接口不按时间过滤），传入时报错；不传时返回最近的订单。
 - ```exchange.GetTickers()```同时包含现货与杠杆代币（ETF）交易对的行情。
@@ -23911,7 +24221,11 @@ Poloniex现货（SPOT账户）。
 
 **专属IO指令**
 
-没有专属指令，通用指令见`exchange.IO`。
+| 指令 | 参数 | 说明 | 返回值 |
+| - | - | - | - |
+| ```"accountId"``` | string | 指定`exchange.GetAccount`读取的现货账户ID：设置后只读这个现货账户，找不到该账户时报错；传空字符串恢复默认（读取第一个现货账户）。不影响`exchange.GetAssets`，它总是汇总全部现货账户。 | 空值。 |
+
+通用指令```api```、```base```、```currency```见`exchange.IO`。
 
 **不支持与合成的函数**
 
@@ -23927,7 +24241,7 @@ Poloniex现货（SPOT账户）。
 
 - 限价单支持IOC、FOK与只做Maker（```postOnly```）。
 - 现货条件单只支持止损（```ORDER_CONDITION_TYPE_SL```）：买单在价格涨到触发价时触发，卖单在价格跌到触发价时触发。止盈（```ORDER_CONDITION_TYPE_TP```）和OCO条件单会直接报错，不会下单。不填委托价为触发后市价成交。
-- ```exchange.GetAccount()```、```exchange.GetAssets()```汇总所有SPOT账户的资产。
+- ```exchange.GetAccount()```只读一个SPOT账户：```exchange.IO("accountId", id)```指定的账户，未指定时为第一个SPOT账户；```exchange.GetAssets()```汇总所有SPOT账户的资产。
 
 #### Upbit
 
@@ -24123,7 +24437,7 @@ WOO X只有永续合约，其它合约代码会报错。下单数量单位为基
 | 指令 | 参数 | 说明 |
 | - | - | - |
 | ```"cross"``` | bool | 全仓（true）/逐仓（false），只修改本地设置，不发请求，之后的下单、条件单和```exchange.SetMarginLevel()```随请求带上；默认全仓。 |
-| ```"dual"``` | bool | 双向（true）/单向（false）持仓，向交易所发出设置请求（```POST /v1/client/position_mode```），成功后连接器按双向持仓下单（带```position_side```）。 |
+| ```"dual"``` | bool | 双向（true）/单向（false）持仓，向交易所发出设置请求（```POST /v1/client/position_mode```），成功后连接器按双向持仓下单（普通单和条件单都带持仓方向）。 |
 
 通用指令```api```、```base```、```currency```见`exchange.IO`。
 
@@ -24161,12 +24475,11 @@ WOO X只有永续合约，其它合约代码会报错。下单数量单位为基
 
 - WOO X现货没有24小时行情接口，```exchange.GetTicker()```由最近24根1小时K线（开高低价、成交量）和盘口（买一、卖一价）拼成，每次调用请求两个接口。
 - 条件单支持止盈、止损和OCO；```exchange.ModifyConditionOrder()```只能修改止盈、止损单，不能修改OCO条件单。
-- ```exchange.GetConditionOrders()```必须传入具体交易对（例如```"BTC_USDT"```），不传或传空字符串时报错。
+- ```exchange.GetConditionOrders()```只能按交易对查询：不传或传空字符串时查询当前交易对。
 
 ```Futures_WOO```（期货）
 
 - 条件单支持止盈、止损和OCO，触发价类型固定为```MARKET_PRICE```；```exchange.ModifyConditionOrder()```只能修改止盈、止损单，不能修改OCO条件单。
-- 双向持仓下创建条件单时连接器不会自动带持仓方向，需要在附加参数中传```positionSide```（```LONG```/```SHORT```）。
 
 #### Zaif
 
@@ -24299,7 +24612,7 @@ HIP-4 Outcome品种的交易对为市场名称（空格、```/```换成```-```�
 | ```"vaultAddress"``` | address | 以金库或子账户的身份下单、撤单、改单、设置杠杆（地址进入签名与请求体），空字符串取消。查询仍使用钱包地址，查询金库的账户与持仓需要同时用```walletAddress```设置为金库地址。 | 设置的地址。 |
 | ```"expiresAfter"``` | timestamp | 设置之后所有签名动作（下单、撤单、改单、设置杠杆等）携带的```expiresAfter```：毫秒级Unix时间戳，超过这个时间交易所拒绝该动作；0取消（默认）。设置值一直生效，过期后的动作都会被拒绝，需要重新设置或改回0。 | 设置的值。 |
 | ```"source"``` | "a" \| "b" | 签名使用的网络：```"a"```为主网（默认），```"b"```为测试网。影响交易类动作Agent签名的```source```字段，以及转账类动作（```usdSend```、```withdraw3```、```usdClassTransfer```等）EIP-712签名的chainId（主网Arbitrum 42161，测试网Arbitrum Sepolia 421614）。不改变接口地址，连接测试网还需要用```exchange.IO("base", "https://api.hyperliquid-testnet.xyz")```切换；测试网没有HIP-3，范围查询只查主dex。 | 设置的值。 |
-| ```"split"``` | symbol, amount | HIP-4 Outcome拆分（```splitOutcome```动作）：按```amount```为```symbol```所属的Outcome拆分出各结果方的头寸。```symbol```为Outcome品种代码（如```BTC-above-100k---Dec_USD.Yes```），```amount```必须大于0。 | 交易所的原始应答（```status```为```ok```）。 |
+| ```"split"``` | symbol, amount | HIP-4 Outcome拆分（```splitOutcome```动作）：按```amount```为```symbol```所属的Outcome拆分出各结果方的头寸。```symbol```为Outcome品种代码（如```BTC-above-100k---Dec_USD.Yes```），写法与行情、下单相同：同名市场写带```-市场编号```的代码（如```Recurring-1399_USD.Yes```），只写名称报歧义错误；```merge```、```mergeQuestion```、```negate```的```symbol```同此规则。```amount```必须大于0。 | 交易所的原始应答（```status```为```ok```）。 |
 | ```"merge"``` | symbol[, amount] | HIP-4 Outcome合并（```mergeOutcome```动作）：把```symbol```所属Outcome各结果方的头寸合并回去，```amount```可省略。 | 交易所的原始应答（```status```为```ok```）。 |
 | ```"mergeQuestion"``` | symbol[, amount] | HIP-4按问题合并（```mergeQuestion```动作）：对```symbol```所属Outcome所在的问题（question）做合并，```amount```可省略。该Outcome不属于任何问题时报错。 | 交易所的原始应答（```status```为```ok```）。 |
 | ```"negate"``` | symbol, amount | HIP-4取反（```negateOutcome```动作）：在```symbol```所属的问题中对该Outcome做取反转换，```amount```必须大于0。该Outcome不属于任何问题时报错。 | 交易所的原始应答（```status```为```ok```）。 |
@@ -24390,7 +24703,7 @@ Lighter只有永续合约，```swap```以外的合约代码会报错。
 
 | 指令 | 参数 | 说明 | 返回值 |
 | - | - | - | - |
-| ```"cross"``` | bool[, symbol] | 全仓（true）/逐仓（false），不传```symbol```时作用于当前合约。Lighter的保证金模式与杠杆在同一笔链上交易里设置，这笔交易同时写入本次运行中该品种最近一次设置的杠杆（来自```exchange.SetMarginLevel()```或上一次```exchange.IO("cross", ...)```）；该品种没有设置过时按20倍写入，所以要先对同一品种调用```exchange.SetMarginLevel()```再切换保证金模式。 | ```{symbol, leverage, marginMode, initialMarginFraction, txHash, ok}```，```txHash```为这笔链上交易的哈希。 |
+| ```"cross"``` | bool[, symbol] | 全仓（true）/逐仓（false），不传```symbol```时作用于当前合约。Lighter的保证金模式与杠杆在同一笔链上交易里设置，这笔交易同时写入该品种当前的杠杆（先读交易所账户数据中该品种的设置；本次运行60秒内刚设置过的以刚设置的为准；都没有时取该市场的缺省杠杆）。 | ```{symbol, leverage, marginMode, initialMarginFraction, txHash, ok}```，```txHash```为这笔链上交易的哈希。 |
 | ```"expiry"``` | number | 之后所下限价单和条件单的存活时长（毫秒，必须大于0），默认29天（交易所允许的上限）；订单的过期时间为下单时刻加10分钟再加该时长。市价单不受影响。 | ```true``` |
 | ```"api"``` | method, path[, params[, raw]] | 直接调用Lighter接口，只支持```GET```、```POST```。默认附带用API密钥私钥生成的鉴权令牌（需要填写私钥与账户索引）；签名参数传```false```时不带令牌，只能用于公开```GET```接口。```raw```不是请求体而是参数表（JSON对象或```a=1&b=2```），非空时整体替换```params```；```GET```编入查询串，```POST```编成表单。不会替调用方签名L2交易。 | 交易所的原始应答；应答```code```不是200时报错。 |
 
@@ -24408,7 +24721,7 @@ Lighter只有永续合约，```swap```以外的合约代码会报错。
 
 **保证金、账户与模拟盘**
 
-保证金模式：用```exchange.IO("cross", bool)```按合约切换全仓/逐仓，用```exchange.SetMarginLevel()```设置杠杆。两者在Lighter是同一笔链上交易（UpdateLeverage），每次调用都会发出一笔交易，并且总是同时写入杠杆和保证金模式：```exchange.SetMarginLevel()```写入本次运行中该品种最近一次设置的保证金模式，没有设置过时按全仓写入（交易所上原为逐仓的品种会被改回全仓）；```exchange.IO("cross", ...)```写入该品种最近一次设置的杠杆，没有设置过时为20倍。这些记录按品种保存，只在本次运行内有效，不会读取交易所当前的设置作为缺省值。持仓的```MarginLevel```由交易所持仓数据中的初始保证金率换算。
+保证金模式：用```exchange.IO("cross", bool)```按合约切换全仓/逐仓，用```exchange.SetMarginLevel()```设置杠杆。两者在Lighter是同一笔链上交易（UpdateLeverage），每次调用都会发出一笔交易，并且总是同时写入杠杆和保证金模式，另一项保持该品种当前的值：```exchange.SetMarginLevel()```保留当前保证金模式，```exchange.IO("cross", ...)```保留当前杠杆。当前值读取交易所账户数据中该品种的设置（没有持仓的品种也有）；本次运行60秒内刚设置过的以刚设置的为准（交易所数据更新有延迟）；都没有时为该市场的缺省杠杆、全仓。```exchange.SetMarginLevel()```也可在附加参数中传```{marginMode: "isolated"}```（或```"cross"```）同时指定保证金模式。持仓的```MarginLevel```由交易所持仓数据中的初始保证金率换算。
 
 持仓模式：单向（净）持仓，不支持双向持仓。
 
@@ -24425,11 +24738,11 @@ Lighter只有永续合约，```swap```以外的合约代码会报错。
 | exchange.GetDepth() | 交易所返回逐笔挂单，每笔挂单单独成一档、不按价格合并，同一价格可能出现多档 |
 | exchange.GetFundings() | ```Rate```为交易所费率除以8（每小时费率），```Interval```为1小时，```Time```为下一个整点 |
 | exchange.CreateOrder() | 限价单支持GTC（按```exchange.IO("expiry", ...)```的存活时长挂单）、IOC和只做Maker，不支持FOK。市价单是以下单时对手一价为限价的IOC单（买单不高于卖一、卖单不低于买一），没有额外滑点，对手一价上的挂单量不足时剩余部分撤销 |
-| exchange.CreateConditionOrder() | 只支持止盈、止损，不支持OCO。带委托价时为限价条件单；委托价为-1（市价）时以下单时刻的对手一价作为价格保护 |
+| exchange.CreateConditionOrder() | 只支持止盈、止损，不支持OCO。带委托价时为限价条件单；委托价为-1（市价）时触发后按市价成交（IOC），最差成交价为触发价±5%（买单上浮、卖单下浮），可在附加参数中用```{slippage: 0.1}```调整 |
 | exchange.ModifyOrder() | 原地改单，订单ID不变；不传的价格或数量沿用原值 |
 | exchange.GetOrders()、exchange.GetConditionOrders() | 交易所接口必须指定品种：不传或传空字符串时只查当前品种。```GetOrders```只返回限价、市价单，```GetConditionOrders```只返回止盈止损单（TWAP等其它类型不出现在两者中）；不支持```USDC.swap```这类范围参数 |
 | exchange.GetOrder() | 只在挂单和该品种最近100条历史订单中查找，更早的订单返回空值 |
-| exchange.ModifyConditionOrder() | 原地修改数量、触发价和委托价，订单ID不变 |
+| exchange.ModifyConditionOrder() | 原地修改数量、触发价和委托价，订单ID不变。不能改变限价/市价类型：限价条件单传委托价-1、市价条件单传正数委托价时报错，需要撤销后重新创建；市价条件单的最差成交价按新的触发价重新计算 |
 | exchange.GetHistoryOrders()、exchange.GetHistoryConditionOrders() | 交易所接口必须指定品种：不传时查当前品种，传空字符串或范围报错；不支持```since```参数，传入时报错；不传```limit```时分别返回最近100条、500条 |
 
 #### edgeX
@@ -24495,7 +24808,7 @@ edgeX只有永续合约，```swap```以外的合约代码会报错。
 | 函数 | Futures_EdgeX的行为 |
 | - | - |
 | exchange.GetTicker() | 行情接口不含买一、卖一，每次调用另取一次盘口填写（共两次请求），盘口请求失败时整个调用失败 |
-| exchange.GetFundings() | 必须传入品种（如```BTC_USDC.swap```），不传时报错并返回空值。```Rate```为交易所的预测费率（下一期），```Time```为下一次结算时间 |
+| exchange.GetFundings() | 传入品种（如```BTC_USDC.swap```）返回该合约一条；不传参数时查询当前计价币的全部可交易永续（如```USDC.swap```，也可直接传这类范围）。edgeX没有批量资金费率接口，范围查询每个合约发一次请求，一百多个合约耗时十几秒，频繁调用请传具体品种。```Rate```为交易所的预测费率（下一期），```Time```为下一次结算时间 |
 | exchange.CreateOrder() | 下单数量以币为单位（1张=1个币）。限价单支持GTC、IOC、FOK和只做Maker；市价单默认为IOC，不能设为只做Maker，并按预言机价格限定成交价格：买单不高于其1.2倍，卖单不低于其0.8倍 |
 | exchange.CreateConditionOrder() | 只支持止盈、止损，不支持OCO（止盈、止损分两张下），按最新成交价触发；委托价为-1（市价）时触发后按市价成交，价格界限按创建时的预言机价格计算。修改条件单需要先撤销再重新创建 |
 | exchange.GetOrders()、exchange.GetConditionOrders() | 不传品种时返回所有合约的挂单。条件单与普通单在同一张订单表里，未触发的条件单也会出现在```exchange.GetOrders()```的结果中 |
@@ -24618,10 +24931,6 @@ Aster永续合约（接口地址```https://fapi.asterdex.com```，币安U本位�
 
 **注意事项**
 
-全部交易所对象
-
-- 条件单只支持止盈、止损单，不支持OCO，需要时分别创建止盈单和止损单；不支持修改条件单（```exchange.ModifyConditionOrder()```），需要先撤销再重新创建。
-
 ```Aster```（现货）、```Futures_Aster```（期货）
 
 - 用```exchange.IO("base", url)```切换到地址中含```testnet```的测试网时，签名自动改用测试网的链ID。
@@ -24629,11 +24938,13 @@ Aster永续合约（接口地址```https://fapi.asterdex.com```，币安U本位�
 ```Futures_ApolloX```（期货）、```Futures_Aster```（期货）
 
 - 下单量是交易币数量（合约面值为1个交易币），市价买单同样按交易币数量下单。
+- 条件单只支持止盈、止损单，不支持OCO，需要时分别创建止盈单和止损单；不支持修改条件单（```exchange.ModifyConditionOrder()```），需要先撤销再重新创建。
 - ```exchange.GetHistoryOrders()```、```exchange.GetHistoryConditionOrders()```必须指定合约。
 
 ```Aster```（现货）
 
 - 市价买单的下单量是计价币金额（按Aster的```quoteOrderQty```下单），市价卖单是交易币数量。条件单不论买卖，数量一律是交易币数量。
+- 条件单只支持止盈、止损单，不支持OCO，需要时分别创建止盈单和止损单；不支持修改条件单（```exchange.ModifyConditionOrder()```），需要先撤销再重新创建。```exchange.GetConditionOrder()```传入普通订单的编号时报错（该订单不是条件单）。
 - ```exchange.GetHistoryOrders()```、```exchange.GetHistoryConditionOrders()```必须指定交易对。
 
 #### Aevo
@@ -24686,7 +24997,7 @@ Aevo没有交割合约，除```swap```与期权代码外的合约代码都会报
 
 **保证金、账户与模拟盘**
 
-保证金模式：Aevo是统一保证金账户，没有全仓/逐仓切换指令，```exchange.GetPositions()```的保证金模式恒为全仓。```exchange.SetMarginLevel()```按永续合约设置杠杆，期权不支持。
+保证金模式：Aevo是统一保证金账户，没有全仓/逐仓切换指令；```exchange.GetPositions()```的保证金模式按交易所返回（持仓的```margin_type```，缺省时取账户里该合约的设置），没有逐合约设置的期权持仓为全仓。```exchange.SetMarginLevel()```按永续合约设置杠杆，期权不支持。
 
 持仓模式：只有单向（净）持仓，没有双向持仓。平仓单（```closebuy```、```closesell```）以只减仓（reduce-only）方式下单。
 
@@ -24708,7 +25019,7 @@ Aevo没有交割合约，除```swap```与期权代码外的合约代码都会报
 **注意事项**
 
 - 只支持限价单，市价单报错；条件单（止盈、止损）的委托价必须是限价，不支持市价止盈止损和OCO。
-- ```exchange.ModifyOrder()```、```exchange.ModifyConditionOrder()```由交易所重新签发订单，返回新的订单号，此后应使用新订单号；```exchange.ModifyOrder()```改单后的订单不再是只减仓（reduce-only）订单。
+- ```exchange.ModifyOrder()```、```exchange.ModifyConditionOrder()```由交易所重新签发订单，返回新的订单号，此后应使用新订单号；```exchange.ModifyOrder()```沿用原订单的只减仓（reduce-only）属性。
 - 永续合约```exchange.GetTicker()```的```Last```为标记价格、```Open```为24小时前的标记价格，没有最高价、最低价（```High```、```Low```为0），```Volume```为24小时成交张数。
 - 资金费率每小时结算一次；```exchange.GetFundings()```只返回永续合约。
 - ```exchange.GetHistoryOrders()```、```exchange.GetHistoryConditionOrders()```只能按单个品种查询，传空字符串（查询全部品种）会报错。
@@ -25878,7 +26189,7 @@ Polymarket是Polygon链上的预测市场。交易所对象通过Polymarket的CL
 | ```Up``` | 涨跌类市场（如加密货币短周期涨跌）的结果选项，另一个是```Down```。 |
 | ```Down``` | 涨跌类市场的结果选项。 |
 
-预测市场没有永续、交割之分，也没有默认合约：合约代码就是市场的结果选项名称，每个市场恰好两个选项（体育等市场的选项可能是队名）。选项名中的空格换成```-```（例如选项「Donald Trump」写作```Donald-Trump```），完整品种代码形如```will-btc-100k_USDC.Yes```。选项名本身含```-```或```.```的市场（例如选项「Non-Fed」）目前无法下单和查询。下单、行情按选项名不区分大小写匹配，但```exchange.GetPositions()```按品种代码精确比较、赎回按持仓的品种代码匹配，所以请照搬```exchange.GetMarkets()```、```exchange.GetPositions()```返回的写法。
+预测市场没有永续、交割之分，也没有默认合约：合约代码就是市场的结果选项名称，每个市场恰好两个选项（体育等市场的选项可能是队名）。选项名中的空格换成```-```（例如选项「Donald Trump」写作```Donald-Trump```），完整品种代码形如```will-btc-100k_USDC.Yes```。选项名本身含```-```或```.```也照写（例如选项「Non-Fed」写作```Non-Fed```、「U.S. Fed」写作```U.S.-Fed```）。下单、行情按选项名不区分大小写匹配，但```exchange.GetPositions()```按品种代码精确比较、赎回按持仓的品种代码匹配，所以请照搬```exchange.GetMarkets()```、```exchange.GetPositions()```返回的写法。
 
 ```exchange.SetContractType()```只检查形式（不能为空、不能含空白和```.```），```swap```等写法不会当场报错，而是在之后的调用中报「outcome not found」。
 
@@ -25891,13 +26202,13 @@ Polymarket是Polygon链上的预测市场。交易所对象通过Polymarket的CL
 | 指令 | 参数 | 说明 | 返回值 |
 | - | - | - | - |
 | ```"proxyWalletAddress"``` | — | 获取配置的存款钱包地址（EIP-55校验和格式）。 | 地址字符串。 |
-| ```"redeem"``` | symbol[, wait] | 市场结算后，把存款钱包持有的该市场份额赎回成USDC（两个选项一起赎回，经relayer免Gas）。```symbol```须与```exchange.GetPositions()```中一个可赎回（持仓原始数据的```redeemable```为```true```）且份额大于0的持仓的品种代码完全一致；存款钱包须已在链上部署。```wait```默认```true```：每2秒查询一次relayer，最多约2分钟，确认后刷新CLOB的余额缓存。也可以传对象```{symbol, wait}```。 | ```wait```为```true```时返回relayer确认后的交易记录对象（```state```为```STATE_CONFIRMED```）；为```false```时立即返回```{"transactionID": "..."}```，不等确认、不刷新余额缓存。relayer报告交易失败（```STATE_FAILED```、```STATE_INVALID```）、等待超时或刷新缓存失败时报错；后两种情况交易可能已经提交，重试前先用```exchange.GetPositions()```、```exchange.GetAccount()```核对。 |
+| ```"redeem"``` | symbol[, wait] | 市场结算后，把存款钱包持有的该市场份额赎回成USDC（两个选项一起赎回，经relayer免Gas）。```symbol```须与```exchange.GetPositions()```中一个可赎回（持仓原始数据的```redeemable```为```true```）且份额大于0的持仓的品种代码完全一致；存款钱包须已在链上部署。```wait```默认```true```：每2秒查询一次relayer，最多约2分钟，确认后刷新CLOB的余额缓存。也可以传对象```{symbol, wait}```。 | ```wait```为```true```时返回relayer确认后的交易记录对象（```state```为```STATE_CONFIRMED```）；为```false```时立即返回```{"transactionID": "..."}```，不等确认、不刷新余额缓存。relayer报告交易失败（```STATE_FAILED```、```STATE_INVALID```）、等待超时或刷新缓存失败时报错，错误信息带```transactionID```；后两种情况交易已经提交（超时的交易之后仍可能上链），重试前先用```exchange.GetPositions()```、```exchange.GetAccount()```核对。等待超时后，同一市场的同一操作在该交易确认或失败之前再次调用会直接报错、不重复提交。 |
 | ```"merge"``` | symbol[, amount[, wait]] | 把等量的两个选项份额合并回USDC（经relayer免Gas）。```symbol```取该市场任一选项的品种代码；```amount```为份额数（截断到6位小数），为0或不传时自动取两个选项持仓中较小的一个。```wait```同```redeem```。也可以传对象```{symbol, amount, wait}```。 | 同```redeem```。 |
 | ```"split"``` | symbol, amount[, wait] | 把USDC拆分成等量的两个选项份额（经relayer免Gas）。```symbol```取该市场任一选项的品种代码；```amount```为USDC数量，必须大于0（截断到6位小数），拆出两个选项各```amount```份。```wait```同```redeem```。也可以传对象```{symbol, amount, wait}```。 | 同```redeem```。 |
-| ```"batchOrders"``` | orders | 批量下单，```orders```为1~15个订单对象的数组，全部签名后一次提交，不写交易日志。每个对象：```symbol```（完整品种代码）、```side```（```buy```/```sell```）、```price```（小于等于0为市价单）、```amount```（份额），可选```option```对象，键与下单参数相同（```orderType```、```expiration```、```postOnly```、```deferExec```、```slippage```，见注意事项）。 | 交易所原始应答数组，每项带```orderID```。任一订单被交易所拒绝时整次调用报错并返回空值，但其余订单可能已经挂上，需要用```exchange.GetOrders()```核对。 |
-| ```"markets_cursor"``` | [string] | 查询或设置```exchange.GetMarkets()```的分页游标（传空串清除），用法见注意事项。游标非空时```exchange.SetContractType()```也会消耗一页（推进游标）。 | 当前（设置后）的游标字符串。 |
-| ```"tickers_cursor"``` | [string] | 同```markets_cursor```，作用于```exchange.GetTickers()```，两个游标相互独立。 | 当前（设置后）的游标字符串。 |
-| ```"base"``` | [url] / kind, url | 不传参数返回当前CLOB接口地址；传一个URL时切换CLOB地址（下单、订单、余额、账户成交、订单簿都走它），```exchange.GetBase()```、```exchange.SetBase()```即此形式。```exchange.IO("base", kind, url)```切换其它服务的地址，```kind```只能是```gamma```（市场信息、市场列表）、```data```（持仓、市场成交）或```relayer```（赎回、合并、拆分）。 | 无参、一参时返回地址字符串（当前地址或修改前的地址）；三参形式返回空值。 |
+| ```"batchOrders"``` | orders | 批量下单，```orders```为1~15个订单对象的数组，全部签名后一次提交，不写交易日志。每个对象：```symbol```（完整品种代码）、```side```（```buy```/```sell```）、```price```（小于等于0为市价单）、```amount```（份额），可选```option```对象，键与下单参数相同（```orderType```、```expiration```、```postOnly```、```deferExec```、```slippage```，见注意事项）。 | 交易所原始应答数组，与```orders```逐项对应：成功的项带```orderID```，被拒的项带```errorMsg```。部分订单被拒时照常返回该数组，被拒的每一项另报一条错误日志；全部被拒或应答格式异常时报错并返回空值。 |
+| ```"markets_cursor"``` | [string] | 查询或设置```exchange.GetMarkets()```的分页游标（传空串清除，回到第一页）；传```"next"```把游标推进到下一页，用法见注意事项。 | 当前（设置或推进后）的游标字符串；推进到最后一页之后为空串。当前游标还没有取过页时传```"next"```报错。 |
+| ```"tickers_cursor"``` | [string] | 同```markets_cursor```，作用于```exchange.GetTickers()```，两个游标相互独立。 | 同```markets_cursor```。 |
+| ```"base"``` | [url] / kind, url | 不传参数返回当前CLOB接口地址；传一个URL时切换CLOB地址（下单、订单、余额、账户成交、订单簿都走它），```exchange.GetBase()```、```exchange.SetBase()```即此形式。```exchange.IO("base", kind, url)```切换各服务的地址，```kind```只能是```gamma```（市场信息、市场列表）、```data```（持仓、市场成交）、```relayer```（赎回、合并、拆分）或```clob```（同一参形式，切换CLOB地址）。一参形式只接受```http://```、```https://```开头的地址，其它值报错。 | 无参、一参时返回地址字符串（当前地址或修改前的地址）；```kind, url```形式返回空值。 |
 | ```"api"``` | method, path[, params[, raw]] | 向CLOB发请求，默认带L2签名：```GET```的```params```拼成查询串，其它方法作为JSON请求体；```path```可以写完整URL（例如data接口地址）；```raw```传字符串时作为原样的查询串或请求体，传```false```时不签名。 | 交易所原始应答（JSON自动解析）；请求失败报错并返回空值。 |
 | ```"gamma"``` | path | 向Gamma接口（市场信息）发不签名的GET请求，```path```含查询串，例如```exchange.IO("gamma", "/markets/slug/will-btc-100k")```；地址跟随```exchange.IO("base", "gamma", url)```。也可以把指令名写成完整的服务地址、第二个参数写路径，例如```exchange.IO("https://gamma-api.polymarket.com", "/markets/slug/will-btc-100k")```。 | 交易所原始应答（JSON自动解析）；请求失败返回空值。 |
 | ```"clob"``` | path | 向CLOB接口发不签名的GET请求，例如```exchange.IO("clob", "/book?token_id=...")```；需要签名的私有接口用```exchange.IO("api", ...)```。 | 交易所原始应答（JSON自动解析）；请求失败返回空值。 |
@@ -25928,12 +26239,12 @@ Polymarket是Polygon链上的预测市场。交易所对象通过Polymarket的CL
 **注意事项**
 
 - 价格是每份的USDC价格，在0~1之间，按市场的价格步长（```exchange.GetMarkets()```的```TickSize```，0.1/0.01/0.001/0.0001）截断，大于1时按1减一个步长下单。数量单位是份额，截断到2位小数；最小下单量见```MinQty```（常见为5份），不预先检查，由交易所拒单。
-- 市价单（价格传```-1```）：CLOB只有限价单，连接器沿对手盘累计到下单量所在档位（深度不够取最后一档），以该档价格×(1±滑点)作为限价发出，滑点默认0.01，对手盘为空时报错；买卖的数量都是份额。这样下出的仍是GTC订单，未成交部分会留在盘口；需要立即成交否则撤销时，在最后一个参数传```{tif: "ioc"}```（FAK）或```{tif: "fok"}```，例如```exchange.CreateOrder(symbol, "buy", -1, 10, {tif: "ioc"})```。
+- 市价单（价格传```-1```，或在下单参数中写明```type: "market"```，此时忽略价格）：CLOB只有限价单，连接器沿对手盘累计到下单量所在档位（深度不够取最后一档），以该档价格×(1±滑点)作为限价发出，滑点默认0.01，对手盘为空时报错；买卖的数量都是份额。这样下出的仍是GTC订单，未成交部分会留在盘口；需要立即成交否则撤销时，在最后一个参数传```{tif: "ioc"}```（FAK）或```{tif: "fok"}```，例如```exchange.CreateOrder(symbol, "buy", -1, 10, {tif: "ioc"})```。
 - 其它下单参数写在下单方向后面，例如```exchange.CreateOrder(symbol, "buy;{\"orderType\":\"GTD\",\"expiration\":1830000000}", price, amount)```或```"buy;slippage=0.02"```：```orderType```（```GTC```默认、```GTD```、```FOK```、```FAK```）、```expiration```（GTD必填，Unix秒，须晚于当前60秒以上；非GTD订单传入会报错）、```postOnly```（仅GTC/GTD）、```deferExec```（原样传给交易所）、```slippage```（市价单滑点）。
 - ```exchange.GetOrders()```、```exchange.GetPositions()```不传品种时返回全部市场；```exchange.GetHistoryOrders()```不传品种时只查当前品种，传空串查全部。
 - ```exchange.GetHistoryOrders()```由账户成交记录生成：每笔成交一行（状态为已成交，同一订单多次成交会出现多行），已撤销或从未成交的订单不会出现；```since```可传毫秒或秒，不传```limit```时最多300条。
 - ```exchange.GetTicker()```取该选项自己的订单簿和最新成交价，```High```、```Low```就是当前卖一、买一价（没有24小时高低价），```Volume```是整个市场（两个选项合计）的24小时成交额。```exchange.GetTickers()```取自Gamma市场列表，第二个选项的价格由第一个选项按```1 - x```换算。
-- ```exchange.GetMarkets()```、```exchange.GetTickers()```每次只返回一页（约100个市场）。游标为空时只返回Gamma市场列表的第一页；用```exchange.IO("markets_cursor", cursor)```（或```tickers_cursor```）设置游标后，每次调用返回从游标开始的一页并把游标更新为下一页（到最后一页清空），连续调用即可逐页翻。首个游标取自Gamma接口```/markets/keyset```应答中的```next_cursor```（例如```exchange.IO("gamma", "/markets/keyset?closed=false&limit=1000")```）。
+- ```exchange.GetMarkets()```、```exchange.GetTickers()```每次只返回一页（约100个市场）。游标为空时只返回Gamma市场列表的第一页；调用返回当前游标处的一页，不移动游标（```exchange.SetContractType()```等内部查询也不会推进它）；取过一页后用```exchange.IO("markets_cursor", "next")```（或```tickers_cursor```）推进到下一页，最后一页之后游标回到空串。逐页翻：```exchange.IO("markets_cursor", "")```，然后循环调用```exchange.GetMarkets()```与```exchange.IO("markets_cursor", "next")```直到返回空串。也可以直接设置游标，例如Gamma接口```/markets/keyset```应答中的```next_cursor```。
 
 ### 证券与期货
 
@@ -26000,6 +26311,7 @@ Polymarket是Polygon链上的预测市场。交易所对象通过Polymarket的CL
 
 - 不支持```exchange.IO("api", ...)```。
 - ```exchange.SetDirection()```、```exchange.Buy()```/```exchange.Sell()```、```exchange.CancelOrder()```、```exchange.ModifyOrder()```、```exchange.GetOrder()```等交易函数的用法与期货市场相同。
+- 富途下单只有买入、卖出两个方向，没有开平仓标志：```closebuy```（平多）按卖出提交，```closesell```（平空）按买入提交，股票与期货相同。为避免平仓单在没有持仓时开出反向仓位，托管者提交平仓单前先查询该品种的持仓：没有对应方向的持仓、可平数量（持有数量减去冻结数量）小于下单数量，或持仓查询失败时，不下单、报错并返回空值。期货持仓按具体月份合约记录，用主连代码平仓会因查不到持仓而被拒绝。同一品种不能同时持有多头和空头。查询到的订单不区分开平，```Offset```按开仓给出（富途回报为「买回」的订单除外）。
 - 交易类查询默认每次都向富途服务端刷新，受富途频率限制（每30秒最多10次），超过会报错；高频轮询时用```exchange.IO("refresh", false)```改为使用```FutuOpenD```的缓存，```FutuOpenD```收到新数据时自动更新缓存。
 - ```FutuOpenD```按登录的IP地址区分地区，非大陆IP登录的账户获取行情时有所限制，具体查阅富途官方文档。
 
@@ -26084,7 +26396,8 @@ Polymarket是Polygon链上的预测市场。交易所对象通过Polymarket的CL
 | exchange.GetDepth() | depth | symbol, limit |
 | exchange.GetTrades() | trades | symbol |
 | exchange.GetRecords() | records | symbol, limit（默认200）, period（分钟） |
-| exchange.GetAccount() / exchange.GetAssets() | assets | 无 |
+| exchange.GetAccount() | accounts（网关报错时改用assets） | 无 |
+| exchange.GetAssets() | assets | 无 |
 | exchange.CreateOrder() / exchange.Buy() / exchange.Sell() | trade | symbol, type, price, amount |
 | exchange.GetOrders() | orders | symbol |
 | exchange.GetHistoryOrders() | historyorders | symbol, since, limit |
@@ -26133,7 +26446,7 @@ Polymarket是Polygon链上的预测市场。交易所对象通过Polymarket的CL
 **注意事项**
 
 - 下单（网关方法```trade```）：```type```为```buy```、```sell```，平仓单为```closebuy```、```closesell```，也可以在下单附加参数中用```direction```直接指定；市价单```price```为```"-1"```；其余附加参数原样并入```params```。不支持只做Maker（postOnly）和GTC以外的有效期。
-- ```exchange.GetAccount()```与```exchange.GetAssets()```都使用网关的```assets```方法（应答```data```为```[{currency, free, frozen}]```），不再调用旧版```GetAccount```使用的```accounts```方法。
+- ```exchange.GetAccount()```先调用网关的```accounts```方法，网关应答错误（例如不支持该方法）时改调```assets```方法，因此只实现```assets```的网关也可以使用；```exchange.GetAssets()```只调用```assets```方法。两个方法的应答```data```都是```[{currency, free, frozen}]```。
 - 请求默认超时30秒。
 
 #### Web3

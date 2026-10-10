@@ -2325,6 +2325,7 @@ fn main() {
 
 | 名称 | 说明 |
 | - | - |
+| `talib.ACCBANDS` | ```talib.ACCBANDS()```函数用于计算**Acceleration Bands (加速带)**。 |
 | `talib.BBANDS` | ```talib.BBANDS()```函数用于计算**Bollinger Bands（布林带）**。 |
 | `talib.DEMA` | ```talib.DEMA()```函数用于计算**Double Exponential Moving Average（双指数移动平均线）**。 |
 | `talib.EMA` | ```talib.EMA()```函数用于计算**Exponential Moving Average（指数移动平均线）**。 |
@@ -2332,6 +2333,7 @@ fn main() {
 | `talib.KAMA` | ```talib.KAMA()```函数用于计算**Kaufman自适应移动平均线（Kaufman Adaptive Moving Average）**。 |
 | `talib.MA` | ```talib.MA()```函数用于计算**Moving average（移动平均线）**。 |
 | `talib.MAMA` | ```talib.MAMA()```函数用于计算**MESA自适应移动平均线（MESA Adaptive Moving Average）**。 |
+| `talib.MAVP` | ```talib.MAVP()```函数用于计算**Moving Average with Variable Period (可变周期移动平均)**。 |
 | `talib.MIDPOINT` | ```talib.MIDPOINT()```函数用于计算**MidPoint over period（中点价格）**。 |
 | `talib.MIDPRICE` | ```talib.MIDPRICE()```函数用于计算**Midpoint Price over period（中点价格）**。 |
 | `talib.SAR` | ```talib.SAR()```函数用于计算**抛物线转向指标（Parabolic SAR）**。 |
@@ -2355,6 +2357,7 @@ fn main() {
 | `talib.CCI` | ```talib.CCI()```函数用于计算**Commodity Channel Index（商品通道指数）**。 |
 | `talib.CMO` | ```talib.CMO()```函数用于计算**Chande Momentum Oscillator（钱德动量摆动指标）**。 |
 | `talib.DX` | ```talib.DX()```函数用于计算**Directional Movement Index（动向指数）**。 |
+| `talib.IMI` | ```talib.IMI()```函数用于计算**Intraday Momentum Index (日内动量指标)**。 |
 | `talib.MACD` | ```talib.MACD()```函数用于计算**Moving Average Convergence/Divergence（移动平均收敛发散指标）**。 |
 | `talib.MACDEXT` | ```talib.MACDEXT()```函数用于计算**MACD with controllable MA type（可控移动平均类型的MACD）**。 |
 | `talib.MACDFIX` | ```talib.MACDFIX()```函数用于计算**Moving Average Convergence/Divergence Fix 12/26（快慢周期固定为12/26的MACD）**。 |
@@ -2407,6 +2410,7 @@ fn main() {
 
 | 名称 | 说明 |
 | - | - |
+| `talib.AVGDEV` | ```talib.AVGDEV()```函数用于计算**Average Deviation (平均绝对偏差)**。 |
 | `talib.AVGPRICE` | ```talib.AVGPRICE()```函数用于计算**Average Price（平均价格）**。 |
 | `talib.MEDPRICE` | ```talib.MEDPRICE()```函数用于计算**Median Price（中位数价格）**。 |
 | `talib.TYPPRICE` | ```talib.TYPPRICE()```函数用于计算**典型价格（Typical Price）**。 |
@@ -2450,6 +2454,7 @@ fn main() {
 
 | 名称 | 说明 |
 | - | - |
+| `talib.ADD` | ```talib.ADD()```函数用于计算**Vector Arithmetic Add (向量加法)**。 |
 | `talib.DIV` | ```talib.DIV()```函数用于计算**Vector Arithmetic Div (向量除法)**。 |
 | `talib.MAX` | ```talib.MAX()```函数用于计算**指定周期内的最大值（Highest value over a specified period）**。 |
 | `talib.MAXINDEX` | ```talib.MAXINDEX()```函数用于计算**指定周期内最大值的索引位置（Index of highest value over a specified period）**。 |
@@ -4442,14 +4447,14 @@ See also: `exchange.SetContractType`, `exchange.SetDirection`, `exchange.GetPosi
 
 | 需求 | 交易所对象 | 说明 |
 | - | - | - |
-| 在EVM链的DEX上兑换代币 | ```Uniswap```（Uniswap、PancakeSwap、Aerodrome）、```KyberSwap```、```OneInch```（1inch） | 用现货交易函数下单，见`Uniswap与PancakeSwap` |
+| 在EVM链的DEX上兑换代币 | ```Uniswap```（Uniswap、PancakeSwap、Aerodrome）、```KyberSwap```、```OneInch```（1inch） | 用现货交易函数下单，见`EVM链上兑换（Uniswap、KyberSwap、1inch）` |
 | 在Solana上兑换代币 | ```Jupiter``` | 见`Solana兑换（Jupiter）` |
 | 通过OKX DEX聚合器在多条链上兑换 | ```OKX_DEX``` | 用助记词配置；交易对写作```{链编号}:{代币}_USD```，代币名区分大小写，见`OKX_DEX`交易所页 |
 | 查询链上数据、调用智能合约、发送自定义交易 | ```Web3``` | 支持以太坊等EVM兼容链（见`以太坊（EVM）`）和波场（见`波场（TRON）`） |
 
 Hyperliquid、Lighter、EdgeX、Aster、Polymarket等链上交易所与中心化交易所一样，用标准交易函数操作，配置见语法手册`去中心化交易所`、`预测市场`中的交易所页。
 
-#### Uniswap与PancakeSwap
+#### EVM链上兑换（Uniswap、KyberSwap、1inch）
 
 Uniswap交易所对象（```exchange.GetName()```返回```Uniswap```）在一条EVM链上连接Uniswap、PancakeSwap或Aerodrome的池子，把链上兑换映射为现货交易函数：用```exchange.GetTicker()```看价格、用```exchange.CreateOrder()```下单，不需要自己注册ABI、编码合约调用。选路、询价、代币授权、价格保护、发送交易都由交易所对象完成。同一套实现还有两个聚合器版本：```KyberSwap```与```OneInch```（1inch），报价和交易数据来自聚合器，在众多DEX和做市商之间拆单选路。
 
@@ -4579,7 +4584,7 @@ See also: `Uniswap`, `exchange.CreateOrder`, `exchange.CancelOrder`
 
 #### Solana兑换（Jupiter）
 
-Jupiter交易所对象（```exchange.GetName()```返回```Jupiter```）连接Solana链上的Jupiter聚合器，把兑换映射为现货交易函数。一个交易所对象对应一个Solana钱包：报价和兑换交易由Jupiter生成（它在Solana上的众多DEX和做市商之间拆单选路），托管者用配置的私钥签名后经Solana节点广播。EVM链上的兑换见`Uniswap与PancakeSwap`。
+Jupiter交易所对象（```exchange.GetName()```返回```Jupiter```）连接Solana链上的Jupiter聚合器，把兑换映射为现货交易函数。一个交易所对象对应一个Solana钱包：报价和兑换交易由Jupiter生成（它在Solana上的众多DEX和做市商之间拆单选路），托管者用配置的私钥签名后经Solana节点广播。EVM链上的兑换见`EVM链上兑换（Uniswap、KyberSwap、1inch）`。
 
 ##### 配置交易所对象
 
@@ -4658,7 +4663,7 @@ See also: `Jupiter`, `exchange.CreateOrder`
 
 Web3交易所对象选择```ChainType```为```ETH```时，可以连接以太坊以及所有EVM兼容链（BSC、Base、Arbitrum、Optimism、Polygon等）的节点，用```exchange.IO()```的各个指令查询余额、调用合约、发送交易。本页按一笔链上操作的流程介绍常用指令，每个指令的完整参数见语法手册的`Web3`交易所页中对应的```exchange.IO("指令", ...)```。
 
-只是想在DEX上兑换代币时，请使用```Uniswap```、```KyberSwap```、```OneInch```交易所对象（见`Uniswap与PancakeSwap`）：它直接支持```exchange.GetTicker()```、```exchange.CreateOrder()```等标准函数，不需要自己编码合约调用。
+只是想在DEX上兑换代币时，请使用```Uniswap```、```KyberSwap```、```OneInch```交易所对象（见`EVM链上兑换（Uniswap、KyberSwap、1inch）`）：它直接支持```exchange.GetTicker()```、```exchange.CreateOrder()```等标准函数，不需要自己编码合约调用。
 
 ##### 1. 配置交易所对象
 

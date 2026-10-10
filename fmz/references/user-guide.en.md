@@ -2326,6 +2326,7 @@ Every function, structure and constant of the API reference, grouped by its cate
 
 | Name | Description |
 | - | - |
+| `talib.ACCBANDS` | The ```talib.ACCBANDS()``` function is used to calculate **Acceleration Bands**. |
 | `talib.BBANDS` | The ```talib.BBANDS()``` function is used to calculate **Bollinger Bands**. |
 | `talib.DEMA` | The ```talib.DEMA()``` function is used to calculate **Double Exponential Moving Average**. |
 | `talib.EMA` | The ```talib.EMA()``` function is used to calculate **Exponential Moving Average**. |
@@ -2333,6 +2334,7 @@ Every function, structure and constant of the API reference, grouped by its cate
 | `talib.KAMA` | The ```talib.KAMA()``` function is used to calculate **Kaufman Adaptive Moving Average**. |
 | `talib.MA` | The ```talib.MA()``` function is used to calculate **Moving average**. |
 | `talib.MAMA` | The ```talib.MAMA()``` function is used to calculate the **MESA Adaptive Moving Average**. |
+| `talib.MAVP` | The ```talib.MAVP()``` function is used to calculate **Moving Average with Variable Period**. |
 | `talib.MIDPOINT` | The ```talib.MIDPOINT()``` function is used to calculate **MidPoint over period**. |
 | `talib.MIDPRICE` | The ```talib.MIDPRICE()``` function is used to calculate **Midpoint Price over period**. |
 | `talib.SAR` | The ```talib.SAR()``` function is used to calculate the **Parabolic SAR (Stop and Reverse)** indicator. |
@@ -2356,6 +2358,7 @@ Every function, structure and constant of the API reference, grouped by its cate
 | `talib.CCI` | The ```talib.CCI()``` function is used to calculate the **Commodity Channel Index**. |
 | `talib.CMO` | The ```talib.CMO()``` function is used to calculate the **Chande Momentum Oscillator**. |
 | `talib.DX` | The ```talib.DX()``` function is used to calculate the **Directional Movement Index**. |
+| `talib.IMI` | The ```talib.IMI()``` function is used to calculate **Intraday Momentum Index**. |
 | `talib.MACD` | The ```talib.MACD()``` function is used to calculate **Moving Average Convergence/Divergence**. |
 | `talib.MACDEXT` | The ```talib.MACDEXT()``` function is used to calculate **MACD with controllable MA type**. |
 | `talib.MACDFIX` | The ```talib.MACDFIX()``` function is used to calculate **Moving Average Convergence/Divergence Fix 12/26**. |
@@ -2408,6 +2411,7 @@ Every function, structure and constant of the API reference, grouped by its cate
 
 | Name | Description |
 | - | - |
+| `talib.AVGDEV` | The ```talib.AVGDEV()``` function is used to calculate **Average Deviation**. |
 | `talib.AVGPRICE` | The ```talib.AVGPRICE()``` function is used to calculate **Average Price**. |
 | `talib.MEDPRICE` | The ```talib.MEDPRICE()``` function is used to calculate **Median Price**. |
 | `talib.TYPPRICE` | The ```talib.TYPPRICE()``` function is used to calculate **Typical Price**. |
@@ -2451,6 +2455,7 @@ Every function, structure and constant of the API reference, grouped by its cate
 
 | Name | Description |
 | - | - |
+| `talib.ADD` | The ```talib.ADD()``` function is used to calculate **Vector Arithmetic Add**. |
 | `talib.DIV` | The ```talib.DIV()``` function is used to calculate **Vector Arithmetic Div**. |
 | `talib.MAX` | The ```talib.MAX()``` function is used to calculate the **Highest value over a specified period**. |
 | `talib.MAXINDEX` | The ```talib.MAXINDEX()``` function is used to calculate the **Index of highest value over a specified period**. |
@@ -4443,14 +4448,14 @@ On-chain trading: which exchange object to use.
 
 | Need | Exchange object | Notes |
 | - | - | - |
-| Swap tokens on DEXs of EVM chains | ```Uniswap``` (Uniswap, PancakeSwap, Aerodrome), ```KyberSwap```, ```OneInch``` (1inch) | Trade with the spot trading functions; see Advanced Topics → Web3 → Uniswap and PancakeSwap |
+| Swap tokens on DEXs of EVM chains | ```Uniswap``` (Uniswap, PancakeSwap, Aerodrome), ```KyberSwap```, ```OneInch``` (1inch) | Trade with the spot trading functions; see Advanced Topics → Web3 → EVM On-chain Swaps (Uniswap, KyberSwap, 1inch) |
 | Swap tokens on Solana | ```Jupiter``` | See Advanced Topics → Web3 → Solana Swaps (Jupiter) |
 | Swap on several chains through the OKX DEX aggregator | ```OKX_DEX``` | Configured with a mnemonic phrase; pairs are written ```{chainIndex}:{token}_USD``` and token names are case-sensitive; see the `OKX_DEX` exchange page |
 | Read on-chain data, call smart contracts, send custom transactions | ```Web3``` | Supports Ethereum and other EVM-compatible chains (see Advanced Topics → Web3 → Ethereum (EVM)) and TRON (see Advanced Topics → Web3 → TRON) |
 
 On-chain exchanges such as Hyperliquid, Lighter, EdgeX, Aster and Polymarket are used with the standard trading functions just like centralized exchanges; for their configuration see the exchange pages under `Decentralized Exchanges` and `Prediction Markets` in the syntax manual.
 
-#### Uniswap and PancakeSwap
+#### EVM On-chain Swaps (Uniswap, KyberSwap, 1inch)
 
 The Uniswap exchange object (```exchange.GetName()``` returns ```Uniswap```) connects to the pools of Uniswap, PancakeSwap or Aerodrome on one EVM chain and maps on-chain swaps to the spot trading functions: check prices with ```exchange.GetTicker()``` and trade with ```exchange.CreateOrder()```, without registering ABIs or encoding contract calls yourself. Routing, quoting, token approval, price protection and sending transactions are handled by the exchange object. The same implementation also comes in two aggregator versions, ```KyberSwap``` and ```OneInch``` (1inch), whose quotes and transaction data come from the aggregator, which splits and routes orders across many DEXs and market makers.
 
@@ -4580,7 +4585,7 @@ See also: `Uniswap`, `exchange.CreateOrder`, `exchange.CancelOrder`
 
 #### Solana Swaps (Jupiter)
 
-The Jupiter exchange object (```exchange.GetName()``` returns ```Jupiter```) connects to the Jupiter aggregator on Solana and maps swaps to the spot trading functions. One exchange object corresponds to one Solana wallet: quotes and swap transactions are generated by Jupiter (which splits and routes orders across the many DEXs and market makers on Solana), signed by the docker with the configured private key and broadcast through a Solana node. For swaps on EVM chains see Advanced Topics → Web3 → Uniswap and PancakeSwap.
+The Jupiter exchange object (```exchange.GetName()``` returns ```Jupiter```) connects to the Jupiter aggregator on Solana and maps swaps to the spot trading functions. One exchange object corresponds to one Solana wallet: quotes and swap transactions are generated by Jupiter (which splits and routes orders across the many DEXs and market makers on Solana), signed by the docker with the configured private key and broadcast through a Solana node. For swaps on EVM chains see Advanced Topics → Web3 → EVM On-chain Swaps (Uniswap, KyberSwap, 1inch).
 
 ##### Configuring the exchange object
 
@@ -4659,7 +4664,7 @@ See also: `Jupiter`, `exchange.CreateOrder`
 
 With ```ChainType``` set to ```ETH```, the Web3 exchange object connects to nodes of Ethereum and every EVM-compatible chain (BSC, Base, Arbitrum, Optimism, Polygon and so on), and uses the ```exchange.IO()``` commands to query balances, call contracts and send transactions. This page walks through the commands in the order of a typical on-chain operation; for the full parameters of each command see the corresponding ```exchange.IO("command", ...)``` in the `Web3` exchange page of the syntax manual.
 
-If you only want to swap tokens on a DEX, use the ```Uniswap```, ```KyberSwap``` or ```OneInch``` exchange object (see Advanced Topics → Web3 → Uniswap and PancakeSwap): it supports standard functions such as ```exchange.GetTicker()``` and ```exchange.CreateOrder()``` directly, with no contract calls to encode yourself.
+If you only want to swap tokens on a DEX, use the ```Uniswap```, ```KyberSwap``` or ```OneInch``` exchange object (see Advanced Topics → Web3 → EVM On-chain Swaps (Uniswap, KyberSwap, 1inch)): it supports standard functions such as ```exchange.GetTicker()``` and ```exchange.CreateOrder()``` directly, with no contract calls to encode yourself.
 
 ##### 1. Configure the exchange object
 

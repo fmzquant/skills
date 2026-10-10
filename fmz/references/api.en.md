@@ -6493,7 +6493,7 @@ The ```exchange.ModifyConditionOrder()``` function validates the parameters firs
 
 Passing additional parameters (option) through the ```side``` parameter is supported, used to modify other properties of the conditional order. The additional parameters need to be merged with the ```side``` parameter, in the format ```"side;{JSON object}"``` (recommended) or ```"side;key=value"``` (URL-encoded format). For example, to modify the trigger price type: ```"buy;{\"newTpTriggerPxType\":\"index\"}"```.
 
-For market order modification of conditional orders, you need to specifically check whether the exchange API supports it. Setting ```TpOrderPrice``` or ```SlOrderPrice``` in the ```condition``` parameter to -1 indicates a market order.
+Setting ```TpOrderPrice``` or ```SlOrderPrice``` in the ```condition``` parameter to -1 means the order executes at market once triggered. Whether a modification can switch between limit and market execution depends on the exchange: some exchanges (for example `Lighter`) cannot change the limit/market type and raise an error when a limit condition order is given -1 or a market condition order is given a positive order price; cancel and recreate the order instead. See each exchange page for details.
 
 When modifying a conditional order, other properties of the conditional order (such as condition type, position mode, account mode, leverage, etc.) are usually retained from the original conditional order's settings. If you need to modify these properties, you can pass them in through additional parameters (option), provided that the exchange API supports it.
 
@@ -8332,23 +8332,50 @@ The ```algo``` parameter also supports the "ed25519" algorithm, which can be com
 
 Returns (string): The ```exchange.Encode()``` function returns the computed hash value encoding.
 
-Example of BitMEX position change push (wss protocol):
+Example of Bybit v5 private WebSocket authentication and position push subscription (wss protocol): when ```key``` is passed the calculation is an HMAC, and the signature is the hex encoding of ```HMAC_SHA256(secretKey, "GET/realtime" + expires)```, where ```expires``` is a millisecond timestamp. ```"{{secretkey}}"``` refers to the ```secretKey``` configured in the exchange object (used as a string, so ```keyFormat``` is ```"string"```), so the secret key never appears in plain text in the strategy code.
 
 ```javascript
 function main() {
-    var APIKEY = "your Access Key(Bitmex API ID)"
-    var expires = parseInt(Date.now() / 1000) + 10
-    var signature = exchange.Encode("sha256", "string", "hex", "GET/realtime" + expires, "hex", "{{secretkey}}")
-    var client = Dial("wss://www.bitmex.com/realtime", 60)
-    var auth = JSON.stringify({args: [APIKEY, expires, signature], op: "authKeyExpires"})
-    var pos = 0
-    client.write(auth)
-    client.write('{"op": "subscribe", "args": "position"}')
+    var APIKEY = "your Bybit API Key"
+    // expires is a millisecond timestamp; signature = HMAC_SHA256(secretKey, "GET/realtime" + expires), hex encoded
+    var expires = Date.now() + 10000
+    var signature = exchange.Encode("sha256", "string", "hex", "GET/realtime" + expires, "string", "{{secretkey}}")
+    var client = Dial("wss://stream.bybit.com/v5/private", 60)
+    if (!client) {
+        Log("connection failed")
+        return
+    }
+    client.write(JSON.stringify({op: "auth", args: [APIKEY, expires, signature]}))
+    client.write(JSON.stringify({op: "subscribe", args: ["position"]}))
+    var positions = {}
+    var lastPing = Date.now()
     while (true) {
-        var bitmexData = JSON.parse(client.read())
-        if(bitmexData.table == 'position' && pos != parseInt(bitmexData.data[0].currentQty)){
-            Log('position change', pos, parseInt(bitmexData.data[0].currentQty), '@')
-            pos = parseInt(bitmexData.data[0].currentQty)
+        // Bybit recommends sending a heartbeat every 20 seconds
+        if (Date.now() - lastPing >= 20000) {
+            client.write(JSON.stringify({op: "ping"}))
+            lastPing = Date.now()
+        }
+        var buf = client.read(1000)
+        if (buf === "") {
+            break    // connection closed
+        }
+        if (!buf) {
+            continue
+        }
+        var msg = JSON.parse(buf)
+        if (msg.op == "auth" && !msg.success) {
+            Log("auth failed", msg.ret_msg)
+            break
+        }
+        if (msg.topic == "position") {
+            msg.data.forEach(function(p) {
+                var key = p.symbol + "/" + p.positionIdx
+                var now = p.side + " " + p.size
+                if (positions[key] !== now) {
+                    Log("position change", key, positions[key], "->", now, "@")
+                    positions[key] = now
+                }
+            })
         }
     }
 }
@@ -8358,19 +8385,91 @@ function main() {
 import time
 import json
 def main():
-    APIKEY = "your Access Key(Bitmex API ID)"
-    expires = int(time.time() + 10)
-    signature = exchange.Encode("sha256", "string", "hex", "GET/realtime" + str(expires), "hex", "{{secretkey}}")
-    client = Dial("wss://www.bitmex.com/realtime", 60)
-    auth = json.dumps({"args": [APIKEY, expires, signature], "op": "authKeyExpires"})
-    pos = 0
-    client.write(auth)
-    client.write('{"op": "subscribe", "args": "position"}')
+    APIKEY = "your Bybit API Key"
+    # expires is a millisecond timestamp; signature = HMAC_SHA256(secretKey, "GET/realtime" + expires), hex encoded
+    expires = int(time.time() * 1000) + 10000
+    signature = exchange.Encode("sha256", "string", "hex", "GET/realtime" + str(expires), "string", "{{secretkey}}")
+    client = Dial("wss://stream.bybit.com/v5/private", 60)
+    if not client:
+        Log("connection failed")
+        return
+    client.write(json.dumps({"op": "auth", "args": [APIKEY, expires, signature]}))
+    client.write(json.dumps({"op": "subscribe", "args": ["position"]}))
+    positions = {}
+    lastPing = time.time()
     while True:
-        bitmexData = json.loads(client.read())
-        if "table" in bitmexData and bitmexData["table"] == "position" and len(bitmexData["data"]) != 0 and pos != bitmexData["data"][0]["currentQty"]:
-            Log("position change", pos, bitmexData["data"][0]["currentQty"], "@")
-            pos = bitmexData["data"][0]["currentQty"]
+        # Bybit recommends sending a heartbeat every 20 seconds
+        if time.time() - lastPing >= 20:
+            client.write(json.dumps({"op": "ping"}))
+            lastPing = time.time()
+        buf = client.read(1000)
+        if buf == "":
+            break    # connection closed
+        if not buf:
+            continue
+        msg = json.loads(buf)
+        if msg.get("op") == "auth" and not msg.get("success"):
+            Log("auth failed", msg.get("ret_msg"))
+            break
+        if msg.get("topic") == "position":
+            for p in msg["data"]:
+                key = "%s/%s" % (p["symbol"], p["positionIdx"])
+                now = p["side"] + " " + p["size"]
+                if positions.get(key) != now:
+                    Log("position change", key, positions.get(key), "->", now, "@")
+                    positions[key] = now
+```
+
+```rust
+use std::collections::HashMap;
+
+fn main() {
+    let apikey = "your Bybit API Key";
+    // expires is a millisecond timestamp; signature = HMAC_SHA256(secretKey, "GET/realtime" + expires), hex encoded
+    let expires = Unix() * 1000 + 10000;
+    let signature = exchange.Encode("sha256", "string", "hex", &format!("GET/realtime{}", expires), "string", "{{secretkey}}");
+    let mut client = Dial::new("wss://stream.bybit.com/v5/private", 60);
+    if !client.Valid() {
+        Log!("connection failed");
+        return;
+    }
+    // the Rust SDK has no JSON serializer, so build the requests with string formatting
+    client.write(&format!(r#"{{"op":"auth","args":["{}",{},"{}"]}}"#, apikey, expires, signature), 0);
+    client.write(r#"{"op":"subscribe","args":["position"]}"#, 0);
+    let mut positions: HashMap<String, String> = HashMap::new();
+    let mut last_ping = Unix();
+    while !client.IsClosed() {
+        // Bybit recommends sending a heartbeat every 20 seconds
+        if Unix() - last_ping >= 20 {
+            client.write(r#"{"op":"ping"}"#, 0);
+            last_ping = Unix();
+        }
+        let buf = client.read(1000);
+        if buf == "" {
+            continue;
+        }
+        let msg = match JSONParse(&buf) {
+            Some(v) => v,
+            None => continue,
+        };
+        if msg["op"].as_str() == Some("auth") && msg["success"].as_bool() != Some(true) {
+            Log!("auth failed", msg["ret_msg"].as_str().unwrap_or(""));
+            break;
+        }
+        if msg["topic"].as_str() == Some("position") {
+            if let Some(arr) = msg["data"].as_array() {
+                for p in arr {
+                    let key = format!("{}/{}", p["symbol"].as_str().unwrap_or(""), p["positionIdx"].as_i64().unwrap_or(0));
+                    let now = format!("{} {}", p["side"].as_str().unwrap_or(""), p["size"].as_str().unwrap_or("0"));
+                    if positions.get(&key) != Some(&now) {
+                        Log!("position change", &key, &now, "@");
+                        positions.insert(key, now);
+                    }
+                }
+            }
+        }
+    }
+}
 ```
 
 Only live trading supports calling the ```exchange.Encode()``` function. The reference methods ```"{{accesskey}}"``` and ```"{{secretkey}}"``` are only valid when calling the ```exchange.Encode()``` function.
@@ -8458,7 +8557,7 @@ Commands of ```exchange.IO()``` specific to an exchange object; see the exchange
 | Command | Exchanges |
 | - | - |
 | ```"abi"``` | `Web3` |
-| ```"accountId"``` | `Futures_Crypto` |
+| ```"accountId"``` | `Futures_Crypto`, `Poloniex` |
 | ```"accounts"``` | `Futures_Futu`, `Futures_IB` |
 | ```"accountType"``` | `Bybit`, `Futures_Bybit` |
 | ```"address"``` | `Uniswap`, `Jupiter`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Web3` |
@@ -13615,6 +13714,44 @@ In ```Python```, ```talib``` is the TA-Lib Python package installed on the docke
 
 Overlap studies: moving averages, Bollinger Bands, parabolic SAR and similar.
 
+##### talib.ACCBANDS
+
+```
+talib.ACCBANDS(inPriceHLC)
+talib.ACCBANDS(inPriceHLC, optInTimePeriod)
+```
+
+The ```talib.ACCBANDS()``` function is used to calculate **Acceleration Bands**.
+
+Parameters:
+
+- `inPriceHLC` ({@struct/Record Record} structure array, required): The ```inPriceHLC``` parameter is used to specify the K-line data.
+- `optInTimePeriod` (number, optional): The ```optInTimePeriod``` parameter is used to set the calculation period, with a default value of 20.
+
+Returns (array): The ```talib.ACCBANDS()``` function returns a two-dimensional array containing three elements: upper band array, middle band array, and lower band array.
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.ACCBANDS(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    upper, middle, lower = talib.ACCBANDS(records.High, records.Low, records.Close)
+    Log(upper, middle, lower)
+```
+
+The ```ACCBANDS()``` function is described in the talib library documentation as: ```ACCBANDS(Records[High,Low,Close],Time Period = 20) = [Array(outRealUpperBand),Array(outRealMiddleBand),Array(outRealLowerBand)]```
+
+The upper band is the simple moving average of ```High * (1 + 4 * (High - Low) / (High + Low))```, the middle band is the simple moving average of the close price, and the lower band is the simple moving average of ```Low * (1 - 4 * (High - Low) / (High + Low))```, all over ```optInTimePeriod``` bars.
+
+In ```Python```, TA-Lib provides this function from version 0.6 (both the C library and the Python package must be 0.6 or later); older versions raise an attribute error.
+
 ##### talib.BBANDS
 
 ```
@@ -13860,6 +13997,57 @@ def main():
 ```
 
 The ```MAMA()``` function is described in the talib library documentation as: ```MAMA(Records[Close],Fast Limit = 0.5,Slow Limit = 0.05) = [Array(outMAMA),Array(outFAMA)]```
+
+##### talib.MAVP
+
+```
+talib.MAVP(inReal, inPeriods)
+talib.MAVP(inReal, inPeriods, optInMinPeriod)
+talib.MAVP(inReal, inPeriods, optInMinPeriod, optInMaxPeriod)
+talib.MAVP(inReal, inPeriods, optInMinPeriod, optInMaxPeriod, optInMAType)
+```
+
+The ```talib.MAVP()``` function is used to calculate **Moving Average with Variable Period**.
+
+Parameters:
+
+- `inReal` (numeric array, required): The ```inReal``` parameter is used to specify the series to average.
+- `inPeriods` (numeric array, required): The ```inPeriods``` parameter is used to specify the period used for each bar; it must have the same length as ```inReal```. Values outside ```[optInMinPeriod, optInMaxPeriod]``` are clamped to the bounds.
+- `optInMinPeriod` (number, optional): The ```optInMinPeriod``` parameter is used to set the minimum period, with a default value of 2.
+- `optInMaxPeriod` (number, optional): The ```optInMaxPeriod``` parameter is used to set the maximum period, with a default value of 30.
+- `optInMAType` (number, optional): The ```optInMAType``` parameter is used to set the moving average type, with a default value of 0.
+
+Returns (array): The ```talib.MAVP()``` function returns a one-dimensional array.
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var closes = records.map(function(r) { return r.Close })
+    // period per bar: 10 for up bars, 20 for down bars (for illustration only)
+    var periods = records.map(function(r) { return r.Close > r.Open ? 10 : 20 })
+    var ret = talib.MAVP(closes, periods, 10, 20)
+    Log(ret)
+}
+```
+
+```python
+import talib
+import numpy as np
+def main():
+    records = exchange.GetRecords()
+    # period per bar: 10 for up bars, 20 for down bars (for illustration only)
+    periods = np.array([10.0 if r["Close"] > r["Open"] else 20.0 for r in records])
+    ret = talib.MAVP(records.Close, periods, 10, 20)
+    Log(ret)
+```
+
+The ```MAVP()``` function is described in the talib library documentation as: ```MAVP(Array(inReal),Array(inPeriods),Min Period = 2,Max Period = 30,MA Type = 0) = Array(outReal)```
+
+The ```i```-th value is the moving average of ```inReal``` up to element ```i``` with period ```inPeriods[i]```; the first ```optInMaxPeriod - 1``` values are ```NaN``` (regardless of the actual values in ```inPeriods```).
+
+Both inputs must be numeric arrays: in ```JavaScript```, extract a field from the K-line data with ```map``` first; if a K-line array is passed, both inputs take the close price of the same K-line data and the result is meaningless; arrays of different lengths raise an error. In ```Python```, both inputs must be numpy arrays of type ```float64```.
+
+Values of ```optInMAType```: 0=SMA, 1=EMA, 2=WMA, 3=DEMA, 4=TEMA, 5=TRIMA, 6=KAMA, 7=MAMA, 8=T3.
 
 ##### talib.MIDPOINT
 
@@ -14496,6 +14684,44 @@ def main():
 ```
 
 The ```DX()``` function is described in the talib library documentation as: ```DX(Records[High,Low,Close],Time Period = 14) = Array(outReal)```
+
+##### talib.IMI
+
+```
+talib.IMI(inPriceOC)
+talib.IMI(inPriceOC, optInTimePeriod)
+```
+
+The ```talib.IMI()``` function is used to calculate **Intraday Momentum Index**.
+
+Parameters:
+
+- `inPriceOC` ({@struct/Record Record} structure array, required): The ```inPriceOC``` parameter is used to specify the K-line data.
+- `optInTimePeriod` (number, optional): The ```optInTimePeriod``` parameter is used to set the calculation period, with a default value of 14.
+
+Returns (array): The ```talib.IMI()``` function returns a one-dimensional array.
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.IMI(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.IMI(records.Open, records.Close)
+    Log(ret)
+```
+
+The ```IMI()``` function is described in the talib library documentation as: ```IMI(Records[Open,Close],Time Period = 14) = Array(outReal)```
+
+Over the last ```optInTimePeriod``` bars, the sum of up-bar bodies (```Close - Open```) as a percentage of the sum of all body lengths, ranging from 0 to 100.
+
+In ```Python```, TA-Lib provides this function from version 0.6 (both the C library and the Python package must be 0.6 or later); older versions raise an attribute error.
 
 ##### talib.MACD
 
@@ -15627,7 +15853,45 @@ The ```HT_TRENDMODE()``` function is described in the talib library documentatio
 
 #### PriceTransform
 
-Price transforms: average, median, typical and weighted close price.
+Price transforms: average, median, typical and weighted close price, plus average deviation.
+
+##### talib.AVGDEV
+
+```
+talib.AVGDEV(inReal)
+talib.AVGDEV(inReal, optInTimePeriod)
+```
+
+The ```talib.AVGDEV()``` function is used to calculate **Average Deviation**.
+
+Parameters:
+
+- `inReal` ({@struct/Record Record} structure array / numeric array, required): The ```inReal``` parameter is used to specify the K-line data.
+- `optInTimePeriod` (number, optional): The ```optInTimePeriod``` parameter is used to set the calculation period, with a default value of 14.
+
+Returns (array): The ```talib.AVGDEV()``` function returns a one-dimensional array.
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    var ret = talib.AVGDEV(records)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    ret = talib.AVGDEV(records.Close)
+    Log(ret)
+```
+
+The ```AVGDEV()``` function is described in the talib library documentation as: ```AVGDEV(Records[Close],Time Period = 14) = Array(outReal)```
+
+Each value is the mean of the absolute differences between the last ```optInTimePeriod``` values and their average.
+
+In ```Python```, TA-Lib provides this function from version 0.6 (both the C library and the Python package must be 0.6 or later); older versions raise an attribute error.
 
 ##### talib.AVGPRICE
 
@@ -16590,7 +16854,48 @@ The ```TANH()``` function is described in the talib library documentation as: ``
 
 #### MathOperators
 
-Math operators: vector subtraction, multiplication and division, maximum and minimum over a period, their indexes, and sum.
+Math operators: vector addition, subtraction, multiplication and division, maximum and minimum over a period, their indexes, and sum.
+
+##### talib.ADD
+
+```
+talib.ADD(inReal0, inReal1)
+```
+
+The ```talib.ADD()``` function is used to calculate **Vector Arithmetic Add**.
+
+Parameters:
+
+- `inReal0` (numeric array, required): The ```inReal0``` parameter is used to specify the first series.
+- `inReal1` (numeric array, required): The ```inReal1``` parameter is used to specify the second series; it must have the same length as ```inReal0```.
+
+Returns (array): The ```talib.ADD()``` function returns a one-dimensional array.
+
+```javascript
+function main() {
+    var records = exchange.GetRecords()
+    // high price plus low price
+    var highs = records.map(function(r) { return r.High })
+    var lows = records.map(function(r) { return r.Low })
+    var ret = talib.ADD(highs, lows)
+    Log(ret)
+}
+```
+
+```python
+import talib
+def main():
+    records = exchange.GetRecords()
+    # high price plus low price
+    ret = talib.ADD(records.High, records.Low)
+    Log(ret)
+```
+
+The ```ADD()``` function is described in the talib library documentation as: ```ADD(Array(inReal0),Array(inReal1)) = Array(outReal)```
+
+Calculates ```inReal0[i] + inReal1[i]``` element by element.
+
+In ```JavaScript```, both inputs must be numeric arrays (extract a field from the K-line data with ```map``` first): if a K-line array is passed, both inputs take the close price of the same K-line data and the result is meaningless; arrays of different lengths raise an error.
 
 ##### talib.DIV
 
@@ -21059,7 +21364,7 @@ Use the quote currency the exchange actually uses (for example ```USDC.swap```).
 **Default range when ```symbol``` is omitted or an empty string ```""```:**
 
 - Spot exchange objects: all instruments.
-- Cryptocurrency futures exchange objects: "current quote currency + contract type of the current contract". The type is ```option``` for an option contract, ```swap_pf``` for ```swap_pf```, ```futures_ff``` for codes ending in ```_ff```, ```swap``` for other codes containing ```swap```, and ```futures``` otherwise; with no contract set it is ```swap```. For example, with the current instrument ```BTC_USDT.swap``` this equals passing ```"USDT.swap"```; with ```BTC_USD.quarter``` it equals ```"USD.futures"```.
+- Cryptocurrency futures exchange objects: "current quote currency + contract type of the current contract". The type is ```futures_combo``` for a combo contract (a contract code containing a comma, such as ```quarter,swap```, or a native Deribit combo code, such as ```BTC-FS-26DEC25_PERP```), ```option``` for an option contract, ```swap_pf``` for ```swap_pf```, ```futures_ff``` for codes ending in ```_ff```, ```swap``` for other codes containing ```swap```, and ```futures``` otherwise; with no contract set it is ```swap```. For example, with the current instrument ```BTC_USDT.swap``` this equals passing ```"USDT.swap"```; with ```BTC_USD.quarter``` it equals ```"USD.futures"```; with ```BTC_USD.quarter,swap``` it equals ```"USD.futures_combo"```.
 - Futures exchange objects without a "quote + contract type" split (```Futures_CTP```, ```Futures_Futu```, ```Futures_IB```, ```Futures_Polymarket```): all instruments.
 - A few exchanges require an instrument in their query API; on these exchanges ```GetOrders``` and ```GetConditionOrders``` without ```symbol``` query only the current trading pair.
 
@@ -21702,13 +22007,14 @@ Account: ```exchange.GetAccount()``` reads the collateral account: ```Balance```
 
 All exchange objects
 
+- The client order ID ```clientId``` must be an integer from 0 to 4294967295; any other value fails and the order is not sent.
 - The batch data of ```exchange.GetTickers()``` has no order book, so ```Buy``` and ```Sell``` are the last trade price; use ```exchange.GetTicker()``` for the real best bid and ask.
 - Conditional orders support take-profit and stop-loss only, not OCO. Backpack trigger orders do not distinguish take-profit from stop-loss, so the type is inferred on query from the trigger price relative to the current last price. With an order price of 0 the order executes at market once triggered. Modifying a conditional order is not supported; cancel and recreate it instead.
 - ```exchange.GetHistoryOrders()``` and ```exchange.GetHistoryConditionOrders()``` query one symbol at a time and do not support ```since``` (the exchange's order history endpoint has no time range); a ```since``` greater than 0 or an empty symbol is rejected.
 
 ```Backpack``` (Spot)
 
-- The amount of a market buy order is the quote currency to spend (placed with Backpack's ```quoteQuantity```); a market sell order uses the base currency amount.
+- The amount of a market buy order is the quote currency to spend (placed with Backpack's ```quoteQuantity```); a market sell order uses the base currency amount. Such market buy orders have no order price in queries, so ```Price``` is 0.
 - ```exchange.GetAccount()``` and ```exchange.GetAssets()``` count available and frozen amounts only, not staked amounts.
 
 ```Futures_Backpack``` (Futures)
@@ -21987,6 +22293,7 @@ Account: Futures margin sits on the ```F0```-suffixed currencies (such as ```UST
 All exchange objects
 
 - Conditional orders support take-profit and stop-loss only, not OCO.
+- An order ```clientId``` must be a positive integer (Bitfinex's ```cid```); other values report an error. Limit orders support ```tif``` IOC, FOK and maker-only (```postOnly```); market orders do not support FOK or maker-only, and conditional orders do not support IOC or FOK; passing them reports an error.
 
 ```Bitfinex``` (Spot)
 
@@ -22432,7 +22739,7 @@ For all exchanges see `Capability-Matrix`.
 
 **Notes**
 
-- Order placement does not support the ```tif``` (IOC, FOK) or maker-only (```postOnly```) options.
+- Maker-only (```postOnly```, limit orders only) orders are supported; the ```tif``` (IOC, FOK) option is not and reports an error.
 - Conditional orders use the ```stop_loss_rate``` (trigger price) of the Coincheck order endpoint and support take-profit and stop-loss (without an order price they execute at market once triggered), not OCO; conditional orders are canceled through the same endpoint as normal orders.
 - When ```exchange.GetConditionOrders()``` is called without the ```symbol``` argument, take-profit and stop-loss cannot be told apart from the current price, and the conditional orders are returned with the generic condition type.
 
@@ -22476,7 +22783,7 @@ For all exchanges see `Capability-Matrix`.
 **Notes**
 
 - ```exchange.GetTickers()``` returns the tickers of all KRW-market pairs.
-- Maker-only (```postOnly```) orders are supported; the ```tif``` (IOC, FOK) option is not.
+- Maker-only (```postOnly```, limit orders only) orders are supported; the ```tif``` (IOC, FOK) option is not and reports an error.
 - Conditional orders use Coinone ```STOP_LIMIT``` orders and support take-profit and stop-loss; an order price after triggering is required (executing at market once triggered is not supported), and OCO is not supported; conditional orders are canceled through the same endpoint as normal orders.
 - The open orders returned by ```exchange.GetOrders()``` include untriggered conditional orders (```STOP_LIMIT```).
 - The exchange's completed orders carry no order type, so historical conditional orders cannot be queried.
@@ -22635,7 +22942,7 @@ Trading pairs look like ```BTC_USD```, matching Crypto.com's ```BTCUSD-PERP``` (
 
 Common contract codes not available: ```this_week```, ```next_week```, ```quarter```, ```next_quarter```.
 
-Delivery contracts use the English name of the expiry month as the contract code, for example trading pair ```BTC_USD``` with contract code ```October```. Delivery contracts in `exchange.GetMarkets` are also keyed by month name, and ```exchange.SetContractType()``` validates against them, so ```this_week```, ```next_week```, ```quarter``` and ```next_quarter``` cannot be used as contract codes.
+Delivery contracts use the English name of the expiry month as the contract code, for example trading pair ```BTC_USD``` with contract code ```October```, meaning the latest-expiring delivery contract (the monthly contract) in the nearest such month. Other delivery contracts in the same month (weekly contracts, for example) use the native contract code as the contract code, such as ```BTC_USD.BTCUSD-261009```. Delivery contracts in `exchange.GetMarkets` follow the same naming and each contract appears once; ```exchange.SetContractType()``` validates against them, so ```this_week```, ```next_week```, ```quarter``` and ```next_quarter``` cannot be used as contract codes.
 
 Native contract code examples: ```BTCUSD-261030```
 
@@ -22688,7 +22995,7 @@ All exchange objects
 
 ```Futures_Crypto``` (Futures)
 
-- `exchange.GetFundings` cannot query in batch; pass a specific perpetual symbol such as ```BTC_USD.swap```.
+- `exchange.GetFundings` cannot query in batch: without arguments or with a range (such as ```USD.swap```) it reports an error and returns a null value; pass a specific perpetual symbol such as ```BTC_USD.swap```.
 
 #### DeepCoin
 
@@ -22786,7 +23093,7 @@ All exchange objects
 
 - Order amendment (```exchange.ModifyOrder()```) is not supported; cancel and place again. Untriggered conditional orders can be modified with ```exchange.ModifyConditionOrder()```.
 - Conditional orders support take-profit and stop-loss only, not OCO (place the take-profit and stop-loss legs as two conditional orders).
-- ```exchange.GetOrders()``` and ```exchange.GetConditionOrders()``` require a concrete trading pair (for example ```"BTC_USDT"```) and fail when it is omitted or empty.
+- ```exchange.GetOrders()``` and ```exchange.GetConditionOrders()``` query one trading pair only: when omitted or empty they query the current trading pair.
 
 ```Futures_DeepCoin``` (Futures)
 
@@ -22832,7 +23139,7 @@ The quote currency selects the contract family: ```BTC_USD``` and ```ETH_USD``` 
 
 Delivery contract codes are not computed locally from dates; they are picked from Deribit's instrument list by settlement period (day, week, month) and expiry time (the list is cached for 10 minutes). An error is returned when that period has no contract at the requested position.
 
-Spread combination contracts (future_combo) are written as two codes "far,near" separated by a comma, for example ```"quarter,swap"```, ```"next_week,swap"```, ```"next_quarter,this_week"```, ```"month,next_week"```; the far leg must be a delivery code, the near leg a delivery code or ```swap```, mapping to Deribit combinations such as ```BTC-FS-25DEC26_PERP```. Combination contracts are for coin-margined pairs (```BTC_USD```, ```ETH_USD```) only.
+Spread combination contracts (future_combo) are written as two codes "far,near" separated by a comma, for example ```"quarter,swap"```, ```"next_week,swap"```, ```"next_quarter,this_week"```, ```"month,next_week"```; the far leg must be a delivery code, the near leg a delivery code or ```swap```, mapping to Deribit combinations such as ```BTC-FS-25DEC26_PERP```. Combination contracts are for coin-margined pairs (```BTC_USD```, ```ETH_USD```) only; a combination code on a USDC or other linear pair fails.
 
 Native contract code examples: ```BTC-30JUL26```, ```BTC_USDC-30JUL26```, ```BTC-FS-25DEC26_PERP```
 
@@ -22878,10 +23185,10 @@ Option codes are Deribit native codes: underlying-expiry (day-month-year abbrevi
 **Notes**
 
 - Order amount units: coin-margined (inverse) contracts are in USD (```BTC-PERPETUAL``` minimum 10, in multiples of 10); USDC linear contracts and options are in coins. ```CtVal``` in ```exchange.GetMarkets()``` is always 1; use ```MinQty``` and ```AmountPrecision``` for the minimum amount and precision.
-- ```exchange.GetFundings()``` needs a specific perpetual symbol (such as ```BTC_USD.swap```); calling it without arguments or with a delivery contract fails. The result is a single current entry, the rate being Deribit's ```current_interest``` normalized to 8 hours.
+- ```exchange.GetFundings()``` with a specific perpetual symbol (such as ```BTC_USD.swap```) returns that contract's single current entry; without arguments it queries every perpetual of the current contract's quote currency (```USD.swap``` is the BTC and ETH coin-margined perpetuals, ```USDC.swap``` all USDC linear perpetuals), and such a range can also be passed directly. The rate is Deribit's ```current_interest``` normalized to 8 hours. Deribit has no batch funding endpoint, so a range query sends one request per perpetual; ```USDC.swap``` covers over a hundred perpetuals and takes over ten seconds, so pass a specific symbol when calling it often. Delivery contracts, options and combinations have no funding rate and fail.
 - Conditional orders support take-profit and stop-loss only, not OCO; ```exchange.ModifyConditionOrder()``` is supported. Triggers use the last trade price by default; pass ```trigger``` (```mark_price```, ```index_price```) in the extra parameters to use the mark or index price.
 - ```exchange.GetHistoryOrders()``` and ```exchange.GetHistoryConditionOrders()``` query by symbol and do not support the ```since``` argument (passing it fails); they return the most recent records.
-- In range queries such as ```USD.swap``` and ```USD.futures```, ```USD``` covers the BTC and ETH coin-margined contracts; the range for spread combination contracts is ```USD.futures_combo```.
+- In range queries such as ```USD.swap``` and ```USD.futures```, ```USD``` covers the BTC and ETH coin-margined contracts; the range for spread combination contracts is ```USD.futures_combo```. When the current contract is a combination, calls without arguments default to ```USD.futures_combo``` (including far combinations returned with native codes); ```USD.futures``` does not include combinations.
 
 #### DigiFinex
 
@@ -23191,7 +23498,7 @@ For all exchanges see `Capability-Matrix`.
 
 **Notes**
 
-- Limit orders support IOC and FOK; maker-only (```postOnly```) is not supported.
+- Limit orders support IOC, FOK and maker-only (```postOnly```, HashKey's ```LIMIT_MAKER```); market orders do not support maker-only or FOK and report an error when they are passed.
 
 #### HitBTC
 
@@ -23519,12 +23826,14 @@ Option codes are Kraken native codes: ```OF_```, underlying and quote currency, 
 
 - The amount of a spot market buy order is in the base currency (Kraken's ```volume```), not a quote-currency amount.
 - Conditional orders support take-profit and stop-loss only, not OCO.
+- Orders support ```tif``` IOC and maker-only (```postOnly```, limit prices only); FOK is not supported and reports an error.
 
 ```Futures_Kraken``` (Futures)
 
 - Order amounts are Kraken contract sizes: one inverse contract is 1 USD, multi-collateral contracts are sized in the underlying coin (see ```CtVal``` and ```CtValCcy``` in `exchange.GetMarkets`).
 - Kraken's raw funding rate is an absolute amount per contract; ```exchange.GetFundings()``` converts it to a relative rate. Perpetuals settle funding every hour.
 - Conditional orders support take-profit and stop-loss only, not OCO; they trigger on the last traded price.
+- Limit orders support ```tif``` IOC and maker-only (```postOnly```), but not FOK; market and conditional orders do not support these options and report an error when they are passed.
 
 #### KuCoin
 
@@ -23633,6 +23942,7 @@ Account: KuCoin futures have no set-leverage endpoint: ```exchange.SetMarginLeve
 ```Futures_KuCoin``` (Futures)
 
 - Order amounts are numbers of contracts and must be positive whole numbers.
+- Limit orders support ```tif``` IOC and maker-only (```postOnly```), but not FOK; market orders do not support these options and report an error when they are passed.
 - Conditional orders support take-profit and stop-loss only, not OCO (KuCoin futures have no OCO endpoint); they trigger on the last traded price.
 
 #### LBank
@@ -23674,7 +23984,7 @@ For all exchanges see `Capability-Matrix`.
 
 **Notes**
 
-- Maker-only (```postOnly```) orders are supported; the ```tif``` (IOC, FOK) option is not.
+- Limit orders support maker-only (```postOnly```) and the ```tif``` (IOC, FOK) option; market orders do not support these options and report an error when they are passed.
 - The open-order endpoint requires a trading pair: without the ```symbol``` argument, ```exchange.GetOrders()``` queries the current trading pair only.
 - ```exchange.GetHistoryOrders()``` does not support the ```since``` argument (the exchange API does not filter by time) and fails when it is given; without it, it returns the most recent orders.
 - ```exchange.GetTickers()``` includes the tickers of both spot pairs and leveraged-token (ETF) pairs.
@@ -23940,7 +24250,11 @@ Trading pairs are written ```BASE_QUOTE```, the same form as the Poloniex native
 
 **Exchange-specific IO Commands**
 
-No exchange-specific commands; for the common commands see `exchange.IO`.
+| Command | Arguments | Description | Returns |
+| - | - | - | - |
+| ```"accountId"``` | string | Set the ID of the spot account that `exchange.GetAccount` reads; once set, only this spot account is read and an error is reported if it is not found; pass an empty string to restore the default (the first spot account). It does not affect `exchange.GetAssets`, which always sums all spot accounts. | A null value. |
+
+For the common commands ```api```, ```base``` and ```currency``` see `exchange.IO`.
 
 **Unsupported and Fallback Functions**
 
@@ -23956,7 +24270,7 @@ For all exchanges see `Capability-Matrix`.
 
 - Limit orders support IOC, FOK and maker-only (```postOnly```).
 - Spot conditional orders support stop-loss only (```ORDER_CONDITION_TYPE_SL```): a buy triggers when the price rises to the trigger price, a sell when it falls to the trigger price. Take-profit (```ORDER_CONDITION_TYPE_TP```) and OCO conditional orders return an error and no order is placed. Without an order price they execute at market once triggered.
-- ```exchange.GetAccount()``` and ```exchange.GetAssets()``` sum the assets of all SPOT accounts.
+- ```exchange.GetAccount()``` reads one SPOT account: the one set with ```exchange.IO("accountId", id)```, or the first SPOT account when none is set; ```exchange.GetAssets()``` sums the assets of all SPOT accounts.
 
 #### Upbit
 
@@ -24152,7 +24466,7 @@ For the common commands ```api```, ```base``` and ```currency``` see `exchange.I
 | Command | Arguments | Description |
 | - | - | - |
 | ```"cross"``` | bool | Cross (true) / isolated (false) margin. Only changes the local setting without sending a request; subsequent orders, conditional orders and ```exchange.SetMarginLevel()``` carry it. Cross margin by default. |
-| ```"dual"``` | bool | Hedge (true) / one-way (false) position mode, sent to the exchange (```POST /v1/client/position_mode```); after it succeeds the connector places orders for hedge mode (with ```position_side```). |
+| ```"dual"``` | bool | Hedge (true) / one-way (false) position mode, sent to the exchange (```POST /v1/client/position_mode```); after it succeeds the connector places orders for hedge mode (both regular and conditional orders carry the position side). |
 
 For the common commands ```api```, ```base``` and ```currency``` see `exchange.IO`.
 
@@ -24190,12 +24504,11 @@ Position mode: Switch hedge/one-way mode with ```exchange.IO("dual", bool)```. T
 
 - WOO X spot has no 24-hour ticker endpoint; ```exchange.GetTicker()``` is built from the latest 24 one-hour K-lines (open, high, low, volume) and the order book (best bid and ask), requesting two endpoints per call.
 - Conditional orders support take-profit, stop-loss and OCO; ```exchange.ModifyConditionOrder()``` can modify take-profit and stop-loss orders only, not OCO conditional orders.
-- ```exchange.GetConditionOrders()``` requires a concrete trading pair (for example ```"BTC_USDT"```) and fails when it is omitted or empty.
+- ```exchange.GetConditionOrders()``` queries one trading pair only: when omitted or empty it queries the current trading pair.
 
 ```Futures_WOO``` (Futures)
 
 - Conditional orders support take-profit, stop-loss and OCO, with the trigger price type fixed to ```MARKET_PRICE```; ```exchange.ModifyConditionOrder()``` can modify take-profit and stop-loss orders only, not OCO conditional orders.
-- In hedge mode the connector does not add the position side when creating conditional orders; pass ```positionSide``` (```LONG```/```SHORT```) in the extra parameters.
 
 #### Zaif
 
@@ -24328,7 +24641,7 @@ For the common commands ```base``` and ```currency``` see `exchange.IO`.
 | ```"vaultAddress"``` | address | Place, cancel and amend orders and set leverage on behalf of a vault or sub-account (the address goes into the signature and the request body); an empty string clears it. Queries still use the wallet address; to query the vault's account and positions, also set ```walletAddress``` to the vault address. | The address set. |
 | ```"expiresAfter"``` | timestamp | Set the ```expiresAfter``` carried by all subsequent signed actions (orders, cancels, amendments, leverage changes, ...), a Unix timestamp in milliseconds after which the exchange rejects the action; 0 clears it (the default). The value stays in effect, so every action after that time is rejected until it is set again or reset to 0. | The value set. |
 | ```"source"``` | "a" \| "b" | The network used for signing: ```"a"``` is mainnet (the default), ```"b"``` is testnet. It sets the ```source``` field of the Agent signature of trading actions and the chainId of the EIP-712 signature of transfer actions (```usdSend```, ```withdraw3```, ```usdClassTransfer```, ...): Arbitrum 42161 on mainnet, Arbitrum Sepolia 421614 on testnet. The API address is not changed; to connect to the testnet also switch it with ```exchange.IO("base", "https://api.hyperliquid-testnet.xyz")```. The testnet has no HIP-3, so range queries cover the main dex only. | The value set. |
-| ```"split"``` | symbol, amount | HIP-4 Outcome split (the ```splitOutcome``` action) of ```amount``` for the Outcome that ```symbol``` belongs to, into positions on each outcome side. ```symbol``` is an Outcome code (such as ```BTC-above-100k---Dec_USD.Yes```); ```amount``` must be greater than 0. | The raw exchange response (```status``` is ```ok```). |
+| ```"split"``` | symbol, amount | HIP-4 Outcome split (the ```splitOutcome``` action) of ```amount``` for the Outcome that ```symbol``` belongs to, into positions on each outcome side. ```symbol``` is an Outcome code (such as ```BTC-above-100k---Dec_USD.Yes```), written as for market data and orders (markets sharing a name take the code with ```-<market id>``` (such as ```Recurring-1399_USD.Yes```) and the bare name fails as ambiguous); the ```symbol``` of ```merge```, ```mergeQuestion``` and ```negate``` follows the same rule. ```amount``` must be greater than 0. | The raw exchange response (```status``` is ```ok```). |
 | ```"merge"``` | symbol[, amount] | HIP-4 Outcome merge (the ```mergeOutcome``` action) of the positions on each side of the Outcome that ```symbol``` belongs to; ```amount``` is optional. | The raw exchange response (```status``` is ```ok```). |
 | ```"mergeQuestion"``` | symbol[, amount] | HIP-4 merge by question (the ```mergeQuestion``` action) for the question that the Outcome of ```symbol``` belongs to; ```amount``` is optional. Fails if the Outcome belongs to no question. | The raw exchange response (```status``` is ```ok```). |
 | ```"negate"``` | symbol, amount | HIP-4 negation (the ```negateOutcome``` action) of the Outcome of ```symbol``` within its question; ```amount``` must be greater than 0. Fails if the Outcome belongs to no question. | The raw exchange response (```status``` is ```ok```). |
@@ -24419,7 +24732,7 @@ Lighter lists perpetuals only; contract codes other than ```swap``` are rejected
 
 | Command | Arguments | Description | Returns |
 | - | - | - | - |
-| ```"cross"``` | bool[, symbol] | Cross (true) / isolated (false) margin, for the current contract when ```symbol``` is omitted. Lighter sets margin mode and leverage in the same on-chain transaction, which also writes the leverage last set for that instrument in the current run (by ```exchange.SetMarginLevel()``` or a previous ```exchange.IO("cross", ...)```), or 20x if none has been set for it, so call ```exchange.SetMarginLevel()``` for the same instrument before switching the margin mode. | ```{symbol, leverage, marginMode, initialMarginFraction, txHash, ok}```; ```txHash``` is the hash of the on-chain transaction. |
+| ```"cross"``` | bool[, symbol] | Cross (true) / isolated (false) margin, for the current contract when ```symbol``` is omitted. Lighter sets margin mode and leverage in the same on-chain transaction, which also writes the instrument's current leverage (read from the instrument's setting in the exchange account data; a value set in this run within the last 60 seconds takes precedence; the market's default leverage when neither exists). | ```{symbol, leverage, marginMode, initialMarginFraction, txHash, ok}```; ```txHash``` is the hash of the on-chain transaction. |
 | ```"expiry"``` | number | Lifetime of subsequent limit orders and conditional orders (milliseconds, must be greater than 0), 29 days by default (the exchange's maximum); an order expires at the time of placing plus 10 minutes plus this duration. Market orders are not affected. | ```true``` |
 | ```"api"``` | method, path[, params[, raw]] | Call a Lighter endpoint directly; only ```GET``` and ```POST``` are supported. By default the auth token generated with the API key private key is attached (the private key and account index must be filled in); with the sign argument set to ```false``` no token is sent, which only works for public ```GET``` endpoints. ```raw``` is not a request body but a parameter table (a JSON object or ```a=1&b=2```) that replaces ```params``` entirely when non-empty; it goes into the query string for ```GET``` and a form body for ```POST```. L2 transactions are not signed for the caller. | The raw exchange response; an error is raised when the response ```code``` is not 200. |
 
@@ -24437,7 +24750,7 @@ For all exchanges see `Capability-Matrix`.
 
 **Margin, Account and Simulation**
 
-Margin mode: Switch cross/isolated margin per contract with ```exchange.IO("cross", bool)``` and set leverage with ```exchange.SetMarginLevel()```. On Lighter both are the same on-chain transaction (UpdateLeverage); every call sends one and always writes both leverage and margin mode: ```exchange.SetMarginLevel()``` writes the margin mode last set for that instrument in the current run, or cross if none has been set (an instrument that is isolated on the exchange is switched back to cross); ```exchange.IO("cross", ...)``` writes the leverage last set for that instrument, or 20x if none has been set. These values are kept per instrument for the current run only, and the exchange's current settings are not read as defaults. A position's ```MarginLevel``` is derived from the initial margin fraction in the exchange's position data.
+Margin mode: Switch cross/isolated margin per contract with ```exchange.IO("cross", bool)``` and set leverage with ```exchange.SetMarginLevel()```. On Lighter both are the same on-chain transaction (UpdateLeverage); every call sends one and always writes both leverage and margin mode, keeping the other one at the instrument's current value: ```exchange.SetMarginLevel()``` keeps the current margin mode and ```exchange.IO("cross", ...)``` keeps the current leverage. The current values are read from the instrument's setting in the exchange account data (present even without a position); a value set in this run within the last 60 seconds takes precedence (the exchange data lags); without either, the market's default leverage and cross. ```exchange.SetMarginLevel()``` also accepts ```{marginMode: "isolated"}``` (or ```"cross"```) in the extra parameters to set the margin mode at the same time. A position's ```MarginLevel``` is derived from the initial margin fraction in the exchange's position data.
 
 Position mode: One-way (net) positions only; hedge mode is not supported.
 
@@ -24454,11 +24767,11 @@ Simulation: The Simulate box connects to the Lighter testnet (```https://testnet
 | exchange.GetDepth() | The exchange returns individual resting orders; each order is its own level and orders at the same price are not merged, so a price may appear more than once |
 | exchange.GetFundings() | ```Rate``` is the exchange's rate divided by 8 (an hourly rate), ```Interval``` is 1 hour and ```Time``` is the next full hour |
 | exchange.CreateOrder() | Limit orders support GTC (resting for the ```exchange.IO("expiry", ...)``` lifetime), IOC and post-only; FOK is not supported. A market order is an IOC order limited at the best opposite price at the time of placing (a buy no higher than the best ask, a sell no lower than the best bid), without extra slippage; whatever the best opposite level cannot fill is canceled |
-| exchange.CreateConditionOrder() | Take-profit and stop-loss only, no OCO. With an order price it is a limit conditional order; with an order price of -1 (market) the best opposite price at the time of placing is used as price protection |
+| exchange.CreateConditionOrder() | Take-profit and stop-loss only, no OCO. With an order price it is a limit conditional order; with an order price of -1 (market) it executes at market once triggered (IOC) with a worst fill price of the trigger price ±5% (up for buys, down for sells), adjustable with ```{slippage: 0.1}``` in the extra parameters |
 | exchange.ModifyOrder() | Modifies in place, the order ID stays the same; a price or amount that is not passed keeps its current value |
 | exchange.GetOrders(), exchange.GetConditionOrders() | The exchange API requires an instrument: without a symbol, or with an empty string, only the current instrument is queried. ```GetOrders``` returns limit and market orders only and ```GetConditionOrders``` take-profit/stop-loss orders only (other types such as TWAP appear in neither); range arguments such as ```USDC.swap``` are not supported |
 | exchange.GetOrder() | Searches only the open orders and the latest 100 historical orders of the instrument; older orders return null |
-| exchange.ModifyConditionOrder() | Modifies the amount, trigger price and order price in place; the order ID stays the same |
+| exchange.ModifyConditionOrder() | Modifies the amount, trigger price and order price in place; the order ID stays the same. The limit/market variant cannot change: an order price of -1 on a limit conditional order, or a positive one on a market conditional order, fails (cancel and recreate instead); a market conditional order's worst fill price is recomputed from the new trigger price |
 | exchange.GetHistoryOrders(), exchange.GetHistoryConditionOrders() | The exchange API requires an instrument: the current one is queried when omitted, and an empty string or a range raises an error; the ```since``` parameter is not supported and raises an error; without ```limit``` the latest 100 and 500 orders are returned respectively |
 
 #### edgeX
@@ -24524,7 +24837,7 @@ Account: The account, positions and orders are queried by the configured Account
 | Function | Behavior on Futures_EdgeX |
 | - | - |
 | exchange.GetTicker() | The ticker endpoint has no bid/ask, so each call makes an extra order book request to fill them in (two requests in all); if the order book request fails, the whole call fails |
-| exchange.GetFundings() | A symbol (such as ```BTC_USDC.swap```) is required; without one the call raises an error and returns null. ```Rate``` is the exchange's forecast (next) rate and ```Time``` the next settlement time |
+| exchange.GetFundings() | With a symbol (such as ```BTC_USDC.swap```) it returns that contract's entry; without arguments it queries every tradable perpetual of the current quote currency (such as ```USDC.swap```, which can also be passed directly). edgeX has no batch funding endpoint, so a range query sends one request per contract and takes over ten seconds for the hundred-plus contracts; pass a specific symbol when calling it often. ```Rate``` is the exchange's forecast (next) rate and ```Time``` the next settlement time |
 | exchange.CreateOrder() | Order amounts are in coins (1 contract = 1 coin). Limit orders support GTC, IOC, FOK and post-only; market orders are IOC by default, cannot be post-only, and are bounded by the oracle price: buys at no more than 1.2 times it, sells at no less than 0.8 times it |
 | exchange.CreateConditionOrder() | Take-profit and stop-loss only, no OCO (place the two legs separately), triggered by the last trade price; with an order price of -1 (market) the order executes at market once triggered, with the price bound computed from the oracle price at creation. To modify a conditional order, cancel it and create a new one |
 | exchange.GetOrders(), exchange.GetConditionOrders() | Without a symbol, open orders of all contracts are returned. Conditional and regular orders share one order table, so untriggered conditional orders also appear in the result of ```exchange.GetOrders()``` |
@@ -24647,10 +24960,6 @@ Margin mode: Switch cross/isolated margin per contract with ```exchange.IO("cros
 
 **Notes**
 
-All exchange objects
-
-- Conditional orders support take-profit and stop-loss only, not OCO; create a take-profit order and a stop-loss order separately when needed. Modifying a conditional order (```exchange.ModifyConditionOrder()```) is not supported; cancel and recreate it instead.
-
 ```Aster``` (Spot), ```Futures_Aster``` (Futures)
 
 - After ```exchange.IO("base", url)``` switches to a testnet address containing ```testnet```, signatures automatically use the testnet chain ID.
@@ -24658,11 +24967,13 @@ All exchange objects
 ```Futures_ApolloX``` (Futures), ```Futures_Aster``` (Futures)
 
 - Order amounts are base-currency quantities (one contract is one unit of the base currency); market buy orders also use the base-currency quantity.
+- Conditional orders support take-profit and stop-loss only, not OCO; create a take-profit order and a stop-loss order separately when needed. Modifying a conditional order (```exchange.ModifyConditionOrder()```) is not supported; cancel and recreate it instead.
 - ```exchange.GetHistoryOrders()``` and ```exchange.GetHistoryConditionOrders()``` require a contract.
 
 ```Aster``` (Spot)
 
 - The amount of a market buy order is the quote-currency amount (sent as Aster's ```quoteOrderQty```); a market sell order uses the base-currency quantity. Conditional orders always use the base-currency quantity, for both buys and sells.
+- Conditional orders support take-profit and stop-loss only, not OCO; create a take-profit order and a stop-loss order separately when needed. Modifying a conditional order (```exchange.ModifyConditionOrder()```) is not supported; cancel and recreate it instead. ```exchange.GetConditionOrder()``` with the ID of a regular order fails (that order is not conditional).
 - ```exchange.GetHistoryOrders()``` and ```exchange.GetHistoryConditionOrders()``` require a trading pair.
 
 #### Aevo
@@ -24715,7 +25026,7 @@ For all exchanges see `Capability-Matrix`.
 
 **Margin, Account and Simulation**
 
-Margin mode: Aevo uses a unified margin account with no cross/isolated switch, and the margin mode in ```exchange.GetPositions()``` is always cross. ```exchange.SetMarginLevel()``` sets leverage per perpetual contract; options are not supported.
+Margin mode: Aevo uses a unified margin account with no cross/isolated switch; the margin mode in ```exchange.GetPositions()``` follows the exchange (the position's ```margin_type```, falling back to the account's setting for that contract), and option positions without a per-contract setting are cross. ```exchange.SetMarginLevel()``` sets leverage per perpetual contract; options are not supported.
 
 Position mode: One-way (net) positions only, no hedge mode. Closing orders (```closebuy```, ```closesell```) are placed as reduce-only.
 
@@ -24737,7 +25048,7 @@ Option codes are Aevo native codes: underlying-expiry (DDMMMYY)-strike-C/P, C fo
 **Notes**
 
 - Limit orders only; market orders are rejected. Conditional orders (take-profit, stop-loss) need a limit order price; market take-profit/stop-loss and OCO are not supported.
-- ```exchange.ModifyOrder()``` and ```exchange.ModifyConditionOrder()``` have the exchange re-issue the order and return a new order ID, which should be used from then on; after ```exchange.ModifyOrder()``` the order is no longer reduce-only.
+- ```exchange.ModifyOrder()``` and ```exchange.ModifyConditionOrder()``` have the exchange re-issue the order and return a new order ID, which should be used from then on; ```exchange.ModifyOrder()``` keeps the original order's reduce-only flag.
 - For perpetuals, ```Last``` in ```exchange.GetTicker()``` is the mark price and ```Open``` the mark price 24 hours ago; there is no high or low (```High``` and ```Low``` are 0), and ```Volume``` is the 24-hour volume in contracts.
 - Funding is settled every hour; ```exchange.GetFundings()``` returns perpetuals only.
 - ```exchange.GetHistoryOrders()``` and ```exchange.GetHistoryConditionOrders()``` query one symbol at a time; an empty string (all symbols) is rejected.
@@ -25907,7 +26218,7 @@ The trading pair is the market's identifier (slug) plus ```_USDC```; the quote c
 | ```Up``` | An outcome of up/down markets (such as short-term crypto up/down markets); the other one is ```Down```. |
 | ```Down``` | An outcome of up/down markets. |
 
-Prediction markets have no perpetual/delivery distinction and no default contract: the contract code is the name of one of the market's outcomes, and every market has exactly two outcomes (sports and similar markets may use team names). Spaces in an outcome name are replaced with ```-``` (the outcome "Donald Trump" is written ```Donald-Trump```), so a full instrument code looks like ```will-btc-100k_USDC.Yes```. Markets whose outcome names themselves contain ```-``` or ```.``` (e.g. the outcome "Non-Fed") currently cannot be traded or queried. Orders and market data match the outcome name case-insensitively, but ```exchange.GetPositions()``` compares instrument codes exactly and redeem matches the position's instrument code, so copy the spelling returned by ```exchange.GetMarkets()``` and ```exchange.GetPositions()```.
+Prediction markets have no perpetual/delivery distinction and no default contract: the contract code is the name of one of the market's outcomes, and every market has exactly two outcomes (sports and similar markets may use team names). Spaces in an outcome name are replaced with ```-``` (the outcome "Donald Trump" is written ```Donald-Trump```), so a full instrument code looks like ```will-btc-100k_USDC.Yes```. Outcome names that themselves contain ```-``` or ```.``` are written as they are (the outcome "Non-Fed" is ```Non-Fed```, "U.S. Fed" is ```U.S.-Fed```). Orders and market data match the outcome name case-insensitively, but ```exchange.GetPositions()``` compares instrument codes exactly and redeem matches the position's instrument code, so copy the spelling returned by ```exchange.GetMarkets()``` and ```exchange.GetPositions()```.
 
 ```exchange.SetContractType()``` only checks the form (not empty, no whitespace or ```.```); ```swap``` and similar codes are not rejected on the spot but fail with "outcome not found" on later calls.
 
@@ -25920,13 +26231,13 @@ The ```Symbol``` (exchange-native code) of each ```exchange.GetMarkets()``` row 
 | Command | Arguments | Description | Returns |
 | - | - | - | - |
 | ```"proxyWalletAddress"``` | — | Get the configured deposit wallet address (EIP-55 checksum form). | The address string. |
-| ```"redeem"``` | symbol[, wait] | After the market resolves, redeem the deposit wallet's shares of that market for USDC (both outcomes at once, gas-free via the relayer). ```symbol``` must exactly equal the instrument code of a position in ```exchange.GetPositions()``` that is redeemable (```redeemable``` is ```true``` in the position's raw data) and holds more than 0 shares; the deposit wallet must be deployed on chain. ```wait``` defaults to ```true```; the relayer is polled every 2 seconds for up to about 2 minutes, and the CLOB balance cache is refreshed after confirmation. An object ```{symbol, wait}``` is also accepted. | With ```wait``` ```true```, the relayer transaction record after confirmation (```state``` is ```STATE_CONFIRMED```); with ```false```, ```{"transactionID": "..."}``` at once, without waiting or refreshing the balance cache. A transaction reported as failed by the relayer (```STATE_FAILED```, ```STATE_INVALID```), a wait timeout or a failed cache refresh is an error; in the last two cases the transaction may already have been submitted, so check ```exchange.GetPositions()``` and ```exchange.GetAccount()``` before retrying. |
+| ```"redeem"``` | symbol[, wait] | After the market resolves, redeem the deposit wallet's shares of that market for USDC (both outcomes at once, gas-free via the relayer). ```symbol``` must exactly equal the instrument code of a position in ```exchange.GetPositions()``` that is redeemable (```redeemable``` is ```true``` in the position's raw data) and holds more than 0 shares; the deposit wallet must be deployed on chain. ```wait``` defaults to ```true```; the relayer is polled every 2 seconds for up to about 2 minutes, and the CLOB balance cache is refreshed after confirmation. An object ```{symbol, wait}``` is also accepted. | With ```wait``` ```true```, the relayer transaction record after confirmation (```state``` is ```STATE_CONFIRMED```); with ```false```, ```{"transactionID": "..."}``` at once, without waiting or refreshing the balance cache. A transaction reported as failed by the relayer (```STATE_FAILED```, ```STATE_INVALID```), a wait timeout or a failed cache refresh is an error whose message carries the ```transactionID```; in the last two cases the transaction has been submitted (a timed-out one may still land later), so check ```exchange.GetPositions()``` and ```exchange.GetAccount()``` before retrying. After a wait timeout, calling the same operation on the same market again fails without submitting until that transaction is confirmed or has failed. |
 | ```"merge"``` | symbol[, amount[, wait]] | Merge equal amounts of both outcomes' shares back into USDC (gas-free via the relayer). ```symbol``` is the instrument code of either outcome of the market; ```amount``` is the number of shares (truncated to 6 decimals), and 0 or omitted takes the smaller of the two outcome positions. ```wait``` is as for ```redeem```. An object ```{symbol, amount, wait}``` is also accepted. | As for ```redeem```. |
 | ```"split"``` | symbol, amount[, wait] | Split USDC into equal amounts of both outcomes' shares (gas-free via the relayer). ```symbol``` is the instrument code of either outcome of the market; ```amount``` is the USDC amount, greater than 0 (truncated to 6 decimals), giving ```amount``` shares of each outcome. ```wait``` is as for ```redeem```. An object ```{symbol, amount, wait}``` is also accepted. | As for ```redeem```. |
-| ```"batchOrders"``` | orders | Batch order placement; ```orders``` is an array of 1-15 order objects, all signed and submitted in one request and not written to the trade log. Each object has ```symbol``` (full instrument code), ```side``` (```buy```/```sell```), ```price``` (0 or below is a market order), ```amount``` (shares), and an optional ```option``` object with the same keys as the order parameters (```orderType```, ```expiration```, ```postOnly```, ```deferExec```, ```slippage```; see the notes). | The raw exchange response array, each item with an ```orderID```. If the exchange rejects any order, the whole call fails and returns null, but the other orders may already be on the book; check with ```exchange.GetOrders()```. |
-| ```"markets_cursor"``` | [string] | Query or set the paging cursor of ```exchange.GetMarkets()``` (an empty string clears it); see the notes for usage. While the cursor is set, ```exchange.SetContractType()``` also consumes a page and advances it. | The current cursor string (after setting). |
-| ```"tickers_cursor"``` | [string] | Like ```markets_cursor```, for ```exchange.GetTickers()```; the two cursors are independent. | The current cursor string (after setting). |
-| ```"base"``` | [url] / kind, url | Without arguments, returns the current CLOB API address; with one URL, switches the CLOB address (used for orders, the balance, account fills and order books); this is what ```exchange.GetBase()``` and ```exchange.SetBase()``` do. ```exchange.IO("base", kind, url)``` switches the address of another service, where ```kind``` is ```gamma``` (market information and lists), ```data``` (positions and market trades) or ```relayer``` (redeem, merge, split). | A string without arguments or with one URL (the current address or the address before the change); null for the three-argument form. |
+| ```"batchOrders"``` | orders | Batch order placement; ```orders``` is an array of 1-15 order objects, all signed and submitted in one request and not written to the trade log. Each object has ```symbol``` (full instrument code), ```side``` (```buy```/```sell```), ```price``` (0 or below is a market order), ```amount``` (shares), and an optional ```option``` object with the same keys as the order parameters (```orderType```, ```expiration```, ```postOnly```, ```deferExec```, ```slippage```; see the notes). | The raw exchange response array, one item per entry of ```orders``` (accepted items carry an ```orderID```, rejected items an ```errorMsg```). When only some orders are rejected the array is still returned and each rejected item is also logged as an error; when all are rejected or the response is malformed, the call fails and returns null. |
+| ```"markets_cursor"``` | [string] | Query or set the paging cursor of ```exchange.GetMarkets()``` (an empty string clears it, back to the first page); ```"next"``` advances the cursor to the next page; see the notes for usage. | The current cursor string (after setting or advancing); an empty string after advancing past the last page. ```"next"``` fails if no page has been fetched at the current cursor yet. |
+| ```"tickers_cursor"``` | [string] | Like ```markets_cursor```, for ```exchange.GetTickers()```; the two cursors are independent. | As for ```markets_cursor```. |
+| ```"base"``` | [url] / kind, url | Without arguments, returns the current CLOB API address; with one URL, switches the CLOB address (used for orders, the balance, account fills and order books); this is what ```exchange.GetBase()``` and ```exchange.SetBase()``` do. ```exchange.IO("base", kind, url)``` switches the address of a service, where ```kind``` is ```gamma``` (market information and lists), ```data``` (positions and market trades), ```relayer``` (redeem, merge, split) or ```clob``` (the CLOB address, as in the one-argument form). The one-argument form accepts only addresses starting with ```http://``` or ```https://```; anything else fails. | A string without arguments or with one URL (the current address or the address before the change); null for the ```kind, url``` form. |
 | ```"api"``` | method, path[, params[, raw]] | Sends a request to the CLOB, L2-signed by default; for ```GET``` the ```params``` become the query string, for other methods the JSON body; ```path``` may be a full URL (e.g. a data API address); a string ```raw``` is sent verbatim as the query string or body, and ```false``` sends the request unsigned. | The raw exchange response (JSON is parsed); an error and null when the request fails. |
 | ```"gamma"``` | path | Sends an unsigned GET request to the Gamma API (market information); ```path``` includes the query string, e.g. ```exchange.IO("gamma", "/markets/slug/will-btc-100k")```; the address follows ```exchange.IO("base", "gamma", url)```. The command name may also be a full service address with the path as the second argument, e.g. ```exchange.IO("https://gamma-api.polymarket.com", "/markets/slug/will-btc-100k")```. | The raw exchange response (JSON is parsed); null when the request fails. |
 | ```"clob"``` | path | Sends an unsigned GET request to the CLOB API, e.g. ```exchange.IO("clob", "/book?token_id=...")```; use ```exchange.IO("api", ...)``` for private endpoints that need a signature. | The raw exchange response (JSON is parsed); null when the request fails. |
@@ -25957,12 +26268,12 @@ Simulation: There is no simulated trading; every call uses real funds on the Pol
 **Notes**
 
 - Prices are USDC per share, between 0 and 1, truncated to the market's price step (```TickSize``` of ```exchange.GetMarkets()```: 0.1/0.01/0.001/0.0001); a price above 1 is sent as 1 minus one step. Quantities are shares, truncated to 2 decimals; the minimum order size is ```MinQty``` (commonly 5 shares), which is not pre-checked, leaving rejection to the exchange.
-- Market orders (price ```-1```): the CLOB only has limit orders, so the connector walks the opposite side of the book to the level that covers the order quantity (the last level if the book is too thin) and sends that level's price × (1 ± slippage) as the limit price, with a default slippage of 0.01; an empty opposite side is an error. Buy and sell quantities are both in shares. The result is still a GTC order and any unfilled part stays on the book; to fill immediately or cancel, pass ```{tif: "ioc"}``` (FAK) or ```{tif: "fok"}``` as the last argument, e.g. ```exchange.CreateOrder(symbol, "buy", -1, 10, {tif: "ioc"})```.
+- Market orders (price ```-1```, or ```type: "market"``` given in the order parameters, which ignores the price): the CLOB only has limit orders, so the connector walks the opposite side of the book to the level that covers the order quantity (the last level if the book is too thin) and sends that level's price × (1 ± slippage) as the limit price, with a default slippage of 0.01; an empty opposite side is an error. Buy and sell quantities are both in shares. The result is still a GTC order and any unfilled part stays on the book; to fill immediately or cancel, pass ```{tif: "ioc"}``` (FAK) or ```{tif: "fok"}``` as the last argument, e.g. ```exchange.CreateOrder(symbol, "buy", -1, 10, {tif: "ioc"})```.
 - Other order parameters go after the order side, e.g. ```exchange.CreateOrder(symbol, "buy;{\"orderType\":\"GTD\",\"expiration\":1830000000}", price, amount)``` or ```"buy;slippage=0.02"```: ```orderType``` (```GTC``` by default, ```GTD```, ```FOK```, ```FAK```), ```expiration``` (required for GTD, Unix seconds, more than 60 seconds ahead; an error for non-GTD orders), ```postOnly``` (GTC/GTD only), ```deferExec``` (passed to the exchange as is), ```slippage``` (market-order slippage).
 - ```exchange.GetOrders()``` and ```exchange.GetPositions()``` without a symbol cover all markets; ```exchange.GetHistoryOrders()``` without a symbol covers only the current instrument, and an empty string covers all.
 - ```exchange.GetHistoryOrders()``` is built from the account's trade records: one row per fill (status filled; an order filled in several trades appears several times), and canceled or never-filled orders do not appear; ```since``` may be milliseconds or seconds, and at most 300 rows are returned when ```limit``` is not given.
 - ```exchange.GetTicker()``` reads the outcome's own order book and last trade price; ```High``` and ```Low``` are the current best ask and best bid (there is no 24-hour high/low), and ```Volume``` is the 24-hour volume of the whole market (both outcomes). ```exchange.GetTickers()``` comes from the Gamma market list, with the second outcome's prices derived from the first as ```1 - x```.
-- ```exchange.GetMarkets()``` and ```exchange.GetTickers()``` return one page (about 100 markets) per call. With no cursor set, they return only the first page of the Gamma market list; after setting a cursor with ```exchange.IO("markets_cursor", cursor)``` (or ```tickers_cursor```), each call returns the page starting at the cursor and advances the cursor to the next page (cleared after the last page), so repeated calls page through the list. The first cursor is the ```next_cursor``` of a Gamma ```/markets/keyset``` response (e.g. ```exchange.IO("gamma", "/markets/keyset?closed=false&limit=1000")```).
+- ```exchange.GetMarkets()``` and ```exchange.GetTickers()``` return one page (about 100 markets) per call. With no cursor set, they return only the first page of the Gamma market list; a call returns the page at the current cursor without moving it (internal queries such as ```exchange.SetContractType()``` do not advance it either); after a page has been fetched, ```exchange.IO("markets_cursor", "next")``` (or ```tickers_cursor```) advances to the next page, and after the last page the cursor returns to an empty string. To page through: ```exchange.IO("markets_cursor", "")```, then loop over ```exchange.GetMarkets()``` and ```exchange.IO("markets_cursor", "next")``` until it returns an empty string. A cursor can also be set directly, e.g. the ```next_cursor``` of a Gamma ```/markets/keyset``` response.
 
 ### Securities and Futures
 
@@ -26029,6 +26340,7 @@ Simulation: The Simulate box connects to Futu paper trading. When ```FutuOpenD``
 
 - ```exchange.IO("api", ...)``` is not supported.
 - Trading functions such as ```exchange.SetDirection()```, ```exchange.Buy()```/```exchange.Sell()```, ```exchange.CancelOrder()```, ```exchange.ModifyOrder()``` and ```exchange.GetOrder()``` are used the same way as in futures markets.
+- Futu orders have only two sides, buy and sell, with no open/close flag: ```closebuy``` (close long) is sent as a sell and ```closesell``` (close short) as a buy, for stocks and futures alike. So that a closing order never opens a position in the opposite direction, the docker queries the instrument's positions before submitting it: if there is no position in the matching direction, the closable quantity (held minus frozen) is less than the order quantity, or the position query fails, no order is placed, an error is reported and null is returned. Futures positions are recorded per specific contract month, so closing through a continuous (main) contract code is rejected because no position is found. Long and short positions cannot be held in the same instrument at once. Queried orders do not distinguish opening from closing, and ```Offset``` is reported as open (except orders Futu reports as "buy back").
 - Trade queries refresh from the Futu server on every call by default and are subject to Futu's rate limit (at most 10 per 30 seconds), returning an error beyond it; for frequent polling use ```exchange.IO("refresh", false)``` to read ```FutuOpenD```'s cache, which ```FutuOpenD``` updates automatically when new data arrives.
 - ```FutuOpenD``` decides the region by the IP address it logs in from; accounts logged in from outside mainland China have some market data restrictions. See Futu's official documentation.
 
@@ -26113,7 +26425,8 @@ Every call is one HTTP POST to the configured server address with a JSON body ``
 | exchange.GetDepth() | depth | symbol, limit |
 | exchange.GetTrades() | trades | symbol |
 | exchange.GetRecords() | records | symbol, limit (default 200), period (minutes) |
-| exchange.GetAccount() / exchange.GetAssets() | assets | none |
+| exchange.GetAccount() | accounts (assets when the gateway returns an error) | none |
+| exchange.GetAssets() | assets | none |
 | exchange.CreateOrder() / exchange.Buy() / exchange.Sell() | trade | symbol, type, price, amount |
 | exchange.GetOrders() | orders | symbol |
 | exchange.GetHistoryOrders() | historyorders | symbol, since, limit |
@@ -26162,7 +26475,7 @@ For all exchanges see `Capability-Matrix`.
 **Notes**
 
 - Orders (gateway method ```trade```): ```type``` is ```buy``` or ```sell```, and ```closebuy``` or ```closesell``` for closing orders, which can also be set directly with ```direction``` in the order extra parameters; a market order has ```price``` ```"-1"```; other extra parameters are merged into ```params``` as is. Post-only orders and time-in-force other than GTC are not supported.
-- ```exchange.GetAccount()``` and ```exchange.GetAssets()``` both use the gateway's ```assets``` method (reply ```data``` is ```[{currency, free, frozen}]```); the ```accounts``` method used by the old ```GetAccount``` is no longer called.
+- ```exchange.GetAccount()``` calls the gateway's ```accounts``` method first and switches to the ```assets``` method when the gateway replies with an error (for example, the method is not supported), so gateways implementing only ```assets``` also work; ```exchange.GetAssets()``` calls only the ```assets``` method. Both methods reply with ```data``` ```[{currency, free, frozen}]```.
 - Requests time out after 30 seconds by default.
 
 #### Web3
