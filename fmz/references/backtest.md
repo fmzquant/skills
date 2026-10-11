@@ -19,7 +19,7 @@ Two ways to run a backtest, same engine core and the same history data:
 4. `stop_backtest(task_id)` stops a running task or discards a finished one. Call it once you have read the result: a task holds one of the account's concurrency slots while running **and after finishing until it is collected or stopped**. Results are kept only a few minutes after completion; afterwards `get_backtest` says `not found`.
 4. `list_backtests` lists the tasks still holding a slot (`task_id`, `started`). Use it with `stop_backtest` when `run_backtest` says too many are running.
 
-`run_backtest` takes either `strategy_id` (own, rented or public; its templates are attached automatically and `args` override saved parameter values) or `source` + `language` (raw code). Supported strategy languages on the platform: JavaScript, TypeScript, Python, Rust, Pine, My language, Blockly, Workflow; the tool's `language` enum lists what it accepts.
+`run_backtest` takes either `strategy_id` (own, rented or public; its templates are attached automatically and `args` override saved parameter values) or `source` + `language` (raw code). Supported strategy languages on the platform: JavaScript, Python, Rust, Pine, My language, Workflow; the tool's `language` enum lists what it accepts.
 
 ## 2. Configuring a run
 
@@ -56,7 +56,7 @@ args: [["fast",5],["slow",20]]
 */
 ```
 
-Python uses `'''backtest ... '''`; Rust, TypeScript and JavaScript use `/*backtest ... */` (the block is the language's comment start followed immediately by the word `backtest`).
+Python uses `'''backtest ... '''`; Rust and JavaScript use `/*backtest ... */` (the block is the language's comment start followed immediately by the word `backtest`).
 
 | Key | Value format | Notes |
 |---|---|---|

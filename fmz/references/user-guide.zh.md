@@ -16,7 +16,7 @@
 - 平台尚未对接的交易所，可以通过`通用协议`自行接入。
 
 **支持的策略语言**
-JavaScript、TypeScript、Python、Rust、PINE、My语言（麦语言）和Workflow工作流，见`编程语言`。
+JavaScript、Python、Rust、PINE、My语言（麦语言）和Workflow工作流，见`编程语言`。
 
 **AI 辅助**
 - 策略编辑器内置`AI助手`，可以生成、解释、修改策略代码并分析回测结果。
@@ -537,7 +537,7 @@ Windows界面版没有IP设置，需要指定出口IP时请使用命令行版。
 托管者监控、实盘监控、额度预警等告警通知同样按推送设置发送，但不会发送到WebHook。
 
 策略中推送消息
-- JavaScript/TypeScript/Python/Rust语言
+- JavaScript/Python/Rust语言
   在策略代码中使用```Log()```函数以及可以在日志区域输出日志信息的函数，例如：```exchange.CreateOrder()```、```exchange.CancelOrder()```等。
   给这些函数传入一个附带参数```"@"```（即：除了必要参数再增加一个附带参数），例如：```Log("This is a push message", "@")```，即可把这条输出的日志信息进行推送，平台会根据「推送设置」进行消息推送。Rust语言中为```Log!```宏，用法相同：```Log!("This is a push message", "@");```。
 - PINE语言/My语言
@@ -728,7 +728,7 @@ function main() {
 
 ### 策略结构
 
-```JavaScript```（含 TypeScript）、```Python```、```Rust```策略由几个约定名称的函数组成，托管者在固定的时机调用它们。My语言、PINE、Workflow 策略不需要编写这些函数。
+```JavaScript```、```Python```、```Rust```策略由几个约定名称的函数组成，托管者在固定的时机调用它们。My语言、PINE、Workflow 策略不需要编写这些函数。
 
 **生命周期函数**
 
@@ -939,7 +939,7 @@ fn onexit() {
 
 #### onerror()
 
-```onerror(msg)```只有```JavaScript```（含 TypeScript）策略支持：```main()```因未捕获的异常结束时调用，参数```msg```为异常的错误信息。调用了```onerror()```就不再调用```onexit()```。最长执行 5 分钟，超时会被强制结束。回测系统不支持该函数。
+```onerror(msg)```只有```JavaScript```策略支持：```main()```因未捕获的异常结束时调用，参数```msg```为异常的错误信息。调用了```onerror()```就不再调用```onexit()```。最长执行 5 分钟，超时会被强制结束。回测系统不支持该函数。
 
 ```Python```、```Rust```策略不支持```onerror()```。
 
@@ -1181,13 +1181,11 @@ fn main() {
 
 **在发明者量化交易平台，可以用哪些编程语言实现我的策略呢？**
 
-发明者量化交易平台支持```JavaScript```、```TypeScript```、```Python```、```Rust```、[```PINE```](https://www.fmz.com/bbs-topic/9315)、[```My语言```](https://www.fmz.com/bbs-topic/2569)、```Workflow```工作流编写设计策略。
-
-```Blockly```可视化编程已下线：不能再新建 Blockly 策略，已有的 Blockly 策略仍可以运行。
+发明者量化交易平台支持```JavaScript```、```Python```、```Rust```、[```PINE```](https://www.fmz.com/bbs-topic/9315)、[```My语言```](https://www.fmz.com/bbs-topic/2569)、```Workflow```工作流编写设计策略。
 
 #### JavaScript
 
-平台支持用```JavaScript```编写策略。运行时基于 QuickJS 引擎，支持```async```/```await```、```class```、```BigInt```等现代语法；实盘时策略在托管者上运行，回测时在浏览器端的回测系统中运行。在代码中加入```// @ts-check```即可改用 TypeScript 编写，见 `TypeScript`。
+平台支持用```JavaScript```编写策略。运行时基于 QuickJS 引擎，支持```async```/```await```、```class```、```BigInt```等现代语法；实盘时策略在托管者上运行，回测时在浏览器端的回测系统中运行。也可以用 TypeScript 编写，见本页末尾「用 TypeScript 编写」。
 
 **策略结构与参数**
 
@@ -1280,48 +1278,30 @@ async function main() {
 
 JavaScript 策略可以直接使用内置的```TA```指标库和```talib```指标库，各语言可用的内置库见 `内置库`。其它第三方 JavaScript 库可以在运行时下载后用```eval```加载，示例见同一页。
 
-#### TypeScript
+**用 TypeScript 编写**
 
-TypeScript 不是单独的语言选项：创建策略时选择```JavaScript```，在代码中加入一行```// @ts-check```（或点击策略编辑区右上角的「TypeScript」按钮），平台就按 TypeScript 处理，在回测和实盘运行前先编译为 JavaScript。通过 AI/MCP 工具保存策略时，语言可以直接写```typescript```，平台按 JavaScript 策略保存，并在代码开头自动加上```//@ts-check```，见 `AI接入`。
+TypeScript 不是单独的语言选项：创建策略时选择```JavaScript```，在代码中（通常是首行）写一行```//@ts-check```注释（或点击策略编辑区右上角的「TypeScript」按钮），平台就按 TypeScript 处理，在回测和实盘运行前先编译为 JavaScript。通过 AI/MCP 工具保存策略时，语言可以写```typescript```，平台按 JavaScript 策略保存，并在代码开头自动加上```//@ts-check```，见 `AI接入`。
 
-静态类型检查能在编写时发现参数个数、属性名、类型用错之类的问题，编辑器的补全也更准确。
-
-最小示例：
+平台 API 的类型声明由策略编辑器内置提供，不需要在代码中引用：全局函数、```exchange```对象、```ITicker```、```IRecord```、```IOrder```、```IPosition```等数据结构接口，以及```TA```、```talib```等。静态类型检查能在编写时发现参数个数、属性名、类型用错之类的问题。运行时的语言特性、API 和库与 JavaScript 相同。
 
 ```ts
-// @ts-check
-interface Signal {
-    side: "buy" | "sell"
-    price: number
-}
-
-function getSignal(ticker: ITicker, ma: number): Signal | null {
+//@ts-check
+function getSignal(ticker: ITicker, ma: number): "buy" | "sell" | null {
     if (ticker.Last > ma) {
-        return {side: "buy", price: ticker.Last}
+        return "buy"
     }
-    if (ticker.Last < ma) {
-        return {side: "sell", price: ticker.Last}
-    }
-    return null
+    return ticker.Last < ma ? "sell" : null
 }
 
 function main() {
-    while (true) {
-        const records = exchange.GetRecords()
-        const ticker = exchange.GetTicker()
-        if (records && ticker && records.length > 20) {
-            const ma = TA.MA(records, 20)
-            const signal = getSignal(ticker, ma[ma.length - 1])
-            if (signal) {
-                Log(signal.side, signal.price)
-            }
-        }
-        Sleep(60 * 1000)
+    const records = exchange.GetRecords()
+    const ticker = exchange.GetTicker()
+    if (records && ticker && records.length > 20) {
+        const ma = TA.MA(records, 20)
+        Log(getSignal(ticker, ma[ma.length - 1]))
     }
 }
 ```
-
-平台 API 的类型声明由策略编辑器内置提供，不需要在代码中引用：全局函数、```exchange```对象、```ITicker```、```IRecord```、```IOrder```、```IPosition```等数据结构接口，以及```TA```、```talib```等。运行时的语言特性、API 和库与 JavaScript 策略相同，见 `JavaScript`。
 
 #### Python
 
@@ -1808,7 +1788,7 @@ function main() {
 
 ### 模板类库
 
-**模板类库**是发明者量化交易平台中可复用的代码模块，是策略代码的一种类别。支持模板类库的语言有：```JavaScript```（含 TypeScript）、```Python```、```Rust```。创建策略时如果类别设置为模板类库，会在当前登录账号的策略库中创建一个模板类库，创建后不能再修改类别为普通策略。
+**模板类库**是发明者量化交易平台中可复用的代码模块，是策略代码的一种类别。支持模板类库的语言有：```JavaScript```、```Python```、```Rust```。创建策略时如果类别设置为模板类库，会在当前登录账号的策略库中创建一个模板类库，创建后不能再修改类别为普通策略。
 
 ![创建模板类库页面](https://www.fmz.com/upload/asset/2e4c55da99fd457ca94a0.png)
 
@@ -1951,7 +1931,7 @@ def main():
 
 发明者量化交易平台内置了一些常用库。各语言可用情况：
 
-| 库 | JavaScript / TypeScript | Python | Rust |
+| 库 | JavaScript | Python | Rust |
 | - | - | - | - |
 | ```TA```指标库 | 支持 | 支持 | 支持 |
 | ```talib```指标库 | 支持 | 需在托管者所在机器安装 TA-Lib 和 numpy | 不支持 |
@@ -2957,7 +2937,7 @@ args: [["fast",5],["slow",20]]
 */
 ```
 
-各语言的注释写法：JavaScript、TypeScript、Rust、PINE语言使用```/*backtest ... */```；Python使用```'''backtest ... '''```；My语言使用```(*backtest ... *)```。
+各语言的注释写法：JavaScript、Rust、PINE语言使用```/*backtest ... */```；Python使用```'''backtest ... '''```；My语言使用```(*backtest ... *)```。
 
 | 键 | 格式 | 说明 |
 | - | - | - |
@@ -2987,9 +2967,9 @@ args: [["fast",5],["slow",20]]
 
 **编程语言**
 
-回测系统支持以下语言编写的策略：JavaScript、TypeScript、Python、Rust、[PINE语言](https://www.fmz.com/bbs-topic/9315)、[My语言](https://www.fmz.com/bbs-topic/2569)、Workflow工作流。
+回测系统支持以下语言编写的策略：JavaScript、Python、Rust、[PINE语言](https://www.fmz.com/bbs-topic/9315)、[My语言](https://www.fmz.com/bbs-topic/2569)、Workflow工作流。
 
-- JavaScript策略（TypeScript先编译为JavaScript）在浏览器中回测，回测引擎以WebAssembly形式运行，不需要安装任何软件。JavaScript策略回测时可以在Chrome浏览器的DevTools中调试，见[参考说明](https://www.fmz.com/digest-topic/9459)。
+- JavaScript策略在浏览器中回测，回测引擎以WebAssembly形式运行，不需要安装任何软件。JavaScript策略回测时可以在Chrome浏览器的DevTools中调试，见[参考说明](https://www.fmz.com/digest-topic/9459)。
 - Rust策略由平台服务器编译；策略中通过frontmatter声明的第三方crate在编译时自动获取，本地不需要安装工具链。回测节点默认为「云端」（在平台服务器上运行），也可以选择「本地」，在浏览器中运行。
 - Python策略的回测节点默认为「云端」（平台的公共服务器），也可以选择自己的托管者，或者选择「本地: Python3」在浏览器中回测（以Pyodide运行）。在托管者上回测与实盘一样依赖托管者所在系统的Python 3环境，需要的第三方库要自行安装；公共服务器只提供常用的库。
 - Workflow工作流策略回测时可以可视化查看各节点的执行状态和数据流转。
@@ -5602,9 +5582,9 @@ Parameters:
 - ```21```：交易插件。
 - `language` (number, required): 策略的编程语言：
 - ```-1```：全部语言。
-- ```0```：JavaScript（TypeScript策略也按JavaScript保存，源码中带```//@ts-check```）。
+- ```0```：JavaScript。
 - ```1```：Python。
-- ```3```：Blockly可视化（已下线，只有存量策略）。
+- ```3```：已停用的策略类型，只会出现在存量策略中。
 - ```4```：My语言。
 - ```5```：PINE语言。
 - ```6```：Workflow工作流。

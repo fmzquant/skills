@@ -16,7 +16,7 @@ FMZ Quant is a quantitative trading platform: write strategies in the browser, b
 - Exchanges the platform has not integrated yet can be connected yourself through the general protocol (see Platform Basics → Exchange → General Protocol).
 
 **Strategy languages**
-JavaScript, TypeScript, Python, Rust, PINE, MyLanguage and Workflow; see Writing Strategies → Programming Languages.
+JavaScript, Python, Rust, PINE, MyLanguage and Workflow; see Writing Strategies → Programming Languages.
 
 **AI assistance**
 - The strategy editor has a built-in AI assistant that generates, explains and edits strategy code and analyzes backtest results (see Development Tools → Strategy Editor → AI Assistant).
@@ -537,7 +537,7 @@ You can enable message push on the [Push Settings page](https://www.fmz.com/m/ac
 Alerts such as docker monitoring, robot monitoring and the balance alert are also sent according to the push settings, but never to the WebHook.
 
 Pushing Messages in Strategies
-- JavaScript/TypeScript/Python/Rust Languages
+- JavaScript/Python/Rust Languages
   In the strategy code, you can use the ```Log()``` function as well as other functions that output log information in the log area, such as ```exchange.CreateOrder()```, ```exchange.CancelOrder()```, etc.
   By passing an additional parameter ```"@"``` to these functions (i.e., adding an extra parameter beyond the required ones), for example ```Log("This is a push message", "@")```, the output log information will be pushed, and the platform will push the message according to the "Push Settings". In the Rust language, the corresponding ```Log!``` macro is used the same way: ```Log!("This is a push message", "@");```.
 - PINE Language/My Language
@@ -728,7 +728,7 @@ Writing strategies: strategy structure (lifecycle, main loop, event-driven), not
 
 ### Strategy Structure
 
-Strategies in ```JavaScript``` (including TypeScript), ```Python``` and ```Rust``` consist of a few functions with agreed names, which the docker calls at fixed points. MyLanguage, PINE and Workflow strategies do not need to define them.
+Strategies in ```JavaScript```, ```Python``` and ```Rust``` consist of a few functions with agreed names, which the docker calls at fixed points. MyLanguage, PINE and Workflow strategies do not need to define them.
 
 **Lifecycle functions**
 
@@ -939,7 +939,7 @@ fn onexit() {
 
 #### onerror()
 
-```onerror(msg)``` is supported only by ```JavaScript``` (including TypeScript) strategies. It is called when ```main()``` ends with an uncaught exception; the argument ```msg``` is the error message. When ```onerror()``` is called, ```onexit()``` is not. It may run for at most 5 minutes and is terminated when it exceeds that. The backtesting system does not support this function.
+```onerror(msg)``` is supported only by ```JavaScript``` strategies. It is called when ```main()``` ends with an uncaught exception; the argument ```msg``` is the error message. When ```onerror()``` is called, ```onexit()``` is not. It may run for at most 5 minutes and is terminated when it exceeds that. The backtesting system does not support this function.
 
 ```Python``` and ```Rust``` strategies do not support ```onerror()```.
 
@@ -1181,13 +1181,11 @@ fn main() {
 
 **What programming languages can I use to write my strategies on the FMZ Quant trading platform?**
 
-The FMZ Quant trading platform supports writing and designing trading strategies using ```JavaScript```, ```TypeScript```, ```Python```, ```Rust```, [```PINE```](https://www.fmz.com/bbs-topic/9315), [```My Language```](https://www.fmz.com/bbs-topic/2569), and the ```Workflow``` workflow tool.
-
-```Blockly``` visual programming has been retired: new Blockly strategies can no longer be created, and existing Blockly strategies still run.
+The FMZ Quant trading platform supports writing and designing trading strategies using ```JavaScript```, ```Python```, ```Rust```, [```PINE```](https://www.fmz.com/bbs-topic/9315), [```My Language```](https://www.fmz.com/bbs-topic/2569), and the ```Workflow``` workflow tool.
 
 #### JavaScript
 
-Strategies can be written in ```JavaScript```. The runtime is based on the QuickJS engine and supports modern syntax such as ```async```/```await```, ```class``` and ```BigInt```. In live trading the strategy runs on the docker; in backtesting it runs in the browser-side backtesting system. Adding ```// @ts-check``` to the code switches to TypeScript (see Programming Languages → TypeScript).
+Strategies can be written in ```JavaScript```. The runtime is based on the QuickJS engine and supports modern syntax such as ```async```/```await```, ```class``` and ```BigInt```. In live trading the strategy runs on the docker; in backtesting it runs in the browser-side backtesting system. Strategies can also be written in TypeScript; see "Writing in TypeScript" at the end of this page.
 
 **Structure and parameters**
 
@@ -1280,48 +1278,30 @@ async function main() {
 
 JavaScript strategies can use the built-in ```TA``` and ```talib``` indicator libraries directly; see Writing Strategies → Built-in Libraries for what each language provides. Other third-party JavaScript libraries can be downloaded at run time and loaded with ```eval```; the same page has an example.
 
-#### TypeScript
+**Writing in TypeScript**
 
-TypeScript is not a separate language option. Create the strategy as ```JavaScript``` and add a ```// @ts-check``` line to the code (or click the "TypeScript" button at the top right of the editor); the platform then treats it as TypeScript and compiles it to JavaScript before backtesting or live trading. When a strategy is saved through the AI/MCP tools, the language can be given as ```typescript```: the platform saves it as a JavaScript strategy and adds ```//@ts-check``` at the top automatically (see External Interfaces → AI Access).
+TypeScript is not a separate language option. Create the strategy as ```JavaScript``` and put a ```//@ts-check``` comment line in the code (usually the first line), or click the "TypeScript" button at the top right of the editor; the platform then treats it as TypeScript and compiles it to JavaScript before backtesting or live trading. When a strategy is saved through the AI/MCP tools, the language can be given as ```typescript```: the platform saves it as a JavaScript strategy and adds ```//@ts-check``` at the top automatically (see External Interfaces → AI Access).
 
-Static type checking catches mistakes such as wrong argument counts, property names or types while you write, and makes editor completion more accurate.
-
-A minimal example:
+Type declarations for the platform API are built into the strategy editor; nothing needs to be referenced in the code. They cover the global functions, the ```exchange``` object, data structure interfaces such as ```ITicker```, ```IRecord```, ```IOrder``` and ```IPosition```, and ```TA```, ```talib``` and so on. Static type checking catches mistakes such as wrong argument counts, property names or types while you write. Language features, APIs and libraries at run time are the same as for JavaScript.
 
 ```ts
-// @ts-check
-interface Signal {
-    side: "buy" | "sell"
-    price: number
-}
-
-function getSignal(ticker: ITicker, ma: number): Signal | null {
+//@ts-check
+function getSignal(ticker: ITicker, ma: number): "buy" | "sell" | null {
     if (ticker.Last > ma) {
-        return {side: "buy", price: ticker.Last}
+        return "buy"
     }
-    if (ticker.Last < ma) {
-        return {side: "sell", price: ticker.Last}
-    }
-    return null
+    return ticker.Last < ma ? "sell" : null
 }
 
 function main() {
-    while (true) {
-        const records = exchange.GetRecords()
-        const ticker = exchange.GetTicker()
-        if (records && ticker && records.length > 20) {
-            const ma = TA.MA(records, 20)
-            const signal = getSignal(ticker, ma[ma.length - 1])
-            if (signal) {
-                Log(signal.side, signal.price)
-            }
-        }
-        Sleep(60 * 1000)
+    const records = exchange.GetRecords()
+    const ticker = exchange.GetTicker()
+    if (records && ticker && records.length > 20) {
+        const ma = TA.MA(records, 20)
+        Log(getSignal(ticker, ma[ma.length - 1]))
     }
 }
 ```
-
-Type declarations for the platform API are built into the strategy editor; nothing needs to be referenced in the code. They cover the global functions, the ```exchange``` object, data structure interfaces such as ```ITicker```, ```IRecord```, ```IOrder``` and ```IPosition```, and ```TA```, ```talib``` and so on. Language features, APIs and libraries at run time are the same as for JavaScript strategies (see Programming Languages → JavaScript).
 
 #### Python
 
@@ -1808,7 +1788,7 @@ For buttons in status bar tables, button colors and sizes (```class```), multi-s
 
 ### Template Library
 
-A **template library** is a reusable code module on the FMZ Quant Trading Platform and a category of strategy code. Languages that support template libraries: ```JavaScript``` (including TypeScript), ```Python``` and ```Rust```. If the category is set to template library when a strategy is created, a template library is created in the strategy library of the logged-in account; its category cannot be changed to an ordinary strategy afterwards.
+A **template library** is a reusable code module on the FMZ Quant Trading Platform and a category of strategy code. Languages that support template libraries: ```JavaScript```, ```Python``` and ```Rust```. If the category is set to template library when a strategy is created, a template library is created in the strategy library of the logged-in account; its category cannot be changed to an ordinary strategy afterwards.
 
 ![Create Template Library Page](https://www.fmz.com/upload/asset/2e4c55da99fd457ca94a0.png)
 
@@ -1952,7 +1932,7 @@ When a strategy references a template library, the currently logged-in FMZ Quant
 
 The FMZ Quant Trading Platform has some commonly used libraries built in. Availability by language:
 
-| Library | JavaScript / TypeScript | Python | Rust |
+| Library | JavaScript | Python | Rust |
 | - | - | - | - |
 | ```TA``` indicators | yes | yes | yes |
 | ```talib``` indicators | yes | requires TA-Lib and numpy installed on the docker's machine | no |
@@ -2958,7 +2938,7 @@ args: [["fast",5],["slow",20]]
 */
 ```
 
-Comment syntax per language: JavaScript, TypeScript, Rust and PINE use ```/*backtest ... */```; Python uses ```'''backtest ... '''```; MyLanguage uses ```(*backtest ... *)```.
+Comment syntax per language: JavaScript, Rust and PINE use ```/*backtest ... */```; Python uses ```'''backtest ... '''```; MyLanguage uses ```(*backtest ... *)```.
 
 | Key | Format | Description |
 | - | - | - |
@@ -2988,9 +2968,9 @@ The other options of the backtest form (slippage, network delay, failure probabi
 
 **Programming languages**
 
-The backtesting system supports strategies written in JavaScript, TypeScript, Python, Rust, [PINE](https://www.fmz.com/bbs-topic/9315), [MyLanguage](https://www.fmz.com/bbs-topic/2569) and Workflow.
+The backtesting system supports strategies written in JavaScript, Python, Rust, [PINE](https://www.fmz.com/bbs-topic/9315), [MyLanguage](https://www.fmz.com/bbs-topic/2569) and Workflow.
 
-- JavaScript strategies (TypeScript is compiled to JavaScript first) are backtested in the browser, where the backtest engine runs as WebAssembly; nothing needs to be installed. JavaScript strategies can be debugged with Chrome DevTools during a backtest, see [this guide](https://www.fmz.com/digest-topic/9459).
+- JavaScript strategies are backtested in the browser, where the backtest engine runs as WebAssembly; nothing needs to be installed. JavaScript strategies can be debugged with Chrome DevTools during a backtest, see [this guide](https://www.fmz.com/digest-topic/9459).
 - Rust strategies are compiled by the platform's servers; third-party crates declared in the strategy's frontmatter are fetched at compile time, so no local toolchain is needed. The backtest node defaults to "Cloud" (runs on the platform's servers); you can also choose "Local", which runs in the browser.
 - For Python strategies the backtest node defaults to "Cloud" (the platform's public servers); you can also choose your own docker, or "Local: Python3" to backtest in the browser (run with Pyodide). A backtest on a docker, like live trading, uses the Python 3 environment of the docker's system; install the third-party libraries you need yourself. The public servers only provide common libraries.
 - Workflow strategies show each node's execution state and data flow visually during a backtest.
@@ -5603,9 +5583,9 @@ Parameters:
 - ```21```: trading plugins.
 - `language` (number, required): Programming language of the strategy:
 - ```-1```: all languages.
-- ```0```: JavaScript (TypeScript strategies are stored as JavaScript with a ```//@ts-check``` line in the source).
+- ```0```: JavaScript.
 - ```1```: Python.
-- ```3```: Blockly (retired; existing strategies only).
+- ```3```: a discontinued strategy type; appears only on existing strategies.
 - ```4```: MyLanguage.
 - ```5```: PINE.
 - ```6```: Workflow.

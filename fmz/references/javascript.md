@@ -33,8 +33,8 @@ function onexit() { Log("exit"); }              // optional, runs when the robot
 | `onexit()` | optional, normal stop | max 5 minutes, otherwise an `interrupt` error. Not called if `onerror` already fired. In a backtest the end of data raises an exception inside your loop, so `onexit` only runs if `main` returns: wrap the loop in `try/catch` when `IsVirtual()` (user-guide example under `#### onexit()`). |
 | `onerror(msg)` | optional, abnormal exit | JavaScript only, max 5 minutes, **not supported by the backtest system**. |
 
-TypeScript:
-- Save with `language: "typescript"` (`save_strategy`), or keep JavaScript and start the file with `// @ts-check` / press the editor's TypeScript button; the platform compiles with type checking. Nothing else differs at run time.
+TypeScript (not a separate language: a JavaScript strategy whose source has a `//@ts-check` comment line, usually the first):
+- Save with `language: "typescript"` (`save_strategy` stores it as JavaScript and adds `//@ts-check`), or keep JavaScript and start the file with `//@ts-check` / press the editor's TypeScript button; the platform compiles with type checking. Nothing else differs at run time.
 - For editor types use `references/fmz.d.ts`; for the native API `references/ctx.d.ts` (set `"lib": ["es2020"]` or `"types": []` so the DOM `onerror` does not clash).
 - The docs state no ECMAScript level or strict mode. Official examples use `let/const`, template literals, `for..of`, destructuring, `async/await`, `Promise.all`, `BigInt`, `setTimeout/clearTimeout` and `fetch`, so modern syntax is fine. Do not `require()` anything.
 

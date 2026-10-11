@@ -613,9 +613,9 @@ Parameters:
 - ```21```: trading plugins.
 - `language` (number, required): Programming language of the strategy:
 - ```-1```: all languages.
-- ```0```: JavaScript (TypeScript strategies are stored as JavaScript with a ```//@ts-check``` line in the source).
+- ```0```: JavaScript.
 - ```1```: Python.
-- ```3```: Blockly (retired; existing strategies only).
+- ```3```: a discontinued strategy type; appears only on existing strategies.
 - ```4```: MyLanguage.
 - ```5```: PINE.
 - ```6```: Workflow.
