@@ -26,13 +26,13 @@ Account overview: counts of robots, strategies, exchange accounts and nodes, plu
 
 ### list_exchanges
 
-Exchanges the platform supports. `eid` is the exchange id used by run_backtest (already the name the history data server uses, e.g. OKX / HTX); backtest=false means the platform has no history data for that exchange, so it can only be traded live.
+Exchanges the platform supports. `eid` is the exchange id used by run_backtest (already the name the history data server uses, e.g. OKX / HTX); backtest=false means the platform has no history data for that exchange, so it can only be traded live. `tags` is a comma-separated venue type list (cex, dex, prediction, broker, custom; may be empty); an eid starting with Futures_ is the futures/perpetual side of that exchange.
 
 (no parameters)
 
 ### list_platforms
 
-The user's configured exchange accounts (API keys are never returned). `id` is the platform_id used by create_robot. New accounts must be added by the user on the website.
+The user's configured exchange accounts (API keys are never returned). `id` is the platform_id used by create_robot; `tags` is the exchange's venue type list (see list_exchanges). New accounts must be added by the user on the website.
 
 (no parameters)
 
@@ -48,7 +48,7 @@ List strategies. scope: mine (default; the user's own plus rented ones, see is_o
 
 - `group_id` (number): Only this strategy group (see list_groups)
 - `keyword` (string): Fuzzy match on the strategy name
-- `language` (string one of javascript/python/mylanguage/pine/flow/rust; legacy strategy types are filtered by their stored names)
+- `language` (string one of javascript/python/mylanguage/pine/flow/rust)
 - `limit` (number): Default 50, max 200
 - `offset` (number)
 - `scope` (string one of mine/public/official/templates)
@@ -145,7 +145,7 @@ Start a backtest on the cloud cluster, either of a saved strategy (strategy_id) 
   - `fee_taker` (number)
   - `pair` (string, required)
   - `stocks` (number)
-- `language` (string one of javascript/python/mylanguage/pine/flow/rust/typescript): Required with source. `typescript` = JavaScript with a `//@ts-check` line
+- `language` (string one of javascript/python/blockly/mylanguage/pine/flow/rust/typescript): Required with source
 - `net_delay` (number): Simulated network latency in ms, default 200
 - `period` (string one of 1m/5m/15m/30m/1h/4h/1d): Default K-line period the strategy sees, default 1h
 - `slippage` (number): Slip points per order, default 0
@@ -196,7 +196,7 @@ Change a STOPPED robot's configuration: name, exchanges/pairs, parameter values,
 
 Static check of strategy source before saving: syntax errors for javascript (TypeScript is JavaScript source with a //@ts-check line; language "typescript" adds that line), compile errors for pine, mylanguage, flow and rust (rust compiles on the build cluster and takes a while). python and legacy strategy types have no static check (checked=false). Returns {ok, error}.
 
-- `language` (string one of javascript/python/mylanguage/pine/flow/rust/typescript, required)
+- `language` (string one of javascript/python/blockly/mylanguage/pine/flow/rust/typescript, required)
 - `source` (string, required)
 
 ### save_strategy
