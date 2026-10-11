@@ -4,25 +4,25 @@ Generated from https://www.fmz.com/user-guide: how the platform works (nodes, ro
 
 ## Getting Started
 
-Start here: what the platform is, the five steps from adding an exchange to running a live robot, and keeping API keys safe.
+Start here: get to know the platform, go from registration to your first live robot in six steps, and keep your exchange API keys safe.
 
 ### Welcome to FMZ Quant Trading Platform
 
 FMZ Quant is a quantitative trading platform: write strategies in the browser, backtest them online, then run them as live robots on a docker you deploy yourself or rent. You can also learn from, share and rent out strategies in the strategy square, or show your own live robots publicly.
 
-**Supported markets**
+#### Supported markets
 - Crypto: spot, futures and perpetual contracts on the major centralized exchanges, plus some on-chain exchanges.
 - Securities and futures: Futu Securities, Interactive Brokers and others.
-- Exchanges the platform has not integrated yet can be connected yourself through the general protocol (see Platform Basics → Exchange → General Protocol).
+- Exchanges the platform has not integrated yet can be connected yourself through the general protocol (see `General Protocol`).
 
-**Strategy languages**
-JavaScript, Python, Rust, PINE, MyLanguage and Workflow; see Writing Strategies → Programming Languages.
+#### Strategy languages
+JavaScript, Python, Rust, PINE, MyLanguage and Workflow; see `Programming Languages`.
 
-**AI assistance**
-- The strategy editor has a built-in AI assistant that generates, explains and edits strategy code and analyzes backtest results (see Development Tools → Strategy Editor → AI Assistant).
-- You can also connect the external AI assistant you already use to the platform and manage strategies, backtests and live robots through conversation (see Extended API Interface → AI Integration).
+#### AI assistance
+- The strategy editor has a built-in AI assistant that generates, explains and edits strategy code and analyzes backtest results (see `AI Assistant`).
+- You can also connect the external AI assistant you already use to the platform and manage strategies, backtests and live robots through conversation (see `AI Integration`).
 
-**Dashboard**
+#### Dashboard
 After signing up and logging in, open the [dashboard](https://www.fmz.com/m):
 
 ![Dashboard overview](https://www.fmz.com/upload/asset/2e4e636a6fe51c8f620e8.png)
@@ -33,7 +33,7 @@ After signing up and logging in, open the [dashboard](https://www.fmz.com/m):
 - [Docker](https://www.fmz.com/m/nodes): deploy and manage the docker programs that run strategies.
 - [Exchange](https://www.fmz.com/m/platforms): add and manage exchange accounts.
 
-**Public resources**
+#### Public resources
 - [Strategy Square](https://www.fmz.com/square): strategies shared publicly or listed for rent, good for learning and reference.
 - [Live](https://www.fmz.com/live): live robots that users show publicly.
 - [Digest](https://www.fmz.com/digest): original articles by the platform.
@@ -42,42 +42,40 @@ After signing up and logging in, open the [dashboard](https://www.fmz.com/m):
 - [Classes](https://www.fmz.com/class): video tutorials.
 - [API Docs](https://www.fmz.com/api): the API syntax manual for writing strategies.
 
-**Getting help**
+#### Getting help
 Post in the community, submit a ticket from the dashboard, or contact the administrators in the [Telegram](https://t.me/fmzquant_cn) group.
 
 ### Quick Start
 
 Six steps take you from registration to your first live robot; each step links to the details.
 
-**1. Register**
+#### 1. Register
 
-Register and log in on the [sign-up page](https://www.fmz.com/sign-up). Adding an exchange asks for your account password (the exchange keys are encrypted with it in the browser); users who log in with a third-party account and have no password yet are asked to set one first. See Getting Started → Key Security.
+Register and log in on the [sign-up page](https://www.fmz.com/sign-up). Adding an exchange asks for your account password (the exchange keys are encrypted with it in the browser); users who log in with a third-party account and have no password yet are asked to set one first. See `Key Security`.
 
-**2. Add an exchange account**
+#### 2. Add an exchange account
 
-Create an API key on the exchange's website (enable only read and trade permissions, never withdrawal), then click "Add Exchange" on the [Exchange page](https://www.fmz.com/m/platforms), choose the exchange and fill in the keys. For a first try, use the exchange's demo trading or a small sub-account. For the steps and every field see Platform Basics → Exchange.
+Create an API key on the exchange's website (enable only read and trade permissions, never withdrawal), then click "Add Exchange" on the [Exchange page](https://www.fmz.com/m/platforms), choose the exchange and fill in the keys. For a first try, use the exchange's demo trading or a small sub-account. For the steps and every field see `Exchange`.
 
-**3. Deploy a docker**
+#### 3. Deploy a docker
 
-The docker is the program that runs strategies; every live robot runs on one. Rent one with a click (Platform Basics → Docker → Deploy Docker → One-Click Docker Rental) or deploy it on your own server (Platform Basics → Docker → Deploy Docker → Manual Deployment of Docker).
+The docker is the program that runs strategies; every live robot runs on one. Rent one with a click (`One-Click Docker Rental`) or deploy it on your own server (`Manual Deployment of Docker`).
 
-**4. Write a strategy**
+#### 4. Write a strategy
 
-On the [new strategy page](https://www.fmz.com/m/add-strategy), choose a programming language, paste in the minimal strategy below and save. It reads the market data and the account every 5 seconds and shows them in the status bar; it does not place orders. A strategy is an entry function ```main()``` with a main loop (see Writing Strategies → Strategy Structure); all functions are listed in Writing Strategies → API Quick Reference, and the editor is described in Development Tools → Strategy Editor. You can also start from a public strategy in the strategy square.
+On the [new strategy page](https://www.fmz.com/m/add-strategy), choose a programming language, paste in the minimal strategy below and save. It reads the market data and the account every 5 seconds and shows them in the status bar; it does not place orders. A strategy is an entry function ```main()``` with a main loop (see `Strategy Structure`); all functions are listed in `API Quick Reference`, and the editor is described in `Strategy Editor`. You can also start from a public strategy in the strategy square.
 
-**5. Backtest**
+#### 5. Backtest
 
-In the backtest panel of the strategy editing page, choose the exchange, trading pair, time range and K-line period, then start a backtest and check the profit curve, trades and logs. Go live only after the backtest looks right; see Backtesting System → Overview and Starting a Backtest.
+In the backtest panel of the strategy editing page, choose the exchange, trading pair, time range and K-line period, then start a backtest and check the profit curve, trades and logs. Go live only after the backtest looks right; see `Overview and Starting a Backtest`.
 
-**6. Create a live robot**
+#### 6. Create a live robot
 
-On the [create robot page](https://www.fmz.com/m/add-robot), choose the strategy, a docker and the exchange account, set the strategy parameters and start it. Live robots are billed by the hour, so the account needs a balance before you start; see Platform Basics → Account and Billing → Live Robot Billing and Top-up. Status, logs and profit are on the robot page; see Platform Basics → Live Trading.
+On the [create robot page](https://www.fmz.com/m/add-robot), choose the strategy, a docker and the exchange account, set the strategy parameters and start it. Live robots are billed by the hour, so the account needs a balance before you start; see `Live Robot Billing and Top-up`. Status, logs and profit are on the robot page; see `Live Trading`.
 
 Read on as needed: "Development Tools" covers editing and debugging, "Advanced Topics" covers rate limiting, communication between robots, multi-threading and on-chain trading, and "Extended API Interface" covers driving the platform from programs or AI assistants.
 
-#### Minimal runnable strategy
-
-Runs as is in both backtesting and live trading.
+Minimal runnable strategy: shows the market data and the account in the status bar every 5 seconds without placing orders; runs as is in backtesting and live trading.
 
 ```javascript
 function main() {
@@ -86,7 +84,8 @@ function main() {
         var ticker = exchange.GetTicker()
         var account = exchange.GetAccount()
         if (ticker && account) {
-            LogStatus(_D(), "last:", ticker.Last, "quote available:", account.Balance, "coins available:", account.Stocks)
+            LogStatus(_D(), "last:", ticker.Last,
+                "quote available:", account.Balance, "coins available:", account.Stocks)
         }
         Sleep(5000)
     }
@@ -100,7 +99,8 @@ def main():
         ticker = exchange.GetTicker()
         account = exchange.GetAccount()
         if ticker and account:
-            LogStatus(_D(), "last:", ticker["Last"], "quote available:", account["Balance"], "coins available:", account["Stocks"])
+            LogStatus(_D(), "last:", ticker["Last"],
+                      "quote available:", account["Balance"], "coins available:", account["Stocks"])
         Sleep(5000)
 ```
 
@@ -109,7 +109,8 @@ fn main() {
     Log!("exchange:", exchange.GetName(), "pair:", exchange.GetCurrency());
     loop {
         if let (Ok(ticker), Ok(account)) = (exchange.GetTicker(None), exchange.GetAccount()) {
-            LogStatus!(_D(None), "last:", ticker.Last, "quote available:", account.Balance, "coins available:", account.Stocks);
+            LogStatus!(_D(None), "last:", ticker.Last,
+                "quote available:", account.Balance, "coins available:", account.Stocks);
         }
         Sleep(5000);
     }
@@ -118,15 +119,15 @@ fn main() {
 
 ### Key Security
 
-A leaked exchange key costs you the assets in that exchange account. Before configuring an exchange account, go through this checklist:
+Before configuring an exchange account, check your key settings against this list; a leaked exchange key costs you the assets in that exchange account.
 
 - **Trade permission only**: enable only read and trade permissions for the API key, and **never enable withdrawal**.
-- **Bind an IP whitelist**: on the exchange, bind the API key to the outbound IP of the server running your docker. If the server has several IPs, pin the outbound IP with the docker's ```-I``` option (see Platform Basics → Docker → Command-Line Options).
-- **Keep private keys local**: if the exchange supports asymmetric keys such as RSA, prefer them, and keep the private key as a credential file on the docker's machine so that the platform stores only the file path (see Platform Basics → Exchange → Local Credential Files).
+- **Bind an IP whitelist**: on the exchange, bind the API key to the outbound IP of the server running your docker. If the server has several IPs, pin the outbound IP with the docker's ```-I``` option (see `Command-Line Options`).
+- **Keep private keys local**: if the exchange supports asymmetric keys such as RSA, prefer them, and keep the private key as a credential file on the docker's machine so that the platform stores only the file path (see `Local Credential Files`).
 - **Start small**: run a new strategy against the exchange's demo trading or a small sub-account first.
 - **Do not publish secrets**: if the strategy code, parameters or description contain keys, account names or similar information, do not publish or sell the strategy.
 
-How the platform stores keys: encrypted fields such as keys on the exchange configuration page are encrypted in the browser with your platform account password before upload, so the platform never stores them in plain text; only a docker started with that account password can decrypt them locally. Changing the platform account password therefore invalidates existing exchange configurations; see Platform Basics → Live Trading → Common Causes of Live Trading Errors and Abnormal Exits for what to do.
+How the platform stores keys: encrypted fields such as keys on the exchange configuration page are encrypted in the browser with your platform account password before upload, so the platform never stores them in plain text; only a docker started with that account password can decrypt them locally. Changing the platform account password therefore invalidates existing exchange configurations; see `Common Causes of Live Trading Errors and Abnormal Exits` for what to do.
 
 ## Platform Basics
 
@@ -136,59 +137,59 @@ The basic objects of the platform: exchange accounts, the docker that runs strat
 
 The [Exchange](https://www.fmz.com/m/platforms) page manages the exchange accounts you have configured. On FMZ, an "exchange" is an account a strategy program can operate: it holds the keys of the funding account together with the protocol and API wrapper used to talk to that exchange.
 
-**Adding an exchange account**
+#### Adding an exchange account
 
-1. **Create an API key on the exchange**: enable only read and trade permissions, never withdrawal; if the exchange supports an IP whitelist, bind the outbound IP of the docker that will run the robot (see the checklist in Getting Started → Key Security).
+1. **Create an API key on the exchange**: enable only read and trade permissions, never withdrawal; if the exchange supports an IP whitelist, bind the outbound IP of the docker that will run the robot (see the checklist in `Key Security`).
 2. **Open the add page**: click "Add Exchange" on the Exchange page to open the [add exchange page](https://www.fmz.com/m/add-platform).
 3. **Choose the protocol**: pick the exchange by category, or search by exchange name or ID. Spot and futures (contracts) are two different exchange objects and are added separately; futures exchanges carry a "Futures" tag. For example Binance spot is ```Binance``` and Binance futures is ```Futures_Binance```.
-4. **Fill in the configuration**: "Label" is the account's name on the platform (the exchange name by default) and tells several accounts on the same exchange apart. The other fields depend on the exchange; the common ones are listed below, and the full list for each exchange is on its exchange page in the syntax manual (all exchanges are listed in `Capability-Matrix`). Fields not marked optional are required.
+4. **Fill in the configuration**: "Label" is the account's name on the platform (the exchange name by default) and tells several accounts on the same exchange apart. The other fields depend on the exchange; the common ones are listed below, and the full list for each exchange is on its exchange page in the syntax manual (all exchanges are listed in `Capability Matrix`). Fields not marked optional are required.
 5. **Confirm**: click the confirm button and enter your platform account password. Encrypted fields such as keys are encrypted in the browser with the account password before upload, so the platform never stores them in plain text.
 6. **Use it**: select the exchange account when creating a live robot or a backtest. If you use the platform's public dockers, their IPs are listed at the bottom of the add page; add them to the exchange's IP whitelist.
 
-**Common fields**
+#### Common fields
 
 | Field | Description |
 | - | - |
 | Access Key, Secret Key | The exchange API key and secret. Secret Key is an encrypted field |
-| Passphrase | The passphrase set when creating the API key; required by ```OKEX``` (OKX), ```Futures_OKCoin``` (OKX futures), Bitget, DeepCoin, ```Futures_KuCoin```, ```WEEX```, ```Futures_WEEX``` and others. For ```KuCoin``` spot this field is labeled Password |
-| Simulate (demo) | When checked, connects to the exchange's demo trading or testnet, e.g. some exchange objects of Binance, OKX, Bybit, Gate and DigiFinex. Demo trading usually needs a separate API key created on the exchange |
-| Version, V5 protocol, V3 protocol | The exchange API version. Keep the default on most exchanges; on a few the version selects the account type (for example v3 is the unified account and v2 the classic account on Bitget), see the exchange page |
-| Wallet address and private keys | On-chain exchanges (Hyperliquid, Lighter, EdgeX, Aster, Polymarket, ...) sign with a wallet address and wallet private key or an API private key generated by the exchange; see the exchange pages under `Decentralized Exchanges` and `Prediction Markets` in the syntax manual for the exact fields |
-| Rpc Address, Chain, ChainType | Node address and chain for the on-chain swap and Web3 exchange objects; see Advanced Topics → Web3 |
-| Server address, trading password | Securities and futures accounts such as Futu and Interactive Brokers; see the exchange pages under `Securities and Futures` in the syntax manual |
+| Passphrase | The passphrase set when creating the API key; required by some exchanges (see below) |
+| Simulate (demo) | When checked, connects to the exchange's demo trading or testnet; usually needs a separate API key |
+| Version, V5 protocol, V3 protocol | The exchange API version; keep the default on most exchanges |
+| Wallet address and private keys | The wallet address, wallet private key or exchange-generated API private key used to sign on on-chain exchanges |
+| Rpc Address, Chain, ChainType | Node address and chain for the on-chain swap and Web3 exchange objects; see `Web3` |
+| Server address, trading password | Securities and futures accounts such as Futu and Interactive Brokers; see `Securities and Futures` in the syntax manual |
 
-Every masked (encrypted) input can hold a credential file path instead, so the private key stays only on the docker's machine; see Platform Basics → Exchange → Local Credential Files.
+- Passphrase: required by ```OKEX``` (OKX), ```Futures_OKCoin``` (OKX futures), Bitget, DeepCoin, ```Futures_KuCoin```, ```WEEX```, ```Futures_WEEX``` and others. For ```KuCoin``` spot this field is labeled Password.
+- Simulate (demo): supported by some exchange objects of Binance, OKX, Bybit, Gate and DigiFinex.
+- API version: on a few exchanges the version selects the account type, for example v3 is the unified account and v2 the classic account on Bitget; see the exchange page.
+- Wallet address and private keys: used by on-chain exchanges such as Hyperliquid, Lighter, EdgeX, Aster and Polymarket; see the exchange pages under `Decentralized Exchanges` and `Prediction Markets` in the syntax manual for the exact fields.
 
-**Exchange objects**
+Every masked (encrypted) input can hold a credential file path instead, so the private key stays only on the docker's machine; see `Local Credential Files`.
+
+#### Exchange objects
 In strategy code a configured exchange is the exchange object `exchange`. A backtest or live robot can be configured with several exchanges; in code they form the exchange object array `exchanges`. ```exchange.GetName()``` returns the name of the exchange object (such as ```Futures_Binance```); the documentation uses this name when it refers to a specific exchange, with the common name in parentheses where helpful.
 
 Strategy code reads the account and market data, places orders and cancels them through the exchange object. In ```JavaScript```:
 
-```js
+```javascript
 function main() {
     let account = exchange.GetAccount()    // query account information
     let ticker = exchange.GetTicker()      // get the ticker
     let id = exchange.Buy(1000, 1)         // price 1000, amount 1
     if (id) {
-        exchange.CancelOrder(id)           // an order Id exists only if the order was placed; cancel it if still open
+        exchange.CancelOrder(id)           // cancel the order if it is still open
     }
 }
 ```
 
-The rest of this chapter:
-- Configuration fields, contract codes, exchange-specific commands and notes of each exchange: see the "Exchanges" chapter of the syntax manual, starting from `Capability-Matrix` or a group page (`Centralized Exchanges`, `Decentralized Exchanges`, `Prediction Markets`, `Securities and Futures`, `On-chain & Custom`).
-- Local Credential Files: keep private keys and other secrets only on the docker's machine.
-- General Protocol: connect an exchange the platform has not integrated yet.
-
 #### Exchange-Specific Notes
 
-The configuration, contract codes, exchange-specific commands and notes of each exchange have moved to the "Exchanges" chapter of the syntax manual. Function and trading-mode command support of all exchanges is in `Capability-Matrix`; the exchange pages are grouped under `Centralized Exchanges`, `Decentralized Exchanges`, `Prediction Markets`, `Securities and Futures` and `On-chain & Custom`.
+The configuration, contract codes, exchange-specific commands and notes of each exchange have moved to the "Exchanges" chapter of the syntax manual. Function and trading-mode command support of all exchanges is in `Capability Matrix`; the exchange pages are grouped under `Centralized Exchanges`, `Decentralized Exchanges`, `Prediction Markets`, `Securities and Futures` and `On-chain & Custom`.
 
 #### Local Credential Files
 
 When configuring an exchange, every masked encrypted input (Secret Key, private key, password, etc.) can hold a credential file path ```file:///name.txt``` instead of the secret itself. When the live robot runs, the docker reads that file on its own machine and uses the content as the value. The private key then exists only on the docker's machine, and the platform stores nothing but a path.
 
-**Path rules**
+##### Path rules
 - The path is resolved relative to **this robot's directory** ```logs/storage/<robot ID>/``` (```logs``` is under the docker's working directory). For robot ID ```123456```, ```file:///rsaKey.txt``` means ```logs/storage/123456/rsaKey.txt```.
 - Subdirectories are allowed, e.g. ```file:///keys/rsaKey.txt```.
 - Only the ```.txt``` suffix is recognized; with any other suffix the text is not read as a file but used literally as the configuration value.
@@ -196,7 +197,7 @@ When configuring an exchange, every masked encrypted input (Secret Key, private 
 - Credential files are read from each robot's own directory, so when several robots use the same exchange configuration, every robot directory needs its own copy.
 - If the file cannot be read, the robot fails to start: a missing file gives an error containing ```resolve key file```, and a file that exists but cannot be read gives one containing ```read key file```; an invalid path fails with ```key file path must be relative and cannot contain '..'``` or ```key file path escapes the robot directory```.
 
-**Example: an RSA key**
+##### Example: an RSA key
 For an exchange that supports ```RSA KEY``` authentication:
 1. Generate an RSA public/private key pair, e.g. a PKCS#8 pair with ```openssl```.
 2. Create an ```RSA KEY``` on the exchange and upload the public key from step 1.
@@ -208,24 +209,24 @@ See the [video walkthrough](https://www.bilibili.com/video/BV1UM41147Jj/) (Chine
 
 #### General Protocol
 
-For exchange API interfaces that have not yet been encapsulated and integrated by the FMZ Quant Trading Platform, you can access them by writing general protocol plugin programs.
+An exchange the platform has not integrated yet can be connected by writing a general protocol plugin: on one side the plugin calls the exchange's API, on the other it talks to the docker in a fixed format.
 
 ![General Protocol Configuration Screenshot](https://www.fmz.com/upload/asset/2e43b059b3ec9f42ded6e.png)
 
-This general protocol can be used to access any exchange that provides API interfaces, supporting the following two protocols:
-- ```REST``` Protocol: [Reference Documentation](https://www.fmz.com/digest-topic/10518).
-- ```FIX``` Protocol: [Reference Project](https://github.com/fmzquant/fixc).
+Any exchange that offers a trading API can be connected this way. Plugins support two protocols:
+- ```REST``` protocol: [reference documentation](https://www.fmz.com/digest-topic/10518).
+- ```FIX``` protocol: [reference project](https://github.com/fmzquant/fixc).
 
-The difference between ```FIX``` protocol plugin programs and ```REST``` protocol plugin programs lies only in the interaction method between the plugin program and the exchange interface. The interaction method, data format, and other implementation details between the protocol plugin program and the FMZ Quant docker program are exactly the same. For specific implementation, please refer to the examples in the above links.
+The two kinds of plugin differ only in how they talk to the exchange API; the interaction with the docker, the data formats and other details are the same. See the examples behind the links above for implementations.
 
 ### Docker
 
 The [docker](https://www.fmz.com/m/nodes) is the program that runs strategies: live strategies run on a docker, not on the FMZ website. The docker talks to the platform, starts and stops strategy processes and sends logs back; every request a strategy makes to an exchange also leaves from the docker's machine. The docker runs on your own server (or a server rented with one click), so a network failure of the platform website does not affect the live robots already running on it.
 
-**Supported systems**
+#### Supported systems
 Only 64-bit builds are released: Linux (x86_64, ARM64), macOS (Intel, Apple Silicon) and Windows (x64, ARM64, plus a GUI version). 32-bit systems are not supported.
 
-**Data directory**
+#### Data directory
 All docker data is in the ```logs``` directory under the working directory (the startup directory by default, or the one given with ```-w```):
 - ```logs/storage/<robot ID>/<robot ID>.db3```: the robot database (```SQLite```) holding logs, profit, charts, the status bar and ```_G()``` data; it can be opened with any ```SQLite``` tool.
 - ```logs/storage/<robot ID>/stdout.log```, ```stderr.log```: standard output and standard error of the strategy process.
@@ -234,30 +235,32 @@ All docker data is in the ```logs``` directory under the working directory (the 
 
 To put the robot directories on another disk, set the environment variable ```QUANT_ROBOT_LOG_DIR``` before starting the docker; it replaces ```logs/storage``` as the parent of the robot directories.
 
-**Network proxy**
+#### Network proxy
 The docker does not read the operating system's proxy settings. Environment variables such as ```HTTP_PROXY```, ```HTTPS_PROXY```, ```ALL_PROXY``` (and ```NO_PROXY```) in the docker process's environment apply to the HTTP requests a strategy makes (```HttpQuery``` and exchange REST calls), but not to WebSocket connections. To reach an exchange through a proxy, the recommended ways are:
 - set a proxy on the exchange object in the strategy with `exchange.SetProxy`;
 - or use a transparent proxy that takes over traffic at the network layer (such as Clash in TUN mode), which needs no docker configuration.
 
-This chapter covers deploying the docker (manual deployment, one-click rental, operation precautions), command-line options, migrating live robot data and docker monitoring.
-
 #### Deploy Docker
 
-The [docker management page](https://www.fmz.com/m/nodes) lists the dockers of your account, as a list or with details, including each docker's IP address, version and build time. Click **Deploy Docker** to open the [docker deployment page](https://www.fmz.com/m/add-node), which offers two ways: one-click docker rental and manual deployment.
+A docker can be deployed in two ways: rent a server on the platform with one click, or deploy it manually on your own device. Click **Deploy Docker** on the [docker management page](https://www.fmz.com/m/nodes) to open the [docker deployment page](https://www.fmz.com/m/add-node) and choose one.
+
+The docker management page lists the dockers of your account, as a list or with details, including each docker's IP address, version and build time.
 
 ![Docker deployment page](https://www.fmz.com/upload/asset/2e527e497b3fa27ba497b.png)
 
 ##### One-Click Docker Rental
 
-On the [Docker Deployment Page](https://www.fmz.com/m/add-node), click the **One-Click Docker Rental** tab and select the server to deploy based on your configuration requirements and server location preferences.
+The platform rents a server for you and deploys the docker on it automatically, so you need no server of your own; the docker is online within a few minutes.
 
-Click "Buy Now" and enter your FMZ Quant Trading Platform account credentials for verification. After successful verification, the docker program will be deployed automatically. The entire deployment process takes a few minutes, and the system will automatically install commonly used Python libraries.
+###### Steps
+1. On the [docker deployment page](https://www.fmz.com/m/add-node), click the **One-Click Docker Rental** tab and choose a server by configuration and data-center region.
+2. Click "Buy Now" and enter your FMZ account password to verify.
+3. After verification the docker program is deployed and common Python libraries are installed automatically; this takes a few minutes.
 
-After clicking "Buy Now", the rented server is provisioned through the platform on your behalf and has limited system permissions, with no support for remote login. If you need to use third-party Python libraries that are not pre-installed, it is recommended to use a private server for manual deployment.
-
-Servers rented through the **One-Click Docker Rental** feature use independent billing, which is separate from live trading billing.
-
-Clicking the "Redeploy" button will not delete the live trading logs and data files in the logs directory under the docker directory.
+###### Notes
+- The server is rented by the platform on your behalf and has limited system permissions, with no remote login. If you need third-party Python libraries that are not pre-installed, deploy on your own server instead (`Manual Deployment of Docker`).
+- Rented servers are billed separately from live robots.
+- "Redeploy" does not delete the robot logs and data files in the ```logs``` directory of the docker.
 
 ##### Manual Deployment of Docker
 
@@ -273,10 +276,10 @@ On the [docker deployment page](https://www.fmz.com/m/add-node), click **Manual 
 1. Communication address: contains your account UID, like ```node.fmz.com/123456```.
 2. Password: the password of the FMZ account that owns the UID.
 
-**Windows GUI version**
+###### Windows GUI version
 Run ```robot.exe```, enter the communication address and password, and click start.
 
-**Command-line version**
+###### Command-line version
 ```bash
 chmod +x robot                      # Linux/macOS: make it executable before the first run
 ./robot -s node.fmz.com/123456      # prompts for the password, which is not echoed
@@ -290,12 +293,12 @@ s=node.fmz.com/123456
 p=your-password
 EOF
 chmod 600 robot.conf
-./robot -c robot.conf               # with robot.conf in the startup directory, plain ./robot loads it too
+./robot -c robot.conf               # plain ./robot also loads ./robot.conf
 ```
 
-All options and the configuration file format are described in Platform Basics → Docker → Command-Line Options.
+All options and the configuration file format are described in `Command-Line Options`.
 
-**Running in the background**
+###### Running in the background
 The docker ignores the terminal hang-up signal: start it in the foreground over SSH and simply disconnect, and it keeps running, with its log also written to ```logs/docker.log```. To start at boot or restart after a crash, run it under a service manager such as systemd, e.g. ```/etc/systemd/system/robot.service```:
 
 ```ini
@@ -321,29 +324,31 @@ sudo systemctl enable --now robot
 
 The ```SIGTERM``` sent by ```systemctl stop robot``` makes the docker shut down gracefully: it stops all its live robots, reports their state and then logs out of the platform. ```TimeoutStopSec``` leaves enough time so that it is not killed before finishing.
 
-**Upgrading the docker**
-The strategy runtime and the exchange connectors are delivered by the platform when needed and need no manual updates. To upgrade the docker program itself, stop the docker (see Docker Operation Precautions), replace the ```robot``` executable with the new version and start it in the **same working directory**. The ```logs``` directory there keeps the docker identity and the robot data, so the docker comes back with its old ID.
+###### Upgrading the docker
+The strategy runtime and the exchange connectors are delivered by the platform when needed and need no manual updates. To upgrade the docker program itself, stop the docker (see `Docker Operation Precautions`), replace the ```robot``` executable with the new version and start it in the **same working directory**. The ```logs``` directory there keeps the docker identity and the robot data, so the docker comes back with its old ID.
 
-**Isolating strategy processes in Docker containers**
-On Linux and macOS, the command-line version can run each strategy process in its own Docker container with the ```-i``` option (Docker must be installed and running on the machine). This isolates strategy processes; it is not a Docker image of the docker program itself. See Command-Line Options for the parameters.
+###### Isolating strategy processes in Docker containers
+On Linux and macOS, the command-line version can run each strategy process in its own Docker container with the ```-i``` option (Docker must be installed and running on the machine). This isolates strategy processes; it is not a Docker image of the docker program itself. See `Command-Line Options` for the parameters.
 
 ##### Docker Operation Precautions
 
-**Stop the robots first, then the docker**
+What to watch out for when stopping or deleting a docker: stop the robots first, stop the docker the normal way, and avoid killing the process.
+
+###### Stop the robots first, then the docker
 Before deleting a docker or stopping its process, make sure no live robot is running on it.
 
-**Stopping the docker normally**
+###### Stopping the docker normally
 - Command-line version: press ```Ctrl+C``` once in the terminal, or send ```SIGTERM``` to the process (```kill <PID>```, ```systemctl stop```).
 - Windows GUI version: click the stop button.
 
 On a stop request the docker shuts down gracefully: it stops all its live robots, reports their final state and then logs out of the platform. Pressing ```Ctrl+C``` again during this shutdown skips the reporting and logout and exits at once; normally do not do that.
 
-**Avoid forced termination**
+###### Avoid forced termination
 Do not end the docker with ```kill -9```, cut the power or force a shutdown. The docker then has no chance to log out, and its live robots may still show as running on the platform and keep being billed; in that case the offline docker has to be deleted before those robots can be stopped. Stop the docker before rebooting the server; when it runs under a service manager such as systemd, a system shutdown sends ```SIGTERM``` automatically.
 
 #### Command-Line Options
 
-Starting the command-line docker program ```robot```:
+Startup options of the command-line docker program ```robot``` and the format of its configuration file ```robot.conf```. Common ways to start it:
 
 ```bash
 ./robot -s node.fmz.com/123456            # prompts for the password (not echoed)
@@ -352,18 +357,20 @@ Starting the command-line docker program ```robot```:
 ./robot -v                                # show the version
 ```
 
-**Options**
+The address and account UID are shown on the [docker deployment page](https://www.fmz.com/m/add-node).
+
+##### Options
 
 | Option | Description |
 | --- | --- |
-| ```-s address``` | Address for talking to the platform, like ```node.fmz.com/123456``` (```123456``` is the account UID); a ```ws://``` or ```wss://``` prefix is allowed. Shown on the [docker deployment page](https://www.fmz.com/m/add-node). |
-| ```-p password``` | Account password. Not recommended: a plain-text password stays in the shell history and the process list. Without it the password is prompted for, or read from the configuration file. |
+| ```-s address``` | Platform address like ```node.fmz.com/123456``` (```123456``` is the account UID); a ```ws://``` or ```wss://``` prefix is allowed. |
+| ```-p password``` | Account password. Avoid: it stays in shell history and the process list. Omit to be prompted, or use the config file. |
 | ```-n name``` | Docker name, shown on the platform's docker page. |
 | ```-w dir``` | Working directory. ```logs``` (robot data, docker log, identity file) lives under it. |
 | ```-c file``` | Configuration file; format below. |
 | ```-u user``` | Linux/macOS only: run strategy processes as this system user; the docker itself must run as root. Ignored with ```-i```. |
-| ```-I IP``` | Local outbound IP: the connection to the platform and the strategies' connections to exchanges are bound to this address; see below. |
-| ```-i image``` | Linux/macOS only: run each strategy process in its own container created from this Docker image; Docker must be installed and running. |
+| ```-I IP``` | Local outbound IP for both the platform connection and the strategies' exchange connections; see below. |
+| ```-i image``` | Linux/macOS only: run each strategy process in its own container from this Docker image (Docker must be running). |
 | ```-e path``` | With ```-i```: path of the executable inside the container. |
 | ```-f JSON``` | With ```-i```: Docker container settings, as inline JSON or ```@path``` to read them from a file. |
 | ```-H address``` | With ```-i```: address the container uses to connect back to the host. |
@@ -371,11 +378,11 @@ Starting the command-line docker program ```robot```:
 | ```-d DNS``` | The old custom DNS option; still accepted but ignored, as the docker always uses the system resolver. |
 | ```-v```, ```-V```, ```--version``` | Print version and build information and exit. |
 | ```-h```, ```--help``` | Print usage. |
-| ```--ctl-stdin``` | Read control commands from standard input (the first line is the password when ```-p``` is not given); ```stop``` or end of input triggers a graceful shutdown. Meant for programs that wrap the docker as a service. |
+| ```--ctl-stdin``` | For service wrappers: read control commands from stdin (password first if no ```-p```); ```stop``` or EOF shuts down gracefully. |
 
 Options that take a value can also be written as ```-option=value```, e.g. ```-n=server01```. An invalid option prints the usage and exits.
 
-**Configuration file robot.conf**
+##### Configuration file robot.conf
 One ```key=value``` per line; the key is the option name without ```-``` (```s p n w u I d i e f H vv```), and lines starting with ```#``` are comments:
 
 ```ini
@@ -392,7 +399,7 @@ vv=true
 - The configuration file path is resolved relative to the startup directory (before ```-w``` changes directory); ```-f @file``` is read after ```-w``` changes directory, so a relative path is resolved against the working directory.
 - The file holds your password, so make it readable only by you (```chmod 600 robot.conf```).
 
-**Pinning the outbound IP (-I)**
+##### Pinning the outbound IP (-I)
 When the server has several IP addresses and the exchange API key is whitelisted for one of them, pin the outbound IP with ```-I```, e.g. ```./robot -s node.fmz.com/123456 -I 192.168.1.100```. The connection to the platform and the strategies' connections to exchanges then leave from that address. With ```-i``` container isolation the container's network may not have that address; in that case let the container use the host network.
 
 The Windows GUI version has no IP setting; use the command-line version when you need to pin the outbound IP. The GUI version accepts only ```-s```, ```-p``` and ```-n```, which prefill the window; when both ```-s``` and ```-p``` are given it starts automatically.
@@ -401,14 +408,14 @@ The Windows GUI version has no IP setting; use the command-line version when you
 
 Each live robot's data is in ```logs/storage/<robot ID>/``` under the docker's working directory (the database ```<robot ID>.db3```, ```stdout.log```, ```stderr.log``` and so on). The logs, profit and charts the platform shows for a robot are read from the docker that runs it.
 
-**Moving one robot to a docker on another machine**
+##### Moving one robot to a docker on another machine
 1. Stop the robot.
 2. Copy the whole ```logs/storage/<robot ID>/``` directory to the same place under the new docker's working directory, keeping the robot ID as the directory name.
 3. Switch the robot's docker to the new one in the robot configuration and start the robot.
 
 The robot's existing logs, profit and other data are then kept on the new machine.
 
-**Moving a whole docker**
+##### Moving a whole docker
 1. Stop the robots on the old docker, then stop the old docker.
 2. Copy the entire ```logs``` directory from the old docker's working directory to the working directory on the new machine.
 3. Start the docker on the new machine.
@@ -423,9 +430,9 @@ On the [docker management page](https://www.fmz.com/m/nodes), **Docker Monitor**
 
 The [Strategy Library](https://www.fmz.com/m/strategies) page holds all strategies of the current account, written in any of the programming languages or visually.
 
-- Grouping: strategies can be grouped just like robots (see Platform Basics → Live Trading → Grouping).
-- Import and export: besides the source code, a complete strategy includes its parameters, interactions, description, notes, manual, template references and more, so move a strategy by exporting and importing the complete strategy (see Import and Export of Complete Strategies).
-- Sharing and renting: generate a "copy code" to share a strategy or a "registration code" to rent it out (see Strategy Sharing and Renting).
+- Grouping: strategies can be grouped just like robots (see `Grouping`).
+- Import and export: besides the source code, a complete strategy includes its parameters, interactions, description, notes, manual, template references and more, so move a strategy by exporting and importing the complete strategy (see `Import and Export of Complete Strategies`).
+- Sharing and renting: generate a "copy code" to share a strategy or a "registration code" to rent it out (see `Strategy Sharing and Renting`).
 
 #### Import and Export of Complete Strategies
 
@@ -441,46 +448,46 @@ Copying the source code is not enough to move a strategy: the parameter design, 
 
 #### Strategy Sharing and Renting
 
-On the [Strategy Library](https://www.fmz.com/m/strategies) page, click the "Actions" button on the right side of a strategy to display a menu containing sharing and renting options.
+There are two ways to let others use your strategy: sharing (they get a full copy of the strategy, source code included) and renting (they get only the right to backtest and run it live, without seeing the source). On the [Strategy Library](https://www.fmz.com/m/strategies) page, click the "Actions" button on the right of the strategy and choose share or rent from the menu.
 
-Important Notice: When creating and distributing strategy **registration codes**, please carefully confirm whether it is a "Registration Code" or "Copy Code" to avoid accidentally leaking your strategy.
+When creating and handing out **registration codes** (rental), make sure you generated a "registration code" and not a "copy code" (sharing), so that you do not give away the source code by mistake.
 
 ##### Strategy Sharing
 
+Sharing a strategy gives the other user a full copy of it, source code included. Click the strategy's "Share" button and choose how to share in the dialog:
+
+- **Public Sharing**: the full strategy is shared to the platform's strategy square, where any user can copy it.
+- **Internal Sharing**: choose a validity period and a number of uses to generate the strategy's **copy page URL** and **copy code**, and hand them to the users you choose. A user opens the copy page URL, logs in and enters the copy code to get the strategy, which then appears in their strategy library.
+
 ![Strategy Sharing](https://www.fmz.com/upload/asset/2e593d57dc36afc004ef6.png)
-
-- Public Sharing
-  After clicking the "Share" button, a dialog box will pop up where you can select "Public Sharing". The strategy will be fully shared to the platform's Strategy Square, where any user can copy the strategy.
-
-- Private Sharing
-  After clicking the "Share" button, a dialog box will pop up where you can select "Private Sharing". After selecting the sharing validity period and sharing limit, a **copy page URL** and **copy code** for the strategy will be generated. These can be distributed to designated FMZ platform users. Users who need the strategy can simply use the **copy page URL** link, log in to the **copy page** and enter the copy code to obtain the strategy. Once obtained, the strategy will automatically appear in their strategy library.
 
 ##### Strategy Rental
 
+Renting a strategy gives the other user only the right to backtest it and run it live; they cannot see the source code or other details. Click the strategy's "Rent" button and choose how to rent it in the dialog:
+
+- **Public Sale**: apply to list the strategy for sale in the strategy square; listing requires review.
+- **Internal Sale**: choose the number of days, the maximum number of concurrent robots and the number of registration codes to generate the strategy's **registration page URL** and **registration codes**, and hand them to the users you choose. A user opens the registration page URL, logs in and enters a registration code to get the right of use; the strategy then appears in their strategy library. A maximum of 0 concurrent robots means no limit: any number of robots can be created.
+
 ![Strategy Rental](https://www.fmz.com/upload/asset/2e4e78f6c46c9dde1ce90.png)
 
-- Public Sale
-  After clicking the "Rent" button, a dialog box will pop up where you can select "Public Sale". The strategy can then be submitted for listing (requires approval).
-
-- Internal Sale
-  After clicking the "Rent" button, a dialog box will pop up where you can select "Internal Sale". After selecting the number of days, maximum concurrent instances, and number of registration codes, the system will generate a **registration page URL** and **registration codes** for this strategy. You can distribute these to designated FMZ platform users. Users who need this strategy only need to visit the **registration page URL** link, log in to the **registration page**, and enter the registration code to obtain access to the strategy. The strategy will also appear in the strategy library, but users will only have backtesting and live trading permissions, and cannot view the strategy source code or other information. When the number of concurrent live trading instances is set to 0, it means there is no limit on concurrent instances, allowing unlimited creation of live trading bots.
+When a rented strategy expires, the robots using it are stopped and cannot be started again; once the maximum number of concurrent robots is reached, no new robot can be started.
 
 ### Live Trading
 
 As opposed to a backtest, a live robot is a strategy program instance that really interacts with an exchange (fetching market data, querying positions, placing and canceling orders, etc.). An instance connected to the exchange's production environment is a live robot, and so is one connected to the exchange's simulation environment (many exchanges offer a test environment).
 
-**Creating a live robot**
-On the [robot creation page](https://www.fmz.com/m/add-robot), choose the strategy, the docker host and the exchanges, then create the robot. Three things must be ready beforehand:
+#### Creating a live robot
+On the [robot creation page](https://www.fmz.com/m/add-robot), choose the strategy, the docker and the exchange accounts, then create the robot. Three things must be ready beforehand:
 - A strategy: click "New Strategy" in the [Strategy Library](https://www.fmz.com/m/strategies), write it and save it.
-- An online docker: click "Deploy Docker" on the [Docker page](https://www.fmz.com/m/nodes) (see Platform Basics → Docker).
-- An exchange account: click "Add Exchange" on the [Exchange page](https://www.fmz.com/m/platforms) and configure it (see Platform Basics → Exchange).
+- An online docker: click "Deploy Docker" on the [Docker page](https://www.fmz.com/m/nodes) (see `Docker`).
+- An exchange account: click "Add Exchange" on the [Exchange page](https://www.fmz.com/m/platforms) and configure it (see `Exchange`).
 
-Live robots are billed by the hour and cannot start without enough balance (see Platform Basics → Account and Billing → Live Robot Billing and Top-up).
+Live robots are billed by the hour and cannot start without enough balance (see `Live Robot Billing and Top-up`).
 
-**Robot monitoring**
+#### Robot monitoring
 On the [live trading page](https://www.fmz.com/m/robots), click "Monitor" in the actions column of a running robot to enable monitoring. Once enabled, when the robot exits for any reason other than a manual operation, the platform sends a notification according to the [push settings](https://www.fmz.com/m/account#push) (App, email, Telegram; never to the WebHook).
 
-**Robot database**
+#### Robot database
 For robot ID ```123456```, the database file is ```logs/storage/123456/123456.db3``` (```SQLite```) under the working directory of the docker running it, with these tables:
 - chart: chart data.
 - cfg: the latest state such as the status bar content and the chart configuration.
@@ -490,71 +497,62 @@ For robot ID ```123456```, the database file is ```logs/storage/123456/123456.db
 
 The same directory also holds the strategy process's standard output ```stdout.log``` and standard error ```stderr.log```.
 
-**In this chapter**
-- Grouping: group management of robots and strategies.
-- Live Trading Observation: show a robot publicly or create a private viewing link.
-- Live Trading Message Push: push logs to the mobile app, email, Telegram or a WebHook.
-- Common Causes of Live Trading Errors and Abnormal Exits.
-
-To let other people view and operate some of your robots, use sub-accounts (see Platform Basics → Account and Billing → Sub-accounts).
+To let other people view and operate some of your robots, use sub-accounts (see `Sub-accounts`).
 
 #### Grouping
 
-Click the **Group Management** button on the right of the "Live Trading" page or the "Strategy Library" page to group robots or strategies; group names are up to you.
-For strategies, for example, you can put **template libraries** in one group, **JavaScript strategies** in another and **test strategies** in a third.
+Click the **Group Management** button on the right of the "Live Trading" page or the "Strategy Library" page to group robots or strategies; group names are up to you. For strategies, for example, you can put template libraries, JavaScript strategies and test strategies in separate groups.
 
-- Strategy groups
-  ![Strategy groups](https://www.fmz.com/upload/asset/2e482ba9b9aa272085d00.png)
+Strategy groups:
 
-- Robot groups
-  ![Robot groups](https://www.fmz.com/upload/asset/2e577d050e817837bbfdf.png)
+![Strategy groups](https://www.fmz.com/upload/asset/2e482ba9b9aa272085d00.png)
+
+Robot groups:
+
+![Robot groups](https://www.fmz.com/upload/asset/2e577d050e817837bbfdf.png)
 
 #### Live Trading Observation
 
-Click the "Public" button in the live trading list on the [Live Trading Page](https://www.fmz.com/m/robots) of FMZ Quant Trading Platform to publicly display the current live trading instance.
+Click the "Public" button of a robot in the robot list on the [Live Trading page](https://www.fmz.com/m/robots) to let others watch it. There are two ways:
 
-Live trading observation currently supports two methods:
-- 1. Publicly display live trading on the [Live Trading Observation](https://www.fmz.com/live) page of FMZ Quant Trading Platform. Click the "Public" button and select **Public Sharing**.
-- 2. Create a private link for live trading observation.
-  Click the "Public" button and select **Internal Sharing**, set the validity period to generate a private link for accessing the private observation page of this strategy's live trading.
+1. **Public Sharing**: the robot is shown on the platform's public [Live Trading Observation](https://www.fmz.com/live) page.
+2. **Internal Sharing**: set a validity period to generate a private link; whoever has the link can open the robot's private observation page.
 
 #### Live Trading Message Push
 
-You can enable message push on the [Push Settings page](https://www.fmz.com/m/account#push).
+A live robot can push log lines as messages to the mobile app, email, Telegram or a WebHook; enable the channels on the [push settings page](https://www.fmz.com/m/account#push).
 
 ![Push Settings](https://www.fmz.com/upload/asset/2e4ad17706aa842c914ce.png)
 
-- Mobile (App)
-  After enabling mobile App push, push messages sent by the live trading program are delivered to the FMZ Quant mobile App.
-- Email
-  To enable email push, verify your email address first. Once verified, you receive the push messages sent by the live trading program.
-- Telegram
-  After binding Telegram in the push settings and enabling it, push messages are sent to Telegram.
-- WebHook
-  Enable WebHook push and set the push address, for example: ```http://abc.com/push.php?data={body}```. When the live trading program sends a push message, the platform sends a ```GET``` request to that address: ```{body}``` in the address is replaced with the message content and ```{subject}``` with the message title, both URL-encoded; ```{{body}}``` and ```{{subject}}``` are replaced as-is, without encoding.
-  To send a ```POST``` request, write the push address as ```request URL||request body```, for example ```http://abc.com/push.php||text={body}```: the part before ```||``` is the request URL and the part after it is the request body; both parts can use the placeholders above. The push address must be an ```http``` or ```https``` address reachable from the public internet.
+##### Push channels
+- Mobile (App): when enabled, push messages are sent to the FMZ mobile app.
+- Email: verify your email address first; after that you receive push messages.
+- Telegram: bind Telegram in the push settings and enable it.
+- WebHook: enable it and set a push address such as ```http://abc.com/push.php?data={body}```; the format is described below.
 
 Alerts such as docker monitoring, robot monitoring and the balance alert are also sent according to the push settings, but never to the WebHook.
 
-Pushing Messages in Strategies
-- JavaScript/Python/Rust Languages
-  In the strategy code, you can use the ```Log()``` function as well as other functions that output log information in the log area, such as ```exchange.CreateOrder()```, ```exchange.CancelOrder()```, etc.
-  By passing an additional parameter ```"@"``` to these functions (i.e., adding an extra parameter beyond the required ones), for example ```Log("This is a push message", "@")```, the output log information will be pushed, and the platform will push the message according to the "Push Settings". In the Rust language, the corresponding ```Log!``` macro is used the same way: ```Log!("This is a push message", "@");```.
-- PINE Language/My Language
-  In the "Trading Library" parameters integrated into PINE Language/My Language strategies, you can enable trading log push, which will automatically push messages after a trading action is triggered.
+##### WebHook address
+When a robot sends a push message, the platform sends a ```GET``` request to the push address: ```{body}``` in the address is replaced with the message content and ```{subject}``` with the message title, both URL-encoded; ```{{body}}``` and ```{{subject}}``` are replaced as-is, without encoding.
 
-Push limits
-- Push messages are reported by the docker with its heartbeat (about every 20 seconds). Several pushes within one cycle are merged into one message, and adjacent repeated lines are folded into ```content ×N```; if the merged message exceeds 4096 bytes it is truncated with a note of how many bytes were cut.
-- Each account can push at most 50 messages per hour (a merged message counts as one); messages beyond that are not pushed.
-- The body of each push is at most 200 characters; anything longer is truncated.
+To send a ```POST``` request, write the push address as ```request URL||request body```, for example ```http://abc.com/push.php||text={body}```: the part before ```||``` is the request URL and the part after it is the request body; both parts can use the placeholders above. The push address must be an ```http``` or ```https``` address reachable from the public internet.
+
+##### Pushing from a strategy
+- JavaScript, Python, Rust: when calling `Log` or another function that writes to the log area (such as ```exchange.CreateOrder()``` or ```exchange.CancelOrder()```), pass one more argument ```"@"``` after the required ones and that log line is pushed according to the push settings, for example ```Log("This is a push message", "@")```. In Rust use the ```Log!``` macro the same way: ```Log!("This is a push message", "@");```.
+- PINE and My language: enable trade log push in the parameters of the "trading library" built into the strategy; trades then push messages automatically.
+
+##### Push limits
+The docker reports push messages with its heartbeat (about every 20 seconds), and several pushes in one cycle are merged into one; each account can push at most 50 messages per hour (a merged message counts as one), and the body of each push is at most 200 characters. The backtest system and the debugging tool do not push messages. See `Log` for the full rules.
 
 #### Common Causes of Live Trading Errors and Abnormal Exits
 
-**The robot cannot start**
+When a robot will not start, reports errors or exits abnormally, check the causes below by category.
+
+##### The robot cannot start
 - No online docker
   A robot cannot start while its docker is offline. Check on the [docker page](https://www.fmz.com/m/nodes) that the docker is online, or pick another online docker.
 - Insufficient balance
-  Starting a robot prepays its first hour, so it cannot start without enough balance; if the balance runs out while it runs, the platform stops it. Top up and start it again (see Platform Basics → Account and Billing → Live Robot Billing and Top-up).
+  Starting a robot prepays its first hour, so it cannot start without enough balance; if the balance runs out while it runs, the platform stops it. Top up and start it again (see `Live Robot Billing and Top-up`).
 - Rented strategy expired or concurrency limit reached
   When a rented strategy expires, robots using it are stopped and cannot be started again; once the rental's maximum number of concurrent robots is reached, no further robot can start.
 - Key decryption failed
@@ -562,9 +560,9 @@ Push limits
   1. Re-enter the exchange keys, passwords and similar fields on the [Exchange management page](https://www.fmz.com/m/platforms).
   2. Stop all dockers and start them again with the new password.
 - Credential file not found
-  The exchange configuration uses a ```file:///xxx.txt``` credential file that is missing from the robot directory; the error contains ```resolve key file``` (or ```read key file``` if the file exists but cannot be read). An invalid path fails with ```key file path must be relative and cannot contain '..'``` or ```key file path escapes the robot directory```. See Platform Basics → Exchange → Local Credential Files.
+  The exchange configuration uses a ```file:///xxx.txt``` credential file that is missing from the robot directory; the error contains ```resolve key file``` (or ```read key file``` if the file exists but cannot be read). An invalid path fails with ```key file path must be relative and cannot contain '..'``` or ```key file path escapes the robot directory```. See `Local Credential Files`.
 
-**Errors caused by strategy code**
+##### Errors caused by strategy code
 - Static syntax errors
 
   ![Syntax error in editor](https://www.fmz.com/upload/asset/2e4daebbb80548adf3927.png)
@@ -579,7 +577,7 @@ Push limits
 - Recursion too deep
   Too many levels of recursion exceed the call stack size.
 
-**Other errors**
+##### Other errors
 - API business errors and network request errors
   These show the exchange object name, the function name, the error message and the reason, and do not stop the robot by themselves. They are usually the trigger rather than the direct cause, which is typically **a program exception from using an API return value without checking it**.
 - ```interrupt``` error
@@ -595,31 +593,29 @@ The trading terminal also supports trading plugins: code you write yourself that
 
 #### Plugin Principle and Development
 
-**How it works**
-
 A trading plugin is a short piece of code executed on a docker: when you click "Execute" on the trading terminal page, the platform sends the plugin code and the exchange account selected in the module to the selected docker, runs it, and shows the return value in the module. The following entry points share the same execution mechanism:
 
 | Entry point | Code that runs | Notes |
 | - | - | - |
 | Trading terminal plugin | A strategy of type "Trading Plugin" in your strategy library | Added and executed on the trading terminal page |
 | Debug Tool (development tools) | JavaScript code written on the page | For testing API calls |
-| Extended API PluginRun | ```source``` in the request, or an existing strategy of the account | For programs |
-| MCP ```plugin_*``` tools | Built-in functions for market data, orders and so on | For AI assistants, authorized by the ```trade``` permission, see Extended API Interface → AI Integration |
+| Extended API `PluginRun` | ```source``` in the request, or an existing strategy of the account | For programs |
+| MCP ```plugin_*``` tools | Built-in functions for market data, orders and so on | For AI assistants, authorized by the ```trade``` permission, see `AI Integration` |
 
-No live trading bot is created and nothing is charged; one run lasts at most 5 minutes and is interrupted on timeout. It suits simple tasks that assist manual trading, such as iceberg orders, placing or cancelling orders in bulk, or calculations; logic that has to run for a long time should be a live trading bot.
+No robot is created and nothing is charged; one run lasts at most 5 minutes and is interrupted on timeout. It suits simple tasks that assist manual trading, such as iceberg orders, placing or cancelling orders in bulk, or calculations; logic that has to run for a long time should be a robot.
 
-**Writing a plugin**
+##### Writing a plugin
 
 Create a strategy and set its type to "Trading Plugin" on the new-strategy page. Trading plugins, the debugging tool and ```PluginRun``` support JavaScript only.
 
-The plugin's entry point is ```main()```, and its return value is the result: a returned table or chart object is shown as a table or chart in the module (see Platform Basics → Trading Terminal → Plugin Examples). Logs written with ```Log()``` are not shown in the module.
+The plugin's entry point is ```main()```, and its return value is the result: a returned table or chart object is shown as a table or chart in the module (see `Plugin Examples`). Logs written with ```Log()``` are not shown in the module.
 
-**Using a plugin**
+##### Using a plugin
 
 - Add: open the module menu on the trading terminal page; the trading plugins in your strategy library are listed there. Choose one to add it.
 - Execute: click "Execute" in the plugin module to run it.
 
-**Data directory**
+##### Data directory
 
 When plugins and the debug tool run on a docker, their working directory is ```logs/storage/p<number>/``` under the docker's running directory (one directory starting with ```p``` per platform account, created on the first run). If an exchange account used by the trading terminal configures its key as a key file path (```file:///xxx.txt```), put the key file in this directory.
 
@@ -627,11 +623,11 @@ When plugins and the debug tool run on a docker, their working directory is ```l
 
 A plugin runs code for a limited time to do simple jobs such as iceberg orders, placing and cancelling orders, or calculations. It returns its result with ```return```; a returned table or chart object is displayed as a table or chart. Two examples follow; more can be found in the **Strategy Square**, e.g. buying or selling in small slices.
 
-**Order book snapshot**
+##### Order book snapshot
 
 Show the top 15 levels of the current order book as a table:
 
-```js
+```javascript
 // Return an order book snapshot
 function main() {
     var tbl = {
@@ -641,19 +637,23 @@ function main() {
         rows: []
     }
     var d = exchange.GetDepth()
+    if (!d) {
+        return 'failed to get the order book'
+    }
     var n = Math.min(d.Asks.length, d.Bids.length, 15)
     for (var i = 0; i < n; i++) {
-        tbl.rows.push([i, d.Asks[i].Amount, d.Asks[i].Price + '#ff0000', d.Bids[i].Price + '#0000ff', d.Bids[i].Amount])
+        tbl.rows.push([i, d.Asks[i].Amount, d.Asks[i].Price + '#ff0000',
+                       d.Bids[i].Price + '#0000ff', d.Bids[i].Amount])
     }
     return tbl
 }
 ```
 
-**Calendar spread chart**
+##### Calendar spread chart
 
 On a futures exchange object, take 5-minute K-lines of the quarterly and the weekly contract and chart the difference of their closes:
 
-```js
+```javascript
 // Chart the calendar spread
 var chart = {
     __isStock: true,
@@ -673,6 +673,9 @@ function main() {
     var recordsA = exchange.GetRecords(PERIOD_M5)
     exchange.SetContractType('this_week')
     var recordsB = exchange.GetRecords(PERIOD_M5)
+    if (!recordsA || !recordsB) {
+        return 'failed to get K-lines'
+    }
 
     var n = Math.min(recordsA.length, recordsB.length)
     for (var i = 0; i < n; i++) {
@@ -690,17 +693,19 @@ How live robots are billed, how to top up, and how to hand some live robots to o
 
 #### Live Robot Billing and Top-up
 
-**Billing**
+Live robots are billed by the hour from your platform account balance; this page covers the billing rules, bills and the balance alert, and what to watch out for when topping up.
+
+##### Billing
 - Live robots are billed by the hour at 0.05 USD per robot per hour; a partial hour counts as a full hour.
 - Billing starts when the robot is created, and starting it prepays the first hour, so a robot cannot start if the account balance is insufficient. Stopping or restarting a robot does not bill it twice.
 - If the balance runs out while a robot is running, the platform stops the robot; when a rented strategy expires, the robots using it are stopped as well.
-- Servers rented with one-click docker rental are billed separately from live robots (see Platform Basics → Docker → Deploy Docker → One-Click Docker Rental).
+- Servers rented with one-click docker rental are billed separately from live robots (see `One-Click Docker Rental`).
 
-**Bills and balance alerts**
+##### Bills and balance alerts
 - The [billing page](https://www.fmz.com/m/billing) shows the balance, top-up records and every billing item.
 - Under [balance alert in account settings](https://www.fmz.com/m/account#alertthreshold), set an alert threshold: when the available balance drops below it, the platform sends a notification according to the [push settings](https://www.fmz.com/m/account#push) (App, email, Telegram; at most once every 24 hours unless you top up or change the setting); 0 turns the alert off.
 
-**Top-up**
+##### Top-up
 Choose the payment method and amount on the [billing page](https://www.fmz.com/m/billing). When topping up with ```USDT```, check carefully:
 - The transfer network must match the network selected on the billing page; TRC20, ERC20 and BSC are supported. ERC20 and BSC addresses both start with ```0x``` and look the same, which makes them the easiest to mix up.
 - The asset is ```USDT```.
@@ -710,35 +715,35 @@ Choose the payment method and amount on the [billing page](https://www.fmz.com/m
 
 A sub-account lets other people view and operate some of your live robots without giving them the main account.
 
-**Create a sub-account**
+##### Create a sub-account
 On the [account settings page](https://www.fmz.com/m/account#shadowmember), open the sub-account tab, select the live robots the sub-account may access under operation permissions, enter its username and login password, and create it. Sub-accounts are listed on the same page, where you can edit, lock/unlock or delete them.
 
 ![Sub-account settings](https://www.fmz.com/upload/asset/2e46d725dbe6b471f1b33.png)
 
-**Permissions**
+##### Permissions
 A sub-account sees only the live robots authorized to it. On those robots it can view logs and charts, change strategy parameters, send interactive commands, stop and restart; it cannot change the robot's docker, strategy, version, name, exchange objects or other configuration.
 
-**Typical uses**
+##### Typical uses
 - A quant team sharing the management of several live robots.
 - Letting the renter of a strategy help debug a live robot.
 
 ## Writing Strategies
 
-Writing strategies: strategy structure (lifecycle, main loop, event-driven), notes for each programming language, strategy parameters, interactive controls, template libraries, built-in libraries, Chinese/English text in the strategy UI, and a categorized quick reference of all API functions.
+What you need to know to write strategies, covering strategy structure (lifecycle, main loop, event-driven), notes for each programming language, strategy parameters, interactive controls, template libraries, built-in libraries, Chinese/English text in the strategy UI, and a categorized quick reference of all API functions.
 
 ### Strategy Structure
 
 Strategies in ```JavaScript```, ```Python``` and ```Rust``` consist of a few functions with agreed names, which the docker calls at fixed points. MyLanguage, PINE and Workflow strategies do not need to define them.
 
-**Lifecycle functions**
+#### Lifecycle functions
 
 | Function | Required | When it is called |
 | - | - | - |
 | ```main()``` | Yes | The entry function and body of the strategy. When ```main()``` returns, the strategy has finished. |
 | ```init()``` | No | Called once before ```main()```, for initialization. |
 | ```onexit()``` | No | Called when the strategy exits, for cleanup (cancel orders, close positions, save state, etc.). |
-| ```onerror(msg)``` | No | ```JavaScript``` only: called when ```main()``` ends with an uncaught exception; ```msg``` is the error message. When ```onerror()``` is called, ```onexit()``` is not. |
-| ```destroy()``` | No | ```JavaScript``` template libraries only: called when the strategy exits, after ```onexit()``` or ```onerror()```; see Writing Strategies → Template Library. |
+| ```onerror(msg)``` | No | ```JavaScript``` only: called when ```main()``` ends with an uncaught exception (```msg``` is the error); then ```onexit()``` is not called. |
+| ```destroy()``` | No | ```JavaScript``` template libraries only: called when the strategy exits, after ```onexit()``` or ```onerror()```; see `Template Library`. |
 
 Which function runs on exit:
 
@@ -748,71 +753,76 @@ Which function runs on exit:
 | Live trading stopped | ```onexit()``` | ```onexit()``` | ```onexit()``` |
 | Uncaught exception or ```panic``` | ```onerror(msg)``` | neither | ```onexit()``` |
 
-**Notes:**
+#### Notes
 - ```onexit()``` and ```onerror()``` may run for at most 5 minutes (the limit is sent by the server with each task; the default is 5 minutes) and are terminated when they exceed it.
-- In backtesting a strategy is usually an endless polling loop, so ```main()``` does not return normally when the backtest ends and ```JavaScript``` and ```Python``` strategies do not run ```onexit()```; see Strategy Structure → onexit() for how to handle this. ```Rust``` strategies run ```onexit()``` automatically when the backtest ends.
+- In backtesting a strategy is usually an endless polling loop, so ```main()``` does not return normally when the backtest ends and ```JavaScript``` and ```Python``` strategies do not run ```onexit()```; see `onexit()` for how to handle this. ```Rust``` strategies run ```onexit()``` automatically when the backtest ends.
 - When ```main()``` of a ```JavaScript``` strategy returns, threads created with ```threading``` are terminated; ```setTimeout``` callbacks that have not fired yet run first, then ```onexit()``` is called.
 - ```JavaScript``` and ```Python``` template libraries can define their own ```init()```, which runs when the template is loaded, before the strategy's ```init()```.
 
-**Main loop and event-driven strategies**
+#### Main loop and event-driven strategies
 
-Most strategies run a loop in ```main()```: each round fetches data, computes, places orders, then calls ```Sleep()``` to wait for the next round (see Strategy Structure → Main Loop). A strategy can also wait for market data, order updates and other events and handle them as they arrive (see Strategy Structure → Event-Driven). For a categorized list of all API functions see Writing Strategies → API Quick Reference.
+Most strategies run a loop in ```main()```: each round fetches data, computes, places orders, then calls ```Sleep()``` to wait for the next round (see `Main Loop`). A strategy can also wait for market data, order updates and other events and handle them as they arrive (see `Event-driven handling`). For a categorized list of all API functions see `API Quick Reference`.
 
 #### init()
 
-```init()``` is the initialization function implemented by the user. When a strategy starts running, the ```init()``` function is automatically executed first to complete the initialization tasks designed within the strategy.
+Optional initialization function, called automatically once when the strategy starts, before ```main()```, to do initialization work.
+
+```init()``` runs before ```main()```; "initializing" is logged first, then the two lines from ```main()```.
 
 ```javascript
 function main(){
-    Log("First line of code executed!", "#FF0000")
-    Log("Exiting!")
+    Log("first line of main()", "#FF0000")
+    Log("exiting")
 }
 
-// Initialization function
+// initialization function
 function init(){
-    Log("Initializing!")
+    Log("initializing")
 }
 ```
 
 ```python
 def main():
-    Log("First line of code executed!", "#FF0000")
-    Log("Exiting!")
+    Log("first line of main()", "#FF0000")
+    Log("exiting")
 
+# initialization function
 def init():
-    Log("Initializing!")
+    Log("initializing")
 ```
 
 ```rust
 fn main() {
-    Log!("First line of code executed!", "#FF0000");
-    Log!("Exiting!");
+    Log!("first line of main()", "#FF0000");
+    Log!("exiting");
 }
 
-// Initialization function
+// initialization function
 fn init() {
-    Log!("Initializing!");
+    Log!("initializing");
 }
 ```
 
 #### onexit()
 
-```onexit()``` is implemented by the user to clean up when the strategy exits; it is optional. It may run for at most 5 minutes and is terminated when it exceeds that. For when each language calls ```onexit()```, see Writing Strategies → Strategy Structure.
+Optional clean-up function, called when the strategy exits to cancel orders, close positions, save state and so on. It may run for at most 5 minutes and is terminated when it exceeds that. For when each language calls ```onexit()```, see `Strategy Structure`.
 
-Testing the ```onexit()``` function:
+In a backtest the strategy is usually an endless polling loop, so ```main()``` has not returned normally when the backtest data ends, and ```JavaScript``` and ```Python``` strategies therefore do not run ```onexit()```. In a backtest (```IsVirtual()``` is true) you can catch the exception (EOF) thrown when the backtest ends so that ```main()``` returns and ```onexit()``` runs; see the second example. ```Rust``` strategies need nothing special: when the backtest ends the SDK runs ```onexit()``` automatically and then stops the strategy.
+
+```main()``` returns after 5 seconds; ```onexit()``` logs the elapsed time every second until it is terminated after 5 minutes.
 
 ```javascript
 function main(){
-    Log("Starting, will stop after 5 seconds and execute cleanup function!")
+    Log("starting; stops after 5 seconds and runs the clean-up function")
     Sleep(1000 * 5)
 }
 
-// cleanup function
+// clean-up function
 function onexit(){
     var beginTime = new Date().getTime()
     while(true){
         var nowTime = new Date().getTime()
-        Log("Program stop countdown..cleanup started, elapsed time:", (nowTime - beginTime) / 1000, "seconds!")
+        Log("cleaning up, elapsed", (nowTime - beginTime) / 1000, "seconds")
         Sleep(1000)
     }
 }
@@ -821,43 +831,44 @@ function onexit(){
 ```python
 import time
 def main():
-    Log("Starting, will stop after 5 seconds and execute cleanup function!")
+    Log("starting; stops after 5 seconds and runs the clean-up function")
     Sleep(1000 * 5)
 
+# clean-up function
 def onexit():
     beginTime = time.time() * 1000
     while True:
         ts = time.time() * 1000
-        Log("Program stop countdown..cleanup started, elapsed time:", (ts - beginTime) / 1000, "seconds!")
+        Log("cleaning up, elapsed", (ts - beginTime) / 1000, "seconds")
         Sleep(1000)
 ```
 
 ```rust
 fn main() {
-    Log!("Starting, will stop after 5 seconds and execute cleanup function!");
+    Log!("starting; stops after 5 seconds and runs the clean-up function");
     Sleep(1000 * 5);
 }
 
-// cleanup function
+// clean-up function
 fn onexit() {
     let beginTime = Unix() * 1000;
     loop {
         let nowTime = Unix() * 1000;
-        Log!("Program stop countdown..cleanup started, elapsed time:", (nowTime - beginTime) / 1000, "seconds!");
+        Log!("cleaning up, elapsed", (nowTime - beginTime) / 1000, "seconds");
         Sleep(1000);
     }
 }
 ```
 
-In the backtesting system a strategy is usually an endless polling loop, so ```main()``` has not returned normally when the backtest data ends, and ```JavaScript``` and ```Python``` strategies therefore do not run ```onexit()```. In a backtest (```IsVirtual()``` is true) you can catch the exception (EOF) thrown when the backtest ends so that ```main()``` returns and ```onexit()``` runs. ```Rust``` strategies need nothing special, because when the backtest ends the SDK runs ```onexit()``` automatically and then stops the strategy.
+Catch the exception at the end of a backtest so that ```main()``` returns and ```onexit()``` runs.
 
 ```javascript
 function main() {
     if (exchange.GetName().startsWith("Futures_")) {
-        Log("Exchange is futures")
+        Log("exchange is futures")
         exchange.SetContractType("swap")
     } else {
-        Log("Exchange is spot")
+        Log("exchange is spot")
     }
 
     if (IsVirtual()) {
@@ -880,16 +891,17 @@ function onTick() {
 }
 
 function onexit() {
-    Log("Executing cleanup function")
+    Log("running the clean-up function")
 }
 ```
 
 ```python
 def main():
     if exchange.GetName().startswith("Futures_"):
-        Log("Exchange is futures")
+        Log("exchange is futures")
+        exchange.SetContractType("swap")
     else:
-        Log("Exchange is spot")
+        Log("exchange is spot")
 
     if IsVirtual():
         try:
@@ -906,13 +918,13 @@ def onTick():
         Sleep(500)
 
 def onexit():
-    Log("Executing cleanup function")
+    Log("running the clean-up function")
 ```
 
 ```rust
 fn onTick() {
     loop {
-        // When the backtest ends the SDK runs onexit() automatically and then stops the strategy; nothing special is needed here
+        // at the end of a backtest the SDK runs onexit() first; nothing to handle here
         match exchange.GetTicker(None) {
             Ok(ticker) => LogStatus!(_D(None), ticker.Last),
             Err(e) => Log!("error:", e),
@@ -923,25 +935,27 @@ fn onTick() {
 
 fn main() {
     if exchange.GetName().starts_with("Futures_") {
-        Log!("Exchange is futures");
+        Log!("exchange is futures");
         let _ = exchange.SetContractType("swap");
     } else {
-        Log!("Exchange is spot");
+        Log!("exchange is spot");
     }
 
     onTick();
 }
 
 fn onexit() {
-    Log!("Executing cleanup function");
+    Log!("running the clean-up function");
 }
 ```
 
 #### onerror()
 
-```onerror(msg)``` is supported only by ```JavaScript``` strategies. It is called when ```main()``` ends with an uncaught exception; the argument ```msg``` is the error message. When ```onerror()``` is called, ```onexit()``` is not. It may run for at most 5 minutes and is terminated when it exceeds that. The backtesting system does not support this function.
+Optional exception handler, ```JavaScript``` only: called when ```main()``` ends with an uncaught exception; the argument ```msg``` is the error message. When ```onerror()``` is called, ```onexit()``` is not. It may run for at most 5 minutes and is terminated when it exceeds that.
 
-```Python``` and ```Rust``` strategies do not support ```onerror()```.
+The backtesting system does not support this function, and neither do ```Python``` and ```Rust``` strategies.
+
+An out-of-range array access in ```main()``` raises an exception, and ```onerror()``` logs the error message.
 
 ```javascript
 function main() {
@@ -954,19 +968,11 @@ function onerror(msg) {
 }
 ```
 
-```python
-# Not supported in Python
-```
-
-```rust
-// Not supported in Rust
-```
-
 #### Main Loop
 
-A strategy usually runs a loop in ```main()```: each round fetches market data, computes signals, places orders, then calls `Sleep` to wait for the next round. In backtesting ```Sleep()``` advances backtest time and controls the replay speed; in live trading it controls the polling interval and therefore how often the exchange API is called. A loop without ```Sleep()``` calls the exchange API as fast as it can and easily hits the exchange's rate limits. To limit the API call rate on the docker, see Advanced Topics → API Rate Limit Control.
+A strategy usually runs a loop in ```main()```: each round fetches market data, computes signals, places orders, then calls `Sleep` to wait for the next round. In backtesting ```Sleep()``` advances backtest time and controls the replay speed; in live trading it controls the polling interval and therefore how often the exchange API is called. A loop without ```Sleep()``` calls the exchange API as fast as it can and easily hits the exchange's rate limits. To limit the API call rate on the docker, see `API Rate Limiting Control`.
 
-Basic framework:
+Basic framework: run ```onTick()``` once per round, then wait 60 seconds with ```Sleep()```.
 
 ```javascript
 function onTick(){
@@ -1008,7 +1014,7 @@ fn main() {
 }
 ```
 
-The simplest example: place a buy order at price 100 for amount 1 every second:
+Place a buy order at price 100 for amount 1 every second (a demo only; it quickly spends all funds on orders).
 
 ```javascript
 function onTick(){
@@ -1050,7 +1056,7 @@ fn main() {
 }
 ```
 
-A strategy that acts on K-line updates (On Bar): ```onTick()``` runs only when the time of the latest K-line changes:
+Acting on K-line updates (On Bar): ```onTick()``` runs only when the time of the latest K-line changes.
 
 ```javascript
 function onTick() {
@@ -1120,11 +1126,11 @@ fn main() {
 
 Besides polling at a fixed interval, a strategy can wait for events and handle them as they arrive, which avoids useless requests and reacts faster to market changes.
 
-**EventLoop**
+##### EventLoop
 
 `EventLoop` waits for events such as the completion of concurrent tasks started with ```exchange.Go()``` or ```HttpQuery_Go()```, readable data on a WebSocket connection, or thread messages; when one occurs it returns the event information and the strategy then reads the corresponding data. Events are recorded only from the first call of ```EventLoop()```, so call ```EventLoop(-1)``` once before starting concurrent tasks:
 
-```js
+```javascript
 function main() {
     EventLoop(-1)                       // start recording events so none are missed
     var r1 = exchange.Go("GetTicker")
@@ -1135,16 +1141,16 @@ function main() {
 }
 ```
 
-**ctx.subscribe / ctx.poll**
+##### ctx.subscribe / ctx.poll
 
 ```JavaScript``` and ```Rust``` strategies can also use the docker's event subscription interface: ```ctx.subscribe()``` subscribes to market data or order updates for an account and symbol and returns a stream ID; ```ctx.poll()``` takes the next event (optionally with a timeout), and the strategy handles it according to its ```kind```. ```Python``` strategies do not support it.
 
-```js
+```javascript
 function main() {
-    ctx.subscribe(0, "BTC_USDT", {channel: "ticker"})   // the first argument is the account's index in exchanges
+    ctx.subscribe(0, "BTC_USDT", {channel: "ticker"})   // 0: index of the account in exchanges
     ctx.subscribe(0, "", {channel: "orders"})           // order updates
     while (true) {
-        const ev = ctx.poll([], 1000)                    // [] means all subscriptions; wait up to 1 second
+        const ev = ctx.poll([], 1000)                    // []: all subscriptions; wait up to 1 s
         if (!ev) {
             continue
         }
@@ -1179,23 +1185,23 @@ fn main() {
 
 ### Programming Languages
 
-**What programming languages can I use to write my strategies on the FMZ Quant trading platform?**
+Strategies can be written in ```JavaScript```, ```Python```, ```Rust```, [```PINE```](https://www.fmz.com/bbs-topic/9315), [```My Language```](https://www.fmz.com/bbs-topic/2569) (MyLanguage) and the ```Workflow``` visual editor.
 
-The FMZ Quant trading platform supports writing and designing trading strategies using ```JavaScript```, ```Python```, ```Rust```, [```PINE```](https://www.fmz.com/bbs-topic/9315), [```My Language```](https://www.fmz.com/bbs-topic/2569), and the ```Workflow``` workflow tool.
+```JavaScript```, ```Python``` and ```Rust``` strategies call the platform's full API directly; PINE and My Language follow the script syntax of TradingView and Wenhua; Workflow builds a strategy from visual nodes without writing code.
 
 #### JavaScript
 
 Strategies can be written in ```JavaScript```. The runtime is based on the QuickJS engine and supports modern syntax such as ```async```/```await```, ```class``` and ```BigInt```. In live trading the strategy runs on the docker; in backtesting it runs in the browser-side backtesting system. Strategies can also be written in TypeScript; see "Writing in TypeScript" at the end of this page.
 
-**Structure and parameters**
+##### Structure and parameters
 
-The entry point is ```function main()```. The optional ```init()```, ```onexit()``` and ```onerror(msg)``` are called automatically by the docker (see Writing Strategies → Strategy Structure). Interface parameters are global variables with the same names; they can be read directly and also modified in code (see Writing Strategies → Strategy Parameters).
+The entry point is ```function main()```. The optional ```init()```, ```onexit()``` and ```onerror(msg)``` are called automatically by the docker (see `Strategy Structure`). Interface parameters are global variables with the same names; they can be read directly and also modified in code (see `Strategy Parameters`).
 
-**Errors and return values**
+##### Errors and return values
 
 When an API call fails (the exchange returns an error, a network problem, etc.) it returns ```null``` and writes the error to the log. Check the return value before using it, or retry with `_C`:
 
-```js
+```javascript
 function main() {
     var ticker = exchange.GetTicker()
     // null when the call fails
@@ -1211,11 +1217,11 @@ function main() {
 
 For program exceptions (for example reading a property of ```undefined```) and API business errors, the log shows the line number in the strategy code where the error occurred, which makes debugging easier.
 
-**Strings and ArrayBuffer**
+##### Strings and ArrayBuffer
 
 JavaScript strings are UTF-16. If text returned by a platform API is not a valid UTF-8 byte sequence, an ```ArrayBuffer``` (the raw bytes) is returned instead so that no data is lost. Every API parameter that accepts a string also accepts an ```ArrayBuffer```.
 
-```js
+```javascript
 function stringToHex(str) {
     let hex = ''
     for (let i = 0; i < str.length; i++) {
@@ -1256,14 +1262,14 @@ function main() {
 }
 ```
 
-**Asynchrony and threads**
+##### Asynchrony and threads
 
 - ```setTimeout```/```clearTimeout```: callbacks run while the main thread is waiting in ```Sleep()```. When ```main()``` returns, timers that have not fired yet run first, then ```onexit()``` is called.
 - ```fetch(url)```: returns a ```Promise``` that resolves to a response object (```ok```, ```status```, ```headers```; ```text()``` and ```json()``` return the content directly). On the docker, ```fetch``` completes the request synchronously when called and returns an already settled ```Promise```, so combining several ```fetch``` calls with ```Promise.all``` does not make them concurrent.
 - Exchange APIs (such as ```exchange.GetTicker()```) are synchronous blocking calls; wrapping them in a ```Promise``` or an ```async``` function does not make them concurrent either.
-- For concurrency use `exchange.Go`, `HttpQuery_Go`, or create threads with `Thread` (see Advanced Topics → JavaScript Multithreading).
+- For concurrency use `exchange.Go`, `HttpQuery_Go`, or create threads with `Thread` (see `JavaScript Multi-threading`).
 
-```js
+```javascript
 async function main() {
     let resp = await fetch("https://www.okx.com/api/v5/market/books?instId=BTC-USDT")
     if (resp.ok) {
@@ -1274,17 +1280,17 @@ async function main() {
 }
 ```
 
-**Libraries and dependencies**
+##### Libraries and dependencies
 
-JavaScript strategies can use the built-in ```TA``` and ```talib``` indicator libraries directly; see Writing Strategies → Built-in Libraries for what each language provides. Other third-party JavaScript libraries can be downloaded at run time and loaded with ```eval```; the same page has an example.
+JavaScript strategies can use the built-in ```TA``` and ```talib``` indicator libraries directly; see `Built-in Libraries` for what each language provides. Other third-party JavaScript libraries can be downloaded at run time and loaded with ```eval```; the same page has an example.
 
-**Writing in TypeScript**
+##### Writing in TypeScript
 
-TypeScript is not a separate language option. Create the strategy as ```JavaScript``` and put a ```//@ts-check``` comment line in the code (usually the first line), or click the "TypeScript" button at the top right of the editor; the platform then treats it as TypeScript and compiles it to JavaScript before backtesting or live trading. When a strategy is saved through the AI/MCP tools, the language can be given as ```typescript```: the platform saves it as a JavaScript strategy and adds ```//@ts-check``` at the top automatically (see External Interfaces → AI Access).
+TypeScript is not a separate language option. Create the strategy as ```JavaScript``` and put a ```//@ts-check``` comment line in the code (usually the first line), or click the "TypeScript" button at the top right of the editor; the platform then treats it as TypeScript and compiles it to JavaScript before backtesting or live trading. When a strategy is saved through the AI/MCP tools, the language can be given as ```typescript```: the platform saves it as a JavaScript strategy and adds ```//@ts-check``` at the top automatically (see `AI Integration`).
 
 Type declarations for the platform API are built into the strategy editor; nothing needs to be referenced in the code. They cover the global functions, the ```exchange``` object, data structure interfaces such as ```ITicker```, ```IRecord```, ```IOrder``` and ```IPosition```, and ```TA```, ```talib``` and so on. Static type checking catches mistakes such as wrong argument counts, property names or types while you write. Language features, APIs and libraries at run time are the same as for JavaScript.
 
-```ts
+```typescript
 //@ts-check
 function getSignal(ticker: ITicker, ma: number): "buy" | "sell" | null {
     if (ticker.Last > ma) {
@@ -1307,7 +1313,7 @@ function main() {
 
 Strategies can be written in ```Python 3```; Python 2 is not supported. Live trading, and backtests that run on a docker, use the Python interpreter installed on the docker's machine.
 
-**Interpreter**
+##### Interpreter
 
 For live trading the docker looks for an interpreter in this order and uses the first program that starts and is Python 3:
 1. the interpreter named on the strategy's first line after ```#!```, for example ```#!/opt/venv/bin/python3```; with ```#!/usr/bin/env python3.11``` it takes ```python3.11```;
@@ -1323,19 +1329,19 @@ export PYTHON_BIN=/opt/venv/bin/python3
 
 Backtests that run on a docker do not read ```PYTHON_BIN```: they search ```PATH``` for the first program that exists, in the order: the interpreter named after ```#!```, ```python3```, ```python```.
 
-**Structure and parameters**
+##### Structure and parameters
 
-The entry point is ```def main()```. The optional ```init()``` and ```onexit()``` are called automatically by the docker (Python does not support ```onerror()```); see Writing Strategies → Strategy Structure. Interface parameters are global variables with the same names; to assign a new value to one inside a function, declare it with ```global``` first.
+The entry point is ```def main()```. The optional ```init()``` and ```onexit()``` are called automatically by the docker (Python does not support ```onerror()```); see `Strategy Structure`. Interface parameters are global variables with the same names; to assign a new value to one inside a function, declare it with ```global``` first.
 
-**Errors and return values**
+##### Errors and return values
 
 When an API call fails it returns ```None``` and writes the error to the log. Check the return value before using it, or retry with ```_C()```. An uncaught exception ends the strategy, and the error is recorded in the log.
 
-**Output**
+##### Output
 
-The output of ```print()``` is written to ```logs/storage/<live trading ID>/stdout.log``` under the docker's directory (error output goes to ```stderr.log``` in the same directory) and does not appear in the live trading log. Use `Log` for anything that should show up in the log.
+The output of ```print()``` is written to ```logs/storage/<robot ID>/stdout.log``` under the docker's directory (error output goes to ```stderr.log``` in the same directory) and does not appear in the live trading log. Use `Log` for anything that should show up in the log.
 
-**Third-party packages**
+##### Third-party packages
 
 A strategy can import any package installed in the interpreter. Install packages with the same interpreter the docker uses, for example:
 
@@ -1349,9 +1355,9 @@ $PYTHON_BIN -m pip install numpy
 
 To use ```talib```, install TA-Lib (the ```talib``` package) and ```numpy``` on the docker's machine.
 
-**Your own modules**
+##### Your own modules
 
-While a strategy runs, its current directory is the live trading directory ```logs/storage/<live trading ID>/``` (files opened with relative paths land there and are kept with the live trading); ```PYTHONPATH``` is a temporary directory created by the docker for that run and deleted afterwards. The current directory is not on the module search path, so ```.py``` files placed in the live trading directory are not found automatically. There are two ways to import your own modules:
+While a strategy runs, its current directory is the live trading directory ```logs/storage/<robot ID>/``` (files opened with relative paths land there and are kept with the live trading); ```PYTHONPATH``` is a temporary directory created by the docker for that run and deleted afterwards. The current directory is not on the module search path, so ```.py``` files placed in the live trading directory are not found automatically. There are two ways to import your own modules:
 - install the module into the interpreter's ```site-packages``` (for example package it and install it with ```pip install```, or copy it into the ```site-packages``` directory);
 - in the strategy, append the absolute path of the module's directory to ```sys.path```, then import it.
 
@@ -1381,11 +1387,11 @@ Keeping the core logic in a module on your own docker, with only the calling cod
 
 Strategies can be written in ```Rust```. Rust strategies are compiled before they run: for backtesting the platform server compiles them and they are backtested in the cloud (on the platform's servers) by default, or in the browser if you choose the "Local" backtest node; in live trading they run on the docker once compiled. The strategy editor integrates ```rust-analyzer``` for Rust, with code completion and live diagnostics.
 
-**Structure**
+##### Structure
 
 A strategy only needs a ```fn main()```. The platform API (```exchange```, ```exchanges```, ```TA```, ```Log!```, ```_C!``` and so on) is imported automatically; no ```use``` or ```mod``` declarations are needed.
 
-The optional ```fn init()``` and ```fn onexit()``` are called automatically by the docker; just define them, no registration is needed. ```init()``` runs before ```main()```; ```onexit()``` runs when ```main()``` returns normally, when the live trading is stopped, and when the strategy panics. Rust does not support ```onerror()```. See Writing Strategies → Strategy Structure.
+The optional ```fn init()``` and ```fn onexit()``` are called automatically by the docker; just define them, no registration is needed. ```init()``` runs before ```main()```; ```onexit()``` runs when ```main()``` returns normally, when the live trading is stopped, and when the strategy panics. Rust does not support ```onerror()```. See `Strategy Structure`.
 
 ```rust
 fn init() {
@@ -1405,7 +1411,7 @@ fn onexit() {
 
 Some functions are macros (note the exclamation mark): ```Log!()```, ```LogStatus!()```, ```Panic!()```, ```_G!()```, ```_C!()```. ```LogProfit()```, ```Sleep()```, ```_D()```, ```_N()```, ```HttpQuery()``` and others are ordinary functions.
 
-**Parameter types**
+##### Parameter types
 
 Interface parameters are injected as global constants with the same names. They can only be read, not modified in code (copy a value into a local variable if it needs to change). The type depends on the kind of parameter:
 
@@ -1431,7 +1437,7 @@ fn main() {
 
 - If a parameter name clashes with another name in the code, refer to the parameter as ```args::ParamName```.
 
-**Errors and return values**
+##### Errors and return values
 
 API calls that can fail return ```Result<T>```; handle it the usual Rust way (in JavaScript a failed call returns ```null```):
 
@@ -1450,11 +1456,11 @@ fn main() {
 
 Optional arguments (such as the ```symbol``` argument of ```GetTicker```) are passed as ```None``` when omitted, or given directly, for example ```exchange.GetTicker("BTC_USDT")```.
 
-**JSON**
+##### JSON
 
 Raw JSON text returned by the platform API (for example the return value of ```exchange.IO()``` or the ```Info``` field of each structure) is parsed with the built-in ```JSONParse()```, which returns an ```Option<JsonValue>```. Navigate with ```v["key"]``` and ```v[0]``` and read values with methods such as ```as_f64()```, ```as_str()``` and ```as_bool()```. ```JsonValue``` implements ```Display```, so ```v.to_string()``` or ```format!("{}", v)``` gives compact JSON text. The SDK has no convenient API for building JSON; build JSON text with ```format!```, or use ```serde_json```.
 
-**Third-party crates**
+##### Third-party crates
 
 The strategy source is the only code file (there is no separate ```Cargo.toml```). Declare dependencies in a frontmatter block wrapped in ```---``` at the very top of the source; it is merged into ```Cargo.toml``` at build time:
 
@@ -1478,15 +1484,15 @@ fn main() {
 - Between a strategy and the template libraries it references, the dependency block may appear in only one place; declaring it in both fails the build.
 - The build environment has no system OpenSSL. For crates that need TLS (HTTP/WebSocket clients and the like), choose the pure-Rust ```rustls``` implementation (for example ```tokio-tungstenite``` with the ```rustls-tls-webpki-roots``` feature) and avoid ```native-tls```/```openssl-sys```. For WebSocket connections prefer the built-in `Dial` function, which needs no third-party crate.
 
-**Built-in libraries**
+##### Built-in libraries
 
-Rust strategies can use the ```TA``` indicator library; ```talib``` is not supported. See Writing Strategies → Built-in Libraries.
+Rust strategies can use the ```TA``` indicator library; ```talib``` is not supported. See `Built-in Libraries`.
 
 #### MyLanguage
 
-The platform supports MyLanguage for writing and designing strategies, compatible with most syntax, instructions and functions of Wenhua MyLanguage. MyLanguage encourages modular programming, breaking down complex algorithms into function modules. Through concise syntax, dedicated data structures and powerful financial function libraries, it supports the implementation of complex financial logic. Building applications in a modular way improves development efficiency and code maintainability.
+Strategies can be written in MyLanguage, which is compatible with most of the syntax, instructions and functions of Wenhua MyLanguage. It breaks complex algorithms into functions and describes trading logic with a concise syntax and a library of financial functions.
 
-MyLanguage Strategy Example: System Based on Displaced Bollinger Bands
+Example strategy: a system based on displaced Bollinger Bands
 
 ```My
 M := 12;          // Parameter range 1, 20
@@ -1494,8 +1500,8 @@ N := 3;           // Parameter range 1, 10
 SDEV := 2;        // Parameter range 1, 10
 P := 16;          // Parameter range 1, 20
 
-// This strategy is a trend-following trading strategy, suitable for larger timeframes such as daily charts.
-// This model is only used as a model development case. Trading based on this carries your own risk.
+// A trend-following strategy for larger periods such as daily K-lines.
+// This model is only an example of model development; trade on it at your own risk.
 
 ////////////////////////////////////////////////////////
 
@@ -1516,10 +1522,10 @@ AUTOFILTER;
 
 #### PINE Language
 
-The platform supports and is compatible with ```Trading View```'s PINE language scripts. PINE is a lightweight yet powerful strategy programming language for creating technical indicators and strategies that can be backtested and traded live. The active community has created over 100,000 PINE scripts.
-Users can easily access and apply various technical analysis tools and trading strategies; leverage community scripts to quickly implement trading ideas without writing code from scratch, significantly reducing development cycles; help both beginners and experienced traders learn and understand different technical indicators, strategies, and programming concepts.
+The platform supports ```Trading View```'s PINE language scripts. PINE is used to write indicators and strategies that can be backtested and traded live; the community has published more than 100,000 PINE scripts that you can reuse to implement your own trading ideas instead of starting from scratch.
 
-PINE Language Strategy Example: Supertrend Strategy
+Example strategy: Supertrend
+
 ```pine
 strategy("supertrend", overlay=true)
 
@@ -1545,131 +1551,122 @@ else if direction > 0
 
 The platform supports writing strategies using the Workflow approach. Workflow is a visual strategy design method that builds trading logic through node connections and configurations, enabling strategy implementation without writing code.
 
-**Workflow Features**:
+##### Workflow Features
 - Visual drag-and-drop design, WYSIWYG
 - Rich preset functional nodes (data retrieval, indicator calculation, conditional judgment, trade execution, etc.)
 - Lower programming barrier, suitable for rapid strategy building and validation
 - Supports backtesting functionality with visual node execution status viewing
 
-**Learning Resources**:
+##### Learning Resources
 - [Workflow Video Tutorial Series](https://www.fmz.com/class/workflow)
 
 ### Strategy Parameters
 
-Parameters set in the strategy interface appear in the strategy code as global variables with the same names (global constants in Rust) and are accessed by name:
+Strategy parameters are set in the strategy interface and appear in the strategy code as global variables with the same names (global constants in Rust), accessed by name. Differences between languages:
 - ```JavaScript```, ```MyLanguage```: parameters can be read directly and the parameter variables can also be modified in code.
 - ```Python```: parameters can be read directly; to assign a new value to one inside a function, declare it with ```global``` first.
-- ```Rust```: parameters are constants that can only be read, not modified; see Programming Languages → Rust for the type of each kind of parameter.
+- ```Rust```: parameters are constants that can only be read, not modified; see `Rust` for the type of each kind of parameter.
 - ```PINE```: interface parameters are created with the ```input()``` function.
 
 ![Strategy Parameter Settings Interface](https://www.fmz.com/upload/asset/2e46b5e593de3b2f11445.png)
 
 #### Interface Parameter Types
 
-| Variable (naming example) | Description | Type | Default Value (description) | Component Configuration (description) | Remarks |
-| - | - | - | - | - | - |
-| pNum       | Description of parameter pNum       | Numeric (number)     | Example: Set default value to 100; f64 in Rust strategies| Used to set the interface control bound to the current parameter: component type, minimum value, maximum value, grouping, filters, etc. | Remarks for parameter pNum, the value of pNum is numeric type |
-| pBool      | Description of parameter pBool      | Boolean (true/false) | Use switch control to set default value, optional control not supported | Same as above                                                          | Remarks for parameter pBool, the value of pBool is boolean type |
-| pStr       | Description of parameter pStr       | String (string)     | Example: Set default value to abc               | Same as above                                                          | Remarks for parameter pStr, the value of pStr is string type |
-| pCombox    | Description of parameter pCombox    | Dropdown (selected)   | Set one or more options from the options      | Same as above                                                          | Remarks for parameter pCombox, the value of pCombox may have various forms |
-| pSecretStr | Description of parameter pSecretStr | Encrypted string (string)     | Example: Set default value to xyz               | Same as above                                                          | Remarks for parameter pSecretStr, the value of pSecretStr is string type |
+Interface parameters are set in the strategy parameters area below the code editor on the strategy editing page. There are 5 types; the variable names in the table are only examples:
 
-Interface parameters are configured in the strategy parameters area below the code editor on the strategy editing page. Please note the following:
-1. In the default value option of parameter settings, the "Optional" control is optional by default. You can change the state of this control to set the current parameter as required. After setting a parameter as required, if the parameter is not set during backtesting or live trading, backtesting cannot be performed or live trading cannot be started.
-2. Variable names for interface parameters in strategy code should not use reserved words (keywords) of the current programming language.
-3. In the backtesting or live trading interface, hovering the mouse over the control bound to a parameter will display the parameter's remarks.
-4. The "Description" of a parameter is the display name of the control bound to the parameter.
-5. The "Variable" of a parameter refers to those in the table above: ```pNum```, ```pBool```, ```pStr```, ```pCombox```, ```pSecretStr```. They exist as global variables in the strategy code, so the values of strategy parameters can be modified in the code (except in Rust, where parameters are global constants and cannot be modified).
-6. For "Encrypted string" and "String" type parameters, no quotes are needed when entering default values; all input is treated as strings. "Encrypted string" parameters are used the same way as "String" parameters, but encrypted strings are transmitted encrypted and not sent in plain text.
-7. If a "String" type parameter is set to "Optional", when no parameter is filled in the control bound to the parameter, the value of the parameter variable is **empty string**;
-  Similarly, the value of a "Numeric" parameter is **null**;
-  Similarly, the value of a "Dropdown" parameter is **null**;
-  Similarly, the value of an "Encrypted string" parameter is **null**.
-  In ```Rust``` strategies, an optional parameter that is left empty has the zero value of its type: ```0``` for numbers, an empty string for strings and encrypted strings, ```false``` for booleans.
-8. For dropdown type interface parameters (e.g., variable name ```pCombox```), when "Support multiple selection" is not enabled in "Component Configuration", the value of pCombox is the index or specific data of the currently selected option (when data is bound to options).
-  If "Support multiple selection" is enabled, the value of pCombox is an array containing the indices or specific data of all currently selected options (when data is bound to options).
+| Type | Example variable | Value in code | Default value |
+| - | - | - | - |
+| Number (number) | ```pNum``` | A number; ```f64``` in Rust | Enter a number, e.g. ```100``` |
+| Boolean (true/false) | ```pBool``` | A boolean | Set with a switch; cannot be optional |
+| String (string) | ```pStr``` | A string | Type it as is, e.g. ```abc```, without quotes |
+| Dropdown (selected) | ```pCombox``` | Index or bound data of the selected option; an array with multiple selection | Select one or more options |
+| Encrypted string (string) | ```pSecretStr``` | A string | Type it as is, e.g. ```xyz```, without quotes |
+
+##### Settings of a parameter
+- Variable: the name of the parameter's global variable in the strategy code; do not use a reserved word (keyword) of the programming language.
+- Description: the display name of the control bound to the parameter.
+- Remarks: the tooltip shown when the mouse hovers over the parameter's control in the backtest or live robot interface.
+- Default value and "Optional": the "Optional" switch next to the default value is on by default and can be turned off to make the parameter required. A backtest or live robot cannot start if a required parameter is not set.
+- Component configuration: the type of UI control bound to the parameter, plus minimum, maximum, group, filter and so on; see `Component Configuration`.
+
+##### Notes
+- Parameters are global variables in the code and can be modified there (except in Rust, where parameters are global constants and cannot be modified).
+- An "Encrypted string" parameter is used the same way as a "String" parameter, but it is sent encrypted, never in plain text.
+- An optional parameter that is left empty is an empty string for String parameters, and a null value for Number, Dropdown and Encrypted string parameters. In ```Rust``` strategies it is the zero value of its type: ```0``` for numbers, an empty string for strings and encrypted strings, ```false``` for booleans.
+- A dropdown parameter without "Support multiple selection" in its component configuration holds the index of the selected option, or the option's bound data if data is bound; with "Support multiple selection" it holds an array of the indices (or bound data) of all selected options.
 
 #### Component Configuration
 
 Both strategy interface parameters and strategy interactive controls have a "Component Configuration" option. It sets the UI control used for the parameter (or interactive control), as well as the minimum, maximum, group, filter and so on.
 
-Components supported by each type:
-- Number (number)
-  Input box (default), time picker, slider.
-- Boolean (true/false)
-  Switch only (default).
-- String (string)
-  Input box (default), text box, time picker, color picker, currency, trading symbol.
-- Dropdown (selected)
-  Dropdown (default), segmented control, currency, trading symbol.
-- Encrypted string (string), strategy parameters only
-  Encrypted input box only (default).
-- Button (button), interactive controls only
-  A single button (default), with no input.
+Components available for each type (the first one is the default):
 
-**Group**
+| Type | Components |
+| - | - |
+| Number (number) | Input box, time picker, slider |
+| Boolean (true/false) | Switch |
+| String (string) | Input box, text box, time picker, color picker, currency, trading symbol |
+| Dropdown (selected) | Dropdown, segmented control, currency, trading symbol |
+| Encrypted string (string), strategy parameters only | Encrypted input box |
+| Button (button), interactive controls only | Button (no input) |
+
+##### Group
 
 Enter a label in the "Group" box of the component configuration to put several strategy parameters in the same group (replacing the platform's old "Strategy Grouping" feature). Interactive controls can be grouped the same way (replacing the old "Interactive Control Grouping" feature).
 
-**Filter**
+##### Filter
 
-In the component configuration of a strategy parameter, the "Filter" box takes a condition expression that controls whether the parameter is available (replacing the platform's old "Parameter Dependency" feature).
-The filter is empty by default, meaning no filtering. Expressions such as ```a > b```, ```a == 1```, ```a```, ```!a``` and ```a >= 1 && a <= 10``` can be used. The parameter is available when the condition is true.
-- With the filter ```a == 1```, the parameter's availability depends on the value of parameter ```a```: it is available when ```a``` equals 1, otherwise not.
-- With the filter ```a >= 1 && a <= 10```, the parameter is available when ```a``` is greater than or equal to 1 and less than or equal to 10, otherwise not.
-- With the filter ```!a```, the condition is "not a"; ```a``` can be a boolean or a number (```!0``` is true).
+In the component configuration of a strategy parameter, the "Filter" box takes a condition expression that controls whether the parameter is available (replacing the platform's old "Parameter Dependency" feature). The filter is empty by default, meaning no filtering; the parameter is available when the condition is true. Expressions such as ```a > b```, ```a == 1```, ```a```, ```!a``` and ```a >= 1 && a <= 10``` can be used, for example:
+- ```a == 1```: available when parameter ```a``` equals 1, otherwise not.
+- ```a >= 1 && a <= 10```: available when ```a``` is at least 1 and at most 10, otherwise not.
+- ```!a```: the condition is "not a"; ```a``` can be a boolean or a number (```!0``` is true).
 
 #### Save Parameter Settings
 
-- Parameter saving in the backtesting system
-  When backtesting, if you want to save the strategy parameters, you can click the "Save Backtest Settings" button after modifying the strategy parameters. For details, see Backtesting System → Backtest Configuration and Saving.
+Strategy parameters set for a backtest can be saved into the strategy code; a live robot's parameters can be exported to a file and imported into another robot.
 
-  | Variable | Description | Type | Default Value |
-  | - | - | - | - |
-  |number |Numeric type |Number (number) |1 |
-  |string |String |String (string) |Hello FMZ |
-  |combox |Dropdown box |Dropdown (selected) |1\|2\|3|
-  |bool |Boolean value |Boolean (true/false) |true |
-  |numberA |Numeric A (its component filter is set to ```isShowA```, so it is available only when ```isShowA``` is true) |Number (number) |2 |
-  |isShowA |Whether to display the numberA parameter |Boolean (true/false) |false |
+##### Saving backtest parameters
+After changing strategy parameters on the backtest page, click "Save Backtest Settings": the parameters are saved together with the backtest configuration as a comment block at the top of the strategy code; see `Backtest Configuration and Saving`. For example, for a strategy with these parameters:
 
-  The configured strategy parameters will be saved in the strategy in the form of code, for example:
+| Variable | Description | Type | Default |
+| - | - | - | - |
+| number | Number | Number (number) | 1 |
+| string | String | String (string) | Hello FMZ |
+| combox | Dropdown | Dropdown (selected) | 1\|2\|3 |
+| bool | Boolean | Boolean (true/false) | true |
+| numberA | Number A (filter ```isShowA```: available only when ```isShowA``` is true) | Number (number) | 2 |
+| isShowA | Whether to show numberA | Boolean (true/false) | false |
 
-  ```js
-  /*backtest
-  start: 2020-02-29 00:00:00
-  end: 2020-03-29 00:00:00
-  period: 1d
-  args: [["number",2],["string","Hello FMZ.COM"],["combox",2],["bool",false],["numberA",666],["isShowA",true]]
-  */
-  ```
+after changing the values and saving, the block at the top of the code looks like this (```JavaScript``` and ```Rust``` use ```/*backtest ... */```, ```Python``` uses ```'''backtest ... '''```):
 
-  ```python
-  '''backtest
-  start: 2020-02-29 00:00:00
-  end: 2020-03-29 00:00:00
-  period: 1d
-  args: [["number",2],["string","Hello FMZ.COM"],["combox",2],["bool",false],["numberA",666],["isShowA",true]]
-  '''
-  ```
+```javascript
+/*backtest
+start: 2020-02-29 00:00:00
+end: 2020-03-29 00:00:00
+period: 1d
+args: [["number",2],["string","Hello"],["combox",2],["bool",false],["numberA",666],["isShowA",true]]
+*/
+```
 
-  ```rust
-  /*backtest
-  start: 2020-02-29 00:00:00
-  end: 2020-03-29 00:00:00
-  period: 1d
-  args: [["number",2],["string","Hello FMZ.COM"],["combox",2],["bool",false],["numberA",666],["isShowA",true]]
-  */
-  ```
+```python
+'''backtest
+start: 2020-02-29 00:00:00
+end: 2020-03-29 00:00:00
+period: 1d
+args: [["number",2],["string","Hello"],["combox",2],["bool",false],["numberA",666],["isShowA",true]]
+'''
+```
 
-  If a ```Rust``` strategy declares dependencies in a frontmatter block at the top, the backtest configuration block must come after the frontmatter (see Programming Languages → Rust).
-- Importing and exporting live trading parameters
-  When running live trading, if you need to save the parameter data of the live trading configuration, you can click the "Parameter Settings" option on the strategy live trading page, then click the "Export Parameters" button. The exported strategy parameters will be saved as a ```json``` file.
-  The exported strategy parameter configuration can also be imported into live trading again. Click the "Import Parameters" button to import the saved strategy live trading parameters into the current live trading, and after importing, click the "Update Parameters" button to save and apply them.
+If a ```Rust``` strategy declares dependencies in a frontmatter block at the top, the backtest configuration block must come after the frontmatter; see `Rust`.
+
+##### Importing and exporting live robot parameters
+1. On the robot page, click "Parameter Settings", then "Export Parameters"; the parameters are saved as a ```json``` file.
+2. On the robot page that should receive them, click "Import Parameters" and choose the exported file.
+3. Click "Update Parameters" to save; the imported parameters take effect only then.
 
 ### Interactive Controls
 
-Strategies in ```JavaScript```, ```Python```, ```Rust``` and MyLanguage can have interactive controls, which send interaction commands to the strategy while it is running live. In ```JavaScript```, ```Python``` and ```Rust``` strategies, the messages produced by interactive controls are read with the `GetCommand` function. The "Component Configuration" of interactive controls is the same as for strategy parameters (see Strategy Parameters → Component Configuration).
+Strategies in ```JavaScript```, ```Python```, ```Rust``` and MyLanguage can have interactive controls, which send interaction commands to the strategy while it is running live. In ```JavaScript```, ```Python``` and ```Rust``` strategies, the messages produced by interactive controls are read with the `GetCommand` function. The "Component Configuration" of interactive controls is the same as for strategy parameters (see `Component Configuration`).
 
 ![Interactive Controls](https://www.fmz.com/upload/asset/2e4320d0cc33c15eb935d.png)
 
@@ -1681,29 +1678,19 @@ With code in the strategy that handles interactive control messages, interactive
 
 #### Types of Interactive Controls
 
-| Variable (naming example) | Description | Type | Default Value (description) | Component Configuration (description) | Notes |
-| - | - | - | - | - | - |
-| cmdNum | Description of interactive control cmdNum | Number type (number) | Default value is optional, can be left empty | Used to set the component type, minimum value, maximum value, grouping, etc. of the interface control bound to the current interactive item | Notes for interactive control cmdNum |
-| cmdBool | Description of interactive control cmdBool | Boolean type (true/false) | Default value is required, on or off | Same as above | Notes for interactive control cmdBool |
-| cmdStr | Description of interactive control cmdStr | String type (string) | Default value is optional, can be left empty | Same as above | Notes for interactive control cmdStr |
-| cmdCombox | Description of interactive control cmdCombox | Dropdown (selected) | Default value is optional, can be left empty | Same as above | Notes for interactive control cmdCombox |
-| cmdBtn | Description of interactive control cmdBtn | Button (button) | Button control does not bind input items | Same as above | Notes for interactive control cmdBtn |
+There are 5 types of interactive control. When the control's button is clicked, `GetCommand` in the strategy receives a string message. The variable names in the table are only examples:
 
-Messages (strings) sent to the strategy after interactive control is triggered:
-- Number type
-  After entering interactive data ```123``` in the input box of interactive control ```cmdNum```, click the button of interactive control cmdNum. The ```GetCommand()``` function in the strategy program will receive the message: ```cmdNum:123```.
-- Boolean type
-  After setting the switch control of interactive control ```cmdBool``` to on, click the button of interactive control cmdBool. The ```GetCommand()``` function in the strategy program will receive the message: ```cmdBool:true```.
-- String type
-  After entering interactive data ```abc``` in the input box of interactive control ```cmdStr```, click the button of interactive control cmdStr. The ```GetCommand()``` function in the strategy program will receive the message: ```cmdStr:abc```.
-- Dropdown
-  After selecting the second option in the dropdown of interactive control ```cmdCombox```, click the button of interactive control cmdCombox. The ```GetCommand()``` function in the strategy program will receive the message: ```cmdCombox:1```, where 1 represents the index of the selected option, the first option has index 0, the second option has index 1.
-- Button
-  Click the button of interactive control ```cmdBtn```. The ```GetCommand()``` function in the strategy program will receive the message: ```cmdBtn```.
+| Type | Example variable | Default value | Message received by ```GetCommand()``` |
+| - | - | - | - |
+| Number (number) | ```cmdNum``` | Optional, may be empty | Enter ```123``` and click: ```cmdNum:123``` |
+| Boolean (true/false) | ```cmdBool``` | Required, on or off | Click with the switch on: ```cmdBool:true``` |
+| String (string) | ```cmdStr``` | Optional, may be empty | Enter ```abc``` and click: ```cmdStr:abc``` |
+| Dropdown (selected) | ```cmdCombox``` | Optional, may be empty | Pick option 2 and click: ```cmdCombox:1``` (index from 0) |
+| Button (button) | ```cmdBtn``` | No input | Click: ```cmdBtn``` |
 
-The "Component Configuration" of interactive controls is the same as for strategy parameters (see Strategy Parameters → Component Configuration).
+The message format is ```variable:value```; a button sends only its variable name. Description, remarks and component configuration of interactive controls work as for strategy parameters; see `Interface Parameter Types` and `Component Configuration`.
 
-**Example: changing a strategy parameter with an interactive control**
+##### Example: changing a strategy parameter with an interactive control
 
 On the strategy editing page, add a string interactive control named ```changeSymbol``` under "Strategy Interaction". The settings of the interactive control:
 
@@ -1711,7 +1698,7 @@ On the strategy editing page, add a string interactive control named ```changeSy
 
 While the strategy runs live, enter ```ETH_USDT``` in the control's input box and click its button; ```GetCommand()``` receives the message ```changeSymbol:ETH_USDT```. The strategy detects the message and updates the corresponding variable (parameters set in the strategy interface are global variables too; a global variable in the code is used here for demonstration):
 
-```js
+```javascript
 // strategy parameter
 var symbol = "BTC_USDT"
 
@@ -1740,11 +1727,18 @@ Besides the controls designed in the "Strategy Interaction" section, a strategy 
 There are three kinds of status bar buttons:
 - A plain button: a click opens a confirmation box, and on confirmation the strategy receives ```cmd```.
   ```json
-  {"type": "button", "name": "平仓|Close", "cmd": "close", "description": "平掉全部持仓|close all positions"}
+  {"type": "button", "name": "平仓|Close", "cmd": "close",
+   "description": "平掉全部持仓|close all positions"}
   ```
 - A button with one input control: set it with ```input```; the strategy receives ```cmd:value```.
   ```json
-  {"type": "button", "name": "开仓|Open", "cmd": "open", "input": {"type": "number", "name": "amount", "label": "开仓数量|amount", "default": 1, "required": true}}
+  {
+      "type": "button",
+      "name": "开仓|Open",
+      "cmd": "open",
+      "input": {"type": "number", "name": "amount", "label": "开仓数量|amount",
+                "default": 1, "required": true}
+  }
   ```
 - A button with a group of input controls: set them with ```group```; the strategy receives ```cmd:JSON``` keyed by each control's ```name```. In this example the price control is shown only when the order type is "limit":
   ```json
@@ -1753,9 +1747,12 @@ There are three kinds of status bar buttons:
       "cmd": "order",
       "name": "下单|Order",
       "group": [
-          {"type": "selected", "name": "orderType", "label": "下单方式|order type", "default": 0, "settings": {"options": ["市价单|market", "限价单|limit"]}},
-          {"type": "number", "name": "price", "label": "价格|price", "settings": {"filter": "orderType==1"}},
-          {"type": "number", "name": "amount", "label": "数量|amount", "default": 1, "required": true}
+          {"type": "selected", "name": "orderType", "label": "下单方式|order type", "default": 0,
+           "settings": {"options": ["市价单|market", "限价单|limit"]}},
+          {"type": "number", "name": "price", "label": "价格|price",
+           "settings": {"filter": "orderType==1"}},
+          {"type": "number", "name": "amount", "label": "数量|amount", "default": 1,
+           "required": true}
       ]
   }
   ```
@@ -1768,10 +1765,13 @@ When writing these controls:
 
 To output a button, encode the button object as a JSON string, wrap it in ``` ` ``` and pass it to ```LogStatus()```. In JavaScript:
 
-```js
+```javascript
 function main() {
     var btnClose = {"type": "button", "name": "平仓|Close", "cmd": "close"}
-    var btnOpen = {"type": "button", "name": "开仓|Open", "cmd": "open", "input": {"type": "number", "name": "amount", "label": "开仓数量|amount", "default": 1}}
+    var btnOpen = {
+        "type": "button", "name": "开仓|Open", "cmd": "open",
+        "input": {"type": "number", "name": "amount", "label": "开仓数量|amount", "default": 1}
+    }
     // one JSON block per line: the two buttons go on two lines
     LogStatus("`" + JSON.stringify(btnClose) + "`\n`" + JSON.stringify(btnOpen) + "`")
     while (true) {
@@ -1806,14 +1806,14 @@ How template functions are exported and called in each language:
 
 #### Export Functions of Template Libraries
 
-Export functions are the interface functions of template libraries, which can be called by strategies that reference the template library.
+Exported functions are the interface a template library offers; strategies that reference the template library can call them. How each language exports them is described in `Template Library`.
 
-Different programming languages have different formats for writing template libraries. The following are example codes for declaring and implementing export functions in template libraries:
+Declare and implement the exported function ```Test``` in a template library, in each language.
 
 ```javascript
 /*
--- 策略引用该模板以后直接用 $.Test() 调用此方法
--- main 函数在策略中不会触发, 只做为模板调试的入口
+-- after referencing this template, a strategy calls this method directly as $.Test()
+-- main is never triggered in the strategy; it is only the entry point for debugging the template
 */
 $.Test = function() {
     Log('Test')
@@ -1828,7 +1828,7 @@ function main() {
 def Test():
     Log("template call")
 
-# 导出Test函数, 主策略可以通过ext.Test()调用
+# export Test; the main strategy calls it as ext.Test()
 ext.Test = Test
 ```
 
@@ -1842,9 +1842,7 @@ pub fn Test() {
 
 #### Template Library Parameters
 
-Template libraries can also set their own interface parameters. Template library parameters are used as global variables in the template library code.
-
-For example, we set a template library parameter:
+Template libraries can also set their own interface parameters. Template library parameters are used as global variables in the template library code (global constants in Rust). For example, a template library with this parameter:
 
 ![Template Parameter](https://www.fmz.com/upload/asset/2e4ab550b85e6a1cac08e.png)
 
@@ -1852,7 +1850,7 @@ For example, we set a template library parameter:
 | - | - | - | - |
 | param1 | Template Parameter 1 | Number | 99 |
 
-Parameters of a ```Rust``` template are constants that can only be read, not modified, so in Rust the example below can only read the parameter:
+In the examples below the template exports functions that read and modify the parameter, and the strategy calls them. Parameters of a ```Rust``` template are constants that can only be read, not modified, so in Rust the parameter can only be read:
 
 ```rust
 // template code
@@ -1869,7 +1867,7 @@ fn main() {
 }
 ```
 
-Template library code for testing the ```param1``` parameter:
+Template library code: export functions that read and modify the ```param1``` parameter.
 
 ```javascript
 $.SetParam1 = function(p1) {
@@ -1895,11 +1893,7 @@ ext.SetParam1 = SetParam1
 ext.GetParam1 = GetParam1
 ```
 
-```rust
-// Rust template parameters are read-only constants; see above for how to read them
-```
-
-Strategy code referencing the above template library example, using the template library's exported functions to get parameter ```param1``` and modify parameter ```param1```.
+Strategy code that references the template above: read and modify ```param1``` through the exported functions.
 
 ```javascript
 function main () {
@@ -1918,10 +1912,6 @@ def main():
     Log("Calling ext.GetParam1:", ext.GetParam1())
 ```
 
-```rust
-// Rust template parameters are read-only constants; see above for how to read them
-```
-
 #### Reference Template Library
 
 When a strategy references a template library, the currently logged-in FMZ Quant Trading Platform account must have available template libraries in its strategy library. On the [Strategy Edit Page](https://www.fmz.com/m/add-strategy), check the templates you need to reference in the Template section, then save the strategy to complete the reference.
@@ -1930,23 +1920,26 @@ When a strategy references a template library, the currently logged-in FMZ Quant
 
 ### Built-in Libraries
 
-The FMZ Quant Trading Platform has some commonly used libraries built in. Availability by language:
+Strategies can use the platform's built-in ```TA``` and ```talib``` indicator libraries and each language's JSON support without importing anything. Availability by language:
 
 | Library | JavaScript | Python | Rust |
 | - | - | - | - |
-| ```TA``` indicators | yes | yes | yes |
-| ```talib``` indicators | yes | requires TA-Lib and numpy installed on the docker's machine | no |
+| ```TA``` indicators | ✓ | ✓ | ✓ |
+| ```talib``` indicators | ✓ | ✓ (needs TA-Lib and numpy on the docker's machine) | ✗ |
 | JSON | the language's built-in ```JSON``` | the standard ```json``` module | ```JSONParse()```/```JsonValue``` |
 
 For the full list of functions and their arguments see `TA` and `Talib` in the reference.
 
-**TA indicator library**
+#### TA indicator library
 
 The platform's ```TA``` library optimizes the common indicator algorithms ([open-source TA library code](https://www.fmz.com/bbs-topic/409)). Where there are not enough K-lines to compute an indicator, invalid values are returned at those positions.
 
-```js
+```javascript
 function main(){
     var records = exchange.GetRecords()
+    if (!records) {
+        return
+    }
     var macd = TA.MACD(records)
     var atr = TA.ATR(records, 14)
 
@@ -1966,29 +1959,34 @@ fn main() {
 }
 ```
 
-**talib indicator library**
+#### talib indicator library
 
-```js
+```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) {
+        return
+    }
     var cci = talib.CCI(records, 14)
     Log(cci)
 }
 ```
 
 ```python
-# Python needs TA-Lib and numpy installed on the docker's machine; without them calling talib raises an error asking to install it
+# needs TA-Lib and numpy on the docker's machine, otherwise talib raises an error
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     cci = talib.CCI(records.High, records.Low, records.Close, 14)
     Log(cci)
 ```
 
-**JavaScript: loading third-party libraries dynamically**
+#### JavaScript: loading third-party libraries dynamically
 
 Other third-party JavaScript libraries can be downloaded at run time and loaded with ```eval```:
 
-```js
+```javascript
 function main() {
     // via. https://cdnjs.com/libraries
     eval(HttpQuery("https://cdnjs.cloudflare.com/ajax/libs/mathjs/13.2.0/math.min.js"))
@@ -2002,17 +2000,23 @@ function main() {
 
 ### UI Text Localization
 
-Both the strategy name and the descriptions of strategy parameters can be written in the ```Chinese|English``` format, allowing the web page to automatically recognize and display the corresponding language. In other use cases—such as **strategy description**, **usage instructions**, and other ```Markdown```-formatted text—using ```[trans]Chinese|English[/trans]``` or ```[trans]Chinese||English[/trans]``` can likewise achieve automatic language recognition. After switching the language, refresh the web page for it to take effect. In addition, in strategy code, any function that can accept a string also supports language switching, such as the ```Log()``` function, the ```LogStatus()``` function, and so on.
+Text in the strategy interface can be written in both Chinese and English; the web page shows the one matching the current language (refresh the page after switching languages):
+- Strategy name and descriptions of strategy parameters: write ```Chinese|English```.
+- Strategy description, usage instructions and other ```Markdown``` text: write ```[trans]Chinese|English[/trans]``` or ```[trans]Chinese||English[/trans]```.
+- Functions in the strategy code that output strings, such as ```Log()``` and ```LogStatus()```: the same as ```Markdown``` text; texts of status bar buttons are written ```Chinese|English``` directly, without the ```[trans]``` tag.
 
-```js
+```javascript
 function main() {
     Log("[trans]日志|log[/trans]")
+    // no [trans] tag inside buttons
+    var btn = {"type": "button", "cmd": "coverAll", "name": "平仓|cover",
+               "description": "描述|description"}
     var table = {
         type: "table",
         title: "[trans]操作|option[/trans]",
         cols: ["[trans]列1|col1[/trans]", "[trans]列2|col2[/trans]", "[trans]操作|option[/trans]"],
         rows: [
-            ["[trans]比特币|BTC[/trans]", "[trans]以太坊|ETH[/trans]", {"type": "button", "cmd": "coverAll", "name": "平仓|cover", "description": "描述|description"}]  // Note: there is no need to add the [trans] tag inside buttons
+            ["[trans]比特币|BTC[/trans]", "[trans]以太坊|ETH[/trans]", btn]
         ]
     }
     LogStatus("[trans]信息|message[/trans]", "\n`" + JSON.stringify(table) + "`")
@@ -2025,12 +2029,14 @@ import json
 
 def main():
     Log("[trans]日志|log[/trans]")
+    btn = {"type": "button", "cmd": "coverAll", "name": "平仓|cover",
+           "description": "描述|description"}
     table = {
         "type": "table",
         "title": "[trans]操作|option[/trans]",
         "cols": ["[trans]列1|col1[/trans]", "[trans]列2|col2[/trans]", "[trans]操作|option[/trans]"],
         "rows": [
-            ["[trans]比特币|BTC[/trans]", "[trans]以太坊|ETH[/trans]", {"type": "button", "cmd": "coverAll", "name": "平仓|cover", "description": "描述|description"}]
+            ["[trans]比特币|BTC[/trans]", "[trans]以太坊|ETH[/trans]", btn]
         ]
     }
     LogStatus("[trans]信息|message[/trans]", "\n`" + json.dumps(table) + "`")
@@ -2045,7 +2051,9 @@ fn main() {
         "title": "[trans]操作|option[/trans]",
         "cols": ["[trans]列1|col1[/trans]", "[trans]列2|col2[/trans]", "[trans]操作|option[/trans]"],
         "rows": [
-            ["[trans]比特币|BTC[/trans]", "[trans]以太坊|ETH[/trans]", {"type": "button", "cmd": "coverAll", "name": "平仓|cover", "description": "描述|description"}]
+            ["[trans]比特币|BTC[/trans]", "[trans]以太坊|ETH[/trans]",
+             {"type": "button", "cmd": "coverAll", "name": "平仓|cover",
+              "description": "描述|description"}]
         ]
     }"#;
     LogStatus!("[trans]信息|message[/trans]", format!("\n`{}`", table));
@@ -2078,8 +2086,8 @@ Every function, structure and constant of the API reference, grouped by its cate
 | `_N` | Format a floating-point number. |
 | `_C` | A retry function used for fault-tolerant handling of interface calls. |
 | `_Cross` | Returns the number of crossover periods between array ```arr1``` and array ```arr2```. |
-| `JSON.parse` | The ```JSON.parse``` function is a method of the **ECMAScript** standard built-in object ```JSON```, used to decode (parse) a JSON string. |
-| `JSON.stringify` | The ```JSON.stringify``` function is a method of the **ECMAScript** standard built-in object ```JSON```, used to convert JavaScript values to JSON strings. |
+| `JSON.parse` | The ```JSON.parse``` function is a method of the ECMAScript standard built-in object ```JSON```, used to decode (parse) a JSON string. |
+| `JSON.stringify` | The ```JSON.stringify``` function is a method of the ECMAScript standard built-in object ```JSON```, used to convert JavaScript values to JSON strings. |
 | `Encode` | This function encodes data according to the parameters passed in. |
 | `MD5` | Calculate the MD5 hash of the parameter ```data```. |
 | `UUID` | Create a UUID. |
@@ -2093,7 +2101,7 @@ Every function, structure and constant of the API reference, grouped by its cate
 | `LogProfit` | Records and prints the profit/loss value, and plots the equity curve based on the profit/loss value. |
 | `LogProfitReset` | Clear all profit logs and the profit chart. |
 | `LogReset` | Clear the logs. |
-| `LogVacuum` | Used to reclaim the storage space occupied by deleted data in **SQLite** after clearing logs with the ```LogReset()``` function. |
+| `LogVacuum` | Used to reclaim the storage space occupied by deleted data in SQLite after clearing logs with the ```LogReset()``` function. |
 | `EnableLog` | Enable or disable logging of order information. |
 | `Chart` | Custom chart plotting function. |
 | `KLineChart` | This function is used to perform custom drawing while a strategy is running, using a drawing approach similar to the ```Pine``` language. |
@@ -2107,9 +2115,9 @@ Every function, structure and constant of the API reference, grouped by its cate
 | - | - |
 | `exchange.GetTicker` | Gets the Ticker structure (market data) of a spot instrument or contract; without ```symbol``` it uses the currently set trading pair and contract code. |
 | `exchange.GetTickers` | The ```exchange.GetTickers()``` function is used to retrieve aggregated market data from the exchange (an array of Ticker structures). |
-| `exchange.GetDepth` | Gets the Depth structure, i.e. |
-| `exchange.GetTrades` | Gets the Trade structure array of the spot or futures corresponding to the currently set trading pair and contract code, i.e. |
-| `exchange.GetRecords` | Get the Record structure array (i.e. |
+| `exchange.GetDepth` | Gets the Depth structure, i.e. the order book data, of the spot or contract corresponding to the currently set trading pair and contract code. |
+| `exchange.GetTrades` | Gets the Trade structure array of the spot or futures corresponding to the currently set trading pair and contract code, i.e. the market's trade (tick) data. |
+| `exchange.GetRecords` | Get the Record structure array (i.e. K-line data) of the spot or contract corresponding to the currently set trading pair or contract code. |
 | `exchange.GetMarkets` | The ```exchange.GetMarkets()``` function is used to retrieve market information from the exchange. |
 | `exchange.GetRawJSON` | Get the raw content returned by the most recent ```rest``` request from the current exchange object (exchange, exchanges). |
 | `exchange.SetData` | The ```exchange.SetData()``` function is used to set the data loaded when the strategy is running. |
@@ -2126,13 +2134,13 @@ Every function, structure and constant of the API reference, grouped by its cate
 | `exchange.CancelOrder` | The ```exchange.CancelOrder()``` function is used to cancel an order. |
 | `exchange.GetOrder` | The ```exchange.GetOrder()``` function is used to obtain order information. |
 | `exchange.GetOrders` | The ```exchange.GetOrders()``` function is used to obtain the current unfilled orders. |
-| `exchange.GetHistoryOrders` | ```exchange.GetHistoryOrders()``` function is used to retrieve the historical orders of the current trading pair or contract, and supports specifying a parti... |
+| `exchange.GetHistoryOrders` | ```exchange.GetHistoryOrders()``` function is used to retrieve the historical orders of the current trading pair or contract, and supports specifying a particular trading instrument. |
 | `exchange.CreateConditionOrder` | The ```exchange.CreateConditionOrder()``` function is used to create a conditional order. |
-| `exchange.ModifyConditionOrder` | The ```exchange.ModifyConditionOrder()``` function is used to modify an existing conditional order, allowing modification of the order amount, trigger condit... |
+| `exchange.ModifyConditionOrder` | The ```exchange.ModifyConditionOrder()``` function is used to modify an existing conditional order, allowing modification of the order amount, trigger condition, and execution price of the conditional order. |
 | `exchange.CancelConditionOrder` | ```exchange.CancelConditionOrder()``` function is used to cancel a conditional order. |
 | `exchange.GetConditionOrder` | The ```exchange.GetConditionOrder()``` function is used to retrieve information about a specified conditional order. |
 | `exchange.GetConditionOrders` | ```exchange.GetConditionOrders()``` function is used to obtain unfinished conditional orders (conditional orders that have not yet been triggered or canceled). |
-| `exchange.GetHistoryConditionOrders` | The ```exchange.GetHistoryConditionOrders()``` function is used to retrieve the historical conditional orders (including triggered, canceled, and expired con... |
+| `exchange.GetHistoryConditionOrders` | The ```exchange.GetHistoryConditionOrders()``` function is used to retrieve the historical conditional orders (including triggered, canceled, and expired conditional orders) for the current trading pair or contract, and supports specifying a… |
 
 ##### Account
 
@@ -2147,7 +2155,7 @@ Every function, structure and constant of the API reference, grouped by its cate
 | - | - |
 | `exchange.SetContractType` | The ```exchange.SetContractType()``` function is used to set the current contract code of the exchange exchange object. |
 | `exchange.GetContractType` | The ```exchange.GetContractType()``` function is used to get the contract code currently set for the exchange exchange object. |
-| `exchange.SetDirection` | The ```exchange.SetDirection()``` function is used to set the order direction when calling the exchange.Buy function or exchange.Sell function to place futur... |
+| `exchange.SetDirection` | The ```exchange.SetDirection()``` function is used to set the order direction when calling the exchange.Buy function or exchange.Sell function to place futures contract orders. |
 | `exchange.SetMarginLevel` | The ```exchange.SetMarginLevel()``` function is used to set the leverage value for the trading pair or contract specified by the ```symbol``` parameter. |
 | `exchange.GetPositions` | The ```exchange.GetPositions()``` function gets position information. |
 | `exchange.GetFundings` | The ```exchange.GetFundings()``` function is used to obtain the funding rate data for the current period. |
@@ -2160,10 +2168,10 @@ Every function, structure and constant of the API reference, grouped by its cate
 | `exchange.GetLabel` | The ```exchange.GetLabel()``` function is used to obtain the custom label set when configuring the exchange object. |
 | `exchange.GetCurrency` | The ```exchange.GetCurrency()``` function is used to get the currently set trading pair. |
 | `exchange.SetCurrency` | The ```exchange.SetCurrency()``` function is used to switch the current trading pair of the exchange object exchange. |
-| `exchange.GetQuoteCurrency` | The ```exchange.GetQuoteCurrency()``` function is used to get the name of the quote currency of the current trading pair, i.e. |
-| `exchange.GetPeriod` | Retrieves the K-line period configured on the FMZ Quant Trading platform website page when running a strategy in backtesting or live trading, i.e., the defau... |
+| `exchange.GetQuoteCurrency` | The ```exchange.GetQuoteCurrency()``` function is used to get the name of the quote currency of the current trading pair, i.e. ```quoteCurrency```. |
+| `exchange.GetPeriod` | Retrieves the K-line period configured on the FMZ Quant Trading platform website page when running a strategy in backtesting or live trading, i.e., the default K-line period used when calling the ```exchange.GetRecords()``` function without… |
 | `exchange.SetMaxBarLen` | Set the maximum length of the K-line (candlestick chart). |
-| `exchange.SetPrecision` | The ```exchange.SetPrecision()``` function is used to set the precision of the **price** and **order amount** for the ```exchange``` exchange object. |
+| `exchange.SetPrecision` | The ```exchange.SetPrecision()``` function is used to set the precision of the price and order amount for the ```exchange``` exchange object. |
 | `exchange.GetRate` | Get the exchange rate currently set for the exchange object. |
 | `exchange.SetRate` | Set the current exchange rate of the exchange object. |
 | `exchange.SetBase` | The ```exchange.SetBase()``` function is used to set the base URL of the exchange API interface used by the exchange exchange object. |
@@ -2180,7 +2188,7 @@ Every function, structure and constant of the API reference, grouped by its cate
 | ```exchange.IO("api", ...)``` | ```exchange.IO("api", ...)``` calls a raw REST endpoint of the exchange that has no wrapper function; the platform signs the request. |
 | ```exchange.IO("currency", ...)``` | ```exchange.IO("currency", ...)``` switches the current trading pair of the exchange object at runtime. |
 | ```exchange.IO("base", ...)``` | ```exchange.IO("base", ...)``` queries or switches the base address of the exchange API. |
-| ```exchange.IO(mode, value)``` | ```exchange.IO(mode, value)``` switches trading modes of the exchange: simulated or live, cross or isolated margin, hedge or one-way positions, unified accou... |
+| ```exchange.IO(mode, value)``` | ```exchange.IO(mode, value)``` switches trading modes of the exchange: simulated or live, cross or isolated margin, hedge or one-way positions, unified account, margin trading mode, self-trade prevention and so on. |
 | ```exchange.IO("rate", ...)``` | ```exchange.IO("rate", ...)``` and ```exchange.IO("quota", ...)``` limit how often API functions are called. |
 
 ##### Network
@@ -2189,7 +2197,7 @@ Every function, structure and constant of the API reference, grouped by its cate
 | - | - |
 | `HttpQuery` | Sends an HTTP request. |
 | `HttpQuery_Go` | Sends an Http request. |
-| `Dial` | Used for raw ```Socket``` access, supporting the ```tcp``` and ```tls``` (also written as ```ssl```) protocols as well as the WebSocket ```ws``` and ```wss``... |
+| `Dial` | Used for raw ```Socket``` access, supporting the ```tcp``` and ```tls``` (also written as ```ssl```) protocols as well as the WebSocket ```ws``` and ```wss``` protocols. |
 | `Mail` | Send an email. |
 | `Mail_Go` | Asynchronous version of the ```Mail``` function. |
 
@@ -2207,311 +2215,311 @@ Every function, structure and constant of the API reference, grouped by its cate
 | Name | Description |
 | - | - |
 | `exchange.Go` | Multi-threaded asynchronous support function that can convert the operations of all supported functions into asynchronous concurrent execution. |
-| `EventLoop` | Listens for events and returns when any ```WebSocket``` has readable data, or when concurrent tasks such as ```exchange.Go()``` or ```HttpQuery_Go()``` compl... |
+| `EventLoop` | Listens for events and returns when any ```WebSocket``` has readable data, or when concurrent tasks such as ```exchange.Go()``` or ```HttpQuery_Go()``` complete. |
 | `ctx.subscribe` | Subscribes to market data pushes for one instrument of an account, or to the order updates of an account, and returns an event stream ID. |
 | `ctx.poll` | Takes the next subscription event, optionally waiting with a timeout. |
 | `ctx.book` | Reads the order book maintained by the docker. |
 
-###### Threads/threading
+##### Threads/threading
 
 | Name | Description |
 | - | - |
-| `Thread` | The ```Thread()``` function is used to create concurrent threads. |
-| `getThread` | The ```getThread()``` function is used to get a thread object based on the specified thread ID. |
-| `mainThread` | The ```mainThread()``` function is used to get the thread object of the main thread, which is the thread where the ```main()``` function in the strategy is l... |
-| `currentThread` | The ```currentThread()``` function is used to get the thread object of the current thread. |
-| `Lock` | The ```Lock()``` function is used to create a thread lock object. |
-| `Condition` | The ```Condition()``` function is used to create a condition variable object, which is used to implement synchronization and communication between threads in... |
-| `Event` | The ```Event()``` function is used to create a *thread event* object, which is used for synchronization between threads, allowing one thread to wait for noti... |
-| `Dict` | The ```Dict()``` function is used to create a dictionary object for passing and sharing data between concurrent threads. |
-| `Serve` | The ```Serve()``` function starts an HTTP, TCP or WebSocket (over HTTP) service inside the strategy process and returns a Server object. |
-| `pending` | The ```pending``` function is used to get the number of concurrent threads currently running in the strategy program. |
+| `threading.Thread` | The ```Thread()``` function is used to create concurrent threads. |
+| `threading.getThread` | The ```getThread()``` function is used to get a thread object based on the specified thread ID. |
+| `threading.mainThread` | The ```mainThread()``` function is used to get the thread object of the main thread, which is the thread where the ```main()``` function in the strategy is located. |
+| `threading.currentThread` | The ```currentThread()``` function is used to get the thread object of the current thread. |
+| `threading.Lock` | The ```Lock()``` function is used to create a thread lock object. |
+| `threading.Condition` | The ```Condition()``` function is used to create a condition variable object, which is used to implement synchronization and communication between threads in a multi-threaded concurrent environment. |
+| `threading.Event` | The ```Event()``` function is used to create a *thread event* object, which is used for synchronization between threads, allowing one thread to wait for notification or signal from another thread. |
+| `threading.Dict` | The ```Dict()``` function is used to create a dictionary object for passing and sharing data between concurrent threads. |
+| `threading.Serve` | The ```Serve()``` function starts an HTTP, TCP or WebSocket (over HTTP) service inside the strategy process and returns a Server object. |
+| `threading.pending` | The ```pending``` function is used to get the number of concurrent threads currently running in the strategy program. |
 
-###### Threads/Thread
-
-| Name | Description |
-| - | - |
-| `peekMessage` | The ```peekMessage()``` function is used to receive messages from a thread. |
-| `postMessage` | The ```postMessage()``` function is used to send messages to a thread. |
-| `join` | The ```join()``` function is used to wait for a thread to exit and reclaim system resources. |
-| `terminate` | The ```terminate()``` function is used to forcibly terminate a thread and release the hardware resources occupied when the thread was created. |
-| `getData` | The ```getData()``` function is used to access variables recorded in the thread environment. |
-| `setData` | The ```setData()``` function is used to store variables in the thread environment. |
-| `id` | The ```id()``` function is used to return the ```threadId``` of the current multi-threaded object instance. |
-| `name` | The ```name()``` function is used to return the name of the current multi-threaded object instance. |
-| `eventLoop` | The ```eventLoop()``` function is used to listen for events received by the current thread (the thread of the caller). |
-
-###### Threads/ThreadLock
+##### Threads/Thread
 
 | Name | Description |
 | - | - |
-| `acquire` | The ```acquire()``` function is used to request a thread lock (acquire lock). |
-| `release` | The ```release()``` function is used to release a thread lock (unlock). |
+| `Thread.peekMessage` | The ```peekMessage()``` function is used to receive messages from a thread. |
+| `Thread.postMessage` | The ```postMessage()``` function is used to send messages to a thread. |
+| `Thread.join` | The ```join()``` function is used to wait for a thread to exit and reclaim system resources. |
+| `Thread.terminate` | The ```terminate()``` function is used to forcibly terminate a thread and release the hardware resources occupied when the thread was created. |
+| `Thread.getData` | The ```getData()``` function is used to access variables recorded in the thread environment. |
+| `Thread.setData` | The ```setData()``` function is used to store variables in the thread environment. |
+| `Thread.id` | The ```id()``` function is used to return the ```threadId``` of the current multi-threaded object instance. |
+| `Thread.name` | The ```name()``` function is used to return the name of the current multi-threaded object instance. |
+| `Thread.eventLoop` | The ```eventLoop()``` function is used to listen for events received by the current thread (the thread of the caller). |
 
-###### Threads/ThreadEvent
-
-| Name | Description |
-| - | - |
-| `set` | The ```set()``` function is used to set an event signal. |
-| `clear` | The ```clear()``` function is used to clear the signal. |
-| `wait` | The ```wait()``` function is used to set event (signal) waiting, which will block until the event (signal) is set; supports setting timeout parameters. |
-| `isSet` | The ```isSet()``` function is used to determine whether an event (signal) has been set. |
-
-###### Threads/ThreadCondition
+##### Threads/ThreadLock
 
 | Name | Description |
 | - | - |
-| `notify` | The ```notify()``` function is used to wake up one waiting thread (if any exists). |
-| `notifyAll` | The ```notifyAll()``` function is used to wake up all waiting threads. |
-| `wait` | The ```wait()``` function is used to put a thread into a waiting state under specific conditions. |
-| `acquire` | The ```acquire()``` function is used to request a thread lock (acquire lock). |
-| `release` | The ```release()``` function is used to release the thread lock (unlock). |
+| `ThreadLock.acquire` | The ```acquire()``` function is used to request a thread lock (acquire lock). |
+| `ThreadLock.release` | The ```release()``` function is used to release a thread lock (unlock). |
 
-###### Threads/ThreadDict
+##### Threads/ThreadEvent
 
 | Name | Description |
 | - | - |
-| `get` | The ```get()``` function is used to retrieve the value of a key recorded in a dictionary object. |
-| `set` | The ```set()``` function is used to set key-value pairs. |
+| `ThreadEvent.set` | The ```set()``` function is used to set an event signal. |
+| `ThreadEvent.clear` | The ```clear()``` function is used to clear the signal. |
+| `ThreadEvent.wait` | The ```wait()``` function is used to set event (signal) waiting, which will block until the event (signal) is set; supports setting timeout parameters. |
+| `ThreadEvent.isSet` | The ```isSet()``` function is used to determine whether an event (signal) has been set. |
 
-###### Threads/Server
+##### Threads/ThreadCondition
 
 | Name | Description |
 | - | - |
-| `addr` | The ```addr()``` function returns the address and port the service actually listens on. |
-| `close` | The ```close()``` function stops accepting new connections; handlers already running finish normally (graceful shutdown). |
-| `stop` | The ```stop()``` function closes the service (as ```close()```) and then terminates every handler thread that is still running. |
-| `join` | The ```join()``` function waits until the service is closed and no handler is running. |
-| `pending` | The ```pending()``` function returns the number of handlers currently running, i.e. |
+| `ThreadCondition.notify` | The ```notify()``` function is used to wake up one waiting thread (if any exists). |
+| `ThreadCondition.notifyAll` | The ```notifyAll()``` function is used to wake up all waiting threads. |
+| `ThreadCondition.wait` | The ```wait()``` function is used to put a thread into a waiting state under specific conditions. |
+| `ThreadCondition.acquire` | The ```acquire()``` function is used to request a thread lock (acquire lock). |
+| `ThreadCondition.release` | The ```release()``` function is used to release the thread lock (unlock). |
+
+##### Threads/ThreadDict
+
+| Name | Description |
+| - | - |
+| `ThreadDict.get` | The ```get()``` function is used to retrieve the value of a key recorded in a dictionary object. |
+| `ThreadDict.set` | The ```set()``` function is used to set key-value pairs. |
+
+##### Threads/Server
+
+| Name | Description |
+| - | - |
+| `Server.addr` | The ```addr()``` function returns the address and port the service actually listens on. |
+| `Server.close` | The ```close()``` function stops accepting new connections; handlers already running finish normally (graceful shutdown). |
+| `Server.stop` | The ```stop()``` function closes the service (as ```close()```) and then terminates every handler thread that is still running. |
+| `Server.join` | The ```join()``` function waits until the service is closed and no handler is running. |
+| `Server.pending` | The ```pending()``` function returns the number of handlers currently running, i.e. connections or requests being handled. |
 
 ##### TA
 
 | Name | Description |
 | - | - |
-| `TA.MACD` | The ```TA.MACD()``` function is used to calculate the **Moving Average Convergence Divergence (MACD) indicator**. |
-| `TA.KDJ` | The ```TA.KDJ()``` function is used to calculate the **Stochastic Oscillator (KDJ)**. |
-| `TA.RSI` | The ```TA.RSI()``` function is used to calculate the **Relative Strength Index (RSI)**. |
-| `TA.ATR` | The ```TA.ATR()``` function is used to calculate the **Average True Range indicator (ATR)**. |
-| `TA.OBV` | ```TA.OBV()``` function is used to calculate the **On-Balance Volume (OBV)**. |
-| `TA.MA` | The ```TA.MA()``` function is used to calculate the **Moving Average indicator (Moving Average)**. |
-| `TA.EMA` | The ```TA.EMA()``` function is used to calculate the **Exponential Moving Average (EMA) indicator**. |
-| `TA.BOLL` | The ```TA.BOLL()``` function is used to calculate the **Bollinger Bands indicator**. |
-| `TA.Alligator` | ```TA.Alligator()``` function is used to calculate the **Alligator indicator**. |
-| `TA.CMF` | The ```TA.CMF()``` function is used to calculate the **Chaikin Money Flow (CMF)** indicator. |
-| `TA.Highest` | The ```TA.Highest()``` function is used to calculate the **highest price within a period**. |
-| `TA.Lowest` | The ```TA.Lowest()``` function is used to calculate the **lowest price over a period**. |
-| `TA.SMA` | The ```TA.SMA()``` function is used to calculate the **Simple Moving Average (SMA) indicator**. |
+| `TA.MACD` | The ```TA.MACD()``` function is used to calculate the Moving Average Convergence Divergence (MACD) indicator. |
+| `TA.KDJ` | The ```TA.KDJ()``` function is used to calculate the Stochastic Oscillator (KDJ). |
+| `TA.RSI` | The ```TA.RSI()``` function is used to calculate the Relative Strength Index (RSI). |
+| `TA.ATR` | The ```TA.ATR()``` function is used to calculate the Average True Range indicator (ATR). |
+| `TA.OBV` | ```TA.OBV()``` function is used to calculate the On-Balance Volume (OBV). |
+| `TA.MA` | The ```TA.MA()``` function is used to calculate the Moving Average indicator (Moving Average). |
+| `TA.EMA` | The ```TA.EMA()``` function is used to calculate the Exponential Moving Average (EMA) indicator. |
+| `TA.BOLL` | The ```TA.BOLL()``` function is used to calculate the Bollinger Bands indicator. |
+| `TA.Alligator` | ```TA.Alligator()``` function is used to calculate the Alligator indicator. |
+| `TA.CMF` | The ```TA.CMF()``` function is used to calculate the Chaikin Money Flow (CMF) indicator. |
+| `TA.Highest` | The ```TA.Highest()``` function is used to calculate the highest price within a period. |
+| `TA.Lowest` | The ```TA.Lowest()``` function is used to calculate the lowest price over a period. |
+| `TA.SMA` | The ```TA.SMA()``` function is used to calculate the Simple Moving Average (SMA) indicator. |
 
-###### Talib/OverlapStudies
-
-| Name | Description |
-| - | - |
-| `talib.ACCBANDS` | The ```talib.ACCBANDS()``` function is used to calculate **Acceleration Bands**. |
-| `talib.BBANDS` | The ```talib.BBANDS()``` function is used to calculate **Bollinger Bands**. |
-| `talib.DEMA` | The ```talib.DEMA()``` function is used to calculate **Double Exponential Moving Average**. |
-| `talib.EMA` | The ```talib.EMA()``` function is used to calculate **Exponential Moving Average**. |
-| `talib.HT_TRENDLINE` | The ```talib.HT_TRENDLINE()``` function is used to calculate **Hilbert Transform - Instantaneous Trendline**. |
-| `talib.KAMA` | The ```talib.KAMA()``` function is used to calculate **Kaufman Adaptive Moving Average**. |
-| `talib.MA` | The ```talib.MA()``` function is used to calculate **Moving average**. |
-| `talib.MAMA` | The ```talib.MAMA()``` function is used to calculate the **MESA Adaptive Moving Average**. |
-| `talib.MAVP` | The ```talib.MAVP()``` function is used to calculate **Moving Average with Variable Period**. |
-| `talib.MIDPOINT` | The ```talib.MIDPOINT()``` function is used to calculate **MidPoint over period**. |
-| `talib.MIDPRICE` | The ```talib.MIDPRICE()``` function is used to calculate **Midpoint Price over period**. |
-| `talib.SAR` | The ```talib.SAR()``` function is used to calculate the **Parabolic SAR (Stop and Reverse)** indicator. |
-| `talib.SAREXT` | The ```talib.SAREXT()``` function is used to calculate **Parabolic SAR - Extended**. |
-| `talib.SMA` | The ```talib.SMA()``` function is used to calculate **Simple Moving Average**. |
-| `talib.T3` | The ```talib.T3()``` function is used to calculate **Triple Exponential Moving Average (T3)**. |
-| `talib.TEMA` | The ```talib.TEMA()``` function is used to calculate **Triple Exponential Moving Average**. |
-| `talib.TRIMA` | The ```talib.TRIMA()``` function is used to calculate **Triangular Moving Average**. |
-| `talib.WMA` | The ```talib.WMA()``` function is used to calculate **Weighted Moving Average**. |
-
-###### Talib/MomentumIndicators
+##### Talib/OverlapStudies
 
 | Name | Description |
 | - | - |
-| `talib.ADX` | The ```talib.ADX()``` function is used to calculate the **Average Directional Movement Index**. |
-| `talib.ADXR` | The ```talib.ADXR()``` function is used to calculate the **Average Directional Movement Index Rating**. |
-| `talib.APO` | The ```talib.APO()``` function is used to calculate **Absolute Price Oscillator**. |
-| `talib.AROON` | The ```talib.AROON()``` function is used to calculate **Aroon (Aroon Indicator)**. |
-| `talib.AROONOSC` | The ```talib.AROONOSC()``` function is used to calculate the **Aroon Oscillator**. |
-| `talib.BOP` | The ```talib.BOP()``` function is used to calculate **Balance Of Power**. |
-| `talib.CCI` | The ```talib.CCI()``` function is used to calculate the **Commodity Channel Index**. |
-| `talib.CMO` | The ```talib.CMO()``` function is used to calculate the **Chande Momentum Oscillator**. |
-| `talib.DX` | The ```talib.DX()``` function is used to calculate the **Directional Movement Index**. |
-| `talib.IMI` | The ```talib.IMI()``` function is used to calculate **Intraday Momentum Index**. |
-| `talib.MACD` | The ```talib.MACD()``` function is used to calculate **Moving Average Convergence/Divergence**. |
-| `talib.MACDEXT` | The ```talib.MACDEXT()``` function is used to calculate **MACD with controllable MA type**. |
-| `talib.MACDFIX` | The ```talib.MACDFIX()``` function is used to calculate **Moving Average Convergence/Divergence Fix 12/26**. |
-| `talib.MFI` | The ```talib.MFI()``` function is used to calculate **Money Flow Index**. |
-| `talib.MINUS_DI` | The ```talib.MINUS_DI()``` function is used to calculate the **Minus Directional Indicator**. |
-| `talib.MINUS_DM` | The ```talib.MINUS_DM()``` function is used to calculate **Minus Directional Movement**. |
-| `talib.MOM` | The ```talib.MOM()``` function is used to calculate **Momentum (Momentum Indicator)**. |
-| `talib.PLUS_DI` | The ```talib.PLUS_DI()``` function is used to calculate the **Plus Directional Indicator**. |
-| `talib.PLUS_DM` | The ```talib.PLUS_DM()``` function is used to calculate **Plus Directional Movement**. |
-| `talib.PPO` | The ```talib.PPO()``` function is used to calculate **Percentage Price Oscillator**. |
-| `talib.ROC` | The ```talib.ROC()``` function is used to calculate the **Rate of Change indicator: ((price/prevPrice)-1)*100**. |
-| `talib.ROCP` | The ```talib.ROCP()``` function is used to calculate **Rate of change Percentage: (price-prevPrice)/prevPrice**. |
-| `talib.ROCR` | The ```talib.ROCR()``` function is used to calculate **Rate of change ratio: (price/prevPrice)**. |
-| `talib.ROCR100` | The ```talib.ROCR100()``` function is used to calculate **Rate of change ratio 100 scale: (price/prevPrice)*100**. |
-| `talib.RSI` | The ```talib.RSI()``` function is used to calculate the **Relative Strength Index**. |
-| `talib.STOCH` | The ```talib.STOCH()``` function is used to calculate the **Stochastic Oscillator (STOCH indicator)**. |
-| `talib.STOCHF` | The ```talib.STOCHF()``` function is used to calculate **Stochastic Fast**. |
-| `talib.STOCHRSI` | The ```talib.STOCHRSI()``` function is used to calculate the **Stochastic Relative Strength Index**. |
-| `talib.TRIX` | The ```talib.TRIX()``` function is used to calculate **1-day Rate-Of-Change (ROC) of a Triple Smooth EMA**. |
-| `talib.ULTOSC` | The ```talib.ULTOSC()``` function is used to calculate the **Ultimate Oscillator**. |
-| `talib.WILLR` | The ```talib.WILLR()``` function is used to calculate **Williams' %R (Williams Percent Range)**. |
+| `talib.ACCBANDS` | Calculates the Acceleration Bands and returns the upper band, middle band and lower band. |
+| `talib.BBANDS` | Calculates the Bollinger Bands and returns the upper band, middle band and lower band. |
+| `talib.DEMA` | Calculates the Double Exponential Moving Average. |
+| `talib.EMA` | Calculates the Exponential Moving Average. |
+| `talib.HT_TRENDLINE` | Calculates the Hilbert Transform - Instantaneous Trendline. |
+| `talib.KAMA` | Calculates the Kaufman Adaptive Moving Average. |
+| `talib.MA` | Calculates the Moving Average. |
+| `talib.MAMA` | Calculates the MESA Adaptive Moving Average and returns the MAMA and FAMA. |
+| `talib.MAVP` | Calculates the Moving Average with Variable Period. |
+| `talib.MIDPOINT` | Calculates the MidPoint over Period. |
+| `talib.MIDPRICE` | Calculates the Midpoint Price over Period. |
+| `talib.SAR` | Calculates the Parabolic SAR. |
+| `talib.SAREXT` | Calculates the Parabolic SAR - Extended. |
+| `talib.SMA` | Calculates the Simple Moving Average. |
+| `talib.T3` | Calculates the Triple Exponential Moving Average (T3). |
+| `talib.TEMA` | Calculates the Triple Exponential Moving Average. |
+| `talib.TRIMA` | Calculates the Triangular Moving Average. |
+| `talib.WMA` | Calculates the Weighted Moving Average. |
 
-###### Talib/VolumeIndicators
+##### Talib/MomentumIndicators
 
 | Name | Description |
 | - | - |
-| `talib.AD` | The ```talib.AD()``` function is used to calculate the **Chaikin A/D Line (Accumulation/Distribution Line indicator)**. |
-| `talib.ADOSC` | The ```talib.ADOSC()``` function is used to calculate **Chaikin A/D Oscillator**. |
-| `talib.OBV` | The ```talib.OBV()``` function is used to calculate **On Balance Volume**. |
+| `talib.ADX` | Calculates the Average Directional Movement Index. |
+| `talib.ADXR` | Calculates the Average Directional Movement Index Rating. |
+| `talib.APO` | Calculates the Absolute Price Oscillator. |
+| `talib.AROON` | Calculates the Aroon and returns the Aroon Down and Aroon Up. |
+| `talib.AROONOSC` | Calculates the Aroon Oscillator. |
+| `talib.BOP` | Calculates the Balance Of Power. |
+| `talib.CCI` | Calculates the Commodity Channel Index. |
+| `talib.CMO` | Calculates the Chande Momentum Oscillator. |
+| `talib.DX` | Calculates the Directional Movement Index. |
+| `talib.IMI` | Calculates the Intraday Momentum Index. |
+| `talib.MACD` | Calculates the Moving Average Convergence/Divergence and returns the MACD line, signal line and histogram. |
+| `talib.MACDEXT` | Calculates the MACD with Controllable MA Type and returns the MACD line, signal line and histogram. |
+| `talib.MACDFIX` | Calculates the Moving Average Convergence/Divergence Fix 12/26 and returns the MACD line, signal line and histogram. |
+| `talib.MFI` | Calculates the Money Flow Index. |
+| `talib.MINUS_DI` | Calculates the Minus Directional Indicator. |
+| `talib.MINUS_DM` | Calculates the Minus Directional Movement. |
+| `talib.MOM` | Calculates the Momentum. |
+| `talib.PLUS_DI` | Calculates the Plus Directional Indicator. |
+| `talib.PLUS_DM` | Calculates the Plus Directional Movement. |
+| `talib.PPO` | Calculates the Percentage Price Oscillator. |
+| `talib.ROC` | Calculates the Rate of Change, defined as `((price/prevPrice)-1)*100`. |
+| `talib.ROCP` | Calculates the Rate of Change Percentage, defined as `(price-prevPrice)/prevPrice`. |
+| `talib.ROCR` | Calculates the Rate of Change Ratio, defined as `price/prevPrice`. |
+| `talib.ROCR100` | Calculates the Rate of Change Ratio 100 Scale, defined as `(price/prevPrice)*100`. |
+| `talib.RSI` | Calculates the Relative Strength Index. |
+| `talib.STOCH` | Calculates the Stochastic and returns the slow %K and slow %D. |
+| `talib.STOCHF` | Calculates the Stochastic Fast and returns the fast %K and fast %D. |
+| `talib.STOCHRSI` | Calculates the Stochastic Relative Strength Index and returns the fast %K and fast %D. |
+| `talib.TRIX` | Calculates the 1-day Rate-Of-Change (ROC) of a Triple Smooth EMA. |
+| `talib.ULTOSC` | Calculates the Ultimate Oscillator. |
+| `talib.WILLR` | Calculates the Williams' %R. |
 
-###### Talib/VolatilityIndicators
-
-| Name | Description |
-| - | - |
-| `talib.ATR` | The ```talib.ATR()``` function is used to calculate the **Average True Range** indicator. |
-| `talib.NATR` | The ```talib.NATR()``` function is used to calculate **Normalized Average True Range**. |
-| `talib.TRANGE` | The ```talib.TRANGE()``` function is used to calculate the **True Range** indicator. |
-
-###### Talib/CycleIndicators
-
-| Name | Description |
-| - | - |
-| `talib.HT_DCPERIOD` | The ```talib.HT_DCPERIOD()``` function is used to calculate **Hilbert Transform - Dominant Cycle Period**. |
-| `talib.HT_DCPHASE` | The ```talib.HT_DCPHASE()``` function is used to calculate the **Hilbert Transform - Dominant Cycle Phase**. |
-| `talib.HT_PHASOR` | The ```talib.HT_PHASOR()``` function is used to calculate **Hilbert Transform - Phasor Components**. |
-| `talib.HT_SINE` | The ```talib.HT_SINE()``` function is used to calculate **Hilbert Transform - SineWave**. |
-| `talib.HT_TRENDMODE` | The ```talib.HT_TRENDMODE()``` function is used to calculate **Hilbert Transform - Trend vs Cycle Mode**. |
-
-###### Talib/PriceTransform
-
-| Name | Description |
-| - | - |
-| `talib.AVGDEV` | The ```talib.AVGDEV()``` function is used to calculate **Average Deviation**. |
-| `talib.AVGPRICE` | The ```talib.AVGPRICE()``` function is used to calculate **Average Price**. |
-| `talib.MEDPRICE` | The ```talib.MEDPRICE()``` function is used to calculate **Median Price**. |
-| `talib.TYPPRICE` | The ```talib.TYPPRICE()``` function is used to calculate **Typical Price**. |
-| `talib.WCLPRICE` | The ```talib.WCLPRICE()``` function is used to calculate **Weighted Close Price**. |
-
-###### Talib/StatisticFunctions
-
-| Name | Description |
-| - | - |
-| `talib.BETA` | The ```talib.BETA()``` function is used to calculate **Beta**. |
-| `talib.CORREL` | The ```talib.CORREL()``` function is used to calculate **Pearson's Correlation Coefficient (r)**. |
-| `talib.LINEARREG` | The ```talib.LINEARREG()``` function is used to calculate the **Linear Regression** indicator. |
-| `talib.LINEARREG_ANGLE` | The ```talib.LINEARREG_ANGLE()``` function is used to calculate **Linear Regression Angle**. |
-| `talib.LINEARREG_INTERCEPT` | The ```talib.LINEARREG_INTERCEPT()``` function is used to calculate the **Linear Regression Intercept**. |
-| `talib.LINEARREG_SLOPE` | The ```talib.LINEARREG_SLOPE()``` function is used to calculate **Linear Regression Slope**. |
-| `talib.STDDEV` | The ```talib.STDDEV()``` function is used to calculate **Standard Deviation**. |
-| `talib.TSF` | The ```talib.TSF()``` function is used to calculate **Time Series Forecast**. |
-| `talib.VAR` | The ```talib.VAR()``` function is used to calculate **Variance**. |
-
-###### Talib/MathTransform
+##### Talib/VolumeIndicators
 
 | Name | Description |
 | - | - |
-| `talib.ACOS` | The ```talib.ACOS()``` function is used to calculate **Vector Trigonometric ACos**. |
-| `talib.ASIN` | The ```talib.ASIN()``` function is used to calculate **Vector Trigonometric ASin**. |
-| `talib.ATAN` | The ```talib.ATAN()``` function is used to calculate **Vector Trigonometric ATan**. |
-| `talib.CEIL` | The ```talib.CEIL()``` function is used to calculate **Vector Ceil**. |
-| `talib.COS` | The ```talib.COS()``` function is used to calculate **Vector Trigonometric Cos**. |
-| `talib.COSH` | The ```talib.COSH()``` function is used to calculate **Vector Trigonometric Cosh**. |
-| `talib.EXP` | The ```talib.EXP()``` function is used to calculate **Vector Arithmetic Exp**. |
-| `talib.FLOOR` | The ```talib.FLOOR()``` function is used to calculate **Vector Floor**. |
-| `talib.LN` | The ```talib.LN()``` function is used to calculate **Vector Log Natural**. |
-| `talib.LOG10` | The ```talib.LOG10()``` function is used to calculate **Vector Log10 (base-10 logarithm)**. |
-| `talib.SIN` | The ```talib.SIN()``` function is used to calculate **Vector Trigonometric Sin**. |
-| `talib.SINH` | The ```talib.SINH()``` function is used to calculate **Vector Trigonometric Sinh**. |
-| `talib.SQRT` | The ```talib.SQRT()``` function is used to calculate **Vector Square Root**. |
-| `talib.TAN` | The ```talib.TAN()``` function is used to calculate **Vector Trigonometric Tan**. |
-| `talib.TANH` | The ```talib.TANH()``` function is used to calculate **Vector Trigonometric Tanh**. |
+| `talib.AD` | Calculates the Chaikin A/D Line. |
+| `talib.ADOSC` | Calculates the Chaikin A/D Oscillator. |
+| `talib.OBV` | Calculates the On Balance Volume. |
 
-###### Talib/MathOperators
+##### Talib/VolatilityIndicators
 
 | Name | Description |
 | - | - |
-| `talib.ADD` | The ```talib.ADD()``` function is used to calculate **Vector Arithmetic Add**. |
-| `talib.DIV` | The ```talib.DIV()``` function is used to calculate **Vector Arithmetic Div**. |
-| `talib.MAX` | The ```talib.MAX()``` function is used to calculate the **Highest value over a specified period**. |
-| `talib.MAXINDEX` | The ```talib.MAXINDEX()``` function is used to calculate the **Index of highest value over a specified period**. |
-| `talib.MIN` | The ```talib.MIN()``` function is used to calculate the **Lowest value over a specified period**. |
-| `talib.MININDEX` | The ```talib.MININDEX()``` function is used to calculate the **Index of lowest value over a specified period**. |
-| `talib.MINMAX` | The ```talib.MINMAX()``` function is used to calculate the **Lowest and highest values over a specified period**. |
-| `talib.MINMAXINDEX` | The ```talib.MINMAXINDEX()``` function is used to calculate **Indexes of lowest and highest values over a specified period**. |
-| `talib.MULT` | The ```talib.MULT()``` function is used to calculate **Vector Arithmetic Mult**. |
-| `talib.SUB` | The ```talib.SUB()``` function is used to calculate **Vector Arithmetic Subtraction**. |
-| `talib.SUM` | The ```talib.SUM()``` function is used to calculate **Summation**. |
+| `talib.ATR` | Calculates the Average True Range. |
+| `talib.NATR` | Calculates the Normalized Average True Range. |
+| `talib.TRANGE` | Calculates the True Range. |
 
-###### Talib/PatternRecognition
+##### Talib/CycleIndicators
 
 | Name | Description |
 | - | - |
-| `talib.CDL2CROWS` | The ```talib.CDL2CROWS()``` function is used to calculate **Two Crows (K-line pattern - Two Crows)**. |
-| `talib.CDL3BLACKCROWS` | The ```talib.CDL3BLACKCROWS()``` function is used to calculate **Three Black Crows (K-line pattern - Three Black Crows)**. |
-| `talib.CDL3INSIDE` | The ```talib.CDL3INSIDE()``` function is used to calculate **Three Inside Up/Down (Candlestick Pattern: Three Inside Up/Down)**. |
-| `talib.CDL3LINESTRIKE` | The ```talib.CDL3LINESTRIKE()``` function is used to calculate **Three-Line Strike (Candlestick Pattern: Three-Line Strike)**. |
-| `talib.CDL3OUTSIDE` | The ```talib.CDL3OUTSIDE()``` function is used to calculate **Three Outside Up/Down (Candlestick Pattern: Three Outside Up/Down)**. |
-| `talib.CDL3STARSINSOUTH` | The ```talib.CDL3STARSINSOUTH()``` function is used to calculate **Three Stars In The South (Candlestick Pattern: Three Stars In The South)**. |
-| `talib.CDL3WHITESOLDIERS` | The ```talib.CDL3WHITESOLDIERS()``` function is used to calculate **Three Advancing White Soldiers (K-line pattern: Three White Soldiers)**. |
-| `talib.CDLABANDONEDBABY` | The ```talib.CDLABANDONEDBABY()``` function is used to calculate **Abandoned Baby (Candlestick Pattern: Abandoned Baby)**. |
-| `talib.CDLADVANCEBLOCK` | The ```talib.CDLADVANCEBLOCK()``` function is used to calculate **Advance Block (Candlestick Pattern: Advance Block)**. |
-| `talib.CDLBELTHOLD` | The ```talib.CDLBELTHOLD()``` function is used to calculate **Belt-hold (Candlestick Pattern: Belt-hold)**. |
-| `talib.CDLBREAKAWAY` | The ```talib.CDLBREAKAWAY()``` function is used to calculate **Breakaway (Candlestick Pattern: Breakaway Pattern)**. |
-| `talib.CDLCLOSINGMARUBOZU` | The ```talib.CDLCLOSINGMARUBOZU()``` function is used to calculate the **Closing Marubozu** candlestick pattern. |
-| `talib.CDLCONCEALBABYSWALL` | The ```talib.CDLCONCEALBABYSWALL()``` function is used to calculate **Concealing Baby Swallow (Candlestick Pattern: Concealing Baby Swallow)**. |
-| `talib.CDLCOUNTERATTACK` | The ```talib.CDLCOUNTERATTACK()``` function is used to calculate **Counterattack Lines (K-Line Pattern: Counterattack)**. |
-| `talib.CDLDARKCLOUDCOVER` | The ```talib.CDLDARKCLOUDCOVER()``` function is used to calculate **Dark Cloud Cover candlestick pattern**. |
-| `talib.CDLDOJI` | The ```talib.CDLDOJI()``` function is used to calculate **Doji (Candlestick Pattern: Doji)**. |
-| `talib.CDLDOJISTAR` | The ```talib.CDLDOJISTAR()``` function is used to calculate **Doji Star (Candlestick Pattern: Doji Star)**. |
-| `talib.CDLDRAGONFLYDOJI` | The ```talib.CDLDRAGONFLYDOJI()``` function is used to calculate **Dragonfly Doji (Candlestick Pattern: Dragonfly Doji)**. |
-| `talib.CDLENGULFING` | The ```talib.CDLENGULFING()``` function is used to calculate **Engulfing Pattern**. |
-| `talib.CDLEVENINGDOJISTAR` | The ```talib.CDLEVENINGDOJISTAR()``` function is used to calculate **Evening Doji Star (K-line pattern: Evening Doji Star)**. |
-| `talib.CDLEVENINGSTAR` | The ```talib.CDLEVENINGSTAR()``` function is used to calculate the **Evening Star** candlestick pattern. |
-| `talib.CDLGAPSIDESIDEWHITE` | The ```talib.CDLGAPSIDESIDEWHITE()``` function is used to calculate **Up/Down-gap side-by-side white lines (K-line pattern: Up/Down-gap side-by-side white li... |
-| `talib.CDLGRAVESTONEDOJI` | The ```talib.CDLGRAVESTONEDOJI()``` function is used to calculate the **Gravestone Doji** candlestick pattern. |
-| `talib.CDLHAMMER` | The ```talib.CDLHAMMER()``` function is used to calculate **Hammer (Candlestick Pattern: Hammer)**. |
-| `talib.CDLHANGINGMAN` | The ```talib.CDLHANGINGMAN()``` function is used to calculate **Hanging Man (Candlestick Pattern: Hanging Man)**. |
-| `talib.CDLHARAMI` | The ```talib.CDLHARAMI()``` function is used to calculate **Harami Pattern (K-line chart: bullish/bearish pattern)**. |
-| `talib.CDLHARAMICROSS` | The ```talib.CDLHARAMICROSS()``` function is used to calculate **Harami Cross Pattern (Candlestick Pattern: Harami Cross)**. |
-| `talib.CDLHIGHWAVE` | The ```talib.CDLHIGHWAVE()``` function is used to calculate **High-Wave Candle (Candlestick Pattern: High Wave Candle)**. |
-| `talib.CDLHIKKAKE` | The ```talib.CDLHIKKAKE()``` function is used to calculate **Hikkake Pattern (Candlestick: Trap Pattern)**. |
-| `talib.CDLHIKKAKEMOD` | The ```talib.CDLHIKKAKEMOD()``` function is used to calculate **Modified Hikkake Pattern (Candlestick: Modified Hikkake Pattern)**. |
-| `talib.CDLHOMINGPIGEON` | The ```talib.CDLHOMINGPIGEON()``` function is used to calculate **Homing Pigeon (Candlestick Pattern: Homing Pigeon)**. |
-| `talib.CDLIDENTICAL3CROWS` | The ```talib.CDLIDENTICAL3CROWS()``` function is used to calculate **Identical Three Crows (Candlestick Pattern: Identical Three Crows)**. |
-| `talib.CDLINNECK` | The ```talib.CDLINNECK()``` function is used to calculate **In-Neck Pattern (Candlestick Chart: In-Neck Pattern)**. |
-| `talib.CDLINVERTEDHAMMER` | The ```talib.CDLINVERTEDHAMMER()``` function is used to calculate **Inverted Hammer (K-Line Pattern: Inverted Hammer)**. |
-| `talib.CDLKICKING` | The ```talib.CDLKICKING()``` function is used to calculate **Kicking (Candlestick Pattern: Kicking Pattern)**. |
-| `talib.CDLKICKINGBYLENGTH` | The ```talib.CDLKICKINGBYLENGTH()``` function is used to calculate **Kicking - bull/bear determined by the longer marubozu (K-line pattern: Kicking Bull/Bear... |
-| `talib.CDLLADDERBOTTOM` | The ```talib.CDLLADDERBOTTOM()``` function is used to calculate **Ladder Bottom (Candlestick Pattern: Ladder Bottom)**. |
-| `talib.CDLLONGLEGGEDDOJI` | The ```talib.CDLLONGLEGGEDDOJI()``` function is used to calculate **Long Legged Doji (Candlestick Pattern: Long Legged Doji)**. |
-| `talib.CDLLONGLINE` | The ```talib.CDLLONGLINE()``` function is used to calculate **Long Line Candle Pattern (Candlestick Chart: Long Line)**. |
-| `talib.CDLMARUBOZU` | The ```talib.CDLMARUBOZU()``` function is used to calculate the **Marubozu (Candlestick Pattern: Shaven Head and Bottom)** pattern. |
-| `talib.CDLMATCHINGLOW` | The ```talib.CDLMATCHINGLOW()``` function is used to calculate **Matching Low (Candlestick Pattern: Matching Low)**. |
-| `talib.CDLMATHOLD` | The ```talib.CDLMATHOLD()``` function is used to calculate **Mat Hold (Candlestick Pattern: Mat Hold)**. |
-| `talib.CDLMORNINGDOJISTAR` | The ```talib.CDLMORNINGDOJISTAR()``` function is used to calculate **Morning Doji Star (Candlestick Pattern: Morning Doji Star)**. |
-| `talib.CDLMORNINGSTAR` | The ```talib.CDLMORNINGSTAR()``` function is used to calculate **Morning Star (Candlestick Pattern: Morning Star)**. |
-| `talib.CDLONNECK` | The ```talib.CDLONNECK()``` function is used to calculate **On-Neck Pattern (Candlestick Chart: On-Neck Pattern)**. |
-| `talib.CDLPIERCING` | The ```talib.CDLPIERCING()``` function is used to calculate **Piercing Pattern (Candlestick Pattern: Piercing Pattern)**. |
-| `talib.CDLRICKSHAWMAN` | The ```talib.CDLRICKSHAWMAN()``` function is used to calculate **Rickshaw Man (Candlestick Pattern: Rickshaw Man)**. |
-| `talib.CDLRISEFALL3METHODS` | The ```talib.CDLRISEFALL3METHODS()``` function is used to calculate **Rising/Falling Three Methods (Candlestick Pattern: Rising/Falling Three Methods)**. |
-| `talib.CDLSEPARATINGLINES` | The ```talib.CDLSEPARATINGLINES()``` function is used to calculate **Separating Lines Pattern (Candlestick Chart: Separating Lines)**. |
-| `talib.CDLSHOOTINGSTAR` | The ```talib.CDLSHOOTINGSTAR()``` function is used to calculate **Shooting Star (Candlestick Pattern: Shooting Star)**. |
-| `talib.CDLSHORTLINE` | The ```talib.CDLSHORTLINE()``` function is used to calculate **Short Line Candle Pattern (K-Line: Short Line)**. |
-| `talib.CDLSPINNINGTOP` | The ```talib.CDLSPINNINGTOP()``` function is used to calculate **Spinning Top (Candlestick Pattern: Spinning Top)**. |
-| `talib.CDLSTALLEDPATTERN` | The ```talib.CDLSTALLEDPATTERN()``` function is used to calculate **Stalled Pattern (Candlestick Pattern: Stalled Pattern)**. |
-| `talib.CDLSTICKSANDWICH` | The ```talib.CDLSTICKSANDWICH()``` function is used to calculate **Stick Sandwich (Candlestick Pattern: Stick Sandwich)**. |
-| `talib.CDLTAKURI` | The ```talib.CDLTAKURI()``` function is used to calculate **Takuri (Dragonfly Doji with very long lower shadow)** candlestick pattern. |
-| `talib.CDLTASUKIGAP` | The ```talib.CDLTASUKIGAP()``` function is used to calculate **Tasuki Gap (Candlestick Pattern: Tasuki Gap)**. |
-| `talib.CDLTHRUSTING` | The ```talib.CDLTHRUSTING()``` function is used to calculate **Thrusting Pattern (Candlestick Pattern: Thrusting Pattern)**. |
-| `talib.CDLTRISTAR` | The ```talib.CDLTRISTAR()``` function is used to calculate **Tristar Pattern (Candlestick Chart: Tristar Pattern)**. |
-| `talib.CDLUNIQUE3RIVER` | The ```talib.CDLUNIQUE3RIVER()``` function is used to calculate **Unique 3 River (Candlestick Pattern: Unique Three River)**. |
-| `talib.CDLUPSIDEGAP2CROWS` | The ```talib.CDLUPSIDEGAP2CROWS()``` function is used to calculate **Upside Gap Two Crows (Candlestick Pattern: Two Crows)**. |
-| `talib.CDLXSIDEGAP3METHODS` | The ```talib.CDLXSIDEGAP3METHODS()``` function is used to calculate **Upside/Downside Gap Three Methods (Candlestick Pattern Recognition)**. |
+| `talib.HT_DCPERIOD` | Calculates the Hilbert Transform - Dominant Cycle Period. |
+| `talib.HT_DCPHASE` | Calculates the Hilbert Transform - Dominant Cycle Phase. |
+| `talib.HT_PHASOR` | Calculates the Hilbert Transform - Phasor Components and returns the in-phase component and quadrature component. |
+| `talib.HT_SINE` | Calculates the Hilbert Transform - SineWave and returns the sine and lead sine. |
+| `talib.HT_TRENDMODE` | Calculates the Hilbert Transform - Trend vs Cycle Mode. |
+
+##### Talib/PriceTransform
+
+| Name | Description |
+| - | - |
+| `talib.AVGDEV` | Calculates the Average Deviation. |
+| `talib.AVGPRICE` | Calculates the Average Price. |
+| `talib.MEDPRICE` | Calculates the Median Price. |
+| `talib.TYPPRICE` | Calculates the Typical Price. |
+| `talib.WCLPRICE` | Calculates the Weighted Close Price. |
+
+##### Talib/StatisticFunctions
+
+| Name | Description |
+| - | - |
+| `talib.BETA` | Calculates the Beta. |
+| `talib.CORREL` | Calculates the Pearson's Correlation Coefficient (r). |
+| `talib.LINEARREG` | Calculates the Linear Regression. |
+| `talib.LINEARREG_ANGLE` | Calculates the Linear Regression Angle. |
+| `talib.LINEARREG_INTERCEPT` | Calculates the Linear Regression Intercept. |
+| `talib.LINEARREG_SLOPE` | Calculates the Linear Regression Slope. |
+| `talib.STDDEV` | Calculates the Standard Deviation. |
+| `talib.TSF` | Calculates the Time Series Forecast. |
+| `talib.VAR` | Calculates the Variance. |
+
+##### Talib/MathTransform
+
+| Name | Description |
+| - | - |
+| `talib.ACOS` | Calculates the arc cosine of each element (Vector Trigonometric ACos). |
+| `talib.ASIN` | Calculates the arc sine of each element (Vector Trigonometric ASin). |
+| `talib.ATAN` | Calculates the arc tangent of each element (Vector Trigonometric ATan). |
+| `talib.CEIL` | Rounds each element up to an integer (Vector Ceil). |
+| `talib.COS` | Calculates the cosine of each element (Vector Trigonometric Cos). |
+| `talib.COSH` | Calculates the hyperbolic cosine of each element (Vector Trigonometric Cosh). |
+| `talib.EXP` | Calculates the exponential (e to the power of x) of each element (Vector Arithmetic Exp). |
+| `talib.FLOOR` | Rounds each element down to an integer (Vector Floor). |
+| `talib.LN` | Calculates the natural logarithm of each element (Vector Log Natural). |
+| `talib.LOG10` | Calculates the base-10 logarithm of each element (Vector Log10). |
+| `talib.SIN` | Calculates the sine of each element (Vector Trigonometric Sin). |
+| `talib.SINH` | Calculates the hyperbolic sine of each element (Vector Trigonometric Sinh). |
+| `talib.SQRT` | Calculates the square root of each element (Vector Square Root). |
+| `talib.TAN` | Calculates the tangent of each element (Vector Trigonometric Tan). |
+| `talib.TANH` | Calculates the hyperbolic tangent of each element (Vector Trigonometric Tanh). |
+
+##### Talib/MathOperators
+
+| Name | Description |
+| - | - |
+| `talib.ADD` | Adds two arrays element by element (Vector Arithmetic Add). |
+| `talib.DIV` | Divides the first array by the second, element by element (Vector Arithmetic Div). |
+| `talib.MAX` | Calculates the Highest Value over a Specified Period. |
+| `talib.MAXINDEX` | Calculates the Index of Highest Value over a Specified Period. |
+| `talib.MIN` | Calculates the Lowest Value over a Specified Period. |
+| `talib.MININDEX` | Calculates the Index of Lowest Value over a Specified Period. |
+| `talib.MINMAX` | Calculates the Lowest and Highest Values over a Specified Period and returns the minimum and maximum. |
+| `talib.MINMAXINDEX` | Calculates the Indexes of Lowest and Highest Values over a Specified Period and returns the minimum index and maximum index. |
+| `talib.MULT` | Multiplies two arrays element by element (Vector Arithmetic Mult). |
+| `talib.SUB` | Subtracts the second array from the first, element by element (Vector Arithmetic Subtraction). |
+| `talib.SUM` | Calculates the Summation. |
+
+##### Talib/PatternRecognition
+
+| Name | Description |
+| - | - |
+| `talib.CDL2CROWS` | Detects the Two Crows candlestick pattern. |
+| `talib.CDL3BLACKCROWS` | Detects the Three Black Crows candlestick pattern. |
+| `talib.CDL3INSIDE` | Detects the Three Inside Up/Down candlestick pattern. |
+| `talib.CDL3LINESTRIKE` | Detects the Three-Line Strike candlestick pattern. |
+| `talib.CDL3OUTSIDE` | Detects the Three Outside Up/Down candlestick pattern. |
+| `talib.CDL3STARSINSOUTH` | Detects the Three Stars In The South candlestick pattern. |
+| `talib.CDL3WHITESOLDIERS` | Detects the Three Advancing White Soldiers candlestick pattern. |
+| `talib.CDLABANDONEDBABY` | Detects the Abandoned Baby candlestick pattern. |
+| `talib.CDLADVANCEBLOCK` | Detects the Advance Block candlestick pattern. |
+| `talib.CDLBELTHOLD` | Detects the Belt-hold candlestick pattern. |
+| `talib.CDLBREAKAWAY` | Detects the Breakaway candlestick pattern. |
+| `talib.CDLCLOSINGMARUBOZU` | Detects the Closing Marubozu candlestick pattern. |
+| `talib.CDLCONCEALBABYSWALL` | Detects the Concealing Baby Swallow candlestick pattern. |
+| `talib.CDLCOUNTERATTACK` | Detects the Counterattack candlestick pattern. |
+| `talib.CDLDARKCLOUDCOVER` | Detects the Dark Cloud Cover candlestick pattern. |
+| `talib.CDLDOJI` | Detects the Doji candlestick pattern. |
+| `talib.CDLDOJISTAR` | Detects the Doji Star candlestick pattern. |
+| `talib.CDLDRAGONFLYDOJI` | Detects the Dragonfly Doji candlestick pattern. |
+| `talib.CDLENGULFING` | Detects the Engulfing Pattern candlestick pattern. |
+| `talib.CDLEVENINGDOJISTAR` | Detects the Evening Doji Star candlestick pattern. |
+| `talib.CDLEVENINGSTAR` | Detects the Evening Star candlestick pattern. |
+| `talib.CDLGAPSIDESIDEWHITE` | Detects the Up/Down-gap side-by-side white lines candlestick pattern. |
+| `talib.CDLGRAVESTONEDOJI` | Detects the Gravestone Doji candlestick pattern. |
+| `talib.CDLHAMMER` | Detects the Hammer candlestick pattern. |
+| `talib.CDLHANGINGMAN` | Detects the Hanging Man candlestick pattern. |
+| `talib.CDLHARAMI` | Detects the Harami Pattern candlestick pattern. |
+| `talib.CDLHARAMICROSS` | Detects the Harami Cross Pattern candlestick pattern. |
+| `talib.CDLHIGHWAVE` | Detects the High-Wave Candle candlestick pattern. |
+| `talib.CDLHIKKAKE` | Detects the Hikkake Pattern candlestick pattern. |
+| `talib.CDLHIKKAKEMOD` | Detects the Modified Hikkake Pattern candlestick pattern. |
+| `talib.CDLHOMINGPIGEON` | Detects the Homing Pigeon candlestick pattern. |
+| `talib.CDLIDENTICAL3CROWS` | Detects the Identical Three Crows candlestick pattern. |
+| `talib.CDLINNECK` | Detects the In-Neck Pattern candlestick pattern. |
+| `talib.CDLINVERTEDHAMMER` | Detects the Inverted Hammer candlestick pattern. |
+| `talib.CDLKICKING` | Detects the Kicking candlestick pattern. |
+| `talib.CDLKICKINGBYLENGTH` | Detects the Kicking - bull/bear determined by the longer marubozu candlestick pattern. |
+| `talib.CDLLADDERBOTTOM` | Detects the Ladder Bottom candlestick pattern. |
+| `talib.CDLLONGLEGGEDDOJI` | Detects the Long Legged Doji candlestick pattern. |
+| `talib.CDLLONGLINE` | Detects the Long Line Candle candlestick pattern. |
+| `talib.CDLMARUBOZU` | Detects the Marubozu candlestick pattern. |
+| `talib.CDLMATCHINGLOW` | Detects the Matching Low candlestick pattern. |
+| `talib.CDLMATHOLD` | Detects the Mat Hold candlestick pattern. |
+| `talib.CDLMORNINGDOJISTAR` | Detects the Morning Doji Star candlestick pattern. |
+| `talib.CDLMORNINGSTAR` | Detects the Morning Star candlestick pattern. |
+| `talib.CDLONNECK` | Detects the On-Neck Pattern candlestick pattern. |
+| `talib.CDLPIERCING` | Detects the Piercing Pattern candlestick pattern. |
+| `talib.CDLRICKSHAWMAN` | Detects the Rickshaw Man candlestick pattern. |
+| `talib.CDLRISEFALL3METHODS` | Detects the Rising/Falling Three Methods candlestick pattern. |
+| `talib.CDLSEPARATINGLINES` | Detects the Separating Lines candlestick pattern. |
+| `talib.CDLSHOOTINGSTAR` | Detects the Shooting Star candlestick pattern. |
+| `talib.CDLSHORTLINE` | Detects the Short Line Candle candlestick pattern. |
+| `talib.CDLSPINNINGTOP` | Detects the Spinning Top candlestick pattern. |
+| `talib.CDLSTALLEDPATTERN` | Detects the Stalled Pattern candlestick pattern. |
+| `talib.CDLSTICKSANDWICH` | Detects the Stick Sandwich candlestick pattern. |
+| `talib.CDLTAKURI` | Detects the Takuri (Dragonfly Doji with very long lower shadow) candlestick pattern. |
+| `talib.CDLTASUKIGAP` | Detects the Tasuki Gap candlestick pattern. |
+| `talib.CDLTHRUSTING` | Detects the Thrusting Pattern candlestick pattern. |
+| `talib.CDLTRISTAR` | Detects the Tristar Pattern candlestick pattern. |
+| `talib.CDLUNIQUE3RIVER` | Detects the Unique 3 River candlestick pattern. |
+| `talib.CDLUPSIDEGAP2CROWS` | Detects the Upside Gap Two Crows candlestick pattern. |
+| `talib.CDLXSIDEGAP3METHODS` | Detects the Upside/Downside Gap Three Methods candlestick pattern. |
 
 ##### OS
 
@@ -2520,39 +2528,39 @@ Every function, structure and constant of the API reference, grouped by its cate
 | `ListFilesResult` | File list object used to record directory listing information. |
 | `FileStat` | File statistics information object. |
 
-###### OS/os
+##### OS/os
 
 | Name | Description |
 | - | - |
-| `open` | Open a file in the specified mode. |
-| `fgets` | Read the entire file content at once. |
-| `fputs` | Write content to a file. |
-| `mmap` | Reads the whole file and returns its binary data as an ArrayBuffer. |
-| `getRootDir` | Get the root directory path for file operations. |
-| `listFiles` | List files and subdirectories in the specified directory. |
-| `exists` | Check if the specified file or directory exists. |
-| `remove` | Delete the specified file or empty directory. |
-| `mkdir` | Create a directory. |
-| `rmdir` | Remove a directory and all its contents. |
-| `rename` | Rename a file or move a file. |
-| `stat` | Get detailed statistics information of a file. |
-| `exit` | Exit the program. |
+| `os.open` | Open a file in the specified mode. |
+| `os.fgets` | Read the entire file content at once. |
+| `os.fputs` | Write content to a file. |
+| `os.mmap` | Reads the whole file and returns its binary data as an ArrayBuffer. |
+| `os.getRootDir` | Get the root directory path for file operations. |
+| `os.listFiles` | List files and subdirectories in the specified directory. |
+| `os.exists` | Check if the specified file or directory exists. |
+| `os.remove` | Delete the specified file or empty directory. |
+| `os.mkdir` | Create a directory. |
+| `os.rmdir` | Remove a directory and all its contents. |
+| `os.rename` | Rename a file or move a file. |
+| `os.stat` | Get detailed statistics information of a file. |
+| `os.exit` | Exit the program. |
 
-###### OS/File
+##### OS/File
 
 | Name | Description |
 | - | - |
-| `close` | Close the file and release associated resources. |
-| `puts` | Write one or more strings to a file. |
-| `printf` | Write formatted data to file. |
-| `flush` | Flush the file buffer to ensure data is written to disk. |
-| `tell` | Get the current file pointer position. |
-| `seek` | Move the file pointer to a specified position. |
-| `eof` | Check if the file pointer has reached the end of file. |
-| `read` | Read data from a file. |
-| `write` | Write string data to a file. |
-| `getline` | Read the next line from the file. |
-| `toString` | Get the string representation of the file object. |
+| `File.close` | Close the file and release associated resources. |
+| `File.puts` | Write one or more strings to a file. |
+| `File.printf` | Write formatted data to file. |
+| `File.flush` | Flush the file buffer to ensure data is written to disk. |
+| `File.tell` | Get the current file pointer position. |
+| `File.seek` | Move the file pointer to a specified position. |
+| `File.eof` | Check if the file pointer has reached the end of file. |
+| `File.read` | Read data from a file. |
+| `File.write` | Write string data to a file. |
+| `File.getline` | Read the next line from the file. |
+| `File.toString` | Get the string representation of the file object. |
 
 #### Structures
 
@@ -2576,7 +2584,7 @@ Every function, structure and constant of the API reference, grouped by its cate
 | Name | Description |
 | - | - |
 | `HttpQuery-options` | This JSON structure is used to configure various parameters for HTTP requests sent by HttpQuery and HttpQuery_Go functions. |
-| `HttpQuery-return` | This JSON structure is the data structure returned by the HttpQuery function in debug mode, when the debug field is set to true in the ```options``` paramete... |
+| `HttpQuery-return` | This JSON structure is the data structure returned by the HttpQuery function in debug mode, when the debug field is set to true in the ```options``` parameter structure while calling the HttpQuery function. |
 | `LogStatus-table` | This JSON structure is used to configure the table content displayed in the strategy status bar. |
 | `LogStatus-btnTypeOne` | Older form of the status bar button structure (input controls without ```settings```), still supported. |
 | `LogStatus-btnTypeTwo` | JSON structure of a status bar button (current form, with ```settings``` on input controls). |
@@ -2587,9 +2595,9 @@ Every function, structure and constant of the API reference, grouped by its cate
 | `SetData-data` | This JSON is used to set the data to be loaded by the ```exchange.SetData()``` function. |
 | `EventLoop-return` | This JSON is the data structure returned by the ```EventLoop()``` function. |
 | `exchange.Go-return` | The concurrent object returned by exchange.Go; its ```wait()``` method returns the result of the concurrent call. |
-| `DBExec-return` | This JSON is the data structure returned by the ```DBExec()``` function; this JSON data structure is also returned when executing SQL statements using the ``... |
+| `DBExec-return` | This JSON is the data structure returned by the ```DBExec()``` function; this JSON data structure is also returned when executing SQL statements using the ```exec()``` method of objects created by the ```Dial()``` function. |
 | `Dial-return` | The connection object returned by Dial. |
-| `Thread.join-return` | This JSON is the data structure returned by the ```join()``` member function of the ```Thread``` object, used to store information related to concurrent thre... |
+| `Thread.join-return` | This JSON is the data structure returned by the ```join()``` member function of the ```Thread``` object, used to store information related to concurrent threads in ```JavaScript``` language strategies. |
 
 #### Built-in Variables and Constants
 
@@ -2598,89 +2606,89 @@ Every function, structure and constant of the API reference, grouped by its cate
 | Name | Description |
 | - | - |
 | `exchange` | exchange is an exchange object, and it is also the first exchange object added in the strategy live trading settings and backtesting settings. |
-| `exchanges` | exchanges is an array of exchange objects that contains all the exchange objects added in the strategy's live trading settings or backtesting settings, where... |
+| `exchanges` | exchanges is an array of exchange objects that contains all the exchange objects added in the strategy's live trading settings or backtesting settings, where exchanges[0] is exchange. |
 
 ##### ORDER_STATE
 
 | Name | Description |
 | - | - |
-| `ORDER_STATE_PENDING` | ORDER_STATE_PENDING is the value of the ```Status``` property in the Order structure, indicating that the order status is pending. |
-| `ORDER_STATE_CLOSED` | ORDER_STATE_CLOSED is the value of the ```Status``` property in the Order structure, indicating that the order status is completed. |
-| `ORDER_STATE_CANCELED` | ORDER_STATE_CANCELED is the value of the ```Status``` property in the Order structure, indicating that the order status is canceled. |
-| `ORDER_STATE_UNKNOWN` | ORDER_STATE_UNKNOWN is the value of the ```Status``` property in the Order structure, indicating that the order status is unknown (other status). |
+| `ORDER_STATE_PENDING` | The order is pending (open, possibly partially filled); the value is ```0```. |
+| `ORDER_STATE_CLOSED` | The order is completed (fully filled); the value is ```1```. |
+| `ORDER_STATE_CANCELED` | The order is canceled; the value is ```2```. |
+| `ORDER_STATE_UNKNOWN` | The order status is unknown (any other status); the value is ```3```. |
 
 ##### ORDER_TYPE
 
 | Name | Description |
 | - | - |
-| `ORDER_TYPE_BUY` | ORDER_TYPE_BUY is the value of the ```Type``` property in the Order structure, representing a buy order type. |
-| `ORDER_TYPE_SELL` | ORDER_TYPE_SELL is the ```Type``` property value in the Order structure, used to indicate a sell order type. |
+| `ORDER_TYPE_BUY` | A buy order; the value is ```0```. |
+| `ORDER_TYPE_SELL` | A sell order; the value is ```1```. |
 
 ##### ORDER_CONDITION_TYPE
 
 | Name | Description |
 | - | - |
-| `ORDER_CONDITION_TYPE_OCO` | ORDER_CONDITION_TYPE_OCO is the value of the ```ConditionType``` property in the Condition structure, representing OCO orders (One-Cancels-the-Other). |
-| `ORDER_CONDITION_TYPE_TP` | ORDER_CONDITION_TYPE_TP is the ```ConditionType``` attribute value in the Condition structure, representing a Take Profit order. |
-| `ORDER_CONDITION_TYPE_SL` | ORDER_CONDITION_TYPE_SL is the ```ConditionType``` attribute value in the Condition structure, representing a Stop Loss order. |
-| `ORDER_CONDITION_TYPE_GENERIC` | ORDER_CONDITION_TYPE_GENERIC is the ```ConditionType``` property value in the Condition structure, representing a generic conditional order. |
+| `ORDER_CONDITION_TYPE_OCO` | An OCO order (One-Cancels-the-Other): take-profit and stop-loss conditions are set together, and when one triggers the other is canceled automatically; the value is ```0```. |
+| `ORDER_CONDITION_TYPE_TP` | A take-profit order: an order is placed when the price reaches the take-profit trigger price; the value is ```1```. |
+| `ORDER_CONDITION_TYPE_SL` | A stop-loss order: an order is placed when the price reaches the stop-loss trigger price, to limit losses; the value is ```2```. |
+| `ORDER_CONDITION_TYPE_GENERIC` | A generic conditional order: its behavior depends on the exchange, and it only appears in query results; the value is ```3```. |
 
 ##### POSITION_DIRECTION
 
 | Name | Description |
 | - | - |
-| `PD_LONG` | PD_LONG is the value of the ```Type``` property in the Position structure, representing a long position type. |
-| `PD_SHORT` | PD_SHORT is the value of the ```Type``` property in the Position structure, representing a short position type. |
+| `PD_LONG` | A long position; the value is ```0```. |
+| `PD_SHORT` | A short position; the value is ```1```. |
 
 ##### ORDER_OFFSET
 
 | Name | Description |
 | - | - |
-| `ORDER_OFFSET_OPEN` | ORDER_OFFSET_OPEN is a value for the ```Offset``` property in the Order structure, indicating that the order is an opening position operation. |
-| `ORDER_OFFSET_CLOSE` | ORDER_OFFSET_CLOSE is a value for the ```Offset``` property in the Order structure, indicating that the order is in the close position direction. |
+| `ORDER_OFFSET_OPEN` | An opening order; the value is ```0```. |
+| `ORDER_OFFSET_CLOSE` | A closing order; the value is ```1```. |
 
 ##### PERIOD
 
 | Name | Description |
 | - | - |
-| `PERIOD_M1` | Constant representing 1-minute candlestick period, with a value of 60. |
-| `PERIOD_M3` | Constant representing the 3-minute candlestick period, with a value of 180. |
-| `PERIOD_M5` | Constant representing the 5-minute candlestick period, with a value of 300. |
-| `PERIOD_M15` | Constant representing the 15-minute candlestick period, with a value of 900. |
-| `PERIOD_M30` | Constant representing the 30-minute candlestick period, with a value of 1800 seconds. |
-| `PERIOD_H1` | Constant representing 1-hour candlestick period, with a value of 3600. |
-| `PERIOD_H2` | Constant representing the 2-hour candlestick period, with a value of 7200. |
-| `PERIOD_H4` | Constant representing the 4-hour candlestick period, with a value of 14400. |
-| `PERIOD_H6` | Constant representing the 6-hour candlestick period, with a value of 21600. |
-| `PERIOD_H12` | Constant representing the 12-hour candlestick period, with a value of 43200. |
-| `PERIOD_D1` | Constant representing 1-day candlestick period, with a value of 86400. |
-| `PERIOD_D3` | Constant representing the 3-day candlestick period, with a value of 259200. |
-| `PERIOD_W1` | Constant representing 1-week candlestick period, with a value of 604800 seconds. |
+| `PERIOD_M1` | 1-minute K-line period; the value is ```60```. |
+| `PERIOD_M3` | 3-minute K-line period; the value is ```180```. |
+| `PERIOD_M5` | 5-minute K-line period; the value is ```300```. |
+| `PERIOD_M15` | 15-minute K-line period; the value is ```900```. |
+| `PERIOD_M30` | 30-minute K-line period; the value is ```1800```. |
+| `PERIOD_H1` | 1-hour K-line period; the value is ```3600```. |
+| `PERIOD_H2` | 2-hour K-line period; the value is ```7200```. |
+| `PERIOD_H4` | 4-hour K-line period; the value is ```14400```. |
+| `PERIOD_H6` | 6-hour K-line period; the value is ```21600```. |
+| `PERIOD_H12` | 12-hour K-line period; the value is ```43200```. |
+| `PERIOD_D1` | 1-day K-line period; the value is ```86400```. |
+| `PERIOD_D3` | 3-day K-line period; the value is ```259200```. |
+| `PERIOD_W1` | 1-week K-line period; the value is ```604800```. |
 
 ##### LOG_TYPE
 
 | Name | Description |
 | - | - |
-| `LOG_TYPE_BUY` | LOG_TYPE_BUY is an optional value for the ```LogType``` parameter of the exchange.Log function, used to set the log type printed by the ```exchange.Log``` fu... |
-| `LOG_TYPE_SELL` | LOG_TYPE_SELL is an optional value for the ```LogType``` parameter of the exchange.Log function, used to set the ```exchange.Log``` function to print sell or... |
-| `LOG_TYPE_CANCEL` | LOG_TYPE_CANCEL is an optional value for the ```LogType``` parameter of the exchange.Log function, used to set the ```exchange.Log``` function to print order... |
+| `LOG_TYPE_BUY` | A buy order log; the value is ```0```. |
+| `LOG_TYPE_SELL` | A sell order log; the value is ```1```. |
+| `LOG_TYPE_CANCEL` | An order cancellation log; the value is ```2```. |
 
 #### Conventions
 
 | Name | Description |
 | - | - |
 | `Symbols` | Functions of exchange objects specify an instrument with the string parameter ```symbol```. |
-| `errors` | ```Failures and null values``` ## Failed calls return a null value |
+| `Failures and null values` | ### Failed calls return a null value |
 
 #### Exchanges
 
 | Name | Description |
 | - | - |
-| `Exchanges` | This chapter is the reference for the exchange objects: one page per brand, with the spot and futures exchange objects of a brand on the same page. |
+| `Capability Matrix` | Support of the standard functions and trading-mode commands per exchange object. |
 
 ## Development Tools
 
-Tools for writing and debugging strategies: the strategy editor, the debugging tool and remote editing from a local editor.
+Tools for writing and debugging strategies: the strategy editor (with the AI assistant and history versions), the debugging tool, and remote editing from a local editor.
 
 ### Strategy Editor
 
@@ -2689,11 +2697,11 @@ Open the **edit page** from the [new strategy page](https://www.fmz.com/m/add-st
 ![Online strategy editor](https://www.fmz.com/upload/asset/2e50fff4160187be92248.png)
 
 This chapter covers the editor's assistance features. Related features of the editing page:
-- Remote editing: write in a local editor and sync to the platform automatically (see Development Tools → Remote Editing).
-- Backtest configuration and saving: save the backtest configuration and strategy parameters with the strategy (see Backtesting System).
-- Import and export of complete strategies: export and import a strategy with its parameters and everything else (see Platform Basics → Strategy Library).
+- Remote editing: write in a local editor and sync to the platform automatically (see `Remote Editing`).
+- `Backtest configuration and saving`: save the backtest configuration and strategy parameters with the strategy (see Backtesting System).
+- `Import and export of complete strategies`: export and import a strategy with its parameters and everything else (see Platform Basics → Strategy Library).
 
-**Editor shortcuts**
+#### Editor shortcuts
 
 - **Command Palette**: right-click in the code editing area and choose "Command Palette" to see the keyboard shortcuts and editor commands for each feature.
 
@@ -2725,7 +2733,7 @@ The strategy editor has a built-in AI assistant that generates strategy code fro
 
 The AI assistant is charged to your account balance by usage, and each conversation shows its cost.
 
-Besides the assistant in the editor, you can connect the external AI assistant you already use to the platform and manage strategies, backtests and live robots through conversation (see Extended API Interface → AI Integration).
+Besides the assistant in the editor, you can connect the external AI assistant you already use to the platform and manage strategies, backtests and live robots through conversation (see `AI Integration`).
 
 #### Strategy Documentation
 
@@ -2734,34 +2742,25 @@ The online strategy editing page keeps the code, description, usage instructions
 ![Strategy documentation options](https://www.fmz.com/upload/asset/2e47983c191c1779bd52e.png)
 
 - Code: the source code of the strategy program.
-  A complete strategy on the platform consists of the source code, the strategy parameter design, the interactive control design and the template library references (see Writing Strategies → Strategy Parameters, Interactive Controls and Template Libraries).
+  A complete strategy on the platform consists of the source code, the strategy parameter design, the interactive control design and the `template library` references (see `Strategy Parameters`, `Interactive Controls` and Template Libraries).
 - Notes: notes taken while developing the strategy.
 - Description: the introduction shown when the strategy is published.
 - Manual: instructions visible only to those who rent the strategy.
 
 #### History Version Management
 
-The platform supports version iteration functionality during strategy development. On the **Strategy Editing Page**, click the "History Version" button in the "Code" editing area to open the strategy history version management page.
+A history version is a snapshot of the strategy at a point in time; use it to roll back or compare code, or to have a live robot run a specific version. On the **Strategy Editing Page**, click the "History Version" button in the "Code" editing area to open the history version management page.
 
-- When the current strategy has no history version snapshots, click the "Create Now" button to create a snapshot of the current strategy. Snapshot contents include: strategy code, notes, description, manual, parameter design, interaction design, etc.
+##### Creating and managing snapshots
+- Create: if the strategy has no snapshot yet, click "Create Now"; otherwise click "Create History Version" above the snapshot list on the right. A snapshot includes the strategy code, notes, description, manual, parameter design, interaction design and so on.
+- Manage: rename a snapshot, delete it, or restore the strategy to a snapshot's version.
+- Preview: click "Preview" at the bottom left of the page to view the code, notes, description, manual, parameter design and interaction design in the selected snapshot.
+- Compare: click "Compare" at the bottom left of the page to see the differences between the selected snapshot and the current strategy.
 
-- After creating a history snapshot, the saved history snapshot list will be displayed on the right side of the history version management page. Click the "Create History Version" button above the list to continue saving new history snapshots.
-
-- Edit and use history snapshots: You can perform operations such as **modify history snapshot name**, **delete history snapshot**, and **restore to the strategy version of the history snapshot** on recorded strategy history snapshots.
-
-- Preview the currently selected history snapshot: Click the "Preview" button at the bottom left of the history version management page to preview the strategy code, notes, description, manual, parameter design, interaction design, and other contents in the current history snapshot.
-
-- Compare the differences between the currently selected history snapshot and the current strategy: Click the "Compare" button at the bottom left of the history version management page to compare the differences between the current history snapshot and the current strategy.
-
-##### Running History Versions in Live Trading
-
-Strategy history versions can not only be used for code management and version rollback, but can also be run directly in live trading:
-
-- **Set Default Running Version**: On the strategy editor page, click the "History Version" button, select a history version, then click the "Modify" button in the menu. In the popup, you can check the "Set as Default Version" option. If not set, the latest version will run by default.
-
-- **Use History Version in Live Trading**: When creating a live trading instance or modifying live trading parameters, the strategy owner can select a specific history version of the strategy to run. This feature is only available to the strategy owner.
-
-- **Version Control for Rented Strategies**: When a strategy is rented to other users, the renter can only run the "default running version" set by the strategy owner and cannot select other history versions. The strategy owner can control which version is used for rented strategies by setting the default running version.
+##### Running a history version live
+- **Set the default running version**: select a version on the history version management page, click "Modify" in the menu and check "Set as Default Version" in the dialog. Without it, the latest version runs by default.
+- **Use a history version in a live robot**: when creating a robot or changing its parameters, the strategy owner can choose a history version of the strategy to run; this works only for the strategy owner.
+- **Versions of rented strategies**: a renter can run only the default running version set by the strategy owner and cannot choose other history versions; the owner controls the version used by rented strategies by setting the default running version.
 
 ### Debugging Tool
 
@@ -2777,7 +2776,7 @@ You can write a strategy in a local editor and have it synced to FMZ automatical
 
 ![Remote editing screenshot](https://www.fmz.com/upload/asset/2e4e8975d1e32517fd989.png)
 
-**Steps**
+#### Steps
 1. Click "Remote Editing" on the strategy editing page. The top of the dialog has download links for the editor plugins; follow one to the plugin page and install it (installation differs slightly between editors).
 2. The dialog shows the current strategy's remote sync token. If it is empty, click "Update Token" to generate one.
 3. Save the strategy source locally and insert the token line shown in the dialog as the first line (e.g. ```// fmz@<token>``` for ```JavaScript```, ```# fmz@<token>``` for ```Python```); from then on every save is synced to the platform.
@@ -2788,7 +2787,7 @@ Without a plugin you can upload the local source with ```curl``` (the dialog sho
 curl -T quant.js -H "Authorization: Bearer <token>" https://www.fmz.com/rsync
 ```
 
-**Managing the token**
+#### Managing the token
 - "Update Token": generates a new token; the old one stops working at once.
 - "Delete Token": deletes the strategy's token and turns remote editing off.
 - If the strategy has not been modified at all for more than 30 days (neither saved on the website nor synced remotely), sync is refused (return code 405); save the strategy once on the website or click "Update Token" to restore it.
@@ -2804,59 +2803,66 @@ Test strategies on historical data: the backtesting system drives the strategy c
 
 A backtest drives the strategy code with the platform's historical market data: the backtest engine keeps a virtual clock and one simulated account per exchange object, and answers every market, order and account call from history. A backtest only shows how the strategy would have behaved on past data; the past does not represent the future, so read backtest results with caution.
 
-**Starting a backtest**
+#### Starting a backtest
 
-- Website: open the strategy editor, switch to the "Backtest" tab, set the backtest configuration and strategy parameters, then click "Start Backtest" (keyboard shortcuts: see Backtesting System → Backtest Page Shortcuts). The configuration can be saved into the strategy source, see Backtesting System → Backtest Configuration and Saving.
-- AI assistant: start a backtest with the MCP tool ```run_backtest``` and read the result with ```get_backtest```, see Extended API Interface → AI Integration. Backtests started through MCP always use the simulated-tick mode.
-- Your own machine: use the open-source local backtest engine, see Backtesting System → Local Backtesting Engine.
+- Website: open the strategy editor, switch to the "Backtest" tab, set the backtest configuration and strategy parameters, then click "Start Backtest" (keyboard shortcuts: see `Backtest Page Shortcuts`). The configuration can be saved into the strategy source, see `Backtest Configuration and Saving`.
+- AI assistant: start a backtest with the MCP tool ```run_backtest``` and read the result with ```get_backtest```, see `AI Integration`. Backtests started through MCP always use the simulated-tick mode.
+- Your own machine: use the open-source local backtest engine, see `Local Backtesting Engine`.
 
-**Configuration items**
+#### Configuration items
 
 | Item | Description |
 | - | - |
 | Time range | Start and end time of the backtest. |
 | K-line period | The K-line period that ```GetRecords()``` returns by default. |
-| Base K-line period | The K-line period from which ticks are generated in simulated-tick mode. Smaller is closer to real markets and slower. Strategy K-lines are built from base K-lines, so they cannot be shorter than the base period. |
-| Mode | Simulated tick or real tick, see Backtesting System → Backtest Modes and Order Matching. |
-| Exchange, trading pair | Each exchange object has its own simulated account; pairs are written like ```BTC_USDT```. On cryptocurrency futures exchanges the contract defaults to ```swap``` (perpetual); to use another contract, call ```exchange.SetContractType()``` in the strategy first. |
-| Initial funds | Initial balances of the quote currency (e.g. USDT) and the base currency (e.g. BTC). Coin-margined contracts use the base currency as margin, so set the base-currency balance. |
-| Fees | Maker and taker rates in percent; the defaults come from the exchange market's configuration. A limit order that fills immediately when placed pays the taker rate; one that rests in the book and is filled later pays the maker rate. |
-| Slippage | Number of price ticks added outside the simulated best bid and best ask; default 0. Only applies in simulated tick mode; real tick mode uses the replayed real order book. |
-| Network delay | In milliseconds; every exchange call advances the virtual clock by this amount; default 200. |
-| Depth levels, amount per level | Number of levels ```GetDepth()``` returns (1-20) and the amount on each simulated level; in real-tick mode the depth levels are the real depth requested from the data source. |
+| Base K-line period | The K-line period from which ticks are generated in simulated-tick mode. |
+| Mode | Simulated tick or real tick, see `Backtest Modes and Order Matching`. |
+| Exchange, trading pair | Each exchange object has its own simulated account; pairs are written like ```BTC_USDT```. |
+| Initial funds | Initial balances of the quote currency (e.g. USDT) and the base currency (e.g. BTC). |
+| Fees | Maker and taker rates in percent. |
+| Slippage | Number of price ticks (minimum price increments) added outside the simulated best bid and ask; default 0. |
+| Network delay | Milliseconds the virtual clock advances on every exchange call; default 200. |
+| Depth levels, amount per level | Number of levels ```GetDepth()``` returns (1-20) and the amount on each simulated level. |
 | Max K-line bars | Upper limit of history bars returned by the first ```GetRecords()``` call (100-5000, default 300). |
 | Log limits | Upper limits on kept runtime logs, profit logs and chart data points. |
-| Data source | The platform's historical data by default; a custom data source can be used instead, see Backtesting System → Custom Data Source. |
+| Data source | The platform's historical data by default, or a `Custom Data Source`. |
 
-**Fault-tolerance test**
+Further details:
+- The smaller the base K-line period, the closer the generated ticks are to the real market and the slower the backtest; strategy K-lines are built from base K-lines, so the K-line period cannot be shorter than the base period.
+- On cryptocurrency futures exchanges the contract defaults to ```swap``` (perpetual); to use another contract, call ```exchange.SetContractType()``` in the strategy first.
+- Coin-margined contracts use the base currency as margin, so set the base-currency balance.
+- Fees default to the exchange market's configuration. A limit order that fills immediately when placed pays the taker rate; one that rests in the book and is filled later pays the maker rate.
+- Slippage applies only in simulated-tick mode; real-tick mode uses the replayed real order book, and there the depth levels are the real depth requested from the data source.
+
+#### Fault-tolerance test
 
 The backtest page also offers a "fault-tolerance test": exchange calls fail with a given probability (0.5 by default), and the first call of each kind always fails; each failure is logged as the error ```FaultTolerant Test```. Use it to check how the strategy handles failed calls, e.g. whether it retries with ```_C()```.
 
-**What the strategy sees in a backtest**
+#### What the strategy sees in a backtest
 
 - ```IsVirtual()``` returns ```true```; logic that must not run in a backtest can be skipped based on it, see `IsVirtual`.
-- Time is virtual: ```Unix()```, ```_D()``` and similar functions read the backtest clock, and ```Sleep()``` advances it. When the clock passes the end time, the engine throws an ```EOF``` exception and the backtest ends; ```JavaScript``` and ```Python``` strategies do not call ```onexit()``` in that case (see Writing Strategies → Strategy Structure → onexit() for how to handle this), while ```Rust``` strategies call ```onexit()``` automatically.
+- Time is virtual: ```Unix()```, ```_D()``` and similar functions read the backtest clock, and ```Sleep()``` advances it. When the clock passes the end time, the engine throws an ```EOF``` exception and the backtest ends; ```JavaScript``` and ```Python``` strategies do not call ```onexit()``` in that case (see `onexit()` for how to handle this), while ```Rust``` strategies call ```onexit()``` automatically.
 - In a backtest ```GetCommand()``` receives no interactive commands, ```onerror()``` is not supported, and network request functions are restricted.
 
 ### Backtest Modes and Order Matching
 
 There are two backtest modes, **simulated tick** and **real tick**. Both are based on real historical data: simulated tick generates ticks from K-lines, real tick replays recorded ticks. The latter is more accurate and slower.
 
-**Simulated tick**
+#### Simulated tick
 
 Within the price frame of each base K-line (open, high, low, close), the engine generates 2-14 simulated ticks along the path open → low/high → close and spreads the bar's volume over them; market calls return the data of the current simulated tick. Each base K-line therefore has several backtest time points, and a strategy can trade several times inside one bar instead of only at the close. The smaller the base K-line period, the closer the ticks follow the real price path, and the slower the backtest. Details: [Simulated-tick mechanism](https://www.fmz.com/bbs-topic/662), [Backtesting mechanism](https://www.fmz.com/digest-topic/4009).
 
 Simulated order book: best ask = tick close + one tick + slippage, best bid = close − one tick − slippage (slippage counted in ticks); ```GetDepth()``` returns several simulated levels outward from the best bid and ask; adjacent levels are spaced by the bid-ask spread (2 ticks + 2 × slippage), each with the configured "amount per level".
 
-**Real tick**
+#### Real tick
 
 Uses per-second ticks recorded by the platform, including order-book depth (configurable, up to 20 levels) and, optionally, replayed trade prints; ```GetDepth()``` and ```GetTrades()``` return the replayed real data. The platform's data service caps each data request per symbol (50 MB, plus a limit of 530,000 records); both modes are subject to it (custom data sources are not), but real-tick data is large and slow to backtest, so it is affected most and the time range is limited; to cover a longer range, lower the depth levels and do not use trade prints. Early periods may have no real-tick data, so do not choose a start time that is too early. In real-tick mode keep the ```Sleep()``` in the strategy loop short (e.g. 100 ms).
 
-**How market moments advance**
+#### How market moments advance
 
 In both modes, at a given market moment, calling each of ```GetTicker()```, ```GetDepth()```, ```GetTrades()``` and ```GetRecords()``` once does not move the backtest time; calling the same function again jumps to the next market moment.
 
-**Order matching**
+#### Order matching
 
 Both modes use the same matching rules:
 
@@ -2866,11 +2872,11 @@ Both modes use the same matching rules:
 - In real-tick mode an order resting exactly at the best bid/ask fills only after the volume queued ahead of it has been consumed.
 - Opening a futures position freezes margin of notional value ÷ leverage plus the estimated fee; when the market data includes funding rates, perpetual contracts are charged funding.
 
-**Effect of data granularity**
+#### Effect of data granularity
 
 The same strategy produces different trade counts and P&L at different data granularities (real tick, simulated tick with a small base period, simulated tick with a large base period, ...). Coarse data backtests faster but may give misleading results, so use fine granularity where possible. The following strategy can be backtested at several granularities for comparison:
 
-```js
+```javascript
 /*backtest
 start: 2025-04-01 08:00:00
 end: 2025-04-18 00:00:00
@@ -2912,22 +2918,22 @@ function main() {
 
 The backtest configuration on the "Backtest" tab (time range, exchanges, fees, ...) and the strategy parameters can be saved with the strategy and are loaded again the next time the strategy is opened.
 
-**Saving**
+#### Saving
 
 - Click "Save Backtest Settings": the configuration and strategy parameters are written as a comment block (the ```backtest``` block) at the top of the strategy source.
 - Click "Save Strategy": the platform also records the current backtest configuration and strategy parameters.
 
-**Loading**
+#### Loading
 
 - When the strategy editor is opened or refreshed, the configuration in the source's ```backtest``` block is loaded first.
 - If the source has no ```backtest``` block, the configuration recorded by the last "Save Strategy" is loaded.
 - After editing the ```backtest``` block by hand, click the "Backtest Settings" button above the block to apply the change to the backtest form.
 
-**Block format**
+#### Block format
 
 The word ```backtest``` follows the language's block-comment opener directly, then one ```key: value``` per line:
 
-```js
+```javascript
 /*backtest
 start: 2024-01-01 00:00:00
 end: 2024-03-01 00:00:00
@@ -2947,7 +2953,7 @@ Comment syntax per language: JavaScript, Rust and PINE use ```/*backtest ... */`
 | basePeriod | same | Base K-line period; defaults to ```period```; ignored in real-tick mode. |
 | mode | ```1``` | Real-tick mode; omit for simulated-tick mode. |
 | exchanges | JSON array | One element per exchange object, fields below. |
-| args | JSON array | Strategy parameters, ```[["name", value], ...]```; a third element with a template ID sets that template's parameter: ```["name", value, templateId]```. |
+| args | JSON array | Strategy parameters ```[["name", value], ...]```; ```["name", value, templateId]``` sets a template's parameter. |
 
 Fields of an ```exchanges``` element; everything except ```eid``` and ```currency``` is optional:
 
@@ -2960,13 +2966,15 @@ Fields of an ```exchanges``` element; everything except ```eid``` and ```currenc
 | feeMin | Minimum fee per fill; only applies to some markets. |
 | depthDeep, depthAmount | Depth levels and the amount on each simulated level. |
 | tradesMode | Whether trade prints are replayed in real-tick mode: ```"0"``` replay, ```"1"``` do not. |
-| feeder | Custom data source URL, see Backtesting System → Custom Data Source. |
+| feeder | Custom data source URL, see `Custom Data Source`. |
 
-The other options of the backtest form (slippage, network delay, failure probability, max K-line bars, etc.) are not written into the comment block; they are stored with the strategy record when you "Save Strategy". The local backtest engines also read this block, but only some of its keys, see Backtesting System → Local Backtesting Engine.
+The other options of the backtest form (slippage, network delay, failure probability, max K-line bars, etc.) are not written into the comment block; they are stored with the strategy record when you "Save Strategy". The local backtest engines also read this block, but only some of its keys, see `Local Backtesting Engine`.
 
 ### Supported Languages and Exchanges
 
-**Programming languages**
+Which programming languages and exchanges the backtest system supports, and where strategies in each language are backtested.
+
+#### Programming languages
 
 The backtesting system supports strategies written in JavaScript, Python, Rust, [PINE](https://www.fmz.com/bbs-topic/9315), [MyLanguage](https://www.fmz.com/bbs-topic/2569) and Workflow.
 
@@ -2975,7 +2983,7 @@ The backtesting system supports strategies written in JavaScript, Python, Rust, 
 - For Python strategies the backtest node defaults to "Cloud" (the platform's public servers); you can also choose your own docker, or "Local: Python3" to backtest in the browser (run with Pyodide). A backtest on a docker, like live trading, uses the Python 3 environment of the docker's system; install the third-party libraries you need yourself. The public servers only provide common libraries.
 - Workflow strategies show each node's execution state and data flow visually during a backtest.
 
-**Exchanges**
+#### Exchanges
 
 Backtests use the platform's historical data; the exchanges selectable on the backtest page are the ones that can be backtested (the MCP tool ```list_exchanges``` also shows this: exchanges with ```backtest``` set to ```true``` have history data).
 
@@ -2984,7 +2992,7 @@ Backtests use the platform's historical data; the exchanges selectable on the ba
   These are the exchange IDs used for backtesting (the ```eid``` in the ```/*backtest*/``` configuration and in the MCP tool ```run_backtest```, matching the names of the history data server). For most exchanges they equal what ```exchange.GetName()``` returns in live trading, but a few differ: backtest ```OKX``` and ```Futures_OKX``` correspond to live ```OKEX``` and ```Futures_OKCoin``` (OKX futures); backtest ```HTX``` and ```Futures_HTX``` correspond to live ```Huobi``` and ```Futures_HuobiDM``` (HTX futures). If a strategy branches on the exchange name, handle both spellings.
 - Futu Securities (```Futures_Futu```): Hong Kong, US and other stock markets. Only daily data is available for backtesting; set ```currency``` to ```STOCK``` and select the stock code in the strategy with ```exchange.SetContractType()```:
 
-```js
+```javascript
 /*backtest
 start: 2024-05-01 00:00:00
 end: 2025-02-17 00:00:00
@@ -2994,34 +3002,26 @@ exchanges: [{"eid":"Futures_Futu","currency":"STOCK","fee":[0.03,0.03]}]
 */
 
 function main() {
-    var info = exchange.SetContractType("TSLA.US")   // Set the stock code: Tesla
-    Log("info:", info)                               // Contract info: InstrumentID, PriceTick, LotTick, VolumeMultiple, ...
-    Log(exchange.GetTicker())                        // Daily market data at the current backtest time
+    // Set the stock code: Tesla
+    var info = exchange.SetContractType("TSLA.US")
+    // Contract info: InstrumentID, PriceTick, LotTick, VolumeMultiple, ...
+    Log("info:", info)
+    // Daily market data at the current backtest time
+    Log(exchange.GetTicker())
 }
 ```
-
-### Parameter Optimization
-
-Parameter optimization generates several parameter sets from the ranges you configure and backtests each of them. In the strategy parameter section of the "Backtest" tab, tick the **Optimize** option to the right of a parameter to show its settings:
-
-- Min: the starting value of the parameter.
-- Max: the largest value the parameter is increased to.
-- Step: the increment.
-- Concurrent threads: how many backtests run at the same time during optimization. This option only takes effect for backtests that run in the browser: JavaScript, PINE and MyLanguage strategies, and Python and Rust strategies with the "Local" backtest node; otherwise backtests run one at a time. Parameters of referenced templates can be selected for optimization too and are included in the combinations.
-
-The system generates parameter combinations from ```Min```, ```Max``` and ```Step``` and backtests every combination once. Only **number** parameters can be optimized.
 
 ### Reading Backtest Results
 
 When a backtest finishes, the backtest page shows the profit curve, statistics, status information, logs and account information.
 
-**Profit curve**
+#### Profit curve
 
 When the strategy calls ```LogProfit()``` (`LogProfit`), the profit curve consists of the recorded values and the statistics below are computed from that series. When it never calls ```LogProfit()```, the backtest page computes profit and loss from the account snapshots recorded by the engine and draws the curve and computes the statistics from them (using the first exchange account).
 
 The ```profit``` and ```max_drawdown``` returned by the MCP tool ```get_backtest``` come from the values recorded with ```LogProfit()```; ```max_drawdown``` is the largest peak-to-trough fall of that series (an absolute amount, not a ratio). When the strategy has no profit records, ```profit``` is the profit computed by the engine and ```max_drawdown``` is not returned.
 
-**Statistics**
+#### Statistics
 
 The statistics are computed from the profit series ```profits``` (each element ```[timestamp, profit]```) and the initial assets ```totalAssets``` with the algorithm below:
 
@@ -3029,23 +3029,26 @@ The statistics are computed from the profit series ```profits``` (each element `
 | - | - |
 | Return (totalReturns) | Last profit value ÷ initial assets. |
 | Annualized return (annualizedReturns) | Return × one year (yearDays days) ÷ backtest duration, scaled linearly. |
-| Max drawdown (maxDrawdown) | The largest fractional drop of assets (initial assets + profit) from their previous peak. maxDrawdownStartTime is the time of that peak, maxDrawdownTime the time of the deepest point. |
-| Win rate (winningRate) | Share of points in the profit series that are higher than the previous point (the first point is compared with 0). It counts profit records, not individual trades. |
-| Volatility (volatility) | The backtest period is cut into days; each day's profit ÷ initial assets is multiplied by yearDays to annualize it (days without profit records count as 0); volatility is the population standard deviation of these values. |
+| Max drawdown (maxDrawdown) | The largest fractional drop of assets (initial assets + profit) from their previous peak. |
+| Win rate (winningRate) | Share of points in the profit series higher than the previous point (the first point is compared with 0). |
+| Volatility (volatility) | Population standard deviation of each day's profit ÷ initial assets, annualized by multiplying by yearDays. |
 | Sharpe ratio (sharpeRatio) | (Annualized return − risk-free rate 3%) ÷ volatility; 0 when volatility is 0. |
 
-yearDays is the number of days per year used for annualization, fixed at 365. Note that daily returns are annualized by multiplying by yearDays rather than the usual √yearDays, so this Sharpe ratio should not be compared directly with values from other platforms.
+- Max drawdown: maxDrawdownStartTime is the time of the asset peak before the drawdown, maxDrawdownTime the time of the deepest point.
+- Win rate: it counts profit records, not individual trades.
+- Volatility: the backtest period is cut into days to compute daily profit; days without profit records count as 0.
+- yearDays is the number of days per year used for annualization, fixed at 365. Daily returns are annualized by multiplying by yearDays rather than the usual √yearDays, so this Sharpe ratio should not be compared directly with values from other platforms.
 
 Algorithm source:
 
-```js
+```javascript
 function returnAnalyze(totalAssets, profits, ts, te, period, yearDays) {
-    // force by days
+    // always by day
     period = 86400000
     if (profits.length == 0) {
         return null
     }
-    var freeProfit = 0.03 // 0.04
+    var freeProfit = 0.03   // risk-free rate
     var yearRange = yearDays * 86400000
     var totalReturns = profits[profits.length - 1][1] / totalAssets
     var annualizedReturns = (totalReturns * yearRange) / (te - ts)
@@ -3137,30 +3140,44 @@ function returnAnalyze(totalAssets, profits, ts, te, period, yearDays) {
 }
 ```
 
-**Downloading data**
+#### Downloading data
 
 - Status bar data: after the backtest finishes, click "Download Table" at the top right of the "Status" panel to download the final status bar data as a CSV file.
 - Log data: click "Download Table" at the top right of the "Logs" panel to download the backtest logs as a CSV file.
 
+### Parameter Optimization
+
+Parameter optimization generates several parameter sets from the ranges you configure and backtests each of them. In the strategy parameter section of the "Backtest" tab, tick the **Optimize** option to the right of a parameter to show its settings:
+
+- Min: the starting value of the parameter.
+- Max: the largest value the parameter is increased to.
+- Step: the increment.
+- Concurrent threads: how many backtests run at the same time during optimization. This option only takes effect for backtests that run in the browser: JavaScript, PINE and MyLanguage strategies, and Python and Rust strategies with the "Local" backtest node; otherwise backtests run one at a time. Parameters of referenced templates can be selected for optimization too and are included in the combinations.
+
+The system generates parameter combinations from ```Min```, ```Max``` and ```Step``` and backtests every combination once. Only **number** parameters can be optimized.
+
 ### Custom Data Source
 
-The FMZ Quant Trading Platform's backtesting system supports custom data sources. During a backtest the platform's data server requests the custom URL with the ```GET``` method, so the URL must be reachable from the public internet. The request carries these parameters:
+The backtest system can use a custom data source instead of the platform's historical data: set the exchange's data source in the backtest configuration to the custom data source (feeder) address, and during the backtest the platform's data server requests that URL with the ```GET``` method, so the URL must be reachable from the public internet. The request carries these parameters:
 
 | Parameter | Meaning | Description |
 | - | - | - |
-| symbol | Symbol name | Spot market data example: ```BTC_USDT```, Futures market data example: ```BTC_USDT.swap```, Perpetual futures funding rate data example: ```BTC_USDT.funding```, Perpetual futures price index data example: ```BTC_USDT.index``` |
+| symbol | Symbol name | Spot like ```BTC_USDT```, futures like ```BTC_USDT.swap```; funding rate and price index: see below |
 | eid | Exchange | For example: OKX, Futures_OKX |
-| round | Data precision | Always ```round=true```: prices and amounts are returned as integers scaled by their precision, which is given by ```quotePrecision``` and ```basePrecision``` in the returned ```detail```; see Backtesting System → Custom Data Source → Data Format. |
+| round | Data precision | Always ```round=true```: values are integers scaled by precision; see `Data Format` |
 | period | K-line data period (milliseconds) | For example: ```60000``` represents a 1-minute period |
 | depth | Order book depth levels | 1-20 |
 | trades | Whether trade-by-trade data is required | Yes (1) / No (0); always 0 in simulated-tick backtests |
 | from | Start time | Unix timestamp in seconds |
 | to | End time | Unix timestamp in seconds |
-| detail | Request detailed information of the symbol | When true, indicates that it needs to be provided by the custom data source. The request sent by the FMZ Quant Trading Platform backtesting system to the custom data source is fixed as: ```detail=true``` |
-| event | Request type | ```feed```: market data requested when the backtest starts; ```fill```: older K-lines fetched when there are not enough bars, in which case it is always ```depth=2&trades=0&custom=0``` with ```period``` ```900000``` or ```86400000``` |
+| detail | Instrument details | Always ```detail=true```: the response must include the instrument details |
+| event | Request type | ```feed```: market data requested when the backtest starts; ```fill```: older K-lines when there are not enough bars |
 | custom | -- | This parameter can be ignored |
 
-When the data source of spot exchange or futures exchange objects is set to custom data source (feeder), examples of requests sent by the backtesting system to the custom data source service:
+- Perpetual contract backtests also request funding rate data (```symbol``` like ```BTC_USDT.funding```) and price index data (```symbol``` like ```BTC_USDT.index```); see `Data Format`.
+- ```event=fill``` requests always carry ```depth=2&trades=0&custom=0```, with ```period``` ```900000``` or ```86400000```.
+
+Example requests sent by the backtest system to a custom data source (one for a spot and one for a futures exchange object):
 
 ```url
 http://customserver:9090/data?custom=0&depth=20&detail=true&eid=Bitget&event=feed&from=1351641600&period=86400000&round=true&symbol=BTC_USDT&to=1611244800&trades=0
@@ -3169,70 +3186,86 @@ http://customserver:9090/data?custom=0&depth=20&detail=true&eid=Futures_OKX&even
 
 #### Data Format
 
-The returned format must be one of the following two formats (automatically recognized by the system):
-- Simulated-level Tick, here is a JSON data example:
-  ```json
-  {
-      "detail": {
-          "eid": "Binance",
-          "symbol": "BTC_USDT",
-          "alias": "BTCUSDT",
-          "baseCurrency": "BTC",
-          "quoteCurrency": "USDT",
-          "marginCurrency": "USDT",
-          "basePrecision": 5,
-          "quotePrecision": 3,
-          "minQty": 0.00001,
-          "maxQty": 9000,
-          "minNotional": 5,
-          "maxNotional": 9000000,
-          "priceTick": 0.01,
-          "volumeTick": 0.00001,
-          "marginLevel": 10
-      },
-      "schema":["time", "open", "high", "low", "close", "vol"],
-      "data":[
-          [1564315200000, 9531300, 9531300, 9497060, 9497060, 787],
-          [1564316100000, 9495160, 9495160, 9474260, 9489460, 338]
-      ]
-  }
-  ```
-- Live-level Tick, here is a JSON data example:
-  Tick-level backtest data (includes order book depth information, depth format is an array of ```[price, quantity]```. Can include multiple levels of depth, ```asks``` sorted in ascending order by price, ```bids``` sorted in descending order by price).
-  ```json
-  {
-      "detail": {
-          "eid": "Binance",
-          "symbol": "BTC_USDT",
-          "alias": "BTCUSDT",
-          "baseCurrency": "BTC",
-          "quoteCurrency": "USDT",
-          "marginCurrency": "USDT",
-          "basePrecision": 5,
-          "quotePrecision": 3,
-          "minQty": 0.00001,
-          "maxQty": 9000,
-          "minNotional": 5,
-          "maxNotional": 9000000,
-          "priceTick": 0.01,
-          "volumeTick": 0.00001,
-          "marginLevel": 10
-      },
-      "schema":["time", "asks", "bids", "trades", "close", "vol"],
-      "data":[
-          [1564315200000, [[9531300, 10]], [[9531300, 10]], [[1564315200000, 0, 9531300, 10]], 9497060, 787],
-          [1564316100000, [[9531300, 10]], [[9531300, 10]], [[1564316100000, 0, 9531300, 10]], 9497060, 787]
-      ]
-  }
-  ```
+A custom data source returns JSON in one of the two formats below, recognized automatically: simulated-tick backtests use K-line data, real-tick backtests use order book depth and trade data. All values are integers scaled by precision; see "Numeric precision" below.
+
+##### Simulated tick
+
+```json
+{
+    "detail": {
+        "eid": "Binance",
+        "symbol": "BTC_USDT",
+        "alias": "BTCUSDT",
+        "baseCurrency": "BTC",
+        "quoteCurrency": "USDT",
+        "marginCurrency": "USDT",
+        "basePrecision": 5,
+        "quotePrecision": 3,
+        "minQty": 0.00001,
+        "maxQty": 9000,
+        "minNotional": 5,
+        "maxNotional": 9000000,
+        "priceTick": 0.01,
+        "volumeTick": 0.00001,
+        "marginLevel": 10
+    },
+    "schema":["time", "open", "high", "low", "close", "vol"],
+    "data":[
+        [1564315200000, 9531300, 9531300, 9497060, 9497060, 787],
+        [1564316100000, 9495160, 9495160, 9474260, 9489460, 338]
+    ]
+}
+```
+
+##### Real tick
+
+The data includes order book depth as arrays of ```[price, amount]```, with any number of levels: ```asks``` in ascending price order, ```bids``` in descending price order.
+
+```json
+{
+    "detail": {
+        "eid": "Binance",
+        "symbol": "BTC_USDT",
+        "alias": "BTCUSDT",
+        "baseCurrency": "BTC",
+        "quoteCurrency": "USDT",
+        "marginCurrency": "USDT",
+        "basePrecision": 5,
+        "quotePrecision": 3,
+        "minQty": 0.00001,
+        "maxQty": 9000,
+        "minNotional": 5,
+        "maxNotional": 9000000,
+        "priceTick": 0.01,
+        "volumeTick": 0.00001,
+        "marginLevel": 10
+    },
+    "schema":["time", "asks", "bids", "trades", "close", "vol"],
+    "data":[
+        [1564315200000, [[9531300, 10]], [[9531300, 10]],
+         [[1564315200000, 0, 9531300, 10]], 9497060, 787],
+        [1564316100000, [[9531300, 10]], [[9531300, 10]],
+         [[1564316100000, 0, 9531300, 10]], 9497060, 787]
+    ]
+}
+```
+
+##### Top-level fields
 
 | Field | Description |
 | - | - |
-| detail | Detailed information of the requested instrument, including quote currency name, base currency name, precision, minimum order quantity, etc. |
-| schema | Specifies the column attributes in the data array, case-sensitive. Limited to time, open, high, low, close, vol, asks, bids, trades, position (open interest), data (custom data) |
-| data | Data recorded according to the column structure set by schema |
+| detail | Details of the requested instrument (currencies, precision, minimum order size...); see "detail field" below |
+| schema | Attributes of the columns of the ```data``` array, case-sensitive |
+| data | The data, laid out by the columns in ```schema``` |
 
-**Numeric precision**
+Columns available in ```schema```: ```time```, ```open```, ```high```, ```low```, ```close```, ```vol```, ```asks```, ```bids```, ```trades```, ```position``` (open interest), ```data``` (custom data). The formats of ```asks```, ```bids``` and ```trades```:
+
+| Column | Format | Example (from the real-tick sample) |
+| - | - | - |
+| asks / bids | ```[[price, amount], ...]``` | ```[[9531300, 10]]``` |
+| trades | ```[[time, side, price, amount], ...]```, side 0 = buy, 1 = sell | ```[[1564315200000, 0, 9531300, 10]]``` |
+
+##### Numeric precision
 
 Requests always carry ```round=true```, and all values are returned as integers scaled by their precision, so that no floating-point precision is lost in transit:
 
@@ -3241,39 +3274,38 @@ Requests always carry ```round=true```, and all values are returned as integers 
 
 In the examples above ```quotePrecision``` is 3, so ```9531300``` means a price of 9531.300; ```basePrecision``` is 5, so ```787``` means an amount of 0.00787. Time columns (```time``` and the time in ```trades```) are millisecond timestamps and are not scaled.
 
-**detail field**
+##### detail field
 
 | Field | Description |
 | - | - |
-| eid            | Exchange ID, note that spot and futures of the same exchange use different eids |
-| symbol         | Trading instrument code |
-| alias          | The corresponding symbol of the current trading instrument code on the exchange |
-| baseCurrency   | Base currency |
-| quoteCurrency  | Quote currency |
+| eid | Exchange ID; spot and futures of the same exchange use different eids |
+| symbol | Trading instrument code |
+| alias | The instrument's symbol on the exchange |
+| baseCurrency | Base currency |
+| quoteCurrency | Quote currency |
 | marginCurrency | Margin currency |
-| basePrecision  | Base currency precision |
+| basePrecision | Base currency precision |
 | quotePrecision | Quote currency precision |
-| minQty         | Minimum order quantity |
-| maxQty         | Maximum order quantity |
-| minNotional    | Minimum order amount |
-| maxNotional    | Maximum order amount |
-| priceTick      | Minimum price tick size |
-| volumeTick     | Minimum volume tick size |
-| marginLevel    | Futures leverage multiplier |
-| contractType   | For perpetual contracts set to: ```swap```, the backtest system will continue to send funding rate and price index requests |
+| minQty | Minimum order quantity |
+| maxQty | Maximum order quantity |
+| minNotional | Minimum order amount |
+| maxNotional | Maximum order amount |
+| priceTick | Minimum price increment |
+| volumeTick | Minimum order quantity increment |
+| marginLevel | Futures leverage |
+| contractType | Set to ```swap``` for perpetual contracts; the backtest system then also requests funding rate and price index data |
 
-Special column attributes ```asks```, ```bids```, ```trades``` description:
+##### Funding rates and price index for perpetual contracts
 
-| Field | Description | Remarks |
-| - | - | - |
-| asks / bids | [[price, quantity], ...]                      | For example, data in the ```Live-level Tick``` data example: ```[[9531300, 10]]``` |
-| trades      | [[time, direction(0:buy,1:sell), price, quantity], ...] | For example, data in the ```Live-level Tick``` data example: ```[[1564315200000, 0, 9531300, 10]]``` |
+When backtesting perpetual contracts on futures exchanges, the custom data source must also provide funding rate data and price index data:
 
-When backtesting perpetual contracts on futures exchanges, custom data sources also need to provide additional funding rate data and price index data. Only when the requested market data is returned and the detail field in the return structure contains the ```"contractType": "swap"``` key-value pair, will the backtest system continue to send funding rate requests, and only when the strategy holds a position in that perpetual contract or calls ```GetFundings()```. If ```swap``` is declared but no funding rate data can be obtained, the backtest fails with ```symbol ... not found```.
-After the backtest system receives the funding rate data, it will continue to send price index data requests.
-For funding rate data only the ```open``` column is read as the rate, truncated to the ```priceTick``` in the funding data's ```detail```, so that ```priceTick``` must be small enough (e.g. ```0.00000001```).
+- The backtest system requests funding rate data only if the ```detail``` of the market data contains ```"contractType": "swap"```, and only when the strategy holds a position in that perpetual contract or calls ```GetFundings()```. If ```swap``` is declared but no funding rate data can be obtained, the backtest fails with ```symbol ... not found```.
+- Only after receiving funding rate data does the backtest system request price index data.
+- For funding rate data only the ```open``` column is read as the rate, truncated to the ```priceTick``` in the funding data's ```detail```, so that ```priceTick``` must be small enough (e.g. ```0.00000001```).
+- Funding rate records are 8 hours apart and, like K-line data, are integers scaled by precision; they can be negative. In the example below ```quotePrecision``` is 8, so ```-16795``` means a funding rate of -0.00016795.
 
-Funding rate data structure is as follows:
+Funding rate data (the requested ```symbol``` looks like ```BTC_USDT.funding```):
+
 ```json
 {
     "detail": {
@@ -3293,46 +3325,22 @@ Funding rate data structure is as follows:
         "volumeTick": 1e-8,
         "marginLevel": 10
     },
-    "schema": [
-        "time",
-        "open",
-        "high",
-        "low",
-        "close",
-        "vol"
-    ],
+    "schema": ["time", "open", "high", "low", "close", "vol"],
     "data": [
-        [
-            1584921600000,
-            -16795,
-            -16795,
-            -16795,
-            -16795,
-            0
-        ],
-        [
-            1584950400000,
-            -16294,
-            -16294,
-            -16294,
-            -16294,
-            0
-        ]
+        [1584921600000, -16795, -16795, -16795, -16795, 0],
+        [1584950400000, -16294, -16294, -16294, -16294, 0]
     ]
 }
 ```
 
-- Adjacent period interval is 8 hours
-- Why is the funding rate -16795?
-  Like K-line data it is an integer scaled by precision: ```quotePrecision``` of this data is 8, so -16795 means a funding rate of -0.00016795. Funding rates can be negative.
-
-Example of funding rate data request sent by the backtest system:
+Example of a funding rate request sent by the backtest system:
 
 ```url
 http://customserver:9090/data?custom=0&depth=20&detail=true&eid=Futures_Binance&from=1351641600&period=86400000&round=true&symbol=BTC_USDT.funding&to=1611244800&trades=0
 ```
 
-Price index data structure is as follows:
+Price index data (the requested ```symbol``` looks like ```BTC_USDT.index```):
+
 ```json
 {
     "detail": {
@@ -3354,14 +3362,7 @@ Price index data structure is as follows:
         "marginLevel": 10,
         "volumeMultiple": 1
     },
-    "schema": [
-        "time",
-        "open",
-        "high",
-        "low",
-        "close",
-        "vol"
-    ],
+    "schema": ["time", "open", "high", "low", "close", "vol"],
     "data": [
         [1584921600000, 58172, 59167, 56902, 58962, 0],
         [1584922500000, 58975, 59428, 58581, 59154, 0]
@@ -3369,16 +3370,22 @@ Price index data structure is as follows:
 }
 ```
 
-Example of price index data request sent by the backtest system:
+Example of a price index request sent by the backtest system:
+
 ```url
 http://customserver:9090/data?custom=0&depth=20&detail=true&eid=Futures_Binance&from=1351641600&period=86400000&round=true&symbol=BTC_USDT.index&to=1611244800&trades=0
 ```
 
 #### Custom Data Source Example
 
-Deploy the service below on a server reachable from the public internet; the data source URL is then ```http://<server>:9090/data``` (replace ```<server>``` with the server's public IP or domain name). The custom data source service is written in ```Golang```:
+A minimal custom data source service written in Go, and a test strategy to check it. Steps:
 
-```golang
+1. Deploy the service below on a server reachable from the public internet; the data source URL is then ```http://<server>:9090/data``` (replace ```<server>``` with the server's public IP or domain name).
+2. In the backtest configuration, set the exchange's data source (```feeder```) to that URL and backtest the test strategy below.
+
+The service:
+
+```go
 package main
 
 import (
@@ -3390,8 +3397,10 @@ import (
 func Handle (w http.ResponseWriter, r *http.Request) {
     // e.g. set on backtest DataSource: http://xxx.xx.x.xx:9090/data
 
-    // request: GET http://xxx.xx.x.xx:9090/data?custom=0&depth=20&detail=true&eid=OKX&from=1584921600&period=86400000&round=true&symbol=BTC_USDT&to=1611244800&trades=1
-    //              http://xxx.xx.x.xx:9090/data?custom=0&depth=20&detail=true&eid=Futures_Binance&from=1599958800&period=3600000&round=true&symbol=BTC_USDT.swap&to=1611244800&trades=0
+    // request: GET http://xxx.xx.x.xx:9090/data?custom=0&depth=20&detail=true&eid=OKX
+    //     &from=1584921600&period=86400000&round=true&symbol=BTC_USDT&to=1611244800&trades=1
+    // request: GET http://xxx.xx.x.xx:9090/data?custom=0&depth=20&detail=true&eid=Futures_Binance
+    //     &from=1599958800&period=3600000&round=true&symbol=BTC_USDT.swap&to=1611244800&trades=0
     fmt.Println("request:", r)
 
     // response
@@ -3460,8 +3469,10 @@ func Handle (w http.ResponseWriter, r *http.Request) {
             },
             "schema": []string{"time","open","high","low","close","vol"},
             "data": []interface{}{
-                []int64{1610755200000, 3673743, 3795000, 3535780, 3599498, 8634843151},  // 1610755200000 : 2021-01-16 08:00:00
-                []int64{1610841600000, 3599498, 3685250, 3385000, 3582861, 8015772738},  // 1610841600000 : 2021-01-17 08:00:00
+                // 1610755200000: 2021-01-16 08:00:00
+                []int64{1610755200000, 3673743, 3795000, 3535780, 3599498, 8634843151},
+                // 1610841600000: 2021-01-17 08:00:00
+                []int64{1610841600000, 3599498, 3685250, 3385000, 3582861, 8015772738},
                 []int64{1610928000000, 3582499, 3746983, 3480000, 3663127, 7069811875},
                 []int64{1611014400000, 3662246, 3785000, 3584406, 3589149, 7961130777},
                 []int64{1611100800000, 3590194, 3641531, 3340000, 3546823, 8936842292},
@@ -3495,8 +3506,16 @@ func Handle (w http.ResponseWriter, r *http.Request) {
             },
             "schema": []string{"time", "asks", "bids", "trades", "close", "vol"},
             "data": []interface{}{
-                []interface{}{1610755200000, []interface{}{[]int64{9531300, 10}}, []interface{}{[]int64{9531300, 10}}, []interface{}{[]int64{1610755200000, 0, 9531300, 10}}, 9497060, 787},
-                []interface{}{1610841600000, []interface{}{[]int64{9531300, 15}}, []interface{}{[]int64{9531300, 15}}, []interface{}{[]int64{1610841600000, 0, 9531300, 11}}, 9497061, 789},
+                []interface{}{1610755200000,
+                    []interface{}{[]int64{9531300, 10}},
+                    []interface{}{[]int64{9531300, 10}},
+                    []interface{}{[]int64{1610755200000, 0, 9531300, 10}},
+                    9497060, 787},
+                []interface{}{1610841600000,
+                    []interface{}{[]int64{9531300, 15}},
+                    []interface{}{[]int64{9531300, 15}},
+                    []interface{}{[]int64{1610841600000, 0, 9531300, 11}},
+                    9497061, 789},
             },
         }
         */
@@ -3513,8 +3532,9 @@ func main () {
 }
 ```
 
-Test strategy, ```JavaScript``` example:
-```js
+Test strategy (```JavaScript```):
+
+```javascript
 /*backtest
 start: 2021-01-16 08:00:00
 end: 2021-01-22 00:00:00
@@ -3535,12 +3555,12 @@ function main() {
 
 ### Local Backtesting Engine
 
-The platform publishes local backtest engines for JavaScript and Python. They use the same engine core and the same history data (downloaded from the platform's data server) as cloud backtests, and backtest JavaScript and Python strategies quickly on your own computer:
+The platform publishes local backtest engines for JavaScript and Python. They use the same engine core and the same history data (downloaded from the platform's data server) as cloud backtests, and backtest JavaScript and Python strategies quickly on your own computer. Source code:
 
 - [Python backtest engine](https://github.com/fmzquant/backtest_python)
 - [JavaScript backtest engine](https://github.com/fmzquant/backtest_javascript)
 
-**Python**
+#### Python
 
 Install (requires Python 3 and pip):
 
@@ -3549,7 +3569,7 @@ pip install https://github.com/fmzquant/backtest_python/archive/master.zip
 pip install pandas matplotlib   # only needed for Join(True) and Show()
 ```
 
-On first use the package downloads the engine file for your system from the data server; afterwards only history data is downloaded. A strategy file is an ordinary FMZ strategy plus the ```backtest``` configuration comment at the top (format: see Backtesting System → Backtest Configuration and Saving; the local engines read only some of its keys, see "Differences from cloud backtests" below) and a few lines that drive the engine:
+On first use the package downloads the engine file for your system from the data server; afterwards only history data is downloaded. A strategy file is an ordinary FMZ strategy plus the ```backtest``` configuration comment at the top (format: see `Backtest Configuration and Saving`; the local engines read only some of its keys, see "Differences from cloud backtests" below) and a few lines that drive the engine:
 
 ```python
 '''backtest
@@ -3561,14 +3581,16 @@ exchanges: [{"eid":"Binance","currency":"BTC_USDT","balance":10000,"stocks":0}]
 '''
 import json
 from fmz import *
-task = VCtx(__doc__)  # Initialize the engine from the configuration above; exchange, Log, TA etc. become globals
+# initialize the engine from the configuration above; exchange, Log, TA etc. become globals
+task = VCtx(__doc__)
 
 # The strategy under test, copied from the platform as is
 def main():
     Log(exchange.GetAccount())
     while True:
         r = exchange.GetRecords()
-        LogStatus(_D(), r[-1]["Close"])
+        if r:
+            LogStatus(_D(), r[-1]["Close"])
         Sleep(60 * 60 * 1000)
 
 try:
@@ -3582,13 +3604,13 @@ print(result["LogsCount"], result["Elapsed"] / 1e6)
 
 Run it with ```python strategy.py```. ```task.Join(False)``` returns the raw result as JSON, ```task.Join(True)``` returns a pandas DataFrame of the first exchange account's profit and loss (PnL) and utilization at each snapshot, and ```task.Show()``` plots equity, profit and loss and utilization from the account snapshots; neither depends on ```LogProfit()```.
 
-**JavaScript**
+#### JavaScript
 
 ```bash
 npm install git+https://github.com/fmzquant/backtest_javascript.git
 ```
 
-```js
+```javascript
 var fmz = require("fmz")
 var task = fmz.VCtx({
     start: "2026-09-01 00:00:00", end: "2026-09-15 00:00:00", period: "1h", basePeriod: "15m",
@@ -3600,7 +3622,9 @@ function main() {
     Log(exchange.GetAccount())
     while (true) {
         var r = exchange.GetRecords()
-        LogStatus(_D(), r[r.length - 1].Close)
+        if (r) {
+            LogStatus(_D(), r[r.length - 1].Close)
+        }
         Sleep(60 * 60 * 1000)
     }
 }
@@ -3614,29 +3638,30 @@ var result = JSON.parse(task.Join())    // Same result as Join(False) of the Pyt
 console.log(result.LogsCount)
 ```
 
-**Differences from cloud backtests**
+#### Differences from cloud backtests
 
 - Only JavaScript and Python strategies are supported and templates are not loaded automatically: paste the code of referenced templates into the file. PINE and MyLanguage strategies depend on trading libraries and therefore cannot be backtested locally.
 - Strategy parameters are not injected; define them as global variables in the code.
 - ```start``` and ```end``` in the comment are parsed in the machine's time zone; network delay is fixed at 200 ms; slippage and real-tick mode are not supported.
 - Only ```start```, ```end```, ```period```, ```basePeriod``` and ```exchanges``` (with its ```eid```, ```currency```, ```balance```, ```stocks```, ```fee```, ```feeMin```) are read from the comment; ```mode```, ```args```, ```depthDeep```, ```tradesMode```, ```feeder``` and the like are ignored. Without ```basePeriod``` it is derived from ```period``` (1d→1h, 1h→30m, 30m→15m, 15m→5m, 5m→1m); without ```stocks``` the default is 3; without ```fee``` the engine's built-in fee table is used. It is best to write them all out.
 
-**Backtesting with an AI assistant**
+#### Backtesting with an AI assistant
 
-An AI assistant can run backtests for you: it starts a cloud backtest with the MCP tool ```run_backtest``` and reads profit, drawdown, error logs and other results with ```get_backtest```, see Extended API Interface → AI Integration. It can also install the local engine on your machine for a fast edit-and-run loop, then confirm once with a cloud backtest.
+An AI assistant can run backtests for you: it starts a cloud backtest with the MCP tool ```run_backtest``` and reads profit, drawdown, error logs and other results with ```get_backtest```, see `AI Integration`. It can also install the local engine on your machine for a fast edit-and-run loop, then confirm once with a cloud backtest.
 
 ### Backtest Page Shortcuts
 
-- Shortcut for switching between strategy editor and backtest page
-  Use ```Ctrl + ,``` to switch between backtest page and strategy editor page. Hold ```Ctrl``` and press ```,```.
-- Shortcut for saving strategy
-  Use ```Ctrl + s``` to save strategy.
-- Shortcut for starting backtest
-  Use ```Ctrl + b``` to start backtest.
+On the strategy editing page and the backtest page, the shortcuts below switch pages, save the strategy and start a backtest.
+
+| Shortcut | Action |
+| - | - |
+| ```Ctrl + ,``` | Switch between the strategy editing page and the backtest page (hold ```Ctrl``` and press ```,```) |
+| ```Ctrl + s``` | Save the strategy |
+| ```Ctrl + b``` | Start a backtest |
 
 ## Advanced Topics
 
-Advanced usage: JavaScript multi-threading, communication between live tradings, API rate limiting, options trading and on-chain trading with Web3.
+Advanced usage: JavaScript multi-threading, communication between robots, API rate limiting, options trading and on-chain trading with Web3.
 
 ### JavaScript Multi-threading
 
@@ -3668,10 +3693,12 @@ The function passed to ```threading.Thread()``` runs in a separate JavaScript en
 
 | Method | Usage | Notes |
 | - | - | - |
-| Messages | ```t.postMessage(msg)``` sends to thread ```t```; inside a thread, ```threading.currentThread().peekMessage(timeout)``` reads the messages it received; a child thread sends back to the main thread with ```threading.mainThread().postMessage(msg)``` | Each thread has its own inbox, read in order. ```peekMessage(-1)``` does not block and returns an empty value when there is no message |
+| Messages | Send with ```postMessage(msg)```, read with ```peekMessage(timeout)```; see below the table | Each thread has its own inbox, read in order |
 | Shared dictionary | ```var d = threading.Dict()```, pass it to threads as an argument, then each thread uses ```d.get(key)``` and ```d.set(key, value)``` | Good for holding the "latest state", such as the latest price or a running flag |
 | Thread data | ```t.setData(key, value)```, ```t.getData(key)``` | Key-value pairs attached to a thread object; invalid after the thread ends (```join()```, ```terminate()```) |
 | Synchronization objects | ```threading.Lock()```, ```threading.Event()```, ```threading.Condition()``` | Passed to threads as arguments for mutual exclusion and waiting for notifications |
+
+Sending and receiving messages: ```t.postMessage(msg)``` sends to thread ```t```; inside a thread, ```threading.currentThread().peekMessage(timeout)``` reads the messages it received, and ```peekMessage(-1)``` does not block and returns a null value when there is no message; a child thread sends back to the main thread with ```threading.mainThread().postMessage(msg)```.
 
 A message received by a thread also raises an event, so the thread object's `eventLoop` can wait for messages and other events in one place.
 
@@ -3688,11 +3715,7 @@ A message received by a thread also raises an event, so the thread object's `eve
 
 The old global function ```__Serve()``` still works but only returns the listening address string; use ```threading.Serve()``` in new code.
 
-#### Examples
-
-##### Several threads compute in parallel, the main thread collects the results
-
-Each thread fetches the K-lines of one symbol and computes a moving average; the result goes back to the main thread as the return value. Note that the symbol is passed as an argument and the thread function references no outer variables.
+Several threads compute in parallel and the main thread collects the results; the symbol is passed as an argument, so the thread function references no outer variables.
 
 ```javascript
 function main() {
@@ -3706,7 +3729,8 @@ function main() {
                 return null
             }
             var ma = TA.MA(records, 20)
-            return {symbol: symbol, close: records[records.length - 1].Close, ma20: ma[ma.length - 1]}
+            var close = records[records.length - 1].Close
+            return {symbol: symbol, close: close, ma20: ma[ma.length - 1]}
         }, symbols[i], PERIOD_H1))
     }
     for (var i = 0; i < threads.length; i++) {
@@ -3718,9 +3742,7 @@ function main() {
 }
 ```
 
-##### A background thread collects prices, the main thread reads them and sends commands
-
-The background thread writes the latest price into a shared dictionary and reports errors to the main thread through messages; the main thread tells it to exit with a message.
+A background thread writes the latest price into a shared dictionary and reports errors by message; the main thread tells it to exit with a message.
 
 ```javascript
 function main() {
@@ -3757,9 +3779,7 @@ function main() {
 }
 ```
 
-##### A status endpoint with threading.Serve
-
-The main thread writes the state into a shared dictionary; the HTTP handler gets the same dictionary as an argument and returns it as JSON.
+A status endpoint with ```threading.Serve```: the HTTP handler gets the shared dictionary as an argument and returns it as JSON.
 
 ```javascript
 function main() {
@@ -3789,7 +3809,7 @@ See also: `Threads`, `Thread`, `Dict`, `Serve`, `exchange.Go`, `EventLoop`
 
 ### Communication Between Live Trading Strategies
 
-Every live trading has a channel whose ID is the live trading ID. A live trading publishes data on its own channel with ```SetChannelData()```, and other live tradings read it with ```GetChannelData(liveTradingId)```. The data is relayed by the platform server, so it can travel across dockers and servers.
+Every live trading has a channel whose ID is the robot ID. A robot publishes data on its own channel with ```SetChannelData()```, and other robots read it with ```GetChannelData(liveTradingId)```. The data is relayed by the platform server, so it can travel across dockers and servers.
 
 A channel holds the **latest state**, not a message queue: each publish overwrites the previous data, and a subscriber always reads the current latest copy. If history is needed, the subscriber keeps it itself.
 
@@ -3801,21 +3821,19 @@ Typical uses:
 
 #### Key points
 
-- **The first read subscribes**: the first ```GetChannelData()``` call for a channel subscribes to it and returns an empty value (```null```/```None```). From then on the server pushes the channel's updates to this live trading, and later calls return the latest data. A subscriber should start reading at startup and handle empty values.
-- **Subscription limit**: a live trading can subscribe to at most 10 different channels (UUID channels below included). Beyond that, the call returns an empty value (```null```/```None```) and logs the error ```channel subscriber exceed limit```; the strategy keeps running.
+- **The first read subscribes**: the first ```GetChannelData()``` call for a channel subscribes to it and returns a null value (```null```/```None```). From then on the server pushes the channel's updates to this robot, and later calls return the latest data. A subscriber should start reading at startup and handle null values.
+- **Subscription limit**: a robot can subscribe to at most 10 different channels (UUID channels below included). Beyond that, the call returns a null value (```null```/```None```) and logs the error ```channel subscriber exceed limit```; the strategy keeps running.
 - **Data format**: in JavaScript and Python, ```SetChannelData()``` accepts any JSON-serializable data and the subscriber reads the parsed object. Unchanged data is not sent again. For the data size limit see `SetChannelData`.
-- **Rust**: ```SetChannelData(string)``` only accepts a string, so build the JSON text yourself; ```GetChannelData()``` takes no argument and reads this live trading's own channel; to read another live trading's or a UUID channel use ```GetChannelDataOf(channel ID)```, which returns a ```JsonValue``` (```Null``` on the first call, the parsed value when the data is JSON, otherwise a string).
-- **Cross-platform push**: an external system (a TradingView alert, your own program, etc.) can push data to a given live trading on a channel identified by a 32-character UUID through the extended API's ```method=pub```; the live trading reads it with ```GetChannelData(UUID)```. For the request format and delivery rules see Extended API Interface → Extended API Interface Details → pub, and `GetChannelData`.
-- **Live trading feature**: channels are meant for communication between live tradings; do not rely on them in backtests. The current live trading ID is available from ```_G()```.
+- **Rust**: ```SetChannelData(string)``` only accepts a string, so build the JSON text yourself; ```GetChannelData()``` takes no argument and reads this robot's own channel; to read another robot's or a UUID channel use ```GetChannelDataOf(channel ID)```, which returns a ```JsonValue``` (```Null``` on the first call, the parsed value when the data is JSON, otherwise a string).
+- **Cross-platform push**: an external system (a TradingView alert, your own program, etc.) can push data to a given live trading on a channel identified by a 32-character UUID through the extended API's ```method=pub```; the live trading reads it with ```GetChannelData(UUID)```. For the request format and delivery rules see `pub`, and `GetChannelData`.
+- **Live trading feature**: channels are meant for communication between robots; do not rely on them in backtests. The current robot ID is available from ```_G()```.
 - Do not pass keys or other sensitive information through channels.
 
-#### Basic usage
-
-##### Publisher: publish a market summary
+Publisher: publish a market summary.
 
 ```javascript
 function main() {
-    var robotId = _G()  // current live trading ID, which is also this live trading's channel ID
+    var robotId = _G()  // current robot ID, which is also this robot's channel ID
     var updateId = 0
 
     while (true) {
@@ -3840,7 +3858,7 @@ function main() {
 import time
 
 def main():
-    robotId = _G()  # current live trading ID, which is also this live trading's channel ID
+    robotId = _G()  # current robot ID, which is also this robot's channel ID
     updateId = 0
 
     while True:
@@ -3861,7 +3879,7 @@ def main():
 
 ```rust
 fn main() {
-    let robotId = _G!();  // current live trading ID, which is also this live trading's channel ID
+    let robotId = _G!();  // current robot ID, which is also this robot's channel ID
     let mut updateId = 0;
 
     loop {
@@ -3869,7 +3887,8 @@ fn main() {
             updateId += 1;
             // Rust's SetChannelData only accepts a string; build the JSON text yourself
             let state = format!(
-                r#"{{"robotId": "{}", "updateId": {}, "timestamp": {}, "symbol": "BTC_USDT", "lastPrice": {}}}"#,
+                r#"{{"robotId": "{}", "updateId": {}, "timestamp": {},
+                    "symbol": "BTC_USDT", "lastPrice": {}}}"#,
                 robotId, updateId, Unix() * 1000, ticker.Last
             );
             SetChannelData(&state);
@@ -3880,11 +3899,11 @@ fn main() {
 }
 ```
 
-##### Subscriber: read two channels
+Subscriber: read two channels.
 
 ```javascript
 function main() {
-    // live trading IDs to subscribe to (change as needed)
+    // robot IDs to subscribe to (change as needed)
     var channels = ["632799", "632800"]
 
     while (true) {
@@ -3893,7 +3912,8 @@ function main() {
             // the first call subscribes and returns null; later calls return the latest data
             var state = GetChannelData(channels[i])
             if (state) {
-                msg += "channel " + channels[i] + ": #" + state.updateId + " " + _D(state.timestamp) + " last " + state.lastPrice + "\n"
+                msg += "channel " + channels[i] + ": #" + state.updateId + " " +
+                    _D(state.timestamp) + " last " + state.lastPrice + "\n"
             } else {
                 msg += "channel " + channels[i] + ": waiting for data\n"
             }
@@ -3906,7 +3926,7 @@ function main() {
 
 ```python
 def main():
-    # live trading IDs to subscribe to (change as needed)
+    # robot IDs to subscribe to (change as needed)
     channels = ["632799", "632800"]
 
     while True:
@@ -3915,7 +3935,8 @@ def main():
             # the first call subscribes and returns None; later calls return the latest data
             state = GetChannelData(ch)
             if state:
-                msg += "channel {}: #{} {} last {}\n".format(ch, state["updateId"], _D(state["timestamp"]), state["lastPrice"])
+                msg += "channel {}: #{} {} last {}\n".format(
+                    ch, state["updateId"], _D(state["timestamp"]), state["lastPrice"])
             else:
                 msg += "channel {}: waiting for data\n".format(ch)
         LogStatus(msg)
@@ -3924,7 +3945,7 @@ def main():
 
 ```rust
 fn main() {
-    // IDs of the live tradings to subscribe to (change as needed)
+    // IDs of the robots to subscribe to (change as needed)
     let channels = ["632799", "632800"];
 
     loop {
@@ -3947,11 +3968,7 @@ fn main() {
 }
 ```
 
-#### Scenario: master/follower strategies
-
-The master strategy computes a moving-average crossover signal and publishes it; the follower reads the signal and places an order when it changes.
-
-**Master strategy (publishes signals)**
+Scenario 1, master/follower strategies: the master computes a moving-average crossover signal and publishes it.
 
 ```javascript
 function main() {
@@ -4033,11 +4050,11 @@ fn main() {
 }
 ```
 
-**Follower strategy (reads and executes signals)**
+Scenario 1, master/follower strategies: the follower reads the signal and places an order when it changes.
 
 ```javascript
 function main() {
-    var masterId = "632799"  // live trading ID of the master strategy
+    var masterId = "632799"  // robot ID of the master strategy
     var lastSignal = null
 
     while (true) {
@@ -4064,7 +4081,7 @@ function main() {
 
 ```python
 def main():
-    masterId = "632799"  # live trading ID of the master strategy
+    masterId = "632799"  # robot ID of the master strategy
     lastSignal = None
 
     while True:
@@ -4086,7 +4103,7 @@ def main():
 
 ```rust
 fn main() {
-    let masterId = "632799";  // live trading ID of the master strategy
+    let masterId = "632799";  // robot ID of the master strategy
     let mut lastSignal = String::new();
 
     loop {
@@ -4097,7 +4114,8 @@ fn main() {
             let signal = data["signal"].as_str().unwrap_or("").to_string();
             let symbol = data["symbol"].as_str().unwrap_or("BTC_USDT");
             if signal != lastSignal {
-                Log!("New signal:", signal.as_str(), "signal price:", data["price"].as_f64().unwrap_or(0.0));
+                let price = data["price"].as_f64().unwrap_or(0.0);
+                Log!("New signal:", signal.as_str(), "signal price:", price);
                 if let Ok(ticker) = exchange.GetTicker(symbol) {
                     if signal == "BUY" {
                         let _ = exchange.CreateOrder(symbol, "buy", ticker.Last, 0.01);
@@ -4107,28 +4125,31 @@ fn main() {
                 }
                 lastSignal = signal.clone();
             }
-            LogStatus!("Current signal:", signal.as_str(), "signal time:", _D(data["timestamp"].as_i64().unwrap_or(0)));
+            let ts = data["timestamp"].as_i64().unwrap_or(0);
+            LogStatus!("Current signal:", signal.as_str(), "signal time:", _D(ts));
         }
         Sleep(5000);
     }
 }
 ```
 
-#### Scenario: monitoring several strategies
-
-Each strategy publishes its status as the publisher above does; the monitoring live trading reads every channel, shows them in a table and marks those without an update for over 2 minutes as abnormal.
+Scenario 2, monitoring several strategies: each strategy publishes its status like the publisher; the monitoring robot reads every channel, shows them in a table and marks those without an update for over 2 minutes as abnormal.
 
 ```javascript
 function main() {
     var monitorList = ["632799", "632800", "632801"]  // at most 10
 
     while (true) {
-        var table = {type: "table", title: "Strategy status", cols: ["Live trading ID", "Status", "Last update", "Symbol", "Last price"], rows: []}
+        var table = {
+            type: "table", title: "Strategy status",
+            cols: ["Robot ID", "Status", "Last update", "Symbol", "Last price"], rows: []
+        }
         for (var i = 0; i < monitorList.length; i++) {
             var data = GetChannelData(monitorList[i])
             if (data) {
                 var status = Date.now() - data.timestamp < 120000 ? "running" : "abnormal"
-                table.rows.push([monitorList[i], status, _D(data.timestamp), data.symbol || "-", data.lastPrice || "-"])
+                table.rows.push([monitorList[i], status, _D(data.timestamp),
+                                 data.symbol || "-", data.lastPrice || "-"])
             } else {
                 table.rows.push([monitorList[i], "waiting for data", "-", "-", "-"])
             }
@@ -4147,12 +4168,17 @@ def main():
     monitorList = ["632799", "632800", "632801"]  # at most 10
 
     while True:
-        table = {"type": "table", "title": "Strategy status", "cols": ["Live trading ID", "Status", "Last update", "Symbol", "Last price"], "rows": []}
+        table = {
+            "type": "table", "title": "Strategy status",
+            "cols": ["Robot ID", "Status", "Last update", "Symbol", "Last price"], "rows": []
+        }
         for robotId in monitorList:
             data = GetChannelData(robotId)
             if data:
-                status = "running" if time.time() * 1000 - data["timestamp"] < 120000 else "abnormal"
-                table["rows"].append([robotId, status, _D(data["timestamp"]), data.get("symbol", "-"), data.get("lastPrice", "-")])
+                fresh = time.time() * 1000 - data["timestamp"] < 120000
+                status = "running" if fresh else "abnormal"
+                table["rows"].append([robotId, status, _D(data["timestamp"]),
+                                      data.get("symbol", "-"), data.get("lastPrice", "-")])
             else:
                 table["rows"].append([robotId, "waiting for data", "-", "-", "-"])
         LogStatus("`" + json.dumps(table) + "`")
@@ -4170,7 +4196,8 @@ fn main() {
             if !data.is_null() {
                 let ts = data["timestamp"].as_i64().unwrap_or(0);
                 let status = if Unix() * 1000 - ts < 120000 { "Running" } else { "Stale" };
-                let price = data["lastPrice"].as_f64().map(|p| p.to_string()).unwrap_or("-".to_string());
+                let price = data["lastPrice"].as_f64()
+                    .map(|p| p.to_string()).unwrap_or("-".to_string());
                 rows.push(format!(r#"["{}", "{}", "{}", "{}", "{}"]"#, robotId, status, _D(ts),
                     data["symbol"].as_str().unwrap_or("-"), price));
             } else {
@@ -4178,7 +4205,9 @@ fn main() {
             }
         }
         let table = format!(
-            r#"{{"type": "table", "title": "Strategy status", "cols": ["Live ID", "Status", "Last update", "Symbol", "Last price"], "rows": [{}]}}"#,
+            r#"{{"type": "table", "title": "Strategy status",
+                "cols": ["Robot ID", "Status", "Last update", "Symbol", "Last price"],
+                "rows": [{}]}}"#,
             rows.join(", "));
         LogStatus!(format!("`{}`", table));
         Sleep(10000);
@@ -4192,7 +4221,7 @@ See also: `SetChannelData`, `GetChannelData`, `_G`
 
 Exchanges limit how often their API may be called. Going over the limit gets requests rejected at best and the account temporarily banned at worst. With ```exchange.IO("rate", ...)``` or ```exchange.IO("quota", ...)``` you can cap the call frequency of standard functions locally on the docker: a call that exceeds the limit is never sent.
 
-```js
+```javascript
 exchange.IO("rate" | "quota", name, count, window[, "delay"])
 ```
 
@@ -4215,7 +4244,8 @@ For the parameter syntax (several function names separated by commas, the ```"*"
 | Account | ```GetAccount```, ```GetAssets```, ```GetPositions```, ```SetMarginLevel``` |
 | Trading | ```CreateOrder``` (```Buy``` and ```Sell``` count here too), ```CancelOrder```, ```ModifyOrder``` |
 | Order queries | ```GetOrder```, ```GetOrders```, ```GetHistoryOrders``` |
-| Conditional orders | ```CreateConditionOrder```, ```ModifyConditionOrder```, ```CancelConditionOrder```, ```GetConditionOrder```, ```GetConditionOrders```, ```GetHistoryConditionOrders``` |
+| Conditional orders | ```CreateConditionOrder```, ```ModifyConditionOrder```, ```CancelConditionOrder``` |
+| Conditional order queries | ```GetConditionOrder```, ```GetConditionOrders```, ```GetHistoryConditionOrders``` |
 | Custom requests | ```IO/api```: limits only ```exchange.IO("api", ...)```, other ```exchange.IO()``` commands are unaffected |
 
 - ```GetAccount``` and ```GetAssets``` are the same underlying request; a rule under either name applies to both functions.
@@ -4232,7 +4262,7 @@ For the parameter syntax (several function names separated by commas, the ```"*"
 
 With the default action, a call over the limit sends no request and is treated as a failed call (JavaScript returns ```null```, Python returns ```None```, Rust returns ```Err```). The error message looks like:
 
-```
+```text
 rate limit exceeded: GetTicker 10/1s
 quota limit exceeded: GetTicker 10/1m
 quota limit exceeded: GetRecords 2000/day (resets at 0800)
@@ -4240,9 +4270,7 @@ quota limit exceeded: GetRecords 2000/day (resets at 0800)
 
 With the ```"delay"``` action the call blocks until a call is available, so the time recorded in the log is the time after the wait. With a rule that resets daily, ```"delay"``` may wait until the next day; use it with care.
 
-#### Examples
-
-##### Default action: calls over the limit fail
+Default action: calls over the limit fail.
 
 ```javascript
 function main() {
@@ -4290,17 +4318,15 @@ fn main() {
 }
 ```
 
-##### Rules grouped after the exchange's own limits
-
-Market data and trading each share one rule; trading calls wait instead of failing when over the limit; every other function without a rule of its own falls back to ```"*"```.
+Rules grouped after the exchange's own limits: market data and trading each share one rule, trading calls wait instead of failing, and every other function falls back to ```"*"```.
 
 ```javascript
 function main() {
-    // market data: GetTicker and GetDepth together at most 20 calls per second on average
+    // market data: GetTicker and GetDepth together 20 calls/s on average
     exchange.IO("rate", "GetTicker,GetDepth", 20, "1s")
-    // trading: placing orders (Buy/Sell included) and cancelling together 5 per second, wait when over the limit
+    // trading: orders (incl. Buy/Sell) and cancels together 5/s; wait when over
     exchange.IO("rate", "CreateOrder,CancelOrder", 5, "1s", "delay")
-    // fallback: other functions (such as GetAccount, GetPositions) together 60 per minute, window aligned to whole minutes
+    // fallback: other functions (GetAccount, GetPositions...) 60/min, aligned to minutes
     exchange.IO("quota", "*", 60, "1m")
 
     while (true) {
@@ -4316,11 +4342,11 @@ function main() {
 
 ```python
 def main():
-    # market data: GetTicker and GetDepth together at most 20 calls per second on average
+    # market data: GetTicker and GetDepth together 20 calls/s on average
     exchange.IO("rate", "GetTicker,GetDepth", 20, "1s")
-    # trading: placing orders (Buy/Sell included) and cancelling together 5 per second, wait when over the limit
+    # trading: orders (incl. Buy/Sell) and cancels together 5/s; wait when over
     exchange.IO("rate", "CreateOrder,CancelOrder", 5, "1s", "delay")
-    # fallback: other functions (such as GetAccount, GetPositions) together 60 per minute, window aligned to whole minutes
+    # fallback: other functions (GetAccount, GetPositions...) 60/min, aligned to minutes
     exchange.IO("quota", "*", 60, "1m")
 
     while True:
@@ -4333,15 +4359,16 @@ def main():
 
 ```rust
 fn main() {
-    // market data: GetTicker and GetDepth together at most 20 calls per second on average
+    // market data: GetTicker and GetDepth together 20 calls/s on average
     let _ = exchange.IO(("rate", "GetTicker,GetDepth", 20, "1s"));
-    // trading: placing orders (Buy/Sell included) and cancelling together 5 per second, wait when over the limit
+    // trading: orders (incl. Buy/Sell) and cancels together 5/s; wait when over
     let _ = exchange.IO(("rate", "CreateOrder,CancelOrder", 5, "1s", "delay"));
-    // fallback: other functions (such as GetAccount, GetPositions) together 60 per minute, window aligned to whole minutes
+    // fallback: other functions (GetAccount, GetPositions...) 60/min, aligned to minutes
     let _ = exchange.IO(("quota", "*", 60, "1m"));
 
     loop {
-        if let (Ok(ticker), Ok(depth)) = (exchange.GetTicker("BTC_USDT"), exchange.GetDepth("BTC_USDT")) {
+        let (t, d) = (exchange.GetTicker("BTC_USDT"), exchange.GetDepth("BTC_USDT"));
+        if let (Ok(ticker), Ok(depth)) = (t, d) {
             Log!("last:", ticker.Last, "best bid:", depth.Bids[0].Price);
         }
         Sleep(1000);
@@ -4349,7 +4376,7 @@ fn main() {
 }
 ```
 
-##### Burst capacity, daily quota and deleting rules
+Burst capacity, daily quota, and deleting rules.
 
 ```javascript
 function main() {
@@ -4428,10 +4455,10 @@ On-chain trading: which exchange object to use.
 
 | Need | Exchange object | Notes |
 | - | - | - |
-| Swap tokens on DEXs of EVM chains | ```Uniswap``` (Uniswap, PancakeSwap, Aerodrome), ```KyberSwap```, ```OneInch``` (1inch) | Trade with the spot trading functions; see Advanced Topics → Web3 → EVM On-chain Swaps (Uniswap, KyberSwap, 1inch) |
-| Swap tokens on Solana | ```Jupiter``` | See Advanced Topics → Web3 → Solana Swaps (Jupiter) |
-| Swap on several chains through the OKX DEX aggregator | ```OKX_DEX``` | Configured with a mnemonic phrase; pairs are written ```{chainIndex}:{token}_USD``` and token names are case-sensitive; see the `OKX_DEX` exchange page |
-| Read on-chain data, call smart contracts, send custom transactions | ```Web3``` | Supports Ethereum and other EVM-compatible chains (see Advanced Topics → Web3 → Ethereum (EVM)) and TRON (see Advanced Topics → Web3 → TRON) |
+| Swap tokens on DEXs of EVM chains | ```Uniswap``` (Uniswap, PancakeSwap, Aerodrome), ```KyberSwap```, ```OneInch``` (1inch) | Trade with the spot trading functions; see `EVM On-chain Swaps (Uniswap, KyberSwap, 1inch)` |
+| Swap tokens on Solana | ```Jupiter``` | See `Solana Swaps (Jupiter)` |
+| Swap on several chains through the OKX DEX aggregator | ```OKX_DEX``` | Mnemonic phrase; pairs are ```{chainIndex}:{token}_USD``` (case-sensitive token names); see `OKX_DEX` |
+| Read on-chain data, call smart contracts, send custom transactions | ```Web3``` | Supports Ethereum and other EVM-compatible chains (see `Ethereum (EVM)`) and TRON (see `TRON`) |
 
 On-chain exchanges such as Hyperliquid, Lighter, EdgeX, Aster and Polymarket are used with the standard trading functions just like centralized exchanges; for their configuration see the exchange pages under `Decentralized Exchanges` and `Prediction Markets` in the syntax manual.
 
@@ -4446,21 +4473,19 @@ The Uniswap exchange object (```exchange.GetName()``` returns ```Uniswap```) con
 | Swap on the pools of a given DEX with control over the route (V2/V3/V4, direct or two-hop) | ```Uniswap```, with DEX set to Uniswap, PancakeSwap or Aerodrome |
 | Let an aggregator find the best price across DEXs, no API key needed | ```KyberSwap``` |
 | Let the 1inch aggregator find the best price (needs a 1inch API key) | ```OneInch``` |
-| Call other contracts, provide liquidity, manage V3 positions, custom transactions | ```Web3```, see Advanced Topics → Web3 → Ethereum (EVM) |
-| Swaps on Solana | ```Jupiter```, see Advanced Topics → Web3 → Solana Swaps (Jupiter) |
+| Call other contracts, provide liquidity, manage V3 positions, custom transactions | ```Web3```, see `Ethereum (EVM)` |
+| Swaps on Solana | ```Jupiter```, see `Solana Swaps (Jupiter)` |
 
 A strategy can add several exchange objects that use the same wallet, for example ```Uniswap``` and ```KyberSwap``` to compare prices and ```Web3``` for other on-chain operations.
 
 ##### Configuring the exchange object
 
-| Field | Description |
-| - | - |
-| DEX | ```Uniswap``` exchange object only: ```Uniswap```, ```PancakeSwap```, ```Aerodrome``` (Base only) |
-| Chain | One exchange object corresponds to one chain; see the table below |
-| Private Key | Wallet private key (hex string). The key can be kept locally on the docker, see Platform Basics → Exchange → Local Credential Files |
-| Rpc Address | Node address for the chain; selecting a Chain fills in the default nodes ("primary,backup"). Separate several nodes with commas; when one fails or lacks data the next one is used |
-| Rpc Api Key | Node authentication, may be empty. Written as ```Name: value``` it is sent as that request header, otherwise as ```Authorization: Basic <value>```. ```OneInch``` has no such field |
-| 1inch Api Key | ```OneInch``` only, required: apply for it on the 1inch developer portal |
+- ```DEX```: ```Uniswap``` exchange object only: ```Uniswap```, ```PancakeSwap```, ```Aerodrome``` (Base only)
+- ```Chain```: One exchange object corresponds to one chain; see the table below
+- ```Private Key```: Wallet private key (hex string). The key can be kept locally on the docker, see `Local Credential Files`
+- ```Rpc Address```: Node address for the chain; selecting a Chain fills in the default nodes (```primary,backup```). Separate several nodes with commas; when one fails or lacks data the next one is used
+- ```Rpc Api Key```: Node authentication, may be empty. Written as ```Name: value``` it is sent as that request header, otherwise as ```Authorization: Basic <value>```. ```OneInch``` has no such field
+- ```1inch Api Key```: ```OneInch``` only, required: apply for it on the 1inch developer portal
 
 DEXs and aggregators by chain:
 
@@ -4518,9 +4543,7 @@ Before placing an order you can quote only with ```exchange.IO("route", ...)``` 
 
 For the detailed behavior of each function and the parameters and return values of the ```exchange.IO()``` commands (```route```, ```simulate```, ```token```, ```transfer```, ```receipt```, ```wrap```, ```unwrap```, ```approve```, ```slippage```, ```deadline```, ```cancelWait```, ```gasMultiplier```, ```contracts```, ```base```, ```sendBase```, ```address```), see the `Uniswap` exchange page of the syntax manual.
 
-##### Example: quote, simulate, then market sell
-
-Using ```ETH_USDC``` on Ethereum; the same code works on the ```KyberSwap``` and ```OneInch``` exchange objects. Note that ```CreateOrder``` sends a real transaction.
+Quote, simulate, then market sell (```ETH_USDC``` on Ethereum; the same code works on ```KyberSwap``` and ```OneInch```). ```CreateOrder``` sends a real transaction.
 
 ```javascript
 function main() {
@@ -4565,16 +4588,14 @@ See also: `Uniswap`, `exchange.CreateOrder`, `exchange.CancelOrder`
 
 #### Solana Swaps (Jupiter)
 
-The Jupiter exchange object (```exchange.GetName()``` returns ```Jupiter```) connects to the Jupiter aggregator on Solana and maps swaps to the spot trading functions. One exchange object corresponds to one Solana wallet: quotes and swap transactions are generated by Jupiter (which splits and routes orders across the many DEXs and market makers on Solana), signed by the docker with the configured private key and broadcast through a Solana node. For swaps on EVM chains see Advanced Topics → Web3 → EVM On-chain Swaps (Uniswap, KyberSwap, 1inch).
+The Jupiter exchange object (```exchange.GetName()``` returns ```Jupiter```) connects to the Jupiter aggregator on Solana and maps swaps to the spot trading functions. One exchange object corresponds to one Solana wallet: quotes and swap transactions are generated by Jupiter (which splits and routes orders across the many DEXs and market makers on Solana), signed by the docker with the configured private key and broadcast through a Solana node. For swaps on EVM chains see `EVM On-chain Swaps (Uniswap, KyberSwap, 1inch)`.
 
 ##### Configuring the exchange object
 
-| Field | Description |
-| - | - |
-| Private Key | Solana wallet private key: the base58 string exported by Phantom or Solflare, or the JSON byte array of a solana-keygen file. The key can be kept locally on the docker, see Platform Basics → Exchange → Local Credential Files |
-| Rpc Address | Solana RPC nodes, separated by commas; when one fails the next one is used. Defaults to the official public node and publicnode |
-| Jupiter Api Key | Optional. Without it the free ```lite-api.jup.ag``` is used; with it ```api.jup.ag``` is used and the request rate can be raised according to your plan |
-| Liquidity Sources | Optional; restricts the liquidity sources swaps go through, comma-separated: ```pump``` (the pump.fun bonding curve and PumpSwap), ```meteora```, ```raydium```, ```orca```, or Jupiter source names (such as ```Meteora DLMM```). Empty means all sources |
+- ```Private Key```: Solana wallet private key: the base58 string exported by Phantom or Solflare, or the JSON byte array of a solana-keygen file. The key can be kept locally on the docker, see `Local Credential Files`
+- ```Rpc Address```: Solana RPC nodes, separated by commas; when one fails the next one is used. Defaults to the official public node and publicnode
+- ```Jupiter Api Key```: Optional. Without it the free ```lite-api.jup.ag``` is used; with it ```api.jup.ag``` is used and the request rate can be raised according to your plan
+- ```Liquidity Sources```: Optional; restricts the liquidity sources swaps go through, comma-separated: ```pump``` (the pump.fun bonding curve and PumpSwap), ```meteora```, ```raydium```, ```orca```, or Jupiter source names (such as ```Meteora DLMM```). Empty means all sources
 
 The wallet needs SOL for fees: each transaction's base fee and priority fee are paid from the SOL balance (the priority fee cap defaults to 0.001 SOL and is changed with ```exchange.IO("priorityFee", ...)```). The first time you buy a token, the wallet has to create an account for it, with a deposit of about 0.002 SOL that still belongs to the wallet.
 
@@ -4602,9 +4623,7 @@ Jupiter limits requests per second and returns 429 beyond the limit. The connect
 
 ```route``` (quote only), ```token``` (register tokens), ```transfer``` (send SOL), ```receipt``` (transaction status), ```slippage```, ```priorityFee```, ```dexes``` (change liquidity sources at run time), ```rps```, plus ```base``` (switch nodes) and ```address``` (wallet address). For their parameters and return values and the detailed behavior of each function, see the `Jupiter` exchange page of the syntax manual.
 
-##### Example: quote, then market sell
-
-Note that ```CreateOrder``` sends a real transaction.
+Quote, then market sell. ```CreateOrder``` sends a real transaction.
 
 ```javascript
 function main() {
@@ -4644,18 +4663,16 @@ See also: `Jupiter`, `exchange.CreateOrder`
 
 With ```ChainType``` set to ```ETH```, the Web3 exchange object connects to nodes of Ethereum and every EVM-compatible chain (BSC, Base, Arbitrum, Optimism, Polygon and so on), and uses the ```exchange.IO()``` commands to query balances, call contracts and send transactions. This page walks through the commands in the order of a typical on-chain operation; for the full parameters of each command see the corresponding ```exchange.IO("command", ...)``` in the `Web3` exchange page of the syntax manual.
 
-If you only want to swap tokens on a DEX, use the ```Uniswap```, ```KyberSwap``` or ```OneInch``` exchange object (see Advanced Topics → Web3 → EVM On-chain Swaps (Uniswap, KyberSwap, 1inch)): it supports standard functions such as ```exchange.GetTicker()``` and ```exchange.CreateOrder()``` directly, with no contract calls to encode yourself.
+If you only want to swap tokens on a DEX, use the ```Uniswap```, ```KyberSwap``` or ```OneInch``` exchange object (see `EVM On-chain Swaps (Uniswap, KyberSwap, 1inch)`): it supports standard functions such as ```exchange.GetTicker()``` and ```exchange.CreateOrder()``` directly, with no contract calls to encode yourself.
 
 ##### 1. Configure the exchange object
 
 Add an exchange on the "Exchange" page (```/m/add-platform```), choose the protocol "Cryptocurrency" and the exchange ```Web3```:
 
-| Field | Description |
-| - | - |
-| ChainType | ```ETH```: Ethereum and all EVM-compatible chains; ```TRON```: TRON, see Advanced Topics → Web3 → TRON |
-| Private Key | Wallet private key (hex string, the ```0x``` prefix is optional). The key can be deployed locally on the docker, see Getting Started → Key Security |
-| Rpc Address | Node address, by default ```https://ethereum-rpc.publicnode.com``` (a public Ethereum mainnet node). For other chains enter a node of that chain, for example BSC: ```https://bsc-dataseed.binance.org```. ```http(s)://``` and ```ws(s)://``` are supported. Several nodes separated by commas back each other up |
-| Rpc Api Key | Node authentication, may be left empty. Written as ```Name: value``` (such as ```x-api-key: xxx```) it is sent as a request header with that name; otherwise it is sent as ```Authorization: Basic <value>``` |
+- ```ChainType```: ```ETH```: Ethereum and all EVM-compatible chains; ```TRON```: TRON, see `TRON`
+- ```Private Key```: Wallet private key (hex string, the ```0x``` prefix is optional). The key can be deployed locally on the docker, see `Key Security`
+- ```Rpc Address```: Node address, by default ```https://ethereum-rpc.publicnode.com``` (a public Ethereum mainnet node). For other chains enter a node of that chain, for example BSC: ```https://bsc-dataseed.binance.org```. ```http(s)://``` and ```ws(s)://``` are supported. Several nodes separated by commas back each other up
+- ```Rpc Api Key```: Node authentication, may be left empty. Written as ```Name: value``` (such as ```x-api-key: xxx```) it is sent as a request header with that name; otherwise it is sent as ```Authorization: Basic <value>```
 
 With several nodes, requests start from the node that last succeeded and move on only when a node is unavailable (connection failure, timeout, rate limiting); errors such as a failed contract execution are returned directly. Nodes whose chain ID differs from the first node's are skipped, so transactions are never sent to another chain.
 
@@ -4667,8 +4684,8 @@ Among the standard functions only ```exchange.GetAccount()``` and ```exchange.Ge
 
 Read-only contract methods (```view```/```pure```) cost no gas and return decoded results directly:
 
-```js
-exchange.IO("api", "eth", "eth_getBalance", wallet, "latest")   // native coin balance, on-chain integer (hex string)
+```javascript
+exchange.IO("api", "eth", "eth_getBalance", wallet, "latest")   // native balance (hex integer)
 exchange.IO("api", tokenAddress, "balanceOf", wallet)           // ERC20 balance, on-chain integer
 exchange.IO("api", tokenAddress, "decimals")                    // token decimals
 ```
@@ -4684,7 +4701,7 @@ Standard ERC20 methods (```balanceOf```, ```decimals```, ```allowance```, ```app
 
 Common contracts can use built-in templates by passing the template name as the third argument: ```"weth"```, ```"uniswapV3Pool"```, ```"uniswapV3Factory"```, ```"uniswapV3QuoterV2"```, ```"uniswapV3SwapRouter02"```, ```"uniswapV3PositionManager"```, ```"permit2"``` (PancakeSwap V3 uses the same templates, aliases such as ```"pancakeV3Pool"``` also work). Addresses of common contracts are available from ```exchange.IO("contracts")```.
 
-```js
+```javascript
 exchange.IO("abi", poolAddress, "uniswapV3Pool")
 var slot0 = exchange.IO("api", poolAddress, "slot0")
 ```
@@ -4697,23 +4714,21 @@ https://api.etherscan.io/v2/api?chainid=1&module=contract&action=getabi&address=
 
 ##### 4. Send transactions
 
-When a write method of a contract is called, the exchange object signs the transaction with the configured private key, broadcasts it and returns the transaction hash. Before sending you can replace ```"api"``` with ```"call"``` and rehearse the same call with ```exchange.IO("call", ...)```: it is simulated on the node without signing or spending gas; on failure it returns an empty value and ```GetLastError()``` holds the reason given by the contract.
+When a write method of a contract is called, the exchange object signs the transaction with the configured private key, broadcasts it and returns the transaction hash. Before sending you can replace ```"api"``` with ```"call"``` and rehearse the same call with ```exchange.IO("call", ...)```: it is simulated on the node without signing or spending gas; on failure it returns a null value and ```GetLastError()``` holds the reason given by the contract.
 
 Taking approve as an example:
 
-```js
-var amount = exchange.IO("toUnits", "100", tokenAddress)                 // 100 tokens as an on-chain integer
+```javascript
+var amount = exchange.IO("toUnits", "100", tokenAddress)   // 100 tokens, on-chain integer
 var txHash = exchange.IO("api", tokenAddress, "approve", spender, amount)
 ```
 
 When the method's ```stateMutability``` is ```payable```, pass one extra argument before the method arguments: the amount of native coin to attach (on-chain integer). The last argument can be an options object:
 
-| Option | Description |
-| - | - |
-| gasLimit | Gas limit. Estimated by the node (```eth_estimateGas```) when omitted. Do not use ```21000``` for contract calls; that is only enough for a plain transfer |
-| gasPrice | Fixed gas price; when given, a legacy transaction is sent. When omitted, chains that support EIP-1559 get an EIP-1559 transaction: the tip is the larger of the node's suggestion and the tips actually paid in recent blocks, and the max fee is ```2 × baseFee + tip``` |
-| nonce | A specific nonce. Allocated automatically when omitted and kept in sync with the on-chain pending count, so consecutive sends never reuse a nonce |
-| dryRun | When ```true```, sign without broadcasting and return fields such as ```hash```, ```raw``` (the signed transaction), ```nonce``` and ```gasLimit```, for checking the transaction or sending it through another channel |
+- ```gasLimit```: Gas limit. Estimated by the node (```eth_estimateGas```) when omitted. Do not use ```21000``` for contract calls; that is only enough for a plain transfer
+- ```gasPrice```: Fixed gas price; when given, a legacy transaction is sent. When omitted, chains that support EIP-1559 get an EIP-1559 transaction: the tip is the larger of the node's suggestion and the tips actually paid in recent blocks, and the max fee is ```2 × baseFee + tip```
+- ```nonce```: A specific nonce. Allocated automatically when omitted and kept in sync with the on-chain pending count, so consecutive sends never reuse a nonce
+- ```dryRun```: When ```true```, sign without broadcasting and return fields such as ```hash```, ```raw``` (the signed transaction), ```nonce``` and ```gasLimit```, for checking the transaction or sending it through another channel
 
 Native coin is sent with ```exchange.IO("api", "eth", "send", toAddress, amount)```, where the amount is an on-chain integer (wei). Its options also accept ```data``` (hex call data) to send a transaction ```{to, data, value}``` returned by an aggregator API as is; gas is then estimated as for a contract call. Note: a plain transfer without ```gasPrice``` bids a fixed 100 Gwei with a gas limit of 21000, usually too high on Ethereum mainnet; query ```eth_gasPrice``` first and pass it in.
 
@@ -4721,7 +4736,7 @@ To send transactions through a private channel (such as Flashbots Protect or MEV
 
 ##### 5. Wait for the transaction to be mined
 
-```exchange.IO("waitReceipt", txHash, {timeout, confirmations})``` waits until the transaction is mined with the required confirmations and returns the receipt: ```status``` is ```1``` for success and ```0``` for failure (with the reason in ```revertReason```), and ```events``` holds the events decoded with the registered ABIs. It returns an empty value on timeout.
+```exchange.IO("waitReceipt", txHash, {timeout, confirmations})``` waits until the transaction is mined with the required confirmations and returns the receipt: ```status``` is ```1``` for success and ```0``` for failure (with the reason in ```revertReason```), and ```events``` holds the events decoded with the registered ABIs. It returns a null value on timeout.
 
 ##### 6. Nonce management, speeding up and cancelling
 
@@ -4737,18 +4752,18 @@ To send transactions through a private channel (such as Flashbots Protect or MEV
 - Hashing: ```exchange.IO("hash", "keccak256", "raw", "hex", text)``` computes keccak256 and other digests, for example method selectors and EIP-712 digests; its parameters are the same as those of the ```Encode()``` function.
 - Complete examples: a swap through an aggregator (quote, build the transaction, rehearse it with ```exchange.IO("call", ...)```, send it with ```data```) is in the examples of ```exchange.IO("call", ...)``` in the syntax manual; an ERC-20 Permit signature verified by the contract is in the examples of ```exchange.IO("sign", ...)``` and ```exchange.IO("signTypedData", ...)```.
 
-##### Example: query balances, approve and wait for the transaction
-
-Uses USDC on Ethereum mainnet. Note that this code sends a real transaction and spends gas.
+Query balances, approve and wait for the transaction (USDC on Ethereum mainnet); this code sends a real transaction and spends gas.
 
 ```javascript
 function main() {
     var usdc = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"     // USDC on Ethereum mainnet
-    var spender = "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45"  // the contract to approve, Uniswap SwapRouter02 here
+    // the contract to approve, Uniswap SwapRouter02 here
+    var spender = "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45"
     var wallet = exchange.IO("address")
 
     // balances: standard ERC20 methods need no ABI registration
-    var eth = exchange.IO("fromUnits", exchange.IO("api", "eth", "eth_getBalance", wallet, "latest"), 18)
+    var wei = exchange.IO("api", "eth", "eth_getBalance", wallet, "latest")
+    var eth = exchange.IO("fromUnits", wei, 18)
     var usdcBalance = exchange.IO("fromUnits", exchange.IO("api", usdc, "balanceOf", wallet), usdc)
     Log("ETH:", eth, "USDC:", usdcBalance)
 
@@ -4782,16 +4797,14 @@ See also: `Web3`, `exchange.IO`
 
 #### TRON
 
-With ```ChainType``` set to ```TRON```, the Web3 exchange object connects to a TRON node. Usage is largely the same as on Ethereum (see Advanced Topics → Web3 → Ethereum (EVM)): the ```exchange.IO()``` commands for registering ABIs, calling contracts, encoding and decoding, signing and switching private keys are the same, addresses use the TRON format (starting with ```T```), and TRX amounts are in sun (1 TRX = 1000000 sun). This page covers the configuration and the TRON-specific parts.
+With ```ChainType``` set to ```TRON```, the Web3 exchange object connects to a TRON node. Usage is largely the same as on Ethereum (see `Ethereum (EVM)`): the ```exchange.IO()``` commands for registering ABIs, calling contracts, encoding and decoding, signing and switching private keys are the same, addresses use the TRON format (starting with ```T```), and TRX amounts are in sun (1 TRX = 1000000 sun). This page covers the configuration and the TRON-specific parts.
 
 ##### Configure the exchange object
 
-| Field | Description |
-| - | - |
-| ChainType | Choose ```TRON``` |
-| Private Key | Wallet private key (hex string). The key can be deployed locally on the docker, see Getting Started → Key Security |
-| Rpc Address | HTTP address of a TRON full node, for example the official node ```https://api.trongrid.io``` (testnets: ```https://nile.trongrid.io```, ```https://api.shasta.trongrid.io```) |
-| Rpc Api Key | TronGrid API key. Enter only the key itself; it is sent as the ```TRON-PRO-API-KEY``` request header. It works without a key, but TronGrid rate-limits keyless requests more strictly |
+- ```ChainType```: Choose ```TRON```
+- ```Private Key```: Wallet private key (hex string). The key can be deployed locally on the docker, see `Key Security`
+- ```Rpc Address```: HTTP address of a TRON full node, for example the official node ```https://api.trongrid.io``` (testnets: ```https://nile.trongrid.io```, ```https://api.shasta.trongrid.io```)
+- ```Rpc Api Key```: TronGrid API key. Enter only the key itself; it is sent as the ```TRON-PRO-API-KEY``` request header. It works without a key, but TronGrid rate-limits keyless requests more strictly
 
 The docker accesses TRON through the full node's HTTP API (```/wallet/...```) and no longer uses gRPC. The old gRPC address ```grpc.trongrid.io:50051``` that the form fills in by default for TRON is replaced automatically with ```https://api.trongrid.io``` (```grpc.nile.trongrid.io:50051``` and ```grpc.shasta.trongrid.io:50051``` likewise become the HTTP addresses of the corresponding testnets); any other gRPC address is rejected, so enter the node's HTTP address instead.
 
@@ -4801,20 +4814,23 @@ At runtime, ```exchange.IO("base", nodeAddress)``` switches nodes, ```exchange.I
 
 As on Ethereum, use ```exchange.IO("api", contractAddress, method, ...args)```: read-only methods return results directly, write methods sign and broadcast a transaction and return the transaction ID. Standard TRC20 methods are built in; for other contracts without a registered ABI, the ABI is read from the chain automatically, and only when that fails do you need to register it with ```exchange.IO("abi", contractAddress, abi)```. The last argument of a write method can be ```{gasLimit: amount}``` to set the fee limit (feeLimit, in sun).
 
-```js
+```javascript
 // USDT (TRC20) contract
 var usdt = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t"
-Log(exchange.IO("api", usdt, "balanceOf", exchange.IO("address")))   // on-chain integer, USDT has 6 decimals
+Log(exchange.IO("api", usdt, "balanceOf", exchange.IO("address")))   // on-chain integer, 6 decimals
 ```
 
 Encoding and decoding work as on Ethereum; address arguments can be written directly as ```T``` addresses:
 
-```js
+```javascript
 exchange.IO("encode", "address", "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t")
 // 000000000000000000000000a614f803b6fd780986a42c78ec9c7f77e6ded13c
 exchange.IO("encodePacked", "address", "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t")
 // a614f803b6fd780986a42c78ec9c7f77e6ded13c
-exchange.IO("decode", "string", "0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000a5465746865722055534400000000000000000000000000000000000000000000")
+exchange.IO("decode", "string",
+    "0000000000000000000000000000000000000000000000000000000000000020" +
+    "000000000000000000000000000000000000000000000000000000000000000a" +
+    "5465746865722055534400000000000000000000000000000000000000000000")
 // Tether USD
 ```
 
@@ -4835,12 +4851,14 @@ exchange.IO("decode", "string", "00000000000000000000000000000000000000000000000
 | ```GetTransactionByID``` | transaction ID | Transaction content |
 | ```GetTransactionInfoByID``` | transaction ID | Execution result of a transaction (fees, energy used, logs, etc.) |
 | ```GetChainParameters``` | none | Chain parameters |
-| ```TriggerConstantContract``` | caller address (may be empty), contract address, method signature with parameter types (e.g. ```"balanceOf(address)"```), JSON array string of the argument values (e.g. ```'["T..."]'```, an empty string for no arguments) | Read-only contract call; the result is in ```constant_result``` (hex strings, decode them with ```exchange.IO("decode", ...)```) |
+| ```TriggerConstantContract``` | caller address (may be empty), contract address, method signature, argument values (see below the table) | Read-only contract call; the result is in ```constant_result``` |
 | ```TRC20ContractBalance``` | address, contract address | TRC20 balance (on-chain integer) |
 | ```TRC20GetName```, ```TRC20GetSymbol```, ```TRC20GetDecimals``` | contract address | Name, symbol and decimals of a TRC20 token |
 | ```TRC20Send```, ```TRC20Approve``` | from address, to or spender address, contract address, amount, feeLimit | TRC20 transfer and approval |
 | ```TRC20Call``` | caller address (may be empty), contract address, call data, read-only flag, feeLimit | Call a contract with raw call data |
 | ```ParseTRC20NumericProperty```, ```ParseTRC20StringProperty``` | hex data | Parse numbers and strings returned by TRC20 |
+
+For ```TriggerConstantContract```, the method signature includes the parameter types (e.g. ```"balanceOf(address)"```) and the argument values are a JSON array string (e.g. ```'["T..."]'```, an empty string for no arguments); the returned ```constant_result``` holds hex strings that can be decoded with ```exchange.IO("decode", ...)```.
 
 Node endpoints not in the table can be called with a path and a request body: ```exchange.IO("api", "tron", "/wallet/endpointName", {body})```.
 
@@ -4850,10 +4868,10 @@ The following commands only work on Ethereum (EVM) and report an error on TRON: 
 
 ```toUnits```, ```fromUnits```, ```uniswapV3```, the encoding and decoding commands and the signing commands work on TRON as well, and a TRC20 contract address can be passed as the decimals:
 
-```js
+```javascript
 var usdt = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t"
 var raw = exchange.IO("api", usdt, "balanceOf", exchange.IO("address"))
-Log(exchange.IO("fromUnits", raw, usdt))   // converted to a readable amount with the contract's decimals()
+Log(exchange.IO("fromUnits", raw, usdt))   // readable amount, using the contract's decimals()
 ```
 
 When the node rejects a contract call at validation time (for example because the contract does not exist), the error carries the node's reason, such as ```tron contract call rejected (CONTRACT_VALIDATE_ERROR): Smart contract is not exist.```; a contract execution failure (revert) reports ```tron contract execution failed``` with the reason.
@@ -4862,9 +4880,7 @@ When the node rejects a contract call at validation time (for example because th
 
 ```exchange.IO("hash", "sign", "hex", "hex", txHash)``` signs a 32-byte hash with the current private key and returns the 65-byte signature ```r‖s‖v``` (v is 0 or 1); other ```hash``` algorithms (such as ```"sha256"```) compute digests, the same as the ```Encode()``` function. When r, s and v (v being 27 or 28) are needed separately for contract verification, use ```exchange.IO("sign", ...)```, see the `Web3` exchange page of the syntax manual.
 
-##### Examples
-
-###### Query TRX and USDT balances and read token information
+Query TRX and USDT balances and read token information.
 
 ```javascript
 function main() {
@@ -4886,7 +4902,7 @@ function main() {
 }
 ```
 
-###### Read several contract methods at once with a Multicall contract
+Read several contract methods at once with a Multicall contract.
 
 ```javascript
 function main() {
@@ -4900,7 +4916,21 @@ function main() {
         [usdt, exchange.IO("encode", usdt, "balanceOf", wallet)]
     ]
     // register the aggregate method of the Multicall contract
-    exchange.IO("abi", multicall, `[{"inputs":[{"components":[{"internalType":"address","name":"target","type":"address"},{"internalType":"bytes","name":"callData","type":"bytes"}],"internalType":"struct TronMulticall.Call[]","name":"calls","type":"tuple[]"}],"name":"aggregate","outputs":[{"internalType":"uint256","name":"blockNumber","type":"uint256"},{"internalType":"bytes[]","name":"returnData","type":"bytes[]"}],"stateMutability":"view","type":"function"}]`)
+    exchange.IO("abi", multicall, `[{
+        "inputs": [{
+            "components": [
+                {"internalType": "address", "name": "target", "type": "address"},
+                {"internalType": "bytes", "name": "callData", "type": "bytes"}
+            ],
+            "internalType": "struct TronMulticall.Call[]", "name": "calls", "type": "tuple[]"
+        }],
+        "name": "aggregate",
+        "outputs": [
+            {"internalType": "uint256", "name": "blockNumber", "type": "uint256"},
+            {"internalType": "bytes[]", "name": "returnData", "type": "bytes[]"}
+        ],
+        "stateMutability": "view", "type": "function"
+    }]`)
     var ret = exchange.IO("api", multicall, "aggregate", calls)
     Log("name:", exchange.IO("decode", "string", ret.returnData[0]))
     Log("decimals:", exchange.IO("decode", "uint8", ret.returnData[1]))
@@ -4912,7 +4942,7 @@ See also: `Web3`, `exchange.IO`
 
 ## Data and Research
 
-The data explorer and the alpha factor analysis tool.
+Two tools for researching market data, the data explorer for querying and visualizing financial data with SQL and the alpha factor analysis tool for computing and testing factors with formulas.
 
 ### Data Explorer
 
@@ -4926,63 +4956,168 @@ The data explorer and the alpha factor analysis tool.
 
 ### Alpha Factor Analysis Tool
 
-The analysis formulas reference the market calculation methods from ```worldquant```'s publicly available [```alpha101```](https://github.com/yli188/WorldQuant_alpha101_code/blob/master/101%20Formulaic%20Alphas.pdf), with basic compatibility for its syntax (unimplemented features are noted), and have been enhanced. This tool is used for rapid time series computation and validation of trading ideas. [Alpha Factor Analysis Tool Page](https://www.fmz.com/m/alpha).
+The [alpha factor analysis tool](https://www.fmz.com/m/alpha) computes formulas over market time series quickly, to test trading ideas. The formulas follow the market calculation methods of ```worldquant```'s public [```alpha101```](https://github.com/yli188/WorldQuant_alpha101_code/blob/master/101%20Formulaic%20Alphas.pdf), are largely compatible with its syntax (unimplemented parts are noted) and add enhancements.
 
 One formula can output several results at once when written as a list: for example ```[sma(close, 10), sma(high, 30)]``` plots two lines on the chart. Without time series data the tool also works as a simple calculator. The functions, operators and available input data are described in the two sections below.
 
 #### Functions and Operators
 
-**The ```{}``` below represents placeholders, all expressions are case-insensitive, x represents data time series**
+Functions and operators available in formulas of the alpha factor analysis tool. Expressions are case-insensitive; below, ```x``` and ```y``` are time series, ```d``` is a number of periods, and ```{}``` is a placeholder.
 
-- ```abs(x), log(x), sign(x)```: absolute value, logarithm and sign function respectively.
+##### Operators
 
-The following operators ``` +, -, *, /, >, < ``` also conform to their standard meanings, ```==```: equality check, ```||```: logical OR, ```x ? y : z```: ternary conditional operator.
+```+```, ```-```, ```*```, ```/```, ```>``` and ```<``` have their standard meaning; ```==``` tests equality, ```||``` is logical or, and ```x ? y : z``` is the ternary conditional operator.
 
-- ```rank(x)``` : Cross-sectional ranking, returns the percentile position. Requires a candidate pool of several instruments; with a single instrument nothing can be ranked and the raw value is returned.
-- ```delay(x, d)``` : Returns the value of series x from d periods ago.
-- ```sma(x, d)``` : Calculates the simple moving average of series x over d periods.
-- ```correlation(x, y, d)```: Calculates the correlation coefficient between time series x and y over the past d periods.
-- ```covariance(x, y, d)``` : Calculates the covariance between time series x and y over the past d periods.
-- ```scale(x, a)``` : Normalizes data such that ```sum(abs(x))=a``` (a defaults to 1).
-- ```delta(x, d)``` : Calculates the current value of time series x minus the value from d periods ago.
-- ```signedpower(x, a)``` : ```x^a```.
-- ```decay_linear(x, d)``` : Calculates the d-period weighted moving average of time series x, with weights d,d-1,d-2....1 (normalized).
-- ```indneutralize(x, g)``` : Industry neutralization based on industry classification g, currently not supported.
-- ```ts_{O}(x, d)``` : Performs operation O on the past d periods of time series x (O can specifically represent min, max, etc., see below), d will be converted to integer.
-- ```ts_min(x, d)``` : Minimum value over the past d periods.
-- ```ts_max(x, d)``` : Maximum value over the past d periods.
-- ```ts_argmax(x, d)``` : Position of ```ts_max(x, d)```.
-- ```ts_argmin(x, d)``` : Position of ```ts_min(x, d)```.
-- ```ts_rank(x, d)``` : Ranking of time series x over the past d periods (percentile ranking).
-- ```min(x, d)``` : ```ts_min(x, d)```.
-- ```max(x, d)```: ```ts_max(x, d)```.
-- ```sum(x, d)``` : Cumulative sum over the past d periods.
-- ```product(x, d)``` : Cumulative product over the past d periods.
-- ```stddev(x, d)``` : Standard deviation over the past d periods.
+##### Functions
+
+| Function | Description |
+| - | - |
+| ```abs(x)```, ```log(x)```, ```sign(x)``` | Absolute value, logarithm, sign |
+| ```rank(x)``` | Cross-sectional percentile rank; needs a pool of instruments, and with a single one returns the value unchanged |
+| ```delay(x, d)``` | Value of x d periods ago |
+| ```sma(x, d)``` | Simple moving average of x over d periods |
+| ```correlation(x, y, d)``` | Correlation of x and y over the past d periods |
+| ```covariance(x, y, d)``` | Covariance of x and y over the past d periods |
+| ```scale(x, a)``` | Normalize so that ```sum(abs(x)) = a``` (a defaults to 1) |
+| ```delta(x, d)``` | Current value of x minus its value d periods ago |
+| ```signedpower(x, a)``` | ```x^a``` |
+| ```decay_linear(x, d)``` | Weighted moving average of x over d periods with weights d, d-1, …, 1 (normalized) |
+| ```indneutralize(x, g)``` | Neutralize by industry classification g; not supported yet |
+| ```ts_{O}(x, d)``` | Apply operation O (min, max, ..., see the rows below) to the past d periods of x; d is converted to an integer |
+| ```ts_min(x, d)```, ```min(x, d)``` | Minimum over the past d periods |
+| ```ts_max(x, d)```, ```max(x, d)``` | Maximum over the past d periods |
+| ```ts_argmin(x, d)``` | Position of ```ts_min(x, d)``` |
+| ```ts_argmax(x, d)``` | Position of ```ts_max(x, d)``` |
+| ```ts_rank(x, d)``` | Rank (percentile) of x within the past d periods |
+| ```sum(x, d)``` | Sum over the past d periods |
+| ```product(x, d)``` | Product over the past d periods |
+| ```stddev(x, d)``` | Standard deviation over the past d periods |
 
 #### Input Data
 
-**Input data is case-insensitive. Default data is the instrument selected on the webpage, but can also be specified directly, for example: ```binance.ada_bnb```**
+Market data that formulas can refer to. Input data is case-insensitive and defaults to the instrument selected on the web page; an instrument can also be given directly, e.g. ```binance.ada_bnb```.
 
-- ```returns```: Close price returns.
-- ```open, close, high, low, volume```: Open price, close price, high price, low price and volume within the period.
-- ```vwap```: Volume-weighted average price (not yet implemented, currently using close price).
-- ```cap```: Total market capitalization (not yet implemented).
-- ```IndClass```: Industry classification (not yet implemented).
+| Data | Description |
+| - | - |
+| ```returns``` | Return of the close price |
+| ```open```, ```close```, ```high```, ```low```, ```volume``` | Open, close, high, low and volume of the period |
+| ```vwap``` | Volume-weighted average price; not implemented yet, currently the close price |
+| ```cap``` | Total market capitalization; not implemented yet |
+| ```IndClass``` | Industry classification; not implemented yet |
 
 ## Extended API Interface
 
-The extended API is the platform's HTTP interface (```https://www.fmz.com/api/v1```) for scripts, scheduled jobs and other programs: query the account, dockers, strategies and live trading bots, create, restart and stop bots, send interactive commands to bots, and so on.
+The extended API is the platform's HTTP interface (```https://www.fmz.com/api/v1```) for scripts, scheduled jobs and other programs: query the account, dockers, strategies and robots, create, restart and stop robots, send interactive commands to robots, and so on.
 
-To operate the platform interactively from an AI assistant (Claude Code, Cursor, ...), prefer AI Integration (the MCP service, see Extended API Interface → AI Integration): it has more tools, takes named parameters, and can be authorized by permission category. Both can use the same API KEY.
+To operate the platform interactively from an AI assistant (Claude Code, Cursor, ...), prefer AI Integration (the MCP service, see `AI Integration`): it has more tools, takes named parameters, and can be authorized by permission category. Both can use the same API KEY.
 
-Steps: create an API KEY (Create ApiKey), send requests as described in Authentication Methods, and look up methods and parameters in Extended API Interface Details.
+Steps: create an API KEY (`Create ApiKey`), send requests as described in `Authentication Methods`, and look up methods and parameters in `Extended API Interface Details`.
+
+### AI Integration
+
+Connect FMZ to an AI coding assistant (AI agent) such as Claude Code, Codex or Cursor, and you can write strategies, run backtests, create and manage live trading, and read logs and profit just by talking to it. The assistant reaches these functions through the platform's MCP (Model Context Protocol) service, with an API KEY created for it alone; you choose its permissions when you approve it and can change or revoke them at any time.
+
+#### Connect with one sentence
+
+Tell your AI assistant:
+
+```text
+Read https://www.fmz.com/agent/setup.md and connect to FMZ
+```
+
+The assistant follows that page; your only step is one click in the browser:
+
+1. The assistant requests authorization and shows you a link such as ```https://www.fmz.com/agent/authorize?code=XXXX-XXXX```, valid for 10 minutes.
+2. Open it in a browser where you are logged in to FMZ, check the requester's name and the permissions, and approve. You can untick permissions you do not want to grant.
+3. The assistant receives an API KEY, writes it into its own MCP configuration and connects. From then on you can simply ask it to "list my live trading" or "backtest this strategy".
+
+The assistant names the key "name @ machine" (for example ```Claude Code @ MacBook```). When a request with the same name is approved again, the old key is revoked and replaced, so connecting again does not pile up keys.
+
+#### Permissions
+
+| Permission | Allows | Default |
+| - | - | - |
+| read | Lists and details of strategies, robots, dockers and exchange accounts; logs, messages, account summary (no secrets) | Yes |
+| backtest | Start, query and stop backtests | Yes |
+| write | Save strategies and versions, groups, alert switches; change the configuration of stopped live trading | Yes |
+| trade | Create, start and stop live trading, send interactive commands (costs balance and places real orders) | Yes |
+| danger | Delete strategies, live trading and nodes; publish strategies | No |
+
+```danger``` is never granted by default: the assistant has to request it explicitly and you have to tick it on the approval page. Before calling a ```[trade]``` or ```[danger]``` tool the assistant should ask you first.
+
+#### Manual configuration
+
+Clients that cannot run commands (for example Cherry Studio) can be configured by hand:
+
+1. Create an API KEY under Account settings → API KEY (```https://www.fmz.com/m/account#apikey```) and note its Access Key and Secret Key.
+2. Add an MCP server of type Streamable HTTP to the client:
+   - URL: ```https://www.fmz.com/api/mcp/<Access Key>```
+   - Header: ```Authorization: Bearer <Secret Key>```
+
+The Secret Key goes in the header only, never in the URL. Examples:
+
+```bash
+# Claude Code
+claude mcp add --transport http fmz "https://www.fmz.com/api/mcp/<Access Key>" \
+    --header "Authorization: Bearer <Secret Key>"
+```
+
+```json
+{
+    "mcpServers": {
+        "fmz": {
+            "url": "https://www.fmz.com/api/mcp/<Access Key>",
+            "headers": {"Authorization": "Bearer <Secret Key>"}
+        }
+    }
+}
+```
+
+The JSON is for Cursor (```~/.cursor/mcp.json```) and other clients that speak Streamable HTTP; Claude Desktop needs the ```npx mcp-remote``` bridge described in the setup page.
+
+#### Install the skills (recommended)
+
+The skills are knowledge packs written for AI assistants: platform workflow, the full API reference, how to write strategies in each language, backtesting and indicators. With them installed the assistant writes noticeably more accurate strategies. In a terminal:
+
+```bash
+npx skills add fmzquant/skills --global --yes -a claude-code
+```
+
+Put your assistant's name after ```-a``` (claude-code, codex, cursor, gemini-cli, ...). They can also be read on GitHub: ```https://github.com/fmzquant/skills```.
+
+#### Available tools
+
+Once connected the assistant can use the tools below; the list the assistant sees is authoritative:
+
+- ```read```: ```ping```, ```get_account_summary```, ```list_exchanges```, ```list_platforms```, ```list_nodes```, ```list_strategies```, ```get_strategy```, ```list_strategy_versions```, ```get_strategy_version```, ```list_robots```, ```get_robot```, ```get_robot_logs```, ```get_robot_profit```, ```get_robot_output```, ```list_messages```, ```list_groups```, ```revoke_my_key```
+- ```backtest```: ```run_backtest```, ```get_backtest```, ```list_backtests```, ```stop_backtest```
+- ```write```: ```check_strategy```, ```save_strategy```, ```save_strategy_version```, ```delete_strategy_version```, ```update_robot```, ```save_group```, ```move_to_group```, ```delete_group```, ```set_robot_alert```, ```set_node_alert```, ```delete_messages```
+- ```trade```: ```create_robot```, ```start_robot```, ```stop_robot```, ```restart_robot```, ```send_robot_command```, and the trading terminal plugin tools ```plugin_*``` (market data, orders, ...)
+- ```danger```: ```delete_strategy```, ```delete_robot```, ```delete_node```, ```publish_strategy```
+
+A typical session: ```list_platforms``` and ```list_nodes``` to see which exchange accounts and nodes the account has; ```save_strategy``` to save a strategy and ```check_strategy``` to check it; ```run_backtest``` and ```get_backtest``` to backtest; then ```create_robot``` to go live and ```get_robot``` / ```get_robot_logs``` to watch it.
+
+#### Security and management
+
+- Exchange API KEYs never pass through the assistant: add them on the Exchanges page of the website and the assistant picks them by id. No tool result ever contains a secret.
+- At ```https://www.fmz.com/m/account#apikey``` you can see the key the assistant uses, change its permissions or lock it. Besides the permission names above, permissions can list tool names, and ```!tool_name``` excludes one tool.
+- When you are done, ask the assistant to call ```revoke_my_key``` to revoke its own key, or delete it on that page.
+- ```stop_robot``` stops live trading; it does not close positions.
+- The first time the assistant creates live trading, backtest first and then run on a demo account or with a small amount.
+
+#### Common problems
+
+- No online node: live trading needs at least one online node, see Platform Basics → Nodes.
+- Too many backtests: concurrent backtests are limited; have the assistant ```stop_backtest``` the ones it no longer needs.
+- The assistant says a tool is missing or a call is refused: the key lacks that permission; change it on the API KEY page and reconnect.
+
+The same API key also works with the `Extended API` for scripts and schedulers; prefer MCP wherever it can be used.
 
 ### Create ApiKey
 
 On the [Account Settings → API KEY](https://www.fmz.com/m/account#apikey) page (```/m/account#apikey```), click "Create New ApiKey" to get an ```AccessKey``` and a ```SecretKey```. The ```SecretKey``` carries every permission of the key; keep it secret. The same page lets you change the permissions of existing keys, or disable and delete them.
 
-**Permissions**
+#### Permissions
 
 When creating or editing a key, enter a comma-separated list in the "API Permissions" field:
 
@@ -4990,7 +5125,7 @@ When creating or editing a key, enter a comma-separated list in the "API Permiss
 - Method names: allow only the listed methods, e.g. ```GetRobotList,GetRobotDetail,CommandRobot```.
 - ```!MethodName```: exclude a method, usually together with ```*```, e.g. ```*,!DeleteRobot,!DeleteNode```.
 
-The same API KEY can also be used for AI Integration (the MCP service, see Extended API Interface → AI Integration). Besides method names (tool names for MCP), permissions can be granted by category: ```read```, ```backtest```, ```write```, ```trade```, ```danger``` (see the AI Integration page), and ```!name``` excludes as well. Categories apply to MCP tools and extended API methods alike. The categories of the extended API methods:
+The same API KEY can also be used for AI Integration (the MCP service, see `AI Integration`). Besides method names (tool names for MCP), permissions can be granted by category: ```read```, ```backtest```, ```write```, ```trade```, ```danger``` (see the AI Integration page), and ```!name``` excludes as well. Categories apply to MCP tools and extended API methods alike. The categories of the extended API methods:
 
 - ```read```: ```GetAccount```, ```GetExchangeList```, ```GetNodeList```, ```GetPlatformList```, ```GetRobotGroupList```, ```GetRobotList```, ```GetRobotDetail```, ```GetRobotLogs```, ```GetStrategyList```;
 - ```trade```: ```NewRobot```, ```RestartRobot```, ```StopRobot```, ```CommandRobot```, ```PluginRun```;
@@ -5002,14 +5137,16 @@ With an empty permission list the extended API does not restrict methods (MCP al
 
 ### Authentication Methods
 
-The extended API supports two authentication methods:
+The extended API supports two authentication methods: signature authentication and direct authentication.
 
-- Signature authentication: the request parameters are signed with the ```SecretKey```, which itself never travels over the network. Programs should use this method.
-- Direct verification: the ```SecretKey``` is put into the request URL itself; meant for webhooks such as TradingView that accept only a single URL.
+- `Signature authentication`: the request parameters are signed with the ```SecretKey```, which itself never travels over the network. Programs should use this method.
+- `Direct verification`: the ```SecretKey``` is put into the request URL itself; meant for webhooks such as TradingView that accept only a single URL.
 
 #### Token Authentication
 
-**Request format**
+Signature authentication signs the request parameters with an MD5 hash that includes the ```SecretKey```, so the ```SecretKey``` itself never travels over the network; programs calling the extended API should use it.
+
+##### Request format
 
 Send a ```POST``` request to ```https://www.fmz.com/api/v1``` with the parameters as a form (```application/x-www-form-urlencoded```). The server also accepts the same parameters in the URL query string of a ```GET``` request, but then they end up in access logs along the way, so ```POST``` is recommended.
 
@@ -5018,13 +5155,13 @@ Send a ```POST``` request to ```https://www.fmz.com/api/v1``` with the parameter
 | version | Version, always ```1.0```. |
 | access_key | The ```AccessKey``` of the API KEY. |
 | method | Method name, e.g. ```GetNodeList```. |
-| args | Method parameters as a JSON string: an array in parameter order (e.g. ```[]```, ```[123, "ok"]```), or an object keyed by parameter name (e.g. ```{"robotId": 123}```), see Extended API Interface Details. Treated as ```[]``` when omitted. |
-| nonce | Timestamp in milliseconds. It must be within 1 hour of server time and greater than the ```nonce``` of this API KEY's previous request. |
+| args | Method parameters as a JSON string (an array or an object, see below the table); ```[]``` when omitted. |
+| nonce | Millisecond timestamp, within 1 hour of server time and greater than this API key's previous ```nonce```. |
 | sign | Signature, computed as described below. |
 
-The request does not contain the ```SecretKey```.
+```args``` is either an array in parameter order (e.g. ```[]```, ```[123, "ok"]```) or an object keyed by parameter name (e.g. ```{"robotId": 123}```); see `Extended API Interface Details`. The request does not contain the ```SecretKey```.
 
-**Signature**
+##### Signature
 
 Concatenate the string below, where ```args``` is the exact JSON string being submitted:
 
@@ -5034,7 +5171,7 @@ version + "|" + method + "|" + args + "|" + nonce + "|" + secretKey
 
 Compute the MD5 of the result and use its 32-character lowercase hexadecimal form as ```sign```.
 
-**Python example**
+##### Python example
 
 ```python
 import hashlib
@@ -5062,12 +5199,12 @@ def api(method, *args, **kwargs):
         return json.loads(resp.read().decode('utf-8'))
 
 print(api('GetNodeList'))                             # Docker list
-print(api('GetRobotList', appId='member2'))           # By name: bots labeled member2
-print(api('CommandRobot', 123, 'ok'))                 # Send an interactive command to bot 123
-print(api('GetRobotDetail', 123))                     # Details of bot 123
+print(api('GetRobotList', appId='member2'))           # By name: robots labeled member2
+print(api('CommandRobot', 123, 'ok'))                 # Send an interactive command to robot 123
+print(api('GetRobotDetail', 123))                     # Details of robot 123
 ```
 
-**Go example**
+##### Go example
 
 ```go
 package main
@@ -5123,7 +5260,7 @@ func main() {
     ret, err := api("GetNodeList")
     fmt.Println(ret, err)
 
-    // Restart bot 123 with a new configuration; settings fields: see the bot configuration section in Extended API Interface Details
+    // restart robot 123 with a new configuration; settings: see Extended API Interface Details
     settings := map[string]interface{}{
         "name":     "hedge test",
         "strategy": 456,
@@ -5142,29 +5279,29 @@ func main() {
 
 Direct verification computes no signature; the ```secret_key``` is put into the request parameters instead. This produces a fixed URL that can be entered into webhooks such as TradingView that accept only a single URL.
 
-> **Security note**: a ```secret_key``` in a URL ends up in browser history, proxy and server access logs, and the webhook provider's configuration; anyone who obtains the URL can call the API with this key's permissions. Use direct verification only for ```CommandRobot``` webhooks, and create a dedicated API KEY for it that is granted ```CommandRobot``` only (see Create ApiKey). If it leaks, delete that API KEY immediately.
+> **Security note**: a ```secret_key``` in a URL ends up in browser history, proxy and server access logs, and the webhook provider's configuration; anyone who obtains the URL can call the API with this key's permissions. Use direct verification only for ```CommandRobot``` webhooks, and create a dedicated API KEY for it that is granted ```CommandRobot``` only (see `Create ApiKey`). If it leaks, delete that API KEY immediately.
 
 The request parameters are ```access_key```, ```secret_key```, ```method``` and ```args``` (a JSON array, URL-encoded); ```version```, ```nonce``` and ```sign``` are not needed. ```CommandRobot``` skips the ```nonce``` check; other methods are still checked: without a ```nonce``` the server uses the current time (to the second), so a second call within the same second returns a nonce error (```code``` 3).
 
-For example, with an API KEY whose ```AccessKey``` is ```xxx``` and ```SecretKey``` is ```yyy```, opening the URL below sends the interactive command ```ok12345``` to the live trading bot with ID ```186515```:
+For example, with an API KEY whose ```AccessKey``` is ```xxx``` and ```SecretKey``` is ```yyy```, opening the URL below sends the interactive command ```ok12345``` to the robot with ID ```186515```:
 
 ```plaintext
 https://www.fmz.com/api/v1?access_key=xxx&secret_key=yyy&method=CommandRobot&args=%5B186515%2C%22ok12345%22%5D
 ```
 
-**Receiving a webhook body**
+##### Receiving a webhook body
 
-When the command argument of ```CommandRobot``` is an empty string and the request is a ```POST```, the server sends the request body to the bot as the interactive command. The body must be JSON or plain text, not form-encoded (a body sent with ```Content-Type: application/x-www-form-urlencoded``` is consumed as a form first and the command becomes an empty string). For example, set the TradingView webhook URL to:
+When the command argument of ```CommandRobot``` is an empty string and the request is a ```POST```, the server sends the request body to the robot as the interactive command. The body must be JSON or plain text, not form-encoded (a body sent with ```Content-Type: application/x-www-form-urlencoded``` is consumed as a form first and the command becomes an empty string). For example, set the TradingView webhook URL to:
 
 ```plaintext
 https://www.fmz.com/api/v1?access_key=xxx&secret_key=yyy&method=CommandRobot&args=%5B186515%2C+%22%22%5D
 ```
 
-The ```args``` value ```%5B186515%2C+%22%22%5D``` decodes to ```[186515, ""]``` (```+``` is a URL-encoded space): ```186515``` is the bot ID and the command is an empty string.
+The ```args``` value ```%5B186515%2C+%22%22%5D``` decodes to ```[186515, ""]``` (```+``` is a URL-encoded space): ```186515``` is the robot ID and the command is an empty string.
 
 Simulating a TradingView webhook alert:
 
-```js
+```javascript
 function main() {
     var options = {
         method: "POST",
@@ -5173,7 +5310,9 @@ function main() {
     }
 
     // A webhook alert sends a POST request with the required headers automatically
-    return HttpQuery("https://www.fmz.com/api/v1?access_key=xxx&secret_key=yyy&method=CommandRobot&args=%5B186515%2C+%22%22%5D", options)
+    var url = "https://www.fmz.com/api/v1?access_key=xxx&secret_key=yyy" +
+        "&method=CommandRobot&args=%5B186515%2C+%22%22%5D"
+    return HttpQuery(url, options)
 }
 ```
 
@@ -5181,25 +5320,25 @@ The content of the TradingView alert message box is the request body:
 
 - JSON format:
 
-  ![](https://www.fmz.com/upload/asset/16d8a37ef80d9ccd0079.png)
+  ![TradingView alert message (JSON format)](https://www.fmz.com/upload/asset/16d8a37ef80d9ccd0079.png)
 
   ```plaintext
   {"close": {{close}}, "name": "aaa"}
   ```
 
-  The bot with ID ```186515``` receives the interactive command ```{"close": 39773.75, "name": "aaa"}```.
+  The robot with ID ```186515``` receives the interactive command ```{"close": 39773.75, "name": "aaa"}```.
 
 - Text format:
 
-  ![](https://www.fmz.com/upload/asset/16d8a506dfbb6c60a077.png)
+  ![TradingView alert message (text format)](https://www.fmz.com/upload/asset/16d8a506dfbb6c60a077.png)
 
   ```plaintext
   BTCUSDTPERP Crossing 39700.00 close: {{close}}
   ```
 
-  The bot with ID ```186515``` receives the interactive command ```BTCUSDTPERP Crossing 39700.00 close: 39739.4```.
+  The robot with ID ```186515``` receives the interactive command ```BTCUSDTPERP Crossing 39700.00 close: 39739.4```.
 
-**Python and Go examples**
+##### Python and Go examples
 
 ```python
 import json
@@ -5279,109 +5418,150 @@ References:
 
 ### Extended API Interface Details
 
-All methods are called through ```https://www.fmz.com/api/v1```; for the request format and signature see Authentication Methods → Token Authentication, for the response structure and error codes see Extended API Interface Return Codes. The ```api()``` used in the examples on the method pages is the function from the Python example on the signature authentication page.
+All methods are called through ```https://www.fmz.com/api/v1```; for the request format and signature see `Token Authentication`, for the response structure and error codes see `Extended API Interface Return Codes`. The ```api()``` used in the examples on the method pages is the function from the Python example on the signature authentication page.
 
-**Method overview**
+#### Method overview
 
 | Object | Method | Parameters (in order; bracketed ones are optional) | Description | Notes |
 | - | - | - | - | - |
-| Account | GetAccount | none | Account information | Read-only |
-| Docker | GetNodeList | [offset, limit] | Docker list | Read-only |
-| Docker | DeleteNode | nid | Delete a docker | Deletes, cannot be undone |
-| Exchange | GetExchangeList | isSummary | Exchanges supported by the platform and their settings | Read-only |
-| Exchange | GetPlatformList | [offset, limit] | Exchange accounts you added | Read-only |
-| Strategy | GetStrategyList | offset, length, strategyType, category, language, kw[, groupId, orderBy] | Strategy list | Read-only |
-| Live trading | GetRobotGroupList | none | Live trading groups | Read-only |
-| Live trading | GetRobotList | [offset, length, customStatus, appId, kw, groupId, orderBy, strategyId] | Live trading list | Read-only |
-| Live trading | GetRobotDetail | robotId | Live trading details | Read-only |
-| Live trading | GetRobotLogs | robotId, logMinId, …, summaryLimit[, logExchange, logKeyword, logTypes] | Logs, profit, chart and status bar data | Read-only |
-| Live trading | NewRobot | settings | Create and start a live trading bot | Charges fees; the bot trades for real |
-| Live trading | RestartRobot | robotId[, settings] | Start (restart) a live trading bot | Charges fees; the bot trades for real |
-| Live trading | StopRobot | robotId | Stop a live trading bot | Does not close positions |
-| Live trading | CommandRobot | robotId, cmd | Send an interactive command | The strategy may place orders on it |
-| Live trading | DeleteRobot | robotId[, removeLog] | Delete a live trading bot | Deletes, cannot be undone |
-| Debugging | PluginRun | settings | Run a piece of code on a docker | The code can place real orders |
-| Channel | pub | robot, channel (URL parameters); the message goes in the request body | Push a message to a channel a robot subscribed to | No API KEY, no signature; see the pub page |
+| Account | `GetAccount` | none | Account information | Read-only |
+| Docker | `GetNodeList` | [offset, limit] | Docker list | Read-only |
+| Docker | `DeleteNode` | nid | Delete a docker | Deletes, cannot be undone |
+| Exchange | `GetExchangeList` | isSummary | Exchanges supported by the platform and their settings | Read-only |
+| Exchange | `GetPlatformList` | [offset, limit] | Exchange accounts you added | Read-only |
+| Strategy | `GetStrategyList` | offset, length, strategyType, category, language, kw[, groupId, orderBy] | Strategy list | Read-only |
+| Robot | `GetRobotGroupList` | none | Robot groups | Read-only |
+| Robot | `GetRobotList` | [offset, length, customStatus, appId, kw, groupId, orderBy, strategyId] | Robot list | Read-only |
+| Robot | `GetRobotDetail` | robotId | Robot details | Read-only |
+| Robot | `GetRobotLogs` | robotId, logMinId, …, summaryLimit[, logExchange, logKeyword, logTypes] | Logs, profit, chart and status bar data | Read-only |
+| Robot | `NewRobot` | settings | Create and start a robot | Charges fees; the robot trades for real |
+| Robot | `RestartRobot` | robotId[, settings] | Start (restart) a robot | Charges fees; the robot trades for real |
+| Robot | `StopRobot` | robotId | Stop a robot | Does not close positions |
+| Robot | `CommandRobot` | robotId, cmd | Send an interactive command | The strategy may place orders on it |
+| Robot | `DeleteRobot` | robotId[, removeLog] | Delete a robot | Deletes, cannot be undone |
+| Debugging | `PluginRun` | settings | Run a piece of code on a docker | The code can place real orders |
+| Channel | `pub` | robot, channel (URL parameters); the message goes in the request body | Push a message to a channel a robot subscribed to | No API key, no signature |
 
-The API KEY needs permission for the method, see Create ApiKey.
+The API key needs permission for the method, see `Create ApiKey`.
 
-**Passing parameters**
+#### Passing parameters
 
 ```args``` can be written in two ways:
 
 - Array: positional parameters in the order of the table above, e.g. ```[123, "ok"]```. Positional calls accept only certain numbers of arguments; any other count returns a ```Params number mismatch``` error:
   - GetNodeList, GetPlatformList: 0 or 2.
-  - GetStrategyList: 0, 6, 7 or 8; with no arguments ```language``` is ```1``` (only Python strategies), see the GetStrategyList page.
+  - GetStrategyList: 0, 6, 7 or 8; with no arguments ```language``` is ```1``` (only Python strategies), see `GetStrategyList`.
   - GetRobotList: 0, 1, 3, 5, 6, 7 or 8; a single argument is taken as ```appId```.
   - GetRobotLogs: 15 to 19 (with 15 the status bar is not queried).
   - RestartRobot, DeleteRobot: 1 or 2; when DeleteRobot gets only ```robotId```, ```removeLog``` is ```false```.
 - Object: values by parameter name, e.g. ```{"robotId": 123, "cmd": "ok"}```. Names are case-insensitive and underscores are ignored; omitted parameters take their defaults. Recommended for methods with many optional parameters (GetRobotList, GetRobotLogs, GetStrategyList).
 
-**Live trading configuration (settings)**
+#### Robot configuration (settings)
 
 The ```settings``` parameter of NewRobot, RestartRobot and PluginRun is a JSON object; common fields:
 
 | Field | Description |
 | - | - |
-| name | Name of the live trading bot. |
-| strategy | Strategy ID, see GetStrategyList. RestartRobot cannot change a bot's strategy. |
+| name | Robot name. |
+| strategy | Strategy ID, see GetStrategyList. RestartRobot cannot change a robot's strategy. |
 | args | Strategy parameters, each element ```["name", value]```, e.g. ```[["Interval", 500]]```; ```[]``` if the strategy has none. |
 | exchanges | Array of exchange object configurations, one element per exchange object, see below. |
-| period | Default K-line period in seconds, e.g. ```60```, ```3600```. Defaults to 60 seconds. ```0```, ```1```, ```2```, ```3```, ```4```, ```5```, ```10``` and ```12``` are read as the old period numbers (1 minute, 3 minutes, 5 minutes, 15 minutes, 30 minutes, 1 hour, 1 day, 1 week respectively), e.g. ```1``` actually means 180 seconds, so pass a number of seconds of 60 or more. |
-| node | ID of the docker that runs the bot, see GetNodeList; omitted or ```-1``` means automatic assignment. |
-| group | Live trading group ID, see GetRobotGroupList. |
+| period | Default K-line period in seconds, e.g. ```60```, ```3600```; 60 seconds when omitted. Pass 60 or more; see below the table. |
+| node | ID of the docker that runs the robot, see GetNodeList; omitted or ```-1``` means automatic assignment. |
+| group | Robot group ID, see GetRobotGroupList. |
 | appid | Custom label; GetRobotList can filter by it. |
+
+A ```period``` of ```0```, ```1```, ```2```, ```3```, ```4```, ```5```, ```10``` or ```12``` is read as an old period number (1 minute, 3 minutes, 5 minutes, 15 minutes, 30 minutes, 1 hour, 1 day, 1 week respectively); for example ```1``` actually means 180 seconds.
 
 An ```exchanges``` element takes one of two forms, which cannot be mixed in one array (the first element decides):
 
 - Reference an exchange account added on the platform: ```{"pid": 123, "pair": "BTC_USDT"}```. ```pid``` is the ```id``` returned by GetPlatformList.
-- Pass the exchange configuration directly: ```{"eid": "Binance", "label": "test", "pair": "BTC_USDT", "meta": {"AccessKey": "...", "SecretKey": "..."}}```. ```eid``` is the exchange ID; the field names of ```meta``` are given by the ```meta``` returned by GetExchangeList; ```label``` is the exchange object's label, read in the strategy with ```exchange.GetLabel()```. The platform does not store the keys in ```meta``` but forwards them to the docker, so a bot created this way needs ```settings``` again on every restart.
+- Pass the exchange configuration directly: ```{"eid": "Binance", "label": "test", "pair": "BTC_USDT", "meta": {"AccessKey": "...", "SecretKey": "..."}}```. ```eid``` is the exchange ID; the field names of ```meta``` are given by the ```meta``` returned by GetExchangeList; ```label``` is the exchange object's label, read in the strategy with ```exchange.GetLabel()```. The platform does not store the keys in ```meta``` but forwards them to the docker, so a robot created this way needs ```settings``` again on every restart.
 
 For a custom-protocol exchange: ```{"eid": "Exchange", "label": "test", "pair": "BTC_USDT", "meta": {"AccessKey": "...", "SecretKey": "...", "Front": "http://127.0.0.1:6666/test"}}```, where ```Front``` is the address of the custom-protocol service.
 
 ##### GetAccount
 
-The ```GetAccount``` method is used to retrieve account information for the FMZ Quant Trading Platform account corresponding to the ```API KEY``` in the request.
+Gets the account information of the account that owns the API key, including the balance and the total amount spent.
 
-Parameters:
+Fields:
 
-No parameters
+- `balance` (number): Account balance in USD, as an integer scaled by 1e8; divide by 1e8 for the actual value (229.44702436 in the example).
+- `consumed` (number): Total amount spent, in the same unit and scaling as ```balance```.
+- `username` (string): User name.
+- `email` (string): Account email.
+- `uid` (string): Account UID.
 
-Returns:
+Returns (object): On success ```data.result``` is the account information; its fields are in the attributes table below.
+
+Query the account balance.
+
+```python
+# api() is the function in the Python example on the signature authentication page
+r = api('GetAccount')
+print(r['data']['result']['balance'] / 1e8)   # output: 229.44702436 (USD)
+```
+
+###### Example response
 
 ```json
 {
-    "code":0,
-    "data":{
-        "result":{
-            "balance":22944702436,
-            "concurrent":0,
-            "consumed":211092719653,
-            "email":"123@qq.com",
-            "openai":false,
-            "settings":{},
-            "sns":{"wechat":true},
-            "uid":"105ea6e51bcc177926a10fdbb7e2a1d6",
-            "username":"abc"
+    "code": 0,
+    "data": {
+        "result": {
+            "balance": 22944702436,
+            "concurrent": 0,
+            "consumed": 211092719653,
+            "email": "123@qq.com",
+            "openai": false,
+            "settings": {},
+            "sns": {"wechat": true},
+            "uid": "105ea6e51bcc177926a10fdbb7e2a1d6",
+            "username": "abc"
         },
-        "error":null
+        "error": null
     }
 }
 ```
 
-- balance: Account balance in USD, stored as an integer for precision; divide by 1e8 (10 to the power of 8) to get the actual value, 229.44702436 in this example.
-- consumed: Total amount spent, same unit and conversion as ```balance```.
-
 ##### GetNodeList
 
-The ```GetNodeList``` method returns the dockers available to the platform account of the ```API KEY``` in the request, including your own dockers and the platform's public dockers.
+Gets the dockers the account can use, including its own dockers and the platform's public dockers.
 
 Parameters:
 
-- `offset` (number, optional): Paging offset, default 0.
-- `limit` (number, optional): Page size; omitted or less than or equal to 0 returns everything.
+- `offset` (number, optional): Paging offset, 0 by default.
+- `limit` (number, optional): Page size; omitted or less than or equal to 0 returns all.
 
-Returns:
+Fields:
+
+- `all` (number): Total number of dockers (public dockers included).
+- `nodes` (array): Array of dockers; the fields of each element are in the rows below (self-explanatory fields are not listed).
+- `nodes[].id` (number): Docker ID, the ```node``` of a robot configuration.
+- `nodes[].build` (string): Version number.
+- `nodes[].version` (string): Detailed version information of the docker.
+- `nodes[].online` (bool): Whether the docker is online.
+- `nodes[].is_owner` (bool): ```true``` for a private docker, ```false``` for a public one.
+- `nodes[].public` (number): ```0``` for a private docker, ```1``` for a public one.
+- `nodes[].loaded` (number): Load: the number of strategy instances running on the docker.
+- `nodes[].city` (string): City.
+- `nodes[].region` (string): Region.
+- `nodes[].wd` (number): Whether the offline alert is on; ```0``` means off.
+
+Returns (object): On success ```data.result``` holds the docker count ```all``` and the docker array ```nodes```; fields are in the attributes table below.
+
+List all dockers and whether they are online.
+
+```python
+# api() is the function in the Python example on the signature authentication page
+r = api('GetNodeList')
+for node in r['data']['result']['nodes']:
+    print(node['id'], node['name'], node['online'])
+```
+
+Dockers rented with one click have extra fields starting with ```ecs_``` and ```unit_```, recording the server's provider, configuration and state, and the billing period and price.
+
+###### Example response
 
 ```json
 {
@@ -5417,53 +5597,52 @@ Returns:
 }
 ```
 
-Return value field descriptions (fields with obvious literal meanings are not elaborated):
-- all: Total number of dockers (public dockers included).
-- nodes: List of detailed information for docker nodes.
-  - build: Version number.
-  - city: City location.
-  - is_owner: true indicates private docker, false indicates public docker.
-  - loaded: Load amount, i.e., the number of currently running strategy instances.
-  - public: 0 indicates private docker, 1 indicates public docker.
-  - region: Geographic location.
-  - version: Detailed version information of the docker.
-  - wd: Offline alarm switch, 0 indicates not enabled.
-
-One-click deployed dockers contain additional information, with related fields prefixed by ```ecs_``` and ```unit_```, recording information about the one-click deployed docker server (operator name, configuration, status, etc.), billing cycle, price, and other information, which will not be detailed here.
-
 ##### DeleteNode
 
-The ```DeleteNode``` method is used to delete a docker node under the FMZ Quant Trading Platform account corresponding to the ```API KEY``` in the request. The docker node ID to be deleted is specified by the ```nid``` parameter.
+Deletes a docker of the account; an online docker is forced to log out and all robots on it become "strategy error". Deletion cannot be undone.
 
 Parameters:
 
-- `nid` (number, required): The ```nid``` parameter is used to specify the docker ID to be deleted. You can obtain the docker information under the account through the ```GetNodeList``` method.
+- `nid` (number, required): ID of the docker to delete; see ```GetNodeList```.
 
-Returns:
+Returns (bool): ```data.result``` is ```true``` when the docker record was deleted: the platform forces the online docker to log out and sets all robots on it to "strategy error" (status code ```5```). It is ```false``` when the docker does not exist, does not belong to the account, or cannot be forced to log out.
 
-```json
-{
-    "code":0,
-    "data":{
-        "result":true,
-        "error":null
-    }
-}
+Delete the docker with ID 123.
+
+```python
+# api() is the function in the Python example on the signature authentication page
+r = api('DeleteNode', 123)
+print(r)   # output: {'code': 0, 'data': {'result': True, 'error': None}}
 ```
-
-- result: ```true``` means the docker record has been deleted. When deleting, the platform forces the docker to log out if it is online, and all bots on that docker are set to "strategy error" (status code ```5```). ```false``` when the docker does not exist, does not belong to the account, or cannot be logged out.
 
 ##### GetExchangeList
 
-The ```GetExchangeList``` method is used to get the list of exchanges supported by the FMZ quantitative trading platform and their configuration information.
+Gets the exchanges the platform supports and the configuration fields each of them needs.
 
 Parameters:
 
-- `isSummary` (bool, required): The ```isSummary``` parameter is used to specify whether the returned data is summary information.
+- `isSummary` (bool, required): ```true``` returns only summary information, without ```meta``` and ```stocks```; ```false``` returns everything.
 
-Returns:
+Fields:
 
-When the ```isSummary``` parameter is ```false```, the returned data:
+- `exchanges[].eid` (string): Exchange ID, e.g. ```Futures_Binance```; used when a robot configuration passes an exchange configuration directly.
+- `exchanges[].name` (string): Display name, written ```Chinese|English```.
+- `exchanges[].category` (string): Category.
+- `exchanges[].meta` (string): Metadata of the exchange's configuration fields (JSON text), returned only when ```isSummary``` is ```false```; the field names of ```meta``` in a robot configuration come from here.
+- `exchanges[].stocks` (string): Common trading pairs, comma-separated, returned only when ```isSummary``` is ```false```.
+
+Returns (object): On success ```data.result.exchanges``` is the array of exchanges; fields are in the attributes table below.
+
+List the supported exchange IDs and names (summary).
+
+```python
+# api() is the function in the Python example on the signature authentication page
+r = api('GetExchangeList', True)
+for e in r['data']['result']['exchanges']:
+    print(e['eid'], e['name'])
+```
+
+###### Example response (isSummary false)
 
 ```json
 {
@@ -5475,7 +5654,7 @@ When the ```isSummary``` parameter is ```false```, the returned data:
                 "eid": "Futures_Binance",
                 "id": 74,
                 "logo": "/upload/asset/d8d84b23e573e9326b99.svg",
-                "meta": "[{\"desc\": \"Access Key\", \"qr\":\"apiKey\",\"required\": true, \"type\": \"string\", \"name\": \"AccessKey\", \"label\": \"Access Key\"}, {\"encrypt\": true, \"qr\":\"secretKey\",\"name\": \"SecretKey\", \"required\": true, \"label\": \"Secret Key\", \"type\": \"password\", \"desc\": \"Secret Key\"}]",
+                "meta": "[...]",
                 "name": "币安期货|Futures_Binance",
                 "priority": 200,
                 "stocks": "BTC_USDT,ETH_USDT,ETH_USD",
@@ -5487,7 +5666,18 @@ When the ```isSummary``` parameter is ```false```, the returned data:
 }
 ```
 
-When the ```isSummary``` parameter is ```true```, the returned data:
+```meta``` is JSON text; parsed, it is an array of configuration fields:
+
+```json
+[
+    {"desc": "Access Key", "qr": "apiKey", "required": true, "type": "string",
+     "name": "AccessKey", "label": "Access Key"},
+    {"encrypt": true, "qr": "secretKey", "name": "SecretKey", "required": true,
+     "label": "Secret Key", "type": "password", "desc": "Secret Key"}
+]
+```
+
+###### Example response (isSummary true)
 
 ```json
 {
@@ -5509,18 +5699,35 @@ When the ```isSummary``` parameter is ```true```, the returned data:
 }
 ```
 
-- meta: Exchange configuration metadata.
-
 ##### GetPlatformList
 
-The ```GetPlatformList``` method is used to get the list of configured exchanges under the FMZ Quant Trading Platform account corresponding to the ```API KEY``` in the request.
+Gets the exchange accounts added to the account.
 
 Parameters:
 
-- `offset` (number, optional): Paging offset, default 0.
-- `limit` (number, optional): Page size; omitted or less than or equal to 0 returns everything.
+- `offset` (number, optional): Paging offset, 0 by default.
+- `limit` (number, optional): Page size; omitted or less than or equal to 0 returns all.
 
-Returns:
+Fields:
+
+- `all` (number): Number of exchange accounts added.
+- `platforms[].id` (number): Exchange account ID, the ```pid``` in the ```exchanges``` of a robot configuration.
+- `platforms[].eid` (string): Exchange ID, used in some configurations and parameters.
+- `platforms[].label` (string): The label set when the account was added.
+- `platforms[].stocks` (array): Common trading pairs.
+
+Returns (object): On success ```data.result``` holds the account count ```all``` and the array of exchange accounts ```platforms```; fields are in the attributes table below.
+
+List the added exchange accounts to get the ```pid``` used in robot configurations.
+
+```python
+# api() is the function in the Python example on the signature authentication page
+r = api('GetPlatformList')
+for p in r['data']['result']['platforms']:
+    print(p['id'], p['eid'], p['label'])
+```
+
+###### Example response
 
 ```json
 {
@@ -5533,17 +5740,18 @@ Returns:
                 "date": "2023-12-07 13:44:52",
                 "eid": "Binance",
                 "id": 123,
-                "label": "币安",
+                "label": "Binance",
                 "logo": "...",
                 "name": "币安现货|Binance",
-                "stocks": ["BTC_USDT", "LTC_USDT", "ETH_USDT", "ETC_USDT", "BTC_TUSD", "ETH_TUSD", "BNB_TUSD"],
+                "stocks": ["BTC_USDT", "LTC_USDT", "ETH_USDT", "ETC_USDT",
+                           "BTC_TUSD", "ETH_TUSD", "BNB_TUSD"],
                 "website": "..."
             }, {
                 "category": "通用协议|Custom Protocol",
                 "date": "2020-11-09 11:23:48",
                 "eid": "Exchange",
                 "id": 123,
-                "label": "XX交易所REST协议",
+                "label": "XX exchange REST protocol",
                 "logo": "...",
                 "name": "通用协议|Custom Protocol",
                 "stocks": ["BTC_USDT", "ETH_USDT"],
@@ -5555,46 +5763,76 @@ Returns:
 }
 ```
 
-- all: Total number of configured exchange objects.
-- platforms: Exchange related information.
-  - eid: Exchange identifier on the FMZ Quant Trading Platform, ```eid``` is required in certain configurations and parameters.
-
 ##### GetStrategyList
 
-The ```GetStrategyList``` method is used to retrieve platform strategy information.
+Queries strategies by scope, type, language, keyword and other conditions.
 
 Parameters:
 
 - `offset` (number, required): Paging offset.
-- `length` (number, required): Page size; less than or equal to 0 returns everything.
-- `strategyType` (number, required): Scope of the query:
-- ```-1```: your own and rented strategies (official strategies included).
-- ```0```: your own and rented strategies (official strategies excluded).
-- ```-3```: only your own strategies.
-- ```-6```: only rented strategies (expired ones included).
-- ```-4```: official strategies.
-- ```-2```: public and paid strategies in the Strategy Square.
-- ```1```: published strategies.
-- ```2```: strategies pending review.
-- `category` (number, required): Strategy type:
-- ```-1```: all.
-- ```0```: ordinary strategies.
-- ```20```: template libraries.
-- ```21```: trading plugins.
-- `language` (number, required): Programming language of the strategy:
-- ```-1```: all languages.
-- ```0```: JavaScript.
-- ```1```: Python.
-- ```3```: a discontinued strategy type; appears only on existing strategies.
-- ```4```: MyLanguage.
-- ```5```: PINE.
-- ```6```: Workflow.
-- ```7```: Rust.
-- `kw` (string, required): Keywords matched against strategy names, separated by spaces; an empty string means no filter. Starting with ```id:``` queries by strategy ID, e.g. ```id:123,456```.
-- `groupId` (number, optional): Strategy group: ```-1``` all (default), ```0``` ungrouped, greater than 0 a specific group. Only applies to your own strategies.
-- `orderBy` (string, optional): Sort field: ```name```, ```last_modified```, ```date```, optionally followed by ``` asc``` for ascending order (default descending); an empty string keeps the default order.
+- `length` (number, required): Page size; less than or equal to 0 returns all.
+- `strategyType` (number, required): Scope, e.g. ```-3``` for only your own strategies; values are listed in the remarks.
+- `category` (number, required): Strategy type: ```-1``` all, ```0``` normal strategy, ```20``` template library, ```21``` trading plugin.
+- `language` (number, required): Programming language, ```-1``` for all; values are listed in the remarks.
+- `kw` (string, required): Keyword matched fuzzily against strategy names, several words separated by spaces; an empty string means no filter. Starting with ```id:``` queries by strategy ID, e.g. ```id:123,456```.
+- `groupId` (number, optional): Strategy group: ```-1``` all (default), ```0``` ungrouped, greater than 0 a specific group. Applies only to your own strategies.
+- `orderBy` (string, optional): Sort field: ```name```, ```last_modified``` or ```date```; append ``` asc``` for ascending (descending by default); an empty string is the default order.
 
-Returns:
+Fields:
+
+- `all` (number): Total number of matching strategies.
+- `strategies` (array): Array of strategies.
+- `strategies[].id` (number): Strategy ID, the ```strategy``` of a robot configuration.
+- `strategies[].category` (number): Strategy type, same values as the ```category``` argument.
+- `strategies[].language` (number): Programming language, same values as the ```language``` argument.
+
+Returns (object): On success ```data.result``` holds the strategy count ```all``` and the strategy array ```strategies```; fields are in the attributes table below.
+
+Get your first 10 strategies with positional arguments, or all your Rust strategies with named arguments.
+
+```python
+# api() is the function in the Python example on the signature authentication page
+r = api('GetStrategyList', 0, 10, -3, -1, -1, '')          # your first 10 strategies
+r = api('GetStrategyList', strategyType=-3, language=7)    # all your Rust strategies
+for s in r['data']['result']['strategies']:
+    print(s['id'], s['name'])
+```
+
+There is no ```needArgs``` parameter: passing an extra argument after ```category``` as old documentation did shifts the following arguments. Pass the arguments in the order above, or by name.
+
+Positional calls accept only 0, 6, 7 or 8 arguments. With no arguments (```args``` is ```[]```) the server fills in ```(-1, -1, -1, -1, 1, "")```, so ```language``` is ```1``` and only Python strategies are returned; to get all languages pass ```language``` as ```-1```, or pass arguments by name (then ```language``` defaults to ```-1```).
+
+###### Parameter values
+
+```strategyType``` (scope):
+
+| Value | Meaning |
+| - | - |
+| ```-1``` | Your own and rented strategies (official strategies included) |
+| ```0``` | Your own and rented strategies (official strategies excluded) |
+| ```-3``` | Only your own strategies |
+| ```-6``` | Only rented strategies (expired ones included) |
+| ```-4``` | Official strategies |
+| ```-2``` | Public and paid strategies in the strategy square |
+| ```1``` | Published strategies |
+| ```2``` | Strategies pending review |
+
+```category``` (strategy type): ```-1``` all, ```0``` normal strategy, ```20``` template library, ```21``` trading plugin.
+
+```language``` (programming language):
+
+| Value | Meaning |
+| - | - |
+| ```-1``` | All languages |
+| ```0``` | JavaScript |
+| ```1``` | Python |
+| ```3``` | A discontinued strategy type that appears only in existing strategies |
+| ```4``` | My language |
+| ```5``` | PINE |
+| ```6``` | Workflow |
+| ```7``` | Rust |
+
+###### Example response
 
 ```json
 {
@@ -5630,27 +5868,27 @@ Returns:
 }
 ```
 
-- all: Total number of strategies matching the filter criteria.
-- strategies: Detailed information of the strategies found; ```category``` and ```language``` take the values described in the parameters above.
-
-There is no ```needArgs``` parameter. Passing an extra parameter after ```category```, as older documentation did, shifts all following parameters; pass them in the order above, or by name:
-
-```plaintext
-api('GetStrategyList', 0, 10, -3, -1, -1, '')           # first 10 of your own strategies
-api('GetStrategyList', strategyType=-3, language=7)     # all of your own Rust strategies
-```
-
-Positional calls accept only 0, 6, 7 or 8 arguments. With no arguments at all (```args``` is ```[]```) the server fills in ```(-1, -1, -1, -1, 1, "")```, i.e. ```language``` is ```1``` and **only Python strategies are returned**; to list all languages pass ```language``` as ```-1```, or pass arguments by name (by name, ```language``` defaults to ```-1```).
-
 ##### GetRobotGroupList
 
-The ```GetRobotGroupList``` method is used to get the list of live trading groups under the FMZ Quant Trading Platform account corresponding to the ```API KEY``` in the request.
+Gets the robot groups of the account; the "Default" group is not listed.
 
-Parameters:
+Fields:
 
-No parameters
+- `items[].id` (number): Robot group ID, the ```group``` of a robot configuration.
+- `items[].name` (string): Robot group name.
 
-Returns:
+Returns (object): On success ```data.result.items``` is the array of groups; it contains only groups you created, not the "Default" group.
+
+List the robot groups.
+
+```python
+# api() is the function in the Python example on the signature authentication page
+r = api('GetRobotGroupList')
+for g in r['data']['result']['items']:
+    print(g['id'], g['name'])
+```
+
+###### Example response
 
 ```json
 {
@@ -5659,10 +5897,10 @@ Returns:
         "result": {
             "items": [{
                 "id": 3417,
-                "name": "Test"
+                "name": "test"
             }, {
                 "id": 3608,
-                "name": "Live Trading Demo"
+                "name": "demo"
             }]
         },
         "error": null
@@ -5670,28 +5908,46 @@ Returns:
 }
 ```
 
-- items: Live trading group information.
-  - id: Live trading group ID.
-  - name: Live trading group name.
-
-The ```items``` field only records newly created groups, the "Default" group is not included in ```items```.
-
 ##### GetRobotList
 
-The ```GetRobotList``` method returns the live trading bots of the platform account of the ```API KEY``` in the request. All parameters are optional.
+Gets the robots of the account, optionally filtered by status, label, name, group or strategy; all arguments can be omitted.
 
 Parameters:
 
-- `offset` (number, optional): Paging offset, default 0.
-- `length` (number, optional): Page size; less than or equal to 0 returns everything (default).
-- `customStatus` (number, optional): Filter by live trading status code, see Live Trading Status Codes; ```-1``` returns all bots (default), ```-2``` returns all bots sorted by start time.
-- `appId` (string, optional): Filter by the bot's custom label (```appid``` in ```settings``` when it was created); an empty string means no filter.
-- `kw` (string, optional): Keyword matched against bot names; an empty string means no filter.
-- `groupId` (number, optional): Live trading group: ```-1``` all (default), ```0``` ungrouped, greater than 0 a specific group.
-- `orderBy` (string, optional): Sort field: ```name```, ```status```, ```node```, ```profit```, ```date```, ```refresh```, ```start_time```, ```strategy_name```, optionally followed by ``` asc``` for ascending order (default descending); an empty string keeps the default order.
-- `strategyId` (number, optional): When greater than 0, only bots of this strategy are returned; default 0 (no filter).
+- `offset` (number, optional): Paging offset, 0 by default.
+- `length` (number, optional): Page size; less than or equal to 0 returns all (default).
+- `customStatus` (number, optional): Filter by robot status code, see `Live Trading Status Codes`; ```-1``` returns all robots (default), ```-2``` all robots sorted by start time.
+- `appId` (string, optional): Filter by the robot's custom label (```appid``` in ```settings``` at creation); an empty string means no filter.
+- `kw` (string, optional): Keyword matched fuzzily against robot names; an empty string means no filter.
+- `groupId` (number, optional): Robot group: ```-1``` all (default), ```0``` ungrouped, greater than 0 a specific group.
+- `orderBy` (string, optional): Sort field: ```name```, ```status```, ```node```, ```profit```, ```date```, ```refresh```, ```start_time``` or ```strategy_name```; append ``` asc``` for ascending (descending by default); an empty string is the default order.
+- `strategyId` (number, optional): When greater than 0, only robots of this strategy are returned; 0 (no filter) by default.
 
-Returns:
+Fields:
+
+- `all` (number): Total number of matching robots.
+- `robots` (array): Array of robots.
+- `robots[].id` (number): Robot ID.
+- `robots[].status` (number): Robot status code, see `Live Trading Status Codes`.
+- `robots[].group_id` (number): Robot group ID; robots in the default group have no such field.
+
+Returns (object): On success ```data.result``` holds the robot count ```all``` and the robot array ```robots```; fields are in the attributes table below.
+
+Get all robots, filter by label, and pass arguments by position or by name.
+
+```python
+# api() is the function in the Python example on the signature authentication page
+r = api('GetRobotList')                               # all robots
+# a single string is taken as the label: all robots labeled member2
+r = api('GetRobotList', 'member2')
+# positional: up to 100 robots labeled member2, starting at offset 0
+r = api('GetRobotList', 0, 100, -1, 'member2', '')
+r = api('GetRobotList', appId='member2', length=100)  # by name, same as above
+for robot in r['data']['result']['robots']:
+    print(robot['id'], robot['name'], robot['status'])
+```
+
+###### Example response
 
 ```json
 {
@@ -5707,7 +5963,7 @@ Returns:
                 "fixed_id": 4509153,
                 "id": 591026,
                 "is_sandbox": 0,
-                "name": "Test",
+                "name": "test",
                 "node_guid": "45891bcf3d57f99b08a43dff76ee1ea1",
                 "node_id": 4519153,
                 "node_public": 0,
@@ -5719,7 +5975,7 @@ Returns:
                 "strategy_id": 411670,
                 "strategy_isowner": true,
                 "strategy_language": 0,
-                "strategy_name": "Test",
+                "strategy_name": "test",
                 "strategy_public": 0,
                 "uid": "105ed6e511cc977921610fdbb7e2a1d6",
                 "wd": 0
@@ -5730,26 +5986,52 @@ Returns:
 }
 ```
 
-- all: Total number of bots matching the filters.
-- robots: Live trading bot information; ```status``` is the live trading status code.
-  - group_id: Live trading bot group ID; if the live trading bot is in the default group, the ```group_id``` field is not included.
-
-Using ```api()``` from the Python example on the signature authentication page:
-
-- ```api('GetRobotList')```: all live trading bots.
-- ```api('GetRobotList', 'member2')```: a single string is taken as the label; all bots labeled member2.
-- ```api('GetRobotList', 0, 100, -1, 'member2', '')```: positional parameters; up to 100 bots labeled member2, starting at offset 0.
-- ```api('GetRobotList', appId='member2', length=100)```: the same by parameter name.
-
 ##### GetRobotDetail
 
-The ```GetRobotDetail``` method is used to get detailed information of a live trading bot under the FMZ Quant Trading Platform account corresponding to the ```API KEY``` in the request. The detailed information of the live trading bot to be retrieved is specified by the ```robotId``` parameter.
+Gets the details of one robot of the account, including its status, billing, exchange configuration and strategy arguments.
 
 Parameters:
 
-- `robotId` (number, required): The ```robotId``` parameter is used to specify the ID of the live trading bot for which to retrieve detailed information. The live trading bot information under the account, including the bot ID, can be obtained through the ```GetRobotList``` method.
+- `robotId` (number, required): Robot ID; see ```GetRobotList```.
 
-Returns:
+Fields:
+
+- `robot.status` (number): Robot status code, see `Live Trading Status Codes`.
+- `robot.name` (string): Robot name.
+- `robot.date` (string): Creation date.
+- `robot.charge_time` (number): Next billing time (Unix timestamp in seconds), i.e. the end of the period already paid for.
+- `robot.charged` (number): Total billed running time in seconds.
+- `robot.consumed` (number): Total amount charged, in USD, as an integer scaled by 1e8; 5375000000 in the example is 53.75 USD.
+- `robot.node_id` (number): Docker ID.
+- `robot.fixed_id` (number): Docker ID set in the robot configuration; ```-1``` when assigned automatically.
+- `robot.is_manager` (bool): Whether you may manage the robot.
+- `robot.is_sandbox` (number): Whether it is a demo (sandbox) robot.
+- `robot.pexchanges` (object): Exchange objects of the robot: keys are ```pid```, values are exchange IDs (```eid```), e.g. ```{"123": "Futures_OKX"}```.
+- `robot.plabels` (object): Labels of the robot's exchange objects, keyed by ```pid```.
+- `robot.strategy_exchange_pairs` (string): Default K-line period, exchange objects and trading pairs (JSON text); format in the remarks.
+- `robot.profit` (number): Robot profit.
+- `robot.public` (number): Whether the robot is public.
+- `robot.refresh` (number): Last active time (millisecond timestamp).
+- `robot.wd` (number): Whether the offline alert is on.
+
+Returns (object): On success ```data.result.robot``` is the robot information; fields are in the attributes table below.
+
+Query the status and exchange configuration of robot 123.
+
+```python
+# api() is the function in the Python example on the signature authentication page
+r = api('GetRobotDetail', 123)
+robot = r['data']['result']['robot']
+print(robot['status'], robot['pexchanges'], robot['strategy_exchange_pairs'])
+```
+
+```strategy_exchange_pairs``` is the text of a JSON array, e.g. ```"[60,[44314,42960,15445,14703],[\"BTC_USDT\",\"BTC_USDT\",\"ETH_USDT\",\"ETH_USDT\"]]"```:
+
+- ```60```: the default K-line period of the robot in seconds (1 minute here).
+- ```[44314,42960,15445,14703]```: the ```pid``` of the robot's exchange objects, in the order they were added.
+- ```["BTC_USDT","BTC_USDT","ETH_USDT","ETH_USDT"]```: the trading pair of each exchange object, matching the ```pid``` list in order.
+
+###### Example response
 
 ```json
 {
@@ -5771,7 +6053,7 @@ Returns:
                 "is_deleted": 0,
                 "is_manager": true,
                 "is_sandbox": 0,
-                "name": "Test",
+                "name": "test",
                 "node_id": 123,
                 "pexchanges": {
                     "123": "Futures_OKX"
@@ -5780,7 +6062,7 @@ Returns:
                     "123": "ca1aca74b9cf7d8624f2af2dac01e36d"
                 },
                 "plabels": {
-                    "123": "OKX Futures"
+                    "123": "OKX futures"
                 },
                 "priority": 0,
                 "profit": 0,
@@ -5793,7 +6075,7 @@ Returns:
                 "strategy_exchange_pairs": "[60,[123],[\"ETH_USDT\"]]",
                 "strategy_id": 123,
                 "strategy_last_modified": "2024-11-21 16:49:25",
-                "strategy_name": "Test",
+                "strategy_name": "test",
                 "strategy_public": "0",
                 "uid": "105ed6e51bcc17792a610fdbb7e2a1d6",
                 "username": "abc",
@@ -5805,64 +6087,99 @@ Returns:
 }
 ```
 
-- charge_time: Next billing time (Unix timestamp in seconds), i.e. the end of the period already paid for.
-- charged: Total billed time in seconds.
-- consumed: Total amount charged in USD, stored as an integer scaled by 1e8; 5375000000 in the example is 53.75 USD.
-- date: Creation date.
-- fixed_id: Docker ID assigned during live trading. If auto-assigned, this value is -1.
-- is_manager: Whether has permission to manage this live trading bot.
-- is_sandbox: Whether it is a simulated trading bot.
-- name: Live trading bot name.
-- node_id: Docker ID.
-- pexchanges: Exchange objects configured for the live trading bot, where 123 is the pid and "Futures_OKX" is the exchange ID (eid).
-- plabels: Label information for the exchange objects configured for the live trading bot.
-- profit: Live trading bot profit data.
-- public: Whether the live trading bot is public.
-- refresh: Last active time.
-- strategy_exchange_pairs: Configured exchange objects and their trading pair information.
-- wd: Whether offline alert is enabled.
-
-Explanation of the ```strategy_exchange_pairs``` attribute, using the following data as an example:
-
-```plaintext
-"[60,[44314,42960,15445,14703],[\"BTC_USDT\",\"BTC_USDT\",\"ETH_USDT\",\"ETH_USDT\"]]"
-```
-
-The first data ```60``` indicates that the default K-line period set for the live trading bot is 1 minute, i.e., 60 seconds.
-
-```[44314,42960,15445,14703]``` are the ```pid``` values of the exchange objects configured for the live trading bot (arranged in the order they were added).
-
-```[\"BTC_USDT\",\"BTC_USDT\",\"ETH_USDT\",\"ETH_USDT\"]``` are the trading pairs set for the exchange objects configured for the live trading bot (corresponding one-to-one with the pid values in the order they were added).
-
 ##### GetRobotLogs
 
-The ```GetRobotLogs``` method is used to get the live trading log information under the FMZ Quant Trading Platform account corresponding to the ```API KEY``` in the request. The live trading ID for which to get log information is specified by the ```robotId``` parameter.
+Gets the strategy log, profit log, chart data and status bar data of one robot of the account.
 
 Parameters:
 
-- `robotId` (number, required): The ```robotId``` parameter is used to specify the live trading ID for which to get log information. You can use the ```GetRobotList``` method to get the live trading information under the account, which includes the live trading ID.
-- `logMinId` (number, required): The ```logMinId``` parameter is used to specify the minimum ID of log records.
-- `logMaxId` (number, required): The ```logMaxId``` parameter is used to specify the maximum ID of log records.
-- `logOffset` (number, required): The ```logOffset``` parameter is used to set the offset. Within the range determined by ```logMinId``` and ```logMaxId```, skip the specified number of records according to ```logOffset``` to determine the starting position for data retrieval.
-- `logLimit` (number, required): The ```logLimit``` parameter is used to set the number of data records to retrieve starting from the initial position.
-- `profitMinId` (number, required): The ```profitMinId``` parameter is used to set the minimum ID of profit logs.
-- `profitMaxId` (number, required): The ```profitMaxId``` parameter is used to set the maximum ID of profit logs.
-- `profitOffset` (number, required): The ```profitOffset``` parameter is used to set the offset, i.e., skip the specified number of records as the starting position.
-- `profitLimit` (number, required): The ```profitLimit``` parameter is used to set the number of data records to retrieve starting from the initial position.
-- `chartMinId` (number, required): The ```chartMinId``` parameter is used to set the minimum ID of chart data records.
-- `chartMaxId` (number, required): The ```chartMaxId``` parameter is used to set the maximum ID of chart data records.
-- `chartOffset` (number, required): The ```chartOffset``` parameter is used to set the offset.
-- `chartLimit` (number, required): The ```chartLimit``` parameter is used to set the number of records to retrieve.
-- `chartUpdateBaseId` (number, required): The ```chartUpdateBaseId``` parameter is used to set the base ID for querying update records.
-- `chartUpdateDate` (number, required): The ```chartUpdateDate``` parameter is used to set the update timestamp of data records, and the system will filter out records greater than this timestamp.
-- `summaryLimit` (number, required): The ```summaryLimit``` parameter sets whether to query the status bar data of the live trading. This parameter is an integer.
+- `robotId` (number, required): Robot ID; see ```GetRobotList```.
+- `logMinId` (number, required): Minimum ID of strategy log entries.
+- `logMaxId` (number, required): Maximum ID of strategy log entries.
+- `logOffset` (number, required): Number of records to skip within the range given by ```logMinId``` and ```logMaxId```.
+- `logLimit` (number, required): Number of records to return from the starting position.
+- `profitMinId` (number, required): Minimum ID of profit log entries.
+- `profitMaxId` (number, required): Maximum ID of profit log entries.
+- `profitOffset` (number, required): Number of records to skip.
+- `profitLimit` (number, required): Number of records to return.
+- `chartMinId` (number, required): Minimum ID of chart log entries.
+- `chartMaxId` (number, required): Maximum ID of chart log entries.
+- `chartOffset` (number, required): Number of records to skip.
+- `chartLimit` (number, required): Number of records to return.
+- `chartUpdateBaseId` (number, required): Base ID for querying updates.
+- `chartUpdateDate` (number, required): Update timestamp; only newer records are returned.
+- `summaryLimit` (number, required): Whether to return status bar data: ```0``` does not; greater than 0 returns it in ```summary``` (the value itself has no effect; at most 2MB).
+- `logExchange` (string, optional): Return only logs of this exchange object (by label); an empty string means no filter.
+- `logKeyword` (string, optional): Return only logs whose content contains this keyword; an empty string means no filter.
+- `logTypes` (string, optional): Return only these log types, comma-separated type numbers, e.g. ```"0,1,2"``` for buy, sell and cancel logs; an empty string means all types.
 
-Setting it to 0 means not querying status bar information; a value greater than 0 returns the status bar data (the number itself has no effect; at most 2MB is returned). The status bar data is stored in the ```summary``` field of the returned data.
-- `logExchange` (string, optional): Only logs of this exchange object (by label); an empty string means no filter. The three filters ```logExchange```, ```logKeyword``` and ```logTypes``` only work on the new docker; an old docker ignores them and returns all logs.
-- `logKeyword` (string, optional): Only logs whose content contains this keyword; an empty string means no filter.
-- `logTypes` (string, optional): Only logs of these types, as comma-separated log type numbers, e.g. ```"0,1,2"``` for buy, sell and cancel logs; an empty string means all types.
+Fields:
 
-Returns:
+- `logs` (array): Three objects: the query results of the strategy log, profit log and chart log tables of the robot database, in that order; the ```Arr``` of each holds the records, formatted as described in the remarks.
+- `summary` (string): Status bar data of the robot (returned when ```summaryLimit``` is greater than 0).
+- `status` (number): Robot status code, see `Live Trading Status Codes`.
+
+Returns (object): On success ```data.result``` holds the logs ```logs```, the status bar data ```summary``` and more; fields are in the attributes table below.
+
+Query the latest 10 strategy log entries and the status bar of robot 123, passing arguments by name.
+
+```python
+# api() is the function in the Python example on the signature authentication page
+r = api('GetRobotLogs', robotId=123, logLimit=10, summaryLimit=1)
+result = r['data']['result']
+for row in result['logs'][0]['Arr']:
+    print(row)
+print(result['summary'])   # status bar data
+```
+
+With this many parameters, passing them by name is recommended (missing ones take their defaults); positional calls take 15 to 19 arguments (with 15 the status bar is not queried). The three filters ```logExchange```, ```logKeyword``` and ```logTypes``` work only on new dockers; old dockers ignore them and return all logs.
+
+###### logs[0]: strategy log
+
+Each entry of ```logs[0].Arr``` is an array of: log ID (```id```), log type (```logType```), label of the exchange object (```platformId```), order ID (```orderId```), price (```price```), amount (```amount```), extra message of the log (```extra```), timestamp (```date```), contract code (```contractType```), direction (```direction```). For example:
+
+```plaintext
+"Arr": [
+    [3977, 3, "Futures_OKX", "", 0, 0, "Sell(688.9, 2): 20016", 1526954372591, "", ""],
+    [3976, 5, "", "", 0, 0, "this_week too many positions, long: 2", 1526954372410, "", ""]
+]
+```
+
+Values of ```logType```:
+
+| logType | Name | Meaning |
+| - | - | - |
+| 0 | BUY | Buy order |
+| 1 | SALE | Sell order |
+| 2 | RETRACT | Order cancelled |
+| 3 | ERROR | Error |
+| 4 | PROFIT | Profit |
+| 5 | MESSAGE | Log message |
+| 6 | RESTART | Restart |
+
+###### logs[1]: profit log
+
+The same as the profit entries of the strategy log; each entry is log ID, profit value, timestamp. In ```[202, 2515.44, 1575896700315]```, ```202``` is the log ID, ```2515.44``` the profit and ```1575896700315``` the timestamp:
+
+```plaintext
+"Arr": [
+    [202, 2515.44, 1575896700315],
+    [201, 1415.44, 1575896341568]
+]
+```
+
+###### logs[2]: chart log
+
+Each entry is log ID, chart series index, data (JSON text). In ```[23637, 0, "{\"close\":648, ...}"]```, ```23637``` is the log ID, ```0``` the series index, and the JSON text is one K-line on the chart:
+
+```plaintext
+"Arr": [
+    [23637, 0, "{\"close\":648,\"high\":650.5,\"low\":647,\"open\":650,\"x\":1575960300000}"],
+    [23636, 5, "{\"x\":1575960300000,\"y\":3.0735}"]
+]
+```
+
+###### Example response
 
 ```json
 {
@@ -5900,80 +6217,21 @@ Returns:
 }
 ```
 
-- logs: Log information; the queried log data entries are stored in the Arr field.
-  The first data structure in logs contains log records from the strategy log table in the live trading database.
-  The second data structure in logs contains log records from the profit log table in the live trading database.
-  The third data structure in logs contains log records from the chart log table in the live trading database.
-- summary: Live trading status bar data.
-
-- Strategy log table in database
-  The description of the ```Arr``` attribute value in the first element (log data) of the ```logs``` attribute value (array structure) in the returned data is as follows:
-
-  ```plaintext
-  "Arr": [
-      [3977, 3, "Futures_OKX", "", 0, 0, "Sell(688.9, 2): 20016", 1526954372591, "", ""],
-      [3976, 5, "", "", 0, 0, "this_week Position too large, long: 2", 1526954372410, "", ""]
-  ],
-  ```
-
-  | id | logType | platformId (exchange object label) | orderId | price | amount | extra | date | contractType | direction |
-  | - | - | - | - | - | - | - | - | - | - |
-  | 3977 | 3 | "Futures_OKX" | "" | 0 | 0 | "Sell(688.9, 2): 20016" | 1526954372591 | "" | "" |
-  | 3976 | 5 | "" | "" | 0 | 0 | "this_week Position too large, long: 2" | 1526954372410 | "" | "" |
-
-  ```extra``` is the additional information for the printed log.
-
-  The log type descriptions corresponding to ```logType``` values are as follows:
-
-  | logType: | 0 | 1 | 2 | 3 | 4 | 5 | 6 |
-  | - | - | - | - | - | - | - | - |
-  | logType meaning: | BUY | SALE | RETRACT | ERROR | PROFIT | MESSAGE | RESTART |
-  | English meaning | Buy order log | Sell order log | Cancel order | Error | Profit | Message | Restart |
-
-- Profit chart log table in database
-  The data in this chart log table is consistent with the profit logs in the strategy log table.
-
-  ```plaintext
-  "Arr": [
-      [202, 2515.44, 1575896700315],
-      [201, 1415.44, 1575896341568]
-  ]
-  ```
-
-  Taking one log data as an example:
-
-  ```plaintext
-  [202, 2515.44, 1575896700315]
-  ```
-
-  ```202``` is the log ID, ```2515.44``` is the profit value, ```1575896700315``` is the timestamp.
-- Chart log table in database
-
-  ```plaintext
-  "Arr": [
-      [23637, 0, "{\"close\":648,\"high\":650.5,\"low\":647,\"open\":650,\"x\":1575960300000}"],
-      [23636, 5, "{\"x\":1575960300000,\"y\":3.0735}"]
-  ]
-  ```
-
-  Taking one log data as an example:
-
-  ```plaintext
-  [23637, 0, "{\"close\":648,\"high\":650.5,\"low\":647,\"open\":650,\"x\":1575960300000}"],
-  ```
-
-  ```23637``` is the log ID, ```0``` is the chart data series index, and the final data ```"{\"close\":648,\"high\":650.5,\"low\":647,\"open\":650,\"x\":1575960300000}"``` is the log data, which is the K-line data on the chart.
-
 ##### NewRobot
 
-The ```NewRobot``` method creates a live trading bot under the platform account of the ```API KEY``` in the request and starts it; like creating a bot on the website, this charges fees.
+Creates a robot in the account and starts it; like creating a robot on the website, this charges fees and the robot trades for real.
 
 Parameters:
 
-- `settings` (JSON object, required): Live trading configuration; for its fields see "Live trading configuration (settings)" in Extended API Interface Details. For example:
+- `settings` (object, required): Robot configuration; fields are described under "Robot configuration (settings)" in `Extended API Interface Details`.
 
-```json
-{
+Returns (number): ```data.result```: the ID of the new robot on success; ```0``` when ```args``` in ```settings``` is not an array; a negative number when no robot was created, see the remarks.
+
+Create and start a robot with an added exchange account (```pid```).
+
+```python
+# api() is the function in the Python example on the signature authentication page
+settings = {
     "name": "test",
     "strategy": 123,
     "args": [],
@@ -5985,107 +6243,86 @@ Parameters:
     "group": 123,
     "appid": "test"
 }
+r = api('NewRobot', settings)
+print(r['data']['result'])   # output: 591988 (ID of the new robot)
 ```
 
-Returns:
+When created through the extended API, the call returns after the start-up has run. If start-up fails (e.g. the strategy does not compile), the ID of the new robot is still returned and the robot is in the "strategy error" state (status code ```5```), so check its status with ```GetRobotDetail``` after creating it.
 
-```json
-{
-    "code":0,
-    "data":{
-        "result":591988,
-        "error":null
-    }
-}
-```
+A negative result means no robot was created; see "Return values of failed starts" in `Live Trading Status Codes`, e.g. ```-2``` no docker found, ```-5``` insufficient balance. When the account exceeds the number of robots it may run, an error with ```code``` 6 is returned.
 
-- result: The ID of the new bot on success. When created through the extended API, the platform returns only after the start has been carried out; if the start fails (for example the strategy does not compile), the ID of the new bot is still returned and the bot is in the "strategy error" state (status code ```5```), so check its status with ```GetRobotDetail``` after creating it.
-  - ```0```: ```args``` in ```settings``` is not an array.
-  - A negative number: no bot was created; see "Return values when a start fails" in Live Trading Status Codes (e.g. ```-2``` no docker found, ```-5``` insufficient balance).
-
-  When the account already runs as many bots as it may, an error with ```code``` 6 is returned.
-
-When the exchange configuration is passed directly with ```eid```, the platform does not store the keys in ```meta```, so every later ```RestartRobot``` of this bot must pass ```settings``` again.
+When an exchange configuration is passed directly with ```eid```, the platform does not store the keys in ```meta```, so every later restart of the robot with ```RestartRobot``` must pass ```settings``` again.
 
 ##### RestartRobot
 
-The ```RestartRobot``` method starts (restarts) a live trading bot of the platform account of the ```API KEY``` in the request; the bot is given by ```robotId```. Starting a bot charges fees.
+Starts (restarts) a robot of the account, optionally replacing its configuration; starting charges fees.
 
 Parameters:
 
-- `robotId` (number, required): Live trading bot ID, see the ```GetRobotList``` method.
-- `settings` (JSON object, optional): Live trading configuration; for its fields see "Live trading configuration (settings)" in Extended API Interface Details. When given, it **replaces** the bot's whole configuration (name, parameters, exchanges, K-line period, docker) before starting; the strategy cannot be changed. Fields you leave out do not keep their old values; ```name``` becomes an empty string, ```args``` becomes ```[]``` (all parameters back to their defaults), omitting ```exchanges``` deletes all of the bot's exchange configurations, ```period``` becomes 60 seconds and ```node``` becomes automatic assignment; only ```group``` keeps the old group when omitted or ```0```. So always pass the complete configuration; it is best to read the current one with ```GetRobotDetail``` and modify that. Passing ```settings``` while the bot is preparing, running or stopping returns an error with ```code``` 6 (```robot is running```).
+- `robotId` (number, required): Robot ID; see ```GetRobotList```.
+- `settings` (object, optional): New robot configuration; when given it replaces the whole configuration before starting, see the remarks. Fields are described under "Robot configuration (settings)" in `Extended API Interface Details`.
 
-Returns:
+Returns (number): ```data.result```: normally ```0``` (preparing), meaning the start-up has run; whether the start succeeded must be checked with ```GetRobotDetail```. Other return values are in the remarks.
 
-```json
-{
-    "code":0,
-    "data":{
-        "result":0,
-        "error":null
-    }
-}
+Start robot 123 with its current configuration.
+
+```python
+# api() is the function in the Python example on the signature authentication page
+r = api('RestartRobot', 123)
+print(r['data']['result'])   # output: 0 (preparing; the start-up has run)
 ```
 
-- result: Normally ```0``` (preparing), meaning the start has been carried out. Whether it succeeded (running, or "strategy error" because of a compile error, for example) has to be checked with ```GetRobotDetail```.
-  - If the bot is already preparing, running or stopping, it is not restarted and its current status code (```0```, ```1```, ```2```) is returned.
-  - A negative number: the start failed; see "Return values when a start fails" in Live Trading Status Codes.
+A robot created on the website with added exchange accounts (```pid```) can be started with just ```robotId```, using its current configuration. A robot whose exchange configurations were passed directly with ```eid``` (usually created through the extended API) has no stored keys, so ```settings``` must be passed on every restart.
 
-A bot created on the website with exchange accounts referenced by ```pid``` can be started with ```robotId``` alone, using its current configuration. A bot whose exchanges were passed directly with ```eid``` (usually created through the extended API) has no stored keys, so ```settings``` must be passed on every restart.
+When ```settings``` is given, it **replaces** the robot's whole configuration (name, arguments, exchanges, K-line period, docker) before the start; the strategy cannot be changed. Fields left out do not keep their old values: ```name``` becomes an empty string, ```args``` becomes ```[]``` (all arguments back to their defaults), leaving out ```exchanges``` deletes all of the robot's exchange configurations, ```period``` becomes 60 seconds and ```node``` becomes automatic; only ```group``` keeps the old group when omitted or ```0```. So always pass a complete configuration; it is best to get the current one with ```GetRobotDetail``` and modify it.
+
+Passing ```settings``` while the robot is preparing, running or stopping returns an error with ```code``` 6 (```robot is running```); without ```settings``` the robot is not restarted and its current status code (```0```, ```1``` or ```2```) is returned.
+
+A negative result means the start failed; see "Return values of failed starts" in `Live Trading Status Codes`. Whether the robot is then running, or in "strategy error" because it failed to compile, must be checked with ```GetRobotDetail```.
 
 ##### StopRobot
 
-The ```StopRobot``` method is used to stop a live trading bot under the FMZ Quant Trading Platform account corresponding to the ```API KEY``` in the request. The bot Id to be stopped is specified by the ```robotId``` parameter.
+Stops a robot of the account; stopping does not close positions.
 
 Parameters:
 
-- `robotId` (number, required): The ```robotId``` parameter is used to specify the bot Id to be stopped. You can obtain the bot information under the account through the ```GetRobotList``` method, which includes the bot Id.
+- `robotId` (number, required): Robot ID; see ```GetRobotList```.
 
-Returns:
+Returns (number): ```data.result``` is the robot status code: ```2``` (stopping) means the stop command was sent to the docker; ```4``` (stopped) means the robot's docker has been deleted, so the robot was set to stopped directly; ```3```, ```4``` or ```5``` may also mean the robot had already ended.
 
-```json
-{
-    "code":0,
-    "data":{
-        "result":2,
-        "error":null
-    }
-}
+Stop robot 123.
+
+```python
+# api() is the function in the Python example on the signature authentication page
+r = api('StopRobot', 123)
+print(r['data']['result'])   # output: 2 (stopping)
 ```
 
-- result: Live trading status code.
-  - ```2``` (stopping): the stop command has been sent to the docker.
-  - ```4``` (stopped): the bot's docker has been deleted, so the bot is set to stopped directly.
-  - ```3```, ```4```, ```5```: the bot had already ended; its current status code is returned.
-
-  While the bot is being started or stopped (```robot is busy```), or when its docker is offline (```docker not found```), an error with ```code``` 6 is returned.
+While the robot is starting or stopping (```robot is busy```), or when its docker is offline (```docker not found```), an error with ```code``` 6 is returned.
 
 ##### CommandRobot
 
-The ```CommandRobot``` method is used to send interactive commands to a live trading bot under the FMZ Quant Trading Platform account corresponding to the ```API KEY``` in the request. The bot Id that receives the interactive command is specified by the ```robotId``` parameter, and the interactive command is captured and returned by the ```GetCommand()``` function called in the strategy.
+Sends an interactive command to a running robot of the account; the strategy receives it with `GetCommand`.
 
 Parameters:
 
-- `robotId` (number, required): The ```robotId``` parameter is used to specify the bot Id that receives the interactive command. You can use the ```GetRobotList``` method to get information about bots under the account, which includes the bot Id.
-- `cmd` (string, required): The interactive command sent to the bot; the strategy reads it with ```GetCommand()```, see `GetCommand`.
+- `robotId` (number, required): ID of the robot that receives the command; see ```GetRobotList```.
+- `cmd` (string, required): The interactive command; the strategy reads it with ```GetCommand()```.
 
-Returns:
+Returns (bool): ```data.result``` tells whether the command was sent; it is ```false``` when the robot is not running.
 
-```json
-{
-    "code":0,
-    "data":{
-        "result":true,
-        "error":null
-    }
-}
+Send the command ```test command``` to running robot 123; its strategy receives it with ```GetCommand()``` and logs it (strategy code in the remarks).
+
+```python
+# api() is the function in the Python example on the signature authentication page
+r = api('CommandRobot', 123, 'test command')
+print(r['data']['result'])   # output: True
 ```
 
-- result: Whether the interactive command was sent successfully. When sending a command to a bot that is not running, the result in the returned data will be false.
+A strategy that receives the command:
 
-Example of bot strategy (assuming this strategy bot is running with bot Id 123):
-```js
+```javascript
+// strategy run by robot 123: print each interactive command it receives
 function main() {
     while (true) {
         var cmd = GetCommand()
@@ -6097,135 +6334,116 @@ function main() {
 }
 ```
 
-Calling ```api("CommandRobot", 123, "test command")``` with ```api()``` from the Python example on the signature authentication page, the bot with Id 123 will receive the interactive command: ```test command```, and output it through the Log function.
+To call ```CommandRobot``` from a webhook that accepts only one URL, such as TradingView, see `Direct Verification`.
 
 ##### DeleteRobot
 
-The ```DeleteRobot``` method deletes a live trading bot of the platform account of the ```API KEY``` in the request; the bot is given by ```robotId```. A running bot must be stopped first. Deletion cannot be undone.
+Deletes a robot of the account; a running robot must be stopped first, and deletion cannot be undone.
 
 Parameters:
 
-- `robotId` (number, required): ID of the bot to delete, see the ```GetRobotList``` method.
-- `removeLog` (bool, optional): Whether to delete the bot's log data on the docker as well. When passing arguments by name and omitting it, the default is ```true```; when passing only ```[robotId]``` positionally, it is ```false```. Passing it explicitly is recommended.
+- `robotId` (number, required): Robot ID; see ```GetRobotList```.
+- `removeLog` (bool, optional): Whether to delete the robot's log data on the docker as well. Defaults to ```true``` when passed by name, and to ```false``` when only ```[robotId]``` is passed by position. Passing it explicitly is recommended.
 
-Returns:
+Returns (number): ```data.result```: ```0``` deleted; ```-1``` not deleted (the robot does not exist, or is running, starting or stopping); ```-2``` the robot was deleted but its docker could not be reached, so the log data was not deleted and must be removed by hand from ```logs/storage/<robotId>/``` in the docker directory (e.g. ```123.db3```).
 
-```json
-{
-    "code":0,
-    "data":{
-        "result":0,
-        "error":null
-    }
-}
+Delete the stopped robot 123 together with its log data on the docker.
+
+```python
+# api() is the function in the Python example on the signature authentication page
+r = api('DeleteRobot', robotId=123, removeLog=True)
+print(r['data']['result'])   # output: 0 (deleted)
 ```
-
-- result: Result of the deletion.
-  - 0: deleted.
-  - -1: not deleted: the bot does not exist, or it is still running, starting or stopping.
-  - -2: the bot was deleted, but its docker could not be reached, so the log data was not removed; delete it manually under ```logs/storage/<bot ID>/``` in the docker's directory (e.g. ```123.db3```).
 
 ##### PluginRun
 
-The ```PluginRun``` method runs a piece of JavaScript code on a docker and returns the result. It uses the same execution mechanism as the "Debug Tool" among the development tools and trading terminal plugins (see Platform Basics → Trading Terminal → Plugin Principle and Development). No live trading bot is created and nothing is charged; one run lasts at most 5 minutes.
+Runs a piece of JavaScript code on a docker and returns the result, without creating a robot or charging fees; one run lasts at most 5 minutes, and the code can place real orders.
 
 Parameters:
 
-- `settings` (JSON object, required): Run configuration, for example:
+- `settings` (object, required): Run configuration; fields are in the attributes table below.
 
-```json
-{
+Fields:
+
+- `settings.source` (string): The code to run; its entry is ```main()```, whose return value is the result.
+- `settings.strategy` (number): Without ```source```, run the account's strategy with this ID (e.g. a trading plugin).
+- `settings.node` (number): ID of the docker that runs the code; omitted or ```-1``` chooses one automatically.
+- `settings.exchanges` (array): Exchange object configuration, written as in "Robot configuration (settings)" in `Extended API Interface Details`.
+
+Returns (string): ```data.result``` is JSON text: ```logs``` holds the lines written by ```Log()``` in the code, and ```result``` is the JSON text of the return value of ```main()```.
+
+Run code on docker 123 and get its logs and return value.
+
+```python
+# api() is the function in the Python example on the signature authentication page
+import json
+
+settings = {
     "source": "function main() {Log(\"Hello FMZ\")}",
     "node": 123,
     "period": 60,
     "exchanges": [{"pid": 123, "pair": "SOL_USDT"}]
 }
+r = api('PluginRun', settings)
+out = json.loads(r['data']['result'])
+print(out['logs'], out['result'])
 ```
 
-- source: the code to run. The entry point is ```main()```, whose return value is the result.
-- strategy: when ```source``` is not given, run the account's strategy with this ID (e.g. a trading plugin).
-- node: ID of the docker that runs the code; omitted or ```-1``` selects one automatically.
-- exchanges: exchange object configuration, same as "Live trading configuration (settings)" in Extended API Interface Details.
+It uses the same execution mechanism as the "Debugging Tool" of the development tools and trading terminal plugins; see `Plugin Principle and Development`.
 
-Returns:
+```exchanges``` can also pass an exchange configuration directly instead of referencing an exchange account on the platform, e.g. ```{"eid": "Binance", "pair": "ETH_BTC", "meta": {"AccessKey": "...", "SecretKey": "..."}}```; the field names of ```meta``` are given by the ```meta``` returned by ```GetExchangeList```. Usually only one exchange object is set in ```exchanges``` (the debugging tool page supports only one); setting two raises no error, but accessing the second exchange object in the code does.
+
+###### Example response
 
 ```json
 {
     "code": 0,
     "data": {
-        "result": "{\"logs\":[{\"PlatformId\":\"\",\"OrderId\":\"0\",\"LogType\":5,\"Price\":0,\"Amount\":0,\"Extra\":\"Hello FMZ\",\"Currency\":\"\",\"Instrument\":\"\",\"Direction\":\"\",\"Time\":1732267473108}],\"result\":\"\"}",
+        "result": "{\"logs\": [...], \"result\": \"\"}",
         "error": null
     }
 }
 ```
 
-- result: The result as a JSON string: ```logs``` holds the logs written with ```Log()```, ```result``` the JSON text of the value returned by ```main()```.
+Parsed, ```result``` is:
 
-```exchanges``` can also pass the exchange configuration directly instead of referencing an exchange account on the platform, for example:
-
-```plaintext
-{"eid": "Binance", "pair": "ETH_BTC", "meta": {"AccessKey": "...", "SecretKey": "..."}}
+```json
+{
+    "logs": [{
+        "PlatformId": "", "OrderId": "0", "LogType": 5, "Price": 0, "Amount": 0,
+        "Extra": "Hello FMZ", "Currency": "", "Instrument": "", "Direction": "",
+        "Time": 1732267473108
+    }],
+    "result": ""
+}
 ```
-
-The field names of ```meta``` are given by the ```meta``` returned by ```GetExchangeList```. Usually only one exchange object is set in ```exchanges``` (the debug tool page also supports only one); setting two causes no error, but accessing the second exchange object in the code does.
 
 ##### pub
 
-The ```pub``` method pushes a message into a channel that a running robot has subscribed to, so systems outside the platform (TradingView webhook alerts, your own trading system, monitoring scripts, ...) can send data to a robot. The robot reads it with `GetChannelData`; for the channel mechanism see Advanced Topics → Communication Between Live Trading Strategies.
+Pushes a message to a channel subscribed by a running robot, so that systems outside the platform (TradingView webhook alerts, your own trading system, monitoring scripts and so on) can send data to the robot. The robot reads it with `GetChannelData`; for how channels work see `Communication Between Live Trading Strategies`.
 
-Unlike the other methods, ```pub``` **needs no API KEY and no signature**: the request URL is ```https://www.fmz.com/api/v1?method=pub&robot={robotId}&channel={channel}``` and the message goes in the request body (```POST```). Anyone who knows the robot Id and the channel name can push, so use a hard-to-guess random channel name, and have the strategy validate what it receives as untrusted input.
+Unlike the other methods, ```pub``` **needs no API key and no signature**: the request URL is ```https://www.fmz.com/api/v1?method=pub&robot={robotId}&channel={channel}``` and the message goes in the request body (```POST```). Anyone who knows the robot ID and the channel name can push, so use a hard-to-guess random string as the channel name, and have the strategy validate what it receives as untrusted input.
 
 Parameters:
 
-- `robot` (number, required): Id of the robot that receives the message (URL parameter). The robot must be running and already subscribed to ```channel```.
-- `channel` (string, required): Channel name (URL parameter); a 32-character random string (a UUID without hyphens) is recommended. It must not be all digits (digits are taken as a robot Id, i.e. that robot's own channel); channel names shorter than 10 characters are never delivered.
-- `message` (string, optional): The message. For a ```POST``` request it is the whole request body, any text such as JSON or plain text; for other requests it is the ```message``` URL parameter.
+- `robot` (number, required): ID of the robot that receives the message (URL parameter). The robot must be running and already subscribed to ```channel```.
+- `channel` (string, required): Channel name (URL parameter); a 32-character random string (a UUID without hyphens) is recommended. It must not be all digits (that is taken as a robot ID, i.e. the robot's own channel); names shorter than 10 characters are not delivered.
+- `message` (string, optional): Message content. For ```POST``` requests it is the whole request body, any text such as JSON or plain text; otherwise it is the URL parameter ```message```.
 
-Returns:
+Fields:
 
-On success:
+- `data.status` (string): ```"ok"``` on success.
+- `data.robot` (number): Echo of the request's ```robot``` parameter.
+- `data.channel` (string): Echo of the request's ```channel``` parameter.
+- `data.message` (string): The message pushed.
+- `data.affected` (number): Number of dockers that received the message.
 
-```json
-{
-    "code": 0,
-    "data": {
-        "status": "ok",
-        "robot": 123456,
-        "channel": "6BC42A119B5DBFA2188A8279DA3B5C30",
-        "message": "{\"id\": 1, \"action\": \"buy\", \"symbol\": \"BTC_USDT\"}",
-        "affected": 1
-    }
-}
-```
+Returns (object): On success ```code``` is 0 and the fields of ```data``` are in the attributes table below; when no robot subscribes to the channel (or the channel name is invalid, or ```robot``` is empty), the HTTP status is 500 and ```code``` is 5.
 
-- status: ```"ok"```.
-- robot, channel, message: the parameters of the request.
-- affected: the number of dockers that received the message.
+Receiving strategy: subscribe to the channel, parse the JSON messages it receives, and use ```id``` to tell new messages from old ones.
 
-When no robot has subscribed to the channel (or the channel name is invalid, or ```robot``` is missing) the HTTP status is 500 and ```code``` is 5:
-
-```json
-{
-    "code": 5,
-    "error": "No subscribers for channel: 6BC42A119B5DBFA2188A8279DA3B5C30",
-    "data": null
-}
-```
-
-**Delivery rules**
-
-- Subscribe first, then push: the robot's first call to ```GetChannelData(channel)``` subscribes to the channel (and returns a null value); the subscription is reported with the docker's heartbeat, so wait a moment before the external system can push successfully. Without a subscribed robot the request fails.
-- The message is delivered to the docker that runs robot ```robot```; every robot on that docker subscribed to the same channel receives it, robots on other dockers do not.
-- A channel keeps only the latest message, there is no queue: ```GetChannelData()``` returns the most recent message every time and reading does not clear it. To tell new messages from old ones, put an increasing number or timestamp in the message.
-- A robot can subscribe to at most 10 channels (including other robots' channels); beyond that ```GetChannelData()``` returns a null value and logs the error ```channel subscriber exceed limit```.
-- The robot receives a **string** (the raw request body). When the body is JSON text, the strategy has to parse it once more.
-
-**Example**
-
-Receiving strategy:
-
-```js
-// Receiving robot (assume its Id is 123456)
+```javascript
+// receiving robot (assume its ID is 123456)
 var CHANNEL = "6BC42A119B5DBFA2188A8279DA3B5C30"
 
 function main() {
@@ -6235,13 +6453,14 @@ function main() {
         if (typeof msg == "string") {
             var obj = null
             try {
-                obj = JSON.parse(msg)          // parse once more when the body is JSON text
+                obj = JSON.parse(msg)          // parse again when the body is JSON text
             } catch (e) {
                 Log("non-JSON message:", msg)
             }
-            if (obj && obj.id != lastId) {     // the channel keeps only the latest message; use id to spot new ones
+            // the channel keeps only the latest message; use id to spot new ones
+            if (obj && obj.id != lastId) {
                 lastId = obj.id
-                Log("external message:", obj)
+                Log("external message received:", obj)
             }
         }
         Sleep(1000)
@@ -6260,28 +6479,64 @@ def main():
         msg = GetChannelData(CHANNEL)    # the first call subscribes and returns None
         if isinstance(msg, str):
             try:
-                obj = json.loads(msg)    # parse once more when the body is JSON text
+                obj = json.loads(msg)    # parse again when the body is JSON text
             except ValueError:
                 obj = None
                 Log("non-JSON message:", msg)
             if isinstance(obj, dict) and obj.get("id") != lastId:
                 lastId = obj.get("id")
-                Log("external message:", obj)
+                Log("external message received:", obj)
         Sleep(1000)
 ```
 
+###### Delivery rules
+
+- Subscribe first, then push: the robot's first ```GetChannelData(channel)``` call subscribes to the channel (and returns a null value); the subscription is reported with the docker's heartbeat, so the external system can push successfully only after a short while. Requests fail while no robot subscribes.
+- The message is delivered to the docker of the ```robot``` robot, and every robot on that docker subscribed to the same channel receives it; robots on other dockers do not.
+- A channel keeps only the latest message, with no queue: ```GetChannelData()``` returns the most recent one each time, and reading does not clear it. To tell new messages from old ones, include an increasing number or a timestamp in the message.
+- Each robot can subscribe to at most 10 channels (other robots' channels included); beyond that ```GetChannelData()``` returns a null value and logs the error ```channel subscriber exceed limit```.
+- The robot receives a **string** (the raw request body). When the body is JSON text, the strategy has to parse it again.
+
+###### Example push request
+
 An external system pushes a message:
 
-```shell
-curl -X POST "https://www.fmz.com/api/v1?method=pub&robot=123456&channel=6BC42A119B5DBFA2188A8279DA3B5C30" \
+```bash
+curl -X POST \
+     "https://www.fmz.com/api/v1?method=pub&robot=123456&channel=6BC42A119B5DBFA2188A8279DA3B5C30" \
      -d '{"id": 1, "action": "buy", "symbol": "BTC_USDT"}'
 ```
 
 In TradingView, put the URL above in the alert's webhook URL; the alert message becomes the request body.
 
+###### Example response
+
+```json
+{
+    "code": 0,
+    "data": {
+        "status": "ok",
+        "robot": 123456,
+        "channel": "6BC42A119B5DBFA2188A8279DA3B5C30",
+        "message": "{\"id\": 1, \"action\": \"buy\", \"symbol\": \"BTC_USDT\"}",
+        "affected": 1
+    }
+}
+```
+
+When no robot subscribes to the channel:
+
+```json
+{
+    "code": 5,
+    "error": "No subscribers for channel: 6BC42A119B5DBFA2188A8279DA3B5C30",
+    "data": null
+}
+```
+
 ### Extended API Interface Return Codes
 
-The extended API returns this structure:
+Every response of the extended API has the JSON structure below: ```code``` tells whether the request itself succeeded, and the method's result is in ```data```.
 
 ```json
 {
@@ -6302,8 +6557,8 @@ The extended API returns this structure:
 | Invalid signature | 2 |
 | Nonce error: the ```nonce``` is not greater than the previous one, or differs from server time by more than 1 hour | 3 |
 | Invalid method: the method does not exist, is not public, or this API KEY has no permission for it | 4 |
-| Invalid arguments: ```args``` is not valid JSON, or the request cannot be dispatched (e.g. ```method``` and ```args``` have different counts) | 5 |
-| The method failed while running (e.g. no permission for the live trading, the live trading is busy, the number of running live tradings is exceeded): the message is in the top-level ```error``` field and ```data``` is ```null``` | 6 |
+| Invalid arguments: ```args``` is not valid JSON, or the request cannot be dispatched (e.g. mismatched ```method```/```args``` counts) | 5 |
+| The method failed while running (e.g. no permission for the robot, robot busy, too many running robots); see below | 6 |
 | The request's source IP is not in this API KEY's IP whitelist | 7 |
 
 With ```code``` 0 the method's result is in ```data.result```. When the number or types of the arguments do not match the method, ```code``` is still 0, ```data.result``` is ```null``` and ```data.error``` holds the error message (```null``` on success). For example, with the wrong number of arguments:
@@ -6318,7 +6573,7 @@ With ```code``` 0 the method's result is in ```data.result```. When the number o
 }
 ```
 
-When the method fails while running, ```code``` is 6, the message is in the top-level ```error``` field and ```data``` is ```null```. For example, when operating on a live trading that is not yours:
+When the method fails while running, ```code``` is 6, the message is in the top-level ```error``` field and ```data``` is ```null```. For example, when operating on a robot that is not yours:
 
 ```json
 {
@@ -6330,7 +6585,7 @@ When the method fails while running, ```code``` is 6, the message is in the top-
 
 ### Live Trading Status Codes
 
-The ```status``` field in the data returned by ```GetRobotList```, ```GetRobotDetail``` and ```GetRobotLogs``` is the live trading status code:
+The ```status``` field in the data returned by ```GetRobotList```, ```GetRobotDetail``` and ```GetRobotLogs``` is the robot status code, with these values.
 
 | Status | Code |
 | - | - |
@@ -6341,111 +6596,17 @@ The ```status``` field in the data returned by ```GetRobotList```, ```GetRobotDe
 | Stopped | 4 |
 | Strategy error | 5 |
 
-**Return values when a start fails**
+#### Return values when a start fails
 
 Negative codes never appear in the ```status``` field; they are only returned by ```NewRobot``` and ```RestartRobot``` when the start fails:
 
 | Meaning | Code |
 | - | - |
-| Strategy not usable: the rental has expired, the strategy is neither yours nor rented, it has been deleted, or the given strategy version does not exist | -1 |
+| Strategy not usable: rental expired, neither yours nor rented, deleted, or the given version does not exist | -1 |
 | No usable docker: the given docker is offline, or no docker is online | -2 |
 | Failed to read the live trading or account data | -3 |
-| The live trading's status changed at the same time as the start (```RestartRobot``` only); query it again and retry | -4 |
+| The robot's status changed at the same time as the start (```RestartRobot``` only); query it again and retry | -4 |
 | Insufficient balance | -5 |
 | The concurrency limit of a rented strategy has been reached and the strategy has no overage price | -6 |
 
-Errors such as exceeding the number of live tradings the account may run, or having no permission for the live trading, are not reported as return values but as an error with ```code``` 6; see Extended API Interface → Extended API Interface Return Codes.
-
-### AI Integration
-
-Connect FMZ to an AI coding assistant (AI agent) such as Claude Code, Codex or Cursor, and you can write strategies, run backtests, create and manage live trading, and read logs and profit just by talking to it. The assistant reaches these functions through the platform's MCP (Model Context Protocol) service, with an API KEY created for it alone; you choose its permissions when you approve it and can change or revoke them at any time.
-
-**Connect with one sentence**
-
-Tell your AI assistant:
-
-```
-Read https://www.fmz.com/agent/setup.md and connect to FMZ
-```
-
-The assistant follows that page; your only step is one click in the browser:
-
-1. The assistant requests authorization and shows you a link such as ```https://www.fmz.com/agent/authorize?code=XXXX-XXXX```, valid for 10 minutes.
-2. Open it in a browser where you are logged in to FMZ, check the requester's name and the permissions, and approve. You can untick permissions you do not want to grant.
-3. The assistant receives an API KEY, writes it into its own MCP configuration and connects. From then on you can simply ask it to "list my live trading" or "backtest this strategy".
-
-The assistant names the key "name @ machine" (for example ```Claude Code @ MacBook```). When a request with the same name is approved again, the old key is revoked and replaced, so connecting again does not pile up keys.
-
-**Permissions**
-
-| Permission | Allows | Default |
-| - | - | - |
-| read | Lists and details of strategies, live trading, nodes and exchange accounts; logs, messages, account summary (never any secret) | Yes |
-| backtest | Start, query and stop backtests | Yes |
-| write | Save strategies and versions, groups, alert switches; change the configuration of stopped live trading | Yes |
-| trade | Create, start and stop live trading, send interactive commands (costs balance and places real orders) | Yes |
-| danger | Delete strategies, live trading and nodes; publish strategies | No |
-
-```danger``` is never granted by default: the assistant has to request it explicitly and you have to tick it on the approval page. Before calling a ```[trade]``` or ```[danger]``` tool the assistant should ask you first.
-
-**Manual configuration**
-
-Clients that cannot run commands (for example Cherry Studio) can be configured by hand:
-
-1. Create an API KEY under Account settings → API KEY (```https://www.fmz.com/m/account#apikey```) and note its Access Key and Secret Key.
-2. Add an MCP server of type Streamable HTTP to the client:
-   - URL: ```https://www.fmz.com/api/mcp/<Access Key>```
-   - Header: ```Authorization: Bearer <Secret Key>```
-
-The Secret Key goes in the header only, never in the URL. Examples:
-
-```bash
-# Claude Code
-claude mcp add --transport http fmz "https://www.fmz.com/api/mcp/<Access Key>" --header "Authorization: Bearer <Secret Key>"
-```
-
-```json
-{"mcpServers": {"fmz": {"url": "https://www.fmz.com/api/mcp/<Access Key>", "headers": {"Authorization": "Bearer <Secret Key>"}}}}
-```
-
-The JSON is for Cursor (```~/.cursor/mcp.json```) and other clients that speak Streamable HTTP; Claude Desktop needs the ```npx mcp-remote``` bridge described in the setup page.
-
-**Install the skills (recommended)**
-
-The skills are knowledge packs written for AI assistants: platform workflow, the full API reference, how to write strategies in each language, backtesting and indicators. With them installed the assistant writes noticeably more accurate strategies. In a terminal:
-
-```bash
-npx skills add fmzquant/skills --global --yes -a claude-code
-```
-
-Put your assistant's name after ```-a``` (claude-code, codex, cursor, gemini-cli, ...). They can also be read on GitHub: ```https://github.com/fmzquant/skills```.
-
-**Available tools**
-
-Once connected the assistant can use the tools below; the list the assistant sees is authoritative:
-
-| Permission | Tools |
-| - | - |
-| read | ```ping```, ```get_account_summary```, ```list_exchanges```, ```list_platforms```, ```list_nodes```, ```list_strategies```, ```get_strategy```, ```list_strategy_versions```, ```get_strategy_version```, ```list_robots```, ```get_robot```, ```get_robot_logs```, ```get_robot_profit```, ```get_robot_output```, ```list_messages```, ```list_groups```, ```revoke_my_key``` |
-| backtest | ```run_backtest```, ```get_backtest```, ```list_backtests```, ```stop_backtest``` |
-| write | ```check_strategy```, ```save_strategy```, ```save_strategy_version```, ```delete_strategy_version```, ```update_robot```, ```save_group```, ```move_to_group```, ```delete_group```, ```set_robot_alert```, ```set_node_alert```, ```delete_messages``` |
-| trade | ```create_robot```, ```start_robot```, ```stop_robot```, ```restart_robot```, ```send_robot_command```, and the trading terminal plugin tools ```plugin_*``` (market data, orders, ...) |
-| danger | ```delete_strategy```, ```delete_robot```, ```delete_node```, ```publish_strategy``` |
-
-A typical session: ```list_platforms``` and ```list_nodes``` to see which exchange accounts and nodes the account has; ```save_strategy``` to save a strategy and ```check_strategy``` to check it; ```run_backtest``` and ```get_backtest``` to backtest; then ```create_robot``` to go live and ```get_robot``` / ```get_robot_logs``` to watch it.
-
-**Security and management**
-
-- Exchange API KEYs never pass through the assistant: add them on the Exchanges page of the website and the assistant picks them by id. No tool result ever contains a secret.
-- At ```https://www.fmz.com/m/account#apikey``` you can see the key the assistant uses, change its permissions or lock it. Besides the permission names above, permissions can list tool names, and ```!tool_name``` excludes one tool.
-- When you are done, ask the assistant to call ```revoke_my_key``` to revoke its own key, or delete it on that page.
-- ```stop_robot``` stops live trading; it does not close positions.
-- The first time the assistant creates live trading, backtest first and then run on a demo account or with a small amount.
-
-**Common problems**
-
-- No online node: live trading needs at least one online node, see Platform Basics → Nodes.
-- Too many backtests: concurrent backtests are limited; have the assistant ```stop_backtest``` the ones it no longer needs.
-- The assistant says a tool is missing or a call is refused: the key lacks that permission; change it on the API KEY page and reconnect.
-
-The same API KEY also works with the Extended API (Extended API Interface) for scripts and schedulers; prefer MCP wherever it can be used.
+Errors such as exceeding the number of robots the account may run, or having no permission for the live trading, are not reported as return values but as an error with ```code``` 6; see `Extended API Interface Return Codes`.

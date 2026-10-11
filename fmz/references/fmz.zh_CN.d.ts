@@ -946,10 +946,10 @@ interface IExchange {
      * ```
      */
     /**
-     * 国内期货柜台（CTP 等）：等当前合约的下一跳行情，或本交易所的下一条订单回报——
+     * 国内期货柜台（CTP 等）：等任一已订阅合约的下一跳行情，或本交易所的下一条订单回报——
      * 两者取先到的（与旧 waitEvent 同时监听 tick/order 两条队列一致）
      * @param timeoutMs - 超时毫秒数；0 或不传 = 默认等待；负数 = 不等待，只看当下有没有
-     * @returns 事件消息：行情跳 `Event: "tick"`（`Ticker` 为 ITicker 形状，`Symbol` 为合约名）；
+     * @returns 事件消息：行情跳 `Event: "tick"`（`Ticker` 为 ITicker 形状，`Symbol` 为来跳的合约）；
      *   订单回报 `Event: "order"`（`Order` 为 IOrder 形状；回报本身不带方向时没有 Type 字段，
      *   下过单的订单按订单号合并下单时的 Type/Offset）；超时没等到返回 null
      * ```js

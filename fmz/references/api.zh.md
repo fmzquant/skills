@@ -4,7 +4,15 @@
 
 ## 内置函数
 
+内置函数是策略代码可以直接调用的全部API，按用途分为全局工具、日志与图表、行情、交易、账户、期货、交易所对象设置、扩展指令、网络、存储、并发、指标库和文件系统。
+
+函数页只写通用语义：调用失败与不支持时的返回见`失败与空值`，品种的写法见`品种代码`，各交易所的支持差异见`能力矩阵`和各交易所页。
+
 ### Global
+
+全局函数不依赖交易所对象，提供休眠与时间、错误处理与重试、数值格式化、JSON与编码哈希，以及运行环境信息。
+
+最常用的是`Sleep`（轮询间隔）、`_D`（格式化时间）、`_N`（截断小数位）、`_C`（失败重试）和`GetLastError`（读取最近的错误）。
 
 #### Version
 
@@ -16,24 +24,31 @@ Version()
 
 Returns (string): 当前系统版本号，例如：```3.9.2```。
 
+打印托管者程序的版本号。
+
 ```javascript
 function main() {
-    Log("version:", Version())
+    Log("版本", Version())
+    // 输出：版本 3.9.2
 }
 ```
 
 ```python
 def main():
-    Log("version:", Version())
+    Log("版本", Version())
+    # 输出：版本 3.9.2
 ```
 
 ```rust
 fn main() {
-    Log!("version:", Version());
+    Log!("版本", Version());
+    // 输出：版本 3.9.2
 }
 ```
 
 系统版本号即托管者程序的版本号。
+
+See also: `GetOS`, `GetPid`, `IsVirtual`
 
 #### IsVirtual
 
@@ -45,35 +60,42 @@ IsVirtual()
 
 Returns (bool): 当策略运行在回测系统环境中时，返回真值，例如：```true```；当策略运行在实盘环境中时，返回假值，例如：```false```。
 
+根据运行环境（回测或实盘）输出不同日志。
+
 ```javascript
 function main() {
     if (IsVirtual()) {
-        Log("Currently in backtest environment.")
+        Log("当前为回测环境")
     } else {
-        Log("Currently in live trading environment.")
+        Log("当前为实盘环境")
     }
+    // 输出：回测中为「当前为回测环境」，实盘中为「当前为实盘环境」
 }
 ```
 
 ```python
 def main():
     if IsVirtual():
-        Log("Currently in backtest environment.")
+        Log("当前为回测环境")
     else:
-        Log("Currently in live trading environment.")
+        Log("当前为实盘环境")
+    # 输出：回测中为「当前为回测环境」，实盘中为「当前为实盘环境」
 ```
 
 ```rust
 fn main() {
     if IsVirtual() {
-        Log!("Currently in backtest environment.");
+        Log!("当前为回测环境");
     } else {
-        Log!("Currently in live trading environment.");
+        Log!("当前为实盘环境");
     }
+    // 输出：回测中为「当前为回测环境」，实盘中为「当前为实盘环境」
 }
 ```
 
 用于判断当前运行环境是否为回测系统，以便兼容回测与实盘环境之间的差异。
+
+See also: `GetOS`, `Version`, `GetPid`
 
 #### GetOS
 
@@ -85,24 +107,31 @@ GetOS()
 
 Returns (string): 操作系统信息。
 
+打印托管者所在设备的系统与架构。
+
 ```javascript
 function main() {
-    Log("GetOS:", GetOS())
+    Log(GetOS())
+    // 输出：linux/amd64（Linux x86-64 设备上）
 }
 ```
 
 ```python
 def main():
-    Log("GetOS:", GetOS())
+    Log(GetOS())
+    # 输出：linux/amd64（Linux x86-64 设备上）
 ```
 
 ```rust
 fn main() {
-    Log!("GetOS:", GetOS());
+    Log!(GetOS());
+    // 输出：linux/amd64（Linux x86-64 设备上）
 }
 ```
 
 例如，在**Mac OS**操作系统下运行的托管者，调用```GetOS()```函数可能返回：```darwin/arm64```或```darwin/amd64```。由于苹果电脑采用多种硬件架构，返回值中会附带具体的架构信息。其中，```darwin```即**Mac OS**系统的内核名称。返回值格式为```系统/架构```，与Go语言的```GOOS/GOARCH```一致，例如Linux系统上为```linux/amd64```，Windows系统上为```windows/amd64```。
+
+See also: `GetPid`, `Version`, `IsVirtual`
 
 #### GetPid
 
@@ -114,10 +143,13 @@ GetPid()
 
 Returns (number): 返回实盘进程的 ID。
 
+打印实盘进程的进程Id。
+
 ```javascript
-function main(){
+function main() {
     var id = GetPid()
     Log(id)
+    // 输出：进程Id，例如 12345
 }
 ```
 
@@ -125,14 +157,18 @@ function main(){
 def main():
     id = GetPid()
     Log(id)
+    # 输出：进程Id，例如 12345
 ```
 
 ```rust
 fn main() {
     let id = GetPid();
     Log!(id);
+    // 输出：进程Id，例如 12345
 }
 ```
+
+See also: `GetOS`, `Version`, `_G`
 
 #### GetMeta
 
@@ -143,6 +179,31 @@ GetMeta()
 获取在生成策略注册码时写入的```Meta```值。
 
 Returns (string): ```Meta```数据。
+
+读取生成注册码时写入的Meta。
+
+```javascript
+function main() {
+    var meta = GetMeta()
+    Log("Meta", meta)
+    // 输出：Meta level1（生成注册码时写入的值；没有设置时为null）
+}
+```
+
+```python
+def main():
+    meta = GetMeta()
+    Log("Meta", meta)
+    # 输出：Meta level1（生成注册码时写入的值；没有设置时为null）
+```
+
+```rust
+fn main() {
+    let meta = GetMeta();
+    Log!("Meta", meta);
+    // 输出：Meta level1（生成注册码时写入的值；没有设置时为null）
+}
+```
 
 应用场景范例：使用```Meta```限制策略可操作的资产数量。
 
@@ -188,7 +249,7 @@ function main() {
 
 ```python
 def main():
-    maxBaseCurrency = null
+    maxBaseCurrency = None
     level = GetMeta()
 
     if level == "level1":
@@ -257,6 +318,8 @@ fn main() {
 
 应用场景：需要对不同的策略租用者进行资金限制。生成注册码时设置的```Meta```值长度不能超过190个字符。```GetMeta()```函数仅支持实盘，在回测系统中不起作用。如果生成策略注册码时未设置元数据（```Meta```），```GetMeta()```函数将返回空值。
 
+See also: `exchange.GetAccount`, `LogStatus`, `_G`
+
 #### Sleep
 
 ```
@@ -267,31 +330,35 @@ Sleep(millisecond)
 
 Parameters:
 
-- `millisecond` (number, required): ```millisecond```参数用于设置休眠时长，单位为毫秒。
+- `millisecond` (number, required): 休眠时长，单位为毫秒。
+
+暂停10秒后继续执行。
 
 ```javascript
 function main() {
-    Sleep(1000 * 10)   // 等待10秒钟
-    Log("Waited for 10 seconds")
+    Sleep(1000 * 10)   // 等待10秒
+    Log("已等待10秒")
 }
 ```
 
 ```python
 def main():
-    Sleep(1000 * 10)
-    Log("Waited for 10 seconds")
+    Sleep(1000 * 10)   # 等待10秒
+    Log("已等待10秒")
 ```
 
 ```rust
 fn main() {
-    Sleep(1000 * 10);   // 等待10秒钟
-    Log!("Waited for 10 seconds");
+    Sleep(1000 * 10);   // 等待10秒
+    Log!("已等待10秒");
 }
 ```
 
 例如，执行```Sleep(1000)```函数时，程序将休眠1秒。该函数支持小于1毫秒的休眠操作，例如```Sleep(0.1)```。支持的最小参数为```0.000001```，即纳秒级休眠，1纳秒等于```1e-6```毫秒。
 
 在使用```Python```语言编写策略时，对于轮询间隔、时间等待等操作，应当使用```Sleep(millisecond)```函数，而不建议使用```Python```中```time```库的```time.sleep(second)```函数。因为策略在回测时若使用```time.sleep(second)```函数，会使策略程序实际等待一段时间（而非在回测系统的时间序列上跳过），从而导致回测速度非常缓慢。
+
+See also: `Unix`, `UnixNano`, `EventLoop`, `_C`
 
 #### Unix
 
@@ -303,10 +370,13 @@ Unix()
 
 Returns (number): 返回秒级时间戳。
 
+获取当前的秒级时间戳。
+
 ```javascript
 function main() {
     var t = Unix()
     Log(t)
+    // 输出：1728632400（秒级时间戳，10位整数）
 }
 ```
 
@@ -314,12 +384,14 @@ function main() {
 def main():
     t = Unix()
     Log(t)
+    # 输出：1728632400（秒级时间戳，10位整数）
 ```
 
 ```rust
 fn main() {
     let t = Unix();
     Log!(t);
+    // 输出：1728632400（秒级时间戳，10位整数）
 }
 ```
 
@@ -333,9 +405,9 @@ UnixNano()
 
 获取当前时刻的纳秒级时间戳。
 
-Returns (number): ```UnixNano()```函数返回纳秒级时间戳。
+Returns (number): 纳秒级时间戳。
 
-如果需要获取毫秒级时间戳，可以使用以下代码：
+如果需要获取毫秒级时间戳，可以使用如下代码。
 
 ```javascript
 function main() {
@@ -367,16 +439,16 @@ _D(timestamp)
 _D(timestamp, fmt)
 ```
 
-将毫秒级时间戳或```Date```对象转换为时间字符串。
+将毫秒时间戳或者```Date```对象转换为时间字符串。
 
 Parameters:
 
-- `timestamp` (number / object, optional): 毫秒级时间戳或```Date```对象。
+- `timestamp` (number / object, optional): 毫秒时间戳或者```Date```对象。
 - `fmt` (string, optional): 格式化字符串，```JavaScript```语言默认格式：```yyyy-MM-dd hh:mm:ss```；```Python```语言默认格式：```%Y-%m-%d %H:%M:%S```。
 
 Returns (string): 时间字符串。
 
-获取并打印当前时间字符串：
+获取、打印当前时间字符串。
 
 ```javascript
 function main(){
@@ -398,7 +470,7 @@ fn main() {
 }
 ```
 
-时间戳为1574993606000，使用代码进行转换：
+时间戳为1574993606000，使用代码转换。
 
 ```javascript
 function main() {
@@ -408,7 +480,7 @@ function main() {
 
 ```python
 def main():
-    # 在北京时间的服务器上运行结果为：2019-11-29 10:13:26；而在其他地区服务器上的托管者运行此代码，结果则为：2019-11-29 02:13:26
+    # 北京时间的服务器上运行：2019-11-29 10:13:26 ，另一台其它地区的服务器上的托管者运行此代码结果则为：2019-11-29 02:13:26
     Log(_D(1574993606))
 ```
 
@@ -418,28 +490,31 @@ fn main() {
 }
 ```
 
-使用参数```fmt```进行格式化，```JavaScript```、```Python```语言的格式化字符串有所不同，具体请参看以下示例：
+使用参数```fmt```格式化，```JavaScript```、```Python```语言的格式化字符串有所不同，具体参看以下例子。
 
 ```javascript
 function main() {
-    Log(_D(1574993606000, "yyyy--MM--dd hh--mm--ss"))   // 2019--11--29 10--13--26
+    Log(_D(1574993606000, "yyyy--MM--dd hh--mm--ss"))
+    // 输出：2019--11--29 10--13--26
 }
 ```
 
 ```python
 def main():
-    # 1574993606 为秒级时间戳
-    Log(_D(1574993606, "%Y--%m--%d %H--%M--%S"))        #  2019--11--29 10--13--26
+    # 1574993606为秒级别时间戳
+    Log(_D(1574993606, "%Y--%m--%d %H--%M--%S"))
+    # 输出：2019--11--29 10--13--26
 ```
 
 ```rust
 fn main() {
     // Rust 的 _D() 函数不支持 fmt 参数，仅支持默认格式：yyyy-MM-dd hh:mm:ss
-    Log!(_D(1574993606000));    // 2019-11-29 02:13:26（UTC）
+    Log!(_D(1574993606000));
+    // 输出：2019-11-29 02:13:26（UTC）
 }
 ```
 
-若不传入任何参数，则返回当前时间字符串。在```Python```策略中使用```_D()```函数时，需要注意传入的参数为秒级时间戳（JavaScript、Rust策略中为毫秒级时间戳，1秒等于1000毫秒）。在实盘中使用```_D()```函数将时间戳解析为可读时间字符串时，需要注意托管者程序所在操作系统的时区与时间设置，因为```_D()```函数的解析结果取决于托管者系统的时间。```Rust```语言的```_D()```函数不受托管者系统时区影响，固定输出UTC时间。
+不传任何参数就返回当前时间字符串。```Python```策略中使用```_D()```函数时，需要注意传入的参数为秒级别时间戳（JavaScript、Rust策略中为毫秒级别时间戳，1秒等于1000毫秒）。在实盘时使用```_D()```函数解析一个时间戳为可读的时间字符串时，需要注意托管者程序所在的操作系统的时区、时间设置。```_D()```函数解析一个时间戳为可读时间字符串是根据托管者系统的时间而定的。```Rust```语言的```_D()```函数不受托管者系统时区影响，固定输出UTC时间。
 
 See also: `UnixNano`, `Unix`
 
@@ -450,15 +525,15 @@ GetCommand()
 GetCommand(timeout)
 ```
 
-获取策略的交互命令。
+获取策略交互命令。
 
 Parameters:
 
 - `timeout` (number, optional): 等待交互命令的超时时间，单位毫秒。设置为```-1```时不等待，没有命令立即返回（```JavaScript```、```Python```不传该参数时即为```-1```）；设置为```0```时一直阻塞等待，直到收到命令；设置为正数时最多等待该毫秒数。```Rust```语言必须传入该参数，轮询时传入```-1```。
 
-Returns (string / 空值): 返回的命令格式为```ControlName:Data```，其中```ControlName```为控件名称，```Data```为控件中输入的数据。如果交互控件不包含输入框、下拉框等输入组件（例如：不带输入框的按钮控件），则返回的命令格式为```ControlName```，即仅返回控件名称。没有交互命令时返回空值。
+Returns (string / 空值): 返回的命令格式为```ControlName:Data```。```ControlName```是控件名称，```Data```是控件中输入的数据。如果交互控件没有输入框、下拉框等组件（例如：不带输入框的按钮控件）则返回的命令格式为```ControlName```，仅返回控件名称。没有交互命令时返回空值。
 
-检测交互命令，并在检测到交互命令时使用```Log```函数将其输出。
+检测交互命令并且在检测到交互命令时使用```Log```函数输出交互命令。
 
 ```javascript
 function main(){
@@ -493,7 +568,7 @@ fn main() {
 }
 ```
 
-例如，在策略交互控件中添加一个不带输入框的控件，将其命名为```buy```，控件描述信息为```买入```，这是一个按钮控件；再添加一个带输入框的控件，将其命名为```sell```，控件描述信息为```卖出```，这是一个由按钮和输入框组合而成的交互控件。在策略中编写交互代码，以响应不同的交互控件：
+例如策略交互控件中添加了一个不带输入框的控件，交互控件命名为：```buy```，控件描述信息为：```买入```，这是一个按钮控件。继续添加一个带输入框的控件，交互控件名为：```sell```，控件描述信息为：```卖出```，这是一个由按钮和输入框组合起来的交互控件。策略中设计交互代码来响应不同交互控件。
 
 ```javascript
 function main() {
@@ -553,7 +628,9 @@ fn main() {
 }
 ```
 
-该函数在回测系统中无效。
+回测系统中不起作用。
+
+See also: `LogStatus`, `状态栏按钮`, `状态栏按钮（旧写法）`
 
 #### GetLastError
 
@@ -565,12 +642,15 @@ GetLastError()
 
 Returns (string): 最近一次的错误信息。
 
+查询不存在的订单后读取出错信息。
+
 ```javascript
 function main(){
     // 由于不存在编号为 123 的订单，因此会触发错误
     exchange.GetOrder("123")
     var error = GetLastError()
     Log(error)
+    // 输出：GetOrder 调用失败的出错信息
 }
 ```
 
@@ -579,6 +659,7 @@ def main():
     exchange.GetOrder("123")
     error = GetLastError()
     Log(error)
+    # 输出：GetOrder 调用失败的出错信息
 ```
 
 ```rust
@@ -589,10 +670,13 @@ fn main() {
     let _ = exchange.GetOrder(&id);
     let error = GetLastError();
     Log!(error);
+    // 输出：GetOrder 调用失败的出错信息
 }
 ```
 
 该函数在回测系统中不起作用。
+
+See also: `SetErrorFilter`, `_C`, `Log`, `失败与空值`
 
 #### SetErrorFilter
 
@@ -663,6 +747,8 @@ fn main() {
 
 与此正则表达式匹配的错误日志将不再上传至日志系统。该函数可多次调用（无次数限制）以设置多个过滤条件，多次设置的正则表达式会累积并同时生效。可传入空字符串以重置用于过滤错误日志的正则表达式：```SetErrorFilter("")```。被过滤的日志将不再写入托管者目录下对应实盘 Id 的数据库文件中，从而防止因频繁报错导致数据库文件膨胀。
 
+See also: `GetLastError`, `Log`, `失败与空值`
+
 #### _N
 
 ```
@@ -670,16 +756,16 @@ _N(num)
 _N(num, precision)
 ```
 
-格式化浮点数。
+格式化一个浮点数。
 
 Parameters:
 
-- `num` (number, required): 待格式化的浮点数。
-- `precision` (number, optional): 用于设置格式化精度，参数```precision```为整数，默认值为4。
+- `num` (number, required): 需要格式化的浮点数。
+- `precision` (number, optional): 格式化的精度设置，参数```precision```为整数，参数```precision```默认为4。
 
-Returns (number): 根据精度设置格式化后的浮点数。
+Returns (number): 根据精度设置，格式化后的浮点数。
 
-例如```_N(3.1415, 2)```会保留```3.1415```小数点后两位，删除其余数位，函数返回```3.14```。
+例如```_N(3.1415, 2)```将删除```3.1415```小数点两位以后的值，函数返回```3.14```。
 
 ```javascript
 function main(){
@@ -707,7 +793,7 @@ fn main() {
 }
 ```
 
-如果需要将小数点左边的N位数字都置为0，可以这样编写：
+如果需要将小数点左边的N个位数都变为0，可以这么写。
 
 ```javascript
 function main(){
@@ -737,7 +823,7 @@ fn main() {
 }
 ```
 
-参数```precision```可以为正整数或负整数。
+参数```precision```可以为正整数、负整数。
 
 See also: `exchange.SetPrecision`
 
@@ -748,16 +834,16 @@ _C(pfn)
 _C(pfn, ...args)
 ```
 
-重试函数，用于对接口调用进行容错处理。
+重试函数，用于接口容错。
 
 Parameters:
 
-- `pfn` (function, required): 参数```pfn```为函数引用，即一个**回调函数**。
-- `arg` (string / number / bool / object / array / function / any (平台支持的任意类型), optional): **回调函数**的参数，参数```arg```可以有多个。参数```arg```的类型与个数由**回调函数**的参数决定。
+- `pfn` (function, required): 函数引用，是一个**回调函数**。
+- `arg` (string / number / bool / object / array / function / any, optional): **回调函数**的参数，参数```arg```可能有多个。参数```arg```的类型与个数根据**回调函数**的参数而定。
 
-Returns (除```null```、```undefined```、```false```以外的所有平台支持的类型（any）。): 回调函数执行后的返回值。
+Returns (any): 回调函数执行时的返回值（不会是```null```、```undefined```、```false```）。
 
-对无参数的函数进行容错处理：
+对于无参数的函数容错。
 
 ```javascript
 function main(){
@@ -790,7 +876,7 @@ fn main() {
 }
 ```
 
-对带参数的函数进行容错处理：
+对于有参数的函数容错。
 
 ```javascript
 function main(){
@@ -812,7 +898,7 @@ fn main() {
 }
 ```
 
-也可用于对自定义函数进行容错处理：
+也可以用于自定义函数的容错处理。
 
 ```javascript
 var test = function(a, b){
@@ -864,13 +950,11 @@ fn main() {
 }
 ```
 
-```_C()```函数会反复调用指定的函数，直到其成功返回为止（当参数```pfn```所引用的函数被调用时返回```null```、```undefined```或```false```，```Python```中为```None```或```False```，则会重试调用```pfn```；返回```0```、空字符串等其它值不会重试，直接作为结果返回）。
+```_C()```函数会一直调用指定函数直到成功返回（参数```pfn```引用的函数调用时返回```null```、```undefined```或```false```会重试调用```pfn```，```Python```中为```None```或```False```；返回```0```、空字符串等其它值不会重试，直接作为结果返回）。
+例如```_C(exchange.GetTicker)```。默认重试间隔为3秒，可以调用```_CDelay()```函数来设置重试间隔。
+例如```_CDelay(1000)```，指改变```_C()```函数的重试间隔为1秒。
 
-例如```_C(exchange.GetTicker)```。默认重试间隔为3秒，可调用```_CDelay()```函数来设置重试间隔。
-
-例如```_CDelay(1000)```，表示将```_C()```函数的重试间隔改为1秒。
-
-可以对以下函数进行容错处理（但不限于此）：
+可以但不限于对以下函数做容错处理：
 
 - ```exchange.GetTicker()```
 - ```exchange.GetDepth()```
@@ -881,7 +965,9 @@ fn main() {
 - ```exchange.GetOrder()```
 - ```exchange.GetPositions()```
 
-以上函数均可通过```_C()```函数调用以实现容错。```_C()```函数的容错并不局限于上述列出的函数。请注意，参数```pfn```为函数引用而非函数调用，即应写作```_C(exchange.GetTicker)```，而非```_C(exchange.GetTicker())```。
+都可以通过```_C()```函数来调用进行容错。```_C()```函数不局限于以上列出的函数容错，参数```pfn```是函数引用并非函数调用，注意是```_C(exchange.GetTicker)```并不是```_C(exchange.GetTicker())```。
+
+See also: `Sleep`, `GetLastError`, `SetErrorFilter`, `失败与空值`
 
 #### _Cross
 
@@ -898,7 +984,7 @@ Parameters:
 
 Returns (number): 数组```arr1```与数组```arr2```的交叉周期数。
 
-可以模拟一组数据来测试_Cross(Arr1, Arr2)函数：
+可以模拟一组数据测试```_Cross(Arr1, Arr2)```函数。
 
 ```javascript
 // 快线指标
@@ -930,7 +1016,9 @@ fn main() {
 }
 ```
 
-```_Cross()```函数的返回值为正数时表示上穿的周期数，为负数时表示下穿的周期数，为0时表示当前价格相等。详细使用说明请参阅：[内置函数_Cross分析及使用说明](https://www.fmz.com/bbs-topic/1140)。
+```_Cross()```函数的返回值是正数表示上穿的周期，负数表示下穿的周期，0指当前价格一样。具体使用说明：[内置函数_Cross分析及使用说明](https://www.fmz.com/bbs-topic/1140)。
+
+See also: `TA.MA`, `TA.EMA`, `TA.MACD`, `exchange.GetRecords`
 
 #### JSON.parse
 
@@ -939,12 +1027,12 @@ JSON.parse(s)
 JSON.parse(s, safeStr)
 ```
 
-```JSON.parse```函数是**ECMAScript**标准内建对象```JSON```的方法，用于解码（解析）JSON字符串。发明者量化交易平台在此基础上为其扩展了一个参数```safeStr```。
+```JSON.parse```函数是**ECMAScript**标准内建对象```JSON```的方法，用于解码（解析）JSON字符串。发明者量化交易平台对其扩展了一个参数```safeStr```。JavaScript、Rust策略可用；Python策略使用标准库```json```（大数值可以借助第三方库处理）。
 
 Parameters:
 
 - `s` (string, required): 该参数为需要解码（解析）的```JSON```字符串。
-- `safeStr` (bool, optional): 当该参数设置为```true```时，若解析过程中遇到可能超出精度范围的数值，会将其以字符串形式返回，以避免精度丢失或数值溢出问题。
+- `safeStr` (bool, optional): 当该参数设置为```true```时，解析过程中若遇到可能超出精度范围的数值，会将其以字符串形式返回，以避免精度丢失或溢出问题。
 
 Returns (object): 返回值为```JSON```对象。
 
@@ -953,17 +1041,17 @@ Returns (object): 返回值为```JSON```对象。
 ```javascript
 function main() {
     let s1 = '{"num": 8754613216564987646512354656874651651358}'
-    Log("JSON.parse:", JSON.parse(s1))          // JSON.parse: {"num":8.754613216564987e+39}
-    Log("JSON.parse:", JSON.parse(s1, true))    // JSON.parse: {"num":"8754613216564987646512354656874651651358"}
+    Log("JSON.parse:", JSON.parse(s1))
+    // 输出：JSON.parse: {"num":8.754613216564987e+39}
+    Log("JSON.parse:", JSON.parse(s1, true))
+    // 输出：JSON.parse: {"num":"8754613216564987646512354656874651651358"}
 
     let s2 = '{"num": 123}'
-    Log("JSON.parse:", JSON.parse(s2))          // JSON.parse: {"num":123}
-    Log("JSON.parse:", JSON.parse(s2, true))    // JSON.parse: {"num":123}
+    Log("JSON.parse:", JSON.parse(s2))
+    // 输出：JSON.parse: {"num":123}
+    Log("JSON.parse:", JSON.parse(s2, true))
+    // 输出：JSON.parse: {"num":123}
 }
-```
-
-```python
-# 可以使用Python的第三方库处理大数值数据。
 ```
 
 ```rust
@@ -971,14 +1059,16 @@ fn main() {
     // Rust 使用 JSONParse() 函数解析JSON字符串，没有 safeStr 参数
     // 超出精度范围的大数值会被解析为 f64 ，可能丢失精度
     let s1 = r#"{"num": 8754613216564987646512354656874651651358}"#;
-    Log!("JSONParse:", JSONParse(s1).unwrap()["num"].as_f64().unwrap_or(0.0));    // JSONParse: 8.754613216564987e39
+    Log!("JSONParse:", JSONParse(s1).unwrap()["num"].as_f64().unwrap_or(0.0));
+    // 输出：JSONParse: 8.754613216564987e39
 
     let s2 = r#"{"num": 123}"#;
-    Log!("JSONParse:", JSONParse(s2).unwrap()["num"].as_f64().unwrap_or(0.0));    // JSONParse: 123
+    Log!("JSONParse:", JSONParse(s2).unwrap()["num"].as_f64().unwrap_or(0.0));
+    // 输出：JSONParse: 123
 }
 ```
 
-```JSON.parse()```函数能够正确解析包含较大数值的JSON字符串；当```safeStr```参数设置为真值时，会将较大的数值解析为字符串类型。
+```JSON.parse()```函数可以正确解析包含有较大数值的JSON字符串，设置```safeStr```参数为真值，会将较大的数值解析为字符串类型。
 
 ```safeStr```参数位也可以传入```reviver```函数，用法与标准```JSON.parse(text, reviver)```的```reviver```参数相同：解析结果的每个成员都会调用一次该函数，用它的返回值替换原值。
 
@@ -986,37 +1076,48 @@ fn main() {
 
 回测系统中不支持```JSON.parse()```函数的```safeStr```参数功能。
 
+See also: `JSON.stringify`, `HttpQuery`, `exchange.GetRawJSON`
+
 #### JSON.stringify
 
 ```
 JSON.stringify(obj)
 ```
 
-```JSON.stringify```函数是**ECMAScript**标准内置对象```JSON```的方法，用于将JavaScript值转换为JSON字符串。
+```JSON.stringify```函数是**ECMAScript**标准内建对象```JSON```的方法，用于编码JSON字符串。JavaScript、Rust策略可用；Python策略使用标准库```json```。
 
 Parameters:
 
-- `obj` (string / number / bool / object / array / function / any (平台支持的任意类型), required): 需要序列化为JSON字符串的值。
+- `obj` (string / number / bool / object / array / function / any, required): 该参数为需要编码的对象。
 
-Returns (string): 返回序列化后的```JSON```字符串。
+Returns (string): 返回值为编码后的```JSON```字符串。
 
-将对象序列化为JSON字符串并输出。
+编码一个对象，输出编码后的JSON字符串。
 
 ```javascript
 function main() {
     let s1 = {"num": "8754613216564987646512354656874651651358"}
     Log("JSON.stringify:", JSON.stringify(s1))
-
-    // JSON.stringify: {"num":"8754613216564987646512354656874651651358"}
-    // JSON.stringify(s1) 返回的变量为一个字符串类型
+    // 输出：JSON.stringify: {"num":"8754613216564987646512354656874651651358"}
+    // JSON.stringify(s1) 返回字符串
 }
 ```
 
-```python
-// 略
+```rust
+fn main() {
+    // Rust 没有 JSON.stringify，JsonValue 的 to_string() 输出紧凑JSON（对象的键按字母序）
+    let mut m = std::collections::BTreeMap::new();
+    m.insert("num".to_string(),
+        JsonValue::String("8754613216564987646512354656874651651358".to_string()));
+    let s1 = JsonValue::Object(m);
+    Log!("JSON.stringify:", s1.to_string());
+    // 输出：JSON.stringify: {"num":"8754613216564987646512354656874651651358"}
+}
 ```
 
 仅支持JavaScript语言。
+
+See also: `JSON.parse`, `LogStatus`, `HttpQuery`
 
 #### Encode
 
@@ -1029,93 +1130,111 @@ Encode(algo, inputFormat, outputFormat, data, keyFormat, key)
 
 Parameters:
 
-- `algo` (string, required): 参数```algo```用于指定编码计算时使用的算法，支持设置为以下值之一："raw"（不使用算法）、"sign"、"signTx"、"md4"、"md5"、"sha224"、"sha256"、"sha384"、"sha512"、"sha1"、"keccak256"、"sha3.224"、"sha3.256"、"sha3.384"、"sha3.512"、"sha3.keccak256"、"sha3.keccak512"、"sha512.384"、"sha512.256"、"sha512.224"、"ripemd160"、"blake2b.256"、"blake2b.512"、"blake2s.128"、"blake2s.256"。
+- `algo` (string, required): 编码、哈希、加密或压缩使用的算法，例如```"raw"```、```"sha256"```、```"text.encoder.utf8"```、```"aes.encrypt"```；全部取值见备注。
+- `inputFormat` (string, required): 用于指定```data```参数的数据格式。```inputFormat```参数支持设置为："raw"，"hex"，"base64"，"string"其中之一。"raw"表示数据为原始数据，"hex"表示数据为```hex```编码，"base64"表示数据为```base64```编码，"string"表示数据为字符串。此外还支持"base64.url"、"base64.rawurl"（URL安全的base64编码，后者不带填充）以及"latin1"（每个字符的码点即一个字节）。
+- `outputFormat` (string, required): 用于指定输出的数据格式。```outputFormat```参数支持设置为："raw"，"hex"，"base64"，"string"其中之一。"raw"表示数据为原始数据，"hex"表示数据为```hex```编码，"base64"表示数据为```base64```编码，"string"表示数据为字符串。此外还支持"base64.url"、"base64.rawurl"（URL安全的base64编码，后者不带填充）。"raw"、"string"输出时每个字节对应一个字符（按latin1）。
+- `data` (string, required): 所要处理的数据。
+- `keyFormat` (string, optional): 用于指定```key```参数的数据格式。```keyFormat```参数支持设置为："raw"，"hex"，"base64"，"string"其中之一。"raw"表示数据为原始数据，"hex"表示数据为```hex```编码，"base64"表示数据为```base64```编码，"string"表示数据为字符串。此外还支持"base64.url"、"base64.rawurl"（URL安全的base64编码，后者不带填充）以及"latin1"（每个字符的码点即一个字节）。
+- `key` (string, optional): ```HMAC```加密时使用的秘钥。
+参数```algo```设置为"sign"或者"signTx"时需要参数```key```。
+参数```algo```设置为"raw"时不会使用```key```参数进行```HMAC```加密（因为HMAC加密必须指定算法）。
 
-参数```algo```还支持"text.encoder.utf8"、"text.decoder.utf8"、"text.encoder.gbk"、"text.decoder.gbk"，用于对字符串进行编码或解码。
+Returns (string): 编码、加密之后的数据。
 
-参数```algo```同时支持"ed25519"算法，并可搭配不同的哈希算法使用，例如参数```algo```可写为"ed25519.md5"、"ed25519.sha512"等，也支持```ed25519.seed```计算。
-
-参数```algo```也支持其它字符集的编码、解码，写作"text.encoder.字符集名"、"text.decoder.字符集名"，例如"text.decoder.big5"。
-
-参数```algo```也支持AES加密、解密："aes.encrypt"、"aes.decrypt"，可追加模式后缀".cbc"（默认）、".cfb"、".ecb"，例如"aes.decrypt.ecb"。AES的密钥由```key```参数传入，长度须为16、24或32字节（对应AES-128、AES-192、AES-256），CBC、CFB模式使用密钥的前16字节作为IV，填充方式为PKCS7。
-
-参数```algo```也支持压缩、解压缩："gzip.deflate"、"gzip.inflate"、"zlib.deflate"、"zlib.inflate"、"raw.deflate"、"raw.inflate"。
-- `inputFormat` (string, required): 用于指定```data```参数的数据格式。```inputFormat```参数支持设置为"raw"、"hex"、"base64"、"string"其中之一。"raw"表示原始数据，"hex"表示```hex```编码数据，"base64"表示```base64```编码数据，"string"表示字符串数据。此外还支持"base64.url"、"base64.rawurl"（URL安全的base64编码，后者不带填充）以及"latin1"（每个字符的码点即一个字节）。
-- `outputFormat` (string, required): 用于指定输出的数据格式。```outputFormat```参数支持设置为"raw"、"hex"、"base64"、"string"其中之一。"raw"表示原始数据，"hex"表示```hex```编码数据，"base64"表示```base64```编码数据，"string"表示字符串数据。此外还支持"base64.url"、"base64.rawurl"（URL安全的base64编码，后者不带填充）。"raw"、"string"输出时每个字节对应一个字符（按latin1）。
-- `data` (string, required): 参数```data```为所要处理的数据。
-- `keyFormat` (string, optional): 用于指定```key```参数的数据格式。```keyFormat```参数支持设置为"raw"、"hex"、"base64"、"string"其中之一。"raw"表示原始数据，"hex"表示```hex```编码数据，"base64"表示```base64```编码数据，"string"表示字符串数据。此外还支持"base64.url"、"base64.rawurl"（URL安全的base64编码，后者不带填充）以及"latin1"（每个字符的码点即一个字节）。
-- `key` (string, optional): 参数```key```为```HMAC```加密时使用的密钥。
-
-当参数```algo```设置为"sign"或"signTx"时，需要传入参数```key```。
-
-当参数```algo```设置为"raw"时，不会使用```key```参数进行```HMAC```加密（因为HMAC加密必须指定算法）。
-
-Returns (string): ```Encode```函数返回编码、加密之后的数据。
-
-Encode 函数调用示例。
+Encode函数调用例子。
 
 ```javascript
 function main() {
-    Log(Encode("raw", "raw", "hex", "example", "raw", "123"))            // 6578616d706c65
-    Log(Encode("raw", "raw", "hex", "example"))                          // 6578616d706c65
-    Log(Encode("sha256", "raw", "hex", "example", "raw", "123"))         // 698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
-    Log(Encode("sha256", "raw", "hex", "example", "", "123"))            // 50d858e0985ecc7f60418aaf0cc5ab587f42c2570a884095a9e8ccacd0f6545c
-    Log(Encode("sha256", "raw", "hex", "example", null, "123"))          // 50d858e0985ecc7f60418aaf0cc5ab587f42c2570a884095a9e8ccacd0f6545c
-    Log(Encode("sha256", "raw", "hex", "example", "string", "123"))      // 698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
+    Log(Encode("raw", "raw", "hex", "example", "raw", "123"))
+    // 输出：6578616d706c65
+    Log(Encode("raw", "raw", "hex", "example"))
+    // 输出：6578616d706c65
+    Log(Encode("sha256", "raw", "hex", "example", "raw", "123"))
+    // 输出：698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
+    Log(Encode("sha256", "raw", "hex", "example", "", "123"))
+    // 输出：50d858e0985ecc7f60418aaf0cc5ab587f42c2570a884095a9e8ccacd0f6545c
+    Log(Encode("sha256", "raw", "hex", "example", null, "123"))
+    // 输出：50d858e0985ecc7f60418aaf0cc5ab587f42c2570a884095a9e8ccacd0f6545c
+    Log(Encode("sha256", "raw", "hex", "example", "string", "123"))
+    // 输出：698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
 
-    Log(Encode("raw", "raw", "hex", "123"))           // 313233
-    Log(Encode("raw", "raw", "base64", "123"))        // MTIz
+    Log(Encode("raw", "raw", "hex", "123"))
+    // 输出：313233
+    Log(Encode("raw", "raw", "base64", "123"))
+    // 输出：MTIz
 
-    Log(Encode("sha256", "raw", "hex", "example", "hex", "313233"))      // 698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
-    Log(Encode("sha256", "raw", "hex", "example", "base64", "MTIz"))     // 698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
+    Log(Encode("sha256", "raw", "hex", "example", "hex", "313233"))
+    // 输出：698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
+    Log(Encode("sha256", "raw", "hex", "example", "base64", "MTIz"))
+    // 输出：698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
 }
 ```
 
 ```python
 def main():
-    Log(Encode("raw", "raw", "hex", "example", "raw", "123"))            # 6578616d706c65
-    Log(Encode("raw", "raw", "hex", "example", "", ""))                  # 6578616d706c65
-    Log(Encode("sha256", "raw", "hex", "example", "raw", "123"))         # 698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
-    Log(Encode("sha256", "raw", "hex", "example", "", "123"))            # 50d858e0985ecc7f60418aaf0cc5ab587f42c2570a884095a9e8ccacd0f6545c
+    Log(Encode("raw", "raw", "hex", "example", "raw", "123"))
+    # 输出：6578616d706c65
+    Log(Encode("raw", "raw", "hex", "example", "", ""))
+    # 输出：6578616d706c65
+    Log(Encode("sha256", "raw", "hex", "example", "raw", "123"))
+    # 输出：698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
+    Log(Encode("sha256", "raw", "hex", "example", "", "123"))
+    # 输出：50d858e0985ecc7f60418aaf0cc5ab587f42c2570a884095a9e8ccacd0f6545c
 
-    Log(Encode("sha256", "raw", "hex", "example", "string", "123"))      # 698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
+    Log(Encode("sha256", "raw", "hex", "example", "string", "123"))
+    # 输出：698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
 
-    Log(Encode("raw", "raw", "hex", "123", "", ""))           # 313233
-    Log(Encode("raw", "raw", "base64", "123", "", ""))        # MTIz
+    Log(Encode("raw", "raw", "hex", "123", "", ""))
+    # 输出：313233
+    Log(Encode("raw", "raw", "base64", "123", "", ""))
+    # 输出：MTIz
 
-    Log(Encode("sha256", "raw", "hex", "example", "hex", "313233"))      # 698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
-    Log(Encode("sha256", "raw", "hex", "example", "base64", "MTIz"))     # 698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
+    Log(Encode("sha256", "raw", "hex", "example", "hex", "313233"))
+    # 输出：698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
+    Log(Encode("sha256", "raw", "hex", "example", "base64", "MTIz"))
+    # 输出：698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
 ```
 
 ```rust
 fn main() {
-    // Rust 的 Encode() 函数 6 个参数均为必填；不加密时，keyFormat 和 key 传入空字符串即可
-    Log!(Encode("raw", "raw", "hex", "example", "raw", "123"));            // 6578616d706c65
-    Log!(Encode("raw", "raw", "hex", "example", "", ""));                  // 6578616d706c65
-    Log!(Encode("sha256", "raw", "hex", "example", "raw", "123"));         // 698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
-    Log!(Encode("sha256", "raw", "hex", "example", "", "123"));            // 50d858e0985ecc7f60418aaf0cc5ab587f42c2570a884095a9e8ccacd0f6545c
+    // Rust 的 Encode() 函数6个参数均为必填，不加密时 keyFormat、key 传入空字符串
+    Log!(Encode("raw", "raw", "hex", "example", "raw", "123"));
+    // 输出：6578616d706c65
+    Log!(Encode("raw", "raw", "hex", "example", "", ""));
+    // 输出：6578616d706c65
+    Log!(Encode("sha256", "raw", "hex", "example", "raw", "123"));
+    // 输出：698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
+    Log!(Encode("sha256", "raw", "hex", "example", "", "123"));
+    // 输出：50d858e0985ecc7f60418aaf0cc5ab587f42c2570a884095a9e8ccacd0f6545c
 
-    Log!(Encode("sha256", "raw", "hex", "example", "string", "123"));      // 698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
+    Log!(Encode("sha256", "raw", "hex", "example", "string", "123"));
+    // 输出：698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
 
-    Log!(Encode("raw", "raw", "hex", "123", "", ""));           // 313233
-    Log!(Encode("raw", "raw", "base64", "123", "", ""));        // MTIz
+    Log!(Encode("raw", "raw", "hex", "123", "", ""));
+    // 输出：313233
+    Log!(Encode("raw", "raw", "base64", "123", "", ""));
+    // 输出：MTIz
 
-    Log!(Encode("sha256", "raw", "hex", "example", "hex", "313233"));      // 698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
-    Log!(Encode("sha256", "raw", "hex", "example", "base64", "MTIz"));     // 698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
+    Log!(Encode("sha256", "raw", "hex", "example", "hex", "313233"));
+    // 输出：698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
+    Log!(Encode("sha256", "raw", "hex", "example", "base64", "MTIz"));
+    // 输出：698d54f0494528a759f19c8e87a9f99e75a5881b9267ee3926bcf62c992d84ba
 }
 ```
 
-参数```algo```还支持以下取值："text.encoder.utf8"、"text.decoder.utf8"、"text.encoder.gbk"、"text.decoder.gbk"，用于对字符串进行编码和解码。
+参数```algo```也支持："text.encoder.utf8"，"text.decoder.utf8"，"text.encoder.gbk"，"text.decoder.gbk"，对字符串编码、解码。
 
 ```javascript
 function main(){
-    var ret1 = Encode("text.encoder.utf8", "raw", "hex", "你好")     // e4bda0e5a5bd
+    var ret1 = Encode("text.encoder.utf8", "raw", "hex", "你好")
     Log(ret1)
+    // 输出：e4bda0e5a5bd
     var ret2 = Encode("text.decoder.utf8", "hex", "string", ret1)
     Log(ret2)
 
-    var ret3 = Encode("text.encoder.gbk", "raw", "hex", "你好")      // c4e3bac3
+    var ret3 = Encode("text.encoder.gbk", "raw", "hex", "你好")
     Log(ret3)
+    // 输出：c4e3bac3
     var ret4 = Encode("text.decoder.gbk", "hex", "string", ret3)
     Log(ret4)
 }
@@ -1123,13 +1242,15 @@ function main(){
 
 ```python
 def main():
-    ret1 = Encode("text.encoder.utf8", "raw", "hex", "你好", "", "")     # e4bda0e5a5bd
+    ret1 = Encode("text.encoder.utf8", "raw", "hex", "你好", "", "")
     Log(ret1)
+    # 输出：e4bda0e5a5bd
     ret2 = Encode("text.decoder.utf8", "hex", "string", ret1, "", "")
     Log(ret2)
 
-    ret3 = Encode("text.encoder.gbk", "raw", "hex", "你好", "", "")      # c4e3bac3
+    ret3 = Encode("text.encoder.gbk", "raw", "hex", "你好", "", "")
     Log(ret3)
+    # 输出：c4e3bac3
     ret4 = Encode("text.decoder.gbk", "hex", "string", ret3, "", "")
     Log(ret4)
 ```
@@ -1137,19 +1258,40 @@ def main():
 ```rust
 fn main() {
     // Rust 的 Encode() 函数6个参数均为必填，不加密时 keyFormat、key 传入空字符串
-    let ret1 = Encode("text.encoder.utf8", "raw", "hex", "你好", "", "");     // e4bda0e5a5bd
+    let ret1 = Encode("text.encoder.utf8", "raw", "hex", "你好", "", "");
     Log!(ret1);
+    // 输出：e4bda0e5a5bd
     let ret2 = Encode("text.decoder.utf8", "hex", "string", &ret1, "", "");
     Log!(ret2);
 
-    let ret3 = Encode("text.encoder.gbk", "raw", "hex", "你好", "", "");      // c4e3bac3
+    let ret3 = Encode("text.encoder.gbk", "raw", "hex", "你好", "", "");
     Log!(ret3);
+    // 输出：c4e3bac3
     let ret4 = Encode("text.decoder.gbk", "hex", "string", &ret3, "", "");
     Log!(ret4);
 }
 ```
 
-```Encode()```函数仅支持实盘。若不传入```key```、```keyFormat```参数，则不进行```key```加密。
+```Encode()```函数仅支持实盘。不传```key```、```keyFormat```参数，则不使用```key```加密。
+
+```algo```参数的取值：
+
+| 类别 | 取值 |
+| - | - |
+| 不使用算法 | ```"raw"``` |
+| 签名 | ```"sign"```、```"signTx"``` |
+| 哈希（MD、SHA-1、SHA-2） | ```"md4"```、```"md5"```、```"sha1"```、```"sha224"```、```"sha256"```、```"sha384"```、```"sha512"```、```"sha512.384"```、```"sha512.256"```、```"sha512.224"``` |
+| 哈希（SHA-3、Keccak） | ```"keccak256"```、```"sha3.224"```、```"sha3.256"```、```"sha3.384"```、```"sha3.512"```、```"sha3.keccak256"```、```"sha3.keccak512"``` |
+| 哈希（其它） | ```"ripemd160"```、```"blake2b.256"```、```"blake2b.512"```、```"blake2s.128"```、```"blake2s.256"``` |
+| 字符串编码、解码 | ```"text.encoder.utf8"```、```"text.decoder.utf8"```、```"text.encoder.gbk"```、```"text.decoder.gbk"``` |
+| 其它字符集 | ```"text.encoder.字符集名"```、```"text.decoder.字符集名"```，例如```"text.decoder.big5"``` |
+| Ed25519 | ```"ed25519"```、```"ed25519.seed"```；可以指定哈希算法，例如```"ed25519.md5"```、```"ed25519.sha512"``` |
+| AES加密、解密 | ```"aes.encrypt"```、```"aes.decrypt"```，可加模式后缀```".cbc"```（默认）、```".cfb"```、```".ecb"```，例如```"aes.decrypt.ecb"``` |
+| 压缩、解压缩 | ```"gzip.deflate"```、```"gzip.inflate"```、```"zlib.deflate"```、```"zlib.inflate"```、```"raw.deflate"```、```"raw.inflate"``` |
+
+AES的密钥由```key```参数传入，长度须为16、24或32字节（对应AES-128、AES-192、AES-256）；CBC、CFB模式使用密钥的前16字节作为IV，填充方式为PKCS7。
+
+See also: `MD5`, `exchange.Encode`, `HttpQuery`, `Dial`
 
 #### MD5
 
@@ -1165,20 +1307,25 @@ Parameters:
 
 Returns (string): MD5 哈希值。
 
+计算字符串 hello world 的MD5值。
+
 ```javascript
 function main() {
-    Log("MD5", MD5("hello world"))
+    Log(MD5("hello world"))
+    // 输出：5eb63bbbe01eeed093cb22bb8f5acdc3
 }
 ```
 
 ```python
 def main():
-    Log("MD5", MD5("hello world"))
+    Log(MD5("hello world"))
+    # 输出：5eb63bbbe01eeed093cb22bb8f5acdc3
 ```
 
 ```rust
 fn main() {
-    Log!("MD5", MD5("hello world"));
+    Log!(MD5("hello world"));
+    // 输出：5eb63bbbe01eeed093cb22bb8f5acdc3
 }
 ```
 
@@ -1196,11 +1343,14 @@ UUID()
 
 Returns (string): 由 32 位大写十六进制字符组成的 UUID 字符串（不带连字符）。
 
+生成两个UUID，每次调用结果都不同。
+
 ```javascript
 function main() {
     var uuid1 = UUID()
     var uuid2 = UUID()
     Log(uuid1, uuid2)
+    // 输出：两个不同的32位大写十六进制串，例如 3F2A8C1D9B7E4A6C8D0E1F2A3B4C5D6E
 }
 ```
 
@@ -1209,6 +1359,7 @@ def main():
     uuid1 = UUID()
     uuid2 = UUID()
     Log(uuid1, uuid2)
+    # 输出：两个不同的32位大写十六进制串，例如 3F2A8C1D9B7E4A6C8D0E1F2A3B4C5D6E
 ```
 
 ```rust
@@ -1216,12 +1367,19 @@ fn main() {
     let uuid1 = UUID();
     let uuid2 = UUID();
     Log!(uuid1, uuid2);
+    // 输出：两个不同的32位大写十六进制串，例如 3F2A8C1D9B7E4A6C8D0E1F2A3B4C5D6E
 }
 ```
 
 ```UUID()``` 函数仅支持实盘。
 
+See also: `MD5`, `Encode`, `UnixNano`
+
 ### Log
+
+日志与图表函数把信息输出到实盘或回测页面：日志栏（`Log`，交易日志`exchange.Log`）、状态栏（`LogStatus`）、收益曲线（`LogProfit`）和自定义图表（`Chart`、`KLineChart`）。
+
+日志写入实盘数据库，长期运行的策略用`LogReset`、`LogVacuum`控制数据量；`console.log`、`console.error`只写「调试信息」栏，不进日志栏。
 
 #### Log
 
@@ -1233,9 +1391,9 @@ Log(...msgs)
 
 Parameters:
 
-- `msg` (string / number / bool / object / array / any (平台支持的任意类型), optional): 参数```msg```为需要输出的内容，可传入多个```msg```参数。
+- `msg` (string / number / bool / object / array / any, optional): 输出的内容，参数```msg```可以传多个。
 
-可以传入多个```msg```参数：
+可以传多个```msg```参数。
 
 ```javascript
 function main() {
@@ -1254,7 +1412,7 @@ fn main() {
 }
 ```
 
-支持设置输出消息的颜色。若需同时设置颜色和推送，需先设置颜色，最后再使用```@```字符设置推送。
+支持设置输出消息的颜色，如果设置颜色和推送同时使用，需要先设置颜色，最后使用```@```字符设置推送。
 
 ```javascript
 function main() {
@@ -1281,7 +1439,7 @@ fn main() {
 }
 ```
 
-```Log()```函数支持打印```base64```编码后的图片，内容以``` ` ```开头，以``` ` ```结尾，例如：
+```Log()```函数支持打印```base64```编码后的图片，以``` ` ```开头，以``` ` ```结尾，例如。
 
 ```javascript
 function main() {
@@ -1300,7 +1458,7 @@ fn main() {
 }
 ```
 
-```Log()```函数支持直接打印```Python```的```matplotlib.pyplot```对象，只要该对象包含```savefig```方法，即可直接使用```Log```函数打印，例如：
+```Log()```函数支持直接打印```Python```的```matplotlib.pyplot```对象，只要对象包含```savefig```方法就可以直接使用```Log```函数打印，例如。
 
 ```python
 import matplotlib.pyplot as plt
@@ -1309,7 +1467,7 @@ def main():
     Log(plt)
 ```
 
-```Log()```函数支持语言切换，其输出的文本会根据平台页面的语言设置自动切换为对应的语言，例如：
+```Log()```函数支持语言切换，```Log()```函数输出文本，会根据平台页面上语言设置自动切换为对应的语言，例如。
 
 ```javascript
 function main() {
@@ -1328,9 +1486,9 @@ fn main() {
 }
 ```
 
-```Log()```函数会在实盘或回测系统的日志区域输出一条日志信息，实盘运行时日志将保存在实盘的数据库中。若```Log()```函数输出的内容以```@```字符结尾，该条日志会进入消息推送队列，并推送至当前发明者量化交易平台账号在[推送设置](https://www.fmz.com/m/account)中配置的邮箱、WebHook地址等。[调试工具](https://www.fmz.com/m/debug)和回测系统不支持消息推送。消息推送存在频率限制，具体规则如下：一个实盘在一个状态上报周期（约20秒）内产生的多条推送消息会合并为一条推送发送，相邻的重复内容折叠为```内容 ×N```的形式，合并后的推送最多4096字节，超出部分会被截断并注明截断的数量；每个平台账号每小时最多发送50条推送，超出的推送不再发送；每条推送的正文最多保留200个字符（通过 Log 函数输出的推送日志仍会正常打印显示在日志区域）。
+```Log()```函数在实盘或者回测系统的日志区域输出一条日志信息，实盘运行时日志会保存在实盘的数据库中。```Log()```函数输出的内容以```@```字符结尾则这条日志会进入消息推送队列。推送到当前发明者量化交易平台账号[推送设置](https://www.fmz.com/m/account)中配置的邮箱、WebHook地址等。[调试工具](https://www.fmz.com/m/debug)、回测系统不支持消息推送。消息推送有频率限制，具体限制规则如下：一个实盘在一个状态上报周期（约20秒）内产生的多条推送消息会合并为一条推送发送，相邻的重复内容折叠为```内容 ×N```的形式，合并后的推送最多4096字节，超出部分会被截断并注明截断的数量；每个平台账号每小时最多发送50条推送，超出的推送不再发送；每条推送的正文最多保留200个字符（通过 Log 函数输出的推送日志会正常打印显示在日志区域）。
 
-若```Log()```函数输出的内容以```&```字符结尾，该条日志将被标记为私密日志。当实盘公开展示时，该条日志对其他用户隐藏，但在实盘拥有者账户视角下仍然可见。此功能可用于记录API密钥、账户余额等敏感信息。例如：```Log("私密信息", "&")```。
+```Log()```函数输出的内容以```&```字符结尾，该条日志将标记为私密日志。当实盘公开展示时，该条日志对其他用户隐藏，但对实盘拥有者账户视角下不隐藏。可用于记录敏感信息如API密钥、账户余额等。例如：```Log("私密信息", "&")```。
 
 推送渠道（邮箱、WebHook等）的设置方法与WebHook请求的格式见用户指南「平台基础 → 实盘 → 实盘消息推送」。
 
@@ -1342,13 +1500,13 @@ See also: `LogReset`, `LogVacuum`
 LogStatus(...msgs)
 ```
 
-在回测系统或实盘页面的状态栏中输出信息。
+在回测系统或者实盘页面状态栏输出信息。
 
 Parameters:
 
-- `msg` (string / number / bool / object / array / any (平台支持的任意类型), optional): 参数```msg```为要输出的内容，可传入多个```msg```参数。
+- `msg` (string / number / bool / object / array / any, optional): 输出的内容，参数```msg```可以传多个。
 
-支持设置输出内容的颜色：
+支持设置输出内容的颜色。
 
 ```javascript
 function main() {
@@ -1373,19 +1531,19 @@ fn main() {
 }
 ```
 
-状态栏中的数据输出示例：
+状态栏中数据输出示例。
 
 ```javascript
 function main() {
     var table = {type: 'table', title: 'Position Info', cols: ['Column 1', 'Column 2'], rows: [ ['abc', 'def'], ['ABC', 'support color #ff0000']]}
-    // JSON 序列化后，在字符串两端添加 ` 字符，即可将其识别为复杂消息格式（当前支持表格）
+    // JSON序列化后两边加上`字符,视为一个复杂消息格式(当前支持表格)
     LogStatus('`' + JSON.stringify(table) + '`')
-    // 表格信息也可以显示在多行文本中
+    // 表格信息也可以在多行中出现
     LogStatus('First line message\n`' + JSON.stringify(table) + '`\nThird line message')
-    // 支持同时显示多个表格，将以标签页（TAB）形式归为一组显示
+    // 支持多个表格同时显示,将以TAB显示到一组里
     LogStatus('`' + JSON.stringify([table, table]) + '`')
 
-    // 也可以在表格中构造按钮，策略通过 GetCommand 接收 cmd 属性的内容
+    // 也可以构造一个按钮在表格中,策略用GetCommand接收cmd属性的内容
     var table = {
         type: 'table',
         title: 'Position Operation',
@@ -1395,9 +1553,9 @@ function main() {
         ]
     }
     LogStatus('`' + JSON.stringify(table) + '`')
-    // 或者构造一个单独的按钮
+    // 或者构造一单独的按钮
     LogStatus('`' + JSON.stringify({'type':'button', 'cmd': 'coverAll', 'name': 'Close All'}) + '`')
-    // 可以自定义按钮样式（bootstrap 的按钮属性）
+    // 可以自定义按钮风格(bootstrap的按钮属性)
     LogStatus('`' + JSON.stringify({'type':'button', 'class': 'btn btn-xs btn-danger', 'cmd': 'coverAll', 'name': 'Close All'}) + '`')
 }
 ```
@@ -1426,26 +1584,26 @@ def main():
 ```rust
 fn main() {
     let table = r#"{"type": "table", "title": "Position Info", "cols": ["Column 1", "Column 2"], "rows": [["abc", "def"], ["ABC", "support color #ff0000"]]}"#;
-    // 在 JSON 字符串两端添加 ` 字符，即可将其识别为复杂消息格式（当前支持表格）
+    // JSON字符串两边加上`字符,视为一个复杂消息格式(当前支持表格)
     LogStatus!(format!("`{}`", table));
-    // 表格信息也可以显示在多行文本中
+    // 表格信息也可以在多行中出现
     LogStatus!(format!("First line message\n`{}`\nThird line message", table));
-    // 支持同时显示多个表格，将以标签页（TAB）形式归为一组显示
+    // 支持多个表格同时显示,将以TAB显示到一组里
     LogStatus!(format!("`[{},{}]`", table, table));
 
-    // 也可以在表格中构造按钮，策略通过 GetCommand 接收 cmd 属性的内容
+    // 也可以构造一个按钮在表格中,策略用GetCommand接收cmd属性的内容
     let table = String::from(r#"{"type": "table", "title": "Position Operation", "cols": ["Column 1", "Column 2", "Action"], "rows": ["#)
         + r#"["abc", "def", {"type": "button", "cmd": "coverAll", "name": "Close All"}]"#
         + r#"]}"#;
     LogStatus!(format!("`{}`", table));
-    // 或者构造一个单独的按钮
+    // 或者构造一单独的按钮
     LogStatus!(format!("`{}`", r#"{"type": "button", "cmd": "coverAll", "name": "Close All"}"#));
-    // 可以自定义按钮样式（bootstrap 的按钮属性）
+    // 可以自定义按钮风格(bootstrap的按钮属性)
     LogStatus!(format!("`{}`", r#"{"type": "button", "class": "btn btn-xs btn-danger", "cmd": "coverAll", "name": "Close All"}"#));
 }
 ```
 
-支持在状态栏中设计按钮控件：
+支持状态栏中设计按钮控件。
 
 ```javascript
 function main() {
@@ -1503,7 +1661,7 @@ fn main() {
 }
 ```
 
-设置状态栏按钮的禁用与描述功能：
+设置状态栏按钮的禁用、描述功能。
 
 ```javascript
 function main() {
@@ -1550,7 +1708,7 @@ fn main() {
 }
 ```
 
-结合 ```GetCommand()``` 函数，构建状态栏按钮的交互功能：
+结合```GetCommand()```函数，构造状态栏按钮交互功能。
 
 ```javascript
 function test1() {
@@ -1771,7 +1929,7 @@ fn main() {
 }
 ```
 
-横向合并```LogStatus()```函数绘制的表格中的单元格：
+横向合并```LogStatus()```函数画出的表格内的单元格。
 
 ```javascript
 function main() {
@@ -1784,7 +1942,7 @@ function main() {
         ]
     }
     var ticker = exchange.GetTicker()
-    // 添加一行数据，将第一个和第二个单元格合并，并在合并后的单元格内输出 ticker 变量
+    // 添加一行数据，第一个和第二个单元格合并，并且输出ticker变量在合并后的单元格内
     table.rows.push([{body : JSON.stringify(ticker), colspan : 2}, "abc"])
     LogStatus('`' + JSON.stringify(table) + '`')
 }
@@ -1818,15 +1976,15 @@ fn main() {
         r#"{{"Buy": {}, "Sell": {}, "High": {}, "Low": {}, "Volume": {}, "Last": {}, "Time": {}}}"#,
         ticker.Buy, ticker.Sell, ticker.High, ticker.Low, ticker.Volume, ticker.Last, ticker.Time
     );
-    // 添加一行数据，将第一个和第二个单元格合并，并在合并后的单元格内输出 ticker 数据
-    // body 为字符串（对应 JS 的 JSON.stringify(ticker)），内部引号需转义后嵌入 JSON
+    // 添加一行数据，第一个和第二个单元格合并，并且输出ticker数据在合并后的单元格内
+    // body为字符串（对应JS的JSON.stringify(ticker)），内部引号需转义后嵌入JSON
     let row2 = format!(r#"[{{"body": "{}", "colspan": 2}}, "abc"]"#, json_ticker.replace('"', "\\\""));
     let table = table_tpl.replace("__ROW2__", &row2);
     LogStatus!(format!("`{}`", table));
 }
 ```
 
-纵向合并 ```LogStatus()``` 函数绘制的表格中的单元格：
+纵向合并```LogStatus()```函数画出的表格内的单元格。
 
 ```javascript
 function main() {
@@ -1844,9 +2002,9 @@ function main() {
 
     table.rows.push([{body : "A2 + B2:" + JSON.stringify(ticker), colspan : 2}, "C2"])
     table.rows.push([{body : "A3 + A4 + A5:" + name, rowspan : 3}, "B3", "C3"])
-    // A4 被上一行的第一个单元格合并
+    // A4被上一行第一个单元格合并
     table.rows.push(["B4", "C4"])
-    // A5 被上一行的第一个单元格合并
+    // A5被上一行第一个单元格合并
     table.rows.push(["B5", "C5"])
     table.rows.push(["A6", "B6", "C6"])
     LogStatus('`' + JSON.stringify(table) + '`')
@@ -1878,19 +2036,19 @@ def main():
 
 ```rust
 fn main() {
-    // 为便于测试，此处使用构造的数据以保持代码简短易读
+    // 为了测试，代码简短易读，这里使用构造的数据
     let json_ticker = r#"{"High": 0, "Low": 0, "Buy": 0, "Sell": 0, "Last": 0, "Time": 0, "Volume": 0}"#;
     let name = exchange.GetName();
 
     let mut rows: Vec<String> = Vec::new();
     rows.push(String::from(r#"["A1", "B1", {"type": "button", "cmd": "coverAll", "name": "C1"}]"#));
-    // body 为字符串，其内部的引号需要转义后才能嵌入 JSON
+    // body为字符串，内部的引号需要转义后嵌入JSON
     let body = format!("A2 + B2:{}", json_ticker).replace('"', "\\\"");
     rows.push(format!(r#"[{{"body": "{}", "colspan": 2}}, "C2"]"#, body));
     rows.push(format!(r#"[{{"body": "A3 + A4 + A5:{}", "rowspan": 3}}, "B3", "C3"]"#, name));
-    // A4 被上一行的第一个单元格合并
+    // A4被上一行第一个单元格合并
     rows.push(String::from(r#"["B4", "C4"]"#));
-    // A5 被上一行的第一个单元格合并
+    // A5被上一行第一个单元格合并
     rows.push(String::from(r#"["B5", "C5"]"#));
     rows.push(String::from(r#"["A6", "B6", "C6"]"#));
 
@@ -1899,7 +2057,7 @@ fn main() {
 }
 ```
 
-状态栏中分页显示表格：
+状态栏表格分页显示。
 
 ```javascript
 function main() {
@@ -1925,7 +2083,7 @@ fn main() {
 }
 ```
 
-除了可以分页显示表格之外，还可以将多个表格自上而下排列显示：
+除了可以分页显示表格，也可以多个表格自上而下排列显示。
 
 ```javascript
 function main(){
@@ -2003,8 +2161,7 @@ fn main() {
 }
 ```
 
-支持设置状态栏表格的横向和纵向滚动模式。将```scroll```属性设置为```"auto"```后，当状态栏表格的纵向行数超过 20 行时，内容将自动滚动显示；当横向列数超出页面显示范围时，则进行横向滚动显示。使用```scroll```属性可以缓解实盘运行时因状态栏写入大量数据而导致的卡顿问题。
-
+支持设置状态栏表格横向、纵向滚动模式。设置```scroll```属性为```"auto"```，当状态栏表格纵向的行数超过20行时内容进行滚动显示，当横向的列数超出页面显示范围时进行横向滚动显示，使用```scroll```属性可以缓解实盘时状态栏中大量写入数据的卡顿问题。
 参考以下测试例子：
 
 ```javascript
@@ -2069,11 +2226,11 @@ fn main() {
 }
 ```
 
-实盘运行时，```LogStatus()```函数输出的信息不会写入日志记录，仅更新当前实盘的状态栏内容；实盘数据库中只保存最新的一份状态栏内容，每次调用都会覆盖之前的内容。
+实盘运行时```LogStatus()```函数输出的信息不写入日志记录，只更新当前实盘的状态栏内容；实盘数据库中只保存最新的一份状态栏内容，每次调用覆盖之前的内容。
 
-```LogStatus()```函数支持打印```base64```编码后的图片，图片字符串以``` ` ```开头，以``` ` ```结尾。例如： ```LogStatus("`data:image/png;base64,AAAA`")```。
+```LogStatus()```函数支持打印```base64```编码后的图片，以``` ` ```开头，以``` ` ```结尾。例如： ```LogStatus("`data:image/png;base64,AAAA`")```。
 
-```LogStatus()```函数支持直接传入```Python```的```matplotlib.pyplot```对象。只要对象包含```savefig```方法，即可作为参数传入```LogStatus()```函数，例如：
+```LogStatus()```函数支持直接传入```Python```的```matplotlib.pyplot```对象，只要对象包含```savefig```方法就可以作为参数传入```LogStatus()```函数，例如：
 
 ```python
 import matplotlib.pyplot as plt
@@ -2083,9 +2240,9 @@ def main():
     LogStatus(plt)
 ```
 
-策略实盘运行时，在实盘页面翻看历史记录时，状态栏会进入休眠状态，停止更新；只有当日志处于第一页时，状态栏数据才会刷新。状态栏支持输出```base64```编码后的图片，也支持在状态栏显示的表格中输出```base64```编码后的图片。由于编码后的图片字符串数据通常很长，因此此处不再展示示例代码。
+策略实盘运行时，在实盘页面如果翻看历史记录，状态栏会进入休眠状态，停止更新。只有日志在第一页的时候状态栏数据才会刷新。支持在状态栏输出```base64```编码后的图片，也支持在状态栏显示的表格中输出```base64```编码后的图片。由于编码后的图片的字符串数据一般很长，所以不再展示范例代码。
 
-**状态栏按钮**
+##### 状态栏按钮
 
 把按钮对象```JSON.stringify()```后用``` ` ```包裹输出到状态栏，或者放进状态栏表格的单元格（一个单元格放多个按钮时写成按钮数组）。状态栏的每一行只能有一段``` ` ```包裹的JSON，多个按钮要分行输出或者放进表格。点击按钮后，策略用`GetCommand`读取命令；实盘没有运行时点击按钮只会提示错误。
 
@@ -2149,14 +2306,14 @@ LogProfit(profit)
 LogProfit(profit, ...args)
 ```
 
-记录并打印盈亏数值，并根据盈亏数值绘制收益曲线。
+记录盈亏值，打印盈亏数值并根据盈亏数值绘制收益曲线。
 
 Parameters:
 
-- `profit` (number, required): 参数```profit```为收益数据，该数据由策略中设计的算法计算得出。
-- `arg` (string / number / bool / object / array / any (平台支持的任意类型), optional): 扩展参数，用于向该条收益日志中输出附带信息，```arg```参数可传入多个。
+- `profit` (number, required): 收益数据，该数据由策略中设计算法、计算给出。
+- `arg` (string / number / bool / object / array / any, optional): 扩展参数，可以输出附带信息到这条收益日志中，```arg```参数可以传多个。
 
-调用```LogProfit```函数时，如果最后一个参数为字符```&```，则不会将日志写入数据库，仅更新收益图表。使用```&```参数可以避免频繁的收益记录产生大量日志，从而保持日志整洁。例如：
+```LogProfit```函数如果以字符```&```结尾，不写入日志到数据库，只更新收益图表。使用```&```参数可以避免频繁的收益记录产生大量日志，保持日志清爽。例如。
 
 ```javascript
 function main() {
@@ -2199,7 +2356,9 @@ LogProfitReset(remain)
 
 Parameters:
 
-- `remain` (number, optional): ```remain```参数用于指定需要保留的日志条数（整数）。
+- `remain` (number, optional): 需要保留的日志条数（整数）。
+
+在收益图表上画30个点，再重置为只保留最后10个点。
 
 ```javascript
 function main() {
@@ -2244,7 +2403,9 @@ LogReset(remain)
 
 Parameters:
 
-- `remain` (number, optional): ```remain``` 参数用于设置需要保留的最近日志条数。
+- `remain` (number, optional): 需要保留的最近日志条数。
+
+保留最近10条日志，清除其余日志。
 
 ```javascript
 function main() {
@@ -2276,6 +2437,8 @@ LogVacuum()
 ```
 
 用于在调用 ```LogReset()``` 函数清除日志后，回收 **SQLite** 删除数据时所占用的存储空间。
+
+清除全部日志后回收数据库占用的空间。
 
 ```javascript
 function main() {
@@ -2313,6 +2476,8 @@ Parameters:
 
 - `enable` (bool, required): 当```enable```参数设置为假值（例如```false```）时，将不打印订单日志（即```exchange.Buy()```等函数产生的日志），也不会写入实盘的数据库。
 
+关闭订单信息的日志记录。
+
 ```javascript
 function main() {
     EnableLog(false)
@@ -2338,27 +2503,77 @@ See also: `exchange.Buy`, `exchange.Sell`, `exchange.CancelOrder`
 Chart(options)
 ```
 
-自定义图表绘图函数。
+自定义图表画图函数。
 
 Parameters:
 
-- `options` (object / object数组, required): ```options```参数为图表配置。```Chart()```函数的参数```options```是可以进行```JSON```序列化的```HighStocks```的```Highcharts.StockChart```参数，相比原生参数增加了一个```__isStock```属性。如果将```__isStock```属性设置为假值（例如```false```），则显示为普通图表，即使用```Highcharts```图表；如果将```__isStock```属性设置为真值（例如```true```），则使用```Highstocks```图表（默认```__isStock```为真值，例如```true```）。详情可查询[HighStocks图表库](http://api.highcharts.com/highstock)。
+- `options` (object / object数组, required): 图表配置。```Chart()```函数的参数```options```是可以```JSON```序列化的```HighStocks```的```Highcharts.StockChart```参数。比原生的参数增加一个```__isStock```属性，如果指定```__isStock:false```，则显示为普通图表。如果设置```__isStock```属性为假值例如：```false```，即使用的图表为```Highcharts```图表。如果设置```__isStock```属性为真值例如：```true```，即使用的图表为```Highstocks```图表（默认```__isStock```为真值，例如```true```）。可以查询[HighStocks图表库](http://api.highcharts.com/highstock)。
 
 Returns (object): 图表对象，见`Chart-return`。
 
-多图表绘制配置说明：
-- ```extension.layout``` 属性
-  当此属性设置为 "single" 时，该图表不会与其他图表叠加显示（即不以分页标签方式呈现），而是单独平铺显示。
-- ```extension.height``` 属性
-  此属性用于设置图表的高度，取值可以为数值类型，也可以采用 "300px" 的形式设置。
-- ```extension.col``` 属性
-  此属性用于设置图表的宽度。页面宽度共划分为 12 个单元，设置为 8 即表示该图表占用 8 个单元的宽度。
+创建一条折线图，每5秒追加一个最新价数据点。
+
+```javascript
+function main() {
+    var chart = Chart({
+        title: {text: "最新价"},
+        xAxis: {type: "datetime"},
+        series: [{name: "Last", data: []}]
+    })
+    chart.reset()
+    while (true) {
+        var ticker = exchange.GetTicker()
+        if (ticker) {
+            chart.add(0, [Date.now(), ticker.Last])
+        }
+        Sleep(5000)
+    }
+}
+```
+
+```python
+import time
+def main():
+    chart = Chart({
+        "title": {"text": "最新价"},
+        "xAxis": {"type": "datetime"},
+        "series": [{"name": "Last", "data": []}]
+    })
+    chart.reset()
+    while True:
+        ticker = exchange.GetTicker()
+        if ticker:
+            chart.add(0, [time.time() * 1000, ticker["Last"]])
+        Sleep(5000)
+```
+
+```rust
+fn main() {
+    let chart = Chart::new(r#"{"title": {"text": "最新价"}, "xAxis": {"type": "datetime"},
+        "series": [{"name": "Last", "data": []}]}"#);
+    chart.reset(0);
+    loop {
+        if let Ok(ticker) = exchange.GetTicker(None) {
+            chart.add(0, &format!("[{}, {}]", Unix() * 1000, ticker.Last), -1);
+        }
+        Sleep(5000);
+    }
+}
+```
+
+多图表画图配置：
+- ```extension.layout```属性
+  如果设置此属性，值为"single"，则图表不会叠加（不会以分页标签方式显示），会单独显示（平铺显示）。
+- ```extension.height```属性
+  此属性用于设置图表的高度，值可以为数值类型，或以"300px"方式设置。
+- ```extension.col```属性
+  此属性用于设置图表的宽度，页面宽度一共划分为12个单元，设置8即该图表占用8个单元宽度。
 
 ```javascript
 function main() {
     var cfgA = {
         extension: {
-            layout: 'single', // 不参与分组，单独显示，默认为分组 'group'
+            layout: 'single', // 不参于分组，单独显示, 默认为分组 'group'
             height: 300, // 指定高度
         },
         title: {
@@ -2402,13 +2617,13 @@ function main() {
                 ["B", 25],
                 ["C", 25],
                 ["D", 25],
-            ]  // 指定初始数据后无需使用 add 函数更新，直接修改图表配置即可更新数据序列。
+            ]  // 指定初始数据后不需要用add函数更新, 直接更改图表配置就可以更新序列.
         }]
     };
     var cfgD = {
         extension: {
             layout: 'single',
-            col: 8, // 指定宽度所占的单元数，总单元数为 12
+            col: 8, // 指定宽度占的单元值, 总值 为12
             height: '300px',
         },
         title: {
@@ -2449,7 +2664,7 @@ function main() {
 
     var chart = Chart([cfgA, cfgB, cfgC, cfgD, cfgE]);
     chart.reset()
-        // 为饼图追加一个数据点，add 只能更新通过 add 方式添加的数据点，内置的数据点无法在后期更新
+        // 为饼图清加一个数点，add只能更新通过add方式添加的数据点, 内置的数据点无法后期更新
     chart.add(3, {
         name: "ZZ",
         y: Math.random() * 100
@@ -2476,7 +2691,7 @@ function main() {
         chart.add(5, [new Date().getTime(), ticker.Buy]);
         cfgC.series[0].data[0][1] = Math.random() * 100;
         cfgE.series[0].data[0][1] = Math.random() * 100;
-        // update 实际上等同于重置图表的配置
+        // update实际上等于重置了图表的配置
         chart.update([cfgA, cfgB, cfgC, cfgD, cfgE]);
     }
 }
@@ -2610,7 +2825,7 @@ def main():
 
 ```rust
 fn main() {
-    // Rust 中图表配置为 JSON 字符串，可变部分使用占位符表示，更新时替换占位符以重新构建配置
+    // Rust 中图表配置为 JSON 字符串，可变部分使用占位符表示，更新时替换占位符重新构建配置
     let cfg_a_tpl = r#"{
         "extension": {
             "layout": "single",
@@ -2668,7 +2883,7 @@ fn main() {
 
     let chart = Chart::new(&format!("[{},{},{},{},{}]", cfg_a, cfg_b, cfg_c, cfg_d, cfg_e));
     chart.reset(0);
-    // 为饼图追加一个数据点，add 只能更新通过 add 方式添加的数据点，内置的数据点无法在后期更新
+    // 为饼图追加一个数据点，add只能更新通过add方式添加的数据点，内置的数据点无法后期更新
     let y = (UnixNano() % 100) as f64;    // 用时间戳模拟随机数
     chart.add(3, &format!(r#"{{"name": "ZZ", "y": {}}}"#, y), -1);
     loop {
@@ -2690,62 +2905,63 @@ fn main() {
         chart.add(5, &format!("[{}, {}]", now, ticker.Buy), -1);
         let cfg_c = cfg_c_tpl.replace("__Y__", &format!("{}", (UnixNano() % 100) as f64));
         let cfg_e = cfg_e_tpl.replace("__Y__", &format!("{}", (UnixNano() % 100) as f64));
-        // update 实际上等同于重置图表的配置
+        // update实际上等于重置了图表的配置
         chart.update(&format!("[{},{},{},{},{}]", cfg_a, cfg_b, cfg_c, cfg_d, cfg_e));
     }
 }
 ```
 
-简单的绘图示例：
+简单的画图例子。
 
 ```javascript
-// 在 JavaScript 中，chart 是一个对象；在调用 Chart 函数之前，我们需要先声明一个用于配置图表的对象变量 chart
+// 这个chart在JavaScript语言中是对象，在使用Chart函数之前我们需要声明一个配置图表的对象变量chart
 var chart = {
-    // 该字段用于标记图表是否为普通图表，感兴趣的读者可以改为 false 运行查看效果
+    // 该字段标记图表是否为一般图表，有兴趣的可以改成false运行看看
     __isStock: true,
-    // 提示框
+    // 缩放工具
     tooltip: {xDateFormat: '%Y-%m-%d %H:%M:%S, %A'},
     // 标题
     title : { text : '差价分析图'},
     // 选择范围
     rangeSelector: {
-        buttons:  [{type: 'hour',count: 1, text: '1h'}, {type: 'hour',count: 3, text: '3h'}, {type: 'hour', count: 8, text: '8h'}, {type: 'all',text: 'All'}],
+        buttons:  [{type: 'hour',count: 1, text: '1h'}, {type: 'hour',count: 3, text: '3h'},
+            {type: 'hour', count: 8, text: '8h'}, {type: 'all',text: 'All'}],
         selected: 0,
         inputEnabled: false
     },
-    // 横轴（即 x 轴），当前设置的类型为：时间
+    // 坐标轴横轴即：x轴，当前设置的类型是：时间
     xAxis: { type: 'datetime'},
-    // 纵轴（即 y 轴），默认数值随数据大小自动调整
+    // 坐标轴纵轴即：y轴，默认数值随数据大小调整
     yAxis : {
         // 标题
         title: {text: '差价'},
-        // 是否启用右侧纵轴
+        // 是否启用右边纵轴
         opposite: false
     },
-    // 数据系列，该属性保存各个数据系列（折线、K 线图、标签等……）
+    // 数据系列，该属性保存的是各个数据系列（线，K线图，标签等...）
     series : [
-        // 索引为 0，data 数组中存放的是该索引系列的数据
+        // 索引为0，data数组内存放的是该索引系列的数据
         {name : "line1", id : "Line 1,buy1Price", data : []},
-        // 索引为 1，设置了 dashStyle: 'shortdash'，即将其设置为虚线
+        // 索引为1，设置了dashStyle:'shortdash'即：设置虚线
         {name : "line2", id : "Line 2,lastPrice", dashStyle : 'shortdash', data : []}
     ]
 }
 
 function main(){
-    // 调用 Chart 函数，初始化图表
+    // 调用Chart函数，初始化图表
     var ObjChart = Chart(chart)
     // 清空
     ObjChart.reset()
     while(true){
-        // 获取本次轮询的时间戳（即毫秒级时间戳），用于确定写入图表的 X 轴位置
+        // 获取本次轮询的时间戳，即一个毫秒的时间戳。用来确定写入到图表的X轴的位置
         var nowTime = new Date().getTime()
         // 获取行情数据
         var ticker = _C(exchange.GetTicker)
-        // 从行情数据的返回值中取得买一价
+        // 从行情数据的返回值取得买一价
         var buy1Price = ticker.Buy
-        // 取得最新成交价，为避免两条线相互重合，此处将其加 1
+        // 取得最后成交价，为了2条线不重合在一起，我们加1
         var lastPrice = ticker.Last + 1
-        // 以时间戳作为 X 值、买一价作为 Y 值，传入索引 0 的数据序列
+        // 用时间戳作为X值，买一价作为Y值传入索引0的数据序列
         ObjChart.add(0, [nowTime, buy1Price])
         // 同上
         ObjChart.add(1, [nowTime, lastPrice])
@@ -2791,7 +3007,7 @@ def main():
 
 ```rust
 fn main() {
-    // 在 Rust 中，图表配置为 JSON 字符串；在调用 Chart::new 函数之前，先定义图表配置
+    // Rust 中图表配置为 JSON 字符串，在使用Chart::new函数之前先定义图表配置
     let chart = r#"{
         "__isStock": true,
         "tooltip": {"xDateFormat": "%Y-%m-%d %H:%M:%S, %A"},
@@ -2812,20 +3028,20 @@ fn main() {
         ]
     }"#;
 
-    // 调用 Chart::new 函数，初始化图表
+    // 调用Chart::new函数，初始化图表
     let obj_chart = Chart::new(chart);
     // 清空
     obj_chart.reset(0);
     loop {
-        // 获取本次轮询的时间戳（即毫秒级时间戳），用于确定写入图表的 X 轴位置
+        // 获取本次轮询的时间戳，即一个毫秒的时间戳。用来确定写入到图表的X轴的位置
         let now_time = Unix() * 1000;
         // 获取行情数据
         let ticker = _C!(exchange.GetTicker(None));
-        // 从行情数据的返回值中取得买一价
+        // 从行情数据的返回值取得买一价
         let buy1_price = ticker.Buy;
-        // 取得最新成交价，为避免两条线相互重合，此处将其加 1
+        // 取得最后成交价，为了2条线不重合在一起，我们加1
         let last_price = ticker.Last + 1.0;
-        // 以时间戳作为 X 值、买一价作为 Y 值，传入索引 0 的数据序列
+        // 用时间戳作为X值，买一价作为Y值传入索引0的数据序列
         obj_chart.add(0, &format!("[{}, {}]", now_time, buy1_price), -1);
         // 同上
         obj_chart.add(1, &format!("[{}, {}]", now_time, last_price), -1);
@@ -2834,37 +3050,37 @@ fn main() {
 }
 ```
 
-绘制三角函数曲线的示例：
+三角函数曲线画图例子。
 
 ```javascript
-// 用于初始化图表的配置对象
+// 用于初始化图表的对象
 var chart = {
     // 图表标题
     title: {text: "Line value triggers plotLines value"},
-    // Y 轴相关设置
+    // Y轴相关设置
     yAxis: {
-        // 垂直于 Y 轴的水平线，用作触发线；这是一个结构体数组，可设置多条触发线
+        // 垂直于Y轴的水平线，用作触发线，是一个结构数组，可以设置多条触发线
         plotLines: [{
-            // 触发线的值，该线将显示在对应的数值位置
+            // 触发线的值，设置多少这条线就在相应的数值位置显示
             value: 0,
             // 设置触发线的颜色
             color: 'red',
-            // 线宽
+            // 宽度
             width: 2,
             // 显示的标签
             label: {
                 // 标签文本
                 text: 'Trigger Value',
-                // 标签居中对齐
+                // 标签位置居中
                 align: 'center'
             }
         }]
     },
-    // X 轴相关设置，此处将类型设置为时间轴
+    // X轴相关设置，这里设置类型是时间轴
     xAxis: {type: "datetime"},
     series: [
         {name: "sin", type: "spline", data: []},
-        // 数据系列，可设置多个，并通过数组索引进行控制
+        // 这个是比较重要的数据系列，可以设置多个数据系列，根据数组索引控制
         {name: "cos", type: "spline", data: []}
     ]
 }
@@ -2875,28 +3091,28 @@ function main(){
     var time = 0
     // 角度
     var angle = 0
-    // 坐标 y 值，用于接收正弦值或余弦值
+    // 坐标y值，用于接收正弦值、余弦值
     var y = 0
-    // 调用 API 接口，使用 chart 对象初始化图表
+    // 调用API接口用chart对象初始化图表
     var objChart = Chart(chart)
-    // 初始化时清空图表
+    // 初始，清空图表
     objChart.reset()
-    // 将触发线的值设置为 1
+    // 设置触发线的值为1
     chart.yAxis.plotLines[0].value = 1
     // 循环
     while(true){
         // 获取当前时刻的时间戳
         time = new Date().getTime()
-        // 每 5 秒将角度 angle 增加 5 度，并计算正弦值
+        // 每5秒角度angle增加5度，计算正弦值
         y = Math.sin(angle * 2 * pi / 360)
-        // 将计算得到的 y 值写入图表对应索引的数据系列，add 函数的第一个参数为指定的数据系列索引
+        // 把计算出来的y值写入图表相应索引的数据系列，add函数的第一个参数为指定的数据系列索引
         objChart.add(0, [time, y])
         // 计算余弦值
         y = Math.cos(angle * 2 * pi / 360)
         objChart.add(1, [time, y])
-        // 增加 5 度
+        // 增加5度
         angle += 5
-        // 暂停 5 秒，避免绘图过于频繁、数据增长过快
+        // 暂停5秒，以免画图太频繁，数据增长过快
         Sleep(5000)
     }
 }
@@ -2942,7 +3158,7 @@ def main():
 
 ```rust
 fn main() {
-    // 用于初始化图表的 JSON 配置字符串，触发线的值在配置中直接设置为 1
+    // 用于初始化图表的JSON配置字符串，触发线的值在配置中直接设置为1
     let chart = r#"{
         "title": {"text": "Line value triggers plotLines value"},
         "yAxis": {
@@ -2964,30 +3180,30 @@ fn main() {
     let pi = 3.1415926535897_f64;
     // 角度
     let mut angle = 0.0_f64;
-    // 调用 API 接口，使用 chart 配置初始化图表
+    // 调用API接口用chart配置初始化图表
     let obj_chart = Chart::new(chart);
-    // 初始化时清空图表
+    // 初始，清空图表
     obj_chart.reset(0);
     // 循环
     loop {
         // 获取当前时刻的毫秒时间戳
         let ts = Unix() * 1000;
-        // 将角度 angle 增加 5 度，并计算正弦值
+        // 角度angle增加5度，计算正弦值
         let mut y = (angle * 2.0 * pi / 360.0).sin();
-        // 将计算得到的 y 值写入图表对应索引的数据系列，add 函数的第一个参数为指定的数据系列索引
+        // 把计算出来的y值写入图表相应索引的数据系列，add函数的第一个参数为指定的数据系列索引
         obj_chart.add(0, &format!("[{}, {}]", ts, y), -1);
         // 计算余弦值
         y = (angle * 2.0 * pi / 360.0).cos();
         obj_chart.add(1, &format!("[{}, {}]", ts, y), -1);
-        // 增加 5 度
+        // 增加5度
         angle += 5.0;
-        // 暂停 5 秒，避免绘图过于频繁、数据增长过快
+        // 暂停5秒，以免画图太频繁，数据增长过快
         Sleep(5000);
     }
 }
 ```
 
-使用混合图表的复杂示例：
+使用混合图表的复杂例子。
 
 ```javascript
 /*backtest
@@ -3263,7 +3479,7 @@ exchanges: [{"eid":"Bitfinex","currency":"BTC_USD"}]
 */
 
 fn main() {
-    // 在 Rust 中，图表配置以 JSON 字符串形式表示；饼图数据使用占位符 __PIE_DATA__ 标记，更新时替换该占位符后重建配置
+    // Rust 中图表配置为 JSON 字符串，饼图数据使用占位符__PIE_DATA__表示，更新时替换后重建配置
     let chart_cfg_tpl = r##"{
         "subtitle": {"text": "subtitle"},
         "yAxis": [{
@@ -3353,7 +3569,7 @@ fn main() {
         c.add(0, &format!("[{}, {}]", t.Time, t.Last), -1); // PnL
         let profit = if let Some(p) = &pre_ticker { t.Last - p.Last } else { 0.0 };
         c.add(1, &format!("[{}, {}]", t.Time, profit), -1); // profit
-        let r = (UnixNano() % 100) as f64 / 100.0;          // 使用时间戳模拟随机数
+        let r = (UnixNano() % 100) as f64 / 100.0;          // 用时间戳模拟随机数
         let pos = (t.Time / 86400) as f64;
         c.add(2, &format!("[{}, {}]", t.Time, pos / 2.0), -1); // Vol
         c.add(3, &format!("[{}, {}]", t.Time, if r > 0.8 { pos.to_string() } else { "null".to_string() }), -1); // Long
@@ -3367,7 +3583,7 @@ fn main() {
 }
 ```
 
-图表中```pie```类型的图表没有时间轴，因此在更新数据时需要直接更新图表配置。例如，在上述范例的代码中，更新数据后调用```c.update(chartCfg)```即可刷新图表，如下所示：
+图表中```pie```类型的图是没有时间轴的图表，在更新数据时需要直接更新图表配置。例如以上范例中的代码，更新数据后使用```c.update(chartCfg)```更新图表，如下所示。
 
 ```javascript
 // update pie
@@ -3404,23 +3620,55 @@ See also: `KLineChart`
 KLineChart(options)
 ```
 
-该函数用于采用类似```Pine```语言的绘图方式，在策略运行时进行自定义绘图。
+该函数用于使用类似```Pine```语言的画图方式进行策略运行时的自定义画图。
 
 Parameters:
 
-- `options` (object / object数组, required): ```options```参数为图表配置对象，支持以下属性：
-
-- ```overlay```：布尔值，用于设置绘图内容是否叠加输出到主图。设置为```true```时在主图显示，设置为```false```时在副图显示。
-
-- ```pricePrecision```：数字，价格数据精度，用于控制图表中价格数据的小数位数。例如，设置为2表示保留2位小数，设置为0表示不保留小数（四舍五入为整数）。
-
-- ```volumePrecision```：数字，成交量数据精度，用于控制图表中成交量数据的小数位数。例如，设置为2表示保留2位小数，设置为0表示不保留小数（四舍五入为整数）。
+- `options` (object / object数组, required): 图表配置对象：```overlay```为```true```时画在主图、```false```时画在副图；```pricePrecision```、```volumePrecision```为价格、成交量显示的小数位数（0为取整）。其它字段见`KLineChart-options`。
 
 Returns (object): 图表对象，画图方法（```barcolor```、```bgcolor```、```plot```、```fill```、```hline```、```plotarrow```、```plotshape```、```plotchar```、```plotcandle```、```signal```、```reset```）的参数见`KLineChart-return`。在K线数据上遍历画图时，每根K线的画图操作必须以```begin(bar)```开始、以```close(bar)```结束。
 
-如果需要在策略自定义画图区域进行画图，必须先创建图表控制对象，使用```KLineChart()```函数即可创建该对象。```KLineChart()```函数的参数为一个图表配置结构，参考代码中使用的图表配置结构非常简单：```{overlay: true}```。
+画出K线，并在K线上叠加收盘价曲线。
 
-该图表配置结构仅设置将画图内容输出在图表主图上。如果```overlay```设置为假值（例如```false```），则图表内容将全部输出在副图上；如果需要指定某个画图函数在主图上绘制，也可以在具体的函数调用中将参数```overlay```指定为真值（例如```true```）。
+```javascript
+function main() {
+    var c = KLineChart({overlay: true})
+    var records = exchange.GetRecords()
+    if (!records) return
+    for (var bar of records) {
+        c.begin(bar)                  // 每根K线以 begin 开始
+        c.plot(bar.Close, "Close")
+        c.close()                     // 以 close 结束
+    }
+}
+```
+
+```python
+def main():
+    c = KLineChart({"overlay": True})
+    records = exchange.GetRecords()
+    if not records:
+        return
+    for bar in records:
+        c.begin(bar)                  # 每根K线以 begin 开始
+        c.plot(bar["Close"], "Close")
+        c.close()                     # 以 close 结束
+```
+
+```rust
+fn main() {
+    let mut c = KLineChart::new(r#"{"overlay": true}"#);
+    let Ok(records) = exchange.GetRecords(None, None, None) else { return };
+    for bar in &records {
+        c.begin(bar);                 // 每根K线以 begin 开始
+        c.plot(bar.Close, r#"{"title": "Close"}"#);
+        c.close();                    // 以 close 结束
+    }
+}
+```
+
+如果在策略自定义画图区域画图必须有图表控制对象，使用```KLineChart()```函数创建该对象。```KLineChart()```函数的参数为一个图表配置结构，在参考代码中使用的图表结构很简单：```{overlay: true}```。
+这个图表配置结构仅仅设置了画图内容在图表主图上输出，如果```overlay```设置为假值，例如：```false```，则图表上的内容都输出在副图上，如果需要指定某个画图函数在主图上画出也可以在具体函数调用中指定参数```overlay```为真值，例如：```true```。
 
 ```javascript
 function main() {
@@ -3435,7 +3683,7 @@ function main() {
         return
     }
 
-    // 遍历K线数据执行画图操作，每次画图操作必须以```c.begin(bar)```函数调用作为起始，以```c.close(bar)```函数调用作为结束。
+    // 在K线数据上遍历执行画图操作，画图操作中必须以```c.begin(bar)```函数调用作为起始，以```c.close(bar)```函数调用作为结束。
     bars.forEach(function(bar, index) {
         c.begin(bar)
         c.barcolor(bar.Close > bar.Open ? 'rgba(255, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.2)')
@@ -3512,7 +3760,7 @@ fn main() {
     // 使用现货交易所对象测试，获取K线数据。如果使用期货交易所对象测试，需要先设置合约
     let bars = exchange.GetRecords(None, None, None).unwrap();
 
-    // 遍历K线数据执行画图操作，每次画图操作必须以c.begin(bar)函数调用作为起始，以c.close()函数调用作为结束。
+    // 在K线数据上遍历执行画图操作，画图操作中必须以c.begin(bar)函数调用作为起始，以c.close()函数调用作为结束。
     for bar in &bars {
         c.begin(bar);
         c.barcolor(if bar.Close > bar.Open { "rgba(255, 0, 0, 0.2)" } else { "rgba(0, 0, 0, 0.2)" }, "{}");
@@ -3539,14 +3787,14 @@ fn main() {
 }
 ```
 
-使用 ```pricePrecision``` 和 ```volumePrecision``` 参数控制图表数据的显示精度。可根据实际需求设置价格与成交量的显示精度，例如对于价格波动较大的品种，可将精度设置为 0 以显示整数；对于价格较为精细的品种，可设置为 2 或更高精度。
+使用```pricePrecision```和```volumePrecision```参数控制图表数据精度。可以根据实际需求设置价格和成交量的显示精度，例如对于价格波动较大的品种可以设置为0显示整数，对于价格精确的品种可以设置为2或更高精度。
 
 ```javascript
 function main() {
-    // 创建图表控制对象，将价格精度与成交量精度均设置为 0（即显示整数）
+    // 创建图表控制对象，设置价格精度为0（整数），成交量精度为0（整数）
     let c = KLineChart({
         overlay: true,
-        pricePrecision: 0,   // 价格数据精度，设置为 2 即保留 2 位小数
+        pricePrecision: 0,   // 价格数据精度，设置2即保留2位小数
         volumePrecision: 0   // 成交量数据精度
     })
 
@@ -3554,13 +3802,13 @@ function main() {
     let symbol = exchange.GetName().includes("Futures_") ? "ETH_USDT.swap" : "ETH_USDT"
     Log("Test symbol:", symbol)
 
-    // 获取 K 线数据
+    // 获取K线数据
     let bars = exchange.GetRecords(symbol)
     if (!bars) {
         return
     }
 
-    // 遍历 K 线数据并绘制图表
+    // 遍历K线数据并绘制图表
     bars.forEach(function(bar, index) {
         c.begin(bar)
         c.barcolor(bar.Close > bar.Open ? 'rgba(255, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.2)')
@@ -3573,10 +3821,10 @@ function main() {
 
 ```python
 def main():
-    # 创建图表控制对象，将价格精度与成交量精度均设置为 0（即显示整数）
+    # 创建图表控制对象，设置价格精度为0（整数），成交量精度为0（整数）
     c = KLineChart({
         "overlay": True,
-        "pricePrecision": 0,   # 价格数据精度，设置为 2 即保留 2 位小数
+        "pricePrecision": 0,   # 价格数据精度，设置2即保留2位小数
         "volumePrecision": 0   # 成交量数据精度
     })
 
@@ -3585,12 +3833,12 @@ def main():
     symbol = "ETH_USDT.swap" if "Futures_" in exName else "ETH_USDT"
     Log("Test symbol:", symbol)
 
-    # 获取 K 线数据
+    # 获取K线数据
     bars = exchange.GetRecords(symbol)
     if not bars:
         return
 
-    # 遍历 K 线数据并绘制图表
+    # 遍历K线数据并绘制图表
     for bar in bars:
         c.begin(bar)
         c.barcolor('rgba(255, 0, 0, 0.2)' if bar.Close > bar.Open else 'rgba(0, 0, 0, 0.2)')
@@ -3601,18 +3849,18 @@ def main():
 
 ```rust
 fn main() {
-    // 创建图表控制对象，将价格精度与成交量精度均设置为 0（即显示整数）
-    // pricePrecision 为价格数据精度，设置为 2 即保留 2 位小数；volumePrecision 为成交量数据精度
+    // 创建图表控制对象，设置价格精度为0（整数），成交量精度为0（整数）
+    // pricePrecision为价格数据精度，设置2即保留2位小数；volumePrecision为成交量数据精度
     let mut c = KLineChart::new(r#"{"overlay": true, "pricePrecision": 0, "volumePrecision": 0}"#);
 
     // 根据交易所类型选择合适的交易对
     let symbol = if exchange.GetName().contains("Futures_") { "ETH_USDT.swap" } else { "ETH_USDT" };
     Log!("Test symbol:", symbol);
 
-    // 获取 K 线数据
+    // 获取K线数据
     let bars = exchange.GetRecords(symbol, None, None).unwrap();
 
-    // 遍历 K 线数据并绘制图表
+    // 遍历K线数据并绘制图表
     for bar in &bars {
         c.begin(bar);
         c.barcolor(if bar.Close > bar.Open { "rgba(255, 0, 0, 0.2)" } else { "rgba(0, 0, 0, 0.2)" }, "{}");
@@ -3623,9 +3871,9 @@ fn main() {
 }
 ```
 
-策略自定义绘图只能选用```KLineChart()```函数或```Chart()```函数两种方式中的一种。有关```KLineChart()```函数调用时所涉及的颜色、样式等设置，请参阅[使用KLineChart函数绘图的专题文章](https://www.fmz.com/bbs-topic/9482)。
+策略自定义画图只能使用```KLineChart()```函数的方式或者```Chart()```函数的方式中的一种。```KLineChart()```函数调用时用到的一些颜色、样式等设置，参看[使用KLineChart函数画图的专题文章](https://www.fmz.com/bbs-topic/9482)
 
-```pricePrecision```和```volumePrecision```参数用于控制图表中数据的显示精度。当未设置这些参数时，图表将使用默认精度显示数据。设置精度参数后，图表中的价格和成交量数据将按照指定的小数位数进行四舍五入显示，这有助于简化图表显示、提升可读性。
+```pricePrecision```和```volumePrecision```参数用于控制图表中数据的显示精度。当不设置这些参数时，图表使用默认精度显示数据。设置精度参数后，图表中的价格和成交量数据将按照指定的小数位数进行四舍五入显示，这对于简化图表显示、提高可读性很有帮助
 
 See also: `Chart`
 
@@ -3635,11 +3883,13 @@ See also: `Chart`
 console.log(...msgs)
 ```
 
-用于在实盘页面中的「调试信息」栏中输出调试信息。举例实盘Id为```123456```，```console.log```函数输出的内容会写入实盘所属托管者目录下的```/logs/storage/123456/stdout.log```文件（多次运行追加写入，文件过大时自动轮转）；实盘停止时，本次运行输出内容的末尾部分会显示在实盘页面的「调试信息」栏中。
+用于在实盘页面中的「调试信息」栏中输出调试信息。举例实盘Id为```123456```，```console.log```函数输出的内容会写入实盘所属托管者目录下的```/logs/storage/123456/stdout.log```文件（多次运行追加写入，文件过大时自动轮转）；实盘停止时，本次运行输出内容的末尾部分会显示在实盘页面的「调试信息」栏中。仅支持JavaScript。
 
 Parameters:
 
-- `msg` (string / number / bool / object / array / any (平台支持的任意类型), optional): 参数```msg```为输出的内容，可以传递多个参数。
+- `msg` (string / number / bool / object / array / any, optional): 输出的内容，参数```msg```可以传多个。
+
+向「调试信息」栏和 stdout.log 输出一条调试信息。
 
 ```javascript
 function main() {
@@ -3647,13 +3897,9 @@ function main() {
 }
 ```
 
-```python
-# 不支持
-```
-
 注意事项：
-- 仅```JavaScript```语言支持此函数。
-- 仅实盘环境支持此函数，「调试工具」和「回测系统」均不支持。
+- 仅```JavaScript```语言支持该函数。
+- 仅实盘支持该函数，「调试工具」和「回测系统」均不支持。
 - 输出对象时会按JSON序列化后输出。
 
 See also: `console.error`
@@ -3664,11 +3910,13 @@ See also: `console.error`
 console.error(...msgs)
 ```
 
-用于在实盘页面中的「调试信息」栏中错误输出。举例实盘Id为```123456```，```console.error```函数输出的内容会写入实盘所属托管者目录下的```/logs/storage/123456/stderr.log```文件（多次运行追加写入，文件过大时自动轮转）；实盘停止时，本次运行错误输出的末尾部分会显示在实盘页面的「调试信息」栏中。
+用于在实盘页面中的「调试信息」栏中错误输出。举例实盘Id为```123456```，```console.error```函数输出的内容会写入实盘所属托管者目录下的```/logs/storage/123456/stderr.log```文件（多次运行追加写入，文件过大时自动轮转）；实盘停止时，本次运行错误输出的末尾部分会显示在实盘页面的「调试信息」栏中。仅支持JavaScript。
 
 Parameters:
 
-- `msg` (string / number / bool / object / array / any (平台支持的任意类型), optional): 参数```msg```为需要输出的内容，可以传入多个参数。
+- `msg` (string / number / bool / object / array / any, optional): 输出的内容，参数```msg```可以传多个。
+
+向「调试信息」栏和 stderr.log 输出一条错误信息。
 
 ```javascript
 function main() {
@@ -3676,13 +3924,9 @@ function main() {
 }
 ```
 
-```python
-# 不支持
-```
-
 注意事项：
-- 仅```JavaScript```语言支持此函数。
-- 仅实盘环境支持此函数，「调试工具」和「回测系统」不支持。
+- 仅```JavaScript```语言支持该函数。
+- 仅实盘支持该函数，「调试工具」和「回测系统」均不支持。
 - 输出对象时会按JSON序列化后输出。
 
 See also: `console.log`
@@ -3698,10 +3942,10 @@ exchange.Log(orderType, price, amount, ...args)
 
 Parameters:
 
-- `orderType` (number, required): ```orderType```参数用于设置输出的日志类型，可选值为`LOG_TYPE_BUY`、`LOG_TYPE_SELL`、`LOG_TYPE_CANCEL`。
-- `price` (number, required): ```price```参数用于设置日志中显示的价格。
-- `amount` (number, required): ```amount```参数用于设置日志中显示的下单量。
-- `arg` (string / number / bool / object / array / any (平台支持的任意类型), optional): 扩展参数，用于向该条日志中输出附带信息，```arg```参数可以传入多个。
+- `orderType` (number, required): 输出的日志类型，可选值为`LOG_TYPE_BUY`、`LOG_TYPE_SELL`、`LOG_TYPE_CANCEL`。
+- `price` (number, required): 日志中显示的价格。
+- `amount` (number, required): 日志中显示的下单量。
+- `arg` (string / number / bool / object / array / any, optional): 扩展参数，用于向该条日志中输出附带信息，```arg```参数可以传入多个。
 
 Returns (string / bool): ```orderType```为```LOG_TYPE_BUY```、```LOG_TYPE_SELL```时返回一个虚拟订单号字符串，格式为```V```加5位递增序号，例如```V00001```；```orderType```为```LOG_TYPE_CANCEL```时```JavaScript```、```Python```返回```true```，```Rust```返回空字符串。
 
@@ -3746,6 +3990,10 @@ See also: `Log`, `exchange`, `LOG_TYPE_BUY`, `LOG_TYPE_SELL`, `LOG_TYPE_CANCEL`
 
 ### Market
 
+行情函数通过交易所对象获取市场数据：行情、深度、成交、K线和市场信息；不传```symbol```时取交易所对象当前的交易对与合约代码。
+
+请求失败返回空值，使用前先判断（见`失败与空值`）；```symbol```的写法见`品种代码`。`exchange.GetRawJSON`读取最近一次请求的原始应答，`exchange.SetData`、`exchange.GetData`加载和读取自定义数据。
+
 #### exchange.GetTicker
 
 ```
@@ -3759,7 +4007,7 @@ Parameters:
 
 - `symbol` (string, optional): 品种代码，例如现货交易所对象上的```"BTC_USDT"```、期货交易所对象上的```"BTC_USDT.swap"```，写法（含期权）见`品种代码`。不传时请求当前交易对、合约代码的行情数据。
 
-Returns (`Ticker` / 空值): ```exchange.GetTicker()```函数请求数据成功时返回`Ticker`结构，请求数据失败时返回空值。
+Returns (`Ticker` / 空值): 成功时返回`Ticker`结构；失败时返回空值。
 
 加密货币期货交易所对象（即```exchange```或```exchanges[0]```）的默认合约为永续合约（```swap```），未调用```exchange.SetContractType()```函数时，行情函数获取的是永续合约的数据；需要其它合约时，先使用```exchange.SetContractType()```函数设置合约代码。见`品种代码`。
 
@@ -3769,18 +4017,20 @@ function main(){
     // exchange.SetContractType("quarter")
 
     var ticker = exchange.GetTicker()
-    /*
-        可能由于网络原因，访问不到交易所接口（即使托管者程序所在设备能打开交易所网站，但是API接口也可能访问不通）
-        此时ticker为null，当访问ticker.High时，会导致错误，所以在测试该代码时，确保可以访问到交易所接口
-    */
-    Log("Symbol:", ticker.Symbol, "High:", ticker.High, "Low:", ticker.Low, "Sell:", ticker.Sell, "Buy:", ticker.Buy, "Last:", ticker.Last, "Open:", ticker.Open, "Volume:", ticker.Volume)
+    if (!ticker) return    // 获取失败（例如访问不到交易所接口）时为null
+    Log("Symbol:", ticker.Symbol, "High:", ticker.High, "Low:", ticker.Low, "Sell:", ticker.Sell,
+        "Buy:", ticker.Buy, "Last:", ticker.Last, "Open:", ticker.Open, "Volume:", ticker.Volume)
 }
 ```
 
 ```python
 def main():
     ticker = exchange.GetTicker()
-    Log("Symbol:", ticker["Symbol"], "High:", ticker["High"], "Low:", ticker["Low"], "Sell:", ticker["Sell"], "Buy:", ticker["Buy"], "Last:", ticker["Last"], "Open:", ticker["Open"], "Volume:", ticker["Volume"])
+    if not ticker:
+        return
+    Log("Symbol:", ticker["Symbol"], "High:", ticker["High"], "Low:", ticker["Low"],
+        "Sell:", ticker["Sell"], "Buy:", ticker["Buy"], "Last:", ticker["Last"],
+        "Open:", ticker["Open"], "Volume:", ticker["Volume"])
 ```
 
 ```rust
@@ -3788,8 +4038,9 @@ fn main() {
     // 期货交易所对象默认为永续合约，需要其它合约时先设置合约代码，例如设置为当季合约
     // exchange.SetContractType("quarter").unwrap();
 
-    let ticker = exchange.GetTicker(None).unwrap();
-    Log!("Symbol:", ticker.Symbol, "High:", ticker.High, "Low:", ticker.Low, "Sell:", ticker.Sell, "Buy:", ticker.Buy, "Last:", ticker.Last, "Open:", ticker.Open, "Volume:", ticker.Volume);
+    let Ok(ticker) = exchange.GetTicker(None) else { return };
+    Log!("Symbol:", ticker.Symbol, "High:", ticker.High, "Low:", ticker.Low, "Sell:", ticker.Sell,
+        "Buy:", ticker.Buy, "Last:", ticker.Last, "Open:", ticker.Open, "Volume:", ticker.Volume);
 }
 ```
 
@@ -3823,7 +4074,7 @@ fn main() {
 
 不支持的交易所：`Web3`。调用时报错并返回空值，所有交易所的对照见`能力矩阵`。
 
-See also: `exchange.GetDepth`, `exchange.GetTrades`, `exchange.GetRecords`, `exchange.GetTickers`, `exchange.IO`（API限流控制）
+See also: `exchange.GetDepth`, `exchange.GetTrades`, `exchange.GetRecords`, `exchange.GetTickers`, `exchange.IO`, `API限流控制`
 
 #### exchange.GetTickers
 
@@ -3831,11 +4082,11 @@ See also: `exchange.GetDepth`, `exchange.GetTrades`, `exchange.GetRecords`, `exc
 exchange.GetTickers()
 ```
 
-```exchange.GetTickers()```函数用于获取交易所的聚合行情数据（`Ticker`结构的数组）。当```exchange```为现货交易所对象时，返回所有交易对的 ticker 行情数据；当```exchange```为期货交易所对象时，返回所有合约的 ticker 行情数据。
+```exchange.GetTickers()```函数用于获取交易所聚合行情数据（`Ticker`结构的数组）。```exchange```为现货交易所对象时返回所有交易对的ticker行情数据；```exchange```为期货交易所对象时返回所有合约的ticker行情数据。
 
-Returns (`Ticker`数组 / 空值): ```exchange.GetTickers()```函数在请求数据成功时返回`Ticker`结构数组，请求数据失败时返回空值。
+Returns (`Ticker`数组 / 空值): 成功时返回`Ticker`结构数组；失败时返回空值。
 
-调用 ```exchange.GetTickers()``` 函数，获取聚合行情数据。
+调用```exchange.GetTickers()```函数，获取聚合行情数据。
 
 ```javascript
 function main() {
@@ -3863,7 +4114,7 @@ fn main() {
 }
 ```
 
-使用现货交易所对象，在回测系统中调用```exchange.GetTickers()```函数。在调用任何行情函数之前，GetTickers仅返回当前默认交易对的ticker数据；在调用行情函数之后，则会返回所有已请求过的交易对的ticker数据。可参考以下测试示例：
+使用现货交易所对象，回测系统中调用```exchange.GetTickers()```函数。调用任何行情函数之前，GetTickers只返回当前默认交易对的ticker数据，调用行情函数之后会返回所有请求过的品种的ticker数据。可以参考以下测试例子。
 
 ```javascript
 /*backtest
@@ -3967,13 +4218,9 @@ fn main() {
 ```
 
 注意事项：
-
-- 该函数请求交易所的聚合行情接口，调用前无需设置交易对或合约代码，且仅返回交易所已上线交易品种的行情数据。
-
+- 该函数请求交易所聚合行情接口，调用之前无需设置交易对、合约代码。仅返回交易所上线交易品种的行情数据。
 - 回测系统支持该函数。
-
-- 未提供聚合行情接口的交易所对象不支持该函数。
-
+- 未提供聚合行情接口的交易所对象，不支持该函数。
 - 该函数不支持期权合约。
 
 不支持的交易所：`BitFlyer`、`Coincheck`、`Gemini`、`WOO`、`Futures_WOO`、`Zaif`、`Futures_EdgeX`、`Futures_Aevo`、`Uniswap`、`Jupiter`、`KyberSwap`、`OneInch`、`Exchange`、`Web3`。调用时报错并返回空值，所有交易所的对照见`能力矩阵`。
@@ -3993,34 +4240,36 @@ Parameters:
 
 - `symbol` (string, optional): 品种代码，例如现货交易所对象上的```"BTC_USDT"```、期货交易所对象上的```"BTC_USDT.swap"```，写法（含期权）见`品种代码`。不传时请求当前交易对、合约代码的订单薄数据。
 
-Returns (`Depth` / 空值): ```exchange.GetDepth()```函数在请求数据成功时返回`Depth`结构，请求数据失败时返回空值。
+Returns (`Depth` / 空值): 成功时返回`Depth`结构；失败时返回空值。
 
-测试```exchange.GetDepth()```函数：
+获取当前交易对的深度，打印卖二价。
 
 ```javascript
 function main(){
     var depth = exchange.GetDepth()
-    /*
-        可能由于网络原因，访问不到交易所接口（即使托管者程序所在设备能打开交易所网站，但是API接口也可能访问不通）
-        此时depth为null，当访问depth.Asks[1].Price时，会导致错误，所以在测试该代码时，确保可以访问到交易所接口
-    */
+    if (!depth || depth.Asks.length < 2) return    // 获取失败时为null
     var price = depth.Asks[1].Price
-    Log("Second ask price:", price)
+    Log("卖二价", price)
 }
 ```
 
 ```python
 def main():
     depth = exchange.GetDepth()
+    if not depth or len(depth["Asks"]) < 2:
+        return
     price = depth["Asks"][1]["Price"]
-    Log("Second ask price:", price)
+    Log("卖二价", price)
 ```
 
 ```rust
 fn main() {
-    let depth = exchange.GetDepth(None).unwrap();
+    let Ok(depth) = exchange.GetDepth(None) else { return };
+    if depth.Asks.len() < 2 {
+        return;
+    }
     let price = depth.Asks[1].Price;
-    Log!("Second ask price:", price);
+    Log!("卖二价", price);
 }
 ```
 
@@ -4071,31 +4320,34 @@ Parameters:
 
 - `symbol` (string, optional): 品种代码，例如现货交易所对象上的```"BTC_USDT"```、期货交易所对象上的```"BTC_USDT.swap"```，写法（含期权）见`品种代码`。不传时请求当前交易对、合约代码的最近成交记录。
 
-Returns (`Trade`数组 / 空值): ```exchange.GetTrades()```函数在请求数据成功时返回`Trade`结构数组，在请求数据失败时返回空值。
+Returns (`Trade`数组 / 空值): 成功时返回`Trade`结构数组；失败时返回空值。
 
-测试```exchange.GetTrades()```函数：
+获取当前交易对的最近成交，打印第一条记录。
 
 ```javascript
 function main(){
     var trades = exchange.GetTrades()
-    /*
-        可能由于网络原因，访问不到交易所接口（即使托管者程序所在设备能打开交易所网站，但是API接口也可能访问不通）
-        此时trades为null，当访问trades[0].Id时，会导致错误，所以在测试该代码时，确保可以访问到交易所接口
-    */
-    Log("id:", trades[0].Id, "time:", trades[0].Time, "Price:", trades[0].Price, "Amount:", trades[0].Amount, "type:", trades[0].Type)
+    if (!trades || trades.length == 0) return    // 获取失败时为null，没有成交时为空数组
+    var t = trades[0]
+    Log("Id:", t.Id, "Time:", t.Time, "Price:", t.Price, "Amount:", t.Amount, "Type:", t.Type)
 }
 ```
 
 ```python
 def main():
     trades = exchange.GetTrades()
-    Log("id:", trades[0]["Id"], "time:", trades[0]["Time"], "Price:", trades[0]["Price"], "Amount:", trades[0]["Amount"], "type:", trades[0]["Type"])
+    if not trades:
+        return
+    t = trades[0]
+    Log("Id:", t["Id"], "Time:", t["Time"], "Price:", t["Price"],
+        "Amount:", t["Amount"], "Type:", t["Type"])
 ```
 
 ```rust
 fn main() {
-    let trades = exchange.GetTrades(None).unwrap();
-    Log!("id:", trades[0].Id, "time:", trades[0].Time, "Price:", trades[0].Price, "Amount:", trades[0].Amount, "type:", trades[0].Type);
+    let Ok(trades) = exchange.GetTrades(None) else { return };
+    let Some(t) = trades.first() else { return };
+    Log!("Id:", t.Id, "Time:", t.Time, "Price:", t.Price, "Amount:", t.Amount, "Type:", t.Type);
 }
 ```
 
@@ -4149,10 +4401,45 @@ exchange.GetRecords(period, limit)
 Parameters:
 
 - `symbol` (string, optional): 品种代码，例如现货交易所对象上的```"BTC_USDT"```、期货交易所对象上的```"BTC_USDT.swap"```，写法（含期权）见`品种代码`。不传时请求当前交易对、合约代码的K线数据。
-- `period` (number, optional): 参数```period```用于指定所请求K线数据的周期，例如：`PERIOD_M1`、`PERIOD_M5`、`PERIOD_M15`等；参数```period```除了可以传入已定义的标准周期外，还可以传入整数数值，单位为秒。若不传该参数，则默认请求的K线数据周期为当前策略实盘/回测所配置的默认K线周期。
-- `limit` (number, optional): 参数```limit```用于指定所请求K线数据的长度，若不传该参数，则默认请求长度为```exchange.SetMaxBarLen()```函数设置的K线长度（未设置时为200）；该参数可能会触发对交易所K线数据的分页查询，分页查询时该函数的调用耗时会相应增加。
+- `period` (number, optional): 所请求K线数据的周期，例如：`PERIOD_M1`、`PERIOD_M5`、`PERIOD_M15`等；参数```period```除了可以传入已定义的标准周期外，还可以传入整数数值，单位为秒。若不传该参数，则默认请求的K线数据周期为当前策略实盘/回测所配置的默认K线周期。
+- `limit` (number, optional): 所请求K线数据的长度，若不传该参数，则默认请求长度为```exchange.SetMaxBarLen()```函数设置的K线长度（未设置时为200）；该参数可能会触发对交易所K线数据的分页查询，分页查询时该函数的调用耗时会相应增加。
 
-Returns (`Record`数组 / 空值): ```exchange.GetRecords()```函数请求数据成功时返回`Record`结构数组，请求数据失败时返回空值。
+Returns (`Record`数组 / 空值): 成功时返回`Record`结构数组；失败时返回空值。
+
+获取1小时K线，读取最早一根和最新两根K线。
+
+```javascript
+function main() {
+    var records = exchange.GetRecords(PERIOD_H1)
+    if (!records || records.length < 2) return    // 获取失败时为null
+    // records[0]是最早的一根，最后一个元素是最新的一根
+    Log("最早一根 Time:", records[0].Time, "Open:", records[0].Open, "High:", records[0].High)
+    Log("最新", records[records.length - 1], "上一根", records[records.length - 2])
+    // 输出：最新 {"Time":...,"Open":...,"High":...,"Low":...,"Close":...,"Volume":...,...} 上一根 {...}
+}
+```
+
+```python
+def main():
+    records = exchange.GetRecords(PERIOD_H1)
+    if not records or len(records) < 2:
+        return
+    Log("最早一根 Time:", records[0]["Time"], "Open:", records[0]["Open"], "High:", records[0]["High"])
+    Log("最新", records[-1], "上一根", records[-2])
+    # 输出：最新 {"Time":...,"Open":...,"High":...,"Low":...,"Close":...,"Volume":...,...} 上一根 {...}
+```
+
+```rust
+fn main() {
+    let Ok(records) = exchange.GetRecords(None, PERIOD_H1, None) else { return };
+    let n = records.len();
+    if n < 2 {
+        return;
+    }
+    Log!("最早一根 Time:", records[0].Time, "Open:", records[0].Open, "High:", records[0].High);
+    Log!("最新", records[n - 1], "上一根", records[n - 2]);
+}
+```
 
 获取自定义周期的 K 线数据。
 
@@ -4177,38 +4464,6 @@ fn main() {
     Log!(exchange.GetRecords(None, 60 * 2, None));
     // 打印 K 线周期为 5 分钟的 K 线数据
     Log!(exchange.GetRecords(None, PERIOD_M5, None));
-}
-```
-
-输出 K 线柱数据：
-
-```javascript
-function main() {
-    var records = exchange.GetRecords(PERIOD_H1)
-    /*
-        可能由于网络原因，无法访问交易所接口（即使托管者程序所在设备能够打开交易所网站，API 接口仍可能无法访问）
-        此时 records 为 null，访问 records[0].Time 时会导致错误。因此在测试该代码时，请确保能够正常访问交易所接口
-    */
-    Log("First K-line data: Time:", records[0].Time, "Open:", records[0].Open, "High:", records[0].High)
-    Log("Second K-line data: Time:", records[1].Time ,"Close:", records[1].Close)
-    Log("Current K-line (latest)", records[records.length-1], "Previous K-line", records[records.length-2])
-}
-```
-
-```python
-def main():
-    records = exchange.GetRecords(PERIOD_H1)
-    Log("First K-line data: Time:", records[0]["Time"], "Open:", records[0]["Open"], "High:", records[0]["High"])
-    Log("Second K-line data: Time:", records[1]["Time"], "Close:", records[1]["Close"])
-    Log("Current K-line (latest)", records[-1], "Previous K-line", records[-2])
-```
-
-```rust
-fn main() {
-    let records = exchange.GetRecords(None, PERIOD_H1, None).unwrap();
-    Log!("First K-line data: Time:", records[0].Time, "Open:", records[0].Open, "High:", records[0].High);
-    Log!("Second K-line data: Time:", records[1].Time, "Close:", records[1].Close);
-    Log!("Current K-line (latest)", records[records.len() - 1], "Previous K-line", records[records.len() - 2]);
 }
 ```
 
@@ -4314,18 +4569,19 @@ See also: `exchange.GetTicker`, `exchange.GetDepth`, `exchange.GetTrades`, `exch
 exchange.GetMarkets()
 ```
 
-```exchange.GetMarkets()```函数用于获取交易所的市场信息。
+```exchange.GetMarkets()```函数用于获取交易所市场信息。
 
 Returns (object / 空值): 包含`Market`结构体的字典，请求失败或交易所不支持时返回空值。Rust中该函数返回字典而非```Result```，失败时返回空字典并输出错误日志。
 
-期货交易所对象的调用示例：
+期货交易所对象的调用例子。
 
 ```javascript
 function main() {
     var markets = exchange.GetMarkets()
+    if (!markets) return    // 获取失败时为null
     var currency = exchange.GetCurrency()
 
-    // 获取当前合约代码也可以使用exchange.GetContractType()函数
+    // 获取当前合约代码也可以用exchange.GetContractType()函数
     var ct = "swap"
 
     var key = currency + "." + ct
@@ -4336,6 +4592,8 @@ function main() {
 ```python
 def main():
     markets = exchange.GetMarkets()
+    if markets is None:
+        return
     currency = exchange.GetCurrency()
     ct = "swap"
 
@@ -4348,7 +4606,7 @@ fn main() {
     let markets = exchange.GetMarkets();
     let currency = exchange.GetCurrency();
 
-    // 获取当前合约代码也可以使用exchange.GetContractType()函数
+    // 获取当前合约代码也可以用exchange.GetContractType()函数
     let ct = "swap";
 
     let key = format!("{}.{}", currency, ct);
@@ -4356,7 +4614,7 @@ fn main() {
 }
 ```
 
-在回测系统中，使用期货交易所对象调用```exchange.GetMarkets()```函数。在调用任何行情函数之前，GetMarkets仅返回当前默认交易对的market数据；在调用行情函数之后，则会返回所有已请求过品种的market数据。可参考以下测试示例：
+使用期货交易所对象，在回测系统中调用```exchange.GetMarkets()```函数。调用任何行情函数之前，GetMarkets只返回当前默认交易对的market数据，调用行情函数之后会返回所有请求过的品种的market数据。可以参考以下测试例子。
 
 ```javascript
 /*backtest
@@ -4464,7 +4722,7 @@ fn marketToJson(key: &str, market: &Market) -> String {
 fn main() {
     let arrSymbol = ["SOL_USDT.swap", "BTC_USDT.quarter", "ETH_USDT.swap", "ETH_USDT.quarter"];
 
-    // Rust SDK 没有JSON序列化功能，此处使用format!拼接表格的JSON文本
+    // Rust SDK 没有JSON序列化，使用format!拼接表格的JSON文本
     let markets1 = exchange.GetMarkets();
     let mut rows1: Vec<String> = Vec::new();
     for (key, market) in &markets1 {
@@ -4487,7 +4745,7 @@ fn main() {
 }
 ```
 
-```exchange.GetMarkets()```函数的返回值为一个字典。对于现货交易所，键名为交易品种名称，格式固定为交易对，例如：
+```exchange.GetMarkets()```函数返回值为一个字典，键名为交易品种的名称，对于现货固定格式为交易对，例如：
 ```json
 {
     "BTC_USDT" : {...},  // 键值为Market结构
@@ -4496,7 +4754,7 @@ fn main() {
 }
 ```
 
-对于期货合约交易所而言，由于同一品种可能存在多个合约，例如```BTC_USDT```交易对包含永续合约、季度合约等，因此```exchange.GetMarkets()```函数返回的字典中，键名为交易对与合约代码的组合，例如：
+对于期货合约交易所来说，因为一个品种可能有多个合约，例如：```BTC_USDT```交易对，有永续合约、季度合约等。```exchange.GetMarkets()```函数返回一个字典，键名为交易对与合约代码的组合，例如：
 ```json
 {
     "BTC_USDT.swap" : {...},     // 键值为Market结构
@@ -4506,8 +4764,8 @@ fn main() {
 }
 ```
 
-- ```exchange.GetMarkets()```函数支持实盘与回测系统。
-- ```exchange.GetMarkets()```函数仅返回交易所已上线交易品种的市场信息。
+- ```exchange.GetMarkets()```函数支持实盘、回测系统。
+- ```exchange.GetMarkets()```函数仅返回交易所上线交易的品种市场信息。
 - 期权合约：部分交易期权的期货交易所返回的结果包含期权合约，键名为交易对加交易所的期权代码（形如```ETH_USDT.ETH-25JUN27-2800-C-USDT```，各交易所格式不同）；结果是否包含期权、键名的具体格式见各交易所页的「期权」一节。
 
 不支持的交易所：`Coincheck`、`Exchange`、`Web3`。调用时报错并返回空值，所有交易所的对照见`能力矩阵`。
@@ -4522,13 +4780,16 @@ exchange.GetRawJSON()
 
 获取当前交易所对象（`exchange`、`exchanges`）最近一次```rest```请求返回的原始内容。
 
-Returns (string): ```rest```请求的响应数据。
+Returns (string): ```rest```请求（包括`exchange.IO`的```"api"```调用）的响应数据；请求失败（没有收到应答或交易所返回错误）时为错误信息，与`GetLastError`获取的内容相同。
+
+查询账户后读取并解析交易所返回的原始内容。
 
 ```javascript
 function main(){
-    exchange.GetAccount();
-    var obj = JSON.parse(exchange.GetRawJSON());
-    Log(obj);
+    exchange.GetAccount()
+    var obj = JSON.parse(exchange.GetRawJSON())
+    Log(obj)
+    // 输出：账户接口返回的原始JSON对象，字段因交易所而异
 }
 ```
 
@@ -4538,6 +4799,18 @@ def main():
     exchange.GetAccount()
     obj = json.loads(exchange.GetRawJSON())
     Log(obj)
+    # 输出：账户接口返回的原始JSON对象，字段因交易所而异
+```
+
+```rust
+fn main() {
+    let _ = exchange.GetAccount();
+    // Rust中GetRawJSON返回String，用JSONParse解析
+    if let Some(obj) = JSONParse(&exchange.GetRawJSON()) {
+        Log!(obj);
+        // 输出：账户接口返回的原始JSON对象，字段因交易所而异
+    }
+}
 ```
 
 ```exchange.GetRawJSON()```函数仅支持实盘交易。
@@ -4724,7 +4997,7 @@ fn main() {
 其中```schema```定义了数据主体中每条记录的数据格式，该格式固定为```["time","data"]```，与```data```属性中逐条数据的格式一一对应。```data```属性用于存储数据主体，每条数据由毫秒级时间戳和数据内容构成（数据内容可以是任何可JSON编码的数据）。
 
 以下是使用Go语言编写的测试服务程序：
-```golang
+```go
 package main
 
 import (
@@ -4869,13 +5142,17 @@ fn main() {
 }
 ```
 
-回测时一次性获取数据，实盘时缓存一分钟的数据。在回测系统中，当使用访问接口请求数据的方式时，回测系统会自动为请求添加```from```(时间戳，单位秒)、```to```(时间戳，单位秒)、```period```(底层K线周期，时间戳，单位毫秒)等参数，用于确定要获取数据的时间范围。
+回测时一次性获取数据，实盘时缓存一分钟的数据。在回测系统中，当使用访问接口请求数据的方式时，回测系统会自动为请求添加```from```（时间戳，单位秒）、```to```（时间戳，单位秒）、```period```（底层K线周期，时间戳，单位毫秒）等参数，用于确定要获取数据的时间范围。
 
 Rust中```exchange.GetData(key)```只接受```key```参数，返回```Result```（请求外部链接失败或不存在该数据集合时返回错误）；如需指定```timeout```、```offset```，请使用```exchange.GetDataWithOptions(key, timeout, offset)```。
 
 See also: `exchange.SetData`
 
 ### Trade
+
+交易函数负责下单、改单、撤单和查询订单，包括普通订单与条件单（止盈止损）；只作用于调用它的交易所对象绑定的账户。
+
+下单推荐用`exchange.CreateOrder`，可以直接指定品种与方向；`exchange.Buy`、`exchange.Sell`按当前交易对下单，期货要先用`exchange.SetDirection`设置开平仓方向。订单结构见`Order`，条件单配置见`Condition`。
 
 #### exchange.Buy
 
@@ -4888,9 +5165,9 @@ exchange.Buy(price, amount, ...args)
 
 Parameters:
 
-- `price` (number, required): ```price```参数用于设置订单价格。
-- `amount` (number, required): ```amount```参数用于设置订单量。
-- `arg` (string / number / bool / object / array / any (平台支持的任意类型), optional): 扩展参数，```arg```参数可以传多个。字符串、数字等参数会输出到这条下单日志中（多个参数以空格连接）。最后一个对象参数不会输出到日志，而是作为下单选项，支持的键：```type```（只能为```"market"```或```"limit"```，显式指定市价单或限价单）、```tif```、```reduceOnly```、```postOnly```。
+- `price` (number, required): 订单价格。
+- `amount` (number, required): 订单量。
+- `arg` (string / number / bool / object / array / any, optional): 扩展参数，```arg```参数可以传多个。字符串、数字等参数会输出到这条下单日志中（多个参数以空格连接）。最后一个对象参数不会输出到日志，而是作为下单选项，支持的键：```type```（只能为```"market"```或```"limit"```，显式指定市价单或限价单）、```tif```、```reduceOnly```、```postOnly```。
 
 Returns (string / 空值): 下单成功返回订单Id，下单失败返回空值。FMZ平台的订单`Order`结构的属性```Id```由交易所品种代码和交易所原始订单Id组成，以英文逗号分隔。例如OKX交易所现货交易对```ETH_USDT```订单的属性```Id```格式为：```ETH-USDT,1547130415509278720```。调用```exchange.Buy()```函数下单时，返回值订单```Id```与订单`Order`结构的```Id```属性一致。
 
@@ -5005,9 +5282,11 @@ fn main() {
 
 如使用较旧版本的托管者，```exchange.Buy()```函数返回的订单```Id```可能与当前文档中描述的返回值订单```Id```有所差别。
 
+```exchange.Buy()```受```CreateOrder```的限流设置影响，见`API限流控制`。
+
 不支持的交易所：`Web3`。调用时报错并返回空值，所有交易所的对照见`能力矩阵`。
 
-See also: `exchange.Sell`, `exchange.SetContractType`, `exchange.SetDirection`, `exchange.IO`（API限流控制，Buy函数受CreateOrder限流设置影响）
+See also: `exchange.Sell`, `exchange.SetContractType`, `exchange.SetDirection`, `exchange.IO`, `API限流控制`
 
 #### exchange.Sell
 
@@ -5020,9 +5299,9 @@ exchange.Sell(price, amount, ...args)
 
 Parameters:
 
-- `price` (number, required): ```price```参数用于设置订单价格。
-- `amount` (number, required): ```amount```参数用于设置下单量。
-- `arg` (string / number / bool / object / array / any (平台支持的任意类型), optional): 扩展参数，```arg```参数可以传多个。字符串、数字等参数会输出到这条下单日志中（多个参数以空格连接）。最后一个对象参数不会输出到日志，而是作为下单选项，支持的键：```type```（只能为```"market"```或```"limit"```，显式指定市价单或限价单）、```tif```、```reduceOnly```、```postOnly```。
+- `price` (number, required): 订单价格。
+- `amount` (number, required): 下单量。
+- `arg` (string / number / bool / object / array / any, optional): 扩展参数，```arg```参数可以传多个。字符串、数字等参数会输出到这条下单日志中（多个参数以空格连接）。最后一个对象参数不会输出到日志，而是作为下单选项，支持的键：```type```（只能为```"market"```或```"limit"```，显式指定市价单或限价单）、```tif```、```reduceOnly```、```postOnly```。
 
 Returns (string / 空值): 下单成功时返回订单Id，下单失败时返回空值。FMZ平台的订单`Order`结构的属性```Id```由交易所品种代码和交易所原始订单Id组成，两者以英文逗号间隔。例如OKX交易所现货交易对```ETH_USDT```订单的属性```Id```格式为：```ETH-USDT,1547130415509278720```。调用```exchange.Sell()```函数下单时，返回值订单```Id```与订单`Order`结构的```Id```属性一致。
 
@@ -5137,9 +5416,11 @@ fn main() {
 
 如使用较旧版本的托管者，```exchange.Sell()```函数返回的订单```Id```可能与当前文档中描述的返回值订单```Id```有所差别。
 
+```exchange.Sell()```受```CreateOrder```的限流设置影响，见`API限流控制`。
+
 不支持的交易所：`Web3`。调用时报错并返回空值，所有交易所的对照见`能力矩阵`。
 
-See also: `exchange.Buy`, `exchange.SetContractType`, `exchange.SetDirection`, `exchange.IO`（API限流控制，Sell函数受CreateOrder限流设置影响）
+See also: `exchange.Buy`, `exchange.SetContractType`, `exchange.SetDirection`, `exchange.IO`, `API限流控制`
 
 #### exchange.CreateOrder
 
@@ -5153,51 +5434,40 @@ exchange.CreateOrder(symbol, side, price, amount, ...args)
 Parameters:
 
 - `symbol` (string, required): 订单的品种，例如现货交易所对象上的```"BTC_USDT"```、期货交易所对象上的```"BTC_USDT.swap"```，写法（含期权）见`品种代码`。
-- `side` (string, required): 参数```side```用于指定订单的交易方向。
+- `side` (string, required): 交易方向：现货为```buy```（买入）、```sell```（卖出）；期货为```buy```（开多）、```sell```（开空）、```closebuy```（平多）、```closesell```（平空）。可以附带交易所特定参数，见备注。
+- `price` (number, required): 订单的价格。价格为-1时表示订单为市价单。
+- `amount` (number, required): 订单的下单量。需要注意当订单为**现货市价单买单**时，下单量为买入金额；个别现货交易所的市价买单下单量为交易币数量而不是金额，见各交易所页的注意事项。对于期货交易所对象，使用```CreateOrder()```/```Buy()```/```Sell()```函数下单时如无特殊说明，下单量参数```amount```均为合约张数。
+- `arg` (string / number / bool / object / array / any, optional): 扩展参数，```arg```参数可以传多个。字符串、数字等参数会输出到这条下单日志中（多个参数以空格连接）。最后一个对象参数不会输出到日志，而是作为下单选项，支持的键：```type```（只能为```"market"```或```"limit"```，显式指定市价单或限价单）、```tif```、```reduceOnly```、```postOnly```。
 
-对于现货交易所对象，```side```参数的可选值为：```buy```、```sell```。其中```buy```表示买入，```sell```表示卖出。
-
-对于期货交易所对象，```side```参数的可选值为：```buy```、```closebuy```、```sell```、```closesell```。其中```buy```表示开多仓，```closebuy```表示平多仓，```sell```表示开空仓，```closesell```表示平空仓。
-
-**支持附加参数（option）**：可以通过```side```参数传递附加参数，格式为：```"side;{JSON对象}"```或```"side;key=value&key=value"```。
-
-例如：```'buy;{"type":"TRAILING_STOP_MARKET","activationPrice":"2300"}'```或```"buy;type=TRAILING_STOP_MARKET&activationPrice=2300"```。
-
-附加参数用于传递交易所特定的参数（如订单类型、生效规则等），具体支持的参数取决于交易所API。
-- `price` (number, required): 参数```price```用于设置订单的价格。当价格为-1时，表示该订单为市价单。
-- `amount` (number, required): 参数```amount```用于设置订单的下单量。需要注意，当订单为**现货市价买单**时，下单量表示买入金额；个别现货交易所的市价买单下单量为交易币数量而不是金额，见各交易所页的注意事项。对于期货交易所对象，使用```CreateOrder()```/```Buy()```/```Sell()```函数下单时，如无特殊说明，下单量参数```amount```均以合约张数为单位。
-- `arg` (string / number / bool / object / array / any (平台支持的任意类型), optional): 扩展参数，```arg```参数可以传多个。字符串、数字等参数会输出到这条下单日志中（多个参数以空格连接）。最后一个对象参数不会输出到日志，而是作为下单选项，支持的键：```type```（只能为```"market"```或```"limit"```，显式指定市价单或限价单）、```tif```、```reduceOnly```、```postOnly```。
-
-Returns (string / 空值): 下单成功时返回订单Id，下单失败时返回空值。FMZ平台的订单`Order`结构的属性```Id```由交易所品种代码和交易所原始订单Id组成，两者以英文逗号分隔。例如OKX交易所现货交易对```ETH_USDT```订单的属性```Id```格式为：```ETH-USDT,1547130415509278720```。
-
+Returns (string / 空值): 下单成功返回订单Id，下单失败返回空值。 FMZ平台的订单`Order`结构的属性```Id```由交易所品种代码和交易所原始订单Id组成，以英文逗号间隔。例如OKX交易所的现货交易对```ETH_USDT```订单的属性```Id```格式为：```ETH-USDT,1547130415509278720```。
 调用```exchange.CreateOrder(symbol, side, price, amount)```函数下单时，返回值订单```Id```与订单`Order`结构的```Id```属性一致。
 
-现货交易所对象与期货交易所对象均通过调用```exchange.CreateOrder()```函数进行下单。
+现货交易所对象、期货交易所对象调用```exchange.CreateOrder()```函数下单。
 
 ```javascript
 function main() {
-    var id = exchange.CreateOrder("BTC_USDT", "buy", 60000, 0.01)           // 现货交易所对象下单，交易BTC_USDT币币交易对
-    // var id = exchange.CreateOrder("BTC_USDT.swap", "buy", 60000, 0.01)   // 期货交易所对象下单，交易BTC的U本位永续合约
+    var id = exchange.CreateOrder("BTC_USDT", "buy", 60000, 0.01)           // 现货交易所对象下单币币交易BTC_USDT交易对
+    // var id = exchange.CreateOrder("BTC_USDT.swap", "buy", 60000, 0.01)   // 期货交易所对象下单BTC的U本位永续合约
     Log("Order Id:", id)
 }
 ```
 
 ```python
 def main():
-    id = exchange.CreateOrder("BTC_USDT", "buy", 60000, 0.01)          # 现货交易所对象下单，交易BTC_USDT币币交易对
-    # id = exchange.CreateOrder("BTC_USDT.swap", "buy", 60000, 0.01)   # 期货交易所对象下单，交易BTC的U本位永续合约
+    id = exchange.CreateOrder("BTC_USDT", "buy", 60000, 0.01)          # 现货交易所对象下单币币交易BTC_USDT交易对
+    # id = exchange.CreateOrder("BTC_USDT.swap", "buy", 60000, 0.01)   # 期货交易所对象下单BTC的U本位永续合约
     Log("Order Id:", id)
 ```
 
 ```rust
 fn main() {
-    let id = exchange.CreateOrder("BTC_USDT", "buy", 60000, 0.01);           // 现货交易所对象下单，交易BTC_USDT币币交易对
-    // let id = exchange.CreateOrder("BTC_USDT.swap", "buy", 60000, 0.01);   // 期货交易所对象下单，交易BTC的U本位永续合约
+    let id = exchange.CreateOrder("BTC_USDT", "buy", 60000, 0.01);           // 现货交易所对象下单币币交易BTC_USDT交易对
+    // let id = exchange.CreateOrder("BTC_USDT.swap", "buy", 60000, 0.01);   // 期货交易所对象下单BTC的U本位永续合约
     Log!("Order Id:", id);
 }
 ```
 
-通过附加参数（option）下单，用于传递交易所的特定参数。
+使用附加参数（option）下单，传递交易所特定参数。
 
 ```javascript
 function main() {
@@ -5247,18 +5517,19 @@ fn main() {
 }
 ```
 
-支持通过```side```参数传递附加参数（option），用于指定交易所特定的参数。附加参数需与```side```参数合并传入，格式为```"side;{JSON对象}"```（推荐）或```"side;key=value&key=value"```（URL编码格式）。例如：```"buy;{\"type\":\"TRAILING_STOP_MARKET\"}"```。
+支持通过```side```参数传递附加参数（option），用于传递交易所特定的参数。附加参数需要与```side```参数合并传入，格式为```"side;{JSON对象}"```（推荐）或```"side;key=value&key=value"```（URL编码格式）。例如：```"buy;{\"type\":\"TRAILING_STOP_MARKET\"}"```。
 
-不同交易所支持的option参数各不相同，具体支持的参数以交易所API文档为准。常见参数包括：订单类型（type）、生效规则（timeInForce）、触发价格（activationPrice）、回调比率（callbackRate）等。
+不同交易所支持的option参数不同，具体支持的参数取决于交易所API文档。常见的参数包括：订单类型（type）、生效规则（timeInForce）、触发价格（activationPrice）、回调比率（callbackRate）等。
 
-使用option参数时，仍需提供```price```和```amount```参数。若某些参数已通过option传递，则这些基础参数可能会被option中的对应参数覆盖，具体行为取决于交易所API的实现。
+使用option参数时，```price```和```amount```参数仍然需要提供。如果交易所API中的某些参数已通过option传递，这些基础参数可能会被option中的对应参数覆盖，具体行为取决于交易所API实现。
 
 链上兑换类交易所（例如Uniswap、Jupiter）下单即立即兑换，不会挂单等待：限价单的```price```是最差可接受成交价，写入链上交易强制执行，当前报价已经达不到时直接报错、不发交易；市价单（```price```为-1）按滑点设置保护，市价买入时```amount```为要花费的计价币数量。订单ID的格式、能否撤单以及支持的附加参数见交易所页，例如`Uniswap`、`Jupiter`。
 
+```side```参数可以附带交易所特定的参数，用于传递交易所特定的参数（如订单类型、生效规则）：写成```"side;{JSON对象}"```或```"side;key=value&key=value"```，例如```'buy;{"type":"TRAILING_STOP_MARKET","activationPrice":"2300"}'```或```"buy;type=TRAILING_STOP_MARKET&activationPrice=2300"```。具体支持的参数取决于交易所API。
+
 不支持的交易所：`Web3`。调用时报错并返回空值，所有交易所的对照见`能力矩阵`。
 
-See also: `exchange.Buy`, `exchange.Sell`,
-  `exchange.ModifyOrder`
+See also: `exchange.Buy`, `exchange.Sell`, `exchange.ModifyOrder`
 
 #### exchange.ModifyOrder
 
@@ -5266,26 +5537,16 @@ See also: `exchange.Buy`, `exchange.Sell`,
 exchange.ModifyOrder(orderId, side, price, amount)
 ```
 
-```exchange.ModifyOrder()```函数用于修改现有的普通订单，可修改订单的价格和数量。该函数支持通过附加参数修改订单的其它属性（具体取决于交易所 API 的支持情况）。
+```exchange.ModifyOrder()```函数用于修改现有的普通订单，可以修改订单的价格和数量。支持通过附加参数修改订单的其它属性（取决于交易所API支持）。
 
 Parameters:
 
-- `orderId` (string, required): 参数```orderId```用于指定待修改的原订单 ID。订单 ID 的格式与`exchange.CreateOrder`函数返回的订单 ID 一致，由交易所品种代码和交易所原始订单 ID 组成，两者以英文逗号分隔。例如：```"ETH-USDT,1547130415509278720"```。
-- `side` (string, required): 参数```side```用于指定订单的交易方向。
+- `orderId` (string, required): 要修改的原订单ID。订单ID格式与`exchange.CreateOrder`函数返回的订单ID一致，由交易所品种代码和交易所原始订单Id组成，以英文逗号间隔。例如：```"ETH-USDT,1547130415509278720"```。
+- `side` (string, required): 交易方向：现货为```buy```（买入）、```sell```（卖出）；期货为```buy```（开多）、```sell```（开空）、```closebuy```（平多）、```closesell```（平空）。可以附带交易所特定参数，见备注。
+- `price` (number, required): 订单的新价格。价格为-1（或其它小于等于0的值）时表示不修改价格。
+- `amount` (number, required): 订单的新下单量。数量为-1（或其它小于等于0的值）时表示不修改数量；价格和数量不能都不修改，否则报错并返回空值。需要注意当订单为**现货市价单买单**时，下单量为买入金额；个别现货交易所的市价单买单的下单量为交易币数。
 
-对于现货交易所对象，```side```参数的可选值为：```buy```、```sell```。其中```buy```表示买入，```sell```表示卖出。
-
-对于期货交易所对象，```side```参数的可选值为：```buy```、```closebuy```、```sell```、```closesell```。其中```buy```表示开多仓，```closebuy```表示平多仓，```sell```表示开空仓，```closesell```表示平空仓。
-
-**支持附加参数（option）**：可通过```side```参数传递附加参数，格式为```"side;{JSON对象}"```或```"side;key=value&key=value"```。
-
-例如：```"buy;{\"priceMatch\":\"QUEUE_20\"}"```或```"buy;priceMatch=QUEUE_20"```。
-
-附加参数用于修改订单的其它属性（如价格匹配模式等），具体支持的参数取决于交易所 API。
-- `price` (number, required): 参数```price```用于设置订单的新价格。价格为-1（或其它小于等于0的值）时表示不修改价格。
-- `amount` (number, required): 参数```amount```用于设置订单的新下单量。数量为-1（或其它小于等于0的值）时表示不修改数量；价格和数量不能都不修改，否则报错并返回空值。需要注意的是，当订单为**现货市价买单**时，下单量表示买入金额；个别现货交易所的市价买单，其下单量为交易币的数量。
-
-Returns (string / 空值): 修改订单成功时返回订单 ID，修改失败时返回空值。返回的订单 ID 可能与原订单 ID 相同，也可能不同，这取决于交易所 API 的实现方式。某些交易所在修改订单后会返回新的订单 ID，而有些交易所则保持订单 ID 不变。
+Returns (string / 空值): 修改订单成功返回订单Id，修改失败返回空值。返回的订单ID可能与原订单ID相同，也可能不同，这取决于交易所API的实现方式。某些交易所修改订单后会返回新的订单ID，而有些交易所保持订单ID不变。
 
 修改普通订单的价格和数量。
 
@@ -5296,12 +5557,12 @@ function main() {
     Log("Original Order ID:", id)
     Sleep(2000)
 
-    // 查询原始订单信息
+    // 查询原订单信息
     var order = exchange.GetOrder(id)
     Log("Original Order Info:", order)
     Sleep(1000)
 
-    // 修改订单的价格和数量
+    // 修改订单价格和数量
     var newId = exchange.ModifyOrder(id, "buy", 77, 2)
     Log("Modified Order ID:", newId)
     Sleep(2000)
@@ -5322,12 +5583,12 @@ def main():
     Log("Original Order ID:", id)
     Sleep(2000)
 
-    # 查询原始订单信息
+    # 查询原订单信息
     order = exchange.GetOrder(id)
     Log("Original Order Info:", order)
     Sleep(1000)
 
-    # 修改订单的价格和数量
+    # 修改订单价格和数量
     newId = exchange.ModifyOrder(id, "buy", 77, 2)
     Log("Modified Order ID:", newId)
     Sleep(2000)
@@ -5347,12 +5608,12 @@ fn main() {
     Log!("Original Order ID:", id);
     Sleep(2000);
 
-    // 查询原始订单信息
+    // 查询原订单信息
     let order = exchange.GetOrder(&id).unwrap();
     Log!("Original Order Info:", order);
     Sleep(1000);
 
-    // 修改订单的价格和数量
+    // 修改订单价格和数量
     let newId = exchange.ModifyOrder(&id, "buy", 77, 2).unwrap();
     Log!("Modified Order ID:", newId);
     Sleep(2000);
@@ -5375,8 +5636,8 @@ function main() {
     Log("Original Order ID:", id)
     Sleep(2000)
 
-    // 修改订单，并将价格匹配模式设置为 QUEUE_20
-    // 通过 side 参数传递附加参数（JSON 格式）
+    // 修改订单，并设置价格匹配模式为QUEUE_20
+    // 通过side参数传递附加参数（JSON格式）
     var option = {"priceMatch": "QUEUE_20"}
     var sideWithOption = "buy;" + JSON.stringify(option)
 
@@ -5388,7 +5649,7 @@ function main() {
     var newOrder = exchange.GetOrder(newId)
     Log("Modified Order Info:", newOrder)
 
-    // 撤销订单
+    // 取消订单
     exchange.CancelOrder(newId)
 }
 ```
@@ -5402,8 +5663,8 @@ def main():
     Log("Original Order ID:", id)
     Sleep(2000)
 
-    # 修改订单，并将价格匹配模式设置为 QUEUE_20
-    # 通过 side 参数传递附加参数（JSON 格式）
+    # 修改订单，并设置价格匹配模式为QUEUE_20
+    # 通过side参数传递附加参数（JSON格式）
     option = {"priceMatch": "QUEUE_20"}
     sideWithOption = "buy;" + json.dumps(option)
 
@@ -5415,7 +5676,7 @@ def main():
     newOrder = exchange.GetOrder(newId)
     Log("Modified Order Info:", newOrder)
 
-    # 撤销订单
+    # 取消订单
     exchange.CancelOrder(newId)
 ```
 
@@ -5426,8 +5687,8 @@ fn main() {
     Log!("Original Order ID:", id);
     Sleep(2000);
 
-    // 修改订单，并将价格匹配模式设置为 QUEUE_20
-    // 通过 side 参数传递附加参数（JSON 格式）；Rust 不支持 JSON.stringify，因此直接使用原始字符串构造 JSON 文本
+    // 修改订单，并设置价格匹配模式为QUEUE_20
+    // 通过side参数传递附加参数（JSON格式），Rust不支持JSON.stringify，直接使用原始字符串构造JSON文本
     let option = r#"{"priceMatch": "QUEUE_20"}"#;
     let sideWithOption = format!("buy;{}", option);
 
@@ -5439,26 +5700,28 @@ fn main() {
     let newOrder = exchange.GetOrder(&newId).unwrap();
     Log!("Modified Order Info:", newOrder);
 
-    // 撤销订单
+    // 取消订单
     let _ = exchange.CancelOrder(&newId);
 }
 ```
 
-```exchange.ModifyOrder()```函数返回的订单 ID 因交易所 API 的实现不同而可能有不同的行为。有些交易所 API 返回的订单 ID 会更新，有些则保持不变。建议使用返回的新订单 ID 进行后续操作。
+```exchange.ModifyOrder()```函数返回的订单ID根据交易所API实现不同可能有不同行为。有些交易所API返回的订单ID会更新，有些则保持不变。建议使用返回的新订单ID进行后续操作。
 
 ```exchange.ModifyOrder()```函数的价格或数量传入-1（小于等于0的值）时，该项不会提交给交易所，表示不修改；两项都不修改时报错并返回空值。其它参数不会按交易所接口规则校验，直接提交给交易所API。
 
-支持通过```side```参数传递附加参数（option），用于修改订单的其它属性。附加参数需与```side```参数合并后传入，格式为```"side;{JSON对象}"```（推荐）或```"side;key=value"```（URL 编码格式）。例如，修改价格匹配模式：```"buy;{\"priceMatch\":\"QUEUE_20\"}"```。
+支持通过```side```参数传递附加参数（option），用于修改订单的其它属性。附加参数需要与```side```参数合并传入，格式为```"side;{JSON对象}"```（推荐）或```"side;key=value"```（URL编码格式）。例如修改价格匹配模式：```"buy;{\"priceMatch\":\"QUEUE_20\"}"```。
 
-对于普通订单的市价单修改，需具体查看交易所 API 是否支持。有些交易所不支持对市价单进行修改操作。
+对于普通订单的市价单修改，需要具体查看交易所API是否支持。有些交易所不支持市价单的修改操作。
 
-修改订单时，订单的其它属性（如订单类型、持仓模式、账户模式、杠杆、订单生效规则等）通常会保留原订单的设置。如需修改这些属性，可通过附加参数（option）传入，前提是交易所 API 支持。
+修改订单时，订单的其它属性（如订单类型、持仓模式、账户模式、杠杆、订单生效规则等）通常会保留原订单的设置。如果需要修改这些属性，可以通过附加参数（option）传入，前提是交易所API支持。
 
-对于现货市价买单，需要注意其下单量单位可能是金额而非币数。
+对于现货市价买单，需要注意订单数量单位可能是金额而非币数。
 
-修改订单功能的支持情况取决于具体交易所，部分交易所可能不支持修改订单功能，或仅支持修改部分参数。使用前请查阅对应交易所的 API 文档。
+修改订单功能的支持情况取决于具体交易所，部分交易所可能不支持修改订单功能或仅支持部分参数的修改。使用前请查阅对应交易所的API文档。
 
-不支持的交易所：`AscendEx`、`Backpack`、`Futures_Backpack`、`BigONE`、`BitFlyer`、`Bithumb`、`Bitstamp`、`Coincheck`、`Coinone`、`Coinw`、`Futures_Coinw`、`DeepCoin`、`DigiFinex`、`Futures_DigiFinex`、`Gemini`、`HashKey`、`Huobi`、`Futures_HuobiDM`、`Korbit`、`Futures_KuCoin`、`LBank`、`MEXC`、`WEEX`、`Futures_WEEX`、`Zaif`、`Futures_EdgeX`、`Aster`、`Futures_ApolloX`、`Futures_Aster`、`Uniswap`、`Jupiter`、`KyberSwap`、`OneInch`、`OKX_DEX`、`Futures_Polymarket`、`Futures_IB`、`Exchange`、`Web3`。调用时报错并返回空值，所有交易所的对照见`能力矩阵`。
+```side```参数可以附带交易所特定的参数，用于修改订单的其它属性（如价格匹配模式）：写成```"side;{JSON对象}"```或```"side;key=value&key=value"```，例如```"buy;{\"priceMatch\":\"QUEUE_20\"}"```或```"buy;priceMatch=QUEUE_20"```。具体支持的参数取决于交易所API。
+
+仅以下交易所支持：`Binance`、`Futures_Binance`、`Bitfinex`、`Futures_Bitfinex`、`Bitget`、`Futures_Bitget`、`Bybit`、`Futures_Bybit`、`Crypto`、`Futures_Crypto`、`Futures_DeepCoin`、`Futures_Deribit`、`GateIO`、`Futures_GateIO`、`HitBTC`、`Kraken`、`Futures_Kraken`、`KuCoin`、`Futures_MEXC`、`OKEX`、`Futures_OKCoin`、`Poloniex`、`Upbit`、`WOO`、`Futures_WOO`、`Hyperliquid`、`Futures_Hyperliquid`、`Futures_Lighter`、`Futures_Aevo`、`Futures_WOOFi`、`Futures_Futu`。其余交易所调用时报错并返回空值，所有交易所的对照见`能力矩阵`。
 
 See also: `exchange.CreateOrder`, `exchange.CancelOrder`, `exchange.GetOrder`, `exchange.GetOrders`
 
@@ -5475,16 +5738,17 @@ exchange.CancelOrder(orderId, ...args)
 
 Parameters:
 
-- `orderId` (string, required): 参数```orderId```用于指定所要取消的订单。
-- `arg` (string / number / bool / object / array / any (平台支持的任意类型), optional): 扩展参数，用于将附带信息输出到本条撤单日志中；```arg```参数可以传入多个。
+- `orderId` (string, required): 所要取消的订单。
+- `arg` (string / number / bool / object / array / any, optional): 扩展参数，用于将附带信息输出到本条撤单日志中；```arg```参数可以传入多个。
 
-Returns (bool / 空值): ```exchange.CancelOrder()```函数返回真值（例如```true```）表示取消订单请求发送成功，请求发送失败时返回空值。返回值仅代表请求发送成功或失败；若要判断交易所是否已取消订单，可以调用```exchange.GetOrders()```进行判断。
+Returns (bool / 空值): 返回真值（例如```true```）表示取消订单请求发送成功，请求发送失败时返回空值。返回值仅代表请求发送成功或失败；若要判断交易所是否已取消订单，可以调用```exchange.GetOrders()```进行判断。
 
 撤销订单。
 
 ```javascript
 function main(){
     var id = exchange.Sell(99999, 1)
+    if (!id) return
     exchange.CancelOrder(id)
 }
 ```
@@ -5492,12 +5756,14 @@ function main(){
 ```python
 def main():
     id = exchange.Sell(99999, 1)
+    if not id:
+        return
     exchange.CancelOrder(id)
 ```
 
 ```rust
 fn main() {
-    let id = exchange.Sell(99999, 1).unwrap();
+    let Ok(id) = exchange.Sell(99999, 1) else { return };
     let _ = exchange.CancelOrder(&id);
 }
 ```
@@ -5578,17 +5844,20 @@ exchange.GetOrder(orderId)
 
 Parameters:
 
-- `orderId` (string, required): ```orderId```参数用于指定要查询的订单。FMZ平台订单`Order`结构的```Id```属性由交易所品种代码和交易所原始订单Id组成，以英文逗号分隔。例如，OKX交易所现货交易对```ETH_USDT```订单的```Id```属性格式为：```ETH-USDT,1547130415509278720```。
+- `orderId` (string, required): 要查询的订单。FMZ平台订单`Order`结构的```Id```属性由交易所品种代码和交易所原始订单Id组成，以英文逗号分隔。例如，OKX交易所现货交易对```ETH_USDT```订单的```Id```属性格式为：```ETH-USDT,1547130415509278720```。
 
 调用```exchange.GetOrder()```函数查询订单时，传入的参数```orderId```与订单`Order`结构的```Id```属性一致。
 
 Returns (`Order` / 空值): 根据订单号查询订单详情，查询成功时返回`Order`结构，查询失败时返回空值。
 
+下一笔卖单，再用返回的订单Id查询订单信息。
+
 ```javascript
 function main(){
     var id = exchange.Sell(1000, 1)
-    // 参数id为订单号码，需填入你想要查询的订单的号码
+    if (!id) return
     var order = exchange.GetOrder(id)
+    if (!order) return
     Log("Id:", order.Id, "Price:", order.Price, "Amount:", order.Amount, "DealAmount:",
         order.DealAmount, "Status:", order.Status, "Type:", order.Type)
 }
@@ -5597,16 +5866,19 @@ function main(){
 ```python
 def main():
     id = exchange.Sell(1000, 1)
+    if not id:
+        return
     order = exchange.GetOrder(id)
+    if not order:
+        return
     Log("Id:", order["Id"], "Price:", order["Price"], "Amount:", order["Amount"], "DealAmount:",
         order["DealAmount"], "Status:", order["Status"], "Type:", order["Type"])
 ```
 
 ```rust
 fn main() {
-    let id = exchange.Sell(1000, 1).unwrap();
-    // 参数id为订单号码，需填入你想要查询的订单的号码
-    let order = exchange.GetOrder(&id).unwrap();
+    let Ok(id) = exchange.Sell(1000, 1) else { return };
+    let Ok(order) = exchange.GetOrder(&id) else { return };
     Log!("Id:", order.Id, "Price:", order.Price, "Amount:", order.Amount, "DealAmount:",
         order.DealAmount, "Status:", order.Status, "Type:", order.Type);
 }
@@ -5640,7 +5912,40 @@ Parameters:
 
 - `symbol` (string, optional): 要查询的品种（例如```"BTC_USDT.swap"```）或品种范围（例如```"USDT.swap"```）。不传或传空字符串时，现货交易所对象查询全部品种，期货交易所对象查询当前计价币种与合约类型的范围（例如当前品种为```BTC_USDT.swap```时即```"USDT.swap"```）。范围写法与缺省范围的完整规则见`品种代码`。
 
-Returns (`Order`数组 / 空值): ```exchange.GetOrders()```函数请求数据成功时返回`Order`结构数组，请求数据失败时返回空值。
+Returns (`Order`数组 / 空值): 成功时返回`Order`结构数组；失败时返回空值。
+
+查询未完成订单（不传参数时按默认范围）并逐条打印。
+
+```javascript
+function main() {
+    var orders = exchange.GetOrders()
+    if (!orders) return    // 获取失败时为null，没有挂单时为空数组
+    Log("未完成订单数", orders.length)
+    for (var o of orders) {
+        Log(o.Symbol, o.Id, "价格", o.Price, "数量", o.Amount, "已成交", o.DealAmount)
+    }
+}
+```
+
+```python
+def main():
+    orders = exchange.GetOrders()
+    if orders is None:
+        return
+    Log("未完成订单数", len(orders))
+    for o in orders:
+        Log(o["Symbol"], o["Id"], "价格", o["Price"], "数量", o["Amount"], "已成交", o["DealAmount"])
+```
+
+```rust
+fn main() {
+    let Ok(orders) = exchange.GetOrders(None) else { return };
+    Log!("未完成订单数", orders.len());
+    for o in &orders {
+        Log!(o.Symbol, o.Id, "价格", o.Price, "数量", o.Amount, "已成交", o.DealAmount);
+    }
+}
+```
 
 使用现货交易所对象，针对多个不同的交易对，以当前价格的一半作为下单价格挂出买单，随后查询未成交订单的信息。
 
@@ -5930,10 +6235,12 @@ exchange.GetHistoryOrders(since, limit)
 Parameters:
 
 - `symbol` (string, optional): 品种代码，例如现货交易所对象上的```"BTC_USDT"```、期货交易所对象上的```"BTC_USDT.swap"```，写法（含期权）见`品种代码`。不传时查询当前交易对、合约代码的历史订单。
-- `since` (number, optional): ```since```参数用于指定查询的起始时间戳，单位为毫秒。
-- `limit` (number, optional): ```limit```参数用于指定查询的订单数量。
+- `since` (number, optional): 查询的起始时间戳，单位为毫秒。
+- `limit` (number, optional): 查询的订单数量。
 
-Returns (`Order`数组 / 空值): ```exchange.GetHistoryOrders()```函数在请求数据成功时返回`Order`结构数组，请求数据失败时返回空值。
+Returns (`Order`数组 / 空值): 成功时返回`Order`结构数组；失败时返回空值。
+
+查询当前交易对的历史订单。
 
 ```javascript
 function main() {
@@ -5981,44 +6288,22 @@ exchange.CreateConditionOrder(symbol, side, amount, condition, ...args)
 Parameters:
 
 - `symbol` (string, required): 条件单的品种，例如现货交易所对象上的```"BTC_USDT"```、期货交易所对象上的```"BTC_USDT.swap"```，写法（含期权）见`品种代码`。
-- `side` (string, required): 参数```side```用于指定条件单的交易方向。
+- `side` (string, required): 交易方向：现货为```buy```（买入）、```sell```（卖出）；期货为```buy```（开多）、```sell```（开空）、```closebuy```（平多）、```closesell```（平空）。可以附带交易所特定参数，见备注。
+- `amount` (number, required): 条件单的下单量。需要注意当订单为**现货市价单买单**时，下单量为买入金额；个别现货交易所的市价买单下单量为交易币数量而不是金额，见各交易所页的注意事项。对于期货交易所对象，下单量参数```amount```均为合约张数。
+- `condition` (object, required): 条件单的触发条件和执行价格，结构见`Condition`；各条件类型必须传入的价格见备注。
+- `arg` (string / number / bool / object / array / any, optional): 扩展参数，```arg```参数可以传多个。字符串、数字等参数会输出到这条条件单日志中（多个参数以空格连接）。对象参数不会输出到日志，而是作为附加参数传给交易所接口（与```side```参数中的附加参数合并）。
 
-对于现货交易所对象，```side```参数的可选值为：```buy```、```sell```。```buy```表示买入，```sell```表示卖出。
+Returns (string / 空值): 创建条件单成功返回条件单Id，创建失败返回空值。条件单Id格式与普通订单Id类似，由交易所品种代码和交易所原始条件单Id组成，以英文逗号间隔。
 
-对于期货交易所对象，```side```参数的可选值为：```buy```、```closebuy```、```sell```、```closesell```。其中```buy```表示开多仓，```closebuy```表示平多仓，```sell```表示开空仓，```closesell```表示平空仓。
-
-**支持附加参数（option）**：可以通过```side```参数传递附加参数，格式为：```"side;{JSON对象}"```或```"side;key=value&key=value"```。
-
-例如：```"buy;{\"type\":\"TRAILING_STOP_MARKET\",\"activatePrice\":\"300\"}"```或```"buy;type=TRAILING_STOP_MARKET&activatePrice=300"```。
-
-附加参数用于传递交易所特定的参数（如订单类型、生效规则等），具体支持的参数取决于交易所API。
-- `amount` (number, required): 参数```amount```用于设置条件单的下单量。需要注意的是，当订单为**现货市价买单**时，下单量表示买入金额；个别现货交易所的市价买单下单量为交易币数量而不是金额，见各交易所页的注意事项。对于期货交易所对象，下单量参数```amount```均以合约张数为单位。
-- `condition` (object, required): 参数```condition```是一个对象，用于设置条件单的触发条件和执行价格。该对象的结构参考`Condition`结构，包含以下属性：
-
-- ```ConditionType```（number）：条件类型，参考`ORDER_CONDITION_TYPE_OCO`、`ORDER_CONDITION_TYPE_TP`、`ORDER_CONDITION_TYPE_SL`。`ORDER_CONDITION_TYPE_GENERIC`只出现在查询结果中（如追踪止损等交易所特有的条件单），创建或修改条件单时不能使用，传入会报错并返回空值。
-
-- ```TpTriggerPrice```（number）：止盈触发价格。
-
-- ```TpOrderPrice```（number）：止盈执行价格，-1表示市价单。
-
-- ```SlTriggerPrice```（number）：止损触发价格。
-
-- ```SlOrderPrice```（number）：止损执行价格，-1表示市价单。
-
-所选条件类型用到的触发价格和执行价格都必须传入且不能为0（OCO需要全部四项，TP需要止盈的两项，SL需要止损的两项），否则报错并返回空值；执行价格为-1表示触发后以市价单执行。
-- `arg` (string / number / bool / object / array / any (平台支持的任意类型), optional): 扩展参数，```arg```参数可以传多个。字符串、数字等参数会输出到这条条件单日志中（多个参数以空格连接）。对象参数不会输出到日志，而是作为附加参数传给交易所接口（与```side```参数中的附加参数合并）。
-
-Returns (string / 空值): 创建条件单成功时返回条件单Id，创建失败时返回空值。条件单Id的格式与普通订单Id类似，由交易所品种代码和交易所原始条件单Id组成，两者之间以英文逗号分隔。
-
-创建止盈单（TP）：当价格上涨至目标价位时自动卖出。
+创建止盈单（TP）：当价格涨到目标价位时自动卖出。
 
 ```javascript
 function main() {
-    // 创建止盈单：当BTC_USDT价格上涨至65000时，以65000的价格卖出0.01个BTC
+    // 创建止盈单：当BTC_USDT价格涨到65000时，以65000价格卖出0.01个BTC
     var condition = {
         ConditionType: ORDER_CONDITION_TYPE_TP,  // 止盈单
         TpTriggerPrice: 65000,   // 触发价格
-        TpOrderPrice: 65000      // 执行价格，也可设置为-1表示市价单
+        TpOrderPrice: 65000      // 执行价格，也可以设置为-1表示市价单
     }
     var id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition)
     Log("TP order Id:", id)
@@ -6027,11 +6312,11 @@ function main() {
 
 ```python
 def main():
-    # 创建止盈单：当BTC_USDT价格上涨至65000时，以65000的价格卖出0.01个BTC
+    # 创建止盈单：当BTC_USDT价格涨到65000时，以65000价格卖出0.01个BTC
     condition = {
         "ConditionType": ORDER_CONDITION_TYPE_TP,  # 止盈单
         "TpTriggerPrice": 65000,   # 触发价格
-        "TpOrderPrice": 65000      # 执行价格，也可设置为-1表示市价单
+        "TpOrderPrice": 65000      # 执行价格，也可以设置为-1表示市价单
     }
     id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition)
     Log("TP order Id:", id)
@@ -6039,11 +6324,11 @@ def main():
 
 ```rust
 fn main() {
-    // 创建止盈单：当BTC_USDT价格上涨至65000时，以65000的价格卖出0.01个BTC
+    // 创建止盈单：当BTC_USDT价格涨到65000时，以65000价格卖出0.01个BTC
     let condition = OrderCondition {
         ConditionType: ORDER_CONDITION_TYPE_TP,  // 止盈单
         TpTriggerPrice: 65000.0,   // 触发价格
-        TpOrderPrice: 65000.0,     // 执行价格，也可设置为-1表示市价单
+        TpOrderPrice: 65000.0,     // 执行价格，也可以设置为-1表示市价单
         ..Default::default()
     };
     let id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, &condition);
@@ -6051,11 +6336,11 @@ fn main() {
 }
 ```
 
-创建止损单（SL）：当价格下跌至止损触发价位时，自动以设定方式卖出。
+创建止损单（SL）：当价格跌到止损价位时自动卖出。
 
 ```javascript
 function main() {
-    // 创建止损单：当BTC_USDT价格下跌至58000时，以市价卖出0.01个BTC
+    // 创建止损单：当BTC_USDT价格跌到58000时，以市价卖出0.01个BTC
     var condition = {
         ConditionType: ORDER_CONDITION_TYPE_SL,  // 止损单
         SlTriggerPrice: 58000,   // 触发价格
@@ -6068,7 +6353,7 @@ function main() {
 
 ```python
 def main():
-    # 创建止损单：当BTC_USDT价格下跌至58000时，以市价卖出0.01个BTC
+    # 创建止损单：当BTC_USDT价格跌到58000时，以市价卖出0.01个BTC
     condition = {
         "ConditionType": ORDER_CONDITION_TYPE_SL,  # 止损单
         "SlTriggerPrice": 58000,   # 触发价格
@@ -6080,7 +6365,7 @@ def main():
 
 ```rust
 fn main() {
-    // 创建止损单：当BTC_USDT价格下跌至58000时，以市价卖出0.01个BTC
+    // 创建止损单：当BTC_USDT价格跌到58000时，以市价卖出0.01个BTC
     let condition = OrderCondition {
         ConditionType: ORDER_CONDITION_TYPE_SL,  // 止损单
         SlTriggerPrice: 58000.0,   // 触发价格
@@ -6092,13 +6377,13 @@ fn main() {
 }
 ```
 
-创建 OCO 订单：同时设置止盈和止损，任意一个触发后，另一个将自动取消。
+创建OCO订单：同时设置止盈和止损，任意一个触发后另一个自动取消。
 
 ```javascript
 function main() {
-    // 创建 OCO 订单：止盈价 65000，止损价 58000
+    // 创建OCO订单：止盈价65000，止损价58000
     var condition = {
-        ConditionType: ORDER_CONDITION_TYPE_OCO,  // OCO 订单
+        ConditionType: ORDER_CONDITION_TYPE_OCO,  // OCO订单
         TpTriggerPrice: 65000,   // 止盈触发价格
         TpOrderPrice: 65000,     // 止盈执行价格
         SlTriggerPrice: 58000,   // 止损触发价格
@@ -6111,9 +6396,9 @@ function main() {
 
 ```python
 def main():
-    # 创建 OCO 订单：止盈价 65000，止损价 58000
+    # 创建OCO订单：止盈价65000，止损价58000
     condition = {
-        "ConditionType": ORDER_CONDITION_TYPE_OCO,  # OCO 订单
+        "ConditionType": ORDER_CONDITION_TYPE_OCO,  # OCO订单
         "TpTriggerPrice": 65000,   # 止盈触发价格
         "TpOrderPrice": 65000,     # 止盈执行价格
         "SlTriggerPrice": 58000,   # 止损触发价格
@@ -6125,9 +6410,9 @@ def main():
 
 ```rust
 fn main() {
-    // 创建 OCO 订单：止盈价 65000，止损价 58000
+    // 创建OCO订单：止盈价65000，止损价58000
     let condition = OrderCondition {
-        ConditionType: ORDER_CONDITION_TYPE_OCO,  // OCO 订单
+        ConditionType: ORDER_CONDITION_TYPE_OCO,  // OCO订单
         TpTriggerPrice: 65000.0,   // 止盈触发价格
         TpOrderPrice: 65000.0,     // 止盈执行价格
         SlTriggerPrice: 58000.0,   // 止损触发价格
@@ -6138,11 +6423,11 @@ fn main() {
 }
 ```
 
-使用附加参数（option）创建条件单，用于传递交易所特定的参数。
+使用附加参数（option）创建条件单，传递交易所特定参数。
 
 ```javascript
 function main() {
-    // 以 JSON 格式传递 option 参数
+    // 使用JSON格式传递option参数
     var option = {
         "type": "TRAILING_STOP_MARKET",
         "activatePrice": "300",
@@ -6166,7 +6451,7 @@ function main() {
 import json
 
 def main():
-    # 以 JSON 格式传递 option 参数
+    # 使用JSON格式传递option参数
     option = {
         "type": "TRAILING_STOP_MARKET",
         "activatePrice": "300",
@@ -6187,7 +6472,7 @@ def main():
 
 ```rust
 fn main() {
-    // 以 JSON 格式传递 option 参数（Rust 无 JSON 序列化功能，此处直接使用原始字符串构造）
+    // 使用JSON格式传递option参数（Rust无JSON序列化，直接用原始字符串构造）
     let option = r#"{"type": "TRAILING_STOP_MARKET", "activatePrice": "300", "callbackRate": "0.1"}"#;
     let sideWithOption = format!("buy;{}", option);
     let condition = OrderCondition {
@@ -6204,17 +6489,21 @@ fn main() {
 }
 ```
 
-条件单功能的支持情况取决于具体交易所，部分交易所可能不支持条件单功能。
+条件单功能支持情况取决于具体交易所，部分交易所可能不支持条件单功能。
 
-条件单在触发前不会占用账户资金，仅在触发后才会实际下单并占用资金。
+条件单在触发前不会占用账户资金，触发后才会实际下单并占用资金。
 
-不同交易所对条件单的支持程度及具体参数可能有所差异，使用前请查阅对应交易所的 API 文档。
+不同交易所对条件单的支持程度和具体参数可能有所差异，使用前请查阅对应交易所的API文档。
 
-支持通过```side```参数传递附加参数（option），用于传递交易所特定的参数。附加参数需与```side```参数合并传入，格式为```"side;{JSON对象}"```（推荐）或```"side;key=value&key=value"```（URL 编码格式）。例如：```"buy;{\"type\":\"TRAILING_STOP_MARKET\"}"```。
+支持通过```side```参数传递附加参数（option），用于传递交易所特定的参数。附加参数需要与```side```参数合并传入，格式为```"side;{JSON对象}"```（推荐）或```"side;key=value&key=value"```（URL编码格式）。例如：```"buy;{\"type\":\"TRAILING_STOP_MARKET\"}"```。
 
-不同交易所支持的 option 参数各不相同，具体支持的参数取决于交易所 API 文档。常见参数包括：订单类型（type）、生效规则（timeInForce）、触发价格（activatePrice）、回调比率（callbackRate）等。
+不同交易所支持的option参数不同，具体支持的参数取决于交易所API文档。常见的参数包括：订单类型（type）、生效规则（timeInForce）、触发价格（activatePrice）、回调比率（callbackRate）等。
 
-使用 option 参数时，仍需提供```amount```和```condition```参数。如果交易所 API 中的某些参数已通过 option 传递，这些基础参数可能会被 option 中的对应参数覆盖，具体行为取决于交易所 API 的实现。
+使用option参数时，```amount```和```condition```参数仍然需要提供。如果交易所API中的某些参数已通过option传递，这些基础参数可能会被option中的对应参数覆盖，具体行为取决于交易所API实现。
+
+```side```参数可以附带交易所特定的参数，用于传递交易所特定的参数（如订单类型、生效规则）：写成```"side;{JSON对象}"```或```"side;key=value&key=value"```，例如```"buy;{\"type\":\"TRAILING_STOP_MARKET\",\"activatePrice\":\"300\"}"```或```"buy;type=TRAILING_STOP_MARKET&activatePrice=300"```。具体支持的参数取决于交易所API。
+
+```condition```的```ConditionType```取`ORDER_CONDITION_TYPE`中的OCO、TP、SL；`ORDER_CONDITION_TYPE_GENERIC`只出现在查询结果中（如追踪止损等交易所特有的条件单），创建或修改条件单时不能使用，传入会报错并返回空值。所选类型用到的触发价格和执行价格都必须传入且不能为0（OCO需要全部四项，TP需要止盈的两项，SL需要止损的两项），否则报错并返回空值；执行价格为-1表示触发后以市价单执行。
 
 不支持的交易所：`AscendEx`、`Bithumb`、`Bitstamp`、`Coinw`、`DigiFinex`、`Futures_DigiFinex`、`Gemini`、`HashKey`、`Korbit`、`LBank`、`MEXC`、`Upbit`、`WEEX`、`Zaif`、`Hyperliquid`、`Uniswap`、`Jupiter`、`KyberSwap`、`OneInch`、`OKX_DEX`、`Futures_Polymarket`、`Futures_Futu`、`Futures_IB`、`Exchange`、`Web3`。调用时报错并返回空值，所有交易所的对照见`能力矩阵`。
 
@@ -6226,29 +6515,16 @@ See also: `Condition`, `exchange.CancelConditionOrder`, `exchange.GetConditionOr
 exchange.ModifyConditionOrder(orderId, side, amount, condition)
 ```
 
-```exchange.ModifyConditionOrder()```函数用于修改现有的条件单，可修改条件单的下单量、触发条件和执行价格。支持通过附加参数修改条件单的其它属性（具体取决于交易所API的支持情况）。
+```exchange.ModifyConditionOrder()```函数用于修改现有的条件单，可以修改条件单的数量、触发条件和执行价格。支持通过附加参数修改条件单的其它属性（取决于交易所API支持）。
 
 Parameters:
 
-- `orderId` (string, required): 参数```orderId```用于指定待修改的原条件单ID。条件单ID的格式与`exchange.CreateConditionOrder`函数返回的条件单ID一致，由交易所品种代码和交易所原始条件单ID组成，两者以英文逗号分隔。例如：```"SOL-USDT-SWAP,3196255845130256384"```。
-- `side` (string, required): 参数```side```用于指定条件单的交易方向。
-对于现货交易所对象，```side```参数的可选值为：```buy```、```sell```。```buy```表示买入，```sell```表示卖出。
-对于期货交易所对象，```side```参数的可选值为：```buy```、```closebuy```、```sell```、```closesell```。```buy```表示开多仓，```closebuy```表示平多仓，```sell```表示开空仓，```closesell```表示平空仓。
+- `orderId` (string, required): 要修改的原条件单ID。条件单ID格式与`exchange.CreateConditionOrder`函数返回的条件单ID一致，由交易所品种代码和交易所原始条件单Id组成，以英文逗号间隔。例如：```"SOL-USDT-SWAP,3196255845130256384"```。
+- `side` (string, required): 交易方向：现货为```buy```（买入）、```sell```（卖出）；期货为```buy```（开多）、```sell```（开空）、```closebuy```（平多）、```closesell```（平空）。可以附带交易所特定参数，见备注。
+- `amount` (number, required): 条件单的新下单量。必须传入大于0的数量，传入-1等无效值会报错并返回空值。对于期货交易所对象，下单量参数```amount```均为合约张数。
+- `condition` (object, required): 条件单新的触发条件和执行价格，结构见`Condition`；各条件类型必须传入的价格见备注。
 
-**支持附加参数（option）**：可以通过```side```参数传递附加参数，格式为：```"side;{JSON对象}"```或```"side;key=value&key=value"```。
-例如：```"buy;{\"newTpTriggerPxType\":\"index\"}"```或```"buy;newTpTriggerPxType=index"```。
-附加参数用于修改条件单的其它属性（如触发价格类型等），具体支持的参数取决于交易所API。
-- `amount` (number, required): 参数```amount```用于设置条件单的新下单量。必须传入大于0的数量，传入-1等无效值会报错并返回空值。对于期货交易所对象，下单量参数```amount```均以合约张数为单位。
-- `condition` (object, required): 参数```condition```是一个对象，用于设置条件单的新触发条件和执行价格。该对象的结构参考`Condition`结构，包含以下属性：
-- ```ConditionType```（number）：条件类型，参考`ORDER_CONDITION_TYPE_OCO`、`ORDER_CONDITION_TYPE_TP`、`ORDER_CONDITION_TYPE_SL`。`ORDER_CONDITION_TYPE_GENERIC`只出现在查询结果中（如追踪止损等交易所特有的条件单），创建或修改条件单时不能使用，传入会报错并返回空值。
-- ```TpTriggerPrice```（number）：止盈触发价格。
-- ```TpOrderPrice```（number）：止盈执行价格，-1表示市价单。
-- ```SlTriggerPrice```（number）：止损触发价格。
-- ```SlOrderPrice```（number）：止损执行价格，-1表示市价单。
-
-所选条件类型用到的触发价格和执行价格都必须传入且不能为0（OCO需要全部四项，TP需要止盈的两项，SL需要止损的两项），否则报错并返回空值；执行价格为-1表示触发后以市价单执行。
-
-Returns (string / 空值): 修改条件单成功时返回条件单ID，修改失败时返回空值。返回的条件单ID可能与原条件单ID相同，也可能不同，这取决于交易所API的具体实现方式。某些交易所在修改条件单后会返回新的条件单ID，而有些交易所则保持条件单ID不变。
+Returns (string / 空值): 修改条件单成功返回条件单Id，修改失败返回空值。返回的条件单ID可能与原条件单ID相同，也可能不同，这取决于交易所API的实现方式。某些交易所修改条件单后会返回新的条件单ID，而有些交易所保持条件单ID不变。
 
 修改条件单的数量和触发条件。
 
@@ -6264,7 +6540,7 @@ function main() {
     Log("Original Condition Order ID:", id)
     Sleep(2000)
 
-    // 查询原始条件单信息
+    // 查询原条件单信息
     var order = exchange.GetConditionOrder(id)
     Log("Original Condition Order Info:", order)
     Sleep(1000)
@@ -6300,7 +6576,7 @@ def main():
     Log("Original Condition Order ID:", id)
     Sleep(2000)
 
-    # 查询原始条件单信息
+    # 查询原条件单信息
     order = exchange.GetConditionOrder(id)
     Log("Original Condition Order Info:", order)
     Sleep(1000)
@@ -6336,7 +6612,7 @@ fn main() {
     Log!("Original Condition Order ID:", id);
     Sleep(2000);
 
-    // 查询原始条件单信息
+    // 查询原条件单信息
     let order = exchange.GetConditionOrder(&id);
     Log!("Original Condition Order Info:", order);
     Sleep(1000);
@@ -6375,8 +6651,8 @@ function main() {
     Log("Original Condition Order ID:", id)
     Sleep(2000)
 
-    // 修改条件单，并将触发价格类型设置为指数价格（index）
-    // 通过 side 参数传递附加参数（JSON 格式）
+    // 修改条件单，并设置触发价格类型为指数价格（index）
+    // 通过side参数传递附加参数（JSON格式）
     var option = {"newTpTriggerPxType": "index"}
     var sideWithOption = "buy;" + JSON.stringify(option)
 
@@ -6412,8 +6688,8 @@ def main():
     Log("Original Condition Order ID:", id)
     Sleep(2000)
 
-    # 修改条件单，并将触发价格类型设置为指数价格（index）
-    # 通过 side 参数传递附加参数（JSON 格式）
+    # 修改条件单，并设置触发价格类型为指数价格（index）
+    # 通过side参数传递附加参数（JSON格式）
     option = {"newTpTriggerPxType": "index"}
     sideWithOption = "buy;" + json.dumps(option)
 
@@ -6447,8 +6723,8 @@ fn main() {
     Log!("Original Condition Order ID:", id);
     Sleep(2000);
 
-    // 修改条件单，并将触发价格类型设置为指数价格（index）
-    // 通过 side 参数传递附加参数（JSON 格式；Rust 无 JSON 序列化，故直接使用原始字符串构造）
+    // 修改条件单，并设置触发价格类型为指数价格（index）
+    // 通过side参数传递附加参数（JSON格式，Rust无JSON序列化，直接用原始字符串构造）
     let sideWithOption = r#"buy;{"newTpTriggerPxType": "index"}"#;
 
     let newCondition = OrderCondition {
@@ -6470,7 +6746,7 @@ fn main() {
 }
 ```
 
-```exchange.ModifyConditionOrder()```函数返回的条件单ID因交易所API实现的不同而可能表现出不同行为。有些交易所API返回的条件单ID会更新，有些则保持不变。建议使用返回的新条件单ID进行后续操作。
+```exchange.ModifyConditionOrder()```函数返回的条件单ID根据交易所API实现不同可能有不同行为。有些交易所API返回的条件单ID会更新，有些则保持不变。建议使用返回的新条件单ID进行后续操作。
 
 ```exchange.ModifyConditionOrder()```函数会先校验参数：数量必须大于0，所选条件类型用到的触发价格和执行价格不能为0，不满足时报错并返回空值，不会提交给交易所。
 
@@ -6478,13 +6754,17 @@ fn main() {
 
 ```condition```参数中的```TpOrderPrice```或```SlOrderPrice```设置为-1表示触发后以市价执行。能否通过修改在限价与市价之间切换取决于交易所：有些交易所（例如`Lighter`）不能改变限价/市价类型，限价条件单传-1或市价条件单传正数执行价格时报错，需要撤销后重新创建，具体见各交易所页。
 
-修改条件单时，条件单的其它属性（如条件类型、持仓模式、账户模式、杠杆等）通常会保留原条件单的设置。如需修改这些属性，可以通过附加参数（option）传入，前提是交易所API支持。
+修改条件单时，条件单的其它属性（如条件类型、持仓模式、账户模式、杠杆等）通常会保留原条件单的设置。如果需要修改这些属性，可以通过附加参数（option）传入，前提是交易所API支持。
 
-可以通过附加参数修改触发价格类型，例如将触发价格类型从最新价（last）修改为指数价格（index）或标记价格（mark）。具体的参数名称和支持情况取决于交易所API文档。
+可以通过附加参数修改触发价格类型，例如将触发价格类型从最新价（last）修改为指数价格（index）或标记价格（mark）。具体参数名称和支持情况取决于交易所API文档。
 
 并非所有交易所都支持修改条件单：不支持的交易所调用时报错并返回空值，需要先撤销原条件单再重新创建；支持修改的交易所也可能只支持修改部分参数（例如只支持某类合约或某种账户模式）。不支持的交易所见本页的「不支持的交易所」名单，所有交易所的对照见`能力矩阵`，限制条件见各交易所页。
 
-不支持的交易所：`AscendEx`、`Backpack`、`Futures_Backpack`、`BigONE`、`Futures_Binance`、`BitFlyer`、`Bithumb`、`Bitstamp`、`Coincheck`、`Coinone`、`Coinw`、`Futures_Coinw`、`DigiFinex`、`Futures_DigiFinex`、`GateIO`、`Gemini`、`HashKey`、`Huobi`、`Futures_HuobiDM`、`Korbit`、`KuCoin`、`Futures_KuCoin`、`LBank`、`MEXC`、`Futures_MEXC`、`Poloniex`、`Upbit`、`WEEX`、`Futures_WEEX`、`Zaif`、`Hyperliquid`、`Futures_EdgeX`、`Aster`、`Futures_ApolloX`、`Futures_Aster`、`Uniswap`、`Jupiter`、`KyberSwap`、`OneInch`、`OKX_DEX`、`Futures_Polymarket`、`Futures_Futu`、`Futures_IB`、`Exchange`、`Web3`。调用时报错并返回空值，所有交易所的对照见`能力矩阵`。
+```side```参数可以附带交易所特定的参数，用于修改条件单的其它属性（如触发价格类型）：写成```"side;{JSON对象}"```或```"side;key=value&key=value"```，例如```"buy;{\"newTpTriggerPxType\":\"index\"}"```或```"buy;newTpTriggerPxType=index"```。具体支持的参数取决于交易所API。
+
+```condition```的```ConditionType```取`ORDER_CONDITION_TYPE`中的OCO、TP、SL；`ORDER_CONDITION_TYPE_GENERIC`只出现在查询结果中（如追踪止损等交易所特有的条件单），创建或修改条件单时不能使用，传入会报错并返回空值。所选类型用到的触发价格和执行价格都必须传入且不能为0（OCO需要全部四项，TP需要止盈的两项，SL需要止损的两项），否则报错并返回空值；执行价格为-1表示触发后以市价单执行。
+
+仅以下交易所支持：`Binance`、`Bitfinex`、`Futures_Bitfinex`、`Bitget`、`Futures_Bitget`、`Bybit`、`Futures_Bybit`、`Crypto`、`Futures_Crypto`、`DeepCoin`、`Futures_DeepCoin`、`Futures_Deribit`、`Futures_GateIO`、`HitBTC`、`Kraken`、`Futures_Kraken`、`OKEX`、`Futures_OKCoin`、`WOO`、`Futures_WOO`、`Futures_Hyperliquid`、`Futures_Lighter`、`Futures_Aevo`、`Futures_WOOFi`。其余交易所调用时报错并返回空值，所有交易所的对照见`能力矩阵`。
 
 See also: `Condition`, `exchange.CreateConditionOrder`, `exchange.CancelConditionOrder`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`
 
@@ -6501,10 +6781,10 @@ exchange.CancelConditionOrder(conditionOrderId, ...args)
 
 Parameters:
 
-- `conditionOrderId` (string, required): ```conditionOrderId```参数用于指定要取消的条件单。
-- `arg` (string / number / bool / object / array / any (平台支持的任意类型), optional): 扩展参数，用于向该条撤销条件单的日志中输出附带信息，```arg```参数可以传入多个。
+- `conditionOrderId` (string, required): 要取消的条件单。
+- `arg` (string / number / bool / object / array / any, optional): 扩展参数，用于向该条撤销条件单的日志中输出附带信息，```arg```参数可以传入多个。
 
-Returns (bool): ```exchange.CancelConditionOrder()```函数返回真值（例如```true```）表示撤销条件单的请求发送成功，返回假值（例如```false```）表示撤销条件单的请求发送失败。
+Returns (bool): 返回真值（例如```true```）表示撤销条件单的请求发送成功，返回假值（例如```false```）表示撤销条件单的请求发送失败。
 
 撤销条件单。
 
@@ -6650,13 +6930,15 @@ exchange.GetConditionOrder(conditionOrderId)
 
 Parameters:
 
-- `conditionOrderId` (string, required): ```conditionOrderId```参数用于指定所要查询的条件单。条件单Id的格式与普通订单Id类似，由交易所品种代码和交易所原始条件单Id组成，两者之间以英文逗号分隔。
+- `conditionOrderId` (string, required): 要查询的条件单。条件单Id的格式与普通订单Id类似，由交易所品种代码和交易所原始条件单Id组成，两者之间以英文逗号分隔。
 
 调用```exchange.GetConditionOrder()```函数查询条件单时传入的```conditionOrderId```参数与条件单结构的```Id```属性一致。
 
 Returns (`Order` / 空值): 根据条件单号查询条件单详情，查询成功时返回`Order`结构，查询失败时返回空值。
 
 返回的Order结构中包含`Condition`字段，该字段包含条件单的详细配置信息（触发价格、执行价格、条件类型等）。
+
+创建止盈条件单后按条件单Id查询其信息。
 
 ```javascript
 function main(){
@@ -6734,7 +7016,7 @@ Parameters:
 
 - `symbol` (string, optional): 要查询的品种（例如```"BTC_USDT.swap"```）或品种范围（例如```"USDT.swap"```）。不传或传空字符串时，现货交易所对象查询全部品种，期货交易所对象查询当前计价币种与合约类型的范围（例如当前品种为```BTC_USDT.swap```时即```"USDT.swap"```）。范围写法与缺省范围的完整规则见`品种代码`。
 
-Returns (`Order`数组 / 空值): ```exchange.GetConditionOrders()```函数在请求数据成功时返回`Order`结构数组，在请求数据失败时返回空值。
+Returns (`Order`数组 / 空值): 成功时返回`Order`结构数组；失败时返回空值。
 
 返回的Order结构中包含`Condition`字段，该字段包含条件单的详细配置信息（触发价格、执行价格、条件类型等）。
 
@@ -6874,10 +7156,10 @@ exchange.GetHistoryConditionOrders(since, limit)
 Parameters:
 
 - `symbol` (string, optional): 品种代码，例如现货交易所对象上的```"BTC_USDT"```、期货交易所对象上的```"BTC_USDT.swap"```，写法（含期权）见`品种代码`。不传时查询当前交易对、合约代码的历史条件单。
-- `since` (number, optional): ```since```参数用于指定查询的起始时间戳，单位为毫秒。
-- `limit` (number, optional): ```limit```参数用于指定查询的条件单数量。
+- `since` (number, optional): 查询的起始时间戳，单位为毫秒。
+- `limit` (number, optional): 查询的条件单数量。
 
-Returns (`Order`数组 / 空值): ```exchange.GetHistoryConditionOrders()```函数在请求数据成功时返回`Order`结构数组，在请求数据失败时返回空值。
+Returns (`Order`数组 / 空值): 成功时返回`Order`结构数组；失败时返回空值。
 
 返回的Order结构中包含`Condition`字段，该字段包含条件单的详细配置信息（触发价格、执行价格、条件类型等）。
 
@@ -7000,6 +7282,10 @@ See also: `Order`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`
 
 ### Account
 
+账户函数查询交易所对象绑定账户的资金：`exchange.GetAccount`返回当前交易对的计价币与交易币余额（期货为保证金与权益），`exchange.GetAssets`返回账户中各币种的资产列表。
+
+查询失败返回空值。期货持仓用`exchange.GetPositions`查询；统一账户等跨币种保证金模式下各交易所的口径见交易所页。
+
 #### exchange.GetAccount
 
 ```
@@ -7009,6 +7295,34 @@ exchange.GetAccount()
 ```exchange.GetAccount()```函数用于请求交易所账户信息。```GetAccount()```是交易所对象`exchange`的成员函数，只作用于该交易所对象绑定的账户（多账户时用```exchanges[i].GetAccount()```指定账户）。
 
 Returns (`Account` / 空值): 查询账户资产信息，查询成功时返回`Account`结构，查询失败时返回空值。
+
+获取当前账户的可用余额与冻结余额。
+
+```javascript
+function main() {
+    var account = exchange.GetAccount()
+    if (!account) return
+    Log("可用", account.Balance, "冻结", account.FrozenBalance)
+    // 输出：可用 <计价币可用数量> 冻结 <计价币冻结数量>
+}
+```
+
+```python
+def main():
+    account = exchange.GetAccount()
+    if not account:
+        return
+    Log("可用", account["Balance"], "冻结", account["FrozenBalance"])
+    # 输出：可用 <计价币可用数量> 冻结 <计价币冻结数量>
+```
+
+```rust
+fn main() {
+    let Ok(account) = exchange.GetAccount() else { return };
+    Log!("可用", account.Balance, "冻结", account.FrozenBalance);
+    // 输出：可用 <计价币可用数量> 冻结 <计价币冻结数量>
+}
+```
 
 设置交易对与合约代码，获取当前账户信息。
 
@@ -7077,7 +7391,7 @@ exchange.GetAssets()
 
 ```exchange.GetAssets```函数用于请求交易所账户的资产信息。
 
-Returns (`Asset`数组 / 空值): ```exchange.GetAssets()```函数请求数据成功时返回`Asset`结构体数组，请求数据失败时返回空值。
+Returns (`Asset`数组 / 空值): 成功时返回`Asset`结构体数组；失败时返回空值。
 
 获取交易所账户的资产信息，```exchange.GetAssets()```函数返回一个以Asset结构体为元素的数组。
 
@@ -7113,6 +7427,10 @@ See also: `Asset`
 
 ### Futures
 
+期货函数设置合约交易参数并查询持仓：合约代码、开平仓方向、杠杆、持仓和资金费率，只适用于期货交易所对象。
+
+一般先用`exchange.SetContractType`选定合约（也可以在函数的```symbol```参数里写完整品种代码，见`品种代码`），再下单和查询持仓。各交易所可用的合约代码、保证金与持仓模式见交易所页。
+
 #### exchange.SetContractType
 
 ```
@@ -7123,21 +7441,11 @@ exchange.SetContractType(symbol)
 
 Parameters:
 
-- `symbol` (string, required): ```symbol```参数用于设置合约代码，可选值为：```"this_week"```、```"next_week"```、```"quarter"```、```"next_quarter"```、```"swap"```等。
-加密货币期货合约中**交割合约**代码如无特殊说明一般有：
-- ```this_week```：当周合约。
-- ```next_week```：次周合约。
-- ```quarter```：季度合约。
-- ```next_quarter```：次季度合约。
+- `symbol` (string, required): 合约代码，例如```"swap"```、```"quarter"```；常见取值见备注，各交易所实际支持的代码见「各交易所的合约代码」表与各交易所页。
 
-加密货币期货合约中**永续合约**代码如无特殊说明一般有：
-- ```swap```：永续合约。
+Returns (object / 空值): 结构，包含当前合约代码对应的交易所合约代码。例如币安期货合约交易所，当前合约代码为```quarter```时，返回值为：```{"InstrumentID":"BTCUSD_260925","instrument":"BTCUSD_260925"}```。设置失败时返回空值。
 
-各交易所实际支持的合约代码不同，见下方「各交易所的合约代码」表与各交易所页。
-
-Returns (object / 空值): ```exchange.SetContractType()```函数返回一个结构，其中包含当前合约代码对应的交易所合约代码。例如币安期货合约交易所，当前合约代码为```quarter```，该函数的返回值结构为：```{"InstrumentID":"BTCUSD_260925","instrument":"BTCUSD_260925"}```。设置失败时返回空值。
-
-设置当前合约为季度合约：
+设置当前合约为季度合约。
 
 ```javascript
 function main() {
@@ -7158,7 +7466,7 @@ fn main() {
 }
 ```
 
-设置```USDT```作为保证金的合约时，需要在代码中切换交易对（也可以在添加交易所对象时直接设置交易对）：
+设置```USDT```作为保证金的合约时，需要在代码中切换交易对（也可以在添加交易所对象时直接设置交易对）。
 
 ```javascript
 function main() {
@@ -7195,7 +7503,7 @@ fn main() {
 }
 ```
 
-打印```exchange.SetContractType()```函数的返回值：
+打印```exchange.SetContractType()```函数的返回值。
 
 ```javascript
 function main(){
@@ -7230,7 +7538,17 @@ fn main() {
 合约代码按交易所对象的市场列表（`exchange.GetMarkets`返回的各品种合约代码部分）校验，不在列表中的合约代码设置失败。期权合约代码（含```-```的交易所原生合约代码，以及Kraken形如```OF_..._C```/```OF_..._P```的期权代码）不查市场列表，直接接受。
 设置失败时函数返回空值，当前合约代码保持不变，可通过`GetLastError`获取错误信息。
 
-**各交易所的合约代码**
+加密货币期货常见的合约代码（没有特别说明时的含义；各交易所实际支持的不同）：
+
+| 合约代码 | 含义 |
+| - | - |
+| ```this_week``` | 当周交割合约 |
+| ```next_week``` | 次周交割合约 |
+| ```quarter``` | 当季交割合约 |
+| ```next_quarter``` | 次季交割合约 |
+| ```swap``` | 永续合约 |
+
+##### 各交易所的合约代码
 
 ✓ 可用；✗ 该交易所明确不支持（设置时报错）；空白表示没有该合约。各合约代码的含义、交易所原生代码的写法见交易所页。
 
@@ -7273,25 +7591,30 @@ exchange.GetContractType()
 
 ```exchange.GetContractType()```函数用于获取`exchange`交易所对象当前设置的合约代码。
 
-Returns (string): ```exchange.GetContractType()```函数返回由FMZ平台定义的合约代码，例如：```this_week```、```swap```等。
+Returns (string): 由FMZ平台定义的合约代码，例如：```this_week```、```swap```等。
+
+设置为当周合约后读取当前合约代码。
 
 ```javascript
 function main () {
-    Log(exchange.SetContractType("this_week"))
+    exchange.SetContractType("this_week")
     Log(exchange.GetContractType())
+    // 输出：this_week
 }
 ```
 
 ```python
 def main():
-    Log(exchange.SetContractType("this_week"))
+    exchange.SetContractType("this_week")
     Log(exchange.GetContractType())
+    # 输出：this_week
 ```
 
 ```rust
 fn main() {
-    Log!(exchange.SetContractType("this_week"));
+    let _ = exchange.SetContractType("this_week");
     Log!(exchange.GetContractType());
+    // 输出：this_week
 }
 ```
 
@@ -7307,7 +7630,9 @@ exchange.SetDirection(direction)
 
 Parameters:
 
-- `direction` (string, required): ```direction```参数用于设置期货合约下单时的方向，可选值为：```"buy"```、```"closesell"```、```"sell"```、```"closebuy"```。
+- `direction` (string, required): 期货合约下单时的方向，可选值为：```"buy"```、```"closesell"```、```"sell"```、```"closebuy"```。
+
+设置方向为开多后下买单，再设置为平多后下卖单平仓。
 
 ```javascript
 function main(){
@@ -7379,7 +7704,9 @@ exchange.SetMarginLevel(marginLevel)
 Parameters:
 
 - `symbol` (string, optional): 要调整杠杆值的品种，例如```"BTC_USDT.swap"```，写法见`品种代码`。
-- `marginLevel` (number, required): ```marginLevel```参数用于设置杠杆值。交易所的杠杆值通常为整数，部分交易所也支持浮点数形式的杠杆值设置。
+- `marginLevel` (number, required): 杠杆值。交易所的杠杆值通常为整数，部分交易所也支持浮点数形式的杠杆值设置。
+
+设置当前合约的杠杆，再设置指定品种的杠杆。
 
 ```javascript
 function main() {
@@ -7428,7 +7755,40 @@ Parameters:
 
 - `symbol` (string, optional): 要查询的品种（例如```"BTC_USDT.swap"```）或品种范围（例如```"USDT.swap"```）。不传或传空字符串时，查询当前计价币种与合约类型的范围（例如当前品种为```BTC_USDT.swap```时即```"USDT.swap"```）。范围写法与缺省范围的完整规则见`品种代码`。
 
-Returns (`Position`数组 / 空值): ```exchange.GetPositions()```函数在请求数据成功时返回`Position`结构数组，在请求数据失败时返回空值。
+Returns (`Position`数组 / 空值): 成功时返回`Position`结构数组；失败时返回空值。
+
+查询持仓（不传参数时按默认范围）并逐条打印。
+
+```javascript
+function main() {
+    var positions = exchange.GetPositions()
+    if (!positions) return    // 获取失败时为null，没有持仓时为空数组
+    for (var pos of positions) {
+        Log(pos.Symbol, "数量", pos.Amount, "均价", pos.Price, "浮动盈亏", pos.Profit)
+    }
+    // 输出：每个持仓一行，依次为品种代码、持仓量、持仓均价、浮动盈亏
+}
+```
+
+```python
+def main():
+    positions = exchange.GetPositions()
+    if positions is None:
+        return
+    for pos in positions:
+        Log(pos["Symbol"], "数量", pos["Amount"], "均价", pos["Price"], "浮动盈亏", pos["Profit"])
+    # 输出：每个持仓一行，依次为品种代码、持仓量、持仓均价、浮动盈亏
+```
+
+```rust
+fn main() {
+    let Ok(positions) = exchange.GetPositions(None) else { return };
+    for pos in &positions {
+        Log!(pos.Symbol, "数量", pos.Amount, "均价", pos.Price, "浮动盈亏", pos.Profit);
+    }
+    // 输出：每个持仓一行，依次为品种代码、持仓量、持仓均价、浮动盈亏
+}
+```
 
 使用期货交易所对象，对多个不同交易对、不同合约代码的品种下市价单，并通过多种方式查询持仓信息。
 
@@ -7571,15 +7931,50 @@ exchange.GetFundings()
 exchange.GetFundings(symbol)
 ```
 
-```exchange.GetFundings()```函数用于获取当前周期的资金费率数据。
+```exchange.GetFundings()```函数用于获取当前周期资金费率数据。
 
 Parameters:
 
 - `symbol` (string, optional): 要查询的品种（例如```"BTC_USDT.swap"```）或品种范围（例如```"USDT.swap"```）。不传或传空字符串时，查询当前计价币种与合约类型的范围（例如当前品种为```BTC_USDT.swap```时即```"USDT.swap"```）。范围写法与缺省范围的完整规则见`品种代码`。
 
-Returns (`Funding`数组 / 空值): ```exchange.GetFundings()```函数请求数据成功时返回`Funding`结构数组，请求数据失败时返回空值。
+Returns (`Funding`数组 / 空值): 成功时返回`Funding`结构数组；失败时返回空值。
 
-使用期货交易所对象，在回测系统中调用```exchange.GetFundings()```函数。在调用任何行情函数之前，GetFundings 仅返回当前默认交易对的 Funding 数据；在调用行情函数之后，则会返回所有已请求过的品种的 Funding 数据。可参考以下测试示例：
+查询资金费率（不传参数时按默认范围）并逐条打印。
+
+```javascript
+function main() {
+    var fundings = exchange.GetFundings()
+    if (!fundings) return
+    for (var f of fundings) {
+        Log(f.Symbol, "费率", f.Rate * 100, "%", "间隔", f.Interval / 3600000, "小时", _D(f.Time))
+    }
+    // 输出：每个品种一行，依次为品种代码、资金费率（%）、结算间隔（小时）、时间
+}
+```
+
+```python
+def main():
+    fundings = exchange.GetFundings()
+    if fundings is None:
+        return
+    for f in fundings:
+        hours = f["Interval"] / 3600000
+        Log(f["Symbol"], "费率", f["Rate"] * 100, "%", "间隔", hours, "小时", _D(f["Time"] / 1000))
+    # 输出：每个品种一行，依次为品种代码、资金费率（%）、结算间隔（小时）、时间
+```
+
+```rust
+fn main() {
+    let Ok(fundings) = exchange.GetFundings(None) else { return };
+    for f in &fundings {
+        let hours = f.Interval as f64 / 3600000.0;
+        Log!(f.Symbol, "费率", f.Rate * 100.0, "%", "间隔", hours, "小时", _D(f.Time));
+    }
+    // 输出：每个品种一行，依次为品种代码、资金费率（%）、结算间隔（小时）、时间
+}
+```
+
+使用期货交易所对象，在回测系统中调用```exchange.GetFundings()```函数。调用任何行情函数之前，GetFundings只返回当前默认交易对的Funding数据，调用行情函数之后会返回所有请求过的品种的Funding数据。可以参考以下测试例子。
 
 ```javascript
 /*backtest
@@ -7713,9 +8108,9 @@ fn main() {
 }
 ```
 
-对于不支持批量查询资金费率数据的期货交易所，若将```symbol```参数指定为查询范围（例如```USDT.swap```）或不传入```symbol```参数，接口将会报错。使用这类期货交易所对象调用```GetFundings()```函数时，必须将```symbol```参数指定为具体的某个永续合约品种，才能查询到该品种的当期资金费率数据。
+对于不支持批量查询资金费率数据的期货交易所，如果指定```symbol```参数为查询范围，例如：```USDT.swap```或者不传```symbol```参数时接口会报错。使用这类期货交易所对象调用```GetFundings()```函数必须指定```symbol```参数为具体某个永续合约品种，才能查询到该品种的当期资金费率数据。
 
-```exchange.GetFundings()```函数支持实盘与回测系统。
+```exchange.GetFundings()```函数支持实盘、回测系统。
 
 哪些期货交易所不支持批量查询资金费率、必须传入具体品种（例如```ETH_USDT.swap```），见各交易所页的注意事项（所有交易所的入口见`能力矩阵`）。
 
@@ -7735,22 +8130,33 @@ exchange.GetName()
 
 ```exchange.GetName()```函数用于获取当前交易所对象所绑定的交易所名称。
 
-Returns (string): ```exchange.GetName()```函数返回由FMZ量化交易平台定义的交易所名称。
+Returns (string): 由FMZ量化交易平台定义的交易所名称。
+
+打印交易所名称，并判断是否为币安现货。
 
 ```javascript
 function main() {
-    Log("Check if exchange object is Binance spot, result:", exchange.GetName() == "Binance")
+    var name = exchange.GetName()
+    Log(name)
+    // 输出：Binance（以币安现货为例；币安U本位期货为 Futures_Binance）
+    Log("是否为币安现货", name == "Binance")
 }
 ```
 
 ```python
 def main():
-    Log("Check if exchange object is Binance spot, result:", exchange.GetName() == "Binance")
+    name = exchange.GetName()
+    Log(name)
+    # 输出：Binance（以币安现货为例；币安U本位期货为 Futures_Binance）
+    Log("是否为币安现货", name == "Binance")
 ```
 
 ```rust
 fn main() {
-    Log!("Check if exchange object is Binance spot, result:", exchange.GetName() == "Binance");
+    let name = exchange.GetName();
+    Log!(name);
+    // 输出：Binance（以币安现货为例；币安U本位期货为 Futures_Binance）
+    Log!("是否为币安现货", name == "Binance");
 }
 ```
 
@@ -7766,22 +8172,27 @@ exchange.GetLabel()
 
 ```exchange.GetLabel()```函数用于获取配置交易所对象时设置的自定义标签。
 
-Returns (string): ```exchange.GetLabel()```函数返回配置交易所对象时设置的自定义标签。
+Returns (string): 配置交易所对象时设置的自定义标签。
+
+打印配置交易所对象时设置的标签。
 
 ```javascript
 function main() {
-    Log("exchange label:", exchange.GetLabel())
+    Log("交易所标签", exchange.GetLabel())
+    // 输出：交易所标签 <添加交易所对象时填写的标签>
 }
 ```
 
 ```python
 def main():
-    Log("exchange label:", exchange.GetLabel())
+    Log("交易所标签", exchange.GetLabel())
+    # 输出：交易所标签 <添加交易所对象时填写的标签>
 ```
 
 ```rust
 fn main() {
-    Log!("exchange label:", exchange.GetLabel());
+    Log!("交易所标签", exchange.GetLabel());
+    // 输出：交易所标签 <添加交易所对象时填写的标签>
 }
 ```
 
@@ -7797,22 +8208,27 @@ exchange.GetCurrency()
 
 ```exchange.GetCurrency()```函数用于获取当前设置的交易对。
 
-Returns (string): ```exchange.GetCurrency()```函数返回当前`exchange`交易所对象所设置的交易对。
+Returns (string): 当前`exchange`交易所对象所设置的交易对。
+
+打印交易所对象当前的交易对。
 
 ```javascript
 function main() {
-    Log("Current trading pair:", exchange.GetCurrency())
+    Log("当前交易对", exchange.GetCurrency())
+    // 输出：当前交易对 BTC_USDT
 }
 ```
 
 ```python
 def main():
-    Log("Current trading pair:", exchange.GetCurrency())
+    Log("当前交易对", exchange.GetCurrency())
+    # 输出：当前交易对 BTC_USDT
 ```
 
 ```rust
 fn main() {
-    Log!("Current trading pair:", exchange.GetCurrency());
+    Log!("当前交易对", exchange.GetCurrency());
+    // 输出：当前交易对 BTC_USDT
 }
 ```
 
@@ -7830,7 +8246,9 @@ exchange.SetCurrency(currency)
 
 Parameters:
 
-- `currency` (string, required): ```currency```参数用于指定要切换的交易对。交易对格式统一为大写，并使用下划线分隔```baseCurrency```与```quoteCurrency```，例如：```BTC_USDT```。个别交易所不转换大小写、按原样保存，见各交易所页的「交易对与合约代码」。
+- `currency` (string, required): 要切换的交易对。交易对格式统一为大写，并使用下划线分隔```baseCurrency```与```quoteCurrency```，例如：```BTC_USDT```。个别交易所不转换大小写、按原样保存，见各交易所页的「交易对与合约代码」。
+
+切换交易对，前后分别查询行情和账户信息。
 
 ```javascript
 function main() {
@@ -7872,11 +8290,11 @@ fn main() {
 }
 ```
 
-1、兼容```exchange.IO("currency", "BTC_USDT")```的切换方式，详见`exchange.IO`。
+兼容```exchange.IO("currency", "BTC_USDT")```的切换方式，详见`exchange.IO`。
 
-  2、支持在回测系统中切换交易对，但回测系统中切换交易对时，计价币的名称不能改变。例如：```BTC_USDT```可以切换为```LTC_USDT```，但不能切换为```LTC_BTC```。
+支持在回测系统中切换交易对，但回测系统中切换交易对时，计价币的名称不能改变。例如：```BTC_USDT```可以切换为```LTC_USDT```，但不能切换为```LTC_BTC```。
 
-  3、切换为非回测页面初始设置的交易对后，交易币的数量为0。例如：回测时回测页面上初始设置的交易对为```BTC_USDT```，```BTC```数量为3个，```USDT```数量为10000。此时立即切换为```LTC_USDT```，切换后交易币数量为0，即账户中```LTC```数量为0；切换后的交易对共享```USDT```数量，即数量仍为10000。
+切换为非回测页面初始设置的交易对后，交易币的数量为0。例如：回测时回测页面上初始设置的交易对为```BTC_USDT```，```BTC```数量为3个，```USDT```数量为10000。此时立即切换为```LTC_USDT```，切换后交易币数量为0，即账户中```LTC```数量为0；切换后的交易对共享```USDT```数量，即数量仍为10000。
 
 See also: `exchange.GetCurrency`
 
@@ -7888,31 +8306,39 @@ exchange.GetQuoteCurrency()
 
 ```exchange.GetQuoteCurrency()```函数用于获取当前交易对的计价币名称，即```quoteCurrency```。
 
-Returns (string): ```exchange.GetQuoteCurrency()```函数返回当前交易对的计价币名称。
+Returns (string): 当前交易对的计价币名称。
+
+切换交易对后读取计价币名称。
 
 ```javascript
 function main() {
     exchange.SetCurrency("BTC_USDT")
-    Log("Quote currency for BTC_USDT:", exchange.GetQuoteCurrency())
-    // exchange.SetCurrency("ETH_BTC")
-    // Log("Quote currency for ETH_BTC:", exchange.GetQuoteCurrency())
+    Log(exchange.GetQuoteCurrency())
+    // 输出：USDT
+    exchange.SetCurrency("ETH_BTC")
+    Log(exchange.GetQuoteCurrency())
+    // 输出：BTC
 }
 ```
 
 ```python
 def main():
     exchange.SetCurrency("BTC_USDT")
-    Log("Quote currency for BTC_USDT:", exchange.GetQuoteCurrency())
-    # exchange.SetCurrency("ETH_BTC")
-    # Log("Quote currency for ETH_BTC:", exchange.GetQuoteCurrency())
+    Log(exchange.GetQuoteCurrency())
+    # 输出：USDT
+    exchange.SetCurrency("ETH_BTC")
+    Log(exchange.GetQuoteCurrency())
+    # 输出：BTC
 ```
 
 ```rust
 fn main() {
     exchange.SetCurrency("BTC_USDT");
-    Log!("Quote currency for BTC_USDT:", exchange.GetQuoteCurrency());
-    // exchange.SetCurrency("ETH_BTC");
-    // Log!("Quote currency for ETH_BTC:", exchange.GetQuoteCurrency());
+    Log!(exchange.GetQuoteCurrency());
+    // 输出：USDT
+    exchange.SetCurrency("ETH_BTC");
+    Log!(exchange.GetQuoteCurrency());
+    // 输出：BTC
 }
 ```
 
@@ -7930,25 +8356,28 @@ exchange.GetPeriod()
 
 Returns (number): K 线周期的秒数，为整数数值，单位为秒。
 
+读取页面上设置的默认K线周期（秒）。
+
 ```javascript
 function main() {
-    // 例如，回测或实盘时在发明者量化交易平台网站页面上设置的 K 线周期为 1 小时
     var period = exchange.GetPeriod()
-    Log("K-line period:", period / (60 * 60), "hours")
+    Log("K线周期（秒）", period)
+    // 输出：K线周期（秒） 3600（页面上设置的K线周期为1小时）
 }
 ```
 
 ```python
 def main():
     period = exchange.GetPeriod()
-    Log("K-line period:", period / (60 * 60), "hours")
+    Log("K线周期（秒）", period)
+    # 输出：K线周期（秒） 3600（页面上设置的K线周期为1小时）
 ```
 
 ```rust
 fn main() {
-    // 例如，回测或实盘时在发明者量化交易平台网站页面上设置的 K 线周期为 1 小时
     let period = exchange.GetPeriod();
-    Log!("K-line period:", period as f64 / (60.0 * 60.0), "hours");
+    Log!("K线周期（秒）", period);
+    // 输出：K线周期（秒） 3600（页面上设置的K线周期为1小时）
 }
 ```
 
@@ -7964,28 +8393,36 @@ exchange.SetMaxBarLen(len)
 
 Parameters:
 
-- `len` (number, required): 参数```len```用于指定K线的最大长度。
+- `len` (number, required): K线的最大长度。
+
+限制K线最多保留50根，再获取K线并打印数量。
 
 ```javascript
 function main() {
     exchange.SetMaxBarLen(50)
     var records = exchange.GetRecords()
-    Log(records.length, records)
+    if (!records) return
+    Log(records.length)
+    // 输出：不超过50的整数
 }
 ```
 
 ```python
 def main():
     exchange.SetMaxBarLen(50)
-    r = exchange.GetRecords()
-    Log(len(r), r)
+    records = exchange.GetRecords()
+    if not records:
+        return
+    Log(len(records))
+    # 输出：不超过50的整数
 ```
 
 ```rust
 fn main() {
     exchange.SetMaxBarLen(50);
-    let records = exchange.GetRecords(None, None, None).unwrap();
-    Log!(records.len(), records);
+    let Ok(records) = exchange.GetRecords(None, None, None) else { return };
+    Log!(records.len());
+    // 输出：不超过50的整数
 }
 ```
 
@@ -8007,8 +8444,10 @@ exchange.SetPrecision(pricePrecision, amountPrecision)
 
 Parameters:
 
-- `pricePrecision` (number, required): ```pricePrecision```参数用于设置价格数据的精度。
-- `amountPrecision` (number, required): ```amountPrecision```参数用于设置下单量数据的精度。
+- `pricePrecision` (number, required): 价格数据的精度。
+- `amountPrecision` (number, required): 下单量数据的精度。
+
+设置价格保留2位小数、下单量保留3位小数。
 
 ```javascript
 function main(){
@@ -8043,31 +8482,34 @@ exchange.GetRate()
 
 Returns (number): 交易所对象当前的汇率值。
 
+读取默认汇率，设置汇率后再次读取。
+
 ```javascript
-function main(){
-    Log(exchange.GetTicker())
-    // 设置汇率转换
+function main() {
+    Log(exchange.GetRate())
+    // 输出：1（未调用 SetRate 时的默认值）
     exchange.SetRate(7)
-    Log(exchange.GetTicker())
-    Log("Current rate:", exchange.GetRate())
+    Log(exchange.GetRate())
+    // 输出：7
 }
 ```
 
 ```python
 def main():
-    Log(exchange.GetTicker())
+    Log(exchange.GetRate())
+    # 输出：1（未调用 SetRate 时的默认值）
     exchange.SetRate(7)
-    Log(exchange.GetTicker())
-    Log("Current rate:", exchange.GetRate())
+    Log(exchange.GetRate())
+    # 输出：7
 ```
 
 ```rust
 fn main() {
-    Log!(exchange.GetTicker(None));
-    // 设置汇率转换
+    Log!(exchange.GetRate());
+    // 输出：1（未调用 SetRate 时的默认值）
     exchange.SetRate(7);
-    Log!(exchange.GetTicker(None));
-    Log!("Current rate:", exchange.GetRate());
+    Log!(exchange.GetRate());
+    // 输出：7
 }
 ```
 
@@ -8089,9 +8531,11 @@ exchange.SetRate(rate)
 
 Parameters:
 
-- `rate` (number, required): ```rate```参数用于指定转换汇率，小于等于0时按1处理（不转换）。
+- `rate` (number, required): 转换汇率，小于等于0时按1处理（不转换）。
 
 Returns (number): 设置之前的汇率值。
+
+设置汇率为7，行情价格按7倍换算，再恢复为1。
 
 ```javascript
 function main(){
@@ -8139,7 +8583,9 @@ exchange.SetBase(s)
 
 Parameters:
 
-- `s` (string, required): ```s```参数用于指定交易所API接口的基地址。
+- `s` (string, required): 交易所API接口的基地址。
+
+切换API基地址，前后各获取一次行情。
 
 ```javascript
 function main() {
@@ -8182,20 +8628,25 @@ exchange.GetBase()
 
 Returns (string): 当前交易所 API 接口的基础地址。
 
+打印当前交易所对象使用的API基地址。
+
 ```javascript
 function main() {
     Log(exchange.GetBase())
+    // 输出：https://api.binance.com（以币安现货为例）
 }
 ```
 
 ```python
 def main():
     Log(exchange.GetBase())
+    # 输出：https://api.binance.com（以币安现货为例）
 ```
 
 ```rust
 fn main() {
     Log!(exchange.GetBase());
+    // 输出：https://api.binance.com（以币安现货为例）
 }
 ```
 
@@ -8211,11 +8662,11 @@ exchange.SetProxy(proxy)
 
 Parameters:
 
-- `proxy` (string, required): ```proxy```参数用于指定代理配置，格式为```协议://[用户名:密码@]主机:端口```，传空字符串取消代理。
+- `proxy` (string, required): 代理配置，格式为```协议://[用户名:密码@]主机:端口```，传空字符串取消代理。
 
 Returns (bool / 空值): 设置成功返回```true```；代理格式不正确（协议不支持或缺少主机、端口）时返回空值，可通过`GetLastError`获取错误信息，原有代理设置不变。
 
-配置`exchange`交易所对象```socks5```代理：
+配置`exchange`交易所对象```socks5```代理。
 
 ```javascript
 function main() {
@@ -8260,7 +8711,9 @@ exchange.SetTimeout(timeout)
 
 Parameters:
 
-- `timeout` (number, required): ```timeout```参数用于指定超时时间的毫秒数。
+- `timeout` (number, required): 超时时间的毫秒数。
+
+把REST请求超时设为3秒后获取行情。
 
 ```javascript
 function main() {
@@ -8295,22 +8748,47 @@ exchange.Encode(algo, inputFormat, outputFormat, data)
 exchange.Encode(algo, inputFormat, outputFormat, data, keyFormat, key)
 ```
 
-```exchange.Encode()```函数用于执行签名与加密计算。
+```exchange.Encode()```函数用于签名加密计算。
 
 Parameters:
 
-- `algo` (string, required): 参数```algo```用于指定编码计算时所使用的算法。
-支持设置为："raw"（不使用算法）、"sign"、"signTx"、"md4"、"md5"、"sha256"、"sha512"、"sha1"、"keccak256"、"sha3.224"、"sha3.256"、"sha3.384"、"sha3.512"、"sha3.keccak256"、"sha3.keccak512"、"sha512.384"、"sha512.256"、"sha512.224"、"ripemd160"、"blake2b.256"、"blake2b.512"、"blake2s.128"、"blake2s.256"。
+- `algo` (string, required): 签名或哈希使用的算法，例如```"sha256"```、```"ed25519"```；全部取值见备注。
+- `inputFormat` (string, required): 用于指定```data```参数的数据格式。```inputFormat```参数支持设置为："raw"，"hex"，"base64"，"string"其中之一。"raw"表示数据为原始数据，"hex"表示数据为```hex```编码，"base64"表示数据为```base64```编码，"string"表示数据为字符串。
+- `outputFormat` (string, required): 用于指定输出的数据格式。```outputFormat```参数支持设置为："raw"，"hex"，"base64"，"string"其中之一。"raw"表示数据为原始数据，"hex"表示数据为```hex```编码，"base64"表示数据为```base64```编码，"string"表示数据为字符串。
+- `data` (string, required): 所要处理的数据。
+- `keyFormat` (string, optional): 用于指定```key```参数的数据格式。```keyFormat```参数支持设置为："raw"，"hex"，"base64"，"string"其中之一。"raw"表示数据为原始数据，"hex"表示数据为```hex```编码，"base64"表示数据为```base64```编码，"string"表示数据为字符串。
+- `key` (string, optional): 签名计算时使用的密钥，可以使用明文字符串。也可以使用```"{{accesskey}}"```、```"{{secretkey}}"```代指`exchange`交易所对象中配置的```accessKey```和```secretKey```。
 
-参数```algo```还支持："text.encoder.utf8"、"text.decoder.utf8"、"text.encoder.gbk"、"text.decoder.gbk"，用于对字符串进行编码、解码。
-参数```algo```也支持"ed25519"算法，并可搭配不同的哈希算法使用，例如参数```algo```可写为"ed25519.md5"、"ed25519.sha512"等，同时支持```ed25519.seed```计算。
-- `inputFormat` (string, required): 用于指定```data```参数的数据格式。```inputFormat```参数支持设置为："raw"、"hex"、"base64"、"string"其中之一。"raw"表示原始数据，"hex"表示```hex```编码数据，"base64"表示```base64```编码数据，"string"表示字符串数据。
-- `outputFormat` (string, required): 用于指定输出的数据格式。```outputFormat```参数支持设置为："raw"、"hex"、"base64"、"string"其中之一。"raw"表示原始数据，"hex"表示```hex```编码数据，"base64"表示```base64```编码数据，"string"表示字符串数据。
-- `data` (string, required): 参数```data```为所要处理的数据。
-- `keyFormat` (string, optional): 用于指定```key```参数的数据格式。```keyFormat```参数支持设置为："raw"、"hex"、"base64"、"string"其中之一。"raw"表示原始数据，"hex"表示```hex```编码数据，"base64"表示```base64```编码数据，"string"表示字符串数据。
-- `key` (string, optional): ```key```参数用于指定签名计算时使用的密钥，可以使用明文字符串，也可以使用```"{{accesskey}}"```、```"{{secretkey}}"```分别代指`exchange`交易所对象中配置的```accessKey```和```secretKey```。
+Returns (string): 计算出来的哈希值编码。
 
-Returns (string): ```exchange.Encode()```函数返回计算得到的哈希值编码。
+用交易所对象配置的secretKey对请求参数做HMAC-SHA256签名。
+
+```javascript
+function main() {
+    var query = "symbol=BTCUSDT&timestamp=" + Date.now()
+    var signature = exchange.Encode("sha256", "raw", "hex", query, "raw", "{{secretkey}}")
+    Log(signature)
+    // 输出：64个字符的十六进制签名
+}
+```
+
+```python
+import time
+def main():
+    query = "symbol=BTCUSDT&timestamp=" + str(int(time.time() * 1000))
+    signature = exchange.Encode("sha256", "raw", "hex", query, "raw", "{{secretkey}}")
+    Log(signature)
+    # 输出：64个字符的十六进制签名
+```
+
+```rust
+fn main() {
+    let query = format!("symbol=BTCUSDT&timestamp={}", Unix() * 1000);
+    let signature = exchange.Encode("sha256", "raw", "hex", &query, "raw", "{{secretkey}}");
+    Log!(signature);
+    // 输出：64个字符的十六进制签名
+}
+```
 
 Bybit v5私有WebSocket鉴权并订阅仓位推送（wss协议）示例：传入```key```时按HMAC计算，签名为```HMAC_SHA256(secretKey, "GET/realtime" + expires)```的hex编码，```expires```为毫秒时间戳；```"{{secretkey}}"```引用交易所对象中配置的```secretKey```（按字符串使用，所以```keyFormat```为```"string"```），策略代码中不出现明文密钥。
 
@@ -8319,7 +8797,8 @@ function main() {
     var APIKEY = "your Bybit API Key"
     // expires为毫秒时间戳；签名 = HMAC_SHA256(secretKey, "GET/realtime" + expires)，hex编码
     var expires = Date.now() + 10000
-    var signature = exchange.Encode("sha256", "string", "hex", "GET/realtime" + expires, "string", "{{secretkey}}")
+    var signature = exchange.Encode("sha256", "string", "hex", "GET/realtime" + expires, "string",
+        "{{secretkey}}")
     var client = Dial("wss://stream.bybit.com/v5/private", 60)
     if (!client) {
         Log("连接失败")
@@ -8368,7 +8847,8 @@ def main():
     APIKEY = "your Bybit API Key"
     # expires为毫秒时间戳；签名 = HMAC_SHA256(secretKey, "GET/realtime" + expires)，hex编码
     expires = int(time.time() * 1000) + 10000
-    signature = exchange.Encode("sha256", "string", "hex", "GET/realtime" + str(expires), "string", "{{secretkey}}")
+    signature = exchange.Encode("sha256", "string", "hex", "GET/realtime" + str(expires), "string",
+        "{{secretkey}}")
     client = Dial("wss://stream.bybit.com/v5/private", 60)
     if not client:
         Log("连接失败")
@@ -8452,7 +8932,19 @@ fn main() {
 }
 ```
 
-仅实盘支持调用```exchange.Encode()```函数。```"{{accesskey}}"```、```"{{secretkey}}"```的引用方式仅在调用```exchange.Encode()```函数时有效。
+仅实盘支持调用```exchange.Encode()```函数。```"{{accesskey}}"```、```"{{secretkey}}"```的引用方式仅在```exchange.Encode()```函数使用时有效。
+
+```algo```参数的取值：
+
+| 类别 | 取值 |
+| - | - |
+| 不使用算法 | ```"raw"``` |
+| 签名 | ```"sign"```、```"signTx"``` |
+| 哈希（MD、SHA-1、SHA-2） | ```"md4"```、```"md5"```、```"sha1"```、```"sha256"```、```"sha512"```、```"sha512.384"```、```"sha512.256"```、```"sha512.224"``` |
+| 哈希（SHA-3、Keccak） | ```"keccak256"```、```"sha3.224"```、```"sha3.256"```、```"sha3.384"```、```"sha3.512"```、```"sha3.keccak256"```、```"sha3.keccak512"``` |
+| 哈希（其它） | ```"ripemd160"```、```"blake2b.256"```、```"blake2b.512"```、```"blake2s.128"```、```"blake2s.256"``` |
+| 字符串编码、解码 | ```"text.encoder.utf8"```、```"text.decoder.utf8"```、```"text.encoder.gbk"```、```"text.decoder.gbk"``` |
+| Ed25519 | ```"ed25519"```、```"ed25519.seed"```；可以指定哈希算法，例如```"ed25519.md5"```、```"ed25519.sha512"``` |
 
 See also: `exchange`, `Encode`
 
@@ -8475,7 +8967,7 @@ Parameters:
 
 Returns (string / number / bool / object / array / any): 返回值由指令决定，部分指令成功时也返回空值；调用失败时返回空值，可通过`GetLastError`获取错误信息。
 
-切换保证金模式并调用交易所原始接口（以币安期货为例）：
+切换保证金模式并调用交易所原始接口（以币安期货为例）。
 
 ```javascript
 function main() {
@@ -8512,7 +9004,7 @@ fn main() {
 }
 ```
 
-**指令一览**
+##### 指令一览
 
 | 指令 | 说明 |
 | - | - |
@@ -8524,13 +9016,13 @@ fn main() {
 
 各指令的详细说明见本分类下的各个页面；各交易所对象特有的指令见下方索引，参数与说明见交易所页（入口见`能力矩阵`）。
 
-**返回值与错误判断**
+##### 返回值与错误判断
 
 返回值由指令决定。部分指令（例如一些期货交易所的```cross```、```dual```、```unified```）成功时也返回空值，与调用失败的返回值相同；需要确认是否成功时，调用后用`GetLastError`读取错误信息。交易所不支持的指令会报错（```unsupported io method```）并返回空值。
 
 ```cross```、```dual```、```unified```这类作用于具体合约的指令，可以在取值之后再传入一个```symbol```参数指定合约，例如```exchange.IO("cross", false, "ETH_USDT.swap")```；不传时作用于当前交易对、合约。指令是按合约还是对整个账户生效、各指令的返回值，见交易所页的专属IO指令表。
 
-**各交易所专属指令**
+##### 各交易所专属指令
 
 下表列出各交易所对象特有的```exchange.IO()```指令，参数与说明见交易所页。
 
@@ -8661,19 +9153,19 @@ Forms:
 
 - `exchange.IO("api", ...)`
 
-```exchange.IO("api", ...)```调用交易所未封装的原始REST接口，签名由平台自动处理。
+```exchange.IO("api", ...)```调用交易所未封装的原始REST接口，签名由平台自动处理。Web3交易所对象上的同名指令用于调用智能合约，见`exchange.IO("api", ...)`。
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"api"```表示调用交易所原始接口。
-- `httpMethod` (string, required): ```httpMethod```参数为请求方法，例如```GET```、```POST```、```DELETE```。
-- `resource` (string, required): ```resource```参数为接口路径，也可以写完整URL（主机部分替换当前基地址）。
-- `params` (string, optional): ```params```参数为URL编码格式的请求参数。
-- `raw` (string, optional): ```raw```参数为原始请求体，例如JSON字符串。
+- `k` (string, required): 固定为```"api"```，用于调用交易所原始接口。
+- `httpMethod` (string, required): 请求方法，例如```GET```、```POST```、```DELETE```。
+- `resource` (string, required): 接口路径，也可以写完整URL（主机部分替换当前基地址）。
+- `params` (string, optional): URL编码格式的请求参数。
+- `raw` (string, optional): 原始请求体，例如JSON字符串。
 
 Returns (object / array / string / 空值): 返回交易所接口的完整应答，应答不是JSON时原样返回字符串；调用失败时返回空值。仅实盘支持。
 
-使用 ```"api"``` 模式调用 ```Futures_OKCoin```（OKX期货）批量下单接口，并通过 ```raw``` 参数传递 JSON 格式的订单数据：
+使用```"api"```模式调用```Futures_OKCoin```（OKX期货）批量下单接口，通过```raw```参数传递JSON订单数据。
 
 ```javascript
 function main() {
@@ -8713,7 +9205,7 @@ fn main() {
 }
 ```
 
-```params```参数中的键值为字符串类型时，需要使用单引号将参数值包裹起来：
+```params```参数中键值为字符串时，需要用单引号包裹参数值。
 
 ```javascript
 var amount = 1
@@ -8746,7 +9238,7 @@ fn main() {
 }
 ```
 
-```resource```参数支持传入完整的URL：
+```resource```参数支持完整URL。
 
 ```javascript
 function main() {
@@ -8768,7 +9260,7 @@ fn main() {
 }
 ```
 
-不使用```raw```参数的GET请求：
+不使用```raw```参数的GET请求。
 
 ```javascript
 function main(){
@@ -8790,13 +9282,13 @@ fn main() {
 }
 ```
 
-**直接调用交易所API（```"api"```模式）**
+##### 直接调用交易所API（```"api"```模式）
 
 ```javascript
 exchange.IO("api", httpMethod, resource, params, raw)
 ```
 
-用于调用交易所未封装的原生API接口。FMZ会自动处理签名验证，您只需填写请求参数即可。
+调用交易所未封装的原始API接口。FMZ自动处理签名验证，只需填请求参数。
 
 | 参数 | 类型 | 必填 | 说明 |
 | - | - | - | - |
@@ -8805,7 +9297,7 @@ exchange.IO("api", httpMethod, resource, params, raw)
 | params | string | 否 | URL编码格式的请求参数 |
 | raw | string | 否 | 原始请求体（JSON等） |
 
-调用失败时返回空值，且该模式仅支持实盘。
+调用失败返回空值。仅实盘支持。
 
 See also: `exchange.IO`
 
@@ -8823,18 +9315,18 @@ Forms:
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"currency"```表示切换交易对。
-- `symbol` (string, required): ```symbol```参数为交易对，大写、下划线分隔，例如```ETH_USDT```。
+- `k` (string, required): 固定为```"currency"```，用于切换交易对。
+- `symbol` (string, required): 交易对，大写、下划线分隔，例如```ETH_USDT```。
 
 Returns (bool / 空值): 切换成功返回```true```；交易对格式不正确时返回空值，当前交易对不变。
 
-运行时切换交易对：
+运行时切换交易对。
 
 ```javascript
 function main() {
-    // 例如，实盘启动时交易所对象当前的交易对为BTC_USDT，打印当前交易对的行情
+    // 例如开始实盘上设置交易所对象目前交易对为BTC_USDT，打印目前交易对行情
     Log(exchange.GetTicker())
-    // 将交易对切换为LTC_BTC
+    // 切换交易对为LTC_BTC
     exchange.IO("currency", "LTC_BTC")
     Log(exchange.GetTicker())
 }
@@ -8849,23 +9341,23 @@ def main():
 
 ```rust
 fn main() {
-    // 例如，实盘启动时交易所对象当前的交易对为BTC_USDT，打印当前交易对的行情
+    // 例如开始实盘上设置交易所对象目前交易对为BTC_USDT，打印目前交易对行情
     Log!(exchange.GetTicker(None));
-    // 将交易对切换为LTC_BTC
+    // 切换交易对为LTC_BTC
     let _ = exchange.IO(("currency", "LTC_BTC"));
     Log!(exchange.GetTicker(None));
 }
 ```
 
-**运行时切换交易对（```"currency"```模式）**
+##### 运行时切换交易对（```"currency"```模式）
 
 ```javascript
 exchange.IO("currency", "ETH_USDT")
 ```
 
-用于在运行时动态切换交易对，交易对格式为大写字母加下划线分隔。此指令等同于`exchange.SetCurrency`。
+动态切换交易对，格式为大写下划线分隔。等同于`exchange.SetCurrency`。
 
-> 回测模式下仅支持现货，且只能切换至相同计价币种的交易对。期货切换交易对后合约代码保持不变，需要换合约时再调用```exchange.SetContractType()```。
+> 回测仅支持现货且只能切换相同计价币的交易对。期货切换交易对后合约代码保持不变，需要换合约时再调用```exchange.SetContractType()```。
 
 See also: `exchange.IO`
 
@@ -8880,16 +9372,16 @@ Forms:
 
 - `exchange.IO("base", ...)`
 
-```exchange.IO("base", ...)```查询或切换交易所接口的基地址。
+```exchange.IO("base", ...)```查询或切换交易所接口的基地址。Web3交易所对象上设置的是RPC节点地址，见`exchange.IO("base", ...)`。
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"base"```表示查询或切换接口基地址。
-- `address` (string, optional): ```address```参数为新的基地址，例如```https://api.example.com```。不传时查询当前基地址。
+- `k` (string, required): 固定为```"base"```，用于查询或切换接口基地址。
+- `address` (string, optional): 新的基地址，例如```https://api.example.com```。不传时查询当前基地址。
 
 Returns (string / 空值): 不传```address```时返回当前基地址；传入```address```时切换基地址，并返回切换之前的基地址。调用失败时返回空值。
 
-切换交易所接口基地址：
+切换交易所接口基地址。
 
 ```javascript
 function main () {
@@ -8913,7 +9405,7 @@ fn main() {
 }
 ```
 
-**查询与切换基地址（```"base"```模式）**
+##### 查询与切换基地址（```"base"```模式）
 
 - ```exchange.IO("base", address)```：切换交易所接口基地址，等同于`exchange.SetBase`。
 - ```exchange.IO("base")```：查询当前基地址，没有切换过时返回交易所的默认接口地址，等同于`exchange.GetBase`。
@@ -8937,12 +9429,12 @@ Forms:
 
 Parameters:
 
-- `mode` (string, required): ```mode```参数为模式指令，例如```"simulate"```、```"cross"```、```"dual"```，全部指令见下表。
-- `value` (bool / string, optional): ```value```参数为模式的取值，类型和含义见下表；部分指令不需要。
+- `mode` (string, required): 模式指令，例如```"simulate"```、```"cross"```、```"dual"```，全部指令见下表。
+- `value` (bool / string, optional): 模式的取值，类型和含义见下表；部分指令不需要。
 
 Returns (string / number / bool / object / array / any): 返回值由指令决定，部分指令（例如一些交易所的```cross```、```dual```）成功时也返回空值；调用失败时返回空值，可通过`GetLastError`获取错误信息。
 
-切换模拟盘/实盘环境（以```Futures_OKCoin```（OKX期货）为例）：
+切换模拟盘/实盘环境（以```Futures_OKCoin```（OKX期货）为例）。
 
 ```javascript
 function main() {
@@ -8967,7 +9459,7 @@ fn main() {
 }
 ```
 
-切换合约保证金模式与持仓模式（以币安期货为例）：
+切换合约保证金模式和持仓模式（以币安期货为例）。
 
 ```javascript
 function main() {
@@ -9001,7 +9493,7 @@ fn main() {
 }
 ```
 
-切换统一账户模式（以币安期货为例）：
+切换统一账户模式（以币安期货为例）。
 
 ```javascript
 function main() {
@@ -9023,7 +9515,7 @@ fn main() {
 }
 ```
 
-设置自成交预防模式（以币安为例）：
+设置自成交预防模式（以币安为例）。
 
 ```javascript
 function main() {
@@ -9044,18 +9536,18 @@ fn main() {
 }
 ```
 
-**通用交易模式指令**
+##### 通用交易模式指令
 
 以下指令在多个交易所中通用，哪些交易所支持哪些指令见`能力矩阵`，取值含义、是否按合约生效与返回值的差异见各交易所页。
 
 | 指令 | 参数 | 功能 |
 | - | - | - |
-| ```simulate``` | bool | 模拟盘(true)/实盘(false) |
-| ```cross``` | bool | 全仓(true)/逐仓(false) |
-| ```dual``` | bool | 双向持仓(true)/单向持仓(false) |
-| ```unified``` | bool | 统一账户(true)/普通账户(false) |
-| ```trade_margin``` | 无 | 切换至逐仓杠杆模式 |
-| ```trade_super_margin``` | 无 | 切换至全仓杠杆模式 |
+| ```simulate``` | bool | 模拟盘（true）/实盘（false） |
+| ```cross``` | bool | 全仓（true）/逐仓（false） |
+| ```dual``` | bool | 双向持仓（true）/单向持仓（false） |
+| ```unified``` | bool | 统一账户（true）/普通账户（false） |
+| ```trade_margin``` | 无 | 切换逐仓杠杆模式 |
+| ```trade_super_margin``` | 无 | 切换全仓杠杆模式 |
 | ```trade_normal``` | 无 | 切换回普通现货模式 |
 | ```selfTradePreventionMode``` | string | 自成交预防（STP）模式 |
 
@@ -9076,15 +9568,15 @@ Forms:
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能：```"rate"```为平滑限流（令牌桶，允许短时突发），```"quota"```为额度限流（按时间窗口计数，窗口按整点对齐）。
-- `functionNames` (string, required): ```functionNames```参数为API函数名（如```GetTicker```、```CreateOrder```、```GetAccount```），多个用逗号分隔共用一条规则；```*```为兜底规则，只作用于没有单独设置规则的函数；```IO/api```对应```exchange.IO("api", ...)```。传空字符串清空全部规则。
-- `maxCalls` (number, required): ```maxCalls```参数为一个周期内允许的最大调用次数，小于等于0时删除```functionNames```的规则。```"rate"```模式可以写成字符串```"次数/突发"```，例如```"10/5"```表示每周期10次、最多连续突发5次；不写突发时突发量等于次数。
-- `period` (string, required): ```period```参数为周期，写法同Go语言的时间长度：```"500ms"```、```"1s"```、```"1m"```、```"1h30m"```（单位ns、us、ms、s、m、h），也可以写```"1d"```；或者每日重置时间点```"@HHMM"```、```"@HHMMSS"```（北京时间），例如```"@0815"```。
-- `behavior` (string, optional): ```behavior```参数为超限时的行为：```"delay"```等待后执行，默认返回空值。
+- `k` (string, required): ```"rate"```为平滑限流（令牌桶，允许短时突发），```"quota"```为额度限流（按时间窗口计数，窗口按整点对齐）。
+- `functionNames` (string, required): API函数名（如```GetTicker```、```CreateOrder```、```GetAccount```），多个用逗号分隔共用一条规则；```*```为兜底规则，只作用于没有单独设置规则的函数；```IO/api```对应```exchange.IO("api", ...)```。传空字符串清空全部规则。
+- `maxCalls` (number, required): 一个周期内允许的最大调用次数，小于等于0时删除```functionNames```的规则。```"rate"```模式可以写成字符串```"次数/突发"```，例如```"10/5"```表示每周期10次、最多连续突发5次；不写突发时突发量等于次数。
+- `period` (string, required): 周期，写法同Go语言的时间长度：```"500ms"```、```"1s"```、```"1m"```、```"1h30m"```（单位ns、us、ms、s、m、h），也可以写```"1d"```；或者每日重置时间点```"@HHMM"```、```"@HHMMSS"```（北京时间），例如```"@0815"```。
+- `behavior` (string, optional): 超限时的行为：```"delay"```等待后执行，默认返回空值。
 
 Returns (string / number / bool / object / array / any): 调用成功时返回指令的结果，调用失败时返回空值。
 
-rate模式限流 - 限制GetTicker每秒最多调用10次，超限返回null：
+rate模式限流 - 限制GetTicker每秒最多调用10次，超限返回null。
 
 ```javascript
 function main() {
@@ -9127,7 +9619,7 @@ fn main() {
 }
 ```
 
-rate模式限流 - 使用```"delay"```参数，超限时自动等待而非返回null：
+rate模式限流 - 使用```"delay"```参数，超限时自动等待而非返回null。
 
 ```javascript
 function main() {
@@ -9160,7 +9652,7 @@ fn main() {
 }
 ```
 
-多个函数共享限流额度：
+多个函数共享限流额度。
 
 ```javascript
 function main() {
@@ -9203,7 +9695,7 @@ fn main() {
 }
 ```
 
-使用通配符限制所有API调用频率：
+使用通配符限制所有API调用频率。
 
 ```javascript
 function main() {
@@ -9245,7 +9737,7 @@ fn main() {
 }
 ```
 
-quota模式 - 严格时间窗口对齐限流：
+quota模式 - 严格时间窗口对齐限流。
 
 ```javascript
 function main() {
@@ -9290,7 +9782,7 @@ fn main() {
 }
 ```
 
-quota模式 - 日内配额，每天指定时间重置：
+quota模式 - 日内配额，每天指定时间重置。
 
 ```javascript
 function main() {
@@ -9348,7 +9840,7 @@ fn main() {
 }
 ```
 
-组合使用多个限流规则：
+组合使用多个限流规则。
 
 ```javascript
 function main() {
@@ -9399,7 +9891,7 @@ fn main() {
 }
 ```
 
-**API限流控制（```"rate"``` / ```"quota"```模式）**
+##### API限流控制（```"rate"``` / ```"quota"```模式）
 
 ```javascript
 exchange.IO("rate", functionNames, maxCalls, period, [behavior])
@@ -9420,7 +9912,7 @@ exchange.IO("quota", functionNames, maxCalls, period, [behavior])
 
   规则按交易所对象分别设置，只在本次运行中有效。超限时默认报错并返回空值，错误信息形如```rate limit exceeded: GetTicker 10/1s```（```"quota"```规则为```quota limit exceeded: ...```，每日定点重置的规则形如```quota limit exceeded: GetTicker 1000/day (resets at 0815)```）；设置```"delay"```时等待到可以调用为止，停止实盘时等待会被打断。```GetAccount```与```GetAssets```是同一个请求，为其中任一个名字设置的规则对两者都生效。
 
-**可以限流的函数名**
+##### 可以限流的函数名
 
 | 类别 | 函数名 |
 | - | - |
@@ -9449,49 +9941,23 @@ HttpQuery(url)
 HttpQuery(url, options)
 ```
 
-发送HTTP请求。
+发送Http请求。
 
 Parameters:
 
-- `url` (string, required): HTTP请求的URL地址。
-- `options` (object, optional): HTTP请求的相关设置，例如可以采用以下结构：
-```json
-{
-    method: "POST",
-    body: "a=10&b=20&c=30",
-    charset: "UTF-8",
-    cookie: "session_id=12345; lang=en",
-    debug: false,
-    headers: {"TEST-HTTP-QUERY": "123"},
-    proxy: "socks5://127.0.0.1:8889",
-    timeout: 1000
-}
-```
+- `url` (string, required): Http请求url。
+- `options` (object, optional): 请求设置，所有字段都可选：```method```、```body```（未设置时用```data```作为请求体）、```headers```、```cookie```、```timeout```（毫秒，默认300000）、```charset```、```proxy```、```debug```，字段说明见`HttpQuery-options`。
 
-- method: 用于设置请求方法。
-- body: 用于设置请求体内容，通常用于 POST、PUT 等请求。
-- data: 与```body```作用相同，未设置```body```时使用```data```作为请求体。
-- cookie: 用于设置请求中的 Cookie，一般用于携带身份验证信息或会话标识。
-- headers: 用于设置请求头信息，可用于指定内容类型、身份验证信息等。
-- debug: 设置为```true```时，此次```HttpQuery```函数调用返回完整的应答报文；设置为```false```时，仅返回应答报文```Body```中的数据。
-- timeout: 用于设置超时时间，单位为毫秒，例如设置为1000表示超时时间为1秒。不设置时默认为300000，即300秒。
-- charset: 用于对请求的应答数据进行转码，例如：GB18030。支持常用编码。
-- proxy: 用于设置本次请求使用的代理，支持```http://```、```https://```、```socks5://```、```socks5h://```，例如：```socks5://username:password@127.0.0.1:8889```。只对本次请求生效，优先于```url```参数中以前缀方式设置的代理。
+Returns (string / object): 应答数据：```debug```为false（默认）时是应答```Body```字符串，JSON需要自己解析（```JSON.parse()```、```json.loads()```、```JSONParse()```）；为true时是完整应答对象，见`HttpQuery-return`。请求失败时的返回值见备注。
 
-此结构中的所有字段均为可选字段，例如可以不设置```headers```字段。
-
-Returns (string / object): 返回请求的应答数据。如果返回值为```JSON```字符串，在```JavaScript```语言的策略中可以使用```JSON.parse()```函数解析，在```Python```语言的策略中可以使用```json.loads()```函数解析，在```Rust```语言的策略中可以使用```JSONParse()```函数解析。参数```options```结构中的```debug```设置为true时，返回值为对象（JSON）；```debug```设置为false时，返回值为字符串。
-
-请求失败（未收到应答，例如连接被拒绝、DNS解析失败、超时、代理失败）时不会返回```null```，并且会在日志中记录包含请求方法和URL的错误信息：```debug```设置为false时返回空字符串；```debug```设置为true时返回```StatusCode```为0且带有```Error```字段（失败原因）的结构，结构说明参见```HttpQuery-return```。HTTP状态码为4xx、5xx的应答不属于请求失败。
-
-访问OKX公共行情API接口的示例。
+访问OKX公共行情API接口的例子。
 
 ```javascript
 function main(){
-    // GET请求不带参数的示例
+    // 一个GET访问不带参数的例子
     var info = JSON.parse(HttpQuery("https://www.okx.com/api/v5/public/time"))
     Log(info)
-    // GET请求带参数的示例
+    // 一个GET访问带参数的例子
     var ticker = JSON.parse(HttpQuery("https://www.okx.com/api/v5/market/books?instId=BTC-USDT"))
     Log(ticker)
 }
@@ -9510,25 +9976,25 @@ def main():
 
 ```rust
 fn main() {
-    // GET请求不带参数的示例，Rust 中由返回值的类型注解决定返回 Body 字符串（String）还是完整应答（HttpRet）
+    // 一个GET访问不带参数的例子，Rust 中由返回值类型注解决定返回 Body 字符串（String）或者完整应答（HttpRet）
     let body: String = HttpQuery("https://www.okx.com/api/v5/public/time", None);
     let info = JSONParse(&body).unwrap();
     Log!(info);
-    // GET请求带参数的示例
+    // 一个GET访问带参数的例子
     let body2: String = HttpQuery("https://www.okx.com/api/v5/market/books?instId=BTC-USDT", None);
     let ticker = JSONParse(&body2).unwrap();
     Log!(ticker);
 }
 ```
 
-HttpQuery函数使用代理设置的示例。
+HttpQuery函数使用代理设置。
 
 ```javascript
 function main() {
-    // 本次调用设置代理并发送HTTP请求，不使用用户名和密码，此次HTTP请求将通过代理发送
+    // 本次设置代理并发送http请求，无用户名，无密码，此次http请求会通过代理发送
     HttpQuery("socks5://127.0.0.1:8889/http://www.baidu.com/")
 
-    // 本次调用设置代理并发送HTTP请求，使用用户名和密码，代理设置仅对当前HttpQuery调用生效，之后再次调用HttpQuery("http://www.baidu.com")时不会使用代理
+    // 本次设置代理并发送http请求，输入用户名和密码，仅HttpQuery当前调用生效，之后再次调用HttpQuery("http://www.baidu.com")这样不会使用代理
     HttpQuery("socks5://username:password@127.0.0.1:8889/http://www.baidu.com/")
 
     // 也可以在options参数中使用proxy字段为本次请求设置代理
@@ -9550,16 +10016,18 @@ def main():
 
 ```rust
 fn main() {
-    // 本次调用设置代理并发送HTTP请求，不使用用户名和密码，此次HTTP请求将通过代理发送
+    // 本次设置代理并发送http请求，无用户名，无密码，此次http请求会通过代理发送
     let ret1: String = HttpQuery("socks5://127.0.0.1:8889/http://www.baidu.com/", None);
 
-    // 本次调用设置代理并发送HTTP请求，使用用户名和密码，代理设置仅对当前HttpQuery调用生效，之后再次调用HttpQuery("http://www.baidu.com")时不会使用代理
+    // 本次设置代理并发送http请求，输入用户名和密码，仅HttpQuery当前调用生效，之后再次调用HttpQuery("http://www.baidu.com")这样不会使用代理
     let ret2: String = HttpQuery("socks5://username:password@127.0.0.1:8889/http://www.baidu.com/", None);
 }
 ```
 
-```HttpQuery()```函数支持```JavaScript```、```Python```、```Rust```语言。```HttpQuery()```主要用于访问交易所无需签名的接口，例如行情信息等公共接口。
-回测系统中可以使用```HttpQuery()```发送请求（仅支持```GET```请求）获取数据。回测时最多允许访问20个不同的```URL```，并且```HttpQuery()```会缓存访问数据：再次访问相同的```URL```时，```HttpQuery()```函数直接返回缓存数据，不再发起实际的网络请求。
+```HttpQuery()```函数支持```JavaScript```、```Python```、```Rust```语言。```HttpQuery()```主要用于访问交易所不需要签名的接口，例如行情信息等公共接口。
+回测系统中可以使用```HttpQuery()```发送请求（只支持```GET```请求）获取数据。回测时限制使用20次访问不同的```URL```，并且```HttpQuery()```访问会缓存数据，相同的```URL```第二次访问时```HttpQuery()```函数返回缓存数据，不再发生实际网络请求。
+
+请求失败（没有收到应答，例如拒绝连接、DNS解析失败、超时、代理失败）时不返回空值，而是在日志中记录包含请求方法和URL的错误信息：```debug```为false时返回空字符串；```debug```为true时返回```StatusCode```为0、带```Error```字段（失败原因）的结构。HTTP状态码为4xx、5xx的应答不算请求失败。
 
 See also: `HttpQuery_Go`
 
@@ -9570,33 +10038,16 @@ HttpQuery_Go(url)
 HttpQuery_Go(url, options)
 ```
 
-发送Http请求，是```HttpQuery```函数的异步版本。
+发送Http请求，```HttpQuery```函数的异步版本。
 
 Parameters:
 
-- `url` (string, required): Http请求的URL地址。
-- `options` (object, optional): Http请求的相关设置，例如可以采用以下结构：
-```json
-{
-    method: "POST",
-    body: "a=10&b=20&c=30",
-    charset: "UTF-8",
-    cookie: "session_id=12345; lang=en",
-    debug: false,
-    headers: {"TEST-HTTP-QUERY": "123"},
-    timeout: 1000
-}
-```
+- `url` (string, required): Http请求url。
+- `options` (object, optional): 请求设置，所有字段都可选，与`HttpQuery`的```options```相同（见`HttpQuery-options`）；```debug```为true时取回完整应答报文，```timeout```为超时毫秒数。
 
-- debug：设置为```true```时，此次```HttpQuery_Go```函数调用返回完整的应答报文；设置为```false```时，仅返回应答报文```Body```中的数据。
-- timeout：超时设置，单位为毫秒，例如设置为1000表示超时时间为1秒。
+Returns (object): 立即返回一个并发对象，用它的```wait```方法取请求结果；结果（包括请求失败时的返回值）与`HttpQuery`的返回值相同。```wait```的超时与重复调用见备注。
 
-此结构中的所有字段均为可选字段，例如可以不设置```headers```字段。
-其它字段与`HttpQuery`的```options```参数相同。
-
-Returns (object): ```HttpQuery_Go()```函数会立即返回一个并发对象，可以调用该并发对象的```wait```方法获取Http请求的结果，在```JavaScript```语言的策略中可以使用```JSON.parse()```函数解析该结果。```wait```方法获取的结果与```HttpQuery```函数的返回值相同，请求失败时的返回值也相同（```debug```为false时返回空字符串，为true时返回```StatusCode```为0且包含```Error```字段的结构）。```wait```方法可以传入超时参数（毫秒）：不传或传入```0```时一直等待到请求完成，传入```-1```时不等待，传入正数时最多等待该毫秒数；请求尚未完成时```JavaScript```返回```undefined```、```Python```返回```None```，之后可以再次调用```wait```获取结果。
-
-异步访问交易所公共接口，获取聚合行情数据。
+异步访问交易所公共接口获取聚合行情数据。
 
 ```javascript
 function main() {
@@ -9633,7 +10084,30 @@ def main():
     Log("tickers2:", tickers2)
 ```
 
-```HttpQuery_Go()```函数支持```JavaScript```、```Python```语言。```HttpQuery_Go()```函数主要用于访问交易所无需签名的接口，例如行情信息等公共接口。回测系统不支持```HttpQuery_Go```函数。
+```rust
+fn main() {
+    // 创建第一个异步请求，参数与HttpQuery相同（无options时传None）
+    let r1 = HttpQuery_Go("https://www.okx.com/api/v5/market/tickers?instType=SPOT", None);
+    // 创建第二个异步请求
+    let r2 = HttpQuery_Go("https://api.huobi.pro/market/tickers", None);
+
+    // 获取第一个异步请求的返回值，wait(0)一直等待到请求完成（对应JS的无参wait()）
+    // 由类型注解决定取Body字符串（String）或完整应答（HttpRet）
+    let tickers1: String = r1.wait(0).unwrap_or_default();
+    // 获取第二个异步请求的返回值
+    let tickers2: String = r2.wait(0).unwrap_or_default();
+
+    // 打印结果
+    Log!("tickers1:", tickers1);
+    Log!("tickers2:", tickers2);
+}
+```
+
+```HttpQuery_Go()```函数支持```JavaScript```、```Python```、```Rust```语言。```HttpQuery_Go()```主要用于访问交易所不需要签名的接口，例如行情信息等公共接口。回测系统中不支持```HttpQuery_Go```函数。
+
+```wait```方法可以传入超时参数（毫秒）：不传或传入```0```时一直等待到请求完成，传入```-1```时不等待，传入正数时最多等待该毫秒数。请求尚未完成时```JavaScript```返回```undefined```、```Python```返回```None```，之后可以再次调用```wait```获取结果；结果已被取走后再次调用```wait```时，```JavaScript```抛出异常```routine N already finished```，```Python```记录该错误并返回```None```。
+
+```Rust```中```wait```方法返回```Result```，结果类型由返回值类型注解决定（```String```为应答```Body```，```HttpRet```为完整应答）；请求尚未完成时返回```Err```（```routine N not finished```），之后可以再次调用```wait```；结果取走后再调用```wait```返回```Err```（```routine N already finished```）。
 
 See also: `HttpQuery`
 
@@ -9655,20 +10129,20 @@ Parameters:
 
 Returns (object): 连接对象，有```read()```、```write()```、```close()```等方法（数据库连接另有```exec()```），见`Dial-return`。连接失败（例如超时）时返回空值并记录错误（```Rust```返回```Valid()```为```false```的连接对象）。
 
-Dial 函数调用示例：
+Dial函数调用例子。
 
 ```javascript
 function main(){
     // Dial支持tcp://、tls://协议以及ws://、wss://协议，tcp://、tls://可加一个参数指定超时的秒数
     var client = Dial("tls://www.baidu.com:443")
     if (client) {
-        // write 可额外传入一个数字参数指定超时，返回成功发送的字节数
+        // write可再跟一个数字参数指定超时,write返回成功发送的字节数
         client.write("GET / HTTP/1.1\nConnection: Closed\n\n")
         while (true) {
-            // read 可额外传入一个数字参数指定超时，单位：毫秒；返回 null 表示出错、超时或 socket 已关闭
+            // read可再跟一个数字参数指定超时，单位：毫秒。返回null指出错或者超时或者socket已经关闭
             var buf = client.read()
             if (!buf) {
-                break
+                 break
             }
             Log(buf)
         }
@@ -9695,10 +10169,10 @@ fn main() {
     // Dial支持tcp://、tls://协议以及ws://、wss://协议，tcp://、tls://可使用Dial::new(addr, timeout)指定超时的秒数
     let mut client = Dial("tls://www.baidu.com:443");
     if client.Valid() {
-        // write 的第二个数字参数用于指定超时，返回成功发送的字节数
+        // write的第二个数字参数指定超时，write返回成功发送的字节数
         client.write("GET / HTTP/1.1\nConnection: Closed\n\n", 0);
         loop {
-            // read 的数字参数用于指定超时，单位：毫秒；返回空字符串表示出错、超时或 socket 已关闭
+            // read的数字参数指定超时，单位：毫秒。返回空字符串指出错或者超时或者socket已经关闭
             let buf = client.read(0);
             if buf == "" {
                 break;
@@ -9710,12 +10184,12 @@ fn main() {
 }
 ```
 
-访问币安（Binance）的 WebSocket 行情接口：
+访问币安（binance）的WebSocket行情接口。
 
 ```javascript
 function main() {
     LogStatus("Connecting...")
-    // 访问币安的 WebSocket 接口
+    // 访问币安的WebSocket接口
     var client = Dial("wss://stream.binance.com:9443/ws/!ticker@arr")
     if (!client) {
         Log("Connection failed, exiting")
@@ -9723,7 +10197,7 @@ function main() {
     }
 
     while (true) {
-        // read 仅返回调用 read 之后接收到的数据
+        // read只返回调用read之后获取的数据
         var buf = client.read()
         if (!buf) {
             break
@@ -9773,7 +10247,7 @@ def main():
 ```rust
 fn main() {
     LogStatus!("Connecting...");
-    // 访问币安的 WebSocket 接口
+    // 访问币安的WebSocket接口
     let mut client = Dial("wss://stream.binance.com:9443/ws/!ticker@arr");
     if !client.Valid() {
         Log!("Connection failed, exiting");
@@ -9781,13 +10255,13 @@ fn main() {
     }
 
     loop {
-        // read 仅返回调用 read 之后接收到的数据
+        // read只返回调用read之后获取的数据
         let buf = client.read(0);
         if buf == "" {
             break;
         }
         let obj = JSONParse(&buf).unwrap();
-        // Rust SDK 没有 JSON 序列化功能，此处使用字符串拼接来构造状态栏表格的 JSON 文本
+        // Rust SDK 没有 JSON 序列化功能，使用字符串拼接构造状态栏表格的 JSON 文本
         let mut rows = String::new();
         if let Some(arr) = obj.as_array() {
             for ticker in arr {
@@ -9859,10 +10333,9 @@ fn main() {
 }
 ```
 
-```address```参数的详细说明：在标准地址```wss://ws.okx.com:8443/ws/v5/public```之后，使用```|```符号进行分隔。如果参数字符串中包含```|```字符，则使用```||```作为分隔符。分隔符之后的部分为功能参数设置，各参数之间使用```&```字符连接。
+```address```参数的详细说明，在正常的地址：```wss://ws.okx.com:8443/ws/v5/public```后，以```|```符号分隔。如果参数字符串中有```|```字符，则以```||```作为分隔符号。之后的部分是一些功能参数设置，各个参数之间用```&```字符连接。
 
-例如，同时设置```ss5```代理和压缩参数时，可以写作：
-
+例如```ss5```代理和压缩参数一起设置时可以写作：
 ```Dial("wss://ws.okx.com:8443/ws/v5/public|proxy=socks5://xxx:9999&compress=gzip_raw&mode=recv")```
 
 | Dial函数的address参数支持的功能 | 参数说明 |
@@ -9870,10 +10343,10 @@ fn main() {
 | WebSocket协议数据压缩相关的参数：compress=参数值 | compress为压缩方式，可选gzip、gzip_raw（也可写作flate）、zlib（也可写作deflate）。gzip_raw为不带gzip头的原始deflate数据，接收的数据不是标准gzip格式时可以使用。设置不支持的值会报错。 |
 | WebSocket协议数据压缩相关的参数：mode=参数值 | mode为压缩模式，只支持recv（接收压缩数据，本地解压缩），不设置时默认为recv。设置了compress时，mode设置为send或dual会报错。 |
 | WebSocket协议启用compression设置：enableCompression=true | 该参数可以设置但不生效，不进行WebSocket的permessage-deflate压缩协商。 |
-| WebSocket协议设置底层自动重连相关的参数：reconnect=参数值 | reconnect用于设置是否自动重连，reconnect=true表示启用重连。未设置该参数时默认不重连。 |
-| WebSocket协议设置底层自动重连相关的参数：interval=参数值 | interval为重试的时间间隔，单位为毫秒。例如interval=10000表示重试间隔为10秒；未设置时默认为1秒，即interval=1000。 |
+| WebSocket协议设置底层自动重连相关的参数：reconnect=参数值 | reconnect为是否设置重连，reconnect=true为启用重连。不设置该参数时默认不重连。 |
+| WebSocket协议设置底层自动重连相关的参数：interval=参数值 | interval为重试时间间隔，单位毫秒，interval=10000为重试间隔10秒，不设置默认1秒，即interval=1000。 |
 | WebSocket协议设置底层自动重连相关的参数：payload=参数值 | payload为WebSocket重连时需要发送的订阅消息，例如：payload=okok。 |
-| socks5代理的相关参数：proxy=参数值 | proxy用于设置ss5代理，参数值格式为：socks5://name:pwd@192.168.0.1:1080。其中name为ss5服务端的用户名，pwd为ss5服务端的登录密码，1080为ss5服务的端口。 |
+| socks5代理的相关参数：proxy=参数值 | proxy为ss5代理设置，参数值格式：socks5://name:pwd@192.168.0.1:1080，name为ss5服务端用户名，pwd为ss5服务端登录密码，1080为ss5服务的端口。 |
 | WebSocket接收缓冲区上限：qsize=参数值 | qsize为接收缓冲区最多保存的消息条数，不设置时默认4096。 |
 | WebSocket接收缓冲区上限：qbytes=参数值 | qbytes为接收缓冲区最多保存的字节数，不设置时默认16777216（16MB）。 |
 
@@ -9881,14 +10354,23 @@ fn main() {
 
 使用Dial函数连接数据库时，连接字符串的写法如下：
 
-| 支持的数据库 | 连接字符串（Connection String） | 备注 |
-| - | - | - |
-| sqlite3 | sqlite3://test1.db | ```sqlite3://```前缀表示使用的是sqlite3数据库。相对路径的数据库文件位于实盘目录（```logs/storage/<实盘ID>/```）下；```sqlite3://:memory:```为内存数据库，不创建文件，连接关闭后数据即丢弃；也支持```sqlite3://file:test.db?cache=shared&mode=memory```这样的URI写法。 |
-| mysql | mysql://username:yourpassword@tcp(localhost:3306)/yourdatabase?charset=utf8mb4&parseTime=true | ```mysql://```之后的写法与Go语言MySQL驱动（go-sql-driver/mysql）的DSN相同。```charset```、```collation```、```timeout```、```readTimeout```、```writeTimeout```、```tls```（```true```、```false```、```skip-verify```、```preferred```）等参数生效，也可以用```ssl-mode```设置TLS；```parseTime```、```loc```只校验取值，不生效；不支持自定义TLS配置名；其它无法识别的参数作为会话变量，连接后执行```SET 参数名 = 参数值```。也可写作URL形式：```mysql://username:yourpassword@localhost:3306/yourdatabase```。 |
-| postgres | postgres://user=username password=yourpassword host=localhost port=5432 dbname=yourdatabase sslmode=disable | libpq键值对写法，各项以空格分隔。```sslmode```按libpq的语义：```disable```不使用TLS，```require```等使用TLS但不校验证书，只有```verify-ca```、```verify-full```校验证书；不支持```sslrootcert```、```sslcert```、```sslkey```、```passfile```、```service```等需要读取文件的参数；其它无法识别的参数作为运行时参数设置。也可写作URL形式：```postgres://username:yourpassword@localhost:5432/yourdatabase?sslmode=disable```。 |
-| clickhouse | clickhouse://tcp://localhost:9000?username=username&password=yourpassword&database=yourdatabase | ```clickhouse://```之后的写法与Go语言ClickHouse驱动（clickhouse-go）的DSN相同：```tcp://```使用原生TCP协议（端口9000；端口9440或者参数```secure=true```时使用TLS，```skip_verify=true```时不校验证书），也可写作```http://```、```https://```使用HTTP接口；其它无法识别的参数作为ClickHouse设置（settings）。也可写作URL形式：```clickhouse://username:yourpassword@localhost:9000/yourdatabase```，默认使用原生TCP协议，使用```clickhouse+http://```、```clickhouse+https://```前缀或者端口8123、8443时使用HTTP接口。 |
+| 支持的数据库 | 连接字符串（Connection String） |
+| - | - |
+| sqlite3 | sqlite3://test1.db |
+| mysql | mysql://username:yourpassword@tcp(localhost:3306)/yourdatabase?charset=utf8mb4&parseTime=true |
+| postgres | postgres://user=username password=yourpassword host=localhost port=5432 dbname=yourdatabase sslmode=disable |
+| clickhouse | clickhouse://tcp://localhost:9000?username=username&password=yourpassword&database=yourdatabase |
+
+各数据库连接字符串的说明：
+
+- sqlite3：```sqlite3://```前缀表示使用的是sqlite3数据库。相对路径的数据库文件位于实盘目录（```logs/storage/<实盘ID>/```）下；```sqlite3://:memory:```为内存数据库，不创建文件，连接关闭后数据即丢弃；也支持```sqlite3://file:test.db?cache=shared&mode=memory```这样的URI写法。
+- mysql：```mysql://```之后的写法与Go语言MySQL驱动（go-sql-driver/mysql）的DSN相同。```charset```、```collation```、```timeout```、```readTimeout```、```writeTimeout```、```tls```（```true```、```false```、```skip-verify```、```preferred```）等参数生效，也可以用```ssl-mode```设置TLS；```parseTime```、```loc```只校验取值，不生效；不支持自定义TLS配置名；其它无法识别的参数作为会话变量，连接后执行```SET 参数名 = 参数值```。也可写作URL形式：```mysql://username:yourpassword@localhost:3306/yourdatabase```。
+- postgres：libpq键值对写法，各项以空格分隔。```sslmode```按libpq的语义：```disable```不使用TLS，```require```等使用TLS但不校验证书，只有```verify-ca```、```verify-full```校验证书；不支持```sslrootcert```、```sslcert```、```sslkey```、```passfile```、```service```等需要读取文件的参数；其它无法识别的参数作为运行时参数设置。也可写作URL形式：```postgres://username:yourpassword@localhost:5432/yourdatabase?sslmode=disable```。
+- clickhouse：```clickhouse://```之后的写法与Go语言ClickHouse驱动（clickhouse-go）的DSN相同：```tcp://```使用原生TCP协议（端口9000；端口9440或者参数```secure=true```时使用TLS，```skip_verify=true```时不校验证书），也可写作```http://```、```https://```使用HTTP接口；其它无法识别的参数作为ClickHouse设置（settings）。也可写作URL形式：```clickhouse://username:yourpassword@localhost:9000/yourdatabase```，默认使用原生TCP协议，使用```clickhouse+http://```、```clickhouse+https://```前缀或者端口8123、8443时使用HTTP接口。
 
 ```address```中```|```之后的参数以```&```连接、以```=```赋值，所以```payload```的内容含有```=```、```&```等字符（例如base64编码的签名、JSON）时会干扰解析。这种情况不要写进```payload```，而是连接成功后用```write()```发送订阅消息。
+
+See also: `Dial返回对象`, `HttpQuery`, `EventLoop`, `DBExec`, `threading.Serve`, `exchange.Encode`
 
 #### Mail
 
@@ -9908,6 +10390,8 @@ Parameters:
 - `body` (string, required): 邮件正文。
 
 Returns (bool): 邮件发送成功时返回真值，例如```true```；发送失败时返回假值，例如```false```。
+
+通过163邮箱的SMTP服务发送一封邮件。
 
 ```javascript
 function main(){
@@ -9942,18 +10426,20 @@ See also: `Mail_Go`
 Mail_Go(smtpServer, smtpUsername, smtpPassword, mailTo, title, body)
 ```
 
-```Mail```函数的异步版本。
+```Mail```函数的异步版本。支持JavaScript、Rust，Python不提供。
 
 Parameters:
 
-- `smtpServer` (string, required): 用于指定邮件发送方的```SMTP```服务器地址。
+- `smtpServer` (string, required): 用于指定邮件发送方的```SMTP```服务地址。
 - `smtpUsername` (string, required): 用于指定邮件发送方的邮箱地址。
-- `smtpPassword` (string, required): 邮件发送方邮箱的```SMTP```授权密码。
+- `smtpPassword` (string, required): 邮件发送方邮箱的```SMTP```密码。
 - `mailTo` (string, required): 用于指定邮件接收方的邮箱地址。
 - `title` (string, required): 邮件标题。
-- `body` (string, required): 邮件正文内容。
+- `body` (string, required): 邮件正文。
 
-Returns (object): ```Mail_Go```函数立即返回一个并发对象，可以使用该并发对象的```wait```方法获取邮件发送结果。邮件发送成功返回真值（例如：```true```），发送失败返回假值（例如：```false```）。
+Returns (object): 立即返回一个并发对象，可以使用该并发对象的```wait```方法获取邮件发送结果，邮件发送成功返回真值，例如：```true```，发送失败返回假值，例如：```false```。结果已被取走后再次调用```wait```时，```JavaScript```抛出异常```routine N already finished```。```Rust```语言中```wait```方法返回```Result<bool>```，发送成功为```Ok(true)```，发送失败为```Ok(false)```；邮件尚未发送完成时返回```Err```（```routine N not finished```），之后可以再次调用```wait```；结果取走后再调用```wait```返回```Err```（```routine N already finished```）。
+
+并发发送两封邮件，再分别等待发送结果。
 
 ```javascript
 function main() {
@@ -9965,14 +10451,25 @@ function main() {
 
     Log("ret1:", ret1)
     Log("ret2:", ret2)
+    // 输出：发送成功时 ret1、ret2 均为 true
 }
 ```
 
-```python
-# 不支持
+```rust
+fn main() {
+    let r1 = Mail_Go("smtp.163.com", "asdf@163.com", "password", "111@163.com", "title", "body");
+    let r2 = Mail_Go("smtp.163.com", "asdf@163.com", "password", "111@163.com", "title", "body");
+
+    // wait(0)一直等待到发送完成（对应JS的无参wait()），返回Result<bool>
+    let ret1 = r1.wait(0);
+    let ret2 = r2.wait(0);
+
+    Log!("ret1:", ret1);
+    Log!("ret2:", ret2);
+}
 ```
 
-在回测系统中不起作用。
+回测系统中不起作用。
 
 See also: `Mail`
 
@@ -9992,10 +10489,12 @@ _G(k, v)
 
 Parameters:
 
-- `k` (string / 空值, optional): 参数```k```为所保存键值对中的键名，区分大小写。
-- `v` (string / number / bool / object / array / 空值, optional): 参数```v```为所保存键值对中的键值，可以是任何能够进行```JSON```序列化的数据。
+- `k` (string / 空值, optional): 所保存键值对中的键名，区分大小写。
+- `v` (string / number / bool / object / array / 空值, optional): 所保存键值对中的键值，可以是任何能够进行```JSON```序列化的数据。
 
 Returns (string / number / bool / object / array / 空值): 持久化保存的```k-v```键值对中的键值数据。
+
+设置、修改、删除持久化变量，并读取实盘ID。
 
 ```javascript
 function main(){
@@ -10007,6 +10506,7 @@ function main(){
     _G("num", null)
     // 返回全局变量num的值
     Log(_G("num"))
+    // 输出：null（num 已被删除）
     // 删除所有全局变量
     _G(null)
     // 返回实盘ID
@@ -10020,6 +10520,7 @@ def main():
     _G("num", "ok")
     _G("num", None)
     Log(_G("num"))
+    # 输出：null（num 已被删除）
     _G(None)
     robotId = _G()
 ```
@@ -10070,15 +10571,9 @@ Parameters:
 - `sql` (string, required): **sql**语句字符串。
 - `arg` (string / number / bool / 空值, optional): **sql**语句中```?```占位符对应的参数值，按顺序传入，```arg```参数可以传多个。仅```JavaScript```、```Python```支持，```Rust```的```DBExec()```只接受**sql**语句一个参数。
 
-Returns (object): 包含**sql**语句执行结果的对象，例如：
+Returns (object): SQL语句的执行结果：```columns```为列名数组，```values```为各行数据组成的二维数组，例如```{"columns":["TS","CLOSE"],"values":[[1518970320000,100]]}```；结构见`DBExec-return`。
 
-    ```json
-
-    {"columns":["TS","HIGH","OPEN","LOW","CLOSE","VOLUME"],"values":[[1518970320000,100,99.1,90,100,12345.6]]}
-
-    ```
-
-支持内存数据库。对于```DBExec```函数的参数，如果**sql**语句以```:```开头，则在内存数据库中执行操作；由于无需写入文件，速度更快。此方式适用于无需持久化保存的数据库操作，例如：
+支持内存数据库，对于```DBExec```函数的参数，如果**sql**语句是以```:```开头则在内存数据库中操作，不写文件速度更快。适合不需要持久化保存的数据库操作，例如。
 
 ```javascript
 function main() {
@@ -10149,7 +10644,7 @@ fn main() {
 }
 ```
 
-使用 ```DBExec()``` 函数创建数据表。
+使用```DBExec()```函数创建表。
 
 ```javascript
 function main() {
@@ -10202,7 +10697,7 @@ fn main() {
 }
 ```
 
-对数据表中的记录执行增、删、查、改操作。
+表中记录的增删查改操作。
 
 ```javascript
 function main() {
@@ -10288,15 +10783,11 @@ fn main() {
 }
 ```
 
-- 通过向函数```DBExec()```传入参数，可对实盘数据库（SQLite 数据库）进行操作。
-
-  - 可实现对实盘数据库中数据的增、删、查、改等操作，并支持**SQLite**语法。
-
-  - 实盘数据库中的系统保留表包括：```kvdb```、```cfg```、```log```、```profit```、```chart```，请勿对这些表进行操作。
-
-  - 目前不支持**事务**，不建议执行此类操作，否则会引发系统冲突。
-
-  - ```DBExec()```函数仅支持实盘。
+- 函数```DBExec()```通过传入参数，可以操作实盘数据库（SQLite数据库）。
+- 实现对实盘数据库中数据的增、删、查、改等操作，支持**SQLite**语法。
+- 实盘数据库中系统保留表：```kvdb```、```cfg```、```log```、```profit```、```chart```，切勿对这些表进行操作。
+- 目前不支持**事务**，不建议执行此类操作，会引起系统中的冲突。
+- ```DBExec()```函数仅支持实盘。
 
 See also: `_G`
 
@@ -10313,6 +10804,47 @@ Parameters:
 - `data` (object / array / string / number / bool / 空值, required): 需要发布到频道的数据，可以是任何支持```JSON```序列化的数据结构，通常为包含实盘状态信息的对象。
 
 Returns (空值): 该函数无返回值。
+
+每分钟把BTC_USDT最新价发布到本实盘的频道。
+
+```javascript
+function main() {
+    while (true) {
+        var ticker = exchange.GetTicker("BTC_USDT")
+        if (ticker) {
+            // 发布最新状态，覆盖上一次发布的数据
+            SetChannelData({symbol: "BTC_USDT", last: ticker.Last, time: Date.now()})
+        }
+        Sleep(60000)
+    }
+}
+```
+
+```python
+import time
+def main():
+    while True:
+        ticker = exchange.GetTicker("BTC_USDT")
+        if ticker:
+            # 发布最新状态，覆盖上一次发布的数据
+            data = {"symbol": "BTC_USDT", "last": ticker["Last"], "time": time.time() * 1000}
+            SetChannelData(data)
+        Sleep(60000)
+```
+
+```rust
+fn main() {
+    loop {
+        if let Ok(ticker) = exchange.GetTicker("BTC_USDT") {
+            // 发布最新状态，覆盖上一次发布的数据；Rust 传JSON字符串
+            let data = format!(r#"{{"symbol": "BTC_USDT", "last": {}, "time": {}}}"#,
+                ticker.Last, Unix() * 1000);
+            SetChannelData(&data);
+        }
+        Sleep(60000);
+    }
+}
+```
 
 频道广播端示例 - 发布 BTC 行情价格数据
 
@@ -10566,37 +11098,74 @@ See also: `GetChannelData`; `_G`
 GetChannelData(channelId)
 ```
 
-订阅指定实盘的频道数据。该函数用于实盘间通信，可获取其他实盘通过```SetChannelData()```函数发布的最新状态数据。
+订阅指定实盘的频道数据。该函数用于实盘间通信，可以获取其他实盘通过```SetChannelData()```函数发布的最新状态数据。
 
 Parameters:
 
-- `channelId` (string / number, required): 频道标识符，支持以下两种类型：
+- `channelId` (string / number, required): 频道标识：其它实盘的实盘ID（实盘间通信，实盘ID可以用```_G()```获取），或32位UUID（订阅外部系统通过HTTP API发送到平台的数据）。
 
-1. **实盘ID**：用于订阅其他实盘的频道数据（即实盘间通信），可通过```_G()```函数获取实盘ID。
+Returns (object / array / string / number / bool / 空值): 返回订阅频道的最新状态数据。首次调用返回```null```，需要重试。数据结构由广播端发布的数据决定。
 
-2. **32位UUID**：用于订阅跨平台发送的数据（即外部系统通过HTTP API向FMZ平台发送的数据）。
+每5秒读取另一个实盘频道发布的最新价。
 
-Returns (object / array / string / number / bool / 空值): 返回所订阅频道的最新状态数据。首次调用时返回```null```，需要重试。数据结构由广播端发布的数据决定。
+```javascript
+function main() {
+    var channelId = "632799"    // 发布数据的实盘ID
+    while (true) {
+        var state = GetChannelData(channelId)
+        // 非阻塞调用：首次调用或对方还没有发布时为null
+        if (state) {
+            Log(state.symbol, "最新价", state.last)
+        }
+        Sleep(5000)
+    }
+}
+```
+
+```python
+def main():
+    channelId = "632799"    # 发布数据的实盘ID
+    while True:
+        state = GetChannelData(channelId)
+        # 非阻塞调用：首次调用或对方还没有发布时为None
+        if state:
+            Log(state["symbol"], "最新价", state["last"])
+        Sleep(5000)
+```
+
+```rust
+fn main() {
+    let channelId = "632799";    // 发布数据的实盘ID
+    loop {
+        // Rust 读取指定实盘的频道用 GetChannelDataOf；首次调用或对方还没有发布时为null
+        let state = GetChannelDataOf(channelId);
+        if !state.is_null() {
+            Log!(state["symbol"].clone(), "最新价", state["last"].clone());
+        }
+        Sleep(5000);
+    }
+}
+```
 
 频道订阅端示例 - 订阅两个实盘的频道数据
 
 ```javascript
 function main() {
-    // 需要订阅的两个频道 ID（请根据实际情况修改）
-    var channelId1 = "632799"  // 频道 1 的实盘 ID
-    var channelId2 = "632800"  // 频道 2 的实盘 ID
+    // 需要订阅的两个频道ID(根据实际情况修改)
+    var channelId1 = "632799"  // 频道1的实盘ID
+    var channelId2 = "632800"  // 频道2的实盘ID
 
     while(true) {
-        // 订阅频道 1 的当前状态
+        // 订阅频道1的当前状态
         var state1 = GetChannelData(channelId1)
 
-        // 订阅频道 2 的当前状态
+        // 订阅频道2的当前状态
         var state2 = GetChannelData(channelId2)
 
         // 构建状态显示
         var statusMsg = "频道订阅端 - 当前订阅状态\n\n"
 
-        // 显示频道 1 状态
+        // 显示频道1状态
         statusMsg += "═══ 频道1 [" + channelId1 + "] ═══\n"
         if (state1 !== null) {
             statusMsg += "更新ID: #" + state1.updateId + "\n"
@@ -10610,7 +11179,7 @@ function main() {
 
         statusMsg += "\n"
 
-        // 显示频道 2 状态
+        // 显示频道2状态
         statusMsg += "═══ 频道2 [" + channelId2 + "] ═══\n"
         if (state2 !== null) {
             statusMsg += "更新ID: #" + state2.updateId + "\n"
@@ -10624,28 +11193,28 @@ function main() {
 
         LogStatus(statusMsg)
 
-        Sleep(5000)  // 每 5 秒订阅一次频道
+        Sleep(5000)  // 每5秒订阅一次频道
     }
 }
 ```
 
 ```python
 def main():
-    # 需要订阅的两个频道 ID（请根据实际情况修改）
-    channelId1 = "632799"  # 频道 1 的实盘 ID
-    channelId2 = "632800"  # 频道 2 的实盘 ID
+    # 需要订阅的两个频道ID(根据实际情况修改)
+    channelId1 = "632799"  # 频道1的实盘ID
+    channelId2 = "632800"  # 频道2的实盘ID
 
     while True:
-        # 订阅频道 1 的当前状态
+        # 订阅频道1的当前状态
         state1 = GetChannelData(channelId1)
 
-        # 订阅频道 2 的当前状态
+        # 订阅频道2的当前状态
         state2 = GetChannelData(channelId2)
 
         # 构建状态显示
         statusMsg = "频道订阅端 - 当前订阅状态\n\n"
 
-        # 显示频道 1 状态
+        # 显示频道1状态
         statusMsg += "═══ 频道1 [{}] ═══\n".format(channelId1)
         if state1 is not None:
             statusMsg += "更新ID: #{}\n".format(state1["updateId"])
@@ -10658,7 +11227,7 @@ def main():
 
         statusMsg += "\n"
 
-        # 显示频道 2 状态
+        # 显示频道2状态
         statusMsg += "═══ 频道2 [{}] ═══\n".format(channelId2)
         if state2 is not None:
             statusMsg += "更新ID: #{}\n".format(state2["updateId"])
@@ -10671,7 +11240,7 @@ def main():
 
         LogStatus(statusMsg)
 
-        Sleep(5000)  # 每 5 秒订阅一次频道
+        Sleep(5000)  # 每5秒订阅一次频道
 ```
 
 ```rust
@@ -10708,15 +11277,15 @@ fn main() {
 }
 ```
 
-跨平台订阅示例 - 使用 UUID 订阅外部系统发送的数据
+跨平台订阅示例 - 使用UUID订阅外部系统发送的数据
 
 ```javascript
 function main() {
-    // 使用 32 位 UUID 作为频道标识符
+    // 使用32位UUID作为频道标识符
     let uuid = "6BC42A119B5DBFA2188A8279DA3B5C30"
 
     while (true) {
-        // 订阅 UUID 频道的数据
+        // 订阅UUID频道的数据
         let data = GetChannelData(uuid)
 
         if (data !== null) {
@@ -10725,18 +11294,18 @@ function main() {
             Log("Waiting for data... (first call returns null)")
         }
 
-        Sleep(10000)  // 每 10 秒检查一次
+        Sleep(10000)  // 每10秒检查一次
     }
 }
 ```
 
 ```python
 def main():
-    # 使用 32 位 UUID 作为频道标识符
+    # 使用32位UUID作为频道标识符
     uuid = "6BC42A119B5DBFA2188A8279DA3B5C30"
 
     while True:
-        # 订阅 UUID 频道的数据
+        # 订阅UUID频道的数据
         data = GetChannelData(uuid)
 
         if data is not None:
@@ -10744,7 +11313,7 @@ def main():
         else:
             Log("Waiting for data... (first call returns None)")
 
-        Sleep(10000)  # 每 10 秒检查一次
+        Sleep(10000)  # 每10秒检查一次
 ```
 
 ```rust
@@ -10767,27 +11336,27 @@ fn main() {
 }
 ```
 
-```GetChannelData()```函数为非阻塞调用，调用后立即返回，不会等待数据接收完成。
+```GetChannelData()```函数是非阻塞调用，调用后立即返回，不会等待数据接收完成。
 
-首次调用```GetChannelData()```函数时会返回```null```，需要重试并等待频道数据同步完成。
+首次调用```GetChannelData()```函数时会返回```null```，需要重试等待频道数据同步完成。
 
-每次调用获取的均为频道上的最新状态数据，而非历史消息队列。
+每次调用获取的都是频道上的最新状态数据，不是历史消息队列。
 
-一个实盘可同时订阅多个不同实盘的频道，只需多次调用```GetChannelData()```并分别传入不同的实盘ID即可。
+一个实盘可以同时订阅多个不同实盘的频道，只需多次调用```GetChannelData()```并传入不同的实盘ID。
 
 每个实盘最多订阅10个不同的频道（实盘ID频道与UUID频道合计），第一次读取某个频道即为订阅该频道。超过上限时该次调用返回空值，并记录一条错误日志```channel subscriber exceed limit```，策略不会中止。
 
-当前实盘也可以订阅自身的频道，即```robotId```参数可以是当前实盘的ID。
+当前实盘也可以订阅自己的频道，即```robotId```参数可以是当前实盘ID。
 
-频道数据可跨实盘、跨托管者、跨服务器进行传输。
+频道数据可以跨实盘、跨托管者、跨服务器进行传输。
 
 广播端使用```SetChannelData()```函数发布频道数据。
 
 ```Rust```中读取指定频道使用```GetChannelDataOf(channelId)```，无参的```GetChannelData()```读取本实盘自身的频道。
 
-频道通信适用于实盘环境，在回测系统中该功能可能受限。
+频道通信适用于实盘环境，回测系统中该功能可能受限。
 
-```GetChannelData()```函数支持跨平台订阅功能。当使用32位UUID作为频道标识符时，可接收来自FMZ平台外部系统通过HTTP API发送的数据。外部系统需同时指定实盘ID和UUID才能发送数据；同一托管者下的所有实盘均可订阅该UUID频道的数据，而不同托管者的实盘则无法订阅。
+```GetChannelData()```函数支持跨平台订阅功能。使用32位UUID作为频道标识符时，可以接收来自FMZ平台外部系统通过HTTP API发送的数据。外部系统需要指定实盘ID和UUID才能发送数据，同一托管者下的所有实盘都可以订阅到该UUID频道的数据，不同托管者的实盘无法订阅。
 
 See also: `SetChannelData`; `_G`
 
@@ -10814,30 +11383,30 @@ exchange.Go(method)
 exchange.Go(method, ...args)
 ```
 
-多线程异步支持函数，可将所有受支持函数的操作转换为异步并发执行。
+多线程异步支持函数，可以把所有支持的函数的操作变成异步并发执行。
 
 Parameters:
 
-- `method` (string, required): ```method```参数用于指定要并发执行的函数名称，请注意该参数为函数名称字符串，而非函数引用。
-- `arg` (string / number / bool / object / array / function / any (平台支持的任意类型), optional): **并发执行函数**的参数，参数```arg```可以有多个。参数```arg```的类型与数量取决于**并发执行函数**的参数定义。
+- `method` (string, required): 并发的函数名称，注意该参数是函数名称字符串，并非函数引用。
+- `arg` (string / number / bool / object / array / function / any, optional): **并发执行函数**的参数，参数```arg```可能有多个。参数```arg```的类型与个数根据**并发执行函数**的参数而定。
 
 Returns (object): 立即返回一个并发对象，用它的```wait()```方法取得并发调用的结果，见`exchange.Go-return`。
 
-```exchange.Go()```函数的使用范例。判断```undefined```时需使用```typeof(xx) === "undefined"```，因为```null == undefined```在 JavaScript 中是成立的。
+```exchange.Go()```函数使用范例，判断```undefined```要用```typeof(xx) === "undefined"```，因为```null == undefined```在JavaScript里是成立的。
 
 ```javascript
 function main(){
-    // 以下四种操作为并发多线程异步执行，不会耗时，会立即返回
+    // 以下四种操作是并发多线程异步执行, 不会耗时, 立即返回的
     var a = exchange.Go("GetTicker")
     var b = exchange.Go("GetDepth")
     var c = exchange.Go("Buy", 1000, 0.1)
     var d = exchange.Go("GetRecords", PERIOD_H1)
 
-    // 调用 wait 方法等待异步获取 ticker 的结果
+    // 调用wait方法等待返回异步获取ticker结果
     var ticker = a.wait()
-    // 返回深度数据，如果获取失败也有可能返回 null
+    // 返回深度, 如果获取失败也是有可能返回null的
     var depth = b.wait()
-    // 返回订单号，限定 1 秒超时，超时返回 undefined，若上次 wait 超时，此对象可继续调用 wait 等待
+    // 返回订单号, 限定1秒超时, 超时返回undefined, 此对象可以继续调用wait等待如果上次wait超时
     var orderId = c.wait(1000)
     if(typeof(orderId) == "undefined") {
         // 超时，重新获取
@@ -10864,20 +11433,20 @@ def main():
 
 ```rust
 fn main() {
-    // Rust 中 exchange.Go 为类型化写法：使用 Go:: 方法 token 指定并发函数，无参数传 ()，有参数传元组
-    // 以下四种操作为并发多线程异步执行，不会耗时，会立即返回
+    // Rust中exchange.Go为类型化写法：用Go::方法token指定并发函数，无参传()，有参传元组
+    // 以下四种操作是并发多线程异步执行, 不会耗时, 立即返回的
     let a = exchange.Go(Go::GetTicker, ());
     let b = exchange.Go(Go::GetDepth, ());
-    // Rust 中没有 Buy 的 token，等价于 CreateOrder，第一个参数 "" 表示当前交易对
+    // Rust中没有Buy的token，等价于CreateOrder，第一个参数""表示当前交易对
     let c = exchange.Go(Go::CreateOrder, ("", "buy", 1000, 0.1));
     let d = exchange.Go(Go::GetRecords, ("", PERIOD_H1));   // 参数依次为交易对（""表示当前交易对）、K线周期
 
-    // 调用 wait 方法等待异步获取 ticker 的结果，wait(0) 会阻塞直到并发线程运行完毕（对应 JS 的无参 wait()）
+    // 调用wait方法等待返回异步获取ticker结果，wait(0)阻塞直到并发线程运行完毕（对应JS的无参wait()）
     let ticker = a.wait(0);
-    // 返回深度数据，如果获取失败也有可能返回 Err
+    // 返回深度, 如果获取失败也是有可能返回Err的
     let depth = b.wait(0);
-    // 返回订单号，限定 1 秒超时，超时返回 Err，若上次 wait 超时，此对象可继续调用 wait 等待
-    // 注意：Err 也可能是下单本身失败（超时的错误信息为 routine N not finished）；下单失败时结果已被取走，再次 wait 会返回 Err（routine N already finished）
+    // 返回订单号, 限定1秒超时, 超时返回Err, 此对象可以继续调用wait等待如果上次wait超时
+    // 注意：Err也可能是下单本身失败（超时的错误信息为routine N not finished）；下单失败时结果已被取走，再次wait会返回Err（routine N already finished）
     let mut orderId = c.wait(1000);
     if orderId.is_err() {
         // 超时，重新获取
@@ -10887,14 +11456,14 @@ fn main() {
 }
 ```
 
-对已释放的并发对象调用其```wait()```方法会报错：
+对已经释放的并发对象，调用其```wait()```方法会报错。
 
 ```javascript
 function main() {
     var d = exchange.Go("GetRecords", PERIOD_H1)
-    // 等待 K 线数据返回结果
+    // 等待K线结果
     var records = d.wait()
-    // 此处对已经 wait 过且已结束的异步操作再次调用 wait，会抛出异常：routine N already finished
+    // 这里wait了一个已经wait过且结束的异步操作，会抛出异常：routine N already finished
     var ret = d.wait()
 }
 ```
@@ -10908,16 +11477,16 @@ def main():
 
 ```rust
 fn main() {
-    // Rust 中 exchange.Go 采用类型化写法：通过 Go:: 方法 token 指定并发函数
+    // Rust中exchange.Go为类型化写法：用Go::方法token指定并发函数
     let d = exchange.Go(Go::GetRecords, ("", PERIOD_H1));   // 参数依次为交易对（""表示当前交易对）、K线周期
-    // 等待 K 线数据返回结果，wait(0) 会阻塞直到运行完毕（对应 JS 的无参 wait()）
+    // 等待K线结果，wait(0)阻塞直到运行完毕（对应JS的无参wait()）
     let records = d.wait(0);
-    // 此处对已经 wait 过且已结束的异步操作再次调用 wait，将返回 Err（routine N already finished）
+    // 这里wait了一个已经wait过且结束的异步操作，会返回Err（routine N already finished）
     let ret = d.wait(0);
 }
 ```
 
-并发获取多个交易所行情：
+并发获取多个交易所行情。
 
 ```javascript
 function main() {
@@ -11022,12 +11591,12 @@ fn main() {
 }
 ```
 
-并发调用```exchange.IO("api", ...)```函数：
+对```exchange.IO("api", ...)```函数并发调用。
 
 ```javascript
 function main() {
     /*
-        测试OKX期货下单接口
+        使用OKX期货下单接口测试
         POST /api/v5/trade/order
     */
 
@@ -11073,14 +11642,14 @@ def main():
 ```rust
 fn main() {
     /*
-        测试OKX期货下单接口
+        使用OKX期货下单接口测试
         POST /api/v5/trade/order
     */
 
     let beginTS = UnixNano() / 1000000;
-    // Rust不支持JSON序列化，直接使用原始字符串构造参数
+    // Rust无JSON序列化，直接用原始字符串构造参数
     let param = r#"{"instId":"BTC-USDT-SWAP","tdMode":"cross","side":"buy","ordType":"limit","px":"16000","sz":"1","posSide":"long"}"#;
-    // 在Rust中，exchange.Go采用类型化写法，token为Go::IO，参数以元组形式传入
+    // Rust中exchange.Go为类型化写法，token为Go::IO，参数以元组传入
     let ret1 = exchange.Go(Go::IO, ("api", "POST", "/api/v5/trade/order", "", param));
     let ret2 = exchange.Go(Go::IO, ("api", "POST", "/api/v5/trade/order", "", param));
     let ret3 = exchange.Go(Go::IO, ("api", "POST", "/api/v5/trade/order", "", param));
@@ -11097,23 +11666,23 @@ fn main() {
 }
 ```
 
-自动释放机制的测试
+针对自动释放机制的测试
 
 ```javascript
 function main() {
     var counter = 0
-    var arr = []                 // 用于测试持续引用并发对象的相关变量
+    var arr = []                 // 用于测试持续引用并发的相关变量
     var symbols = ["BTC_USDT", "ETH_USDT", "SOL_USDT", "LTC_USDT", "EOS_USDT"]
     while (true) {
         var arrRoutine = []
         for (var symbol of symbols) {
             var r = exchange.Go("GetTicker", symbol)
-            arrRoutine.push(r)   // 记录并发对象，用于调用 r.wait() 函数获取结果，每轮循环都会清空
-            // arr.push(r)       // 若使用这句代码，运行时会持续引用并发对象，导致其无法自动释放；未取结果的并发任务达到 2000 个后，再调用 exchange.Go() 会报错：too many routine wait, max is 2000
+            arrRoutine.push(r)   // 记录并发对象用于调用 r.wait() 函数获取结果，每一轮循环都清空
+            // arr.push(r)       // 如果使用这句代码，运行时持续引用并发的对象，无法自动释放；未取结果的并发任务达到2000个后，再调用exchange.Go()会报错：too many routine wait, max is 2000
             counter++
         }
 
-        // 遍历 arrRoutine 并调用 r.wait() 获取结果
+        // 遍历 arrRoutine 调用 r.wait()
 
         LogStatus(_D(), "routine number:", counter)
         Sleep(50)
@@ -11124,19 +11693,19 @@ function main() {
 ```rust
 fn main() {
     let mut counter = 0;
-    let mut arr: Vec<TypedRoutine<Go::GetTicker>> = Vec::new();   // 用于测试持续引用并发对象的相关变量
+    let mut arr: Vec<TypedRoutine<Go::GetTicker>> = Vec::new();   // 用于测试持续引用并发的相关变量
     let symbols = ["BTC_USDT", "ETH_USDT", "SOL_USDT", "LTC_USDT", "EOS_USDT"];
     loop {
         let mut arrRoutine = Vec::new();
         for symbol in symbols {
-            // Rust 中 exchange.Go 为类型化写法，token 为 Go::GetTicker
+            // Rust中exchange.Go为类型化写法，token为Go::GetTicker
             let r = exchange.Go(Go::GetTicker, (symbol,));
-            arrRoutine.push(r);   // 记录并发对象，用于调用 r.wait(0) 函数获取结果，每轮循环都会清空
-            // arr.push(r);       // 若使用这句代码，运行时会持续引用并发对象，导致其无法自动释放；未取结果的并发任务达到 2000 个后，再调用 exchange.Go() 会报错：too many routine wait, max is 2000
+            arrRoutine.push(r);   // 记录并发对象用于调用 r.wait(0) 函数获取结果，每一轮循环都清空
+            // arr.push(r);       // 如果使用这句代码，运行时持续引用并发的对象，无法自动释放；未取结果的并发任务达到2000个后，再调用exchange.Go()会报错：too many routine wait, max is 2000
             counter += 1;
         }
 
-        // 遍历 arrRoutine 并调用 r.wait(0) 获取结果
+        // 遍历 arrRoutine 调用 r.wait(0)
 
         LogStatus!(_D(None), "routine number:", counter);
         Sleep(50);
@@ -11144,15 +11713,15 @@ fn main() {
 }
 ```
 
-该函数仅在实盘运行时创建多线程执行任务，回测不支持多线程并发执行任务（回测中可用，但仍为顺序执行）。
+该函数只在实盘运行时创建多线程执行任务，回测不支持多线程并发执行任务（回测可用，但是还是顺序执行）。
 
 并发对象```wait()```方法的超时参数，以及各语言在完成、超时、重复调用时的返回值，见`exchange.Go-return`。```Python```中```wait()```返回```(结果, 是否成功)```两个值。
 
-虽然系统底层具有自动回收机制，但如果持续引用相关变量，并发任务的结果将不会被释放。当未取结果的并发任务达到2000个时，再调用```exchange.Go()```提交新任务会当场报错：```"too many routine wait, max is 2000"```，该任务不会执行。
+虽然系统底层有自动回收机制，但是如果持续引用相关变量，并发任务的结果并不会释放。未取结果的并发任务达到2000个时，再调用```exchange.Go()```提交新任务会当场报错：```"too many routine wait, max is 2000"```，该任务不会执行。
 
-支持的函数：```GetTicker```，```GetDepth```，```GetTrades```，```GetRecords```，```GetAccount```，```GetOrders```，```GetOrder```，```CancelOrder```，```Buy```，```Sell```，```GetPositions```，```IO```等。这些函数并发调用时均基于当前`exchange`交易所对象执行。
+支持的函数：```GetTicker```，```GetDepth```，```GetTrades```，```GetRecords```，```GetAccount```，```GetOrders```，```GetOrder```，```CancelOrder```，```Buy```，```Sell```，```GetPositions```，```IO```等。这些函数并发调用时都基于当前`exchange`交易所对象执行。
 
-See also: `Mail_Go`, `HttpQuery_Go`, `EventLoop`, `exchange.IO`（API 限流控制）
+See also: `Mail_Go`, `HttpQuery_Go`, `EventLoop`, `exchange.IO`, `API限流控制`
 
 #### EventLoop
 
@@ -11161,20 +11730,15 @@ EventLoop()
 EventLoop(timeout)
 ```
 
-监听事件，当任意```WebSocket```有可读数据，或```exchange.Go()```、```HttpQuery_Go()```等并发任务完成后返回。
+监听事件，在有任意```WebSocket```可读数据或者```exchange.Go()```、```HttpQuery_Go()```等并发的任务完成以后返回。
 
 Parameters:
 
-- `timeout` (number, optional): 参数```timeout```用于设置超时时间，单位为毫秒。
-当```timeout```设置为0时，函数会一直等待，直到有事件发生才返回；当```timeout```大于0时，表示设置事件等待的超时时间；当```timeout```小于0时，则立即返回最近的事件。
+- `timeout` (number, optional): 超时时间（毫秒）：```0```等到有事件发生才返回，大于0为最长等待时间，小于0立即返回最近的事件。
 
-Returns (object): 如果返回的对象不为空值，则返回内容中的```Event```字段表示事件的触发类型。例如以下返回值结构：
+Returns (object): 事件对象，```Event```为事件类型，例如```{"Seq":1,"Event":"Exchange_GetTrades","ThreadId":0,"Index":3,"Nano":1682068771309583400}```，结构见`EventLoop-return`；超时没有事件时返回空值。
 
-```json
-
-{"Seq":1,"Event":"Exchange_GetTrades","ThreadId":0,"Index":3,"Nano":1682068771309583400}
-
-```
+并发获取行情、深度、成交记录，用EventLoop依次取回完成事件。
 
 ```javascript
 function main() {
@@ -11184,7 +11748,8 @@ function main() {
 
     // 并发任务在提交时就已登记：即使这里先Sleep(2000)，之后的EventLoop也不会错过这些任务的完成事件
 
-    // Log("GetDepth:", routine_getDepth.wait()) 如果这里提前调用wait函数取出GetDepth函数并发调用的结果，本次GetDepth函数收到请求结果的事件便不会在EventLoop函数中返回
+    // Log("GetDepth:", routine_getDepth.wait()) 如果这里提前调用wait函数取出GetDepth函数并发调用的结果，
+    // 此次GetDepth函数收到请求结果的事件便不会在EventLoop函数返回
     var ts1 = new Date().getTime()
     var ret1 = EventLoop(0)
 
@@ -11238,7 +11803,8 @@ fn main() {
 
     // 并发任务在提交时就已登记：即使这里先Sleep(2000)，之后的EventLoop也不会错过这些任务的完成事件
 
-    // Log!("GetDepth:", routine_getDepth.wait(0)) 如果这里提前调用wait函数取出GetDepth函数并发调用的结果，本次GetDepth函数收到请求结果的事件便不会在EventLoop函数中返回
+    // Log!("GetDepth:", routine_getDepth.wait(0)) 如果这里提前调用wait函数取出GetDepth函数并发调用的结果，
+    // 此次GetDepth函数收到请求结果的事件便不会在EventLoop函数返回
     let ts1 = Unix() * 1000;
     let ret1 = EventLoop(0);
 
@@ -11258,15 +11824,12 @@ fn main() {
 }
 ```
 
-```exchange.Go()```、```HttpQuery_Go()```等并发任务在提交时就已登记，即使任务在首次调用```EventLoop()```之前已经完成，也不会错过其完成事件。系统底层封装的队列结构每个线程最多可缓存10240个事件，如果程序运行过程中没有及时调用```EventLoop()```函数取出，超出上限时最早的事件将被丢弃。
-
-```EventLoop()```函数的调用不会影响系统底层WebSocket的缓存队列，也不会影响```exchange.Go()```等并发函数的缓存，这些缓存中的数据仍需使用各自的方法取出。对于在```EventLoop()```函数返回之前已经取出的数据，不会在```EventLoop()```函数中再次产生返回事件。
-
-```EventLoop()```函数的主要用途是通知策略层：系统底层已接收到新的网络数据，从而以事件驱动整个策略。当```EventLoop()```函数返回事件时，只需遍历所有数据来源（例如WebSocket连接、```exchange.Go()```创建的对象）尝试获取数据即可。
-
+```exchange.Go()```、```HttpQuery_Go()```等并发任务在提交时就已登记，即使任务在首次调用```EventLoop()```之前就已完成，也不会错过它的完成事件。底层系统封装的队列结构每个线程最多缓存10240个事件，如果程序执行过程中没有及时调用```EventLoop()```函数取出，超出上限时最早的事件会被丢弃。
+```EventLoop()```函数的调用不会影响系统底层WebSocket的缓存队列，也不影响```exchange.Go()```等并发函数的缓存，对于这些缓存依然需要使用各自的方法取出数据。对于在```EventLoop()```函数返回之前，已经取出的数据，不会在```EventLoop()```函数中产生返回事件。
+```EventLoop()```函数的主要用途就是通知策略层，系统底层接收到了新的网络数据。以事件驱动整个策略。当```EventLoop()```函数返回事件时，只需遍历所有数据来源。例如WebSocket连接、```exchange.Go()```创建的对象尝试获取数据。
 ```EventLoop()```函数仅支持实盘。
 
-在主函数```main()```中调用时，监听主线程的事件。在使用```JavaScript```语言编写的策略中，也可以在```threading.Thread()```函数创建的线程的执行函数中调用，用于监听当前线程的事件。
+在主函数```main()```中调用时，监听主线程的事件。在```JavaScript```语言编写的策略中，```threading.Thread()```函数创建的线程，在线程的执行函数中也可以调用，监听当前线程的事件。
 
 See also: `Dial`, `exchange.Go`, `HttpQuery_Go`
 
@@ -11486,7 +12049,7 @@ See also: `ctx.subscribe`, `ctx.poll`, `ctx.book`, `EventLoop`, `exchange.GetDep
 
 ```threading```对象作为全局多线程管理工具，提供了创建并发线程、线程锁、条件变量等功能。本章节介绍```threading```对象的成员函数。仅```JavaScript```语言策略支持该对象。
 
-##### Thread
+##### threading.Thread
 
 ```
 Thread(func, ...args)
@@ -11497,11 +12060,11 @@ Thread(...items)
 
 Parameters:
 
-- `func` (function, required): 参数```func```是用于并发执行的函数（通过引用传递），支持传入匿名函数。```func```可接受多个参数，这些参数将在并发执行时通过```...args```传入。因此，```func```的参数列表需要与```...args```保持一致。
-- `arg` (string / number / bool / object / array / function / any (平台支持的任意类型), optional): 参数```arg```是在回调执行时传递给```func```（即并发线程执行函数）的实际参数；参数```arg```可以有多个，```func```的参数列表需要与```...args```保持一致。
-- `item` (array, required): 参数```item```是一个数组，第一个元素是函数引用或函数源码字符串，其余元素是该函数的参数；调用```Thread```函数时，参数```item```可以传入多组。多组时在同一个线程里按以下顺序执行：先从最后一组倒序执行到第二组，最后执行第一组；第一组是主函数，其返回值作为```join()```结果中的```ret```。后面几组通常用来定义函数、加载库：源码字符串按全局脚本执行，其中定义的函数可以在主函数中调用（源码字符串不接收参数）。
+- `func` (function, required): 用于并发执行的函数（通过引用传递），支持传入匿名函数。```func```可接受多个参数，这些参数将在并发执行时通过```...args```传入。因此，```func```的参数列表需要与```...args```保持一致。
+- `arg` (string / number / bool / object / array / function / any, optional): 在回调执行时传递给```func```（即并发线程执行函数）的实际参数；参数```arg```可以有多个，```func```的参数列表需要与```...args```保持一致。
+- `item` (array, required): 一个数组，第一个元素是函数引用或函数源码字符串，其余元素是该函数的参数；调用```Thread```函数时，参数```item```可以传入多组。多组时在同一个线程里按以下顺序执行：先从最后一组倒序执行到第二组，最后执行第一组；第一组是主函数，其返回值作为```join()```结果中的```ret```。后面几组通常用来定义函数、加载库：源码字符串按全局脚本执行，其中定义的函数可以在主函数中调用（源码字符串不接收参数）。
 
-Returns (```Thread```对象): ```Thread()```函数返回一个```Thread```对象，用于管理创建的并发线程、线程通信等。
+Returns (`Thread`对象): ```Thread```对象，用于管理创建的并发线程、线程通信等。
 
 同时创建一个自定义函数和一个匿名函数的并发线程。
 
@@ -11585,7 +12148,7 @@ function main() {
 
 See also: `getThread`, `mainThread`, `currentThread`, `Lock`,  `Condition`, `Event`, `Dict`, `pending`,  `eventLoop`
 
-##### getThread
+##### threading.getThread
 
 ```
 getThread(threadId)
@@ -11595,9 +12158,9 @@ getThread(threadId)
 
 Parameters:
 
-- `threadId` (number, required): 参数```threadId```为线程对象ID，通过指定该参数获取对应的线程对象。
+- `threadId` (number, required): 线程对象ID，通过指定该参数获取对应的线程对象。
 
-Returns (```Thread```对象): ```getThread()```函数返回由参数threadId指定的```Thread```对象
+Returns (`Thread`对象): 由参数threadId指定的```Thread```对象
 
 通过```threadId```获取指定的线程对象。
 
@@ -11621,7 +12184,7 @@ function main() {
 
 See also: `Thread`, `mainThread`, `currentThread`, `Lock`,  `Condition`, `Event`, `Dict`, `pending`,  `eventLoop`
 
-##### mainThread
+##### threading.mainThread
 
 ```
 mainThread()
@@ -11629,7 +12192,7 @@ mainThread()
 
 ```mainThread()```函数用于获取主线程的线程对象，即策略中```main()```函数所在的线程。
 
-Returns (```Thread```对象): ```mainThread()```函数返回主线程的线程对象。
+Returns (`Thread`对象): 主线程的线程对象。
 
 获取主线程的```Thread```对象，输出主线程的```threadId```。
 
@@ -11656,7 +12219,7 @@ function main() {
 
 See also: `getThread`, `Thread`, `currentThread`, `Lock`,  `Condition`, `Event`, `Dict`, `pending`,  `eventLoop`
 
-##### currentThread
+##### threading.currentThread
 
 ```
 currentThread()
@@ -11664,7 +12227,7 @@ currentThread()
 
 ```currentThread()```函数用于获取当前线程的线程对象。
 
-Returns (```Thread```对象): ```currentThread()```函数返回当前线程的线程对象。
+Returns (`Thread`对象): 当前线程的线程对象。
 
 获取当前线程的```Thread```对象，输出当前线程的```threadId```。
 
@@ -11683,7 +12246,7 @@ function main() {
 
 See also: `Thread`, `mainThread`, `Thread`, `Lock`,  `Condition`, `Event`, `Dict`, `pending`,  `eventLoop`
 
-##### Lock
+##### threading.Lock
 
 ```
 Lock()
@@ -11691,7 +12254,7 @@ Lock()
 
 ```Lock()```函数用于创建线程锁对象。
 
-Returns (```ThreadLock```对象): ```Lock()```函数返回一个线程锁对象。
+Returns (`ThreadLock`对象): 线程锁对象。
 
 两个并发线程访问共享资源。
 
@@ -11733,7 +12296,7 @@ function main() {
 
 See also: `getThread`, `mainThread`, `currentThread`, `Thread`,  `Condition`, `Event`, `Dict`, `pending`,  `eventLoop`
 
-##### Condition
+##### threading.Condition
 
 ```
 Condition()
@@ -11741,7 +12304,7 @@ Condition()
 
 ```Condition()```函数用于创建一个条件变量对象，该对象用于在多线程并发环境中实现线程间的同步与通信。通过```Condition()```，一个线程可以在特定条件未满足时进入等待状态，直到另一个线程发出信号通知条件已满足。
 
-Returns (```ThreadCondition```对象): ```Condition()```函数返回一个```ThreadCondition```对象。
+Returns (`ThreadCondition`对象): ```ThreadCondition```对象。
 
 两个并发线程访问共享资源。
 
@@ -11790,7 +12353,7 @@ function main() {
 
 See also: `getThread`, `mainThread`, `currentThread`, `Lock`,  `Thread`, `Event`, `Dict`, `pending`,  `eventLoop`
 
-##### Event
+##### threading.Event
 
 ```
 Event()
@@ -11798,7 +12361,7 @@ Event()
 
 ```Event()```函数用于创建一个*线程事件*对象，该对象用于线程间的同步，允许一个线程等待另一个线程的通知或信号。
 
-Returns (```ThreadEvent```对象): ```Event()```函数返回一个```ThreadEvent```对象。
+Returns (`ThreadEvent`对象): ```ThreadEvent```对象。
 
 两个并发线程访问共享资源。
 
@@ -11857,7 +12420,7 @@ function main() {
 
 See also: `getThread`, `mainThread`, `currentThread`, `Lock`,  `Condition`, `Thread`, `Dict`, `pending`,  `eventLoop`
 
-##### Dict
+##### threading.Dict
 
 ```
 Dict()
@@ -11865,7 +12428,7 @@ Dict()
 
 ```Dict()```函数用于创建一个字典对象，用于在并发线程间传递和共享数据。
 
-Returns (```ThreadDict```对象): ```Dict()```函数返回一个```ThreadDict```对象。
+Returns (`ThreadDict`对象): ```ThreadDict```对象。
 
 向并发线程执行函数传入普通对象，测试修改对象键值后是否会影响其他线程中的对象键值。
 
@@ -11929,7 +12492,7 @@ function main() {
 
 See also: `getThread`, `mainThread`, `currentThread`, `Lock`,  `Condition`, `Event`, `Thread`, `pending`,  `eventLoop`
 
-##### Serve
+##### threading.Serve
 
 ```
 Serve(serveURI, handler)
@@ -11940,26 +12503,29 @@ Serve(serveURI, handler, ...args)
 
 Parameters:
 
-- `serveURI` (string, required): ```serveURI```参数配置服务的协议、绑定地址、端口以及可选的设置，例如：```http://0.0.0.0:8088?gzip=true```，可以省略IP写成```http://:8088?gzip=true```（监听所有网卡）；端口写```0```时随机分配空闲端口，实际地址用返回对象的```addr()```获取。
-- TCP协议
-  ```serveURI```参数设置例如：```tcp://127.0.0.1:6666```。
-- Http协议
-  ```serveURI```参数设置例如：```http://127.0.0.1:6666```。Websocket服务也使用Http协议，在处理函数中调用```ctx.upgrade("websocket")```切换。
-
-可以在```?```后面加入以下设置：
-- ```gzip=true```：启用gzip压缩。
-- ```tls=true```：启用TLS加密（Https、wss、TLS加密的TCP），必须同时用```cert_pem```和```cert_key_pem```传入PEM格式的证书和私钥（内容需要URL编码），例如：```http://:8443?tls=true&cert_pem=xxxx&cert_key_pem=xxxx```。协议前缀只支持```tcp://```和```http://```，Https服务写成```http://```加```tls=true```。
-- `handler` (function, required): ```handler```参数用于传入路由处理函数（Http协议）、消息处理函数（TCP协议）、Stream处理函数（Websocket）。每个TCP连接、每个Http请求都在独立的线程中调用一次该函数。
+- `serveURI` (string, required): 服务的协议、绑定地址、端口和可选设置，例如```http://0.0.0.0:8088?gzip=true```、```tcp://127.0.0.1:6666```；写法见备注。
+- `handler` (function, required): 路由处理函数（Http协议）、消息处理函数（TCP协议）、Stream处理函数（Websocket）。每个TCP连接、每个Http请求都在独立的线程中调用一次该函数。
 参数```handler```传入的回调函数可以定义多个参数，第一个参数为ctx对象（上下文对象）。
-- `arg` (string / number / bool / object / array / function / any (平台支持的任意类型), optional): 作为参数```handler```传入的**回调函数**的参数的实参，参数```arg```可能有多个，例如：
-```js
-threading.Serve("http://:8088", function(ctx, a, b, c) {
-    Log(`ctx.host():`, ctx.host(), ", a=", a, ", b=", b, ", c=", c)
-}, 1, 2, 3)
-```
-调用```Serve()```函数时传入的参数```1```, ```2```, ```3```对应传入回调函数的参数```a```, ```b```, ```c```。
+- `arg` (string / number / bool / object / array / function / any, optional): 传给回调函数```handler```的额外实参，可以有多个，依次对应回调函数中```ctx```之后的参数。
 
-Returns (Server对象): 返回`Server`对象。用```addr()```获取实际监听的IP地址、端口，例如：```127.0.0.1:8088```、```0.0.0.0:8089```；用```close()```、```stop()```关闭服务。
+Returns (`Server`对象): 返回`Server`对象。用```addr()```获取实际监听的IP地址、端口，例如：```127.0.0.1:8088```、```0.0.0.0:8089```；用```close()```、```stop()```关闭服务。
+
+启动一个Http服务，并从主线程请求它。
+
+```javascript
+function main() {
+    var server = threading.Serve("http://127.0.0.1:8088", function (ctx) {
+        ctx.write("hello " + ctx.path())
+    })
+    Log("serve on", server.addr())
+    // 输出：serve on 127.0.0.1:8088
+    Log(HttpQuery("http://127.0.0.1:8088/ping"))
+    // 输出：hello /ping
+    server.close()
+}
+```
+
+在一个进程内启动Http（含WebSocket）和TCP回显服务，并逐一测试。
 
 ```javascript
 function main() {
@@ -12045,10 +12611,6 @@ function main() {
 }
 ```
 
-```python
-# 不支持
-```
-
 - 该函数仅支持JavaScript语言策略。
 - 处理函数与`Thread`创建的线程一样运行在隔离环境中，不能引用外部变量、闭包或自定义函数，需要的数据通过```...args```传入；可以调用平台所有的API函数。`ThreadDict`、`ThreadLock`等对象也可以作为参数传入，与其它线程共享数据。
 - Http服务每个连接只处理一个请求，处理函数中```ctx.write()```写入的内容在函数返回后一次性发送。
@@ -12091,9 +12653,23 @@ function main() {
 - ctx.write(s)
   应用于Http/TCP协议，用于写入字符串数据，可以使用```JSON.stringify()```编码JSON对象为字符串之后写入。对于```WebSocket```协议，可以使用该方法将编码后的字符串传递给客户端。
 
+```serveURI```参数的写法：
+
+- 协议前缀只支持```tcp://```（TCP服务）和```http://```（HTTP服务）。WebSocket服务也用```http://```，在处理函数中调用```ctx.upgrade("websocket")```切换。
+- IP可以省略，写成```http://:8088```表示监听所有网卡；端口写```0```时随机分配空闲端口，实际地址用返回对象的```addr()```获取。
+- ```?```后面可以加```gzip=true```（启用gzip压缩）、```tls=true```（启用TLS加密：Https、wss、TLS加密的TCP）。启用TLS时必须同时用```cert_pem```和```cert_key_pem```传入PEM格式的证书和私钥（内容需要URL编码），例如```http://:8443?tls=true&cert_pem=xxxx&cert_key_pem=xxxx```；Https服务写成```http://```加```tls=true```。
+
+```arg```参数的用法：下面调用```Serve()```时传入的```1```、```2```、```3```依次成为回调函数的参数```a```、```b```、```c```。
+
+```javascript
+threading.Serve("http://:8088", function(ctx, a, b, c) {
+    Log(`ctx.host():`, ctx.host(), ", a=", a, ", b=", b, ", c=", c)
+}, 1, 2, 3)
+```
+
 See also: `Server`, `Dial`, `HttpQuery`, `Thread`
 
-##### pending
+##### threading.pending
 
 ```
 pending()
@@ -12101,7 +12677,7 @@ pending()
 
 ```pending```函数用于获取当前策略程序中正在运行的并发线程数量。
 
-Returns (number): ```pending()```函数返回当前策略程序中正在运行的并发线程数量。
+Returns (number): 当前策略程序中正在运行的并发线程数量。
 
 创建两个并发运行的线程，并在不同时间点调用```pending()```函数。
 
@@ -12141,7 +12717,7 @@ See also: `getThread`, `mainThread`, `currentThread`, `Lock`,  `Condition`, `Eve
 
 ```Thread```对象可以通过```threading.Thread()```、```threading.getThread()```、```threading.mainThread()```、```threading.currentThread()```创建或返回。
 
-##### peekMessage
+##### Thread.peekMessage
 
 ```
 peekMessage()
@@ -12152,9 +12728,9 @@ peekMessage(timeout)
 
 Parameters:
 
-- `timeout` (number, optional): 参数```timeout```为超时设置，按照该参数设置的毫秒数阻塞等待并返回数据；若无数据且超时则返回空值。如果```timeout```设置为0或不传```timeout```参数，则一直阻塞等待，直到接收到通道中的数据。如果```timeout```设置为-1，则不阻塞并立即返回数据，无数据时返回空值。
+- `timeout` (number, optional): 超时设置，按照该参数设置的毫秒数阻塞等待并返回数据；若无数据且超时则返回空值。如果```timeout```设置为0或不传```timeout```参数，则一直阻塞等待，直到接收到通道中的数据。如果```timeout```设置为-1，则不阻塞并立即返回数据，无数据时返回空值。
 
-Returns (string / number / bool / object / array / any (平台支持的任意类型)): ```peekMessage()```函数返回当前线程对象关联的线程所接收到的消息。
+Returns (string / number / bool / object / array / any): 当前线程对象关联的线程所接收到的消息。
 
 并发线程向主线程发送消息。
 
@@ -12185,7 +12761,7 @@ function main() {
 
 See also: `postMessage`, `join`, `terminate`, `getData`, `setData`, `id`, `name`, `eventLoop`
 
-##### postMessage
+##### Thread.postMessage
 
 ```
 postMessage(msg)
@@ -12195,7 +12771,7 @@ postMessage(msg)
 
 Parameters:
 
-- `msg` (string / number / bool / object / array / function / any (平台支持的任意类型), required): 参数```msg```为要发送的消息。
+- `msg` (string / number / bool / object / array / function / any, required): 要发送的消息。
 
 在并发线程中发送消息，使用```eventLoop()```接收消息通知。
 
@@ -12238,7 +12814,7 @@ function main() {
 
 See also: `peekMessage`, `join`, `terminate`, `getData`, `setData`, `id`, `name`, `eventLoop`
 
-##### join
+##### Thread.join
 
 ```
 join()
@@ -12249,15 +12825,9 @@ join(timeout)
 
 Parameters:
 
-- `timeout` (number, optional): ```timeout```参数用于设置等待线程结束的超时时间，单位为毫秒。当```timeout```参数设置为0或不设置```timeout```参数时，```join()```函数会阻塞，直到线程执行结束。当```timeout```参数设置为-1时，```join()```函数会立即返回。
+- `timeout` (number, optional): 等待线程结束的超时时间，单位为毫秒。```timeout```参数设置为0或者不设置```timeout```参数时```join()```函数会阻塞，等待到线程执行结束。```timeout```参数设置为-1时，```join()```函数会立即返回。
 
-Returns (```ThreadRet```对象): `ThreadRet`对象包含执行结果的相关数据，包含以下属性：
-
-- id: 线程ID。
-- terminated: 线程是否被强制终止。
-- elapsed: 线程的运行时间（纳秒）。
-- error: 线程函数抛出异常时的错误信息，没有异常时为null。
-- ret: 线程函数的返回值。
+Returns (`ThreadRet`对象): `ThreadRet`对象：线程Id（```id```）、是否被强制结束（```terminated```）、运行时间（```elapsed```，纳秒）、异常信息（```error```，没有异常时为null）和线程函数的返回值（```ret```）。
 
 测试```join()```函数超时，输出返回值。
 
@@ -12269,18 +12839,20 @@ function main() {
     })
 
     var ret = t1.join(1000)
-    Log("ret:", ret)   // ret: undefined
+    Log("ret:", ret)
+    // 输出：ret: undefined
 
     ret = t1.join()
-    Log("ret:", ret)   // ret: {"id":1,"terminated":false,"elapsed":5003252000,"error":null}
+    Log("ret:", ret)
+    // 输出：ret: {"id":1,"terminated":false,"elapsed":5003252000,"error":null}
 }
 ```
 
-当```join()```函数超时时，返回```undefined```。
+```join()```函数超时，返回```undefined```。
 
 See also: `peekMessage`, `postMessage`, `terminate`, `getData`, `setData`, `id`, `name`, `eventLoop`
 
-##### terminate
+##### Thread.terminate
 
 ```
 terminate()
@@ -12314,7 +12886,7 @@ function main() {
 
 See also: `peekMessage`, `postMessage`, `join`, `getData`, `setData`, `id`, `name`, `eventLoop`
 
-##### getData
+##### Thread.getData
 
 ```
 getData(key)
@@ -12324,9 +12896,9 @@ getData(key)
 
 Parameters:
 
-- `key` (string, required): ```key```参数为存储的键值对的键名。
+- `key` (string, required): 存储的键值对的键名。
 
-Returns (string / number / bool / object / array / any (平台支持的任意类型)): ```getData()```函数返回当前线程环境中存储的键值对中```key```参数对应的键值。
+Returns (string / number / bool / object / array / any): 当前线程环境中存储的键值对中```key```参数对应的键值。
 
 在并发线程的环境中记录键名为```count```的值，然后在主线程中读取```count```的键值。
 
@@ -12350,7 +12922,7 @@ function main() {
 
 See also: `peekMessage`, `postMessage`, `join`, `terminate`, `setData`, `id`, `name`, `eventLoop`
 
-##### setData
+##### Thread.setData
 
 ```
 setData(key, value)
@@ -12360,8 +12932,8 @@ setData(key, value)
 
 Parameters:
 
-- `key` (string, required): ```key```参数用于指定存储的键值对的键名。
-- `value` (string / number / bool / object / array / function / any (平台支持的任意类型), required): ```value```参数用于指定存储的键值对的键值。
+- `key` (string, required): 存储的键值对的键名。
+- `value` (string / number / bool / object / array / function / any, required): 存储的键值对的键值。
 
 在并发线程中设置键值对，在主线程中读取该键值对。
 
@@ -12404,7 +12976,7 @@ function main() {
 
 See also: `peekMessage`, `postMessage`, `join`, `terminate`, `getData`, `id`, `name`, `eventLoop`
 
-##### id
+##### Thread.id
 
 ```
 id()
@@ -12412,7 +12984,7 @@ id()
 
 ```id()```函数用于返回当前多线程对象实例的```threadId```。
 
-Returns (number): ```id()```函数返回```threadId```。
+Returns (number): 线程Id（```threadId```）。
 
 创建一个并发运行的线程，在主线程中输出该并发线程的```threadId```。
 
@@ -12428,7 +13000,7 @@ function main() {
 
 See also: `peekMessage`, `postMessage`, `join`, `terminate`, `getData`, `setData`, `name`, `eventLoop`
 
-##### name
+##### Thread.name
 
 ```
 name()
@@ -12436,7 +13008,7 @@ name()
 
 ```name()```函数用于返回当前多线程对象实例的名称。
 
-Returns (string): ```name()```函数返回并发线程的名称。
+Returns (string): 并发线程的名称。
 
 创建一个并发运行的线程，在主线程中输出该并发线程的名称。
 
@@ -12445,14 +13017,15 @@ function main() {
     var t1 = threading.Thread(function() {
         threading.currentThread().setData("data", 100)
     })
-    Log(`t1.name():`, t1.name())  // t1.name(): Thread-1
+    Log(`t1.name():`, t1.name())
+    // 输出：t1.name(): Thread-1
     t1.join()
 }
 ```
 
 See also: `peekMessage`, `postMessage`, `join`, `terminate`, `getData`, `setData`, `id`, `eventLoop`
 
-##### eventLoop
+##### Thread.eventLoop
 
 ```
 eventLoop()
@@ -12463,9 +13036,9 @@ eventLoop(timeout)
 
 Parameters:
 
-- `timeout` (number, optional): 参数 ```timeout``` 用于设置超时时间，单位为毫秒。若 ```timeout``` 设置为 0，则一直阻塞等待，直到有事件发生才返回；若大于 0，则设置事件等待的超时时间；若小于 0，则立即返回最近的事件。
+- `timeout` (number, optional): 超时时间，单位为毫秒。若 ```timeout``` 设置为 0，则一直阻塞等待，直到有事件发生才返回；若大于 0，则设置事件等待的超时时间；若小于 0，则立即返回最近的事件。
 
-Returns (object / 空值): ```eventLoop()``` 函数返回当前线程接收到的事件信息，详见`事件信息结构`。
+Returns (object / 空值): 当前线程接收到的事件信息，详见`事件信息结构`。
 
 并发执行 3 个线程，输出接收到的事件信息；当超时或立即返回时，输出的是空值。
 
@@ -12474,8 +13047,8 @@ function main() {
     var t1 = threading.Thread(function() {
         while (true) {
             var eventMsg = threading.currentThread().eventLoop()     // 阻塞等待
-            // 2024-11-14 10:14:18 thread1 eventMsg: {"Seq":1,"Event":"thread","ThreadId":0,"Index":1,"Queue":0,"Nano":1731550458699947000}
             Log(_D(), "thread1 eventMsg:", eventMsg)
+            // 输出：2024-11-14 10:14:18 thread1 eventMsg: {"Seq":1,"Event":"thread","ThreadId":0,"Index":1,"Queue":0,"Nano":1731550458699947000}
         }
     })
 
@@ -12511,7 +13084,7 @@ See also: `peekMessage`, `postMessage`, `join`, `terminate`, `getData`, `setData
 
 线程锁对象，用于多线程同步处理。
 
-##### acquire
+##### ThreadLock.acquire
 
 ```
 acquire()
@@ -12526,13 +13099,11 @@ Parameters:
 
 Returns (bool): 获得锁返回```true```，等待超时返回```false```。
 
-示例请参考```threading.Lock()```章节的内容。
-
 ```acquire()```函数用于请求线程锁。当线程调用某个线程锁对象的```acquire()```函数时，它会尝试获取该锁。如果锁当前未被其他线程占用，调用线程将成功获得锁并继续执行。如果锁已被其他线程持有，调用```acquire()```的线程将被阻塞，直到锁被释放。
 
 See also: `Lock`, `release`
 
-##### release
+##### ThreadLock.release
 
 ```
 release()
@@ -12593,7 +13164,7 @@ See also: `Lock`, `acquire`
 
 事件对象，用于多线程间的事件通知和信号传递。
 
-##### set
+##### ThreadEvent.set
 
 ```
 set()
@@ -12601,13 +13172,11 @@ set()
 
 ```set()```函数用于设置事件信号。
 
-请参考```threading.Event()```章节中的示例。
-
 对已经通过```set()```设置的事件再次调用```set()```没有额外效果。调用```set()```时正在```wait()```的线程都会被唤醒，即使紧接着调用了```clear()```。
 
-See also: `clear`, `wait`, `isSet`
+See also: `clear`, `wait`, `isSet`, `threading.Event`
 
-##### clear
+##### ThreadEvent.clear
 
 ```
 clear()
@@ -12615,11 +13184,9 @@ clear()
 
 ```clear()```函数用于清除信号。
 
-请参考```threading.Event()```章节中的示例。
+See also: `set`, `wait`, `isSet`, `threading.Event`
 
-See also: `set`, `wait`, `isSet`
-
-##### wait
+##### ThreadEvent.wait
 
 ```
 wait()
@@ -12630,9 +13197,9 @@ wait(timeout)
 
 Parameters:
 
-- `timeout` (number, optional): 参数```timeout```用于设置等待超时时间，单位为毫秒。
+- `timeout` (number, optional): 等待超时时间，单位为毫秒。
 
-Returns (bool): ```wait()```函数返回是否超时，如果发生超时则返回真值。
+Returns (bool): 返回是否超时，如果发生超时则返回真值。
 
 测试```wait()```函数的返回值。
 
@@ -12654,7 +13221,7 @@ function main() {
 
 See also: `set`, `clear`, `isSet`
 
-##### isSet
+##### ThreadEvent.isSet
 
 ```
 isSet()
@@ -12662,17 +13229,15 @@ isSet()
 
 ```isSet()```函数用于判断事件（信号）是否已被设置。
 
-Returns (bool): ```isSet()```函数返回事件（信号）的设置状态；如果事件（信号）已被设置，则返回真值。
+Returns (bool): 事件（信号）的设置状态；如果事件（信号）已被设置，则返回真值。
 
-请参考```threading.Event()```章节中的示例。
-
-See also: `set`, `clear`, `wait`
+See also: `set`, `clear`, `wait`, `threading.Event`
 
 #### ThreadCondition
 
 条件变量对象，用于实现多线程间的同步与通信。
 
-##### notify
+##### ThreadCondition.notify
 
 ```
 notify()
@@ -12741,7 +13306,7 @@ function main() {
 
 See also: `notifyAll`, `wait`,  `acquire`, `release`
 
-##### notifyAll
+##### ThreadCondition.notifyAll
 
 ```
 notifyAll()
@@ -12749,13 +13314,11 @@ notifyAll()
 
 ```notifyAll()```函数用于唤醒所有正在等待的线程。
 
-示例请参考```ThreadCondition.notify()```章节的内容。
-
 ```notifyAll()```函数会逐个唤醒所有处于等待状态的线程，被唤醒的线程将重新获取线程锁。
 
-See also: `notify`, `wait`,  `acquire`, `release`
+See also: `notify`, `wait`,  `acquire`, `release`, `threading.Condition`
 
-##### wait
+##### ThreadCondition.wait
 
 ```
 wait()
@@ -12763,13 +13326,11 @@ wait()
 
 ```wait()```函数用于在特定条件下使线程进入等待状态。
 
-示例请参考```ThreadCondition.notify()```章节的内容。
-
 ```wait()```函数会释放线程锁，当线程被唤醒时将重新获取线程锁。
 
-See also: `notify`, `notifyAll`, `acquire`, `release`
+See also: `notify`, `notifyAll`, `acquire`, `release`, `threading.Condition`
 
-##### acquire
+##### ThreadCondition.acquire
 
 ```
 acquire()
@@ -12777,13 +13338,11 @@ acquire()
 
 ```acquire()```函数用于请求线程锁（加锁）。
 
-示例请参考```ThreadCondition.notify()```章节的内容。
-
 在调用```wait()```之前必须先请求当前条件对象的线程锁（加锁）。
 
-See also: `notify`, `notifyAll`, `wait`,  `release`
+See also: `notify`, `notifyAll`, `wait`,  `release`, `threading.Condition`
 
-##### release
+##### ThreadCondition.release
 
 ```
 release()
@@ -12791,17 +13350,15 @@ release()
 
 ```release()```函数用于释放线程锁（解锁）。
 
-示例请参考```ThreadCondition.notify()```章节的内容。
-
 在调用```wait()```后需要释放当前条件对象的线程锁（解锁）。
 
-See also: `notify`, `notifyAll`, `wait`,  `acquire`
+See also: `notify`, `notifyAll`, `wait`,  `acquire`, `threading.Condition`
 
 #### ThreadDict
 
 线程安全的字典对象，用于在多线程环境中进行数据共享。
 
-##### get
+##### ThreadDict.get
 
 ```
 get(key)
@@ -12811,9 +13368,9 @@ get(key)
 
 Parameters:
 
-- `key` (string, required): 参数```key```用于指定要获取的键名。
+- `key` (string, required): 要获取的键名。
 
-Returns (string / number / bool / object / array / any (平台支持的任意类型)): ```get()```函数返回参数```key```指定的键对应的值。
+Returns (string / number / bool / object / array / any): 参数```key```指定的键对应的值。
 
 使用事件对象通知线程读取和修改数据。
 
@@ -12845,7 +13402,7 @@ function main() {
 
 See also: `set`
 
-##### set
+##### ThreadDict.set
 
 ```
 set(key, value)
@@ -12855,8 +13412,8 @@ set(key, value)
 
 Parameters:
 
-- `key` (string, required): 参数```key```用于指定需要设置的键名。
-- `value` (string / number / bool / object / array / function / any (平台支持的任意类型), required): 参数```value```用于指定需要设置的键值。
+- `key` (string, required): 需要设置的键名。
+- `value` (string / number / bool / object / array / function / any, required): 需要设置的键值。
 
 支持将函数作为键值传入。
 
@@ -12878,9 +13435,9 @@ See also: `get`
 
 #### Server
 
-```Server```对象由`threading.Serve()`返回，代表一个正在运行的服务。可以作为线程执行函数的参数传入其它线程，在其它线程中查询或关闭服务。
+```Server```对象是`threading.Serve`函数的返回值，代表一个正在运行的服务。可以作为线程执行函数的参数传入其它线程，在其它线程中查询或关闭服务。
 
-##### addr
+##### Server.addr
 
 ```
 addr()
@@ -12890,6 +13447,8 @@ addr()
 
 Returns (string): 监听地址，例如```127.0.0.1:8088```、```0.0.0.0:8089```。端口写```0```时返回系统分配的端口。
 
+在随机端口启动Http服务，观察处理中的请求数，再优雅关闭。
+
 ```javascript
 function main() {
     // 端口写 0 表示随机分配空闲端口，实际地址用 addr() 获取
@@ -12898,22 +13457,26 @@ function main() {
         ctx.write("done")
     })
     Log("listen on", server.addr())
+    // 输出：listen on 127.0.0.1:<随机端口>
 
     // 在另一个线程里发起请求，主线程观察服务状态
     threading.Thread(function (addr) {
         Log("response:", HttpQuery("http://" + addr + "/"))
+        // 输出：response: done（约1秒后）
     }, server.addr())
     Sleep(200)
-    Log("pending:", server.pending())  // 1：有一个请求正在处理
+    Log("pending:", server.pending())
+    // 输出：pending: 1（有一个请求正在处理）
 
     server.close()                      // 不再接收新连接，正在处理的请求继续执行
-    Log("idle:", server.join(5000))     // true：服务已关闭且请求都处理完了
+    Log("idle:", server.join(5000))
+    // 输出：idle: true（服务已关闭且请求都处理完了）
 }
 ```
 
 See also: `close`, `stop`, `join`, `pending`, `Serve`
 
-##### close
+##### Server.close
 
 ```
 close()
@@ -12921,6 +13484,8 @@ close()
 
 ```close()```函数停止接收新连接，正在执行的处理函数继续执行完（优雅关闭）。
 
+在随机端口启动Http服务，观察处理中的请求数，再优雅关闭。
+
 ```javascript
 function main() {
     // 端口写 0 表示随机分配空闲端口，实际地址用 addr() 获取
@@ -12929,16 +13494,20 @@ function main() {
         ctx.write("done")
     })
     Log("listen on", server.addr())
+    // 输出：listen on 127.0.0.1:<随机端口>
 
     // 在另一个线程里发起请求，主线程观察服务状态
     threading.Thread(function (addr) {
         Log("response:", HttpQuery("http://" + addr + "/"))
+        // 输出：response: done（约1秒后）
     }, server.addr())
     Sleep(200)
-    Log("pending:", server.pending())  // 1：有一个请求正在处理
+    Log("pending:", server.pending())
+    // 输出：pending: 1（有一个请求正在处理）
 
     server.close()                      // 不再接收新连接，正在处理的请求继续执行
-    Log("idle:", server.join(5000))     // true：服务已关闭且请求都处理完了
+    Log("idle:", server.join(5000))
+    // 输出：idle: true（服务已关闭且请求都处理完了）
 }
 ```
 
@@ -12946,13 +13515,15 @@ function main() {
 
 See also: `addr`, `stop`, `join`, `pending`, `Serve`
 
-##### stop
+##### Server.stop
 
 ```
 stop()
 ```
 
 ```stop()```函数先关闭服务（同```close()```），再强制结束所有正在执行的处理函数线程。
+
+在随机端口启动Http服务，观察处理中的请求数，再优雅关闭。
 
 ```javascript
 function main() {
@@ -12962,16 +13533,20 @@ function main() {
         ctx.write("done")
     })
     Log("listen on", server.addr())
+    // 输出：listen on 127.0.0.1:<随机端口>
 
     // 在另一个线程里发起请求，主线程观察服务状态
     threading.Thread(function (addr) {
         Log("response:", HttpQuery("http://" + addr + "/"))
+        // 输出：response: done（约1秒后）
     }, server.addr())
     Sleep(200)
-    Log("pending:", server.pending())  // 1：有一个请求正在处理
+    Log("pending:", server.pending())
+    // 输出：pending: 1（有一个请求正在处理）
 
     server.close()                      // 不再接收新连接，正在处理的请求继续执行
-    Log("idle:", server.join(5000))     // true：服务已关闭且请求都处理完了
+    Log("idle:", server.join(5000))
+    // 输出：idle: true（服务已关闭且请求都处理完了）
 }
 ```
 
@@ -12979,7 +13554,7 @@ function main() {
 
 See also: `addr`, `close`, `join`, `pending`, `Serve`
 
-##### join
+##### Server.join
 
 ```
 join()
@@ -12994,6 +13569,8 @@ Parameters:
 
 Returns (bool): 服务已关闭且没有正在执行的处理函数时返回```true```，超时返回```false```。
 
+在随机端口启动Http服务，观察处理中的请求数，再优雅关闭。
+
 ```javascript
 function main() {
     // 端口写 0 表示随机分配空闲端口，实际地址用 addr() 获取
@@ -13002,16 +13579,20 @@ function main() {
         ctx.write("done")
     })
     Log("listen on", server.addr())
+    // 输出：listen on 127.0.0.1:<随机端口>
 
     // 在另一个线程里发起请求，主线程观察服务状态
     threading.Thread(function (addr) {
         Log("response:", HttpQuery("http://" + addr + "/"))
+        // 输出：response: done（约1秒后）
     }, server.addr())
     Sleep(200)
-    Log("pending:", server.pending())  // 1：有一个请求正在处理
+    Log("pending:", server.pending())
+    // 输出：pending: 1（有一个请求正在处理）
 
     server.close()                      // 不再接收新连接，正在处理的请求继续执行
-    Log("idle:", server.join(5000))     // true：服务已关闭且请求都处理完了
+    Log("idle:", server.join(5000))
+    // 输出：idle: true（服务已关闭且请求都处理完了）
 }
 ```
 
@@ -13019,7 +13600,7 @@ function main() {
 
 See also: `addr`, `close`, `stop`, `pending`, `Serve`
 
-##### pending
+##### Server.pending
 
 ```
 pending()
@@ -13029,6 +13610,8 @@ pending()
 
 Returns (number): 正在执行的处理函数数量。
 
+在随机端口启动Http服务，观察处理中的请求数，再优雅关闭。
+
 ```javascript
 function main() {
     // 端口写 0 表示随机分配空闲端口，实际地址用 addr() 获取
@@ -13037,16 +13620,20 @@ function main() {
         ctx.write("done")
     })
     Log("listen on", server.addr())
+    // 输出：listen on 127.0.0.1:<随机端口>
 
     // 在另一个线程里发起请求，主线程观察服务状态
     threading.Thread(function (addr) {
         Log("response:", HttpQuery("http://" + addr + "/"))
+        // 输出：response: done（约1秒后）
     }, server.addr())
     Sleep(200)
-    Log("pending:", server.pending())  // 1：有一个请求正在处理
+    Log("pending:", server.pending())
+    // 输出：pending: 1（有一个请求正在处理）
 
     server.close()                      // 不再接收新连接，正在处理的请求继续执行
-    Log("idle:", server.join(5000))     // true：服务已关闭且请求都处理完了
+    Log("idle:", server.join(5000))
+    // 输出：idle: true（服务已关闭且请求都处理完了）
 }
 ```
 
@@ -13071,37 +13658,41 @@ TA.MACD(inReal, optInFastPeriod, optInSlowPeriod, optInSignalPeriod)
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInFastPeriod` (number, optional): ```optInFastPeriod```参数用于设置快线周期。
-- `optInSlowPeriod` (number, optional): ```optInSlowPeriod```参数用于设置慢线周期。
-- `optInSignalPeriod` (number, optional): ```optInSignalPeriod```参数用于设置信号线周期。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数据。
+- `optInFastPeriod` (number, optional): 快线周期。
+- `optInSlowPeriod` (number, optional): 慢线周期。
+- `optInSignalPeriod` (number, optional): 信号线周期。
 
-Returns (array): ```TA.MACD()```函数的返回值为二维数组，其结构为：```[DIF, DEA, MACD]```。
+Returns (array): 二维数组，其结构为：```[DIF, DEA, MACD]```。
+
+用15分钟K线计算MACD(12,26,9)。
 
 ```javascript
-function main(){
-    // 可以填入不同k线周期，比如PERIOD_M1,PERIOD_M30,PERIOD_H1......
+function main() {
     var records = exchange.GetRecords(PERIOD_M15)
+    if (!records) return
     var macd = TA.MACD(records, 12, 26, 9)
-    // 观看日志可得知返回三个数组，分别对应DIF，DEA，MACD
     Log("DIF:", macd[0], "DEA:", macd[1], "MACD:", macd[2])
+    // 输出：DIF: [...] DEA: [...] MACD: [...]，三个数组各与K线等长
 }
 ```
 
 ```python
 def main():
-    r = exchange.GetRecords(PERIOD_M15)
-    macd = TA.MACD(r, 12, 26, 9)
+    records = exchange.GetRecords(PERIOD_M15)
+    if not records:
+        return
+    macd = TA.MACD(records, 12, 26, 9)
     Log("DIF:", macd[0], "DEA:", macd[1], "MACD:", macd[2])
+    # 输出：DIF: [...] DEA: [...] MACD: [...]，三个数组各与K线等长
 ```
 
 ```rust
 fn main() {
-    // 可以填入不同k线周期，比如PERIOD_M1,PERIOD_M30,PERIOD_H1......
-    let records = exchange.GetRecords(None, PERIOD_M15, None).unwrap();
+    let Ok(records) = exchange.GetRecords(None, PERIOD_M15, None) else { return };
     let macd = TA.MACD(&records, 12, 26, 9);
-    // 观看日志可得知返回三个数组，分别对应DIF，DEA，MACD
     Log!("DIF:", macd[0], "DEA:", macd[1], "MACD:", macd[2]);
+    // 输出：DIF: [...] DEA: [...] MACD: [...]，三个数组各与K线等长
 }
 ```
 
@@ -13111,7 +13702,7 @@ fn main() {
 
 柱值```MACD``` = ```DIF``` - ```DEA```（不乘2）。EMA以前period根的简单平均作为初值，预热期为```NaN```（```Python```中为```None```）。
 
-See also: `TA.KDJ`, `TA.RSI`, `TA.ATR`, `TA.OBV`,  `TA.MA`, `TA.EMA`, `TA.BOLL`, `TA.Alligator`, `TA.CMF`, `TA.Highest`, `TA.Lowest`, `TA.SMA`
+See also: `TA`, `TA.EMA`, `TA.MA`, `TA.KDJ`, `TA.RSI`, `talib.MACD`
 
 #### TA.KDJ
 
@@ -13124,39 +13715,47 @@ TA.KDJ(inPriceHLC, period, kPeriod, dPeriod)
 
 Parameters:
 
-- `inPriceHLC` ({@struct/Record Record}结构数组, required): ```inPriceHLC```参数用于指定K线数据（计算使用最高价、最低价与收盘价），只接受K线数据。
-- `period` (number, optional): ```period```参数用于设置计算周期 1。
-- `kPeriod` (number, optional): ```kPeriod```参数用于设置计算周期 2。
-- `dPeriod` (number, optional): ```dPeriod```参数用于设置计算周期 3。
+- `inPriceHLC` ({@struct/Record Record}数组, required): K线数据（计算使用最高价、最低价与收盘价），只接受K线数据。
+- `period` (number, optional): 计算周期 1。
+- `kPeriod` (number, optional): 计算周期 2。
+- `dPeriod` (number, optional): 计算周期 3。
 
-Returns (array): ```TA.KDJ()```函数的返回值为二维数组，其结构为：```[K, D, J]```。
+Returns (array): 二维数组，其结构为：```[K, D, J]```。
+
+用15分钟K线计算KDJ(9,3,3)。
 
 ```javascript
-function main(){
+function main() {
     var records = exchange.GetRecords(PERIOD_M15)
+    if (!records) return
     var kdj = TA.KDJ(records, 9, 3, 3)
     Log("k:", kdj[0], "d:", kdj[1], "j:", kdj[2])
+    // 输出：k: [...] d: [...] j: [...]，三个数组各与K线等长
 }
 ```
 
 ```python
 def main():
-    r = exchange.GetRecords(PERIOD_M15)
-    kdj = TA.KDJ(r, 9, 3, 3)
+    records = exchange.GetRecords(PERIOD_M15)
+    if not records:
+        return
+    kdj = TA.KDJ(records, 9, 3, 3)
     Log("k:", kdj[0], "d:", kdj[1], "j:", kdj[2])
+    # 输出：k: [...] d: [...] j: [...]，三个数组各与K线等长
 ```
 
 ```rust
 fn main() {
-    let records = exchange.GetRecords(None, PERIOD_M15, None).unwrap();
+    let Ok(records) = exchange.GetRecords(None, PERIOD_M15, None) else { return };
     let kdj = TA.KDJ(&records, 9, 3, 3);
     Log!("k:", kdj[0], "d:", kdj[1], "j:", kdj[2]);
+    // 输出：k: [...] d: [...] j: [...]，三个数组各与K线等长
 }
 ```
 
 ```TA.KDJ()```函数的```period```、```kPeriod```、```dPeriod```参数的默认值分别为：```9```、```3```、```3```。
 
-See also: `TA.MACD`, `TA.RSI`, `TA.ATR`, `TA.OBV`,  `TA.MA`, `TA.EMA`, `TA.BOLL`, `TA.Alligator`, `TA.CMF`, `TA.Highest`, `TA.Lowest`, `TA.SMA`
+See also: `TA`, `TA.RSI`, `TA.MACD`, `TA.Highest`, `TA.Lowest`, `talib.STOCH`
 
 #### TA.RSI
 
@@ -13169,37 +13768,45 @@ TA.RSI(inReal, optInTimePeriod)
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数据。
+- `optInTimePeriod` (number, optional): 计算周期。
 
-Returns (array): ```TA.RSI()```函数的返回值为一维数组。
+Returns (array): 一维数组。
+
+用30分钟K线计算14周期RSI。
 
 ```javascript
-function main(){
+function main() {
     var records = exchange.GetRecords(PERIOD_M30)
+    if (!records) return
     var rsi = TA.RSI(records, 14)
     Log(rsi)
+    // 输出：与K线等长的数组，开头预热期为NaN
 }
 ```
 
 ```python
 def main():
-    r = exchange.GetRecords(PERIOD_M30)
-    rsi = TA.RSI(r, 14)
+    records = exchange.GetRecords(PERIOD_M30)
+    if not records:
+        return
+    rsi = TA.RSI(records, 14)
     Log(rsi)
+    # 输出：与K线等长的列表，开头预热期为None
 ```
 
 ```rust
 fn main() {
-    let records = exchange.GetRecords(None, PERIOD_M30, None).unwrap();
+    let Ok(records) = exchange.GetRecords(None, PERIOD_M30, None) else { return };
     let rsi = TA.RSI(&records, 14);
     Log!(rsi);
+    // 输出：与K线等长的数组，开头预热期为NaN
 }
 ```
 
 ```TA.RSI()```函数的```optInTimePeriod```参数的默认值为：```14```。
 
-See also: `TA.MACD`, `TA.KDJ`, `TA.ATR`, `TA.OBV`,  `TA.MA`, `TA.EMA`, `TA.BOLL`, `TA.Alligator`, `TA.CMF`, `TA.Highest`, `TA.Lowest`, `TA.SMA`
+See also: `TA`, `TA.KDJ`, `TA.MACD`, `TA.SMA`, `talib.RSI`
 
 #### TA.ATR
 
@@ -13212,37 +13819,45 @@ TA.ATR(inPriceHLC, optInTimePeriod)
 
 Parameters:
 
-- `inPriceHLC` ({@struct/Record Record}结构数组, required): ```inPriceHLC```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期。
+- `inPriceHLC` ({@struct/Record Record}数组, required): K线数据。
+- `optInTimePeriod` (number, optional): 计算周期。
 
-Returns (array): ```TA.ATR()```函数的返回值为一维数组。
+Returns (array): 一维数组。
+
+用30分钟K线计算14周期ATR。
 
 ```javascript
-function main(){
+function main() {
     var records = exchange.GetRecords(PERIOD_M30)
+    if (!records) return
     var atr = TA.ATR(records, 14)
     Log(atr)
+    // 输出：与K线等长的数组，开头预热期为NaN
 }
 ```
 
 ```python
 def main():
-    r = exchange.GetRecords(PERIOD_M30)
-    atr = TA.ATR(r, 14)
+    records = exchange.GetRecords(PERIOD_M30)
+    if not records:
+        return
+    atr = TA.ATR(records, 14)
     Log(atr)
+    # 输出：与K线等长的列表，开头预热期为None
 ```
 
 ```rust
 fn main() {
-    let records = exchange.GetRecords(None, PERIOD_M30, None).unwrap();
+    let Ok(records) = exchange.GetRecords(None, PERIOD_M30, None) else { return };
     let atr = TA.ATR(&records, 14);
     Log!(atr);
+    // 输出：与K线等长的数组，开头预热期为NaN
 }
 ```
 
 ```TA.ATR()```函数的```optInTimePeriod```参数默认值为：```14```。
 
-See also: `TA.MACD`, `TA.KDJ`, `TA.RSI`, `TA.OBV`,  `TA.MA`, `TA.EMA`, `TA.BOLL`, `TA.Alligator`, `TA.CMF`, `TA.Highest`, `TA.Lowest`, `TA.SMA`
+See also: `TA`, `TA.BOLL`, `TA.Highest`, `TA.Lowest`, `talib.ATR`
 
 #### TA.OBV
 
@@ -13254,34 +13869,42 @@ TA.OBV(inReal)
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组, required): ```inReal```参数用于指定K线数据（计算时使用K线数据中的收盘价与成交量）。
+- `inReal` ({@struct/Record Record}数组, required): K线数据（计算时使用K线数据中的收盘价与成交量）。
 
-Returns (array): ```TA.OBV()```函数的返回值为一维数组。
+Returns (array): 一维数组。
+
+用30分钟K线计算OBV。
 
 ```javascript
-function main(){
+function main() {
     var records = exchange.GetRecords(PERIOD_M30)
+    if (!records) return
     var obv = TA.OBV(records)
     Log(obv)
+    // 输出：与K线等长的数组，开头预热期为NaN
 }
 ```
 
 ```python
 def main():
-    r = exchange.GetRecords(PERIOD_M30)
-    obv = TA.OBV(r)
+    records = exchange.GetRecords(PERIOD_M30)
+    if not records:
+        return
+    obv = TA.OBV(records)
     Log(obv)
+    # 输出：与K线等长的列表，开头预热期为None
 ```
 
 ```rust
 fn main() {
-    let records = exchange.GetRecords(None, PERIOD_M30, None).unwrap();
+    let Ok(records) = exchange.GetRecords(None, PERIOD_M30, None) else { return };
     let obv = TA.OBV(&records);
     Log!(obv);
+    // 输出：与K线等长的数组，开头预热期为NaN
 }
 ```
 
-See also: `TA.MACD`, `TA.KDJ`, `TA.RSI`, `TA.ATR`,  `TA.MA`, `TA.EMA`, `TA.BOLL`, `TA.Alligator`, `TA.CMF`, `TA.Highest`, `TA.Lowest`, `TA.SMA`
+See also: `TA`, `TA.CMF`, `TA.MA`, `talib.OBV`
 
 #### TA.MA
 
@@ -13294,37 +13917,45 @@ TA.MA(inReal, optInTimePeriod)
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数据。
+- `optInTimePeriod` (number, optional): 计算周期。
 
-Returns (array): ```TA.MA()```函数的返回值为一维数组。
+Returns (array): 一维数组。
+
+用30分钟K线计算14周期均线。
 
 ```javascript
-function main(){
+function main() {
     var records = exchange.GetRecords(PERIOD_M30)
+    if (!records) return
     var ma = TA.MA(records, 14)
     Log(ma)
+    // 输出：与K线等长的数组，开头预热期为NaN
 }
 ```
 
 ```python
 def main():
-    r = exchange.GetRecords(PERIOD_M30)
-    ma = TA.MA(r, 14)
+    records = exchange.GetRecords(PERIOD_M30)
+    if not records:
+        return
+    ma = TA.MA(records, 14)
     Log(ma)
+    # 输出：与K线等长的列表，开头预热期为None
 ```
 
 ```rust
 fn main() {
-    let records = exchange.GetRecords(None, PERIOD_M30, None).unwrap();
+    let Ok(records) = exchange.GetRecords(None, PERIOD_M30, None) else { return };
     let ma = TA.MA(&records, 14);
     Log!(ma);
+    // 输出：与K线等长的数组，开头预热期为NaN
 }
 ```
 
 ```TA.MA()```函数的```optInTimePeriod```参数的默认值为：```9```。
 
-See also: `TA.MACD`, `TA.KDJ`, `TA.RSI`, `TA.ATR`, `TA.OBV`,  `TA.EMA`, `TA.BOLL`, `TA.Alligator`, `TA.CMF`, `TA.Highest`, `TA.Lowest`, `TA.SMA`
+See also: `TA`, `TA.EMA`, `TA.SMA`, `TA.BOLL`, `TA.MACD`, `talib.MA`
 
 #### TA.EMA
 
@@ -13337,44 +13968,49 @@ TA.EMA(inReal, optInTimePeriod)
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于传入K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数据。
+- `optInTimePeriod` (number, optional): 计算周期。
 
-Returns (array): ```TA.EMA()```函数的返回值为：一维数组。
+Returns (array): 一维数组。
+
+K线数量足够时计算9周期EMA。
 
 ```javascript
-function main(){
+function main() {
     var records = exchange.GetRecords()
     // 判断K线Bar数量是否满足指标计算所需的周期
     if (records && records.length > 9) {
         var ema = TA.EMA(records, 9)
         Log(ema)
+        // 输出：与K线等长的数组，开头预热期为NaN
     }
 }
 ```
 
 ```python
 def main():
-    r = exchange.GetRecords()
-    if r and len(r) > 9:
-        ema = TA.EMA(r, 9)
+    records = exchange.GetRecords()
+    if records and len(records) > 9:
+        ema = TA.EMA(records, 9)
         Log(ema)
+        # 输出：与K线等长的列表，开头预热期为None
 ```
 
 ```rust
 fn main() {
-    let records = exchange.GetRecords(None, None, None).unwrap();
+    let Ok(records) = exchange.GetRecords(None, None, None) else { return };
     // 判断K线Bar数量是否满足指标计算所需的周期
     if records.len() > 9 {
         let ema = TA.EMA(&records, 9);
         Log!(ema);
+        // 输出：与K线等长的数组，开头预热期为NaN
     }
 }
 ```
 
 ```TA.EMA()```函数的```optInTimePeriod```参数的默认值为：```9```。
 
-See also: `TA.MACD`, `TA.KDJ`, `TA.RSI`, `TA.ATR`, `TA.OBV`,  `TA.MA`, `TA.BOLL`, `TA.Alligator`, `TA.CMF`, `TA.Highest`, `TA.Lowest`, `TA.SMA`
+See also: `TA`, `TA.MA`, `TA.SMA`, `TA.MACD`, `talib.EMA`
 
 #### TA.BOLL
 
@@ -13387,16 +14023,18 @@ TA.BOLL(inReal, period, multiplier)
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `period` (number, optional): ```period```参数用于设置计算周期。
-- `multiplier` (number, optional): ```multiplier```参数用于设置乘数（标准差倍数）。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数据。
+- `period` (number, optional): 计算周期。
+- `multiplier` (number, optional): 乘数（标准差倍数）。
 
-Returns (array): ```TA.BOLL()```函数的返回值为二维数组，其结构为```[upLine, midLine, downLine]```。
+Returns (array): 二维数组，其结构为```[upLine, midLine, downLine]```。
+
+K线数量足够时计算20周期、2倍标准差的布林带。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
-    if(records && records.length > 20) {
+    if (records && records.length > 20) {
         var boll = TA.BOLL(records, 20, 2)
         var upLine = boll[0]
         var midLine = boll[1]
@@ -13404,39 +14042,42 @@ function main() {
         Log(upLine)
         Log(midLine)
         Log(downLine)
+        // 输出：上轨、中轨、下轨三个数组，各与K线等长
     }
 }
 ```
 
 ```python
 def main():
-    r = exchange.GetRecords()
-    if r and len(r) > 20:
-        boll = TA.BOLL(r, 20, 2)
+    records = exchange.GetRecords()
+    if records and len(records) > 20:
+        boll = TA.BOLL(records, 20, 2)
         upLine = boll[0]
         midLine = boll[1]
         downLine = boll[2]
         Log(upLine)
         Log(midLine)
         Log(downLine)
+        # 输出：上轨、中轨、下轨三个数组，各与K线等长
 ```
 
 ```rust
 fn main() {
-    let records = exchange.GetRecords(None, None, None).unwrap();
+    let Ok(records) = exchange.GetRecords(None, None, None) else { return };
     if records.len() > 20 {
         let boll = TA.BOLL(&records, 20, 2.0);
         let [upLine, midLine, downLine] = boll;
         Log!(upLine);
         Log!(midLine);
         Log!(downLine);
+        // 输出：上轨、中轨、下轨三个数组，各与K线等长
     }
 }
 ```
 
 ```TA.BOLL()```函数的```period```、```multiplier```参数的默认值分别为```20```和```2```。
 
-See also: `TA.MACD`, `TA.KDJ`, `TA.RSI`, `TA.ATR`, `TA.OBV`,  `TA.MA`, `TA.EMA`, `TA.Alligator`, `TA.CMF`, `TA.Highest`, `TA.Lowest`, `TA.SMA`
+See also: `TA`, `TA.MA`, `TA.ATR`, `TA.Highest`, `TA.Lowest`, `talib.BBANDS`
 
 #### TA.Alligator
 
@@ -13449,45 +14090,53 @@ TA.Alligator(inPriceHL, jawLength, teethLength, lipsLength)
 
 Parameters:
 
-- `inPriceHL` ({@struct/Record Record}结构数组, required): ```inPriceHL```参数用于指定K线数据（计算使用最高价与最低价的中值），只接受K线数据。
-- `jawLength` (number, optional): ```jawLength```参数用于设置下颚线（Jaw）的周期。
-- `teethLength` (number, optional): ```teethLength```参数用于设置牙齿线（Teeth）的周期。
-- `lipsLength` (number, optional): ```lipsLength```参数用于设置上唇线（Lips）的周期。
+- `inPriceHL` ({@struct/Record Record}数组, required): K线数据（计算使用最高价与最低价的中值），只接受K线数据。
+- `jawLength` (number, optional): 下颚线（Jaw）的周期。
+- `teethLength` (number, optional): 牙齿线（Teeth）的周期。
+- `lipsLength` (number, optional): 上唇线（Lips）的周期。
 
-Returns (array): ```TA.Alligator()```函数的返回值为二维数组，其结构为：```[jawLine, teethLine, lipsLine]```。下颚线、牙齿线、上唇线分别向右平移8、5、3根Bar：数组开头依次补8、5、3个```NaN```（```Python```中为```None```），因此三个数组分别比输入长8、5、3。
+Returns (array): 二维数组，其结构为：```[jawLine, teethLine, lipsLine]```。下颚线、牙齿线、上唇线分别向右平移8、5、3根Bar：数组开头依次补8、5、3个```NaN```（```Python```中为```None```），因此三个数组分别比输入长8、5、3。
+
+用默认参数计算鳄鱼线的下颚线、牙齿线、上唇线。
 
 ```javascript
-function main(){
+function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var alligator = TA.Alligator(records)
     Log("jawLine:", alligator[0])
     Log("teethLine:", alligator[1])
     Log("lipsLine:", alligator[2])
+    // 输出：三个数组分别比K线多8、5、3个元素（开头补NaN）
 }
 ```
 
 ```python
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     alligator = TA.Alligator(records)
     Log("jawLine:", alligator[0])
     Log("teethLine:", alligator[1])
     Log("lipsLine:", alligator[2])
+    # 输出：三个列表分别比K线多8、5、3个元素（开头补None）
 ```
 
 ```rust
 fn main() {
-    let records = exchange.GetRecords(None, None, None).unwrap();
+    let Ok(records) = exchange.GetRecords(None, None, None) else { return };
     let alligator = TA.Alligator(&records, None, None, None);
     Log!("jawLine:", alligator[0]);
     Log!("teethLine:", alligator[1]);
     Log!("lipsLine:", alligator[2]);
+    // 输出：三个数组分别比K线多8、5、3个元素（开头补NaN）
 }
 ```
 
 ```TA.Alligator()```函数的```jawLength```、```teethLength```、```lipsLength```参数默认值分别为：```13```、```8```、```5```。
 
-See also: `TA.MACD`, `TA.KDJ`, `TA.RSI`, `TA.ATR`, `TA.OBV`,  `TA.MA`, `TA.EMA`, `TA.BOLL`, `TA.CMF`, `TA.Highest`, `TA.Lowest`, `TA.SMA`
+See also: `TA`, `TA.MA`, `TA.SMA`, `TA.EMA`
 
 #### TA.CMF
 
@@ -13500,35 +14149,43 @@ TA.CMF(inReal, periods)
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组, required): ```inReal```参数用于指定K线数据（计算时使用K线数据中的最高价、最低价、收盘价与成交量）。
-- `periods` (number, optional): ```periods```参数用于指定计算周期，默认值为20。
+- `inReal` ({@struct/Record Record}数组, required): K线数据（计算时使用K线数据中的最高价、最低价、收盘价与成交量）。
+- `periods` (number, optional): 计算周期，默认值为20。
 
-Returns (array): ```TA.CMF()```函数的返回值为一维数组。
+Returns (array): 一维数组。
+
+用默认周期计算CMF。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var cmf = TA.CMF(records)
     Log(cmf)
+    // 输出：与K线等长的数组，开头预热期为NaN
 }
 ```
 
 ```python
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     cmf = TA.CMF(records)
     Log(cmf)
+    # 输出：与K线等长的列表，开头预热期为None
 ```
 
 ```rust
 fn main() {
-    let records = exchange.GetRecords(None, None, None).unwrap();
+    let Ok(records) = exchange.GetRecords(None, None, None) else { return };
     let cmf = TA.CMF(&records, None);
     Log!(cmf);
+    // 输出：与K线等长的数组，开头预热期为NaN
 }
 ```
 
-See also: `TA.MACD`, `TA.KDJ`, `TA.RSI`, `TA.ATR`, `TA.OBV`,  `TA.MA`, `TA.EMA`, `TA.BOLL`, `TA.Alligator`, `TA.Highest`, `TA.Lowest`, `TA.SMA`
+See also: `TA`, `TA.OBV`, `TA.ATR`, `talib.AD`
 
 #### TA.Highest
 
@@ -13541,34 +14198,42 @@ TA.Highest(inReal, period, attr)
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据或数值数组。
-- `period` (number, required): ```period```参数用于设置周期，必须传入；设为```0```表示计算所有```Bar```。
-- `attr` (string, optional): ```attr```参数用于指定属性，可选值：```Open```、```Close```、```Low```、```High```、```Volume```、```OpenInterest```。不传时把```inReal```视为数值数组。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数据或数值数组。
+- `period` (number, required): 周期，必须传入；设为```0```表示计算所有```Bar```。
+- `attr` (string, optional): 属性，可选值：```Open```、```Close```、```Low```、```High```、```Volume```、```OpenInterest```。不传时把```inReal```视为数值数组。
 
-Returns (number): ```TA.Highest()```函数返回最近指定周期内某个属性的最大值，不包含当前Bar。
+Returns (number): 最近指定周期内某个属性的最大值，不包含当前Bar。
+
+计算最近10根K线（不含当前Bar）开盘价的最高值。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var highestForOpen = TA.Highest(records, 10, "Open")
     Log(highestForOpen)
+    // 输出：一个数值，即这10根K线开盘价的最高值
 }
 ```
 
 ```python
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     highestForOpen = TA.Highest(records, 10, "Open")
     Log(highestForOpen)
+    # 输出：一个数值，即这10根K线开盘价的最高值
 ```
 
 ```rust
 fn main() {
-    let records = exchange.GetRecords(None, None, None).unwrap();
+    let Ok(records) = exchange.GetRecords(None, None, None) else { return };
     // Rust 的 TA.Highest 无属性名参数，先提取开盘价数值序列再计算（不包含当前Bar）
     let opens: Vec<f64> = records.iter().map(|r| r.Open).collect();
     let highestForOpen = TA.Highest(&opens, 10);
     Log!(highestForOpen);
+    // 输出：一个数值，即这10根K线开盘价的最高值
 }
 ```
 
@@ -13578,7 +14243,7 @@ fn main() {
 
 ```Rust```中```TA.Highest(src, n)```接受数值序列（传K线时取收盘价）；按字段计算请用```TA.HighestBy(&records, n, "High")```。
 
-See also: `TA.MACD`, `TA.KDJ`, `TA.RSI`, `TA.ATR`, `TA.OBV`,  `TA.MA`, `TA.EMA`, `TA.BOLL`, `TA.Alligator`, `TA.CMF`, `TA.Lowest`, `TA.SMA`
+See also: `TA`, `TA.Lowest`, `TA.BOLL`, `TA.ATR`, `talib.MAX`
 
 #### TA.Lowest
 
@@ -13591,34 +14256,42 @@ TA.Lowest(inReal, period, attr)
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据或数值数组。
-- `period` (number, required): ```period```参数用于设置周期，必须传入；设为```0```表示计算所有```Bar```。
-- `attr` (string, optional): ```attr```参数用于指定属性，可选值：```Open```、```Close```、```Low```、```High```、```Volume```、```OpenInterest```。不传时把```inReal```视为数值数组。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数据或数值数组。
+- `period` (number, required): 周期，必须传入；设为```0```表示计算所有```Bar```。
+- `attr` (string, optional): 属性，可选值：```Open```、```Close```、```Low```、```High```、```Volume```、```OpenInterest```。不传时把```inReal```视为数值数组。
 
-Returns (number): ```TA.Lowest()```函数返回最近一定周期内某个属性的最小值，不包含当前Bar。
+Returns (number): 最近一定周期内某个属性的最小值，不包含当前Bar。
+
+计算最近10根K线（不含当前Bar）开盘价的最低值。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var lowestForOpen = TA.Lowest(records, 10, "Open")
     Log(lowestForOpen)
+    // 输出：一个数值，即这10根K线开盘价的最低值
 }
 ```
 
 ```python
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     lowestForOpen = TA.Lowest(records, 10, "Open")
     Log(lowestForOpen)
+    # 输出：一个数值，即这10根K线开盘价的最低值
 ```
 
 ```rust
 fn main() {
-    let records = exchange.GetRecords(None, None, None).unwrap();
+    let Ok(records) = exchange.GetRecords(None, None, None) else { return };
     // Rust 的 TA.Lowest 无属性名参数，先提取开盘价数值序列再计算（不包含当前Bar）
     let opens: Vec<f64> = records.iter().map(|r| r.Open).collect();
     let lowestForOpen = TA.Lowest(&opens, 10);
     Log!(lowestForOpen);
+    // 输出：一个数值，即这10根K线开盘价的最低值
 }
 ```
 
@@ -13628,7 +14301,7 @@ fn main() {
 
 ```Rust```中```TA.Lowest(src, n)```接受数值序列（传K线时取收盘价）；按字段计算请用```TA.LowestBy(&records, n, "Low")```。
 
-See also: `TA.MACD`, `TA.KDJ`, `TA.RSI`, `TA.ATR`, `TA.OBV`,  `TA.MA`, `TA.EMA`, `TA.BOLL`, `TA.Alligator`, `TA.CMF`, `TA.Highest`, `TA.SMA`
+See also: `TA`, `TA.Highest`, `TA.BOLL`, `TA.ATR`, `talib.MIN`
 
 #### TA.SMA
 
@@ -13641,31 +14314,39 @@ TA.SMA(inReal, optInTimePeriod)
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于传入K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数据。
+- `optInTimePeriod` (number, optional): 计算周期。
 
-Returns (array): ```TA.SMA()```函数的返回值为：一维数组。
+Returns (array): 一维数组。
+
+用30分钟K线计算14周期SMA。
 
 ```javascript
-function main(){
+function main() {
     var records = exchange.GetRecords(PERIOD_M30)
+    if (!records) return
     var sma = TA.SMA(records, 14)
     Log(sma)
+    // 输出：与K线等长的数组，开头预热期为NaN
 }
 ```
 
 ```python
 def main():
-    r = exchange.GetRecords(PERIOD_M30)
-    sma = TA.SMA(r, 14)
+    records = exchange.GetRecords(PERIOD_M30)
+    if not records:
+        return
+    sma = TA.SMA(records, 14)
     Log(sma)
+    # 输出：与K线等长的列表，开头预热期为None
 ```
 
 ```rust
 fn main() {
-    let records = exchange.GetRecords(None, PERIOD_M30, None).unwrap();
+    let Ok(records) = exchange.GetRecords(None, PERIOD_M30, None) else { return };
     let sma = TA.SMA(&records, 14);
     Log!(sma);
+    // 输出：与K线等长的数组，开头预热期为NaN
 }
 ```
 
@@ -13673,19 +14354,35 @@ fn main() {
 
 ```TA.SMA()```与```TA.MA()```相同，都是简单移动平均。
 
-See also: `TA.MACD`, `TA.KDJ`, `TA.RSI`, `TA.ATR`, `TA.OBV`,  `TA.MA`, `TA.EMA`, `TA.BOLL`, `TA.Alligator`, `TA.CMF`, `TA.Highest`, `TA.Lowest`
+See also: `TA`, `TA.MA`, `TA.EMA`, `TA.RSI`, `talib.SMA`
 
 ### Talib
 
-```talib```对接TA-Lib指标库，支持```JavaScript```、```Python```策略调用（```Rust```不提供）。
+`talib`对接TA-Lib指标库，供`JavaScript`、`Python`策略调用（`Rust`不提供）。
 
-```JavaScript```中可直接传入K线数组（自动取各函数需要的字段）或数值数组；多输出函数返回二维数组；开头不足计算所需根数的部分为```NaN```。
+`JavaScript`中可直接传入K线数组（自动取各函数需要的字段）或数值数组；多输出函数返回二维数组；开头不足计算所需根数的部分为`NaN`。
 
-```Python```中的```talib```是托管者所在机器上安装的TA-Lib Python包（```pip install TA-Lib```，依赖```numpy```），未安装时调用会报错```Please install talib module for python```；需按函数要求传入```records.Close```等numpy数组，多输出函数返回由numpy数组组成的```tuple```。
+`Python`中的`talib`是托管者所在机器上安装的TA-Lib Python包（`pip install TA-Lib`，依赖`numpy`），未安装时调用会报错`Please install talib module for python`；需按函数要求传入`records.Close`等numpy数组，多输出函数返回由numpy数组组成的`tuple`。需要多个价格字段的函数（参数名为`inPriceHLC`、`inPriceOHLC`等）要按字段顺序分别传入，例如`talib.ATR(records.High, records.Low, records.Close)`。
 
-#### OverlapStudies
+#### 均线类型（MAType）
 
-均线与通道类指标（重叠研究）：移动平均、布林带、抛物线SAR等。
+`optInMAType`、`optInFastMAType`等均线类型参数的取值如下，默认都是`0`（SMA）。
+
+| 值 | 均线类型 |
+| - | - |
+| `0` | SMA（简单移动平均） |
+| `1` | EMA（指数移动平均） |
+| `2` | WMA（加权移动平均） |
+| `3` | DEMA（双重指数移动平均） |
+| `4` | TEMA（三重指数移动平均） |
+| `5` | TRIMA（三角移动平均） |
+| `6` | KAMA（考夫曼自适应移动平均） |
+| `7` | MAMA（MESA自适应移动平均） |
+| `8` | T3（T3三重指数移动平均） |
+
+#### 均线与通道
+
+均线与通道（Overlap Studies，重叠研究）类指标与价格画在同一坐标上，包括移动平均、布林带、抛物线SAR等。
 
 ##### talib.ACCBANDS
 
@@ -13694,19 +14391,23 @@ talib.ACCBANDS(inPriceHLC)
 talib.ACCBANDS(inPriceHLC, optInTimePeriod)
 ```
 
-```talib.ACCBANDS()```函数用于计算**Acceleration Bands (加速带)**。
+计算加速带（Acceleration Bands），返回上轨、中轨、下轨。
 
 Parameters:
 
-- `inPriceHLC` ({@struct/Record Record}结构数组, required): ```inPriceHLC```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置周期，默认值为20。
+- `inPriceHLC` ({@struct/Record Record}数组, required): K线数组，取最高价、最低价、收盘价；Python中依次传入`records.High`、`records.Low`、`records.Close`。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `20`。
 
-Returns (array): ```talib.ACCBANDS()```函数的返回值为：二维数组。该数组包含三个元素分别是：上轨数组、中轨数组、下轨数组。
+Returns (array): 二维数组，依次为上轨、中轨、下轨数组（Python中为同样顺序的tuple）。
+
+用最近的K线计算加速带。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.ACCBANDS(records)
+    // 输出：[上轨数组, 中轨数组, 下轨数组]
     Log(ret)
 }
 ```
@@ -13715,15 +14416,20 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     upper, middle, lower = talib.ACCBANDS(records.High, records.Low, records.Close)
+    # 输出：(上轨数组, 中轨数组, 下轨数组)
     Log(upper, middle, lower)
 ```
 
-```ACCBANDS()```函数在talib库文档中的描述为：```ACCBANDS(Records[High,Low,Close],Time Period = 20) = [Array(outRealUpperBand),Array(outRealMiddleBand),Array(outRealLowerBand)]```
+对应TA-Lib：`ACCBANDS(Records[High,Low,Close],Time Period = 20) = [Array(outRealUpperBand),Array(outRealMiddleBand),Array(outRealLowerBand)]`。
 
-上轨为```High * (1 + 4 * (High - Low) / (High + Low))```的简单移动平均，中轨为收盘价的简单移动平均，下轨为```Low * (1 - 4 * (High - Low) / (High + Low))```的简单移动平均，周期都是```optInTimePeriod```。
+上轨为`High * (1 + 4 * (High - Low) / (High + Low))`的简单移动平均，中轨为收盘价的简单移动平均，下轨为`Low * (1 - 4 * (High - Low) / (High + Low))`的简单移动平均，周期都是`optInTimePeriod`。
 
-```Python```的TA-Lib从0.6版本（C库与Python包都要0.6及以上）开始提供此函数，旧版本调用会报属性不存在的错误。
+`Python`的TA-Lib从0.6版本（C库与Python包都要0.6及以上）开始提供此函数，旧版本调用会报属性不存在的错误。
+
+See also: `talib.BBANDS`, `talib.SMA`, `talib.ATR`, `TA.BOLL`
 
 ##### talib.BBANDS
 
@@ -13735,22 +14441,26 @@ talib.BBANDS(inReal, optInTimePeriod, optInNbDevUp, optInNbDevDn)
 talib.BBANDS(inReal, optInTimePeriod, optInNbDevUp, optInNbDevDn, optInMAType)
 ```
 
-```talib.BBANDS()```函数用于计算**Bollinger Bands（布林带）**。
+计算布林带（Bollinger Bands），返回上轨、中轨、下轨。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为5。
-- `optInNbDevUp` (number, optional): ```optInNbDevUp```参数用于设置上轨标准差倍数，默认值为2。
-- `optInNbDevDn` (number, optional): ```optInNbDevDn```参数用于设置下轨标准差倍数，默认值为2。
-- `optInMAType` (number, optional): ```optInMAType```参数用于设置移动平均线类型，默认值为0。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `5`。
+- `optInNbDevUp` (number, optional): 上轨的标准差倍数。默认 `2`。
+- `optInNbDevDn` (number, optional): 下轨的标准差倍数。默认 `2`。
+- `optInMAType` (number, optional): 均线类型，取值见`Talib`的MAType表。默认 `0`（SMA）。
 
-Returns (array): ```talib.BBANDS()```函数返回一个二维数组，该数组包含三个元素，分别为：上轨数组、中轨数组、下轨数组。
+Returns (array): 二维数组，依次为上轨、中轨、下轨数组（Python中为同样顺序的tuple）。
+
+用最近的K线计算布林带。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.BBANDS(records)
+    // 输出：[上轨数组, 中轨数组, 下轨数组]
     Log(ret)
 }
 ```
@@ -13759,11 +14469,16 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.BBANDS(records.Close)
+    # 输出：(上轨数组, 中轨数组, 下轨数组)
     Log(ret)
 ```
 
-```BBANDS()```函数在talib库文档中的描述为：```BBANDS(Records[Close],Time Period = 5,Deviations up = 2,Deviations down = 2,MA Type = 0) = [Array(outRealUpperBand),Array(outRealMiddleBand),Array(outRealLowerBand)]```
+对应TA-Lib：`BBANDS(Records[Close],Time Period = 5,Deviations up = 2,Deviations down = 2,MA Type = 0) = [Array(outRealUpperBand),Array(outRealMiddleBand),Array(outRealLowerBand)]`。
+
+See also: `talib.ACCBANDS`, `talib.SMA`, `talib.STDDEV`, `talib.MA`, `TA.BOLL`
 
 ##### talib.DEMA
 
@@ -13772,18 +14487,21 @@ talib.DEMA(inReal)
 talib.DEMA(inReal, optInTimePeriod)
 ```
 
-```talib.DEMA()```函数用于计算**Double Exponential Moving Average（双指数移动平均线）**。
+计算双重指数移动平均线（Double Exponential Moving Average）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为30。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `30`。
 
-Returns (array): ```talib.DEMA()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算双重指数移动平均线。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.DEMA(records)
     Log(ret)
 }
@@ -13793,11 +14511,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.DEMA(records.Close)
     Log(ret)
 ```
 
-```DEMA()```函数在talib库文档中的描述为：```DEMA(Records[Close],Time Period = 30) = Array(outReal)```
+对应TA-Lib：`DEMA(Records[Close],Time Period = 30) = Array(outReal)`。
+
+See also: `talib.EMA`, `talib.TEMA`, `talib.T3`, `TA.EMA`
 
 ##### talib.EMA
 
@@ -13806,18 +14528,21 @@ talib.EMA(inReal)
 talib.EMA(inReal, optInTimePeriod)
 ```
 
-```talib.EMA()```函数用于计算**Exponential Moving Average（指数移动平均线）**。
+计算指数移动平均线（Exponential Moving Average）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为30。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `30`。
 
-Returns (array): ```talib.EMA()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算指数移动平均线。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.EMA(records)
     Log(ret)
 }
@@ -13827,11 +14552,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.EMA(records.Close)
     Log(ret)
 ```
 
-```EMA()```函数在talib库文档中的描述为：```EMA(Records[Close],Time Period = 30) = Array(outReal)```
+对应TA-Lib：`EMA(Records[Close],Time Period = 30) = Array(outReal)`。
+
+See also: `talib.SMA`, `talib.DEMA`, `talib.TEMA`, `talib.MA`, `TA.EMA`
 
 ##### talib.HT_TRENDLINE
 
@@ -13839,17 +14568,20 @@ def main():
 talib.HT_TRENDLINE(inReal)
 ```
 
-```talib.HT_TRENDLINE()```函数用于计算**Hilbert Transform - Instantaneous Trendline（希尔伯特变换瞬时趋势线）**。
+计算希尔伯特变换瞬时趋势线（Hilbert Transform - Instantaneous Trendline）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
 
-Returns (array): ```talib.HT_TRENDLINE()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算希尔伯特变换瞬时趋势线。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.HT_TRENDLINE(records)
     Log(ret)
 }
@@ -13859,11 +14591,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.HT_TRENDLINE(records.Close)
     Log(ret)
 ```
 
-```HT_TRENDLINE()```函数在talib库文档中的描述为：```HT_TRENDLINE(Records[Close]) = Array(outReal)```
+对应TA-Lib：`HT_TRENDLINE(Records[Close]) = Array(outReal)`。
+
+See also: `talib.HT_DCPERIOD`, `talib.HT_TRENDMODE`, `talib.MAMA`, `talib.KAMA`
 
 ##### talib.KAMA
 
@@ -13872,18 +14608,21 @@ talib.KAMA(inReal)
 talib.KAMA(inReal, optInTimePeriod)
 ```
 
-```talib.KAMA()```函数用于计算**Kaufman自适应移动平均线（Kaufman Adaptive Moving Average）**。
+计算考夫曼自适应移动平均线（Kaufman Adaptive Moving Average）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为30。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `30`。
 
-Returns (array): ```talib.KAMA()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算考夫曼自适应移动平均线。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.KAMA(records)
     Log(ret)
 }
@@ -13893,11 +14632,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.KAMA(records.Close)
     Log(ret)
 ```
 
-```KAMA()```函数在talib库文档中的描述为：```KAMA(Records[Close],Time Period = 30) = Array(outReal)```
+对应TA-Lib：`KAMA(Records[Close],Time Period = 30) = Array(outReal)`。
+
+See also: `talib.MAMA`, `talib.EMA`, `talib.MA`, `TA.MA`
 
 ##### talib.MA
 
@@ -13907,19 +14650,22 @@ talib.MA(inReal, optInTimePeriod)
 talib.MA(inReal, optInTimePeriod, optInMAType)
 ```
 
-```talib.MA()```函数用于计算**Moving average（移动平均线）**。
+计算移动平均线（Moving Average）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为30。
-- `optInMAType` (number, optional): ```optInMAType```参数用于设置移动平均线类型，默认值为0。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `30`。
+- `optInMAType` (number, optional): 均线类型，取值见`Talib`的MAType表。默认 `0`（SMA）。
 
-Returns (array): ```talib.MA()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算移动平均线。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.MA(records)
     Log(ret)
 }
@@ -13929,11 +14675,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.MA(records.Close)
     Log(ret)
 ```
 
-```MA()```函数在talib库文档中的描述为：```MA(Records[Close],Time Period = 30,MA Type = 0) = Array(outReal)```
+对应TA-Lib：`MA(Records[Close],Time Period = 30,MA Type = 0) = Array(outReal)`。
+
+See also: `talib.SMA`, `talib.EMA`, `talib.WMA`, `talib.MAVP`, `TA.MA`, `TA.EMA`
 
 ##### talib.MAMA
 
@@ -13943,20 +14693,24 @@ talib.MAMA(inReal, optInFastLimit)
 talib.MAMA(inReal, optInFastLimit, optInSlowLimit)
 ```
 
-```talib.MAMA()```函数用于计算**MESA自适应移动平均线（MESA Adaptive Moving Average）**。
+计算MESA自适应移动平均线（MESA Adaptive Moving Average），返回MAMA、FAMA。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInFastLimit` (number, optional): ```optInFastLimit```参数用于设置快速限制值，默认值为0.5。
-- `optInSlowLimit` (number, optional): ```optInSlowLimit```参数用于设置慢速限制值，默认值为0.05。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
+- `optInFastLimit` (number, optional): 快速限制（Fast Limit）。默认 `0.5`。
+- `optInSlowLimit` (number, optional): 慢速限制（Slow Limit）。默认 `0.05`。
 
-Returns (array): ```talib.MAMA()```函数返回二维数组。
+Returns (array): 二维数组，依次为MAMA、FAMA数组（Python中为同样顺序的tuple）。
+
+用最近的K线计算MESA自适应移动平均线。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.MAMA(records)
+    // 输出：[MAMA数组, FAMA数组]
     Log(ret)
 }
 ```
@@ -13965,11 +14719,16 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.MAMA(records.Close)
+    # 输出：(MAMA数组, FAMA数组)
     Log(ret)
 ```
 
-```MAMA()```函数在talib库文档中的描述为：```MAMA(Records[Close],Fast Limit = 0.5,Slow Limit = 0.05) = [Array(outMAMA),Array(outFAMA)]```
+对应TA-Lib：`MAMA(Records[Close],Fast Limit = 0.5,Slow Limit = 0.05) = [Array(outMAMA),Array(outFAMA)]`。
+
+See also: `talib.KAMA`, `talib.HT_TRENDLINE`, `talib.MA`
 
 ##### talib.MAVP
 
@@ -13980,21 +14739,24 @@ talib.MAVP(inReal, inPeriods, optInMinPeriod, optInMaxPeriod)
 talib.MAVP(inReal, inPeriods, optInMinPeriod, optInMaxPeriod, optInMAType)
 ```
 
-```talib.MAVP()```函数用于计算**Moving Average with Variable Period (可变周期移动平均)**。
+计算可变周期移动平均线（Moving Average with Variable Period）。
 
 Parameters:
 
-- `inReal` (数值数组, required): ```inReal```参数用于指定要计算均线的数据。
-- `inPeriods` (数值数组, required): ```inPeriods```参数用于指定每根K线使用的周期，长度必须与```inReal```相同；超出```[optInMinPeriod, optInMaxPeriod]```的值按边界计算。
-- `optInMinPeriod` (number, optional): ```optInMinPeriod```参数用于设置最小周期，默认值为2。
-- `optInMaxPeriod` (number, optional): ```optInMaxPeriod```参数用于设置最大周期，默认值为30。
-- `optInMAType` (number, optional): ```optInMAType```参数用于设置均线类型，默认值为0。
+- `inReal` (数值数组, required): 要计算均线的数据。
+- `inPeriods` (数值数组, required): 每根K线使用的周期，长度必须与`inReal`相同；超出`[optInMinPeriod, optInMaxPeriod]`的值按边界计算。
+- `optInMinPeriod` (number, optional): 最小周期。默认 `2`。
+- `optInMaxPeriod` (number, optional): 最大周期。默认 `30`。
+- `optInMAType` (number, optional): 均线类型，取值见`Talib`的MAType表。默认 `0`（SMA）。
 
-Returns (array): ```talib.MAVP()```函数的返回值为：一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+阳线用10、阴线用20作为周期，计算可变周期均线。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var closes = records.map(function(r) { return r.Close })
     // 每根K线的周期：阳线用10，阴线用20（仅作示例）
     var periods = records.map(function(r) { return r.Close > r.Open ? 10 : 20 })
@@ -14008,19 +14770,21 @@ import talib
 import numpy as np
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     # 每根K线的周期：阳线用10，阴线用20（仅作示例）
     periods = np.array([10.0 if r["Close"] > r["Open"] else 20.0 for r in records])
     ret = talib.MAVP(records.Close, periods, 10, 20)
     Log(ret)
 ```
 
-```MAVP()```函数在talib库文档中的描述为：```MAVP(Array(inReal),Array(inPeriods),Min Period = 2,Max Period = 30,MA Type = 0) = Array(outReal)```
+对应TA-Lib：`MAVP(Array(inReal),Array(inPeriods),Min Period = 2,Max Period = 30,MA Type = 0) = Array(outReal)`。
 
-第```i```个值是```inReal```截至第```i```个元素、周期为```inPeriods[i]```的移动平均；开头```optInMaxPeriod - 1```个值为```NaN```（与```inPeriods```的实际取值无关）。
+第`i`个值是`inReal`截至第`i`个元素、周期为`inPeriods[i]`的移动平均；开头`optInMaxPeriod - 1`个值为`NaN`（与`inPeriods`的实际取值无关）。
 
-两个输入都必须是数值数组：```JavaScript```中先用```map```从K线中取出字段，传入K线数组时两个输入都会取同一份K线的收盘价，结果没有意义；两个数组长度不同会报错。```Python```中两个输入都要是```float64```类型的numpy数组。
+两个输入都必须是数值数组：`JavaScript`中先用`map`从K线中取出字段，传入K线数组时两个输入都会取同一份K线的收盘价，结果没有意义；两个数组长度不同会报错。`Python`中两个输入都要是`float64`类型的numpy数组。
 
-```optInMAType```的取值：0=SMA、1=EMA、2=WMA、3=DEMA、4=TEMA、5=TRIMA、6=KAMA、7=MAMA、8=T3。
+See also: `talib.MA`, `talib.SMA`, `talib.EMA`, `TA.MA`
 
 ##### talib.MIDPOINT
 
@@ -14029,18 +14793,21 @@ talib.MIDPOINT(inReal)
 talib.MIDPOINT(inReal, optInTimePeriod)
 ```
 
-```talib.MIDPOINT()```函数用于计算**MidPoint over period（中点价格）**。
+计算周期中点（MidPoint over Period）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为14。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `14`。
 
-Returns (array): ```talib.MIDPOINT()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算周期中点。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.MIDPOINT(records)
     Log(ret)
 }
@@ -14050,11 +14817,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.MIDPOINT(records.Close)
     Log(ret)
 ```
 
-```MIDPOINT()```函数在talib库文档中的描述为：```MIDPOINT(Records[Close],Time Period = 14) = Array(outReal)```
+对应TA-Lib：`MIDPOINT(Records[Close],Time Period = 14) = Array(outReal)`。
+
+See also: `talib.MIDPRICE`, `talib.MAX`, `talib.MIN`
 
 ##### talib.MIDPRICE
 
@@ -14063,18 +14834,21 @@ talib.MIDPRICE(inPriceHL)
 talib.MIDPRICE(inPriceHL, optInTimePeriod)
 ```
 
-```talib.MIDPRICE()```函数用于计算**Midpoint Price over period（中点价格）**。
+计算周期中点价格（Midpoint Price over Period）。
 
 Parameters:
 
-- `inPriceHL` ({@struct/Record Record}结构数组, required): ```inPriceHL```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置时间周期，默认值为14。
+- `inPriceHL` ({@struct/Record Record}数组, required): K线数组，取最高价、最低价；Python中依次传入`records.High`、`records.Low`。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `14`。
 
-Returns (array): ```talib.MIDPRICE()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算周期中点价格。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.MIDPRICE(records)
     Log(ret)
 }
@@ -14084,11 +14858,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.MIDPRICE(records.High, records.Low)
     Log(ret)
 ```
 
-```MIDPRICE()```函数在talib库文档中的描述为：```MIDPRICE(Records[High,Low],Time Period = 14) = Array(outReal)```
+对应TA-Lib：`MIDPRICE(Records[High,Low],Time Period = 14) = Array(outReal)`。
+
+See also: `talib.MIDPOINT`, `talib.MEDPRICE`, `talib.MAX`, `talib.MIN`, `TA.Highest`, `TA.Lowest`
 
 ##### talib.SAR
 
@@ -14098,19 +14876,22 @@ talib.SAR(inPriceHL, optInAcceleration)
 talib.SAR(inPriceHL, optInAcceleration, optInMaximum)
 ```
 
-```talib.SAR()```函数用于计算**抛物线转向指标（Parabolic SAR）**。
+计算抛物线转向指标（Parabolic SAR）。
 
 Parameters:
 
-- `inPriceHL` ({@struct/Record Record}结构数组, required): ```inPriceHL```参数用于指定K线数据。
-- `optInAcceleration` (number, optional): ```optInAcceleration```参数用于设置加速因子（Acceleration Factor），默认值为0.02。
-- `optInMaximum` (number, optional): ```optInMaximum```参数用于设置加速因子最大值（AF Maximum），默认值为0.2。
+- `inPriceHL` ({@struct/Record Record}数组, required): K线数组，取最高价、最低价；Python中依次传入`records.High`、`records.Low`。
+- `optInAcceleration` (number, optional): 加速因子（Acceleration Factor）。默认 `0.02`。
+- `optInMaximum` (number, optional): 加速因子上限（AF Maximum）。默认 `0.2`。
 
-Returns (array): ```talib.SAR()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算抛物线转向指标。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.SAR(records)
     Log(ret)
 }
@@ -14120,11 +14901,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.SAR(records.High, records.Low)
     Log(ret)
 ```
 
-```SAR()```函数在talib库文档中的描述为：```SAR(Records[High,Low],Acceleration Factor = 0.02,AF Maximum = 0.2) = Array(outReal)```
+对应TA-Lib：`SAR(Records[High,Low],Acceleration Factor = 0.02,AF Maximum = 0.2) = Array(outReal)`。
+
+See also: `talib.SAREXT`, `talib.ATR`, `talib.ADX`
 
 ##### talib.SAREXT
 
@@ -14140,25 +14925,28 @@ talib.SAREXT(inPriceHL, optInStartValue, optInOffsetOnReverse, optInAcceleration
 talib.SAREXT(inPriceHL, optInStartValue, optInOffsetOnReverse, optInAccelerationInitLong, optInAccelerationLong, optInAccelerationMaxLong, optInAccelerationInitShort, optInAccelerationShort, optInAccelerationMaxShort)
 ```
 
-```talib.SAREXT()```函数用于计算**Parabolic SAR - Extended（增强型抛物线转向指标）**。
+计算扩展抛物线转向指标（Parabolic SAR - Extended）。
 
 Parameters:
 
-- `inPriceHL` ({@struct/Record Record}结构数组, required): ```inPriceHL```参数用于指定K线数据。
-- `optInStartValue` (number, optional): ```optInStartValue```参数用于设置起始值（Start Value），默认值为0。
-- `optInOffsetOnReverse` (number, optional): ```optInOffsetOnReverse```参数用于设置反转偏移量（Offset on Reverse），默认值为0。
-- `optInAccelerationInitLong` (number, optional): ```optInAccelerationInitLong```参数用于设置多头初始加速因子（AF Init Long），默认值为0.02。
-- `optInAccelerationLong` (number, optional): ```optInAccelerationLong```参数用于设置多头加速因子（AF Long），默认值为0.02。
-- `optInAccelerationMaxLong` (number, optional): ```optInAccelerationMaxLong```参数用于设置多头最大加速因子（AF Max Long），默认值为0.2。
-- `optInAccelerationInitShort` (number, optional): ```optInAccelerationInitShort```参数用于设置空头初始加速因子（AF Init Short），默认值为0.02。
-- `optInAccelerationShort` (number, optional): ```optInAccelerationShort```参数用于设置空头加速因子（AF Short），默认值为0.02。
-- `optInAccelerationMaxShort` (number, optional): ```optInAccelerationMaxShort```参数用于设置空头最大加速因子（AF Max Short），默认值为0.2。
+- `inPriceHL` ({@struct/Record Record}数组, required): K线数组，取最高价、最低价；Python中依次传入`records.High`、`records.Low`。
+- `optInStartValue` (number, optional): 起始值（Start Value）：`0`表示自动判断方向，正数按多头开始，负数按空头开始。默认 `0`。
+- `optInOffsetOnReverse` (number, optional): 反转偏移（Offset on Reverse）。默认 `0`。
+- `optInAccelerationInitLong` (number, optional): 多头初始加速因子（AF Init Long）。默认 `0.02`。
+- `optInAccelerationLong` (number, optional): 多头加速因子（AF Long）。默认 `0.02`。
+- `optInAccelerationMaxLong` (number, optional): 多头加速因子上限（AF Max Long）。默认 `0.2`。
+- `optInAccelerationInitShort` (number, optional): 空头初始加速因子（AF Init Short）。默认 `0.02`。
+- `optInAccelerationShort` (number, optional): 空头加速因子（AF Short）。默认 `0.02`。
+- `optInAccelerationMaxShort` (number, optional): 空头加速因子上限（AF Max Short）。默认 `0.2`。
 
-Returns (array): ```talib.SAREXT()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算扩展抛物线转向指标。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.SAREXT(records)
     Log(ret)
 }
@@ -14168,11 +14956,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.SAREXT(records.High, records.Low)
     Log(ret)
 ```
 
-```SAREXT()```函数在talib库文档中的描述为：```SAREXT(Records[High,Low],Start Value = 0,Offset on Reverse = 0,AF Init Long = 0.02,AF Long = 0.02,AF Max Long = 0.2,AF Init Short = 0.02,AF Short = 0.02,AF Max Short = 0.2) = Array(outReal)```
+对应TA-Lib：`SAREXT(Records[High,Low],Start Value = 0,Offset on Reverse = 0,AF Init Long = 0.02,AF Long = 0.02,AF Max Long = 0.2,AF Init Short = 0.02,AF Short = 0.02,AF Max Short = 0.2) = Array(outReal)`。
+
+See also: `talib.SAR`, `talib.ATR`, `talib.ADX`
 
 ##### talib.SMA
 
@@ -14181,18 +14973,21 @@ talib.SMA(inReal)
 talib.SMA(inReal, optInTimePeriod)
 ```
 
-```talib.SMA()```函数用于计算**Simple Moving Average（简单移动平均线）**。
+计算简单移动平均线（Simple Moving Average）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为30。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `30`。
 
-Returns (array): ```talib.SMA()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算简单移动平均线。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.SMA(records)
     Log(ret)
 }
@@ -14202,11 +14997,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.SMA(records.Close)
     Log(ret)
 ```
 
-```SMA()```函数在talib库文档中的描述为：```SMA(Records[Close],Time Period = 30) = Array(outReal)```
+对应TA-Lib：`SMA(Records[Close],Time Period = 30) = Array(outReal)`。
+
+See also: `talib.EMA`, `talib.WMA`, `talib.TRIMA`, `talib.MA`, `TA.MA`, `TA.SMA`
 
 ##### talib.T3
 
@@ -14216,19 +15015,22 @@ talib.T3(inReal, optInTimePeriod)
 talib.T3(inReal, optInTimePeriod, optInVFactor)
 ```
 
-```talib.T3()```函数用于计算**Triple Exponential Moving Average (T3) (三重指数移动平均)**。
+计算T3三重指数移动平均线（Triple Exponential Moving Average (T3)）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为5。
-- `optInVFactor` (number, optional): ```optInVFactor```参数用于设置成交量因子，默认值为0.7。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `5`。
+- `optInVFactor` (number, optional): 平滑系数（Volume Factor），取值`0`~`1`。默认 `0.7`。
 
-Returns (array): ```talib.T3()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算T3三重指数移动平均线。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.T3(records)
     Log(ret)
 }
@@ -14238,11 +15040,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.T3(records.Close)
     Log(ret)
 ```
 
-```T3()```函数在talib库文档中的描述为：```T3(Records[Close],Time Period = 5,Volume Factor = 0.7) = Array(outReal)```
+对应TA-Lib：`T3(Records[Close],Time Period = 5,Volume Factor = 0.7) = Array(outReal)`。
+
+See also: `talib.TEMA`, `talib.DEMA`, `talib.EMA`, `TA.EMA`
 
 ##### talib.TEMA
 
@@ -14251,18 +15057,21 @@ talib.TEMA(inReal)
 talib.TEMA(inReal, optInTimePeriod)
 ```
 
-```talib.TEMA()```函数用于计算**Triple Exponential Moving Average（三重指数移动平均线）**。
+计算三重指数移动平均线（Triple Exponential Moving Average）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为30。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `30`。
 
-Returns (array): ```talib.TEMA()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算三重指数移动平均线。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.TEMA(records)
     Log(ret)
 }
@@ -14272,11 +15081,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.TEMA(records.Close)
     Log(ret)
 ```
 
-```TEMA()```函数在talib库文档中的描述为：```TEMA(Records[Close],Time Period = 30) = Array(outReal)```
+对应TA-Lib：`TEMA(Records[Close],Time Period = 30) = Array(outReal)`。
+
+See also: `talib.DEMA`, `talib.T3`, `talib.EMA`, `talib.TRIX`, `TA.EMA`
 
 ##### talib.TRIMA
 
@@ -14285,18 +15098,21 @@ talib.TRIMA(inReal)
 talib.TRIMA(inReal, optInTimePeriod)
 ```
 
-```talib.TRIMA()```函数用于计算**Triangular Moving Average（三角移动平均线）**。
+计算三角移动平均线（Triangular Moving Average）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为30。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `30`。
 
-Returns (array): ```talib.TRIMA()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算三角移动平均线。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.TRIMA(records)
     Log(ret)
 }
@@ -14306,11 +15122,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.TRIMA(records.Close)
     Log(ret)
 ```
 
-```TRIMA()```函数在talib库文档中的描述为：```TRIMA(Records[Close],Time Period = 30) = Array(outReal)```
+对应TA-Lib：`TRIMA(Records[Close],Time Period = 30) = Array(outReal)`。
+
+See also: `talib.SMA`, `talib.WMA`, `talib.MA`, `TA.MA`
 
 ##### talib.WMA
 
@@ -14319,18 +15139,21 @@ talib.WMA(inReal)
 talib.WMA(inReal, optInTimePeriod)
 ```
 
-```talib.WMA()```函数用于计算**Weighted Moving Average（加权移动平均）**。
+计算加权移动平均线（Weighted Moving Average）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为30。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `30`。
 
-Returns (array): ```talib.WMA()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算加权移动平均线。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.WMA(records)
     Log(ret)
 }
@@ -14340,15 +15163,19 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.WMA(records.Close)
     Log(ret)
 ```
 
-```WMA()```函数在talib库文档中的描述为：```WMA(Records[Close],Time Period = 30) = Array(outReal)```
+对应TA-Lib：`WMA(Records[Close],Time Period = 30) = Array(outReal)`。
 
-#### MomentumIndicators
+See also: `talib.SMA`, `talib.EMA`, `talib.TRIMA`, `talib.MA`, `TA.MA`
 
-动量类指标：MACD、RSI、随机指标（STOCH）、ADX、CCI等。
+#### 动量指标
+
+动量指标（Momentum Indicators）衡量价格变化的速度与强弱，包括MACD、RSI、随机指标（STOCH）、ADX、CCI等。
 
 ##### talib.ADX
 
@@ -14357,18 +15184,21 @@ talib.ADX(inPriceHLC)
 talib.ADX(inPriceHLC, optInTimePeriod)
 ```
 
-```talib.ADX()```函数用于计算**Average Directional Movement Index（平均趋向指数）**。
+计算平均趋向指数（Average Directional Movement Index）。
 
 Parameters:
 
-- `inPriceHLC` ({@struct/Record Record}结构数组, required): ```inPriceHLC```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为14。
+- `inPriceHLC` ({@struct/Record Record}数组, required): K线数组，取最高价、最低价、收盘价；Python中依次传入`records.High`、`records.Low`、`records.Close`。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `14`。
 
-Returns (array): ```talib.ADX()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算平均趋向指数。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.ADX(records)
     Log(ret)
 }
@@ -14378,11 +15208,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.ADX(records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```ADX()```函数在talib库文档中的描述为：```ADX(Records[High,Low,Close],Time Period = 14) = Array(outReal)```
+对应TA-Lib：`ADX(Records[High,Low,Close],Time Period = 14) = Array(outReal)`。
+
+See also: `talib.ADXR`, `talib.DX`, `talib.PLUS_DI`, `talib.MINUS_DI`
 
 ##### talib.ADXR
 
@@ -14391,18 +15225,21 @@ talib.ADXR(inPriceHLC)
 talib.ADXR(inPriceHLC, optInTimePeriod)
 ```
 
-```talib.ADXR()```函数用于计算**平均趋向指数评级（Average Directional Movement Index Rating）**。
+计算平均趋向指数评估（Average Directional Movement Index Rating）。
 
 Parameters:
 
-- `inPriceHLC` ({@struct/Record Record}结构数组, required): ```inPriceHLC```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为14。
+- `inPriceHLC` ({@struct/Record Record}数组, required): K线数组，取最高价、最低价、收盘价；Python中依次传入`records.High`、`records.Low`、`records.Close`。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `14`。
 
-Returns (array): ```talib.ADXR()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算平均趋向指数评估。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.ADXR(records)
     Log(ret)
 }
@@ -14412,11 +15249,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.ADXR(records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```ADXR()```函数在talib库文档中的描述为：```ADXR(Records[High,Low,Close],Time Period = 14) = Array(outReal)```
+对应TA-Lib：`ADXR(Records[High,Low,Close],Time Period = 14) = Array(outReal)`。
+
+See also: `talib.ADX`, `talib.DX`, `talib.PLUS_DI`, `talib.MINUS_DI`
 
 ##### talib.APO
 
@@ -14427,20 +15268,23 @@ talib.APO(inReal, optInFastPeriod, optInSlowPeriod)
 talib.APO(inReal, optInFastPeriod, optInSlowPeriod, optInMAType)
 ```
 
-```talib.APO()```函数用于计算**Absolute Price Oscillator（绝对价格振荡器）**。
+计算绝对价格振荡指标（Absolute Price Oscillator）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInFastPeriod` (number, optional): ```optInFastPeriod```参数用于设置快速周期，默认值为12。
-- `optInSlowPeriod` (number, optional): ```optInSlowPeriod```参数用于设置慢速周期，默认值为26。
-- `optInMAType` (number, optional): ```optInMAType```参数用于设置移动平均线类型，默认值为0。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
+- `optInFastPeriod` (number, optional): 快线周期。默认 `12`。
+- `optInSlowPeriod` (number, optional): 慢线周期。默认 `26`。
+- `optInMAType` (number, optional): 均线类型，取值见`Talib`的MAType表。默认 `0`（SMA）。
 
-Returns (array): ```talib.APO()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算绝对价格振荡指标。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.APO(records)
     Log(ret)
 }
@@ -14450,11 +15294,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.APO(records.Close)
     Log(ret)
 ```
 
-```APO()```函数在talib库文档中的描述为：```APO(Records[Close],Fast Period = 12,Slow Period = 26,MA Type = 0) = Array(outReal)```
+对应TA-Lib：`APO(Records[Close],Fast Period = 12,Slow Period = 26,MA Type = 0) = Array(outReal)`。
+
+See also: `talib.PPO`, `talib.MACD`, `talib.MOM`, `talib.EMA`, `TA.MACD`
 
 ##### talib.AROON
 
@@ -14463,19 +15311,23 @@ talib.AROON(inPriceHL)
 talib.AROON(inPriceHL, optInTimePeriod)
 ```
 
-```talib.AROON()```函数用于计算**Aroon（阿隆指标）**。
+计算阿隆指标（Aroon），返回阿隆下降线、阿隆上升线。
 
 Parameters:
 
-- `inPriceHL` ({@struct/Record Record}结构数组, required): ```inPriceHL```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为14。
+- `inPriceHL` ({@struct/Record Record}数组, required): K线数组，取最高价、最低价；Python中依次传入`records.High`、`records.Low`。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `14`。
 
-Returns (array): ```talib.AROON()```函数返回二维数组。
+Returns (array): 二维数组，依次为阿隆下降线、阿隆上升线数组（Python中为同样顺序的tuple）。
+
+用最近的K线计算阿隆指标。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.AROON(records)
+    // 输出：[阿隆下降线数组, 阿隆上升线数组]
     Log(ret)
 }
 ```
@@ -14484,11 +15336,16 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.AROON(records.High, records.Low)
+    # 输出：(阿隆下降线数组, 阿隆上升线数组)
     Log(ret)
 ```
 
-```AROON()```函数在talib库文档中的描述为：```AROON(Records[High,Low],Time Period = 14) = [Array(outAroonDown),Array(outAroonUp)]```
+对应TA-Lib：`AROON(Records[High,Low],Time Period = 14) = [Array(outAroonDown),Array(outAroonUp)]`。
+
+See also: `talib.AROONOSC`, `talib.MAXINDEX`, `talib.MININDEX`, `TA.Highest`, `TA.Lowest`
 
 ##### talib.AROONOSC
 
@@ -14497,18 +15354,21 @@ talib.AROONOSC(inPriceHL)
 talib.AROONOSC(inPriceHL, optInTimePeriod)
 ```
 
-```talib.AROONOSC()```函数用于计算**Aroon Oscillator（阿隆震荡指标）**。
+计算阿隆振荡指标（Aroon Oscillator）。
 
 Parameters:
 
-- `inPriceHL` ({@struct/Record Record}结构数组, required): ```inPriceHL```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为14。
+- `inPriceHL` ({@struct/Record Record}数组, required): K线数组，取最高价、最低价；Python中依次传入`records.High`、`records.Low`。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `14`。
 
-Returns (array): ```talib.AROONOSC()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算阿隆振荡指标。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.AROONOSC(records)
     Log(ret)
 }
@@ -14518,11 +15378,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.AROONOSC(records.High, records.Low)
     Log(ret)
 ```
 
-```AROONOSC()```函数在talib库文档中的描述为：```AROONOSC(Records[High,Low],Time Period = 14) = Array(outReal)```
+对应TA-Lib：`AROONOSC(Records[High,Low],Time Period = 14) = Array(outReal)`。
+
+See also: `talib.AROON`, `talib.ADX`, `talib.MOM`
 
 ##### talib.BOP
 
@@ -14530,17 +15394,20 @@ def main():
 talib.BOP(inPriceOHLC)
 ```
 
-```talib.BOP()```函数用于计算**Balance Of Power（均势指标）**。
+计算均势指标（Balance Of Power）。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.BOP()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算均势指标。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.BOP(records)
     Log(ret)
 }
@@ -14550,11 +15417,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.BOP(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```BOP()```函数在talib库文档中的描述为：```BOP(Records[Open,High,Low,Close]) = Array(outReal)```
+对应TA-Lib：`BOP(Records[Open,High,Low,Close]) = Array(outReal)`。
+
+See also: `talib.CCI`, `talib.WILLR`, `talib.AVGPRICE`
 
 ##### talib.CCI
 
@@ -14563,18 +15434,21 @@ talib.CCI(inPriceHLC)
 talib.CCI(inPriceHLC, optInTimePeriod)
 ```
 
-```talib.CCI()```函数用于计算**Commodity Channel Index（商品通道指数）**。
+计算顺势指标（Commodity Channel Index）。
 
 Parameters:
 
-- `inPriceHLC` ({@struct/Record Record}结构数组, required): ```inPriceHLC```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为14。
+- `inPriceHLC` ({@struct/Record Record}数组, required): K线数组，取最高价、最低价、收盘价；Python中依次传入`records.High`、`records.Low`、`records.Close`。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `14`。
 
-Returns (array): ```talib.CCI()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算顺势指标。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CCI(records)
     Log(ret)
 }
@@ -14584,11 +15458,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CCI(records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CCI()```函数在talib库文档中的描述为：```CCI(Records[High,Low,Close],Time Period = 14) = Array(outReal)```
+对应TA-Lib：`CCI(Records[High,Low,Close],Time Period = 14) = Array(outReal)`。
+
+See also: `talib.TYPPRICE`, `talib.WILLR`, `talib.RSI`, `talib.MFI`
 
 ##### talib.CMO
 
@@ -14597,18 +15475,21 @@ talib.CMO(inReal)
 talib.CMO(inReal, optInTimePeriod)
 ```
 
-```talib.CMO()```函数用于计算**Chande Momentum Oscillator（钱德动量摆动指标）**。
+计算钱德动量摆动指标（Chande Momentum Oscillator）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为14。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `14`。
 
-Returns (array): ```talib.CMO()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算钱德动量摆动指标。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CMO(records)
     Log(ret)
 }
@@ -14618,11 +15499,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CMO(records.Close)
     Log(ret)
 ```
 
-```CMO()```函数在talib库文档中的描述为：```CMO(Records[Close],Time Period = 14) = Array(outReal)```
+对应TA-Lib：`CMO(Records[Close],Time Period = 14) = Array(outReal)`。
+
+See also: `talib.RSI`, `talib.MOM`, `talib.STOCHRSI`, `TA.RSI`
 
 ##### talib.DX
 
@@ -14631,18 +15516,21 @@ talib.DX(inPriceHLC)
 talib.DX(inPriceHLC, optInTimePeriod)
 ```
 
-```talib.DX()```函数用于计算**Directional Movement Index（动向指数）**。
+计算动向指数（Directional Movement Index）。
 
 Parameters:
 
-- `inPriceHLC` ({@struct/Record Record}结构数组, required): ```inPriceHLC```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为14。
+- `inPriceHLC` ({@struct/Record Record}数组, required): K线数组，取最高价、最低价、收盘价；Python中依次传入`records.High`、`records.Low`、`records.Close`。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `14`。
 
-Returns (array): ```talib.DX()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算动向指数。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.DX(records)
     Log(ret)
 }
@@ -14652,11 +15540,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.DX(records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```DX()```函数在talib库文档中的描述为：```DX(Records[High,Low,Close],Time Period = 14) = Array(outReal)```
+对应TA-Lib：`DX(Records[High,Low,Close],Time Period = 14) = Array(outReal)`。
+
+See also: `talib.ADX`, `talib.ADXR`, `talib.PLUS_DI`, `talib.MINUS_DI`
 
 ##### talib.IMI
 
@@ -14665,18 +15557,21 @@ talib.IMI(inPriceOC)
 talib.IMI(inPriceOC, optInTimePeriod)
 ```
 
-```talib.IMI()```函数用于计算**Intraday Momentum Index (日内动量指标)**。
+计算日内动量指标（Intraday Momentum Index）。
 
 Parameters:
 
-- `inPriceOC` ({@struct/Record Record}结构数组, required): ```inPriceOC```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置周期，默认值为14。
+- `inPriceOC` ({@struct/Record Record}数组, required): K线数组，取开盘价、收盘价；Python中依次传入`records.Open`、`records.Close`。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `14`。
 
-Returns (array): ```talib.IMI()```函数的返回值为：一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算日内动量指标。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.IMI(records)
     Log(ret)
 }
@@ -14686,15 +15581,19 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.IMI(records.Open, records.Close)
     Log(ret)
 ```
 
-```IMI()```函数在talib库文档中的描述为：```IMI(Records[Open,Close],Time Period = 14) = Array(outReal)```
+对应TA-Lib：`IMI(Records[Open,Close],Time Period = 14) = Array(outReal)`。
 
-最近```optInTimePeriod```根K线中，阳线实体（```Close - Open```）之和占全部实体长度之和的百分比，取值0~100。
+最近`optInTimePeriod`根K线中，阳线实体（`Close - Open`）之和占全部实体长度之和的百分比，取值0~100。
 
-```Python```的TA-Lib从0.6版本（C库与Python包都要0.6及以上）开始提供此函数，旧版本调用会报属性不存在的错误。
+`Python`的TA-Lib从0.6版本（C库与Python包都要0.6及以上）开始提供此函数，旧版本调用会报属性不存在的错误。
+
+See also: `talib.RSI`, `talib.CMO`, `talib.MOM`, `TA.RSI`
 
 ##### talib.MACD
 
@@ -14705,21 +15604,25 @@ talib.MACD(inReal, optInFastPeriod, optInSlowPeriod)
 talib.MACD(inReal, optInFastPeriod, optInSlowPeriod, optInSignalPeriod)
 ```
 
-```talib.MACD()```函数用于计算**Moving Average Convergence/Divergence（移动平均收敛发散指标）**。
+计算指数平滑异同移动平均线（Moving Average Convergence/Divergence），返回MACD线、信号线、柱状线。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInFastPeriod` (number, optional): ```optInFastPeriod```参数用于设置快速周期，默认值为12。
-- `optInSlowPeriod` (number, optional): ```optInSlowPeriod```参数用于设置慢速周期，默认值为26。
-- `optInSignalPeriod` (number, optional): ```optInSignalPeriod```参数用于设置信号线周期，默认值为9。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
+- `optInFastPeriod` (number, optional): 快线周期。默认 `12`。
+- `optInSlowPeriod` (number, optional): 慢线周期。默认 `26`。
+- `optInSignalPeriod` (number, optional): 信号线周期。默认 `9`。
 
-Returns (array): ```talib.MACD()```函数返回二维数组。
+Returns (array): 二维数组，依次为MACD线、信号线、柱状线数组（Python中为同样顺序的tuple）。
+
+用最近的K线计算指数平滑异同移动平均线。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.MACD(records)
+    // 输出：[MACD线数组, 信号线数组, 柱状线数组]
     Log(ret)
 }
 ```
@@ -14728,11 +15631,16 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.MACD(records.Close)
+    # 输出：(MACD线数组, 信号线数组, 柱状线数组)
     Log(ret)
 ```
 
-```MACD()```函数在talib库文档中的描述为：```MACD(Records[Close],Fast Period = 12,Slow Period = 26,Signal Period = 9) = [Array(outMACD),Array(outMACDSignal),Array(outMACDHist)]```
+对应TA-Lib：`MACD(Records[Close],Fast Period = 12,Slow Period = 26,Signal Period = 9) = [Array(outMACD),Array(outMACDSignal),Array(outMACDHist)]`。
+
+See also: `talib.MACDEXT`, `talib.MACDFIX`, `talib.APO`, `talib.PPO`, `talib.EMA`, `TA.MACD`
 
 ##### talib.MACDEXT
 
@@ -14746,24 +15654,28 @@ talib.MACDEXT(inReal, optInFastPeriod, optInFastMAType, optInSlowPeriod, optInSl
 talib.MACDEXT(inReal, optInFastPeriod, optInFastMAType, optInSlowPeriod, optInSlowMAType, optInSignalPeriod, optInSignalMAType)
 ```
 
-```talib.MACDEXT()```函数用于计算**MACD with controllable MA type（可控移动平均类型的MACD）**。
+计算可指定均线类型的MACD（MACD with Controllable MA Type），返回MACD线、信号线、柱状线。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInFastPeriod` (number, optional): ```optInFastPeriod```参数用于设置快速周期，默认值为12。
-- `optInFastMAType` (number, optional): ```optInFastMAType```参数用于设置快速移动平均线类型，默认值为0。
-- `optInSlowPeriod` (number, optional): ```optInSlowPeriod```参数用于设置慢速周期，默认值为26。
-- `optInSlowMAType` (number, optional): ```optInSlowMAType```参数用于设置慢速移动平均线类型，默认值为0。
-- `optInSignalPeriod` (number, optional): ```optInSignalPeriod```参数用于设置信号线周期，默认值为9。
-- `optInSignalMAType` (number, optional): ```optInSignalMAType```参数用于设置信号线移动平均类型，默认值为0。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
+- `optInFastPeriod` (number, optional): 快线周期。默认 `12`。
+- `optInFastMAType` (number, optional): 快线的均线类型，取值见`Talib`的MAType表。默认 `0`（SMA）。
+- `optInSlowPeriod` (number, optional): 慢线周期。默认 `26`。
+- `optInSlowMAType` (number, optional): 慢线的均线类型，取值见`Talib`的MAType表。默认 `0`（SMA）。
+- `optInSignalPeriod` (number, optional): 信号线周期。默认 `9`。
+- `optInSignalMAType` (number, optional): 信号线的均线类型，取值见`Talib`的MAType表。默认 `0`（SMA）。
 
-Returns (array): ```talib.MACDEXT()```函数返回一个二维数组。
+Returns (array): 二维数组，依次为MACD线、信号线、柱状线数组（Python中为同样顺序的tuple）。
+
+用最近的K线计算可指定均线类型的MACD。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.MACDEXT(records)
+    // 输出：[MACD线数组, 信号线数组, 柱状线数组]
     Log(ret)
 }
 ```
@@ -14772,11 +15684,16 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.MACDEXT(records.Close)
+    # 输出：(MACD线数组, 信号线数组, 柱状线数组)
     Log(ret)
 ```
 
-```MACDEXT()```函数在talib库文档中的描述为：```MACDEXT(Records[Close],Fast Period = 12,Fast MA = 0,Slow Period = 26,Slow MA = 0,Signal Period = 9,Signal MA = 0) = [Array(outMACD),Array(outMACDSignal),Array(outMACDHist)]```
+对应TA-Lib：`MACDEXT(Records[Close],Fast Period = 12,Fast MA = 0,Slow Period = 26,Slow MA = 0,Signal Period = 9,Signal MA = 0) = [Array(outMACD),Array(outMACDSignal),Array(outMACDHist)]`。
+
+See also: `talib.MACD`, `talib.MACDFIX`, `TA.MACD`
 
 ##### talib.MACDFIX
 
@@ -14785,19 +15702,23 @@ talib.MACDFIX(inReal)
 talib.MACDFIX(inReal, optInSignalPeriod)
 ```
 
-```talib.MACDFIX()```函数用于计算**Moving Average Convergence/Divergence Fix 12/26（快慢周期固定为12/26的MACD）**。
+计算快慢周期固定为12/26的MACD（Moving Average Convergence/Divergence Fix 12/26），返回MACD线、信号线、柱状线。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInSignalPeriod` (number, optional): ```optInSignalPeriod```参数用于设置信号周期，默认值为9。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
+- `optInSignalPeriod` (number, optional): 信号线周期。默认 `9`。
 
-Returns (array): ```talib.MACDFIX()```函数返回二维数组。
+Returns (array): 二维数组，依次为MACD线、信号线、柱状线数组（Python中为同样顺序的tuple）。
+
+用最近的K线计算快慢周期固定为12/26的MACD。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.MACDFIX(records)
+    // 输出：[MACD线数组, 信号线数组, 柱状线数组]
     Log(ret)
 }
 ```
@@ -14806,11 +15727,16 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.MACDFIX(records.Close)
+    # 输出：(MACD线数组, 信号线数组, 柱状线数组)
     Log(ret)
 ```
 
-```MACDFIX()```函数在talib库文档中的描述为：```MACDFIX(Records[Close],Signal Period = 9) = [Array(outMACD),Array(outMACDSignal),Array(outMACDHist)]```
+对应TA-Lib：`MACDFIX(Records[Close],Signal Period = 9) = [Array(outMACD),Array(outMACDSignal),Array(outMACDHist)]`。
+
+See also: `talib.MACD`, `talib.MACDEXT`, `TA.MACD`
 
 ##### talib.MFI
 
@@ -14819,18 +15745,21 @@ talib.MFI(inPriceHLCV)
 talib.MFI(inPriceHLCV, optInTimePeriod)
 ```
 
-```talib.MFI()```函数用于计算**Money Flow Index（资金流量指数）**。
+计算资金流量指标（Money Flow Index）。
 
 Parameters:
 
-- `inPriceHLCV` ({@struct/Record Record}结构数组, required): ```inPriceHLCV```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为14。
+- `inPriceHLCV` ({@struct/Record Record}数组, required): K线数组，取最高价、最低价、收盘价、成交量；Python中依次传入`records.High`、`records.Low`、`records.Close`、`records.Volume`。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `14`。
 
-Returns (array): ```talib.MFI()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算资金流量指标。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.MFI(records)
     Log(ret)
 }
@@ -14840,11 +15769,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.MFI(records.High, records.Low, records.Close, records.Volume)
     Log(ret)
 ```
 
-```MFI()```函数在talib库文档中的描述为：```MFI(Records[High,Low,Close,Volume],Time Period = 14) = Array(outReal)```
+对应TA-Lib：`MFI(Records[High,Low,Close,Volume],Time Period = 14) = Array(outReal)`。
+
+See also: `talib.RSI`, `talib.OBV`, `talib.AD`, `TA.CMF`
 
 ##### talib.MINUS_DI
 
@@ -14853,18 +15786,21 @@ talib.MINUS_DI(inPriceHLC)
 talib.MINUS_DI(inPriceHLC, optInTimePeriod)
 ```
 
-```talib.MINUS_DI()```函数用于计算**负向指标（Minus Directional Indicator）**。
+计算下降方向线（Minus Directional Indicator）。
 
 Parameters:
 
-- `inPriceHLC` ({@struct/Record Record}结构数组, required): ```inPriceHLC```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为14。
+- `inPriceHLC` ({@struct/Record Record}数组, required): K线数组，取最高价、最低价、收盘价；Python中依次传入`records.High`、`records.Low`、`records.Close`。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `14`。
 
-Returns (array): ```talib.MINUS_DI()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算下降方向线。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.MINUS_DI(records)
     Log(ret)
 }
@@ -14874,11 +15810,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.MINUS_DI(records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```MINUS_DI()```函数在talib库文档中的描述为：```MINUS_DI(Records[High,Low,Close],Time Period = 14) = Array(outReal)```
+对应TA-Lib：`MINUS_DI(Records[High,Low,Close],Time Period = 14) = Array(outReal)`。
+
+See also: `talib.PLUS_DI`, `talib.MINUS_DM`, `talib.DX`, `talib.ADX`
 
 ##### talib.MINUS_DM
 
@@ -14887,18 +15827,21 @@ talib.MINUS_DM(inPriceHL)
 talib.MINUS_DM(inPriceHL, optInTimePeriod)
 ```
 
-```talib.MINUS_DM()```函数用于计算**负向运动指标（Minus Directional Movement）**。
+计算下降动向值（Minus Directional Movement）。
 
 Parameters:
 
-- `inPriceHL` ({@struct/Record Record}结构数组, required): ```inPriceHL```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为14。
+- `inPriceHL` ({@struct/Record Record}数组, required): K线数组，取最高价、最低价；Python中依次传入`records.High`、`records.Low`。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `14`。
 
-Returns (array): ```talib.MINUS_DM()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算下降动向值。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.MINUS_DM(records)
     Log(ret)
 }
@@ -14908,11 +15851,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.MINUS_DM(records.High, records.Low)
     Log(ret)
 ```
 
-```MINUS_DM()```函数在talib库文档中的描述为：```MINUS_DM(Records[High,Low],Time Period = 14) = Array(outReal)```
+对应TA-Lib：`MINUS_DM(Records[High,Low],Time Period = 14) = Array(outReal)`。
+
+See also: `talib.PLUS_DM`, `talib.MINUS_DI`, `talib.DX`
 
 ##### talib.MOM
 
@@ -14921,18 +15868,21 @@ talib.MOM(inReal)
 talib.MOM(inReal, optInTimePeriod)
 ```
 
-```talib.MOM()```函数用于计算**Momentum（动量指标）**。
+计算动量（Momentum）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为10。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `10`。
 
-Returns (array): ```talib.MOM()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算动量。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.MOM(records)
     Log(ret)
 }
@@ -14942,11 +15892,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.MOM(records.Close)
     Log(ret)
 ```
 
-```MOM()```函数在talib库文档中的描述为：```MOM(Records[Close],Time Period = 10) = Array(outReal)```
+对应TA-Lib：`MOM(Records[Close],Time Period = 10) = Array(outReal)`。
+
+See also: `talib.ROC`, `talib.ROCP`, `talib.ROCR`, `talib.CMO`
 
 ##### talib.PLUS_DI
 
@@ -14955,18 +15909,21 @@ talib.PLUS_DI(inPriceHLC)
 talib.PLUS_DI(inPriceHLC, optInTimePeriod)
 ```
 
-```talib.PLUS_DI()```函数用于计算**Plus Directional Indicator（正向指标）**。
+计算上升方向线（Plus Directional Indicator）。
 
 Parameters:
 
-- `inPriceHLC` ({@struct/Record Record}结构数组, required): ```inPriceHLC```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置时间周期，默认值为14。
+- `inPriceHLC` ({@struct/Record Record}数组, required): K线数组，取最高价、最低价、收盘价；Python中依次传入`records.High`、`records.Low`、`records.Close`。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `14`。
 
-Returns (array): ```talib.PLUS_DI()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算上升方向线。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.PLUS_DI(records)
     Log(ret)
 }
@@ -14976,11 +15933,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.PLUS_DI(records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```PLUS_DI()```函数在talib库文档中的描述为：```PLUS_DI(Records[High,Low,Close],Time Period = 14) = Array(outReal)```
+对应TA-Lib：`PLUS_DI(Records[High,Low,Close],Time Period = 14) = Array(outReal)`。
+
+See also: `talib.MINUS_DI`, `talib.PLUS_DM`, `talib.DX`, `talib.ADX`
 
 ##### talib.PLUS_DM
 
@@ -14989,18 +15950,21 @@ talib.PLUS_DM(inPriceHL)
 talib.PLUS_DM(inPriceHL, optInTimePeriod)
 ```
 
-```talib.PLUS_DM()```函数用于计算**Plus Directional Movement（正向运动指标）**。
+计算上升动向值（Plus Directional Movement）。
 
 Parameters:
 
-- `inPriceHL` ({@struct/Record Record}结构数组, required): ```inPriceHL```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为14。
+- `inPriceHL` ({@struct/Record Record}数组, required): K线数组，取最高价、最低价；Python中依次传入`records.High`、`records.Low`。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `14`。
 
-Returns (array): ```talib.PLUS_DM()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算上升动向值。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.PLUS_DM(records)
     Log(ret)
 }
@@ -15010,11 +15974,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.PLUS_DM(records.High, records.Low)
     Log(ret)
 ```
 
-```PLUS_DM()```函数在talib库文档中的描述为：```PLUS_DM(Records[High,Low],Time Period = 14) = Array(outReal)```
+对应TA-Lib：`PLUS_DM(Records[High,Low],Time Period = 14) = Array(outReal)`。
+
+See also: `talib.MINUS_DM`, `talib.PLUS_DI`, `talib.DX`
 
 ##### talib.PPO
 
@@ -15025,20 +15993,23 @@ talib.PPO(inReal, optInFastPeriod, optInSlowPeriod)
 talib.PPO(inReal, optInFastPeriod, optInSlowPeriod, optInMAType)
 ```
 
-```talib.PPO()```函数用于计算**Percentage Price Oscillator（价格振荡百分比）**。
+计算价格振荡百分比（Percentage Price Oscillator）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInFastPeriod` (number, optional): ```optInFastPeriod```参数用于设置快速周期，默认值为12。
-- `optInSlowPeriod` (number, optional): ```optInSlowPeriod```参数用于设置慢速周期，默认值为26。
-- `optInMAType` (number, optional): ```optInMAType```参数用于设置移动平均线类型，默认值为0。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
+- `optInFastPeriod` (number, optional): 快线周期。默认 `12`。
+- `optInSlowPeriod` (number, optional): 慢线周期。默认 `26`。
+- `optInMAType` (number, optional): 均线类型，取值见`Talib`的MAType表。默认 `0`（SMA）。
 
-Returns (array): ```talib.PPO()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算价格振荡百分比。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.PPO(records)
     Log(ret)
 }
@@ -15048,11 +16019,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.PPO(records.Close)
     Log(ret)
 ```
 
-```PPO()```函数在talib库文档中的描述为：```PPO(Records[Close],Fast Period = 12,Slow Period = 26,MA Type = 0) = Array(outReal)```
+对应TA-Lib：`PPO(Records[Close],Fast Period = 12,Slow Period = 26,MA Type = 0) = Array(outReal)`。
+
+See also: `talib.APO`, `talib.MACD`, `talib.ROC`, `TA.MACD`
 
 ##### talib.ROC
 
@@ -15061,18 +16036,21 @@ talib.ROC(inReal)
 talib.ROC(inReal, optInTimePeriod)
 ```
 
-```talib.ROC()```函数用于计算**变动率指标（Rate of change）：((price/prevPrice)-1)*100**。
+计算变动率（Rate of Change），公式为`((price/prevPrice)-1)*100`。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为10。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `10`。
 
-Returns (array): ```talib.ROC()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算变动率。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.ROC(records)
     Log(ret)
 }
@@ -15082,11 +16060,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.ROC(records.Close)
     Log(ret)
 ```
 
-```ROC()```函数在talib库文档中的描述为：```ROC(Records[Close],Time Period = 10) = Array(outReal)```
+对应TA-Lib：`ROC(Records[Close],Time Period = 10) = Array(outReal)`。
+
+See also: `talib.ROCP`, `talib.ROCR`, `talib.ROCR100`, `talib.MOM`
 
 ##### talib.ROCP
 
@@ -15095,18 +16077,21 @@ talib.ROCP(inReal)
 talib.ROCP(inReal, optInTimePeriod)
 ```
 
-```talib.ROCP()```函数用于计算**价格变化率百分比：(price-prevPrice)/prevPrice**。
+计算变动率百分比（Rate of Change Percentage），公式为`(price-prevPrice)/prevPrice`。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为10。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `10`。
 
-Returns (array): ```talib.ROCP()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算变动率百分比。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.ROCP(records)
     Log(ret)
 }
@@ -15116,11 +16101,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.ROCP(records.Close)
     Log(ret)
 ```
 
-```ROCP()```函数在talib库文档中的描述为：```ROCP(Records[Close],Time Period = 10) = Array(outReal)```
+对应TA-Lib：`ROCP(Records[Close],Time Period = 10) = Array(outReal)`。
+
+See also: `talib.ROC`, `talib.ROCR`, `talib.ROCR100`, `talib.MOM`
 
 ##### talib.ROCR
 
@@ -15129,18 +16118,21 @@ talib.ROCR(inReal)
 talib.ROCR(inReal, optInTimePeriod)
 ```
 
-```talib.ROCR()```函数用于计算**价格变化率比值：(price/prevPrice)**。
+计算变动率比值（Rate of Change Ratio），公式为`price/prevPrice`。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为10。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `10`。
 
-Returns (array): ```talib.ROCR()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算变动率比值。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.ROCR(records)
     Log(ret)
 }
@@ -15150,11 +16142,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.ROCR(records.Close)
     Log(ret)
 ```
 
-```ROCR()```函数在talib库文档中的描述为：```ROCR(Records[Close],Time Period = 10) = Array(outReal)```
+对应TA-Lib：`ROCR(Records[Close],Time Period = 10) = Array(outReal)`。
+
+See also: `talib.ROC`, `talib.ROCP`, `talib.ROCR100`, `talib.MOM`
 
 ##### talib.ROCR100
 
@@ -15163,18 +16159,21 @@ talib.ROCR100(inReal)
 talib.ROCR100(inReal, optInTimePeriod)
 ```
 
-```talib.ROCR100()```函数用于计算**Rate of change ratio 100 scale: (price/prevPrice)*100（价格变化率比例100倍）**。
+计算百倍变动率比值（Rate of Change Ratio 100 Scale），公式为`(price/prevPrice)*100`。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为10。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `10`。
 
-Returns (array): ```talib.ROCR100()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算百倍变动率比值。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.ROCR100(records)
     Log(ret)
 }
@@ -15184,11 +16183,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.ROCR100(records.Close)
     Log(ret)
 ```
 
-```ROCR100()```函数在talib库文档中的描述为：```ROCR100(Records[Close],Time Period = 10) = Array(outReal)```
+对应TA-Lib：`ROCR100(Records[Close],Time Period = 10) = Array(outReal)`。
+
+See also: `talib.ROC`, `talib.ROCP`, `talib.ROCR`, `talib.MOM`
 
 ##### talib.RSI
 
@@ -15197,18 +16200,21 @@ talib.RSI(inReal)
 talib.RSI(inReal, optInTimePeriod)
 ```
 
-```talib.RSI()```函数用于计算**Relative Strength Index（相对强弱指标）**。
+计算相对强弱指标（Relative Strength Index）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为14。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `14`。
 
-Returns (array): ```talib.RSI()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算相对强弱指标。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.RSI(records)
     Log(ret)
 }
@@ -15218,11 +16224,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.RSI(records.Close)
     Log(ret)
 ```
 
-```RSI()```函数在talib库文档中的描述为：```RSI(Records[Close],Time Period = 14) = Array(outReal)```
+对应TA-Lib：`RSI(Records[Close],Time Period = 14) = Array(outReal)`。
+
+See also: `talib.STOCHRSI`, `talib.CMO`, `talib.MFI`, `talib.WILLR`, `TA.RSI`
 
 ##### talib.STOCH
 
@@ -15235,23 +16245,27 @@ talib.STOCH(inPriceHLC, optInFastK_Period, optInSlowK_Period, optInSlowK_MAType,
 talib.STOCH(inPriceHLC, optInFastK_Period, optInSlowK_Period, optInSlowK_MAType, optInSlowD_Period, optInSlowD_MAType)
 ```
 
-```talib.STOCH()```函数用于计算**随机指标（STOCH指标）**。
+计算随机指标（Stochastic），返回慢速K、慢速D。
 
 Parameters:
 
-- `inPriceHLC` ({@struct/Record Record}结构数组, required): ```inPriceHLC```参数用于指定K线数据。
-- `optInFastK_Period` (number, optional): ```optInFastK_Period```参数用于设置快速K值周期，默认值为5。
-- `optInSlowK_Period` (number, optional): ```optInSlowK_Period```参数用于设置慢速K值周期，默认值为3。
-- `optInSlowK_MAType` (number, optional): ```optInSlowK_MAType```参数用于设置慢速K值移动平均线类型，默认值为0。
-- `optInSlowD_Period` (number, optional): ```optInSlowD_Period```参数用于设置慢速D值周期，默认值为3。
-- `optInSlowD_MAType` (number, optional): ```optInSlowD_MAType```参数用于设置慢速D值移动平均线类型，默认值为0。
+- `inPriceHLC` ({@struct/Record Record}数组, required): K线数组，取最高价、最低价、收盘价；Python中依次传入`records.High`、`records.Low`、`records.Close`。
+- `optInFastK_Period` (number, optional): 快速K周期。默认 `5`。
+- `optInSlowK_Period` (number, optional): 慢速K周期。默认 `3`。
+- `optInSlowK_MAType` (number, optional): 慢速K的均线类型，取值见`Talib`的MAType表。默认 `0`（SMA）。
+- `optInSlowD_Period` (number, optional): 慢速D周期。默认 `3`。
+- `optInSlowD_MAType` (number, optional): 慢速D的均线类型，取值见`Talib`的MAType表。默认 `0`（SMA）。
 
-Returns (array): ```talib.STOCH()```函数返回二维数组。
+Returns (array): 二维数组，依次为慢速K、慢速D数组（Python中为同样顺序的tuple）。
+
+用最近的K线计算随机指标。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.STOCH(records)
+    // 输出：[慢速K数组, 慢速D数组]
     Log(ret)
 }
 ```
@@ -15260,11 +16274,16 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.STOCH(records.High, records.Low, records.Close)
+    # 输出：(慢速K数组, 慢速D数组)
     Log(ret)
 ```
 
-```STOCH()```函数在talib库文档中的描述为：```STOCH(Records[High,Low,Close],Fast-K Period = 5,Slow-K Period = 3,Slow-K MA = 0,Slow-D Period = 3,Slow-D MA = 0) = [Array(outSlowK),Array(outSlowD)]```
+对应TA-Lib：`STOCH(Records[High,Low,Close],Fast-K Period = 5,Slow-K Period = 3,Slow-K MA = 0,Slow-D Period = 3,Slow-D MA = 0) = [Array(outSlowK),Array(outSlowD)]`。
+
+See also: `talib.STOCHF`, `talib.STOCHRSI`, `talib.WILLR`, `TA.KDJ`
 
 ##### talib.STOCHF
 
@@ -15275,21 +16294,25 @@ talib.STOCHF(inPriceHLC, optInFastK_Period, optInFastD_Period)
 talib.STOCHF(inPriceHLC, optInFastK_Period, optInFastD_Period, optInFastD_MAType)
 ```
 
-```talib.STOCHF()```函数用于计算**快速随机指标（Stochastic Fast）**。
+计算快速随机指标（Stochastic Fast），返回快速K、快速D。
 
 Parameters:
 
-- `inPriceHLC` ({@struct/Record Record}结构数组, required): ```inPriceHLC```参数用于指定K线数据。
-- `optInFastK_Period` (number, optional): ```optInFastK_Period```参数用于设置Fast-K周期，默认值为5。
-- `optInFastD_Period` (number, optional): ```optInFastD_Period```参数用于设置Fast-D周期，默认值为3。
-- `optInFastD_MAType` (number, optional): ```optInFastD_MAType```参数用于设置Fast-D移动平均线类型，默认值为0。
+- `inPriceHLC` ({@struct/Record Record}数组, required): K线数组，取最高价、最低价、收盘价；Python中依次传入`records.High`、`records.Low`、`records.Close`。
+- `optInFastK_Period` (number, optional): 快速K周期。默认 `5`。
+- `optInFastD_Period` (number, optional): 快速D周期。默认 `3`。
+- `optInFastD_MAType` (number, optional): 快速D的均线类型，取值见`Talib`的MAType表。默认 `0`（SMA）。
 
-Returns (array): ```talib.STOCHF()```函数返回二维数组。
+Returns (array): 二维数组，依次为快速K、快速D数组（Python中为同样顺序的tuple）。
+
+用最近的K线计算快速随机指标。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.STOCHF(records)
+    // 输出：[快速K数组, 快速D数组]
     Log(ret)
 }
 ```
@@ -15298,11 +16321,16 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.STOCHF(records.High, records.Low, records.Close)
+    # 输出：(快速K数组, 快速D数组)
     Log(ret)
 ```
 
-```STOCHF()```函数在talib库文档中的描述为：```STOCHF(Records[High,Low,Close],Fast-K Period = 5,Fast-D Period = 3,Fast-D MA = 0) = [Array(outFastK),Array(outFastD)]```
+对应TA-Lib：`STOCHF(Records[High,Low,Close],Fast-K Period = 5,Fast-D Period = 3,Fast-D MA = 0) = [Array(outFastK),Array(outFastD)]`。
+
+See also: `talib.STOCH`, `talib.STOCHRSI`, `talib.WILLR`, `TA.KDJ`
 
 ##### talib.STOCHRSI
 
@@ -15314,22 +16342,26 @@ talib.STOCHRSI(inReal, optInTimePeriod, optInFastK_Period, optInFastD_Period)
 talib.STOCHRSI(inReal, optInTimePeriod, optInFastK_Period, optInFastD_Period, optInFastD_MAType)
 ```
 
-```talib.STOCHRSI()```函数用于计算**随机相对强弱指数（Stochastic Relative Strength Index）**。
+计算随机相对强弱指标（Stochastic Relative Strength Index），返回快速K、快速D。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定价格数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为14。
-- `optInFastK_Period` (number, optional): ```optInFastK_Period```参数用于设置Fast-K线周期，默认值为5。
-- `optInFastD_Period` (number, optional): ```optInFastD_Period```参数用于设置Fast-D线周期，默认值为3。
-- `optInFastD_MAType` (number, optional): ```optInFastD_MAType```参数用于设置Fast-D线移动平均类型，默认值为0。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `14`。
+- `optInFastK_Period` (number, optional): 快速K周期。默认 `5`。
+- `optInFastD_Period` (number, optional): 快速D周期。默认 `3`。
+- `optInFastD_MAType` (number, optional): 快速D的均线类型，取值见`Talib`的MAType表。默认 `0`（SMA）。
 
-Returns (array): ```talib.STOCHRSI()```函数返回二维数组，包含Fast-K和Fast-D两个数组。
+Returns (array): 二维数组，依次为快速K、快速D数组（Python中为同样顺序的tuple）。
+
+用最近的K线计算随机相对强弱指标。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.STOCHRSI(records)
+    // 输出：[快速K数组, 快速D数组]
     Log(ret)
 }
 ```
@@ -15338,11 +16370,16 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.STOCHRSI(records.Close)
+    # 输出：(快速K数组, 快速D数组)
     Log(ret)
 ```
 
-```STOCHRSI()```函数在talib库文档中的描述为：```STOCHRSI(Records[Close],Time Period = 14,Fast-K Period = 5,Fast-D Period = 3,Fast-D MA = 0) = [Array(outFastK),Array(outFastD)]```
+对应TA-Lib：`STOCHRSI(Records[Close],Time Period = 14,Fast-K Period = 5,Fast-D Period = 3,Fast-D MA = 0) = [Array(outFastK),Array(outFastD)]`。
+
+See also: `talib.RSI`, `talib.STOCH`, `talib.STOCHF`, `TA.RSI`, `TA.KDJ`
 
 ##### talib.TRIX
 
@@ -15351,18 +16388,21 @@ talib.TRIX(inReal)
 talib.TRIX(inReal, optInTimePeriod)
 ```
 
-```talib.TRIX()```函数用于计算**1-day Rate-Of-Change (ROC) of a Triple Smooth EMA（三重指数平滑移动平均线的一日变化率）**。
+计算三重指数平滑平均线变动率（1-day Rate-Of-Change (ROC) of a Triple Smooth EMA）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为30。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `30`。
 
-Returns (array): ```talib.TRIX()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算三重指数平滑平均线变动率。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.TRIX(records)
     Log(ret)
 }
@@ -15372,11 +16412,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.TRIX(records.Close)
     Log(ret)
 ```
 
-```TRIX()```函数在talib库文档中的描述为：```TRIX(Records[Close],Time Period = 30) = Array(outReal)```
+对应TA-Lib：`TRIX(Records[Close],Time Period = 30) = Array(outReal)`。
+
+See also: `talib.TEMA`, `talib.EMA`, `talib.ROC`
 
 ##### talib.ULTOSC
 
@@ -15387,20 +16431,23 @@ talib.ULTOSC(inPriceHLC, optInTimePeriod1, optInTimePeriod2)
 talib.ULTOSC(inPriceHLC, optInTimePeriod1, optInTimePeriod2, optInTimePeriod3)
 ```
 
-```talib.ULTOSC()```函数用于计算**Ultimate Oscillator（极限振荡器）**。
+计算终极振荡指标（Ultimate Oscillator）。
 
 Parameters:
 
-- `inPriceHLC` ({@struct/Record Record}结构数组, required): ```inPriceHLC```参数用于指定K线数据。
-- `optInTimePeriod1` (number, optional): ```optInTimePeriod1```参数用于设置第一个时间周期，默认值为7。
-- `optInTimePeriod2` (number, optional): ```optInTimePeriod2```参数用于设置第二个时间周期，默认值为14。
-- `optInTimePeriod3` (number, optional): ```optInTimePeriod3```参数用于设置第三个时间周期，默认值为28。
+- `inPriceHLC` ({@struct/Record Record}数组, required): K线数组，取最高价、最低价、收盘价；Python中依次传入`records.High`、`records.Low`、`records.Close`。
+- `optInTimePeriod1` (number, optional): 第一周期。默认 `7`。
+- `optInTimePeriod2` (number, optional): 第二周期。默认 `14`。
+- `optInTimePeriod3` (number, optional): 第三周期。默认 `28`。
 
-Returns (array): ```talib.ULTOSC()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算终极振荡指标。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.ULTOSC(records)
     Log(ret)
 }
@@ -15410,11 +16457,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.ULTOSC(records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```ULTOSC()```函数在talib库文档中的描述为：```ULTOSC(Records[High,Low,Close],First Period = 7,Second Period = 14,Third Period = 28) = Array(outReal)```
+对应TA-Lib：`ULTOSC(Records[High,Low,Close],First Period = 7,Second Period = 14,Third Period = 28) = Array(outReal)`。
+
+See also: `talib.STOCH`, `talib.WILLR`, `talib.RSI`
 
 ##### talib.WILLR
 
@@ -15423,18 +16474,21 @@ talib.WILLR(inPriceHLC)
 talib.WILLR(inPriceHLC, optInTimePeriod)
 ```
 
-```talib.WILLR()```函数用于计算**Williams' %R（威廉指标）**。
+计算威廉指标（Williams' %R）。
 
 Parameters:
 
-- `inPriceHLC` ({@struct/Record Record}结构数组, required): ```inPriceHLC```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为14。
+- `inPriceHLC` ({@struct/Record Record}数组, required): K线数组，取最高价、最低价、收盘价；Python中依次传入`records.High`、`records.Low`、`records.Close`。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `14`。
 
-Returns (array): ```talib.WILLR()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算威廉指标。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.WILLR(records)
     Log(ret)
 }
@@ -15444,15 +16498,19 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.WILLR(records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```WILLR()```函数在talib库文档中的描述为：```WILLR(Records[High,Low,Close],Time Period = 14) = Array(outReal)```
+对应TA-Lib：`WILLR(Records[High,Low,Close],Time Period = 14) = Array(outReal)`。
 
-#### VolumeIndicators
+See also: `talib.STOCH`, `talib.STOCHF`, `talib.CCI`, `talib.RSI`, `TA.KDJ`
 
-成交量类指标：AD、ADOSC、OBV。
+#### 成交量指标
+
+成交量指标（Volume Indicators）结合价格与成交量判断资金流向，包括AD、ADOSC、OBV。
 
 ##### talib.AD
 
@@ -15460,17 +16518,20 @@ def main():
 talib.AD(inPriceHLCV)
 ```
 
-```talib.AD()```函数用于计算**Chaikin A/D Line（累积/派发线指标）**。
+计算蔡金累积/派发线（Chaikin A/D Line）。
 
 Parameters:
 
-- `inPriceHLCV` ({@struct/Record Record}结构数组, required): ```inPriceHLCV```参数用于指定K线数据。
+- `inPriceHLCV` ({@struct/Record Record}数组, required): K线数组，取最高价、最低价、收盘价、成交量；Python中依次传入`records.High`、`records.Low`、`records.Close`、`records.Volume`。
 
-Returns (array): ```talib.AD()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算蔡金累积/派发线。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.AD(records)
     Log(ret)
 }
@@ -15480,11 +16541,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.AD(records.High, records.Low, records.Close, records.Volume)
     Log(ret)
 ```
 
-```AD()```函数在talib库文档中的描述为：```AD(Records[High,Low,Close,Volume]) = Array(outReal)```
+对应TA-Lib：`AD(Records[High,Low,Close,Volume]) = Array(outReal)`。
+
+See also: `talib.ADOSC`, `talib.OBV`, `talib.MFI`, `TA.CMF`
 
 ##### talib.ADOSC
 
@@ -15494,19 +16559,22 @@ talib.ADOSC(inPriceHLCV, optInFastPeriod)
 talib.ADOSC(inPriceHLCV, optInFastPeriod, optInSlowPeriod)
 ```
 
-```talib.ADOSC()```函数用于计算**Chaikin A/D Oscillator（佳庆指标）**。
+计算佳庆指标（Chaikin A/D Oscillator）。
 
 Parameters:
 
-- `inPriceHLCV` ({@struct/Record Record}结构数组, required): ```inPriceHLCV```参数用于指定K线数据。
-- `optInFastPeriod` (number, optional): ```optInFastPeriod```参数用于设置快周期，默认值为3。
-- `optInSlowPeriod` (number, optional): ```optInSlowPeriod```参数用于设置慢周期，默认值为10。
+- `inPriceHLCV` ({@struct/Record Record}数组, required): K线数组，取最高价、最低价、收盘价、成交量；Python中依次传入`records.High`、`records.Low`、`records.Close`、`records.Volume`。
+- `optInFastPeriod` (number, optional): 快线周期。默认 `3`。
+- `optInSlowPeriod` (number, optional): 慢线周期。默认 `10`。
 
-Returns (array): ```talib.ADOSC()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算快线3、慢线10的佳庆指标。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.ADOSC(records, 3, 10)
     Log(ret)
 }
@@ -15516,11 +16584,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.ADOSC(records.High, records.Low, records.Close, records.Volume, 3, 10)
     Log(ret)
 ```
 
-```ADOSC()```函数在talib库文档中的描述为：```ADOSC(Records[High,Low,Close,Volume],Fast Period = 3,Slow Period = 10) = Array(outReal)```
+对应TA-Lib：`ADOSC(Records[High,Low,Close,Volume],Fast Period = 3,Slow Period = 10) = Array(outReal)`。
+
+See also: `talib.AD`, `talib.OBV`, `talib.MFI`, `TA.CMF`
 
 ##### talib.OBV
 
@@ -15529,18 +16601,21 @@ talib.OBV(inReal)
 talib.OBV(inReal, inPriceV)
 ```
 
-```talib.OBV()```函数用于计算**On Balance Volume（能量潮指标）**。
+计算能量潮（On Balance Volume）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据（取收盘价与成交量）或收盘价数值数组。
-- `inPriceV` ({@struct/Record Record}结构数组 / 数值数组, optional): ```inPriceV```参数用于指定成交量：```inReal```为K线数据时无需传入；```inReal```为收盘价数组时必须传入（传K线数据则取其成交量，或传成交量数值数组）。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数据（取收盘价与成交量）或收盘价数值数组。
+- `inPriceV` ({@struct/Record Record}数组 / 数值数组, optional): 成交量：`inReal`为K线数据时无需传入；`inReal`为收盘价数组时必须传入（传K线数据则取其成交量，或传成交量数值数组）。
 
-Returns (array): ```talib.OBV()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算能量潮。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.OBV(records)
     Log(ret)
 }
@@ -15550,15 +16625,19 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.OBV(records.Close, records.Volume)
     Log(ret)
 ```
 
-```OBV()```函数在talib库文档中的描述为：```OBV(Records[Close],Records[Volume]) = Array(outReal)```
+对应TA-Lib：`OBV(Records[Close],Records[Volume]) = Array(outReal)`。
 
-#### VolatilityIndicators
+See also: `talib.AD`, `talib.ADOSC`, `talib.MFI`, `TA.OBV`
 
-波动率类指标：ATR、NATR、TRANGE。
+#### 波动率指标
+
+波动率指标（Volatility Indicators）衡量价格的波动幅度，包括ATR、NATR、TRANGE。
 
 ##### talib.ATR
 
@@ -15567,18 +16646,21 @@ talib.ATR(inPriceHLC)
 talib.ATR(inPriceHLC, optInTimePeriod)
 ```
 
-```talib.ATR()```函数用于计算**Average True Range（平均真实波幅）**指标。
+计算平均真实波幅（Average True Range）。
 
 Parameters:
 
-- `inPriceHLC` ({@struct/Record Record}结构数组, required): ```inPriceHLC```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为14。
+- `inPriceHLC` ({@struct/Record Record}数组, required): K线数组，取最高价、最低价、收盘价；Python中依次传入`records.High`、`records.Low`、`records.Close`。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `14`。
 
-Returns (array): ```talib.ATR()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算平均真实波幅。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.ATR(records)
     Log(ret)
 }
@@ -15588,11 +16670,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.ATR(records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```ATR()```函数在talib库文档中的描述为：```ATR(Records[High,Low,Close],Time Period = 14) = Array(outReal)```
+对应TA-Lib：`ATR(Records[High,Low,Close],Time Period = 14) = Array(outReal)`。
+
+See also: `talib.NATR`, `talib.TRANGE`, `talib.STDDEV`, `TA.ATR`
 
 ##### talib.NATR
 
@@ -15601,18 +16687,21 @@ talib.NATR(inPriceHLC)
 talib.NATR(inPriceHLC, optInTimePeriod)
 ```
 
-```talib.NATR()```函数用于计算**Normalized Average True Range（归一化平均真实波幅）**。
+计算归一化平均真实波幅（Normalized Average True Range）。
 
 Parameters:
 
-- `inPriceHLC` ({@struct/Record Record}结构数组, required): ```inPriceHLC```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为14。
+- `inPriceHLC` ({@struct/Record Record}数组, required): K线数组，取最高价、最低价、收盘价；Python中依次传入`records.High`、`records.Low`、`records.Close`。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `14`。
 
-Returns (array): ```talib.NATR()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算归一化平均真实波幅。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.NATR(records)
     Log(ret)
 }
@@ -15622,11 +16711,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.NATR(records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```NATR()```函数在talib库文档中的描述为：```NATR(Records[High,Low,Close],Time Period = 14) = Array(outReal)```
+对应TA-Lib：`NATR(Records[High,Low,Close],Time Period = 14) = Array(outReal)`。
+
+See also: `talib.ATR`, `talib.TRANGE`, `TA.ATR`
 
 ##### talib.TRANGE
 
@@ -15634,17 +16727,20 @@ def main():
 talib.TRANGE(inPriceHLC)
 ```
 
-```talib.TRANGE()```函数用于计算**True Range（真实范围）**指标。
+计算真实波幅（True Range）。
 
 Parameters:
 
-- `inPriceHLC` ({@struct/Record Record}结构数组, required): ```inPriceHLC```参数用于指定K线数据。
+- `inPriceHLC` ({@struct/Record Record}数组, required): K线数组，取最高价、最低价、收盘价；Python中依次传入`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.TRANGE()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算真实波幅。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.TRANGE(records)
     Log(ret)
 }
@@ -15654,15 +16750,19 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.TRANGE(records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```TRANGE()```函数在talib库文档中的描述为：```TRANGE(Records[High,Low,Close]) = Array(outReal)```
+对应TA-Lib：`TRANGE(Records[High,Low,Close]) = Array(outReal)`。
 
-#### CycleIndicators
+See also: `talib.ATR`, `talib.NATR`, `TA.ATR`
 
-周期类指标（希尔伯特变换）。
+#### 周期指标
+
+周期指标（Cycle Indicators）用希尔伯特变换估计价格的主导周期、相位和趋势模式。
 
 ##### talib.HT_DCPERIOD
 
@@ -15670,17 +16770,20 @@ def main():
 talib.HT_DCPERIOD(inReal)
 ```
 
-```talib.HT_DCPERIOD()```函数用于计算**Hilbert Transform - Dominant Cycle Period（希尔伯特变换主导周期）**。
+计算希尔伯特变换主导周期（Hilbert Transform - Dominant Cycle Period）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
 
-Returns (array): ```talib.HT_DCPERIOD()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算希尔伯特变换主导周期。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.HT_DCPERIOD(records)
     Log(ret)
 }
@@ -15690,11 +16793,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.HT_DCPERIOD(records.Close)
     Log(ret)
 ```
 
-```HT_DCPERIOD()```函数在talib库文档中的描述为：```HT_DCPERIOD(Records[Close]) = Array(outReal)```
+对应TA-Lib：`HT_DCPERIOD(Records[Close]) = Array(outReal)`。
+
+See also: `talib.HT_DCPHASE`, `talib.HT_PHASOR`, `talib.HT_SINE`, `talib.HT_TRENDMODE`, `talib.HT_TRENDLINE`
 
 ##### talib.HT_DCPHASE
 
@@ -15702,17 +16809,20 @@ def main():
 talib.HT_DCPHASE(inReal)
 ```
 
-```talib.HT_DCPHASE()```函数用于计算**希尔伯特变换主周期相位（Hilbert Transform - Dominant Cycle Phase）**。
+计算希尔伯特变换主导周期相位（Hilbert Transform - Dominant Cycle Phase）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的K线数据。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
 
-Returns (array): ```talib.HT_DCPHASE()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算希尔伯特变换主导周期相位。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.HT_DCPHASE(records)
     Log(ret)
 }
@@ -15722,11 +16832,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.HT_DCPHASE(records.Close)
     Log(ret)
 ```
 
-```HT_DCPHASE()```函数在talib库文档中的描述为：```HT_DCPHASE(Records[Close]) = Array(outReal)```
+对应TA-Lib：`HT_DCPHASE(Records[Close]) = Array(outReal)`。
+
+See also: `talib.HT_DCPERIOD`, `talib.HT_PHASOR`, `talib.HT_SINE`, `talib.HT_TRENDMODE`
 
 ##### talib.HT_PHASOR
 
@@ -15734,18 +16848,22 @@ def main():
 talib.HT_PHASOR(inReal)
 ```
 
-```talib.HT_PHASOR()```函数用于计算**Hilbert Transform - Phasor Components（希尔伯特变换-相量分量）**。
+计算希尔伯特变换相量分量（Hilbert Transform - Phasor Components），返回同相分量、正交分量。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的K线数据。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
 
-Returns (array): ```talib.HT_PHASOR()```函数返回一个二维数组。
+Returns (array): 二维数组，依次为同相分量、正交分量数组（Python中为同样顺序的tuple）。
+
+用最近的K线计算希尔伯特变换相量分量。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.HT_PHASOR(records)
+    // 输出：[同相分量数组, 正交分量数组]
     Log(ret)
 }
 ```
@@ -15754,11 +16872,16 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.HT_PHASOR(records.Close)
+    # 输出：(同相分量数组, 正交分量数组)
     Log(ret)
 ```
 
-```HT_PHASOR()```函数在talib库文档中的描述为：```HT_PHASOR(Records[Close]) = [Array(outInPhase),Array(outQuadrature)]```
+对应TA-Lib：`HT_PHASOR(Records[Close]) = [Array(outInPhase),Array(outQuadrature)]`。
+
+See also: `talib.HT_DCPHASE`, `talib.HT_SINE`, `talib.HT_DCPERIOD`
 
 ##### talib.HT_SINE
 
@@ -15766,18 +16889,22 @@ def main():
 talib.HT_SINE(inReal)
 ```
 
-```talib.HT_SINE()```函数用于计算**Hilbert Transform - SineWave（希尔伯特变换 - 正弦波）**。
+计算希尔伯特变换正弦波（Hilbert Transform - SineWave），返回正弦线、超前正弦线。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
 
-Returns (array): ```talib.HT_SINE()```函数返回二维数组。
+Returns (array): 二维数组，依次为正弦线、超前正弦线数组（Python中为同样顺序的tuple）。
+
+用最近的K线计算希尔伯特变换正弦波。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.HT_SINE(records)
+    // 输出：[正弦线数组, 超前正弦线数组]
     Log(ret)
 }
 ```
@@ -15786,11 +16913,16 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.HT_SINE(records.Close)
+    # 输出：(正弦线数组, 超前正弦线数组)
     Log(ret)
 ```
 
-```HT_SINE()```函数在talib库文档中的描述为：```HT_SINE(Records[Close]) = [Array(outSine),Array(outLeadSine)]```
+对应TA-Lib：`HT_SINE(Records[Close]) = [Array(outSine),Array(outLeadSine)]`。
+
+See also: `talib.HT_DCPHASE`, `talib.HT_PHASOR`, `talib.HT_TRENDMODE`
 
 ##### talib.HT_TRENDMODE
 
@@ -15798,17 +16930,20 @@ def main():
 talib.HT_TRENDMODE(inReal)
 ```
 
-```talib.HT_TRENDMODE()```函数用于计算**Hilbert Transform - Trend vs Cycle Mode（希尔伯特变换 - 趋势与周期模式）**。
+计算希尔伯特变换趋势与周期模式（Hilbert Transform - Trend vs Cycle Mode）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
 
-Returns (array): ```talib.HT_TRENDMODE()```函数返回一维数组。
+Returns (数值数组): 趋势模式数组：`1`表示趋势模式，`0`表示周期模式。
+
+用最近的K线计算希尔伯特变换趋势与周期模式。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.HT_TRENDMODE(records)
     Log(ret)
 }
@@ -15818,15 +16953,19 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.HT_TRENDMODE(records.Close)
     Log(ret)
 ```
 
-```HT_TRENDMODE()```函数在talib库文档中的描述为：```HT_TRENDMODE(Records[Close]) = Array(outInteger)```
+对应TA-Lib：`HT_TRENDMODE(Records[Close]) = Array(outInteger)`。
 
-#### PriceTransform
+See also: `talib.HT_TRENDLINE`, `talib.HT_DCPERIOD`, `talib.HT_SINE`
 
-价格变换：平均价、中间价、典型价、加权收盘价，以及平均绝对偏差。
+#### 价格变换
+
+价格变换（Price Transform）把每根K线的开高低收合成一个价格，包括平均价、中间价、典型价、加权收盘价，另含平均绝对偏差（AVGDEV）。
 
 ##### talib.AVGDEV
 
@@ -15835,18 +16974,21 @@ talib.AVGDEV(inReal)
 talib.AVGDEV(inReal, optInTimePeriod)
 ```
 
-```talib.AVGDEV()```函数用于计算**Average Deviation (平均绝对偏差)**。
+计算平均绝对偏差（Average Deviation）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置周期，默认值为14。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `14`。
 
-Returns (array): ```talib.AVGDEV()```函数的返回值为：一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算平均绝对偏差。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.AVGDEV(records)
     Log(ret)
 }
@@ -15856,15 +16998,19 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.AVGDEV(records.Close)
     Log(ret)
 ```
 
-```AVGDEV()```函数在talib库文档中的描述为：```AVGDEV(Records[Close],Time Period = 14) = Array(outReal)```
+对应TA-Lib：`AVGDEV(Records[Close],Time Period = 14) = Array(outReal)`。
 
-每个值是最近```optInTimePeriod```个数据与它们的平均值之差的绝对值的平均。
+每个值是最近`optInTimePeriod`个数据与它们的平均值之差的绝对值的平均。
 
-```Python```的TA-Lib从0.6版本（C库与Python包都要0.6及以上）开始提供此函数，旧版本调用会报属性不存在的错误。
+`Python`的TA-Lib从0.6版本（C库与Python包都要0.6及以上）开始提供此函数，旧版本调用会报属性不存在的错误。
+
+See also: `talib.STDDEV`, `talib.VAR`, `talib.CCI`
 
 ##### talib.AVGPRICE
 
@@ -15872,17 +17018,20 @@ def main():
 talib.AVGPRICE(inPriceOHLC)
 ```
 
-```talib.AVGPRICE()```函数用于计算**Average Price（平均价格）**。
+计算平均价格（Average Price）。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.AVGPRICE()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算平均价格。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.AVGPRICE(records)
     Log(ret)
 }
@@ -15892,11 +17041,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.AVGPRICE(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```AVGPRICE()```函数在talib库文档中的描述为：```AVGPRICE(Records[Open,High,Low,Close]) = Array(outReal)```
+对应TA-Lib：`AVGPRICE(Records[Open,High,Low,Close]) = Array(outReal)`。
+
+See also: `talib.MEDPRICE`, `talib.TYPPRICE`, `talib.WCLPRICE`
 
 ##### talib.MEDPRICE
 
@@ -15904,17 +17057,20 @@ def main():
 talib.MEDPRICE(inPriceHL)
 ```
 
-```talib.MEDPRICE()```函数用于计算**Median Price（中位数价格）**。
+计算中间价（Median Price）。
 
 Parameters:
 
-- `inPriceHL` ({@struct/Record Record}结构数组, required): ```inPriceHL```参数用于指定K线数据。
+- `inPriceHL` ({@struct/Record Record}数组, required): K线数组，取最高价、最低价；Python中依次传入`records.High`、`records.Low`。
 
-Returns (array): ```talib.MEDPRICE()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算中间价。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.MEDPRICE(records)
     Log(ret)
 }
@@ -15924,11 +17080,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.MEDPRICE(records.High, records.Low)
     Log(ret)
 ```
 
-```MEDPRICE()```函数在talib库文档中的描述为：```MEDPRICE(Records[High,Low]) = Array(outReal)```
+对应TA-Lib：`MEDPRICE(Records[High,Low]) = Array(outReal)`。
+
+See also: `talib.AVGPRICE`, `talib.TYPPRICE`, `talib.WCLPRICE`, `talib.MIDPRICE`, `TA.Alligator`
 
 ##### talib.TYPPRICE
 
@@ -15936,17 +17096,20 @@ def main():
 talib.TYPPRICE(inPriceHLC)
 ```
 
-```talib.TYPPRICE()```函数用于计算**典型价格（Typical Price）**。
+计算典型价格（Typical Price）。
 
 Parameters:
 
-- `inPriceHLC` ({@struct/Record Record}结构数组, required): ```inPriceHLC```参数用于指定K线数据。
+- `inPriceHLC` ({@struct/Record Record}数组, required): K线数组，取最高价、最低价、收盘价；Python中依次传入`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.TYPPRICE()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算典型价格。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.TYPPRICE(records)
     Log(ret)
 }
@@ -15956,11 +17119,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.TYPPRICE(records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```TYPPRICE()```函数在talib库文档中的描述为：```TYPPRICE(Records[High,Low,Close]) = Array(outReal)```
+对应TA-Lib：`TYPPRICE(Records[High,Low,Close]) = Array(outReal)`。
+
+See also: `talib.AVGPRICE`, `talib.MEDPRICE`, `talib.WCLPRICE`, `talib.CCI`
 
 ##### talib.WCLPRICE
 
@@ -15968,17 +17135,20 @@ def main():
 talib.WCLPRICE(inPriceHLC)
 ```
 
-```talib.WCLPRICE()```函数用于计算**Weighted Close Price（加权收盘价）**。
+计算加权收盘价（Weighted Close Price）。
 
 Parameters:
 
-- `inPriceHLC` ({@struct/Record Record}结构数组, required): ```inPriceHLC```参数用于指定K线数据。
+- `inPriceHLC` ({@struct/Record Record}数组, required): K线数组，取最高价、最低价、收盘价；Python中依次传入`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.WCLPRICE()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算加权收盘价。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.WCLPRICE(records)
     Log(ret)
 }
@@ -15988,15 +17158,19 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.WCLPRICE(records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```WCLPRICE()```函数在talib库文档中的描述为：```WCLPRICE(Records[High,Low,Close]) = Array(outReal)```
+对应TA-Lib：`WCLPRICE(Records[High,Low,Close]) = Array(outReal)`。
 
-#### StatisticFunctions
+See also: `talib.AVGPRICE`, `talib.MEDPRICE`, `talib.TYPPRICE`
 
-统计函数：贝塔系数、皮尔逊相关系数、线性回归、标准差、方差、时间序列预测。
+#### 统计函数
+
+统计函数（Statistic Functions）在滑动窗口上做统计计算，包括贝塔系数、皮尔逊相关系数、线性回归、标准差、方差、时间序列预测。
 
 ##### talib.BETA
 
@@ -16005,21 +17179,24 @@ talib.BETA(inReal0, inReal1)
 talib.BETA(inReal0, inReal1, optInTimePeriod)
 ```
 
-```talib.BETA()```函数用于计算**Beta (贝塔系数)**。
+计算贝塔系数（Beta）。
 
 Parameters:
 
-- `inReal0` (数值数组, required): ```inReal0```参数用于指定第一组价格数据（作为基准）。
-- `inReal1` (数值数组, required): ```inReal1```参数用于指定第二组价格数据，长度必须与```inReal0```相同。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置周期，默认值为5。
+- `inReal0` (数值数组, required): 第一组价格数据（作为基准）。
+- `inReal1` (数值数组, required): 第二组价格数据，长度必须与`inReal0`相同。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `5`。
 
-Returns (array): ```talib.BETA()```函数的返回值为：一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+计算第二个交易所对象的品种相对第一个（基准）的贝塔系数。
 
 ```javascript
 function main() {
     // exchanges[0] 为基准，exchanges[1] 为要计算贝塔系数的品种
     var r0 = exchanges[0].GetRecords()
     var r1 = exchanges[1].GetRecords()
+    if (!r0 || !r1) return
     var n = Math.min(r0.length, r1.length)
     var c0 = r0.slice(-n).map(function(r) { return r.Close })
     var c1 = r1.slice(-n).map(function(r) { return r.Close })
@@ -16034,16 +17211,20 @@ def main():
     # exchanges[0] 为基准，exchanges[1] 为要计算贝塔系数的品种
     r0 = exchanges[0].GetRecords()
     r1 = exchanges[1].GetRecords()
+    if not r0 or not r1:
+        return
     n = min(len(r0), len(r1))
     ret = talib.BETA(r0.Close[-n:], r1.Close[-n:], 5)
     Log(ret)
 ```
 
-```BETA()```函数在talib库文档中的描述为：```BETA(Array(inReal0),Array(inReal1),Time Period = 5) = Array(outReal)```
+对应TA-Lib：`BETA(Array(inReal0),Array(inReal1),Time Period = 5) = Array(outReal)`。
 
-以```inReal0```逐根的涨跌幅为自变量、```inReal1```逐根的涨跌幅为因变量，在最近```optInTimePeriod```个涨跌幅上做线性回归，返回斜率。计算某个品种相对基准的贝塔系数时，```inReal0```传基准价格，```inReal1```传该品种价格。
+以`inReal0`逐根的涨跌幅为自变量、`inReal1`逐根的涨跌幅为因变量，在最近`optInTimePeriod`个涨跌幅上做线性回归，返回斜率。计算某个品种相对基准的贝塔系数时，`inReal0`传基准价格，`inReal1`传该品种价格。
 
-```JavaScript```中两个输入都要传数值数组（可先用```map```从K线中取出字段）：传入K线数组时两个输入都会取同一份K线的收盘价，结果没有意义；两个数组长度不同会报错。
+`JavaScript`中两个输入都要传数值数组（可先用`map`从K线中取出字段）：传入K线数组时两个输入都会取同一份K线的收盘价，结果没有意义；两个数组长度不同会报错。
+
+See also: `talib.CORREL`, `talib.LINEARREG_SLOPE`, `talib.VAR`
 
 ##### talib.CORREL
 
@@ -16052,19 +17233,22 @@ talib.CORREL(inReal0, inReal1)
 talib.CORREL(inReal0, inReal1, optInTimePeriod)
 ```
 
-```talib.CORREL()```函数用于计算**Pearson's Correlation Coefficient (r) (皮尔逊相关系数)**。
+计算皮尔逊相关系数（Pearson's Correlation Coefficient (r)）。
 
 Parameters:
 
-- `inReal0` (数值数组, required): ```inReal0```参数用于指定第一组数据。
-- `inReal1` (数值数组, required): ```inReal1```参数用于指定第二组数据，长度必须与```inReal0```相同。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置周期，默认值为30。
+- `inReal0` (数值数组, required): 第一组数据。
+- `inReal1` (数值数组, required): 第二组数据，长度必须与`inReal0`相同。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `30`。
 
-Returns (array): ```talib.CORREL()```函数的返回值为：一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+计算收盘价与成交量在30根K线上的相关系数。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var closes = records.map(function(r) { return r.Close })
     var volumes = records.map(function(r) { return r.Volume })
     var ret = talib.CORREL(closes, volumes, 30)
@@ -16076,15 +17260,19 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CORREL(records.Close, records.Volume, 30)
     Log(ret)
 ```
 
-```CORREL()```函数在talib库文档中的描述为：```CORREL(Array(inReal0),Array(inReal1),Time Period = 30) = Array(outReal)```
+对应TA-Lib：`CORREL(Array(inReal0),Array(inReal1),Time Period = 30) = Array(outReal)`。
 
-返回两组数据在最近```optInTimePeriod```根上的皮尔逊相关系数，取值范围[-1, 1]。
+返回两组数据在最近`optInTimePeriod`根上的皮尔逊相关系数，取值范围[-1, 1]。
 
-```JavaScript```中两个输入都要传数值数组（可先用```map```从K线中取出字段）：传入K线数组时两个输入都会取同一份K线的收盘价，结果没有意义；两个数组长度不同会报错。
+`JavaScript`中两个输入都要传数值数组（可先用`map`从K线中取出字段）：传入K线数组时两个输入都会取同一份K线的收盘价，结果没有意义；两个数组长度不同会报错。
+
+See also: `talib.BETA`, `talib.LINEARREG`, `talib.STDDEV`
 
 ##### talib.LINEARREG
 
@@ -16093,18 +17281,21 @@ talib.LINEARREG(inReal)
 talib.LINEARREG(inReal, optInTimePeriod)
 ```
 
-```talib.LINEARREG()```函数用于计算**Linear Regression（线性回归）**指标。
+计算线性回归（Linear Regression）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为14。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `14`。
 
-Returns (array): ```talib.LINEARREG()```函数返回一维数组，包含线性回归计算结果。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算线性回归。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.LINEARREG(records)
     Log(ret)
 }
@@ -16114,11 +17305,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.LINEARREG(records.Close)
     Log(ret)
 ```
 
-```LINEARREG()```函数在talib库文档中的描述为：```LINEARREG(Records[Close],Time Period = 14) = Array(outReal)```
+对应TA-Lib：`LINEARREG(Records[Close],Time Period = 14) = Array(outReal)`。
+
+See also: `talib.LINEARREG_SLOPE`, `talib.LINEARREG_INTERCEPT`, `talib.LINEARREG_ANGLE`, `talib.TSF`
 
 ##### talib.LINEARREG_ANGLE
 
@@ -16127,18 +17322,21 @@ talib.LINEARREG_ANGLE(inReal)
 talib.LINEARREG_ANGLE(inReal, optInTimePeriod)
 ```
 
-```talib.LINEARREG_ANGLE()```函数用于计算**Linear Regression Angle（线性回归角度）**。
+计算线性回归角度（Linear Regression Angle）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为14。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `14`。
 
-Returns (array): ```talib.LINEARREG_ANGLE()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算线性回归角度。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.LINEARREG_ANGLE(records)
     Log(ret)
 }
@@ -16148,11 +17346,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.LINEARREG_ANGLE(records.Close)
     Log(ret)
 ```
 
-```LINEARREG_ANGLE()```函数在talib库文档中的描述为：```LINEARREG_ANGLE(Records[Close],Time Period = 14) = Array(outReal)```
+对应TA-Lib：`LINEARREG_ANGLE(Records[Close],Time Period = 14) = Array(outReal)`。
+
+See also: `talib.LINEARREG_SLOPE`, `talib.LINEARREG`, `talib.LINEARREG_INTERCEPT`
 
 ##### talib.LINEARREG_INTERCEPT
 
@@ -16161,18 +17363,21 @@ talib.LINEARREG_INTERCEPT(inReal)
 talib.LINEARREG_INTERCEPT(inReal, optInTimePeriod)
 ```
 
-```talib.LINEARREG_INTERCEPT()```函数用于计算**线性回归截距（Linear Regression Intercept）**。
+计算线性回归截距（Linear Regression Intercept）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为14。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `14`。
 
-Returns (array): ```talib.LINEARREG_INTERCEPT()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算线性回归截距。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.LINEARREG_INTERCEPT(records)
     Log(ret)
 }
@@ -16182,11 +17387,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.LINEARREG_INTERCEPT(records.Close)
     Log(ret)
 ```
 
-```LINEARREG_INTERCEPT()```函数在talib库文档中的描述为：```LINEARREG_INTERCEPT(Records[Close],Time Period = 14) = Array(outReal)```
+对应TA-Lib：`LINEARREG_INTERCEPT(Records[Close],Time Period = 14) = Array(outReal)`。
+
+See also: `talib.LINEARREG`, `talib.LINEARREG_SLOPE`, `talib.TSF`
 
 ##### talib.LINEARREG_SLOPE
 
@@ -16195,18 +17404,21 @@ talib.LINEARREG_SLOPE(inReal)
 talib.LINEARREG_SLOPE(inReal, optInTimePeriod)
 ```
 
-```talib.LINEARREG_SLOPE()```函数用于计算**Linear Regression Slope（线性回归斜率）**。
+计算线性回归斜率（Linear Regression Slope）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为14。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `14`。
 
-Returns (array): ```talib.LINEARREG_SLOPE()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算线性回归斜率。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.LINEARREG_SLOPE(records)
     Log(ret)
 }
@@ -16216,11 +17428,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.LINEARREG_SLOPE(records.Close)
     Log(ret)
 ```
 
-```LINEARREG_SLOPE()```函数在talib库文档中的描述为：```LINEARREG_SLOPE(Records[Close],Time Period = 14) = Array(outReal)```
+对应TA-Lib：`LINEARREG_SLOPE(Records[Close],Time Period = 14) = Array(outReal)`。
+
+See also: `talib.LINEARREG`, `talib.LINEARREG_ANGLE`, `talib.LINEARREG_INTERCEPT`
 
 ##### talib.STDDEV
 
@@ -16230,19 +17446,22 @@ talib.STDDEV(inReal, optInTimePeriod)
 talib.STDDEV(inReal, optInTimePeriod, optInNbDev)
 ```
 
-```talib.STDDEV()```函数用于计算**标准偏差（Standard Deviation）**。
+计算标准差（Standard Deviation）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为5。
-- `optInNbDev` (number, optional): ```optInNbDev```参数用于设置偏差倍数，默认值为1。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `5`。
+- `optInNbDev` (number, optional): 标准差倍数（Deviations）。默认 `1`。
 
-Returns (array): ```talib.STDDEV()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算标准差。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.STDDEV(records)
     Log(ret)
 }
@@ -16252,11 +17471,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.STDDEV(records.Close)
     Log(ret)
 ```
 
-```STDDEV()```函数在talib库文档中的描述为：```STDDEV(Records[Close],Time Period = 5,Deviations = 1) = Array(outReal)```
+对应TA-Lib：`STDDEV(Records[Close],Time Period = 5,Deviations = 1) = Array(outReal)`。
+
+See also: `talib.VAR`, `talib.AVGDEV`, `talib.BBANDS`
 
 ##### talib.TSF
 
@@ -16265,18 +17488,21 @@ talib.TSF(inReal)
 talib.TSF(inReal, optInTimePeriod)
 ```
 
-```talib.TSF()```函数用于计算**Time Series Forecast（时间序列预测）**。
+计算时间序列预测（Time Series Forecast）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为14。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `14`。
 
-Returns (array): ```talib.TSF()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算时间序列预测。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.TSF(records)
     Log(ret)
 }
@@ -16286,11 +17512,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.TSF(records.Close)
     Log(ret)
 ```
 
-```TSF()```函数在talib库文档中的描述为：```TSF(Records[Close],Time Period = 14) = Array(outReal)```
+对应TA-Lib：`TSF(Records[Close],Time Period = 14) = Array(outReal)`。
+
+See also: `talib.LINEARREG`, `talib.LINEARREG_SLOPE`, `talib.LINEARREG_INTERCEPT`
 
 ##### talib.VAR
 
@@ -16300,19 +17530,22 @@ talib.VAR(inReal, optInTimePeriod)
 talib.VAR(inReal, optInTimePeriod, optInNbDev)
 ```
 
-```talib.VAR()```函数用于计算**方差（Variance）**。
+计算方差（Variance）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为5。
-- `optInNbDev` (number, optional): ```optInNbDev```参数用于设置标准差倍数，默认值为1。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `5`。
+- `optInNbDev` (number, optional): 标准差倍数（Deviations）。默认 `1`。
 
-Returns (array): ```talib.VAR()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算方差。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.VAR(records)
     Log(ret)
 }
@@ -16322,15 +17555,19 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.VAR(records.Close)
     Log(ret)
 ```
 
-```VAR()```函数在talib库文档中的描述为：```VAR(Records[Close],Time Period = 5,Deviations = 1) = Array(outReal)```
+对应TA-Lib：`VAR(Records[Close],Time Period = 5,Deviations = 1) = Array(outReal)`。
 
-#### MathTransform
+See also: `talib.STDDEV`, `talib.AVGDEV`, `talib.BETA`
 
-数学变换：三角函数、指数、对数、取整、开方。
+#### 数学变换
+
+数学变换（Math Transform）对数组逐个元素做数学运算，包括三角函数、指数、对数、取整、开方。
 
 ##### talib.ACOS
 
@@ -16338,18 +17575,21 @@ def main():
 talib.ACOS(inReal)
 ```
 
-```talib.ACOS()```函数用于计算**向量三角反余弦函数（Vector Trigonometric ACos）**。
+逐个元素计算反余弦（Vector Trigonometric ACos）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的实数数据。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
 
-Returns (array): ```talib.ACOS()```函数返回一维数组，包含计算得出的反余弦值。
+Returns (数值数组): 与输入等长的结果数组。
+
+对一组数值计算反余弦。
 
 ```javascript
 function main() {
     var data = [-1, 0, 1]
     var ret = talib.ACOS(data)
+    // 输出：约 [3.1416, 1.5708, 0]
     Log(ret)
 }
 ```
@@ -16360,10 +17600,13 @@ import numpy as np
 def main():
     data = [-1.0, 0, 1.0]
     ret = talib.ACOS(np.array(data))
+    # 输出：约 [3.1416, 1.5708, 0]
     Log(ret)
 ```
 
-```ACOS()```函数在talib库文档中的描述为：```ACOS(Records[Close]) = Array(outReal)```
+对应TA-Lib：`ACOS(Records[Close]) = Array(outReal)`。
+
+See also: `talib.ASIN`, `talib.ATAN`, `talib.COS`
 
 ##### talib.ASIN
 
@@ -16371,18 +17614,21 @@ def main():
 talib.ASIN(inReal)
 ```
 
-```talib.ASIN()```函数用于计算**向量三角反正弦函数（Vector Trigonometric ASin）**。
+逐个元素计算反正弦（Vector Trigonometric ASin）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的实数数据。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
 
-Returns (array): ```talib.ASIN()```函数返回一维数组，包含计算得出的反正弦值。
+Returns (数值数组): 与输入等长的结果数组。
+
+对一组数值计算反正弦。
 
 ```javascript
 function main() {
     var data = [-1, 0, 1]
     var ret = talib.ASIN(data)
+    // 输出：约 [-1.5708, 0, 1.5708]
     Log(ret)
 }
 ```
@@ -16393,10 +17639,13 @@ import numpy as np
 def main():
     data = [-1.0, 0, 1.0]
     ret = talib.ASIN(np.array(data))
+    # 输出：约 [-1.5708, 0, 1.5708]
     Log(ret)
 ```
 
-```ASIN()```函数在talib库文档中的描述为：```ASIN(Records[Close]) = Array(outReal)```
+对应TA-Lib：`ASIN(Records[Close]) = Array(outReal)`。
+
+See also: `talib.ACOS`, `talib.ATAN`, `talib.SIN`
 
 ##### talib.ATAN
 
@@ -16404,18 +17653,21 @@ def main():
 talib.ATAN(inReal)
 ```
 
-```talib.ATAN()```函数用于计算**向量三角反正切函数（Vector Trigonometric ATan）**。
+逐个元素计算反正切（Vector Trigonometric ATan）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的实数数据。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
 
-Returns (array): ```talib.ATAN()```函数返回一维数组，包含计算得出的反正切值。
+Returns (数值数组): 与输入等长的结果数组。
+
+对一组数值计算反正切。
 
 ```javascript
 function main() {
     var data = [-3.14/2, 0, 3.14/2]
     var ret = talib.ATAN(data)
+    // 输出：约 [-1.0037, 0, 1.0037]
     Log(ret)
 }
 ```
@@ -16426,10 +17678,13 @@ import numpy as np
 def main():
     data = [-3.14/2, 0, 3.14/2]
     ret = talib.ATAN(np.array(data))
+    # 输出：约 [-1.0037, 0, 1.0037]
     Log(ret)
 ```
 
-```ATAN()```函数在talib库文档中的描述为：```ATAN(Records[Close]) = Array(outReal)```
+对应TA-Lib：`ATAN(Records[Close]) = Array(outReal)`。
+
+See also: `talib.ACOS`, `talib.ASIN`, `talib.TAN`
 
 ##### talib.CEIL
 
@@ -16437,17 +17692,20 @@ def main():
 talib.CEIL(inReal)
 ```
 
-```talib.CEIL()```函数用于计算**向上取整（Vector Ceil）**。
+把每个元素向上取整（Vector Ceil）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的K线数据。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
 
-Returns (array): ```talib.CEIL()```函数返回一维数组。
+Returns (数值数组): 与输入等长的结果数组。
+
+把最近K线的收盘价向上取整。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CEIL(records)
     Log(ret)
 }
@@ -16457,11 +17715,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CEIL(records.Close)
     Log(ret)
 ```
 
-```CEIL()```函数在talib库文档中的描述为：```CEIL(Records[Close]) = Array(outReal)```
+对应TA-Lib：`CEIL(Records[Close]) = Array(outReal)`。
+
+See also: `talib.FLOOR`, `talib.DIV`, `talib.MULT`
 
 ##### talib.COS
 
@@ -16469,18 +17731,21 @@ def main():
 talib.COS(inReal)
 ```
 
-```talib.COS()```函数用于计算**Vector Trigonometric Cos（向量三角余弦函数）**。
+逐个元素计算余弦（Vector Trigonometric Cos）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的实数数据序列。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
 
-Returns (array): ```talib.COS()```函数返回一个包含余弦计算结果的一维数组。
+Returns (数值数组): 与输入等长的结果数组。
+
+对一组数值计算余弦。
 
 ```javascript
 function main() {
     var data = [-3.14, 0, 3.14]
     var ret = talib.COS(data)
+    // 输出：约 [-1, 1, -1]
     Log(ret)
 }
 ```
@@ -16491,10 +17756,13 @@ import numpy as np
 def main():
     data = [-3.14, 0, 3.14]
     ret = talib.COS(np.array(data))
+    # 输出：约 [-1, 1, -1]
     Log(ret)
 ```
 
-```COS()```函数在talib库文档中的描述为：```COS(Records[Close]) = Array(outReal)```
+对应TA-Lib：`COS(Records[Close]) = Array(outReal)`。
+
+See also: `talib.SIN`, `talib.TAN`, `talib.ACOS`, `talib.COSH`
 
 ##### talib.COSH
 
@@ -16502,18 +17770,21 @@ def main():
 talib.COSH(inReal)
 ```
 
-```talib.COSH()```函数用于计算**向量三角双曲余弦值（Vector Trigonometric Cosh）**。
+逐个元素计算双曲余弦（Vector Trigonometric Cosh）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的K线数据。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
 
-Returns (array): ```talib.COSH()```函数返回一维数组，包含计算得出的双曲余弦值。
+Returns (数值数组): 与输入等长的结果数组。
+
+对一组数值计算双曲余弦。
 
 ```javascript
 function main() {
     var data = [-1, 0, 1]
     var ret = talib.COSH(data)
+    // 输出：约 [1.5431, 1, 1.5431]
     Log(ret)
 }
 ```
@@ -16524,10 +17795,13 @@ import numpy as np
 def main():
     data = [-1.0, 0, 1.0]
     ret = talib.COSH(np.array(data))
+    # 输出：约 [1.5431, 1, 1.5431]
     Log(ret)
 ```
 
-```COSH()```函数在talib库文档中的描述为：```COSH(Records[Close]) = Array(outReal)```
+对应TA-Lib：`COSH(Records[Close]) = Array(outReal)`。
+
+See also: `talib.SINH`, `talib.TANH`, `talib.COS`
 
 ##### talib.EXP
 
@@ -16535,18 +17809,21 @@ def main():
 talib.EXP(inReal)
 ```
 
-```talib.EXP()```函数用于计算**向量算术指数函数（Vector Arithmetic Exp）**。
+逐个元素计算以e为底的指数（Vector Arithmetic Exp）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的实数数据。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
 
-Returns (array): ```talib.EXP()```函数返回一维数组，包含输入数据的指数计算结果。
+Returns (数值数组): 与输入等长的结果数组。
+
+对一组数值计算以e为底的指数。
 
 ```javascript
 function main() {
     var data = [0, 1, 2]
-    var ret = talib.EXP(data)    // e^0, e^1, e^2
+    var ret = talib.EXP(data)
+    // 输出：约 [1, 2.7183, 7.3891]
     Log(ret)
 }
 ```
@@ -16557,10 +17834,13 @@ import numpy as np
 def main():
     data = [0, 1.0, 2.0]
     ret = talib.EXP(np.array(data))
+    # 输出：约 [1, 2.7183, 7.3891]
     Log(ret)
 ```
 
-```EXP()```函数在talib库文档中的描述为：```EXP(Records[Close]) = Array(outReal)```
+对应TA-Lib：`EXP(Records[Close]) = Array(outReal)`。
+
+See also: `talib.LN`, `talib.LOG10`, `talib.SQRT`
 
 ##### talib.FLOOR
 
@@ -16568,17 +17848,20 @@ def main():
 talib.FLOOR(inReal)
 ```
 
-```talib.FLOOR()```函数用于计算**向量向下取整（Vector Floor）**。
+把每个元素向下取整（Vector Floor）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的K线数据。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
 
-Returns (array): ```talib.FLOOR()```函数返回一维数组。
+Returns (数值数组): 与输入等长的结果数组。
+
+把最近K线的收盘价向下取整。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.FLOOR(records)
     Log(ret)
 }
@@ -16588,11 +17871,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.FLOOR(records.Close)
     Log(ret)
 ```
 
-```FLOOR()```函数在talib库文档中的描述为：```FLOOR(Records[Close]) = Array(outReal)```
+对应TA-Lib：`FLOOR(Records[Close]) = Array(outReal)`。
+
+See also: `talib.CEIL`, `talib.DIV`, `talib.MULT`
 
 ##### talib.LN
 
@@ -16600,18 +17887,21 @@ def main():
 talib.LN(inReal)
 ```
 
-```talib.LN()```函数用于计算**向量自然对数（Vector Log Natural）**。
+逐个元素计算自然对数（Vector Log Natural）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的K线数据。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
 
-Returns (array): ```talib.LN()```函数返回一维数组。
+Returns (数值数组): 与输入等长的结果数组。
+
+对一组数值计算自然对数。
 
 ```javascript
 function main() {
     var data = [1, 2, 3]
     var ret = talib.LN(data)
+    // 输出：约 [0, 0.6931, 1.0986]
     Log(ret)
 }
 ```
@@ -16622,10 +17912,13 @@ import numpy as np
 def main():
     data = [1.0, 2.0, 3.0]
     ret = talib.LN(np.array(data))
+    # 输出：约 [0, 0.6931, 1.0986]
     Log(ret)
 ```
 
-```LN()```函数在talib库文档中的描述为：```LN(Records[Close]) = Array(outReal)```
+对应TA-Lib：`LN(Records[Close]) = Array(outReal)`。
+
+See also: `talib.LOG10`, `talib.EXP`, `talib.SQRT`
 
 ##### talib.LOG10
 
@@ -16633,18 +17926,21 @@ def main():
 talib.LOG10(inReal)
 ```
 
-```talib.LOG10()```函数用于计算**Vector Log10（常用对数，以10为底）**。
+逐个元素计算常用对数（Vector Log10）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
 
-Returns (array): ```talib.LOG10()```函数的返回值为一维数组。
+Returns (数值数组): 与输入等长的结果数组。
+
+对一组数值计算常用对数。
 
 ```javascript
 function main() {
     var data = [10, 100, 1000]
     var ret = talib.LOG10(data)
+    // 输出：[1, 2, 3]
     Log(ret)
 }
 ```
@@ -16655,10 +17951,13 @@ import numpy as np
 def main():
     data = [10.0, 100.0, 1000.0]
     ret = talib.LOG10(np.array(data))
+    # 输出：[1, 2, 3]
     Log(ret)
 ```
 
-```LOG10()```函数在talib库文档中的描述为：```LOG10(Records[Close]) = Array(outReal)```
+对应TA-Lib：`LOG10(Records[Close]) = Array(outReal)`。
+
+See also: `talib.LN`, `talib.EXP`, `talib.SQRT`
 
 ##### talib.SIN
 
@@ -16666,18 +17965,21 @@ def main():
 talib.SIN(inReal)
 ```
 
-```talib.SIN()```函数用于计算**Vector Trigonometric Sin（正弦值）**。
+逐个元素计算正弦（Vector Trigonometric Sin）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
 
-Returns (array): ```talib.SIN()```函数返回一维数组。
+Returns (数值数组): 与输入等长的结果数组。
+
+对一组数值计算正弦。
 
 ```javascript
 function main() {
     var data = [-3.14/2, 0, 3.14/2]
     var ret = talib.SIN(data)
+    // 输出：约 [-1, 0, 1]
     Log(ret)
 }
 ```
@@ -16688,10 +17990,13 @@ import numpy as np
 def main():
     data = [-3.14/2, 0, 3.14/2]
     ret = talib.SIN(np.array(data))
+    # 输出：约 [-1, 0, 1]
     Log(ret)
 ```
 
-```SIN()```函数在talib库文档中的描述为：```SIN(Records[Close]) = Array(outReal)```
+对应TA-Lib：`SIN(Records[Close]) = Array(outReal)`。
+
+See also: `talib.COS`, `talib.TAN`, `talib.ASIN`, `talib.SINH`
 
 ##### talib.SINH
 
@@ -16699,18 +18004,21 @@ def main():
 talib.SINH(inReal)
 ```
 
-```talib.SINH()```函数用于计算**向量三角双曲正弦函数（Vector Trigonometric Sinh）**。
+逐个元素计算双曲正弦（Vector Trigonometric Sinh）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的实数数据。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
 
-Returns (array): ```talib.SINH()```函数返回一维数组，包含计算得出的双曲正弦值。
+Returns (数值数组): 与输入等长的结果数组。
+
+对一组数值计算双曲正弦。
 
 ```javascript
 function main() {
     var data = [-1, 0, 1]
     var ret = talib.SINH(data)
+    // 输出：约 [-1.1752, 0, 1.1752]
     Log(ret)
 }
 ```
@@ -16721,10 +18029,13 @@ import numpy as np
 def main():
     data = [-1.0, 0, 1.0]
     ret = talib.SINH(np.array(data))
+    # 输出：约 [-1.1752, 0, 1.1752]
     Log(ret)
 ```
 
-```SINH()```函数在talib库文档中的描述为：```SINH(Records[Close]) = Array(outReal)```
+对应TA-Lib：`SINH(Records[Close]) = Array(outReal)`。
+
+See also: `talib.COSH`, `talib.TANH`, `talib.SIN`
 
 ##### talib.SQRT
 
@@ -16732,18 +18043,21 @@ def main():
 talib.SQRT(inReal)
 ```
 
-```talib.SQRT()```函数用于计算**向量平方根（Vector Square Root）**。
+逐个元素计算平方根（Vector Square Root）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的数值数据。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
 
-Returns (array): ```talib.SQRT()```函数返回一维数组，包含输入数据的平方根值。
+Returns (数值数组): 与输入等长的结果数组。
+
+对一组数值计算平方根。
 
 ```javascript
 function main() {
     var data = [4, 64, 100]
     var ret = talib.SQRT(data)
+    // 输出：[2, 8, 10]
     Log(ret)
 }
 ```
@@ -16754,10 +18068,13 @@ import numpy as np
 def main():
     data = [4.0, 64.0, 100.0]
     ret = talib.SQRT(np.array(data))
+    # 输出：[2, 8, 10]
     Log(ret)
 ```
 
-```SQRT()```函数在talib库文档中的描述为：```SQRT(Records[Close]) = Array(outReal)```
+对应TA-Lib：`SQRT(Records[Close]) = Array(outReal)`。
+
+See also: `talib.EXP`, `talib.LN`, `talib.MULT`
 
 ##### talib.TAN
 
@@ -16765,18 +18082,21 @@ def main():
 talib.TAN(inReal)
 ```
 
-```talib.TAN()```函数用于计算**向量三角正切值（Vector Trigonometric Tan）**。
+逐个元素计算正切（Vector Trigonometric Tan）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的K线数据。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
 
-Returns (array): ```talib.TAN()```函数返回一维数组。
+Returns (数值数组): 与输入等长的结果数组。
+
+对一组数值计算正切。
 
 ```javascript
 function main() {
     var data = [-1, 0, 1]
     var ret = talib.TAN(data)
+    // 输出：约 [-1.5574, 0, 1.5574]
     Log(ret)
 }
 ```
@@ -16787,10 +18107,13 @@ import numpy as np
 def main():
     data = [-1.0, 0, 1.0]
     ret = talib.TAN(np.array(data))
+    # 输出：约 [-1.5574, 0, 1.5574]
     Log(ret)
 ```
 
-```TAN()```函数在talib库文档中的描述为：```TAN(Records[Close]) = Array(outReal)```
+对应TA-Lib：`TAN(Records[Close]) = Array(outReal)`。
+
+See also: `talib.SIN`, `talib.COS`, `talib.ATAN`, `talib.TANH`
 
 ##### talib.TANH
 
@@ -16798,18 +18121,21 @@ def main():
 talib.TANH(inReal)
 ```
 
-```talib.TANH()```函数用于计算**向量三角双曲正切函数（Vector Trigonometric Tanh）**。
+逐个元素计算双曲正切（Vector Trigonometric Tanh）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的实数数据序列。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
 
-Returns (array): ```talib.TANH()```函数返回一个包含双曲正切计算结果的一维数组。
+Returns (数值数组): 与输入等长的结果数组。
+
+对一组数值计算双曲正切。
 
 ```javascript
 function main() {
     var data = [-1, 0, 1]
     var ret = talib.TANH(data)
+    // 输出：约 [-0.7616, 0, 0.7616]
     Log(ret)
 }
 ```
@@ -16820,14 +18146,17 @@ import numpy as np
 def main():
     data = [-1.0, 0, 1.0]
     ret = talib.TANH(np.array(data))
+    # 输出：约 [-0.7616, 0, 0.7616]
     Log(ret)
 ```
 
-```TANH()```函数在talib库文档中的描述为：```TANH(Records[Close]) = Array(outReal)```
+对应TA-Lib：`TANH(Records[Close]) = Array(outReal)`。
 
-#### MathOperators
+See also: `talib.SINH`, `talib.COSH`, `talib.TAN`
 
-数学运算：向量加法、减法、乘法、除法，区间最大值、最小值及其位置、求和。
+#### 数学运算
+
+数学运算（Math Operators）包括两个数组的逐元素加减乘除，以及周期内的最大值、最小值、它们的位置和求和。
 
 ##### talib.ADD
 
@@ -16835,18 +18164,21 @@ def main():
 talib.ADD(inReal0, inReal1)
 ```
 
-```talib.ADD()```函数用于计算**Vector Arithmetic Add (向量加法)**。
+把两个数组逐个元素相加（Vector Arithmetic Add）。
 
 Parameters:
 
-- `inReal0` (数值数组, required): ```inReal0```参数用于指定第一组数据。
-- `inReal1` (数值数组, required): ```inReal1```参数用于指定第二组数据，长度必须与```inReal0```相同。
+- `inReal0` (数值数组, required): 第一组数据。
+- `inReal1` (数值数组, required): 第二组数据，长度必须与`inReal0`相同。
 
-Returns (array): ```talib.ADD()```函数的返回值为：一维数组。
+Returns (数值数组): 与输入等长的结果数组。
+
+把每根K线的最高价与最低价相加。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     // 最高价加最低价
     var highs = records.map(function(r) { return r.High })
     var lows = records.map(function(r) { return r.Low })
@@ -16859,16 +18191,20 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     # 最高价加最低价
     ret = talib.ADD(records.High, records.Low)
     Log(ret)
 ```
 
-```ADD()```函数在talib库文档中的描述为：```ADD(Array(inReal0),Array(inReal1)) = Array(outReal)```
+对应TA-Lib：`ADD(Array(inReal0),Array(inReal1)) = Array(outReal)`。
 
-逐个元素计算```inReal0[i] + inReal1[i]```。
+逐个元素计算`inReal0[i] + inReal1[i]`。
 
-```JavaScript```中两个输入都要传数值数组（可先用```map```从K线中取出字段）：传入K线数组时两个输入都会取同一份K线的收盘价，结果没有意义；两个数组长度不同会报错。
+`JavaScript`中两个输入都要传数值数组（可先用`map`从K线中取出字段）：传入K线数组时两个输入都会取同一份K线的收盘价，结果没有意义；两个数组长度不同会报错。
+
+See also: `talib.SUB`, `talib.MULT`, `talib.DIV`
 
 ##### talib.DIV
 
@@ -16876,18 +18212,21 @@ def main():
 talib.DIV(inReal0, inReal1)
 ```
 
-```talib.DIV()```函数用于计算**Vector Arithmetic Div (向量除法)**。
+用第一个数组逐个元素除以第二个数组（Vector Arithmetic Div）。
 
 Parameters:
 
-- `inReal0` (数值数组, required): ```inReal0```参数用于指定第一组数据。
-- `inReal1` (数值数组, required): ```inReal1```参数用于指定第二组数据，长度必须与```inReal0```相同。
+- `inReal0` (数值数组, required): 第一组数据。
+- `inReal1` (数值数组, required): 第二组数据，长度必须与`inReal0`相同。
 
-Returns (array): ```talib.DIV()```函数的返回值为：一维数组。
+Returns (数值数组): 与输入等长的结果数组。
+
+用每根K线的收盘价除以开盘价。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     // 收盘价除以开盘价
     var closes = records.map(function(r) { return r.Close })
     var opens = records.map(function(r) { return r.Open })
@@ -16900,16 +18239,20 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     # 收盘价除以开盘价
     ret = talib.DIV(records.Close, records.Open)
     Log(ret)
 ```
 
-```DIV()```函数在talib库文档中的描述为：```DIV(Array(inReal0),Array(inReal1)) = Array(outReal)```
+对应TA-Lib：`DIV(Array(inReal0),Array(inReal1)) = Array(outReal)`。
 
-逐个元素计算```inReal0[i] / inReal1[i]```。
+逐个元素计算`inReal0[i] / inReal1[i]`。
 
-```JavaScript```中两个输入都要传数值数组（可先用```map```从K线中取出字段）：传入K线数组时两个输入都会取同一份K线的收盘价，结果没有意义；两个数组长度不同会报错。
+`JavaScript`中两个输入都要传数值数组（可先用`map`从K线中取出字段）：传入K线数组时两个输入都会取同一份K线的收盘价，结果没有意义；两个数组长度不同会报错。
+
+See also: `talib.MULT`, `talib.ADD`, `talib.SUB`
 
 ##### talib.MAX
 
@@ -16918,18 +18261,21 @@ talib.MAX(inReal)
 talib.MAX(inReal, optInTimePeriod)
 ```
 
-```talib.MAX()```函数用于计算**指定周期内的最大值（Highest value over a specified period）**。
+计算周期最大值（Highest Value over a Specified Period）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为30。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `30`。
 
-Returns (array): ```talib.MAX()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算周期最大值。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.MAX(records)
     Log(ret)
 }
@@ -16939,11 +18285,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.MAX(records.Close)
     Log(ret)
 ```
 
-```MAX()```函数在talib库文档中的描述为：```MAX(Records[Close],Time Period = 30) = Array(outReal)```
+对应TA-Lib：`MAX(Records[Close],Time Period = 30) = Array(outReal)`。
+
+See also: `talib.MIN`, `talib.MAXINDEX`, `talib.MINMAX`, `TA.Highest`
 
 ##### talib.MAXINDEX
 
@@ -16952,18 +18302,21 @@ talib.MAXINDEX(inReal)
 talib.MAXINDEX(inReal, optInTimePeriod)
 ```
 
-```talib.MAXINDEX()```函数用于计算**指定周期内最大值的索引位置（Index of highest value over a specified period）**。
+计算周期最大值索引（Index of Highest Value over a Specified Period）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为30。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `30`。
 
-Returns (array): ```talib.MAXINDEX()```函数返回一个一维数组，包含指定周期内最大值的索引位置。
+Returns (数值数组): 周期内最大值所在位置的索引数组。
+
+求最近5根K线收盘价最大值所在的索引。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.MAXINDEX(records, 5)
     Log(ret)
 }
@@ -16973,11 +18326,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.MAXINDEX(records.Close, 5)
     Log(ret)
 ```
 
-```MAXINDEX()```函数在talib库文档中的描述为：```MAXINDEX(Records[Close],Time Period = 30) = Array(outInteger)```
+对应TA-Lib：`MAXINDEX(Records[Close],Time Period = 30) = Array(outInteger)`。
+
+See also: `talib.MAX`, `talib.MININDEX`, `talib.MINMAXINDEX`, `TA.Highest`
 
 ##### talib.MIN
 
@@ -16986,18 +18343,21 @@ talib.MIN(inReal)
 talib.MIN(inReal, optInTimePeriod)
 ```
 
-```talib.MIN()```函数用于计算**指定周期内的最小值（Lowest value over a specified period）**。
+计算周期最小值（Lowest Value over a Specified Period）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为30。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `30`。
 
-Returns (array): ```talib.MIN()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算周期最小值。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.MIN(records)
     Log(ret)
 }
@@ -17007,11 +18367,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.MIN(records.Close)
     Log(ret)
 ```
 
-```MIN()```函数在talib库文档中的描述为：```MIN(Records[Close],Time Period = 30) = Array(outReal)```
+对应TA-Lib：`MIN(Records[Close],Time Period = 30) = Array(outReal)`。
+
+See also: `talib.MAX`, `talib.MININDEX`, `talib.MINMAX`, `TA.Lowest`
 
 ##### talib.MININDEX
 
@@ -17020,18 +18384,21 @@ talib.MININDEX(inReal)
 talib.MININDEX(inReal, optInTimePeriod)
 ```
 
-```talib.MININDEX()```函数用于计算**指定周期内最小值的索引位置（Index of lowest value over a specified period）**。
+计算周期最小值索引（Index of Lowest Value over a Specified Period）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为30。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `30`。
 
-Returns (array): ```talib.MININDEX()```函数返回一个一维数组，包含指定周期内最小值的索引位置。
+Returns (数值数组): 周期内最小值所在位置的索引数组。
+
+用最近的K线计算周期最小值索引。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.MININDEX(records)
     Log(ret)
 }
@@ -17041,11 +18408,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.MININDEX(records.Close)
     Log(ret)
 ```
 
-```MININDEX()```函数在talib库文档中的描述为：```MININDEX(Records[Close],Time Period = 30) = Array(outInteger)```
+对应TA-Lib：`MININDEX(Records[Close],Time Period = 30) = Array(outInteger)`。
+
+See also: `talib.MIN`, `talib.MAXINDEX`, `talib.MINMAXINDEX`, `TA.Lowest`
 
 ##### talib.MINMAX
 
@@ -17054,19 +18425,23 @@ talib.MINMAX(inReal)
 talib.MINMAX(inReal, optInTimePeriod)
 ```
 
-```talib.MINMAX()```函数用于计算**指定周期内的最小值和最大值（Lowest and highest values over a specified period）**。
+计算周期最小值和最大值（Lowest and Highest Values over a Specified Period），返回最小值、最大值。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为30。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `30`。
 
-Returns (array): ```talib.MINMAX()```函数返回一个二维数组。该二维数组的第一个元素为最小值数组，第二个元素为最大值数组。
+Returns (array): 二维数组，依次为最小值、最大值数组（Python中为同样顺序的tuple）。
+
+用最近的K线计算周期最小值和最大值。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.MINMAX(records)
+    // 输出：[最小值数组, 最大值数组]
     Log(ret)
 }
 ```
@@ -17075,11 +18450,16 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.MINMAX(records.Close)
+    # 输出：(最小值数组, 最大值数组)
     Log(ret)
 ```
 
-```MINMAX()```函数在talib库文档中的描述为：```MINMAX(Records[Close],Time Period = 30) = [Array(outMin),Array(outMax)]```
+对应TA-Lib：`MINMAX(Records[Close],Time Period = 30) = [Array(outMin),Array(outMax)]`。
+
+See also: `talib.MIN`, `talib.MAX`, `talib.MINMAXINDEX`, `TA.Highest`, `TA.Lowest`
 
 ##### talib.MINMAXINDEX
 
@@ -17088,19 +18468,23 @@ talib.MINMAXINDEX(inReal)
 talib.MINMAXINDEX(inReal, optInTimePeriod)
 ```
 
-```talib.MINMAXINDEX()```函数用于计算**指定周期内最低值和最高值的索引位置（Indexes of lowest and highest values over a specified period）**。
+计算周期最小值和最大值索引（Indexes of Lowest and Highest Values over a Specified Period），返回最小值索引、最大值索引。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定输入的K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为30。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `30`。
 
-Returns (array): ```talib.MINMAXINDEX()```函数返回一个二维数组。该数组的第一个元素为最小值索引数组，第二个元素为最大值索引数组。
+Returns (array): 二维数组，依次为最小值索引、最大值索引数组（Python中为同样顺序的tuple）。
+
+用最近的K线计算周期最小值和最大值索引。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.MINMAXINDEX(records)
+    // 输出：[最小值索引数组, 最大值索引数组]
     Log(ret)
 }
 ```
@@ -17109,11 +18493,16 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.MINMAXINDEX(records.Close)
+    # 输出：(最小值索引数组, 最大值索引数组)
     Log(ret)
 ```
 
-```MINMAXINDEX()```函数在talib库文档中的描述为：```MINMAXINDEX(Records[Close],Time Period = 30) = [Array(outMinIdx),Array(outMaxIdx)]```
+对应TA-Lib：`MINMAXINDEX(Records[Close],Time Period = 30) = [Array(outMinIdx),Array(outMaxIdx)]`。
+
+See also: `talib.MININDEX`, `talib.MAXINDEX`, `talib.MINMAX`
 
 ##### talib.MULT
 
@@ -17121,18 +18510,21 @@ def main():
 talib.MULT(inReal0, inReal1)
 ```
 
-```talib.MULT()```函数用于计算**Vector Arithmetic Mult (向量乘法)**。
+把两个数组逐个元素相乘（Vector Arithmetic Mult）。
 
 Parameters:
 
-- `inReal0` (数值数组, required): ```inReal0```参数用于指定第一组数据。
-- `inReal1` (数值数组, required): ```inReal1```参数用于指定第二组数据，长度必须与```inReal0```相同。
+- `inReal0` (数值数组, required): 第一组数据。
+- `inReal1` (数值数组, required): 第二组数据，长度必须与`inReal0`相同。
 
-Returns (array): ```talib.MULT()```函数的返回值为：一维数组。
+Returns (数值数组): 与输入等长的结果数组。
+
+用每根K线的收盘价乘以成交量。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     // 收盘价乘以成交量
     var closes = records.map(function(r) { return r.Close })
     var volumes = records.map(function(r) { return r.Volume })
@@ -17145,16 +18537,20 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     # 收盘价乘以成交量
     ret = talib.MULT(records.Close, records.Volume)
     Log(ret)
 ```
 
-```MULT()```函数在talib库文档中的描述为：```MULT(Array(inReal0),Array(inReal1)) = Array(outReal)```
+对应TA-Lib：`MULT(Array(inReal0),Array(inReal1)) = Array(outReal)`。
 
-逐个元素计算```inReal0[i] * inReal1[i]```。
+逐个元素计算`inReal0[i] * inReal1[i]`。
 
-```JavaScript```中两个输入都要传数值数组（可先用```map```从K线中取出字段）：传入K线数组时两个输入都会取同一份K线的收盘价，结果没有意义；两个数组长度不同会报错。
+`JavaScript`中两个输入都要传数值数组（可先用`map`从K线中取出字段）：传入K线数组时两个输入都会取同一份K线的收盘价，结果没有意义；两个数组长度不同会报错。
+
+See also: `talib.DIV`, `talib.ADD`, `talib.SUB`
 
 ##### talib.SUB
 
@@ -17162,18 +18558,21 @@ def main():
 talib.SUB(inReal0, inReal1)
 ```
 
-```talib.SUB()```函数用于计算**Vector Arithmetic Subtraction (向量减法)**。
+用第一个数组逐个元素减去第二个数组（Vector Arithmetic Subtraction）。
 
 Parameters:
 
-- `inReal0` (数值数组, required): ```inReal0```参数用于指定第一组数据。
-- `inReal1` (数值数组, required): ```inReal1```参数用于指定第二组数据，长度必须与```inReal0```相同。
+- `inReal0` (数值数组, required): 第一组数据。
+- `inReal1` (数值数组, required): 第二组数据，长度必须与`inReal0`相同。
 
-Returns (array): ```talib.SUB()```函数的返回值为：一维数组。
+Returns (数值数组): 与输入等长的结果数组。
+
+用每根K线的最高价减去最低价。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     // 最高价减最低价
     var highs = records.map(function(r) { return r.High })
     var lows = records.map(function(r) { return r.Low })
@@ -17186,16 +18585,20 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     # 最高价减最低价
     ret = talib.SUB(records.High, records.Low)
     Log(ret)
 ```
 
-```SUB()```函数在talib库文档中的描述为：```SUB(Array(inReal0),Array(inReal1)) = Array(outReal)```
+对应TA-Lib：`SUB(Array(inReal0),Array(inReal1)) = Array(outReal)`。
 
-逐个元素计算```inReal0[i] - inReal1[i]```。
+逐个元素计算`inReal0[i] - inReal1[i]`。
 
-```JavaScript```中两个输入都要传数值数组（可先用```map```从K线中取出字段）：传入K线数组时两个输入都会取同一份K线的收盘价，结果没有意义；两个数组长度不同会报错。
+`JavaScript`中两个输入都要传数值数组（可先用`map`从K线中取出字段）：传入K线数组时两个输入都会取同一份K线的收盘价，结果没有意义；两个数组长度不同会报错。
+
+See also: `talib.ADD`, `talib.MULT`, `talib.DIV`
 
 ##### talib.SUM
 
@@ -17204,18 +18607,21 @@ talib.SUM(inReal)
 talib.SUM(inReal, optInTimePeriod)
 ```
 
-```talib.SUM()```函数用于计算**求和（Summation）**。
+计算周期求和（Summation）。
 
 Parameters:
 
-- `inReal` ({@struct/Record Record}结构数组 / 数值数组, required): ```inReal```参数用于指定K线数据。
-- `optInTimePeriod` (number, optional): ```optInTimePeriod```参数用于设置计算周期，默认值为30。
+- `inReal` ({@struct/Record Record}数组 / 数值数组, required): K线数组（取收盘价）或数值数组；Python中传入`records.Close`等数值数组。
+- `optInTimePeriod` (number, optional): 计算周期。默认 `30`。
 
-Returns (array): ```talib.SUM()```函数返回一维数组。
+Returns (数值数组): 与输入等长的指标值数组，开头数据不足的部分为`NaN`。
+
+用最近的K线计算周期求和。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.SUM(records)
     Log(ret)
 }
@@ -17225,15 +18631,19 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.SUM(records.Close)
     Log(ret)
 ```
 
-```SUM()```函数在talib库文档中的描述为：```SUM(Records[Close],Time Period = 30) = Array(outReal)```
+对应TA-Lib：`SUM(Records[Close],Time Period = 30) = Array(outReal)`。
 
-#### PatternRecognition
+See also: `talib.ADD`, `talib.SMA`, `talib.MAX`
 
-K线形态识别：出现形态时返回非零值（正数为看涨形态、负数为看跌形态），否则返回0；JavaScript中开头不足计算所需根数的部分为NaN。
+#### K线形态识别
+
+K线形态识别（Pattern Recognition）函数识别经典蜡烛图形态，出现形态时返回非零值（正数为看涨形态、负数为看跌形态，通常为`100`或`-100`），否则返回`0`。JavaScript中开头不足计算所需根数的部分为`NaN`。
 
 ##### talib.CDL2CROWS
 
@@ -17241,17 +18651,20 @@ K线形态识别：出现形态时返回非零值（正数为看涨形态、负�
 talib.CDL2CROWS(inPriceOHLC)
 ```
 
-```talib.CDL2CROWS()```函数用于计算**Two Crows（K线形态--两只乌鸦）**。
+识别两只乌鸦（Two Crows）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDL2CROWS()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别两只乌鸦形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDL2CROWS(records)
     Log(ret)
 }
@@ -17261,33 +18674,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDL2CROWS(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDL2CROWS()```函数在talib库文档中的描述为：```CDL2CROWS(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDL2CROWS(Records[Open,High,Low,Close]) = Array(outInteger)`。
 
-对于```Python```语言中的调用，传参方式有所不同，需要根据上述描述中的：```Records[Open,High,Low,Close]```进行传参。
-
-例如，将一个变量```records```（即参数```inPriceOHLC```，类型为`Record`结构数组）拆分为：
-
-```Open```列表：在Python中表示为```records.Open```。
-
-```High```列表：在Python中表示为```records.High```。
-
-```Low```列表：在Python中表示为```records.Low```。
-
-```Close```列表：在Python中表示为```records.Close```。
-
-Python策略代码中的调用方式：
-
-```
-
-talib.CDL2CROWS(records.Open, records.High, records.Low, records.Close)
-
-```
-
-其他```talib```指标的调用方式与此类似，不再赘述。
+See also: `talib.CDLUPSIDEGAP2CROWS`, `talib.CDL3BLACKCROWS`, `talib.CDLIDENTICAL3CROWS`
 
 ##### talib.CDL3BLACKCROWS
 
@@ -17295,17 +18690,20 @@ talib.CDL2CROWS(records.Open, records.High, records.Low, records.Close)
 talib.CDL3BLACKCROWS(inPriceOHLC)
 ```
 
-```talib.CDL3BLACKCROWS()```函数用于计算**Three Black Crows（K线图形态--三只黑乌鸦）**。
+识别三只乌鸦（Three Black Crows）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDL3BLACKCROWS()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别三只乌鸦形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDL3BLACKCROWS(records)
     Log(ret)
 }
@@ -17315,11 +18713,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDL3BLACKCROWS(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDL3BLACKCROWS()```函数在talib库文档中的描述为：```CDL3BLACKCROWS(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDL3BLACKCROWS(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLIDENTICAL3CROWS`, `talib.CDL2CROWS`, `talib.CDL3WHITESOLDIERS`
 
 ##### talib.CDL3INSIDE
 
@@ -17327,17 +18729,20 @@ def main():
 talib.CDL3INSIDE(inPriceOHLC)
 ```
 
-```talib.CDL3INSIDE()```函数用于计算**Three Inside Up/Down（K线形态：三内部上涨/下跌）**。
+识别三内部上涨和下跌（Three Inside Up/Down）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDL3INSIDE()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别三内部上涨和下跌形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDL3INSIDE(records)
     Log(ret)
 }
@@ -17347,11 +18752,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDL3INSIDE(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDL3INSIDE()```函数在talib库文档中的描述为：```CDL3INSIDE(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDL3INSIDE(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLHARAMI`, `talib.CDL3OUTSIDE`, `talib.CDLENGULFING`
 
 ##### talib.CDL3LINESTRIKE
 
@@ -17359,17 +18768,20 @@ def main():
 talib.CDL3LINESTRIKE(inPriceOHLC)
 ```
 
-```talib.CDL3LINESTRIKE()```函数用于计算**Three-Line Strike（K线图：三线打击）**。
+识别三线打击（Three-Line Strike）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDL3LINESTRIKE()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别三线打击形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDL3LINESTRIKE(records)
     Log(ret)
 }
@@ -17379,11 +18791,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDL3LINESTRIKE(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDL3LINESTRIKE()```函数在talib库文档中的描述为：```CDL3LINESTRIKE(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDL3LINESTRIKE(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDL3BLACKCROWS`, `talib.CDL3WHITESOLDIERS`, `talib.CDLENGULFING`
 
 ##### talib.CDL3OUTSIDE
 
@@ -17391,17 +18807,20 @@ def main():
 talib.CDL3OUTSIDE(inPriceOHLC)
 ```
 
-```talib.CDL3OUTSIDE()```函数用于计算**Three Outside Up/Down（K线形态：三外部上涨/下跌）**。
+识别三外部上涨和下跌（Three Outside Up/Down）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDL3OUTSIDE()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别三外部上涨和下跌形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDL3OUTSIDE(records)
     Log(ret)
 }
@@ -17411,11 +18830,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDL3OUTSIDE(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDL3OUTSIDE()```函数在talib库文档中的描述为：```CDL3OUTSIDE(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDL3OUTSIDE(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLENGULFING`, `talib.CDL3INSIDE`, `talib.CDLHARAMI`
 
 ##### talib.CDL3STARSINSOUTH
 
@@ -17423,17 +18846,20 @@ def main():
 talib.CDL3STARSINSOUTH(inPriceOHLC)
 ```
 
-```talib.CDL3STARSINSOUTH()```函数用于计算**Three Stars In The South（K线形态：南方三星）**。
+识别南方三星（Three Stars In The South）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDL3STARSINSOUTH()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别南方三星形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDL3STARSINSOUTH(records)
     Log(ret)
 }
@@ -17443,11 +18869,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDL3STARSINSOUTH(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDL3STARSINSOUTH()```函数在talib库文档中的描述为：```CDL3STARSINSOUTH(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDL3STARSINSOUTH(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLMORNINGSTAR`, `talib.CDLTRISTAR`, `talib.CDLLADDERBOTTOM`
 
 ##### talib.CDL3WHITESOLDIERS
 
@@ -17455,17 +18885,20 @@ def main():
 talib.CDL3WHITESOLDIERS(inPriceOHLC)
 ```
 
-```talib.CDL3WHITESOLDIERS()```函数用于计算**Three Advancing White Soldiers（K线形态：三白兵）**。
+识别三个白兵（Three Advancing White Soldiers）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDL3WHITESOLDIERS()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别三个白兵形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDL3WHITESOLDIERS(records)
     Log(ret)
 }
@@ -17475,11 +18908,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDL3WHITESOLDIERS(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDL3WHITESOLDIERS()```函数在talib库文档中的描述为：```CDL3WHITESOLDIERS(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDL3WHITESOLDIERS(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDL3BLACKCROWS`, `talib.CDLADVANCEBLOCK`, `talib.CDLSTALLEDPATTERN`
 
 ##### talib.CDLABANDONEDBABY
 
@@ -17488,18 +18925,21 @@ talib.CDLABANDONEDBABY(inPriceOHLC)
 talib.CDLABANDONEDBABY(inPriceOHLC, optInPenetration)
 ```
 
-```talib.CDLABANDONEDBABY()```函数用于计算**弃婴形态（K线图：Abandoned Baby）**。
+识别弃婴（Abandoned Baby）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-- `optInPenetration` (number, optional): ```optInPenetration```参数用于设置穿透度，默认值为0.3。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
+- `optInPenetration` (number, optional): 穿透比例（Penetration），即一根K线实体穿入另一根K线实体的比例（非负数）。默认 `0.3`。
 
-Returns (array): ```talib.CDLABANDONEDBABY()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别弃婴形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLABANDONEDBABY(records)
     Log(ret)
 }
@@ -17509,11 +18949,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLABANDONEDBABY(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLABANDONEDBABY()```函数在talib库文档中的描述为：```CDLABANDONEDBABY(Records[Open,High,Low,Close],Penetration = 0.3) = Array(outInteger)```
+对应TA-Lib：`CDLABANDONEDBABY(Records[Open,High,Low,Close],Penetration = 0.3) = Array(outInteger)`。
+
+See also: `talib.CDLMORNINGDOJISTAR`, `talib.CDLEVENINGDOJISTAR`, `talib.CDLDOJISTAR`
 
 ##### talib.CDLADVANCEBLOCK
 
@@ -17521,17 +18965,20 @@ def main():
 talib.CDLADVANCEBLOCK(inPriceOHLC)
 ```
 
-```talib.CDLADVANCEBLOCK()```函数用于计算**Advance Block（K线形态：推进阻挡）**。
+识别前进受阻（Advance Block）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLADVANCEBLOCK()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别前进受阻形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLADVANCEBLOCK(records)
     Log(ret)
 }
@@ -17541,11 +18988,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLADVANCEBLOCK(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLADVANCEBLOCK()```函数在talib库文档中的描述为：```CDLADVANCEBLOCK(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLADVANCEBLOCK(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDL3WHITESOLDIERS`, `talib.CDLSTALLEDPATTERN`, `talib.CDL3BLACKCROWS`
 
 ##### talib.CDLBELTHOLD
 
@@ -17553,17 +19004,20 @@ def main():
 talib.CDLBELTHOLD(inPriceOHLC)
 ```
 
-```talib.CDLBELTHOLD()```函数用于计算**Belt-hold（K线形态：腰带线）**。
+识别捉腰带线（Belt-hold）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLBELTHOLD()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别捉腰带线形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLBELTHOLD(records)
     Log(ret)
 }
@@ -17573,11 +19027,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLBELTHOLD(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLBELTHOLD()```函数在talib库文档中的描述为：```CDLBELTHOLD(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLBELTHOLD(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLMARUBOZU`, `talib.CDLCLOSINGMARUBOZU`, `talib.CDLLONGLINE`
 
 ##### talib.CDLBREAKAWAY
 
@@ -17585,17 +19043,20 @@ def main():
 talib.CDLBREAKAWAY(inPriceOHLC)
 ```
 
-```talib.CDLBREAKAWAY()```函数用于计算**Breakaway（K线形态：分离形态）**。
+识别脱离（Breakaway）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLBREAKAWAY()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别脱离形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLBREAKAWAY(records)
     Log(ret)
 }
@@ -17605,11 +19066,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLBREAKAWAY(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLBREAKAWAY()```函数在talib库文档中的描述为：```CDLBREAKAWAY(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLBREAKAWAY(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLXSIDEGAP3METHODS`, `talib.CDLRISEFALL3METHODS`, `talib.CDLTASUKIGAP`
 
 ##### talib.CDLCLOSINGMARUBOZU
 
@@ -17617,17 +19082,20 @@ def main():
 talib.CDLCLOSINGMARUBOZU(inPriceOHLC)
 ```
 
-```talib.CDLCLOSINGMARUBOZU()```函数用于计算**收盘光头光脚线（Closing Marubozu）**K线形态。
+识别收盘光头光脚线（Closing Marubozu）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLCLOSINGMARUBOZU()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别收盘光头光脚线形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLCLOSINGMARUBOZU(records)
     Log(ret)
 }
@@ -17637,11 +19105,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLCLOSINGMARUBOZU(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLCLOSINGMARUBOZU()```函数在talib库文档中的描述为：```CDLCLOSINGMARUBOZU(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLCLOSINGMARUBOZU(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLMARUBOZU`, `talib.CDLBELTHOLD`, `talib.CDLLONGLINE`
 
 ##### talib.CDLCONCEALBABYSWALL
 
@@ -17649,17 +19121,20 @@ def main():
 talib.CDLCONCEALBABYSWALL(inPriceOHLC)
 ```
 
-```talib.CDLCONCEALBABYSWALL()```函数用于计算**Concealing Baby Swallow（K线图：藏婴吞没形态）**。
+识别藏婴吞没（Concealing Baby Swallow）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLCONCEALBABYSWALL()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别藏婴吞没形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLCONCEALBABYSWALL(records)
     Log(ret)
 }
@@ -17669,11 +19144,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLCONCEALBABYSWALL(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLCONCEALBABYSWALL()```函数在talib库文档中的描述为：```CDLCONCEALBABYSWALL(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLCONCEALBABYSWALL(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDL3BLACKCROWS`, `talib.CDLENGULFING`, `talib.CDLMARUBOZU`
 
 ##### talib.CDLCOUNTERATTACK
 
@@ -17681,17 +19160,20 @@ def main():
 talib.CDLCOUNTERATTACK(inPriceOHLC)
 ```
 
-```talib.CDLCOUNTERATTACK()```函数用于计算**反击线形态（K线图：反击）**。
+识别反击线（Counterattack）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLCOUNTERATTACK()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别反击线形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLCOUNTERATTACK(records)
     Log(ret)
 }
@@ -17701,11 +19183,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLCOUNTERATTACK(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLCOUNTERATTACK()```函数在talib库文档中的描述为：```CDLCOUNTERATTACK(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLCOUNTERATTACK(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLPIERCING`, `talib.CDLDARKCLOUDCOVER`, `talib.CDLMATCHINGLOW`
 
 ##### talib.CDLDARKCLOUDCOVER
 
@@ -17714,18 +19200,21 @@ talib.CDLDARKCLOUDCOVER(inPriceOHLC)
 talib.CDLDARKCLOUDCOVER(inPriceOHLC, optInPenetration)
 ```
 
-```talib.CDLDARKCLOUDCOVER()```函数用于计算**乌云盖顶（Dark Cloud Cover）K线形态**。
+识别乌云压顶（Dark Cloud Cover）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-- `optInPenetration` (number, optional): ```optInPenetration```参数用于设置穿透比例，默认值为0.5。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
+- `optInPenetration` (number, optional): 穿透比例（Penetration），即一根K线实体穿入另一根K线实体的比例（非负数）。默认 `0.5`。
 
-Returns (array): ```talib.CDLDARKCLOUDCOVER()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别乌云压顶形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLDARKCLOUDCOVER(records)
     Log(ret)
 }
@@ -17735,11 +19224,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLDARKCLOUDCOVER(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLDARKCLOUDCOVER()```函数在talib库文档中的描述为：```CDLDARKCLOUDCOVER(Records[Open,High,Low,Close],Penetration = 0.5) = Array(outInteger)```
+对应TA-Lib：`CDLDARKCLOUDCOVER(Records[Open,High,Low,Close],Penetration = 0.5) = Array(outInteger)`。
+
+See also: `talib.CDLPIERCING`, `talib.CDLENGULFING`, `talib.CDLCOUNTERATTACK`
 
 ##### talib.CDLDOJI
 
@@ -17747,17 +19240,20 @@ def main():
 talib.CDLDOJI(inPriceOHLC)
 ```
 
-```talib.CDLDOJI()```函数用于计算**Doji（K线图：十字线）**。
+识别十字星（Doji）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLDOJI()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别十字星形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLDOJI(records)
     Log(ret)
 }
@@ -17767,11 +19263,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLDOJI(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLDOJI()```函数在talib库文档中的描述为：```CDLDOJI(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLDOJI(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLDOJISTAR`, `talib.CDLLONGLEGGEDDOJI`, `talib.CDLDRAGONFLYDOJI`, `talib.CDLGRAVESTONEDOJI`, `talib.CDLRICKSHAWMAN`
 
 ##### talib.CDLDOJISTAR
 
@@ -17779,17 +19279,20 @@ def main():
 talib.CDLDOJISTAR(inPriceOHLC)
 ```
 
-```talib.CDLDOJISTAR()```函数用于计算**Doji Star（K线图：跳空十字星）**。
+识别跳空十字星（Doji Star）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLDOJISTAR()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别跳空十字星形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLDOJISTAR(records)
     Log(ret)
 }
@@ -17799,11 +19302,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLDOJISTAR(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLDOJISTAR()```函数在talib库文档中的描述为：```CDLDOJISTAR(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLDOJISTAR(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLDOJI`, `talib.CDLMORNINGDOJISTAR`, `talib.CDLEVENINGDOJISTAR`, `talib.CDLABANDONEDBABY`
 
 ##### talib.CDLDRAGONFLYDOJI
 
@@ -17811,17 +19318,20 @@ def main():
 talib.CDLDRAGONFLYDOJI(inPriceOHLC)
 ```
 
-```talib.CDLDRAGONFLYDOJI()```函数用于计算**Dragonfly Doji（K线形态：蜻蜓十字星）**。
+识别蜻蜓十字（Dragonfly Doji）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLDRAGONFLYDOJI()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别蜻蜓十字形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLDRAGONFLYDOJI(records)
     Log(ret)
 }
@@ -17831,11 +19341,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLDRAGONFLYDOJI(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLDRAGONFLYDOJI()```函数在talib库文档中的描述为：```CDLDRAGONFLYDOJI(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLDRAGONFLYDOJI(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLDOJI`, `talib.CDLGRAVESTONEDOJI`, `talib.CDLTAKURI`, `talib.CDLHAMMER`
 
 ##### talib.CDLENGULFING
 
@@ -17843,17 +19357,20 @@ def main():
 talib.CDLENGULFING(inPriceOHLC)
 ```
 
-```talib.CDLENGULFING()```函数用于计算**吞没形态（Engulfing Pattern）**。
+识别吞没（Engulfing Pattern）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLENGULFING()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别吞没形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLENGULFING(records)
     Log(ret)
 }
@@ -17863,11 +19380,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLENGULFING(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLENGULFING()```函数在talib库文档中的描述为：```CDLENGULFING(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLENGULFING(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLHARAMI`, `talib.CDL3OUTSIDE`, `talib.CDLPIERCING`, `talib.CDLDARKCLOUDCOVER`
 
 ##### talib.CDLEVENINGDOJISTAR
 
@@ -17876,18 +19397,21 @@ talib.CDLEVENINGDOJISTAR(inPriceOHLC)
 talib.CDLEVENINGDOJISTAR(inPriceOHLC, optInPenetration)
 ```
 
-```talib.CDLEVENINGDOJISTAR()```函数用于计算**Evening Doji Star（K线形态：黄昏十字星）**。
+识别黄昏十字星（Evening Doji Star）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-- `optInPenetration` (number, optional): ```optInPenetration```参数用于设置穿透率，默认值为0.3。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
+- `optInPenetration` (number, optional): 穿透比例（Penetration），即一根K线实体穿入另一根K线实体的比例（非负数）。默认 `0.3`。
 
-Returns (array): ```talib.CDLEVENINGDOJISTAR()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别黄昏十字星形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLEVENINGDOJISTAR(records)
     Log(ret)
 }
@@ -17897,11 +19421,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLEVENINGDOJISTAR(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLEVENINGDOJISTAR()```函数在talib库文档中的描述为：```CDLEVENINGDOJISTAR(Records[Open,High,Low,Close],Penetration = 0.3) = Array(outInteger)```
+对应TA-Lib：`CDLEVENINGDOJISTAR(Records[Open,High,Low,Close],Penetration = 0.3) = Array(outInteger)`。
+
+See also: `talib.CDLEVENINGSTAR`, `talib.CDLMORNINGDOJISTAR`, `talib.CDLABANDONEDBABY`, `talib.CDLDOJISTAR`
 
 ##### talib.CDLEVENINGSTAR
 
@@ -17910,18 +19438,21 @@ talib.CDLEVENINGSTAR(inPriceOHLC)
 talib.CDLEVENINGSTAR(inPriceOHLC, optInPenetration)
 ```
 
-```talib.CDLEVENINGSTAR()```函数用于计算**Evening Star（K线图：黄昏之星）**形态。
+识别黄昏之星（Evening Star）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-- `optInPenetration` (number, optional): ```optInPenetration```参数用于设置穿透度（Penetration），默认值为0.3。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
+- `optInPenetration` (number, optional): 穿透比例（Penetration），即一根K线实体穿入另一根K线实体的比例（非负数）。默认 `0.3`。
 
-Returns (array): ```talib.CDLEVENINGSTAR()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别黄昏之星形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLEVENINGSTAR(records)
     Log(ret)
 }
@@ -17931,11 +19462,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLEVENINGSTAR(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLEVENINGSTAR()```函数在talib库文档中的描述为：```CDLEVENINGSTAR(Records[Open,High,Low,Close],Penetration = 0.3) = Array(outInteger)```
+对应TA-Lib：`CDLEVENINGSTAR(Records[Open,High,Low,Close],Penetration = 0.3) = Array(outInteger)`。
+
+See also: `talib.CDLEVENINGDOJISTAR`, `talib.CDLMORNINGSTAR`, `talib.CDLSHOOTINGSTAR`
 
 ##### talib.CDLGAPSIDESIDEWHITE
 
@@ -17943,17 +19478,20 @@ def main():
 talib.CDLGAPSIDESIDEWHITE(inPriceOHLC)
 ```
 
-```talib.CDLGAPSIDESIDEWHITE()```函数用于计算**Up/Down-gap side-by-side white lines (K线图：上/下间隙并排白色线条)**。
+识别向上/向下跳空并列阳线（Up/Down-gap side-by-side white lines）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLGAPSIDESIDEWHITE()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别向上/向下跳空并列阳线形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLGAPSIDESIDEWHITE(records)
     Log(ret)
 }
@@ -17963,11 +19501,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLGAPSIDESIDEWHITE(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLGAPSIDESIDEWHITE()```函数在talib库文档中的描述为：```CDLGAPSIDESIDEWHITE(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLGAPSIDESIDEWHITE(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLTASUKIGAP`, `talib.CDLXSIDEGAP3METHODS`, `talib.CDLSEPARATINGLINES`
 
 ##### talib.CDLGRAVESTONEDOJI
 
@@ -17975,17 +19517,20 @@ def main():
 talib.CDLGRAVESTONEDOJI(inPriceOHLC)
 ```
 
-```talib.CDLGRAVESTONEDOJI()```函数用于计算**墓碑十字线（Gravestone Doji）**K线形态。
+识别墓碑十字（Gravestone Doji）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLGRAVESTONEDOJI()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别墓碑十字形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLGRAVESTONEDOJI(records)
     Log(ret)
 }
@@ -17995,11 +19540,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLGRAVESTONEDOJI(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLGRAVESTONEDOJI()```函数在talib库文档中的描述为：```CDLGRAVESTONEDOJI(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLGRAVESTONEDOJI(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLDOJI`, `talib.CDLDRAGONFLYDOJI`, `talib.CDLSHOOTINGSTAR`, `talib.CDLINVERTEDHAMMER`
 
 ##### talib.CDLHAMMER
 
@@ -18007,17 +19556,20 @@ def main():
 talib.CDLHAMMER(inPriceOHLC)
 ```
 
-```talib.CDLHAMMER()```函数用于计算**锤子线（K线形态：锤子）**。
+识别锤头线（Hammer）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLHAMMER()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别锤头线形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLHAMMER(records)
     Log(ret)
 }
@@ -18027,11 +19579,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLHAMMER(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLHAMMER()```函数在talib库文档中的描述为：```CDLHAMMER(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLHAMMER(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLHANGINGMAN`, `talib.CDLINVERTEDHAMMER`, `talib.CDLTAKURI`, `talib.CDLDRAGONFLYDOJI`
 
 ##### talib.CDLHANGINGMAN
 
@@ -18039,17 +19595,20 @@ def main():
 talib.CDLHANGINGMAN(inPriceOHLC)
 ```
 
-```talib.CDLHANGINGMAN()```函数用于计算**Hanging Man（K线形态：吊人线）**。
+识别上吊线（Hanging Man）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLHANGINGMAN()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别上吊线形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLHANGINGMAN(records)
     Log(ret)
 }
@@ -18059,11 +19618,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLHANGINGMAN(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLHANGINGMAN()```函数在talib库文档中的描述为：```CDLHANGINGMAN(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLHANGINGMAN(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLHAMMER`, `talib.CDLSHOOTINGSTAR`, `talib.CDLINVERTEDHAMMER`
 
 ##### talib.CDLHARAMI
 
@@ -18071,17 +19634,20 @@ def main():
 talib.CDLHARAMI(inPriceOHLC)
 ```
 
-```talib.CDLHARAMI()```函数用于计算**Harami Pattern（K线图：阴阳线模式）**。
+识别母子线（Harami Pattern）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLHARAMI()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别母子线形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLHARAMI(records)
     Log(ret)
 }
@@ -18091,11 +19657,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLHARAMI(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLHARAMI()```函数在talib库文档中的描述为：```CDLHARAMI(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLHARAMI(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLHARAMICROSS`, `talib.CDL3INSIDE`, `talib.CDLENGULFING`, `talib.CDLHOMINGPIGEON`
 
 ##### talib.CDLHARAMICROSS
 
@@ -18103,17 +19673,20 @@ def main():
 talib.CDLHARAMICROSS(inPriceOHLC)
 ```
 
-```talib.CDLHARAMICROSS()```函数用于计算**Harami Cross Pattern（K线图：十字星孕线形态）**。
+识别十字孕线（Harami Cross Pattern）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLHARAMICROSS()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别十字孕线形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLHARAMICROSS(records)
     Log(ret)
 }
@@ -18123,11 +19696,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLHARAMICROSS(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLHARAMICROSS()```函数在talib库文档中的描述为：```CDLHARAMICROSS(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLHARAMICROSS(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLHARAMI`, `talib.CDLDOJI`, `talib.CDL3INSIDE`
 
 ##### talib.CDLHIGHWAVE
 
@@ -18135,17 +19712,20 @@ def main():
 talib.CDLHIGHWAVE(inPriceOHLC)
 ```
 
-```talib.CDLHIGHWAVE()```函数用于计算**High-Wave Candle（K线图：风高浪大线）**。
+识别风高浪大线（High-Wave Candle）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLHIGHWAVE()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别风高浪大线形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLHIGHWAVE(records)
     Log(ret)
 }
@@ -18155,11 +19735,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLHIGHWAVE(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLHIGHWAVE()```函数在talib库文档中的描述为：```CDLHIGHWAVE(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLHIGHWAVE(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLSPINNINGTOP`, `talib.CDLLONGLEGGEDDOJI`, `talib.CDLRICKSHAWMAN`
 
 ##### talib.CDLHIKKAKE
 
@@ -18167,17 +19751,20 @@ def main():
 talib.CDLHIKKAKE(inPriceOHLC)
 ```
 
-```talib.CDLHIKKAKE()```函数用于计算**Hikkake Pattern（K线图：陷阱模式）**。
+识别陷阱（Hikkake Pattern）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLHIKKAKE()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别陷阱形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLHIKKAKE(records)
     Log(ret)
 }
@@ -18187,11 +19774,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLHIKKAKE(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLHIKKAKE()```函数在talib库文档中的描述为：```CDLHIKKAKE(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLHIKKAKE(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLHIKKAKEMOD`, `talib.CDLHARAMI`, `talib.CDL3INSIDE`
 
 ##### talib.CDLHIKKAKEMOD
 
@@ -18199,17 +19790,20 @@ def main():
 talib.CDLHIKKAKEMOD(inPriceOHLC)
 ```
 
-```talib.CDLHIKKAKEMOD()```函数用于计算**Modified Hikkake Pattern（K线图：改良陷阱模式）**。
+识别修正陷阱（Modified Hikkake Pattern）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLHIKKAKEMOD()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别修正陷阱形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLHIKKAKEMOD(records)
     Log(ret)
 }
@@ -18219,11 +19813,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLHIKKAKEMOD(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLHIKKAKEMOD()```函数在talib库文档中的描述为：```CDLHIKKAKEMOD(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLHIKKAKEMOD(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLHIKKAKE`, `talib.CDLHARAMI`, `talib.CDL3INSIDE`
 
 ##### talib.CDLHOMINGPIGEON
 
@@ -18231,17 +19829,20 @@ def main():
 talib.CDLHOMINGPIGEON(inPriceOHLC)
 ```
 
-```talib.CDLHOMINGPIGEON()```函数用于计算**Homing Pigeon（K线形态：信鸽形态）**。
+识别家鸽（Homing Pigeon）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLHOMINGPIGEON()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别家鸽形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLHOMINGPIGEON(records)
     Log(ret)
 }
@@ -18251,11 +19852,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLHOMINGPIGEON(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLHOMINGPIGEON()```函数在talib库文档中的描述为：```CDLHOMINGPIGEON(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLHOMINGPIGEON(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLHARAMI`, `talib.CDL3INSIDE`, `talib.CDLMATCHINGLOW`
 
 ##### talib.CDLIDENTICAL3CROWS
 
@@ -18263,17 +19868,20 @@ def main():
 talib.CDLIDENTICAL3CROWS(inPriceOHLC)
 ```
 
-```talib.CDLIDENTICAL3CROWS()```函数用于计算**Identical Three Crows（K线形态：相同三只乌鸦）**。
+识别三胞胎乌鸦（Identical Three Crows）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLIDENTICAL3CROWS()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别三胞胎乌鸦形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLIDENTICAL3CROWS(records)
     Log(ret)
 }
@@ -18283,11 +19891,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLIDENTICAL3CROWS(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLIDENTICAL3CROWS()```函数在talib库文档中的描述为：```CDLIDENTICAL3CROWS(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLIDENTICAL3CROWS(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDL3BLACKCROWS`, `talib.CDL2CROWS`, `talib.CDLUPSIDEGAP2CROWS`
 
 ##### talib.CDLINNECK
 
@@ -18295,17 +19907,20 @@ def main():
 talib.CDLINNECK(inPriceOHLC)
 ```
 
-```talib.CDLINNECK()```函数用于计算**颈内线形态（K线图：颈内线）**。
+识别颈内线（In-Neck Pattern）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLINNECK()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别颈内线形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLINNECK(records)
     Log(ret)
 }
@@ -18315,11 +19930,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLINNECK(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLINNECK()```函数在talib库文档中的描述为：```CDLINNECK(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLINNECK(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLONNECK`, `talib.CDLTHRUSTING`, `talib.CDLPIERCING`
 
 ##### talib.CDLINVERTEDHAMMER
 
@@ -18327,17 +19946,20 @@ def main():
 talib.CDLINVERTEDHAMMER(inPriceOHLC)
 ```
 
-```talib.CDLINVERTEDHAMMER()```函数用于计算**倒锤形态（K线图：倒锤）**。
+识别倒锤头线（Inverted Hammer）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLINVERTEDHAMMER()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别倒锤头线形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLINVERTEDHAMMER(records)
     Log(ret)
 }
@@ -18347,11 +19969,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLINVERTEDHAMMER(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLINVERTEDHAMMER()```函数在talib库文档中的描述为：```CDLINVERTEDHAMMER(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLINVERTEDHAMMER(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLHAMMER`, `talib.CDLSHOOTINGSTAR`, `talib.CDLGRAVESTONEDOJI`
 
 ##### talib.CDLKICKING
 
@@ -18359,17 +19985,20 @@ def main():
 talib.CDLKICKING(inPriceOHLC)
 ```
 
-```talib.CDLKICKING()```函数用于计算**Kicking（K线形态：踢腿形态）**。
+识别反冲（Kicking）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLKICKING()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别反冲形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLKICKING(records)
     Log(ret)
 }
@@ -18379,11 +20008,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLKICKING(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLKICKING()```函数在talib库文档中的描述为：```CDLKICKING(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLKICKING(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLKICKINGBYLENGTH`, `talib.CDLMARUBOZU`, `talib.CDLSEPARATINGLINES`
 
 ##### talib.CDLKICKINGBYLENGTH
 
@@ -18391,17 +20024,20 @@ def main():
 talib.CDLKICKINGBYLENGTH(inPriceOHLC)
 ```
 
-```talib.CDLKICKINGBYLENGTH()```函数用于计算**Kicking - bull/bear determined by the longer marubozu (K线图：踢牛/踢熊)**。
+识别按较长光头光脚线定方向的反冲（Kicking - bull/bear determined by the longer marubozu）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLKICKINGBYLENGTH()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别按较长光头光脚线定方向的反冲形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLKICKINGBYLENGTH(records)
     Log(ret)
 }
@@ -18411,11 +20047,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLKICKINGBYLENGTH(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLKICKINGBYLENGTH()```函数在talib库文档中的描述为：```CDLKICKINGBYLENGTH(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLKICKINGBYLENGTH(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLKICKING`, `talib.CDLMARUBOZU`, `talib.CDLLONGLINE`
 
 ##### talib.CDLLADDERBOTTOM
 
@@ -18423,17 +20063,20 @@ def main():
 talib.CDLLADDERBOTTOM(inPriceOHLC)
 ```
 
-```talib.CDLLADDERBOTTOM()```函数用于计算**Ladder Bottom（K线形态：梯底）**。
+识别梯底（Ladder Bottom）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLLADDERBOTTOM()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别梯底形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLLADDERBOTTOM(records)
     Log(ret)
 }
@@ -18443,11 +20086,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLLADDERBOTTOM(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLLADDERBOTTOM()```函数在talib库文档中的描述为：```CDLLADDERBOTTOM(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLLADDERBOTTOM(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDL3STARSINSOUTH`, `talib.CDLMATCHINGLOW`, `talib.CDLHOMINGPIGEON`
 
 ##### talib.CDLLONGLEGGEDDOJI
 
@@ -18455,17 +20102,20 @@ def main():
 talib.CDLLONGLEGGEDDOJI(inPriceOHLC)
 ```
 
-```talib.CDLLONGLEGGEDDOJI()```函数用于计算**长腿十字线（K线形态：Long Legged Doji）**。
+识别长脚十字（Long Legged Doji）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLLONGLEGGEDDOJI()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别长脚十字形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLLONGLEGGEDDOJI(records)
     Log(ret)
 }
@@ -18475,11 +20125,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLLONGLEGGEDDOJI(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLLONGLEGGEDDOJI()```函数在talib库文档中的描述为：```CDLLONGLEGGEDDOJI(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLLONGLEGGEDDOJI(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLDOJI`, `talib.CDLRICKSHAWMAN`, `talib.CDLHIGHWAVE`
 
 ##### talib.CDLLONGLINE
 
@@ -18487,17 +20141,20 @@ def main():
 talib.CDLLONGLINE(inPriceOHLC)
 ```
 
-```talib.CDLLONGLINE()```函数用于计算**长线蜡烛形态（K线图：长线）**。
+识别长蜡烛线（Long Line Candle）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLLONGLINE()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别长蜡烛线形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLLONGLINE(records)
     Log(ret)
 }
@@ -18507,11 +20164,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLLONGLINE(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLLONGLINE()```函数在talib库文档中的描述为：```CDLLONGLINE(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLLONGLINE(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLSHORTLINE`, `talib.CDLMARUBOZU`, `talib.CDLBELTHOLD`
 
 ##### talib.CDLMARUBOZU
 
@@ -18519,17 +20180,20 @@ def main():
 talib.CDLMARUBOZU(inPriceOHLC)
 ```
 
-```talib.CDLMARUBOZU()```函数用于计算**Marubozu（K线图：光头光脚）**模式。
+识别光头光脚线（Marubozu）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLMARUBOZU()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别光头光脚线形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLMARUBOZU(records)
     Log(ret)
 }
@@ -18539,11 +20203,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLMARUBOZU(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLMARUBOZU()```函数在talib库文档中的描述为：```CDLMARUBOZU(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLMARUBOZU(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLCLOSINGMARUBOZU`, `talib.CDLBELTHOLD`, `talib.CDLKICKING`, `talib.CDLLONGLINE`
 
 ##### talib.CDLMATCHINGLOW
 
@@ -18551,17 +20219,20 @@ def main():
 talib.CDLMATCHINGLOW(inPriceOHLC)
 ```
 
-```talib.CDLMATCHINGLOW()```函数用于计算**Matching Low（K线图：匹配低点）**。
+识别相同低价（Matching Low）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLMATCHINGLOW()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别相同低价形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLMATCHINGLOW(records)
     Log(ret)
 }
@@ -18571,11 +20242,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLMATCHINGLOW(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLMATCHINGLOW()```函数在talib库文档中的描述为：```CDLMATCHINGLOW(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLMATCHINGLOW(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLHOMINGPIGEON`, `talib.CDLSTICKSANDWICH`, `talib.CDLCOUNTERATTACK`
 
 ##### talib.CDLMATHOLD
 
@@ -18584,18 +20259,21 @@ talib.CDLMATHOLD(inPriceOHLC)
 talib.CDLMATHOLD(inPriceOHLC, optInPenetration)
 ```
 
-```talib.CDLMATHOLD()```函数用于计算**Mat Hold（K线形态：垫住）**。
+识别铺垫（Mat Hold）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-- `optInPenetration` (number, optional): ```optInPenetration```参数用于设置穿透比例，即一根K线实体穿入另一根K线实体的比例（非负数），默认值为0.5。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
+- `optInPenetration` (number, optional): 穿透比例（Penetration），即一根K线实体穿入另一根K线实体的比例（非负数）。默认 `0.5`。
 
-Returns (array): ```talib.CDLMATHOLD()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别铺垫形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLMATHOLD(records)
     Log(ret)
 }
@@ -18605,11 +20283,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLMATHOLD(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLMATHOLD()```函数在talib库文档中的描述为：```CDLMATHOLD(Records[Open,High,Low,Close],Penetration = 0.5) = Array(outInteger)```
+对应TA-Lib：`CDLMATHOLD(Records[Open,High,Low,Close],Penetration = 0.5) = Array(outInteger)`。
+
+See also: `talib.CDLRISEFALL3METHODS`, `talib.CDLXSIDEGAP3METHODS`, `talib.CDLTASUKIGAP`
 
 ##### talib.CDLMORNINGDOJISTAR
 
@@ -18618,18 +20300,21 @@ talib.CDLMORNINGDOJISTAR(inPriceOHLC)
 talib.CDLMORNINGDOJISTAR(inPriceOHLC, optInPenetration)
 ```
 
-```talib.CDLMORNINGDOJISTAR()```函数用于计算**Morning Doji Star（K线形态：早晨十字星）**。
+识别十字晨星（Morning Doji Star）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-- `optInPenetration` (number, optional): ```optInPenetration```参数用于设置穿透比例，即一根K线实体穿入另一根K线实体的比例（非负数），默认值为0.3。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
+- `optInPenetration` (number, optional): 穿透比例（Penetration），即一根K线实体穿入另一根K线实体的比例（非负数）。默认 `0.3`。
 
-Returns (array): ```talib.CDLMORNINGDOJISTAR()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别十字晨星形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLMORNINGDOJISTAR(records)
     Log(ret)
 }
@@ -18639,11 +20324,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLMORNINGDOJISTAR(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLMORNINGDOJISTAR()```函数在talib库文档中的描述为：```CDLMORNINGDOJISTAR(Records[Open,High,Low,Close],Penetration = 0.3) = Array(outInteger)```
+对应TA-Lib：`CDLMORNINGDOJISTAR(Records[Open,High,Low,Close],Penetration = 0.3) = Array(outInteger)`。
+
+See also: `talib.CDLMORNINGSTAR`, `talib.CDLEVENINGDOJISTAR`, `talib.CDLABANDONEDBABY`, `talib.CDLDOJISTAR`
 
 ##### talib.CDLMORNINGSTAR
 
@@ -18652,18 +20341,21 @@ talib.CDLMORNINGSTAR(inPriceOHLC)
 talib.CDLMORNINGSTAR(inPriceOHLC, optInPenetration)
 ```
 
-```talib.CDLMORNINGSTAR()```函数用于计算**Morning Star（K线形态：晨星）**。
+识别晨星（Morning Star）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
-- `optInPenetration` (number, optional): ```optInPenetration```参数用于设置穿透比例，即一根K线实体穿入另一根K线实体的比例（非负数），默认值为0.3。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
+- `optInPenetration` (number, optional): 穿透比例（Penetration），即一根K线实体穿入另一根K线实体的比例（非负数）。默认 `0.3`。
 
-Returns (array): ```talib.CDLMORNINGSTAR()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别晨星形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLMORNINGSTAR(records)
     Log(ret)
 }
@@ -18673,11 +20365,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLMORNINGSTAR(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLMORNINGSTAR()```函数在talib库文档中的描述为：```CDLMORNINGSTAR(Records[Open,High,Low,Close],Penetration=0.3) = Array(outInteger)```
+对应TA-Lib：`CDLMORNINGSTAR(Records[Open,High,Low,Close],Penetration=0.3) = Array(outInteger)`。
+
+See also: `talib.CDLMORNINGDOJISTAR`, `talib.CDLEVENINGSTAR`, `talib.CDL3STARSINSOUTH`
 
 ##### talib.CDLONNECK
 
@@ -18685,17 +20381,20 @@ def main():
 talib.CDLONNECK(inPriceOHLC)
 ```
 
-```talib.CDLONNECK()```函数用于计算**On-Neck Pattern（K线图：颈上线形态）**。
+识别颈上线（On-Neck Pattern）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLONNECK()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别颈上线形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLONNECK(records)
     Log(ret)
 }
@@ -18705,11 +20404,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLONNECK(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLONNECK()```函数在talib库文档中的描述为：```CDLONNECK(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLONNECK(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLINNECK`, `talib.CDLTHRUSTING`, `talib.CDLPIERCING`
 
 ##### talib.CDLPIERCING
 
@@ -18717,17 +20420,20 @@ def main():
 talib.CDLPIERCING(inPriceOHLC)
 ```
 
-```talib.CDLPIERCING()```函数用于计算**Piercing Pattern（K线图：穿透形态）**。
+识别刺透（Piercing Pattern）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLPIERCING()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别刺透形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLPIERCING(records)
     Log(ret)
 }
@@ -18737,11 +20443,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLPIERCING(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLPIERCING()```函数在talib库文档中的描述为：```CDLPIERCING(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLPIERCING(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLDARKCLOUDCOVER`, `talib.CDLENGULFING`, `talib.CDLTHRUSTING`, `talib.CDLINNECK`
 
 ##### talib.CDLRICKSHAWMAN
 
@@ -18749,17 +20459,20 @@ def main():
 talib.CDLRICKSHAWMAN(inPriceOHLC)
 ```
 
-```talib.CDLRICKSHAWMAN()```函数用于计算**Rickshaw Man（K线形态：车夫线）**。
+识别黄包车夫（Rickshaw Man）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLRICKSHAWMAN()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别黄包车夫形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLRICKSHAWMAN(records)
     Log(ret)
 }
@@ -18769,11 +20482,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLRICKSHAWMAN(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLRICKSHAWMAN()```函数在talib库文档中的描述为：```CDLRICKSHAWMAN(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLRICKSHAWMAN(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLLONGLEGGEDDOJI`, `talib.CDLDOJI`, `talib.CDLHIGHWAVE`
 
 ##### talib.CDLRISEFALL3METHODS
 
@@ -18781,17 +20498,20 @@ def main():
 talib.CDLRISEFALL3METHODS(inPriceOHLC)
 ```
 
-```talib.CDLRISEFALL3METHODS()```函数用于计算**Rising/Falling Three Methods（K线形态：上升/下降三法）**。
+识别上升/下降三法（Rising/Falling Three Methods）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLRISEFALL3METHODS()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别上升/下降三法形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLRISEFALL3METHODS(records)
     Log(ret)
 }
@@ -18801,11 +20521,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLRISEFALL3METHODS(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLRISEFALL3METHODS()```函数在talib库文档中的描述为：```CDLRISEFALL3METHODS(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLRISEFALL3METHODS(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLMATHOLD`, `talib.CDLXSIDEGAP3METHODS`, `talib.CDL3LINESTRIKE`
 
 ##### talib.CDLSEPARATINGLINES
 
@@ -18813,17 +20537,20 @@ def main():
 talib.CDLSEPARATINGLINES(inPriceOHLC)
 ```
 
-```talib.CDLSEPARATINGLINES()```函数用于计算**分离线形态（K线图：分离线）**。
+识别分离线（Separating Lines）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLSEPARATINGLINES()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别分离线形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLSEPARATINGLINES(records)
     Log(ret)
 }
@@ -18833,11 +20560,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLSEPARATINGLINES(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLSEPARATINGLINES()```函数在talib库文档中的描述为：```CDLSEPARATINGLINES(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLSEPARATINGLINES(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLKICKING`, `talib.CDLBELTHOLD`, `talib.CDLGAPSIDESIDEWHITE`
 
 ##### talib.CDLSHOOTINGSTAR
 
@@ -18845,17 +20576,20 @@ def main():
 talib.CDLSHOOTINGSTAR(inPriceOHLC)
 ```
 
-```talib.CDLSHOOTINGSTAR()```函数用于计算**Shooting Star（K线形态：流星）**。
+识别射击之星（Shooting Star）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLSHOOTINGSTAR()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别射击之星形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLSHOOTINGSTAR(records)
     Log(ret)
 }
@@ -18865,11 +20599,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLSHOOTINGSTAR(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLSHOOTINGSTAR()```函数在talib库文档中的描述为：```CDLSHOOTINGSTAR(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLSHOOTINGSTAR(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLINVERTEDHAMMER`, `talib.CDLHANGINGMAN`, `talib.CDLGRAVESTONEDOJI`, `talib.CDLEVENINGSTAR`
 
 ##### talib.CDLSHORTLINE
 
@@ -18877,17 +20615,20 @@ def main():
 talib.CDLSHORTLINE(inPriceOHLC)
 ```
 
-```talib.CDLSHORTLINE()```函数用于计算**短线蜡烛图形态（K线图：短线）**。
+识别短蜡烛线（Short Line Candle）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线价格数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLSHORTLINE()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别短蜡烛线形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLSHORTLINE(records)
     Log(ret)
 }
@@ -18897,11 +20638,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLSHORTLINE(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLSHORTLINE()```函数在talib库文档中的描述为：```CDLSHORTLINE(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLSHORTLINE(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLLONGLINE`, `talib.CDLSPINNINGTOP`, `talib.CDLDOJI`
 
 ##### talib.CDLSPINNINGTOP
 
@@ -18909,17 +20654,20 @@ def main():
 talib.CDLSPINNINGTOP(inPriceOHLC)
 ```
 
-```talib.CDLSPINNINGTOP()```函数用于计算**Spinning Top（K线形态：陀螺）**。
+识别纺锤线（Spinning Top）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLSPINNINGTOP()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别纺锤线形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLSPINNINGTOP(records)
     Log(ret)
 }
@@ -18929,11 +20677,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLSPINNINGTOP(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLSPINNINGTOP()```函数在talib库文档中的描述为：```CDLSPINNINGTOP(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLSPINNINGTOP(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLHIGHWAVE`, `talib.CDLDOJI`, `talib.CDLSHORTLINE`
 
 ##### talib.CDLSTALLEDPATTERN
 
@@ -18941,17 +20693,20 @@ def main():
 talib.CDLSTALLEDPATTERN(inPriceOHLC)
 ```
 
-```talib.CDLSTALLEDPATTERN()```函数用于计算**Stalled Pattern（K线图：停滞模式）**。
+识别停顿（Stalled Pattern）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLSTALLEDPATTERN()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别停顿形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLSTALLEDPATTERN(records)
     Log(ret)
 }
@@ -18961,11 +20716,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLSTALLEDPATTERN(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLSTALLEDPATTERN()```函数在talib库文档中的描述为：```CDLSTALLEDPATTERN(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLSTALLEDPATTERN(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLADVANCEBLOCK`, `talib.CDL3WHITESOLDIERS`, `talib.CDLSPINNINGTOP`
 
 ##### talib.CDLSTICKSANDWICH
 
@@ -18973,17 +20732,20 @@ def main():
 talib.CDLSTICKSANDWICH(inPriceOHLC)
 ```
 
-```talib.CDLSTICKSANDWICH()```函数用于计算**Stick Sandwich（K线形态：棍子三明治）**。
+识别条形三明治（Stick Sandwich）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLSTICKSANDWICH()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别条形三明治形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLSTICKSANDWICH(records)
     Log(ret)
 }
@@ -18993,11 +20755,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLSTICKSANDWICH(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLSTICKSANDWICH()```函数在talib库文档中的描述为：```CDLSTICKSANDWICH(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLSTICKSANDWICH(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLMATCHINGLOW`, `talib.CDLHOMINGPIGEON`, `talib.CDLLADDERBOTTOM`
 
 ##### talib.CDLTAKURI
 
@@ -19005,17 +20771,20 @@ def main():
 talib.CDLTAKURI(inPriceOHLC)
 ```
 
-```talib.CDLTAKURI()```函数用于计算**Takuri (Dragonfly Doji with very long lower shadow) (K线图:托里)**蜡烛图形态。
+识别探水竿（Takuri (Dragonfly Doji with very long lower shadow)）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLTAKURI()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别探水竿形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLTAKURI(records)
     Log(ret)
 }
@@ -19025,11 +20794,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLTAKURI(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLTAKURI()```函数在talib库文档中的描述为：```CDLTAKURI(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLTAKURI(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLDRAGONFLYDOJI`, `talib.CDLHAMMER`, `talib.CDLDOJI`
 
 ##### talib.CDLTASUKIGAP
 
@@ -19037,17 +20810,20 @@ def main():
 talib.CDLTASUKIGAP(inPriceOHLC)
 ```
 
-```talib.CDLTASUKIGAP()```函数用于计算**Tasuki Gap（K线图：翼隙）**。
+识别跳空并列阴阳线（Tasuki Gap）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLTASUKIGAP()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别跳空并列阴阳线形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLTASUKIGAP(records)
     Log(ret)
 }
@@ -19057,11 +20833,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLTASUKIGAP(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLTASUKIGAP()```函数在talib库文档中的描述为：```CDLTASUKIGAP(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLTASUKIGAP(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLGAPSIDESIDEWHITE`, `talib.CDLXSIDEGAP3METHODS`, `talib.CDLMATHOLD`
 
 ##### talib.CDLTHRUSTING
 
@@ -19069,17 +20849,20 @@ def main():
 talib.CDLTHRUSTING(inPriceOHLC)
 ```
 
-```talib.CDLTHRUSTING()```函数用于计算**Thrusting Pattern（K线图：推进模式）**。
+识别插入线（Thrusting Pattern）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLTHRUSTING()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别插入线形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLTHRUSTING(records)
     Log(ret)
 }
@@ -19089,11 +20872,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLTHRUSTING(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLTHRUSTING()```函数在talib库文档中的描述为：```CDLTHRUSTING(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLTHRUSTING(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLINNECK`, `talib.CDLONNECK`, `talib.CDLPIERCING`
 
 ##### talib.CDLTRISTAR
 
@@ -19101,17 +20888,20 @@ def main():
 talib.CDLTRISTAR(inPriceOHLC)
 ```
 
-```talib.CDLTRISTAR()```函数用于计算**三星形态（K线图：三星模式）**。
+识别三星（Tristar Pattern）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLTRISTAR()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别三星形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLTRISTAR(records)
     Log(ret)
 }
@@ -19121,11 +20911,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLTRISTAR(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLTRISTAR()```函数在talib库文档中的描述为：```CDLTRISTAR(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLTRISTAR(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLDOJI`, `talib.CDLDOJISTAR`, `talib.CDLMORNINGDOJISTAR`, `talib.CDLEVENINGDOJISTAR`
 
 ##### talib.CDLUNIQUE3RIVER
 
@@ -19133,17 +20927,20 @@ def main():
 talib.CDLUNIQUE3RIVER(inPriceOHLC)
 ```
 
-```talib.CDLUNIQUE3RIVER()```函数用于计算**Unique 3 River（K线形态：独特三河）**。
+识别奇特三河床（Unique 3 River）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLUNIQUE3RIVER()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别奇特三河床形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLUNIQUE3RIVER(records)
     Log(ret)
 }
@@ -19153,11 +20950,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLUNIQUE3RIVER(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLUNIQUE3RIVER()```函数在talib库文档中的描述为：```CDLUNIQUE3RIVER(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLUNIQUE3RIVER(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLMORNINGSTAR`, `talib.CDL3STARSINSOUTH`, `talib.CDLHAMMER`
 
 ##### talib.CDLUPSIDEGAP2CROWS
 
@@ -19165,17 +20966,20 @@ def main():
 talib.CDLUPSIDEGAP2CROWS(inPriceOHLC)
 ```
 
-```talib.CDLUPSIDEGAP2CROWS()```函数用于计算**向上跳空双乌鸦形态（K线图：双飞乌鸦）**。
+识别向上跳空的两只乌鸦（Upside Gap Two Crows）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLUPSIDEGAP2CROWS()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别向上跳空的两只乌鸦形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLUPSIDEGAP2CROWS(records)
     Log(ret)
 }
@@ -19185,11 +20989,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLUPSIDEGAP2CROWS(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLUPSIDEGAP2CROWS()```函数在talib库文档中的描述为：```CDLUPSIDEGAP2CROWS(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLUPSIDEGAP2CROWS(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDL2CROWS`, `talib.CDL3BLACKCROWS`, `talib.CDLEVENINGSTAR`
 
 ##### talib.CDLXSIDEGAP3METHODS
 
@@ -19197,17 +21005,20 @@ def main():
 talib.CDLXSIDEGAP3METHODS(inPriceOHLC)
 ```
 
-```talib.CDLXSIDEGAP3METHODS()```函数用于计算**上行/下行缺口三方法（K线形态识别）**。
+识别上升/下降跳空三法（Upside/Downside Gap Three Methods）K线形态。
 
 Parameters:
 
-- `inPriceOHLC` ({@struct/Record Record}结构数组, required): ```inPriceOHLC```参数用于指定K线数据。
+- `inPriceOHLC` ({@struct/Record Record}数组, required): K线数组，取开盘价、最高价、最低价、收盘价；Python中依次传入`records.Open`、`records.High`、`records.Low`、`records.Close`。
 
-Returns (array): ```talib.CDLXSIDEGAP3METHODS()```函数返回一维数组。
+Returns (数值数组): 形态信号数组：看涨形态为正数、看跌形态为负数（通常为`100`或`-100`），未出现形态为`0`。
+
+用最近的K线识别上升/下降跳空三法形态。
 
 ```javascript
 function main() {
     var records = exchange.GetRecords()
+    if (!records) return
     var ret = talib.CDLXSIDEGAP3METHODS(records)
     Log(ret)
 }
@@ -19217,11 +21028,15 @@ function main() {
 import talib
 def main():
     records = exchange.GetRecords()
+    if not records:
+        return
     ret = talib.CDLXSIDEGAP3METHODS(records.Open, records.High, records.Low, records.Close)
     Log(ret)
 ```
 
-```CDLXSIDEGAP3METHODS()```函数在talib库文档中的描述为：```CDLXSIDEGAP3METHODS(Records[Open,High,Low,Close]) = Array(outInteger)```
+对应TA-Lib：`CDLXSIDEGAP3METHODS(Records[Open,High,Low,Close]) = Array(outInteger)`。
+
+See also: `talib.CDLTASUKIGAP`, `talib.CDLRISEFALL3METHODS`, `talib.CDLGAPSIDESIDEWHITE`
 
 ### OS
 
@@ -19246,7 +21061,7 @@ os库支持：文件对象、文件列表对象、文件信息对象。
 
 os库为发明者量化交易平台提供完整的文件系统操作接口。
 
-##### open
+##### os.open
 
 ```
 open(filename)
@@ -19260,7 +21075,7 @@ Parameters:
 - `filename` (string, required): 文件名称。参数```filename```是包含文件名的路径。由于托管者与回测系统都支持```os```操作，需要注意在**非回测环境**下，文件操作被限制在托管者目录下实盘数据库文件同级目录的```files```文件夹中，因此不支持使用绝对路径操作任何文件（路径开头的```/```会被忽略，路径中不能包含```..```）。其它```os```函数的路径参数遵循同样的限制，见`OS`。
 - `mode` (string, optional): 指定文件的打开模式。
 
-Returns (```File```对象): ```open()```函数返回一个```File```对象，用于操作文件。打开失败（如只读模式下文件不存在、模式串非法）时抛出异常。
+Returns (`File`对象): ```File```对象，用于操作文件。打开失败（如只读模式下文件不存在、模式串非法）时抛出异常。
 
 创建文件，写入数据后再读取。
 
@@ -19268,10 +21083,12 @@ Returns (```File```对象): ```open()```函数返回一个```File```对象，用
 function main() {
     let fileHandle = os.open("output.txt", "w+")
     let bytesWritten = fileHandle.write("Hello FMZ!")
-    Log("Bytes written:", bytesWritten)     // Bytes written: 10
+    Log("Bytes written:", bytesWritten)
+    // 输出：Bytes written: 10
     fileHandle.seek(0, 0)
     let fileContent = fileHandle.read()
-    Log("File content read:", fileContent)  // File content read: Hello FMZ!
+    Log("File content read:", fileContent)
+    // 输出：File content read: Hello FMZ!
     fileHandle.close()
 }
 ```
@@ -19292,9 +21109,9 @@ function main() {
 
 文件的打开/创建位于实盘数据库文件目录（xxx.db3，其中xxx为实盘Id）下的```files```文件夹中。以写入方式（```w```、```a```、```+```）打开时，路径中不存在的父目录会自动创建。
 
-See also: `File`, `ListFilesResult`, `FileStat`,  `open`, `fgets`, `fputs`, `mmap`, `getRootDir`, `listFiles`, `exists`, `remove`, `mkdir`, `rmdir`, `rename`, `stat`, `exit`,
+See also: `os`, `File`, `os.fgets`, `os.fputs`, `os.exists`
 
-##### fgets
+##### os.fgets
 
 ```
 fgets(filename)
@@ -19319,7 +21136,8 @@ function main() {
     // fileHandle.close()
 
     let content = os.fgets("config.json")
-    Log("Config content:", content)  // Config content: {"name":"tom","age":18}
+    Log("Config content:", content)
+    // 输出：Config content: {"name":"tom","age":18}
 }
 ```
 
@@ -19327,9 +21145,9 @@ function main() {
 
 如果文件不存在，```fgets()```函数会抛出异常。
 
-See also: `File`, `ListFilesResult`, `FileStat`,  `open`, `fgets`, `fputs`, `mmap`, `getRootDir`, `listFiles`, `exists`, `remove`, `mkdir`, `rmdir`, `rename`, `stat`, `exit`,
+See also: `os`, `os.open`, `os.fputs`, `os.mmap`
 
-##### fputs
+##### os.fputs
 
 ```
 fputs(filename, content)
@@ -19352,21 +21170,25 @@ Returns (number): 返回实际写入的字节数。
 function main() {
     let config = '{"strategy": "MA", "period": 20}'
     let bytesWritten = os.fputs("strategy_config.json", config)
-    Log("Bytes written:", bytesWritten)                                          // Bytes written: 32
-    Log(`os.fgets("strategy_config.json"):`, os.fgets("strategy_config.json"))   // os.fgets("strategy_config.json"): {"strategy": "MA", "period": 20}
+    Log("Bytes written:", bytesWritten)
+    // 输出：Bytes written: 32
+    Log(`os.fgets("strategy_config.json"):`, os.fgets("strategy_config.json"))
+    // 输出：os.fgets("strategy_config.json"): {"strategy": "MA", "period": 20}
 
     // 追加日志信息
     let logInfo = "\n[" + new Date().toISOString() + "] Config saved"
     os.fputs("strategy_config.json", logInfo, true)
-    Log(`os.fgets("strategy_config.json"):`, os.fgets("strategy_config.json"))   // os.fgets("strategy_config.json"): {"strategy": "MA", "period": 20} [2025-09-08T07:20:30.563Z] Config saved
+    Log(`os.fgets("strategy_config.json"):`, os.fgets("strategy_config.json"))
+    // 输出：os.fgets("strategy_config.json"): {"strategy": "MA", "period": 20}
+    // [2025-09-08T07:20:30.563Z] Config saved
 }
 ```
 
 便捷的文件写入方法，默认覆盖文件内容。设置 append 为 true 可以追加到文件末尾。
 
-See also: `File`, `ListFilesResult`, `FileStat`,  `open`, `fgets`, `fputs`, `mmap`, `getRootDir`, `listFiles`, `exists`, `remove`, `mkdir`, `rmdir`, `rename`, `stat`, `exit`,
+See also: `os`, `os.fgets`, `os.open`
 
-##### mmap
+##### os.mmap
 
 ```
 mmap(filename)
@@ -19392,16 +21214,18 @@ function main() {
     let buffer = os.mmap("strategyConfig/testData.txt")
     Log("File size in bytes:", buffer.byteLength)
     let arr = Array.from(new Uint8Array(buffer))
-    Log("arr:",  arr)                        // arr: [72,101,108,108,111,32,70,77,90,33]
-    Log("ab2str(buffer):", ab2str(buffer))   // ab2str(buffer): Hello FMZ!
+    Log("arr:",  arr)
+    // 输出：arr: [72,101,108,108,111,32,70,77,90,33]
+    Log("ab2str(buffer):", ab2str(buffer))
+    // 输出：ab2str(buffer): Hello FMZ!
 }
 ```
 
 一次性将整个文件读入内存并作为 ArrayBuffer 返回（并非按需加载的内存映射，大文件会占用等量内存）。
 
-See also: `File`, `ListFilesResult`, `FileStat`,  `open`, `fgets`, `fputs`, `mmap`, `getRootDir`, `listFiles`, `exists`, `remove`, `mkdir`, `rmdir`, `rename`, `stat`, `exit`,
+See also: `os`, `os.fgets`, `os.open`
 
-##### getRootDir
+##### os.getRootDir
 
 ```
 getRootDir()
@@ -19420,28 +21244,24 @@ function main() {
 }
 ```
 
-See also: `File`, `ListFilesResult`, `FileStat`,  `open`, `fgets`, `fputs`, `mmap`, `getRootDir`, `listFiles`, `exists`, `remove`, `mkdir`, `rmdir`, `rename`, `stat`, `exit`,
+See also: `os`, `os.listFiles`, `os.mkdir`
 
-##### listFiles
+##### os.listFiles
 
 ```
 listFiles()
 listFiles(pattern)
 ```
 
-列出指定目录中的文件和子目录。
+列出目录中的文件和子目录。
 
 Parameters:
 
-- `pattern` (string, optional): 可选的匹配模式，支持通配符（如 *.txt、data_*.json），可以指定目录路径。
+- `pattern` (string, optional): 可选的匹配模式，支持通配符（如*.txt, data_*.json），可以指定目录。
 
-Returns (ListFilesResult 对象): 返回包含 ```files``` 和 ```dirs``` 数组的对象。
+Returns (`ListFilesResult`对象): `ListFilesResult`对象：```files```为匹配到的文件名数组，```dirs```为当前目录下的子目录数组。
 
-- files：匹配到的文件名数组。
-
-- dirs：当前目录下的子目录名数组。
-
-列出匹配的文件和目录。
+列出搜索的文件和目录。
 
 ```javascript
 function main() {
@@ -19455,11 +21275,11 @@ function main() {
 }
 ```
 
-不指定 ```pattern``` 参数时，列出文件根目录（即`getRootDir`返回的目录）下的所有文件和子目录。```pattern``` 为目录路径时列出该目录；通配符（```*```、```?```）只能用在最后一级，例如 ```data/*.json```，此时返回的名称带目录前缀（如 ```data/a.json```）。
+不指定```pattern```参数时列出文件根目录（即`getRootDir`返回的目录）下所有文件和子目录。```pattern```为目录路径时列出该目录；通配符（```*```、```?```）只能用在最后一级，例如```data/*.json```，此时返回的名称带目录前缀（如```data/a.json```）。
 
-See also: `File`, `ListFilesResult`, `FileStat`,  `open`, `fgets`, `fputs`, `mmap`, `getRootDir`, `listFiles`, `exists`, `remove`, `mkdir`, `rmdir`, `rename`, `stat`, `exit`,
+See also: `os`, `ListFilesResult`, `os.getRootDir`, `os.stat`
 
-##### exists
+##### os.exists
 
 ```
 exists(filename)
@@ -19477,17 +21297,22 @@ Returns (bool): 如果文件或目录存在则返回 true，否则返回 false�
 
 ```javascript
 function main() {
-    Log(`os.exists("./strategyConfig"):`, os.exists("./strategyConfig"))    // os.exists("./strategyConfig"): true
-    Log(`os.exists("./strategyConfig/testData.txt"):`, os.exists("./strategyConfig/testData.txt"))  // os.exists("./strategyConfig/testData.txt"): true
-    // Log(`os.exists("../strategyConfig"):`, os.exists("../strategyConfig"))   // 路径中含 ".." 会抛出异常：invalid path: path traversal not allowed
-    Log(`os.exists("test_1.txt"):`, os.exists("test_1.txt"))                // os.exists("test_1.txt"): true
-    Log(`os.exists("test_2.txt"):`, os.exists("test_2.txt"))                // os.exists("test_2.txt"): false
+    Log(`os.exists("./strategyConfig"):`, os.exists("./strategyConfig"))
+    // 输出：os.exists("./strategyConfig"): true
+    Log(`os.exists("./strategyConfig/testData.txt"):`, os.exists("./strategyConfig/testData.txt"))
+    // 输出：os.exists("./strategyConfig/testData.txt"): true
+    // Log(`os.exists("../strategyConfig"):`, os.exists("../strategyConfig"))   // 路径中含 ".." 会抛出异常：
+    // invalid path: path traversal not allowed
+    Log(`os.exists("test_1.txt"):`, os.exists("test_1.txt"))
+    // 输出：os.exists("test_1.txt"): true
+    Log(`os.exists("test_2.txt"):`, os.exists("test_2.txt"))
+    // 输出：os.exists("test_2.txt"): false
 }
 ```
 
-See also: `File`, `ListFilesResult`, `FileStat`,  `open`, `fgets`, `fputs`, `mmap`, `getRootDir`, `listFiles`, `exists`, `remove`, `mkdir`, `rmdir`, `rename`, `stat`, `exit`,
+See also: `os`, `os.stat`, `os.open`
 
-##### remove
+##### os.remove
 
 ```
 remove(filename)
@@ -19515,9 +21340,9 @@ function main() {
 
 此函数可以删除文件或空目录。如需删除非空目录，请使用```rmdir()```函数。
 
-See also: `File`, `ListFilesResult`, `FileStat`,  `open`, `fgets`, `fputs`, `mmap`, `getRootDir`, `listFiles`, `exists`, `remove`, `mkdir`, `rmdir`, `rename`, `stat`, `exit`,
+See also: `os`, `os.exists`, `os.rmdir`, `os.rename`
 
-##### mkdir
+##### os.mkdir
 
 ```
 mkdir(dirname)
@@ -19546,9 +21371,9 @@ function main() {
 
 支持递归创建多级目录。如果父目录不存在，将自动创建。
 
-See also: `File`, `ListFilesResult`, `FileStat`,  `open`, `fgets`, `fputs`, `mmap`, `getRootDir`, `listFiles`, `exists`, `remove`, `mkdir`, `rmdir`, `rename`, `stat`, `exit`,
+See also: `os`, `os.rmdir`, `os.getRootDir`
 
-##### rmdir
+##### os.rmdir
 
 ```
 rmdir(dirname)
@@ -19576,9 +21401,9 @@ function main() {
 
 此操作将永久删除目录及其所有内容，请谨慎使用。
 
-See also: `File`, `ListFilesResult`, `FileStat`,  `open`, `fgets`, `fputs`, `mmap`, `getRootDir`, `listFiles`, `exists`, `remove`, `mkdir`, `rmdir`, `rename`, `stat`, `exit`,
+See also: `os`, `os.mkdir`, `os.remove`
 
-##### rename
+##### os.rename
 
 ```
 rename(oldName, newName)
@@ -19604,15 +21429,16 @@ function main() {
 
     os.mkdir("outputFiles")
     let retRename = os.rename(oldFileName, newFileName)
-    Log("retRename:", retRename)     // retRename: true
+    Log("retRename:", retRename)
+    // 输出：retRename: true
 }
 ```
 
 该函数可用于重命名文件，或将文件移动到其他目录。如果新路径所在的目录不存在，操作将会失败。
 
-See also: `File`, `ListFilesResult`, `FileStat`,  `open`, `fgets`, `fputs`, `mmap`, `getRootDir`, `listFiles`, `exists`, `remove`, `mkdir`, `rmdir`, `rename`, `stat`, `exit`,
+See also: `os`, `os.remove`, `os.exists`
 
-##### stat
+##### os.stat
 
 ```
 stat(filename)
@@ -19624,15 +21450,16 @@ Parameters:
 
 - `filename` (string, required): 文件路径。
 
-Returns (FileStat 对象): 返回包含文件统计信息的对象。
+Returns (`FileStat`对象): 返回包含文件统计信息的对象。
 
 获取文件信息并检查文件大小。
 
 ```javascript
 function main() {
     if (os.exists("strategyConfig/testData.txt")) {
-        let stat = os.stat("strategyConfig/testData.txt")  // stat: {"size":10,"mode":420,"mtime":1757312981796,"atime":1757312981796,"ctime":1757312981796}
+        let stat = os.stat("strategyConfig/testData.txt")
         Log("stat:", stat)
+        // 输出：stat: {"size":10,"mode":420,"mtime":1757312981796,"atime":1757312981796,"ctime":1757312981796}
     }
 }
 ```
@@ -19649,9 +21476,9 @@ function main() {
 
 - ctime: 当前与 mtime 相同。
 
-See also: `File`, `ListFilesResult`, `FileStat`,  `open`, `fgets`, `fputs`, `mmap`, `getRootDir`, `listFiles`, `exists`, `remove`, `mkdir`, `rmdir`, `rename`, `stat`, `exit`,
+See also: `os`, `FileStat`, `os.exists`
 
-##### exit
+##### os.exit
 
 ```
 exit()
@@ -19663,8 +21490,6 @@ exit(status)
 Parameters:
 
 - `status` (number, optional): 可选的退出状态码，默认值为 0。
-
-Returns (never): 此函数不会返回值，程序将直接终止执行。
 
 检查条件后退出程序。
 
@@ -19681,13 +21506,13 @@ function main() {
 
 立即终止策略进程，不会执行```onexit()```等收尾函数。状态码 0 表示正常结束（实盘状态显示为已完成），非零值表示异常退出（实盘状态显示为错误）。
 
-See also: `File`, `ListFilesResult`, `FileStat`,  `open`, `fgets`, `fputs`, `mmap`, `getRootDir`, `listFiles`, `exists`, `remove`, `mkdir`, `rmdir`, `rename`, `stat`, `exit`,
+See also: `os`, `os.getRootDir`
 
 #### File
 
 文件对象，提供文件读写、定位等操作。
 
-##### close
+##### File.close
 
 ```
 close()
@@ -19707,9 +21532,9 @@ function main() {
 
 使用完文件对象后必须调用此方法以释放系统资源。
 
-See also: `close`, `puts`, `printf`, `flush`, `tell`, `seek`,  `eof`, `read`, `write`, `getline`, `toString`
+See also: `File`, `os.open`, `File.flush`
 
-##### puts
+##### File.puts
 
 ```
 puts(data1, data2, ...dataN)
@@ -19729,28 +21554,31 @@ Returns (number): 返回实际写入的字节数。
 function main() {
     let file = os.open("output.txt", "w+")
     let bytes = file.puts("Hello", " ", "World", "!")
-    Log("Bytes written:", bytes)  // Bytes written: 12
+    Log("Bytes written:", bytes)
+    // 输出：Bytes written: 12
 
     file.seek(0, 0)
     let data = file.read()
-    Log("data:", data)            // If the file is opened with os.open("output.txt", "w") (write-only), read() throws an exception
-                                  // data: Hello World!
+    Log("data:", data)
+    // 输出：data: Hello World!
+    // 如果用 os.open("output.txt", "w")（只写）打开文件，read() 会抛出异常
 
     // file.puts()                // error: puts requires at least 1 argument at main
     file.puts(", Hello FMZ!")
 
     file.seek(0, 0)
     data = file.read()
-    Log("data:", data)            // data: Hello World!, Hello FMZ!
+    Log("data:", data)
+    // 输出：data: Hello World!, Hello FMZ!
     file.close()
 }
 ```
 
 可一次写入多个字符串参数，将按顺序连接后写入。
 
-See also: `close`, `puts`, `printf`, `flush`, `tell`, `seek`,  `eof`, `read`, `write`, `getline`, `toString`
+See also: `File`, `os.open`, `File.printf`, `File.write`, `File.flush`
 
-##### printf
+##### File.printf
 
 ```
 printf(format)
@@ -19762,7 +21590,7 @@ printf(format, arg1, arg2, ...argN)
 Parameters:
 
 - `format` (string, required): 格式化字符串。
-- `args` (any (平台支持的任意类型), optional): 格式化参数。
+- `args` (any, optional): 格式化参数。
 
 Returns (number): 返回实际写入的字节数。
 
@@ -19778,7 +21606,8 @@ function main() {
 
     file.seek(0, 0)
     let data = file.read()
-    Log("data:", data)                              // data: Price: 100.25, Volume: 1000
+    Log("data:", data)
+    // 输出：data: Price: 100.25, Volume: 1000
 
     // file.printf("| Price: %.2f, Volume: %d\n")   // "| Price: %!f(MISSING), Volume: %!d(MISSING)"
     // file.seek(0, 0)
@@ -19791,9 +21620,9 @@ function main() {
 
 支持的格式符：```%s```、```%d```、```%f```、```%v```、```%%```，可以带标志（```-```、```0```）、宽度和精度，例如```%.2f```、```%-8s```、```%08d```。参数不足时，对应位置写入```%!d(MISSING)```这样的占位文本。
 
-See also: `close`, `puts`, `printf`, `flush`, `tell`, `seek`,  `eof`, `read`, `write`, `getline`, `toString`
+See also: `File`, `os.open`, `File.puts`, `File.write`
 
-##### flush
+##### File.flush
 
 ```
 flush()
@@ -19813,9 +21642,9 @@ function main() {
 }
 ```
 
-See also: `close`, `puts`, `printf`, `flush`, `tell`, `seek`,  `eof`, `read`, `write`, `getline`, `toString`
+See also: `File`, `os.open`, `File.close`, `File.write`
 
-##### tell
+##### File.tell
 
 ```
 tell()
@@ -19830,19 +21659,21 @@ Returns (number): 返回当前文件指针的位置（以字节为单位的偏�
 ```javascript
 function main() {
     let file = os.open("data.txt", "r+")
-    Log("Initial position:", file.tell())      // Initial position: 0
+    Log("Initial position:", file.tell())
+    // 输出：Initial position: 0
 
     file.write("Hello")
-    Log("After write position:", file.tell())  // After write position: 5
+    Log("After write position:", file.tell())
+    // 输出：After write position: 5
     file.close()
 }
 ```
 
 返回当前文件指针相对于文件起始位置的字节偏移量。
 
-See also: `close`, `puts`, `printf`, `flush`, `tell`, `seek`,  `eof`, `read`, `write`, `getline`, `toString`
+See also: `File`, `os.open`, `File.seek`, `File.eof`
 
-##### seek
+##### File.seek
 
 ```
 seek(offset, whence)
@@ -19878,9 +21709,9 @@ function main() {
 
 用于定位文件指针，```offset```参数可以为负数（表示向前移动）。
 
-See also: `close`, `puts`, `printf`, `flush`, `tell`, `seek`,  `eof`, `read`, `write`, `getline`, `toString`
+See also: `File`, `os.open`, `File.tell`, `File.eof`
 
-##### eof
+##### File.eof
 
 ```
 eof()
@@ -19912,9 +21743,9 @@ function main() {
 
 用于在读取文件时判断是否已读取完所有内容。只有在某次读取碰到文件末尾后才返回```true```：例如```getline()```返回```undefined```、```read(size)```读不到数据，或不带参数的```read()```读完剩余内容；调用```seek()```后恢复为```false```。
 
-See also: `close`, `puts`, `printf`, `flush`, `tell`, `seek`,  `eof`, `read`, `write`, `getline`, `toString`
+See also: `File`, `os.open`, `File.read`, `File.getline`
 
-##### read
+##### File.read
 
 ```
 read()
@@ -19957,9 +21788,9 @@ function main() {
 
 可以读取指定字节数的内容或文件中剩余的全部内容。文件以```b```模式（如```"rb"```）打开时返回```ArrayBuffer```，否则返回字符串。不带参数读完剩余内容，或某次读取已无数据可读之后，```eof()```返回```true```。
 
-See also: `close`, `puts`, `printf`, `flush`, `tell`, `seek`,  `eof`, `read`, `write`, `getline`, `toString`
+See also: `File`, `os.open`, `File.getline`, `File.eof`, `File.seek`
 
-##### write
+##### File.write
 
 ```
 write(data)
@@ -19988,9 +21819,9 @@ function main() {
 
 将字符串数据写入文件的当前位置。
 
-See also: `close`, `puts`, `printf`, `flush`, `tell`, `seek`,  `eof`, `read`, `write`, `getline`, `toString`
+See also: `File`, `os.open`, `File.puts`, `File.flush`
 
-##### getline
+##### File.getline
 
 ```
 getline()
@@ -20020,9 +21851,9 @@ function main() {
 
 按行顺序读取文件内容。
 
-See also: `close`, `puts`, `printf`, `flush`, `tell`, `seek`,  `eof`, `read`, `write`, `getline`, `toString`
+See also: `File`, `os.open`, `File.read`, `File.eof`
 
-##### toString
+##### File.toString
 
 ```
 toString()
@@ -20037,14 +21868,15 @@ Returns (string): 返回文件对象的字符串描述信息。
 ```javascript
 function main() {
     let file = os.open("data/data.txt", "r")
-    Log("File info:", file.toString())           // File info: File(data/data.txt)
+    Log("File info:", file.toString())
+    // 输出：File info: File(data/data.txt)
     file.close()
 }
 ```
 
 返回文件对象的描述信息。
 
-See also: `close`, `puts`, `printf`, `flush`, `tell`, `seek`,  `eof`, `read`, `write`, `getline`, `toString`
+See also: `File`, `os.open`, `File.read`
 
 #### ListFilesResult
 
@@ -20052,7 +21884,7 @@ See also: `close`, `puts`, `printf`, `flush`, `tell`, `seek`,  `eof`, `read`, `w
 
 ListFilesResult对象结构：
 
-```js
+```javascript
 {
     files: string[],  // 搜索的文件名数组
     dirs: string[]    // 当前目录下，子目录名数组
@@ -20069,7 +21901,7 @@ See also: `File`, `os`, `FileStat`
 
 FileStat对象结构：
 
-```js
+```javascript
 {
     size: number,   // 文件大小（字节）
     mode: number,   // 文件模式（低 9 位为权限位，普通 0644 文件为 420）
@@ -20085,31 +21917,29 @@ See also: `File`, `os`, `ListFilesResult`
 
 ## 结构体
 
+结构体是API函数返回的数据结构：行情、深度、成交、K线、市场信息、订单、条件单、账户、资产、持仓和资金费率，以及函数的选项与返回对象（`其它结构`）。
+
+各结构的```Info```字段是交易所接口的原始数据（回测中没有），标准字段缺失时可以从这里读取。返回结构的函数调用失败时返回空值，见`失败与空值`。
+
 ### Ticker
 
-市场行情数据结构。
+市场行情的结构。
 
 Fields:
 
-- `Info` (object): 交易所接口返回的原始数据，回测时不包含此属性。
-- `Symbol` (string): ```Symbol```字段为FMZ平台定义的交易品种代码。
-
-- 对于现货交易所对象，```Symbol```字段值的格式为（示例）：```BTC_USDT```，表示BTC_USDT现货交易对。
-
-- 对于期货交易所对象，```Symbol```字段值的格式为（示例）：```BTC_USDT.swap```，表示BTC的USDT本位永续合约。
-
-- 对于期货交易所对象（期权相关功能也封装在期货交易所对象中），```Symbol```字段值的格式为（示例）：```BTC_USDT.BTC-240108-40000-C```，表示BTC的USDT本位期权合约，行权日期为2024年1月8日，行权价格为40000的看涨期权合约。
+- `Info` (object): 交易所接口返回的原始数据，回测时无此属性。
+- `Symbol` (string): FMZ定义的品种代码，写法见`品种代码`，例如现货```BTC_USDT```、期货```BTC_USDT.swap```（USDT本位永续合约），期权```BTC_USDT.BTC-240108-40000-C```（2024年1月8日行权、行权价40000的看涨期权）。
 - `High` (number): 最高价。交易所接口没有提供24小时最高价时可能为0，部分交易所以卖一价格近似。
 - `Low` (number): 最低价。交易所接口没有提供24小时最低价时可能为0，部分交易所以买一价格近似。
-- `Sell` (number): 当前卖一价格。部分交易所的行情接口不含盘口数据，此时为0，需要盘口价格请使用`exchange.GetDepth`。
-- `Buy` (number): 当前买一价格。部分交易所的行情接口不含盘口数据，此时为0。
-- `Last` (number): 最新成交价。
+- `Sell` (number): 当前时刻的卖一价。部分交易所的行情接口不含盘口数据，此时为0，需要盘口价格请使用`exchange.GetDepth`。
+- `Buy` (number): 当前时刻的买一价。部分交易所的行情接口不含盘口数据，此时为0。
+- `Last` (number): 最新的成交价。
 - `Open` (number): 周期开盘价。交易所接口没有提供24小时滚动周期的开盘价时可能为0。
-- `Volume` (number): 最近成交量。原则上，现货成交量单位为交易币种（baseCurrency），合约成交量单位为合约张数。如果交易所接口未提供此类数据，则使用交易所接口现有数据填充，例如可能为计价币种（quoteCurrency）为单位的成交量。
-- `Time` (number): 毫秒级时间戳。
-- `OpenInterest` (number): 持仓量。大部分交易所接口不提供该数据，不支持时值为0。
+- `Volume` (number): 最近成交量，原则上现货成交量单位为交易币种（baseCurrency），合约成交量单位为合约张数。如果交易所接口没有提供此类数据则使用交易所接口现有的数据填充，例如可能为计价币（quoteCurrency）为单位的成交量。
+- `Time` (number): 毫秒级别时间戳。
+- `OpenInterest` (number): 持仓量，大部分交易所接口不提供该数据，不支持该数据时值为0。
 
-exchange.GetTicker()函数返回一个Ticker结构。
+```exchange.GetTicker()```函数返回一个Ticker结构。
 
 对于期权合约，盘口流动性通常较差，经常出现买一、卖一没有挂单的情况，此时```Ticker```结构的```Buy```、```Sell```字段为0；从未成交的期权合约```Last```也可能为0。个别交易所以标记价格作为```Last```（全部合约，或只在没有最新成交价时），各字段的取值见交易所页的「期权」与「注意事项」。使用期权行情前应检查这些字段。
 
@@ -20139,7 +21969,7 @@ Fields:
 - `Price` (number): 订单价格。
 - `Amount` (number): 订单数量。
 
-exchange.GetDepth()函数返回的数据结构中，Bids和Asks的属性值为OrderBook数组。
+```exchange.GetDepth()```函数返回的数据结构中，Bids和Asks的属性值为OrderBook数组。
 
 See also: `exchange.GetDepth`, `Depth`
 
@@ -20155,7 +21985,7 @@ Fields:
 - `Amount` (number): 成交数量。
 - `Type` (number): 订单类型，参考`ORDER_TYPE_BUY`、`ORDER_TYPE_SELL`。交易所没有提供成交方向、无法判定时为```2```，不要用「不是卖就是买」的方式判断方向。
 
-exchange.GetTrades()函数返回Trade数组，没有数据时为空数组，调用失败时返回空值（JavaScript为```null```，Python为```None```）。
+```exchange.GetTrades()```函数返回Trade数组，没有数据时为空数组，调用失败时返回空值（JavaScript为```null```，Python为```None```）。
 
 See also: `exchange.GetTrades`
 
@@ -20173,7 +22003,7 @@ Fields:
 - `OpenInterest` (number): 持仓量。大部分交易所接口不提供此数据，不支持时值为0。
 - `Volume` (number): 成交量。现货成交量单位原则上为基础货币（baseCurrency），合约成交量单位为合约张数。若交易所接口未提供标准数据，则使用接口现有数据填充，例如可能为计价货币（quoteCurrency）单位的成交量。
 
-exchange.GetRecords()函数返回Record数组，没有数据时为空数组，调用失败时返回空值（JavaScript为```null```，Python为```None```）。每个Record结构代表一根K线柱。
+```exchange.GetRecords()```函数返回Record数组，没有数据时为空数组，调用失败时返回空值（JavaScript为```null```，Python为```None```）。每个Record结构代表一根K线柱。
 
 对于Python语言，不同版本的pandas包处理方式可能不同，例如：
 
@@ -20206,7 +22036,7 @@ Fields:
 - `CtValCcy` (string): ```CtValCcy```字段记录单张合约的价值单位，单张合约的价值单位可能是：```BTC```、```USD```、```ETH```等。
 - `Info` (object): ```Info```字段记录交易所市场信息接口返回的该品种的原始数据。
 
-exchange.GetMarkets()函数返回包含此```Market```结构的字典。
+```exchange.GetMarkets()```函数返回包含此```Market```结构的字典。
 
 由于各个交易所对于市场信息数据支持程度不同，部分字段的取值需要注意：```MaxQty```、```MaxNotional```在交易所没有提供时为```9007199254740991```（表示没有限制）；```MaxNotional```、```CtVal```、```CtValCcy```没有数据时不包含该字段（现货品种一般没有```CtVal```、```CtValCcy```；Rust的```Market```结构字段固定存在，此时为```0```或空字符串）；```PricePrecision```、```AmountPrecision```可能为负数；没有市场列表接口的交易所无法给出原始名称，此时```Symbol```为FMZ平台定义的交易品种代码（如```BTC_USDT```）。以上各个字段数据取值均来自于交易所接口原始数据，具体也可以查询```Info```字段内容。
 
@@ -20214,60 +22044,52 @@ See also: `exchange.GetMarkets`
 
 ### Order
 
-订单结构。
+订单的结构。
 
 Fields:
 
-- `Info` (object): 交易所接口返回的原始数据，回测时无此属性。
-- `Symbol` (string): ```Symbol```字段为FMZ平台定义的交易品种代码，格式与`Ticker`结构的```Symbol```字段一致。
-
-- 对于现货交易所对象，```Symbol```字段值的格式（示例）为：```BTC_USDT```，表示BTC_USDT现货交易对。
-
-- 对于期货交易所对象，```Symbol```字段值的格式（示例）为：```BTC_USDT.swap```，表示BTC的USDT本位永续合约。
-- `Id` (string): 订单ID。大多数交易所的订单ID由交易所品种代码和交易所原始订单ID组成，以英文逗号分隔。例如OKX交易所的现货交易对```ETH_USDT```订单的属性```Id```格式为：```ETH-USDT,1547130415509278720```。少数交易所的订单ID就是交易所原始订单ID，不带品种代码。策略应把```Id```当作不透明的字符串原样使用（如传给```exchange.CancelOrder()```），不要自行拆分或拼接。
-- `Price` (number): 下单价格，注意市价单的该属性可能为0或-1。
-- `Amount` (number): 下单数量，注意市价单的该属性可能为金额而非币数。
-- `DealAmount` (number): 成交数量，如果交易所接口不提供该数据，则可能使用0填充。
-- `AvgPrice` (number): 成交均价，注意部分交易所不提供该数据。不提供且无法计算得出的情况下，该属性设置为0。
+- `Info` (object): 交易所接口应答的原始数据，回测时无此属性。
+- `Symbol` (string): FMZ定义的品种代码，写法见`品种代码`，例如现货```BTC_USDT```、期货```BTC_USDT.swap```（USDT本位永续合约），格式与`Ticker`的```Symbol```相同。
+- `Id` (string): 订单Id。大多数交易所的订单Id由交易所品种代码和交易所原始订单Id组成，以英文逗号间隔。例如OKX交易所的现货交易对```ETH_USDT```订单的属性```Id```格式为：```ETH-USDT,1547130415509278720```。少数交易所的订单Id就是交易所原始订单Id，不带品种代码。策略应把```Id```当作不透明的字符串原样使用（如传给```exchange.CancelOrder()```），不要自行拆分或拼接。
+- `Price` (number): 下单价格，注意市价单的该属性可能为0或者-1。
+- `Amount` (number): 下单数量，注意市价单的该属性可能为金额并非币数。
+- `DealAmount` (number): 成交数量，如果交易所接口不提供该数据则可能使用0填充。
+- `AvgPrice` (number): 成交均价，注意有些交易所不提供该数据。不提供、也无法计算得出的情况该属性设置为0。
 - `Status` (number): 订单状态，参考`ORDER_STATE_PENDING`、`ORDER_STATE_CLOSED`、`ORDER_STATE_CANCELED`、`ORDER_STATE_UNKNOWN`。
 - `Type` (number): 订单类型，参考`ORDER_TYPE_BUY`、`ORDER_TYPE_SELL`。
-- `Offset` (number): 合约订单的开平仓方向，参考`ORDER_OFFSET_OPEN`、`ORDER_OFFSET_CLOSE`。
+- `Offset` (number): 合约订单的开、平仓方向，参考`ORDER_OFFSET_OPEN`、`ORDER_OFFSET_CLOSE`。
 - `ContractType` (string): 现货订单中该属性为```""```，即空字符串。合约订单中该属性为具体的合约代码。
-- `Condition` (object): 条件单配置信息。当订单为条件单时，该字段包含条件单的触发条件和执行价格配置。普通订单没有该字段：JavaScript中读取结果为```undefined```；Python中该键不存在，直接按属性访问```order.Condition```会抛出```AttributeError```异常，应使用```order.get("Condition")```或```"Condition" in order```判断；Rust中```Order```结构始终带有```Condition```字段，普通订单的```Condition.ConditionType```为```-1```。
+- `Condition` (object): 条件单的触发条件和执行价格，结构见`Condition`。普通订单没有该字段，各语言的读取方式见备注。
+- `Time` (number): 订单创建时间，毫秒级别时间戳。
 
-该字段的结构参考`Condition`结构。
-- `Time` (number): 订单创建时间，毫秒级时间戳。
+```Order```订单结构可由```exchange.GetOrder()```、```exchange.GetOrders()```函数返回。```exchange.GetOrders()```函数返回的是```Order```结构的数组，如果当前没有未完成的订单，则返回```[]```即空数组；调用失败（网络错误、交易所报错等）时返回空值（JavaScript为```null```，Python为```None```）。```Order```订单结构的```Status```属性可以直接和```ORDER_STATE_PENDING```等常量比较，判断是否相等从而确定订单状态。
 
-```Order```订单结构可由```exchange.GetOrder()```、```exchange.GetOrders()```函数返回。```exchange.GetOrders()```函数返回```Order```结构的数组，如果当前没有未完成的订单，则返回```[]```即空数组；调用失败（网络错误、交易所报错等）时返回空值（JavaScript为```null```，Python为```None```）。```Order```订单结构的```Status```属性可以直接与```ORDER_STATE_PENDING```等常量比较，判断是否相等从而确定订单状态。
+对于单向持仓模式下，对于无法判断订单是否是平仓（减仓）时，```Offset```字段默认设置为开仓方向，即```ORDER_OFFSET_OPEN```。
 
-对于单向持仓模式，当无法判断订单是否为平仓（减仓）时，```Offset```字段默认设置为开仓方向，即```ORDER_OFFSET_OPEN```。
+```Time```字段表示订单创建时间，为毫秒级别时间戳。部分交易所可能在```Info```字段中也包含时间信息，但```Time```字段统一提供标准化的时间戳格式。
 
-```Time```字段表示订单创建时间，为毫秒级时间戳。部分交易所可能在```Info```字段中也包含时间信息，但```Time```字段统一提供标准化的时间戳格式。
+普通订单没有```Condition```字段：JavaScript中读取结果为```undefined```；Python中该键不存在，直接按属性访问```order.Condition```会抛出```AttributeError```异常，应使用```order.get("Condition")```或```"Condition" in order```判断；Rust中```Order```结构始终带有```Condition```字段，普通订单的```Condition.ConditionType```为```-1```。
 
 See also: `exchange.GetOrder`, `exchange.GetOrders`, `exchange.GetHistoryOrders`, `Condition`
 
 ### Condition
 
-条件单配置信息结构，用于设置条件单的触发条件和执行价格。
+条件单配置信息的结构。用于设置条件单的触发条件和执行价格。
 
 Fields:
 
-- `ConditionType` (number): 条件单类型，可选值：
-- `ORDER_CONDITION_TYPE_OCO`（值为0）：OCO订单（One-Cancels-the-Other，二择一订单）
-- `ORDER_CONDITION_TYPE_TP`（值为1）：止盈单（Take Profit）
-- `ORDER_CONDITION_TYPE_SL`（值为2）：止损单（Stop Loss）
-- `ORDER_CONDITION_TYPE_GENERIC`（值为3）：通用条件单
-- `TpTriggerPrice` (number): 止盈触发价格。当条件单类型为TP或OCO时使用，当市场价格达到该价格时触发止盈订单。
-- `TpOrderPrice` (number): 止盈订单执行价格，即止盈触发后的实际下单价格。下单时价格设置为-1表示以市价单执行；查询返回的条件单中，以市价执行的该价格通常为0。
-- `SlTriggerPrice` (number): 止损触发价格。当条件单类型为SL或OCO时使用，当市场价格达到该价格时触发止损订单。
-- `SlOrderPrice` (number): 止损订单执行价格，即止损触发后的实际下单价格。下单时价格设置为-1表示以市价单执行；查询返回的条件单中，以市价执行的该价格通常为0。
+- `ConditionType` (number): 条件单类型，取值见`ORDER_CONDITION_TYPE`：OCO（```0```）、止盈（```1```）、止损（```2```）、通用（```3```，只出现在查询结果中）。
+- `TpTriggerPrice` (number): 止盈触发价格。当条件单类型为TP或OCO时使用。当市场价格达到该价格时，触发止盈订单。
+- `TpOrderPrice` (number): 止盈订单执行价格。止盈触发后的实际下单价格。下单时价格设置为-1表示以市价单执行；查询返回的条件单中，以市价执行的该价格通常为0。
+- `SlTriggerPrice` (number): 止损触发价格。当条件单类型为SL或OCO时使用。当市场价格达到该价格时，触发止损订单。
+- `SlOrderPrice` (number): 止损订单执行价格。止损触发后的实际下单价格。下单时价格设置为-1表示以市价单执行；查询返回的条件单中，以市价执行的该价格通常为0。
 
 - OCO订单（ConditionType=`ORDER_CONDITION_TYPE_OCO`）同时设置止盈和止损条件，当其中一个条件触发时，另一个自动取消。
 - TP订单（ConditionType=`ORDER_CONDITION_TYPE_TP`）仅使用TpTriggerPrice和TpOrderPrice字段。
 - SL订单（ConditionType=`ORDER_CONDITION_TYPE_SL`）仅使用SlTriggerPrice和SlOrderPrice字段。
-- GENERIC订单（ConditionType=`ORDER_CONDITION_TYPE_GENERIC`）为通用条件单，具体使用的字段取决于交易所的实现。查询返回的GENERIC订单中，Tp*与Sl*两组字段的值相同（同一组触发价、委托价）。GENERIC类型只出现在查询结果中，`exchange.CreateConditionOrder`、`exchange.ModifyConditionOrder`不支持该类型，传入时返回空值并记录错误。
+- GENERIC订单（ConditionType=`ORDER_CONDITION_TYPE_GENERIC`）为通用条件单，具体使用哪些字段取决于交易所实现。查询返回的GENERIC订单中，Tp*与Sl*两组字段的值相同（同一组触发价、委托价）。GENERIC类型只出现在查询结果中，`exchange.CreateConditionOrder`、`exchange.ModifyConditionOrder`不支持该类型，传入时返回空值并记录错误。
 
-条件单功能的支持情况取决于具体交易所，部分交易所可能不支持某些类型的条件单。
+条件单功能支持情况取决于具体交易所，部分交易所可能不支持某些类型的条件单。
 
 See also: `Order`, `exchange.CreateConditionOrder`, `exchange.GetConditionOrder`
 
@@ -20285,7 +22107,7 @@ Fields:
 - `Equity` (number): 仅期货交易所对象支持此字段。```Equity```字段表示当前合约设置下期货账户保证金的**总权益**。如果交易所接口未提供相关数据，则此字段值为0。
 - `UPnL` (number): 仅期货交易所对象支持此字段。```UPnL```字段表示当前合约设置下期货账户保证金中所有开仓仓位的**未实现盈亏**总和。
 
-exchange.GetAccount()函数返回一个Account结构。返回结构中的数据依赖于当前设置的交易对和合约代码。
+```exchange.GetAccount()```函数返回一个Account结构。返回结构中的数据依赖于当前设置的交易对和合约代码。
 
 See also: `exchange.GetAccount`
 
@@ -20305,30 +22127,26 @@ See also: `exchange.GetAssets`
 
 ### Position
 
-合约仓位信息的数据结构。
+合约仓位信息的结构。
 
 Fields:
 
-- `Info` (object): 交易所接口返回的原始数据，回测模式下此属性不存在。
-- `Symbol` (string): ```Symbol```字段为FMZ平台定义的交易品种代码，格式与`Ticker`结构的```Symbol```字段保持一致。
+- `Info` (object): 交易所接口返回的原始数据，回测时无此属性。
+- `Symbol` (string): FMZ定义的品种代码，写法见`品种代码`，例如现货```BTC_USDT```、期货```BTC_USDT.swap```（USDT本位永续合约），格式与`Ticker`的```Symbol```相同。
+- `MarginLevel` (number): 持仓杆杠大小，如果交易所接口没有提供该数据则通过计算填充，可能会有误差。
+- `Amount` (number): 持仓量，通常是正整数（合约张数）。注意每个交易所的合约乘数、价值等合约规格可能不一样。
+- `FrozenAmount` (number): 仓位冻结量，平仓单未成交时的临时冻结仓位数量。
+- `Price` (number): 持仓均价，原则上该属性为仓位总体的平均价格（不参与结算）， 如果交易所接口没有提供该数据则用交易所接口现有的持仓均价填充（参与结算）。
+- `Profit` (number): 持仓浮动盈亏，原则上为持仓的未实现盈亏，如果交易所接口没有提供该数据则用交易所接口其它盈亏数据填充，盈亏数值的单位和当前合约保证金的单位相同。
+- `Type` (number): 仓位类型，参考`PD_LONG`, `PD_SHORT`。
+- `ContractType` (string): 合约代码，具体可以参看`exchange.SetContractType`函数的描述内容。
+- `Margin` (number): 仓位占用的保证金，如果交易所接口没有提供该数据则使用0填充。
 
-- 对于现货交易所对象，```Symbol```字段值的格式（示例）为：```BTC_USDT```，表示BTC_USDT现货交易对。
+```exchange.GetPositions()```函数返回一个Position数组，没有持仓时为空数组，调用失败时返回空值（JavaScript为```null```，Python为```None```）。
 
-- 对于期货交易所对象，```Symbol```字段值的格式（示例）为：```BTC_USDT.swap```，表示BTC的USDT本位永续合约。
-- `MarginLevel` (number): 持仓杠杆倍数，如果交易所接口未提供该数据则通过计算填充，可能存在误差。
-- `Amount` (number): 持仓数量，通常为正整数（合约张数）。注意各交易所的合约乘数、价值等合约规格可能存在差异。
-- `FrozenAmount` (number): 仓位冻结数量，平仓订单未成交时的临时冻结仓位数量。
-- `Price` (number): 持仓均价，原则上该属性为仓位整体的平均价格（不参与结算），如果交易所接口未提供该数据则使用交易所接口现有的持仓均价填充（参与结算）。
-- `Profit` (number): 持仓浮动盈亏，原则上为持仓的未实现盈亏，如果交易所接口未提供该数据则使用交易所接口其他盈亏数据填充，盈亏数值的单位与当前合约保证金的单位相同。
-- `Type` (number): 仓位类型，参考`PD_LONG`、`PD_SHORT`。
-- `ContractType` (string): 合约代码，具体内容请参考`exchange.SetContractType`函数的描述。
-- `Margin` (number): 仓位占用的保证金，如果交易所接口未提供该数据则使用0填充。
-
-exchange.GetPositions()函数返回一个Position数组，没有持仓时为空数组，调用失败时返回空值（JavaScript为```null```，Python为```None```）。
-
-对于加密货币期货需要注意，exchange.GetPositions()函数返回的Position结构数组中，持仓数据结构的FrozenAmount、Profit、Margin属性由于交易所提供的数据并不统一，不同交易所对象调用exchange.GetPositions()接口时返回数据的定义可能存在差异。
-
-例如，某些交易所持仓数据中无仓位冻结数据，此时FrozenAmount为0。如需计算特定数据，可使用Info属性中的原始数据进行计算分析。
+对于加密货币期货需要注意，```exchange.GetPositions()```函数返回的Position结构数组。
+对于其中持仓数据结构中的FrozenAmount、Profit、Margin属性，由于交易所提供数据并不统一，不同交易所对象调用```exchange.GetPositions()```接口时返回的数据的定义可能不同。
+例如，有些交易所持仓数据中无仓位冻结数据，此时FrozenAmount为0。 如果需要计算某些数据可以使用Info属性中的原始数据计算分析。
 
 See also: `exchange.GetPositions`
 
@@ -20367,12 +22185,12 @@ Fields:
 - `charset` (string): 应答报文的字符集。设置后按该字符集把应答体解码为UTF-8文本，例如对GBK编码的网页设置为：```"GBK"```。返回结构中的```Length```仍为解码前的长度；无法识别的字符集会记录一条错误，应答体保持原样。该选项与请求体的编码无关。
 - `cookie` (string): Cookie是用于在客户端（通常是浏览器）和服务器之间存储和交换状态信息的小型数据片段。
 - `debug` (bool): 调试模式开关。设置为true时，HttpQuery函数调用将返回完整的HTTP响应报文；设置为false时仅返回响应报文Body中的数据。
-- `headers` (JSON): HTTP请求头信息，以键值对形式存在（JSON结构），用于传递各种信息，如内容类型、认证信息、缓存控制等。
+- `headers` (object): HTTP请求头信息，以键值对形式存在（JSON结构），用于传递各种信息，如内容类型、认证信息、缓存控制等。
 - `proxy` (string): 本次请求使用的代理，支持```http://```、```https://```、```socks5://```、```socks5h://```，例如：```"socks5://user:pass@127.0.0.1:1080"```。只作用于这一次请求，与```exchange.SetProxy()```设置的交易所代理互不影响。
 - `timeout` (number): 超时时间设置，单位为毫秒。设置1000表示1秒钟超时。不设置时默认为300000（5分钟）。
 
 使用范例：
-```js
+```javascript
 function main() {
     var options = {
         method: "POST",
@@ -20413,9 +22231,9 @@ See also: `HttpQuery`, `HttpQuery_Go`
 Fields:
 
 - `StatusCode` (number): HTTP状态码。请求未收到应答（连接被拒绝、DNS解析失败、超时、代理失败等）时为0。
-- `Header` (JSON): 应答头信息。每个键的值为字符串数组（同名应答头可能出现多次，例如多条```Set-Cookie```）。
+- `Header` (object): 应答头信息。每个键的值为字符串数组（同名应答头可能出现多次，例如多条```Set-Cookie```）。
 - `Cookies` (array): 应答中各条```Set-Cookie```解析得到的数组，每个元素包含```Name```、```Value```、```Path```、```Domain```、```Expires```、```MaxAge```、```Secure```、```HttpOnly```、```SameSite```、```Raw```字段。
-- `Trace` (JSON): 请求各阶段的耗时等诊断信息，包括```elapsed_ms```（总耗时）、```dns_ms```、```connect_ms```、```tls_ms```、```ttfb_ms```（首字节耗时）、```recv_ms```等毫秒数，以及```peer_addr```（对端地址）、```reused```（是否复用连接）、```version```（HTTP版本）等字段。仅在```debug```为true时存在。
+- `Trace` (object): 请求各阶段的耗时等诊断信息，包括```elapsed_ms```（总耗时）、```dns_ms```、```connect_ms```、```tls_ms```、```ttfb_ms```（首字节耗时）、```recv_ms```等毫秒数，以及```peer_addr```（对端地址）、```reused```（是否复用连接）、```version```（HTTP版本）等字段。仅在```debug```为true时存在。
 - `Length` (number): 报文长度。设置了```charset```时为解码前的长度。
 - `Body` (string): 报文内容。请求失败时为空字符串。
 - `Error` (string): 请求失败的原因，包含请求方法、URL和底层错误信息，例如：```Get "https://www.okx.com/api/v5/public/time": timeout after 1000ms```。仅在请求失败（```StatusCode```为0）时出现。
@@ -20473,7 +22291,7 @@ Fields:
 - `cols` (array): 用于设置状态栏表格的列标题，数组的第一个元素为第一列的标题，依此类推。
 - `rows` (array): 用于设置状态栏表格的行数据。该rows数组（二维数组）的第一个元素也是数组结构，此数组结构的长度应当与表格列数一致（数组中的元素与表格列名一一对应），即表格中的第一行数据。
 
-```js
+```javascript
 function main() {
     var tbl = {
         type: "table",
@@ -20493,10 +22311,10 @@ See also: `LogStatus`
 
 #### LogStatus-btnTypeOne
 
-状态栏按钮JSON结构的旧写法（输入控件不带```settings```），仍然可用。新代码使用`LogStatus-btnTypeTwo`，字段说明见`LogStatus`的「状态栏按钮」。
+状态栏按钮JSON结构的旧写法（输入控件不带```settings```），平台仍然兼容；新代码使用`LogStatus-btnTypeTwo`，字段说明见`LogStatus`的「状态栏按钮」。
 
-该JSON结构用于配置状态栏中的按钮控件，按钮控件JSON结构可以嵌入到状态栏表格JSON结构中。此结构为旧版本结构，平台目前仍然兼容，建议使用最新版本的按钮JSON结构。
-状态栏按钮控件构造示例（按钮触发点击后，弹框中包含单个输入控件，通过input字段构造）：
+按钮可以单独输出到状态栏，也可以嵌入状态栏表格。点击按钮后弹框里的控件用```input```（一个控件）或```group```（一组控件）配置，提交的内容由`GetCommand`收到。例如点击后弹出一个数值输入框：
+
 ```json
 {
     "type": "button",
@@ -20509,51 +22327,31 @@ See also: `LogStatus`
     }
 }
 ```
-状态栏按钮控件点击触发后的弹框中的控件通过```input```或```group```字段设置。
 
 Fields:
 
-- `type` (string): 对于按钮控件，固定设置为：```button```。
-- `class` (string): 按钮类型设置。
-- `name` (string): 按钮控件上显示的文本，即按钮名称。
+- `type` (string): 对于按钮控件来说固定设置为：```button```。
+- `class` (string): 按钮样式，取Bootstrap按钮类名，例如```"btn btn-xs btn-danger"```；取值范例见备注。
+- `name` (string): 按钮控件上的文本，即按钮名称。
 - `cmd` (string): 按钮控件触发点击操作时，发送给策略的交互命令内容。
-- `description` (string): 按钮控件的描述信息。当鼠标悬停在状态栏中该按钮上时显示此描述信息。
-- `disabled` (bool): 设置按钮为禁用（true）或启用（false）。
-- `input` (JSON): 在构造状态栏按钮进行交互时支持输入数据，交互指令最终由```GetCommand()```函数捕获。在状态栏按钮控件的JSON数据结构中添加```input```项，用于配置按钮触发时显示的弹框中的输入控件。
-例如，设置```input```字段值为：
-```json
-{
-    "name": "开仓数量",
-    "type": "number",
-    "defValue": 1,
-    "description": "test"
-}
-```
+- `description` (string): 按钮控件的描述信息，在状态栏中鼠标放在该按钮上时显示的描述信息。
+- `disabled` (bool): 设置按钮为禁用（true） / 启用（false）。
+- `input` (object): 点击按钮后弹框中的输入控件，字段见备注中的「```input```字段」表。
+- `group` (array): 点击按钮后弹框中的一组控件，每个元素的结构与```input```相同。
 
-上述JSON结构中各字段描述：
-- name
-  状态栏按钮触发点击操作后，弹出的弹框中控件的标题。
-- description
-  状态栏按钮触发点击操作后，弹出的弹框中控件的描述信息。
-- type
-  状态栏按钮触发点击操作后，弹出的弹框中控件的类型。type字段可取以下值：
-  1、```"number"```：数值输入控件。
-  2、```"string"```：字符串输入控件。
-  3、```"selected"```：下拉框控件。
-  4、```"boolean"```：开关控件。
-- defValue
-  状态栏按钮触发点击操作后，弹出的弹框中控件的默认值。
-  如果是下拉框类型控件（selected），defValue字段用于设置下拉框选项，例如：```"input": {"name": "开仓数量", "type": "selected", "defValue": "A|B|C"}```，下拉框选项的文本描述被设置为A、B、C。
+```input```字段（```group```的每个元素相同）：
 
-对于下拉框类型控件的扩展字段：
-- options
-  状态栏按钮控件触发的页面中的下拉框控件，可以使用options字段设置选项。options字段中的选项不仅支持字符串，还支持使用```{text: "描述", value: "值"}```结构。使用defValue字段设置默认选项，默认选项可以多选。
-- multiple
-  当该字段设置为true时，支持下拉框多选。
-- `group` (array): ```input```字段配置状态栏按钮触发点击后弹出的弹框中的单个控件，而```group```字段用于配置一组控件。```group```中的元素与```input```字段值的数据结构一致，请参考```input```字段的相关描述说明。
+| 字段 | 说明 |
+| - | - |
+| ```name``` | 弹框中控件的标题。 |
+| ```description``` | 弹框中控件的描述信息。 |
+| ```type``` | 控件类型：```"number"```数值输入框、```"string"```字符串输入框、```"selected"```下拉框、```"boolean"```开关。 |
+| ```defValue``` | 控件的默认值。下拉框可以直接用它写选项（选项之间用竖线分隔）；设置了```options```时它是默认选项，多选时为数组。 |
+| ```options``` | 下拉框的选项，元素为字符串或```{text: "描述", value: "值"}```。 |
+| ```multiple``` | 为```true```时下拉框可以多选。 |
 
-状态栏中按钮JSON结构的```class```属性取值示例：
-```js
+状态栏中按钮JSON结构的```class```取值范例：
+```javascript
 function main() {
     var table = {
         type: "table",
@@ -20574,10 +22372,10 @@ function main() {
 }
 ```
 
-```group```字段与```input```字段使用示例：
-```js
+```group```字段与```input```字段使用范例：
+```javascript
 function main() {
-    // 状态栏按钮控件（设置input字段实现）testBtn1按钮触发的页面中的下拉框控件使用options字段设置选项，使用defValue字段设置默认选项。区别于本章其他示例中直接使用defValue设置选项。
+    // 状态栏按钮控件（设置input字段实现）testBtn1按钮触发的页面中的下拉框控件使用options字段设置选项，使用defValue字段设置默认选项。区别于本章其它例子中直接使用defValue设置选项。
     var testBtn1 = {
         type: "button",
         name: "testBtn1",
@@ -20688,28 +22486,22 @@ See also: `LogStatus`, `LogStatus-btnTypeOne`, `GetCommand`
 
 #### Chart-options
 
-此JSON用于配置自定义绘图函数```Chart()```的图表设置信息，图表库使用Highcharts。以下列出几个基本的配置字段。
+该JSON用于设置自定义画图函数```Chart()```的图表配置信息，图表库使用的是Highcharts。这里只列出几个基本的配置字段。
 
 Fields:
 
-- `__isStock` (bool): 平台扩展字段。设置为true时使用Highstocks图表；设置为false时使用Highcharts图表。
-- `extension` (JSON): 平台扩展字段。```layout```设置为```"single"```时该图表不参与分组、单独显示，默认为分组```"group"```；```height```指定图表高度。例如：
-```json
-{
-    "layout": "single",
-    "height": 300
-}
-```
-- `title` (JSON): 图表标题，为对象，例如：```{text: "差价分析图"}```。
-- `xAxis` (JSON): X轴配置。
-- `yAxis` (JSON): Y轴配置。
-- `series` (JSON): 图表数据系列。
+- `__isStock` (bool): 平台扩展字段。设置为true，使用的是Highstocks图表；设置为false，使用的是Highcharts图表。
+- `extension` (object): 平台扩展字段：```layout```为```"single"```时该图表不参与分组、单独显示（默认```"group"```）；```height```为图表高度，例如```{"layout": "single", "height": 300}```。
+- `title` (object): 图表标题，为对象，例如：```{text: "差价分析图"}```。
+- `xAxis` (object): X轴配置。
+- `yAxis` (object): Y轴配置。
+- `series` (object): 图表数据系列。
 
-简单的绘图示例：
-```js
-// 此chart在JavaScript语言中是对象，在使用Chart函数之前需要声明一个配置图表的对象变量chart
+简单的画图例子：
+```javascript
+// 这个chart在JavaScript语言中是对象，在使用Chart函数之前我们需要声明一个配置图表的对象变量chart
 var chart = {
-    // 该字段标记图表是否为股票图表，有兴趣的可以改成false运行查看效果
+    // 该字段标记图表是否为一般图表，有兴趣的可以改成false运行看看
     __isStock: true,
     // 悬停提示框
     tooltip: {xDateFormat: '%Y-%m-%d %H:%M:%S, %A'},
@@ -20717,24 +22509,24 @@ var chart = {
     title : { text : '差价分析图'},
     // 选择范围
     rangeSelector: {
-        buttons: [{type: 'hour',count: 1, text: '1h'}, {type: 'hour',count: 3, text: '3h'}, {type: 'hour', count: 8, text: '8h'}, {type: 'all',text: 'All'}],
+        buttons:  [{type: 'hour',count: 1, text: '1h'}, {type: 'hour',count: 3, text: '3h'}, {type: 'hour', count: 8, text: '8h'}, {type: 'all',text: 'All'}],
         selected: 0,
         inputEnabled: false
     },
-    // 坐标轴横轴即X轴，当前设置的类型为时间
+    // 坐标轴横轴即：x轴，当前设置的类型是：时间
     xAxis: { type: 'datetime'},
-    // 坐标轴纵轴即Y轴，默认数值随数据大小调整
+    // 坐标轴纵轴即：y轴，默认数值随数据大小调整
     yAxis : {
         // 标题
         title: {text: '差价'},
-        // 是否启用右侧纵轴
+        // 是否启用右边纵轴
         opposite: false
     },
-    // 数据系列，该属性保存各个数据系列（线条、K线图、标签等）
+    // 数据系列，该属性保存的是各个数据系列（线，K线图，标签等...）
     series : [
-        // 索引为0，data数组内存放该索引系列的数据
+        // 索引为0，data数组内存放的是该索引系列的数据
         {name : "line1", id : "线1,buy1Price", data : []},
-        // 索引为1，设置了dashStyle:'shortdash'即设置为虚线
+        // 索引为1，设置了dashStyle:'shortdash'即：设置虚线
         {name : "line2", id : "线2,lastPrice", dashStyle : 'shortdash', data : []}
     ]
 }
@@ -20744,13 +22536,13 @@ function main(){
     // 清空
     ObjChart.reset()
     while(true){
-        // 获取本次轮询的时间戳，即毫秒级时间戳，用于确定写入图表X轴的位置
+        // 获取本次轮询的时间戳，即一个毫秒的时间戳。用来确定写入到图表的X轴的位置
         var nowTime = new Date().getTime()
         // 获取行情数据
         var ticker = _C(exchange.GetTicker)
-        // 从行情数据的返回值中获取买一价
+        // 从行情数据的返回值取得买一价
         var buy1Price = ticker.Buy
-        // 获取最后成交价，为了使两条线不重合，我们加1
+        // 取得最后成交价，为了2条线不重合在一起，我们加1
         var lastPrice = ticker.Last + 1
         // 用时间戳作为X值，买一价作为Y值传入索引0的数据序列
         ObjChart.add(0, [nowTime, buy1Price])
@@ -20783,9 +22575,9 @@ See also: `Chart`, `Chart-options`
 Fields:
 
 - `overlay` (bool): 是否绘制在主图上。
-- `xAxis` (JSON): X轴配置参数。
-- `yAxis` (JSON): Y轴配置参数。
-- `candle` (JSON): 蜡烛图配置参数。
+- `xAxis` (object): X轴配置参数。
+- `yAxis` (object): Y轴配置参数。
+- `candle` (object): 蜡烛图配置参数。
 
 参考[使用KLineChart函数画图的专题文章](https://www.fmz.com/bbs-topic/9482)。
 
@@ -20801,11 +22593,11 @@ Fields:
 - `close(bar)` (function): 结束当前K线上的画图。```Rust```中为```close()```，不传参数。
 - `barcolor(color, offset, editable, show_last, title, display)` (function): 设置K线颜色。```display```可选```"none"```、```"all"```。
 - `bgcolor(color, offset, editable, show_last, title, display, overlay)` (function): 用指定颜色填充K线的背景。```display```可选```"none"```、```"all"```。
-- `plot(series, title, color, linewidth, style, trackprice, histbase, offset, join, editable, show_last, display, overlay)` (function): 画一条数据线，返回线的编号（供```fill()```使用）。```style```可选```"stepline_diamond"```、```"stepline"```、```"cross"```、```"areabr"```、```"area"```、```"circles"```、```"columns"```、```"histogram"```、```"linebr"```、```"line"```；```display```可选```"none"```、```"all"```。数值传```NaN```（```Python```为```None```）时该点不画，配合```"linebr"```可以画不连续的线。
+- `plot(series, title, color, linewidth, style, trackprice, histbase, offset, join, editable, show_last, display, overlay)` (function): 画一条数据线，返回线的编号（供```fill()```使用）。```style```、```display```的取值见备注。
 - `fill(plot1, plot2, color, title, editable, show_last, fillgaps, display)` (function): 用颜色填充两条线（```plot()```或```hline()```的返回值）之间的背景。```display```可选```"none"```、```"all"```。
 - `hline(price, title, color, linestyle, linewidth, editable, display, overlay)` (function): 在固定价格处画水平线。```linestyle```可选```"dashed"```、```"dotted"```、```"solid"```；```display```可选```"none"```、```"all"```。
 - `plotarrow(series, title, colorup, colordown, offset, minheight, maxheight, editable, show_last, display, overlay)` (function): 画向上、向下的箭头（数值为正向上，为负向下）。```display```可选```"none"```、```"all"```。
-- `plotshape(series, title, style, location, color, offset, text, textcolor, editable, size, show_last, display, overlay)` (function): 画形状。```style```可选```"diamond"```、```"square"```、```"label_down"```、```"label_up"```、```"arrow_down"```、```"arrow_up"```、```"circle"```、```"flag"```、```"triangle_down"```、```"triangle_up"```、```"cross"```、```"xcross"```；```location```可选```"abovebar"```、```"belowbar"```、```"top"```、```"bottom"```、```"absolute"```；```size```可选```"10px"```、```"14px"```、```"20px"```、```"40px"```、```"80px"```（对应Pine语言的```size.tiny```、```size.small```、```size.normal```、```size.large```、```size.huge```，```size.auto```即```size.small```）；```display```可选```"none"```、```"all"```。
+- `plotshape(series, title, style, location, color, offset, text, textcolor, editable, size, show_last, display, overlay)` (function): 画形状。```style```、```location```、```size```、```display```的取值见备注。
 - `plotchar(series, title, char, location, color, offset, text, textcolor, editable, size, show_last, display, overlay)` (function): 用任意Unicode字符画形状。```location```、```size```、```display```的取值同```plotshape()```。
 - `plotcandle(open, high, low, close, title, color, wickcolor, editable, show_last, bordercolor, display, overlay)` (function): 画K线。```display```可选```"none"```、```"all"```。
 - `signal(direction, price, qty, id)` (function): Pine语言没有的方法，画买卖信号。```direction```可选```"long"```、```"closelong"```、```"short"```、```"closeshort"```；```price```为标记的纵轴位置；```qty```为交易数量；```id```可选，替换默认显示的文字（默认为交易方向）。
@@ -20815,6 +22607,10 @@ Fields:
 
 颜色可以写作```"rgba(255, 0, 0, 0.2)"```或```"#FF0000"```。
 
+```plot()```参数的取值：```style```可选```"stepline_diamond"```、```"stepline"```、```"cross"```、```"areabr"```、```"area"```、```"circles"```、```"columns"```、```"histogram"```、```"linebr"```、```"line"```；```display```可选```"none"```、```"all"```。数值传```NaN```（```Python```为```None```）时该点不画，配合```"linebr"```可以画不连续的线。
+
+```plotshape()```参数的取值：```style```可选```"diamond"```、```"square"```、```"label_down"```、```"label_up"```、```"arrow_down"```、```"arrow_up"```、```"circle"```、```"flag"```、```"triangle_down"```、```"triangle_up"```、```"cross"```、```"xcross"```；```location```可选```"abovebar"```、```"belowbar"```、```"top"```、```"bottom"```、```"absolute"```；```size```可选```"10px"```、```"14px"```、```"20px"```、```"40px"```、```"80px"```（对应Pine语言的```size.tiny```、```size.small```、```size.normal```、```size.large```、```size.huge```，```size.auto```即```size.small```）；```display```可选```"none"```、```"all"```。
+
 See also: `KLineChart`, `KLineChart-options`
 
 #### SetData-data
@@ -20823,11 +22619,11 @@ See also: `KLineChart`, `KLineChart-options`
 
 Fields:
 
-- `time` (number): 数据的时间戳，用于标记该条数据(data)对应的时间。
-- `data` (string / number / bool / object / array / any (平台支持的任意类型)): data是```exchange.SetData()```函数加载的数据中某个时间对应的具体数据内容。策略运行时，```exchange.GetData()```函数根据当前时间获取对应时间戳的数据。
+- `time` (number): 数据的时间戳，用于标记该条数据（data）对应的时间。
+- `data` (string / number / bool / object / array / any): data是```exchange.SetData()```函数加载的数据中某个时间对应的具体数据内容。策略运行时，```exchange.GetData()```函数根据当前时间获取对应时间戳的数据。
 
 回测系统中加载数据，策略回测运行时取出数据的示例：
-```js
+```javascript
 /*backtest
 start: 2020-01-21 00:00:00
 end: 2020-02-12 00:00:00
@@ -20848,7 +22644,7 @@ See also: `exchange.SetData`, `exchange.GetData`
 
 #### EventLoop-return
 
-该JSON是```EventLoop()```函数返回的数据结构。```EventLoop()```函数监听以下事件：1、任意WebSocket可读数据事件；2、exchange.Go()、HttpQuery_Go()函数并发任务完成事件；3、JavaScript语言策略中```threading.Thread()```函数创建的线程发送的消息事件。
+该JSON是```EventLoop()```函数返回的数据结构。```EventLoop()```函数监听以下事件：1、任意WebSocket可读数据事件；2、exchange.Go()、```HttpQuery_Go()```函数并发任务完成事件；3、JavaScript语言策略中```threading.Thread()```函数创建的线程发送的消息事件。
 
 Fields:
 
@@ -20889,11 +22685,15 @@ See also: `EventLoop`
 
 #### exchange.Go-return
 
-`exchange.Go`函数返回的并发对象，用```wait()```方法取得并发调用的结果。```HttpQuery_Go()```、```Mail_Go()```返回的并发对象也有```wait()```方法，返回值见各自的函数页。
+`exchange.Go`函数返回的并发对象，用```wait()```方法取得并发调用的结果。```HttpQuery_Go()```、```Mail_Go()```返回的并发对象也有```wait()```方法，返回值见各自的函数页，结果被取走后再次调用```wait()```的处理与下表相同（```Python```的```HttpQuery_Go```返回```None```）。
 
 Fields:
 
 - `wait(timeout)` (function): 等待并取出并发调用的结果。```timeout```单位毫秒：不传或```0```时阻塞到任务完成；```-1```立即返回；正数为最长等待时间。
+
+任务完成后，并发对象不再被引用时结果自动释放；一直持有并发对象而不取结果，结果不会释放。未取结果的并发任务达到2000个时，再调用```exchange.Go()```会报错```too many routine wait, max is 2000```。
+
+```wait()```在各语言中的返回值：
 
 | 情况 | JavaScript | Python | Rust |
 | - | - | - | - |
@@ -20902,8 +22702,6 @@ Fields:
 | 结果已被取走后再次调用 | 抛出异常```routine N already finished``` | 记录错误并返回```(None, False)``` | ```Err``` |
 
 超时后可以继续调用```wait()```等待。```JavaScript```判断超时要用```typeof(r) === "undefined"```，因为```null == undefined```成立。
-
-任务完成后，并发对象不再被引用时结果自动释放；一直持有并发对象而不取结果，结果不会释放。未取结果的并发任务达到2000个时，再调用```exchange.Go()```会报错```too many routine wait, max is 2000```。
 
 See also: `exchange.Go`, `EventLoop`, `HttpQuery_Go`
 
@@ -20936,6 +22734,15 @@ See also: `DBExec`, `Dial`
 Fields:
 
 - `read(timeout)` (function): 读取一条数据。```timeout```单位毫秒：不传时阻塞到有数据；正数为最长等待时间，超时返回空值。以下两个取值只对WebSocket有效：```-1```不等待，没有数据立即返回空值；```-2```不等待，只返回最新的一条，缓冲区中更早的数据被丢弃。
+- `write(data)` (function): 发送数据，返回发送的字节数；连接断开时返回```0```。
+- `close()` (function): 关闭连接。设置了自动重连（地址参数```reconnect=true```）的WebSocket连接断开后由底层重连，不需要关闭；已经关闭的连接不能再使用。
+- `exec(sql, ...args)` (function): 数据库连接独有：执行SQL语句，用法与返回值同`DBExec`（见`DBExec-return`）。```JavaScript```、```Python```中可以在SQL语句后继续传入```?```占位符对应的参数值。
+- `fd()` (function): 仅```JavaScript```：返回指向同一连接的句柄。把句柄传给其它线程（例如作为```threading.Thread()```的参数），在线程中调用```Dial(handle)```得到同一连接的连接对象继续使用，WebSocket、TCP与数据库连接都适用；句柄的```valueOf()```为连接编号。
+- `Valid()` (function): 仅```Rust```：连接是否建立成功。
+
+```JavaScript```中，数据库连接对象本身也可以作为参数传给```threading.Thread()```创建的线程、存入```threading.Dict()```或者通过```postMessage()```发送给其它线程，在多个线程之间共享同一个连接；连接对象不再被引用时自动关闭连接。```Python```、```Rust```不支持在线程间共享连接。
+
+```read()```的接收缓冲区与各种```timeout```取值下的行为：
 
 WebSocket收到的数据先进入接收缓冲区（队列），两次```read()```间隔太长时数据会累积；缓冲区默认最多4096条或16MB（先到为准），超出后丢弃最旧的数据，上限可以用```Dial()```地址参数中的```qsize```、```qbytes```调整。
 
@@ -20944,13 +22751,6 @@ WebSocket收到的数据先进入接收缓冲区（队列），两次```read()``
 | 缓冲区已有数据 | 立即返回最旧的数据 | 立即返回最旧的数据 | 立即返回最新的数据，丢弃其余 | 立即返回最旧的数据 |
 | 缓冲区没有数据 | 阻塞到有数据时返回 | 立即返回空值 | 立即返回空值 | 最多等待2000毫秒，没有数据返回空值 |
 | 连接断开或底层正在重连 | 返回空字符串```""``` | -- | -- | -- |
-- `write(data)` (function): 发送数据，返回发送的字节数；连接断开时返回```0```。
-- `close()` (function): 关闭连接。设置了自动重连（地址参数```reconnect=true```）的WebSocket连接断开后由底层重连，不需要关闭；已经关闭的连接不能再使用。
-- `exec(sql, ...args)` (function): 数据库连接独有：执行SQL语句，用法与返回值同`DBExec`（见`DBExec-return`）。```JavaScript```、```Python```中可以在SQL语句后继续传入```?```占位符对应的参数值。
-- `fd()` (function): 仅```JavaScript```：返回指向同一连接的句柄。把句柄传给其它线程（例如作为```threading.Thread()```的参数），在线程中调用```Dial(handle)```得到同一连接的连接对象继续使用，WebSocket、TCP与数据库连接都适用；句柄的```valueOf()```为连接编号。
-- `Valid()` (function): 仅```Rust```：连接是否建立成功。
-
-```JavaScript```中，数据库连接对象本身也可以作为参数传给```threading.Thread()```创建的线程、存入```threading.Dict()```或者通过```postMessage()```发送给其它线程，在多个线程之间共享同一个连接；连接对象不再被引用时自动关闭连接。```Python```、```Rust```不支持在线程间共享连接。
 
 See also: `Dial`, `DBExec`, `EventLoop`
 
@@ -20967,7 +22767,7 @@ Fields:
 - `ret` (any): 线程函数的返回值，可以是任意类型；线程函数没有返回值时为```undefined```。
 
 ```join(timeout)```在超时时间内线程没有结束时返回```undefined```（不是```null```），之后可以再次调用```join()```等待。以下代码测试```Thread```对象的```join()```函数的超时机制，并打印输出```join()```函数的返回值。
-```js
+```javascript
 function testFunc() {
     for (var i = 0; i < 5; i++) {
         Log(i)
@@ -20984,13 +22784,23 @@ function main() {
 
 See also: `join`
 
-## 内置变量
+## 内置变量与常量
+
+内置变量与常量：交易所对象`exchange`、`exchanges`，以及订单状态、订单方向、条件单类型、持仓方向、开平仓、K线周期和日志类型等常量组。
+
+每个常量组的目录页有「常量｜值｜含义」总表；常量是数值，可以直接与结构体字段比较，例如```order.Status == ORDER_STATE_CLOSED```。
 
 ### EXCHANGE
+
+交易所对象：`exchange`是实盘或回测配置里添加的第一个交易所对象，`exchanges`是全部交易所对象按添加顺序组成的数组，```exchanges[0]```就是```exchange```。
+
+行情、交易、账户、期货等函数都是交易所对象的成员函数，例如```exchange.GetTicker()```、```exchanges[1].GetAccount()```，只作用于该对象绑定的账户。
 
 #### exchange
 
 exchange 是一个交易所对象，也是在策略实盘设置、回测设置中添加的第一个交易所对象。所有与交易所的交互均通过该对象的成员函数实现。
+
+打印第一个交易所对象的名称和标签。
 
 ```javascript
 function main() {
@@ -21017,10 +22827,13 @@ exchanges 是一个交易所对象数组，包含在策略实盘设置或回测�
 
 在策略实盘设置或回测设置中添加的交易所对象，将根据添加的先后顺序依次对应 exchanges[0]、exchanges[1]、exchanges[2]、…… exchanges[n]。
 
+遍历所有交易所对象，打印各自的名称和标签。
+
 ```javascript
 function main() {
     for(var i = 0; i < exchanges.length; i++) {
-        Log("Exchange index:", i, "Name:", exchanges[i].GetName(), "Label:", exchanges[i].GetLabel())
+        Log("Exchange index:", i, "Name:", exchanges[i].GetName(), "Label:",
+            exchanges[i].GetLabel())
     }
 }
 ```
@@ -21028,13 +22841,15 @@ function main() {
 ```python
 def main():
     for i in range(len(exchanges)):
-        Log("Exchange index:", i, "Name:", exchanges[i].GetName(), "Label:", exchanges[i].GetLabel())
+        Log("Exchange index:", i, "Name:", exchanges[i].GetName(), "Label:",
+            exchanges[i].GetLabel())
 ```
 
 ```rust
 fn main() {
     for i in 0..exchanges.len() {
-        Log!("Exchange index:", i, "Name:", exchanges[i].GetName(), "Label:", exchanges[i].GetLabel());
+        Log!("Exchange index:", i, "Name:", exchanges[i].GetName(), "Label:",
+            exchanges[i].GetLabel());
     }
 }
 ```
@@ -21043,237 +22858,270 @@ See also: `exchange`, `exchange.GetName`, `exchange.GetLabel`
 
 ### ORDER_STATE
 
+订单状态常量：`Order`结构```Status```字段的取值，判断订单是否完成时直接与这些常量比较。
+
+| 常量 | 值 | 含义 |
+| - | - | - |
+| `ORDER_STATE_PENDING` | ```0``` | 订单未完成（挂单中，可能已部分成交） |
+| `ORDER_STATE_CLOSED` | ```1``` | 订单已完成（全部成交） |
+| `ORDER_STATE_CANCELED` | ```2``` | 订单已取消 |
+| `ORDER_STATE_UNKNOWN` | ```3``` | 订单状态未知（其它状态） |
+
 #### ORDER_STATE_PENDING
 
-ORDER_STATE_PENDING是`Order`结构中的```Status```属性的值，表示订单状态为待处理状态。
+订单未完成（挂单中，可能已部分成交），值为```0```。用于`Order`结构的```Status```字段。
 
-ORDER_STATE_PENDING的值为0。
-
-See also: `ORDER_STATE_CLOSED`, `ORDER_STATE_CANCELED`, `ORDER_STATE_UNKNOWN`
+See also: `ORDER_STATE`, `Order`, `exchange.GetOrder`, `exchange.GetOrders`
 
 #### ORDER_STATE_CLOSED
 
-ORDER_STATE_CLOSED是`Order`结构中的```Status```属性的值，表示订单状态为已完成。
+订单已完成（全部成交），值为```1```。用于`Order`结构的```Status```字段。
 
-ORDER_STATE_CLOSED的值为1。
-
-See also: `ORDER_STATE_PENDING`, `ORDER_STATE_CANCELED`, `ORDER_STATE_UNKNOWN`
+See also: `ORDER_STATE`, `Order`, `exchange.GetOrder`, `exchange.GetOrders`
 
 #### ORDER_STATE_CANCELED
 
-ORDER_STATE_CANCELED 是 `Order` 结构中 ```Status``` 属性的值，表示订单状态为已取消。
+订单已取消，值为```2```。用于`Order`结构的```Status```字段。
 
-ORDER_STATE_CANCELED 的值为 2。
-
-See also: `ORDER_STATE_PENDING`, `ORDER_STATE_CLOSED`, `ORDER_STATE_UNKNOWN`
+See also: `ORDER_STATE`, `Order`, `exchange.GetOrder`, `exchange.GetOrders`
 
 #### ORDER_STATE_UNKNOWN
 
-ORDER_STATE_UNKNOWN是`Order`结构中的```Status```属性的值，表示订单状态为未知状态（其他状态）。
+订单状态未知（其它状态），值为```3```。用于`Order`结构的```Status```字段。
 
-ORDER_STATE_UNKNOWN的值为3。
+订单处于```ORDER_STATE_UNKNOWN```状态时，可以调用`exchange.GetRawJSON`获取交易所返回的原始订单状态，对照交易所文档确认具体含义。
 
-对于```ORDER_STATE_UNKNOWN```状态，可以调用`exchange.GetRawJSON`函数获取原始订单的状态信息，根据交易所文档查看具体描述。
-
-See also: `ORDER_STATE_PENDING`, `ORDER_STATE_CLOSED`, `ORDER_STATE_CANCELED`
+See also: `ORDER_STATE`, `Order`, `exchange.GetOrder`, `exchange.GetOrders`
 
 ### ORDER_TYPE
 
+订单方向常量：`Order`结构```Type```字段的取值。
+
+| 常量 | 值 | 含义 |
+| - | - | - |
+| `ORDER_TYPE_BUY` | ```0``` | 买单 |
+| `ORDER_TYPE_SELL` | ```1``` | 卖单 |
+
 #### ORDER_TYPE_BUY
 
-ORDER_TYPE_BUY是`Order`结构中的```Type```属性值，表示买入订单类型。
+买单，值为```0```。用于`Order`结构的```Type```字段。
 
-ORDER_TYPE_BUY的值为0。
-
-See also: `ORDER_TYPE_SELL`
+See also: `ORDER_TYPE`, `Order`, `ORDER_OFFSET`
 
 #### ORDER_TYPE_SELL
 
-ORDER_TYPE_SELL是`Order`结构中的```Type```属性值，用于表示卖单类型。
+卖单，值为```1```。用于`Order`结构的```Type```字段。
 
-ORDER_TYPE_SELL的值为1。
-
-See also: `ORDER_TYPE_BUY`
+See also: `ORDER_TYPE`, `Order`, `ORDER_OFFSET`
 
 ### ORDER_CONDITION_TYPE
 
+条件单类型常量：`Condition`结构```ConditionType```字段的取值，创建、修改、查询条件单时使用。普通订单没有条件单配置（Rust中```Order```结构的```Condition.ConditionType```为```-1```）。
+
+| 常量 | 值 | 含义 |
+| - | - | - |
+| `ORDER_CONDITION_TYPE_OCO` | ```0``` | OCO订单（One-Cancels-the-Other，二选一）：同时设置止盈和止损条件，其中一个触发后另一个自动取消 |
+| `ORDER_CONDITION_TYPE_TP` | ```1``` | 止盈单（Take Profit）：价格达到止盈触发价时下单 |
+| `ORDER_CONDITION_TYPE_SL` | ```2``` | 止损单（Stop Loss）：价格达到止损触发价时下单，用于限制损失 |
+| `ORDER_CONDITION_TYPE_GENERIC` | ```3``` | 通用条件单：具体行为取决于交易所，只出现在查询结果中 |
+
 #### ORDER_CONDITION_TYPE_OCO
 
-ORDER_CONDITION_TYPE_OCO是`Condition`结构中的```ConditionType```属性的值，表示OCO订单（One-Cancels-the-Other，一触即撤订单）。OCO订单同时设置止盈和止损条件，当其中一个条件触发时，另一个条件自动取消。
+OCO订单（One-Cancels-the-Other，二选一）：同时设置止盈和止损条件，其中一个触发后另一个自动取消，值为```0```。用于`Condition`结构的```ConditionType```字段。
 
-ORDER_CONDITION_TYPE_OCO的值为0。
-
-See also: `Condition`, `ORDER_CONDITION_TYPE_TP`, `ORDER_CONDITION_TYPE_SL`
+See also: `ORDER_CONDITION_TYPE`, `Condition`, `exchange.CreateConditionOrder`, `exchange.GetConditionOrders`
 
 #### ORDER_CONDITION_TYPE_TP
 
-ORDER_CONDITION_TYPE_TP 是 `Condition` 结构中的 ```ConditionType``` 属性值，表示止盈单（Take Profit）。止盈单在市场价格达到预设的目标盈利价格时自动触发订单。
+止盈单（Take Profit）：价格达到止盈触发价时下单，值为```1```。用于`Condition`结构的```ConditionType```字段。
 
-ORDER_CONDITION_TYPE_TP 的值为 1。
-
-See also: `Condition`, `ORDER_CONDITION_TYPE_OCO`, `ORDER_CONDITION_TYPE_SL`
+See also: `ORDER_CONDITION_TYPE`, `Condition`, `exchange.CreateConditionOrder`, `exchange.GetConditionOrders`
 
 #### ORDER_CONDITION_TYPE_SL
 
-ORDER_CONDITION_TYPE_SL 是 `Condition` 结构中的 ```ConditionType``` 属性值，表示止损单（Stop Loss）。止损单在市场价格触及预设止损价格时自动触发，用于限制潜在损失。
+止损单（Stop Loss）：价格达到止损触发价时下单，用于限制损失，值为```2```。用于`Condition`结构的```ConditionType```字段。
 
-ORDER_CONDITION_TYPE_SL 的值为 2。
-
-See also: `Condition`, `ORDER_CONDITION_TYPE_OCO`, `ORDER_CONDITION_TYPE_TP`
+See also: `ORDER_CONDITION_TYPE`, `Condition`, `exchange.CreateConditionOrder`, `exchange.GetConditionOrders`
 
 #### ORDER_CONDITION_TYPE_GENERIC
 
-ORDER_CONDITION_TYPE_GENERIC 是 `Condition` 结构中的 ```ConditionType``` 属性值，表示通用条件单。通用条件单的具体行为取决于交易所的实现。
+通用条件单：具体行为取决于交易所，只出现在查询结果中，值为```3```。用于`Condition`结构的```ConditionType```字段。
 
-ORDER_CONDITION_TYPE_GENERIC 的值为 3。
+GENERIC类型只出现在查询结果中，`exchange.CreateConditionOrder`、`exchange.ModifyConditionOrder`不支持该类型，传入时返回空值并记录错误。
 
-See also: `Condition`, `ORDER_CONDITION_TYPE_OCO`, `ORDER_CONDITION_TYPE_TP`
+See also: `ORDER_CONDITION_TYPE`, `Condition`, `exchange.CreateConditionOrder`, `exchange.GetConditionOrders`
 
 ### POSITION_DIRECTION
 
+持仓方向常量：`Position`结构```Type```字段的取值。
+
+| 常量 | 值 | 含义 |
+| - | - | - |
+| `PD_LONG` | ```0``` | 多头持仓 |
+| `PD_SHORT` | ```1``` | 空头持仓 |
+
 #### PD_LONG
 
-PD_LONG是`Position`结构中的```Type```属性值，表示多头仓位类型。
+多头持仓，值为```0```。用于`Position`结构的```Type```字段。
 
-PD_LONG的值为0。
+平掉多头持仓时，先用```exchange.SetDirection("closebuy")```设置平仓方向再下卖单。
 
-对于合约市场多头持仓，使用exchange.SetDirection("closebuy")设置平仓方向来平掉该类型的持仓。
-
-See also: `PD_SHORT`
+See also: `POSITION_DIRECTION`, `Position`, `exchange.SetDirection`, `exchange.GetPositions`
 
 #### PD_SHORT
 
-PD_SHORT是`Position`结构中的```Type```属性值，表示空头仓位类型。
+空头持仓，值为```1```。用于`Position`结构的```Type```字段。
 
-PD_SHORT的值为1。
+平掉空头持仓时，先用```exchange.SetDirection("closesell")```设置平仓方向再下买单。
 
-对于合约市场空头持仓，使用exchange.SetDirection("closesell")设置平仓方向，以平掉该类型的持仓。
-
-See also: `PD_LONG`
+See also: `POSITION_DIRECTION`, `Position`, `exchange.SetDirection`, `exchange.GetPositions`
 
 ### ORDER_OFFSET
 
+开平仓常量：`Order`结构```Offset```字段的取值。单向持仓模式下无法判断是否为平仓（减仓）的订单，```Offset```按开仓处理。
+
+| 常量 | 值 | 含义 |
+| - | - | - |
+| `ORDER_OFFSET_OPEN` | ```0``` | 开仓 |
+| `ORDER_OFFSET_CLOSE` | ```1``` | 平仓 |
+
 #### ORDER_OFFSET_OPEN
 
-ORDER_OFFSET_OPEN是`Order`结构中```Offset```属性的取值，表示该订单为开仓操作。
+开仓，值为```0```。用于`Order`结构的```Offset```字段。
 
-ORDER_OFFSET_OPEN的数值为0。
-
-See also: `ORDER_OFFSET_CLOSE`
+See also: `ORDER_OFFSET`, `Order`, `ORDER_TYPE`
 
 #### ORDER_OFFSET_CLOSE
 
-ORDER_OFFSET_CLOSE是`Order`结构中```Offset```属性的取值，表示订单为平仓方向。
+平仓，值为```1```。用于`Order`结构的```Offset```字段。
 
-ORDER_OFFSET_CLOSE的值为1。
-
-See also: `ORDER_OFFSET_OPEN`
+See also: `ORDER_OFFSET`, `Order`, `ORDER_TYPE`
 
 ### PERIOD
 
+K线周期常量，值为周期的秒数，用作`exchange.GetRecords`等函数的```period```参数。其它周期直接传秒数（例如```60 * 10```为10分钟）。
+
+| 常量 | 值 | 含义 |
+| - | - | - |
+| `PERIOD_M1` | ```60``` | 1分钟K线周期 |
+| `PERIOD_M3` | ```180``` | 3分钟K线周期 |
+| `PERIOD_M5` | ```300``` | 5分钟K线周期 |
+| `PERIOD_M15` | ```900``` | 15分钟K线周期 |
+| `PERIOD_M30` | ```1800``` | 30分钟K线周期 |
+| `PERIOD_H1` | ```3600``` | 1小时K线周期 |
+| `PERIOD_H2` | ```7200``` | 2小时K线周期 |
+| `PERIOD_H4` | ```14400``` | 4小时K线周期 |
+| `PERIOD_H6` | ```21600``` | 6小时K线周期 |
+| `PERIOD_H12` | ```43200``` | 12小时K线周期 |
+| `PERIOD_D1` | ```86400``` | 1天K线周期 |
+| `PERIOD_D3` | ```259200``` | 3天K线周期 |
+| `PERIOD_W1` | ```604800``` | 1周K线周期 |
+
 #### PERIOD_M1
 
-表示1分钟K线周期的常量，数值为60。
+1分钟K线周期，值为```60```。用作`exchange.GetRecords`的```period```参数（单位秒）。
 
-See also: `exchange.GetRecords`, `PERIOD_M3`, `PERIOD_M5`, `PERIOD_M15`,  `PERIOD_M30`, `PERIOD_H1`, `PERIOD_H2`, `PERIOD_H4`,  `PERIOD_H6`, `PERIOD_H12`, `PERIOD_D1`, `PERIOD_D3`, `PERIOD_W1`
+See also: `PERIOD`, `exchange.GetRecords`, `Record`
 
 #### PERIOD_M3
 
-表示3分钟K线周期的常量，其值为180。
+3分钟K线周期，值为```180```。用作`exchange.GetRecords`的```period```参数（单位秒）。
 
-See also: `exchange.GetRecords`, `PERIOD_M1`, `PERIOD_M5`, `PERIOD_M15`, `PERIOD_M30`, `PERIOD_H1`, `PERIOD_H2`, `PERIOD_H4`, `PERIOD_H6`, `PERIOD_H12`, `PERIOD_D1`, `PERIOD_D3`, `PERIOD_W1`
+See also: `PERIOD`, `exchange.GetRecords`, `Record`
 
 #### PERIOD_M5
 
-表示5分钟K线周期的常量，数值为300。
+5分钟K线周期，值为```300```。用作`exchange.GetRecords`的```period```参数（单位秒）。
 
-See also: `exchange.GetRecords`, `PERIOD_M1`, `PERIOD_M3`, `PERIOD_M15`, `PERIOD_M30`, `PERIOD_H1`, `PERIOD_H2`, `PERIOD_H4`, `PERIOD_H6`, `PERIOD_H12`, `PERIOD_D1`, `PERIOD_D3`, `PERIOD_W1`
+See also: `PERIOD`, `exchange.GetRecords`, `Record`
 
 #### PERIOD_M15
 
-表示15分钟K线周期的常量，其值为900。
+15分钟K线周期，值为```900```。用作`exchange.GetRecords`的```period```参数（单位秒）。
 
-See also: `exchange.GetRecords`, `PERIOD_M1`, `PERIOD_M3`, `PERIOD_M5`, `PERIOD_M30`, `PERIOD_H1`, `PERIOD_H2`, `PERIOD_H4`, `PERIOD_H6`, `PERIOD_H12`, `PERIOD_D1`, `PERIOD_D3`, `PERIOD_W1`
+See also: `PERIOD`, `exchange.GetRecords`, `Record`
 
 #### PERIOD_M30
 
-表示30分钟K线周期的常量，其值为1800秒。
+30分钟K线周期，值为```1800```。用作`exchange.GetRecords`的```period```参数（单位秒）。
 
-See also: `exchange.GetRecords`, `PERIOD_M1`, `PERIOD_M3`, `PERIOD_M5`, `PERIOD_M15`, `PERIOD_H1`, `PERIOD_H2`, `PERIOD_H4`, `PERIOD_H6`, `PERIOD_H12`, `PERIOD_D1`, `PERIOD_D3`, `PERIOD_W1`
+See also: `PERIOD`, `exchange.GetRecords`, `Record`
 
 #### PERIOD_H1
 
-表示1小时K线周期的常量，数值为3600。
+1小时K线周期，值为```3600```。用作`exchange.GetRecords`的```period```参数（单位秒）。
 
-See also: `exchange.GetRecords`, `PERIOD_M1`, `PERIOD_M3`, `PERIOD_M5`, `PERIOD_M15`, `PERIOD_M30`, `PERIOD_H2`, `PERIOD_H4`, `PERIOD_H6`, `PERIOD_H12`, `PERIOD_D1`, `PERIOD_D3`, `PERIOD_W1`
+See also: `PERIOD`, `exchange.GetRecords`, `Record`
 
 #### PERIOD_H2
 
-表示2小时K线周期的常量，数值为7200。
+2小时K线周期，值为```7200```。用作`exchange.GetRecords`的```period```参数（单位秒）。
 
-See also: `exchange.GetRecords`, `PERIOD_M1`, `PERIOD_M3`, `PERIOD_M5`, `PERIOD_M15`, `PERIOD_M30`, `PERIOD_H1`, `PERIOD_H4`, `PERIOD_H6`, `PERIOD_H12`, `PERIOD_D1`, `PERIOD_D3`, `PERIOD_W1`
+See also: `PERIOD`, `exchange.GetRecords`, `Record`
 
 #### PERIOD_H4
 
-表示4小时K线周期的常量，数值为14400。
+4小时K线周期，值为```14400```。用作`exchange.GetRecords`的```period```参数（单位秒）。
 
-See also: `exchange.GetRecords`, `PERIOD_M1`, `PERIOD_M3`, `PERIOD_M5`, `PERIOD_M15`, `PERIOD_M30`, `PERIOD_H1`, `PERIOD_H2`, `PERIOD_H6`, `PERIOD_H12`, `PERIOD_D1`, `PERIOD_D3`, `PERIOD_W1`
+See also: `PERIOD`, `exchange.GetRecords`, `Record`
 
 #### PERIOD_H6
 
-表示6小时K线周期的常量，数值为21600。
+6小时K线周期，值为```21600```。用作`exchange.GetRecords`的```period```参数（单位秒）。
 
-See also: `exchange.GetRecords`, `PERIOD_M1`, `PERIOD_M3`, `PERIOD_M5`, `PERIOD_M15`, `PERIOD_M30`, `PERIOD_H1`, `PERIOD_H2`, `PERIOD_H4`, `PERIOD_H12`, `PERIOD_D1`, `PERIOD_D3`, `PERIOD_W1`
+See also: `PERIOD`, `exchange.GetRecords`, `Record`
 
 #### PERIOD_H12
 
-表示12小时K线周期的常量，数值为43200。
+12小时K线周期，值为```43200```。用作`exchange.GetRecords`的```period```参数（单位秒）。
 
-See also: `exchange.GetRecords`, `PERIOD_M1`, `PERIOD_M3`, `PERIOD_M5`, `PERIOD_M15`, `PERIOD_M30`, `PERIOD_H1`, `PERIOD_H2`, `PERIOD_H4`, `PERIOD_H6`, `PERIOD_D1`, `PERIOD_D3`, `PERIOD_W1`
+See also: `PERIOD`, `exchange.GetRecords`, `Record`
 
 #### PERIOD_D1
 
-表示1日K线周期的常量，数值为86400。
+1天K线周期，值为```86400```。用作`exchange.GetRecords`的```period```参数（单位秒）。
 
-See also: `exchange.GetRecords`, `PERIOD_M1`, `PERIOD_M3`, `PERIOD_M5`, `PERIOD_M15`, `PERIOD_M30`, `PERIOD_H1`, `PERIOD_H2`, `PERIOD_H4`, `PERIOD_H6`, `PERIOD_H12`, `PERIOD_D3`, `PERIOD_W1`
+See also: `PERIOD`, `exchange.GetRecords`, `Record`
 
 #### PERIOD_D3
 
-表示3日K线周期的常量，数值为259200。
+3天K线周期，值为```259200```。用作`exchange.GetRecords`的```period```参数（单位秒）。
 
-See also: `exchange.GetRecords`, `PERIOD_M1`, `PERIOD_M3`, `PERIOD_M5`, `PERIOD_M15`, `PERIOD_M30`, `PERIOD_H1`, `PERIOD_H2`, `PERIOD_H4`, `PERIOD_H6`, `PERIOD_H12`, `PERIOD_D1`, `PERIOD_W1`
+See also: `PERIOD`, `exchange.GetRecords`, `Record`
 
 #### PERIOD_W1
 
-表示1周K线周期的常量，数值为604800秒。
+1周K线周期，值为```604800```。用作`exchange.GetRecords`的```period```参数（单位秒）。
 
-See also: `exchange.GetRecords`, `PERIOD_M1`, `PERIOD_M3`, `PERIOD_M5`, `PERIOD_M15`, `PERIOD_M30`, `PERIOD_H1`, `PERIOD_H2`, `PERIOD_H4`, `PERIOD_H6`, `PERIOD_H12`, `PERIOD_D1`, `PERIOD_D3`
+See also: `PERIOD`, `exchange.GetRecords`, `Record`
 
 ### LOG_TYPE
 
+日志类型常量：`exchange.Log`的```orderType```参数取值，决定输出的是买单、卖单还是撤单日志（只输出日志，不下单）。
+
+| 常量 | 值 | 含义 |
+| - | - | - |
+| `LOG_TYPE_BUY` | ```0``` | 买单日志 |
+| `LOG_TYPE_SELL` | ```1``` | 卖单日志 |
+| `LOG_TYPE_CANCEL` | ```2``` | 撤单日志 |
+
 #### LOG_TYPE_BUY
 
-LOG_TYPE_BUY是`exchange.Log`函数的```LogType```参数可选值，用于设置```exchange.Log```函数打印的日志类型为买单日志。
+买单日志，值为```0```。用作`exchange.Log`的```orderType```参数。
 
-LOG_TYPE_BUY的值为0。
-
-See also: `LOG_TYPE_SELL`, `LOG_TYPE_CANCEL`
+See also: `LOG_TYPE`, `exchange.Log`
 
 #### LOG_TYPE_SELL
 
-LOG_TYPE_SELL是`exchange.Log`函数的```LogType```参数可选值，用于设置```exchange.Log```函数打印卖单日志。
+卖单日志，值为```1```。用作`exchange.Log`的```orderType```参数。
 
-LOG_TYPE_SELL的值为1。
-
-See also: `LOG_TYPE_BUY`, `LOG_TYPE_CANCEL`
+See also: `LOG_TYPE`, `exchange.Log`
 
 #### LOG_TYPE_CANCEL
 
-LOG_TYPE_CANCEL是`exchange.Log`函数的```LogType```参数可选值，用于设置```exchange.Log```函数打印撤销订单日志。
+撤单日志，值为```2```。用作`exchange.Log`的```orderType```参数。
 
-LOG_TYPE_CANCEL的值为2。
-
-See also: `LOG_TYPE_BUY`, `LOG_TYPE_SELL`
+See also: `LOG_TYPE`, `exchange.Log`
 
 ## 通用约定
 
@@ -21332,7 +23180,7 @@ See also: `LOG_TYPE_BUY`, `LOG_TYPE_SELL`
 
 计价币种按交易所实际使用的写（例如```USDC.swap```）。交易所接口不支持的范围会报错并返回空值。
 
-**不传```symbol```或传空字符串```""```时的缺省范围：**
+##### 不传```symbol```或传空字符串```""```时的缺省范围
 
 - 现货交易所对象：查询全部品种。
 - 加密货币期货交易所对象：查询「当前计价币种 + 当前合约所属的合约类型」。当前合约是组合合约（合约代码含英文逗号，如```quarter,swap```，或为Deribit原生组合代码，如```BTC-FS-26DEC25_PERP```）时为```futures_combo```；是期权时为```option```；是```swap_pf```时为```swap_pf```；以```_ff```结尾时为```futures_ff```；其它含```swap```的为```swap```，否则为```futures```；没有设置合约时按```swap```。例如当前品种为```BTC_USDT.swap```时等价于传```"USDT.swap"```，为```BTC_USD.quarter```时等价于传```"USD.futures"```，为```BTC_USD.quarter,swap```时等价于传```"USD.futures_combo"```。
@@ -21425,9 +23273,7 @@ fn main() {
 
 本章是各交易所对象的参考：每个品牌一页，同品牌的现货、期货交易所对象写在同一页。页面依次给出名称（```exchange.GetName()```的返回值与别名）、配置项、交易对与合约代码、专属IO指令、不支持与合成的函数、保证金账户与模拟盘、期权和注意事项；各函数页只写通用语义，交易所之间的差异以本章为准。所有交易所的函数支持情况、交易模式指令汇总在`能力矩阵`。
 
-本章由```doc_tools/gen_exchange_docs.py```根据各连接器的文档元数据生成，请勿手工修改。
-
-**名称对照**
+### 名称对照
 
 交易所对象的名称以```exchange.GetName()```的返回值为准，点击名称查看交易所页。
 
@@ -21507,10 +23353,11 @@ fn main() {
 
 各交易所对象对标准函数与交易模式指令的支持情况。✓ 支持；✗ 不支持（调用时报错并返回空值）；合成：交易所的接口不能完整提供该函数（没有对应接口，或缺少部分K线周期等），由托管者补足，说明见交易所页；— 不适用（现货交易所对象没有期货函数）。
 
-**行情**
+#### 行情
 
 | 交易所 | `GetTicker` | `GetTickers` | `GetDepth` | `GetTrades` | `GetRecords` | `GetMarkets` |
 | - | - | - | - | - | - | - |
+| **中心化交易所** |  |  |  |  |  |  |
 | `AscendEx` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
 | `Backpack` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
 | `Futures_Backpack` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
@@ -21561,6 +23408,7 @@ fn main() {
 | `WOO` | ✓ | ✗ | ✓ | ✓ | 合成 | ✓ |
 | `Futures_WOO` | ✓ | ✗ | ✓ | ✓ | 合成 | ✓ |
 | `Zaif` | ✓ | ✗ | ✓ | ✓ | 合成 | ✓ |
+| **去中心化交易所** |  |  |  |  |  |  |
 | `Hyperliquid` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
 | `Futures_Hyperliquid` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
 | `Futures_Lighter` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
@@ -21575,16 +23423,20 @@ fn main() {
 | `KyberSwap` | ✓ | ✗ | ✓ | ✗ | ✗ | ✓ |
 | `OneInch` | ✓ | ✗ | ✓ | ✗ | ✗ | ✓ |
 | `OKX_DEX` | ✓ | ✓ | ✗ | ✓ | 合成 | ✓ |
+| **预测市场** |  |  |  |  |  |  |
 | `Futures_Polymarket` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
+| **证券与期货** |  |  |  |  |  |  |
 | `Futures_Futu` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
 | `Futures_IB` | ✓ | ✓ | ✓ | ✗ | 合成 | ✓ |
+| **链上与自定义接入** |  |  |  |  |  |  |
 | `Exchange` | ✓ | ✗ | ✓ | ✓ | 合成 | ✗ |
 | `Web3` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
 
-**交易**
+#### 交易
 
 | 交易所 | `CreateOrder` | `Buy` | `Sell` | `CancelOrder` | `ModifyOrder` | `GetOrder` | `GetOrders` | `GetHistoryOrders` |
 | - | - | - | - | - | - | - | - | - |
+| **中心化交易所** |  |  |  |  |  |  |  |  |
 | `AscendEx` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✓ |
 | `Backpack` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✓ |
 | `Futures_Backpack` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✓ |
@@ -21635,6 +23487,7 @@ fn main() {
 | `WOO` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `Futures_WOO` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `Zaif` | ✓ | ✓ | ✓ | ✓ | ✗ | 合成 | ✓ | ✓ |
+| **去中心化交易所** |  |  |  |  |  |  |  |  |
 | `Hyperliquid` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `Futures_Hyperliquid` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `Futures_Lighter` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
@@ -21649,16 +23502,20 @@ fn main() {
 | `KyberSwap` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✗ |
 | `OneInch` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✗ |
 | `OKX_DEX` | ✓ | ✓ | ✓ | ✗ | ✗ | ✓ | ✗ | ✗ |
+| **预测市场** |  |  |  |  |  |  |  |  |
 | `Futures_Polymarket` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✓ |
+| **证券与期货** |  |  |  |  |  |  |  |  |
 | `Futures_Futu` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `Futures_IB` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✗ |
+| **链上与自定义接入** |  |  |  |  |  |  |  |  |
 | `Exchange` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✓ |
 | `Web3` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
 
-**条件单**
+#### 条件单
 
 | 交易所 | `CreateConditionOrder` | `ModifyConditionOrder` | `CancelConditionOrder` | `GetConditionOrder` | `GetConditionOrders` | `GetHistoryConditionOrders` |
 | - | - | - | - | - | - | - |
+| **中心化交易所** |  |  |  |  |  |  |
 | `AscendEx` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
 | `Backpack` | ✓ | ✗ | ✓ | ✓ | ✓ | ✓ |
 | `Futures_Backpack` | ✓ | ✗ | ✓ | ✓ | ✓ | ✓ |
@@ -21709,6 +23566,7 @@ fn main() {
 | `WOO` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `Futures_WOO` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `Zaif` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
+| **去中心化交易所** |  |  |  |  |  |  |
 | `Hyperliquid` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
 | `Futures_Hyperliquid` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `Futures_Lighter` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
@@ -21723,16 +23581,20 @@ fn main() {
 | `KyberSwap` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
 | `OneInch` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
 | `OKX_DEX` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
+| **预测市场** |  |  |  |  |  |  |
 | `Futures_Polymarket` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
+| **证券与期货** |  |  |  |  |  |  |
 | `Futures_Futu` | ✗ | ✗ | ✗ | ✗ | ✓ | ✓ |
 | `Futures_IB` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
+| **链上与自定义接入** |  |  |  |  |  |  |
 | `Exchange` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
 | `Web3` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
 
-**账户与期货**
+#### 账户与期货
 
 | 交易所 | `GetAccount` | `GetAssets` | `GetPositions` | `SetMarginLevel` | `SetDirection` | `SetContractType` | `GetFundings` |
 | - | - | - | - | - | - | - | - |
+| **中心化交易所** |  |  |  |  |  |  |  |
 | `AscendEx` | ✓ | ✓ | — | — | — | — | — |
 | `Backpack` | ✓ | ✓ | — | — | — | — | — |
 | `Futures_Backpack` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
@@ -21783,6 +23645,7 @@ fn main() {
 | `WOO` | ✓ | ✓ | — | — | — | — | — |
 | `Futures_WOO` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `Zaif` | ✓ | ✓ | — | — | — | — | — |
+| **去中心化交易所** |  |  |  |  |  |  |  |
 | `Hyperliquid` | ✓ | ✓ | — | — | — | — | — |
 | `Futures_Hyperliquid` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `Futures_Lighter` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
@@ -21797,49 +23660,54 @@ fn main() {
 | `KyberSwap` | ✓ | ✓ | — | — | — | — | — |
 | `OneInch` | ✓ | ✓ | — | — | — | — | — |
 | `OKX_DEX` | ✓ | ✓ | — | — | — | — | — |
+| **预测市场** |  |  |  |  |  |  |  |
 | `Futures_Polymarket` | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✗ |
+| **证券与期货** |  |  |  |  |  |  |  |
 | `Futures_Futu` | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✗ |
 | `Futures_IB` | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✗ |
+| **链上与自定义接入** |  |  |  |  |  |  |  |
 | `Exchange` | ✓ | ✓ | — | — | — | — | — |
 | `Web3` | ✓ | ✓ | — | — | — | — | — |
 
-**交易模式指令**
+#### 交易模式指令
 
-支持下列```exchange.IO()```交易模式指令的交易所（✓），指令语义见```exchange.IO(mode, value)```页（`IO`分类下）；未列出的交易所不支持这些指令。
+各交易所对```exchange.IO()```交易模式指令的支持：✓ 支持，✗ 不支持（调用时报错）。指令语义见```exchange.IO(mode, value)```页（`IO`分类下）；未列出的交易所不支持其中任何一条。
 
-| 交易所 | simulate | cross | dual | unified | trade_margin | trade_super_margin | trade_normal | selfTradePreventionMode |
+| 交易所 | ```simulate``` | ```cross``` | ```dual``` | ```unified``` | ```trade_margin``` | ```trade_super_margin``` | ```trade_normal``` | ```selfTradePreventionMode``` |
 | - | - | - | - | - | - | - | - | - |
-| `AscendEx` |  |  |  |  | ✓ |  | ✓ |  |
-| `Backpack` |  |  |  |  |  |  |  | ✓ |
-| `Futures_Backpack` |  |  |  |  |  |  |  | ✓ |
-| `Binance` |  |  |  | ✓ | ✓ | ✓ | ✓ | ✓ |
-| `Futures_Binance` |  | ✓ | ✓ | ✓ |  |  |  | ✓ |
-| `Bitget` | ✓ |  |  |  |  |  |  |  |
-| `Futures_Bitget` | ✓ | ✓ | ✓ |  |  |  |  |  |
-| `Bybit` |  |  |  |  | ✓ |  | ✓ |  |
-| `Futures_Bybit` |  | ✓ | ✓ |  |  |  |  |  |
-| `Futures_Coinw` |  | ✓ |  |  |  |  |  |  |
-| `Crypto` |  |  |  |  | ✓ |  | ✓ |  |
-| `Futures_DeepCoin` |  | ✓ |  |  |  |  |  |  |
-| `Futures_DigiFinex` | ✓ | ✓ |  |  |  |  |  |  |
-| `GateIO` |  |  |  | ✓ | ✓ | ✓ | ✓ |  |
-| `Futures_GateIO` |  | ✓ | ✓ | ✓ |  |  |  |  |
-| `Huobi` |  |  |  |  | ✓ | ✓ | ✓ |  |
-| `Futures_HuobiDM` |  | ✓ | ✓ | ✓ |  |  |  |  |
-| `Futures_Kraken` |  | ✓ |  |  |  |  |  |  |
-| `Futures_KuCoin` |  | ✓ |  |  |  |  |  |  |
-| `Futures_MEXC` |  | ✓ |  |  |  |  |  |  |
-| `OKEX` | ✓ |  |  |  | ✓ | ✓ | ✓ |  |
-| `Futures_OKCoin` | ✓ | ✓ | ✓ |  |  |  |  |  |
-| `WOO` |  |  |  |  | ✓ |  | ✓ |  |
-| `Futures_WOO` |  | ✓ | ✓ |  |  |  |  |  |
-| `Futures_Hyperliquid` |  | ✓ |  |  |  |  |  |  |
-| `Futures_Lighter` |  | ✓ |  |  |  |  |  |  |
-| `Futures_ApolloX` |  | ✓ | ✓ |  |  |  |  |  |
-| `Futures_Aster` |  | ✓ | ✓ |  |  |  |  |  |
-| `Uniswap` | ✓ |  |  |  |  |  |  |  |
-| `KyberSwap` | ✓ |  |  |  |  |  |  |  |
-| `OneInch` | ✓ |  |  |  |  |  |  |  |
+| **中心化交易所** |  |  |  |  |  |  |  |  |
+| `AscendEx` | ✗ | ✗ | ✗ | ✗ | ✓ | ✗ | ✓ | ✗ |
+| `Backpack` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✓ |
+| `Futures_Backpack` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✓ |
+| `Binance` | ✗ | ✗ | ✗ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `Futures_Binance` | ✗ | ✓ | ✓ | ✓ | ✗ | ✗ | ✗ | ✓ |
+| `Bitget` | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
+| `Futures_Bitget` | ✓ | ✓ | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ |
+| `Bybit` | ✗ | ✗ | ✗ | ✗ | ✓ | ✗ | ✓ | ✗ |
+| `Futures_Bybit` | ✗ | ✓ | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ |
+| `Futures_Coinw` | ✗ | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
+| `Crypto` | ✗ | ✗ | ✗ | ✗ | ✓ | ✗ | ✓ | ✗ |
+| `Futures_DeepCoin` | ✗ | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
+| `Futures_DigiFinex` | ✓ | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
+| `GateIO` | ✗ | ✗ | ✗ | ✓ | ✓ | ✓ | ✓ | ✗ |
+| `Futures_GateIO` | ✗ | ✓ | ✓ | ✓ | ✗ | ✗ | ✗ | ✗ |
+| `Huobi` | ✗ | ✗ | ✗ | ✗ | ✓ | ✓ | ✓ | ✗ |
+| `Futures_HuobiDM` | ✗ | ✓ | ✓ | ✓ | ✗ | ✗ | ✗ | ✗ |
+| `Futures_Kraken` | ✗ | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
+| `Futures_KuCoin` | ✗ | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
+| `Futures_MEXC` | ✗ | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
+| `OKEX` | ✓ | ✗ | ✗ | ✗ | ✓ | ✓ | ✓ | ✗ |
+| `Futures_OKCoin` | ✓ | ✓ | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ |
+| `WOO` | ✗ | ✗ | ✗ | ✗ | ✓ | ✗ | ✓ | ✗ |
+| `Futures_WOO` | ✗ | ✓ | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ |
+| **去中心化交易所** |  |  |  |  |  |  |  |  |
+| `Futures_Hyperliquid` | ✗ | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
+| `Futures_Lighter` | ✗ | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
+| `Futures_ApolloX` | ✗ | ✓ | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ |
+| `Futures_Aster` | ✗ | ✓ | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ |
+| `Uniswap` | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
+| `KyberSwap` | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
+| `OneInch` | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
 
 ### 中心化交易所
 
@@ -21849,35 +23717,31 @@ fn main() {
 
 AscendEx现货，支持现货钱包与杠杆钱包（用```exchange.IO("trade_margin")```切换）。
 
-**名称**
+##### 名称与配置
 
-| ```exchange.GetName()``` | 类型 | 别名 |
-| - | - | - |
-| ```AscendEx``` | 现货 | AscendEX、BitMax |
+```exchange.GetName()```：```AscendEx```（现货）；别名：AscendEX、BitMax。
 
-**配置项**
+| 配置项 | 必填 |
+| - | - |
+| Access Key | 是 |
+| Secret Key | 是 |
 
-| 配置项 | 必填 | 默认值 | 说明 |
-| - | - | - | - |
-| Access Key | 是 | — | — |
-| Secret Key | 是 | — | — |
-
-**交易对与合约代码**
+##### 交易对与合约代码
 
 交易对示例：```BTC_USDT```、```ETH_USDT```
 
 交易对写作```BASE_QUOTE```，对应AscendEx原生代码```BTC/USDT```。
 
-**专属IO指令**
+##### 专属IO指令
 
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```"trade_margin"``` | — | 切换为杠杆钱包。之后账户、下单、撤单、查单、挂单与历史订单、```exchange.GetMarkets()```都使用杠杆钱包的接口；杠杆钱包下```exchange.GetTickers()```报错。 |
-| ```"trade_normal"``` | — | 切换回现货钱包（默认）。 |
+| 指令 | 说明 |
+| - | - |
+| ```"trade_margin"``` | 切换为杠杆钱包。之后账户、下单、撤单、查单、挂单与历史订单、```exchange.GetMarkets()```都使用杠杆钱包的接口；杠杆钱包下```exchange.GetTickers()```报错。 |
+| ```"trade_normal"``` | 切换回现货钱包（默认）。 |
 
 通用指令```api```、```base```、```currency```见`exchange.IO`。
 
-**不支持与合成的函数**
+##### 函数支持差异
 
 不支持（调用时报错并返回空值）：`exchange.ModifyOrder`、`exchange.CreateConditionOrder`、`exchange.ModifyConditionOrder`、`exchange.CancelConditionOrder`、`exchange.GetConditionOrder`、`exchange.GetConditionOrders`、`exchange.GetHistoryConditionOrders`。
 
@@ -21885,46 +23749,38 @@ AscendEx现货，支持现货钱包与杠杆钱包（用```exchange.IO("trade_ma
 
 - `exchange.GetRecords`：原生周期为1分钟、5分钟、15分钟、30分钟、1小时、2小时、4小时、6小时、12小时、1天、1周、1月；其它周期由托管者合成。
 
-所有交易所的对照见`能力矩阵`。
-
-**注意事项**
+##### 注意事项
 
 - 交易所已停止服务。
 - 现货市价买单的下单量是交易币数，不是计价币金额。
 
 #### Backpack
 
-```Backpack```（现货）
+```Backpack```（现货）：Backpack Exchange的现货交易（主要以USDC计价），包括交易所上线的代币化股票。永续合约见Futures_Backpack交易所对象。
 
-Backpack Exchange的现货交易（主要以USDC计价），包括交易所上线的代币化股票。永续合约见Futures_Backpack交易所对象。
+```Futures_Backpack```（期货）：Backpack Exchange的USDC永续合约，包括代币化股票的永续合约。现货见Backpack交易所对象。
 
-```Futures_Backpack```（期货）
-
-Backpack Exchange的USDC永续合约，包括代币化股票的永续合约。现货见Backpack交易所对象。
-
-**名称**
+##### 名称与配置
 
 | ```exchange.GetName()``` | 类型 | 别名 |
 | - | - | - |
 | ```Backpack``` | 现货 | Backpack Exchange |
 | ```Futures_Backpack``` | 期货 | — |
 
-**配置项**
+| 配置项 | 必填 |
+| - | - |
+| Access Key | 是 |
+| Secret Key | 是 |
 
-| 配置项 | 必填 | 默认值 | 说明 |
-| - | - | - | - |
-| Access Key | 是 | — | — |
-| Secret Key | 是 | — | — |
+##### 交易对与合约代码
 
-**交易对与合约代码**
-
-```Backpack```（现货）
+###### ```Backpack```（现货）
 
 交易对示例：```SOL_USDC```、```BTC_USDC```、```SPCX-US_USDC```
 
 交易对写作```SOL_USDC```。代币化股票的交易所币名带```.```（如```SPCX.US```），在交易对和资产名中写作```-```：```SPCX-US_USDC```。
 
-```Futures_Backpack```（期货）
+###### ```Futures_Backpack```（期货）
 
 交易对示例：```BTC_USDC```、```ETH_USDC```
 
@@ -21936,9 +23792,9 @@ Backpack永续合约以USDC计价，交易对写作```ETH_USDC```（省略计价
 
 Backpack只有永续合约，其它合约代码都会报错。
 
-**专属IO指令**
+##### 专属IO指令
 
-```Backpack```（现货）
+###### ```Backpack```（现货）
 
 | 指令 | 参数 | 说明 | 返回值 |
 | - | - | - | - |
@@ -21946,7 +23802,7 @@ Backpack只有永续合约，其它合约代码都会报错。
 
 通用指令```api```、```base```、```currency```见`exchange.IO`。
 
-```Futures_Backpack```（期货）
+###### ```Futures_Backpack```（期货）
 
 | 指令 | 参数 | 说明 | 返回值 |
 | - | - | - | - |
@@ -21954,7 +23810,7 @@ Backpack只有永续合约，其它合约代码都会报错。
 
 通用指令```api```、```base```、```currency```见`exchange.IO`。
 
-**不支持与合成的函数**
+##### 函数支持差异
 
 不支持（调用时报错并返回空值）：`exchange.ModifyOrder`、`exchange.ModifyConditionOrder`。
 
@@ -21962,11 +23818,9 @@ Backpack只有永续合约，其它合约代码都会报错。
 
 - `exchange.GetRecords`：原生周期为1分钟、3分钟、5分钟、15分钟、30分钟、1小时、2小时、4小时、6小时、8小时、12小时、1天、3天、1周、1月；其它周期由托管者合成。
 
-所有交易所的对照见`能力矩阵`。
+##### 保证金、账户与模拟盘
 
-**保证金、账户与模拟盘**
-
-```Futures_Backpack```（期货）
+###### ```Futures_Backpack```（期货）
 
 保证金模式：Backpack是统一抵押账户，只有全仓，没有全仓/逐仓切换指令。```exchange.SetMarginLevel()```修改的是账户级的杠杆上限（```leverageLimit```），对所有合约生效；调用时同时把账户的自动借贷设置（```autoBorrowSettlements```、```autoLend```、```autoRepayBorrows```）设为开启。
 
@@ -21974,21 +23828,21 @@ Backpack只有永续合约，其它合约代码都会报错。
 
 账户：```exchange.GetAccount()```读取抵押品账户：```Balance```为可用净权益，```FrozenBalance```为占用的净权益，```Equity```为净权益；各抵押币种在```exchange.GetAssets()```中逐币列出。
 
-**注意事项**
+##### 注意事项
 
-全部交易所对象
+###### 全部交易所对象
 
 - 客户端订单号```clientId```必须是0～4294967295之间的整数，其它值报错，订单不会发出。
 - ```exchange.GetTickers()```的批量行情没有盘口，```Buy```、```Sell```取最新成交价；需要真实买一、卖一时用```exchange.GetTicker()```。
 - 条件单只支持止盈、止损单，不支持OCO；Backpack的触发单不区分止盈、止损，查询时按触发价与当前最新价的关系判定类型。委托价为0时触发后以市价成交。不支持修改条件单，需要先撤销再重新创建。
 - ```exchange.GetHistoryOrders()```、```exchange.GetHistoryConditionOrders()```只能按单个品种查询，不支持```since```参数（交易所的历史订单接口没有时间范围），传入大于0的```since```或空字符串品种会报错。
 
-```Backpack```（现货）
+###### ```Backpack```（现货）
 
 - 市价买单的下单量是要花费的计价币金额（按Backpack的```quoteQuantity```下单），市价卖单为交易币数量。按计价币金额下的市价买单在订单查询中没有委托价，```Price```为0。
 - ```exchange.GetAccount()```、```exchange.GetAssets()```只统计可用与冻结数量，不包含质押中的数量。
 
-```Futures_Backpack```（期货）
+###### ```Futures_Backpack```（期货）
 
 - 市价单的下单量是合约数量（交易币数量），买卖相同。
 - 各合约的资金费率结算间隔不同，```exchange.GetFundings()```按交易所合约信息给出。
@@ -21997,30 +23851,22 @@ Backpack只有永续合约，其它合约代码都会报错。
 
 BigONE现货。
 
-**名称**
+##### 名称与配置
 
-| ```exchange.GetName()``` | 类型 | 别名 |
-| - | - | - |
-| ```BigONE``` | 现货 | — |
+```exchange.GetName()```：```BigONE```（现货）。
 
-**配置项**
+| 配置项 | 必填 |
+| - | - |
+| Access Key | 是 |
+| Secret Key | 是 |
 
-| 配置项 | 必填 | 默认值 | 说明 |
-| - | - | - | - |
-| Access Key | 是 | — | — |
-| Secret Key | 是 | — | — |
-
-**交易对与合约代码**
+##### 交易对与合约代码
 
 交易对示例：```BTC_USDT```、```ETH_BTC```
 
 交易对写作```BASE_QUOTE```，对应BigONE原生代码```BTC-USDT```。
 
-**专属IO指令**
-
-没有专属指令，通用指令见`exchange.IO`。
-
-**不支持与合成的函数**
+##### 函数支持差异
 
 不支持（调用时报错并返回空值）：`exchange.ModifyOrder`、`exchange.ModifyConditionOrder`。
 
@@ -22028,9 +23874,7 @@ BigONE现货。
 
 - `exchange.GetRecords`：原生周期为1分钟、5分钟、15分钟、30分钟、1小时、3小时、4小时、6小时、12小时、1天、1周、1月；其它周期由托管者合成。
 
-所有交易所的对照见`能力矩阵`。
-
-**注意事项**
+##### 注意事项
 
 - 不支持市价单，只能下限价单；不支持FOK（```tif```为```"fok"```时报错），支持IOC与只做Maker（```postOnly```）。
 - 查询未完成订单、未完成条件单的接口必须指定交易对：```exchange.GetOrders()```、```exchange.GetConditionOrders()```不传```symbol```参数时只查询当前交易对。
@@ -22039,38 +23883,32 @@ BigONE现货。
 
 #### 币安
 
-```Binance```（现货）
+```Binance```（现货）：币安现货，以及币安杠杆账户（逐仓、全仓）和统一账户（组合保证金）下的全仓杠杆交易。
 
-币安现货，以及币安杠杆账户（逐仓、全仓）和统一账户（组合保证金）下的全仓杠杆交易。
+```Futures_Binance```（期货）：币安U本位（USDT、USDC保证金）、币本位永续与交割合约，以及币安欧式期权（USDT结算）。
 
-```Futures_Binance```（期货）
+##### 名称与配置
 
-币安U本位（USDT、USDC保证金）、币本位永续与交割合约，以及币安欧式期权（USDT结算）。
+| ```exchange.GetName()``` | 类型 |
+| - | - |
+| ```Binance``` | 现货 |
+| ```Futures_Binance``` | 期货 |
 
-**名称**
-
-| ```exchange.GetName()``` | 类型 | 别名 |
+| 配置项 | 必填 | 默认值 |
 | - | - | - |
-| ```Binance``` | 现货 | — |
-| ```Futures_Binance``` | 期货 | — |
+| Access Key | 是 | — |
+| Secret Key | 是 | — |
+| 模拟盘 | 否 | 不勾选 |
 
-**配置项**
+##### 交易对与合约代码
 
-| 配置项 | 必填 | 默认值 | 说明 |
-| - | - | - | - |
-| Access Key | 是 | — | — |
-| Secret Key | 是 | — | — |
-| 模拟盘 | 否 | 不勾选 | — |
-
-**交易对与合约代码**
-
-```Binance```（现货）
+###### ```Binance```（现货）
 
 交易对示例：```BTC_USDT```、```ETH_BTC```
 
 交易对写作```BTC_USDT```，不带合约代码；带```.swap```等合约后缀的品种代码会报错（合约请使用Futures_Binance交易所对象）。
 
-```Futures_Binance```（期货）
+###### ```Futures_Binance```（期货）
 
 交易对示例：```BTC_USDT```、```BTC_USDC```、```BTC_USD```
 
@@ -22090,9 +23928,9 @@ BigONE现货。
 
 交割合约也可以直接写币安的原生合约代码（交易对去掉下划线、加```_```和交割日期）。
 
-**专属IO指令**
+##### 专属IO指令
 
-```Binance```（现货）
+###### ```Binance```（现货）
 
 | 指令 | 参数 | 说明 | 返回值 |
 | - | - | - | - |
@@ -22104,7 +23942,7 @@ BigONE现货。
 
 通用指令```api```、```base```、```currency```见`exchange.IO`。
 
-```Futures_Binance```（期货）
+###### ```Futures_Binance```（期货）
 
 | 指令 | 参数 | 说明 | 返回值 |
 | - | - | - | - |
@@ -22117,9 +23955,9 @@ BigONE现货。
 
 通用指令```api```、```base```、```currency```见`exchange.IO`。
 
-**不支持与合成的函数**
+##### 函数支持差异
 
-```Binance```（现货）
+###### ```Binance```（现货）
 
 没有不支持的标准函数。
 
@@ -22127,7 +23965,7 @@ BigONE现货。
 
 - `exchange.GetRecords`：原生周期为1秒、1分钟、3分钟、5分钟、15分钟、30分钟、1小时、2小时、4小时、6小时、8小时、12小时、1天、3天、1周、1月；其它周期由托管者合成。
 
-```Futures_Binance```（期货）
+###### ```Futures_Binance```（期货）
 
 不支持（调用时报错并返回空值）：`exchange.ModifyConditionOrder`。
 
@@ -22135,17 +23973,15 @@ BigONE现货。
 
 - `exchange.GetRecords`：原生周期为1分钟、3分钟、5分钟、15分钟、30分钟、1小时、2小时、4小时、6小时、8小时、12小时、1天、3天、1周、1月；其它周期由托管者合成。
 
-所有交易所的对照见`能力矩阵`。
+##### 保证金、账户与模拟盘
 
-**保证金、账户与模拟盘**
-
-```Binance```（现货）
+###### ```Binance```（现货）
 
 账户：默认为普通现货账户，用```exchange.IO("trade_margin")```、```exchange.IO("trade_super_margin")```切换到逐仓、全仓杠杆账户，切换后所有账户与订单调用都换到对应的杠杆接口，直到```exchange.IO("trade_normal")```切回。逐仓杠杆下```exchange.GetAssets()```把各逐仓交易对中同一币种的余额相加。
 
 模拟盘：勾选「模拟盘」使用币安demo环境（```demo-api.binance.com```）。demo环境没有杠杆接口，只能交易普通现货。
 
-```Futures_Binance```（期货）
+###### ```Futures_Binance```（期货）
 
 保证金模式：用```exchange.IO("cross", bool)```按合约切换全仓/逐仓；```exchange.SetMarginLevel()```设置杠杆。统一账户恒为全仓，切换逐仓会报错。
 
@@ -22155,9 +23991,9 @@ BigONE现货。
 
 模拟盘：勾选「模拟盘」使用币安demo环境（```demo-fapi```、```demo-dapi```）。demo环境没有期权接口，模拟盘下期权相关调用报错（可以用```exchange.IO("eapiBase", url)```显式指定期权接口地址）。
 
-**期权**
+##### 期权
 
-```Futures_Binance```（期货）
+###### ```Futures_Binance```（期货）
 
 支持币安欧式期权（USDT结算），需要账户已开通期权交易；交易所可能要求单独申请期权卖方资格。限制：
 
@@ -22170,50 +24006,44 @@ BigONE现货。
 
 期权代码为币安原生代码：标的-到期日（YYMMDD）-行权价-C/P，C为看涨、P为看跌。币安期权以USDT结算，交易对设置为```BTC_USDT```，完整品种代码形如```BTC_USDT.BTC-260925-145000-C```。
 
-**注意事项**
+##### 注意事项
 
-```Binance```（现货）
+###### ```Binance```（现货）
 
 - ```exchange.ModifyOrder()```、```exchange.ModifyConditionOrder()```使用币安的撤单再下单接口（```cancelReplace```，撤单失败则不下新单），返回新订单的ID，之后按新ID操作；只支持普通现货账户，杠杆账户下报错。
 - 条件单只支持止盈、止损单，不支持OCO，需要时分别创建止盈单和止损单。
 
-```Futures_Binance```（期货）
+###### ```Futures_Binance```（期货）
 
 - 条件单只支持止盈、止损单，不支持OCO（币安合约没有OCO接口）；不支持修改条件单，需要先撤销再重新创建。
 
 #### Bitfinex
 
-```Bitfinex```（现货）
+```Bitfinex```（现货）：Bitfinex现货交易（交易所钱包），使用Bitfinex v2接口。
 
-Bitfinex现货交易（交易所钱包），使用Bitfinex v2接口。
+```Futures_Bitfinex```（期货）：Bitfinex衍生品：USDT结算的永续合约。
 
-```Futures_Bitfinex```（期货）
-
-Bitfinex衍生品：USDT结算的永续合约。
-
-**名称**
+##### 名称与配置
 
 | ```exchange.GetName()``` | 类型 | 别名 |
 | - | - | - |
 | ```Bitfinex``` | 现货 | — |
 | ```Futures_Bitfinex``` | 期货 | Bitfinex期货、Bitfinex Futures |
 
-**配置项**
+| 配置项 | 必填 |
+| - | - |
+| Access Key | 是 |
+| Secret Key | 是 |
 
-| 配置项 | 必填 | 默认值 | 说明 |
-| - | - | - | - |
-| Access Key | 是 | — | — |
-| Secret Key | 是 | — | — |
+##### 交易对与合约代码
 
-**交易对与合约代码**
-
-```Bitfinex```（现货）
+###### ```Bitfinex```（现货）
 
 交易对示例：```BTC_USD```、```BTC_USDT```、```AAVE_USD```
 
 交易对写作```BASE_QUOTE```，对应Bitfinex的```tBTCUSD```、```tAAVE:USD```。Bitfinex把USDT写作```UST```，交易对用```USDT```即可，返回的品种代码统一用```USDT```。
 
-```Futures_Bitfinex```（期货）
+###### ```Futures_Bitfinex```（期货）
 
 交易对示例：```BTC_USDT```、```ETH_USDT```
 
@@ -22225,17 +24055,17 @@ Bitfinex衍生品：USDT结算的永续合约。
 
 Bitfinex只有永续合约，其它合约代码会报错。
 
-**专属IO指令**
+##### 专属IO指令
 
-```Bitfinex```（现货）
+###### ```Bitfinex```（现货）
 
-| 指令 | 参数 | 说明 | 返回值 |
-| - | - | - | - |
-| ```"version"``` | — | 获取API版本号。 | 固定返回```"v2"```。 |
+| 指令 | 说明 | 返回值 |
+| - | - | - |
+| ```"version"``` | 获取API版本号。 | 固定返回```"v2"```。 |
 
 通用指令```api```、```base```、```currency```见`exchange.IO`。
 
-```Futures_Bitfinex```（期货）
+###### ```Futures_Bitfinex```（期货）
 
 | 指令 | 参数 | 说明 | 返回值 |
 | - | - | - | - |
@@ -22243,7 +24073,7 @@ Bitfinex只有永续合约，其它合约代码会报错。
 
 通用指令```api```、```base```、```currency```见`exchange.IO`。
 
-**不支持与合成的函数**
+##### 函数支持差异
 
 没有不支持的标准函数。
 
@@ -22251,27 +24081,25 @@ Bitfinex只有永续合约，其它合约代码会报错。
 
 - `exchange.GetRecords`：原生周期为1分钟、5分钟、15分钟、30分钟、1小时、3小时、6小时、12小时、1天、1周、14天、1月；其它周期由托管者合成。
 
-所有交易所的对照见`能力矩阵`。
+##### 保证金、账户与模拟盘
 
-**保证金、账户与模拟盘**
-
-```Futures_Bitfinex```（期货）
+###### ```Futures_Bitfinex```（期货）
 
 账户：合约保证金在Bitfinex保证金钱包（margin）中带```F0```后缀的币种上（如```USTF0```），`exchange.GetAccount`返回的币种去掉了后缀（```USTF0```显示为```USDT```）。Bitfinex没有设置杠杆的接口：```exchange.SetMarginLevel()```只在本地记下每个合约的杠杆，下单时随订单发送（未设置时为10倍）。
 
-**注意事项**
+##### 注意事项
 
-全部交易所对象
+###### 全部交易所对象
 
 - 条件单只支持止盈、止损单，不支持OCO。
 - 下单的```clientId```只接受正整数（Bitfinex的```cid```），其它值报错。限价单支持```tif```的IOC、FOK与只做Maker（```postOnly```）；市价单不支持FOK与只做Maker，条件单不支持IOC、FOK，传入时报错。
 
-```Bitfinex```（现货）
+###### ```Bitfinex```（现货）
 
 - 现货市价买单的下单量是交易币数，不是计价币金额。
 - Bitfinex价格精度为5位有效数字，没有固定的价格步长；`exchange.GetMarkets`返回的```TickSize```、```PricePrecision```按当前最新价换算，价格量级变化后会随之变化。
 
-```Futures_Bitfinex```（期货）
+###### ```Futures_Bitfinex```（期货）
 
 - 下单量的单位是币数，不是合约张数。
 - Bitfinex价格精度为5位有效数字，`exchange.GetMarkets`返回的```TickSize```、```PricePrecision```按当前最新价换算。
@@ -22280,30 +24108,22 @@ Bitfinex只有永续合约，其它合约代码会报错。
 
 bitFlyer（日本）现货。只提供现货交易对，不含bitFlyer的FX与期货产品。
 
-**名称**
+##### 名称与配置
 
-| ```exchange.GetName()``` | 类型 | 别名 |
-| - | - | - |
-| ```BitFlyer``` | 现货 | — |
+```exchange.GetName()```：```BitFlyer```（现货）。
 
-**配置项**
+| 配置项 | 必填 |
+| - | - |
+| Access Key | 是 |
+| Secret Key | 是 |
 
-| 配置项 | 必填 | 默认值 | 说明 |
-| - | - | - | - |
-| Access Key | 是 | — | — |
-| Secret Key | 是 | — | — |
-
-**交易对与合约代码**
+##### 交易对与合约代码
 
 交易对示例：```BTC_JPY```、```ETH_JPY```
 
 交易对写作```BASE_QUOTE```，与bitFlyer原生```product_code```同形。
 
-**专属IO指令**
-
-没有专属指令，通用指令见`exchange.IO`。
-
-**不支持与合成的函数**
+##### 函数支持差异
 
 不支持（调用时报错并返回空值）：`exchange.GetTickers`、`exchange.ModifyOrder`、`exchange.ModifyConditionOrder`。
 
@@ -22311,9 +24131,7 @@ bitFlyer（日本）现货。只提供现货交易对，不含bitFlyer的FX与�
 
 - `exchange.GetRecords`：交易所没有K线接口，由托管者用成交记录合成：首次调用只有最近成交覆盖的少量K线，随调用逐步累积。
 
-所有交易所的对照见`能力矩阵`。
-
-**注意事项**
+##### 注意事项
 
 - 现货市价买单的下单量是交易币数，不是计价币金额（按bitFlyer的```size```下单）。
 - 不支持只做Maker（```postOnly```）。
@@ -22324,22 +24142,16 @@ bitFlyer（日本）现货。只提供现货交易对，不含bitFlyer的FX与�
 
 #### Bitget
 
-```Bitget```（现货）
+```Bitget```（现货）：Bitget现货，支持统一账户（UTA，配置项「Version」选v3）与经典账户（选v2）。
 
-Bitget现货，支持统一账户（UTA，配置项「Version」选v3）与经典账户（选v2）。
+```Futures_Bitget```（期货）：Bitget USDT、USDC永续合约，币本位永续与交割合约。支持统一账户（UTA，配置项「Version」选v3）与经典账户（选v2）。
 
-```Futures_Bitget```（期货）
-
-Bitget USDT、USDC永续合约，币本位永续与交割合约。支持统一账户（UTA，配置项「Version」选v3）与经典账户（选v2）。
-
-**名称**
+##### 名称与配置
 
 | ```exchange.GetName()``` | 类型 | 别名 |
 | - | - | - |
 | ```Bitget``` | 现货 | Bitget现货 |
 | ```Futures_Bitget``` | 期货 | Bitget期货 |
-
-**配置项**
 
 | 配置项 | 必填 | 默认值 | 说明 |
 | - | - | - | - |
@@ -22348,15 +24160,15 @@ Bitget USDT、USDC永续合约，币本位永续与交割合约。支持统一�
 | Passphrase | 是 | — | — |
 | Version | 是 | ```v3``` | 账户类型：v3为统一账户（UTA），v2为经典账户。可选：```v3```、```v2``` |
 
-**交易对与合约代码**
+##### 交易对与合约代码
 
-```Bitget```（现货）
+###### ```Bitget```（现货）
 
 交易对示例：```BTC_USDT```、```ETH_BTC```
 
 交易对写作```BTC_USDT```，不带合约代码；合约请使用Futures_Bitget交易所对象。
 
-```Futures_Bitget```（期货）
+###### ```Futures_Bitget```（期货）
 
 交易对示例：```BTC_USDT```、```BTC_USDC```、```BTC_USD```
 
@@ -22372,9 +24184,9 @@ Bitget USDT、USDC永续合约，币本位永续与交割合约。支持统一�
 
 交割合约也可以直接写Bitget的原生合约代码，例如```BTC_USD.BTCUSDU26```；统一账户（v3）的币本位交割合约代码形如```ETHCMZ26```。
 
-**专属IO指令**
+##### 专属IO指令
 
-```Bitget```（现货）
+###### ```Bitget```（现货）
 
 | 指令 | 参数 | 说明 | 返回值 |
 | - | - | - | - |
@@ -22382,7 +24194,7 @@ Bitget USDT、USDC永续合约，币本位永续与交割合约。支持统一�
 
 通用指令```api```、```base```、```currency```见`exchange.IO`。
 
-```Futures_Bitget```（期货）
+###### ```Futures_Bitget```（期货）
 
 | 指令 | 参数 | 说明 | 返回值 |
 | - | - | - | - |
@@ -22392,37 +24204,35 @@ Bitget USDT、USDC永续合约，币本位永续与交割合约。支持统一�
 
 通用指令```api```、```base```、```currency```见`exchange.IO`。
 
-**不支持与合成的函数**
+##### 函数支持差异
 
-全部交易所对象
+###### 全部交易所对象
 
 没有不支持的标准函数。
 
-```Bitget```（现货）
+###### ```Bitget```（现货）
 
 以回退方式支持：
 
 - `exchange.GetRecords`：原生周期为1分钟、3分钟、5分钟、15分钟、30分钟、1小时、4小时、6小时、12小时、1天、3天、1周、1月；其它周期由托管者合成。3分钟只在统一账户（v3）可用。
 
-```Futures_Bitget```（期货）
+###### ```Futures_Bitget```（期货）
 
 以回退方式支持：
 
 - `exchange.GetRecords`：原生周期为1分钟、3分钟、5分钟、15分钟、30分钟、1小时、4小时、6小时、12小时、1天、3天、1周、1月；其它周期由托管者合成。统一账户（v3）的币本位交割合约没有3天周期。
 
-所有交易所的对照见`能力矩阵`。
+##### 保证金、账户与模拟盘
 
-**保证金、账户与模拟盘**
-
-全部交易所对象
+###### 全部交易所对象
 
 账户：配置项「Version」决定账户类型：v3为统一账户（私有接口使用```/api/v3```），v2为经典账户（使用```/api/v2```）。统一账户调用经典账户接口会被交易所拒绝（40085），请按账户实际类型选择。
 
-```Bitget```（现货）
+###### ```Bitget```（现货）
 
 模拟盘：用```exchange.IO("simulate", true)```切换到Bitget模拟盘，需要使用模拟盘的API KEY。
 
-```Futures_Bitget```（期货）
+###### ```Futures_Bitget```（期货）
 
 保证金模式：经典账户（v2）用```exchange.IO("cross", bool)```按合约切换全仓/逐仓；统一账户（v3）固定全仓。```exchange.SetMarginLevel()```设置杠杆。
 
@@ -22430,14 +24240,14 @@ Bitget USDT、USDC永续合约，币本位永续与交割合约。支持统一�
 
 模拟盘：用```exchange.IO("simulate", true)```切换到Bitget模拟盘，需要使用模拟盘的API KEY，交易对写作```SBTC_SUSDT```等。统一账户（v3）的接口不支持模拟盘品种，模拟盘请选择v2。
 
-**注意事项**
+##### 注意事项
 
-```Bitget```（现货）
+###### ```Bitget```（现货）
 
 - 统一账户（v3）没有现货条件单接口，条件单相关函数（```exchange.CreateConditionOrder()```、```exchange.GetConditionOrders()```等）报错并返回空值；经典账户（v2）支持止盈、止损条件单（不支持OCO）和```exchange.ModifyConditionOrder()```。
 - ```exchange.ModifyOrder()```：统一账户原地改单；经典账户使用撤单再下单接口（```cancel-replace-order```），返回新订单的ID。
 
-```Futures_Bitget```（期货）
+###### ```Futures_Bitget```（期货）
 
 - ```exchange.GetFundings()```不支持批量查询，需要传入具体的永续合约，例如```exchange.GetFundings("ETH_USDT.swap")```。
 - 条件单只支持止盈、止损单，不支持OCO，需要时分别创建止盈单和止损单。
@@ -22447,30 +24257,22 @@ Bitget USDT、USDC永续合约，币本位永续与交割合约。支持统一�
 
 Bithumb（韩国）现货。
 
-**名称**
+##### 名称与配置
 
-| ```exchange.GetName()``` | 类型 | 别名 |
-| - | - | - |
-| ```Bithumb``` | 现货 | — |
+```exchange.GetName()```：```Bithumb```（现货）。
 
-**配置项**
+| 配置项 | 必填 |
+| - | - |
+| Access Key | 是 |
+| Secret Key | 是 |
 
-| 配置项 | 必填 | 默认值 | 说明 |
-| - | - | - | - |
-| Access Key | 是 | — | — |
-| Secret Key | 是 | — | — |
-
-**交易对与合约代码**
+##### 交易对与合约代码
 
 交易对示例：```BTC_KRW```、```ETH_KRW```
 
 交易对写作```BASE_QUOTE```，Bithumb原生市场代码是计价币在前（```BTC_KRW```对应```KRW-BTC```），由连接器转换。
 
-**专属IO指令**
-
-没有专属指令，通用指令见`exchange.IO`。
-
-**不支持与合成的函数**
+##### 函数支持差异
 
 不支持（调用时报错并返回空值）：`exchange.ModifyOrder`、`exchange.CreateConditionOrder`、`exchange.ModifyConditionOrder`、`exchange.CancelConditionOrder`、`exchange.GetConditionOrder`、`exchange.GetConditionOrders`、`exchange.GetHistoryConditionOrders`。
 
@@ -22478,9 +24280,7 @@ Bithumb（韩国）现货。
 
 - `exchange.GetRecords`：原生周期为1分钟、3分钟、5分钟、10分钟、15分钟、30分钟、1小时、4小时、1天、1周、1月；其它周期由托管者合成。
 
-所有交易所的对照见`能力矩阵`。
-
-**注意事项**
+##### 注意事项
 
 - 只支持GTC限价单与市价单：指定```tif```为```"ioc"```、```"fok"```或```postOnly```时报错。
 - ```exchange.GetMarkets()```中KRW市场的价格精度按最新价所在的价格档位计算（Bithumb的KRW报价单位随价格分段），其它市场不提供价格、数量精度。
@@ -22489,31 +24289,23 @@ Bithumb（韩国）现货。
 
 Bitstamp现货。
 
-**名称**
+##### 名称与配置
 
-| ```exchange.GetName()``` | 类型 | 别名 |
+```exchange.GetName()```：```Bitstamp```（现货）。
+
+| 配置项 | 必填 | 说明 |
 | - | - | - |
-| ```Bitstamp``` | 现货 | — |
+| Access Key | 是 | — |
+| Secret Key | 是 | — |
+| Client ID | 是 | Bitstamp账户的客户号（Customer ID），参与私有接口签名。 |
 
-**配置项**
-
-| 配置项 | 必填 | 默认值 | 说明 |
-| - | - | - | - |
-| Access Key | 是 | — | — |
-| Secret Key | 是 | — | — |
-| Client ID | 是 | — | Bitstamp账户的客户号（Customer ID），参与私有接口签名。 |
-
-**交易对与合约代码**
+##### 交易对与合约代码
 
 交易对示例：```BTC_USD```、```ETH_EUR```、```BTC_USDT```
 
 交易对写作```BASE_QUOTE```，对应Bitstamp原生代码```btcusd```。
 
-**专属IO指令**
-
-没有专属指令，通用指令见`exchange.IO`。
-
-**不支持与合成的函数**
+##### 函数支持差异
 
 不支持（调用时报错并返回空值）：`exchange.GetHistoryOrders`、`exchange.ModifyOrder`、`exchange.CreateConditionOrder`、`exchange.ModifyConditionOrder`、`exchange.CancelConditionOrder`、`exchange.GetConditionOrder`、`exchange.GetConditionOrders`、`exchange.GetHistoryConditionOrders`。
 
@@ -22521,31 +24313,23 @@ Bitstamp现货。
 
 - `exchange.GetRecords`：原生周期为1分钟、3分钟、5分钟、15分钟、30分钟、1小时、2小时、4小时、6小时、12小时、1天、3天；其它周期由托管者合成。
 
-所有交易所的对照见`能力矩阵`。
-
-**注意事项**
+##### 注意事项
 
 - 现货市价买单的下单量是交易币数，不是计价币金额（使用Bitstamp的市价单接口）。
 - 交易所没有历史订单接口，不支持```exchange.GetHistoryOrders()```；```exchange.GetOrder()```可以查询已完成的订单。
 
 #### Bybit
 
-```Bybit```（现货）
+```Bybit```（现货）：Bybit现货，以及现货杠杆（下单时借贷）。统一交易账户（UTA）与经典账户都支持，使用Bybit V5接口。
 
-Bybit现货，以及现货杠杆（下单时借贷）。统一交易账户（UTA）与经典账户都支持，使用Bybit V5接口。
+```Futures_Bybit```（期货）：Bybit USDT、USDC永续与交割合约（linear），币本位永续与交割合约（inverse），以及USDT结算期权。统一交易账户（UTA）与经典账户都支持，使用Bybit V5接口。
 
-```Futures_Bybit```（期货）
-
-Bybit USDT、USDC永续与交割合约（linear），币本位永续与交割合约（inverse），以及USDT结算期权。统一交易账户（UTA）与经典账户都支持，使用Bybit V5接口。
-
-**名称**
+##### 名称与配置
 
 | ```exchange.GetName()``` | 类型 | 别名 |
 | - | - | - |
 | ```Bybit``` | 现货 | Bybit现货 |
 | ```Futures_Bybit``` | 期货 | Bybit期货 |
-
-**配置项**
 
 | 配置项 | 必填 | 默认值 | 说明 |
 | - | - | - | - |
@@ -22554,15 +24338,15 @@ Bybit USDT、USDC永续与交割合约（linear），币本位永续与交割合
 | Version | 是 | ```v5``` | 兼容保留，连接器始终使用Bybit V5接口，选择哪个版本都不影响。可选：```v3```、```v5``` |
 | 模拟盘 | 否 | 不勾选 | — |
 
-**交易对与合约代码**
+##### 交易对与合约代码
 
-```Bybit```（现货）
+###### ```Bybit```（现货）
 
 交易对示例：```BTC_USDT```、```ETH_BTC```
 
 交易对写作```BTC_USDT```，不带合约代码；合约请使用Futures_Bybit交易所对象。
 
-```Futures_Bybit```（期货）
+###### ```Futures_Bybit```（期货）
 
 交易对示例：```BTC_USDT```、```BTC_USDC```、```BTC_USD```
 
@@ -22587,9 +24371,9 @@ Bybit USDT、USDC永续与交割合约（linear），币本位永续与交割合
 
 交割合约也可以直接写Bybit的原生合约代码。Bybit有些交割合约没有明确的周期，这类合约直接使用原生代码，例如交易对```ETH_USDT```、合约代码```ETHUSDT-04APR25```。
 
-**专属IO指令**
+##### 专属IO指令
 
-```Bybit```（现货）
+###### ```Bybit```（现货）
 
 | 指令 | 参数 | 说明 | 返回值 |
 | - | - | - | - |
@@ -22599,7 +24383,7 @@ Bybit USDT、USDC永续与交割合约（linear），币本位永续与交割合
 
 通用指令```api```、```base```、```currency```见`exchange.IO`。
 
-```Futures_Bybit```（期货）
+###### ```Futures_Bybit```（期货）
 
 | 指令 | 参数 | 说明 | 返回值 |
 | - | - | - | - |
@@ -22609,37 +24393,35 @@ Bybit USDT、USDC永续与交割合约（linear），币本位永续与交割合
 
 通用指令```api```、```base```、```currency```见`exchange.IO`。
 
-**不支持与合成的函数**
+##### 函数支持差异
 
-全部交易所对象
+###### 全部交易所对象
 
 没有不支持的标准函数。
 
-```Bybit```（现货）
+###### ```Bybit```（现货）
 
 以回退方式支持：
 
 - `exchange.GetRecords`：原生周期为1分钟、3分钟、5分钟、15分钟、30分钟、1小时、2小时、4小时、6小时、12小时、1天、1周、1月；其它周期由托管者合成。
 
-```Futures_Bybit```（期货）
+###### ```Futures_Bybit```（期货）
 
 以回退方式支持：
 
 - `exchange.GetRecords`：原生周期为1分钟、3分钟、5分钟、15分钟、30分钟、1小时、2小时、4小时、6小时、12小时、1天、1周、1月；其它周期由托管者合成。期权没有K线接口，由托管者用成交记录合成。
 
-所有交易所的对照见`能力矩阵`。
+##### 保证金、账户与模拟盘
 
-**保证金、账户与模拟盘**
-
-全部交易所对象
+###### 全部交易所对象
 
 模拟盘：勾选「模拟盘」使用Bybit模拟交易（Demo Trading，```api-demo.bybit.com```），API KEY需要在Bybit主站切换到模拟交易模式后创建；与测试网（testnet）不是同一个环境。
 
-```Bybit```（现货）
+###### ```Bybit```（现货）
 
 账户：统一交易账户与经典账户的现货资产在不同的钱包，连接器首次私有请求时查询账户类型（也可以用```exchange.IO("accountType", ...)```指定）。现货杠杆用```exchange.IO("trade_margin")```开启，之后的订单在下单时借贷。
 
-```Futures_Bybit```（期货）
+###### ```Futures_Bybit```（期货）
 
 保证金模式：用```exchange.IO("cross", bool)```按合约切换全仓/逐仓；```exchange.SetMarginLevel()```设置杠杆（买卖同一杠杆）。
 
@@ -22647,9 +24429,9 @@ Bybit USDT、USDC永续与交割合约（linear），币本位永续与交割合
 
 账户：账户类型在首次私有请求时自动探测。统一交易账户1.0的U本位资产在统一钱包、币本位资产在合约钱包，```exchange.GetAssets()```会同时查询两个钱包。
 
-**期权**
+##### 期权
 
-```Futures_Bybit```（期货）
+###### ```Futures_Bybit```（期货）
 
 支持Bybit的USDT结算期权（Bybit目前只挂牌USDT结算的期权）。
 
@@ -22660,13 +24442,13 @@ Bybit USDT、USDC永续与交割合约（linear），币本位永续与交割合
 
 期权代码为Bybit原生代码：标的-到期日-行权价-C/P-结算币。Bybit期权以USDT结算，交易对设置为```ETH_USDT```，完整品种代码形如```ETH_USDT.ETH-25JUN27-2800-C-USDT```；交易对的计价币必须与结算币一致。
 
-**注意事项**
+##### 注意事项
 
-全部交易所对象
+###### 全部交易所对象
 
 - 条件单只支持止盈、止损单，不支持OCO，需要时分别创建止盈单和止损单。
 
-```Futures_Bybit```（期货）
+###### ```Futures_Bybit```（期货）
 
 - ```exchange.GetMarkets()```的结果包含盘前交易（PreLaunch）合约。
 
@@ -22674,30 +24456,22 @@ Bybit USDT、USDC永续与交割合约（linear），币本位永续与交割合
 
 Coincheck（日本）现货。
 
-**名称**
+##### 名称与配置
 
-| ```exchange.GetName()``` | 类型 | 别名 |
-| - | - | - |
-| ```Coincheck``` | 现货 | — |
+```exchange.GetName()```：```Coincheck```（现货）。
 
-**配置项**
+| 配置项 | 必填 |
+| - | - |
+| Access Key | 是 |
+| Secret Key | 是 |
 
-| 配置项 | 必填 | 默认值 | 说明 |
-| - | - | - | - |
-| Access Key | 是 | — | — |
-| Secret Key | 是 | — | — |
-
-**交易对与合约代码**
+##### 交易对与合约代码
 
 交易对示例：```BTC_JPY```、```ETH_JPY```
 
 交易对写作```BASE_QUOTE```，对应Coincheck原生代码```btc_jpy```；可交易的交易对以交易所为准。
 
-**专属IO指令**
-
-没有专属指令，通用指令见`exchange.IO`。
-
-**不支持与合成的函数**
+##### 函数支持差异
 
 不支持（调用时报错并返回空值）：`exchange.GetTickers`、`exchange.GetMarkets`、`exchange.GetHistoryOrders`、`exchange.ModifyOrder`、`exchange.ModifyConditionOrder`、`exchange.GetHistoryConditionOrders`。
 
@@ -22706,9 +24480,7 @@ Coincheck（日本）现货。
 - `exchange.GetRecords`：交易所没有K线接口，由托管者用成交记录合成：首次调用只有最近成交覆盖的少量K线，随调用逐步累积。
 - `exchange.GetOrder`：交易所没有查询单个订单的接口，在当前未完成订单中查找；交易所不提供历史订单查询，已成交或已撤销的订单查不到（返回空值）。
 
-所有交易所的对照见`能力矩阵`。
-
-**注意事项**
+##### 注意事项
 
 - 下单支持只做Maker（```postOnly```，仅限价单），不支持```tif```（IOC、FOK）选项，传入时报错。
 - 条件单通过Coincheck下单接口的```stop_loss_rate```（触发价）实现，支持止盈、止损（不填委托价为触发后市价成交），不支持OCO；撤销条件单与撤销普通订单使用同一接口。
@@ -22718,30 +24490,22 @@ Coincheck（日本）现货。
 
 Coinone（韩国）现货，KRW市场。
 
-**名称**
+##### 名称与配置
 
-| ```exchange.GetName()``` | 类型 | 别名 |
-| - | - | - |
-| ```Coinone``` | 现货 | — |
+```exchange.GetName()```：```Coinone```（现货）。
 
-**配置项**
+| 配置项 | 必填 |
+| - | - |
+| Access Key | 是 |
+| Secret Key | 是 |
 
-| 配置项 | 必填 | 默认值 | 说明 |
-| - | - | - | - |
-| Access Key | 是 | — | — |
-| Secret Key | 是 | — | — |
-
-**交易对与合约代码**
+##### 交易对与合约代码
 
 交易对示例：```BTC_KRW```、```ETH_KRW```
 
 交易对写作```BASE_QUOTE```，计价币为KRW。
 
-**专属IO指令**
-
-没有专属指令，通用指令见`exchange.IO`。
-
-**不支持与合成的函数**
+##### 函数支持差异
 
 不支持（调用时报错并返回空值）：`exchange.ModifyOrder`、`exchange.ModifyConditionOrder`、`exchange.GetHistoryConditionOrders`。
 
@@ -22749,9 +24513,7 @@ Coinone（韩国）现货，KRW市场。
 
 - `exchange.GetRecords`：原生周期为1分钟、3分钟、5分钟、10分钟、15分钟、30分钟、1小时、2小时、4小时、6小时、1天、1周、1月；其它周期由托管者合成。
 
-所有交易所的对照见`能力矩阵`。
-
-**注意事项**
+##### 注意事项
 
 - ```exchange.GetTickers()```返回KRW市场全部交易对的行情。
 - 下单支持只做Maker（```postOnly```，仅限价单），不支持```tif```（IOC、FOK）选项，传入时报错。
@@ -22761,37 +24523,31 @@ Coinone（韩国）现货，KRW市场。
 
 #### CoinW
 
-```Coinw```（现货）
+```Coinw```（现货）：CoinW现货交易。
 
-CoinW现货交易。
+```Futures_Coinw```（期货）：CoinW U本位永续合约（USDT、USDC保证金）。
 
-```Futures_Coinw```（期货）
-
-CoinW U本位永续合约（USDT、USDC保证金）。
-
-**名称**
+##### 名称与配置
 
 | ```exchange.GetName()``` | 类型 | 别名 |
 | - | - | - |
 | ```Coinw``` | 现货 | 币赢 |
 | ```Futures_Coinw``` | 期货 | CoinW期货 |
 
-**配置项**
+| 配置项 | 必填 |
+| - | - |
+| Access Key | 是 |
+| Secret Key | 是 |
 
-| 配置项 | 必填 | 默认值 | 说明 |
-| - | - | - | - |
-| Access Key | 是 | — | — |
-| Secret Key | 是 | — | — |
+##### 交易对与合约代码
 
-**交易对与合约代码**
-
-```Coinw```（现货）
+###### ```Coinw```（现货）
 
 交易对示例：```BTC_USDT```、```ETH_USDT```
 
 交易对写作```BTC_USDT```，与CoinW现货的原生代码相同（大写）。本交易所对象只交易现货，带合约后缀的品种会报错，永续合约请使用```Futures_Coinw```。
 
-```Futures_Coinw```（期货）
+###### ```Futures_Coinw```（期货）
 
 交易对示例：```BTC_USDT```、```BTC_USDC```
 
@@ -22803,13 +24559,13 @@ CoinW U本位永续合约（USDT、USDC保证金）。
 
 CoinW只有永续合约，其它合约代码会报错。下单数量单位为张，每张对应的币数为```exchange.GetMarkets()```中的```CtVal```。
 
-**专属IO指令**
+##### 专属IO指令
 
-```Coinw```（现货）
+###### ```Coinw```（现货）
 
 没有专属指令，通用指令见`exchange.IO`。
 
-```Futures_Coinw```（期货）
+###### ```Futures_Coinw```（期货）
 
 | 指令 | 参数 | 说明 |
 | - | - | - |
@@ -22817,9 +24573,9 @@ CoinW只有永续合约，其它合约代码会报错。下单数量单位为张
 
 通用指令```api```、```base```、```currency```见`exchange.IO`。
 
-**不支持与合成的函数**
+##### 函数支持差异
 
-```Coinw```（现货）
+###### ```Coinw```（现货）
 
 不支持（调用时报错并返回空值）：`exchange.ModifyOrder`、`exchange.CreateConditionOrder`、`exchange.ModifyConditionOrder`、`exchange.CancelConditionOrder`、`exchange.GetConditionOrder`、`exchange.GetConditionOrders`、`exchange.GetHistoryConditionOrders`。
 
@@ -22827,7 +24583,7 @@ CoinW只有永续合约，其它合约代码会报错。下单数量单位为张
 
 - `exchange.GetRecords`：原生周期为1分钟、3分钟、5分钟、15分钟、30分钟、1小时、2小时、4小时、1天、1周；其它周期由托管者合成。
 
-```Futures_Coinw```（期货）
+###### ```Futures_Coinw```（期货）
 
 不支持（调用时报错并返回空值）：`exchange.ModifyOrder`、`exchange.ModifyConditionOrder`。
 
@@ -22835,23 +24591,21 @@ CoinW只有永续合约，其它合约代码会报错。下单数量单位为张
 
 - `exchange.GetRecords`：原生周期为1分钟、3分钟、5分钟、15分钟、30分钟、1小时、4小时、1天、1周、1月；其它周期由托管者合成。单次最多返回300根。
 
-所有交易所的对照见`能力矩阵`。
+##### 保证金、账户与模拟盘
 
-**保证金、账户与模拟盘**
-
-```Futures_Coinw```（期货）
+###### ```Futures_Coinw```（期货）
 
 保证金模式：用```exchange.IO("cross", bool)```切换账户的全仓/逐仓；没有切换过时，每次下单前查询账户当前模式并随单带上。CoinW没有设置杠杆的接口：```exchange.SetMarginLevel()```只记录杠杆倍数（必须是不小于1的整数），之后按合约随每张订单发送，没有设置过时按10倍下单；也可以在下单附加参数中传```leverage```指定单张订单的杠杆。
 
 持仓模式：只有单向持仓，不支持```exchange.IO("dual", ...)```。平仓（```closebuy```、```closesell```）通过平掉对应方向的已有持仓实现，没有该方向的持仓时报错。
 
-**注意事项**
+##### 注意事项
 
-```Coinw```（现货）
+###### ```Coinw```（现货）
 
 - 查询未完成订单的接口必须带交易对：```exchange.GetOrders()```不传参数时只查询当前交易对的未完成订单，不是所有交易对。
 
-```Futures_Coinw```（期货）
+###### ```Futures_Coinw```（期货）
 
 - 条件单只支持止盈、止损单，不支持OCO；不支持改单和修改条件单，需要先撤单再重新下单。
 - 查询未完成订单和未完成条件单的接口必须带交易对：```exchange.GetOrders()```、```exchange.GetConditionOrders()```不传参数时只查询当前合约，不是所有合约。
@@ -22859,37 +24613,31 @@ CoinW只有永续合约，其它合约代码会报错。下单数量单位为张
 
 #### Crypto.com
 
-```Crypto```（现货）
+```Crypto```（现货）：Crypto.com Exchange现货交易，支持现货杠杆下单。
 
-Crypto.com Exchange现货交易，支持现货杠杆下单。
+```Futures_Crypto```（期货）：Crypto.com Exchange衍生品：永续合约与交割合约。账户中的代币可以折算为USD计价的额度，用作合约保证金。
 
-```Futures_Crypto```（期货）
-
-Crypto.com Exchange衍生品：永续合约与交割合约。账户中的代币可以折算为USD计价的额度，用作合约保证金。
-
-**名称**
+##### 名称与配置
 
 | ```exchange.GetName()``` | 类型 | 别名 |
 | - | - | - |
 | ```Crypto``` | 现货 | — |
 | ```Futures_Crypto``` | 期货 | Crypto.com期货、Crypto.com Futures |
 
-**配置项**
+| 配置项 | 必填 |
+| - | - |
+| Access Key | 是 |
+| Secret Key | 是 |
 
-| 配置项 | 必填 | 默认值 | 说明 |
-| - | - | - | - |
-| Access Key | 是 | — | — |
-| Secret Key | 是 | — | — |
+##### 交易对与合约代码
 
-**交易对与合约代码**
-
-```Crypto```（现货）
+###### ```Crypto```（现货）
 
 交易对示例：```BTC_USDT```、```CRO_USD```
 
 交易对写作```BASE_QUOTE```，与Crypto.com的交易对名称一致。
 
-```Futures_Crypto```（期货）
+###### ```Futures_Crypto```（期货）
 
 交易对示例：```BTC_USD```、```ETH_USD```
 
@@ -22919,18 +24667,18 @@ Crypto.com Exchange衍生品：永续合约与交割合约。账户中的代币�
 
 也可以直接使用Crypto.com的交割合约代码，形如```BTCUSD-YYMMDD```。
 
-**专属IO指令**
+##### 专属IO指令
 
-```Crypto```（现货）
+###### ```Crypto```（现货）
 
-| 指令 | 参数 | 说明 | 返回值 |
-| - | - | - | - |
-| ```"trade_margin"``` | — | 切换为现货杠杆：之后的订单（含条件单）带```spot_margin=MARGIN```下单。只影响下单，不向交易所发请求。 | 指令名```"trade_margin"```。 |
-| ```"trade_normal"``` | — | 切换回普通现货下单（默认）。 | 指令名```"trade_normal"```。 |
+| 指令 | 说明 | 返回值 |
+| - | - | - |
+| ```"trade_margin"``` | 切换为现货杠杆：之后的订单（含条件单）带```spot_margin=MARGIN```下单。只影响下单，不向交易所发请求。 | 指令名```"trade_margin"```。 |
+| ```"trade_normal"``` | 切换回普通现货下单（默认）。 | 指令名```"trade_normal"```。 |
 
 通用指令```api```、```base```、```currency```见`exchange.IO`。
 
-```Futures_Crypto```（期货）
+###### ```Futures_Crypto```（期货）
 
 | 指令 | 参数 | 说明 | 返回值 |
 | - | - | - | - |
@@ -22938,7 +24686,7 @@ Crypto.com Exchange衍生品：永续合约与交割合约。账户中的代币�
 
 通用指令```api```、```base```、```currency```见`exchange.IO`。
 
-**不支持与合成的函数**
+##### 函数支持差异
 
 没有不支持的标准函数。
 
@@ -22946,62 +24694,54 @@ Crypto.com Exchange衍生品：永续合约与交割合约。账户中的代币�
 
 - `exchange.GetRecords`：原生周期为1分钟、5分钟、15分钟、30分钟、1小时、2小时、4小时、6小时、12小时、1天、1周、14天、1月；其它周期由托管者合成。
 
-所有交易所的对照见`能力矩阵`。
+##### 保证金、账户与模拟盘
 
-**保证金、账户与模拟盘**
-
-```Futures_Crypto```（期货）
+###### ```Futures_Crypto```（期货）
 
 账户：```exchange.SetMarginLevel()```设置的是整个交易账户的杠杆（Crypto.com的账户级杠杆），必须是1到100的整数。
 
-**注意事项**
+##### 注意事项
 
-全部交易所对象
+###### 全部交易所对象
 
 - 条件单只支持止盈、止损单，不支持OCO。
 
-```Crypto```（现货）
+###### ```Crypto```（现货）
 
 - 普通市价买单的下单量是交易币数（Crypto.com的```quantity```），不是计价币金额；触发后为市价的条件买单则以计价币金额（```notional```）下单。
 
-```Futures_Crypto```（期货）
+###### ```Futures_Crypto```（期货）
 
 - `exchange.GetFundings`不支持批量查询，不传参数或传入范围（如```USD.swap```）时报错并返回空值，需要传入具体的永续合约品种代码，例如```BTC_USD.swap```。
 
 #### DeepCoin
 
-```DeepCoin```（现货）
+```DeepCoin```（现货）：DeepCoin现货交易。API KEY需要同时配置Access Key、Secret Key和Passphrase。
 
-DeepCoin现货交易。API KEY需要同时配置Access Key、Secret Key和Passphrase。
+```Futures_DeepCoin```（期货）：DeepCoin U本位（USDT保证金）与币本位永续合约。API KEY需要同时配置Access Key、Secret Key和Passphrase。
 
-```Futures_DeepCoin```（期货）
-
-DeepCoin U本位（USDT保证金）与币本位永续合约。API KEY需要同时配置Access Key、Secret Key和Passphrase。
-
-**名称**
+##### 名称与配置
 
 | ```exchange.GetName()``` | 类型 | 别名 |
 | - | - | - |
 | ```DeepCoin``` | 现货 | Deepcoin |
 | ```Futures_DeepCoin``` | 期货 | DeepCoin期货 |
 
-**配置项**
+| 配置项 | 必填 |
+| - | - |
+| Access Key | 是 |
+| Secret Key | 是 |
+| Passphrase | 是 |
 
-| 配置项 | 必填 | 默认值 | 说明 |
-| - | - | - | - |
-| Access Key | 是 | — | — |
-| Secret Key | 是 | — | — |
-| Passphrase | 是 | — | — |
+##### 交易对与合约代码
 
-**交易对与合约代码**
-
-```DeepCoin```（现货）
+###### ```DeepCoin```（现货）
 
 交易对示例：```BTC_USDT```、```ETH_USDT```
 
 交易对写作```BTC_USDT```，对应DeepCoin的原生代码```BTC-USDT```。本交易所对象只交易现货，永续合约请使用```Futures_DeepCoin```。
 
-```Futures_DeepCoin```（期货）
+###### ```Futures_DeepCoin```（期货）
 
 交易对示例：```BTC_USDT```、```BTC_USD```
 
@@ -23013,13 +24753,13 @@ DeepCoin U本位（USDT保证金）与币本位永续合约。API KEY需要同�
 
 DeepCoin只有永续合约，其它合约代码会报错。下单数量单位为张，每张对应的数量为```exchange.GetMarkets()```中的```CtVal```（单位见```CtValCcy```）。
 
-**专属IO指令**
+##### 专属IO指令
 
-```DeepCoin```（现货）
+###### ```DeepCoin```（现货）
 
 没有专属指令，通用指令见`exchange.IO`。
 
-```Futures_DeepCoin```（期货）
+###### ```Futures_DeepCoin```（期货）
 
 | 指令 | 参数 | 说明 |
 | - | - | - |
@@ -23028,45 +24768,43 @@ DeepCoin只有永续合约，其它合约代码会报错。下单数量单位为
 
 通用指令```api```、```base```、```currency```见`exchange.IO`。
 
-**不支持与合成的函数**
+##### 函数支持差异
 
-全部交易所对象
+###### 全部交易所对象
 
 以回退方式支持：
 
 - `exchange.GetRecords`：原生周期为1分钟、3分钟、5分钟、15分钟、30分钟、1小时、2小时、4小时、6小时、12小时、1天、1周、1月、1年；其它周期由托管者合成。
 
-```DeepCoin```（现货）
+###### ```DeepCoin```（现货）
 
 不支持（调用时报错并返回空值）：`exchange.ModifyOrder`。
 
-```Futures_DeepCoin```（期货）
+###### ```Futures_DeepCoin```（期货）
 
 没有不支持的标准函数。
 
-所有交易所的对照见`能力矩阵`。
+##### 保证金、账户与模拟盘
 
-**保证金、账户与模拟盘**
-
-```Futures_DeepCoin```（期货）
+###### ```Futures_DeepCoin```（期货）
 
 保证金模式：用```exchange.IO("cross", bool)```选择全仓/逐仓，这是本地设置，随每次下单带上（默认全仓）；连接器没有读取账户实际保证金模式的途径。```exchange.SetMarginLevel()```按合约设置杠杆，同时带上当前的全仓/逐仓与合并/拆分持仓设置，交易所回执与请求不符时报错。
 
 持仓模式：用```exchange.IO("merge", bool)```选择合并持仓/拆分持仓（默认合并）。下单时按方向带上持仓方向（开多、平空为long，开空、平多为short），拆分持仓模式需要它区分多空仓位。
 
-**注意事项**
+##### 注意事项
 
-全部交易所对象
+###### 全部交易所对象
 
 - ```exchange.GetHistoryOrders()```、```exchange.GetHistoryConditionOrders()```不支持```since```参数（交易所的历史订单接口没有时间范围参数），传入时报错，只能查询最近的订单。
 
-```DeepCoin```（现货）
+###### ```DeepCoin```（现货）
 
 - 不支持改单（```exchange.ModifyOrder()```），需要先撤单再重新下单；未触发的条件单可以用```exchange.ModifyConditionOrder()```修改。
 - 条件单只支持止盈、止损单，不支持OCO（需要分成止盈、止损两张条件单下单）。
 - ```exchange.GetOrders()```、```exchange.GetConditionOrders()```只能按交易对查询：不传或传空字符串时查询当前交易对。
 
-```Futures_DeepCoin```（期货）
+###### ```Futures_DeepCoin```（期货）
 
 - 条件单只支持止盈、止损单，不支持OCO（需要分成止盈、止损两张条件单下单）；未触发的条件单可以用```exchange.ModifyConditionOrder()```修改。
 - 查询未完成条件单的接口必须带交易对：```exchange.GetConditionOrders()```不传参数时只查询当前合约，不能传范围（如```"USDT.swap"```）；单次最多返回100条。
@@ -23076,20 +24814,16 @@ DeepCoin只有永续合约，其它合约代码会报错。下单数量单位为
 
 Deribit的币本位（反向）永续与交割合约、USDC线性永续与交割合约、差价组合合约（future_combo），以及期权与组合期权。
 
-**名称**
+##### 名称与配置
 
-| ```exchange.GetName()``` | 类型 | 别名 |
-| - | - | - |
-| ```Futures_Deribit``` | 期货 | — |
+```exchange.GetName()```：```Futures_Deribit```（期货）。
 
-**配置项**
+| 配置项 | 必填 |
+| - | - |
+| Access Key | 是 |
+| Secret Key | 是 |
 
-| 配置项 | 必填 | 默认值 | 说明 |
-| - | - | - | - |
-| Access Key | 是 | — | — |
-| Secret Key | 是 | — | — |
-
-**交易对与合约代码**
+##### 交易对与合约代码
 
 交易对示例：```BTC_USD```、```ETH_USD```、```BTC_USDC```、```XRP_USDC```
 
@@ -23110,17 +24844,13 @@ Deribit的币本位（反向）永续与交割合约、USDC线性永续与交割
 
 交割合约代码不在本地按日期推算，而是按Deribit合约列表的到期周期（日、周、月）和到期时间排序选取（列表缓存10分钟）；该周期没有挂出对应序号的合约时报错。
 
-差价组合合约（future_combo）写成「远期,近期」两个代码，以英文逗号分隔，例如```"quarter,swap"```、```"next_week,swap"```、```"next_quarter,this_week"```、```"month,next_week"```；远期一腿必须是交割代码，近期一腿可以是交割代码或```swap```，对应Deribit的```BTC-FS-25DEC26_PERP```一类组合合约。组合合约只用于币本位交易对（```BTC_USD```、```ETH_USD```），在USDC等线性交易对上写组合代码会报错。
+差价组合合约（future_combo）写成```"远期代码,近期代码"```，两个代码以英文逗号分隔，例如```"quarter,swap"```、```"next_week,swap"```、```"next_quarter,this_week"```、```"month,next_week"```；远期一腿必须是交割代码，近期一腿可以是交割代码或```swap```，对应Deribit的```BTC-FS-25DEC26_PERP```一类组合合约。组合合约只用于币本位交易对（```BTC_USD```、```ETH_USD```），在USDC等线性交易对上写组合代码会报错。
 
 原生合约代码示例：```BTC-30JUL26```、```BTC_USDC-30JUL26```、```BTC-FS-25DEC26_PERP```
 
 任何交割或组合合约都可以直接写Deribit的原生代码（日期为日月年缩写），超出上述代码范围的远期合约就用这种写法，例如交易对```BTC_USD```、合约代码```BTC-30JUL26```。查询结果中映射不回上述代码的合约也以原生代码返回。
 
-**专属IO指令**
-
-没有专属指令，通用指令见`exchange.IO`。
-
-**不支持与合成的函数**
+##### 函数支持差异
 
 不支持（调用时报错并返回空值）：`exchange.SetMarginLevel`。
 
@@ -23128,9 +24858,7 @@ Deribit的币本位（反向）永续与交割合约、USDC线性永续与交割
 
 - `exchange.GetRecords`：原生周期为1分钟、3分钟、5分钟、10分钟、15分钟、30分钟、1小时、2小时、3小时、6小时、12小时、1天；其它周期由托管者合成。
 
-所有交易所的对照见`能力矩阵`。
-
-**保证金、账户与模拟盘**
+##### 保证金、账户与模拟盘
 
 保证金模式：Deribit按币种的保证金账户统一计算保证金，没有逐合约的保证金模式和杠杆设置：```exchange.SetMarginLevel()```不支持，```exchange.IO("cross", ...)```报错。```exchange.GetPositions()```的```MarginLevel```取Deribit持仓返回的杠杆，期权持仓为0；```Margin```为初始保证金与维持保证金之和。
 
@@ -23140,7 +24868,7 @@ Deribit的币本位（反向）永续与交割合约、USDC线性永续与交割
 
 模拟盘：配置里没有模拟盘选项。使用Deribit测试网时，填入测试网的API Key，并在策略开始时调用```exchange.IO("base", "https://test.deribit.com")```切换接口地址。
 
-**期权**
+##### 期权
 
 设置期权合约后即可获取行情、下单、撤单、查询持仓，BTC、ETH期权的下单量单位是币数。
 
@@ -23153,7 +24881,7 @@ Deribit的币本位（反向）永续与交割合约、USDC线性永续与交割
 
 期权代码为Deribit原生代码：标的-到期日（日月年缩写）-行权价-C/P，C为看涨、P为看跌，行权价的小数点写作```d```（如```2d3```即2.3）。BTC、ETH期权以币结算，交易对设置为```BTC_USD```、```ETH_USD```，完整品种代码形如```BTC_USD.BTC-25DEC26-100000-C```；USDC结算的期权代码自带```_USDC```，交易对设置为对应的```_USDC```交易对，例如```SOL_USDC.SOL_USDC-25DEC26-148-C```。组合期权（如```BTC-CS-6SEP24-57000_57500```、```BTC-PCAL-20SEP24_13SEP24-55000```）同样直接写原生代码。
 
-**注意事项**
+##### 注意事项
 
 - 下单量单位：币本位（反向）合约是USD金额（```BTC-PERPETUAL```最小10且为10的倍数），USDC线性合约与期权是币数。```exchange.GetMarkets()```的```CtVal```恒为1，最小下单量与精度以```MinQty```、```AmountPrecision```为准。
 - ```exchange.GetFundings()```传具体永续合约品种（如```BTC_USD.swap```）返回该合约当前一条；不传参数时按当前合约的计价币查询该计价币的全部永续（如```USD.swap```为BTC、ETH币本位永续，```USDC.swap```为全部USDC线性永续），也可直接传这类范围。费率取Deribit按8小时折算的```current_interest```。Deribit没有批量资金费率接口，范围查询每个永续发一次请求，```USDC.swap```有一百多个永续、耗时十几秒，频繁调用请传具体品种。交割合约、期权与组合合约没有资金费率，传入会报错。
@@ -23163,22 +24891,16 @@ Deribit的币本位（反向）永续与交割合约、USDC线性永续与交割
 
 #### DigiFinex
 
-```DigiFinex```（现货）
+```DigiFinex```（现货）：DigiFinex现货交易。
 
-DigiFinex现货交易。
+```Futures_DigiFinex```（期货）：DigiFinex U本位与币本位永续合约。
 
-```Futures_DigiFinex```（期货）
-
-DigiFinex U本位与币本位永续合约。
-
-**名称**
+##### 名称与配置
 
 | ```exchange.GetName()``` | 类型 | 别名 |
 | - | - | - |
 | ```DigiFinex``` | 现货 | — |
 | ```Futures_DigiFinex``` | 期货 | DigiFinex期货 |
-
-**配置项**
 
 ✓ 表示该交易所对象有这个配置项。
 
@@ -23188,15 +24910,15 @@ DigiFinex U本位与币本位永续合约。
 | Secret Key | ✓ | ✓ | 是 | — | — |
 | 模拟盘 | ✓ |  | 否 | 不勾选 | DigiFinex现货没有模拟盘环境，勾选后不起作用，仍然交易实盘。模拟盘只有合约（```Futures_DigiFinex```）支持。 |
 
-**交易对与合约代码**
+##### 交易对与合约代码
 
-```DigiFinex```（现货）
+###### ```DigiFinex```（现货）
 
 交易对示例：```BTC_USDT```、```ETH_USDT```
 
 交易对写作```BTC_USDT```，对应DigiFinex的原生代码```btc_usdt```（小写）。本交易所对象只交易现货，带合约后缀的品种会报错，永续合约请使用```Futures_DigiFinex```。
 
-```Futures_DigiFinex```（期货）
+###### ```Futures_DigiFinex```（期货）
 
 交易对示例：```BTC_USDT```、```BTC_USD```
 
@@ -23208,13 +24930,13 @@ DigiFinex U本位与币本位永续合约。
 
 DigiFinex只有永续合约，其它合约代码会报错。下单数量单位为张，每张对应的数量为```exchange.GetMarkets()```中的```CtVal```（单位见```CtValCcy```）。
 
-**专属IO指令**
+##### 专属IO指令
 
-```DigiFinex```（现货）
+###### ```DigiFinex```（现货）
 
 没有专属指令，通用指令见`exchange.IO`。
 
-```Futures_DigiFinex```（期货）
+###### ```Futures_DigiFinex```（期货）
 
 | 指令 | 参数 | 说明 | 返回值 |
 | - | - | - | - |
@@ -23223,7 +24945,7 @@ DigiFinex只有永续合约，其它合约代码会报错。下单数量单位�
 
 通用指令```api```、```base```、```currency```见`exchange.IO`。
 
-**不支持与合成的函数**
+##### 函数支持差异
 
 不支持（调用时报错并返回空值）：`exchange.ModifyOrder`、`exchange.CreateConditionOrder`、`exchange.ModifyConditionOrder`、`exchange.CancelConditionOrder`、`exchange.GetConditionOrder`、`exchange.GetConditionOrders`、`exchange.GetHistoryConditionOrders`。
 
@@ -23231,56 +24953,48 @@ DigiFinex只有永续合约，其它合约代码会报错。下单数量单位�
 
 - `exchange.GetRecords`：原生周期为1分钟、5分钟、15分钟、30分钟、1小时、4小时、12小时、1天、1周；其它周期由托管者合成。
 
-所有交易所的对照见`能力矩阵`。
+##### 保证金、账户与模拟盘
 
-**保证金、账户与模拟盘**
-
-```Futures_DigiFinex```（期货）
+###### ```Futures_DigiFinex```（期货）
 
 保证金模式：用```exchange.IO("cross", bool)```按合约切换全仓/逐仓，交易所回执与请求不符时报错。```exchange.SetMarginLevel()```按合约设置杠杆；逐仓且双向持仓的账户需要按方向设置，交易所提示持仓模式错误时，连接器补上保证金模式（默认逐仓，可在附加参数中传```margin_mode```）和方向（取```exchange.SetDirection()```设置的方向，或附加参数中的```side```：```long```/```short```）重试一次。
 
 模拟盘：交易所配置中没有模拟盘选项，用```exchange.IO("simulate", true)```切换；只影响行情列表、合约列表、账户余额和持仓查询。
 
-**注意事项**
+##### 注意事项
 
-```Futures_DigiFinex```（期货）
+###### ```Futures_DigiFinex```（期货）
 
 - 不支持批量查询资金费率：```exchange.GetFundings()```必须传入具体永续合约品种（例如```"BTC_USDT.swap"```），不传或传范围（如```"USDT.swap"```）时报错。
 
 #### Gate
 
-```GateIO```（现货）
+```GateIO```（现货）：Gate现货，以及杠杆账户（逐仓、全仓）和统一账户下的现货交易。
 
-Gate现货，以及杠杆账户（逐仓、全仓）和统一账户下的现货交易。
+```Futures_GateIO```（期货）：Gate USDT本位永续与交割合约、币本位（BTC结算）永续合约，以及USDT期权。经典账户与统一账户都支持。
 
-```Futures_GateIO```（期货）
-
-Gate USDT本位永续与交割合约、币本位（BTC结算）永续合约，以及USDT期权。经典账户与统一账户都支持。
-
-**名称**
+##### 名称与配置
 
 | ```exchange.GetName()``` | 类型 | 别名 |
 | - | - | - |
 | ```GateIO``` | 现货 | Gate.io、Gate现货 |
 | ```Futures_GateIO``` | 期货 | Gate期货 |
 
-**配置项**
+| 配置项 | 必填 | 默认值 |
+| - | - | - |
+| Access Key | 是 | — |
+| Secret Key | 是 | — |
+| 模拟盘 | 否 | 不勾选 |
 
-| 配置项 | 必填 | 默认值 | 说明 |
-| - | - | - | - |
-| Access Key | 是 | — | — |
-| Secret Key | 是 | — | — |
-| 模拟盘 | 否 | 不勾选 | — |
+##### 交易对与合约代码
 
-**交易对与合约代码**
-
-```GateIO```（现货）
+###### ```GateIO```（现货）
 
 交易对示例：```BTC_USDT```、```ETH_BTC```
 
 交易对写作```BTC_USDT```，不带合约代码；合约请使用Futures_GateIO交易所对象。
 
-```Futures_GateIO```（期货）
+###### ```Futures_GateIO```（期货）
 
 交易对示例：```BTC_USDT```、```BTC_USD```
 
@@ -23300,9 +25014,9 @@ Gate USDT本位永续与交割合约、币本位（BTC结算）永续合约，�
 
 交割合约也可以直接写Gate的原生合约名，例如```BTC_USDT.BTC_USDT_20260807```。
 
-**专属IO指令**
+##### 专属IO指令
 
-```GateIO```（现货）
+###### ```GateIO```（现货）
 
 | 指令 | 参数 | 说明 | 返回值 |
 | - | - | - | - |
@@ -23313,19 +25027,23 @@ Gate USDT本位永续与交割合约、币本位（BTC结算）永续合约，�
 
 通用指令```api```、```base```、```currency```见`exchange.IO`。
 
-```Futures_GateIO```（期货）
+###### ```Futures_GateIO```（期货）
 
 | 指令 | 参数 | 说明 | 返回值 |
 | - | - | - | - |
-| ```"cross"``` | bool[, symbol] | 全仓（true）/逐仓（false），向交易所发送请求。Gate用杠杆值表示保证金模式，切换时杠杆重设为10倍（逐仓杠杆10倍；永续全仓杠杆上限10倍），需要其它杠杆时之后再调用```exchange.SetMarginLevel()```。期权不支持。 | 成功也返回空值，需要确认时调用后读取GetLastError()。 |
+| ```"cross"``` | bool[, symbol] | 全仓（true）/逐仓（false），向交易所发送请求。（详见表下） | 成功也返回空值，需要确认时调用后读取GetLastError()。 |
 | ```"dual"``` | bool[, symbol] | 双向（true）/单向（false）持仓，向交易所发送请求。按结算币（USDT、BTC）分别设置，只适用于永续合约。 | 成功也返回空值，需要确认时调用后读取GetLastError()。 |
 | ```"unified"``` | bool | 统一账户（true）/经典账户（false）。不调用时首次私有请求自动探测。 | 成功也返回空值，需要确认时调用后读取GetLastError()。 |
 
+表中长说明的其余部分：
+
+- ```"cross"```：Gate用杠杆值表示保证金模式，切换时杠杆重设为10倍（逐仓杠杆10倍；永续全仓杠杆上限10倍），需要其它杠杆时之后再调用```exchange.SetMarginLevel()```。期权不支持。
+
 通用指令```api```、```base```、```currency```见`exchange.IO`。
 
-**不支持与合成的函数**
+##### 函数支持差异
 
-```GateIO```（现货）
+###### ```GateIO```（现货）
 
 不支持（调用时报错并返回空值）：`exchange.ModifyConditionOrder`。
 
@@ -23333,7 +25051,7 @@ Gate USDT本位永续与交割合约、币本位（BTC结算）永续合约，�
 
 - `exchange.GetRecords`：原生周期为10秒、1分钟、5分钟、15分钟、30分钟、1小时、4小时、8小时、1天、1周、1月；其它周期由托管者合成。
 
-```Futures_GateIO```（期货）
+###### ```Futures_GateIO```（期货）
 
 没有不支持的标准函数。
 
@@ -23341,19 +25059,17 @@ Gate USDT本位永续与交割合约、币本位（BTC结算）永续合约，�
 
 - `exchange.GetRecords`：原生周期为10秒、30秒、1分钟、5分钟、15分钟、30分钟、1小时、2小时、4小时、6小时、8小时、12小时、1天、1周、1月；其它周期由托管者合成。
 
-所有交易所的对照见`能力矩阵`。
+##### 保证金、账户与模拟盘
 
-**保证金、账户与模拟盘**
-
-全部交易所对象
+###### 全部交易所对象
 
 模拟盘：勾选「模拟盘」使用Gate测试网（```api-testnet.gateapi.io```），需要使用测试网的API KEY。
 
-```GateIO```（现货）
+###### ```GateIO```（现货）
 
 账户：默认为普通现货账户，用```exchange.IO("trade_margin")```、```exchange.IO("trade_super_margin")```切换到逐仓、全仓杠杆账户。账户是否为统一账户在首次私有请求时自动探测，也可以用```exchange.IO("unified", bool)```指定。
 
-```Futures_GateIO```（期货）
+###### ```Futures_GateIO```（期货）
 
 保证金模式：Gate用杠杆值表示保证金模式（杠杆为0即全仓）。```exchange.SetMarginLevel()```先查询该合约当前的模式再设置杠杆，不会改变全仓/逐仓：全仓永续调整的是全仓杠杆上限；交割合约全仓时杠杆固定为0。用```exchange.IO("cross", bool)```切换全仓/逐仓。
 
@@ -23361,9 +25077,9 @@ Gate USDT本位永续与交割合约、币本位（BTC结算）永续合约，�
 
 账户：账户是否为统一账户在首次私有请求时自动探测，也可以用```exchange.IO("unified", bool)```指定。经典账户的永续、交割、期权分属不同钱包，USDT本位与币本位也分开：```exchange.GetAccount()```、```exchange.GetAssets()```只返回当前合约所在钱包的资产。
 
-**期权**
+##### 期权
 
-```Futures_GateIO```（期货）
+###### ```Futures_GateIO```（期货）
 
 支持Gate的USDT期权，```exchange.GetMarkets()```的结果包含期权合约。账户没有开通期权时，查询订单、持仓会返回交易所的错误。期权不支持条件单、改单（```exchange.ModifyOrder()```）、```exchange.SetMarginLevel()```，也不能用```cross```切换保证金模式。
 
@@ -23371,14 +25087,14 @@ Gate USDT本位永续与交割合约、币本位（BTC结算）永续合约，�
 
 期权代码为Gate原生代码：标的-到期日（YYYYMMDD）-行权价-C/P，代码中的标的必须与交易对一致。交易对设置为```BTC_USDT```，完整品种代码形如```BTC_USDT.BTC_USDT-20261225-65000-C```。
 
-**注意事项**
+##### 注意事项
 
-```GateIO```（现货）
+###### ```GateIO```（现货）
 
 - 市价单默认以```fok```（全部成交或撤销）提交，可以在下单附加参数中传```time_in_force```覆盖。
 - 条件单只支持止盈、止损单，不支持OCO；不支持修改条件单，需要先撤销再重新创建。
 
-```Futures_GateIO```（期货）
+###### ```Futures_GateIO```（期货）
 
 - 条件单只支持止盈、止损单，不支持OCO。```exchange.ModifyConditionOrder()```只支持永续合约（原地修改），交割合约需要先撤销再重新创建。
 - ```exchange.GetHistoryConditionOrders()```不支持```since```参数（交易所接口不能按时间过滤），传入时报错。
@@ -23387,26 +25103,22 @@ Gate USDT本位永续与交割合约、币本位（BTC结算）永续合约，�
 
 Gemini现货。
 
-**名称**
+##### 名称与配置
 
-| ```exchange.GetName()``` | 类型 | 别名 |
-| - | - | - |
-| ```Gemini``` | 现货 | — |
+```exchange.GetName()```：```Gemini```（现货）。
 
-**配置项**
+| 配置项 | 必填 |
+| - | - |
+| Access Key | 是 |
+| Secret Key | 是 |
 
-| 配置项 | 必填 | 默认值 | 说明 |
-| - | - | - | - |
-| Access Key | 是 | — | — |
-| Secret Key | 是 | — | — |
-
-**交易对与合约代码**
+##### 交易对与合约代码
 
 交易对示例：```BTC_USD```、```ETH_BTC```、```BTC_USDT```
 
 交易对写作```BASE_QUOTE```，对应Gemini原生代码```btcusd```。
 
-**专属IO指令**
+##### 专属IO指令
 
 | 指令 | 参数 | 说明 |
 | - | - | - |
@@ -23414,7 +25126,7 @@ Gemini现货。
 
 通用指令```api```、```base```、```currency```见`exchange.IO`。
 
-**不支持与合成的函数**
+##### 函数支持差异
 
 不支持（调用时报错并返回空值）：`exchange.GetTickers`、`exchange.ModifyOrder`、`exchange.CreateConditionOrder`、`exchange.ModifyConditionOrder`、`exchange.CancelConditionOrder`、`exchange.GetConditionOrder`、`exchange.GetConditionOrders`、`exchange.GetHistoryConditionOrders`。
 
@@ -23422,9 +25134,7 @@ Gemini现货。
 
 - `exchange.GetRecords`：原生周期为1分钟、5分钟、15分钟、30分钟、1小时、6小时、1天；其它周期由托管者合成。
 
-所有交易所的对照见`能力矩阵`。
-
-**注意事项**
+##### 注意事项
 
 - 不支持市价单，只能下限价单；支持IOC、FOK与只做Maker（```postOnly```）。
 - ```exchange.GetHistoryOrders()```不支持```since```参数，传入时报错；单次最多返回500条。
@@ -23434,30 +25144,22 @@ Gemini现货。
 
 HashKey现货（接口地址```https://api-pro.hashkey.com```）。
 
-**名称**
+##### 名称与配置
 
-| ```exchange.GetName()``` | 类型 | 别名 |
-| - | - | - |
-| ```HashKey``` | 现货 | — |
+```exchange.GetName()```：```HashKey```（现货）。
 
-**配置项**
+| 配置项 | 必填 |
+| - | - |
+| Access Key | 是 |
+| Secret Key | 是 |
 
-| 配置项 | 必填 | 默认值 | 说明 |
-| - | - | - | - |
-| Access Key | 是 | — | — |
-| Secret Key | 是 | — | — |
-
-**交易对与合约代码**
+##### 交易对与合约代码
 
 交易对示例：```BTC_USDT```、```ETH_USD```、```BTC_HKD```
 
 交易对写作```BASE_QUOTE```，对应HashKey原生代码```BTCUSDT```；有HKD计价的交易对。
 
-**专属IO指令**
-
-没有专属指令，通用指令见`exchange.IO`。
-
-**不支持与合成的函数**
+##### 函数支持差异
 
 不支持（调用时报错并返回空值）：`exchange.ModifyOrder`、`exchange.CreateConditionOrder`、`exchange.ModifyConditionOrder`、`exchange.CancelConditionOrder`、`exchange.GetConditionOrder`、`exchange.GetConditionOrders`、`exchange.GetHistoryConditionOrders`。
 
@@ -23465,9 +25167,7 @@ HashKey现货（接口地址```https://api-pro.hashkey.com```）。
 
 - `exchange.GetRecords`：原生周期为1分钟、3分钟、5分钟、15分钟、30分钟、1小时、2小时、4小时、6小时、8小时、12小时、1天、1周、1月；其它周期由托管者合成。
 
-所有交易所的对照见`能力矩阵`。
-
-**注意事项**
+##### 注意事项
 
 - 限价单支持IOC、FOK与只做Maker（```postOnly```，对应HashKey的```LIMIT_MAKER```）；市价单不支持只做Maker与FOK，传入时报错。
 
@@ -23475,30 +25175,22 @@ HashKey现货（接口地址```https://api-pro.hashkey.com```）。
 
 HitBTC现货。
 
-**名称**
+##### 名称与配置
 
-| ```exchange.GetName()``` | 类型 | 别名 |
-| - | - | - |
-| ```HitBTC``` | 现货 | — |
+```exchange.GetName()```：```HitBTC```（现货）。
 
-**配置项**
+| 配置项 | 必填 |
+| - | - |
+| Access Key | 是 |
+| Secret Key | 是 |
 
-| 配置项 | 必填 | 默认值 | 说明 |
-| - | - | - | - |
-| Access Key | 是 | — | — |
-| Secret Key | 是 | — | — |
-
-**交易对与合约代码**
+##### 交易对与合约代码
 
 交易对示例：```BTC_USDT```、```ETH_BTC```
 
 交易对写作```BASE_QUOTE```，对应HitBTC原生代码```BTCUSDT```。
 
-**专属IO指令**
-
-没有专属指令，通用指令见`exchange.IO`。
-
-**不支持与合成的函数**
+##### 函数支持差异
 
 没有不支持的标准函数。
 
@@ -23506,9 +25198,7 @@ HitBTC现货。
 
 - `exchange.GetRecords`：原生周期为1分钟、3分钟、5分钟、15分钟、30分钟、1小时、4小时、1天、1周、1月；其它周期由托管者合成。
 
-所有交易所的对照见`能力矩阵`。
-
-**注意事项**
+##### 注意事项
 
 - 现货市价买单的下单量是交易币数，不是计价币金额（按HitBTC的```quantity```下单）。
 - 限价单支持IOC、FOK与只做Maker（```postOnly```）。
@@ -23517,37 +25207,31 @@ HitBTC现货。
 
 #### 火币
 
-```Huobi```（现货）
+```Huobi```（现货）：HTX（火币）现货，以及逐仓、全仓杠杆账户。
 
-HTX（火币）现货，以及逐仓、全仓杠杆账户。
+```Futures_HuobiDM```（期货）：HTX（火币）U本位（USDT）永续与交割合约、币本位永续与交割合约。经典账户、统一账户与多资产保证金模式都支持。
 
-```Futures_HuobiDM```（期货）
-
-HTX（火币）U本位（USDT）永续与交割合约、币本位永续与交割合约。经典账户、统一账户与多资产保证金模式都支持。
-
-**名称**
+##### 名称与配置
 
 | ```exchange.GetName()``` | 类型 | 别名 |
 | - | - | - |
 | ```Huobi``` | 现货 | 火币现货 |
 | ```Futures_HuobiDM``` | 期货 | Futures_HTX、HuobiDM、HTX期货、火币期货 |
 
-**配置项**
+| 配置项 | 必填 |
+| - | - |
+| Access Key | 是 |
+| Secret Key | 是 |
 
-| 配置项 | 必填 | 默认值 | 说明 |
-| - | - | - | - |
-| Access Key | 是 | — | — |
-| Secret Key | 是 | — | — |
+##### 交易对与合约代码
 
-**交易对与合约代码**
-
-```Huobi```（现货）
+###### ```Huobi```（现货）
 
 交易对示例：```BTC_USDT```、```ETH_BTC```
 
 交易对写作```BTC_USDT```，不带合约代码；合约请使用Futures_HuobiDM交易所对象。支持火币的中文交易对，例如```币安人生_USDT```。
 
-```Futures_HuobiDM```（期货）
+###### ```Futures_HuobiDM```（期货）
 
 交易对示例：```BTC_USDT```、```BTC_USD```
 
@@ -23567,19 +25251,19 @@ HTX（火币）U本位（USDT）永续与交割合约、币本位永续与交割
 
 交割合约也可以直接写HTX的原生合约代码：U本位形如```BTC_USDT.BTC-USDT-260925```，币本位形如```BTC_USD.BTC260925```。
 
-**专属IO指令**
+##### 专属IO指令
 
-```Huobi```（现货）
+###### ```Huobi```（现货）
 
-| 指令 | 参数 | 说明 | 返回值 |
-| - | - | - | - |
-| ```"trade_margin"``` | — | 切换为逐仓杠杆账户，之后下单使用该交易对的逐仓杠杆账户（```source=margin-api```）。 | 指令名本身（```"trade_margin"```）。 |
-| ```"trade_super_margin"``` | — | 切换为全仓杠杆账户，之后下单与查询余额使用全仓杠杆账户（```source=super-margin-api```）。 | 指令名本身（```"trade_super_margin"```）。 |
-| ```"trade_normal"``` | — | 切换回普通现货账户（默认）。 | 指令名本身（```"trade_normal"```）。 |
+| 指令 | 说明 | 返回值 |
+| - | - | - |
+| ```"trade_margin"``` | 切换为逐仓杠杆账户，之后下单使用该交易对的逐仓杠杆账户（```source=margin-api```）。 | 指令名本身（```"trade_margin"```）。 |
+| ```"trade_super_margin"``` | 切换为全仓杠杆账户，之后下单与查询余额使用全仓杠杆账户（```source=super-margin-api```）。 | 指令名本身（```"trade_super_margin"```）。 |
+| ```"trade_normal"``` | 切换回普通现货账户（默认）。 | 指令名本身（```"trade_normal"```）。 |
 
 通用指令```api```、```base```、```currency```见`exchange.IO`。
 
-```Futures_HuobiDM```（期货）
+###### ```Futures_HuobiDM```（期货）
 
 | 指令 | 参数 | 说明 | 返回值 |
 | - | - | - | - |
@@ -23590,33 +25274,31 @@ HTX（火币）U本位（USDT）永续与交割合约、币本位永续与交割
 
 通用指令```api```、```base```、```currency```见`exchange.IO`。
 
-**不支持与合成的函数**
+##### 函数支持差异
 
-全部交易所对象
+###### 全部交易所对象
 
 不支持（调用时报错并返回空值）：`exchange.ModifyOrder`、`exchange.ModifyConditionOrder`。
 
-```Huobi```（现货）
+###### ```Huobi```（现货）
 
 以回退方式支持：
 
 - `exchange.GetRecords`：原生周期为1分钟、5分钟、15分钟、30分钟、1小时、4小时、1天、1周、1月、1年；其它周期由托管者合成。
 
-```Futures_HuobiDM```（期货）
+###### ```Futures_HuobiDM```（期货）
 
 以回退方式支持：
 
 - `exchange.GetRecords`：原生周期为1分钟、5分钟、15分钟、30分钟、1小时、4小时、1天、1周、1月；其它周期由托管者合成。
 
-所有交易所的对照见`能力矩阵`。
+##### 保证金、账户与模拟盘
 
-**保证金、账户与模拟盘**
-
-```Huobi```（现货）
+###### ```Huobi```（现货）
 
 账户：钱包模式只保存在本地，切换后下单与查询余额使用对应的杠杆账户。逐仓杠杆账户按交易对区分，```exchange.GetAccount()```、```exchange.GetAssets()```不能确定是哪个交易对的逐仓账户，在逐仓模式下调用会报错。
 
-```Futures_HuobiDM```（期货）
+###### ```Futures_HuobiDM```（期货）
 
 保证金模式：U本位合约默认全仓，用```exchange.IO("cross", false)```切换为逐仓（只影响之后的下单）；币本位合约为逐仓。
 
@@ -23624,13 +25306,13 @@ HTX（火币）U本位（USDT）永续与交割合约、币本位永续与交割
 
 账户：连接器自动探测U本位账户的形态（经典、统一账户、多资产保证金），按形态使用对应的接口；用```exchange.IO("unified", bool)```切换账户类型后重新探测。
 
-**注意事项**
+##### 注意事项
 
-```Huobi```（现货）
+###### ```Huobi```（现货）
 
 - 条件单只支持普通现货账户，只支持止盈、止损单，不支持OCO。
 
-```Futures_HuobiDM```（期货）
+###### ```Futures_HuobiDM```（期货）
 
 - 条件单只支持止盈、止损单，不支持OCO；多资产保证金模式下同样可以使用条件单。
 
@@ -23638,30 +25320,22 @@ HTX（火币）U本位（USDT）永续与交割合约、币本位永续与交割
 
 Korbit（韩国）现货，KRW市场。
 
-**名称**
+##### 名称与配置
 
-| ```exchange.GetName()``` | 类型 | 别名 |
-| - | - | - |
-| ```Korbit``` | 现货 | — |
+```exchange.GetName()```：```Korbit```（现货）。
 
-**配置项**
+| 配置项 | 必填 |
+| - | - |
+| Access Key | 是 |
+| Secret Key | 是 |
 
-| 配置项 | 必填 | 默认值 | 说明 |
-| - | - | - | - |
-| Access Key | 是 | — | — |
-| Secret Key | 是 | — | — |
-
-**交易对与合约代码**
+##### 交易对与合约代码
 
 交易对示例：```BTC_KRW```、```ETH_KRW```
 
 交易对写作```BASE_QUOTE```，对应Korbit原生代码```btc_krw```。
 
-**专属IO指令**
-
-没有专属指令，通用指令见`exchange.IO`。
-
-**不支持与合成的函数**
+##### 函数支持差异
 
 不支持（调用时报错并返回空值）：`exchange.ModifyOrder`、`exchange.CreateConditionOrder`、`exchange.ModifyConditionOrder`、`exchange.CancelConditionOrder`、`exchange.GetConditionOrder`、`exchange.GetConditionOrders`、`exchange.GetHistoryConditionOrders`。
 
@@ -23669,46 +25343,38 @@ Korbit（韩国）现货，KRW市场。
 
 - `exchange.GetRecords`：原生周期为1分钟、5分钟、15分钟、30分钟、1小时、4小时、1天、1周；其它周期由托管者合成。
 
-所有交易所的对照见`能力矩阵`。
-
-**注意事项**
+##### 注意事项
 
 - 只支持GTC限价单与市价单：指定```tif```为```"ioc"```、```"fok"```或```postOnly```时报错。
 - ```exchange.GetOrders()```不传```symbol```参数时只查询当前交易对。
 
 #### Kraken
 
-```Kraken```（现货）
+```Kraken```（现货）：Kraken现货交易。
 
-Kraken现货交易。
+```Futures_Kraken```（期货）：Kraken期货：反向（币本位）永续与交割合约、多币种抵押（线性）永续与交割合约，以及Kraken期货的期权。
 
-```Futures_Kraken```（期货）
-
-Kraken期货：反向（币本位）永续与交割合约、多币种抵押（线性）永续与交割合约，以及Kraken期货的期权。
-
-**名称**
+##### 名称与配置
 
 | ```exchange.GetName()``` | 类型 | 别名 |
 | - | - | - |
 | ```Kraken``` | 现货 | — |
 | ```Futures_Kraken``` | 期货 | Kraken期货、Kraken Futures |
 
-**配置项**
+| 配置项 | 必填 |
+| - | - |
+| Access Key | 是 |
+| Secret Key | 是 |
 
-| 配置项 | 必填 | 默认值 | 说明 |
-| - | - | - | - |
-| Access Key | 是 | — | — |
-| Secret Key | 是 | — | — |
+##### 交易对与合约代码
 
-**交易对与合约代码**
-
-```Kraken```（现货）
+###### ```Kraken```（现货）
 
 交易对示例：```BTC_USD```、```ETH_USDT```、```BTC_EUR```
 
 交易对写作```BASE_QUOTE```。Kraken把BTC写作```XBT```、DOGE写作```XDG```，交易对用```BTC```、```DOGE```即可（写```XBT_USD```也可以），返回的品种代码统一用```BTC```、```DOGE```。
 
-```Futures_Kraken```（期货）
+###### ```Futures_Kraken```（期货）
 
 交易对示例：```BTC_USD```、```ETH_USD```
 
@@ -23735,13 +25401,13 @@ Kraken只挂月度和季度交割合约，```this_week```、```month```都指最
 
 也可以直接使用Kraken的原生合约代码（```PI_```、```PF_```、```FI_```、```FF_```前缀），例如```ETH_USD.FF_ETHUSD_250307```。
 
-**专属IO指令**
+##### 专属IO指令
 
-```Kraken```（现货）
+###### ```Kraken```（现货）
 
 没有专属指令，通用指令见`exchange.IO`。
 
-```Futures_Kraken```（期货）
+###### ```Futures_Kraken```（期货）
 
 | 指令 | 参数 | 说明 | 返回值 |
 | - | - | - | - |
@@ -23749,37 +25415,35 @@ Kraken只挂月度和季度交割合约，```this_week```、```month```都指最
 
 通用指令```api```、```base```、```currency```见`exchange.IO`。
 
-**不支持与合成的函数**
+##### 函数支持差异
 
-全部交易所对象
+###### 全部交易所对象
 
 没有不支持的标准函数。
 
-```Kraken```（现货）
+###### ```Kraken```（现货）
 
 以回退方式支持：
 
 - `exchange.GetRecords`：原生周期为1分钟、5分钟、15分钟、30分钟、1小时、4小时、1天、1周、15天；其它周期由托管者合成。
 
-```Futures_Kraken```（期货）
+###### ```Futures_Kraken```（期货）
 
 以回退方式支持：
 
 - `exchange.GetRecords`：原生周期为1分钟、5分钟、15分钟、30分钟、1小时、4小时、12小时、1天、1周；其它周期由托管者合成。
 
-所有交易所的对照见`能力矩阵`。
+##### 保证金、账户与模拟盘
 
-**保证金、账户与模拟盘**
-
-```Futures_Kraken```（期货）
+###### ```Futures_Kraken```（期货）
 
 保证金模式：只有多币种抵押合约（```swap_pf```、```*_ff```）可以切换全仓/逐仓和设置杠杆，反向合约与期权调用```exchange.IO("cross", ...)```、```exchange.SetMarginLevel()```报错。Kraken以杠杆偏好表达保证金模式：```exchange.SetMarginLevel()```设置杠杆上限的同时会把该合约切换为逐仓，```exchange.IO("cross", true)```取消杠杆上限、恢复全仓。
 
 账户：反向合约使用各自的单币种钱包，```exchange.GetAccount()```的```Stocks```为该钱包的可用币数；多币种抵押合约与期权使用多币种抵押钱包，```Balance```为以USD计价的可用保证金。
 
-**期权**
+##### 期权
 
-```Futures_Kraken```（期货）
+###### ```Futures_Kraken```（期货）
 
 支持Kraken期货的期权。限制：
 
@@ -23791,15 +25455,15 @@ Kraken只挂月度和季度交割合约，```this_week```、```month```都指最
 
 期权代码为Kraken原生代码：```OF_```、标的与计价币、到期日（YYMMDD）、行权价、C/P，C为看涨、P为看跌。代码中的标的与计价币必须与交易对一致，BTC写作```XBT```，完整品种代码形如```ETH_USD.OF_ETHUSD_261225_4000_C```。
 
-**注意事项**
+##### 注意事项
 
-```Kraken```（现货）
+###### ```Kraken```（现货）
 
 - 现货市价买单的下单量是交易币数（Kraken的```volume```），不是计价币金额。
 - 条件单只支持止盈、止损单，不支持OCO。
 - 下单支持```tif```的IOC与只做Maker（```postOnly```，仅限价委托），不支持FOK，传入时报错。
 
-```Futures_Kraken```（期货）
+###### ```Futures_Kraken```（期货）
 
 - 下单量为Kraken的合约数量：反向合约每张1 USD，多币种抵押合约以标的币数计（见`exchange.GetMarkets`的```CtVal```、```CtValCcy```）。
 - Kraken的资金费率原始值是每张合约的绝对金额，```exchange.GetFundings()```已换算为相对费率；永续合约每小时结算一次。
@@ -23808,41 +25472,35 @@ Kraken只挂月度和季度交割合约，```this_week```、```month```都指最
 
 #### 库币
 
-```KuCoin```（现货）
+```KuCoin```（现货）：KuCoin现货交易。
 
-KuCoin现货交易。
+```Futures_KuCoin```（期货）：KuCoin合约：USDT、USDC保证金永续合约，币本位永续与交割合约。
 
-```Futures_KuCoin```（期货）
-
-KuCoin合约：USDT、USDC保证金永续合约，币本位永续与交割合约。
-
-**名称**
+##### 名称与配置
 
 | ```exchange.GetName()``` | 类型 | 别名 |
 | - | - | - |
 | ```KuCoin``` | 现货 | — |
 | ```Futures_KuCoin``` | 期货 | KuCoin期货、KuCoin Futures |
 
-**配置项**
-
 ✓ 表示该交易所对象有这个配置项。
 
-| 配置项 | ```KuCoin``` | ```Futures_KuCoin``` | 必填 | 默认值 | 说明 |
-| - | - | - | - | - | - |
-| Access Key | ✓ | ✓ | 是 | — | — |
-| Secret Key | ✓ | ✓ | 是 | — | — |
-| Password | ✓ |  | 是 | — | 创建API Key时设置的Passphrase。 |
-| Passphrase |  | ✓ | 是 | — | — |
+| 配置项 | ```KuCoin``` | ```Futures_KuCoin``` | 必填 | 说明 |
+| - | - | - | - | - |
+| Access Key | ✓ | ✓ | 是 | — |
+| Secret Key | ✓ | ✓ | 是 | — |
+| Password | ✓ |  | 是 | 创建API Key时设置的Passphrase。 |
+| Passphrase |  | ✓ | 是 | — |
 
-**交易对与合约代码**
+##### 交易对与合约代码
 
-```KuCoin```（现货）
+###### ```KuCoin```（现货）
 
 交易对示例：```BTC_USDT```、```ETH_BTC```
 
 交易对写作```BASE_QUOTE```，对应KuCoin的```BASE-QUOTE```交易对，大小写不敏感。
 
-```Futures_KuCoin```（期货）
+###### ```Futures_KuCoin```（期货）
 
 交易对示例：```BTC_USDT```、```BTC_USDC```、```BTC_USD```
 
@@ -23860,13 +25518,13 @@ KuCoin合约：USDT、USDC保证金永续合约，币本位永续与交割合约
 
 更远期的交割合约使用KuCoin的原生合约代码（全大写、带数字），例如交易对```BTC_USD```、合约代码```XBTMZ26```；`exchange.GetMarkets`中第三个及以后到期的交割合约也以原生代码为合约代码。
 
-**专属IO指令**
+##### 专属IO指令
 
-```KuCoin```（现货）
+###### ```KuCoin```（现货）
 
 没有专属指令，通用指令见`exchange.IO`。
 
-```Futures_KuCoin```（期货）
+###### ```Futures_KuCoin```（期货）
 
 | 指令 | 参数 | 说明 | 返回值 |
 | - | - | - | - |
@@ -23874,9 +25532,9 @@ KuCoin合约：USDT、USDC保证金永续合约，币本位永续与交割合约
 
 通用指令```api```、```base```、```currency```见`exchange.IO`。
 
-**不支持与合成的函数**
+##### 函数支持差异
 
-```KuCoin```（现货）
+###### ```KuCoin```（现货）
 
 不支持（调用时报错并返回空值）：`exchange.ModifyConditionOrder`。
 
@@ -23884,7 +25542,7 @@ KuCoin合约：USDT、USDC保证金永续合约，币本位永续与交割合约
 
 - `exchange.GetRecords`：原生周期为1分钟、3分钟、5分钟、15分钟、30分钟、1小时、2小时、4小时、6小时、8小时、12小时、1天、1周；其它周期由托管者合成。
 
-```Futures_KuCoin```（期货）
+###### ```Futures_KuCoin```（期货）
 
 不支持（调用时报错并返回空值）：`exchange.ModifyOrder`、`exchange.ModifyConditionOrder`。
 
@@ -23892,11 +25550,9 @@ KuCoin合约：USDT、USDC保证金永续合约，币本位永续与交割合约
 
 - `exchange.GetRecords`：原生周期为1分钟、5分钟、15分钟、30分钟、1小时、2小时、4小时、8小时、12小时、1天、1周；其它周期由托管者合成。
 
-所有交易所的对照见`能力矩阵`。
+##### 保证金、账户与模拟盘
 
-**保证金、账户与模拟盘**
-
-```Futures_KuCoin```（期货）
+###### ```Futures_KuCoin```（期货）
 
 保证金模式：用```exchange.IO("cross", bool)```切换全仓/逐仓（默认全仓）。交易所的保证金模式按合约设置，但交易所对象只记住最后一次切换的模式并随所有订单带上；KuCoin要求订单的保证金模式与该合约的当前设置一致，切换了A合约后再给保证金模式不同的B合约下单会被交易所拒绝。
 
@@ -23904,13 +25560,13 @@ KuCoin合约：USDT、USDC保证金永续合约，币本位永续与交割合约
 
 账户：KuCoin合约没有设置杠杆的接口，```exchange.SetMarginLevel()```只在本地记下每个合约的杠杆，下单时随订单发送（未设置时为10倍）。全仓模式下交易所按该合约在交易所的杠杆设置计算，不按订单里的杠杆。
 
-**注意事项**
+##### 注意事项
 
-```KuCoin```（现货）
+###### ```KuCoin```（现货）
 
 - 条件单只支持止盈、止损单，不支持OCO（KuCoin没有OCO接口）；不支持修改条件单，需要先撤销再重新创建。条件单与普通订单分属两个订单空间，撤销、查询条件单使用条件单函数。
 
-```Futures_KuCoin```（期货）
+###### ```Futures_KuCoin```（期货）
 
 - 下单量为合约张数，必须是正整数。
 - 限价单支持```tif```的IOC与只做Maker（```postOnly```），不支持FOK；市价单不支持这些选项，传入时报错。
@@ -23920,30 +25576,22 @@ KuCoin合约：USDT、USDC保证金永续合约，币本位永续与交割合约
 
 LBank现货。
 
-**名称**
+##### 名称与配置
 
-| ```exchange.GetName()``` | 类型 | 别名 |
-| - | - | - |
-| ```LBank``` | 现货 | — |
+```exchange.GetName()```：```LBank```（现货）。
 
-**配置项**
+| 配置项 | 必填 |
+| - | - |
+| Access Key | 是 |
+| Secret Key | 是 |
 
-| 配置项 | 必填 | 默认值 | 说明 |
-| - | - | - | - |
-| Access Key | 是 | — | — |
-| Secret Key | 是 | — | — |
-
-**交易对与合约代码**
+##### 交易对与合约代码
 
 交易对示例：```BTC_USDT```、```ETH_USDT```
 
 交易对写作```BASE_QUOTE```，对应LBank原生代码```btc_usdt```。
 
-**专属IO指令**
-
-没有专属指令，通用指令见`exchange.IO`。
-
-**不支持与合成的函数**
+##### 函数支持差异
 
 不支持（调用时报错并返回空值）：`exchange.ModifyOrder`、`exchange.CreateConditionOrder`、`exchange.ModifyConditionOrder`、`exchange.CancelConditionOrder`、`exchange.GetConditionOrder`、`exchange.GetConditionOrders`、`exchange.GetHistoryConditionOrders`。
 
@@ -23951,9 +25599,7 @@ LBank现货。
 
 - `exchange.GetRecords`：原生周期为1分钟、5分钟、15分钟、30分钟、1小时、4小时、8小时、12小时、1天、1周、1月；其它周期由托管者合成。
 
-所有交易所的对照见`能力矩阵`。
-
-**注意事项**
+##### 注意事项
 
 - 限价单支持只做Maker（```postOnly```）与```tif```（IOC、FOK）选项；市价单不支持这些选项，传入时报错。
 - 查询未完成订单的接口必须指定交易对：```exchange.GetOrders()```不传```symbol```参数时只查询当前交易对。
@@ -23962,22 +25608,16 @@ LBank现货。
 
 #### MEXC
 
-```MEXC```（现货）
+```MEXC```（现货）：MEXC（抹茶）现货交易，使用MEXC V3接口。
 
-MEXC（抹茶）现货交易，使用MEXC V3接口。
+```Futures_MEXC```（期货）：MEXC（抹茶）永续合约：USDT、USDC保证金合约与币本位合约。
 
-```Futures_MEXC```（期货）
-
-MEXC（抹茶）永续合约：USDT、USDC保证金合约与币本位合约。
-
-**名称**
+##### 名称与配置
 
 | ```exchange.GetName()``` | 类型 | 别名 |
 | - | - | - |
 | ```MEXC``` | 现货 | 抹茶 |
 | ```Futures_MEXC``` | 期货 | 抹茶期货、MEXC期货、MEXC Futures |
-
-**配置项**
 
 ✓ 表示该交易所对象有这个配置项。
 
@@ -23987,15 +25627,15 @@ MEXC（抹茶）永续合约：USDT、USDC保证金合约与币本位合约。
 | Secret Key | ✓ | ✓ | 是 | — | — |
 | V3协议 | ✓ |  | 否 | 勾选 | 兼容旧配置保留的选项，连接器固定使用V3接口，勾选与否不影响。 |
 
-**交易对与合约代码**
+##### 交易对与合约代码
 
-```MEXC```（现货）
+###### ```MEXC```（现货）
 
 交易对示例：```BTC_USDT```、```ETH_USDC```
 
 交易对写作```BASE_QUOTE```，大小写不敏感。
 
-```Futures_MEXC```（期货）
+###### ```Futures_MEXC```（期货）
 
 交易对示例：```BTC_USDT```、```BTC_USDC```、```BTC_USD```
 
@@ -24007,13 +25647,13 @@ MEXC（抹茶）永续合约：USDT、USDC保证金合约与币本位合约。
 
 MEXC合约只有永续合约，其它合约代码会报错。
 
-**专属IO指令**
+##### 专属IO指令
 
-```MEXC```（现货）
+###### ```MEXC```（现货）
 
 没有专属指令，通用指令见`exchange.IO`。
 
-```Futures_MEXC```（期货）
+###### ```Futures_MEXC```（期货）
 
 | 指令 | 参数 | 说明 | 返回值 |
 | - | - | - | - |
@@ -24021,9 +25661,9 @@ MEXC合约只有永续合约，其它合约代码会报错。
 
 通用指令```api```、```base```、```currency```见`exchange.IO`。
 
-**不支持与合成的函数**
+##### 函数支持差异
 
-```MEXC```（现货）
+###### ```MEXC```（现货）
 
 不支持（调用时报错并返回空值）：`exchange.ModifyOrder`、`exchange.CreateConditionOrder`、`exchange.ModifyConditionOrder`、`exchange.CancelConditionOrder`、`exchange.GetConditionOrder`、`exchange.GetConditionOrders`、`exchange.GetHistoryConditionOrders`。
 
@@ -24031,7 +25671,7 @@ MEXC合约只有永续合约，其它合约代码会报错。
 
 - `exchange.GetRecords`：原生周期为1分钟、5分钟、15分钟、30分钟、1小时、4小时、1天、1周、1月；其它周期由托管者合成。
 
-```Futures_MEXC```（期货）
+###### ```Futures_MEXC```（期货）
 
 不支持（调用时报错并返回空值）：`exchange.ModifyConditionOrder`。
 
@@ -24039,23 +25679,21 @@ MEXC合约只有永续合约，其它合约代码会报错。
 
 - `exchange.GetRecords`：原生周期为1分钟、5分钟、15分钟、30分钟、1小时、4小时、8小时、1天、1周、1月；其它周期由托管者合成。
 
-所有交易所的对照见`能力矩阵`。
+##### 保证金、账户与模拟盘
 
-**保证金、账户与模拟盘**
-
-```Futures_MEXC```（期货）
+###### ```Futures_MEXC```（期货）
 
 保证金模式：用```exchange.IO("cross", bool)```选择全仓/逐仓，下单时随订单发送；`exchange.GetPositions`只返回与当前选择的保证金模式一致的持仓。
 
 账户：```exchange.SetMarginLevel()```在全仓模式下向交易所修改该合约多、空两侧的杠杆；逐仓模式下只在本地记下杠杆，下单时随订单发送。逐仓下单时没有设置过杠杆，会先向交易所查询该合约当前的逐仓杠杆。
 
-**注意事项**
+##### 注意事项
 
-```MEXC```（现货）
+###### ```MEXC```（现货）
 
 - MEXC现货查询挂单的接口必须指定交易对：```exchange.GetOrders()```不传参数时只查询当前交易对的挂单，不是所有交易对的挂单。
 
-```Futures_MEXC```（期货）
+###### ```Futures_MEXC```（期货）
 
 - `exchange.GetFundings`不支持批量查询，需要传入具体品种代码，例如```BTC_USDT.swap```。
 - 条件单只支持止盈、止损单，不支持OCO；不支持修改条件单；条件单不能使用自定义订单号（clientId）。条件单以最新成交价触发，有效期为24小时，到期自动失效。
@@ -24063,22 +25701,16 @@ MEXC合约只有永续合约，其它合约代码会报错。
 
 #### OKX
 
-```OKEX```（现货）
+```OKEX```（现货）：OKX（欧易）现货，以及同一账户下的现货杠杆交易（逐仓、全仓）。使用OKX V5接口。
 
-OKX（欧易）现货，以及同一账户下的现货杠杆交易（逐仓、全仓）。使用OKX V5接口。
+```Futures_OKCoin```（期货）：OKX（欧易）永续合约（USDT、USDC保证金与币本位）、交割合约（币本位、USDT保证金、USD保证金）以及期权。使用OKX V5接口。
 
-```Futures_OKCoin```（期货）
-
-OKX（欧易）永续合约（USDT、USDC保证金与币本位）、交割合约（币本位、USDT保证金、USD保证金）以及期权。使用OKX V5接口。
-
-**名称**
+##### 名称与配置
 
 | ```exchange.GetName()``` | 类型 | 别名 |
 | - | - | - |
 | ```OKEX``` | 现货 | 欧易、OKX现货 |
 | ```Futures_OKCoin``` | 期货 | Futures_OKX、OKX期货、欧易期货 |
-
-**配置项**
 
 | 配置项 | 必填 | 默认值 | 说明 |
 | - | - | - | - |
@@ -24088,15 +25720,15 @@ OKX（欧易）永续合约（USDT、USDC保证金与币本位）、交割合约
 | V5协议 | 否 | 勾选 | 兼容保留，连接器始终使用OKX V5接口，勾选与否不影响。 |
 | 模拟盘 | 否 | 不勾选 | — |
 
-**交易对与合约代码**
+##### 交易对与合约代码
 
-```OKEX```（现货）
+###### ```OKEX```（现货）
 
 交易对示例：```BTC_USDT```、```ETH_BTC```
 
 交易对写作```BTC_USDT```（对应OKX的```BTC-USDT```），不带合约代码；合约请使用Futures_OKCoin交易所对象。
 
-```Futures_OKCoin```（期货）
+###### ```Futures_OKCoin```（期货）
 
 交易对示例：```BTC_USDT```、```BTC_USDC```、```BTC_USD```、```BTC_USD_UM```
 
@@ -24120,9 +25752,9 @@ OKX（欧易）永续合约（USDT、USDC保证金与币本位）、交割合约
 
 交割合约也可以直接写OKX的原生合约代码，包括没有固定周期的盘前交易合约：交易对设置为```HMSTR_USDT```，再```exchange.SetContractType("HMSTR-USDT-250207")```；支持```symbol```参数的函数可以写成```HMSTR_USDT.HMSTR-USDT-250207```。
 
-**专属IO指令**
+##### 专属IO指令
 
-```OKEX```（现货）
+###### ```OKEX```（现货）
 
 | 指令 | 参数 | 说明 | 返回值 |
 | - | - | - | - |
@@ -24134,7 +25766,7 @@ OKX（欧易）永续合约（USDT、USDC保证金与币本位）、交割合约
 
 通用指令```api```、```base```、```currency```见`exchange.IO`。
 
-```Futures_OKCoin```（期货）
+###### ```Futures_OKCoin```（期货）
 
 | 指令 | 参数 | 说明 | 返回值 |
 | - | - | - | - |
@@ -24145,7 +25777,7 @@ OKX（欧易）永续合约（USDT、USDC保证金与币本位）、交割合约
 
 通用指令```api```、```base```、```currency```见`exchange.IO`。
 
-**不支持与合成的函数**
+##### 函数支持差异
 
 没有不支持的标准函数。
 
@@ -24153,27 +25785,25 @@ OKX（欧易）永续合约（USDT、USDC保证金与币本位）、交割合约
 
 - `exchange.GetRecords`：原生周期为1分钟、3分钟、5分钟、15分钟、30分钟、1小时、2小时、4小时、6小时、12小时、1天、3天、1周、1月、3月；其它周期由托管者合成。
 
-所有交易所的对照见`能力矩阵`。
+##### 保证金、账户与模拟盘
 
-**保证金、账户与模拟盘**
-
-全部交易所对象
+###### 全部交易所对象
 
 模拟盘：勾选「模拟盘」或调用```exchange.IO("simulate", true)```使用OKX模拟盘，需要使用在OKX模拟盘页面创建的API KEY。
 
-```OKEX```（现货）
+###### ```OKEX```（现货）
 
 账户：现货与杠杆共用OKX的同一套接口，区别在下单的```tdMode```和订单查询的品种类型。切换到杠杆后，连接器首次请求时查询账户模式（acctLv）：现货模式的账户不能下杠杆单（报错```acctLv is 1```）；单币种保证金模式下杠杆单带借币币种（买单借计价币、卖单借交易币）；跨币种、组合保证金模式下全仓杠杆的订单登记在现货品种下，查询时自动按此处理。可以在下单附加参数中显式传```tdMode```、```ccy```覆盖。
 
-```Futures_OKCoin```（期货）
+###### ```Futures_OKCoin```（期货）
 
 保证金模式：默认全仓，用```exchange.IO("cross", false)```或```exchange.IO("tdMode", "isolated")```切换为逐仓；也可以在下单附加参数中显式传```tdMode```。```exchange.SetMarginLevel()```按当前的全仓/逐仓设置杠杆。
 
 持仓模式：下单前自动查询账户的持仓模式，双向持仓时按开平方向带```posSide```；也可以用```exchange.IO("dual", bool)```切换。
 
-**期权**
+##### 期权
 
-```Futures_OKCoin```（期货）
+###### ```Futures_OKCoin```（期货）
 
 支持OKX期权，用法与期货合约相同。
 
@@ -24185,13 +25815,13 @@ OKX（欧易）永续合约（USDT、USDC保证金与币本位）、交割合约
 
 期权代码为OKX原生代码：标的-计价币-到期日（YYMMDD）-行权价-C/P。交易对设置为```BTC_USD```，完整品种代码形如```BTC_USD.BTC-USD-260925-60000-C```。
 
-**注意事项**
+##### 注意事项
 
-```OKEX```（现货）
+###### ```OKEX```（现货）
 
 - 条件单支持止盈、止损和OCO；```exchange.ModifyConditionOrder()```使用OKX的改算法单接口（```amend-algos```）原地修改，不撤单重下。
 
-```Futures_OKCoin```（期货）
+###### ```Futures_OKCoin```（期货）
 
 - ```exchange.GetFundings()```不支持批量查询，需要传入具体的永续合约，例如```exchange.GetFundings("ETH_USDT.swap")```；不传或传范围（如```USDT.swap```）时报错。
 - 条件单支持止盈、止损和OCO；```exchange.ModifyOrder()```、```exchange.ModifyConditionOrder()```使用OKX的改单接口原地修改，订单ID不变。
@@ -24200,26 +25830,22 @@ OKX（欧易）永续合约（USDT、USDC保证金与币本位）、交割合约
 
 Poloniex现货（SPOT账户）。
 
-**名称**
+##### 名称与配置
 
-| ```exchange.GetName()``` | 类型 | 别名 |
-| - | - | - |
-| ```Poloniex``` | 现货 | — |
+```exchange.GetName()```：```Poloniex```（现货）。
 
-**配置项**
+| 配置项 | 必填 |
+| - | - |
+| Access Key | 是 |
+| Secret Key | 是 |
 
-| 配置项 | 必填 | 默认值 | 说明 |
-| - | - | - | - |
-| Access Key | 是 | — | — |
-| Secret Key | 是 | — | — |
-
-**交易对与合约代码**
+##### 交易对与合约代码
 
 交易对示例：```BTC_USDT```、```ETH_USDT```
 
 交易对写作```BASE_QUOTE```，与Poloniex原生代码同形。
 
-**专属IO指令**
+##### 专属IO指令
 
 | 指令 | 参数 | 说明 | 返回值 |
 | - | - | - | - |
@@ -24227,7 +25853,7 @@ Poloniex现货（SPOT账户）。
 
 通用指令```api```、```base```、```currency```见`exchange.IO`。
 
-**不支持与合成的函数**
+##### 函数支持差异
 
 不支持（调用时报错并返回空值）：`exchange.ModifyConditionOrder`。
 
@@ -24235,9 +25861,7 @@ Poloniex现货（SPOT账户）。
 
 - `exchange.GetRecords`：原生周期为1分钟、5分钟、10分钟、15分钟、30分钟、1小时、2小时、4小时、6小时、12小时、1天、3天、1周、1月；其它周期由托管者合成。
 
-所有交易所的对照见`能力矩阵`。
-
-**注意事项**
+##### 注意事项
 
 - 限价单支持IOC、FOK与只做Maker（```postOnly```）。
 - 现货条件单只支持止损（```ORDER_CONDITION_TYPE_SL```）：买单在价格涨到触发价时触发，卖单在价格跌到触发价时触发。止盈（```ORDER_CONDITION_TYPE_TP```）和OCO条件单会直接报错，不会下单。不填委托价为触发后市价成交。
@@ -24247,30 +25871,22 @@ Poloniex现货（SPOT账户）。
 
 Upbit（韩国）现货，KRW、BTC、USDT市场。
 
-**名称**
+##### 名称与配置
 
-| ```exchange.GetName()``` | 类型 | 别名 |
-| - | - | - |
-| ```Upbit``` | 现货 | — |
+```exchange.GetName()```：```Upbit```（现货）。
 
-**配置项**
+| 配置项 | 必填 |
+| - | - |
+| Access Key | 是 |
+| Secret Key | 是 |
 
-| 配置项 | 必填 | 默认值 | 说明 |
-| - | - | - | - |
-| Access Key | 是 | — | — |
-| Secret Key | 是 | — | — |
-
-**交易对与合约代码**
+##### 交易对与合约代码
 
 交易对示例：```BTC_KRW```、```ETH_BTC```、```XRP_USDT```
 
 交易对写作```BASE_QUOTE```，Upbit原生市场代码是计价币在前（```BTC_KRW```对应```KRW-BTC```），由连接器转换。
 
-**专属IO指令**
-
-没有专属指令，通用指令见`exchange.IO`。
-
-**不支持与合成的函数**
+##### 函数支持差异
 
 不支持（调用时报错并返回空值）：`exchange.CreateConditionOrder`、`exchange.ModifyConditionOrder`、`exchange.CancelConditionOrder`、`exchange.GetConditionOrder`、`exchange.GetConditionOrders`、`exchange.GetHistoryConditionOrders`。
 
@@ -24278,49 +25894,41 @@ Upbit（韩国）现货，KRW、BTC、USDT市场。
 
 - `exchange.GetRecords`：原生周期为1秒、1分钟、3分钟、5分钟、10分钟、15分钟、30分钟、1小时、4小时、1天、1周、1月、1年；其它周期由托管者合成。
 
-所有交易所的对照见`能力矩阵`。
-
-**注意事项**
+##### 注意事项
 
 - 限价单支持IOC、FOK与只做Maker（```postOnly```）。
 - ```exchange.ModifyOrder()```使用Upbit的撤单并重新下单接口（```cancel_and_new```），由交易所原子地撤销原订单并下新订单，返回新订单的订单号，之后应使用新订单号。
 
 #### WEEX
 
-```WEEX```（现货）
+```WEEX```（现货）：WEEX现货交易（V3接口）。API KEY需要同时配置Access Key、Secret Key和Passphrase。
 
-WEEX现货交易（V3接口）。API KEY需要同时配置Access Key、Secret Key和Passphrase。
+```Futures_WEEX```（期货）：WEEX USDT本位永续合约（V3接口）。API KEY需要同时配置Access Key、Secret Key和Passphrase。
 
-```Futures_WEEX```（期货）
-
-WEEX USDT本位永续合约（V3接口）。API KEY需要同时配置Access Key、Secret Key和Passphrase。
-
-**名称**
+##### 名称与配置
 
 | ```exchange.GetName()``` | 类型 | 别名 |
 | - | - | - |
 | ```WEEX``` | 现货 | 唯客 |
 | ```Futures_WEEX``` | 期货 | WEEX期货 |
 
-**配置项**
+| 配置项 | 必填 |
+| - | - |
+| Access Key | 是 |
+| Secret Key | 是 |
+| Passphrase | 是 |
 
-| 配置项 | 必填 | 默认值 | 说明 |
-| - | - | - | - |
-| Access Key | 是 | — | — |
-| Secret Key | 是 | — | — |
-| Passphrase | 是 | — | — |
+##### 交易对与合约代码
 
-**交易对与合约代码**
-
-全部交易所对象
+###### 全部交易所对象
 
 交易对示例：```BTC_USDT```、```ETH_USDT```
 
-```WEEX```（现货）
+###### ```WEEX```（现货）
 
 交易对写作```BTC_USDT```，对应WEEX的原生代码```BTCUSDT```。
 
-```Futures_WEEX```（期货）
+###### ```Futures_WEEX```（期货）
 
 交易对写作```BTC_USDT```，对应WEEX的原生代码```BTCUSDT```；可交易的合约以```exchange.GetMarkets()```为准。
 
@@ -24330,13 +25938,9 @@ WEEX USDT本位永续合约（V3接口）。API KEY需要同时配置Access Key�
 
 WEEX没有交割合约，其它合约代码会报错。下单数量单位为基础币（交易所不支持按张下单，```exchange.GetMarkets()```中```CtVal```为1）。
 
-**专属IO指令**
+##### 函数支持差异
 
-没有专属指令，通用指令见`exchange.IO`。
-
-**不支持与合成的函数**
-
-```WEEX```（现货）
+###### ```WEEX```（现货）
 
 不支持（调用时报错并返回空值）：`exchange.ModifyOrder`、`exchange.CreateConditionOrder`、`exchange.ModifyConditionOrder`、`exchange.CancelConditionOrder`、`exchange.GetConditionOrder`、`exchange.GetConditionOrders`、`exchange.GetHistoryConditionOrders`。
 
@@ -24344,7 +25948,7 @@ WEEX没有交割合约，其它合约代码会报错。下单数量单位为基�
 
 - `exchange.GetRecords`：原生周期为1分钟、5分钟、15分钟、30分钟、1小时、2小时、4小时、6小时、8小时、12小时、1天、1周；其它周期由托管者合成。
 
-```Futures_WEEX```（期货）
+###### ```Futures_WEEX```（期货）
 
 不支持（调用时报错并返回空值）：`exchange.ModifyOrder`、`exchange.ModifyConditionOrder`。
 
@@ -24352,64 +25956,56 @@ WEEX没有交割合约，其它合约代码会报错。下单数量单位为基�
 
 - `exchange.GetRecords`：原生周期为1分钟、5分钟、15分钟、30分钟、1小时、4小时、12小时、1天、1周；其它周期由托管者合成。
 
-所有交易所的对照见`能力矩阵`。
+##### 保证金、账户与模拟盘
 
-**保证金、账户与模拟盘**
-
-```Futures_WEEX```（期货）
+###### ```Futures_WEEX```（期货）
 
 保证金模式：没有切换全仓/逐仓的IO指令，保证金模式按交易所账户中该合约的设置。```exchange.SetMarginLevel()```先查询该合约当前的保证金模式：逐仓时同时设置多、空两侧杠杆，全仓时设置全仓杠杆。
 
 持仓模式：每张订单都带持仓方向```positionSide```，由下单方向推出：开多、平多为```LONG```，开空、平空为```SHORT```；也可以在附加参数中显式传```positionSide```。条件单同样带持仓方向。
 
-**注意事项**
+##### 注意事项
 
-```WEEX```（现货）
+###### ```WEEX```（现货）
 
 - 市价买单的数量为计价币金额：WEEX现货接口不支持按金额下市价单，连接器按当前卖盘把金额折算成基础币数量（按数量步长向下取整）后下单，实际成交金额可能与传入的金额略有差异。在附加参数中显式传```quantity```时直接使用该数量。
 - 不支持只做Maker（post-only）订单，限价单的有效方式只有GTC、IOC、FOK。
 
-```Futures_WEEX```（期货）
+###### ```Futures_WEEX```（期货）
 
 - 条件单只支持止盈、止损单，不支持OCO（需要分成止盈、止损两张条件单下单）。
 
 #### WOO X
 
-```WOO```（现货）
+```WOO```（现货）：WOO X现货交易。API KEY需要同时配置Access Key、Secret Key和Application Id。
 
-WOO X现货交易。API KEY需要同时配置Access Key、Secret Key和Application Id。
+```Futures_WOO```（期货）：WOO X永续合约。API KEY需要同时配置Access Key、Secret Key和Application Id。
 
-```Futures_WOO```（期货）
-
-WOO X永续合约。API KEY需要同时配置Access Key、Secret Key和Application Id。
-
-**名称**
+##### 名称与配置
 
 | ```exchange.GetName()``` | 类型 | 别名 |
 | - | - | - |
 | ```WOO``` | 现货 | WOOX |
 | ```Futures_WOO``` | 期货 | WOO X期货 |
 
-**配置项**
-
 ✓ 表示该交易所对象有这个配置项。
 
-| 配置项 | ```WOO``` | ```Futures_WOO``` | 必填 | 默认值 | 说明 |
-| - | - | - | - | - | - |
-| Access Key | ✓ | ✓ | 是 | — | — |
-| Secret Key | ✓ | ✓ | 是 | — | — |
-| Application Id | ✓ |  | 是 | — | WOO X API管理页面中API KEY对应的Application ID，用于核对账户余额应答属于本账户，必须填写。 |
-| Application Id |  | ✓ | 是 | — | WOO X API管理页面中API KEY对应的Application ID，用于核对账户应答属于本账户，必须填写。 |
+| 配置项 | ```WOO``` | ```Futures_WOO``` | 必填 | 说明 |
+| - | - | - | - | - |
+| Access Key | ✓ | ✓ | 是 | — |
+| Secret Key | ✓ | ✓ | 是 | — |
+| Application Id | ✓ |  | 是 | WOO X API管理页面中API KEY对应的Application ID，用于核对账户余额应答属于本账户，必须填写。 |
+| Application Id |  | ✓ | 是 | WOO X API管理页面中API KEY对应的Application ID，用于核对账户应答属于本账户，必须填写。 |
 
-**交易对与合约代码**
+##### 交易对与合约代码
 
-```WOO```（现货）
+###### ```WOO```（现货）
 
 交易对示例：```BTC_USDT```、```ETH_USDT```
 
 交易对写作```BTC_USDT```，对应WOO X的原生代码```SPOT_BTC_USDT```。本交易所对象只交易现货，带合约后缀的品种（如```BTC_USDT.swap```）会报错，永续合约请使用```Futures_WOO```。
 
-```Futures_WOO```（期货）
+###### ```Futures_WOO```（期货）
 
 交易对示例：```BTC_USDT```
 
@@ -24421,18 +26017,18 @@ WOO X永续合约。API KEY需要同时配置Access Key、Secret Key和Applicati
 
 WOO X只有永续合约，其它合约代码会报错。下单数量单位为基础币（```exchange.GetMarkets()```中```CtVal```为1）。
 
-**专属IO指令**
+##### 专属IO指令
 
-```WOO```（现货）
+###### ```WOO```（现货）
 
-| 指令 | 参数 | 说明 |
-| - | - | - |
-| ```"trade_margin"``` | — | 账户切换为杠杆模式（MARGIN），向交易所发出设置请求（```POST /v1/client/account_mode```），交易所确认后返回```true```。是账户级设置。 |
-| ```"trade_normal"``` | — | 账户切换为纯现货模式（PURE_SPOT），向交易所发出设置请求，交易所确认后返回```true```。是账户级设置。 |
+| 指令 | 说明 |
+| - | - |
+| ```"trade_margin"``` | 账户切换为杠杆模式（MARGIN），向交易所发出设置请求（```POST /v1/client/account_mode```），交易所确认后返回```true```。是账户级设置。 |
+| ```"trade_normal"``` | 账户切换为纯现货模式（PURE_SPOT），向交易所发出设置请求，交易所确认后返回```true```。是账户级设置。 |
 
 通用指令```api```、```base```、```currency```见`exchange.IO`。
 
-```Futures_WOO```（期货）
+###### ```Futures_WOO```（期货）
 
 | 指令 | 参数 | 说明 |
 | - | - | - |
@@ -24441,43 +26037,41 @@ WOO X只有永续合约，其它合约代码会报错。下单数量单位为基
 
 通用指令```api```、```base```、```currency```见`exchange.IO`。
 
-**不支持与合成的函数**
+##### 函数支持差异
 
-全部交易所对象
+###### 全部交易所对象
 
 不支持（调用时报错并返回空值）：`exchange.GetTickers`。
 
-```WOO```（现货）
+###### ```WOO```（现货）
 
 以回退方式支持：
 
 - `exchange.GetRecords`：原生周期为1分钟、5分钟、15分钟、30分钟、1小时、4小时、12小时、1天、1周、1月；其它周期由托管者合成。
 
-```Futures_WOO```（期货）
+###### ```Futures_WOO```（期货）
 
 以回退方式支持：
 
 - `exchange.GetRecords`：原生周期为1分钟、5分钟、15分钟、30分钟、1小时、4小时、12小时、1天、1周、1月、1年；其它周期由托管者合成。
 
-所有交易所的对照见`能力矩阵`。
+##### 保证金、账户与模拟盘
 
-**保证金、账户与模拟盘**
-
-```Futures_WOO```（期货）
+###### ```Futures_WOO```（期货）
 
 保证金模式：用```exchange.IO("cross", bool)```选择全仓/逐仓，这是本地设置，随每次下单带上（默认全仓）。```exchange.SetMarginLevel()```按合约设置杠杆，同时带上当前的全仓/逐仓设置。
 
 持仓模式：用```exchange.IO("dual", bool)```切换双向/单向持仓。连接器不自动探测账户的持仓模式：账户已经是双向持仓时，每次运行策略都要先调用```exchange.IO("dual", true)```，否则下单不带持仓方向会被交易所拒绝。双向持仓下```exchange.SetMarginLevel()```按```exchange.SetDirection()```设置的方向只设置多头或空头一侧（未设置方向时为多头），也可以在附加参数中传```{"position_side": "LONG"|"SHORT"|"BOTH"}```指定。
 
-**注意事项**
+##### 注意事项
 
-```WOO```（现货）
+###### ```WOO```（现货）
 
 - WOO X现货没有24小时行情接口，```exchange.GetTicker()```由最近24根1小时K线（开高低价、成交量）和盘口（买一、卖一价）拼成，每次调用请求两个接口。
 - 条件单支持止盈、止损和OCO；```exchange.ModifyConditionOrder()```只能修改止盈、止损单，不能修改OCO条件单。
 - ```exchange.GetConditionOrders()```只能按交易对查询：不传或传空字符串时查询当前交易对。
 
-```Futures_WOO```（期货）
+###### ```Futures_WOO```（期货）
 
 - 条件单支持止盈、止损和OCO，触发价类型固定为```MARKET_PRICE```；```exchange.ModifyConditionOrder()```只能修改止盈、止损单，不能修改OCO条件单。
 
@@ -24485,30 +26079,22 @@ WOO X只有永续合约，其它合约代码会报错。下单数量单位为基
 
 Zaif（日本）现货。
 
-**名称**
+##### 名称与配置
 
-| ```exchange.GetName()``` | 类型 | 别名 |
-| - | - | - |
-| ```Zaif``` | 现货 | — |
+```exchange.GetName()```：```Zaif```（现货）。
 
-**配置项**
+| 配置项 | 必填 |
+| - | - |
+| Access Key | 是 |
+| Secret Key | 是 |
 
-| 配置项 | 必填 | 默认值 | 说明 |
-| - | - | - | - |
-| Access Key | 是 | — | — |
-| Secret Key | 是 | — | — |
-
-**交易对与合约代码**
+##### 交易对与合约代码
 
 交易对示例：```BTC_JPY```、```ETH_JPY```
 
 交易对写作```BASE_QUOTE```，对应Zaif原生代码```btc_jpy```。
 
-**专属IO指令**
-
-没有专属指令，通用指令见`exchange.IO`。
-
-**不支持与合成的函数**
+##### 函数支持差异
 
 不支持（调用时报错并返回空值）：`exchange.GetTickers`、`exchange.ModifyOrder`、`exchange.CreateConditionOrder`、`exchange.ModifyConditionOrder`、`exchange.CancelConditionOrder`、`exchange.GetConditionOrder`、`exchange.GetConditionOrders`、`exchange.GetHistoryConditionOrders`。
 
@@ -24517,9 +26103,7 @@ Zaif（日本）现货。
 - `exchange.GetRecords`：交易所没有K线接口，由托管者用成交记录合成：首次调用只有最近成交覆盖的少量K线，随调用逐步累积。
 - `exchange.GetOrder`：交易所没有查询单个订单的接口，在当前未完成订单和历史订单中查找该订单。
 
-所有交易所的对照见`能力矩阵`。
-
-**注意事项**
+##### 注意事项
 
 - 不支持市价单，只能下GTC限价单：指定```tif```为```"ioc"```、```"fok"```或```postOnly```时报错。
 - ```exchange.GetOrders()```不传```symbol```参数时只查询当前交易对。
@@ -24528,53 +26112,47 @@ Zaif（日本）现货。
 
 去中心化交易所，交易由配置的钱包或密钥签名。
 
-**订单簿永续合约**
+#### 订单簿永续合约
 
-链上订单簿撮合的永续合约交易所：`Hyperliquid`、`Lighter`、`edgeX`、`Aster`、`Aevo`、`WOOFi-Pro`。
+链上订单簿撮合的永续合约交易所：`Hyperliquid`、`Lighter`、`edgeX`、`Aster`、`Aevo`、`WOOFi Pro`。
 
-**兑换与聚合器**
+#### 兑换与聚合器
 
-AMM池子与兑换聚合器，把链上兑换映射为现货交易函数：`Uniswap`、`Jupiter`、`KyberSwap`、`1inch`、`OKX-DEX`。
+AMM池子与兑换聚合器，把链上兑换映射为现货交易函数：`Uniswap`、`Jupiter`、`KyberSwap`、`1inch`、`OKX DEX`。
 
 #### Hyperliquid
 
-```Hyperliquid```（现货）
+```Hyperliquid```（现货）：Hyperliquid链上订单簿的现货市场。行情与账户查询只需要钱包地址；下单、撤单、改单由API钱包（代理钱包）私钥做EIP-712签名后提交，不需要链上gas。永续合约与HIP-3、HIP-4（Outcome）品种由Futures_Hyperliquid交易所对象负责。
 
-Hyperliquid链上订单簿的现货市场。行情与账户查询只需要钱包地址；下单、撤单、改单由API钱包（代理钱包）私钥做EIP-712签名后提交，不需要链上gas。永续合约与HIP-3、HIP-4（Outcome）品种由Futures_Hyperliquid交易所对象负责。
-
-```Futures_Hyperliquid```（期货）
-
-Hyperliquid链上订单簿的USDC保证金永续合约，包括主dex的永续、HIP-3（由builder部署的dex上的永续，代码带```dex:```前缀）以及HIP-4 Outcome（预测）品种。行情与账户查询只需要钱包地址；下单、撤单、改单、设置杠杆由API钱包（代理钱包）私钥做EIP-712签名后提交，不需要链上gas。现货由Hyperliquid交易所对象负责。
+```Futures_Hyperliquid```（期货）：Hyperliquid链上订单簿的USDC保证金永续合约，包括主dex的永续、HIP-3（由builder部署的dex上的永续，代码带```dex:```前缀）以及HIP-4 Outcome（预测）品种。行情与账户查询只需要钱包地址；下单、撤单、改单、设置杠杆由API钱包（代理钱包）私钥做EIP-712签名后提交，不需要链上gas。现货由Hyperliquid交易所对象负责。
 
 参考[Hyperliquid 使用指南](https://www.fmz.com/digest-topic/10574)。
 
-**名称**
+##### 名称与配置
 
 | ```exchange.GetName()``` | 类型 | 别名 |
 | - | - | - |
 | ```Hyperliquid``` | 现货 | Hyperliquid现货 |
 | ```Futures_Hyperliquid``` | 期货 | Hyperliquid期货、HIP-3、HIP-4 |
 
-**配置项**
-
 ✓ 表示该交易所对象有这个配置项。
 
-| 配置项 | ```Hyperliquid``` | ```Futures_Hyperliquid``` | 必填 | 默认值 | 说明 |
-| - | - | - | - | - | - |
-| 钱包地址 | ✓ | ✓ | 是 | — | 主账户钱包地址（```0x```开头），行情以外的所有查询都以它为```user```。 |
-| 钱包私钥 | ✓ | ✓ | 否 | — | 主账户私钥，可选。只用于签名转账类动作（通过```exchange.IO("api", "POST", "/exchange", ...)```发送的```usdSend```、```withdraw3```等），下单不需要。 |
-| API钱包私钥 | ✓ |  | 是 | — | 在Hyperliquid网页「API」页面创建的API钱包（代理钱包）私钥，用于签名下单、撤单、改单。不填时只能查询行情和账户。 |
-| API钱包私钥 |  | ✓ | 是 | — | 在Hyperliquid网页「API」页面创建的API钱包（代理钱包）私钥，用于签名下单、撤单、改单、设置杠杆。不填时只能查询行情和账户。 |
+| 配置项 | ```Hyperliquid``` | ```Futures_Hyperliquid``` | 必填 | 说明 |
+| - | - | - | - | - |
+| 钱包地址 | ✓ | ✓ | 是 | 主账户钱包地址（```0x```开头），行情以外的所有查询都以它为```user```。 |
+| 钱包私钥 | ✓ | ✓ | 否 | 主账户私钥，可选。只用于签名转账类动作（通过```exchange.IO("api", "POST", "/exchange", ...)```发送的```usdSend```、```withdraw3```等），下单不需要。 |
+| API钱包私钥 | ✓ |  | 是 | 在Hyperliquid网页「API」页面创建的API钱包（代理钱包）私钥，用于签名下单、撤单、改单。不填时只能查询行情和账户。 |
+| API钱包私钥 |  | ✓ | 是 | 在Hyperliquid网页「API」页面创建的API钱包（代理钱包）私钥，用于签名下单、撤单、改单、设置杠杆。不填时只能查询行情和账户。 |
 
-**交易对与合约代码**
+##### 交易对与合约代码
 
-```Hyperliquid```（现货）
+###### ```Hyperliquid```（现货）
 
 交易对示例：```HYPE_USDC```、```PURR_USDC```
 
 交易对写作```币名_计价币```，币名取Hyperliquid现货代币名（例如```HYPE```、```PURR```；跨链资产按交易所的代币名书写，如```UBTC```），不区分大小写。交易所内部的```@1```、```@2```这类交易对名由连接器按现货元数据换算，不需要直接使用。
 
-```Futures_Hyperliquid```（期货）
+###### ```Futures_Hyperliquid```（期货）
 
 交易对示例：```BTC_USD```、```xyz:XYZ100_USD```、```BTC-above-100k---Dec_USD```
 
@@ -24588,41 +26166,53 @@ HIP-4 Outcome品种的交易对为市场名称（空格、```/```换成```-```�
 
 没有交割合约。Outcome品种的合约代码是结果方名称（如```Yes```、```No```），不是```swap```。
 
-**专属IO指令**
+##### 专属IO指令
 
-```Hyperliquid```（现货）
+###### ```Hyperliquid```（现货）
 
 | 指令 | 参数 | 说明 | 返回值 |
 | - | - | - | - |
 | ```"walletAddress"``` | address | 设置只读查询（资产、订单、历史订单）使用的地址，可以查询其它地址的资产；不改变签名下单的钱包。要恢复查询本账户，传回配置的钱包地址。 | 设置的地址。 |
 | ```"vaultAddress"``` | address | 以金库或子账户的身份下单、撤单、改单（地址进入签名与请求体），空字符串取消。查询仍使用钱包地址，查询金库的资产与订单需要同时用```walletAddress```设置为金库地址。 | 设置的地址。 |
 | ```"expiresAfter"``` | timestamp | 设置之后所有签名动作（下单、撤单、改单等）携带的```expiresAfter```：毫秒级Unix时间戳，超过这个时间交易所拒绝该动作；0取消（默认）。设置值一直生效，过期后的动作都会被拒绝，需要重新设置或改回0。 | 设置的值。 |
-| ```"source"``` | "a" \| "b" | 签名使用的网络：```"a"```为主网（默认），```"b"```为测试网。影响交易类动作Agent签名的```source```字段，以及转账类动作（```usdSend```、```spotSend```、```withdraw3```等）EIP-712签名的chainId（主网Arbitrum 42161，测试网Arbitrum Sepolia 421614）。不改变接口地址，连接测试网还需要用```exchange.IO("base", "https://api.hyperliquid-testnet.xyz")```切换。 | 设置的值。 |
-| ```"api"``` | method, path[, params[, body]] | 直接调用Hyperliquid接口。```POST```到```/exchange```时，参数是一个action对象，连接器自动加nonce并签名：转账类动作（```usdSend```、```spotSend```、```withdraw3```、```usdClassTransfer```、```approveAgent```、```approveBuilderFee```、```userSetAbstraction```）用钱包私钥```WalletPrivateKey```签名，动作里的```hyperliquidChain```等字段需要自己填写；其它动作用API钱包私钥签名。其它路径（如```POST /info```）原样发送，不签名。 | 交易所的原始应答。 |
+| ```"source"``` | "a" \| "b" | 签名使用的网络：```"a"```为主网（默认），```"b"```为测试网。（详见表下） | 设置的值。 |
+| ```"api"``` | method, path[, params[, body]] | 直接调用Hyperliquid接口。（详见表下） | 交易所的原始应答。 |
+
+表中长说明的其余部分：
+
+- ```"source"```：影响交易类动作Agent签名的```source```字段，以及转账类动作（```usdSend```、```spotSend```、```withdraw3```等）EIP-712签名的chainId（主网Arbitrum 42161，测试网Arbitrum Sepolia 421614）。不改变接口地址，连接测试网还需要用```exchange.IO("base", "https://api.hyperliquid-testnet.xyz")```切换。
+- ```"api"```：```POST```到```/exchange```时，参数是一个action对象，连接器自动加nonce并签名：转账类动作（```usdSend```、```spotSend```、```withdraw3```、```usdClassTransfer```、```approveAgent```、```approveBuilderFee```、```userSetAbstraction```）用钱包私钥```WalletPrivateKey```签名，动作里的```hyperliquidChain```等字段需要自己填写；其它动作用API钱包私钥签名。其它路径（如```POST /info```）原样发送，不签名。
 
 通用指令```base```、```currency```见`exchange.IO`。
 
-```Futures_Hyperliquid```（期货）
+###### ```Futures_Hyperliquid```（期货）
 
 | 指令 | 参数 | 说明 | 返回值 |
 | - | - | - | - |
 | ```"cross"``` | bool | 全仓（true，默认）/逐仓（false）。只在连接器里记录，下次调用```exchange.SetMarginLevel()```时随杠杆一起提交，调用本指令本身不发请求。 | ```"cross"```或```"isolated"```。 |
-| ```"dex"``` | name | 设置默认的HIP-3 dex名称，空字符串为主dex。设置后，不带品种的范围查询（```GetPositions()```、```GetOrders()```、```GetConditionOrders()```、```GetTickers()```、```GetMarkets()```）只查这个dex；不设置时这些查询遍历全部dex汇总。带品种的调用总是按品种自身的dex前缀。 | 设置的dex名称。 |
+| ```"dex"``` | name | 设置默认的HIP-3 dex名称，空字符串为主dex。（详见表下） | 设置的dex名称。 |
 | ```"walletAddress"``` | address | 设置只读查询（账户、持仓、订单）使用的地址，可以查询其它地址的持仓；不改变签名下单的钱包。要恢复查询本账户，传回配置的钱包地址。 | 设置的地址。 |
 | ```"vaultAddress"``` | address | 以金库或子账户的身份下单、撤单、改单、设置杠杆（地址进入签名与请求体），空字符串取消。查询仍使用钱包地址，查询金库的账户与持仓需要同时用```walletAddress```设置为金库地址。 | 设置的地址。 |
 | ```"expiresAfter"``` | timestamp | 设置之后所有签名动作（下单、撤单、改单、设置杠杆等）携带的```expiresAfter```：毫秒级Unix时间戳，超过这个时间交易所拒绝该动作；0取消（默认）。设置值一直生效，过期后的动作都会被拒绝，需要重新设置或改回0。 | 设置的值。 |
-| ```"source"``` | "a" \| "b" | 签名使用的网络：```"a"```为主网（默认），```"b"```为测试网。影响交易类动作Agent签名的```source```字段，以及转账类动作（```usdSend```、```withdraw3```、```usdClassTransfer```等）EIP-712签名的chainId（主网Arbitrum 42161，测试网Arbitrum Sepolia 421614）。不改变接口地址，连接测试网还需要用```exchange.IO("base", "https://api.hyperliquid-testnet.xyz")```切换；测试网没有HIP-3，范围查询只查主dex。 | 设置的值。 |
-| ```"split"``` | symbol, amount | HIP-4 Outcome拆分（```splitOutcome```动作）：按```amount```为```symbol```所属的Outcome拆分出各结果方的头寸。```symbol```为Outcome品种代码（如```BTC-above-100k---Dec_USD.Yes```），写法与行情、下单相同：同名市场写带```-市场编号```的代码（如```Recurring-1399_USD.Yes```），只写名称报歧义错误；```merge```、```mergeQuestion```、```negate```的```symbol```同此规则。```amount```必须大于0。 | 交易所的原始应答（```status```为```ok```）。 |
+| ```"source"``` | "a" \| "b" | 签名使用的网络：```"a"```为主网（默认），```"b"```为测试网。（详见表下） | 设置的值。 |
+| ```"split"``` | symbol, amount | HIP-4 Outcome拆分（```splitOutcome```动作）：按```amount```为```symbol```所属的Outcome拆分出各结果方的头寸。（详见表下） | 交易所的原始应答（```status```为```ok```）。 |
 | ```"merge"``` | symbol[, amount] | HIP-4 Outcome合并（```mergeOutcome```动作）：把```symbol```所属Outcome各结果方的头寸合并回去，```amount```可省略。 | 交易所的原始应答（```status```为```ok```）。 |
 | ```"mergeQuestion"``` | symbol[, amount] | HIP-4按问题合并（```mergeQuestion```动作）：对```symbol```所属Outcome所在的问题（question）做合并，```amount```可省略。该Outcome不属于任何问题时报错。 | 交易所的原始应答（```status```为```ok```）。 |
 | ```"negate"``` | symbol, amount | HIP-4取反（```negateOutcome```动作）：在```symbol```所属的问题中对该Outcome做取反转换，```amount```必须大于0。该Outcome不属于任何问题时报错。 | 交易所的原始应答（```status```为```ok```）。 |
-| ```"api"``` | method, path[, params[, body]] | 直接调用Hyperliquid接口。```POST```到```/exchange```时，参数是一个action对象，连接器自动加nonce并签名：转账类动作（```usdSend```、```spotSend```、```withdraw3```、```usdClassTransfer```、```approveAgent```、```approveBuilderFee```、```userSetAbstraction```）用钱包私钥```WalletPrivateKey```签名，动作里的```hyperliquidChain```等字段需要自己填写；其它动作用API钱包私钥签名。其它路径（如```POST /info```）原样发送，不签名。 | 交易所的原始应答。 |
+| ```"api"``` | method, path[, params[, body]] | 直接调用Hyperliquid接口。（详见表下） | 交易所的原始应答。 |
+
+表中长说明的其余部分：
+
+- ```"dex"```：设置后，不带品种的范围查询（```GetPositions()```、```GetOrders()```、```GetConditionOrders()```、```GetTickers()```、```GetMarkets()```）只查这个dex；不设置时这些查询遍历全部dex汇总。带品种的调用总是按品种自身的dex前缀。
+- ```"source"```：影响交易类动作Agent签名的```source```字段，以及转账类动作（```usdSend```、```withdraw3```、```usdClassTransfer```等）EIP-712签名的chainId（主网Arbitrum 42161，测试网Arbitrum Sepolia 421614）。不改变接口地址，连接测试网还需要用```exchange.IO("base", "https://api.hyperliquid-testnet.xyz")```切换；测试网没有HIP-3，范围查询只查主dex。
+- ```"split"```：```symbol```为Outcome品种代码（如```BTC-above-100k---Dec_USD.Yes```），写法与行情、下单相同：同名市场写带```-市场编号```的代码（如```Recurring-1399_USD.Yes```），只写名称报歧义错误；```merge```、```mergeQuestion```、```negate```的```symbol```同此规则。```amount```必须大于0。
+- ```"api"```：```POST```到```/exchange```时，参数是一个action对象，连接器自动加nonce并签名：转账类动作（```usdSend```、```spotSend```、```withdraw3```、```usdClassTransfer```、```approveAgent```、```approveBuilderFee```、```userSetAbstraction```）用钱包私钥```WalletPrivateKey```签名，动作里的```hyperliquidChain```等字段需要自己填写；其它动作用API钱包私钥签名。其它路径（如```POST /info```）原样发送，不签名。
 
 通用指令```base```、```currency```见`exchange.IO`。
 
-**不支持与合成的函数**
+##### 函数支持差异
 
-```Hyperliquid```（现货）
+###### ```Hyperliquid```（现货）
 
 不支持（调用时报错并返回空值）：`exchange.CreateConditionOrder`、`exchange.ModifyConditionOrder`、`exchange.CancelConditionOrder`、`exchange.GetConditionOrder`、`exchange.GetConditionOrders`、`exchange.GetHistoryConditionOrders`。
 
@@ -24630,7 +26220,7 @@ HIP-4 Outcome品种的交易对为市场名称（空格、```/```换成```-```�
 
 - `exchange.GetRecords`：原生周期为1分钟、3分钟、5分钟、15分钟、30分钟、1小时、2小时、4小时、8小时、12小时、1天、3天、1周、1月；其它周期由托管者合成。
 
-```Futures_Hyperliquid```（期货）
+###### ```Futures_Hyperliquid```（期货）
 
 没有不支持的标准函数。
 
@@ -24638,11 +26228,9 @@ HIP-4 Outcome品种的交易对为市场名称（空格、```/```换成```-```�
 
 - `exchange.GetRecords`：原生周期为1分钟、3分钟、5分钟、15分钟、30分钟、1小时、2小时、4小时、8小时、12小时、1天、3天、1周；其它周期由托管者合成。Outcome品种没有K线。
 
-所有交易所的对照见`能力矩阵`。
+##### 保证金、账户与模拟盘
 
-**保证金、账户与模拟盘**
-
-```Futures_Hyperliquid```（期货）
+###### ```Futures_Hyperliquid```（期货）
 
 保证金模式：用```exchange.IO("cross", bool)```选择全仓/逐仓，在下一次```exchange.SetMarginLevel()```时随杠杆一起提交（交易所的```updateLeverage```动作）；杠杆向下取整为整数。HIP-3品种的保证金按dex分账。
 
@@ -24650,16 +26238,16 @@ HIP-4 Outcome品种的交易对为市场名称（空格、```/```换成```-```�
 
 账户：账户为统一账户或组合保证金模式时，```exchange.GetAccount()```的余额与权益取现货USDC余额，未实现盈亏取永续账户；普通账户取永续账户（HIP-3按当前品种所在的dex）。余额币为USDC。
 
-**注意事项**
+##### 注意事项
 
-```Hyperliquid```（现货）
+###### ```Hyperliquid```（现货）
 
 - 市价单按中间价±0.5%作为限价、以IOC方式提交；市价买单的数量是要买入的币数，不是计价币金额。
 - ```exchange.ModifyOrder()```成功后订单ID会改变，返回值是新的订单ID。
 - ```exchange.GetTicker()```的```Buy```、```Sell```为盘口买一、卖一（一侧没有挂单时用中间价），```Last```、```High```、```Low```都是中间价，交易所没有24小时最高、最低价；```exchange.GetTickers()```的```Buy```、```Sell```也是中间价。
 - ```exchange.GetHistoryOrders()```只能取交易所返回的最近订单，不支持```since```参数，传入大于0的```since```会报错。
 
-```Futures_Hyperliquid```（期货）
+###### ```Futures_Hyperliquid```（期货）
 
 - 市价单按中间价±0.5%作为限价、以IOC方式提交；Outcome品种为中间价±1%（限制在0.001到0.999之间）。条件单触发后按市价执行时同样按中间价±0.5%定价。
 - 条件单支持止盈、止损，不支持OCO；止盈、止损各是一张独立的触发单。```exchange.ModifyOrder()```、```exchange.ModifyConditionOrder()```成功后订单ID会改变，返回值是新的订单ID。
@@ -24672,13 +26260,9 @@ HIP-4 Outcome品种的交易对为市场名称（空格、```/```换成```-```�
 
 Lighter是zk rollup上的永续合约DEX，以USDC计价和结算。交易所对象连接Lighter的永续合约：下单、改单、撤单和设置杠杆都是用API密钥私钥签名的L2交易，查询挂单、历史订单要用同一把私钥生成的鉴权令牌。接入前需要在Lighter创建API密钥，并记下API密钥索引与账户索引。
 
-**名称**
+##### 名称与配置
 
-| ```exchange.GetName()``` | 类型 | 别名 |
-| - | - | - |
-| ```Futures_Lighter``` | 期货 | zkLighter |
-
-**配置项**
+```exchange.GetName()```：```Futures_Lighter```（期货）；别名：zkLighter。
 
 | 配置项 | 必填 | 默认值 | 说明 |
 | - | - | - | - |
@@ -24687,7 +26271,7 @@ Lighter是zk rollup上的永续合约DEX，以USDC计价和结算。交易所对
 | 账户索引 | 是 | — | Lighter账户索引，用于标识主账户或子账户 |
 | 模拟盘 | 否 | 不勾选 | 勾选后连接Lighter测试网。 |
 
-**交易对与合约代码**
+##### 交易对与合约代码
 
 交易对示例：```BTC_USDC```、```ETH_USDC```
 
@@ -24699,17 +26283,22 @@ Lighter是zk rollup上的永续合约DEX，以USDC计价和结算。交易所对
 
 Lighter只有永续合约，```swap```以外的合约代码会报错。
 
-**专属IO指令**
+##### 专属IO指令
 
 | 指令 | 参数 | 说明 | 返回值 |
 | - | - | - | - |
-| ```"cross"``` | bool[, symbol] | 全仓（true）/逐仓（false），不传```symbol```时作用于当前合约。Lighter的保证金模式与杠杆在同一笔链上交易里设置，这笔交易同时写入该品种当前的杠杆（先读交易所账户数据中该品种的设置；本次运行60秒内刚设置过的以刚设置的为准；都没有时取该市场的缺省杠杆）。 | ```{symbol, leverage, marginMode, initialMarginFraction, txHash, ok}```，```txHash```为这笔链上交易的哈希。 |
+| ```"cross"``` | bool[, symbol] | 全仓（true）/逐仓（false），不传```symbol```时作用于当前合约。（详见表下） | ```{symbol, leverage, marginMode, initialMarginFraction, txHash, ok}```，```txHash```为这笔链上交易的哈希。 |
 | ```"expiry"``` | number | 之后所下限价单和条件单的存活时长（毫秒，必须大于0），默认29天（交易所允许的上限）；订单的过期时间为下单时刻加10分钟再加该时长。市价单不受影响。 | ```true``` |
-| ```"api"``` | method, path[, params[, raw]] | 直接调用Lighter接口，只支持```GET```、```POST```。默认附带用API密钥私钥生成的鉴权令牌（需要填写私钥与账户索引）；签名参数传```false```时不带令牌，只能用于公开```GET```接口。```raw```不是请求体而是参数表（JSON对象或```a=1&b=2```），非空时整体替换```params```；```GET```编入查询串，```POST```编成表单。不会替调用方签名L2交易。 | 交易所的原始应答；应答```code```不是200时报错。 |
+| ```"api"``` | method, path[, params[, raw]] | 直接调用Lighter接口，只支持```GET```、```POST```。（详见表下） | 交易所的原始应答；应答```code```不是200时报错。 |
+
+表中长说明的其余部分：
+
+- ```"cross"```：Lighter的保证金模式与杠杆在同一笔链上交易里设置，这笔交易同时写入该品种当前的杠杆（先读交易所账户数据中该品种的设置；本次运行60秒内刚设置过的以刚设置的为准；都没有时取该市场的缺省杠杆）。
+- ```"api"```：默认附带用API密钥私钥生成的鉴权令牌（需要填写私钥与账户索引）；签名参数传```false```时不带令牌，只能用于公开```GET```接口。```raw```不是请求体而是参数表（JSON对象或```a=1&b=2```），非空时整体替换```params```；```GET```编入查询串，```POST```编成表单。不会替调用方签名L2交易。
 
 通用指令```base```、```currency```见`exchange.IO`。
 
-**不支持与合成的函数**
+##### 函数支持差异
 
 没有不支持的标准函数。
 
@@ -24717,9 +26306,7 @@ Lighter只有永续合约，```swap```以外的合约代码会报错。
 
 - `exchange.GetRecords`：原生周期为1分钟、5分钟、15分钟、30分钟、1小时、4小时、12小时、1天、1周；其它周期由托管者合成。
 
-所有交易所的对照见`能力矩阵`。
-
-**保证金、账户与模拟盘**
+##### 保证金、账户与模拟盘
 
 保证金模式：用```exchange.IO("cross", bool)```按合约切换全仓/逐仓，用```exchange.SetMarginLevel()```设置杠杆。两者在Lighter是同一笔链上交易（UpdateLeverage），每次调用都会发出一笔交易，并且总是同时写入杠杆和保证金模式，另一项保持该品种当前的值：```exchange.SetMarginLevel()```保留当前保证金模式，```exchange.IO("cross", ...)```保留当前杠杆。当前值读取交易所账户数据中该品种的设置（没有持仓的品种也有）；本次运行60秒内刚设置过的以刚设置的为准（交易所数据更新有延迟）；都没有时为该市场的缺省杠杆、全仓。```exchange.SetMarginLevel()```也可在附加参数中传```{marginMode: "isolated"}```（或```"cross"```）同时指定保证金模式。持仓的```MarginLevel```由交易所持仓数据中的初始保证金率换算。
 
@@ -24729,7 +26316,7 @@ Lighter只有永续合约，```swap```以外的合约代码会报错。
 
 模拟盘：勾选「模拟盘」连接Lighter测试网（```https://testnet.zklighter.elliot.ai```）。也可以用```exchange.SetBase()```（或```exchange.IO("base", url)```）切换接口地址：地址中含```testnet```时按测试网签名，否则按主网签名。
 
-**注意事项**
+##### 注意事项
 
 | 函数 | Futures_Lighter的行为 |
 | - | - |
@@ -24749,23 +26336,19 @@ Lighter只有永续合约，```swap```以外的合约代码会报错。
 
 edgeX永续合约DEX（V2接口），合约以USDC计价。私有接口使用edgeX Perps V2的API Key、API Secret、API Passphrase做HMAC认证，下单另用交易签名私钥（SDK Signer）做EIP-712签名；配置交易所对象前需要在edgeX创建这两套凭据并记下账户ID。
 
-**名称**
+##### 名称与配置
 
-| ```exchange.GetName()``` | 类型 | 别名 |
+```exchange.GetName()```：```Futures_EdgeX```（期货）；别名：EdgeX。
+
+| 配置项 | 必填 | 说明 |
 | - | - | - |
-| ```Futures_EdgeX``` | 期货 | EdgeX |
+| AccountID | 是 | edgeX账户ID（数字）。 |
+| API Key | 是 | edgeX Perps V2的API Key，与API Secret、API Passphrase一起用于私有接口的HMAC认证。 |
+| API Secret | 是 | edgeX Perps V2的API Secret（HMAC密钥）。 |
+| API Passphrase | 是 | edgeX Perps V2的API Passphrase。 |
+| Trading Private Key | 是 | edgeX Perps V2 SDK Signer的私钥（十六进制），用于订单的EIP-712签名；IO指令```calcOrderHashAndSign```也用它做Stark签名。 |
 
-**配置项**
-
-| 配置项 | 必填 | 默认值 | 说明 |
-| - | - | - | - |
-| AccountID | 是 | — | edgeX账户ID（数字）。 |
-| API Key | 是 | — | edgeX Perps V2的API Key，与API Secret、API Passphrase一起用于私有接口的HMAC认证。 |
-| API Secret | 是 | — | edgeX Perps V2的API Secret（HMAC密钥）。 |
-| API Passphrase | 是 | — | edgeX Perps V2的API Passphrase。 |
-| Trading Private Key | 是 | — | edgeX Perps V2 SDK Signer的私钥（十六进制），用于订单的EIP-712签名；IO指令```calcOrderHashAndSign```也用它做Stark签名。 |
-
-**交易对与合约代码**
+##### 交易对与合约代码
 
 交易对示例：```BTC_USDC```、```ETH_USDC```
 
@@ -24777,15 +26360,19 @@ edgeX的永续合约都以USDC计价，交易对写作```BTC_USDC```等，完整
 
 edgeX只有永续合约，```swap```以外的合约代码会报错。
 
-**专属IO指令**
+##### 专属IO指令
 
 | 指令 | 参数 | 说明 | 返回值 |
 | - | - | - | - |
-| ```"calcOrderHashAndSign"``` | json | 旧版（StarkEx）限价单签名，仅供旧策略继续调用：计算LIMIT_ORDER_WITH_FEES的Pedersen哈希，并用配置的TradingPrivateKey做Stark ECDSA签名。参数是含10个键的JSON字符串或对象，见注意事项。edgeX V2下单使用EIP-712签名，不接受这个签名，本交易所对象下单也不用它。 | 128个字符的小写十六进制字符串（r、s各64个字符，不带```0x```）。 |
+| ```"calcOrderHashAndSign"``` | json | 旧版（StarkEx）限价单签名，仅供旧策略继续调用：计算LIMIT_ORDER_WITH_FEES的Pedersen哈希，并用配置的TradingPrivateKey做Stark ECDSA签名。（详见表下） | 128个字符的小写十六进制字符串（r、s各64个字符，不带```0x```）。 |
+
+表中长说明的其余部分：
+
+- ```"calcOrderHashAndSign"```：参数是含10个键的JSON字符串或对象，见注意事项。edgeX V2下单使用EIP-712签名，不接受这个签名，本交易所对象下单也不用它。
 
 通用指令```api```、```base```、```currency```见`exchange.IO`。
 
-**不支持与合成的函数**
+##### 函数支持差异
 
 不支持（调用时报错并返回空值）：`exchange.GetTickers`、`exchange.GetTrades`、`exchange.ModifyOrder`、`exchange.ModifyConditionOrder`、`exchange.SetMarginLevel`。
 
@@ -24793,9 +26380,7 @@ edgeX只有永续合约，```swap```以外的合约代码会报错。
 
 - `exchange.GetRecords`：原生周期为1分钟、5分钟、15分钟、30分钟、1小时、2小时、4小时、6小时、8小时、12小时、1天、1周、1月；其它60秒整数倍的周期由托管者用原生K线合成，其余周期（如秒级）不可用（交易所没有成交接口）。
 
-所有交易所的对照见`能力矩阵`。
-
-**保证金、账户与模拟盘**
+##### 保证金、账户与模拟盘
 
 保证金模式：edgeX为全仓保证金，持仓的```MarginLevel```为交易所返回的当前杠杆。不支持```exchange.SetMarginLevel()```，杠杆需要在edgeX上自行设置。
 
@@ -24803,7 +26388,7 @@ edgeX只有永续合约，```swap```以外的合约代码会报错。
 
 账户：账户、持仓、订单都按配置的「AccountID」查询。```exchange.GetAssets()```按币种列出抵押资产，```exchange.GetAccount()```取当前交易对计价币（USDC）那一行。
 
-**注意事项**
+##### 注意事项
 
 | 函数 | Futures_EdgeX的行为 |
 | - | - |
@@ -24819,19 +26404,13 @@ edgeX只有永续合约，```swap```以外的合约代码会报错。
 
 #### Aster
 
-```Aster```（现货）
+```Aster```（现货）：Aster现货（接口地址```https://sapi.asterdex.com```）。私有接口使用钱包签名（EIP-712）：配置主账户钱包地址，以及在Aster上为该账户授权的API签名钱包的地址和私钥，不需要API Key。永续合约使用Futures_Aster交易所对象。
 
-Aster现货（接口地址```https://sapi.asterdex.com```）。私有接口使用钱包签名（EIP-712）：配置主账户钱包地址，以及在Aster上为该账户授权的API签名钱包的地址和私钥，不需要API Key。永续合约使用Futures_Aster交易所对象。
+```Futures_ApolloX```（期货）：ApolloX已并入Aster并更名。Futures_ApolloX用API Key（HMAC签名）接入同一交易所的旧版合约接口（```https://fapi.apollox.finance```，币安U本位同构的v1/v2接口），只有永续合约。用钱包签名接入v3接口的是Futures_Aster交易所对象。
 
-```Futures_ApolloX```（期货）
+```Futures_Aster```（期货）：Aster永续合约（接口地址```https://fapi.asterdex.com```，币安U本位同构的v3接口）。私有接口使用钱包签名（EIP-712）：配置主账户钱包地址，以及在Aster上为该账户授权的API签名钱包的地址和私钥，不需要API Key。用API Key（HMAC）接入同一交易所旧版接口的是Futures_ApolloX交易所对象；现货使用Aster交易所对象。
 
-ApolloX已并入Aster并更名。Futures_ApolloX用API Key（HMAC签名）接入同一交易所的旧版合约接口（```https://fapi.apollox.finance```，币安U本位同构的v1/v2接口），只有永续合约。用钱包签名接入v3接口的是Futures_Aster交易所对象。
-
-```Futures_Aster```（期货）
-
-Aster永续合约（接口地址```https://fapi.asterdex.com```，币安U本位同构的v3接口）。私有接口使用钱包签名（EIP-712）：配置主账户钱包地址，以及在Aster上为该账户授权的API签名钱包的地址和私钥，不需要API Key。用API Key（HMAC）接入同一交易所旧版接口的是Futures_ApolloX交易所对象；现货使用Aster交易所对象。
-
-**名称**
+##### 名称与配置
 
 | ```exchange.GetName()``` | 类型 | 别名 |
 | - | - | - |
@@ -24839,25 +26418,23 @@ Aster永续合约（接口地址```https://fapi.asterdex.com```，币安U本位�
 | ```Futures_ApolloX``` | 期货 | ApolloX、ApolloX DEX |
 | ```Futures_Aster``` | 期货 | Aster期货 |
 
-**配置项**
-
 ✓ 表示该交易所对象有这个配置项。
 
-| 配置项 | ```Aster``` | ```Futures_ApolloX``` | ```Futures_Aster``` | 必填 | 默认值 | 说明 |
-| - | - | - | - | - | - | - |
-| 主账户地址 | ✓ |  | ✓ | 是 | — | 主账户（资产所在账户）的钱包地址。 |
-| 签名钱包地址 | ✓ |  | ✓ | 是 | — | 在Aster上为主账户授权的API签名钱包（代理钱包）地址。 |
-| 签名钱包私钥 | ✓ |  | ✓ | 是 | — | 上述签名钱包的私钥，用于对私有请求签名。 |
-| Access Key |  | ✓ |  | 是 | — | 在交易所API管理中创建的API Key。 |
-| Secret Key |  | ✓ |  | 是 | — | 与API Key配对的Secret Key，用于HMAC签名。 |
+| 配置项 | ```Aster``` | ```Futures_ApolloX``` | ```Futures_Aster``` | 必填 | 说明 |
+| - | - | - | - | - | - |
+| 主账户地址 | ✓ |  | ✓ | 是 | 主账户（资产所在账户）的钱包地址。 |
+| 签名钱包地址 | ✓ |  | ✓ | 是 | 在Aster上为主账户授权的API签名钱包（代理钱包）地址。 |
+| 签名钱包私钥 | ✓ |  | ✓ | 是 | 上述签名钱包的私钥，用于对私有请求签名。 |
+| Access Key |  | ✓ |  | 是 | 在交易所API管理中创建的API Key。 |
+| Secret Key |  | ✓ |  | 是 | 与API Key配对的Secret Key，用于HMAC签名。 |
 
-**交易对与合约代码**
+##### 交易对与合约代码
 
-全部交易所对象
+###### 全部交易所对象
 
 交易对示例：```BTC_USDT```、```ETH_USDT```
 
-```Futures_ApolloX```（期货）、```Futures_Aster```（期货）
+###### ```Futures_ApolloX```（期货）、```Futures_Aster```（期货）
 
 交易对按交易所给出的交易币、计价币拼成```BASE_QUOTE```；计价币主要是USDT，也有USD1等，以```exchange.GetMarkets()```为准。
 
@@ -24867,17 +26444,17 @@ Aster永续合约（接口地址```https://fapi.asterdex.com```，币安U本位�
 
 只有永续合约，其它合约代码报错。
 
-```Aster```（现货）
+###### ```Aster```（现货）
 
 交易对按交易所给出的交易币、计价币拼成```BASE_QUOTE```（大写）；计价币除USDT外还有USD1等，以```exchange.GetMarkets()```为准。现货交易对不能带合约后缀。
 
-**专属IO指令**
+##### 专属IO指令
 
-```Aster```（现货）
+###### ```Aster```（现货）
 
 没有专属指令，通用指令见`exchange.IO`。
 
-```Futures_ApolloX```（期货）
+###### ```Futures_ApolloX```（期货）
 
 | 指令 | 参数 | 说明 | 返回值 |
 | - | - | - | - |
@@ -24886,7 +26463,7 @@ Aster永续合约（接口地址```https://fapi.asterdex.com```，币安U本位�
 
 通用指令```api```、```base```、```currency```见`exchange.IO`。
 
-```Futures_Aster```（期货）
+###### ```Futures_Aster```（期货）
 
 | 指令 | 参数 | 说明 | 返回值 |
 | - | - | - | - |
@@ -24895,53 +26472,51 @@ Aster永续合约（接口地址```https://fapi.asterdex.com```，币安U本位�
 
 通用指令```api```、```base```、```currency```见`exchange.IO`。
 
-**不支持与合成的函数**
+##### 函数支持差异
 
-全部交易所对象
+###### 全部交易所对象
 
 不支持（调用时报错并返回空值）：`exchange.ModifyOrder`、`exchange.ModifyConditionOrder`。
 
-```Futures_ApolloX```（期货）、```Futures_Aster```（期货）
+###### ```Futures_ApolloX```（期货）、```Futures_Aster```（期货）
 
 以回退方式支持：
 
 - `exchange.GetRecords`：原生周期为1分钟、3分钟、5分钟、15分钟、30分钟、1小时、2小时、4小时、6小时、8小时、12小时、1天、3天、1周、1月；其它周期由托管者合成。
 
-```Aster```（现货）
+###### ```Aster```（现货）
 
 以回退方式支持：
 
 - `exchange.GetRecords`：原生周期为1秒、1分钟、3分钟、5分钟、15分钟、30分钟、1小时、2小时、4小时、6小时、8小时、12小时、1天、3天、1周、1月；其它周期由托管者合成。
 
-所有交易所的对照见`能力矩阵`。
+##### 保证金、账户与模拟盘
 
-**保证金、账户与模拟盘**
-
-```Futures_ApolloX```（期货）、```Futures_Aster```（期货）
+###### ```Futures_ApolloX```（期货）、```Futures_Aster```（期货）
 
 持仓模式：用```exchange.IO("dual", bool)```切换双向/单向持仓。首次下单前查询一次账户的持仓模式并缓存，双向持仓下单时自动带```positionSide```（平仓不带```reduceOnly```），也可以在下单附加参数中显式传```positionSide```；下单失败后下一单重新查询持仓模式。
 
-```Futures_ApolloX```（期货）
+###### ```Futures_ApolloX```（期货）
 
 保证金模式：用```exchange.IO("cross", bool)```按合约切换全仓/逐仓；```exchange.SetMarginLevel()```按合约设置杠杆。
 
-```Futures_Aster```（期货）
+###### ```Futures_Aster```（期货）
 
 保证金模式：用```exchange.IO("cross", bool)```按合约切换全仓/逐仓；```exchange.SetMarginLevel()```按合约设置杠杆。账户开启联合保证金（Multi-Assets）模式时，交易所拒绝切换为逐仓。
 
-**注意事项**
+##### 注意事项
 
-```Aster```（现货）、```Futures_Aster```（期货）
+###### ```Aster```（现货）、```Futures_Aster```（期货）
 
 - 用```exchange.IO("base", url)```切换到地址中含```testnet```的测试网时，签名自动改用测试网的链ID。
 
-```Futures_ApolloX```（期货）、```Futures_Aster```（期货）
+###### ```Futures_ApolloX```（期货）、```Futures_Aster```（期货）
 
 - 下单量是交易币数量（合约面值为1个交易币），市价买单同样按交易币数量下单。
 - 条件单只支持止盈、止损单，不支持OCO，需要时分别创建止盈单和止损单；不支持修改条件单（```exchange.ModifyConditionOrder()```），需要先撤销再重新创建。
 - ```exchange.GetHistoryOrders()```、```exchange.GetHistoryConditionOrders()```必须指定合约。
 
-```Aster```（现货）
+###### ```Aster```（现货）
 
 - 市价买单的下单量是计价币金额（按Aster的```quoteOrderQty```下单），市价卖单是交易币数量。条件单不论买卖，数量一律是交易币数量。
 - 条件单只支持止盈、止损单，不支持OCO，需要时分别创建止盈单和止损单；不支持修改条件单（```exchange.ModifyConditionOrder()```），需要先撤销再重新创建。```exchange.GetConditionOrder()```传入普通订单的编号时报错（该订单不是条件单）。
@@ -24951,21 +26526,17 @@ Aster永续合约（接口地址```https://fapi.asterdex.com```，币安U本位�
 
 Aevo的USDC永续合约与USDC期权。查询、撤单、设置杠杆使用API Key签名；下单、改单、条件单还要用注册在Aevo账户上的签名密钥（配置项「Signing Key」）对订单做EIP-712签名。
 
-**名称**
+##### 名称与配置
 
-| ```exchange.GetName()``` | 类型 | 别名 |
+```exchange.GetName()```：```Futures_Aevo```（期货）。
+
+| 配置项 | 必填 | 说明 |
 | - | - | - |
-| ```Futures_Aevo``` | 期货 | — |
+| Access Key | 是 | — |
+| Secret Key | 是 | — |
+| Signing Key | 是 | Aevo账户上注册的EIP-712 API签名私钥（```0x```加64位十六进制），用于下单、改单和条件单；也可以运行时用```exchange.IO("signingKey", key)```设置。 |
 
-**配置项**
-
-| 配置项 | 必填 | 默认值 | 说明 |
-| - | - | - | - |
-| Access Key | 是 | — | — |
-| Secret Key | 是 | — | — |
-| Signing Key | 是 | — | Aevo账户上注册的EIP-712 API签名私钥（```0x```加64位十六进制），用于下单、改单和条件单；也可以运行时用```exchange.IO("signingKey", key)```设置。 |
-
-**交易对与合约代码**
+##### 交易对与合约代码
 
 交易对示例：```BTC_USDC```、```ETH_USDC```
 
@@ -24977,7 +26548,7 @@ Aevo以USDC计价和结算，交易对写作```ETH_USDC```；计价币写成USDC
 
 Aevo没有交割合约，除```swap```与期权代码外的合约代码都会报错。
 
-**专属IO指令**
+##### 专属IO指令
 
 | 指令 | 参数 | 说明 | 返回值 |
 | - | - | - | - |
@@ -24985,7 +26556,7 @@ Aevo没有交割合约，除```swap```与期权代码外的合约代码都会报
 
 通用指令```api```、```base```、```currency```见`exchange.IO`。
 
-**不支持与合成的函数**
+##### 函数支持差异
 
 不支持（调用时报错并返回空值）：`exchange.GetTickers`。
 
@@ -24993,9 +26564,7 @@ Aevo没有交割合约，除```swap```与期权代码外的合约代码都会报
 
 - `exchange.GetRecords`：交易所没有K线接口，由托管者用成交记录合成：首次调用只有最近成交覆盖的少量K线，随调用逐步累积。合约没有成交时为空。
 
-所有交易所的对照见`能力矩阵`。
-
-**保证金、账户与模拟盘**
+##### 保证金、账户与模拟盘
 
 保证金模式：Aevo是统一保证金账户，没有全仓/逐仓切换指令；```exchange.GetPositions()```的保证金模式按交易所返回（持仓的```margin_type```，缺省时取账户里该合约的设置），没有逐合约设置的期权持仓为全仓。```exchange.SetMarginLevel()```按永续合约设置杠杆，期权不支持。
 
@@ -25003,7 +26572,7 @@ Aevo没有交割合约，除```swap```与期权代码外的合约代码都会报
 
 账户：```exchange.GetAccount()```的```Balance```为USDC可用余额，```FrozenBalance```为占用的初始保证金，```Equity```为账户权益；USDC以外的抵押品在```exchange.GetAssets()```中逐币列出。
 
-**期权**
+##### 期权
 
 支持Aevo的USDC期权，下单、撤单、查询与永续走同一套接口。限制：
 
@@ -25016,7 +26585,7 @@ Aevo没有交割合约，除```swap```与期权代码外的合约代码都会报
 
 期权代码为Aevo原生代码：标的-到期日（DDMMMYY）-行权价-C/P，C为看涨、P为看跌。期权以USDC结算，交易对设置为标的币加```_USDC```（标的必须与交易对的交易币一致），完整品种代码形如```ETH_USDC.ETH-30JUN23-1600-C```。
 
-**注意事项**
+##### 注意事项
 
 - 只支持限价单，市价单报错；条件单（止盈、止损）的委托价必须是限价，不支持市价止盈止损和OCO。
 - ```exchange.ModifyOrder()```、```exchange.ModifyConditionOrder()```由交易所重新签发订单，返回新的订单号，此后应使用新订单号；```exchange.ModifyOrder()```沿用原订单的只减仓（reduce-only）属性。
@@ -25028,21 +26597,17 @@ Aevo没有交割合约，除```swap```与期权代码外的合约代码都会报
 
 WOOFi Pro永续合约（WOO生态基于Orderly Network的永续合约DEX，与WOO X交易所是不同的产品和账户）。只有USDC结算的永续合约，账户为全仓、单向持仓。需要配置Orderly账户ID和Orderly API密钥（ed25519密钥对）。
 
-**名称**
+##### 名称与配置
 
-| ```exchange.GetName()``` | 类型 | 别名 |
+```exchange.GetName()```：```Futures_WOOFi```（期货）；别名：WOOFi、Orderly。
+
+| 配置项 | 必填 | 说明 |
 | - | - | - |
-| ```Futures_WOOFi``` | 期货 | WOOFi、Orderly |
+| AccountID | 是 | Orderly账户ID。 |
+| Access Key | 是 | Orderly API密钥的公钥（ed25519），带不带```ed25519:```前缀均可。 |
+| Secret Key | 是 | Orderly API密钥的私钥（base58编码），带不带```ed25519:```前缀均可。 |
 
-**配置项**
-
-| 配置项 | 必填 | 默认值 | 说明 |
-| - | - | - | - |
-| AccountID | 是 | — | Orderly账户ID。 |
-| Access Key | 是 | — | Orderly API密钥的公钥（ed25519），带不带```ed25519:```前缀均可。 |
-| Secret Key | 是 | — | Orderly API密钥的私钥（base58编码），带不带```ed25519:```前缀均可。 |
-
-**交易对与合约代码**
+##### 交易对与合约代码
 
 交易对示例：```BTC_USDC```、```ETH_USDC```
 
@@ -25054,11 +26619,7 @@ WOOFi Pro永续合约（WOO生态基于Orderly Network的永续合约DEX，与WO
 
 只有永续合约，其它合约代码会报错。下单数量单位为基础币（```exchange.GetMarkets()```中```CtVal```为1）。
 
-**专属IO指令**
-
-没有专属指令，通用指令见`exchange.IO`。
-
-**不支持与合成的函数**
+##### 函数支持差异
 
 没有不支持的标准函数。
 
@@ -25066,15 +26627,13 @@ WOOFi Pro永续合约（WOO生态基于Orderly Network的永续合约DEX，与WO
 
 - `exchange.GetRecords`：原生周期为1分钟、5分钟、15分钟、30分钟、1小时、4小时、12小时、1天、1周、1月、1年；其它周期由托管者合成。单次最多返回1000根。
 
-所有交易所的对照见`能力矩阵`。
-
-**保证金、账户与模拟盘**
+##### 保证金、账户与模拟盘
 
 保证金模式：账户恒为全仓，没有逐仓，不支持```exchange.IO("cross", ...)```。```exchange.SetMarginLevel()```设置杠杆；交易所按整个账户生效，设置一个合约的杠杆会同时改变其它合约的杠杆。
 
 持仓模式：只有单向（净）持仓，不支持```exchange.IO("dual", ...)```，```exchange.SetDirection()```只用于区分开平仓。
 
-**注意事项**
+##### 注意事项
 
 - 条件单只支持止盈、止损单，不支持OCO（需要分成止盈、止损两张条件单下单）；触发价按标记价格。
 - 盘口和K线接口也需要签名：```exchange.GetDepth()```、```exchange.GetRecords()```以及```exchange.GetTicker()```（买一、卖一价取自盘口）都要求配置好API密钥；```exchange.GetTickers()```、```exchange.GetTrades()```、```exchange.GetFundings()```、```exchange.GetMarkets()```不需要签名。
@@ -25089,44 +26648,44 @@ Uniswap交易所对象在一条链上连接一个DEX（配置项「DEX」选Unis
 
 每笔兑换在所有可用池子的直连路径和经中转币的两跳路径中选报价最好的一条。V4与Infinity路径通过各自的Universal Router兑换，代币授权经过各自的Permit2合约（见```exchange.IO("approve", ...)```）。Aerodrome的基础池子和两代Slipstream各有自己的路由合约，代币分别授权给本次兑换所用的那个路由。
 
-**名称**
+##### 名称与配置
 
-| ```exchange.GetName()``` | 类型 | 别名 |
-| - | - | - |
-| ```Uniswap``` | 现货 | PancakeSwap、Aerodrome |
-
-**配置项**
+```exchange.GetName()```：```Uniswap```（现货）；别名：PancakeSwap、Aerodrome。
 
 | 配置项 | 必填 | 默认值 | 说明 |
 | - | - | - | - |
 | DEX | 是 | ```Uniswap``` | 可选：```Uniswap```、```PancakeSwap```、```Aerodrome (Base)``` |
 | 链 | 是 | ```Ethereum``` | 可选：```Ethereum```、```Arbitrum```、```Base```、```BNB Chain```、```Unichain```、```Polygon```、```OP Mainnet```、```Robinhood```、```Arc``` |
 | 钱包私钥 | 是 | — | 钱包私钥（十六进制）。 |
-| 节点地址 | 否 | ```https://ethereum-rpc.publicnode.com,https://eth.drpc.org``` | RPC节点地址；多个节点用逗号分隔，某个节点出错或缺少数据时自动换下一个；不填时使用各链内置的默认节点（主节点加备用节点，逗号分隔）。查询订单状态需要节点能查到已上链交易的回执：publicnode的Base、BNB Chain、Arbitrum公共节点查不到回执（要求归档权限），不要单独使用。 |
+| 节点地址 | 否 | ```https://ethereum-rpc.publicnode.com,https://eth.drpc.org``` | RPC节点地址；多个节点用逗号分隔，某个节点出错或缺少数据时自动换下一个；不填时使用各链内置的默认节点（主节点加备用节点，逗号分隔）。（详见表下） |
 | 节点认证 | 否 | — | RPC节点认证：```Header-Name: value```形式的请求头，或Basic认证值。 |
 
-**交易对与合约代码**
+表中长说明的其余部分：
+
+- 节点地址：查询订单状态需要节点能查到已上链交易的回执：publicnode的Base、BNB Chain、Arbitrum公共节点查不到回执（要求归档权限），不要单独使用。
+
+##### 交易对与合约代码
 
 交易对示例：```ETH_USDC```、```WETH_USDC```、```ETH_USDG```
 
 交易对写作```ETH_USDC```，原生币（ETH、BNB、POL）与包装币（WETH、WBNB、WPOL）是两个不同的资产。代币表以外的代币用```exchange.IO("token", name, address)```登记后即可写在交易对里。Polygon的原生币为POL；Arc链用USDC支付gas，原生余额与USDC代币（```0x3600000000000000000000000000000000000000```）是同一笔资金，交易对写作```WETH_USDC```、```EURC_USDC```；Robinhood链上没有USDC和USDT，主流稳定币为USDG，交易对写作```ETH_USDG```；Unichain、Polygon上的USDT写作```USDT0```。
 
-**专属IO指令**
+##### 专属IO指令
 
 | 指令 | 参数 | 说明 | 返回值 |
 | - | - | - | - |
-| ```"transfer"``` | to, amount[, token] | 从配置的钱包转出原生币或ERC20代币（```token```为代币名或合约地址，不传为原生币；Arc链上为USDC）；```amount```可传```"all"```转出全部（原生币扣除手续费）。只等交易广播，不等上链。见子页`exchange.IO("transfer")`。 | ```{txHash, from, to, token, tokenAddress, amount, raw}``` |
-| ```"receipt"``` | txHash[, waitMs] | 查询本交易所对象发出的交易（下单、转账等）的回执，可以等待上链（最多10分钟）。查询订单时传订单ID中逗号后面的交易哈希。见子页`exchange.IO("receipt")`。 | 已上链返回```{txHash, status, blockNumber, gasUsed, fee}```，未上链返回```{txHash, pending: true, known}```。 |
-| ```"route"``` | symbol, side, qty | 只询价不下单：列出一笔兑换各条候选路径的报价和最优路径。见子页`exchange.IO("route")`。 | ```{symbol, side, qty, best, quote, price, candidates}``` |
-| ```"simulate"``` | symbol, side, qty[, price[, stateOverride[, route]]] | 按下单逻辑（选路、询价、价格保护）构造兑换交易，只用```eth_call```模拟执行，不签名、不广播、不花费gas。见子页`exchange.IO("simulate")`。 | ```{route, exactIn, amountIn, amountOut, quoted, executed, value, calls}``` |
-| ```"token"``` | [name, address] | 登记代币，登记后的代币可以直接写在交易对里；不传参数时列出代币表。见子页`exchange.IO("token")`。 | 登记时返回```{symbol, address, decimals}```，列表时返回```{symbol, address, decimals, native}```数组。 |
-| ```"wrap"``` | amount | 原生币包装成包装币（例如ETH→WETH），1:1、无滑点、只花gas；不接受```"all"```（要留gas）。见子页`exchange.IO("wrap")`。 | ```{txHash, action, from, to, amount, raw}``` |
-| ```"unwrap"``` | amount | 包装币解包成原生币（例如WETH→ETH），```amount```可传```"all"```。见子页`exchange.IO("unwrap")`。 | ```{txHash, action, from, to, amount, raw}``` |
-| ```"approve"``` | ["exact" \| "max"] | 代币授权模式：```"exact"```（默认）每次只授权本次兑换需要的数量，```"max"```授权无限额度。不传参数时查询。见子页`exchange.IO("approve")`。 | 当前模式。 |
-| ```"slippage"``` | [ratio] | 市价单的滑点保护比例，范围```[0, 0.5)```，默认```0.005```（0.5%）。不传参数时查询。见子页`exchange.IO("slippage")`。 | 当前滑点比例。 |
-| ```"deadline"``` | [seconds] | 交易有效期（秒），范围10到86400，默认120。不传参数时查询。见子页`exchange.IO("deadline")`。 | 当前截止时间（秒）。 |
-| ```"cancelWait"``` | [seconds] | 撤单时等待结果的最长时间（秒），范围0到600，默认30；0表示发出撤单交易后立即返回。不传参数时查询。见子页`exchange.IO("cancelWait")`。 | 当前等待时间（秒）。 |
-| ```"gasMultiplier"``` | [x] | gas上限倍数，范围1到5，默认1.2：交易的gasLimit为节点估算的gas乘以该倍数。不传参数时查询。见子页`exchange.IO("gasMultiplier")`。 | 当前倍数。 |
+| ```"transfer"``` | to, amount[, token] | 从配置的钱包转出原生币或ERC20代币（```token```为代币名或合约地址，不传为原生币；Arc链上为USDC）；```amount```可传```"all"```转出全部（原生币扣除手续费）。只等交易广播，不等上链。见子页`exchange.IO("transfer", ...)`。 | ```{txHash, from, to, token, tokenAddress, amount, raw}``` |
+| ```"receipt"``` | txHash[, waitMs] | 查询本交易所对象发出的交易（下单、转账等）的回执，可以等待上链（最多10分钟）。查询订单时传订单ID中逗号后面的交易哈希。见子页`exchange.IO("receipt", ...)`。 | 已上链返回```{txHash, status, blockNumber, gasUsed, fee}```，未上链返回```{txHash, pending: true, known}```。 |
+| ```"route"``` | symbol, side, qty | 只询价不下单：列出一笔兑换各条候选路径的报价和最优路径。见子页`exchange.IO("route", ...)`。 | ```{symbol, side, qty, best, quote, price, candidates}``` |
+| ```"simulate"``` | symbol, side, qty[, price[, stateOverride[, route]]] | 按下单逻辑（选路、询价、价格保护）构造兑换交易，只用```eth_call```模拟执行，不签名、不广播、不花费gas。见子页`exchange.IO("simulate", ...)`。 | ```{route, exactIn, amountIn, amountOut, quoted, executed, value, calls}``` |
+| ```"token"``` | [name, address] | 登记代币，登记后的代币可以直接写在交易对里；不传参数时列出代币表。见子页`exchange.IO("token", ...)`。 | 登记时返回```{symbol, address, decimals}```，列表时返回```{symbol, address, decimals, native}```数组。 |
+| ```"wrap"``` | amount | 原生币包装成包装币（例如ETH→WETH），1:1、无滑点、只花gas；不接受```"all"```（要留gas）。见子页`exchange.IO("wrap", ...)`。 | ```{txHash, action, from, to, amount, raw}``` |
+| ```"unwrap"``` | amount | 包装币解包成原生币（例如WETH→ETH），```amount```可传```"all"```。见子页`exchange.IO("unwrap", ...)`。 | ```{txHash, action, from, to, amount, raw}``` |
+| ```"approve"``` | ["exact" \| "max"] | 代币授权模式：```"exact"```（默认）每次只授权本次兑换需要的数量，```"max"```授权无限额度。不传参数时查询。见子页`exchange.IO("approve", ...)`。 | 当前模式。 |
+| ```"slippage"``` | [ratio] | 市价单的滑点保护比例，范围```[0, 0.5)```，默认```0.005```（0.5%）。不传参数时查询。见子页`exchange.IO("slippage", ...)`。 | 当前滑点比例。 |
+| ```"deadline"``` | [seconds] | 交易有效期（秒），范围10到86400，默认120。不传参数时查询。见子页`exchange.IO("deadline", ...)`。 | 当前截止时间（秒）。 |
+| ```"cancelWait"``` | [seconds] | 撤单时等待结果的最长时间（秒），范围0到600，默认30；0表示发出撤单交易后立即返回。不传参数时查询。见子页`exchange.IO("cancelWait", ...)`。 | 当前等待时间（秒）。 |
+| ```"gasMultiplier"``` | [x] | gas上限倍数，范围1到5，默认1.2：交易的gasLimit为节点估算的gas乘以该倍数。不传参数时查询。见子页`exchange.IO("gasMultiplier", ...)`。 | 当前倍数。 |
 | ```"base"``` | [url] | 不传参数时返回当前节点地址；传入地址时切换节点。多个节点写成逗号分隔的字符串（传数组时只使用第一个地址）。换节点后第一次请求会核对节点所在的链，与配置的链不一致时报错。 | 切换前的地址。 |
 | ```"sendBase"``` | url | 设置只用来广播交易的节点（私有交易通道）。与Web3不同：不返回设置前的地址，不传参数时不查询，传空字符串不会清除设置。 | ```true``` |
 | ```"address"``` | — | 配置的私钥对应的钱包地址（```0x```开头的小写地址）。 | — |
@@ -25134,13 +26693,11 @@ Uniswap交易所对象在一条链上连接一个DEX（配置项「DEX」选Unis
 
 通用指令```api```、```currency```见`exchange.IO`。
 
-**不支持与合成的函数**
+##### 函数支持差异
 
 不支持（调用时报错并返回空值）：`exchange.GetTickers`、`exchange.GetRecords`、`exchange.GetHistoryOrders`、`exchange.ModifyOrder`、`exchange.CreateConditionOrder`、`exchange.ModifyConditionOrder`、`exchange.CancelConditionOrder`、`exchange.GetConditionOrder`、`exchange.GetConditionOrders`、`exchange.GetHistoryConditionOrders`。
 
-所有交易所的对照见`能力矩阵`。
-
-**注意事项**
+##### 注意事项
 
 | 函数 | Uniswap交易所的行为 |
 | - | - |
@@ -25163,14 +26720,14 @@ Forms:
 
 - `exchange.IO("transfer", ...)`
 
-```exchange.IO("transfer", ...)```调用方式用于从Uniswap交易所对象所配置的钱包中转出链上原生币（如ETH、BNB）或ERC20代币。
+从Uniswap交易所对象配置的钱包转出链上原生币（ETH、BNB）或ERC20代币。
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于指定```exchange.IO()```函数的功能。设置为```"transfer"```时，该函数用于执行转账。
-- `to` (string, required): ```to```参数为收款地址，即以```0x```开头的20字节十六进制地址，且必须是交易所对象所在链上的地址。
-- `amount` (string / number, required): ```amount```参数为转账数量，采用可读单位（例如```"0.05"```表示0.05个ETH）。建议以字符串形式传入，函数会按代币精度进行精确换算；若小数位数超出代币精度则直接报错，不会静默截断。设置为```"all"```表示全部转出：转原生币时，按本次交易手续费上限预留后转出剩余全部余额；转代币时，转出全部代币余额。
-- `token` (string, optional): ```token```参数用于指定要转出的代币，可以是代币名称（如```"USDC"```，按交易对中代币名的同样规则解析：代币表中的内置或登记过的代币，以及官方代币列表中的代币，参看```exchange.IO("token", ...)```），也可以是代币合约地址。不传入该参数时表示转出原生币。
+- `k` (string, required): 固定为```"transfer"```，用于执行转账。
+- `to` (string, required): 收款地址，即以```0x```开头的20字节十六进制地址，且必须是交易所对象所在链上的地址。
+- `amount` (string / number, required): 转账数量，采用可读单位（例如```"0.05"```表示0.05个ETH）。建议以字符串形式传入，函数会按代币精度进行精确换算；若小数位数超出代币精度则直接报错，不会静默截断。设置为```"all"```表示全部转出：转原生币时，按本次交易手续费上限预留后转出剩余全部余额；转代币时，转出全部代币余额。
+- `token` (string, optional): 要转出的代币，可以是代币名称（如```"USDC"```，按交易对中代币名的同样规则解析：代币表中的内置或登记过的代币，以及官方代币列表中的代币，参看```exchange.IO("token", ...)```），也可以是代币合约地址。不传入该参数时表示转出原生币。
 
 Returns (object / 空值): 交易广播成功时返回```{txHash, from, to, token, tokenAddress, amount, raw}```：其中```txHash```为交易哈希；```amount```为转出数量（可读单位）；```raw```为以最小单位表示的十进制字符串；转出原生币时```tokenAddress```为```null```。该函数仅等待交易广播完成，不等待交易上链确认；上链结果需通过```exchange.IO("receipt", ...)```查询。调用失败时返回空值，可通过```GetLastError()```获取失败原因。
 
@@ -25209,6 +26766,8 @@ function main() {
 
 转账为链上真实交易，一经发出无法撤回。向交易所充值地址转账前，请确认对方支持该链上的充值。
 
+See also: `Uniswap`, `exchange.IO`, `exchange.IO("receipt")`, `exchange.IO("token")`, `exchange.IO("wrap")`
+
 ##### exchange.IO("receipt", ...)
 
 ```
@@ -25220,13 +26779,13 @@ Forms:
 
 - `exchange.IO("receipt", ...)`
 
-以```exchange.IO("receipt", ...)```方式调用该函数，可查询Uniswap交易所对象所发出交易（如下单、转账等）的回执，也可等待交易上链。
+查询Uniswap交易所对象发出的交易（下单、转账等）的回执，可以等待交易上链。
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能。设置为```"receipt"```时，该函数用于查询交易回执。
-- `txHash` (string, required): ```txHash```参数为交易哈希，即以```0x```开头、长度为32字节的十六进制字符串，例如```exchange.IO("transfer", ...)```返回的```txHash```。查询订单的交易时，传订单ID（形如```ETH_USDC,0x…```）中逗号后面的部分。
-- `waitMs` (number, optional): ```waitMs```参数为最长等待时间，单位为毫秒。交易未上链时，每1.5秒查询一次，最长等待10分钟。未传入该参数或传入0时，仅查询一次。
+- `k` (string, required): 固定为```"receipt"```，用于查询交易回执。
+- `txHash` (string, required): 交易哈希，即以```0x```开头、长度为32字节的十六进制字符串，例如```exchange.IO("transfer", ...)```返回的```txHash```。查询订单的交易时，传订单ID（形如```ETH_USDC,0x…```）中逗号后面的部分。
+- `waitMs` (number, optional): 最长等待时间，单位为毫秒。交易未上链时，每1.5秒查询一次，最长等待10分钟。未传入该参数或传入0时，仅查询一次。
 
 Returns (object): 交易已上链时，返回```{txHash, status, blockNumber, gasUsed, fee}```。其中，```status```的值为```"success"```或```"reverted"```；```fee```为实际支付的手续费，以原生币计价，采用可读单位。等待时间内交易仍未上链时，返回```{txHash, pending: true, known}```。其中，```known```表示节点能否查询到该笔交易；如果查询不到，通常是因为交易已被丢弃或交易哈希有误。
 
@@ -25246,6 +26805,8 @@ function main() {
 
 查询订单成交情况时，使用```exchange.GetOrder()```即可。```exchange.IO("receipt", ...)```主要用于查询转账等非下单类交易。
 
+See also: `Uniswap`, `exchange.IO`, `exchange.IO("transfer")`, `exchange.IO("cancelWait")`, `exchange.IO("wrap")`, `exchange.IO("unwrap")`
+
 ##### exchange.IO("route", ...)
 
 ```
@@ -25256,18 +26817,18 @@ Forms:
 
 - `exchange.IO("route", ...)`
 
-```exchange.IO("route", ...)```调用用于在Uniswap交易所对象上询价：列出一笔兑换在各条候选路径上的报价以及最优路径，不会实际下单。
+在Uniswap交易所对象上询价：列出一笔兑换各条候选路径的报价和最优路径，不下单。
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"route"```时，该函数用于询价。
-- `symbol` (string, required): ```symbol```参数为交易对，例如```"ETH_USDC"```。
-- `side` (string, required): ```side```参数为交易方向：```"sell"```表示卖出```qty```个基础币，```"buy"```表示买入```qty```个基础币。
-- `qty` (number, required): ```qty```参数为基础币的数量。
+- `k` (string, required): 固定为```"route"```，用于询价。
+- `symbol` (string, required): 交易对，例如```"ETH_USDC"```。
+- `side` (string, required): 方向：```"sell"```表示卖出```qty```个基础币，```"buy"```表示买入```qty```个基础币。
+- `qty` (number, required): 基础币数量。
 
-Returns (object / 空值): 返回```{symbol, side, qty, best, quote, price, candidates}```。其中，```best```为最优路径；```quote```为最优报价（卖出时为可获得的计价币数量，买入时为需支付的计价币数量）；```price```为对应的平均成交价格；```candidates```为各条候选路径的报价，每项格式为```{route, quote}```（无法报价的路径，其```quote```为```null```）。没有可用的池子时仍返回对象：```best```、```quote```、```price```为```null```，```candidates```为空数组（有池子但都报不出价时，```candidates```各项的```quote```为```null```）。交易对中的代币无法识别、节点所在的链与配置不一致等出错时返回空值，```GetLastError()```中有原因。
+Returns (object / 空值): 返回```{symbol, side, qty, best, quote, price, candidates}```：最优路径、最优报价、平均价格和各候选路径的报价，字段说明见备注。出错时返回空值，原因见```GetLastError()```。
 
-比较卖出1个ETH时各条路径的报价。
+比较卖出1个ETH的各条路径。
 
 ```javascript
 function main() {
@@ -25287,9 +26848,13 @@ function main() {
 }
 ```
 
-候选路径包括：V3各费率档位的直连池、V2池，经由包装币（如WETH）或USDC/USDT中转的两跳路径，以及Uniswap V4不带hook的池子（直连和经原生币或USDC/USDT中转的两跳）。路径的表示形式如```v3:WETH-500-USDC```（V3池，费率500即0.05%）、```v2:WETH-USDC```、```v3:UNI-3000-USDT-100-USDC```（两跳路径）、```v4:ETH-500/10-USDC```（V4，费率500、tick间距10，ETH为原生币）、```infinity:BNB-67/1-USDT```（PancakeSwap Infinity CL）；Aerodrome为```cl:WETH-100-USDC```（第一代Slipstream，数字为tick间距）、```cl2:WETH-500-USDC```（第二代Slipstream）、```volatile:AERO-USDC```、```stable:USDC-USDbC```（基础池子）。
+候选路径包括：V3各费率档的直连池子、V2池子、经包装币或USDC/USDT中转的两跳路径，以及Uniswap V4不带hook的池子（直连和经原生币或USDC/USDT中转的两跳）。路径写法如```v3:WETH-500-USDC```（V3，费率500即0.05%）、```v2:WETH-USDC```、```v3:UNI-3000-USDT-100-USDC```（两跳）、```v4:ETH-500/10-USDC```（V4，费率500、tick间距10，ETH为原生币）、```infinity:BNB-67/1-USDT```（PancakeSwap Infinity CL）；Aerodrome为```cl:WETH-100-USDC```（第一代Slipstream，数字为tick间距）、```cl2:WETH-500-USDC```（第二代Slipstream）、```volatile:AERO-USDC```、```stable:USDC-USDbC```（基础池子）。
 
-V3路径通过链上QuoterV2合约询价（对整笔兑换进行完整模拟），V2路径根据池子储备在本地计算。报价均不含gas费用。
+V3路径用链上QuoterV2询价（把整笔兑换模拟一遍），V2按池子储备本地计算，报价不含gas。
+
+返回对象的字段：```best```为最优路径，```quote```为最优报价（卖出时为可得到的计价币数量，买入时为需要花费的计价币数量），```price```为对应的平均价格，```candidates```为每条候选路径```{route, quote}```（报不出价的路径```quote```为```null```）。没有可用的池子时仍返回对象：```best```、```quote```、```price```为```null```，```candidates```为空数组（有池子但都报不出价时，```candidates```各项的```quote```为```null```）。交易对中的代币无法识别、节点所在的链与配置不一致等出错时返回空值，```GetLastError()```中有原因。
+
+See also: `Uniswap`, `exchange.IO`, `exchange.IO("simulate")`, `exchange.IO("slippage")`, `exchange.IO("token")`, `exchange.CreateOrder`
 
 ##### exchange.IO("simulate", ...)
 
@@ -25304,21 +26869,21 @@ Forms:
 
 - `exchange.IO("simulate", ...)`
 
-```exchange.IO("simulate", ...)```调用方式按照Uniswap交易所对象的下单逻辑（路径选择、询价、价格保护）构造兑换交易，仅在链上进行模拟执行（```eth_call```），不签名、不广播，也不消耗gas。
+```exchange.IO("simulate", ...)```函数的调用方式用于按Uniswap交易所对象的下单逻辑（选路、询价、价格保护）构造兑换交易，只在链上模拟执行（```eth_call```），不签名、不广播、不花费gas。
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于指定```exchange.IO()```函数的功能，设置为```"simulate"```时表示模拟下单。
-- `symbol` (string, required): ```symbol```参数为交易对，例如```"ETH_USDC"```。
-- `side` (string, required): ```side```参数为交易方向，取值为```"buy"```或```"sell"```。
-- `qty` (number, required): ```qty```参数为下单数量，含义与```exchange.CreateOrder()```中的数量参数相同（市价买入时为要花费的计价币数量）。
-- `price` (number, optional): ```price```参数为限价价格，不传或传入```null```时表示市价单。
-- `stateOverride` (object, optional): ```stateOverride```参数为节点```eth_call```调用的状态覆盖（即geth的state override set），用于在模拟时为钱包临时补充余额或授权额度，例如```{"0x钱包地址": {"balance": "0x56bc75e2d63100000"}}```。该覆盖仅在本次模拟中生效。
-- `route` (string, optional): ```route```参数用于限定路径类型，可选值为```"v2"```、```"v3"```、```"v4"```、```"hop"```（两跳）或```"direct"```（直连）；Aerodrome的```"v2"```为基础池子、```"v3"```为Slipstream池子。不传时在所有路径中选择最优路径。
+- `k` (string, required): 固定为```"simulate"```，用于模拟下单。
+- `symbol` (string, required): 交易对，例如```"ETH_USDC"```。
+- `side` (string, required): 方向，```"buy"```或```"sell"```。
+- `qty` (number, required): 数量，含义与```exchange.CreateOrder()```相同（市价买入时为要花费的计价币数量）。
+- `price` (number, optional): 限价，不传或传```null```表示市价单。
+- `stateOverride` (object, optional): 节点```eth_call```的状态覆盖（geth的state override set），用于模拟时给钱包临时补充余额或授权，例如```{"0x钱包地址": {"balance": "0x56bc75e2d63100000"}}```。只在本次模拟中生效。
+- `route` (string, optional): 限定路径类型：```"v2"```、```"v3"```、```"v4"```、```"hop"```（两跳）或```"direct"```（直连）；Aerodrome的```"v2"```为基础池子、```"v3"```为Slipstream池子。不传表示在所有路径中选最优。
 
-Returns (object / 空值): 返回```{route, exactIn, amountIn, amountOut, quoted, executed, value, calls}```。其中，```quoted```为下单时的报价数量，```executed```为模拟执行得到的实际数量（精确输入时为实际获得的数量，精确输出时为实际花费的数量），两者均为以最小单位表示的十进制字符串。V4路径（含PancakeSwap Infinity）经Universal Router执行，路由不返回成交数量，```executed```为```null```：模拟不报错即说明按这组参数（含最少得到/最多花费）能够成交。当限价无法满足，或余额、授权不足（且未通过状态覆盖补足）时，返回空值并输出错误信息。
+Returns (object / 空值): 返回```{route, exactIn, amountIn, amountOut, quoted, executed, value, calls}```，主要看下单时的报价```quoted```与模拟执行得到的数量```executed```，字段说明见备注。不能成交时返回空值并报错。
 
-为钱包临时补充100个ETH，模拟卖出1个ETH。
+给钱包临时补100个ETH，模拟卖出1个ETH。
 
 ```javascript
 function main() {
@@ -25329,9 +26894,13 @@ function main() {
 }
 ```
 
-模拟基于最新区块状态执行，与真实下单相比，唯一的差异在于交易实际上链前价格可能发生变化。
+模拟用的是最新区块状态，与真实下单相比，只差在交易实际上链前价格可能变化。
 
-当钱包余额不足或代币未授权时，模拟会因路由合约转账失败而报错，此时可以使用```stateOverride```参数进行状态覆盖。
+钱包余额不足或代币未授权时，模拟会因为路由合约转账失败而报错，可以用```stateOverride```覆盖。
+
+返回对象的字段：```quoted```为下单时的报价，```executed```为模拟执行得到的实际数量（精确输入时为得到的数量，精确输出时为花费的数量），两者均为最小单位的十进制字符串。V4路径（含PancakeSwap Infinity）经Universal Router执行，路由不返回成交数量，```executed```为```null```：模拟不报错即说明按这组参数（含最少得到/最多花费）能够成交。限价达不到、余额或授权不足（未覆盖时）等情况返回空值并报错。
+
+See also: `Uniswap`, `exchange.IO`, `exchange.IO("route")`, `exchange.IO("slippage")`, `exchange.IO("gasMultiplier")`, `exchange.CreateOrder`
 
 ##### exchange.IO("token", ...)
 
@@ -25344,13 +26913,13 @@ Forms:
 
 - `exchange.IO("token", ...)`
 
-```exchange.IO("token", ...)```函数的调用方式用于在Uniswap交易所对象上登记代币，或者列出代币表。登记后的代币可以直接写在交易对里使用。
+在Uniswap交易所对象上登记代币，或列出代币表；登记后的代币可以直接写在交易对里。
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"token"```表示该函数用于代币登记。
-- `name` (string, optional): ```name```参数为代币在交易对中使用的名字，例如```"UNI"```。
-- `address` (string, optional): ```address```参数为代币合约地址，精度从链上读取。
+- `k` (string, required): 固定为```"token"```，用于代币登记。
+- `name` (string, optional): 代币在交易对中使用的名字，例如```"UNI"```。
+- `address` (string, optional): 代币合约地址，精度从链上读取。
 
 Returns (object / array / 空值): 登记时返回```{symbol, address, decimals}```；不传参数时返回代币表数组，每项为```{symbol, address, decimals, native}```（```native```为```true```的是链上原生币）。地址不是ERC20代币时返回空值。
 
@@ -25374,6 +26943,8 @@ function main() {
 
 原生币（ETH、BNB）与包装币（WETH、WBNB）是两个不同的资产：交易原生币时由路由合约自动包装和解包。
 
+See also: `Uniswap`, `exchange.IO`, `exchange.IO("route")`, `exchange.IO("transfer")`, `exchange.IO("approve")`
+
 ##### exchange.IO("wrap", ...)
 
 ```
@@ -25388,8 +26959,8 @@ Forms:
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"wrap"```表示该函数用于包装原生币。
-- `amount` (string / number, required): ```amount```参数为要包装的原生币数量（可读单位，建议写成字符串，例如```"0.01"```）。不支持```"all"```：原生币还要留着支付gas。
+- `k` (string, required): 固定为```"wrap"```，用于包装原生币。
+- `amount` (string / number, required): 要包装的原生币数量（可读单位，建议写成字符串，例如```"0.01"```）。不支持```"all"```：原生币还要留着支付gas。
 
 Returns (object / 空值): 交易广播成功返回```{txHash, action, from, to, amount, raw}```，```from```、```to```为兑换前后的币种名。只等交易广播，不等上链，上链结果用```exchange.IO("receipt", ...)```查询。余额不足等情况返回空值并报错。
 
@@ -25409,6 +26980,8 @@ function main() {
 
 直接调用包装币合约的```deposit()```，不经过Uniswap路由和资金池。```ETH_WETH```这样的交易对不能下单，原生币与包装币之间的转换请用```exchange.IO("wrap", ...)```和```exchange.IO("unwrap", ...)```。
 
+See also: `Uniswap`, `exchange.IO`, `exchange.IO("unwrap")`, `exchange.IO("receipt")`, `exchange.IO("transfer")`
+
 ##### exchange.IO("unwrap", ...)
 
 ```
@@ -25423,8 +26996,8 @@ Forms:
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"unwrap"```表示该函数用于解包包装币。
-- `amount` (string / number, required): ```amount```参数为要解包的包装币数量（可读单位，建议写成字符串）；设置为```"all"```表示解包全部包装币。
+- `k` (string, required): 固定为```"unwrap"```，用于解包包装币。
+- `amount` (string / number, required): 要解包的包装币数量（可读单位，建议写成字符串）；设置为```"all"```表示解包全部包装币。
 
 Returns (object / 空值): 交易广播成功返回```{txHash, action, from, to, amount, raw}```。包装币余额不足或为0时返回空值并报错。
 
@@ -25444,6 +27017,8 @@ function main() {
 
 直接调用包装币合约的```withdraw(uint256)```，不经过Uniswap路由和资金池。
 
+See also: `Uniswap`, `exchange.IO`, `exchange.IO("wrap")`, `exchange.IO("receipt")`, `exchange.IO("transfer")`
+
 ##### exchange.IO("approve", ...)
 
 ```
@@ -25459,8 +27034,8 @@ Forms:
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于指定```exchange.IO()```函数的功能。设置为```"approve"```时，表示该函数用于设置代币授权模式。
-- `mode` (string, optional): ```mode```参数为授权模式：```"exact"```（默认）表示每次仅授权本次兑换所需的数量；```"max"```表示授权无限额度，此后同一代币无需再次授权。不传入该参数时，表示查询当前授权模式。
+- `k` (string, required): 固定为```"approve"```，用于设置代币授权模式。
+- `mode` (string, optional): 授权模式：```"exact"```（默认）表示每次仅授权本次兑换所需的数量；```"max"```表示授权无限额度，此后同一代币无需再次授权。不传入该参数时，表示查询当前授权模式。
 
 Returns (string): 返回当前的授权模式：```"exact"```或```"max"```。
 
@@ -25479,6 +27054,8 @@ function main() {
 
 ```"max"```模式可省去后续的授权交易及相应的gas费用，但路由合约将有权动用该代币的全部余额，请根据实际需要选择。
 
+See also: `Uniswap`, `exchange.IO`, `exchange.IO("transfer")`, `exchange.IO("simulate")`, `exchange.IO("gasMultiplier")`
+
 ##### exchange.IO("slippage", ...)
 
 ```
@@ -25490,12 +27067,12 @@ Forms:
 
 - `exchange.IO("slippage", ...)`
 
-```exchange.IO("slippage", ...)```函数的此种调用方式用于为Uniswap交易所对象设置市价单的滑点保护。
+设置Uniswap交易所对象市价单的滑点保护。
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能。设置为```"slippage"```时，表示该函数用于设置市价单的滑点保护。
-- `ratio` (number, optional): ```ratio```参数为滑点比例，取值范围为```[0, 0.5)```，默认值为```0.005```（即0.5%）。不传入该参数时，表示查询当前的滑点比例。
+- `k` (string, required): 固定为```"slippage"```，用于设置市价单的滑点保护。
+- `ratio` (number, optional): 滑点比例，取值范围为```[0, 0.5)```，默认值为```0.005```（即0.5%）。不传入该参数时，表示查询当前的滑点比例。
 
 Returns (number): 返回当前的滑点比例。
 
@@ -25512,6 +27089,8 @@ function main() {
 
 也可以在```exchange.CreateOrder()```函数的方向参数后附加```;{"slippage":0.01}```，为单笔订单单独指定滑点。限价单不使用滑点，因为限价本身就是最差成交价。
 
+See also: `Uniswap`, `exchange.IO`, `exchange.IO("route")`, `exchange.IO("simulate")`, `exchange.IO("deadline")`, `exchange.CreateOrder`
+
 ##### exchange.IO("deadline", ...)
 
 ```
@@ -25527,8 +27106,8 @@ Forms:
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于指定```exchange.IO()```函数的功能，设置为```"deadline"```时，表示该函数用于设置交易的截止时间。
-- `seconds` (number, optional): ```seconds```参数为交易有效期，单位为秒，取值范围为10至86400，默认值为120。不传入该参数时，表示查询当前设置值。
+- `k` (string, required): 固定为```"deadline"```，用于设置交易的截止时间。
+- `seconds` (number, optional): 交易有效期，单位为秒，取值范围为10至86400，默认值为120。不传入该参数时，表示查询当前设置值。
 
 Returns (number): 返回当前设置的交易截止时间，单位为秒。
 
@@ -25542,6 +27121,8 @@ function main() {
 ```
 
 兑换交易发出后，若超过截止时间仍未上链，执行时将被回滚。这样可以避免长时间挂起的交易在价格大幅波动后才成交。
+
+See also: `Uniswap`, `exchange.IO`, `exchange.IO("slippage")`, `exchange.IO("gasMultiplier")`, `exchange.IO("cancelWait")`
 
 ##### exchange.IO("cancelWait", ...)
 
@@ -25558,8 +27139,8 @@ Forms:
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"cancelWait"```表示该函数用于设置撤单等待结果的最长时间。
-- `seconds` (number, optional): ```seconds```参数为等待时间（秒），范围0到600，默认30。设置为0表示发出撤单交易后立即返回。不传表示查询当前值。
+- `k` (string, required): 固定为```"cancelWait"```，用于设置撤单等待结果的最长时间。
+- `seconds` (number, optional): 等待时间（秒），范围0到600，默认30。设置为0表示发出撤单交易后立即返回。不传表示查询当前值。
 
 Returns (number): 返回当前等待时间（秒）。
 
@@ -25580,6 +27161,8 @@ function main() {
 
 以太坊主网约12秒出一个块，默认的30秒约等于两三个块；出块快的链（Base、Arbitrum、BNB Chain）通常几秒内就有结果。
 
+See also: `Uniswap`, `exchange.IO`, `exchange.IO("receipt")`, `exchange.IO("deadline")`, `exchange.CancelOrder`
+
 ##### exchange.IO("gasMultiplier", ...)
 
 ```
@@ -25595,8 +27178,8 @@ Forms:
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于指定```exchange.IO()```函数的功能，设置为```"gasMultiplier"```时，表示该函数用于设置gas上限倍数。
-- `x` (number, optional): ```x```参数为gas上限倍数，取值范围为1到5，默认值为1.2。交易的gasLimit等于节点估算的gas用量乘以该倍数。不传入该参数时，表示查询当前倍数。
+- `k` (string, required): 固定为```"gasMultiplier"```，用于设置gas上限倍数。
+- `x` (number, optional): gas上限倍数，取值范围为1到5，默认值为1.2。交易的gasLimit等于节点估算的gas用量乘以该倍数。不传入该参数时，表示查询当前倍数。
 
 Returns (number): 返回当前的gas上限倍数。
 
@@ -25611,55 +27194,55 @@ function main() {
 
 gasLimit仅为gas用量上限，实际手续费按实际消耗的gas计算，因此适当调高倍数不会增加实际花费；但钱包余额需足以覆盖gasLimit对应的最高手续费，否则交易可能无法发送。
 
+See also: `Uniswap`, `exchange.IO`, `exchange.IO("deadline")`, `exchange.IO("simulate")`, `exchange.IO("slippage")`
+
 #### Jupiter
 
 Jupiter交易所对象连接Solana链上的Jupiter聚合器，把兑换映射为现货交易函数。一个交易所对象对应一个Solana钱包：报价和兑换交易由Jupiter Swap API生成（它在Solana上的众多DEX和做市商之间拆单选路），托管者用配置的私钥签名后经Solana节点广播。不填Jupiter API Key时使用免费的```lite-api.jup.ag```，填写后使用```api.jup.ag```。
 
-**名称**
+##### 名称与配置
 
-| ```exchange.GetName()``` | 类型 | 别名 |
-| - | - | - |
-| ```Jupiter``` | 现货 | — |
-
-**配置项**
+```exchange.GetName()```：```Jupiter```（现货）。
 
 | 配置项 | 必填 | 默认值 | 说明 |
 | - | - | - | - |
 | 钱包私钥 | 是 | — | Solana钱包私钥：Phantom、Solflare导出的base58字符串，或solana-keygen生成的JSON字节数组。 |
 | 节点地址 | 否 | ```https://api.mainnet-beta.solana.com,https://solana-rpc.publicnode.com``` | Solana RPC节点，多个用逗号分隔，某个节点出错时自动换下一个。默认为官方公共节点和publicnode。 |
 | Jupiter API Key | 否 | — | 可选。不填时使用免费的```lite-api.jup.ag```；填写后使用```api.jup.ag```，请求速率可按套餐提高（见```exchange.IO("rps", ...)```）。 |
-| 流动性来源 | 否 | — | 可选。只经过这些流动性来源兑换，例如```pump```（pump.fun的bonding curve与PumpSwap）、```meteora```、```raydium```、```orca```，或Jupiter的来源名；不填表示全部来源。运行中可用```exchange.IO("dexes", ...)```修改。 |
+| 流动性来源 | 否 | — | 可选。（详见表下） |
 
-**交易对与合约代码**
+表中长说明的其余部分：
+
+- 流动性来源：只经过这些流动性来源兑换，例如```pump```（pump.fun的bonding curve与PumpSwap）、```meteora```、```raydium```、```orca```，或Jupiter的来源名；不填表示全部来源。运行中可用```exchange.IO("dexes", ...)```修改。
+
+##### 交易对与合约代码
 
 交易对示例：```SOL_USDC```、```JUP_USDC```、```BONK_SOL```
 
 SOL为原生币，兑换时自动包装、解包。内置代币：SOL、USDC、USDT、JUP、BONK、WIF、JTO、PYTH、RAY、JitoSOL、mSOL、JupSOL、TRUMP、PENGU、POPCAT。其它代币有三种写法：直接写代币名，按Jupiter代币列表中经过认证、名称完全一致的代币识别（同名的多个认证代币时报错）；直接写mint地址；或者先用```exchange.IO("token", ...)```登记。交易对不转大写（mint地址与```mSOL```这类币名区分大小写），按原样书写，例如```DB5QKorV9KHY54y73h5xWQqYyuD8P3jC1p5Ea8DBpump_SOL```。
 
-**专属IO指令**
+##### 专属IO指令
 
 | 指令 | 参数 | 说明 | 返回值 |
 | - | - | - | - |
-| ```"route"``` | symbol, side, qty | 只询价不下单：卖出（```sell```）按精确输入、买入（```buy```）按精确输出询价```qty```个基础币，返回报价和经过的流动性来源。报价不含Solana交易手续费。见子页`exchange.IO("route")`。 | ```{symbol, side, qty, route, quote, price, priceImpactPct}```；没有路由时```route```、```quote```、```price```为```null```。 |
-| ```"token"``` | [name, mint] | 登记代币（只在本次运行中有效），登记后的代币名可以直接写在交易对里；不传参数时列出代币表。见子页`exchange.IO("token")`。 | 登记时返回```{symbol, mint, decimals}```，列表时返回```{symbol, mint, decimals, native}```数组。 |
-| ```"transfer"``` | to, amount | 从钱包转出SOL；```amount```可传```"all"```转出全部余额（扣除手续费）。只支持SOL，第三个参数传其它代币会报错。只等广播，不等上链。见子页`exchange.IO("transfer")`。 | ```{signature, amount, lastValidBlockHeight}``` |
-| ```"receipt"``` | signature[, waitMs] | 查询一笔Solana交易的状态，可等待到确认或失败（最多10分钟）。查询订单时传订单ID中逗号后面的交易签名。见子页`exchange.IO("receipt")`。 | ```{signature, state, slot, confirmationStatus, err, fee, blockTime}```，```state```为```"success"```、```"failed"```或```"pending"```。 |
-| ```"slippage"``` | [ratio] | 市价单的滑点保护比例，范围```[0, 0.5)```，默认```0.005```（0.5%），由链上程序强制执行。限价单不使用这个设置。不传参数时查询。见子页`exchange.IO("slippage")`。 | 当前滑点比例。 |
-| ```"priorityFee"``` | [sol] | 每笔兑换交易的优先费上限（SOL），范围0到0.1，默认0.001；实际优先费由Jupiter按网络拥堵情况估算，不超过上限。不传参数时查询。见子页`exchange.IO("priorityFee")`。 | 当前上限（SOL）。 |
-| ```"dexes"``` | [sources] | 限定兑换经过的流动性来源（逗号分隔）：分组简写```pump```、```meteora```、```raydium```、```orca```，或Jupiter的来源名（区分大小写）；```""```表示不限定。行情、询价和下单都只经过这些来源。不传参数时查询。见子页`exchange.IO("dexes")`。 | 当前限定的来源名数组（分组已展开；空数组表示不限定）。 |
-| ```"rps"``` | [n] | 请求Jupiter API的每秒最多请求数，范围0.1到500，默认1。请求依次排队，相邻两次至少间隔```1/n```秒。不传参数时查询。见子页`exchange.IO("rps")`。 | 当前每秒最多请求数。 |
+| ```"route"``` | symbol, side, qty | 只询价不下单：卖出（```sell```）按精确输入、买入（```buy```）按精确输出询价```qty```个基础币，返回报价和经过的流动性来源。报价不含Solana交易手续费。见子页`exchange.IO("route", ...)`。 | ```{symbol, side, qty, route, quote, price, priceImpactPct}```；没有路由时```route```、```quote```、```price```为```null```。 |
+| ```"token"``` | [name, mint] | 登记代币（只在本次运行中有效），登记后的代币名可以直接写在交易对里；不传参数时列出代币表。见子页`exchange.IO("token", ...)`。 | 登记时返回```{symbol, mint, decimals}```，列表时返回```{symbol, mint, decimals, native}```数组。 |
+| ```"transfer"``` | to, amount | 从钱包转出SOL；```amount```可传```"all"```转出全部余额（扣除手续费）。只支持SOL，第三个参数传其它代币会报错。只等广播，不等上链。见子页`exchange.IO("transfer", ...)`。 | ```{signature, amount, lastValidBlockHeight}``` |
+| ```"receipt"``` | signature[, waitMs] | 查询一笔Solana交易的状态，可等待到确认或失败（最多10分钟）。查询订单时传订单ID中逗号后面的交易签名。见子页`exchange.IO("receipt", ...)`。 | ```{signature, state, slot, confirmationStatus, err, fee, blockTime}```，```state```为```"success"```、```"failed"```或```"pending"```。 |
+| ```"slippage"``` | [ratio] | 市价单的滑点保护比例，范围```[0, 0.5)```，默认```0.005```（0.5%），由链上程序强制执行。限价单不使用这个设置。不传参数时查询。见子页`exchange.IO("slippage", ...)`。 | 当前滑点比例。 |
+| ```"priorityFee"``` | [sol] | 每笔兑换交易的优先费上限（SOL），范围0到0.1，默认0.001；实际优先费由Jupiter按网络拥堵情况估算，不超过上限。不传参数时查询。见子页`exchange.IO("priorityFee", ...)`。 | 当前上限（SOL）。 |
+| ```"dexes"``` | [sources] | 限定兑换经过的流动性来源（逗号分隔）：分组简写```pump```、```meteora```、```raydium```、```orca```，或Jupiter的来源名（区分大小写）；```""```表示不限定。行情、询价和下单都只经过这些来源。不传参数时查询。见子页`exchange.IO("dexes", ...)`。 | 当前限定的来源名数组（分组已展开；空数组表示不限定）。 |
+| ```"rps"``` | [n] | 请求Jupiter API的每秒最多请求数，范围0.1到500，默认1。请求依次排队，相邻两次至少间隔```1/n```秒。不传参数时查询。见子页`exchange.IO("rps", ...)`。 | 当前每秒最多请求数。 |
 | ```"base"``` | [url] | 不传参数时返回当前Solana节点地址；传入地址时切换节点（多个用逗号分隔）。 | 切换前的地址。 |
 | ```"address"``` | — | 钱包地址（base58）。 | — |
 
 通用指令```api```、```currency```见`exchange.IO`。
 
-**不支持与合成的函数**
+##### 函数支持差异
 
 不支持（调用时报错并返回空值）：`exchange.GetTickers`、`exchange.GetRecords`、`exchange.GetTrades`、`exchange.GetHistoryOrders`、`exchange.CancelOrder`、`exchange.ModifyOrder`、`exchange.CreateConditionOrder`、`exchange.ModifyConditionOrder`、`exchange.CancelConditionOrder`、`exchange.GetConditionOrder`、`exchange.GetConditionOrders`、`exchange.GetHistoryConditionOrders`。
 
-所有交易所的对照见`能力矩阵`。
-
-**注意事项**
+##### 注意事项
 
 | 函数 | Jupiter交易所的行为 |
 | - | - |
@@ -25685,14 +27268,14 @@ Forms:
 
 - `exchange.IO("route", ...)`
 
-```exchange.IO("route", ...)```函数的调用方式用于在Jupiter交易所对象上询价：返回一笔兑换的报价和路由，不下单。
+在Jupiter交易所对象上询价：返回一笔兑换的报价和路由，不下单。
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"route"```表示该函数用于询价。
-- `symbol` (string, required): ```symbol```参数为交易对，例如```"SOL_USDC"```。
-- `side` (string, required): ```side```参数为方向：```"sell"```表示卖出```qty```个基础币，```"buy"```表示买入```qty```个基础币。
-- `qty` (number, required): ```qty```参数为基础币数量。
+- `k` (string, required): 固定为```"route"```，用于询价。
+- `symbol` (string, required): 交易对，例如```"SOL_USDC"```。
+- `side` (string, required): 方向：```"sell"```表示卖出```qty```个基础币，```"buy"```表示买入```qty```个基础币。
+- `qty` (number, required): 基础币数量。
 
 Returns (object / 空值): 返回```{symbol, side, qty, route, quote, price, priceImpactPct}```：```route```为经过的流动性来源名称数组，```quote```为卖出时可得到、买入时需花费的计价币数量，```price```为平均价格，```priceImpactPct```为Jupiter估计的价格冲击（比例，0.001即0.1%）。没有路由时仍返回对象，```route```、```quote```、```price```为```null```。代币无法识别、请求失败时返回空值，```GetLastError()```中有原因。
 
@@ -25715,6 +27298,8 @@ function main() {
 
 卖出按精确输入询价，买入按精确输出询价（能走精确输出的流动性来源较少，个别小币买入询价可能没有路由，此时可以用卖出方向询价估算）。报价不含Solana交易手续费。
 
+See also: `Jupiter`, `exchange.IO`, `exchange.IO("slippage")`, `exchange.IO("dexes")`, `exchange.IO("token")`, `exchange.CreateOrder`
+
 ##### exchange.IO("token", ...)
 
 ```
@@ -25726,13 +27311,13 @@ Forms:
 
 - `exchange.IO("token", ...)`
 
-```exchange.IO("token", ...)```函数的调用方式用于在Jupiter交易所对象上登记代币，或列出代币表。
+在Jupiter交易所对象上登记代币，或列出代币表。
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"token"```表示该函数用于登记代币。
-- `name` (string, optional): ```name```参数为在交易对中使用的代币名，不能包含```_```和```,```，不能与内置代币重名。
-- `mint` (string, optional): ```mint```参数为代币的mint地址，精度从链上读取。
+- `k` (string, required): 固定为```"token"```，用于登记代币。
+- `name` (string, optional): 在交易对中使用的代币名，不能包含```_```和```,```，不能与内置代币重名。
+- `mint` (string, optional): 代币的mint地址，精度从链上读取。
 
 Returns (object / array / 空值): 登记时返回```{symbol, mint, decimals}```；不传参数时返回代币表数组，每项为```{symbol, mint, decimals, native}```（```native```为```true```的是原生币SOL）。mint地址不是代币、节点出错时返回空值。
 
@@ -25748,6 +27333,8 @@ function main() {
 
 登记只在本次运行中有效。不登记也可以直接在交易对中写代币名（按Jupiter认证代币列表识别）或mint地址；同名代币有多个时必须登记或写mint地址。
 
+See also: `Jupiter`, `exchange.IO`, `exchange.IO("route")`, `exchange.IO("transfer")`, `exchange.IO("dexes")`
+
 ##### exchange.IO("transfer", ...)
 
 ```
@@ -25758,13 +27345,13 @@ Forms:
 
 - `exchange.IO("transfer", ...)`
 
-```exchange.IO("transfer", ...)```函数的调用方式用于从Jupiter交易所对象的钱包转出SOL。
+从Jupiter交易所对象的钱包转出SOL。
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"transfer"```表示该函数用于转账。
-- `to` (string, required): ```to```参数为收款的Solana地址。
-- `amount` (number / string, required): ```amount```参数为SOL数量；传```"all"```表示转出全部余额（扣除手续费）。
+- `k` (string, required): 固定为```"transfer"```，用于转账。
+- `to` (string, required): 收款的Solana地址。
+- `amount` (number / string, required): SOL数量；传```"all"```表示转出全部余额（扣除手续费）。
 
 Returns (object / 空值): 广播成功时返回```{signature, amount, lastValidBlockHeight}```：```signature```为交易签名，可用```exchange.IO("receipt", ...)```查询是否上链。地址无效、余额不足、广播失败时返回空值。
 
@@ -25783,6 +27370,8 @@ function main() {
 
 只支持转出SOL，暂不支持转出其它代币。转出全部余额后钱包无法再支付兑换手续费。
 
+See also: `Jupiter`, `exchange.IO`, `exchange.IO("receipt")`, `exchange.IO("priorityFee")`, `exchange.IO("token")`
+
 ##### exchange.IO("receipt", ...)
 
 ```
@@ -25794,13 +27383,13 @@ Forms:
 
 - `exchange.IO("receipt", ...)`
 
-```exchange.IO("receipt", ...)```函数的调用方式用于在Jupiter交易所对象上查询一笔Solana交易的状态，可等待到确认。
+在Jupiter交易所对象上查询一笔Solana交易的状态，可以等待到确认。
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"receipt"```表示该函数用于查询交易状态。
-- `signature` (string, required): ```signature```参数为交易签名。查询订单时传订单ID中逗号后面的部分。
-- `waitMs` (number, optional): ```waitMs```参数为最长等待毫秒数（最多600000），交易确认或失败时提前返回。不传表示不等待。
+- `k` (string, required): 固定为```"receipt"```，用于查询交易状态。
+- `signature` (string, required): 交易签名。查询订单时传订单ID中逗号后面的部分。
+- `waitMs` (number, optional): 最长等待毫秒数（最多600000），交易确认或失败时提前返回。不传表示不等待。
 
 Returns (object / 空值): 返回```{signature, state, slot, confirmationStatus, err, fee, blockTime}```：```state```为```"success"```（已确认）、```"failed"```（链上执行失败，```err```为原因）或```"pending"```（未确认；节点还查不到时另有```visible: false```）；确认后带```fee```（SOL）和```blockTime```（秒）。节点请求失败时返回空值。
 
@@ -25815,6 +27404,8 @@ function main() {
 }
 ```
 
+See also: `Jupiter`, `exchange.IO`, `exchange.IO("transfer")`, `exchange.IO("priorityFee")`, `exchange.IO("route")`
+
 ##### exchange.IO("slippage", ...)
 
 ```
@@ -25826,12 +27417,12 @@ Forms:
 
 - `exchange.IO("slippage", ...)`
 
-```exchange.IO("slippage", ...)```函数的调用方式用于在Jupiter交易所对象上设置市价单的滑点保护。
+设置Jupiter交易所对象市价单的滑点保护。
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"slippage"```表示该函数用于设置市价单的滑点保护。
-- `ratio` (number, optional): ```ratio```参数为滑点比例，范围```[0, 0.5)```，默认```0.005```（0.5%）。不传表示查询当前值。
+- `k` (string, required): 固定为```"slippage"```，用于设置市价单的滑点保护。
+- `ratio` (number, optional): 滑点比例，范围```[0, 0.5)```，默认```0.005```（0.5%）。不传表示查询当前值。
 
 Returns (number): 返回当前滑点比例。
 
@@ -25848,6 +27439,8 @@ function main() {
 
 单笔订单也可以在```exchange.CreateOrder()```的方向参数后附加```;{"slippage":0.01}```单独指定。限价单不使用这个设置：连接器按限价算出恰好的滑点，限价本身就是最差成交价。
 
+See also: `Jupiter`, `exchange.IO`, `exchange.IO("route")`, `exchange.IO("dexes")`, `exchange.IO("priorityFee")`, `exchange.CreateOrder`
+
 ##### exchange.IO("priorityFee", ...)
 
 ```
@@ -25863,8 +27456,8 @@ Forms:
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"priorityFee"```表示该函数用于设置优先费上限。
-- `sol` (number, optional): ```sol```参数为每笔交易的优先费上限（单位SOL），范围0~0.1，默认0.001。不传表示查询当前值。
+- `k` (string, required): 固定为```"priorityFee"```，用于设置优先费上限。
+- `sol` (number, optional): 每笔交易的优先费上限（单位SOL），范围0~0.1，默认0.001。不传表示查询当前值。
 
 Returns (number): 返回当前优先费上限（SOL）。
 
@@ -25878,6 +27471,8 @@ function main() {
 ```
 
 实际优先费由Jupiter按当前网络拥堵情况估算（较高档），不超过这个上限。交易确认后，`exchange.GetOrder`返回的订单```Info```中```fee```为本笔交易实际支付的手续费（SOL，含基础费与优先费）。上限过低时网络拥堵期间交易可能无法及时上链而过期。
+
+See also: `Jupiter`, `exchange.IO`, `exchange.IO("slippage")`, `exchange.IO("receipt")`, `exchange.IO("transfer")`, `exchange.CreateOrder`
 
 ##### exchange.IO("dexes", ...)
 
@@ -25894,8 +27489,8 @@ Forms:
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"dexes"```表示该函数用于限定流动性来源。
-- `sources` (string, optional): ```sources```参数为逗号分隔的来源列表，可以写分组简写```pump```（Pump.fun、Pump.fun Amm）、```meteora```（Meteora、Meteora DAMM v2、Meteora DLMM）、```raydium```（Raydium、Raydium CLMM、Raydium CP、Raydium Launchlab）、```orca```（Whirlpool、Orca V1、Orca V2），也可以写Jupiter的来源名（区分大小写）。传空字符串```""```表示不限定。不传表示查询当前设置。
+- `k` (string, required): 固定为```"dexes"```，用于限定流动性来源。
+- `sources` (string, optional): 逗号分隔的来源列表，可以写分组简写```pump```（Pump.fun、Pump.fun Amm）、```meteora```（Meteora、Meteora DAMM v2、Meteora DLMM）、```raydium```（Raydium、Raydium CLMM、Raydium CP、Raydium Launchlab）、```orca```（Whirlpool、Orca V1、Orca V2），也可以写Jupiter的来源名（区分大小写）。传空字符串```""```表示不限定。不传表示查询当前设置。
 
 Returns (array / 空值): 返回当前限定的来源名数组（分组已展开；空数组表示不限定）。来源名不在Jupiter的来源表中时返回空值，设置不变，```GetLastError()```中列出可用的来源名。
 
@@ -25912,6 +27507,8 @@ function main() {
 
 限定后行情（```exchange.GetTicker()```、```exchange.GetDepth()```）、询价和下单都只经过这些来源；路由找不到时报“没有路由”。配置中的“流动性来源”是同一个设置的初始值。
 
+See also: `Jupiter`, `exchange.IO`, `exchange.IO("route")`, `exchange.IO("slippage")`, `exchange.IO("priorityFee")`, `exchange.CreateOrder`
+
 ##### exchange.IO("rps", ...)
 
 ```
@@ -25927,8 +27524,8 @@ Forms:
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"rps"```表示该函数用于设置请求速率。
-- `n` (number, optional): ```n```参数为每秒最多请求数，范围0.1~500，默认1。不传表示查询当前值。
+- `k` (string, required): 固定为```"rps"```，用于设置请求速率。
+- `n` (number, optional): 每秒最多请求数，范围0.1~500，默认1。不传表示查询当前值。
 
 Returns (number): 返回当前每秒最多请求数。
 
@@ -25945,19 +27542,17 @@ function main() {
 
 Jupiter按每秒请求数限流：不带API Key约0.5~1次每秒，免费API Key为1次每秒，付费套餐为10~150次每秒。连接器让请求依次排队，相邻两次至少间隔```1/n```秒；仍收到429时退避重试，多次失败返回空值。设置值高于套餐允许的速率会频繁触发限流。
 
+See also: `Jupiter`, `exchange.IO`, `exchange.IO("route")`, `exchange.IO("token")`, `exchange.IO("receipt")`
+
 #### KyberSwap
 
 KyberSwap交易所对象接入KyberSwap聚合器：报价和交易数据来自KyberSwap Aggregator API（在众多DEX和做市商之间拆单选路，不需要API Key），由托管者用配置的私钥签名后发给KyberSwap的路由合约MetaAggregationRouterV2（```0x6131B5fae19EA4f9D964eAc0408E4408b66337b5```）。一个交易所对象对应一条链，可选Ethereum、Arbitrum、Base、BNB Chain、Unichain、Polygon、OP Mainnet、Robinhood。
 
 它与Uniswap交易所对象是同一套实现的聚合器版本：代币表、余额、授权、订单、撤单、转账与包装的用法都相同，区别是没有DEX选项，兑换路径由KyberSwap给出。
 
-**名称**
+##### 名称与配置
 
-| ```exchange.GetName()``` | 类型 | 别名 |
-| - | - | - |
-| ```KyberSwap``` | 现货 | Kyber |
-
-**配置项**
+```exchange.GetName()```：```KyberSwap```（现货）；别名：Kyber。
 
 | 配置项 | 必填 | 默认值 | 说明 |
 | - | - | - | - |
@@ -25966,13 +27561,13 @@ KyberSwap交易所对象接入KyberSwap聚合器：报价和交易数据来自Ky
 | 节点地址 | 否 | ```https://ethereum-rpc.publicnode.com,https://eth.drpc.org``` | RPC节点地址；多个节点用逗号分隔，某个节点出错或缺少数据时自动换下一个。查询订单状态需要节点能查到已上链交易的回执：publicnode的Base、BNB Chain、Arbitrum公共节点查不到回执（要求归档权限），不要单独使用。 |
 | 节点认证 | 否 | — | RPC节点认证：```Header-Name: value```形式的请求头，或Basic认证值。 |
 
-**交易对与合约代码**
+##### 交易对与合约代码
 
 交易对示例：```ETH_USDC```、```WETH_USDC```、```ETH_USDG```
 
 交易对写作```ETH_USDC```，原生币（ETH、BNB、POL）与包装币（WETH、WBNB、WPOL）是两个不同的资产。代币表沿用该链Uniswap交易所对象的代币表，表外的代币用```exchange.IO("token", name, address)```登记后即可写在交易对里。Polygon的原生币为POL；Robinhood链上没有USDC和USDT，主流稳定币为USDG，交易对写作```ETH_USDG```；Unichain、Polygon上的USDT写作```USDT0```。```exchange.GetMarkets()```列出代币表中在该链Uniswap上有池子的交易对。
 
-**专属IO指令**
+##### 专属IO指令
 
 | 指令 | 参数 | 说明 | 返回值 |
 | - | - | - | - |
@@ -25995,13 +27590,11 @@ KyberSwap交易所对象接入KyberSwap聚合器：报价和交易数据来自Ky
 
 通用指令```api```、```currency```见`exchange.IO`。
 
-**不支持与合成的函数**
+##### 函数支持差异
 
 不支持（调用时报错并返回空值）：`exchange.GetTickers`、`exchange.GetRecords`、`exchange.GetTrades`、`exchange.GetHistoryOrders`、`exchange.ModifyOrder`、`exchange.CreateConditionOrder`、`exchange.ModifyConditionOrder`、`exchange.CancelConditionOrder`、`exchange.GetConditionOrder`、`exchange.GetConditionOrders`、`exchange.GetHistoryConditionOrders`。
 
-所有交易所的对照见`能力矩阵`。
-
-**注意事项**
+##### 注意事项
 
 | 函数 | KyberSwap交易所的行为 |
 | - | - |
@@ -26018,28 +27611,28 @@ OneInch交易所对象接入1inch聚合器：报价和交易数据来自1inch Sw
 
 它与Uniswap交易所对象是同一套实现的聚合器版本：代币表、余额、授权、订单、撤单、转账与包装的用法都相同，区别是兑换路径由1inch给出。使用前需要在1inch开发者门户申请API Key，填在交易所配置中（必填）。
 
-**名称**
+##### 名称与配置
 
-| ```exchange.GetName()``` | 类型 | 别名 |
-| - | - | - |
-| ```OneInch``` | 现货 | — |
-
-**配置项**
+```exchange.GetName()```：```OneInch```（现货）。
 
 | 配置项 | 必填 | 默认值 | 说明 |
 | - | - | - | - |
 | 链 | 是 | ```Ethereum``` | 可选：```Ethereum```、```Arbitrum```、```Base```、```BNB Chain```、```Unichain```、```Polygon```、```OP Mainnet``` |
 | 钱包私钥 | 是 | — | 钱包私钥（十六进制）。 |
-| 节点地址 | 否 | ```https://ethereum-rpc.publicnode.com,https://eth.drpc.org``` | RPC节点地址；多个节点用逗号分隔，某个节点出错或缺少数据时自动换下一个。查询订单状态需要节点能查到已上链交易的回执：publicnode的Base、BNB Chain、Arbitrum公共节点查不到回执（要求归档权限），不要单独使用。RPC节点不带认证。 |
+| 节点地址 | 否 | ```https://ethereum-rpc.publicnode.com,https://eth.drpc.org``` | RPC节点地址；多个节点用逗号分隔，某个节点出错或缺少数据时自动换下一个。（详见表下） |
 | 1inch API Key | 是 | — | 1inch开发者门户申请的API Key（必填），请求时以```Authorization: Bearer <key>```发送。 |
 
-**交易对与合约代码**
+表中长说明的其余部分：
+
+- 节点地址：查询订单状态需要节点能查到已上链交易的回执：publicnode的Base、BNB Chain、Arbitrum公共节点查不到回执（要求归档权限），不要单独使用。RPC节点不带认证。
+
+##### 交易对与合约代码
 
 交易对示例：```ETH_USDC```、```WETH_USDC```、```POL_USDT0```
 
 交易对写作```ETH_USDC```，原生币（ETH、BNB、POL）与包装币（WETH、WBNB、WPOL）是两个不同的资产。代币表沿用该链Uniswap交易所对象的代币表，表外的代币用```exchange.IO("token", name, address)```登记后即可写在交易对里。Polygon的原生币为POL；Unichain、Polygon上的USDT写作```USDT0```。```exchange.GetMarkets()```列出代币表中在该链Uniswap上有池子的交易对。
 
-**专属IO指令**
+##### 专属IO指令
 
 | 指令 | 参数 | 说明 | 返回值 |
 | - | - | - | - |
@@ -26062,13 +27655,11 @@ OneInch交易所对象接入1inch聚合器：报价和交易数据来自1inch Sw
 
 通用指令```api```、```currency```见`exchange.IO`。
 
-**不支持与合成的函数**
+##### 函数支持差异
 
 不支持（调用时报错并返回空值）：`exchange.GetTickers`、`exchange.GetRecords`、`exchange.GetTrades`、`exchange.GetHistoryOrders`、`exchange.ModifyOrder`、`exchange.CreateConditionOrder`、`exchange.ModifyConditionOrder`、`exchange.CancelConditionOrder`、`exchange.GetConditionOrder`、`exchange.GetConditionOrders`、`exchange.GetHistoryConditionOrders`。
 
-所有交易所的对照见`能力矩阵`。
-
-**注意事项**
+##### 注意事项
 
 | 函数 | OneInch交易所的行为 |
 | - | - |
@@ -26085,19 +27676,15 @@ OneInch交易所对象接入1inch聚合器：报价和交易数据来自1inch Sw
 
 OKX DEX交易所对象通过OKX DEX聚合器接口在链上兑换代币，钱包由配置的助记词派生（EVM链、Tron、Solana、TON、Aptos、SUI、Starknet）。只支持同一条链上的市价兑换；行情、K线、成交、代币列表来自OKX DEX的行情接口。接口凭据默认使用平台内置的项目凭据，也可以用```exchange.IO("config", ...)```换成自己的OKX API凭据。
 
-**名称**
+##### 名称与配置
 
-| ```exchange.GetName()``` | 类型 | 别名 |
+```exchange.GetName()```：```OKX_DEX```（现货）；别名：OKX Web3、欧易DEX。
+
+| 配置项 | 必填 | 说明 |
 | - | - | - |
-| ```OKX_DEX``` | 现货 | OKX Web3、欧易DEX |
+| 助记词 | 是 | 钱包助记词（BIP39，12或24个单词），各链钱包地址由它派生。 |
 
-**配置项**
-
-| 配置项 | 必填 | 默认值 | 说明 |
-| - | - | - | - |
-| 助记词 | 是 | — | 钱包助记词（BIP39，12或24个单词），各链钱包地址由它派生。 |
-
-**交易对与合约代码**
+##### 交易对与合约代码
 
 交易对示例：```1:ETH_USD```、```501:SOL_USD```、```1:ETH_1:USDC```
 
@@ -26105,36 +27692,36 @@ OKX DEX交易所对象通过OKX DEX聚合器接口在链上兑换代币，钱包
 
 代币可以写代币名或合约地址（如```1:0xa0b8..._USD```）。**代币名区分大小写**（OKX把```BAX```与```BAx```当作两个代币）。同一条链上名字相同的多个合约（例如GALA的新旧合约）不出现在代币列表中，也不能按名字使用，需要写合约地址或用```regToken```把名字绑定到某个地址。
 
-**专属IO指令**
+##### 专属IO指令
 
-| 指令 | 参数 | 说明 | 返回值 |
-| - | - | - | - |
-| ```"config"``` | string(JSON) | 设置OKX API凭据，字段```ApiKey```、```SecretKey```、```Passphrase```、```Project```缺一不可。不设置时使用平台内置的项目凭据。 | — |
-| ```"key"``` | string | 运行时更换钱包助记词（12或24个单词），解析失败时保留原钱包。 | — |
-| ```"address"``` | [chainIndex] | 获取钱包在某条链上的地址，不传时为以太坊（1）。 | — |
-| ```"addresses"``` | — | 导出钱包在全部链上的地址。 | — |
-| ```"slippage"``` | [number] | 无参数时读取，带参数时设置兑换滑点（百分比，范围(0, 50]，默认0.5）。 | — |
-| ```"gasLevel"``` | [string] | 无参数时读取，带参数时设置Gas档位：```average```（默认）、```fast```、```slow```。 | — |
-| ```"gasMultiplier"``` | [number] | 无参数时读取，带参数时设置Gas倍数（≥1，默认1.5）。 | — |
-| ```"allChainBalance"``` | [bool] | 无参数时读取，带参数时设置```exchange.GetAccount()```、```exchange.GetAssets()```是否查询全部链的余额（默认只查以太坊）。 | — |
-| ```"rpc"``` | [chain[, url]] | 查询或设置各链的自定义RPC地址：无参数返回全部，只传链返回该链的地址，url为空字符串时删除。查询授权额度等链上读操作需要配置RPC。 | — |
-| ```"regChain"``` | chainId, alias | 注册链别名，之后可以在品种代码中用别名代替链号。 | — |
-| ```"regToken"``` | chainId, alias, address | 把代币名绑定到某条链上的合约地址。 | — |
-| ```"quote"``` | symbol, amount | 只读报价预览（双边品种代码，例如```1:USDC_1:ETH```），不构造链上交易。 | — |
-| ```"allowance"``` | symbol[, spender] | 查询钱包对spender的ERC-20授权额度（最小单位），不传spender时使用OKX DEX的路由合约。 | — |
-| ```"approve"``` | symbol[, amount] | ERC-20授权（品种代码第一个代币），不传amount时为最大额度；等待交易上链。 | 交易哈希。 |
-| ```"signTx"``` | tx, chainIndex | 只签名不广播。 | — |
-| ```"broadcast"``` | signedTx, chainIndex | 广播已签名的交易。 | — |
-| ```"marketSupportedChains"``` | — | 只读查询行情接口支持的链。 | — |
-| ```"balanceSupportedChains"``` | — | 只读查询余额接口支持的链。 | — |
-| ```"swapSupportedChains"``` | — | 只读查询兑换接口支持的链。 | — |
-| ```"broadcastSupportedChains"``` | — | 只读查询广播接口支持的链。 | — |
-| ```"tokenSearch"``` | chains, search | 按名称或地址搜索代币（```chains```为逗号分隔的链号）。 | — |
-| ```"allTokens"``` | chainIndex | 列出某条链上可兑换的全部代币。 | — |
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```"config"``` | string(JSON) | 设置OKX API凭据，字段```ApiKey```、```SecretKey```、```Passphrase```、```Project```缺一不可。不设置时使用平台内置的项目凭据。 |
+| ```"key"``` | string | 运行时更换钱包助记词（12或24个单词），解析失败时保留原钱包。 |
+| ```"address"``` | [chainIndex] | 获取钱包在某条链上的地址，不传时为以太坊（1）。 |
+| ```"addresses"``` | — | 导出钱包在全部链上的地址。 |
+| ```"slippage"``` | [number] | 无参数时读取，带参数时设置兑换滑点（百分比，大于0且不超过50，默认0.5）。 |
+| ```"gasLevel"``` | [string] | 无参数时读取，带参数时设置Gas档位：```average```（默认）、```fast```、```slow```。 |
+| ```"gasMultiplier"``` | [number] | 无参数时读取，带参数时设置Gas倍数（≥1，默认1.5）。 |
+| ```"allChainBalance"``` | [bool] | 无参数时读取，带参数时设置```exchange.GetAccount()```、```exchange.GetAssets()```是否查询全部链的余额（默认只查以太坊）。 |
+| ```"rpc"``` | [chain[, url]] | 查询或设置各链的自定义RPC地址：无参数返回全部，只传链返回该链的地址，url为空字符串时删除。查询授权额度等链上读操作需要配置RPC。 |
+| ```"regChain"``` | chainId, alias | 注册链别名，之后可以在品种代码中用别名代替链号。 |
+| ```"regToken"``` | chainId, alias, address | 把代币名绑定到某条链上的合约地址。 |
+| ```"quote"``` | symbol, amount | 只读报价预览（双边品种代码，例如```1:USDC_1:ETH```），不构造链上交易。 |
+| ```"allowance"``` | symbol[, spender] | 查询钱包对spender的ERC-20授权额度（最小单位），不传spender时使用OKX DEX的路由合约。 |
+| ```"approve"``` | symbol[, amount] | ERC-20授权（品种代码第一个代币），不传amount时为最大额度；等待交易上链。返回：交易哈希。 |
+| ```"signTx"``` | tx, chainIndex | 只签名不广播。 |
+| ```"broadcast"``` | signedTx, chainIndex | 广播已签名的交易。 |
+| ```"marketSupportedChains"``` | — | 只读查询行情接口支持的链。 |
+| ```"balanceSupportedChains"``` | — | 只读查询余额接口支持的链。 |
+| ```"swapSupportedChains"``` | — | 只读查询兑换接口支持的链。 |
+| ```"broadcastSupportedChains"``` | — | 只读查询广播接口支持的链。 |
+| ```"tokenSearch"``` | chains, search | 按名称或地址搜索代币（```chains```为逗号分隔的链号）。 |
+| ```"allTokens"``` | chainIndex | 列出某条链上可兑换的全部代币。 |
 
 通用指令```api```、```base```、```currency```见`exchange.IO`。
 
-**不支持与合成的函数**
+##### 函数支持差异
 
 不支持（调用时报错并返回空值）：`exchange.GetDepth`、`exchange.GetOrders`、`exchange.GetHistoryOrders`、`exchange.CancelOrder`、`exchange.ModifyOrder`、`exchange.CreateConditionOrder`、`exchange.ModifyConditionOrder`、`exchange.CancelConditionOrder`、`exchange.GetConditionOrder`、`exchange.GetConditionOrders`、`exchange.GetHistoryConditionOrders`。
 
@@ -26142,9 +27729,7 @@ OKX DEX交易所对象通过OKX DEX聚合器接口在链上兑换代币，钱包
 
 - `exchange.GetRecords`：原生周期为1分钟、3分钟、5分钟、15分钟、30分钟、1小时、2小时、4小时、6小时、12小时、1天、3天、1周、1月、3月；其它周期由托管者合成。
 
-所有交易所的对照见`能力矩阵`。
-
-**注意事项**
+##### 注意事项
 
 - 只支持市价单（```price```为-1），限价单报错；不支持跨链兑换。卖出时```amount```是品种代码第一个代币的数量，买入时是第二个代币（花费）的数量。订单ID为```<品种代码>,<交易哈希>```，用```exchange.GetOrder()```查询兑换结果。
 - EVM链上花费ERC-20代币（非原生币）的兑换，下单前自动检查授权额度，不足时先发送授权交易并等待上链；检查额度需要该链的RPC，没有用```exchange.IO("rpc", chain, url)```配置时下单报错。
@@ -26160,23 +27745,23 @@ OKX DEX交易所对象通过OKX DEX聚合器接口在链上兑换代币，钱包
 
 Polymarket是Polygon链上的预测市场。交易所对象通过Polymarket的CLOB（中央限价订单簿）接口下单、查询订单簿、订单、余额和账户成交，通过Gamma接口查询市场信息，通过data接口查询持仓和市场成交；赎回、合并、拆分经Polymarket的免Gas中继（relayer）提交链上交易。全部是REST轮询，没有行情和订单推送。
 
-**名称**
+##### 名称与配置
 
-| ```exchange.GetName()``` | 类型 | 别名 |
+```exchange.GetName()```：```Futures_Polymarket```（预测市场）。
+
+| 配置项 | 必填 | 说明 |
 | - | - | - |
-| ```Futures_Polymarket``` | 预测市场 | — |
+| 存款钱包地址 | 是 | Polymarket存款钱包（POLY_1271智能合约钱包）地址，即在Polymarket存入资金的钱包地址，必须是合法的0x地址，否则启动失败。订单以它为下单方，持仓和账户成交按它查询；赎回、合并、拆分要求它已在链上部署。 |
+| 钱包私钥 | 是 | 用于 API 认证和订单签名的私钥。邮箱登录用户请从 reveal.magic.link/polymarket 导出；浏览器钱包用户使用 MetaMask 等钱包私钥（请妥善保管，切勿泄露） |
+| Builder API Key | 是 | Polymarket Builder API Key。（详见表下） |
+| Builder API Secret | 是 | Polymarket Builder API Secret，与```BuilderKey```、```BuilderPassphrase```一起用于relayer认证。 |
+| Builder API Passphrase | 是 | Polymarket Builder API Passphrase，与```BuilderKey```、```BuilderSecret```一起用于relayer认证。 |
 
-**配置项**
+表中长说明的其余部分：
 
-| 配置项 | 必填 | 默认值 | 说明 |
-| - | - | - | - |
-| 存款钱包地址 | 是 | — | Polymarket存款钱包（POLY_1271智能合约钱包）地址，即在Polymarket存入资金的钱包地址，必须是合法的0x地址，否则启动失败。订单以它为下单方，持仓和账户成交按它查询；赎回、合并、拆分要求它已在链上部署。 |
-| 钱包私钥 | 是 | — | 用于 API 认证和订单签名的私钥。邮箱登录用户请从 reveal.magic.link/polymarket 导出；浏览器钱包用户使用 MetaMask 等钱包私钥（请妥善保管，切勿泄露） |
-| Builder API Key | 是 | — | Polymarket Builder API Key。与```BuilderSecret```、```BuilderPassphrase```三项都必须填写（缺一项启动时报错），用于赎回、合并、拆分时向relayer认证；下单用的CLOB接口凭据由私钥自动派生，不用这三项。 |
-| Builder API Secret | 是 | — | Polymarket Builder API Secret，与```BuilderKey```、```BuilderPassphrase```一起用于relayer认证。 |
-| Builder API Passphrase | 是 | — | Polymarket Builder API Passphrase，与```BuilderKey```、```BuilderSecret```一起用于relayer认证。 |
+- Builder API Key：与```BuilderSecret```、```BuilderPassphrase```三项都必须填写（缺一项启动时报错），用于赎回、合并、拆分时向relayer认证；下单用的CLOB接口凭据由私钥自动派生，不用这三项。
 
-**交易对与合约代码**
+##### 交易对与合约代码
 
 交易对示例：```will-btc-100k_USDC```
 
@@ -26197,26 +27782,36 @@ Polymarket是Polygon链上的预测市场。交易所对象通过Polymarket的CL
 
 ```exchange.GetMarkets()```里每行的```Symbol```（交易所原生代码）是该选项的CLOB token ID，只用于对照交易所接口，不能当作合约代码使用。
 
-**专属IO指令**
+##### 专属IO指令
 
 | 指令 | 参数 | 说明 | 返回值 |
 | - | - | - | - |
 | ```"proxyWalletAddress"``` | — | 获取配置的存款钱包地址（EIP-55校验和格式）。 | 地址字符串。 |
-| ```"redeem"``` | symbol[, wait] | 市场结算后，把存款钱包持有的该市场份额赎回成USDC（两个选项一起赎回，经relayer免Gas）。```symbol```须与```exchange.GetPositions()```中一个可赎回（持仓原始数据的```redeemable```为```true```）且份额大于0的持仓的品种代码完全一致；存款钱包须已在链上部署。```wait```默认```true```：每2秒查询一次relayer，最多约2分钟，确认后刷新CLOB的余额缓存。也可以传对象```{symbol, wait}```。 | ```wait```为```true```时返回relayer确认后的交易记录对象（```state```为```STATE_CONFIRMED```）；为```false```时立即返回```{"transactionID": "..."}```，不等确认、不刷新余额缓存。relayer报告交易失败（```STATE_FAILED```、```STATE_INVALID```）、等待超时或刷新缓存失败时报错，错误信息带```transactionID```；后两种情况交易已经提交（超时的交易之后仍可能上链），重试前先用```exchange.GetPositions()```、```exchange.GetAccount()```核对。等待超时后，同一市场的同一操作在该交易确认或失败之前再次调用会直接报错、不重复提交。 |
-| ```"merge"``` | symbol[, amount[, wait]] | 把等量的两个选项份额合并回USDC（经relayer免Gas）。```symbol```取该市场任一选项的品种代码；```amount```为份额数（截断到6位小数），为0或不传时自动取两个选项持仓中较小的一个。```wait```同```redeem```。也可以传对象```{symbol, amount, wait}```。 | 同```redeem```。 |
-| ```"split"``` | symbol, amount[, wait] | 把USDC拆分成等量的两个选项份额（经relayer免Gas）。```symbol```取该市场任一选项的品种代码；```amount```为USDC数量，必须大于0（截断到6位小数），拆出两个选项各```amount```份。```wait```同```redeem```。也可以传对象```{symbol, amount, wait}```。 | 同```redeem```。 |
-| ```"batchOrders"``` | orders | 批量下单，```orders```为1~15个订单对象的数组，全部签名后一次提交，不写交易日志。每个对象：```symbol```（完整品种代码）、```side```（```buy```/```sell```）、```price```（小于等于0为市价单）、```amount```（份额），可选```option```对象，键与下单参数相同（```orderType```、```expiration```、```postOnly```、```deferExec```、```slippage```，见注意事项）。 | 交易所原始应答数组，与```orders```逐项对应：成功的项带```orderID```，被拒的项带```errorMsg```。部分订单被拒时照常返回该数组，被拒的每一项另报一条错误日志；全部被拒或应答格式异常时报错并返回空值。 |
+| ```"redeem"``` | symbol[, wait] | 市场结算后，把存款钱包持有的该市场份额赎回成USDC（两个选项一起赎回，经relayer免Gas）。（详见表下） | ```wait```为```true```时返回relayer确认后的交易记录对象（```state```为```STATE_CONFIRMED```）；为```false```时立即返回```{"transactionID": "..."}```，不等确认、不刷新余额缓存。（详见表下） |
+| ```"merge"``` | symbol[, amount[, wait]] | 把等量的两个选项份额合并回USDC（经relayer免Gas）。（详见表下） | 同```redeem```。 |
+| ```"split"``` | symbol, amount[, wait] | 把USDC拆分成等量的两个选项份额（经relayer免Gas）。（详见表下） | 同```redeem```。 |
+| ```"batchOrders"``` | orders | 批量下单，```orders```为1~15个订单对象的数组，全部签名后一次提交，不写交易日志。（详见表下） | 交易所原始应答数组，与```orders```逐项对应：成功的项带```orderID```，被拒的项带```errorMsg```。部分订单被拒时照常返回该数组，被拒的每一项另报一条错误日志；全部被拒或应答格式异常时报错并返回空值。 |
 | ```"markets_cursor"``` | [string] | 查询或设置```exchange.GetMarkets()```的分页游标（传空串清除，回到第一页）；传```"next"```把游标推进到下一页，用法见注意事项。 | 当前（设置或推进后）的游标字符串；推进到最后一页之后为空串。当前游标还没有取过页时传```"next"```报错。 |
 | ```"tickers_cursor"``` | [string] | 同```markets_cursor```，作用于```exchange.GetTickers()```，两个游标相互独立。 | 同```markets_cursor```。 |
-| ```"base"``` | [url] / kind, url | 不传参数返回当前CLOB接口地址；传一个URL时切换CLOB地址（下单、订单、余额、账户成交、订单簿都走它），```exchange.GetBase()```、```exchange.SetBase()```即此形式。```exchange.IO("base", kind, url)```切换各服务的地址，```kind```只能是```gamma```（市场信息、市场列表）、```data```（持仓、市场成交）、```relayer```（赎回、合并、拆分）或```clob```（同一参形式，切换CLOB地址）。一参形式只接受```http://```、```https://```开头的地址，其它值报错。 | 无参、一参时返回地址字符串（当前地址或修改前的地址）；```kind, url```形式返回空值。 |
+| ```"base"``` | [url] / kind, url | 不传参数返回当前CLOB接口地址；传一个URL时切换CLOB地址（下单、订单、余额、账户成交、订单簿都走它），```exchange.GetBase()```、```exchange.SetBase()```即此形式。（详见表下） | 无参、一参时返回地址字符串（当前地址或修改前的地址）；```kind, url```形式返回空值。 |
 | ```"api"``` | method, path[, params[, raw]] | 向CLOB发请求，默认带L2签名：```GET```的```params```拼成查询串，其它方法作为JSON请求体；```path```可以写完整URL（例如data接口地址）；```raw```传字符串时作为原样的查询串或请求体，传```false```时不签名。 | 交易所原始应答（JSON自动解析）；请求失败报错并返回空值。 |
-| ```"gamma"``` | path | 向Gamma接口（市场信息）发不签名的GET请求，```path```含查询串，例如```exchange.IO("gamma", "/markets/slug/will-btc-100k")```；地址跟随```exchange.IO("base", "gamma", url)```。也可以把指令名写成完整的服务地址、第二个参数写路径，例如```exchange.IO("https://gamma-api.polymarket.com", "/markets/slug/will-btc-100k")```。 | 交易所原始应答（JSON自动解析）；请求失败返回空值。 |
+| ```"gamma"``` | path | 向Gamma接口（市场信息）发不签名的GET请求，```path```含查询串，例如```exchange.IO("gamma", "/markets/slug/will-btc-100k")```；地址跟随```exchange.IO("base", "gamma", url)```。（详见表下） | 交易所原始应答（JSON自动解析）；请求失败返回空值。 |
 | ```"clob"``` | path | 向CLOB接口发不签名的GET请求，例如```exchange.IO("clob", "/book?token_id=...")```；需要签名的私有接口用```exchange.IO("api", ...)```。 | 交易所原始应答（JSON自动解析）；请求失败返回空值。 |
 | ```"data"``` | path | 向data接口（持仓、市场成交）发不签名的GET请求，例如```exchange.IO("data", "/trades?market=<conditionId>")```；地址跟随```exchange.IO("base", "data", url)```。 | 交易所原始应答（JSON自动解析）；请求失败返回空值。 |
 
+表中长说明的其余部分：
+
+- ```"redeem"```：```symbol```须与```exchange.GetPositions()```中一个可赎回（持仓原始数据的```redeemable```为```true```）且份额大于0的持仓的品种代码完全一致；存款钱包须已在链上部署。```wait```默认```true```：每2秒查询一次relayer，最多约2分钟，确认后刷新CLOB的余额缓存。也可以传对象```{symbol, wait}```。
+- ```"redeem"```的返回值：relayer报告交易失败（```STATE_FAILED```、```STATE_INVALID```）、等待超时或刷新缓存失败时报错，错误信息带```transactionID```；后两种情况交易已经提交（超时的交易之后仍可能上链），重试前先用```exchange.GetPositions()```、```exchange.GetAccount()```核对。等待超时后，同一市场的同一操作在该交易确认或失败之前再次调用会直接报错、不重复提交。
+- ```"merge"```：```symbol```取该市场任一选项的品种代码；```amount```为份额数（截断到6位小数），为0或不传时自动取两个选项持仓中较小的一个。```wait```同```redeem```。也可以传对象```{symbol, amount, wait}```。
+- ```"split"```：```symbol```取该市场任一选项的品种代码；```amount```为USDC数量，必须大于0（截断到6位小数），拆出两个选项各```amount```份。```wait```同```redeem```。也可以传对象```{symbol, amount, wait}```。
+- ```"batchOrders"```：每个对象：```symbol```（完整品种代码）、```side```（```buy```/```sell```）、```price```（小于等于0为市价单）、```amount```（份额），可选```option```对象，键与下单参数相同（```orderType```、```expiration```、```postOnly```、```deferExec```、```slippage```，见注意事项）。
+- ```"base"```：```exchange.IO("base", kind, url)```切换各服务的地址，```kind```只能是```gamma```（市场信息、市场列表）、```data```（持仓、市场成交）、```relayer```（赎回、合并、拆分）或```clob```（同一参形式，切换CLOB地址）。一参形式只接受```http://```、```https://```开头的地址，其它值报错。
+- ```"gamma"```：也可以把指令名写成完整的服务地址、第二个参数写路径，例如```exchange.IO("https://gamma-api.polymarket.com", "/markets/slug/will-btc-100k")```。
+
 通用指令```currency```见`exchange.IO`。
 
-**不支持与合成的函数**
+##### 函数支持差异
 
 不支持（调用时报错并返回空值）：`exchange.ModifyOrder`、`exchange.SetMarginLevel`、`exchange.GetFundings`、`exchange.CreateConditionOrder`、`exchange.ModifyConditionOrder`、`exchange.CancelConditionOrder`、`exchange.GetConditionOrder`、`exchange.GetConditionOrders`、`exchange.GetHistoryConditionOrders`。
 
@@ -26224,9 +27819,7 @@ Polymarket是Polygon链上的预测市场。交易所对象通过Polymarket的CL
 
 - `exchange.GetRecords`：交易所没有K线接口，由托管者用成交记录合成：首次调用只有最近成交覆盖的少量K线，随调用逐步累积。
 
-所有交易所的对照见`能力矩阵`。
-
-**保证金、账户与模拟盘**
+##### 保证金、账户与模拟盘
 
 保证金模式：没有保证金和杠杆：买入份额用USDC全额支付，```exchange.IO("cross", ...)```等保证金指令报错。
 
@@ -26236,10 +27829,10 @@ Polymarket是Polygon链上的预测市场。交易所对象通过Polymarket的CL
 
 模拟盘：没有模拟盘，所有调用都在Polygon主网上使用真实资金。
 
-**注意事项**
+##### 注意事项
 
 - 价格是每份的USDC价格，在0~1之间，按市场的价格步长（```exchange.GetMarkets()```的```TickSize```，0.1/0.01/0.001/0.0001）截断，大于1时按1减一个步长下单。数量单位是份额，截断到2位小数；最小下单量见```MinQty```（常见为5份），不预先检查，由交易所拒单。
-- 市价单（价格传```-1```，或在下单参数中写明```type: "market"```，此时忽略价格）：CLOB只有限价单，连接器沿对手盘累计到下单量所在档位（深度不够取最后一档），以该档价格×(1±滑点)作为限价发出，滑点默认0.01，对手盘为空时报错；买卖的数量都是份额。这样下出的仍是GTC订单，未成交部分会留在盘口；需要立即成交否则撤销时，在最后一个参数传```{tif: "ioc"}```（FAK）或```{tif: "fok"}```，例如```exchange.CreateOrder(symbol, "buy", -1, 10, {tif: "ioc"})```。
+- 市价单（价格传```-1```，或在下单参数中写明```type: "market"```，此时忽略价格）：CLOB只有限价单，连接器沿对手盘累计到下单量所在档位（深度不够取最后一档），以该档价格×（1±滑点）作为限价发出，滑点默认0.01，对手盘为空时报错；买卖的数量都是份额。这样下出的仍是GTC订单，未成交部分会留在盘口；需要立即成交否则撤销时，在最后一个参数传```{tif: "ioc"}```（FAK）或```{tif: "fok"}```，例如```exchange.CreateOrder(symbol, "buy", -1, 10, {tif: "ioc"})```。
 - 其它下单参数写在下单方向后面，例如```exchange.CreateOrder(symbol, "buy;{\"orderType\":\"GTD\",\"expiration\":1830000000}", price, amount)```或```"buy;slippage=0.02"```：```orderType```（```GTC```默认、```GTD```、```FOK```、```FAK```）、```expiration```（GTD必填，Unix秒，须晚于当前60秒以上；非GTD订单传入会报错）、```postOnly```（仅GTC/GTD）、```deferExec```（原样传给交易所）、```slippage```（市价单滑点）。
 - ```exchange.GetOrders()```、```exchange.GetPositions()```不传品种时返回全部市场；```exchange.GetHistoryOrders()```不传品种时只查当前品种，传空串查全部。
 - ```exchange.GetHistoryOrders()```由账户成交记录生成：每笔成交一行（状态为已成交，同一订单多次成交会出现多行），已撤销或从未成交的订单不会出现；```since```可传毫秒或秒，不传```limit```时最多300条。
@@ -26254,13 +27847,9 @@ Polymarket是Polygon链上的预测市场。交易所对象通过Polymarket的CL
 
 通过富途的```FutuOpenD```网关交易港股、美股、A股（A股通）和期货，支持实盘与模拟交易。需要运行托管者能访问到的[```FutuOpenD```](https://www.futunn.com/download/OpenAPI?lang=zh-CN)（交易所配置中的服务器地址，默认为本机```127.0.0.1:11111```），配置交易所对象、运行```FutuOpenD```等操作参看[富途证券配置说明文档](https://www.fmz.com/bbs-topic/10185)。
 
-**名称**
+##### 名称与配置
 
-| ```exchange.GetName()``` | 类型 | 别名 |
-| - | - | - |
-| ```Futures_Futu``` | 证券与期货 | Futu |
-
-**配置项**
+```exchange.GetName()```：```Futures_Futu```（证券与期货）；别名：Futu。
 
 | 配置项 | 必填 | 默认值 | 说明 |
 | - | - | - | - |
@@ -26268,30 +27857,34 @@ Polymarket是Polygon链上的预测市场。交易所对象通过Polymarket的CL
 | 交易密码 | 是 | — | 富途交易密码，用于解锁交易、访问账户信息。 |
 | 模拟盘 | 否 | 不勾选 | — |
 
-**交易对与合约代码**
+##### 交易对与合约代码
 
 交易对示例：```00700.HK```、```AAPL.US```、```600519.SH```
 
 品种代码格式为```代码.市场```，用```exchange.SetContractType()```（或```exchange.SetCurrency()```）设置，整段代码作为当前品种。市场后缀：```HK```港股、```US```美股、```SH```沪市、```SZ```深市、```SG```新加坡期货、```JP```日本期货。查询、撤单、改单也接受旧写法```HK.00700```。```exchange.GetMarkets()```只列出本策略已经设置过的品种。
 
-**专属IO指令**
+##### 专属IO指令
 
-| 指令 | 参数 | 说明 | 返回值 |
-| - | - | - | - |
-| ```"refresh"``` | bool | 交易类查询（GetOrder、GetOrders、GetPositions、GetAccount）是否刷新OpenD缓存，默认刷新；传```false```后使用缓存。刷新缓存的查询受富途频率限制（每30秒最多10次）。 | — |
-| ```"accounts"``` | — | 获取所有交易账户列表。 | — |
-| ```"lock"``` | — | 锁定交易。 | — |
-| ```"unlock"``` | — | 解锁交易。 | — |
-| ```"instrument"``` | symbol | 获取品种静态信息，例如```exchange.IO("instrument", "00700.HK")```。 | — |
-| ```"timeout"``` | number | 设置与OpenD通信的超时时间（毫秒）。 | — |
-| ```"statusDetail"``` | — | 获取连接状态详情。 | ```{"connected":..., "server":..., "simulate":...}``` |
-| ```"historyKlines"``` | object | 获取历史K线，参数```{symbol, interval, begin, end, limit}```，```interval```单位为秒，```begin```、```end```、```limit```可省略。 | — |
-| ```"status"``` | — | 固定返回```true```（兼容旧版），连接状态请用```statusDetail```。 | — |
-| ```"wait"``` | [number] | JavaScript和Python策略中等待当前合约的下一笔行情或本交易所对象的下一条订单回报，返回与EventLoop事件相同结构的对象；参数为超时毫秒数，负数表示不等待，0或不传使用默认超时，超时返回空值。Rust策略中固定返回```true```。 | — |
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```"refresh"``` | bool | 交易类查询（GetOrder、GetOrders、GetPositions、GetAccount）是否刷新OpenD缓存，默认刷新；传```false```后使用缓存。刷新缓存的查询受富途频率限制（每30秒最多10次）。 |
+| ```"accounts"``` | — | 获取所有交易账户列表。 |
+| ```"lock"``` | — | 锁定交易。 |
+| ```"unlock"``` | — | 解锁交易。 |
+| ```"instrument"``` | symbol | 获取品种静态信息，例如```exchange.IO("instrument", "00700.HK")```。 |
+| ```"timeout"``` | number | 设置与OpenD通信的超时时间（毫秒）。 |
+| ```"statusDetail"``` | — | 获取连接状态详情。返回：```{"connected":..., "server":..., "simulate":...}``` |
+| ```"historyKlines"``` | object | 获取历史K线，参数```{symbol, interval, begin, end, limit}```，```interval```单位为秒，```begin```、```end```、```limit```可省略。 |
+| ```"status"``` | — | 固定返回```true```（兼容旧版），连接状态请用```statusDetail```。 |
+| ```"wait"``` | [number] | JavaScript和Python策略中等待当前合约的下一笔行情或本交易所对象的下一条订单回报，返回与EventLoop事件相同结构的对象；参数为超时毫秒数，负数表示不等待，0或不传使用默认超时，超时返回空值。（详见表下） |
+
+表中长说明的其余部分：
+
+- ```"wait"```：Rust策略中固定返回```true```。
 
 通用指令```api```、```base```、```currency```见`exchange.IO`。
 
-**不支持与合成的函数**
+##### 函数支持差异
 
 不支持（调用时报错并返回空值）：`exchange.GetFundings`、`exchange.SetMarginLevel`、`exchange.CreateConditionOrder`、`exchange.ModifyConditionOrder`、`exchange.CancelConditionOrder`、`exchange.GetConditionOrder`。
 
@@ -26299,15 +27892,13 @@ Polymarket是Polygon链上的预测市场。交易所对象通过Polymarket的CL
 
 - `exchange.GetRecords`：原生周期为1分钟、3分钟、5分钟、15分钟、30分钟、1小时、1天、1周、1月；其它周期由托管者合成。
 
-所有交易所的对照见`能力矩阵`。
-
-**保证金、账户与模拟盘**
+##### 保证金、账户与模拟盘
 
 账户：富途用```TrdMarket```区分市场（1香港、2美国、3大陆、4香港A股通、5期货）。```exchange.GetAccount()```的```Balance```、```FrozenBalance```、```Equity```、```UPnL```取当前品种所在市场的币种（例如```00700.HK```为HKD，未设置品种时为香港市场），```Stocks```、```FrozenStocks```为0；```Info```中有```accounts```（交易账户列表）和```funds```（各市场的```trdMarket```、```currency```与资金明细）。```exchange.GetAssets()```按币种汇总所有已授权市场的资金。
 
 模拟盘：勾选「模拟盘」接入富途模拟交易。通过```FutuOpenD```接入模拟交易时，有些股票代码不支持，因而无法交易（富途牛牛手机App上可以模拟交易）。
 
-**注意事项**
+##### 注意事项
 
 - 不支持```exchange.IO("api", ...)```。
 - ```exchange.SetDirection()```、```exchange.Buy()```/```exchange.Sell()```、```exchange.CancelOrder()```、```exchange.ModifyOrder()```、```exchange.GetOrder()```等交易函数的用法与期货市场相同。
@@ -26319,20 +27910,16 @@ Polymarket是Polygon链上的预测市场。交易所对象通过Polymarket的CL
 
 通过TWS API（socket协议）直连托管者所在机器上运行的「IB Gateway」或「TWS（Trader Workstation）」，交易盈透证券账户中的股票、期货、期权等。以TWS为例：登录后点击右上角的配置按钮，选择「配置」→「API」→「设置」，**不要**勾选「只读API」，勾选「启用ActiveX和套接字客户端」，并记下「套接字端口」（TWS默认实盘7496、模拟盘7497；IB Gateway默认实盘4001、模拟盘4002），填入交易所配置的服务器地址。鉴权在TWS或IB Gateway的登录状态中完成，交易所配置不需要密钥。
 
-**名称**
+##### 名称与配置
 
-| ```exchange.GetName()``` | 类型 | 别名 |
-| - | - | - |
-| ```Futures_IB``` | 证券与期货 | IB、盈透 |
-
-**配置项**
+```exchange.GetName()```：```Futures_IB```（证券与期货）；别名：IB、盈透。
 
 | 配置项 | 必填 | 默认值 | 说明 |
 | - | - | - | - |
 | 服务器地址 | 是 | ```localhost:7496``` | TWS或IB Gateway的API地址和端口，例如```localhost:7496```。 |
 | 行情类型 | 是 | ```1``` | 实时数据、冻结数据、延迟数据、延迟冻结数据之一。没有订阅实时行情的账户可以选择延迟数据。运行中可用```exchange.IO("marketDataType", n)```切换。可选：```实时数据```、```冻结数据```、```延迟数据```、```延迟冻结数据``` |
 
-**交易对与合约代码**
+##### 交易对与合约代码
 
 交易对示例：```AAPL.US```、```TSLA.US```
 
@@ -26345,25 +27932,29 @@ Polymarket是Polygon链上的预测市场。交易所对象通过Polymarket的CL
 
 持仓、订单的```Symbol```是简写形式（如```Z74.SGD```），```exchange.GetPositions()```、```exchange.GetOrders()```传入简写或下单时用的完整代码（如```Z74.SGD.STK.SGX```）都可以。
 
-**专属IO指令**
+##### 专属IO指令
 
-| 指令 | 参数 | 说明 | 返回值 |
-| - | - | - | - |
-| ```"status"``` | — | 与TWS/IB Gateway的会话是否已建立（不主动建立连接）。 | — |
-| ```"time"``` | — | 获取IB服务器时间（毫秒时间戳）。 | — |
-| ```"accounts"``` | — | 获取托管账户列表。 | — |
-| ```"reqId"``` | — | 强制获取新请求ID。 | — |
-| ```"orderId"``` | — | 获取下一个可用订单ID。 | — |
-| ```"ignore"``` | codes | 设置同步请求时忽略的TWS错误码，参数为错误码数组或数组的JSON字符串。 | 设置后的错误码列表。 |
-| ```"scan"``` | object | 执行市场扫描器，参数为扫描订阅字段（对象或JSON字符串），必须包含```Instrument```，例如```STK```配合```LocationCode```为```STK.US.MAJOR```。 | — |
-| ```"wait"``` | [number] | JavaScript和Python策略中等待当前合约的下一笔行情或本交易所对象的下一条订单回报，返回与EventLoop事件相同结构的对象；参数为超时毫秒数，负数表示不等待，0或不传使用默认超时，超时返回空值。Rust策略中返回下一条完整的TWS消息。 | — |
-| ```"debug"``` | [bool] | 查询或设置调试模式：开启后把与TWS/IB Gateway收发的每一帧按TWS API日志的格式输出到日志。 | — |
-| ```"marketDataType"``` | number | 切换行情数据类型（1实时、2冻结、3延迟、4延迟冻结）。 | ```true``` |
-| ```"api"``` | msgId, ...fields \| name[, params[, filterMsgId[, timeout]]] | 发送原始TWS消息（```[消息ID, 字段...]```，发送后返回```true```）；或按旧版请求名调用（如```ReqCurrentTime```、```ReqContractDetails```），等待并返回指定消息ID的应答。 | — |
+| 指令 | 参数 | 说明 |
+| - | - | - |
+| ```"status"``` | — | 与TWS/IB Gateway的会话是否已建立（不主动建立连接）。 |
+| ```"time"``` | — | 获取IB服务器时间（毫秒时间戳）。 |
+| ```"accounts"``` | — | 获取托管账户列表。 |
+| ```"reqId"``` | — | 强制获取新请求ID。 |
+| ```"orderId"``` | — | 获取下一个可用订单ID。 |
+| ```"ignore"``` | codes | 设置同步请求时忽略的TWS错误码，参数为错误码数组或数组的JSON字符串。返回：设置后的错误码列表。 |
+| ```"scan"``` | object | 执行市场扫描器，参数为扫描订阅字段（对象或JSON字符串），必须包含```Instrument```，例如```STK```配合```LocationCode```为```STK.US.MAJOR```。 |
+| ```"wait"``` | [number] | JavaScript和Python策略中等待当前合约的下一笔行情或本交易所对象的下一条订单回报，返回与EventLoop事件相同结构的对象；参数为超时毫秒数，负数表示不等待，0或不传使用默认超时，超时返回空值。（详见表下） |
+| ```"debug"``` | [bool] | 查询或设置调试模式：开启后把与TWS/IB Gateway收发的每一帧按TWS API日志的格式输出到日志。 |
+| ```"marketDataType"``` | number | 切换行情数据类型（1实时、2冻结、3延迟、4延迟冻结）。返回：```true``` |
+| ```"api"``` | msgId, ...fields \| name[, params[, filterMsgId[, timeout]]] | 发送原始TWS消息（```[消息ID, 字段...]```，发送后返回```true```）；或按旧版请求名调用（如```ReqCurrentTime```、```ReqContractDetails```），等待并返回指定消息ID的应答。 |
+
+表中长说明的其余部分：
+
+- ```"wait"```：Rust策略中返回下一条完整的TWS消息。
 
 通用指令```base```、```currency```见`exchange.IO`。
 
-**不支持与合成的函数**
+##### 函数支持差异
 
 不支持（调用时报错并返回空值）：`exchange.GetTrades`、`exchange.GetHistoryOrders`、`exchange.GetFundings`、`exchange.SetMarginLevel`、`exchange.ModifyOrder`、`exchange.CreateConditionOrder`、`exchange.ModifyConditionOrder`、`exchange.CancelConditionOrder`、`exchange.GetConditionOrder`、`exchange.GetConditionOrders`、`exchange.GetHistoryConditionOrders`。
 
@@ -26371,9 +27962,7 @@ Polymarket是Polygon链上的预测市场。交易所对象通过Polymarket的CL
 
 - `exchange.GetRecords`：原生周期为1分钟、3分钟、5分钟、15分钟、30分钟、1小时、2小时、4小时、6小时、1天、1周；其它60秒整数倍的周期由托管者用原生K线合成，其余周期（如秒级）不可用（本交易所对象不支持```exchange.GetTrades()```）。
 
-所有交易所的对照见`能力矩阵`。
-
-**注意事项**
+##### 注意事项
 
 - 托管者以实盘ID作为连接TWS的客户端号（clientId），实盘重启后客户端号不变，仍可撤销此前挂出的订单。TWS只允许订单的原始客户端号（或主客户端）撤销订单；```exchange.GetOrder()```只能查到本客户端号的订单。
 - 行情为快照：```exchange.GetDepth()```只有买一、卖一一档；```exchange.GetTickers()```返回本次运行中已经使用过的合约的行情。
@@ -26404,27 +27993,23 @@ Polymarket是Polygon链上的预测市场。交易所对象通过Polymarket的CL
 | exchange.GetOrder() | order | id, symbol |
 | exchange.CancelOrder() | cancel | id, symbol |
 
-**名称**
+##### 名称与配置
 
-| ```exchange.GetName()``` | 类型 | 别名 |
+```exchange.GetName()```：```Exchange```（自定义接入）；别名：自定义交易所、Custom Exchange。
+
+| 配置项 | 必填 | 说明 |
 | - | - | - |
-| ```Exchange``` | 自定义接入 | 自定义交易所、Custom Exchange |
+| 服务地址 | 是 | 协议插件程序（网关）的完整地址，只支持```http://```、```https://```，请求直接POST到这个地址。 |
+| Access Key | 是 | 原样放进请求体的```access_key```。 |
+| Secret Key | 是 | 原样放进请求体的```secret_key```。 |
 
-**配置项**
-
-| 配置项 | 必填 | 默认值 | 说明 |
-| - | - | - | - |
-| 服务地址 | 是 | — | 协议插件程序（网关）的完整地址，只支持```http://```、```https://```，请求直接POST到这个地址。 |
-| Access Key | 是 | — | 原样放进请求体的```access_key```。 |
-| Secret Key | 是 | — | 原样放进请求体的```secret_key```。 |
-
-**交易对与合约代码**
+##### 交易对与合约代码
 
 交易对示例：```BTC_USDT```
 
 交易对按```BTC_USDT```书写，发给网关时转为小写（```btc_usdt```）。
 
-**专属IO指令**
+##### 专属IO指令
 
 | 指令 | 参数 | 说明 | 返回值 |
 | - | - | - | - |
@@ -26433,7 +28018,7 @@ Polymarket是Polygon链上的预测市场。交易所对象通过Polymarket的CL
 
 通用指令```base```、```currency```见`exchange.IO`。
 
-**不支持与合成的函数**
+##### 函数支持差异
 
 不支持（调用时报错并返回空值）：`exchange.GetTickers`、`exchange.GetMarkets`、`exchange.ModifyOrder`、`exchange.CreateConditionOrder`、`exchange.ModifyConditionOrder`、`exchange.CancelConditionOrder`、`exchange.GetConditionOrder`、`exchange.GetConditionOrders`、`exchange.GetHistoryConditionOrders`。
 
@@ -26441,9 +28026,7 @@ Polymarket是Polygon链上的预测市场。交易所对象通过Polymarket的CL
 
 - `exchange.GetRecords`：网关的```records```只接受1分钟、3分钟、5分钟、15分钟、30分钟、1小时、1天周期，其它周期由托管者合成；不支持指定起始时间。
 
-所有交易所的对照见`能力矩阵`。
-
-**注意事项**
+##### 注意事项
 
 - 下单（网关方法```trade```）：```type```为```buy```、```sell```，平仓单为```closebuy```、```closesell```，也可以在下单附加参数中用```direction```直接指定；市价单```price```为```"-1"```；其余附加参数原样并入```params```。不支持只做Maker（postOnly）和GTC以外的有效期。
 - ```exchange.GetAccount()```先调用网关的```accounts```方法，网关应答错误（例如不支持该方法）时改调```assets```方法，因此只实现```assets```的网关也可以使用；```exchange.GetAssets()```只调用```assets```方法。两个方法的应答```data```都是```[{currency, free, frozen}]```。
@@ -26455,13 +28038,9 @@ Web3交易所对象连接EVM链或TRON链的节点（配置项「ChainType」选
 
 标准交易函数中只支持```exchange.GetAssets()```、```exchange.GetAccount()```（钱包的原生币余额）。在去中心化交易所兑换代币请使用Uniswap交易所对象：它可以直接使用```exchange.GetTicker()```、```exchange.CreateOrder()```等标准函数。
 
-**名称**
+##### 名称与配置
 
-| ```exchange.GetName()``` | 类型 | 别名 |
-| - | - | - |
-| ```Web3``` | 自定义接入 | 以太坊、Ethereum、波场、TRON |
-
-**配置项**
+```exchange.GetName()```：```Web3```（自定义接入）；别名：以太坊、Ethereum、波场、TRON。
 
 | 配置项 | 必填 | 默认值 | 说明 |
 | - | - | - | - |
@@ -26470,50 +28049,48 @@ Web3交易所对象连接EVM链或TRON链的节点（配置项「ChainType」选
 | 节点地址 | 否 | ```http://127.0.0.1:8545``` | EVM为JSON-RPC节点地址，多个节点用逗号分隔互为备用；TRON为全节点HTTP地址（只能一个，旧的gRPC地址会换成对应的HTTP地址）。 |
 | 节点认证 | 否 | — | EVM：```Header-Name: value```形式的请求头，或Basic认证值；TRON：作为```TRON-PRO-API-KEY```请求头发送。 |
 
-**交易对与合约代码**
+##### 交易对与合约代码
 
 交易对示例：```ETH_USDT```
 
 交易对不参与链上操作，任意```BASE_QUOTE```形式都可以设置。合约、代币用地址指定：EVM为```0x```开头的地址，TRON为```T```开头的地址。
 
-**专属IO指令**
+##### 专属IO指令
 
 | 指令 | 参数 | 说明 | 返回值 |
 | - | - | - | - |
-| ```"abi"``` | address, abiContent | 为合约地址注册ABI（JSON字符串，或内置模板名```weth```、```uniswapV3Pool```、```uniswapV3Factory```、```uniswapV3QuoterV2```、```uniswapV3SwapRouter02```、```uniswapV3PositionManager```、```permit2```，PancakeSwap V3有对应的```pancakeV3*```别名）。标准ERC20方法不需要注册；TRON上未注册的合约会自动从链上读取ABI。见子页`exchange.IO("abi")`。 | — |
-| ```"api"``` | address \| "eth" \| "tron", method, ...args[, options] | 第一个参数为合约地址时调用合约方法：只读方法（```view```、```pure```）返回解码后的值，写方法签名并广播后返回交易哈希（```options```可设```gasLimit```、```gasPrice```、```nonce```、```dryRun```）。第一个参数为```"eth"```或```"tron"```时直接调用节点的RPC方法，```"send"```转出原生币。见子页`exchange.IO("api")`。 | — |
-| ```"call"``` | address, method \| calldata, ...args[, options] | 以```eth_call```模拟执行合约的任意方法（包括写方法），不签名、不广播、不消耗gas，用于询价、交易预演；```options```为```{from, value, block, gasLimit}```。仅EVM。见子页`exchange.IO("call")`。 | 方法名调用返回解码后的值（没有返回值时为```true```）；calldata调用返回原始返回数据（十六进制字符串）。 |
-| ```"multicall"``` | calls[, options] | 通过Multicall3合约在同一区块状态上一次读取多个合约调用，```calls```每项为```[合约地址, 方法, ...参数]```；```options```为```{allowFailure, block, multicall}```。子调用的调用者是Multicall3合约。仅EVM。见子页`exchange.IO("multicall")`。 | 与```calls```顺序一致的结果数组。 |
-| ```"logs"``` | query | 查询合约的事件日志（```eth_getLogs```）并按ABI解码；```query```为```{address, event, filter, fromBlock, toBlock, topics, blockHash}```。仅EVM。见子页`exchange.IO("logs")`。 | 日志数组，能解码时每项另有```event```、```args```。 |
-| ```"waitReceipt"``` | txHash[, options] | 等待交易上链并达到确认数，```options```为```{timeout, confirmations, interval}```（默认最长等待120秒）。仅EVM。见子页`exchange.IO("waitReceipt")`。 | 交易回执（```status```为数字，```events```为解码后的事件）；超时返回空值。 |
-| ```"nonce"``` | ["sync" \| number] | 查看发送交易使用的nonce计数；传```"sync"```按节点的pending计数重新同步，传数字设置本地下一个nonce。仅EVM。见子页`exchange.IO("nonce")`。 | ```{address, latest, pending, local}```（数值均为字符串）。 |
-| ```"speedUp"``` | txHash[, options] | 给还未上链的交易加价重发（同nonce，接收地址、金额、调用数据和gas上限不变）；```options```为```{multiplier, dryRun}```，```multiplier```范围1.1到10，默认1.125。仅EVM。见子页`exchange.IO("speedUp")`。 | 替换交易的哈希；```dryRun```时返回替换交易的内容。 |
-| ```"cancelTx"``` | txHash[, options] | 取消还未上链的交易：用同一个nonce发送一笔转给自己的0金额交易，手续费更高；```options```同```speedUp```。不保证成功。仅EVM。见子页`exchange.IO("cancelTx")`。 | 取消交易的哈希；```dryRun```时返回取消交易的内容。 |
-| ```"encode"``` | [address, ]dataFormat, ...args | 按类型表做标准ABI编码（同Solidity的```abi.encode```）；第一个参数为合约地址时编码该合约的方法调用（calldata）。见子页`exchange.IO("encode")`。 | 不带```0x```的十六进制字符串。 |
-| ```"encodePacked"``` | dataFormat, ...args | 按类型表做紧凑编码（同Solidity的```abi.encodePacked```）。见子页`exchange.IO("encodePacked")`。 | 不带```0x```的十六进制字符串。 |
-| ```"decode"``` | dataFormat, data | 按类型表解码十六进制数据。见子页`exchange.IO("decode")`。 | 只有一个类型时直接返回值，多个类型时返回数组。 |
-| ```"hash"``` | algo, inputFormat, outputFormat, data[, keyFormat, key] | 计算哈希摘要、HMAC，或用配置的私钥签名等，参数与`Encode`函数相同；常用于计算```keccak256```。见子页`exchange.IO("hash")`。 | — |
-| ```"key"``` | privateKey | 切换交易所对象使用的私钥（十六进制，```0x```前缀可选）；私钥无效时报错，不切换。不能并发切换。见子页`exchange.IO("key")`。 | — |
-| ```"sign"``` | hash[, key] | 用secp256k1私钥对32字节哈希签名（不再做哈希），用于EIP-712等链下签名；不传```key```时用配置的私钥。见子页`exchange.IO("sign")`。 | ```{r, s, v, signature, vs}```（```v```为27或28，```vs```为EIP-2098紧凑签名）。 |
-| ```"signTypedData"``` | typedData[, key] \| domain, types, message[, key] | 按EIP-712对结构化数据签名，一步完成类型哈希、域分隔符、结构体哈希和摘要计算。见子页`exchange.IO("signTypedData")`。 | 同```sign```，另有```digest```（EIP-712摘要）。 |
-| ```"signMessage"``` | message[, key] | 按EIP-191（```personal_sign```）对消息签名；字符串按UTF-8签名，原始字节传```{hex: "0x..."}```。见子页`exchange.IO("signMessage")`。 | 同```sign```，另有```digest```（EIP-191消息哈希）。 |
-| ```"toUnits"``` | amount, decimals | 把可读数量换算为链上整数，按字符串精确计算；```decimals```可以是数字或代币合约地址（自动读取```decimals()```）。小数位多于精度时报错。见子页`exchange.IO("toUnits")`。 | 十进制字符串。 |
-| ```"fromUnits"``` | amount, decimals | 把链上整数换算为可读数量，按字符串精确计算；```decimals```同```toUnits```。见子页`exchange.IO("fromUnits")`。 | 十进制字符串（去掉末尾的0）。 |
-| ```"uniswapV3"``` | fn, ...args | 集中流动性计算：```tickToPrice```、```priceToTick```、```sqrtPriceToPrice```、```tickToSqrtPrice```、```sqrtPriceToTick```、```nearestUsableTick```、```amountsForLiquidity```、```liquidityForAmounts```；精度参数可以是数字或代币地址。适用于Uniswap v3/v4、PancakeSwap v3等使用相同公式的协议。见子页`exchange.IO("uniswapV3")`。 | — |
-| ```"contracts"``` | [chainId] | 当前链（或指定链）的常用合约地址：主流代币、Multicall3、Permit2，以及Uniswap V3、PancakeSwap V3的Factory、路由、QuoterV2、头寸管理合约。支持以太坊（1）、BNB Smart Chain（56）、Base（8453）、Arbitrum One（42161）。仅EVM。见子页`exchange.IO("contracts")`。 | ```{chainId, name, wrappedNative, tokens, multicall3, permit2, uniswapV3, pancakeV3}``` |
+| ```"abi"``` | address, abiContent | 为合约地址注册ABI（JSON字符串，或内置模板名```weth```、```uniswapV3Pool```、```uniswapV3Factory```、```uniswapV3QuoterV2```、```uniswapV3SwapRouter02```、```uniswapV3PositionManager```、```permit2```，PancakeSwap V3有对应的```pancakeV3*```别名）。见子页`exchange.IO("abi", ...)`。 | — |
+| ```"api"``` | address \| "eth" \| "tron", method, ...args[, options] | 第一个参数为合约地址时调用合约方法：只读方法（```view```、```pure```）返回解码后的值，写方法签名并广播后返回交易哈希（```options```可设```gasLimit```、```gasPrice```、```nonce```、```dryRun```）。见子页`exchange.IO("api", ...)`。 | — |
+| ```"call"``` | address, method \| calldata, ...args[, options] | 以```eth_call```模拟执行合约的任意方法（包括写方法），不签名、不广播、不消耗gas，用于询价、交易预演；```options```为```{from, value, block, gasLimit}```。仅EVM。见子页`exchange.IO("call", ...)`。 | 方法名调用返回解码后的值（没有返回值时为```true```）；calldata调用返回原始返回数据（十六进制字符串）。 |
+| ```"multicall"``` | calls[, options] | 通过Multicall3合约在同一区块状态上一次读取多个合约调用，```calls```每项为```[合约地址, 方法, ...参数]```；```options```为```{allowFailure, block, multicall}```。见子页`exchange.IO("multicall", ...)`。 | 与```calls```顺序一致的结果数组。 |
+| ```"logs"``` | query | 查询合约的事件日志（```eth_getLogs```）并按ABI解码；```query```为```{address, event, filter, fromBlock, toBlock, topics, blockHash}```。仅EVM。见子页`exchange.IO("logs", ...)`。 | 日志数组，能解码时每项另有```event```、```args```。 |
+| ```"waitReceipt"``` | txHash[, options] | 等待交易上链并达到确认数，```options```为```{timeout, confirmations, interval}```（默认最长等待120秒）。仅EVM。见子页`exchange.IO("waitReceipt", ...)`。 | 交易回执（```status```为数字，```events```为解码后的事件）；超时返回空值。 |
+| ```"nonce"``` | ["sync" \| number] | 查看发送交易使用的nonce计数；传```"sync"```按节点的pending计数重新同步，传数字设置本地下一个nonce。仅EVM。见子页`exchange.IO("nonce", ...)`。 | ```{address, latest, pending, local}```（数值均为字符串）。 |
+| ```"speedUp"``` | txHash[, options] | 给还未上链的交易加价重发（同nonce，接收地址、金额、调用数据和gas上限不变）；```options```为```{multiplier, dryRun}```，```multiplier```范围1.1到10，默认1.125。仅EVM。见子页`exchange.IO("speedUp", ...)`。 | 替换交易的哈希；```dryRun```时返回替换交易的内容。 |
+| ```"cancelTx"``` | txHash[, options] | 取消还未上链的交易：用同一个nonce发送一笔转给自己的0金额交易，手续费更高；```options```同```speedUp```。不保证成功。仅EVM。见子页`exchange.IO("cancelTx", ...)`。 | 取消交易的哈希；```dryRun```时返回取消交易的内容。 |
+| ```"encode"``` | [address, ]dataFormat, ...args | 按类型表做标准ABI编码（同Solidity的```abi.encode```）；第一个参数为合约地址时编码该合约的方法调用（calldata）。见子页`exchange.IO("encode", ...)`。 | 不带```0x```的十六进制字符串。 |
+| ```"encodePacked"``` | dataFormat, ...args | 按类型表做紧凑编码（同Solidity的```abi.encodePacked```）。见子页`exchange.IO("encodePacked", ...)`。 | 不带```0x```的十六进制字符串。 |
+| ```"decode"``` | dataFormat, data | 按类型表解码十六进制数据。见子页`exchange.IO("decode", ...)`。 | 只有一个类型时直接返回值，多个类型时返回数组。 |
+| ```"hash"``` | algo, inputFormat, outputFormat, data[, keyFormat, key] | 计算哈希摘要、HMAC，或用配置的私钥签名等，参数与`Encode`函数相同；常用于计算```keccak256```。见子页`exchange.IO("hash", ...)`。 | — |
+| ```"key"``` | privateKey | 切换交易所对象使用的私钥（十六进制，```0x```前缀可选）；私钥无效时报错，不切换。不能并发切换。见子页`exchange.IO("key", ...)`。 | — |
+| ```"sign"``` | hash[, key] | 用secp256k1私钥对32字节哈希签名（不再做哈希），用于EIP-712等链下签名；不传```key```时用配置的私钥。见子页`exchange.IO("sign", ...)`。 | ```{r, s, v, signature, vs}```（```v```为27或28，```vs```为EIP-2098紧凑签名）。 |
+| ```"signTypedData"``` | typedData[, key] \| domain, types, message[, key] | 按EIP-712对结构化数据签名，一步完成类型哈希、域分隔符、结构体哈希和摘要计算。见子页`exchange.IO("signTypedData", ...)`。 | 同```sign```，另有```digest```（EIP-712摘要）。 |
+| ```"signMessage"``` | message[, key] | 按EIP-191（```personal_sign```）对消息签名；字符串按UTF-8签名，原始字节传```{hex: "0x..."}```。见子页`exchange.IO("signMessage", ...)`。 | 同```sign```，另有```digest```（EIP-191消息哈希）。 |
+| ```"toUnits"``` | amount, decimals | 把可读数量换算为链上整数，按字符串精确计算；```decimals```可以是数字或代币合约地址（自动读取```decimals()```）。小数位多于精度时报错。见子页`exchange.IO("toUnits", ...)`。 | 十进制字符串。 |
+| ```"fromUnits"``` | amount, decimals | 把链上整数换算为可读数量，按字符串精确计算；```decimals```同```toUnits```。见子页`exchange.IO("fromUnits", ...)`。 | 十进制字符串（去掉末尾的0）。 |
+| ```"uniswapV3"``` | fn, ...args | 集中流动性计算：```tickToPrice```、```priceToTick```、```sqrtPriceToPrice```、```tickToSqrtPrice```、```sqrtPriceToTick```、```nearestUsableTick```、```amountsForLiquidity```、```liquidityForAmounts```；精度参数可以是数字或代币地址。见子页`exchange.IO("uniswapV3", ...)`。 | — |
+| ```"contracts"``` | [chainId] | 当前链（或指定链）的常用合约地址：主流代币、Multicall3、Permit2，以及Uniswap V3、PancakeSwap V3的Factory、路由、QuoterV2、头寸管理合约。见子页`exchange.IO("contracts", ...)`。 | ```{chainId, name, wrappedNative, tokens, multicall3, permit2, uniswapV3, pancakeV3}``` |
 | ```"address"``` | [key] | 配置的钱包地址（EVM为```0x```开头的小写地址，TRON为```T```开头的地址）；传入私钥时返回该私钥的地址，不切换私钥。见子页`exchange.IO("address")`。 | — |
-| ```"base"``` | [address] | 查询或设置RPC节点地址。EVM支持多个节点互为备用（数组或逗号分隔），每个节点第一次使用时核对chainId；TRON只支持一个全节点HTTP地址，旧的gRPC地址```grpc.trongrid.io:50051```等换成对应的HTTP地址。见子页`exchange.IO("base")`。 | 设置前的节点地址；不传参数时返回当前地址。 |
-| ```"sendBase"``` | [url] | 设置只用来广播交易的节点（Flashbots Protect、MEV Blocker等私有交易通道），读取、查nonce、估算gas仍用配置的节点；传空字符串清除。仅EVM。见子页`exchange.IO("sendBase")`。 | 设置前的发送节点地址，未设置时为空字符串。 |
+| ```"base"``` | [address] | 查询或设置RPC节点地址。EVM支持多个节点互为备用（数组或逗号分隔），每个节点第一次使用时核对chainId；TRON只支持一个全节点HTTP地址，旧的gRPC地址```grpc.trongrid.io:50051```等换成对应的HTTP地址。见子页`exchange.IO("base", ...)`。 | 设置前的节点地址；不传参数时返回当前地址。 |
+| ```"sendBase"``` | [url] | 设置只用来广播交易的节点（Flashbots Protect、MEV Blocker等私有交易通道），读取、查nonce、估算gas仍用配置的节点；传空字符串清除。仅EVM。见子页`exchange.IO("sendBase", ...)`。 | 设置前的发送节点地址，未设置时为空字符串。 |
 
 通用指令```currency```见`exchange.IO`。
 
-**不支持与合成的函数**
+##### 函数支持差异
 
 不支持（调用时报错并返回空值）：`exchange.GetTicker`、`exchange.GetTickers`、`exchange.GetDepth`、`exchange.GetTrades`、`exchange.GetRecords`、`exchange.GetMarkets`、`exchange.CreateOrder`、`exchange.Buy`、`exchange.Sell`、`exchange.CancelOrder`、`exchange.ModifyOrder`、`exchange.GetOrder`、`exchange.GetOrders`、`exchange.GetHistoryOrders`、`exchange.CreateConditionOrder`、`exchange.ModifyConditionOrder`、`exchange.CancelConditionOrder`、`exchange.GetConditionOrder`、`exchange.GetConditionOrders`、`exchange.GetHistoryConditionOrders`。
 
-所有交易所的对照见`能力矩阵`。
-
-**注意事项**
+##### 注意事项
 
 - ```exchange.GetAssets()```返回钱包的原生币余额：EVM按节点的chainId确定币名（ETH、BNB、POL、AVAX等，认不出的链报错），TRON为TRX；```exchange.GetAccount()```按当前交易对从中取值（例如交易对为```ETH_USDT```时```Stocks```为ETH余额）。代币余额用```exchange.IO("api", 代币地址, "balanceOf", 地址)```查询。
 
@@ -26527,17 +28104,17 @@ Forms:
 
 - `exchange.IO("abi", ...)`
 
-在发明者量化交易平台中，区块链相关的各种功能和调用主要通过```exchange.IO()```函数实现。以下文档按照功能对```exchange.IO()```函数的各种调用方式分别进行描述。 ```exchange.IO("abi", ...)```这一调用方式用于注册ABI。
-
+在发明者量化交易平台主要通过```exchange.IO()```函数实现区块链相关的各种功能、调用。以下文档把```exchange.IO()```函数根据其功能分别描述。 ```exchange.IO("abi", ...)```函数的调用方式用于注册ABI。
 - 支持以太坊（eth）
-
 - 支持波场（tron）
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于指定```exchange.IO()```函数的功能，设置为```"abi"```时表示该函数用于注册```ABI```。
-- `address` (string, required): ```address```参数用于指定智能合约的地址。
-- `abiContent` (string, required): ```abiContent```参数用于指定智能合约的```ABI```（JSON字符串）。也可以传入内置模板名：```"weth"```（包装币的```deposit```、```withdraw```方法，别名```"wbnb"```、```"wrappedNative"```）、```"uniswapV3Pool"```、```"uniswapV3Factory"```、```"uniswapV3QuoterV2"```、```"uniswapV3SwapRouter02"```、```"uniswapV3PositionManager"```、```"permit2"```。PancakeSwap V3对应的合约使用相同模板，也可以写```"pancakeV3Pool"```、```"pancakeV3Factory"```、```"pancakeV3QuoterV2"```、```"pancakeV3SmartRouter"```、```"pancakeV3PositionManager"```，或通用别名```"v3Pool"```、```"v3Factory"```、```"v3QuoterV2"```、```"v3Router"```、```"v3PositionManager"```。模板名不存在时报错。
+- `k` (string, required): 固定为```"abi"```，用于注册```ABI```。
+- `address` (string, required): 智能合约的地址。
+- `abiContent` (string, required): 智能合约的```ABI```（JSON字符串），或内置模板名，例如```"weth"```、```"uniswapV3Pool"```、```"permit2"```；全部模板名见备注。
+
+注册Uniswap SwapRouter02合约exactOutput方法的ABI片段。
 
 ```javascript
 function main() {
@@ -26550,7 +28127,7 @@ function main() {
 }
 ```
 
-使用内置模板注册Uniswap V3头寸管理合约，并查询最近新增的头寸。
+使用内置模板注册Uniswap V3头寸管理合约，并查询最近的头寸。
 
 ```javascript
 function main() {
@@ -26568,18 +28145,22 @@ function main() {
 }
 ```
 
-如果调用的智能合约方法是标准的ERC20方法，则无需注册ABI。
+调用的智能合约方法如果是标准ERC20方法，则不需要注册。
 
-合约的```ABI```内容可以通过Etherscan的V2接口获取（需要Etherscan的API Key，```chainid```为链ID），只需取其中的```result```字段，例如：
+获取合约的```ABI```内容可以使用Etherscan的V2接口（需要Etherscan的API Key，```chainid```为链ID），只取```result```字段，例如：
 ```url
 https://api.etherscan.io/v2/api?chainid=1&module=contract&action=getabi&address=0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45&apikey=YourApiKey
 ```
 
-通过方法名调用时，优先匹配该地址所注册ABI中的方法，其次匹配内置的ERC20方法；对于同名的重载方法，需要使用完整的方法签名加以区分，例如```"permit(address,((address,uint160,uint48,uint48),address,uint256),bytes)"```。
+使用方法名调用时，优先使用该地址注册的ABI中的方法，其次是内置的ERC20方法；同名的重载方法需要使用完整的方法签名区分，例如```"permit(address,((address,uint160,uint48,uint48),address,uint256),bytes)"```。
 
-内置模板包含常用的函数和事件定义，其中的事件定义可配合```exchange.IO("logs", ...)```、```exchange.IO("waitReceipt", ...)```进行解码；常用合约的地址可以通过```exchange.IO("contracts", ...)```获取。
+内置模板包含常用的函数和事件定义，事件可以配合```exchange.IO("logs", ...)```、```exchange.IO("waitReceipt", ...)```解码；常用合约地址可以通过```exchange.IO("contracts", ...)```获取。
 
 波场（TRON）上调用没有注册ABI的合约方法时，会自动从链上读取该合约的ABI并缓存；链上读取不到时报错，需要用```exchange.IO("abi", ...)```手动注册。
+
+```abiContent```也可以传入内置模板名：```"weth"```（包装币的```deposit```、```withdraw```方法，别名```"wbnb"```、```"wrappedNative"```）、```"uniswapV3Pool"```、```"uniswapV3Factory"```、```"uniswapV3QuoterV2"```、```"uniswapV3SwapRouter02"```、```"uniswapV3PositionManager"```、```"permit2"```。PancakeSwap V3对应的合约使用相同模板，也可以写```"pancakeV3Pool"```、```"pancakeV3Factory"```、```"pancakeV3QuoterV2"```、```"pancakeV3SmartRouter"```、```"pancakeV3PositionManager"```，或通用别名```"v3Pool"```、```"v3Factory"```、```"v3QuoterV2"```、```"v3Router"```、```"v3PositionManager"```。模板名不存在时报错。
+
+See also: `Web3`, `exchange.IO`, `exchange.IO("api")`, `exchange.IO("encode")`, `exchange.IO("decode")`, `exchange.IO("logs")`
 
 ##### exchange.IO("api", blockChain, ...)
 
@@ -26592,24 +28173,24 @@ Forms:
 
 - `exchange.IO("api", "eth", ...)`
 
-```exchange.IO("api", "eth", ...)```调用方式用于调用以太坊RPC方法（配置Web3交易所对象时需选择eth）。
-```exchange.IO("api", "tron", ...)```调用方式用于调用波场RPC方法（配置Web3交易所对象时需选择tron）。
+```exchange.IO("api", "eth", ...)```函数的调用方式，用于调用以太坊RPC方法（需要Web3交易所对象配置时选择eth）。
+```exchange.IO("api", "tron", ...)```函数的调用方式，用于调用波场RPC方法（需要Web3交易所对象配置时选择tron）。
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"api"```时表示该函数用于扩展调用请求。
-- `blockChain` (string, required): ```blockChain```参数用于指定```exchange.IO()```函数调用的区块链网络，设置为```"eth"```时表示调用以太坊网络的RPC方法；设置为```"tron"```时表示调用波场网络的RPC方法。
-- `rpcMethod` (string, required): ```rpcMethod```参数用于指定```exchange.IO()```函数所要调用的RPC方法。
-- `arg` (string / number / bool / object / array / any (平台支持的任意类型), optional): ```arg```参数用于指定所要调用的RPC方法的参数。
-```arg```参数可以有多个，其类型与个数取决于```rpcMethod```参数所指定的RPC方法。
+- `k` (string, required): 固定为```"api"```，用于扩展调用请求。
+- `blockChain` (string, required): 区块链网络：```"eth"```表示调用以太坊网络的RPC方法；```"tron"```表示调用波场的RPC方法。
+- `rpcMethod` (string, required): ```exchange.IO()```函数调用的RPC方法。
+- `arg` (string / number / bool / object / array / any, optional): 要调用的RPC方法的参数。
+```arg```参数可能有多个，```arg```参数的类型与个数根据```rpcMethod```参数指定的RPC方法而定。
 
-Returns (string / number / bool / object / array / any (平台支持的任意类型)): ```exchange.IO("api", "eth", ...)```函数返回所调用RPC方法的返回值。
+Returns (string / number / bool / object / array / any): 调用的RPC方法的返回值。
 
-查询钱包中的ETH余额：
+查询钱包中ETH的余额。
 
 ```javascript
-// 将链上整数数量转换为可读数量。decimals为代币精度：ETH为18，USDT/USDC为6。
-// 同时支持十进制字符串和0x开头的十六进制字符串：eth_getBalance等RPC方法返回的即为0x开头的十六进制字符串。
+// 链上整数数量 -> 可读数量。decimals为代币精度，ETH是18，USDT/USDC是6。
+// 十进制串、0x串都收：eth_getBalance等RPC方法返回的就是0x串。
 function toAmount(raw, decimals) {
     var t = String(raw).trim()
     if (t.slice(0, 2).toLowerCase() == "0x") t = BigInt(t).toString()
@@ -26621,12 +28202,13 @@ function toAmount(raw, decimals) {
 }
 
 function main() {
-    // "owner" 需替换为实际的钱包地址
-    // "latest"所在位置为区块参数，可选值：'latest'、'earliest'或'pending'，详见https://eth.wiki/json-rpc/API#the-default-block-parameter
-    // 返回值 ethBalance 为十六进制字符串，例如：0x9b19ce56113070
+    // "owner" 需要替换为具体钱包地址
+    // "latest"字符串位置的参数标签：'latest'、'earliest'或'pending'，
+    // 参考https://eth.wiki/json-rpc/API#the-default-block-parameter
+    // 返回值 ethBalance 为十六进制字符串：0x9b19ce56113070
     var ethBalance = exchange.IO("api", "eth", "eth_getBalance", "owner", "latest")
 
-    // ETH的精度为18，即1 ETH等于1e18个最小单位
+    // ETH的精度单位为1e18
     var ethDecimal = 18
 
     // 链上数量都是整数，换算成可读数量要按精度移小数点。小数点按字符串移动，只有最后 Number() 转成数字时
@@ -26636,17 +28218,17 @@ function main() {
 }
 ```
 
-ETH转账时，可以根据具体需求设置```{gasPrice: 11, gasLimit: 111, nonce: 111}```参数，该参数作为```exchange.IO()```函数的最后一个参数传入。不需要的选项可以省略。注意普通转账不设置```gasPrice```时按固定的100 Gwei出价、```gasLimit```默认为21000，建议先用```eth_gasPrice```查询gas价格后传入。
+ETH转账，可以根据具体需求设置```{gasPrice: 11, gasLimit: 111, nonce: 111}```参数，该参数设置在```exchange.IO()```函数的最后一个参数上。不需要的选项可以省略。注意普通转账不设置```gasPrice```时按固定的100 Gwei出价、```gasLimit```默认为21000，建议先用```eth_gasPrice```查询gas价格后传入。
 
-该参数还支持```data```和```dryRun```字段：```data```为任意调用数据（以```0x```开头的十六进制字符串），用于直接发送聚合器、Pendle等API返回的交易```{to, data, value}```；设置```data```时，gas价格和gasLimit按合约调用的方式由节点估算。```dryRun```设置为```true```时仅签名、不广播，返回包含```hash```、```raw```（签名后的交易）、```nonce```、```gasLimit```等字段的对象，可用于检查交易内容或交由其它渠道发送。例如：```exchange.IO("api", "eth", "send", router, value, {data: calldata, dryRun: true})```。发送前可以先使用```exchange.IO("call", router, calldata, {value: value})```进行模拟调用。未设置```nonce```时，系统会自动分配nonce并与链上保持同步，连续发送交易不会重复使用nonce，详见```exchange.IO("nonce", ...)```；交易长时间未上链时，可以使用```exchange.IO("speedUp", ...)```提高gas价格重新发送，或使用```exchange.IO("cancelTx", ...)```取消交易。
+该参数还支持```data```和```dryRun```：```data```为任意调用数据（```0x```开头的十六进制字符串），用于直接发送聚合器、Pendle等API返回的交易```{to, data, value}```，设置```data```时gas价格和gasLimit按合约调用的方式由节点估算；```dryRun```设置为```true```时只签名不广播，返回包含```hash```、```raw```（签名后的交易）、```nonce```、```gasLimit```等字段的对象，可用于检查交易内容或交给其它渠道发送。例如：```exchange.IO("api", "eth", "send", router, value, {data: calldata, dryRun: true})```。发送前可以先用```exchange.IO("call", router, calldata, {value: value})```预演。不设置```nonce```时自动分配并与链上同步，连续发送不会重复使用nonce，参看```exchange.IO("nonce", ...)```；交易长时间未上链可以用```exchange.IO("speedUp", ...)```加价重发或用```exchange.IO("cancelTx", ...)```取消。
 
 ```javascript
-// 可读数量 -> 链上整数数量（字符串）。全程以字符串方式移动小数点，不经过浮点数运算，
-// 超过2^53的数量也不会丢失精度。需要表示17位以上有效数字时，amount请传入字符串。
+// 可读数量 -> 链上整数数量（字符串）。全程按字符串移小数点，不经过浮点数，
+// 超过2^53的数量也不会丢位。要表示17位以上有效数字时，amount请传字符串。
 function toInnerAmount(amount, decimals) {
     var t = String(amount), d = Number(decimals) || 0
     var m = /^([0-9]*)(?:\.([0-9]*))?[eE]([+-]?[0-9]+)$/.exec(t)
-    if (m) {   // 展开科学计数法：0.0000001 会被JavaScript表示为 1e-7
+    if (m) {   // 摊平科学计数法：0.0000001 会被JavaScript写成 1e-7
         var digits = (m[1] || "") + (m[2] || ""), point = (m[1] || "").length + parseInt(m[3], 10)
         t = point <= 0 ? "0." + new Array(1 - point).join("0") + digits
             : point >= digits.length ? digits + new Array(point - digits.length + 1).join("0")
@@ -26654,7 +28236,7 @@ function toInnerAmount(amount, decimals) {
     }
     var dot = t.indexOf("."), int = dot < 0 ? t : t.slice(0, dot)
     var frac = dot < 0 ? "" : t.slice(dot + 1)
-    frac = frac.slice(0, d)                       // 超出精度的小数位直接截断
+    frac = frac.slice(0, d)                       // 超出精度的小数位直接截掉
     while (frac.length < d) frac += "0"
     return (int + frac).replace(/^0+(?=[0-9])/, "")
 }
@@ -26663,21 +28245,21 @@ function main() {
     // ETH的精度单位为1e18
     var ethDecimal = 18
 
-    // 转账数量（可读数量），例如：0.01个ETH
+    // 转账数量，可读的数量例如：0.01个ETH
     var sendAmount = 0.01
 
-    // 转换为链上使用的整数数量：0.01 -> "10000000000000000"
+    // 转换为链上处理的数据：0.01 -> "10000000000000000"
     var amount = toInnerAmount(sendAmount, ethDecimal)
 
-    // "toAddress"为转账接收方的ETH钱包地址，需根据实际情况填写；amount为转账数量
+    // "toAddress"为转账时接收方的ETH钱包地址，需要具体填写，amount为转账数量
     exchange.IO("api", "eth", "send", "toAddress", amount)
 }
 ```
 
-查询```gasPrice```：
+查询```gasPrice```。
 
 ```javascript
-// toAmount函数用于将hex编码的数值转换为十进制数值，decimals传入0表示不移动小数点
+// toAmount函数可以把hex编码的数值转换为十进制数值，decimals传0表示不移小数点
 function toAmount(raw, decimals) {
     var t = String(raw).trim()
     if (t.slice(0, 2).toLowerCase() == "0x") t = BigInt(t).toString()
@@ -26690,15 +28272,16 @@ function toAmount(raw, decimals) {
 
 function main() {
     var gasPrice = exchange.IO("api", "eth", "eth_gasPrice")
-    Log("gasPrice:", toAmount(gasPrice, 0))   // 5000000000 , in wei (5 gwei)
+    Log("gasPrice:", toAmount(gasPrice, 0))
+    // 输出：gasPrice: 5000000000（单位wei，即5 gwei）
     Log("gasPrice:", toAmount(gasPrice, 9), "gwei")   // gwei的精度单位为1e9
 }
 ```
 
-调用```eth_estimateGas```估算交易所需的Gas：
+查询```eth_estimateGas```。
 
 ```javascript
-// toAmount函数用于将十六进制编码的数值转换为十进制数值
+// toAmount函数可以把hex编码的数值转换为十进制数值
 function toAmount(raw, decimals) {
     var t = String(raw).trim()
     if (t.slice(0, 2).toLowerCase() == "0x") t = BigInt(t).toString()
@@ -26710,7 +28293,7 @@ function toAmount(raw, decimals) {
 }
 
 function main() {
-    // 对approve（授权）方法的调用进行编码
+    // 编码approve（授权）方法的调用
     var data = exchange.IO("encode", "0x111111111117dC0aa78b770fA6A738034120C302", "approve", "0xe592427a0aece92de3edee1f18e0157c05861564", "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff")
     Log("data:", data)
     var gasPrice = exchange.IO("api", "eth", "eth_gasPrice")
@@ -26726,19 +28309,21 @@ function main() {
     var gasLimit = exchange.IO("api", "eth", "eth_estimateGas", obj)
     Log("gasLimit:", toAmount(gasLimit, 0))
 
-    // 手续费 = gasLimit * gasPrice，两者均为以wei为单位的大整数，使用BigInt相乘以避免精度丢失，
-    // 再按1e18换算为便于阅读的ETH数量
+    // 手续费 = gasLimit * gasPrice，两个都是wei单位的大整数，用BigInt相乘避免丢精度，
+    // 再按1e18换算成可读的ETH数量
     Log("gas fee", toAmount((BigInt(gasLimit) * BigInt(gasPrice)).toString(), 18))
 }
 ```
 
-当```exchange.IO()```函数的第二个参数设置为```"eth"```时，可以直接调用以太坊节点服务器支持的RPC方法。
+```exchange.IO()```函数的第二个参数为```"eth"```时，可以直接调用以太坊节点服务器可用的RPC方法。
 
 调用节点方法时原样返回节点给出的```result```。节点返回```null```时（例如交易还未上链时的```eth_getTransactionReceipt```）返回空值，不报错；节点返回错误时返回空值，```GetLastError()```中有错误信息，合约revert的原因会解码为可读文本。
 
 ```exchange.IO("api", "eth", "send", toAddress, value[, options])```从当前钱包转出原生币，```value```为链上整数（wei），返回交易哈希。不带```data```的普通转账发送传统（legacy）交易：不设置```gasPrice```时固定按100 Gwei（附加一个很小的随机值）出价，不设置```gasLimit```时为21000，在以太坊主网上通常偏高，建议先用```eth_gasPrice```查询后传入。设置```data```时按合约调用处理：gas上限由节点估算，gas价格与合约写方法相同（支持EIP-1559的链发送EIP-1559交易，参看```exchange.IO("api", ...)```）。
 
 波场（TRON）上第二个参数写```"tron"```，方法名不区分大小写，例如```GetNowBlock```、```GetAccount```、```GetTransactionInfoByID```、```TRC20ContractBalance```。```send```的参数为收款地址和TRX数量（单位sun，1 TRX = 1000000 sun），返回不带```0x```的交易ID。需要签名的方法（转账、触发合约等）会自动签名并广播。未内置的全节点接口可以直接传路径和请求体：```exchange.IO("api", "tron", "/wallet/接口名", {请求体})```。
+
+See also: `Web3`, `exchange.IO`, `exchange.IO("fromUnits")`, `exchange.IO("toUnits")`, `exchange.IO("api")`, `exchange.IO("nonce")`
 
 ##### exchange.IO("encode", ...)
 
@@ -26752,31 +28337,33 @@ Forms:
 
 - `exchange.IO("encode", ...)`
 
-```exchange.IO("encode", ...)```函数的这种调用方式用于数据编码。
+```exchange.IO("encode", ...)```函数的调用方式用于数据编码。
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"encode"```表示该函数用于数据编码。
-- `address` (string, optional): ```address```参数用于设置智能合约的地址。调用```exchange.IO("encode", ...)```函数时，如果传入```address```参数，表示对智能合约的方法调用进行编码（encode）；如果未传入```address```参数，则该函数用于按指定的类型顺序对数据进行编码，功能等同于```Solidity```中的```abi.encode```。
-- `dataFormat` (string, required): ```dataFormat```参数用于指定编码数据的方法、类型和顺序。
-- `arg` (string / number / tuple / array / any (平台支持的任意类型), optional): ```arg```参数用于指定与```dataFormat```参数匹配的具体数据值。
-```arg```参数可以有多个，其类型与个数取决于```dataFormat```参数的设置。
+- `k` (string, required): 固定为```"encode"```，用于数据编码。
+- `address` (string, optional): 智能合约的地址。 在调用```exchange.IO("encode", ...)```函数时，如果传入```address```参数表示编码（encode）智能合约上的方法调用。在调用```exchange.IO("encode", ...)```函数时，如果未传入```address```参数，则该函数用于编码指定的类型顺序，功能等同```Solidity```中的```abi.encode```。
+- `dataFormat` (string, required): 编码数据的方法、类型、顺序。
+- `arg` (string / number / array / any, optional): 与```dataFormat```参数匹配的具体数据值。
+```arg```参数可能有多个，```arg```参数的类型与个数根据```dataFormat```参数设置而定。元组（tuple）按数组传入。
 
-Returns (string): ```exchange.IO("encode", ...)```函数返回编码后的数据。
+Returns (string): 编码后的数据。
 
-以编码```unwrapWETH9```方法的调用为例：
+编码```unwrapWETH9```方法的调用为例。
 
 ```javascript
 function main() {
     // ContractV3SwapRouterV2 主网地址 : 0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45
-    // 调用unwrapWETH9方法需要先注册ABI，此处省略注册步骤
-    // "owner"代表钱包地址，需要具体填写；1为amountMinimum，即最少解包装数量，单位为wei（不是1个WETH）：路由合约把自己持有的全部WETH解包装为ETH转给owner，数量少于amountMinimum时交易失败
-    var data = exchange.IO("encode", "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45", "unwrapWETH9(uint256,address)", 1, "owner")
+    // 调用unwrapWETH9方法需要先注册ABI，此处省略注册
+    // "owner"代表钱包地址，需要具体填写；1为amountMinimum，即最少解包装数量，单位为wei（不是1个WETH）：
+    // 路由合约把自己持有的全部WETH解包装为ETH转给owner，数量少于amountMinimum时交易失败
+    var data = exchange.IO("encode", "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45",
+        "unwrapWETH9(uint256,address)", 1, "owner")
     Log(data)
 }
 ```
 
-等同于```Solidity```中```abi.encode```的编码范例：
+等同```Solidity```中```abi.encode```的编码范例。
 
 ```javascript
 function main() {
@@ -26784,59 +28371,63 @@ function main() {
     var address = "0x02a5fBb259d20A3Ad2Fdf9CCADeF86F6C1c1Ccc9"
     var str = "Hello World"
     var array = [1, 2, 3]
-    var ret = exchange.IO("encode", "uint256,address,string,uint256[]", x, address, str, array)   // uint 等同 uint256，也可以直接写 uint
+    // uint 等同 uint256，也可以直接写 uint
+    var ret = exchange.IO("encode", "uint256,address,string,uint256[]", x, address, str, array)
     Log("ret:", ret)
-    /*
-    000000000000000000000000000000000000000000000000000000000000000a    // x
-    00000000000000000000000002a5fbb259d20a3ad2fdf9ccadef86f6c1c1ccc9    // address
-    0000000000000000000000000000000000000000000000000000000000000080    // str 的偏移量
-    00000000000000000000000000000000000000000000000000000000000000c0    // array 的偏移量
-    000000000000000000000000000000000000000000000000000000000000000b    // str 的长度
-    48656c6c6f20576f726c64000000000000000000000000000000000000000000    // str 的数据
-    0000000000000000000000000000000000000000000000000000000000000003    // array 的长度
-    0000000000000000000000000000000000000000000000000000000000000001    // array 的第一个元素
-    0000000000000000000000000000000000000000000000000000000000000002    // array 的第二个元素
-    0000000000000000000000000000000000000000000000000000000000000003    // array 的第三个元素
-    */
+    // 输出：ret 为以下32字节字段依次拼接的十六进制串
+    // 000000000000000000000000000000000000000000000000000000000000000a  x
+    // 00000000000000000000000002a5fbb259d20a3ad2fdf9ccadef86f6c1c1ccc9  address
+    // 0000000000000000000000000000000000000000000000000000000000000080  str 的偏移
+    // 00000000000000000000000000000000000000000000000000000000000000c0  array 的偏移
+    // 000000000000000000000000000000000000000000000000000000000000000b  str 的长度
+    // 48656c6c6f20576f726c64000000000000000000000000000000000000000000  str 数据
+    // 0000000000000000000000000000000000000000000000000000000000000003  array 的长度
+    // 0000000000000000000000000000000000000000000000000000000000000001  array 第一个数据
+    // 0000000000000000000000000000000000000000000000000000000000000002  array 第二个数据
+    // 0000000000000000000000000000000000000000000000000000000000000003  array 第三个数据
 }
 ```
 
-支持对元组（tuple）或者包含元组的类型顺序进行编码。本例中的类型顺序由```tuple```、```bytes```组成，因此在调用```exchange.IO()```进行encode时需要继续传入两个参数：
+支持对元组（tuple）或者包含元组的类型顺序编码，这个类型顺序由```tuple```、```bytes```组成，所以在调用```exchange.IO()```进行encode时需要继续传入两个参数：
 - 1、对应tuple类型的变量：
-  ```
+  ```json
   [30, 20, "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"]
   ```
-  元组的值以数组形式按位置传入，元素的个数、顺序和类型都必须与```types```参数中的```(uint256,uint8,address)```一致。字面量元组没有字段名，解码时各字段按位置依次编号为```Field1```、```Field2```……
+  元组的值按位置传数组，个数、顺序和类型都要与```types```参数里的```(uint256,uint8,address)```一致。字面元组没有字段名，解码时字段按位置编号为```Field1```、```Field2```……
 - 2、对应```bytes```类型的变量：
-  ```
+  ```json
   "0011"
   ```
 
 ```javascript
 function main() {
     var types = "(uint256,uint8,address),bytes"
-    var ret = exchange.IO("encode", types, [30, 20, "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"], "0011")
+    var ret = exchange.IO("encode", types, [30, 20, "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"],
+        "0011")
     Log("encode: ", ret)
 }
 ```
 
-支持对数组或者包含数组的类型顺序进行编码：
+支持对数组或者包含数组的类型顺序编码。
 
 ```javascript
 function main() {
-    var path = ["0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2", "0xdac17f958d2ee523a2206206994597c13d831ec7"]   // ETH address, USDT address
+    var path = ["0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "0xdac17f958d2ee523a2206206994597c13d831ec7"]   // ETH address, USDT address
     var ret = exchange.IO("encode", "address[]", path)
     Log("encode: ", ret)
 }
 ```
 
-```exchange.IO()```函数封装了```encode```方法，可以将函数调用编码为```hex```字符串格式并返回。在Uniswap / PancakeSwap上兑换可以直接使用`Uniswap`交易所对象，不需要自己编码调用。
+```exchange.IO()```函数封装了```encode```方法，可以把函数调用编码返回为```hex```字符串格式。在Uniswap / PancakeSwap上兑换可以直接使用`Uniswap`交易所对象，不需要自己编码调用。
 
 编码智能合约上的方法调用时，方法可以写方法名、完整的方法签名或方法选择器；标准ERC20方法已内置，其它方法需要先注册对应的ABI。
 
 返回不带```0x```前缀的十六进制字符串。```bytesN```类型的值可以传十六进制字符串（```0x```前缀可选）或字节数值数组；```address```类型可以传波场```T```开头的地址。
 
 ```exchange.IO("pack", ...)```是```exchange.IO("encode", ...)```的别名。
+
+See also: `Web3`, `exchange.IO`, `exchange.IO("decode")`, `exchange.IO("encodePacked")`, `exchange.IO("abi")`, `exchange.IO("call")`
 
 ##### exchange.IO("encodePacked", ...)
 
@@ -26848,19 +28439,18 @@ Forms:
 
 - `exchange.IO("encodePacked", ...)`
 
-```exchange.IO("encodePacked", ...)```函数用于执行```encodePacked```编码操作。
+```exchange.IO("encodePacked", ...)```函数的调用方式用于```encodePacked```编码。
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能模式，当设置为```"encodePacked"```时，表示该函数执行数据```encodePacked```编码操作。
-- `dataFormat` (string, required): ```dataFormat```参数用于指定```encodePacked```编码时数据的类型格式和排列顺序。
-- `arg` (string / number / tuple / array / any (平台支持的任意类型), required): ```arg```参数用于指定与```dataFormat```参数格式相匹配的具体数据值。
+- `k` (string, required): 固定为```"encodePacked"```，用于数据```encodePacked```编码。
+- `dataFormat` (string, required): ```encodePacked```编码数据的类型、顺序。
+- `arg` (string / number / array / any, required): 与```dataFormat```参数匹配的具体数据值。
+```arg```参数可能有多个，```arg```参数的类型与个数根据```dataFormat```参数设置而定。元组（tuple）按数组传入。
 
-```arg```参数可以有多个，其类型和数量由```dataFormat```参数的设置决定。
+Returns (string): ```encodePacked```编码后的数据。
 
-Returns (string): ```exchange.IO("encodePacked", ...)```函数返回经过```encodePacked```编码处理后的数据字符串。
-
-在使用```Uniswap V3```时需要传入交易路径等参数，此时需要使用```encodePacked```编码操作：
+使用```Uniswap V3```时需要传入兑换路径之类的参数，就需要使用```encodePacked```编码操作。
 
 ```javascript
 function main() {
@@ -26873,6 +28463,8 @@ function main() {
 }
 ```
 
+See also: `Web3`, `exchange.IO`, `exchange.IO("encode")`, `exchange.IO("decode")`, `exchange.IO("hash")`
+
 ##### exchange.IO("decode", ...)
 
 ```
@@ -26883,17 +28475,17 @@ Forms:
 
 - `exchange.IO("decode", ...)`
 
-```exchange.IO("decode", ...)```调用方式用于对数据进行解码。
+```exchange.IO("decode", ...)```函数的调用方式用于解码。
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"decode"```时表示该函数用于数据解码。
-- `dataFormat` (string, required): ```dataFormat```参数用于指定待解码数据的类型和顺序。
-- `data` (string, required): ```data```参数为要解码的数据，十六进制字符串，```0x```前缀可选。
+- `k` (string, required): 固定为```"decode"```，用于数据解码。
+- `dataFormat` (string, required): 解码数据的类型、顺序。
+- `data` (string, required): 要解码的数据，十六进制字符串，```0x```前缀可选。
 
 Returns (string / number / bool / object / array): ```dataFormat```只有一个类型时直接返回解码后的值，有多个类型时返回数组。整数中```uint64```、```int64```及以下位宽为数字，更大位宽为十进制字符串（JavaScript、Python中绝对值不小于2^53的整数也返回十进制字符串，避免丢失精度）；```address```为```0x```开头的小写地址（波场上同样返回```0x```格式）；```bytes```为不带```0x```的十六进制字符串；```bytes32```等定长```bytesN```为字节数值数组；字面元组为以```Field1```、```Field2```……为键的对象。
 
-```exchange.IO("encode", ...)```函数的逆向操作：
+```exchange.IO("encode", ...)```函数的反向操作。
 
 ```javascript
 function main() {
@@ -26901,18 +28493,19 @@ function main() {
     var types = "(uint256,uint8,address),bytes"
 
     // 元组的值按位置传数组
-    var ret = exchange.IO("encode", types, [30, 20, "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"], "0011")
+    var ret = exchange.IO("encode", types, [30, 20, "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"],
+        "0011")
     Log("encode: ", ret)
-
-    // 解码结果：[{"Field1":"30","Field2":20,"Field3":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"}, "0011"]
     // 字面元组没有字段名，按位置编号为Field1、Field2……要用有意义的字段名，
     // 需要先用exchange.IO("abi", ...)注册合约ABI，参考下一个例子
     var rawData = exchange.IO("decode", types, ret)
     Log("decode:", rawData)
+
+    // 输出：decode: [{"Field1":"30","Field2":20,"Field3":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"}, "0011"]
 }
 ```
 
-以下例子首先对```path```参数进行```encodePacked```编码处理，因为后续需要编码的```exactOutput```方法调用要以```path```作为参数。然后对路由合约的```exactOutput```方法进行```encode```编码，该方法只有一个参数，参数类型为```tuple```。方法名```exactOutput```编码后为：```0x09b81346```。最后使用```exchange.IO("decode", ...)```方法按```(bytes,address,uint256,uint256)```解码得到```decodeRaw```，其字段按位置编号为```Field1```～```Field4```，各字段的值与变量```dataTuple```中的内容依次对应。
+以下例子首先在```path```参数处理时进行了```encodePacked```操作，因为之后需要编码的```exactOutput```方法调用需要```path```作为参数。然后```encode```路由合约的```exactOutput```方法，该方法只有一个参数，参数类型是```tuple```类型。```exactOutput```这个方法名编码后即：```0x09b81346```，使用```exchange.IO("decode", ...)```方法按```(bytes,address,uint256,uint256)```解码得出```decodeRaw```，其字段按位置编号为```Field1```～```Field4```，值与变量```dataTuple```依次对应。
 
 ```javascript
 function main() {
@@ -26938,7 +28531,8 @@ function main() {
     }
     // encode SwapRouter02 exactOutput
     var rawData = exchange.IO("encode", routerAddress, "exactOutput", dataTuple)
-    Log("method hash:", rawData.slice(0, 8))   // 09b81346
+    Log("method hash:", rawData.slice(0, 8))
+    // 输出：09b81346
     Log("params hash:", rawData.slice(8))
 
     // decode exactOutput params
@@ -26947,9 +28541,11 @@ function main() {
 }
 ```
 
-在数据处理方面，```exchange.IO()```函数不仅支持编码（encode），也支持解码（decode）。
+对于数据的处理，```exchange.IO()```函数不仅支持编码（encode），也支持解码（decode）。
 
 ```exchange.IO("unpack", ...)```是```exchange.IO("decode", ...)```的别名。
+
+See also: `Web3`, `exchange.IO`, `exchange.IO("encode")`, `exchange.IO("encodePacked")`, `exchange.IO("abi")`
 
 ##### exchange.IO("hash", ...)
 
@@ -26966,14 +28562,8 @@ Forms:
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"hash"```表示该函数用于哈希、签名等计算。
-- `algo` (string, required): ```algo```参数为算法：
-- 摘要：```"md4"```、```"md5"```、```"sha1"```、```"sha224"```、```"sha256"```、```"sha384"```（同```"sha512.384"```）、```"sha512"```、```"sha512.224"```、```"sha512.256"```、```"keccak256"```（同```"sha3.keccak256"```）、```"sha3.keccak512"```、```"sha3.224"```、```"sha3.256"```、```"sha3.384"```、```"sha3.512"```、```"ripemd160"```、```"blake2b.256"```、```"blake2b.512"```、```"blake2s.128"```、```"blake2s.256"```。传入```keyFormat```和```key```时计算HMAC（blake2s为带密钥的MAC）。
-- ```"raw"```、```"string"```：不计算，只做格式转换。
-- ```"sign"```：用secp256k1私钥对32字节的```data```签名，返回65字节的```r‖s‖v```，其中v为0或1；不传```key```时使用交易所对象配置的私钥。
-- ```"signTx"```：```data```为传统（legacy）交易的JSON，字段为```Nonce```、```GasPrice```、```GasLimit```、```To```、```Value```、```Data```、```ChainId```（字段名不区分大小写，缺少的数值按0处理），可以带```Key```字段指定私钥；返回签名后的交易。
-- ```"abi.类型"```：按ABI编码一个值，例如```"abi.uint256"```、```"abi.address"```。
-- 另外支持```"ed25519"```（及```"ed25519.seed"```、```"ed25519.sha512"```）签名，```"text.encoder.字符集"```、```"text.decoder.字符集"```字符集转换，```"aes.encrypt"```、```"aes.decrypt"```（可加```.cbc```、```.ecb```、```.cfb```，默认cbc），```"zlib"```、```"gzip"```、```"flate"```、```"br"```、```"zstd"```、```"lz4"```加```.deflate```（压缩）或```.inflate```（解压），以及```"unzip"```（返回以文件名为键的对象）。
+- `k` (string, required): 固定为```"hash"```，用于哈希、签名等计算。
+- `algo` (string, required): 算法：摘要（如```"sha256"```、```"keccak256"```，可计算HMAC）、格式转换（```"raw"```、```"string"```）、签名（```"sign"```、```"signTx"```）、ABI编码（```"abi.类型"```），以及Ed25519、字符集转换、AES和压缩；全部取值见备注。
 - `inputFormat` (string, required): ```data```的格式：```"raw"```、```"string"```（按字符串的字节）、```"hex"```（```0x```前缀可选）、```"base64"```、```"base64.url"```、```"base64.rawurl"```。
 - `outputFormat` (string, required): 输出格式：```"hex"```（不带```0x```）、```"base64"```、```"base64.url"```、```"base64.rawurl"```、```"raw"```、```"string"```（输出必须是有效的UTF-8文本）。
 - `data` (string, required): 要处理的数据，按```inputFormat```解析。
@@ -26988,7 +28578,8 @@ Returns (string / object): 返回按```outputFormat```编码的结果；```"unzi
 function main() {
     // 方法选择器：keccak256("transfer(address,uint256)") 的前 4 字节
     var h = exchange.IO("hash", "keccak256", "raw", "hex", "transfer(address,uint256)")
-    Log("selector:", "0x" + h.slice(0, 8))      // 0xa9059cbb
+    Log("selector:", "0x" + h.slice(0, 8))
+    // 输出：0xa9059cbb
 
     // 对十六进制数据求哈希，输出不带 0x
     Log(exchange.IO("hash", "keccak256", "hex", "hex", "0x1234"))
@@ -27008,7 +28599,8 @@ function main() {
 def main():
     # 方法选择器：keccak256("transfer(address,uint256)") 的前 4 字节
     h = exchange.IO("hash", "keccak256", "raw", "hex", "transfer(address,uint256)")
-    Log("selector:", "0x" + h[:8])      # 0xa9059cbb
+    Log("selector:", "0x" + h[:8])
+    # 输出：0xa9059cbb
 
     # 对十六进制数据求哈希，输出不带 0x
     Log(exchange.IO("hash", "keccak256", "hex", "hex", "0x1234"))
@@ -27023,11 +28615,47 @@ def main():
     Log(exchange.IO("hash", "sign", "hex", "hex", h))
 ```
 
+```rust
+fn main() {
+    // 方法选择器：keccak256("transfer(address,uint256)") 的前 4 字节
+    let hv = exchange.IO(("hash", "keccak256", "raw", "hex", "transfer(address,uint256)"));
+    let Ok(hv) = hv else { return };
+    let h = hv.as_str().unwrap_or("").to_string();
+    Log!("selector:", format!("0x{}", &h[..8]));
+    // 输出：0xa9059cbb
+
+    // 对十六进制数据求哈希，输出不带 0x
+    Log!(exchange.IO(("hash", "keccak256", "hex", "hex", "0x1234")));
+
+    // HMAC-SHA256：最后两个参数为密钥的格式和密钥；超过6个参数时用 Vec<Arg> 传参
+    let args: Vec<Arg> = ["hash", "sha256", "string", "base64", "message", "string", "secret"]
+        .iter().map(|s| Arg::Str(s.to_string())).collect();
+    Log!(exchange.IO(args));
+
+    // 按 ABI 编码一个 uint256
+    Log!(exchange.IO(("hash", "abi.uint256", "string", "hex", "1000")));
+
+    // 用配置的私钥对 32 字节哈希签名：65 字节 r‖s‖v，v 为 0 或 1
+    Log!(exchange.IO(("hash", "sign", "hex", "hex", h.as_str())));
+}
+```
+
 参数个数必须是4个或6个（不含```"hash"```）。
 
 ```"sign"```返回的签名v为0或1，与旧版本一致；需要分别取得```r```、```s```、```v```（v为27或28）或EIP-2098紧凑签名用于合约校验时，使用```exchange.IO("sign", ...)```。
 
 以太坊（EVM）和波场（TRON）的交易所对象都可以使用。
+
+```algo```参数的取值：
+
+- 摘要：```"md4"```、```"md5"```、```"sha1"```、```"sha224"```、```"sha256"```、```"sha384"```（同```"sha512.384"```）、```"sha512"```、```"sha512.224"```、```"sha512.256"```、```"keccak256"```（同```"sha3.keccak256"```）、```"sha3.keccak512"```、```"sha3.224"```、```"sha3.256"```、```"sha3.384"```、```"sha3.512"```、```"ripemd160"```、```"blake2b.256"```、```"blake2b.512"```、```"blake2s.128"```、```"blake2s.256"```。传入```keyFormat```和```key```时计算HMAC（blake2s为带密钥的MAC）。
+- ```"raw"```、```"string"```：不计算，只做格式转换。
+- ```"sign"```：用secp256k1私钥对32字节的```data```签名，返回65字节的```r‖s‖v```，其中v为0或1；不传```key```时使用交易所对象配置的私钥。
+- ```"signTx"```：```data```为传统（legacy）交易的JSON，字段为```Nonce```、```GasPrice```、```GasLimit```、```To```、```Value```、```Data```、```ChainId```（字段名不区分大小写，缺少的数值按0处理），可以带```Key```字段指定私钥；返回签名后的交易。
+- ```"abi.类型"```：按ABI编码一个值，例如```"abi.uint256"```、```"abi.address"```。
+- 另外支持```"ed25519"```（及```"ed25519.seed"```、```"ed25519.sha512"```）签名，```"text.encoder.字符集"```、```"text.decoder.字符集"```字符集转换，```"aes.encrypt"```、```"aes.decrypt"```（可加```.cbc```、```.ecb```、```.cfb```，默认cbc），```"zlib"```、```"gzip"```、```"flate"```、```"br"```、```"zstd"```、```"lz4"```加```.deflate```（压缩）或```.inflate```（解压），以及```"unzip"```（返回以文件名为键的对象）。
+
+See also: `Web3`, `exchange.IO`, `exchange.IO("sign")`, `exchange.IO("signTypedData")`, `exchange.IO("encodePacked")`, `Encode`
 
 ##### exchange.IO("key", ...)
 
@@ -27043,8 +28671,10 @@ Forms:
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，当设置为```"key"```时，表示该函数用于切换私钥。
-- `key` (string, required): ```key```参数用于设置私钥字符串。
+- `k` (string, required): 固定为```"key"```，用于切换私钥。
+- `key` (string, required): 私钥字符串。
+
+切换交易所对象使用的私钥。
 
 ```javascript
 function main() {
@@ -27057,6 +28687,8 @@ function main() {
 对于切换私钥的操作：```exchange.IO("key", "xxx")```，不能使用并发方式进行切换。
 
 私钥为十六进制字符串，```0x```前缀可选。私钥无效时报错，不会切换。私钥只保存在内存中，不会写入日志；切换后，获取地址、签名和发送交易都使用新的私钥。
+
+See also: `Web3`, `exchange.IO`, `exchange.IO("address")`, `exchange.IO("sign")`, `exchange.IO("signMessage")`
 
 ##### exchange.IO("sign", ...)
 
@@ -27073,11 +28705,11 @@ Forms:
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"sign"```表示该函数用于对哈希进行签名。
-- `hash` (string, required): ```hash```参数为待签名的32字节哈希，格式为十六进制字符串，```0x```前缀可选。该函数不会对```hash```再次进行哈希处理，EIP-712摘要需预先计算完成，请参考范例。
-- `key` (string, optional): ```key```参数用于指定签名所使用的私钥，未传入时使用`exchange`交易所对象配置的私钥。
+- `k` (string, required): 固定为```"sign"```，用于对哈希进行签名。
+- `hash` (string, required): 待签名的32字节哈希，格式为十六进制字符串，```0x```前缀可选。该函数不会对```hash```再次进行哈希处理，EIP-712摘要需预先计算完成，请参考范例。
+- `key` (string, optional): 签名所使用的私钥，未传入时使用`exchange`交易所对象配置的私钥。
 
-Returns (object): ```exchange.IO("sign", ...)```函数返回签名对象，包含以下字段：```r```（32字节，十六进制字符串）、```s```（32字节，十六进制字符串）、```v```（数值，27或28）、```signature```（65字节```r‖s‖v```，十六进制字符串）、```vs```（EIP-2098紧凑签名，32字节，十六进制字符串）。调用失败时返回空值。
+Returns (object): 签名对象，包含以下字段：```r```（32字节，十六进制字符串）、```s```（32字节，十六进制字符串）、```v```（数值，27或28）、```signature```（65字节```r‖s‖v```，十六进制字符串）、```vs```（EIP-2098紧凑签名，32字节，十六进制字符串）。调用失败时返回空值。
 
 以以太坊主网USDC的ERC-20 Permit（EIP-2612）授权签名为例：首先读取链上参数，使用```exchange.IO("encode", ...)```和```exchange.IO("hash", "keccak256", ...)```计算EIP-712摘要，然后使用```exchange.IO("sign", ...)```对摘要进行签名，最后通过```eth_call```模拟调用USDC合约的```permit```方法以验证签名（仅模拟执行，不发送交易，不消耗gas）。```bytes32```类型的返回值以字节数组形式返回，范例中使用```bytesToHex```函数将其转换为十六进制字符串。
 
@@ -27111,10 +28743,14 @@ function simulate(data) {
 function main() {
     // 1. 注册所需的 ABI 片段，读取链上参数
     exchange.IO("abi", USDC, JSON.stringify([
-        { type: "function", name: "name", stateMutability: "view", inputs: [], outputs: [{ type: "string" }] },
-        { type: "function", name: "version", stateMutability: "view", inputs: [], outputs: [{ type: "string" }] },
-        { type: "function", name: "nonces", stateMutability: "view", inputs: [{ type: "address" }], outputs: [{ type: "uint256" }] },
-        { type: "function", name: "DOMAIN_SEPARATOR", stateMutability: "view", inputs: [], outputs: [{ type: "bytes32" }] }
+        { type: "function", name: "name", stateMutability: "view", inputs: [],
+            outputs: [{ type: "string" }] },
+        { type: "function", name: "version", stateMutability: "view", inputs: [],
+            outputs: [{ type: "string" }] },
+        { type: "function", name: "nonces", stateMutability: "view", inputs: [{ type: "address" }],
+            outputs: [{ type: "uint256" }] },
+        { type: "function", name: "DOMAIN_SEPARATOR", stateMutability: "view", inputs: [],
+            outputs: [{ type: "bytes32" }] }
     ]))
     var owner = exchange.IO("address")
     var name = exchange.IO("api", USDC, "name")
@@ -27125,15 +28761,20 @@ function main() {
     Log("owner:", owner, "| token:", name, "v" + version, "| nonce:", nonce, "| chainId:", chainId)
 
     // 2. 计算 EIP-712 域分隔符，并与合约的 DOMAIN_SEPARATOR() 返回值比对
-    var domainSeparator = keccak("hex", exchange.IO("encode", "bytes32,bytes32,bytes32,uint256,address",
-        keccak("raw", "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"),
+    var domainSeparator = keccak("hex", exchange.IO("encode",
+        "bytes32,bytes32,bytes32,uint256,address",
+        keccak("raw",
+            "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"),
         keccak("raw", name), keccak("raw", version), chainId, USDC))
     var onchain = bytesToHex(exchange.IO("api", USDC, "DOMAIN_SEPARATOR"))
-    Log("domainSeparator:", domainSeparator, domainSeparator === onchain ? "与链上一致" : "与链上不一致: " + onchain)
+    Log("domainSeparator:", domainSeparator,
+        domainSeparator === onchain ? "与链上一致" : "与链上不一致: " + onchain)
 
     // 3. Permit 结构体哈希 → EIP-712 摘要 → 签名
-    var structHash = keccak("hex", exchange.IO("encode", "bytes32,address,address,uint256,uint256,uint256",
-        keccak("raw", "Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)"),
+    var structHash = keccak("hex", exchange.IO("encode",
+        "bytes32,address,address,uint256,uint256,uint256",
+        keccak("raw",
+            "Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)"),
         owner, SPENDER, VALUE, nonce, deadline))
     var digest = keccak("hex", "1901" + strip0x(domainSeparator) + strip0x(structHash))
     var sig = exchange.IO("sign", digest)
@@ -27170,6 +28811,8 @@ EIP-712结构化数据签名可以直接使用```exchange.IO("signTypedData", ..
 
 ```hash```不是32字节时报错。签名与链无关，波场（TRON）的交易所对象同样可用。
 
+See also: `Web3`, `exchange.IO`, `exchange.IO("hash")`, `exchange.IO("signTypedData")`, `exchange.IO("signMessage")`
+
 ##### exchange.IO("signTypedData", ...)
 
 ```
@@ -27187,12 +28830,12 @@ Forms:
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"signTypedData"```表示使用该函数进行EIP-712签名。
-- `typedData` (object, string, optional): ```typedData```参数为包含```domain```、```types```、```primaryType```、```message```的对象（即MetaMask ```eth_signTypedData_v4```的格式，```types```中可以包含```EIP712Domain```），也可以传入该对象的JSON字符串。
-- `domain` (object, optional): ```domain```参数为EIP-712域，例如```{name, version, chainId, verifyingContract}```。使用```domain```、```types```、```message```三个参数的调用方式与ethers的```signTypedData```相同：```types```中无需包含```EIP712Domain```（根据```domain```中出现的字段自动推导），主类型为未被其它类型引用的类型。
-- `types` (object, optional): ```types```参数为类型定义，例如```{Permit: [{name: "owner", type: "address"}, ...]}```，支持嵌套结构体和数组。
-- `message` (object, optional): ```message```参数为待签名的数据。大整数可以以字符串形式传入。
-- `key` (string, optional): ```key```参数用于指定签名所使用的私钥，不传该参数时使用`exchange`交易所对象配置的私钥。
+- `k` (string, required): 固定为```"signTypedData"```，用于进行EIP-712签名。
+- `typedData` (object / string, optional): 包含```domain```、```types```、```primaryType```、```message```的对象（即MetaMask ```eth_signTypedData_v4```的格式，```types```中可以包含```EIP712Domain```），也可以传入该对象的JSON字符串。
+- `domain` (object, optional): EIP-712域，例如```{name, version, chainId, verifyingContract}```。使用```domain```、```types```、```message```三个参数的调用方式与ethers的```signTypedData```相同：```types```中无需包含```EIP712Domain```（根据```domain```中出现的字段自动推导），主类型为未被其它类型引用的类型。
+- `types` (object, optional): 类型定义，例如```{Permit: [{name: "owner", type: "address"}, ...]}```，支持嵌套结构体和数组。
+- `message` (object, optional): 待签名的数据。大整数可以以字符串形式传入。
+- `key` (string, optional): 签名所使用的私钥，不传该参数时使用`exchange`交易所对象配置的私钥。
 
 Returns (object): 返回签名对象，字段与```exchange.IO("sign", ...)```的返回值相同：```r```、```s```、```v```（27或28）、```signature```（65字节）、```vs```（EIP-2098紧凑签名），此外还包含```digest```字段，即EIP-712摘要。调用失败时返回空值。
 
@@ -27205,7 +28848,8 @@ function main() {
     var owner = exchange.IO("address")
     var deadline = Math.floor(Date.now() / 1000) + 3600
     // nonce 必须等于合约里的 nonces(owner)：钱包用过一次 permit 后就不再是 0
-    exchange.IO("abi", USDC, JSON.stringify([{ type: "function", name: "nonces", stateMutability: "view",
+    exchange.IO("abi", USDC, JSON.stringify([{ type: "function", name: "nonces",
+        stateMutability: "view",
         inputs: [{ type: "address" }], outputs: [{ type: "uint256" }] }]))
     var nonce = exchange.IO("api", USDC, "nonces", owner)
 
@@ -27218,12 +28862,14 @@ function main() {
             { name: "deadline", type: "uint256" }
         ]
     }
-    var message = { owner: owner, spender: spender, value: "1000000", nonce: nonce, deadline: deadline }
+    var message = { owner: owner, spender: spender, value: "1000000", nonce: nonce,
+        deadline: deadline }
     var sig = exchange.IO("signTypedData", domain, types, message)
     Log("digest:", sig.digest, "v:", sig.v, "r:", sig.r, "s:", sig.s)
 
     // 单对象写法（MetaMask eth_signTypedData_v4 的格式）结果相同
-    var sig2 = exchange.IO("signTypedData", { domain: domain, types: types, primaryType: "Permit", message: message })
+    var sig2 = exchange.IO("signTypedData", { domain: domain, types: types, primaryType: "Permit",
+        message: message })
     Log("两种写法一致:", sig.signature === sig2.signature)
 
     // 用 eth_call 模拟 USDC 的 permit，由合约验证签名（不发送交易）
@@ -27238,6 +28884,8 @@ function main() {
 ```message```中缺少类型定义中的字段时会报错，不会将缺失字段补零后签名。
 
 私钥仅在交易所对象内部使用，策略代码无法获取私钥。
+
+See also: `Web3`, `exchange.IO`, `exchange.IO("sign")`, `exchange.IO("signMessage")`, `exchange.IO("hash")`
 
 ##### exchange.IO("signMessage", ...)
 
@@ -27254,9 +28902,9 @@ Forms:
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"signMessage"```时表示该函数用于对消息进行签名。
-- `message` (string, object, required): ```message```参数用于指定待签名的消息：传入字符串时，按UTF-8编码进行签名；需要对原始字节签名时，传入```{hex: "0x..."}```格式的对象。
-- `key` (string, optional): ```key```参数用于指定签名所使用的私钥，未传入该参数时，默认使用`exchange`交易所对象配置的私钥。
+- `k` (string, required): 固定为```"signMessage"```，用于对消息进行签名。
+- `message` (string / object, required): 待签名的消息：传入字符串时，按UTF-8编码进行签名；需要对原始字节签名时，传入```{hex: "0x..."}```格式的对象。
+- `key` (string, optional): 签名所使用的私钥，未传入该参数时，默认使用`exchange`交易所对象配置的私钥。
 
 Returns (object): 返回签名对象，其字段与```exchange.IO("sign", ...)```的返回值相同（```r```、```s```、```v```、```signature```、```vs```），此外还包含```digest```字段，表示EIP-191消息哈希。调用失败时返回空值。
 
@@ -27274,10 +28922,13 @@ function main() {
 
     // 使用 ecrecover 预编译合约还原签名地址，结果应与当前钱包地址一致
     var ret = exchange.IO("call", "0x0000000000000000000000000000000000000001",
-        "0x" + sig.digest.slice(2) + exchange.IO("encode", "uint8,bytes32,bytes32", sig.v, sig.r, sig.s))
+        "0x" + sig.digest.slice(2) + exchange.IO("encode", "uint8,bytes32,bytes32", sig.v, sig.r,
+            sig.s))
     Log("还原地址:", "0x" + String(ret).slice(-40), "钱包地址:", exchange.IO("address").toLowerCase())
 }
 ```
+
+See also: `Web3`, `exchange.IO`, `exchange.IO("sign")`, `exchange.IO("signTypedData")`, `exchange.IO("address")`
 
 ##### exchange.IO("api", ...)
 
@@ -27292,93 +28943,94 @@ Forms:
 
 - `exchange.IO("api", ...)`
 
-```exchange.IO("api", ...)```调用方式用于调用智能合约的方法。
+在Web3交易所对象上调用智能合约的方法：只读方法返回解码后的值，写方法签名并广播交易。
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"api"```时表示该函数用于扩展调用请求。
-- `address` (string, required): ```address```参数用于指定智能合约的地址。
-- `method` (string, required): ```method```参数用于指定所要调用的智能合约方法。
-- `value` (number / string, optional): ```value```参数为调用时附带的原生币数量（链上整数，以太坊为wei，波场为sun）。只有方法的```stateMutability```为```payable```时才需要传，并且放在方法参数之前；```exchange.IO()```函数根据已注册ABI中的```stateMutability```判断是否需要该参数，```nonpayable```、```view```等方法不传```value```参数。```stateMutability```属性可以从ABI中查看。
-- `arg` (string / number / bool / any (平台支持的任意类型), optional): ```arg```参数用于指定所要调用的智能合约方法的参数。
-```arg```参数可能有多个，其类型与个数取决于所要调用的智能合约方法。
-- `options` (object, optional): ```options```参数为发送交易的选项，只对写方法有效，作为最后一个参数传入（参数个数比方法参数多一个时识别为选项）：```gasLimit```为gas上限，不设置时由节点估算（```eth_estimateGas```）；```gasPrice```为gas价格，设置后发送传统（legacy）交易；```nonce```指定nonce，不设置时自动分配；```dryRun```为```true```时只签名不广播。波场（TRON）只支持```gasLimit```，表示手续费上限feeLimit（单位sun）。
+- `k` (string, required): 固定为```"api"```，用于扩展调用请求。
+- `address` (string, required): 智能合约的地址。
+- `method` (string, required): 要调用的智能合约的方法。
+- `value` (number / string, optional): 调用时附带的原生币数量（链上整数，以太坊为wei，波场为sun）。只有方法的```stateMutability```为```payable```时才需要传，并且放在方法参数之前；```exchange.IO()```函数根据已注册ABI中的```stateMutability```判断是否需要该参数，```nonpayable```、```view```等方法不传```value```参数。```stateMutability```属性可以从ABI中查看。
+- `arg` (string / number / bool / any, optional): 要调用智能合约的方法的参数。
+```arg```参数可能有多个，```arg```参数的类型与个数根据所要调用的智能合约的方法而定。
+- `options` (object, optional): 发送交易的选项，只对写方法有效，作为最后一个参数传入（参数个数比方法参数多一个时识别为选项）：```gasLimit```为gas上限，不设置时由节点估算（```eth_estimateGas```）；```gasPrice```为gas价格，设置后发送传统（legacy）交易；```nonce```指定nonce，不设置时自动分配；```dryRun```为```true```时只签名不广播。波场（TRON）只支持```gasLimit```，表示手续费上限feeLimit（单位sun）。
 
-Returns (string / number / bool / object / array): 调用只读方法（```view```、```pure```）时返回解码后的返回值：只有一个返回值时直接返回该值；有多个返回值时返回以输出参数名为键的对象，没有名字的输出依次为```ret0```、```ret1```……。```uint64```及以下位宽的整数为数字，更大的整数为十进制字符串（JavaScript、Python中绝对值不小于2^53的整数也返回十进制字符串，避免丢失精度）；```address```为```0x```开头的小写地址（波场为```T```开头的地址）；```bytes```为不带```0x```的十六进制字符串；```bytes32```等定长```bytesN```为字节数值数组（例如```[17, 17, ...]```）。
+Returns (string / number / bool / object / array): 只读方法返回解码后的值，写方法返回交易哈希（设置```dryRun```时返回签名后的交易对象）；调用失败返回空值，```GetLastError()```中有错误信息。值的类型与```dryRun```返回的字段见备注。
 
-调用写方法时返回交易哈希（以太坊为```0x```开头的字符串，波场为不带```0x```的交易ID）；设置```dryRun```时返回包含```hash```、```raw```（签名后的交易）、```from```、```to```、```value```、```data```、```nonce```、```gasLimit```、```chainId```、```type```、```gasPrice```、```maxFeePerGas```、```maxPriorityFeePerGas```的对象。调用失败返回空值，```GetLastError()```中有错误信息。
-
-```decimals```方法是ERC20的一个```constant```方法，不会产生gas消耗，可用于查询某个token的精度数据。
+```decimals```方法是ERC20的一个```constant```的方法，不会产生gas消耗，可以查询某个token的精度数据。
 ```decimals```方法没有参数。返回值：token的精度数据。
 
 ```javascript
 function main(){
     var tokenAddress = "0x111111111117dC0aa78b770fA6A738034120C302"    // 代币的合约地址，例子中的代币为1INCH
-    Log(exchange.IO("api", tokenAddress, "decimals"))                  // 查询并打印1INCH代币的精度指数，结果为18
+    Log(exchange.IO("api", tokenAddress, "decimals"))
+    // 输出：18（1INCH代币的精度）
 }
 ```
 
-```allowance```方法是ERC20的一个```constant```方法，不会产生gas消耗，可用于查询某个token对某个合约地址的授权额度。
-```allowance```方法需要传入2个参数，第一个参数为钱包地址，第二个参数为被授权的地址。返回值：token的授权额度。
-```owner```：钱包地址，例子中以字符串"owner"代替，实际使用时需要填写具体地址。
-```spender```：被授权的合约地址，例子中以字符串"spender"代替，实际使用时需要填写具体地址，例如可以是```Uniswap V3 router v1```地址。
+```allowance```方法是ERC20的一个```constant```的方法，不会产生gas消耗，可以查询某个token对于某个合约地址的授权额度。
+```allowance```方法需要传2个参数，第一个参数为钱包地址，第二个参数为被授权的地址。返回值：token的授权额度。
+```owner```：钱包地址，例子中以字符串"owner"代替，实际使用需要具体填写地址。
+```spender```：被授权的合约地址，例子中以字符串"spender"代替，实际使用需要具体填写地址，例如可以是```Uniswap V3 router v1```地址。
 
 ```javascript
 function main(){
     // 代币的合约地址，例子中的代币为1INCH
     var tokenAddress = "0x111111111117dC0aa78b770fA6A738034120C302"
 
-    // 例如查询结果为1000000000000000000，除以该token的精度单位1e18，可知当前交易所对象绑定的钱包给spender地址授权了1个1INCH
+    // 例如查询得出1000000000000000000，除以该token的精度单位1e18，得出当前交易所对象绑定的钱包给spender地址授权了1个1INCH数量
     Log(exchange.IO("api", tokenAddress, "allowance", "owner", "spender"))
 }
 ```
 
-```approve```方法是ERC20的一个非```constant```方法，会产生gas消耗，用于给某个合约地址授权token的操作额度。
-```approve```方法需要传入2个参数，第一个参数为被授权的地址，第二个参数为授权的额度。返回值：txid。
-```spender```：被授权的合约地址，例子中以字符串"spender"代替，实际使用时需要填写具体地址，例如可以是```Uniswap V3 router v1```地址。
-```0xde0b6b3a7640000```：授权数量，此处使用十六进制字符串表示，对应的十进制数值为1e18，除以例子中的token精度单位（即1e18），即授权了1个token。
-```exchange.IO()```函数的第三个参数传入方法名```approve```，也可以写为methodId的形式，例如："0x095ea7b3"；还可以写为完整的标准方法名，例如："approve(address,uint256)"。
+```approve```方法是ERC20的一个非```constant```的方法，会产生gas消耗，用来给某个合约地址授权token的操作额度。
+```approve```方法需要传2个参数，第一个参数为被授权的地址，第二个参数为授权的额度。返回值：txid。
+```spender```：被授权的合约地址，例子中以字符串"spender"代替，实际使用需要具体填写地址，例如可以是```Uniswap V3 router v1```地址。
+```0xde0b6b3a7640000```：授权数量，这里使用的是十六进制字符串表示，对应的十进制数值为1e18，除以例子中的token精度单位（即1e18），得出授权了1个token。
+```exchange.IO()```函数的第三个参数传入方法名```approve```，也可以写methodId的形式，例如："0x095ea7b3"。也可以写完整标准方法名，例如："approve(address,uint256)"。
 
 ```javascript
 function main(){
     // 代币的合约地址，例子中的代币为1INCH
     var tokenAddress = "0x111111111117dC0aa78b770fA6A738034120C302"
 
-    // 授权量的十六进制字符串: 0xde0b6b3a7640000 , 对应的十进制数值: 1e18 , 1e18除以该token的精度单位，即1个代币 , 所以这里表示授权1个代币
+    // 授权量的十六进制字符串: 0xde0b6b3a7640000 , 对应的十进制字符串: 1e18 , 1e18除以该token的精度单位，即1个代币数量 , 所以这里指授权一个代币
     Log(exchange.IO("api", tokenAddress, "approve", "spender", "0xde0b6b3a7640000"))
 }
 ```
 
-```multicall```方法是```Uniswap V3```的一个非```constant```方法，会产生gas消耗，用于多路径兑换代币。
+```multicall```方法是```Uniswap V3```的一个非```constant```的方法，会产生gas消耗，用来多路兑换代币。
 ```multicall```方法可能有多种传参方式，具体可以查询包含该方法的ABI，调用该方法之前需要先注册ABI。返回值：txid。
 在Uniswap / PancakeSwap上兑换可以直接使用`Uniswap`交易所对象，不需要自己编码调用。
 
-以下使用伪代码来描述一些细节：
-```
+这里使用伪代码来描述一些细节：
+```javascript
 exchange.IO("api", ContractV3SwapRouterV2, "multicall(uint256,bytes[])", value, deadline, data)
 ```
 
 ```ContractV3SwapRouterV2```：Uniswap V3的router v2地址。
 ```value```：随交易附带的原生币数量，单位为wei（链上整数，可以用```exchange.IO("toUnits", "0.01", 18)```换算）；兑换操作的tokenIn代币不是ETH时设置为0。
-```deadline```：```deadline```是```multicall```方法的参数，可以设置为(new Date().getTime() / 1000) + 3600，表示一小时内有效。
-```data```：```data```是```multicall```方法的参数，类型为```bytes[]```，即需要执行的各个操作的调用数据（```0x```开头的十六进制字符串）组成的数组。与```exchange.IO("api", "eth", "send", "toAddress", toAmount)```类似，调用```multicall```方法时也可以指定方法调用的```gasLimit/gasPrice/nonce```设置，同样使用伪代码来描述：
+```deadline```：```deadline```是```multicall```方法的参数，可以设置为```(new Date().getTime() / 1000) + 3600```，表示一小时内有效。
+```data```：```data```是```multicall```方法的参数，类型为```bytes[]```，即需要执行的各个操作的调用数据（```0x```开头的十六进制字符串）组成的数组。与```exchange.IO("api", "eth", "send", "toAddress", toAmount)```类似，在调用```multicall```方法时也可以指定方法调用的```gasLimit/gasPrice/nonce```设置，同样使用伪代码来描述：
 
-```
+```javascript
 exchange.IO("api", ContractV3SwapRouterV2, "multicall(uint256,bytes[])", value, deadline, data, {gasPrice: 123456, gasLimit: 300000})
 ```
 
-可以根据具体需求设置```{gasPrice: 11, gasLimit: 111, nonce: 111}```参数，该参数作为```exchange.IO()```函数的最后一个参数传入。
-可以省略其中的```nonce```，使用系统默认值；也可以不设置```gasLimit/gasPrice/nonce```，全部使用系统默认值。
+可以根据具体需求设置```{gasPrice: 11, gasLimit: 111, nonce: 111}```参数，该参数设置在```exchange.IO()```函数的最后一个参数上。
+可以省略其中的```nonce```使用系统默认的值，或者不设置```gasLimit/gasPrice/nonce```，全部使用系统默认值。
 
-在该参数中设置```dryRun: true```时，只签名不广播，返回包含```hash```、```raw```（签名后的交易）等字段的对象。如需预先确认调用能否成功，可以将```"api"```替换为```"call"```，使用```exchange.IO("call", ...)```模拟执行（不签名、不消耗gas），详见```exchange.IO("call", ...)```。
+该参数中设置```dryRun: true```时只签名不广播，返回包含```hash```、```raw```（签名后的交易）等字段的对象。需要先确认调用能否成功时，可以把```"api"```换成```"call"```，使用```exchange.IO("call", ...)```模拟执行（不签名、不消耗gas），参看```exchange.IO("call", ...)```。
 
 ```javascript
 function main() {
     var ContractV3SwapRouterV2 = "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45"
     var tokenInName = "ETH"
-    var amountIn = exchange.IO("toUnits", "0.01", 18)              // 0.01 ETH 换算为 wei：payable 方法的 value 是链上整数
-    var options = {gasPrice: 5000000000, gasLimit: 300000, nonce: 100}   // 此处仅为示例，具体需根据实际场景设置
-    var data = []                                                       // bytes[]：各个操作编码后的调用数据（0x 开头的十六进制字符串），此处为空数组，具体要根据实际场景设置
+    // 0.01 ETH 换算为 wei：payable 方法的 value 是链上整数
+    var amountIn = exchange.IO("toUnits", "0.01", 18)
+    var options = {gasPrice: 5000000000, gasLimit: 300000, nonce: 100}   // 此处为举例，具体要根据实际场景设置
+    // bytes[]：各个操作编码后的调用数据（0x 开头的十六进制字符串），此处为空数组，具体要根据实际场景设置
+    var data = []
     var tx = exchange.IO("api", ContractV3SwapRouterV2, "multicall(uint256,bytes[])", (tokenInName == 'ETH' ? amountIn : 0), (new Date().getTime() / 1000) + 3600, data, options || {})
 }
 ```
@@ -27390,6 +29042,12 @@ function main() {
 不设置```nonce```时自动分配并与链上待处理计数同步，连续发送不会重复使用nonce，参看```exchange.IO("nonce", ...)```。交易发送后可以用```exchange.IO("waitReceipt", ...)```等待上链，长时间未上链时可以用```exchange.IO("speedUp", ...)```加价重发或用```exchange.IO("cancelTx", ...)```取消。
 
 声明为```nonpayable```的询价方法（如Uniswap QuoterV2）会被当作写方法签名并发送交易。只想取得返回值或预演写操作时，使用```exchange.IO("call", ...)```模拟执行。
+
+调用只读方法（```view```、```pure```）时返回解码后的返回值：只有一个返回值时直接返回该值；有多个返回值时返回以输出参数名为键的对象，没有名字的输出依次为```ret0```、```ret1```……。```uint64```及以下位宽的整数为数字，更大的整数为十进制字符串（JavaScript、Python中绝对值不小于2^53的整数也返回十进制字符串，避免丢失精度）；```address```为```0x```开头的小写地址（波场为```T```开头的地址）；```bytes```为不带```0x```的十六进制字符串；```bytes32```等定长```bytesN```为字节数值数组（例如```[17, 17, ...]```）。
+
+调用写方法时返回交易哈希（以太坊为```0x```开头的字符串，波场为不带```0x```的交易ID）；设置```dryRun```时返回包含```hash```、```raw```（签名后的交易）、```from```、```to```、```value```、```data```、```nonce```、```gasLimit```、```chainId```、```type```、```gasPrice```、```maxFeePerGas```、```maxPriorityFeePerGas```的对象。调用失败返回空值，```GetLastError()```中有错误信息。
+
+See also: `Web3`, `exchange.IO`, `exchange.IO("abi")`, `exchange.IO("call")`, `exchange.IO("multicall")`, `exchange.IO("waitReceipt")`
 
 ##### exchange.IO("call", ...)
 
@@ -27407,13 +29065,13 @@ Forms:
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"call"```时表示该函数用于模拟执行合约方法。
-- `address` (string, required): ```address```参数用于指定智能合约的地址。
-- `method` (string, optional): ```method```参数用于指定要模拟执行的方法，可以是方法名、完整的方法签名（例如```"transfer(address,uint256)"```，用于区分重载方法）或方法选择器。使用方法名时，需要先通过```exchange.IO("abi", ...)```注册合约ABI（ERC20标准方法已内置，无需注册）。
-- `calldata` (string, optional): ```calldata```参数为完整的调用数据（以```0x```开头的十六进制字符串，由方法选择器和编码后的参数组成），例如聚合器API返回的交易```data```。传入```calldata```时无需注册ABI，函数返回原始返回数据。
-- `args` (string, number, bool, object, array, any (platform supported type), optional): ```args```参数为方法的参数，排列方式与```exchange.IO("api", ...)```调用合约方法时完全相同（```payable```方法第一个参数为附带的原生币数量），把```"api"```换成```"call"```即可预演同一笔调用。最后一个参数可以是选项对象```{from, value, block, gasLimit}```：```from```指定以哪个地址的身份执行（默认为配置的钱包地址，没有配置私钥时为零地址），```value```为附带的原生币数量，```block```为执行时的区块（默认```"latest"```，可设置区块高度或```"pending"```等标签），```gasLimit```为执行的gas上限。
+- `k` (string, required): 固定为```"call"```，用于模拟执行合约方法。
+- `address` (string, required): 智能合约的地址。
+- `method` (string, optional): 要模拟执行的方法，可以是方法名、完整的方法签名（例如```"transfer(address,uint256)"```，用于区分重载方法）或方法选择器。使用方法名时，需要先通过```exchange.IO("abi", ...)```注册合约ABI（ERC20标准方法已内置，无需注册）。
+- `calldata` (string, optional): 完整的调用数据（以```0x```开头的十六进制字符串，由方法选择器和编码后的参数组成），例如聚合器API返回的交易```data```。传入```calldata```时无需注册ABI，函数返回原始返回数据。
+- `args` (string / number / bool / object / array / any, optional): 方法的参数，排列方式与```exchange.IO("api", ...)```调用合约方法时完全相同（```payable```方法第一个参数为附带的原生币数量），把```"api"```换成```"call"```即可预演同一笔调用。最后一个参数可以是选项对象```{from, value, block, gasLimit}```：```from```指定以哪个地址的身份执行（默认为配置的钱包地址，没有配置私钥时为零地址），```value```为附带的原生币数量，```block```为执行时的区块（默认```"latest"```，可设置区块高度或```"pending"```等标签），```gasLimit```为执行的gas上限。
 
-Returns (string, number, bool, object, array): 使用方法名调用时，返回按ABI解码后的返回值（有多个返回值时为对象）；方法没有返回值时，执行成功返回```true```。使用```calldata```调用时，返回原始返回数据（以```0x```开头的十六进制字符串），可以使用```exchange.IO("decode", ...)```进行解码。执行失败（合约revert）时返回空值，可以通过```GetLastError()```获取合约给出的失败原因。
+Returns (string / number / bool / object / array): 使用方法名调用时，返回按ABI解码后的返回值（有多个返回值时为对象）；方法没有返回值时，执行成功返回```true```。使用```calldata```调用时，返回原始返回数据（以```0x```开头的十六进制字符串），可以使用```exchange.IO("decode", ...)```进行解码。执行失败（合约revert）时返回空值，可以通过```GetLastError()```获取合约给出的失败原因。
 
 使用 Uniswap QuoterV2 进行询价，并模拟执行写入操作。
 
@@ -27430,18 +29088,22 @@ function main() {
             { name: "tokenIn", type: "address" }, { name: "tokenOut", type: "address" },
             { name: "amountIn", type: "uint256" }, { name: "fee", type: "uint24" },
             { name: "sqrtPriceLimitX96", type: "uint160" }] }],
-        outputs: [{ name: "amountOut", type: "uint256" }, { name: "sqrtPriceX96After", type: "uint160" },
-            { name: "initializedTicksCrossed", type: "uint32" }, { name: "gasEstimate", type: "uint256" }]
+        outputs: [{ name: "amountOut", type: "uint256" }, { name: "sqrtPriceX96After",
+            type: "uint160" },
+            { name: "initializedTicksCrossed", type: "uint32" }, { name: "gasEstimate",
+                type: "uint256" }]
     }]))
     // 询价：1 WETH 在 0.05% 费率池中可兑换多少 USDC
-    var q = exchange.IO("call", QUOTER, "quoteExactInputSingle", [WETH, USDC, "1000000000000000000", 500, 0])
+    var q = exchange.IO("call", QUOTER, "quoteExactInputSingle", [WETH, USDC, "1000000000000000000",
+        500, 0])
     Log("amountOut:", q.amountOut, "gasEstimate:", q.gasEstimate)
 
     // 模拟写入：以当前钱包地址的身份执行 transfer，余额不足时返回 null，可通过 GetLastError() 获取合约返回的失败原因
     var ok = exchange.IO("call", USDC, "transfer", "0x1111111254EEB25477B68fb85Ed929f73A960582", 1)
     Log("transfer 模拟:", ok, GetLastError())
     // 通过 from 参数指定以其他地址的身份进行模拟
-    Log("指定 from 模拟:", exchange.IO("call", USDC, "transfer", "0x1111111254EEB25477B68fb85Ed929f73A960582", 1,
+    Log("指定 from 模拟:", exchange.IO("call", USDC, "transfer",
+        "0x1111111254EEB25477B68fb85Ed929f73A960582", 1,
         { from: "0x55FE002aefF02F77364de339a1292923A15844B8" }))
 }
 ```
@@ -27452,7 +29114,8 @@ function main() {
 // 聚合器询价与兑换示例（使用 KyberSwap 公开 API，无需 key）：询价 → 生成交易 → eth_call 预演 → 发送
 // DRY_RUN = true 时仅签名、不广播
 var DRY_RUN = true
-var CHAIN = "ethereum"                                          // KyberSwap 使用的链名称：ethereum / bsc / base / arbitrum …
+// KyberSwap 使用的链名称：ethereum / bsc / base / arbitrum …
+var CHAIN = "ethereum"
 var NATIVE = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"       // 聚合器约定的原生代币地址
 var TOKEN_IN = NATIVE                                           // 卖出：ETH
 var TOKEN_OUT = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"    // 买入：USDC
@@ -27487,7 +29150,8 @@ function main() {
     // 1. 询价
     var route = getJSON(API + "/routes?tokenIn=" + TOKEN_IN + "&tokenOut=" + TOKEN_OUT + "&amountIn=" + AMOUNT_IN, { headers: HEADERS })
     var s = route.routeSummary
-    Log("询价：", s.amountIn, "→", s.amountOut, "（约 $" + Number(s.amountOutUsd).toFixed(2) + "），gas≈" + s.gas)
+    Log("询价：", s.amountIn, "→", s.amountOut,
+        "（约 $" + Number(s.amountOutUsd).toFixed(2) + "），gas≈" + s.gas)
 
     // 2. 生成交易：聚合器返回路由合约地址、calldata 以及需附带的原生代币数量
     var from = SIMULATE_FROM || wallet
@@ -27521,7 +29185,8 @@ function main() {
     if (DRY_RUN) opts.dryRun = true
     var tx = exchange.IO("api", "eth", "send", router, value, opts)
     if (DRY_RUN) {
-        Log("已签名（dryRun，未广播）：hash", tx && tx.hash, "| nonce", tx && tx.nonce, "| type", tx && tx.type)
+        Log("已签名（dryRun，未广播）：hash", tx && tx.hash, "| nonce", tx && tx.nonce, "| type",
+            tx && tx.type)
     } else {
         Log("已发送：", tx)
     }
@@ -27535,6 +29200,8 @@ Uniswap QuoterV2等合约的询价方法声明为```nonpayable```，使用```exc
 需要实际发送交易时，可以使用```exchange.IO("api", "eth", "send", toAddress, value, {data: calldata})```发送任意调用数据；设置```dryRun: true```时只签名、不广播。
 
 目前仅支持以太坊（EVM）链，不支持波场（TRON）。
+
+See also: `Web3`, `exchange.IO`, `exchange.IO("api")`, `exchange.IO("multicall")`, `exchange.IO("encode")`, `exchange.IO("decode")`
 
 ##### exchange.IO("multicall", ...)
 
@@ -27551,9 +29218,9 @@ Forms:
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"multicall"```时表示使用该函数批量读取合约调用结果。
-- `calls` (array, required): ```calls```参数为调用数组，数组中每一项的格式为```[合约地址, 方法, ...参数]```，写法与```exchange.IO("call", ...)```相同，其中方法也可以是完整的调用数据（calldata）。不支持附带原生代币的```payable```调用。
-- `options` (object, optional): ```options```参数为可选设置项：```allowFailure```设置为```true```时，调用失败的项返回空值；否则（默认）任意一项调用失败时整体返回空值，并可通过```GetLastError()```获取失败项的序号和原因。```block```用于指定读取的区块（默认为```"latest"```，负数表示相对于最新区块的偏移）。```multicall```用于指定Multicall3合约地址（默认为```0xcA11bde05977b3631167028862bE2a173976CA11```，主流EVM链均在该地址部署了此合约）。
+- `k` (string, required): 固定为```"multicall"```，用于批量读取合约调用结果。
+- `calls` (array, required): 调用数组，数组中每一项的格式为```[合约地址, 方法, ...参数]```，写法与```exchange.IO("call", ...)```相同，其中方法也可以是完整的调用数据（calldata）。不支持附带原生代币的```payable```调用。
+- `options` (object, optional): 可选设置项：```allowFailure```设置为```true```时，调用失败的项返回空值；否则（默认）任意一项调用失败时整体返回空值，并可通过```GetLastError()```获取失败项的序号和原因。```block```用于指定读取的区块（默认为```"latest"```，负数表示相对于最新区块的偏移）。```multicall```用于指定Multicall3合约地址（默认为```0xcA11bde05977b3631167028862bE2a173976CA11```，主流EVM链均在该地址部署了此合约）。
 
 Returns (array): 返回与```calls```顺序一致的结果数组，每一项的解码方式与```exchange.IO("call", ...)```相同。注意每个子调用的调用者（```msg.sender```）是Multicall3合约，而```exchange.IO("call", ...)```默认以钱包地址调用，依赖调用者的方法（如```transfer```、按调用者检查余额或授权的写方法）结果会不同，```exchange.IO("multicall", ...)```只适合与调用者无关的读取。
 
@@ -27568,10 +29235,13 @@ function main() {
     exchange.IO("abi", POOL, JSON.stringify([
         { type: "function", name: "slot0", stateMutability: "view", inputs: [], outputs: [
             { name: "sqrtPriceX96", type: "uint160" }, { name: "tick", type: "int24" },
-            { name: "observationIndex", type: "uint16" }, { name: "observationCardinality", type: "uint16" },
-            { name: "observationCardinalityNext", type: "uint16" }, { name: "feeProtocol", type: "uint8" },
+            { name: "observationIndex", type: "uint16" }, { name: "observationCardinality",
+                type: "uint16" },
+            { name: "observationCardinalityNext", type: "uint16" }, { name: "feeProtocol",
+                type: "uint8" },
             { name: "unlocked", type: "bool" }] },
-        { type: "function", name: "liquidity", stateMutability: "view", inputs: [], outputs: [{ type: "uint128" }] }
+        { type: "function", name: "liquidity", stateMutability: "view", inputs: [],
+            outputs: [{ type: "uint128" }] }
     ]))
 
     // 每项写法与 exchange.IO("call", ...) 相同：[合约地址, 方法, ...参数]，一次请求读完
@@ -27585,7 +29255,8 @@ function main() {
     Log("池子 tick:", ret[2].tick, "流动性:", ret[3])
 
     // 默认任何一项失败就整体返回 null；allowFailure 为 true 时失败项为 null
-    var ret2 = exchange.IO("multicall", [[USDC, "decimals"], [USDC, "transfer", POOL, 1]], { allowFailure: true })
+    var ret2 = exchange.IO("multicall", [[USDC, "decimals"], [USDC, "transfer", POOL, 1]],
+        { allowFailure: true })
     Log("decimals:", ret2[0], "transfer（调用者是Multicall3合约，不是钱包）:", ret2[1])
 }
 ```
@@ -27593,6 +29264,8 @@ function main() {
 所有调用均基于同一区块状态执行，返回结果相互一致。
 
 目前仅支持以太坊（EVM）链，暂不支持波场（TRON）。
+
+See also: `Web3`, `exchange.IO`, `exchange.IO("api")`, `exchange.IO("call")`, `exchange.IO("contracts")`
 
 ##### exchange.IO("logs", ...)
 
@@ -27608,8 +29281,8 @@ Forms:
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"logs"```时表示该函数用于查询事件日志。
-- `query` (object, required): ```query```参数用于设置查询条件：```address```为合约地址（字符串或数组）；```event```为事件名称或完整的事件签名（例如```"Transfer(address,address,uint256)"```）；```filter```为按indexed参数名进行过滤的对象，值为数组时表示匹配其中任意一个值；```fromBlock```、```toBlock```用于指定区块范围（可为数字或```"latest"```等标签，负数表示相对于最新区块的偏移，默认均为```"latest"```）；也可以直接设置```topics```或```blockHash```。
+- `k` (string, required): 固定为```"logs"```，用于查询事件日志。
+- `query` (object, required): 查询条件：```address```为合约地址（字符串或数组）；```event```为事件名称或完整的事件签名（例如```"Transfer(address,address,uint256)"```）；```filter```为按indexed参数名进行过滤的对象，值为数组时表示匹配其中任意一个值；```fromBlock```、```toBlock```用于指定区块范围（可为数字或```"latest"```等标签，负数表示相对于最新区块的偏移，默认均为```"latest"```）；也可以直接设置```topics```或```blockHash```。
 
 Returns (array): 返回日志数组，每项包含```address```（小写）、```blockNumber```、```logIndex```、```transactionIndex```（数字）、```transactionHash```、```blockHash```、```topics```、```data```、```removed```，能按ABI解码时另有```event```（事件名）和```args```（参数）。
 
@@ -27627,19 +29300,25 @@ function main() {
         var t = transfers[0]
         Log(t.blockNumber, t.transactionHash, t.args.from, "→", t.args.to, t.args.value)
         // 按 indexed 参数过滤
-        var mine = exchange.IO("logs", { address: USDC, event: "Transfer", fromBlock: -2, filter: { from: t.args.from } })
+        var mine = exchange.IO("logs", { address: USDC, event: "Transfer", fromBlock: -2,
+            filter: { from: t.args.from } })
         Log("同一发送方:", mine.length, "条")
     }
 
     // 其它合约的事件需要先注册包含该事件的 ABI
-    exchange.IO("abi", POOL, JSON.stringify([{ type: "event", name: "Swap", anonymous: false, inputs: [
-        { indexed: true, name: "sender", type: "address" }, { indexed: true, name: "recipient", type: "address" },
-        { indexed: false, name: "amount0", type: "int256" }, { indexed: false, name: "amount1", type: "int256" },
-        { indexed: false, name: "sqrtPriceX96", type: "uint160" }, { indexed: false, name: "liquidity", type: "uint128" },
+    exchange.IO("abi", POOL, JSON.stringify([{ type: "event", name: "Swap", anonymous: false,
+        inputs: [
+        { indexed: true, name: "sender", type: "address" }, { indexed: true, name: "recipient",
+            type: "address" },
+        { indexed: false, name: "amount0", type: "int256" }, { indexed: false, name: "amount1",
+            type: "int256" },
+        { indexed: false, name: "sqrtPriceX96", type: "uint160" }, { indexed: false,
+            name: "liquidity", type: "uint128" },
         { indexed: false, name: "tick", type: "int24" }] }]))
     var swaps = exchange.IO("logs", { address: POOL, event: "Swap", fromBlock: -20 })
     swaps.forEach(function (s) {
-        Log("Swap 区块", s.blockNumber, "amount0:", s.args.amount0, "amount1:", s.args.amount1, "tick:", s.args.tick)
+        Log("Swap 区块", s.blockNumber, "amount0:", s.args.amount0, "amount1:", s.args.amount1,
+            "tick:", s.args.tick)
     })
 }
 ```
@@ -27649,6 +29328,8 @@ function main() {
 当节点对查询的区块跨度或返回条数有限制时，将返回节点给出的错误信息，此时可缩小区块范围进行分段查询。
 
 目前仅支持以太坊（EVM）链，不支持波场（TRON）。
+
+See also: `Web3`, `exchange.IO`, `exchange.IO("abi")`, `exchange.IO("waitReceipt")`, `exchange.IO("decode")`
 
 ##### exchange.IO("waitReceipt", ...)
 
@@ -27665,9 +29346,9 @@ Forms:
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"waitReceipt"```时表示该函数用于等待交易回执。
-- `txHash` (string, required): ```txHash```参数为交易哈希（以```0x```开头的32字节十六进制字符串），即发送交易时```exchange.IO("api", ...)```返回的值。
-- `options` (object, optional): ```options```参数为可选设置```{timeout, confirmations, interval}```：```timeout```为最长等待时间（毫秒，默认120000，范围1000～600000），```confirmations```为需要的确认数（默认1），```interval```为查询间隔（毫秒，默认1500，范围200～60000）。
+- `k` (string, required): 固定为```"waitReceipt"```，用于等待交易回执。
+- `txHash` (string, required): 交易哈希（以```0x```开头的32字节十六进制字符串），即发送交易时```exchange.IO("api", ...)```返回的值。
+- `options` (object, optional): 可选设置```{timeout, confirmations, interval}```：```timeout```为最长等待时间（毫秒，默认120000，范围1000～600000），```confirmations```为需要的确认数（默认1），```interval```为查询间隔（毫秒，默认1500，范围200～60000）。
 
 Returns (object): 返回交易回执，保留节点返回的原始字段，并做如下处理：```status```为数值（1表示成功，0表示失败），```blockNumber```为数值，```gasUsed```、```effectiveGasPrice```等字段为十进制字符串；```events```为解码后的事件数组，每个元素包含```address```、```event```、```args```、```logIndex```字段；交易执行失败时，```revertReason```为失败原因。若超时仍未上链，则返回空值，可通过```GetLastError()```获取具体的错误信息。
 
@@ -27676,7 +29357,8 @@ Returns (object): 返回交易回执，保留节点返回的原始字段，并�
 ```javascript
 function main() {
     // 发送交易后会得到交易哈希，例如：
-    // var txHash = exchange.IO("api", "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", "approve", spender, amount)
+    // var txHash = exchange.IO("api", "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", "approve",
+    // spender, amount)
     var txHash = "TX_HASH"     // 需要等待的交易哈希
 
     // 最多等待 2 分钟，直到达到 2 个确认
@@ -27701,6 +29383,8 @@ function main() {
 
 目前仅支持以太坊（EVM）链，暂不支持波场（TRON）。
 
+See also: `Web3`, `exchange.IO`, `exchange.IO("logs")`, `exchange.IO("speedUp")`, `exchange.IO("cancelTx")`, `exchange.IO("api")`
+
 ##### exchange.IO("nonce", ...)
 
 ```
@@ -27717,8 +29401,8 @@ Forms:
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"nonce"```时表示该函数用于管理nonce。
-- `nonce` (string, number, optional): 不传该参数时仅查询nonce状态；传入```"sync"```时，按节点返回的pending计数重新同步本地记录；传入数值时，将本地记录的下一个nonce设置为该值。
+- `k` (string, required): 固定为```"nonce"```，用于管理nonce。
+- `nonce` (string / number, optional): 不传该参数时仅查询nonce状态；传入```"sync"```时，按节点返回的pending计数重新同步本地记录；传入数值时，将本地记录的下一个nonce设置为该值。
 
 Returns (object): 返回```{address, latest, pending, local}```对象：```latest```为已上链的交易数；```pending```为节点返回的包含待处理交易在内的计数；```local```为本地记录的下一个nonce（尚未发送过交易时为空值）。各数值均以字符串形式返回。
 
@@ -27746,6 +29430,8 @@ function main() {
 
 目前仅支持以太坊（EVM）链，暂不支持波场（TRON）。
 
+See also: `Web3`, `exchange.IO`, `exchange.IO("cancelTx")`, `exchange.IO("speedUp")`, `exchange.IO("sendBase")`
+
 ##### exchange.IO("speedUp", ...)
 
 ```
@@ -27761,11 +29447,11 @@ Forms:
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"speedUp"```表示该函数用于加价重发交易。
-- `txHash` (string, required): ```txHash```参数为待替换的、尚未上链的交易哈希，该交易必须由当前钱包发出。
-- `options` (object, optional): ```options```参数为可选设置：```multiplier```为手续费放大倍数，范围1.1～10，默认1.125；```dryRun```为```true```时只签名不发送，返回替换交易的内容（字段与```exchange.IO("api", ...)```设置```dryRun```时相同，另有```replaces```为被替换的交易哈希）。
+- `k` (string, required): 固定为```"speedUp"```，用于加价重发交易。
+- `txHash` (string, required): 待替换的、尚未上链的交易哈希，该交易必须由当前钱包发出。
+- `options` (object, optional): 可选设置：```multiplier```为手续费放大倍数，范围1.1～10，默认1.125；```dryRun```为```true```时只签名不发送，返回替换交易的内容（字段与```exchange.IO("api", ...)```设置```dryRun```时相同，另有```replaces```为被替换的交易哈希）。
 
-Returns (string, object): 返回替换交易的哈希；```dryRun```为```true```时返回替换交易的内容。
+Returns (string / object): 返回替换交易的哈希；```dryRun```为```true```时返回替换交易的内容。
 
 交易在一段时间内未上链时加价重发。
 
@@ -27796,6 +29482,8 @@ function main() {
 
 原交易在交易所对象配置的节点上查询；设置了```exchange.IO("sendBase", ...)```时，替换交易从该节点广播。
 
+See also: `Web3`, `exchange.IO`, `exchange.IO("cancelTx")`, `exchange.IO("nonce")`, `exchange.IO("waitReceipt")`
+
 ##### exchange.IO("cancelTx", ...)
 
 ```
@@ -27811,11 +29499,11 @@ Forms:
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"cancelTx"```时表示该函数用于取消交易。
-- `txHash` (string, required): ```txHash```参数为待替换的、尚未上链的交易哈希，该交易必须由当前钱包发出。
-- `options` (object, optional): ```options```参数为可选设置：```multiplier```为手续费放大倍数，范围1.1～10，默认1.125；```dryRun```为```true```时只签名不发送，返回替换交易的内容（字段与```exchange.IO("api", ...)```设置```dryRun```时相同，另有```replaces```为被替换的交易哈希）。
+- `k` (string, required): 固定为```"cancelTx"```，用于取消交易。
+- `txHash` (string, required): 待替换的、尚未上链的交易哈希，该交易必须由当前钱包发出。
+- `options` (object, optional): 可选设置：```multiplier```为手续费放大倍数，范围1.1～10，默认1.125；```dryRun```为```true```时只签名不发送，返回替换交易的内容（字段与```exchange.IO("api", ...)```设置```dryRun```时相同，另有```replaces```为被替换的交易哈希）。
 
-Returns (string, object): 返回取消交易的哈希；启用```dryRun```时返回取消交易的内容。
+Returns (string / object): 返回取消交易的哈希；启用```dryRun```时返回取消交易的内容。
 
 取消一笔已发送的交易。
 
@@ -27845,6 +29533,8 @@ function main() {
 
 原交易在交易所对象配置的节点上查询；设置了```exchange.IO("sendBase", ...)```时，替换交易从该节点广播。
 
+See also: `Web3`, `exchange.IO`, `exchange.IO("speedUp")`, `exchange.IO("nonce")`, `exchange.IO("waitReceipt")`
+
 ##### exchange.IO("toUnits", ...)
 
 ```
@@ -27859,9 +29549,9 @@ Forms:
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"toUnits"```表示该函数用于将可读数量换算为链上整数。
-- `amount` (string, number, required): ```amount```参数为可读数量，例如```"1.5"```。建议以字符串形式传入，以避免JavaScript数值类型的精度问题；不支持科学计数法。
-- `decimals` (number, string, required): ```decimals```参数为精度，可以传入数字（例如USDC为6，ETH为18），也可以传入代币合约地址，此时将自动调用该代币合约的```decimals()```方法读取精度。
+- `k` (string, required): 固定为```"toUnits"```，用于将可读数量换算为链上整数。
+- `amount` (string / number, required): 可读数量，例如```"1.5"```。建议以字符串形式传入，以避免JavaScript数值类型的精度问题；不支持科学计数法。
+- `decimals` (number / string, required): 精度，可以传入数字（例如USDC为6，ETH为18），也可以传入代币合约地址，此时将自动调用该代币合约的```decimals()```方法读取精度。
 
 Returns (string): 返回链上整数（十进制字符串）。当小数位数超过精度时，返回空值并报错，不会静默截断。
 
@@ -27871,11 +29561,15 @@ Returns (string): 返回链上整数（十进制字符串）。当小数位数�
 function main() {
     var USDC = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
     // 可读数量 -> 链上整数，精度可以传数字，也可以传代币地址（自动读取 decimals）
-    Log(exchange.IO("toUnits", "1.5", 6))           // 1500000
-    Log(exchange.IO("toUnits", "1.5", USDC))        // 1500000
-    Log(exchange.IO("toUnits", "0.01", 18))         // 10000000000000000
+    Log(exchange.IO("toUnits", "1.5", 6))
+    // 输出：1500000
+    Log(exchange.IO("toUnits", "1.5", USDC))
+    // 输出：1500000
+    Log(exchange.IO("toUnits", "0.01", 18))
+    // 输出：10000000000000000
     // 链上整数 -> 可读数量
-    Log(exchange.IO("fromUnits", "1500000", 6))     // 1.5
+    Log(exchange.IO("fromUnits", "1500000", 6))
+    // 输出：1.5
     var raw = exchange.IO("api", USDC, "balanceOf", exchange.IO("address"))
     Log("USDC余额:", exchange.IO("fromUnits", raw, USDC))
     // 小数位多于精度时报错，不会静默截断
@@ -27884,6 +29578,8 @@ function main() {
 ```
 
 与```exchange.IO("fromUnits", ...)```互为逆运算。
+
+See also: `Web3`, `exchange.IO`, `exchange.IO("fromUnits")`, `以太坊/波场RPC调用`, `exchange.IO("api")`
 
 ##### exchange.IO("fromUnits", ...)
 
@@ -27899,9 +29595,9 @@ Forms:
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"fromUnits"```时表示该函数用于将链上整数值换算为可读数量。
-- `amount` (string, number, required): ```amount```参数为待换算的链上整数值，可以是十进制字符串、以```0x```开头的十六进制字符串或数值。
-- `decimals` (number, string, required): ```decimals```参数用于指定精度，可以传入数值（例如USDC为6，ETH为18），也可以传入代币合约地址，此时将自动调用该代币合约的```decimals()```方法读取精度。
+- `k` (string, required): 固定为```"fromUnits"```，用于将链上整数值换算为可读数量。
+- `amount` (string / number, required): 待换算的链上整数值，可以是十进制字符串、以```0x```开头的十六进制字符串或数值。
+- `decimals` (number / string, required): 精度，可以传入数值（例如USDC为6，ETH为18），也可以传入代币合约地址，此时将自动调用该代币合约的```decimals()```方法读取精度。
 
 Returns (string): 返回可读数量（十进制字符串，已去除末尾多余的0）。
 
@@ -27911,11 +29607,15 @@ USDC与ETH的数量换算。
 function main() {
     var USDC = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
     // 可读数量 -> 链上整数，精度可以传数字，也可以传代币地址（自动读取 decimals）
-    Log(exchange.IO("toUnits", "1.5", 6))           // 1500000
-    Log(exchange.IO("toUnits", "1.5", USDC))        // 1500000
-    Log(exchange.IO("toUnits", "0.01", 18))         // 10000000000000000
+    Log(exchange.IO("toUnits", "1.5", 6))
+    // 输出：1500000
+    Log(exchange.IO("toUnits", "1.5", USDC))
+    // 输出：1500000
+    Log(exchange.IO("toUnits", "0.01", 18))
+    // 输出：10000000000000000
     // 链上整数 -> 可读数量
-    Log(exchange.IO("fromUnits", "1500000", 6))     // 1.5
+    Log(exchange.IO("fromUnits", "1500000", 6))
+    // 输出：1.5
     var raw = exchange.IO("api", USDC, "balanceOf", exchange.IO("address"))
     Log("USDC余额:", exchange.IO("fromUnits", raw, USDC))
     // 小数位多于精度时报错，不会静默截断
@@ -27924,6 +29624,8 @@ function main() {
 ```
 
 与```exchange.IO("toUnits", ...)```互为逆运算。
+
+See also: `Web3`, `exchange.IO`, `exchange.IO("toUnits")`, `以太坊/波场RPC调用`, `exchange.IO("api")`
 
 ##### exchange.IO("uniswapV3", ...)
 
@@ -27935,25 +29637,17 @@ Forms:
 
 - `exchange.IO("uniswapV3", ...)`
 
-```exchange.IO("uniswapV3", ...)```调用方式用于集中流动性（Uniswap V3）相关的计算，包括tick、价格与sqrtPriceX96之间的换算，以及流动性与代币数量之间的换算。适用于Uniswap v3/v4、PancakeSwap v3、Aerodrome Slipstream、SushiSwap v3等采用相同公式的协议。
+```exchange.IO("uniswapV3", ...)```函数的调用方式用于集中流动性（Uniswap V3）相关的计算：tick、价格、sqrtPriceX96之间的换算，以及流动性与代币数量之间的换算。适用于Uniswap v3/v4、PancakeSwap v3、Aerodrome Slipstream、SushiSwap v3等使用相同公式的协议。
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"uniswapV3"```时表示该函数用于集中流动性计算。
-- `fn` (string, required): 需要调用的计算函数，支持以下函数：
-tickToPrice(tick, decimals0, decimals1)：计算tick对应的价格（1个token0可兑换的token1数量）；
-priceToTick(price, decimals0, decimals1[, tickSpacing])：计算不高于该价格的最大tick，传入tickSpacing时向下对齐到其整数倍；
-sqrtPriceToPrice(sqrtPriceX96, decimals0, decimals1)：将池子slot0中的sqrtPriceX96换算为价格；
-tickToSqrtPrice(tick)：计算tick对应的sqrtPriceX96（与合约TickMath.getSqrtRatioAtTick的结果一致）；
-sqrtPriceToTick(sqrtPriceX96)：计算sqrtPriceX96所在的tick（与合约TickMath.getTickAtSqrtRatio的结果一致）；
-nearestUsableTick(tick, tickSpacing)：将tick四舍五入到tickSpacing的整数倍；
-amountsForLiquidity(sqrtPriceX96, tickLower, tickUpper, liquidity)：计算区间内的流动性在当前价格下对应的代币数量{amount0, amount1}（与合约移除流动性时的计算一致）；
-liquidityForAmounts(sqrtPriceX96, tickLower, tickUpper, amount0, amount1)：计算在不超过给定代币数量的前提下可提供的最大流动性。
-- `args` (string, number, required): 计算函数的参数。精度参数```decimals0```、```decimals1```可以传入数字，也可以传入代币地址（此时自动调用```decimals()```读取精度）。大整数参数可以使用字符串传入。
+- `k` (string, required): 固定为```"uniswapV3"```，用于集中流动性计算。
+- `fn` (string, required): 要调用的计算函数名，例如```"tickToPrice"```、```"priceToTick"```；全部函数及其参数见备注。
+- `args` (string / number, required): 计算函数的参数。精度参数```decimals0```、```decimals1```可以是数字，也可以是代币地址（自动读取```decimals()```）。大整数参数可以使用字符串。
 
-Returns (number, string, object): 价格类函数返回数值（浮点数，用于显示和价位估算）；tick类函数返回整数；sqrtPriceX96、流动性及数量类函数返回十进制字符串（精确值）。
+Returns (number / string / object): 价格类函数返回数字（浮点数，用于显示和价位估算）；tick类函数返回整数；sqrtPriceX96和流动性、数量类函数返回十进制字符串（精确值）。
 
-读取Uniswap V3池子的价格，并计算在当前价格附近提供流动性所需的代币数量。
+读取Uniswap V3池子价格，并计算在当前价格附近提供流动性所需的数量。
 
 ```javascript
 function main() {
@@ -27975,13 +29669,27 @@ function main() {
         exchange.IO("toUnits", "1000", 6), exchange.IO("toUnits", "0.4", 18))
     var used = exchange.IO("uniswapV3", "amountsForLiquidity", s.sqrtPriceX96, lower, upper, liq)
     Log("区间 tick:", lower, "~", upper, "流动性:", liq)
-    Log("实际投入:", exchange.IO("fromUnits", used.amount0, 6), "USDC +", exchange.IO("fromUnits", used.amount1, 18), "WETH")
+    Log("实际投入:", exchange.IO("fromUnits", used.amount0, 6), "USDC +", exchange.IO("fromUnits",
+        used.amount1, 18), "WETH")
 }
 ```
 
-tick与sqrtPriceX96之间的换算、流动性与代币数量之间的换算，均为合约TickMath、LiquidityAmounts算法的逐位移植，计算结果与链上合约完全一致；价格换算使用浮点数运算，存在浮点精度误差。
+tick与sqrtPriceX96的换算、流动性与数量的换算是合约TickMath、LiquidityAmounts算法的逐位移植，结果与链上合约完全一致；价格换算使用浮点数，存在浮点精度误差。
 
-池子中的token0、token1按合约地址大小排序，价格方向为1个token0可兑换的token1数量，计算前需要先确认池子的```token0```。
+池子中token0、token1按地址大小排序，价格的方向是1个token0值多少token1，计算前需要确认池子的```token0```。
+
+```fn```支持的计算函数（函数名后为它的参数）：
+
+- ```tickToPrice(tick, decimals0, decimals1)```：tick对应的价格（1个token0值多少token1）。
+- ```priceToTick(price, decimals0, decimals1[, tickSpacing])```：不高于该价格的最大tick，传tickSpacing时向下对齐到其整数倍。
+- ```sqrtPriceToPrice(sqrtPriceX96, decimals0, decimals1)```：池子slot0中的sqrtPriceX96换算为价格。
+- ```tickToSqrtPrice(tick)```：tick对应的sqrtPriceX96（与合约TickMath.getSqrtRatioAtTick结果一致）。
+- ```sqrtPriceToTick(sqrtPriceX96)```：sqrtPriceX96所在的tick（与合约TickMath.getTickAtSqrtRatio一致）。
+- ```nearestUsableTick(tick, tickSpacing)```：四舍五入到tickSpacing的整数倍。
+- ```amountsForLiquidity(sqrtPriceX96, tickLower, tickUpper, liquidity)```：区间内流动性在当前价格下对应的代币数量{amount0, amount1}（与合约取出流动性的计算一致）。
+- ```liquidityForAmounts(sqrtPriceX96, tickLower, tickUpper, amount0, amount1)```：最多投入给定数量时能提供的流动性。。
+
+See also: `Web3`, `exchange.IO`, `exchange.IO("contracts")`, `exchange.IO("multicall")`, `exchange.IO("api")`
 
 ##### exchange.IO("contracts", ...)
 
@@ -27998,8 +29706,8 @@ Forms:
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"contracts"```时表示该函数用于获取常用合约地址。
-- `chainId` (number, optional): ```chainId```参数用于指定链ID，未传入时默认使用当前节点所在的链。目前支持的链：以太坊（1）、BNB Smart Chain（56）、Base（8453）、Arbitrum One（42161）。
+- `k` (string, required): 固定为```"contracts"```，用于获取常用合约地址。
+- `chainId` (number, optional): 链ID，未传入时默认使用当前节点所在的链。目前支持的链：以太坊（1）、BNB Smart Chain（56）、Base（8453）、Arbitrum One（42161）。
 
 Returns (object): 返回```{chainId, name, wrappedNative, tokens, multicall3, permit2, uniswapV3, pancakeV3}```：```name```为链名称；```wrappedNative```为包装币在```tokens```中的名称（如```"WETH"```、```"WBNB"```）；```tokens```的每一项为```{address, decimals}```；```uniswapV3```、```pancakeV3```包含```factory```、```router```（Uniswap为SwapRouter02，PancakeSwap为SmartRouter）、```quoterV2```、```positionManager```。不支持的链返回空值并报错。
 
@@ -28033,6 +29741,8 @@ function main() {
 
 目前仅支持以太坊（EVM）链，在波场（TRON）上调用返回空值，```GetLastError()```中有错误信息。
 
+See also: `Web3`, `exchange.IO`, `exchange.IO("api")`, `exchange.IO("multicall")`, `exchange.IO("uniswapV3")`, `exchange.IO("abi")`
+
 ##### exchange.IO("address")
 
 ```
@@ -28048,16 +29758,21 @@ Forms:
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能。当设置为```"address"```时，表示该函数用于获取已配置的钱包地址。
-- `key` (string, optional): ```key```参数为私钥（十六进制字符串，```0x```前缀可选），返回该私钥对应的钱包地址，不会切换交易所对象使用的私钥（切换请使用```exchange.IO("key", ...)```）。不传时使用配置的私钥。
+- `k` (string, required): 固定为```"address"```，用于获取已配置的钱包地址。
+- `key` (string, optional): 私钥（十六进制字符串，```0x```前缀可选），返回该私钥对应的钱包地址，不会切换交易所对象使用的私钥（切换请使用```exchange.IO("key", ...)```）。不传时使用配置的私钥。
 
 Returns (string): 返回钱包地址：以太坊（EVM）为```0x```开头的小写地址，波场（TRON）为```T```开头的地址。私钥无效时返回空值。
 
+打印交易所对象所配置私钥的钱包地址。
+
 ```javascript
 function main() {
-    Log(exchange.IO("address"))         // 打印exchange交易所对象上配置的私钥对应的钱包地址
+    Log(exchange.IO("address"))
+    // 输出：0x开头的钱包地址
 }
 ```
+
+See also: `Web3`, `exchange.IO`, `exchange.IO("key")`, `exchange.IO("sign")`, `exchange.IO("signMessage")`
 
 ##### exchange.IO("base", ...)
 
@@ -28070,14 +29785,16 @@ Forms:
 
 - `exchange.IO("base", ...)`
 
-```exchange.IO("base", ...)```调用方式用于设置RPC节点地址，支持设置多个节点互为备用。
+设置Web3交易所对象的RPC节点地址，EVM链可以设置多个节点互为备用。
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于指定```exchange.IO()```函数的功能，设置为```"base"```时表示该函数用于切换RPC节点。
-- `address` (string, array, optional): ```address```参数为节点地址。以太坊（EVM）支持```http(s)://```和```ws(s)://```地址；设置多个节点时传入地址数组，或用逗号（也可以是空格、换行）分隔的字符串。波场（TRON）只支持一个全节点HTTP地址，传入多个地址（数组或逗号分隔的字符串）时报错；旧的gRPC地址```grpc.trongrid.io:50051```、```grpc.nile.trongrid.io:50051```、```grpc.shasta.trongrid.io:50051```会换成对应的HTTP地址，其它非HTTP地址报错。不传时只查询当前的节点地址。
+- `k` (string, required): 固定为```"base"```，用于切换RPC节点。
+- `address` (string / array, optional): 节点地址。以太坊（EVM）支持```http(s)://```和```ws(s)://```地址；设置多个节点时传入地址数组，或用逗号（也可以是空格、换行）分隔的字符串。波场（TRON）只支持一个全节点HTTP地址，传入多个地址（数组或逗号分隔的字符串）时报错；旧的gRPC地址```grpc.trongrid.io:50051```、```grpc.nile.trongrid.io:50051```、```grpc.shasta.trongrid.io:50051```会换成对应的HTTP地址，其它非HTTP地址报错。不传时只查询当前的节点地址。
 
 Returns (string): 设置时返回设置前的节点地址（多个节点时为逗号分隔的字符串）；不传```address```时返回当前的节点地址。
+
+把RPC节点切换到BSC链。
 
 ```javascript
 function main() {
@@ -28103,6 +29820,8 @@ function main() {
 
 切换节点后重新获取链ID。多个节点互为备用只适用于以太坊（EVM），波场（TRON）不支持。
 
+See also: `Web3`, `exchange.IO`, `exchange.IO("sendBase")`, `以太坊/波场RPC调用`, `exchange.IO("contracts")`
+
 ##### exchange.IO("sendBase", ...)
 
 ```
@@ -28118,8 +29837,8 @@ Forms:
 
 Parameters:
 
-- `k` (string, required): ```k```参数用于设置```exchange.IO()```函数的功能，设置为```"sendBase"```时表示该函数用于设置广播交易的节点。
-- `url` (string, optional): ```url```参数为节点的JSON-RPC地址（支持http或https协议），例如```"https://rpc.mevblocker.io"```、```"https://rpc.flashbots.net"```。传入空字符串时清除该设置，恢复为通过交易所对象配置的节点发送交易；不传入该参数时，仅查询当前设置。
+- `k` (string, required): 固定为```"sendBase"```，用于设置广播交易的节点。
+- `url` (string, optional): 节点的JSON-RPC地址（支持http或https协议），例如```"https://rpc.mevblocker.io"```、```"https://rpc.flashbots.net"```。传入空字符串时清除该设置，恢复为通过交易所对象配置的节点发送交易；不传入该参数时，仅查询当前设置。
 
 Returns (string): 返回设置前的发送节点地址；此前未设置时返回空字符串。
 
@@ -28144,3 +29863,5 @@ function main() {
 影响```exchange.IO("api", ...)```发送的交易（转账和合约写操作）以及```exchange.IO("speedUp", ...)```、```exchange.IO("cancelTx", ...)```的替换交易，```dryRun```时不会发送。
 
 目前仅支持以太坊（EVM）链，在波场（TRON）上调用返回空值，```GetLastError()```中有错误信息。
+
+See also: `Web3`, `exchange.IO`, `exchange.IO("base")`, `exchange.IO("nonce")`, `exchange.IO("speedUp")`

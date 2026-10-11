@@ -952,13 +952,13 @@ interface IExchange {
      * ```
      */
     /**
-     * Domestic futures counters (CTP etc.): wait for the next tick of the current contract
+     * Domestic futures counters (CTP etc.): wait for the next tick of any subscribed contract
      * or the next order update of this exchange, whichever arrives first (the legacy
      * waitEvent listened on both the tick and the order queue)
      * @param timeoutMs - Timeout in milliseconds; 0 / omitted = the default wait; negative =
      *   do not wait, only report what is already there
      * @returns The event message: a tick as `Event: "tick"` (`Ticker` in ITicker shape,
-     *   `Symbol` = contract); an order update as `Event: "order"` (`Order` in IOrder shape;
+     *   `Symbol` = the contract that ticked); an order update as `Event: "order"` (`Order` in IOrder shape;
      *   `Type` is absent when the update carries no side — orders placed here merge the
      *   Type/Offset recorded at submit time by order id); null when nothing arrived before
      *   the timeout

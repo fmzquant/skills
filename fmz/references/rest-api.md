@@ -2,17 +2,117 @@
 
 Same API keys as MCP (website: `/m/account#apikey`). For REST the key's privileges are method names or `*` (scope names only apply to MCP). Prefer the MCP tools when they are available; this is for scripts, cron jobs and older integrations. Below is the user guide's section, verbatim: creating a key, the request format and signature, every method, the return codes and the robot status codes.
 
-The extended API is the platform's HTTP interface (```https://www.fmz.com/api/v1```) for scripts, scheduled jobs and other programs: query the account, dockers, strategies and live trading bots, create, restart and stop bots, send interactive commands to bots, and so on.
+The extended API is the platform's HTTP interface (```https://www.fmz.com/api/v1```) for scripts, scheduled jobs and other programs: query the account, dockers, strategies and robots, create, restart and stop robots, send interactive commands to robots, and so on.
 
-To operate the platform interactively from an AI assistant (Claude Code, Cursor, ...), prefer AI Integration (the MCP service, see Extended API Interface → AI Integration): it has more tools, takes named parameters, and can be authorized by permission category. Both can use the same API KEY.
+To operate the platform interactively from an AI assistant (Claude Code, Cursor, ...), prefer AI Integration (the MCP service, see `AI Integration`): it has more tools, takes named parameters, and can be authorized by permission category. Both can use the same API KEY.
 
-Steps: create an API KEY (Create ApiKey), send requests as described in Authentication Methods, and look up methods and parameters in Extended API Interface Details.
+Steps: create an API KEY (`Create ApiKey`), send requests as described in `Authentication Methods`, and look up methods and parameters in `Extended API Interface Details`.
+
+## AI Integration
+
+Connect FMZ to an AI coding assistant (AI agent) such as Claude Code, Codex or Cursor, and you can write strategies, run backtests, create and manage live trading, and read logs and profit just by talking to it. The assistant reaches these functions through the platform's MCP (Model Context Protocol) service, with an API KEY created for it alone; you choose its permissions when you approve it and can change or revoke them at any time.
+
+### Connect with one sentence
+
+Tell your AI assistant:
+
+```text
+Read https://www.fmz.com/agent/setup.md and connect to FMZ
+```
+
+The assistant follows that page; your only step is one click in the browser:
+
+1. The assistant requests authorization and shows you a link such as ```https://www.fmz.com/agent/authorize?code=XXXX-XXXX```, valid for 10 minutes.
+2. Open it in a browser where you are logged in to FMZ, check the requester's name and the permissions, and approve. You can untick permissions you do not want to grant.
+3. The assistant receives an API KEY, writes it into its own MCP configuration and connects. From then on you can simply ask it to "list my live trading" or "backtest this strategy".
+
+The assistant names the key "name @ machine" (for example ```Claude Code @ MacBook```). When a request with the same name is approved again, the old key is revoked and replaced, so connecting again does not pile up keys.
+
+### Permissions
+
+| Permission | Allows | Default |
+| - | - | - |
+| read | Lists and details of strategies, robots, dockers and exchange accounts; logs, messages, account summary (no secrets) | Yes |
+| backtest | Start, query and stop backtests | Yes |
+| write | Save strategies and versions, groups, alert switches; change the configuration of stopped live trading | Yes |
+| trade | Create, start and stop live trading, send interactive commands (costs balance and places real orders) | Yes |
+| danger | Delete strategies, live trading and nodes; publish strategies | No |
+
+```danger``` is never granted by default: the assistant has to request it explicitly and you have to tick it on the approval page. Before calling a ```[trade]``` or ```[danger]``` tool the assistant should ask you first.
+
+### Manual configuration
+
+Clients that cannot run commands (for example Cherry Studio) can be configured by hand:
+
+1. Create an API KEY under Account settings → API KEY (```https://www.fmz.com/m/account#apikey```) and note its Access Key and Secret Key.
+2. Add an MCP server of type Streamable HTTP to the client:
+   - URL: ```https://www.fmz.com/api/mcp/<Access Key>```
+   - Header: ```Authorization: Bearer <Secret Key>```
+
+The Secret Key goes in the header only, never in the URL. Examples:
+
+```bash
+# Claude Code
+claude mcp add --transport http fmz "https://www.fmz.com/api/mcp/<Access Key>" \
+    --header "Authorization: Bearer <Secret Key>"
+```
+
+```json
+{
+    "mcpServers": {
+        "fmz": {
+            "url": "https://www.fmz.com/api/mcp/<Access Key>",
+            "headers": {"Authorization": "Bearer <Secret Key>"}
+        }
+    }
+}
+```
+
+The JSON is for Cursor (```~/.cursor/mcp.json```) and other clients that speak Streamable HTTP; Claude Desktop needs the ```npx mcp-remote``` bridge described in the setup page.
+
+### Install the skills (recommended)
+
+The skills are knowledge packs written for AI assistants: platform workflow, the full API reference, how to write strategies in each language, backtesting and indicators. With them installed the assistant writes noticeably more accurate strategies. In a terminal:
+
+```bash
+npx skills add fmzquant/skills --global --yes -a claude-code
+```
+
+Put your assistant's name after ```-a``` (claude-code, codex, cursor, gemini-cli, ...). They can also be read on GitHub: ```https://github.com/fmzquant/skills```.
+
+### Available tools
+
+Once connected the assistant can use the tools below; the list the assistant sees is authoritative:
+
+- ```read```: ```ping```, ```get_account_summary```, ```list_exchanges```, ```list_platforms```, ```list_nodes```, ```list_strategies```, ```get_strategy```, ```list_strategy_versions```, ```get_strategy_version```, ```list_robots```, ```get_robot```, ```get_robot_logs```, ```get_robot_profit```, ```get_robot_output```, ```list_messages```, ```list_groups```, ```revoke_my_key```
+- ```backtest```: ```run_backtest```, ```get_backtest```, ```list_backtests```, ```stop_backtest```
+- ```write```: ```check_strategy```, ```save_strategy```, ```save_strategy_version```, ```delete_strategy_version```, ```update_robot```, ```save_group```, ```move_to_group```, ```delete_group```, ```set_robot_alert```, ```set_node_alert```, ```delete_messages```
+- ```trade```: ```create_robot```, ```start_robot```, ```stop_robot```, ```restart_robot```, ```send_robot_command```, and the trading terminal plugin tools ```plugin_*``` (market data, orders, ...)
+- ```danger```: ```delete_strategy```, ```delete_robot```, ```delete_node```, ```publish_strategy```
+
+A typical session: ```list_platforms``` and ```list_nodes``` to see which exchange accounts and nodes the account has; ```save_strategy``` to save a strategy and ```check_strategy``` to check it; ```run_backtest``` and ```get_backtest``` to backtest; then ```create_robot``` to go live and ```get_robot``` / ```get_robot_logs``` to watch it.
+
+### Security and management
+
+- Exchange API KEYs never pass through the assistant: add them on the Exchanges page of the website and the assistant picks them by id. No tool result ever contains a secret.
+- At ```https://www.fmz.com/m/account#apikey``` you can see the key the assistant uses, change its permissions or lock it. Besides the permission names above, permissions can list tool names, and ```!tool_name``` excludes one tool.
+- When you are done, ask the assistant to call ```revoke_my_key``` to revoke its own key, or delete it on that page.
+- ```stop_robot``` stops live trading; it does not close positions.
+- The first time the assistant creates live trading, backtest first and then run on a demo account or with a small amount.
+
+### Common problems
+
+- No online node: live trading needs at least one online node, see Platform Basics → Nodes.
+- Too many backtests: concurrent backtests are limited; have the assistant ```stop_backtest``` the ones it no longer needs.
+- The assistant says a tool is missing or a call is refused: the key lacks that permission; change it on the API KEY page and reconnect.
+
+The same API key also works with the `Extended API` for scripts and schedulers; prefer MCP wherever it can be used.
 
 ## Create ApiKey
 
 On the [Account Settings → API KEY](https://www.fmz.com/m/account#apikey) page (```/m/account#apikey```), click "Create New ApiKey" to get an ```AccessKey``` and a ```SecretKey```. The ```SecretKey``` carries every permission of the key; keep it secret. The same page lets you change the permissions of existing keys, or disable and delete them.
 
-**Permissions**
+### Permissions
 
 When creating or editing a key, enter a comma-separated list in the "API Permissions" field:
 
@@ -20,7 +120,7 @@ When creating or editing a key, enter a comma-separated list in the "API Permiss
 - Method names: allow only the listed methods, e.g. ```GetRobotList,GetRobotDetail,CommandRobot```.
 - ```!MethodName```: exclude a method, usually together with ```*```, e.g. ```*,!DeleteRobot,!DeleteNode```.
 
-The same API KEY can also be used for AI Integration (the MCP service, see Extended API Interface → AI Integration). Besides method names (tool names for MCP), permissions can be granted by category: ```read```, ```backtest```, ```write```, ```trade```, ```danger``` (see the AI Integration page), and ```!name``` excludes as well. Categories apply to MCP tools and extended API methods alike. The categories of the extended API methods:
+The same API KEY can also be used for AI Integration (the MCP service, see `AI Integration`). Besides method names (tool names for MCP), permissions can be granted by category: ```read```, ```backtest```, ```write```, ```trade```, ```danger``` (see the AI Integration page), and ```!name``` excludes as well. Categories apply to MCP tools and extended API methods alike. The categories of the extended API methods:
 
 - ```read```: ```GetAccount```, ```GetExchangeList```, ```GetNodeList```, ```GetPlatformList```, ```GetRobotGroupList```, ```GetRobotList```, ```GetRobotDetail```, ```GetRobotLogs```, ```GetStrategyList```;
 - ```trade```: ```NewRobot```, ```RestartRobot```, ```StopRobot```, ```CommandRobot```, ```PluginRun```;
@@ -32,14 +132,16 @@ With an empty permission list the extended API does not restrict methods (MCP al
 
 ## Authentication Methods
 
-The extended API supports two authentication methods:
+The extended API supports two authentication methods: signature authentication and direct authentication.
 
-- Signature authentication: the request parameters are signed with the ```SecretKey```, which itself never travels over the network. Programs should use this method.
-- Direct verification: the ```SecretKey``` is put into the request URL itself; meant for webhooks such as TradingView that accept only a single URL.
+- `Signature authentication`: the request parameters are signed with the ```SecretKey```, which itself never travels over the network. Programs should use this method.
+- `Direct verification`: the ```SecretKey``` is put into the request URL itself; meant for webhooks such as TradingView that accept only a single URL.
 
 ### Token Authentication
 
-**Request format**
+Signature authentication signs the request parameters with an MD5 hash that includes the ```SecretKey```, so the ```SecretKey``` itself never travels over the network; programs calling the extended API should use it.
+
+#### Request format
 
 Send a ```POST``` request to ```https://www.fmz.com/api/v1``` with the parameters as a form (```application/x-www-form-urlencoded```). The server also accepts the same parameters in the URL query string of a ```GET``` request, but then they end up in access logs along the way, so ```POST``` is recommended.
 
@@ -48,13 +150,13 @@ Send a ```POST``` request to ```https://www.fmz.com/api/v1``` with the parameter
 | version | Version, always ```1.0```. |
 | access_key | The ```AccessKey``` of the API KEY. |
 | method | Method name, e.g. ```GetNodeList```. |
-| args | Method parameters as a JSON string: an array in parameter order (e.g. ```[]```, ```[123, "ok"]```), or an object keyed by parameter name (e.g. ```{"robotId": 123}```), see Extended API Interface Details. Treated as ```[]``` when omitted. |
-| nonce | Timestamp in milliseconds. It must be within 1 hour of server time and greater than the ```nonce``` of this API KEY's previous request. |
+| args | Method parameters as a JSON string (an array or an object, see below the table); ```[]``` when omitted. |
+| nonce | Millisecond timestamp, within 1 hour of server time and greater than this API key's previous ```nonce```. |
 | sign | Signature, computed as described below. |
 
-The request does not contain the ```SecretKey```.
+```args``` is either an array in parameter order (e.g. ```[]```, ```[123, "ok"]```) or an object keyed by parameter name (e.g. ```{"robotId": 123}```); see `Extended API Interface Details`. The request does not contain the ```SecretKey```.
 
-**Signature**
+#### Signature
 
 Concatenate the string below, where ```args``` is the exact JSON string being submitted:
 
@@ -64,7 +166,7 @@ version + "|" + method + "|" + args + "|" + nonce + "|" + secretKey
 
 Compute the MD5 of the result and use its 32-character lowercase hexadecimal form as ```sign```.
 
-**Python example**
+#### Python example
 
 ```python
 import hashlib
@@ -92,12 +194,12 @@ def api(method, *args, **kwargs):
         return json.loads(resp.read().decode('utf-8'))
 
 print(api('GetNodeList'))                             # Docker list
-print(api('GetRobotList', appId='member2'))           # By name: bots labeled member2
-print(api('CommandRobot', 123, 'ok'))                 # Send an interactive command to bot 123
-print(api('GetRobotDetail', 123))                     # Details of bot 123
+print(api('GetRobotList', appId='member2'))           # By name: robots labeled member2
+print(api('CommandRobot', 123, 'ok'))                 # Send an interactive command to robot 123
+print(api('GetRobotDetail', 123))                     # Details of robot 123
 ```
 
-**Go example**
+#### Go example
 
 ```go
 package main
@@ -153,7 +255,7 @@ func main() {
     ret, err := api("GetNodeList")
     fmt.Println(ret, err)
 
-    // Restart bot 123 with a new configuration; settings fields: see the bot configuration section in Extended API Interface Details
+    // restart robot 123 with a new configuration; settings: see Extended API Interface Details
     settings := map[string]interface{}{
         "name":     "hedge test",
         "strategy": 456,
@@ -172,29 +274,29 @@ func main() {
 
 Direct verification computes no signature; the ```secret_key``` is put into the request parameters instead. This produces a fixed URL that can be entered into webhooks such as TradingView that accept only a single URL.
 
-> **Security note**: a ```secret_key``` in a URL ends up in browser history, proxy and server access logs, and the webhook provider's configuration; anyone who obtains the URL can call the API with this key's permissions. Use direct verification only for ```CommandRobot``` webhooks, and create a dedicated API KEY for it that is granted ```CommandRobot``` only (see Create ApiKey). If it leaks, delete that API KEY immediately.
+> **Security note**: a ```secret_key``` in a URL ends up in browser history, proxy and server access logs, and the webhook provider's configuration; anyone who obtains the URL can call the API with this key's permissions. Use direct verification only for ```CommandRobot``` webhooks, and create a dedicated API KEY for it that is granted ```CommandRobot``` only (see `Create ApiKey`). If it leaks, delete that API KEY immediately.
 
 The request parameters are ```access_key```, ```secret_key```, ```method``` and ```args``` (a JSON array, URL-encoded); ```version```, ```nonce``` and ```sign``` are not needed. ```CommandRobot``` skips the ```nonce``` check; other methods are still checked: without a ```nonce``` the server uses the current time (to the second), so a second call within the same second returns a nonce error (```code``` 3).
 
-For example, with an API KEY whose ```AccessKey``` is ```xxx``` and ```SecretKey``` is ```yyy```, opening the URL below sends the interactive command ```ok12345``` to the live trading bot with ID ```186515```:
+For example, with an API KEY whose ```AccessKey``` is ```xxx``` and ```SecretKey``` is ```yyy```, opening the URL below sends the interactive command ```ok12345``` to the robot with ID ```186515```:
 
 ```plaintext
 https://www.fmz.com/api/v1?access_key=xxx&secret_key=yyy&method=CommandRobot&args=%5B186515%2C%22ok12345%22%5D
 ```
 
-**Receiving a webhook body**
+#### Receiving a webhook body
 
-When the command argument of ```CommandRobot``` is an empty string and the request is a ```POST```, the server sends the request body to the bot as the interactive command. The body must be JSON or plain text, not form-encoded (a body sent with ```Content-Type: application/x-www-form-urlencoded``` is consumed as a form first and the command becomes an empty string). For example, set the TradingView webhook URL to:
+When the command argument of ```CommandRobot``` is an empty string and the request is a ```POST```, the server sends the request body to the robot as the interactive command. The body must be JSON or plain text, not form-encoded (a body sent with ```Content-Type: application/x-www-form-urlencoded``` is consumed as a form first and the command becomes an empty string). For example, set the TradingView webhook URL to:
 
 ```plaintext
 https://www.fmz.com/api/v1?access_key=xxx&secret_key=yyy&method=CommandRobot&args=%5B186515%2C+%22%22%5D
 ```
 
-The ```args``` value ```%5B186515%2C+%22%22%5D``` decodes to ```[186515, ""]``` (```+``` is a URL-encoded space): ```186515``` is the bot ID and the command is an empty string.
+The ```args``` value ```%5B186515%2C+%22%22%5D``` decodes to ```[186515, ""]``` (```+``` is a URL-encoded space): ```186515``` is the robot ID and the command is an empty string.
 
 Simulating a TradingView webhook alert:
 
-```js
+```javascript
 function main() {
     var options = {
         method: "POST",
@@ -203,7 +305,9 @@ function main() {
     }
 
     // A webhook alert sends a POST request with the required headers automatically
-    return HttpQuery("https://www.fmz.com/api/v1?access_key=xxx&secret_key=yyy&method=CommandRobot&args=%5B186515%2C+%22%22%5D", options)
+    var url = "https://www.fmz.com/api/v1?access_key=xxx&secret_key=yyy" +
+        "&method=CommandRobot&args=%5B186515%2C+%22%22%5D"
+    return HttpQuery(url, options)
 }
 ```
 
@@ -211,25 +315,25 @@ The content of the TradingView alert message box is the request body:
 
 - JSON format:
 
-  ![](https://www.fmz.com/upload/asset/16d8a37ef80d9ccd0079.png)
+  ![TradingView alert message (JSON format)](https://www.fmz.com/upload/asset/16d8a37ef80d9ccd0079.png)
 
   ```plaintext
   {"close": {{close}}, "name": "aaa"}
   ```
 
-  The bot with ID ```186515``` receives the interactive command ```{"close": 39773.75, "name": "aaa"}```.
+  The robot with ID ```186515``` receives the interactive command ```{"close": 39773.75, "name": "aaa"}```.
 
 - Text format:
 
-  ![](https://www.fmz.com/upload/asset/16d8a506dfbb6c60a077.png)
+  ![TradingView alert message (text format)](https://www.fmz.com/upload/asset/16d8a506dfbb6c60a077.png)
 
   ```plaintext
   BTCUSDTPERP Crossing 39700.00 close: {{close}}
   ```
 
-  The bot with ID ```186515``` receives the interactive command ```BTCUSDTPERP Crossing 39700.00 close: 39739.4```.
+  The robot with ID ```186515``` receives the interactive command ```BTCUSDTPERP Crossing 39700.00 close: 39739.4```.
 
-**Python and Go examples**
+#### Python and Go examples
 
 ```python
 import json
@@ -309,109 +413,150 @@ References:
 
 ## Extended API Interface Details
 
-All methods are called through ```https://www.fmz.com/api/v1```; for the request format and signature see Authentication Methods → Token Authentication, for the response structure and error codes see Extended API Interface Return Codes. The ```api()``` used in the examples on the method pages is the function from the Python example on the signature authentication page.
+All methods are called through ```https://www.fmz.com/api/v1```; for the request format and signature see `Token Authentication`, for the response structure and error codes see `Extended API Interface Return Codes`. The ```api()``` used in the examples on the method pages is the function from the Python example on the signature authentication page.
 
-**Method overview**
+### Method overview
 
 | Object | Method | Parameters (in order; bracketed ones are optional) | Description | Notes |
 | - | - | - | - | - |
-| Account | GetAccount | none | Account information | Read-only |
-| Docker | GetNodeList | [offset, limit] | Docker list | Read-only |
-| Docker | DeleteNode | nid | Delete a docker | Deletes, cannot be undone |
-| Exchange | GetExchangeList | isSummary | Exchanges supported by the platform and their settings | Read-only |
-| Exchange | GetPlatformList | [offset, limit] | Exchange accounts you added | Read-only |
-| Strategy | GetStrategyList | offset, length, strategyType, category, language, kw[, groupId, orderBy] | Strategy list | Read-only |
-| Live trading | GetRobotGroupList | none | Live trading groups | Read-only |
-| Live trading | GetRobotList | [offset, length, customStatus, appId, kw, groupId, orderBy, strategyId] | Live trading list | Read-only |
-| Live trading | GetRobotDetail | robotId | Live trading details | Read-only |
-| Live trading | GetRobotLogs | robotId, logMinId, …, summaryLimit[, logExchange, logKeyword, logTypes] | Logs, profit, chart and status bar data | Read-only |
-| Live trading | NewRobot | settings | Create and start a live trading bot | Charges fees; the bot trades for real |
-| Live trading | RestartRobot | robotId[, settings] | Start (restart) a live trading bot | Charges fees; the bot trades for real |
-| Live trading | StopRobot | robotId | Stop a live trading bot | Does not close positions |
-| Live trading | CommandRobot | robotId, cmd | Send an interactive command | The strategy may place orders on it |
-| Live trading | DeleteRobot | robotId[, removeLog] | Delete a live trading bot | Deletes, cannot be undone |
-| Debugging | PluginRun | settings | Run a piece of code on a docker | The code can place real orders |
-| Channel | pub | robot, channel (URL parameters); the message goes in the request body | Push a message to a channel a robot subscribed to | No API KEY, no signature; see the pub page |
+| Account | `GetAccount` | none | Account information | Read-only |
+| Docker | `GetNodeList` | [offset, limit] | Docker list | Read-only |
+| Docker | `DeleteNode` | nid | Delete a docker | Deletes, cannot be undone |
+| Exchange | `GetExchangeList` | isSummary | Exchanges supported by the platform and their settings | Read-only |
+| Exchange | `GetPlatformList` | [offset, limit] | Exchange accounts you added | Read-only |
+| Strategy | `GetStrategyList` | offset, length, strategyType, category, language, kw[, groupId, orderBy] | Strategy list | Read-only |
+| Robot | `GetRobotGroupList` | none | Robot groups | Read-only |
+| Robot | `GetRobotList` | [offset, length, customStatus, appId, kw, groupId, orderBy, strategyId] | Robot list | Read-only |
+| Robot | `GetRobotDetail` | robotId | Robot details | Read-only |
+| Robot | `GetRobotLogs` | robotId, logMinId, …, summaryLimit[, logExchange, logKeyword, logTypes] | Logs, profit, chart and status bar data | Read-only |
+| Robot | `NewRobot` | settings | Create and start a robot | Charges fees; the robot trades for real |
+| Robot | `RestartRobot` | robotId[, settings] | Start (restart) a robot | Charges fees; the robot trades for real |
+| Robot | `StopRobot` | robotId | Stop a robot | Does not close positions |
+| Robot | `CommandRobot` | robotId, cmd | Send an interactive command | The strategy may place orders on it |
+| Robot | `DeleteRobot` | robotId[, removeLog] | Delete a robot | Deletes, cannot be undone |
+| Debugging | `PluginRun` | settings | Run a piece of code on a docker | The code can place real orders |
+| Channel | `pub` | robot, channel (URL parameters); the message goes in the request body | Push a message to a channel a robot subscribed to | No API key, no signature |
 
-The API KEY needs permission for the method, see Create ApiKey.
+The API key needs permission for the method, see `Create ApiKey`.
 
-**Passing parameters**
+### Passing parameters
 
 ```args``` can be written in two ways:
 
 - Array: positional parameters in the order of the table above, e.g. ```[123, "ok"]```. Positional calls accept only certain numbers of arguments; any other count returns a ```Params number mismatch``` error:
   - GetNodeList, GetPlatformList: 0 or 2.
-  - GetStrategyList: 0, 6, 7 or 8; with no arguments ```language``` is ```1``` (only Python strategies), see the GetStrategyList page.
+  - GetStrategyList: 0, 6, 7 or 8; with no arguments ```language``` is ```1``` (only Python strategies), see `GetStrategyList`.
   - GetRobotList: 0, 1, 3, 5, 6, 7 or 8; a single argument is taken as ```appId```.
   - GetRobotLogs: 15 to 19 (with 15 the status bar is not queried).
   - RestartRobot, DeleteRobot: 1 or 2; when DeleteRobot gets only ```robotId```, ```removeLog``` is ```false```.
 - Object: values by parameter name, e.g. ```{"robotId": 123, "cmd": "ok"}```. Names are case-insensitive and underscores are ignored; omitted parameters take their defaults. Recommended for methods with many optional parameters (GetRobotList, GetRobotLogs, GetStrategyList).
 
-**Live trading configuration (settings)**
+### Robot configuration (settings)
 
 The ```settings``` parameter of NewRobot, RestartRobot and PluginRun is a JSON object; common fields:
 
 | Field | Description |
 | - | - |
-| name | Name of the live trading bot. |
-| strategy | Strategy ID, see GetStrategyList. RestartRobot cannot change a bot's strategy. |
+| name | Robot name. |
+| strategy | Strategy ID, see GetStrategyList. RestartRobot cannot change a robot's strategy. |
 | args | Strategy parameters, each element ```["name", value]```, e.g. ```[["Interval", 500]]```; ```[]``` if the strategy has none. |
 | exchanges | Array of exchange object configurations, one element per exchange object, see below. |
-| period | Default K-line period in seconds, e.g. ```60```, ```3600```. Defaults to 60 seconds. ```0```, ```1```, ```2```, ```3```, ```4```, ```5```, ```10``` and ```12``` are read as the old period numbers (1 minute, 3 minutes, 5 minutes, 15 minutes, 30 minutes, 1 hour, 1 day, 1 week respectively), e.g. ```1``` actually means 180 seconds, so pass a number of seconds of 60 or more. |
-| node | ID of the docker that runs the bot, see GetNodeList; omitted or ```-1``` means automatic assignment. |
-| group | Live trading group ID, see GetRobotGroupList. |
+| period | Default K-line period in seconds, e.g. ```60```, ```3600```; 60 seconds when omitted. Pass 60 or more; see below the table. |
+| node | ID of the docker that runs the robot, see GetNodeList; omitted or ```-1``` means automatic assignment. |
+| group | Robot group ID, see GetRobotGroupList. |
 | appid | Custom label; GetRobotList can filter by it. |
+
+A ```period``` of ```0```, ```1```, ```2```, ```3```, ```4```, ```5```, ```10``` or ```12``` is read as an old period number (1 minute, 3 minutes, 5 minutes, 15 minutes, 30 minutes, 1 hour, 1 day, 1 week respectively); for example ```1``` actually means 180 seconds.
 
 An ```exchanges``` element takes one of two forms, which cannot be mixed in one array (the first element decides):
 
 - Reference an exchange account added on the platform: ```{"pid": 123, "pair": "BTC_USDT"}```. ```pid``` is the ```id``` returned by GetPlatformList.
-- Pass the exchange configuration directly: ```{"eid": "Binance", "label": "test", "pair": "BTC_USDT", "meta": {"AccessKey": "...", "SecretKey": "..."}}```. ```eid``` is the exchange ID; the field names of ```meta``` are given by the ```meta``` returned by GetExchangeList; ```label``` is the exchange object's label, read in the strategy with ```exchange.GetLabel()```. The platform does not store the keys in ```meta``` but forwards them to the docker, so a bot created this way needs ```settings``` again on every restart.
+- Pass the exchange configuration directly: ```{"eid": "Binance", "label": "test", "pair": "BTC_USDT", "meta": {"AccessKey": "...", "SecretKey": "..."}}```. ```eid``` is the exchange ID; the field names of ```meta``` are given by the ```meta``` returned by GetExchangeList; ```label``` is the exchange object's label, read in the strategy with ```exchange.GetLabel()```. The platform does not store the keys in ```meta``` but forwards them to the docker, so a robot created this way needs ```settings``` again on every restart.
 
 For a custom-protocol exchange: ```{"eid": "Exchange", "label": "test", "pair": "BTC_USDT", "meta": {"AccessKey": "...", "SecretKey": "...", "Front": "http://127.0.0.1:6666/test"}}```, where ```Front``` is the address of the custom-protocol service.
 
 #### GetAccount
 
-The ```GetAccount``` method is used to retrieve account information for the FMZ Quant Trading Platform account corresponding to the ```API KEY``` in the request.
+Gets the account information of the account that owns the API key, including the balance and the total amount spent.
 
-Parameters:
+Fields:
 
-No parameters
+- `balance` (number): Account balance in USD, as an integer scaled by 1e8; divide by 1e8 for the actual value (229.44702436 in the example).
+- `consumed` (number): Total amount spent, in the same unit and scaling as ```balance```.
+- `username` (string): User name.
+- `email` (string): Account email.
+- `uid` (string): Account UID.
 
-Returns:
+Returns (object): On success ```data.result``` is the account information; its fields are in the attributes table below.
+
+Query the account balance.
+
+```python
+# api() is the function in the Python example on the signature authentication page
+r = api('GetAccount')
+print(r['data']['result']['balance'] / 1e8)   # output: 229.44702436 (USD)
+```
+
+##### Example response
 
 ```json
 {
-    "code":0,
-    "data":{
-        "result":{
-            "balance":22944702436,
-            "concurrent":0,
-            "consumed":211092719653,
-            "email":"123@qq.com",
-            "openai":false,
-            "settings":{},
-            "sns":{"wechat":true},
-            "uid":"105ea6e51bcc177926a10fdbb7e2a1d6",
-            "username":"abc"
+    "code": 0,
+    "data": {
+        "result": {
+            "balance": 22944702436,
+            "concurrent": 0,
+            "consumed": 211092719653,
+            "email": "123@qq.com",
+            "openai": false,
+            "settings": {},
+            "sns": {"wechat": true},
+            "uid": "105ea6e51bcc177926a10fdbb7e2a1d6",
+            "username": "abc"
         },
-        "error":null
+        "error": null
     }
 }
 ```
 
-- balance: Account balance in USD, stored as an integer for precision; divide by 1e8 (10 to the power of 8) to get the actual value, 229.44702436 in this example.
-- consumed: Total amount spent, same unit and conversion as ```balance```.
-
 #### GetNodeList
 
-The ```GetNodeList``` method returns the dockers available to the platform account of the ```API KEY``` in the request, including your own dockers and the platform's public dockers.
+Gets the dockers the account can use, including its own dockers and the platform's public dockers.
 
 Parameters:
 
-- `offset` (number, optional): Paging offset, default 0.
-- `limit` (number, optional): Page size; omitted or less than or equal to 0 returns everything.
+- `offset` (number, optional): Paging offset, 0 by default.
+- `limit` (number, optional): Page size; omitted or less than or equal to 0 returns all.
 
-Returns:
+Fields:
+
+- `all` (number): Total number of dockers (public dockers included).
+- `nodes` (array): Array of dockers; the fields of each element are in the rows below (self-explanatory fields are not listed).
+- `nodes[].id` (number): Docker ID, the ```node``` of a robot configuration.
+- `nodes[].build` (string): Version number.
+- `nodes[].version` (string): Detailed version information of the docker.
+- `nodes[].online` (bool): Whether the docker is online.
+- `nodes[].is_owner` (bool): ```true``` for a private docker, ```false``` for a public one.
+- `nodes[].public` (number): ```0``` for a private docker, ```1``` for a public one.
+- `nodes[].loaded` (number): Load: the number of strategy instances running on the docker.
+- `nodes[].city` (string): City.
+- `nodes[].region` (string): Region.
+- `nodes[].wd` (number): Whether the offline alert is on; ```0``` means off.
+
+Returns (object): On success ```data.result``` holds the docker count ```all``` and the docker array ```nodes```; fields are in the attributes table below.
+
+List all dockers and whether they are online.
+
+```python
+# api() is the function in the Python example on the signature authentication page
+r = api('GetNodeList')
+for node in r['data']['result']['nodes']:
+    print(node['id'], node['name'], node['online'])
+```
+
+Dockers rented with one click have extra fields starting with ```ecs_``` and ```unit_```, recording the server's provider, configuration and state, and the billing period and price.
+
+##### Example response
 
 ```json
 {
@@ -447,53 +592,52 @@ Returns:
 }
 ```
 
-Return value field descriptions (fields with obvious literal meanings are not elaborated):
-- all: Total number of dockers (public dockers included).
-- nodes: List of detailed information for docker nodes.
-  - build: Version number.
-  - city: City location.
-  - is_owner: true indicates private docker, false indicates public docker.
-  - loaded: Load amount, i.e., the number of currently running strategy instances.
-  - public: 0 indicates private docker, 1 indicates public docker.
-  - region: Geographic location.
-  - version: Detailed version information of the docker.
-  - wd: Offline alarm switch, 0 indicates not enabled.
-
-One-click deployed dockers contain additional information, with related fields prefixed by ```ecs_``` and ```unit_```, recording information about the one-click deployed docker server (operator name, configuration, status, etc.), billing cycle, price, and other information, which will not be detailed here.
-
 #### DeleteNode
 
-The ```DeleteNode``` method is used to delete a docker node under the FMZ Quant Trading Platform account corresponding to the ```API KEY``` in the request. The docker node ID to be deleted is specified by the ```nid``` parameter.
+Deletes a docker of the account; an online docker is forced to log out and all robots on it become "strategy error". Deletion cannot be undone.
 
 Parameters:
 
-- `nid` (number, required): The ```nid``` parameter is used to specify the docker ID to be deleted. You can obtain the docker information under the account through the ```GetNodeList``` method.
+- `nid` (number, required): ID of the docker to delete; see ```GetNodeList```.
 
-Returns:
+Returns (bool): ```data.result``` is ```true``` when the docker record was deleted: the platform forces the online docker to log out and sets all robots on it to "strategy error" (status code ```5```). It is ```false``` when the docker does not exist, does not belong to the account, or cannot be forced to log out.
 
-```json
-{
-    "code":0,
-    "data":{
-        "result":true,
-        "error":null
-    }
-}
+Delete the docker with ID 123.
+
+```python
+# api() is the function in the Python example on the signature authentication page
+r = api('DeleteNode', 123)
+print(r)   # output: {'code': 0, 'data': {'result': True, 'error': None}}
 ```
-
-- result: ```true``` means the docker record has been deleted. When deleting, the platform forces the docker to log out if it is online, and all bots on that docker are set to "strategy error" (status code ```5```). ```false``` when the docker does not exist, does not belong to the account, or cannot be logged out.
 
 #### GetExchangeList
 
-The ```GetExchangeList``` method is used to get the list of exchanges supported by the FMZ quantitative trading platform and their configuration information.
+Gets the exchanges the platform supports and the configuration fields each of them needs.
 
 Parameters:
 
-- `isSummary` (bool, required): The ```isSummary``` parameter is used to specify whether the returned data is summary information.
+- `isSummary` (bool, required): ```true``` returns only summary information, without ```meta``` and ```stocks```; ```false``` returns everything.
 
-Returns:
+Fields:
 
-When the ```isSummary``` parameter is ```false```, the returned data:
+- `exchanges[].eid` (string): Exchange ID, e.g. ```Futures_Binance```; used when a robot configuration passes an exchange configuration directly.
+- `exchanges[].name` (string): Display name, written ```Chinese|English```.
+- `exchanges[].category` (string): Category.
+- `exchanges[].meta` (string): Metadata of the exchange's configuration fields (JSON text), returned only when ```isSummary``` is ```false```; the field names of ```meta``` in a robot configuration come from here.
+- `exchanges[].stocks` (string): Common trading pairs, comma-separated, returned only when ```isSummary``` is ```false```.
+
+Returns (object): On success ```data.result.exchanges``` is the array of exchanges; fields are in the attributes table below.
+
+List the supported exchange IDs and names (summary).
+
+```python
+# api() is the function in the Python example on the signature authentication page
+r = api('GetExchangeList', True)
+for e in r['data']['result']['exchanges']:
+    print(e['eid'], e['name'])
+```
+
+##### Example response (isSummary false)
 
 ```json
 {
@@ -505,7 +649,7 @@ When the ```isSummary``` parameter is ```false```, the returned data:
                 "eid": "Futures_Binance",
                 "id": 74,
                 "logo": "/upload/asset/d8d84b23e573e9326b99.svg",
-                "meta": "[{\"desc\": \"Access Key\", \"qr\":\"apiKey\",\"required\": true, \"type\": \"string\", \"name\": \"AccessKey\", \"label\": \"Access Key\"}, {\"encrypt\": true, \"qr\":\"secretKey\",\"name\": \"SecretKey\", \"required\": true, \"label\": \"Secret Key\", \"type\": \"password\", \"desc\": \"Secret Key\"}]",
+                "meta": "[...]",
                 "name": "币安期货|Futures_Binance",
                 "priority": 200,
                 "stocks": "BTC_USDT,ETH_USDT,ETH_USD",
@@ -517,7 +661,18 @@ When the ```isSummary``` parameter is ```false```, the returned data:
 }
 ```
 
-When the ```isSummary``` parameter is ```true```, the returned data:
+```meta``` is JSON text; parsed, it is an array of configuration fields:
+
+```json
+[
+    {"desc": "Access Key", "qr": "apiKey", "required": true, "type": "string",
+     "name": "AccessKey", "label": "Access Key"},
+    {"encrypt": true, "qr": "secretKey", "name": "SecretKey", "required": true,
+     "label": "Secret Key", "type": "password", "desc": "Secret Key"}
+]
+```
+
+##### Example response (isSummary true)
 
 ```json
 {
@@ -539,18 +694,35 @@ When the ```isSummary``` parameter is ```true```, the returned data:
 }
 ```
 
-- meta: Exchange configuration metadata.
-
 #### GetPlatformList
 
-The ```GetPlatformList``` method is used to get the list of configured exchanges under the FMZ Quant Trading Platform account corresponding to the ```API KEY``` in the request.
+Gets the exchange accounts added to the account.
 
 Parameters:
 
-- `offset` (number, optional): Paging offset, default 0.
-- `limit` (number, optional): Page size; omitted or less than or equal to 0 returns everything.
+- `offset` (number, optional): Paging offset, 0 by default.
+- `limit` (number, optional): Page size; omitted or less than or equal to 0 returns all.
 
-Returns:
+Fields:
+
+- `all` (number): Number of exchange accounts added.
+- `platforms[].id` (number): Exchange account ID, the ```pid``` in the ```exchanges``` of a robot configuration.
+- `platforms[].eid` (string): Exchange ID, used in some configurations and parameters.
+- `platforms[].label` (string): The label set when the account was added.
+- `platforms[].stocks` (array): Common trading pairs.
+
+Returns (object): On success ```data.result``` holds the account count ```all``` and the array of exchange accounts ```platforms```; fields are in the attributes table below.
+
+List the added exchange accounts to get the ```pid``` used in robot configurations.
+
+```python
+# api() is the function in the Python example on the signature authentication page
+r = api('GetPlatformList')
+for p in r['data']['result']['platforms']:
+    print(p['id'], p['eid'], p['label'])
+```
+
+##### Example response
 
 ```json
 {
@@ -563,17 +735,18 @@ Returns:
                 "date": "2023-12-07 13:44:52",
                 "eid": "Binance",
                 "id": 123,
-                "label": "币安",
+                "label": "Binance",
                 "logo": "...",
                 "name": "币安现货|Binance",
-                "stocks": ["BTC_USDT", "LTC_USDT", "ETH_USDT", "ETC_USDT", "BTC_TUSD", "ETH_TUSD", "BNB_TUSD"],
+                "stocks": ["BTC_USDT", "LTC_USDT", "ETH_USDT", "ETC_USDT",
+                           "BTC_TUSD", "ETH_TUSD", "BNB_TUSD"],
                 "website": "..."
             }, {
                 "category": "通用协议|Custom Protocol",
                 "date": "2020-11-09 11:23:48",
                 "eid": "Exchange",
                 "id": 123,
-                "label": "XX交易所REST协议",
+                "label": "XX exchange REST protocol",
                 "logo": "...",
                 "name": "通用协议|Custom Protocol",
                 "stocks": ["BTC_USDT", "ETH_USDT"],
@@ -585,46 +758,76 @@ Returns:
 }
 ```
 
-- all: Total number of configured exchange objects.
-- platforms: Exchange related information.
-  - eid: Exchange identifier on the FMZ Quant Trading Platform, ```eid``` is required in certain configurations and parameters.
-
 #### GetStrategyList
 
-The ```GetStrategyList``` method is used to retrieve platform strategy information.
+Queries strategies by scope, type, language, keyword and other conditions.
 
 Parameters:
 
 - `offset` (number, required): Paging offset.
-- `length` (number, required): Page size; less than or equal to 0 returns everything.
-- `strategyType` (number, required): Scope of the query:
-- ```-1```: your own and rented strategies (official strategies included).
-- ```0```: your own and rented strategies (official strategies excluded).
-- ```-3```: only your own strategies.
-- ```-6```: only rented strategies (expired ones included).
-- ```-4```: official strategies.
-- ```-2```: public and paid strategies in the Strategy Square.
-- ```1```: published strategies.
-- ```2```: strategies pending review.
-- `category` (number, required): Strategy type:
-- ```-1```: all.
-- ```0```: ordinary strategies.
-- ```20```: template libraries.
-- ```21```: trading plugins.
-- `language` (number, required): Programming language of the strategy:
-- ```-1```: all languages.
-- ```0```: JavaScript.
-- ```1```: Python.
-- ```3```: a discontinued strategy type; appears only on existing strategies.
-- ```4```: MyLanguage.
-- ```5```: PINE.
-- ```6```: Workflow.
-- ```7```: Rust.
-- `kw` (string, required): Keywords matched against strategy names, separated by spaces; an empty string means no filter. Starting with ```id:``` queries by strategy ID, e.g. ```id:123,456```.
-- `groupId` (number, optional): Strategy group: ```-1``` all (default), ```0``` ungrouped, greater than 0 a specific group. Only applies to your own strategies.
-- `orderBy` (string, optional): Sort field: ```name```, ```last_modified```, ```date```, optionally followed by ``` asc``` for ascending order (default descending); an empty string keeps the default order.
+- `length` (number, required): Page size; less than or equal to 0 returns all.
+- `strategyType` (number, required): Scope, e.g. ```-3``` for only your own strategies; values are listed in the remarks.
+- `category` (number, required): Strategy type: ```-1``` all, ```0``` normal strategy, ```20``` template library, ```21``` trading plugin.
+- `language` (number, required): Programming language, ```-1``` for all; values are listed in the remarks.
+- `kw` (string, required): Keyword matched fuzzily against strategy names, several words separated by spaces; an empty string means no filter. Starting with ```id:``` queries by strategy ID, e.g. ```id:123,456```.
+- `groupId` (number, optional): Strategy group: ```-1``` all (default), ```0``` ungrouped, greater than 0 a specific group. Applies only to your own strategies.
+- `orderBy` (string, optional): Sort field: ```name```, ```last_modified``` or ```date```; append ``` asc``` for ascending (descending by default); an empty string is the default order.
 
-Returns:
+Fields:
+
+- `all` (number): Total number of matching strategies.
+- `strategies` (array): Array of strategies.
+- `strategies[].id` (number): Strategy ID, the ```strategy``` of a robot configuration.
+- `strategies[].category` (number): Strategy type, same values as the ```category``` argument.
+- `strategies[].language` (number): Programming language, same values as the ```language``` argument.
+
+Returns (object): On success ```data.result``` holds the strategy count ```all``` and the strategy array ```strategies```; fields are in the attributes table below.
+
+Get your first 10 strategies with positional arguments, or all your Rust strategies with named arguments.
+
+```python
+# api() is the function in the Python example on the signature authentication page
+r = api('GetStrategyList', 0, 10, -3, -1, -1, '')          # your first 10 strategies
+r = api('GetStrategyList', strategyType=-3, language=7)    # all your Rust strategies
+for s in r['data']['result']['strategies']:
+    print(s['id'], s['name'])
+```
+
+There is no ```needArgs``` parameter: passing an extra argument after ```category``` as old documentation did shifts the following arguments. Pass the arguments in the order above, or by name.
+
+Positional calls accept only 0, 6, 7 or 8 arguments. With no arguments (```args``` is ```[]```) the server fills in ```(-1, -1, -1, -1, 1, "")```, so ```language``` is ```1``` and only Python strategies are returned; to get all languages pass ```language``` as ```-1```, or pass arguments by name (then ```language``` defaults to ```-1```).
+
+##### Parameter values
+
+```strategyType``` (scope):
+
+| Value | Meaning |
+| - | - |
+| ```-1``` | Your own and rented strategies (official strategies included) |
+| ```0``` | Your own and rented strategies (official strategies excluded) |
+| ```-3``` | Only your own strategies |
+| ```-6``` | Only rented strategies (expired ones included) |
+| ```-4``` | Official strategies |
+| ```-2``` | Public and paid strategies in the strategy square |
+| ```1``` | Published strategies |
+| ```2``` | Strategies pending review |
+
+```category``` (strategy type): ```-1``` all, ```0``` normal strategy, ```20``` template library, ```21``` trading plugin.
+
+```language``` (programming language):
+
+| Value | Meaning |
+| - | - |
+| ```-1``` | All languages |
+| ```0``` | JavaScript |
+| ```1``` | Python |
+| ```3``` | A discontinued strategy type that appears only in existing strategies |
+| ```4``` | My language |
+| ```5``` | PINE |
+| ```6``` | Workflow |
+| ```7``` | Rust |
+
+##### Example response
 
 ```json
 {
@@ -660,27 +863,27 @@ Returns:
 }
 ```
 
-- all: Total number of strategies matching the filter criteria.
-- strategies: Detailed information of the strategies found; ```category``` and ```language``` take the values described in the parameters above.
-
-There is no ```needArgs``` parameter. Passing an extra parameter after ```category```, as older documentation did, shifts all following parameters; pass them in the order above, or by name:
-
-```plaintext
-api('GetStrategyList', 0, 10, -3, -1, -1, '')           # first 10 of your own strategies
-api('GetStrategyList', strategyType=-3, language=7)     # all of your own Rust strategies
-```
-
-Positional calls accept only 0, 6, 7 or 8 arguments. With no arguments at all (```args``` is ```[]```) the server fills in ```(-1, -1, -1, -1, 1, "")```, i.e. ```language``` is ```1``` and **only Python strategies are returned**; to list all languages pass ```language``` as ```-1```, or pass arguments by name (by name, ```language``` defaults to ```-1```).
-
 #### GetRobotGroupList
 
-The ```GetRobotGroupList``` method is used to get the list of live trading groups under the FMZ Quant Trading Platform account corresponding to the ```API KEY``` in the request.
+Gets the robot groups of the account; the "Default" group is not listed.
 
-Parameters:
+Fields:
 
-No parameters
+- `items[].id` (number): Robot group ID, the ```group``` of a robot configuration.
+- `items[].name` (string): Robot group name.
 
-Returns:
+Returns (object): On success ```data.result.items``` is the array of groups; it contains only groups you created, not the "Default" group.
+
+List the robot groups.
+
+```python
+# api() is the function in the Python example on the signature authentication page
+r = api('GetRobotGroupList')
+for g in r['data']['result']['items']:
+    print(g['id'], g['name'])
+```
+
+##### Example response
 
 ```json
 {
@@ -689,10 +892,10 @@ Returns:
         "result": {
             "items": [{
                 "id": 3417,
-                "name": "Test"
+                "name": "test"
             }, {
                 "id": 3608,
-                "name": "Live Trading Demo"
+                "name": "demo"
             }]
         },
         "error": null
@@ -700,28 +903,46 @@ Returns:
 }
 ```
 
-- items: Live trading group information.
-  - id: Live trading group ID.
-  - name: Live trading group name.
-
-The ```items``` field only records newly created groups, the "Default" group is not included in ```items```.
-
 #### GetRobotList
 
-The ```GetRobotList``` method returns the live trading bots of the platform account of the ```API KEY``` in the request. All parameters are optional.
+Gets the robots of the account, optionally filtered by status, label, name, group or strategy; all arguments can be omitted.
 
 Parameters:
 
-- `offset` (number, optional): Paging offset, default 0.
-- `length` (number, optional): Page size; less than or equal to 0 returns everything (default).
-- `customStatus` (number, optional): Filter by live trading status code, see Live Trading Status Codes; ```-1``` returns all bots (default), ```-2``` returns all bots sorted by start time.
-- `appId` (string, optional): Filter by the bot's custom label (```appid``` in ```settings``` when it was created); an empty string means no filter.
-- `kw` (string, optional): Keyword matched against bot names; an empty string means no filter.
-- `groupId` (number, optional): Live trading group: ```-1``` all (default), ```0``` ungrouped, greater than 0 a specific group.
-- `orderBy` (string, optional): Sort field: ```name```, ```status```, ```node```, ```profit```, ```date```, ```refresh```, ```start_time```, ```strategy_name```, optionally followed by ``` asc``` for ascending order (default descending); an empty string keeps the default order.
-- `strategyId` (number, optional): When greater than 0, only bots of this strategy are returned; default 0 (no filter).
+- `offset` (number, optional): Paging offset, 0 by default.
+- `length` (number, optional): Page size; less than or equal to 0 returns all (default).
+- `customStatus` (number, optional): Filter by robot status code, see `Live Trading Status Codes`; ```-1``` returns all robots (default), ```-2``` all robots sorted by start time.
+- `appId` (string, optional): Filter by the robot's custom label (```appid``` in ```settings``` at creation); an empty string means no filter.
+- `kw` (string, optional): Keyword matched fuzzily against robot names; an empty string means no filter.
+- `groupId` (number, optional): Robot group: ```-1``` all (default), ```0``` ungrouped, greater than 0 a specific group.
+- `orderBy` (string, optional): Sort field: ```name```, ```status```, ```node```, ```profit```, ```date```, ```refresh```, ```start_time``` or ```strategy_name```; append ``` asc``` for ascending (descending by default); an empty string is the default order.
+- `strategyId` (number, optional): When greater than 0, only robots of this strategy are returned; 0 (no filter) by default.
 
-Returns:
+Fields:
+
+- `all` (number): Total number of matching robots.
+- `robots` (array): Array of robots.
+- `robots[].id` (number): Robot ID.
+- `robots[].status` (number): Robot status code, see `Live Trading Status Codes`.
+- `robots[].group_id` (number): Robot group ID; robots in the default group have no such field.
+
+Returns (object): On success ```data.result``` holds the robot count ```all``` and the robot array ```robots```; fields are in the attributes table below.
+
+Get all robots, filter by label, and pass arguments by position or by name.
+
+```python
+# api() is the function in the Python example on the signature authentication page
+r = api('GetRobotList')                               # all robots
+# a single string is taken as the label: all robots labeled member2
+r = api('GetRobotList', 'member2')
+# positional: up to 100 robots labeled member2, starting at offset 0
+r = api('GetRobotList', 0, 100, -1, 'member2', '')
+r = api('GetRobotList', appId='member2', length=100)  # by name, same as above
+for robot in r['data']['result']['robots']:
+    print(robot['id'], robot['name'], robot['status'])
+```
+
+##### Example response
 
 ```json
 {
@@ -737,7 +958,7 @@ Returns:
                 "fixed_id": 4509153,
                 "id": 591026,
                 "is_sandbox": 0,
-                "name": "Test",
+                "name": "test",
                 "node_guid": "45891bcf3d57f99b08a43dff76ee1ea1",
                 "node_id": 4519153,
                 "node_public": 0,
@@ -749,7 +970,7 @@ Returns:
                 "strategy_id": 411670,
                 "strategy_isowner": true,
                 "strategy_language": 0,
-                "strategy_name": "Test",
+                "strategy_name": "test",
                 "strategy_public": 0,
                 "uid": "105ed6e511cc977921610fdbb7e2a1d6",
                 "wd": 0
@@ -760,26 +981,52 @@ Returns:
 }
 ```
 
-- all: Total number of bots matching the filters.
-- robots: Live trading bot information; ```status``` is the live trading status code.
-  - group_id: Live trading bot group ID; if the live trading bot is in the default group, the ```group_id``` field is not included.
-
-Using ```api()``` from the Python example on the signature authentication page:
-
-- ```api('GetRobotList')```: all live trading bots.
-- ```api('GetRobotList', 'member2')```: a single string is taken as the label; all bots labeled member2.
-- ```api('GetRobotList', 0, 100, -1, 'member2', '')```: positional parameters; up to 100 bots labeled member2, starting at offset 0.
-- ```api('GetRobotList', appId='member2', length=100)```: the same by parameter name.
-
 #### GetRobotDetail
 
-The ```GetRobotDetail``` method is used to get detailed information of a live trading bot under the FMZ Quant Trading Platform account corresponding to the ```API KEY``` in the request. The detailed information of the live trading bot to be retrieved is specified by the ```robotId``` parameter.
+Gets the details of one robot of the account, including its status, billing, exchange configuration and strategy arguments.
 
 Parameters:
 
-- `robotId` (number, required): The ```robotId``` parameter is used to specify the ID of the live trading bot for which to retrieve detailed information. The live trading bot information under the account, including the bot ID, can be obtained through the ```GetRobotList``` method.
+- `robotId` (number, required): Robot ID; see ```GetRobotList```.
 
-Returns:
+Fields:
+
+- `robot.status` (number): Robot status code, see `Live Trading Status Codes`.
+- `robot.name` (string): Robot name.
+- `robot.date` (string): Creation date.
+- `robot.charge_time` (number): Next billing time (Unix timestamp in seconds), i.e. the end of the period already paid for.
+- `robot.charged` (number): Total billed running time in seconds.
+- `robot.consumed` (number): Total amount charged, in USD, as an integer scaled by 1e8; 5375000000 in the example is 53.75 USD.
+- `robot.node_id` (number): Docker ID.
+- `robot.fixed_id` (number): Docker ID set in the robot configuration; ```-1``` when assigned automatically.
+- `robot.is_manager` (bool): Whether you may manage the robot.
+- `robot.is_sandbox` (number): Whether it is a demo (sandbox) robot.
+- `robot.pexchanges` (object): Exchange objects of the robot: keys are ```pid```, values are exchange IDs (```eid```), e.g. ```{"123": "Futures_OKX"}```.
+- `robot.plabels` (object): Labels of the robot's exchange objects, keyed by ```pid```.
+- `robot.strategy_exchange_pairs` (string): Default K-line period, exchange objects and trading pairs (JSON text); format in the remarks.
+- `robot.profit` (number): Robot profit.
+- `robot.public` (number): Whether the robot is public.
+- `robot.refresh` (number): Last active time (millisecond timestamp).
+- `robot.wd` (number): Whether the offline alert is on.
+
+Returns (object): On success ```data.result.robot``` is the robot information; fields are in the attributes table below.
+
+Query the status and exchange configuration of robot 123.
+
+```python
+# api() is the function in the Python example on the signature authentication page
+r = api('GetRobotDetail', 123)
+robot = r['data']['result']['robot']
+print(robot['status'], robot['pexchanges'], robot['strategy_exchange_pairs'])
+```
+
+```strategy_exchange_pairs``` is the text of a JSON array, e.g. ```"[60,[44314,42960,15445,14703],[\"BTC_USDT\",\"BTC_USDT\",\"ETH_USDT\",\"ETH_USDT\"]]"```:
+
+- ```60```: the default K-line period of the robot in seconds (1 minute here).
+- ```[44314,42960,15445,14703]```: the ```pid``` of the robot's exchange objects, in the order they were added.
+- ```["BTC_USDT","BTC_USDT","ETH_USDT","ETH_USDT"]```: the trading pair of each exchange object, matching the ```pid``` list in order.
+
+##### Example response
 
 ```json
 {
@@ -801,7 +1048,7 @@ Returns:
                 "is_deleted": 0,
                 "is_manager": true,
                 "is_sandbox": 0,
-                "name": "Test",
+                "name": "test",
                 "node_id": 123,
                 "pexchanges": {
                     "123": "Futures_OKX"
@@ -810,7 +1057,7 @@ Returns:
                     "123": "ca1aca74b9cf7d8624f2af2dac01e36d"
                 },
                 "plabels": {
-                    "123": "OKX Futures"
+                    "123": "OKX futures"
                 },
                 "priority": 0,
                 "profit": 0,
@@ -823,7 +1070,7 @@ Returns:
                 "strategy_exchange_pairs": "[60,[123],[\"ETH_USDT\"]]",
                 "strategy_id": 123,
                 "strategy_last_modified": "2024-11-21 16:49:25",
-                "strategy_name": "Test",
+                "strategy_name": "test",
                 "strategy_public": "0",
                 "uid": "105ed6e51bcc17792a610fdbb7e2a1d6",
                 "username": "abc",
@@ -835,64 +1082,99 @@ Returns:
 }
 ```
 
-- charge_time: Next billing time (Unix timestamp in seconds), i.e. the end of the period already paid for.
-- charged: Total billed time in seconds.
-- consumed: Total amount charged in USD, stored as an integer scaled by 1e8; 5375000000 in the example is 53.75 USD.
-- date: Creation date.
-- fixed_id: Docker ID assigned during live trading. If auto-assigned, this value is -1.
-- is_manager: Whether has permission to manage this live trading bot.
-- is_sandbox: Whether it is a simulated trading bot.
-- name: Live trading bot name.
-- node_id: Docker ID.
-- pexchanges: Exchange objects configured for the live trading bot, where 123 is the pid and "Futures_OKX" is the exchange ID (eid).
-- plabels: Label information for the exchange objects configured for the live trading bot.
-- profit: Live trading bot profit data.
-- public: Whether the live trading bot is public.
-- refresh: Last active time.
-- strategy_exchange_pairs: Configured exchange objects and their trading pair information.
-- wd: Whether offline alert is enabled.
-
-Explanation of the ```strategy_exchange_pairs``` attribute, using the following data as an example:
-
-```plaintext
-"[60,[44314,42960,15445,14703],[\"BTC_USDT\",\"BTC_USDT\",\"ETH_USDT\",\"ETH_USDT\"]]"
-```
-
-The first data ```60``` indicates that the default K-line period set for the live trading bot is 1 minute, i.e., 60 seconds.
-
-```[44314,42960,15445,14703]``` are the ```pid``` values of the exchange objects configured for the live trading bot (arranged in the order they were added).
-
-```[\"BTC_USDT\",\"BTC_USDT\",\"ETH_USDT\",\"ETH_USDT\"]``` are the trading pairs set for the exchange objects configured for the live trading bot (corresponding one-to-one with the pid values in the order they were added).
-
 #### GetRobotLogs
 
-The ```GetRobotLogs``` method is used to get the live trading log information under the FMZ Quant Trading Platform account corresponding to the ```API KEY``` in the request. The live trading ID for which to get log information is specified by the ```robotId``` parameter.
+Gets the strategy log, profit log, chart data and status bar data of one robot of the account.
 
 Parameters:
 
-- `robotId` (number, required): The ```robotId``` parameter is used to specify the live trading ID for which to get log information. You can use the ```GetRobotList``` method to get the live trading information under the account, which includes the live trading ID.
-- `logMinId` (number, required): The ```logMinId``` parameter is used to specify the minimum ID of log records.
-- `logMaxId` (number, required): The ```logMaxId``` parameter is used to specify the maximum ID of log records.
-- `logOffset` (number, required): The ```logOffset``` parameter is used to set the offset. Within the range determined by ```logMinId``` and ```logMaxId```, skip the specified number of records according to ```logOffset``` to determine the starting position for data retrieval.
-- `logLimit` (number, required): The ```logLimit``` parameter is used to set the number of data records to retrieve starting from the initial position.
-- `profitMinId` (number, required): The ```profitMinId``` parameter is used to set the minimum ID of profit logs.
-- `profitMaxId` (number, required): The ```profitMaxId``` parameter is used to set the maximum ID of profit logs.
-- `profitOffset` (number, required): The ```profitOffset``` parameter is used to set the offset, i.e., skip the specified number of records as the starting position.
-- `profitLimit` (number, required): The ```profitLimit``` parameter is used to set the number of data records to retrieve starting from the initial position.
-- `chartMinId` (number, required): The ```chartMinId``` parameter is used to set the minimum ID of chart data records.
-- `chartMaxId` (number, required): The ```chartMaxId``` parameter is used to set the maximum ID of chart data records.
-- `chartOffset` (number, required): The ```chartOffset``` parameter is used to set the offset.
-- `chartLimit` (number, required): The ```chartLimit``` parameter is used to set the number of records to retrieve.
-- `chartUpdateBaseId` (number, required): The ```chartUpdateBaseId``` parameter is used to set the base ID for querying update records.
-- `chartUpdateDate` (number, required): The ```chartUpdateDate``` parameter is used to set the update timestamp of data records, and the system will filter out records greater than this timestamp.
-- `summaryLimit` (number, required): The ```summaryLimit``` parameter sets whether to query the status bar data of the live trading. This parameter is an integer.
+- `robotId` (number, required): Robot ID; see ```GetRobotList```.
+- `logMinId` (number, required): Minimum ID of strategy log entries.
+- `logMaxId` (number, required): Maximum ID of strategy log entries.
+- `logOffset` (number, required): Number of records to skip within the range given by ```logMinId``` and ```logMaxId```.
+- `logLimit` (number, required): Number of records to return from the starting position.
+- `profitMinId` (number, required): Minimum ID of profit log entries.
+- `profitMaxId` (number, required): Maximum ID of profit log entries.
+- `profitOffset` (number, required): Number of records to skip.
+- `profitLimit` (number, required): Number of records to return.
+- `chartMinId` (number, required): Minimum ID of chart log entries.
+- `chartMaxId` (number, required): Maximum ID of chart log entries.
+- `chartOffset` (number, required): Number of records to skip.
+- `chartLimit` (number, required): Number of records to return.
+- `chartUpdateBaseId` (number, required): Base ID for querying updates.
+- `chartUpdateDate` (number, required): Update timestamp; only newer records are returned.
+- `summaryLimit` (number, required): Whether to return status bar data: ```0``` does not; greater than 0 returns it in ```summary``` (the value itself has no effect; at most 2MB).
+- `logExchange` (string, optional): Return only logs of this exchange object (by label); an empty string means no filter.
+- `logKeyword` (string, optional): Return only logs whose content contains this keyword; an empty string means no filter.
+- `logTypes` (string, optional): Return only these log types, comma-separated type numbers, e.g. ```"0,1,2"``` for buy, sell and cancel logs; an empty string means all types.
 
-Setting it to 0 means not querying status bar information; a value greater than 0 returns the status bar data (the number itself has no effect; at most 2MB is returned). The status bar data is stored in the ```summary``` field of the returned data.
-- `logExchange` (string, optional): Only logs of this exchange object (by label); an empty string means no filter. The three filters ```logExchange```, ```logKeyword``` and ```logTypes``` only work on the new docker; an old docker ignores them and returns all logs.
-- `logKeyword` (string, optional): Only logs whose content contains this keyword; an empty string means no filter.
-- `logTypes` (string, optional): Only logs of these types, as comma-separated log type numbers, e.g. ```"0,1,2"``` for buy, sell and cancel logs; an empty string means all types.
+Fields:
 
-Returns:
+- `logs` (array): Three objects: the query results of the strategy log, profit log and chart log tables of the robot database, in that order; the ```Arr``` of each holds the records, formatted as described in the remarks.
+- `summary` (string): Status bar data of the robot (returned when ```summaryLimit``` is greater than 0).
+- `status` (number): Robot status code, see `Live Trading Status Codes`.
+
+Returns (object): On success ```data.result``` holds the logs ```logs```, the status bar data ```summary``` and more; fields are in the attributes table below.
+
+Query the latest 10 strategy log entries and the status bar of robot 123, passing arguments by name.
+
+```python
+# api() is the function in the Python example on the signature authentication page
+r = api('GetRobotLogs', robotId=123, logLimit=10, summaryLimit=1)
+result = r['data']['result']
+for row in result['logs'][0]['Arr']:
+    print(row)
+print(result['summary'])   # status bar data
+```
+
+With this many parameters, passing them by name is recommended (missing ones take their defaults); positional calls take 15 to 19 arguments (with 15 the status bar is not queried). The three filters ```logExchange```, ```logKeyword``` and ```logTypes``` work only on new dockers; old dockers ignore them and return all logs.
+
+##### logs[0]: strategy log
+
+Each entry of ```logs[0].Arr``` is an array of: log ID (```id```), log type (```logType```), label of the exchange object (```platformId```), order ID (```orderId```), price (```price```), amount (```amount```), extra message of the log (```extra```), timestamp (```date```), contract code (```contractType```), direction (```direction```). For example:
+
+```plaintext
+"Arr": [
+    [3977, 3, "Futures_OKX", "", 0, 0, "Sell(688.9, 2): 20016", 1526954372591, "", ""],
+    [3976, 5, "", "", 0, 0, "this_week too many positions, long: 2", 1526954372410, "", ""]
+]
+```
+
+Values of ```logType```:
+
+| logType | Name | Meaning |
+| - | - | - |
+| 0 | BUY | Buy order |
+| 1 | SALE | Sell order |
+| 2 | RETRACT | Order cancelled |
+| 3 | ERROR | Error |
+| 4 | PROFIT | Profit |
+| 5 | MESSAGE | Log message |
+| 6 | RESTART | Restart |
+
+##### logs[1]: profit log
+
+The same as the profit entries of the strategy log; each entry is log ID, profit value, timestamp. In ```[202, 2515.44, 1575896700315]```, ```202``` is the log ID, ```2515.44``` the profit and ```1575896700315``` the timestamp:
+
+```plaintext
+"Arr": [
+    [202, 2515.44, 1575896700315],
+    [201, 1415.44, 1575896341568]
+]
+```
+
+##### logs[2]: chart log
+
+Each entry is log ID, chart series index, data (JSON text). In ```[23637, 0, "{\"close\":648, ...}"]```, ```23637``` is the log ID, ```0``` the series index, and the JSON text is one K-line on the chart:
+
+```plaintext
+"Arr": [
+    [23637, 0, "{\"close\":648,\"high\":650.5,\"low\":647,\"open\":650,\"x\":1575960300000}"],
+    [23636, 5, "{\"x\":1575960300000,\"y\":3.0735}"]
+]
+```
+
+##### Example response
 
 ```json
 {
@@ -930,80 +1212,21 @@ Returns:
 }
 ```
 
-- logs: Log information; the queried log data entries are stored in the Arr field.
-  The first data structure in logs contains log records from the strategy log table in the live trading database.
-  The second data structure in logs contains log records from the profit log table in the live trading database.
-  The third data structure in logs contains log records from the chart log table in the live trading database.
-- summary: Live trading status bar data.
-
-- Strategy log table in database
-  The description of the ```Arr``` attribute value in the first element (log data) of the ```logs``` attribute value (array structure) in the returned data is as follows:
-
-  ```plaintext
-  "Arr": [
-      [3977, 3, "Futures_OKX", "", 0, 0, "Sell(688.9, 2): 20016", 1526954372591, "", ""],
-      [3976, 5, "", "", 0, 0, "this_week Position too large, long: 2", 1526954372410, "", ""]
-  ],
-  ```
-
-  | id | logType | platformId (exchange object label) | orderId | price | amount | extra | date | contractType | direction |
-  | - | - | - | - | - | - | - | - | - | - |
-  | 3977 | 3 | "Futures_OKX" | "" | 0 | 0 | "Sell(688.9, 2): 20016" | 1526954372591 | "" | "" |
-  | 3976 | 5 | "" | "" | 0 | 0 | "this_week Position too large, long: 2" | 1526954372410 | "" | "" |
-
-  ```extra``` is the additional information for the printed log.
-
-  The log type descriptions corresponding to ```logType``` values are as follows:
-
-  | logType: | 0 | 1 | 2 | 3 | 4 | 5 | 6 |
-  | - | - | - | - | - | - | - | - |
-  | logType meaning: | BUY | SALE | RETRACT | ERROR | PROFIT | MESSAGE | RESTART |
-  | English meaning | Buy order log | Sell order log | Cancel order | Error | Profit | Message | Restart |
-
-- Profit chart log table in database
-  The data in this chart log table is consistent with the profit logs in the strategy log table.
-
-  ```plaintext
-  "Arr": [
-      [202, 2515.44, 1575896700315],
-      [201, 1415.44, 1575896341568]
-  ]
-  ```
-
-  Taking one log data as an example:
-
-  ```plaintext
-  [202, 2515.44, 1575896700315]
-  ```
-
-  ```202``` is the log ID, ```2515.44``` is the profit value, ```1575896700315``` is the timestamp.
-- Chart log table in database
-
-  ```plaintext
-  "Arr": [
-      [23637, 0, "{\"close\":648,\"high\":650.5,\"low\":647,\"open\":650,\"x\":1575960300000}"],
-      [23636, 5, "{\"x\":1575960300000,\"y\":3.0735}"]
-  ]
-  ```
-
-  Taking one log data as an example:
-
-  ```plaintext
-  [23637, 0, "{\"close\":648,\"high\":650.5,\"low\":647,\"open\":650,\"x\":1575960300000}"],
-  ```
-
-  ```23637``` is the log ID, ```0``` is the chart data series index, and the final data ```"{\"close\":648,\"high\":650.5,\"low\":647,\"open\":650,\"x\":1575960300000}"``` is the log data, which is the K-line data on the chart.
-
 #### NewRobot
 
-The ```NewRobot``` method creates a live trading bot under the platform account of the ```API KEY``` in the request and starts it; like creating a bot on the website, this charges fees.
+Creates a robot in the account and starts it; like creating a robot on the website, this charges fees and the robot trades for real.
 
 Parameters:
 
-- `settings` (JSON object, required): Live trading configuration; for its fields see "Live trading configuration (settings)" in Extended API Interface Details. For example:
+- `settings` (object, required): Robot configuration; fields are described under "Robot configuration (settings)" in `Extended API Interface Details`.
 
-```json
-{
+Returns (number): ```data.result```: the ID of the new robot on success; ```0``` when ```args``` in ```settings``` is not an array; a negative number when no robot was created, see the remarks.
+
+Create and start a robot with an added exchange account (```pid```).
+
+```python
+# api() is the function in the Python example on the signature authentication page
+settings = {
     "name": "test",
     "strategy": 123,
     "args": [],
@@ -1015,107 +1238,86 @@ Parameters:
     "group": 123,
     "appid": "test"
 }
+r = api('NewRobot', settings)
+print(r['data']['result'])   # output: 591988 (ID of the new robot)
 ```
 
-Returns:
+When created through the extended API, the call returns after the start-up has run. If start-up fails (e.g. the strategy does not compile), the ID of the new robot is still returned and the robot is in the "strategy error" state (status code ```5```), so check its status with ```GetRobotDetail``` after creating it.
 
-```json
-{
-    "code":0,
-    "data":{
-        "result":591988,
-        "error":null
-    }
-}
-```
+A negative result means no robot was created; see "Return values of failed starts" in `Live Trading Status Codes`, e.g. ```-2``` no docker found, ```-5``` insufficient balance. When the account exceeds the number of robots it may run, an error with ```code``` 6 is returned.
 
-- result: The ID of the new bot on success. When created through the extended API, the platform returns only after the start has been carried out; if the start fails (for example the strategy does not compile), the ID of the new bot is still returned and the bot is in the "strategy error" state (status code ```5```), so check its status with ```GetRobotDetail``` after creating it.
-  - ```0```: ```args``` in ```settings``` is not an array.
-  - A negative number: no bot was created; see "Return values when a start fails" in Live Trading Status Codes (e.g. ```-2``` no docker found, ```-5``` insufficient balance).
-
-  When the account already runs as many bots as it may, an error with ```code``` 6 is returned.
-
-When the exchange configuration is passed directly with ```eid```, the platform does not store the keys in ```meta```, so every later ```RestartRobot``` of this bot must pass ```settings``` again.
+When an exchange configuration is passed directly with ```eid```, the platform does not store the keys in ```meta```, so every later restart of the robot with ```RestartRobot``` must pass ```settings``` again.
 
 #### RestartRobot
 
-The ```RestartRobot``` method starts (restarts) a live trading bot of the platform account of the ```API KEY``` in the request; the bot is given by ```robotId```. Starting a bot charges fees.
+Starts (restarts) a robot of the account, optionally replacing its configuration; starting charges fees.
 
 Parameters:
 
-- `robotId` (number, required): Live trading bot ID, see the ```GetRobotList``` method.
-- `settings` (JSON object, optional): Live trading configuration; for its fields see "Live trading configuration (settings)" in Extended API Interface Details. When given, it **replaces** the bot's whole configuration (name, parameters, exchanges, K-line period, docker) before starting; the strategy cannot be changed. Fields you leave out do not keep their old values; ```name``` becomes an empty string, ```args``` becomes ```[]``` (all parameters back to their defaults), omitting ```exchanges``` deletes all of the bot's exchange configurations, ```period``` becomes 60 seconds and ```node``` becomes automatic assignment; only ```group``` keeps the old group when omitted or ```0```. So always pass the complete configuration; it is best to read the current one with ```GetRobotDetail``` and modify that. Passing ```settings``` while the bot is preparing, running or stopping returns an error with ```code``` 6 (```robot is running```).
+- `robotId` (number, required): Robot ID; see ```GetRobotList```.
+- `settings` (object, optional): New robot configuration; when given it replaces the whole configuration before starting, see the remarks. Fields are described under "Robot configuration (settings)" in `Extended API Interface Details`.
 
-Returns:
+Returns (number): ```data.result```: normally ```0``` (preparing), meaning the start-up has run; whether the start succeeded must be checked with ```GetRobotDetail```. Other return values are in the remarks.
 
-```json
-{
-    "code":0,
-    "data":{
-        "result":0,
-        "error":null
-    }
-}
+Start robot 123 with its current configuration.
+
+```python
+# api() is the function in the Python example on the signature authentication page
+r = api('RestartRobot', 123)
+print(r['data']['result'])   # output: 0 (preparing; the start-up has run)
 ```
 
-- result: Normally ```0``` (preparing), meaning the start has been carried out. Whether it succeeded (running, or "strategy error" because of a compile error, for example) has to be checked with ```GetRobotDetail```.
-  - If the bot is already preparing, running or stopping, it is not restarted and its current status code (```0```, ```1```, ```2```) is returned.
-  - A negative number: the start failed; see "Return values when a start fails" in Live Trading Status Codes.
+A robot created on the website with added exchange accounts (```pid```) can be started with just ```robotId```, using its current configuration. A robot whose exchange configurations were passed directly with ```eid``` (usually created through the extended API) has no stored keys, so ```settings``` must be passed on every restart.
 
-A bot created on the website with exchange accounts referenced by ```pid``` can be started with ```robotId``` alone, using its current configuration. A bot whose exchanges were passed directly with ```eid``` (usually created through the extended API) has no stored keys, so ```settings``` must be passed on every restart.
+When ```settings``` is given, it **replaces** the robot's whole configuration (name, arguments, exchanges, K-line period, docker) before the start; the strategy cannot be changed. Fields left out do not keep their old values: ```name``` becomes an empty string, ```args``` becomes ```[]``` (all arguments back to their defaults), leaving out ```exchanges``` deletes all of the robot's exchange configurations, ```period``` becomes 60 seconds and ```node``` becomes automatic; only ```group``` keeps the old group when omitted or ```0```. So always pass a complete configuration; it is best to get the current one with ```GetRobotDetail``` and modify it.
+
+Passing ```settings``` while the robot is preparing, running or stopping returns an error with ```code``` 6 (```robot is running```); without ```settings``` the robot is not restarted and its current status code (```0```, ```1``` or ```2```) is returned.
+
+A negative result means the start failed; see "Return values of failed starts" in `Live Trading Status Codes`. Whether the robot is then running, or in "strategy error" because it failed to compile, must be checked with ```GetRobotDetail```.
 
 #### StopRobot
 
-The ```StopRobot``` method is used to stop a live trading bot under the FMZ Quant Trading Platform account corresponding to the ```API KEY``` in the request. The bot Id to be stopped is specified by the ```robotId``` parameter.
+Stops a robot of the account; stopping does not close positions.
 
 Parameters:
 
-- `robotId` (number, required): The ```robotId``` parameter is used to specify the bot Id to be stopped. You can obtain the bot information under the account through the ```GetRobotList``` method, which includes the bot Id.
+- `robotId` (number, required): Robot ID; see ```GetRobotList```.
 
-Returns:
+Returns (number): ```data.result``` is the robot status code: ```2``` (stopping) means the stop command was sent to the docker; ```4``` (stopped) means the robot's docker has been deleted, so the robot was set to stopped directly; ```3```, ```4``` or ```5``` may also mean the robot had already ended.
 
-```json
-{
-    "code":0,
-    "data":{
-        "result":2,
-        "error":null
-    }
-}
+Stop robot 123.
+
+```python
+# api() is the function in the Python example on the signature authentication page
+r = api('StopRobot', 123)
+print(r['data']['result'])   # output: 2 (stopping)
 ```
 
-- result: Live trading status code.
-  - ```2``` (stopping): the stop command has been sent to the docker.
-  - ```4``` (stopped): the bot's docker has been deleted, so the bot is set to stopped directly.
-  - ```3```, ```4```, ```5```: the bot had already ended; its current status code is returned.
-
-  While the bot is being started or stopped (```robot is busy```), or when its docker is offline (```docker not found```), an error with ```code``` 6 is returned.
+While the robot is starting or stopping (```robot is busy```), or when its docker is offline (```docker not found```), an error with ```code``` 6 is returned.
 
 #### CommandRobot
 
-The ```CommandRobot``` method is used to send interactive commands to a live trading bot under the FMZ Quant Trading Platform account corresponding to the ```API KEY``` in the request. The bot Id that receives the interactive command is specified by the ```robotId``` parameter, and the interactive command is captured and returned by the ```GetCommand()``` function called in the strategy.
+Sends an interactive command to a running robot of the account; the strategy receives it with `GetCommand`.
 
 Parameters:
 
-- `robotId` (number, required): The ```robotId``` parameter is used to specify the bot Id that receives the interactive command. You can use the ```GetRobotList``` method to get information about bots under the account, which includes the bot Id.
-- `cmd` (string, required): The interactive command sent to the bot; the strategy reads it with ```GetCommand()```, see `GetCommand`.
+- `robotId` (number, required): ID of the robot that receives the command; see ```GetRobotList```.
+- `cmd` (string, required): The interactive command; the strategy reads it with ```GetCommand()```.
 
-Returns:
+Returns (bool): ```data.result``` tells whether the command was sent; it is ```false``` when the robot is not running.
 
-```json
-{
-    "code":0,
-    "data":{
-        "result":true,
-        "error":null
-    }
-}
+Send the command ```test command``` to running robot 123; its strategy receives it with ```GetCommand()``` and logs it (strategy code in the remarks).
+
+```python
+# api() is the function in the Python example on the signature authentication page
+r = api('CommandRobot', 123, 'test command')
+print(r['data']['result'])   # output: True
 ```
 
-- result: Whether the interactive command was sent successfully. When sending a command to a bot that is not running, the result in the returned data will be false.
+A strategy that receives the command:
 
-Example of bot strategy (assuming this strategy bot is running with bot Id 123):
-```js
+```javascript
+// strategy run by robot 123: print each interactive command it receives
 function main() {
     while (true) {
         var cmd = GetCommand()
@@ -1127,135 +1329,116 @@ function main() {
 }
 ```
 
-Calling ```api("CommandRobot", 123, "test command")``` with ```api()``` from the Python example on the signature authentication page, the bot with Id 123 will receive the interactive command: ```test command```, and output it through the Log function.
+To call ```CommandRobot``` from a webhook that accepts only one URL, such as TradingView, see `Direct Verification`.
 
 #### DeleteRobot
 
-The ```DeleteRobot``` method deletes a live trading bot of the platform account of the ```API KEY``` in the request; the bot is given by ```robotId```. A running bot must be stopped first. Deletion cannot be undone.
+Deletes a robot of the account; a running robot must be stopped first, and deletion cannot be undone.
 
 Parameters:
 
-- `robotId` (number, required): ID of the bot to delete, see the ```GetRobotList``` method.
-- `removeLog` (bool, optional): Whether to delete the bot's log data on the docker as well. When passing arguments by name and omitting it, the default is ```true```; when passing only ```[robotId]``` positionally, it is ```false```. Passing it explicitly is recommended.
+- `robotId` (number, required): Robot ID; see ```GetRobotList```.
+- `removeLog` (bool, optional): Whether to delete the robot's log data on the docker as well. Defaults to ```true``` when passed by name, and to ```false``` when only ```[robotId]``` is passed by position. Passing it explicitly is recommended.
 
-Returns:
+Returns (number): ```data.result```: ```0``` deleted; ```-1``` not deleted (the robot does not exist, or is running, starting or stopping); ```-2``` the robot was deleted but its docker could not be reached, so the log data was not deleted and must be removed by hand from ```logs/storage/<robotId>/``` in the docker directory (e.g. ```123.db3```).
 
-```json
-{
-    "code":0,
-    "data":{
-        "result":0,
-        "error":null
-    }
-}
+Delete the stopped robot 123 together with its log data on the docker.
+
+```python
+# api() is the function in the Python example on the signature authentication page
+r = api('DeleteRobot', robotId=123, removeLog=True)
+print(r['data']['result'])   # output: 0 (deleted)
 ```
-
-- result: Result of the deletion.
-  - 0: deleted.
-  - -1: not deleted: the bot does not exist, or it is still running, starting or stopping.
-  - -2: the bot was deleted, but its docker could not be reached, so the log data was not removed; delete it manually under ```logs/storage/<bot ID>/``` in the docker's directory (e.g. ```123.db3```).
 
 #### PluginRun
 
-The ```PluginRun``` method runs a piece of JavaScript code on a docker and returns the result. It uses the same execution mechanism as the "Debug Tool" among the development tools and trading terminal plugins (see Platform Basics → Trading Terminal → Plugin Principle and Development). No live trading bot is created and nothing is charged; one run lasts at most 5 minutes.
+Runs a piece of JavaScript code on a docker and returns the result, without creating a robot or charging fees; one run lasts at most 5 minutes, and the code can place real orders.
 
 Parameters:
 
-- `settings` (JSON object, required): Run configuration, for example:
+- `settings` (object, required): Run configuration; fields are in the attributes table below.
 
-```json
-{
+Fields:
+
+- `settings.source` (string): The code to run; its entry is ```main()```, whose return value is the result.
+- `settings.strategy` (number): Without ```source```, run the account's strategy with this ID (e.g. a trading plugin).
+- `settings.node` (number): ID of the docker that runs the code; omitted or ```-1``` chooses one automatically.
+- `settings.exchanges` (array): Exchange object configuration, written as in "Robot configuration (settings)" in `Extended API Interface Details`.
+
+Returns (string): ```data.result``` is JSON text: ```logs``` holds the lines written by ```Log()``` in the code, and ```result``` is the JSON text of the return value of ```main()```.
+
+Run code on docker 123 and get its logs and return value.
+
+```python
+# api() is the function in the Python example on the signature authentication page
+import json
+
+settings = {
     "source": "function main() {Log(\"Hello FMZ\")}",
     "node": 123,
     "period": 60,
     "exchanges": [{"pid": 123, "pair": "SOL_USDT"}]
 }
+r = api('PluginRun', settings)
+out = json.loads(r['data']['result'])
+print(out['logs'], out['result'])
 ```
 
-- source: the code to run. The entry point is ```main()```, whose return value is the result.
-- strategy: when ```source``` is not given, run the account's strategy with this ID (e.g. a trading plugin).
-- node: ID of the docker that runs the code; omitted or ```-1``` selects one automatically.
-- exchanges: exchange object configuration, same as "Live trading configuration (settings)" in Extended API Interface Details.
+It uses the same execution mechanism as the "Debugging Tool" of the development tools and trading terminal plugins; see `Plugin Principle and Development`.
 
-Returns:
+```exchanges``` can also pass an exchange configuration directly instead of referencing an exchange account on the platform, e.g. ```{"eid": "Binance", "pair": "ETH_BTC", "meta": {"AccessKey": "...", "SecretKey": "..."}}```; the field names of ```meta``` are given by the ```meta``` returned by ```GetExchangeList```. Usually only one exchange object is set in ```exchanges``` (the debugging tool page supports only one); setting two raises no error, but accessing the second exchange object in the code does.
+
+##### Example response
 
 ```json
 {
     "code": 0,
     "data": {
-        "result": "{\"logs\":[{\"PlatformId\":\"\",\"OrderId\":\"0\",\"LogType\":5,\"Price\":0,\"Amount\":0,\"Extra\":\"Hello FMZ\",\"Currency\":\"\",\"Instrument\":\"\",\"Direction\":\"\",\"Time\":1732267473108}],\"result\":\"\"}",
+        "result": "{\"logs\": [...], \"result\": \"\"}",
         "error": null
     }
 }
 ```
 
-- result: The result as a JSON string: ```logs``` holds the logs written with ```Log()```, ```result``` the JSON text of the value returned by ```main()```.
+Parsed, ```result``` is:
 
-```exchanges``` can also pass the exchange configuration directly instead of referencing an exchange account on the platform, for example:
-
-```plaintext
-{"eid": "Binance", "pair": "ETH_BTC", "meta": {"AccessKey": "...", "SecretKey": "..."}}
+```json
+{
+    "logs": [{
+        "PlatformId": "", "OrderId": "0", "LogType": 5, "Price": 0, "Amount": 0,
+        "Extra": "Hello FMZ", "Currency": "", "Instrument": "", "Direction": "",
+        "Time": 1732267473108
+    }],
+    "result": ""
+}
 ```
-
-The field names of ```meta``` are given by the ```meta``` returned by ```GetExchangeList```. Usually only one exchange object is set in ```exchanges``` (the debug tool page also supports only one); setting two causes no error, but accessing the second exchange object in the code does.
 
 #### pub
 
-The ```pub``` method pushes a message into a channel that a running robot has subscribed to, so systems outside the platform (TradingView webhook alerts, your own trading system, monitoring scripts, ...) can send data to a robot. The robot reads it with `GetChannelData`; for the channel mechanism see Advanced Topics → Communication Between Live Trading Strategies.
+Pushes a message to a channel subscribed by a running robot, so that systems outside the platform (TradingView webhook alerts, your own trading system, monitoring scripts and so on) can send data to the robot. The robot reads it with `GetChannelData`; for how channels work see `Communication Between Live Trading Strategies`.
 
-Unlike the other methods, ```pub``` **needs no API KEY and no signature**: the request URL is ```https://www.fmz.com/api/v1?method=pub&robot={robotId}&channel={channel}``` and the message goes in the request body (```POST```). Anyone who knows the robot Id and the channel name can push, so use a hard-to-guess random channel name, and have the strategy validate what it receives as untrusted input.
+Unlike the other methods, ```pub``` **needs no API key and no signature**: the request URL is ```https://www.fmz.com/api/v1?method=pub&robot={robotId}&channel={channel}``` and the message goes in the request body (```POST```). Anyone who knows the robot ID and the channel name can push, so use a hard-to-guess random string as the channel name, and have the strategy validate what it receives as untrusted input.
 
 Parameters:
 
-- `robot` (number, required): Id of the robot that receives the message (URL parameter). The robot must be running and already subscribed to ```channel```.
-- `channel` (string, required): Channel name (URL parameter); a 32-character random string (a UUID without hyphens) is recommended. It must not be all digits (digits are taken as a robot Id, i.e. that robot's own channel); channel names shorter than 10 characters are never delivered.
-- `message` (string, optional): The message. For a ```POST``` request it is the whole request body, any text such as JSON or plain text; for other requests it is the ```message``` URL parameter.
+- `robot` (number, required): ID of the robot that receives the message (URL parameter). The robot must be running and already subscribed to ```channel```.
+- `channel` (string, required): Channel name (URL parameter); a 32-character random string (a UUID without hyphens) is recommended. It must not be all digits (that is taken as a robot ID, i.e. the robot's own channel); names shorter than 10 characters are not delivered.
+- `message` (string, optional): Message content. For ```POST``` requests it is the whole request body, any text such as JSON or plain text; otherwise it is the URL parameter ```message```.
 
-Returns:
+Fields:
 
-On success:
+- `data.status` (string): ```"ok"``` on success.
+- `data.robot` (number): Echo of the request's ```robot``` parameter.
+- `data.channel` (string): Echo of the request's ```channel``` parameter.
+- `data.message` (string): The message pushed.
+- `data.affected` (number): Number of dockers that received the message.
 
-```json
-{
-    "code": 0,
-    "data": {
-        "status": "ok",
-        "robot": 123456,
-        "channel": "6BC42A119B5DBFA2188A8279DA3B5C30",
-        "message": "{\"id\": 1, \"action\": \"buy\", \"symbol\": \"BTC_USDT\"}",
-        "affected": 1
-    }
-}
-```
+Returns (object): On success ```code``` is 0 and the fields of ```data``` are in the attributes table below; when no robot subscribes to the channel (or the channel name is invalid, or ```robot``` is empty), the HTTP status is 500 and ```code``` is 5.
 
-- status: ```"ok"```.
-- robot, channel, message: the parameters of the request.
-- affected: the number of dockers that received the message.
+Receiving strategy: subscribe to the channel, parse the JSON messages it receives, and use ```id``` to tell new messages from old ones.
 
-When no robot has subscribed to the channel (or the channel name is invalid, or ```robot``` is missing) the HTTP status is 500 and ```code``` is 5:
-
-```json
-{
-    "code": 5,
-    "error": "No subscribers for channel: 6BC42A119B5DBFA2188A8279DA3B5C30",
-    "data": null
-}
-```
-
-**Delivery rules**
-
-- Subscribe first, then push: the robot's first call to ```GetChannelData(channel)``` subscribes to the channel (and returns a null value); the subscription is reported with the docker's heartbeat, so wait a moment before the external system can push successfully. Without a subscribed robot the request fails.
-- The message is delivered to the docker that runs robot ```robot```; every robot on that docker subscribed to the same channel receives it, robots on other dockers do not.
-- A channel keeps only the latest message, there is no queue: ```GetChannelData()``` returns the most recent message every time and reading does not clear it. To tell new messages from old ones, put an increasing number or timestamp in the message.
-- A robot can subscribe to at most 10 channels (including other robots' channels); beyond that ```GetChannelData()``` returns a null value and logs the error ```channel subscriber exceed limit```.
-- The robot receives a **string** (the raw request body). When the body is JSON text, the strategy has to parse it once more.
-
-**Example**
-
-Receiving strategy:
-
-```js
-// Receiving robot (assume its Id is 123456)
+```javascript
+// receiving robot (assume its ID is 123456)
 var CHANNEL = "6BC42A119B5DBFA2188A8279DA3B5C30"
 
 function main() {
@@ -1265,13 +1448,14 @@ function main() {
         if (typeof msg == "string") {
             var obj = null
             try {
-                obj = JSON.parse(msg)          // parse once more when the body is JSON text
+                obj = JSON.parse(msg)          // parse again when the body is JSON text
             } catch (e) {
                 Log("non-JSON message:", msg)
             }
-            if (obj && obj.id != lastId) {     // the channel keeps only the latest message; use id to spot new ones
+            // the channel keeps only the latest message; use id to spot new ones
+            if (obj && obj.id != lastId) {
                 lastId = obj.id
-                Log("external message:", obj)
+                Log("external message received:", obj)
             }
         }
         Sleep(1000)
@@ -1290,28 +1474,64 @@ def main():
         msg = GetChannelData(CHANNEL)    # the first call subscribes and returns None
         if isinstance(msg, str):
             try:
-                obj = json.loads(msg)    # parse once more when the body is JSON text
+                obj = json.loads(msg)    # parse again when the body is JSON text
             except ValueError:
                 obj = None
                 Log("non-JSON message:", msg)
             if isinstance(obj, dict) and obj.get("id") != lastId:
                 lastId = obj.get("id")
-                Log("external message:", obj)
+                Log("external message received:", obj)
         Sleep(1000)
 ```
 
+##### Delivery rules
+
+- Subscribe first, then push: the robot's first ```GetChannelData(channel)``` call subscribes to the channel (and returns a null value); the subscription is reported with the docker's heartbeat, so the external system can push successfully only after a short while. Requests fail while no robot subscribes.
+- The message is delivered to the docker of the ```robot``` robot, and every robot on that docker subscribed to the same channel receives it; robots on other dockers do not.
+- A channel keeps only the latest message, with no queue: ```GetChannelData()``` returns the most recent one each time, and reading does not clear it. To tell new messages from old ones, include an increasing number or a timestamp in the message.
+- Each robot can subscribe to at most 10 channels (other robots' channels included); beyond that ```GetChannelData()``` returns a null value and logs the error ```channel subscriber exceed limit```.
+- The robot receives a **string** (the raw request body). When the body is JSON text, the strategy has to parse it again.
+
+##### Example push request
+
 An external system pushes a message:
 
-```shell
-curl -X POST "https://www.fmz.com/api/v1?method=pub&robot=123456&channel=6BC42A119B5DBFA2188A8279DA3B5C30" \
+```bash
+curl -X POST \
+     "https://www.fmz.com/api/v1?method=pub&robot=123456&channel=6BC42A119B5DBFA2188A8279DA3B5C30" \
      -d '{"id": 1, "action": "buy", "symbol": "BTC_USDT"}'
 ```
 
 In TradingView, put the URL above in the alert's webhook URL; the alert message becomes the request body.
 
+##### Example response
+
+```json
+{
+    "code": 0,
+    "data": {
+        "status": "ok",
+        "robot": 123456,
+        "channel": "6BC42A119B5DBFA2188A8279DA3B5C30",
+        "message": "{\"id\": 1, \"action\": \"buy\", \"symbol\": \"BTC_USDT\"}",
+        "affected": 1
+    }
+}
+```
+
+When no robot subscribes to the channel:
+
+```json
+{
+    "code": 5,
+    "error": "No subscribers for channel: 6BC42A119B5DBFA2188A8279DA3B5C30",
+    "data": null
+}
+```
+
 ## Extended API Interface Return Codes
 
-The extended API returns this structure:
+Every response of the extended API has the JSON structure below: ```code``` tells whether the request itself succeeded, and the method's result is in ```data```.
 
 ```json
 {
@@ -1332,8 +1552,8 @@ The extended API returns this structure:
 | Invalid signature | 2 |
 | Nonce error: the ```nonce``` is not greater than the previous one, or differs from server time by more than 1 hour | 3 |
 | Invalid method: the method does not exist, is not public, or this API KEY has no permission for it | 4 |
-| Invalid arguments: ```args``` is not valid JSON, or the request cannot be dispatched (e.g. ```method``` and ```args``` have different counts) | 5 |
-| The method failed while running (e.g. no permission for the live trading, the live trading is busy, the number of running live tradings is exceeded): the message is in the top-level ```error``` field and ```data``` is ```null``` | 6 |
+| Invalid arguments: ```args``` is not valid JSON, or the request cannot be dispatched (e.g. mismatched ```method```/```args``` counts) | 5 |
+| The method failed while running (e.g. no permission for the robot, robot busy, too many running robots); see below | 6 |
 | The request's source IP is not in this API KEY's IP whitelist | 7 |
 
 With ```code``` 0 the method's result is in ```data.result```. When the number or types of the arguments do not match the method, ```code``` is still 0, ```data.result``` is ```null``` and ```data.error``` holds the error message (```null``` on success). For example, with the wrong number of arguments:
@@ -1348,7 +1568,7 @@ With ```code``` 0 the method's result is in ```data.result```. When the number o
 }
 ```
 
-When the method fails while running, ```code``` is 6, the message is in the top-level ```error``` field and ```data``` is ```null```. For example, when operating on a live trading that is not yours:
+When the method fails while running, ```code``` is 6, the message is in the top-level ```error``` field and ```data``` is ```null```. For example, when operating on a robot that is not yours:
 
 ```json
 {
@@ -1360,7 +1580,7 @@ When the method fails while running, ```code``` is 6, the message is in the top-
 
 ## Live Trading Status Codes
 
-The ```status``` field in the data returned by ```GetRobotList```, ```GetRobotDetail``` and ```GetRobotLogs``` is the live trading status code:
+The ```status``` field in the data returned by ```GetRobotList```, ```GetRobotDetail``` and ```GetRobotLogs``` is the robot status code, with these values.
 
 | Status | Code |
 | - | - |
@@ -1371,111 +1591,17 @@ The ```status``` field in the data returned by ```GetRobotList```, ```GetRobotDe
 | Stopped | 4 |
 | Strategy error | 5 |
 
-**Return values when a start fails**
+### Return values when a start fails
 
 Negative codes never appear in the ```status``` field; they are only returned by ```NewRobot``` and ```RestartRobot``` when the start fails:
 
 | Meaning | Code |
 | - | - |
-| Strategy not usable: the rental has expired, the strategy is neither yours nor rented, it has been deleted, or the given strategy version does not exist | -1 |
+| Strategy not usable: rental expired, neither yours nor rented, deleted, or the given version does not exist | -1 |
 | No usable docker: the given docker is offline, or no docker is online | -2 |
 | Failed to read the live trading or account data | -3 |
-| The live trading's status changed at the same time as the start (```RestartRobot``` only); query it again and retry | -4 |
+| The robot's status changed at the same time as the start (```RestartRobot``` only); query it again and retry | -4 |
 | Insufficient balance | -5 |
 | The concurrency limit of a rented strategy has been reached and the strategy has no overage price | -6 |
 
-Errors such as exceeding the number of live tradings the account may run, or having no permission for the live trading, are not reported as return values but as an error with ```code``` 6; see Extended API Interface → Extended API Interface Return Codes.
-
-## AI Integration
-
-Connect FMZ to an AI coding assistant (AI agent) such as Claude Code, Codex or Cursor, and you can write strategies, run backtests, create and manage live trading, and read logs and profit just by talking to it. The assistant reaches these functions through the platform's MCP (Model Context Protocol) service, with an API KEY created for it alone; you choose its permissions when you approve it and can change or revoke them at any time.
-
-**Connect with one sentence**
-
-Tell your AI assistant:
-
-```
-Read https://www.fmz.com/agent/setup.md and connect to FMZ
-```
-
-The assistant follows that page; your only step is one click in the browser:
-
-1. The assistant requests authorization and shows you a link such as ```https://www.fmz.com/agent/authorize?code=XXXX-XXXX```, valid for 10 minutes.
-2. Open it in a browser where you are logged in to FMZ, check the requester's name and the permissions, and approve. You can untick permissions you do not want to grant.
-3. The assistant receives an API KEY, writes it into its own MCP configuration and connects. From then on you can simply ask it to "list my live trading" or "backtest this strategy".
-
-The assistant names the key "name @ machine" (for example ```Claude Code @ MacBook```). When a request with the same name is approved again, the old key is revoked and replaced, so connecting again does not pile up keys.
-
-**Permissions**
-
-| Permission | Allows | Default |
-| - | - | - |
-| read | Lists and details of strategies, live trading, nodes and exchange accounts; logs, messages, account summary (never any secret) | Yes |
-| backtest | Start, query and stop backtests | Yes |
-| write | Save strategies and versions, groups, alert switches; change the configuration of stopped live trading | Yes |
-| trade | Create, start and stop live trading, send interactive commands (costs balance and places real orders) | Yes |
-| danger | Delete strategies, live trading and nodes; publish strategies | No |
-
-```danger``` is never granted by default: the assistant has to request it explicitly and you have to tick it on the approval page. Before calling a ```[trade]``` or ```[danger]``` tool the assistant should ask you first.
-
-**Manual configuration**
-
-Clients that cannot run commands (for example Cherry Studio) can be configured by hand:
-
-1. Create an API KEY under Account settings → API KEY (```https://www.fmz.com/m/account#apikey```) and note its Access Key and Secret Key.
-2. Add an MCP server of type Streamable HTTP to the client:
-   - URL: ```https://www.fmz.com/api/mcp/<Access Key>```
-   - Header: ```Authorization: Bearer <Secret Key>```
-
-The Secret Key goes in the header only, never in the URL. Examples:
-
-```bash
-# Claude Code
-claude mcp add --transport http fmz "https://www.fmz.com/api/mcp/<Access Key>" --header "Authorization: Bearer <Secret Key>"
-```
-
-```json
-{"mcpServers": {"fmz": {"url": "https://www.fmz.com/api/mcp/<Access Key>", "headers": {"Authorization": "Bearer <Secret Key>"}}}}
-```
-
-The JSON is for Cursor (```~/.cursor/mcp.json```) and other clients that speak Streamable HTTP; Claude Desktop needs the ```npx mcp-remote``` bridge described in the setup page.
-
-**Install the skills (recommended)**
-
-The skills are knowledge packs written for AI assistants: platform workflow, the full API reference, how to write strategies in each language, backtesting and indicators. With them installed the assistant writes noticeably more accurate strategies. In a terminal:
-
-```bash
-npx skills add fmzquant/skills --global --yes -a claude-code
-```
-
-Put your assistant's name after ```-a``` (claude-code, codex, cursor, gemini-cli, ...). They can also be read on GitHub: ```https://github.com/fmzquant/skills```.
-
-**Available tools**
-
-Once connected the assistant can use the tools below; the list the assistant sees is authoritative:
-
-| Permission | Tools |
-| - | - |
-| read | ```ping```, ```get_account_summary```, ```list_exchanges```, ```list_platforms```, ```list_nodes```, ```list_strategies```, ```get_strategy```, ```list_strategy_versions```, ```get_strategy_version```, ```list_robots```, ```get_robot```, ```get_robot_logs```, ```get_robot_profit```, ```get_robot_output```, ```list_messages```, ```list_groups```, ```revoke_my_key``` |
-| backtest | ```run_backtest```, ```get_backtest```, ```list_backtests```, ```stop_backtest``` |
-| write | ```check_strategy```, ```save_strategy```, ```save_strategy_version```, ```delete_strategy_version```, ```update_robot```, ```save_group```, ```move_to_group```, ```delete_group```, ```set_robot_alert```, ```set_node_alert```, ```delete_messages``` |
-| trade | ```create_robot```, ```start_robot```, ```stop_robot```, ```restart_robot```, ```send_robot_command```, and the trading terminal plugin tools ```plugin_*``` (market data, orders, ...) |
-| danger | ```delete_strategy```, ```delete_robot```, ```delete_node```, ```publish_strategy``` |
-
-A typical session: ```list_platforms``` and ```list_nodes``` to see which exchange accounts and nodes the account has; ```save_strategy``` to save a strategy and ```check_strategy``` to check it; ```run_backtest``` and ```get_backtest``` to backtest; then ```create_robot``` to go live and ```get_robot``` / ```get_robot_logs``` to watch it.
-
-**Security and management**
-
-- Exchange API KEYs never pass through the assistant: add them on the Exchanges page of the website and the assistant picks them by id. No tool result ever contains a secret.
-- At ```https://www.fmz.com/m/account#apikey``` you can see the key the assistant uses, change its permissions or lock it. Besides the permission names above, permissions can list tool names, and ```!tool_name``` excludes one tool.
-- When you are done, ask the assistant to call ```revoke_my_key``` to revoke its own key, or delete it on that page.
-- ```stop_robot``` stops live trading; it does not close positions.
-- The first time the assistant creates live trading, backtest first and then run on a demo account or with a small amount.
-
-**Common problems**
-
-- No online node: live trading needs at least one online node, see Platform Basics → Nodes.
-- Too many backtests: concurrent backtests are limited; have the assistant ```stop_backtest``` the ones it no longer needs.
-- The assistant says a tool is missing or a call is refused: the key lacks that permission; change it on the API KEY page and reconnect.
-
-The same API KEY also works with the Extended API (Extended API Interface) for scripts and schedulers; prefer MCP wherever it can be used.
+Errors such as exceeding the number of robots the account may run, or having no permission for the live trading, are not reported as return values but as an error with ```code``` 6; see `Extended API Interface Return Codes`.
