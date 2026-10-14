@@ -5747,7 +5747,7 @@ fn main() {
 
 也可以将参数附加在```side```参数之后（旧写法），格式为```"side;{JSON对象}"```或```"side;key=value&key=value"```，例如```"buy;{\"priceMatch\":\"QUEUE_20\"}"```或```"buy;priceMatch=QUEUE_20"```。具体支持哪些参数取决于交易所API。
 
-仅以下交易所支持：`Binance`、`Futures_Binance`、`Bitfinex`、`Futures_Bitfinex`、`Bitget`、`Futures_Bitget`、`Bybit`、`Futures_Bybit`、`Crypto`、`Futures_Crypto`、`Futures_DeepCoin`、`Futures_Deribit`、`GateIO`、`Futures_GateIO`、`HitBTC`、`Kraken`、`Futures_Kraken`、`KuCoin`、`Futures_MEXC`、`OKEX`、`Futures_OKCoin`、`Poloniex`、`Upbit`、`WOO`、`Futures_WOO`、`Hyperliquid`、`Futures_Hyperliquid`、`Futures_Lighter`、`Futures_Aevo`、`Futures_Boros`、`Futures_WOOFi`、`Futures_Futu`。其余交易所调用时报错并返回空值，所有交易所的对照见`能力矩阵`。
+仅以下交易所支持：`Binance`、`Futures_Binance`、`Bitfinex`、`Futures_Bitfinex`、`Bitget`、`Futures_Bitget`、`Bybit`、`Futures_Bybit`、`Crypto`、`Futures_Crypto`、`Futures_DeepCoin`、`Futures_Deribit`、`GateIO`、`Futures_GateIO`、`HitBTC`、`Kraken`、`Futures_Kraken`、`KuCoin`、`Futures_MEXC`、`OKEX`、`Futures_OKCoin`、`Poloniex`、`Upbit`、`WOO`、`Futures_WOO`、`Hyperliquid`、`Futures_Hyperliquid`、`Futures_Lighter`、`Futures_Aevo`、`Futures_Boros`、`Futures_WOOFi`、`Jupiter`、`Futures_Futu`。其余交易所调用时报错并返回空值，所有交易所的对照见`能力矩阵`。
 
 See also: `exchange.CreateOrder`, `exchange.CancelOrder`, `exchange.GetOrder`, `exchange.GetOrders`
 
@@ -9113,6 +9113,7 @@ fn main() {
 | ```io``` | `Exchange` |
 | ```isolatedTransfer``` | `Futures_Boros` |
 | ```key``` | `OKX_DEX`、`Web3` |
+| ```kyberApiKey``` | `KyberSwap` |
 | ```lock``` | `Futures_Futu` |
 | ```logs``` | `Web3` |
 | ```lp.add``` | `Uniswap`、`Jupiter` |
@@ -9194,7 +9195,9 @@ fn main() {
 | ```trade_normal``` | `AscendEx`、`Binance`、`Bybit`、`Crypto`、`GateIO`、`Huobi`、`OKEX`、`WOO` |
 | ```trade_super_margin``` | `Binance`、`GateIO`、`Huobi`、`OKEX` |
 | ```transfer``` | `Uniswap`、`Jupiter`、`KyberSwap`、`OneInch` |
+| ```trigger.api``` | `Jupiter` |
 | ```trigger.simulate``` | `Jupiter` |
+| ```trigger.vault``` | `Jupiter` |
 | ```unified``` | `Binance`、`Futures_Binance`、`GateIO`、`Futures_GateIO`、`Futures_HuobiDM` |
 | ```uniswapV3``` | `Web3` |
 | ```unlock``` | `Futures_Futu` |
@@ -23579,7 +23582,7 @@ fn main() {
 | `Futures_Boros` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `Futures_WOOFi` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `Uniswap` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✗ |
-| `Jupiter` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✓ |
+| `Jupiter` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `KyberSwap` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✗ |
 | `OneInch` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✗ |
 | `OKX_DEX` | ✓ | ✓ | ✓ | ✗ | ✗ | ✓ | ✗ | ✗ |
@@ -27781,7 +27784,7 @@ See also: `Uniswap`, `exchange.IO`, `exchange.IO("deadline")`, `exchange.IO("sim
 
 #### Jupiter
 
-连接Solana链上的Jupiter聚合器，把兑换映射为现货交易函数。一个交易所对象对应一个Solana钱包：报价和兑换交易由Jupiter Swap API生成（它在Solana上的众多DEX和做市商之间拆单选路），托管者用配置的私钥签名后经Solana节点广播。不填Jupiter API Key时使用免费的```lite-api.jup.ag```，填写后使用```api.jup.ag```。
+连接Solana链上的Jupiter聚合器，把兑换映射为现货交易函数。一个交易所对象对应一个Solana钱包：报价和兑换交易由Jupiter Swap API生成（它在Solana上的众多DEX和做市商之间拆单选路），托管者用配置的私钥签名后经Solana节点广播。不填Jupiter API Key时使用免费的```lite-api.jup.ag```，填写后使用```api.jup.ag```；**注意：填写API Key后，计价币为USDC、USDT的原生限价单与定投默认改用Jupiter Trigger V2，资金要存入Jupiter托管的vault（不再留在链上自己的订单账户）**；要保持非托管的v1，在策略开头调用```exchange.IO("trigger.api", "v1")```。见下文「限价单」「定投」。
 
 同一个交易所对象还提供Meteora DLMM、Raydium CLMM与Orca Whirlpools池子的集中流动性（```exchange.IO("lp.*", ...)```，见下文「集中流动性」）：交易由连接器自己构造、签名并经Solana节点广播，指令与返回字段对齐Uniswap交易所对象的LP指令。
 
@@ -27795,11 +27798,12 @@ pump.fun打新（```exchange.IO("pump.*", ...)```，见下文「Pump.fun打新�
 | - | - | - | - |
 | 钱包私钥 | 是 | — | Solana钱包私钥：Phantom、Solflare导出的base58字符串，或solana-keygen生成的JSON字节数组。 |
 | 节点地址 | 否 | ```https://api.mainnet-beta.solana.com,https://solana-rpc.publicnode.com``` | Solana RPC节点，多个用逗号分隔，某个节点出错时自动换下一个。默认为官方公共节点和publicnode。 |
-| Jupiter API Key | 否 | — | 可选。不填时使用免费的```lite-api.jup.ag```；填写后使用```api.jup.ag```，请求速率可按套餐提高（见```exchange.IO("rps", ...)```）。 |
+| Jupiter API Key | 否 | — | 可选。（详见表下） |
 | 流动性来源 | 否 | — | 可选。（详见表下） |
 
 表中长说明的其余部分：
 
+- Jupiter API Key：不填时使用免费的```lite-api.jup.ag```；填写后使用```api.jup.ag```，请求速率可按套餐提高（见```exchange.IO("rps", ...)```），并且计价币为USDC、USDT的原生限价单与定投默认改用Jupiter Trigger V2（资金存入Jupiter托管的vault，见「限价单」「定投」；要保持非托管的v1，调用```exchange.IO("trigger.api", "v1")```）。API Key在Jupiter开发者平台申请；设置了接口权限的Key要包含Trigger。
 - 流动性来源：只经过这些流动性来源兑换，例如```pump```（pump.fun的bonding curve与PumpSwap）、```meteora```、```raydium```、```orca```，或Jupiter的来源名；不填表示全部来源。运行中可用```exchange.IO("dexes", ...)```修改。
 
 ##### 交易对与合约代码
@@ -27816,11 +27820,13 @@ SOL为原生币，兑换时自动包装、解包。内置代币：SOL、USDC、U
 | ```token``` | [name, mint] | 登记代币（只在本次运行中有效），登记后的代币名可以直接写在交易对里；不传参数时列出代币表。见子页`exchange.IO("token", ...)`。 | 登记时返回```{symbol, mint, decimals}```，列表时返回```{symbol, mint, decimals, native}```数组。 |
 | ```transfer``` | to, amount | 从钱包转出SOL；```amount```可传```all```转出全部余额（扣除手续费）。只支持SOL，第三个参数传其它代币会报错。只等广播，不等上链。见子页`exchange.IO("transfer", ...)`。 | ```{signature, amount, lastValidBlockHeight}``` |
 | ```receipt``` | signature[, waitMs] | 查询一笔Solana交易的状态，可等待到确认或失败（最多10分钟）。查询订单时传订单ID中逗号后面的交易签名。见子页`exchange.IO("receipt", ...)`。 | ```{signature, state, slot, confirmationStatus, err, fee, blockTime}```，```state```为```success```、```failed```或```pending```；```fee```、```blockTime```只在确认或失败后才有。（详见表下） |
-| ```dca.create``` | params | 创建定投（Jupiter Recurring，按时间）：```params```为```{symbol, side, total, perOrder, numberOfOrders, interval, minPrice, maxPrice, startAt}```。（详见表下） | ```{id, signature, symbol, side, total, perOrder, numberOfOrders, interval, minPrice, maxPrice, startAt, priorityFeeLamports}```，```id```为定投订单账户地址。 |
-| ```dca.list``` | [params] | 列出钱包的定投：```params.status```为```active```（缺省，进行中）或```history```（已结束），```params.symbol```只列这个交易对。 | ```[{id, symbol, side, state, total, perOrder, numberOfOrders, ordersFilled, interval, minPrice, maxPrice, spent, received, filledQty, avgPrice, fee, createdAt, updatedAt, openTx, closeTx, info}]```：```state```为```active```、```completed```或```canceled```；```spent```为已花出的输入币，```received```为已换到的输出币（```fee```为其中被扣的手续费，输出币计），```filledQty```、```avgPrice```为按基础币折算的成交量与均价；```info```为Jupiter的原始行。 |
-| ```dca.cancel``` | id | 撤销一笔进行中的定投，剩余的输入币与未提取的输出币退回钱包。只等广播，不等上链。 | ```{id, signature, priorityFeeLamports}``` |
-| ```dca.simulate``` | params[, wallet] | 按```dca.create```的参数生成交易，用节点的```simulateTransaction```执行（不签名、不广播），用来在下单前检查余额、最低金额等；```params```写成```{cancel: id}```时模拟撤销这笔定投。（详见表下） | ```{ok, err, reason, logs, unitsConsumed, wallet, id, plan, priorityFeeLamports}```：```ok```为模拟是否成功，失败时```reason```为原因；```plan```为换算后的定投参数。 |
-| ```trigger.simulate``` | params[, wallet] | 生成Jupiter限价单的挂单交易并用节点的```simulateTransaction```执行（不签名、不广播）：```params```为```{symbol, side, price, amount, expiry, slippage}```，含义同下单（```amount```为基础币数量，```expiry```、```slippage```同下单附加参数）；写成```{cancel: orderId}```时模拟撤销这张限价单。（详见表下） | ```{ok, err, reason, logs, unitsConsumed, wallet, order, makingAmount, takingAmount, priorityFeeLamports}```：```order```为订单账户地址，```makingAmount```、```takingAmount```为付出、换回的最小单位数量。 |
+| ```dca.create``` | params | 创建定投。（详见表下） | ```{id, version, signature, symbol, side, total, perOrder, numberOfOrders, interval, minPrice, maxPrice, startAt, priorityFeeLamports}```：```version```为```v1```或```v2```；v1的```id```为定投订单账户地址，V2的```id```为Jupiter的订单UUID，```signature```为存入交易，另有```vault```。 |
+| ```dca.list``` | [params] | 列出钱包的定投（v1在前；配置了API Key或```trigger.api```为```v2```时再列V2）：```params.status```为```active```（缺省，进行中）或```history```（已结束），```params.symbol```只列这个交易对。 | ```[{id, version, symbol, side, state, total, perOrder, numberOfOrders, ordersFilled, interval, minPrice, maxPrice, spent, received, filledQty, avgPrice, fee, createdAt, updatedAt, openTx, closeTx, info}]```：```state```为```active```、```completed```或```canceled```，V2另有```pending```（存入中）、```canceling```（已撤销、未取回）、```failed```（存入失败），V2行另有```nextFillAt```，```fee```为```null```（手续费已含在换到的币里）；```spent```为已花出的输入币，```received```为已换到的输出币（```fee```为其中被扣的手续费，输出币计），```filledQty```、```avgPrice```为按基础币折算的成交量与均价；```info```为Jupiter的原始行。 |
+| ```dca.cancel``` | id | 撤销一笔进行中的定投，剩余的输入币退回钱包，按```id```的形状分v1、V2（V2的定投号是UUID，要配置API Key）。（详见表下） | v1：```{id, version, signature, priorityFeeLamports}```；V2：```{id, version, signature, refund, refundCurrency, roundsRemaining, info}```，```signature```为取回交易，```refund```为退回的输入币数量。 |
+| ```dca.simulate``` | params[, wallet] | 按```dca.create```的参数生成交易，用节点的```simulateTransaction```执行（不签名、不广播），用来在下单前检查余额、最低金额等；```params```写成```{cancel: id}```时模拟撤销这笔定投。（详见表下） | ```{ok, err, reason, logs, unitsConsumed, wallet, id, plan, priorityFeeLamports}```（V2另有```version```、```vault```，没有```id```）：```ok```为模拟是否成功，失败时```reason```为原因；```plan```为换算后的定投参数。 |
+| ```trigger.simulate``` | params[, wallet] | 生成Jupiter限价单的挂单交易并用节点的```simulateTransaction```执行（不签名、不广播）：```params```为```{symbol, side, price, amount, expiry, slippage}```，含义同下单（```amount```为基础币数量，```expiry```、```slippage```同下单附加参数）；写成```{cancel: orderId}```时模拟撤销这张限价单。（详见表下） | v1：```{ok, err, reason, logs, unitsConsumed, wallet, order, makingAmount, takingAmount, priorityFeeLamports}```，```order```为订单账户地址，```makingAmount```、```takingAmount```为付出、换回的最小单位数量；V2：```{ok, err, reason, logs, unitsConsumed, version, wallet, vault, inputMint, inputAmount, triggerPriceUsd, triggerCondition, expiresAt, priorityFeeLamports}```。 |
+| ```trigger.api``` | [mode] | 新挂的原生限价单（```tif```为```gtc```）与新建的定投用哪套接口：```auto```（缺省）为配置了API Key且计价币为USDC或USDT时用Trigger V2（托管vault），否则用v1；```v1```为一律用v1（非托管，资金在链上订单账户），配置了API Key也一样；```v2```为一律用V2，计价币不是USDC、USDT时下单报错，没有配置API Key也照用（Jupiter目前放行不带Key的V2调用，但官方文档写的是必须带Key，随时可能收紧）。（详见表下） | 当前模式：```auto```、```v1```或```v2```。 |
+| ```trigger.vault``` | — | 查询本钱包在Jupiter Trigger V2的托管vault及其中的余额（需要配置API Key，或```exchange.IO("trigger.api", "v2")```）。（详见表下） | 还没有vault时为```{wallet, registered: false}```；否则为```{wallet, registered: true, vault, sol, tokens, info}```，```tokens```为```[{mint, symbol, amount, raw}]```（```symbol```只对代币表中的币给出），```info```为Jupiter返回的vault信息。 |
 | ```slippage``` | [ratio] | 市价单的滑点保护比例，范围```[0, 0.5)```，默认```0.005```（0.5%），由链上程序强制执行。限价单不使用这个设置。不传参数时查询。见子页`exchange.IO("slippage", ...)`。 | 当前滑点比例。 |
 | ```priorityFee``` | [sol] | 每笔兑换交易的优先费上限（SOL），范围0到0.1，默认0.001；实际优先费由Jupiter按网络拥堵情况估算，不超过上限。不传参数时查询。见子页`exchange.IO("priorityFee", ...)`。 | 当前上限（SOL）。 |
 | ```dexes``` | [sources] | 限定兑换经过的流动性来源（逗号分隔）：分组简写```pump```、```meteora```、```raydium```、```orca```，或Jupiter的来源名（区分大小写）；```""```表示不限定。行情、询价和下单都只经过这些来源。不传参数时查询。见子页`exchange.IO("dexes", ...)`。 | 当前限定的来源名数组（分组已展开；空数组表示不限定）。 |
@@ -27856,9 +27862,12 @@ SOL为原生币，兑换时自动包装、解包。内置代币：SOL、USDC、U
 
 表中长说明的其余部分：
 
-- ```dca.create```：```side```为```buy```时用计价币分批买入基础币，```total```、```perOrder```按计价币计；为```sell```时分批卖出基础币，按基础币计。```perOrder```与```numberOfOrders```给一个即可（都给时必须一致，只给```perOrder```时```total```必须是它的整数倍）；```interval```为每份的间隔秒数；```minPrice```、```maxPrice```（可选）为价格区间（计价币/基础币），价格在区间外的那一轮跳过；```startAt```（可选）为开始时间戳（毫秒），缺省立即开始。总额一次存入定投订单账户，此后由Jupiter按间隔代为兑换，买到的币自动转回钱包。下单前在本地检查：至少2份、每份至少值50美元（按Jupiter价格接口折算）、两种代币都不是Token-2022代币。只等广播，不等上链。
-- ```dca.simulate```：```wallet```为另一个钱包地址时以它为下单人模拟（只读）。
-- ```trigger.simulate```：```wallet```为另一个钱包地址时以它为挂单人模拟（只读）。
+- ```dca.create```：配置了API Key且计价币为USDC或USDT时用Jupiter Trigger V2的DCA，否则用Recurring v1（按时间），可用```exchange.IO("trigger.api", ...)```强制其一，两者的差别见下文「定投」。```params```字段相同：```params```为```{symbol, side, total, perOrder, numberOfOrders, interval, minPrice, maxPrice, startAt}```。```side```为```buy```时用计价币分批买入基础币，```total```、```perOrder```按计价币计；为```sell```时分批卖出基础币，按基础币计。```perOrder```与```numberOfOrders```给一个即可（都给时必须一致，只给```perOrder```时```total```必须是它的整数倍）；```interval```为每份的间隔秒数；```minPrice```、```maxPrice```（可选）为价格区间（计价币/基础币），价格在区间外的那一轮跳过；```startAt```（可选）为开始时间戳（毫秒），缺省立即开始。v1：总额一次存入定投订单账户，此后由Jupiter按间隔代为兑换，买到的币自动转回钱包；下单前在本地检查：至少2份、每份至少值50美元（按Jupiter价格接口折算）、两种代币都不是Token-2022代币；只等广播，不等上链。V2：总额存入vault（存入交易由连接器签名，Jupiter在创建定投时上链，返回时已上链），```interval```为60秒到1年，```startAt```最多30天后，每份至少值10美元，给了```minPrice```或```maxPrice```时为按价格区间（基础币的美元价）执行、区间外的一轮顺延到下一个间隔。
+- ```dca.cancel```：v1剩余的输入币与未提取的输出币退回钱包，只等广播，不等上链；V2分两步：Jupiter先停止定投并生成取回交易，连接器核对、签名后交给Jupiter确认上链，第二步失败时定投停在```canceling```，再撤一次即可取回。已成交的轮次不退。
+- ```dca.simulate```：```wallet```为另一个钱包地址时以它为下单人模拟（只读）。走V2时模拟的是存入vault的交易，只能用本钱包，且钱包还没有vault时报错（vault在第一次V2下单时才注册）；V2定投不能模拟撤销（撤销调用本身就会停止定投）。
+- ```trigger.simulate```：```wallet```为另一个钱包地址时以它为挂单人模拟（只读）。走V2时（见下文「限价单」）模拟的是存入vault的交易，只能用本钱包，钱包还没有vault时报错（vault在第一次V2下单时才注册）；V2限价单不能模拟撤销（撤销调用本身就会停止订单）。
+- ```trigger.api```：只影响新单：已有订单按订单ID的形状走v1或V2，与这个设置无关（```v1```模式下配置了API Key时仍可查询、撤销、修改已有的V2订单）。不传参数时查询。
+- ```trigger.vault```：V2限价单与定投的资金都存在这里：挂着的单、过期未取回的单、撤销未取回的单的钱都在vault里。
 - ```pump.new```：```options.limit```为查看的创建交易笔数，默认20，最多100；```options.since```为毫秒时间戳，只返回在它之后创建的币（查到更早的交易即停）。解析过的交易在进程内缓存，轮询时只取新交易：每次调用为1次```getSignaturesForAddress```加上新交易笔数次```getTransaction```。链上执行失败的创建交易不列出。
 - ```pump.new```的返回值：```name```、```symbol```、```uri```由创建者随意填写。
 - ```pump.buy```：发送前用节点模拟，模拟失败不发送。```options```：```slippage```（```[0, 1)```，默认```0.05```）；```priorityFee```（这笔交易的优先费总额，SOL，0到1；不给时取最近写这些账户的交易费率第75百分位，不超过```exchange.IO("priorityFee", ...)```）；```computeUnitLimit```（不给时按模拟用量加余量）；```dryRun```（```true```只模拟，不签名不发送）；```payer```（只能与```dryRun```一起用：模拟时以这个钱包付款）；```wait```（默认```true```等确认并按链上事件回报成交；```false```广播后立即返回）。曲线已完成的币改用Jupiter市价兑换（见下文）。
@@ -27892,7 +27901,7 @@ SOL为原生币，兑换时自动包装、解包。内置代币：SOL、USDC、U
 
 ##### 函数支持差异
 
-不支持（调用时报错并返回空值）：`exchange.GetTickers`、`exchange.GetTrades`、`exchange.ModifyOrder`、`exchange.CreateConditionOrder`、`exchange.ModifyConditionOrder`、`exchange.CancelConditionOrder`、`exchange.GetConditionOrder`、`exchange.GetConditionOrders`、`exchange.GetHistoryConditionOrders`。
+不支持（调用时报错并返回空值）：`exchange.GetTickers`、`exchange.GetTrades`、`exchange.CreateConditionOrder`、`exchange.ModifyConditionOrder`、`exchange.CancelConditionOrder`、`exchange.GetConditionOrder`、`exchange.GetConditionOrders`、`exchange.GetHistoryConditionOrders`。
 
 以回退方式支持：
 
@@ -27907,11 +27916,12 @@ SOL为原生币，兑换时自动包装、解包。内置代币：SOL、USDC、U
 | exchange.GetRecords() | K线来自GeckoTerminal的池子级数据：Jupiter是聚合器，取GeckoTerminal上两边正好是这两个代币（SOL按wSOL）的池子里美元流动性最深的一个（不限DEX，在两个代币各自靠前的20个池子里找，选中的池子缓存1小时）。价格为该池子的逐笔成交价（含池子手续费，与```exchange.GetTicker()```的中间价可能相差约一个池子费率），单位为计价币/基础币，```Volume```为基础币数量；没有成交的周期按上一根收盘价补平、成交量为0，最后一根可能尚未收盘。GeckoTerminal的数据有几十秒到1分钟的延迟，公开接口约每分钟10次：同一周期的K线缓存1分钟，请求在托管者内排队，被限频时等待重试，仍不行时报错。找不到该交易对的池子时报错 |
 | exchange.GetMarkets() | 代币表中的币与USDC、USDT、SOL组成的交易对（不逐个验证路由）。数量精度为基础币的代币精度，最小下单量为一个最小单位，价格精度固定为8位 |
 | exchange.GetAssets() | SOL与代币表中各代币的钱包余额，单独持有的wSOL记为```WSOL```；代币表以外的持仓不进余额列表，列在```Info```的```unlisted```中（```{mint, amount}```） |
-| exchange.CreateOrder() | 立即兑换：限价为最差成交价，由链上程序按滑点强制执行，当前报价已经达不到时直接报错、不发交易；市价按滑点保护；市价买入时数量为要花费的计价币。下单附加参数```slippage```覆盖本单滑点。Jupiter生成交易时会先模拟一遍，余额不足等会直接报错。广播前Solana节点按最新状态再模拟一遍：模拟失败时交易没有发出，连接器重新询价、生成交易再试，最多重试2次（第二次重试起避开失败路由经过的流动性来源，不会因此超出```exchange.IO("dexes", ...)```的限定），仍失败时报错，错误信息中带模拟的```err```与相关程序日志；成功时```Info```的```preflightRetries```为重试次数。下单选项```tif```为```gtc```时不立即兑换，改挂Jupiter原生限价单，见下文「限价单」 |
-| exchange.GetOrder() | 订单ID形如```SOL_USDC,5VERv8…```（交易对、逗号、交易签名）。交易确认后为已成交，成交数量按交易前后的钱包余额计算；链上执行失败为已撤销（手续费照扣）；超过有效期（约1分钟）仍未上链为已撤销。不是本程序发出的交易只能查已确认成功的（方向按余额变化判断），尚未确认或链上失败的报错。限价单的订单ID为交易对加订单账户地址，见下文「限价单」 |
-| exchange.GetOrders() | 本程序发出、尚未确认也未过期的兑换，加上钱包的全部活动限价单（不限于本程序挂的） |
+| exchange.CreateOrder() | 立即兑换：限价为最差成交价，由链上程序按滑点强制执行，当前报价已经达不到时直接报错、不发交易；市价按滑点保护；市价买入时数量为要花费的计价币。下单附加参数```slippage```覆盖本单滑点。Jupiter生成交易时会先模拟一遍，余额不足等会直接报错。广播前Solana节点按最新状态再模拟一遍：模拟失败时交易没有发出，连接器重新询价、生成交易再试，最多重试2次（第二次重试起避开失败路由经过的流动性来源，不会因此超出```exchange.IO("dexes", ...)```的限定），仍失败时报错，错误信息中带模拟的```err```与相关程序日志；成功时```Info```的```preflightRetries```为重试次数。下单选项```tif```为```gtc```时不立即兑换，改挂Jupiter原生限价单（配置了API Key且计价币为USDC、USDT时为Trigger V2，否则v1；可用```exchange.IO("trigger.api", ...)```强制其一），见下文「限价单」 |
+| exchange.GetOrder() | 订单ID形如```SOL_USDC,5VERv8…```（交易对、逗号、交易签名）。交易确认后为已成交，成交数量按交易前后的钱包余额计算；链上执行失败为已撤销（手续费照扣）；超过有效期（约1分钟）仍未上链为已撤销。不是本程序发出的交易只能查已确认成功的（方向按余额变化判断），尚未确认或链上失败的报错。限价单的订单ID为交易对加订单账户地址（v1）或Jupiter的订单UUID（V2），见下文「限价单」 |
+| exchange.GetOrders() | 本程序发出、尚未确认也未过期的兑换，加上钱包的全部活动限价单（不限于本程序挂的；V2限价单只在配置了API Key时列出） |
 | exchange.CancelOrder() | 只能撤限价单。兑换单不支持：Solana交易发出后无法撤回，未上链的交易约1分钟后自动过期 |
-| exchange.GetHistoryOrders() | 只有已成交、已撤销的限价单，不含兑换单（兑换单用```exchange.GetOrder()```查）。不传```since```、```limit```时买卖两个方向各取最近10条；传```since```时取创建时间不早于它的全部，传```limit```时取够为止 |
+| exchange.ModifyOrder() | 只能改V2限价单的价格（及下单附加参数```slippage```），见下文「限价单」。v1限价单与兑换单不支持 |
+| exchange.GetHistoryOrders() | 只有已成交、已撤销（含过期）的限价单，不含兑换单（兑换单用```exchange.GetOrder()```查）。不传```since```、```limit```时v1买卖两个方向各取最近10条、V2取最近10条；传```since```时取创建时间不早于它的全部，传```limit```时取够为止。v1与V2合并后按创建时间倒序 |
 
 - 请求速率：Jupiter按每秒请求数限流，超过后返回429。连接器按```exchange.IO("rps", ...)```（默认每秒1次）给请求排队，同一个托管者进程中使用同一个Jupiter API地址的交易所对象共用这个节奏。默认设置下```exchange.GetTicker()```约需2秒，5档```exchange.GetDepth()```约需10秒；需要更快时申请Jupiter API Key，并按套餐调高```rps```。
 - 手续费：每笔交易的Solana基础费与优先费（上限见```exchange.IO("priorityFee", ...)```）从SOL余额中扣除，订单的```Info```中有```fee```。第一次买入某个代币时，钱包需要新建该代币的账户，押金约0.002 SOL；押金仍归钱包所有，不计入成交。
@@ -27956,21 +27966,57 @@ while (true) {
 
 ##### 限价单（tif gtc）
 
-```exchange.CreateOrder(symbol, side, price, amount, {tif: "gtc"})```（或```exchange.Buy```、```exchange.Sell```带同样的下单选项）不立即兑换，而是挂一张Jupiter原生限价单（Trigger API v1，程序```j1o2qRpjcyUwEvwtcfhEQefh773ZgjxcVRry7LDqg5X```）：卖出的币存进订单账户，价格到了由Jupiter的keeper代为成交，成交是异步的，按限价成交（默认0滑点）。不带```tif```或```tif```为其它值时行为不变（立即兑换）。
+```exchange.CreateOrder(symbol, side, price, amount, {tif: "gtc"})```（或```exchange.Buy```、```exchange.Sell```带同样的下单选项）不立即兑换，而是挂一张Jupiter原生限价单，由Jupiter的keeper在价格到达后异步成交。不带```tif```或```tif```为其它值时行为不变（立即兑换）。有两套接口：
 
-- 数量：```amount```为基础币数量，买入付出```amount × price```计价币（向下取整到最小单位，不多付），卖出换回```amount × price```计价币（向上取整，不少收）。限价单不支持市价单（```price```为```-1```或```type```为```market```时报错）。
-- 下单附加参数：```expiry```为到期时间戳（毫秒），到期后不再成交（缺省不过期）；```slippage```为允许的滑点比例（如```0.003```），提高成交率但可能低于限价成交，缺省0。
-- 最低金额：付出或换回的一边至少值5美元（Jupiter的限制，连接器按Jupiter价格接口提前检查）。
-- 手续费：Jupiter从换回的币中扣手续费（官方说明稳定币对0.03%，其它0.1%，以每笔成交记录为准），订单的```AvgPrice```按扣费前计算，实际到账见```Info```的```trades```。挂单与撤单交易各付一次Solana交易费与优先费；第一次挂某种币的单时要新建代币账户等，押金归钱包。
-- 订单ID：```SOL_USDC,订单账户地址```（兑换单的ID是交易签名，按长度区分）。```exchange.GetOrder()```先查活动单再查历史单；本程序刚挂、Jupiter还没收录的单按链上状态给出（订单账户存在为挂单中）。状态：挂着为未成交，有部分成交为部分成交，```Completed```为已成交，```Cancelled```为已撤销；```Info```为Jupiter的原始订单行（含```trades```、```expiredAt```）。
-- 撤单：```exchange.CancelOrder()```生成撤单交易、签名并广播，未成交的币退回钱包；订单已经成交或撤销时返回```false```，原因见```GetLastError()```。只等广播，撤单结果用```exchange.GetOrder()```确认。
-- 带转账税（transfer fee）扩展的Token-2022代币不能挂限价单（Jupiter不支持）。
-- ```exchange.GetOrders()```每次调用都会请求一次Jupiter限价单列表，受```exchange.IO("rps", ...)```节流。
-- 交易由连接器签名后经Solana节点广播，节点预检（模拟）失败时没有发出并报错；挂单前可以用```exchange.IO("trigger.simulate", ...)```只模拟。
+| | Trigger v1 | Trigger V2 |
+| - | - | - |
+| 何时使用（```trigger.api```为缺省的```auto```） | 没有配置API Key，或计价币不是USDC、USDT | 配置了API Key且计价币为USDC或USDT |
+| 资金存放 | 链上订单账户（程序```j1o2qRpjcyUwEvwtcfhEQefh773ZgjxcVRry7LDqg5X```），挂单信息链上公开 | 存入Jupiter托管（Privy）的vault，一个钱包一个，所有V2订单共用；订单存在Jupiter链下，成交前不公开 |
+| 触发与成交 | 按两种代币的兑换比率，按限价成交（默认0滑点），换回数量有保证 | 按基础币的美元价触发，到价后按当时市价经Jupiter路由兑换：换回数量不保证，可以部分成交；滑点缺省由Jupiter自动设定 |
+| 订单ID | ```SOL_USDC,订单账户地址``` | ```SOL_USDC,订单UUID``` |
+| 最低金额 | 付出或换回的一边至少值5美元 | 付出的一边至少值10美元 |
+| 到期 | 可选，缺省不过期 | 必须有，缺省30天；过期后钱留在vault，要撤单取回 |
+| 改单 | 不支持 | ```exchange.ModifyOrder()```改价格 |
+
+**填写API Key后默认就是托管的V2**：挂单的钱离开钱包、存进Jupiter托管的vault。要保持非托管的v1，调用```exchange.IO("trigger.api", "v1")```；反过来```exchange.IO("trigger.api", "v2")```在没有API Key时也强制用V2（Jupiter目前放行不带Key的V2调用，但官方文档要求带Key）。
+
+Jupiter官方已把v1标为不再开发（只做关键修复，尚未公布停用），新功能都在V2。已挂的v1单不受配置影响，照常可查、可撤（订单ID的形状决定走哪套接口，与```trigger.api```无关；V2订单要配置API Key或```trigger.api```为```v2```才能查、撤、改）。
+
+通用规则：
+
+- 数量：```amount```为基础币数量，买入付出```amount × price```计价币（向下取整到最小单位，不多付），卖出付出```amount```基础币（v1另要求换回```amount × price```计价币，向上取整，不少收）。不支持市价单（```price```为```-1```或```type```为```market```时报错）。
+- 下单附加参数：```expiry```为到期时间戳（毫秒）；```slippage```为允许的滑点比例（如```0.003```）。v1缺省0（按限价精确成交），给了可以提高成交率但可能低于限价成交；V2缺省由Jupiter按市场自动设定，给了就用固定滑点。
+- 状态：挂着为未成交，有部分成交为部分成交；全部成交为已成交；已撤销、过期为已撤销（V2过期单的钱还在vault里）。```Info```为Jupiter的原始订单行。
+- 撤单：订单已经成交或撤销时```exchange.CancelOrder()```返回```false```，原因见```GetLastError()```。
+- ```exchange.GetOrders()```每次调用都会请求一次v1限价单列表（配置了API Key时再请求一次V2列表），受```exchange.IO("rps", ...)```节流。
+- 带转账税（transfer fee）或transfer hook扩展的Token-2022代币不能挂限价单（Jupiter不支持）。
+- 挂单前可以用```exchange.IO("trigger.simulate", ...)```只模拟。
+
+Trigger v1：
+
+- 挂单与撤单都是连接器签名后经Solana节点广播的链上交易，节点预检（模拟）失败时没有发出并报错；各付一次Solana交易费与优先费，第一次挂某种币的单时要新建代币账户等，押金归钱包。撤单只等广播，结果用```exchange.GetOrder()```确认。
+- 手续费：Jupiter从换回的币中扣手续费（官方说明稳定币对0.03%，其它0.1%，以每笔成交记录为准），订单的```AvgPrice```按扣费前计算，实际到账见```Info```的```trades```。
+- ```exchange.GetOrder()```先查活动单再查历史单；本程序刚挂、Jupiter还没收录的单按链上状态给出（订单账户存在为挂单中）。
+
+Trigger V2：
+
+- 认证：连接器用钱包私钥签名Jupiter的登录挑战（只签以Jupiter固定登录文本开头、写明本钱包地址的消息），换取15分钟的访问令牌并自动续期，令牌只在内存中。令牌泄露也不能转走资金（取回要钱包签名交易），但可以撤单、改价。
+- 下单：连接器先查本钱包的vault，没有就注册一个（在Jupiter为钱包新建托管账户）；再请Jupiter生成存入交易，逐条核对（钱包是付费者，只调用系统、代币、关联代币账户、计算预算、Memo程序，钱包转出的币只进vault一侧、合计正好是下单金额），签名后先用节点模拟（模拟失败时没有发出并报错），再连同订单参数交给Jupiter，Jupiter在这次调用中把存入交易上链并返回订单UUID。这次调用出错时存入交易可能已经上链，错误信息中带存入交易签名，请用```exchange.IO("receipt", ...)```与```exchange.IO("trigger.vault")```确认后再重试。
+- 触发：买单为基础币的美元价跌到```price```以下时买入，卖单为涨到```price```以上时卖出。计价币按1美元看待（USDC、USDT脱锚时触发价随之偏离）。Jupiter不检查价格是否合理：买入价高于市价、卖出价低于市价的单会立即按市价成交。
+- 数量与成交：订单的```Amount```卖单为存入的基础币，买单为存入的计价币÷价格；```DealAmount```、```AvgPrice```按实际消耗与换回的数量计算（手续费已含在换回的数量中，V2不单列）。
+- 改单：```exchange.ModifyOrder()```只改价格（与```slippage```），只有挂着、未开始成交的普通单能改，追踪止损单不能改价；数量由存入金额决定，不能改（传入的数量必须等于原数量）。买单改价后花费的计价币不变，```Amount```随之变为金额÷新价格。
+- 撤单分两步：Jupiter先停止订单（此后不再成交）并生成取回交易，连接器核对（钱包只付手续费）并签名，交给Jupiter补上vault的签名后上链，未成交的币回到钱包。第二步失败时订单停在待取回状态（仍列在```exchange.GetOrders()```中），再撤一次即可取回。过期的单同样用```exchange.CancelOrder()```取回。
+- 托管风险：挂单期间资金在Jupiter通过Privy托管的vault中，不在钱包里，余额不计入```exchange.GetAssets()```，用```exchange.IO("trigger.vault")```查看。取回依赖Jupiter生成取回交易并补签，Jupiter服务异常时无法自行取回。V2接口官方仍标为beta，行为可能变化。
+- 费用：存入与取回交易由钱包付网络费；成交由keeper执行并付网络费，Jupiter的兑换手续费已从换回的数量中扣除。没有集成方手续费。
+- 请求：每次查询、下单都要先认证（进程内缓存令牌），会多占一两次请求额度；API Key设置了接口权限时必须包含Trigger，否则相关调用报403。
+- 订单函数会列出钱包的全部V2限价单，包括在jup.ag等处挂的（止盈止损、OCO的每一条腿都按一张单列出，价格为它的美元触发价，方向见```Info```的```triggerCondition```）。按美元价触发、却不是以USDC或USDT计价、或者不按基础币价格触发的单无法表示为交易对的价格，查询到它们时报错（指定交易对查询时只看这个交易对的单）。
 
 ##### 定投（DCA）
 
-```exchange.IO("dca.create", ...)```、```dca.list```、```dca.cancel```、```dca.simulate```对应Jupiter Recurring API v1（按时间定投，程序```DCA265Vj8a9CEuX1eb1LWRnDT7uK6q1xMipnNyatn23M```）：总额一次存入定投订单账户，由Jupiter的keeper每隔```interval```秒兑换一份，买到的币自动转回钱包。限制：至少2份、每份至少值50美元；不支持Token-2022代币；Jupiter从换到的币中收0.1%手续费。创建和撤销都是链上交易，要付交易费与优先费；撤销后剩余的币退回钱包。定投不进```exchange.GetOrders()```等订单函数，用```dca.list```查询。Jupiter已不再维护Recurring API（官方的新版定投在Trigger V2里，要另行认证），但它仍然可用。
+```exchange.IO("dca.create", ...)```、```dca.list```、```dca.cancel```、```dca.simulate```：配置了API Key且计价币为USDC或USDT时新定投默认用Jupiter Trigger V2的DCA（托管vault；```exchange.IO("trigger.api", ...)```同样适用：```v1```保持Recurring v1，```v2```强制V2），否则用Recurring API v1（按时间定投，程序```DCA265Vj8a9CEuX1eb1LWRnDT7uK6q1xMipnNyatn23M```）。Jupiter已不再维护Recurring v1（仍可用），定投功能已并入Trigger V2。```dca.list```两边都列（V2要配置API Key），```dca.cancel```按定投ID的形状分v1（地址）、V2（UUID）。定投不进```exchange.GetOrders()```等订单函数。
+
+- v1：总额一次存入定投订单账户，由Jupiter的keeper每隔```interval```秒兑换一份，买到的币自动转回钱包。至少2份、每份至少值50美元；不支持Token-2022代币；Jupiter从换到的币中收0.1%手续费。创建和撤销都是链上交易，要付交易费与优先费；撤销后剩余的币退回钱包。
+- V2：认证、vault、存入与托管风险同上文V2限价单。总额存入vault，keeper每轮兑换一份，换到的币直接进钱包，网络费由keeper付；滑点由Jupiter按市场自动设定，不能指定；手续费已含在换到的数量中。至少2份、每份至少值10美元，间隔60秒到1年，开始时间最多30天后，每个钱包最多10个进行中的定投。给了```minPrice```或```maxPrice```时只在基础币的美元价落在区间内时兑换，区间外的一轮顺延到下一个间隔。不能修改；撤销分两步（同V2限价单），已成交的轮次不退。
 
 ##### 集中流动性（LP）
 
@@ -28301,7 +28347,7 @@ See also: `Jupiter`, `exchange.IO`, `exchange.IO("route")`, `exchange.IO("token"
 
 #### KyberSwap
 
-接入KyberSwap聚合器：报价和交易数据来自KyberSwap Aggregator API（在众多DEX和做市商之间拆单选路，不需要API Key），由托管者用配置的私钥签名后发给KyberSwap的路由合约MetaAggregationRouterV2（```0x6131B5fae19EA4f9D964eAc0408E4408b66337b5```）。一个交易所对象对应一条链，可选Ethereum、Arbitrum、Base、BNB Chain、Unichain、Polygon、OP Mainnet、Robinhood。
+接入KyberSwap聚合器：报价和交易数据来自KyberSwap Aggregator API（在众多DEX和做市商之间拆单选路，API Key可选，见下文「API Key与限频」），由托管者用配置的私钥签名后发给KyberSwap的路由合约MetaAggregationRouterV2（```0x6131B5fae19EA4f9D964eAc0408E4408b66337b5```）。一个交易所对象对应一条链，可选Ethereum、Arbitrum、Base、BNB Chain、Unichain、Polygon、OP Mainnet、Robinhood。
 
 它与Uniswap交易所对象是同一套实现的聚合器版本：代币表、余额、授权、订单、撤单、转账与包装的用法都相同，区别是没有DEX选项，兑换路径由KyberSwap给出。
 
@@ -28315,6 +28361,11 @@ See also: `Jupiter`, `exchange.IO`, `exchange.IO("route")`, `exchange.IO("token"
 | 钱包私钥 | 是 | — | 钱包私钥（十六进制）。 |
 | 节点地址 | 否 | ```https://ethereum-rpc.publicnode.com,https://eth.drpc.org``` | RPC节点地址；多个节点用逗号分隔，某个节点出错或缺少数据时自动换下一个。查询订单状态需要节点能查到已上链交易的回执：publicnode的Base、BNB Chain、Arbitrum公共节点查不到回执（要求归档权限），不要单独使用。 |
 | 节点认证 | 否 | — | RPC节点认证：```Header-Name: value```形式的请求头，或Basic认证值。 |
+| KyberSwap Api Key | 否 | — | KyberSwap Aggregator API的API Key，可选。（详见表下） |
+
+表中长说明的其余部分：
+
+- KyberSwap Api Key：填写后报价与生成交易走KyberSwap的API网关（请求头```X-Api-Key```），限频更高；不填使用公开端点（每秒约3次）。获取方式与限频见下文「API Key与限频」，运行中可用```exchange.IO("kyberApiKey", key)```更换。
 
 ##### 交易对与合约代码
 
@@ -28340,7 +28391,8 @@ See also: `Jupiter`, `exchange.IO`, `exchange.IO("route")`, `exchange.IO("token"
 | ```gasMultiplier``` | [x] | gas上限倍数，范围1到5，默认1.2：交易的gasLimit为节点估算的gas乘以该倍数。不传参数时查询。 | 当前倍数。 |
 | ```base``` | [url] | 不传参数时返回当前节点地址；传入地址时切换节点。多个节点写成逗号分隔的字符串（传数组时只使用第一个地址）。换节点后第一次请求会核对节点所在的链，与配置的链不一致时报错。 | 切换前的地址。 |
 | ```sendBase``` | url | 设置只用来广播交易的节点（私有交易通道）。与Web3不同：不返回设置前的地址，不传参数时不查询，传空字符串不会清除设置。 | ```true``` |
-| ```clientId``` | [id] | 设置请求KyberSwap Aggregator API时携带的客户端标识（请求头```x-client-id```），只能是字母、数字、```.```、```_```、```-```，1到64个字符。（详见表下） | 当前的客户端标识。 |
+| ```clientId``` | [id] | 设置请求KyberSwap Aggregator API时携带的客户端标识（请求头```x-client-id```，设置了API Key时也照发），只能是字母、数字、```.```、```_```、```-```，1到64个字符。（详见表下） | 当前的客户端标识。 |
+| ```kyberApiKey``` | [key] | 设置KyberSwap的API Key（只对本交易所对象生效，不回显），与配置项```KyberSwap Api Key```相同：设置后报价与生成交易改走KyberSwap的API网关```https://api.kyberswap.com/swap```，请求头带```X-Api-Key```，限频更高；传```""```清除，回到公开端点。（详见表下） | 是否已设置Key（布尔值）。 |
 | ```address``` | — | 配置的私钥对应的钱包地址（```0x```开头的小写地址）。 | — |
 | ```contracts``` | — | 本链上的部署信息，字段与Uniswap交易所对象相同：```dex```为```KyberSwap```，```router```为KyberSwap路由合约；```quoterV2```、```v3Factory```、```v4```等是该链Uniswap的部署（用来列出市场、估算美元价），```aerodrome```为```null```；```tokenList```给出内置代币表的生成时间与本链代币数量。 | — |
 | ```bridge.chains``` | — | 跨链桥（LI.FI）支持的链：EVM链与Solana，缓存1小时。 | ```{id, key, name, chainType, nativeToken}```数组，```chainType```为```EVM```或```SVM```。 |
@@ -28354,7 +28406,8 @@ See also: `Jupiter`, `exchange.IO`, `exchange.IO("route")`, `exchange.IO("token"
 表中长说明的其余部分：
 
 - ```simulate```：第6个参数（限定路径类型）对聚合器不适用，传入会报错```route is not applicable to the KyberSwap aggregator```。用代币支付的兑换（如用USDC买入），钱包对路由合约的授权不够时（默认```approve```为```exact```，真实下单前才授权），自动用```eth_call```的state override补上授权再模拟，结果里```allowanceOverride```列出补了哪些；传入的```stateOverride```与它合并，已写的存储槽位不覆盖。找不到代币存放授权额度的存储槽位时，模拟失败的报错里说明尚未授权，需要先授权或自己传```stateOverride```。余额不会自动补。
-- ```clientId```：KyberSwap的公开限频按这个标识计算（默认每秒3次），共用同一个标识的程序共用这份额度，频繁报HTTP 429时可以换成自己的标识。默认值为```fmz-```加钱包地址哈希的前8位十六进制（同一钱包重启后不变，不包含地址本身；没配私钥时为本次运行随机生成的值）。不传参数时查询。
+- ```clientId```：没有API Key时KyberSwap的公开限频按这个标识计算（每秒3次），共用同一个标识的程序共用这份额度，频繁报HTTP 429时可以换成自己的标识，或设置API Key（见```kyberApiKey```）。默认值为```fmz-```加钱包地址哈希的前8位十六进制（同一钱包重启后不变，不包含地址本身；没配私钥时为本次运行随机生成的值）。不传参数时查询。
+- ```kyberApiKey```：Key只能是1到256个不含空格的可见ASCII字符，不合法时报错且原设置不变。不传参数只查询。Key无效或过期时，网关返回HTTP 401，报错```KyberSwap API key rejected (HTTP 401: invalid api key)```，不会自动退回公开端点。
 - ```bridge.quote```：```params```：```toChain```（目标链：链ID、LI.FI的链key如```arb```、或链名如```Arbitrum```、```Solana```）、```fromToken```（本链代币：代币表里的名字或合约地址）、```toToken```（目标链代币：名字或地址，由LI.FI解析为它的标准代币，如Arbitrum上的```USDC```是原生USDC，不是USDC.e）、```amount```（```fromToken```的数量，按代币单位，超出代币精度的位舍去）、```toAddress```（收款地址；目标为EVM链时缺省为本钱包，目标为Solana时必须传Solana地址，不传报错）、```slippage```（缺省为```exchange.IO("slippage")```的值）、```order```（```CHEAPEST```或```FASTEST```）、```allowBridges```/```denyBridges```（LI.FI的桥名，数组或逗号分隔）。不认识的键报错。
 - ```bridge.simulate```：代币授权不够时自动用state override补成无限额度（同```simulate```，结果里```allowanceOverride```列出补了什么）；余额不会自动补，可以用```stateOverride```（```eth_call```的第三参）自己补。余额不够导致失败时报错里给出钱包余额。
 - ```bridge.send```：原生币不用授权。只等授权上链，不等桥接交易；跨链是异步的，用```bridge.status```轮询。传```bridge.quote```的结果时按其中的```request```重新报价（报价随时变化，实际成交以新报价为准，```toAmountMin```由交易在链上保证）。
@@ -28384,6 +28437,14 @@ See also: `Jupiter`, `exchange.IO`, `exchange.IO("route")`, `exchange.IO("token"
 | exchange.GetOrder() | 订单ID形如```ETH_USDC,0x…```（交易对、逗号、交易哈希），状态来自交易回执；原交易的nonce已被撤单交易（或其它交易）占用时显示为已撤销。成交量取路由合约的```Swapped```事件（原生币进出也在其中） |
 | exchange.GetOrders() | 只列出本交易所对象在本次运行中发出、尚未上链的兑换交易 |
 | exchange.CancelOrder() | 发送同nonce的替换交易（向自己转0金额），并等待结果（默认最多30秒，见```exchange.IO("cancelWait", ...)```）：撤单交易先上链返回```true```；原订单已经上链或先于撤单上链时返回```false```（撤单没成功，但不是调用错误），原因见```exchange.GetLastError()```；等待超时返回```true```，表示撤单已提交，最终状态以```exchange.GetOrder()```为准 |
+
+##### API Key与限频
+
+- 没有API Key：请求发往公开端点```https://aggregator-api.kyberswap.com```，按客户端标识（```x-client-id```，见```exchange.IO("clientId")```）限频，每秒3次（应答头为每10秒30次）。托管者在同一进程内给KyberSwap请求排队（相邻请求至少间隔约0.34秒）。
+- 有API Key：在配置项```KyberSwap Api Key```中填写或用```exchange.IO("kyberApiKey", key)```设置后，请求发往API网关```https://api.kyberswap.com/swap```（路径与公开端点相同），请求头带```X-Api-Key```（同时照发```x-client-id```），限频更高，具体额度随Key而定（KyberSwap文档没有公开数字）。
+- 获取Key：KyberSwap不提供自助申请，需发邮件给KyberSwap商务团队```business@kyber.network```申请；KyberSwap已不再为```x-client-id```开白名单，提高限频只能通过API Key。
+- 被限频（HTTP 429）时，按应答头```x-ratelimit-reset-after```给出的时间（最多10秒）或1、2、4秒退避，最多重试3次；仍被限频时报错```rate limited (HTTP 429) after 4 attempts```，没有Key时报错里提示设置API Key。```exchange.GetDepth()```逐档询价，档数多时最容易触发限频。
+- Key缺失、无效或过期时网关返回HTTP 401，报错```KyberSwap API key rejected (HTTP 401: …)```；不会自动退回公开端点，可用```exchange.IO("kyberApiKey", "")```清除Key。
 
 ##### 跨链桥（bridge）
 
