@@ -242,7 +242,7 @@ function main() {
 
 #### 部署托管者
 
-部署托管者有两种方式：在平台一键租用服务器，或在自己的设备上手动部署。在[托管者管理页面](https://www.fmz.com/m/nodes)点击**部署托管者**进入[托管者部署页面](https://www.fmz.com/m/add-node)选择方式。
+可以在平台一键租用服务器，或在自己的设备上手动部署。在[托管者管理页面](https://www.fmz.com/m/nodes)点击**部署托管者**进入[托管者部署页面](https://www.fmz.com/m/add-node)选择方式。
 
 托管者管理页面列出当前账号下的托管者，可以切换列表或详细信息展示，查看托管者的IP地址、版本、编译时间等信息。
 
@@ -538,7 +538,7 @@ Windows界面版没有IP设置，需要指定出口IP时请使用命令行版。
 需要发送```POST```请求时，把推送地址写成```请求地址||请求体```，例如```http://abc.com/push.php||text={body}```：```||```之前是请求地址，之后是请求体，两部分都可以使用上述占位符。推送地址必须是可从公网访问的```http```或```https```地址。
 
 ##### 在策略中推送
-- JavaScript、Python、Rust：调用`Log`以及其它会在日志区域输出日志的函数（如```exchange.CreateOrder()```、```exchange.CancelOrder()```）时，在必要参数之后再传一个参数```"@"```，这条日志就会按推送设置推送，例如```Log("This is a push message", "@")```；Rust中用```Log!```宏，写法相同：```Log!("This is a push message", "@");```。
+- JavaScript、Python、Rust：调用`Log`以及其它会在日志区域输出日志的函数（如```exchange.CreateOrder()```、```exchange.CancelOrder()```）时，在必要参数之后再传一个参数```@```，这条日志就会按推送设置推送，例如```Log("This is a push message", "@")```；Rust中用```Log!```宏，写法相同：```Log!("This is a push message", "@");```。
 - PINE语言、My语言：在策略集成的「交易类库」的参数中开启交易日志推送，触发交易动作后自动推送。
 
 ##### 推送限制
@@ -713,7 +713,7 @@ function main() {
 
 #### 子账号
 
-子账号用来把部分实盘交给他人查看和操作，而不交出主账号。
+把部分实盘交给他人查看和操作，而不交出主账号。
 
 ##### 创建子账号
 在[账号设置页面](https://www.fmz.com/m/account#shadowmember)打开子账号页签，在操作权限中选择该子账号可以访问的实盘，填写子账号的用户名和登录密码后创建。创建后的子账号显示在同一页面，可以修改、锁定/解锁、删除。
@@ -729,7 +729,7 @@ function main() {
 
 ## 编写策略
 
-编写策略需要了解的内容：策略结构（生命周期、主循环、事件驱动）、各编程语言的说明、策略参数、交互控件、模板类库、内置库、策略界面文字的中英文写法，以及全部 API 函数的分类速查。
+介绍策略结构（生命周期、主循环、事件驱动）、各编程语言的说明、策略参数、交互控件、模板类库、内置库、策略界面文字的中英文写法，以及全部 API 函数的分类速查。
 
 ### 策略结构
 
@@ -1163,7 +1163,7 @@ function main() {
 }
 ```
 
-- ```channel```可选```"ticker"```、```"bbo"```、```"depth"```、```"trade"```、```"kline"```（```interval```为周期秒数）、```"orders"```。
+- ```channel```可选```ticker```、```bbo```、```depth```、```trade```、```kline```（```interval```为周期秒数）、```orders```。
 - 事件的```kind```：1 为 ticker，3 为深度（事件只表示订单簿已更新，档位用```ctx.book(ev.ex, ev.symbol, n)```读取），4 为成交，5 为 K 线，16 为订单回报。
 - 行情类订阅消费不及时会只保留最新数据或丢弃最旧的数据，订单回报不会丢弃，策略需要持续调用```ctx.poll()```。
 - ```EventLoop()```与```ctx.poll()```从同一批事件队列中取事件，一个策略只使用其中一种。
@@ -1562,7 +1562,7 @@ else if direction > 0
 
 ### 策略参数
 
-策略参数在策略界面上设置，在策略代码中以同名的全局变量（Rust 中为全局常量）出现，直接用变量名访问。各语言的差异：
+在策略界面上设置，在策略代码中以同名的全局变量（Rust 中为全局常量）出现，直接用变量名访问。各语言的差异：
 - ```JavaScript```、```My语言```：可以直接读取参数，也可以在代码中修改参数变量。
 - ```Python```：可以直接读取；在函数中给参数变量重新赋值时，需要先用```global```声明。
 - ```Rust```：参数是常量，只能读取，不能修改；各种参数对应的类型见 `Rust`。
@@ -1788,7 +1788,7 @@ function main() {
 
 ### 模板类库
 
-**模板类库**是发明者量化交易平台中可复用的代码模块，是策略代码的一种类别。支持模板类库的语言有：```JavaScript```、```Python```、```Rust```。创建策略时如果类别设置为模板类库，会在当前登录账号的策略库中创建一个模板类库，创建后不能再修改类别为普通策略。
+发明者量化交易平台中可复用的代码模块，是策略代码的一种类别。支持模板类库的语言有：```JavaScript```、```Python```、```Rust```。创建策略时如果类别设置为模板类库，会在当前登录账号的策略库中创建一个模板类库，创建后不能再修改类别为普通策略。
 
 ![创建模板类库页面](https://www.fmz.com/upload/asset/2e4c55da99fd457ca94a0.png)
 
@@ -2086,8 +2086,8 @@ fn main() {
 | `_N` | 格式化一个浮点数。 |
 | `_C` | 重试函数，用于接口容错。 |
 | `_Cross` | 返回数组```arr1```与数组```arr2```的交叉周期数。 |
-| `JSON.parse` | ```JSON.parse```函数是ECMAScript标准内建对象```JSON```的方法，用于解码（解析）JSON字符串。 |
-| `JSON.stringify` | ```JSON.stringify```函数是ECMAScript标准内建对象```JSON```的方法，用于编码JSON字符串。 |
+| `JSON.parse` | 解码（解析）JSON字符串，是ECMAScript标准内建对象```JSON```的方法。 |
+| `JSON.stringify` | 编码JSON字符串，是ECMAScript标准内建对象```JSON```的方法。 |
 | `Encode` | 该函数根据传入的参数对数据进行编码。 |
 | `MD5` | 计算参数```data```的 MD5 哈希值。 |
 | `UUID` | 创建一个 UUID。 |
@@ -2096,7 +2096,7 @@ fn main() {
 
 | 名称 | 说明 |
 | - | - |
-| `Log` | ```Log()```函数用于输出日志。 |
+| `Log` | 输出日志。 |
 | `LogStatus` | 在回测系统或者实盘页面状态栏输出信息。 |
 | `LogProfit` | 记录盈亏值，打印盈亏数值并根据盈亏数值绘制收益曲线。 |
 | `LogProfitReset` | 清空所有收益日志及收益图表。 |
@@ -2107,89 +2107,89 @@ fn main() {
 | `KLineChart` | 该函数用于使用类似```Pine```语言的画图方式进行策略运行时的自定义画图。 |
 | `console.log` | 用于在实盘页面中的「调试信息」栏中输出调试信息。 |
 | `console.error` | 用于在实盘页面中的「调试信息」栏中错误输出。 |
-| `exchange.Log` | ```exchange.Log()```函数用于在日志栏区域输出下单、撤单日志。 |
+| `exchange.Log` | 在日志栏区域输出下单、撤单日志。 |
 
 ##### Market
 
 | 名称 | 说明 |
 | - | - |
 | `exchange.GetTicker` | 获取现货或合约的Ticker结构，即行情数据；不传```symbol```时取当前设置的交易对、合约代码的行情。 |
-| `exchange.GetTickers` | ```exchange.GetTickers()```函数用于获取交易所聚合行情数据（Ticker结构的数组）。 |
+| `exchange.GetTickers` | 获取交易所聚合行情数据（Ticker结构的数组）。 |
 | `exchange.GetDepth` | 获取当前设置的交易对、合约代码所对应的现货或合约的Depth结构，即订单簿数据。 |
 | `exchange.GetTrades` | 获取当前设置的交易对、合约代码所对应的现货或合约的Trade结构数组，即市场的成交数据。 |
 | `exchange.GetRecords` | 获取当前设置的交易对、合约代码所对应的现货或合约的Record结构数组，即K线数据。 |
-| `exchange.GetMarkets` | ```exchange.GetMarkets()```函数用于获取交易所市场信息。 |
+| `exchange.GetMarkets` | 获取交易所市场信息。 |
 | `exchange.GetRawJSON` | 获取当前交易所对象（exchange、exchanges）最近一次```rest```请求返回的原始内容。 |
-| `exchange.SetData` | ```exchange.SetData()```函数用于设置策略运行时所加载的数据。 |
-| `exchange.GetData` | ```exchange.GetData()```函数用于获取由```exchange.SetData()```函数加载的数据，或外部链接提供的数据。 |
+| `exchange.SetData` | 设置策略运行时所加载的数据。 |
+| `exchange.GetData` | 获取由```exchange.SetData()```函数加载的数据，或外部链接提供的数据。 |
 
 ##### Trade
 
 | 名称 | 说明 |
 | - | - |
-| `exchange.Buy` | ```exchange.Buy()```函数用于下买单。 |
-| `exchange.Sell` | ```exchange.Sell()```函数用于下达卖单。 |
-| `exchange.CreateOrder` | ```exchange.CreateOrder()```函数用于下单。 |
-| `exchange.ModifyOrder` | ```exchange.ModifyOrder()```函数用于修改现有的普通订单，可以修改订单的价格和数量。 |
-| `exchange.CancelOrder` | ```exchange.CancelOrder()```函数用于取消订单。 |
-| `exchange.GetOrder` | ```exchange.GetOrder()```函数用于获取订单信息。 |
-| `exchange.GetOrders` | ```exchange.GetOrders()```函数用于获取当前未完成的订单。 |
-| `exchange.GetHistoryOrders` | ```exchange.GetHistoryOrders()```函数用于获取当前交易对、合约的历史订单，并支持指定具体的交易品种。 |
-| `exchange.CreateConditionOrder` | ```exchange.CreateConditionOrder()```函数用于创建条件单。 |
-| `exchange.ModifyConditionOrder` | ```exchange.ModifyConditionOrder()```函数用于修改现有的条件单，可以修改条件单的数量、触发条件和执行价格。 |
-| `exchange.CancelConditionOrder` | ```exchange.CancelConditionOrder()```函数用于取消条件单。 |
-| `exchange.GetConditionOrder` | ```exchange.GetConditionOrder()```函数用于获取指定条件单的信息。 |
-| `exchange.GetConditionOrders` | ```exchange.GetConditionOrders()```函数用于获取未完成的条件单（尚未触发或尚未取消的条件单）。 |
-| `exchange.GetHistoryConditionOrders` | ```exchange.GetHistoryConditionOrders()```函数用于获取当前交易对、合约的历史条件单（包括已触发、已取消、已过期的条件单），并支持指定具体的交易品种。 |
+| `exchange.Buy` | 下买单。 |
+| `exchange.Sell` | 下达卖单。 |
+| `exchange.CreateOrder` | 下单。 |
+| `exchange.ModifyOrder` | 修改现有的普通订单，可以修改订单的价格和数量。 |
+| `exchange.CancelOrder` | 取消订单。 |
+| `exchange.GetOrder` | 获取订单信息。 |
+| `exchange.GetOrders` | 获取当前未完成的订单。 |
+| `exchange.GetHistoryOrders` | 获取当前交易对、合约的历史订单，并支持指定具体的交易品种。 |
+| `exchange.CreateConditionOrder` | 创建条件单。 |
+| `exchange.ModifyConditionOrder` | 修改现有的条件单，可以修改条件单的数量、触发条件和执行价格。 |
+| `exchange.CancelConditionOrder` | 取消条件单。 |
+| `exchange.GetConditionOrder` | 获取指定条件单的信息。 |
+| `exchange.GetConditionOrders` | 获取未完成的条件单（尚未触发或尚未取消的条件单）。 |
+| `exchange.GetHistoryConditionOrders` | 获取当前交易对、合约的历史条件单（包括已触发、已取消、已过期的条件单），并支持指定具体的交易品种。 |
 
 ##### Account
 
 | 名称 | 说明 |
 | - | - |
-| `exchange.GetAccount` | ```exchange.GetAccount()```函数用于请求交易所账户信息。 |
-| `exchange.GetAssets` | ```exchange.GetAssets```函数用于请求交易所账户的资产信息。 |
+| `exchange.GetAccount` | 请求交易所账户信息。 |
+| `exchange.GetAssets` | 请求交易所账户的资产信息。 |
 
 ##### Futures
 
 | 名称 | 说明 |
 | - | - |
-| `exchange.SetContractType` | ```exchange.SetContractType()```函数用于设置exchange交易所对象当前的合约代码。 |
-| `exchange.GetContractType` | ```exchange.GetContractType()```函数用于获取exchange交易所对象当前设置的合约代码。 |
-| `exchange.SetDirection` | ```exchange.SetDirection()```函数用于设置调用exchange.Buy函数、exchange.Sell函数进行期货合约下单时的订单方向。 |
-| `exchange.SetMarginLevel` | ```exchange.SetMarginLevel()```函数用于设置```symbol```参数所指定的交易对、合约的杠杆值。 |
-| `exchange.GetPositions` | ```exchange.GetPositions()```函数用于获取持仓信息。 |
-| `exchange.GetFundings` | ```exchange.GetFundings()```函数用于获取当前周期资金费率数据。 |
+| `exchange.SetContractType` | 设置exchange交易所对象当前的合约代码。 |
+| `exchange.GetContractType` | 获取exchange交易所对象当前设置的合约代码。 |
+| `exchange.SetDirection` | 设置调用exchange.Buy函数、exchange.Sell函数进行期货合约下单时的订单方向。 |
+| `exchange.SetMarginLevel` | 设置```symbol```参数所指定的交易对、合约的杠杆值。 |
+| `exchange.GetPositions` | 获取持仓信息。 |
+| `exchange.GetFundings` | 获取当前周期资金费率数据。 |
 
 ##### Exchange
 
 | 名称 | 说明 |
 | - | - |
-| `exchange.GetName` | ```exchange.GetName()```函数用于获取当前交易所对象所绑定的交易所名称。 |
-| `exchange.GetLabel` | ```exchange.GetLabel()```函数用于获取配置交易所对象时设置的自定义标签。 |
-| `exchange.GetCurrency` | ```exchange.GetCurrency()```函数用于获取当前设置的交易对。 |
-| `exchange.SetCurrency` | ```exchange.SetCurrency()```函数用于切换交易所对象exchange当前的交易对。 |
-| `exchange.GetQuoteCurrency` | ```exchange.GetQuoteCurrency()```函数用于获取当前交易对的计价币名称，即```quoteCurrency```。 |
+| `exchange.GetName` | 获取当前交易所对象所绑定的交易所名称。 |
+| `exchange.GetLabel` | 获取配置交易所对象时设置的自定义标签。 |
+| `exchange.GetCurrency` | 获取当前设置的交易对。 |
+| `exchange.SetCurrency` | 切换交易所对象exchange当前的交易对。 |
+| `exchange.GetQuoteCurrency` | 获取当前交易对的计价币名称，即```quoteCurrency```。 |
 | `exchange.GetPeriod` | 获取回测或实盘运行策略时，在发明者量化交易平台网站页面上所设置的 K 线周期，即调用 ```exchange.GetRecords()``` 函数且不传入参数时使用的默认 K 线周期。 |
 | `exchange.SetMaxBarLen` | 设置K线的最大长度。 |
-| `exchange.SetPrecision` | ```exchange.SetPrecision()```函数用于设置```exchange```交易所对象的价格与下单量的精度，设置后系统会自动忽略数据中超出精度的多余部分。 |
+| `exchange.SetPrecision` | 设置```exchange```交易所对象的价格与下单量的精度，设置后系统会自动忽略数据中超出精度的多余部分。 |
 | `exchange.GetRate` | 获取交易所对象当前设置的汇率。 |
 | `exchange.SetRate` | 设置交易所对象当前的汇率。 |
-| `exchange.SetBase` | ```exchange.SetBase()```函数用于设置exchange交易所对象所使用的交易所API接口基地址。 |
-| `exchange.GetBase` | ```exchange.GetBase()``` 函数用于获取当前交易所 API 接口的基础地址。 |
-| `exchange.SetProxy` | ```exchange.SetProxy()```函数用于设置exchange交易所对象的代理配置。 |
-| `exchange.SetTimeout` | ```exchange.SetTimeout()```函数用于设置exchange交易所对象```rest```请求的超时时间。 |
-| `exchange.Encode` | ```exchange.Encode()```函数用于签名加密计算。 |
+| `exchange.SetBase` | 设置exchange交易所对象所使用的交易所API接口基地址。 |
+| `exchange.GetBase` | 获取当前交易所 API 接口的基础地址。 |
+| `exchange.SetProxy` | 设置exchange交易所对象的代理配置。 |
+| `exchange.SetTimeout` | 设置exchange交易所对象```rest```请求的超时时间。 |
+| `exchange.Encode` | 签名加密计算。 |
 
 ##### IO
 
 | 名称 | 说明 |
 | - | - |
-| `exchange.IO` | ```exchange.IO()```函数用于交易所对象相关的其它接口调用。 |
-| ```exchange.IO("api", ...)``` | ```exchange.IO("api", ...)```调用交易所未封装的原始REST接口，签名由平台自动处理。 |
-| ```exchange.IO("currency", ...)``` | ```exchange.IO("currency", ...)```在运行时切换交易所对象的当前交易对。 |
-| ```exchange.IO("base", ...)``` | ```exchange.IO("base", ...)```查询或切换交易所接口的基地址。 |
-| ```exchange.IO(mode, value)``` | ```exchange.IO(mode, value)```切换交易所的交易模式：模拟盘/实盘、全仓/逐仓、双向/单向持仓、统一账户、杠杆模式、自成交预防等。 |
-| ```exchange.IO("rate", ...)``` | ```exchange.IO("rate", ...)```与```exchange.IO("quota", ...)```限制API函数的调用频率。 |
+| `exchange.IO` | 调用交易所对象相关的其它接口。 |
+| ```exchange.IO("api", ...)``` | 调用交易所未封装的原始REST接口，签名由平台自动处理。 |
+| ```exchange.IO("currency", ...)``` | 在运行时切换交易所对象的当前交易对。 |
+| ```exchange.IO("base", ...)``` | 查询或切换交易所接口的基地址。 |
+| ```exchange.IO(mode, value)``` | 切换交易所的交易模式，包括模拟盘/实盘、全仓/逐仓、双向/单向持仓、统一账户、杠杆模式及自成交预防等。 |
+| ```exchange.IO("rate", ...)``` | 按函数限制API函数的调用频率：```rate```为平滑限流，```quota```为额度限流。 |
 
 ##### Network
 
@@ -2224,91 +2224,91 @@ fn main() {
 
 | 名称 | 说明 |
 | - | - |
-| `threading.Thread` | ```Thread()```函数用于创建并发线程。 |
-| `threading.getThread` | ```getThread()```函数用于根据指定的线程ID获取线程对象。 |
-| `threading.mainThread` | ```mainThread()```函数用于获取主线程的线程对象，即策略中```main()```函数所在的线程。 |
-| `threading.currentThread` | ```currentThread()```函数用于获取当前线程的线程对象。 |
-| `threading.Lock` | ```Lock()```函数用于创建线程锁对象。 |
-| `threading.Condition` | ```Condition()```函数用于创建一个条件变量对象，该对象用于在多线程并发环境中实现线程间的同步与通信。 |
-| `threading.Event` | ```Event()```函数用于创建一个*线程事件*对象，该对象用于线程间的同步，允许一个线程等待另一个线程的通知或信号。 |
-| `threading.Dict` | ```Dict()```函数用于创建一个字典对象，用于在并发线程间传递和共享数据。 |
-| `threading.Serve` | ```Serve()```函数在策略进程内创建Http服务、TCP服务、Websocket服务（基于Http协议），返回Server对象。 |
-| `threading.pending` | ```pending```函数用于获取当前策略程序中正在运行的并发线程数量。 |
+| `threading.Thread` | 创建并发线程。 |
+| `threading.getThread` | 根据指定的线程ID获取线程对象。 |
+| `threading.mainThread` | 获取主线程的线程对象，即策略中```main()```函数所在的线程。 |
+| `threading.currentThread` | 获取当前线程的线程对象。 |
+| `threading.Lock` | 创建线程锁对象。 |
+| `threading.Condition` | 创建一个条件变量对象，该对象用于在多线程并发环境中实现线程间的同步与通信。 |
+| `threading.Event` | 创建一个*线程事件*对象，该对象用于线程间的同步，允许一个线程等待另一个线程的通知或信号。 |
+| `threading.Dict` | 创建一个字典对象，用于在并发线程间传递和共享数据。 |
+| `threading.Serve` | 在策略进程内创建Http服务、TCP服务、Websocket服务（基于Http协议），返回Server对象。 |
+| `threading.pending` | 获取当前策略程序中正在运行的并发线程数量。 |
 
 ##### Threads/Thread
 
 | 名称 | 说明 |
 | - | - |
-| `Thread.peekMessage` | ```peekMessage()```函数用于从线程接收消息。 |
-| `Thread.postMessage` | ```postMessage()```函数用于向线程发送消息。 |
-| `Thread.join` | ```join()```函数用于等待线程退出，并回收系统资源。 |
-| `Thread.terminate` | ```terminate()```函数用于强制终止线程，释放创建线程时占用的硬件资源。 |
-| `Thread.getData` | ```getData()```函数用于访问线程环境中记录的变量。 |
-| `Thread.setData` | ```setData()```函数用于在线程环境中存储变量。 |
-| `Thread.id` | ```id()```函数用于返回当前多线程对象实例的```threadId```。 |
-| `Thread.name` | ```name()```函数用于返回当前多线程对象实例的名称。 |
-| `Thread.eventLoop` | ```eventLoop()``` 函数用于监听当前线程（调用者所在线程）接收到的事件。 |
+| `Thread.peekMessage` | 从线程接收消息。 |
+| `Thread.postMessage` | 向线程发送消息。 |
+| `Thread.join` | 等待线程退出，并回收系统资源。 |
+| `Thread.terminate` | 强制终止线程，释放创建线程时占用的硬件资源。 |
+| `Thread.getData` | 访问线程环境中记录的变量。 |
+| `Thread.setData` | 在线程环境中存储变量。 |
+| `Thread.id` | 返回当前多线程对象实例的```threadId```。 |
+| `Thread.name` | 返回当前多线程对象实例的名称。 |
+| `Thread.eventLoop` | 监听当前线程（调用者所在线程）接收到的事件。 |
 
 ##### Threads/ThreadLock
 
 | 名称 | 说明 |
 | - | - |
-| `ThreadLock.acquire` | ```acquire()```函数用于请求线程锁（加锁）。 |
-| `ThreadLock.release` | ```release()```函数用于释放线程锁（解锁）。 |
+| `ThreadLock.acquire` | 请求线程锁（加锁）。 |
+| `ThreadLock.release` | 释放线程锁（解锁）。 |
 
 ##### Threads/ThreadEvent
 
 | 名称 | 说明 |
 | - | - |
-| `ThreadEvent.set` | ```set()```函数用于设置事件信号。 |
-| `ThreadEvent.clear` | ```clear()```函数用于清除信号。 |
-| `ThreadEvent.wait` | ```wait()```函数用于设置事件（信号）等待，在事件（信号）被设置之前会阻塞；支持设置超时参数。 |
-| `ThreadEvent.isSet` | ```isSet()```函数用于判断事件（信号）是否已被设置。 |
+| `ThreadEvent.set` | 设置事件信号。 |
+| `ThreadEvent.clear` | 清除信号。 |
+| `ThreadEvent.wait` | 设置事件（信号）等待，在事件（信号）被设置之前会阻塞；支持设置超时参数。 |
+| `ThreadEvent.isSet` | 判断事件（信号）是否已被设置。 |
 
 ##### Threads/ThreadCondition
 
 | 名称 | 说明 |
 | - | - |
-| `ThreadCondition.notify` | ```notify()```函数用于唤醒一个正在等待的线程（如果存在）。 |
-| `ThreadCondition.notifyAll` | ```notifyAll()```函数用于唤醒所有正在等待的线程。 |
-| `ThreadCondition.wait` | ```wait()```函数用于在特定条件下使线程进入等待状态。 |
-| `ThreadCondition.acquire` | ```acquire()```函数用于请求线程锁（加锁）。 |
-| `ThreadCondition.release` | ```release()```函数用于释放线程锁（解锁）。 |
+| `ThreadCondition.notify` | 唤醒一个正在等待的线程（如果存在）。 |
+| `ThreadCondition.notifyAll` | 唤醒所有正在等待的线程。 |
+| `ThreadCondition.wait` | 在特定条件下使线程进入等待状态。 |
+| `ThreadCondition.acquire` | 请求线程锁（加锁）。 |
+| `ThreadCondition.release` | 释放线程锁（解锁）。 |
 
 ##### Threads/ThreadDict
 
 | 名称 | 说明 |
 | - | - |
-| `ThreadDict.get` | ```get()```函数用于获取字典对象中记录的键值。 |
-| `ThreadDict.set` | ```set()```函数用于设置键值对。 |
+| `ThreadDict.get` | 获取字典对象中记录的键值。 |
+| `ThreadDict.set` | 设置键值对。 |
 
 ##### Threads/Server
 
 | 名称 | 说明 |
 | - | - |
-| `Server.addr` | ```addr()```函数返回服务实际监听的地址和端口。 |
-| `Server.close` | ```close()```函数停止接收新连接，正在执行的处理函数继续执行完（优雅关闭）。 |
-| `Server.stop` | ```stop()```函数先关闭服务（同```close()```），再强制结束所有正在执行的处理函数线程。 |
-| `Server.join` | ```join()```函数等待服务关闭且所有处理函数执行完毕。 |
-| `Server.pending` | ```pending()```函数返回当前正在执行的处理函数数量，即正在处理的连接或请求数。 |
+| `Server.addr` | 返回服务实际监听的地址和端口。 |
+| `Server.close` | 停止接收新连接，正在执行的处理函数继续执行完（优雅关闭）。 |
+| `Server.stop` | 先关闭服务（同```close()```），再强制结束所有正在执行的处理函数线程。 |
+| `Server.join` | 等待服务关闭且所有处理函数执行完毕。 |
+| `Server.pending` | 返回当前正在执行的处理函数数量，即正在处理的连接或请求数。 |
 
 ##### TA
 
 | 名称 | 说明 |
 | - | - |
-| `TA.MACD` | ```TA.MACD()```函数用于计算指数平滑异同移动平均线（MACD）指标。 |
-| `TA.KDJ` | ```TA.KDJ()```函数用于计算随机指标（KDJ）。 |
-| `TA.RSI` | ```TA.RSI()```函数用于计算相对强弱指标（RSI）。 |
-| `TA.ATR` | ```TA.ATR()```函数用于计算平均真实波幅指标（ATR）。 |
-| `TA.OBV` | ```TA.OBV()```函数用于计算能量潮指标（OBV）。 |
-| `TA.MA` | ```TA.MA()```函数用于计算移动平均线指标（Moving Average）。 |
-| `TA.EMA` | ```TA.EMA()```函数用于计算指数移动平均线（EMA）指标。 |
-| `TA.BOLL` | ```TA.BOLL()```函数用于计算布林带指标。 |
-| `TA.Alligator` | ```TA.Alligator()```函数用于计算鳄鱼线指标（Alligator）。 |
-| `TA.CMF` | ```TA.CMF()```函数用于计算蔡金资金流量指标（Chaikin Money Flow）。 |
-| `TA.Highest` | ```TA.Highest()```函数用于计算周期内最高价。 |
-| `TA.Lowest` | ```TA.Lowest()```函数用于计算周期最低价。 |
-| `TA.SMA` | ```TA.SMA()```函数用于计算简单移动平均线（SMA）指标。 |
+| `TA.MACD` | 计算指数平滑异同移动平均线（MACD）指标。 |
+| `TA.KDJ` | 计算随机指标（KDJ）。 |
+| `TA.RSI` | 计算相对强弱指标（RSI）。 |
+| `TA.ATR` | 计算平均真实波幅指标（ATR）。 |
+| `TA.OBV` | 计算能量潮指标（OBV）。 |
+| `TA.MA` | 计算移动平均线指标（Moving Average）。 |
+| `TA.EMA` | 计算指数移动平均线（EMA）指标。 |
+| `TA.BOLL` | 计算布林带指标。 |
+| `TA.Alligator` | 计算鳄鱼线指标（Alligator）。 |
+| `TA.CMF` | 计算蔡金资金流量指标（Chaikin Money Flow）。 |
+| `TA.Highest` | 计算周期内最高价。 |
+| `TA.Lowest` | 计算周期最低价。 |
+| `TA.SMA` | 计算简单移动平均线（SMA）指标。 |
 
 ##### Talib/OverlapStudies
 
@@ -2566,18 +2566,18 @@ fn main() {
 
 | 名称 | 说明 |
 | - | - |
-| `Ticker` | 市场行情的结构。 |
-| `Depth` | 市场深度数据结构。 |
-| `OrderBook` | 市场深度中的订单结构。 |
-| `Trade` | 市场成交记录的数据结构。 |
+| `Ticker` | ```exchange.GetTicker()```返回的行情：最高价、最低价、卖一价、买一价、最新成交价、开盘价、成交量与持仓量。 |
+| `Depth` | ```exchange.GetDepth()```返回的市场深度：卖盘```Asks```、买盘```Bids```（OrderBook数组）与时间戳。 |
+| `OrderBook` | 市场深度（Depth）里卖盘、买盘的一档：价格与数量。 |
+| `Trade` | ```exchange.GetTrades()```返回的市场成交记录：成交Id、时间、价格、数量与方向。 |
 | `Record` | K线柱的数据结构，标准的OHLC格式，用于绘制K线图和技术指标计算分析。 |
-| `Market` | 交易品种市场信息的数据结构。 |
-| `Order` | 订单的结构。 |
-| `Condition` | 条件单配置信息的结构。 |
-| `Account` | 账户信息的数据结构。 |
-| `Asset` | 具体币种资产信息的数据结构。 |
-| `Position` | 合约仓位信息的结构。 |
-| `Funding` | 交易品种资金费率信息的数据结构，仅加密货币永续合约支持资金费率功能。 |
+| `Market` | ```exchange.GetMarkets()```返回的品种市场信息：交易币与计价币、价格与数量的步长和精度、下单数量与金额的上下限、合约面值。 |
+| `Order` | ```exchange.GetOrder()```、```exchange.GetOrders()```等返回的订单：订单Id、价格、数量、成交数量、成交均价、状态、方向、开平仓、合约代码与条件单配置。 |
+| `Condition` | 条件单的配置：条件单类型，以及止盈、止损的触发价与委托价。 |
+| `Account` | ```exchange.GetAccount()```返回的账户信息：计价币与交易币的可用、冻结数量，期货另有权益与未实现盈亏。 |
+| `Asset` | ```exchange.GetAssets()```返回的数组中的一项：一个币种的可用数量与冻结数量。 |
+| `Position` | ```exchange.GetPositions()```返回的持仓：品种、杠杆、持仓量与冻结量、持仓均价、浮动盈亏、持仓方向、合约代码与保证金。 |
+| `Funding` | ```exchange.GetFundings()```返回的资金费率信息：品种、结算周期、时间与费率；仅加密货币永续合约有资金费率。 |
 
 ##### OtherStruct
 
@@ -2605,8 +2605,8 @@ fn main() {
 
 | 名称 | 说明 |
 | - | - |
-| `exchange` | exchange 是一个交易所对象，也是在策略实盘设置、回测设置中添加的第一个交易所对象。 |
-| `exchanges` | exchanges 是一个交易所对象数组，包含在策略实盘设置或回测设置中添加的所有交易所对象，其中 exchanges[0] 即为 exchange。 |
+| `exchange` | 在策略实盘设置、回测设置中添加的第一个交易所对象。 |
+| `exchanges` | 交易所对象数组，包含在策略实盘设置或回测设置中添加的所有交易所对象，其中 exchanges[0] 即为 exchange。 |
 
 ##### ORDER_STATE
 
@@ -3147,7 +3147,7 @@ function returnAnalyze(totalAssets, profits, ts, te, period, yearDays) {
 
 ### 参数调优
 
-参数调优在回测时按设置的范围生成多组参数，逐组回测。在「模拟回测」分页的策略参数部分，勾选参数右侧的**调优**选项后出现调优设置：
+回测时按设置的范围生成多组参数，逐组回测。在「模拟回测」分页的策略参数部分，勾选参数右侧的**调优**选项后出现调优设置：
 
 - 最小值：参数的起始值。
 - 最大值：参数递增后的最大值。
@@ -4225,13 +4225,13 @@ exchange.IO("rate" | "quota", 名字, 次数, 窗口[, "delay"])
 #### 两种模式
 
 - **rate（令牌桶）**：桶容量默认等于```次数```，开始时是满的，之后按「次数/窗口」的速度匀速补充，每次调用消耗一个。允许短时间连续调用，长期平均不超过「次数/窗口」。```次数```写成```"10/5"```时表示每个窗口补充10次、桶容量为5，用来限制突发。
-- **quota（固定窗口）**：每个窗口内最多调用```次数```次，进入下一个窗口时清零。窗口按时间纪元对齐：```"1s"```对齐整秒，```"1m"```对齐整分钟，```"1h"```对齐整点，```"1d"```对齐UTC零点（即北京时间08:00）。例如12:00:00.900开始计数，到12:00:01.000就进入了新窗口。
+- **quota（固定窗口）**：每个窗口内最多调用```次数```次，进入下一个窗口时清零。窗口按时间纪元对齐：```1s```对齐整秒，```1m```对齐整分钟，```1h```对齐整点，```1d```对齐UTC零点（即北京时间08:00）。例如12:00:00.900开始计数，到12:00:01.000就进入了新窗口。
 
 需要严格保证「任意一个交易所计数周期内不超过N次」时用```quota```并让窗口与交易所的计数周期一致；只需要控制平均频率时用```rate```。
 
 #### 参数
 
-参数写法（多个函数名用逗号分隔、```"*"```兜底规则、```rate```模式的```"次数/突发"```、窗口时长与```"@HHMM"```每日定时清零、```"delay"```动作、删除规则）见语法手册`exchange.IO`分类中的```exchange.IO("rate", ...)```。
+参数写法（多个函数名用逗号分隔、```*```兜底规则、```rate```模式的```"次数/突发"```、窗口时长与```@HHMM```每日定时清零、```delay```动作、删除规则）见语法手册`exchange.IO`分类中的```exchange.IO("rate", ...)```。
 
 #### 可以限制的函数名
 
@@ -4253,7 +4253,7 @@ exchange.IO("rate" | "quota", 名字, 次数, 窗口[, "delay"])
 - 规则按交易所对象分别设置：```exchanges[0]```上的规则不影响```exchanges[1]```。
 - 规则只在本次运行中有效，实盘重启后需要重新设置，通常写在```main()```开头。
 - 同一个名字再次设置时覆盖原规则；名字传空字符串（```exchange.IO("rate", "")```）清空该交易所对象上的全部规则。
-- 一次调用只按一条规则计数：有专属规则的函数不再计入```"*"```，所以```"*"```不能当作「所有调用的总配额」叠加在专属规则之上。
+- 一次调用只按一条规则计数：有专属规则的函数不再计入```*```，所以```*```不能当作「所有调用的总配额」叠加在专属规则之上。
 
 #### 超限时的表现
 
@@ -4265,7 +4265,7 @@ quota limit exceeded: GetTicker 10/1m
 quota limit exceeded: GetRecords 2000/day (resets at 0800)
 ```
 
-使用```"delay"```动作时调用会阻塞到有可用次数，日志中记录的调用时间是等待结束之后的时间。对每天清零的规则使用```"delay"```，最长可能等待到第二天，请谨慎使用。
+使用```delay```动作时调用会阻塞到有可用次数，日志中记录的调用时间是等待结束之后的时间。对每天清零的规则使用```delay```，最长可能等待到第二天，请谨慎使用。
 
 默认动作：超限的调用直接失败。
 
@@ -4315,7 +4315,7 @@ fn main() {
 }
 ```
 
-按交易所的限频规则分组设置：行情和交易各共用一条规则，交易类超限时等待而不是失败，其余函数用```"*"```兜底。
+按交易所的限频规则分组设置：行情和交易各共用一条规则，交易类超限时等待而不是失败，其余函数用```*```兜底。
 
 ```javascript
 function main() {
@@ -4696,7 +4696,7 @@ exchange.IO("api", tokenAddress, "decimals")                    // 代币精度
 
 标准ERC20方法（```balanceOf```、```decimals```、```allowance```、```approve```、```transfer```等）已内置，不需要注册。调用其它合约的方法前，需要用```exchange.IO("abi", 合约地址, ABI)```注册该合约的ABI。
 
-常用合约可以直接使用内置模板，第三个参数传模板名：```"weth"```、```"uniswapV3Pool"```、```"uniswapV3Factory"```、```"uniswapV3QuoterV2"```、```"uniswapV3SwapRouter02"```、```"uniswapV3PositionManager"```、```"permit2"```（PancakeSwap V3使用相同的模板，也可以写```"pancakeV3Pool"```等别名）。常用合约的地址可以用```exchange.IO("contracts")```查询。
+常用合约可以直接使用内置模板，第三个参数传模板名：```weth```、```uniswapV3Pool```、```uniswapV3Factory```、```uniswapV3QuoterV2```、```uniswapV3SwapRouter02```、```uniswapV3PositionManager```、```permit2```（PancakeSwap V3使用相同的模板，也可以写```pancakeV3Pool```等别名）。常用合约的地址可以用```exchange.IO("contracts")```查询。
 
 ```javascript
 exchange.IO("abi", poolAddress, "uniswapV3Pool")
@@ -4711,7 +4711,7 @@ https://api.etherscan.io/v2/api?chainid=1&module=contract&action=getabi&address=
 
 ##### 4. 发送交易
 
-调用合约的写方法时，交易所对象用配置的私钥签名并广播交易，返回交易哈希。发送前可以把```"api"```换成```"call"```，用```exchange.IO("call", ...)```预演同一笔调用：在节点上模拟执行，不签名、不消耗gas，执行失败时返回空值，```GetLastError()```中有合约给出的失败原因。
+调用合约的写方法时，交易所对象用配置的私钥签名并广播交易，返回交易哈希。发送前可以把```api```换成```call```，用```exchange.IO("call", ...)```预演同一笔调用：在节点上模拟执行，不签名、不消耗gas，执行失败时返回空值，```GetLastError()```中有合约给出的失败原因。
 
 以授权（approve）为例：
 
@@ -4875,7 +4875,7 @@ Log(exchange.IO("fromUnits", raw, usdt))   // 按合约的 decimals() 换算为�
 
 ##### 签名
 
-```exchange.IO("hash", "sign", "hex", "hex", 交易哈希)```用当前私钥对32字节哈希签名，返回65字节签名```r‖s‖v```（v为0或1）；```hash```的其它算法（如```"sha256"```）用于计算摘要，功能与```Encode()```函数相同。需要分别取得r、s、v（v为27或28）用于合约校验时，使用```exchange.IO("sign", ...)```，见语法手册的`Web3`交易所页。
+```exchange.IO("hash", "sign", "hex", "hex", 交易哈希)```用当前私钥对32字节哈希签名，返回65字节签名```r‖s‖v```（v为0或1）；```hash```的其它算法（如```sha256```）用于计算摘要，功能与```Encode()```函数相同。需要分别取得r、s、v（v为27或28）用于合约校验时，使用```exchange.IO("sign", ...)```，见语法手册的`Web3`交易所页。
 
 查询TRX与USDT余额，读取代币信息。
 
@@ -5004,7 +5004,7 @@ Alpha因子分析工具的公式中可以使用的函数和操作符。表达式
 
 ## 扩展API接口
 
-扩展API接口是平台的HTTP接口（```https://www.fmz.com/api/v1```），供脚本、定时任务等程序调用平台功能：查询账号、托管者、策略和实盘，创建、重启、停止实盘，向实盘发送交互命令等。
+平台的HTTP接口（```https://www.fmz.com/api/v1```），供脚本、定时任务等程序调用平台功能：查询账号、托管者、策略和实盘，创建、重启、停止实盘，向实盘发送交互命令等。
 
 在AI助手（Claude Code、Cursor等）中交互式地操作平台时，优先使用`AI接入`（MCP服务）：工具更全，参数按名称传递，权限可以按类别授予。两者可以使用同一把API KEY。
 
@@ -5274,7 +5274,7 @@ func main() {
 
 #### 直接验证
 
-直接验证不计算签名，而是把```secret_key```直接放在请求参数中，因此可以生成一个固定的URL，填到TradingView等只能设置一个URL的Webhook回调里。
+不计算签名，而是把```secret_key```直接放在请求参数中，因此可以生成一个固定的URL，填到TradingView等只能设置一个URL的Webhook回调里。
 
 > **安全提示**：```secret_key```写在URL中，会留在浏览器历史、代理和服务器的访问日志、Webhook服务方的配置里，任何拿到这个URL的人都能以这把API KEY的权限调用接口。建议只在```CommandRobot```的Webhook中使用直接验证，并为它单独创建一把只授权```CommandRobot```的API KEY（见`创建ApiKey`）；一旦泄露，立即删除这把API KEY。
 
@@ -6427,7 +6427,7 @@ Parameters:
 
 Fields:
 
-- `data.status` (string): 推送成功时为```"ok"```。
+- `data.status` (string): 推送成功时为```ok```。
 - `data.robot` (number): 本次请求的```robot```参数。
 - `data.channel` (string): 本次请求的```channel```参数。
 - `data.message` (string): 本次推送的消息。

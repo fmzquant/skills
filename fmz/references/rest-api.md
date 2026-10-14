@@ -2,7 +2,7 @@
 
 Same API keys as MCP (website: `/m/account#apikey`). For REST the key's privileges are method names or `*` (scope names only apply to MCP). Prefer the MCP tools when they are available; this is for scripts, cron jobs and older integrations. Below is the user guide's section, verbatim: creating a key, the request format and signature, every method, the return codes and the robot status codes.
 
-The extended API is the platform's HTTP interface (```https://www.fmz.com/api/v1```) for scripts, scheduled jobs and other programs: query the account, dockers, strategies and robots, create, restart and stop robots, send interactive commands to robots, and so on.
+The platform's HTTP interface (```https://www.fmz.com/api/v1```) for scripts, scheduled jobs and other programs: query the account, dockers, strategies and robots, create, restart and stop robots, send interactive commands to robots, and so on.
 
 To operate the platform interactively from an AI assistant (Claude Code, Cursor, ...), prefer AI Integration (the MCP service, see `AI Integration`): it has more tools, takes named parameters, and can be authorized by permission category. Both can use the same API KEY.
 
@@ -272,7 +272,7 @@ func main() {
 
 ### Direct Verification
 
-Direct verification computes no signature; the ```secret_key``` is put into the request parameters instead. This produces a fixed URL that can be entered into webhooks such as TradingView that accept only a single URL.
+Puts the ```secret_key``` into the request parameters instead of computing a signature. This produces a fixed URL that can be entered into webhooks such as TradingView that accept only a single URL.
 
 > **Security note**: a ```secret_key``` in a URL ends up in browser history, proxy and server access logs, and the webhook provider's configuration; anyone who obtains the URL can call the API with this key's permissions. Use direct verification only for ```CommandRobot``` webhooks, and create a dedicated API KEY for it that is granted ```CommandRobot``` only (see `Create ApiKey`). If it leaks, delete that API KEY immediately.
 
@@ -1427,7 +1427,7 @@ Parameters:
 
 Fields:
 
-- `data.status` (string): ```"ok"``` on success.
+- `data.status` (string): ```ok``` on success.
 - `data.robot` (number): Echo of the request's ```robot``` parameter.
 - `data.channel` (string): Echo of the request's ```channel``` parameter.
 - `data.message` (string): The message pushed.

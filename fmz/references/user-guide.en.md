@@ -242,7 +242,7 @@ The docker does not read the operating system's proxy settings. Environment vari
 
 #### Deploy Docker
 
-A docker can be deployed in two ways: rent a server on the platform with one click, or deploy it manually on your own device. Click **Deploy Docker** on the [docker management page](https://www.fmz.com/m/nodes) to open the [docker deployment page](https://www.fmz.com/m/add-node) and choose one.
+Rent a server on the platform with one click, or deploy it manually on your own device. Click **Deploy Docker** on the [docker management page](https://www.fmz.com/m/nodes) to open the [docker deployment page](https://www.fmz.com/m/add-node) and choose one.
 
 The docker management page lists the dockers of your account, as a list or with details, including each docker's IP address, version and build time.
 
@@ -538,7 +538,7 @@ When a robot sends a push message, the platform sends a ```GET``` request to the
 To send a ```POST``` request, write the push address as ```request URL||request body```, for example ```http://abc.com/push.php||text={body}```: the part before ```||``` is the request URL and the part after it is the request body; both parts can use the placeholders above. The push address must be an ```http``` or ```https``` address reachable from the public internet.
 
 ##### Pushing from a strategy
-- JavaScript, Python, Rust: when calling `Log` or another function that writes to the log area (such as ```exchange.CreateOrder()``` or ```exchange.CancelOrder()```), pass one more argument ```"@"``` after the required ones and that log line is pushed according to the push settings, for example ```Log("This is a push message", "@")```. In Rust use the ```Log!``` macro the same way: ```Log!("This is a push message", "@");```.
+- JavaScript, Python, Rust: when calling `Log` or another function that writes to the log area (such as ```exchange.CreateOrder()``` or ```exchange.CancelOrder()```), pass one more argument ```@``` after the required ones and that log line is pushed according to the push settings, for example ```Log("This is a push message", "@")```. In Rust use the ```Log!``` macro the same way: ```Log!("This is a push message", "@");```.
 - PINE and My language: enable trade log push in the parameters of the "trading library" built into the strategy; trades then push messages automatically.
 
 ##### Push limits
@@ -713,7 +713,7 @@ Choose the payment method and amount on the [billing page](https://www.fmz.com/m
 
 #### Sub-accounts
 
-A sub-account lets other people view and operate some of your live robots without giving them the main account.
+Lets other people view and operate some of your live robots without giving them the main account.
 
 ##### Create a sub-account
 On the [account settings page](https://www.fmz.com/m/account#shadowmember), open the sub-account tab, select the live robots the sub-account may access under operation permissions, enter its username and login password, and create it. Sub-accounts are listed on the same page, where you can edit, lock/unlock or delete them.
@@ -729,7 +729,7 @@ A sub-account sees only the live robots authorized to it. On those robots it can
 
 ## Writing Strategies
 
-What you need to know to write strategies, covering strategy structure (lifecycle, main loop, event-driven), notes for each programming language, strategy parameters, interactive controls, template libraries, built-in libraries, Chinese/English text in the strategy UI, and a categorized quick reference of all API functions.
+Covers strategy structure (lifecycle, main loop, event-driven), notes for each programming language, strategy parameters, interactive controls, template libraries, built-in libraries, Chinese/English text in the strategy UI, and a categorized quick reference of all API functions.
 
 ### Strategy Structure
 
@@ -1163,7 +1163,7 @@ function main() {
 }
 ```
 
-- ```channel``` can be ```"ticker"```, ```"bbo"```, ```"depth"```, ```"trade"```, ```"kline"``` (```interval``` is the period in seconds) or ```"orders"```.
+- ```channel``` can be ```ticker```, ```bbo```, ```depth```, ```trade```, ```kline``` (```interval``` is the period in seconds) or ```orders```.
 - Event ```kind```: 1 ticker, 3 depth (the event only signals that the order book changed; read the levels with ```ctx.book(ev.ex, ev.symbol, n)```), 4 trade, 5 K-line, 16 order update.
 - If market data subscriptions are not consumed in time, only the latest data is kept or the oldest is dropped; order updates are never dropped, so the strategy must keep calling ```ctx.poll()```.
 - ```EventLoop()``` and ```ctx.poll()``` take events from the same queues, so a strategy should use only one of them.
@@ -1562,7 +1562,7 @@ The platform supports writing strategies using the Workflow approach. Workflow i
 
 ### Strategy Parameters
 
-Strategy parameters are set in the strategy interface and appear in the strategy code as global variables with the same names (global constants in Rust), accessed by name. Differences between languages:
+Set in the strategy interface; they appear in the strategy code as global variables with the same names (global constants in Rust), accessed by name. Differences between languages:
 - ```JavaScript```, ```MyLanguage```: parameters can be read directly and the parameter variables can also be modified in code.
 - ```Python```: parameters can be read directly; to assign a new value to one inside a function, declare it with ```global``` first.
 - ```Rust```: parameters are constants that can only be read, not modified; see `Rust` for the type of each kind of parameter.
@@ -1788,7 +1788,7 @@ For buttons in status bar tables, button colors and sizes (```class```), multi-s
 
 ### Template Library
 
-A **template library** is a reusable code module on the FMZ Quant Trading Platform and a category of strategy code. Languages that support template libraries: ```JavaScript```, ```Python``` and ```Rust```. If the category is set to template library when a strategy is created, a template library is created in the strategy library of the logged-in account; its category cannot be changed to an ordinary strategy afterwards.
+A reusable code module on the FMZ Quant Trading Platform and a category of strategy code. Languages that support template libraries: ```JavaScript```, ```Python``` and ```Rust```. If the category is set to template library when a strategy is created, a template library is created in the strategy library of the logged-in account; its category cannot be changed to an ordinary strategy afterwards.
 
 ![Create Template Library Page](https://www.fmz.com/upload/asset/2e4c55da99fd457ca94a0.png)
 
@@ -2076,7 +2076,7 @@ Every function, structure and constant of the API reference, grouped by its cate
 | `GetOS` | Retrieves the operating system information of the device hosting the bot. |
 | `GetPid` | Get the ID of the live trading process. |
 | `GetMeta` | Get the ```Meta``` value written when generating the strategy registration code. |
-| `Sleep` | The sleep function pauses program execution for a specified period of time. |
+| `Sleep` | Pauses program execution for a specified period of time. |
 | `Unix` | Get the second-level timestamp of the current moment. |
 | `UnixNano` | Get the nanosecond-level timestamp of the current moment. |
 | `_D` | Convert a millisecond-level timestamp or a ```Date``` object into a time string. |
@@ -2086,8 +2086,8 @@ Every function, structure and constant of the API reference, grouped by its cate
 | `_N` | Format a floating-point number. |
 | `_C` | A retry function used for fault-tolerant handling of interface calls. |
 | `_Cross` | Returns the number of crossover periods between array ```arr1``` and array ```arr2```. |
-| `JSON.parse` | The ```JSON.parse``` function is a method of the ECMAScript standard built-in object ```JSON```, used to decode (parse) a JSON string. |
-| `JSON.stringify` | The ```JSON.stringify``` function is a method of the ECMAScript standard built-in object ```JSON```, used to convert JavaScript values to JSON strings. |
+| `JSON.parse` | Decodes (parses) a JSON string; a method of the ECMAScript standard built-in object ```JSON```. |
+| `JSON.stringify` | Converts JavaScript values to JSON strings; a method of the ECMAScript standard built-in object ```JSON```. |
 | `Encode` | This function encodes data according to the parameters passed in. |
 | `MD5` | Calculate the MD5 hash of the parameter ```data```. |
 | `UUID` | Create a UUID. |
@@ -2096,7 +2096,7 @@ Every function, structure and constant of the API reference, grouped by its cate
 
 | Name | Description |
 | - | - |
-| `Log` | The ```Log()``` function is used to output logs. |
+| `Log` | Outputs logs. |
 | `LogStatus` | Outputs information to the status bar on the backtesting system or the live trading page. |
 | `LogProfit` | Records and prints the profit/loss value, and plots the equity curve based on the profit/loss value. |
 | `LogProfitReset` | Clear all profit logs and the profit chart. |
@@ -2107,89 +2107,89 @@ Every function, structure and constant of the API reference, grouped by its cate
 | `KLineChart` | This function is used to perform custom drawing while a strategy is running, using a drawing approach similar to the ```Pine``` language. |
 | `console.log` | Used to output debug information in the "Debug Info" section of the live trading page. |
 | `console.error` | Used to output error messages in the "Debug Information" section of the live trading page. |
-| `exchange.Log` | The ```exchange.Log()``` function is used to output order placement and cancellation logs in the log column area. |
+| `exchange.Log` | Outputs order placement and cancellation logs in the log column area. |
 
 ##### Market
 
 | Name | Description |
 | - | - |
 | `exchange.GetTicker` | Gets the Ticker structure (market data) of a spot instrument or contract; without ```symbol``` it uses the currently set trading pair and contract code. |
-| `exchange.GetTickers` | The ```exchange.GetTickers()``` function is used to retrieve aggregated market data from the exchange (an array of Ticker structures). |
+| `exchange.GetTickers` | Retrieves aggregated market data from the exchange (an array of Ticker structures). |
 | `exchange.GetDepth` | Gets the Depth structure, i.e. the order book data, of the spot or contract corresponding to the currently set trading pair and contract code. |
 | `exchange.GetTrades` | Gets the Trade structure array of the spot or futures corresponding to the currently set trading pair and contract code, i.e. the market's trade (tick) data. |
 | `exchange.GetRecords` | Get the Record structure array (i.e. K-line data) of the spot or contract corresponding to the currently set trading pair or contract code. |
-| `exchange.GetMarkets` | The ```exchange.GetMarkets()``` function is used to retrieve market information from the exchange. |
+| `exchange.GetMarkets` | Retrieves market information from the exchange. |
 | `exchange.GetRawJSON` | Get the raw content returned by the most recent ```rest``` request from the current exchange object (exchange, exchanges). |
-| `exchange.SetData` | The ```exchange.SetData()``` function is used to set the data loaded when the strategy is running. |
-| `exchange.GetData` | The ```exchange.GetData()``` function is used to retrieve data loaded by the ```exchange.SetData()``` function, or data provided by an external link. |
+| `exchange.SetData` | Sets the data loaded when the strategy is running. |
+| `exchange.GetData` | Retrieves data loaded by the ```exchange.SetData()``` function, or data provided by an external link. |
 
 ##### Trade
 
 | Name | Description |
 | - | - |
-| `exchange.Buy` | The ```exchange.Buy()``` function places a buy order. |
-| `exchange.Sell` | The ```exchange.Sell()``` function is used to place a sell order. |
-| `exchange.CreateOrder` | ```exchange.CreateOrder()``` function is used to place orders. |
-| `exchange.ModifyOrder` | The ```exchange.ModifyOrder()``` function is used to modify an existing regular order, allowing you to modify the order's price and quantity. |
-| `exchange.CancelOrder` | The ```exchange.CancelOrder()``` function is used to cancel an order. |
-| `exchange.GetOrder` | The ```exchange.GetOrder()``` function is used to obtain order information. |
-| `exchange.GetOrders` | The ```exchange.GetOrders()``` function is used to obtain the current unfilled orders. |
-| `exchange.GetHistoryOrders` | ```exchange.GetHistoryOrders()``` function is used to retrieve the historical orders of the current trading pair or contract, and supports specifying a particular trading instrument. |
-| `exchange.CreateConditionOrder` | The ```exchange.CreateConditionOrder()``` function is used to create a conditional order. |
-| `exchange.ModifyConditionOrder` | The ```exchange.ModifyConditionOrder()``` function is used to modify an existing conditional order, allowing modification of the order amount, trigger condition, and execution price of the conditional order. |
-| `exchange.CancelConditionOrder` | ```exchange.CancelConditionOrder()``` function is used to cancel a conditional order. |
-| `exchange.GetConditionOrder` | The ```exchange.GetConditionOrder()``` function is used to retrieve information about a specified conditional order. |
-| `exchange.GetConditionOrders` | ```exchange.GetConditionOrders()``` function is used to obtain unfinished conditional orders (conditional orders that have not yet been triggered or canceled). |
-| `exchange.GetHistoryConditionOrders` | The ```exchange.GetHistoryConditionOrders()``` function is used to retrieve the historical conditional orders (including triggered, canceled, and expired conditional orders) for the current trading pair or contract, and supports specifying a… |
+| `exchange.Buy` | Places a buy order. |
+| `exchange.Sell` | Places a sell order. |
+| `exchange.CreateOrder` | Places orders. |
+| `exchange.ModifyOrder` | Modifies an existing regular order, allowing you to modify the order's price and quantity. |
+| `exchange.CancelOrder` | Cancels an order. |
+| `exchange.GetOrder` | Obtains order information. |
+| `exchange.GetOrders` | Obtains the current unfilled orders. |
+| `exchange.GetHistoryOrders` | Retrieves the historical orders of the current trading pair or contract, and supports specifying a particular trading instrument. |
+| `exchange.CreateConditionOrder` | Creates a conditional order. |
+| `exchange.ModifyConditionOrder` | Modifies an existing conditional order, allowing modification of the order amount, trigger condition, and execution price of the conditional order. |
+| `exchange.CancelConditionOrder` | Cancels a conditional order. |
+| `exchange.GetConditionOrder` | Retrieves information about a specified conditional order. |
+| `exchange.GetConditionOrders` | Obtains unfinished conditional orders (conditional orders that have not yet been triggered or canceled). |
+| `exchange.GetHistoryConditionOrders` | Retrieves the historical conditional orders (including triggered, canceled, and expired conditional orders) for the current trading pair or contract, and supports specifying a particular trading instrument. |
 
 ##### Account
 
 | Name | Description |
 | - | - |
-| `exchange.GetAccount` | The ```exchange.GetAccount()``` function requests the exchange account information. |
-| `exchange.GetAssets` | The ```exchange.GetAssets``` function is used to request the asset information of the exchange account. |
+| `exchange.GetAccount` | Requests the exchange account information. |
+| `exchange.GetAssets` | Requests the asset information of the exchange account. |
 
 ##### Futures
 
 | Name | Description |
 | - | - |
-| `exchange.SetContractType` | The ```exchange.SetContractType()``` function is used to set the current contract code of the exchange exchange object. |
-| `exchange.GetContractType` | The ```exchange.GetContractType()``` function is used to get the contract code currently set for the exchange exchange object. |
-| `exchange.SetDirection` | The ```exchange.SetDirection()``` function is used to set the order direction when calling the exchange.Buy function or exchange.Sell function to place futures contract orders. |
-| `exchange.SetMarginLevel` | The ```exchange.SetMarginLevel()``` function is used to set the leverage value for the trading pair or contract specified by the ```symbol``` parameter. |
-| `exchange.GetPositions` | The ```exchange.GetPositions()``` function gets position information. |
-| `exchange.GetFundings` | The ```exchange.GetFundings()``` function is used to obtain the funding rate data for the current period. |
+| `exchange.SetContractType` | Sets the current contract code of the exchange object. |
+| `exchange.GetContractType` | Gets the contract code currently set for the exchange object. |
+| `exchange.SetDirection` | Sets the order direction when calling the exchange.Buy function or exchange.Sell function to place futures contract orders. |
+| `exchange.SetMarginLevel` | Sets the leverage value for the trading pair or contract specified by the ```symbol``` parameter. |
+| `exchange.GetPositions` | Gets position information. |
+| `exchange.GetFundings` | Obtains the funding rate data for the current period. |
 
 ##### Exchange
 
 | Name | Description |
 | - | - |
-| `exchange.GetName` | The ```exchange.GetName()``` function is used to get the name of the exchange bound to the current exchange object. |
-| `exchange.GetLabel` | The ```exchange.GetLabel()``` function is used to obtain the custom label set when configuring the exchange object. |
-| `exchange.GetCurrency` | The ```exchange.GetCurrency()``` function is used to get the currently set trading pair. |
-| `exchange.SetCurrency` | The ```exchange.SetCurrency()``` function is used to switch the current trading pair of the exchange object exchange. |
-| `exchange.GetQuoteCurrency` | The ```exchange.GetQuoteCurrency()``` function is used to get the name of the quote currency of the current trading pair, i.e. ```quoteCurrency```. |
+| `exchange.GetName` | Gets the name of the exchange bound to the current exchange object. |
+| `exchange.GetLabel` | Obtains the custom label set when configuring the exchange object. |
+| `exchange.GetCurrency` | Gets the currently set trading pair. |
+| `exchange.SetCurrency` | Switches the current trading pair of the exchange object exchange. |
+| `exchange.GetQuoteCurrency` | Gets the name of the quote currency of the current trading pair, i.e. ```quoteCurrency```. |
 | `exchange.GetPeriod` | Retrieves the K-line period configured on the FMZ Quant Trading platform website page when running a strategy in backtesting or live trading, i.e., the default K-line period used when calling the ```exchange.GetRecords()``` function without… |
 | `exchange.SetMaxBarLen` | Set the maximum length of the K-line (candlestick chart). |
-| `exchange.SetPrecision` | The ```exchange.SetPrecision()``` function is used to set the precision of the price and order amount for the ```exchange``` exchange object. |
+| `exchange.SetPrecision` | Sets the precision of the price and order amount for the ```exchange``` object. |
 | `exchange.GetRate` | Get the exchange rate currently set for the exchange object. |
 | `exchange.SetRate` | Set the current exchange rate of the exchange object. |
-| `exchange.SetBase` | The ```exchange.SetBase()``` function is used to set the base URL of the exchange API interface used by the exchange exchange object. |
-| `exchange.GetBase` | The ```exchange.GetBase()``` function is used to get the base address of the current exchange API interface. |
-| `exchange.SetProxy` | The ```exchange.SetProxy()``` function is used to set the proxy configuration of the exchange exchange object. |
-| `exchange.SetTimeout` | The ```exchange.SetTimeout()``` function is used to set the timeout for ```rest``` requests of the exchange exchange object. |
-| `exchange.Encode` | The ```exchange.Encode()``` function is used to perform signature and encryption computations. |
+| `exchange.SetBase` | Sets the base URL of the exchange API interface used by the exchange object. |
+| `exchange.GetBase` | Gets the base address of the current exchange API interface. |
+| `exchange.SetProxy` | Sets the proxy configuration of the exchange object. |
+| `exchange.SetTimeout` | Sets the timeout for ```rest``` requests of the exchange object. |
+| `exchange.Encode` | Performs signature and encryption computations. |
 
 ##### IO
 
 | Name | Description |
 | - | - |
-| `exchange.IO` | ```exchange.IO()``` function is used to call other interfaces related to the exchange object. |
-| ```exchange.IO("api", ...)``` | ```exchange.IO("api", ...)``` calls a raw REST endpoint of the exchange that has no wrapper function; the platform signs the request. |
-| ```exchange.IO("currency", ...)``` | ```exchange.IO("currency", ...)``` switches the current trading pair of the exchange object at runtime. |
-| ```exchange.IO("base", ...)``` | ```exchange.IO("base", ...)``` queries or switches the base address of the exchange API. |
-| ```exchange.IO(mode, value)``` | ```exchange.IO(mode, value)``` switches trading modes of the exchange: simulated or live, cross or isolated margin, hedge or one-way positions, unified account, margin trading mode, self-trade prevention and so on. |
-| ```exchange.IO("rate", ...)``` | ```exchange.IO("rate", ...)``` and ```exchange.IO("quota", ...)``` limit how often API functions are called. |
+| `exchange.IO` | Calls other interfaces related to the exchange object. |
+| ```exchange.IO("api", ...)``` | Calls a raw REST endpoint of the exchange that has no wrapper function; the platform signs the request. |
+| ```exchange.IO("currency", ...)``` | Switches the current trading pair of the exchange object at runtime. |
+| ```exchange.IO("base", ...)``` | Queries or switches the base address of the exchange API. |
+| ```exchange.IO(mode, value)``` | Switches the trading mode of an exchange, including demo/live trading, cross/isolated margin, hedge/one-way position mode, unified account, margin trading mode and self-trade prevention. |
+| ```exchange.IO("rate", ...)``` | Limits how often each API function is called: ```rate``` for smoothed limiting, ```quota``` for quota limiting. |
 
 ##### Network
 
@@ -2224,91 +2224,91 @@ Every function, structure and constant of the API reference, grouped by its cate
 
 | Name | Description |
 | - | - |
-| `threading.Thread` | The ```Thread()``` function is used to create concurrent threads. |
-| `threading.getThread` | The ```getThread()``` function is used to get a thread object based on the specified thread ID. |
-| `threading.mainThread` | The ```mainThread()``` function is used to get the thread object of the main thread, which is the thread where the ```main()``` function in the strategy is located. |
-| `threading.currentThread` | The ```currentThread()``` function is used to get the thread object of the current thread. |
-| `threading.Lock` | The ```Lock()``` function is used to create a thread lock object. |
-| `threading.Condition` | The ```Condition()``` function is used to create a condition variable object, which is used to implement synchronization and communication between threads in a multi-threaded concurrent environment. |
-| `threading.Event` | The ```Event()``` function is used to create a *thread event* object, which is used for synchronization between threads, allowing one thread to wait for notification or signal from another thread. |
-| `threading.Dict` | The ```Dict()``` function is used to create a dictionary object for passing and sharing data between concurrent threads. |
-| `threading.Serve` | The ```Serve()``` function starts an HTTP, TCP or WebSocket (over HTTP) service inside the strategy process and returns a Server object. |
-| `threading.pending` | The ```pending``` function is used to get the number of concurrent threads currently running in the strategy program. |
+| `threading.Thread` | Creates concurrent threads. |
+| `threading.getThread` | Gets a thread object based on the specified thread ID. |
+| `threading.mainThread` | Gets the thread object of the main thread, which is the thread where the ```main()``` function in the strategy is located. |
+| `threading.currentThread` | Gets the thread object of the current thread. |
+| `threading.Lock` | Creates a thread lock object. |
+| `threading.Condition` | Creates a condition variable object, which is used to implement synchronization and communication between threads in a multi-threaded concurrent environment. |
+| `threading.Event` | Creates a *thread event* object, which is used for synchronization between threads, allowing one thread to wait for notification or signal from another thread. |
+| `threading.Dict` | Creates a dictionary object for passing and sharing data between concurrent threads. |
+| `threading.Serve` | Starts an HTTP, TCP or WebSocket (over HTTP) service inside the strategy process and returns a Server object. |
+| `threading.pending` | Gets the number of concurrent threads currently running in the strategy program. |
 
 ##### Threads/Thread
 
 | Name | Description |
 | - | - |
-| `Thread.peekMessage` | The ```peekMessage()``` function is used to receive messages from a thread. |
-| `Thread.postMessage` | The ```postMessage()``` function is used to send messages to a thread. |
-| `Thread.join` | The ```join()``` function is used to wait for a thread to exit and reclaim system resources. |
-| `Thread.terminate` | The ```terminate()``` function is used to forcibly terminate a thread and release the hardware resources occupied when the thread was created. |
-| `Thread.getData` | The ```getData()``` function is used to access variables recorded in the thread environment. |
-| `Thread.setData` | The ```setData()``` function is used to store variables in the thread environment. |
-| `Thread.id` | The ```id()``` function is used to return the ```threadId``` of the current multi-threaded object instance. |
-| `Thread.name` | The ```name()``` function is used to return the name of the current multi-threaded object instance. |
-| `Thread.eventLoop` | The ```eventLoop()``` function is used to listen for events received by the current thread (the thread of the caller). |
+| `Thread.peekMessage` | Receives messages from a thread. |
+| `Thread.postMessage` | Sends messages to a thread. |
+| `Thread.join` | Waits for a thread to exit and reclaims its system resources. |
+| `Thread.terminate` | Forcibly terminates a thread and releases the hardware resources occupied when the thread was created. |
+| `Thread.getData` | Accesses variables recorded in the thread environment. |
+| `Thread.setData` | Stores variables in the thread environment. |
+| `Thread.id` | Returns the ```threadId``` of the current multi-threaded object instance. |
+| `Thread.name` | Returns the name of the current multi-threaded object instance. |
+| `Thread.eventLoop` | Listens for events received by the current thread (the thread of the caller). |
 
 ##### Threads/ThreadLock
 
 | Name | Description |
 | - | - |
-| `ThreadLock.acquire` | The ```acquire()``` function is used to request a thread lock (acquire lock). |
-| `ThreadLock.release` | The ```release()``` function is used to release a thread lock (unlock). |
+| `ThreadLock.acquire` | Requests a thread lock (acquire lock). |
+| `ThreadLock.release` | Releases a thread lock (unlock). |
 
 ##### Threads/ThreadEvent
 
 | Name | Description |
 | - | - |
-| `ThreadEvent.set` | The ```set()``` function is used to set an event signal. |
-| `ThreadEvent.clear` | The ```clear()``` function is used to clear the signal. |
-| `ThreadEvent.wait` | The ```wait()``` function is used to set event (signal) waiting, which will block until the event (signal) is set; supports setting timeout parameters. |
-| `ThreadEvent.isSet` | The ```isSet()``` function is used to determine whether an event (signal) has been set. |
+| `ThreadEvent.set` | Sets an event signal. |
+| `ThreadEvent.clear` | Clears the signal. |
+| `ThreadEvent.wait` | Sets event (signal) waiting, which will block until the event (signal) is set; supports setting timeout parameters. |
+| `ThreadEvent.isSet` | Determines whether an event (signal) has been set. |
 
 ##### Threads/ThreadCondition
 
 | Name | Description |
 | - | - |
-| `ThreadCondition.notify` | The ```notify()``` function is used to wake up one waiting thread (if any exists). |
-| `ThreadCondition.notifyAll` | The ```notifyAll()``` function is used to wake up all waiting threads. |
-| `ThreadCondition.wait` | The ```wait()``` function is used to put a thread into a waiting state under specific conditions. |
-| `ThreadCondition.acquire` | The ```acquire()``` function is used to request a thread lock (acquire lock). |
-| `ThreadCondition.release` | The ```release()``` function is used to release the thread lock (unlock). |
+| `ThreadCondition.notify` | Wakes up one waiting thread (if any exists). |
+| `ThreadCondition.notifyAll` | Wakes up all waiting threads. |
+| `ThreadCondition.wait` | Puts a thread into a waiting state under specific conditions. |
+| `ThreadCondition.acquire` | Requests a thread lock (acquire lock). |
+| `ThreadCondition.release` | Releases the thread lock (unlock). |
 
 ##### Threads/ThreadDict
 
 | Name | Description |
 | - | - |
-| `ThreadDict.get` | The ```get()``` function is used to retrieve the value of a key recorded in a dictionary object. |
-| `ThreadDict.set` | The ```set()``` function is used to set key-value pairs. |
+| `ThreadDict.get` | Retrieves the value of a key recorded in a dictionary object. |
+| `ThreadDict.set` | Sets key-value pairs. |
 
 ##### Threads/Server
 
 | Name | Description |
 | - | - |
-| `Server.addr` | The ```addr()``` function returns the address and port the service actually listens on. |
-| `Server.close` | The ```close()``` function stops accepting new connections; handlers already running finish normally (graceful shutdown). |
-| `Server.stop` | The ```stop()``` function closes the service (as ```close()```) and then terminates every handler thread that is still running. |
-| `Server.join` | The ```join()``` function waits until the service is closed and no handler is running. |
-| `Server.pending` | The ```pending()``` function returns the number of handlers currently running, i.e. connections or requests being handled. |
+| `Server.addr` | Returns the address and port the service actually listens on. |
+| `Server.close` | Stops accepting new connections; handlers already running finish normally (graceful shutdown). |
+| `Server.stop` | Closes the service (as ```close()```) and then terminates every handler thread that is still running. |
+| `Server.join` | Waits until the service is closed and no handler is running. |
+| `Server.pending` | Returns the number of handlers currently running, i.e. connections or requests being handled. |
 
 ##### TA
 
 | Name | Description |
 | - | - |
-| `TA.MACD` | The ```TA.MACD()``` function is used to calculate the Moving Average Convergence Divergence (MACD) indicator. |
-| `TA.KDJ` | The ```TA.KDJ()``` function is used to calculate the Stochastic Oscillator (KDJ). |
-| `TA.RSI` | The ```TA.RSI()``` function is used to calculate the Relative Strength Index (RSI). |
-| `TA.ATR` | The ```TA.ATR()``` function is used to calculate the Average True Range indicator (ATR). |
-| `TA.OBV` | ```TA.OBV()``` function is used to calculate the On-Balance Volume (OBV). |
-| `TA.MA` | The ```TA.MA()``` function is used to calculate the Moving Average indicator (Moving Average). |
-| `TA.EMA` | The ```TA.EMA()``` function is used to calculate the Exponential Moving Average (EMA) indicator. |
-| `TA.BOLL` | The ```TA.BOLL()``` function is used to calculate the Bollinger Bands indicator. |
-| `TA.Alligator` | ```TA.Alligator()``` function is used to calculate the Alligator indicator. |
-| `TA.CMF` | The ```TA.CMF()``` function is used to calculate the Chaikin Money Flow (CMF) indicator. |
-| `TA.Highest` | The ```TA.Highest()``` function is used to calculate the highest price within a period. |
-| `TA.Lowest` | The ```TA.Lowest()``` function is used to calculate the lowest price over a period. |
-| `TA.SMA` | The ```TA.SMA()``` function is used to calculate the Simple Moving Average (SMA) indicator. |
+| `TA.MACD` | Calculates the Moving Average Convergence Divergence (MACD) indicator. |
+| `TA.KDJ` | Calculates the Stochastic Oscillator (KDJ). |
+| `TA.RSI` | Calculates the Relative Strength Index (RSI). |
+| `TA.ATR` | Calculates the Average True Range indicator (ATR). |
+| `TA.OBV` | Calculates the On-Balance Volume (OBV). |
+| `TA.MA` | Calculates the Moving Average indicator (Moving Average). |
+| `TA.EMA` | Calculates the Exponential Moving Average (EMA) indicator. |
+| `TA.BOLL` | Calculates the Bollinger Bands indicator. |
+| `TA.Alligator` | Calculates the Alligator indicator. |
+| `TA.CMF` | Calculates the Chaikin Money Flow (CMF) indicator. |
+| `TA.Highest` | Calculates the highest price within a period. |
+| `TA.Lowest` | Calculates the lowest price over a period. |
+| `TA.SMA` | Calculates the Simple Moving Average (SMA) indicator. |
 
 ##### Talib/OverlapStudies
 
@@ -2566,18 +2566,18 @@ Every function, structure and constant of the API reference, grouped by its cate
 
 | Name | Description |
 | - | - |
-| `Ticker` | Market data structure. |
-| `Depth` | Market depth data structure. |
-| `OrderBook` | Order structure in market depth. |
-| `Trade` | Data structure for market trade records. |
+| `Ticker` | Market data returned by ```exchange.GetTicker()```: high, low, best ask, best bid, last price, open, volume and open interest. |
+| `Depth` | Market depth returned by ```exchange.GetDepth()```: the asks ```Asks``` and bids ```Bids``` (OrderBook arrays) and a timestamp. |
+| `OrderBook` | One price level of the asks or bids in market depth (Depth): price and amount. |
+| `Trade` | Returned by ```exchange.GetTrades()```: a market trade's ID, time, price, amount and side. |
 | `Record` | Data structure for candlestick bars in standard OHLC format, used for charting candlesticks and calculating technical indicators. |
-| `Market` | Data structure for trading symbol market information. |
-| `Order` | Order structure. |
-| `Condition` | Conditional order configuration structure, used to set trigger conditions and execution prices for conditional orders. |
-| `Account` | Data structure for account information. |
-| `Asset` | Data structure for specific currency asset information. |
-| `Position` | Data structure for contract position information. |
-| `Funding` | Data structure for trading instrument funding rate information, only cryptocurrency perpetual contracts support funding rate functionality. |
+| `Market` | Returned by ```exchange.GetMarkets()```: an instrument's base and quote assets, price and amount steps and precisions, order quantity and notional limits, and contract value. |
+| `Order` | Returned by ```exchange.GetOrder()```, ```exchange.GetOrders()``` and similar: order ID, price, amount, filled amount, average price, status, type, offset, contract code and conditional order settings. |
+| `Condition` | Conditional order settings: the conditional order type and the take-profit and stop-loss trigger and order prices, used to set the trigger conditions and execution prices of conditional orders. |
+| `Account` | Returned by ```exchange.GetAccount()```: the available and frozen amounts of the quote and base currencies, plus equity and unrealized profit and loss on futures. |
+| `Asset` | One item of the array returned by ```exchange.GetAssets()```: the available and frozen amounts of one currency. |
+| `Position` | Returned by ```exchange.GetPositions()```: instrument, leverage, amount and frozen amount, average price, unrealized profit, direction, contract code and margin. |
+| `Funding` | Returned by ```exchange.GetFundings()```: instrument, settlement interval, time and funding rate; only cryptocurrency perpetual contracts have funding rates. |
 
 ##### OtherStruct
 
@@ -2605,8 +2605,8 @@ Every function, structure and constant of the API reference, grouped by its cate
 
 | Name | Description |
 | - | - |
-| `exchange` | exchange is an exchange object, and it is also the first exchange object added in the strategy live trading settings and backtesting settings. |
-| `exchanges` | exchanges is an array of exchange objects that contains all the exchange objects added in the strategy's live trading settings or backtesting settings, where exchanges[0] is exchange. |
+| `exchange` | The first exchange object added in the strategy live trading settings and backtesting settings. |
+| `exchanges` | An array of exchange objects that contains all the exchange objects added in the strategy's live trading settings or backtesting settings, where exchanges[0] is exchange. |
 
 ##### ORDER_STATE
 
@@ -3147,7 +3147,7 @@ function returnAnalyze(totalAssets, profits, ts, te, period, yearDays) {
 
 ### Parameter Optimization
 
-Parameter optimization generates several parameter sets from the ranges you configure and backtests each of them. In the strategy parameter section of the "Backtest" tab, tick the **Optimize** option to the right of a parameter to show its settings:
+Generates several parameter sets from the ranges you configure and backtests each of them. In the strategy parameter section of the "Backtest" tab, tick the **Optimize** option to the right of a parameter to show its settings:
 
 - Min: the starting value of the parameter.
 - Max: the largest value the parameter is increased to.
@@ -4228,13 +4228,13 @@ exchange.IO("rate" | "quota", name, count, window[, "delay"])
 #### Two modes
 
 - **rate (token bucket)**: the bucket capacity defaults to ```count```. It starts full and refills at a steady "count per window"; each call takes one token. Short bursts are allowed, while the long-run average never exceeds "count per window". Writing ```count``` as ```"10/5"``` means 10 refills per window with a bucket capacity of 5, which limits bursts.
-- **quota (fixed window)**: at most ```count``` calls per window; the counter resets when the next window starts. Windows are aligned to the Unix epoch: ```"1s"``` to whole seconds, ```"1m"``` to whole minutes, ```"1h"``` to whole hours, ```"1d"``` to UTC midnight (08:00 Beijing time). For example, counting that starts at 12:00:00.900 is already in a new window at 12:00:01.000.
+- **quota (fixed window)**: at most ```count``` calls per window; the counter resets when the next window starts. Windows are aligned to the Unix epoch: ```1s``` to whole seconds, ```1m``` to whole minutes, ```1h``` to whole hours, ```1d``` to UTC midnight (08:00 Beijing time). For example, counting that starts at 12:00:00.900 is already in a new window at 12:00:01.000.
 
 Use ```quota``` with a window matching the exchange's counting period when you must guarantee "no more than N calls in any of the exchange's periods"; use ```rate``` when you only need to control the average frequency.
 
 #### Parameters
 
-For the parameter syntax (several function names separated by commas, the ```"*"``` fallback rule, ```"count/burst"``` in ```rate``` mode, window durations and daily resets with ```"@HHMM"```, the ```"delay"``` action, deleting rules) see ```exchange.IO("rate", ...)``` in the `exchange.IO` category of the syntax manual.
+For the parameter syntax (several function names separated by commas, the ```*``` fallback rule, ```"count/burst"``` in ```rate``` mode, window durations and daily resets with ```@HHMM```, the ```delay``` action, deleting rules) see ```exchange.IO("rate", ...)``` in the `exchange.IO` category of the syntax manual.
 
 #### Function names that can be limited
 
@@ -4256,7 +4256,7 @@ For the parameter syntax (several function names separated by commas, the ```"*"
 - Rules are set per exchange object: a rule on ```exchanges[0]``` does not affect ```exchanges[1]```.
 - Rules last for the current run only. Set them again after the live trading restarts, usually at the beginning of ```main()```.
 - Setting the same name again replaces its rule; an empty name (```exchange.IO("rate", "")```) clears all rules of that exchange object.
-- Each call is counted under one rule only: a function with its own rule is no longer counted under ```"*"```, so ```"*"``` cannot be used as a "total quota for all calls" stacked on top of specific rules.
+- Each call is counted under one rule only: a function with its own rule is no longer counted under ```*```, so ```*``` cannot be used as a "total quota for all calls" stacked on top of specific rules.
 
 #### When the limit is exceeded
 
@@ -4268,7 +4268,7 @@ quota limit exceeded: GetTicker 10/1m
 quota limit exceeded: GetRecords 2000/day (resets at 0800)
 ```
 
-With the ```"delay"``` action the call blocks until a call is available, so the time recorded in the log is the time after the wait. With a rule that resets daily, ```"delay"``` may wait until the next day; use it with care.
+With the ```delay``` action the call blocks until a call is available, so the time recorded in the log is the time after the wait. With a rule that resets daily, ```delay``` may wait until the next day; use it with care.
 
 Default action: calls over the limit fail.
 
@@ -4318,7 +4318,7 @@ fn main() {
 }
 ```
 
-Rules grouped after the exchange's own limits: market data and trading each share one rule, trading calls wait instead of failing, and every other function falls back to ```"*"```.
+Rules grouped after the exchange's own limits: market data and trading each share one rule, trading calls wait instead of failing, and every other function falls back to ```*```.
 
 ```javascript
 function main() {
@@ -4699,7 +4699,7 @@ exchange.IO("api", tokenAddress, "decimals")                    // token decimal
 
 Standard ERC20 methods (```balanceOf```, ```decimals```, ```allowance```, ```approve```, ```transfer``` and others) are built in and need no registration. Before calling methods of other contracts, register the contract's ABI with ```exchange.IO("abi", contractAddress, abi)```.
 
-Common contracts can use built-in templates by passing the template name as the third argument: ```"weth"```, ```"uniswapV3Pool"```, ```"uniswapV3Factory"```, ```"uniswapV3QuoterV2"```, ```"uniswapV3SwapRouter02"```, ```"uniswapV3PositionManager"```, ```"permit2"``` (PancakeSwap V3 uses the same templates, aliases such as ```"pancakeV3Pool"``` also work). Addresses of common contracts are available from ```exchange.IO("contracts")```.
+Common contracts can use built-in templates by passing the template name as the third argument: ```weth```, ```uniswapV3Pool```, ```uniswapV3Factory```, ```uniswapV3QuoterV2```, ```uniswapV3SwapRouter02```, ```uniswapV3PositionManager```, ```permit2``` (PancakeSwap V3 uses the same templates, aliases such as ```pancakeV3Pool``` also work). Addresses of common contracts are available from ```exchange.IO("contracts")```.
 
 ```javascript
 exchange.IO("abi", poolAddress, "uniswapV3Pool")
@@ -4714,7 +4714,7 @@ https://api.etherscan.io/v2/api?chainid=1&module=contract&action=getabi&address=
 
 ##### 4. Send transactions
 
-When a write method of a contract is called, the exchange object signs the transaction with the configured private key, broadcasts it and returns the transaction hash. Before sending you can replace ```"api"``` with ```"call"``` and rehearse the same call with ```exchange.IO("call", ...)```: it is simulated on the node without signing or spending gas; on failure it returns a null value and ```GetLastError()``` holds the reason given by the contract.
+When a write method of a contract is called, the exchange object signs the transaction with the configured private key, broadcasts it and returns the transaction hash. Before sending you can replace ```api``` with ```call``` and rehearse the same call with ```exchange.IO("call", ...)```: it is simulated on the node without signing or spending gas; on failure it returns a null value and ```GetLastError()``` holds the reason given by the contract.
 
 Taking approve as an example:
 
@@ -4878,7 +4878,7 @@ When the node rejects a contract call at validation time (for example because th
 
 ##### Signing
 
-```exchange.IO("hash", "sign", "hex", "hex", txHash)``` signs a 32-byte hash with the current private key and returns the 65-byte signature ```r‖s‖v``` (v is 0 or 1); other ```hash``` algorithms (such as ```"sha256"```) compute digests, the same as the ```Encode()``` function. When r, s and v (v being 27 or 28) are needed separately for contract verification, use ```exchange.IO("sign", ...)```, see the `Web3` exchange page of the syntax manual.
+```exchange.IO("hash", "sign", "hex", "hex", txHash)``` signs a 32-byte hash with the current private key and returns the 65-byte signature ```r‖s‖v``` (v is 0 or 1); other ```hash``` algorithms (such as ```sha256```) compute digests, the same as the ```Encode()``` function. When r, s and v (v being 27 or 28) are needed separately for contract verification, use ```exchange.IO("sign", ...)```, see the `Web3` exchange page of the syntax manual.
 
 Query TRX and USDT balances and read token information.
 
@@ -4962,7 +4962,7 @@ One formula can output several results at once when written as a list: for examp
 
 #### Functions and Operators
 
-Functions and operators available in formulas of the alpha factor analysis tool. Expressions are case-insensitive; below, ```x``` and ```y``` are time series, ```d``` is a number of periods, and ```{}``` is a placeholder.
+What can be used in formulas of the alpha factor analysis tool. Expressions are case-insensitive; below, ```x``` and ```y``` are time series, ```d``` is a number of periods, and ```{}``` is a placeholder.
 
 ##### Operators
 
@@ -5007,7 +5007,7 @@ Market data that formulas can refer to. Input data is case-insensitive and defau
 
 ## Extended API Interface
 
-The extended API is the platform's HTTP interface (```https://www.fmz.com/api/v1```) for scripts, scheduled jobs and other programs: query the account, dockers, strategies and robots, create, restart and stop robots, send interactive commands to robots, and so on.
+The platform's HTTP interface (```https://www.fmz.com/api/v1```) for scripts, scheduled jobs and other programs: query the account, dockers, strategies and robots, create, restart and stop robots, send interactive commands to robots, and so on.
 
 To operate the platform interactively from an AI assistant (Claude Code, Cursor, ...), prefer AI Integration (the MCP service, see `AI Integration`): it has more tools, takes named parameters, and can be authorized by permission category. Both can use the same API KEY.
 
@@ -5277,7 +5277,7 @@ func main() {
 
 #### Direct Verification
 
-Direct verification computes no signature; the ```secret_key``` is put into the request parameters instead. This produces a fixed URL that can be entered into webhooks such as TradingView that accept only a single URL.
+Puts the ```secret_key``` into the request parameters instead of computing a signature. This produces a fixed URL that can be entered into webhooks such as TradingView that accept only a single URL.
 
 > **Security note**: a ```secret_key``` in a URL ends up in browser history, proxy and server access logs, and the webhook provider's configuration; anyone who obtains the URL can call the API with this key's permissions. Use direct verification only for ```CommandRobot``` webhooks, and create a dedicated API KEY for it that is granted ```CommandRobot``` only (see `Create ApiKey`). If it leaks, delete that API KEY immediately.
 
@@ -6432,7 +6432,7 @@ Parameters:
 
 Fields:
 
-- `data.status` (string): ```"ok"``` on success.
+- `data.status` (string): ```ok``` on success.
 - `data.robot` (number): Echo of the request's ```robot``` parameter.
 - `data.channel` (string): Echo of the request's ```channel``` parameter.
 - `data.message` (string): The message pushed.
