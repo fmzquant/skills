@@ -5921,7 +5921,7 @@ fn main() {
 交易所没有对应接口，由托管者实现：
 
 - `Coincheck`：交易所没有查询单个订单的接口，在当前未完成订单中查找；交易所不提供历史订单查询，已成交或已撤销的订单查不到（返回空值）。
-- `Zaif`：交易所没有查询单个订单的接口，在当前未完成订单和历史订单中查找该订单。
+- `Zaif`：交易所没有查询单个订单的接口，在当前未完成订单和历史订单中查找该订单。历史订单由成交记录重建，```Id```不保证等于订单号，已完成的订单可能找不到。
 
 See also: `Order`, `exchange.GetOrders`, `exchange.GetHistoryOrders`, `exchange.ModifyOrder`
 
@@ -9071,6 +9071,7 @@ fn main() {
 | ```cancelTx``` | `Web3` |
 | ```cancelWait``` | `Pendle`、`Uniswap`、`KyberSwap`、`OneInch` |
 | ```cancelWithdraw``` | `Futures_Boros` |
+| ```clientId``` | `KyberSwap` |
 | ```clob``` | `Futures_Polymarket` |
 | ```coinmBase``` | `Futures_Binance` |
 | ```config``` | `OKX_DEX` |
@@ -23866,21 +23867,6 @@ Backpack只有永续合约，其它合约代码都会报错。
 
 ##### 专属IO指令
 
-###### ```Backpack```（现货）
-
-| 指令 | 参数 | 说明 | 返回值 |
-| - | - | - | - |
-| ```selfTradePreventionMode``` | string | 自成交预防，可选```Allow```、```RejectTaker```、```RejectMaker```、```RejectBoth```（区分大小写），设置后之后的订单和条件单随单带上。 | 成功返回空值；取值不在上述范围内时报错。 |
-| ```api``` | method, path[, params[, raw]] | 直接调用Backpack接口，默认签名。（详见表下） | 交易所的原始应答；应答带```message```或```error```错误信息时报错。 |
-
-表中长说明的其余部分：
-
-- ```api```：私有接口要在```params```（或```raw```对象）里写上交易所规定的指令名```instruction```（如```balanceQuery```、```orderQueryAll```），它只参与签名，不随请求发送。```raw```非空时整体替换```params```：```GET```可以是JSON对象或```a=1&b=2```，其它方法必须是JSON对象。```path```也可以是完整URL。第4个参数传```false```时不签名，只能用于公开的```GET```接口。
-
-通用指令```base```、```currency```见`exchange.IO`。
-
-###### ```Futures_Backpack```（期货）
-
 | 指令 | 参数 | 说明 | 返回值 |
 | - | - | - | - |
 | ```selfTradePreventionMode``` | string | 自成交预防，可选```Allow```、```RejectTaker```、```RejectMaker```、```RejectBoth```（区分大小写），设置后之后的订单和条件单随单带上。 | 成功返回设置的取值；取值不在上述范围内时报错。 |
@@ -23922,7 +23908,7 @@ Backpack只有永续合约，其它合约代码都会报错。
 ###### ```Backpack```（现货）
 
 - 市价买单的下单量是要花费的计价币金额（按Backpack的```quoteQuantity```下单），市价卖单为交易币数量。按计价币金额下的市价买单在订单查询中没有委托价，```Price```为0，```Amount```为已成交的交易币数量。
-- 条件单与普通订单在同一个订单列表里：```exchange.GetOrders()```、```exchange.GetHistoryOrders()```、```exchange.GetOrder()```的结果也包含条件单（带```Condition```字段）；```exchange.GetConditionOrders()```、```exchange.GetHistoryConditionOrders()```只返回条件单。
+- ```exchange.GetOrders()```、```exchange.GetHistoryOrders()```只返回普通订单，不含条件单；用```exchange.GetOrder()```查询条件单的订单号会报错，条件单用```exchange.GetConditionOrder()```查询，挂单与历史条件单分别用```exchange.GetConditionOrders()```、```exchange.GetHistoryConditionOrders()```查询。
 - ```exchange.GetAccount()```、```exchange.GetAssets()```只统计可用与冻结数量，不包含质押中的数量。
 
 ###### ```Futures_Backpack```（期货）
@@ -24376,7 +24362,7 @@ Bitfinex只有永续合约，其它合约代码会报错。
 
 #### Bithumb
 
-韩国交易所Bithumb的现货交易，使用Bithumb新版接口（与Upbit同构，JWT鉴权）。只提供现货交易对，不支持条件单；限价单只有GTC。使用API Key与Secret Key接入。
+韩国交易所Bithumb的现货交易，使用Bithumb新版接口（与Upbit同构，JWT鉴权）。只提供现货交易对，不支持条件单。使用API Key与Secret Key接入。
 
 ##### 名称与配置
 
@@ -24404,7 +24390,8 @@ Bitfinex只有永续合约，其它合约代码会报错。
 ##### 注意事项
 
 - 市价买单的下单量是要花费的计价币金额（按Bithumb的```order_type=price```下单），市价卖单为交易币数量。订单查询中市价单的```Price```为-1，按金额下的市价买单```Amount```为下单金额。
-- 只支持GTC限价单与市价单：指定```tif```为```ioc```、```fok```或```postOnly```时报错。
+- 限价单支持```tif```的IOC（```ioc```/```fak```）、FOK与只做Maker（```postOnly```），对应Bithumb的```time_in_force```取值```ioc```、```fok```、```post_only```；按Bithumb规定只能用于KRW市场的限价单，市价单、非KRW市场，或```postOnly```与IOC/FOK同时指定时报错，订单不会发出。IOC部分成交后剩余量被撤销的订单，交易所记为完成，查询时状态为已撤销（```DealAmount```为已成交量）。
+- 自定义订单号（```clientId```）作为Bithumb的```client_order_id```发送（1～36个字符，只能是字母、数字、```-```、```_```，不符合时报错），返回和查询用的订单号仍是交易所订单号；查询订单时原样带回。
 - ```exchange.GetMarkets()```中KRW市场的价格精度按最新价所在的价格档位计算（Bithumb的KRW报价单位随价格分段），数量步长为0.00000001，最小下单金额（```MinNotional```）为5000韩元；其它市场不提供价格、数量精度。
 - ```exchange.GetTickers()```的批量行情没有盘口，```Buy```、```Sell```为0；```exchange.GetTicker()```会另查盘口填买一、卖一价。
 - 订单列表接口没有成交明细：```exchange.GetOrders()```、```exchange.GetHistoryOrders()```中已有成交的订单```AvgPrice```按交易所返回的成交总额（```executed_funds```）除以成交量计算；成交总额缺失时限价单取委托价、市价单为0。准确的成交均价以```exchange.GetOrder()```为准。
@@ -24843,7 +24830,7 @@ CoinW只有永续合约，其它合约代码会报错。下单数量单位为张
 | 指令 | 参数 | 说明 | 返回值 |
 | - | - | - | - |
 | ```api``` | httpMethod, method[, params[, raw]] | 直接调用Crypto.com接口：资源写RPC方法名，如```private/user-balance```、```public/get-tickers```（也可以写```/exchange/v1/```开头的路径或完整URL）。（详见表下） | 交易所的完整应答（```code```为0）；业务错误时返回空值。 |
-| ```trade_margin``` | — | 切换为现货杠杆：之后的订单（含条件单）带```spot_margin=MARGIN```下单。只影响下单，不向交易所发请求。 | 指令名本身。 |
+| ```trade_margin``` | — | 切换为现货杠杆：之后的普通订单带```spot_margin=MARGIN```下单，条件单带```exec_inst```的```MARGIN_ORDER```下单。只影响下单，不向交易所发请求。 | 指令名本身。 |
 | ```trade_normal``` | — | 切换回普通现货下单（默认）。 | 指令名本身。 |
 
 表中长说明的其余部分：
@@ -24885,16 +24872,13 @@ CoinW只有永续合约，其它合约代码会报错。下单数量单位为张
 
 ##### 注意事项
 
-###### 全部交易所对象
-
-- 支持```exchange.ModifyOrder()```与```exchange.ModifyConditionOrder()```（Crypto.com原地改单），条件单可改触发价、委托价与数量，不能修改```tif```与```postOnly```（传入时报错）。
-
 ###### ```Crypto```（现货）
 
-- 普通市价买单的下单量是交易币数（Crypto.com的```quantity```），不是计价币金额；触发后为市价的条件买单则以计价币金额（```notional```）下单。
-- 条件单只支持止盈、止损单，不支持OCO；以最新成交价触发。
+- 市价买单的下单量是交易币数（Crypto.com的```quantity```），不是计价币金额；触发后为市价的条件买单同样按交易币数下单。
+- 条件单只支持止盈、止损单，不支持OCO；以最新成交价触发。条件单使用Crypto.com的Advanced Order Management接口下单、改单、撤单与查询。
 - 限价单支持```tif```的IOC、FOK与只做Maker（```postOnly```），只做Maker不能与IOC、FOK同时使用；市价单传入```tif```或```postOnly```时报错。条件单中带委托价的（触发后挂限价单）同样支持```tif```与```postOnly```，触发后市价成交的条件单传入时报错。
-- ```exchange.GetOrders()```、```exchange.GetConditionOrders()```不传参数时返回全部交易对的挂单。```exchange.GetHistoryOrders()```、```exchange.GetHistoryConditionOrders()```不传```limit```时返回最近100条，传更大的```limit```时自动翻页取满。
+- 支持```exchange.ModifyOrder()```与```exchange.ModifyConditionOrder()```（Crypto.com原地改单，订单ID不变），条件单可改触发价、委托价与数量；执行价格传-1可把触发后限价的条件单改成触发后市价，传正数则反过来。不能修改```tif```与```postOnly```（传入时报错）。
+- ```exchange.GetOrders()```、```exchange.GetConditionOrders()```不传参数时返回全部交易对的挂单。```exchange.GetHistoryOrders()```、```exchange.GetHistoryConditionOrders()```不传```limit```时返回最近100条，传更大的```limit```时自动翻页取满。条件单历史不传```since```时，Crypto.com只返回最近一天内的记录，要查更早的请传```since```。
 - ```exchange.GetAssets()```的冻结数量取Crypto.com的```reserved_qty```（挂单与保证金占用之和），可用数量为持有量减去它。
 
 ###### ```Futures_Crypto```（期货）
@@ -24904,6 +24888,8 @@ CoinW只有永续合约，其它合约代码会报错。下单数量单位为张
 - 下单量直接作为Crypto.com的```quantity```发送，合约面值见`exchange.GetMarkets`的```CtVal```（面值币种```CtValCcy```为标的币）。
 - 条件单只支持止盈、止损单，不支持OCO；以标记价格触发。
 - 限价单支持```tif```的IOC、FOK与只做Maker（```postOnly```），只做Maker不能与IOC、FOK同时使用；市价单传入```tif```或```postOnly```时报错。条件单中带委托价的（触发后挂限价单）同样支持```tif```与```postOnly```，触发后市价成交的条件单传入时报错。普通单与条件单都支持只减仓（```reduceOnly```）。
+- 支持```exchange.ModifyOrder()```与```exchange.ModifyConditionOrder()```（Crypto.com原地改单），条件单可改触发价、委托价与数量；执行价格传-1可把触发后限价的条件单改成触发后市价，传正数则反过来。不能修改```tif```与```postOnly```（传入时报错）。
+- ```exchange.GetHistoryConditionOrders()```不传```since```时，Crypto.com只返回最近一天内的条件单历史；要查更早的记录请传```since```。
 
 #### DeepCoin
 
@@ -25164,7 +25150,7 @@ DigiFinex只有永续合约，其它合约代码会报错。下单数量单位�
 
 ###### ```Futures_DigiFinex```（期货）
 
-保证金模式：用```exchange.IO("cross", bool)```按合约切换全仓/逐仓，交易所回执与请求不符时报错。```exchange.SetMarginLevel()```按合约设置杠杆；逐仓且双向持仓的账户需要按方向设置，交易所提示持仓模式错误时，连接器补上逐仓模式和方向重试一次：方向取```exchange.SetDirection()```设置的值（```buy```、```closesell```为多头，```sell```、```closebuy```为空头）。没有调用过```exchange.SetDirection()```时重试不带方向，交易所会再次报错，需要先设置方向再设置杠杆。
+保证金模式：用```exchange.IO("cross", bool)```按合约切换全仓/逐仓，交易所回执与请求不符时报错。```exchange.SetMarginLevel()```按合约设置杠杆，不需要额外参数：全仓或单向持仓的账户一次设置完成；逐仓且双向持仓的账户要按方向设置，交易所提示持仓模式错误时，连接器补上保证金模式，把多头、空头两侧都设置为同一杠杆（任一侧失败即报错，错误信息里注明已设置成功的一侧）。补上的保证金模式取本次运行中```exchange.IO("cross", bool)```对该合约的设置，没有设置过时按逐仓。```exchange.SetDirection()```设置的方向不影响杠杆设置。
 
 持仓模式：没有切换持仓模式的指令（```exchange.IO("dual", ...)```报不支持）。下单按```exchange.SetDirection()```设置的方向使用开多、开空、平多、平空四种方向码。
 
@@ -26160,7 +26146,7 @@ Poloniex的现货交易（接口地址```https://api.poloniex.com```，v3接口�
 
 - 市价买单的下单量是要花费的计价币金额（按Upbit的```price```下单，```ord_type```为```price```），市价卖单是交易币数量。
 - 限价单支持IOC、FOK与只做Maker（```postOnly```）。
-- ```exchange.ModifyOrder()```使用Upbit的撤单并重新下单接口（```cancel_and_new```），由交易所原子地撤销原订单并下新订单，返回新订单的订单号，之后应使用新订单号。价格为正数时新订单是限价单；价格不为正数时新订单是市价单（必须传方向，买单的数量是计价币金额）。
+- ```exchange.ModifyOrder()```使用Upbit的撤单并重新下单接口（```cancel_and_new```），由交易所原子地撤销原订单并下新订单，返回新订单的订单号，之后应使用新订单号。新订单仍是限价单，必须传入大于0的新价格；价格不为正数时报错，不会改成市价单。不改数量（数量不为正数）时新订单数量为原订单的剩余量。```exchange.ModifyOrder()```不会把订单改成市价单。
 - ```exchange.GetTickers()```的批量行情不含盘口，```Buy```、```Sell```为0。
 - ```exchange.GetHistoryOrders()```返回已成交和已撤销的订单，不传```limit```时最多返回100条。
 
@@ -26343,7 +26329,7 @@ WOO X只有永续合约，其它合约代码会报错。下单数量单位为基
 
 保证金模式：用```exchange.IO("cross", bool)```选择全仓/逐仓，这是本地设置，随每次下单带上（默认全仓）。```exchange.SetMarginLevel()```按合约设置杠杆，同时带上当前的全仓/逐仓设置。
 
-持仓模式：用```exchange.IO("dual", bool)```切换双向/单向持仓。连接器不自动探测账户的持仓模式：账户已经是双向持仓时，每次运行策略都要先调用```exchange.IO("dual", true)```，否则下单不带持仓方向会被交易所拒绝。双向持仓下```exchange.SetMarginLevel()```按```exchange.SetDirection()```设置的方向只设置多头（```buy```、```closebuy```）或空头（```sell```、```closesell```）一侧，未设置方向时为多头；两侧都要设置时，分别设置方向后各调用一次。
+持仓模式：用```exchange.IO("dual", bool)```切换双向/单向持仓。连接器不自动探测账户的持仓模式：账户已经是双向持仓时，每次运行策略都要先调用```exchange.IO("dual", true)```，否则下单不带持仓方向会被交易所拒绝。双向持仓下```exchange.SetMarginLevel()```一次把多头、空头两侧都设置为同一杠杆（任一侧失败即报错，错误信息里注明已设置成功的一侧），与```exchange.SetDirection()```设置的方向无关；单向持仓下设置一次。
 
 ##### 注意事项
 
@@ -26392,13 +26378,13 @@ WOO X只有永续合约，其它合约代码会报错。下单数量单位为基
 以回退方式支持：
 
 - `exchange.GetRecords`：交易所没有K线接口，由托管者用成交记录合成：首次调用只有最近成交覆盖的少量K线，随调用逐步累积。
-- `exchange.GetOrder`：交易所没有查询单个订单的接口，在当前未完成订单和历史订单中查找该订单。
+- `exchange.GetOrder`：交易所没有查询单个订单的接口，在当前未完成订单和历史订单中查找该订单。历史订单由成交记录重建，```Id```不保证等于订单号，已完成的订单可能找不到。
 
 ##### 注意事项
 
 - 不支持市价单，只能下GTC限价单：指定```tif```为```ioc```、```fok```或```postOnly```时报错。
 - ```exchange.GetOrders()```不传```symbol```参数时只查询当前交易对。返回的挂单不带成交信息，```DealAmount```为0。
-- ```exchange.GetHistoryOrders()```读取的是Zaif的成交记录（```trade_history```）：每条成交作为一个已成交订单返回；不传```limit```时最多返回100条，```since```按秒精度传给交易所。
+- Zaif没有历史订单接口，```exchange.GetHistoryOrders()```由成交记录（```trade_history```）重建：每条成交记录作为一个已成交订单返回，```Price```、```AvgPrice```为这笔成交的价格，```Amount```、```DealAmount```为这笔成交的数量，```Type```为本账户在这笔成交中的方向（自成交时取成交的主动方向）。成交记录不带所属订单号，因此：同一订单分多次成交时出现多行，无法合并；```Id```是成交记录的编号，不保证等于下单返回的订单号；从未成交就撤销的订单不会出现，部分成交后撤销的订单只出现已成交的部分。不传```limit```时最多返回100条；```since```按秒精度传给交易所，传入时返回该时间之后最早的记录，不传时返回最近的记录。不传```symbol```时普通交易对与代币交易对（交易所的```is_token```）各查询一次再合并；交易所限制该接口60秒内不超过12次调用。
 - ```exchange.GetTicker()```没有开盘价（```Open```为0），交易所也不提供行情时间，```Time```为本地时间。
 
 ### 去中心化交易所
@@ -26695,6 +26681,7 @@ edgeX只有永续合约，```swap```以外的合约代码会报错。
 | 函数 | Futures_EdgeX的行为 |
 | - | - |
 | exchange.GetTicker() | 行情接口不含买一、卖一，每次调用另取一次盘口填写（共两次请求），盘口请求失败时整个调用失败。```Time```为盘口应答的服务器时间（```exchange.GetDepth()```的```Time```同此），不是行情接口的```endTime```（24小时统计窗口的结束时间，按15分钟刻度更新），```endTime```仍可在```Info```中读取 |
+| exchange.GetTickers() | 不支持：edgeX没有一次返回全部合约行情的接口（行情接口不传合约ID时返回空列表），调用时报错并返回空值。需要多个合约的行情请逐个调用```exchange.GetTicker(symbol)```（如```exchange.GetTicker("BTC_USDC.swap")```） |
 | exchange.GetFundings() | 传入品种（如```BTC_USDC.swap```）返回该合约一条；不传参数时查询当前计价币的全部可交易永续（如```USDC.swap```，也可直接传这类范围）。edgeX没有批量资金费率接口，范围查询每个合约发一次请求，一百多个合约耗时十几秒，频繁调用请传具体品种。```Rate```为交易所的预测费率（下一期），```Time```为下一次结算时间 |
 | exchange.CreateOrder() | 下单数量以币为单位（1张=1个币）。限价单支持GTC、IOC、FOK和只做Maker；市价单默认为IOC，不能设为只做Maker，并按预言机价格限定成交价格：买单不高于其1.2倍，卖单不低于其0.8倍 |
 | exchange.CreateConditionOrder() | 只支持止盈、止损，不支持OCO（止盈、止损分两张下），按最新成交价触发；委托价为-1（市价）时触发后按市价成交，价格界限按创建时的预言机价格计算。修改条件单需要先撤销再重新创建 |
@@ -26706,11 +26693,11 @@ edgeX只有永续合约，```swap```以外的合约代码会报错。
 
 #### Aster
 
-```Aster```（现货）：Aster现货（接口地址```https://sapi.asterdex.com```）。私有接口使用钱包签名（EIP-712）：配置主账户钱包地址，以及在Aster上为该账户授权的API签名钱包的地址和私钥，不需要API Key。永续合约使用Futures_Aster交易所对象。
+```Aster```（现货）：Aster现货（接口地址```https://sapi.asterdex.com```）。私有接口使用钱包签名（EIP-712）：配置主账户钱包地址和在Aster上为该账户授权的API签名钱包的私钥（签名钱包地址可不填，由私钥推出），不需要API Key。永续合约使用Futures_Aster交易所对象。
 
 ```Futures_ApolloX```（期货）：ApolloX已并入Aster并更名。Futures_ApolloX用API Key（HMAC签名）接入同一交易所的旧版合约接口（```https://fapi.apollox.finance```，币安U本位同构的v1/v2接口），只有永续合约。用钱包签名接入v3接口的是Futures_Aster交易所对象。
 
-```Futures_Aster```（期货）：Aster永续合约（接口地址```https://fapi.asterdex.com```，币安U本位同构的v3接口）。私有接口使用钱包签名（EIP-712）：配置主账户钱包地址，以及在Aster上为该账户授权的API签名钱包的地址和私钥，不需要API Key。用API Key（HMAC）接入同一交易所旧版接口的是Futures_ApolloX交易所对象；现货使用Aster交易所对象。
+```Futures_Aster```（期货）：Aster永续合约（接口地址```https://fapi.asterdex.com```，币安U本位同构的v3接口）。私有接口使用钱包签名（EIP-712）：配置主账户钱包地址和在Aster上为该账户授权的API签名钱包的私钥（签名钱包地址可不填，由私钥推出），不需要API Key。用API Key（HMAC）接入同一交易所旧版接口的是Futures_ApolloX交易所对象；现货使用Aster交易所对象。
 
 ##### 名称与配置
 
@@ -26725,7 +26712,7 @@ edgeX只有永续合约，```swap```以外的合约代码会报错。
 | 配置项 | ```Aster``` | ```Futures_ApolloX``` | ```Futures_Aster``` | 必填 | 说明 |
 | - | - | - | - | - | - |
 | 主账户地址 | ✓ |  | ✓ | 是 | 主账户（资产所在账户）的钱包地址。 |
-| 签名钱包地址 | ✓ |  | ✓ | 是 | 在Aster上为主账户授权的API签名钱包（代理钱包）地址。 |
+| 签名钱包地址 | ✓ |  | ✓ | 否 | 在Aster上为主账户授权的API签名钱包（代理钱包）地址。可不填：不填时由下面的签名钱包私钥推出（该私钥对应的地址就是签名钱包地址）；填写时原样使用，须与私钥对应。 |
 | 签名钱包私钥 | ✓ |  | ✓ | 是 | 上述签名钱包的私钥，用于对私有请求签名。 |
 | Access Key |  | ✓ |  | 是 | 在交易所API管理中创建的API Key。 |
 | Secret Key |  | ✓ |  | 是 | 与API Key配对的Secret Key，用于HMAC签名。 |
@@ -28213,12 +28200,14 @@ See also: `Jupiter`, `exchange.IO`, `exchange.IO("route")`, `exchange.IO("token"
 | ```gasMultiplier``` | [x] | gas上限倍数，范围1到5，默认1.2：交易的gasLimit为节点估算的gas乘以该倍数。不传参数时查询。 | 当前倍数。 |
 | ```base``` | [url] | 不传参数时返回当前节点地址；传入地址时切换节点。多个节点写成逗号分隔的字符串（传数组时只使用第一个地址）。换节点后第一次请求会核对节点所在的链，与配置的链不一致时报错。 | 切换前的地址。 |
 | ```sendBase``` | url | 设置只用来广播交易的节点（私有交易通道）。与Web3不同：不返回设置前的地址，不传参数时不查询，传空字符串不会清除设置。 | ```true``` |
+| ```clientId``` | [id] | 设置请求KyberSwap Aggregator API时携带的客户端标识（请求头```x-client-id```），只能是字母、数字、```.```、```_```、```-```，1到64个字符。（详见表下） | 当前的客户端标识。 |
 | ```address``` | — | 配置的私钥对应的钱包地址（```0x```开头的小写地址）。 | — |
 | ```contracts``` | — | 本链上的部署信息，字段与Uniswap交易所对象相同：```dex```为```KyberSwap```，```router```为KyberSwap路由合约；```quoterV2```、```v3Factory```、```v4```等是该链Uniswap的部署（用来列出市场、估算美元价），```aerodrome```为```null```；```tokenList```给出内置代币表的生成时间与本链代币数量。 | — |
 
 表中长说明的其余部分：
 
 - ```simulate```：第6个参数（限定路径类型）对聚合器不适用，传入会报错```route is not applicable to the KyberSwap aggregator```。用代币支付的兑换（如用USDC买入），钱包对路由合约的授权不够时（默认```approve```为```exact```，真实下单前才授权），自动用```eth_call```的state override补上授权再模拟，结果里```allowanceOverride```列出补了哪些；传入的```stateOverride```与它合并，已写的存储槽位不覆盖。找不到代币存放授权额度的存储槽位时，模拟失败的报错里说明尚未授权，需要先授权或自己传```stateOverride```。余额不会自动补。
+- ```clientId```：KyberSwap的公开限频按这个标识计算（默认每秒3次），共用同一个标识的程序共用这份额度，频繁报HTTP 429时可以换成自己的标识。默认值为```fmz-```加钱包地址哈希的前8位十六进制（同一钱包重启后不变，不包含地址本身；没配私钥时为本次运行随机生成的值）。不传参数时查询。
 
 通用指令```currency```见`exchange.IO`。
 

@@ -5992,7 +5992,7 @@ Exchanges that serve this function through a fallback: the exchange's API does n
 The exchange has no such endpoint; the docker implements the function:
 
 - `Coincheck`: The exchange has no single-order query interface, so the order is looked up among the current open orders; the exchange provides no historical order query, so filled or canceled orders cannot be found (null is returned).
-- `Zaif`: The exchange has no single-order query interface, so the order is looked up among the current open orders and the historical orders.
+- `Zaif`: The exchange has no single-order query interface, so the order is looked up among the current open orders and the historical orders. The historical orders are rebuilt from trade records whose ```Id``` is not guaranteed to equal the order ID, so a completed order may not be found.
 
 See also: `Order`, `exchange.GetOrders`, `exchange.GetHistoryOrders`, `exchange.ModifyOrder`
 
@@ -9168,6 +9168,7 @@ Commands of ```exchange.IO()``` specific to an exchange object; see the exchange
 | ```cancelTx``` | `Web3` |
 | ```cancelWait``` | `Pendle`, `Uniswap`, `KyberSwap`, `OneInch` |
 | ```cancelWithdraw``` | `Futures_Boros` |
+| ```clientId``` | `KyberSwap` |
 | ```clob``` | `Futures_Polymarket` |
 | ```coinmBase``` | `Futures_Binance` |
 | ```config``` | `OKX_DEX` |
@@ -24013,21 +24014,6 @@ Backpack lists perpetual contracts only; any other contract code is rejected.
 
 ##### Exchange-specific IO Commands
 
-###### ```Backpack``` (Spot)
-
-| Command | Arguments | Description | Returns |
-| - | - | - | - |
-| ```selfTradePreventionMode``` | string | Self-trade prevention for subsequent orders and conditional orders; one of ```Allow```, ```RejectTaker```, ```RejectMaker```, ```RejectBoth``` (case-sensitive). | Null on success; an error for any other value. |
-| ```api``` | method, path[, params[, raw]] | Call a Backpack endpoint directly; requests are signed by default. (more below the table) | The raw exchange response; an error is raised when the response carries a ```message``` or ```error``` error message. |
-
-The rest of the longer descriptions in the table:
-
-- ```api```: Private endpoints need the exchange's instruction name ```instruction``` (such as ```balanceQuery``` or ```orderQueryAll```) in ```params``` (or in the ```raw``` object); it is used for signing only and is not sent with the request. A non-empty ```raw``` replaces ```params``` entirely: for ```GET``` it may be a JSON object or ```a=1&b=2```, for other methods it must be a JSON object. ```path``` may also be a full URL. With ```false``` as the 4th argument the request is not signed, which only works for public ```GET``` endpoints.
-
-For the common commands ```base``` and ```currency``` see `exchange.IO`.
-
-###### ```Futures_Backpack``` (Futures)
-
 | Command | Arguments | Description | Returns |
 | - | - | - | - |
 | ```selfTradePreventionMode``` | string | Self-trade prevention for subsequent orders and conditional orders; one of ```Allow```, ```RejectTaker```, ```RejectMaker```, ```RejectBoth``` (case-sensitive). | The value set on success; an error for any other value. |
@@ -24069,7 +24055,7 @@ Account: ```exchange.GetAccount()``` reads the collateral account: ```Balance```
 ###### ```Backpack``` (Spot)
 
 - The amount of a market buy order is the quote currency to spend (placed with Backpack's ```quoteQuantity```); a market sell order uses the base currency amount. Such market buy orders have no order price in queries, so ```Price``` is 0, and ```Amount``` is the filled base currency amount.
-- Conditional orders share one order list with regular orders: the results of ```exchange.GetOrders()```, ```exchange.GetHistoryOrders()``` and ```exchange.GetOrder()``` include conditional orders as well (with the ```Condition``` field), while ```exchange.GetConditionOrders()``` and ```exchange.GetHistoryConditionOrders()``` return conditional orders only.
+- ```exchange.GetOrders()``` and ```exchange.GetHistoryOrders()``` return regular orders only, without conditional orders; querying a conditional order ID with ```exchange.GetOrder()``` fails, so use ```exchange.GetConditionOrder()``` for conditional orders, and ```exchange.GetConditionOrders()``` / ```exchange.GetHistoryConditionOrders()``` for open and historical conditional orders.
 - ```exchange.GetAccount()``` and ```exchange.GetAssets()``` count available and frozen amounts only, not staked amounts.
 
 ###### ```Futures_Backpack``` (Futures)
@@ -24523,7 +24509,7 @@ Simulation: Check the Simulate box when adding the exchange (or switch at run ti
 
 #### Bithumb
 
-Spot trading on the Korean exchange Bithumb, using Bithumb's new API (Upbit-style, JWT authentication). Only spot pairs are served and conditional orders are not supported; limit orders are GTC only. Access uses an API Key and Secret Key.
+Spot trading on the Korean exchange Bithumb, using Bithumb's new API (Upbit-style, JWT authentication). Only spot pairs are served and conditional orders are not supported. Access uses an API Key and Secret Key.
 
 ##### Names and Configuration
 
@@ -24551,7 +24537,8 @@ Served through a fallback:
 ##### Notes
 
 - The amount of a market buy order is the quote currency to spend (placed with Bithumb's ```order_type=price```); a market sell order uses the base currency amount. In order queries ```Price``` of market orders is -1, and ```Amount``` of a market buy placed by amount is the order amount.
-- Only GTC limit orders and market orders are supported: a ```tif``` of ```ioc``` or ```fok```, or ```postOnly```, fails.
+- Limit orders support the ```tif``` values IOC (```ioc```/```fak```), FOK and post-only (```postOnly```), sent as Bithumb's ```time_in_force``` values ```ioc```, ```fok``` and ```post_only```. Bithumb only allows them on limit orders in KRW markets: market orders, non-KRW markets, or ```postOnly``` together with IOC/FOK fail without sending the order. An IOC order whose remainder was canceled after a partial fill is recorded as done by the exchange and is reported as canceled (```DealAmount``` is the filled amount).
+- A custom order id (```clientId```) is sent as Bithumb's ```client_order_id``` (1-36 characters, letters, digits, ```-``` and ```_``` only; anything else fails); the returned and queried order ID is still the exchange order ID, and order queries return the custom id as sent.
 - In ```exchange.GetMarkets()``` the price precision of KRW markets is derived from the price band of the latest price (Bithumb's KRW tick size depends on the price), the amount step is 0.00000001 and the minimum order value (```MinNotional```) is 5000 KRW; other markets give no price/amount precision.
 - The batch data of ```exchange.GetTickers()``` has no order book, so ```Buy``` and ```Sell``` are 0; ```exchange.GetTicker()``` queries the order book separately for the best bid and ask.
 - The order list endpoints carry no fill details: for orders with fills, ```AvgPrice``` in ```exchange.GetOrders()``` and ```exchange.GetHistoryOrders()``` is the executed total returned by the exchange (```executed_funds```) divided by the filled amount; when that total is missing it is the order price for limit orders and 0 for market orders. Use ```exchange.GetOrder()``` for the exact average fill price.
@@ -24990,7 +24977,7 @@ Crypto.com delivery contract codes in the form ```BTCUSD-YYMMDD``` can also be u
 | Command | Arguments | Description | Returns |
 | - | - | - | - |
 | ```api``` | httpMethod, method[, params[, raw]] | Call a Crypto.com endpoint directly; the resource is the RPC method name, such as ```private/user-balance``` or ```public/get-tickers``` (a path starting with ```/exchange/v1/``` or a full URL also works). (more below the table) | The complete exchange response (```code``` is 0); null on a business error. |
-| ```trade_margin``` | — | Switch to spot margin; subsequent orders (including conditional orders) are placed with ```spot_margin=MARGIN```. Affects order placement only; no request is sent to the exchange. | The command name itself. |
+| ```trade_margin``` | — | Switch to spot margin; subsequent regular orders are placed with ```spot_margin=MARGIN```, and conditional orders with ```MARGIN_ORDER``` in ```exec_inst```. Affects order placement only; no request is sent to the exchange. | The command name itself. |
 | ```trade_normal``` | — | Switch back to regular spot orders (the default). | The command name itself. |
 
 The rest of the longer descriptions in the table:
@@ -25032,16 +25019,13 @@ Account: ```exchange.SetMarginLevel()``` sets the leverage of the whole trading 
 
 ##### Notes
 
-###### All exchange objects
-
-- ```exchange.ModifyOrder()``` and ```exchange.ModifyConditionOrder()``` are supported (Crypto.com amends the order in place); conditional orders can change the trigger price, order price and amount, but not ```tif``` or ```postOnly``` (passing them reports an error).
-
 ###### ```Crypto``` (Spot)
 
-- The amount of a regular market buy order is in the base currency (Crypto.com's ```quantity```), not a quote-currency amount; a conditional buy order that becomes a market order when triggered is placed with a quote-currency amount (```notional```).
-- Conditional orders support take-profit and stop-loss only, not OCO; they trigger on the last traded price.
+- The amount of a market buy order is in the base currency (Crypto.com's ```quantity```), not a quote-currency amount; a conditional buy order that becomes a market order when triggered is also placed in the base currency.
+- Conditional orders support take-profit and stop-loss only, not OCO; they trigger on the last traded price. Conditional orders are placed, modified, canceled and queried through Crypto.com's Advanced Order Management API.
 - Limit orders support ```tif``` IOC, FOK and maker-only (```postOnly```); maker-only cannot be combined with IOC or FOK, and passing ```tif``` or ```postOnly``` on a market order reports an error. Conditional orders with an order price (a limit order once triggered) support ```tif``` and ```postOnly``` too; conditional orders that execute at market once triggered report an error when given them.
-- ```exchange.GetOrders()``` and ```exchange.GetConditionOrders()``` without arguments return the open orders of all trading pairs. ```exchange.GetHistoryOrders()``` and ```exchange.GetHistoryConditionOrders()``` return the latest 100 records when ```limit``` is not given, and page automatically to fill a larger ```limit```.
+- ```exchange.ModifyOrder()``` and ```exchange.ModifyConditionOrder()``` are supported (Crypto.com amends the order in place, keeping its order ID); conditional orders can change the trigger price, order price and amount, and an order price of -1 turns a conditional limit order into one that executes at market when triggered (a positive price does the reverse). ```tif``` and ```postOnly``` cannot be changed (passing them reports an error).
+- ```exchange.GetOrders()``` and ```exchange.GetConditionOrders()``` without arguments return the open orders of all trading pairs. ```exchange.GetHistoryOrders()``` and ```exchange.GetHistoryConditionOrders()``` return the latest 100 records when ```limit``` is not given, and page automatically to fill a larger ```limit```. Without ```since```, Crypto.com returns only the last day of conditional order history; pass ```since``` to query earlier records.
 - The frozen amount in ```exchange.GetAssets()``` is Crypto.com's ```reserved_qty``` (open orders plus margin in use), and the available amount is the holding minus it.
 
 ###### ```Futures_Crypto``` (Futures)
@@ -25051,6 +25035,8 @@ Account: ```exchange.SetMarginLevel()``` sets the leverage of the whole trading 
 - The order amount is sent as Crypto.com's ```quantity``` directly; see ```CtVal``` in `exchange.GetMarkets` for the contract size (```CtValCcy```, the size currency, is the underlying coin).
 - Conditional orders support take-profit and stop-loss only, not OCO; they trigger on the mark price.
 - Limit orders support ```tif``` IOC, FOK and maker-only (```postOnly```); maker-only cannot be combined with IOC or FOK, and passing ```tif``` or ```postOnly``` on a market order reports an error. Conditional orders with an order price (a limit order once triggered) support ```tif``` and ```postOnly``` too; conditional orders that execute at market once triggered report an error when given them. Both regular and conditional orders support reduce-only (```reduceOnly```).
+- ```exchange.ModifyOrder()``` and ```exchange.ModifyConditionOrder()``` are supported (Crypto.com amends the order in place); conditional orders can change the trigger price, order price and amount, and an order price of -1 turns a conditional limit order into one that executes at market when triggered (a positive price does the reverse). ```tif``` and ```postOnly``` cannot be changed (passing them reports an error).
+- Without ```since```, ```exchange.GetHistoryConditionOrders()``` returns only the last day of conditional order history from Crypto.com; pass ```since``` to query earlier records.
 
 #### DeepCoin
 
@@ -25311,7 +25297,7 @@ Served through a fallback:
 
 ###### ```Futures_DigiFinex``` (Futures)
 
-Margin mode: Switch cross/isolated margin per contract with ```exchange.IO("cross", bool)```; it fails when the exchange's acknowledgement does not match the request. ```exchange.SetMarginLevel()``` sets leverage per contract; isolated accounts in hedge mode need leverage per side, so when the exchange reports a position mode error the connector retries once with isolated margin and the side taken from ```exchange.SetDirection()``` (```buy``` and ```closesell``` mean long, ```sell``` and ```closebuy``` mean short). Without a prior ```exchange.SetDirection()``` call the retry carries no side and the exchange rejects it again, so set the direction before setting leverage.
+Margin mode: Switch cross/isolated margin per contract with ```exchange.IO("cross", bool)```; it fails when the exchange's acknowledgement does not match the request. ```exchange.SetMarginLevel()``` sets leverage per contract and needs no extra arguments: cross-margin or one-way accounts are set in one request; isolated accounts in hedge mode need leverage per side, so when the exchange reports a position mode error the connector adds the margin mode and sets the same leverage on both the long and the short side (it fails if either side fails, and the error names the side that was already set). The margin mode it adds is the one ```exchange.IO("cross", bool)``` set for that contract during this run, or isolated when it was not set. The direction set by ```exchange.SetDirection()``` does not affect leverage.
 
 Position mode: There is no command for switching the position mode (```exchange.IO("dual", ...)``` reports it as unsupported). Orders use the four direction codes open long, open short, close long and close short, following the direction set by ```exchange.SetDirection()```.
 
@@ -26307,7 +26293,7 @@ Served through a fallback:
 
 - The amount of a market buy order is the quote currency to spend (placed as Upbit's ```price``` with ```ord_type``` ```price```); a market sell order uses the base-currency quantity.
 - Limit orders support IOC, FOK and maker-only (```postOnly```).
-- ```exchange.ModifyOrder()``` uses Upbit's cancel-and-new endpoint (```cancel_and_new```): the exchange atomically cancels the original order and places a new one, and the new order ID is returned; use the new ID from then on. With a positive price the new order is a limit order; with a price that is not positive it is a market order (the direction is required, and a buy amount is in the quote currency).
+- ```exchange.ModifyOrder()``` uses Upbit's cancel-and-new endpoint (```cancel_and_new```): the exchange atomically cancels the original order and places a new one, and the new order ID is returned; use the new ID from then on. The new order stays a limit order and needs a new price greater than 0; a price that is not positive is an error and never turns it into a market order. When the amount is not changed (not positive), the new order takes the original order's remaining amount. ```exchange.ModifyOrder()``` never turns an order into a market order.
 - The batch tickers of ```exchange.GetTickers()``` carry no order book, so ```Buy``` and ```Sell``` are 0.
 - ```exchange.GetHistoryOrders()``` returns filled and canceled orders; without ```limit```, at most 100 orders are returned.
 
@@ -26490,7 +26476,7 @@ Served through a fallback:
 
 Margin mode: Choose cross/isolated margin with ```exchange.IO("cross", bool)```; it is a local setting carried with every order (cross by default). ```exchange.SetMarginLevel()``` sets leverage per contract and carries the current cross/isolated setting.
 
-Position mode: Switch hedge/one-way mode with ```exchange.IO("dual", bool)```. The connector does not detect the account's position mode: if the account is already in hedge mode, call ```exchange.IO("dual", true)``` at the start of every run, otherwise orders lack the position side and are rejected by the exchange. In hedge mode ```exchange.SetMarginLevel()``` sets only the long side (```buy```, ```closebuy```) or the short side (```sell```, ```closesell```) according to the direction set by ```exchange.SetDirection()```, long when no direction is set; to set both sides, set each direction and call it once per side.
+Position mode: Switch hedge/one-way mode with ```exchange.IO("dual", bool)```. The connector does not detect the account's position mode: if the account is already in hedge mode, call ```exchange.IO("dual", true)``` at the start of every run, otherwise orders lack the position side and are rejected by the exchange. In hedge mode ```exchange.SetMarginLevel()``` sets the same leverage on both the long and the short side in one call (it fails if either side fails, and the error names the side that was already set), regardless of the direction set by ```exchange.SetDirection()```; in one-way mode it is set once.
 
 ##### Notes
 
@@ -26539,13 +26525,13 @@ Not supported (the call fails with an error and returns null): `exchange.GetTick
 Served through a fallback:
 
 - `exchange.GetRecords`: The exchange has no K-line endpoint; bars are synthesized by the docker from trades. The first call covers only the few bars spanned by recent trades, and more accumulate with later calls.
-- `exchange.GetOrder`: The exchange has no single-order query interface, so the order is looked up among the current open orders and the historical orders.
+- `exchange.GetOrder`: The exchange has no single-order query interface, so the order is looked up among the current open orders and the historical orders. The historical orders are rebuilt from trade records whose ```Id``` is not guaranteed to equal the order ID, so a completed order may not be found.
 
 ##### Notes
 
 - Market orders are not supported, only GTC limit orders: a ```tif``` of ```ioc``` or ```fok```, or ```postOnly```, fails.
 - Without the ```symbol``` argument, ```exchange.GetOrders()``` queries the current trading pair only. The returned open orders carry no fill information, so ```DealAmount``` is 0.
-- ```exchange.GetHistoryOrders()``` reads Zaif's trade history (```trade_history```): each trade is returned as a filled order; without ```limit```, at most 100 are returned, and ```since``` is passed to the exchange with second precision.
+- Zaif has no order history endpoint, so ```exchange.GetHistoryOrders()``` is rebuilt from the trade history (```trade_history```): each trade is returned as a filled order, with ```Price``` and ```AvgPrice``` set to that trade's price, ```Amount``` and ```DealAmount``` set to that trade's amount, and ```Type``` set to this account's side in the trade (the trade's aggressor side for self-trades). Trade records carry no order ID, so an order filled in several trades shows up as several rows that cannot be merged; ```Id``` is the trade record's number and is not guaranteed to equal the order ID returned when the order was placed; orders cancelled without any fill never appear, and an order cancelled after a partial fill shows only the filled part. Without ```limit```, at most 100 rows are returned; ```since``` is passed to the exchange with second precision, and with it the earliest records after that time are returned, without it the most recent ones. Without ```symbol```, regular pairs and token pairs (the exchange's ```is_token```) are queried once each and merged; the exchange allows at most 12 calls to this endpoint per 60 seconds.
 - ```exchange.GetTicker()``` has no opening price (```Open``` is 0), and the exchange gives no ticker time, so ```Time``` is the local time.
 
 ### Decentralized Exchanges (DEX)
@@ -26842,6 +26828,7 @@ Account: The account, positions and orders are queried by the configured Account
 | Function | Behavior on Futures_EdgeX |
 | - | - |
 | exchange.GetTicker() | The ticker endpoint has no bid/ask, so each call makes an extra order book request to fill them in (two requests in all); if the order book request fails, the whole call fails. ```Time``` is the server time of the order book response (as is the ```Time``` of ```exchange.GetDepth()```), not the ticker's ```endTime``` (the end of the 24-hour statistics window, which advances in 15-minute steps); ```endTime``` is still available in ```Info``` |
+| exchange.GetTickers() | Not supported: edgeX has no endpoint that returns the tickers of all contracts at once (its ticker endpoint returns an empty list without a contract ID), so the call reports an error and returns null. To get several contracts' tickers, call ```exchange.GetTicker(symbol)``` for each one (such as ```exchange.GetTicker("BTC_USDC.swap")```) |
 | exchange.GetFundings() | With a symbol (such as ```BTC_USDC.swap```) it returns that contract's entry; without arguments it queries every tradable perpetual of the current quote currency (such as ```USDC.swap```, which can also be passed directly). edgeX has no batch funding endpoint, so a range query sends one request per contract and takes over ten seconds for the hundred-plus contracts; pass a specific symbol when calling it often. ```Rate``` is the exchange's forecast (next) rate and ```Time``` the next settlement time |
 | exchange.CreateOrder() | Order amounts are in coins (1 contract = 1 coin). Limit orders support GTC, IOC, FOK and post-only; market orders are IOC by default, cannot be post-only, and are bounded by the oracle price: buys at no more than 1.2 times it, sells at no less than 0.8 times it |
 | exchange.CreateConditionOrder() | Take-profit and stop-loss only, no OCO (place the two legs separately), triggered by the last trade price; with an order price of -1 (market) the order executes at market once triggered, with the price bound computed from the oracle price at creation. To modify a conditional order, cancel it and create a new one |
@@ -26853,11 +26840,11 @@ The argument of ```exchange.IO("calcOrderHashAndSign", json)``` must have exactl
 
 #### Aster
 
-```Aster``` (Spot): Aster spot (API address ```https://sapi.asterdex.com```). Private endpoints use wallet signatures (EIP-712): configure the main account's wallet address plus the address and private key of the API signer wallet authorized for that account on Aster; no API Key is needed. Perpetual contracts use the Futures_Aster exchange object.
+```Aster``` (Spot): Aster spot (API address ```https://sapi.asterdex.com```). Private endpoints use wallet signatures (EIP-712): configure the main account's wallet address plus the private key of the API signer wallet authorized for that account on Aster (the signer wallet address is optional and is derived from the private key); no API Key is needed. Perpetual contracts use the Futures_Aster exchange object.
 
 ```Futures_ApolloX``` (Futures): ApolloX has merged into and been renamed Aster. Futures_ApolloX connects to the same exchange's legacy futures API (```https://fapi.apollox.finance```, the v1/v2 API that mirrors Binance USDⓈ-M) with an API Key (HMAC signature); perpetual contracts only. The Futures_Aster exchange object connects to the v3 API with wallet signatures.
 
-```Futures_Aster``` (Futures): Aster perpetual contracts (API address ```https://fapi.asterdex.com```, the v3 API that mirrors Binance USDⓈ-M). Private endpoints use wallet signatures (EIP-712): configure the main account's wallet address plus the address and private key of the API signer wallet authorized for that account on Aster; no API Key is needed. The Futures_ApolloX exchange object connects to the same exchange's legacy API with an API Key (HMAC); spot uses the Aster exchange object.
+```Futures_Aster``` (Futures): Aster perpetual contracts (API address ```https://fapi.asterdex.com```, the v3 API that mirrors Binance USDⓈ-M). Private endpoints use wallet signatures (EIP-712): configure the main account's wallet address plus the private key of the API signer wallet authorized for that account on Aster (the signer wallet address is optional and is derived from the private key); no API Key is needed. The Futures_ApolloX exchange object connects to the same exchange's legacy API with an API Key (HMAC); spot uses the Aster exchange object.
 
 ##### Names and Configuration
 
@@ -26872,7 +26859,7 @@ The argument of ```exchange.IO("calcOrderHashAndSign", json)``` must have exactl
 | Field | ```Aster``` | ```Futures_ApolloX``` | ```Futures_Aster``` | Required | Description |
 | - | - | - | - | - | - |
 | User | ✓ |  | ✓ | Yes | Wallet address of the main account (the account holding the assets). |
-| Signer | ✓ |  | ✓ | Yes | Address of the API signer wallet (agent wallet) authorized for the main account on Aster. |
+| Signer | ✓ |  | ✓ | No | Address of the API signer wallet (agent wallet) authorized for the main account on Aster. It is optional; when blank it is derived from the signer private key below (the address of that key is the signer wallet address); when filled it is used as is and must match the private key. |
 | Private Key | ✓ |  | ✓ | Yes | Private key of the signer wallet above, used to sign private requests. |
 | Access Key |  | ✓ |  | Yes | The API Key created in the exchange's API management. |
 | Secret Key |  | ✓ |  | Yes | The Secret Key paired with the API Key, used for HMAC signing. |
@@ -28361,12 +28348,14 @@ Pairs are written as ```ETH_USDC```; the native coin (ETH, BNB, POL) and its wra
 | ```gasMultiplier``` | [x] | Gas limit multiplier, 1 to 5, default 1.2; a transaction's gasLimit is the node's gas estimate times this value. Queries when called without an argument. | The current multiplier. |
 | ```base``` | [url] | Without an argument, returns the current node address; with an address, switches the node. Several nodes are written as one comma-separated string (with an array only the first address is used). After a switch, the first request checks which chain the node is on and fails if it is not the configured chain. | The previous address. |
 | ```sendBase``` | url | Set a node used only to broadcast transactions (a private transaction channel). Unlike Web3, it does not return the previous address, does not query when called without an argument, and an empty string does not clear the setting. | ```true``` |
+| ```clientId``` | [id] | Set the client id sent with KyberSwap Aggregator API requests (the ```x-client-id``` header), 1 to 64 letters, digits, ```.```, ```_``` or ```-```. (more below the table) | The current client id. |
 | ```address``` | — | The wallet address of the configured private key (lowercase, starting with ```0x```). | — |
 | ```contracts``` | — | The deployment on this chain, with the same fields as the Uniswap exchange object: ```dex``` is ```KyberSwap``` and ```router``` is the KyberSwap router contract; ```quoterV2```, ```v3Factory```, ```v4``` and the like are the chain's Uniswap deployment (used to list markets and estimate USD prices), and ```aerodrome``` is ```null```; ```tokenList``` gives the generation time of the built-in token table and its token count on this chain. | — |
 
 The rest of the longer descriptions in the table:
 
 - ```simulate```: The route description then lists the liquidity sources it goes through. The sixth argument (route type filter) does not apply to an aggregator and fails with ```route is not applicable to the KyberSwap aggregator``` if given. For a swap paid with a token (such as buying with USDC), when the wallet's allowance for the router falls short (```approve``` defaults to ```exact```, which approves only right before a real order), the allowance is supplied automatically through an ```eth_call``` state override before simulating, and ```allowanceOverride``` in the result lists what was supplied; a ```stateOverride``` you pass is merged with it, and storage slots you set are not overwritten. If the token's allowance storage slot cannot be located, a failing simulation says the token is not approved yet and needs an approval or your own ```stateOverride```. Balances are not supplied automatically.
+- ```clientId```: KyberSwap's public rate limit (3 requests per second by default) is counted per client id, so programs sharing an id share that budget; use your own id if HTTP 429 errors are frequent. The default is ```fmz-``` followed by the first 8 hex digits of a hash of the wallet address (stable across restarts for the same wallet, without revealing the address; a value generated randomly for the run when no private key is configured). Queries when called without an argument.
 
 For the common command ```currency``` see `exchange.IO`.
 
