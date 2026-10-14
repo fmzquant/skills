@@ -5856,7 +5856,7 @@ fn main() {
 
 如果使用较旧版本的托管者，```exchange.CancelOrder()```函数的参数```orderId```可能与当前文档中描述的```orderId```有所差别。
 
-不支持的交易所：`Jupiter`、`OKX_DEX`、`Web3`。调用时报错并返回空值，所有交易所的对照见`能力矩阵`。
+不支持的交易所：`OKX_DEX`、`Web3`。调用时报错并返回空值，所有交易所的对照见`能力矩阵`。
 
 See also: `exchange.Buy`, `exchange.Sell`, `exchange.GetOrders`, `exchange.ModifyOrder`
 
@@ -6298,7 +6298,7 @@ fn main() {
 
 - 该函数仅支持提供历史订单查询接口的交易所。
 
-不支持的交易所：`Bitstamp`、`Coincheck`、`Uniswap`、`Jupiter`、`KyberSwap`、`OneInch`、`OKX_DEX`、`Futures_IB`、`Web3`。调用时报错并返回空值，所有交易所的对照见`能力矩阵`。
+不支持的交易所：`Bitstamp`、`Coincheck`、`Uniswap`、`KyberSwap`、`OneInch`、`OKX_DEX`、`Futures_IB`、`Web3`。调用时报错并返回空值，所有交易所的对照见`能力矩阵`。
 
 See also: `Order`, `exchange.GetOrder`, `exchange.GetOrders`
 
@@ -9064,6 +9064,13 @@ fn main() {
 | ```balanceSupportedChains``` | `OKX_DEX` |
 | ```base``` | `Futures_Binance`、`Pendle`、`Futures_Boros`、`Uniswap`、`Jupiter`、`KyberSwap`、`OneInch`、`Futures_Polymarket`、`Web3` |
 | ```batchOrders``` | `Futures_Polymarket` |
+| ```bridge.apiKey``` | `Uniswap`、`Jupiter`、`KyberSwap`、`OneInch` |
+| ```bridge.chains``` | `Uniswap`、`Jupiter`、`KyberSwap`、`OneInch` |
+| ```bridge.quote``` | `Uniswap`、`Jupiter`、`KyberSwap`、`OneInch` |
+| ```bridge.send``` | `Uniswap`、`Jupiter`、`KyberSwap`、`OneInch` |
+| ```bridge.simulate``` | `Uniswap`、`Jupiter`、`KyberSwap`、`OneInch` |
+| ```bridge.status``` | `Uniswap`、`Jupiter`、`KyberSwap`、`OneInch` |
+| ```bridge.tokens``` | `Uniswap`、`Jupiter`、`KyberSwap`、`OneInch` |
 | ```broadcast``` | `OKX_DEX` |
 | ```broadcastSupportedChains``` | `OKX_DEX` |
 | ```calcOrderHashAndSign``` | `Futures_EdgeX` |
@@ -9078,6 +9085,10 @@ fn main() {
 | ```contracts``` | `Uniswap`、`KyberSwap`、`OneInch`、`Web3` |
 | ```cross``` | `Futures_Binance`、`Futures_Bitget`、`Futures_Bybit`、`Futures_Coinw`、`Futures_DeepCoin`、`Futures_DigiFinex`、`Futures_GateIO`、`Futures_HuobiDM`、`Futures_Kraken`、`Futures_KuCoin`、`Futures_MEXC`、`Futures_OKCoin`、`Futures_WOO`、`Futures_Hyperliquid`、`Futures_Lighter`、`Futures_ApolloX`、`Futures_Aster` |
 | ```data``` | `Futures_Polymarket` |
+| ```dca.cancel``` | `Jupiter` |
+| ```dca.create``` | `Jupiter` |
+| ```dca.list``` | `Jupiter` |
+| ```dca.simulate``` | `Jupiter` |
 | ```deadline``` | `Uniswap`、`KyberSwap`、`OneInch` |
 | ```debug``` | `Futures_IB` |
 | ```decode``` | `Web3` |
@@ -9136,6 +9147,12 @@ fn main() {
 | ```price``` | `Pendle` |
 | ```priorityFee``` | `Jupiter` |
 | ```proxyWalletAddress``` | `Futures_Polymarket` |
+| ```pump.buy``` | `Jupiter` |
+| ```pump.holdings``` | `Jupiter` |
+| ```pump.info``` | `Jupiter` |
+| ```pump.new``` | `Jupiter` |
+| ```pump.quote``` | `Jupiter` |
+| ```pump.sell``` | `Jupiter` |
 | ```quote``` | `OKX_DEX` |
 | ```receipt``` | `Pendle`、`Uniswap`、`Jupiter`、`KyberSwap`、`OneInch` |
 | ```redeem``` | `Futures_Polymarket` |
@@ -9177,6 +9194,7 @@ fn main() {
 | ```trade_normal``` | `AscendEx`、`Binance`、`Bybit`、`Crypto`、`GateIO`、`Huobi`、`OKEX`、`WOO` |
 | ```trade_super_margin``` | `Binance`、`GateIO`、`Huobi`、`OKEX` |
 | ```transfer``` | `Uniswap`、`Jupiter`、`KyberSwap`、`OneInch` |
+| ```trigger.simulate``` | `Jupiter` |
 | ```unified``` | `Binance`、`Futures_Binance`、`GateIO`、`Futures_GateIO`、`Futures_HuobiDM` |
 | ```uniswapV3``` | `Web3` |
 | ```unlock``` | `Futures_Futu` |
@@ -23561,7 +23579,7 @@ fn main() {
 | `Futures_Boros` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `Futures_WOOFi` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `Uniswap` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✗ |
-| `Jupiter` | ✓ | ✓ | ✓ | ✗ | ✗ | ✓ | ✓ | ✗ |
+| `Jupiter` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✓ |
 | `KyberSwap` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✗ |
 | `OneInch` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✗ |
 | `OKX_DEX` | ✓ | ✓ | ✓ | ✗ | ✗ | ✓ | ✗ | ✗ |
@@ -27185,6 +27203,13 @@ Boros API按计算单位限流：每个IP每分钟200个单位（下单、撤单
 | ```lp.stake``` | positionIds | Aerodrome / Velodrome：把仓位质押进所在池子的gauge领AERO（Velodrome为VELO，下同），每个仓位各自的交易。（详见表下） | ```{positions: [{id, gauge, approveTxHash, txHash, feesBase, feesQuote}]}```；基础池为```{id, gauge, txHash, lpTokens}```。 |
 | ```lp.unstake``` | positionIds | Aerodrome / Velodrome：从gauge取回。Slipstream仓位取回NFT，同时领走累积的AERO；基础池取回全部质押的LP代币，AERO留在gauge里，用```lp.claim```领。每个仓位各自的交易。 | ```{positions: [{id, gauge, txHash, rewards}]}```，```rewards```为这笔交易领到的AERO / VELO；基础池另有```lpTokens```。 |
 | ```lp.claim``` | positionIds[, sell] | Aerodrome / Velodrome：领AERO / VELO奖励，一笔```Voter.claimRewards```领这些仓位所在gauge里本钱包的全部奖励（同一gauge里本钱包的其它质押仓位也一起领）；```sell```为```true```时把领到的奖励币按市价卖成USDC。 | ```{txHash, gauges, rewardToken, rewards, sell}```，```rewardToken```为```AERO```或```VELO```。 |
+| ```bridge.chains``` | — | 跨链桥（LI.FI）支持的链：EVM链与Solana，缓存1小时。 | ```{id, key, name, chainType, nativeToken}```数组，```chainType```为```EVM```或```SVM```。 |
+| ```bridge.tokens``` | [chain] | LI.FI认识的某条链上的代币（缺省为本链），缓存1小时。 | ```{symbol, address, decimals, name, priceUSD}```数组。 |
+| ```bridge.quote``` | params | 跨链报价（只读），源链为本交易所对象的链。（详见表下） | ```{tool, toolName, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, fromAmountRaw, toAmountRaw, toAmountMinRaw, fromAmountUSD, toAmountUSD, slippage, toAddress, feeCosts, gasCosts, executionDuration, approvalAddress, steps, transactionId, request}```：数量为代币单位（```*Raw```为最小单位原值）；```toAmountMin```为扣除滑点后保证到手的数量；```feeCosts```为```[{name, amount, token, amountUSD, percentage, included}]```（```included```为```false```的费用另付）；```gasCosts```为源链gas估算；```executionDuration```为预计耗时（秒）；```approvalAddress```为需要授权的合约（原生币、Solana为```null```）；```steps```为各步骤（```cross```为跨链，```swap```为兑换）；```request```为参数原样回显。 |
+| ```bridge.simulate``` | params\|quote[, stateOverride] | 重新报价，用```eth_call```执行LI.FI给出的交易，不签名、不广播、不花gas。（详见表下） | ```bridge.quote```的结果，另有```simulated```（```true```）、```to```、```value```、```walletBalance```，补过授权时有```allowanceOverride```。 |
+| ```bridge.send``` | params\|quote | 跨链转出：重新报价 → 检查余额 → 代币对LI.FI的```approvalAddress```授权不够时先授权（按```exchange.IO("approve")```的```exact```/```max```，USDT这类先清零，等授权上链；授权过就再报价一次）→ ```eth_call```模拟 → 签名广播；gasLimit取```eth_estimateGas```估算×```gasMultiplier```与LI.FI建议的```gasLimit```中较大的一个（桥合约还会调用别的合约，估算可能偏少），实际只按用量扣费。（详见表下） | ```{txHash, tool, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, toAddress, value, transactionId}```，```txHash```为源链交易哈希，可用```receipt```查回执。 |
+| ```bridge.status``` | txHash[, options] | 跨链进度（LI.FI ```/status```），参数为```bridge.send```返回的源链交易哈希；```options```可给```{toChain, bridge}```加快查找。（详见表下） | ```{status, substatus, substatusMessage, tool, sending, receiving, fromAddress, toAddress, explorer, bridgeExplorer}```：```status```为```NOT_FOUND```、```INVALID```、```PENDING```、```DONE```、```FAILED```；```DONE```时```substatus```为```COMPLETED```（按报价到账）、```PARTIAL```（收到的是别的代币）或```REFUNDED```（已退回）；```sending```、```receiving```为```{txHash, txLink, chainId, amount, amountRaw, token, timestamp}```，```receiving.amount```与```receiving.token```为实际到账的数量与代币。 |
+| ```bridge.apiKey``` | [key] | 设置LI.FI的API Key（请求头```x-lifi-api-key```，只对本交易所对象生效，不回显），传```""```清除；不传参数只查询。没有Key时按出口IP限频，见下文。 | 是否已设置Key（布尔值）。 |
 
 表中长说明的其余部分：
 
@@ -27204,6 +27229,10 @@ Boros API按计算单位限流：每个IP每分钟200个单位（下单、撤单
 - ```lp.history```：V4与Infinity的事件不记录代币数量，这两种仓位只给每次流动性变化（```add```、```remove```、```collect```）和当前仓位。需要能查历史日志的节点；公共节点常常不支持。Aerodrome / Velodrome基础池的LP代币没有按仓位的事件，不支持。
 - ```lp.track```：节点查不到全部历史日志时用它找回以前建的仓位；策略可以把```lp.add```返回的ID存起来（如```_G```），重启后登记。
 - ```lp.stake```：Slipstream仓位先把这个NFT授权给gauge（已授权时跳过），再存入整个NFT，存入时gauge把仓位未领的手续费转给本人；基础池把钱包里未质押的LP代币全部存入。已被Voter停掉的gauge不能存入，报错。质押期间仓位不收交易手续费（归投票人），只拿AERO；仍在区间外时不发奖励（Slipstream）。
+- ```bridge.quote```：```params```：```toChain```（目标链：链ID、LI.FI的链key如```arb```、或链名如```Arbitrum```、```Solana```）、```fromToken```（本链代币：代币表里的名字或合约地址）、```toToken```（目标链代币：名字或地址，由LI.FI解析为它的标准代币，如Arbitrum上的```USDC```是原生USDC，不是USDC.e）、```amount```（```fromToken```的数量，按代币单位，超出代币精度的位舍去）、```toAddress```（收款地址；目标为EVM链时缺省为本钱包，目标为Solana时必须传Solana地址，不传报错）、```slippage```（缺省为```exchange.IO("slippage")```的值）、```order```（```CHEAPEST```或```FASTEST```）、```allowBridges```/```denyBridges```（LI.FI的桥名，数组或逗号分隔）。不认识的键报错。
+- ```bridge.simulate```：代币授权不够时自动用state override补成无限额度（同```simulate```，结果里```allowanceOverride```列出补了什么）；余额不会自动补，可以用```stateOverride```（```eth_call```的第三参）自己补。余额不够导致失败时报错里给出钱包余额。
+- ```bridge.send```：原生币不用授权。只等授权上链，不等桥接交易；跨链是异步的，用```bridge.status```轮询。传```bridge.quote```的结果时按其中的```request```重新报价（报价随时变化，实际成交以新报价为准，```toAmountMin```由交易在链上保证）。
+- ```bridge.status```：刚广播时LI.FI可能还没收录，返回```NOT_FOUND```，继续轮询即可（建议间隔10～30秒）。
 
 通用指令```currency```见`exchange.IO`。
 
@@ -27251,6 +27280,17 @@ Aerodrome（Base）与Velodrome（OP Mainnet）（同一套合约，用法相同
 - 每次建仓、调仓、领取、撤出都是链上交易，频繁调仓的gas成本可能超过手续费收入；更适合Base、Arbitrum、Robinhood等低gas的链。
 - 计划中的预估日手续费按过去24小时成交与当前占池比例估算，不代表未来收益。
 - Aerodrome / Velodrome的奖励按AERO / VELO计价，价格波动大；领到后可以用```lp.claim```的```sell```卖成USDC。
+
+##### 跨链桥（bridge）
+
+```exchange.IO("bridge.*", ...)```经LI.FI聚合的跨链桥（Across、Stargate、CCTP、deBridge、Mayan、Relay、NEAR Intents等）把代币从本交易所对象的链转到另一条链，支持EVM链之间以及EVM与Solana之间（源链为本交易所对象的链）。报价与交易由LI.FI给出，由托管者授权、```eth_call```模拟后签名广播。请求带集成方标识```integrator=fmz```，不加收任何费用；报价中的```LIFI Fixed Fee```等是LI.FI与桥自己的费用，已计入```toAmount```。
+
+典型流程：```bridge.quote```看报价 → ```bridge.simulate```模拟 → ```bridge.send```发出 → 每10～30秒```bridge.status```直到```DONE```或```FAILED```。
+
+- 跨链是异步的：```bridge.send```返回时只是源链交易已广播，到账要几秒到几十分钟（见报价的```executionDuration```），必须轮询```bridge.status```确认；```PARTIAL```表示目标链收到的是别的代币，```REFUNDED```表示已退回源链。
+- 跨虚拟机（EVM↔Solana）必须传```toAddress```，地址格式按目标链检查；地址写错的资金无法找回。
+- 风险：桥合约与跨链消息的安全风险由各桥承担；报价随时变化，```bridge.send```发出前会重新报价；目标链需要有gas才能继续使用到账的代币。先用小额测试。
+- 限频：没有API Key时LI.FI按出口IP限频，```/quote```两小时75次（```bridge.quote```、```bridge.simulate```、```bridge.send```各用一次，授权后再报价时多一次），其它接口每分钟100次；同一托管者上的策略共用额度。用```exchange.IO("bridge.apiKey", key)```设置Key后每分钟100次。被限频时报错```rate limited (HTTP 429 …)```。
 
 ##### exchange.IO("transfer", ...)
 
@@ -27745,6 +27785,8 @@ See also: `Uniswap`, `exchange.IO`, `exchange.IO("deadline")`, `exchange.IO("sim
 
 同一个交易所对象还提供Meteora DLMM、Raydium CLMM与Orca Whirlpools池子的集中流动性（```exchange.IO("lp.*", ...)```，见下文「集中流动性」）：交易由连接器自己构造、签名并经Solana节点广播，指令与返回字段对齐Uniswap交易所对象的LP指令。
 
+pump.fun打新（```exchange.IO("pump.*", ...)```，见下文「Pump.fun打新」）：在链上发现刚创建的币，直接在pump.fun的联合曲线上报价、买卖（连接器自己构造、模拟、签名交易），币毕业迁到PumpSwap后自动改走Jupiter兑换。新币风险极高，见该节的风险说明。
+
 ##### 名称与配置
 
 ```exchange.GetName()```：```Jupiter```（现货）。
@@ -27774,12 +27816,23 @@ SOL为原生币，兑换时自动包装、解包。内置代币：SOL、USDC、U
 | ```token``` | [name, mint] | 登记代币（只在本次运行中有效），登记后的代币名可以直接写在交易对里；不传参数时列出代币表。见子页`exchange.IO("token", ...)`。 | 登记时返回```{symbol, mint, decimals}```，列表时返回```{symbol, mint, decimals, native}```数组。 |
 | ```transfer``` | to, amount | 从钱包转出SOL；```amount```可传```all```转出全部余额（扣除手续费）。只支持SOL，第三个参数传其它代币会报错。只等广播，不等上链。见子页`exchange.IO("transfer", ...)`。 | ```{signature, amount, lastValidBlockHeight}``` |
 | ```receipt``` | signature[, waitMs] | 查询一笔Solana交易的状态，可等待到确认或失败（最多10分钟）。查询订单时传订单ID中逗号后面的交易签名。见子页`exchange.IO("receipt", ...)`。 | ```{signature, state, slot, confirmationStatus, err, fee, blockTime}```，```state```为```success```、```failed```或```pending```；```fee```、```blockTime```只在确认或失败后才有。（详见表下） |
+| ```dca.create``` | params | 创建定投（Jupiter Recurring，按时间）：```params```为```{symbol, side, total, perOrder, numberOfOrders, interval, minPrice, maxPrice, startAt}```。（详见表下） | ```{id, signature, symbol, side, total, perOrder, numberOfOrders, interval, minPrice, maxPrice, startAt, priorityFeeLamports}```，```id```为定投订单账户地址。 |
+| ```dca.list``` | [params] | 列出钱包的定投：```params.status```为```active```（缺省，进行中）或```history```（已结束），```params.symbol```只列这个交易对。 | ```[{id, symbol, side, state, total, perOrder, numberOfOrders, ordersFilled, interval, minPrice, maxPrice, spent, received, filledQty, avgPrice, fee, createdAt, updatedAt, openTx, closeTx, info}]```：```state```为```active```、```completed```或```canceled```；```spent```为已花出的输入币，```received```为已换到的输出币（```fee```为其中被扣的手续费，输出币计），```filledQty```、```avgPrice```为按基础币折算的成交量与均价；```info```为Jupiter的原始行。 |
+| ```dca.cancel``` | id | 撤销一笔进行中的定投，剩余的输入币与未提取的输出币退回钱包。只等广播，不等上链。 | ```{id, signature, priorityFeeLamports}``` |
+| ```dca.simulate``` | params[, wallet] | 按```dca.create```的参数生成交易，用节点的```simulateTransaction```执行（不签名、不广播），用来在下单前检查余额、最低金额等；```params```写成```{cancel: id}```时模拟撤销这笔定投。（详见表下） | ```{ok, err, reason, logs, unitsConsumed, wallet, id, plan, priorityFeeLamports}```：```ok```为模拟是否成功，失败时```reason```为原因；```plan```为换算后的定投参数。 |
+| ```trigger.simulate``` | params[, wallet] | 生成Jupiter限价单的挂单交易并用节点的```simulateTransaction```执行（不签名、不广播）：```params```为```{symbol, side, price, amount, expiry, slippage}```，含义同下单（```amount```为基础币数量，```expiry```、```slippage```同下单附加参数）；写成```{cancel: orderId}```时模拟撤销这张限价单。（详见表下） | ```{ok, err, reason, logs, unitsConsumed, wallet, order, makingAmount, takingAmount, priorityFeeLamports}```：```order```为订单账户地址，```makingAmount```、```takingAmount```为付出、换回的最小单位数量。 |
 | ```slippage``` | [ratio] | 市价单的滑点保护比例，范围```[0, 0.5)```，默认```0.005```（0.5%），由链上程序强制执行。限价单不使用这个设置。不传参数时查询。见子页`exchange.IO("slippage", ...)`。 | 当前滑点比例。 |
 | ```priorityFee``` | [sol] | 每笔兑换交易的优先费上限（SOL），范围0到0.1，默认0.001；实际优先费由Jupiter按网络拥堵情况估算，不超过上限。不传参数时查询。见子页`exchange.IO("priorityFee", ...)`。 | 当前上限（SOL）。 |
 | ```dexes``` | [sources] | 限定兑换经过的流动性来源（逗号分隔）：分组简写```pump```、```meteora```、```raydium```、```orca```，或Jupiter的来源名（区分大小写）；```""```表示不限定。行情、询价和下单都只经过这些来源。不传参数时查询。见子页`exchange.IO("dexes", ...)`。 | 当前限定的来源名数组（分组已展开；空数组表示不限定）。 |
 | ```rps``` | [n] | 请求Jupiter API的每秒最多请求数，范围0.1到500，默认1。请求依次排队，相邻两次至少间隔```1/n```秒。不传参数时查询。见子页`exchange.IO("rps", ...)`。 | 当前每秒最多请求数。 |
 | ```base``` | [url] | 不传参数时返回当前Solana节点地址；传入地址时切换节点（多个用逗号分隔）。 | 切换前的地址。 |
 | ```address``` | — | 钱包地址（base58）。 | — |
+| ```pump.new``` | [options] | 最近在pump.fun上新建的币，从链上发现：查pump.fun mint authority（```TSLvdd1pWpHVjahSpsvCXUbgwsL3JAcvokwaKt1eokM```，只出现在创建交易里）的最近签名，逐笔取交易解析其中的```CreateEvent```，新的在前。（详见表下） | ```[{signature, slot, time, mint, name, symbol, uri, creator, user, bondingCurve, tokenProgram, quote, quoteMint, mayhem, cashback, holderReward, devBuy}]```：```time```为区块时间（毫秒）；```user```为发起创建的钱包（一般就是```creator```）；```tokenProgram```为```spl-token```或```token-2022```；```quote```为```SOL```、```USDC```或报价代币的mint（只有```SOL```的币能用```pump.buy```、```pump.sell```）；```devBuy```为同一笔交易里的首买```{tokens, quoteAmount}```（```quoteAmount```含费，报价币不是SOL或USDC时为```null```），没有首买为```null```。（详见表下） |
+| ```pump.info``` | mint | 币的联合曲线（bonding curve）状态，一次```getMultipleAccounts```读曲线、mint、全局配置与费率表。不是pump.fun的币时报错。 | ```{mint, bondingCurve, creator, tokenProgram, decimals, quote, quoteMint, complete, migrated, virtualTokenReserves, virtualQuoteReserves, realTokenReserves, realQuoteReserves, tokenTotalSupply, price, marketCap, progress, fees, mayhem, cashback, holderReward}```：储备与供应量为可读单位；```price```为1个币值多少报价币（SOL），```marketCap```为```price```乘总供应量；```progress```为曲线已卖出的比例（%），到100时曲线完成（```complete```），随后迁移到PumpSwap（```migrated```，储备清零，```price```、```marketCap```、```fees```为```null```）；```fees```为当前费率```{protocolBps, creatorBps}```（万分之几）。 |
+| ```pump.quote``` | mint, side, amount | 在联合曲线上本地报价（不发交易），公式与费用同链上程序：```buy```时```amount```为要花的SOL（含费），```sell```时为要卖的币数。曲线已完成时报错（改用```exchange.IO("route", "MINT_SOL", ...)```询Jupiter）。 | ```{mint, side, quote, amountIn, amountOut, price, spotPrice, priceAfter, priceImpactPct, fees, protocolFeeBps, creatorFeeBps, crossesCurve}```：```price```为含费成交均价（SOL/币），```priceImpactPct```为不含费均价相对现价```spotPrice```的偏离（%），```fees```为协议费加创作者费（SOL）；```crossesCurve```为```true```表示买穿曲线（见下文「Pump.fun打新」）。 |
+| ```pump.buy``` | mint, solAmount[, options] | 花```solAmount``` SOL（含协议费与创作者费）在联合曲线上买入：先幂等地建钱包的代币账户，再发```buy_exact_quote_in_v3```，最少到手数量为本地报价×(1 − ```slippage```)，由链上程序强制执行。（详见表下） | ```{txHash, venue, mint, side, solAmount, tokenAmount, price, fee, slot}```：```venue```为```pump```或```jupiter```（另带```route```）；```solAmount```为付出的SOL（含协议费与创作者费，不含网络费与账户押金），```tokenAmount```为买到的币，```fee```为网络费（SOL）。（详见表下） |
+| ```pump.sell``` | mint, amount[, options] | 在联合曲线上卖出```amount```个币（```all```为全部余额），发```sell_v3```，最少收回的SOL为本地报价×(1 − ```slippage```)。（详见表下） | 同```pump.buy```：```solAmount```为到手的SOL（已扣协议费与创作者费）。 |
+| ```pump.holdings``` | [wallet] | 钱包（默认本交易所对象的钱包）持有的pump.fun币：钱包代币余额里有联合曲线的那些，按曲线估值。 | ```[{mint, amount, quote, complete, price, value}]```：```value```为现在按曲线全部卖出可得的报价币（已扣费）；曲线已完成或超出曲线能买回的量时```price```、```value```为```null```（已毕业的币用```exchange.IO("route", ...)```估值）。 |
 | ```lp.pools``` | token[, quote] | 列出代币的Meteora DLMM、Raydium CLMM与Orca Whirlpools池子（指定计价币，或SOL、USDC、USDT）：费率、bin步长与active bin（DLMM）或tick间距与当前tick（CLMM）、现价、池子两种代币的余额与TVL；24小时成交与手续费、美元TVL分别取自Meteora的数据API（```dlmm.datapi.meteora.ag```）、Raydium API v3（```api-v3.raydium.io```）与Orca的公开API（```api.orca.so```），现价、余额等从链上读，Raydium的费率取池子所属的AmmConfig账户。（详见表下） | ```[{id, protocol, dex, symbol, base, quote, fee, feeRate, feeRateNow, binStep, activeId, price, reserveBase, reserveQuote, tvlQuote, tvlUsd, volume24hUsd, fees24hUsd, enabled, rewards, empty}]```：```protocol```为```meteora```；```price```为计价币/代币；```fee```为基础费率（百万分之几，与Uniswap的```fee```同单位），```feeRate```为比例，```feeRateNow```为含波动附加费的当前费率；```rewards```为池子farm奖励代币```[{mint, symbol}]```。（详见表下） |
 | ```lp.select``` | token, budget[, options] | 按规则自动选池：```options.fee```（同```lp.pools```的```fee```）或```options.binStep```指定时只在这些池子里选；在美元TVL不低于max(5000美元, 预算)的池子里选24小时成交最大的，没有成交数据时选TVL最大的，都不够门槛时选TVL最大的。（详见表下） | ```lp.pools```的一行，另带```reason```（选择理由）。 |
 | ```lp.pool``` | poolId | 池子实时状态。（详见表下） | ```{id, protocol, dex, tokenX, tokenY, symbolX, symbolY, decimalsX, decimalsY, price, fee, feeRate, feeRateNow, binStep, activeId, reserveX, reserveY, tvlUsd, volume24hUsd, fees24hUsd, enabled, rewards}```，```price```为1个X值多少Y（池子自己的顺序）。（详见表下） |
@@ -27793,9 +27846,24 @@ SOL为原生币，兑换时自动包装、解包。内置代币：SOL、USDC、U
 | ```lp.remove``` | positionIds[, ratio[, sell]] | 撤出流动性并领取手续费与奖励，每个仓位各自的交易；```ratio```默认1：全部撤出后关掉仓位账户（Raydium为```close_position```：烧掉NFT、关NFT账户、NFT mint与仓位账户），退回租金（```rentRefundSol```）；小于1时只撤一部分。（详见表下） | 同```lp.decrease```。 |
 | ```lp.positions``` | [filter[, wallet]] | 钱包的全部Meteora DLMM仓位（节点```getProgramAccounts```按主人查，需要节点支持）、Raydium CLMM与Orca Whirlpools仓位（```getTokenAccountsByOwner```找钱包里数量为1的NFT，再读它们的仓位账户；Orca另列出钱包持有的Position Bundle里的仓位）：bin区间、是否在区间内、两种代币当前数量（按每个bin里的份额折算）、价值、未领手续费与farm奖励、押的租金。（详见表下） | ```[{id, pool, protocol, symbol, fee, lowerBinId, upperBinId, activeId, binStep, width, priceLower, priceUpper, price, inRange, liquidity, amountBase, amountQuote, value, feesBase, feesQuote, feesValue, rewards, rentSol, feeOwner, closed}]```，```value```、```feesValue```按计价币计，```rewards```为```[{mint, symbol, amount}]```，```liquidity```为各bin份额之和。（详见表下） |
 | ```lp.track``` | positionIds | 登记仓位（```meteora:地址```、```raydium:NFT mint```、```orca:NFT mint```或只写地址——Raydium、Orca也认仓位账户地址；先核对是对应协议的仓位），之后```lp.positions```也会查这些仓位（主人每次按链上核对，转走的、已关掉的不列）。（详见表下） | 本进程记住的全部仓位地址。 |
+| ```bridge.chains``` | — | 跨链桥（LI.FI）支持的链：EVM链与Solana，缓存1小时。 | ```{id, key, name, chainType, nativeToken}```数组，```chainType```为```EVM```或```SVM```。 |
+| ```bridge.tokens``` | [chain] | LI.FI认识的某条链上的代币（缺省为Solana），缓存1小时。 | ```{symbol, address, decimals, name, priceUSD}```数组。 |
+| ```bridge.quote``` | params | 跨链报价（只读），源链为本交易所对象的链。（详见表下） | ```{tool, toolName, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, fromAmountRaw, toAmountRaw, toAmountMinRaw, fromAmountUSD, toAmountUSD, slippage, toAddress, feeCosts, gasCosts, executionDuration, approvalAddress, steps, transactionId, request}```：数量为代币单位（```*Raw```为最小单位原值）；```toAmountMin```为扣除滑点后保证到手的数量；```feeCosts```为```[{name, amount, token, amountUSD, percentage, included}]```（```included```为```false```的费用另付）；```gasCosts```为源链gas估算；```executionDuration```为预计耗时（秒）；```approvalAddress```为需要授权的合约（原生币、Solana为```null```）；```steps```为各步骤（```cross```为跨链，```swap```为兑换）；```request```为参数原样回显。 |
+| ```bridge.simulate``` | params\|quote | 重新报价，用本钱包签名LI.FI给出的序列化交易后```simulateTransaction```（核对签名），不广播。（详见表下） | ```bridge.quote```的结果，另有```simulated```（```true```）、```unitsConsumed```、```signature```。 |
+| ```bridge.send``` | params\|quote | 跨链转出：重新报价 → 检查余额 → 用本钱包签名LI.FI给出的序列化交易（本钱包不是签名者时报错）→ ```simulateTransaction``` → 经Solana节点广播。（详见表下） | ```{txHash, tool, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, toAddress, transactionId}```，```txHash```为源链交易签名，可用```receipt```查状态。 |
+| ```bridge.status``` | signature[, options] | 跨链进度（LI.FI ```/status```），参数为```bridge.send```返回的源链交易签名；```options```可给```{toChain, bridge}```加快查找。（详见表下） | ```{status, substatus, substatusMessage, tool, sending, receiving, fromAddress, toAddress, explorer, bridgeExplorer}```：```status```为```NOT_FOUND```、```INVALID```、```PENDING```、```DONE```、```FAILED```；```DONE```时```substatus```为```COMPLETED```（按报价到账）、```PARTIAL```（收到的是别的代币）或```REFUNDED```（已退回）；```sending```、```receiving```为```{txHash, txLink, chainId, amount, amountRaw, token, timestamp}```，```receiving.amount```与```receiving.token```为实际到账的数量与代币。 |
+| ```bridge.apiKey``` | [key] | 设置LI.FI的API Key（请求头```x-lifi-api-key```，只对本交易所对象生效，不回显），传```""```清除；不传参数只查询。没有Key时按出口IP限频，见下文。 | 是否已设置Key（布尔值）。 |
 
 表中长说明的其余部分：
 
+- ```dca.create```：```side```为```buy```时用计价币分批买入基础币，```total```、```perOrder```按计价币计；为```sell```时分批卖出基础币，按基础币计。```perOrder```与```numberOfOrders```给一个即可（都给时必须一致，只给```perOrder```时```total```必须是它的整数倍）；```interval```为每份的间隔秒数；```minPrice```、```maxPrice```（可选）为价格区间（计价币/基础币），价格在区间外的那一轮跳过；```startAt```（可选）为开始时间戳（毫秒），缺省立即开始。总额一次存入定投订单账户，此后由Jupiter按间隔代为兑换，买到的币自动转回钱包。下单前在本地检查：至少2份、每份至少值50美元（按Jupiter价格接口折算）、两种代币都不是Token-2022代币。只等广播，不等上链。
+- ```dca.simulate```：```wallet```为另一个钱包地址时以它为下单人模拟（只读）。
+- ```trigger.simulate```：```wallet```为另一个钱包地址时以它为挂单人模拟（只读）。
+- ```pump.new```：```options.limit```为查看的创建交易笔数，默认20，最多100；```options.since```为毫秒时间戳，只返回在它之后创建的币（查到更早的交易即停）。解析过的交易在进程内缓存，轮询时只取新交易：每次调用为1次```getSignaturesForAddress```加上新交易笔数次```getTransaction```。链上执行失败的创建交易不列出。
+- ```pump.new```的返回值：```name```、```symbol```、```uri```由创建者随意填写。
+- ```pump.buy```：发送前用节点模拟，模拟失败不发送。```options```：```slippage```（```[0, 1)```，默认```0.05```）；```priorityFee```（这笔交易的优先费总额，SOL，0到1；不给时取最近写这些账户的交易费率第75百分位，不超过```exchange.IO("priorityFee", ...)```）；```computeUnitLimit```（不给时按模拟用量加余量）；```dryRun```（```true```只模拟，不签名不发送）；```payer```（只能与```dryRun```一起用：模拟时以这个钱包付款）；```wait```（默认```true```等确认并按链上事件回报成交；```false```广播后立即返回）。曲线已完成的币改用Jupiter市价兑换（见下文）。
+- ```pump.buy```的返回值：```wait```为```false```时为```{txHash, venue, mint, side, pending, lastValidBlockHeight, expected}```（```expected```为本地报价）；```dryRun```时为```{dryRun, venue, mint, side, payer, ok, simulationError, logs, unitsConsumed, txBytes, solAmount, tokenAmount, price, expected}```，成交数量取自模拟的链上事件。
+- ```pump.sell```：```all```时默认在同一笔交易里关掉钱包的代币账户、退回押金（```options.closeAccount```为```false```时保留）。其它选项同```pump.buy```。超过余额时报错，不发送；曲线已完成的币改用Jupiter市价兑换。
 - ```lp.pools```：按美元TVL降序。某个协议的API不可用时改用节点的```getProgramAccounts```按mint在链上找它的池子，这些行的```tvlUsd```、```volume24hUsd```、```fees24hUsd```为```null```。
 - ```lp.pools```的返回值：Raydium的行```protocol```为```raydium```，没有```feeRateNow```、```binStep```、```activeId```，另有```tickSpacing```、```tick```、```liquidity```（当前流动性）、```sqrtPriceX64```；```rewards```为```[{mint, symbol, active, endTime}]```（```active```为奖励正在发放）。Orca的行```protocol```为```orca```，同样没有```feeRateNow```、```binStep```、```activeId```，另有```tickSpacing```、```tick```、```liquidity```、```sqrtPriceX64```，没有```enabled```，另带```adaptiveFee```（费率随波动变化的池子，```fee```为基础费率）、```fullRangeOnly```（Splash池，只能建全区间仓位）；```rewards```为```[{mint, symbol, active}]```。
 - ```lp.select```：```budget```按计价币计，```options.quote```指定计价币，```options.protocol```按协议筛选（```meteora```、```raydium```、```orca```，可以给数组）；```options.binStep```只看Meteora池子，```options.tickSpacing```只看这个tick间距的CLMM池子（Raydium、Orca）。
@@ -27813,6 +27881,10 @@ SOL为原生币，兑换时自动包装、解包。内置代币：SOL、USDC、U
 - ```lp.positions```：```filter```为交易对（给定价格朝向）或代币（只列含它的仓位），```*```或不传为全部；```wallet```为其它钱包地址时只读查看那个钱包。```lp.track```登记的仓位也查（按链上主人核对，已关掉的不列）。Orca的数量按流动性在现价折算，未领手续费与奖励按链上的增长量估算（同Orca官方SDK）。
 - ```lp.positions```的返回值：Raydium与Orca的行没有bin字段与```feeOwner```，另有```tickLower```、```tickUpper```、```tick```、```tickSpacing```、```nftMint```（仓位NFT的mint）、```positionAccount```（仓位账户），Raydium另有```nftAccount```，Orca另有```nftProgram```（Position Bundle里的仓位则为```bundleMint```、```bundleIndex```，```id```为```orca:仓位账户地址```）；```liquidity```为仓位的流动性；Raydium未领手续费与奖励按区间内增长算到当前（奖励按发放速率推到当前时间），```rentSol```为仓位账户、NFT账户与NFT mint的租金；Orca的```rentSol```为仓位账户与NFT mint押的lamports。
 - ```lp.track```：三家的仓位按主人就能查到，一般不需要登记；保留这个指令与Uniswap一致，本进程```lp.add```建的仓位会自动记住。查别的钱包的Orca仓位要用节点的```getTokenLargestAccounts```找NFT持有人（公共节点对它限流很紧）。
+- ```bridge.quote```：```params```：```toChain```（目标链：链ID、LI.FI的链key如```arb```、或链名如```Arbitrum```、```Solana```）、```fromToken```（本链代币：代币表里的名字或mint地址）、```toToken```（目标链代币：名字或地址，由LI.FI解析为它的标准代币，如Arbitrum上的```USDC```是原生USDC，不是USDC.e）、```amount```（```fromToken```的数量，按代币单位，超出代币精度的位舍去）、```toAddress```（收款地址；目标为Solana以外的链时都必须给出，EVM链写```0x```地址，格式不对报错）、```slippage```（缺省为```exchange.IO("slippage")```的值）、```order```（```CHEAPEST```或```FASTEST```）、```allowBridges```/```denyBridges```（LI.FI的桥名，数组或逗号分隔）。不认识的键报错。
+- ```bridge.simulate```：没有余额覆盖：钱包里没有要桥的代币或没有SOL付手续费时模拟失败，报错里给出原因（如```AccountNotFound```即钱包没有SOL）与钱包余额。
+- ```bridge.send```：不等确认；跨链是异步的，用```bridge.status```轮询。传```bridge.quote```的结果时按其中的```request```重新报价（报价随时变化，实际成交以新报价为准）。
+- ```bridge.status```：刚广播时LI.FI可能还没收录，返回```NOT_FOUND```，继续轮询即可（建议间隔10～30秒）。
 
 通用指令```currency```见`exchange.IO`。
 
@@ -27820,7 +27892,7 @@ SOL为原生币，兑换时自动包装、解包。内置代币：SOL、USDC、U
 
 ##### 函数支持差异
 
-不支持（调用时报错并返回空值）：`exchange.GetTickers`、`exchange.GetTrades`、`exchange.GetHistoryOrders`、`exchange.CancelOrder`、`exchange.ModifyOrder`、`exchange.CreateConditionOrder`、`exchange.ModifyConditionOrder`、`exchange.CancelConditionOrder`、`exchange.GetConditionOrder`、`exchange.GetConditionOrders`、`exchange.GetHistoryConditionOrders`。
+不支持（调用时报错并返回空值）：`exchange.GetTickers`、`exchange.GetTrades`、`exchange.ModifyOrder`、`exchange.CreateConditionOrder`、`exchange.ModifyConditionOrder`、`exchange.CancelConditionOrder`、`exchange.GetConditionOrder`、`exchange.GetConditionOrders`、`exchange.GetHistoryConditionOrders`。
 
 以回退方式支持：
 
@@ -27835,13 +27907,70 @@ SOL为原生币，兑换时自动包装、解包。内置代币：SOL、USDC、U
 | exchange.GetRecords() | K线来自GeckoTerminal的池子级数据：Jupiter是聚合器，取GeckoTerminal上两边正好是这两个代币（SOL按wSOL）的池子里美元流动性最深的一个（不限DEX，在两个代币各自靠前的20个池子里找，选中的池子缓存1小时）。价格为该池子的逐笔成交价（含池子手续费，与```exchange.GetTicker()```的中间价可能相差约一个池子费率），单位为计价币/基础币，```Volume```为基础币数量；没有成交的周期按上一根收盘价补平、成交量为0，最后一根可能尚未收盘。GeckoTerminal的数据有几十秒到1分钟的延迟，公开接口约每分钟10次：同一周期的K线缓存1分钟，请求在托管者内排队，被限频时等待重试，仍不行时报错。找不到该交易对的池子时报错 |
 | exchange.GetMarkets() | 代币表中的币与USDC、USDT、SOL组成的交易对（不逐个验证路由）。数量精度为基础币的代币精度，最小下单量为一个最小单位，价格精度固定为8位 |
 | exchange.GetAssets() | SOL与代币表中各代币的钱包余额，单独持有的wSOL记为```WSOL```；代币表以外的持仓不进余额列表，列在```Info```的```unlisted```中（```{mint, amount}```） |
-| exchange.CreateOrder() | 立即兑换：限价为最差成交价，由链上程序按滑点强制执行，当前报价已经达不到时直接报错、不发交易；市价按滑点保护；市价买入时数量为要花费的计价币。下单附加参数```slippage```覆盖本单滑点。Jupiter生成交易时会先模拟一遍，余额不足等会直接报错。广播前Solana节点按最新状态再模拟一遍：模拟失败时交易没有发出，连接器重新询价、生成交易再试，最多重试2次（第二次重试起避开失败路由经过的流动性来源，不会因此超出```exchange.IO("dexes", ...)```的限定），仍失败时报错，错误信息中带模拟的```err```与相关程序日志；成功时```Info```的```preflightRetries```为重试次数 |
-| exchange.GetOrder() | 订单ID形如```SOL_USDC,5VERv8…```（交易对、逗号、交易签名）。交易确认后为已成交，成交数量按交易前后的钱包余额计算；链上执行失败为已撤销（手续费照扣）；超过有效期（约1分钟）仍未上链为已撤销。不是本程序发出的交易只能查已确认成功的（方向按余额变化判断），尚未确认或链上失败的报错 |
-| exchange.GetOrders() | 本程序发出、尚未确认也未过期的兑换 |
-| exchange.CancelOrder() | 不支持：Solana交易发出后无法撤回，未上链的交易约1分钟后自动过期 |
+| exchange.CreateOrder() | 立即兑换：限价为最差成交价，由链上程序按滑点强制执行，当前报价已经达不到时直接报错、不发交易；市价按滑点保护；市价买入时数量为要花费的计价币。下单附加参数```slippage```覆盖本单滑点。Jupiter生成交易时会先模拟一遍，余额不足等会直接报错。广播前Solana节点按最新状态再模拟一遍：模拟失败时交易没有发出，连接器重新询价、生成交易再试，最多重试2次（第二次重试起避开失败路由经过的流动性来源，不会因此超出```exchange.IO("dexes", ...)```的限定），仍失败时报错，错误信息中带模拟的```err```与相关程序日志；成功时```Info```的```preflightRetries```为重试次数。下单选项```tif```为```gtc```时不立即兑换，改挂Jupiter原生限价单，见下文「限价单」 |
+| exchange.GetOrder() | 订单ID形如```SOL_USDC,5VERv8…```（交易对、逗号、交易签名）。交易确认后为已成交，成交数量按交易前后的钱包余额计算；链上执行失败为已撤销（手续费照扣）；超过有效期（约1分钟）仍未上链为已撤销。不是本程序发出的交易只能查已确认成功的（方向按余额变化判断），尚未确认或链上失败的报错。限价单的订单ID为交易对加订单账户地址，见下文「限价单」 |
+| exchange.GetOrders() | 本程序发出、尚未确认也未过期的兑换，加上钱包的全部活动限价单（不限于本程序挂的） |
+| exchange.CancelOrder() | 只能撤限价单。兑换单不支持：Solana交易发出后无法撤回，未上链的交易约1分钟后自动过期 |
+| exchange.GetHistoryOrders() | 只有已成交、已撤销的限价单，不含兑换单（兑换单用```exchange.GetOrder()```查）。不传```since```、```limit```时买卖两个方向各取最近10条；传```since```时取创建时间不早于它的全部，传```limit```时取够为止 |
 
 - 请求速率：Jupiter按每秒请求数限流，超过后返回429。连接器按```exchange.IO("rps", ...)```（默认每秒1次）给请求排队，同一个托管者进程中使用同一个Jupiter API地址的交易所对象共用这个节奏。默认设置下```exchange.GetTicker()```约需2秒，5档```exchange.GetDepth()```约需10秒；需要更快时申请Jupiter API Key，并按套餐调高```rps```。
 - 手续费：每笔交易的Solana基础费与优先费（上限见```exchange.IO("priorityFee", ...)```）从SOL余额中扣除，订单的```Info```中有```fee```。第一次买入某个代币时，钱包需要新建该代币的账户，押金约0.002 SOL；押金仍归钱包所有，不计入成交。
+
+##### Pump.fun打新
+
+```exchange.IO("pump.*", ...)```直接交易pump.fun（程序```6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P```）联合曲线上的币，不经过Jupiter。账户、指令与报价公式按pump.fun官方公开文档（GitHub ```pump-fun/pump-public-docs```的IDL与说明）。
+
+- 新币：```pump.new```从链上发现新币，策略循环轮询它（见下例）。公共节点按秒限流、延迟高（20笔约需4秒），抢新请在「节点地址」里配置自己的付费节点。
+- 只交易SOL报价的币：pump.fun也有以USDC或其它pump币为报价的币（```pump.new```的```quote```），```pump.buy```、```pump.sell```对它们报错；cashback币（已停止新建）也报错，可用```exchange.Buy```、```exchange.Sell```经Jupiter交易。
+- 价格保护：买入是精确输入（花```solAmount```，含费），最少到手 = 本地报价×(1 − ```slippage```)；卖出最少收回 = 本地报价×(1 − ```slippage```)。默认滑点5%，由链上程序强制执行，达不到时整笔失败，只扣网络费。
+- 费用：协议费与创作者费按Pump Fees程序的费率表随市值分档（2026年10月为0.95% + 0.30%；```pump.info```、```pump.quote```返回实际费率，没有创作者的币不收创作者费），另有Solana网络费与优先费。第一次买某个币要建代币账户（押金约0.002 SOL，```pump.sell```卖```all```时默认关掉账户退回）；钱包第一次在pump.fun交易时程序还会建它的成交量账户（约0.0018 SOL，不退）。
+- 买穿曲线：买入预算超过曲线剩余可卖量时（mayhem币除外），超出部分按迁移后PumpSwap池子的价格成交（官方的「合成迁移」），```pump.quote```的```crossesCurve```为```true```；之后到迁移完成前曲线不能再交易。mayhem币买入超过剩余量时报错。
+- 毕业：曲线完成（```complete```）的币，```pump.buy```、```pump.sell```改用本交易所对象的Jupiter市价兑换（交易对```MINT_SOL```，价格保护用本单的```slippage```，Jupiter要求小于0.5），返回的```venue```为```jupiter```；这时```priorityFee```、```computeUnitLimit```选项不适用（报错），优先费上限按```exchange.IO("priorityFee", ...)```，```dryRun```也不支持（用```exchange.IO("route", ...)```询价）。曲线刚完成、还没迁移的短时间内两条路都可能失败。
+- 每笔交易发送前都用节点模拟，模拟失败不发送并报出原因（pump.fun的错误码附名字，如```BuySlippageBelowMinTokensOut```）；广播与「是否已发出」的判断同兑换下单。
+- 抢新时优先费要给足（```options.priorityFee```），否则在拥堵时可能过期不上链。
+
+抢新轮询示例（JavaScript）：
+
+```javascript
+var seen = {}
+var start = Date.now()
+while (true) {
+    var coins = exchange.IO("pump.new", {limit: 20, since: start})
+    for (var i = 0; coins && i < coins.length; i++) {
+        var c = coins[i]
+        if (seen[c.mint] || c.quote != "SOL" || c.mayhem) continue
+        seen[c.mint] = true
+        if (c.devBuy && c.devBuy.quoteAmount > 1) continue   // 创作者首买过大，跳过
+        var r = exchange.IO("pump.buy", c.mint, 0.01, {slippage: 0.2, priorityFee: 0.0005})
+        if (r) Log("bought", r.tokenAmount, c.symbol, "for", r.solAmount, "SOL", r.txHash)
+    }
+    Sleep(1000)
+}
+```
+
+风险：
+- 绝大多数新币很快归零；创作者或与它捆绑的钱包常在创建同笔或随后几个区块里买入，随时砸盘跑路（rug pull）。
+- 抢新机器人与MEV竞争激烈：同一区块里的先后顺序取决于优先费与小费，滑点设得大会被三明治夹击，按最差价成交。
+- 名称、符号、元数据链接由创建者随意填写，可以冒充知名项目；请以mint地址为准。
+- 协议费、创作者费、网络费与优先费在每次买卖都要付，频繁进出的成本很高。
+
+##### 限价单（tif gtc）
+
+```exchange.CreateOrder(symbol, side, price, amount, {tif: "gtc"})```（或```exchange.Buy```、```exchange.Sell```带同样的下单选项）不立即兑换，而是挂一张Jupiter原生限价单（Trigger API v1，程序```j1o2qRpjcyUwEvwtcfhEQefh773ZgjxcVRry7LDqg5X```）：卖出的币存进订单账户，价格到了由Jupiter的keeper代为成交，成交是异步的，按限价成交（默认0滑点）。不带```tif```或```tif```为其它值时行为不变（立即兑换）。
+
+- 数量：```amount```为基础币数量，买入付出```amount × price```计价币（向下取整到最小单位，不多付），卖出换回```amount × price```计价币（向上取整，不少收）。限价单不支持市价单（```price```为```-1```或```type```为```market```时报错）。
+- 下单附加参数：```expiry```为到期时间戳（毫秒），到期后不再成交（缺省不过期）；```slippage```为允许的滑点比例（如```0.003```），提高成交率但可能低于限价成交，缺省0。
+- 最低金额：付出或换回的一边至少值5美元（Jupiter的限制，连接器按Jupiter价格接口提前检查）。
+- 手续费：Jupiter从换回的币中扣手续费（官方说明稳定币对0.03%，其它0.1%，以每笔成交记录为准），订单的```AvgPrice```按扣费前计算，实际到账见```Info```的```trades```。挂单与撤单交易各付一次Solana交易费与优先费；第一次挂某种币的单时要新建代币账户等，押金归钱包。
+- 订单ID：```SOL_USDC,订单账户地址```（兑换单的ID是交易签名，按长度区分）。```exchange.GetOrder()```先查活动单再查历史单；本程序刚挂、Jupiter还没收录的单按链上状态给出（订单账户存在为挂单中）。状态：挂着为未成交，有部分成交为部分成交，```Completed```为已成交，```Cancelled```为已撤销；```Info```为Jupiter的原始订单行（含```trades```、```expiredAt```）。
+- 撤单：```exchange.CancelOrder()```生成撤单交易、签名并广播，未成交的币退回钱包；订单已经成交或撤销时返回```false```，原因见```GetLastError()```。只等广播，撤单结果用```exchange.GetOrder()```确认。
+- 带转账税（transfer fee）扩展的Token-2022代币不能挂限价单（Jupiter不支持）。
+- ```exchange.GetOrders()```每次调用都会请求一次Jupiter限价单列表，受```exchange.IO("rps", ...)```节流。
+- 交易由连接器签名后经Solana节点广播，节点预检（模拟）失败时没有发出并报错；挂单前可以用```exchange.IO("trigger.simulate", ...)```只模拟。
+
+##### 定投（DCA）
+
+```exchange.IO("dca.create", ...)```、```dca.list```、```dca.cancel```、```dca.simulate```对应Jupiter Recurring API v1（按时间定投，程序```DCA265Vj8a9CEuX1eb1LWRnDT7uK6q1xMipnNyatn23M```）：总额一次存入定投订单账户，由Jupiter的keeper每隔```interval```秒兑换一份，买到的币自动转回钱包。限制：至少2份、每份至少值50美元；不支持Token-2022代币；Jupiter从换到的币中收0.1%手续费。创建和撤销都是链上交易，要付交易费与优先费；撤销后剩余的币退回钱包。定投不进```exchange.GetOrders()```等订单函数，用```dca.list```查询。Jupiter已不再维护Recurring API（官方的新版定投在Trigger V2里，要另行认证），但它仍然可用。
 
 ##### 集中流动性（LP）
 
@@ -27872,6 +28001,17 @@ Raydium CLMM与Orca Whirlpools（与Uniswap V3相同的tick模型）与上面DLM
 - 开仓押的租金：仓位账户（Raydium、Orca还有NFT）的租金撤仓时退回，新建BinArray、TickArray的租金不退；拆成多个仓位时每个都要押一份。
 - 每次建仓、调仓、领取、撤出都是链上交易，要付手续费与优先费；频繁调仓的成本可能超过手续费收入。
 - 计划中的预估日手续费按过去24小时成交与当前在active bin里的份额估算，不代表未来收益。
+
+##### 跨链桥（bridge）
+
+```exchange.IO("bridge.*", ...)```经LI.FI聚合的跨链桥（Across、Stargate、CCTP、deBridge、Mayan、Relay、NEAR Intents等）把代币从本交易所对象的链转到另一条链，支持EVM链之间以及EVM与Solana之间（源链为Solana）。报价与交易由LI.FI给出，LI.FI返回序列化交易，由托管者签名、```simulateTransaction```模拟后广播。请求带集成方标识```integrator=fmz```，不加收任何费用；报价中的```LIFI Fixed Fee```等是LI.FI与桥自己的费用，已计入```toAmount```。
+
+典型流程：```bridge.quote```看报价 → ```bridge.simulate```模拟 → ```bridge.send```发出 → 每10～30秒```bridge.status```直到```DONE```或```FAILED```。
+
+- 跨链是异步的：```bridge.send```返回时只是源链交易已广播，到账要几秒到几十分钟（见报价的```executionDuration```），必须轮询```bridge.status```确认；```PARTIAL```表示目标链收到的是别的代币，```REFUNDED```表示已退回源链。
+- 跨虚拟机（EVM↔Solana）必须传```toAddress```，地址格式按目标链检查；地址写错的资金无法找回。
+- 风险：桥合约与跨链消息的安全风险由各桥承担；报价随时变化，```bridge.send```发出前会重新报价；目标链需要有gas才能继续使用到账的代币。先用小额测试。
+- 限频：没有API Key时LI.FI按出口IP限频，```/quote```两小时75次（```bridge.quote```、```bridge.simulate```、```bridge.send```各用一次），其它接口每分钟100次；同一托管者上的策略共用额度。用```exchange.IO("bridge.apiKey", key)```设置Key后每分钟100次。被限频时报错```rate limited (HTTP 429 …)```。
 
 ##### exchange.IO("route", ...)
 
@@ -28203,11 +28343,22 @@ See also: `Jupiter`, `exchange.IO`, `exchange.IO("route")`, `exchange.IO("token"
 | ```clientId``` | [id] | 设置请求KyberSwap Aggregator API时携带的客户端标识（请求头```x-client-id```），只能是字母、数字、```.```、```_```、```-```，1到64个字符。（详见表下） | 当前的客户端标识。 |
 | ```address``` | — | 配置的私钥对应的钱包地址（```0x```开头的小写地址）。 | — |
 | ```contracts``` | — | 本链上的部署信息，字段与Uniswap交易所对象相同：```dex```为```KyberSwap```，```router```为KyberSwap路由合约；```quoterV2```、```v3Factory```、```v4```等是该链Uniswap的部署（用来列出市场、估算美元价），```aerodrome```为```null```；```tokenList```给出内置代币表的生成时间与本链代币数量。 | — |
+| ```bridge.chains``` | — | 跨链桥（LI.FI）支持的链：EVM链与Solana，缓存1小时。 | ```{id, key, name, chainType, nativeToken}```数组，```chainType```为```EVM```或```SVM```。 |
+| ```bridge.tokens``` | [chain] | LI.FI认识的某条链上的代币（缺省为本链），缓存1小时。 | ```{symbol, address, decimals, name, priceUSD}```数组。 |
+| ```bridge.quote``` | params | 跨链报价（只读），源链为本交易所对象的链。（详见表下） | ```{tool, toolName, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, fromAmountRaw, toAmountRaw, toAmountMinRaw, fromAmountUSD, toAmountUSD, slippage, toAddress, feeCosts, gasCosts, executionDuration, approvalAddress, steps, transactionId, request}```：数量为代币单位（```*Raw```为最小单位原值）；```toAmountMin```为扣除滑点后保证到手的数量；```feeCosts```为```[{name, amount, token, amountUSD, percentage, included}]```（```included```为```false```的费用另付）；```gasCosts```为源链gas估算；```executionDuration```为预计耗时（秒）；```approvalAddress```为需要授权的合约（原生币、Solana为```null```）；```steps```为各步骤（```cross```为跨链，```swap```为兑换）；```request```为参数原样回显。 |
+| ```bridge.simulate``` | params\|quote[, stateOverride] | 重新报价，用```eth_call```执行LI.FI给出的交易，不签名、不广播、不花gas。（详见表下） | ```bridge.quote```的结果，另有```simulated```（```true```）、```to```、```value```、```walletBalance```，补过授权时有```allowanceOverride```。 |
+| ```bridge.send``` | params\|quote | 跨链转出：重新报价 → 检查余额 → 代币对LI.FI的```approvalAddress```授权不够时先授权（按```exchange.IO("approve")```的```exact```/```max```，USDT这类先清零，等授权上链；授权过就再报价一次）→ ```eth_call```模拟 → 签名广播；gasLimit取```eth_estimateGas```估算×```gasMultiplier```与LI.FI建议的```gasLimit```中较大的一个（桥合约还会调用别的合约，估算可能偏少），实际只按用量扣费。（详见表下） | ```{txHash, tool, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, toAddress, value, transactionId}```，```txHash```为源链交易哈希，可用```receipt```查回执。 |
+| ```bridge.status``` | txHash[, options] | 跨链进度（LI.FI ```/status```），参数为```bridge.send```返回的源链交易哈希；```options```可给```{toChain, bridge}```加快查找。（详见表下） | ```{status, substatus, substatusMessage, tool, sending, receiving, fromAddress, toAddress, explorer, bridgeExplorer}```：```status```为```NOT_FOUND```、```INVALID```、```PENDING```、```DONE```、```FAILED```；```DONE```时```substatus```为```COMPLETED```（按报价到账）、```PARTIAL```（收到的是别的代币）或```REFUNDED```（已退回）；```sending```、```receiving```为```{txHash, txLink, chainId, amount, amountRaw, token, timestamp}```，```receiving.amount```与```receiving.token```为实际到账的数量与代币。 |
+| ```bridge.apiKey``` | [key] | 设置LI.FI的API Key（请求头```x-lifi-api-key```，只对本交易所对象生效，不回显），传```""```清除；不传参数只查询。没有Key时按出口IP限频，见下文。 | 是否已设置Key（布尔值）。 |
 
 表中长说明的其余部分：
 
 - ```simulate```：第6个参数（限定路径类型）对聚合器不适用，传入会报错```route is not applicable to the KyberSwap aggregator```。用代币支付的兑换（如用USDC买入），钱包对路由合约的授权不够时（默认```approve```为```exact```，真实下单前才授权），自动用```eth_call```的state override补上授权再模拟，结果里```allowanceOverride```列出补了哪些；传入的```stateOverride```与它合并，已写的存储槽位不覆盖。找不到代币存放授权额度的存储槽位时，模拟失败的报错里说明尚未授权，需要先授权或自己传```stateOverride```。余额不会自动补。
 - ```clientId```：KyberSwap的公开限频按这个标识计算（默认每秒3次），共用同一个标识的程序共用这份额度，频繁报HTTP 429时可以换成自己的标识。默认值为```fmz-```加钱包地址哈希的前8位十六进制（同一钱包重启后不变，不包含地址本身；没配私钥时为本次运行随机生成的值）。不传参数时查询。
+- ```bridge.quote```：```params```：```toChain```（目标链：链ID、LI.FI的链key如```arb```、或链名如```Arbitrum```、```Solana```）、```fromToken```（本链代币：代币表里的名字或合约地址）、```toToken```（目标链代币：名字或地址，由LI.FI解析为它的标准代币，如Arbitrum上的```USDC```是原生USDC，不是USDC.e）、```amount```（```fromToken```的数量，按代币单位，超出代币精度的位舍去）、```toAddress```（收款地址；目标为EVM链时缺省为本钱包，目标为Solana时必须传Solana地址，不传报错）、```slippage```（缺省为```exchange.IO("slippage")```的值）、```order```（```CHEAPEST```或```FASTEST```）、```allowBridges```/```denyBridges```（LI.FI的桥名，数组或逗号分隔）。不认识的键报错。
+- ```bridge.simulate```：代币授权不够时自动用state override补成无限额度（同```simulate```，结果里```allowanceOverride```列出补了什么）；余额不会自动补，可以用```stateOverride```（```eth_call```的第三参）自己补。余额不够导致失败时报错里给出钱包余额。
+- ```bridge.send```：原生币不用授权。只等授权上链，不等桥接交易；跨链是异步的，用```bridge.status```轮询。传```bridge.quote```的结果时按其中的```request```重新报价（报价随时变化，实际成交以新报价为准，```toAmountMin```由交易在链上保证）。
+- ```bridge.status```：刚广播时LI.FI可能还没收录，返回```NOT_FOUND```，继续轮询即可（建议间隔10～30秒）。
 
 通用指令```currency```见`exchange.IO`。
 
@@ -28233,6 +28384,17 @@ See also: `Jupiter`, `exchange.IO`, `exchange.IO("route")`, `exchange.IO("token"
 | exchange.GetOrder() | 订单ID形如```ETH_USDC,0x…```（交易对、逗号、交易哈希），状态来自交易回执；原交易的nonce已被撤单交易（或其它交易）占用时显示为已撤销。成交量取路由合约的```Swapped```事件（原生币进出也在其中） |
 | exchange.GetOrders() | 只列出本交易所对象在本次运行中发出、尚未上链的兑换交易 |
 | exchange.CancelOrder() | 发送同nonce的替换交易（向自己转0金额），并等待结果（默认最多30秒，见```exchange.IO("cancelWait", ...)```）：撤单交易先上链返回```true```；原订单已经上链或先于撤单上链时返回```false```（撤单没成功，但不是调用错误），原因见```exchange.GetLastError()```；等待超时返回```true```，表示撤单已提交，最终状态以```exchange.GetOrder()```为准 |
+
+##### 跨链桥（bridge）
+
+```exchange.IO("bridge.*", ...)```经LI.FI聚合的跨链桥（Across、Stargate、CCTP、deBridge、Mayan、Relay、NEAR Intents等）把代币从本交易所对象的链转到另一条链，支持EVM链之间以及EVM与Solana之间（源链为本交易所对象的链）。报价与交易由LI.FI给出，由托管者授权、```eth_call```模拟后签名广播。请求带集成方标识```integrator=fmz```，不加收任何费用；报价中的```LIFI Fixed Fee```等是LI.FI与桥自己的费用，已计入```toAmount```。
+
+典型流程：```bridge.quote```看报价 → ```bridge.simulate```模拟 → ```bridge.send```发出 → 每10～30秒```bridge.status```直到```DONE```或```FAILED```。
+
+- 跨链是异步的：```bridge.send```返回时只是源链交易已广播，到账要几秒到几十分钟（见报价的```executionDuration```），必须轮询```bridge.status```确认；```PARTIAL```表示目标链收到的是别的代币，```REFUNDED```表示已退回源链。
+- 跨虚拟机（EVM↔Solana）必须传```toAddress```，地址格式按目标链检查；地址写错的资金无法找回。
+- 风险：桥合约与跨链消息的安全风险由各桥承担；报价随时变化，```bridge.send```发出前会重新报价；目标链需要有gas才能继续使用到账的代币。先用小额测试。
+- 限频：没有API Key时LI.FI按出口IP限频，```/quote```两小时75次（```bridge.quote```、```bridge.simulate```、```bridge.send```各用一次，授权后再报价时多一次），其它接口每分钟100次；同一托管者上的策略共用额度。用```exchange.IO("bridge.apiKey", key)```设置Key后每分钟100次。被限频时报错```rate limited (HTTP 429 …)```。
 
 #### 1inch
 
@@ -28281,10 +28443,21 @@ OneInch交易所对象接入1inch聚合器：报价和交易数据来自1inch Sw
 | ```sendBase``` | url | 设置只用来广播交易的节点（私有交易通道）。与Web3不同：不返回设置前的地址，不传参数时不查询，传空字符串不会清除设置。 | ```true``` |
 | ```address``` | — | 配置的私钥对应的钱包地址（```0x```开头的小写地址）。 | — |
 | ```contracts``` | — | 本链上的部署信息，字段与Uniswap交易所对象相同：```dex```为```1inch```，```router```为1inch路由合约；```quoterV2```、```v3Factory```、```v4```等是该链Uniswap的部署（用来列出市场、估算美元价），```aerodrome```为```null```；```tokenList```给出内置代币表的生成时间与本链代币数量。 | — |
+| ```bridge.chains``` | — | 跨链桥（LI.FI）支持的链：EVM链与Solana，缓存1小时。 | ```{id, key, name, chainType, nativeToken}```数组，```chainType```为```EVM```或```SVM```。 |
+| ```bridge.tokens``` | [chain] | LI.FI认识的某条链上的代币（缺省为本链），缓存1小时。 | ```{symbol, address, decimals, name, priceUSD}```数组。 |
+| ```bridge.quote``` | params | 跨链报价（只读），源链为本交易所对象的链。（详见表下） | ```{tool, toolName, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, fromAmountRaw, toAmountRaw, toAmountMinRaw, fromAmountUSD, toAmountUSD, slippage, toAddress, feeCosts, gasCosts, executionDuration, approvalAddress, steps, transactionId, request}```：数量为代币单位（```*Raw```为最小单位原值）；```toAmountMin```为扣除滑点后保证到手的数量；```feeCosts```为```[{name, amount, token, amountUSD, percentage, included}]```（```included```为```false```的费用另付）；```gasCosts```为源链gas估算；```executionDuration```为预计耗时（秒）；```approvalAddress```为需要授权的合约（原生币、Solana为```null```）；```steps```为各步骤（```cross```为跨链，```swap```为兑换）；```request```为参数原样回显。 |
+| ```bridge.simulate``` | params\|quote[, stateOverride] | 重新报价，用```eth_call```执行LI.FI给出的交易，不签名、不广播、不花gas。（详见表下） | ```bridge.quote```的结果，另有```simulated```（```true```）、```to```、```value```、```walletBalance```，补过授权时有```allowanceOverride```。 |
+| ```bridge.send``` | params\|quote | 跨链转出：重新报价 → 检查余额 → 代币对LI.FI的```approvalAddress```授权不够时先授权（按```exchange.IO("approve")```的```exact```/```max```，USDT这类先清零，等授权上链；授权过就再报价一次）→ ```eth_call```模拟 → 签名广播；gasLimit取```eth_estimateGas```估算×```gasMultiplier```与LI.FI建议的```gasLimit```中较大的一个（桥合约还会调用别的合约，估算可能偏少），实际只按用量扣费。（详见表下） | ```{txHash, tool, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, toAddress, value, transactionId}```，```txHash```为源链交易哈希，可用```receipt```查回执。 |
+| ```bridge.status``` | txHash[, options] | 跨链进度（LI.FI ```/status```），参数为```bridge.send```返回的源链交易哈希；```options```可给```{toChain, bridge}```加快查找。（详见表下） | ```{status, substatus, substatusMessage, tool, sending, receiving, fromAddress, toAddress, explorer, bridgeExplorer}```：```status```为```NOT_FOUND```、```INVALID```、```PENDING```、```DONE```、```FAILED```；```DONE```时```substatus```为```COMPLETED```（按报价到账）、```PARTIAL```（收到的是别的代币）或```REFUNDED```（已退回）；```sending```、```receiving```为```{txHash, txLink, chainId, amount, amountRaw, token, timestamp}```，```receiving.amount```与```receiving.token```为实际到账的数量与代币。 |
+| ```bridge.apiKey``` | [key] | 设置LI.FI的API Key（请求头```x-lifi-api-key```，只对本交易所对象生效，不回显），传```""```清除；不传参数只查询。没有Key时按出口IP限频，见下文。 | 是否已设置Key（布尔值）。 |
 
 表中长说明的其余部分：
 
 - ```simulate```：第6个参数（限定路径类型）对聚合器不适用，传入会报错```route is not applicable to the 1inch aggregator```。用代币支付的兑换（如用USDC买入），钱包对路由合约的授权不够时（默认```approve```为```exact```，真实下单前才授权），自动用```eth_call```的state override补上授权再模拟，结果里```allowanceOverride```列出补了哪些；传入的```stateOverride```与它合并，已写的存储槽位不覆盖。找不到代币存放授权额度的存储槽位时，模拟失败的报错里说明尚未授权，需要先授权或自己传```stateOverride```。余额不会自动补。
+- ```bridge.quote```：```params```：```toChain```（目标链：链ID、LI.FI的链key如```arb```、或链名如```Arbitrum```、```Solana```）、```fromToken```（本链代币：代币表里的名字或合约地址）、```toToken```（目标链代币：名字或地址，由LI.FI解析为它的标准代币，如Arbitrum上的```USDC```是原生USDC，不是USDC.e）、```amount```（```fromToken```的数量，按代币单位，超出代币精度的位舍去）、```toAddress```（收款地址；目标为EVM链时缺省为本钱包，目标为Solana时必须传Solana地址，不传报错）、```slippage```（缺省为```exchange.IO("slippage")```的值）、```order```（```CHEAPEST```或```FASTEST```）、```allowBridges```/```denyBridges```（LI.FI的桥名，数组或逗号分隔）。不认识的键报错。
+- ```bridge.simulate```：代币授权不够时自动用state override补成无限额度（同```simulate```，结果里```allowanceOverride```列出补了什么）；余额不会自动补，可以用```stateOverride```（```eth_call```的第三参）自己补。余额不够导致失败时报错里给出钱包余额。
+- ```bridge.send```：原生币不用授权。只等授权上链，不等桥接交易；跨链是异步的，用```bridge.status```轮询。传```bridge.quote```的结果时按其中的```request```重新报价（报价随时变化，实际成交以新报价为准，```toAmountMin```由交易在链上保证）。
+- ```bridge.status```：刚广播时LI.FI可能还没收录，返回```NOT_FOUND```，继续轮询即可（建议间隔10～30秒）。
 
 通用指令```currency```见`exchange.IO`。
 
@@ -28312,6 +28485,17 @@ OneInch交易所对象接入1inch聚合器：报价和交易数据来自1inch Sw
 | exchange.CancelOrder() | 发送同nonce的替换交易（向自己转0金额），并等待结果（默认最多30秒，见```exchange.IO("cancelWait", ...)```）：撤单交易先上链返回```true```；原订单已经上链或先于撤单上链时返回```false```（撤单没成功，但不是调用错误），原因见```exchange.GetLastError()```；等待超时返回```true```，表示撤单已提交，最终状态以```exchange.GetOrder()```为准 |
 
 1inch免费档每秒1次请求，连接器自动排队，遇到限频（HTTP 429）会稍等重试。
+
+##### 跨链桥（bridge）
+
+```exchange.IO("bridge.*", ...)```经LI.FI聚合的跨链桥（Across、Stargate、CCTP、deBridge、Mayan、Relay、NEAR Intents等）把代币从本交易所对象的链转到另一条链，支持EVM链之间以及EVM与Solana之间（源链为本交易所对象的链）。报价与交易由LI.FI给出，由托管者授权、```eth_call```模拟后签名广播。请求带集成方标识```integrator=fmz```，不加收任何费用；报价中的```LIFI Fixed Fee```等是LI.FI与桥自己的费用，已计入```toAmount```。
+
+典型流程：```bridge.quote```看报价 → ```bridge.simulate```模拟 → ```bridge.send```发出 → 每10～30秒```bridge.status```直到```DONE```或```FAILED```。
+
+- 跨链是异步的：```bridge.send```返回时只是源链交易已广播，到账要几秒到几十分钟（见报价的```executionDuration```），必须轮询```bridge.status```确认；```PARTIAL```表示目标链收到的是别的代币，```REFUNDED```表示已退回源链。
+- 跨虚拟机（EVM↔Solana）必须传```toAddress```，地址格式按目标链检查；地址写错的资金无法找回。
+- 风险：桥合约与跨链消息的安全风险由各桥承担；报价随时变化，```bridge.send```发出前会重新报价；目标链需要有gas才能继续使用到账的代币。先用小额测试。
+- 限频：没有API Key时LI.FI按出口IP限频，```/quote```两小时75次（```bridge.quote```、```bridge.simulate```、```bridge.send```各用一次，授权后再报价时多一次），其它接口每分钟100次；同一托管者上的策略共用额度。用```exchange.IO("bridge.apiKey", key)```设置Key后每分钟100次。被限频时报错```rate limited (HTTP 429 …)```。
 
 #### OKX DEX
 
