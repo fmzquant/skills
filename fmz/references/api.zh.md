@@ -28953,7 +28953,7 @@ Polygon链上的预测市场。交易所对象通过Polymarket的CLOB（中央�
 
 #### Web3
 
-连接EVM链或TRON链的节点（配置项「ChainType」选ETH或TRON），通过```exchange.IO()```的各个指令读写链上数据：注册ABI后调用合约、编码解码、签名、批量查询、事件日志、发送交易和管理nonce等。EVM侧使用节点的JSON-RPC，节点所在的链由节点决定（Ethereum、BNB Smart Chain、Base、Arbitrum等任意EVM链）；TRON侧使用全节点的HTTP接口（```/wallet/*```）。
+连接EVM链或TRON链的节点（配置项「ChainType」选一条EVM链或TRON），通过```exchange.IO()```的各个指令读写链上数据：注册ABI后调用合约、编码解码、签名、批量查询、事件日志、发送交易和管理nonce等。EVM侧使用节点的JSON-RPC，节点所在的链由节点决定（Ethereum、BNB Smart Chain、Base、Arbitrum等任意EVM链）；TRON侧使用全节点的HTTP接口（```/wallet/*```）。
 
 标准交易函数中只支持```exchange.GetAssets()```、```exchange.GetAccount()```（钱包的原生币余额）。在去中心化交易所兑换代币请使用Uniswap交易所对象：它可以直接使用```exchange.GetTicker()```、```exchange.CreateOrder()```等标准函数。
 
@@ -28963,10 +28963,15 @@ Polygon链上的预测市场。交易所对象通过Polymarket的CLOB（中央�
 
 | 配置项 | 必填 | 默认值 | 说明 |
 | - | - | - | - |
-| 链类型 | 是 | ```ETH``` | ETH表示EVM链（具体哪条链由节点决定），TRON表示波场。可选：```ETH```、```TRON``` |
+| 链 | 是 | ```ETH``` | EVM链选Ethereum、BNB Chain、Base、Arbitrum、OP Mainnet、Polygon、Avalanche C-Chain、Unichain之一时自动填入该链的公共节点；其它EVM链选「Other EVM」并自己填节点地址；TRON为波场。（详见表下） |
 | 钱包私钥 | 是 | — | 钱包私钥（十六进制，```0x```前缀可选）。只读用法可以不填，运行中可用```exchange.IO("key", ...)```切换。 |
-| 节点地址 | 否 | ```http://127.0.0.1:8545``` | EVM为JSON-RPC节点地址，多个节点用逗号分隔互为备用；TRON为全节点HTTP地址（只能一个，旧的gRPC地址会换成对应的HTTP地址）。 |
+| 节点地址 | 否 | ```https://ethereum-rpc.publicnode.com,https://eth.drpc.org``` | EVM为JSON-RPC节点地址，多个节点用逗号分隔互为备用；不填时用所选链的公共节点（「Other EVM」必须填）。（详见表下） |
 | 节点认证 | 否 | — | EVM：```Header-Name: value```形式的请求头，或Basic认证值；TRON：作为```TRON-PRO-API-KEY```请求头发送。 |
+
+表中长说明的其余部分：
+
+- 链：EVM上具体连的是哪条链仍以节点的chainId为准（选项只决定缺省节点），所以存量配置「ETH + 自填节点」照旧可连任意EVM链。可选：```Ethereum```、```BNB Chain```、```Base```、```Arbitrum```、```OP Mainnet```、```Polygon```、```Avalanche C-Chain```、```Unichain```、```Other EVM (custom RPC)```、```TRON```
+- 节点地址：公共节点限流较严，频繁调用或要查历史日志时请换成自己的节点。TRON为全节点HTTP地址（只能一个，不填为```https://api.trongrid.io```，旧的gRPC地址会换成对应的HTTP地址）。
 
 ##### 交易对与合约代码
 

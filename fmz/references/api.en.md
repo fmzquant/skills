@@ -29101,7 +29101,7 @@ Served through a fallback:
 
 #### Web3
 
-Connects to an EVM or TRON chain node (the ChainType option: ETH or TRON) and reads and writes on-chain data through the commands of ```exchange.IO()```: calling contracts after registering their ABI, encoding and decoding, signing, batched reads, event logs, sending transactions and managing nonces. On EVM it uses the node's JSON-RPC, and the chain is whatever chain the node serves (Ethereum, BNB Smart Chain, Base, Arbitrum or any other EVM chain); on TRON it uses the full node's HTTP interface (```/wallet/*```).
+Connects to an EVM or TRON chain node (the ChainType option: an EVM chain or TRON) and reads and writes on-chain data through the commands of ```exchange.IO()```: calling contracts after registering their ABI, encoding and decoding, signing, batched reads, event logs, sending transactions and managing nonces. On EVM it uses the node's JSON-RPC, and the chain is whatever chain the node serves (Ethereum, BNB Smart Chain, Base, Arbitrum or any other EVM chain); on TRON it uses the full node's HTTP interface (```/wallet/*```).
 
 Of the standard trading functions only ```exchange.GetAssets()``` and ```exchange.GetAccount()``` (the wallet's native coin balance) are supported. To swap tokens on a decentralized exchange, use the Uniswap exchange object instead: it supports the standard functions such as ```exchange.GetTicker()``` and ```exchange.CreateOrder()```.
 
@@ -29111,10 +29111,15 @@ Of the standard trading functions only ```exchange.GetAssets()``` and ```exchang
 
 | Field | Required | Default | Description |
 | - | - | - | - |
-| ChainType | Yes | ```ETH``` | ETH means an EVM chain (which one is decided by the node), TRON means the TRON chain. Options: ```ETH```, ```TRON``` |
+| Chain | Yes | ```ETH``` | Picking an EVM chain (Ethereum, BNB Chain, Base, Arbitrum, OP Mainnet, Polygon, Avalanche C-Chain or Unichain) fills in that chain's public nodes; for any other EVM chain pick "Other EVM" and enter the node address yourself; TRON is the TRON chain. (more below the table) |
 | Private Key | Yes | — | Wallet private key (hex, ```0x``` prefix optional). It can be left empty for read-only use and switched at run time with ```exchange.IO("key", ...)```. |
-| Rpc Address | No | ```http://127.0.0.1:8545``` | The JSON-RPC node address on EVM, with several nodes separated by commas backing each other up; the full-node HTTP address on TRON (only one; legacy gRPC addresses are mapped to their HTTP counterparts). |
+| Rpc Address | No | ```https://ethereum-rpc.publicnode.com,https://eth.drpc.org``` | The JSON-RPC node address on EVM, with several nodes separated by commas backing each other up; left empty, the selected chain's public nodes are used ("Other EVM" requires one). (more below the table) |
 | Rpc Api Key | No | — | EVM: a ```Header-Name: value``` header or a Basic auth value; TRON: sent as the ```TRON-PRO-API-KEY``` header. |
+
+The rest of the longer descriptions in the table:
+
+- Chain: On EVM the chain actually used is still the node's chainId (the option only sets the default nodes), so existing configurations of ETH plus a custom node keep working on any EVM chain. Options: ```Ethereum```, ```BNB Chain```, ```Base```, ```Arbitrum```, ```OP Mainnet```, ```Polygon```, ```Avalanche C-Chain```, ```Unichain```, ```Other EVM (custom RPC)```, ```TRON```
+- Rpc Address: Public nodes are rate-limited, so use your own node for frequent calls or historical log queries. On TRON, the full-node HTTP address (only one; empty means ```https://api.trongrid.io```, and legacy gRPC addresses are mapped to their HTTP counterparts).
 
 ##### Trading Pairs and Contract Codes
 
