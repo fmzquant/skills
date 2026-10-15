@@ -1722,7 +1722,7 @@ function main() {
 
 #### 状态栏中的交互控件
 
-除了在「策略交互」栏中设计交互控件，还可以在策略状态栏中输出交互控件。状态栏中目前只支持按钮，按钮与输入控件的全部字段、点击后`GetCommand`收到的命令格式见`LogStatus`的「状态栏按钮」，本页只介绍常见写法。
+除了在「策略交互」栏中设计交互控件，还可以在策略状态栏中输出交互控件。状态栏中的交互控件只有按钮，按钮与输入控件的全部字段、点击后`GetCommand`收到的命令格式见`LogStatus`的「状态栏按钮」，本页只介绍常见写法。
 
 状态栏中的按钮分为三种：
 - 普通按钮：点击后弹出确认框，确认后策略收到```cmd```。
@@ -1785,6 +1785,32 @@ function main() {
 ```
 
 把按钮放进状态栏表格、按钮的颜色与尺寸（```class```）、下拉框多选与自定义选项、滑动条和日期选择等控件外观，见`LogStatus`。
+
+##### 状态栏展示组件
+
+除了文字、表格和按钮，`LogStatus`还可以直接传带 `type` 的对象，状态栏按类型显示成组件：`grid`、`tabs` 负责布局，`kpi`（指标卡）、`stat`（键值列表）、`chart`（折线、柱状、面积图）、`sparkline`、`gauge`、`progress`、`pie`、`histogram`、`heatmap`、`calendar`、`timeline`、`markdown`、`alert`、`badge` 负责展示。组件只用于展示，可以和按钮、表格放进同一个 `grid`：
+
+```javascript
+function main() {
+    var btn = {type: "button", name: "平仓|Close", cmd: "close"}
+    while (true) {
+        var ticker = exchange.GetTicker()
+        if (ticker) {
+            LogStatus({type: "grid", cols: 2, items: [
+                {type: "kpi", title: "最新价", value: ticker.Last},
+                btn   // 按钮放进 grid 时不用加反引号
+            ]})
+        }
+        var cmd = GetCommand()
+        if (cmd) {
+            Log("收到命令：", cmd)
+        }
+        Sleep(1000)
+    }
+}
+```
+
+各组件的字段与三种语言的示例见`状态栏组件`，直接传对象、反引号、多个参数的输入写法见`LogStatus`。
 
 ### 模板类库
 
@@ -2097,7 +2123,7 @@ fn main() {
 | 名称 | 说明 |
 | - | - |
 | `Log` | 输出日志。 |
-| `LogStatus` | 在回测系统或者实盘页面状态栏输出信息。 |
+| `LogStatus` | 刷新回测或实盘页面的状态栏：输出文字、表格、按钮，或带 `type` 的组件对象（指标卡、图表、标签页等）；每次调用替换上一次的内容。 |
 | `LogProfit` | 记录盈亏值，打印盈亏数值并根据盈亏数值绘制收益曲线。 |
 | `LogProfitReset` | 清空所有收益日志及收益图表。 |
 | `LogReset` | 清除日志。 |
@@ -2585,7 +2611,7 @@ fn main() {
 | - | - |
 | `HttpQuery-options` | 此JSON结构用于配置HttpQuery函数和HttpQuery_Go函数发送HTTP请求的各项参数。 |
 | `HttpQuery-return` | 该JSON结构是调用HttpQuery函数时，在参数```options```结构中将debug字段指定为true后，HttpQuery函数在调试模式下返回的数据结构。 |
-| `LogStatus-table` | 此JSON结构用于配置策略状态栏中显示的表格内容。 |
+| `LogStatus-table` | 状态栏表格，用LogStatus输出：列可以设置数值格式、涨跌色和单位，单元格可以合并、放按钮，多个表格可以分页显示。 |
 | `LogStatus-btnTypeOne` | 状态栏按钮JSON结构的旧写法（输入控件不带```settings```），平台仍然兼容；新代码使用LogStatus-btnTypeTwo，字段说明见LogStatus的「状态栏按钮」。 |
 | `LogStatus-btnTypeTwo` | 状态栏按钮的JSON结构（当前写法，输入控件带```settings```）。 |
 | `Chart-options` | 该JSON用于设置自定义画图函数```Chart()```的图表配置信息，图表库使用的是Highcharts。 |
@@ -2598,6 +2624,27 @@ fn main() {
 | `DBExec-return` | 该JSON是```DBExec()```函数返回的数据结构；使用```Dial()```函数创建的对象的```exec()```方法执行SQL语句时，也返回此JSON数据结构。 |
 | `Dial-return` | Dial函数返回的连接对象。 |
 | `Thread.join-return` | 该JSON是```Thread```对象的成员函数```join()```返回的数据结构，用于保存```JavaScript```语言策略中并发线程的相关信息。 |
+
+##### OtherStruct/LogStatus-display
+
+| 名称 | 说明 |
+| - | - |
+| `grid` | 网格布局：把多个组件排成几列，容器变窄时自动减少列数。 |
+| `tabs` | 标签页：每页放一组组件，点击切换；状态栏刷新时保持当前选中的页。 |
+| `kpi` | 指标卡：醒目显示一个数值，可带单位、涨跌幅和说明，适合权益、收益率、最新价。 |
+| `stat` | 键值列表：一组「名称—数值」，适合账户余额、冻结资金、杠杆、强平价等明细。 |
+| `progress` | 进度条：显示一个比例，或「当前值 / 总数」。 |
+| `gauge` | 仪表盘：用半圆刻度显示数值在区间中的位置，可按阈值变色，适合RSI、仓位、风险度。 |
+| `sparkline` | 迷你走势图：一个数值加一条小折线，默认按首尾涨跌着色。 |
+| `chart` | 简易图表：折线、柱状或面积，支持多条序列、右侧纵轴和买卖点标记；需要更多配置时用Chart。 |
+| `heatmap` | 热力图：二维网格按数值深浅着色，适合时段 × 品种的收益、相关性矩阵。 |
+| `calendar` | 收益日历：按日的热力格（类似贡献图），或按年 × 月的收益表。 |
+| `histogram` | 分布图：传原始数据，自动分组统计次数，并显示样本数、均值、中位数和正值占比。 |
+| `pie` | 饼图：各部分占总数的比例，默认环形，中心显示合计。 |
+| `timeline` | 时间线：按顺序列出事件，适合成交记录、交易信号、风控事件。 |
+| `markdown` | 按Markdown排版显示文本：标题、列表、粗体、表格等，适合策略说明与行情解读。 |
+| `alert` | 提示条：带图标的提示、成功、警告或错误信息，适合风控与异常提示。 |
+| `badge` | 状态标签：一组带圆点的小标签，在行内显示，可以跟在一行文字后面。 |
 
 #### 内置变量与常量
 

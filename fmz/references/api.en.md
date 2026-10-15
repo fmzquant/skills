@@ -1517,11 +1517,11 @@ See also: `LogReset`, `LogVacuum`
 LogStatus(...msgs)
 ```
 
-Outputs information to the status bar on the backtesting system or the live trading page.
+Refreshes the status bar of a backtest or live trading page with text, tables, buttons or component objects with a `type` (KPI cards, charts, tabs and more); each call replaces the previous content.
 
 Parameters:
 
-- `msg` (string / number / bool / object / array / any, optional): The parameter ```msg``` is the content to be output. Multiple ```msg``` parameters can be passed in.
+- `msg` (string / number / bool / object / array, optional): Content to show: text, numbers, table or button objects, `Status Bar Components` objects, or arrays of them. Several can be passed; they are joined with spaces, and `"\n"` starts a new line.
 
 Supports setting the color of the output content.
 
@@ -1545,6 +1545,569 @@ fn main() {
     LogStatus!("This is a normal status message");
     LogStatus!("This is a red font status message#ff0000");
     LogStatus!("This is a multi-line status message\nI am the second line");
+}
+```
+
+Pass a component object directly: a line of text followed by a last-price KPI card.
+
+```javascript
+function main() {
+    var ticker = exchange.GetTicker()
+    if (!ticker) return
+    // Pass the component object directly: no JSON.stringify, no backticks
+    LogStatus("Updated " + _D(), {type: "kpi", title: "Last", value: ticker.Last})
+    // Output: the text "Updated ..." followed by a last-price KPI card
+}
+```
+
+```python
+def main():
+    ticker = exchange.GetTicker()
+    if not ticker:
+        return
+    # Pass the component dict directly: no json.dumps, no backticks
+    LogStatus("Updated " + _D(), {"type": "kpi", "title": "Last", "value": ticker["Last"]})
+    # Output: the text "Updated ..." followed by a last-price KPI card
+```
+
+```rust
+fn main() {
+    let Ok(t) = exchange.GetTicker(None) else { return };
+    // The component is one-line JSON text after the text, without backticks
+    let kpi = format!(r#"{{"type": "kpi", "title": "Last", "value": {}}}"#, t.Last);
+    LogStatus!(format!("Updated {}", _D(None)), kpi);
+    // Output: the text "Updated ..." followed by a last-price KPI card
+}
+```
+
+A dashboard: a grid of KPI cards, an equity curve and a positions table.
+
+```javascript
+function main() {
+    exchange.SetContractType("swap")
+    var times = [], curve = [], f2 = {precision: 2}
+    while (true) {
+        var account = exchange.GetAccount()
+        var positions = exchange.GetPositions()
+        if (account && positions) {
+            var profit = 0
+            var rows = positions.map(function (p) {
+                profit += p.Profit
+                var side = p.Type == PD_LONG || p.Type == PD_LONG_YD ? "Long" : "Short"
+                return [p.Symbol, side, p.Amount, p.Price, p.Profit]
+            })
+            // Futures accounts report Equity; otherwise use available + frozen
+            var equity = account.Equity || account.Balance + account.FrozenBalance
+            times.push(Date.now())
+            curve.push(equity)
+            if (curve.length > 500) { times.shift(); curve.shift() }
+            var color = profit >= 0 ? "up" : "down"
+            LogStatus({type: "grid", cols: 3, items: [
+                {type: "kpi", title: "Equity", value: equity, unit: "USDT", format: f2},
+                {type: "kpi", title: "Available", value: account.Balance, format: f2},
+                {type: "kpi", title: "Floating PnL", value: profit, color: color},
+                {type: "chart", span: 3, kind: "area", title: "Equity curve", x: times,
+                    series: [{name: "Equity", data: curve}]},
+                {type: "table", span: 3, title: "Positions", rows: rows,
+                    cols: ["Symbol", "Side", "Amount", "Avg price", "Floating PnL"]}
+            ]})
+        }
+        Sleep(60 * 1000)
+    }
+}
+```
+
+```python
+import time
+
+def main():
+    exchange.SetContractType("swap")
+    times, curve, f2 = [], [], {"precision": 2}
+    while True:
+        account = exchange.GetAccount()
+        positions = exchange.GetPositions()
+        if account and positions is not None:
+            rows, profit = [], 0
+            for p in positions:
+                profit += p["Profit"]
+                side = "Long" if p["Type"] in (PD_LONG, PD_LONG_YD) else "Short"
+                rows.append([p["Symbol"], side, p["Amount"], p["Price"], p["Profit"]])
+            # Futures accounts report Equity; otherwise use available + frozen
+            equity = account.get("Equity") or account["Balance"] + account["FrozenBalance"]
+            times.append(int(time.time() * 1000))
+            curve.append(equity)
+            del times[:-500], curve[:-500]
+            color = "up" if profit >= 0 else "down"
+            LogStatus({"type": "grid", "cols": 3, "items": [
+                {"type": "kpi", "title": "Equity", "value": equity, "unit": "USDT", "format": f2},
+                {"type": "kpi", "title": "Available", "value": account["Balance"], "format": f2},
+                {"type": "kpi", "title": "Floating PnL", "value": profit, "color": color},
+                {"type": "chart", "span": 3, "kind": "area", "title": "Equity curve", "x": times,
+                 "series": [{"name": "Equity", "data": curve}]},
+                {"type": "table", "span": 3, "title": "Positions", "rows": rows,
+                 "cols": ["Symbol", "Side", "Amount", "Avg price", "Floating PnL"]}
+            ]})
+        Sleep(60 * 1000)
+```
+
+```rust
+fn join<T: ToString>(v: &[T]) -> String {
+    v.iter().map(|x| x.to_string()).collect::<Vec<_>>().join(",")
+}
+
+fn main() {
+    if exchange.SetContractType("swap").is_err() { return; }
+    let (mut times, mut curve) = (Vec::new(), Vec::new());
+    loop {
+        if let (Ok(a), Ok(ps)) = (exchange.GetAccount(), exchange.GetPositions(None)) {
+            let profit: f64 = ps.iter().map(|p| p.Profit).sum();
+            let rows: Vec<String> = ps.iter().map(|p| {
+                let long = p.Type == PD_LONG || p.Type == PD_LONG_YD;
+                let side = if long { "Long" } else { "Short" };
+                format!(r#"["{}","{}",{},{},{}]"#, p.Symbol, side, p.Amount, p.Price, p.Profit)
+            }).collect();
+            // Futures accounts report Equity; otherwise use available + frozen
+            let equity = if a.Equity > 0.0 { a.Equity } else { a.Balance + a.FrozenBalance };
+            times.push(UnixNano() / 1_000_000);
+            curve.push(equity);
+            if curve.len() > 500 { times.remove(0); curve.remove(0); }
+            let color = if profit >= 0.0 { "up" } else { "down" };
+            LogStatus!(format!(r#"{{"type": "grid", "cols": 3, "items": [
+{{"type": "kpi", "title": "Equity", "value": {}, "unit": "USDT", "format": {{"precision": 2}}}},
+{{"type": "kpi", "title": "Available", "value": {}, "format": {{"precision": 2}}}},
+{{"type": "kpi", "title": "Floating PnL", "value": {}, "color": "{}"}},
+{{"type": "chart", "span": 3, "kind": "area", "title": "Equity curve", "x": [{}],
+  "series": [{{"name": "Equity", "data": [{}]}}]}},
+{{"type": "table", "span": 3, "title": "Positions", "rows": [{}],
+  "cols": ["Symbol", "Side", "Amount", "Avg price", "Floating PnL"]}}]}}"#,
+                equity, a.Balance, profit, color, join(&times), join(&curve), rows.join(",")));
+        }
+        Sleep(60 * 1000);
+    }
+}
+```
+
+Enhanced table: column formats, up/down colors and units; clicking a header sorts by the raw numbers.
+
+```javascript
+function main() {
+    exchange.SetContractType("swap")
+    var positions = exchange.GetPositions()
+    if (!positions) return
+    var rows = positions.map(function (p) {
+        var ratio = p.Margin > 0 ? p.Profit / p.Margin : 0
+        // Cell object: unit and color for this cell only
+        var lever = {value: p.MarginLevel, unit: "x",
+            color: p.MarginLevel > 10 ? "warning" : "muted"}
+        return [p.Symbol, p.Amount, p.Price, p.Profit, ratio, lever]
+    })
+    var f2 = {precision: 2}, pct = {percent: true, precision: 2}
+    // A table on its own: JavaScript and Python add the backticks automatically
+    LogStatus({type: "table", title: "Positions", rows: rows, cols: [
+        "Symbol",
+        {title: "Amount", align: "right"},
+        {title: "Avg price", format: f2, align: "right"},
+        {title: "Floating PnL", format: f2, color: "sign", unit: "USDT", align: "right"},
+        {title: "Return", format: pct, color: "sign", align: "right"},
+        {title: "Leverage", align: "right"}
+    ]})
+    // Output: PnL and return colored by sign, sorted by value rather than text
+}
+```
+
+```python
+def main():
+    exchange.SetContractType("swap")
+    positions = exchange.GetPositions()
+    if positions is None:
+        return
+    rows = []
+    for p in positions:
+        ratio = p["Profit"] / p["Margin"] if p["Margin"] > 0 else 0
+        # Cell object: unit and color for this cell only
+        lever = {"value": p["MarginLevel"], "unit": "x",
+                 "color": "warning" if p["MarginLevel"] > 10 else "muted"}
+        rows.append([p["Symbol"], p["Amount"], p["Price"], p["Profit"], ratio, lever])
+    f2, pct = {"precision": 2}, {"percent": True, "precision": 2}
+    # A table on its own: JavaScript and Python add the backticks automatically
+    LogStatus({"type": "table", "title": "Positions", "rows": rows, "cols": [
+        "Symbol",
+        {"title": "Amount", "align": "right"},
+        {"title": "Avg price", "format": f2, "align": "right"},
+        {"title": "Floating PnL", "format": f2, "color": "sign", "unit": "USDT", "align": "right"},
+        {"title": "Return", "format": pct, "color": "sign", "align": "right"},
+        {"title": "Leverage", "align": "right"}
+    ]})
+    # Output: PnL and return colored by sign, sorted by value rather than text
+```
+
+```rust
+fn main() {
+    if exchange.SetContractType("swap").is_err() { return; }
+    let Ok(positions) = exchange.GetPositions(None) else { return };
+    let rows: Vec<String> = positions.iter().map(|p| {
+        let ratio = if p.Margin > 0.0 { p.Profit / p.Margin } else { 0.0 };
+        let warn = if p.MarginLevel > 10.0 { "warning" } else { "muted" };
+        // Cell object: unit and color for this cell only
+        let lever = format!(r#"{{"value": {}, "unit": "x", "color": "{}"}}"#, p.MarginLevel, warn);
+        format!(r#"["{}", {}, {}, {}, {}, {}]"#,
+            p.Symbol, p.Amount, p.Price, p.Profit, ratio, lever)
+    }).collect();
+    let table = format!(r#"{{"type": "table", "title": "Positions", "rows": [{}], "cols": [
+        "Symbol", {{"title": "Amount", "align": "right"}},
+        {{"title": "Avg price", "format": {{"precision": 2}}, "align": "right"}},
+        {{"title": "Floating PnL", "format": {{"precision": 2}}, "color": "sign",
+          "unit": "USDT", "align": "right"}},
+        {{"title": "Return", "format": {{"percent": true, "precision": 2}},
+          "color": "sign", "align": "right"}},
+        {{"title": "Leverage", "align": "right"}}]}}"#, rows.join(","));
+    // A table on its own needs backticks, and the JSON inside must be one line
+    LogStatus!(format!("`{}`", table.replace('\n', "")));
+    // Output: PnL and return colored by sign, sorted by value rather than text
+}
+```
+
+Tabs for market data, positions and the account; the selected tab survives refreshes.
+
+```javascript
+function main() {
+    exchange.SetContractType("swap")
+    while (true) {
+        var ticker = exchange.GetTicker()
+        var account = exchange.GetAccount()
+        var positions = exchange.GetPositions()
+        if (ticker && account && positions) {
+            var rows = positions.map(function (p) { return [p.Symbol, p.Amount, p.Profit] })
+            var table = {type: "table", cols: ["Symbol", "Amount", "Floating PnL"], rows: rows}
+            LogStatus({type: "tabs", id: "main", items: [
+                {title: "Market", cols: 3, items: [
+                    {type: "kpi", title: "Last", value: ticker.Last},
+                    {type: "kpi", title: "Bid", value: ticker.Buy},
+                    {type: "kpi", title: "Ask", value: ticker.Sell}
+                ]},
+                {title: "Positions", items: [table]},
+                {title: "Account", items: [{type: "stat", cols: 2, items: [
+                    {label: "Available", value: account.Balance},
+                    {label: "Frozen", value: account.FrozenBalance}
+                ]}]}
+            ]})
+        }
+        Sleep(5000)
+    }
+}
+```
+
+```python
+def main():
+    exchange.SetContractType("swap")
+    while True:
+        ticker = exchange.GetTicker()
+        account = exchange.GetAccount()
+        positions = exchange.GetPositions()
+        if ticker and account and positions is not None:
+            rows = [[p["Symbol"], p["Amount"], p["Profit"]] for p in positions]
+            table = {"type": "table", "cols": ["Symbol", "Amount", "Floating PnL"], "rows": rows}
+            LogStatus({"type": "tabs", "id": "main", "items": [
+                {"title": "Market", "cols": 3, "items": [
+                    {"type": "kpi", "title": "Last", "value": ticker["Last"]},
+                    {"type": "kpi", "title": "Bid", "value": ticker["Buy"]},
+                    {"type": "kpi", "title": "Ask", "value": ticker["Sell"]}
+                ]},
+                {"title": "Positions", "items": [table]},
+                {"title": "Account", "items": [{"type": "stat", "cols": 2, "items": [
+                    {"label": "Available", "value": account["Balance"]},
+                    {"label": "Frozen", "value": account["FrozenBalance"]}
+                ]}]}
+            ]})
+        Sleep(5000)
+```
+
+```rust
+fn main() {
+    if exchange.SetContractType("swap").is_err() { return; }
+    loop {
+        let t = exchange.GetTicker(None);
+        let (a, ps) = (exchange.GetAccount(), exchange.GetPositions(None));
+        if let (Ok(t), Ok(a), Ok(ps)) = (t, a, ps) {
+            let rows: Vec<String> = ps.iter()
+                .map(|p| format!(r#"["{}", {}, {}]"#, p.Symbol, p.Amount, p.Profit))
+                .collect();
+            LogStatus!(format!(r#"{{"type": "tabs", "id": "main", "items": [
+{{"title": "Market", "cols": 3, "items": [{{"type": "kpi", "title": "Last", "value": {}}},
+  {{"type": "kpi", "title": "Bid", "value": {}}}, {{"type": "kpi", "title": "Ask", "value": {}}}]}},
+{{"title": "Positions", "items": [{{"type": "table",
+  "cols": ["Symbol", "Amount", "Floating PnL"], "rows": [{}]}}]}},
+{{"title": "Account", "items": [{{"type": "stat", "cols": 2, "items": [
+  {{"label": "Available", "value": {}}}, {{"label": "Frozen", "value": {}}}]}}]}}]}}"#,
+                t.Last, t.Buy, t.Sell, rows.join(","), a.Balance, a.FrozenBalance));
+        }
+        Sleep(5000);
+    }
+}
+```
+
+Several charts: sparkline, gauge, progress, pie, histogram and heatmap.
+
+```javascript
+function main() {
+    var r = exchange.GetRecords(PERIOD_H1)
+    var account = exchange.GetAccount()
+    if (!r || r.length < 73 || !account) return
+    r = r.slice(-73)
+    var closes = r.map(function (b) { return b.Close })
+    var rets = closes.slice(1).map(function (c, i) { return c / closes[i] - 1 })
+    var day = r.slice(-24)
+    var hi = Math.max.apply(null, day.map(function (b) { return b.High }))
+    var lo = Math.min.apply(null, day.map(function (b) { return b.Low }))
+    var pos = hi > lo ? (closes[72] - lo) / (hi - lo) : 0.5
+    var total = account.Balance + account.FrozenBalance
+    var frozen = total > 0 ? account.FrozenBalance / total : 0
+    var pct = {percent: true, precision: 2}
+    LogStatus({type: "grid", cols: 3, items: [
+        {type: "sparkline", title: "Last 24 hours", data: closes.slice(-24)},
+        {type: "gauge", title: "Position in 24h range", value: pos, format: {percent: true},
+            thresholds: [{value: 0.8, color: "up"}]},
+        {type: "progress", title: "Frozen share", value: frozen},
+        {type: "pie", title: "Funds", items: [
+            {name: "Available", value: account.Balance},
+            {name: "Frozen", value: account.FrozenBalance}]},
+        {type: "histogram", title: "Hourly change distribution", data: rets, format: pct},
+        {type: "heatmap", title: "Hourly change", format: pct,
+            x: day.map(function (b) { return _D(b.Time, "hh:00") }),
+            y: ["2 days ago", "Yesterday", "Today"],
+            z: [rets.slice(0, 24), rets.slice(24, 48), rets.slice(48, 72)]}
+    ]})
+}
+```
+
+```python
+def main():
+    r = exchange.GetRecords(PERIOD_H1)
+    account = exchange.GetAccount()
+    if not r or len(r) < 73 or not account:
+        return
+    r = r[-73:]
+    closes = [b["Close"] for b in r]
+    rets = [closes[i] / closes[i - 1] - 1 for i in range(1, 73)]
+    day = r[-24:]
+    hi, lo = max(b["High"] for b in day), min(b["Low"] for b in day)
+    pos = (closes[72] - lo) / (hi - lo) if hi > lo else 0.5
+    total = account["Balance"] + account["FrozenBalance"]
+    frozen = account["FrozenBalance"] / total if total > 0 else 0
+    pct = {"percent": True, "precision": 2}
+    LogStatus({"type": "grid", "cols": 3, "items": [
+        {"type": "sparkline", "title": "Last 24 hours", "data": closes[-24:]},
+        {"type": "gauge", "title": "Position in 24h range", "value": pos,
+         "format": {"percent": True}, "thresholds": [{"value": 0.8, "color": "up"}]},
+        {"type": "progress", "title": "Frozen share", "value": frozen},
+        {"type": "pie", "title": "Funds", "items": [
+            {"name": "Available", "value": account["Balance"]},
+            {"name": "Frozen", "value": account["FrozenBalance"]}]},
+        {"type": "histogram", "title": "Hourly change distribution", "data": rets, "format": pct},
+        {"type": "heatmap", "title": "Hourly change", "format": pct,
+         "x": [_D(b["Time"] / 1000, "%H:00") for b in day],
+         "y": ["2 days ago", "Yesterday", "Today"],
+         "z": [rets[0:24], rets[24:48], rets[48:72]]}
+    ]})
+```
+
+```rust
+fn join<T: ToString>(v: &[T]) -> String {
+    v.iter().map(|x| x.to_string()).collect::<Vec<_>>().join(",")
+}
+
+fn main() {
+    let Ok(r) = exchange.GetRecords(None, PERIOD_H1, None) else { return };
+    let Ok(a) = exchange.GetAccount() else { return };
+    if r.len() < 73 { return; }
+    let r = &r[r.len() - 73..];
+    let closes: Vec<f64> = r.iter().map(|b| b.Close).collect();
+    let rets: Vec<f64> = closes.windows(2).map(|w| w[1] / w[0] - 1.0).collect();
+    let day = &r[49..];
+    let hi = day.iter().map(|b| b.High).fold(f64::MIN, f64::max);
+    let lo = day.iter().map(|b| b.Low).fold(f64::MAX, f64::min);
+    let pos = if hi > lo { (closes[72] - lo) / (hi - lo) } else { 0.5 };
+    let total = a.Balance + a.FrozenBalance;
+    let frozen = if total > 0.0 { a.FrozenBalance / total } else { 0.0 };
+    // Rust's _D() always prints UTC time
+    let hours: Vec<String> = day.iter()
+        .map(|b| format!("\"{}:00\"", &_D(b.Time)[11..13]))
+        .collect();
+    let z = format!("[{}],[{}],[{}]", join(&rets[..24]), join(&rets[24..48]), join(&rets[48..]));
+    LogStatus!(format!(r#"{{"type": "grid", "cols": 3, "items": [
+{{"type": "sparkline", "title": "Last 24 hours", "data": [{}]}},
+{{"type": "gauge", "title": "Position in 24h range", "value": {}, "format": {{"percent": true}},
+  "thresholds": [{{"value": 0.8, "color": "up"}}]}},
+{{"type": "progress", "title": "Frozen share", "value": {}}},
+{{"type": "pie", "title": "Funds", "items": [{{"name": "Available", "value": {}}},
+  {{"name": "Frozen", "value": {}}}]}},
+{{"type": "histogram", "title": "Hourly change distribution", "data": [{}],
+  "format": {{"percent": true, "precision": 2}}}},
+{{"type": "heatmap", "title": "Hourly change", "format": {{"percent": true, "precision": 2}},
+  "x": [{}], "y": ["2 days ago", "Yesterday", "Today"], "z": [{}]}}]}}"#,
+        join(&closes[49..]), pos, frozen, a.Balance, a.FrozenBalance,
+        join(&rets), hours.join(","), z));
+}
+```
+
+A title line with badges, followed by an alert, a Markdown note and a timeline of events.
+
+```javascript
+function main() {
+    var events = [{time: Date.now(), text: "Strategy started", color: "primary"}]
+    while (true) {
+        var account = exchange.GetAccount()
+        if (account) {
+            var low = account.Balance < 100
+            if (low) {
+                events.unshift({time: Date.now(), text: "Funds below 100", color: "down"})
+            }
+            events = events.slice(0, 10)
+            var alert = low
+                ? {type: "alert", level: "warning", title: "Low funds",
+                    text: "Below 100, opening paused"}
+                : {type: "alert", level: "success", title: "Risk check passed"}
+            // "\n" splits lines: text and badges, then stacked components
+            LogStatus("Grid strategy", {type: "badge", items: [
+                {text: IsVirtual() ? "Backtest" : "Live", color: "muted"},
+                {text: low ? "Paused" : "Running", color: low ? "warning" : "up"}
+            ]}, "\n", [
+                alert,
+                {type: "markdown", text: "#### Notes\n- Spacing **0.5%**\n- 0.01 per grid"},
+                {type: "timeline", title: "Recent events", items: events}
+            ])
+        }
+        Sleep(10 * 1000)
+    }
+}
+```
+
+```python
+import time
+
+def main():
+    now = lambda: int(time.time() * 1000)
+    events = [{"time": now(), "text": "Strategy started", "color": "primary"}]
+    while True:
+        account = exchange.GetAccount()
+        if account:
+            low = account["Balance"] < 100
+            if low:
+                events.insert(0, {"time": now(), "text": "Funds below 100", "color": "down"})
+            del events[10:]
+            if low:
+                alert = {"type": "alert", "level": "warning", "title": "Low funds",
+                         "text": "Below 100, opening paused"}
+            else:
+                alert = {"type": "alert", "level": "success", "title": "Risk check passed"}
+            # "\n" splits lines: text and badges, then stacked components
+            LogStatus("Grid strategy", {"type": "badge", "items": [
+                {"text": "Backtest" if IsVirtual() else "Live", "color": "muted"},
+                {"text": "Paused" if low else "Running", "color": "warning" if low else "up"}
+            ]}, "\n", [
+                alert,
+                {"type": "markdown", "text": "#### Notes\n- Spacing **0.5%**\n- 0.01 per grid"},
+                {"type": "timeline", "title": "Recent events", "items": events}
+            ])
+        Sleep(10 * 1000)
+```
+
+```rust
+fn item(text: &str, color: &str) -> String {
+    format!(r#"{{"text": "{}", "color": "{}"}}"#, text, color)
+}
+fn ev(text: &str, color: &str) -> String {
+    let ms = UnixNano() / 1_000_000;
+    format!(r#"{{"time": {}, "text": "{}", "color": "{}"}}"#, ms, text, color)
+}
+
+fn main() {
+    let mut events = vec![ev("Strategy started", "primary")];
+    loop {
+        if let Ok(a) = exchange.GetAccount() {
+            let low = a.Balance < 100.0;
+            if low { events.insert(0, ev("Funds below 100", "down")); events.truncate(10); }
+            let mode = if IsVirtual() { "Backtest" } else { "Live" };
+            let (state, color) = if low { ("Paused", "warning") } else { ("Running", "up") };
+            let badge = format!(r#"{{"type": "badge", "items": [{}, {}]}}"#,
+                item(mode, "muted"), item(state, color));
+            let (level, title, text) = match low {
+                true => ("warning", "Low funds", "Below 100, opening paused"),
+                false => ("success", "Risk check passed", ""),
+            };
+            let alert = format!(
+                r#"{{"type": "alert", "level": "{}", "title": "{}", "text": "{}"}}"#,
+                level, title, text
+            );
+            let notes = r"#### Notes\n- Spacing **0.5%**\n- 0.01 per grid";
+            let md = format!(r#"{{"type": "markdown", "text": "{}"}}"#, notes);
+            let tl = format!(r#"{{"type": "timeline", "title": "Recent events", "items": [{}]}}"#,
+                events.join(","));
+            // "\n" splits lines: text and badges, then stacked components (one line each)
+            LogStatus!("Grid strategy", badge, "\n", format!("[{},{},{}]", alert, md, tl));
+        }
+        Sleep(10 * 1000);
+    }
+}
+```
+
+Mixing with the old style: a backtick table, a button and new components on separate lines.
+
+```javascript
+function main() {
+    var account = exchange.GetAccount()
+    if (!account) return
+    var table = {type: "table", title: "Account", cols: ["Available", "Frozen"],
+        rows: [[account.Balance, account.FrozenBalance]]}
+    var btn = {type: "button", cmd: "pause", name: "Pause"}
+    LogStatus(
+        "`" + JSON.stringify(table) + "`",           // Old style: backtick JSON, shown as before
+        "\nSummary",
+        {type: "grid", cols: 3, items: [             // New components go at the end of the line
+            {type: "kpi", title: "Available", value: account.Balance},
+            table, btn                                // No backticks inside a grid
+        ]},
+        "\n`" + JSON.stringify(btn) + "`"
+    )
+    // Output: the old table, then text with a component grid, then a button read with GetCommand()
+}
+```
+
+```python
+import json
+
+def main():
+    account = exchange.GetAccount()
+    if not account:
+        return
+    table = {"type": "table", "title": "Account", "cols": ["Available", "Frozen"],
+             "rows": [[account["Balance"], account["FrozenBalance"]]]}
+    btn = {"type": "button", "cmd": "pause", "name": "Pause"}
+    LogStatus(
+        "`" + json.dumps(table) + "`",               # Old style: backtick JSON, shown as before
+        "\nSummary",
+        {"type": "grid", "cols": 3, "items": [       # New components go at the end of the line
+            {"type": "kpi", "title": "Available", "value": account["Balance"]},
+            table, btn                                # No backticks inside a grid
+        ]},
+        "\n`" + json.dumps(btn) + "`"
+    )
+    # Output: the old table, then text with a component grid, then a button read with GetCommand()
+```
+
+```rust
+fn main() {
+    let Ok(a) = exchange.GetAccount() else { return };
+    // JSON in backticks or after text must be one line, so drop the line breaks
+    let table = format!(r#"{{"type": "table", "title": "Account", "cols": ["Available", "Frozen"],
+        "rows": [[{}, {}]]}}"#, a.Balance, a.FrozenBalance).replace('\n', "");
+    let btn = r#"{"type": "button", "cmd": "pause", "name": "Pause"}"#;
+    let kpi = format!(r#"{{"type": "kpi", "title": "Available", "value": {}}}"#, a.Balance);
+    // New components go at the end of the line；No backticks inside a grid
+    let grid = format!(r#"{{"type": "grid", "cols": 3, "items": [{}, {}, {}]}}"#, kpi, table, btn);
+    // Old style: backtick JSON, shown as before
+    LogStatus!(format!("`{}`", table), "\nSummary", grid, format!("\n`{}`", btn));
+    // Output: the old table, then text with a component grid, then a button read with GetCommand()
 }
 ```
 
@@ -1946,319 +2509,33 @@ fn main() {
 }
 ```
 
-Horizontally merge cells in the table drawn by the ```LogStatus()``` function.
-
-```javascript
-function main() {
-    var table = {
-        type: 'table',
-        title: 'Position Operation',
-        cols: ['Column 1', 'Column 2', 'Action'],
-        rows: [
-            ['abc', 'def', {'type':'button', 'cmd': 'coverAll', 'name': 'Close'}]
-        ]
-    }
-    var ticker = exchange.GetTicker()
-    // Add a row of data, merge the first and second cells, and output the ticker variable in the merged cell
-    table.rows.push([{body : JSON.stringify(ticker), colspan : 2}, "abc"])
-    LogStatus('`' + JSON.stringify(table) + '`')
-}
-```
-
-```python
-import json
-def main():
-    table = {
-        "type" : "table",
-        "title" : "Position Operation",
-        "cols" : ["Column 1", "Column 2", "Action"],
-        "rows" : [
-            ["abc", "def", {"type": "button", "cmd": "coverAll", "name": "Close"}]
-        ]
-    }
-    ticker = exchange.GetTicker()
-    table["rows"].append([{"body": json.dumps(ticker), "colspan": 2}, "abc"])
-    LogStatus("`" + json.dumps(table) + "`")
-```
-
-```rust
-fn main() {
-    let table_tpl = String::from(r#"{"type": "table", "title": "Position Operation", "cols": ["Column 1", "Column 2", "Action"], "rows": ["#)
-        + r#"["abc", "def", {"type": "button", "cmd": "coverAll", "name": "Close"}],"#
-        + r#"__ROW2__"#
-        + r#"]}"#;
-
-    let ticker = exchange.GetTicker(None).unwrap();
-    let json_ticker = format!(
-        r#"{{"Buy": {}, "Sell": {}, "High": {}, "Low": {}, "Volume": {}, "Last": {}, "Time": {}}}"#,
-        ticker.Buy, ticker.Sell, ticker.High, ticker.Low, ticker.Volume, ticker.Last, ticker.Time
-    );
-    // Add a row of data, merge the first and second cells, and output the ticker data in the merged cell
-    // body is a string (corresponding to JS's JSON.stringify(ticker)); its internal quotes must be escaped before being embedded into the JSON
-    let row2 = format!(r#"[{{"body": "{}", "colspan": 2}}, "abc"]"#, json_ticker.replace('"', "\\\""));
-    let table = table_tpl.replace("__ROW2__", &row2);
-    LogStatus!(format!("`{}`", table));
-}
-```
-
-Vertically merge cells in a table drawn by the ```LogStatus()``` function.
-
-```javascript
-function main() {
-    var table = {
-        type: 'table',
-        title: 'Table Demo',
-        cols: ['Column A', 'Column B', 'Column C'],
-        rows: [
-            ['A1', 'B1', {'type':'button', 'cmd': 'coverAll', 'name': 'C1'}]
-        ]
-    }
-
-    var ticker = exchange.GetTicker()
-    var name = exchange.GetName()
-
-    table.rows.push([{body : "A2 + B2:" + JSON.stringify(ticker), colspan : 2}, "C2"])
-    table.rows.push([{body : "A3 + A4 + A5:" + name, rowspan : 3}, "B3", "C3"])
-    // A4 is merged into the first cell of the previous row
-    table.rows.push(["B4", "C4"])
-    // A5 is merged into the first cell of the previous row
-    table.rows.push(["B5", "C5"])
-    table.rows.push(["A6", "B6", "C6"])
-    LogStatus('`' + JSON.stringify(table) + '`')
-}
-```
-
-```python
-import json
-def main():
-    table = {
-        "type" : "table",
-        "title" : "Table Demo",
-        "cols" : ["Column A", "Column B", "Column C"],
-        "rows" : [
-            ["A1", "B1", {"type": "button", "cmd": "coverAll", "name": "C1"}]
-        ]
-    }
-
-    ticker = exchange.GetTicker()
-    name = exchange.GetName()
-
-    table["rows"].append([{"body": "A2 + B2:" + json.dumps(ticker), "colspan": 2}, "C2"])
-    table["rows"].append([{"body": "A3 + A4 + A5:" + name, "rowspan": 3}, "B3", "C3"])
-    table["rows"].append(["B4", "C4"])
-    table["rows"].append(["B5", "C5"])
-    table["rows"].append(["A6", "B6", "C6"])
-    LogStatus("`" + json.dumps(table) + "`")
-```
-
-```rust
-fn main() {
-    // For ease of testing, constructed data is used here to keep the code short and readable
-    let json_ticker = r#"{"High": 0, "Low": 0, "Buy": 0, "Sell": 0, "Last": 0, "Time": 0, "Volume": 0}"#;
-    let name = exchange.GetName();
-
-    let mut rows: Vec<String> = Vec::new();
-    rows.push(String::from(r#"["A1", "B1", {"type": "button", "cmd": "coverAll", "name": "C1"}]"#));
-    // body is a string, and the quotes inside it must be escaped before they can be embedded in JSON
-    let body = format!("A2 + B2:{}", json_ticker).replace('"', "\\\"");
-    rows.push(format!(r#"[{{"body": "{}", "colspan": 2}}, "C2"]"#, body));
-    rows.push(format!(r#"[{{"body": "A3 + A4 + A5:{}", "rowspan": 3}}, "B3", "C3"]"#, name));
-    // A4 is merged into the first cell of the previous row
-    rows.push(String::from(r#"["B4", "C4"]"#));
-    // A5 is merged into the first cell of the previous row
-    rows.push(String::from(r#"["B5", "C5"]"#));
-    rows.push(String::from(r#"["A6", "B6", "C6"]"#));
-
-    let table = format!(r#"{{"type": "table", "title": "Table Demo", "cols": ["Column A", "Column B", "Column C"], "rows": [{}]}}"#, rows.join(","));
-    LogStatus!(format!("`{}`", table));
-}
-```
-
-Display tables with pagination in the status bar.
-
-```javascript
-function main() {
-    var table1 = {type: 'table', title: 'table1', cols: ['Column 1', 'Column 2'], rows: [ ['abc', 'def'], ['ABC', 'support color #ff0000']]}
-    var table2 = {type: 'table', title: 'table2', cols: ['Column 1', 'Column 2'], rows: [ ['abc', 'def'], ['ABC', 'support color #ff0000']]}
-    LogStatus('`' + JSON.stringify([table1, table2]) + '`')
-}
-```
-
-```python
-import json
-def main():
-    table1 = {"type": "table", "title": "table1", "cols": ["Column 1", "Column 2"], "rows": [ ["abc", "def"], ["ABC", "support color #ff0000"]]}
-    table2 = {"type": "table", "title": "table2", "cols": ["Column 1", "Column 2"], "rows": [ ["abc", "def"], ["ABC", "support color #ff0000"]]}
-    LogStatus("`" + json.dumps([table1, table2]) + "`")
-```
-
-```rust
-fn main() {
-    let table1 = r#"{"type": "table", "title": "table1", "cols": ["Column 1", "Column 2"], "rows": [["abc", "def"], ["ABC", "support color #ff0000"]]}"#;
-    let table2 = r#"{"type": "table", "title": "table2", "cols": ["Column 1", "Column 2"], "rows": [["abc", "def"], ["ABC", "support color #ff0000"]]}"#;
-    LogStatus!(format!("`[{},{}]`", table1, table2));
-}
-```
-
-In addition to displaying tables with pagination, you can also arrange multiple tables from top to bottom.
-
-```javascript
-function main(){
-    var tab1 = {
-        type : "table",
-        title : "Table 1",
-        cols : ["1", "2"],
-        rows : []
-    }
-    var tab2 = {
-        type : "table",
-        title : "Table 2",
-        cols : ["1", "2", "3"],
-        rows : []
-    }
-    var tab3 = {
-        type : "table",
-        title : "Table 3",
-        cols : ["A", "B", "C"],
-        rows : []
-    }
-
-    tab1.rows.push(["jack", "lucy"])
-    tab2.rows.push(["A", "B", "C"])
-    tab3.rows.push(["A", "B", "C"])
-
-    LogStatus('`' + JSON.stringify(tab1) + '`\n' +
-        '`' + JSON.stringify(tab2) + '`\n' +
-        '`' + JSON.stringify(tab3) + '`')
-
-    Log("exit")
-}
-```
-
-```python
-import json
-def main():
-    tab1 = {
-        "type": "table",
-        "title": "Table 1",
-        "cols": ["1", "2"],
-        "rows": []
-    }
-    tab2 = {
-        "type": "table",
-        "title": "Table 2",
-        "cols": ["1", "2", "3"],
-        "rows": []
-    }
-    tab3 = {
-        "type": "table",
-        "title": "Table 3",
-        "cols": ["A", "B", "C"],
-        "rows": []
-    }
-
-    tab1["rows"].append(["jack", "lucy"])
-    tab2["rows"].append(["A", "B", "C"])
-    tab3["rows"].append(["A", "B", "C"])
-    LogStatus("`" + json.dumps(tab1) + "`\n" +
-        "`" + json.dumps(tab2) + "`\n" +
-        "`" + json.dumps(tab3) + "`")
-```
-
-```rust
-fn main() {
-    // In Rust, write the row data directly into the JSON string
-    let tab1 = r#"{"type": "table", "title": "Table 1", "cols": ["1", "2"], "rows": [["jack", "lucy"]]}"#;
-    let tab2 = r#"{"type": "table", "title": "Table 2", "cols": ["1", "2", "3"], "rows": [["A", "B", "C"]]}"#;
-    let tab3 = r#"{"type": "table", "title": "Table 3", "cols": ["A", "B", "C"], "rows": [["A", "B", "C"]]}"#;
-
-    LogStatus!(format!("`{}`\n`{}`\n`{}`", tab1, tab2, tab3));
-
-    Log!("exit");
-}
-```
-
-Supports setting horizontal and vertical scroll modes for the status bar table. After setting the ```scroll``` attribute to ```auto```, when the number of vertical rows in the status bar table exceeds 20, the content will scroll automatically; when the number of horizontal columns exceeds the visible range of the page, horizontal scrolling will be applied. Using the ```scroll``` attribute can help mitigate the lag caused by writing large amounts of data to the status bar during live trading.
-
-Refer to the following test example:
-
-```javascript
-function main() {
-    var tbl = {
-        type : "table",
-        title : "test scroll",
-        scroll : "auto",
-        cols : ["col 0", "col 1", "col 2", "col 3", "col 4", "col 5", "col 6", "col 7", "col 8", "col 9", "col 10",
-            "col 11", "col 12", "col 13", "col 14", "col 15", "col 16", "col 17", "col 18", "col 19", "col 20"],
-        rows : []
-    }
-
-    for (var i = 1 ; i < 100 ; i++) {
-        tbl.rows.push([i, "1," + i, "2," + i, "3," + i, "4," + i, "5," + i, "6," + i, "7," + i, "8," + i, "9," + i, "10," + i,
-            "11," + i, "12," + i, "13," + i, "14," + i, "15," + i, "16," + i, "17," + i, "18," + i, "19," + i, "20," + i])
-    }
-
-    LogStatus("`" + JSON.stringify(tbl) + "`")
-}
-```
-
-```python
-import json
-
-def main():
-    tbl = {
-        "type" : "table",
-        "title" : "test scroll",
-        "scroll" : "auto",
-        "cols" : ["col 0", "col 1", "col 2", "col 3", "col 4", "col 5", "col 6", "col 7", "col 8", "col 9", "col 10",
-            "col 11", "col 12", "col 13", "col 14", "col 15", "col 16", "col 17", "col 18", "col 19", "col 20"],
-        "rows" : []
-    }
-
-    for index in range(1, 100):
-        i = str(index)
-        tbl["rows"].append([i, "1," + i, "2," + i, "3," + i, "4," + i, "5," + i, "6," + i, "7," + i, "8," + i, "9," + i, "10," + i,
-            "11," + i, "12," + i, "13," + i, "14," + i, "15," + i, "16," + i, "17," + i, "18," + i, "19," + i, "20," + i])
-
-    LogStatus("`" + json.dumps(tbl) + "`")
-```
-
-```rust
-fn main() {
-    let tbl_tpl = String::from(r#"{"type": "table", "title": "test scroll", "scroll": "auto", "cols": ["#)
-        + r#""col 0", "col 1", "col 2", "col 3", "col 4", "col 5", "col 6", "col 7", "col 8", "col 9", "col 10","#
-        + r#""col 11", "col 12", "col 13", "col 14", "col 15", "col 16", "col 17", "col 18", "col 19", "col 20""#
-        + r#"], "rows": [__ROWS__]}"#;
-
-    let mut rows: Vec<String> = Vec::new();
-    for index in 1..100 {
-        let i = index.to_string();
-        rows.push(format!(
-            r#"[{}, "1,{}", "2,{}", "3,{}", "4,{}", "5,{}", "6,{}", "7,{}", "8,{}", "9,{}", "10,{}", "11,{}", "12,{}", "13,{}", "14,{}", "15,{}", "16,{}", "17,{}", "18,{}", "19,{}", "20,{}"]"#,
-            i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, i
-        ));
-    }
-
-    let tbl = tbl_tpl.replace("__ROWS__", &rows.join(","));
-    LogStatus!(format!("`{}`", tbl));
-}
-```
-
 During live trading, the information output by the ```LogStatus()``` function is not written to the log records; it only updates the content of the current live trading status bar. The live trading database keeps only the latest status bar content, and each call overwrites the previous one.
 
-The ```LogStatus()``` function supports printing ```base64```-encoded images. The image string starts with ``` ` ``` and ends with ``` ` ```. For example: ```LogStatus("`data:image/png;base64,AAAA`")```.
+##### Input forms
 
-The ```LogStatus()``` function supports directly passing in a ```Python``` ```matplotlib.pyplot``` object. As long as the object contains the ```savefig``` method, it can be passed as a parameter to the ```LogStatus()``` function. For example:
+The arguments are turned into text and joined with spaces: strings as is, numbers as text, objects and arrays as JSON (in JavaScript and Python a table object whose `type` is `table` is also wrapped in backticks). The result is split into lines at `\n`; the table shows how each line is displayed.
 
-```python
-import matplotlib.pyplot as plt
+| Form | Display |
+| - | - |
+| Plain text | Text; a trailing `#ff0000` sets the color, the `[trans]` tag follows the page language |
+| Component object with a `type`, or an array containing components | `Status Bar Components`; components in an array are stacked top to bottom |
+| Backtick-wrapped JSON: `` `{...}` `` | Tables, arrays of tables (shown as tabs) and buttons, or components |
+| The whole status bar is one component JSON (it may span several lines) | Recognized as a whole |
 
-def main():
-    plt.plot([3,6,2,4,7,1])
-    LogStatus(plt)
-```
+- At most one JSON block per line. A component without backticks must come last on its line, optionally after some text (for example `LogStatus("Updated", kpi)`); to show several components on one line put them in an array or a `grid`, or split lines with `"\n"`.
+- Backtick-wrapped JSON may have text before and after it. Once a line contains backticks, components without backticks on that line are no longer recognized.
+- Without backticks only components are recognized: objects whose `type` is not a component (such as the result of `GetAccount()` or a lone button object) and arrays of tables only are shown as JSON text, as before.
 
-When a strategy is running live, if you scroll through the historical records on the live trading page, the status bar enters a dormant state and stops updating; the status bar data is only refreshed when the log is on the first page. The status bar supports outputting ```base64```-encoded images, and also supports outputting ```base64```-encoded images within tables displayed in the status bar. Since encoded image string data is usually very long, no example code is shown here.
+##### Status bar components
+
+Component objects are rendered by `type`: `grid` and `tabs` handle layout; `kpi`, `stat`, `progress`, `gauge`, `sparkline`, `chart`, `heatmap`, `calendar`, `histogram`, `pie`, `timeline`, `markdown`, `alert` and `badge` display data; table and button objects can also go into the `items` of `grid` and `tabs`. For the fields and examples of each component see `Status Bar Components`.
+
+- `grid` drops columns with the container width, so it also works on narrow screens.
+- A malformed component (missing required field, unknown type, data over a limit) shows an error card only in its own place, naming the faulty field and showing its JSON; the other components render as usual.
+- Colors follow the page's light or dark theme; `up` and `down` follow the page's up/down color setting (FMZ defaults to green for up and red for down).
+- Fully compatible with the old style: text, backtick tables and buttons look the same and can be mixed with components. Tables also support column formats, up/down colors and units; see `LogStatus-table`.
+- Components are for display only; use the status bar buttons below for interaction. Buttons can go into table cells or into `grid` and `tabs`.
+- Limits: 5000 points per chart series, 40000 heatmap cells, 6 nesting levels of `grid` and `tabs`; a component over a limit shows an error card.
 
 ##### Status bar buttons
 
@@ -2315,7 +2592,25 @@ The older form without ```settings``` still works: a drop-down sets its options 
 
 Button text, control titles and descriptions, drop-down options, table titles and column names accept bilingual text ```"中文|English"```, shown according to the page language; for bilingual text in plain status bar text and table cells use ```[trans]中文|English[/trans]```.
 
-See also: `GetCommand`
+Buttons can also go into the `items` of `grid` or `tabs` next to status bar components, without backticks.
+
+The ```LogStatus()``` function supports printing ```base64```-encoded images. The image string starts with ``` ` ``` and ends with ``` ` ```. For example: ```LogStatus("`data:image/png;base64,AAAA`")```.
+
+When a strategy is running live, if you scroll through the historical records on the live trading page, the status bar enters a dormant state and stops updating; the status bar data is only refreshed when the log is on the first page. The status bar supports outputting ```base64```-encoded images, and also supports outputting ```base64```-encoded images within tables displayed in the status bar. Since encoded image string data is usually very long, no example code is shown here.
+
+Rust has no object literals: write a component as JSON text (with `format!`, write `{` and `}` as `{{` and `}}`), or pass a `JsonValue` from `JSONParse()`; the frontend recognizes both. String arguments are never wrapped in backticks, so a table on its own is written as ``format!("`{}`", table)``; inside `grid`, `tabs` or an array with components no backticks are needed. Numbers must be finite: `NaN` makes the whole JSON unparsable and it is shown as text.
+
+The ```LogStatus()``` function supports directly passing in a ```Python``` ```matplotlib.pyplot``` object. As long as the object contains the ```savefig``` method, it can be passed as a parameter to the ```LogStatus()``` function. For example:
+
+```python
+import matplotlib.pyplot as plt
+
+def main():
+    plt.plot([3,6,2,4,7,1])
+    LogStatus(plt)
+```
+
+See also: `GetCommand`, `Status Bar Components`, `LogStatus-table`, `Chart`
 
 #### LogProfit
 
@@ -4568,7 +4863,7 @@ Setting the ```period``` parameter to 5 means requesting K-line data with a peri
 
 In the simulation-level backtesting of the backtesting system, because the underlying K-line period must be set (during simulation-level backtesting, the system uses the corresponding K-line data to generate Tick data based on the configured underlying K-line period), the following must be noted: the K-line data period obtained in the strategy cannot be smaller than the underlying K-line period. This is because in simulation-level backtesting, the K-line data of each period is synthesized from the K-line data corresponding to the underlying K-line period.
 
-Exchanges that do not support this function: `Pendle`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
+Exchanges that do not support this function: `Pendle`, `Uniswap`, `Jupiter`, `KyberSwap`, `OneInch`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
 
 Exchanges that serve this function through a fallback: the exchange's API does not fully provide this function, and the docker fills the gap.
 
@@ -4620,8 +4915,6 @@ Some periods are synthesized by the docker:
 - `Futures_Hyperliquid`: Native periods are 1m, 3m, 5m, 15m, 30m, 1h, 2h, 4h, 8h, 12h, 1d, 3d, 1w; other periods are synthesized by the docker. Outcome instruments have no bars.
 - `Futures_EdgeX`: Native periods are 1m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 8h, 12h, 1d, 1w, 1M; other periods that are a multiple of 60 seconds are synthesized by the docker from native bars, and the rest (such as second-level periods) are not available (the exchange has no trades endpoint).
 - `Futures_WOOFi`: Native periods are 1m, 5m, 15m, 30m, 1h, 4h, 12h, 1d, 1w, 1M, 1y; other periods are synthesized by the docker. At most 1000 bars per call.
-- `Uniswap`: Native periods are 1m, 5m, 15m, 1h, 4h, 12h, 1d (GeckoTerminal's timeframes); other periods are synthesized by the docker.
-- `Jupiter`, `KyberSwap`, `OneInch`: Native periods are 1m, 5m, 15m, 1h, 4h, 12h, 1d (GeckoTerminal's timeframes); other periods of a minute or longer are synthesized by the docker, while second-level periods are unavailable (there is no trade feed to build them from).
 - `Futures_Futu`: Native periods are 1m, 3m, 5m, 15m, 30m, 1h, 1d, 1w, 1M; other periods are synthesized by the docker.
 - `Futures_IB`: Native periods are 1m, 3m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 1d, 1w; other periods that are a multiple of 60 seconds are synthesized by the docker from native bars, and the rest (such as second-level periods) are not available (this exchange object does not support ```exchange.GetTrades()```).
 - `Exchange`: The gateway's ```records``` takes only the 1m, 3m, 5m, 15m, 30m, 1h and 1d periods; other periods are synthesized by the docker, and a start time cannot be specified.
@@ -5228,17 +5521,17 @@ exchange.Buy(price, amount)
 exchange.Buy(price, amount, ...args)
 ```
 
-Submits a buy order. ```Buy()``` is a member function of the exchange object `exchange` and acts only on the account bound to that exchange object (with multiple accounts, use ```exchanges[i].Buy()``` to specify the account).
+Places a buy order. ```Buy()``` is a member function of the exchange object `exchange` and acts only on the account bound to that exchange object (with several accounts, use ```exchanges[i].Buy()``` to pick one).
 
 Parameters:
 
 - `price` (number, required): Order price.
-- `amount` (number, required): Order quantity.
-- `arg` (string / number / bool / object / array / any, optional): Extended parameters; multiple ```arg``` parameters can be passed. Arguments of types such as string and number are output to the log of this order (multiple arguments are joined with spaces). If the last argument is an object, it is not output to the log but is used as order options. Supported keys: ```type``` (value can only be ```market``` or ```limit```, used to explicitly specify a market order or a limit order), ```tif```, ```reduceOnly```, ```postOnly```; any other keys are passed to the exchange as exchange-specific parameters, e.g. ```{"slippage":0.01}```.
+- `amount` (number, required): Order amount.
+- `arg` (string / number / bool / object / array / any, optional): Extension parameters; multiple ```arg``` parameters can be passed in. Strings, numbers and similar values are written to this order log (joined with spaces). The last object argument is not written to the log; it is used as order options with the keys ```type``` (must be ```market``` or ```limit```, explicitly selecting a market or limit order), ```tif```, ```reduceOnly``` and ```postOnly```.
 
-Returns (string / null value): Returns the order Id if the order is placed successfully, or a null value if the order fails. The ```Id``` attribute of the FMZ platform order `Order` structure consists of the exchange's symbol code and the exchange's original order Id, separated by an English comma. For example, for an order on the OKX spot trading pair ```ETH_USDT```, the ```Id``` attribute has the format: ```ETH-USDT,1547130415509278720```. When placing an order by calling the ```exchange.Buy()``` function, the returned order ```Id``` is the same as the ```Id``` attribute of the order `Order` structure.
+Returns (string / null value): Returns the order Id if the order is placed successfully, and returns a null value if the order fails. The ```Id``` attribute of the order `Order` structure on the FMZ platform consists of the exchange symbol code and the exchange's original order Id, separated by an English comma. For example, the ```Id``` attribute format of an order for the OKX exchange spot trading pair ```ETH_USDT``` is: ```ETH-USDT,1547130415509278720```. When calling the ```exchange.Buy()``` function to place an order, the returned order ```Id``` is consistent with the ```Id``` attribute of the order `Order` structure.
 
-The order ID returned by ```exchange.Buy()``` can be used to query order information and cancel the order.
+The order number returned by ```exchange.Buy()``` can be used to query order information and cancel orders.
 
 ```javascript
 function main() {
@@ -5260,25 +5553,25 @@ fn main() {
 }
 ```
 
-Before placing a cryptocurrency futures contract order, use the ```exchange.SetDirection()``` function to set the trade direction. Once set, both ```exchange.Buy()``` and ```exchange.Sell()``` place orders in that direction, so they must be paired according to the following mapping: ```buy``` and ```closesell``` with ```exchange.Buy()```, ```sell``` and ```closebuy``` with ```exchange.Sell()```. A mismatch between the direction and the function raises no error; the order is placed in the set direction instead (for example, calling ```exchange.Buy()``` after setting ```sell``` actually submits a sell order that opens a short position), which may result in an order opposite to what was intended.
+Before placing a cryptocurrency futures order, set the trading direction with the ```exchange.SetDirection()``` function. After that, ```exchange.Buy()``` and ```exchange.Sell()``` place orders in the direction that was set, so they must be used in matching pairs: ```buy``` and ```closesell``` with ```exchange.Buy()```, ```sell``` and ```closebuy``` with ```exchange.Sell()```. A mismatch does not raise an error; the order is placed in the direction that was set (for example, calling ```exchange.Buy()``` after setting ```sell``` actually places a sell order that opens a short position), which may produce an order opposite to what you intended.
 
 ```javascript
 function main() {
     exchange.SetContractType("quarter")
 
-    // Open long: set "buy" direction, call Buy
+    // Open long: set the "buy" direction, call Buy
     exchange.SetDirection("buy")
     var id1 = exchange.Buy(50, 1)
 
-    // Close long: set "closebuy" direction, call Sell
+    // Close long: set the "closebuy" direction, call Sell
     exchange.SetDirection("closebuy")
     var id2 = exchange.Sell(60, 1)
 
-    // Open short: set "sell" direction, call Sell
+    // Open short: set the "sell" direction, call Sell
     exchange.SetDirection("sell")
     var id3 = exchange.Sell(60, 1)
 
-    // Close short: set "closesell" direction, call Buy
+    // Close short: set the "closesell" direction, call Buy
     exchange.SetDirection("closesell")
     var id4 = exchange.Buy(50, 1)
 }
@@ -5301,31 +5594,31 @@ def main():
 fn main() {
     let _ = exchange.SetContractType("quarter");
 
-    // Open long: set "buy" direction, call Buy
+    // Open long: set the "buy" direction, call Buy
     let _ = exchange.SetDirection("buy");
     let id1 = exchange.Buy(50, 1);
 
-    // Close long: set "closebuy" direction, call Sell
+    // Close long: set the "closebuy" direction, call Sell
     let _ = exchange.SetDirection("closebuy");
     let id2 = exchange.Sell(60, 1);
 
-    // Open short: set "sell" direction, call Sell
+    // Open short: set the "sell" direction, call Sell
     let _ = exchange.SetDirection("sell");
     let id3 = exchange.Sell(60, 1);
 
-    // Close short: set "closesell" direction, call Buy
+    // Close short: set the "closesell" direction, call Buy
     let _ = exchange.SetDirection("closesell");
     let id4 = exchange.Buy(50, 1);
     Log!(id1, id2, id3, id4);
 }
 ```
 
-Spot market buy order.
+Spot market order.
 
 ```javascript
-// Taking the ETH_BTC trading pair as an example, buy at market price
+// For example, trading pair: ETH_BTC, market order buy
 function main() {
-    // Place a market buy order, buying ETH with an amount worth 0.1 BTC (quote currency)
+    // Place a market order to buy, buying ETH worth 0.1 BTC (quote currency)
     exchange.Buy(-1, 0.1)
 }
 ```
@@ -5336,26 +5629,24 @@ def main():
 ```
 
 ```rust
-// Taking the ETH_BTC trading pair as an example, buy at market price
+// For example, trading pair: ETH_BTC, market order buy
 fn main() {
-    // Place a market buy order, buying ETH with an amount worth 0.1 BTC (quote currency)
+    // Place a market order to buy, buying ETH worth 0.1 BTC (quote currency)
     let _ = exchange.Buy(-1, 0.1);
 }
 ```
 
-When placing futures contract orders, make sure the trade direction is set correctly. After the direction is set with ```exchange.SetDirection()```, ```exchange.Buy()``` places orders in that direction; a mismatch between the direction and the function raises no error and may result in an order opposite to what was intended. Unless otherwise specified, order quantities on cryptocurrency futures exchanges are in number of contracts.
+When placing an order for a futures contract, you must pay attention to whether the trading direction is set correctly. After the direction is set with ```exchange.SetDirection()```, ```exchange.Buy()``` places the order in that direction; a mismatch between the direction and the function does not raise an error and may produce an order opposite to what you intended. Unless otherwise specified, the order amount on cryptocurrency futures contract exchanges is denominated in number of contracts.
 
-Set the ```price``` parameter to ```-1``` to place a market order, provided the exchange's order interface supports market orders. For a market buy order on cryptocurrency spot, the order quantity parameter ```amount``` is the amount in quote currency; for a market order on cryptocurrency futures contracts, the unit of the order quantity parameter ```amount``` is the number of contracts. In live trading, a few cryptocurrency exchanges do not support the market order interface. On some spot exchanges, the order quantity of a market buy order is the amount of base currency rather than the quote amount; see the notes on each exchange's page for details.
+When the ```price``` parameter is set to ```-1```, it is used to place a market order. This feature requires the exchange's order placement interface to support market orders. When placing a buy order for cryptocurrency spot in the form of a market order, the order amount parameter ```amount``` is the amount denominated in the quote currency. When placing an order for a cryptocurrency futures contract in the form of a market order, the unit of the order amount parameter ```amount``` is number of contracts. In live trading, a few cryptocurrency exchanges do not support the market order interface. On a few spot exchanges the amount of a market buy order is the number of base coins rather than a quote amount; see the notes on each exchange page.
 
-If an older version of the docker is used, the order ```Id``` returned by the ```exchange.Buy()``` function may differ in format from the order ```Id``` described in this documentation.
+If you are using an older version of the docker, the order ```Id``` returned by the ```exchange.Buy()``` function may differ from the return value order ```Id``` described in the current document.
 
-```exchange.Buy()``` is subject to the rate limit settings of ```CreateOrder```; see `API Rate Limiting` for details.
-
-Unsupported exchanges: `Web3`; calling it raises an error and returns a null value. For each exchange's support status, see the `Capability Matrix`.
+```exchange.Buy()``` is subject to the rate limit set for ```CreateOrder```; see `API rate limiting`.
 
 Exchanges that do not support this function: `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
 
-See also: `exchange.Sell`, `exchange.SetContractType`, `exchange.SetDirection`, `exchange.IO`, `API Rate Limiting`
+See also: `exchange.Sell`, `exchange.SetContractType`, `exchange.SetDirection`, `exchange.IO`, `API rate limiting`
 
 #### exchange.Sell
 
@@ -5364,17 +5655,17 @@ exchange.Sell(price, amount)
 exchange.Sell(price, amount, ...args)
 ```
 
-Submits a sell order.
+Places a sell order.
 
 Parameters:
 
-- `price` (number, required): The order price.
-- `amount` (number, required): The order amount.
-- `arg` (string / number / bool / object / array / any, optional): Extended parameters; multiple ```arg``` parameters can be passed. Parameters of types such as string and number are output to the log of this order (multiple parameters are joined with spaces). The last parameter of object type is not output to the log; instead, it is used as order options. Supported keys include: ```type``` (the value can only be ```market``` or ```limit```, used to explicitly specify a market order or limit order), ```tif```, ```reduceOnly```, ```postOnly```; the remaining keys are passed to the exchange as exchange-specific parameters, e.g. ```{"slippage":0.01}```.
+- `price` (number, required): Order price.
+- `amount` (number, required): Order size.
+- `arg` (string / number / bool / object / array / any, optional): Extension parameters; multiple ```arg``` parameters can be passed in. Strings, numbers and similar values are written to this order log (joined with spaces). The last object argument is not written to the log; it is used as order options with the keys ```type``` (must be ```market``` or ```limit```, explicitly selecting a market or limit order), ```tif```, ```reduceOnly``` and ```postOnly```.
 
-Returns (string / null value): Returns the order Id when the order is placed successfully, and a null value when the order fails. The ```Id``` attribute of the FMZ platform order `Order` structure consists of the exchange's symbol code and the exchange's original order Id, separated by an English comma. For example, the format of the order ```Id``` attribute for the spot trading pair ```ETH_USDT``` on the OKX exchange is: ```ETH-USDT,1547130415509278720```. When an order is placed by calling the ```exchange.Sell()``` function, the returned order ```Id``` is consistent with the ```Id``` attribute of the order `Order` structure.
+Returns (string / null value): Returns the order Id when the order is placed successfully, and returns a null value when the order fails. The ```Id``` property of the FMZ platform's `Order` structure consists of the exchange symbol code and the exchange's original order Id, separated by an English comma. For example, the ```Id``` property format of an order for the spot trading pair ```ETH_USDT``` on the OKX exchange is: ```ETH-USDT,1547130415509278720```. When calling the ```exchange.Sell()``` function to place an order, the returned order ```Id``` is consistent with the ```Id``` property of the order `Order` structure.
 
-The order ID returned by ```exchange.Sell()``` can be used to query order information and cancel orders.
+The order number returned by ```exchange.Sell()``` can be used to query order information and cancel orders.
 
 ```javascript
 function main(){
@@ -5396,7 +5687,7 @@ fn main() {
 }
 ```
 
-Before placing a cryptocurrency futures contract order, use the ```exchange.SetDirection()``` function to set the trade direction. Once set, ```exchange.Buy()``` and ```exchange.Sell()``` place orders in the set direction and must be paired accordingly: ```buy``` and ```closesell``` go with ```exchange.Buy()```, while ```sell``` and ```closebuy``` go with ```exchange.Sell()```. If the direction does not match the function, no error is reported; instead, the order is placed in the set direction (for example, calling ```exchange.Buy()``` after setting ```sell``` actually places a sell order that opens a short position), and an order opposite to what was expected may be placed.
+Before placing a cryptocurrency futures order, set the trading direction with the ```exchange.SetDirection()``` function. After that, ```exchange.Buy()``` and ```exchange.Sell()``` place orders in the direction that was set, so they must be used in matching pairs: ```buy``` and ```closesell``` with ```exchange.Buy()```, ```sell``` and ```closebuy``` with ```exchange.Sell()```. A mismatch does not raise an error; the order is placed in the direction that was set (for example, calling ```exchange.Buy()``` after setting ```sell``` actually places a sell order that opens a short position), which may produce an order opposite to what you intended.
 
 ```javascript
 function main() {
@@ -5456,12 +5747,12 @@ fn main() {
 }
 ```
 
-Spot market order example.
+Spot market order.
 
 ```javascript
-// For example, trading pair: ETH_BTC, sell at market price
+// For example, trading pair: ETH_BTC, sell with a market order
 function main() {
-    // Note: place a market sell order to sell 0.2 ETH
+    // Note: place a market order to sell, selling 0.2 ETH
     exchange.Sell(-1, 0.2)
 }
 ```
@@ -5472,26 +5763,24 @@ def main():
 ```
 
 ```rust
-// For example, trading pair: ETH_BTC, sell at market price
+// For example, trading pair: ETH_BTC, sell with a market order
 fn main() {
-    // Note: place a market sell order to sell 0.2 ETH
+    // Note: place a market order to sell, selling 0.2 ETH
     let _ = exchange.Sell(-1, 0.2);
 }
 ```
 
-When placing futures contract orders, make sure the trade direction is set correctly. After the direction is set by calling ```exchange.SetDirection()```, ```exchange.Sell()``` places orders in the set direction; if the direction does not match the function, no error is reported, and an order opposite to what was expected may be placed. Unless otherwise specified, the order amount on cryptocurrency futures exchanges is denominated in number of contracts.
+When placing orders for futures contracts, you must pay attention to whether the trading direction is set correctly. After the direction is set with ```exchange.SetDirection()```, ```exchange.Sell()``` places the order in that direction; a mismatch between the direction and the function does not raise an error and may produce an order opposite to what you intended. For cryptocurrency futures contract exchanges, the order size is denominated in number of contracts unless otherwise specified.
 
-Set the parameter ```price``` to ```-1``` to place a market order, provided that the exchange's order placement API supports market orders. When placing a market sell order on cryptocurrency spot, the order amount parameter ```amount``` is the quantity denominated in the trading currency. When placing a market order on cryptocurrency futures contracts, the order amount parameter ```amount``` is denominated in number of contracts. In live trading, a few cryptocurrency exchanges do not support the market order API.
+When the ```price``` parameter is set to ```-1```, it is used to place a market order, which requires the exchange's order interface to support market orders. When trading cryptocurrency spot with market orders, when placing a sell order, the order size parameter ```amount``` is denominated in the trading currency. When trading cryptocurrency futures contracts with market orders, the order size parameter ```amount``` is denominated in number of contracts. In live trading, a few cryptocurrency exchanges do not support the market order interface.
 
-If an older version of the docker is used, the order ```Id``` returned by the ```exchange.Sell()``` function may differ from the format described in the current documentation.
+If you are using an older version of the docker, the order ```Id``` returned by the ```exchange.Sell()``` function may differ from the returned order ```Id``` described in the current documentation.
 
-```exchange.Sell()``` is subject to the rate limit settings of ```CreateOrder```; see `API Rate Limiting` for details.
-
-Unsupported exchanges: `Web3`; calling it on them reports an error and returns a null value. See the `Capability Matrix` for the support status of each exchange.
+```exchange.Sell()``` is subject to the rate limit set for ```CreateOrder```; see `API rate limiting`.
 
 Exchanges that do not support this function: `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
 
-See also: `exchange.Buy`, `exchange.SetContractType`, `exchange.SetDirection`, `exchange.IO`, `API Rate Limiting`
+See also: `exchange.Buy`, `exchange.SetContractType`, `exchange.SetDirection`, `exchange.IO`, `API rate limiting`
 
 #### exchange.CreateOrder
 
@@ -5500,84 +5789,50 @@ exchange.CreateOrder(symbol, side, price, amount)
 exchange.CreateOrder(symbol, side, price, amount, ...args)
 ```
 
-Places an order.
+Places orders.
 
 Parameters:
 
-- `symbol` (string, required): The trading symbol of the order, e.g. ```BTC_USDT``` on a spot exchange object or ```BTC_USDT.swap``` on a futures exchange object. For the notation (including options), see `Symbol Codes`.
-- `side` (string, required): Trade direction: for spot, ```buy``` (buy) or ```sell``` (sell); for futures, ```buy``` (open long), ```sell``` (open short), ```closebuy``` (close long) or ```closesell``` (close short). Exchange-specific parameters can be appended; see the remarks.
-- `price` (number, required): The order price. A price of -1 indicates a market order.
-- `amount` (number, required): The order quantity. Note: for a **spot market buy order**, the quantity is the amount of quote currency to spend; on a few spot exchanges the quantity of a market buy order is the number of coins rather than the amount spent. See the notes on each exchange's page for details. For futures exchange objects, when placing orders with the ```CreateOrder()```/```Buy()```/```Sell()``` functions, the ```amount``` parameter is the number of contracts unless otherwise specified.
-- `arg` (string / number / bool / object / array / any, optional): Extended parameters; multiple ```arg``` parameters can be passed. String, number and similar parameters are written to the log entry for this order (multiple parameters are joined with spaces). The last object parameter is not written to the log but serves as order options. Supported keys include: ```type``` (only ```market``` or ```limit```, to explicitly specify a market or limit order), ```tif```, ```reduceOnly``` and ```postOnly```. Any other keys are passed to the exchange as exchange-specific parameters, equivalent to appending ```"side;{JSON对象}"``` to the ```side``` parameter (for duplicate keys, the value in ```side``` takes precedence), e.g. ```{"slippage":0.01}```.
+- `symbol` (string, required): The instrument of the order, for example ```BTC_USDT``` on a spot exchange object or ```BTC_USDT.swap``` on a futures exchange object; the notation (including options) is described in `Symbols`.
+- `side` (string, required): Trading direction: on spot ```buy``` or ```sell```; on futures ```buy``` (open long), ```sell``` (open short), ```closebuy``` (close long) or ```closesell``` (close short). Exchange-specific parameters can be attached, see the remarks.
+- `price` (number, required): Price of the order. When the price is -1, it indicates that the order is a market order.
+- `amount` (number, required): Order quantity. Note that when the order is a **spot market buy order**, the order quantity represents the purchase amount; on a few spot exchanges the amount of a market buy order is the number of base coins rather than a quote amount; see the notes on each exchange page. For futures exchange objects, when using the ```CreateOrder()```/```Buy()```/```Sell()``` functions to place orders, unless otherwise specified, the order quantity parameter ```amount``` is denominated in number of contracts.
+- `arg` (string / number / bool / object / array / any, optional): Extension parameters; multiple ```arg``` parameters can be passed in. Strings, numbers and similar values are written to this order log (joined with spaces). The last object argument is not written to the log; it is used as order options with the keys ```type``` (must be ```market``` or ```limit```, explicitly selecting a market or limit order), ```tif```, ```reduceOnly``` and ```postOnly```.
 
-Returns (string / null value): Returns the order Id if the order is placed successfully, or a null value if it fails. The ```Id``` attribute of the FMZ platform's order `Order` structure consists of the exchange's symbol code and the exchange's original order Id, separated by a comma. For example, for an order on the OKX spot trading pair ```ETH_USDT```, the ```Id``` attribute has the format ```ETH-USDT,1547130415509278720```.
-When an order is placed by calling ```exchange.CreateOrder(symbol, side, price, amount)```, the returned order ```Id``` matches the ```Id``` attribute of the order `Order` structure.
+Returns (string / null value): Returns the order Id when the order is placed successfully, and returns a null value when the order fails. The ```Id``` property of the FMZ platform's `Order` structure consists of the exchange symbol code and the exchange's original order Id, separated by a comma. For example, the ```Id``` property of an order for the spot trading pair ```ETH_USDT``` on the OKX exchange has the format: ```ETH-USDT,1547130415509278720```.
 
-Both spot and futures exchange objects can place orders with the ```exchange.CreateOrder()``` function.
+When calling the ```exchange.CreateOrder(symbol, side, price, amount)``` function to place an order, the returned order ```Id``` is consistent with the ```Id``` property of the order `Order` structure.
+
+Both spot exchange objects and futures exchange objects place orders by calling the ```exchange.CreateOrder()``` function.
 
 ```javascript
 function main() {
-    var id = exchange.CreateOrder("BTC_USDT", "buy", 60000, 0.01)           // Order placed by a spot exchange object; the trading pair is BTC_USDT spot
-    // var id = exchange.CreateOrder("BTC_USDT.swap", "buy", 60000, 0.01)   // Order placed by a futures exchange object; the contract is the BTC USDT-margined perpetual swap
+    var id = exchange.CreateOrder("BTC_USDT", "buy", 60000, 0.01)           // Spot exchange object places an order, trading the BTC_USDT spot trading pair
+    // var id = exchange.CreateOrder("BTC_USDT.swap", "buy", 60000, 0.01)   // Futures exchange object places an order, trading BTC's USDT-margined perpetual contract
     Log("Order Id:", id)
 }
 ```
 
 ```python
 def main():
-    id = exchange.CreateOrder("BTC_USDT", "buy", 60000, 0.01)          # Order placed by a spot exchange object; the trading pair is BTC_USDT spot
-    # id = exchange.CreateOrder("BTC_USDT.swap", "buy", 60000, 0.01)   # Order placed by a futures exchange object; the contract is the BTC USDT-margined perpetual swap
+    id = exchange.CreateOrder("BTC_USDT", "buy", 60000, 0.01)          # Spot exchange object places an order, trading the BTC_USDT spot trading pair
+    # id = exchange.CreateOrder("BTC_USDT.swap", "buy", 60000, 0.01)   # Futures exchange object places an order, trading BTC's USDT-margined perpetual contract
     Log("Order Id:", id)
 ```
 
 ```rust
 fn main() {
-    let id = exchange.CreateOrder("BTC_USDT", "buy", 60000, 0.01);           // Order placed by a spot exchange object; the trading pair is BTC_USDT spot
-    // let id = exchange.CreateOrder("BTC_USDT.swap", "buy", 60000, 0.01);   // Order placed by a futures exchange object; the contract is the BTC USDT-margined perpetual swap
+    let id = exchange.CreateOrder("BTC_USDT", "buy", 60000, 0.01);           // Spot exchange object places an order, trading the BTC_USDT spot trading pair
+    // let id = exchange.CreateOrder("BTC_USDT.swap", "buy", 60000, 0.01);   // Futures exchange object places an order, trading BTC's USDT-margined perpetual contract
     Log!("Order Id:", id);
 }
 ```
 
-Place an order with exchange-specific parameters passed in the last argument, an object (recommended).
+Place an order with additional parameters (option), used to pass exchange-specific parameters.
 
 ```javascript
 function main() {
-    // selfTradePreventionMode is not an order option, so it is passed through to the exchange unchanged (Binance Futures self-trade prevention mode)
-    var id = exchange.CreateOrder("SOL_USDT.swap", "buy", 150, 1, {selfTradePreventionMode: "EXPIRE_MAKER"})
-    Log("Order Id:", id)
-
-    Sleep(2000)
-    Log(exchange.GetOrder(id))
-}
-```
-
-```python
-def main():
-    # selfTradePreventionMode is not an order option, so it is passed through to the exchange unchanged (Binance Futures self-trade prevention mode)
-    id = exchange.CreateOrder("SOL_USDT.swap", "buy", 150, 1, {"selfTradePreventionMode": "EXPIRE_MAKER"})
-    Log("Order Id:", id)
-
-    Sleep(2000)
-    Log(exchange.GetOrder(id))
-```
-
-```rust
-fn main() {
-    // In Rust, use the function with the WithOptions suffix to pass the object argument
-    let opts = JSONParse(r#"{"selfTradePreventionMode": "EXPIRE_MAKER"}"#).unwrap();
-    let id = exchange.CreateOrderWithOptions("SOL_USDT.swap", "buy", 150, 1, &opts).unwrap();
-    Log!("Order Id:", id);
-
-    Sleep(2000);
-    Log!(exchange.GetOrder(&id));
-}
-```
-
-When a parameter name clashes with an order option (for example, ```type``` for Binance trailing stop orders), the parameter can only be passed by appending it after the ```side``` parameter (legacy syntax).
-
-```javascript
-function main() {
-    // type clashes with an order option, so it can only be passed by appending it after the side parameter
+    // Pass the option parameter in JSON format
     var option = {
         "type": "TRAILING_STOP_MARKET",
         "activationPrice": "2300",
@@ -5596,7 +5851,7 @@ function main() {
 import json
 
 def main():
-    # type clashes with an order option, so it can only be passed by appending it after the side parameter
+    # Pass the option parameter in JSON format
     option = {
         "type": "TRAILING_STOP_MARKET",
         "activationPrice": "2300",
@@ -5612,7 +5867,7 @@ def main():
 
 ```rust
 fn main() {
-    // type clashes with an order option, so it can only be passed by appending it after the side parameter
+    // Pass the option parameter in JSON format (Rust does not support JSON.stringify, so construct the JSON text directly using a raw string)
     let option = r#"{"type": "TRAILING_STOP_MARKET", "activationPrice": "2300", "callbackRate": "0.1"}"#;
     let sideWithOption = format!("buy;{}", option);
     let id = exchange.CreateOrder("SOL_USDT.swap", &sideWithOption, -1, 1).unwrap();
@@ -5623,40 +5878,37 @@ fn main() {
 }
 ```
 
-Exchange-specific parameters (options) should go in the last argument, as an object. For example, in ```exchange.CreateOrder(symbol, "buy", price, amount, {timeInForce: "GTX"})```, the keys ```type```, ```tif```, ```reduceOnly``` and ```postOnly``` are order options. All other keys are passed through to the exchange unchanged. In Rust, use ```exchange.CreateOrderWithOptions()``` to pass the object argument.
+Additional parameters (option) can be passed via the ```side``` parameter to specify exchange-specific parameters. The additional parameters must be merged into the ```side``` parameter, in the format ```"side;{JSON object}"``` (recommended) or ```"side;key=value&key=value"``` (URL-encoded format). For example: ```"buy;{\"type\":\"TRAILING_STOP_MARKET\"}"```.
 
-Each exchange supports its own set of option parameters; refer to the exchange's API documentation for details. Common parameters include order type (type), time in force (timeInForce), activation price (activationPrice), callback rate (callbackRate) and others.
+The option parameters supported by different exchanges vary. The specific supported parameters are subject to the exchange's API documentation. Common parameters include: order type (type), time in force (timeInForce), activation price (activationPrice), callback rate (callbackRate), etc.
 
-When you use option parameters, you must still provide the ```price``` and ```amount``` arguments. If the option object also sets the matching exchange API parameters, those values may override the base arguments. The exact behavior depends on the exchange's API implementation.
+When using the option parameters, you still need to provide the ```price``` and ```amount``` parameters. If certain parameters have already been passed via option, these base parameters may be overridden by the corresponding parameters in option; the specific behavior depends on the exchange's API implementation.
 
-On on-chain swap exchanges such as Uniswap and Jupiter, an order is swapped at once rather than resting on the order book. For a limit order, ```price``` is the worst acceptable execution price, and the on-chain transaction enforces it. If the current quote cannot meet that price, the call returns an error and no transaction is sent. A market order (```price``` set to -1) is protected by the slippage setting, and for a market buy ```amount``` is the amount of quote currency to spend. For the order ID format, whether orders can be canceled and the supported extra parameters, see the page for each exchange, such as `Uniswap` and `Jupiter`.
+On-chain swap exchanges (such as Uniswap and Jupiter) swap immediately when an order is placed; nothing rests on a book. For a limit order ```price``` is the worst acceptable fill price, enforced on chain, and the call fails without sending a transaction if the current quote cannot reach it; market orders (```price``` of -1) are protected by the slippage setting, and for a market buy ```amount``` is the quote currency to spend. Order IDs, cancelation and the supported order options are described on the exchange pages, for example `Uniswap` and `Jupiter`.
 
-You can also append parameters to the ```side``` argument (legacy syntax), as ```"side;{JSON object}"``` or ```"side;key=value&key=value"``` (URL-encoded), for example ```'buy;{"type":"TRAILING_STOP_MARKET","activationPrice":"2300"}'```. An exchange parameter with the same name as an order option, such as Binance's ```type```, can only be passed with this syntax. If both syntaxes pass a parameter with the same name, the value in ```side``` takes precedence. Which parameters are supported depends on the exchange API.
-
-Unsupported exchanges: `Web3`. Calling this function on these exchanges raises an error and returns a null value. To compare support across exchanges, see the `capability matrix`.
+The ```side``` argument can carry exchange-specific parameters to pass exchange-specific parameters (such as the order type or time-in-force): write ```"side;{JSON object}"``` or ```"side;key=value&key=value"```, for example ```'buy;{"type":"TRAILING_STOP_MARKET","activationPrice":"2300"}'``` or ```"buy;type=TRAILING_STOP_MARKET&activationPrice=2300"```. Which parameters are supported depends on the exchange API.
 
 Exchanges that do not support this function: `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
 
-See also: `exchange.Buy`, `exchange.Sell`, `exchange.ModifyOrder`
+See also: `exchange.Buy`, `exchange.Sell`,
+  `exchange.ModifyOrder`
 
 #### exchange.ModifyOrder
 
 ```
 exchange.ModifyOrder(orderId, side, price, amount)
-exchange.ModifyOrder(orderId, side, price, amount, options)
 ```
 
-Modifies the price and quantity of an existing regular order. You can also change other order attributes through extra parameters, if the exchange API supports it.
+Modifies an existing regular order, allowing you to modify the order's price and quantity. This function supports modifying other order attributes via additional parameters (depending on the support of the exchange API).
 
 Parameters:
 
-- `orderId` (string, required): ID of the original order to modify. It uses the same format as the order ID returned by the `exchange.CreateOrder` function: the exchange symbol code and the exchange's original order ID, separated by a comma. For example: ```"ETH-USDT,1547130415509278720"```.
-- `side` (string, required): Trade direction. For spot: ```buy``` (buy) and ```sell``` (sell). For futures: ```buy``` (open long), ```sell``` (open short), ```closebuy``` (close long) and ```closesell``` (close short). You can append exchange-specific parameters. See the remarks for details.
-- `price` (number, required): New price of the order. Set it to -1 (or any other value less than or equal to 0) to keep the price unchanged.
-- `amount` (number, required): New order quantity. Set it to -1 (or any other value less than or equal to 0) to keep the quantity unchanged. You must change the price, the quantity or both. If you leave both unchanged, an error is reported and a null value is returned. Note: for a **spot market buy order**, the order quantity is the amount of quote currency to spend. On a few spot exchanges, the quantity of a market buy order is the number of coins to buy.
-- `options` (object, optional): Exchange-specific parameters. The object's keys are passed to the exchange as they are, for example ```{"priceMatch":"QUEUE_20"}```. An ```extra``` sub-object is expanded first. In Rust, pass them through ```exchange.ModifyOrderWithOptions()```.
+- `orderId` (string, required): ID of the original order to be modified. The order ID format is consistent with the order ID returned by the `exchange.CreateOrder` function, consisting of the exchange symbol code and the exchange's original order ID, separated by an English comma. For example: ```"ETH-USDT,1547130415509278720"```.
+- `side` (string, required): Trading direction: on spot ```buy``` or ```sell```; on futures ```buy``` (open long), ```sell``` (open short), ```closebuy``` (close long) or ```closesell``` (close short). Exchange-specific parameters can be attached, see the remarks.
+- `price` (number, required): New price of the order. A price of -1 (or any other value less than or equal to 0) means the price is not modified.
+- `amount` (number, required): New order quantity. A quantity of -1 (or any other value less than or equal to 0) means the quantity is not modified; the price and the quantity cannot both be left unmodified, otherwise an error is reported and a null value is returned. Note that when the order is a **spot market buy order**, the order quantity represents the buy amount; for the market buy orders of certain spot exchanges, the order quantity is the amount of the trading currency.
 
-Returns (string / null value): Returns the order ID if the modification succeeds, or a null value if it fails. The returned order ID may be the same as the original order ID or different, depending on the exchange API: some exchanges return a new order ID after the order is modified, while others keep the same order ID.
+Returns (string / null value): Returns the order ID when the order modification succeeds, and returns a null value when the modification fails. The returned order ID may be the same as the original order ID or different, depending on the exchange API implementation. Some exchanges return a new order ID after modifying the order, while others keep the order ID unchanged.
 
 Modify the price and quantity of a regular order.
 
@@ -5737,7 +5989,7 @@ fn main() {
 }
 ```
 
-Modifies an order's price match mode through the extra parameter (option).
+Use the additional parameter (option) to modify the order's price match mode.
 
 ```javascript
 function main() {
@@ -5746,8 +5998,12 @@ function main() {
     Log("Original Order ID:", id)
     Sleep(2000)
 
-    // Modify the order and set the price match mode to QUEUE_20 (exchange-specific parameters are passed in through the last object parameter)
-    var newId = exchange.ModifyOrder(id, "buy", -1, 2, {priceMatch: "QUEUE_20"})
+    // Modify the order and set the price match mode to QUEUE_20
+    // Pass the additional parameter (JSON format) via the side parameter
+    var option = {"priceMatch": "QUEUE_20"}
+    var sideWithOption = "buy;" + JSON.stringify(option)
+
+    var newId = exchange.ModifyOrder(id, sideWithOption, -1, 2)
     Log("Modified Order ID:", newId)
     Sleep(2000)
 
@@ -5761,14 +6017,20 @@ function main() {
 ```
 
 ```python
+import json
+
 def main():
     # Create a limit buy order
     id = exchange.CreateOrder("SOL_USDT.swap", "buy", 77, 1)
     Log("Original Order ID:", id)
     Sleep(2000)
 
-    # Modify the order and set the price match mode to QUEUE_20 (exchange-specific parameters are passed in through the last object parameter)
-    newId = exchange.ModifyOrder(id, "buy", -1, 2, {"priceMatch": "QUEUE_20"})
+    # Modify the order and set the price match mode to QUEUE_20
+    # Pass the additional parameter (JSON format) via the side parameter
+    option = {"priceMatch": "QUEUE_20"}
+    sideWithOption = "buy;" + json.dumps(option)
+
+    newId = exchange.ModifyOrder(id, sideWithOption, -1, 2)
     Log("Modified Order ID:", newId)
     Sleep(2000)
 
@@ -5787,9 +6049,12 @@ fn main() {
     Log!("Original Order ID:", id);
     Sleep(2000);
 
-    // Modify the order and set the price match mode to QUEUE_20 (in Rust, object parameters are passed in through the function with the WithOptions suffix)
-    let opts = JSONParse(r#"{"priceMatch": "QUEUE_20"}"#).unwrap();
-    let newId = exchange.ModifyOrderWithOptions(&id, "buy", -1, 2, &opts).unwrap();
+    // Modify the order and set the price match mode to QUEUE_20
+    // Pass the additional parameter (JSON format) via the side parameter; Rust does not support JSON.stringify, so construct the JSON text directly using a raw string
+    let option = r#"{"priceMatch": "QUEUE_20"}"#;
+    let sideWithOption = format!("buy;{}", option);
+
+    let newId = exchange.ModifyOrder(&id, &sideWithOption, -1, 2).unwrap();
     Log!("Modified Order ID:", newId);
     Sleep(2000);
 
@@ -5802,23 +6067,23 @@ fn main() {
 }
 ```
 
-The order ID returned by the ```exchange.ModifyOrder()``` function depends on how the exchange API is implemented: some exchanges return an updated order ID, while others keep the original order ID. Use the returned order ID in later operations.
+The order ID returned by the ```exchange.ModifyOrder()``` function may behave differently depending on the exchange API implementation. Some exchange APIs return an updated order ID, while others keep it unchanged. It is recommended to use the returned new order ID for subsequent operations.
 
-If -1 (or any value less than or equal to 0) is passed as the price or amount parameter of the ```exchange.ModifyOrder()``` function, that field is not sent to the exchange and stays unchanged. If neither field is changed, the function reports an error and returns a null value. Other parameters are not checked against the exchange's API rules and are sent directly to the exchange API.
+When the price or quantity passed to the ```exchange.ModifyOrder()``` function is -1 (a value less than or equal to 0), that item is not sent to the exchange, meaning it is not modified; if neither is modified, an error is reported and a null value is returned. Other parameters are not validated against the exchange interface rules and are submitted directly to the exchange API.
 
-Exchange-specific parameters (option) go in the last parameter, an object, and change other attributes of the order. For example, to change the price match mode: ```exchange.ModifyOrder(id, "buy", -1, 2, {priceMatch: "QUEUE_20"})```. In Rust, use ```exchange.ModifyOrderWithOptions()```.
+Supports passing additional parameters (option) via the ```side``` parameter to modify other order attributes. Additional parameters must be merged with the ```side``` parameter before being passed in, in the format ```"side;{JSON object}"``` (recommended) or ```"side;key=value"``` (URL-encoded format). For example, to modify the price match mode: ```"buy;{\"priceMatch\":\"QUEUE_20\"}"```.
 
-Whether a market order among regular orders can be modified depends on the exchange API. Some exchanges do not support modifying market orders.
+For modifying market orders among regular orders, you need to check specifically whether the exchange API supports it. Some exchanges do not support modifying market orders.
 
-When an order is modified, its other attributes (such as order type, position mode, account mode, leverage and time in force) usually keep the original order's settings. To change these attributes, pass them through the extra parameter (option), if the exchange API supports it.
+When modifying an order, the order's other attributes (such as order type, position mode, account mode, leverage, order time-in-force rules, etc.) usually retain the settings of the original order. If you need to modify these attributes, they can be passed in via additional parameters (option), provided the exchange API supports it.
 
-For spot market buy orders, the order amount may be in quote currency (the amount to spend) rather than the number of coins.
+For spot market buy orders, note that the unit of the order quantity may be the amount rather than the number of coins.
 
-Support for order modification varies by exchange. Some exchanges do not support modifying orders, or only allow some parameters to be changed. Check the exchange's API documentation before use.
+Support for the order modification feature depends on the specific exchange; some exchanges may not support the order modification feature, or may only support modifying certain parameters. Please consult the API documentation of the corresponding exchange before use.
 
-Parameters can also be appended to the ```side``` parameter (legacy syntax), in the format ```"side;{JSON对象}"``` or ```"side;key=value&key=value"```, for example ```"buy;{\"priceMatch\":\"QUEUE_20\"}"``` or ```"buy;priceMatch=QUEUE_20"```. The supported parameters depend on the exchange API.
+The ```side``` argument can carry exchange-specific parameters to modify other attributes of the order (such as the price match mode): write ```"side;{JSON object}"``` or ```"side;key=value&key=value"```, for example ```"buy;{\"priceMatch\":\"QUEUE_20\"}"``` or ```"buy;priceMatch=QUEUE_20"```. Which parameters are supported depends on the exchange API.
 
-Only these exchanges support this function: `Binance`, `Futures_Binance`, `Bitfinex`, `Futures_Bitfinex`, `Bitget`, `Futures_Bitget`, `Bybit`, `Futures_Bybit`, `Crypto`, `Futures_Crypto`, `Futures_DeepCoin`, `Futures_Deribit`, `GateIO`, `Futures_GateIO`, `HitBTC`, `Kraken`, `Futures_Kraken`, `KuCoin`, `Futures_MEXC`, `OKEX`, `Futures_OKCoin`, `Poloniex`, `Upbit`, `WOO`, `Futures_WOO`, `Hyperliquid`, `Futures_Hyperliquid`, `Futures_Lighter`, `Futures_Aevo`, `Futures_Boros`, `Futures_WOOFi`, `Jupiter`, `Futures_Futu`. On every other exchange the call fails with an error and returns null; for all exchanges see `Capability Matrix`.
+Only these exchanges support this function: `Binance`, `Futures_Binance`, `Bitfinex`, `Futures_Bitfinex`, `Bitget`, `Futures_Bitget`, `Bybit`, `Futures_Bybit`, `Crypto`, `Futures_Crypto`, `Futures_DeepCoin`, `Futures_Deribit`, `GateIO`, `Futures_GateIO`, `HitBTC`, `Kraken`, `Futures_Kraken`, `KuCoin`, `Futures_MEXC`, `OKEX`, `Futures_OKCoin`, `Poloniex`, `Upbit`, `WOO`, `Futures_WOO`, `Hyperliquid`, `Futures_Hyperliquid`, `Futures_Lighter`, `Futures_Aevo`, `Futures_Boros`, `Futures_WOOFi`, `Futures_Futu`. On every other exchange the call fails with an error and returns null; for all exchanges see `Capability Matrix`.
 
 See also: `exchange.CreateOrder`, `exchange.CancelOrder`, `exchange.GetOrder`, `exchange.GetOrders`
 
@@ -5927,7 +6192,7 @@ fn main() {
 
 If you are using an older version of the docker (hosting agent), the parameter ```orderId``` of the ```exchange.CancelOrder()``` function may differ from the ```orderId``` described in the current documentation.
 
-Exchanges that do not support this function: `OKX_DEX`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
+Exchanges that do not support this function: `Jupiter`, `OKX_DEX`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
 
 See also: `exchange.Buy`, `exchange.Sell`, `exchange.GetOrders`, `exchange.ModifyOrder`
 
@@ -5992,7 +6257,7 @@ Exchanges that serve this function through a fallback: the exchange's API does n
 The exchange has no such endpoint; the docker implements the function:
 
 - `Coincheck`: The exchange has no single-order query interface, so the order is looked up among the current open orders; the exchange provides no historical order query, so filled or canceled orders cannot be found (null is returned).
-- `Zaif`: The exchange has no single-order query interface, so the order is looked up among the current open orders and the historical orders. The historical orders are rebuilt from trade records whose ```Id``` is not guaranteed to equal the order ID, so a completed order may not be found.
+- `Zaif`: The exchange has no single-order query interface, so the order is looked up among the current open orders and the historical orders.
 
 See also: `Order`, `exchange.GetOrders`, `exchange.GetHistoryOrders`, `exchange.ModifyOrder`
 
@@ -6375,7 +6640,7 @@ fn main() {
 
 - This function is only supported by exchanges that provide a historical order query interface.
 
-Exchanges that do not support this function: `Bitstamp`, `Coincheck`, `Uniswap`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Futures_IB`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
+Exchanges that do not support this function: `Bitstamp`, `Coincheck`, `Uniswap`, `Jupiter`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Futures_IB`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
 
 See also: `Order`, `exchange.GetOrder`, `exchange.GetOrders`
 
@@ -6386,27 +6651,27 @@ exchange.CreateConditionOrder(symbol, side, amount, condition)
 exchange.CreateConditionOrder(symbol, side, amount, condition, ...args)
 ```
 
-Creates a conditional order. A conditional order is executed automatically once its trigger condition is met.
+Creates a conditional order. A conditional order is a type of order that is automatically executed when specific trigger conditions are met.
 
 Parameters:
 
-- `symbol` (string, required): The trading symbol of the conditional order, e.g. ```BTC_USDT``` on a spot exchange object or ```BTC_USDT.swap``` on a futures exchange object. See `Symbol Codes` for how to write symbol codes, including options.
-- `side` (string, required): The trade direction. For spot: ```buy``` (buy) and ```sell``` (sell). For futures: ```buy``` (open long), ```sell``` (open short), ```closebuy``` (close long) and ```closesell``` (close short). Exchange-specific parameters can be appended; see Remarks.
-- `amount` (number, required): The order quantity of the conditional order. Note: for a **spot market buy order**, the quantity is the amount to spend. On a few spot exchanges, the quantity of a market buy order is the number of coins rather than the amount to spend; see the notes on each exchange's page. For futures exchange objects, the ```amount``` parameter is always the number of contracts.
-- `condition` (object, required): The trigger condition and execution price of the conditional order. See `Condition` for its structure. See Remarks for the prices each condition type requires.
-- `arg` (string / number / bool / object / array / any, optional): Extended parameters. You can pass more than one ```arg``` parameter. String, number and similar parameters are written to the log of this conditional order, joined by spaces. Object parameters are not logged. They are passed unchanged to the exchange as exchange-specific parameters. The ```extra``` sub-object is unpacked first and then merged with the parameters appended to ```side```. In Rust, use ```exchange.CreateConditionOrderWithOptions()``` to pass object parameters.
+- `symbol` (string, required): The instrument of the condition order, for example ```BTC_USDT``` on a spot exchange object or ```BTC_USDT.swap``` on a futures exchange object; the notation (including options) is described in `Symbols`.
+- `side` (string, required): Trading direction: on spot ```buy``` or ```sell```; on futures ```buy``` (open long), ```sell``` (open short), ```closebuy``` (close long) or ```closesell``` (close short). Exchange-specific parameters can be attached, see the remarks.
+- `amount` (number, required): Order size of the conditional order. Note that when the order is a **spot market buy order**, the order size represents the purchase amount; on a few spot exchanges the amount of a market buy order is the number of base coins rather than a quote amount; see the notes on each exchange page. For a futures exchange object, the order size parameter ```amount``` is always measured in the number of contracts.
+- `condition` (object, required): The trigger conditions and order prices of the conditional order, see `Condition`; see the remarks for the prices each condition type requires.
+- `arg` (string / number / bool / object / array / any, optional): Extension parameters; multiple ```arg``` parameters can be passed in. Strings, numbers and similar values are written to the log of this conditional order (joined with spaces). An object argument is not written to the log; it is passed to the exchange API as additional parameters (merged with the additional parameters in the ```side``` parameter).
 
-Returns (string / null value): Returns the conditional order Id on success and a null value on failure. A conditional order Id has a similar format to a regular order Id: the exchange's symbol code and the exchange's original conditional order Id, separated by a comma.
+Returns (string / null value): When the conditional order is created successfully, the conditional order Id is returned; when creation fails, a null value is returned. The format of the conditional order Id is similar to that of an ordinary order Id, consisting of the exchange symbol code and the exchange's original conditional order Id, separated by an English comma.
 
-Create a take-profit (TP) order that sells automatically once the price rises to the target level.
+Create a take-profit order (TP): automatically sell when the price rises to the target price.
 
 ```javascript
 function main() {
-    // Create a take-profit order: when the BTC_USDT price rises to 65000, sell 0.01 BTC at a price of 65000
+    // Create a take-profit order: when the BTC_USDT price rises to 65000, sell 0.01 BTC at the price of 65000
     var condition = {
         ConditionType: ORDER_CONDITION_TYPE_TP,  // Take-profit order
         TpTriggerPrice: 65000,   // Trigger price
-        TpOrderPrice: 65000      // Order price; can also be set to -1 to place a market order
+        TpOrderPrice: 65000      // Execution price, can also be set to -1 for a market order
     }
     var id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition)
     Log("TP order Id:", id)
@@ -6415,11 +6680,11 @@ function main() {
 
 ```python
 def main():
-    # Create a take-profit order: when the BTC_USDT price rises to 65000, sell 0.01 BTC at a price of 65000
+    # Create a take-profit order: when the BTC_USDT price rises to 65000, sell 0.01 BTC at the price of 65000
     condition = {
         "ConditionType": ORDER_CONDITION_TYPE_TP,  # Take-profit order
         "TpTriggerPrice": 65000,   # Trigger price
-        "TpOrderPrice": 65000      # Order price; can also be set to -1 to place a market order
+        "TpOrderPrice": 65000      # Execution price, can also be set to -1 for a market order
     }
     id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition)
     Log("TP order Id:", id)
@@ -6427,11 +6692,11 @@ def main():
 
 ```rust
 fn main() {
-    // Create a take-profit order: when the BTC_USDT price rises to 65000, sell 0.01 BTC at a price of 65000
+    // Create a take-profit order: when the BTC_USDT price rises to 65000, sell 0.01 BTC at the price of 65000
     let condition = OrderCondition {
         ConditionType: ORDER_CONDITION_TYPE_TP,  // Take-profit order
         TpTriggerPrice: 65000.0,   // Trigger price
-        TpOrderPrice: 65000.0,     // Order price; can also be set to -1 to place a market order
+        TpOrderPrice: 65000.0,     // Execution price, can also be set to -1 for a market order
         ..Default::default()
     };
     let id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, &condition);
@@ -6439,15 +6704,15 @@ fn main() {
 }
 ```
 
-Create a stop-loss (SL) order that sells automatically once the price falls to the stop level.
+Create a stop-loss order (SL): when the price drops to the stop-loss trigger price, automatically sell in the configured manner.
 
 ```javascript
 function main() {
-    // Create a stop-loss order: when the BTC_USDT price falls to 58000, sell 0.01 BTC at market price
+    // Create a stop-loss order: when the BTC_USDT price drops to 58000, sell 0.01 BTC at market price
     var condition = {
         ConditionType: ORDER_CONDITION_TYPE_SL,  // Stop-loss order
         SlTriggerPrice: 58000,   // Trigger price
-        SlOrderPrice: -1         // -1 means place a market order
+        SlOrderPrice: -1         // -1 indicates a market order
     }
     var id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition)
     Log("SL order Id:", id)
@@ -6456,11 +6721,11 @@ function main() {
 
 ```python
 def main():
-    # Create a stop-loss order: when the BTC_USDT price falls to 58000, sell 0.01 BTC at market price
+    # Create a stop-loss order: when the BTC_USDT price drops to 58000, sell 0.01 BTC at market price
     condition = {
         "ConditionType": ORDER_CONDITION_TYPE_SL,  # Stop-loss order
         "SlTriggerPrice": 58000,   # Trigger price
-        "SlOrderPrice": -1         # -1 means place a market order
+        "SlOrderPrice": -1         # -1 indicates a market order
     }
     id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition)
     Log("SL order Id:", id)
@@ -6468,11 +6733,11 @@ def main():
 
 ```rust
 fn main() {
-    // Create a stop-loss order: when the BTC_USDT price falls to 58000, sell 0.01 BTC at market price
+    // Create a stop-loss order: when the BTC_USDT price drops to 58000, sell 0.01 BTC at market price
     let condition = OrderCondition {
         ConditionType: ORDER_CONDITION_TYPE_SL,  // Stop-loss order
         SlTriggerPrice: 58000.0,   // Trigger price
-        SlOrderPrice: -1.0,        // -1 means place a market order
+        SlOrderPrice: -1.0,        // -1 indicates a market order
         ..Default::default()
     };
     let id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, &condition);
@@ -6480,17 +6745,17 @@ fn main() {
 }
 ```
 
-Creates an OCO order: sets both a take-profit and a stop-loss at the same time. When either side is triggered, the order on the other side is canceled automatically.
+Create an OCO order: set take-profit and stop-loss simultaneously. Once either one is triggered, the other is automatically canceled.
 
 ```javascript
 function main() {
     // Create an OCO order: take-profit price 65000, stop-loss price 58000
     var condition = {
-        ConditionType: ORDER_CONDITION_TYPE_OCO,  // Condition type: OCO order
+        ConditionType: ORDER_CONDITION_TYPE_OCO,  // OCO order
         TpTriggerPrice: 65000,   // Take-profit trigger price
-        TpOrderPrice: 65000,     // Take-profit order price
+        TpOrderPrice: 65000,     // Take-profit execution price
         SlTriggerPrice: 58000,   // Stop-loss trigger price
-        SlOrderPrice: 58000      // Stop-loss order price
+        SlOrderPrice: 58000      // Stop-loss execution price
     }
     var id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition)
     Log("OCO order Id:", id)
@@ -6501,11 +6766,11 @@ function main() {
 def main():
     # Create an OCO order: take-profit price 65000, stop-loss price 58000
     condition = {
-        "ConditionType": ORDER_CONDITION_TYPE_OCO,  # Condition type: OCO order
+        "ConditionType": ORDER_CONDITION_TYPE_OCO,  # OCO order
         "TpTriggerPrice": 65000,   # Take-profit trigger price
-        "TpOrderPrice": 65000,     # Take-profit order price
+        "TpOrderPrice": 65000,     # Take-profit execution price
         "SlTriggerPrice": 58000,   # Stop-loss trigger price
-        "SlOrderPrice": 58000      # Stop-loss order price
+        "SlOrderPrice": 58000      # Stop-loss execution price
     }
     id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition)
     Log("OCO order Id:", id)
@@ -6515,33 +6780,34 @@ def main():
 fn main() {
     // Create an OCO order: take-profit price 65000, stop-loss price 58000
     let condition = OrderCondition {
-        ConditionType: ORDER_CONDITION_TYPE_OCO,  // Condition type: OCO order
+        ConditionType: ORDER_CONDITION_TYPE_OCO,  // OCO order
         TpTriggerPrice: 65000.0,   // Take-profit trigger price
-        TpOrderPrice: 65000.0,     // Take-profit order price
+        TpOrderPrice: 65000.0,     // Take-profit execution price
         SlTriggerPrice: 58000.0,   // Stop-loss trigger price
-        SlOrderPrice: 58000.0      // Stop-loss order price
+        SlOrderPrice: 58000.0      // Stop-loss execution price
     };
     let id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, &condition);
     Log!("OCO order Id:", id);
 }
 ```
 
-Creates a conditional order with an extra argument (option) that passes exchange-specific parameters.
+Create a conditional order with an additional parameter (option), used to pass exchange-specific parameters.
 
 ```javascript
 function main() {
-    // Exchange-specific parameters go in the last object argument
+    // Pass the option parameter in JSON format
     var option = {
         "type": "TRAILING_STOP_MARKET",
         "activatePrice": "300",
         "callbackRate": "0.1"
     }
+    var sideWithOption = "buy;" + JSON.stringify(option)
     var condition = {
         ConditionType: ORDER_CONDITION_TYPE_TP,
         TpTriggerPrice: 77,
         TpOrderPrice: 71
     }
-    var id = exchange.CreateConditionOrder("SOL_USDT.swap", "buy", 1, condition, option)
+    var id = exchange.CreateConditionOrder("SOL_USDT.swap", sideWithOption, 1, condition)
     Log("Condition Order Id:", id)
 
     Sleep(2000)
@@ -6550,19 +6816,22 @@ function main() {
 ```
 
 ```python
+import json
+
 def main():
-    # Exchange-specific parameters go in the last object argument
+    # Pass the option parameter in JSON format
     option = {
         "type": "TRAILING_STOP_MARKET",
         "activatePrice": "300",
         "callbackRate": "0.1"
     }
+    sideWithOption = "buy;" + json.dumps(option)
     condition = {
         "ConditionType": ORDER_CONDITION_TYPE_TP,
         "TpTriggerPrice": 77,
         "TpOrderPrice": 71
     }
-    id = exchange.CreateConditionOrder("SOL_USDT.swap", "buy", 1, condition, option)
+    id = exchange.CreateConditionOrder("SOL_USDT.swap", sideWithOption, 1, condition)
     Log("Condition Order Id:", id)
 
     Sleep(2000)
@@ -6571,15 +6840,16 @@ def main():
 
 ```rust
 fn main() {
-    // Rust passes the object argument through the function with the WithOptions suffix
-    let opts = JSONParse(r#"{"type": "TRAILING_STOP_MARKET", "activatePrice": "300", "callbackRate": "0.1"}"#).unwrap();
+    // Pass the option parameter in JSON format (Rust has no JSON serialization capability, so a raw string is used directly here to construct it)
+    let option = r#"{"type": "TRAILING_STOP_MARKET", "activatePrice": "300", "callbackRate": "0.1"}"#;
+    let sideWithOption = format!("buy;{}", option);
     let condition = OrderCondition {
         ConditionType: ORDER_CONDITION_TYPE_TP,
         TpTriggerPrice: 77.0,
         TpOrderPrice: 71.0,
         ..Default::default()
     };
-    let id = exchange.CreateConditionOrderWithOptions("SOL_USDT.swap", "buy", 1, &condition, &opts).unwrap();
+    let id = exchange.CreateConditionOrder("SOL_USDT.swap", &sideWithOption, 1, &condition).unwrap();
     Log!("Condition Order Id:", id);
 
     Sleep(2000);
@@ -6587,21 +6857,21 @@ fn main() {
 }
 ```
 
-Support for conditional orders depends on the specific exchange; some exchanges do not support conditional orders.
+Whether conditional orders are supported depends on the specific exchange; some exchanges may not support conditional orders.
 
-A conditional order does not tie up account funds before it is triggered; the order is actually placed and funds are tied up only after it is triggered.
+A conditional order does not lock up account funds before it is triggered; the order is only actually placed and funds are only committed after it is triggered.
 
-Exchanges differ in how far they support conditional orders and in the specific parameters they accept. Check the corresponding exchange's API documentation before use.
+Different exchanges may vary in their level of support for conditional orders and in the specific parameters involved. Please consult the API documentation of the corresponding exchange before use.
 
-Exchange-specific parameters (option) go in the last parameter as an object, for example ```exchange.CreateConditionOrder(symbol, "buy", amount, condition, {type: "TRAILING_STOP_MARKET", activatePrice: "300"})```. The keys in the object are passed to the exchange as is. In Rust, use ```exchange.CreateConditionOrderWithOptions()```.
+Additional parameters (option) can be passed via the ```side``` parameter to supply exchange-specific parameters. The additional parameters must be merged into the ```side``` parameter, in the format ```"side;{JSON object}"``` (recommended) or ```"side;key=value&key=value"``` (URL-encoded format). For example: ```"buy;{\"type\":\"TRAILING_STOP_MARKET\"}"```.
 
-The supported option parameters vary by exchange; refer to the exchange's API documentation for details. Common parameters include order type (type), time in force (timeInForce), activation price (activatePrice) and callback rate (callbackRate).
+The option parameters supported vary from exchange to exchange; the specific supported parameters depend on the exchange's API documentation. Common parameters include: order type (type), time in force (timeInForce), activation price (activatePrice), callback rate (callbackRate), and so on.
 
-The ```amount``` and ```condition``` parameters are still required when using option parameters. If some exchange API parameters are already passed through option, the corresponding parameters in option may override these basic parameters. The exact behavior depends on the exchange's API implementation.
+When using option parameters, you still need to provide the ```amount``` and ```condition``` parameters. If certain parameters in the exchange API have already been passed via option, these base parameters may be overridden by the corresponding parameters in option; the exact behavior depends on the exchange API's implementation.
 
-Parameters can also be appended after the ```side``` parameter (legacy syntax), written as ```"side;{JSON object}"``` or ```"side;key=value&key=value"```, for example ```"buy;{\"type\":\"TRAILING_STOP_MARKET\",\"activatePrice\":\"300\"}"``` or ```"buy;type=TRAILING_STOP_MARKET&activatePrice=300"```. The supported parameters depend on the exchange API.
+The ```side``` argument can carry exchange-specific parameters to pass exchange-specific parameters (such as the order type or time-in-force): write ```"side;{JSON object}"``` or ```"side;key=value&key=value"```, for example ```"buy;{\"type\":\"TRAILING_STOP_MARKET\",\"activatePrice\":\"300\"}"``` or ```"buy;type=TRAILING_STOP_MARKET&activatePrice=300"```. Which parameters are supported depends on the exchange API.
 
-The ```ConditionType``` of ```condition``` can be OCO, TP or SL from `ORDER_CONDITION_TYPE`. `ORDER_CONDITION_TYPE_GENERIC` appears only in query results (for exchange-specific conditional orders such as trailing stops). It cannot be used when creating or modifying a conditional order; passing it raises an error and returns a null value. Every trigger price and execution price required by the selected type must be passed and must not be 0 (OCO needs all four, TP needs the two take-profit prices, SL needs the two stop-loss prices); otherwise an error is raised and a null value is returned. An execution price of -1 means the order is executed as a market order once triggered.
+The ```ConditionType``` of ```condition``` is OCO, TP or SL from `ORDER_CONDITION_TYPE`; `ORDER_CONDITION_TYPE_GENERIC` only appears in query results (exchange-specific conditional orders such as trailing stops) and cannot be used to create or modify a conditional order: passing it fails with an error and returns a null value. The trigger and order prices used by the chosen type must all be given and non-zero (OCO needs all four, TP the two take-profit prices, SL the two stop-loss prices), otherwise the call fails and returns a null value; an order price of -1 executes a market order when triggered.
 
 Exchanges that do not support this function: `AscendEx`, `Bithumb`, `Bitstamp`, `Coinw`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Korbit`, `LBank`, `MEXC`, `Upbit`, `WEEX`, `Zaif`, `Hyperliquid`, `Pendle`, `Uniswap`, `Jupiter`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Futures_Polymarket`, `Futures_Futu`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
 
@@ -6611,22 +6881,20 @@ See also: `Condition`, `exchange.CancelConditionOrder`, `exchange.GetConditionOr
 
 ```
 exchange.ModifyConditionOrder(orderId, side, amount, condition)
-exchange.ModifyConditionOrder(orderId, side, amount, condition, options)
 ```
 
-Modifies an existing conditional order, including its order quantity, trigger condition and execution price. Other properties of the conditional order can also be modified through additional parameters, if the exchange API supports it.
+Modifies an existing conditional order, allowing modification of the order amount, trigger condition, and execution price of the conditional order. It supports modifying other properties of the conditional order through additional parameters (depending on the specific support of the exchange API).
 
 Parameters:
 
-- `orderId` (string, required): The ID of the conditional order to modify. It uses the same format as the conditional order ID returned by the `exchange.CreateConditionOrder` function: the exchange symbol code and the exchange's original conditional order Id, separated by a comma. For example: ```"SOL-USDT-SWAP,3196255845130256384"```.
-- `side` (string, required): Trade direction. For spot: ```buy``` (buy) and ```sell``` (sell). For futures: ```buy``` (open long), ```sell``` (open short), ```closebuy``` (close long) and ```closesell``` (close short). Exchange-specific parameters may be appended; see the Remarks for details.
-- `amount` (number, required): The new order quantity of the conditional order. It must be greater than 0. An invalid value such as -1 causes an error and returns a null value. For futures exchange objects, the order quantity parameter ```amount``` is always expressed in number of contracts.
-- `condition` (object, required): The new trigger condition and execution price of the conditional order. See `Condition` for its structure. See the Remarks for the prices required by each condition type.
-- `options` (object, optional): Exchange-specific parameters. The key-value pairs in this object are passed to the exchange unchanged, for example ```{"newTpTriggerPxType":"index"}```. The ```extra``` sub-object in it is flattened first. In Rust, pass them with ```exchange.ModifyConditionOrderWithOptions()```.
+- `orderId` (string, required): ID of the original conditional order to be modified. The format of the conditional order ID is consistent with the conditional order ID returned by the `exchange.CreateConditionOrder` function, consisting of the exchange symbol code and the exchange's original conditional order ID, separated by an English comma. For example: ```"SOL-USDT-SWAP,3196255845130256384"```.
+- `side` (string, required): Trading direction: on spot ```buy``` or ```sell```; on futures ```buy``` (open long), ```sell``` (open short), ```closebuy``` (close long) or ```closesell``` (close short). Exchange-specific parameters can be attached, see the remarks.
+- `amount` (number, required): New order amount of the conditional order. A value greater than 0 must be passed; an invalid value such as -1 reports an error and returns a null value. For futures exchange objects, the order amount parameter ```amount``` is denominated in the number of contracts.
+- `condition` (object, required): The new trigger conditions and order prices of the conditional order, see `Condition`; see the remarks for the prices each condition type requires.
 
-Returns (string / null value): Returns the conditional order Id if the modification succeeds, or a null value if it fails. The returned ID may be the same as the original conditional order ID or a different one, depending on the exchange API. Some exchanges return a new conditional order ID after a modification, while others keep the same ID.
+Returns (string / null value): When the conditional order is successfully modified, the conditional order ID is returned; when the modification fails, a null value is returned. The returned conditional order ID may be the same as the original conditional order ID, or it may be different, depending on the specific implementation of the exchange API. Some exchanges return a new conditional order ID after modifying the conditional order, while some exchanges keep the conditional order ID unchanged.
 
-Modifies the quantity and trigger conditions of a conditional order.
+Modify the quantity and trigger conditions of a conditional order.
 
 ```javascript
 function main() {
@@ -6640,7 +6908,7 @@ function main() {
     Log("Original Condition Order ID:", id)
     Sleep(2000)
 
-    // Query the original conditional order
+    // Query the original conditional order information
     var order = exchange.GetConditionOrder(id)
     Log("Original Condition Order Info:", order)
     Sleep(1000)
@@ -6655,7 +6923,7 @@ function main() {
     Log("Modified Condition Order ID:", newId)
     Sleep(2000)
 
-    // Query the modified conditional order
+    // Query the modified conditional order information
     var newOrder = exchange.GetConditionOrder(newId)
     Log("Modified Condition Order Info:", newOrder)
 
@@ -6676,7 +6944,7 @@ def main():
     Log("Original Condition Order ID:", id)
     Sleep(2000)
 
-    # Query the original conditional order
+    # Query the original conditional order information
     order = exchange.GetConditionOrder(id)
     Log("Original Condition Order Info:", order)
     Sleep(1000)
@@ -6691,7 +6959,7 @@ def main():
     Log("Modified Condition Order ID:", newId)
     Sleep(2000)
 
-    # Query the modified conditional order
+    # Query the modified conditional order information
     newOrder = exchange.GetConditionOrder(newId)
     Log("Modified Condition Order Info:", newOrder)
 
@@ -6712,7 +6980,7 @@ fn main() {
     Log!("Original Condition Order ID:", id);
     Sleep(2000);
 
-    // Query the original conditional order
+    // Query the original conditional order information
     let order = exchange.GetConditionOrder(&id);
     Log!("Original Condition Order Info:", order);
     Sleep(1000);
@@ -6728,7 +6996,7 @@ fn main() {
     Log!("Modified Condition Order ID:", newId);
     Sleep(2000);
 
-    // Query the modified conditional order
+    // Query the modified conditional order information
     let newOrder = exchange.GetConditionOrder(&newId);
     Log!("Modified Condition Order Info:", newOrder);
 
@@ -6737,7 +7005,7 @@ fn main() {
 }
 ```
 
-Change the trigger price type of a conditional order through the extra parameter (option).
+Use the additional parameter (option) to modify the trigger price type of a conditional order.
 
 ```javascript
 function main() {
@@ -6751,17 +7019,21 @@ function main() {
     Log("Original Condition Order ID:", id)
     Sleep(2000)
 
-    // Modify the conditional order and set the trigger price type to the index price (index): exchange-specific parameters are passed in the last object parameter
+    // Modify the conditional order and set the trigger price type to index price (index)
+    // Pass the additional parameter via the side parameter (in JSON format)
+    var option = {"newTpTriggerPxType": "index"}
+    var sideWithOption = "buy;" + JSON.stringify(option)
+
     var newCondition = {
         ConditionType: ORDER_CONDITION_TYPE_TP,
         TpTriggerPrice: 75,
         TpOrderPrice: 71
     }
-    var newId = exchange.ModifyConditionOrder(id, "buy", 2, newCondition, {newTpTriggerPxType: "index"})
+    var newId = exchange.ModifyConditionOrder(id, sideWithOption, 2, newCondition)
     Log("Modified Condition Order ID:", newId)
     Sleep(2000)
 
-    // Query the modified conditional order
+    // Query the modified conditional order information
     var newOrder = exchange.GetConditionOrder(newId)
     Log("Modified Condition Order Info:", newOrder)
 
@@ -6771,6 +7043,8 @@ function main() {
 ```
 
 ```python
+import json
+
 def main():
     # Create a take-profit conditional order
     condition = {
@@ -6782,17 +7056,21 @@ def main():
     Log("Original Condition Order ID:", id)
     Sleep(2000)
 
-    # Modify the conditional order and set the trigger price type to the index price (index): exchange-specific parameters are passed in the last object parameter
+    # Modify the conditional order and set the trigger price type to index price (index)
+    # Pass the additional parameter via the side parameter (in JSON format)
+    option = {"newTpTriggerPxType": "index"}
+    sideWithOption = "buy;" + json.dumps(option)
+
     newCondition = {
         "ConditionType": ORDER_CONDITION_TYPE_TP,
         "TpTriggerPrice": 75,
         "TpOrderPrice": 71
     }
-    newId = exchange.ModifyConditionOrder(id, "buy", 2, newCondition, {"newTpTriggerPxType": "index"})
+    newId = exchange.ModifyConditionOrder(id, sideWithOption, 2, newCondition)
     Log("Modified Condition Order ID:", newId)
     Sleep(2000)
 
-    # Query the modified conditional order
+    # Query the modified conditional order information
     newOrder = exchange.GetConditionOrder(newId)
     Log("Modified Condition Order Info:", newOrder)
 
@@ -6813,8 +7091,9 @@ fn main() {
     Log!("Original Condition Order ID:", id);
     Sleep(2000);
 
-    // Modify the conditional order and set the trigger price type to the index price (index): in Rust, use the function with the WithOptions suffix to pass the object parameter
-    let opts = JSONParse(r#"{"newTpTriggerPxType": "index"}"#).unwrap();
+    // Modify the conditional order and set the trigger price type to index price (index)
+    // Pass the additional parameter via the side parameter (in JSON format; Rust has no JSON serialization here, so a raw string literal is used directly)
+    let sideWithOption = r#"buy;{"newTpTriggerPxType": "index"}"#;
 
     let newCondition = OrderCondition {
         ConditionType: ORDER_CONDITION_TYPE_TP,
@@ -6822,11 +7101,11 @@ fn main() {
         TpOrderPrice: 71.0,
         ..Default::default()
     };
-    let newId = exchange.ModifyConditionOrderWithOptions(&id, "buy", 2, &newCondition, &opts).unwrap();
+    let newId = exchange.ModifyConditionOrder(&id, sideWithOption, 2, &newCondition).unwrap();
     Log!("Modified Condition Order ID:", newId);
     Sleep(2000);
 
-    // Query the modified conditional order
+    // Query the modified conditional order information
     let newOrder = exchange.GetConditionOrder(&newId);
     Log!("Modified Condition Order Info:", newOrder);
 
@@ -6835,23 +7114,23 @@ fn main() {
 }
 ```
 
-The condition order ID returned by the ```exchange.ModifyConditionOrder()``` function may vary depending on each exchange's API implementation: some exchange APIs return an updated condition order ID, while others keep it unchanged. It is recommended to use the newly returned condition order ID for subsequent operations.
+The conditional order ID returned by the ```exchange.ModifyConditionOrder()``` function may exhibit different behaviors depending on the exchange API implementation. Some exchange APIs return an updated conditional order ID, while others keep it unchanged. It is recommended to use the returned new conditional order ID for subsequent operations.
 
-The ```exchange.ModifyConditionOrder()``` function validates the parameters first: the quantity must be greater than 0, and the trigger prices and execution prices required by the selected condition type cannot be 0. If validation fails, an error is reported and a null value is returned, and nothing is submitted to the exchange.
+The ```exchange.ModifyConditionOrder()``` function validates the parameters first: the amount must be greater than 0, and the trigger and execution prices used by the selected condition type must not be 0. If not, an error is reported, a null value is returned, and nothing is sent to the exchange.
 
-Exchange-specific parameters (option) are passed in through the last object parameter and are used to modify other attributes of the condition order, for example modifying the trigger price type: ```exchange.ModifyConditionOrder(id, "buy", 2, condition, {newTpTriggerPxType: "index"})```. Rust uses ```exchange.ModifyConditionOrderWithOptions()```.
+Passing additional parameters (option) through the ```side``` parameter is supported, used to modify other properties of the conditional order. The additional parameters need to be merged with the ```side``` parameter, in the format ```"side;{JSON object}"``` (recommended) or ```"side;key=value"``` (URL-encoded format). For example, to modify the trigger price type: ```"buy;{\"newTpTriggerPxType\":\"index\"}"```.
 
-Setting ```TpOrderPrice``` or ```SlOrderPrice``` in the ```condition``` parameter to -1 means the order is executed at market price once triggered. Whether a modification can switch between limit and market depends on the exchange: some exchanges (e.g. `Lighter`) do not allow changing the limit/market type, and passing -1 for a limit condition order or a positive execution price for a market condition order will report an error. In that case, the order must be canceled and recreated. See each exchange's page for details.
+Setting ```TpOrderPrice``` or ```SlOrderPrice``` in the ```condition``` parameter to -1 means the order executes at market once triggered. Whether a modification can switch between limit and market execution depends on the exchange: some exchanges (for example `Lighter`) cannot change the limit/market type and raise an error when a limit condition order is given -1 or a market condition order is given a positive order price; cancel and recreate the order instead. See each exchange page for details.
 
-When modifying a condition order, its other attributes (such as condition type, position mode, account mode, leverage, etc.) usually follow the settings of the original condition order. To modify these attributes, pass them in through the additional parameter (option), provided the exchange API supports it.
+When modifying a conditional order, other properties of the conditional order (such as condition type, position mode, account mode, leverage, etc.) are usually retained from the original conditional order's settings. If you need to modify these properties, you can pass them in through additional parameters (option), provided that the exchange API supports it.
 
-The trigger price type can be modified through additional parameters, for example changing the trigger price type from the last price (last) to the index price (index) or the mark price (mark). The specific parameter names and support are subject to the exchange's API documentation.
+The trigger price type can be modified through additional parameters, for example, changing the trigger price type from the last price (last) to the index price (index) or the mark price (mark). The specific parameter names and support status depend on the exchange API documentation.
 
-Not all exchanges support modifying condition orders: calling it on an unsupported exchange reports an error and returns a null value, and the original condition order must be canceled first and then recreated. Exchanges that do support modification may only support modifying some parameters (e.g. only certain contract types or a certain account mode). For unsupported exchanges, see the "Unsupported Exchanges" list on this page; for a comparison of support across exchanges, see the `Capability Matrix`; for specific restrictions, see each exchange's page.
+Not every exchange can modify conditional orders: on those that cannot, the call fails with an error and returns a null value, and the conditional order has to be canceled and created again; exchanges that can modify them may support only some parameters (for example only one contract type or account mode). The unsupported exchanges are listed on this page under "Exchanges that do not support this function", all exchanges are compared in `Capability Matrix`, and the restrictions are given on each exchange page.
 
-Parameters can also be appended after the ```side``` parameter (legacy syntax): written as ```"side;{JSON对象}"``` or ```"side;key=value&key=value"```, for example ```"buy;{\"newTpTriggerPxType\":\"index\"}"``` or ```"buy;newTpTriggerPxType=index"```. The specific supported parameters depend on the exchange API.
+The ```side``` argument can carry exchange-specific parameters to modify other attributes of the conditional order (such as the trigger price type): write ```"side;{JSON object}"``` or ```"side;key=value&key=value"```, for example ```"buy;{\"newTpTriggerPxType\":\"index\"}"``` or ```"buy;newTpTriggerPxType=index"```. Which parameters are supported depends on the exchange API.
 
-The ```ConditionType``` of ```condition``` can take OCO, TP, or SL from `ORDER_CONDITION_TYPE`; `ORDER_CONDITION_TYPE_GENERIC` only appears in query results (for exchange-specific condition orders such as trailing stops) and cannot be used when creating or modifying condition orders; passing it reports an error and returns a null value. The trigger prices and execution prices required by the selected type must all be passed in and cannot be 0 (OCO requires all four, TP requires the two take-profit values, SL requires the two stop-loss values), otherwise an error is reported and a null value is returned; an execution price of -1 means a market order is executed once triggered.
+The ```ConditionType``` of ```condition``` is OCO, TP or SL from `ORDER_CONDITION_TYPE`; `ORDER_CONDITION_TYPE_GENERIC` only appears in query results (exchange-specific conditional orders such as trailing stops) and cannot be used to create or modify a conditional order: passing it fails with an error and returns a null value. The trigger and order prices used by the chosen type must all be given and non-zero (OCO needs all four, TP the two take-profit prices, SL the two stop-loss prices), otherwise the call fails and returns a null value; an order price of -1 executes a market order when triggered.
 
 Only these exchanges support this function: `Binance`, `Bitfinex`, `Futures_Bitfinex`, `Bitget`, `Futures_Bitget`, `Bybit`, `Futures_Bybit`, `Crypto`, `Futures_Crypto`, `DeepCoin`, `Futures_DeepCoin`, `Futures_Deribit`, `Futures_GateIO`, `HitBTC`, `Kraken`, `Futures_Kraken`, `OKEX`, `Futures_OKCoin`, `Futures_WEEX`, `WOO`, `Futures_WOO`, `Futures_Hyperliquid`, `Futures_Lighter`, `Futures_Aevo`, `Futures_WOOFi`. On every other exchange the call fails with an error and returns null; for all exchanges see `Capability Matrix`.
 
@@ -7090,13 +7369,7 @@ The returned conditional order structure contains information such as the trigge
 
 Conditional order statuses include: not triggered, triggered, canceled, etc. The specific status values are determined by the exchange.
 
-Exchanges that do not support this function: `AscendEx`, `Bithumb`, `Bitstamp`, `Coinw`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Korbit`, `LBank`, `MEXC`, `Upbit`, `WEEX`, `Zaif`, `Hyperliquid`, `Pendle`, `Uniswap`, `Jupiter`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Futures_Polymarket`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
-
-Exchanges that serve this function through a fallback: the exchange's API does not fully provide this function, and the docker fills the gap.
-
-The exchange's API covers only part of the function; the docker fills in the rest:
-
-- `Futures_Futu`: There is no single condition-order query, so the order is looked up among the instrument's open condition orders and its condition orders of the last 90 days (at most 100). Condition orders are native Futu orders placed through the order functions with ```orderType``` (10 to 15) in the options object; see the notes.
+Exchanges that do not support this function: `AscendEx`, `Bithumb`, `Bitstamp`, `Coinw`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Korbit`, `LBank`, `MEXC`, `Upbit`, `WEEX`, `Zaif`, `Hyperliquid`, `Pendle`, `Uniswap`, `Jupiter`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Futures_Polymarket`, `Futures_Futu`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
 
 See also: `Order`, `exchange.GetConditionOrders`, `exchange.GetHistoryConditionOrders`, `exchange.ModifyConditionOrder`
 
@@ -7661,7 +7934,7 @@ Common contract codes of crypto futures (their usual meaning; what each exchange
 | `Futures_Bitget` | ✓ |  |  |  |  | ✓ | ✓ |  |  |  |
 | `Futures_Bybit` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |  | ```delivery```, ```third_week``` |
 | `Futures_Coinw` | ✓ |  |  |  |  |  |  |  |  |  |
-| `Futures_Crypto` | ✓ | ✓ | ✓ |  |  | ✓ | ✓ |  |  | ```January```, ```February```, ```March```, ```April```, ```May```, ```June```, ```July```, ```August```, ```September```, ```October```, ```November```, ```December``` |
+| `Futures_Crypto` | ✓ | ✗ | ✗ |  |  | ✗ | ✗ |  |  | ```January```, ```February```, ```March```, ```April```, ```May```, ```June```, ```July```, ```August```, ```September```, ```October```, ```November```, ```December``` |
 | `Futures_DeepCoin` | ✓ |  |  |  |  |  |  |  |  |  |
 | `Futures_Deribit` | ✓ | ✓ | ✓ | ✓ |  | ✓ | ✓ | ✓ | ✓ | ```today```, ```tomorrow``` |
 | `Futures_DigiFinex` | ✓ |  |  |  |  |  |  |  |  |  |
@@ -9147,27 +9420,20 @@ Commands of ```exchange.IO()``` specific to an exchange object; see the exchange
 | ```accountId``` | `Futures_Crypto`, `Poloniex` |
 | ```accounts``` | `Futures_Futu`, `Futures_IB` |
 | ```accountType``` | `Bybit`, `Futures_Bybit` |
-| ```address``` | `Pendle`, `Futures_Boros`, `Uniswap`, `Jupiter`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Web3` |
+| ```address``` | `Pendle`, `Uniswap`, `Jupiter`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Web3` |
 | ```addresses``` | `OKX_DEX` |
 | ```agent``` | `Futures_Boros` |
 | ```allChainBalance``` | `OKX_DEX` |
 | ```allowance``` | `OKX_DEX` |
 | ```allTokens``` | `OKX_DEX` |
-| ```api``` | `AscendEx`, `Backpack`, `Futures_Backpack`, `BigONE`, `Bitstamp`, `Coinw`, `Crypto`, `Futures_Crypto`, `DigiFinex`, `Futures_DigiFinex`, `WOO`, `Futures_WOO`, `Hyperliquid`, `Futures_Hyperliquid`, `Futures_Lighter`, `Futures_EdgeX`, `Futures_Aevo`, `Futures_WOOFi`, `Futures_Polymarket`, `Futures_IB`, `Exchange`, `Web3` |
+| ```api``` | `Hyperliquid`, `Futures_Hyperliquid`, `Futures_Lighter`, `Futures_Polymarket`, `Futures_IB`, `Exchange`, `Web3` |
 | ```approve``` | `Pendle`, `Uniswap`, `KyberSwap`, `OneInch`, `OKX_DEX` |
 | ```approveAgent``` | `Futures_Boros` |
 | ```apy``` | `Pendle` |
 | ```autoTopUp``` | `Futures_Boros` |
 | ```balanceSupportedChains``` | `OKX_DEX` |
-| ```base``` | `Futures_Binance`, `Pendle`, `Futures_Boros`, `Uniswap`, `Jupiter`, `KyberSwap`, `OneInch`, `Futures_Polymarket`, `Web3` |
+| ```base``` | `Pendle`, `Futures_Boros`, `Uniswap`, `Jupiter`, `KyberSwap`, `OneInch`, `Futures_Polymarket`, `Web3` |
 | ```batchOrders``` | `Futures_Polymarket` |
-| ```bridge.apiKey``` | `Uniswap`, `Jupiter`, `KyberSwap`, `OneInch` |
-| ```bridge.chains``` | `Uniswap`, `Jupiter`, `KyberSwap`, `OneInch` |
-| ```bridge.quote``` | `Uniswap`, `Jupiter`, `KyberSwap`, `OneInch` |
-| ```bridge.send``` | `Uniswap`, `Jupiter`, `KyberSwap`, `OneInch` |
-| ```bridge.simulate``` | `Uniswap`, `Jupiter`, `KyberSwap`, `OneInch` |
-| ```bridge.status``` | `Uniswap`, `Jupiter`, `KyberSwap`, `OneInch` |
-| ```bridge.tokens``` | `Uniswap`, `Jupiter`, `KyberSwap`, `OneInch` |
 | ```broadcast``` | `OKX_DEX` |
 | ```broadcastSupportedChains``` | `OKX_DEX` |
 | ```calcOrderHashAndSign``` | `Futures_EdgeX` |
@@ -9175,17 +9441,12 @@ Commands of ```exchange.IO()``` specific to an exchange object; see the exchange
 | ```cancelTx``` | `Web3` |
 | ```cancelWait``` | `Pendle`, `Uniswap`, `KyberSwap`, `OneInch` |
 | ```cancelWithdraw``` | `Futures_Boros` |
-| ```clientId``` | `KyberSwap` |
 | ```clob``` | `Futures_Polymarket` |
 | ```coinmBase``` | `Futures_Binance` |
 | ```config``` | `OKX_DEX` |
 | ```contracts``` | `Uniswap`, `KyberSwap`, `OneInch`, `Web3` |
 | ```cross``` | `Futures_Binance`, `Futures_Bitget`, `Futures_Bybit`, `Futures_Coinw`, `Futures_DeepCoin`, `Futures_DigiFinex`, `Futures_GateIO`, `Futures_HuobiDM`, `Futures_Kraken`, `Futures_KuCoin`, `Futures_MEXC`, `Futures_OKCoin`, `Futures_WOO`, `Futures_Hyperliquid`, `Futures_Lighter`, `Futures_ApolloX`, `Futures_Aster` |
 | ```data``` | `Futures_Polymarket` |
-| ```dca.cancel``` | `Jupiter` |
-| ```dca.create``` | `Jupiter` |
-| ```dca.list``` | `Jupiter` |
-| ```dca.simulate``` | `Jupiter` |
 | ```deadline``` | `Uniswap`, `KyberSwap`, `OneInch` |
 | ```debug``` | `Futures_IB` |
 | ```decode``` | `Web3` |
@@ -9210,26 +9471,22 @@ Commands of ```exchange.IO()``` specific to an exchange object; see the exchange
 | ```io``` | `Exchange` |
 | ```isolatedTransfer``` | `Futures_Boros` |
 | ```key``` | `OKX_DEX`, `Web3` |
-| ```kyberApiKey``` | `KyberSwap` |
 | ```lock``` | `Futures_Futu` |
 | ```logs``` | `Web3` |
-| ```lp.add``` | `Uniswap`, `Jupiter` |
-| ```lp.claim``` | `Uniswap` |
-| ```lp.collect``` | `Uniswap`, `Jupiter` |
-| ```lp.decrease``` | `Uniswap`, `Jupiter` |
+| ```lp.add``` | `Uniswap` |
+| ```lp.collect``` | `Uniswap` |
+| ```lp.decrease``` | `Uniswap` |
 | ```lp.history``` | `Uniswap` |
-| ```lp.increase``` | `Uniswap`, `Jupiter` |
-| ```lp.plan``` | `Uniswap`, `Jupiter` |
-| ```lp.pool``` | `Uniswap`, `Jupiter` |
-| ```lp.pools``` | `Uniswap`, `Jupiter` |
-| ```lp.positions``` | `Uniswap`, `Jupiter` |
-| ```lp.remove``` | `Uniswap`, `Jupiter` |
-| ```lp.select``` | `Uniswap`, `Jupiter` |
-| ```lp.simulate``` | `Uniswap`, `Jupiter` |
-| ```lp.stake``` | `Uniswap` |
-| ```lp.ticks``` | `Uniswap`, `Jupiter` |
-| ```lp.track``` | `Uniswap`, `Jupiter` |
-| ```lp.unstake``` | `Uniswap` |
+| ```lp.increase``` | `Uniswap` |
+| ```lp.plan``` | `Uniswap` |
+| ```lp.pool``` | `Uniswap` |
+| ```lp.pools``` | `Uniswap` |
+| ```lp.positions``` | `Uniswap` |
+| ```lp.remove``` | `Uniswap` |
+| ```lp.select``` | `Uniswap` |
+| ```lp.simulate``` | `Uniswap` |
+| ```lp.ticks``` | `Uniswap` |
+| ```lp.track``` | `Uniswap` |
 | ```market``` | `Pendle`, `Futures_Boros` |
 | ```marketDataType``` | `Futures_IB` |
 | ```markets_cursor``` | `Futures_Polymarket` |
@@ -9245,12 +9502,6 @@ Commands of ```exchange.IO()``` specific to an exchange object; see the exchange
 | ```price``` | `Pendle` |
 | ```priorityFee``` | `Jupiter` |
 | ```proxyWalletAddress``` | `Futures_Polymarket` |
-| ```pump.buy``` | `Jupiter` |
-| ```pump.holdings``` | `Jupiter` |
-| ```pump.info``` | `Jupiter` |
-| ```pump.new``` | `Jupiter` |
-| ```pump.quote``` | `Jupiter` |
-| ```pump.sell``` | `Jupiter` |
 | ```quote``` | `OKX_DEX` |
 | ```receipt``` | `Pendle`, `Uniswap`, `Jupiter`, `KyberSwap`, `OneInch` |
 | ```redeem``` | `Futures_Polymarket` |
@@ -9292,9 +9543,6 @@ Commands of ```exchange.IO()``` specific to an exchange object; see the exchange
 | ```trade_normal``` | `AscendEx`, `Binance`, `Bybit`, `Crypto`, `GateIO`, `Huobi`, `OKEX`, `WOO` |
 | ```trade_super_margin``` | `Binance`, `GateIO`, `Huobi`, `OKEX` |
 | ```transfer``` | `Uniswap`, `Jupiter`, `KyberSwap`, `OneInch` |
-| ```trigger.api``` | `Jupiter` |
-| ```trigger.simulate``` | `Jupiter` |
-| ```trigger.vault``` | `Jupiter` |
 | ```unified``` | `Binance`, `Futures_Binance`, `GateIO`, `Futures_GateIO`, `Futures_HuobiDM` |
 | ```uniswapV3``` | `Web3` |
 | ```unlock``` | `Futures_Futu` |
@@ -22397,7 +22645,7 @@ See also: `exchange.GetFundings`
 
 ### Other Structures
 
-Option objects of functions, and objects or structures they return (connection, chart and concurrent objects, button structures, etc.).
+Option objects of functions, and objects or structures they return (connection, chart and concurrent objects, status bar components and button structures, etc.).
 
 #### HttpQuery-options
 
@@ -22507,14 +22755,26 @@ See also: `HttpQuery`, `HttpQuery_Go`
 
 #### LogStatus-table
 
-This JSON structure is used to configure the table content displayed in the strategy status bar.
+Status bar table output with `LogStatus`: columns can set number formats, up/down colors and units; cells can be merged or hold buttons; several tables can be shown as tabs.
 
 Fields:
 
-- `type` (string): Used to set the type of UI control to be parsed and displayed. For status bar tables, it is fixed as: ```table```.
-- `title` (string): Used to set the title of the status bar table.
-- `cols` (array): Used to set the column headers of the status bar table. The first element of the array is the title of the first column, and so on.
-- `rows` (array): Used to set the row data of the status bar table. The first element of this rows array (two-dimensional array) is also an array structure. The length of this array structure should be consistent with the number of table columns (elements in the array correspond one-to-one with table column names), representing the first row of data in the table.
+- `type` (string): Required. Always `table`.
+- `title` (string): Table title.
+- `cols` (array): Required. Column headers: each item is a string or a column definition object with `title`.
+- `rows` (array): Required. 2D array, one array per row with one item per column. A cell can be text (a trailing `#ff0000` sets the color), a number, a button object (an array for several buttons), a merged cell `{body, colspan, rowspan}`, or a formatted cell `{value, format, color, unit}`.
+- `scroll` (string): `auto` scrolls vertically beyond 20 rows and horizontally when the columns overflow, which helps with large data.
+- `cols[].title` (string): Column header.
+- `cols[].format` (object): Number format of the column `{precision, compact, percent}`; see `Status Bar Components`.
+- `cols[].color` (string): Color of the column's numbers: `sign` picks the up or down color by sign (`0` stays uncolored), or `up`, `down`, `primary`, `warning`, `muted`.
+- `cols[].unit` (string): Unit after the column's numbers.
+- `cols[].align` (string): Alignment: `left`, `center` or `right`.
+- `rows[][].value` (number / string): Value of a formatted cell.
+- `rows[][].format` (object): Number format of the cell, taking precedence over the column.
+- `rows[][].color` (string): Color of the cell, same values as `cols[].color`.
+- `rows[][].unit` (string): Unit of the cell.
+
+Outputs a table with 3 rows and 3 columns.
 
 ```javascript
 function main() {
@@ -22523,16 +22783,412 @@ function main() {
         title: "Title",
         cols: ["Column 1", "Column 2", "Column 3"],
         rows: [
-            ["Row 1 Col 1", "Row 1 Col 2", "Row 1 Col 3"],
-            ["Row 2 Col 1", "Row 2 Col 2", "Row 2 Col 3"],
-            ["Row 3 Col 1", "Row 3 Col 2", "Row 3 Col 3"],
+            ["Row 1 Column 1", "Row 1 Column 2", "Row 1 Column 3"],
+            ["Row 2 Column 1", "Row 2 Column 2", "Row 2 Column 3"],
+            ["Row 3 Column 1", "Row 3 Column 2", "Row 3 Column 3"]
         ]
     }
+    // A lone table object gets backticks automatically
+    LogStatus(tbl)
+}
+```
+
+```python
+def main():
+    tbl = {
+        "type": "table",
+        "title": "Title",
+        "cols": ["Column 1", "Column 2", "Column 3"],
+        "rows": [
+            ["Row 1 Column 1", "Row 1 Column 2", "Row 1 Column 3"],
+            ["Row 2 Column 1", "Row 2 Column 2", "Row 2 Column 3"],
+            ["Row 3 Column 1", "Row 3 Column 2", "Row 3 Column 3"]
+        ]
+    }
+    # A lone table dict gets backticks automatically
+    LogStatus(tbl)
+```
+
+```rust
+fn main() {
+    let tbl = r#"{"type": "table", "title": "Title", "cols": ["Column 1", "Column 2", "Column 3"],
+        "rows": [["Row 1 Column 1", "Row 1 Column 2", "Row 1 Column 3"],
+                 ["Row 2 Column 1", "Row 2 Column 2", "Row 2 Column 3"],
+                 ["Row 3 Column 1", "Row 3 Column 2", "Row 3 Column 3"]]}"#;
+    // Rust strings get no automatic backticks; the JSON inside must be one line
+    LogStatus!(format!("`{}`", tbl.replace('\n', "")));
+}
+```
+
+The last 10 daily K-lines: column formats and up/down colors, plus a cell object with its own color.
+
+```javascript
+function main() {
+    var r = exchange.GetRecords(PERIOD_D1)
+    if (!r || r.length < 11) return
+    var rows = []
+    for (var i = r.length - 1; i >= r.length - 10; i--) {
+        var chg = r[i].Close / r[i - 1].Close - 1
+        var note = Math.abs(chg) > 0.05 ? {value: "Big move", color: "warning"} : ""
+        rows.push([_D(r[i].Time, "yyyy-MM-dd"), r[i].Close, chg, r[i].Volume, note])
+    }
+    LogStatus({type: "table", title: "Last 10 days", rows: rows, cols: [
+        "Date",
+        {title: "Close", format: {precision: 2}, align: "right"},
+        {title: "Change", format: {percent: true, precision: 2}, color: "sign", align: "right"},
+        {title: "Volume", format: {compact: true}, align: "right"},
+        "Note"
+    ]})
+}
+```
+
+```python
+def main():
+    r = exchange.GetRecords(PERIOD_D1)
+    if not r or len(r) < 11:
+        return
+    rows = []
+    for i in range(len(r) - 1, len(r) - 11, -1):
+        chg = r[i]["Close"] / r[i - 1]["Close"] - 1
+        note = {"value": "Big move", "color": "warning"} if abs(chg) > 0.05 else ""
+        rows.append([_D(r[i]["Time"] / 1000, "%Y-%m-%d"), r[i]["Close"], chg, r[i]["Volume"], note])
+    pct = {"percent": True, "precision": 2}
+    LogStatus({"type": "table", "title": "Last 10 days", "rows": rows, "cols": [
+        "Date",
+        {"title": "Close", "format": {"precision": 2}, "align": "right"},
+        {"title": "Change", "format": pct, "color": "sign", "align": "right"},
+        {"title": "Volume", "format": {"compact": True}, "align": "right"},
+        "Note"
+    ]})
+```
+
+```rust
+fn main() {
+    let Ok(r) = exchange.GetRecords(None, PERIOD_D1, None) else { return };
+    if r.len() < 11 { return; }
+    let rows: Vec<String> = (r.len() - 10..r.len()).rev().map(|i| {
+        let chg = r[i].Close / r[i - 1].Close - 1.0;
+        let big = r#"{"value": "Big move", "color": "warning"}"#;
+        let note = if chg.abs() > 0.05 { big } else { r#""""# };
+        let date = &_D(r[i].Time)[..10];
+        format!(r#"["{}", {}, {}, {}, {}]"#, date, r[i].Close, chg, r[i].Volume, note)
+    }).collect();
+    let table = format!(r#"{{"type": "table", "title": "Last 10 days", "rows": [{}], "cols": [
+        "Date", {{"title": "Close", "format": {{"precision": 2}}, "align": "right"}},
+        {{"title": "Change", "format": {{"percent": true, "precision": 2}},
+          "color": "sign", "align": "right"}},
+        {{"title": "Volume", "format": {{"compact": true}}, "align": "right"}},
+        "Note"]}}"#, rows.join(","));
+    // The JSON inside backticks must be one line
+    LogStatus!(format!("`{}`", table.replace('\n', "")));
+}
+```
+
+Horizontally merge cells in the table drawn by the ```LogStatus()``` function.
+
+```javascript
+function main() {
+    var table = {
+        type: 'table',
+        title: 'Position Operation',
+        cols: ['Column 1', 'Column 2', 'Action'],
+        rows: [
+            ['abc', 'def', {'type':'button', 'cmd': 'coverAll', 'name': 'Close'}]
+        ]
+    }
+    var ticker = exchange.GetTicker()
+    // Add a row of data, merge the first and second cells, and output the ticker variable in the merged cell
+    table.rows.push([{body : JSON.stringify(ticker), colspan : 2}, "abc"])
+    LogStatus('`' + JSON.stringify(table) + '`')
+}
+```
+
+```python
+import json
+def main():
+    table = {
+        "type" : "table",
+        "title" : "Position Operation",
+        "cols" : ["Column 1", "Column 2", "Action"],
+        "rows" : [
+            ["abc", "def", {"type": "button", "cmd": "coverAll", "name": "Close"}]
+        ]
+    }
+    ticker = exchange.GetTicker()
+    table["rows"].append([{"body": json.dumps(ticker), "colspan": 2}, "abc"])
+    LogStatus("`" + json.dumps(table) + "`")
+```
+
+```rust
+fn main() {
+    let table_tpl = String::from(r#"{"type": "table", "title": "Position Operation", "cols": ["Column 1", "Column 2", "Action"], "rows": ["#)
+        + r#"["abc", "def", {"type": "button", "cmd": "coverAll", "name": "Close"}],"#
+        + r#"__ROW2__"#
+        + r#"]}"#;
+
+    let ticker = exchange.GetTicker(None).unwrap();
+    let json_ticker = format!(
+        r#"{{"Buy": {}, "Sell": {}, "High": {}, "Low": {}, "Volume": {}, "Last": {}, "Time": {}}}"#,
+        ticker.Buy, ticker.Sell, ticker.High, ticker.Low, ticker.Volume, ticker.Last, ticker.Time
+    );
+    // Add a row of data, merge the first and second cells, and output the ticker data in the merged cell
+    // body is a string (corresponding to JS's JSON.stringify(ticker)); its internal quotes must be escaped before being embedded into the JSON
+    let row2 = format!(r#"[{{"body": "{}", "colspan": 2}}, "abc"]"#, json_ticker.replace('"', "\\\""));
+    let table = table_tpl.replace("__ROW2__", &row2);
+    LogStatus!(format!("`{}`", table));
+}
+```
+
+Vertically merge cells in a table drawn by the ```LogStatus()``` function.
+
+```javascript
+function main() {
+    var table = {
+        type: 'table',
+        title: 'Table Demo',
+        cols: ['Column A', 'Column B', 'Column C'],
+        rows: [
+            ['A1', 'B1', {'type':'button', 'cmd': 'coverAll', 'name': 'C1'}]
+        ]
+    }
+
+    var ticker = exchange.GetTicker()
+    var name = exchange.GetName()
+
+    table.rows.push([{body : "A2 + B2:" + JSON.stringify(ticker), colspan : 2}, "C2"])
+    table.rows.push([{body : "A3 + A4 + A5:" + name, rowspan : 3}, "B3", "C3"])
+    // A4 is merged into the first cell of the previous row
+    table.rows.push(["B4", "C4"])
+    // A5 is merged into the first cell of the previous row
+    table.rows.push(["B5", "C5"])
+    table.rows.push(["A6", "B6", "C6"])
+    LogStatus('`' + JSON.stringify(table) + '`')
+}
+```
+
+```python
+import json
+def main():
+    table = {
+        "type" : "table",
+        "title" : "Table Demo",
+        "cols" : ["Column A", "Column B", "Column C"],
+        "rows" : [
+            ["A1", "B1", {"type": "button", "cmd": "coverAll", "name": "C1"}]
+        ]
+    }
+
+    ticker = exchange.GetTicker()
+    name = exchange.GetName()
+
+    table["rows"].append([{"body": "A2 + B2:" + json.dumps(ticker), "colspan": 2}, "C2"])
+    table["rows"].append([{"body": "A3 + A4 + A5:" + name, "rowspan": 3}, "B3", "C3"])
+    table["rows"].append(["B4", "C4"])
+    table["rows"].append(["B5", "C5"])
+    table["rows"].append(["A6", "B6", "C6"])
+    LogStatus("`" + json.dumps(table) + "`")
+```
+
+```rust
+fn main() {
+    // For ease of testing, constructed data is used here to keep the code short and readable
+    let json_ticker = r#"{"High": 0, "Low": 0, "Buy": 0, "Sell": 0, "Last": 0, "Time": 0, "Volume": 0}"#;
+    let name = exchange.GetName();
+
+    let mut rows: Vec<String> = Vec::new();
+    rows.push(String::from(r#"["A1", "B1", {"type": "button", "cmd": "coverAll", "name": "C1"}]"#));
+    // body is a string, and the quotes inside it must be escaped before they can be embedded in JSON
+    let body = format!("A2 + B2:{}", json_ticker).replace('"', "\\\"");
+    rows.push(format!(r#"[{{"body": "{}", "colspan": 2}}, "C2"]"#, body));
+    rows.push(format!(r#"[{{"body": "A3 + A4 + A5:{}", "rowspan": 3}}, "B3", "C3"]"#, name));
+    // A4 is merged into the first cell of the previous row
+    rows.push(String::from(r#"["B4", "C4"]"#));
+    // A5 is merged into the first cell of the previous row
+    rows.push(String::from(r#"["B5", "C5"]"#));
+    rows.push(String::from(r#"["A6", "B6", "C6"]"#));
+
+    let table = format!(r#"{{"type": "table", "title": "Table Demo", "cols": ["Column A", "Column B", "Column C"], "rows": [{}]}}"#, rows.join(","));
+    LogStatus!(format!("`{}`", table));
+}
+```
+
+Display tables with pagination in the status bar.
+
+```javascript
+function main() {
+    var table1 = {type: 'table', title: 'table1', cols: ['Column 1', 'Column 2'], rows: [ ['abc', 'def'], ['ABC', 'support color #ff0000']]}
+    var table2 = {type: 'table', title: 'table2', cols: ['Column 1', 'Column 2'], rows: [ ['abc', 'def'], ['ABC', 'support color #ff0000']]}
+    LogStatus('`' + JSON.stringify([table1, table2]) + '`')
+}
+```
+
+```python
+import json
+def main():
+    table1 = {"type": "table", "title": "table1", "cols": ["Column 1", "Column 2"], "rows": [ ["abc", "def"], ["ABC", "support color #ff0000"]]}
+    table2 = {"type": "table", "title": "table2", "cols": ["Column 1", "Column 2"], "rows": [ ["abc", "def"], ["ABC", "support color #ff0000"]]}
+    LogStatus("`" + json.dumps([table1, table2]) + "`")
+```
+
+```rust
+fn main() {
+    let table1 = r#"{"type": "table", "title": "table1", "cols": ["Column 1", "Column 2"], "rows": [["abc", "def"], ["ABC", "support color #ff0000"]]}"#;
+    let table2 = r#"{"type": "table", "title": "table2", "cols": ["Column 1", "Column 2"], "rows": [["abc", "def"], ["ABC", "support color #ff0000"]]}"#;
+    LogStatus!(format!("`[{},{}]`", table1, table2));
+}
+```
+
+In addition to displaying tables with pagination, you can also arrange multiple tables from top to bottom.
+
+```javascript
+function main(){
+    var tab1 = {
+        type : "table",
+        title : "Table 1",
+        cols : ["1", "2"],
+        rows : []
+    }
+    var tab2 = {
+        type : "table",
+        title : "Table 2",
+        cols : ["1", "2", "3"],
+        rows : []
+    }
+    var tab3 = {
+        type : "table",
+        title : "Table 3",
+        cols : ["A", "B", "C"],
+        rows : []
+    }
+
+    tab1.rows.push(["jack", "lucy"])
+    tab2.rows.push(["A", "B", "C"])
+    tab3.rows.push(["A", "B", "C"])
+
+    LogStatus('`' + JSON.stringify(tab1) + '`\n' +
+        '`' + JSON.stringify(tab2) + '`\n' +
+        '`' + JSON.stringify(tab3) + '`')
+
+    Log("exit")
+}
+```
+
+```python
+import json
+def main():
+    tab1 = {
+        "type": "table",
+        "title": "Table 1",
+        "cols": ["1", "2"],
+        "rows": []
+    }
+    tab2 = {
+        "type": "table",
+        "title": "Table 2",
+        "cols": ["1", "2", "3"],
+        "rows": []
+    }
+    tab3 = {
+        "type": "table",
+        "title": "Table 3",
+        "cols": ["A", "B", "C"],
+        "rows": []
+    }
+
+    tab1["rows"].append(["jack", "lucy"])
+    tab2["rows"].append(["A", "B", "C"])
+    tab3["rows"].append(["A", "B", "C"])
+    LogStatus("`" + json.dumps(tab1) + "`\n" +
+        "`" + json.dumps(tab2) + "`\n" +
+        "`" + json.dumps(tab3) + "`")
+```
+
+```rust
+fn main() {
+    // In Rust, write the row data directly into the JSON string
+    let tab1 = r#"{"type": "table", "title": "Table 1", "cols": ["1", "2"], "rows": [["jack", "lucy"]]}"#;
+    let tab2 = r#"{"type": "table", "title": "Table 2", "cols": ["1", "2", "3"], "rows": [["A", "B", "C"]]}"#;
+    let tab3 = r#"{"type": "table", "title": "Table 3", "cols": ["A", "B", "C"], "rows": [["A", "B", "C"]]}"#;
+
+    LogStatus!(format!("`{}`\n`{}`\n`{}`", tab1, tab2, tab3));
+
+    Log!("exit");
+}
+```
+
+Supports setting horizontal and vertical scroll modes for the status bar table. After setting the ```scroll``` attribute to ```auto```, when the number of vertical rows in the status bar table exceeds 20, the content will scroll automatically; when the number of horizontal columns exceeds the visible range of the page, horizontal scrolling will be applied. Using the ```scroll``` attribute can help mitigate the lag caused by writing large amounts of data to the status bar during live trading.
+
+Refer to the following test example:
+
+```javascript
+function main() {
+    var tbl = {
+        type : "table",
+        title : "test scroll",
+        scroll : "auto",
+        cols : ["col 0", "col 1", "col 2", "col 3", "col 4", "col 5", "col 6", "col 7", "col 8", "col 9", "col 10",
+            "col 11", "col 12", "col 13", "col 14", "col 15", "col 16", "col 17", "col 18", "col 19", "col 20"],
+        rows : []
+    }
+
+    for (var i = 1 ; i < 100 ; i++) {
+        tbl.rows.push([i, "1," + i, "2," + i, "3," + i, "4," + i, "5," + i, "6," + i, "7," + i, "8," + i, "9," + i, "10," + i,
+            "11," + i, "12," + i, "13," + i, "14," + i, "15," + i, "16," + i, "17," + i, "18," + i, "19," + i, "20," + i])
+    }
+
     LogStatus("`" + JSON.stringify(tbl) + "`")
 }
 ```
 
-See also: `LogStatus`
+```python
+import json
+
+def main():
+    tbl = {
+        "type" : "table",
+        "title" : "test scroll",
+        "scroll" : "auto",
+        "cols" : ["col 0", "col 1", "col 2", "col 3", "col 4", "col 5", "col 6", "col 7", "col 8", "col 9", "col 10",
+            "col 11", "col 12", "col 13", "col 14", "col 15", "col 16", "col 17", "col 18", "col 19", "col 20"],
+        "rows" : []
+    }
+
+    for index in range(1, 100):
+        i = str(index)
+        tbl["rows"].append([i, "1," + i, "2," + i, "3," + i, "4," + i, "5," + i, "6," + i, "7," + i, "8," + i, "9," + i, "10," + i,
+            "11," + i, "12," + i, "13," + i, "14," + i, "15," + i, "16," + i, "17," + i, "18," + i, "19," + i, "20," + i])
+
+    LogStatus("`" + json.dumps(tbl) + "`")
+```
+
+```rust
+fn main() {
+    let tbl_tpl = String::from(r#"{"type": "table", "title": "test scroll", "scroll": "auto", "cols": ["#)
+        + r#""col 0", "col 1", "col 2", "col 3", "col 4", "col 5", "col 6", "col 7", "col 8", "col 9", "col 10","#
+        + r#""col 11", "col 12", "col 13", "col 14", "col 15", "col 16", "col 17", "col 18", "col 19", "col 20""#
+        + r#"], "rows": [__ROWS__]}"#;
+
+    let mut rows: Vec<String> = Vec::new();
+    for index in 1..100 {
+        let i = index.to_string();
+        rows.push(format!(
+            r#"[{}, "1,{}", "2,{}", "3,{}", "4,{}", "5,{}", "6,{}", "7,{}", "8,{}", "9,{}", "10,{}", "11,{}", "12,{}", "13,{}", "14,{}", "15,{}", "16,{}", "17,{}", "18,{}", "19,{}", "20,{}"]"#,
+            i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, i
+        ));
+    }
+
+    let tbl = tbl_tpl.replace("__ROWS__", &rows.join(","));
+    LogStatus!(format!("`{}`", tbl));
+}
+```
+
+Column definitions apply only to the column's numbers; strings are shown as is, and cell objects take precedence over the column. Formatted text still sorts by the raw numbers; search and CSV export in the table use the formatted text.
+
+To output a table on its own, JavaScript and Python pass the table object directly (backticks are added automatically) or write ``LogStatus("`" + JSON.stringify(tbl) + "`")``; Rust writes ``format!("`{}`", table)``. Inside `grid`, `tabs` or an array with components no backticks are needed.
+
+An array of tables wrapped in backticks is shown as tabs; tables on separate lines are stacked top to bottom. For buttons in cells see `LogStatus-btnTypeTwo`.
+
+See also: `LogStatus`, `Status Bar Components`, `LogStatus-btnTypeTwo`
 
 #### LogStatus-btnTypeOne
 
@@ -22708,6 +23364,1078 @@ Fields:
 - `group` (array): A group of input controls opened on click; each item has the structure of ```input```, and ```name``` is the key of the control in the command JSON. The command is ```cmd:JSON```.
 
 See also: `LogStatus`, `LogStatus-btnTypeOne`, `GetCommand`
+
+#### Status Bar Components
+
+`LogStatus` accepts objects with a `type` directly, and the status bar renders them as components such as KPI cards, charts and tabs. Components are for display only; use status bar buttons for interaction.
+
+The table lists all components; tables and buttons can be placed next to them.
+
+| Component | Use |
+| - | - |
+| `grid` | Grid layout that drops columns with the container width |
+| `tabs` | Tabs |
+| `kpi` | KPI card |
+| `stat` | Key-value list |
+| `progress` | Progress bar |
+| `gauge` | Gauge |
+| `sparkline` | Sparkline |
+| `chart` | Line, bar and area charts with a right axis and buy/sell marks |
+| `heatmap` | Heatmap |
+| `calendar` | Return calendar |
+| `histogram` | Histogram |
+| `pie` | Pie chart |
+| `timeline` | Timeline |
+| `markdown` | Markdown text |
+| `alert` | Alert |
+| `badge` | Badges |
+| `LogStatus-table` | Table (`type` is `table`) with column formats and up/down colors |
+| `LogStatus-btnTypeTwo` | Button (`type` is `button`); the strategy reads clicks with `GetCommand` |
+
+##### Common fields
+
+Every component accepts the following fields, written the same way.
+
+| Field | Description |
+| - | - |
+| `id` | Stable identifier. Set it when the number or order of components changes, so refreshes do not rebuild the component (tabs keep their selection, charts do not flicker) |
+| `span` | Columns spanned in the enclosing `grid`, default `1` |
+| `color` | `up` and `down` colors (following the page's up/down color setting; FMZ defaults to green for up and red for down), `primary` theme color, `warning` color, `muted` secondary text color; other values are ignored |
+| `format` | Number format: `precision` decimal places; `compact: true` for compact notation (12.3K); `percent: true` shows a ratio as a percentage (`0.12` shows 12%). Without it up to 8 decimals are kept, with digit grouping by page language |
+
+Texts such as `title`, `label` and `text` support the `[trans]` bilingual tag like status bar text. Colors follow the page's light or dark theme. A malformed component (missing required field, unknown type, over a limit) shows an error card only in its own place, naming the faulty field and showing the first 200 characters of its JSON; the other components render as usual.
+
+##### grid
+
+Arranges components in columns and drops columns automatically when the container gets narrow.
+
+Fields:
+
+- `type` (string): Required. Always `grid`.
+- `items` (array): Required. Child components: any status bar component, or table and button objects.
+- `cols` (number): Desired number of columns, `1`–`12`. Defaults to the number of children.
+- `minColWidth` (number): Minimum column width in pixels; columns are dropped when they do not fit. Default `180`.
+- `gap` (string): Gap: `sm`, `md` or `lg`. Default `md`.
+- `title` (string): Title shown above the grid.
+- `id` (string): Stable identifier. Set it when the number or order of components changes, so refreshes do not rebuild the component.
+- `span` (number): Number of columns it spans in the enclosing `grid`. Default `1`.
+
+Three KPI cards in one row show the best bid, best ask and last price.
+
+```javascript
+function main() {
+    var ticker = exchange.GetTicker()
+    if (!ticker) return
+    LogStatus({
+        type: "grid", cols: 3, minColWidth: 160, items: [
+            {type: "kpi", title: "Bid", value: ticker.Buy},
+            {type: "kpi", title: "Ask", value: ticker.Sell},
+            {type: "kpi", title: "Last", value: ticker.Last}
+        ]
+    })
+}
+```
+
+```python
+def main():
+    ticker = exchange.GetTicker()
+    if not ticker:
+        return
+    LogStatus({
+        "type": "grid", "cols": 3, "minColWidth": 160, "items": [
+            {"type": "kpi", "title": "Bid", "value": ticker["Buy"]},
+            {"type": "kpi", "title": "Ask", "value": ticker["Sell"]},
+            {"type": "kpi", "title": "Last", "value": ticker["Last"]}
+        ]
+    })
+```
+
+```rust
+fn kpi(title: &str, value: f64) -> String {
+    format!(r#"{{"type": "kpi", "title": "{}", "value": {}}}"#, title, value)
+}
+
+fn main() {
+    let Ok(t) = exchange.GetTicker(None) else { return };
+    let items = [kpi("Bid", t.Buy), kpi("Ask", t.Sell), kpi("Last", t.Last)];
+    // A component is JSON text passed to LogStatus! as is, without backticks
+    LogStatus!(format!(
+        r#"{{"type": "grid", "cols": 3, "minColWidth": 160, "items": [{}]}}"#,
+        items.join(",")
+    ));
+}
+```
+
+The actual column count is the largest value that does not exceed `cols` and keeps every column at least `minColWidth` wide. A child's `span` scales proportionally: a component spanning 2 of 4 columns spans 1 column when the grid drops to 2 columns, and the full row at 1 column.
+
+`grid` and `tabs` can be nested in each other up to 6 levels; deeper parts show an error card.
+
+Passing an array of components directly (for example `LogStatus([a, b])`) is the same as a one-column `grid`: the components are stacked from top to bottom.
+
+See also: `LogStatus`, `Status Bar Components`, `tabs`, `kpi`
+
+##### tabs
+
+Groups components into tabs; the selected tab is kept when the status bar refreshes.
+
+Fields:
+
+- `type` (string): Required. Always `tabs`.
+- `items` (object array): Required. One entry per tab.
+- `items[].title` (string): Tab label.
+- `items[].items` (array): Components of the tab, laid out as a `grid`.
+- `items[].cols` (number): Number of columns of the tab. Default `1`.
+- `id` (string): Stable identifier. Set it when the number or order of components changes, so refreshes do not rebuild the component.
+- `span` (number): Number of columns it spans in the enclosing `grid`. Default `1`.
+
+Two tabs show market data and the account.
+
+```javascript
+function main() {
+    var ticker = exchange.GetTicker()
+    var account = exchange.GetAccount()
+    if (!ticker || !account) return
+    LogStatus({type: "tabs", items: [
+        {title: "Market", cols: 2, items: [
+            {type: "kpi", title: "Last", value: ticker.Last},
+            {type: "kpi", title: "24h volume", value: ticker.Volume, format: {compact: true}}
+        ]},
+        {title: "Account", items: [{type: "stat", items: [
+            {label: "Available", value: account.Balance},
+            {label: "Frozen", value: account.FrozenBalance}
+        ]}]}
+    ]})
+}
+```
+
+```python
+def main():
+    ticker = exchange.GetTicker()
+    account = exchange.GetAccount()
+    if not ticker or not account:
+        return
+    LogStatus({"type": "tabs", "items": [
+        {"title": "Market", "cols": 2, "items": [
+            {"type": "kpi", "title": "Last", "value": ticker["Last"]},
+            {"type": "kpi", "title": "24h volume", "value": ticker["Volume"],
+             "format": {"compact": True}}
+        ]},
+        {"title": "Account", "items": [{"type": "stat", "items": [
+            {"label": "Available", "value": account["Balance"]},
+            {"label": "Frozen", "value": account["FrozenBalance"]}
+        ]}]}
+    ]})
+```
+
+```rust
+fn main() {
+    let Ok(t) = exchange.GetTicker(None) else { return };
+    let Ok(a) = exchange.GetAccount() else { return };
+    let market = format!(
+        r#"{{"title": "Market", "cols": 2, "items": [
+            {{"type": "kpi", "title": "Last", "value": {}}},
+            {{"type": "kpi", "title": "24h volume", "value": {},
+              "format": {{"compact": true}}}}]}}"#,
+        t.Last, t.Volume
+    );
+    let account = format!(
+        r#"{{"title": "Account", "items": [{{"type": "stat", "items": [
+            {{"label": "Available", "value": {}}}, {{"label": "Frozen", "value": {}}}]}}]}}"#,
+        a.Balance, a.FrozenBalance
+    );
+    // When this JSON is the whole status bar it may span several lines
+    LogStatus!(format!(r#"{{"type": "tabs", "items": [{}, {}]}}"#, market, account));
+}
+```
+
+`tabs` has no title of its own. The content of each tab drops columns with the container width like `grid`; nesting is limited to 6 levels.
+
+An array of tables wrapped in backticks (the old style) is also shown as tabs; see `LogStatus-table`.
+
+See also: `LogStatus`, `Status Bar Components`, `grid`, `LogStatus-table`
+
+##### kpi
+
+Shows one prominent number with optional unit, change and hint, for equity, returns or the last price.
+
+Fields:
+
+- `type` (string): Required. Always `kpi`.
+- `value` (number / string): Required. The value: numbers are formatted with `format`, strings are shown as is.
+- `unit` (string): Unit shown after the value.
+- `delta` (number): Change: positive values show the up color with ▲, negative ones the down color with ▼, 2 decimals.
+- `deltaUnit` (string): Unit of `delta`. Default `%`.
+- `format` (object): Number format `{precision, compact, percent}`; see `Status Bar Components`.
+- `color` (string): Color: `up`, `down`, `primary`, `warning` or `muted`; see `Status Bar Components`.
+- `hint` (string): Note shown under the value.
+- `title` (string): Title shown at the top left of the component.
+- `id` (string): Stable identifier. Set it when the number or order of components changes, so refreshes do not rebuild the component.
+- `span` (number): Number of columns it spans in the enclosing `grid`. Default `1`.
+
+A KPI card shows the last price and its change from the open.
+
+```javascript
+function main() {
+    var ticker = exchange.GetTicker()
+    if (!ticker) return
+    var change = ticker.Open > 0 ? (ticker.Last / ticker.Open - 1) * 100 : 0
+    LogStatus({type: "kpi", title: "Last price", value: ticker.Last,
+        delta: change, hint: "vs. open"})
+}
+```
+
+```python
+def main():
+    ticker = exchange.GetTicker()
+    if not ticker:
+        return
+    change = (ticker["Last"] / ticker["Open"] - 1) * 100 if ticker["Open"] > 0 else 0
+    LogStatus({"type": "kpi", "title": "Last price", "value": ticker["Last"],
+               "delta": change, "hint": "vs. open"})
+```
+
+```rust
+fn main() {
+    let Ok(t) = exchange.GetTicker(None) else { return };
+    let change = if t.Open > 0.0 { (t.Last / t.Open - 1.0) * 100.0 } else { 0.0 };
+    LogStatus!(format!(
+        r#"{{"type": "kpi", "title": "Last price", "value": {}, "delta": {}, "hint": "vs. open"}}"#,
+        t.Last, change
+    ));
+}
+```
+
+`delta` is the change itself, not a ratio: write `3.2` for a 3.2% rise. When `value` uses `format.percent`, pass a ratio (`0.032`).
+
+See also: `LogStatus`, `Status Bar Components`, `stat`, `sparkline`
+
+##### stat
+
+Lists label and value pairs, for details such as balances, frozen funds, leverage or liquidation price.
+
+Fields:
+
+- `type` (string): Required. Always `stat`.
+- `items` (object array): Required. Entries without `label` or `value` are skipped.
+- `items[].label` (string): Required. Label.
+- `items[].value` (number / string): Required. Number or text.
+- `items[].unit` (string): Unit.
+- `items[].color` (string): Color: `up`, `down`, `primary`, `warning` or `muted`; see `Status Bar Components`.
+- `items[].format` (object): Number format `{precision, compact, percent}`; see `Status Bar Components`.
+- `items[].hint` (string): Note after the value.
+- `cols` (number): Number of side-by-side columns, `1`–`4`. Default `1`.
+- `title` (string): Title shown at the top left of the component.
+- `id` (string): Stable identifier. Set it when the number or order of components changes, so refreshes do not rebuild the component.
+- `span` (number): Number of columns it spans in the enclosing `grid`. Default `1`.
+
+Two columns show available and frozen funds and the update time.
+
+```javascript
+function main() {
+    var account = exchange.GetAccount()
+    if (!account) return
+    var f2 = {precision: 2}
+    LogStatus({type: "stat", title: "Account", cols: 2, items: [
+        {label: "Available", value: account.Balance, unit: "USDT", format: f2},
+        {label: "Frozen", value: account.FrozenBalance, unit: "USDT", format: f2},
+        {label: "Updated", value: _D()}
+    ]})
+}
+```
+
+```python
+def main():
+    account = exchange.GetAccount()
+    if not account:
+        return
+    f2 = {"precision": 2}
+    LogStatus({"type": "stat", "title": "Account", "cols": 2, "items": [
+        {"label": "Available", "value": account["Balance"], "unit": "USDT", "format": f2},
+        {"label": "Frozen", "value": account["FrozenBalance"], "unit": "USDT", "format": f2},
+        {"label": "Updated", "value": _D()}
+    ]})
+```
+
+```rust
+fn main() {
+    let Ok(a) = exchange.GetAccount() else { return };
+    let item = |label: &str, v: f64| format!(
+        r#"{{"label": "{}", "value": {}, "unit": "USDT", "format": {{"precision": 2}}}}"#,
+        label, v
+    );
+    let items = [
+        item("Available", a.Balance),
+        item("Frozen", a.FrozenBalance),
+        format!(r#"{{"label": "Updated", "value": "{}"}}"#, _D(None)),
+    ];
+    LogStatus!(format!(
+        r#"{{"type": "stat", "title": "Account", "cols": 2, "items": [{}]}}"#,
+        items.join(",")
+    ));
+}
+```
+
+See also: `LogStatus`, `Status Bar Components`, `kpi`, `Account`
+
+##### progress
+
+Shows a ratio, or current value / total, as a bar.
+
+Fields:
+
+- `type` (string): Required. Always `progress`.
+- `value` (number): Required. Current value.
+- `max` (number): Total. When given the bar shows `value / max`; otherwise `value` is a ratio from `0` to `1` shown as a percentage.
+- `color` (string): Bar color, default `primary`. Values: see `Status Bar Components`.
+- `title` (string): Title shown at the top left of the component.
+- `id` (string): Stable identifier. Set it when the number or order of components changes, so refreshes do not rebuild the component.
+- `span` (number): Number of columns it spans in the enclosing `grid`. Default `1`.
+
+Shows the share of frozen funds and today's order count against a cap.
+
+```javascript
+function main() {
+    var account = exchange.GetAccount()
+    if (!account) return
+    var total = account.Balance + account.FrozenBalance
+    var frozen = total > 0 ? account.FrozenBalance / total : 0
+    var orders = 3   // Order count kept by the strategy
+    LogStatus([
+        {type: "progress", title: "Frozen share", value: frozen},
+        {type: "progress", title: "Orders today", value: orders, max: 20, color: "warning"}
+    ])
+}
+```
+
+```python
+def main():
+    account = exchange.GetAccount()
+    if not account:
+        return
+    total = account["Balance"] + account["FrozenBalance"]
+    frozen = account["FrozenBalance"] / total if total > 0 else 0
+    orders = 3   # Order count kept by the strategy
+    LogStatus([
+        {"type": "progress", "title": "Frozen share", "value": frozen},
+        {"type": "progress", "title": "Orders today", "value": orders, "max": 20,
+         "color": "warning"}
+    ])
+```
+
+```rust
+fn main() {
+    let Ok(a) = exchange.GetAccount() else { return };
+    let total = a.Balance + a.FrozenBalance;
+    let frozen = if total > 0.0 { a.FrozenBalance / total } else { 0.0 };
+    let orders = 3; // Order count kept by the strategy
+    LogStatus!(format!(
+        r#"[{{"type": "progress", "title": "Frozen share", "value": {}}},
+           {{"type": "progress", "title": "Orders today", "value": {}, "max": 20,
+             "color": "warning"}}]"#,
+        frozen, orders
+    ));
+}
+```
+
+See also: `LogStatus`, `Status Bar Components`, `gauge`
+
+##### gauge
+
+Shows where a value sits in a range on a half-circle dial, with optional threshold colors; for RSI, exposure or risk.
+
+Fields:
+
+- `type` (string): Required. Always `gauge`.
+- `value` (number): Required. Current value.
+- `min` (number): Lower bound. Default `0`.
+- `max` (number): Upper bound, must be greater than `min`. Default `1`.
+- `unit` (string): Unit.
+- `format` (object): Number format `{precision, compact, percent}`; see `Status Bar Components`.
+- `color` (string): Color when no threshold is reached, default `primary`. Values: see `Status Bar Components`.
+- `thresholds` (object array): Thresholds: the color of the highest threshold reached by `value` is used.
+- `thresholds[].value` (number): From this value on `color` is used.
+- `thresholds[].color` (string): Color: `up`, `down`, `primary`, `warning` or `muted`; see `Status Bar Components`.
+- `title` (string): Title shown at the top left of the component.
+- `id` (string): Stable identifier. Set it when the number or order of components changes, so refreshes do not rebuild the component.
+- `span` (number): Number of columns it spans in the enclosing `grid`. Default `1`.
+
+Shows where the last price sits in the 24-hour high-low range, changing color near the ends.
+
+```javascript
+function main() {
+    var r = exchange.GetRecords(PERIOD_H1)
+    if (!r || r.length < 24) return
+    var bars = r.slice(-24)
+    var hi = Math.max.apply(null, bars.map(function (b) { return b.High }))
+    var lo = Math.min.apply(null, bars.map(function (b) { return b.Low }))
+    var pos = hi > lo ? (bars[23].Close - lo) / (hi - lo) : 0.5
+    var levels = [{value: 0, color: "down"}, {value: 0.2, color: "primary"},
+        {value: 0.8, color: "up"}]
+    LogStatus({type: "gauge", title: "Position in 24h range", value: pos,
+        format: {percent: true}, thresholds: levels})
+}
+```
+
+```python
+def main():
+    r = exchange.GetRecords(PERIOD_H1)
+    if not r or len(r) < 24:
+        return
+    bars = r[-24:]
+    hi = max(b["High"] for b in bars)
+    lo = min(b["Low"] for b in bars)
+    pos = (bars[-1]["Close"] - lo) / (hi - lo) if hi > lo else 0.5
+    levels = [{"value": 0, "color": "down"}, {"value": 0.2, "color": "primary"},
+              {"value": 0.8, "color": "up"}]
+    LogStatus({"type": "gauge", "title": "Position in 24h range", "value": pos,
+               "format": {"percent": True}, "thresholds": levels})
+```
+
+```rust
+fn main() {
+    let Ok(r) = exchange.GetRecords(None, PERIOD_H1, None) else { return };
+    if r.len() < 24 { return; }
+    let bars = &r[r.len() - 24..];
+    let hi = bars.iter().map(|b| b.High).fold(f64::MIN, f64::max);
+    let lo = bars.iter().map(|b| b.Low).fold(f64::MAX, f64::min);
+    let pos = if hi > lo { (bars[23].Close - lo) / (hi - lo) } else { 0.5 };
+    LogStatus!(format!(
+        r#"{{"type": "gauge", "title": "Position in 24h range", "value": {},
+            "format": {{"percent": true}},
+            "thresholds": [{{"value": 0, "color": "down"}}, {{"value": 0.2, "color": "primary"}},
+                           {{"value": 0.8, "color": "up"}}]}}"#,
+        pos
+    ));
+}
+```
+
+A `max` not greater than `min` shows an error card.
+
+See also: `LogStatus`, `Status Bar Components`, `progress`, `kpi`
+
+##### sparkline
+
+Shows a number with a small trend line, colored by the first-to-last change by default.
+
+Fields:
+
+- `type` (string): Required. Always `sparkline`.
+- `data` (numeric array): Required. At least 2 numbers; non-numeric items are ignored.
+- `value` (number / string): The large value. Defaults to the last item of `data`.
+- `unit` (string): Unit.
+- `format` (object): Number format `{precision, compact, percent}`; see `Status Bar Components`.
+- `color` (string): Line color, by default `up` or `down` from comparing the first and last items. Values: see `Status Bar Components`.
+- `title` (string): Title shown at the top left of the component.
+- `id` (string): Stable identifier. Set it when the number or order of components changes, so refreshes do not rebuild the component.
+- `span` (number): Number of columns it spans in the enclosing `grid`. Default `1`.
+
+Shows the close prices of the last 24 hourly K-lines.
+
+```javascript
+function main() {
+    var r = exchange.GetRecords(PERIOD_H1)
+    if (!r || r.length < 24) return
+    var closes = r.slice(-24).map(function (b) { return b.Close })
+    LogStatus({type: "sparkline", title: "Last 24 hours", data: closes})
+}
+```
+
+```python
+def main():
+    r = exchange.GetRecords(PERIOD_H1)
+    if not r or len(r) < 24:
+        return
+    closes = [b["Close"] for b in r[-24:]]
+    LogStatus({"type": "sparkline", "title": "Last 24 hours", "data": closes})
+```
+
+```rust
+fn main() {
+    let Ok(r) = exchange.GetRecords(None, PERIOD_H1, None) else { return };
+    if r.len() < 24 { return; }
+    let closes: Vec<String> = r[r.len() - 24..].iter().map(|b| b.Close.to_string()).collect();
+    LogStatus!(format!(
+        r#"{{"type": "sparkline", "title": "Last 24 hours", "data": [{}]}}"#,
+        closes.join(",")
+    ));
+}
+```
+
+When the first and last items have the same sign, the change between them is shown as a percentage next to the value; it is hidden when the signs differ (for example a funding rate turning negative).
+
+See also: `LogStatus`, `Status Bar Components`, `chart`, `kpi`
+
+##### chart
+
+Draws line, bar or area charts with several series, a right axis and buy/sell marks; use `Chart` for more options.
+
+Fields:
+
+- `type` (string): Required. Always `chart`.
+- `series` (object array): Required. Data series.
+- `series[].data` (numeric array): Required. One value per `x`; non-numeric items leave a gap.
+- `series[].name` (string): Legend name.
+- `series[].kind` (string): Type of this series, overriding `kind`.
+- `series[].color` (string): Series color, assigned in order by default. Values: see `Status Bar Components`.
+- `series[].axis` (string): `right` draws the series on the right axis, for data of a different scale (such as price and volume).
+- `kind` (string): `line`, `bar` or `area`. Default `line`.
+- `x` (string array / numeric array): X-axis values. A time axis when all are millisecond timestamps; indexes when omitted.
+- `marks` (object array): Marks such as buy/sell or rebalance points.
+- `marks[].x` (string / number): Required. A value of `x`; on a time axis the nearest point.
+- `marks[].y` (number): Y value. Defaults to the first series at that point.
+- `marks[].text` (string): Mark label.
+- `marks[].color` (string): `up` draws ▲ below the line, `down` draws ▼ above it, other colors draw a dot.
+- `stacked` (bool): Stack the series. Default `false`.
+- `height` (number): Height in pixels, `120`–`600`. Default `260`.
+- `format` (object): Left-axis number format, default `{"compact": true}`; see `Status Bar Components`.
+- `rightFormat` (object): Right-axis number format. Defaults to `format`.
+- `title` (string): Title shown at the top left of the component.
+- `id` (string): Stable identifier. Set it when the number or order of components changes, so refreshes do not rebuild the component.
+- `span` (number): Number of columns it spans in the enclosing `grid`. Default `1`.
+
+Close prices as a line with volume bars on the right axis, and a mark at the highest close.
+
+```javascript
+function main() {
+    var r = exchange.GetRecords(PERIOD_H1)
+    if (!r || r.length < 48) return
+    r = r.slice(-48)
+    var top = r.reduce(function (a, b) { return b.Close > a.Close ? b : a })
+    LogStatus({
+        type: "chart", title: "Last 48 hours",
+        x: r.map(function (b) { return b.Time }),
+        series: [
+            {name: "Close", data: r.map(function (b) { return b.Close })},
+            {name: "Volume", kind: "bar", axis: "right", color: "muted",
+                data: r.map(function (b) { return b.Volume })}
+        ],
+        marks: [{x: top.Time, text: "High", color: "up"}]
+    })
+}
+```
+
+```python
+def main():
+    r = exchange.GetRecords(PERIOD_H1)
+    if not r or len(r) < 48:
+        return
+    r = r[-48:]
+    top = max(r, key=lambda b: b["Close"])
+    LogStatus({
+        "type": "chart", "title": "Last 48 hours",
+        "x": [b["Time"] for b in r],
+        "series": [
+            {"name": "Close", "data": [b["Close"] for b in r]},
+            {"name": "Volume", "kind": "bar", "axis": "right", "color": "muted",
+             "data": [b["Volume"] for b in r]}
+        ],
+        "marks": [{"x": top["Time"], "text": "High", "color": "up"}]
+    })
+```
+
+```rust
+fn join<T: ToString>(v: impl Iterator<Item = T>) -> String {
+    v.map(|x| x.to_string()).collect::<Vec<_>>().join(",")
+}
+
+fn main() {
+    let Ok(r) = exchange.GetRecords(None, PERIOD_H1, None) else { return };
+    if r.len() < 48 { return; }
+    let r = &r[r.len() - 48..];
+    let top = r.iter().fold(&r[0], |a, b| if b.Close > a.Close { b } else { a });
+    LogStatus!(format!(
+        r#"{{"type": "chart", "title": "Last 48 hours", "x": [{}], "series": [
+            {{"name": "Close", "data": [{}]}},
+            {{"name": "Volume", "kind": "bar", "axis": "right", "color": "muted", "data": [{}]}}],
+            "marks": [{{"x": {}, "text": "High", "color": "up"}}]}}"#,
+        join(r.iter().map(|b| b.Time)),
+        join(r.iter().map(|b| b.Close)),
+        join(r.iter().map(|b| b.Volume)),
+        top.Time
+    ));
+}
+```
+
+Each series holds at most 5000 points; more shows an error card. A legend is shown for several series; drag on the chart to zoom into an x range.
+
+See also: `LogStatus`, `Status Bar Components`, `sparkline`, `Chart`, `KLineChart`
+
+##### heatmap
+
+Shades a 2D grid by value, for returns by period and symbol or correlation matrices.
+
+Fields:
+
+- `type` (string): Required. Always `heatmap`.
+- `x` (string array / numeric array): Required. X-axis labels.
+- `y` (string array / numeric array): Required. Y-axis labels; the first one is at the bottom.
+- `z` (array): Required. 2D numeric array `z[row][column]`: as many rows as `y` labels, each with as many values as `x` labels; non-numeric cells stay empty.
+- `min` (number): Lower bound of the color scale. Defaults to the data minimum.
+- `max` (number): Upper bound of the color scale. Defaults to the data maximum.
+- `color` (string): Single-color shading. When unset and the data has both signs, positive cells use the up color and negative ones the down color, shaded by magnitude. Values: see `Status Bar Components`.
+- `format` (object): Number format `{precision, compact, percent}`; see `Status Bar Components`.
+- `height` (number): Height in pixels, `120`–`600`. Default `260`.
+- `title` (string): Title shown at the top left of the component.
+- `id` (string): Stable identifier. Set it when the number or order of components changes, so refreshes do not rebuild the component.
+- `span` (number): Number of columns it spans in the enclosing `grid`. Default `1`.
+
+Hourly K-lines show the change of every hour over the last 3 days.
+
+```javascript
+function main() {
+    var r = exchange.GetRecords(PERIOD_H1)
+    if (!r || r.length < 73) return
+    var rets = r.slice(-73).map(function (b, i, a) { return i ? b.Close / a[i - 1].Close - 1 : 0 })
+    var days = [1, 25, 49]   // 24 bars per day; the first row is the earliest day
+    LogStatus({
+        type: "heatmap", title: "Hourly change, last 3 days", format: {percent: true, precision: 2},
+        x: r.slice(-24).map(function (b) { return _D(b.Time, "hh:00") }),
+        y: days.map(function (d) { return _D(r[r.length - 73 + d].Time, "MM-dd") }),
+        z: days.map(function (d) { return rets.slice(d, d + 24) })
+    })
+}
+```
+
+```python
+def main():
+    r = exchange.GetRecords(PERIOD_H1)
+    if not r or len(r) < 73:
+        return
+    bars = r[-73:]
+    rets = [0] + [bars[i]["Close"] / bars[i - 1]["Close"] - 1 for i in range(1, 73)]
+    days = [1, 25, 49]   # 24 bars per day; the first row is the earliest day
+    LogStatus({
+        "type": "heatmap", "title": "Hourly change, last 3 days",
+        "format": {"percent": True, "precision": 2},
+        "x": [_D(b["Time"] / 1000, "%H:00") for b in bars[-24:]],
+        "y": [_D(bars[d]["Time"] / 1000, "%m-%d") for d in days],
+        "z": [rets[d:d + 24] for d in days]
+    })
+```
+
+```rust
+fn main() {
+    let Ok(r) = exchange.GetRecords(None, PERIOD_H1, None) else { return };
+    if r.len() < 73 { return; }
+    let bars = &r[r.len() - 73..];
+    let days = [1usize, 25, 49]; // 24 bars per day; the first row is the earliest day
+    // Rust's _D() always prints UTC time
+    let x: Vec<String> = bars[49..].iter()
+        .map(|b| format!("\"{}:00\"", &_D(b.Time)[11..13]))
+        .collect();
+    let y: Vec<String> = days.iter()
+        .map(|&d| format!("\"{}\"", &_D(bars[d].Time)[5..10]))
+        .collect();
+    let ret = |i: usize| (bars[i].Close / bars[i - 1].Close - 1.0).to_string();
+    let row = |d: usize| format!("[{}]", (d..d + 24).map(ret).collect::<Vec<_>>().join(","));
+    let z: Vec<String> = days.iter().map(|&d| row(d)).collect();
+    LogStatus!(format!(
+        r#"{{"type": "heatmap", "title": "Hourly change, last 3 days",
+            "format": {{"percent": true, "precision": 2}},
+            "x": [{}], "y": [{}], "z": [{}]}}"#,
+        x.join(","), y.join(","), z.join(",")
+    ));
+}
+```
+
+The product of the `x` and `y` counts may not exceed 40000; more cells, or `z` dimensions that do not match, show an error card. Hovering shows a cell's value.
+
+See also: `LogStatus`, `Status Bar Components`, `calendar`, `chart`
+
+##### calendar
+
+Shows returns as daily heat cells (like a contribution graph) or as a year × month table.
+
+Fields:
+
+- `type` (string): Required. Always `calendar`.
+- `data` (array): Required. Array of `[date, value]`: the date is a millisecond timestamp or a `YYYY-MM-DD` / `YYYY-MM` string; values of the same day are added up.
+- `mode` (string): `day`: daily heat cells, up to 53 weeks; `month`: a year × month table with yearly totals. Default `day`.
+- `format` (object): Number format `{precision, compact, percent}`; see `Status Bar Components`.
+- `title` (string): Title shown at the top left of the component.
+- `id` (string): Stable identifier. Set it when the number or order of components changes, so refreshes do not rebuild the component.
+- `span` (number): Number of columns it spans in the enclosing `grid`. Default `1`.
+
+Daily K-line changes drawn as a return calendar.
+
+```javascript
+function main() {
+    var r = exchange.GetRecords(PERIOD_D1)
+    if (!r || r.length < 2) return
+    var data = r.slice(1).map(function (b, i) { return [b.Time, b.Close / r[i].Close - 1] })
+    LogStatus({type: "calendar", title: "Daily change", data: data,
+        format: {percent: true, precision: 2}})
+}
+```
+
+```python
+def main():
+    r = exchange.GetRecords(PERIOD_D1)
+    if not r or len(r) < 2:
+        return
+    data = [[r[i]["Time"], r[i]["Close"] / r[i - 1]["Close"] - 1] for i in range(1, len(r))]
+    LogStatus({"type": "calendar", "title": "Daily change", "data": data,
+               "format": {"percent": True, "precision": 2}})
+```
+
+```rust
+fn main() {
+    let Ok(r) = exchange.GetRecords(None, PERIOD_D1, None) else { return };
+    if r.len() < 2 { return; }
+    let data: Vec<String> = r.windows(2)
+        .map(|w| format!("[{}, {}]", w[1].Time, w[1].Close / w[0].Close - 1.0))
+        .collect();
+    LogStatus!(format!(
+        r#"{{"type": "calendar", "title": "Daily change", "data": [{}],
+            "format": {{"percent": true, "precision": 2}}}}"#,
+        data.join(",")
+    ));
+}
+```
+
+Positive values use the up color and negative ones the down color, shaded by magnitude. `day` mode shows only day-precise entries; `month` mode adds up the values of each month. Timestamps are converted to dates in the browser's time zone.
+
+See also: `LogStatus`, `Status Bar Components`, `heatmap`, `histogram`
+
+##### histogram
+
+Bins raw data automatically and shows the counts with sample size, mean, median and share of positive values.
+
+Fields:
+
+- `type` (string): Required. Always `histogram`.
+- `data` (numeric array): Required. Raw data, at least 2 numbers.
+- `bins` (number): Number of bins, `1`–`100`. Defaults to the square root of the sample size, limited to `5`–`40`.
+- `format` (object): Format of bin bounds and statistics; see `Status Bar Components`.
+- `color` (string): Bar color. By default positive bins use the up color and negative ones the down color. Values: see `Status Bar Components`.
+- `height` (number): Height in pixels, `120`–`600`. Default `220`.
+- `title` (string): Title shown at the top left of the component.
+- `id` (string): Stable identifier. Set it when the number or order of components changes, so refreshes do not rebuild the component.
+- `span` (number): Number of columns it spans in the enclosing `grid`. Default `1`.
+
+Shows the distribution of the changes of the last 200 hourly K-lines.
+
+```javascript
+function main() {
+    var r = exchange.GetRecords(PERIOD_H1)
+    if (!r || r.length < 3) return
+    r = r.slice(-201)
+    var rets = r.slice(1).map(function (b, i) { return b.Close / r[i].Close - 1 })
+    LogStatus({type: "histogram", title: "Hourly change distribution", data: rets,
+        format: {percent: true, precision: 2}})
+}
+```
+
+```python
+def main():
+    r = exchange.GetRecords(PERIOD_H1)
+    if not r or len(r) < 3:
+        return
+    r = r[-201:]
+    rets = [r[i]["Close"] / r[i - 1]["Close"] - 1 for i in range(1, len(r))]
+    LogStatus({"type": "histogram", "title": "Hourly change distribution", "data": rets,
+               "format": {"percent": True, "precision": 2}})
+```
+
+```rust
+fn main() {
+    let Ok(r) = exchange.GetRecords(None, PERIOD_H1, None) else { return };
+    if r.len() < 3 { return; }
+    let r = &r[r.len().saturating_sub(201)..];
+    let rets: Vec<String> = r.windows(2)
+        .map(|w| (w[1].Close / w[0].Close - 1.0).to_string())
+        .collect();
+    LogStatus!(format!(
+        r#"{{"type": "histogram", "title": "Hourly change distribution", "data": [{}],
+            "format": {{"percent": true, "precision": 2}}}}"#,
+        rets.join(",")
+    ));
+}
+```
+
+When the data has both signs, `0` falls on a bin boundary, so gains and losses never share a bin.
+
+See also: `LogStatus`, `Status Bar Components`, `calendar`, `chart`
+
+##### pie
+
+Shows the share of each part in the total; a donut by default with the total in the center.
+
+Fields:
+
+- `type` (string): Required. Always `pie`.
+- `items` (object array): Required. The parts; entries without `name` or `value`, or with a negative `value`, are skipped.
+- `items[].name` (string): Required. Name.
+- `items[].value` (number): Required. Value, not negative.
+- `items[].color` (string): Color, assigned in order by default. Values: see `Status Bar Components`.
+- `donut` (bool): Donut chart; `false` draws a solid pie. Default `true`.
+- `legend` (bool): List the parts next to the chart. Default `false`: values show on hover (tap on phones).
+- `format` (object): Number format `{precision, compact, percent}`; see `Status Bar Components`.
+- `title` (string): Title shown at the top left of the component.
+- `id` (string): Stable identifier. Set it when the number or order of components changes, so refreshes do not rebuild the component.
+- `span` (number): Number of columns it spans in the enclosing `grid`. Default `1`.
+
+Shows how margin is split across positions.
+
+```javascript
+function main() {
+    exchange.SetContractType("swap")
+    var positions = exchange.GetPositions()
+    if (!positions) return
+    var items = positions.map(function (p) { return {name: p.Symbol, value: p.Margin} })
+    LogStatus({type: "pie", title: "Margin by position", legend: true, items: items,
+        format: {precision: 2}})
+}
+```
+
+```python
+def main():
+    exchange.SetContractType("swap")
+    positions = exchange.GetPositions()
+    if positions is None:
+        return
+    items = [{"name": p["Symbol"], "value": p["Margin"]} for p in positions]
+    LogStatus({"type": "pie", "title": "Margin by position", "legend": True, "items": items,
+               "format": {"precision": 2}})
+```
+
+```rust
+fn main() {
+    if exchange.SetContractType("swap").is_err() { return; }
+    let Ok(positions) = exchange.GetPositions(None) else { return };
+    let items: Vec<String> = positions.iter()
+        .map(|p| format!(r#"{{"name": "{}", "value": {}}}"#, p.Symbol, p.Margin))
+        .collect();
+    LogStatus!(format!(
+        r#"{{"type": "pie", "title": "Margin by position", "legend": true, "items": [{}],
+            "format": {{"precision": 2}}}}"#,
+        items.join(",")
+    ));
+}
+```
+
+See also: `LogStatus`, `Status Bar Components`, `stat`, `Position`
+
+##### timeline
+
+Lists events in order, for fills, trading signals or risk events.
+
+Fields:
+
+- `type` (string): Required. Always `timeline`.
+- `items` (object array): Required. Events, shown top to bottom in array order; entries without `text` are skipped.
+- `items[].text` (string): Required. Event text.
+- `items[].time` (number / string): Millisecond timestamp or any text; a midnight timestamp shows only the date.
+- `items[].color` (string): Dot color, default `primary`. Values: see `Status Bar Components`.
+- `title` (string): Title shown at the top left of the component.
+- `id` (string): Stable identifier. Set it when the number or order of components changes, so refreshes do not rebuild the component.
+- `span` (number): Number of columns it spans in the enclosing `grid`. Default `1`.
+
+Lists the latest events recorded by the strategy, newest first.
+
+```javascript
+function main() {
+    var events = []
+    var add = function (text, color) {
+        events.unshift({time: Date.now(), text: text, color: color})
+        if (events.length > 10) events.pop()
+    }
+    add("Strategy started", "primary")
+    add("Price breakout", "up")
+    add("Risk check passed", "muted")
+    LogStatus({type: "timeline", title: "Recent events", items: events})
+}
+```
+
+```python
+import time
+
+def main():
+    events = []
+    def add(text, color):
+        events.insert(0, {"time": int(time.time() * 1000), "text": text, "color": color})
+        del events[10:]
+    add("Strategy started", "primary")
+    add("Price breakout", "up")
+    add("Risk check passed", "muted")
+    LogStatus({"type": "timeline", "title": "Recent events", "items": events})
+```
+
+```rust
+fn main() {
+    let mut events: Vec<String> = Vec::new();
+    let mut add = |text: &str, color: &str| {
+        let ms = UnixNano() / 1_000_000;
+        let e = format!(r#"{{"time": {}, "text": "{}", "color": "{}"}}"#, ms, text, color);
+        events.insert(0, e);
+        events.truncate(10);
+    };
+    add("Strategy started", "primary");
+    add("Price breakout", "up");
+    add("Risk check passed", "muted");
+    LogStatus!(format!(
+        r#"{{"type": "timeline", "title": "Recent events", "items": [{}]}}"#,
+        events.join(",")
+    ));
+}
+```
+
+See also: `LogStatus`, `Status Bar Components`, `alert`, `chart`
+
+##### markdown
+
+Renders Markdown text with headings, lists, bold and tables, for strategy notes and market commentary.
+
+Fields:
+
+- `type` (string): Required. Always `markdown`.
+- `text` (string): Required. Markdown text.
+- `id` (string): Stable identifier. Set it when the number or order of components changes, so refreshes do not rebuild the component.
+- `span` (number): Number of columns it spans in the enclosing `grid`. Default `1`.
+
+Builds a note with a heading and a list from account data.
+
+```javascript
+function main() {
+    var account = exchange.GetAccount()
+    if (!account) return
+    var text = "#### Account overview\n" +
+        "- Available: **" + _N(account.Balance, 2) + "** USDT\n" +
+        "- Frozen: " + _N(account.FrozenBalance, 2) + " USDT\n" +
+        "- Updated: " + _D()
+    LogStatus({type: "markdown", text: text})
+}
+```
+
+```python
+def main():
+    account = exchange.GetAccount()
+    if not account:
+        return
+    text = ("#### Account overview\n" +
+        "- Available: **" + str(_N(account["Balance"], 2)) + "** USDT\n" +
+        "- Frozen: " + str(_N(account["FrozenBalance"], 2)) + " USDT\n" +
+        "- Updated: " + _D())
+    LogStatus({"type": "markdown", "text": text})
+```
+
+```rust
+fn main() {
+    let Ok(a) = exchange.GetAccount() else { return };
+    let text = format!(
+        "#### Account overview\\n- Available: **{}** USDT\\n- Frozen: {} USDT\\n- Updated: {}",
+        _N(a.Balance, 2), _N(a.FrozenBalance, 2), _D(None)
+    );
+    // Line breaks are the JSON escape \\n inside the JSON string
+    LogStatus!(format!(r#"{{"type": "markdown", "text": "{}"}}"#, text));
+}
+```
+
+Plain status bar text is not parsed as Markdown; use this component when you need formatting.
+
+See also: `LogStatus`, `Status Bar Components`, `alert`
+
+##### alert
+
+Shows an info, success, warning or error message with an icon, for risk and error notices.
+
+Fields:
+
+- `type` (string): Required. Always `alert`.
+- `level` (string): Level: `info`, `success`, `warning` or `error`. Default `info`.
+- `title` (string): Title. At least one of `title` and `text` is required.
+- `text` (string): Description; when only `text` is given it is shown as the title.
+- `id` (string): Stable identifier. Set it when the number or order of components changes, so refreshes do not rebuild the component.
+- `span` (number): Number of columns it spans in the enclosing `grid`. Default `1`.
+
+Shows a warning when available funds fall below a threshold, otherwise a passed check.
+
+```javascript
+function main() {
+    var account = exchange.GetAccount()
+    if (!account) return
+    var alert = account.Balance < 100
+        ? {type: "alert", level: "warning", title: "Low funds", text: "Below 100, opening paused"}
+        : {type: "alert", level: "success", title: "Funds check passed"}
+    LogStatus(alert)
+}
+```
+
+```python
+def main():
+    account = exchange.GetAccount()
+    if not account:
+        return
+    if account["Balance"] < 100:
+        alert = {"type": "alert", "level": "warning", "title": "Low funds",
+                 "text": "Below 100, opening paused"}
+    else:
+        alert = {"type": "alert", "level": "success", "title": "Funds check passed"}
+    LogStatus(alert)
+```
+
+```rust
+fn main() {
+    let Ok(a) = exchange.GetAccount() else { return };
+    let alert = if a.Balance < 100.0 {
+        r#"{"type": "alert", "level": "warning",
+            "title": "Low funds", "text": "Below 100, opening paused"}"#
+    } else {
+        r#"{"type": "alert", "level": "success", "title": "Funds check passed"}"#
+    };
+    // This JSON is the whole status bar, so it may span lines
+    LogStatus!(alert);
+}
+```
+
+See also: `LogStatus`, `Status Bar Components`, `badge`, `markdown`
+
+##### badge
+
+Shows small labels with a dot inline, so they can follow a line of text.
+
+Fields:
+
+- `type` (string): Required. Always `badge`.
+- `items` (object array): Required. At least one badge with `text`.
+- `items[].text` (string): Required. Badge text.
+- `items[].color` (string): Color, default `primary`. Values: see `Status Bar Components`.
+- `id` (string): Stable identifier. Set it when the number or order of components changes, so refreshes do not rebuild the component.
+- `span` (number): Number of columns it spans in the enclosing `grid`. Default `1`.
+
+Shows the run mode and state after a line of text.
+
+```javascript
+function main() {
+    LogStatus("MA strategy", {type: "badge", items: [
+        {text: IsVirtual() ? "Backtest" : "Live", color: "muted"},
+        {text: "Running", color: "up"}
+    ]})
+}
+```
+
+```python
+def main():
+    LogStatus("MA strategy", {"type": "badge", "items": [
+        {"text": "Backtest" if IsVirtual() else "Live", "color": "muted"},
+        {"text": "Running", "color": "up"}
+    ]})
+```
+
+```rust
+fn main() {
+    let mode = if IsVirtual() { "Backtest" } else { "Live" };
+    let item = |text: &str, color: &str| format!(r#"{{"text": "{}", "color": "{}"}}"#, text, color);
+    let badge = format!(
+        r#"{{"type": "badge", "items": [{}, {}]}}"#,
+        item(mode, "muted"), item("Running", "up")
+    );
+    // Text and a component on one line: the component goes last, as one-line JSON
+    LogStatus!("MA strategy", badge);
+}
+```
+
+See also: `LogStatus`, `Status Bar Components`, `alert`, `kpi`
 
 #### Chart-options
 
@@ -23565,12 +25293,12 @@ An exchange object is named by the value of ```exchange.GetName()```; click a na
 | `Pendle` | Pendle | Spot | Pendle Finance, PT, YT |
 | `Futures_Boros` | Pendle | Futures | Boros, Pendle Boros, Futures_Boros |
 | `Futures_WOOFi` | WOOFi Pro | Futures | WOOFi, Orderly |
-| `Uniswap` | Uniswap | Spot | PancakeSwap, Aerodrome, Velodrome |
+| `Uniswap` | Uniswap | Spot | PancakeSwap, Aerodrome |
 | `Jupiter` | Jupiter | Spot | — |
 | `KyberSwap` | KyberSwap | Spot | Kyber |
 | `OneInch` | 1inch | Spot | — |
 | `OKX_DEX` | OKX DEX | Spot | OKX Web3 |
-| `Futures_Polymarket` | Polymarket | Prediction market | Futures_Polymarket |
+| `Futures_Polymarket` | Polymarket | Prediction market | — |
 | `Futures_Futu` | Futu Securities | Securities and futures | Futu |
 | `Futures_IB` | Interactive Brokers | Securities and futures | IB |
 | `Exchange` | General Protocol | Custom access | Custom Exchange |
@@ -23647,10 +25375,10 @@ Support of the standard functions and trading-mode commands per exchange object.
 | `Pendle` | ✓ | ✗ | ✓ | ✗ | ✗ | ✓ |
 | `Futures_Boros` | ✓ | ✗ | ✓ | ✓ | ✓ | ✓ |
 | `Futures_WOOFi` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `Uniswap` | ✓ | ✗ | ✓ | ✓ | Synth | ✓ |
-| `Jupiter` | ✓ | ✗ | ✓ | ✗ | Synth | ✓ |
-| `KyberSwap` | ✓ | ✗ | ✓ | ✗ | Synth | ✓ |
-| `OneInch` | ✓ | ✗ | ✓ | ✗ | Synth | ✓ |
+| `Uniswap` | ✓ | ✗ | ✓ | ✓ | ✗ | ✓ |
+| `Jupiter` | ✓ | ✗ | ✓ | ✗ | ✗ | ✓ |
+| `KyberSwap` | ✓ | ✗ | ✓ | ✗ | ✗ | ✓ |
+| `OneInch` | ✓ | ✗ | ✓ | ✗ | ✗ | ✓ |
 | `OKX_DEX` | ✓ | ✓ | ✗ | ✓ | Synth | ✓ |
 | **Prediction Markets** |  |  |  |  |  |  |
 | `Futures_Polymarket` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
@@ -23729,7 +25457,7 @@ Support of the standard functions and trading-mode commands per exchange object.
 | `Futures_Boros` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `Futures_WOOFi` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `Uniswap` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✗ |
-| `Jupiter` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `Jupiter` | ✓ | ✓ | ✓ | ✗ | ✗ | ✓ | ✓ | ✗ |
 | `KyberSwap` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✗ |
 | `OneInch` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✗ |
 | `OKX_DEX` | ✓ | ✓ | ✓ | ✗ | ✗ | ✓ | ✗ | ✗ |
@@ -23817,7 +25545,7 @@ Support of the standard functions and trading-mode commands per exchange object.
 | **Prediction Markets** |  |  |  |  |  |  |
 | `Futures_Polymarket` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
 | **Securities and Futures** |  |  |  |  |  |  |
-| `Futures_Futu` | ✗ | ✗ | ✗ | Synth | ✓ | ✓ |
+| `Futures_Futu` | ✗ | ✗ | ✗ | ✗ | ✓ | ✓ |
 | `Futures_IB` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
 | **On-chain & Custom** |  |  |  |  |  |  |
 | `Exchange` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
@@ -23950,7 +25678,7 @@ Crypto exchanges, one page per brand; the spot and futures exchange objects of a
 
 #### AscendEx
 
-Spot trading on AscendEX (formerly BitMax); only spot pairs are served. The account has a cash wallet (the default) and a margin wallet, switched with ```exchange.IO("trade_margin")``` and ```exchange.IO("trade_normal")```; after switching, account, order placement and order queries use that wallet's endpoints. Access uses an API Key and Secret Key.
+Spot, with the cash wallet and the margin wallet (switch with ```exchange.IO("trade_margin")```).
 
 ##### Names and Configuration
 
@@ -23969,17 +25697,12 @@ Trading pairs are written ```BASE_QUOTE```, matching the AscendEx native code ``
 
 ##### Exchange-specific IO Commands
 
-| Command | Arguments | Description | Returns |
-| - | - | - | - |
-| ```trade_margin``` | — | Switch to the margin wallet. Account, order placement, cancellation, order queries, open and historical orders and ```exchange.GetMarkets()``` then use the margin wallet endpoints; ```exchange.GetTickers()``` fails on the margin wallet. Kept locally; no request is sent to the exchange. | The command name itself. |
-| ```trade_normal``` | — | Switch back to the cash wallet (the default). | The command name itself. |
-| ```api``` | method, path[, params[, raw]] | Call an AscendEX endpoint directly; requests are signed by default. (more below the table) | The full exchange response (including ```code```); an error is raised when ```code``` is not 0. |
+| Command | Description |
+| - | - |
+| ```trade_margin``` | Switch to the margin wallet. Account, order placement, cancellation, order queries, open and historical orders and ```exchange.GetMarkets()``` then use the margin wallet endpoints; ```exchange.GetTickers()``` fails on the margin wallet. |
+| ```trade_normal``` | Switch back to the cash wallet (the default). |
 
-The rest of the longer descriptions in the table:
-
-- ```api```: The signature covers only the timestamp and the endpoint name, and the path of a signed request must contain ```/api/pro```; private endpoints need the account group prefix in the path, such as ```/<accountGroup>/api/pro/v1/cash/balance``` (the account group can be read with ```GET /api/pro/v1/info```). A non-empty ```raw``` replaces ```params``` entirely: an encoded query string for ```GET```, the request body for ```POST``` and ```DELETE```.
-
-For the common commands ```base``` and ```currency``` see `exchange.IO`.
+For the common commands ```api```, ```base``` and ```currency``` see `exchange.IO`.
 
 ##### Function Support
 
@@ -23993,13 +25716,12 @@ Served through a fallback:
 
 - The exchange has ceased operation.
 - The amount of a spot market buy order is in the base currency, not a quote-currency amount.
-- The order ```Time``` comes from the exchange's ```createTime``` field; the endpoints behind ```exchange.GetOrders()``` and ```exchange.GetOrder()``` do not return it, so ```Time``` is 0 there.
 
 #### Backpack
 
-```Backpack``` (Spot): Spot trading on Backpack Exchange (mainly USDC-quoted), including the tokenized stocks listed on the exchange; the account reads the spot balances. Access uses an API key created on Backpack (an ED25519 key pair). Perpetual contracts are served by the Futures_Backpack exchange object.
+```Backpack``` (Spot): Spot trading on Backpack Exchange (mainly USDC-quoted), including the tokenized stocks listed on the exchange. Perpetual contracts are served by the Futures_Backpack exchange object.
 
-```Futures_Backpack``` (Futures): Backpack Exchange USDC perpetual contracts, including perpetuals on tokenized stocks. The account is a unified collateral account with cross margin and one-way positions only. Access uses an API key created on Backpack (an ED25519 key pair). Spot is served by the Backpack exchange object.
+```Futures_Backpack``` (Futures): Backpack Exchange USDC perpetual contracts, including perpetuals on tokenized stocks. Spot is served by the Backpack exchange object.
 
 ##### Names and Configuration
 
@@ -24008,10 +25730,10 @@ Served through a fallback:
 | ```Backpack``` | Spot | Backpack Exchange |
 | ```Futures_Backpack``` | Futures | — |
 
-| Field | Required | Description |
-| - | - | - |
-| Access Key | Yes | The public key of the Backpack API key (base64). |
-| Secret Key | Yes | The ED25519 private key matching the public key (32-byte seed, base64 or hex). |
+| Field | Required |
+| - | - |
+| Access Key | Yes |
+| Secret Key | Yes |
 
 ##### Trading Pairs and Contract Codes
 
@@ -24035,16 +25757,21 @@ Backpack lists perpetual contracts only; any other contract code is rejected.
 
 ##### Exchange-specific IO Commands
 
+###### ```Backpack``` (Spot)
+
+| Command | Arguments | Description | Returns |
+| - | - | - | - |
+| ```selfTradePreventionMode``` | string | Self-trade prevention for subsequent orders and conditional orders; one of ```Allow```, ```RejectTaker```, ```RejectMaker```, ```RejectBoth``` (case-sensitive). | Null on success; an error for any other value. |
+
+For the common commands ```api```, ```base``` and ```currency``` see `exchange.IO`.
+
+###### ```Futures_Backpack``` (Futures)
+
 | Command | Arguments | Description | Returns |
 | - | - | - | - |
 | ```selfTradePreventionMode``` | string | Self-trade prevention for subsequent orders and conditional orders; one of ```Allow```, ```RejectTaker```, ```RejectMaker```, ```RejectBoth``` (case-sensitive). | The value set on success; an error for any other value. |
-| ```api``` | method, path[, params[, raw]] | Call a Backpack endpoint directly; requests are signed by default. (more below the table) | The raw exchange response; an error is raised when the response carries a ```message``` or ```error``` error message. |
 
-The rest of the longer descriptions in the table:
-
-- ```api```: Private endpoints need the exchange's instruction name ```instruction``` (such as ```balanceQuery``` or ```orderQueryAll```) in ```params``` (or in the ```raw``` object); it is used for signing only and is not sent with the request. A non-empty ```raw``` replaces ```params``` entirely: for ```GET``` it may be a JSON object or ```a=1&b=2```, for other methods it must be a JSON object. ```path``` may also be a full URL. With ```false``` as the 4th argument the request is not signed, which only works for public ```GET``` endpoints.
-
-For the common commands ```base``` and ```currency``` see `exchange.IO`.
+For the common commands ```api```, ```base``` and ```currency``` see `exchange.IO`.
 
 ##### Function Support
 
@@ -24075,19 +25802,17 @@ Account: ```exchange.GetAccount()``` reads the collateral account: ```Balance```
 
 ###### ```Backpack``` (Spot)
 
-- The amount of a market buy order is the quote currency to spend (placed with Backpack's ```quoteQuantity```); a market sell order uses the base currency amount. Such market buy orders have no order price in queries, so ```Price``` is 0, and ```Amount``` is the filled base currency amount.
-- ```exchange.GetOrders()``` and ```exchange.GetHistoryOrders()``` return regular orders only, without conditional orders; querying a conditional order ID with ```exchange.GetOrder()``` fails, so use ```exchange.GetConditionOrder()``` for conditional orders, and ```exchange.GetConditionOrders()``` / ```exchange.GetHistoryConditionOrders()``` for open and historical conditional orders.
+- The amount of a market buy order is the quote currency to spend (placed with Backpack's ```quoteQuantity```); a market sell order uses the base currency amount. Such market buy orders have no order price in queries, so ```Price``` is 0.
 - ```exchange.GetAccount()``` and ```exchange.GetAssets()``` count available and frozen amounts only, not staked amounts.
 
 ###### ```Futures_Backpack``` (Futures)
 
 - The amount of a market order is the contract quantity (in the base currency) for both buys and sells.
-- ```exchange.GetOrders()``` and ```exchange.GetHistoryOrders()``` return regular orders only, without conditional orders; querying a conditional order ID with ```exchange.GetOrder()``` fails, so use ```exchange.GetConditionOrder()``` for conditional orders.
 - Funding intervals differ between contracts; ```exchange.GetFundings()``` reports each one from the exchange's contract information.
 
 #### BigONE
 
-Spot trading on BigONE; only spot pairs are served. The exchange has no regular market order, so only limit orders can be placed (IOC and maker-only are supported); conditional orders support take-profit and stop-loss and can execute at a limit or at market once triggered. Access uses an API Key and Secret Key created on BigONE.
+Spot trading.
 
 ##### Names and Configuration
 
@@ -24104,18 +25829,6 @@ Pair examples: ```BTC_USDT```, ```ETH_BTC```
 
 Trading pairs are written ```BASE_QUOTE```, matching the BigONE native code ```BTC-USDT```.
 
-##### Exchange-specific IO Commands
-
-| Command | Arguments | Description | Returns |
-| - | - | - | - |
-| ```api``` | method, path[, params[, raw[, sign]]] | Call a BigONE endpoint directly; requests are signed by default, and signed requests support ```GET``` and ```POST``` only. (more below the table) | The full exchange response (```code```, ```data``` and the ```page_token``` used for paging, etc.); an error is raised when ```code``` is not 0. |
-
-The rest of the longer descriptions in the table:
-
-- ```api```: ```params``` goes into the query string for ```GET``` and into a JSON body for ```POST``` (all values are sent as strings). The ```raw``` argument is a query string for ```GET``` (appended after ```params```) and a JSON body sent as is for ```POST``` (keeping booleans, numbers and other value types; passing it together with ```params``` reports an error); with ```false``` as the last argument the request is not signed, which only works for ```GET```.
-
-For the common commands ```base``` and ```currency``` see `exchange.IO`.
-
 ##### Function Support
 
 Not supported (the call fails with an error and returns null): `exchange.ModifyOrder`, `exchange.ModifyConditionOrder`.
@@ -24128,15 +25841,14 @@ Served through a fallback:
 
 - Market orders are not supported, only limit orders; FOK is not supported (a ```tif``` of ```fok``` fails), while IOC and maker-only (```postOnly```) are supported.
 - The open-order and open-conditional-order endpoints require a trading pair: without the ```symbol``` argument, ```exchange.GetOrders()``` and ```exchange.GetConditionOrders()``` query the current trading pair only.
-- ```exchange.GetHistoryOrders()``` and ```exchange.GetHistoryConditionOrders()``` do not support the ```since``` argument (the exchange API has no time-range parameter) and fail when it is given; without it they return the most recent orders, at most 200 by default.
+- ```exchange.GetHistoryOrders()``` and ```exchange.GetHistoryConditionOrders()``` do not support the ```since``` argument (the exchange API has no time-range parameter) and fail when it is given; without it they return the most recent orders.
 - Conditional orders support take-profit and stop-loss (without an order price they execute at market once triggered), not OCO.
-- The order limits in ```exchange.GetMarkets()``` are given as quote-currency amounts (```MinNotional```, ```MaxNotional```); ```MinQty``` and ```MaxQty``` are 0.
 
 #### Binance
 
-```Binance``` (Spot): Binance spot, plus Binance margin accounts (isolated and cross) and cross margin trading under a unified (portfolio margin) account. It connects with a Binance API Key whose Secret Key may be an HMAC secret or an RSA private key; with the Simulate box checked it connects to the Binance demo environment.
+```Binance``` (Spot): Binance spot, plus Binance margin accounts (isolated and cross) and cross margin trading under a unified (portfolio margin) account.
 
-```Futures_Binance``` (Futures): Binance USDⓈ-M (USDT- and USDC-margined) and COIN-M perpetual and delivery contracts, plus Binance European options (USDT-settled). It connects with a Binance API Key whose Secret Key may be an HMAC secret or an RSA private key; a unified (portfolio margin) account is detected automatically; with the Simulate box checked it connects to the Binance demo environment.
+```Futures_Binance``` (Futures): Binance USDⓈ-M (USDT- and USDC-margined) and COIN-M perpetual and delivery contracts, plus Binance European options (USDT-settled).
 
 ##### Names and Configuration
 
@@ -24145,11 +25857,11 @@ Served through a fallback:
 | ```Binance``` | Spot |
 | ```Futures_Binance``` | Futures |
 
-| Field | Required | Default | Description |
-| - | - | - | - |
-| Access Key | Yes | — | The API Key created in Binance API management. |
-| Secret Key | Yes | — | The Secret Key paired with the API Key (HMAC signing); for an RSA key, enter the PKCS#8 PEM private key (containing ```BEGIN PRIVATE KEY```) and requests are signed with RSA. |
-| Simulate | No | Unchecked | — |
+| Field | Required | Default |
+| - | - | - |
+| Access Key | Yes | — |
+| Secret Key | Yes | — |
+| Simulate | No | Unchecked |
 
 ##### Trading Pairs and Contract Codes
 
@@ -24197,19 +25909,14 @@ For the common commands ```api```, ```base``` and ```currency``` see `exchange.I
 
 | Command | Arguments | Description | Returns |
 | - | - | - | - |
-| ```cross``` | bool[, symbol] | Cross (true) / isolated (false) margin, set per contract; the current contract is used when ```symbol``` is omitted. Not available for option contracts. | Null also on success; check GetLastError() afterwards when needed. The exchange reports an error (```-4046```) when the contract is already in the requested mode. |
-| ```dual``` | bool[, symbol] | Hedge (true) / one-way (false) position mode, set separately for USDⓈ-M and COIN-M; ```symbol``` (the current contract when omitted) selects which one. Not available for option contracts. | Null also on success; check GetLastError() afterwards when needed. The exchange reports an error (```-4059```) when that mode is already set. |
-| ```unified``` | bool[, symbol] | Unified account (portfolio margin), using papi.binance.com after switching; detected automatically on the first private request when not set. Fails while the current contract is an option. | Null also on success; check GetLastError() afterwards when needed. |
-| ```selfTradePreventionMode``` | string | Self-trade prevention for subsequent orders; one of ```EXPIRE_TAKER```, ```EXPIRE_MAKER```, ```EXPIRE_BOTH```, ```NONE```. | Null also on success; check GetLastError() afterwards when needed. |
-| ```base``` | [string] | Query or switch the API base address. (more below the table) | The USDⓈ-M address before the change; the current USDⓈ-M address when called without an argument. |
-| ```coinmBase``` | [string] | Query or switch the COIN-M API base address; affects COIN-M only. | The address before the change; the current address when called without an argument. |
-| ```eapiBase``` | [string] | Query or switch the options API base address. In simulation there is no options address by default; set one explicitly with this command. | The address before the change; the current address when called without an argument. |
+| ```cross``` | bool[, symbol] | Cross (true) / isolated (false) margin. | Null also on success; check GetLastError() afterwards when needed. |
+| ```dual``` | bool[, symbol] | Hedge (true) / one-way (false) position mode, set separately for USDⓈ-M and COIN-M. | Null also on success; check GetLastError() afterwards when needed. |
+| ```unified``` | bool[, symbol] | Unified account (portfolio margin), using papi.binance.com after switching; detected automatically on the first private request when not set. Fails while the current contract is an option. | — |
+| ```selfTradePreventionMode``` | string | Self-trade prevention for subsequent orders; one of ```EXPIRE_TAKER```, ```EXPIRE_MAKER```, ```EXPIRE_BOTH```, ```NONE```. | — |
+| ```coinmBase``` | [string] | Query or switch the COIN-M API base address (the ```base``` command covers USDⓈ-M only). | The address before the change. |
+| ```eapiBase``` | [string] | Query or switch the options API base address. | The address before the change. |
 
-The rest of the longer descriptions in the table:
-
-- ```base```: With an official Binance mainnet address (```https://fapi.binance.com```, ```https://dapi.binance.com```, ```https://papi.binance.com```, ```https://eapi.binance.com``` or ```https://api.binance.com```), USDⓈ-M uses that address and COIN-M, unified account and options each go back to their own official mainnet address; with any other address (a proxy, gateway, etc.), USDⓈ-M, COIN-M, unified account and options requests all go to that address. ```coinmBase``` and ```eapiBase``` can override them individually afterwards.
-
-For the common commands ```api``` and ```currency``` see `exchange.IO`.
+For the common commands ```api```, ```base``` and ```currency``` see `exchange.IO`.
 
 ##### Function Support
 
@@ -24239,7 +25946,7 @@ Simulation: The Simulate box uses the Binance demo environment (```demo-api.bina
 
 ###### ```Futures_Binance``` (Futures)
 
-Margin mode: Switch cross/isolated margin per contract with ```exchange.IO("cross", bool)```; set leverage with ```exchange.SetMarginLevel()```. A unified account is always cross margin; switching to isolated fails. When the account has Multi-Assets mode enabled, the exchange rejects switching to isolated margin (```-4168```).
+Margin mode: Switch cross/isolated margin per contract with ```exchange.IO("cross", bool)```; set leverage with ```exchange.SetMarginLevel()```. A unified account is always cross margin; switching to isolated fails.
 
 Position mode: Switch hedge/one-way mode with ```exchange.IO("dual", bool)```; USDⓈ-M and COIN-M are independent. Orders carry position parameters matching the account's actual mode, or an explicit ```positionSide``` in the order's extra parameters.
 
@@ -24257,7 +25964,6 @@ Binance European options (USDT-settled) are supported; options trading must be e
 - ```exchange.SetMarginLevel()``` and ```exchange.GetFundings()``` are not supported, and option contracts cannot switch margin mode.
 - ```exchange.IO("unified", true)``` fails while the current contract is an option; if the account itself is a unified account, options are still traded through the options API.
 - ```exchange.GetMarkets()``` does not list option contracts; get option codes from the Binance API or website.
-- The options account is a separate account; ```exchange.GetAccount()``` and ```exchange.GetAssets()``` do not include its assets.
 
 Option code examples: ```BTC-260925-145000-C```, ```XRP-240112-0.5-C```
 
@@ -24267,23 +25973,18 @@ Option codes are Binance native codes: underlying-expiry (YYMMDD)-strike-C/P, C 
 
 ###### ```Binance``` (Spot)
 
-- The amount of a market buy order is the quote-currency amount (sent as Binance's ```quoteOrderQty```); a market sell order uses the base-currency quantity. Conditional orders always use the base-currency quantity, for both buys and sells.
 - ```exchange.ModifyOrder()``` and ```exchange.ModifyConditionOrder()``` use Binance's cancel-replace endpoint (```cancelReplace```; no new order is placed if the cancellation fails) and return the new order's ID, which should be used from then on; only the normal spot account is supported, margin accounts report an error.
 - Conditional orders support take-profit and stop-loss only, not OCO; create a take-profit order and a stop-loss order separately when needed.
-- ```exchange.GetHistoryOrders()``` and ```exchange.GetHistoryConditionOrders()``` require a trading pair.
 
 ###### ```Futures_Binance``` (Futures)
 
-- Order amounts: base-currency quantity for USDⓈ-M, number of contracts for COIN-M (each contract's face value is the ```CtVal``` of ```exchange.GetMarkets()```, in USD); market buy orders also use the quantity.
-- ```exchange.ModifyOrder()``` amends the price and quantity in place and keeps the order ID; a price or quantity not given keeps the original order's value (the quantity is the original order quantity).
 - Conditional orders support take-profit and stop-loss only, not OCO (Binance futures have no OCO endpoint); modifying a conditional order is not supported, cancel and recreate it instead.
-- ```exchange.GetHistoryOrders()``` and ```exchange.GetHistoryConditionOrders()``` require a contract.
 
 #### Bitfinex
 
-```Bitfinex``` (Spot): Bitfinex spot trading through the Bitfinex v2 API (```https://api.bitfinex.com```), accessed with an API Key and Secret Key. Orders and balances use Bitfinex's exchange wallet, not the margin wallet; Bitfinex perpetual contracts are a separate exchange object, ```Futures_Bitfinex```.
+```Bitfinex``` (Spot): Bitfinex spot trading (exchange wallet) through the Bitfinex v2 API.
 
-```Futures_Bitfinex``` (Futures): Bitfinex derivatives: USDT-settled perpetual contracts through the Bitfinex v2 API (```https://api.bitfinex.com```), accessed with an API Key and Secret Key. Margin sits on the ```F0```-suffixed currencies of the Bitfinex margin wallet, in cross margin with one-way positions; Bitfinex spot is a separate exchange object, ```Bitfinex```.
+```Futures_Bitfinex``` (Futures): Bitfinex derivatives: USDT-settled perpetual contracts.
 
 ##### Names and Configuration
 
@@ -24331,7 +26032,7 @@ For the common commands ```api```, ```base``` and ```currency``` see `exchange.I
 
 | Command | Arguments | Description | Returns |
 | - | - | - | - |
-| ```mbase``` | [url] | Query or switch the market-data (public) API base address (only ```http://``` and ```https://``` addresses are accepted), separate from the trading API base address (the ```base``` command); the same as the trading address when not set. | The address before the change. |
+| ```mbase``` | [string] | Query or switch the market-data (public) API base address, separate from the trading API base address (the ```base``` command); the same as the trading address when not set. | The address before the change. |
 
 For the common commands ```api```, ```base``` and ```currency``` see `exchange.IO`.
 
@@ -24347,11 +26048,7 @@ Served through a fallback:
 
 ###### ```Futures_Bitfinex``` (Futures)
 
-Margin mode: Cross margin only; the margin mode in ```exchange.GetPositions()``` is always cross; ```exchange.IO("cross", ...)``` fails.
-
-Position mode: One-way positions: each contract has a single net position, with Bitfinex expressing long and short by the sign of the amount; ```exchange.IO("dual", ...)``` fails.
-
-Account: Futures margin sits on the ```F0```-suffixed currencies (such as ```USTF0```) of the Bitfinex margin wallet; `exchange.GetAccount` returns the currencies without the suffix (```USTF0``` shows as ```USDT```). Bitfinex has no set-leverage endpoint: ```exchange.SetMarginLevel()``` only records the leverage per contract locally and sends it with each regular and conditional order (10x when not set).
+Account: Futures margin sits on the ```F0```-suffixed currencies (such as ```USTF0```) of the Bitfinex margin wallet; `exchange.GetAccount` returns the currencies without the suffix (```USTF0``` shows as ```USDT```). Bitfinex has no set-leverage endpoint: ```exchange.SetMarginLevel()``` only records the leverage per contract locally and sends it with each order (10x when not set).
 
 ##### Notes
 
@@ -24359,23 +26056,20 @@ Account: Futures margin sits on the ```F0```-suffixed currencies (such as ```UST
 
 - Conditional orders support take-profit and stop-loss only, not OCO.
 - An order ```clientId``` must be a positive integer (Bitfinex's ```cid```); other values report an error. Limit orders support ```tif``` IOC, FOK and maker-only (```postOnly```); market orders do not support FOK or maker-only, and conditional orders do not support IOC or FOK; passing them reports an error.
-- ```exchange.ModifyOrder()``` and ```exchange.ModifyConditionOrder()``` are supported (Bitfinex amends the order in place). Bitfinex amounts carry the direction as a sign, so changing the amount requires the order side.
-- ```exchange.IO("api", ...)``` signs by default and sends the parameters of a signed request as a JSON body; paths starting with ```/v1/``` are signed the Bitfinex v1 way.
 
 ###### ```Bitfinex``` (Spot)
 
 - The amount of a spot market buy order is in the base currency, not a quote-currency amount.
-- Bitfinex prices have 5 significant digits and no fixed tick size; the ```TickSize``` and ```PricePrecision``` returned by `exchange.GetMarkets` are derived from the current last price and change when the price moves to another order of magnitude; amount precision is fixed at 8 decimals.
+- Bitfinex prices have 5 significant digits and no fixed tick size; the ```TickSize``` and ```PricePrecision``` returned by `exchange.GetMarkets` are derived from the current last price and change when the price moves to another order of magnitude.
 
 ###### ```Futures_Bitfinex``` (Futures)
 
 - Order amounts are in coins, not numbers of contracts.
 - Bitfinex prices have 5 significant digits; the ```TickSize``` and ```PricePrecision``` returned by `exchange.GetMarkets` are derived from the current last price.
-- The rate from ```exchange.GetFundings()``` is the current rate from Bitfinex's derivatives status, settled every 8 hours; without arguments it returns every perpetual of the current quote currency.
 
 #### bitFlyer
 
-Spot trading on the Japanese exchange bitFlyer (```api.bitflyer.jp```). Only spot pairs are served (products whose ```market_type``` is ```Spot```), not bitFlyer's FX and futures products; the exchange has no K-line or batch ticker endpoint. Conditional orders use bitFlyer parent orders. Access uses an API Key and Secret Key.
+Spot trading on a Japanese exchange. Only spot pairs are served, not bitFlyer's FX and futures products.
 
 ##### Names and Configuration
 
@@ -24403,19 +26097,17 @@ Served through a fallback:
 ##### Notes
 
 - The amount of a spot market buy order is in the base currency, not a quote-currency amount (orders are placed by bitFlyer ```size```).
-- Maker-only (```postOnly```) orders are not supported; the exchange has no client order ID field, so a custom order ID (```clientId```) is not supported for regular or conditional orders and fails without sending the order.
-- The open-order and open-conditional-order endpoints require a trading pair: without the ```symbol``` argument, ```exchange.GetOrders()``` and ```exchange.GetConditionOrders()``` query the current trading pair only. Without ```limit``` both page through and return all open orders.
-- ```exchange.GetHistoryOrders()``` and ```exchange.GetHistoryConditionOrders()``` do not support the ```since``` argument (the exchange only pages by order id) and fail when it is given; without it they return the most recent orders, at most 100 by default.
+- Maker-only (```postOnly```) orders are not supported.
+- The open-order and open-conditional-order endpoints require a trading pair: without the ```symbol``` argument, ```exchange.GetOrders()``` and ```exchange.GetConditionOrders()``` query the current trading pair only.
+- ```exchange.GetHistoryOrders()``` and ```exchange.GetHistoryConditionOrders()``` do not support the ```since``` argument (the exchange only pages by order id) and fail when it is given; without it they return the most recent orders.
 - Conditional orders use bitFlyer parent orders (SIMPLE) and support take-profit and stop-loss (without an order price they execute at market once triggered), not OCO.
 - ```exchange.GetMarkets()``` gives no price/amount precision or order-size limits (the exchange API does not provide them); those fields are 0.
-- The exchange's ticker endpoint has no 24-hour high, low or open price: ```High``` and ```Low``` in ```exchange.GetTicker()``` are filled with the best ask and best bid, and ```Open``` is 0.
-- The order ID returned on placement is the acceptance ID (starting with ```JRF```), while ```exchange.GetOrders()``` and ```exchange.GetHistoryOrders()``` give the exchange's internal order ID; both IDs can be used to query and cancel, and the same applies to conditional (parent) orders.
 
 #### Bitget
 
-```Bitget``` (Spot): Bitget spot, for unified accounts (UTA; choose v3 for the "Version" option, the default) and classic accounts (choose v2). A Bitget API key is required: Access Key, Secret Key and Passphrase.
+```Bitget``` (Spot): Bitget spot, for unified accounts (UTA; choose v3 for the "Version" option) and classic accounts (choose v2).
 
-```Futures_Bitget``` (Futures): Bitget USDT and USDC perpetual contracts, and coin-margined perpetual and delivery contracts. Supports unified accounts (UTA; choose v3 for the "Version" option, the default) and classic accounts (choose v2). A Bitget API key is required: Access Key, Secret Key and Passphrase.
+```Futures_Bitget``` (Futures): Bitget USDT and USDC perpetual contracts, and coin-margined perpetual and delivery contracts. Supports unified accounts (UTA; choose v3 for the "Version" option) and classic accounts (choose v2).
 
 ##### Names and Configuration
 
@@ -24506,7 +26198,7 @@ Simulation: Check the Simulate box when adding the exchange to use Bitget demo t
 
 ###### ```Futures_Bitget``` (Futures)
 
-Margin mode: On a classic account (v2) switch cross/isolated margin per contract with ```exchange.IO("cross", bool)```; a unified account (v3) is always cross margin. Set leverage with ```exchange.SetMarginLevel()```; under isolated margin only the side given by ```exchange.SetDirection()``` is set (```buy``` long, ```sell``` short, long when no direction was set), or pass ```holdSide``` (v2) or ```posSide``` (v3) in the extra parameters.
+Margin mode: On a classic account (v2) switch cross/isolated margin per contract with ```exchange.IO("cross", bool)```; a unified account (v3) is always cross margin. Set leverage with ```exchange.SetMarginLevel()```.
 
 Position mode: Orders carry open/close parameters matching the account's actual position mode; switch it with ```exchange.IO("dual", bool)```.
 
@@ -24517,20 +26209,17 @@ Simulation: Check the Simulate box when adding the exchange (or switch at run ti
 ###### ```Bitget``` (Spot)
 
 - A unified account (v3) has no spot conditional-order API, so conditional-order functions (```exchange.CreateConditionOrder()```, ```exchange.GetConditionOrders()```, etc.) report an error and return null; a classic account (v2) supports take-profit and stop-loss conditional orders (not OCO) and ```exchange.ModifyConditionOrder()```.
-- ```exchange.ModifyOrder()``` amends in place on a unified account; on a classic account it uses the cancel-replace endpoint (```cancel-replace-order```) and returns the new order's ID (expressed by its client order ID, in the form ```clientOid:…```), which works directly for cancelling and querying the order.
+- ```exchange.ModifyOrder()``` amends in place on a unified account; on a classic account it uses the cancel-replace endpoint (```cancel-replace-order```) and returns the new order's ID.
 
 ###### ```Futures_Bitget``` (Futures)
 
 - ```exchange.GetFundings()``` has no batch query; pass a specific perpetual contract, for example ```exchange.GetFundings("ETH_USDT.swap")```.
 - Conditional orders support take-profit and stop-loss only, not OCO; create a take-profit order and a stop-loss order separately when needed.
-- On a classic account (v2), ```exchange.ModifyOrder()``` has the exchange cancel the old order and place a new one, so the order ID changes and the new ID is returned (a client order ID of the form ```clientOid:...```, usable for queries and cancellation as usual); a unified account (v3) amends in place.
-- Order quantity units: on a classic account (v2) every contract family is in base coin (1 contract = 1 coin); on a unified account (v3) USDT and USDC contracts are in base coin and coin-margined contracts in USD contracts. See ```CtVal``` and ```CtValCcy``` in ```exchange.GetMarkets()```.
-- On a unified account (v3), coin-margined contracts support neither conditional orders nor ```exchange.ModifyOrder()```; calls report an error.
-- Without ```since```, ```exchange.GetHistoryConditionOrders()``` covers the last 7 days on a classic account (v2) and the last 30 days on a unified account (v3); with ```since``` it covers the 30 days starting at ```since```.
+- On a classic account (v2), ```exchange.ModifyOrder()``` has the exchange cancel the old order and place a new one, so the order ID changes and the new ID is returned; a unified account (v3) amends in place.
 
 #### Bithumb
 
-Spot trading on the Korean exchange Bithumb, using Bithumb's new API (Upbit-style, JWT authentication). Only spot pairs are served and conditional orders are not supported. Access uses an API Key and Secret Key.
+Spot trading on a Korean exchange.
 
 ##### Names and Configuration
 
@@ -24557,17 +26246,12 @@ Served through a fallback:
 
 ##### Notes
 
-- The amount of a market buy order is the quote currency to spend (placed with Bithumb's ```order_type=price```); a market sell order uses the base currency amount. In order queries ```Price``` of market orders is -1, and ```Amount``` of a market buy placed by amount is the order amount.
-- Limit orders support the ```tif``` values IOC (```ioc```/```fak```), FOK and post-only (```postOnly```), sent as Bithumb's ```time_in_force``` values ```ioc```, ```fok``` and ```post_only```. Bithumb only allows them on limit orders in KRW markets: market orders, non-KRW markets, or ```postOnly``` together with IOC/FOK fail without sending the order. An IOC order whose remainder was canceled after a partial fill is recorded as done by the exchange and is reported as canceled (```DealAmount``` is the filled amount).
-- A custom order id (```clientId```) is sent as Bithumb's ```client_order_id``` (1-36 characters, letters, digits, ```-``` and ```_``` only; anything else fails); the returned and queried order ID is still the exchange order ID, and order queries return the custom id as sent.
-- In ```exchange.GetMarkets()``` the price precision of KRW markets is derived from the price band of the latest price (Bithumb's KRW tick size depends on the price), the amount step is 0.00000001 and the minimum order value (```MinNotional```) is 5000 KRW; other markets give no price/amount precision.
-- The batch data of ```exchange.GetTickers()``` has no order book, so ```Buy``` and ```Sell``` are 0; ```exchange.GetTicker()``` queries the order book separately for the best bid and ask.
-- The order list endpoints carry no fill details: for orders with fills, ```AvgPrice``` in ```exchange.GetOrders()``` and ```exchange.GetHistoryOrders()``` is the executed total returned by the exchange (```executed_funds```) divided by the filled amount; when that total is missing it is the order price for limit orders and 0 for market orders. Use ```exchange.GetOrder()``` for the exact average fill price.
-- ```exchange.GetHistoryOrders()``` returns filled and canceled orders, at most 100 by default; ```since``` is applied locally to the order creation time.
+- Only GTC limit orders and market orders are supported: a ```tif``` of ```ioc``` or ```fok```, or ```postOnly```, fails.
+- In ```exchange.GetMarkets()``` the price precision of KRW markets is derived from the price band of the latest price (Bithumb's KRW tick size depends on the price); other markets give no price/amount precision.
 
 #### Bitstamp
 
-Spot trading on Bitstamp; only spot pairs are served. The exchange has no conditional-order or order-history endpoint. Private endpoints need the account's customer ID (Client ID) for signing in addition to the API Key and Secret Key.
+Spot trading.
 
 ##### Names and Configuration
 
@@ -24583,19 +26267,7 @@ Spot trading on Bitstamp; only spot pairs are served. The exchange has no condit
 
 Pair examples: ```BTC_USD```, ```ETH_EUR```, ```BTC_USDT```
 
-Trading pairs are written ```BASE_QUOTE```, matching the Bitstamp native code ```btcusd```. USD is assumed when the quote currency is omitted (```BTC``` means ```BTC_USD```).
-
-##### Exchange-specific IO Commands
-
-| Command | Arguments | Description | Returns |
-| - | - | - | - |
-| ```api``` | method, path[, params[, raw[, sign]]] | Call a Bitstamp endpoint directly; requests are signed by default, with ```params``` sent as a form body together with ```key```, ```signature``` and ```nonce``` (Bitstamp private endpoints use ```POST```). (more below the table) | The raw exchange response; an error is raised when the response ```status``` is ```error``` or it carries an ```error``` field. |
-
-The rest of the longer descriptions in the table:
-
-- ```api```: The ```raw``` argument is an encoded ```"a=1&b=2"``` string (or an object); it is appended to the query string for ```GET``` and ```DELETE``` and to the form body for other methods. With ```false``` as the last argument the request is not signed, and ```params``` goes into the query string for ```GET``` and ```DELETE``` and into a form body for other methods.
-
-For the common commands ```base``` and ```currency``` see `exchange.IO`.
+Trading pairs are written ```BASE_QUOTE```, matching the Bitstamp native code ```btcusd```.
 
 ##### Function Support
 
@@ -24609,15 +26281,12 @@ Served through a fallback:
 
 - The amount of a spot market buy order is in the base currency, not a quote-currency amount (Bitstamp's market order endpoint is used).
 - The exchange has no order-history endpoint, so ```exchange.GetHistoryOrders()``` is not supported; ```exchange.GetOrder()``` can still query completed orders.
-- Maker-only (```postOnly```) orders are placed with Bitstamp's ```moc_order```; IOC and FOK limit orders are supported as well.
-- The minimum order size in ```exchange.GetMarkets()``` is the exchange's minimum order value (in the quote currency), given in ```MinNotional```; ```MinQty``` and ```MaxQty``` are 0.
-- ```exchange.GetTrades()``` returns the trades of the last hour (the exchange endpoint's default time window).
 
 #### Bybit
 
-```Bybit``` (Spot): Bybit spot, plus spot margin (borrowing on order). Both unified trading accounts (UTA) and classic accounts are supported, using the Bybit V5 API; a Bybit API key (Access Key, Secret Key) is required.
+```Bybit``` (Spot): Bybit spot, plus spot margin (borrowing on order). Both unified trading accounts (UTA) and classic accounts are supported, using the Bybit V5 API.
 
-```Futures_Bybit``` (Futures): Bybit USDT and USDC perpetual and delivery contracts (linear), coin-margined perpetual and delivery contracts (inverse), and USDT-settled options. Both unified trading accounts (UTA) and classic accounts are supported, using the Bybit V5 API; a Bybit API key (Access Key, Secret Key) is required.
+```Futures_Bybit``` (Futures): Bybit USDT and USDC perpetual and delivery contracts (linear), coin-margined perpetual and delivery contracts (inverse), and USDT-settled options. Both unified trading accounts (UTA) and classic accounts are supported, using the Bybit V5 API.
 
 ##### Names and Configuration
 
@@ -24662,8 +26331,6 @@ The quote currency selects the contract family: ```BTC_USDT``` and ```BTC_USDC``
 
 Delivery contracts are picked from the expiries actually listed in the Bybit instrument list: the week tiers map to contracts expiring in each of the next three seven-day windows, month tiers take month-end expiries, and quarter tiers take month-end expiries in March, June, September or December. A tier the exchange has not listed is rejected.
 
-One contract often belongs to several tiers (a month-end contract is also a third-week contract, a coin-margined quarterly contract is also the monthly one); `exchange.GetMarkets` and the symbols of tickers, orders and positions use only one of them, taken in the order quarter tiers, month tiers, week tiers. A delivery contract outside every tier uses its native code as the contract code, such as ```BTC_USDT.BTCUSDT-24SEP27```. Each contract appears once in `exchange.GetMarkets`; ```delivery``` always coincides with another tier and therefore does not appear. Tier codes and native codes that do not appear there still work, both ```exchange.SetContractType("delivery")``` and ```exchange.GetTicker("BTC_USDT.delivery")```.
-
 Native contract code examples: ```BTCUSDU26```, ```ETHUSDT-04APR25```
 
 Delivery contracts can also be given by their Bybit native code. Some Bybit delivery contracts have no clear cycle and are used by their native code, for example pair ```ETH_USDT``` with contract code ```ETHUSDT-04APR25```.
@@ -24674,9 +26341,9 @@ Delivery contracts can also be given by their Bybit native code. Some Bybit deli
 
 | Command | Arguments | Description | Returns |
 | - | - | - | - |
-| ```trade_margin``` | — | Spot margin; subsequent orders (conditional orders included) carry ```isLeverage=1``` and borrow automatically. Kept locally; no request is made. | The command name itself. |
+| ```trade_margin``` | — | Spot margin; subsequent orders carry ```isLeverage=1``` and borrow automatically. Kept locally; no request is made. | The command name itself. |
 | ```trade_normal``` | — | Switch back to normal spot (the default). | The command name itself. |
-| ```accountType``` | string | Set the account type (which wallet asset queries read): ```UNIFIED``` (unified trading account) or ```SPOT``` (the spot wallet of a classic account). Detected automatically on the first asset query when not set. | The account type set. |
+| ```accountType``` | string | Set the account type: ```UNIFIED``` (unified trading account) or ```SPOT``` (the spot wallet of a classic account). Detected automatically on the first private request when not set. | The account type set. |
 
 For the common commands ```api```, ```base``` and ```currency``` see `exchange.IO`.
 
@@ -24684,9 +26351,9 @@ For the common commands ```api```, ```base``` and ```currency``` see `exchange.I
 
 | Command | Arguments | Description | Returns |
 | - | - | - | - |
-| ```cross``` | bool[, symbol] | Cross (true) / isolated (false) margin; sends a per-contract switch request to the exchange that also sets buy and sell leverage (the contract's last ```exchange.SetMarginLevel()``` value, or 10x if never set). No request is sent when this command already switched to the same mode. Not available for options. | Null also on success; check GetLastError() afterwards when needed. |
-| ```dual``` | bool[, symbol] | Hedge (true) / one-way (false) position mode; sends a switch request to the exchange (carrying the contract's ```symbol```). No request is sent when this command already switched to the same mode. Not available for options. | Null also on success; check GetLastError() afterwards when needed. |
-| ```accountType``` | string | Set the wallet that asset queries read: ```UNIFIED``` (unified trading account), ```CONTRACT``` (the contract wallet of a classic account); ```auto``` restores auto-detection (the default). | The account type set (```auto``` for auto-detection). |
+| ```cross``` | bool[, symbol] | Cross (true) / isolated (false) margin; sends a switch request to the exchange. Switching to isolated also sets buy and sell leverage (the last ```exchange.SetMarginLevel()``` value, or 10x if never set). Not available for options. | Null also on success; check GetLastError() afterwards when needed. |
+| ```dual``` | bool[, symbol] | Hedge (true) / one-way (false) position mode; sends a switch request to the exchange. Not available for options. | Null also on success; check GetLastError() afterwards when needed. |
+| ```accountType``` | string | Set the account type: ```UNIFIED``` (unified trading account), ```CONTRACT``` (the contract wallet of a classic account); ```auto``` restores auto-detection (the default). | The account type set (```auto``` for auto-detection). |
 
 For the common commands ```api```, ```base``` and ```currency``` see `exchange.IO`.
 
@@ -24716,7 +26383,7 @@ Simulation: The Simulate box uses Bybit Demo Trading (```api-demo.bybit.com```);
 
 ###### ```Bybit``` (Spot)
 
-Account: Spot assets of unified trading accounts and classic accounts live in different wallets; the connector queries the account type on the first asset query (or set it with ```exchange.IO("accountType", ...)```). Spot margin is enabled with ```exchange.IO("trade_margin")```, after which orders borrow when placed.
+Account: Spot assets of unified trading accounts and classic accounts live in different wallets; the connector queries the account type on the first private request (or set it with ```exchange.IO("accountType", ...)```). Spot margin is enabled with ```exchange.IO("trade_margin")```, after which orders borrow when placed.
 
 ###### ```Futures_Bybit``` (Futures)
 
@@ -24724,7 +26391,7 @@ Margin mode: Switch cross/isolated margin per contract with ```exchange.IO("cros
 
 Position mode: The contract's position mode is queried automatically before orders, and ```positionIdx``` is added in hedge mode; ```positionIdx``` can also be passed explicitly in the order's extra parameters, or the mode switched with ```exchange.IO("dual", bool)```.
 
-Account: The account type is detected on the first asset query. Under unified trading account 1.0, linear assets are in the unified wallet and inverse assets in the contract wallet; ```exchange.GetAssets()``` queries both.
+Account: The account type is detected on the first private request. Under unified trading account 1.0, linear assets are in the unified wallet and inverse assets in the contract wallet; ```exchange.GetAssets()``` queries both.
 
 ##### Options
 
@@ -24744,20 +26411,14 @@ Option codes are Bybit native codes: underlying-expiry-strike-C/P-settlement coi
 ###### All exchange objects
 
 - Conditional orders support take-profit and stop-loss only, not OCO; create a take-profit order and a stop-loss order separately when needed.
-- ```exchange.ModifyOrder()``` and ```exchange.ModifyConditionOrder()``` amend in place; the order ID does not change.
-
-###### ```Bybit``` (Spot)
-
-- Market-order quantities follow the Bybit API default (a market buy is a quote-currency amount); pass ```marketUnit``` (```baseCoin``` or ```quoteCoin```) in the order's extra parameters to choose the unit; extra parameters are passed to the exchange as is.
 
 ###### ```Futures_Bybit``` (Futures)
 
 - The result of ```exchange.GetMarkets()``` includes pre-launch (PreLaunch) contracts.
-- Order quantity units: linear contracts and options are in base coin; inverse (coin-margined) contracts are in contracts of 1 USD each; see ```CtVal``` and ```CtValCcy``` in ```exchange.GetMarkets()```.
 
 #### Coincheck
 
-Spot trading on the Japanese exchange Coincheck (API address ```https://coincheck.com```). It uses REST only, with no market-data or order push. Private endpoints are signed with a Coincheck API key (Access Key and Secret Key). The exchange has no K-line, all-market ticker, market list or historical order endpoint; see below for how the affected functions behave.
+Spot trading on a Japanese exchange.
 
 ##### Names and Configuration
 
@@ -24785,16 +26446,13 @@ Served through a fallback:
 
 ##### Notes
 
-- The amount of a market buy order is the quote currency (JPY) to spend (placed as Coincheck's ```market_buy_amount```); a market sell order uses the base-currency quantity. A conditional buy that executes at market once triggered is also sized in JPY.
 - Maker-only (```postOnly```, limit orders only) orders are supported; the ```tif``` (IOC, FOK) option is not and reports an error.
 - Conditional orders use the ```stop_loss_rate``` (trigger price) of the Coincheck order endpoint and support take-profit and stop-loss (without an order price they execute at market once triggered), not OCO; conditional orders are canceled through the same endpoint as normal orders.
 - When ```exchange.GetConditionOrders()``` is called without the ```symbol``` argument, take-profit and stop-loss cannot be told apart from the current price, and the conditional orders are returned with the generic condition type.
-- The orders returned by ```exchange.GetOrders()``` and ```exchange.GetConditionOrders()``` only reflect the unfilled part: ```Amount``` is the remaining unfilled quantity (Coincheck's ```pending_amount```), and ```DealAmount``` and ```AvgPrice``` are 0; for a market buy order (such as a conditional buy that executes at market once triggered), ```Amount``` is the remaining JPY amount.
-- ```exchange.GetTicker()``` has no opening price, so ```Open``` is filled with the last price.
 
 #### Coinone
 
-Spot trading on the KRW market of the Korean exchange Coinone (API address ```https://api.coinone.co.kr```). It uses REST only, with no market-data or order push. Private endpoints are signed with a Coinone API key (Access Key and Secret Key).
+Spot trading on a Korean exchange, the KRW market.
 
 ##### Names and Configuration
 
@@ -24821,20 +26479,17 @@ Served through a fallback:
 
 ##### Notes
 
-- ```exchange.GetTickers()``` returns the tickers of all KRW-market pairs; ```exchange.GetMarkets()``` returns only the tradable KRW-market pairs (```trade_status``` is 1).
-- The amount of a market buy order is the quote currency (KRW) to spend (placed as Coinone's ```amount```); a market sell order uses the base-currency quantity.
+- ```exchange.GetTickers()``` returns the tickers of all KRW-market pairs.
 - Maker-only (```postOnly```, limit orders only) orders are supported; the ```tif``` (IOC, FOK) option is not and reports an error.
 - Conditional orders use Coinone ```STOP_LIMIT``` orders and support take-profit and stop-loss; an order price after triggering is required (executing at market once triggered is not supported), and OCO is not supported; conditional orders are canceled through the same endpoint as normal orders.
 - The open orders returned by ```exchange.GetOrders()``` include untriggered conditional orders (```STOP_LIMIT```).
 - The exchange's completed orders carry no order type, so historical conditional orders cannot be queried.
-- When ```exchange.GetConditionOrders()``` is called without the ```symbol``` argument, take-profit and stop-loss cannot be told apart from the current price, and the conditional orders are returned with the generic condition type.
-- ```exchange.GetHistoryOrders()``` reads Coinone's completed orders (```completed_orders```), which include filled orders only, not canceled ones; without ```limit```, at most 100 orders are returned.
 
 #### CoinW
 
-```Coinw``` (Spot): CoinW spot trading through CoinW's ```command```-style spot API (```api.coinw.com```); everything is REST polling, with no market data or order push. Private endpoints need an API key (Access Key and Secret Key). Spot only, with no simulated trading; use ```Futures_Coinw``` for perpetual contracts.
+```Coinw``` (Spot): CoinW spot trading.
 
-```Futures_Coinw``` (Futures): CoinW USDⓈ-margined perpetual contracts (USDT and USDC margin), through the CoinW futures API (```/v1/perpum``` on ```api.coinw.com```); everything is REST polling, with no market data or order push. Private endpoints need an API key (Access Key and Secret Key). Perpetual contracts only, with no coin-margined or delivery contracts and no simulated trading.
+```Futures_Coinw``` (Futures): CoinW USDⓈ-margined perpetual contracts (USDT and USDC margin).
 
 ##### Names and Configuration
 
@@ -24872,21 +26527,13 @@ CoinW lists perpetual contracts only; other contract codes are rejected. Order a
 
 ###### ```Coinw``` (Spot)
 
-| Command | Arguments | Description | Returns |
-| - | - | - | - |
-| ```api``` | method, path, params[, raw] | Call a CoinW spot private endpoint directly, always signed. (more below the table) | The exchange's whole response (not just ```data```); an error is raised when the response ```code``` is not 200. |
-
-The rest of the longer descriptions in the table:
-
-- ```api```: CoinW spot dispatches by ```command```, which must be given in ```params``` (e.g. ```exchange.IO("api", "POST", "/api/v1/private", "command=returnBalances")```); it is an error when missing. ```params``` is an object or a string like ```"a=1&b=2"```; a non-empty ```raw``` replaces ```params``` entirely.
-
-For the common commands ```base``` and ```currency``` see `exchange.IO`.
+No exchange-specific commands; for the common commands see `exchange.IO`.
 
 ###### ```Futures_Coinw``` (Futures)
 
-| Command | Arguments | Description | Returns |
-| - | - | - | - |
-| ```cross``` | bool | Cross (true) / isolated (false) margin, an account-level setting sent to the exchange; the exchange rejects it with an error (code 9042) while positions are open. | The value set. |
+| Command | Arguments | Description |
+| - | - | - |
+| ```cross``` | bool | Cross (true) / isolated (false) margin, an account-level setting sent to the exchange; the exchange rejects it with an error (code 9042) while positions are open. |
 
 For the common commands ```api```, ```base``` and ```currency``` see `exchange.IO`.
 
@@ -24912,7 +26559,7 @@ Served through a fallback:
 
 ###### ```Futures_Coinw``` (Futures)
 
-Margin mode: Switch the account between cross and isolated margin with ```exchange.IO("cross", bool)```; until it is switched, the current mode is queried before each order and sent with it. CoinW has no endpoint for setting leverage: ```exchange.SetMarginLevel()``` only records the leverage (a fraction is truncated, and a value below 1 after truncation is rejected), which is then sent with every order (conditional orders included) of that contract; without it orders use 10x. ```leverage``` in an order's extra parameters sets the leverage of that order.
+Margin mode: Switch the account between cross and isolated margin with ```exchange.IO("cross", bool)```; until it is switched, the current mode is queried before each order and sent with it. CoinW has no endpoint for setting leverage: ```exchange.SetMarginLevel()``` only records the leverage (an integer of at least 1), which is then sent with every order of that contract; without it orders use 10x. ```leverage``` in an order's extra parameters sets the leverage of that order.
 
 Position mode: One-way positions only; ```exchange.IO("dual", ...)``` is not supported. Closing (```closebuy```, ```closesell```) closes the existing position in that direction and fails when there is none.
 
@@ -24921,23 +26568,18 @@ Position mode: One-way positions only; ```exchange.IO("dual", ...)``` is not sup
 ###### ```Coinw``` (Spot)
 
 - The open-order endpoint requires a trading pair: ```exchange.GetOrders()``` without arguments queries the open orders of the current trading pair only, not all pairs.
-- The amount of a market buy order is the quote-currency sum to spend (sent as CoinW's ```funds```); a market sell order's amount is in the base currency.
-- Orders are only limit or market: the exchange does not support post-only (```postOnly```), IOC or FOK, and passing them fails without sending the order. A custom order id (```clientId```) is sent as CoinW's ```out_trade_no``` (at most 50 characters, letters, digits, ```-``` and ```_``` only); the returned and queried order ID is still the exchange order ID.
 
 ###### ```Futures_Coinw``` (Futures)
 
 - Conditional orders support take-profit and stop-loss only, not OCO; orders and conditional orders cannot be modified, cancel and place again instead.
 - The open-order and open-conditional-order endpoints require a trading pair: ```exchange.GetOrders()``` and ```exchange.GetConditionOrders()``` without arguments query the current contract only, not all contracts.
 - ```exchange.GetHistoryOrders()``` and ```exchange.GetHistoryConditionOrders()``` do not support the ```since``` argument (the exchange's history endpoint has no time-range parameter) and fail when it is given; only the most recent orders can be queried.
-- Amounts in ```exchange.GetDepth()``` are in contracts: the coin amounts from the exchange are converted with the coin amount per contract and rounded. Amounts in ```exchange.GetTrades()``` are in contracts as well.
-- USDT-margined and USDC-margined contracts use two accounts: ```exchange.GetAccount()``` and ```exchange.GetAssets()``` query the account of the current contract's quote currency (```BTC_USDC.swap``` queries the USDC account); without a trading pair both accounts are returned.
-- Limit orders support IOC, FOK and post-only (```postOnly```), mapped to the CoinW ```positionType``` values ```IOC```, ```FOK``` and ```PostOnly```; market orders, closing orders (```reduceOnly```, which use the exchange's close-position endpoint) and conditional orders do not support these options and fail when they are given. A custom order ID (```clientId```) is sent as ```thirdOrderId```; closing orders do not support it.
 
 #### Crypto.com
 
-```Crypto``` (Spot): Crypto.com Exchange spot trading (Exchange v1 API ```https://api.crypto.com/exchange/v1```), accessed with an API Key and Secret Key, including spot margin orders (```exchange.IO("trade_margin")```). Balances come from the Crypto.com unified account; Crypto.com derivatives are a separate exchange object, ```Futures_Crypto```.
+```Crypto``` (Spot): Crypto.com Exchange spot trading, including spot margin orders.
 
-```Futures_Crypto``` (Futures): Crypto.com Exchange derivatives: perpetual and delivery contracts (Exchange v1 API ```https://api.crypto.com/exchange/v1```), accessed with an API Key and Secret Key. Tokens in the account can be converted into a USD-denominated amount used as futures margin; position queries and the leverage setting apply to the master account, and ```exchange.IO("accountId", ...)``` selects another account. Crypto.com spot is a separate exchange object, ```Crypto```.
+```Futures_Crypto``` (Futures): Crypto.com Exchange derivatives: perpetual and delivery contracts. Tokens in the account can be converted into a USD-denominated amount used as futures margin.
 
 ##### Names and Configuration
 
@@ -24980,12 +26622,10 @@ Trading pairs look like ```BTC_USD```, matching Crypto.com's ```BTCUSD-PERP``` (
 | ```October``` | The delivery contract expiring in October. |
 | ```November``` | The delivery contract expiring in November. |
 | ```December``` | The delivery contract expiring in December. |
-| ```this_week``` | The nearest-expiring delivery contract. |
-| ```next_week``` | The second-nearest-expiring delivery contract. |
-| ```quarter``` | The nearest delivery contract expiring in March, June, September or December. |
-| ```next_quarter``` | The second-nearest delivery contract expiring in March, June, September or December. |
 
-Delivery contracts use the English name of the expiry month as the contract code, for example trading pair ```BTC_USD``` with contract code ```October```, meaning the latest-expiring delivery contract (the monthly contract) in the nearest such month. Other delivery contracts in the same month (weekly contracts, for example) use the native contract code as the contract code, such as ```BTC_USD.BTCUSD-261009```. Delivery contracts in `exchange.GetMarkets` follow the same naming and each contract appears once.
+Common contract codes not available: ```this_week```, ```next_week```, ```quarter```, ```next_quarter```.
+
+Delivery contracts use the English name of the expiry month as the contract code, for example trading pair ```BTC_USD``` with contract code ```October```, meaning the latest-expiring delivery contract (the monthly contract) in the nearest such month. Other delivery contracts in the same month (weekly contracts, for example) use the native contract code as the contract code, such as ```BTC_USD.BTCUSD-261009```. Delivery contracts in `exchange.GetMarkets` follow the same naming and each contract appears once; ```exchange.SetContractType()``` validates against them, so ```this_week```, ```next_week```, ```quarter``` and ```next_quarter``` cannot be used as contract codes.
 
 Native contract code examples: ```BTCUSD-261030```
 
@@ -24995,30 +26635,20 @@ Crypto.com delivery contract codes in the form ```BTCUSD-YYMMDD``` can also be u
 
 ###### ```Crypto``` (Spot)
 
-| Command | Arguments | Description | Returns |
-| - | - | - | - |
-| ```api``` | httpMethod, method[, params[, raw]] | Call a Crypto.com endpoint directly; the resource is the RPC method name, such as ```private/user-balance``` or ```public/get-tickers``` (a path starting with ```/exchange/v1/``` or a full URL also works). (more below the table) | The complete exchange response (```code``` is 0); null on a business error. |
-| ```trade_margin``` | — | Switch to spot margin; subsequent regular orders are placed with ```spot_margin=MARGIN```, and conditional orders with ```MARGIN_ORDER``` in ```exec_inst```. Affects order placement only; no request is sent to the exchange. | The command name itself. |
-| ```trade_normal``` | — | Switch back to regular spot orders (the default). | The command name itself. |
+| Command | Description | Returns |
+| - | - | - |
+| ```trade_margin``` | Switch to spot margin; subsequent orders (including conditional orders) are placed with ```spot_margin=MARGIN```. Affects order placement only; no request is sent to the exchange. | The command name itself. |
+| ```trade_normal``` | Switch back to regular spot orders (the default). | The command name itself. |
 
-The rest of the longer descriptions in the table:
-
-- ```api```: Requests are signed by default and sent as a JSON-RPC body, with the ```params``` object keeping its JSON types (nested objects and arrays are sent as they are); a ```raw``` JSON object string replaces ```params``` entirely. With the sign argument set to ```false``` the request is unsigned, and ```GET``` parameters go into the query string.
-
-For the common commands ```base``` and ```currency``` see `exchange.IO`.
+For the common commands ```api```, ```base``` and ```currency``` see `exchange.IO`.
 
 ###### ```Futures_Crypto``` (Futures)
 
 | Command | Arguments | Description | Returns |
 | - | - | - | - |
-| ```api``` | httpMethod, method[, params[, raw]] | Call a Crypto.com endpoint directly; the resource is the RPC method name, such as ```private/get-positions``` or ```public/get-tickers``` (a path starting with ```/exchange/v1/``` or a full URL also works). (more below the table) | The complete exchange response (```code``` is 0); null on a business error. |
 | ```accountId``` | string | Set the trading account ID (account uuid) used for querying positions and setting leverage; the master account is used when not set. | An object such as ```{"accountId": "..."}```. |
 
-The rest of the longer descriptions in the table:
-
-- ```api```: Requests are signed by default and sent as a JSON-RPC body, with the ```params``` object keeping its JSON types (nested objects and arrays are sent as they are); a ```raw``` JSON object string replaces ```params``` entirely. With the sign argument set to ```false``` the request is unsigned, and ```GET``` parameters go into the query string.
-
-For the common commands ```base``` and ```currency``` see `exchange.IO`.
+For the common commands ```api```, ```base``` and ```currency``` see `exchange.IO`.
 
 ##### Function Support
 
@@ -25032,38 +26662,27 @@ Served through a fallback:
 
 ###### ```Futures_Crypto``` (Futures)
 
-Margin mode: Cross margin on the unified account with no isolated mode; the margin mode in ```exchange.GetPositions()``` is always cross; ```exchange.IO("cross", ...)``` fails.
-
-Position mode: One-way positions: each contract has a single net position, with Crypto.com expressing long and short by the sign of the quantity; ```exchange.IO("dual", ...)``` fails.
-
 Account: ```exchange.SetMarginLevel()``` sets the leverage of the whole trading account (Crypto.com's account-level leverage); it must be an integer from 1 to 100.
 
 ##### Notes
 
+###### All exchange objects
+
+- Conditional orders support take-profit and stop-loss only, not OCO.
+
 ###### ```Crypto``` (Spot)
 
-- The amount of a market buy order is in the base currency (Crypto.com's ```quantity```), not a quote-currency amount; a conditional buy order that becomes a market order when triggered is also placed in the base currency.
-- Conditional orders support take-profit and stop-loss only, not OCO; they trigger on the last traded price. Conditional orders are placed, modified, canceled and queried through Crypto.com's Advanced Order Management API.
-- Limit orders support ```tif``` IOC, FOK and maker-only (```postOnly```); maker-only cannot be combined with IOC or FOK, and passing ```tif``` or ```postOnly``` on a market order reports an error. Conditional orders with an order price (a limit order once triggered) support ```tif``` and ```postOnly``` too; conditional orders that execute at market once triggered report an error when given them.
-- ```exchange.ModifyOrder()``` and ```exchange.ModifyConditionOrder()``` are supported (Crypto.com amends the order in place, keeping its order ID); conditional orders can change the trigger price, order price and amount, and an order price of -1 turns a conditional limit order into one that executes at market when triggered (a positive price does the reverse). ```tif``` and ```postOnly``` cannot be changed (passing them reports an error).
-- ```exchange.GetOrders()``` and ```exchange.GetConditionOrders()``` without arguments return the open orders of all trading pairs. ```exchange.GetHistoryOrders()``` and ```exchange.GetHistoryConditionOrders()``` return the latest 100 records when ```limit``` is not given, and page automatically to fill a larger ```limit```. Without ```since```, Crypto.com returns only the last day of conditional order history; pass ```since``` to query earlier records.
-- The frozen amount in ```exchange.GetAssets()``` is Crypto.com's ```reserved_qty``` (open orders plus margin in use), and the available amount is the holding minus it.
+- The amount of a regular market buy order is in the base currency (Crypto.com's ```quantity```), not a quote-currency amount; a conditional buy order that becomes a market order when triggered is placed with a quote-currency amount (```notional```).
 
 ###### ```Futures_Crypto``` (Futures)
 
 - `exchange.GetFundings` cannot query in batch: without arguments or with a range (such as ```USD.swap```) it reports an error and returns a null value; pass a specific perpetual symbol such as ```BTC_USD.swap```.
-- Funding settles every hour; the rate is Crypto.com's ```funding_rate``` valuation.
-- The order amount is sent as Crypto.com's ```quantity``` directly; see ```CtVal``` in `exchange.GetMarkets` for the contract size (```CtValCcy```, the size currency, is the underlying coin).
-- Conditional orders support take-profit and stop-loss only, not OCO; they trigger on the mark price.
-- Limit orders support ```tif``` IOC, FOK and maker-only (```postOnly```); maker-only cannot be combined with IOC or FOK, and passing ```tif``` or ```postOnly``` on a market order reports an error. Conditional orders with an order price (a limit order once triggered) support ```tif``` and ```postOnly``` too; conditional orders that execute at market once triggered report an error when given them. Both regular and conditional orders support reduce-only (```reduceOnly```).
-- ```exchange.ModifyOrder()``` and ```exchange.ModifyConditionOrder()``` are supported (Crypto.com amends the order in place); conditional orders can change the trigger price, order price and amount, and an order price of -1 turns a conditional limit order into one that executes at market when triggered (a positive price does the reverse). ```tif``` and ```postOnly``` cannot be changed (passing them reports an error).
-- Without ```since```, ```exchange.GetHistoryConditionOrders()``` returns only the last day of conditional order history from Crypto.com; pass ```since``` to query earlier records.
 
 #### DeepCoin
 
-```DeepCoin``` (Spot): DeepCoin spot trading through the DeepCoin API (```api.deepcoin.com```); everything is REST polling, with no market data or order push. The API KEY configuration needs the Access Key, Secret Key and Passphrase. Account and order calls use the spot account (```SPOT```) only. Spot only, with no simulated trading; use ```Futures_DeepCoin``` for perpetual contracts.
+```DeepCoin``` (Spot): DeepCoin spot trading. The API KEY configuration needs the Access Key, Secret Key and Passphrase.
 
-```Futures_DeepCoin``` (Futures): DeepCoin USDT-margined and coin-margined perpetual contracts through the DeepCoin API (```api.deepcoin.com```); everything is REST polling, with no market data or order push. The API KEY configuration needs the Access Key, Secret Key and Passphrase. Perpetual contracts only, with no simulated trading.
+```Futures_DeepCoin``` (Futures): DeepCoin USDT-margined and coin-margined perpetual contracts. The API KEY configuration needs the Access Key, Secret Key and Passphrase.
 
 ##### Names and Configuration
 
@@ -25072,11 +26691,11 @@ Account: ```exchange.SetMarginLevel()``` sets the leverage of the whole trading 
 | ```DeepCoin``` | Spot | Deepcoin |
 | ```Futures_DeepCoin``` | Futures | — |
 
-| Field | Required | Description |
-| - | - | - |
-| Access Key | Yes | — |
-| Secret Key | Yes | — |
-| Passphrase | Yes | The passphrase set when creating the API key; required for private endpoints. |
+| Field | Required |
+| - | - |
+| Access Key | Yes |
+| Secret Key | Yes |
+| Passphrase | Yes |
 
 ##### Trading Pairs and Contract Codes
 
@@ -25084,7 +26703,7 @@ Account: ```exchange.SetMarginLevel()``` sets the leverage of the whole trading 
 
 Pair examples: ```BTC_USDT```, ```ETH_USDT```
 
-Trading pairs are written ```BTC_USDT```, matching the DeepCoin native code ```BTC-USDT```. Symbols with a contract suffix (such as ```.swap```) are rejected.
+Trading pairs are written ```BTC_USDT```, matching the DeepCoin native code ```BTC-USDT```. This exchange object trades spot only; use ```Futures_DeepCoin``` for perpetual contracts.
 
 ###### ```Futures_DeepCoin``` (Futures)
 
@@ -25106,10 +26725,10 @@ No exchange-specific commands; for the common commands see `exchange.IO`.
 
 ###### ```Futures_DeepCoin``` (Futures)
 
-| Command | Arguments | Description | Returns |
-| - | - | - | - |
-| ```cross``` | bool | Cross (true) / isolated (false) margin. Only changes the local setting without sending a request; subsequent orders, conditional orders and ```exchange.SetMarginLevel()``` carry it. Cross margin by default. | The value set. |
-| ```merge``` | bool | Merged positions (true) / split positions (false). Only changes the local setting without sending a request; subsequent orders, conditional orders and ```exchange.SetMarginLevel()``` carry it. Merged positions by default. | The value set. |
+| Command | Arguments | Description |
+| - | - | - |
+| ```cross``` | bool | Cross (true) / isolated (false) margin. Only changes the local setting without sending a request; subsequent orders, conditional orders and ```exchange.SetMarginLevel()``` carry it. Cross margin by default. |
+| ```merge``` | bool | Merged positions (true) / split positions (false). Only changes the local setting without sending a request; subsequent orders, conditional orders and ```exchange.SetMarginLevel()``` carry it. Merged positions by default. |
 
 For the common commands ```api```, ```base``` and ```currency``` see `exchange.IO`.
 
@@ -25145,17 +26764,14 @@ Position mode: Choose merged/split positions with ```exchange.IO("merge", bool)`
 
 ###### ```DeepCoin``` (Spot)
 
-- Order amendment (```exchange.ModifyOrder()```) is not supported; cancel and place again. Untriggered conditional orders can be modified with ```exchange.ModifyConditionOrder()```, which keeps the order id.
-- The amount of a market buy order is the quote-currency sum to spend (DeepCoin's ```tgtCcy``` is ```quote_ccy```); a market sell order's amount is in the base currency. Limit orders support IOC, FOK and post-only (```postOnly```).
-- Conditional orders support take-profit and stop-loss only, not OCO (place the take-profit and stop-loss legs as two conditional orders). Conditional and regular order ids are not interchangeable; conditional orders can only be canceled with ```exchange.CancelConditionOrder()```.
-- ```exchange.GetOrders()``` and ```exchange.GetConditionOrders()``` query one trading pair only: when omitted or empty they query the current trading pair. The untriggered conditional-order endpoint has no pagination and returns at most 100 orders per call; when the exchange returns exactly 100 orders, ```exchange.GetConditionOrders()``` reports an error (completeness cannot be confirmed).
+- Order amendment (```exchange.ModifyOrder()```) is not supported; cancel and place again. Untriggered conditional orders can be modified with ```exchange.ModifyConditionOrder()```.
+- Conditional orders support take-profit and stop-loss only, not OCO (place the take-profit and stop-loss legs as two conditional orders).
+- ```exchange.GetOrders()``` and ```exchange.GetConditionOrders()``` query one trading pair only: when omitted or empty they query the current trading pair.
 
 ###### ```Futures_DeepCoin``` (Futures)
 
-- Order amendment (```exchange.ModifyOrder()```) uses DeepCoin's cancel-replace endpoint (```replace-order```); the return value is the new order's Id, use it for later queries and cancellation. A changed amount is truncated to whole contracts.
-- Limit orders support IOC, FOK and post-only (```postOnly```).
-- Conditional orders support take-profit and stop-loss only, not OCO (place the take-profit and stop-loss legs as two conditional orders), and cannot carry a custom order id (clientId); untriggered conditional orders can be modified with ```exchange.ModifyConditionOrder()```, which keeps the order id. Conditional and regular order ids are not interchangeable; conditional orders can only be canceled with ```exchange.CancelConditionOrder()```.
-- The open-conditional-order endpoint requires a trading pair: ```exchange.GetConditionOrders()``` without arguments queries the current contract only, and ranges (such as ```USDT.swap```) are not accepted. The endpoint has no pagination and returns at most 100 orders per call; a response of exactly 100 orders is an error (completeness cannot be confirmed).
+- Conditional orders support take-profit and stop-loss only, not OCO (place the take-profit and stop-loss legs as two conditional orders); untriggered conditional orders can be modified with ```exchange.ModifyConditionOrder()```.
+- The open-conditional-order endpoint requires a trading pair: ```exchange.GetConditionOrders()``` without arguments queries the current contract only, and ranges (such as ```USDT.swap```) are not accepted; at most 100 orders are returned per call.
 - Trading coin-margined contracts requires the account to have opened a coin-margined contract account on DeepCoin; otherwise orders are rejected by the exchange.
 
 #### Deribit
@@ -25239,9 +26855,9 @@ Option codes are Deribit native codes: underlying-expiry (day-month-year abbrevi
 
 #### DigiFinex
 
-```DigiFinex``` (Spot): DigiFinex spot trading over the REST endpoints of DigiFinex OpenAPI v3 (```openapi.digifinex.com```); private endpoints need an API key (Access Key and Secret Key). Spot only, with no simulated trading; use ```Futures_DigiFinex``` for perpetual contracts.
+```DigiFinex``` (Spot): DigiFinex spot trading.
 
-```Futures_DigiFinex``` (Futures): DigiFinex perpetual contracts over the REST endpoints of the DigiFinex futures API (```/swap/v2```): USDⓈ-margined (e.g. ```BTC_USDT.swap```) and coin-margined inverse contracts (e.g. ```BTC_USD.swap```), with no delivery contracts. Private endpoints need an API key (Access Key and Secret Key); check Simulate to use DigiFinex futures simulated trading.
+```Futures_DigiFinex``` (Futures): DigiFinex USDⓈ-margined and coin-margined perpetual contracts.
 
 ##### Names and Configuration
 
@@ -25282,15 +26898,7 @@ DigiFinex lists perpetual contracts only; other contract codes are rejected. Ord
 
 ###### ```DigiFinex``` (Spot)
 
-| Command | Arguments | Description | Returns |
-| - | - | - | - |
-| ```api``` | method, path[, params[, raw]] | Call a DigiFinex endpoint directly; ```path``` may be a full URL. (more below the table) | The whole exchange response; an error is raised when the response ```code``` is not 0. |
-
-The rest of the longer descriptions in the table:
-
-- ```api```: Requests are signed by default, with ```GET``` parameters in the query string and ```POST``` parameters as a form body; with the sign argument set to ```false``` the request is unsigned, which only works for ```GET```. ```raw``` is not a request body but a parameter table (a JSON object) that replaces ```params``` entirely when non-empty and is signed as usual; object or array values are JSON-encoded into a single field.
-
-For the common commands ```base``` and ```currency``` see `exchange.IO`.
+No exchange-specific commands; for the common commands see `exchange.IO`.
 
 ###### ```Futures_DigiFinex``` (Futures)
 
@@ -25298,13 +26906,8 @@ For the common commands ```base``` and ```currency``` see `exchange.IO`.
 | - | - | - | - |
 | ```simulate``` | bool | Switch between simulated (true) and live (false) trading; only changes the local setting. After switching, the ticker list (```exchange.GetTickers()```), contract list, account balance and position queries carry the simulated-trading parameter (```type=1```); orders, cancels and other endpoints do not. | Null on success. |
 | ```cross``` | bool[, symbol] | Cross (true) / isolated (false) margin, sent to the exchange per contract; applies to the current contract when no symbol is given. | The value that was set (```false``` when switching to isolated); null when the exchange rejects it. |
-| ```api``` | method, path[, params[, raw]] | Call a DigiFinex futures endpoint directly; only ```GET``` and ```POST``` are supported, and ```path``` starts with ```/``` or is a full URL. (more below the table) | The whole exchange response (with ```code``` and ```data```); an error is raised when the response ```code``` is not 0. |
 
-The rest of the longer descriptions in the table:
-
-- ```api```: Requests are signed by default, with ```GET``` parameters in the query string and ```POST``` parameters as a JSON body; with the sign argument set to ```false``` the request is unsigned, which only works for ```GET```. ```raw``` is not a request body but a parameter table (a JSON object or ```"a=1&b=2"```) that replaces ```params``` entirely when non-empty and is signed as usual.
-
-For the common commands ```base``` and ```currency``` see `exchange.IO`.
+For the common commands ```api```, ```base``` and ```currency``` see `exchange.IO`.
 
 ##### Function Support
 
@@ -25318,9 +26921,7 @@ Served through a fallback:
 
 ###### ```Futures_DigiFinex``` (Futures)
 
-Margin mode: Switch cross/isolated margin per contract with ```exchange.IO("cross", bool)```; it fails when the exchange's acknowledgement does not match the request. ```exchange.SetMarginLevel()``` sets leverage per contract and needs no extra arguments: cross-margin or one-way accounts are set in one request; isolated accounts in hedge mode need leverage per side, so when the exchange reports a position mode error the connector adds the margin mode and sets the same leverage on both the long and the short side (it fails if either side fails, and the error names the side that was already set). The margin mode it adds is the one ```exchange.IO("cross", bool)``` set for that contract during this run, or isolated when it was not set. The direction set by ```exchange.SetDirection()``` does not affect leverage.
-
-Position mode: There is no command for switching the position mode (```exchange.IO("dual", ...)``` reports it as unsupported). Orders use the four direction codes open long, open short, close long and close short, following the direction set by ```exchange.SetDirection()```.
+Margin mode: Switch cross/isolated margin per contract with ```exchange.IO("cross", bool)```; it fails when the exchange's acknowledgement does not match the request. ```exchange.SetMarginLevel()``` sets leverage per contract; isolated accounts in hedge mode need leverage per side, so when the exchange reports a position mode error the connector retries once with the margin mode (isolated by default, or ```margin_mode``` in the extra parameters) and the side (the direction set by ```exchange.SetDirection()```, or ```side``` in the extra parameters: ```long```/```short```).
 
 Simulation: Check the Simulate box when adding the exchange to use DigiFinex futures simulated trading; ```exchange.IO("simulate", true)``` still switches at run time for older strategies. Simulated trading only affects the ticker list, contract list, account balance and position queries (they carry ```type=1```).
 
@@ -25336,9 +26937,9 @@ DigiFinex spot has no simulated environment and its configuration has no Simulat
 
 #### Gate
 
-```GateIO``` (Spot): Gate spot (Gate API v4), plus margin accounts (isolated and cross) and spot trading under a unified account. It connects with a Gate API Key (Access Key and Secret Key); with the Simulate box checked it connects to the Gate testnet.
+```GateIO``` (Spot): Gate spot, plus margin accounts (isolated and cross) and spot trading under a unified account.
 
-```Futures_GateIO``` (Futures): Gate USDT-margined perpetual and delivery contracts, coin-margined (BTC-settled) perpetual contracts, and USDT options (Gate API v4). It connects with a Gate API Key (Access Key and Secret Key); both classic and unified accounts are supported. With the Simulate box checked it connects to the Gate testnet.
+```Futures_GateIO``` (Futures): Gate USDT-margined perpetual and delivery contracts, coin-margined (BTC-settled) perpetual contracts, and USDT options. Both classic and unified accounts are supported.
 
 ##### Names and Configuration
 
@@ -25359,7 +26960,7 @@ DigiFinex spot has no simulated environment and its configuration has no Simulat
 
 Pair examples: ```BTC_USDT```, ```ETH_BTC```
 
-Pairs are written as ```BTC_USDT``` without a contract code; symbols with a contract suffix such as ```.swap``` are rejected (use a Futures_GateIO exchange object for contracts).
+Pairs are written as ```BTC_USDT``` without a contract code; use a Futures_GateIO exchange object for contracts.
 
 ###### ```Futures_GateIO``` (Futures)
 
@@ -25434,7 +27035,7 @@ Simulation: The Simulate box uses the Gate testnet (```api-testnet.gateapi.io```
 
 ###### ```GateIO``` (Spot)
 
-Account: The default is the normal spot account; ```exchange.IO("trade_margin")``` and ```exchange.IO("trade_super_margin")``` switch to the isolated and cross margin accounts. Whether the account is unified is detected on the first private request, or set with ```exchange.IO("unified", bool)```. Under the isolated margin account, ```exchange.GetAccount()``` and ```exchange.GetAssets()``` sum the balances of all isolated pairs (the same currency is added up).
+Account: The default is the normal spot account; ```exchange.IO("trade_margin")``` and ```exchange.IO("trade_super_margin")``` switch to the isolated and cross margin accounts. Whether the account is unified is detected on the first private request, or set with ```exchange.IO("unified", bool)```.
 
 ###### ```Futures_GateIO``` (Futures)
 
@@ -25442,7 +27043,7 @@ Margin mode: Gate expresses the margin mode through the leverage value (leverage
 
 Position mode: Hedge mode is set per settlement currency and applies to perpetuals only; switch it with ```exchange.IO("dual", bool)```.
 
-Account: Whether the account is unified is detected on the first private request, or set with ```exchange.IO("unified", bool)```. On a classic account, perpetuals, delivery contracts and options are separate wallets, and USDT-margined and coin-margined are separate too: ```exchange.GetAccount()``` and ```exchange.GetAssets()``` return only the wallet of the current contract. On a unified account they return all currencies of the unified account.
+Account: Whether the account is unified is detected on the first private request, or set with ```exchange.IO("unified", bool)```. On a classic account, perpetuals, delivery contracts and options are separate wallets, and USDT-margined and coin-margined are separate too: ```exchange.GetAccount()``` and ```exchange.GetAssets()``` return only the wallet of the current contract.
 
 ##### Options
 
@@ -25458,22 +27059,17 @@ Option codes are Gate native codes: underlying-expiry (YYYYMMDD)-strike-C/P, and
 
 ###### ```GateIO``` (Spot)
 
-- The amount of a market buy order is the quote-currency amount to spend; a market sell order is in base currency (sent as Gate's ```amount```). Conditional orders that execute at market after triggering work the same way.
 - Market orders are submitted as ```fok``` (fill or kill) by default; override with ```time_in_force``` in the order's extra parameters.
-- ```exchange.GetHistoryOrders()``` needs a pair (the current pair when omitted); an empty string fails.
-- Conditional orders support take-profit and stop-loss only, not OCO; modifying a conditional order is not supported, cancel and recreate it instead. The order placed on trigger is a GTC limit order when an order price is given, otherwise an IOC market order; the trigger is valid for 30 days. ```exchange.GetHistoryConditionOrders()``` does not support the ```since``` argument (the exchange API cannot filter by time) and fails when it is given.
+- Conditional orders support take-profit and stop-loss only, not OCO; modifying a conditional order is not supported, cancel and recreate it instead.
 
 ###### ```Futures_GateIO``` (Futures)
 
-- Order, position and trade amounts are contract counts (the minimum order size is the ```MinQty``` in ```exchange.GetMarkets()```; some contracts accept fractional contracts); what one contract represents is the ```CtVal``` in ```exchange.GetMarkets()```: some base currency for USDT-margined contracts and options, 1 USD per contract for coin-margined contracts.
-- Market orders are sent with price 0 and ```ioc``` (how Gate futures express a market order).
-- ```exchange.GetHistoryOrders()``` needs a specific contract (the current contract when omitted); an empty string or a range fails. Delivery contracts do not support the ```since``` argument.
-- Conditional orders support take-profit and stop-loss only, not OCO, and trigger on the last traded price; the order placed on trigger is a limit order when an order price is given, otherwise a market order (price 0, ```ioc```). ```exchange.ModifyConditionOrder()``` supports perpetuals only (amended in place); for delivery contracts cancel and recreate instead.
+- Conditional orders support take-profit and stop-loss only, not OCO. ```exchange.ModifyConditionOrder()``` supports perpetuals only (amended in place); for delivery contracts cancel and recreate instead.
 - ```exchange.GetHistoryConditionOrders()``` does not support the ```since``` argument (the exchange API cannot filter by time) and fails when it is given.
 
 #### Gemini
 
-Spot trading on Gemini (API address ```https://api.gemini.com```). It uses REST only, with no market-data or order push. Private endpoints are signed with a Gemini API key (Access Key and Secret Key). With a master API key (starting with ```master-```), ```exchange.IO("subAccount", name)``` selects the sub-account to operate on. Market orders and conditional orders are not supported.
+Spot trading.
 
 ##### Names and Configuration
 
@@ -25492,9 +27088,9 @@ Trading pairs are written ```BASE_QUOTE```, matching the Gemini native code ```b
 
 ##### Exchange-specific IO Commands
 
-| Command | Arguments | Description | Returns |
-| - | - | - | - |
-| ```subAccount``` | string | Set the sub-account name. Only takes effect with a master API key (an Access Key starting with ```master-```), whose private requests then carry this sub-account; ```primary``` is used when not set. | A null value. |
+| Command | Arguments | Description |
+| - | - | - |
+| ```subAccount``` | string | Set the sub-account name. Only takes effect with a master API key (an Access Key starting with ```master-```), whose private requests then carry this sub-account; ```primary``` is used when not set. |
 
 For the common commands ```api```, ```base``` and ```currency``` see `exchange.IO`.
 
@@ -25511,12 +27107,10 @@ Served through a fallback:
 - Market orders are not supported, only limit orders; IOC, FOK and maker-only (```postOnly```) are supported.
 - ```exchange.GetHistoryOrders()``` does not support the ```since``` argument and fails when it is given; at most 500 orders are returned per call.
 - The K-line endpoint has no paging, so each period only gives the most recent batch the exchange returns (about the last day for 1-minute K-lines).
-- ```exchange.GetMarkets()``` returns only the spot pairs whose status is ```open```, not Gemini's perpetual contracts; precision and similar details are queried from the exchange one pair at a time, so the call takes a while.
-- In ```exchange.GetTrades()```, trades from auction matching have no taker side, so their ```Type``` is ```2```.
 
 #### HashKey
 
-Spot trading on the Hong Kong-based exchange HashKey (API address ```https://api-pro.hashkey.com```), with pairs quoted in USDT, USDC, USD, HKD and others. It uses REST only, with no market-data or order push. Private endpoints are signed with a HashKey API key (Access Key and Secret Key). Conditional orders and order amendment are not supported.
+Spot trading (API address ```https://api-pro.hashkey.com```).
 
 ##### Names and Configuration
 
@@ -25544,12 +27138,10 @@ Served through a fallback:
 ##### Notes
 
 - Limit orders support IOC, FOK and maker-only (```postOnly```, HashKey's ```LIMIT_MAKER```); market orders do not support maker-only or FOK and report an error when they are passed.
-- ```exchange.GetHistoryOrders()``` returns finished orders only (not open or partially filled orders still on the book); without ```limit```, at most 100 orders are returned.
-- ```exchange.GetTickers()``` skips pairs whose last, open, high and low prices and volume are all 0 (no trades).
 
 #### HitBTC
 
-Spot trading on HitBTC (API address ```https://api.hitbtc.com```, v3 API), without HitBTC's perpetual contracts (```_PERP```): ```exchange.GetMarkets()``` and ```exchange.GetTickers()``` list only the spot pairs whose exchange status is ```working```. It uses REST only, with no market-data or order push. Private endpoints use a HitBTC API key (Access Key and Secret Key).
+Spot trading.
 
 ##### Names and Configuration
 
@@ -25579,15 +27171,13 @@ Served through a fallback:
 - The amount of a spot market buy order is in the base currency, not a quote-currency amount (orders are placed by HitBTC ```quantity```).
 - Limit orders support IOC, FOK and maker-only (```postOnly```).
 - Order IDs use the HitBTC ```client_order_id``` (order queries, cancellation and amendment all address orders by it).
-- ```exchange.ModifyOrder()``` can change the price and amount; a price or amount that is not positive is left unchanged. Amending gives the order a new ```client_order_id```, so the new order ID is returned; use the new ID from then on.
-- Conditional orders support take-profit and stop-loss (without an order price they execute at market once triggered), not OCO; ```exchange.ModifyConditionOrder()``` can change the trigger price, order price and amount (values that are not positive are left unchanged) and, like a normal amendment, returns the new order ID; conditional orders are canceled through the same endpoint as normal orders.
-- ```exchange.GetHistoryOrders()``` queries by trading pair and returns finished orders only; without ```limit```, at most 1000 orders are returned.
+- Conditional orders support take-profit and stop-loss (without an order price they execute at market once triggered), not OCO; ```exchange.ModifyConditionOrder()``` can change the trigger price, order price and amount, and conditional orders are canceled through the same endpoint as normal orders.
 
 #### HTX
 
-```Huobi``` (Spot): HTX (Huobi) spot, plus isolated and cross margin accounts; it connects to ```api.huobi.pro``` by default. It uses an HTX API Key (Access Key and Secret Key); orders and balance queries use the key's spot account (or the margin account switched to).
+```Huobi``` (Spot): HTX (Huobi) spot, plus isolated and cross margin accounts.
 
-```Futures_HuobiDM``` (Futures): HTX (Huobi) USDT-margined perpetual and delivery contracts, and coin-margined perpetual and delivery contracts; it connects to ```api.hbdm.com``` by default (the three kinds belong to HTX's separate USDT-margined, coin-margined perpetual and coin-margined delivery APIs). It uses an HTX API Key (Access Key and Secret Key); classic accounts, unified accounts and multi-asset margin mode are supported.
+```Futures_HuobiDM``` (Futures): HTX (Huobi) USDT-margined perpetual and delivery contracts, and coin-margined perpetual and delivery contracts. Classic accounts, unified accounts and multi-asset margin mode are supported.
 
 ##### Names and Configuration
 
@@ -25596,13 +27186,10 @@ Served through a fallback:
 | ```Huobi``` | Spot | — |
 | ```Futures_HuobiDM``` | Futures | Futures_HTX, HuobiDM |
 
-✓ marks the exchange objects that have the field.
-
-| Field | ```Huobi``` | ```Futures_HuobiDM``` | Required | Description |
-| - | - | - | - | - |
-| Access Key | ✓ | ✓ | Yes | — |
-| Secret Key | ✓ |  | Yes | The Secret Key paired with the API Key. For an HTX key that requires an extra ECDSA signature, write it as ```Secret Key,PEM private key``` (the part after the comma is a secp256k1 private key in PEM); requests then carry ```PrivateSignature``` in addition to the HMAC signature. |
-| Secret Key |  | ✓ | Yes | — |
+| Field | Required |
+| - | - |
+| Access Key | Yes |
+| Secret Key | Yes |
 
 ##### Trading Pairs and Contract Codes
 
@@ -25610,7 +27197,7 @@ Served through a fallback:
 
 Pair examples: ```BTC_USDT```, ```ETH_BTC```
 
-Pairs are written as ```BTC_USDT``` without a contract code; symbols with a contract suffix such as ```.swap``` are rejected (use a Futures_HuobiDM exchange object for contracts). HTX trading pairs with Chinese names are supported, for example ```币安人生_USDT```.
+Pairs are written as ```BTC_USDT``` without a contract code; use a Futures_HuobiDM exchange object for contracts. HTX trading pairs with Chinese names are supported, for example ```币安人生_USDT```.
 
 ###### ```Futures_HuobiDM``` (Futures)
 
@@ -25648,14 +27235,10 @@ For the common commands ```api```, ```base``` and ```currency``` see `exchange.I
 
 | Command | Arguments | Description | Returns |
 | - | - | - | - |
-| ```cross``` | bool | Cross (true, the default) / isolated (false) margin, effective for USDT-margined contracts on classic and unified accounts only. (more below the table) | Null also on success; check GetLastError() afterwards when needed. |
-| ```dual``` | bool[, symbol] | Hedge (true, dual_side) / one-way (false, single_side) position mode; sends a switch request to the exchange. USDT-margined contracts only. On classic and unified accounts it switches the cross or isolated account (isolated per the contract's pair) according to the current ```cross``` setting. | Null also on success; check GetLastError() afterwards when needed. |
-| ```unified``` | bool | Sends a request switching the account to a unified (true) / classic (false) account; the account shape is detected again after success. | Null also on success; check GetLastError() afterwards when needed. |
+| ```cross``` | bool | Cross (true, the default) / isolated (false) margin, effective for USDT-margined contracts only. Kept locally and used when placing orders; no request is made and it applies to all contracts. | Null also on success; check GetLastError() afterwards when needed. |
+| ```dual``` | bool[, symbol] | Hedge (true, dual_side) / one-way (false, single_side) position mode; sends a switch request to the exchange. USDT-margined contracts only. | Null also on success; check GetLastError() afterwards when needed. |
+| ```unified``` | bool | Sends a request switching the account to a unified (true) / classic (false) account. | Null also on success; check GetLastError() afterwards when needed. |
 | ```signHost``` | string | Set the Host used for API signing. HTX includes the host in the signature, so set it when accessing through a proxy or alternative domain; without it the host of the API base address is used. | Null also on success. |
-
-The rest of the longer descriptions in the table:
-
-- ```cross```: Kept locally with no request to the exchange and applies to all contracts: subsequent USDT-margined orders, cancellations, conditional orders, and position and order queries use the API of that mode (on a classic account ```exchange.GetAccount()``` and ```exchange.GetAssets()``` sum cross and isolated). Multi-asset margin mode is always cross and is not affected.
 
 For the common commands ```api```, ```base``` and ```currency``` see `exchange.IO`.
 
@@ -25681,11 +27264,11 @@ Served through a fallback:
 
 ###### ```Huobi``` (Spot)
 
-Account: The wallet mode is kept locally; after switching, orders and balance queries use the corresponding margin account. Isolated margin accounts are per pair, so ```exchange.GetAccount()``` and ```exchange.GetAssets()``` cannot tell which pair's isolated account to use and fail in isolated mode; likewise, ```exchange.GetOrders()``` and ```exchange.GetConditionOrders()``` need a pair in isolated mode.
+Account: The wallet mode is kept locally; after switching, orders and balance queries use the corresponding margin account. Isolated margin accounts are per pair, so ```exchange.GetAccount()``` and ```exchange.GetAssets()``` cannot tell which pair's isolated account to use and fail in isolated mode.
 
 ###### ```Futures_HuobiDM``` (Futures)
 
-Margin mode: USDT-margined contracts default to cross margin; switch to isolated with ```exchange.IO("cross", false)``` (affects subsequent trading and queries, see that command). Coin-margined contracts are isolated, and multi-asset margin mode is cross. Classic and unified accounts have no separate leverage API: ```exchange.SetMarginLevel()``` is kept locally and takes effect with the contract's subsequent orders (```lever_rate```); without it the contract's current leverage is read from the account, and when the account has none (for example a contract never traded) orders fail until ```exchange.SetMarginLevel()``` is called. In multi-asset margin mode ```exchange.SetMarginLevel()``` sets the leverage on the exchange directly.
+Margin mode: USDT-margined contracts default to cross margin; switch to isolated with ```exchange.IO("cross", false)``` (affects subsequent orders only). Coin-margined contracts are isolated.
 
 Position mode: Switch hedge/one-way mode for USDT-margined contracts with ```exchange.IO("dual", bool)```.
 
@@ -25695,21 +27278,15 @@ Account: The connector detects the shape of the USDT-margined account (classic, 
 
 ###### ```Huobi``` (Spot)
 
-- The amount of a market buy order is the quote-currency amount to spend; a market sell order is in base currency. Conditional buy orders that execute at market after triggering are also placed by quote-currency amount (```orderValue```).
-- Limit orders support ```tif``` ```ioc```, ```fok``` and post-only (```postOnly```, HTX's ```limit-maker```).
-- ```exchange.GetHistoryOrders()``` and ```exchange.GetHistoryConditionOrders()``` need a pair (the current pair when omitted); an empty string fails.
-- Conditional orders use HTX algo orders (```/v2/algo-orders```), are available on the normal spot account only, and support take-profit and stop-loss only, not OCO. A conditional order's ID is its ```clientOrderId``` (a UUID is generated when none is given), not a numeric order ID.
+- Conditional orders are available on the normal spot account only and support take-profit and stop-loss only, not OCO.
 
 ###### ```Futures_HuobiDM``` (Futures)
 
-- Order and position amounts are contract counts (integers); what one contract represents is the ```CtVal``` in ```exchange.GetMarkets()```: some base currency for USDT-margined contracts, some USD for coin-margined contracts.
-- On classic and unified accounts market orders are placed at the opponent price (```opponent```); in multi-asset margin mode they are market orders. Limit orders support ```tif``` ```ioc```, ```fok``` and post-only (```postOnly```).
-- Conditional orders support take-profit and stop-loss only, not OCO; they are also available in multi-asset margin mode. Without an order price, the triggered order executes at the best 20 levels (```optimal_20```).
-- Range queries in ```exchange.GetConditionOrders()``` support USDT only (such as ```USDT.swap```); coin-margined contracts need a specific contract. On classic and unified accounts ```exchange.GetHistoryConditionOrders()``` does not support the ```since``` argument (fails when it is given) and only covers the last 90 days.
+- Conditional orders support take-profit and stop-loss only, not OCO; they are also available in multi-asset margin mode.
 
 #### Korbit
 
-Spot trading on the KRW market of the Korean exchange Korbit (API address ```https://api.korbit.co.kr```, v2 API). It uses REST only, with no market-data or order push. Private endpoints are signed with a Korbit API key (Access Key and Secret Key). Conditional orders and order amendment are not supported.
+Spot trading on a Korean exchange, the KRW market.
 
 ##### Names and Configuration
 
@@ -25736,16 +27313,14 @@ Served through a fallback:
 
 ##### Notes
 
-- The amount of a market buy order is the quote currency (KRW) to spend (placed as Korbit's ```amt```); a market sell order uses the base-currency quantity. For a queried market buy order, ```Amount``` is likewise the KRW amount, while ```DealAmount``` is the filled base-currency quantity.
 - Only GTC limit orders and market orders are supported: a ```tif``` of ```ioc``` or ```fok```, or ```postOnly```, fails.
 - Without the ```symbol``` argument, ```exchange.GetOrders()``` queries the current trading pair only.
-- ```exchange.GetMarkets()``` returns only the pairs whose status is ```launched``` (listed for trading).
 
 #### Kraken
 
-```Kraken``` (Spot): Kraken spot trading (Kraken REST API ```https://api.kraken.com```), accessed with a Kraken API Key and Secret Key. The account is the Kraken spot balance, with the available amount being the balance minus what open orders hold; Kraken Futures is a separate exchange object, ```Futures_Kraken```.
+```Kraken``` (Spot): Kraken spot trading.
 
-```Futures_Kraken``` (Futures): Kraken Futures (Kraken Futures API ```https://futures.kraken.com```): inverse (coin-margined) perpetual and delivery contracts, multi-collateral (linear) perpetual and delivery contracts, and Kraken Futures options. Access uses a Kraken Futures API Key and Secret Key; Kraken spot is a separate exchange object, ```Kraken```.
+```Futures_Kraken``` (Futures): Kraken Futures: inverse (coin-margined) perpetual and delivery contracts, multi-collateral (linear) perpetual and delivery contracts, and Kraken Futures options.
 
 ##### Names and Configuration
 
@@ -25777,22 +27352,22 @@ Trading pairs look like ```BTC_USD```; the contract code selects the contract ty
 | - | - |
 | ```swap``` | Inverse perpetual contract (the default). |
 | ```month``` | The nearest-expiry inverse delivery contract. |
-| ```this_week``` | Same as ```month```; written as ```month``` in `exchange.GetMarkets` and query results. |
+| ```this_week``` | Same as ```month```. |
 | ```quarter``` | Inverse quarterly contract (the nearest one expiring in March, June, September or December). |
 | ```next_quarter``` | Inverse next-quarter contract. |
 | ```third_quarter``` | Inverse third-quarter contract. |
 | ```swap_pf``` | Multi-collateral perpetual contract. |
 | ```month_ff``` | The nearest-expiry multi-collateral delivery contract. |
-| ```this_week_ff``` | Same as ```month_ff```; written as ```month_ff``` in `exchange.GetMarkets` and query results. |
+| ```this_week_ff``` | Same as ```month_ff```. |
 | ```quarter_ff``` | Multi-collateral quarterly contract. |
 | ```next_quarter_ff``` | Multi-collateral next-quarter contract. |
 | ```third_quarter_ff``` | Multi-collateral third-quarter contract. |
 
-Kraken lists monthly and quarterly delivery contracts only; ```this_week``` and ```month``` both mean the nearest expiry. Delivery contracts are picked by expiry from the exchange's contract list. When one contract belongs to several tiers (the nearest quarterly contract is also ```month```, for example), `exchange.GetMarkets` and the symbols of tickers, positions and orders use only one of them, with the quarter tiers ahead of ```month```; a delivery contract outside every tier uses its native code as the contract code (such as ```BTC_USD.FF_XBTUSD_261030```). Each contract appears once in `exchange.GetMarkets`. Positions and open orders can be queried with the ranges ```USD.swap_pf``` (multi-collateral perpetuals) and ```USD.futures_ff``` (multi-collateral delivery).
+Kraken lists monthly and quarterly delivery contracts only; ```this_week``` and ```month``` both mean the nearest expiry. Delivery contracts are picked by expiry from the exchange's contract list. Positions and open orders can be queried with the ranges ```USD.swap_pf``` (multi-collateral perpetuals) and ```USD.futures_ff``` (multi-collateral delivery).
 
 Native contract code examples: ```FF_ETHUSD_250307```, ```PF_XBTUSD```
 
-Contracts can be given by their Kraken native codes: delivery contracts (prefixes ```FI_```, ```FF_```) such as ```ETH_USD.FF_ETHUSD_250307```, perpetuals (prefixes ```PI_```, ```PF_```) such as ```BTC_USD.PF_XBTUSD```. ```exchange.SetContractType()``` also accepts the native codes of the current pair (including delivery contracts that belong to a tier and appear under the tier code in `exchange.GetMarkets`), for example ```exchange.SetContractType("PF_XBTUSD")``` with pair ```BTC_USD```.
+Kraken native contract codes (prefixes ```PI_```, ```PF_```, ```FI_```, ```FF_```) can be used directly, for example ```ETH_USD.FF_ETHUSD_250307```.
 
 ##### Exchange-specific IO Commands
 
@@ -25832,8 +27407,6 @@ Served through a fallback:
 
 Margin mode: Only multi-collateral contracts (```swap_pf```, ```*_ff```) can switch cross/isolated margin and set leverage; for inverse contracts and options ```exchange.IO("cross", ...)``` and ```exchange.SetMarginLevel()``` fail. Kraken expresses the margin mode through leverage preferences: ```exchange.SetMarginLevel()``` sets the leverage limit and also switches the contract to isolated margin, while ```exchange.IO("cross", true)``` removes the limit and returns to cross margin.
 
-Position mode: The connector has no position-mode setting; ```exchange.IO("dual", ...)``` fails.
-
 Account: Inverse contracts use their own single-currency wallets, and the ```Stocks``` of ```exchange.GetAccount()``` is that wallet's available coin amount; multi-collateral contracts and options use the multi-collateral wallet, where ```Balance``` is the available margin in USD.
 
 ##### Options
@@ -25857,22 +27430,19 @@ Option codes are Kraken native codes: ```OF_```, underlying and quote currency, 
 - The amount of a spot market buy order is in the base currency (Kraken's ```volume```), not a quote-currency amount.
 - Conditional orders support take-profit and stop-loss only, not OCO.
 - Orders support ```tif``` IOC and maker-only (```postOnly```, limit prices only); FOK is not supported and reports an error.
-- ```exchange.ModifyOrder()``` and ```exchange.ModifyConditionOrder()``` are supported; both amend the order in place on Kraken and keep the order ID. Regular orders can change price and amount; conditional orders can change the trigger price, order price and amount.
-- ```exchange.GetOrders()``` and ```exchange.GetConditionOrders()``` without arguments return the open orders of all trading pairs. ```exchange.GetHistoryOrders()``` and ```exchange.GetHistoryConditionOrders()``` return the latest 50 records when ```limit``` is not given, and page automatically to fill a larger ```limit```.
 
 ###### ```Futures_Kraken``` (Futures)
 
 - Order amounts are Kraken contract sizes: one inverse contract is 1 USD, multi-collateral contracts are sized in the underlying coin (see ```CtVal``` and ```CtValCcy``` in `exchange.GetMarkets`).
 - Kraken's raw funding rate is an absolute amount per contract; ```exchange.GetFundings()``` converts it to a relative rate. Perpetuals settle funding every hour.
 - Conditional orders support take-profit and stop-loss only, not OCO; they trigger on the last traded price.
-- Limit orders support ```tif``` IOC and maker-only (```postOnly```), but not FOK; market orders do not support FOK or maker-only, and conditional orders support neither ```tif``` nor maker-only; passing them reports an error.
-- ```exchange.ModifyOrder()``` and ```exchange.ModifyConditionOrder()``` are supported (Kraken's edit-order endpoint); conditional orders can change the trigger price, order price and amount.
+- Limit orders support ```tif``` IOC and maker-only (```postOnly```), but not FOK; market and conditional orders do not support these options and report an error when they are passed.
 
 #### KuCoin
 
-```KuCoin``` (Spot): KuCoin spot trading; it connects to ```api.kucoin.com``` by default. It uses a KuCoin API Key and needs the Access Key, Secret Key and the passphrase set when the key was created. Balances come from the trading account (trade) only; assets in the funding account must be transferred to the trading account first. There is no account-switch command for margin orders; pass KuCoin's ```tradeType``` and similar fields in the order's extra parameters (merged into the request as is).
+```KuCoin``` (Spot): KuCoin spot trading.
 
-```Futures_KuCoin``` (Futures): KuCoin futures: USDT- and USDC-margined perpetual contracts, plus coin-margined perpetual and delivery contracts; it connects to ```api-futures.kucoin.com``` by default. It uses a KuCoin API Key and needs the Access Key, Secret Key and the passphrase set when the key was created.
+```Futures_KuCoin``` (Futures): KuCoin futures: USDT- and USDC-margined perpetual contracts, plus coin-margined perpetual and delivery contracts.
 
 ##### Names and Configuration
 
@@ -25896,7 +27466,7 @@ Option codes are Kraken native codes: ```OF_```, underlying and quote currency, 
 
 Pair examples: ```BTC_USDT```, ```ETH_BTC```
 
-Trading pairs are written ```BASE_QUOTE```, matching KuCoin's ```BASE-QUOTE``` pairs; case-insensitive. Symbols with a contract suffix such as ```.swap``` are rejected (use a Futures_KuCoin exchange object for contracts).
+Trading pairs are written ```BASE_QUOTE```, matching KuCoin's ```BASE-QUOTE``` pairs; case-insensitive.
 
 ###### ```Futures_KuCoin``` (Futures)
 
@@ -25956,28 +27526,23 @@ Margin mode: Switch cross/isolated margin with ```exchange.IO("cross", bool)``` 
 
 Position mode: Orders are placed for one-way position mode (no position-side parameter); closing orders are sent as reduce-only.
 
-Account: KuCoin futures have no set-leverage endpoint: ```exchange.SetMarginLevel()``` only records the leverage per contract locally and sends it with each order (10x when not set). In cross mode the exchange uses the contract's leverage setting on the exchange, not the leverage in the order. ```exchange.GetAccount()``` and ```exchange.GetAssets()``` query accounts by settlement currency: USDT and USDC contracts use the account of that quote currency, coin-margined contracts the account of the base coin (such as BTC); without a symbol every settlement currency's account is queried.
+Account: KuCoin futures have no set-leverage endpoint: ```exchange.SetMarginLevel()``` only records the leverage per contract locally and sends it with each order (10x when not set). In cross mode the exchange uses the contract's leverage setting on the exchange, not the leverage in the order.
 
 ##### Notes
 
 ###### ```KuCoin``` (Spot)
 
-- The amount of a market buy order is the quote-currency amount to spend (KuCoin's ```funds```); a market sell order is in base currency. Conditional buy orders that execute at market after triggering work the same way.
-- Limit orders support ```tif``` ```ioc```, ```fok``` and post-only (```postOnly```).
-- ```exchange.ModifyOrder()``` makes KuCoin issue a new order ID: the new order ID is returned and the original ID becomes invalid.
-- ```exchange.GetHistoryOrders()``` and ```exchange.GetHistoryConditionOrders()``` need a pair (the current pair when omitted); an empty string fails.
 - Conditional orders support take-profit and stop-loss only, not OCO (KuCoin has no OCO endpoint); modifying a conditional order is not supported, cancel and recreate it instead. Conditional orders live in a separate order space from regular orders; cancel and query them with the conditional-order functions.
 
 ###### ```Futures_KuCoin``` (Futures)
 
-- Order amounts are numbers of contracts and must be positive whole numbers; what one contract represents is the ```CtVal``` in ```exchange.GetMarkets()```: some base currency for USDT and USDC contracts, 1 USD per contract for coin-margined contracts.
-- ```exchange.GetHistoryOrders()``` and ```exchange.GetHistoryConditionOrders()``` need a specific contract (the current contract when omitted); an empty string or a range fails.
+- Order amounts are numbers of contracts and must be positive whole numbers.
 - Limit orders support ```tif``` IOC and maker-only (```postOnly```), but not FOK; market orders do not support these options and report an error when they are passed.
 - Conditional orders support take-profit and stop-loss only, not OCO (KuCoin futures have no OCO endpoint); they trigger on the last traded price.
 
 #### LBank
 
-Spot trading on LBank (API address ```https://api.lbank.info```, v2 API), including leveraged-token (ETF) pairs. It uses REST only, with no market-data or order push. Private endpoints are signed with an LBank API key (Access Key and Secret Key). Conditional orders and order amendment are not supported.
+Spot trading.
 
 ##### Names and Configuration
 
@@ -26007,14 +27572,13 @@ Served through a fallback:
 - Limit orders support maker-only (```postOnly```) and the ```tif``` (IOC, FOK) option; market orders do not support these options and report an error when they are passed.
 - The open-order endpoint requires a trading pair: without the ```symbol``` argument, ```exchange.GetOrders()``` queries the current trading pair only.
 - ```exchange.GetHistoryOrders()``` does not support the ```since``` argument (the exchange API does not filter by time) and fails when it is given; without it, it returns the most recent orders.
-- ```exchange.GetTickers()``` includes the tickers of both spot pairs and leveraged-token (ETF) pairs. The batch ticker endpoints carry no best bid or ask, so the returned ```Buy``` and ```Sell``` are both the last price.
-- The best bid and ask of ```exchange.GetTicker()``` come from an extra order book query; the exchange ticker has no opening price, so ```Open``` is derived from the last price and the 24-hour change.
+- ```exchange.GetTickers()``` includes the tickers of both spot pairs and leveraged-token (ETF) pairs.
 
 #### MEXC
 
-```MEXC``` (Spot): MEXC spot trading through the MEXC spot V3 API (```api.mexc.com```); everything is REST polling, with no market data or order push. Private endpoints need an API key (Access Key and Secret Key). Spot only, with no simulated trading; use ```Futures_MEXC``` for perpetual contracts.
+```MEXC``` (Spot): MEXC spot trading through the MEXC V3 API.
 
-```Futures_MEXC``` (Futures): MEXC perpetual contracts: USDT- and USDC-margined and coin-margined contracts, through the MEXC futures API (```contract.mexc.com```); everything is REST polling, with no market data or order push. Private endpoints need an API key (Access Key and Secret Key). Perpetual contracts only, with no simulated trading.
+```Futures_MEXC``` (Futures): MEXC perpetual contracts: USDT- and USDC-margined and coin-margined contracts.
 
 ##### Names and Configuration
 
@@ -26037,7 +27601,7 @@ Served through a fallback:
 
 Pair examples: ```BTC_USDT```, ```ETH_USDC```
 
-Trading pairs are written ```BASE_QUOTE```, case-insensitive; for example ```BTC_USDT``` maps to the MEXC native code ```BTCUSDT```. Symbols with a contract suffix (such as ```.swap```) or containing ```-``` are rejected.
+Trading pairs are written ```BASE_QUOTE```; case-insensitive.
 
 ###### ```Futures_MEXC``` (Futures)
 
@@ -26049,7 +27613,7 @@ Trading pair ```BTC_USDT``` or ```BTC_USDC``` means USDT- or USDC-margined contr
 | - | - |
 | ```swap``` | Perpetual contract (the only contract code). |
 
-MEXC futures have perpetual contracts only; other contract codes are rejected. The native contract code has the same form as the trading pair (```BTC_USDT```). Order amounts are in contracts (for both limit and market orders); the coin amount per contract is ```CtVal``` in ```exchange.GetMarkets()```.
+MEXC futures have perpetual contracts only; other contract codes are rejected.
 
 ##### Exchange-specific IO Commands
 
@@ -26089,29 +27653,25 @@ Served through a fallback:
 
 Margin mode: Choose cross/isolated margin with ```exchange.IO("cross", bool)```; it is sent with each order. `exchange.GetPositions` returns only positions in the currently selected margin mode.
 
-Account: In cross mode ```exchange.SetMarginLevel()``` changes the contract's leverage for both the long and short side on the exchange; in isolated mode it only records the leverage locally and sends it with each order. An isolated order without a leverage set first queries the contract's current isolated leverage from the exchange. Leverage is rounded to the nearest integer before it is sent, and a value that rounds below 1 is rejected; ```leverage``` in an order's extra parameters sets the leverage of that order.
+Account: In cross mode ```exchange.SetMarginLevel()``` changes the contract's leverage for both the long and short side on the exchange; in isolated mode it only records the leverage locally and sends it with each order. An isolated order without a leverage set first queries the contract's current isolated leverage from the exchange.
 
 ##### Notes
 
 ###### ```MEXC``` (Spot)
 
 - MEXC spot's open-order endpoint requires a trading pair: ```exchange.GetOrders()``` without arguments queries the current trading pair only, not all pairs.
-- The amount of a market buy order is the quote-currency sum to spend (sent as MEXC's ```quoteOrderQty```); a market sell order's amount is in the base currency.
-- A limit order with post-only (```postOnly```) is placed as MEXC's ```LIMIT_MAKER``` type.
-- ```exchange.GetHistoryOrders()``` can only query orders from the last 7 days (an exchange API limit); a ```since``` earlier than 7 days ago starts from 7 days ago.
 
 ###### ```Futures_MEXC``` (Futures)
 
 - `exchange.GetFundings` cannot query in batch; pass a specific symbol such as ```BTC_USDT.swap```.
 - Conditional orders support take-profit and stop-loss only, not OCO; modifying a conditional order is not supported, and conditional orders cannot carry a custom order id (clientId). They trigger on the last traded price and are valid for 24 hours, expiring automatically afterwards.
 - Order amendment (```exchange.ModifyOrder()```) works on limit orders only; the exchange cancels the original order and places a new one; the return value is the new order's Id, use it for later queries and cancellation.
-- Limit orders support IOC, FOK and post-only (```postOnly```); market orders cannot use FOK or post-only, and conditional orders support GTC only.
 
 #### OKX
 
-```OKEX``` (Spot): OKX spot, plus spot margin trading (isolated and cross) on the same account. Uses the OKX V5 API and needs the API key's Access Key, Secret Key and Passphrase.
+```OKEX``` (Spot): OKX spot, plus spot margin trading (isolated and cross) on the same account. Uses the OKX V5 API.
 
-```Futures_OKCoin``` (Futures): OKX perpetual contracts (USDT-, USDC-margined and coin-margined), delivery contracts (coin-margined, USDT-margined and USD-margined) and options. Uses the OKX V5 API and needs the API key's Access Key, Secret Key and Passphrase; order amounts are in contracts.
+```Futures_OKCoin``` (Futures): OKX perpetual contracts (USDT-, USDC-margined and coin-margined), delivery contracts (coin-margined, USDT-margined and USD-margined) and options. Uses the OKX V5 API.
 
 ##### Names and Configuration
 
@@ -26134,7 +27694,7 @@ Account: In cross mode ```exchange.SetMarginLevel()``` changes the contract's le
 
 Pair examples: ```BTC_USDT```, ```ETH_BTC```
 
-Pairs are written as ```BTC_USDT``` (OKX ```BTC-USDT```) without a contract code; a symbol with a contract suffix (such as ```BTC_USDT.swap```) is rejected. Use a Futures_OKCoin exchange object for contracts.
+Pairs are written as ```BTC_USDT``` (OKX ```BTC-USDT```) without a contract code; use a Futures_OKCoin exchange object for contracts.
 
 ###### ```Futures_OKCoin``` (Futures)
 
@@ -26158,7 +27718,7 @@ Delivery contracts are looked up by their tier in the OKX instrument list; a tie
 
 Native contract code examples: ```BTC-USD-260925```, ```HMSTR-USDT-250207```
 
-Delivery contracts can also be given by their OKX native code, including pre-market contracts without a fixed cycle: set the pair to ```HMSTR_USDT```, then ```exchange.SetContractType("HMSTR-USDT-250207")```; functions that take a ```symbol``` accept ```HMSTR_USDT.HMSTR-USDT-250207```. OKX long-term delivery contracts (USD-margined, exchange contract family like ```BTC-USD_UM_XPERP```) have no fixed tier; ```exchange.GetMarkets()``` lists them in native-code form such as ```BTC_USD_UM_XPERP.BTC-USD_UM_XPERP-310404```, and they are used the same way.
+Delivery contracts can also be given by their OKX native code, including pre-market contracts without a fixed cycle: set the pair to ```HMSTR_USDT```, then ```exchange.SetContractType("HMSTR-USDT-250207")```; functions that take a ```symbol``` accept ```HMSTR_USDT.HMSTR-USDT-250207```.
 
 ##### Exchange-specific IO Commands
 
@@ -26201,11 +27761,11 @@ Simulation: Check the Simulate box or call ```exchange.IO("simulate", true)``` t
 
 ###### ```OKEX``` (Spot)
 
-Account: Spot and margin share the same OKX API; they differ in the order's ```tdMode``` and the instrument type used for order queries. After switching to margin, the connector queries the account mode (acctLv) on the first request: a spot-mode account cannot place margin orders (error ```acctLv is 1```); in single-currency margin mode margin orders carry the borrowing currency (the quote currency for buys, the base currency for sells); in multi-currency and portfolio margin modes cross margin orders are recorded under the spot instrument type, which queries take into account. ```tdMode``` and ```ccy``` can be overridden explicitly in the order's extra parameters. After switching to margin, ```exchange.GetMarkets()``` lists OKX margin instruments (instType ```MARGIN```), and ```exchange.GetTickers()``` also queries ```MARGIN```, which OKX rejects (an error); switch back with ```trade_normal``` for market-wide tickers.
+Account: Spot and margin share the same OKX API; they differ in the order's ```tdMode``` and the instrument type used for order queries. After switching to margin, the connector queries the account mode (acctLv) on the first request: a spot-mode account cannot place margin orders (error ```acctLv is 1```); in single-currency margin mode margin orders carry the borrowing currency (the quote currency for buys, the base currency for sells); in multi-currency and portfolio margin modes cross margin orders are recorded under the spot instrument type, which queries take into account. ```tdMode``` and ```ccy``` can be overridden explicitly in the order's extra parameters.
 
 ###### ```Futures_OKCoin``` (Futures)
 
-Margin mode: Cross margin by default; switch to isolated with ```exchange.IO("cross", false)``` or ```exchange.IO("tdMode", "isolated")```, or pass ```tdMode``` explicitly in the order's extra parameters. ```exchange.SetMarginLevel()``` sets leverage for the current cross/isolated mode (it fails when ```tdMode``` is ```cash```); in hedge mode with isolated margin OKX keeps separate long and short leverage, and the side is taken from the direction set by ```exchange.SetDirection()``` (```buy``` is long, ```sell``` is short, long when not set).
+Margin mode: Cross margin by default; switch to isolated with ```exchange.IO("cross", false)``` or ```exchange.IO("tdMode", "isolated")```, or pass ```tdMode``` explicitly in the order's extra parameters. ```exchange.SetMarginLevel()``` sets leverage for the current cross/isolated mode.
 
 Position mode: The account's position mode is queried automatically before orders, and in hedge mode ```posSide``` is set from the open/close direction; it can also be switched with ```exchange.IO("dual", bool)```.
 
@@ -26215,8 +27775,7 @@ Position mode: The account's position mode is queried automatically before order
 
 OKX options are supported and used like futures contracts.
 
-- ```exchange.GetMarkets()``` and ```exchange.GetTickers()``` do not list option contracts; query them with OKX's ```/api/v5/public/instruments?instType=OPTION&uly=BTC-USD``` endpoint.
-- When the current contract is an option, ```exchange.GetPositions()```, ```exchange.GetOrders()``` and similar calls without a symbol query the ```USD.option``` range, and the connector queries each underlying in OKX's option underlying list.
+- ```exchange.GetMarkets()``` does not list option contracts; query them with OKX's ```/api/v5/public/instruments?instType=OPTION&uly=BTC-USD``` endpoint.
 - For an option contract that has never traded, the ```Last``` of ```exchange.GetTicker()``` is the mark price.
 - Option orders carry no ```posSide```.
 
@@ -26228,20 +27787,16 @@ Option codes are OKX native codes: underlying-quote-expiry (YYMMDD)-strike-C/P. 
 
 ###### ```OKEX``` (Spot)
 
-- The amount of a spot market buy order is a quote-currency amount (the connector does not set ```tgtCcy```, so OKX's default applies); to size a market buy in the base currency, pass ```{"tgtCcy": "base_ccy"}``` in the order's extra parameters.
-- ```exchange.ModifyOrder()``` amends in place through OKX's amend endpoint (```amend-order```), keeping the order ID.
 - Conditional orders support take-profit, stop-loss and OCO; ```exchange.ModifyConditionOrder()``` amends in place through OKX's amend-algo endpoint (```amend-algos```) without canceling and re-placing.
-- ```exchange.GetHistoryOrders()``` queries one pair at a time; an empty string fails. ```exchange.GetHistoryConditionOrders()``` does not support the ```since``` parameter; passing it fails.
 
 ###### ```Futures_OKCoin``` (Futures)
 
 - ```exchange.GetFundings()``` has no batch query; pass a specific perpetual contract, for example ```exchange.GetFundings("ETH_USDT.swap")```; calling it without a symbol or with a range (such as ```USDT.swap```) fails.
 - Conditional orders support take-profit, stop-loss and OCO; ```exchange.ModifyOrder()``` and ```exchange.ModifyConditionOrder()``` amend in place through OKX's amend endpoints, keeping the order ID.
-- ```exchange.GetHistoryConditionOrders()``` does not support the ```since``` parameter; passing it fails. ```exchange.GetHistoryOrders()``` does.
 
 #### Poloniex
 
-Spot trading on Poloniex (API address ```https://api.poloniex.com```, v3 API); orders are placed in the SPOT account (```accountType``` is ```SPOT```). It uses REST only, with no market-data or order push. Private endpoints are signed with a Poloniex API key (Access Key and Secret Key). Conditional orders use Poloniex smart orders (```/smartorders```) and support stop-loss only.
+Spot trading (the SPOT account).
 
 ##### Names and Configuration
 
@@ -26276,16 +27831,13 @@ Served through a fallback:
 
 ##### Notes
 
-- The amount of a market buy order is the quote currency to spend (placed as Poloniex's ```amount```); a market sell order uses the base-currency quantity.
 - Limit orders support IOC, FOK and maker-only (```postOnly```).
-- ```exchange.ModifyOrder()``` uses Poloniex's replace endpoint: the exchange cancels the original order and places a new one, and the new order ID is returned; use the new ID from then on. A price or amount that is not positive is left unchanged. The amended amount is always the base-currency quantity (Poloniex's ```quantity```), including when only the amount of a buy order is changed.
-- Spot conditional orders support stop-loss only (```ORDER_CONDITION_TYPE_SL```): a buy triggers when the price rises to the trigger price, a sell when it falls to the trigger price. Take-profit (```ORDER_CONDITION_TYPE_TP```) and OCO conditional orders return an error and no order is placed. Without an order price they execute at market once triggered. The amount of a conditional order is always the base-currency quantity, for both buys and sells.
-- Conditional orders and normal orders have separate order IDs: a conditional order can only be canceled with `exchange.CancelConditionOrder`. The normal order created when a conditional order triggers appears in ```exchange.GetOrders()```, while ```exchange.GetConditionOrders()``` lists only untriggered conditional orders.
+- Spot conditional orders support stop-loss only (```ORDER_CONDITION_TYPE_SL```): a buy triggers when the price rises to the trigger price, a sell when it falls to the trigger price. Take-profit (```ORDER_CONDITION_TYPE_TP```) and OCO conditional orders return an error and no order is placed. Without an order price they execute at market once triggered.
 - ```exchange.GetAccount()``` reads one SPOT account: the one set with ```exchange.IO("accountId", id)```, or the first SPOT account when none is set; ```exchange.GetAssets()``` sums the assets of all SPOT accounts.
 
 #### Upbit
 
-Spot trading on the Korean exchange Upbit (API address ```https://api.upbit.com```): the KRW, BTC and USDT markets. It uses REST only, with no market-data or order push. Private endpoints are signed with an Upbit API key (Access Key and Secret Key). Conditional orders are not supported.
+Spot trading on a Korean exchange: the KRW, BTC and USDT markets.
 
 ##### Names and Configuration
 
@@ -26312,17 +27864,14 @@ Served through a fallback:
 
 ##### Notes
 
-- The amount of a market buy order is the quote currency to spend (placed as Upbit's ```price``` with ```ord_type``` ```price```); a market sell order uses the base-currency quantity.
 - Limit orders support IOC, FOK and maker-only (```postOnly```).
-- ```exchange.ModifyOrder()``` uses Upbit's cancel-and-new endpoint (```cancel_and_new```): the exchange atomically cancels the original order and places a new one, and the new order ID is returned; use the new ID from then on. The new order stays a limit order and needs a new price greater than 0; a price that is not positive is an error and never turns it into a market order. When the amount is not changed (not positive), the new order takes the original order's remaining amount. ```exchange.ModifyOrder()``` never turns an order into a market order.
-- The batch tickers of ```exchange.GetTickers()``` carry no order book, so ```Buy``` and ```Sell``` are 0.
-- ```exchange.GetHistoryOrders()``` returns filled and canceled orders; without ```limit```, at most 100 orders are returned.
+- ```exchange.ModifyOrder()``` uses Upbit's cancel-and-new endpoint (```cancel_and_new```): the exchange atomically cancels the original order and places a new one, and the new order ID is returned; use the new ID from then on.
 
 #### WEEX
 
-```WEEX``` (Spot): WEEX spot trading over the WEEX spot V3 REST API (```api-spot.weex.com```). The API KEY configuration needs the Access Key, Secret Key and Passphrase. Spot only; use ```Futures_WEEX``` for perpetual contracts.
+```WEEX``` (Spot): WEEX spot trading (V3 API). The API KEY configuration needs the Access Key, Secret Key and Passphrase.
 
-```Futures_WEEX``` (Futures): WEEX USDT-margined perpetual contracts over the WEEX futures V3 REST API (```api-contract.weex.com```), with no delivery contracts. The API KEY configuration needs the Access Key, Secret Key and Passphrase. Native take-profit and stop-loss conditional orders are supported.
+```Futures_WEEX``` (Futures): WEEX USDT-margined perpetual contracts (V3 API). The API KEY configuration needs the Access Key, Secret Key and Passphrase.
 
 ##### Names and Configuration
 
@@ -26345,7 +27894,7 @@ Pair examples: ```BTC_USDT```, ```ETH_USDT```
 
 ###### ```WEEX``` (Spot)
 
-Trading pairs are written ```BTC_USDT```, matching the WEEX native code ```BTCUSDT```. Symbols with a contract suffix are rejected.
+Trading pairs are written ```BTC_USDT```, matching the WEEX native code ```BTCUSDT```.
 
 ###### ```Futures_WEEX``` (Futures)
 
@@ -26387,25 +27936,20 @@ Position mode: Every order carries the position side ```positionSide```, derived
 
 ###### ```WEEX``` (Spot)
 
-- The amount of a market buy order is in the quote currency: the WEEX spot API cannot place market orders by amount, so the connector converts the amount into a base-currency quantity using the current asks (up to 200 levels, rounded down to the quantity step) before ordering; the filled amount may differ slightly from the amount passed. If the asks cannot absorb the amount, or the converted quantity is below the minimum order size, an error is reported instead of buying less. An explicit ```quantity``` in the extra parameters is used as is. When the order is queried, the ```Amount``` of a market buy order is the base-currency quantity recorded by the exchange.
+- The amount of a market buy order is in the quote currency: the WEEX spot API cannot place market orders by amount, so the connector converts the amount into a base-currency quantity using the current asks (rounded down to the quantity step) before ordering; the filled amount may differ slightly from the amount passed. An explicit ```quantity``` in the extra parameters is used as is.
 - Post-only (maker-only) orders are not supported; limit orders accept GTC, IOC and FOK only.
-- ```exchange.GetHistoryOrders()``` queries one trading pair only (the exchange's order history endpoint is per pair): without ```symbol``` it queries the current trading pair, and an empty string fails. The exchange looks back about 90 days only; a ```since``` older than that is queried from 90 days ago.
 
 ###### ```Futures_WEEX``` (Futures)
 
 - Conditional orders support take-profit and stop-loss only, not OCO (place the take-profit and stop-loss legs as two conditional orders).
 - ```exchange.ModifyConditionOrder()``` modifies the order in place through the exchange's modify endpoint, keeping the order ID; only untriggered take-profit and stop-loss conditional orders can be modified. The trigger price and order price can be changed: they are taken from ```TpTriggerPrice```/```TpOrderPrice``` or ```SlTriggerPrice```/```SlOrderPrice``` of ```condition``` according to the condition type, and an order price of ```-1``` (or not greater than 0) switches to market execution after triggering. The exchange cannot change the amount or the side: if the amount or direction passed differs from the original order, an error is reported and a null value is returned rather than ignoring it. The trigger price type is kept from the original order (mark price or last price); ```triggerPriceType``` (```CONTRACT_PRICE``` or ```MARK_PRICE```) can also be passed in the extra parameters. Whether the modified order is a take-profit or a stop-loss is decided by the exchange from the new trigger price and may differ from ```ConditionType```; check ```exchange.GetConditionOrder()```.
-- The exchange has no endpoint for querying a conditional order by ID, so ```exchange.GetConditionOrder()``` searches the active conditional orders and then the latest 20000 historical conditional orders, and fails when the order is not found.
-- ```exchange.GetHistoryOrders()``` and ```exchange.GetHistoryConditionOrders()``` look back about 90 days only; a ```since``` older than that is queried from 90 days ago.
-- The ```Rate``` of ```exchange.GetFundings()``` is the forecast funding rate of the next settlement and ```Time``` is the next settlement time; batch queries are supported (no symbol, or a range such as ```USDT.swap```).
-- In ```exchange.GetTickers()```, contracts without order book data (missing from the exchange's book ticker, for example a contract whose market is closed) have ```Buy``` and ```Sell``` of 0.
 - ```Offset``` of orders and conditional orders follows the side and the position side: selling on the long side (close long) and buying on the short side (close short) are closing, everything else is opening. In hedge mode the exchange returns ```reduceOnly``` as ```false``` even for closing conditional orders, so it is not used; only when the position side is one-way (```BOTH```) or missing are ```reduceOnly```/```closePosition``` used.
 
 #### WOO X
 
-```WOO``` (Spot): WOO X spot trading over the WOO X REST API (```api.woox.io```), with native take-profit, stop-loss and OCO conditional orders. The API KEY configuration needs the Access Key, Secret Key and Application Id. The account can be switched between margin mode and pure spot mode with ```exchange.IO("trade_margin")``` and ```exchange.IO("trade_normal")```; use ```Futures_WOO``` for perpetual contracts.
+```WOO``` (Spot): WOO X spot trading. The API KEY configuration needs the Access Key, Secret Key and Application Id.
 
-```Futures_WOO``` (Futures): WOO X perpetual contracts over the WOO X REST API (```api.woox.io```), with no delivery contracts; native take-profit, stop-loss and OCO conditional orders are supported. The API KEY configuration needs the Access Key, Secret Key and Application Id (all three must be filled in).
+```Futures_WOO``` (Futures): WOO X perpetual contracts. The API KEY configuration needs the Access Key, Secret Key and Application Id.
 
 ##### Names and Configuration
 
@@ -26447,17 +27991,12 @@ WOO X lists perpetual contracts only; other contract codes are rejected. Order a
 
 ###### ```WOO``` (Spot)
 
-| Command | Arguments | Description |
-| - | - | - |
-| ```trade_margin``` | — | Switches the account to margin mode (MARGIN) by sending a settings request to the exchange (```POST /v1/client/account_mode```); returns ```true``` once the exchange confirms. This is an account-level setting. |
-| ```trade_normal``` | — | Switches the account to pure spot mode (PURE_SPOT) by sending a settings request to the exchange; returns ```true``` once the exchange confirms. This is an account-level setting. |
-| ```api``` | method, path[, params[, raw]] | Call a WOO X endpoint directly; ```path``` may be a full URL. (more below the table) |
+| Command | Description |
+| - | - |
+| ```trade_margin``` | Switches the account to margin mode (MARGIN) by sending a settings request to the exchange (```POST /v1/client/account_mode```); returns ```true``` once the exchange confirms. This is an account-level setting. |
+| ```trade_normal``` | Switches the account to pure spot mode (PURE_SPOT) by sending a settings request to the exchange; returns ```true``` once the exchange confirms. This is an account-level setting. |
 
-The rest of the longer descriptions in the table:
-
-- ```api```: The signing rule follows ```/v1/``` or ```/v3/``` in the path; ```GET``` parameters go into the query string, other methods send a form body for v1 and a JSON body for v3. Paths containing ```/public/``` are unsigned by default and all others signed; the sign argument can set it explicitly, and unsigned requests are also sent with the given HTTP method. ```raw``` is not a request body but a parameter table (a JSON object) that replaces ```params``` entirely when non-empty and is signed as usual; for v3 JSON bodies its object, array, number and boolean values are kept as they are. Spot and futures behave the same for this command. Returns: The whole exchange response (```data``` is not unwrapped for either v1 or v3 endpoints); an error is raised when the response ```success``` is not ```true```.
-
-For the common commands ```base``` and ```currency``` see `exchange.IO`.
+For the common commands ```api```, ```base``` and ```currency``` see `exchange.IO`.
 
 ###### ```Futures_WOO``` (Futures)
 
@@ -26465,13 +28004,8 @@ For the common commands ```base``` and ```currency``` see `exchange.IO`.
 | - | - | - |
 | ```cross``` | bool | Cross (true) / isolated (false) margin. Only changes the local setting without sending a request; subsequent orders, conditional orders and ```exchange.SetMarginLevel()``` carry it. Cross margin by default. |
 | ```dual``` | bool | Hedge (true) / one-way (false) position mode, sent to the exchange (```POST /v1/client/position_mode```); after it succeeds the connector places orders for hedge mode (both regular and conditional orders carry the position side). |
-| ```api``` | method, path[, params[, raw]] | Call a WOO X endpoint directly; ```path``` may be a full URL. (more below the table) |
 
-The rest of the longer descriptions in the table:
-
-- ```api```: The signing rule follows ```/v1/``` or ```/v3/``` in the path; ```GET``` parameters go into the query string, other methods send a form body for v1 and a JSON body for v3. Paths containing ```/public/``` are unsigned by default and all others signed; the sign argument can set it explicitly, and unsigned requests are also sent with the given HTTP method. ```raw``` is not a request body but a parameter table (a JSON object) that replaces ```params``` entirely when non-empty and is signed as usual; for v3 JSON bodies its object, array, number and boolean values are kept as they are. Spot and futures behave the same for this command. Returns: The whole exchange response (```data``` is not unwrapped for either v1 or v3 endpoints); an error is raised when the response ```success``` is not ```true```.
-
-For the common commands ```base``` and ```currency``` see `exchange.IO`.
+For the common commands ```api```, ```base``` and ```currency``` see `exchange.IO`.
 
 ##### Function Support
 
@@ -26497,32 +28031,23 @@ Served through a fallback:
 
 Margin mode: Choose cross/isolated margin with ```exchange.IO("cross", bool)```; it is a local setting carried with every order (cross by default). ```exchange.SetMarginLevel()``` sets leverage per contract and carries the current cross/isolated setting.
 
-Position mode: Switch hedge/one-way mode with ```exchange.IO("dual", bool)```. The connector does not detect the account's position mode: if the account is already in hedge mode, call ```exchange.IO("dual", true)``` at the start of every run, otherwise orders lack the position side and are rejected by the exchange. In hedge mode ```exchange.SetMarginLevel()``` sets the same leverage on both the long and the short side in one call (it fails if either side fails, and the error names the side that was already set), regardless of the direction set by ```exchange.SetDirection()```; in one-way mode it is set once.
+Position mode: Switch hedge/one-way mode with ```exchange.IO("dual", bool)```. The connector does not detect the account's position mode: if the account is already in hedge mode, call ```exchange.IO("dual", true)``` at the start of every run, otherwise orders lack the position side and are rejected by the exchange. In hedge mode ```exchange.SetMarginLevel()``` sets only the long or short side according to the direction set by ```exchange.SetDirection()``` (long when no direction is set), or pass ```{"position_side": "LONG"|"SHORT"|"BOTH"}``` in the extra parameters.
 
 ##### Notes
 
-###### All exchange objects
-
-- ```exchange.ModifyOrder()``` modifies the price and amount in place, keeping the order ID.
-
 ###### ```WOO``` (Spot)
 
-- The amount of a market buy order is the quote-currency amount to spend (WOO X's ```order_amount```); a market sell order is in the base currency. When queried, both ```Amount``` and ```DealAmount``` of a regular market buy order are the filled base-currency quantity.
 - WOO X spot has no 24-hour ticker endpoint; ```exchange.GetTicker()``` is built from the latest 24 one-hour K-lines (open, high, low, volume) and the order book (best bid and ask), requesting two endpoints per call.
 - Conditional orders support take-profit, stop-loss and OCO; ```exchange.ModifyConditionOrder()``` can modify take-profit and stop-loss orders only, not OCO conditional orders.
 - ```exchange.GetConditionOrders()``` queries one trading pair only: when omitted or empty it queries the current trading pair.
-- ```exchange.GetHistoryOrders()``` and ```exchange.GetHistoryConditionOrders()``` query one trading pair only: without ```symbol``` they query the current trading pair, and an empty string fails.
 
 ###### ```Futures_WOO``` (Futures)
 
-- Conditional orders support take-profit, stop-loss and OCO, with the trigger price type fixed to ```MARKET_PRICE```; ```exchange.ModifyConditionOrder()``` can modify take-profit and stop-loss orders only (trigger price, order price and amount, keeping the order ID), not OCO conditional orders.
-- The ```Rate``` of ```exchange.GetFundings()``` is the exchange's estimated funding rate for the next settlement and ```Time``` is the next settlement time; batch queries are supported.
-- In ```exchange.GetPositions()```, ```Profit``` is computed as (mark price − average open price) × position size and ```Margin``` is estimated as average open price × position size ÷ leverage; the position's margin mode is the ```marginMode``` in the exchange's position data (one account can hold both cross and isolated positions), independent of the local ```exchange.IO("cross", bool)``` order setting.
-- Like the open-order queries, ```exchange.GetHistoryOrders()``` and ```exchange.GetHistoryConditionOrders()``` accept ranges such as ```USDT.swap```: the exchange is queried without a trading pair and the results are filtered by the range, with ```limit``` counting only orders inside the range.
+- Conditional orders support take-profit, stop-loss and OCO, with the trigger price type fixed to ```MARKET_PRICE```; ```exchange.ModifyConditionOrder()``` can modify take-profit and stop-loss orders only, not OCO conditional orders.
 
 #### Zaif
 
-Spot trading on the Japanese exchange Zaif (API address ```https://api.zaif.jp```). It uses REST only, with no market-data or order push. Private endpoints (```/tapi```) are signed with a Zaif API key (Access Key and Secret Key). The exchange has no K-line or all-market ticker endpoint, supports GTC limit orders only, and does not support conditional orders or order amendment.
+Spot trading on a Japanese exchange.
 
 ##### Names and Configuration
 
@@ -26537,7 +28062,7 @@ Spot trading on the Japanese exchange Zaif (API address ```https://api.zaif.jp``
 
 Pair examples: ```BTC_JPY```, ```ETH_JPY```
 
-Trading pairs are written ```BASE_QUOTE```, matching the Zaif native code ```btc_jpy```. For pairs whose currency names contain ```.``` (such as the native ```polygon.mv_jpy```), write the ```.``` in the currency name as ```-```: ```POLYGON-MV_JPY```; ```exchange.GetMarkets()``` and the account assets return currency names in the same form.
+Trading pairs are written ```BASE_QUOTE```, matching the Zaif native code ```btc_jpy```.
 
 ##### Function Support
 
@@ -26546,14 +28071,12 @@ Not supported (the call fails with an error and returns null): `exchange.GetTick
 Served through a fallback:
 
 - `exchange.GetRecords`: The exchange has no K-line endpoint; bars are synthesized by the docker from trades. The first call covers only the few bars spanned by recent trades, and more accumulate with later calls.
-- `exchange.GetOrder`: The exchange has no single-order query interface, so the order is looked up among the current open orders and the historical orders. The historical orders are rebuilt from trade records whose ```Id``` is not guaranteed to equal the order ID, so a completed order may not be found.
+- `exchange.GetOrder`: The exchange has no single-order query interface, so the order is looked up among the current open orders and the historical orders.
 
 ##### Notes
 
 - Market orders are not supported, only GTC limit orders: a ```tif``` of ```ioc``` or ```fok```, or ```postOnly```, fails.
-- Without the ```symbol``` argument, ```exchange.GetOrders()``` queries the current trading pair only. The returned open orders carry no fill information, so ```DealAmount``` is 0.
-- Zaif has no order history endpoint, so ```exchange.GetHistoryOrders()``` is rebuilt from the trade history (```trade_history```): each trade is returned as a filled order, with ```Price``` and ```AvgPrice``` set to that trade's price, ```Amount``` and ```DealAmount``` set to that trade's amount, and ```Type``` set to this account's side in the trade (the trade's aggressor side for self-trades). Trade records carry no order ID, so an order filled in several trades shows up as several rows that cannot be merged; ```Id``` is the trade record's number and is not guaranteed to equal the order ID returned when the order was placed; orders cancelled without any fill never appear, and an order cancelled after a partial fill shows only the filled part. Without ```limit```, at most 100 rows are returned; ```since``` is passed to the exchange with second precision, and with it the earliest records after that time are returned, without it the most recent ones. Without ```symbol```, regular pairs and token pairs (the exchange's ```is_token```) are queried once each and merged; the exchange allows at most 12 calls to this endpoint per 60 seconds.
-- ```exchange.GetTicker()``` has no opening price (```Open``` is 0), and the exchange gives no ticker time, so ```Time``` is the local time.
+- Without the ```symbol``` argument, ```exchange.GetOrders()``` queries the current trading pair only.
 
 ### Decentralized Exchanges (DEX)
 
@@ -26629,7 +28152,7 @@ There are no delivery contracts. The contract code of an Outcome instrument is t
 The rest of the longer descriptions in the table:
 
 - ```source```: It sets the ```source``` field of the Agent signature of trading actions and the chainId of the EIP-712 signature of transfer actions (```usdSend```, ```spotSend```, ```withdraw3```, ...): Arbitrum 42161 on mainnet, Arbitrum Sepolia 421614 on testnet. The API address is not changed; to connect to the testnet also switch it with ```exchange.IO("base", "https://api.hyperliquid-testnet.xyz")```.
-- ```api```: A ```POST``` to ```/exchange``` takes an action object, and the connector adds the nonce and signs it; transfer actions (```usdSend```, ```spotSend```, ```withdraw3```, ```usdClassTransfer```, ```approveAgent```, ```approveBuilderFee```, ```userSetAbstraction```) are signed with the wallet private key ```WalletPrivateKey```, and fields such as ```hyperliquidChain``` must be filled in by the caller; other actions are signed with the API wallet private key. Other paths (such as ```POST /info```) are sent as they are, unsigned. ```body``` (a JSON object or a JSON string), when given, is the request body (the action for ```/exchange```); otherwise ```params``` is used as the body; a ```body``` of any other type is an error.
+- ```api```: A ```POST``` to ```/exchange``` takes an action object, and the connector adds the nonce and signs it; transfer actions (```usdSend```, ```spotSend```, ```withdraw3```, ```usdClassTransfer```, ```approveAgent```, ```approveBuilderFee```, ```userSetAbstraction```) are signed with the wallet private key ```WalletPrivateKey```, and fields such as ```hyperliquidChain``` must be filled in by the caller; other actions are signed with the API wallet private key. Other paths (such as ```POST /info```) are sent as they are, unsigned.
 
 For the common commands ```base``` and ```currency``` see `exchange.IO`.
 
@@ -26637,7 +28160,7 @@ For the common commands ```base``` and ```currency``` see `exchange.IO`.
 
 | Command | Arguments | Description | Returns |
 | - | - | - | - |
-| ```cross``` | bool | Cross (true, the default) / isolated (false) margin. Only recorded by the connector, not per contract, and submitted together with the leverage on the next ```exchange.SetMarginLevel()``` call for any contract; the command itself sends no request. | ```cross``` or ```isolated```. |
+| ```cross``` | bool | Cross (true, the default) / isolated (false) margin. Only recorded by the connector and submitted together with the leverage on the next ```exchange.SetMarginLevel()``` call; the command itself sends no request. | ```cross``` or ```isolated```. |
 | ```dex``` | name | Set the default HIP-3 dex name; an empty string is the main dex. (more below the table) | The dex name set. |
 | ```walletAddress``` | address | Set the address used by read-only queries (account, positions, orders), so another address's positions can be queried; the wallet that signs orders is unchanged. To query your own account again, pass the configured wallet address. | The address set. |
 | ```vaultAddress``` | address | Place, cancel and amend orders and set leverage on behalf of a vault or sub-account (the address goes into the signature and the request body); an empty string clears it. Queries still use the wallet address; to query the vault's account and positions, also set ```walletAddress``` to the vault address. | The address set. |
@@ -26654,7 +28177,7 @@ The rest of the longer descriptions in the table:
 - ```dex```: Once set, range queries without a symbol (```GetPositions()```, ```GetOrders()```, ```GetConditionOrders()```, ```GetTickers()```, ```GetMarkets()```) cover only this dex; when not set they gather all dexes. Calls with a symbol always follow the symbol's own dex prefix.
 - ```source```: It sets the ```source``` field of the Agent signature of trading actions and the chainId of the EIP-712 signature of transfer actions (```usdSend```, ```withdraw3```, ```usdClassTransfer```, ...): Arbitrum 42161 on mainnet, Arbitrum Sepolia 421614 on testnet. The API address is not changed; to connect to the testnet also switch it with ```exchange.IO("base", "https://api.hyperliquid-testnet.xyz")```. The testnet has no HIP-3, so range queries cover the main dex only.
 - ```split```: ```symbol``` is an Outcome code (such as ```BTC-above-100k---Dec_USD.Yes```), written as for market data and orders (markets sharing a name take the code with ```-<market id>``` (such as ```Recurring-1399_USD.Yes```) and the bare name fails as ambiguous); the ```symbol``` of ```merge```, ```mergeQuestion``` and ```negate``` follows the same rule. ```amount``` must be greater than 0.
-- ```api```: A ```POST``` to ```/exchange``` takes an action object, and the connector adds the nonce and signs it; transfer actions (```usdSend```, ```spotSend```, ```withdraw3```, ```usdClassTransfer```, ```approveAgent```, ```approveBuilderFee```, ```userSetAbstraction```) are signed with the wallet private key ```WalletPrivateKey```, and fields such as ```hyperliquidChain``` must be filled in by the caller; other actions are signed with the API wallet private key. Other paths (such as ```POST /info```) are sent as they are, unsigned. ```body``` (a JSON object or a JSON string), when given, is the request body (the action for ```/exchange```); otherwise ```params``` is used as the body; a ```body``` of any other type is an error.
+- ```api```: A ```POST``` to ```/exchange``` takes an action object, and the connector adds the nonce and signs it; transfer actions (```usdSend```, ```spotSend```, ```withdraw3```, ```usdClassTransfer```, ```approveAgent```, ```approveBuilderFee```, ```userSetAbstraction```) are signed with the wallet private key ```WalletPrivateKey```, and fields such as ```hyperliquidChain``` must be filled in by the caller; other actions are signed with the API wallet private key. Other paths (such as ```POST /info```) are sent as they are, unsigned.
 
 For the common commands ```base``` and ```currency``` see `exchange.IO`.
 
@@ -26690,20 +28213,14 @@ Account: For a unified account or portfolio margin account, the balance and equi
 
 ###### ```Hyperliquid``` (Spot)
 
-- Market orders are sent as IOC orders priced at the mid price ±0.5%; the amount of a market buy is the number of coins to buy, not a quote-currency amount. An explicit ```{type: "limit"}``` with a price of 0 or below is an error; it is never sent as a market order.
-- Order options go in the last object argument: ```{tif: "ioc"}``` for IOC and ```{postOnly: true}``` for post-only (the exchange's ```Alo```, not allowed on market orders); ```fok``` is not supported on limit orders and fails. ```builder``` (builder fee, ```{b: builder address, f: integer fee}```) and ```grouping``` are merged into the order action and signed with it; other keys are ignored.
-- Prices allow at most 5 significant figures and at most 8 minus the coin's size decimals (szDecimals) decimal places; integer prices are always valid. ```TickSize``` and ```PricePrecision``` of ```exchange.GetMarkets()``` are computed at the magnitude of the current price, so the tick changes when the price crosses a power of 10: for example ```HYPE_USDC``` (szDecimals 2) has a tick of 0.001 below 100 and 0.01 from 100 up. An order or amendment whose price breaks the rule fails with an error that gives the tick at that price and the nearest valid prices on both sides; the price is not rounded automatically. The protective price of a market order is rounded by the connector according to the rule.
-- ```AvgPrice``` of an order is the actual average fill price aggregated per order from the exchange's fill records (```userFillsByTime```), and 0 when nothing is filled. For a few seconds after a fill the exchange's fill records may not be updated yet; ```AvgPrice``` is then 0 (or the average of the fills already recorded) and is accurate when queried again shortly afterwards. The exchange keeps only the latest 10000 fills, so orders filled earlier report 0. Fill records are queried only for filled orders, and the results are cached.
+- Market orders are sent as IOC orders priced at the mid price ±0.5%; the amount of a market buy is the number of coins to buy, not a quote-currency amount.
 - After a successful ```exchange.ModifyOrder()``` the order ID changes; the return value is the new order ID.
 - ```Buy``` and ```Sell``` of ```exchange.GetTicker()``` are the best bid and ask (the mid price when one side is empty); ```Last```, ```High``` and ```Low``` are all the mid price, as the exchange has no 24h high/low. ```Buy``` and ```Sell``` of ```exchange.GetTickers()``` are the mid price too.
 - ```exchange.GetHistoryOrders()``` returns only the recent orders the exchange provides; the ```since``` parameter is not supported and a ```since``` greater than 0 fails.
 
 ###### ```Futures_Hyperliquid``` (Futures)
 
-- Market orders are sent as IOC orders priced at the mid price ±0.5%; for Outcome instruments ±1% (bounded to 0.001–0.999). A conditional order that executes at market after triggering is priced at the mid price ±0.5% as well. An explicit ```{type: "limit"}``` with a price of 0 or below is an error; it is never sent as a market order.
-- Order options go in the last object argument: ```{tif: "ioc"}``` for IOC and ```{postOnly: true}``` for post-only (the exchange's ```Alo```; an error on conditional orders and on market orders of Outcome instruments; other market orders are always IOC); ```fok``` is not supported on limit orders and fails. ```builder``` (builder fee, ```{b: builder address, f: integer fee}```) and ```grouping``` are merged into the order action and signed with it; ```orders``` (a non-empty array) replaces the order legs built by the connector entirely, with the legs written by the caller in the exchange's format; other keys are ignored.
-- Prices allow at most 5 significant figures and at most 6 minus the contract's size decimals (szDecimals) decimal places; integer prices are always valid. ```TickSize``` and ```PricePrecision``` of ```exchange.GetMarkets()``` are computed at the magnitude of the current price, so the tick changes when the price crosses a power of 10. An order or amendment (including the order price of a conditional order) whose price breaks the rule fails with an error that gives the tick at that price and the nearest valid prices on both sides; the price is not rounded automatically. The protective price of a market order is rounded by the connector according to the rule. HIP-4 Outcome instruments are not checked locally.
-- ```AvgPrice``` of orders and conditional orders is the actual average fill price aggregated per order from the exchange's fill records (```userFillsByTime```), and 0 when nothing is filled. For a few seconds after a fill the exchange's fill records may not be updated yet; ```AvgPrice``` is then 0 (or the average of the fills already recorded) and is accurate when queried again shortly afterwards. The exchange keeps only the latest 10000 fills, so orders filled earlier report 0. Fill records are queried only for filled orders, and the results are cached.
+- Market orders are sent as IOC orders priced at the mid price ±0.5%; for Outcome instruments ±1% (bounded to 0.001–0.999). A conditional order that executes at market after triggering is priced at the mid price ±0.5% as well.
 - Conditional orders support take-profit and stop-loss, not OCO; take-profit and stop-loss are separate trigger orders. After a successful ```exchange.ModifyOrder()``` or ```exchange.ModifyConditionOrder()``` the order ID changes; the return value is the new order ID.
 - ```Last``` of ```exchange.GetTicker()``` and ```exchange.GetTickers()``` is the mid price; ```Buy``` and ```Sell``` are the exchange's bid/ask impact prices (not the best bid and ask; use ```exchange.GetDepth()``` for those), and ```High```/```Low``` take the same impact prices, as the exchange has no 24h high/low.
 - ```exchange.GetFundings()```: the main dex returns predicted funding rates (settled hourly); HIP-3 instruments need an explicit symbol and return the funding records of the last 24 hours.
@@ -26743,12 +28260,12 @@ Lighter lists perpetuals only; contract codes other than ```swap``` are rejected
 | - | - | - | - |
 | ```cross``` | bool[, symbol] | Cross (true) / isolated (false) margin, for the current contract when ```symbol``` is omitted. (more below the table) | ```{symbol, leverage, marginMode, initialMarginFraction, txHash, ok}```; ```txHash``` is the hash of the on-chain transaction. |
 | ```expiry``` | number | Lifetime of subsequent limit orders and conditional orders (milliseconds, must be greater than 0), 29 days by default (the exchange's maximum); an order expires at the time of placing plus 10 minutes plus this duration. Market orders are not affected. | ```true``` |
-| ```api``` | method, path[, params[, raw[, sign]]] | Call a Lighter endpoint directly; only ```GET``` and ```POST``` are supported. (more below the table) | The raw exchange response; an error is raised when the response ```code``` is not 200. |
+| ```api``` | method, path[, params[, raw]] | Call a Lighter endpoint directly; only ```GET``` and ```POST``` are supported. (more below the table) | The raw exchange response; an error is raised when the response ```code``` is not 200. |
 
 The rest of the longer descriptions in the table:
 
 - ```cross```: Lighter sets margin mode and leverage in the same on-chain transaction, which also writes the instrument's current leverage (read from the instrument's setting in the exchange account data; a value set in this run within the last 60 seconds takes precedence; the market's default leverage when neither exists).
-- ```api```: By default the auth token generated with the API key private key is attached (the private key and account index must be filled in); with ```sign``` set to ```false``` (it may also be given directly as the 4th argument) no token is sent, which only works for public ```GET``` endpoints. ```raw``` is not a request body but a parameter table (a JSON object or ```a=1&b=2```) that replaces ```params``` entirely when non-empty; it goes into the query string for ```GET``` and a form body for ```POST```. L2 transactions are not signed for the caller.
+- ```api```: By default the auth token generated with the API key private key is attached (the private key and account index must be filled in); with the sign argument set to ```false``` no token is sent, which only works for public ```GET``` endpoints. ```raw``` is not a request body but a parameter table (a JSON object or ```a=1&b=2```) that replaces ```params``` entirely when non-empty; it goes into the query string for ```GET``` and a form body for ```POST```. L2 transactions are not signed for the caller.
 
 For the common commands ```base``` and ```currency``` see `exchange.IO`.
 
@@ -26778,7 +28295,7 @@ Simulation: The Simulate box connects to the Lighter testnet (```https://testnet
 | exchange.GetTickers() | ```Buy``` and ```Sell``` are each instrument's last trade price (the exchange has no batch order book endpoint); use ```exchange.GetTicker()``` or ```exchange.GetDepth()``` when you need the best bid and ask. Placeholder instruments whose last price, 24h high/low and volume are all zero are omitted |
 | exchange.GetDepth() | The exchange returns individual resting orders; each order is its own level and orders at the same price are not merged, so a price may appear more than once |
 | exchange.GetFundings() | ```Rate``` is the exchange's rate divided by 8 (an hourly rate), ```Interval``` is 1 hour and ```Time``` is the next full hour |
-| exchange.CreateOrder() | Limit orders support GTC (resting for the ```exchange.IO("expiry", ...)``` lifetime), IOC and post-only; FOK is not supported. A market order is an IOC order whose worst fill price is the best opposite price at the time of placing plus or minus a slippage (a buy no higher than the best ask × (1 + slippage), a sell no lower than the best bid × (1 − slippage)); the slippage defaults to 0.5% and can be set with the order extra parameter ```slippage``` (such as ```0.01```, greater than 0 and less than 1, the same parameter as for market conditional orders); whatever the book cannot fill within that price is canceled. An order that fills nothing is canceled with a ```DealAmount``` of 0, and ```status``` in ```Info``` gives the reason (such as ```canceled-too-much-slippage```) |
+| exchange.CreateOrder() | Limit orders support GTC (resting for the ```exchange.IO("expiry", ...)``` lifetime), IOC and post-only; FOK is not supported. A market order is an IOC order limited at the best opposite price at the time of placing (a buy no higher than the best ask, a sell no lower than the best bid), without extra slippage; whatever the best opposite level cannot fill is canceled |
 | exchange.CreateConditionOrder() | Take-profit and stop-loss only, no OCO. With an order price it is a limit conditional order; with an order price of -1 (market) it executes at market once triggered (IOC) with a worst fill price of the trigger price ±5% (up for buys, down for sells), adjustable with ```{slippage: 0.1}``` in the extra parameters |
 | exchange.ModifyOrder() | Modifies in place, the order ID stays the same; a price or amount that is not passed keeps its current value |
 | exchange.GetOrders(), exchange.GetConditionOrders() | The exchange API requires an instrument: without a symbol, or with an empty string, only the current instrument is queried. ```GetOrders``` returns limit and market orders only and ```GetConditionOrders``` take-profit/stop-loss orders only (other types such as TWAP appear in neither); range arguments such as ```USDC.swap``` are not supported |
@@ -26788,7 +28305,7 @@ Simulation: The Simulate box connects to the Lighter testnet (```https://testnet
 
 #### edgeX
 
-A perpetual-futures DEX (V2 API), with contracts quoted in USDC. Private endpoints are authenticated by HMAC with the edgeX Perps V2 API Key, API Secret and API Passphrase, and orders are additionally EIP-712-signed with the trading private key (SDK Signer); create both sets of credentials on edgeX and note the account ID before configuring the exchange object. Configurations from the old V1 scheme (only AccountID and the StarkEx private key Secret Key) no longer work: private endpoints report missing V2 credentials, so create V2 API credentials on edgeX and fill in all five fields.
+A perpetual-futures DEX (V2 API), with contracts quoted in USDC. Private endpoints are authenticated by HMAC with the edgeX Perps V2 API Key, API Secret and API Passphrase, and orders are additionally EIP-712-signed with the trading private key (SDK Signer); create both sets of credentials on edgeX and note the account ID before configuring the exchange object.
 
 ##### Names and Configuration
 
@@ -26819,14 +28336,12 @@ edgeX lists perpetuals only; contract codes other than ```swap``` are rejected.
 | Command | Arguments | Description | Returns |
 | - | - | - | - |
 | ```calcOrderHashAndSign``` | json | Legacy (StarkEx) limit-order signature, kept only so that old strategies keep working; computes the Pedersen hash of a LIMIT_ORDER_WITH_FEES order and signs it with Stark ECDSA using the configured TradingPrivateKey. (more below the table) | A 128-character lowercase hex string (r and s, 64 characters each, without ```0x```). |
-| ```api``` | method, path[, params[, raw[, sign]]] | Call an edgeX endpoint directly. (more below the table) | The ```data``` of the response; an error is raised when the response ```code``` is not ```SUCCESS```. |
 
 The rest of the longer descriptions in the table:
 
 - ```calcOrderHashAndSign```: The argument is a JSON string or object with 10 keys, see the notes. edgeX V2 orders use EIP-712 signatures and do not accept this signature, and this exchange object does not use it when placing orders.
-- ```api```: By default the request is HMAC-signed with the API Key, API Secret and API Passphrase (these three V2 credentials must be filled in); with ```sign``` set to ```false``` (it may also be given directly as the 4th argument) it is sent unsigned, which only works for ```GET```. ```GET``` parameters go into the query string, other methods send a JSON body. ```raw``` is not a request body but a parameter table (a JSON object, a JSON string or ```a=1&b=2```) that replaces ```params``` entirely when non-empty. Orders are not EIP-712-signed for the caller.
 
-For the common commands ```base``` and ```currency``` see `exchange.IO`.
+For the common commands ```api```, ```base``` and ```currency``` see `exchange.IO`.
 
 ##### Function Support
 
@@ -26848,8 +28363,7 @@ Account: The account, positions and orders are queried by the configured Account
 
 | Function | Behavior on Futures_EdgeX |
 | - | - |
-| exchange.GetTicker() | The ticker endpoint has no bid/ask, so each call makes an extra order book request to fill them in (two requests in all); if the order book request fails, the whole call fails. ```Time``` is the server time of the order book response (as is the ```Time``` of ```exchange.GetDepth()```), not the ticker's ```endTime``` (the end of the 24-hour statistics window, which advances in 15-minute steps); ```endTime``` is still available in ```Info``` |
-| exchange.GetTickers() | Not supported: edgeX has no endpoint that returns the tickers of all contracts at once (its ticker endpoint returns an empty list without a contract ID), so the call reports an error and returns null. To get several contracts' tickers, call ```exchange.GetTicker(symbol)``` for each one (such as ```exchange.GetTicker("BTC_USDC.swap")```) |
+| exchange.GetTicker() | The ticker endpoint has no bid/ask, so each call makes an extra order book request to fill them in (two requests in all); if the order book request fails, the whole call fails |
 | exchange.GetFundings() | With a symbol (such as ```BTC_USDC.swap```) it returns that contract's entry; without arguments it queries every tradable perpetual of the current quote currency (such as ```USDC.swap```, which can also be passed directly). edgeX has no batch funding endpoint, so a range query sends one request per contract and takes over ten seconds for the hundred-plus contracts; pass a specific symbol when calling it often. ```Rate``` is the exchange's forecast (next) rate and ```Time``` the next settlement time |
 | exchange.CreateOrder() | Order amounts are in coins (1 contract = 1 coin). Limit orders support GTC, IOC, FOK and post-only; market orders are IOC by default, cannot be post-only, and are bounded by the oracle price: buys at no more than 1.2 times it, sells at no less than 0.8 times it |
 | exchange.CreateConditionOrder() | Take-profit and stop-loss only, no OCO (place the two legs separately), triggered by the last trade price; with an order price of -1 (market) the order executes at market once triggered, with the price bound computed from the oracle price at creation. To modify a conditional order, cancel it and create a new one |
@@ -26861,11 +28375,11 @@ The argument of ```exchange.IO("calcOrderHashAndSign", json)``` must have exactl
 
 #### Aster
 
-```Aster``` (Spot): Aster spot (API address ```https://sapi.asterdex.com```). Private endpoints use wallet signatures (EIP-712): configure the main account's wallet address plus the private key of the API signer wallet authorized for that account on Aster (the signer wallet address is optional and is derived from the private key); no API Key is needed. Perpetual contracts use the Futures_Aster exchange object.
+```Aster``` (Spot): Aster spot (API address ```https://sapi.asterdex.com```). Private endpoints use wallet signatures (EIP-712): configure the main account's wallet address plus the address and private key of the API signer wallet authorized for that account on Aster; no API Key is needed. Perpetual contracts use the Futures_Aster exchange object.
 
 ```Futures_ApolloX``` (Futures): ApolloX has merged into and been renamed Aster. Futures_ApolloX connects to the same exchange's legacy futures API (```https://fapi.apollox.finance```, the v1/v2 API that mirrors Binance USDⓈ-M) with an API Key (HMAC signature); perpetual contracts only. The Futures_Aster exchange object connects to the v3 API with wallet signatures.
 
-```Futures_Aster``` (Futures): Aster perpetual contracts (API address ```https://fapi.asterdex.com```, the v3 API that mirrors Binance USDⓈ-M). Private endpoints use wallet signatures (EIP-712): configure the main account's wallet address plus the private key of the API signer wallet authorized for that account on Aster (the signer wallet address is optional and is derived from the private key); no API Key is needed. The Futures_ApolloX exchange object connects to the same exchange's legacy API with an API Key (HMAC); spot uses the Aster exchange object.
+```Futures_Aster``` (Futures): Aster perpetual contracts (API address ```https://fapi.asterdex.com```, the v3 API that mirrors Binance USDⓈ-M). Private endpoints use wallet signatures (EIP-712): configure the main account's wallet address plus the address and private key of the API signer wallet authorized for that account on Aster; no API Key is needed. The Futures_ApolloX exchange object connects to the same exchange's legacy API with an API Key (HMAC); spot uses the Aster exchange object.
 
 ##### Names and Configuration
 
@@ -26880,7 +28394,7 @@ The argument of ```exchange.IO("calcOrderHashAndSign", json)``` must have exactl
 | Field | ```Aster``` | ```Futures_ApolloX``` | ```Futures_Aster``` | Required | Description |
 | - | - | - | - | - | - |
 | User | ✓ |  | ✓ | Yes | Wallet address of the main account (the account holding the assets). |
-| Signer | ✓ |  | ✓ | No | Address of the API signer wallet (agent wallet) authorized for the main account on Aster. It is optional; when blank it is derived from the signer private key below (the address of that key is the signer wallet address); when filled it is used as is and must match the private key. |
+| Signer | ✓ |  | ✓ | Yes | Address of the API signer wallet (agent wallet) authorized for the main account on Aster. |
 | Private Key | ✓ |  | ✓ | Yes | Private key of the signer wallet above, used to sign private requests. |
 | Access Key |  | ✓ |  | Yes | The API Key created in the exchange's API management. |
 | Secret Key |  | ✓ |  | Yes | The Secret Key paired with the API Key, used for HMAC signing. |
@@ -26959,9 +28473,7 @@ Margin mode: Switch cross/isolated margin per contract with ```exchange.IO("cros
 
 ###### ```Futures_Aster``` (Futures)
 
-Margin mode: Switch cross/isolated margin per contract with ```exchange.IO("cross", bool)```; set leverage per contract with ```exchange.SetMarginLevel()```. When the account has Multi-Assets mode enabled, the exchange rejects switching to isolated margin (```-4168```).
-
-Account: In single-asset mode ```exchange.GetAccount()``` reads the row of the current quote currency (such as USDT): ```Balance``` is that currency's withdrawable balance and ```Equity``` its margin balance. In Multi-Assets mode all margin currencies share one USD-valued margin pool: ```Balance``` is the account's available margin (```availableBalance```), ```FrozenBalance``` the initial margin held by open orders, ```Equity``` the account margin balance (```totalMarginBalance```) and ```UPnL``` the account's unrealized PnL, all whole-account USD values computed by the exchange regardless of the quote currency; the account mode is queried at most once a minute and cached. ```exchange.GetAssets()``` lists each currency's own wallet balance.
+Margin mode: Switch cross/isolated margin per contract with ```exchange.IO("cross", bool)```; set leverage per contract with ```exchange.SetMarginLevel()```. When the account has Multi-Assets mode enabled, the exchange rejects switching to isolated margin.
 
 ##### Notes
 
@@ -26978,7 +28490,6 @@ Account: In single-asset mode ```exchange.GetAccount()``` reads the row of the c
 ###### ```Aster``` (Spot)
 
 - The amount of a market buy order is the quote-currency amount (sent as Aster's ```quoteOrderQty```); a market sell order uses the base-currency quantity. Conditional orders always use the base-currency quantity, for both buys and sells.
-- A market buy by quote amount is rounded down to the quantity step by the exchange; the leftover amount below one step is not used and the order ends as ```EXPIRED```. As long as anything was filled, the queried order status is filled (```ORDER_STATE_CLOSED```), and both ```Amount``` and ```DealAmount``` are the base-currency quantity actually bought. A market order placed by quantity that is not fully filled for lack of liquidity is still canceled (```DealAmount``` less than ```Amount```).
 - Conditional orders support take-profit and stop-loss only, not OCO; create a take-profit order and a stop-loss order separately when needed. Modifying a conditional order (```exchange.ModifyConditionOrder()```) is not supported; cancel and recreate it instead. ```exchange.GetConditionOrder()``` with the ID of a regular order fails (that order is not conditional).
 - ```exchange.GetHistoryOrders()``` and ```exchange.GetHistoryConditionOrders()``` require a trading pair.
 
@@ -26992,13 +28503,9 @@ USDC perpetual contracts and USDC options. Queries, cancellations and leverage c
 
 | Field | Required | Description |
 | - | - | - |
-| Access Key | Yes | The Aevo API key, sent as the ```AEVO-KEY``` header of private endpoints. |
-| Secret Key | Yes | The Aevo API secret, used for the HMAC-SHA256 signature of private endpoints. |
-| Signing Key | Yes | The EIP-712 signing private key registered on the Aevo account (```0x``` plus 64 hex digits), used for orders, order amendments and conditional orders. (more below the table) |
-
-The rest of the longer descriptions in the table:
-
-- Signing Key: Generate it on Aevo's settings page (```https://app.aevo.xyz/settings```, not the API Keys page); it expires automatically one week after generation, after which a new one must be generated and entered here. Without it, placing or amending orders and creating conditional orders fail, while queries, cancellations and leverage settings still work; it can also be set at run time with ```exchange.IO("signingKey", key)```.
+| Access Key | Yes | — |
+| Secret Key | Yes | — |
+| Signing Key | Yes | The EIP-712 API signing private key registered on the Aevo account (```0x``` plus 64 hex digits), used for orders, order amendments and conditional orders; it can also be set at run time with ```exchange.IO("signingKey", key)```. |
 
 ##### Trading Pairs and Contract Codes
 
@@ -27017,13 +28524,8 @@ Aevo has no delivery contracts; any contract code other than ```swap``` and opti
 | Command | Arguments | Description | Returns |
 | - | - | - | - |
 | ```signingKey``` | string | Set the EIP-712 signing private key (```0x``` plus 64 hex digits) used for orders by this exchange object, overriding the "Signing Key" option for the current run only. The signing key is generated and registered on the account when an API key is created on the Aevo website; it has an expiry and must be regenerated after it expires. | The wallet address of the key, to check against the signing key list on the Aevo website; an error if the key is malformed. Registration is not checked here; an unregistered key fails when an order is placed. |
-| ```api``` | method, path[, params[, raw[, sign]]] | Call an Aevo endpoint directly. (more below the table) | The raw exchange response; an error is raised when the response carries ```error```. |
 
-The rest of the longer descriptions in the table:
-
-- ```api```: Public paths (```/markets```, ```/statistics```, ```/orderbook```, ```/instrument/...```, ```/funding```, ```/coingecko-statistics```; for a full URL ```path```, its path part decides) are unsigned by default and other paths are signed with the API key (```AEVO-KEY```, ```AEVO-SIGNATURE``` and related headers); ```sign``` set to ```true```/```false``` (it may also be given directly as the 4th argument) forces signing on or off. ```GET``` parameters go into the query string, other methods send a JSON body (numbers and booleans keep their types). ```raw``` is not a request body but a parameter table (a JSON object, a JSON string or ```a=1&b=2```) that replaces ```params``` entirely when non-empty. Orders are not EIP-712-signed for the caller.
-
-For the common commands ```base``` and ```currency``` see `exchange.IO`.
+For the common commands ```api```, ```base``` and ```currency``` see `exchange.IO`.
 
 ##### Function Support
 
@@ -27035,7 +28537,7 @@ Served through a fallback:
 
 ##### Margin, Account and Simulation
 
-Margin mode: Aevo uses a unified margin account with no cross/isolated switch; the margin mode in ```exchange.GetPositions()``` follows the exchange (the position's ```margin_type```, falling back to the account's setting for that contract), and option positions without a per-contract setting are cross. ```exchange.SetMarginLevel()``` sets leverage per perpetual contract; options are not supported. A position's ```MarginLevel``` is the contract's leverage (the position's ```leverage```, falling back to the account's setting for that contract; 0 for options), and ```Margin``` is the initial margin held by the position (```initial_margin```).
+Margin mode: Aevo uses a unified margin account with no cross/isolated switch; the margin mode in ```exchange.GetPositions()``` follows the exchange (the position's ```margin_type```, falling back to the account's setting for that contract), and option positions without a per-contract setting are cross. ```exchange.SetMarginLevel()``` sets leverage per perpetual contract; options are not supported.
 
 Position mode: One-way (net) positions only, no hedge mode. Closing orders (```closebuy```, ```closesell```) are placed as reduce-only.
 
@@ -27057,9 +28559,7 @@ Option codes are Aevo native codes: underlying-expiry (DDMMMYY)-strike-C/P, C fo
 ##### Notes
 
 - Limit orders only; market orders are rejected. Conditional orders (take-profit, stop-loss) need a limit order price; market take-profit/stop-loss and OCO are not supported.
-- Order options go in the last object argument: ```{tif: "ioc"}```, ```{tif: "fok"}``` and ```{postOnly: true}``` map to the exchange's IOC, FOK and post-only; other keys are merged into the order request body as they are (overriding fields of the same name built by the connector).
-- ```exchange.ModifyOrder()``` and ```exchange.ModifyConditionOrder()``` have the exchange re-issue the order and return a new order ID, which should be used from then on; ```exchange.ModifyOrder()``` keeps the original order's reduce-only flag. The exchange keeps reporting a conditional order replaced by ```exchange.ModifyConditionOrder()``` as open (it is no longer in the open order list, and cancelling it fails with ```ORDER_DOES_NOT_EXIST```); for conditional orders modified within the same docker process, ```exchange.GetConditionOrder(original ID)``` checks the open order list and returns canceled, while orders modified after a restart or by another process are returned as the exchange reports them.
-- When the order query has no average fill price, ```exchange.GetOrder()``` and ```exchange.GetConditionOrder()``` compute ```AvgPrice``` for orders with fills from the exchange's trade history (volume-weighted, one or a few extra requests), and cache the result for finished orders; ```AvgPrice``` is 0 while the fills have not been recorded yet.
+- ```exchange.ModifyOrder()``` and ```exchange.ModifyConditionOrder()``` have the exchange re-issue the order and return a new order ID, which should be used from then on; ```exchange.ModifyOrder()``` keeps the original order's reduce-only flag.
 - For perpetuals, ```Last``` in ```exchange.GetTicker()``` is the mark price and ```Open``` the mark price 24 hours ago; there is no high or low (```High``` and ```Low``` are 0), and ```Volume``` is the 24-hour volume in contracts.
 - Funding is settled every hour; ```exchange.GetFundings()``` returns perpetuals only.
 - ```exchange.GetHistoryOrders()``` and ```exchange.GetHistoryConditionOrders()``` query one symbol at a time; an empty string (all symbols) is rejected.
@@ -27081,7 +28581,7 @@ Option codes are Aevo native codes: underlying-expiry (DDMMMYY)-strike-C/P, C fo
 
 | Field | ```Pendle``` | ```Futures_Boros``` | Required | Default | Description |
 | - | - | - | - | - | - |
-| Chain | ✓ |  | Yes | ```Ethereum``` | The chain of the wallet and the trades; it also determines the default nodes and the native coin's name. Options: ```Ethereum```, ```Arbitrum```, ```Base```, ```BNB Chain```, ```HyperEVM```, ```Plasma```, ```Robinhood```, ```Monad```, ```X Layer``` |
+| Chain | ✓ |  | Yes | ```Ethereum``` | Options: ```Ethereum```, ```Arbitrum```, ```Base```, ```BNB Chain```, ```HyperEVM```, ```Plasma```, ```Robinhood```, ```Monad```, ```X Layer``` |
 | Wallet Private Key | ✓ |  | Yes | — | The EVM wallet private key (hex). |
 | RPC Address | ✓ |  | No | ```https://ethereum-rpc.publicnode.com,https://eth.drpc.org``` | RPC nodes; separate several with commas, and the next one is used automatically when a node fails. Choosing a chain fills in its default nodes. |
 | RPC Auth | ✓ |  | No | — | Optional. For RPC nodes that need authentication: a header in the form ```Header-Name: value```, or a Basic auth value. |
@@ -27116,32 +28616,25 @@ Contract codes are Boros market names with underscores, ```funding source_asset_
 | ```apy``` | symbol, price | Convert a PT/YT price to an implied APY (the same conversion limit orders use): the quote is converted to the accounting asset at the SY rate, PT price = (1 + APY)^(−years to expiry), YT price = 1 − PT price. | The implied APY (0.16 means 16%); null when the price has no implied APY (a PT at or above one accounting asset, a YT outside 0 to 1). |
 | ```price``` | symbol, apy | The reverse of ```apy```, converting an implied APY to a price in the quote token. | The price. |
 | ```slippage``` | [ratio] | Slippage protection of market orders, range ```[0, 0.5)```, default ```0.005``` (0.5%), written into the swap transaction. The order option ```slippage``` overrides it for one order. Queries when called without an argument. | The current slippage ratio. |
-| ```orderExpiry``` | [seconds] | Default lifetime of limit orders in seconds, 60 to 31536000 (one year), 604800 (7 days) by default, never beyond the market's expiry. (more below the table) | The current lifetime (seconds). |
+| ```orderExpiry``` | [seconds] | Default lifetime of limit orders in seconds, 604800 (7 days) by default, never beyond the market's expiry. The order option ```expiry``` (a timestamp in seconds or milliseconds) sets it for one order. Queries when called without an argument. | The current lifetime (seconds). |
 | ```cancelWait``` | [seconds] | How long a cancel waits for the cancel transaction to be mined, default 30, range 0 to 600. On timeout ```exchange.CancelOrder()``` still returns ```true```, meaning the cancel was submitted. Queries when called without an argument. | The current wait (seconds). |
 | ```approve``` | [mode] | Approval amount: ```max``` for unlimited, ```exact``` for just what the order needs (the default). Swaps approve the Pendle Router, limit orders the Pendle limit order contract. Queries when called without an argument. | The current mode. |
 | ```gasMultiplier``` | [x] | gasLimit = estimated gas × x, range 1 to 5, default 1.2. Queries when called without an argument. | The current multiplier. |
-| ```receipt``` | txHash[, waitMs] | Query a transaction receipt: status, block, gas and fee, optionally waiting until it is mined (up to 10 minutes). For a swap order, pass the transaction hash after the comma in the order ID. | ```{txHash, status, blockNumber, gasUsed, fee}```, where ```status``` is ```success```, ```reverted``` or ```pending```; while not mined (```pending```) only ```txHash``` and ```status``` are present. |
+| ```receipt``` | txHash[, waitMs] | Query a transaction receipt: status, block, gas and fee, optionally waiting until it is mined (up to 10 minutes). For a swap order, pass the transaction hash after the comma in the order ID. | ```{txHash, status, blockNumber, gasUsed, fee}```, where ```status``` is ```success```, ```reverted``` or ```pending```. |
 | ```base``` | [url] | Without an argument, returns the current RPC node address; with an address, switches the node (separate several with commas), and the first request afterwards checks that the node is on the configured chain. | The previous address. |
 | ```address``` | — | The wallet address. | — |
 
-The rest of the longer descriptions in the table:
-
-- ```orderExpiry```: The order option ```expiry``` sets the expiry of one order as a timestamp in seconds or milliseconds (a point in time, not a duration); a time already past fails, and a time after the market's expiry becomes one minute before it. Queries when called without an argument.
-
-For the common command ```currency``` see `exchange.IO`.
-
-The common command ```api``` is not supported (the call fails with an error and returns null).
+For the common commands ```api``` and ```currency``` see `exchange.IO`.
 
 ###### ```Futures_Boros``` (Futures)
 
 | Command | Arguments | Description | Returns |
 | - | - | - | - |
-| ```address``` | — | The wallet address (the root address of the Boros account). | — |
 | ```agent``` | — | The trading agent: its address, the sub-account, and the approval expiry (Unix seconds, 0 when not approved). Read-only; the agent is approved automatically before the first order and renewed when less than a day is left. | ```{agent, accountId, expiry, approved}``` |
 | ```approveAgent``` | — | Have the wallet sign a (re)approval of the trading agent right away, valid for 30 days. The approval goes on chain through Pendle's relayer and costs no ETH from the wallet. The agent can only place and cancel orders and pay gas; it cannot withdraw. | ```{agent, expiry}``` |
 | ```gasBalance``` | — | The Boros relayer gas balance in USD. Each order or cancel costs about $0.02 to $0.04; the relayer refuses submissions below a floor. | The balance in USD; negative means debt. |
 | ```topUpGas``` | usd[, currency] | Pay the gas balance from the cross account's cash; ```usd``` is the USD amount (at most 100) and ```currency``` the collateral to pay with, ```USDT``` by default. | ```{txHash, usd, paid, currency}``` |
-| ```autoTopUp``` | [enabled[, usd]] | Automatic gas top-up: when on (the default) and the gas balance is below $0.3, an order first pays ```usd``` dollars (default 1, at most 20, plus any debt) from the cross cash of the market's collateral, in the same batch. ```enabled``` is a boolean. Queries when called without arguments. | ```{enabled, usd}``` |
+| ```autoTopUp``` | [enabled[, usd]] | Automatic gas top-up: when on (the default) and the gas balance is below $0.3, an order first pays ```usd``` dollars (default 1, plus any debt) from the cross cash of the market's collateral, in the same batch. Queries when called without arguments. | ```{enabled, usd}``` |
 | ```slippage``` | [rate] | The maximum distance of a market order from the mark rate (a decimal rate, default ```0.01```, one percentage point), range 0 to 0.5. The order option ```slippage``` overrides it for one order. Queries when called without an argument. | The current value. |
 | ```base``` | [url] | Query or switch the Boros API base URL (default ```https://api-boros.pendle.finance/apis```). | The address before the switch. |
 | ```rpc``` | [url] | Query or switch the Arbitrum RPC nodes (used for deposits, withdrawals and on-chain nonce reads); separate several with commas. | The address before the switch. |
@@ -27151,11 +28644,9 @@ The common command ```api``` is not supported (the call fails with an error and 
 | ```withdraw``` | currency, amount | A wallet transaction: request a withdrawal from the cross account to the wallet, from the main account (sub-account 0) only. Boros completes it automatically after the cooldown (about 15 minutes at present); another request during the cooldown adds to the amount and restarts the timer. | ```{txHash, currency, amount, note}``` |
 | ```cancelWithdraw``` | currency | A wallet transaction: cancel a pending withdrawal request. | ```{txHash, currency}``` |
 | ```isolatedTransfer``` | symbol, amount | Move cash between the cross account and the isolated account of an isolated-only market: a positive ```amount``` (in the collateral) moves it from cross into isolated, a negative one moves it back. Goes through the relayer and uses the gas balance. Withdrawals come from the cross account only, so move isolated cash back first. | ```{txHash, symbol, amount, account}``` |
-| ```wallet``` | — | The wallet's (not the Boros account's) ETH and collateral token balances on Arbitrum, for checking before a deposit. | ```[{currency, amount, token}]```; the first item is the wallet's ETH (```currency``` is ```ETH (gas)```, without ```token```). |
+| ```wallet``` | — | The wallet's (not the Boros account's) ETH and collateral token balances on Arbitrum, for checking before a deposit. | ```[{currency, amount, token}]``` |
 
-For the common command ```currency``` see `exchange.IO`.
-
-The common command ```api``` is not supported (the call fails with an error and returns null).
+For the common commands ```api``` and ```currency``` see `exchange.IO`.
 
 ##### Function Support
 
@@ -27175,7 +28666,7 @@ Margin mode: Ordinary markets use the cross account (one per collateral token, s
 
 Position mode: One-way positions. Boros has no reduce-only flag: closing orders (```closebuy```, ```closesell```) are opposite orders capped at the current position (the exact position size when within one part per billion of it), and fail without an order when there is no position in that direction.
 
-Account: ```exchange.GetAccount()``` reads the cross account of the current pair's collateral (the isolated account for an isolated-only market): ```Balance``` is the available initial margin, ```FrozenBalance``` the initial margin in use, ```Equity``` the account's net value (cash plus position value). In ```exchange.GetPositions()```, ```Price``` is the fixed annualized entry rate, ```Profit``` the unrealized PnL, and ```Margin``` the initial margin the position uses in the account that holds it (cross or isolated), all in the collateral; a matured position awaiting settlement has a ```Margin``` of 0.
+Account: ```exchange.GetAccount()``` reads the cross account of the current pair's collateral (the isolated account for an isolated-only market): ```Balance``` is the available initial margin, ```FrozenBalance``` the initial margin in use, ```Equity``` the account's net value (cash plus position value). In ```exchange.GetPositions()```, ```Price``` is the fixed annualized entry rate and ```Profit``` the unrealized PnL in the collateral.
 
 ##### Notes
 
@@ -27183,15 +28674,15 @@ Account: ```exchange.GetAccount()``` reads the cross account of the current pair
 
 | Function | Pendle behavior |
 | - | - |
-| exchange.GetTicker() | Buy/Sell are Pendle's live executable swap rates (AMM and limit orders matched, fees included); when the live rates are missing, a quote for about $1000 is used instead (shrinking to $100 and $10 when that cannot be filled); ```Info``` carries ```impliedApy``` and ```expiry``` (milliseconds). No 24h statistics: ```High```, ```Low```, ```Open``` are the current price and ```Volume``` is 0 |
+| exchange.GetTicker() | Buy/Sell are Pendle's live executable swap rates (AMM and limit orders matched, fees included); ```Info``` carries ```impliedApy``` and ```expiry``` (milliseconds). No 24h statistics: ```High```, ```Low```, ```Open``` are the current price and ```Volume``` is 0 |
 | exchange.GetDepth() | Pendle's order book (limit orders and the AMM combined), grouped by 0.01% implied APY and converted to prices |
 | exchange.GetMarkets() | For each active market, PT and YT against the underlying asset and the accounting asset; ```Info``` carries the market address, expiry, implied APY and PT/YT/SY addresses |
 | exchange.GetAssets() | The native coin and every PT, YT, underlying asset etc. with a non-zero balance |
-| exchange.CreateOrder() | Price -1 swaps immediately: for a market buy ```amount``` is the quote to spend, for a sell the PT/YT amount, with slippage protection. A price above 0 places a resting limit order on Pendle's book, with ```amount``` in PT/YT (a buy pays ```amount``` × price of the quote token): the price is converted to an implied APY via the accounting-asset rate and years to expiry (see ```exchange.IO("apy", ...)```). Order options go in the last object argument, e.g. ```exchange.CreateOrder(symbol, "buy", price, amount, {expiry: 1793836800})```: ```impliedApy``` places a limit order at an APY directly, ```expiry``` is the limit order's expiry (a timestamp in seconds or milliseconds, see ```exchange.IO("orderExpiry", ...)```), and ```slippage``` is the slippage of one market order; a value that is not a number fails |
-| exchange.GetOrder() | Swap order IDs are ```pair,txHash``` with the state from the receipt, and a swap sent by this process that the node still cannot find after 5 minutes is canceled; limit order IDs are ```pair,lo-orderHash``` with state, filled amount and average price from Pendle (still pending while partially filled). Pendle takes 15 to 40 seconds to index on-chain cancels and fills; until then the state follows the chain: once this process's cancel transaction is mined successfully the order shows as canceled right away, and an order that is fully filled or canceled on chain shows that state right away when the filled amount can be reconciled (from the on-chain fill events for orders placed by this process). ```Info.onChain``` holds the remaining and filled amounts on chain, and ```Info.indexed``` is ```false``` while Pendle has not caught up. For limit orders not placed by this process (after a restart, for example), the price is converted back from the order's implied APY at the current rate and is approximate |
-| exchange.GetOrders() | The wallet's resting limit orders (orders already canceled or filled on chain are left out), plus swaps sent by this process that are not mined yet |
-| exchange.CancelOrder() | Limit orders: sends an on-chain cancel transaction and waits for it (see ```exchange.IO("cancelWait", ...)```). An order already canceled or fully filled on chain fails right away with an error saying which, without sending a transaction; it also fails while an earlier cancel transaction is still waiting to be mined (within 5 minutes), which can be checked with ```exchange.IO("receipt", ...)```. Swaps cannot be canceled |
-| exchange.GetHistoryOrders() | The wallet's finished (filled, canceled, expired) limit orders, including ones finished on chain that Pendle has not indexed yet; swaps are not included |
+| exchange.CreateOrder() | Price -1 swaps immediately: for a market buy ```amount``` is the quote to spend, for a sell the PT/YT amount, with slippage protection. A price above 0 places a resting limit order on Pendle's book: the price is converted to an implied APY via the accounting-asset rate and years to expiry (see ```exchange.IO("apy", ...)```); the option ```impliedApy``` places it at an APY directly |
+| exchange.GetOrder() | Swap order IDs are ```pair,txHash``` with the state from the receipt; limit order IDs are ```pair,lo-orderHash``` with state, filled amount and average price from Pendle (still pending while partially filled) |
+| exchange.GetOrders() | The wallet's resting limit orders, plus swaps sent by this process that are not mined yet |
+| exchange.CancelOrder() | Limit orders: sends an on-chain cancel transaction and waits for it (see ```exchange.IO("cancelWait", ...)```). Swaps cannot be canceled |
+| exchange.GetHistoryOrders() | The wallet's finished (filled, canceled, expired) limit orders; swaps are not included |
 
 Limit orders can only pay with or pay out tokens the market's SY accepts (usually the underlying and accounting assets); another quote token fails with the list of usable tokens. The token given is approved to the Pendle limit order contract automatically before placing; placing itself is off-chain and costs no gas, while canceling is an on-chain transaction.
 
@@ -27205,13 +28696,13 @@ Pendle's API is rate-limited by computing units (200 per minute: a swap quote co
 | exchange.GetDepth() | The Boros order book (AMM included), grouped by 0.0001 of rate |
 | exchange.GetTrades() | Recent trades of the market; Boros has no trade IDs, so ```Id``` is synthesized from the transaction hash, size and rate |
 | exchange.GetRecords() | Native periods are 5 minutes, 1 hour, 1 day and 1 week; other periods are synthesized by the docker. Candle values are rates; periods without trades repeat the previous close |
-| exchange.GetFundings() | The current funding rate of the underlying perpetual exchange: ```Rate``` is the annualized ```floatingApr``` scaled to one settlement period (1 hour), and ```Interval``` is the settlement period. Without a pair it returns every unmatured market, from the market list cached for up to 10 minutes |
-| exchange.CreateOrder() | Limit orders are GTC by default (the option ```tif``` can be ```ioc```, ```fok``` or ```postOnly```); the rate is rounded to a tick in the trader's favor (a long never above, a short never below the given rate), and the given rate also guards the average fill rate. Price -1 is a market order: IOC within the mark rate ± slippage (see ```exchange.IO("slippage", ...)```), failing when nothing fills. Orders must be worth more than $10 (except closing a whole position). A paused market takes no orders and a close-only market takes closing orders only. The first order in a market enters it automatically (Boros charges a one-time entrance fee). For an isolated-only market the option ```cashIn``` (in the collateral) moves cash into the isolated account before the order |
-| exchange.GetOrder() | Order IDs are ```market id,order id```; market orders that filled at once and never rested are returned from the fill recorded when this process placed them. ```AvgPrice``` is the order's tick rate (Boros order records carry no average fill rate), and for a market order the protective rate it was placed with |
+| exchange.GetFundings() | The current funding rate of the underlying perpetual exchange: ```Rate``` is the annualized ```floatingApr``` scaled to one settlement period (1 hour), and ```Interval``` is the settlement period |
+| exchange.CreateOrder() | Limit orders are GTC by default (the option ```tif``` can be ```ioc```, ```fok``` or ```postOnly```); the rate is rounded to a tick in the trader's favor (a long never above, a short never below the given rate), and the given rate also guards the average fill rate. Price -1 is a market order: IOC within the mark rate ± slippage (see ```exchange.IO("slippage", ...)```), failing when nothing fills. Orders must be worth more than $10 (except closing a whole position). The first order in a market enters it automatically (Boros charges a one-time entrance fee). For an isolated-only market the option ```cashIn``` (in the collateral) moves cash into the isolated account before the order |
+| exchange.GetOrder() | Order IDs are ```market id,order id```; market orders that filled at once and never rested are returned from the fill recorded when this process placed them |
 | exchange.CancelOrder() | Cancels through the relayer; fails when the order is no longer open (filled or already canceled) |
-| exchange.ModifyOrder() | Atomically cancels the old order and places a new one (Boros's ```idToStrictCancel```), returning the new order ID; the whole call fails when the old order is gone. The new order is a GTC limit order; without a price it keeps the old order's rate, and without an amount it takes the old order's unfilled amount |
-| exchange.CreateConditionOrder() | Boros take-profit / stop-loss orders: once the rate crosses the trigger (```TpTriggerPrice``` or ```SlTriggerPrice```, which must be above 0) the position is closed at market, reduce-only. The side is the closing side (```closebuy``` closes a long, ```closesell``` a short); an amount not below the position closes the whole position; the order price can only be -1 (market) and OCO is not supported. Main account (sub-account 0) only. The stop-order API needs an API signing key: the connector mints one the first time, signed by the trading agent (named ```fmz-…```, valid 7 days, renewed before it expires; when the key slots are full it revokes the least recently used key this agent minted). A new key takes a while to reach all of Boros's gateways, so within a minute of minting, stop-order requests rejected with 401 are retried automatically after a short wait; the first call may take a few seconds longer |
-| exchange.GetConditionOrders() | Take-profit / stop-loss orders waiting to trigger or executing; ```Price``` is -1 and the trigger is in ```Condition```; an order that closes the whole position has an ```Amount``` of 0 (the size is the position at trigger time) |
+| exchange.ModifyOrder() | Atomically cancels the old order and places a new one (Boros's ```idToStrictCancel```), returning the new order ID; the whole call fails when the old order is gone |
+| exchange.CreateConditionOrder() | Boros take-profit / stop-loss orders: once the rate crosses the trigger (```TpTriggerPrice``` or ```SlTriggerPrice```, which must be above 0) the position is closed at market, reduce-only. The side is the closing side (```closebuy``` closes a long, ```closesell``` a short); an amount not below the position closes the whole position; the order price can only be -1 (market) and OCO is not supported. Main account (sub-account 0) only. The stop-order API needs an API signing key: the connector mints one the first time, signed by the trading agent (named ```fmz-…```, valid 7 days, renewed before it expires; when the key slots are full it revokes the least recently used key this agent minted) |
+| exchange.GetConditionOrders() | Take-profit / stop-loss orders waiting to trigger or executing; ```Price``` is -1 and the trigger is in ```Condition``` |
 
 Every order and cancel goes on chain through Pendle's relayer and is paid from the Boros account's gas balance (about $0.02 to $0.04, see ```exchange.IO("gasBalance")```); by default a low balance is topped up from the cross cash automatically (see ```exchange.IO("autoTopUp", ...)```). Submissions of one exchange object run one at a time.
 
@@ -27245,18 +28736,6 @@ Only USDC-settled contracts exist; the quote currency must be ```USDC```, for ex
 
 Perpetual contracts only; other contract codes are rejected. Order amounts are in the base currency (```CtVal``` is 1 in ```exchange.GetMarkets()```).
 
-##### Exchange-specific IO Commands
-
-| Command | Arguments | Description | Returns |
-| - | - | - | - |
-| ```api``` | method, path[, params[, raw[, sign]]] | Call an Orderly endpoint directly. (more below the table) | The whole response (with ```success```, ```data``` and ```timestamp```; ```data``` is not unwrapped); an error is raised when ```success``` is ```false```. |
-
-The rest of the longer descriptions in the table:
-
-- ```api```: Paths starting with ```/v1/public/``` or ```/v1/tv/``` are unsigned by default and other paths are signed with the ed25519 key (```orderly-key```, ```orderly-signature``` and related headers; the account ID and API key must be configured); ```sign``` set to ```true```/```false``` (it may also be given directly as the 4th argument) forces signing on or off. ```GET``` parameters go into the query string, ```DELETE``` sends a form body and other methods a JSON body. ```raw``` is not a request body but a parameter table (a JSON object or ```a=1&b=2```) that replaces ```params``` entirely when non-empty.
-
-For the common commands ```base``` and ```currency``` see `exchange.IO`.
-
 ##### Function Support
 
 No unsupported standard functions.
@@ -27267,39 +28746,32 @@ Served through a fallback:
 
 ##### Margin, Account and Simulation
 
-Margin mode: The account is always cross margin, with no isolated margin; ```exchange.IO("cross", ...)``` is not supported. ```exchange.SetMarginLevel()``` sets leverage, which must be an integer; the exchange applies it to the whole account, so setting one contract's leverage also changes the other contracts.
+Margin mode: The account is always cross margin, with no isolated margin; ```exchange.IO("cross", ...)``` is not supported. ```exchange.SetMarginLevel()``` sets leverage; the exchange applies it to the whole account, so setting one contract's leverage also changes the other contracts.
 
 Position mode: One-way (net) positions only; ```exchange.IO("dual", ...)``` is not supported, and ```exchange.SetDirection()``` only distinguishes opening from closing.
 
-Account: The equity of ```exchange.GetAccount()``` is the USDC holding, and the unrealized PnL is the sum of the positions' unsettled PnL (```unsettled_pnl```). ```exchange.GetAssets()``` lists holdings per currency: frozen = ```frozen``` + ```pending_short```, available = holding − frozen.
-
 ##### Notes
 
-- Conditional orders support take-profit and stop-loss only, not OCO (place the take-profit and stop-loss legs as two conditional orders); they trigger on the mark price, and with an order price of -1 (market) they execute at market once triggered.
-- Limit orders accept ```{tif: "ioc"}```, ```{tif: "fok"}``` or ```{postOnly: true}``` in the last object argument, mapped to the exchange's ```IOC```, ```FOK``` and ```POST_ONLY``` order types; other keys are merged into the order request body as they are (overriding fields of the same name built by the connector).
-- ```exchange.ModifyOrder()``` modifies in place and the order ID stays the same; a price or amount that is not passed keeps its current value. ```exchange.ModifyConditionOrder()``` modifies the trigger price, order price and amount in place, and the order ID stays the same as well.
-- For market orders ```Price``` is 0; the average fill price is in ```AvgPrice``` (the exchange's ```average_executed_price```).
-- ```MarginLevel``` in ```exchange.GetPositions()``` is the position's leverage (the exchange's ```leverage``` on the position row, or the reciprocal of the initial margin ratio ```imr``` when it is absent), and ```Margin``` is the initial margin in use (position value ÷ leverage).
+- Conditional orders support take-profit and stop-loss only, not OCO (place the take-profit and stop-loss legs as two conditional orders); they trigger on the mark price.
 - The order book and K-line endpoints also require a signature: ```exchange.GetDepth()```, ```exchange.GetRecords()``` and ```exchange.GetTicker()``` (best bid and ask come from the order book) all need a configured API key; ```exchange.GetTickers()```, ```exchange.GetTrades()```, ```exchange.GetFundings()``` and ```exchange.GetMarkets()``` need no signature.
 
 #### Uniswap
 
-Connects to the pools of one DEX (the "DEX" option: Uniswap, PancakeSwap, Aerodrome or Velodrome) on one chain and maps on-chain swaps onto the spot trading functions:
+Connects to the pools of one DEX (the "DEX" option: Uniswap, PancakeSwap or Aerodrome) on one chain and maps on-chain swaps onto the spot trading functions:
 
 - Uniswap: Ethereum, Arbitrum, Base, BNB Chain, Unichain, Polygon, OP Mainnet, Robinhood, Arc. V3 pools; V4 pools (only pools without hooks are used, and the native coin ETH/BNB/POL takes part in swaps directly without its wrapped token); V2 pools are used on Ethereum, Unichain, Robinhood and Arc.
-- PancakeSwap: V2 and V3 pools on Ethereum, Arbitrum, Base and BNB Chain; on BNB Chain and Base also Infinity CL pools (only pools without hooks and with a fee of at most 1% are used; Infinity has no fixed fee tiers, so the connector collects pools from recent on-chain trades with ```eth_getLogs```, and pools without trades for a long time are not used; when the configured nodes cannot serve logs (the official BSC bsc-dataseed nodes refuse ```eth_getLogs``` outright, and free nodes such as drpc rate-limit it), these public trades are read through the chain's default public nodes, and if that also fails ```exchange.IO("route", ...)``` carries a ```warning``` with the reason). Both V3 and Infinity CL pools support LP (see "Concentrated liquidity" below).
-- Aerodrome: Base only. Uses Slipstream concentrated-liquidity pools (both the old and the new deployment, pools distinguished by tick spacing, fees set by each pool) and basic pools (volatile is constant product, stable is the stablecoin curve). Basic pools support exact input only: limit buys (filled by the amount bought) can only go through Slipstream pools. Both kinds support LP and staking in gauges for AERO (see "Concentrated liquidity" below).
-- Velodrome: OP Mainnet only. The same contracts as Aerodrome, with the same pool kinds, swaps and LP usage (also two Slipstream generations); gauges pay VELO.
+- PancakeSwap: V2 and V3 pools on Ethereum, Arbitrum, Base and BNB Chain; on BNB Chain and Base also Infinity CL pools (only pools without hooks and with a fee of at most 1% are used; Infinity has no fixed fee tiers, so the connector collects pools from recent on-chain trades, and pools without trades for a long time are not used).
+- Aerodrome: Base only. Uses Slipstream concentrated-liquidity pools (both the old and the new deployment, pools distinguished by tick spacing, fees set by each pool) and basic pools (volatile is constant product, stable is the stablecoin curve). Basic pools support exact input only: limit buys (filled by the amount bought) can only go through Slipstream pools.
 
-Each swap takes the best-quoted route among the direct routes through all available pools and the two-hop routes through hub tokens. V4 and Infinity routes swap through their own Universal Router, with token approvals going through their own Permit2 contract (see ```exchange.IO("approve", ...)```). Aerodrome's and Velodrome's basic pools and the two Slipstream generations each have their own router contract, and tokens are approved to the router used by the swap at hand.
+Each swap takes the best-quoted route among the direct routes through all available pools and the two-hop routes through hub tokens. V4 and Infinity routes swap through their own Universal Router, with token approvals going through their own Permit2 contract (see ```exchange.IO("approve", ...)```). Aerodrome's basic pools and the two Slipstream generations each have their own router contract, and tokens are approved to the router used by the swap at hand.
 
 ##### Names and Configuration
 
-```exchange.GetName()```: ```Uniswap``` (Spot); aliases: PancakeSwap, Aerodrome, Velodrome.
+```exchange.GetName()```: ```Uniswap``` (Spot); aliases: PancakeSwap, Aerodrome.
 
 | Field | Required | Default | Description |
 | - | - | - | - |
-| DEX | Yes | ```Uniswap``` | The DEX to connect to, Uniswap, PancakeSwap, Aerodrome (Base only) or Velodrome (OP Mainnet only). (more below the table) |
+| DEX | Yes | ```Uniswap``` | Options: ```Uniswap```, ```PancakeSwap```, ```Aerodrome (Base)``` |
 | Chain | Yes | ```Ethereum``` | Options: ```Ethereum```, ```Arbitrum```, ```Base```, ```BNB Chain```, ```Unichain```, ```Polygon```, ```OP Mainnet```, ```Robinhood```, ```Arc``` |
 | Private Key | Yes | — | Wallet private key (hex). |
 | Rpc Address | No | ```https://ethereum-rpc.publicnode.com,https://eth.drpc.org``` | RPC node URL; several nodes separated by commas fail over to each other when one errors or lacks data; when empty, each chain's built-in default (a primary node plus a backup, comma-separated) is used. (more below the table) |
@@ -27307,7 +28779,6 @@ Each swap takes the best-quoted route among the direct routes through all availa
 
 The rest of the longer descriptions in the table:
 
-- DEX: Choosing a chain where the DEX is not deployed fails at startup. Options: ```Uniswap```, ```PancakeSwap```, ```Aerodrome (Base)```, ```Velodrome (OP Mainnet)```
 - Rpc Address: Order states need a node that returns receipts of mined transactions; the publicnode public nodes for Base, BNB Chain and Arbitrum cannot (archive access is required), so do not use them alone.
 
 ##### Trading Pairs and Contract Codes
@@ -27321,9 +28792,9 @@ Pairs are written as ```ETH_USDC```; the native coin (ETH, BNB, POL) and its wra
 | Command | Arguments | Description | Returns |
 | - | - | - | - |
 | ```transfer``` | to, amount[, token] | Transfer the native coin or an ERC20 token out of the configured wallet (```token``` is a token name or contract address, the native coin when omitted; USDC on Arc); ```amount``` may be ```all``` (the native coin keeps the fee). Waits for the broadcast only, not for confirmation. See the sub-page `exchange.IO("transfer", ...)`. | ```{txHash, from, to, token, tokenAddress, amount, raw}``` |
-| ```receipt``` | txHash[, waitMs] | Query the receipt of any transaction on this chain (not only those sent by this exchange object), optionally waiting for confirmation (up to 10 minutes). For an order, pass the transaction hash after the comma in the order ID. See the sub-page `exchange.IO("receipt", ...)`. | ```{txHash, status, blockNumber, gasUsed, fee}``` once mined (```status``` is ```success``` or ```reverted```), ```{txHash, pending: true, known}``` otherwise. |
-| ```route``` | symbol, side, qty | Quote only, no order: lists the quote of every candidate route of a swap and the best route. ```qty``` is always in the base token: ```sell``` sells ```qty``` as exact input and ```buy``` buys ```qty``` as exact output (unlike a market buy, which is sized in the quote token). See the sub-page `exchange.IO("route", ...)`. | ```{symbol, side, qty, best, quote, price, candidates}```, plus ```warning``` when PancakeSwap Infinity pools could not be collected (no node served the logs). |
-| ```simulate``` | symbol, side, qty[, price[, stateOverride[, route]]] | Build the swap transaction with the order logic (route selection, quoting, price protection) and only simulate it with ```eth_call```; nothing is signed, broadcast or paid. See the sub-page `exchange.IO("simulate", ...)`. | ```{route, exactIn, amountIn, amountOut, quoted, executed, value, calls}```, plus ```allowanceOverride``` when an allowance was supplied. |
+| ```receipt``` | txHash[, waitMs] | Query the receipt of a transaction sent by this exchange object (an order, a transfer, ...), optionally waiting for confirmation (up to 10 minutes). For an order, pass the transaction hash after the comma in the order ID. See the sub-page `exchange.IO("receipt", ...)`. | ```{txHash, status, blockNumber, gasUsed, fee}``` once mined, ```{txHash, pending: true, known}``` otherwise. |
+| ```route``` | symbol, side, qty | Quote only, no order: lists the quote of every candidate route of a swap and the best route. See the sub-page `exchange.IO("route", ...)`. | ```{symbol, side, qty, best, quote, price, candidates}``` |
+| ```simulate``` | symbol, side, qty[, price[, stateOverride[, route]]] | Build the swap transaction with the order logic (route selection, quoting, price protection) and only simulate it with ```eth_call```; nothing is signed, broadcast or paid. See the sub-page `exchange.IO("simulate", ...)`. | ```{route, exactIn, amountIn, amountOut, quoted, executed, value, calls}``` |
 | ```token``` | [name, address] | Register a token so it can be used in pairs; without arguments, list the token table. See the sub-page `exchange.IO("token", ...)`. | ```{symbol, address, decimals}``` when registering, an array of ```{symbol, address, decimals, native}``` when listing. |
 | ```wrap``` | amount | Wrap the native coin into its wrapped token (e.g. ETH→WETH), 1:1 without slippage, gas only; ```all``` is not accepted (gas must remain). See the sub-page `exchange.IO("wrap", ...)`. | ```{txHash, action, from, to, amount, raw}``` |
 | ```unwrap``` | amount | Unwrap the wrapped token into the native coin (e.g. WETH→ETH); ```amount``` may be ```all```. See the sub-page `exchange.IO("unwrap", ...)`. | ```{txHash, action, from, to, amount, raw}``` |
@@ -27335,92 +28806,53 @@ Pairs are written as ```ETH_USDC```; the native coin (ETH, BNB, POL) and its wra
 | ```base``` | [url] | Without an argument, returns the current node address; with an address, switches the node. Several nodes are written as one comma-separated string (with an array only the first address is used). After a switch, the first request checks which chain the node is on and fails if it is not the configured chain. | The previous address. |
 | ```sendBase``` | url | Set a node used only to broadcast transactions (a private transaction channel). Unlike Web3, it does not return the previous address, does not query when called without an argument, and an empty string does not clear the setting. | ```true``` |
 | ```address``` | — | The wallet address of the configured private key (lowercase, starting with ```0x```). | — |
-| ```contracts``` | — | The deployment of this exchange object's DEX on its chain; contract addresses, fee tiers and the built-in token list snapshot. | An object: ```dex```, ```chainId```, ```chain```, ```router```, ```quoterV2```, ```v3Factory```, ```v3Fees```, ```positionManager``` (the V3 PositionManager), ```v2Factory```, ```v2Fee``` (in millionths, 3000 = 0.3%), ```wrappedNative```, ```v4``` (the Uniswap V4 or PancakeSwap Infinity CL contracts, including the ```positionManager``` used for LP: the Uniswap V4 PositionManager or the Infinity CLPositionManager), ```aerodrome``` (the Aerodrome contracts; a Velodrome exchange object has ```velodrome``` with the same structure instead), ```tokenList``` (the token list snapshot's build time ```embeddedAt```, token count ```tokens``` and common-token count ```core```); deployments absent on the chain are ```null```. |
-| ```lp.pools``` | token[, quote] | Lists every V3 and V4 (Infinity CL on PancakeSwap) pool of a token (against the given quote, or the chain's wrapped native, USDC and USDT) with fee tier, tick spacing, current price, liquidity, both token balances of the pool and TVL; 24h volume and fees come from GeckoTerminal (```null``` when unavailable; cached in the process for 5 minutes and shared with ```lp.select``` and ```lp.plan```, with one retry after a pause when rate-limited). (more below the table) | ```[{id, protocol, dex, symbol, fee, feeRate, tickSpacing, tick, price, liquidity, reserveBase, reserveQuote, tvlQuote, tvlUsd, volume24hUsd, fees24hUsd, empty}]```, where ```price``` is quote per token. (more below the table) |
+| ```contracts``` | — | The deployment of this exchange object's DEX on its chain; contract addresses, fee tiers and the built-in token list snapshot. | An object: ```dex```, ```chainId```, ```chain```, ```router```, ```quoterV2```, ```v3Factory```, ```v3Fees```, ```v2Factory```, ```v2Fee``` (in millionths, 3000 = 0.3%), ```wrappedNative```, ```v4``` (the Uniswap V4 or PancakeSwap Infinity CL contracts, including the ```positionManager``` used for LP), ```aerodrome``` (the Aerodrome contracts), ```tokenList``` (the token list snapshot's build time ```embeddedAt```, token count ```tokens``` and common-token count ```core```); deployments absent on the chain are ```null```. |
+| ```lp.pools``` | token[, quote] | Lists every V3 and V4 pool of a token (against the given quote, or the chain's wrapped native, USDC and USDT) with fee tier, tick spacing, current price, liquidity, both token balances of the pool and TVL; 24h volume and fees come from GeckoTerminal (```null``` when unavailable). (more below the table) | ```[{id, protocol, dex, symbol, fee, feeRate, tickSpacing, tick, price, liquidity, reserveBase, reserveQuote, tvlQuote, tvlUsd, volume24hUsd, fees24hUsd, empty}]```, where ```price``` is quote per token. |
 | ```lp.select``` | token, budget[, options] | Picks a pool by rule: with ```options.fee```, the pool of that fee tier is used when it meets the liquidity threshold (only that tier when ```exact``` is ```true```); otherwise, among pools whose TVL is at least max($5000, budget), the one with the largest 24h volume, or the largest TVL without volume data. (more below the table) | One ```lp.pools``` row with an extra ```reason```. |
-| ```lp.pool``` | poolId | Live state of a pool. (more below the table) | ```{id, protocol, currency0, currency1, token0, token1, fee, tickSpacing, tick, sqrtPriceX96, price0, price1, liquidity}```, where ```price0``` is token1 per token0; a V4 native currency is the zero address. |
+| ```lp.pool``` | poolId | Live state of a pool. ```poolId``` is a V3 pool contract address (only pools created by this DEX's factory) or a V4 PoolId (```0x``` plus 64 hex digits, hookless pools only). | ```{id, protocol, currency0, currency1, token0, token1, fee, tickSpacing, tick, sqrtPriceX96, price0, price1, liquidity}```, where ```price0``` is token1 per token0; a V4 native currency is the zero address. |
 | ```lp.ticks``` | poolId, tickLower, tickUpper[, step] | Liquidity distribution over a tick range, with each segment's liquidity and amounts of both tokens (summed over initialized ticks inside it); ```step``` is the segment width in ticks (the tick spacing by default). Ranges wider than 120 bitmap words are refused. | ```{pool, tick, token0, token1, segments: [{tickLower, tickUpper, price0Lower, price0Upper, liquidity, amount0, amount1, current}]}``` |
-| ```lp.plan``` | params | A position plan (read-only, costs nothing). (more below the table) | ```{params, symbol, pool, protocol, fee, tickSpacing, tick, price, shape, budget, budgetUsd, positions: [{tickLower, tickUpper, priceLower, priceUpper, liquidity, amountBase, amountQuote, share}], needBase, needQuote, haveBase, haveQuote, swap, payWith, shortfall, shareOfPool, volume24hUsd, estDailyFeesUsd, slippageBps, layers, layersRequested, warning?}```; ```swap``` is the swap needed before adding (```{side, amount, currency}``` or ```null```). (more below the table) |
+| ```lp.plan``` | params | A position plan (read-only, costs nothing). (more below the table) | ```{params, symbol, pool, protocol, fee, tickSpacing, tick, price, shape, budget, budgetUsd, positions: [{tickLower, tickUpper, priceLower, priceUpper, liquidity, amountBase, amountQuote, share}], needBase, needQuote, haveBase, haveQuote, swap, shortfall, shareOfPool, volume24hUsd, estDailyFeesUsd, slippageBps}```; ```swap``` is the swap needed before adding (```{side, amount, currency}``` or ```null```). |
 | ```lp.simulate``` | plan[, stateOverride] | Runs the plan's add-liquidity transaction with ```eth_call``` (no signing, no broadcast) to confirm it executes and see the amounts used. (more below the table) | ```{pool, positions: [{liquidity, amountBase, amountQuote}], value, swapNeeded, note}``` |
-| ```lp.add``` | plan | Adds liquidity by the plan, swapping first with a market order when needed, approving (V3 approves the PositionManager; V4 and Infinity approve Permit2 for the token, then grant the PositionManager an allowance inside Permit2), and creating every position in one transaction; returns after it is mined. (more below the table) | ```{txHash, swapTxHash, pool, positions: [{id, tickLower, tickUpper, priceLower, priceUpper, liquidity, amountBase, amountQuote}]}``` |
-| ```lp.increase``` | positionId, budget[, options] | Adds to a position, splitting ```budget``` (in the quote token) by the position's range and the current price and swapping first for whichever token is short. (more below the table) | ```{txHash, swapTxHash, id, liquidity, amountBase, amountQuote}``` |
-| ```lp.decrease``` | positionId, ratio[, options] | Withdraws a ratio (0 to 1) of a position's liquidity and collects all its fees; the position stays. (more below the table) | ```{txHash, positions: [{id, symbol, principalBase, principalQuote, feesBase, feesQuote, receivedBase, receivedQuote}], sells}``` |
-| ```lp.collect``` | positionIds[, sell] | Collects fees, several positions in one transaction; with ```sell``` ```true``` the collected token is sold for the quote. (more below the table) | Same as ```lp.decrease```. |
-| ```lp.remove``` | positionIds[, ratio[, sell]] | Withdraws liquidity and collects fees, several positions in one transaction; ```ratio``` defaults to 1 (withdraw everything and burn the position NFT), below 1 only that share is withdrawn; with ```sell``` ```true``` the returned token is sold for the quote. (more below the table) | Same as ```lp.decrease```. |
-| ```lp.positions``` | [filter[, wallet]] | Every V3 and V4 (Infinity CL on PancakeSwap) position of the wallet with range, in-range flag, liquidity, current amounts and value, and uncollected fees. (more below the table) | ```[{id, pool, protocol, symbol, fee, tickLower, tickUpper, priceLower, priceUpper, price, tick, inRange, liquidity, amountBase, amountQuote, value, feesBase, feesQuote, feesValue, closed}]```, with ```value``` and ```feesValue``` in the quote token. |
+| ```lp.add``` | plan | Adds liquidity by the plan, swapping first with a market order when needed, approving (V3 approves the PositionManager; V4 approves Permit2 for the token, then grants the PositionManager an allowance inside Permit2), and creating every position in one transaction; returns after it is mined. (more below the table) | ```{txHash, swapTxHash, pool, positions: [{id, tickLower, tickUpper, priceLower, priceUpper, liquidity, amountBase, amountQuote}]}``` |
+| ```lp.increase``` | positionId, budget[, options] | Adds to a position, splitting ```budget``` (in the quote token) by the position's range and the current price and swapping first for whichever token is short. ```options.symbol``` sets the orientation (the stablecoin is the quote by default); ```options.slippage``` sets price protection. | ```{txHash, swapTxHash, id, liquidity, amountBase, amountQuote}``` |
+| ```lp.decrease``` | positionId, ratio[, options] | Withdraws a ratio (0 to 1) of a position's liquidity and collects all its fees; the position stays. ```options.slippage``` sets price protection; with ```options.sell``` ```true``` the returned token is sold for the quote. | ```{txHash, positions: [{id, symbol, principalBase, principalQuote, feesBase, feesQuote, receivedBase, receivedQuote}], sells}``` |
+| ```lp.collect``` | positionIds[, sell] | Collects fees, several positions in one transaction; with ```sell``` ```true``` the collected token is sold for the quote. | Same as ```lp.decrease```. |
+| ```lp.remove``` | positionIds[, ratio[, sell]] | Withdraws liquidity and collects fees, several positions in one transaction; ```ratio``` defaults to 1 (withdraw everything and burn the position NFT), below 1 only that share is withdrawn; with ```sell``` ```true``` the returned token is sold for the quote. | Same as ```lp.decrease```. |
+| ```lp.positions``` | [filter[, wallet]] | Every V3 and V4 position of the wallet with range, in-range flag, liquidity, current amounts and value, and uncollected fees. (more below the table) | ```[{id, pool, protocol, symbol, fee, tickLower, tickUpper, priceLower, priceUpper, price, tick, inRange, liquidity, amountBase, amountQuote, value, feesBase, feesQuote, feesValue, closed}]```, with ```value``` and ```feesValue``` in the quote token. |
 | ```lp.history``` | positionId | A position's cash flow: deposits, withdrawn principal, collected fees, and PnL valued at the current pool price (current value + collected fees + withdrawn principal − deposits, gas excluded). (more below the table) | ```{id, symbol, events: [{action, block, txHash, liquidity, amountBase, amountQuote}], depositedBase, depositedQuote, withdrawnBase, withdrawnQuote, feesCollectedBase, feesCollectedQuote, price, pnlQuote, note}```; for V4 positions ```{id, pool, symbol, events: [{action, block, txHash, liquidity}], position, note}```. |
-| ```lp.track``` | positionIds | Registers V4 position IDs (such as ```["v4:123456"]```, or ```inf:number``` for PancakeSwap Infinity; a prefix that does not match the exchange object is an error), Aerodrome Slipstream positions (```aero:number```, ```aero2:number```; ```velo:number```, ```velo2:number``` on Velodrome) and basic pool addresses so that ```lp.positions``` checks them (ownership is verified on chain each time, staked positions by their staker; transferred-away positions are not listed). (more below the table) | Every V4 and Aerodrome / Velodrome position ID remembered by this process. |
-| ```lp.stake``` | positionIds | Aerodrome / Velodrome: stakes positions in their pool's gauge for AERO (VELO on Velodrome, likewise below), one transaction per position. (more below the table) | ```{positions: [{id, gauge, approveTxHash, txHash, feesBase, feesQuote}]}```; for basic pools ```{id, gauge, txHash, lpTokens}```. |
-| ```lp.unstake``` | positionIds | Aerodrome / Velodrome: takes positions out of the gauge. A Slipstream position NFT comes back together with its accrued AERO; a basic pool returns all staked LP tokens and leaves the AERO in the gauge for ```lp.claim```. One transaction per position. | ```{positions: [{id, gauge, txHash, rewards}]}```, where ```rewards``` is the AERO / VELO received in that transaction; basic pools also have ```lpTokens```. |
-| ```lp.claim``` | positionIds[, sell] | Aerodrome / Velodrome: claims AERO / VELO rewards with one ```Voter.claimRewards``` covering the wallet's rewards in the gauges of these positions (the wallet's other staked positions in the same gauges are claimed too); with ```sell``` ```true``` the reward token is sold for USDC at market. | ```{txHash, gauges, rewardToken, rewards, sell}```, where ```rewardToken``` is ```AERO``` or ```VELO```. |
-| ```bridge.chains``` | — | Chains supported by the bridge (LI.FI): EVM chains and Solana, cached for an hour. | An array of ```{id, key, name, chainType, nativeToken}```, ```chainType``` being ```EVM``` or ```SVM```. |
-| ```bridge.tokens``` | [chain] | Tokens LI.FI knows on a chain (this chain by default), cached for an hour. | An array of ```{symbol, address, decimals, name, priceUSD}```. |
-| ```bridge.quote``` | params | A bridge quote (read-only) from this exchange object's chain. (more below the table) | ```{tool, toolName, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, fromAmountRaw, toAmountRaw, toAmountMinRaw, fromAmountUSD, toAmountUSD, slippage, toAddress, feeCosts, gasCosts, executionDuration, approvalAddress, steps, transactionId, request}```: amounts are in token units (```*Raw``` in the smallest unit); ```toAmountMin``` is the amount guaranteed after slippage; ```feeCosts``` is ```[{name, amount, token, amountUSD, percentage, included}]``` (fees with ```included``` ```false``` are paid on top); ```gasCosts``` estimates source-chain gas; ```executionDuration``` is the expected time in seconds; ```approvalAddress``` is the contract to approve (```null``` for the native coin and on Solana); ```steps``` lists the steps (```cross``` bridges, ```swap``` swaps); ```request``` echoes the parameters. |
-| ```bridge.simulate``` | params\|quote[, stateOverride] | Re-quotes and runs LI.FI's transaction with ```eth_call```: nothing is signed, broadcast or paid. (more below the table) | The ```bridge.quote``` result plus ```simulated``` (```true```), ```to```, ```value``` and ```walletBalance```, and ```allowanceOverride``` when an allowance was supplied. |
-| ```bridge.send``` | params\|quote | Bridges out: re-quotes → checks the balance → approves LI.FI's ```approvalAddress``` when the token allowance is short (following ```exchange.IO("approve")``` ```exact```/```max```, resetting USDT-like tokens to zero first, waiting for the approval to be mined and re-quoting after it) → simulates with ```eth_call``` → signs and broadcasts, with a gas limit of the larger of the ```eth_estimateGas``` estimate × ```gasMultiplier``` and LI.FI's suggested ```gasLimit``` (bridge contracts call into other contracts, so the estimate can fall short; only the gas used is charged). (more below the table) | ```{txHash, tool, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, toAddress, value, transactionId}```; ```txHash``` is the source-chain transaction, whose receipt ```receipt``` returns. |
-| ```bridge.status``` | txHash[, options] | Bridge progress (LI.FI ```/status```) for the source-chain transaction hash returned by ```bridge.send```; ```options``` may give ```{toChain, bridge}``` to speed up the lookup. (more below the table) | ```{status, substatus, substatusMessage, tool, sending, receiving, fromAddress, toAddress, explorer, bridgeExplorer}```: ```status``` is ```NOT_FOUND```, ```INVALID```, ```PENDING```, ```DONE``` or ```FAILED```; when ```DONE```, ```substatus``` is ```COMPLETED``` (delivered as quoted), ```PARTIAL``` (a different token arrived) or ```REFUNDED```; ```sending``` and ```receiving``` are ```{txHash, txLink, chainId, amount, amountRaw, token, timestamp}```, with ```receiving.amount``` and ```receiving.token``` being what actually arrived. |
-| ```bridge.apiKey``` | [key] | Sets the LI.FI API key (header ```x-lifi-api-key```, for this exchange object only, never echoed); ```""``` clears it and no argument just queries. Without a key requests are rate-limited per outgoing IP, see below. | Whether a key is set (a boolean). |
+| ```lp.track``` | positionIds | Registers V4 position IDs (such as ```["v4:123456"]```) so that ```lp.positions``` checks them (ownership is verified on chain each time; transferred-away positions are not listed). Use it to recover older V4 positions when the node does not serve the full log history; a strategy can save the IDs returned by ```lp.add``` (for example with ```_G```) and register them after a restart. | Every V4 position ID remembered by this process. |
 
 The rest of the longer descriptions in the table:
 
-- ```lp.pools```: Sorted by TVL, largest first; empty pools (```empty``` ```true```, with no liquidity at the current price, whose price is then meaningless) have ```null``` ```price```, ```tvlQuote``` and ```tvlUsd``` and come last. V4 pools (```protocol``` ```v4```) are listed only without hooks, with native and wrapped-token pools listed separately (such as ```ETH_USDC``` and ```WETH_USDC```); V4 is a singleton contract, so ```reserveBase``` and ```reserveQuote``` are ```null``` and TVL comes from GeckoTerminal. PancakeSwap Infinity CL pools (```protocol``` ```infinity```) are likewise listed only without hooks and with a fee of at most 1%, with balances and TVL as for V4; Infinity has no fixed fee tiers, so the list holds the pools collected for swap routing (those with recent trades, see above) and pools used in this process, and any other pool can be passed by its PoolId to ```lp.pool``` and ```lp.plan```.
-- ```lp.pools``` returns: On Aerodrome and Velodrome, Slipstream pools (```protocol``` ```slipstream``` for the old factory, ```slipstream2``` for the new one) and basic pools (```volatile```, ```stable```, with an extra ```stable``` and no tick) are listed, each row also carrying gauge data: ```gauge```, ```gaugeAlive```, ```stakedShare``` (the staked share), ```rewardsPerDay``` (AERO emitted per day, VELO on Velodrome), ```rewardsPerDayUsd``` and ```rewardAprPct``` (the reward APR on the staked TVL, %).
-- ```lp.select```: ```budget``` is in the quote token; ```options.quote``` sets the quote token. ```options.protocol``` filters by pool type (```v3```, ```v4```, ```infinity```; on Aerodrome / Velodrome ```slipstream```, ```slipstream2```, ```volatile```, ```stable```; or an array of them), and on Aerodrome / Velodrome ```options.tickSpacing``` filters too.
-- ```lp.pool```: ```poolId``` is a V3 pool contract address (only pools created by this DEX's factory; ```pool … not found``` when there is no pool at the address) or a V4 / PancakeSwap Infinity CL PoolId (```0x``` plus 64 hex digits, hookless pools only; any initialized Infinity pool can be looked up by its PoolId, while Uniswap V4 knows pools that have had positions on the PositionManager or were listed by ```lp.pools```); on Aerodrome / Velodrome, a Slipstream or basic pool address, with the gauge data of ```lp.pools``` and, for basic pools, the reserves ```reserve0```, ```reserve1``` and the LP token supply ```lpSupply```.
-- ```lp.plan```: ```params```: ```symbol``` (such as ```ETH_USDC```), ```budget``` (in the quote token), ```range``` (```{lower, upper}``` prices, ```{pct: [-5, 5]}``` percent around the current price, or ```{ticks: [lo, hi]}```, aligned to the tick spacing), ```shape``` (```spot``` one range, ```curve``` nested layers thickest at the price, ```bidask``` segments on both sides thicker further out), ```layers``` (default 3, at most 20; curve layers all cross the current price, are distinct and aligned to the tick spacing, nesting inward first and filling with the range's other price-crossing combinations when nesting runs out; a two-sided range holds at most (legal lower bounds below the price) × (legal upper bounds above it) layers, and beyond that the plan gives as many as fit; the actual count is the returned ```layers``` and a ```warning``` explains it when it is below the request), ```pool``` (picked by ```lp.select``` when omitted), ```fee```, ```slippage``` (default 0.01). When the wallet falls short the plan is still returned with ```shortfall``` explaining it. On a V3 pool with a native pair (such as ```ETH_USDC```), the wrapped-token side is paid either entirely in the native coin or entirely in the wrapped token, never a mix of both balances: the native coin when it covers the whole side, otherwise the wrapped token when that does, and when neither does, ```haveBase```/```haveQuote``` and the swap are computed for the larger of the two (```swap.currency``` is that one); ```payWith``` is the coin that side is paid in. On Aerodrome / Velodrome, a ```range``` means a Slipstream pool (```tickSpacing``` and ```protocol``` narrow the choice); without ```range``` (or with a basic ```pool```) the plan is for a basic pool, depositing both tokens in the reserve ratio, with ```stable``` ```true``` or ```false``` choosing the pool type; ```stake``` ```true``` makes ```lp.add``` stake into the gauge right after adding.
-- ```lp.plan``` returns: A basic-pool plan is ```{params, symbol, pool, protocol, stable, fee, price, budget, budgetUsd, needBase, needQuote, haveBase, haveQuote, amountBase, amountQuote, lpTokens, swap, shortfall, shareOfPool, volume24hUsd, estDailyFeesUsd, slippageBps}```.
-- ```lp.simulate```: A plan that needs a swap is simulated as if swapped; pass ```stateOverride``` to supply balances or allowances the wallet lacks (V4 and Infinity pools pay tokens through Permit2, so supply the token's approval of Permit2 and the PositionManager allowance inside Permit2; PancakeSwap uses its own Permit2, see ```v4.permit2``` in ```exchange.IO("contracts")```). The V4 and Infinity PositionManagers return no amounts, so the result shows the planned ones. Aerodrome / Velodrome basic pools are simulated with the Router's ```quoteAddLiquidity``` (no balances or approvals needed), returning ```{pool, protocol, lpTokens, amountBase, amountQuote, swapNeeded, note}```.
-- ```lp.add```: Accepts the plan or its ```params``` (recomputed at the latest pool price). V3 pools: with a native pair (such as ```ETH_USDC```) the wrapped-token side is paid as ```payWith``` in the plan says, either entirely in the native coin (sent with the transaction, the excess refunded by ```refundETH```) or entirely in the wrapped token, never mixed; collected amounts come back as the wrapped token. V4 and Infinity pools: a native pool uses and returns the native coin, a wrapped-token pool uses the wrapped token; payment is capped at the planned amount plus slippage, so liquidity is sized to (1 − slippage) of the holdings; position ```id```s are ```v4:number``` or ```inf:number```. Aerodrome / Velodrome: Slipstream position ```id```s are ```aero:number``` (old factory) or ```aero2:number``` (new factory), ```velo:number``` and ```velo2:number``` on Velodrome; basic pools are added through the Router, using the native balance when the pair is written with the native coin (```addLiquidityETH```), the position ```id``` is the pool address, and the result is ```{txHash, swapTxHash, pool, id, lpTokens, amountBase, amountQuote}```. With ```stake: true``` in the plan the result also has ```stake``` (as ```lp.stake```).
-- ```lp.increase```: ```options.symbol``` sets the orientation (the stablecoin is the quote by default; with a native pair such as ```ETH_USDC``` the native side is paid as in ```lp.add```); ```options.slippage``` sets price protection. A staked position must be unstaked with ```lp.unstake``` first; for an Aerodrome / Velodrome basic pool (```positionId``` is the pool address) it is another ```lp.add``` into that pool, staked afterwards when ```options.stake``` is ```true```.
-- ```lp.decrease```: ```options.slippage``` sets price protection; with ```options.sell``` ```true``` the returned token is sold for the quote. A staked position must be unstaked with ```lp.unstake``` first (an Aerodrome / Velodrome basic pool only needs enough unstaked LP tokens in the wallet); basic pools redeem that share of the LP tokens, and the native coin comes back wrapped.
-- ```lp.collect```: Staked Aerodrome / Velodrome positions earn no trading fees (they go to voters), so they fail with a hint to claim AERO / VELO with ```lp.claim```; basic pools collect the fees accrued to the wallet's LP tokens with the pool's ```claimFees```, one transaction per pool.
-- ```lp.remove```: Staked Aerodrome / Velodrome positions are first taken out of the gauge (claiming the rewards, see ```lp.unstake```); a full withdrawal from a basic pool also sends a ```claimFees``` transaction for the fees.
-- ```lp.positions```: ```filter``` is a pair (sets the price orientation) or a token (only positions containing it); ```*``` or nothing means all; ```wallet``` views another wallet read-only. V4 position ```id```s look like ```v4:123456``` and PancakeSwap Infinity ones like ```inf:123456```. The V4 and Infinity PositionManagers cannot list a wallet's positions, so they are found from the logs of NFTs sent to the wallet: a node that serves the full log history finds all of them; public nodes usually serve only recent blocks, so register older positions with ```lp.track``` (positions created by ```lp.add``` in this process are remembered automatically). Aerodrome / Velodrome: Slipstream positions in the wallet are listed directly; staked position NFTs are owned by the gauge, so these gauges are checked: those staked into by this process, those found in the logs of NFTs sent out of the wallet (subject to the same node log limits), those holding positions registered with ```lp.track```, and those of the pools matching ```filter```; basic-pool positions are checked for pools added to by this process, registered with ```lp.track``` or matching ```filter```. Each row also has ```staked```, ```gauge```, ```rewardToken``` (AERO), ```rewards``` (claimable AERO) and ```rewardsValue``` (in the quote token); basic pools also have ```fullRange```, ```lpTokens``` and ```stakedLpTokens``` and no ticks.
-- ```lp.history```: V4 and Infinity events do not record token amounts, so for those positions only each liquidity change (```add```, ```remove```, ```collect```) and the current position are given. Needs a node that serves historical logs; public nodes often do not. Aerodrome / Velodrome basic-pool LP tokens have no per-position events and are not supported.
-- ```lp.track```: Use it to recover older positions when the node does not serve the full log history; a strategy can save the IDs returned by ```lp.add``` (for example with ```_G```) and register them after a restart.
-- ```lp.stake```: A Slipstream position NFT is first approved to the gauge (skipped when already approved) and then deposited whole, the gauge passing the position's uncollected fees to the owner on deposit; for a basic pool all unstaked LP tokens in the wallet are deposited. Gauges killed by the Voter accept no deposits and fail. While staked a position earns no trading fees (they go to voters), only AERO, and an out-of-range Slipstream position earns no rewards.
-- ```bridge.quote```: ```params```: ```toChain``` (destination chain: a chain ID, a LI.FI chain key such as ```arb```, or a name such as ```Arbitrum``` or ```Solana```), ```fromToken``` (a token on this chain: a name in the token table or a contract address), ```toToken``` (a token on the destination chain: a name or address resolved by LI.FI to its canonical token, so ```USDC``` on Arbitrum is native USDC, not USDC.e), ```amount``` (of ```fromToken```, in token units; digits beyond the token's decimals are dropped), ```toAddress``` (the recipient; defaults to this wallet when the destination is an EVM chain, required, as a Solana address, when the destination is Solana), ```slippage``` (defaults to the ```exchange.IO("slippage")``` value), ```order``` (```CHEAPEST``` or ```FASTEST```), ```allowBridges```/```denyBridges``` (LI.FI bridge names, an array or comma-separated). Unknown keys are errors.
-- ```bridge.simulate```: A short token allowance is supplied as unlimited through a state override (as in ```simulate```; ```allowanceOverride``` in the result lists it); balances are not supplied, pass them yourself in ```stateOverride``` (the third ```eth_call``` argument). A failure caused by a short balance reports the wallet balance.
-- ```bridge.send```: The native coin needs no approval. Only the approval is awaited, not the bridge transaction; bridging is asynchronous, so poll ```bridge.status```. Given a ```bridge.quote``` result, it re-quotes from its ```request``` (quotes move; the new quote applies and ```toAmountMin``` is enforced on chain).
-- ```bridge.status```: Right after broadcasting LI.FI may not have indexed it yet and returns ```NOT_FOUND```; keep polling (every 10 to 30 seconds).
+- ```lp.pools```: Sorted by TVL, largest first. V4 pools (```protocol``` ```v4```) are listed only without hooks, with native and wrapped-token pools listed separately (such as ```ETH_USDC``` and ```WETH_USDC```); V4 is a singleton contract, so ```reserveBase``` and ```reserveQuote``` are ```null``` and TVL comes from GeckoTerminal.
+- ```lp.select```: ```budget``` is in the quote token; ```options.quote``` sets the quote token.
+- ```lp.plan```: ```params```: ```symbol``` (such as ```ETH_USDC```), ```budget``` (in the quote token), ```range``` (```{lower, upper}``` prices, ```{pct: [-5, 5]}``` percent around the current price, or ```{ticks: [lo, hi]}```, aligned to the tick spacing), ```shape``` (```spot``` one range, ```curve``` nested layers thickest at the price, ```bidask``` segments on both sides thicker further out), ```layers``` (default 3), ```pool``` (picked by ```lp.select``` when omitted), ```fee```, ```slippage``` (default 0.01). When the wallet falls short the plan is still returned with ```shortfall``` explaining it.
+- ```lp.simulate```: A plan that needs a swap is simulated as if swapped; pass ```stateOverride``` to supply balances or allowances the wallet lacks (V4 pools pay tokens through Permit2, so supply the token's approval of Permit2 and the PositionManager allowance inside Permit2). The V4 PositionManager returns no amounts, so the result shows the planned ones.
+- ```lp.add```: Accepts the plan or its ```params``` (recomputed at the latest pool price). V3 pools: with a native pair (such as ```ETH_USDC```) the native balance can be used directly and collected amounts come back as the wrapped token. V4 pools: a native pool uses and returns the native coin, a wrapped-token pool uses the wrapped token; V4 caps payment at the planned amount plus slippage, so liquidity is sized to (1 − slippage) of the holdings.
+- ```lp.positions```: ```filter``` is a pair (sets the price orientation) or a token (only positions containing it); ```*``` or nothing means all; ```wallet``` views another wallet read-only. V4 position ```id```s look like ```v4:123456```. The V4 PositionManager cannot list a wallet's positions, so they are found from the logs of NFTs sent to the wallet: a node that serves the full log history finds all of them; public nodes usually serve only recent blocks, so register older positions with ```lp.track``` (positions created by ```lp.add``` in this process are remembered automatically).
+- ```lp.history```: V4 events do not record token amounts, so for V4 positions only each liquidity change (```add```, ```remove```, ```collect```) and the current position are given. Needs a node that serves historical logs; public nodes often do not.
 
-For the common command ```currency``` see `exchange.IO`.
-
-The common command ```api``` is not supported (the call fails with an error and returns null).
+For the common commands ```api``` and ```currency``` see `exchange.IO`.
 
 ##### Function Support
 
-Not supported (the call fails with an error and returns null): `exchange.GetTickers`, `exchange.GetHistoryOrders`, `exchange.ModifyOrder`, `exchange.CreateConditionOrder`, `exchange.ModifyConditionOrder`, `exchange.CancelConditionOrder`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`, `exchange.GetHistoryConditionOrders`.
-
-Served through a fallback:
-
-- `exchange.GetRecords`: Native periods are 1m, 5m, 15m, 1h, 4h, 12h, 1d (GeckoTerminal's timeframes); other periods are synthesized by the docker.
+Not supported (the call fails with an error and returns null): `exchange.GetTickers`, `exchange.GetRecords`, `exchange.GetHistoryOrders`, `exchange.ModifyOrder`, `exchange.CreateConditionOrder`, `exchange.ModifyConditionOrder`, `exchange.CancelConditionOrder`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`, `exchange.GetHistoryConditionOrders`.
 
 ##### Notes
 
 | Function | Behavior on Uniswap |
 | - | - |
 | exchange.GetTicker() | Bid and ask are executable prices for about $1000; on-chain pools have no 24h statistics |
-| exchange.GetDepth() | Derived from on-chain quotes at increasing sizes, from about $1000 up to $1 million; 5 levels by default, at most 10 |
-| exchange.GetTrades() | On-chain trades of all pools of the pair in roughly the last 10 minutes of blocks, at most 500 per call |
-| exchange.GetRecords() | K-lines come from GeckoTerminal's pool-level data: the pair's pool on this DEX with the largest USD liquidity on GeckoTerminal (V2, V3, V4, Infinity and Aerodrome / Velodrome pools are all compared, and a pair written with the native coin also counts the wrapped-token pools; the chosen pool is cached for an hour). Prices are that pool's trade prices (including the pool fee, so they may differ from the mid price of ```exchange.GetTicker()``` by about one pool fee) in quote per base, and ```Volume``` is in the base token; periods without trades repeat the previous close with zero volume, and the last bar may still be open. GeckoTerminal data lags by tens of seconds up to a minute and its public API allows about 10 requests per minute: bars of the same period are cached for a minute, requests queue inside the docker and wait and retry when rate-limited, and fail if that still does not succeed. Fails when GeckoTerminal lists no pool of the pair on this DEX |
-| exchange.GetMarkets() | Pairs of built-in and registered tokens that actually have a pool on chain; pairs with the wrapped token also get a row written with the native coin. ```TickSize``` is fixed at 1e-8, ```PricePrecision``` is 8, ```AmountPrecision``` is the token's decimals and ```MinNotional``` is 0 |
-| exchange.GetOrders() | Only the swaps sent by this process that are not mined yet (kept in memory, cleared on restart) |
+| exchange.GetDepth() | Derived from on-chain quotes at increasing sizes |
+| exchange.GetTrades() | Recent on-chain trades of all pools of the pair |
 | exchange.GetAssets() | Wallet balances of the native coin and of the tokens in the token table |
-| exchange.CreateOrder() | Swaps on chain immediately: a limit price is the worst acceptable fill, and an order whose limit the current quote cannot reach fails without sending a transaction; market orders are protected by the slippage setting; when the best route is V4 and needs extra Permit2 approval transactions, V4 is chosen only if it beats the best V2/V3 quote by at least 0.1%; a market buy is sized in the quote currency. The order extra parameter ```slippage``` overrides the slippage for that order, and ```route``` (```v2```, ```v3```, ```v4```, ```hop```, ```direct```) restricts the route type (on Aerodrome / Velodrome ```v2``` means basic pools and ```v3``` Slipstream) |
+| exchange.CreateOrder() | Swaps on chain immediately: a limit price is the worst acceptable fill, market orders are protected by the slippage setting; a market buy is sized in the quote currency. The order extra parameter ```slippage``` overrides the slippage for that order, and ```route``` (```v2```, ```v3```, ```v4```, ```hop```, ```direct```) restricts the route type (on Aerodrome ```v2``` means basic pools and ```v3``` Slipstream) |
 | exchange.GetOrder() | The order ID looks like ```ETH_USDC,0x…``` (the pair, a comma, then the transaction hash); the state comes from the transaction receipt, and the order is reported as canceled once the nonce of the original transaction has been taken by the cancel transaction (or another transaction). the ID does not carry the chain, so ```Info``` contains ```chainId``` and the chain name ```chain``` for telling orders apart when aggregating across chains; querying on an exchange object of another chain fails with "not found on <chain>" |
-| exchange.CancelOrder() | Sends a replacement transaction with the same nonce (a zero-value transfer to itself) and waits for the result (at most 30 seconds by default, see ```exchange.IO("cancelWait", ...)```): returns ```true``` if the cancel transaction lands first; if the original order is already mined or lands first, it returns ```false``` (the cancel did not happen, but this is not a call error), with the reason in ```GetLastError()```; returns ```true``` on timeout, meaning the cancel has been submitted |
+| exchange.CancelOrder() | Sends a replacement transaction with the same nonce and waits for the result (at most 30 seconds by default, see ```exchange.IO("cancelWait", ...)```): returns ```true``` if the cancel transaction lands first, ```false``` if the original order lands first, and ```true``` on timeout, meaning the cancel has been submitted |
 
 ##### Concentrated liquidity (LP)
 
-The ```exchange.IO("lp.*", ...)``` commands provide concentrated liquidity on V3 pools (Uniswap V3, PancakeSwap V3), hookless Uniswap V4 pools and hookless PancakeSwap Infinity CL pools: pool selection, planning and simulation, adding, increasing and decreasing, fee collection, withdrawal and position queries. Positions are PositionManager NFTs: a V3 position ```id``` is the NFT number, a V4 one is written ```v4:number``` and an Infinity one ```inf:number``` (the contracts' numbers overlap); V3 and V4 (or V3 and Infinity) positions can be passed together in one command, one transaction each. V4 is available on Ethereum, Base, Arbitrum, BNB Chain, Unichain, Polygon, OP Mainnet, Robinhood and Arc (Arc uses only the ERC-20 form of USDC; pools of native USDC are not visible); Infinity CL is available on PancakeSwap on BNB Chain and Base (only pools with a fee of at most 1%; the commands and result fields are those of V4, with ```protocol``` ```infinity```, and tokens are approved through PancakeSwap's own Permit2); Infinity Bin pools are not supported; KyberSwap and 1inch exchange objects have no LP commands.
-
-Aerodrome (Base) and Velodrome (OP Mainnet) (the same contracts, used the same way; AERO below is VELO on Velodrome):
-- Slipstream pools (both factory generations) work like V3, with positions written ```aero:number``` (old factory) or ```aero2:number``` (new factory), ```velo:number``` and ```velo2:number``` on Velodrome; each pool sets its own fee (possibly dynamic), and ```fee``` is the current value. An unstaked Slipstream position gives part of its fees (the pool's ```unstakedFee```, mostly 5% today) to the gauge.
-- Basic pools (volatile, stable) are full-range: ```lp.plan``` without a ```range``` plans for a basic pool, both tokens are deposited in the reserve ratio, and the position is the pool's LP token with the pool address as ```id```.
-- Gauge staking: ```lp.stake``` puts positions into the gauge for AERO, ```lp.unstake``` takes them out and ```lp.claim``` claims the rewards. While staked, trading fees go to voters and the position earns only AERO, and an out-of-range Slipstream position earns nothing; staked positions cannot be increased, decreased or have fees collected until taken out (```lp.remove``` takes them out automatically). ```rewardAprPct``` in ```lp.pools``` extrapolates the current per-second rewards over the staked TVL and moves with the AERO price and the staked amount.
-
-Write commands (```lp.add```, ```lp.increase```, ```lp.decrease```, ```lp.collect```, ```lp.remove```, ```lp.stake```, ```lp.unstake```, ```lp.claim```) return after the transaction is mined, and for the next minute on-chain reads are pinned to no earlier than that transaction's block (load-balanced public nodes may otherwise answer from a machine that has not reached it), so the next command right after does not build its transaction on stale state. When adding liquidity the native coin keeps about 3 million gas at the current gas price for fees; the rest can be used for the position.
+The ```exchange.IO("lp.*", ...)``` commands provide concentrated liquidity on V3 pools (Uniswap V3, PancakeSwap V3) and hookless Uniswap V4 pools: pool selection, planning and simulation, adding, increasing and decreasing, fee collection, withdrawal and position queries. Positions are PositionManager NFTs: a V3 position ```id``` is the NFT number and a V4 one is written ```v4:number``` (the two contracts' numbers overlap); V3 and V4 positions can be passed together in one command, one transaction each. V4 is available on Ethereum, Base, Arbitrum, BNB Chain, Unichain, Polygon, OP Mainnet, Robinhood and Arc (Arc uses only the ERC-20 form of USDC; pools of native USDC are not visible); PancakeSwap Infinity and Aerodrome positions are not supported; KyberSwap and 1inch exchange objects have no LP commands.
 
 Monitoring and exits are left to the strategy: ```lp.positions``` reports whether each position is in range, its current value and uncollected fees, and the strategy decides when to rebalance or stop out (see the example strategy ```examples/strategies/uniswap-lp-monitor.js```).
 
@@ -27429,18 +28861,6 @@ Risks:
 - Once the price leaves the range the position holds only one token and earns no fees until the price returns.
 - Every add, rebalance, collect and withdrawal is an on-chain transaction; frequent rebalancing can cost more gas than it earns in fees, so low-gas chains such as Base, Arbitrum and Robinhood suit it better.
 - The estimated daily fees in a plan extrapolate the last 24h volume at the current pool share and do not predict future income.
-- Aerodrome / Velodrome rewards are paid in AERO / VELO, whose price is volatile; ```sell``` in ```lp.claim``` converts them to USDC.
-
-##### Cross-chain bridge
-
-```exchange.IO("bridge.*", ...)``` bridges tokens from this exchange object's chain to another chain through the bridges LI.FI aggregates (Across, Stargate, CCTP, deBridge, Mayan, Relay, NEAR Intents and more), between EVM chains and between EVM and Solana (from this exchange object's chain). LI.FI supplies the quote and transaction, and the docker approves, simulates with ```eth_call```, signs and broadcasts. Requests carry the integrator tag ```integrator=fmz``` and add no fee; fees in a quote such as ```LIFI Fixed Fee``` are LI.FI's and the bridges' own and are already deducted from ```toAmount```.
-
-Typical flow: ```bridge.quote``` for a quote → ```bridge.simulate``` to simulate → ```bridge.send``` to send → ```bridge.status``` every 10 to 30 seconds until ```DONE``` or ```FAILED```.
-
-- Bridging is asynchronous: when ```bridge.send``` returns, only the source-chain transaction has been broadcast; delivery takes seconds to tens of minutes (see ```executionDuration``` in the quote) and must be confirmed by polling ```bridge.status```; ```PARTIAL``` means a different token arrived on the destination chain and ```REFUNDED``` that the funds went back to the source chain.
-- Cross-VM transfers (EVM↔Solana) require ```toAddress```, checked against the destination chain's address format; funds sent to a wrong address cannot be recovered.
-- Risks: the security of bridge contracts and cross-chain messaging rests with each bridge; quotes move, and ```bridge.send``` re-quotes before sending; the destination wallet needs gas to use what arrives. Test with a small amount first.
-- Rate limits: without an API key LI.FI limits by outgoing IP, ```/quote``` to 75 requests per 2 hours (```bridge.quote```, ```bridge.simulate``` and ```bridge.send``` use one each, plus one more when re-quoting after an approval) and other endpoints to 100 per minute; strategies on the same docker share the quota. With a key set through ```exchange.IO("bridge.apiKey", key)``` the limit is 100 per minute. A rate-limited call fails with ```rate limited (HTTP 429 …)```.
 
 ##### exchange.IO("transfer", ...)
 
@@ -27932,11 +29352,7 @@ See also: `Uniswap`, `exchange.IO`, `exchange.IO("deadline")`, `exchange.IO("sim
 
 #### Jupiter
 
-Connects to the Jupiter aggregator on the Solana chain and maps swaps onto the spot trading functions. One exchange object corresponds to one Solana wallet: quotes and swap transactions are produced by the Jupiter Swap API (which splits and routes orders across the many DEXs and market makers on Solana), and the docker signs them with the configured private key and broadcasts them through a Solana node. Without a Jupiter API key the free ```lite-api.jup.ag``` is used; with one, ```api.jup.ag```, and **by default native limit orders and DCA with a USDC or USDT quote then switch to Jupiter Trigger V2, whose funds are deposited into a vault held in Jupiter's custody (no longer in the wallet's own on-chain order account)**; to keep the non-custodial v1, call ```exchange.IO("trigger.api", "v1")``` at the start of the strategy. See "Limit orders" and "DCA" below.
-
-The same exchange object also provides concentrated liquidity on Meteora DLMM, Raydium CLMM and Orca Whirlpools pools (```exchange.IO("lp.*", ...)```, see "Concentrated liquidity" below): the connector builds and signs the transactions itself and broadcasts them through a Solana node, with commands and result fields aligned with the LP commands of the Uniswap exchange object.
-
-pump.fun launches (```exchange.IO("pump.*", ...)```, see "Pump.fun launches" below): newly created coins are discovered on chain and quoted, bought and sold directly on the pump.fun bonding curve (the connector builds, simulates and signs the transactions itself); once a coin graduates to PumpSwap, trades go through Jupiter swaps automatically. New coins are extremely risky; see the risks in that section.
+Connects to the Jupiter aggregator on the Solana chain and maps swaps onto the spot trading functions. One exchange object corresponds to one Solana wallet: quotes and swap transactions are produced by the Jupiter Swap API (which splits and routes orders across the many DEXs and market makers on Solana), and the docker signs them with the configured private key and broadcasts them through a Solana node. Without a Jupiter API key the free ```lite-api.jup.ag``` is used; with one, ```api.jup.ag```.
 
 ##### Names and Configuration
 
@@ -27946,12 +29362,11 @@ pump.fun launches (```exchange.IO("pump.*", ...)```, see "Pump.fun launches" bel
 | - | - | - | - |
 | Private Key | Yes | — | The Solana wallet private key: the base58 string exported by Phantom or Solflare, or the JSON byte array generated by solana-keygen. |
 | Rpc Address | No | ```https://api.mainnet-beta.solana.com,https://solana-rpc.publicnode.com``` | Solana RPC nodes; separate several with commas, and the next one is used automatically when a node fails. The default is the official public node plus publicnode. |
-| Jupiter Api Key | No | — | Optional. (more below the table) |
+| Jupiter Api Key | No | — | Optional. Without it the free ```lite-api.jup.ag``` is used; with it ```api.jup.ag``` is used, and the request rate can be raised according to your plan (see ```exchange.IO("rps", ...)```). |
 | Liquidity Sources | No | — | Optional. (more below the table) |
 
 The rest of the longer descriptions in the table:
 
-- Jupiter Api Key: Without it the free ```lite-api.jup.ag``` is used; with it ```api.jup.ag``` is used, the request rate can be raised according to your plan (see ```exchange.IO("rps", ...)```), and native limit orders and DCA with a USDC or USDT quote switch by default to Jupiter Trigger V2 (funds deposited into a vault in Jupiter's custody, see "Limit orders" and "DCA"; to keep the non-custodial v1, call ```exchange.IO("trigger.api", "v1")```). Get the key on the Jupiter developer platform; a key restricted by endpoint permissions must include Trigger.
 - Liquidity Sources: Swap only through these liquidity sources, for example ```pump``` (the pump.fun bonding curve and PumpSwap), ```meteora```, ```raydium```, ```orca```, or Jupiter source names; empty means all sources. It can be changed at run time with ```exchange.IO("dexes", ...)```.
 
 ##### Trading Pairs and Contract Codes
@@ -27964,248 +29379,38 @@ SOL is the native coin and is wrapped and unwrapped automatically during swaps. 
 
 | Command | Arguments | Description | Returns |
 | - | - | - | - |
-| ```route``` | symbol, side, qty | Quote only, no order, on the same basis as orders: ```sell``` quotes selling ```qty``` base tokens as exact input; ```buy``` quotes buying ```qty``` base tokens as exact output, and when there is no exact-output route (sources such as Meteora and PumpSwap do not support exact output) it estimates with exact input instead, the same fallback as a limit buy (a market buy is exact input itself). See the sub-page `exchange.IO("route", ...)`. | ```{symbol, side, qty, route, quote, price, priceImpactPct, swapMode, baseQty}```: ```swapMode``` is ```ExactIn``` or ```ExactOut```; ```baseQty``` is the base amount this quote actually buys or sells (with the exact-input estimate for a buy it may differ slightly from ```qty```), and ```price``` is ```quote``` divided by ```baseQty```. (more below the table) |
+| ```route``` | symbol, side, qty | Quote only, no order: quotes ```qty``` base tokens, as exact input for ```sell``` and exact output for ```buy```, and returns the quote and the liquidity sources it goes through. The quote excludes Solana transaction fees. See the sub-page `exchange.IO("route", ...)`. | ```{symbol, side, qty, route, quote, price, priceImpactPct}```; without a route, ```route```, ```quote``` and ```price``` are ```null```. |
 | ```token``` | [name, mint] | Register a token (for this run only) so its name can be used in pairs; without arguments, list the token table. See the sub-page `exchange.IO("token", ...)`. | ```{symbol, mint, decimals}``` when registering, an array of ```{symbol, mint, decimals, native}``` when listing. |
 | ```transfer``` | to, amount | Transfer SOL out of the wallet; ```amount``` may be ```all``` (the whole balance minus the fee). Only SOL is supported; a third argument naming another token fails. Waits for the broadcast only, not for confirmation. See the sub-page `exchange.IO("transfer", ...)`. | ```{signature, amount, lastValidBlockHeight}``` |
-| ```receipt``` | signature[, waitMs] | Query the status of a Solana transaction, optionally waiting until it is confirmed or fails (up to 10 minutes). For an order, pass the transaction signature after the comma in the order ID. See the sub-page `exchange.IO("receipt", ...)`. | ```{signature, state, slot, confirmationStatus, err, fee, blockTime}```, where ```state``` is ```success```, ```failed``` or ```pending```; ```fee``` and ```blockTime``` appear only once it is confirmed or failed. (more below the table) |
-| ```dca.create``` | params | Creates a DCA order. (more below the table) | ```{id, version, signature, symbol, side, total, perOrder, numberOfOrders, interval, minPrice, maxPrice, startAt, priorityFeeLamports}```: ```version``` is ```v1``` or ```v2```; a v1 ```id``` is the DCA order account address and a V2 ```id``` is Jupiter's order UUID, ```signature``` being the deposit transaction, plus ```vault```. |
-| ```dca.list``` | [params] | Lists the wallet's DCA orders (v1 first, then V2 when an API key is set or ```trigger.api``` is ```v2```): ```params.status``` is ```active``` (default, running) or ```history``` (ended), and ```params.symbol``` limits the list to that pair. | ```[{id, version, symbol, side, state, total, perOrder, numberOfOrders, ordersFilled, interval, minPrice, maxPrice, spent, received, filledQty, avgPrice, fee, createdAt, updatedAt, openTx, closeTx, info}]```, where ```state``` is ```active```, ```completed``` or ```canceled```, and for V2 also ```pending``` (depositing), ```canceling``` (canceled, funds not yet withdrawn) or ```failed``` (deposit failed); V2 rows also carry ```nextFillAt```, and their ```fee``` is ```null``` (the fee is already taken from the tokens received); ```spent``` is the input token spent so far and ```received``` the output token received (```fee```, in the output token, is the fee deducted from it); ```filledQty``` and ```avgPrice``` are the filled amount and average price in base-token terms; ```info``` is Jupiter's raw row. |
-| ```dca.cancel``` | id | Cancels a running DCA order and returns the remaining input token to the wallet; v1 and V2 are told apart by the shape of ```id``` (a V2 ID is a UUID and needs the API key). (more below the table) | v1: ```{id, version, signature, priorityFeeLamports}```; V2: ```{id, version, signature, refund, refundCurrency, roundsRemaining, info}```, where ```signature``` is the withdrawal transaction and ```refund``` the amount of input token returned. |
-| ```dca.simulate``` | params[, wallet] | Builds the transaction of ```dca.create``` from the same parameters and runs it with the node's ```simulateTransaction``` (not signed, nothing broadcast), to check balances, minimums and so on before ordering; with ```params``` written ```{cancel: id}``` it simulates canceling that DCA order. (more below the table) | ```{ok, err, reason, logs, unitsConsumed, wallet, id, plan, priorityFeeLamports}``` (V2 adds ```version``` and ```vault``` and has no ```id```): ```ok``` tells whether the simulation succeeded and ```reason``` explains a failure; ```plan``` holds the normalized DCA parameters. |
-| ```trigger.simulate``` | params[, wallet] | Builds the transaction of a Jupiter limit order and runs it with the node's ```simulateTransaction``` (not signed, nothing broadcast). (more below the table) | v1: ```{ok, err, reason, logs, unitsConsumed, wallet, order, makingAmount, takingAmount, priorityFeeLamports}```, where ```order``` is the order account address and ```makingAmount``` and ```takingAmount``` are the amounts given and received in smallest units; V2: ```{ok, err, reason, logs, unitsConsumed, version, wallet, vault, inputMint, inputAmount, triggerPriceUsd, triggerCondition, expiresAt, priorityFeeLamports}```. |
-| ```trigger.api``` | [mode] | Which API new native limit orders (```tif``` ```gtc```) and new DCA orders use: ```auto``` (default) uses Trigger V2 (custodial vault) when an API key is set and the quote is USDC or USDT, and v1 otherwise; ```v1``` always uses v1 (non-custodial, funds in an on-chain order account), even with an API key; ```v2``` always uses V2, fails orders whose quote is not USDC or USDT, and works without an API key too (Jupiter currently accepts V2 calls without a key, but its documentation says a key is required and this may be enforced at any time). (more below the table) | The current mode: ```auto```, ```v1``` or ```v2```. |
-| ```trigger.vault``` | — | Queries this wallet's custodial vault in Jupiter Trigger V2 and its balances (needs the API key, or ```exchange.IO("trigger.api", "v2")```). (more below the table) | ```{wallet, registered: false}``` while there is no vault; otherwise ```{wallet, registered: true, vault, sol, tokens, info}```, where ```tokens``` is ```[{mint, symbol, amount, raw}]``` (```symbol``` only for tokens in the token table) and ```info``` is Jupiter's vault record. |
+| ```receipt``` | signature[, waitMs] | Query the status of a Solana transaction, optionally waiting until it is confirmed or fails (up to 10 minutes). For an order, pass the transaction signature after the comma in the order ID. See the sub-page `exchange.IO("receipt", ...)`. | ```{signature, state, slot, confirmationStatus, err, fee, blockTime}```, where ```state``` is ```success```, ```failed``` or ```pending```. |
 | ```slippage``` | [ratio] | Slippage protection of market orders, range ```[0, 0.5)```, default ```0.005``` (0.5%), enforced on chain. Limit orders do not use it. Queries when called without an argument. See the sub-page `exchange.IO("slippage", ...)`. | The current slippage ratio. |
 | ```priorityFee``` | [sol] | Cap on the priority fee of each swap transaction, in SOL, 0 to 0.1, default 0.001; Jupiter estimates the actual priority fee from network congestion, up to the cap. Queries when called without an argument. See the sub-page `exchange.IO("priorityFee", ...)`. | The current cap (SOL). |
 | ```dexes``` | [sources] | Restrict the liquidity sources swaps go through (comma-separated) to the group shorthands ```pump```, ```meteora```, ```raydium```, ```orca``` or Jupiter source names (case-sensitive); ```""``` removes the restriction. Market data, quotes and orders all use only these sources. Queries when called without an argument. See the sub-page `exchange.IO("dexes", ...)`. | The array of restricted source names (groups expanded; an empty array means no restriction). |
 | ```rps``` | [n] | Maximum requests per second to the Jupiter API, 0.1 to 500, default 1. Requests are queued with at least ```1/n``` seconds between two of them. Queries when called without an argument. See the sub-page `exchange.IO("rps", ...)`. | The current maximum requests per second. |
 | ```base``` | [url] | Without an argument, returns the current Solana node address; with an address, switches the node (separate several with commas). | The previous address. |
 | ```address``` | — | The wallet address (base58). | — |
-| ```pump.new``` | [options] | Coins recently created on pump.fun, discovered on chain: the recent signatures of the pump.fun mint authority (```TSLvdd1pWpHVjahSpsvCXUbgwsL3JAcvokwaKt1eokM```, which appears only in creation transactions) are listed and each transaction's ```CreateEvent``` is parsed, newest first. (more below the table) | ```[{signature, slot, time, mint, name, symbol, uri, creator, user, bondingCurve, tokenProgram, quote, quoteMint, mayhem, cashback, holderReward, devBuy}]```: ```time``` is the block time (milliseconds); ```user``` is the wallet that sent the creation (usually the ```creator```); ```tokenProgram``` is ```spl-token``` or ```token-2022```; ```quote``` is ```SOL```, ```USDC``` or the quote token's mint (only ```SOL``` coins can be traded with ```pump.buy``` and ```pump.sell```); ```devBuy``` is the first buy in the same transaction, ```{tokens, quoteAmount}``` (```quoteAmount``` includes fees and is ```null``` when the quote is neither SOL nor USDC), or ```null``` when there is none. (more below the table) |
-| ```pump.info``` | mint | The coin's bonding-curve state, read with one ```getMultipleAccounts``` (curve, mint, global config and fee table). Fails for a coin that is not a pump.fun coin. | ```{mint, bondingCurve, creator, tokenProgram, decimals, quote, quoteMint, complete, migrated, virtualTokenReserves, virtualQuoteReserves, realTokenReserves, realQuoteReserves, tokenTotalSupply, price, marketCap, progress, fees, mayhem, cashback, holderReward}```: reserves and supply are in readable units; ```price``` is the quote (SOL) value of one coin and ```marketCap``` is ```price``` times the total supply; ```progress``` is the share of the curve sold (%), and at 100 the curve is complete (```complete```) and then migrates to PumpSwap (```migrated```, reserves zeroed, ```price```, ```marketCap``` and ```fees``` ```null```); ```fees``` is the current rate ```{protocolBps, creatorBps}``` in basis points. |
-| ```pump.quote``` | mint, side, amount | Quotes locally on the bonding curve (no transaction), with the on-chain program's formula and fees: for ```buy``` ```amount``` is the SOL to spend (fees included), for ```sell``` the number of coins to sell. Fails once the curve is complete (quote Jupiter with ```exchange.IO("route", "MINT_SOL", ...)``` instead). | ```{mint, side, quote, amountIn, amountOut, price, spotPrice, priceAfter, priceImpactPct, fees, protocolFeeBps, creatorFeeBps, crossesCurve}```: ```price``` is the average fill price including fees (SOL per coin), ```priceImpactPct``` is how far the average price before fees is from the current price ```spotPrice``` (%), and ```fees``` is the protocol plus creator fee (SOL); ```crossesCurve``` ```true``` means the buy goes past the end of the curve (see "Pump.fun launches" below). |
-| ```pump.buy``` | mint, solAmount[, options] | Buys on the bonding curve for ```solAmount``` SOL (protocol and creator fees included): the wallet's token account is created idempotently, then ```buy_exact_quote_in_v3``` is sent with a minimum output of the local quote × (1 − ```slippage```), enforced on chain. (more below the table) | ```{txHash, venue, mint, side, solAmount, tokenAmount, price, fee, slot}```: ```venue``` is ```pump``` or ```jupiter``` (which adds ```route```); ```solAmount``` is the SOL paid (protocol and creator fees included, network fee and account deposits excluded), ```tokenAmount``` the coins bought and ```fee``` the network fee (SOL). (more below the table) |
-| ```pump.sell``` | mint, amount[, options] | Sells ```amount``` coins on the bonding curve (```all``` for the whole balance) with ```sell_v3```, with a minimum SOL output of the local quote × (1 − ```slippage```). (more below the table) | Same as ```pump.buy```: ```solAmount``` is the SOL received (protocol and creator fees deducted). |
-| ```pump.holdings``` | [wallet] | The pump.fun coins held by a wallet (by default this exchange object's wallet): the token balances that have a bonding curve, valued on the curve. | ```[{mint, amount, quote, complete, price, value}]```: ```value``` is the quote (fees deducted) that selling the whole balance on the curve would return now; ```price``` and ```value``` are ```null``` once the curve is complete or when the balance exceeds what the curve can buy back (value graduated coins with ```exchange.IO("route", ...)```). |
-| ```lp.pools``` | token[, quote] | Lists a token's Meteora DLMM, Raydium CLMM and Orca Whirlpools pools (against the given quote, or SOL, USDC and USDT) with fee, bin step and active bin (DLMM) or tick spacing and current tick (CLMM), current price, both token balances of the pool and TVL; 24h volume and fees and the USD TVL come from Meteora's data API (```dlmm.datapi.meteora.ag```), the Raydium API v3 (```api-v3.raydium.io```) and Orca's public API (```api.orca.so```) respectively, while prices, balances and the like are read on chain, Raydium's fee from the pool's AmmConfig account. (more below the table) | ```[{id, protocol, dex, symbol, base, quote, fee, feeRate, feeRateNow, binStep, activeId, price, reserveBase, reserveQuote, tvlQuote, tvlUsd, volume24hUsd, fees24hUsd, enabled, rewards, empty}]```: ```protocol``` is ```meteora```; ```price``` is quote per token; ```fee``` is the base fee in millionths (the unit of Uniswap's ```fee```), ```feeRate``` the same as a ratio, and ```feeRateNow``` the current rate including the volatility surcharge; ```rewards``` are the pool's farm reward tokens ```[{mint, symbol}]```. (more below the table) |
-| ```lp.select``` | token, budget[, options] | Picks a pool by rule. (more below the table) | One ```lp.pools``` row with an extra ```reason```. |
-| ```lp.pool``` | poolId | Live state of a pool. (more below the table) | ```{id, protocol, dex, tokenX, tokenY, symbolX, symbolY, decimalsX, decimalsY, price, fee, feeRate, feeRateNow, binStep, activeId, reserveX, reserveY, tvlUsd, volume24hUsd, fees24hUsd, enabled, rewards}```, where ```price``` is Y per X (the pool's own order). (more below the table) |
-| ```lp.ticks``` | poolId[, lowerBinId, upperBinId[, step]] | The liquidity distribution over a bin range (DLMM has bins rather than ticks): both token amounts per segment, ```step``` being the segment width in bins (default 1). (more below the table) | ```{pool, activeId, binStep, price, tokenX, tokenY, symbolX, symbolY, segments: [{binLower, binUpper, priceLower, priceUpper, amountX, amountY, current}]}```, prices in Y per X. (more below the table) |
-| ```lp.plan``` | params | A position plan (read-only, costs nothing). (more below the table) | ```{params, symbol, pool, protocol, fee, feeRate, price, shape, strategy, budget, budgetUsd, binStep, activeId, lowerBinId, upperBinId, bins, positions: [{lowerBinId, upperBinId, priceLower, priceUpper, amountBase, amountQuote, share}], needBase, needQuote, haveBase, haveQuote, swap, shortfall, shareOfPool, volume24hUsd, estDailyFeesUsd, slippageBps, maxActiveBinSlippage, binArraysToCreate, rentSol, rentRefundableSol, warning?}```: ```swap``` is the swap needed before adding (```{side, amount, currency}``` or ```null```); ```shareOfPool``` is the plan's share of the active bin and ```estDailyFeesUsd``` = 24h volume × fee rate × that share (assuming the price stays in range); ```rentSol``` is the rent the positions lock, of which ```rentRefundableSol``` belongs to the position accounts (returned when they are closed) and the rest to new bin arrays (```binArraysToCreate```, not returned). (more below the table) |
-| ```lp.simulate``` | plan[, payer] | Builds the complete add-liquidity transactions of the plan (creating bin arrays, the position, ATAs, wrapping SOL, adding liquidity, unwrapping) and runs them with the node's ```simulateTransaction``` (no signature check, nothing broadcast), one transaction per position. (more below the table) | ```{pool, protocol, payer, ok, positions: [{position, lowerBinId, upperBinId, amountBase, amountQuote, ok, err, error, logs, unitsConsumed, txBytes}], swapNeeded, shortfall, note}```: ```logs``` is the tail of the program logs and ```error``` the failure reason (DLMM, Raydium CLMM and Orca Whirlpool error codes with their names); Raydium and Orca rows carry ```tickLower``` and ```tickUpper``` instead of the bin fields, and ```position``` is the mint of the position NFT. |
-| ```lp.add``` | plan | Adds liquidity by the plan. (more below the table) | ```{txHash, txHashes, swapTxHash, pool, protocol, symbol, positions: [{id, txHash, lowerBinId, upperBinId, priceLower, priceUpper, amountBase, amountQuote, rentSol, feeSol}]}```, with position ```id```s written ```meteora:address```, ```raydium:position NFT mint``` or ```orca:position NFT mint```; Raydium and Orca rows carry ```tickLower``` and ```tickUpper``` instead of the bin fields. |
-| ```lp.increase``` | positionId, budget[, options] | Adds to a position, splitting ```budget``` (in the quote token) over the position's bin range at the current price and swapping first for whichever token is short. (more below the table) | ```{txHash, swapTxHash, id, symbol, amountBase, amountQuote, feeSol}``` |
-| ```lp.decrease``` | positionId, ratio[, options] | Withdraws a ratio (0 to 1, converted to basis points) from every bin of the position that has liquidity and claims all fees and farm rewards; the position stays. (more below the table) | ```{txHash, txHashes, positions: [{id, symbol, txHashes, principalBase, principalQuote, feesBase, feesQuote, receivedBase, receivedQuote, rewards, rentRefundSol, feeSol}], sells}```: ```received*``` come from the balances before and after the transactions, and the fee part is split off by the amounts claimable on chain before sending. |
-| ```lp.collect``` | positionIds[, sell] | Claims fees and farm rewards (```claim_fee2``` and ```claim_reward2``` on DLMM, a zero-liquidity ```decrease_liquidity_v2``` on Raydium, ```update_fees_and_rewards``` + ```collect_fees_v2``` + ```collect_reward_v2``` on Orca), one transaction per position; with ```sell``` ```true``` the collected base token is sold for the quote. | Same as ```lp.decrease```. |
-| ```lp.remove``` | positionIds[, ratio[, sell]] | Withdraws liquidity and claims fees and rewards, each position in its own transactions; ```ratio``` defaults to 1, which withdraws everything and closes the position account (on Raydium, ```close_position``` burns the NFT and closes the NFT account, the NFT mint and the position account), returning its rent (```rentRefundSol```); below 1 only that share is withdrawn. (more below the table) | Same as ```lp.decrease```. |
-| ```lp.positions``` | [filter[, wallet]] | Every Meteora DLMM position of the wallet (found by owner with the node's ```getProgramAccounts```, which the node must serve) and every Raydium CLMM and Orca Whirlpools position (NFTs with amount 1 found with ```getTokenAccountsByOwner```, then their position accounts; on Orca positions in Position Bundles the wallet holds are listed too): bin range, in-range flag, current amounts of both tokens (from the position's share of each bin), value, uncollected fees and farm rewards, and the rent it locks. (more below the table) | ```[{id, pool, protocol, symbol, fee, lowerBinId, upperBinId, activeId, binStep, width, priceLower, priceUpper, price, inRange, liquidity, amountBase, amountQuote, value, feesBase, feesQuote, feesValue, rewards, rentSol, feeOwner, closed}]```, with ```value``` and ```feesValue``` in the quote token, ```rewards``` as ```[{mint, symbol, amount}]``` and ```liquidity``` the sum of the bin shares. (more below the table) |
-| ```lp.track``` | positionIds | Registers positions (```meteora:address```, ```raydium:NFT mint```, ```orca:NFT mint``` or the bare address, Raydium and Orca also accepting the position account address; verified to be positions of that protocol) so that ```lp.positions``` checks them as well (ownership is verified on chain each time; transferred-away and closed positions are not listed). (more below the table) | All position addresses remembered in this process. |
-| ```bridge.chains``` | — | Chains supported by the bridge (LI.FI): EVM chains and Solana, cached for an hour. | An array of ```{id, key, name, chainType, nativeToken}```, ```chainType``` being ```EVM``` or ```SVM```. |
-| ```bridge.tokens``` | [chain] | Tokens LI.FI knows on a chain (Solana by default), cached for an hour. | An array of ```{symbol, address, decimals, name, priceUSD}```. |
-| ```bridge.quote``` | params | A bridge quote (read-only) from this exchange object's chain. (more below the table) | ```{tool, toolName, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, fromAmountRaw, toAmountRaw, toAmountMinRaw, fromAmountUSD, toAmountUSD, slippage, toAddress, feeCosts, gasCosts, executionDuration, approvalAddress, steps, transactionId, request}```: amounts are in token units (```*Raw``` in the smallest unit); ```toAmountMin``` is the amount guaranteed after slippage; ```feeCosts``` is ```[{name, amount, token, amountUSD, percentage, included}]``` (fees with ```included``` ```false``` are paid on top); ```gasCosts``` estimates source-chain gas; ```executionDuration``` is the expected time in seconds; ```approvalAddress``` is the contract to approve (```null``` for the native coin and on Solana); ```steps``` lists the steps (```cross``` bridges, ```swap``` swaps); ```request``` echoes the parameters. |
-| ```bridge.simulate``` | params\|quote | Re-quotes, signs LI.FI's serialized transaction with this wallet and runs ```simulateTransaction``` (with signature verification) without broadcasting. (more below the table) | The ```bridge.quote``` result plus ```simulated``` (```true```), ```unitsConsumed``` and ```signature```. |
-| ```bridge.send``` | params\|quote | Bridges out: re-quotes → checks the balance → signs LI.FI's serialized transaction with this wallet (refusing one this wallet does not sign) → ```simulateTransaction``` → broadcasts through the Solana node. (more below the table) | ```{txHash, tool, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, toAddress, transactionId}```; ```txHash``` is the source-chain signature, whose state ```receipt``` returns. |
-| ```bridge.status``` | signature[, options] | Bridge progress (LI.FI ```/status```) for the source-chain transaction signature returned by ```bridge.send```; ```options``` may give ```{toChain, bridge}``` to speed up the lookup. (more below the table) | ```{status, substatus, substatusMessage, tool, sending, receiving, fromAddress, toAddress, explorer, bridgeExplorer}```: ```status``` is ```NOT_FOUND```, ```INVALID```, ```PENDING```, ```DONE``` or ```FAILED```; when ```DONE```, ```substatus``` is ```COMPLETED``` (delivered as quoted), ```PARTIAL``` (a different token arrived) or ```REFUNDED```; ```sending``` and ```receiving``` are ```{txHash, txLink, chainId, amount, amountRaw, token, timestamp}```, with ```receiving.amount``` and ```receiving.token``` being what actually arrived. |
-| ```bridge.apiKey``` | [key] | Sets the LI.FI API key (header ```x-lifi-api-key```, for this exchange object only, never echoed); ```""``` clears it and no argument just queries. Without a key requests are rate-limited per outgoing IP, see below. | Whether a key is set (a boolean). |
 
-The rest of the longer descriptions in the table:
-
-- ```dca.create```: With an API key and a USDC or USDT quote it uses Jupiter Trigger V2 DCA, otherwise Recurring v1 (time-based); ```exchange.IO("trigger.api", ...)``` can force either; see "DCA" below for the differences. ```params``` is the same for both: ```{symbol, side, total, perOrder, numberOfOrders, interval, minPrice, maxPrice, startAt}```. With ```side``` ```buy``` the quote token buys the base token in installments, and ```total``` and ```perOrder``` are in the quote token; with ```sell``` the base token is sold in installments and they are in the base token. Give either ```perOrder``` or ```numberOfOrders``` (if both, they must agree; with only ```perOrder```, ```total``` must be a whole multiple of it); ```interval``` is the number of seconds between installments; ```minPrice``` and ```maxPrice``` (optional) bound the price (quote per base), and a round whose price is outside the range is skipped; ```startAt``` (optional) is the start timestamp in milliseconds, default immediately. v1: the total is deposited into the DCA order account at once, Jupiter then swaps an installment every interval and the bought tokens are sent back to the wallet; checked locally before sending: at least 2 installments, each worth at least 50 USD (valued with the Jupiter price API), and neither token is a Token-2022 token; waits for the broadcast only, not for confirmation. V2: the total is deposited into the vault (the connector signs the deposit transaction and Jupiter lands it while creating the order, so it has landed on return); ```interval``` is 60 seconds to 1 year, ```startAt``` at most 30 days ahead, each installment worth at least 10 USD, and with ```minPrice``` or ```maxPrice``` the order is price-conditional (on the base token's USD price), a round outside the range moving to the next interval.
-- ```dca.cancel```: v1 also returns any output token not yet withdrawn and waits for the broadcast only, not for confirmation. V2 takes two steps; Jupiter stops the order and builds a withdrawal transaction, which the connector checks, signs and hands back to Jupiter to land; if the second step fails the order stays ```canceling``` and canceling it again completes the withdrawal. Rounds already filled are not reversed.
-- ```dca.simulate```: With ```wallet``` set to another wallet address the simulation uses it as the owner (read-only). On V2 the deposit into the vault is simulated, only for this wallet, and the call fails while the wallet has no vault yet (the vault is registered by the first V2 order); canceling a V2 DCA order cannot be simulated (the cancel call itself stops the order).
-- ```trigger.simulate```: ```params``` is ```{symbol, side, price, amount, expiry, slippage}``` with the meaning of an order (```amount``` in the base token, ```expiry``` and ```slippage``` as the order extra parameters); written ```{cancel: orderId}``` it simulates canceling that limit order. With ```wallet``` set to another wallet address the simulation uses it as the maker (read-only). On V2 (see "Limit orders" below) the deposit into the vault is simulated, only for this wallet, and the call fails while the wallet has no vault yet (the vault is registered by the first V2 order); canceling a V2 limit order cannot be simulated (the cancel call itself stops the order).
-- ```trigger.api```: Only new orders are affected: existing orders go to v1 or V2 by the shape of their order ID regardless of this setting (in ```v1``` mode with an API key, existing V2 orders can still be queried, canceled and modified). Queries when called without an argument.
-- ```trigger.vault```: The funds of V2 limit orders and DCA orders sit here, including those of open orders, of expired orders not yet withdrawn and of canceled orders whose withdrawal did not complete.
-- ```pump.new```: ```options.limit``` is how many creation transactions to look at, 20 by default and at most 100; ```options.since``` is a millisecond timestamp, and only coins created after it are returned (the scan stops at the first older transaction). Parsed transactions are cached in the process, so polling fetches only new ones: each call is one ```getSignaturesForAddress``` plus one ```getTransaction``` per new transaction. Creation transactions that failed on chain are not listed.
-- ```pump.new``` returns: ```name```, ```symbol``` and ```uri``` are whatever the creator chose.
-- ```pump.buy```: The transaction is simulated by the node first and is not sent when the simulation fails. ```options```: ```slippage``` (```[0, 1)```, default ```0.05```); ```priorityFee``` (the transaction's total priority fee in SOL, 0 to 1; without it the 75th percentile of recent fees paid by transactions writing the same accounts, capped by ```exchange.IO("priorityFee", ...)```); ```computeUnitLimit``` (default: the simulated usage plus headroom); ```dryRun``` (```true``` simulates only, without signing or sending); ```payer``` (only with ```dryRun```: simulate with this wallet paying); ```wait``` (default ```true``` waits for confirmation and reports the fill from the on-chain events; ```false``` returns right after the broadcast). Coins whose curve is complete are swapped through Jupiter at market instead (see below).
-- ```pump.buy``` returns: With ```wait``` ```false``` it is ```{txHash, venue, mint, side, pending, lastValidBlockHeight, expected}``` (```expected``` is the local quote); with ```dryRun``` it is ```{dryRun, venue, mint, side, payer, ok, simulationError, logs, unitsConsumed, txBytes, solAmount, tokenAmount, price, expected}```, with the fill taken from the simulated on-chain events.
-- ```pump.sell```: With ```all``` the wallet's token account is closed in the same transaction and its deposit returned (keep it with ```options.closeAccount``` ```false```). The other options are those of ```pump.buy```. Selling more than the balance fails without sending; coins whose curve is complete are swapped through Jupiter at market instead.
-- ```lp.pools```: Sorted by USD TVL, largest first. When a protocol's API is unavailable its pools are found on chain by mint with the node's ```getProgramAccounts```, and those rows have ```tvlUsd```, ```volume24hUsd``` and ```fees24hUsd``` ```null```.
-- ```lp.pools``` returns: Raydium rows have ```protocol``` ```raydium``` and, instead of ```feeRateNow```, ```binStep``` and ```activeId```, carry ```tickSpacing```, ```tick```, ```liquidity``` (the current liquidity) and ```sqrtPriceX64```; their ```rewards``` are ```[{mint, symbol, active, endTime}]``` (```active``` meaning the reward is being emitted). Orca rows have ```protocol``` ```orca``` and likewise carry ```tickSpacing```, ```tick```, ```liquidity``` and ```sqrtPriceX64``` instead of ```feeRateNow```, ```binStep``` and ```activeId```; they have no ```enabled``` but carry ```adaptiveFee``` (pools whose fee follows volatility; ```fee``` is then the base fee) and ```fullRangeOnly``` (Splash pools, which take full-range positions only); their ```rewards``` are ```[{mint, symbol, active}]```.
-- ```lp.select```: With ```options.fee``` (the ```fee``` of ```lp.pools```) or ```options.binStep``` only those pools are considered; among pools with a USD TVL of at least max($5000, budget) the one with the largest 24h volume wins, the largest TVL when there is no volume data, and the largest TVL overall when none reaches the floor. ```budget``` is in the quote token, ```options.quote``` sets the quote and ```options.protocol``` filters by protocol (```meteora```, ```raydium```, ```orca```, or an array of them); ```options.binStep``` keeps only Meteora pools and ```options.tickSpacing``` only CLMM pools (Raydium, Orca) of that tick spacing.
-- ```lp.pool```: ```poolId``` is the pool address (a DLMM LbPair account, a Raydium CLMM PoolState account or an Orca Whirlpool account), optionally written ```meteora:address```, ```raydium:address``` or ```orca:address```; an address that is not an account of an LP protocol program is an error.
-- ```lp.pool``` returns: Raydium and Orca pools carry the fields of their protocols rows of ```lp.pools```.
-- ```lp.ticks```: Without a range it covers 35 bins on each side of the active bin; at most 1400 bins per call. For a Raydium pool the two range arguments are ticks (```tickLower```, ```tickUpper```, aligned outward to the tick spacing), and each segment's liquidity and token amounts are derived from the current liquidity through the initialized ticks in the TickArrays, ```step``` being the segment width in ticks (the tick spacing by default); without a range it covers about 10% on each side of the price; at most 200 TickArrays (including the current tick) and 2000 segments per call. Orca pools are given by tick: the range is in ticks (aligned outward to the tick spacing) and ```step``` is the segment width in ticks (rounded up to the tick spacing, one tick spacing by default); without a range it covers 35 tick spacings on each side of the current tick, at most 2000 tick spacings per call; each segment gives the active liquidity of its first cell and both token amounts that liquidity represents over the segment.
-- ```lp.ticks``` returns: For a Raydium pool it is ```{pool, tick, tickSpacing, price, tokenX, tokenY, symbolX, symbolY, segments: [{tickLower, tickUpper, priceLower, priceUpper, liquidity, amountX, amountY, current}]}```, ```liquidity``` being the largest liquidity inside the segment. For Orca: ```{pool, tick, tickSpacing, liquidity, price, tokenX, tokenY, symbolX, symbolY, segments: [{tickLower, tickUpper, priceLower, priceUpper, liquidity, amountX, amountY, current}]}```.
-- ```lp.plan```: ```params```: ```symbol``` (such as ```SOL_USDC```), ```budget``` (in the quote token), ```range``` (```{lower, upper}``` prices, ```{pct: [-5, 5]}``` percent around the current price, or ```{bins: [lowerBinId, upperBinId]}```; prices are rounded outward to bins), ```shape``` (```spot``` equal value per bin, ```curve``` thicker towards the price on both sides, ```bidask``` thicker away from it; these are DLMM's SpotImBalanced, CurveImBalanced and BidAskImBalanced strategies: the active bin and those below hold Y, those above hold X), ```pool``` (picked by ```lp.select``` when omitted), ```fee```, ```binStep```, ```slippage``` (default 0.01, converted into the allowed drift of the active bin in bins, ```maxActiveBinSlippage```). A position holds at most 70 bins: a ```spot``` range wider than that is split into several positions (one transaction and one rent deposit each, at most 10, explained in ```warning```); ```curve``` and ```bidask``` ranges wider than 70 bins are an error. When the wallet falls short the plan is still returned with ```shortfall``` explaining it; the SOL side counts what is left after rent and fees (wSOL in the wallet counts as SOL). Raydium CLMM and Orca Whirlpools pools are planned the Uniswap way: ```range``` may also be ```{ticks: [tickLower, tickUpper]}```, and prices and ticks are aligned outward to the tick spacing; ```shape``` is ```spot``` (one range), ```curve``` (nested layers, thickest at the price) or ```bidask``` (segments on both sides of the price, thicker further out, the cell holding the price left empty), with ```layers``` the number of layers (default 3, at most 20; used by curve and bidask, the same algorithm as the Uniswap exchange object); each position is one NFT and one transaction, at most 20 positions per plan; ```tickSpacing``` picks the pool by tick spacing. On Raydium ```slippage``` is the headroom allowed on the second token, on Orca the allowed price move (```priceBounds``` are the resulting price limits, beyond which the transaction fails). Orca's Splash pools (tick spacing of 32768 or more) take full-range positions only, so the range and shape are ignored (explained in ```warning```).
-- ```lp.plan``` returns: A CLMM (Raydium, Orca) plan's positions are ```{tickLower, tickUpper, priceLower, priceUpper, amountBase, amountQuote, share}```; it has no ```strategy```, ```binStep```, ```activeId```, ```lowerBinId```, ```upperBinId```, ```bins```, ```maxActiveBinSlippage``` or ```binArraysToCreate``` and carries ```tickSpacing```, ```tick```, ```tickLower```, ```tickUpper``` (the whole range), ```layers``` (the layers actually built, which can be fewer than ```layersRequested``` in a narrow range), ```layersRequested``` and ```tickArraysToCreate``` (start ticks of TickArrays to create, rent not returned), plus ```liquidities``` (each position's liquidity) on Raydium and ```priceBounds``` on Orca; ```shareOfPool``` is the plan's share of the liquidity at the price, and ```rentRefundableSol``` covers the position NFT mint, the NFT account and the position account (on Orca also two ticks), returned on closing.
-- ```lp.simulate```: With ```payer``` set to another wallet address the simulation uses it as payer and owner (read-only, for checking when your own wallet is empty); a plan that needs a swap first is simulated with the post-swap amounts. A Raydium transaction creates ATAs, wraps SOL, runs ```open_position_with_token22_nft``` (creating the position NFT and position account; missing TickArrays are created by the program) and unwraps. An Orca add transaction creates ATAs, wraps SOL, creates dynamic tick arrays (```initialize_dynamic_tick_array```), opens the position (```open_position_with_token_extensions```), adds liquidity by token maxima (```increase_liquidity_by_token_amounts_v2```) and unwraps.
-- ```lp.add```: When needed it first swaps with a Jupiter market order and waits for it, then recomputes at the latest pool price and balances; each position is one transaction (the position account, or the position NFT mint on Raydium and Orca, is created with a freshly generated key that co-signs), simulated before sending and not sent when the simulation fails; after confirmation the actual deposited amounts come from the balances before and after the transaction. Accepts the plan or its ```params```.
-- ```lp.increase```: ```options.symbol``` sets the orientation (the stablecoin is the quote by default), ```options.shape``` the shape (default ```spot```) and ```options.slippage``` price protection. Only positions of at most 70 bins. Raydium positions use ```increase_liquidity_v2```, fixing one token''s amount over the position''s tick range (the SOL side first) with the other capped at the planned amount × (1 + ```slippage```). Orca positions have no width limit: the two amounts go on chain as maxima, and the program adds the most liquidity they allow at the execution price.
-- ```lp.decrease```: With ```options.sell``` ```true``` the returned base token is sold for the quote. Positions wider than 70 bins are handled in transactions of 70 bins each. Raydium positions use one ```decrease_liquidity_v2``` that removes that share of the liquidity and claims the fees and all rewards, with minimum outputs of the amounts at the current price × 0.99. Orca: one transaction decreases liquidity by the ratio (```decrease_liquidity_v2```, with a minimum for each token of the amount estimated at the current price less 1%; a price move beyond that makes the simulation fail and nothing is sent) and collects fees and rewards (```collect_fees_v2```, ```collect_reward_v2```).
-- ```lp.remove```: With ```sell``` ```true``` the proceeds are sold back to the quote. Orca closes the position after withdrawing everything (```close_position_with_token_extensions``` for Token-2022 NFT positions, ```close_position``` for older SPL Token NFT positions, ```close_bundled_position``` for positions in a Position Bundle), returning the rent of the position account, the NFT mint and the NFT token account.
-- ```lp.positions```: ```filter``` is a pair (sets the price orientation) or a token (only positions containing it); ```*``` or nothing means all; ```wallet``` views another wallet read-only. Positions registered with ```lp.track``` are checked too (ownership verified on chain; closed ones are not listed). Orca amounts come from the liquidity at the current price, and uncollected fees and rewards are estimated from the on-chain growth (as the official Orca SDK does).
-- ```lp.positions``` returns: Raydium and Orca rows have no bin fields or ```feeOwner``` and carry ```tickLower```, ```tickUpper```, ```tick```, ```tickSpacing```, ```nftMint``` (the position NFT mint) and ```positionAccount``` (the position account), plus ```nftAccount``` on Raydium and ```nftProgram``` on Orca (positions in a Position Bundle carry ```bundleMint``` and ```bundleIndex``` instead, and their ```id``` is ```orca:position account address```); ```liquidity``` is the position's liquidity. On Raydium uncollected fees and rewards are brought up to date from the growth inside the range (rewards advanced to the current time at their emission rate), and ```rentSol``` covers the position account, the NFT account and the NFT mint; on Orca ```rentSol``` is the lamports held by the position account and the NFT mint.
-- ```lp.track```: Positions of all three protocols are found by owner, so registering is normally unnecessary; the command is kept for parity with Uniswap, and positions created by ```lp.add``` in this process are remembered automatically. Looking up another wallet's Orca position uses the node's ```getTokenLargestAccounts``` to find the NFT holder (public nodes rate-limit it tightly).
-- ```bridge.quote```: ```params```: ```toChain``` (destination chain: a chain ID, a LI.FI chain key such as ```arb```, or a name such as ```Arbitrum``` or ```Solana```), ```fromToken``` (a token on this chain: a name in the token table or a mint address), ```toToken``` (a token on the destination chain: a name or address resolved by LI.FI to its canonical token, so ```USDC``` on Arbitrum is native USDC, not USDC.e), ```amount``` (of ```fromToken```, in token units; digits beyond the token's decimals are dropped), ```toAddress``` (the recipient; required for every destination, since all of them are other chains, an ```0x``` address for EVM chains, checked for format), ```slippage``` (defaults to the ```exchange.IO("slippage")``` value), ```order``` (```CHEAPEST``` or ```FASTEST```), ```allowBridges```/```denyBridges``` (LI.FI bridge names, an array or comma-separated). Unknown keys are errors.
-- ```bridge.simulate```: There is no balance override: without the token to bridge, or without SOL for fees, the simulation fails, and the error gives the reason (```AccountNotFound``` means the wallet has no SOL) and the wallet balance.
-- ```bridge.send```: It does not wait for confirmation; bridging is asynchronous, so poll ```bridge.status```. Given a ```bridge.quote``` result, it re-quotes from its ```request``` (quotes move; the new quote applies).
-- ```bridge.status```: Right after broadcasting LI.FI may not have indexed it yet and returns ```NOT_FOUND```; keep polling (every 10 to 30 seconds).
-
-For the common command ```currency``` see `exchange.IO`.
-
-The common command ```api``` is not supported (the call fails with an error and returns null).
+For the common commands ```api``` and ```currency``` see `exchange.IO`.
 
 ##### Function Support
 
-Not supported (the call fails with an error and returns null): `exchange.GetTickers`, `exchange.GetTrades`, `exchange.CreateConditionOrder`, `exchange.ModifyConditionOrder`, `exchange.CancelConditionOrder`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`, `exchange.GetHistoryConditionOrders`.
-
-Served through a fallback:
-
-- `exchange.GetRecords`: Native periods are 1m, 5m, 15m, 1h, 4h, 12h, 1d (GeckoTerminal's timeframes); other periods of a minute or longer are synthesized by the docker, while second-level periods are unavailable (there is no trade feed to build them from).
+Not supported (the call fails with an error and returns null): `exchange.GetTickers`, `exchange.GetRecords`, `exchange.GetTrades`, `exchange.GetHistoryOrders`, `exchange.CancelOrder`, `exchange.ModifyOrder`, `exchange.CreateConditionOrder`, `exchange.ModifyConditionOrder`, `exchange.CancelConditionOrder`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`, `exchange.GetHistoryConditionOrders`.
 
 ##### Notes
 
 | Function | Behavior on Jupiter |
 | - | - |
 | exchange.GetTicker() | Bid and ask are executable prices for about $1000 (two quotes); for small tokens that cannot absorb $1000 the size steps down to $100 and then $10, and the sell side shrinks further if needed; the actual sizes are in ```sizeQuote``` and ```bidSize``` of ```Info```. There are no 24h statistics: ```High```, ```Low``` and ```Open``` are the current price and ```Volume``` is 0 |
-| exchange.GetDepth() | Derived from quotes at sizes increasing from about $1000, two quotes per level. Bid prices strictly descend and ask prices strictly ascend. The two sides are quotes taken at different moments in opposite directions and occasionally cross (best bid not below best ask): the crossing levels are then merged into one level around the mid of the two (best bid and best ask at the mid minus and plus 0.0001%, amounts kept), and the original best bid and ask are in ```crossed``` of ```Info```, which is ```null``` when the book did not cross |
-| exchange.GetRecords() | K-lines come from GeckoTerminal's pool-level data: Jupiter is an aggregator, so the pool (on any DEX) holding exactly the two tokens (SOL as wSOL) with the largest USD liquidity on GeckoTerminal is used (searched among the top 20 pools of each token; the chosen pool is cached for an hour). Prices are that pool's trade prices (including the pool fee, so they may differ from the mid price of ```exchange.GetTicker()``` by about one pool fee) in quote per base, and ```Volume``` is in the base token; periods without trades repeat the previous close with zero volume, and the last bar may still be open. GeckoTerminal data lags by tens of seconds up to a minute and its public API allows about 10 requests per minute: bars of the same period are cached for a minute, requests queue inside the docker and wait and retry when rate-limited, and fail if that still does not succeed. Fails when no pool of the pair is found |
-| exchange.GetMarkets() | Pairs of the tokens in the token table against USDC, USDT and SOL (routes are not verified pair by pair). The amount precision is the base token's decimals, the minimum quantity is one smallest unit, and the price precision is fixed at 8 |
+| exchange.GetDepth() | Derived from quotes at sizes increasing from about $1000, two quotes per level |
+| exchange.GetMarkets() | Pairs of the tokens in the token table against USDC, USDT and SOL (routes are not verified pair by pair) |
 | exchange.GetAssets() | Wallet balances of SOL and of the tokens in the token table, with separately held wSOL reported as ```WSOL```; holdings outside the token table are not in the balance list but in ```unlisted``` of ```Info``` (```{mint, amount}```) |
-| exchange.CreateOrder() | Swaps immediately: a limit price is the worst acceptable fill, enforced on chain by the program through the slippage bound, and if the current quote cannot reach it the call fails without sending a transaction; market orders are protected by the slippage setting; a market buy is sized in the quote currency to spend. The order extra parameter ```slippage``` overrides the slippage for that order. Jupiter simulates the transaction when building it, so problems such as an insufficient balance fail immediately. Before broadcasting, the Solana node simulates it again on the latest state: if that simulation fails, nothing is sent and the connector quotes and builds the transaction again, up to 2 retries (from the second retry on it avoids the liquidity sources of the failed routes, never going beyond the ```exchange.IO("dexes", ...)``` restriction); if it still fails the call fails with the simulation's ```err``` and the relevant program logs in the error message. On success ```preflightRetries``` in ```Info``` is the number of retries. With the order option ```tif``` set to ```gtc``` it places a native Jupiter limit order instead of swapping (Trigger V2 with an API key and a USDC or USDT quote, otherwise v1; ```exchange.IO("trigger.api", ...)``` can force either), see "Limit orders" below |
-| exchange.GetOrder() | The order ID looks like ```SOL_USDC,5VERv8…``` (the pair, a comma, then the transaction signature). A confirmed transaction is filled, with the filled amounts computed from the wallet balances before and after the transaction; a transaction that fails on chain is canceled (the fee is still charged); one still not included after its validity period (about one minute) is canceled. A transaction not sent by this program can only be queried once it has succeeded (the direction is inferred from the balance changes); one not yet confirmed or failed on chain returns an error. A limit order's ID is the pair plus the order account address (v1) or Jupiter's order UUID (V2), see "Limit orders" below |
-| exchange.GetOrders() | Swaps sent by this program that are neither confirmed nor expired, plus all open limit orders of the wallet (not only those placed by this program; V2 limit orders only when an API key is set) |
-| exchange.CancelOrder() | Limit orders only. Swaps cannot be canceled: a sent Solana transaction cannot be recalled, and one that is not included expires automatically after about one minute |
-| exchange.ModifyOrder() | Changes the price (and the order extra parameter ```slippage```) of V2 limit orders only, see "Limit orders" below. v1 limit orders and swaps cannot be modified |
-| exchange.GetHistoryOrders() | Filled and canceled (including expired) limit orders only, no swaps (query swaps with ```exchange.GetOrder()```). Without ```since``` and ```limit``` it returns the latest 10 v1 orders in each direction (buy and sell) and the latest 10 V2 orders; with ```since``` all created at or after it, and with ```limit``` until that many are collected. v1 and V2 are merged, newest created first |
+| exchange.CreateOrder() | Swaps immediately: a limit price is the worst acceptable fill, enforced on chain by the program through the slippage bound, and if the current quote cannot reach it the call fails without sending a transaction; market orders are protected by the slippage setting; a market buy is sized in the quote currency to spend. The order extra parameter ```slippage``` overrides the slippage for that order. Jupiter simulates the transaction when building it, so problems such as an insufficient balance fail immediately |
+| exchange.GetOrder() | The order ID looks like ```SOL_USDC,5VERv8…``` (the pair, a comma, then the transaction signature). A confirmed transaction is filled, with the filled amounts computed from the wallet balances before and after the transaction; a transaction that fails on chain is canceled (the fee is still charged); one still not included after its validity period (about one minute) is canceled |
+| exchange.GetOrders() | Swaps sent by this program that are neither confirmed nor expired |
+| exchange.CancelOrder() | Not supported: a sent Solana transaction cannot be recalled, and one that is not included expires automatically after about one minute |
 
 - Request rate: Jupiter limits requests per second and returns 429 above the limit. The connector queues requests at the rate set with ```exchange.IO("rps", ...)``` (1 per second by default), and the exchange objects in one docker process that use the same Jupiter API address share this pace. With the default setting ```exchange.GetTicker()``` takes about 2 seconds and a 5-level ```exchange.GetDepth()``` about 10 seconds; for more speed, get a Jupiter API key and raise ```rps``` according to your plan.
 - Fees: the Solana base fee and priority fee of each transaction (capped by ```exchange.IO("priorityFee", ...)```) are deducted from the SOL balance, and the order's ```Info``` contains ```fee```. The first time a token is bought, the wallet has to create an account for it, which takes a deposit of about 0.002 SOL; the deposit still belongs to the wallet and is not counted in the fill.
-
-##### Pump.fun launches
-
-```exchange.IO("pump.*", ...)``` trades coins on the pump.fun bonding curve (program ```6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P```) directly, without Jupiter. Accounts, instructions and quote formulas follow pump.fun's official public documentation (the IDLs and docs of ```pump-fun/pump-public-docs``` on GitHub).
-
-- New coins: ```pump.new``` discovers new coins on chain, and a strategy polls it in a loop (see the example below). Public nodes rate-limit per second and are slow (about 4 seconds for 20 transactions); for sniping, configure your own paid node in "Rpc Address".
-- Only SOL-quoted coins are traded: pump.fun also has coins quoted in USDC or in another pump coin (```quote``` of ```pump.new```), for which ```pump.buy``` and ```pump.sell``` fail; cashback coins (no longer created) fail too and can be traded through Jupiter with ```exchange.Buy``` and ```exchange.Sell```.
-- Price protection: a buy is exact input (spending ```solAmount```, fees included) with a minimum output of the local quote × (1 − ```slippage```); a sell's minimum SOL output is the local quote × (1 − ```slippage```). The default slippage is 5%, enforced on chain; when it cannot be met the whole transaction fails and only the network fee is charged.
-- Fees: the protocol and creator fees follow the Pump Fees program's fee table, tiered by market cap (0.95% + 0.30% in October 2026; ```pump.info``` and ```pump.quote``` return the actual rates, and coins without a creator charge no creator fee), plus the Solana network and priority fees. The first buy of a coin creates its token account (a deposit of about 0.002 SOL, returned by default when ```pump.sell``` sells ```all``` and closes the account); a wallet's first pump.fun trade also creates its volume account (about 0.0018 SOL, not returned).
-- Buying past the curve: when a buy's budget exceeds what the curve has left to sell (except on mayhem coins), the rest fills at the price of the PumpSwap pool the migration will create (pump.fun's "synthetic migration"), and ```crossesCurve``` of ```pump.quote``` is ```true```; after that the curve cannot be traded until the migration happens. On mayhem coins a buy beyond what is left fails.
-- Graduation: for coins whose curve is complete (```complete```), ```pump.buy``` and ```pump.sell``` swap through this exchange object's Jupiter at market instead (pair ```MINT_SOL```, price protection by the call's ```slippage```, which Jupiter requires to be below 0.5) and return ```venue``` ```jupiter```; the ```priorityFee``` and ```computeUnitLimit``` options do not apply then (they fail), the priority fee cap is ```exchange.IO("priorityFee", ...)```, and ```dryRun``` is not available (quote with ```exchange.IO("route", ...)```). In the short time after a curve completes and before it migrates, both routes can fail.
-- Every transaction is simulated by the node before sending and is not sent when the simulation fails, with the reason in the error (pump.fun error codes with their names, such as ```BuySlippageBelowMinTokensOut```); broadcasting and deciding whether a transaction went out work as for swap orders.
-- When sniping, pay enough priority fee (```options.priorityFee```), or under congestion the transaction may expire without being included.
-
-Sniping loop example (JavaScript):
-
-```javascript
-var seen = {}
-var start = Date.now()
-while (true) {
-    var coins = exchange.IO("pump.new", {limit: 20, since: start})
-    for (var i = 0; coins && i < coins.length; i++) {
-        var c = coins[i]
-        if (seen[c.mint] || c.quote != "SOL" || c.mayhem) continue
-        seen[c.mint] = true
-        if (c.devBuy && c.devBuy.quoteAmount > 1) continue   // creator bought too much, skip
-        var r = exchange.IO("pump.buy", c.mint, 0.01, {slippage: 0.2, priorityFee: 0.0005})
-        if (r) Log("bought", r.tokenAmount, c.symbol, "for", r.solAmount, "SOL", r.txHash)
-    }
-    Sleep(1000)
-}
-```
-
-Risks:
-- Most new coins go to zero quickly; the creator or wallets bundled with it often buy in the creation transaction or the next few blocks and can dump at any moment (rug pull).
-- Sniping bots and MEV compete hard: the order within a block depends on priority fees and tips, and a wide slippage invites sandwich attacks that fill at the worst price.
-- The name, symbol and metadata link are whatever the creator chose and can impersonate well-known projects; go by the mint address.
-- Protocol, creator, network and priority fees are paid on every buy and sell, so frequent in-and-out trading is costly.
-
-##### Limit orders (tif gtc)
-
-```exchange.CreateOrder(symbol, side, price, amount, {tif: "gtc"})``` (or ```exchange.Buy``` and ```exchange.Sell``` with the same order option) does not swap immediately but places a native Jupiter limit order, which Jupiter's keepers fill asynchronously once the price is reached. Without ```tif```, or with another ```tif```, orders behave as before (immediate swaps). There are two APIs:
-
-| | Trigger v1 | Trigger V2 |
-| - | - | - |
-| Used when (```trigger.api``` at its default ```auto```) | No API key is set, or the quote is not USDC or USDT | An API key is set and the quote is USDC or USDT |
-| Where funds sit | An on-chain order account (program ```j1o2qRpjcyUwEvwtcfhEQefh773ZgjxcVRry7LDqg5X```); open orders are public on chain | A vault in Jupiter's custody (Privy), one per wallet, shared by all V2 orders; orders are kept off chain by Jupiter and stay private until they fill |
-| Trigger and fill | On the exchange rate of the two tokens, filled at the limit price (zero slippage by default); the amount received is guaranteed | On the base token's USD price; once reached, the order swaps at the market rate through Jupiter routing: the amount received is not guaranteed and fills may be partial; slippage is set automatically by Jupiter by default |
-| Order ID | ```SOL_USDC,order account address``` | ```SOL_USDC,order UUID``` |
-| Minimum | The side given or received worth at least 5 USD | The side given worth at least 10 USD |
-| Expiry | Optional, none by default | Required, 30 days by default; after expiry the funds stay in the vault until withdrawn by canceling |
-| Modify | Not supported | ```exchange.ModifyOrder()``` changes the price |
-
-**With an API key the default is the custodial V2**: the funds of an order leave the wallet for a vault in Jupiter's custody. To keep the non-custodial v1, call ```exchange.IO("trigger.api", "v1")```; conversely ```exchange.IO("trigger.api", "v2")``` forces V2 even without an API key (Jupiter currently accepts V2 calls without a key, but its documentation requires one).
-
-Jupiter has marked v1 as no longer developed (critical fixes only, no shutdown announced); new features go to V2. Existing v1 orders are not affected by the configuration and can still be queried and canceled (the shape of the order ID selects the API, regardless of ```trigger.api```; V2 orders need the API key or ```trigger.api``` set to ```v2``` to be queried, canceled or modified).
-
-Common rules:
-
-- Amounts: ```amount``` is in the base token; a buy gives ```amount × price``` of the quote token (rounded down to the smallest unit, never paying more), a sell gives ```amount``` of the base token (v1 also asks for ```amount × price``` of the quote token in return, rounded up, never receiving less). Market orders are not possible (a ```price``` of ```-1``` or ```type``` ```market``` fails).
-- Order extra parameters: ```expiry``` is the expiry timestamp in milliseconds; ```slippage``` is an allowed slippage ratio (such as ```0.003```). v1 defaults to 0 (exact fills at the limit price), and a slippage raises the fill rate at the cost of filling below the limit; V2 lets Jupiter set it automatically from market conditions by default, and a given slippage is used as a fixed value.
-- States: open is pending, open with fills is partially filled, fully filled is filled, canceled or expired is canceled (an expired V2 order's funds are still in the vault). ```Info``` is Jupiter's raw order row.
-- Canceling: for an order already filled or canceled ```exchange.CancelOrder()``` returns ```false``` with the reason in ```GetLastError()```.
-- Every ```exchange.GetOrders()``` call requests Jupiter's v1 limit order list once (and the V2 list once more when an API key is set), paced by ```exchange.IO("rps", ...)```.
-- Token-2022 tokens with the transfer fee or transfer hook extension cannot be used in limit orders (Jupiter does not support them).
-- Use ```exchange.IO("trigger.simulate", ...)``` to simulate an order before placing it.
-
-Trigger v1:
-
-- Placing and canceling are on-chain transactions signed by the connector and broadcast through a Solana node; when the node's preflight simulation fails nothing is sent and the call fails. Each pays a Solana transaction fee and priority fee, and the first order in a token may create token accounts, whose deposits remain the wallet's. Canceling waits for the broadcast only; confirm the result with ```exchange.GetOrder()```.
-- Fees: Jupiter deducts its fee from the token received (0.03% for stable pairs and 0.1% otherwise per its documentation; each fill record is authoritative). The order's ```AvgPrice``` is before fees, and the amounts actually received are in ```trades``` of ```Info```.
-- ```exchange.GetOrder()``` looks in the open orders and then in the history; an order this program has just placed that Jupiter has not indexed yet is reported from its on-chain state (an existing order account means open).
-
-Trigger V2:
-
-- Authentication: the connector signs Jupiter's login challenge with the wallet's private key (only a message that starts with Jupiter's fixed login text and names this wallet) for a 15-minute access token, refreshed automatically and kept in memory only. A leaked token cannot move funds (withdrawals need a transaction signed by the wallet) but can cancel orders and change their prices.
-- Placing: the connector looks up the wallet's vault and registers one if there is none (this creates a custodial account for the wallet at Jupiter); it then has Jupiter build the deposit transaction and checks it instruction by instruction (the wallet pays the fee, only the System, Token, Associated Token Account, Compute Budget and Memo programs are called, and the tokens leaving the wallet go only to the vault side and add up to exactly the order amount), signs it, simulates it with the node first (nothing is sent and the call fails when the simulation fails), and hands it to Jupiter with the order parameters; Jupiter lands the deposit during that call and returns the order UUID. If that call fails the deposit may already have landed: the error names the deposit transaction signature; check it with ```exchange.IO("receipt", ...)``` and ```exchange.IO("trigger.vault")``` before retrying.
-- Trigger: a buy buys when the base token's USD price falls to ```price``` or below, a sell sells when it rises to ```price``` or above. The quote token is taken as 1 USD (if USDC or USDT depegs, the trigger drifts accordingly). Jupiter does not check whether the price makes sense: a buy above or a sell below the market fills at once at the market rate.
-- Amounts and fills: the order's ```Amount``` is the base token deposited for a sell and the quote token deposited ÷ price for a buy; ```DealAmount``` and ```AvgPrice``` come from the amounts actually used and received (the fee is already taken from the amount received and not listed separately on V2).
-- Modifying: ```exchange.ModifyOrder()``` changes only the price (and ```slippage```), only for an open single order that has not started filling, and not the trigger price of a trailing order; the amount is fixed by the deposit and cannot change (an amount passed in must equal the original). A buy keeps the quote amount it spends when its price changes, so its ```Amount``` becomes amount ÷ new price.
-- Canceling takes two steps: Jupiter stops the order (no more fills from then on) and builds a withdrawal transaction, which the connector checks (the wallet only pays the fee) and signs; Jupiter adds the vault's signature and lands it, and the unfilled tokens return to the wallet. If the second step fails the order waits for withdrawal (still listed by ```exchange.GetOrders()```), and canceling it again completes the withdrawal. Expired orders are withdrawn with ```exchange.CancelOrder()``` too.
-- Custody risk: while an order is open its funds are in Jupiter's Privy-held vault, not in the wallet; they are not counted by ```exchange.GetAssets()``` (see ```exchange.IO("trigger.vault")```). Withdrawals depend on Jupiter building the withdrawal transaction and co-signing it, so they cannot be done alone while Jupiter's service is down. Jupiter still labels the V2 API beta, and its behavior may change.
-- Fees: the wallet pays the network fees of the deposit and withdrawal transactions; fills are executed by Jupiter's keepers, who pay their network fees, and Jupiter's swap fee is already taken from the amount received. There is no integrator fee.
-- Requests: queries and orders authenticate first (the token is cached in the process), using one or two extra requests of the rate limit; an API key restricted by endpoint permissions must include Trigger, otherwise those calls fail with 403.
-- The order functions list all V2 limit orders of the wallet, including those placed elsewhere such as on jup.ag (each take-profit, stop-loss or OCO leg is listed as one order priced at its USD trigger, with the direction in ```triggerCondition``` of ```Info```). An order that triggers on a USD price but is not quoted in USDC or USDT, or that does not trigger on the base token's price, cannot be expressed as a price of its pair, and queries that meet it fail (a query for a given pair only looks at that pair's orders).
-
-##### DCA
-
-```exchange.IO("dca.create", ...)```, ```dca.list```, ```dca.cancel``` and ```dca.simulate```: with an API key and a USDC or USDT quote new DCA orders use Jupiter Trigger V2 DCA by default (custodial vault; ```exchange.IO("trigger.api", ...)``` applies as well: ```v1``` keeps Recurring v1, ```v2``` forces V2), otherwise the Recurring API v1 (time-based DCA, program ```DCA265Vj8a9CEuX1eb1LWRnDT7uK6q1xMipnNyatn23M```). Jupiter no longer maintains Recurring v1 (it still works); DCA has moved into Trigger V2. ```dca.list``` lists both (V2 needs the API key), and ```dca.cancel``` tells v1 (an address) from V2 (a UUID) by the shape of the DCA ID. DCA orders do not appear in ```exchange.GetOrders()``` and the other order functions.
-
-- v1: the total is deposited into a DCA order account at once, Jupiter's keepers swap one installment every ```interval``` seconds, and the bought tokens are sent back to the wallet. At least 2 installments, each worth at least 50 USD; Token-2022 tokens are not supported; Jupiter takes a 0.1% fee from the tokens received. Creating and canceling are on-chain transactions with transaction and priority fees; canceling returns the remaining tokens to the wallet.
-- V2: authentication, the vault, the deposit and the custody risk are as for V2 limit orders above. The total is deposited into the vault and the keepers swap one installment per round, sending the tokens received straight to the wallet and paying the network fees; slippage is set automatically by Jupiter from market conditions and cannot be specified; the fee is already taken from the amount received. At least 2 installments, each worth at least 10 USD, an interval of 60 seconds to 1 year, a start at most 30 days ahead, and at most 10 running DCA orders per wallet. With ```minPrice``` or ```maxPrice``` a round swaps only while the base token's USD price is in the range, and a round outside it moves to the next interval. DCA orders cannot be modified; canceling takes two steps (as for V2 limit orders), and rounds already filled are not reversed.
-
-##### Concentrated liquidity (LP)
-
-The ```exchange.IO("lp.*", ...)``` commands provide concentrated liquidity on Meteora DLMM pools (program ```LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo```), Raydium CLMM pools (program ```CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK```) and Orca Whirlpools pools (program ```whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc```; how these two differ from DLMM is below): pool selection, planning and simulation, adding, increasing and decreasing, collecting fees and farm rewards, withdrawal and position queries. Command names, parameters and result fields follow the ```lp.*``` commands of the Uniswap exchange object, with these differences:
-
-- Prices are discretized into bins rather than ticks: bin ```i``` has price (1 + binStep/10000)^i (scaled by the two tokens' decimals), ranges are given as ```lowerBinId``` and ```upperBinId``` (both inclusive), and the bin holding the current price is ```activeId```; ```range``` may be written ```{bins: [lo, hi]}```. The active bin holds both tokens, bins above it only X and bins below only Y, so the shape of a position is how much goes into each bin (```spot```, ```curve```, ```bidask```).
-- A position is an account, not an NFT: its ```id``` is ```meteora:position address``` (the bare address is accepted too); a position holds at most 70 bins, and wider ```spot``` ranges are split into several positions.
-- Rent: each position account locks its rent-exempt minimum (from the node's ```getMinimumBalanceForRentExemption```, about 0.042 SOL in October 2026), returned when ```lp.remove``` withdraws everything and closes it; bin array accounts (70 bins each) missing in the range are created first, and their rent (about 0.052 SOL each in October 2026) is not returned. ```rentSol```, ```rentRefundableSol``` and ```binArraysToCreate``` of the plan give these amounts. Holding a token for the first time also creates a token account (about 0.0015 SOL, still the wallet's).
-- SOL is wrapped and unwrapped automatically: when one side of the pool is SOL, the transaction wraps the SOL to deposit into wSOL and closes the wallet's wSOL account at the end (wSOL already in the wallet turns back into SOL as well).
-- Swaps go through this exchange object's Jupiter swaps (market orders, slippage per ```exchange.IO("slippage", ...)```).
-- Every write transaction is simulated by the node before sending and is not sent when the simulation fails, with the reason in the error (DLMM, Raydium CLMM and Orca Whirlpool error codes with their names). The compute-unit limit is the simulated usage plus headroom, and the priority fee is the 75th percentile of recent fees paid by transactions writing the same accounts, capped by ```exchange.IO("priorityFee", ...)```. Broadcasting and the "may it have been sent" judgment are those of swap orders; commands return after confirmation, with actual amounts from the balances before and after the transaction.
-- Withdrawals have no minimum-output protection: DLMM withdraws the position's share of each bin, so the amounts depend on the bins' composition at that moment.
-- Token-2022 tokens with a transfer hook are not supported, nor are positions whose fees go to another wallet (```feeOwner```); there is no ```lp.history```, ```lp.stake```, ```lp.unstake``` or ```lp.claim``` (farm rewards are claimed by ```lp.collect```, ```lp.decrease``` and ```lp.remove```).
-- ```lp.positions``` finds positions by owner with the node's ```getProgramAccounts```; the official public node serves it, some nodes do not or rate-limit it, and then the call fails. Public nodes rate-limit per second and the connector backs off and retries; for frequent queries configure your own node.
-
-How Raydium CLMM and Orca Whirlpools differ from DLMM above (they use the same tick model as Uniswap V3):
-
-- Prices are discretized into ticks: tick ```i``` has price 1.0001^i (scaled by the two tokens' decimals), a position covers [```tickLower```, ```tickUpper```), and both ends are multiples of the pool's tick spacing (```tickSpacing```); a position in range holds both tokens, one out of range holds one. Shapes and ```layers``` are those of the Uniswap exchange object: ```curve``` and ```bidask``` consist of several positions.
-- A position is an NFT: its ```id``` is ```raydium:NFT mint``` or ```orca:NFT mint``` (the bare mint or the position account address is accepted too); whoever holds the NFT owns the position. ```lp.positions``` finds positions from the NFTs with amount 1 in the wallet and needs no ```getProgramAccounts```. Token-2022 tokens with a transfer hook are not supported.
-- Raydium: new positions are Token-2022 NFTs, and opening creates no metadata to keep the deposits minimal: rent for the position account, the NFT mint and the NFT account (about 0.0053 SOL together in October 2026), all returned when ```lp.remove``` closes the position. The TickArrays (60 tick spacings each) at the two ends of the range are created by the opening transaction when missing, and their rent (about 0.072 SOL each in October 2026) is not returned; ```tickArraysToCreate``` of the plan lists them. Adding and increasing fix the amount of one token (the SOL side first, otherwise the more valuable side) and cap the other at the planned amount × (1 + ```slippage```); when a price move pushes the other token beyond the cap the program fails with ```PriceSlippageCheck``` and nothing is sent. Withdrawals require at least the amounts at the current price × 0.99. Every initialized reward of the pool (even an ended one) is settled with each withdrawal or collection, and the reward tokens' ATAs are created first. Ticks beyond the pool's built-in range need the pool's TickArray bitmap extension account, and its absence is an error. Looking up a single position that is not in this wallet (```lp.track```) finds the NFT's holder by mint with the node's ```getProgramAccounts``` (the official public node serves it).
-- Orca: new positions use a Token-2022 NFT (with the metadata extension, as the official Orca SDK does); older SPL Token NFT positions and positions in a Position Bundle can be queried, increased, decreased, collected and closed as well. Each position locks the rent-exempt minimums of the position account, the NFT mint and the NFT token account plus the rent of two ticks (about 0.0084 SOL in all in October 2026), all returned when ```lp.remove``` closes it; a tick array (covering 88 tick spacings) missing at either end of the range is first created as a dynamic tick array, and its rent (about 0.0019 SOL each) is not returned. Adding liquidity passes the two token amounts on chain as maxima (```increase_liquidity_by_token_amounts_v2```), and the program adds the most liquidity they allow at the execution price, failing when the price is outside the bounds implied by ```slippage```; withdrawals are protected by minimum amounts (those estimated at the current price less 1%). Decreasing or closing a locked position (```lock_position```) fails in simulation; only the main program deployment is supported (not Orca's immutable deployment). Pool statistics come from Orca's public API (```api.orca.so```); looking up a position that is not in this wallet finds the NFT holder with the node's ```getTokenLargestAccounts``` (public nodes rate-limit it tightly).
-
-Monitoring and exits are left to the strategy: ```lp.positions``` reports whether each position is in range, its current value and uncollected fees, and the strategy decides when to rebalance or stop out.
-
-Risks:
-- Impermanent loss: the further the price moves from the entry, the lower the position is worth compared with simply holding; as the price rises the position sells X bin by bin, and as it falls it buys X.
-- Once the price leaves the range the position holds a single token and earns no fees until the price returns.
-- Rent locked when opening: the position account's rent (and the NFT's on Raydium and Orca) comes back on withdrawal, new bin arrays' and TickArrays' rent does not; a plan split into several positions locks rent for each.
-- Every add, adjustment, collection and withdrawal is an on-chain transaction with fees and priority fees; frequent rebalancing can cost more than it earns.
-- The estimated daily fees in a plan come from the past 24h volume and the plan's current share of the active bin; they do not predict future income.
-
-##### Cross-chain bridge
-
-```exchange.IO("bridge.*", ...)``` bridges tokens from this exchange object's chain to another chain through the bridges LI.FI aggregates (Across, Stargate, CCTP, deBridge, Mayan, Relay, NEAR Intents and more), between EVM chains and between EVM and Solana (from Solana). LI.FI supplies the quote and transaction, as a serialized transaction that the docker signs, simulates with ```simulateTransaction``` and broadcasts. Requests carry the integrator tag ```integrator=fmz``` and add no fee; fees in a quote such as ```LIFI Fixed Fee``` are LI.FI's and the bridges' own and are already deducted from ```toAmount```.
-
-Typical flow: ```bridge.quote``` for a quote → ```bridge.simulate``` to simulate → ```bridge.send``` to send → ```bridge.status``` every 10 to 30 seconds until ```DONE``` or ```FAILED```.
-
-- Bridging is asynchronous: when ```bridge.send``` returns, only the source-chain transaction has been broadcast; delivery takes seconds to tens of minutes (see ```executionDuration``` in the quote) and must be confirmed by polling ```bridge.status```; ```PARTIAL``` means a different token arrived on the destination chain and ```REFUNDED``` that the funds went back to the source chain.
-- Cross-VM transfers (EVM↔Solana) require ```toAddress```, checked against the destination chain's address format; funds sent to a wrong address cannot be recovered.
-- Risks: the security of bridge contracts and cross-chain messaging rests with each bridge; quotes move, and ```bridge.send``` re-quotes before sending; the destination wallet needs gas to use what arrives. Test with a small amount first.
-- Rate limits: without an API key LI.FI limits by outgoing IP, ```/quote``` to 75 requests per 2 hours (```bridge.quote```, ```bridge.simulate``` and ```bridge.send``` use one each) and other endpoints to 100 per minute; strategies on the same docker share the quota. With a key set through ```exchange.IO("bridge.apiKey", key)``` the limit is 100 per minute. A rate-limited call fails with ```rate limited (HTTP 429 …)```.
 
 ##### exchange.IO("route", ...)
 
@@ -28495,7 +29700,7 @@ See also: `Jupiter`, `exchange.IO`, `exchange.IO("route")`, `exchange.IO("token"
 
 #### KyberSwap
 
-Connects to the KyberSwap aggregator: quotes and transaction data come from the KyberSwap Aggregator API (which splits and routes orders across many DEXs and market makers; an API key is optional, see "API key and rate limits" below), and the docker signs them with the configured private key and sends them to KyberSwap's router contract MetaAggregationRouterV2 (```0x6131B5fae19EA4f9D964eAc0408E4408b66337b5```). One exchange object covers one chain: Ethereum, Arbitrum, Base, BNB Chain, Unichain, Polygon, OP Mainnet or Robinhood.
+Connects to the KyberSwap aggregator: quotes and transaction data come from the KyberSwap Aggregator API (which splits and routes orders across many DEXs and market makers and needs no API key), and the docker signs them with the configured private key and sends them to KyberSwap's router contract MetaAggregationRouterV2 (```0x6131B5fae19EA4f9D964eAc0408E4408b66337b5```). One exchange object covers one chain: Ethereum, Arbitrum, Base, BNB Chain, Unichain, Polygon, OP Mainnet or Robinhood.
 
 It is the aggregator version of the same implementation as the Uniswap exchange object: the token table, balances, approvals, orders, cancels, transfers and wrapping work the same way; the differences are that there is no DEX option and the swap route comes from KyberSwap.
 
@@ -28509,11 +29714,6 @@ It is the aggregator version of the same implementation as the Uniswap exchange 
 | Private Key | Yes | — | Wallet private key (hex). |
 | Rpc Address | No | ```https://ethereum-rpc.publicnode.com,https://eth.drpc.org``` | RPC node URL; several nodes separated by commas fail over to each other when one errors or lacks data. Order states need a node that returns receipts of mined transactions; the publicnode public nodes for Base, BNB Chain and Arbitrum cannot (archive access is required), so do not use them alone. |
 | Rpc Api Key | No | — | RPC authentication: a ```Header-Name: value``` header or a Basic auth value. |
-| KyberSwap Api Key | No | — | API key of the KyberSwap Aggregator API, optional. (more below the table) |
-
-The rest of the longer descriptions in the table:
-
-- KyberSwap Api Key: With it, quotes and swap builds go through KyberSwap's API gateway (header ```X-Api-Key```) with a higher rate limit; without it the public endpoint (about 3 requests per second) is used. See "API key and rate limits" below for how to get one; ```exchange.IO("kyberApiKey", key)``` changes it at run time.
 
 ##### Trading Pairs and Contract Codes
 
@@ -28528,7 +29728,7 @@ Pairs are written as ```ETH_USDC```; the native coin (ETH, BNB, POL) and its wra
 | ```transfer``` | to, amount[, token] | Transfer the native coin or an ERC20 token out of the configured wallet (```token``` is a token name or contract address, the native coin when omitted); ```amount``` may be ```all``` (the native coin keeps the fee). Waits for the broadcast only, not for confirmation. | ```{txHash, from, to, token, tokenAddress, amount, raw}``` |
 | ```receipt``` | txHash[, waitMs] | Query the receipt of a transaction sent by this exchange object (an order, a transfer, ...), optionally waiting for confirmation (up to 10 minutes). For an order, pass the transaction hash after the comma in the order ID. | ```{txHash, status, blockNumber, gasUsed, fee}``` once mined, ```{txHash, pending: true, known}``` otherwise. |
 | ```route``` | symbol, side, qty | Quote only, no order. The aggregator has a single candidate route (such as ```kyberswap:ETH-USDC```); ```buy``` quotes receiving ```qty``` base (approximated with several exact-input quotes), ```sell``` quotes selling ```qty``` base. | ```{symbol, side, qty, best, quote, price, candidates}``` |
-| ```simulate``` | symbol, side, qty[, price[, stateOverride]] | Build the swap transaction with the order logic (quoting, price protection, building the transaction with KyberSwap) and only simulate it with ```eth_call```; nothing is signed, broadcast or paid. (more below the table) | ```{route, exactIn, amountIn, amountOut, quoted, executed, value, calls}```, plus ```allowanceOverride``` when an allowance was supplied. |
+| ```simulate``` | symbol, side, qty[, price[, stateOverride]] | Build the swap transaction with the order logic (quoting, price protection, building the transaction with KyberSwap) and only simulate it with ```eth_call```; nothing is signed, broadcast or paid. The route description then lists the liquidity sources it goes through. The sixth argument (route type filter) does not apply to an aggregator and fails if given. | ```{route, exactIn, amountIn, amountOut, quoted, executed, value, calls}``` |
 | ```token``` | [name, address] | Register a token so it can be used in pairs; without arguments, list the token table. | ```{symbol, address, decimals}``` when registering, an array of ```{symbol, address, decimals, native}``` when listing. |
 | ```wrap``` | amount | Wrap the native coin into its wrapped token (e.g. ETH→WETH), 1:1 without slippage, gas only; ```all``` is not accepted (gas must remain). | ```{txHash, action, from, to, amount, raw}``` |
 | ```unwrap``` | amount | Unwrap the wrapped token into the native coin (e.g. WETH→ETH); ```amount``` may be ```all```. | ```{txHash, action, from, to, amount, raw}``` |
@@ -28539,71 +29739,25 @@ Pairs are written as ```ETH_USDC```; the native coin (ETH, BNB, POL) and its wra
 | ```gasMultiplier``` | [x] | Gas limit multiplier, 1 to 5, default 1.2; a transaction's gasLimit is the node's gas estimate times this value. Queries when called without an argument. | The current multiplier. |
 | ```base``` | [url] | Without an argument, returns the current node address; with an address, switches the node. Several nodes are written as one comma-separated string (with an array only the first address is used). After a switch, the first request checks which chain the node is on and fails if it is not the configured chain. | The previous address. |
 | ```sendBase``` | url | Set a node used only to broadcast transactions (a private transaction channel). Unlike Web3, it does not return the previous address, does not query when called without an argument, and an empty string does not clear the setting. | ```true``` |
-| ```clientId``` | [id] | Set the client id sent with KyberSwap Aggregator API requests (the ```x-client-id``` header, also sent when an API key is set), 1 to 64 letters, digits, ```.```, ```_``` or ```-```. (more below the table) | The current client id. |
-| ```kyberApiKey``` | [key] | Sets the KyberSwap API key (for this exchange object only, never echoed), the same as the ```KyberSwap Api Key``` setting: with a key, quotes and swap builds go to KyberSwap's API gateway ```https://api.kyberswap.com/swap``` with the ```X-Api-Key``` header and a higher rate limit; ```""``` clears it and returns to the public endpoint. (more below the table) | Whether a key is set (a boolean). |
 | ```address``` | — | The wallet address of the configured private key (lowercase, starting with ```0x```). | — |
-| ```contracts``` | — | The deployment on this chain, with the same fields as the Uniswap exchange object: ```dex``` is ```KyberSwap``` and ```router``` is the KyberSwap router contract; ```quoterV2```, ```v3Factory```, ```v4``` and the like are the chain's Uniswap deployment (used to list markets and estimate USD prices), and ```aerodrome``` is ```null```; ```tokenList``` gives the generation time of the built-in token table and its token count on this chain. | — |
-| ```bridge.chains``` | — | Chains supported by the bridge (LI.FI): EVM chains and Solana, cached for an hour. | An array of ```{id, key, name, chainType, nativeToken}```, ```chainType``` being ```EVM``` or ```SVM```. |
-| ```bridge.tokens``` | [chain] | Tokens LI.FI knows on a chain (this chain by default), cached for an hour. | An array of ```{symbol, address, decimals, name, priceUSD}```. |
-| ```bridge.quote``` | params | A bridge quote (read-only) from this exchange object's chain. (more below the table) | ```{tool, toolName, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, fromAmountRaw, toAmountRaw, toAmountMinRaw, fromAmountUSD, toAmountUSD, slippage, toAddress, feeCosts, gasCosts, executionDuration, approvalAddress, steps, transactionId, request}```: amounts are in token units (```*Raw``` in the smallest unit); ```toAmountMin``` is the amount guaranteed after slippage; ```feeCosts``` is ```[{name, amount, token, amountUSD, percentage, included}]``` (fees with ```included``` ```false``` are paid on top); ```gasCosts``` estimates source-chain gas; ```executionDuration``` is the expected time in seconds; ```approvalAddress``` is the contract to approve (```null``` for the native coin and on Solana); ```steps``` lists the steps (```cross``` bridges, ```swap``` swaps); ```request``` echoes the parameters. |
-| ```bridge.simulate``` | params\|quote[, stateOverride] | Re-quotes and runs LI.FI's transaction with ```eth_call```: nothing is signed, broadcast or paid. (more below the table) | The ```bridge.quote``` result plus ```simulated``` (```true```), ```to```, ```value``` and ```walletBalance```, and ```allowanceOverride``` when an allowance was supplied. |
-| ```bridge.send``` | params\|quote | Bridges out: re-quotes → checks the balance → approves LI.FI's ```approvalAddress``` when the token allowance is short (following ```exchange.IO("approve")``` ```exact```/```max```, resetting USDT-like tokens to zero first, waiting for the approval to be mined and re-quoting after it) → simulates with ```eth_call``` → signs and broadcasts, with a gas limit of the larger of the ```eth_estimateGas``` estimate × ```gasMultiplier``` and LI.FI's suggested ```gasLimit``` (bridge contracts call into other contracts, so the estimate can fall short; only the gas used is charged). (more below the table) | ```{txHash, tool, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, toAddress, value, transactionId}```; ```txHash``` is the source-chain transaction, whose receipt ```receipt``` returns. |
-| ```bridge.status``` | txHash[, options] | Bridge progress (LI.FI ```/status```) for the source-chain transaction hash returned by ```bridge.send```; ```options``` may give ```{toChain, bridge}``` to speed up the lookup. (more below the table) | ```{status, substatus, substatusMessage, tool, sending, receiving, fromAddress, toAddress, explorer, bridgeExplorer}```: ```status``` is ```NOT_FOUND```, ```INVALID```, ```PENDING```, ```DONE``` or ```FAILED```; when ```DONE```, ```substatus``` is ```COMPLETED``` (delivered as quoted), ```PARTIAL``` (a different token arrived) or ```REFUNDED```; ```sending``` and ```receiving``` are ```{txHash, txLink, chainId, amount, amountRaw, token, timestamp}```, with ```receiving.amount``` and ```receiving.token``` being what actually arrived. |
-| ```bridge.apiKey``` | [key] | Sets the LI.FI API key (header ```x-lifi-api-key```, for this exchange object only, never echoed); ```""``` clears it and no argument just queries. Without a key requests are rate-limited per outgoing IP, see below. | Whether a key is set (a boolean). |
+| ```contracts``` | — | The deployment on this chain, with the same fields as the Uniswap exchange object: ```dex``` is ```KyberSwap``` and ```router``` is the KyberSwap router contract; ```quoterV2```, ```v3Factory```, ```v4``` and the like are the chain's Uniswap deployment (used to list markets and estimate USD prices), and ```aerodrome``` is ```null```. | — |
 
-The rest of the longer descriptions in the table:
-
-- ```simulate```: The route description then lists the liquidity sources it goes through. The sixth argument (route type filter) does not apply to an aggregator and fails with ```route is not applicable to the KyberSwap aggregator``` if given. For a swap paid with a token (such as buying with USDC), when the wallet's allowance for the router falls short (```approve``` defaults to ```exact```, which approves only right before a real order), the allowance is supplied automatically through an ```eth_call``` state override before simulating, and ```allowanceOverride``` in the result lists what was supplied; a ```stateOverride``` you pass is merged with it, and storage slots you set are not overwritten. If the token's allowance storage slot cannot be located, a failing simulation says the token is not approved yet and needs an approval or your own ```stateOverride```. Balances are not supplied automatically.
-- ```clientId```: Without an API key KyberSwap's public rate limit (3 requests per second) is counted per client id, so programs sharing an id share that budget; use your own id if HTTP 429 errors are frequent, or set an API key (see ```kyberApiKey```). The default is ```fmz-``` followed by the first 8 hex digits of a hash of the wallet address (stable across restarts for the same wallet, without revealing the address; a value generated randomly for the run when no private key is configured). Queries when called without an argument.
-- ```kyberApiKey```: A key is 1 to 256 visible ASCII characters without spaces; an invalid one fails and keeps the previous setting. No argument just queries. When the key is invalid or expired the gateway answers HTTP 401 and the call fails with ```KyberSwap API key rejected (HTTP 401: invalid api key)```; it does not fall back to the public endpoint.
-- ```bridge.quote```: ```params```: ```toChain``` (destination chain: a chain ID, a LI.FI chain key such as ```arb```, or a name such as ```Arbitrum``` or ```Solana```), ```fromToken``` (a token on this chain: a name in the token table or a contract address), ```toToken``` (a token on the destination chain: a name or address resolved by LI.FI to its canonical token, so ```USDC``` on Arbitrum is native USDC, not USDC.e), ```amount``` (of ```fromToken```, in token units; digits beyond the token's decimals are dropped), ```toAddress``` (the recipient; defaults to this wallet when the destination is an EVM chain, required, as a Solana address, when the destination is Solana), ```slippage``` (defaults to the ```exchange.IO("slippage")``` value), ```order``` (```CHEAPEST``` or ```FASTEST```), ```allowBridges```/```denyBridges``` (LI.FI bridge names, an array or comma-separated). Unknown keys are errors.
-- ```bridge.simulate```: A short token allowance is supplied as unlimited through a state override (as in ```simulate```; ```allowanceOverride``` in the result lists it); balances are not supplied, pass them yourself in ```stateOverride``` (the third ```eth_call``` argument). A failure caused by a short balance reports the wallet balance.
-- ```bridge.send```: The native coin needs no approval. Only the approval is awaited, not the bridge transaction; bridging is asynchronous, so poll ```bridge.status```. Given a ```bridge.quote``` result, it re-quotes from its ```request``` (quotes move; the new quote applies and ```toAmountMin``` is enforced on chain).
-- ```bridge.status```: Right after broadcasting LI.FI may not have indexed it yet and returns ```NOT_FOUND```; keep polling (every 10 to 30 seconds).
-
-For the common command ```currency``` see `exchange.IO`.
-
-The common command ```api``` is not supported (the call fails with an error and returns null).
+For the common commands ```api``` and ```currency``` see `exchange.IO`.
 
 ##### Function Support
 
-Not supported (the call fails with an error and returns null): `exchange.GetTickers`, `exchange.GetTrades`, `exchange.GetHistoryOrders`, `exchange.ModifyOrder`, `exchange.CreateConditionOrder`, `exchange.ModifyConditionOrder`, `exchange.CancelConditionOrder`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`, `exchange.GetHistoryConditionOrders`.
-
-Served through a fallback:
-
-- `exchange.GetRecords`: Native periods are 1m, 5m, 15m, 1h, 4h, 12h, 1d (GeckoTerminal's timeframes); other periods of a minute or longer are synthesized by the docker, while second-level periods are unavailable (there is no trade feed to build them from).
+Not supported (the call fails with an error and returns null): `exchange.GetTickers`, `exchange.GetRecords`, `exchange.GetTrades`, `exchange.GetHistoryOrders`, `exchange.ModifyOrder`, `exchange.CreateConditionOrder`, `exchange.ModifyConditionOrder`, `exchange.CancelConditionOrder`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`, `exchange.GetHistoryConditionOrders`.
 
 ##### Notes
 
 | Function | Behavior on KyberSwap |
 | - | - |
 | exchange.GetTicker() | Bid and ask are KyberSwap quotes for about $1000; there are no 24h statistics. The two sides are quoted separately, and when they cross both sides report the mid price |
-| exchange.GetDepth() | Derived from KyberSwap quotes at increasing sizes (one quote per level and side, queued with back-off and retries when rate-limited, so more levels take longer: about 20 seconds for 10); if a quote fails midway, the levels already obtained are returned (none are made up) with the reason in ```Info.partial```, and it fails only when no level was obtained |
-| exchange.GetRecords() | K-lines come from GeckoTerminal's pool-level data: an aggregator has no pools of its own, so the pair's pool (on any DEX) with the largest USD liquidity on GeckoTerminal is used (searched among the top 20 pools of each of the two tokens for one holding exactly this pair; the chosen pool is cached for an hour). Prices are that pool's trade prices (including the pool fee, so they may differ from the mid price of ```exchange.GetTicker()``` by about one pool fee) in quote per base, and ```Volume``` is in the base token; periods without trades repeat the previous close with zero volume, and the last bar may still be open. GeckoTerminal data lags by tens of seconds up to a minute and its public API allows about 10 requests per minute: bars of the same period are cached for a minute, requests queue inside the docker and wait and retry when rate-limited, and fail if that still does not succeed. Fails when no pool of the pair is found |
+| exchange.GetDepth() | Derived from KyberSwap quotes at increasing sizes; each level of the ask side approximates exact output and needs 3 to 5 quotes, so it takes correspondingly longer |
 | exchange.GetAssets() | Wallet balances of the native coin and of the tokens in the token table |
-| exchange.CreateOrder() | Swaps on chain immediately: a limit price is the worst acceptable fill, market orders are protected by the slippage setting; a market buy is sized in the quote currency. KyberSwap supports exact input only: a limit buy is executed as "spend at most amount × price and receive at least amount", so the amount actually bought may be slightly more than the order amount. The order extra parameter ```slippage``` overrides the slippage for that order; ```route``` does not apply to an aggregator and fails with ```route is not applicable to the KyberSwap aggregator``` if given |
+| exchange.CreateOrder() | Swaps on chain immediately: a limit price is the worst acceptable fill, market orders are protected by the slippage setting; a market buy is sized in the quote currency. KyberSwap supports exact input only: a limit buy is executed as "spend at most amount × price and receive at least amount", so the amount actually bought may be slightly more than the order amount. The order extra parameter ```slippage``` overrides the slippage for that order; ```route``` does not apply to an aggregator and fails if given |
 | exchange.GetOrder() | The order ID looks like ```ETH_USDC,0x…``` (the pair, a comma, then the transaction hash); the state comes from the transaction receipt, and the order is reported as canceled once the nonce of the original transaction has been taken by the cancel transaction (or another transaction). Filled amounts come from the router contract's ```Swapped``` event (which also covers the native coin) |
-| exchange.GetOrders() | Lists only the swap transactions sent by this exchange object during the current run that are not yet mined |
-| exchange.CancelOrder() | Sends a replacement transaction with the same nonce (a zero-amount transfer to itself) and waits for the result (at most 30 seconds by default, see ```exchange.IO("cancelWait", ...)```): returns ```true``` if the cancel transaction lands first; if the original order is already mined or lands first, it returns ```false``` (the cancel did not happen, but this is not a call error), with the reason in ```exchange.GetLastError()```; returns ```true``` on timeout, meaning the cancel has been submitted and ```exchange.GetOrder()``` reports the final state |
-
-##### API key and rate limits
-
-- Without an API key: requests go to the public endpoint ```https://aggregator-api.kyberswap.com``` and are rate-limited per client id (```x-client-id```, see ```exchange.IO("clientId")```) to 3 requests per second (30 per 10 seconds in the response headers). The docker queues KyberSwap requests within a process (at least about 0.34 seconds apart).
-- With an API key, set in the ```KyberSwap Api Key``` setting or with ```exchange.IO("kyberApiKey", key)```: requests go to the API gateway ```https://api.kyberswap.com/swap``` (same paths as the public endpoint) with the ```X-Api-Key``` header (```x-client-id``` is still sent), at a higher rate limit that depends on the key (KyberSwap's documentation gives no figure).
-- Getting a key: there is no self-service sign-up; email the KyberSwap business team at ```business@kyber.network```. KyberSwap no longer whitelists ```x-client-id``` values, so a higher limit is only available through an API key.
-- When rate-limited (HTTP 429), requests back off for the time in the ```x-ratelimit-reset-after``` response header (at most 10 seconds) or 1, 2 and 4 seconds, retrying at most 3 times; if still limited the call fails with ```rate limited (HTTP 429) after 4 attempts```, and without a key the error suggests setting one. ```exchange.GetDepth()``` quotes level by level and is the most likely to hit the limit.
-- A missing, invalid or expired key makes the gateway answer HTTP 401 and the call fails with ```KyberSwap API key rejected (HTTP 401: …)```; it does not fall back to the public endpoint; clear the key with ```exchange.IO("kyberApiKey", "")```.
-
-##### Cross-chain bridge
-
-```exchange.IO("bridge.*", ...)``` bridges tokens from this exchange object's chain to another chain through the bridges LI.FI aggregates (Across, Stargate, CCTP, deBridge, Mayan, Relay, NEAR Intents and more), between EVM chains and between EVM and Solana (from this exchange object's chain). LI.FI supplies the quote and transaction, and the docker approves, simulates with ```eth_call```, signs and broadcasts. Requests carry the integrator tag ```integrator=fmz``` and add no fee; fees in a quote such as ```LIFI Fixed Fee``` are LI.FI's and the bridges' own and are already deducted from ```toAmount```.
-
-Typical flow: ```bridge.quote``` for a quote → ```bridge.simulate``` to simulate → ```bridge.send``` to send → ```bridge.status``` every 10 to 30 seconds until ```DONE``` or ```FAILED```.
-
-- Bridging is asynchronous: when ```bridge.send``` returns, only the source-chain transaction has been broadcast; delivery takes seconds to tens of minutes (see ```executionDuration``` in the quote) and must be confirmed by polling ```bridge.status```; ```PARTIAL``` means a different token arrived on the destination chain and ```REFUNDED``` that the funds went back to the source chain.
-- Cross-VM transfers (EVM↔Solana) require ```toAddress```, checked against the destination chain's address format; funds sent to a wrong address cannot be recovered.
-- Risks: the security of bridge contracts and cross-chain messaging rests with each bridge; quotes move, and ```bridge.send``` re-quotes before sending; the destination wallet needs gas to use what arrives. Test with a small amount first.
-- Rate limits: without an API key LI.FI limits by outgoing IP, ```/quote``` to 75 requests per 2 hours (```bridge.quote```, ```bridge.simulate``` and ```bridge.send``` use one each, plus one more when re-quoting after an approval) and other endpoints to 100 per minute; strategies on the same docker share the quota. With a key set through ```exchange.IO("bridge.apiKey", key)``` the limit is 100 per minute. A rate-limited call fails with ```rate limited (HTTP 429 …)```.
+| exchange.CancelOrder() | Sends a replacement transaction with the same nonce and waits for the result (at most 30 seconds by default, see ```exchange.IO("cancelWait", ...)```): returns ```true``` if the cancel transaction lands first, ```false``` if the original order lands first, and ```true``` on timeout, meaning the cancel has been submitted |
 
 #### 1inch
 
@@ -28639,7 +29793,7 @@ Pairs are written as ```ETH_USDC```; the native coin (ETH, BNB, POL) and its wra
 | ```transfer``` | to, amount[, token] | Transfer the native coin or an ERC20 token out of the configured wallet (```token``` is a token name or contract address, the native coin when omitted); ```amount``` may be ```all``` (the native coin keeps the fee). Waits for the broadcast only, not for confirmation. | ```{txHash, from, to, token, tokenAddress, amount, raw}``` |
 | ```receipt``` | txHash[, waitMs] | Query the receipt of a transaction sent by this exchange object (an order, a transfer, ...), optionally waiting for confirmation (up to 10 minutes). For an order, pass the transaction hash after the comma in the order ID. | ```{txHash, status, blockNumber, gasUsed, fee}``` once mined, ```{txHash, pending: true, known}``` otherwise. |
 | ```route``` | symbol, side, qty | Quote only, no order. The aggregator has a single candidate route (such as ```1inch:ETH-USDC```); ```buy``` quotes receiving ```qty``` base (approximated with several exact-input quotes), ```sell``` quotes selling ```qty``` base. | ```{symbol, side, qty, best, quote, price, candidates}``` |
-| ```simulate``` | symbol, side, qty[, price[, stateOverride]] | Build the swap transaction with the order logic (quoting, price protection, building the transaction with 1inch) and only simulate it with ```eth_call```; nothing is signed, broadcast or paid. (more below the table) | ```{route, exactIn, amountIn, amountOut, quoted, executed, value, calls}```, plus ```allowanceOverride``` when an allowance was supplied. |
+| ```simulate``` | symbol, side, qty[, price[, stateOverride]] | Build the swap transaction with the order logic (quoting, price protection, building the transaction with 1inch) and only simulate it with ```eth_call```; nothing is signed, broadcast or paid. The route description then lists the liquidity sources it goes through. The sixth argument (route type filter) does not apply to an aggregator and fails if given. | ```{route, exactIn, amountIn, amountOut, quoted, executed, value, calls}``` |
 | ```token``` | [name, address] | Register a token so it can be used in pairs; without arguments, list the token table. | ```{symbol, address, decimals}``` when registering, an array of ```{symbol, address, decimals, native}``` when listing. |
 | ```wrap``` | amount | Wrap the native coin into its wrapped token (e.g. ETH→WETH), 1:1 without slippage, gas only; ```all``` is not accepted (gas must remain). | ```{txHash, action, from, to, amount, raw}``` |
 | ```unwrap``` | amount | Unwrap the wrapped token into the native coin (e.g. WETH→ETH); ```amount``` may be ```all```. | ```{txHash, action, from, to, amount, raw}``` |
@@ -28651,64 +29805,30 @@ Pairs are written as ```ETH_USDC```; the native coin (ETH, BNB, POL) and its wra
 | ```base``` | [url] | Without an argument, returns the current node address; with an address, switches the node. Several nodes are written as one comma-separated string (with an array only the first address is used). After a switch, the first request checks which chain the node is on and fails if it is not the configured chain. | The previous address. |
 | ```sendBase``` | url | Set a node used only to broadcast transactions (a private transaction channel). Unlike Web3, it does not return the previous address, does not query when called without an argument, and an empty string does not clear the setting. | ```true``` |
 | ```address``` | — | The wallet address of the configured private key (lowercase, starting with ```0x```). | — |
-| ```contracts``` | — | The deployment on this chain, with the same fields as the Uniswap exchange object: ```dex``` is ```1inch``` and ```router``` is the 1inch router contract; ```quoterV2```, ```v3Factory```, ```v4``` and the like are the chain's Uniswap deployment (used to list markets and estimate USD prices), and ```aerodrome``` is ```null```; ```tokenList``` gives the generation time of the built-in token table and its token count on this chain. | — |
-| ```bridge.chains``` | — | Chains supported by the bridge (LI.FI): EVM chains and Solana, cached for an hour. | An array of ```{id, key, name, chainType, nativeToken}```, ```chainType``` being ```EVM``` or ```SVM```. |
-| ```bridge.tokens``` | [chain] | Tokens LI.FI knows on a chain (this chain by default), cached for an hour. | An array of ```{symbol, address, decimals, name, priceUSD}```. |
-| ```bridge.quote``` | params | A bridge quote (read-only) from this exchange object's chain. (more below the table) | ```{tool, toolName, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, fromAmountRaw, toAmountRaw, toAmountMinRaw, fromAmountUSD, toAmountUSD, slippage, toAddress, feeCosts, gasCosts, executionDuration, approvalAddress, steps, transactionId, request}```: amounts are in token units (```*Raw``` in the smallest unit); ```toAmountMin``` is the amount guaranteed after slippage; ```feeCosts``` is ```[{name, amount, token, amountUSD, percentage, included}]``` (fees with ```included``` ```false``` are paid on top); ```gasCosts``` estimates source-chain gas; ```executionDuration``` is the expected time in seconds; ```approvalAddress``` is the contract to approve (```null``` for the native coin and on Solana); ```steps``` lists the steps (```cross``` bridges, ```swap``` swaps); ```request``` echoes the parameters. |
-| ```bridge.simulate``` | params\|quote[, stateOverride] | Re-quotes and runs LI.FI's transaction with ```eth_call```: nothing is signed, broadcast or paid. (more below the table) | The ```bridge.quote``` result plus ```simulated``` (```true```), ```to```, ```value``` and ```walletBalance```, and ```allowanceOverride``` when an allowance was supplied. |
-| ```bridge.send``` | params\|quote | Bridges out: re-quotes → checks the balance → approves LI.FI's ```approvalAddress``` when the token allowance is short (following ```exchange.IO("approve")``` ```exact```/```max```, resetting USDT-like tokens to zero first, waiting for the approval to be mined and re-quoting after it) → simulates with ```eth_call``` → signs and broadcasts, with a gas limit of the larger of the ```eth_estimateGas``` estimate × ```gasMultiplier``` and LI.FI's suggested ```gasLimit``` (bridge contracts call into other contracts, so the estimate can fall short; only the gas used is charged). (more below the table) | ```{txHash, tool, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, toAddress, value, transactionId}```; ```txHash``` is the source-chain transaction, whose receipt ```receipt``` returns. |
-| ```bridge.status``` | txHash[, options] | Bridge progress (LI.FI ```/status```) for the source-chain transaction hash returned by ```bridge.send```; ```options``` may give ```{toChain, bridge}``` to speed up the lookup. (more below the table) | ```{status, substatus, substatusMessage, tool, sending, receiving, fromAddress, toAddress, explorer, bridgeExplorer}```: ```status``` is ```NOT_FOUND```, ```INVALID```, ```PENDING```, ```DONE``` or ```FAILED```; when ```DONE```, ```substatus``` is ```COMPLETED``` (delivered as quoted), ```PARTIAL``` (a different token arrived) or ```REFUNDED```; ```sending``` and ```receiving``` are ```{txHash, txLink, chainId, amount, amountRaw, token, timestamp}```, with ```receiving.amount``` and ```receiving.token``` being what actually arrived. |
-| ```bridge.apiKey``` | [key] | Sets the LI.FI API key (header ```x-lifi-api-key```, for this exchange object only, never echoed); ```""``` clears it and no argument just queries. Without a key requests are rate-limited per outgoing IP, see below. | Whether a key is set (a boolean). |
+| ```contracts``` | — | The deployment on this chain, with the same fields as the Uniswap exchange object: ```dex``` is ```1inch``` and ```router``` is the 1inch router contract; ```quoterV2```, ```v3Factory```, ```v4``` and the like are the chain's Uniswap deployment (used to list markets and estimate USD prices), and ```aerodrome``` is ```null```. | — |
 
-The rest of the longer descriptions in the table:
-
-- ```simulate```: The route description then lists the liquidity sources it goes through. The sixth argument (route type filter) does not apply to an aggregator and fails with ```route is not applicable to the 1inch aggregator``` if given. For a swap paid with a token (such as buying with USDC), when the wallet's allowance for the router falls short (```approve``` defaults to ```exact```, which approves only right before a real order), the allowance is supplied automatically through an ```eth_call``` state override before simulating, and ```allowanceOverride``` in the result lists what was supplied; a ```stateOverride``` you pass is merged with it, and storage slots you set are not overwritten. If the token's allowance storage slot cannot be located, a failing simulation says the token is not approved yet and needs an approval or your own ```stateOverride```. Balances are not supplied automatically.
-- ```bridge.quote```: ```params```: ```toChain``` (destination chain: a chain ID, a LI.FI chain key such as ```arb```, or a name such as ```Arbitrum``` or ```Solana```), ```fromToken``` (a token on this chain: a name in the token table or a contract address), ```toToken``` (a token on the destination chain: a name or address resolved by LI.FI to its canonical token, so ```USDC``` on Arbitrum is native USDC, not USDC.e), ```amount``` (of ```fromToken```, in token units; digits beyond the token's decimals are dropped), ```toAddress``` (the recipient; defaults to this wallet when the destination is an EVM chain, required, as a Solana address, when the destination is Solana), ```slippage``` (defaults to the ```exchange.IO("slippage")``` value), ```order``` (```CHEAPEST``` or ```FASTEST```), ```allowBridges```/```denyBridges``` (LI.FI bridge names, an array or comma-separated). Unknown keys are errors.
-- ```bridge.simulate```: A short token allowance is supplied as unlimited through a state override (as in ```simulate```; ```allowanceOverride``` in the result lists it); balances are not supplied, pass them yourself in ```stateOverride``` (the third ```eth_call``` argument). A failure caused by a short balance reports the wallet balance.
-- ```bridge.send```: The native coin needs no approval. Only the approval is awaited, not the bridge transaction; bridging is asynchronous, so poll ```bridge.status```. Given a ```bridge.quote``` result, it re-quotes from its ```request``` (quotes move; the new quote applies and ```toAmountMin``` is enforced on chain).
-- ```bridge.status```: Right after broadcasting LI.FI may not have indexed it yet and returns ```NOT_FOUND```; keep polling (every 10 to 30 seconds).
-
-For the common command ```currency``` see `exchange.IO`.
-
-The common command ```api``` is not supported (the call fails with an error and returns null).
+For the common commands ```api``` and ```currency``` see `exchange.IO`.
 
 ##### Function Support
 
-Not supported (the call fails with an error and returns null): `exchange.GetTickers`, `exchange.GetTrades`, `exchange.GetHistoryOrders`, `exchange.ModifyOrder`, `exchange.CreateConditionOrder`, `exchange.ModifyConditionOrder`, `exchange.CancelConditionOrder`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`, `exchange.GetHistoryConditionOrders`.
-
-Served through a fallback:
-
-- `exchange.GetRecords`: Native periods are 1m, 5m, 15m, 1h, 4h, 12h, 1d (GeckoTerminal's timeframes); other periods of a minute or longer are synthesized by the docker, while second-level periods are unavailable (there is no trade feed to build them from).
+Not supported (the call fails with an error and returns null): `exchange.GetTickers`, `exchange.GetRecords`, `exchange.GetTrades`, `exchange.GetHistoryOrders`, `exchange.ModifyOrder`, `exchange.CreateConditionOrder`, `exchange.ModifyConditionOrder`, `exchange.CancelConditionOrder`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`, `exchange.GetHistoryConditionOrders`.
 
 ##### Notes
 
 | Function | Behavior on OneInch |
 | - | - |
 | exchange.GetTicker() | Bid and ask are 1inch quotes for about $1000; there are no 24h statistics. The two sides are quoted separately, and when they cross both sides report the mid price |
-| exchange.GetDepth() | Derived from 1inch quotes at increasing sizes (one quote per level and side, queued with back-off and retries when rate-limited, one per second on the free plan, so 10 levels take about 25 seconds); if a quote fails midway, the levels already obtained are returned (none are made up) with the reason in ```Info.partial```, and it fails only when no level was obtained |
-| exchange.GetRecords() | K-lines come from GeckoTerminal's pool-level data: an aggregator has no pools of its own, so the pair's pool (on any DEX) with the largest USD liquidity on GeckoTerminal is used (searched among the top 20 pools of each of the two tokens for one holding exactly this pair; the chosen pool is cached for an hour). Prices are that pool's trade prices (including the pool fee, so they may differ from the mid price of ```exchange.GetTicker()``` by about one pool fee) in quote per base, and ```Volume``` is in the base token; periods without trades repeat the previous close with zero volume, and the last bar may still be open. GeckoTerminal data lags by tens of seconds up to a minute and its public API allows about 10 requests per minute: bars of the same period are cached for a minute, requests queue inside the docker and wait and retry when rate-limited, and fail if that still does not succeed. Fails when no pool of the pair is found |
+| exchange.GetDepth() | Derived from 1inch quotes at increasing sizes; each level of the ask side approximates exact output and needs 3 to 5 quotes, so it takes correspondingly longer |
 | exchange.GetAssets() | Wallet balances of the native coin and of the tokens in the token table |
-| exchange.CreateOrder() | Swaps on chain immediately: a limit price is the worst acceptable fill, market orders are protected by the slippage setting; a market buy is sized in the quote currency. 1inch supports exact input only: a limit buy is executed as "spend at most amount × price and receive at least amount", so the amount actually bought may be slightly more than the order amount. The order extra parameter ```slippage``` overrides the slippage for that order; ```route``` does not apply to an aggregator and fails with ```route is not applicable to the 1inch aggregator``` if given |
+| exchange.CreateOrder() | Swaps on chain immediately: a limit price is the worst acceptable fill, market orders are protected by the slippage setting; a market buy is sized in the quote currency. 1inch supports exact input only: a limit buy is executed as "spend at most amount × price and receive at least amount", so the amount actually bought may be slightly more than the order amount. The order extra parameter ```slippage``` overrides the slippage for that order; ```route``` does not apply to an aggregator and fails if given |
 | exchange.GetOrder() | The order ID looks like ```ETH_USDC,0x…``` (the pair, a comma, then the transaction hash); the state comes from the transaction receipt, and the order is reported as canceled once the nonce of the original transaction has been taken by the cancel transaction (or another transaction). The 1inch router has no unified fill event: tokens are counted from the wallet's incoming and outgoing transfers in the transaction receipt; when the native coin is received, the amount is the wallet's balance difference between the transaction's block and the previous block plus the fee (inaccurate if the wallet has other transactions in the same block) |
-| exchange.GetOrders() | Lists only the swap transactions sent by this exchange object during the current run that are not yet mined |
-| exchange.CancelOrder() | Sends a replacement transaction with the same nonce (a zero-amount transfer to itself) and waits for the result (at most 30 seconds by default, see ```exchange.IO("cancelWait", ...)```): returns ```true``` if the cancel transaction lands first; if the original order is already mined or lands first, it returns ```false``` (the cancel did not happen, but this is not a call error), with the reason in ```exchange.GetLastError()```; returns ```true``` on timeout, meaning the cancel has been submitted and ```exchange.GetOrder()``` reports the final state |
+| exchange.CancelOrder() | Sends a replacement transaction with the same nonce and waits for the result (at most 30 seconds by default, see ```exchange.IO("cancelWait", ...)```): returns ```true``` if the cancel transaction lands first, ```false``` if the original order lands first, and ```true``` on timeout, meaning the cancel has been submitted |
 
 The 1inch free tier allows 1 request per second; the connector queues requests automatically and waits and retries when rate-limited (HTTP 429).
 
-##### Cross-chain bridge
-
-```exchange.IO("bridge.*", ...)``` bridges tokens from this exchange object's chain to another chain through the bridges LI.FI aggregates (Across, Stargate, CCTP, deBridge, Mayan, Relay, NEAR Intents and more), between EVM chains and between EVM and Solana (from this exchange object's chain). LI.FI supplies the quote and transaction, and the docker approves, simulates with ```eth_call```, signs and broadcasts. Requests carry the integrator tag ```integrator=fmz``` and add no fee; fees in a quote such as ```LIFI Fixed Fee``` are LI.FI's and the bridges' own and are already deducted from ```toAmount```.
-
-Typical flow: ```bridge.quote``` for a quote → ```bridge.simulate``` to simulate → ```bridge.send``` to send → ```bridge.status``` every 10 to 30 seconds until ```DONE``` or ```FAILED```.
-
-- Bridging is asynchronous: when ```bridge.send``` returns, only the source-chain transaction has been broadcast; delivery takes seconds to tens of minutes (see ```executionDuration``` in the quote) and must be confirmed by polling ```bridge.status```; ```PARTIAL``` means a different token arrived on the destination chain and ```REFUNDED``` that the funds went back to the source chain.
-- Cross-VM transfers (EVM↔Solana) require ```toAddress```, checked against the destination chain's address format; funds sent to a wrong address cannot be recovered.
-- Risks: the security of bridge contracts and cross-chain messaging rests with each bridge; quotes move, and ```bridge.send``` re-quotes before sending; the destination wallet needs gas to use what arrives. Test with a small amount first.
-- Rate limits: without an API key LI.FI limits by outgoing IP, ```/quote``` to 75 requests per 2 hours (```bridge.quote```, ```bridge.simulate``` and ```bridge.send``` use one each, plus one more when re-quoting after an approval) and other endpoints to 100 per minute; strategies on the same docker share the quota. With a key set through ```exchange.IO("bridge.apiKey", key)``` the limit is 100 per minute. A rate-limited call fails with ```rate limited (HTTP 429 …)```.
-
 #### OKX DEX
 
-Swaps tokens on-chain through the OKX DEX aggregator API, with wallets derived from the configured mnemonic (EVM chains, Tron, Solana, TON, Aptos, SUI, Starknet). Only market swaps on a single chain are supported; tickers, K-lines, trades and token lists come from the OKX DEX market API. API credentials default to the platform's built-in project credentials and can be replaced with your own OKX API credentials via ```exchange.IO("config", ...)``` (apply for them on the OKX developer portal https://web3.okx.com/onchainos/dev-portal; the source of each field is described under that command). Each chain always uses the first account of the mnemonic (```m/44'/60'/0'/0/0``` on EVM chains); choosing another account index or importing a private key is not supported.
+Swaps tokens on-chain through the OKX DEX aggregator API, with wallets derived from the configured mnemonic (EVM chains, Tron, Solana, TON, Aptos, SUI, Starknet). Only market swaps on a single chain are supported; tickers, K-lines, trades and token lists come from the OKX DEX market API. API credentials default to the platform's built-in project credentials and can be replaced with your own OKX API credentials via ```exchange.IO("config", ...)```.
 
 ##### Names and Configuration
 
@@ -28716,7 +29836,7 @@ Swaps tokens on-chain through the OKX DEX aggregator API, with wallets derived f
 
 | Field | Required | Description |
 | - | - | - |
-| Mnemonic Phrase | Yes | The wallet mnemonic (BIP39, 12 or 24 words; private keys are not supported) from which the wallet address on each chain is derived, using only the first account of each chain (see the notes for the derivation paths). The OKX API credentials are not entered here; see ```exchange.IO("config", ...)```. |
+| Mnemonic Phrase | Yes | The wallet mnemonic (BIP39, 12 or 24 words) from which the wallet address on each chain is derived. |
 
 ##### Trading Pairs and Contract Codes
 
@@ -28728,38 +29848,30 @@ A token may be a token name or a contract address (such as ```1:0xa0b8..._USD```
 
 ##### Exchange-specific IO Commands
 
-| Command | Arguments | Description | Returns |
-| - | - | - | - |
-| ```config``` | string(JSON) | Set the OKX API credentials; the fields ```ApiKey```, ```SecretKey```, ```Passphrase``` and ```Project``` are all required. (more below the table) | ```true``` on success. |
-| ```key``` | string | Replace the wallet mnemonic (12 or 24 words) at runtime; the current wallet is kept if parsing fails. | ```true``` on success. |
-| ```address``` | [chainIndex] | Get the wallet address on a chain (the chain may be a chain index or a chain name); Ethereum (1) when omitted. | — |
-| ```addresses``` | — | Export the wallet addresses on all chains. | An object keyed by chain index with the addresses as values. |
-| ```slippage``` | [number] | Read without an argument, set with one; swap slippage in percent, range (0, 50], default 0.5. | The current value when reading, ```true``` when set. |
-| ```gasLevel``` | [string] | Read without an argument, set with one; gas level: ```average``` (default), ```fast```, ```slow```. | The current value when reading, ```true``` when set. |
-| ```gasMultiplier``` | [number] | Read without an argument, set with one; multiplier of the gas limit of EVM transactions (≥1, default 1.5). | The current value when reading, ```true``` when set. |
-| ```allChainBalance``` | [bool] | Read without an argument, set with one; whether ```exchange.GetAssets()``` queries balances on all chains (only Ethereum by default); when on, ```Equity``` of ```exchange.GetAccount()``` also covers all chains. (more below the table) | The current value when reading, ```true``` when set. |
-| ```rpc``` | [chain[, url]] | Query or set custom RPC addresses per chain; ```chain``` must be the chain index (such as ```1```, ```501```), a chain name has no effect. (more below the table) | ```true``` when set or deleted. |
-| ```regChain``` | chainId, alias | Register a chain alias that can then replace the chain index in symbols. Aliases are case-insensitive, must not contain ```_``` or ```:```, and are at most 20 characters. | ```true``` on success. |
-| ```regToken``` | chainId, alias, address | Bind a token name to a contract address on a chain (```chainId``` must be the chain index); a bound name takes precedence over the OKX token list and is case-insensitive when used; naming rules as for ```regChain```. | ```true``` on success. |
-| ```quote``` | symbol, amount | Read-only quote preview (two-sided symbol, for example ```1:USDC_1:ETH```, both sides on one chain); ```amount``` is the quantity of the first token (spent), and the ```slippage``` setting applies; no on-chain transaction is built. | ```{toAmount, fromAmount, priceImpact, estimateGasFee, routerList, info}``` |
-| ```allowance``` | symbol[, spender] | Query the wallet's ERC-20 allowance for the spender (first token of the symbol); without a spender, the OKX DEX approval contract is used. EVM chains only; configure the chain's RPC with ```exchange.IO("rpc", chainIndex, url)``` first; the native coin has no allowance and fails. | The allowance, as a decimal string in the smallest unit. |
-| ```approve``` | symbol[, amount] | ERC-20 approval for the first token of the symbol (EVM chains only); ```amount``` is in token units (scaled by the token's decimals), the maximum amount when omitted; waits for the transaction to be confirmed (up to 60 seconds). | The transaction hash. |
-| ```signTx``` | tx, chainIndex | Sign only, without broadcasting. ```tx``` is the transaction JSON (a string or an object); ```chainIndex``` may be a chain index or a chain name. | The signed transaction (a string). |
-| ```broadcast``` | signedTx, chainIndex | Broadcast a signed transaction. | ```{txHash, orderId}``` |
-| ```marketSupportedChains``` | — | Read-only list of chains supported by the market API. | — |
-| ```balanceSupportedChains``` | — | Read-only list of chains supported by the balance API. | — |
-| ```swapSupportedChains``` | — | Read-only list of chains supported by the swap API. | — |
-| ```broadcastSupportedChains``` | — | Read-only list of chains supported by the broadcast API. | — |
-| ```tokenSearch``` | chains, search | Search tokens by name or address (```chains``` is a comma-separated list of chain indexes); returns the raw data of the OKX API. | — |
-| ```allTokens``` | chainIndex | List all swappable tokens on a chain; returns the raw data of the OKX API. | — |
-
-The rest of the longer descriptions in the table:
-
-- ```config```: Without it the platform's built-in project credentials are used (one rate limit shared by all users, so frequent queries run into HTTP 429 more easily).
-
-Apply for credentials on the OKX developer portal: https://web3.okx.com/onchainos/dev-portal (the old ```/build/dev-portal``` address no longer works). After logging in, create a project, then create an API key under it: ```Project``` is the project's Project ID; ```ApiKey``` and ```SecretKey``` are the API key and secret key generated with the API key (the secret key is shown only once, at creation); ```Passphrase``` is the passphrase you set when creating the API key. This ```SecretKey``` is the OKX API secret, unrelated to the wallet mnemonic entered in the configuration.
-- ```allChainBalance```: The all-chain query groups chains by wallet address (EVM chains share one address, up to 50 chains per request; every other chain is queried on its own) and waits 1 second between consecutive requests to stay under the rate limit, so one query takes over ten seconds (```exchange.GetAccount()``` also queries the valuation, doubling the requests); do not poll it frequently.
-- ```rpc```: Without arguments returns all, with only a chain returns that chain's address (an empty string if not set), an empty url deletes it. On EVM chains, allowance queries (```allowance``` and the automatic check before orders) require an RPC, which also backs up OKX's nonce API when it fails; Solana, Tron, SUI and TON signing query on-chain state through the chain's public node when none is configured. Unichain (```130```) comes with its official RPC preset.
+| Command | Arguments | Description |
+| - | - | - |
+| ```config``` | string(JSON) | Set the OKX API credentials; the fields ```ApiKey```, ```SecretKey```, ```Passphrase``` and ```Project``` are all required. Without it the platform's built-in project credentials are used. |
+| ```key``` | string | Replace the wallet mnemonic (12 or 24 words) at runtime; the current wallet is kept if parsing fails. |
+| ```address``` | [chainIndex] | Get the wallet address on a chain; Ethereum (1) when omitted. |
+| ```addresses``` | — | Export the wallet addresses on all chains. |
+| ```slippage``` | [number] | Read without an argument, set with one; swap slippage in percent, range (0, 50], default 0.5. |
+| ```gasLevel``` | [string] | Read without an argument, set with one; gas level: ```average``` (default), ```fast```, ```slow```. |
+| ```gasMultiplier``` | [number] | Read without an argument, set with one; gas multiplier (≥1, default 1.5). |
+| ```allChainBalance``` | [bool] | Read without an argument, set with one; whether ```exchange.GetAccount()``` and ```exchange.GetAssets()``` query balances on all chains (only Ethereum by default). |
+| ```rpc``` | [chain[, url]] | Query or set custom RPC addresses per chain; without arguments returns all, with only a chain returns that chain's address, an empty url deletes it. On-chain reads such as allowance queries need an RPC. |
+| ```regChain``` | chainId, alias | Register a chain alias that can then replace the chain index in symbols. |
+| ```regToken``` | chainId, alias, address | Bind a token name to a contract address on a chain. |
+| ```quote``` | symbol, amount | Read-only quote preview (two-sided symbol, for example ```1:USDC_1:ETH```); no on-chain transaction is built. |
+| ```allowance``` | symbol[, spender] | Query the wallet's ERC-20 allowance for the spender (in the smallest unit); without a spender, the OKX DEX router contract is used. |
+| ```approve``` | symbol[, amount] | ERC-20 approval for the first token of the symbol, the maximum amount when ```amount``` is omitted; waits for the transaction to be confirmed. Returns: The transaction hash. |
+| ```signTx``` | tx, chainIndex | Sign only, without broadcasting. |
+| ```broadcast``` | signedTx, chainIndex | Broadcast a signed transaction. |
+| ```marketSupportedChains``` | — | Read-only list of chains supported by the market API. |
+| ```balanceSupportedChains``` | — | Read-only list of chains supported by the balance API. |
+| ```swapSupportedChains``` | — | Read-only list of chains supported by the swap API. |
+| ```broadcastSupportedChains``` | — | Read-only list of chains supported by the broadcast API. |
+| ```tokenSearch``` | chains, search | Search tokens by name or address (```chains``` is a comma-separated list of chain indexes). |
+| ```allTokens``` | chainIndex | List all swappable tokens on a chain. |
 
 For the common commands ```api```, ```base``` and ```currency``` see `exchange.IO`.
 
@@ -28774,14 +29886,10 @@ Served through a fallback:
 ##### Notes
 
 - Only market orders (```price``` of -1) are supported; limit orders fail, and cross-chain swaps are not supported. For a sell, ```amount``` is the quantity of the symbol's first token; for a buy, it is the quantity of the second token (the amount spent). The order ID is ```<symbol>,<transaction hash>```; query the swap result with ```exchange.GetOrder()```.
-- Order extra parameters are passed as-is to the OKX DEX swap API (for example ```slippagePercent``` overrides the slippage for that order); swaps on Solana carry no ```gasLevel``` and set ```computeUnitPrice``` and ```computeUnitLimit``` automatically instead, which can also be given in the extra parameters.
-- For a swap that spends an ERC-20 token (not the native coin) on an EVM chain, the allowance is checked before the order, and if it is insufficient an unlimited approval transaction is sent and confirmed first; checking the allowance needs an RPC for that chain, and the order fails if none is configured with ```exchange.IO("rpc", chainIndex, url)```.
-- ```exchange.GetOrder()``` queries OKX's swap record by transaction hash, with quantities measured in the first token (base token) of the symbol in the order ID, the same way for buys and sells: a swap that receives the base token is a buy and one that spends it is a sell (```Type```); ```Amount``` is the quantity of the token spent (for a buy, the quote token spent, as the ```amount``` of the order); ```DealAmount``` is the quantity of base token traded (bought for a buy, sold for a sell); ```AvgPrice``` is quote token ÷ base token. ```DealAmount``` and ```AvgPrice``` are given only once the swap succeeded and are 0 when it failed or is not finished; while the transaction is not yet indexed the order is reported as pending.
-- When OKX rate-limits a request (HTTP 429, error code 50011), the request waits 1, 2 and 4 seconds and is retried, at most 3 times, before the error is reported.
+- For a swap that spends an ERC-20 token (not the native coin) on an EVM chain, the allowance is checked before the order, and if it is insufficient an approval transaction is sent and confirmed first; checking the allowance needs an RPC for that chain, and the order fails if none is configured with ```exchange.IO("rpc", chain, url)```.
 - There is no order book and no resting orders on-chain: ```exchange.GetDepth()```, ```exchange.GetOrders()```, ```exchange.CancelOrder()``` and similar functions report an error and return null.
-- ```exchange.GetTickers()``` returns the tokens of the 24h volume leaderboard on Ethereum (chain index 1), not all tokens; ```exchange.GetMarkets()``` lists the swappable tokens on Ethereum (tokens sharing a name on the same chain are left out).
-- ```exchange.GetAssets()``` queries balances on Ethereum only by default, with asset names written as ```chain:token``` (an asset for which OKX gives no token name uses its contract address in place of the name); use ```exchange.IO("allChainBalance", true)``` for all chains. ```exchange.GetAccount()``` queries the chains of the two tokens of the current pair and takes ```Stocks``` (left token) and ```Balance``` (right token; 0 when quoted in ```USD```) by chain index and contract address, whether the pair is written with chain indexes, chain names or contract addresses.
-- The wallet can only be derived from the mnemonic, always with the first account of each chain; choosing an account index or importing a private key is not supported. EVM chains (Ethereum, BSC, Base, Arbitrum and others share one address) use ```m/44'/60'/0'/0/0```, which is account 1 of the mnemonic in wallets such as MetaMask; accounts 2 and later cannot be used. Other chains: ETC ```m/44'/61'/0'/0/0```; Tron ```m/44'/195'/0'/0/0```; Bitcoin ```m/86'/0'/0'/0/0``` (Taproot address ```bc1p…```); Litecoin ```m/49'/2'/0'/0/0``` (P2SH-SegWit); Dogecoin ```m/44'/3'/0'/0/0```, Dash ```m/44'/5'/0'/0/0```, Bitcoin Cash ```m/44'/145'/0'/0/0```; Osmosis ```m/44'/118'/0'/0/0```; Stacks ```m/44'/5757'/0'/0/0```; Solana ```m/44'/501'/0'/0'```; Aptos ```m/44'/637'/0'/0'/0'```; SUI ```m/44'/784'/0'/0'/0'```; TON ```m/44'/607'/0'``` (W5R1 wallet contract address); Starknet derives ```m/44'/9004'/0'/0/0``` from the EVM private key as the seed. Check an address with ```exchange.IO("address", chain)```.
+- ```exchange.GetTickers()``` returns a chain's volume leaderboard, not all tokens.
+- ```exchange.GetAccount()``` and ```exchange.GetAssets()``` query balances on Ethereum only by default, with asset names written as ```chain:token```; use ```exchange.IO("allChainBalance", true)``` for all chains.
 
 ### Prediction Markets
 
@@ -28793,7 +29901,7 @@ A prediction market on the Polygon chain. The exchange object places orders and 
 
 ##### Names and Configuration
 
-```exchange.GetName()```: ```Futures_Polymarket``` (Prediction market); aliases: Futures_Polymarket.
+```exchange.GetName()```: ```Futures_Polymarket``` (Prediction market).
 
 | Field | Required | Description |
 | - | - | - |
@@ -28879,7 +29987,7 @@ Simulation: There is no simulated trading; every call uses real funds on the Pol
 
 - Prices are USDC per share, between 0 and 1, truncated to the market's price step (```TickSize``` of ```exchange.GetMarkets()```: 0.1/0.01/0.001/0.0001); a price above 1 is sent as 1 minus one step. Quantities are shares, truncated to 2 decimals; the minimum order size is ```MinQty``` (commonly 5 shares), which is not pre-checked, leaving rejection to the exchange.
 - Market orders (price ```-1```, or ```type: "market"``` given in the order parameters, which ignores the price): the CLOB only has limit orders, so the connector walks the opposite side of the book to the level that covers the order quantity (the last level if the book is too thin) and sends that level's price × (1 ± slippage) as the limit price, with a default slippage of 0.01; an empty opposite side is an error. Buy and sell quantities are both in shares. The result is still a GTC order and any unfilled part stays on the book; to fill immediately or cancel, pass ```{tif: "ioc"}``` (FAK) or ```{tif: "fok"}``` as the last argument, e.g. ```exchange.CreateOrder(symbol, "buy", -1, 10, {tif: "ioc"})```.
-- Other order parameters go in the last object argument, e.g. ```exchange.CreateOrder(symbol, "buy", price, amount, {orderType: "GTD", expiration: 1830000000})``` (the old forms ```"buy;{\"orderType\":\"GTD\"}"``` and ```"buy;slippage=0.02"``` still work): ```orderType``` (```GTC``` by default, ```GTD```, ```FOK```, ```FAK```), ```expiration``` (required for GTD, Unix seconds, more than 60 seconds ahead; an error for non-GTD orders), ```postOnly``` (GTC/GTD only), ```deferExec``` (passed to the exchange as is), ```slippage``` (market-order slippage).
+- Other order parameters go after the order side, e.g. ```exchange.CreateOrder(symbol, "buy;{\"orderType\":\"GTD\",\"expiration\":1830000000}", price, amount)``` or ```"buy;slippage=0.02"```: ```orderType``` (```GTC``` by default, ```GTD```, ```FOK```, ```FAK```), ```expiration``` (required for GTD, Unix seconds, more than 60 seconds ahead; an error for non-GTD orders), ```postOnly``` (GTC/GTD only), ```deferExec``` (passed to the exchange as is), ```slippage``` (market-order slippage).
 - ```exchange.GetOrders()``` and ```exchange.GetPositions()``` without a symbol cover all markets; ```exchange.GetHistoryOrders()``` without a symbol covers only the current instrument, and an empty string covers all.
 - ```exchange.GetHistoryOrders()``` is built from the account's trade records: one row per fill (status filled; an order filled in several trades appears several times), and canceled or never-filled orders do not appear; ```since``` may be milliseconds or seconds, and at most 300 rows are returned when ```limit``` is not given.
 - ```exchange.GetTicker()``` reads the outcome's own order book and last trade price; ```High``` and ```Low``` are the current best ask and best bid (there is no 24-hour high/low), and ```Volume``` is the 24-hour volume of the whole market (both outcomes). ```exchange.GetTickers()``` comes from the Gamma market list, with the second outcome's prices derived from the first as ```1 - x```.
@@ -28891,7 +29999,7 @@ Securities brokers and futures: the docker must be able to reach the broker's ga
 
 #### Futu Securities
 
-Trades Hong Kong, US and China A-share (Stock Connect) securities and futures through Futu's ```FutuOpenD``` gateway, live or paper. A [```FutuOpenD```](https://www.futunn.com/download/OpenAPI?lang=zh-CN) reachable from the docker must be running (the server address in the exchange configuration, ```127.0.0.1:11111``` on the local machine by default). The Futu ID logs in inside ```FutuOpenD```; the exchange configuration only holds the ```FutuOpenD``` address and the Futu trade password. RSA encryption must be turned off in ```FutuOpenD``` (the docker talks to it over the plain-text protocol). For configuring the exchange object and running ```FutuOpenD```, see the [Futu Securities configuration guide](https://www.fmz.com/bbs-topic/10185).
+Trades Hong Kong, US and China A-share (Stock Connect) securities and futures through Futu's ```FutuOpenD``` gateway, live or paper. A [```FutuOpenD```](https://www.futunn.com/download/OpenAPI?lang=zh-CN) reachable from the docker must be running (the server address in the exchange configuration, ```127.0.0.1:11111``` on the local machine by default). For configuring the exchange object and running ```FutuOpenD```, see the [Futu Securities configuration guide](https://www.fmz.com/bbs-topic/10185).
 
 ##### Names and Configuration
 
@@ -28911,40 +30019,36 @@ Instrument codes are written ```code.market``` and set with ```exchange.SetContr
 
 ##### Exchange-specific IO Commands
 
-| Command | Arguments | Description | Returns |
-| - | - | - | - |
-| ```refresh``` | bool | Whether trade queries (GetOrder, GetOrders, GetPositions, GetAccount, GetAssets) refresh the OpenD cache; refreshes by default, pass ```false``` to use the cache, and nothing changes when no argument is given. (more below the table) | — |
-| ```accounts``` | — | Get the full list of trading accounts returned by Futu (raw data, including accounts that do not match the live/paper setting and are not used). | — |
-| ```lock``` | — | Lock trading. | Null on success. |
-| ```unlock``` | — | Unlock trading with the configured trade password. Trade requests also unlock once automatically and retry when Futu asks for unlocking, so a manual call is usually unnecessary. | Null on success. |
-| ```instrument``` | symbol | Get the static information of an instrument, for example ```exchange.IO("instrument", "00700.HK")```; instruments queried this way appear in ```exchange.GetMarkets()```. | ```{instrument, InstrumentID, InstrumentName, VolumeMultiple, IsTrading, SecType, info, ...}```; ```VolumeMultiple``` is the lot size (the contract multiplier for options and futures) and ```info``` is Futu's raw static information. |
-| ```timeout``` | number | Set the timeout for communication with OpenD (milliseconds); 20000 by default, clamped to 100–600000. | ```{"ok": true, "timeout": effective milliseconds}``` |
-| ```statusDetail``` | — | Get connection status details. | ```{"connected":..., "server":..., "simulate":...}``` |
-| ```historyKlines``` | object | Get historical K-lines over a time range (Futu's historical K-line interface, which has a quota); parameter ```{symbol, interval, begin, end, limit}```: ```symbol``` is required (the current instrument is not filled in); ```interval``` is in seconds and must be one of the native periods of ```exchange.GetRecords()```; ```begin``` and ```end``` are dates in ```YYYY-MM-DD``` form, defaulting to the last 7 days plus ```interval``` × ```limit``` up to tomorrow; ```limit``` is the page size (at most 1000, 1000 by default), and pages are fetched until the whole range is covered. (more below the table) | — |
-| ```status``` | — | Always returns ```true``` (legacy compatibility); use ```statusDetail``` for the connection status. | — |
-| ```wait``` | [number] | Legacy compatibility probe: the Futu connector has no market data or order push, so it does not wait and always returns ```true```. | — |
+| Command | Arguments | Description |
+| - | - | - |
+| ```refresh``` | bool | Whether trade queries (GetOrder, GetOrders, GetPositions, GetAccount) refresh the OpenD cache; refreshes by default, pass ```false``` to use the cache. Queries that refresh the cache are rate-limited by Futu (at most 10 per 30 seconds). |
+| ```accounts``` | — | Get the list of all trading accounts. |
+| ```lock``` | — | Lock trading. |
+| ```unlock``` | — | Unlock trading. |
+| ```instrument``` | symbol | Get the static information of an instrument, for example ```exchange.IO("instrument", "00700.HK")```. |
+| ```timeout``` | number | Set the timeout for communication with OpenD (milliseconds). |
+| ```statusDetail``` | — | Get connection status details. Returns: ```{"connected":..., "server":..., "simulate":...}``` |
+| ```historyKlines``` | object | Get historical K-lines; parameter ```{symbol, interval, begin, end, limit}```, ```interval``` in seconds, ```begin```/```end```/```limit``` optional. |
+| ```status``` | — | Always returns ```true``` (legacy compatibility); use ```statusDetail``` for the connection status. |
+| ```wait``` | [number] | In JavaScript and Python strategies, waits for the next tick of the current contract or the next order update of this exchange object and returns an object shaped like an EventLoop event; the argument is the timeout in milliseconds, negative means no waiting, 0 or omitted uses the default, and null is returned on timeout. (more below the table) |
 
 The rest of the longer descriptions in the table:
 
-- ```refresh```: Queries that refresh the cache are rate-limited by Futu (at most 10 per 30 seconds).
-- ```historyKlines```: K-lines are forward-adjusted.
+- ```wait```: In Rust strategies it always returns ```true```.
 
-For the common commands ```base``` and ```currency``` see `exchange.IO`.
-
-The common command ```api``` is not supported (the call fails with an error and returns null).
+For the common commands ```api```, ```base``` and ```currency``` see `exchange.IO`.
 
 ##### Function Support
 
-Not supported (the call fails with an error and returns null): `exchange.GetFundings`, `exchange.SetMarginLevel`, `exchange.CreateConditionOrder`, `exchange.ModifyConditionOrder`, `exchange.CancelConditionOrder`.
+Not supported (the call fails with an error and returns null): `exchange.GetFundings`, `exchange.SetMarginLevel`, `exchange.CreateConditionOrder`, `exchange.ModifyConditionOrder`, `exchange.CancelConditionOrder`, `exchange.GetConditionOrder`.
 
 Served through a fallback:
 
 - `exchange.GetRecords`: Native periods are 1m, 3m, 5m, 15m, 30m, 1h, 1d, 1w, 1M; other periods are synthesized by the docker.
-- `exchange.GetConditionOrder`: There is no single condition-order query, so the order is looked up among the instrument's open condition orders and its condition orders of the last 90 days (at most 100). Condition orders are native Futu orders placed through the order functions with ```orderType``` (10 to 15) in the options object; see the notes.
 
 ##### Margin, Account and Simulation
 
-Account: Futu uses ```TrdMarket``` to tell markets apart (1 Hong Kong, 2 US, 3 mainland, 4 Hong Kong Stock Connect, 5 futures). ```Balance```, ```FrozenBalance```, ```Equity``` and ```UPnL``` of ```exchange.GetAccount()``` are in the currency of the current instrument's market (HKD for ```00700.HK```; the Hong Kong market when no instrument with a market suffix is set), and ```Stocks``` and ```FrozenStocks``` are 0; ```Info``` contains ```accounts``` (the trading accounts) and ```funds``` (each market's ```trdMarket```, ```currency``` and fund details). ```exchange.GetAssets()``` sums the funds of all authorized markets per currency. Live trading uses the margin account and paper trading the cash account, and only active accounts with market permissions are used; when no account matches, an error listing the available accounts is reported.
+Account: Futu uses ```TrdMarket``` to tell markets apart (1 Hong Kong, 2 US, 3 mainland, 4 Hong Kong Stock Connect, 5 futures). ```Balance```, ```FrozenBalance```, ```Equity``` and ```UPnL``` of ```exchange.GetAccount()``` are in the currency of the current instrument's market (HKD for ```00700.HK```; the Hong Kong market when no instrument with a market suffix is set), and ```Stocks``` and ```FrozenStocks``` are 0; ```Info``` contains ```accounts``` (the trading accounts) and ```funds``` (each market's ```trdMarket```, ```currency``` and fund details). ```exchange.GetAssets()``` sums the funds of all authorized markets per currency.
 
 Simulation: The Simulate box connects to Futu paper trading. When ```FutuOpenD``` is used for paper trading, some stock codes are not supported and cannot be traded (paper trading works in the Futu NiuNiu mobile app).
 
@@ -28955,14 +30059,6 @@ Simulation: The Simulate box connects to Futu paper trading. When ```FutuOpenD``
 - Futu orders have only two sides, buy and sell, with no open/close flag: ```closebuy``` (close long) is sent as a sell and ```closesell``` (close short) as a buy, for stocks and futures alike. So that a closing order never opens a position in the opposite direction, the docker queries the instrument's positions before submitting it: if there is no position in the matching direction, the closable quantity (held minus frozen) is less than the order quantity, or the position query fails, no order is placed, an error is reported and null is returned. Futures positions are recorded per specific contract month, so closing through a continuous (main) contract code is rejected because no position is found. Long and short positions cannot be held in the same instrument at once. Queried orders do not distinguish opening from closing, and ```Offset``` is reported as open (except orders Futu reports as "buy back").
 - Trade queries refresh from the Futu server on every call by default and are subject to Futu's rate limit (at most 10 per 30 seconds), returning an error beyond it; for frequent polling use ```exchange.IO("refresh", false)``` to read ```FutuOpenD```'s cache, which ```FutuOpenD``` updates automatically when new data arrives.
 - ```FutuOpenD``` decides the region by the IP address it logs in from; accounts logged in from outside mainland China have some market data restrictions. See Futu's official documentation.
-- When the trading pair configured on the exchange object is not in ```code.market``` form (for example ```00700```), ```exchange.GetCurrency()``` returns the configured value and ```exchange.GetContractType()``` returns an empty string, meaning no instrument is set yet. Call ```exchange.SetContractType("00700.HK")``` first; otherwise market data and trading functions called without an instrument report an error and return null.
-- ```exchange.GetDepth()``` subscribes to Futu's order book and returns up to 10 levels; the subscription counts against Futu's subscription quota. Without order book permission, with the quota used up, or when the book has no levels (market closed, trading halted), it falls back to the best bid and ask from the snapshot; ```Info``` then has ```source``` set to ```snapshot``` and ```orderBookError``` giving the reason.
-- Order quantities are numbers of shares (contracts for futures and options), not amounts of money, market buy orders included; a price of ```-1``` or ```0``` submits a Futu market order. Limit orders default to ```GTC``` (good till canceled) in live trading and to day orders in paper trading, and market orders are day orders; ```ioc```, ```fok``` and ```postOnly``` are not supported. Orders may fill in all trading sessions (pre-market and after-hours included) by default.
-- Futu-specific order parameters are passed in the options object at the end of the order functions and handed to Futu as is: ```orderType``` (a ```Trd_Common.OrderType``` value: 10 stop market, 11 stop limit, 12 market if touched, 13 limit if touched, 14 trailing stop market, 15 trailing stop limit), ```auxPrice``` (trigger price), ```trailType```, ```trailValue```, ```trailSpread```, ```timeInForce``` (0 day, 1 good till canceled), ```session```, ```fillOutsideRTH```, ```adjustPrice```, ```adjustSideAndLimit```, ```remark``` and ```trdSide``` (a raw side value; when given, the position check before closing is skipped). Condition orders placed with ```orderType``` share one order list with ordinary orders: both ```exchange.GetOrders()``` and ```exchange.GetConditionOrders()``` list them, and ```exchange.CancelOrder()``` cancels them.
-- ```exchange.ModifyOrder()``` changes the price and quantity of a limit order in place and keeps the order ID; when only one of them is changed, the other is taken from the original order; market orders cannot be modified.
-- Without an instrument, ```exchange.GetOrders()``` and ```exchange.GetPositions()``` return all open orders and positions of every authorized market. ```exchange.GetHistoryOrders()``` returns only finished orders; without an instrument it covers all instruments, without a start time it covers the last 90 days, results are in ascending time order, and a given count keeps the most recent ones.
-- Without arguments, ```exchange.GetTickers()``` returns the tickers of the instruments this strategy has set or queried. ```exchange.GetRecords()``` returns at most 1000 bars, forward-adjusted; ```exchange.GetTrades()``` returns 100 trades by default and at most 1000.
-- In ```exchange.GetMarkets()```, ```CtVal``` is 1 for stocks (the number of shares per lot is ```lotSize``` in ```Info```), and for options and futures ```CtVal``` is the contract multiplier. ```TickSize``` is the minimum price change at the current price level (Hong Kong stocks have price-tiered tick sizes that change with the price).
 
 #### Interactive Brokers
 
@@ -28981,7 +30077,7 @@ Connects through the TWS API (socket protocol) to "IB Gateway" or "TWS (Trader W
 
 Pair examples: ```AAPL.US```, ```TSLA.US```
 
-Set with ```exchange.SetContractType()``` (or ```exchange.SetCurrency()```); the trading pair configured on the exchange object is the initial instrument. The form is ```symbol.currency[.type[.exchange]]```; the type defaults to stock ```STK``` and the exchange to ```SMART```, and the whole code is one instrument:
+Set with ```exchange.SetContractType()``` in the form ```symbol.currency[.type[.exchange]]```; the type defaults to stock ```STK``` and the exchange to ```SMART```, and the whole code is one instrument:
 
 - US stocks: ```AAPL.US```, ```TSLA.US``` (```US``` means priced in USD, ```HK``` in HKD; other currencies are written as their currency code).
 - Futures (```FUT```): ```symbol-expiry[-multiplier].currency.FUT.exchange```, with the expiry month written as ```YYYYMM``` and the exchange as IB's exchange code.
@@ -28990,28 +30086,25 @@ Set with ```exchange.SetContractType()``` (or ```exchange.SetCurrency()```); the
 
 ```Symbol``` in positions and orders is the short form (e.g. ```Z74.SGD```); ```exchange.GetPositions()``` and ```exchange.GetOrders()``` accept either the short form or the full code used when ordering (e.g. ```Z74.SGD.STK.SGX```).
 
-```exchange.SetContractType()``` queries the gateway for the contract details and returns them, including ```InstrumentID```, ```PriceTick```, ```VolumeMultiple``` (the multiplier, 1 for stocks), ```TradingHours```, ```LiquidHours``` and ```IsTrading```; ```IsTrading``` tells from the trading hours whether the contract is trading now, and passing ```liquid``` as the second argument uses the liquid hours instead.
-
 ##### Exchange-specific IO Commands
 
 | Command | Arguments | Description |
 | - | - | - |
 | ```status``` | — | Whether the session with TWS/IB Gateway is established (does not connect by itself). |
 | ```time``` | — | Get the IB server time (millisecond timestamp). |
-| ```accounts``` | — | Get the list of managed accounts (account IDs). |
-| ```reqId``` | — | Allocate a new request ID (incremented on every call). |
-| ```orderId``` | — | Take the next available order ID and reserve it, so the docker's own orders no longer use it; useful for placing orders directly with the ```api``` command. |
+| ```accounts``` | — | Get the list of managed accounts. |
+| ```reqId``` | — | Force a new request ID. |
+| ```orderId``` | — | Get the next available order ID. |
 | ```ignore``` | codes | Set the TWS error codes ignored by synchronous requests; the argument is an array of codes or its JSON string. Returns: The error code list after the change. |
-| ```scan``` | object | Run the market scanner; the argument holds the scanner subscription fields (an object or a JSON string, keyed as in the legacy ```ScannerSubscription```, such as ```Instrument```, ```LocationCode```, ```ScanCode```, ```NumberOfRows``` and ```AbovePrice```) and must contain ```Instrument```, for example ```STK``` with ```LocationCode``` ```STK.US.MAJOR```; ```ScanCode``` defaults to ```HOT_BY_VOLUME```. (more below the table) |
-| ```wait``` | [number] | Wait for and return the next complete message from TWS/IB Gateway; the argument is the timeout in milliseconds (at most 600 seconds), negative means no waiting, 0 or omitted waits up to 30 seconds, and null is returned on timeout. Returns: ```{id, fields}```: ```id``` is the TWS message ID and ```fields``` the remaining fields as an array of strings. |
-| ```debug``` | [bool] | Query or set debug mode; when on, every frame sent to or received from TWS/IB Gateway is written in the TWS API log format (at most 512 bytes per frame) to the docker's standard output log, not to the robot log. Returns: The current debug mode (```true```/```false```). |
+| ```scan``` | object | Run the market scanner; the argument holds the scanner subscription fields (an object or a JSON string) and must contain ```Instrument```, for example ```STK``` with ```LocationCode``` ```STK.US.MAJOR```. |
+| ```wait``` | [number] | In JavaScript and Python strategies, waits for the next tick of the current contract or the next order update of this exchange object and returns an object shaped like an EventLoop event; the argument is the timeout in milliseconds, negative means no waiting, 0 or omitted uses the default, and null is returned on timeout. (more below the table) |
+| ```debug``` | [bool] | Query or set debug mode; when on, every frame sent to or received from TWS/IB Gateway is logged in the TWS API log format. |
 | ```marketDataType``` | number | Switch the market data type (1 realtime, 2 frozen, 3 delayed, 4 delayed frozen). Returns: ```true``` |
-| ```api``` | msgId, ...fields \| name[, params[, filterMsgId[, timeout]]] | Send a raw TWS message: ```exchange.IO("api", msgId, fields...)``` returns ```true``` once sent. (more below the table) |
+| ```api``` | msgId, ...fields \| name[, params[, filterMsgId[, timeout]]] | Send a raw TWS message (```[msgId, fields...]```, returning ```true``` once sent), or call by a legacy request name (such as ```ReqCurrentTime``` or ```ReqContractDetails```), waiting for and returning the reply with the given message ID. |
 
 The rest of the longer descriptions in the table:
 
-- ```scan```: Returns: An array of scan results, each ```{rank, symbol, conId, secType, exchange, currency, localSymbol, tradingClass, marketName, ...}```.
-- ```api```: The legacy form ```exchange.IO("api", requestName or msgId, paramArray, waitMsgId, timeoutSeconds)``` also works (request names such as ```PlaceOrder``` or ```CancelOrder```; the parameter array may be a JSON string): without a message ID to wait for it returns ```true``` once sent; with one it returns every message received from sending until that message ID arrives, each as an array of strings.
+- ```wait```: In Rust strategies it returns the next complete TWS message.
 
 For the common commands ```base``` and ```currency``` see `exchange.IO`.
 
@@ -29023,17 +30116,11 @@ Served through a fallback:
 
 - `exchange.GetRecords`: Native periods are 1m, 3m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 1d, 1w; other periods that are a multiple of 60 seconds are synthesized by the docker from native bars, and the rest (such as second-level periods) are not available (this exchange object does not support ```exchange.GetTrades()```).
 
-##### Margin, Account and Simulation
-
-Account: The first managed account logged in to TWS/IB Gateway is used. ```exchange.GetAssets()``` returns each currency's net liquidation value (```NetLiquidationByCurrency```, or the currency's cash balance when it is absent) with a frozen amount of 0; ```Balance``` and ```Equity``` of ```exchange.GetAccount()``` are the total net liquidation value in the account's base currency, and ```Info``` holds all account values sent by TWS. ```Price``` of ```exchange.GetPositions()``` is the average price per unit (for futures and options the average cost is divided by the contract multiplier; the original is ```AvgCost``` in ```Info```), and ```Profit``` is 0 (the IB position query has no unrealized profit).
-
 ##### Notes
 
-- The docker connects to TWS with the live trading ID as its client ID (clientId), so the client ID stays the same across restarts and orders placed earlier can still be canceled. TWS only lets the client ID that placed an order (or the master client) cancel it. ```exchange.GetOrders()``` returns all open orders on the gateway (every contract when no instrument is given); ```exchange.GetOrder()``` only finds open orders and orders seen during this run, not orders finished earlier. ```Time``` of orders is 0 (TWS order reports carry no order time).
-- Market data are snapshots: ```exchange.GetDepth()``` has only the best bid and ask and reports an error when there is no valid bid/ask; ```exchange.GetTickers()``` returns the tickers of the contracts already used in this run. For US stocks, ```Volume``` of ```exchange.GetTicker()``` is converted from TWS lots (100 shares) to shares.
-- ```exchange.GetMarkets()``` gets the contract list through the market scanner (```STK```, ```STK.US.MAJOR```, ranked by volume with ```HOT_BY_VOLUME```) and then queries each contract's details for precision; it contains only the contracts in the scan results.
-- Order quantities are numbers of shares (contracts for futures and options), not amounts of money; a price of ```-1``` or ```0``` submits a market order (```MKT```). Orders are ```GTC``` by default; the options object at the end of the order functions may pass ```{tif: "ioc"}``` or ```{tif: "fok"}```, and ```postOnly``` is not supported. In the options object, ```outsideRth: true``` allows fills outside regular trading hours (not allowed by default) and ```account``` chooses the account to order in.
-- ```closebuy``` and ```closesell``` only place an order in the opposite direction (sell, buy) with no reduce-only guarantee: without a matching position they open a position in the opposite direction.
+- The docker connects to TWS with the live trading ID as its client ID (clientId), so the client ID stays the same across restarts and orders placed earlier can still be canceled. TWS only lets the client ID that placed an order (or the master client) cancel it; ```exchange.GetOrder()``` only finds orders of this client ID.
+- Market data are snapshots: ```exchange.GetDepth()``` has only the best bid and ask; ```exchange.GetTickers()``` returns the tickers of the contracts already used in this run.
+- ```exchange.GetMarkets()``` gets the contract list through the market scanner (```STK```, ```STK.US.MAJOR```) and then queries each contract's details for precision.
 - When the gateway rejects an order, the ```Reject``` field in the order's ```Info``` holds the reason.
 
 ### On-chain & Custom
@@ -29097,11 +30184,11 @@ Served through a fallback:
 
 - Orders (gateway method ```trade```): ```type``` is ```buy``` or ```sell```, and ```closebuy``` or ```closesell``` for closing orders, which can also be set directly with ```direction``` in the order extra parameters; a market order has ```price``` ```"-1"```; other extra parameters are merged into ```params``` as is. Post-only orders and time-in-force other than GTC are not supported.
 - ```exchange.GetAccount()``` calls the gateway's ```accounts``` method first and switches to the ```assets``` method when the gateway replies with an error (for example, the method is not supported), so gateways implementing only ```assets``` also work; ```exchange.GetAssets()``` calls only the ```assets``` method. Both methods reply with ```data``` ```[{currency, free, frozen}]```.
-- Requests time out after 30 seconds by default; the timeout of the standard functions' requests can be changed with `exchange.SetTimeout`, while requests forwarded by ```exchange.IO()``` always use 30 seconds.
+- Requests time out after 30 seconds by default.
 
 #### Web3
 
-Connects to an EVM or TRON chain node (the ChainType option: an EVM chain or TRON) and reads and writes on-chain data through the commands of ```exchange.IO()```: calling contracts after registering their ABI, encoding and decoding, signing, batched reads, event logs, sending transactions and managing nonces. On EVM it uses the node's JSON-RPC, and the chain is whatever chain the node serves (Ethereum, BNB Smart Chain, Base, Arbitrum or any other EVM chain); on TRON it uses the full node's HTTP interface (```/wallet/*```).
+Connects to an EVM or TRON chain node (the ChainType option: ETH or TRON) and reads and writes on-chain data through the commands of ```exchange.IO()```: calling contracts after registering their ABI, encoding and decoding, signing, batched reads, event logs, sending transactions and managing nonces. On EVM it uses the node's JSON-RPC, and the chain is whatever chain the node serves (Ethereum, BNB Smart Chain, Base, Arbitrum or any other EVM chain); on TRON it uses the full node's HTTP interface (```/wallet/*```).
 
 Of the standard trading functions only ```exchange.GetAssets()``` and ```exchange.GetAccount()``` (the wallet's native coin balance) are supported. To swap tokens on a decentralized exchange, use the Uniswap exchange object instead: it supports the standard functions such as ```exchange.GetTicker()``` and ```exchange.CreateOrder()```.
 
@@ -29111,15 +30198,10 @@ Of the standard trading functions only ```exchange.GetAssets()``` and ```exchang
 
 | Field | Required | Default | Description |
 | - | - | - | - |
-| Chain | Yes | ```ETH``` | Picking an EVM chain (Ethereum, BNB Chain, Base, Arbitrum, OP Mainnet, Polygon, Avalanche C-Chain or Unichain) fills in that chain's public nodes; for any other EVM chain pick "Other EVM" and enter the node address yourself; TRON is the TRON chain. (more below the table) |
+| ChainType | Yes | ```ETH``` | ETH means an EVM chain (which one is decided by the node), TRON means the TRON chain. Options: ```ETH```, ```TRON``` |
 | Private Key | Yes | — | Wallet private key (hex, ```0x``` prefix optional). It can be left empty for read-only use and switched at run time with ```exchange.IO("key", ...)```. |
-| Rpc Address | No | ```https://ethereum-rpc.publicnode.com,https://eth.drpc.org``` | The JSON-RPC node address on EVM, with several nodes separated by commas backing each other up; left empty, the selected chain's public nodes are used ("Other EVM" requires one). (more below the table) |
+| Rpc Address | No | ```http://127.0.0.1:8545``` | The JSON-RPC node address on EVM, with several nodes separated by commas backing each other up; the full-node HTTP address on TRON (only one; legacy gRPC addresses are mapped to their HTTP counterparts). |
 | Rpc Api Key | No | — | EVM: a ```Header-Name: value``` header or a Basic auth value; TRON: sent as the ```TRON-PRO-API-KEY``` header. |
-
-The rest of the longer descriptions in the table:
-
-- Chain: On EVM the chain actually used is still the node's chainId (the option only sets the default nodes), so existing configurations of ETH plus a custom node keep working on any EVM chain. Options: ```Ethereum```, ```BNB Chain```, ```Base```, ```Arbitrum```, ```OP Mainnet```, ```Polygon```, ```Avalanche C-Chain```, ```Unichain```, ```Other EVM (custom RPC)```, ```TRON```
-- Rpc Address: Public nodes are rate-limited, so use your own node for frequent calls or historical log queries. On TRON, the full-node HTTP address (only one; empty means ```https://api.trongrid.io```, and legacy gRPC addresses are mapped to their HTTP counterparts).
 
 ##### Trading Pairs and Contract Codes
 
@@ -29134,9 +30216,9 @@ The trading pair plays no part in on-chain operations; any ```BASE_QUOTE``` form
 | ```abi``` | address, abiContent | Register the ABI of a contract address (a JSON string, or one of the built-in templates ```weth```, ```uniswapV3Pool```, ```uniswapV3Factory```, ```uniswapV3QuoterV2```, ```uniswapV3SwapRouter02```, ```uniswapV3PositionManager```, ```permit2```, with matching ```pancakeV3*``` aliases for PancakeSwap V3). See the sub-page `exchange.IO("abi", ...)`. | — |
 | ```api``` | address \| "eth" \| "tron", method, ...args[, options] | With a contract address as the first argument, calls a contract method; read-only methods (```view```, ```pure```) return the decoded value, and write methods are signed and broadcast and return the transaction hash (```options``` may set ```gasLimit```, ```gasPrice```, ```nonce```, ```dryRun```). See the sub-page `exchange.IO("api", ...)`. | — |
 | ```call``` | address, method \| calldata, ...args[, options] | Simulate any contract method (including write methods) with ```eth_call```, without signing, broadcasting or spending gas, for quotes and dry runs; ```options``` is ```{from, value, block, gasLimit}```. EVM only. See the sub-page `exchange.IO("call", ...)`. | The decoded value when called by method name (```true``` for a method without return values); the raw return data (a hex string) when called with calldata. |
-| ```multicall``` | calls[, options] | Read several contract calls in one request on the same block state through the Multicall3 contract; each item of ```calls``` is ```[address, method, ...args]```, and ```options``` is ```{allowFailure, block, multicall}```. See the sub-page `exchange.IO("multicall", ...)`. | An array of results in the order of ```calls```. By default any failing item fails the whole call (with its index and reason); with ```allowFailure``` ```true```, failed items are null. |
+| ```multicall``` | calls[, options] | Read several contract calls in one request on the same block state through the Multicall3 contract; each item of ```calls``` is ```[address, method, ...args]```, and ```options``` is ```{allowFailure, block, multicall}```. See the sub-page `exchange.IO("multicall", ...)`. | An array of results in the order of ```calls```. |
 | ```logs``` | query | Query a contract's event logs (```eth_getLogs```) and decode them by ABI; ```query``` is ```{address, event, filter, fromBlock, toBlock, topics, blockHash}```. EVM only. See the sub-page `exchange.IO("logs", ...)`. | An array of logs, each with ```event``` and ```args``` when it can be decoded. |
-| ```waitReceipt``` | txHash[, options] | Wait until a transaction is mined and has the required confirmations; ```options``` is ```{timeout, confirmations, interval}```: ```timeout``` and ```interval``` are in milliseconds, 120000 (1000 to 600000) and 1500 by default, and ```confirmations``` defaults to 1. See the sub-page `exchange.IO("waitReceipt", ...)`. | The transaction receipt (```status``` as a number, ```events``` decoded); an error and null on timeout. |
+| ```waitReceipt``` | txHash[, options] | Wait until a transaction is mined and has the required confirmations; ```options``` is ```{timeout, confirmations, interval}``` (120 seconds at most by default). EVM only. See the sub-page `exchange.IO("waitReceipt", ...)`. | The transaction receipt (```status``` as a number, ```events``` decoded); null on timeout. |
 | ```nonce``` | ["sync" \| number] | Show the nonce counter used for sending transactions; ```sync``` resyncs it from the node's pending count, and a number sets the next local nonce. EVM only. See the sub-page `exchange.IO("nonce", ...)`. | ```{address, latest, pending, local}``` (all values are strings). |
 | ```speedUp``` | txHash[, options] | Resend a pending transaction with a higher fee (same nonce, recipient, amount, call data and gas limit); ```options``` is ```{multiplier, dryRun}```, ```multiplier``` 1.1 to 10, default 1.125. EVM only. See the sub-page `exchange.IO("speedUp", ...)`. | The replacement transaction's hash; its content with ```dryRun```. |
 | ```cancelTx``` | txHash[, options] | Cancel a pending transaction by sending a zero-amount transaction to yourself with the same nonce and a higher fee; ```options``` as for ```speedUp```. Success is not guaranteed. EVM only. See the sub-page `exchange.IO("cancelTx", ...)`. | The cancel transaction's hash; its content with ```dryRun```. |

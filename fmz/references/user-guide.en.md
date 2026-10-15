@@ -1722,7 +1722,7 @@ function main() {
 
 #### Interactive Controls in Status Bar
 
-Besides the controls designed in the "Strategy Interaction" section, a strategy can output interactive controls in its status bar. Only buttons are supported there. For all fields of buttons and input controls, and the format of the command that `GetCommand` receives after a click, see "Status bar buttons" on the `LogStatus` page; this page shows the common patterns.
+Besides the controls designed in the "Strategy Interaction" section, a strategy can output interactive controls in its status bar. The only interactive control there is the button. For all fields of buttons and input controls, and the format of the command that `GetCommand` receives after a click, see "Status bar buttons" on the `LogStatus` page; this page shows the common patterns.
 
 There are three kinds of status bar buttons:
 - A plain button: a click opens a confirmation box, and on confirmation the strategy receives ```cmd```.
@@ -1785,6 +1785,32 @@ function main() {
 ```
 
 For buttons in status bar tables, button colors and sizes (```class```), multi-select and customizable drop-downs, sliders, date pickers and other control styles, see `LogStatus`.
+
+##### Status bar display components
+
+Besides text, tables and buttons, `LogStatus` accepts objects with a `type` directly and the status bar renders them as components: `grid` and `tabs` handle layout, while `kpi` (KPI card), `stat` (key-value list), `chart` (line, bar and area charts), `sparkline`, `gauge`, `progress`, `pie`, `histogram`, `heatmap`, `calendar`, `timeline`, `markdown`, `alert` and `badge` display data. Components are display-only and can share a `grid` with buttons and tables:
+
+```javascript
+function main() {
+    var btn = {type: "button", name: "平仓|Close", cmd: "close"}
+    while (true) {
+        var ticker = exchange.GetTicker()
+        if (ticker) {
+            LogStatus({type: "grid", cols: 2, items: [
+                {type: "kpi", title: "Last price", value: ticker.Last},
+                btn   // no backticks needed for a button inside a grid
+            ]})
+        }
+        var cmd = GetCommand()
+        if (cmd) {
+            Log("Command received:", cmd)
+        }
+        Sleep(1000)
+    }
+}
+```
+
+For the fields of every component and examples in three languages see `Status Bar Components`; for the input forms (objects, backticks, several arguments) see `LogStatus`.
 
 ### Template Library
 
@@ -2097,7 +2123,7 @@ Every function, structure and constant of the API reference, grouped by its cate
 | Name | Description |
 | - | - |
 | `Log` | Outputs logs. |
-| `LogStatus` | Outputs information to the status bar on the backtesting system or the live trading page. |
+| `LogStatus` | Refreshes the status bar of a backtest or live trading page with text, tables, buttons or component objects with a `type` (KPI cards, charts, tabs and more); each call replaces the previous content. |
 | `LogProfit` | Records and prints the profit/loss value, and plots the equity curve based on the profit/loss value. |
 | `LogProfitReset` | Clear all profit logs and the profit chart. |
 | `LogReset` | Clear the logs. |
@@ -2585,7 +2611,7 @@ Every function, structure and constant of the API reference, grouped by its cate
 | - | - |
 | `HttpQuery-options` | This JSON structure is used to configure various parameters for HTTP requests sent by HttpQuery and HttpQuery_Go functions. |
 | `HttpQuery-return` | This JSON structure is the data structure returned by the HttpQuery function in debug mode, when the debug field is set to true in the ```options``` parameter structure while calling the HttpQuery function. |
-| `LogStatus-table` | This JSON structure is used to configure the table content displayed in the strategy status bar. |
+| `LogStatus-table` | Status bar table output with LogStatus: columns can set number formats, up/down colors and units; cells can be merged or hold buttons; several tables can be shown as tabs. |
 | `LogStatus-btnTypeOne` | Older form of the status bar button structure (input controls without ```settings```), still supported. |
 | `LogStatus-btnTypeTwo` | JSON structure of a status bar button (current form, with ```settings``` on input controls). |
 | `Chart-options` | This JSON is used to configure chart settings for the custom plotting function ```Chart()```. |
@@ -2598,6 +2624,27 @@ Every function, structure and constant of the API reference, grouped by its cate
 | `DBExec-return` | This JSON is the data structure returned by the ```DBExec()``` function; this JSON data structure is also returned when executing SQL statements using the ```exec()``` method of objects created by the ```Dial()``` function. |
 | `Dial-return` | The connection object returned by Dial. |
 | `Thread.join-return` | This JSON is the data structure returned by the ```join()``` member function of the ```Thread``` object, used to store information related to concurrent threads in ```JavaScript``` language strategies. |
+
+##### OtherStruct/LogStatus-display
+
+| Name | Description |
+| - | - |
+| `grid` | Arranges components in columns and drops columns automatically when the container gets narrow. |
+| `tabs` | Groups components into tabs; the selected tab is kept when the status bar refreshes. |
+| `kpi` | Shows one prominent number with optional unit, change and hint, for equity, returns or the last price. |
+| `stat` | Lists label and value pairs, for details such as balances, frozen funds, leverage or liquidation price. |
+| `progress` | Shows a ratio, or current value / total, as a bar. |
+| `gauge` | Shows where a value sits in a range on a half-circle dial, with optional threshold colors; for RSI, exposure or risk. |
+| `sparkline` | Shows a number with a small trend line, colored by the first-to-last change by default. |
+| `chart` | Draws line, bar or area charts with several series, a right axis and buy/sell marks; use Chart for more options. |
+| `heatmap` | Shades a 2D grid by value, for returns by period and symbol or correlation matrices. |
+| `calendar` | Shows returns as daily heat cells (like a contribution graph) or as a year × month table. |
+| `histogram` | Bins raw data automatically and shows the counts with sample size, mean, median and share of positive values. |
+| `pie` | Shows the share of each part in the total; a donut by default with the total in the center. |
+| `timeline` | Lists events in order, for fills, trading signals or risk events. |
+| `markdown` | Renders Markdown text with headings, lists, bold and tables, for strategy notes and market commentary. |
+| `alert` | Shows an info, success, warning or error message with an icon, for risk and error notices. |
+| `badge` | Shows small labels with a dot inline, so they can follow a line of text. |
 
 #### Built-in Variables and Constants
 
