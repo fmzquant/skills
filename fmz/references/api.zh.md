@@ -25124,7 +25124,7 @@ fn main() {
 
 ## 交易所
 
-本章是各交易所对象的参考：每个品牌一页，同品牌的现货、期货交易所对象写在同一页。页面依次给出名称（```exchange.GetName()```的返回值与别名）、配置项、交易对与合约代码、专属IO指令、不支持与合成的函数、保证金账户与模拟盘、期权和注意事项；各函数页只写通用语义，交易所之间的差异以本章为准。所有交易所的函数支持情况、交易模式指令汇总在`能力矩阵`。
+本章是各交易所对象的参考：每个品牌一页，同品牌的现货、期货交易所对象写在同一页（实现相同的几个品牌也合写一页）。页面依次给出名称（```exchange.GetName()```的返回值与别名）、配置项、交易对与合约代码、专属IO指令、不支持与合成的函数、保证金账户与模拟盘、期权和注意事项；各函数页只写通用语义，交易所之间的差异以本章为准。一页有几个交易所对象时（同品牌的现货与期货，或实现相同的几个交易所合写一页），相同的内容只写一次，不同之处在表格里写成「（A：x；B：y）」或「（仅A：x）」，在正文里以交易所对象为小标题分写。所有交易所的函数支持情况、交易模式指令汇总在`能力矩阵`。
 
 ### 名称对照
 
@@ -28211,7 +28211,7 @@ WOO X只有永续合约，其它合约代码会报错。下单数量单位为基
 
 #### 兑换与聚合器
 
-AMM池子与兑换聚合器，把链上兑换映射为现货交易函数：`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`Jupiter`、`KyberSwap`、`1inch`、`OKX DEX`。
+AMM池子与兑换聚合器，把链上兑换映射为现货交易函数：`Uniswap / PancakeSwap`、`Aerodrome / Velodrome`、`Jupiter`、`KyberSwap`、`1inch`、`OKX DEX`。
 
 #### Hyperliquid
 
@@ -28928,23 +28928,37 @@ Boros API按计算单位限流：每个IP每分钟200个单位（下单、撤单
 - ```exchange.GetPositions()```返回的```MarginLevel```取该持仓的杠杆（交易所持仓行的```leverage```，缺失时取初始保证金率```imr```的倒数），```Margin```为占用的初始保证金（持仓价值 ÷ 杠杆）。
 - 盘口和K线接口也需要签名：```exchange.GetDepth()```、```exchange.GetRecords()```以及```exchange.GetTicker()```（买一、卖一价取自盘口）都要求配置好API密钥；```exchange.GetTickers()```、```exchange.GetTrades()```、```exchange.GetFundings()```、```exchange.GetMarkets()```不需要签名。
 
-#### Uniswap
+#### Uniswap / PancakeSwap
 
-在一条链上连接Uniswap的池子，把链上兑换映射为现货交易函数。链可选Ethereum、Arbitrum、Base、BNB Chain、Unichain、Polygon、OP Mainnet、Robinhood、Arc。使用V3池子；V4池子（只使用不带hook的池子，原生币ETH/BNB/POL直接参与兑换、不经包装币）；V2池子在Ethereum、Unichain、Robinhood、Arc上使用。
+Uniswap与PancakeSwap两个交易所对象各在一条链上连接本交易所的池子，把链上兑换映射为现货交易函数。两者的池子结构相同：V2池子、V3池子，以及单例合约里的V4池子（PancakeSwap称为Infinity CL，下文合称V4/Infinity CL；只使用不带hook的池子，原生币直接参与兑换、不经包装币）；代币表、兑换、订单、撤单、LP与跨链桥的用法也相同，所以合写一页。两者的差别：
 
-每笔兑换在所有可用池子的直连路径和经中转币的两跳路径中选报价最好的一条。V4路径通过Universal Router兑换，代币授权经过Permit2合约（见```exchange.IO("approve", ...)```）。
+| 比较项 | Uniswap | PancakeSwap |
+| - | - | - |
+| 链 | Ethereum、Arbitrum、Base、BNB Chain、Unichain、Polygon、OP Mainnet、Robinhood、Arc（缺省Ethereum） | Ethereum、Arbitrum、Base、BNB Chain（缺省BNB Chain） |
+| V2池子 | Ethereum、Unichain、Robinhood、Arc上使用，手续费0.3% | 四条链都使用，手续费0.25% |
+| V3费率档 | 0.01%、0.05%、0.3%、1% | 0.01%、0.05%、0.25%、1% |
+| V4/Infinity CL | Uniswap V4，九条链都可用（Arc只用ERC20形态的USDC，原生USDC的池子看不到） | Infinity CL，只在BNB Chain与Base上可用，只用手续费不超过1%的池子；Infinity的Bin池子不支持 |
+| V4/Infinity CL仓位ID | ```v4:编号``` | ```inf:编号``` |
+| 兑换与授权合约 | Uniswap的Universal Router与Permit2 | PancakeSwap自己的Universal Router与Permit2 |
 
-`PancakeSwap`、`Aerodrome`、`Velodrome`从2026年10月起是独立的交易所，新配置请直接选这些交易所。本交易所的「DEX」配置项已去掉：以前在这里选了它们的旧配置启动时报错（如```Velodrome is now its own exchange: add a Velodrome exchange instead of Uniswap with Dex=Velodrome```），请改建对应的交易所。
+PancakeSwap的Infinity CL没有固定费率档，连接器用```eth_getLogs```从最近的链上成交中收集池子，长时间没有成交的池子不会被使用；所配节点查不了日志时（BSC官方节点bsc-dataseed一律拒绝```eth_getLogs```，drpc等免费节点限流）改用本链默认公共节点查这些公开成交，仍查不到时```exchange.IO("route", ...)```结果带```warning```说明原因。
+
+每笔兑换在所有可用池子的直连路径和经中转币的两跳路径中选报价最好的一条。V4/Infinity CL路径通过Universal Router兑换，代币授权经过Permit2合约（见```exchange.IO("approve", ...)```）。
+
+同一套实现的还有`Aerodrome / Velodrome`（Slipstream与基础池子，gauge质押）和兑换聚合器`KyberSwap`、`1inch`。PancakeSwap、Aerodrome、Velodrome原是Uniswap交易所「DEX」配置项的选项，2026年10月起是独立的交易所；Uniswap交易所的「DEX」配置项已去掉，以前在那里选了它们的旧配置启动时报错（如```Velodrome is now its own exchange: add a Velodrome exchange instead of Uniswap with Dex=Velodrome```），请改建对应的交易所。
 
 ##### 名称与配置
 
-```exchange.GetName()```：```Uniswap```（现货）。
+| ```exchange.GetName()``` | 类型 | 别名 |
+| - | - | - |
+| ```Uniswap``` | 现货 | — |
+| ```PancakeSwap``` | 现货 | Pancake |
 
 | 配置项 | 必填 | 默认值 | 说明 |
 | - | - | - | - |
-| 链 | 是 | ```Ethereum``` | 可选：```Ethereum```、```Arbitrum```、```Base```、```BNB Chain```、```Unichain```、```Polygon```、```OP Mainnet```、```Robinhood```、```Arc``` |
+| 链 | 是 | Uniswap：```Ethereum```；PancakeSwap：```BNB``` | 可选：```Ethereum```、```Arbitrum```、```Base```、```BNB Chain```（仅Uniswap：```Unichain```、```Polygon```、```OP Mainnet```、```Robinhood```、```Arc```） |
 | 钱包私钥 | 是 | — | 钱包私钥（十六进制）。 |
-| 节点地址 | 否 | ```https://ethereum-rpc.publicnode.com,https://eth.drpc.org``` | RPC节点地址；多个节点用逗号分隔，某个节点出错或缺少数据时自动换下一个；不填时使用各链内置的默认节点（主节点加备用节点，逗号分隔）。（详见表下） |
+| 节点地址 | 否 | Uniswap：```https://ethereum-rpc.publicnode.com,https://eth.drpc.org```；PancakeSwap：```https://bsc-dataseed.binance.org,https://bsc-rpc.publicnode.com``` | RPC节点地址；多个节点用逗号分隔，某个节点出错或缺少数据时自动换下一个；不填时使用各链内置的默认节点（主节点加备用节点，逗号分隔）。（详见表下） |
 | 节点认证 | 否 | — | RPC节点认证：```Header-Name: value```形式的请求头，或Basic认证值。 |
 
 表中长说明的其余部分：
@@ -28953,9 +28967,9 @@ Boros API按计算单位限流：每个IP每分钟200个单位（下单、撤单
 
 ##### 交易对与合约代码
 
-交易对示例：```ETH_USDC```、```WETH_USDC```、```ETH_USDG```
+交易对示例：```ETH_USDC```、```WETH_USDC```
 
-交易对写作```ETH_USDC```，原生币（ETH、BNB、POL）与包装币（WETH、WBNB、WPOL）是两个不同的资产。Polygon的原生币为POL；Arc链用USDC支付gas，原生余额与USDC代币（```0x3600000000000000000000000000000000000000```）是同一笔资金，交易对写作```WETH_USDC```、```EURC_USDC```；Robinhood链上没有USDC和USDT，主流稳定币为USDG，交易对写作```ETH_USDG```；Unichain、Polygon上的USDT写作```USDT0```。
+交易对写作```ETH_USDC```，原生币（ETH、BNB、POL）与包装币（WETH、WBNB、WPOL）是两个不同的资产，如BNB Chain上的```BNB_USDT```与```WBNB_USDT```。以下几条链只有Uniswap支持：Polygon的原生币为POL；Arc链用USDC支付gas，原生余额与USDC代币（```0x3600000000000000000000000000000000000000```）是同一笔资金，交易对写作```WETH_USDC```、```EURC_USDC```；Robinhood链上没有USDC和USDT，主流稳定币为USDG，交易对写作```ETH_USDG```；Unichain、Polygon上的USDT写作```USDT0```。
 
 代币表以外的代币用```exchange.IO("token", name, address)```登记后即可写在交易对里。
 
@@ -28965,7 +28979,7 @@ Boros API按计算单位限流：每个IP每分钟200个单位（下单、撤单
 | - | - | - | - |
 | ```transfer``` | to, amount[, token] | 从配置的钱包转出原生币或ERC20代币（```token```为代币名或合约地址，不传为原生币）；```amount```可传```all```转出全部（原生币扣除手续费）。只等交易广播，不等上链。见子页`exchange.IO("transfer", ...)`。 | ```{txHash, from, to, token, tokenAddress, amount, raw}``` |
 | ```receipt``` | txHash[, waitMs] | 查询本链任意交易的回执（不限本交易所对象发出的），可以等待上链（最多10分钟）。查询订单时传订单ID中逗号后面的交易哈希。见子页`exchange.IO("receipt", ...)`。 | 已上链返回```{txHash, status, blockNumber, gasUsed, fee}```（```status```为```success```或```reverted```），未上链返回```{txHash, pending: true, known}```。 |
-| ```route``` | symbol, side, qty | 只询价不下单：列出一笔兑换各条候选路径的报价和最优路径。```qty```一律是基础币数量：```sell```按精确输入卖出```qty```，```buy```按精确输出买到```qty```（与市价买单按计价币金额下单不同）。见子页`exchange.IO("route", ...)`。 | ```{symbol, side, qty, best, quote, price, candidates}``` |
+| ```route``` | symbol, side, qty | 只询价不下单：列出一笔兑换各条候选路径的报价和最优路径。```qty```一律是基础币数量：```sell```按精确输入卖出```qty```，```buy```按精确输出买到```qty```（与市价买单按计价币金额下单不同）。见子页`exchange.IO("route", ...)`。 | ```{symbol, side, qty, best, quote, price, candidates}```（仅PancakeSwap：Infinity池子没能收集（节点查不了日志）时另有```warning```。） |
 | ```simulate``` | symbol, side, qty[, price[, stateOverride[, route]]] | 按下单逻辑（选路、询价、价格保护）构造兑换交易，只用```eth_call```模拟执行，不签名、不广播、不花费gas。见子页`exchange.IO("simulate", ...)`。 | ```{route, exactIn, amountIn, amountOut, quoted, executed, value, calls}```，补过授权时另有```allowanceOverride```。 |
 | ```token``` | [name, address] | 登记代币，登记后的代币可以直接写在交易对里；不传参数时列出代币表。见子页`exchange.IO("token", ...)`。 | 登记时返回```{symbol, address, decimals}```，列表时返回```{symbol, address, decimals, native}```数组。 |
 | ```wrap``` | amount | 原生币包装成包装币（例如ETH→WETH），1:1、无滑点、只花gas；不接受```all```（要留gas）。见子页`exchange.IO("wrap", ...)`。 | ```{txHash, action, from, to, amount, raw}``` |
@@ -28979,7 +28993,7 @@ Boros API按计算单位限流：每个IP每分钟200个单位（下单、撤单
 | ```sendBase``` | url | 设置只用来广播交易的节点（私有交易通道）。与Web3不同：不返回设置前的地址，不传参数时不查询，传空字符串不会清除设置。 | ```true``` |
 | ```address``` | — | 配置的私钥对应的钱包地址（```0x```开头的小写地址）。 | — |
 | ```contracts``` | — | 本交易所在本链上的部署信息：合约地址、手续费档和内置代币列表快照。 | 对象：```dex```、```chainId```、```chain```、```router```、```quoterV2```、```v3Factory```、```v3Fees```、```positionManager```、```v2Factory```、```v2Fee```（百万分之一，3000即0.3%）、```wrappedNative```、```v4```、```tokenList```（代币列表快照的生成时间```embeddedAt```、代币数```tokens```、常用币数```core```）；本链没有的部署为```null```。（详见表下） |
-| ```lp.pools``` | token[, quote] | 列出代币的全部V3与V4池子（指定计价币，或本链的包装币、USDC、USDT）：费率、tick间距、现价、流动性、池子两种代币的余额与TVL；24小时成交与手续费取自GeckoTerminal（取不到时为```null```；结果在进程内缓存5分钟，```lp.select```、```lp.plan```共用，限流时等一会儿重试一次）。（详见表下） | ```[{id, protocol, dex, symbol, fee, feeRate, tickSpacing, tick, price, liquidity, reserveBase, reserveQuote, tvlQuote, tvlUsd, volume24hUsd, fees24hUsd, empty}]```，```price```为计价币/代币。 |
+| ```lp.pools``` | token[, quote] | 列出代币的全部V3与V4/Infinity CL池子（指定计价币，或本链的包装币、USDC、USDT）：费率、tick间距、现价、流动性、池子两种代币的余额与TVL；24小时成交与手续费取自GeckoTerminal（取不到时为```null```；结果在进程内缓存5分钟，```lp.select```、```lp.plan```共用，限流时等一会儿重试一次）。（详见表下） | ```[{id, protocol, dex, symbol, fee, feeRate, tickSpacing, tick, price, liquidity, reserveBase, reserveQuote, tvlQuote, tvlUsd, volume24hUsd, fees24hUsd, empty}]```，```price```为计价币/代币。 |
 | ```lp.select``` | token, budget[, options] | 按规则自动选池：```options.fee```指定费率时该费率的池子满足流动性门槛就选它（```exact```为```true```时只用该费率）；否则在TVL不低于max(5000美元, 预算)的池子里选24小时成交最大的，没有成交数据时选TVL最大的。（详见表下） | ```lp.pools```的一行，另带```reason```（选择理由）。 |
 | ```lp.pool``` | poolId | 池子实时状态。（详见表下） | ```{id, protocol, currency0, currency1, token0, token1, fee, tickSpacing, tick, sqrtPriceX96, price0, price1, liquidity}```，```price0```为1个token0值多少token1。（详见表下） |
 | ```lp.ticks``` | poolId, tickLower, tickUpper[, step] | tick区间内的流动性分布：每段的流动性和两种代币数量（按已初始化的tick细分求和），```step```为合并成的段宽（tick，默认等于tick间距）。区间超过120个位图字时报错。 | ```{pool, tick, token0, token1, segments: [{tickLower, tickUpper, price0Lower, price0Upper, liquidity, amount0, amount1, current}]}``` |
@@ -28990,9 +29004,9 @@ Boros API按计算单位限流：每个IP每分钟200个单位（下单、撤单
 | ```lp.decrease``` | positionId, ratio[, options] | 按比例（0到1）减仓，同时领取全部手续费，仓位保留。```options.slippage```价格保护，```options.sell```为```true```时把拿回的代币卖成计价币。 | ```{txHash, positions: [{id, symbol, principalBase, principalQuote, feesBase, feesQuote, receivedBase, receivedQuote}], sells}``` |
 | ```lp.collect``` | positionIds[, sell] | 领取手续费，多个仓位合成一笔交易；```sell```为```true```时把领到的代币卖成计价币。 | 同```lp.decrease```。 |
 | ```lp.remove``` | positionIds[, ratio[, sell]] | 撤出流动性并领取手续费，多个仓位合成一笔交易；```ratio```默认1（全部撤出并销毁仓位NFT），小于1时只撤一部分；```sell```为```true```时卖回计价币。 | 同```lp.decrease```。 |
-| ```lp.positions``` | [filter[, wallet]] | 钱包的全部V3与V4仓位：区间、是否在区间内、流动性、当前数量与价值、未领手续费。（详见表下） | ```[{id, pool, protocol, symbol, fee, tickLower, tickUpper, priceLower, priceUpper, price, tick, inRange, liquidity, amountBase, amountQuote, value, feesBase, feesQuote, feesValue, closed}]```，```value```、```feesValue```按计价币计。 |
-| ```lp.history``` | positionId | 仓位资金流水：存入、撤出本金、领取手续费，以及按当前池价折算的盈亏（现值 + 已领手续费 + 已撤本金 − 存入本金，不含gas）。（详见表下） | ```{id, symbol, events: [{action, block, txHash, liquidity, amountBase, amountQuote}], depositedBase, depositedQuote, withdrawnBase, withdrawnQuote, feesCollectedBase, feesCollectedQuote, price, pnlQuote, note}```；V4仓位为```{id, pool, symbol, events: [{action, block, txHash, liquidity}], position, note}```。 |
-| ```lp.track``` | positionIds | 登记V4仓位ID（如```["v4:123456"]```；与交易所对象不符的前缀报错），之后```lp.positions```会查这些仓位（归属每次按链上核对，转走的不列）。（详见表下） | 本进程记住的全部仓位ID。 |
+| ```lp.positions``` | [filter[, wallet]] | 钱包的全部V3与V4/Infinity CL仓位：区间、是否在区间内、流动性、当前数量与价值、未领手续费。（详见表下） | ```[{id, pool, protocol, symbol, fee, tickLower, tickUpper, priceLower, priceUpper, price, tick, inRange, liquidity, amountBase, amountQuote, value, feesBase, feesQuote, feesValue, closed}]```，```value```、```feesValue```按计价币计。 |
+| ```lp.history``` | positionId | 仓位资金流水：存入、撤出本金、领取手续费，以及按当前池价折算的盈亏（现值 + 已领手续费 + 已撤本金 − 存入本金，不含gas）。（详见表下） | ```{id, symbol, events: [{action, block, txHash, liquidity, amountBase, amountQuote}], depositedBase, depositedQuote, withdrawnBase, withdrawnQuote, feesCollectedBase, feesCollectedQuote, price, pnlQuote, note}```；V4/Infinity CL仓位为```{id, pool, symbol, events: [{action, block, txHash, liquidity}], position, note}```。 |
+| ```lp.track``` | positionIds | 登记V4/Infinity CL仓位ID（如（Uniswap：```["v4:123456"]```；PancakeSwap：```["inf:123456"]```）；与交易所对象不符的前缀报错），之后```lp.positions```会查这些仓位（归属每次按链上核对，转走的不列）。（详见表下） | 本进程记住的全部仓位ID。 |
 | ```bridge.chains``` | — | 跨链桥（LI.FI）支持的链：EVM链与Solana，缓存1小时。 | ```{id, key, name, chainType, nativeToken}```数组，```chainType```为```EVM```或```SVM```。 |
 | ```bridge.tokens``` | [chain] | LI.FI认识的某条链上的代币（缺省为本链），缓存1小时。 | ```{symbol, address, decimals, name, priceUSD}```数组。 |
 | ```bridge.quote``` | params | 跨链报价（只读），源链为本交易所对象的链。（详见表下） | ```{tool, toolName, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, fromAmountRaw, toAmountRaw, toAmountMinRaw, fromAmountUSD, toAmountUSD, slippage, toAddress, feeCosts, gasCosts, executionDuration, approvalAddress, steps, transactionId, request}```：数量为代币单位（```*Raw```为最小单位原值）；```toAmountMin```为扣除滑点后保证到手的数量；```feeCosts```为```[{name, amount, token, amountUSD, percentage, included}]```（```included```为```false```的费用另付）；```gasCosts```为源链gas估算；```executionDuration```为预计耗时（秒）；```approvalAddress```为需要授权的合约（原生币、Solana为```null```）；```steps```为各步骤（```cross```为跨链，```swap```为兑换）；```request```为参数原样回显。 |
@@ -29003,17 +29017,17 @@ Boros API按计算单位限流：每个IP每分钟200个单位（下单、撤单
 
 表中长说明的其余部分：
 
-- ```contracts```的返回值：```positionManager```为V3的PositionManager；```v4```为V4的合约（```flavor```为```uniswap-v4```），含LP用的```positionManager```（Uniswap V4的PositionManager）；另有```aerodrome```，为```null```。
-- ```lp.pools```：按TVL降序，空池子（```empty```为```true```，现价处没有流动性，现价没有意义）的```price```、```tvlQuote```、```tvlUsd```为```null```，排在最后。V4池子（```protocol```为```v4```）只列不带hook的，原生币池子与包装币池子分开列（如```ETH_USDC```与```WETH_USDC```）；V4是单例合约，池子余额```reserveBase```、```reserveQuote```为```null```，TVL取自GeckoTerminal。
-- ```lp.select```：```budget```按计价币计，```options.quote```指定计价币。可用```options.protocol```按池子类型筛选（```v3```、```v4```或它们的数组）。
-- ```lp.pool```：```poolId```为V3池子合约地址（只认本交易所工厂创建的，地址上没有池子时报```pool … not found```）或V4的PoolId（```0x```加64位十六进制，只认不带hook的；V4只认PositionManager上有过仓位或```lp.pools```列出过的）。
-- ```lp.pool```的返回值：V4原生币的```currency```为零地址。
+- ```contracts```的返回值：```positionManager```为V3的PositionManager；```v4```为V4/Infinity CL的合约（```flavor```为（Uniswap：```uniswap-v4```；PancakeSwap：```pancakeswap-infinity-cl```）），含LP用的```positionManager```（Uniswap：Uniswap V4的PositionManager；PancakeSwap：Infinity的CLPositionManager）；另有```aerodrome```，为```null```。
+- ```lp.pools```：按TVL降序，空池子（```empty```为```true```，现价处没有流动性，现价没有意义）的```price```、```tvlQuote```、```tvlUsd```为```null```，排在最后。V4/Infinity CL池子（```protocol```为（Uniswap：```v4```；PancakeSwap：```infinity```））只列不带hook的（Uniswap：原生币池子与包装币池子分开列（如```ETH_USDC```与```WETH_USDC```）；PancakeSwap：手续费不超过1%的）；V4/Infinity CL是单例合约，池子余额```reserveBase```、```reserveQuote```为```null```，TVL取自GeckoTerminal。（仅PancakeSwap：Infinity没有固定费率档，列出的是兑换选路收集到的池子（最近有成交的，见上文）和本进程用过的池子，其它池子可以直接用PoolId传给```lp.pool```、```lp.plan```。）
+- ```lp.select```：```budget```按计价币计，```options.quote```指定计价币。可用```options.protocol```按池子类型筛选（```v3```、（Uniswap：```v4```；PancakeSwap：```infinity```）或它们的数组）。
+- ```lp.pool```：```poolId```为V3池子合约地址（只认本交易所工厂创建的，地址上没有池子时报```pool … not found```）或V4/Infinity CL的PoolId（```0x```加64位十六进制，只认不带hook的；（Uniswap：V4只认PositionManager上有过仓位或```lp.pools```列出过的；PancakeSwap：Infinity的任何已初始化池子都能按PoolId查到））。
+- ```lp.pool```的返回值：V4/Infinity CL原生币的```currency```为零地址。
 - ```lp.plan```：```params```：```symbol```（如```ETH_USDC```）、```budget```（计价币）、```range```（```{lower, upper}```价格，或```{pct: [-5, 5]}```相对现价百分比，或```{ticks: [lo, hi]}```，自动对齐tick间距）、```shape```（```spot```单一区间、```curve```多层嵌套现价附近最厚、```bidask```两侧分段越远越厚）、```layers```（默认3，最多20；curve各层都跨过现价、互不相同且对齐tick间距，优先逐层向内嵌套，嵌套排不下时用区间内其它跨现价的组合补齐；双边区间最多能放下「现价以下的合法下沿数×现价以上的合法上沿数」层，超过时给出能放下的最多层数，实际层数见返回的```layers```，少于请求时带```warning```）、```pool```（不填按```lp.select```选）、```fee```、```slippage```（默认0.01）。钱包不够时照样给出计划，```shortfall```说明差额。V3池子、交易对写原生币（如```ETH_USDC```）时，包装币那一侧要么整笔用原生币付、要么整笔用包装币付，两种余额不会拼着用：原生币够这一侧全额时用原生币，否则包装币够就用包装币，都不够时按余额多的那种计算```haveBase```/```haveQuote```与需要换的币（```swap.currency```就是那一种），返回的```payWith```为这一侧实际用的币。
-- ```lp.simulate```：计划需要先换币时按换完的数量模拟；钱包余额或授权不够时可用```stateOverride```补上。V4池子的代币经Permit2付款，要补代币对Permit2的授权和Permit2里给PositionManager的额度（Permit2地址见```exchange.IO("contracts")```的```v4.permit2```）。V4的PositionManager不返回数量，结果中的数量为计划量。
-- ```lp.add```：传计划或计划的```params```都可以（执行时按最新池价重算）。V3池子：交易对写原生币（如```ETH_USDC```）时按计划的```payWith```付包装币那一侧：整笔原生币（随交易附带，多的由```refundETH```退回）或整笔包装币，不拼着用；领回来的是包装币。V3授权PositionManager；V4池子的代币先授权Permit2，再在Permit2里给PositionManager额度，原生币池子用原生币余额、领回原生币，包装币池子用包装币；付款上限比计划量多出滑点，流动性按持有量的(1 − 滑点)计算；仓位```id```为```v4:编号```。
+- ```lp.simulate```：计划需要先换币时按换完的数量模拟；钱包余额或授权不够时可用```stateOverride```补上。V4/Infinity CL池子的代币经Permit2付款，要补代币对Permit2的授权和Permit2里给PositionManager的额度（Permit2地址见```exchange.IO("contracts")```的```v4.permit2```）。V4/Infinity CL的PositionManager不返回数量，结果中的数量为计划量。
+- ```lp.add```：传计划或计划的```params```都可以（执行时按最新池价重算）。V3池子：交易对写原生币（如```ETH_USDC```）时按计划的```payWith```付包装币那一侧：整笔原生币（随交易附带，多的由```refundETH```退回）或整笔包装币，不拼着用；领回来的是包装币。V3授权PositionManager；V4/Infinity CL池子的代币先授权Permit2，再在Permit2里给PositionManager额度，原生币池子用原生币余额、领回原生币，包装币池子用包装币；付款上限比计划量多出滑点，流动性按持有量的(1 − 滑点)计算；仓位```id```为（Uniswap：```v4:编号```；PancakeSwap：```inf:编号```）。
 - ```lp.increase```：```options.symbol```指定朝向（默认稳定币为计价币；写原生币如```ETH_USDC```时原生币那一侧的付法同```lp.add```），```options.slippage```价格保护。
-- ```lp.positions```：```filter```为交易对（给定价格朝向）或代币（只列含它的仓位），```*```或不传为全部；```wallet```为其它钱包地址时只读查看那个钱包。V4仓位的```id```形如```v4:123456```。V4的PositionManager不能按钱包列出仓位，靠转入钱包的NFT日志查找：节点支持查询全部历史日志时能找全；公共节点通常只能查最近一段区块，更早的仓位要用```lp.track```登记（本进程```lp.add```建的会自动记住）。
-- ```lp.history```：需要能查历史日志的节点；公共节点常常不支持。V4的事件不记录代币数量，V4仓位只给每次流动性变化（```add```、```remove```、```collect```）和当前仓位。
+- ```lp.positions```：```filter```为交易对（给定价格朝向）或代币（只列含它的仓位），```*```或不传为全部；```wallet```为其它钱包地址时只读查看那个钱包。V4/Infinity CL仓位的```id```形如（Uniswap：```v4:123456```；PancakeSwap：```inf:123456```）。V4/Infinity CL的PositionManager不能按钱包列出仓位，靠转入钱包的NFT日志查找：节点支持查询全部历史日志时能找全；公共节点通常只能查最近一段区块，更早的仓位要用```lp.track```登记（本进程```lp.add```建的会自动记住）。
+- ```lp.history```：需要能查历史日志的节点；公共节点常常不支持。V4/Infinity CL的事件不记录代币数量，V4/Infinity CL仓位只给每次流动性变化（```add```、```remove```、```collect```）和当前仓位。
 - ```lp.track```：节点查不到全部历史日志时用它找回以前建的仓位；策略可以把```lp.add```返回的ID存起来（如```_G```），重启后登记。
 - ```bridge.quote```：```params```：```toChain```（目标链：链ID、LI.FI的链key如```arb```、或链名如```Arbitrum```、```Solana```）、```fromToken```（本链代币：代币表里的名字或合约地址）、```toToken```（目标链代币：名字或地址，由LI.FI解析为它的标准代币，如Arbitrum上的```USDC```是原生USDC，不是USDC.e）、```amount```（```fromToken```的数量，按代币单位，超出代币精度的位舍去）、```toAddress```（收款地址；目标为EVM链时缺省为本钱包，目标为Solana时必须传Solana地址，不传报错）、```slippage```（缺省为```exchange.IO("slippage")```的值）、```order```（```CHEAPEST```或```FASTEST```）、```allowBridges```/```denyBridges```（LI.FI的桥名，数组或逗号分隔）。不认识的键报错。
 - ```bridge.simulate```：代币授权不够时自动用state override补成无限额度（同```simulate```，结果里```allowanceOverride```列出补了什么）；余额不会自动补，可以用```stateOverride```（```eth_call```的第三参）自己补。余额不够导致失败时报错里给出钱包余额。
@@ -29034,22 +29048,22 @@ Boros API按计算单位限流：每个IP每分钟200个单位（下单、撤单
 
 ##### 注意事项
 
-| 函数 | Uniswap交易所的行为 |
+| 函数 | 行为 |
 | - | - |
 | exchange.GetTicker() | 买一、卖一为约1000美元规模的实际可成交价；链上没有24小时统计。买卖两边各取最优池子，跨池偶尔交叉时两边都给中间价，```Info.crossed```写明交叉幅度 |
 | exchange.GetDepth() | 由逐档递增规模的链上询价推算：规模从约1000美元递增到100万美元，默认5档、最多10档。买卖两边取各自最优的池子，跨池偶尔交叉（买一高于卖一）时，交叉的价格按中间价给出、数量不变，```Info.crossed```写明中间价与交叉幅度 |
 | exchange.GetTrades() | 该交易对各个池子最近约10分钟区块内的链上成交，每次最多500条 |
-| exchange.GetRecords() | K线来自GeckoTerminal的池子级数据：取Uniswap上该交易对在GeckoTerminal美元流动性最深的池子（V2、V3、V4池子都参与比较，交易对写原生币时原生币池与包装币池都算；选中的池子缓存1小时）。价格为该池子的逐笔成交价（含池子手续费，与```exchange.GetTicker()```的中间价可能相差约一个池子费率），单位为计价币/基础币，```Volume```为基础币数量；没有成交的周期按上一根收盘价补平、成交量为0，最后一根可能尚未收盘。GeckoTerminal的数据有几十秒到1分钟的延迟，公开接口约每分钟10次：同一周期的K线缓存1分钟，请求在托管者内排队，被限频时等待重试，仍不行时报错。GeckoTerminal没有收录Uniswap上该交易对的任何池子时报错 |
+| exchange.GetRecords() | K线来自GeckoTerminal的池子级数据：取本交易所上该交易对在GeckoTerminal美元流动性最深的池子（V2、V3、V4/Infinity CL池子都参与比较，交易对写原生币时原生币池与包装币池都算；选中的池子缓存1小时）。价格为该池子的逐笔成交价（含池子手续费，与```exchange.GetTicker()```的中间价可能相差约一个池子费率），单位为计价币/基础币，```Volume```为基础币数量；没有成交的周期按上一根收盘价补平、成交量为0，最后一根可能尚未收盘。GeckoTerminal的数据有几十秒到1分钟的延迟，公开接口约每分钟10次：同一周期的K线缓存1分钟，请求在托管者内排队，被限频时等待重试，仍不行时报错。GeckoTerminal没有收录本交易所上该交易对的任何池子时报错 |
 | exchange.GetMarkets() | 内置与已登记代币两两配对、链上确实有池子的交易对；含包装币的交易对另列一行原生币写法。```TickSize```固定为1e-8，```PricePrecision```为8，```AmountPrecision```为代币精度，```MinNotional```为0 |
 | exchange.GetOrders() | 只列出本进程发出、还没上链的兑换交易（保存在内存里，重启后清空） |
 | exchange.GetAssets() | 原生币和代币表中各代币的钱包余额 |
-| exchange.CreateOrder() | 立即在链上兑换：限价为最差成交价，按当前报价达不到限价时直接报错、不发交易；市价按滑点保护；市价买入时数量为要花费的计价币。最优路径是V4且还需要额外的Permit2授权交易时，只有V4的报价比最好的V2/V3至少好0.1%才选V4。下单附加参数```slippage```覆盖本单滑点，```route```（```v2```、```v3```、```v4```、```hop```、```direct```）限定路径类型，```v4```指V4池子 |
+| exchange.CreateOrder() | 立即在链上兑换：限价为最差成交价，按当前报价达不到限价时直接报错、不发交易；市价按滑点保护；市价买入时数量为要花费的计价币。最优路径是V4/Infinity CL且还需要额外的Permit2授权交易时，只有V4/Infinity CL的报价比最好的V2/V3至少好0.1%才选V4/Infinity CL。下单附加参数```slippage```覆盖本单滑点，```route```（```v2```、```v3```、```v4```、```hop```、```direct```）限定路径类型，```v4```指V4/Infinity CL池子 |
 | exchange.GetOrder() | 订单ID形如```ETH_USDC,0x…```（交易对、逗号、交易哈希），状态来自交易回执；原交易的nonce已被撤单交易（或其它交易）占用时显示为已撤销。订单号只含交易对和交易哈希，不含链；```Info```中有```chainId```与链名```chain```，跨链汇总订单时用它找回所属的链；在别的链的交易所对象上查询会报错“not found on <链>” |
 | exchange.CancelOrder() | 发送同nonce的替换交易（向自己转0金额），并等待结果（默认最多30秒，见```exchange.IO("cancelWait", ...)```）：撤单交易先上链返回```true```；原订单已经上链或先于撤单上链时返回```false```（撤单没成功，但不是调用错误），原因见```GetLastError()```；等待超时返回```true```，表示撤单已提交 |
 
 ##### 区间流动性（LP）
 
-```exchange.IO("lp.*", ...)```指令提供Uniswap V3池子与不带hook的V4池子的区间流动性：选池、规划与模拟、建仓、加减仓、领手续费、撤出和仓位查询。仓位是PositionManager的NFT：V3仓位的```id```即NFT编号，V4仓位写成```v4:编号```（两个合约的编号会重复）；V3与V4仓位可以在同一条指令里一起传，各发一笔交易。V4在Ethereum、Base、Arbitrum、BNB Chain、Unichain、Polygon、OP Mainnet、Robinhood、Arc上可用（Arc只用ERC20形态的USDC，原生USDC的池子看不到）。
+```exchange.IO("lp.*", ...)```指令提供V3池子与不带hook的V4/Infinity CL池子的区间流动性：选池、规划与模拟、建仓、加减仓、领手续费、撤出和仓位查询。仓位是PositionManager的NFT：V3仓位的```id```即NFT编号；V4/Infinity CL仓位带前缀，Uniswap写成```v4:编号```、PancakeSwap写成```inf:编号```，因为它与V3的PositionManager编号会重复。V3与V4/Infinity CL仓位可以在同一条指令里一起传，各发一笔交易。
 
 写指令（```lp.add```、```lp.increase```、```lp.decrease```、```lp.collect```、```lp.remove```）在交易上链后返回；之后一分钟内的链上读取都不早于该交易所在的区块（公共节点背后的负载均衡可能落到还没同步到这一块的机器），所以紧接着调用下一条指令不会按旧状态构造交易。建仓时原生币按当前gas价留出约300万gas的手续费，其余可用于建仓。
 
@@ -29058,7 +29072,7 @@ Boros API按计算单位限流：每个IP每分钟200个单位（下单、撤单
 风险：
 - 无常损失：价格偏离建仓价越远，仓位价值相对单纯持有越低；单边上涨时仓位逐步卖出代币，下跌时逐步买入。
 - 价格出区间后仓位只剩一种代币，不再赚手续费，直到价格回到区间。
-- 每次建仓、调仓、领取、撤出都是链上交易，频繁调仓的gas成本可能超过手续费收入；更适合Base、Arbitrum、Robinhood等低gas的链。
+- 每次建仓、调仓、领取、撤出都是链上交易，频繁调仓的gas成本可能超过手续费收入；更适合Base、Arbitrum、BNB Chain等低gas的链。
 - 计划中的预估日手续费按过去24小时成交与当前占池比例估算，不代表未来收益。
 
 ##### 跨链桥（bridge）
@@ -29129,7 +29143,7 @@ function main() {
 
 转账是真实的链上交易，一经发出无法撤回。转入交易所充值地址前，请确认对方支持该链的充值。
 
-See also: `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `exchange.IO`, `exchange.IO("receipt")`, `exchange.IO("token")`, `exchange.IO("wrap")`
+See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("receipt")`, `exchange.IO("token")`, `exchange.IO("wrap")`
 
 ##### exchange.IO("receipt", ...)
 
@@ -29168,7 +29182,7 @@ function main() {
 
 订单的成交情况直接用```exchange.GetOrder()```查询即可，```exchange.IO("receipt", ...)```主要用于查询转账等非下单交易。
 
-See also: `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `exchange.IO`, `exchange.IO("transfer")`, `exchange.IO("cancelWait")`, `exchange.IO("wrap")`, `exchange.IO("unwrap")`
+See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("transfer")`, `exchange.IO("cancelWait")`, `exchange.IO("wrap")`, `exchange.IO("unwrap")`
 
 ##### exchange.IO("route", ...)
 
@@ -29217,7 +29231,7 @@ V3路径通过链上QuoterV2询价（完整模拟整笔兑换），V2路径根�
 
 返回对象的字段：```best```为最优路径；```quote```为最优报价（卖出时为可获得的计价币数量，买入时为需花费的计价币数量）；```price```为对应的平均成交价格；```candidates```为各候选路径的```{route, quote}```（无法报价的路径，其```quote```为```null```）。没有可用的池子时仍返回对象，此时```best```、```quote```、```price```均为```null```，```candidates```为空数组（若有池子但均无法报价，则```candidates```中各项的```quote```为```null```）。交易对中的代币无法识别、节点所在的链与配置不一致等出错情况下返回空值，原因可通过```GetLastError()```查看。
 
-See also: `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `exchange.IO`, `exchange.IO("simulate")`, `exchange.IO("slippage")`, `exchange.IO("token")`, `exchange.CreateOrder`
+See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("simulate")`, `exchange.IO("slippage")`, `exchange.IO("token")`, `exchange.CreateOrder`
 
 ##### exchange.IO("simulate", ...)
 
@@ -29263,7 +29277,7 @@ function main() {
 
 返回对象的字段：```quoted```为下单时的报价，```executed```为模拟执行得到的实际数量（精确输入时为获得的数量，精确输出时为花费的数量），两者均为以最小单位表示的十进制字符串。Uniswap的V4路径与PancakeSwap的Infinity路径经由Universal Router执行，路由合约不返回成交数量，因此```executed```为```null```：只要模拟未报错，即表明按这组参数（含最少获得/最多花费）能够成交。未达到限价、余额或授权不足（未覆盖时）等情况下返回空值并报错。
 
-See also: `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `exchange.IO`, `exchange.IO("route")`, `exchange.IO("slippage")`, `exchange.IO("gasMultiplier")`, `exchange.CreateOrder`
+See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("route")`, `exchange.IO("slippage")`, `exchange.IO("gasMultiplier")`, `exchange.CreateOrder`
 
 ##### exchange.IO("token", ...)
 
@@ -29306,7 +29320,7 @@ function main() {
 
 原生币（如ETH、BNB）与包装币（如WETH、WBNB）是两种不同的资产：交易原生币时，路由合约会自动完成包装和解包。
 
-See also: `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `exchange.IO`, `exchange.IO("route")`, `exchange.IO("transfer")`, `exchange.IO("approve")`
+See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("route")`, `exchange.IO("transfer")`, `exchange.IO("approve")`
 
 ##### exchange.IO("wrap", ...)
 
@@ -29343,7 +29357,7 @@ function main() {
 
 直接调用包装币合约的```deposit()```方法，不经过兑换路由和资金池。```ETH_WETH```这类交易对无法下单，原生币与包装币之间的转换请使用```exchange.IO("wrap", ...)```和```exchange.IO("unwrap", ...)```。
 
-See also: `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `exchange.IO`, `exchange.IO("unwrap")`, `exchange.IO("receipt")`, `exchange.IO("transfer")`
+See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("unwrap")`, `exchange.IO("receipt")`, `exchange.IO("transfer")`
 
 ##### exchange.IO("unwrap", ...)
 
@@ -29380,7 +29394,7 @@ function main() {
 
 直接调用包装币合约的```withdraw(uint256)```方法，不经过兑换路由，也不经过资金池。
 
-See also: `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `exchange.IO`, `exchange.IO("wrap")`, `exchange.IO("receipt")`, `exchange.IO("transfer")`
+See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("wrap")`, `exchange.IO("receipt")`, `exchange.IO("transfer")`
 
 ##### exchange.IO("approve", ...)
 
@@ -29416,7 +29430,7 @@ Uniswap的V4路径和PancakeSwap的Infinity路径分两步授权：先将代币�
 
 ```max```模式可省去后续的授权交易及gas费用，但路由合约将可以动用该代币的全部余额，请根据需要选择。
 
-See also: `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `exchange.IO`, `exchange.IO("transfer")`, `exchange.IO("simulate")`, `exchange.IO("gasMultiplier")`
+See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("transfer")`, `exchange.IO("simulate")`, `exchange.IO("gasMultiplier")`
 
 ##### exchange.IO("slippage", ...)
 
@@ -29451,7 +29465,7 @@ function main() {
 
 也可以在```exchange.CreateOrder()```的方向参数后附加```;{"slippage":0.01}```，为单笔订单单独指定滑点。限价单不使用滑点，因为限价本身就是最差成交价。
 
-See also: `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `exchange.IO`, `exchange.IO("route")`, `exchange.IO("simulate")`, `exchange.IO("deadline")`, `exchange.CreateOrder`
+See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("route")`, `exchange.IO("simulate")`, `exchange.IO("deadline")`, `exchange.CreateOrder`
 
 ##### exchange.IO("deadline", ...)
 
@@ -29484,7 +29498,7 @@ function main() {
 
 兑换交易发出后，如果超过截止时间仍未上链，执行时将被回滚。这样可以避免长时间挂起的交易在价格大幅波动后才成交。
 
-See also: `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `exchange.IO`, `exchange.IO("slippage")`, `exchange.IO("gasMultiplier")`, `exchange.IO("cancelWait")`
+See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("slippage")`, `exchange.IO("gasMultiplier")`, `exchange.IO("cancelWait")`
 
 ##### exchange.IO("cancelWait", ...)
 
@@ -29523,7 +29537,7 @@ function main() {
 
 以太坊主网约每12秒产生一个区块，默认的30秒约相当于两到三个区块；出块较快的链（Base、Arbitrum、BNB Chain）通常几秒内即可得到结果。
 
-See also: `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `exchange.IO`, `exchange.IO("receipt")`, `exchange.IO("deadline")`, `exchange.CancelOrder`
+See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("receipt")`, `exchange.IO("deadline")`, `exchange.CancelOrder`
 
 ##### exchange.IO("gasMultiplier", ...)
 
@@ -29558,170 +29572,34 @@ gasLimit仅为上限，实际手续费按gas实际用量扣除，因此调高倍
 
 对于会结算已有仓位手续费的LP交易（加仓、减仓、领取手续费、撤出流动性；Aerodrome、Velodrome还包括质押、取回质押和领取奖励），gasLimit取「估算值×倍数」与「估算值+余量」中的较大者。余量为每个仓位50000，另加每笔手续费（或奖励）转出40000。原因是估算时仓位可能尚未产生手续费，而交易上链前产生了手续费，执行时就需要额外的记账和代币转出操作。```exchange.IO("bridge.send", ...)```的gasLimit不低于LI.FI报价中给出的```gasLimit```。
 
-See also: `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `exchange.IO`, `exchange.IO("deadline")`, `exchange.IO("simulate")`, `exchange.IO("slippage")`
+See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("deadline")`, `exchange.IO("simulate")`, `exchange.IO("slippage")`
 
-#### PancakeSwap
+#### Aerodrome / Velodrome
 
-在一条链上连接PancakeSwap的池子，把链上兑换映射为现货交易函数。链可选Ethereum、Arbitrum、Base、BNB Chain（缺省BNB Chain）。使用V2和V3池子；BNB Chain与Base上还有Infinity CL池子（只使用不带hook、手续费不超过1%的池子；Infinity没有固定费率档，连接器用```eth_getLogs```从最近的链上成交中收集池子，长时间没有成交的池子不会被使用；所配节点查不了日志时（BSC官方节点bsc-dataseed一律拒绝```eth_getLogs```，drpc等免费节点限流）改用本链默认公共节点查这些公开成交，仍查不到时```exchange.IO("route", ...)```结果带```warning```说明原因）。V3与Infinity CL池子都支持LP。
+Aerodrome与Velodrome两个交易所对象使用同一套合约，各连一条链上本交易所的池子，把链上兑换映射为现货交易函数；池子种类、兑换与LP用法都相同，所以合写一页。链是固定的，配置里没有「链」选项（旧式配置带了别的```Chain```时启动报错）。使用Slipstream集中流动性池子（新旧两代部署都使用，池子按tick间距区分，手续费由池子自己设定）和基础池子（volatile为恒定乘积，stable为稳定币曲线）。基础池子只支持精确输入：限价买入（按买到的数量成交）只能走Slipstream池子。两类池子都支持LP与gauge质押领奖励。两者的差别：
 
-每笔兑换在所有可用池子的直连路径和经中转币的两跳路径中选报价最好的一条。Infinity路径通过PancakeSwap的Universal Router兑换，代币授权经过PancakeSwap自己的Permit2合约（见```exchange.IO("approve", ...)```）。
-
-PancakeSwap原是`Uniswap`交易所「DEX」配置项的一个选项，2026年10月起是独立的交易所；以前在Uniswap交易所选了PancakeSwap的配置启动时报错，请改建PancakeSwap交易所。
-
-##### 名称与配置
-
-```exchange.GetName()```：```PancakeSwap```（现货）；别名：Pancake。
-
-| 配置项 | 必填 | 默认值 | 说明 |
-| - | - | - | - |
-| 链 | 是 | ```BNB``` | 可选：```Ethereum```、```Arbitrum```、```Base```、```BNB Chain``` |
-| 钱包私钥 | 是 | — | 钱包私钥（十六进制）。 |
-| 节点地址 | 否 | ```https://bsc-dataseed.binance.org,https://bsc-rpc.publicnode.com``` | RPC节点地址；多个节点用逗号分隔，某个节点出错或缺少数据时自动换下一个；不填时使用各链内置的默认节点（主节点加备用节点，逗号分隔）。（详见表下） |
-| 节点认证 | 否 | — | RPC节点认证：```Header-Name: value```形式的请求头，或Basic认证值。 |
-
-表中长说明的其余部分：
-
-- 节点地址：查询订单状态需要节点能查到已上链交易的回执：publicnode的Base、BNB Chain、Arbitrum公共节点查不到回执（要求归档权限），不要单独使用。
-
-##### 交易对与合约代码
-
-交易对示例：```BNB_USDT```、```WBNB_USDT```、```ETH_USDC```
-
-交易对写作```BNB_USDT```，原生币（BNB、ETH）与包装币（WBNB、WETH）是两个不同的资产。
-
-代币表以外的代币用```exchange.IO("token", name, address)```登记后即可写在交易对里。
-
-##### 专属IO指令
-
-| 指令 | 参数 | 说明 | 返回值 |
-| - | - | - | - |
-| ```transfer``` | to, amount[, token] | 从配置的钱包转出原生币或ERC20代币（```token```为代币名或合约地址，不传为原生币）；```amount```可传```all```转出全部（原生币扣除手续费）。只等交易广播，不等上链。见子页`exchange.IO("transfer", ...)`。 | ```{txHash, from, to, token, tokenAddress, amount, raw}``` |
-| ```receipt``` | txHash[, waitMs] | 查询本链任意交易的回执（不限本交易所对象发出的），可以等待上链（最多10分钟）。查询订单时传订单ID中逗号后面的交易哈希。见子页`exchange.IO("receipt", ...)`。 | 已上链返回```{txHash, status, blockNumber, gasUsed, fee}```（```status```为```success```或```reverted```），未上链返回```{txHash, pending: true, known}```。 |
-| ```route``` | symbol, side, qty | 只询价不下单：列出一笔兑换各条候选路径的报价和最优路径。```qty```一律是基础币数量：```sell```按精确输入卖出```qty```，```buy```按精确输出买到```qty```（与市价买单按计价币金额下单不同）。见子页`exchange.IO("route", ...)`。 | ```{symbol, side, qty, best, quote, price, candidates}```；Infinity池子没能收集（节点查不了日志）时另有```warning```。 |
-| ```simulate``` | symbol, side, qty[, price[, stateOverride[, route]]] | 按下单逻辑（选路、询价、价格保护）构造兑换交易，只用```eth_call```模拟执行，不签名、不广播、不花费gas。见子页`exchange.IO("simulate", ...)`。 | ```{route, exactIn, amountIn, amountOut, quoted, executed, value, calls}```，补过授权时另有```allowanceOverride```。 |
-| ```token``` | [name, address] | 登记代币，登记后的代币可以直接写在交易对里；不传参数时列出代币表。见子页`exchange.IO("token", ...)`。 | 登记时返回```{symbol, address, decimals}```，列表时返回```{symbol, address, decimals, native}```数组。 |
-| ```wrap``` | amount | 原生币包装成包装币（例如ETH→WETH），1:1、无滑点、只花gas；不接受```all```（要留gas）。见子页`exchange.IO("wrap", ...)`。 | ```{txHash, action, from, to, amount, raw}``` |
-| ```unwrap``` | amount | 包装币解包成原生币（例如WETH→ETH），```amount```可传```all```。见子页`exchange.IO("unwrap", ...)`。 | ```{txHash, action, from, to, amount, raw}``` |
-| ```approve``` | ["exact" \| "max"] | 代币授权模式：```exact```（默认）每次只授权本次兑换需要的数量，```max```授权无限额度。不传参数时查询。见子页`exchange.IO("approve", ...)`。 | 当前模式。 |
-| ```slippage``` | [ratio] | 市价单的滑点保护比例，范围```[0, 0.5)```，默认```0.005```（0.5%）。不传参数时查询。见子页`exchange.IO("slippage", ...)`。 | 当前滑点比例。 |
-| ```deadline``` | [seconds] | 交易有效期（秒），范围10到86400，默认120。不传参数时查询。见子页`exchange.IO("deadline", ...)`。 | 当前截止时间（秒）。 |
-| ```cancelWait``` | [seconds] | 撤单时等待结果的最长时间（秒），范围0到600，默认30；0表示发出撤单交易后立即返回。不传参数时查询。见子页`exchange.IO("cancelWait", ...)`。 | 当前等待时间（秒）。 |
-| ```gasMultiplier``` | [x] | gas上限倍数，范围1到5，默认1.2：交易的gasLimit为节点估算的gas乘以该倍数。见子页`exchange.IO("gasMultiplier", ...)`。 | 当前倍数。 |
-| ```base``` | [url] | 不传参数时返回当前节点地址；传入地址时切换节点。多个节点写成逗号分隔的字符串（传数组时只使用第一个地址）。换节点后第一次请求会核对节点所在的链，与配置的链不一致时报错。 | 切换前的地址。 |
-| ```sendBase``` | url | 设置只用来广播交易的节点（私有交易通道）。与Web3不同：不返回设置前的地址，不传参数时不查询，传空字符串不会清除设置。 | ```true``` |
-| ```address``` | — | 配置的私钥对应的钱包地址（```0x```开头的小写地址）。 | — |
-| ```contracts``` | — | 本交易所在本链上的部署信息：合约地址、手续费档和内置代币列表快照。 | 对象：```dex```、```chainId```、```chain```、```router```、```quoterV2```、```v3Factory```、```v3Fees```、```positionManager```、```v2Factory```、```v2Fee```（百万分之一，3000即0.3%）、```wrappedNative```、```v4```、```tokenList```（代币列表快照的生成时间```embeddedAt```、代币数```tokens```、常用币数```core```）；本链没有的部署为```null```。（详见表下） |
-| ```lp.pools``` | token[, quote] | 列出代币的全部V3与Infinity CL池子（指定计价币，或本链的包装币、USDC、USDT）：费率、tick间距、现价、流动性、池子两种代币的余额与TVL；24小时成交与手续费取自GeckoTerminal（取不到时为```null```；结果在进程内缓存5分钟，```lp.select```、```lp.plan```共用，限流时等一会儿重试一次）。（详见表下） | ```[{id, protocol, dex, symbol, fee, feeRate, tickSpacing, tick, price, liquidity, reserveBase, reserveQuote, tvlQuote, tvlUsd, volume24hUsd, fees24hUsd, empty}]```，```price```为计价币/代币。 |
-| ```lp.select``` | token, budget[, options] | 按规则自动选池：```options.fee```指定费率时该费率的池子满足流动性门槛就选它（```exact```为```true```时只用该费率）；否则在TVL不低于max(5000美元, 预算)的池子里选24小时成交最大的，没有成交数据时选TVL最大的。（详见表下） | ```lp.pools```的一行，另带```reason```（选择理由）。 |
-| ```lp.pool``` | poolId | 池子实时状态。（详见表下） | ```{id, protocol, currency0, currency1, token0, token1, fee, tickSpacing, tick, sqrtPriceX96, price0, price1, liquidity}```，```price0```为1个token0值多少token1。（详见表下） |
-| ```lp.ticks``` | poolId, tickLower, tickUpper[, step] | tick区间内的流动性分布：每段的流动性和两种代币数量（按已初始化的tick细分求和），```step```为合并成的段宽（tick，默认等于tick间距）。区间超过120个位图字时报错。 | ```{pool, tick, token0, token1, segments: [{tickLower, tickUpper, price0Lower, price0Upper, liquidity, amount0, amount1, current}]}``` |
-| ```lp.plan``` | params | 建仓计划（只读，不花钱）。（详见表下） | ```{params, symbol, pool, protocol, fee, tickSpacing, tick, price, shape, budget, budgetUsd, positions: [{tickLower, tickUpper, priceLower, priceUpper, liquidity, amountBase, amountQuote, share}], needBase, needQuote, haveBase, haveQuote, swap, payWith, shortfall, shareOfPool, volume24hUsd, estDailyFeesUsd, slippageBps, layers, layersRequested, warning?}```；```swap```为建仓前需要换的币（```{side, amount, currency}```或```null```）。 |
-| ```lp.simulate``` | plan[, stateOverride] | 按计划用```eth_call```执行建仓交易（不签名、不广播），确认能成交及实际投入数量。（详见表下） | ```{pool, positions: [{liquidity, amountBase, amountQuote}], value, swapNeeded, note}``` |
-| ```lp.add``` | plan | 按计划建仓：需要时先用市价单换币，再授权，一笔交易创建全部仓位，等上链后返回。（详见表下） | ```{txHash, swapTxHash, pool, positions: [{id, tickLower, tickUpper, priceLower, priceUpper, liquidity, amountBase, amountQuote}]}``` |
-| ```lp.increase``` | positionId, budget[, options] | 给仓位加仓：```budget```（计价币）按仓位区间与现价的配比拆成两种代币，缺的那种先换。（详见表下） | ```{txHash, swapTxHash, id, liquidity, amountBase, amountQuote}``` |
-| ```lp.decrease``` | positionId, ratio[, options] | 按比例（0到1）减仓，同时领取全部手续费，仓位保留。```options.slippage```价格保护，```options.sell```为```true```时把拿回的代币卖成计价币。 | ```{txHash, positions: [{id, symbol, principalBase, principalQuote, feesBase, feesQuote, receivedBase, receivedQuote}], sells}``` |
-| ```lp.collect``` | positionIds[, sell] | 领取手续费，多个仓位合成一笔交易；```sell```为```true```时把领到的代币卖成计价币。 | 同```lp.decrease```。 |
-| ```lp.remove``` | positionIds[, ratio[, sell]] | 撤出流动性并领取手续费，多个仓位合成一笔交易；```ratio```默认1（全部撤出并销毁仓位NFT），小于1时只撤一部分；```sell```为```true```时卖回计价币。 | 同```lp.decrease```。 |
-| ```lp.positions``` | [filter[, wallet]] | 钱包的全部V3与Infinity CL仓位：区间、是否在区间内、流动性、当前数量与价值、未领手续费。（详见表下） | ```[{id, pool, protocol, symbol, fee, tickLower, tickUpper, priceLower, priceUpper, price, tick, inRange, liquidity, amountBase, amountQuote, value, feesBase, feesQuote, feesValue, closed}]```，```value```、```feesValue```按计价币计。 |
-| ```lp.history``` | positionId | 仓位资金流水：存入、撤出本金、领取手续费，以及按当前池价折算的盈亏（现值 + 已领手续费 + 已撤本金 − 存入本金，不含gas）。（详见表下） | ```{id, symbol, events: [{action, block, txHash, liquidity, amountBase, amountQuote}], depositedBase, depositedQuote, withdrawnBase, withdrawnQuote, feesCollectedBase, feesCollectedQuote, price, pnlQuote, note}```；Infinity CL仓位为```{id, pool, symbol, events: [{action, block, txHash, liquidity}], position, note}```。 |
-| ```lp.track``` | positionIds | 登记Infinity CL仓位ID（如```["inf:123456"]```；与交易所对象不符的前缀报错），之后```lp.positions```会查这些仓位（归属每次按链上核对，转走的不列）。（详见表下） | 本进程记住的全部仓位ID。 |
-| ```bridge.chains``` | — | 跨链桥（LI.FI）支持的链：EVM链与Solana，缓存1小时。 | ```{id, key, name, chainType, nativeToken}```数组，```chainType```为```EVM```或```SVM```。 |
-| ```bridge.tokens``` | [chain] | LI.FI认识的某条链上的代币（缺省为本链），缓存1小时。 | ```{symbol, address, decimals, name, priceUSD}```数组。 |
-| ```bridge.quote``` | params | 跨链报价（只读），源链为本交易所对象的链。（详见表下） | ```{tool, toolName, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, fromAmountRaw, toAmountRaw, toAmountMinRaw, fromAmountUSD, toAmountUSD, slippage, toAddress, feeCosts, gasCosts, executionDuration, approvalAddress, steps, transactionId, request}```：数量为代币单位（```*Raw```为最小单位原值）；```toAmountMin```为扣除滑点后保证到手的数量；```feeCosts```为```[{name, amount, token, amountUSD, percentage, included}]```（```included```为```false```的费用另付）；```gasCosts```为源链gas估算；```executionDuration```为预计耗时（秒）；```approvalAddress```为需要授权的合约（原生币、Solana为```null```）；```steps```为各步骤（```cross```为跨链，```swap```为兑换）；```request```为参数原样回显。 |
-| ```bridge.simulate``` | params\|quote[, stateOverride] | 重新报价，用```eth_call```执行LI.FI给出的交易，不签名、不广播、不花gas。（详见表下） | ```bridge.quote```的结果，另有```simulated```（```true```）、```to```、```value```、```walletBalance```，补过授权时有```allowanceOverride```。 |
-| ```bridge.send``` | params\|quote | 跨链转出：重新报价 → 检查余额 → 代币对LI.FI的```approvalAddress```授权不够时先授权（按```exchange.IO("approve")```的```exact```/```max```，USDT这类先清零，等授权上链；授权过就再报价一次）→ ```eth_call```模拟 → 签名广播；gasLimit取```eth_estimateGas```估算×```gasMultiplier```与LI.FI建议的```gasLimit```中较大的一个（桥合约还会调用别的合约，估算可能偏少），实际只按用量扣费。（详见表下） | ```{txHash, tool, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, toAddress, value, transactionId}```，```txHash```为源链交易哈希，可用```receipt```查回执。 |
-| ```bridge.status``` | txHash[, options] | 跨链进度（LI.FI ```/status```），参数为```bridge.send```返回的源链交易哈希；```options```可给```{toChain, bridge}```加快查找。（详见表下） | ```{status, substatus, substatusMessage, tool, sending, receiving, fromAddress, toAddress, explorer, bridgeExplorer}```：```status```为```NOT_FOUND```、```INVALID```、```PENDING```、```DONE```、```FAILED```；```DONE```时```substatus```为```COMPLETED```（按报价到账）、```PARTIAL```（收到的是别的代币）或```REFUNDED```（已退回）；```sending```、```receiving```为```{txHash, txLink, chainId, amount, amountRaw, token, timestamp}```，```receiving.amount```与```receiving.token```为实际到账的数量与代币。 |
-| ```bridge.apiKey``` | [key] | 设置LI.FI的API Key（请求头```x-lifi-api-key```，只对本交易所对象生效，不回显），传```""```清除；不传参数只查询。没有Key时按出口IP限频，见下文。 | 是否已设置Key（布尔值）。 |
-
-表中长说明的其余部分：
-
-- ```contracts```的返回值：```positionManager```为V3的PositionManager；```v4```为Infinity CL的合约（```flavor```为```pancakeswap-infinity-cl```），含LP用的```positionManager```（Infinity的CLPositionManager）；另有```aerodrome```，为```null```。
-- ```lp.pools```：按TVL降序，空池子（```empty```为```true```，现价处没有流动性，现价没有意义）的```price```、```tvlQuote```、```tvlUsd```为```null```，排在最后。Infinity CL池子（```protocol```为```infinity```）只列不带hook的、手续费不超过1%的；Infinity CL是单例合约，池子余额```reserveBase```、```reserveQuote```为```null```，TVL取自GeckoTerminal。Infinity没有固定费率档，列出的是兑换选路收集到的池子（最近有成交的，见上文）和本进程用过的池子，其它池子可以直接用PoolId传给```lp.pool```、```lp.plan```。
-- ```lp.select```：```budget```按计价币计，```options.quote```指定计价币。可用```options.protocol```按池子类型筛选（```v3```、```infinity```或它们的数组）。
-- ```lp.pool```：```poolId```为V3池子合约地址（只认本交易所工厂创建的，地址上没有池子时报```pool … not found```）或Infinity CL的PoolId（```0x```加64位十六进制，只认不带hook的；Infinity的任何已初始化池子都能按PoolId查到）。
-- ```lp.pool```的返回值：Infinity CL原生币的```currency```为零地址。
-- ```lp.plan```：```params```：```symbol```（如```ETH_USDC```）、```budget```（计价币）、```range```（```{lower, upper}```价格，或```{pct: [-5, 5]}```相对现价百分比，或```{ticks: [lo, hi]}```，自动对齐tick间距）、```shape```（```spot```单一区间、```curve```多层嵌套现价附近最厚、```bidask```两侧分段越远越厚）、```layers```（默认3，最多20；curve各层都跨过现价、互不相同且对齐tick间距，优先逐层向内嵌套，嵌套排不下时用区间内其它跨现价的组合补齐；双边区间最多能放下「现价以下的合法下沿数×现价以上的合法上沿数」层，超过时给出能放下的最多层数，实际层数见返回的```layers```，少于请求时带```warning```）、```pool```（不填按```lp.select```选）、```fee```、```slippage```（默认0.01）。钱包不够时照样给出计划，```shortfall```说明差额。V3池子、交易对写原生币（如```ETH_USDC```）时，包装币那一侧要么整笔用原生币付、要么整笔用包装币付，两种余额不会拼着用：原生币够这一侧全额时用原生币，否则包装币够就用包装币，都不够时按余额多的那种计算```haveBase```/```haveQuote```与需要换的币（```swap.currency```就是那一种），返回的```payWith```为这一侧实际用的币。
-- ```lp.simulate```：计划需要先换币时按换完的数量模拟；钱包余额或授权不够时可用```stateOverride```补上。Infinity CL池子的代币经Permit2付款，要补代币对Permit2的授权和Permit2里给PositionManager的额度（Permit2地址见```exchange.IO("contracts")```的```v4.permit2```）。Infinity CL的PositionManager不返回数量，结果中的数量为计划量。
-- ```lp.add```：传计划或计划的```params```都可以（执行时按最新池价重算）。V3池子：交易对写原生币（如```ETH_USDC```）时按计划的```payWith```付包装币那一侧：整笔原生币（随交易附带，多的由```refundETH```退回）或整笔包装币，不拼着用；领回来的是包装币。V3授权PositionManager；Infinity CL池子的代币先授权Permit2，再在Permit2里给PositionManager额度，原生币池子用原生币余额、领回原生币，包装币池子用包装币；付款上限比计划量多出滑点，流动性按持有量的(1 − 滑点)计算；仓位```id```为```inf:编号```。
-- ```lp.increase```：```options.symbol```指定朝向（默认稳定币为计价币；写原生币如```ETH_USDC```时原生币那一侧的付法同```lp.add```），```options.slippage```价格保护。
-- ```lp.positions```：```filter```为交易对（给定价格朝向）或代币（只列含它的仓位），```*```或不传为全部；```wallet```为其它钱包地址时只读查看那个钱包。Infinity CL仓位的```id```形如```inf:123456```。Infinity CL的PositionManager不能按钱包列出仓位，靠转入钱包的NFT日志查找：节点支持查询全部历史日志时能找全；公共节点通常只能查最近一段区块，更早的仓位要用```lp.track```登记（本进程```lp.add```建的会自动记住）。
-- ```lp.history```：需要能查历史日志的节点；公共节点常常不支持。Infinity CL的事件不记录代币数量，Infinity CL仓位只给每次流动性变化（```add```、```remove```、```collect```）和当前仓位。
-- ```lp.track```：节点查不到全部历史日志时用它找回以前建的仓位；策略可以把```lp.add```返回的ID存起来（如```_G```），重启后登记。
-- ```bridge.quote```：```params```：```toChain```（目标链：链ID、LI.FI的链key如```arb```、或链名如```Arbitrum```、```Solana```）、```fromToken```（本链代币：代币表里的名字或合约地址）、```toToken```（目标链代币：名字或地址，由LI.FI解析为它的标准代币，如Arbitrum上的```USDC```是原生USDC，不是USDC.e）、```amount```（```fromToken```的数量，按代币单位，超出代币精度的位舍去）、```toAddress```（收款地址；目标为EVM链时缺省为本钱包，目标为Solana时必须传Solana地址，不传报错）、```slippage```（缺省为```exchange.IO("slippage")```的值）、```order```（```CHEAPEST```或```FASTEST```）、```allowBridges```/```denyBridges```（LI.FI的桥名，数组或逗号分隔）。不认识的键报错。
-- ```bridge.simulate```：代币授权不够时自动用state override补成无限额度（同```simulate```，结果里```allowanceOverride```列出补了什么）；余额不会自动补，可以用```stateOverride```（```eth_call```的第三参）自己补。余额不够导致失败时报错里给出钱包余额。
-- ```bridge.send```：原生币不用授权。只等授权上链，不等桥接交易；跨链是异步的，用```bridge.status```轮询。传```bridge.quote```的结果时按其中的```request```重新报价（报价随时变化，实际成交以新报价为准，```toAmountMin```由交易在链上保证）。
-- ```bridge.status```：刚广播时LI.FI可能还没收录，返回```NOT_FOUND```，继续轮询即可（建议间隔10～30秒）。
-
-通用指令```currency```见`exchange.IO`。
-
-不支持通用指令```api```（调用时报错并返回空值）。
-
-##### 函数支持差异
-
-不支持（调用时报错并返回空值）：`exchange.GetTickers`、`exchange.GetHistoryOrders`、`exchange.ModifyOrder`、`exchange.CreateConditionOrder`、`exchange.ModifyConditionOrder`、`exchange.CancelConditionOrder`、`exchange.GetConditionOrder`、`exchange.GetConditionOrders`、`exchange.GetHistoryConditionOrders`。
-
-以回退方式支持：
-
-- `exchange.GetRecords`：原生周期为1分钟、5分钟、15分钟、1小时、4小时、12小时、1天（GeckoTerminal的周期）；其它周期由托管者合成：分钟级以上的周期由原生周期合并，秒级周期由```exchange.GetTrades()```的链上成交逐笔累积（首次调用只有最近约10分钟成交覆盖的那几根，之后随每次调用累积；还没有成交时报错并说明原因，取成交失败时报错带上失败原因）。
-
-##### 注意事项
-
-| 函数 | PancakeSwap交易所的行为 |
-| - | - |
-| exchange.GetTicker() | 买一、卖一为约1000美元规模的实际可成交价；链上没有24小时统计。买卖两边各取最优池子，跨池偶尔交叉时两边都给中间价，```Info.crossed```写明交叉幅度 |
-| exchange.GetDepth() | 由逐档递增规模的链上询价推算：规模从约1000美元递增到100万美元，默认5档、最多10档。买卖两边取各自最优的池子，跨池偶尔交叉（买一高于卖一）时，交叉的价格按中间价给出、数量不变，```Info.crossed```写明中间价与交叉幅度 |
-| exchange.GetTrades() | 该交易对各个池子最近约10分钟区块内的链上成交，每次最多500条 |
-| exchange.GetRecords() | K线来自GeckoTerminal的池子级数据：取PancakeSwap上该交易对在GeckoTerminal美元流动性最深的池子（V2、V3、Infinity CL池子都参与比较，交易对写原生币时原生币池与包装币池都算；选中的池子缓存1小时）。价格为该池子的逐笔成交价（含池子手续费，与```exchange.GetTicker()```的中间价可能相差约一个池子费率），单位为计价币/基础币，```Volume```为基础币数量；没有成交的周期按上一根收盘价补平、成交量为0，最后一根可能尚未收盘。GeckoTerminal的数据有几十秒到1分钟的延迟，公开接口约每分钟10次：同一周期的K线缓存1分钟，请求在托管者内排队，被限频时等待重试，仍不行时报错。GeckoTerminal没有收录PancakeSwap上该交易对的任何池子时报错 |
-| exchange.GetMarkets() | 内置与已登记代币两两配对、链上确实有池子的交易对；含包装币的交易对另列一行原生币写法。```TickSize```固定为1e-8，```PricePrecision```为8，```AmountPrecision```为代币精度，```MinNotional```为0 |
-| exchange.GetOrders() | 只列出本进程发出、还没上链的兑换交易（保存在内存里，重启后清空） |
-| exchange.GetAssets() | 原生币和代币表中各代币的钱包余额 |
-| exchange.CreateOrder() | 立即在链上兑换：限价为最差成交价，按当前报价达不到限价时直接报错、不发交易；市价按滑点保护；市价买入时数量为要花费的计价币。最优路径是Infinity CL且还需要额外的Permit2授权交易时，只有Infinity CL的报价比最好的V2/V3至少好0.1%才选Infinity CL。下单附加参数```slippage```覆盖本单滑点，```route```（```v2```、```v3```、```v4```、```hop```、```direct```）限定路径类型，```v4```指Infinity CL池子 |
-| exchange.GetOrder() | 订单ID形如```ETH_USDC,0x…```（交易对、逗号、交易哈希），状态来自交易回执；原交易的nonce已被撤单交易（或其它交易）占用时显示为已撤销。订单号只含交易对和交易哈希，不含链；```Info```中有```chainId```与链名```chain```，跨链汇总订单时用它找回所属的链；在别的链的交易所对象上查询会报错“not found on <链>” |
-| exchange.CancelOrder() | 发送同nonce的替换交易（向自己转0金额），并等待结果（默认最多30秒，见```exchange.IO("cancelWait", ...)```）：撤单交易先上链返回```true```；原订单已经上链或先于撤单上链时返回```false```（撤单没成功，但不是调用错误），原因见```GetLastError()```；等待超时返回```true```，表示撤单已提交 |
-
-PancakeSwap的V3费率档为0.01%、0.05%、0.25%、1%，V2手续费为0.25%。
-
-##### 区间流动性（LP）
-
-```exchange.IO("lp.*", ...)```指令提供PancakeSwap V3池子与不带hook的Infinity CL池子的区间流动性：选池、规划与模拟、建仓、加减仓、领手续费、撤出和仓位查询。仓位是PositionManager的NFT：V3仓位的```id```即NFT编号，Infinity CL仓位写成```inf:编号```（两个合约的编号会重复）；V3与Infinity CL仓位可以在同一条指令里一起传，各发一笔交易。Infinity CL只在BNB Chain与Base上可用，只用手续费不超过1%的池子；Infinity的Bin池子不支持。
-
-写指令（```lp.add```、```lp.increase```、```lp.decrease```、```lp.collect```、```lp.remove```）在交易上链后返回；之后一分钟内的链上读取都不早于该交易所在的区块（公共节点背后的负载均衡可能落到还没同步到这一块的机器），所以紧接着调用下一条指令不会按旧状态构造交易。建仓时原生币按当前gas价留出约300万gas的手续费，其余可用于建仓。
-
-监控与撤退由策略自己做：```lp.positions```给出是否在区间内、当前价值与未领手续费，策略据此决定调仓或止损（参考示例策略```examples/strategies/uniswap-lp-monitor.js```）。
-
-风险：
-- 无常损失：价格偏离建仓价越远，仓位价值相对单纯持有越低；单边上涨时仓位逐步卖出代币，下跌时逐步买入。
-- 价格出区间后仓位只剩一种代币，不再赚手续费，直到价格回到区间。
-- 每次建仓、调仓、领取、撤出都是链上交易，频繁调仓的gas成本可能超过手续费收入；更适合BNB Chain、Base、Arbitrum等低gas的链。
-- 计划中的预估日手续费按过去24小时成交与当前占池比例估算，不代表未来收益。
-
-##### 跨链桥（bridge）
-
-```exchange.IO("bridge.*", ...)```经LI.FI聚合的跨链桥（Across、Stargate、CCTP、deBridge、Mayan、Relay、NEAR Intents等）把代币从本交易所对象的链转到另一条链，支持EVM链之间以及EVM与Solana之间（源链为本交易所对象的链）。报价与交易由LI.FI给出，由托管者授权、```eth_call```模拟后签名广播。请求带集成方标识```integrator=fmz```，不加收任何费用；报价中的```LIFI Fixed Fee```等是LI.FI与桥自己的费用，已计入```toAmount```。
-
-典型流程：```bridge.quote```看报价 → ```bridge.simulate```模拟 → ```bridge.send```发出 → 每10～30秒```bridge.status```直到```DONE```或```FAILED```。
-
-- 跨链是异步的：```bridge.send```返回时只是源链交易已广播，到账要几秒到几十分钟（见报价的```executionDuration```），必须轮询```bridge.status```确认；```PARTIAL```表示目标链收到的是别的代币，```REFUNDED```表示已退回源链。
-- 跨虚拟机（EVM↔Solana）必须传```toAddress```，地址格式按目标链检查；地址写错的资金无法找回。
-- 风险：桥合约与跨链消息的安全风险由各桥承担；报价随时变化，```bridge.send```发出前会重新报价；目标链需要有gas才能继续使用到账的代币。先用小额测试。
-- 限频：没有API Key时LI.FI按出口IP限频，```/quote```两小时75次（```bridge.quote```、```bridge.simulate```、```bridge.send```各用一次，授权后再报价时多一次），其它接口每分钟100次；同一托管者上的策略共用额度。用```exchange.IO("bridge.apiKey", key)```设置Key后每分钟100次。被限频时报错```rate limited (HTTP 429 …)```。
-
-#### Aerodrome
-
-连接Base上Aerodrome的池子，把链上兑换映射为现货交易函数。链固定为Base，配置里没有「链」选项（旧式配置带了别的```Chain```时启动报错）。使用Slipstream集中流动性池子（新旧两代部署都使用，池子按tick间距区分，手续费由池子自己设定）和基础池子（volatile为恒定乘积，stable为稳定币曲线）。基础池子只支持精确输入：限价买入（按买到的数量成交）只能走Slipstream池子。两类池子都支持LP与gauge质押领AERO。
+| 比较项 | Aerodrome | Velodrome |
+| - | - | - |
+| 链 | Base | OP Mainnet |
+| gauge奖励币 | AERO | VELO |
+| Slipstream仓位ID | ```aero:编号```（老工厂）、```aero2:编号```（新工厂） | ```velo:编号```（老工厂）、```velo2:编号```（新工厂） |
+| ```exchange.IO("contracts")```里本交易所的合约 | ```aerodrome``` | ```velodrome``` |
 
 每笔兑换在所有可用池子的直连路径和经中转币的两跳路径中选报价最好的一条。基础池子和两代Slipstream各有自己的路由合约，代币分别授权给本次兑换所用的那个路由。
 
-Aerodrome原是`Uniswap`交易所「DEX」配置项的一个选项，2026年10月起是独立的交易所；以前在Uniswap交易所选了Aerodrome的配置启动时报错，请改建Aerodrome交易所。
+同一套实现的还有`Uniswap / PancakeSwap`和兑换聚合器`KyberSwap`、`1inch`：代币表、余额、授权、订单、撤单、转账与跨链桥的用法相同。Aerodrome、Velodrome原是Uniswap交易所「DEX」配置项的选项，2026年10月起是独立的交易所；以前在Uniswap交易所选了它们的配置启动时报错，请改建对应的交易所。
 
 ##### 名称与配置
 
-```exchange.GetName()```：```Aerodrome```（现货）；别名：Aero。
+| ```exchange.GetName()``` | 类型 | 别名 |
+| - | - | - |
+| ```Aerodrome``` | 现货 | Aero |
+| ```Velodrome``` | 现货 | Velo |
 
 | 配置项 | 必填 | 默认值 | 说明 |
 | - | - | - | - |
 | 钱包私钥 | 是 | — | 钱包私钥（十六进制）。 |
-| 节点地址 | 否 | ```https://mainnet.base.org,https://base-rpc.publicnode.com``` | RPC节点地址；多个节点用逗号分隔，某个节点出错或缺少数据时自动换下一个；不填时使用各链内置的默认节点（主节点加备用节点，逗号分隔）。（详见表下） |
+| 节点地址 | 否 | Aerodrome：```https://mainnet.base.org,https://base-rpc.publicnode.com```；Velodrome：```https://mainnet.optimism.io,https://optimism-rpc.publicnode.com``` | RPC节点地址；多个节点用逗号分隔，某个节点出错或缺少数据时自动换下一个；不填时使用各链内置的默认节点（主节点加备用节点，逗号分隔）。（详见表下） |
 | 节点认证 | 否 | — | RPC节点认证：```Header-Name: value```形式的请求头，或Basic认证值。 |
 
 表中长说明的其余部分：
@@ -29765,14 +29643,14 @@ Aerodrome原是`Uniswap`交易所「DEX」配置项的一个选项，2026年10�
 | ```lp.add``` | plan | 按计划建仓：需要时先用市价单换币，再授权，一笔交易创建全部仓位，等上链后返回。（详见表下） | ```{txHash, swapTxHash, pool, positions: [{id, tickLower, tickUpper, priceLower, priceUpper, liquidity, amountBase, amountQuote}]}``` |
 | ```lp.increase``` | positionId, budget[, options] | 给仓位加仓：```budget```（计价币）按仓位区间与现价的配比拆成两种代币，缺的那种先换。（详见表下） | ```{txHash, swapTxHash, id, liquidity, amountBase, amountQuote}``` |
 | ```lp.decrease``` | positionId, ratio[, options] | 按比例（0到1）减仓，同时领取全部手续费，仓位保留。（详见表下） | ```{txHash, positions: [{id, symbol, principalBase, principalQuote, feesBase, feesQuote, receivedBase, receivedQuote}], sells}``` |
-| ```lp.collect``` | positionIds[, sell] | 领取手续费，多个仓位合成一笔交易；```sell```为```true```时把领到的代币卖成计价币。质押着的仓位不收交易手续费（归投票人），报错并提示用```lp.claim```领AERO；基础池用池子的```claimFees```领取钱包里LP代币累积的手续费，每个池子一笔交易。 | 同```lp.decrease```。 |
+| ```lp.collect``` | positionIds[, sell] | 领取手续费，多个仓位合成一笔交易；```sell```为```true```时把领到的代币卖成计价币。质押着的仓位不收交易手续费（归投票人），报错并提示用```lp.claim```领奖励；基础池用池子的```claimFees```领取钱包里LP代币累积的手续费，每个池子一笔交易。 | 同```lp.decrease```。 |
 | ```lp.remove``` | positionIds[, ratio[, sell]] | 撤出流动性并领取手续费，多个仓位合成一笔交易；```ratio```默认1（全部撤出并销毁仓位NFT），小于1时只撤一部分；```sell```为```true```时卖回计价币。（详见表下） | 同```lp.decrease```。 |
 | ```lp.positions``` | [filter[, wallet]] | 钱包的全部Slipstream与基础池仓位：区间、是否在区间内、流动性、当前数量与价值、未领手续费。（详见表下） | ```[{id, pool, protocol, symbol, fee, tickLower, tickUpper, priceLower, priceUpper, price, tick, inRange, liquidity, amountBase, amountQuote, value, feesBase, feesQuote, feesValue, closed}]```，```value```、```feesValue```按计价币计。 |
 | ```lp.history``` | positionId | 仓位资金流水：存入、撤出本金、领取手续费，以及按当前池价折算的盈亏（现值 + 已领手续费 + 已撤本金 − 存入本金，不含gas）。需要能查历史日志的节点；公共节点常常不支持。基础池的LP代币没有按仓位的事件，不支持。 | ```{id, symbol, events: [{action, block, txHash, liquidity, amountBase, amountQuote}], depositedBase, depositedQuote, withdrawnBase, withdrawnQuote, feesCollectedBase, feesCollectedQuote, price, pnlQuote, note}``` |
-| ```lp.track``` | positionIds | 登记Slipstream仓位（```aero:编号```、```aero2:编号```；与交易所对象不符的前缀报错）和基础池地址，之后```lp.positions```会查这些仓位（归属每次按链上核对，质押在gauge里的按质押人核对，转走的不列）。（详见表下） | 本进程记住的全部仓位ID。 |
-| ```lp.stake``` | positionIds | 把仓位质押进所在池子的gauge领AERO，每个仓位各自的交易。（详见表下） | ```{positions: [{id, gauge, approveTxHash, txHash, feesBase, feesQuote}]}```；基础池为```{id, gauge, txHash, lpTokens}```。 |
-| ```lp.unstake``` | positionIds | 从gauge取回。Slipstream仓位取回NFT，同时领走累积的AERO；基础池取回全部质押的LP代币，AERO留在gauge里，用```lp.claim```领。每个仓位各自的交易。 | ```{positions: [{id, gauge, txHash, rewards}]}```，```rewards```为这笔交易领到的AERO；基础池另有```lpTokens```。 |
-| ```lp.claim``` | positionIds[, sell] | 领AERO奖励，一笔```Voter.claimRewards```领这些仓位所在gauge里本钱包的全部奖励（同一gauge里本钱包的其它质押仓位也一起领）；```sell```为```true```时把领到的奖励币按市价卖成USDC。 | ```{txHash, gauges, rewardToken, rewards, sell}```，```rewardToken```为```AERO```。 |
+| ```lp.track``` | positionIds | 登记Slipstream仓位（（Aerodrome：```aero:编号```、```aero2:编号```；Velodrome：```velo:编号```、```velo2:编号```）；与交易所对象不符的前缀报错）和基础池地址，之后```lp.positions```会查这些仓位（归属每次按链上核对，质押在gauge里的按质押人核对，转走的不列）。（详见表下） | 本进程记住的全部仓位ID。 |
+| ```lp.stake``` | positionIds | 把仓位质押进所在池子的gauge领奖励，每个仓位各自的交易。（详见表下） | ```{positions: [{id, gauge, approveTxHash, txHash, feesBase, feesQuote}]}```；基础池为```{id, gauge, txHash, lpTokens}```。 |
+| ```lp.unstake``` | positionIds | 从gauge取回。Slipstream仓位取回NFT，同时领走累积的奖励；基础池取回全部质押的LP代币，奖励留在gauge里，用```lp.claim```领。每个仓位各自的交易。 | ```{positions: [{id, gauge, txHash, rewards}]}```，```rewards```为这笔交易领到的奖励币数量；基础池另有```lpTokens```。 |
+| ```lp.claim``` | positionIds[, sell] | 领奖励，一笔```Voter.claimRewards```领这些仓位所在gauge里本钱包的全部奖励（同一gauge里本钱包的其它质押仓位也一起领）；```sell```为```true```时把领到的奖励币按市价卖成USDC。 | ```{txHash, gauges, rewardToken, rewards, sell}```，```rewardToken```为（Aerodrome：```AERO```；Velodrome：```VELO```）。 |
 | ```bridge.chains``` | — | 跨链桥（LI.FI）支持的链：EVM链与Solana，缓存1小时。 | ```{id, key, name, chainType, nativeToken}```数组，```chainType```为```EVM```或```SVM```。 |
 | ```bridge.tokens``` | [chain] | LI.FI认识的某条链上的代币（缺省为本链），缓存1小时。 | ```{symbol, address, decimals, name, priceUSD}```数组。 |
 | ```bridge.quote``` | params | 跨链报价（只读），源链为本交易所对象的链。（详见表下） | ```{tool, toolName, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, fromAmountRaw, toAmountRaw, toAmountMinRaw, fromAmountUSD, toAmountUSD, slippage, toAddress, feeCosts, gasCosts, executionDuration, approvalAddress, steps, transactionId, request}```：数量为代币单位（```*Raw```为最小单位原值）；```toAmountMin```为扣除滑点后保证到手的数量；```feeCosts```为```[{name, amount, token, amountUSD, percentage, included}]```（```included```为```false```的费用另付）；```gasCosts```为源链gas估算；```executionDuration```为预计耗时（秒）；```approvalAddress```为需要授权的合约（原生币、Solana为```null```）；```steps```为各步骤（```cross```为跨链，```swap```为兑换）；```request```为参数原样回显。 |
@@ -29783,20 +29661,20 @@ Aerodrome原是`Uniswap`交易所「DEX」配置项的一个选项，2026年10�
 
 表中长说明的其余部分：
 
-- ```contracts```的返回值：```router```为基础池子的Router，```quoterV2```、```v3Factory```为第一代Slipstream的QuoterV2与工厂，```v3Fees```为空、```v2Fee```为0，```v2Factory```、```positionManager```、```v4```为```null```；Aerodrome的合约在```aerodrome```里：基础池的```router```、```poolFactory```，以及各代Slipstream的```factory```、```swapRouter```、```quoterV2```、```tickSpacings```。
+- ```contracts```的返回值：```router```为基础池子的Router，```quoterV2```、```v3Factory```为第一代Slipstream的QuoterV2与工厂，```v3Fees```为空、```v2Fee```为0，```v2Factory```、```positionManager```、```v4```为```null```；本交易所的合约在（Aerodrome：```aerodrome```；Velodrome：```velodrome```）里：基础池的```router```、```poolFactory```，以及各代Slipstream的```factory```、```swapRouter```、```quoterV2```、```tickSpacings```。
 - ```lp.pools```：按TVL降序，空池子（```empty```为```true```，现价处没有流动性，现价没有意义）的```price```、```tvlQuote```、```tvlUsd```为```null```，排在最后。Slipstream池子的```protocol```为```slipstream```（老工厂）或```slipstream2```（新工厂）；基础池子为```volatile```、```stable```，另带```stable```，没有tick。
-- ```lp.pools```的返回值：每行另带gauge信息```gauge```、```gaugeAlive```、```stakedShare```（质押占比）、```rewardsPerDay```（每天发的AERO）、```rewardsPerDayUsd```、```rewardAprPct```（按质押部分TVL折算的奖励年化，%）。
+- ```lp.pools```的返回值：每行另带gauge信息```gauge```、```gaugeAlive```、```stakedShare```（质押占比）、```rewardsPerDay```（每天发的奖励币数量）、```rewardsPerDayUsd```、```rewardAprPct```（按质押部分TVL折算的奖励年化，%）。
 - ```lp.select```：```budget```按计价币计，```options.quote```指定计价币。可用```options.protocol```按池子类型筛选（```slipstream```、```slipstream2```、```volatile```、```stable```或它们的数组），也可用```options.tickSpacing```筛选。
 - ```lp.plan```：```params```：```symbol```（如```ETH_USDC```）、```budget```（计价币）、```range```（```{lower, upper}```价格，或```{pct: [-5, 5]}```相对现价百分比，或```{ticks: [lo, hi]}```，自动对齐tick间距）、```shape```（```spot```单一区间、```curve```多层嵌套现价附近最厚、```bidask```两侧分段越远越厚）、```layers```（默认3，最多20；curve各层都跨过现价、互不相同且对齐tick间距，优先逐层向内嵌套，嵌套排不下时用区间内其它跨现价的组合补齐；双边区间最多能放下「现价以下的合法下沿数×现价以上的合法上沿数」层，超过时给出能放下的最多层数，实际层数见返回的```layers```，少于请求时带```warning```）、```pool```（不填按```lp.select```选）、```fee```、```slippage```（默认0.01）。钱包不够时照样给出计划，```shortfall```说明差额。Slipstream池子、交易对写原生币（如```ETH_USDC```）时，包装币那一侧要么整笔用原生币付、要么整笔用包装币付，两种余额不会拼着用：原生币够这一侧全额时用原生币，否则包装币够就用包装币，都不够时按余额多的那种计算```haveBase```/```haveQuote```与需要换的币（```swap.currency```就是那一种），返回的```payWith```为这一侧实际用的币。有```range```时用Slipstream池子（可加```tickSpacing```、```protocol```选池）；不给```range```（或```pool```是基础池）时为基础池计划：两种代币按储备比例存入，```stable```为```true```或```false```限定池子类型；```stake```为```true```时```lp.add```建完直接质押进gauge。
 - ```lp.plan```的返回值：基础池计划为```{params, symbol, pool, protocol, stable, fee, price, budget, budgetUsd, needBase, needQuote, haveBase, haveQuote, amountBase, amountQuote, lpTokens, swap, shortfall, shareOfPool, volume24hUsd, estDailyFeesUsd, slippageBps}```。
 - ```lp.simulate```：计划需要先换币时按换完的数量模拟；钱包余额或授权不够时可用```stateOverride```补上。基础池用Router的```quoteAddLiquidity```模拟（不需要余额和授权），返回```{pool, protocol, lpTokens, amountBase, amountQuote, swapNeeded, note}```。
-- ```lp.add```：传计划或计划的```params```都可以（执行时按最新池价重算）。Slipstream池子：交易对写原生币（如```ETH_USDC```）时按计划的```payWith```付包装币那一侧：整笔原生币（随交易附带，多的由```refundETH```退回）或整笔包装币，不拼着用；领回来的是包装币。Slipstream仓位的```id```为```aero:编号```（老工厂）或```aero2:编号```（新工厂）；基础池经Router存入，交易对写原生币时用原生币余额（```addLiquidityETH```），仓位```id```为池子地址，返回```{txHash, swapTxHash, pool, id, lpTokens, amountBase, amountQuote}```。计划的```stake```为```true```时结果另有```stake```（同```lp.stake```）。
+- ```lp.add```：传计划或计划的```params```都可以（执行时按最新池价重算）。Slipstream池子：交易对写原生币（如```ETH_USDC```）时按计划的```payWith```付包装币那一侧：整笔原生币（随交易附带，多的由```refundETH```退回）或整笔包装币，不拼着用；领回来的是包装币。Slipstream仓位的```id```为（Aerodrome：```aero:编号```或```aero2:编号```；Velodrome：```velo:编号```或```velo2:编号```）（老、新工厂）；基础池经Router存入，交易对写原生币时用原生币余额（```addLiquidityETH```），仓位```id```为池子地址，返回```{txHash, swapTxHash, pool, id, lpTokens, amountBase, amountQuote}```。计划的```stake```为```true```时结果另有```stake```（同```lp.stake```）。
 - ```lp.increase```：```options.symbol```指定朝向（默认稳定币为计价币；写原生币如```ETH_USDC```时原生币那一侧的付法同```lp.add```），```options.slippage```价格保护。质押着的仓位要先```lp.unstake```；基础池（```positionId```为池子地址）加仓等于对该池子再```lp.add```，```options.stake```为```true```时加完质押。
 - ```lp.decrease```：```options.slippage```价格保护，```options.sell```为```true```时把拿回的代币卖成计价币。质押着的仓位要先```lp.unstake```（基础池只要钱包里未质押的LP代币够就可以）；基础池按比例取回LP代币，拿回的原生币是包装币。
 - ```lp.remove```：质押着的仓位先从gauge取回（同时领走奖励，见```lp.unstake```）再撤；基础池全部撤出时另发一笔```claimFees```领手续费。
-- ```lp.positions```：```filter```为交易对（给定价格朝向）或代币（只列含它的仓位），```*```或不传为全部；```wallet```为其它钱包地址时只读查看那个钱包。钱包里的Slipstream仓位直接列出；质押在gauge里的仓位NFT归gauge所有，去这些gauge查：本进程质押过的、钱包转出NFT的日志里找到的（节点通常只能查最近一段区块的日志）、```lp.track```登记过的仓位所在的、以及```filter```对应池子的；基础池仓位查本进程建过的、```lp.track```登记的池子和```filter```对应的池子；列全部（```*```或不传）或按代币筛选时还查代币表（内置与已登记的代币，加上AERO）里每个代币与包装币、稳定币、AERO组成的交易对上的volatile与stable池子（最多128对，池子地址缓存10分钟），钱包里或gauge里有LP代币（或gauge里有未领奖励）的就列出，新进程不用```lp.track```也能找到；其它交易对上的基础池用```filter```或```lp.track```。每行另有```staked```、```gauge```、```rewardToken```（AERO）、```rewards```（可领的AERO）、```rewardsValue```（按计价币折算）；基础池另有```fullRange```、```lpTokens```、```stakedLpTokens```，没有tick。
+- ```lp.positions```：```filter```为交易对（给定价格朝向）或代币（只列含它的仓位），```*```或不传为全部；```wallet```为其它钱包地址时只读查看那个钱包。钱包里的Slipstream仓位直接列出；质押在gauge里的仓位NFT归gauge所有，去这些gauge查：本进程质押过的、钱包转出NFT的日志里找到的（节点通常只能查最近一段区块的日志）、```lp.track```登记过的仓位所在的、以及```filter```对应池子的；基础池仓位查本进程建过的、```lp.track```登记的池子和```filter```对应的池子；列全部（```*```或不传）或按代币筛选时还查代币表（内置与已登记的代币，加上奖励币）里每个代币与包装币、稳定币、奖励币组成的交易对上的volatile与stable池子（最多128对，池子地址缓存10分钟），钱包里或gauge里有LP代币（或gauge里有未领奖励）的就列出，新进程不用```lp.track```也能找到；其它交易对上的基础池用```filter```或```lp.track```。每行另有```staked```、```gauge```、```rewardToken```（奖励币）、```rewards```（可领的奖励币数量）、```rewardsValue```（按计价币折算）；基础池另有```fullRange```、```lpTokens```、```stakedLpTokens```，没有tick。
 - ```lp.track```：节点查不到全部历史日志时用它找回以前建的仓位；策略可以把```lp.add```返回的ID存起来（如```_G```），重启后登记。
-- ```lp.stake```：Slipstream仓位先把这个NFT授权给gauge（已授权时跳过），再存入整个NFT，存入时gauge把仓位未领的手续费转给本人；基础池把钱包里未质押的LP代币全部存入。已被Voter停掉的gauge不能存入，报错。质押期间仓位不收交易手续费（归投票人），只拿AERO；仍在区间外时不发奖励（Slipstream）。
+- ```lp.stake```：Slipstream仓位先把这个NFT授权给gauge（已授权时跳过），再存入整个NFT，存入时gauge把仓位未领的手续费转给本人；基础池把钱包里未质押的LP代币全部存入。已被Voter停掉的gauge不能存入，报错。质押期间仓位不收交易手续费（归投票人），只拿奖励币；仍在区间外时不发奖励（Slipstream）。
 - ```bridge.quote```：```params```：```toChain```（目标链：链ID、LI.FI的链key如```arb```、或链名如```Arbitrum```、```Solana```）、```fromToken```（本链代币：代币表里的名字或合约地址）、```toToken```（目标链代币：名字或地址，由LI.FI解析为它的标准代币，如Arbitrum上的```USDC```是原生USDC，不是USDC.e）、```amount```（```fromToken```的数量，按代币单位，超出代币精度的位舍去）、```toAddress```（收款地址；目标为EVM链时缺省为本钱包，目标为Solana时必须传Solana地址，不传报错）、```slippage```（缺省为```exchange.IO("slippage")```的值）、```order```（```CHEAPEST```或```FASTEST```）、```allowBridges```/```denyBridges```（LI.FI的桥名，数组或逗号分隔）。不认识的键报错。
 - ```bridge.simulate```：代币授权不够时自动用state override补成无限额度（同```simulate```，结果里```allowanceOverride```列出补了什么）；余额不会自动补，可以用```stateOverride```（```eth_call```的第三参）自己补。余额不够导致失败时报错里给出钱包余额。
 - ```bridge.send```：原生币不用授权。只等授权上链，不等桥接交易；跨链是异步的，用```bridge.status```轮询。传```bridge.quote```的结果时按其中的```request```重新报价（报价随时变化，实际成交以新报价为准，```toAmountMin```由交易在链上保证）。
@@ -29816,12 +29694,12 @@ Aerodrome原是`Uniswap`交易所「DEX」配置项的一个选项，2026年10�
 
 ##### 注意事项
 
-| 函数 | Aerodrome交易所的行为 |
+| 函数 | 行为 |
 | - | - |
 | exchange.GetTicker() | 买一、卖一为约1000美元规模的实际可成交价；链上没有24小时统计。买卖两边各取最优池子，跨池偶尔交叉时两边都给中间价，```Info.crossed```写明交叉幅度 |
 | exchange.GetDepth() | 由逐档递增规模的链上询价推算：规模从约1000美元递增到100万美元，默认5档、最多10档。买卖两边取各自最优的池子，跨池偶尔交叉（买一高于卖一）时，交叉的价格按中间价给出、数量不变，```Info.crossed```写明中间价与交叉幅度 |
 | exchange.GetTrades() | 该交易对各个池子最近约10分钟区块内的链上成交，每次最多500条 |
-| exchange.GetRecords() | K线来自GeckoTerminal的池子级数据：取Aerodrome上该交易对在GeckoTerminal美元流动性最深的池子（Slipstream与基础池子都参与比较，交易对写原生币时原生币池与包装币池都算；选中的池子缓存1小时）。价格为该池子的逐笔成交价（含池子手续费，与```exchange.GetTicker()```的中间价可能相差约一个池子费率），单位为计价币/基础币，```Volume```为基础币数量；没有成交的周期按上一根收盘价补平、成交量为0，最后一根可能尚未收盘。GeckoTerminal的数据有几十秒到1分钟的延迟，公开接口约每分钟10次：同一周期的K线缓存1分钟，请求在托管者内排队，被限频时等待重试，仍不行时报错。GeckoTerminal没有收录Aerodrome上该交易对的任何池子时报错 |
+| exchange.GetRecords() | K线来自GeckoTerminal的池子级数据：取本交易所上该交易对在GeckoTerminal美元流动性最深的池子（Slipstream与基础池子都参与比较，交易对写原生币时原生币池与包装币池都算；选中的池子缓存1小时）。价格为该池子的逐笔成交价（含池子手续费，与```exchange.GetTicker()```的中间价可能相差约一个池子费率），单位为计价币/基础币，```Volume```为基础币数量；没有成交的周期按上一根收盘价补平、成交量为0，最后一根可能尚未收盘。GeckoTerminal的数据有几十秒到1分钟的延迟，公开接口约每分钟10次：同一周期的K线缓存1分钟，请求在托管者内排队，被限频时等待重试，仍不行时报错。GeckoTerminal没有收录本交易所上该交易对的任何池子时报错 |
 | exchange.GetMarkets() | 内置与已登记代币两两配对、链上确实有池子的交易对；含包装币的交易对另列一行原生币写法。```TickSize```固定为1e-8，```PricePrecision```为8，```AmountPrecision```为代币精度，```MinNotional```为0 |
 | exchange.GetOrders() | 只列出本进程发出、还没上链的兑换交易（保存在内存里，重启后清空） |
 | exchange.GetAssets() | 原生币和代币表中各代币的钱包余额 |
@@ -29831,165 +29709,11 @@ Aerodrome原是`Uniswap`交易所「DEX」配置项的一个选项，2026年10�
 
 ##### 区间流动性（LP）
 
-```exchange.IO("lp.*", ...)```指令提供Aerodrome的Slipstream池子与基础池子的区间流动性：选池、规划与模拟、建仓、加减仓、领手续费、撤出和仓位查询，以及gauge质押领AERO。Slipstream池子（新旧两代工厂）是集中流动性池子，仓位是各代PositionManager的NFT，写成```aero:编号```（老工厂）或```aero2:编号```（新工厂）；池子费率由池子自己定（可能是动态费率），```fee```为当前值。没有质押的Slipstream仓位要把一部分手续费（池子的```unstakedFee```，目前多为5%）交给gauge。
+```exchange.IO("lp.*", ...)```指令提供Slipstream池子与基础池子的区间流动性：选池、规划与模拟、建仓、加减仓、领手续费、撤出和仓位查询，以及gauge质押领奖励。Slipstream池子（新旧两代工厂）是集中流动性池子，仓位是各代PositionManager的NFT，写成```前缀:编号```（老工厂）或```前缀2:编号```（新工厂），前缀Aerodrome为```aero```、Velodrome为```velo```；池子费率由池子自己定（可能是动态费率），```fee```为当前值。没有质押的Slipstream仓位要把一部分手续费（池子的```unstakedFee```，目前多为5%）交给gauge。
 
 基础池（volatile、stable）是全区间的：```lp.plan```不给```range```即为基础池计划，两种代币按储备比例存入，仓位就是池子的LP代币，```id```为池子地址。
 
-gauge质押：```lp.stake```把仓位存进gauge领AERO，```lp.unstake```取回，```lp.claim```领奖励。质押期间交易手续费归投票人、仓位只拿AERO，Slipstream仓位在区间外时也不发奖励；质押着的仓位不能加减仓或领手续费，要先取回（```lp.remove```会自动先取回）。```lp.pools```的```rewardAprPct```按当前每秒奖励与质押部分的TVL估算，随AERO价格和质押量变化；奖励按AERO计价，价格波动大，领到后可以用```lp.claim```的```sell```卖成USDC。
-
-写指令（```lp.add```、```lp.increase```、```lp.decrease```、```lp.collect```、```lp.remove```、```lp.stake```、```lp.unstake```、```lp.claim```）在交易上链后返回；之后一分钟内的链上读取都不早于该交易所在的区块（公共节点背后的负载均衡可能落到还没同步到这一块的机器），所以紧接着调用下一条指令不会按旧状态构造交易。建仓时原生币按当前gas价留出约300万gas的手续费，其余可用于建仓。
-
-监控与撤退由策略自己做：```lp.positions```给出是否在区间内、当前价值与未领手续费，策略据此决定调仓或止损（参考示例策略```examples/strategies/uniswap-lp-monitor.js```）。
-
-风险：
-- 无常损失：价格偏离建仓价越远，仓位价值相对单纯持有越低；单边上涨时仓位逐步卖出代币，下跌时逐步买入。
-- 价格出区间后仓位只剩一种代币，不再赚手续费，直到价格回到区间。
-- 每次建仓、调仓、领取、撤出都是链上交易，频繁调仓的gas成本可能超过手续费收入。
-- 计划中的预估日手续费按过去24小时成交与当前占池比例估算，不代表未来收益。
-
-##### 跨链桥（bridge）
-
-```exchange.IO("bridge.*", ...)```经LI.FI聚合的跨链桥（Across、Stargate、CCTP、deBridge、Mayan、Relay、NEAR Intents等）把代币从本交易所对象的链转到另一条链，支持EVM链之间以及EVM与Solana之间（源链为本交易所对象的链）。报价与交易由LI.FI给出，由托管者授权、```eth_call```模拟后签名广播。请求带集成方标识```integrator=fmz```，不加收任何费用；报价中的```LIFI Fixed Fee```等是LI.FI与桥自己的费用，已计入```toAmount```。
-
-典型流程：```bridge.quote```看报价 → ```bridge.simulate```模拟 → ```bridge.send```发出 → 每10～30秒```bridge.status```直到```DONE```或```FAILED```。
-
-- 跨链是异步的：```bridge.send```返回时只是源链交易已广播，到账要几秒到几十分钟（见报价的```executionDuration```），必须轮询```bridge.status```确认；```PARTIAL```表示目标链收到的是别的代币，```REFUNDED```表示已退回源链。
-- 跨虚拟机（EVM↔Solana）必须传```toAddress```，地址格式按目标链检查；地址写错的资金无法找回。
-- 风险：桥合约与跨链消息的安全风险由各桥承担；报价随时变化，```bridge.send```发出前会重新报价；目标链需要有gas才能继续使用到账的代币。先用小额测试。
-- 限频：没有API Key时LI.FI按出口IP限频，```/quote```两小时75次（```bridge.quote```、```bridge.simulate```、```bridge.send```各用一次，授权后再报价时多一次），其它接口每分钟100次；同一托管者上的策略共用额度。用```exchange.IO("bridge.apiKey", key)```设置Key后每分钟100次。被限频时报错```rate limited (HTTP 429 …)```。
-
-#### Velodrome
-
-连接OP Mainnet上Velodrome的池子，把链上兑换映射为现货交易函数。链固定为OP Mainnet，配置里没有「链」选项（旧式配置带了别的```Chain```时启动报错）。使用Slipstream集中流动性池子（新旧两代部署都使用，池子按tick间距区分，手续费由池子自己设定）和基础池子（volatile为恒定乘积，stable为稳定币曲线）。基础池子只支持精确输入：限价买入（按买到的数量成交）只能走Slipstream池子。两类池子都支持LP与gauge质押领VELO。
-
-与`Aerodrome`是同一套合约，池子种类、兑换与LP用法都相同。
-
-每笔兑换在所有可用池子的直连路径和经中转币的两跳路径中选报价最好的一条。基础池子和两代Slipstream各有自己的路由合约，代币分别授权给本次兑换所用的那个路由。
-
-Velodrome原是`Uniswap`交易所「DEX」配置项的一个选项，2026年10月起是独立的交易所；以前在Uniswap交易所选了Velodrome的配置启动时报错，请改建Velodrome交易所。
-
-##### 名称与配置
-
-```exchange.GetName()```：```Velodrome```（现货）；别名：Velo。
-
-| 配置项 | 必填 | 默认值 | 说明 |
-| - | - | - | - |
-| 钱包私钥 | 是 | — | 钱包私钥（十六进制）。 |
-| 节点地址 | 否 | ```https://mainnet.optimism.io,https://optimism-rpc.publicnode.com``` | RPC节点地址；多个节点用逗号分隔，某个节点出错或缺少数据时自动换下一个；不填时使用各链内置的默认节点（主节点加备用节点，逗号分隔）。（详见表下） |
-| 节点认证 | 否 | — | RPC节点认证：```Header-Name: value```形式的请求头，或Basic认证值。 |
-
-表中长说明的其余部分：
-
-- 节点地址：查询订单状态需要节点能查到已上链交易的回执：publicnode的Base、BNB Chain、Arbitrum公共节点查不到回执（要求归档权限），不要单独使用。
-
-##### 交易对与合约代码
-
-交易对示例：```ETH_USDC```、```WETH_USDC```
-
-交易对写作```ETH_USDC```，原生币（ETH）与包装币（WETH）是两个不同的资产。
-
-代币表以外的代币用```exchange.IO("token", name, address)```登记后即可写在交易对里。
-
-##### 专属IO指令
-
-| 指令 | 参数 | 说明 | 返回值 |
-| - | - | - | - |
-| ```transfer``` | to, amount[, token] | 从配置的钱包转出原生币或ERC20代币（```token```为代币名或合约地址，不传为原生币）；```amount```可传```all```转出全部（原生币扣除手续费）。只等交易广播，不等上链。见子页`exchange.IO("transfer", ...)`。 | ```{txHash, from, to, token, tokenAddress, amount, raw}``` |
-| ```receipt``` | txHash[, waitMs] | 查询本链任意交易的回执（不限本交易所对象发出的），可以等待上链（最多10分钟）。查询订单时传订单ID中逗号后面的交易哈希。见子页`exchange.IO("receipt", ...)`。 | 已上链返回```{txHash, status, blockNumber, gasUsed, fee}```（```status```为```success```或```reverted```），未上链返回```{txHash, pending: true, known}```。 |
-| ```route``` | symbol, side, qty | 只询价不下单：列出一笔兑换各条候选路径的报价和最优路径。```qty```一律是基础币数量：```sell```按精确输入卖出```qty```，```buy```按精确输出买到```qty```（与市价买单按计价币金额下单不同）。见子页`exchange.IO("route", ...)`。 | ```{symbol, side, qty, best, quote, price, candidates}``` |
-| ```simulate``` | symbol, side, qty[, price[, stateOverride[, route]]] | 按下单逻辑（选路、询价、价格保护）构造兑换交易，只用```eth_call```模拟执行，不签名、不广播、不花费gas。见子页`exchange.IO("simulate", ...)`。 | ```{route, exactIn, amountIn, amountOut, quoted, executed, value, calls}```，补过授权时另有```allowanceOverride```。 |
-| ```token``` | [name, address] | 登记代币，登记后的代币可以直接写在交易对里；不传参数时列出代币表。见子页`exchange.IO("token", ...)`。 | 登记时返回```{symbol, address, decimals}```，列表时返回```{symbol, address, decimals, native}```数组。 |
-| ```wrap``` | amount | 原生币包装成包装币（例如ETH→WETH），1:1、无滑点、只花gas；不接受```all```（要留gas）。见子页`exchange.IO("wrap", ...)`。 | ```{txHash, action, from, to, amount, raw}``` |
-| ```unwrap``` | amount | 包装币解包成原生币（例如WETH→ETH），```amount```可传```all```。见子页`exchange.IO("unwrap", ...)`。 | ```{txHash, action, from, to, amount, raw}``` |
-| ```approve``` | ["exact" \| "max"] | 代币授权模式：```exact```（默认）每次只授权本次兑换需要的数量，```max```授权无限额度。不传参数时查询。见子页`exchange.IO("approve", ...)`。 | 当前模式。 |
-| ```slippage``` | [ratio] | 市价单的滑点保护比例，范围```[0, 0.5)```，默认```0.005```（0.5%）。不传参数时查询。见子页`exchange.IO("slippage", ...)`。 | 当前滑点比例。 |
-| ```deadline``` | [seconds] | 交易有效期（秒），范围10到86400，默认120。不传参数时查询。见子页`exchange.IO("deadline", ...)`。 | 当前截止时间（秒）。 |
-| ```cancelWait``` | [seconds] | 撤单时等待结果的最长时间（秒），范围0到600，默认30；0表示发出撤单交易后立即返回。不传参数时查询。见子页`exchange.IO("cancelWait", ...)`。 | 当前等待时间（秒）。 |
-| ```gasMultiplier``` | [x] | gas上限倍数，范围1到5，默认1.2：交易的gasLimit为节点估算的gas乘以该倍数。见子页`exchange.IO("gasMultiplier", ...)`。 | 当前倍数。 |
-| ```base``` | [url] | 不传参数时返回当前节点地址；传入地址时切换节点。多个节点写成逗号分隔的字符串（传数组时只使用第一个地址）。换节点后第一次请求会核对节点所在的链，与配置的链不一致时报错。 | 切换前的地址。 |
-| ```sendBase``` | url | 设置只用来广播交易的节点（私有交易通道）。与Web3不同：不返回设置前的地址，不传参数时不查询，传空字符串不会清除设置。 | ```true``` |
-| ```address``` | — | 配置的私钥对应的钱包地址（```0x```开头的小写地址）。 | — |
-| ```contracts``` | — | 本交易所在本链上的部署信息：合约地址、手续费档和内置代币列表快照。 | 对象：```dex```、```chainId```、```chain```、```router```、```quoterV2```、```v3Factory```、```v3Fees```、```positionManager```、```v2Factory```、```v2Fee```（百万分之一，3000即0.3%）、```wrappedNative```、```v4```、```tokenList```（代币列表快照的生成时间```embeddedAt```、代币数```tokens```、常用币数```core```）；本链没有的部署为```null```。（详见表下） |
-| ```lp.pools``` | token[, quote] | 列出代币的全部Slipstream与基础池子（指定计价币，或本链的包装币、USDC、USDT）：费率、tick间距、现价、流动性、池子两种代币的余额与TVL；24小时成交与手续费取自GeckoTerminal（取不到时为```null```；结果在进程内缓存5分钟，```lp.select```、```lp.plan```共用，限流时等一会儿重试一次）。（详见表下） | ```[{id, protocol, dex, symbol, fee, feeRate, tickSpacing, tick, price, liquidity, reserveBase, reserveQuote, tvlQuote, tvlUsd, volume24hUsd, fees24hUsd, empty}]```，```price```为计价币/代币。（详见表下） |
-| ```lp.select``` | token, budget[, options] | 按规则自动选池：```options.fee```指定费率时该费率的池子满足流动性门槛就选它（```exact```为```true```时只用该费率）；否则在TVL不低于max(5000美元, 预算)的池子里选24小时成交最大的，没有成交数据时选TVL最大的。（详见表下） | ```lp.pools```的一行，另带```reason```（选择理由）。 |
-| ```lp.pool``` | poolId | 池子实时状态。```poolId```为Slipstream或基础池的合约地址；另给gauge信息（同```lp.pools```），基础池另给储备```reserve0```、```reserve1```与LP代币总量```lpSupply```。 | ```{id, protocol, currency0, currency1, token0, token1, fee, tickSpacing, tick, sqrtPriceX96, price0, price1, liquidity}```，```price0```为1个token0值多少token1。 |
-| ```lp.ticks``` | poolId, tickLower, tickUpper[, step] | tick区间内的流动性分布：每段的流动性和两种代币数量（按已初始化的tick细分求和），```step```为合并成的段宽（tick，默认等于tick间距）。区间超过120个位图字时报错。 | ```{pool, tick, token0, token1, segments: [{tickLower, tickUpper, price0Lower, price0Upper, liquidity, amount0, amount1, current}]}``` |
-| ```lp.plan``` | params | 建仓计划（只读，不花钱）。（详见表下） | ```{params, symbol, pool, protocol, fee, tickSpacing, tick, price, shape, budget, budgetUsd, positions: [{tickLower, tickUpper, priceLower, priceUpper, liquidity, amountBase, amountQuote, share}], needBase, needQuote, haveBase, haveQuote, swap, payWith, shortfall, shareOfPool, volume24hUsd, estDailyFeesUsd, slippageBps, layers, layersRequested, warning?}```；```swap```为建仓前需要换的币（```{side, amount, currency}```或```null```）。（详见表下） |
-| ```lp.simulate``` | plan[, stateOverride] | 按计划用```eth_call```执行建仓交易（不签名、不广播），确认能成交及实际投入数量。（详见表下） | ```{pool, positions: [{liquidity, amountBase, amountQuote}], value, swapNeeded, note}``` |
-| ```lp.add``` | plan | 按计划建仓：需要时先用市价单换币，再授权，一笔交易创建全部仓位，等上链后返回。（详见表下） | ```{txHash, swapTxHash, pool, positions: [{id, tickLower, tickUpper, priceLower, priceUpper, liquidity, amountBase, amountQuote}]}``` |
-| ```lp.increase``` | positionId, budget[, options] | 给仓位加仓：```budget```（计价币）按仓位区间与现价的配比拆成两种代币，缺的那种先换。（详见表下） | ```{txHash, swapTxHash, id, liquidity, amountBase, amountQuote}``` |
-| ```lp.decrease``` | positionId, ratio[, options] | 按比例（0到1）减仓，同时领取全部手续费，仓位保留。（详见表下） | ```{txHash, positions: [{id, symbol, principalBase, principalQuote, feesBase, feesQuote, receivedBase, receivedQuote}], sells}``` |
-| ```lp.collect``` | positionIds[, sell] | 领取手续费，多个仓位合成一笔交易；```sell```为```true```时把领到的代币卖成计价币。质押着的仓位不收交易手续费（归投票人），报错并提示用```lp.claim```领VELO；基础池用池子的```claimFees```领取钱包里LP代币累积的手续费，每个池子一笔交易。 | 同```lp.decrease```。 |
-| ```lp.remove``` | positionIds[, ratio[, sell]] | 撤出流动性并领取手续费，多个仓位合成一笔交易；```ratio```默认1（全部撤出并销毁仓位NFT），小于1时只撤一部分；```sell```为```true```时卖回计价币。（详见表下） | 同```lp.decrease```。 |
-| ```lp.positions``` | [filter[, wallet]] | 钱包的全部Slipstream与基础池仓位：区间、是否在区间内、流动性、当前数量与价值、未领手续费。（详见表下） | ```[{id, pool, protocol, symbol, fee, tickLower, tickUpper, priceLower, priceUpper, price, tick, inRange, liquidity, amountBase, amountQuote, value, feesBase, feesQuote, feesValue, closed}]```，```value```、```feesValue```按计价币计。 |
-| ```lp.history``` | positionId | 仓位资金流水：存入、撤出本金、领取手续费，以及按当前池价折算的盈亏（现值 + 已领手续费 + 已撤本金 − 存入本金，不含gas）。需要能查历史日志的节点；公共节点常常不支持。基础池的LP代币没有按仓位的事件，不支持。 | ```{id, symbol, events: [{action, block, txHash, liquidity, amountBase, amountQuote}], depositedBase, depositedQuote, withdrawnBase, withdrawnQuote, feesCollectedBase, feesCollectedQuote, price, pnlQuote, note}``` |
-| ```lp.track``` | positionIds | 登记Slipstream仓位（```velo:编号```、```velo2:编号```；与交易所对象不符的前缀报错）和基础池地址，之后```lp.positions```会查这些仓位（归属每次按链上核对，质押在gauge里的按质押人核对，转走的不列）。（详见表下） | 本进程记住的全部仓位ID。 |
-| ```lp.stake``` | positionIds | 把仓位质押进所在池子的gauge领VELO，每个仓位各自的交易。（详见表下） | ```{positions: [{id, gauge, approveTxHash, txHash, feesBase, feesQuote}]}```；基础池为```{id, gauge, txHash, lpTokens}```。 |
-| ```lp.unstake``` | positionIds | 从gauge取回。Slipstream仓位取回NFT，同时领走累积的VELO；基础池取回全部质押的LP代币，VELO留在gauge里，用```lp.claim```领。每个仓位各自的交易。 | ```{positions: [{id, gauge, txHash, rewards}]}```，```rewards```为这笔交易领到的VELO；基础池另有```lpTokens```。 |
-| ```lp.claim``` | positionIds[, sell] | 领VELO奖励，一笔```Voter.claimRewards```领这些仓位所在gauge里本钱包的全部奖励（同一gauge里本钱包的其它质押仓位也一起领）；```sell```为```true```时把领到的奖励币按市价卖成USDC。 | ```{txHash, gauges, rewardToken, rewards, sell}```，```rewardToken```为```VELO```。 |
-| ```bridge.chains``` | — | 跨链桥（LI.FI）支持的链：EVM链与Solana，缓存1小时。 | ```{id, key, name, chainType, nativeToken}```数组，```chainType```为```EVM```或```SVM```。 |
-| ```bridge.tokens``` | [chain] | LI.FI认识的某条链上的代币（缺省为本链），缓存1小时。 | ```{symbol, address, decimals, name, priceUSD}```数组。 |
-| ```bridge.quote``` | params | 跨链报价（只读），源链为本交易所对象的链。（详见表下） | ```{tool, toolName, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, fromAmountRaw, toAmountRaw, toAmountMinRaw, fromAmountUSD, toAmountUSD, slippage, toAddress, feeCosts, gasCosts, executionDuration, approvalAddress, steps, transactionId, request}```：数量为代币单位（```*Raw```为最小单位原值）；```toAmountMin```为扣除滑点后保证到手的数量；```feeCosts```为```[{name, amount, token, amountUSD, percentage, included}]```（```included```为```false```的费用另付）；```gasCosts```为源链gas估算；```executionDuration```为预计耗时（秒）；```approvalAddress```为需要授权的合约（原生币、Solana为```null```）；```steps```为各步骤（```cross```为跨链，```swap```为兑换）；```request```为参数原样回显。 |
-| ```bridge.simulate``` | params\|quote[, stateOverride] | 重新报价，用```eth_call```执行LI.FI给出的交易，不签名、不广播、不花gas。（详见表下） | ```bridge.quote```的结果，另有```simulated```（```true```）、```to```、```value```、```walletBalance```，补过授权时有```allowanceOverride```。 |
-| ```bridge.send``` | params\|quote | 跨链转出：重新报价 → 检查余额 → 代币对LI.FI的```approvalAddress```授权不够时先授权（按```exchange.IO("approve")```的```exact```/```max```，USDT这类先清零，等授权上链；授权过就再报价一次）→ ```eth_call```模拟 → 签名广播；gasLimit取```eth_estimateGas```估算×```gasMultiplier```与LI.FI建议的```gasLimit```中较大的一个（桥合约还会调用别的合约，估算可能偏少），实际只按用量扣费。（详见表下） | ```{txHash, tool, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, toAddress, value, transactionId}```，```txHash```为源链交易哈希，可用```receipt```查回执。 |
-| ```bridge.status``` | txHash[, options] | 跨链进度（LI.FI ```/status```），参数为```bridge.send```返回的源链交易哈希；```options```可给```{toChain, bridge}```加快查找。（详见表下） | ```{status, substatus, substatusMessage, tool, sending, receiving, fromAddress, toAddress, explorer, bridgeExplorer}```：```status```为```NOT_FOUND```、```INVALID```、```PENDING```、```DONE```、```FAILED```；```DONE```时```substatus```为```COMPLETED```（按报价到账）、```PARTIAL```（收到的是别的代币）或```REFUNDED```（已退回）；```sending```、```receiving```为```{txHash, txLink, chainId, amount, amountRaw, token, timestamp}```，```receiving.amount```与```receiving.token```为实际到账的数量与代币。 |
-| ```bridge.apiKey``` | [key] | 设置LI.FI的API Key（请求头```x-lifi-api-key```，只对本交易所对象生效，不回显），传```""```清除；不传参数只查询。没有Key时按出口IP限频，见下文。 | 是否已设置Key（布尔值）。 |
-
-表中长说明的其余部分：
-
-- ```contracts```的返回值：```router```为基础池子的Router，```quoterV2```、```v3Factory```为第一代Slipstream的QuoterV2与工厂，```v3Fees```为空、```v2Fee```为0，```v2Factory```、```positionManager```、```v4```为```null```；Velodrome的合约在```velodrome```里：基础池的```router```、```poolFactory```，以及各代Slipstream的```factory```、```swapRouter```、```quoterV2```、```tickSpacings```。
-- ```lp.pools```：按TVL降序，空池子（```empty```为```true```，现价处没有流动性，现价没有意义）的```price```、```tvlQuote```、```tvlUsd```为```null```，排在最后。Slipstream池子的```protocol```为```slipstream```（老工厂）或```slipstream2```（新工厂）；基础池子为```volatile```、```stable```，另带```stable```，没有tick。
-- ```lp.pools```的返回值：每行另带gauge信息```gauge```、```gaugeAlive```、```stakedShare```（质押占比）、```rewardsPerDay```（每天发的VELO）、```rewardsPerDayUsd```、```rewardAprPct```（按质押部分TVL折算的奖励年化，%）。
-- ```lp.select```：```budget```按计价币计，```options.quote```指定计价币。可用```options.protocol```按池子类型筛选（```slipstream```、```slipstream2```、```volatile```、```stable```或它们的数组），也可用```options.tickSpacing```筛选。
-- ```lp.plan```：```params```：```symbol```（如```ETH_USDC```）、```budget```（计价币）、```range```（```{lower, upper}```价格，或```{pct: [-5, 5]}```相对现价百分比，或```{ticks: [lo, hi]}```，自动对齐tick间距）、```shape```（```spot```单一区间、```curve```多层嵌套现价附近最厚、```bidask```两侧分段越远越厚）、```layers```（默认3，最多20；curve各层都跨过现价、互不相同且对齐tick间距，优先逐层向内嵌套，嵌套排不下时用区间内其它跨现价的组合补齐；双边区间最多能放下「现价以下的合法下沿数×现价以上的合法上沿数」层，超过时给出能放下的最多层数，实际层数见返回的```layers```，少于请求时带```warning```）、```pool```（不填按```lp.select```选）、```fee```、```slippage```（默认0.01）。钱包不够时照样给出计划，```shortfall```说明差额。Slipstream池子、交易对写原生币（如```ETH_USDC```）时，包装币那一侧要么整笔用原生币付、要么整笔用包装币付，两种余额不会拼着用：原生币够这一侧全额时用原生币，否则包装币够就用包装币，都不够时按余额多的那种计算```haveBase```/```haveQuote```与需要换的币（```swap.currency```就是那一种），返回的```payWith```为这一侧实际用的币。有```range```时用Slipstream池子（可加```tickSpacing```、```protocol```选池）；不给```range```（或```pool```是基础池）时为基础池计划：两种代币按储备比例存入，```stable```为```true```或```false```限定池子类型；```stake```为```true```时```lp.add```建完直接质押进gauge。
-- ```lp.plan```的返回值：基础池计划为```{params, symbol, pool, protocol, stable, fee, price, budget, budgetUsd, needBase, needQuote, haveBase, haveQuote, amountBase, amountQuote, lpTokens, swap, shortfall, shareOfPool, volume24hUsd, estDailyFeesUsd, slippageBps}```。
-- ```lp.simulate```：计划需要先换币时按换完的数量模拟；钱包余额或授权不够时可用```stateOverride```补上。基础池用Router的```quoteAddLiquidity```模拟（不需要余额和授权），返回```{pool, protocol, lpTokens, amountBase, amountQuote, swapNeeded, note}```。
-- ```lp.add```：传计划或计划的```params```都可以（执行时按最新池价重算）。Slipstream池子：交易对写原生币（如```ETH_USDC```）时按计划的```payWith```付包装币那一侧：整笔原生币（随交易附带，多的由```refundETH```退回）或整笔包装币，不拼着用；领回来的是包装币。Slipstream仓位的```id```为```velo:编号```（老工厂）或```velo2:编号```（新工厂）；基础池经Router存入，交易对写原生币时用原生币余额（```addLiquidityETH```），仓位```id```为池子地址，返回```{txHash, swapTxHash, pool, id, lpTokens, amountBase, amountQuote}```。计划的```stake```为```true```时结果另有```stake```（同```lp.stake```）。
-- ```lp.increase```：```options.symbol```指定朝向（默认稳定币为计价币；写原生币如```ETH_USDC```时原生币那一侧的付法同```lp.add```），```options.slippage```价格保护。质押着的仓位要先```lp.unstake```；基础池（```positionId```为池子地址）加仓等于对该池子再```lp.add```，```options.stake```为```true```时加完质押。
-- ```lp.decrease```：```options.slippage```价格保护，```options.sell```为```true```时把拿回的代币卖成计价币。质押着的仓位要先```lp.unstake```（基础池只要钱包里未质押的LP代币够就可以）；基础池按比例取回LP代币，拿回的原生币是包装币。
-- ```lp.remove```：质押着的仓位先从gauge取回（同时领走奖励，见```lp.unstake```）再撤；基础池全部撤出时另发一笔```claimFees```领手续费。
-- ```lp.positions```：```filter```为交易对（给定价格朝向）或代币（只列含它的仓位），```*```或不传为全部；```wallet```为其它钱包地址时只读查看那个钱包。钱包里的Slipstream仓位直接列出；质押在gauge里的仓位NFT归gauge所有，去这些gauge查：本进程质押过的、钱包转出NFT的日志里找到的（节点通常只能查最近一段区块的日志）、```lp.track```登记过的仓位所在的、以及```filter```对应池子的；基础池仓位查本进程建过的、```lp.track```登记的池子和```filter```对应的池子；列全部（```*```或不传）或按代币筛选时还查代币表（内置与已登记的代币，加上VELO）里每个代币与包装币、稳定币、VELO组成的交易对上的volatile与stable池子（最多128对，池子地址缓存10分钟），钱包里或gauge里有LP代币（或gauge里有未领奖励）的就列出，新进程不用```lp.track```也能找到；其它交易对上的基础池用```filter```或```lp.track```。每行另有```staked```、```gauge```、```rewardToken```（VELO）、```rewards```（可领的VELO）、```rewardsValue```（按计价币折算）；基础池另有```fullRange```、```lpTokens```、```stakedLpTokens```，没有tick。
-- ```lp.track```：节点查不到全部历史日志时用它找回以前建的仓位；策略可以把```lp.add```返回的ID存起来（如```_G```），重启后登记。
-- ```lp.stake```：Slipstream仓位先把这个NFT授权给gauge（已授权时跳过），再存入整个NFT，存入时gauge把仓位未领的手续费转给本人；基础池把钱包里未质押的LP代币全部存入。已被Voter停掉的gauge不能存入，报错。质押期间仓位不收交易手续费（归投票人），只拿VELO；仍在区间外时不发奖励（Slipstream）。
-- ```bridge.quote```：```params```：```toChain```（目标链：链ID、LI.FI的链key如```arb```、或链名如```Arbitrum```、```Solana```）、```fromToken```（本链代币：代币表里的名字或合约地址）、```toToken```（目标链代币：名字或地址，由LI.FI解析为它的标准代币，如Arbitrum上的```USDC```是原生USDC，不是USDC.e）、```amount```（```fromToken```的数量，按代币单位，超出代币精度的位舍去）、```toAddress```（收款地址；目标为EVM链时缺省为本钱包，目标为Solana时必须传Solana地址，不传报错）、```slippage```（缺省为```exchange.IO("slippage")```的值）、```order```（```CHEAPEST```或```FASTEST```）、```allowBridges```/```denyBridges```（LI.FI的桥名，数组或逗号分隔）。不认识的键报错。
-- ```bridge.simulate```：代币授权不够时自动用state override补成无限额度（同```simulate```，结果里```allowanceOverride```列出补了什么）；余额不会自动补，可以用```stateOverride```（```eth_call```的第三参）自己补。余额不够导致失败时报错里给出钱包余额。
-- ```bridge.send```：原生币不用授权。只等授权上链，不等桥接交易；跨链是异步的，用```bridge.status```轮询。传```bridge.quote```的结果时按其中的```request```重新报价（报价随时变化，实际成交以新报价为准，```toAmountMin```由交易在链上保证）。
-- ```bridge.status```：刚广播时LI.FI可能还没收录，返回```NOT_FOUND```，继续轮询即可（建议间隔10～30秒）。
-
-通用指令```currency```见`exchange.IO`。
-
-不支持通用指令```api```（调用时报错并返回空值）。
-
-##### 函数支持差异
-
-不支持（调用时报错并返回空值）：`exchange.GetTickers`、`exchange.GetHistoryOrders`、`exchange.ModifyOrder`、`exchange.CreateConditionOrder`、`exchange.ModifyConditionOrder`、`exchange.CancelConditionOrder`、`exchange.GetConditionOrder`、`exchange.GetConditionOrders`、`exchange.GetHistoryConditionOrders`。
-
-以回退方式支持：
-
-- `exchange.GetRecords`：原生周期为1分钟、5分钟、15分钟、1小时、4小时、12小时、1天（GeckoTerminal的周期）；其它周期由托管者合成：分钟级以上的周期由原生周期合并，秒级周期由```exchange.GetTrades()```的链上成交逐笔累积（首次调用只有最近约10分钟成交覆盖的那几根，之后随每次调用累积；还没有成交时报错并说明原因，取成交失败时报错带上失败原因）。
-
-##### 注意事项
-
-| 函数 | Velodrome交易所的行为 |
-| - | - |
-| exchange.GetTicker() | 买一、卖一为约1000美元规模的实际可成交价；链上没有24小时统计。买卖两边各取最优池子，跨池偶尔交叉时两边都给中间价，```Info.crossed```写明交叉幅度 |
-| exchange.GetDepth() | 由逐档递增规模的链上询价推算：规模从约1000美元递增到100万美元，默认5档、最多10档。买卖两边取各自最优的池子，跨池偶尔交叉（买一高于卖一）时，交叉的价格按中间价给出、数量不变，```Info.crossed```写明中间价与交叉幅度 |
-| exchange.GetTrades() | 该交易对各个池子最近约10分钟区块内的链上成交，每次最多500条 |
-| exchange.GetRecords() | K线来自GeckoTerminal的池子级数据：取Velodrome上该交易对在GeckoTerminal美元流动性最深的池子（Slipstream与基础池子都参与比较，交易对写原生币时原生币池与包装币池都算；选中的池子缓存1小时）。价格为该池子的逐笔成交价（含池子手续费，与```exchange.GetTicker()```的中间价可能相差约一个池子费率），单位为计价币/基础币，```Volume```为基础币数量；没有成交的周期按上一根收盘价补平、成交量为0，最后一根可能尚未收盘。GeckoTerminal的数据有几十秒到1分钟的延迟，公开接口约每分钟10次：同一周期的K线缓存1分钟，请求在托管者内排队，被限频时等待重试，仍不行时报错。GeckoTerminal没有收录Velodrome上该交易对的任何池子时报错 |
-| exchange.GetMarkets() | 内置与已登记代币两两配对、链上确实有池子的交易对；含包装币的交易对另列一行原生币写法。```TickSize```固定为1e-8，```PricePrecision```为8，```AmountPrecision```为代币精度，```MinNotional```为0 |
-| exchange.GetOrders() | 只列出本进程发出、还没上链的兑换交易（保存在内存里，重启后清空） |
-| exchange.GetAssets() | 原生币和代币表中各代币的钱包余额 |
-| exchange.CreateOrder() | 立即在链上兑换：限价为最差成交价，按当前报价达不到限价时直接报错、不发交易；市价按滑点保护；市价买入时数量为要花费的计价币。下单附加参数```slippage```覆盖本单滑点，```route```限定路径类型：```v2```为基础池子、```v3```为Slipstream，```hop```、```direct```为两跳、直连（```v4```不适用） |
-| exchange.GetOrder() | 订单ID形如```ETH_USDC,0x…```（交易对、逗号、交易哈希），状态来自交易回执；原交易的nonce已被撤单交易（或其它交易）占用时显示为已撤销。订单号只含交易对和交易哈希，不含链；```Info```中有```chainId```与链名```chain```，跨链汇总订单时用它找回所属的链；在别的链的交易所对象上查询会报错“not found on <链>” |
-| exchange.CancelOrder() | 发送同nonce的替换交易（向自己转0金额），并等待结果（默认最多30秒，见```exchange.IO("cancelWait", ...)```）：撤单交易先上链返回```true```；原订单已经上链或先于撤单上链时返回```false```（撤单没成功，但不是调用错误），原因见```GetLastError()```；等待超时返回```true```，表示撤单已提交 |
-
-##### 区间流动性（LP）
-
-```exchange.IO("lp.*", ...)```指令提供Velodrome的Slipstream池子与基础池子的区间流动性：选池、规划与模拟、建仓、加减仓、领手续费、撤出和仓位查询，以及gauge质押领VELO。Slipstream池子（新旧两代工厂）是集中流动性池子，仓位是各代PositionManager的NFT，写成```velo:编号```（老工厂）或```velo2:编号```（新工厂）；池子费率由池子自己定（可能是动态费率），```fee```为当前值。没有质押的Slipstream仓位要把一部分手续费（池子的```unstakedFee```，目前多为5%）交给gauge。
-
-基础池（volatile、stable）是全区间的：```lp.plan```不给```range```即为基础池计划，两种代币按储备比例存入，仓位就是池子的LP代币，```id```为池子地址。
-
-gauge质押：```lp.stake```把仓位存进gauge领VELO，```lp.unstake```取回，```lp.claim```领奖励。质押期间交易手续费归投票人、仓位只拿VELO，Slipstream仓位在区间外时也不发奖励；质押着的仓位不能加减仓或领手续费，要先取回（```lp.remove```会自动先取回）。```lp.pools```的```rewardAprPct```按当前每秒奖励与质押部分的TVL估算，随VELO价格和质押量变化；奖励按VELO计价，价格波动大，领到后可以用```lp.claim```的```sell```卖成USDC。
+gauge质押：```lp.stake```把仓位存进gauge领奖励，```lp.unstake```取回，```lp.claim```领奖励。质押期间交易手续费归投票人、仓位只拿奖励币（Aerodrome为AERO，Velodrome为VELO），Slipstream仓位在区间外时也不发奖励；质押着的仓位不能加减仓或领手续费，要先取回（```lp.remove```会自动先取回）。```lp.pools```的```rewardAprPct```按当前每秒奖励与质押部分的TVL估算，随奖励币价格和质押量变化；奖励按奖励币计价，价格波动大，领到后可以用```lp.claim```的```sell```卖成USDC。
 
 写指令（```lp.add```、```lp.increase```、```lp.decrease```、```lp.collect```、```lp.remove```、```lp.stake```、```lp.unstake```、```lp.claim```）在交易上链后返回；之后一分钟内的链上读取都不早于该交易所在的区块（公共节点背后的负载均衡可能落到还没同步到这一块的机器），所以紧接着调用下一条指令不会按旧状态构造交易。建仓时原生币按当前gas价留出约300万gas的手续费，其余可用于建仓。
 
