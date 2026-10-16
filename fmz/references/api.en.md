@@ -4578,7 +4578,7 @@ Notes:
 
 - This function does not support options contracts.
 
-Exchanges that do not support this function: `BitFlyer`, `Coincheck`, `Gemini`, `WOO`, `Futures_WOO`, `Zaif`, `Futures_EdgeX`, `Futures_Aevo`, `Pendle`, `Futures_Boros`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `Jupiter`, `KyberSwap`, `OneInch`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
+Exchanges that do not support this function: `BitFlyer`, `Coincheck`, `Gemini`, `WOO`, `Futures_WOO`, `Zaif`, `Futures_EdgeX`, `Futures_Aevo`, `Pendle`, `Futures_Boros`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
 
 See also: `Ticker`, `exchange.GetTicker`
 
@@ -4736,7 +4736,7 @@ In the backtesting system, when backtesting with **simulation-level Tick**, the 
 
 In the backtesting system, when backtesting with **live-trading-level Tick**, the data returned by the ```exchange.GetTrades()``` function is order flow snapshot data, i.e. the `Trade` structure array.
 
-Exchanges that do not support this function: `Futures_EdgeX`, `Pendle`, `Jupiter`, `KyberSwap`, `OneInch`, `Futures_IB`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
+Exchanges that do not support this function: `Futures_EdgeX`, `Pendle`, `KyberSwap`, `OneInch`, `Jupiter`, `Futures_IB`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
 
 See also: `exchange.GetTicker`, `exchange.GetDepth`, `exchange.GetRecords`
 
@@ -4916,7 +4916,7 @@ Some periods are synthesized by the docker:
 - `Futures_EdgeX`: Native periods are 1m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 8h, 12h, 1d, 1w, 1M; other periods that are a multiple of 60 seconds are synthesized by the docker from native bars, and the rest (such as second-level periods) are not available (the exchange has no trades endpoint).
 - `Futures_WOOFi`: Native periods are 1m, 5m, 15m, 30m, 1h, 4h, 12h, 1d, 1w, 1M, 1y; other periods are synthesized by the docker. At most 1000 bars per call.
 - `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`: Native periods are 1m, 5m, 15m, 1h, 4h, 12h, 1d (GeckoTerminal's timeframes); other periods are synthesized by the docker: periods of a minute or longer are merged from native periods, and second-level periods are accumulated from the on-chain trades of ```exchange.GetTrades()``` (the first call has only the bars covered by the trades of roughly the last 10 minutes, and later calls keep accumulating; with no trade seen yet the call fails saying so, and when fetching trades fails the error carries that cause).
-- `Jupiter`, `KyberSwap`, `OneInch`: Native periods are 1m, 5m, 15m, 1h, 4h, 12h, 1d (GeckoTerminal's timeframes); other periods of a minute or longer are synthesized by the docker, while second-level periods are unavailable (there is no trade feed to build them from).
+- `KyberSwap`, `OneInch`, `Jupiter`: Native periods are 1m, 5m, 15m, 1h, 4h, 12h, 1d (GeckoTerminal's timeframes); other periods of a minute or longer are synthesized by the docker, while second-level periods are unavailable (there is no trade feed to build them from).
 - `Futures_Futu`: Native periods are 1m, 3m, 5m, 15m, 30m, 1h, 1d, 1w, 1M; other periods are synthesized by the docker.
 - `Futures_IB`: Native periods are 1m, 3m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 1d, 1w; other periods that are a multiple of 60 seconds are synthesized by the docker from native bars, and the rest (such as second-level periods) are not available (this exchange object does not support ```exchange.GetTrades()```).
 - `Exchange`: The gateway's ```records``` takes only the 1m, 3m, 5m, 15m, 30m, 1h and 1d periods; other periods are synthesized by the docker, and a start time cannot be specified.
@@ -6898,7 +6898,7 @@ Parameters can also be appended after the ```side``` parameter (legacy syntax), 
 
 The ```ConditionType``` of ```condition``` can be OCO, TP or SL from `ORDER_CONDITION_TYPE`. `ORDER_CONDITION_TYPE_GENERIC` appears only in query results (for exchange-specific conditional orders such as trailing stops). It cannot be used when creating or modifying a conditional order; passing it raises an error and returns a null value. Every trigger price and execution price required by the selected type must be passed and must not be 0 (OCO needs all four, TP needs the two take-profit prices, SL needs the two stop-loss prices); otherwise an error is raised and a null value is returned. An execution price of -1 means the order is executed as a market order once triggered.
 
-Exchanges that do not support this function: `AscendEx`, `Bithumb`, `Bitstamp`, `Coinw`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Korbit`, `LBank`, `MEXC`, `Upbit`, `WEEX`, `Zaif`, `Hyperliquid`, `Pendle`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `Jupiter`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Futures_Polymarket`, `Futures_Futu`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
+Exchanges that do not support this function: `AscendEx`, `Bithumb`, `Bitstamp`, `Coinw`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Korbit`, `LBank`, `MEXC`, `Upbit`, `WEEX`, `Zaif`, `Hyperliquid`, `Pendle`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter`, `OKX_DEX`, `Futures_Polymarket`, `Futures_Futu`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
 
 See also: `Condition`, `exchange.CancelConditionOrder`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`, `exchange.ModifyConditionOrder`
 
@@ -7300,7 +7300,7 @@ The return value of the ```exchange.CancelConditionOrder()``` function only indi
 
 Only untriggered conditional orders can be canceled; conditional orders that have already been triggered and converted into regular orders cannot be canceled through this function.
 
-Exchanges that do not support this function: `AscendEx`, `Bithumb`, `Bitstamp`, `Coinw`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Korbit`, `LBank`, `MEXC`, `Upbit`, `WEEX`, `Zaif`, `Hyperliquid`, `Pendle`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `Jupiter`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Futures_Polymarket`, `Futures_Futu`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
+Exchanges that do not support this function: `AscendEx`, `Bithumb`, `Bitstamp`, `Coinw`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Korbit`, `LBank`, `MEXC`, `Upbit`, `WEEX`, `Zaif`, `Hyperliquid`, `Pendle`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter`, `OKX_DEX`, `Futures_Polymarket`, `Futures_Futu`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
 
 See also: `exchange.CreateConditionOrder`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`, `exchange.ModifyConditionOrder`
 
@@ -7385,7 +7385,7 @@ The returned conditional order structure contains information such as the trigge
 
 Conditional order statuses include: not triggered, triggered, canceled, etc. The specific status values are determined by the exchange.
 
-Exchanges that do not support this function: `AscendEx`, `Bithumb`, `Bitstamp`, `Coinw`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Korbit`, `LBank`, `MEXC`, `Upbit`, `WEEX`, `Zaif`, `Hyperliquid`, `Pendle`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `Jupiter`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Futures_Polymarket`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
+Exchanges that do not support this function: `AscendEx`, `Bithumb`, `Bitstamp`, `Coinw`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Korbit`, `LBank`, `MEXC`, `Upbit`, `WEEX`, `Zaif`, `Hyperliquid`, `Pendle`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter`, `OKX_DEX`, `Futures_Polymarket`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
 
 Exchanges that serve this function through a fallback: the exchange's API does not fully provide this function, and the docker fills the gap.
 
@@ -7528,7 +7528,7 @@ On a few exchanges the open conditional-order endpoint requires a symbol: there,
 
 Support for the conditional order feature depends on the specific exchange; some exchanges may not support the conditional order feature.
 
-Exchanges that do not support this function: `AscendEx`, `Bithumb`, `Bitstamp`, `Coinw`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Korbit`, `LBank`, `MEXC`, `Upbit`, `WEEX`, `Zaif`, `Hyperliquid`, `Pendle`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `Jupiter`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Futures_Polymarket`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
+Exchanges that do not support this function: `AscendEx`, `Bithumb`, `Bitstamp`, `Coinw`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Korbit`, `LBank`, `MEXC`, `Upbit`, `WEEX`, `Zaif`, `Hyperliquid`, `Pendle`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter`, `OKX_DEX`, `Futures_Polymarket`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
 
 See also: `Order`, `exchange.GetConditionOrder`, `exchange.GetHistoryConditionOrders`
 
@@ -7668,7 +7668,7 @@ The returned array of historical conditional orders is sorted in ascending order
 
 Support for the conditional order feature depends on the specific exchange. Some exchanges may not support the conditional order feature or the historical conditional order query feature.
 
-Exchanges that do not support this function: `AscendEx`, `Bithumb`, `Bitstamp`, `Coincheck`, `Coinone`, `Coinw`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Korbit`, `LBank`, `MEXC`, `Upbit`, `WEEX`, `Zaif`, `Hyperliquid`, `Pendle`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `Jupiter`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Futures_Polymarket`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
+Exchanges that do not support this function: `AscendEx`, `Bithumb`, `Bitstamp`, `Coincheck`, `Coinone`, `Coinw`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Korbit`, `LBank`, `MEXC`, `Upbit`, `WEEX`, `Zaif`, `Hyperliquid`, `Pendle`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter`, `OKX_DEX`, `Futures_Polymarket`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
 
 See also: `Order`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`
 
@@ -9442,7 +9442,7 @@ Commands of ```exchange.IO()``` specific to an exchange object; see the exchange
 | ```accountId``` | `Futures_Crypto`, `Poloniex` |
 | ```accounts``` | `Futures_Futu`, `Futures_IB` |
 | ```accountType``` | `Bybit`, `Futures_Bybit` |
-| ```address``` | `Pendle`, `Futures_Boros`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `Jupiter`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Web3` |
+| ```address``` | `Pendle`, `Futures_Boros`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter`, `OKX_DEX`, `Web3` |
 | ```addresses``` | `OKX_DEX` |
 | ```agent``` | `Futures_Boros` |
 | ```allChainBalance``` | `OKX_DEX` |
@@ -9454,15 +9454,15 @@ Commands of ```exchange.IO()``` specific to an exchange object; see the exchange
 | ```apy``` | `Pendle` |
 | ```autoTopUp``` | `Futures_Boros` |
 | ```balanceSupportedChains``` | `OKX_DEX` |
-| ```base``` | `Futures_Binance`, `Pendle`, `Futures_Boros`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `Jupiter`, `KyberSwap`, `OneInch`, `Futures_Polymarket`, `Web3` |
+| ```base``` | `Futures_Binance`, `Pendle`, `Futures_Boros`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter`, `Futures_Polymarket`, `Web3` |
 | ```batchOrders``` | `Futures_Polymarket` |
-| ```bridge.apiKey``` | `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `Jupiter`, `KyberSwap`, `OneInch` |
-| ```bridge.chains``` | `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `Jupiter`, `KyberSwap`, `OneInch` |
-| ```bridge.quote``` | `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `Jupiter`, `KyberSwap`, `OneInch` |
-| ```bridge.send``` | `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `Jupiter`, `KyberSwap`, `OneInch` |
-| ```bridge.simulate``` | `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `Jupiter`, `KyberSwap`, `OneInch` |
-| ```bridge.status``` | `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `Jupiter`, `KyberSwap`, `OneInch` |
-| ```bridge.tokens``` | `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `Jupiter`, `KyberSwap`, `OneInch` |
+| ```bridge.apiKey``` | `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter` |
+| ```bridge.chains``` | `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter` |
+| ```bridge.quote``` | `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter` |
+| ```bridge.send``` | `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter` |
+| ```bridge.simulate``` | `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter` |
+| ```bridge.status``` | `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter` |
+| ```bridge.tokens``` | `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter` |
 | ```broadcast``` | `OKX_DEX` |
 | ```broadcastSupportedChains``` | `OKX_DEX` |
 | ```calcOrderHashAndSign``` | `Futures_EdgeX` |
@@ -9547,13 +9547,13 @@ Commands of ```exchange.IO()``` specific to an exchange object; see the exchange
 | ```pump.quote``` | `Jupiter` |
 | ```pump.sell``` | `Jupiter` |
 | ```quote``` | `OKX_DEX` |
-| ```receipt``` | `Pendle`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `Jupiter`, `KyberSwap`, `OneInch` |
+| ```receipt``` | `Pendle`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter` |
 | ```redeem``` | `Futures_Polymarket` |
 | ```refresh``` | `Futures_Futu` |
 | ```regChain``` | `OKX_DEX` |
 | ```regToken``` | `OKX_DEX` |
 | ```reqId``` | `Futures_IB` |
-| ```route``` | `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `Jupiter`, `KyberSwap`, `OneInch` |
+| ```route``` | `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter` |
 | ```rpc``` | `Futures_Boros`, `OKX_DEX` |
 | ```rps``` | `Jupiter` |
 | ```scan``` | `Futures_IB` |
@@ -9566,7 +9566,7 @@ Commands of ```exchange.IO()``` specific to an exchange object; see the exchange
 | ```signTx``` | `OKX_DEX` |
 | ```signTypedData``` | `Web3` |
 | ```simulate``` | `Bitget`, `Futures_Bitget`, `Futures_DigiFinex`, `OKEX`, `Futures_OKCoin`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch` |
-| ```slippage``` | `Pendle`, `Futures_Boros`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `Jupiter`, `KyberSwap`, `OneInch`, `OKX_DEX` |
+| ```slippage``` | `Pendle`, `Futures_Boros`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter`, `OKX_DEX` |
 | ```source``` | `Hyperliquid`, `Futures_Hyperliquid` |
 | ```speedUp``` | `Web3` |
 | ```split``` | `Futures_Hyperliquid`, `Futures_Polymarket` |
@@ -9579,14 +9579,14 @@ Commands of ```exchange.IO()``` specific to an exchange object; see the exchange
 | ```tickers_cursor``` | `Futures_Polymarket` |
 | ```time``` | `Futures_IB` |
 | ```timeout``` | `Futures_Futu` |
-| ```token``` | `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `Jupiter`, `KyberSwap`, `OneInch` |
+| ```token``` | `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter` |
 | ```tokenSearch``` | `OKX_DEX` |
 | ```topUpGas``` | `Futures_Boros` |
 | ```toUnits``` | `Web3` |
 | ```trade_margin``` | `AscendEx`, `Binance`, `Bybit`, `Crypto`, `GateIO`, `Huobi`, `OKEX`, `WOO` |
 | ```trade_normal``` | `AscendEx`, `Binance`, `Bybit`, `Crypto`, `GateIO`, `Huobi`, `OKEX`, `WOO` |
 | ```trade_super_margin``` | `Binance`, `GateIO`, `Huobi`, `OKEX` |
-| ```transfer``` | `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `Jupiter`, `KyberSwap`, `OneInch` |
+| ```transfer``` | `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter` |
 | ```trigger.api``` | `Jupiter` |
 | ```trigger.simulate``` | `Jupiter` |
 | ```trigger.vault``` | `Jupiter` |
@@ -25344,9 +25344,9 @@ An exchange object is named by the value of ```exchange.GetName()```; click a na
 | `PancakeSwap` | PancakeSwap | Spot | Pancake |
 | `Aerodrome` | Aerodrome | Spot | Aero |
 | `Velodrome` | Velodrome | Spot | Velo |
-| `Jupiter` | Jupiter | Spot | — |
 | `KyberSwap` | KyberSwap | Spot | Kyber |
 | `OneInch` | 1inch | Spot | — |
+| `Jupiter` | Jupiter | Spot | — |
 | `OKX_DEX` | OKX DEX | Spot | OKX Web3 |
 | `Futures_Polymarket` | Polymarket | Prediction market | Futures_Polymarket |
 | `Futures_Futu` | Futu Securities | Securities and futures | Futu |
@@ -25429,9 +25429,9 @@ Support of the standard functions and trading-mode commands per exchange object.
 | `PancakeSwap` | ✓ | ✗ | ✓ | ✓ | Synth | ✓ |
 | `Aerodrome` | ✓ | ✗ | ✓ | ✓ | Synth | ✓ |
 | `Velodrome` | ✓ | ✗ | ✓ | ✓ | Synth | ✓ |
-| `Jupiter` | ✓ | ✗ | ✓ | ✗ | Synth | ✓ |
 | `KyberSwap` | ✓ | ✗ | ✓ | ✗ | Synth | ✓ |
 | `OneInch` | ✓ | ✗ | ✓ | ✗ | Synth | ✓ |
+| `Jupiter` | ✓ | ✗ | ✓ | ✗ | Synth | ✓ |
 | `OKX_DEX` | ✓ | ✓ | ✗ | ✓ | Synth | ✓ |
 | **Prediction Markets** |  |  |  |  |  |  |
 | `Futures_Polymarket` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
@@ -25513,9 +25513,9 @@ Support of the standard functions and trading-mode commands per exchange object.
 | `PancakeSwap` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✗ |
 | `Aerodrome` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✗ |
 | `Velodrome` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✗ |
-| `Jupiter` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `KyberSwap` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✗ |
 | `OneInch` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✗ |
+| `Jupiter` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `OKX_DEX` | ✓ | ✓ | ✓ | ✗ | ✗ | ✓ | ✗ | ✗ |
 | **Prediction Markets** |  |  |  |  |  |  |  |  |
 | `Futures_Polymarket` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✓ |
@@ -25597,9 +25597,9 @@ Support of the standard functions and trading-mode commands per exchange object.
 | `PancakeSwap` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
 | `Aerodrome` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
 | `Velodrome` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
-| `Jupiter` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
 | `KyberSwap` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
 | `OneInch` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
+| `Jupiter` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
 | `OKX_DEX` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
 | **Prediction Markets** |  |  |  |  |  |  |
 | `Futures_Polymarket` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
@@ -25681,9 +25681,9 @@ Support of the standard functions and trading-mode commands per exchange object.
 | `PancakeSwap` | ✓ | ✓ | — | — | — | — | — |
 | `Aerodrome` | ✓ | ✓ | — | — | — | — | — |
 | `Velodrome` | ✓ | ✓ | — | — | — | — | — |
-| `Jupiter` | ✓ | ✓ | — | — | — | — | — |
 | `KyberSwap` | ✓ | ✓ | — | — | — | — | — |
 | `OneInch` | ✓ | ✓ | — | — | — | — | — |
+| `Jupiter` | ✓ | ✓ | — | — | — | — | — |
 | `OKX_DEX` | ✓ | ✓ | — | — | — | — | — |
 | **Prediction Markets** |  |  |  |  |  |  |  |
 | `Futures_Polymarket` | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✗ |
@@ -25774,6 +25774,24 @@ The rest of the longer descriptions in the table:
 
 For the common commands ```base``` and ```currency``` see `exchange.IO`.
 
+##### Common Usage
+
+###### Look up the account group, then call private endpoints
+
+```javascript
+function main() {
+    // Paths of private endpoints need the account group prefix
+    var info = exchange.IO("api", "GET", "/api/pro/v1/info")
+    var group = info.data.accountGroup
+    // The whole reply (with code) is returned
+    var bal = exchange.IO("api", "GET", "/" + group + "/api/pro/v1/cash/balance")
+    Log(bal.data)
+    var path = "/" + group + "/api/pro/v1/cash/order/open"
+    var orders = exchange.IO("api", "GET", path, "symbol=BTC/USDT")
+    Log(orders.data)
+}
+```
+
 ##### Function Support
 
 Not supported (the call fails with an error and returns null): `exchange.ModifyOrder`, `exchange.CreateConditionOrder`, `exchange.ModifyConditionOrder`, `exchange.CancelConditionOrder`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`, `exchange.GetHistoryConditionOrders`.
@@ -25838,6 +25856,33 @@ The rest of the longer descriptions in the table:
 - ```api```: Private endpoints need the exchange's instruction name ```instruction``` (such as ```balanceQuery``` or ```orderQueryAll```) in ```params``` (or in the ```raw``` object); it is used for signing only and is not sent with the request. A non-empty ```raw``` replaces ```params``` entirely: for ```GET``` it may be a JSON object or ```a=1&b=2```, for other methods it must be a JSON object. ```path``` may also be a full URL. With ```false``` as the 4th argument the request is not signed, which only works for public ```GET``` endpoints.
 
 For the common commands ```base``` and ```currency``` see `exchange.IO`.
+
+##### Common Usage
+
+###### Call private endpoints (signing needs ```instruction```) and public endpoints
+
+```javascript
+function main() {
+    // Private endpoint: instruction is the exchange-defined instruction name; it is only
+    // signed, not sent with the request
+    var balances = exchange.IO("api", "GET", "/api/v1/capital", {instruction: "balanceQuery"})
+    Log(balances)   // {"USDC": {"available": "...", "locked": "...", "staked": "..."}, ...}
+    var orders = exchange.IO("api", "GET", "/api/v1/orders", {instruction: "orderQueryAll"})
+    Log(orders)     // array of open orders
+    // Public endpoint: false as the last argument skips signing (GET only)
+    var t = exchange.IO("api", "GET", "/api/v1/ticker", "symbol=SOL_USDC", false)
+    Log(t.lastPrice)
+}
+```
+
+###### Set self-trade prevention (values are case-sensitive)
+
+```javascript
+function main() {
+    // Later orders and conditional orders carry it; an unknown value fails and returns null
+    Log(exchange.IO("selfTradePreventionMode", "RejectTaker"))   // RejectTaker
+}
+```
 
 ##### Function Support
 
@@ -26004,6 +26049,27 @@ The rest of the longer descriptions in the table:
 
 For the common commands ```api``` and ```currency``` see `exchange.IO`.
 
+##### Common Usage
+
+###### Query and switch the endpoint base addresses (access through a proxy) (Futures_Binance only)
+
+```javascript
+function main() {
+    // Without an argument the current address is returned
+    Log("USDT-M:", exchange.IO("base"), "COIN-M:", exchange.IO("coinmBase"))
+    Log("Options:", exchange.IO("eapiBase"))
+    // A proxy address: USDT-M, COIN-M, unified account and options requests all go to it;
+    // the previous USDT-M address is returned
+    var old = exchange.IO("base", "https://binance-proxy.example.com")
+    Log("Previous:", old, "COIN-M:", exchange.IO("coinmBase"))   // COIN-M uses the proxy too
+    // Send only COIN-M back to the official address
+    exchange.IO("coinmBase", "https://dapi.binance.com")
+    // Setting an official address sends COIN-M, unified account and options back to
+    // their own official mainnet addresses
+    exchange.IO("base", "https://fapi.binance.com")
+}
+```
+
 ##### Function Support
 
 ###### ```Binance``` (Spot)
@@ -26127,6 +26193,19 @@ For the common commands ```api```, ```base``` and ```currency``` see `exchange.I
 | ```mbase``` | [url] | Query or switch the market-data (public) API base address (only ```http://``` and ```https://``` addresses are accepted), separate from the trading API base address (the ```base``` command); the same as the trading address when not set. | The address before the change. |
 
 For the common commands ```api```, ```base``` and ```currency``` see `exchange.IO`.
+
+##### Common Usage
+
+###### Send market data requests to the public API domain while trading requests stay (Futures_Bitfinex only)
+
+```javascript
+function main() {
+    // Returns the previous market data address (the trading address when not set)
+    var old = exchange.IO("mbase", "https://api-pub.bitfinex.com")
+    Log("Previous:", old, "Market:", exchange.IO("mbase"), "Trading:", exchange.IO("base"))
+    Log(exchange.GetTicker("BTC_USDT.swap"))   // sent to api-pub.bitfinex.com
+}
+```
 
 ##### Function Support
 
@@ -26483,6 +26562,31 @@ For the common commands ```api```, ```base``` and ```currency``` see `exchange.I
 
 For the common commands ```api```, ```base``` and ```currency``` see `exchange.IO`.
 
+##### Common Usage
+
+###### Choose the wallet read by asset queries (Bybit only)
+
+```javascript
+function main() {
+    // Unified trading account; use SPOT for the spot wallet of a classic account.
+    // Once set, the account type is no longer detected automatically
+    Log(exchange.IO("accountType", "UNIFIED"))   // UNIFIED
+    Log(exchange.GetAssets())
+}
+```
+
+###### Choose the wallet read by asset queries, then restore auto-detection (Futures_Bybit only)
+
+```javascript
+function main() {
+    // Unified trading account; use CONTRACT for the contract wallet of a classic account
+    Log(exchange.IO("accountType", "UNIFIED"))   // UNIFIED
+    Log(exchange.GetAssets())
+    // Restore auto-detection (the default)
+    Log(exchange.IO("accountType", "auto"))      // auto
+}
+```
+
 ##### Function Support
 
 ###### All exchange objects
@@ -26683,6 +26787,22 @@ For the common commands ```base``` and ```currency``` see `exchange.IO`.
 
 For the common commands ```api```, ```base``` and ```currency``` see `exchange.IO`.
 
+##### Common Usage
+
+###### Call spot private endpoints by ```command``` (Coinw only)
+
+```javascript
+function main() {
+    // command goes in params ("a=1&b=2" string or object); the whole reply (code 200)
+    // is returned
+    var r = exchange.IO("api", "POST", "/api/v1/private", "command=returnBalances")
+    Log(r.data)
+    var params = {command: "returnOpenOrders", currencyPair: "BTC_USDT"}
+    var orders = exchange.IO("api", "POST", "/api/v1/private", params)
+    Log(orders.data)
+}
+```
+
 ##### Function Support
 
 ###### ```Coinw``` (Spot)
@@ -26813,6 +26933,35 @@ The rest of the longer descriptions in the table:
 
 For the common commands ```base``` and ```currency``` see `exchange.IO`.
 
+##### Common Usage
+
+###### Call the API by JSON-RPC method name
+
+```javascript
+function main() {
+    // Private method: signed by default, sent as a JSON-RPC request body;
+    // the whole reply (code 0) is returned
+    var r = exchange.IO("api", "POST", "private/user-balance")
+    Log(r.result.data[0].position_balances)
+    // Public method: false as the last argument skips signing; GET params go in the query
+    var t = exchange.IO("api", "GET", "public/get-tickers", "instrument_name=BTC_USDT", false)
+    Log(t.result.data[0])   // {"i": "BTC_USDT", "a": "...", "b": "...", "k": "...", ...}
+}
+```
+
+###### Look up the account uuids and choose the account for positions and leverage (Futures_Crypto only)
+
+```javascript
+function main() {
+    var r = exchange.IO("api", "POST", "private/get-accounts")
+    var uuid = r.result.master_account.uuid
+    Log("Master account:", uuid, "Sub-accounts:", r.result.sub_account_list)
+    // Positions and leverage now use this account (the master account when not set)
+    Log(exchange.IO("accountId", uuid))   // {"accountId": "..."}
+    Log(exchange.GetPositions())
+}
+```
+
 ##### Function Support
 
 No unsupported standard functions.
@@ -26905,6 +27054,23 @@ No exchange-specific commands; for the common commands see `exchange.IO`.
 | ```merge``` | bool | Merged positions (true) / split positions (false). Only changes the local setting without sending a request; subsequent orders, conditional orders and ```exchange.SetMarginLevel()``` carry it. Merged positions by default. | The value set. |
 
 For the common commands ```api```, ```base``` and ```currency``` see `exchange.IO`.
+
+##### Common Usage
+
+###### Set leverage and place an order in isolated margin with split positions (Futures_DeepCoin only)
+
+```javascript
+function main() {
+    exchange.SetContractType("swap")
+    // Local settings only, no request; later orders, conditional orders and
+    // leverage settings carry them
+    Log(exchange.IO("cross", false))   // false: isolated margin
+    Log(exchange.IO("merge", false))   // false: split positions
+    exchange.SetMarginLevel(5)
+    var id = exchange.CreateOrder("BTC_USDT.swap", "buy", -1, 1)
+    Log("Order Id:", id)
+}
+```
 
 ##### Function Support
 
@@ -27291,6 +27457,21 @@ Trading pairs are written ```BASE_QUOTE```, matching the Gemini native code ```b
 
 For the common commands ```api```, ```base``` and ```currency``` see `exchange.IO`.
 
+##### Common Usage
+
+###### Operate a sub-account with a master API key
+
+```javascript
+function main() {
+    // Only for a master key (Access Key starting with master-): later private requests
+    // carry this sub-account
+    exchange.IO("subAccount", "my-sub-account")
+    Log(exchange.GetAccount())
+    // Back to the default, primary
+    exchange.IO("subAccount", "primary")
+}
+```
+
 ##### Function Support
 
 Not supported (the call fails with an error and returns null): `exchange.GetTickers`, `exchange.ModifyOrder`, `exchange.CreateConditionOrder`, `exchange.ModifyConditionOrder`, `exchange.CancelConditionOrder`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`, `exchange.GetHistoryConditionOrders`.
@@ -27444,13 +27625,28 @@ For the common commands ```api```, ```base``` and ```currency``` see `exchange.I
 | ```cross``` | bool | Cross (true, the default) / isolated (false) margin, effective for USDT-margined contracts on classic and unified accounts only. (more below the table) | Null also on success; check GetLastError() afterwards when needed. |
 | ```dual``` | bool[, symbol] | Hedge (true, dual_side) / one-way (false, single_side) position mode; sends a switch request to the exchange. USDT-margined contracts only. On classic and unified accounts it switches the cross or isolated account (isolated per the contract's pair) according to the current ```cross``` setting. | Null also on success; check GetLastError() afterwards when needed. |
 | ```unified``` | bool | Sends a request switching the account to a unified (true) / classic (false) account; the account shape is detected again after success. | Null also on success; check GetLastError() afterwards when needed. |
-| ```signHost``` | string | Set the Host used for API signing. HTX includes the host in the signature, so set it when accessing through a proxy or alternative domain; without it the host of the API base address is used. | Null also on success. |
+| ```signHost``` | string | Set the address used by private (signed) requests; a bare host name (such as ```api.hbdm.vn```) keeps the scheme of the API base address. HTX includes the host in the signature; once set, both the host in the signature and the address private requests (account, positions, orders, etc.) are actually sent to change to it, while public market data still uses the API base address; without it both use the API base address. | Null also on success. |
 
 The rest of the longer descriptions in the table:
 
 - ```cross```: Kept locally with no request to the exchange and applies to all contracts: subsequent USDT-margined orders, cancellations, conditional orders, and position and order queries use the API of that mode (on a classic account ```exchange.GetAccount()``` and ```exchange.GetAssets()``` sum cross and isolated). Multi-asset margin mode is always cross and is not affected.
 
 For the common commands ```api```, ```base``` and ```currency``` see `exchange.IO`.
+
+##### Common Usage
+
+###### Send private requests to an alternative domain (market data keeps the API base address) (Futures_HuobiDM only)
+
+```javascript
+function main() {
+    // Private requests (account, positions, orders, etc.) now go to api.hbdm.vn,
+    // and the signature uses this host
+    exchange.IO("signHost", "https://api.hbdm.vn")
+    Log(exchange.GetAccount())
+    // Public requests such as market data still go to the API base address
+    Log(exchange.IO("base"), exchange.GetTicker("BTC_USDT.swap"))
+}
+```
 
 ##### Function Support
 
@@ -27978,6 +28174,35 @@ For the common commands ```api```, ```base``` and ```currency``` see `exchange.I
 
 For the common commands ```api```, ```base``` and ```currency``` see `exchange.IO`.
 
+##### Common Usage
+
+###### Switch between isolated margin, cross margin and plain spot with ```tdMode``` (OKEX only)
+
+```javascript
+function main() {
+    // Isolated margin, same as exchange.IO("trade_margin"); use cross for cross margin
+    Log(exchange.IO("tdMode", "isolated"))   // isolated
+    // Orders now carry tdMode=isolated; open and history order queries read margin orders
+    Log(exchange.GetOrders("BTC_USDT"))
+    // Back to plain spot, same as exchange.IO("trade_normal")
+    Log(exchange.IO("tdMode", "cash"))       // cash
+}
+```
+
+###### Set leverage and place an order in isolated margin mode (Futures_OKCoin only)
+
+```javascript
+function main() {
+    exchange.SetContractType("swap")
+    // Saved locally only; later orders, conditional orders and leverage settings use
+    // isolated margin, same as exchange.IO("cross", false)
+    Log(exchange.IO("tdMode", "isolated"))   // isolated
+    exchange.SetMarginLevel(5)
+    var id = exchange.CreateOrder("BTC_USDT.swap", "buy", -1, 1)
+    Log("Order Id:", id)
+}
+```
+
 ##### Function Support
 
 No unsupported standard functions.
@@ -28058,6 +28283,24 @@ Trading pairs are written ```BASE_QUOTE```, the same form as the Poloniex native
 | ```accountId``` | string | Set the ID of the spot account that `exchange.GetAccount` reads; once set, only this spot account is read and an error is reported if it is not found; pass an empty string to restore the default (the first spot account). It does not affect `exchange.GetAssets`, which always sums all spot accounts. | A null value. |
 
 For the common commands ```api```, ```base``` and ```currency``` see `exchange.IO`.
+
+##### Common Usage
+
+###### List the spot accounts and choose the one ```exchange.GetAccount()``` reads
+
+```javascript
+function main() {
+    // The exchange's account list; each item has accountId, accountType (such as SPOT)
+    // and accountState
+    var accounts = exchange.IO("api", "GET", "/accounts")
+    Log(accounts)
+    // From now on exchange.GetAccount() reads only this spot account (an error if not found)
+    exchange.IO("accountId", accounts[0].accountId)
+    Log(exchange.GetAccount())
+    // An empty string restores the default (the first spot account)
+    exchange.IO("accountId", "")
+}
+```
 
 ##### Function Support
 
@@ -28358,7 +28601,11 @@ Perpetual exchanges with an on-chain order book: `Hyperliquid`, `Lighter`, `edge
 
 #### Swaps and Aggregators
 
-AMM pools and swap aggregators, mapping on-chain swaps onto the spot trading functions: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `Jupiter`, `KyberSwap`, `1inch`, `OKX DEX`.
+AMM pools and swap aggregators, mapping on-chain swaps onto the spot trading functions: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `KyberSwap`, `1inch`, `Jupiter`, `OKX DEX`.
+
+IO command sub-pages shared by several exchanges: `EVM DEX Common Commands` (`Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `KyberSwap`, `1inch`).
+
+See also: `DEX Strategy Examples`.
 
 #### Hyperliquid
 
@@ -28431,25 +28678,180 @@ For the common commands ```base``` and ```currency``` see `exchange.IO`.
 | Command | Arguments | Description | Returns |
 | - | - | - | - |
 | ```cross``` | bool | Cross (true, the default) / isolated (false) margin. Only recorded by the connector, not per contract, and submitted together with the leverage on the next ```exchange.SetMarginLevel()``` call for any contract; the command itself sends no request. | ```cross``` or ```isolated```. |
-| ```dex``` | name | Set the default HIP-3 dex name; an empty string is the main dex. (more below the table) | The dex name set. |
+| ```dex``` | name | Set the default HIP-3 dex name (without ```:```, such as ```xyz```; list the names with ```exchange.IO("api", "POST", "/info", {type: "perpDexs"})```). (more below the table) | The dex name set (an empty string when cleared). |
 | ```walletAddress``` | address | Set the address used by read-only queries (account, positions, orders), so another address's positions can be queried; the wallet that signs orders is unchanged. To query your own account again, pass the configured wallet address. | The address set. |
 | ```vaultAddress``` | address | Place, cancel and amend orders and set leverage on behalf of a vault or sub-account (the address goes into the signature and the request body); an empty string clears it. Queries still use the wallet address; to query the vault's account and positions, also set ```walletAddress``` to the vault address. | The address set. |
 | ```expiresAfter``` | timestamp | Set the ```expiresAfter``` carried by all subsequent signed actions (orders, cancels, amendments, leverage changes, ...), a Unix timestamp in milliseconds after which the exchange rejects the action; 0 clears it (the default). The value stays in effect, so every action after that time is rejected until it is set again or reset to 0. | The value set. |
 | ```source``` | "a" \| "b" | The network used for signing: ```a``` is mainnet (the default; ```b``` when the Simulate (testnet) box is checked), ```b``` is testnet. (more below the table) | The value set. |
 | ```split``` | symbol, amount | HIP-4 Outcome split (the ```splitOutcome``` action) of ```amount``` for the Outcome that ```symbol``` belongs to, into positions on each outcome side. (more below the table) | The raw exchange response (```status``` is ```ok```). |
-| ```merge``` | symbol[, amount] | HIP-4 Outcome merge (the ```mergeOutcome``` action) of the positions on each side of the Outcome that ```symbol``` belongs to; ```amount``` is optional. | The raw exchange response (```status``` is ```ok```). |
-| ```mergeQuestion``` | symbol[, amount] | HIP-4 merge by question (the ```mergeQuestion``` action) for the question that the Outcome of ```symbol``` belongs to; ```amount``` is optional. Fails if the Outcome belongs to no question. | The raw exchange response (```status``` is ```ok```). |
+| ```merge``` | symbol[, amount] | HIP-4 Outcome merge (the ```mergeOutcome``` action) of the positions on each side of the Outcome that ```symbol``` belongs to; ```amount``` is optional, and when omitted or not above 0 the request carries no amount. | The raw exchange response (```status``` is ```ok```). |
+| ```mergeQuestion``` | symbol[, amount] | HIP-4 merge by question (the ```mergeQuestion``` action) for the question that the Outcome of ```symbol``` belongs to; ```amount``` is optional (when omitted or not above 0 the request carries no amount). Fails if the Outcome belongs to no question. | The raw exchange response (```status``` is ```ok```). |
 | ```negate``` | symbol, amount | HIP-4 negation (the ```negateOutcome``` action) of the Outcome of ```symbol``` within its question; ```amount``` must be greater than 0. Fails if the Outcome belongs to no question. | The raw exchange response (```status``` is ```ok```). |
 | ```api``` | method, path[, params[, body]] | Call a Hyperliquid endpoint directly. (more below the table) | The raw exchange response. |
 
 The rest of the longer descriptions in the table:
 
-- ```dex```: Once set, range queries without a symbol (```GetPositions()```, ```GetOrders()```, ```GetConditionOrders()```, ```GetTickers()```, ```GetMarkets()```) cover only this dex; when not set they gather all dexes. Calls with a symbol always follow the symbol's own dex prefix.
+- ```dex```: Once set, range queries without a symbol (```GetPositions()```, ```GetOrders()```, ```GetConditionOrders()```, ```GetTickers()```, ```GetMarkets()```) cover only this dex, while ```GetTickers()``` and ```GetMarkets()``` still add all HIP-4 Outcome instruments. An empty string clears it and restores the default, where these queries gather the main dex and all HIP-3 dexes. Calls with a symbol always follow the symbol's own dex prefix. The name is not checked when set; an unknown name fails on the next range query.
 - ```source```: It sets the ```source``` field of the Agent signature of trading actions and the chainId of the EIP-712 signature of transfer actions (```usdSend```, ```withdraw3```, ```usdClassTransfer```, ...): Arbitrum 42161 on mainnet, Arbitrum Sepolia 421614 on testnet. The API address is not changed; to connect to the testnet also switch it with ```exchange.IO("base", "https://api.hyperliquid-testnet.xyz")```. The testnet has no HIP-3, so range queries cover the main dex only.
 - ```split```: ```symbol``` is an Outcome code (such as ```BTC-above-100k---Dec_USD.Yes```), written as for market data and orders (markets sharing a name take the code with ```-<market id>``` (such as ```Recurring-1399_USD.Yes```) and the bare name fails as ambiguous); the ```symbol``` of ```merge```, ```mergeQuestion``` and ```negate``` follows the same rule. ```amount``` must be greater than 0.
 - ```api```: A ```POST``` to ```/exchange``` takes an action object, and the connector adds the nonce and signs it; transfer actions (```usdSend```, ```spotSend```, ```withdraw3```, ```usdClassTransfer```, ```approveAgent```, ```approveBuilderFee```, ```userSetAbstraction```) are signed with the wallet private key ```WalletPrivateKey```, and fields such as ```hyperliquidChain``` must be filled in by the caller; other actions are signed with the API wallet private key. Other paths (such as ```POST /info```) are sent as they are, unsigned. ```body``` (a JSON object or a JSON string), when given, is the request body (the action for ```/exchange```); otherwise ```params``` is used as the body; a ```body``` of any other type is an error.
 
 For the common commands ```base``` and ```currency``` see `exchange.IO`.
+
+##### Common Usage
+
+###### Query the Info endpoint with api and read another address's account
+
+```javascript
+function main() {
+    // POST /info is unsigned; the params object is the request body
+    var mids = exchange.IO("api", "POST", "/info", {type: "allMids"})
+    Log("BTC mid:", mids["BTC"], "HYPE mid:", mids["HYPE"])
+    var meta = exchange.IO("api", "POST", "/info", {type: "spotMeta"})
+    Log("Spot tokens:", meta.tokens.length, "spot pairs:", meta.universe.length)
+    // Later account and order queries target this address (the HLP vault here); the wallet
+    // that signs orders is unchanged. Pass the configured wallet address to query your own
+    // account again
+    exchange.IO("walletAddress", "0xdfc24b077bc1425ad1dea75bcb6f8158e10df303")
+    Log("Account of that address:", exchange.GetAccount())
+    Log("Open orders of that address:", exchange.GetOrders())
+}
+```
+
+###### Trade on behalf of a vault or sub-account
+
+```javascript
+function main() {
+    var vault = "0x..."    // replace with the vault or sub-account address
+    // Later orders, cancels and amendments are signed and sent on behalf of the vault
+    exchange.IO("vaultAddress", vault)
+    // Queries still use the wallet address; set it as well to query the vault
+    exchange.IO("walletAddress", vault)
+    Log("Vault account:", exchange.GetAccount())
+    var orders = exchange.GetOrders()
+    for (var i = 0; i < orders.length; i++) {
+        exchange.CancelOrder(orders[i].Id)
+    }
+    // An empty string clears it; later actions are the wallet's own again
+    exchange.IO("vaultAddress", "")
+}
+```
+
+###### Give signed actions an expiry time
+
+```javascript
+function main() {
+    // Later signed actions (orders, cancels, amendments, ...) expire in 10 seconds; the
+    // exchange rejects actions that arrive after that time
+    exchange.IO("expiresAfter", Date.now() + 10 * 1000)
+    var orders = exchange.GetOrders()
+    for (var i = 0; i < orders.length; i++) {
+        if (!exchange.CancelOrder(orders[i].Id)) {
+            Log("Cancel failed:", GetLastError())
+        }
+    }
+    // The value stays in effect; reset it to 0, or every later action is rejected
+    exchange.IO("expiresAfter", 0)
+}
+```
+
+###### Send a transfer action with api, moving USDC between the spot and perpetual accounts
+
+```javascript
+function main() {
+    // Transfer actions are signed with the "Wallet Private Key" option; the caller fills in
+    // hyperliquidChain, signatureChainId and the other fields
+    var r = exchange.IO("api", "POST", "/exchange", {
+        type: "usdClassTransfer",
+        hyperliquidChain: "Mainnet",     // Testnet on the testnet
+        signatureChainId: "0xa4b1",      // signing chain ID 42161; 0x66eee (421614) on testnet
+        amount: "10",                    // a string
+        toPerp: true,                    // true: spot to perp; false: perp to spot
+        nonce: Date.now()
+    })
+    Log(r)
+}
+```
+
+###### List the HIP-3 dexes and query the instruments and positions of one of them (Futures_Hyperliquid only)
+
+```javascript
+function main() {
+    // perpDexs: the first item is the main dex (null), followed by the HIP-3 dexes
+    var dexs = exchange.IO("api", "POST", "/info", {type: "perpDexs"})
+    var names = []
+    for (var i = 0; i < dexs.length; i++) {
+        if (dexs[i]) {
+            names.push(dexs[i].name)
+        }
+    }
+    Log("HIP-3 dexes:", names.join(", "))
+    // Later range queries without a symbol cover only xyz (GetMarkets and GetTickers
+    // always add the HIP-4 Outcome instruments)
+    exchange.IO("dex", "xyz")
+    var markets = exchange.GetMarkets()
+    var n = 0
+    for (var k in markets) {
+        if (k.indexOf("xyz:") == 0) {
+            n++
+        }
+    }
+    Log("Perpetuals on xyz:", n)
+    Log("Positions on xyz:", exchange.GetPositions())
+    // Calls with a symbol follow the symbol's own dex prefix, whatever IO("dex") says
+    Log(exchange.GetTicker("xyz:XYZ100_USD.swap"))
+    // An empty string clears it; range queries gather the main dex and all HIP-3 dexes again
+    exchange.IO("dex", "")
+}
+```
+
+###### Find HIP-4 Outcome instruments and the questions they belong to (Futures_Hyperliquid only)
+
+```javascript
+function main() {
+    // Rows of GetMarkets() with Info.isOutcome true are Outcome instruments, and
+    // Info.outcomeId is the Outcome number
+    var markets = exchange.GetMarkets()
+    var byId = {}
+    for (var k in markets) {
+        var info = markets[k].Info
+        if (info.isOutcome) {
+            byId[info.outcomeId] = byId[info.outcomeId] || []
+            byId[info.outcomeId].push(k)
+        }
+    }
+    // A question consists of several Outcomes (namedOutcomes) plus a fallback Outcome
+    var meta = exchange.IO("api", "POST", "/info", {type: "outcomeMeta"})
+    Log("Outcomes:", meta.outcomes.length, "questions:", meta.questions.length)
+    var q = meta.questions[0]
+    Log("Question", q.question, q.description)
+    for (var i = 0; i < q.namedOutcomes.length; i++) {
+        Log("Outcome", q.namedOutcomes[i], byId[q.namedOutcomes[i]])
+    }
+    Log("Fallback Outcome", q.fallbackOutcome, byId[q.fallbackOutcome])
+    var symbol = byId[q.namedOutcomes[0]][0]
+    Log(symbol, exchange.GetDepth(symbol))
+}
+```
+
+###### Split, merge and negate HIP-4 Outcome positions (Futures_Hyperliquid only)
+
+```javascript
+function main() {
+    var symbol = "BTC-above-100k---Dec_USD.Yes"    // replace with an Outcome code of GetMarkets()
+    // Split: an amount of 10 into positions on each side of the Outcome; must be above 0
+    var r = exchange.IO("split", symbol, 10)
+    Log("split:", r ? r.status : GetLastError())
+    // Merge the positions on each side back; the amount may be omitted
+    r = exchange.IO("merge", symbol, 10)
+    Log("merge:", r ? r.status : GetLastError())
+    // negate and mergeQuestion only work for an Outcome that belongs to a question
+    r = exchange.IO("negate", symbol, 10)
+    Log("negate:", r ? r.status : GetLastError())
+    r = exchange.IO("mergeQuestion", symbol)
+    Log("mergeQuestion:", r ? r.status : GetLastError())
+}
+```
 
 ##### Function Support
 
@@ -28545,6 +28947,38 @@ The rest of the longer descriptions in the table:
 
 For the common commands ```base``` and ```currency``` see `exchange.IO`.
 
+##### Common Usage
+
+###### Set the lifetime of limit orders
+
+```javascript
+function main() {
+    // Later limit and conditional orders expire 10 minutes plus 1 hour after they are placed
+    // (29 days by default); market orders are not affected
+    exchange.IO("expiry", 60 * 60 * 1000)
+    var id = exchange.CreateOrder("ETH_USDC.swap", "buy", 2000, 0.01)
+    Log("Order ID:", id)
+}
+```
+
+###### Call public endpoints and account endpoints that need the auth token with api
+
+```javascript
+function main() {
+    // Public endpoints: false as the 4th argument sends no auth token
+    var books = exchange.IO("api", "GET", "/api/v1/orderBooks", {}, false)
+    Log("Markets:", books.order_books.length)
+    var d = exchange.IO("api", "GET", "/api/v1/orderBookDetails", {market_id: 0}, false)
+    Log(d.order_book_details[0].symbol, "last:", d.order_book_details[0].last_trade_price)
+    // Account endpoints carry the auth token by default; the account index is in the Info
+    // of GetAccount()
+    var idx = exchange.GetAccount().Info.account_index
+    var params = {account_index: idx, market_id: 0}
+    var r = exchange.IO("api", "GET", "/api/v1/accountActiveOrders", params)
+    Log("Open orders on market_id 0:", r.orders.length)
+}
+```
+
 ##### Function Support
 
 No unsupported standard functions.
@@ -28621,6 +29055,54 @@ The rest of the longer descriptions in the table:
 
 For the common commands ```base``` and ```currency``` see `exchange.IO`.
 
+##### Common Usage
+
+###### Call public endpoints and signed account endpoints with api
+
+```javascript
+function main() {
+    // Public endpoints: false as the 4th argument sends the request unsigned (GET only);
+    // the data of the response is returned
+    var meta = exchange.IO("api", "GET", "/api/v2/public/meta/getMetaData", {}, false)
+    var c = null
+    for (var i = 0; i < meta.contractList.length; i++) {
+        if (meta.contractList[i].contractName == "BTCUSDC") {
+            c = meta.contractList[i]
+        }
+    }
+    var p = {contractId: c.contractId}
+    var t = exchange.IO("api", "GET", "/api/v2/public/quote/getTicker", p, false)
+    Log(c.contractName, "contract ID:", c.contractId, "last:", t[0].lastPrice)
+    // Account endpoints are HMAC-signed by default; accountId is in the Info of GetAccount()
+    var accountId = exchange.GetAccount().Info.account.id
+    var params = {accountId: accountId, size: "50"}
+    var orders = exchange.IO("api", "GET", "/api/v2/private/order/getActiveOrderPage", params)
+    Log("Open orders:", orders.dataList.length)
+}
+```
+
+###### Compute a legacy (StarkEx) limit-order signature for an old strategy
+
+```javascript
+function main() {
+    // Exactly 10 keys; an accountID beyond JavaScript integer precision is a decimal string
+    var sig = exchange.IO("calcOrderHashAndSign", JSON.stringify({
+        assetIdSynthetic: "0x4554482d3900000000000000000000",
+        assetIdCollateral: "0x2ce625e94458d39dd0bf3b45a843544dd4a14b8169045a3a3d15aa564b936c5",
+        assetIdFee: "0x2ce625e94458d39dd0bf3b45a843544dd4a14b8169045a3a3d15aa564b936c5",
+        isBuyingSynthetic: true,
+        amountSynthetic: 10000000,
+        amountCollateral: 13020000,
+        amountFee: 6250,
+        nonce: 676432751,
+        accountID: "601416704693633632",
+        expirationTimestamp: 484831
+    }))
+    // 128 hex characters: the first 64 are r, the last 64 are s
+    Log("r:", sig.slice(0, 64), "s:", sig.slice(64))
+}
+```
+
 ##### Function Support
 
 Not supported (the call fails with an error and returns null): `exchange.GetTickers`, `exchange.GetTrades`, `exchange.ModifyOrder`, `exchange.ModifyConditionOrder`, `exchange.SetMarginLevel`.
@@ -28650,7 +29132,7 @@ Account: The account, positions and orders are queried by the configured Account
 | exchange.GetHistoryOrders() | At most 100 orders are returned when ```limit``` is omitted; finished conditional orders are included |
 | exchange.GetHistoryConditionOrders() | The third parameter keeps its legacy meaning and is not a count: a value above 1e12 is taken as the end time (millisecond timestamp) and smaller values are ignored; the number of results is not limited. Without ```since``` the call pages through the contract's whole order history and fails beyond about 10,000 orders, so passing ```since``` is recommended |
 
-The argument of ```exchange.IO("calcOrderHashAndSign", json)``` must have exactly 10 keys: ```assetIdSynthetic```, ```assetIdCollateral```, ```assetIdFee``` (hex), ```isBuyingSynthetic``` (bool), ```amountSynthetic```, ```amountCollateral```, ```amountFee```, ```nonce```, ```accountID``` and ```expirationTimestamp``` (integers). A missing or malformed key reports ```argument X error```, and extra keys report ```argument error```. The signing key is the configured TradingPrivateKey (used as a Stark private key), not the Stark key of an old account; the signing nonce is deterministic (RFC 6979), so the same input always gives the same signature, which differs from the old docker's but is equally valid.
+The argument of ```exchange.IO("calcOrderHashAndSign", json)``` must have exactly 10 keys: ```assetIdSynthetic```, ```assetIdCollateral```, ```assetIdFee``` (hex), ```isBuyingSynthetic``` (bool), ```amountSynthetic```, ```amountCollateral```, ```amountFee```, ```nonce```, ```accountID``` and ```expirationTimestamp``` (integers, or decimal strings; an ```accountID``` beyond JavaScript integer precision must be a string). A missing or malformed key reports ```argument X error```, and extra keys report ```argument error```. The signing key is the configured TradingPrivateKey (used as a Stark private key), not the Stark key of an old account; the signing nonce is deterministic (RFC 6979), so the same input always gives the same signature, which differs from the old docker's but is equally valid.
 
 #### Aster
 
@@ -28818,6 +29300,26 @@ The rest of the longer descriptions in the table:
 
 For the common commands ```base``` and ```currency``` see `exchange.IO`.
 
+##### Common Usage
+
+###### Query markets and the account with api, and switch to another signing key
+
+```javascript
+function main() {
+    // Public paths are unsigned by default
+    var q = {asset: "ETH", instrument_type: "PERPETUAL"}
+    var markets = exchange.IO("api", "GET", "/markets", q)
+    Log(markets[0].instrument_name, "mark price:", markets[0].mark_price)
+    // Other paths are signed with the API key by default
+    var account = exchange.IO("api", "GET", "/account")
+    Log("Available balance:", account.available_balance, "positions:", account.positions.length)
+    // Switch to another registered signing key for this run only; the key's wallet address
+    // is returned, to check against the signing key list on the Aevo website
+    var addr = exchange.IO("signingKey", "0x...")    // replace with the signing private key
+    Log("Signing key address:", addr)
+}
+```
+
 ##### Function Support
 
 Not supported (the call fails with an error and returns null): `exchange.GetTickers`.
@@ -28905,9 +29407,9 @@ Contract codes are Boros market names with underscores, ```funding source_asset_
 
 | Command | Arguments | Description | Returns |
 | - | - | - | - |
-| ```market``` | symbol | The market of a pair: expiry, years to expiry, current implied APY, the PT/YT/SY, underlying and accounting asset addresses, and how much accounting asset one quote token is worth (used by the limit-order conversion). | ```{symbol, market, name, kind, expiry, yearsToExpiry, impliedApy, pt, yt, sy, underlying, accounting, accountingPerQuote, chainId}``` |
-| ```apy``` | symbol, price | Convert a PT/YT price to an implied APY (the same conversion limit orders use): the quote is converted to the accounting asset at the SY rate, PT price = (1 + APY)^(−years to expiry), YT price = 1 − PT price. | The implied APY (0.16 means 16%); null when the price has no implied APY (a PT at or above one accounting asset, a YT outside 0 to 1). |
-| ```price``` | symbol, apy | The reverse of ```apy```, converting an implied APY to a price in the quote token. | The price. |
+| ```market``` | symbol | The market of a pair: expiry, years to expiry, current implied APY, the PT/YT/SY, underlying and accounting asset addresses, and how much accounting asset one quote token is worth (used by the limit-order conversion). | ```{symbol, market, name, kind, expiry, yearsToExpiry, impliedApy, pt, yt, sy, underlying, accounting, accountingPerQuote, chainId}```: ```kind``` is ```PT``` or ```YT```, ```expiry``` is a timestamp in milliseconds and the addresses are contract addresses; ```accountingPerQuote``` is null when the quote token cannot be converted through the SY (such as ```USDC``` swapped through an aggregator). |
+| ```apy``` | symbol, price | Convert a PT/YT price to an implied APY (the same conversion limit orders use): the quote is converted to the accounting asset at the SY rate, PT price = (1 + APY)^(−years to expiry), YT price = 1 − PT price. The quote token must be one the SY can convert (as for limit orders); otherwise it fails. | The implied APY (0.16 means 16%); an error and null when the price has no implied APY (a PT at or above one accounting asset, a YT outside 0 to 1) or the market has expired. |
+| ```price``` | symbol, apy | The reverse of ```apy```, converting an implied APY to a price in the quote token; the quote token must meet the same condition as for ```apy```. | The price. |
 | ```slippage``` | [ratio] | Slippage protection of market orders, range ```[0, 0.5)```, default ```0.005``` (0.5%), written into the swap transaction. The order option ```slippage``` overrides it for one order. Queries when called without an argument. | The current slippage ratio. |
 | ```orderExpiry``` | [seconds] | Default lifetime of limit orders in seconds, 60 to 31536000 (one year), 604800 (7 days) by default, never beyond the market's expiry. (more below the table) | The current lifetime (seconds). |
 | ```cancelWait``` | [seconds] | How long a cancel waits for the cancel transaction to be mined, default 30, range 0 to 600. On timeout ```exchange.CancelOrder()``` still returns ```true```, meaning the cancel was submitted. Queries when called without an argument. | The current wait (seconds). |
@@ -28934,11 +29436,11 @@ The common command ```api``` is not supported (the call fails with an error and 
 | ```approveAgent``` | — | Have the wallet sign a (re)approval of the trading agent right away, valid for 30 days. The approval goes on chain through Pendle's relayer and costs no ETH from the wallet. The agent can only place and cancel orders and pay gas; it cannot withdraw. | ```{agent, expiry}``` |
 | ```gasBalance``` | — | The Boros relayer gas balance in USD. Each order or cancel costs about $0.02 to $0.04; the relayer refuses submissions below a floor. | The balance in USD; negative means debt. |
 | ```topUpGas``` | usd[, currency] | Pay the gas balance from the cross account's cash; ```usd``` is the USD amount (at most 100) and ```currency``` the collateral to pay with, ```USDT``` by default. | ```{txHash, usd, paid, currency}``` |
-| ```autoTopUp``` | [enabled[, usd]] | Automatic gas top-up: when on (the default) and the gas balance is below $0.3, an order first pays ```usd``` dollars (default 1, at most 20, plus any debt) from the cross cash of the market's collateral, in the same batch. ```enabled``` is a boolean. Queries when called without arguments. | ```{enabled, usd}``` |
+| ```autoTopUp``` | [enabled[, usd]] | Automatic gas top-up: when on (the default) and the gas balance is below $0.3, an order first pays ```usd``` dollars (default 1, above 0 and at most 20, plus any debt) from the cross cash of the market's collateral, in the same batch. ```enabled``` must be a boolean (```true```/```false```); any other value leaves the switch unchanged. Queries when called without arguments. | ```{enabled, usd}``` |
 | ```slippage``` | [rate] | The maximum distance of a market order from the mark rate (a decimal rate, default ```0.01```, one percentage point), range 0 to 0.5. The order option ```slippage``` overrides it for one order. Queries when called without an argument. | The current value. |
 | ```base``` | [url] | Query or switch the Boros API base URL (default ```https://api-boros.pendle.finance/apis```). | The address before the switch. |
 | ```rpc``` | [url] | Query or switch the Arbitrum RPC nodes (used for deposits, withdrawals and on-chain nonce reads); separate several with commas. | The address before the switch. |
-| ```market``` | symbol | The raw market data: fees, margin parameters, mark rate, underlying funding rate, maturity and more. | The Boros ```/v1/markets/by-ids``` response. |
+| ```market``` | symbol | The raw market data: fees, margin parameters, mark rate, underlying funding rate, maturity and more. ```symbol``` must be a full symbol (such as ```BTC_USDT.HYPERLIQUID_BTC_27NOV2026```); the same holds for ```tick``` and ```isolatedTransfer```. | The Boros ```/v1/markets/by-ids``` response ```{results, ...}```: ```results[0]``` is the market, with ```marketId```, ```imData``` (```symbol```, ```maturity```, ```tickStep```, ```isIsolatedOnly``` and more) and ```data``` (```markApr```, ```floatingApr```, ```bestBid```, ```bestAsk```, ```nextSettlementTime``` and more; times in Unix seconds). |
 | ```tick``` | symbol, rate[, side] | Convert a rate to a limit tick: a long (```buy```, the default) takes the nearest step not above the rate, a short (```sell```) the nearest step not below it, the same rounding orders use. | ```{market, marketId, tick, rate, tickStep}```, where ```rate``` is the actual rate of the tick. |
 | ```deposit``` | currency, amount | A wallet transaction: deposit a collateral token from the wallet into the Boros cross account (approving the Boros Router first); pays ETH gas from the wallet and returns once mined. | ```{txHash, currency, amount, accountId}``` |
 | ```withdraw``` | currency, amount | A wallet transaction: request a withdrawal from the cross account to the wallet, from the main account (sub-account 0) only. Boros completes it automatically after the cooldown (about 15 minutes at present); another request during the cooldown adds to the amount and restarts the timer. | ```{txHash, currency, amount, note}``` |
@@ -28949,6 +29451,152 @@ The common command ```api``` is not supported (the call fails with an error and 
 For the common command ```currency``` see `exchange.IO`.
 
 The common command ```api``` is not supported (the call fails with an error and returns null).
+
+##### Common Usage
+
+###### Read a PT market and convert between price and implied APY (Pendle only)
+
+```javascript
+function main() {
+    var symbol = "PT-apyUSD-11FEB2027_apyUSD"
+    var m = exchange.IO("market", symbol)
+    if (!m) {
+        Log("Market query failed:", GetLastError())
+        return
+    }
+    Log(m.kind, m.name, "expiry:", _D(m.expiry), "years to expiry:", m.yearsToExpiry)
+    Log("implied APY now:", m.impliedApy, "accounting asset per quote:", m.accountingPerQuote)
+    var t = exchange.GetTicker(symbol)
+    if (t) {
+        // The APY locked in by buying at the best ask
+        Log("ask:", t.Sell, "implied APY:", exchange.IO("apy", symbol, t.Sell))
+    }
+    // The buy price for an APY one point above the current one (a lower PT price)
+    var price = exchange.IO("price", symbol, m.impliedApy + 0.01)
+    Log("price for the target APY:", price)
+}
+```
+
+###### Place a PT limit buy at a target APY and cancel it if it has not filled after a while (Pendle only)
+
+```javascript
+function main() {
+    var symbol = "PT-apyUSD-11FEB2027_apyUSD"
+    exchange.IO("orderExpiry", 86400)    // limit orders placed from now on expire after 1 day
+    exchange.IO("approve", "max")        // approve the paying token in full (default: per order)
+    exchange.IO("cancelWait", 60)        // wait up to 60 seconds for a cancel to be mined
+    var m = exchange.IO("market", symbol)
+    var apy = m.impliedApy + 0.01
+    var price = exchange.IO("price", symbol, apy)
+    var id = exchange.CreateOrder(symbol, "buy", price, 10)    // the amount is in PT
+    if (!id) {
+        Log("Order failed:", GetLastError())
+        return
+    }
+    Log("limit order:", id, "price:", price, "APY:", apy)
+    Sleep(10 * 60 * 1000)
+    var o = exchange.GetOrder(id)
+    if (o && o.Status == ORDER_STATE_PENDING) {
+        // Canceling is an on-chain transaction and costs gas
+        Log("cancel:", exchange.CancelOrder(id), "filled:", o.DealAmount)
+    }
+}
+```
+
+###### Buy PT at market, then read the transaction receipt (Pendle only)
+
+```javascript
+function main() {
+    var symbol = "PT-apyUSD-11FEB2027_USDC"    // quoted in USDC, swapped through an aggregator
+    exchange.IO("slippage", 0.003)              // 0.3% slippage protection
+    var id = exchange.CreateOrder(symbol, "buy", -1, 20)    // market buy: spend 20 USDC
+    if (!id) {
+        Log("Swap failed:", GetLastError())
+        return
+    }
+    // A swap order ID is "pair,txHash"; wait up to 2 minutes for it to be mined
+    var r = exchange.IO("receipt", id.split(",")[1], 120000)
+    Log("status:", r.status, "block:", r.blockNumber, "gas:", r.gasUsed, "fee:", r.fee)
+    if (r.status == "success") {
+        var o = exchange.GetOrder(id)
+        Log("PT bought:", o.DealAmount, "average price:", o.AvgPrice)
+    }
+}
+```
+
+###### Check the trading agent and the gas balance, and top up gas by hand when it runs low (Futures_Boros only)
+
+```javascript
+function main() {
+    Log("wallet:", exchange.IO("address"))
+    var a = exchange.IO("agent")
+    if (!a) {
+        Log("Agent query failed:", GetLastError())
+        return
+    }
+    Log("agent:", a.agent, "sub-account:", a.accountId, "approved:", a.approved)
+    // Renew early when less than 3 days are left (wallet signature, relayed, no ETH spent)
+    if (!a.approved || a.expiry - Date.now() / 1000 < 3 * 86400) {
+        var r = exchange.IO("approveAgent")
+        Log("agent approved until:", _D(r.expiry * 1000))
+    }
+    var gas = exchange.IO("gasBalance")
+    Log("gas balance (USD):", gas)
+    if (gas < 0.5) {
+        var t = exchange.IO("topUpGas", 2, "USDT")    // pay $2 from the USDT cross cash
+        Log("gas topped up:", t.paid, t.currency, t.txHash)
+    }
+    // Automatic top-up before orders: keep it on, paying $3 each time
+    Log(exchange.IO("autoTopUp", true, 3))
+}
+```
+
+###### Deposit from the wallet, move margin into an isolated-only market, then request a withdrawal (Futures_Boros only)
+
+```javascript
+function main() {
+    // The wallet's (not the Boros account's) balances on Arbitrum
+    var w = exchange.IO("wallet")
+    for (var i = 0; i < w.length; i++) {
+        Log(w[i].currency, w[i].amount)
+    }
+    // A wallet transaction: pays ETH gas from the wallet and returns once mined
+    var d = exchange.IO("deposit", "USDT", 50)
+    if (!d) {
+        Log("Deposit failed:", GetLastError())
+        return
+    }
+    Log("deposited", d.amount, d.currency, "into sub-account", d.accountId, d.txHash)
+    // Isolated-only market: positive moves cash from cross into it, negative moves it back
+    var iso = "BRENTOIL_USDT.HYPERLIQUID_XYZBRENTOIL_18NOV2026"
+    Log(exchange.IO("isolatedTransfer", iso, 20))
+    Log(exchange.IO("isolatedTransfer", iso, -20))
+    // Request a withdrawal (from the cross account of sub-account 0 only), paid after cooldown
+    var r = exchange.IO("withdraw", "USDT", 30)
+    Log(r ? r.note : GetLastError())
+    // Cancel during the cooldown with exchange.IO("cancelWithdraw", "USDT")
+}
+```
+
+###### Read a market's mark rate and underlying funding rate, and see which tick a target rate rounds to (Futures_Boros only)
+
+```javascript
+function main() {
+    var symbol = "BTC_USDT.HYPERLIQUID_BTC_27NOV2026"
+    var r = exchange.IO("market", symbol)
+    if (!r) {
+        Log("Query failed:", GetLastError())
+        return
+    }
+    var m = r.results[0]
+    Log(m.imData.symbol, "market id:", m.marketId, "isolated only:", m.imData.isIsolatedOnly)
+    Log("mark rate:", m.data.markApr, "underlying funding rate:", m.data.floatingApr,
+        "next settlement:", _D(m.data.nextSettlementTime * 1000))
+    // A long half a point below the mark rate: see which tick it rounds to first
+    var t = exchange.IO("tick", symbol, m.data.markApr - 0.005, "buy")
+    Log("tick:", t.tick, "actual rate:", t.rate, "tickStep:", t.tickStep)
+}
+```
 
 ##### Function Support
 
@@ -28976,11 +29624,11 @@ Account: ```exchange.GetAccount()``` reads the cross account of the current pair
 
 | Function | Pendle behavior |
 | - | - |
-| exchange.GetTicker() | Buy/Sell are Pendle's live executable swap rates (AMM and limit orders matched, fees included); when the live rates are missing, a quote for about $1000 is used instead (shrinking to $100 and $10 when that cannot be filled); ```Info``` carries ```impliedApy``` and ```expiry``` (milliseconds). No 24h statistics: ```High```, ```Low```, ```Open``` are the current price and ```Volume``` is 0 |
-| exchange.GetDepth() | Pendle's order book (limit orders and the AMM combined), grouped by 0.01% implied APY and converted to prices |
+| exchange.GetTicker() | Buy/Sell are Pendle's live executable swap rates (AMM and limit orders matched, fees included); when the live rates are missing, or the market's SY cannot convert the quote token (a token swapped through an aggregator, such as USDC on some markets), a quote for about $1000 is used instead (shrinking to $100 and $10 when that cannot be filled) and ```Info.source``` is ```convert```; ```Info``` carries ```impliedApy``` and ```expiry``` (milliseconds). No 24h statistics: ```High```, ```Low```, ```Open``` are the current price and ```Volume``` is 0 |
+| exchange.GetDepth() | Pendle's order book (limit orders and the AMM combined), grouped by 0.01% implied APY and converted to prices. When the market's SY cannot convert the quote token, the whole book is scaled by executable quotes for about $1000 (the mid matches ```exchange.GetTicker()``` and the relative structure of the levels is kept; without a quote, the USD prices of the two tokens are used as an approximation), and ```Info.approximate``` says how |
 | exchange.GetMarkets() | For each active market, PT and YT against the underlying asset and the accounting asset; ```Info``` carries the market address, expiry, implied APY and PT/YT/SY addresses |
 | exchange.GetAssets() | The native coin and every PT, YT, underlying asset etc. with a non-zero balance |
-| exchange.CreateOrder() | Price -1 swaps immediately: for a market buy ```amount``` is the quote to spend, for a sell the PT/YT amount, with slippage protection. A price above 0 places a resting limit order on Pendle's book, with ```amount``` in PT/YT (a buy pays ```amount``` × price of the quote token): the price is converted to an implied APY via the accounting-asset rate and years to expiry (see ```exchange.IO("apy", ...)```). Order options go in the last object argument, e.g. ```exchange.CreateOrder(symbol, "buy", price, amount, {expiry: 1793836800})```: ```impliedApy``` places a limit order at an APY directly, ```expiry``` is the limit order's expiry (a timestamp in seconds or milliseconds, see ```exchange.IO("orderExpiry", ...)```), and ```slippage``` is the slippage of one market order; a value that is not a number fails |
+| exchange.CreateOrder() | Price -1 swaps immediately: for a market buy ```amount``` is the quote to spend, for a sell the PT/YT amount, with slippage protection. A price above 0 places a resting limit order on Pendle's book, with ```amount``` in PT/YT (a buy pays ```amount``` × price of the quote token): the price is converted to an implied APY via the accounting-asset rate and years to expiry (see ```exchange.IO("apy", ...)```). Order options go in the last object argument, e.g. ```exchange.CreateOrder(symbol, "buy", price, amount, {expiry: 1793836800})```: ```impliedApy``` places a limit order at an APY directly (a buy still pays ```amount``` × price of the quote token), ```expiry``` is the limit order's expiry (a timestamp in seconds or milliseconds, see ```exchange.IO("orderExpiry", ...)```), and ```slippage``` is the slippage of one market order; a value that is not a number fails |
 | exchange.GetOrder() | Swap order IDs are ```pair,txHash``` with the state from the receipt, and a swap sent by this process that the node still cannot find after 5 minutes is canceled; limit order IDs are ```pair,lo-orderHash``` with state, filled amount and average price from Pendle (still pending while partially filled). Pendle takes 15 to 40 seconds to index on-chain cancels and fills; until then the state follows the chain: once this process's cancel transaction is mined successfully the order shows as canceled right away, and an order that is fully filled or canceled on chain shows that state right away when the filled amount can be reconciled (from the on-chain fill events for orders placed by this process). ```Info.onChain``` holds the remaining and filled amounts on chain, and ```Info.indexed``` is ```false``` while Pendle has not caught up. For limit orders not placed by this process (after a restart, for example), the price is converted back from the order's implied APY at the current rate and is approximate |
 | exchange.GetOrders() | The wallet's resting limit orders (orders already canceled or filled on chain are left out), plus swaps sent by this process that are not mined yet |
 | exchange.CancelOrder() | Limit orders: sends an on-chain cancel transaction and waits for it (see ```exchange.IO("cancelWait", ...)```). An order already canceled or fully filled on chain fails right away with an error saying which, without sending a transaction; it also fails while an earlier cancel transaction is still waiting to be mined (within 5 minutes), which can be checked with ```exchange.IO("receipt", ...)```. Swaps cannot be canceled |
@@ -29049,6 +29697,26 @@ The rest of the longer descriptions in the table:
 - ```api```: Paths starting with ```/v1/public/``` or ```/v1/tv/``` are unsigned by default and other paths are signed with the ed25519 key (```orderly-key```, ```orderly-signature``` and related headers; the account ID and API key must be configured); ```sign``` set to ```true```/```false``` (it may also be given directly as the 4th argument) forces signing on or off. ```GET``` parameters go into the query string, ```DELETE``` sends a form body and other methods a JSON body. ```raw``` is not a request body but a parameter table (a JSON object or ```a=1&b=2```) that replaces ```params``` entirely when non-empty.
 
 For the common commands ```base``` and ```currency``` see `exchange.IO`.
+
+##### Common Usage
+
+###### Call public and signed endpoints with api
+
+```javascript
+function main() {
+    // Paths starting with /v1/public/ are unsigned by default; the whole response is
+    // returned, with the payload in data
+    var info = exchange.IO("api", "GET", "/v1/public/info/PERP_ETH_USDC")
+    Log("Tick:", info.data.quote_tick, "min size:", info.data.base_min)
+    var fr = exchange.IO("api", "GET", "/v1/public/funding_rate/PERP_ETH_USDC")
+    Log("Estimated funding rate:", fr.data.est_funding_rate)
+    // Other paths are signed with the ed25519 key by default
+    var orders = exchange.IO("api", "GET", "/v1/orders", {status: "INCOMPLETE"})
+    Log("Open orders:", orders.data.rows.length)
+    var pos = exchange.IO("api", "GET", "/v1/positions")
+    Log("Positions:", pos.data.rows.length, "success:", pos.success)
+}
+```
 
 ##### Function Support
 
@@ -29140,46 +29808,31 @@ Tokens outside the token table can be used in pairs after registering them with 
 | ```sendBase``` | url | Set a node used only to broadcast transactions (a private transaction channel). Unlike Web3, it does not return the previous address, does not query when called without an argument, and an empty string does not clear the setting. | ```true``` |
 | ```address``` | — | The wallet address of the configured private key (lowercase, starting with ```0x```). | — |
 | ```contracts``` | — | The exchange's deployment on its chain; contract addresses, fee tiers and the built-in token list snapshot. | An object: ```dex```, ```chainId```, ```chain```, ```router```, ```quoterV2```, ```v3Factory```, ```v3Fees```, ```positionManager```, ```v2Factory```, ```v2Fee``` (in millionths, 3000 = 0.3%), ```wrappedNative```, ```v4```, ```tokenList``` (the token list snapshot's build time ```embeddedAt```, token count ```tokens``` and common-token count ```core```); deployments absent on the chain are ```null```. (more below the table) |
-| ```lp.pools``` | token[, quote] | Lists every V3 and V4/Infinity CL pool of a token (against the given quote, or the chain's wrapped native, USDC and USDT) with fee tier, tick spacing, current price, liquidity, both token balances of the pool and TVL; 24h volume and fees come from GeckoTerminal (```null``` when unavailable; cached in the process for 5 minutes and shared with ```lp.select``` and ```lp.plan```, with one retry after a pause when rate-limited). (more below the table) | ```[{id, protocol, dex, symbol, fee, feeRate, tickSpacing, tick, price, liquidity, reserveBase, reserveQuote, tvlQuote, tvlUsd, volume24hUsd, fees24hUsd, empty}]```, where ```price``` is quote per token. |
-| ```lp.select``` | token, budget[, options] | Picks a pool by rule: with ```options.fee```, the pool of that fee tier is used when it meets the liquidity threshold (only that tier when ```exact``` is ```true```); otherwise, among pools whose TVL is at least max($5000, budget), the one with the largest 24h volume, or the largest TVL without volume data. (more below the table) | One ```lp.pools``` row with an extra ```reason```. |
-| ```lp.pool``` | poolId | Live state of a pool. (more below the table) | ```{id, protocol, currency0, currency1, token0, token1, fee, tickSpacing, tick, sqrtPriceX96, price0, price1, liquidity}```, where ```price0``` is token1 per token0. (more below the table) |
-| ```lp.ticks``` | poolId, tickLower, tickUpper[, step] | Liquidity distribution over a tick range, with each segment's liquidity and amounts of both tokens (summed over initialized ticks inside it); ```step``` is the segment width in ticks (the tick spacing by default). Ranges wider than 120 bitmap words are refused. | ```{pool, tick, token0, token1, segments: [{tickLower, tickUpper, price0Lower, price0Upper, liquidity, amount0, amount1, current}]}``` |
-| ```lp.plan``` | params | A position plan (read-only, costs nothing). (more below the table) | ```{params, symbol, pool, protocol, fee, tickSpacing, tick, price, shape, budget, budgetUsd, positions: [{tickLower, tickUpper, priceLower, priceUpper, liquidity, amountBase, amountQuote, share}], needBase, needQuote, haveBase, haveQuote, swap, payWith, shortfall, shareOfPool, volume24hUsd, estDailyFeesUsd, slippageBps, layers, layersRequested, warning?}```; ```swap``` is the swap needed before adding (```{side, amount, currency}``` or ```null```). |
-| ```lp.simulate``` | plan[, stateOverride] | Runs the plan's add-liquidity transaction with ```eth_call``` (no signing, no broadcast) to confirm it executes and see the amounts used. (more below the table) | ```{pool, positions: [{liquidity, amountBase, amountQuote}], value, swapNeeded, note}``` |
-| ```lp.add``` | plan | Adds liquidity by the plan, swapping first with a market order when needed, approving, and creating every position in one transaction; returns after it is mined. (more below the table) | ```{txHash, swapTxHash, pool, positions: [{id, tickLower, tickUpper, priceLower, priceUpper, liquidity, amountBase, amountQuote}]}``` |
-| ```lp.increase``` | positionId, budget[, options] | Adds to a position, splitting ```budget``` (in the quote token) by the position's range and the current price and swapping first for whichever token is short. (more below the table) | ```{txHash, swapTxHash, id, liquidity, amountBase, amountQuote}``` |
-| ```lp.decrease``` | positionId, ratio[, options] | Withdraws a ratio (0 to 1) of a position's liquidity and collects all its fees; the position stays. ```options.slippage``` sets price protection; with ```options.sell``` ```true``` the returned token is sold for the quote. | ```{txHash, positions: [{id, symbol, principalBase, principalQuote, feesBase, feesQuote, receivedBase, receivedQuote}], sells}``` |
-| ```lp.collect``` | positionIds[, sell] | Collects fees, several positions in one transaction; with ```sell``` ```true``` the collected token is sold for the quote. | Same as ```lp.decrease```. |
-| ```lp.remove``` | positionIds[, ratio[, sell]] | Withdraws liquidity and collects fees, several positions in one transaction; ```ratio``` defaults to 1 (withdraw everything and burn the position NFT), below 1 only that share is withdrawn; with ```sell``` ```true``` the returned token is sold for the quote. | Same as ```lp.decrease```. |
-| ```lp.positions``` | [filter[, wallet]] | Every V3 and V4/Infinity CL position of the wallet with range, in-range flag, liquidity, current amounts and value, and uncollected fees. (more below the table) | ```[{id, pool, protocol, symbol, fee, tickLower, tickUpper, priceLower, priceUpper, price, tick, inRange, liquidity, amountBase, amountQuote, value, feesBase, feesQuote, feesValue, closed}]```, with ```value``` and ```feesValue``` in the quote token. |
-| ```lp.history``` | positionId | A position's cash flow: deposits, withdrawn principal, collected fees, and PnL valued at the current pool price (current value + collected fees + withdrawn principal − deposits, gas excluded). (more below the table) | ```{id, symbol, events: [{action, block, txHash, liquidity, amountBase, amountQuote}], depositedBase, depositedQuote, withdrawnBase, withdrawnQuote, feesCollectedBase, feesCollectedQuote, price, pnlQuote, note}```; for V4/Infinity CL positions ```{id, pool, symbol, events: [{action, block, txHash, liquidity}], position, note}```. |
-| ```lp.track``` | positionIds | Registers V4/Infinity CL position IDs (such as (Uniswap: ```["v4:123456"]```; PancakeSwap: ```["inf:123456"]```); a prefix that does not match the exchange object is an error) so that ```lp.positions``` checks them (ownership is verified on chain each time; transferred-away positions are not listed). (more below the table) | Every position ID remembered by this process. |
-| ```bridge.chains``` | — | Chains supported by the bridge (LI.FI): EVM chains and Solana, cached for an hour. | An array of ```{id, key, name, chainType, nativeToken}```, ```chainType``` being ```EVM``` or ```SVM```. |
-| ```bridge.tokens``` | [chain] | Tokens LI.FI knows on a chain (this chain by default), cached for an hour. | An array of ```{symbol, address, decimals, name, priceUSD}```. |
-| ```bridge.quote``` | params | A bridge quote (read-only) from this exchange object's chain. (more below the table) | ```{tool, toolName, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, fromAmountRaw, toAmountRaw, toAmountMinRaw, fromAmountUSD, toAmountUSD, slippage, toAddress, feeCosts, gasCosts, executionDuration, approvalAddress, steps, transactionId, request}```: amounts are in token units (```*Raw``` in the smallest unit); ```toAmountMin``` is the amount guaranteed after slippage; ```feeCosts``` is ```[{name, amount, token, amountUSD, percentage, included}]``` (fees with ```included``` ```false``` are paid on top); ```gasCosts``` estimates source-chain gas; ```executionDuration``` is the expected time in seconds; ```approvalAddress``` is the contract to approve (```null``` for the native coin and on Solana); ```steps``` lists the steps (```cross``` bridges, ```swap``` swaps); ```request``` echoes the parameters. |
-| ```bridge.simulate``` | params\|quote[, stateOverride] | Re-quotes and runs LI.FI's transaction with ```eth_call```: nothing is signed, broadcast or paid. (more below the table) | The ```bridge.quote``` result plus ```simulated``` (```true```), ```to```, ```value``` and ```walletBalance```, and ```allowanceOverride``` when an allowance was supplied. |
-| ```bridge.send``` | params\|quote | Bridges out: re-quotes → checks the balance → approves LI.FI's ```approvalAddress``` when the token allowance is short (following ```exchange.IO("approve")``` ```exact```/```max```, resetting USDT-like tokens to zero first, waiting for the approval to be mined and re-quoting after it) → simulates with ```eth_call``` → signs and broadcasts, with a gas limit of the larger of the ```eth_estimateGas``` estimate × ```gasMultiplier``` and LI.FI's suggested ```gasLimit``` (bridge contracts call into other contracts, so the estimate can fall short; only the gas used is charged). (more below the table) | ```{txHash, tool, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, toAddress, value, transactionId}```; ```txHash``` is the source-chain transaction, whose receipt ```receipt``` returns. |
-| ```bridge.status``` | txHash[, options] | Bridge progress (LI.FI ```/status```) for the source-chain transaction hash returned by ```bridge.send```; ```options``` may give ```{toChain, bridge}``` to speed up the lookup. (more below the table) | ```{status, substatus, substatusMessage, tool, sending, receiving, fromAddress, toAddress, explorer, bridgeExplorer}```: ```status``` is ```NOT_FOUND```, ```INVALID```, ```PENDING```, ```DONE``` or ```FAILED```; when ```DONE```, ```substatus``` is ```COMPLETED``` (delivered as quoted), ```PARTIAL``` (a different token arrived) or ```REFUNDED```; ```sending``` and ```receiving``` are ```{txHash, txLink, chainId, amount, amountRaw, token, timestamp}```, with ```receiving.amount``` and ```receiving.token``` being what actually arrived. |
-| ```bridge.apiKey``` | [key] | Sets the LI.FI API key (header ```x-lifi-api-key```, for this exchange object only, never echoed); ```""``` clears it and no argument just queries. Without a key requests are rate-limited per outgoing IP, see below. | Whether a key is set (a boolean). |
+| ```lp.pools``` | token[, quote] | Lists every V3 and V4/Infinity CL pool of a token (against the given quote, or the chain's wrapped native, USDC and USDT) with fee tier, tick spacing, current price, liquidity, both token balances of the pool and TVL; 24h volume and fees come from GeckoTerminal (```null``` when unavailable; cached in the process for 5 minutes and shared with ```lp.select``` and ```lp.plan```, with one retry after a pause when rate-limited). See the sub-page `exchange.IO("lp.pools", ...)`. | ```[{id, protocol, dex, symbol, fee, feeRate, tickSpacing, tick, price, liquidity, reserveBase, reserveQuote, tvlQuote, tvlUsd, volume24hUsd, fees24hUsd, empty}]```, where ```price``` is quote per token. |
+| ```lp.select``` | token, budget[, options] | Picks a pool by rule: with ```options.fee```, the pool of that fee tier is used when it meets the liquidity threshold (only that tier when ```exact``` is ```true```); otherwise, among pools whose TVL is at least max($5000, budget), the one with the largest 24h volume, or the largest TVL without volume data. See the sub-page `exchange.IO("lp.select", ...)`. | One ```lp.pools``` row with an extra ```reason```. |
+| ```lp.pool``` | poolId | Live state of a pool. See the sub-page `exchange.IO("lp.pool", ...)`. | ```{id, protocol, currency0, currency1, token0, token1, fee, tickSpacing, tick, sqrtPriceX96, price0, price1, liquidity}```, where ```price0``` is token1 per token0. (more below the table) |
+| ```lp.ticks``` | poolId, tickLower, tickUpper[, step] | Liquidity distribution over a tick range, with each segment's liquidity and amounts of both tokens (summed over initialized ticks inside it); ```step``` is the segment width in ticks (the tick spacing by default). Ranges wider than 120 bitmap words are refused. See the sub-page `exchange.IO("lp.ticks", ...)`. | ```{pool, tick, token0, token1, segments: [{tickLower, tickUpper, price0Lower, price0Upper, liquidity, amount0, amount1, current}]}``` |
+| ```lp.plan``` | params | A position plan (read-only, costs nothing). See the sub-page `exchange.IO("lp.plan", ...)`. | ```{params, symbol, pool, protocol, fee, tickSpacing, tick, price, shape, budget, budgetUsd, positions: [{tickLower, tickUpper, priceLower, priceUpper, liquidity, amountBase, amountQuote, share}], needBase, needQuote, haveBase, haveQuote, swap, payWith, shortfall, shareOfPool, volume24hUsd, estDailyFeesUsd, slippageBps, layers, layersRequested, warning?}```; ```swap``` is the swap needed before adding (```{side, amount, currency}``` or ```null```). |
+| ```lp.simulate``` | plan[, stateOverride] | Runs the plan's add-liquidity transaction with ```eth_call``` (no signing, no broadcast) to confirm it executes and see the amounts used. See the sub-page `exchange.IO("lp.simulate", ...)`. | ```{pool, positions: [{liquidity, amountBase, amountQuote}], value, swapNeeded, note}``` |
+| ```lp.add``` | plan | Adds liquidity by the plan, swapping first with a market order when needed, approving, and creating every position in one transaction; returns after it is mined. See the sub-page `exchange.IO("lp.add", ...)`. | ```{txHash, swapTxHash, pool, positions: [{id, tickLower, tickUpper, priceLower, priceUpper, liquidity, amountBase, amountQuote}]}``` |
+| ```lp.increase``` | positionId, budget[, options] | Adds to a position, splitting ```budget``` (in the quote token) by the position's range and the current price and swapping first for whichever token is short. See the sub-page `exchange.IO("lp.increase", ...)`. | ```{txHash, swapTxHash, id, liquidity, amountBase, amountQuote}``` |
+| ```lp.decrease``` | positionId, ratio[, options] | Withdraws a ratio (0 to 1) of a position's liquidity and collects all its fees; the position stays. ```options.slippage``` sets price protection; with ```options.sell``` ```true``` the returned token is sold for the quote. See the sub-page `exchange.IO("lp.decrease", ...)`. | ```{txHash, positions: [{id, symbol, principalBase, principalQuote, feesBase, feesQuote, receivedBase, receivedQuote}], sells}``` |
+| ```lp.collect``` | positionIds[, sell] | Collects fees, several positions in one transaction; with ```sell``` ```true``` the collected token is sold for the quote. See the sub-page `exchange.IO("lp.collect", ...)`. | Same as ```lp.decrease```. |
+| ```lp.remove``` | positionIds[, ratio[, sell]] | Withdraws liquidity and collects fees, several positions in one transaction; ```ratio``` defaults to 1 (withdraw everything and burn the position NFT), below 1 only that share is withdrawn; with ```sell``` ```true``` the returned token is sold for the quote. See the sub-page `exchange.IO("lp.remove", ...)`. | Same as ```lp.decrease```. |
+| ```lp.positions``` | [filter[, wallet]] | Every V3 and V4/Infinity CL position of the wallet with range, in-range flag, liquidity, current amounts and value, and uncollected fees. See the sub-page `exchange.IO("lp.positions", ...)`. | ```[{id, pool, protocol, symbol, fee, tickLower, tickUpper, priceLower, priceUpper, price, tick, inRange, liquidity, amountBase, amountQuote, value, feesBase, feesQuote, feesValue, closed}]```, with ```value``` and ```feesValue``` in the quote token. |
+| ```lp.history``` | positionId | A position's cash flow: deposits, withdrawn principal, collected fees, and PnL valued at the current pool price (current value + collected fees + withdrawn principal − deposits, gas excluded). See the sub-page `exchange.IO("lp.history", ...)`. | ```{id, symbol, events: [{action, block, txHash, liquidity, amountBase, amountQuote}], depositedBase, depositedQuote, withdrawnBase, withdrawnQuote, feesCollectedBase, feesCollectedQuote, price, pnlQuote, note}```; for V4/Infinity CL positions ```{id, pool, symbol, events: [{action, block, txHash, liquidity}], position, note}```. |
+| ```lp.track``` | positionIds | Registers V4/Infinity CL position IDs (such as (Uniswap: ```["v4:123456"]```; PancakeSwap: ```["inf:123456"]```); a prefix that does not match the exchange object is an error) so that ```lp.positions``` checks them (ownership is verified on chain each time; transferred-away positions are not listed). See the sub-page `exchange.IO("lp.track", ...)`. | Every position ID remembered by this process. |
+| ```bridge.chains``` | — | Chains supported by the bridge (LI.FI): EVM chains and Solana, cached for an hour. See the sub-page `exchange.IO("bridge.*", ...)`. | An array of ```{id, key, name, chainType, nativeToken}```, ```chainType``` being ```EVM``` or ```SVM```. |
+| ```bridge.tokens``` | [chain] | Tokens LI.FI knows on a chain (this chain by default), cached for an hour. See the sub-page `exchange.IO("bridge.*", ...)`. | An array of ```{symbol, address, decimals, name, priceUSD}```. |
+| ```bridge.quote``` | params | A bridge quote (read-only) from this exchange object's chain. See the sub-page `exchange.IO("bridge.*", ...)`. | ```{tool, toolName, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, fromAmountRaw, toAmountRaw, toAmountMinRaw, fromAmountUSD, toAmountUSD, slippage, toAddress, feeCosts, gasCosts, executionDuration, approvalAddress, steps, transactionId, request}```: amounts are in token units (```*Raw``` in the smallest unit); ```toAmountMin``` is the amount guaranteed after slippage; ```feeCosts``` is ```[{name, amount, token, amountUSD, percentage, included}]``` (fees with ```included``` ```false``` are paid on top); ```gasCosts``` estimates source-chain gas; ```executionDuration``` is the expected time in seconds; ```approvalAddress``` is the contract to approve (```null``` for the native coin and on Solana); ```steps``` lists the steps (```cross``` bridges, ```swap``` swaps); ```request``` echoes the parameters. |
+| ```bridge.simulate``` | params\|quote[, stateOverride] | Re-quotes and runs LI.FI's transaction with ```eth_call```: nothing is signed, broadcast or paid. See the sub-page `exchange.IO("bridge.*", ...)`. | The ```bridge.quote``` result plus ```simulated``` (```true```), ```to```, ```value``` and ```walletBalance```, and ```allowanceOverride``` when an allowance was supplied. |
+| ```bridge.send``` | params\|quote | Bridges out: re-quotes → checks the balance → approves LI.FI's ```approvalAddress``` when the token allowance is short (following ```exchange.IO("approve")``` ```exact```/```max```, resetting USDT-like tokens to zero first, waiting for the approval to be mined and re-quoting after it) → simulates with ```eth_call``` → signs and broadcasts, with a gas limit of the larger of the ```eth_estimateGas``` estimate × ```gasMultiplier``` and LI.FI's suggested ```gasLimit``` (bridge contracts call into other contracts, so the estimate can fall short; only the gas used is charged). See the sub-page `exchange.IO("bridge.*", ...)`. | ```{txHash, tool, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, toAddress, value, transactionId}```; ```txHash``` is the source-chain transaction, whose receipt ```receipt``` returns. |
+| ```bridge.status``` | txHash[, options] | Bridge progress (LI.FI ```/status```) for the source-chain transaction hash returned by ```bridge.send```; ```options``` may give ```{toChain, bridge}``` to speed up the lookup. See the sub-page `exchange.IO("bridge.*", ...)`. | ```{status, substatus, substatusMessage, tool, sending, receiving, fromAddress, toAddress, explorer, bridgeExplorer}```: ```status``` is ```NOT_FOUND```, ```INVALID```, ```PENDING```, ```DONE``` or ```FAILED```; when ```DONE```, ```substatus``` is ```COMPLETED``` (delivered as quoted), ```PARTIAL``` (a different token arrived) or ```REFUNDED```; ```sending``` and ```receiving``` are ```{txHash, txLink, chainId, amount, amountRaw, token, timestamp}```, with ```receiving.amount``` and ```receiving.token``` being what actually arrived. |
+| ```bridge.apiKey``` | [key] | Sets the LI.FI API key (header ```x-lifi-api-key```, for this exchange object only, never echoed); ```""``` clears it and no argument just queries. Without a key requests are rate-limited per outgoing IP, see below. See the sub-page `exchange.IO("bridge.*", ...)`. | Whether a key is set (a boolean). |
 
 The rest of the longer descriptions in the table:
 
 - ```contracts``` returns: ```positionManager``` is the V3 PositionManager; ```v4``` holds the V4/Infinity CL contracts (```flavor``` (Uniswap: ```uniswap-v4```; PancakeSwap: ```pancakeswap-infinity-cl```)), including the ```positionManager``` used for LP (the (Uniswap: Uniswap V4 PositionManager; PancakeSwap: Infinity CLPositionManager)); there is also ```aerodrome```, which is ```null```.
-- ```lp.pools```: Sorted by TVL, largest first; empty pools (```empty``` ```true```, with no liquidity at the current price, whose price is then meaningless) have ```null``` ```price```, ```tvlQuote``` and ```tvlUsd``` and come last. V4/Infinity CL pools (```protocol``` (Uniswap: ```v4```; PancakeSwap: ```infinity```)) are listed only without hooks, with (Uniswap: native and wrapped-token pools listed separately (such as ```ETH_USDC``` and ```WETH_USDC```); PancakeSwap: a fee of at most 1%); V4/Infinity CL is a singleton contract, so ```reserveBase``` and ```reserveQuote``` are ```null``` and TVL comes from GeckoTerminal. (PancakeSwap only: Infinity has no fixed fee tiers, so the list holds the pools collected for swap routing (those with recent trades, see above) and pools used in this process, and any other pool can be passed by its PoolId to ```lp.pool``` and ```lp.plan```.)
-- ```lp.select```: ```budget``` is in the quote token; ```options.quote``` sets the quote token. ```options.protocol``` filters by pool type (```v3```, (Uniswap: ```v4```; PancakeSwap: ```infinity```) or an array of them).
-- ```lp.pool```: ```poolId``` is a V3 pool contract address (only pools created by this exchange's factory; ```pool … not found``` when there is no pool at the address) or the PoolId of the V4/Infinity CL pool (```0x``` plus 64 hex digits, hookless pools only; (Uniswap: V4 knows pools that have had positions on the PositionManager or were listed by ```lp.pools```; PancakeSwap: any initialized Infinity pool can be looked up by its PoolId)).
-- ```lp.pool``` returns: In V4/Infinity CL pools the native currency is the zero address.
-- ```lp.plan```: ```params```: ```symbol``` (such as ```ETH_USDC```), ```budget``` (in the quote token), ```range``` (```{lower, upper}``` prices, ```{pct: [-5, 5]}``` percent around the current price, or ```{ticks: [lo, hi]}```, aligned to the tick spacing), ```shape``` (```spot``` one range, ```curve``` nested layers thickest at the price, ```bidask``` segments on both sides thicker further out), ```layers``` (default 3, at most 20; curve layers all cross the current price, are distinct and aligned to the tick spacing, nesting inward first and filling with the range's other price-crossing combinations when nesting runs out; a two-sided range holds at most (legal lower bounds below the price) × (legal upper bounds above it) layers, and beyond that the plan gives as many as fit; the actual count is the returned ```layers``` and a ```warning``` explains it when it is below the request), ```pool``` (picked by ```lp.select``` when omitted), ```fee```, ```slippage``` (default 0.01). When the wallet falls short the plan is still returned with ```shortfall``` explaining it. On a V3 pool with a native pair (such as ```ETH_USDC```), the wrapped-token side is paid either entirely in the native coin or entirely in the wrapped token, never a mix of both balances: the native coin when it covers the whole side, otherwise the wrapped token when that does, and when neither does, ```haveBase```/```haveQuote``` and the swap are computed for the larger of the two (```swap.currency``` is that one); ```payWith``` is the coin that side is paid in.
-- ```lp.simulate```: A plan that needs a swap is simulated as if swapped; pass ```stateOverride``` to supply balances or allowances the wallet lacks. V4/Infinity CL pools pay tokens through Permit2, so supply the token's approval of Permit2 and the PositionManager allowance inside Permit2 (the Permit2 address is ```v4.permit2``` in ```exchange.IO("contracts")```). The V4/Infinity CL PositionManager returns no amounts, so the result shows the planned ones.
-- ```lp.add```: Accepts the plan or its ```params``` (recomputed at the latest pool price). V3 pools: with a native pair (such as ```ETH_USDC```) the wrapped-token side is paid as ```payWith``` in the plan says, either entirely in the native coin (sent with the transaction, the excess refunded by ```refundETH```) or entirely in the wrapped token, never mixed; collected amounts come back as the wrapped token. V3 approves the PositionManager; V4/Infinity CL pools approve Permit2 for the token, then grant the PositionManager an allowance inside Permit2, a native pool uses and returns the native coin and a wrapped-token pool uses the wrapped token; payment is capped at the planned amount plus slippage, so liquidity is sized to (1 − slippage) of the holdings; position ```id```s are (Uniswap: ```v4:number```; PancakeSwap: ```inf:number```).
-- ```lp.increase```: ```options.symbol``` sets the orientation (the stablecoin is the quote by default; with a native pair such as ```ETH_USDC``` the native side is paid as in ```lp.add```); ```options.slippage``` sets price protection.
-- ```lp.positions```: ```filter``` is a pair (sets the price orientation) or a token (only positions containing it); ```*``` or nothing means all; ```wallet``` views another wallet read-only. V4/Infinity CL position ```id```s look like (Uniswap: ```v4:123456```; PancakeSwap: ```inf:123456```). The V4/Infinity CL PositionManager cannot list a wallet's positions, so they are found from the logs of NFTs sent to the wallet: a node that serves the full log history finds all of them; public nodes usually serve only recent blocks, so register older positions with ```lp.track``` (positions created by ```lp.add``` in this process are remembered automatically).
-- ```lp.history```: Needs a node that serves historical logs; public nodes often do not. V4/Infinity CL events do not record token amounts, so for V4/Infinity CL positions only each liquidity change (```add```, ```remove```, ```collect```) and the current position are given.
-- ```lp.track```: Use it to recover older positions when the node does not serve the full log history; a strategy can save the IDs returned by ```lp.add``` (for example with ```_G```) and register them after a restart.
-- ```bridge.quote```: ```params```: ```toChain``` (destination chain: a chain ID, a LI.FI chain key such as ```arb```, or a name such as ```Arbitrum``` or ```Solana```), ```fromToken``` (a token on this chain: a name in the token table or a contract address), ```toToken``` (a token on the destination chain: a name or address resolved by LI.FI to its canonical token, so ```USDC``` on Arbitrum is native USDC, not USDC.e), ```amount``` (of ```fromToken```, in token units; digits beyond the token's decimals are dropped), ```toAddress``` (the recipient; defaults to this wallet when the destination is an EVM chain, required, as a Solana address, when the destination is Solana), ```slippage``` (defaults to the ```exchange.IO("slippage")``` value), ```order``` (```CHEAPEST``` or ```FASTEST```), ```allowBridges```/```denyBridges``` (LI.FI bridge names, an array or comma-separated). Unknown keys are errors.
-- ```bridge.simulate```: A short token allowance is supplied as unlimited through a state override (as in ```simulate```; ```allowanceOverride``` in the result lists it); balances are not supplied, pass them yourself in ```stateOverride``` (the third ```eth_call``` argument). A failure caused by a short balance reports the wallet balance.
-- ```bridge.send```: The native coin needs no approval. Only the approval is awaited, not the bridge transaction; bridging is asynchronous, so poll ```bridge.status```. Given a ```bridge.quote``` result, it re-quotes from its ```request``` (quotes move; the new quote applies and ```toAmountMin``` is enforced on chain).
-- ```bridge.status```: Right after broadcasting LI.FI may not have indexed it yet and returns ```NOT_FOUND```; keep polling (every 10 to 30 seconds).
 
 For the common command ```currency``` see `exchange.IO`.
 
@@ -29214,7 +29867,7 @@ The ```exchange.IO("lp.*", ...)``` commands provide concentrated liquidity on V3
 
 Write commands (```lp.add```, ```lp.increase```, ```lp.decrease```, ```lp.collect```, ```lp.remove```) return after the transaction is mined, and for the next minute on-chain reads are pinned to no earlier than that transaction's block (load-balanced public nodes may otherwise answer from a machine that has not reached it), so the next command right after does not build its transaction on stale state. When adding liquidity the native coin keeps about 3 million gas at the current gas price for fees; the rest can be used for the position.
 
-Monitoring and exits are left to the strategy: ```lp.positions``` reports whether each position is in range, its current value and uncollected fees, and the strategy decides when to rebalance or stop out (see the example strategy ```examples/strategies/uniswap-lp-monitor.js```).
+Monitoring and exits are left to the strategy: ```lp.positions``` reports whether each position is in range, its current value and uncollected fees, and the strategy decides when to rebalance or stop out (for a complete strategy that re-centers after leaving the range see `LP Auto-Rebalancing`; more in `DEX Strategy Examples`).
 
 Risks:
 - Impermanent loss: the further the price moves from the entry price, the more the position lags simply holding; as the price rises the position sells the token, as it falls it buys.
@@ -29232,495 +29885,6 @@ Typical flow: ```bridge.quote``` for a quote → ```bridge.simulate``` to simula
 - Cross-VM transfers (EVM↔Solana) require ```toAddress```, checked against the destination chain's address format; funds sent to a wrong address cannot be recovered.
 - Risks: the security of bridge contracts and cross-chain messaging rests with each bridge; quotes move, and ```bridge.send``` re-quotes before sending; the destination wallet needs gas to use what arrives. Test with a small amount first.
 - Rate limits: without an API key LI.FI limits by outgoing IP, ```/quote``` to 75 requests per 2 hours (```bridge.quote```, ```bridge.simulate``` and ```bridge.send``` use one each, plus one more when re-quoting after an approval) and other endpoints to 100 per minute; strategies on the same docker share the quota. With a key set through ```exchange.IO("bridge.apiKey", key)``` the limit is 100 per minute. A rate-limited call fails with ```rate limited (HTTP 429 …)```.
-
-##### exchange.IO("transfer", ...)
-
-```
-exchange.IO(k, to, amount)
-exchange.IO(k, to, amount, token)
-```
-
-Forms:
-
-- `exchange.IO("transfer", ...)`
-
-Transfers the chain's native coin (such as ETH or BNB) or an ERC20 token out of the wallet configured for a Uniswap, PancakeSwap, Aerodrome or Velodrome exchange object.
-
-Parameters:
-
-- `k` (string, required): Always ```transfer```, which runs a transfer.
-- `to` (string, required): Recipient address: a 20-byte hexadecimal address that starts with ```0x```. It must be an address on the same chain as the exchange object.
-- `amount` (string / number, required): Amount to transfer, in human-readable units (for example, ```"0.05"``` means 0.05 ETH). Passing it as a string is recommended, because the system then converts it exactly using the token's decimals. If it has more decimal places than the token supports, an error is raised right away; it is never silently truncated. Set it to ```all``` to transfer everything: for the native coin, the maximum fee for this transaction is reserved and the rest is transferred; for a token, the whole balance is transferred.
-- `token` (string, optional): Token to transfer. It can be a token name (such as ```USDC```, resolved the same way as token names in trading pairs: built-in or registered tokens in the token table, plus tokens in the official token list; see ```exchange.IO("token", ...)```) or a token contract address. If it is omitted, the native coin is transferred.
-
-Returns (object / null value): When the transaction is broadcast successfully, returns ```{txHash, from, to, token, tokenAddress, amount, raw}```: ```txHash``` is the transaction hash, ```amount``` is the amount transferred (in human-readable units), ```raw``` is the same amount as a decimal string in the smallest unit, and ```tokenAddress``` is ```null``` when the native coin is transferred. The function only waits for the broadcast, not for the transaction to be confirmed on-chain; check the on-chain result with ```exchange.IO("receipt", ...)```. On failure it returns null, and ```GetLastError()``` gives the reason.
-
-Transfer ETH and USDC, then wait for the transaction to be confirmed on-chain.
-
-```javascript
-function main() {
-    var TO = "0xRecipientAddress"
-    // Transfer 0.05 ETH; use "all" to transfer the full balance
-    var r = exchange.IO("transfer", TO, "0.05")
-    if (!r) {
-        Log("Transfer failed:", GetLastError())
-        return
-    }
-    Log("Sent", r.amount, r.token, "tx:", r.txHash)
-
-    // Wait up to 3 minutes for on-chain confirmation
-    var rc = exchange.IO("receipt", r.txHash, 180000)
-    if (rc.pending) {
-        Log("Not on-chain yet")
-    } else {
-        Log("Result:", rc.status, "block:", rc.blockNumber, "fee:", rc.fee)
-    }
-
-    // Transfer 10 USDC
-    var r2 = exchange.IO("transfer", TO, "10", "USDC")
-    Log(r2 ? r2.txHash : GetLastError())
-}
-```
-
-In the following cases an error is raised before signing and no transaction is sent: an invalid address format, the zero address, a transfer to the wallet itself, an amount of 0, an amount larger than the balance, or a token that cannot be identified.
-
-When the whole native-coin balance is transferred (```all```) on an EIP-1559 chain, the maximum fee quoted for this transaction is reserved. Because the fee actually charged is lower than the reserve, a very small balance stays in the wallet.
-
-The priority fee (tip) is the larger of the node's suggested value and the median priority fee in recent blocks. This keeps a transaction from staying unconfirmed for a long time when the node suggests 0.
-
-A transfer is a real on-chain transaction and cannot be reversed once sent. Before sending to an exchange deposit address, make sure the exchange accepts deposits on this chain.
-
-See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("receipt")`, `exchange.IO("token")`, `exchange.IO("wrap")`
-
-##### exchange.IO("receipt", ...)
-
-```
-exchange.IO(k, txHash)
-exchange.IO(k, txHash, waitMs)
-```
-
-Forms:
-
-- `exchange.IO("receipt", ...)`
-
-Queries the receipt of any transaction on the current chain through a Uniswap, PancakeSwap, Aerodrome or Velodrome exchange object, and can wait for the transaction to be confirmed on-chain. The transaction does not have to be an order, transfer or other transaction sent by this exchange object.
-
-Parameters:
-
-- `k` (string, required): Always ```receipt```, which queries a transaction receipt.
-- `txHash` (string, required): The transaction hash, a 32-byte hexadecimal string starting with ```0x```, such as the ```txHash``` returned by ```exchange.IO("transfer", ...)```. To query the transaction behind an order, pass the part of the order ID (in the form ```ETH_USDC,0x…```) after the comma.
-- `waitMs` (number, optional): The maximum wait time in milliseconds. While the transaction is not yet on-chain, it is queried every 1.5 seconds, for up to 10 minutes. If this is omitted or set to 0, the transaction is queried only once.
-
-Returns (object): When the transaction is on-chain, returns ```{txHash, status, blockNumber, gasUsed, fee}```. Here ```status``` is ```success``` or ```reverted```, and ```fee``` is the fee actually paid, in the native coin and in readable units. If the transaction is not on-chain within the wait time, returns ```{txHash, pending: true, known}```. ```known``` shows whether the node can find the transaction. If it cannot, the transaction was usually dropped or the hash is wrong.
-
-Wait for a transaction to be confirmed on-chain.
-
-```javascript
-function main() {
-    var txHash = "TX_HASH"     // Hash of the transaction to query
-    var rc = exchange.IO("receipt", txHash, 120000)
-    if (rc.pending) {
-        Log("Not on-chain within 2 minutes; the node", rc.known ? "can find" : "cannot find", "this transaction")
-        return
-    }
-    Log("Status:", rc.status, "Block:", rc.blockNumber, "gasUsed:", rc.gasUsed, "Fee:", rc.fee)
-}
-```
-
-To check an order's fill status, just use ```exchange.GetOrder()```. ```exchange.IO("receipt", ...)``` is mainly for querying transactions that are not orders, such as transfers.
-
-See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("transfer")`, `exchange.IO("cancelWait")`, `exchange.IO("wrap")`, `exchange.IO("unwrap")`
-
-##### exchange.IO("route", ...)
-
-```
-exchange.IO(k, symbol, side, qty)
-```
-
-Forms:
-
-- `exchange.IO("route", ...)`
-
-Requests a quote on a Uniswap, PancakeSwap, Aerodrome or Velodrome exchange object. It lists a swap's quote on each candidate route and the best route. It does not place an order.
-
-Parameters:
-
-- `k` (string, required): Always ```route```, which requests a quote.
-- `symbol` (string, required): Trading pair, for example ```ETH_USDC```.
-- `side` (string, required): Swap direction: ```sell``` sells ```qty``` units of the base currency, and ```buy``` buys ```qty``` units of the base currency.
-- `qty` (number, required): Amount of the base currency.
-
-Returns (object / null value): Returns ```{symbol, side, qty, best, quote, price, candidates}```, which holds the best route, the best quote, the average price and the quote on each candidate route. See the remarks for the fields. Returns null on error. Call ```GetLastError()``` to see the cause.
-
-Compare the quotes on each route for selling 1 ETH.
-
-```javascript
-function main() {
-    var r = exchange.IO("route", "ETH_USDC", "sell", 1)
-    if (!r) {
-        Log("Quote failed:", GetLastError())
-        return
-    }
-    if (r.best === null) {
-        Log("No usable pool")
-        return
-    }
-    Log("Best route:", r.best, "receive:", r.quote, "USDC")
-    r.candidates.forEach(function (c) {
-        Log(c.route, c.quote)
-    })
-}
-```
-
-Candidate routes include the exchange's direct pools and two-hop routes through the wrapped native token or USDC/USDT. The pool types depend on the exchange. Uniswap uses V3 pools at each fee tier, V2 pools and V4 pools without hooks (V4 routes go through the native token or USDC/USDT). PancakeSwap uses V3, V2 and Infinity CL pools. Aerodrome and Velodrome use both generations of Slipstream pools and basic pools. Routes are written like this: ```v3:WETH-500-USDC``` (V3, fee 500 = 0.05%), ```v2:WETH-USDC```, ```v3:UNI-3000-USDT-100-USDC``` (two hops), ```v4:ETH-500/10-USDC``` (Uniswap V4, fee 500, tick spacing 10, ETH is the native token), ```infinity:BNB-67/1-USDT``` (PancakeSwap Infinity CL), ```cl:WETH-100-USDC``` (first-generation Slipstream on Aerodrome and Velodrome; the number is the tick spacing), ```cl2:WETH-500-USDC``` (second-generation Slipstream), ```volatile:AERO-USDC```, ```stable:USDC-USDbC``` (basic pools).
-
-V3 routes are quoted on-chain through QuoterV2, which simulates the whole swap. V2 routes are calculated locally from the pool reserves. Quotes do not include gas fees.
-
-Fields of the returned object: ```best``` is the best route. ```quote``` is the best quote (for a sell, the amount of quote currency received; for a buy, the amount of quote currency spent). ```price``` is the matching average fill price. ```candidates``` holds ```{route, quote}``` for each candidate route (a route that cannot be quoted has a ```quote``` of ```null```). If no pool is available, an object is still returned, with ```best```, ```quote``` and ```price``` all ```null``` and ```candidates``` an empty array (if pools exist but none can be quoted, each item in ```candidates``` has a ```quote``` of ```null```). On errors such as a token in the trading pair that cannot be recognized, or a node on a different chain from the configured one, null is returned. Call ```GetLastError()``` to see the cause.
-
-See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("simulate")`, `exchange.IO("slippage")`, `exchange.IO("token")`, `exchange.CreateOrder`
-
-##### exchange.IO("simulate", ...)
-
-```
-exchange.IO(k, symbol, side, qty)
-exchange.IO(k, symbol, side, qty, price)
-exchange.IO(k, symbol, side, qty, price, stateOverride)
-exchange.IO(k, symbol, side, qty, price, stateOverride, route)
-```
-
-Forms:
-
-- `exchange.IO("simulate", ...)`
-
-Builds a swap transaction with the same order logic as the Uniswap, PancakeSwap, Aerodrome and Velodrome exchange objects (route selection, quoting and price protection). It only simulates the swap on-chain (```eth_call```), so nothing is signed, nothing is broadcast and no gas is used.
-
-Parameters:
-
-- `k` (string, required): Always ```simulate```. It selects a simulated order.
-- `symbol` (string, required): The trading pair, for example ```ETH_USDC```.
-- `side` (string, required): The trade direction: ```buy``` or ```sell```.
-- `qty` (number, required): The order quantity. It has the same meaning as in ```exchange.CreateOrder()```. For a market buy, it is the amount of quote currency to spend.
-- `price` (number, optional): The limit price. If you omit it or pass ```null```, the order is a market order.
-- `stateOverride` (object, optional): The state override parameter for the node's ```eth_call``` (the geth state override set). Use it to give the wallet temporary balance or allowance during the simulation, for example ```{"0xWalletAddress": {"balance": "0x56bc75e2d63100000"}}```. It applies to this simulation only.
-- `route` (string, optional): Limits the route type: ```v2```, ```v3```, ```v4```, ```hop``` (two hops) or ```direct``` (direct pool). On PancakeSwap, ```v4``` means the Infinity CL pools. On Aerodrome and Velodrome, ```v2``` means the basic pools and ```v3``` means the Slipstream pools (```v4``` is not supported). If omitted, the best route among all routes is used.
-
-Returns (object / null value): Returns ```{route, exactIn, amountIn, amountOut, quoted, executed, value, calls}```. The key fields are the quote at order time, ```quoted```, and the amount from the simulated execution, ```executed```. See the remarks for what each field means. If the order cannot be filled, the function returns null and reports an error.
-
-Gives the wallet a temporary balance of 100 ETH and simulates selling 1 ETH.
-
-```javascript
-function main() {
-    var ov = {}
-    ov[exchange.IO("address")] = { balance: "0x56bc75e2d63100000" }
-    var r = exchange.IO("simulate", "ETH_USDC", "sell", 1, null, ov)
-    Log("Route:", r.route, "quoted:", r.quoted, "simulated:", r.executed)
-}
-```
-
-The simulation uses the latest block state. The only difference from a real order is that the price may change before the transaction is actually included on-chain.
-
-If the wallet balance is too low or the token is not approved, the simulation fails with an error because the router contract cannot transfer the tokens. Use ```stateOverride``` to override this.
-
-Fields of the returned object: ```quoted``` is the quote at order time. ```executed``` is the actual amount from the simulated execution: the amount received for an exact-input swap, or the amount spent for an exact-output swap. Both are decimal strings in the token's smallest unit. Uniswap V4 routes and PancakeSwap Infinity routes run through the Universal
-  Router, which does not return the filled amount, so ```executed``` is ```null```. In that case, a simulation that does not fail means the order can be filled with these parameters, including the minimum amount received or maximum amount spent. If the limit price is not met, or the balance or allowance is too low (and not overridden), the function returns null and reports an error.
-
-See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("route")`, `exchange.IO("slippage")`, `exchange.IO("gasMultiplier")`, `exchange.CreateOrder`
-
-##### exchange.IO("token", ...)
-
-```
-exchange.IO(k)
-exchange.IO(k, name, address)
-```
-
-Forms:
-
-- `exchange.IO("token", ...)`
-
-Registers a token on a Uniswap, PancakeSwap, Aerodrome, or Velodrome exchange object, or lists the token table. A registered token can be used by name in trading pairs.
-
-Parameters:
-
-- `k` (string, required): Set to ```token```, which means a token is being registered.
-- `name` (string, optional): The name the token uses in trading pairs, such as ```UNI```.
-- `address` (string, optional): The token's contract address. Its decimals are read from the chain.
-
-Returns (object / array / null value): When a token is registered, the function returns ```{symbol, address, decimals}```. When no arguments are passed, it returns the token table as an array, and each item is ```{symbol, address, decimals, native}```. If ```native``` is ```true```, the token is the chain's native coin. If the address is not an ERC20 token, the function returns null.
-
-Register UNI, then get the ticker for UNI_USDC.
-
-```javascript
-function main() {
-    exchange.IO("token", "UNI", "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984")
-    var t = exchange.GetTicker("UNI_USDC")
-    Log("Bid:", t.Buy, "Ask:", t.Sell)
-}
-```
-
-Token names are resolved in this order: ① The token table. It holds manually verified built-in tokens (the native coin, the wrapped coin, USDC, USDT, the chain's BTC, and others) and any tokens registered with ```exchange.IO("token", ...)```. If a registered token has the same name as a built-in token, it replaces that built-in entry. ② The official token lists. Ethereum and Arbitrum use the Uniswap Labs default list (tokens.uniswap.org). BNB Chain merges the PancakeSwap list (tokens.pancakeswap.finance) with the Uniswap Labs list. Base merges the Uniswap Labs list with the PancakeSwap list. Tokens resolved from an official list are added to the token table. The connector ships with a snapshot of these lists. It fetches the latest lists only when a name is not in the snapshot, and it fetches them at most once every 24 hours.
-
-If an official list has more than one token with the same name on the same chain, such as a bridged version and a native version, you cannot use that name directly. The error message lists the candidate addresses, so specify the token by its contract address instead. The decimals of a listed token are taken from its on-chain contract. If they differ from the list's record, the token is rejected.
-
-A token that is not in the token table can still be used in a trading pair through its contract address, for example ```0x1f9840a85d5af5bf1d1762f925bdaddc4201f984_USDC```.
-
-```exchange.GetMarkets()``` lists only two kinds of trading pairs: pairs between tokens in the token table (built-in and registered tokens), and pairs of popular high-liquidity coins against the wrapped coin, USDC, or USDT. Tokens that are not listed can still be traded directly.
-
-A native coin (such as ETH or BNB) and its wrapped coin (such as WETH or WBNB) are two different assets. When you trade the native coin, the router contract wraps and unwraps it automatically.
-
-See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("route")`, `exchange.IO("transfer")`, `exchange.IO("approve")`
-
-##### exchange.IO("wrap", ...)
-
-```
-exchange.IO(k, amount)
-```
-
-Forms:
-
-- `exchange.IO("wrap", ...)`
-
-Wraps the native coin (such as ETH or BNB) into its wrapped token (such as WETH or WBNB) on Uniswap, PancakeSwap, Aerodrome and Velodrome exchange objects. The conversion is 1:1 with no slippage; only gas is consumed.
-
-Parameters:
-
-- `k` (string, required): Fixed as ```wrap```, which means wrapping the native coin.
-- `amount` (string / number, required): The amount of native coin to wrap, in human-readable units. Passing it as a string is recommended, for example ```"0.01"```. ```all``` is not supported, because some native coin must be kept to pay for gas.
-
-Returns (object / null value): Returns ```{txHash, action, from, to, amount, raw}``` when the transaction is broadcast successfully. ```from``` and ```to``` are the names of the currency before and after the conversion. The call waits only for the transaction to be broadcast, not for it to be confirmed on-chain; use ```exchange.IO("receipt", ...)``` to check the on-chain result. Returns a null value and reports an error in cases such as insufficient balance.
-
-Wrap 0.01 ETH into WETH.
-
-```javascript
-function main() {
-    var r = exchange.IO("wrap", "0.01")
-    if (!r) {
-        Log("wrap failed:", GetLastError())
-        return
-    }
-    var rc = exchange.IO("receipt", r.txHash, 120000)
-    Log(r.from, "→", r.to, r.amount, "status:", rc.status)
-}
-```
-
-Calls the ```deposit()``` method of the wrapped token contract directly, without going through the swap router or liquidity pools. Orders cannot be placed on trading pairs such as ```ETH_WETH```. To convert between the native coin and the wrapped token, use ```exchange.IO("wrap", ...)``` and ```exchange.IO("unwrap", ...)```.
-
-See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("unwrap")`, `exchange.IO("receipt")`, `exchange.IO("transfer")`
-
-##### exchange.IO("unwrap", ...)
-
-```
-exchange.IO(k, amount)
-```
-
-Forms:
-
-- `exchange.IO("unwrap", ...)`
-
-Unwraps wrapped tokens (such as WETH and WBNB) into native coins (such as ETH and BNB) at a 1:1 ratio. Available on Uniswap, PancakeSwap, Aerodrome and Velodrome exchange objects. The operation has no slippage and costs only gas.
-
-Parameters:
-
-- `k` (string, required): Fixed as ```unwrap```, which means unwrapping wrapped tokens.
-- `amount` (string / number, required): The amount of wrapped tokens to unwrap, in human-readable units. Passing it as a string is recommended. Set it to ```all``` to unwrap the entire wrapped token balance.
-
-Returns (object / null value): Returns ```{txHash, action, from, to, amount, raw}``` when the transaction is broadcast successfully. Returns a null value and outputs an error message when the wrapped token balance is insufficient or zero.
-
-Unwrap all WETH into ETH.
-
-```javascript
-function main() {
-    var r = exchange.IO("unwrap", "all")
-    if (!r) {
-        Log("unwrap failed:", GetLastError())
-        return
-    }
-    var rc = exchange.IO("receipt", r.txHash, 120000)
-    Log(r.from, "→", r.to, r.amount, "status:", rc.status)
-}
-```
-
-Calls the ```withdraw(uint256)``` method of the wrapped token contract directly, bypassing both the swap router and the liquidity pools.
-
-See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("wrap")`, `exchange.IO("receipt")`, `exchange.IO("transfer")`
-
-##### exchange.IO("approve", ...)
-
-```
-exchange.IO(k)
-exchange.IO(k, mode)
-```
-
-Forms:
-
-- `exchange.IO("approve", ...)`
-
-Sets the token approval mode for Uniswap, PancakeSwap, Aerodrome and Velodrome exchange objects.
-
-Parameters:
-
-- `k` (string, required): Fixed to ```approve```. Sets the token approval mode.
-- `mode` (string, optional): Approval mode. ```exact``` (default) approves only the amount needed for the current swap. ```max``` grants an unlimited allowance, so the same token does not need to be approved again. If this parameter is omitted, the call returns the current mode.
-
-Returns (string): Returns the current approval mode, either ```exact``` or ```max```.
-
-Set the token approval mode.
-
-```javascript
-function main() {
-    exchange.IO("approve", "max")
-    Log("Current approval mode:", exchange.IO("approve"))
-}
-```
-
-Before selling a token (using an ERC20 token as the input), the connector checks how much the router contract is allowed to spend. If that allowance is too low, the connector first sends an approval transaction and waits for it to be confirmed on-chain. Only then does it send the swap transaction. If the existing allowance is not 0 but is still too low, the connector first resets it to 0 and then approves again, because some tokens such as USDT require this.
-Uniswap V4 routes and PancakeSwap Infinity routes use a two-step approval. First, the token is approved for the Permit2 contract, following the same rules as above (each exchange uses its own Permit2). Second, the matching Universal Router is approved to spend through Permit2. In ```exact``` mode this second approval covers only the current amount and expires after 1 day. In ```max``` mode it is unlimited and expires after 30 days. For each step, a transaction is sent only when the allowance is too low or has expired.
-
-```max``` mode avoids later approval transactions and their gas fees, but the router contract can then spend your entire balance of that token. Choose the mode that fits your needs.
-
-See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("transfer")`, `exchange.IO("simulate")`, `exchange.IO("gasMultiplier")`
-
-##### exchange.IO("slippage", ...)
-
-```
-exchange.IO(k)
-exchange.IO(k, ratio)
-```
-
-Forms:
-
-- `exchange.IO("slippage", ...)`
-
-Sets the slippage protection for market orders on Uniswap, PancakeSwap, Aerodrome and Velodrome exchange objects.
-
-Parameters:
-
-- `k` (string, required): Fixed as ```slippage```, which sets the slippage protection for market orders.
-- `ratio` (number, optional): Slippage ratio, in the range ```[0, 0.5)```. The default value is ```0.005``` (i.e. 0.5%). If this parameter is omitted, the current slippage ratio is returned.
-
-Returns (number): Returns the current slippage ratio.
-
-Set the slippage protection for market orders.
-
-```javascript
-function main() {
-    exchange.IO("slippage", 0.01)     // 1%
-    Log("Slippage:", exchange.IO("slippage"))
-}
-```
-
-A market order takes the quote at the time the order is placed, deducts the slippage, calculates the minimum amount to receive and writes it into the on-chain transaction. If the price moves beyond the slippage range by the time the trade executes, the whole transaction is reverted (only the gas fee is lost).
-
-You can also append ```;{"slippage":0.01}``` to the direction parameter of ```exchange.CreateOrder()``` to set the slippage for a single order. Limit orders do not use slippage, because the limit price is already the worst execution price.
-
-See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("route")`, `exchange.IO("simulate")`, `exchange.IO("deadline")`, `exchange.CreateOrder`
-
-##### exchange.IO("deadline", ...)
-
-```
-exchange.IO(k)
-exchange.IO(k, seconds)
-```
-
-Forms:
-
-- `exchange.IO("deadline", ...)`
-
-Sets the transaction deadline for Uniswap, PancakeSwap, Aerodrome and Velodrome exchange objects, or queries the current deadline setting.
-
-Parameters:
-
-- `k` (string, required): Fixed as ```deadline```, which sets or queries the transaction deadline.
-- `seconds` (number, optional): Transaction validity period in seconds. Valid range is 10–86400 and the default is 120. If this parameter is omitted, the current value is queried.
-
-Returns (number): Returns the current transaction deadline in seconds.
-
-Set the transaction deadline and query the current value.
-
-```javascript
-function main() {
-    exchange.IO("deadline", 300)
-    Log("Deadline:", exchange.IO("deadline"), "seconds")
-}
-```
-
-If a swap transaction is not confirmed on-chain before the deadline, it is reverted when executed. This prevents a transaction that has been pending for a long time from being filled after a large price move.
-
-See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("slippage")`, `exchange.IO("gasMultiplier")`, `exchange.IO("cancelWait")`
-
-##### exchange.IO("cancelWait", ...)
-
-```
-exchange.IO(k)
-exchange.IO(k, seconds)
-```
-
-Forms:
-
-- `exchange.IO("cancelWait", ...)`
-
-Sets the maximum time that the Uniswap, PancakeSwap, Aerodrome and Velodrome exchange objects wait for the result after cancelling an order.
-
-Parameters:
-
-- `k` (string, required): Fixed to ```cancelWait```. Sets the maximum time to wait for the result after cancelling an order.
-- `seconds` (number, optional): Wait time in seconds. The range is 0 to 600 and the default is 30. Set it to 0 to return as soon as the cancellation transaction is sent. Leave it out to query the current value.
-
-Returns (number): Returns the current wait time in seconds.
-
-Increase the wait time before cancelling, and handle a failed cancellation.
-
-```javascript
-function main() {
-    exchange.IO("cancelWait", 60)
-    var id = exchange.CreateOrder("ETH_USDC", "buy", 2000, 0.01)
-    if (id && !exchange.CancelOrder(id)) {
-        Log("Cancel failed:", GetLastError())
-    }
-    Log(exchange.GetOrder(id))
-}
-```
-
-An on-chain cancellation sends a replacement transaction with the same nonce, so there is no way to know whether the original order transaction or the cancellation transaction will be included on-chain first. After ```exchange.CancelOrder()``` sends the cancellation transaction, it checks for the result during the wait time. If the cancellation transaction is included first, it returns ```true```. If the original order transaction is included first (filled or failed), it returns ```false```, and you can call `GetLastError` to see why. If the wait times out, it returns ```true```, which means the cancellation transaction has been submitted. Use the result of `exchange.GetOrder` to get the final status.
-
-Ethereum mainnet produces a block about every 12 seconds, so the 30-second default is about two to three blocks. Chains with faster block times (Base, Arbitrum, BNB Chain) usually return a result within a few seconds.
-
-See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("receipt")`, `exchange.IO("deadline")`, `exchange.CancelOrder`
-
-##### exchange.IO("gasMultiplier", ...)
-
-```
-exchange.IO(k)
-exchange.IO(k, x)
-```
-
-Forms:
-
-- `exchange.IO("gasMultiplier", ...)`
-
-Sets the gas limit multiplier for Uniswap, PancakeSwap, Aerodrome and Velodrome exchange objects.
-
-Parameters:
-
-- `k` (string, required): Always ```gasMultiplier```, which sets the gas limit multiplier.
-- `x` (number, optional): The multiplier, from 1 to 5. The default is 1.2. A transaction's gasLimit is the node's gas estimate times this multiplier. If you leave this parameter out, the call returns the current multiplier.
-
-Returns (number): Returns the current multiplier.
-
-Set the gas limit multiplier.
-
-```javascript
-function main() {
-    exchange.IO("gasMultiplier", 1.5)
-    Log("gas multiplier:", exchange.IO("gasMultiplier"))
-}
-```
-
-gasLimit is only a cap. The actual fee is charged on the gas the transaction uses, so a higher multiplier does not raise what you pay. However, the wallet balance must be enough to cover the fee at the full gasLimit.
-
-Some LP transactions settle fees that an existing position has earned: increasing liquidity, decreasing liquidity, collecting fees and removing liquidity. On Aerodrome and Velodrome this also includes staking, unstaking and claiming rewards. For these transactions, gasLimit is the larger of "estimate × multiplier" and "estimate + buffer". The buffer is 50000 per position, plus 40000 for each fee (or reward) transfer. This is needed because a position may have no fees yet when gas is estimated, but earn fees before the transaction is confirmed on-chain, and then execution needs extra accounting and token transfers. For ```exchange.IO("bridge.send", ...)```, gasLimit is never lower than the ```gasLimit``` given in the LI.FI quote.
-
-See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("deadline")`, `exchange.IO("simulate")`, `exchange.IO("slippage")`
 
 #### Aerodrome / Velodrome
 
@@ -29782,51 +29946,34 @@ Tokens outside the token table can be used in pairs after registering them with 
 | ```sendBase``` | url | Set a node used only to broadcast transactions (a private transaction channel). Unlike Web3, it does not return the previous address, does not query when called without an argument, and an empty string does not clear the setting. | ```true``` |
 | ```address``` | — | The wallet address of the configured private key (lowercase, starting with ```0x```). | — |
 | ```contracts``` | — | The exchange's deployment on its chain; contract addresses, fee tiers and the built-in token list snapshot. | An object: ```dex```, ```chainId```, ```chain```, ```router```, ```quoterV2```, ```v3Factory```, ```v3Fees```, ```positionManager```, ```v2Factory```, ```v2Fee``` (in millionths, 3000 = 0.3%), ```wrappedNative```, ```v4```, ```tokenList``` (the token list snapshot's build time ```embeddedAt```, token count ```tokens``` and common-token count ```core```); deployments absent on the chain are ```null```. (more below the table) |
-| ```lp.pools``` | token[, quote] | Lists every Slipstream and basic pool of a token (against the given quote, or the chain's wrapped native, USDC and USDT) with fee tier, tick spacing, current price, liquidity, both token balances of the pool and TVL; 24h volume and fees come from GeckoTerminal (```null``` when unavailable; cached in the process for 5 minutes and shared with ```lp.select``` and ```lp.plan```, with one retry after a pause when rate-limited). (more below the table) | ```[{id, protocol, dex, symbol, fee, feeRate, tickSpacing, tick, price, liquidity, reserveBase, reserveQuote, tvlQuote, tvlUsd, volume24hUsd, fees24hUsd, empty}]```, where ```price``` is quote per token. (more below the table) |
-| ```lp.select``` | token, budget[, options] | Picks a pool by rule: with ```options.fee```, the pool of that fee tier is used when it meets the liquidity threshold (only that tier when ```exact``` is ```true```); otherwise, among pools whose TVL is at least max($5000, budget), the one with the largest 24h volume, or the largest TVL without volume data. (more below the table) | One ```lp.pools``` row with an extra ```reason```. |
-| ```lp.pool``` | poolId | Live state of a pool. ```poolId``` is a Slipstream or basic pool address; the result also has the gauge data of ```lp.pools``` and, for basic pools, the reserves ```reserve0```, ```reserve1``` and the LP token supply ```lpSupply```. | ```{id, protocol, currency0, currency1, token0, token1, fee, tickSpacing, tick, sqrtPriceX96, price0, price1, liquidity}```, where ```price0``` is token1 per token0. |
-| ```lp.ticks``` | poolId, tickLower, tickUpper[, step] | Liquidity distribution over a tick range, with each segment's liquidity and amounts of both tokens (summed over initialized ticks inside it); ```step``` is the segment width in ticks (the tick spacing by default). Ranges wider than 120 bitmap words are refused. | ```{pool, tick, token0, token1, segments: [{tickLower, tickUpper, price0Lower, price0Upper, liquidity, amount0, amount1, current}]}``` |
-| ```lp.plan``` | params | A position plan (read-only, costs nothing). (more below the table) | ```{params, symbol, pool, protocol, fee, tickSpacing, tick, price, shape, budget, budgetUsd, positions: [{tickLower, tickUpper, priceLower, priceUpper, liquidity, amountBase, amountQuote, share}], needBase, needQuote, haveBase, haveQuote, swap, payWith, shortfall, shareOfPool, volume24hUsd, estDailyFeesUsd, slippageBps, layers, layersRequested, warning?}```; ```swap``` is the swap needed before adding (```{side, amount, currency}``` or ```null```). (more below the table) |
-| ```lp.simulate``` | plan[, stateOverride] | Runs the plan's add-liquidity transaction with ```eth_call``` (no signing, no broadcast) to confirm it executes and see the amounts used. (more below the table) | ```{pool, positions: [{liquidity, amountBase, amountQuote}], value, swapNeeded, note}``` |
-| ```lp.add``` | plan | Adds liquidity by the plan, swapping first with a market order when needed, approving, and creating every position in one transaction; returns after it is mined. (more below the table) | ```{txHash, swapTxHash, pool, positions: [{id, tickLower, tickUpper, priceLower, priceUpper, liquidity, amountBase, amountQuote}]}``` |
-| ```lp.increase``` | positionId, budget[, options] | Adds to a position, splitting ```budget``` (in the quote token) by the position's range and the current price and swapping first for whichever token is short. (more below the table) | ```{txHash, swapTxHash, id, liquidity, amountBase, amountQuote}``` |
-| ```lp.decrease``` | positionId, ratio[, options] | Withdraws a ratio (0 to 1) of a position's liquidity and collects all its fees; the position stays. (more below the table) | ```{txHash, positions: [{id, symbol, principalBase, principalQuote, feesBase, feesQuote, receivedBase, receivedQuote}], sells}``` |
-| ```lp.collect``` | positionIds[, sell] | Collects fees, several positions in one transaction; with ```sell``` ```true``` the collected token is sold for the quote. Staked positions earn no trading fees (they go to voters), so they fail with a hint to claim the rewards with ```lp.claim```; basic pools collect the fees accrued to the wallet's LP tokens with the pool's ```claimFees```, one transaction per pool. | Same as ```lp.decrease```. |
-| ```lp.remove``` | positionIds[, ratio[, sell]] | Withdraws liquidity and collects fees, several positions in one transaction; ```ratio``` defaults to 1 (withdraw everything and burn the position NFT), below 1 only that share is withdrawn; with ```sell``` ```true``` the returned token is sold for the quote. (more below the table) | Same as ```lp.decrease```. |
-| ```lp.positions``` | [filter[, wallet]] | Every Slipstream and basic-pool position of the wallet with range, in-range flag, liquidity, current amounts and value, and uncollected fees. (more below the table) | ```[{id, pool, protocol, symbol, fee, tickLower, tickUpper, priceLower, priceUpper, price, tick, inRange, liquidity, amountBase, amountQuote, value, feesBase, feesQuote, feesValue, closed}]```, with ```value``` and ```feesValue``` in the quote token. |
-| ```lp.history``` | positionId | A position's cash flow: deposits, withdrawn principal, collected fees, and PnL valued at the current pool price (current value + collected fees + withdrawn principal − deposits, gas excluded). Needs a node that serves historical logs; public nodes often do not. Basic-pool LP tokens have no per-position events and are not supported. | ```{id, symbol, events: [{action, block, txHash, liquidity, amountBase, amountQuote}], depositedBase, depositedQuote, withdrawnBase, withdrawnQuote, feesCollectedBase, feesCollectedQuote, price, pnlQuote, note}``` |
-| ```lp.track``` | positionIds | Registers Slipstream positions ((Aerodrome: ```aero:number```, ```aero2:number```; Velodrome: ```velo:number```, ```velo2:number```); a prefix that does not match the exchange object is an error) and basic pool addresses so that ```lp.positions``` checks them (ownership is verified on chain each time, staked positions by their staker; transferred-away positions are not listed). (more below the table) | Every position ID remembered by this process. |
-| ```lp.stake``` | positionIds | Stakes positions in their pool's gauge for rewards, one transaction per position. (more below the table) | ```{positions: [{id, gauge, approveTxHash, txHash, feesBase, feesQuote}]}```; for basic pools ```{id, gauge, txHash, lpTokens}```. |
-| ```lp.unstake``` | positionIds | Takes positions out of the gauge. A Slipstream position NFT comes back together with its accrued rewards; a basic pool returns all staked LP tokens and leaves the rewards in the gauge for ```lp.claim```. One transaction per position. | ```{positions: [{id, gauge, txHash, rewards}]}```, where ```rewards``` is the reward tokens received in that transaction; basic pools also have ```lpTokens```. |
-| ```lp.claim``` | positionIds[, sell] | Claims rewards with one ```Voter.claimRewards``` covering the wallet's rewards in the gauges of these positions (the wallet's other staked positions in the same gauges are claimed too); with ```sell``` ```true``` the reward token is sold for USDC at market. | ```{txHash, gauges, rewardToken, rewards, sell}```, where ```rewardToken``` is (Aerodrome: ```AERO```; Velodrome: ```VELO```). |
-| ```bridge.chains``` | — | Chains supported by the bridge (LI.FI): EVM chains and Solana, cached for an hour. | An array of ```{id, key, name, chainType, nativeToken}```, ```chainType``` being ```EVM``` or ```SVM```. |
-| ```bridge.tokens``` | [chain] | Tokens LI.FI knows on a chain (this chain by default), cached for an hour. | An array of ```{symbol, address, decimals, name, priceUSD}```. |
-| ```bridge.quote``` | params | A bridge quote (read-only) from this exchange object's chain. (more below the table) | ```{tool, toolName, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, fromAmountRaw, toAmountRaw, toAmountMinRaw, fromAmountUSD, toAmountUSD, slippage, toAddress, feeCosts, gasCosts, executionDuration, approvalAddress, steps, transactionId, request}```: amounts are in token units (```*Raw``` in the smallest unit); ```toAmountMin``` is the amount guaranteed after slippage; ```feeCosts``` is ```[{name, amount, token, amountUSD, percentage, included}]``` (fees with ```included``` ```false``` are paid on top); ```gasCosts``` estimates source-chain gas; ```executionDuration``` is the expected time in seconds; ```approvalAddress``` is the contract to approve (```null``` for the native coin and on Solana); ```steps``` lists the steps (```cross``` bridges, ```swap``` swaps); ```request``` echoes the parameters. |
-| ```bridge.simulate``` | params\|quote[, stateOverride] | Re-quotes and runs LI.FI's transaction with ```eth_call```: nothing is signed, broadcast or paid. (more below the table) | The ```bridge.quote``` result plus ```simulated``` (```true```), ```to```, ```value``` and ```walletBalance```, and ```allowanceOverride``` when an allowance was supplied. |
-| ```bridge.send``` | params\|quote | Bridges out: re-quotes → checks the balance → approves LI.FI's ```approvalAddress``` when the token allowance is short (following ```exchange.IO("approve")``` ```exact```/```max```, resetting USDT-like tokens to zero first, waiting for the approval to be mined and re-quoting after it) → simulates with ```eth_call``` → signs and broadcasts, with a gas limit of the larger of the ```eth_estimateGas``` estimate × ```gasMultiplier``` and LI.FI's suggested ```gasLimit``` (bridge contracts call into other contracts, so the estimate can fall short; only the gas used is charged). (more below the table) | ```{txHash, tool, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, toAddress, value, transactionId}```; ```txHash``` is the source-chain transaction, whose receipt ```receipt``` returns. |
-| ```bridge.status``` | txHash[, options] | Bridge progress (LI.FI ```/status```) for the source-chain transaction hash returned by ```bridge.send```; ```options``` may give ```{toChain, bridge}``` to speed up the lookup. (more below the table) | ```{status, substatus, substatusMessage, tool, sending, receiving, fromAddress, toAddress, explorer, bridgeExplorer}```: ```status``` is ```NOT_FOUND```, ```INVALID```, ```PENDING```, ```DONE``` or ```FAILED```; when ```DONE```, ```substatus``` is ```COMPLETED``` (delivered as quoted), ```PARTIAL``` (a different token arrived) or ```REFUNDED```; ```sending``` and ```receiving``` are ```{txHash, txLink, chainId, amount, amountRaw, token, timestamp}```, with ```receiving.amount``` and ```receiving.token``` being what actually arrived. |
-| ```bridge.apiKey``` | [key] | Sets the LI.FI API key (header ```x-lifi-api-key```, for this exchange object only, never echoed); ```""``` clears it and no argument just queries. Without a key requests are rate-limited per outgoing IP, see below. | Whether a key is set (a boolean). |
+| ```lp.pools``` | token[, quote] | Lists every Slipstream and basic pool of a token (against the given quote, or the chain's wrapped native, USDC and USDT) with fee tier, tick spacing, current price, liquidity, both token balances of the pool and TVL; 24h volume and fees come from GeckoTerminal (```null``` when unavailable; cached in the process for 5 minutes and shared with ```lp.select``` and ```lp.plan```, with one retry after a pause when rate-limited). See the sub-page `exchange.IO("lp.pools", ...)`. | ```[{id, protocol, dex, symbol, fee, feeRate, tickSpacing, tick, price, liquidity, reserveBase, reserveQuote, tvlQuote, tvlUsd, volume24hUsd, fees24hUsd, empty}]```, where ```price``` is quote per token. (more below the table) |
+| ```lp.select``` | token, budget[, options] | Picks a pool by rule: with ```options.fee```, the pool of that fee tier is used when it meets the liquidity threshold (only that tier when ```exact``` is ```true```); otherwise, among pools whose TVL is at least max($5000, budget), the one with the largest 24h volume, or the largest TVL without volume data. See the sub-page `exchange.IO("lp.select", ...)`. | One ```lp.pools``` row with an extra ```reason```. |
+| ```lp.pool``` | poolId | Live state of a pool. See the sub-page `exchange.IO("lp.pool", ...)`. | ```{id, protocol, currency0, currency1, token0, token1, fee, tickSpacing, tick, sqrtPriceX96, price0, price1, liquidity}```, where ```price0``` is token1 per token0. |
+| ```lp.ticks``` | poolId, tickLower, tickUpper[, step] | Liquidity distribution over a tick range, with each segment's liquidity and amounts of both tokens (summed over initialized ticks inside it); ```step``` is the segment width in ticks (the tick spacing by default). Ranges wider than 120 bitmap words are refused. See the sub-page `exchange.IO("lp.ticks", ...)`. | ```{pool, tick, token0, token1, segments: [{tickLower, tickUpper, price0Lower, price0Upper, liquidity, amount0, amount1, current}]}``` |
+| ```lp.plan``` | params | A position plan (read-only, costs nothing). See the sub-page `exchange.IO("lp.plan", ...)`. | ```{params, symbol, pool, protocol, fee, tickSpacing, tick, price, shape, budget, budgetUsd, positions: [{tickLower, tickUpper, priceLower, priceUpper, liquidity, amountBase, amountQuote, share}], needBase, needQuote, haveBase, haveQuote, swap, payWith, shortfall, shareOfPool, volume24hUsd, estDailyFeesUsd, slippageBps, layers, layersRequested, warning?}```; ```swap``` is the swap needed before adding (```{side, amount, currency}``` or ```null```). (more below the table) |
+| ```lp.simulate``` | plan[, stateOverride] | Runs the plan's add-liquidity transaction with ```eth_call``` (no signing, no broadcast) to confirm it executes and see the amounts used. See the sub-page `exchange.IO("lp.simulate", ...)`. | ```{pool, positions: [{liquidity, amountBase, amountQuote}], value, swapNeeded, note}``` |
+| ```lp.add``` | plan | Adds liquidity by the plan, swapping first with a market order when needed, approving, and creating every position in one transaction; returns after it is mined. See the sub-page `exchange.IO("lp.add", ...)`. | ```{txHash, swapTxHash, pool, positions: [{id, tickLower, tickUpper, priceLower, priceUpper, liquidity, amountBase, amountQuote}]}``` |
+| ```lp.increase``` | positionId, budget[, options] | Adds to a position, splitting ```budget``` (in the quote token) by the position's range and the current price and swapping first for whichever token is short. See the sub-page `exchange.IO("lp.increase", ...)`. | ```{txHash, swapTxHash, id, liquidity, amountBase, amountQuote}``` |
+| ```lp.decrease``` | positionId, ratio[, options] | Withdraws a ratio (0 to 1) of a position's liquidity and collects all its fees; the position stays. See the sub-page `exchange.IO("lp.decrease", ...)`. | ```{txHash, positions: [{id, symbol, principalBase, principalQuote, feesBase, feesQuote, receivedBase, receivedQuote}], sells}``` |
+| ```lp.collect``` | positionIds[, sell] | Collects fees, several positions in one transaction; with ```sell``` ```true``` the collected token is sold for the quote. Staked positions earn no trading fees (they go to voters), so they fail with a hint to claim the rewards with ```lp.claim```; basic pools collect the fees accrued to the wallet's LP tokens with the pool's ```claimFees```, one transaction per pool. See the sub-page `exchange.IO("lp.collect", ...)`. | Same as ```lp.decrease```. |
+| ```lp.remove``` | positionIds[, ratio[, sell]] | Withdraws liquidity and collects fees, several positions in one transaction; ```ratio``` defaults to 1 (withdraw everything and burn the position NFT), below 1 only that share is withdrawn; with ```sell``` ```true``` the returned token is sold for the quote. See the sub-page `exchange.IO("lp.remove", ...)`. | Same as ```lp.decrease```. |
+| ```lp.positions``` | [filter[, wallet]] | Every Slipstream and basic-pool position of the wallet with range, in-range flag, liquidity, current amounts and value, and uncollected fees. See the sub-page `exchange.IO("lp.positions", ...)`. | ```[{id, pool, protocol, symbol, fee, tickLower, tickUpper, priceLower, priceUpper, price, tick, inRange, liquidity, amountBase, amountQuote, value, feesBase, feesQuote, feesValue, closed}]```, with ```value``` and ```feesValue``` in the quote token. |
+| ```lp.history``` | positionId | A position's cash flow: deposits, withdrawn principal, collected fees, and PnL valued at the current pool price (current value + collected fees + withdrawn principal − deposits, gas excluded). Needs a node that serves historical logs; public nodes often do not. Basic-pool LP tokens have no per-position events and are not supported. See the sub-page `exchange.IO("lp.history", ...)`. | ```{id, symbol, events: [{action, block, txHash, liquidity, amountBase, amountQuote}], depositedBase, depositedQuote, withdrawnBase, withdrawnQuote, feesCollectedBase, feesCollectedQuote, price, pnlQuote, note}``` |
+| ```lp.track``` | positionIds | Registers Slipstream positions ((Aerodrome: ```aero:number```, ```aero2:number```; Velodrome: ```velo:number```, ```velo2:number```); a prefix that does not match the exchange object is an error) and basic pool addresses so that ```lp.positions``` checks them (ownership is verified on chain each time, staked positions by their staker; transferred-away positions are not listed). See the sub-page `exchange.IO("lp.track", ...)`. | Every position ID remembered by this process. |
+| ```lp.stake``` | positionIds | Stakes positions in their pool's gauge for rewards, one transaction per position. See the sub-page `exchange.IO("lp.stake", ...)`. | ```{positions: [{id, gauge, approveTxHash, txHash, feesBase, feesQuote}]}```; for basic pools ```{id, gauge, txHash, lpTokens}```. |
+| ```lp.unstake``` | positionIds | Takes positions out of the gauge. A Slipstream position NFT comes back together with its accrued rewards; a basic pool returns all staked LP tokens and leaves the rewards in the gauge for ```lp.claim```. One transaction per position. See the sub-page `exchange.IO("lp.unstake", ...)`. | ```{positions: [{id, gauge, txHash, rewards}]}```, where ```rewards``` is the reward tokens received in that transaction; basic pools also have ```lpTokens```. |
+| ```lp.claim``` | positionIds[, sell] | Claims rewards with one ```Voter.claimRewards``` covering the wallet's rewards in the gauges of these positions (the wallet's other staked positions in the same gauges are claimed too); with ```sell``` ```true``` the reward token is sold for USDC at market. See the sub-page `exchange.IO("lp.claim", ...)`. | ```{txHash, gauges, rewardToken, rewards, sell}```, where ```rewardToken``` is (Aerodrome: ```AERO```; Velodrome: ```VELO```). |
+| ```bridge.chains``` | — | Chains supported by the bridge (LI.FI): EVM chains and Solana, cached for an hour. See the sub-page `exchange.IO("bridge.*", ...)`. | An array of ```{id, key, name, chainType, nativeToken}```, ```chainType``` being ```EVM``` or ```SVM```. |
+| ```bridge.tokens``` | [chain] | Tokens LI.FI knows on a chain (this chain by default), cached for an hour. See the sub-page `exchange.IO("bridge.*", ...)`. | An array of ```{symbol, address, decimals, name, priceUSD}```. |
+| ```bridge.quote``` | params | A bridge quote (read-only) from this exchange object's chain. See the sub-page `exchange.IO("bridge.*", ...)`. | ```{tool, toolName, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, fromAmountRaw, toAmountRaw, toAmountMinRaw, fromAmountUSD, toAmountUSD, slippage, toAddress, feeCosts, gasCosts, executionDuration, approvalAddress, steps, transactionId, request}```: amounts are in token units (```*Raw``` in the smallest unit); ```toAmountMin``` is the amount guaranteed after slippage; ```feeCosts``` is ```[{name, amount, token, amountUSD, percentage, included}]``` (fees with ```included``` ```false``` are paid on top); ```gasCosts``` estimates source-chain gas; ```executionDuration``` is the expected time in seconds; ```approvalAddress``` is the contract to approve (```null``` for the native coin and on Solana); ```steps``` lists the steps (```cross``` bridges, ```swap``` swaps); ```request``` echoes the parameters. |
+| ```bridge.simulate``` | params\|quote[, stateOverride] | Re-quotes and runs LI.FI's transaction with ```eth_call```: nothing is signed, broadcast or paid. See the sub-page `exchange.IO("bridge.*", ...)`. | The ```bridge.quote``` result plus ```simulated``` (```true```), ```to```, ```value``` and ```walletBalance```, and ```allowanceOverride``` when an allowance was supplied. |
+| ```bridge.send``` | params\|quote | Bridges out: re-quotes → checks the balance → approves LI.FI's ```approvalAddress``` when the token allowance is short (following ```exchange.IO("approve")``` ```exact```/```max```, resetting USDT-like tokens to zero first, waiting for the approval to be mined and re-quoting after it) → simulates with ```eth_call``` → signs and broadcasts, with a gas limit of the larger of the ```eth_estimateGas``` estimate × ```gasMultiplier``` and LI.FI's suggested ```gasLimit``` (bridge contracts call into other contracts, so the estimate can fall short; only the gas used is charged). See the sub-page `exchange.IO("bridge.*", ...)`. | ```{txHash, tool, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, toAddress, value, transactionId}```; ```txHash``` is the source-chain transaction, whose receipt ```receipt``` returns. |
+| ```bridge.status``` | txHash[, options] | Bridge progress (LI.FI ```/status```) for the source-chain transaction hash returned by ```bridge.send```; ```options``` may give ```{toChain, bridge}``` to speed up the lookup. See the sub-page `exchange.IO("bridge.*", ...)`. | ```{status, substatus, substatusMessage, tool, sending, receiving, fromAddress, toAddress, explorer, bridgeExplorer}```: ```status``` is ```NOT_FOUND```, ```INVALID```, ```PENDING```, ```DONE``` or ```FAILED```; when ```DONE```, ```substatus``` is ```COMPLETED``` (delivered as quoted), ```PARTIAL``` (a different token arrived) or ```REFUNDED```; ```sending``` and ```receiving``` are ```{txHash, txLink, chainId, amount, amountRaw, token, timestamp}```, with ```receiving.amount``` and ```receiving.token``` being what actually arrived. |
+| ```bridge.apiKey``` | [key] | Sets the LI.FI API key (header ```x-lifi-api-key```, for this exchange object only, never echoed); ```""``` clears it and no argument just queries. Without a key requests are rate-limited per outgoing IP, see below. See the sub-page `exchange.IO("bridge.*", ...)`. | Whether a key is set (a boolean). |
 
 The rest of the longer descriptions in the table:
 
 - ```contracts``` returns: ```router``` is the basic-pool Router, ```quoterV2``` and ```v3Factory``` are the first Slipstream generation's QuoterV2 and factory, ```v3Fees``` is empty and ```v2Fee``` 0, and ```v2Factory```, ```positionManager``` and ```v4``` are ```null```; this exchange's contracts are under (Aerodrome: ```aerodrome```; Velodrome: ```velodrome```): the basic-pool ```router``` and ```poolFactory```, and each Slipstream generation's ```factory```, ```swapRouter```, ```quoterV2``` and ```tickSpacings```.
-- ```lp.pools```: Sorted by TVL, largest first; empty pools (```empty``` ```true```, with no liquidity at the current price, whose price is then meaningless) have ```null``` ```price```, ```tvlQuote``` and ```tvlUsd``` and come last. Slipstream pools have ```protocol``` ```slipstream``` (old factory) or ```slipstream2``` (new factory); basic pools are ```volatile``` or ```stable```, carry an extra ```stable``` and have no tick.
-- ```lp.pools``` returns: Each row also carries gauge data: ```gauge```, ```gaugeAlive```, ```stakedShare``` (the staked share), ```rewardsPerDay``` (reward tokens emitted per day), ```rewardsPerDayUsd``` and ```rewardAprPct``` (the reward APR on the staked TVL, %).
-- ```lp.select```: ```budget``` is in the quote token; ```options.quote``` sets the quote token. ```options.protocol``` filters by pool type (```slipstream```, ```slipstream2```, ```volatile```, ```stable``` or an array of them), and ```options.tickSpacing``` filters too.
-- ```lp.plan```: ```params```: ```symbol``` (such as ```ETH_USDC```), ```budget``` (in the quote token), ```range``` (```{lower, upper}``` prices, ```{pct: [-5, 5]}``` percent around the current price, or ```{ticks: [lo, hi]}```, aligned to the tick spacing), ```shape``` (```spot``` one range, ```curve``` nested layers thickest at the price, ```bidask``` segments on both sides thicker further out), ```layers``` (default 3, at most 20; curve layers all cross the current price, are distinct and aligned to the tick spacing, nesting inward first and filling with the range's other price-crossing combinations when nesting runs out; a two-sided range holds at most (legal lower bounds below the price) × (legal upper bounds above it) layers, and beyond that the plan gives as many as fit; the actual count is the returned ```layers``` and a ```warning``` explains it when it is below the request), ```pool``` (picked by ```lp.select``` when omitted), ```fee```, ```slippage``` (default 0.01). When the wallet falls short the plan is still returned with ```shortfall``` explaining it. On a Slipstream pool with a native pair (such as ```ETH_USDC```), the wrapped-token side is paid either entirely in the native coin or entirely in the wrapped token, never a mix of both balances: the native coin when it covers the whole side, otherwise the wrapped token when that does, and when neither does, ```haveBase```/```haveQuote``` and the swap are computed for the larger of the two (```swap.currency``` is that one); ```payWith``` is the coin that side is paid in. A ```range``` means a Slipstream pool (```tickSpacing``` and ```protocol``` narrow the choice); without ```range``` (or with a basic ```pool```) the plan is for a basic pool, depositing both tokens in the reserve ratio, with ```stable``` ```true``` or ```false``` choosing the pool type; ```stake``` ```true``` makes ```lp.add``` stake into the gauge right after adding.
-- ```lp.plan``` returns: A basic-pool plan is ```{params, symbol, pool, protocol, stable, fee, price, budget, budgetUsd, needBase, needQuote, haveBase, haveQuote, amountBase, amountQuote, lpTokens, swap, shortfall, shareOfPool, volume24hUsd, estDailyFeesUsd, slippageBps}```.
-- ```lp.simulate```: A plan that needs a swap is simulated as if swapped; pass ```stateOverride``` to supply balances or allowances the wallet lacks. Basic pools are simulated with the Router's ```quoteAddLiquidity``` (no balances or approvals needed), returning ```{pool, protocol, lpTokens, amountBase, amountQuote, swapNeeded, note}```.
-- ```lp.add```: Accepts the plan or its ```params``` (recomputed at the latest pool price). Slipstream pools: with a native pair (such as ```ETH_USDC```) the wrapped-token side is paid as ```payWith``` in the plan says, either entirely in the native coin (sent with the transaction, the excess refunded by ```refundETH```) or entirely in the wrapped token, never mixed; collected amounts come back as the wrapped token. Slipstream position ```id```s are (Aerodrome: ```aero:number``` or ```aero2:number```; Velodrome: ```velo:number``` or ```velo2:number```) (old and new factory); basic pools are added through the Router, using the native balance when the pair is written with the native coin (```addLiquidityETH```), the position ```id``` is the pool address, and the result is ```{txHash, swapTxHash, pool, id, lpTokens, amountBase, amountQuote}```. With ```stake: true``` in the plan the result also has ```stake``` (as ```lp.stake```).
-- ```lp.increase```: ```options.symbol``` sets the orientation (the stablecoin is the quote by default; with a native pair such as ```ETH_USDC``` the native side is paid as in ```lp.add```); ```options.slippage``` sets price protection. A staked position must be unstaked with ```lp.unstake``` first; for a basic pool (```positionId``` is the pool address) it is another ```lp.add``` into that pool, staked afterwards when ```options.stake``` is ```true```.
-- ```lp.decrease```: ```options.slippage``` sets price protection; with ```options.sell``` ```true``` the returned token is sold for the quote. A staked position must be unstaked with ```lp.unstake``` first (a basic pool only needs enough unstaked LP tokens in the wallet); basic pools redeem that share of the LP tokens, and the native coin comes back wrapped.
-- ```lp.remove```: Staked positions are first taken out of the gauge (claiming the rewards, see ```lp.unstake```); a full withdrawal from a basic pool also sends a ```claimFees``` transaction for the fees.
-- ```lp.positions```: ```filter``` is a pair (sets the price orientation) or a token (only positions containing it); ```*``` or nothing means all; ```wallet``` views another wallet read-only. Slipstream positions in the wallet are listed directly; staked position NFTs are owned by the gauge, so these gauges are checked: those staked into by this process, those found in the logs of NFTs sent out of the wallet (nodes usually serve only recent logs), those holding positions registered with ```lp.track```, and those of the pools matching ```filter```; basic-pool positions are checked for pools added to by this process, registered with ```lp.track``` or matching ```filter```; when listing everything (```*``` or nothing) or filtering by a token, the volatile and stable pools of every pair formed by a token-table token (built-in and registered tokens, plus the reward token) and a hub (the wrapped native coin, stablecoins, the reward token) are checked too (at most 128 pairs, pool addresses cached for 10 minutes), and those where the wallet or a gauge holds its LP tokens (or a gauge holds unclaimed rewards) are listed, so a new process finds them without ```lp.track```; basic pools of other pairs need ```filter``` or ```lp.track```. Each row also has ```staked```, ```gauge```, ```rewardToken``` (the reward token), ```rewards``` (claimable reward tokens) and ```rewardsValue``` (in the quote token); basic pools also have ```fullRange```, ```lpTokens``` and ```stakedLpTokens``` and no ticks.
-- ```lp.track```: Use it to recover older positions when the node does not serve the full log history; a strategy can save the IDs returned by ```lp.add``` (for example with ```_G```) and register them after a restart.
-- ```lp.stake```: A Slipstream position NFT is first approved to the gauge (skipped when already approved) and then deposited whole, the gauge passing the position's uncollected fees to the owner on deposit; for a basic pool all unstaked LP tokens in the wallet are deposited. Gauges killed by the Voter accept no deposits and fail. While staked a position earns no trading fees (they go to voters), only the reward token, and an out-of-range Slipstream position earns no rewards.
-- ```bridge.quote```: ```params```: ```toChain``` (destination chain: a chain ID, a LI.FI chain key such as ```arb```, or a name such as ```Arbitrum``` or ```Solana```), ```fromToken``` (a token on this chain: a name in the token table or a contract address), ```toToken``` (a token on the destination chain: a name or address resolved by LI.FI to its canonical token, so ```USDC``` on Arbitrum is native USDC, not USDC.e), ```amount``` (of ```fromToken```, in token units; digits beyond the token's decimals are dropped), ```toAddress``` (the recipient; defaults to this wallet when the destination is an EVM chain, required, as a Solana address, when the destination is Solana), ```slippage``` (defaults to the ```exchange.IO("slippage")``` value), ```order``` (```CHEAPEST``` or ```FASTEST```), ```allowBridges```/```denyBridges``` (LI.FI bridge names, an array or comma-separated). Unknown keys are errors.
-- ```bridge.simulate```: A short token allowance is supplied as unlimited through a state override (as in ```simulate```; ```allowanceOverride``` in the result lists it); balances are not supplied, pass them yourself in ```stateOverride``` (the third ```eth_call``` argument). A failure caused by a short balance reports the wallet balance.
-- ```bridge.send```: The native coin needs no approval. Only the approval is awaited, not the bridge transaction; bridging is asynchronous, so poll ```bridge.status```. Given a ```bridge.quote``` result, it re-quotes from its ```request``` (quotes move; the new quote applies and ```toAmountMin``` is enforced on chain).
-- ```bridge.status```: Right after broadcasting LI.FI may not have indexed it yet and returns ```NOT_FOUND```; keep polling (every 10 to 30 seconds).
 
 For the common command ```currency``` see `exchange.IO`.
 
@@ -29865,13 +30012,15 @@ Gauge staking: ```lp.stake``` puts positions into the gauge for rewards, ```lp.u
 
 Write commands (```lp.add```, ```lp.increase```, ```lp.decrease```, ```lp.collect```, ```lp.remove```, ```lp.stake```, ```lp.unstake```, ```lp.claim```) return after the transaction is mined, and for the next minute on-chain reads are pinned to no earlier than that transaction's block (load-balanced public nodes may otherwise answer from a machine that has not reached it), so the next command right after does not build its transaction on stale state. When adding liquidity the native coin keeps about 3 million gas at the current gas price for fees; the rest can be used for the position.
 
-Monitoring and exits are left to the strategy: ```lp.positions``` reports whether each position is in range, its current value and uncollected fees, and the strategy decides when to rebalance or stop out (see the example strategy ```examples/strategies/uniswap-lp-monitor.js```).
+Monitoring and exits are left to the strategy: ```lp.positions``` reports whether each position is in range, its current value and uncollected fees, and the strategy decides when to rebalance or stop out (for a complete strategy that re-centers after leaving the range see `LP Auto-Rebalancing`; more in `DEX Strategy Examples`).
 
 Risks:
 - Impermanent loss: the further the price moves from the entry price, the more the position lags simply holding; as the price rises the position sells the token, as it falls it buys.
 - Once the price leaves the range the position holds only one token and earns no fees until the price returns.
 - Every add, rebalance, collect and withdrawal is an on-chain transaction; frequent rebalancing can cost more gas than it earns in fees.
 - The estimated daily fees in a plan extrapolate the last 24h volume at the current pool share and do not predict future income.
+
+For a complete strategy that stakes into a gauge and compounds the rewards, see `Gauge Staking and Compounding`.
 
 ##### Cross-chain bridge
 
@@ -29883,6 +30032,1879 @@ Typical flow: ```bridge.quote``` for a quote → ```bridge.simulate``` to simula
 - Cross-VM transfers (EVM↔Solana) require ```toAddress```, checked against the destination chain's address format; funds sent to a wrong address cannot be recovered.
 - Risks: the security of bridge contracts and cross-chain messaging rests with each bridge; quotes move, and ```bridge.send``` re-quotes before sending; the destination wallet needs gas to use what arrives. Test with a small amount first.
 - Rate limits: without an API key LI.FI limits by outgoing IP, ```/quote``` to 75 requests per 2 hours (```bridge.quote```, ```bridge.simulate``` and ```bridge.send``` use one each, plus one more when re-quoting after an approval) and other endpoints to 100 per minute; strategies on the same docker share the quota. With a key set through ```exchange.IO("bridge.apiKey", key)``` the limit is 100 per minute. A rate-limited call fails with ```rate limited (HTTP 429 …)```.
+
+##### exchange.IO("lp.stake", ...)
+
+```
+exchange.IO(k, positionIds)
+```
+
+Forms:
+
+- `exchange.IO("lp.stake", ...)`
+
+Aerodrome and Velodrome: stakes positions in their pool's gauge to earn the reward token (AERO or VELO) instead.
+
+Parameters:
+
+- `k` (string, required): Set to ```lp.stake``` to stake positions.
+- `positionIds` (string / array, required): Position IDs: one ID or an array; Slipstream positions such as ```aero:123``` or ```aero2:456``` (```velo:``` and ```velo2:``` on Velodrome), basic pools by the pool address.
+
+Returns (object / null value): ```{positions: [{id, gauge, approveTxHash, txHash, feesBase, feesQuote}]}```: ```approveTxHash``` is the transaction approving the NFT to the gauge (```null``` when already approved), ```feesBase``` and ```feesQuote``` the uncollected fees the gauge passed to the owner on deposit; for a basic pool ```{id, gauge, txHash, lpTokens}```. Null with an error on failure.
+
+Stake every unstaked position of the wallet that is still in range.
+
+```javascript
+function main() {
+    var ids = exchange.IO("lp.positions").filter(function (p) {
+        return !p.staked && !p.closed && p.inRange
+    }).map(function (p) { return p.id })
+    if (ids.length == 0) {
+        return
+    }
+    var r = exchange.IO("lp.stake", ids)
+    if (!r) {
+        Log("Staking failed:", GetLastError())
+        return
+    }
+    r.positions.forEach(function (p) {
+        Log(p.id, "staked in", p.gauge, "transaction", p.txHash)
+    })
+}
+```
+
+One set of transactions per position: a Slipstream position NFT is first approved to the gauge (skipped when already approved) and then deposited whole, the gauge passing the position's uncollected fees to the owner on deposit; for a basic pool all unstaked LP tokens in the wallet are deposited. A gauge killed by the Voter (```gaugeAlive``` ```false``` in ```lp.pools```) accepts no deposits and fails.
+
+While staked, the position's trading fees go to voters and it earns only the reward token; an out-of-range Slipstream position earns no rewards either. Staked positions cannot be increased, decreased or have fees collected until taken out with ```lp.unstake``` (```lp.remove``` takes them out automatically). An unstaked Slipstream position gives part of its fees (the pool's ```unstakedFee```, mostly 5% today) to the gauge.
+
+Positions can also be staked when added: put ```stake: true``` in the ```lp.plan``` parameters, and ```lp.add``` stakes right after adding, with ```stake``` in its result.
+
+See also: `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("lp.stake")`, `exchange.IO("lp.unstake")`, `exchange.IO("lp.claim")`, `exchange.IO("lp.positions")`, `exchange.IO("lp.pools")`
+
+##### exchange.IO("lp.unstake", ...)
+
+```
+exchange.IO(k, positionIds)
+```
+
+Forms:
+
+- `exchange.IO("lp.unstake", ...)`
+
+Aerodrome and Velodrome: takes staked positions out of the gauge; Slipstream positions also claim their accrued rewards.
+
+Parameters:
+
+- `k` (string, required): Set to ```lp.unstake``` to take positions out of the gauge.
+- `positionIds` (string / array, required): Position IDs: one ID or an array; Slipstream positions such as ```aero:123``` or ```aero2:456``` (```velo:``` and ```velo2:``` on Velodrome), basic pools by the pool address.
+
+Returns (object / null value): ```{positions: [{id, gauge, txHash, rewards}]}```, where ```rewards``` is the reward tokens received in that transaction; basic pools also have ```lpTokens``` (the LP tokens returned). Null with an error on failure.
+
+Take every staked position out of the gauge.
+
+```javascript
+function main() {
+    var ids = exchange.IO("lp.positions").filter(function (p) {
+        return p.staked
+    }).map(function (p) { return p.id })
+    if (ids.length == 0) {
+        return
+    }
+    var r = exchange.IO("lp.unstake", ids)
+    if (!r) {
+        Log("Unstaking failed:", GetLastError())
+        return
+    }
+    r.positions.forEach(function (p) {
+        Log(p.id, "taken out, rewards received:", p.rewards)
+    })
+}
+```
+
+One transaction per position. A Slipstream position NFT comes back together with its accrued rewards; a basic pool returns all staked LP tokens and leaves the rewards in the gauge for ```lp.claim```.
+
+Once taken out, the position earns trading fees again and can be increased, decreased, collected or withdrawn; to withdraw, just call ```lp.remove```, which takes staked positions out first.
+
+See also: `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("lp.stake")`, `exchange.IO("lp.unstake")`, `exchange.IO("lp.claim")`, `exchange.IO("lp.positions")`, `exchange.IO("lp.pools")`
+
+##### exchange.IO("lp.claim", ...)
+
+```
+exchange.IO(k, positionIds)
+exchange.IO(k, positionIds, sell)
+```
+
+Forms:
+
+- `exchange.IO("lp.claim", ...)`
+
+Aerodrome and Velodrome: claims the reward tokens accrued in the gauges of staked positions, optionally selling them for USDC.
+
+Parameters:
+
+- `k` (string, required): Set to ```lp.claim``` to claim rewards.
+- `positionIds` (string / array, required): Position IDs: one ID or an array; Slipstream positions such as ```aero:123``` or ```aero2:456``` (```velo:``` and ```velo2:``` on Velodrome), basic pools by the pool address.
+- `sell` (bool, optional): ```true``` sells the claimed reward token for USDC at market; ```false``` by default.
+
+Returns (object / null value): ```{txHash, gauges, rewardToken, rewards, sell}```: ```gauges``` are the gauges claimed from, ```rewardToken``` is ```AERO``` or ```VELO``` and ```rewards``` the amount received; when selling there is also ```sell``` (```{symbol, qty, txHash}```, or ```{symbol, qty, error}``` when the sale failed). Null with an error on failure.
+
+Claim the rewards and sell them for USDC once they are worth more than 10 USDC.
+
+```javascript
+function main() {
+    var staked = exchange.IO("lp.positions").filter(function (p) { return p.staked })
+    var value = 0
+    staked.forEach(function (p) { value += p.rewardsValue || 0 })
+    if (value < 10) {
+        return
+    }
+    var r = exchange.IO("lp.claim", staked.map(function (p) { return p.id }), true)
+    if (!r) {
+        Log("Claim failed:", GetLastError())
+        return
+    }
+    Log("Received", r.rewards, r.rewardToken, "sold:", r.sell)
+}
+```
+
+One ```Voter.claimRewards``` transaction claims the wallet's rewards in the gauges of these positions, including the wallet's other staked positions in the same gauges. The claimable amount is ```rewards``` and ```rewardsValue``` in ```lp.positions```.
+
+Rewards are paid in the reward token, whose price is volatile, so ```sell``` converts them to USDC; use this to claim without taking positions out, since ```lp.unstake``` also claims the rewards of Slipstream positions.
+
+See also: `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("lp.stake")`, `exchange.IO("lp.unstake")`, `exchange.IO("lp.claim")`, `exchange.IO("lp.positions")`, `exchange.IO("lp.pools")`
+
+#### KyberSwap
+
+Connects to the KyberSwap aggregator: quotes and transaction data come from the KyberSwap Aggregator API (which splits and routes orders across many DEXs and market makers; an API key is optional, see "API key and rate limits" below), and the docker signs them with the configured private key and sends them to KyberSwap's router contract MetaAggregationRouterV2 (```0x6131B5fae19EA4f9D964eAc0408E4408b66337b5```). One exchange object covers one chain: Ethereum, Arbitrum, Base, BNB Chain, Unichain, Polygon, OP Mainnet or Robinhood.
+
+It is the aggregator version of the same implementation as the `Uniswap` exchange object: the token table, balances, approvals, orders, cancels, transfers and wrapping work the same way; the difference is that the swap route comes from KyberSwap.
+
+##### Names and Configuration
+
+```exchange.GetName()```: ```KyberSwap``` (Spot); aliases: Kyber.
+
+| Field | Required | Default | Description |
+| - | - | - | - |
+| Chain | Yes | ```Ethereum``` | Options: ```Ethereum```, ```Arbitrum```, ```Base```, ```BNB Chain```, ```Unichain```, ```Polygon```, ```OP Mainnet```, ```Robinhood``` |
+| Private Key | Yes | — | Wallet private key (hex). |
+| Rpc Address | No | ```https://ethereum-rpc.publicnode.com,https://eth.drpc.org``` | RPC node URL; several nodes separated by commas fail over to each other when one errors or lacks data; when empty, each chain's built-in default (a primary node plus a backup, comma-separated) is used. (more below the table) |
+| Rpc Api Key | No | — | RPC authentication: a ```Header-Name: value``` header or a Basic auth value. |
+| KyberSwap Api Key | No | — | API key of the KyberSwap Aggregator API, optional. (more below the table) |
+
+The rest of the longer descriptions in the table:
+
+- Rpc Address: Order states need a node that returns receipts of mined transactions; the publicnode public nodes for Base, BNB Chain and Arbitrum cannot (archive access is required), so do not use them alone.
+- KyberSwap Api Key: With it, quotes and swap builds go through KyberSwap's API gateway (header ```X-Api-Key```) with a higher rate limit; without it the public endpoint (about 3 requests per second) is used. See "API key and rate limits" below for how to get one; ```exchange.IO("kyberApiKey", key)``` changes it at run time.
+
+##### Trading Pairs and Contract Codes
+
+Pair examples: ```ETH_USDC```, ```WETH_USDC```, ```ETH_USDG```
+
+Pairs are written as ```ETH_USDC```; the native coin (ETH, BNB, POL) and its wrapped token (WETH, WBNB, WPOL) are different assets. The native coin of Polygon is POL; the Robinhood chain has no USDC or USDT and its main stablecoin is USDG, so pairs are written as ```ETH_USDG```; USDT on Unichain and Polygon is written as ```USDT0```.
+
+The token table is the one of the `Uniswap` exchange object on the same chain; other tokens can be used in pairs after registering them with ```exchange.IO("token", name, address)```, and ```exchange.GetMarkets()``` lists the pairs of the token table that have a Uniswap pool on the chain.
+
+##### Exchange-specific IO Commands
+
+| Command | Arguments | Description | Returns |
+| - | - | - | - |
+| ```transfer``` | to, amount[, token] | Transfer the native coin or an ERC20 token out of the configured wallet (```token``` is a token name or contract address, the native coin when omitted); ```amount``` may be ```all``` (the native coin keeps the fee). Waits for the broadcast only, not for confirmation. See the sub-page `exchange.IO("transfer", ...)`. | ```{txHash, from, to, token, tokenAddress, amount, raw}``` |
+| ```receipt``` | txHash[, waitMs] | Query the receipt of any transaction on this chain (not only those sent by this exchange object), optionally waiting for confirmation (up to 10 minutes). For an order, pass the transaction hash after the comma in the order ID. See the sub-page `exchange.IO("receipt", ...)`. | ```{txHash, status, blockNumber, gasUsed, fee}``` once mined (```status``` is ```success``` or ```reverted```), ```{txHash, pending: true, known}``` otherwise. |
+| ```route``` | symbol, side, qty | Quote only, no order. The aggregator has a single candidate route (such as ```kyberswap:ETH-USDC```); ```buy``` quotes receiving ```qty``` base (approximated with several exact-input quotes), ```sell``` quotes selling ```qty``` base. See the sub-page `exchange.IO("route", ...)`. | ```{symbol, side, qty, best, quote, price, candidates}``` |
+| ```simulate``` | symbol, side, qty[, price[, stateOverride]] | Build the swap transaction with the order logic (quoting, price protection, building the transaction with KyberSwap) and only simulate it with ```eth_call```; nothing is signed, broadcast or paid. See the sub-page `exchange.IO("simulate", ...)`. | ```{route, exactIn, amountIn, amountOut, quoted, executed, value, calls}```, plus ```allowanceOverride``` when an allowance was supplied. |
+| ```token``` | [name, address] | Register a token so it can be used in pairs; without arguments, list the token table. See the sub-page `exchange.IO("token", ...)`. | ```{symbol, address, decimals}``` when registering, an array of ```{symbol, address, decimals, native}``` when listing. |
+| ```wrap``` | amount | Wrap the native coin into its wrapped token (e.g. ETH→WETH), 1:1 without slippage, gas only; ```all``` is not accepted (gas must remain). See the sub-page `exchange.IO("wrap", ...)`. | ```{txHash, action, from, to, amount, raw}``` |
+| ```unwrap``` | amount | Unwrap the wrapped token into the native coin (e.g. WETH→ETH); ```amount``` may be ```all```. See the sub-page `exchange.IO("unwrap", ...)`. | ```{txHash, action, from, to, amount, raw}``` |
+| ```approve``` | ["exact" \| "max"] | Token approval mode (tokens are approved directly to the KyberSwap router contract, not through Permit2): ```exact``` (default) approves only what the swap needs, ```max``` grants an unlimited allowance. Queries when called without an argument. See the sub-page `exchange.IO("approve", ...)`. | The current mode. |
+| ```slippage``` | [ratio] | Slippage protection of market orders, range ```[0, 0.5)```, default ```0.005``` (0.5%). Queries when called without an argument. See the sub-page `exchange.IO("slippage", ...)`. | The current slippage ratio. |
+| ```deadline``` | [seconds] | Transaction deadline in seconds, 10 to 86400, default 120. Queries when called without an argument. The deadline is passed to KyberSwap when the swap transaction is built. See the sub-page `exchange.IO("deadline", ...)`. | The current deadline (seconds). |
+| ```cancelWait``` | [seconds] | How long a cancel waits for the result, in seconds, 0 to 600, default 30; 0 returns right after the cancel transaction is sent. Queries when called without an argument. See the sub-page `exchange.IO("cancelWait", ...)`. | The current wait time (seconds). |
+| ```gasMultiplier``` | [x] | Gas limit multiplier, 1 to 5, default 1.2; a transaction's gasLimit is the node's gas estimate times this value. The gasLimit is only a cap; the gas actually used is what is charged. Queries when called without an argument. See the sub-page `exchange.IO("gasMultiplier", ...)`. | The current multiplier. |
+| ```base``` | [url] | Without an argument, returns the current node address; with an address, switches the node. Several nodes are written as one comma-separated string (with an array only the first address is used). After a switch, the first request checks which chain the node is on and fails if it is not the configured chain. | The previous address. |
+| ```sendBase``` | url | Set a node used only to broadcast transactions (a private transaction channel). Unlike Web3, it does not return the previous address, does not query when called without an argument, and an empty string does not clear the setting. | ```true``` |
+| ```address``` | — | The wallet address of the configured private key (lowercase, starting with ```0x```). | — |
+| ```contracts``` | — | The deployment on this chain, with the same fields as the `Uniswap` exchange object: ```dex``` is ```KyberSwap``` and ```router``` is the KyberSwap router contract; ```quoterV2```, ```v3Factory```, ```v4``` and the like are the chain's Uniswap deployment (used to list markets and estimate USD prices), and ```aerodrome``` is ```null```; ```tokenList``` gives the generation time of the built-in token table and its token count on this chain. | — |
+| ```bridge.chains``` | — | Chains supported by the bridge (LI.FI): EVM chains and Solana, cached for an hour. See the sub-page `exchange.IO("bridge.*", ...)`. | An array of ```{id, key, name, chainType, nativeToken}```, ```chainType``` being ```EVM``` or ```SVM```. |
+| ```bridge.tokens``` | [chain] | Tokens LI.FI knows on a chain (this chain by default), cached for an hour. See the sub-page `exchange.IO("bridge.*", ...)`. | An array of ```{symbol, address, decimals, name, priceUSD}```. |
+| ```bridge.quote``` | params | A bridge quote (read-only) from this exchange object's chain. See the sub-page `exchange.IO("bridge.*", ...)`. | ```{tool, toolName, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, fromAmountRaw, toAmountRaw, toAmountMinRaw, fromAmountUSD, toAmountUSD, slippage, toAddress, feeCosts, gasCosts, executionDuration, approvalAddress, steps, transactionId, request}```: amounts are in token units (```*Raw``` in the smallest unit); ```toAmountMin``` is the amount guaranteed after slippage; ```feeCosts``` is ```[{name, amount, token, amountUSD, percentage, included}]``` (fees with ```included``` ```false``` are paid on top); ```gasCosts``` estimates source-chain gas; ```executionDuration``` is the expected time in seconds; ```approvalAddress``` is the contract to approve (```null``` for the native coin and on Solana); ```steps``` lists the steps (```cross``` bridges, ```swap``` swaps); ```request``` echoes the parameters. |
+| ```bridge.simulate``` | params\|quote[, stateOverride] | Re-quotes and runs LI.FI's transaction with ```eth_call```: nothing is signed, broadcast or paid. See the sub-page `exchange.IO("bridge.*", ...)`. | The ```bridge.quote``` result plus ```simulated``` (```true```), ```to```, ```value``` and ```walletBalance```, and ```allowanceOverride``` when an allowance was supplied. |
+| ```bridge.send``` | params\|quote | Bridges out: re-quotes → checks the balance → approves LI.FI's ```approvalAddress``` when the token allowance is short (following ```exchange.IO("approve")``` ```exact```/```max```, resetting USDT-like tokens to zero first, waiting for the approval to be mined and re-quoting after it) → simulates with ```eth_call``` → signs and broadcasts, with a gas limit of the larger of the ```eth_estimateGas``` estimate × ```gasMultiplier``` and LI.FI's suggested ```gasLimit``` (bridge contracts call into other contracts, so the estimate can fall short; only the gas used is charged). See the sub-page `exchange.IO("bridge.*", ...)`. | ```{txHash, tool, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, toAddress, value, transactionId}```; ```txHash``` is the source-chain transaction, whose receipt ```receipt``` returns. |
+| ```bridge.status``` | txHash[, options] | Bridge progress (LI.FI ```/status```) for the source-chain transaction hash returned by ```bridge.send```; ```options``` may give ```{toChain, bridge}``` to speed up the lookup. See the sub-page `exchange.IO("bridge.*", ...)`. | ```{status, substatus, substatusMessage, tool, sending, receiving, fromAddress, toAddress, explorer, bridgeExplorer}```: ```status``` is ```NOT_FOUND```, ```INVALID```, ```PENDING```, ```DONE``` or ```FAILED```; when ```DONE```, ```substatus``` is ```COMPLETED``` (delivered as quoted), ```PARTIAL``` (a different token arrived) or ```REFUNDED```; ```sending``` and ```receiving``` are ```{txHash, txLink, chainId, amount, amountRaw, token, timestamp}```, with ```receiving.amount``` and ```receiving.token``` being what actually arrived. |
+| ```bridge.apiKey``` | [key] | Sets the LI.FI API key (header ```x-lifi-api-key```, for this exchange object only, never echoed); ```""``` clears it and no argument just queries. Without a key requests are rate-limited per outgoing IP, see below. See the sub-page `exchange.IO("bridge.*", ...)`. | Whether a key is set (a boolean). |
+| ```clientId``` | [id] | Set the client id sent with KyberSwap Aggregator API requests (the ```x-client-id``` header, also sent when an API key is set), 1 to 64 letters, digits, ```.```, ```_``` or ```-```. (more below the table) | The current client id. |
+| ```kyberApiKey``` | [key] | Sets the KyberSwap API key (for this exchange object only, never echoed), the same as the ```KyberSwap Api Key``` setting: with a key, quotes and swap builds go to KyberSwap's API gateway ```https://api.kyberswap.com/swap``` with the ```X-Api-Key``` header and a higher rate limit; ```""``` clears it and returns to the public endpoint. (more below the table) | Whether a key is set (a boolean). |
+
+The rest of the longer descriptions in the table:
+
+- ```clientId```: Without an API key KyberSwap's public rate limit (3 requests per second) is counted per client id, so programs sharing an id share that budget; use your own id if HTTP 429 errors are frequent, or set an API key (see ```kyberApiKey```). The default is ```fmz-``` followed by the first 8 hex digits of a hash of the wallet address (stable across restarts for the same wallet, without revealing the address; a value generated randomly for the run when no private key is configured). Queries when called without an argument.
+- ```kyberApiKey```: A key is 1 to 256 visible ASCII characters without spaces; an invalid one fails and keeps the previous setting. No argument just queries. When the key is invalid or expired the gateway answers HTTP 401 and the call fails with ```KyberSwap API key rejected (HTTP 401: invalid api key)```; it does not fall back to the public endpoint.
+
+For the common command ```currency``` see `exchange.IO`.
+
+The common command ```api``` is not supported (the call fails with an error and returns null).
+
+##### Function Support
+
+Not supported (the call fails with an error and returns null): `exchange.GetTickers`, `exchange.GetHistoryOrders`, `exchange.ModifyOrder`, `exchange.CreateConditionOrder`, `exchange.ModifyConditionOrder`, `exchange.CancelConditionOrder`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`, `exchange.GetHistoryConditionOrders`, `exchange.GetTrades`.
+
+Served through a fallback:
+
+- `exchange.GetRecords`: Native periods are 1m, 5m, 15m, 1h, 4h, 12h, 1d (GeckoTerminal's timeframes); other periods of a minute or longer are synthesized by the docker, while second-level periods are unavailable (there is no trade feed to build them from).
+
+##### Notes
+
+| Function | Behavior on KyberSwap |
+| - | - |
+| exchange.GetTicker() | Bid and ask are KyberSwap quotes for about $1000; there are no 24h statistics. The two sides are quoted separately and their best sources can differ (such as different market-maker quotes on Base), so two individually executable quotes occasionally cross (bid above ask); both sides then report the mid price and ```Info.crossed``` gives how far they crossed |
+| exchange.GetDepth() | Derived from KyberSwap quotes at increasing sizes (one quote per level and side, queued with back-off and retries when rate-limited, so more levels take longer: about 20 seconds for 10); if a quote fails midway, the levels already obtained are returned (none are made up) with the reason in ```Info.partial```, and it fails only when no level was obtained; when the two sides' best sources differ and cross, crossed prices are reported at the mid price with quantities unchanged, and ```Info.crossed``` gives the mid price and how far it crossed |
+| exchange.GetRecords() | K-lines come from GeckoTerminal's pool-level data: an aggregator has no pools of its own, so the pair's pool (on any DEX) with the largest USD liquidity on GeckoTerminal is used (searched among the top 20 pools of each of the two tokens for one holding exactly this pair; the chosen pool is cached for an hour). Prices are that pool's trade prices (including the pool fee, so they may differ from the mid price of ```exchange.GetTicker()``` by about one pool fee) in quote per base, and ```Volume``` is in the base token; periods without trades repeat the previous close with zero volume, and the last bar may still be open. GeckoTerminal data lags by tens of seconds up to a minute and its public API allows about 10 requests per minute: bars of the same period are cached for a minute, requests queue inside the docker and wait and retry when rate-limited, and fail if that still does not succeed. Fails when GeckoTerminal has no pool of the pair |
+| exchange.GetAssets() | Wallet balances of the native coin and of the tokens in the token table |
+| exchange.CreateOrder() | Swaps on chain immediately: a limit price is the worst acceptable fill, market orders are protected by the slippage setting; a market buy is sized in the quote currency. KyberSwap supports exact input only: a limit buy is executed as "spend at most amount × price and receive at least amount", so the amount actually bought may be slightly more than the order amount. The order extra parameter ```slippage``` overrides the slippage for that order; ```route``` does not apply to an aggregator and fails with ```route is not applicable to the KyberSwap aggregator``` |
+| exchange.GetOrder() | The order ID looks like ```ETH_USDC,0x…``` (the pair, a comma, then the transaction hash); the state comes from the transaction receipt, and the order is reported as canceled once the nonce of the original transaction has been taken by the cancel transaction (or another transaction). Filled amounts come from the router contract's ```Swapped``` event (which also covers the native coin) |
+| exchange.GetOrders() | Lists only the swap transactions sent by this exchange object during the current run that are not yet mined |
+| exchange.CancelOrder() | Sends a replacement transaction with the same nonce (a zero-amount transfer to itself) and waits for the result (at most 30 seconds by default, see ```exchange.IO("cancelWait", ...)```): returns ```true``` if the cancel transaction lands first; if the original order is already mined or lands first, it returns ```false``` (the cancel did not happen, but this is not a call error), with the reason in ```exchange.GetLastError()```; returns ```true``` on timeout, meaning the cancel has been submitted, and ```exchange.GetOrder()``` gives the final state |
+
+##### API key and rate limits
+
+- Without an API key: requests go to the public endpoint ```https://aggregator-api.kyberswap.com``` and are rate-limited per client id (```x-client-id```, see ```exchange.IO("clientId")```) to 3 requests per second (30 per 10 seconds in the response headers). The docker queues KyberSwap requests within a process (at least about 0.34 seconds apart).
+- With an API key, set in the ```KyberSwap Api Key``` setting or with ```exchange.IO("kyberApiKey", key)```: requests go to the API gateway ```https://api.kyberswap.com/swap``` (same paths as the public endpoint) with the ```X-Api-Key``` header (```x-client-id``` is still sent), at a higher rate limit that depends on the key (KyberSwap's documentation gives no figure).
+- Getting a key: there is no self-service sign-up; email the KyberSwap business team at ```business@kyber.network```. KyberSwap no longer whitelists ```x-client-id``` values, so a higher limit is only available through an API key.
+- When rate-limited (HTTP 429), requests back off for the time in the ```x-ratelimit-reset-after``` response header (at most 10 seconds) or 1, 2 and 4 seconds, retrying at most 3 times; if still limited the call fails with ```rate limited (HTTP 429) after 4 attempts```, and without a key the error suggests setting one. ```exchange.GetDepth()``` quotes level by level and is the most likely to hit the limit.
+- A missing, invalid or expired key makes the gateway answer HTTP 401 and the call fails with ```KyberSwap API key rejected (HTTP 401: …)```; it does not fall back to the public endpoint; clear the key with ```exchange.IO("kyberApiKey", "")```.
+
+Complete runnable strategies (DEX-CEX arbitrage, dollar-cost averaging) are in `DEX Strategy Examples`.
+
+##### Cross-chain bridge
+
+```exchange.IO("bridge.*", ...)``` bridges tokens from this exchange object's chain to another chain through the bridges LI.FI aggregates (Across, Stargate, CCTP, deBridge, Mayan, Relay, NEAR Intents and more), between EVM chains and between EVM and Solana (from this exchange object's chain). LI.FI supplies the quote and transaction, and the docker approves, simulates with ```eth_call```, signs and broadcasts. Requests carry the integrator tag ```integrator=fmz``` and add no fee; fees in a quote such as ```LIFI Fixed Fee``` are LI.FI's and the bridges' own and are already deducted from ```toAmount```.
+
+Typical flow: ```bridge.quote``` for a quote → ```bridge.simulate``` to simulate → ```bridge.send``` to send → ```bridge.status``` every 10 to 30 seconds until ```DONE``` or ```FAILED```.
+
+- Bridging is asynchronous: when ```bridge.send``` returns, only the source-chain transaction has been broadcast; delivery takes seconds to tens of minutes (see ```executionDuration``` in the quote) and must be confirmed by polling ```bridge.status```; ```PARTIAL``` means a different token arrived on the destination chain and ```REFUNDED``` that the funds went back to the source chain.
+- Cross-VM transfers (EVM↔Solana) require ```toAddress```, checked against the destination chain's address format; funds sent to a wrong address cannot be recovered.
+- Risks: the security of bridge contracts and cross-chain messaging rests with each bridge; quotes move, and ```bridge.send``` re-quotes before sending; the destination wallet needs gas to use what arrives. Test with a small amount first.
+- Rate limits: without an API key LI.FI limits by outgoing IP, ```/quote``` to 75 requests per 2 hours (```bridge.quote```, ```bridge.simulate``` and ```bridge.send``` use one each, plus one more when re-quoting after an approval) and other endpoints to 100 per minute; strategies on the same docker share the quota. With a key set through ```exchange.IO("bridge.apiKey", key)``` the limit is 100 per minute. A rate-limited call fails with ```rate limited (HTTP 429 …)```.
+
+#### 1inch
+
+A OneInch exchange object connects to the 1inch aggregator: quotes and transaction data come from the 1inch Swap API v6.0 (which splits and routes orders across 1inch's many liquidity sources), and the docker signs them with the configured private key and sends them to 1inch's router contract AggregationRouterV6 (```0x111111125421cA6dc452d289314280a0f8842A65```). One exchange object covers one chain: Ethereum, Arbitrum, Base, BNB Chain, Unichain, Polygon or OP Mainnet. An API key from the 1inch developer portal is required in the exchange configuration.
+
+It is the aggregator version of the same implementation as the `Uniswap` exchange object: the token table, balances, approvals, orders, cancels, transfers and wrapping work the same way; the difference is that the swap route comes from 1inch.
+
+##### Names and Configuration
+
+```exchange.GetName()```: ```OneInch``` (Spot).
+
+| Field | Required | Default | Description |
+| - | - | - | - |
+| Chain | Yes | ```Ethereum``` | Options: ```Ethereum```, ```Arbitrum```, ```Base```, ```BNB Chain```, ```Unichain```, ```Polygon```, ```OP Mainnet``` |
+| Private Key | Yes | — | Wallet private key (hex). |
+| Rpc Address | No | ```https://ethereum-rpc.publicnode.com,https://eth.drpc.org``` | RPC node URL; several nodes separated by commas fail over to each other when one errors or lacks data; when empty, each chain's built-in default (a primary node plus a backup, comma-separated) is used. (more below the table) |
+| 1inch Api Key | Yes | — | API key from the 1inch developer portal (required), sent as ```Authorization: Bearer <key>```. |
+
+The rest of the longer descriptions in the table:
+
+- Rpc Address: Order states need a node that returns receipts of mined transactions; the publicnode public nodes for Base, BNB Chain and Arbitrum cannot (archive access is required), so do not use them alone. RPC nodes are used without authentication.
+
+##### Trading Pairs and Contract Codes
+
+Pair examples: ```ETH_USDC```, ```WETH_USDC```, ```POL_USDT0```
+
+Pairs are written as ```ETH_USDC```; the native coin (ETH, BNB, POL) and its wrapped token (WETH, WBNB, WPOL) are different assets. The native coin of Polygon is POL; USDT on Unichain and Polygon is written as ```USDT0```.
+
+The token table is the one of the `Uniswap` exchange object on the same chain; other tokens can be used in pairs after registering them with ```exchange.IO("token", name, address)```, and ```exchange.GetMarkets()``` lists the pairs of the token table that have a Uniswap pool on the chain.
+
+##### Exchange-specific IO Commands
+
+| Command | Arguments | Description | Returns |
+| - | - | - | - |
+| ```transfer``` | to, amount[, token] | Transfer the native coin or an ERC20 token out of the configured wallet (```token``` is a token name or contract address, the native coin when omitted); ```amount``` may be ```all``` (the native coin keeps the fee). Waits for the broadcast only, not for confirmation. See the sub-page `exchange.IO("transfer", ...)`. | ```{txHash, from, to, token, tokenAddress, amount, raw}``` |
+| ```receipt``` | txHash[, waitMs] | Query the receipt of any transaction on this chain (not only those sent by this exchange object), optionally waiting for confirmation (up to 10 minutes). For an order, pass the transaction hash after the comma in the order ID. See the sub-page `exchange.IO("receipt", ...)`. | ```{txHash, status, blockNumber, gasUsed, fee}``` once mined (```status``` is ```success``` or ```reverted```), ```{txHash, pending: true, known}``` otherwise. |
+| ```route``` | symbol, side, qty | Quote only, no order. The aggregator has a single candidate route (such as ```1inch:ETH-USDC```); ```buy``` quotes receiving ```qty``` base (approximated with several exact-input quotes), ```sell``` quotes selling ```qty``` base. See the sub-page `exchange.IO("route", ...)`. | ```{symbol, side, qty, best, quote, price, candidates}``` |
+| ```simulate``` | symbol, side, qty[, price[, stateOverride]] | Build the swap transaction with the order logic (quoting, price protection, building the transaction with 1inch) and only simulate it with ```eth_call```; nothing is signed, broadcast or paid. See the sub-page `exchange.IO("simulate", ...)`. | ```{route, exactIn, amountIn, amountOut, quoted, executed, value, calls}```, plus ```allowanceOverride``` when an allowance was supplied. |
+| ```token``` | [name, address] | Register a token so it can be used in pairs; without arguments, list the token table. See the sub-page `exchange.IO("token", ...)`. | ```{symbol, address, decimals}``` when registering, an array of ```{symbol, address, decimals, native}``` when listing. |
+| ```wrap``` | amount | Wrap the native coin into its wrapped token (e.g. ETH→WETH), 1:1 without slippage, gas only; ```all``` is not accepted (gas must remain). See the sub-page `exchange.IO("wrap", ...)`. | ```{txHash, action, from, to, amount, raw}``` |
+| ```unwrap``` | amount | Unwrap the wrapped token into the native coin (e.g. WETH→ETH); ```amount``` may be ```all```. See the sub-page `exchange.IO("unwrap", ...)`. | ```{txHash, action, from, to, amount, raw}``` |
+| ```approve``` | ["exact" \| "max"] | Token approval mode (tokens are approved directly to the 1inch router contract, not through Permit2): ```exact``` (default) approves only what the swap needs, ```max``` grants an unlimited allowance. Queries when called without an argument. See the sub-page `exchange.IO("approve", ...)`. | The current mode. |
+| ```slippage``` | [ratio] | Slippage protection of market orders, range ```[0, 0.5)```, default ```0.005``` (0.5%). Queries when called without an argument. See the sub-page `exchange.IO("slippage", ...)`. | The current slippage ratio. |
+| ```deadline``` | [seconds] | Transaction deadline in seconds, 10 to 86400, default 120. Queries when called without an argument. Transactions built by 1inch carry no deadline, so the setting has no effect on swaps of a OneInch exchange object. See the sub-page `exchange.IO("deadline", ...)`. | The current deadline (seconds). |
+| ```cancelWait``` | [seconds] | How long a cancel waits for the result, in seconds, 0 to 600, default 30; 0 returns right after the cancel transaction is sent. Queries when called without an argument. See the sub-page `exchange.IO("cancelWait", ...)`. | The current wait time (seconds). |
+| ```gasMultiplier``` | [x] | Gas limit multiplier, 1 to 5, default 1.2; a transaction's gasLimit is the node's gas estimate times this value. The gasLimit is only a cap; the gas actually used is what is charged. Queries when called without an argument. See the sub-page `exchange.IO("gasMultiplier", ...)`. | The current multiplier. |
+| ```base``` | [url] | Without an argument, returns the current node address; with an address, switches the node. Several nodes are written as one comma-separated string (with an array only the first address is used). After a switch, the first request checks which chain the node is on and fails if it is not the configured chain. | The previous address. |
+| ```sendBase``` | url | Set a node used only to broadcast transactions (a private transaction channel). Unlike Web3, it does not return the previous address, does not query when called without an argument, and an empty string does not clear the setting. | ```true``` |
+| ```address``` | — | The wallet address of the configured private key (lowercase, starting with ```0x```). | — |
+| ```contracts``` | — | The deployment on this chain, with the same fields as the `Uniswap` exchange object: ```dex``` is ```1inch``` and ```router``` is the 1inch router contract; ```quoterV2```, ```v3Factory```, ```v4``` and the like are the chain's Uniswap deployment (used to list markets and estimate USD prices), and ```aerodrome``` is ```null```; ```tokenList``` gives the generation time of the built-in token table and its token count on this chain. | — |
+| ```bridge.chains``` | — | Chains supported by the bridge (LI.FI): EVM chains and Solana, cached for an hour. See the sub-page `exchange.IO("bridge.*", ...)`. | An array of ```{id, key, name, chainType, nativeToken}```, ```chainType``` being ```EVM``` or ```SVM```. |
+| ```bridge.tokens``` | [chain] | Tokens LI.FI knows on a chain (this chain by default), cached for an hour. See the sub-page `exchange.IO("bridge.*", ...)`. | An array of ```{symbol, address, decimals, name, priceUSD}```. |
+| ```bridge.quote``` | params | A bridge quote (read-only) from this exchange object's chain. See the sub-page `exchange.IO("bridge.*", ...)`. | ```{tool, toolName, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, fromAmountRaw, toAmountRaw, toAmountMinRaw, fromAmountUSD, toAmountUSD, slippage, toAddress, feeCosts, gasCosts, executionDuration, approvalAddress, steps, transactionId, request}```: amounts are in token units (```*Raw``` in the smallest unit); ```toAmountMin``` is the amount guaranteed after slippage; ```feeCosts``` is ```[{name, amount, token, amountUSD, percentage, included}]``` (fees with ```included``` ```false``` are paid on top); ```gasCosts``` estimates source-chain gas; ```executionDuration``` is the expected time in seconds; ```approvalAddress``` is the contract to approve (```null``` for the native coin and on Solana); ```steps``` lists the steps (```cross``` bridges, ```swap``` swaps); ```request``` echoes the parameters. |
+| ```bridge.simulate``` | params\|quote[, stateOverride] | Re-quotes and runs LI.FI's transaction with ```eth_call```: nothing is signed, broadcast or paid. See the sub-page `exchange.IO("bridge.*", ...)`. | The ```bridge.quote``` result plus ```simulated``` (```true```), ```to```, ```value``` and ```walletBalance```, and ```allowanceOverride``` when an allowance was supplied. |
+| ```bridge.send``` | params\|quote | Bridges out: re-quotes → checks the balance → approves LI.FI's ```approvalAddress``` when the token allowance is short (following ```exchange.IO("approve")``` ```exact```/```max```, resetting USDT-like tokens to zero first, waiting for the approval to be mined and re-quoting after it) → simulates with ```eth_call``` → signs and broadcasts, with a gas limit of the larger of the ```eth_estimateGas``` estimate × ```gasMultiplier``` and LI.FI's suggested ```gasLimit``` (bridge contracts call into other contracts, so the estimate can fall short; only the gas used is charged). See the sub-page `exchange.IO("bridge.*", ...)`. | ```{txHash, tool, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, toAddress, value, transactionId}```; ```txHash``` is the source-chain transaction, whose receipt ```receipt``` returns. |
+| ```bridge.status``` | txHash[, options] | Bridge progress (LI.FI ```/status```) for the source-chain transaction hash returned by ```bridge.send```; ```options``` may give ```{toChain, bridge}``` to speed up the lookup. See the sub-page `exchange.IO("bridge.*", ...)`. | ```{status, substatus, substatusMessage, tool, sending, receiving, fromAddress, toAddress, explorer, bridgeExplorer}```: ```status``` is ```NOT_FOUND```, ```INVALID```, ```PENDING```, ```DONE``` or ```FAILED```; when ```DONE```, ```substatus``` is ```COMPLETED``` (delivered as quoted), ```PARTIAL``` (a different token arrived) or ```REFUNDED```; ```sending``` and ```receiving``` are ```{txHash, txLink, chainId, amount, amountRaw, token, timestamp}```, with ```receiving.amount``` and ```receiving.token``` being what actually arrived. |
+| ```bridge.apiKey``` | [key] | Sets the LI.FI API key (header ```x-lifi-api-key```, for this exchange object only, never echoed); ```""``` clears it and no argument just queries. Without a key requests are rate-limited per outgoing IP, see below. See the sub-page `exchange.IO("bridge.*", ...)`. | Whether a key is set (a boolean). |
+
+For the common command ```currency``` see `exchange.IO`.
+
+The common command ```api``` is not supported (the call fails with an error and returns null).
+
+##### Function Support
+
+Not supported (the call fails with an error and returns null): `exchange.GetTickers`, `exchange.GetHistoryOrders`, `exchange.ModifyOrder`, `exchange.CreateConditionOrder`, `exchange.ModifyConditionOrder`, `exchange.CancelConditionOrder`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`, `exchange.GetHistoryConditionOrders`, `exchange.GetTrades`.
+
+Served through a fallback:
+
+- `exchange.GetRecords`: Native periods are 1m, 5m, 15m, 1h, 4h, 12h, 1d (GeckoTerminal's timeframes); other periods of a minute or longer are synthesized by the docker, while second-level periods are unavailable (there is no trade feed to build them from).
+
+##### Notes
+
+| Function | Behavior on 1inch |
+| - | - |
+| exchange.GetTicker() | Bid and ask are 1inch quotes for about $1000; there are no 24h statistics. The two sides are quoted separately and their best sources can differ (such as different market-maker quotes on Base), so two individually executable quotes occasionally cross (bid above ask); both sides then report the mid price and ```Info.crossed``` gives how far they crossed |
+| exchange.GetDepth() | Derived from 1inch quotes at increasing sizes (one quote per level and side, queued with back-off and retries when rate-limited, one per second on the free plan, so 10 levels take about 25 seconds); if a quote fails midway, the levels already obtained are returned (none are made up) with the reason in ```Info.partial```, and it fails only when no level was obtained; when the two sides' best sources differ and cross, crossed prices are reported at the mid price with quantities unchanged, and ```Info.crossed``` gives the mid price and how far it crossed |
+| exchange.GetRecords() | K-lines come from GeckoTerminal's pool-level data: an aggregator has no pools of its own, so the pair's pool (on any DEX) with the largest USD liquidity on GeckoTerminal is used (searched among the top 20 pools of each of the two tokens for one holding exactly this pair; the chosen pool is cached for an hour). Prices are that pool's trade prices (including the pool fee, so they may differ from the mid price of ```exchange.GetTicker()``` by about one pool fee) in quote per base, and ```Volume``` is in the base token; periods without trades repeat the previous close with zero volume, and the last bar may still be open. GeckoTerminal data lags by tens of seconds up to a minute and its public API allows about 10 requests per minute: bars of the same period are cached for a minute, requests queue inside the docker and wait and retry when rate-limited, and fail if that still does not succeed. Fails when GeckoTerminal has no pool of the pair |
+| exchange.GetAssets() | Wallet balances of the native coin and of the tokens in the token table |
+| exchange.CreateOrder() | Swaps on chain immediately: a limit price is the worst acceptable fill, market orders are protected by the slippage setting; a market buy is sized in the quote currency. 1inch supports exact input only: a limit buy is executed as "spend at most amount × price and receive at least amount", so the amount actually bought may be slightly more than the order amount. The order extra parameter ```slippage``` overrides the slippage for that order; ```route``` does not apply to an aggregator and fails with ```route is not applicable to the 1inch aggregator``` |
+| exchange.GetOrder() | The order ID looks like ```ETH_USDC,0x…``` (the pair, a comma, then the transaction hash); the state comes from the transaction receipt, and the order is reported as canceled once the nonce of the original transaction has been taken by the cancel transaction (or another transaction). The 1inch router has no unified fill event: tokens are counted from the wallet's incoming and outgoing transfers in the transaction receipt; when the native coin is received, the amount is the wallet's balance difference between the transaction's block and the previous block plus the fee (inaccurate if the wallet has other transactions in the same block) |
+| exchange.GetOrders() | Lists only the swap transactions sent by this exchange object during the current run that are not yet mined |
+| exchange.CancelOrder() | Sends a replacement transaction with the same nonce (a zero-amount transfer to itself) and waits for the result (at most 30 seconds by default, see ```exchange.IO("cancelWait", ...)```): returns ```true``` if the cancel transaction lands first; if the original order is already mined or lands first, it returns ```false``` (the cancel did not happen, but this is not a call error), with the reason in ```exchange.GetLastError()```; returns ```true``` on timeout, meaning the cancel has been submitted, and ```exchange.GetOrder()``` gives the final state |
+
+The 1inch free tier allows 1 request per second; the connector queues requests automatically and waits and retries when rate-limited (HTTP 429).
+
+Complete runnable strategies (DEX-CEX arbitrage, dollar-cost averaging) are in `DEX Strategy Examples`.
+
+##### Cross-chain bridge
+
+```exchange.IO("bridge.*", ...)``` bridges tokens from this exchange object's chain to another chain through the bridges LI.FI aggregates (Across, Stargate, CCTP, deBridge, Mayan, Relay, NEAR Intents and more), between EVM chains and between EVM and Solana (from this exchange object's chain). LI.FI supplies the quote and transaction, and the docker approves, simulates with ```eth_call```, signs and broadcasts. Requests carry the integrator tag ```integrator=fmz``` and add no fee; fees in a quote such as ```LIFI Fixed Fee``` are LI.FI's and the bridges' own and are already deducted from ```toAmount```.
+
+Typical flow: ```bridge.quote``` for a quote → ```bridge.simulate``` to simulate → ```bridge.send``` to send → ```bridge.status``` every 10 to 30 seconds until ```DONE``` or ```FAILED```.
+
+- Bridging is asynchronous: when ```bridge.send``` returns, only the source-chain transaction has been broadcast; delivery takes seconds to tens of minutes (see ```executionDuration``` in the quote) and must be confirmed by polling ```bridge.status```; ```PARTIAL``` means a different token arrived on the destination chain and ```REFUNDED``` that the funds went back to the source chain.
+- Cross-VM transfers (EVM↔Solana) require ```toAddress```, checked against the destination chain's address format; funds sent to a wrong address cannot be recovered.
+- Risks: the security of bridge contracts and cross-chain messaging rests with each bridge; quotes move, and ```bridge.send``` re-quotes before sending; the destination wallet needs gas to use what arrives. Test with a small amount first.
+- Rate limits: without an API key LI.FI limits by outgoing IP, ```/quote``` to 75 requests per 2 hours (```bridge.quote```, ```bridge.simulate``` and ```bridge.send``` use one each, plus one more when re-quoting after an approval) and other endpoints to 100 per minute; strategies on the same docker share the quota. With a key set through ```exchange.IO("bridge.apiKey", key)``` the limit is 100 per minute. A rate-limited call fails with ```rate limited (HTTP 429 …)```.
+
+#### EVM DEX Common Commands
+
+The `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `KyberSwap` and `1inch` exchange objects share one implementation (swaps, concentrated liquidity and bridging on EVM chains); this directory holds the sub-pages of their common ```exchange.IO()``` commands. Each exchange page lists all its commands in its IO table and links here, and the differences between the exchanges are in the remarks of each sub-page.
+
+| Commands | Exchanges |
+| - | - |
+| Swap quotes and simulation: ```route```, ```simulate```; token table: ```token``` | All (on KyberSwap and 1inch the aggregator supplies the route) |
+| Wallet: ```transfer```, ```receipt```, ```wrap```, ```unwrap``` | All |
+| Settings: ```approve```, ```slippage```, ```deadline```, ```cancelWait```, ```gasMultiplier``` | All |
+| Concentrated liquidity: ```lp.*``` | Uniswap, PancakeSwap, Aerodrome, Velodrome; gauge staking with `lp.stake`, `lp.unstake` and `lp.claim` on Aerodrome and Velodrome only |
+| Bridge: ```bridge.*``` | All |
+
+The usual LP flow: pick a pool with `lp.pools` or `lp.select` → plan with `lp.plan` → simulate with `lp.simulate` → add with `lp.add` → monitor with `lp.positions` → collect fees with `lp.collect`, reduce with `lp.decrease` or withdraw with `lp.remove`; the `lp.add` page has a complete strategy example, and `DEX Strategy Examples` has runnable strategies such as range re-centering, gauge compounding, DEX-CEX arbitrage and dollar-cost averaging.
+
+##### exchange.IO("route", ...)
+
+```
+exchange.IO(k, symbol, side, qty)
+```
+
+Forms:
+
+- `exchange.IO("route", ...)`
+
+Quotes a swap without placing an order: lists the quote of every candidate route and the best route.
+
+Parameters:
+
+- `k` (string, required): Always ```route```, which requests a quote.
+- `symbol` (string, required): Trading pair, for example ```ETH_USDC```.
+- `side` (string, required): Swap direction: ```sell``` sells ```qty``` units of the base currency, and ```buy``` buys ```qty``` units of the base currency.
+- `qty` (number, required): Amount of the base currency.
+
+Returns (object / null value): Returns ```{symbol, side, qty, best, quote, price, candidates}```, which holds the best route, the best quote, the average price and the quote on each candidate route. See the remarks for the fields. Returns null on error. Call ```GetLastError()``` to see the cause.
+
+Compare the quotes on each route for selling 1 ETH.
+
+```javascript
+function main() {
+    var r = exchange.IO("route", "ETH_USDC", "sell", 1)
+    if (!r) {
+        Log("Quote failed:", GetLastError())
+        return
+    }
+    if (r.best === null) {
+        Log("No usable pool")
+        return
+    }
+    Log("Best route:", r.best, "receive:", r.quote, "USDC")
+    r.candidates.forEach(function (c) {
+        Log(c.route, c.quote)
+    })
+}
+```
+
+Candidate routes include the exchange's direct pools and two-hop routes through the wrapped native token or USDC/USDT. The pool types depend on the exchange. Uniswap uses V3 pools at each fee tier, V2 pools and V4 pools without hooks (V4 routes go through the native token or USDC/USDT). PancakeSwap uses V3, V2 and Infinity CL pools. Aerodrome and Velodrome use both generations of Slipstream pools and basic pools. Routes are written like this: ```v3:WETH-500-USDC``` (V3, fee 500 = 0.05%), ```v2:WETH-USDC```, ```v3:UNI-3000-USDT-100-USDC``` (two hops), ```v4:ETH-500/10-USDC``` (Uniswap V4, fee 500, tick spacing 10, ETH is the native token), ```infinity:BNB-67/1-USDT``` (PancakeSwap Infinity CL), ```cl:WETH-100-USDC``` (first-generation Slipstream on Aerodrome and Velodrome; the number is the tick spacing), ```cl2:WETH-500-USDC``` (second-generation Slipstream), ```volatile:AERO-USDC```, ```stable:USDC-USDbC``` (basic pools).
+
+V3 routes are quoted on-chain through QuoterV2, which simulates the whole swap. V2 routes are calculated locally from the pool reserves. Quotes do not include gas fees.
+
+Fields of the returned object: ```best``` is the best route. ```quote``` is the best quote (for a sell, the amount of quote currency received; for a buy, the amount of quote currency spent). ```price``` is the matching average fill price. ```candidates``` holds ```{route, quote}``` for each candidate route (a route that cannot be quoted has a ```quote``` of ```null```). If no pool is available, an object is still returned, with ```best```, ```quote``` and ```price``` all ```null``` and ```candidates``` an empty array (if pools exist but none can be quoted, each item in ```candidates``` has a ```quote``` of ```null```). On errors such as a token in the trading pair that cannot be recognized, or a node on a different chain from the configured one, null is returned. Call ```GetLastError()``` to see the cause.
+
+On the KyberSwap and 1inch exchange objects (aggregators) there is a single candidate route, the aggregator's quote, written ```kyberswap:ETH-USDC``` or ```1inch:ETH-USDC``` (```kyberswap:USDC-ETH``` when buying, the paid token first); ```buy``` quotes receiving ```qty``` base tokens, approximated with several exact-input quotes. When PancakeSwap cannot collect Infinity CL pools from on-chain trades (no node serves ```eth_getLogs```), the result carries a ```warning``` with the reason.
+
+See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `KyberSwap`, `1inch`, `exchange.IO`, `exchange.IO("simulate")`, `exchange.IO("slippage")`, `exchange.IO("token")`, `exchange.CreateOrder`
+
+##### exchange.IO("simulate", ...)
+
+```
+exchange.IO(k, symbol, side, qty)
+exchange.IO(k, symbol, side, qty, price)
+exchange.IO(k, symbol, side, qty, price, stateOverride)
+exchange.IO(k, symbol, side, qty, price, stateOverride, route)
+```
+
+Forms:
+
+- `exchange.IO("simulate", ...)`
+
+Builds a swap transaction with the order logic (route selection, quoting, price protection) and only simulates it on chain (```eth_call```): nothing is signed, broadcast or paid.
+
+Parameters:
+
+- `k` (string, required): Always ```simulate```. It selects a simulated order.
+- `symbol` (string, required): The trading pair, for example ```ETH_USDC```.
+- `side` (string, required): The trade direction: ```buy``` or ```sell```.
+- `qty` (number, required): The order quantity. It has the same meaning as in ```exchange.CreateOrder()```. For a market buy, it is the amount of quote currency to spend.
+- `price` (number, optional): The limit price. If you omit it or pass ```null```, the order is a market order.
+- `stateOverride` (object, optional): The state override parameter for the node's ```eth_call``` (the geth state override set). Use it to give the wallet temporary balance or allowance during the simulation, for example ```{"0xWalletAddress": {"balance": "0x56bc75e2d63100000"}}```. It applies to this simulation only.
+- `route` (string, optional): Limits the route type: ```v2```, ```v3```, ```v4```, ```hop``` (two hops) or ```direct``` (direct pool). On PancakeSwap, ```v4``` means the Infinity CL pools. On Aerodrome and Velodrome, ```v2``` means the basic pools and ```v3``` means the Slipstream pools (```v4``` is not supported). If omitted, the best route among all routes is used.
+
+Returns (object / null value): Returns ```{route, exactIn, amountIn, amountOut, quoted, executed, value, calls}```. The key fields are the quote at order time, ```quoted```, and the amount from the simulated execution, ```executed```. See the remarks for what each field means. If the order cannot be filled, the function returns null and reports an error.
+
+Gives the wallet a temporary balance of 100 ETH and simulates selling 1 ETH.
+
+```javascript
+function main() {
+    var ov = {}
+    ov[exchange.IO("address")] = { balance: "0x56bc75e2d63100000" }
+    var r = exchange.IO("simulate", "ETH_USDC", "sell", 1, null, ov)
+    Log("Route:", r.route, "quoted:", r.quoted, "simulated:", r.executed)
+}
+```
+
+The simulation uses the latest block state. The only difference from a real order is that the price may change before the transaction is actually included on-chain.
+
+For a swap paid with a token (such as buying with USDC), a short wallet allowance is supplied through a state override before simulating (```approve``` defaults to ```exact```, which approves only right before a real order), and ```allowanceOverride``` in the result lists what was supplied; a ```stateOverride``` you pass is merged with it, without overwriting slots you set. Balances are not supplied: when paying with the native coin, give the wallet a ```balance``` in ```stateOverride```; when paying with a token, override the token contract's balance slot yourself.
+
+Fields of the returned object: ```quoted``` is the quote at order time. ```executed``` is the actual amount from the simulated execution: the amount received for an exact-input swap, or the amount spent for an exact-output swap. Both are decimal strings in the token's smallest unit. Uniswap V4 routes and PancakeSwap Infinity routes run through the Universal
+  Router, which does not return the filled amount, so ```executed``` is ```null```. In that case, a simulation that does not fail means the order can be filled with these parameters, including the minimum amount received or maximum amount spent. If the limit price is not met, or the balance or allowance is too low (and not overridden), the function returns null and reports an error.
+
+On the KyberSwap and 1inch exchange objects (aggregators) the transaction built by the aggregator is simulated, and ```route``` looks like ```kyberswap:ETH-USDC via flux-prop```, listing the liquidity sources after ```via```; the seventh argument ```route``` does not apply and fails with ```route is not applicable to the KyberSwap aggregator``` (likewise for 1inch).
+
+See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `KyberSwap`, `1inch`, `exchange.IO`, `exchange.IO("route")`, `exchange.IO("slippage")`, `exchange.IO("gasMultiplier")`, `exchange.CreateOrder`
+
+##### exchange.IO("token", ...)
+
+```
+exchange.IO(k)
+exchange.IO(k, name, address)
+```
+
+Forms:
+
+- `exchange.IO("token", ...)`
+
+Registers a token, or lists the token table; a registered token can be used by name in trading pairs.
+
+Parameters:
+
+- `k` (string, required): Set to ```token```, which means a token is being registered.
+- `name` (string, optional): The name the token uses in trading pairs, such as ```UNI```.
+- `address` (string, optional): The token's contract address. Its decimals are read from the chain.
+
+Returns (object / array / null value): When a token is registered, the function returns ```{symbol, address, decimals}```. When no arguments are passed, it returns the token table as an array, and each item is ```{symbol, address, decimals, native}```. If ```native``` is ```true```, the token is the chain's native coin. If the address is not an ERC20 token, the function returns null.
+
+Register UNI on Ethereum and query the UNI_USDC ticker (contract addresses differ per chain; use the address on your chain).
+
+```javascript
+function main() {
+    var t = exchange.IO("token", "UNI", "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984")
+    if (!t) {
+        Log("Registration failed:", GetLastError())
+        return
+    }
+    var ticker = exchange.GetTicker("UNI_USDC")
+    Log(t.symbol, "decimals:", t.decimals, "bid:", ticker.Buy, "ask:", ticker.Sell)
+}
+```
+
+Token names are resolved in this order: ① The token table. It holds manually verified built-in tokens (the native coin, the wrapped coin, USDC, USDT, the chain's BTC, and others) and any tokens registered with ```exchange.IO("token", ...)```. If a registered token has the same name as a built-in token, it replaces that built-in entry. ② The official token lists. The lists depend on the chain, not on the exchange (KyberSwap and 1inch exchange objects use the same lists on the same chain): BNB Chain merges the PancakeSwap list (tokens.pancakeswap.finance) with the Uniswap Labs default list (tokens.uniswap.org), Base merges the Uniswap Labs list with the PancakeSwap list, and the other chains use the Uniswap Labs list. Tokens resolved from an official list are added to the token table. The connector ships with a snapshot of these lists. It fetches the latest lists only when a name is not in the snapshot, and it fetches them at most once every 24 hours.
+
+If an official list has more than one token with the same name on the same chain, such as a bridged version and a native version, you cannot use that name directly. The error message lists the candidate addresses, so specify the token by its contract address instead. The decimals of a listed token are taken from its on-chain contract. If they differ from the list's record, the token is rejected.
+
+A token that is not in the token table can still be used in a trading pair through its contract address, for example ```0x1f9840a85d5af5bf1d1762f925bdaddc4201f984_USDC```.
+
+```exchange.GetMarkets()``` lists only two kinds of trading pairs: pairs between tokens in the token table (built-in and registered tokens), and pairs of popular high-liquidity coins against the wrapped coin, USDC, or USDT. Tokens that are not listed can still be traded directly.
+
+A native coin (such as ETH or BNB) and its wrapped coin (such as WETH or WBNB) are two different assets. When you trade the native coin, the router contract wraps and unwraps it automatically.
+
+See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `KyberSwap`, `1inch`, `exchange.IO`, `exchange.IO("route")`, `exchange.IO("transfer")`, `exchange.IO("approve")`
+
+##### exchange.IO("transfer", ...)
+
+```
+exchange.IO(k, to, amount)
+exchange.IO(k, to, amount, token)
+```
+
+Forms:
+
+- `exchange.IO("transfer", ...)`
+
+Transfers the chain's native coin (such as ETH or BNB) or an ERC20 token out of the configured wallet.
+
+Parameters:
+
+- `k` (string, required): Always ```transfer```, which runs a transfer.
+- `to` (string, required): Recipient address: a 20-byte hexadecimal address that starts with ```0x```. It must be an address on the same chain as the exchange object.
+- `amount` (string / number, required): Amount to transfer, in human-readable units (for example, ```"0.05"``` means 0.05 ETH). Passing it as a string is recommended, because the system then converts it exactly using the token's decimals. If it has more decimal places than the token supports, an error is raised right away; it is never silently truncated. Set it to ```all``` to transfer everything: for the native coin, the maximum fee for this transaction is reserved and the rest is transferred; for a token, the whole balance is transferred.
+- `token` (string, optional): Token to transfer. It can be a token name (such as ```USDC```, resolved the same way as token names in trading pairs: built-in or registered tokens in the token table, plus tokens in the official token list; see ```exchange.IO("token", ...)```) or a token contract address. If it is omitted, the native coin is transferred.
+
+Returns (object / null value): When the transaction is broadcast successfully, returns ```{txHash, from, to, token, tokenAddress, amount, raw}```: ```txHash``` is the transaction hash, ```amount``` is the amount transferred (in human-readable units), ```raw``` is the same amount as a decimal string in the smallest unit, and ```tokenAddress``` is ```null``` when the native coin is transferred. The function only waits for the broadcast, not for the transaction to be confirmed on-chain; check the on-chain result with ```exchange.IO("receipt", ...)```. On failure it returns null, and ```GetLastError()``` gives the reason.
+
+Transfer ETH and USDC, then wait for the transaction to be confirmed on-chain.
+
+```javascript
+function main() {
+    var TO = "0xRecipientAddress"
+    // Transfer 0.05 ETH; use "all" to transfer the full balance
+    var r = exchange.IO("transfer", TO, "0.05")
+    if (!r) {
+        Log("Transfer failed:", GetLastError())
+        return
+    }
+    Log("Sent", r.amount, r.token, "tx:", r.txHash)
+
+    // Wait up to 3 minutes for on-chain confirmation
+    var rc = exchange.IO("receipt", r.txHash, 180000)
+    if (rc.pending) {
+        Log("Not on-chain yet")
+    } else {
+        Log("Result:", rc.status, "block:", rc.blockNumber, "fee:", rc.fee)
+    }
+
+    // Transfer 10 USDC
+    var r2 = exchange.IO("transfer", TO, "10", "USDC")
+    Log(r2 ? r2.txHash : GetLastError())
+}
+```
+
+In the following cases an error is raised before signing and no transaction is sent: an invalid address format, the zero address, a transfer to the wallet itself, an amount of 0, an amount larger than the balance, or a token that cannot be identified.
+
+When the whole native-coin balance is transferred (```all```) on an EIP-1559 chain, the maximum fee quoted for this transaction is reserved. Because the fee actually charged is lower than the reserve, a very small balance stays in the wallet.
+
+The priority fee (tip) is the larger of the node's suggested value and the median priority fee in recent blocks. This keeps a transaction from staying unconfirmed for a long time when the node suggests 0.
+
+A transfer is a real on-chain transaction and cannot be reversed once sent. Before sending to an exchange deposit address, make sure the exchange accepts deposits on this chain.
+
+See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `KyberSwap`, `1inch`, `exchange.IO`, `exchange.IO("receipt")`, `exchange.IO("token")`, `exchange.IO("wrap")`
+
+##### exchange.IO("receipt", ...)
+
+```
+exchange.IO(k, txHash)
+exchange.IO(k, txHash, waitMs)
+```
+
+Forms:
+
+- `exchange.IO("receipt", ...)`
+
+Queries the receipt of any transaction on the exchange object's chain (not only orders and transfers sent by it), optionally waiting for it to be mined.
+
+Parameters:
+
+- `k` (string, required): Always ```receipt```, which queries a transaction receipt.
+- `txHash` (string, required): The transaction hash, a 32-byte hexadecimal string starting with ```0x```, such as the ```txHash``` returned by ```exchange.IO("transfer", ...)```. To query the transaction behind an order, pass the part of the order ID (in the form ```ETH_USDC,0x…```) after the comma.
+- `waitMs` (number, optional): The maximum wait time in milliseconds. While the transaction is not yet on-chain, it is queried every 1.5 seconds, for up to 10 minutes. If this is omitted or set to 0, the transaction is queried only once.
+
+Returns (object): When the transaction is on-chain, returns ```{txHash, status, blockNumber, gasUsed, fee}```. Here ```status``` is ```success``` or ```reverted```, and ```fee``` is the fee actually paid, in the native coin and in readable units. If the transaction is not on-chain within the wait time, returns ```{txHash, pending: true, known}```. ```known``` shows whether the node can find the transaction. If it cannot, the transaction was usually dropped or the hash is wrong.
+
+Wait for a transaction to be confirmed on-chain.
+
+```javascript
+function main() {
+    var txHash = "TX_HASH"     // Hash of the transaction to query
+    var rc = exchange.IO("receipt", txHash, 120000)
+    if (rc.pending) {
+        Log("Not mined within 2 minutes; known to the node:", rc.known)
+        return
+    }
+    Log("Status:", rc.status, "Block:", rc.blockNumber, "gasUsed:", rc.gasUsed, "Fee:", rc.fee)
+}
+```
+
+To check an order's fill status, just use ```exchange.GetOrder()```. ```exchange.IO("receipt", ...)``` is mainly for querying transactions that are not orders, such as transfers.
+
+See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `KyberSwap`, `1inch`, `exchange.IO`, `exchange.IO("transfer")`, `exchange.IO("cancelWait")`, `exchange.IO("wrap")`, `exchange.IO("unwrap")`
+
+##### exchange.IO("wrap", ...)
+
+```
+exchange.IO(k, amount)
+```
+
+Forms:
+
+- `exchange.IO("wrap", ...)`
+
+Wraps the native coin (such as ETH or BNB) into its wrapped token (such as WETH or WBNB), 1:1 without slippage, costing only gas.
+
+Parameters:
+
+- `k` (string, required): Fixed as ```wrap```, which means wrapping the native coin.
+- `amount` (string / number, required): The amount of native coin to wrap, in human-readable units. Passing it as a string is recommended, for example ```"0.01"```. ```all``` is not supported, because some native coin must be kept to pay for gas.
+
+Returns (object / null value): Returns ```{txHash, action, from, to, amount, raw}``` when the transaction is broadcast successfully. ```from``` and ```to``` are the names of the currency before and after the conversion. The call waits only for the transaction to be broadcast, not for it to be confirmed on-chain; use ```exchange.IO("receipt", ...)``` to check the on-chain result. Returns a null value and reports an error in cases such as insufficient balance.
+
+Wrap 0.01 ETH into WETH.
+
+```javascript
+function main() {
+    var r = exchange.IO("wrap", "0.01")
+    if (!r) {
+        Log("wrap failed:", GetLastError())
+        return
+    }
+    var rc = exchange.IO("receipt", r.txHash, 120000)
+    Log(r.from, "→", r.to, r.amount, "status:", rc.status)
+}
+```
+
+Calls the ```deposit()``` method of the wrapped token contract directly, without going through the swap router or liquidity pools. Orders cannot be placed on trading pairs such as ```ETH_WETH```. To convert between the native coin and the wrapped token, use ```exchange.IO("wrap", ...)``` and ```exchange.IO("unwrap", ...)```.
+
+See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `KyberSwap`, `1inch`, `exchange.IO`, `exchange.IO("unwrap")`, `exchange.IO("receipt")`, `exchange.IO("transfer")`
+
+##### exchange.IO("unwrap", ...)
+
+```
+exchange.IO(k, amount)
+```
+
+Forms:
+
+- `exchange.IO("unwrap", ...)`
+
+Unwraps the wrapped token (such as WETH or WBNB) into the native coin (such as ETH or BNB), 1:1 without slippage, costing only gas.
+
+Parameters:
+
+- `k` (string, required): Fixed as ```unwrap```, which means unwrapping wrapped tokens.
+- `amount` (string / number, required): The amount of wrapped tokens to unwrap, in human-readable units. Passing it as a string is recommended. Set it to ```all``` to unwrap the entire wrapped token balance.
+
+Returns (object / null value): Returns ```{txHash, action, from, to, amount, raw}``` when the transaction is broadcast successfully. Returns a null value and outputs an error message when the wrapped token balance is insufficient or zero.
+
+Unwrap all WETH into ETH.
+
+```javascript
+function main() {
+    var r = exchange.IO("unwrap", "all")
+    if (!r) {
+        Log("unwrap failed:", GetLastError())
+        return
+    }
+    var rc = exchange.IO("receipt", r.txHash, 120000)
+    Log(r.from, "→", r.to, r.amount, "status:", rc.status)
+}
+```
+
+Calls the ```withdraw(uint256)``` method of the wrapped token contract directly, bypassing both the swap router and the liquidity pools.
+
+See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `KyberSwap`, `1inch`, `exchange.IO`, `exchange.IO("wrap")`, `exchange.IO("receipt")`, `exchange.IO("transfer")`
+
+##### exchange.IO("approve", ...)
+
+```
+exchange.IO(k)
+exchange.IO(k, mode)
+```
+
+Forms:
+
+- `exchange.IO("approve", ...)`
+
+Sets the token approval mode: approve only what each swap needs, or grant an unlimited allowance.
+
+Parameters:
+
+- `k` (string, required): Fixed to ```approve```. Sets the token approval mode.
+- `mode` (string, optional): Approval mode. ```exact``` (default) approves only the amount needed for the current swap. ```max``` grants an unlimited allowance, so the same token does not need to be approved again. If this parameter is omitted, the call returns the current mode.
+
+Returns (string): Returns the current approval mode, either ```exact``` or ```max```.
+
+Set the token approval mode.
+
+```javascript
+function main() {
+    exchange.IO("approve", "max")
+    Log("Current approval mode:", exchange.IO("approve"))
+}
+```
+
+Before selling a token (using an ERC20 token as the input), the connector checks how much the router contract is allowed to spend. If that allowance is too low, the connector first sends an approval transaction and waits for it to be confirmed on-chain. Only then does it send the swap transaction. If the existing allowance is not 0 but is still too low, the connector first resets it to 0 and then approves again, because some tokens such as USDT require this.
+Uniswap V4 routes and PancakeSwap Infinity routes use a two-step approval. First, the token is approved for the Permit2 contract, following the same rules as above (each exchange uses its own Permit2). Second, the matching Universal Router is approved to spend through Permit2. In ```exact``` mode this second approval covers only the current amount and expires after 1 day. In ```max``` mode it is unlimited and expires after 30 days. For each step, a transaction is sent only when the allowance is too low or has expired.
+
+```max``` mode avoids later approval transactions and their gas fees, but the router contract can then spend your entire balance of that token. Choose the mode that fits your needs.
+
+Who gets approved depends on the exchange: on Uniswap and PancakeSwap, V2/V3 routes approve their router and V4/Infinity CL routes go through Permit2 (see above); Aerodrome and Velodrome approve the router used by the swap (the basic pools and both Slipstream generations each have their own); KyberSwap and 1inch approve the aggregator's router directly (MetaAggregationRouterV2 for KyberSwap, AggregationRouterV6 for 1inch), without Permit2. LP and bridge approvals follow this mode too: ```lp.add``` approves the PositionManager and ```bridge.send``` the ```approvalAddress``` of the LI.FI quote.
+
+See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `KyberSwap`, `1inch`, `exchange.IO`, `exchange.IO("transfer")`, `exchange.IO("simulate")`, `exchange.IO("gasMultiplier")`
+
+##### exchange.IO("slippage", ...)
+
+```
+exchange.IO(k)
+exchange.IO(k, ratio)
+```
+
+Forms:
+
+- `exchange.IO("slippage", ...)`
+
+Sets the slippage protection of market orders.
+
+Parameters:
+
+- `k` (string, required): Fixed as ```slippage```, which sets the slippage protection for market orders.
+- `ratio` (number, optional): Slippage ratio, in the range ```[0, 0.5)```. The default value is ```0.005``` (i.e. 0.5%). If this parameter is omitted, the current slippage ratio is returned.
+
+Returns (number): Returns the current slippage ratio.
+
+Set the slippage protection for market orders.
+
+```javascript
+function main() {
+    exchange.IO("slippage", 0.01)     // 1%
+    Log("Slippage:", exchange.IO("slippage"))
+}
+```
+
+A market order takes the quote at the time the order is placed, deducts the slippage, calculates the minimum amount to receive and writes it into the on-chain transaction. If the price moves beyond the slippage range by the time the trade executes, the whole transaction is reverted (only the gas fee is lost).
+
+You can also append ```;{"slippage":0.01}``` to the direction parameter of ```exchange.CreateOrder()``` to set the slippage for a single order. Limit orders do not use slippage, because the limit price is already the worst execution price.
+
+See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `KyberSwap`, `1inch`, `exchange.IO`, `exchange.IO("route")`, `exchange.IO("simulate")`, `exchange.IO("deadline")`, `exchange.CreateOrder`
+
+##### exchange.IO("deadline", ...)
+
+```
+exchange.IO(k)
+exchange.IO(k, seconds)
+```
+
+Forms:
+
+- `exchange.IO("deadline", ...)`
+
+Sets the deadline of swap transactions, or queries it.
+
+Parameters:
+
+- `k` (string, required): Fixed as ```deadline```, which sets or queries the transaction deadline.
+- `seconds` (number, optional): Transaction validity period in seconds. Valid range is 10–86400 and the default is 120. If this parameter is omitted, the current value is queried.
+
+Returns (number): Returns the current transaction deadline in seconds.
+
+Set the transaction deadline and query the current value.
+
+```javascript
+function main() {
+    exchange.IO("deadline", 300)
+    Log("Deadline:", exchange.IO("deadline"), "seconds")
+}
+```
+
+If a swap transaction is not confirmed on-chain before the deadline, it is reverted when executed. This prevents a transaction that has been pending for a long time from being filled after a large price move.
+
+The KyberSwap exchange object passes the deadline to KyberSwap when the swap transaction is built; transactions built by 1inch carry no deadline, so the setting has no effect on swaps of a OneInch exchange object.
+
+See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `KyberSwap`, `1inch`, `exchange.IO`, `exchange.IO("slippage")`, `exchange.IO("gasMultiplier")`, `exchange.IO("cancelWait")`
+
+##### exchange.IO("cancelWait", ...)
+
+```
+exchange.IO(k)
+exchange.IO(k, seconds)
+```
+
+Forms:
+
+- `exchange.IO("cancelWait", ...)`
+
+Sets how long a cancel waits for its result.
+
+Parameters:
+
+- `k` (string, required): Fixed to ```cancelWait```. Sets the maximum time to wait for the result after cancelling an order.
+- `seconds` (number, optional): Wait time in seconds. The range is 0 to 600 and the default is 30. Set it to 0 to return as soon as the cancellation transaction is sent. Leave it out to query the current value.
+
+Returns (number): Returns the current wait time in seconds.
+
+Increase the wait time before cancelling, and handle a failed cancellation.
+
+```javascript
+function main() {
+    exchange.IO("cancelWait", 60)
+    var id = exchange.CreateOrder("ETH_USDC", "buy", 2000, 0.01)
+    if (id && !exchange.CancelOrder(id)) {
+        Log("Cancel failed:", GetLastError())
+    }
+    Log(exchange.GetOrder(id))
+}
+```
+
+An on-chain cancellation sends a replacement transaction with the same nonce, so there is no way to know whether the original order transaction or the cancellation transaction will be included on-chain first. After ```exchange.CancelOrder()``` sends the cancellation transaction, it checks for the result during the wait time. If the cancellation transaction is included first, it returns ```true```. If the original order transaction is included first (filled or failed), it returns ```false```, and you can call `GetLastError` to see why. If the wait times out, it returns ```true```, which means the cancellation transaction has been submitted. Use the result of `exchange.GetOrder` to get the final status.
+
+Ethereum mainnet produces a block about every 12 seconds, so the 30-second default is about two to three blocks. Chains with faster block times (Base, Arbitrum, BNB Chain) usually return a result within a few seconds.
+
+See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `KyberSwap`, `1inch`, `exchange.IO`, `exchange.IO("receipt")`, `exchange.IO("deadline")`, `exchange.CancelOrder`
+
+##### exchange.IO("gasMultiplier", ...)
+
+```
+exchange.IO(k)
+exchange.IO(k, x)
+```
+
+Forms:
+
+- `exchange.IO("gasMultiplier", ...)`
+
+Sets the gas limit multiplier: a transaction's gasLimit is the node's gas estimate times this value.
+
+Parameters:
+
+- `k` (string, required): Always ```gasMultiplier```, which sets the gas limit multiplier.
+- `x` (number, optional): The multiplier, from 1 to 5. The default is 1.2. A transaction's gasLimit is the node's gas estimate times this multiplier. If you leave this parameter out, the call returns the current multiplier.
+
+Returns (number): Returns the current multiplier.
+
+Set the gas limit multiplier.
+
+```javascript
+function main() {
+    exchange.IO("gasMultiplier", 1.5)
+    Log("gas multiplier:", exchange.IO("gasMultiplier"))
+}
+```
+
+gasLimit is only a cap. The actual fee is charged on the gas the transaction uses, so a higher multiplier does not raise what you pay. However, the wallet balance must be enough to cover the fee at the full gasLimit.
+
+Some LP transactions settle fees that an existing position has earned: increasing liquidity, decreasing liquidity, collecting fees and removing liquidity. On Aerodrome and Velodrome this also includes staking, unstaking and claiming rewards. For these transactions, gasLimit is the larger of "estimate × multiplier" and "estimate + buffer". The buffer is 50000 per position, plus 40000 for each fee (or reward) transfer. This is needed because a position may have no fees yet when gas is estimated, but earn fees before the transaction is confirmed on-chain, and then execution needs extra accounting and token transfers. For ```exchange.IO("bridge.send", ...)```, gasLimit is never lower than the ```gasLimit``` given in the LI.FI quote.
+
+See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `KyberSwap`, `1inch`, `exchange.IO`, `exchange.IO("deadline")`, `exchange.IO("simulate")`, `exchange.IO("slippage")`
+
+##### exchange.IO("lp.pools", ...)
+
+```
+exchange.IO(k, token)
+exchange.IO(k, token, quote)
+```
+
+Forms:
+
+- `exchange.IO("lp.pools", ...)`
+
+Lists every LP pool of a token (V3 and V4/Infinity CL pools on Uniswap and PancakeSwap, Slipstream and basic pools on Aerodrome and Velodrome) with fee, price, liquidity, TVL and 24h volume, largest TVL first.
+
+Parameters:
+
+- `k` (string, required): Set to ```lp.pools``` to list pools.
+- `token` (string, required): Token name or contract address, such as ```ETH```, ```WETH``` or ```UNI```. The pools' ```symbol``` uses this spelling.
+- `quote` (string, optional): Quote token such as ```USDC```: only pools of this pair are listed. When omitted, the token's pools against the chain's wrapped native token, USDC and USDT are listed.
+
+Returns (array / null value): An array of pools ```[{id, protocol, dex, symbol, fee, feeRate, tickSpacing, tick, price, liquidity, reserveBase, reserveQuote, tvlQuote, tvlUsd, volume24hUsd, fees24hUsd, empty}]```; see the remarks for the fields. Null when the token is unknown or the node fails, with the reason in ```GetLastError()```.
+
+List the ETH/USDC pools and look at the largest by TVL and volume.
+
+```javascript
+function main() {
+    var pools = exchange.IO("lp.pools", "ETH", "USDC")
+    if (!pools) {
+        Log("Query failed:", GetLastError())
+        return
+    }
+    pools.slice(0, 5).forEach(function (p) {
+        Log(p.protocol, p.id, "fee:", p.feeRate, "TVL:", p.tvlUsd, "24h volume:", p.volume24hUsd)
+    })
+}
+```
+
+Aerodrome and Velodrome: rank the pools whose gauge still pays rewards by reward APR.
+
+```javascript
+function main() {
+    var pools = exchange.IO("lp.pools", "ETH", "USDC").filter(function (p) {
+        return p.gaugeAlive && p.rewardAprPct !== null
+    })
+    pools.sort(function (a, b) { return b.rewardAprPct - a.rewardAprPct })
+    pools.slice(0, 3).forEach(function (p) {
+        Log(p.protocol, p.id, "tick spacing:", p.tickSpacing, "reward APR %:", p.rewardAprPct,
+            "staked share:", p.stakedShare)
+    })
+}
+```
+
+Fields of each item:
+
+| Field | Description |
+| - | - |
+| ```id``` | Pool ID: the pool contract address for V3, Slipstream and basic pools, the PoolId (```0x``` plus 64 hex digits) for V4/Infinity CL; pass it to ```lp.pool```, ```lp.ticks``` and ```pool``` of ```lp.plan``` |
+| ```protocol``` | Pool type: ```v3```; ```v4``` for Uniswap V4, ```infinity``` for PancakeSwap Infinity CL; ```slipstream``` (old factory), ```slipstream2``` (new factory), ```volatile``` and ```stable``` (basic pools) on Aerodrome and Velodrome |
+| ```dex```, ```symbol``` | Exchange name and the pool's pair (such as ```WETH_USDC```) |
+| ```fee```, ```feeRate``` | Fee: ```fee``` in millionths (500 = 0.05%), ```feeRate``` as a fraction (0.0005); Slipstream pools set their own (possibly dynamic) fee, and this is the current value |
+| ```tickSpacing```, ```tick``` | Tick spacing and current tick; ```null``` for basic pools, which have no ticks |
+| ```price``` | Current price, quote per token |
+| ```liquidity``` | Liquidity at the current price (decimal string) |
+| ```reserveBase```, ```reserveQuote``` | Both token balances of the pool; ```null``` for V4/Infinity CL, which is a singleton contract |
+| ```tvlQuote```, ```tvlUsd``` | TVL in the quote token and in USD (from GeckoTerminal for V4/Infinity CL) |
+| ```volume24hUsd```, ```fees24hUsd``` | 24h volume and fees in USD from GeckoTerminal, ```null``` when unavailable |
+| ```empty``` | ```true``` when there is no liquidity at the current price, which makes the price meaningless: ```price```, ```tvlQuote``` and ```tvlUsd``` are ```null``` and the pool comes last |
+
+On Aerodrome and Velodrome each item also has ```stable``` (whether a basic pool uses the stable curve, ```null``` for Slipstream) and gauge data: ```gauge``` (gauge address), ```gaugeAlive``` (whether the gauge still pays rewards), ```stakedShare``` (the share of the liquidity at the current price staked in the gauge), ```rewardsPerDay``` and ```rewardsPerDayUsd``` (reward tokens emitted per day and their USD value) and ```rewardAprPct``` (the reward APR on the staked TVL, %). The APR extrapolates the current per-second rewards and moves with the reward token's price and the staked amount. It is an instantaneous figure: on Slipstream pools ```stakedShare``` is the staked share of the in-range liquidity at the current tick, which jumps as the price moves and positions go in and out of range, so ```rewardAprPct``` can change several-fold within minutes; when picking pools or estimating returns with it, sample it over time and average.
+
+Uniswap and PancakeSwap list only hookless V4/Infinity CL pools: Uniswap V4 lists native and wrapped-token pools separately (such as ```ETH_USDC``` and ```WETH_USDC```); PancakeSwap Infinity CL lists only pools with a fee of at most 1%, and since it has no fixed fee tiers the list holds the pools collected from recent on-chain trades for swap routing and the pools used in this process; any other pool can be passed by its PoolId to ```lp.pool``` and ```lp.plan```.
+
+GeckoTerminal data is cached in the process for 5 minutes and shared with ```lp.select``` and ```lp.plan```; when rate-limited it waits and retries once, and the fields are ```null``` if that also fails.
+
+The KyberSwap and 1inch exchange objects (aggregators) have no LP commands; calls fail with ```LP functions are not available for KyberSwap on Base```.
+
+See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("lp.select")`, `exchange.IO("lp.pool")`, `exchange.IO("lp.plan")`, `exchange.IO("lp.positions")`
+
+##### exchange.IO("lp.select", ...)
+
+```
+exchange.IO(k, token, budget)
+exchange.IO(k, token, budget, options)
+```
+
+Forms:
+
+- `exchange.IO("lp.select", ...)`
+
+Picks an LP pool by rule: the pool with the largest 24h volume among those with enough liquidity, or the pool of a given fee tier.
+
+Parameters:
+
+- `k` (string, required): Set to ```lp.select``` to pick a pool.
+- `token` (string, required): Token name or contract address, such as ```ETH```.
+- `budget` (number, required): Budget in the quote token, which sets the liquidity threshold: a pool's TVL must be at least max($5000, budget).
+- `options` (object, optional): Selection options ```{quote, fee, exact, protocol, tickSpacing}```, all optional; see the remarks.
+
+Returns (object / null value): The chosen pool: an item of ```lp.pools``` plus ```reason``` (why it was chosen). Null with an error when no pool has liquidity, when the fee tier does not exist (with ```exact``` ```true```), and so on.
+
+Pick an ETH/USDC pool, then pick one among the V4 pools only.
+
+```javascript
+function main() {
+    var p = exchange.IO("lp.select", "ETH", 1000, {quote: "USDC"})
+    if (!p) {
+        Log("Selection failed:", GetLastError())
+        return
+    }
+    Log("Chosen:", p.protocol, p.id, "fee:", p.feeRate, "reason:", p.reason)
+    // V4 pools only (infinity on PancakeSwap, slipstream etc. on Aerodrome and Velodrome)
+    var v4 = exchange.IO("lp.select", "ETH", 1000, {quote: "USDC", protocol: "v4"})
+    Log("V4 pool:", v4 ? v4.id : GetLastError())
+}
+```
+
+Keys of ```options```:
+
+| Key | Description |
+| - | - |
+| ```quote``` | Quote token such as ```USDC```; when omitted, pools against the chain's wrapped native token, USDC and USDT are all compared |
+| ```fee``` | Preferred fee tier in millionths, such as ```500``` |
+| ```exact``` | ```true``` uses only the fee tier given in ```fee``` |
+| ```protocol``` | Pool type, a string or an array: ```v3``` and ```v4``` on Uniswap, ```v3``` and ```infinity``` on PancakeSwap, ```slipstream```, ```slipstream2```, ```volatile``` and ```stable``` on Aerodrome and Velodrome |
+| ```tickSpacing``` | Only pools with this tick spacing (mainly for Slipstream, whose pools are told apart by tick spacing) |
+
+The rule: empty pools and pools not matching ```protocol``` or ```tickSpacing``` are dropped first; with ```fee```, the pool of that tier is chosen when it meets the liquidity threshold (```reason``` ```fee tier 500 requested```), and with ```exact``` ```true``` it is chosen even below the threshold, failing when no pool has that tier; otherwise, among pools whose TVL is at least max($5000, budget), the one with the largest 24h volume (```largest 24h volume among pools with enough liquidity```), or the largest TVL without volume data; when no pool meets the threshold, the largest TVL, as ```reason``` says.
+
+```exchange.IO("lp.plan", ...)``` without ```pool``` picks a pool by the same rule (with ```fee``` and ```tickSpacing``` from the plan parameters; on Aerodrome and Velodrome a plan with a ```range``` picks among Slipstream pools only). To add liquidity to a V4/Infinity CL pool on Uniswap or PancakeSwap, pick it with ```protocol``` first and pass its ```id``` as the plan's ```pool```.
+
+See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("lp.pools")`, `exchange.IO("lp.plan")`, `exchange.IO("lp.pool")`
+
+##### exchange.IO("lp.pool", ...)
+
+```
+exchange.IO(k, poolId)
+```
+
+Forms:
+
+- `exchange.IO("lp.pool", ...)`
+
+Queries a pool's live state: both tokens, fee, tick spacing, current tick, price and liquidity.
+
+Parameters:
+
+- `k` (string, required): Set to ```lp.pool``` to query a pool.
+- `poolId` (string, required): Pool ID: the pool contract address for V3, Slipstream and basic pools, the PoolId (```0x``` plus 64 hex digits) for V4/Infinity CL; take it from ```id``` of ```lp.pools``` or ```lp.select```.
+
+Returns (object / null value): ```{id, protocol, currency0, currency1, token0, token1, fee, tickSpacing, tick, sqrtPriceX96, price0, price1, liquidity}```; see the remarks for the fields. Null with an error when the pool does not exist.
+
+Look at the token order and prices of the chosen pool.
+
+```javascript
+function main() {
+    var p = exchange.IO("lp.select", "ETH", 1000, {quote: "USDC"})
+    var pool = exchange.IO("lp.pool", p.id)
+    if (!pool) {
+        Log("Query failed:", GetLastError())
+        return
+    }
+    Log(pool.token0.symbol, "/", pool.token1.symbol, "tick:", pool.tick,
+        "tick spacing:", pool.tickSpacing)
+    Log("1", pool.token0.symbol, "=", pool.price0, pool.token1.symbol)
+}
+```
+
+The pool is ordered by the contract's ```token0``` and ```token1``` (the smaller address is ```token0```), which need not match a pair's base and quote: ```token0``` and ```token1``` are ```{address, decimals, symbol}```, ```currency0``` and ```currency1``` the two addresses (the native coin is the zero address in V4/Infinity CL pools); ```price0``` is token1 per token0 and ```price1``` token0 per token1; ```sqrtPriceX96``` and ```liquidity``` are the pool's raw values as decimal strings.
+
+Uniswap and PancakeSwap: V3 pools must come from this exchange's factory (```pool … not found``` when there is no pool at the address); V4/Infinity CL pools must be hookless, Uniswap V4 knows pools that have had positions on the PositionManager or were listed by ```lp.pools```, and any initialized PancakeSwap Infinity CL pool can be looked up by its PoolId.
+
+Aerodrome and Velodrome: the result also has the gauge data of ```lp.pools``` (```gauge```, ```gaugeAlive```, ```stakedShare```, ```rewardsPerDay```, ```rewardsPerDayUsd```, ```rewardAprPct```; ```rewardAprPct``` uses the same TVL as ```lp.pools``` and is the same jumpy instantaneous figure, see the ```lp.pools``` page); basic pools also have the reserves ```reserve0``` and ```reserve1``` and the LP token supply ```lpSupply```.
+
+See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("lp.pools")`, `exchange.IO("lp.ticks")`, `exchange.IO("lp.plan")`
+
+##### exchange.IO("lp.ticks", ...)
+
+```
+exchange.IO(k, poolId, tickLower, tickUpper)
+exchange.IO(k, poolId, tickLower, tickUpper, step)
+```
+
+Forms:
+
+- `exchange.IO("lp.ticks", ...)`
+
+Queries a pool's liquidity distribution over a tick range, giving the liquidity and both token amounts per segment.
+
+Parameters:
+
+- `k` (string, required): Set to ```lp.ticks``` to query the liquidity distribution.
+- `poolId` (string, required): Pool ID as in ```exchange.IO("lp.pool", ...)```; not applicable to basic pools, which have no ticks.
+- `tickLower` (number, required): Lower end of the range (tick).
+- `tickUpper` (number, required): Upper end of the range (tick).
+- `step` (number, optional): Segment width in ticks; the pool's tick spacing by default.
+
+Returns (object / null value): ```{pool, tick, token0, token1, segments}```, where ```segments``` lists ```{tickLower, tickUpper, price0Lower, price0Upper, liquidity, amount0, amount1, current}```; see the remarks. Null with an error when the range is too wide.
+
+Look at the liquidity within 10 tick spacings on either side of the price.
+
+```javascript
+function main() {
+    var p = exchange.IO("lp.select", "ETH", 1000, {quote: "USDC"})
+    var pool = exchange.IO("lp.pool", p.id)
+    var w = pool.tickSpacing * 10
+    var r = exchange.IO("lp.ticks", p.id, pool.tick - w, pool.tick + w, pool.tickSpacing * 2)
+    r.segments.forEach(function (s) {
+        Log(s.tickLower, s.tickUpper, s.current ? "<- price" : "",
+            pool.token0.symbol, s.amount0, pool.token1.symbol, s.amount1)
+    })
+}
+```
+
+Each segment's ```liquidity``` is the liquidity inside it and ```amount0``` and ```amount1``` the amounts of both tokens in it (summed over the initialized ticks, in token units); ```price0Lower``` and ```price0Upper``` give token1 per token0 at the two ends; the segment with ```current``` ```true``` contains the current tick and is the only one holding both tokens. The token order is that of ```lp.pool```.
+
+The range is read through the tick bitmap; spans of more than 120 bitmap words (each covering 256 tick spacings) fail, so narrow the range or query it in parts.
+
+See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("lp.pool")`, `exchange.IO("lp.plan")`
+
+##### exchange.IO("lp.plan", ...)
+
+```
+exchange.IO(k, params)
+```
+
+Forms:
+
+- `exchange.IO("lp.plan", ...)`
+
+Builds a position plan (read-only, costs nothing): from a budget, a price range and a shape, it computes each position's range, liquidity and token amounts, whether the wallet covers them and what must be swapped first.
+
+Parameters:
+
+- `k` (string, required): Set to ```lp.plan``` to build a plan.
+- `params` (object, required): Plan parameters such as ```{symbol: "ETH_USDC", budget: 100, range: {pct: [-5, 5]}}```; ```symbol``` and ```budget``` are required, and concentrated-liquidity pools also need ```range```; see the remarks.
+
+Returns (object / null value): The plan; see the remarks for its fields. Pass it unchanged to ```lp.simulate``` or ```lp.add```. Null with an error for bad parameters, an unknown pool or no liquidity at the current price. When the wallet falls short the plan is still returned, with ```shortfall``` explaining it.
+
+Plan a ±5% range position in the chosen pool and see the funds needed and whether the wallet covers them.
+
+```javascript
+function main() {
+    var sel = exchange.IO("lp.select", "ETH", 100, {quote: "USDC"})
+    var params = {symbol: "ETH_USDC", budget: 100, pool: sel.id, range: {pct: [-5, 5]}}
+    var plan = exchange.IO("lp.plan", params)
+    if (!plan) {
+        Log("Plan failed:", GetLastError())
+        return
+    }
+    var p = plan.positions[0]
+    Log("Range:", p.priceLower, "~", p.priceUpper, "price:", plan.price)
+    Log("Needs:", plan.needBase, "ETH +", plan.needQuote, "USDC")
+    Log("Estimated daily fees:", plan.estDailyFeesUsd, "USD")
+    if (plan.swap) {
+        Log("Swap first:", plan.swap.side, plan.swap.amount, plan.swap.currency)
+    }
+    if (plan.shortfall) {
+        Log("Wallet short:", plan.shortfall)
+    }
+}
+```
+
+A three-layer curve: the positions near the price are the thickest.
+
+```javascript
+function main() {
+    var plan = exchange.IO("lp.plan", {symbol: "ETH_USDC", budget: 100, range: {pct: [-5, 5]},
+        shape: "curve", layers: 3})
+    plan.positions.forEach(function (p) {
+        Log(p.priceLower, "~", p.priceUpper, "share of budget:", p.share)
+    })
+    if (plan.warning) {
+        Log(plan.warning)
+    }
+}
+```
+
+Aerodrome and Velodrome: a plan without range is a basic (volatile) pool plan.
+
+```javascript
+function main() {
+    var plan = exchange.IO("lp.plan", {symbol: "ETH_USDC", budget: 100, stable: false})
+    Log(plan.protocol, plan.pool, "deposit:", plan.amountBase, "ETH +", plan.amountQuote, "USDC",
+        "LP tokens:", plan.lpTokens)
+}
+```
+
+Keys of ```params```:
+
+| Key | Description |
+| - | - |
+| ```symbol``` | Pair such as ```ETH_USDC```; prices are quote per base |
+| ```budget``` | Budget in the quote token |
+| ```range``` | Price range, in one of three forms: ```{lower, upper}``` prices; ```{pct: [-5, 5]}``` percent around the current price; ```{ticks: [lo, hi]}``` ticks. Aligned to the pool's tick spacing |
+| ```shape``` | ```spot``` (default) one range; ```curve``` nested layers, thickest at the price; ```bidask``` segments on both sides, thicker further out |
+| ```layers``` | Number of layers for ```curve``` and ```bidask```, default 3, at most 20 |
+| ```pool``` | Pool ID; when omitted the pool is picked by the ```lp.select``` rule (using ```fee``` and ```tickSpacing``` below) |
+| ```fee``` | Preferred fee tier when picking the pool (millionths) |
+| ```slippage``` | Price protection, default ```0.01``` (1%), at most 0.5 |
+| ```tickSpacing```, ```protocol``` | Aerodrome and Velodrome: filters when picking a Slipstream pool; ```protocol``` defaults to ```["slipstream", "slipstream2"]``` |
+| ```stable``` | Aerodrome and Velodrome basic-pool plan: ```true``` a stable pool, ```false``` a volatile pool; both when omitted |
+| ```stake``` | Aerodrome and Velodrome: ```true``` makes ```lp.add``` stake into the gauge right after adding |
+
+Fields of the plan:
+
+| Field | Description |
+| - | - |
+| ```params``` | The parameters, echoed |
+| ```symbol```, ```pool```, ```protocol```, ```fee```, ```tickSpacing```, ```tick```, ```price``` | The chosen pool and the current price |
+| ```shape```, ```layers```, ```layersRequested``` | Shape, actual and requested layer count; ```warning``` explains a count below the request |
+| ```budget```, ```budgetUsd``` | Budget in the quote token and in USD |
+| ```positions``` | Each position ```{tickLower, tickUpper, priceLower, priceUpper, liquidity, amountBase, amountQuote, share}```, ```share``` being its part of the budget |
+| ```needBase```, ```needQuote``` | Token amounts the positions need |
+| ```haveBase```, ```haveQuote``` | Amounts available in the wallet |
+| ```swap``` | The swap needed first, ```{side, amount, currency}``` (```sell``` sells base, ```buy``` buys base), or ```null``` |
+| ```payWith``` | With a native pair, the coin that pays the wrapped-token side (such as ```ETH``` or ```WETH```); otherwise ```null``` |
+| ```shortfall``` | Why the wallet falls short, or ```null```; ```lp.add``` fails while it is set. Its content is described under Funding below |
+| ```shareOfPool``` | Share of the pool's liquidity at the current price after adding |
+| ```volume24hUsd```, ```estDailyFeesUsd``` | The pool's 24h volume and the daily fees estimated from the pool share (USD), an extrapolation of past volume |
+| ```slippageBps``` | Price protection in basis points |
+
+Funding: a token the wallet lacks is bought with the other one (1% extra), ```swap``` gives the amount and ```lp.add``` places that market order first; when the two tokens together do not cover the budget, ```shortfall``` explains it: the two amounts the plan deposits (the same as ```needBase``` and ```needQuote```), what the wallet holds (```haveBase```, ```haveQuote```) and its value in the quote token at the pool price, and, when the missing token has to be bought with the other one, how much of that other token is needed in all (deposit plus swap cost, with 1% headroom) and how much is missing. For example, with a budget of 100 USDC, a plan depositing 0.02 ETH + 50 USDC and a wallet holding only 60 USDC, it says that buying the missing 0.02 ETH takes about 50.5 USDC, so the USDC side needs 100.5 USDC in all (50 to deposit + 50.5 for the swap) and is 40.5 USDC short. About 3 million gas at the current gas price is kept back from the native coin for fees. In V3 and Slipstream pools the native coin takes part as its wrapped token, so with a native pair (such as ```ETH_USDC```) the wrapped-token side is paid either entirely in the native coin or entirely in the wrapped token, never a mix: the native coin when it covers the whole side, otherwise the wrapped token when that does, and when neither does the larger balance is used for the calculation; ```payWith``` is the coin actually used. In V4/Infinity CL native and wrapped pools are different pools, each using its own coin.
+
+Pool choice: without ```pool``` the pool is picked by the ```lp.select``` rule every time, and ```lp.simulate``` and ```lp.add``` recompute a plan from its ```params``` (at the latest pool price), so they may pick another pool; to add to the pool you looked at, put ```pool``` in ```params```. V4/Infinity CL pools on Uniswap and PancakeSwap always need ```pool``` (from ```lp.select``` with ```{protocol: "v4"}``` or ```{protocol: "infinity"}```).
+
+Range and shape: a range above the current price holds only the base token and one below it only the quote token; ```estDailyFeesUsd``` is then 0, and fees are earned once the price enters the range. ```curve``` layers all cross the current price, are distinct and aligned to the tick spacing, nesting inward first and filling with the range's other price-crossing combinations when nesting runs out; a two-sided range holds at most (legal lower bounds below the price) × (legal upper bounds above it) layers, and beyond that the plan gives as many as fit.
+
+Aerodrome and Velodrome: a ```range``` means a Slipstream pool; without ```range``` (or with a basic ```pool```) the plan is for a basic pool, depositing both tokens in the reserve ratio, and is ```{params, symbol, pool, protocol, stable, fee, price, budget, budgetUsd, needBase, needQuote, haveBase, haveQuote, amountBase, amountQuote, lpTokens, swap, shortfall, shareOfPool, volume24hUsd, estDailyFeesUsd, slippageBps}```, ```lpTokens``` being the expected LP tokens. ```stake``` ```true``` stakes right after adding (see `exchange.IO("lp.stake")`).
+
+See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("lp.select")`, `exchange.IO("lp.simulate")`, `exchange.IO("lp.add")`, `exchange.IO("lp.pools")`
+
+##### exchange.IO("lp.simulate", ...)
+
+```
+exchange.IO(k, plan)
+exchange.IO(k, plan, stateOverride)
+```
+
+Forms:
+
+- `exchange.IO("lp.simulate", ...)`
+
+Runs a plan's add-liquidity transaction with ```eth_call``` (nothing is signed, broadcast or paid) to confirm it executes and see the amounts it uses.
+
+Parameters:
+
+- `k` (string, required): Set to ```lp.simulate``` to simulate adding liquidity.
+- `plan` (object, required): A plan returned by ```exchange.IO("lp.plan", ...)```, or its ```params```; it is recomputed from ```params``` at the latest pool price and then simulated.
+- `stateOverride` (object, optional): State override for the node's ```eth_call``` (geth's state override set), to give the wallet a temporary balance or allowance, such as ```{"0xWalletAddress": {"balance": "0x56bc75e2d63100000"}}```; it applies to this simulation only.
+
+Returns (object / null value): ```{pool, positions: [{liquidity, amountBase, amountQuote}], value, swapNeeded, note}```; see the remarks. Null with an error when the transaction would revert (short balance or allowance, price beyond the protection, and so on).
+
+Give the wallet a temporary 100 ETH and simulate a range above the price that uses only ETH.
+
+```javascript
+function main() {
+    var plan = exchange.IO("lp.plan", {symbol: "ETH_USDC", budget: 100, range: {pct: [2, 10]}})
+    var ov = {}
+    ov[exchange.IO("address")] = {balance: "0x56bc75e2d63100000"}
+    var r = exchange.IO("lp.simulate", plan, ov)
+    if (!r) {
+        Log("Simulation failed:", GetLastError())
+        return
+    }
+    Log("Pool:", r.pool, "ETH sent (wei):", r.value)
+    r.positions.forEach(function (p) {
+        Log("Liquidity:", p.liquidity, "uses:", p.amountBase, "ETH +", p.amountQuote, "USDC")
+    })
+}
+```
+
+Aerodrome and Velodrome: a basic-pool plan simulates without any balance.
+
+```javascript
+function main() {
+    var plan = exchange.IO("lp.plan", {symbol: "ETH_USDC", budget: 100, stable: false})
+    var r = exchange.IO("lp.simulate", plan)
+    Log(r.protocol, "LP tokens:", r.lpTokens)
+    Log("Deposit:", r.amountBase, "ETH +", r.amountQuote, "USDC")
+}
+```
+
+Fields: ```positions``` gives each position's minted liquidity and the token amounts used; ```value``` is the native coin sent with the transaction (decimal string in the smallest unit, non-zero when paying in the native coin); ```swapNeeded``` ```true``` means the plan needs a swap first, so the post-swap amounts are simulated and the token the wallet does not hold yet must be supplied with ```stateOverride```, or the call reverts on the transfer (an error such as ```execution reverted: STF```).
+
+Allowances: the transaction pulls tokens from the wallet, so a short allowance for the PositionManager (Permit2 for V4/Infinity CL) also reverts; a real ```lp.add``` approves automatically, while a simulation either pays in the native coin (no approval needed) or supplies the allowance in ```stateOverride```. A plan that needs only the native coin (such as a range above the price on a native pair) simulates with just a ```balance``` for the wallet.
+
+V4/Infinity CL pools on Uniswap and PancakeSwap pay tokens through Permit2, so supply the token's approval of Permit2 and the PositionManager allowance inside Permit2 (the Permit2 address is ```v4.permit2``` in ```exchange.IO("contracts")```); their PositionManager returns no amounts, so the result shows the planned amounts plus ```tickLower``` and ```tickUpper```, and ```note``` says so (no revert means the amounts fit).
+
+Basic pools on Aerodrome and Velodrome are simulated with the Router's ```quoteAddLiquidity```, which needs no balances or approvals, returning ```{pool, protocol, lpTokens, amountBase, amountQuote, swapNeeded, note}```.
+
+See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("lp.plan")`, `exchange.IO("lp.add")`, `exchange.IO("simulate")`
+
+##### exchange.IO("lp.add", ...)
+
+```
+exchange.IO(k, plan)
+```
+
+Forms:
+
+- `exchange.IO("lp.add", ...)`
+
+Adds liquidity by a plan: swaps first when needed, approves, creates every position of the plan in one transaction and returns the position IDs once it is mined.
+
+Parameters:
+
+- `k` (string, required): Set to ```lp.add``` to add liquidity.
+- `plan` (object, required): A plan returned by ```exchange.IO("lp.plan", ...)```, or its ```params```; it is recomputed from ```params``` at the latest pool price.
+
+Returns (object / null value): ```{txHash, swapTxHash, pool, positions: [{id, tickLower, tickUpper, priceLower, priceUpper, liquidity, amountBase, amountQuote}]}```: ```txHash``` is the add transaction, ```swapTxHash``` the swap before it (```null``` without one), and ```id``` in ```positions``` the position ID. Null with an error on failure.
+
+Add a ±5% position in the chosen pool.
+
+```javascript
+function main() {
+    var sel = exchange.IO("lp.select", "ETH", 200, {quote: "USDC"})
+    var params = {symbol: "ETH_USDC", budget: 200, pool: sel.id, range: {pct: [-5, 5]}}
+    var plan = exchange.IO("lp.plan", params)
+    if (!plan || plan.shortfall) {
+        Log("Cannot add:", plan ? plan.shortfall : GetLastError())
+        return
+    }
+    var r = exchange.IO("lp.add", plan)
+    if (!r) {
+        Log("Adding failed:", GetLastError())
+        return
+    }
+    r.positions.forEach(function (p) {
+        Log("Position", p.id, "range", p.priceLower, "~", p.priceUpper,
+            "uses", p.amountBase, "ETH +", p.amountQuote, "USDC")
+    })
+}
+```
+
+A complete LP strategy: pick a pool, plan, simulate and add; check the positions every minute, collect fees once they are large enough, and withdraw and re-add after the price stays out of range.
+
+```javascript
+// The complete LP flow: pick a pool → plan → simulate → add → monitor → collect fees
+// → withdraw and re-add after the price leaves the range
+var SYMBOL = "ETH_USDC"
+var BUDGET = 200              // budget of each position (USDC)
+var RANGE = {pct: [-5, 5]}    // ±5% around the price
+var OUT_LIMIT = 30            // withdraw and re-add after this many checks (minutes) out of range
+var MIN_FEES = 5              // collect once uncollected fees exceed this many USDC
+
+function open() {
+    var sel = exchange.IO("lp.select", "ETH", BUDGET, {quote: "USDC"})
+    if (!sel) {
+        Log("Pool selection failed:", GetLastError())
+        return null
+    }
+    var plan = exchange.IO("lp.plan", {symbol: SYMBOL, budget: BUDGET, pool: sel.id, range: RANGE})
+    if (!plan || plan.shortfall) {
+        Log("Cannot add:", plan ? plan.shortfall : GetLastError())
+        return null
+    }
+    Log("Pool", plan.pool, plan.protocol, "est. daily fees", plan.estDailyFeesUsd, "USD")
+    // a plan that needs a swap cannot be simulated before the swap (lp.add swaps first)
+    if (!plan.swap && !exchange.IO("lp.simulate", plan)) {
+        Log("Simulation failed:", GetLastError())
+        return null
+    }
+    var r = exchange.IO("lp.add", plan)
+    if (!r) {
+        Log("Adding failed:", GetLastError())
+        return null
+    }
+    var ids = r.positions.map(function (p) { return p.id })
+    _G("lpIds", ids)    // keep the IDs to find the positions again after a restart
+    Log("Added", ids, "transaction", r.txHash)
+    return ids
+}
+
+function main() {
+    var ids = _G("lpIds")
+    if (ids) {
+        // lets lp.positions find V4/Infinity CL and Aerodrome/Velodrome positions after a restart
+        exchange.IO("lp.track", ids)
+    }
+    var outCount = 0
+    while (true) {
+        if (!ids) {
+            ids = open()
+            if (!ids) {
+                Sleep(60000)
+                continue
+            }
+        }
+        var mine = (exchange.IO("lp.positions", SYMBOL) || []).filter(function (p) {
+            return ids.indexOf(p.id) >= 0 && !p.closed
+        })
+        if (mine.length == 0) {
+            ids = null
+            continue
+        }
+        var fees = 0
+        var inRange = false
+        mine.forEach(function (p) {
+            fees += p.feesValue
+            inRange = inRange || p.inRange
+        })
+        LogStatus(_D(), "positions", ids, inRange ? "in range" : "out of range",
+            "fees", fees, "USDC")
+        if (fees > MIN_FEES) {
+            exchange.IO("lp.collect", ids)
+        }
+        outCount = inRange ? 0 : outCount + 1
+        if (outCount >= OUT_LIMIT) {
+            // withdraw everything and sell the returned ETH for USDC; re-add in the next round
+            var r = exchange.IO("lp.remove", ids, 1, true)
+            Log("Withdrawn", r ? r.txHash : GetLastError())
+            ids = null
+            _G("lpIds", null)
+            outCount = 0
+        }
+        Sleep(60000)
+    }
+}
+```
+
+Steps: the plan is recomputed at the latest pool price, and a plan with ```shortfall``` fails without sending anything → the needed swap goes first as a market order (```swapTxHash```) → approvals: V3 and Slipstream approve the PositionManager, V4/Infinity CL approve Permit2 and then grant the PositionManager an allowance inside Permit2, following ```exchange.IO("approve")``` ```exact```/```max``` → one transaction creates every position, and the call returns once it is mined. If a step after the swap fails, the error says the swap already went through (the swapped tokens stay in the wallet).
+
+Price protection and payment: each position pays at most its planned amounts plus slippage (the plan's ```slippage```, 1% by default, within what the wallet holds), and the whole transaction reverts (costing only gas) when price moves make it use less than the planned amounts × (1 − slippage). In V3 and Slipstream pools with a native pair the wrapped-token side is paid as the plan's ```payWith``` says: entirely in the native coin (sent with the transaction, the excess refunded by ```refundETH```) or entirely in the wrapped token; collected amounts later come back as the wrapped token. V4/Infinity CL native pools use and return the native coin. About 3 million gas at the current gas price is kept back from the native coin for fees.
+
+Position IDs: V3 positions are PositionManager NFT numbers (such as ```1381183```); ```v4:number``` on Uniswap V4 and ```inf:number``` on PancakeSwap Infinity CL; ```aero:number``` (old factory) and ```aero2:number``` (new factory) on Aerodrome, ```velo:number``` and ```velo2:number``` on Velodrome; a basic pool has no NFT and its position ID is the pool address. When the node does not serve the full log history, V4/Infinity CL and Slipstream positions must be registered with ```exchange.IO("lp.track", ids)``` after a restart before ```lp.positions``` finds them, so keep the returned IDs (for example with ```_G()```).
+
+Write commands return after the transaction is mined, and for the next minute on-chain reads are pinned to no earlier than its block, so ```lp.positions``` called right after sees the new positions.
+
+Aerodrome and Velodrome basic pools are added through the Router (using the native balance with a native pair, ```addLiquidityETH```), returning ```{txHash, swapTxHash, pool, id, lpTokens, amountBase, amountQuote}```; with ```stake``` ```true``` in the plan the result also has ```stake``` (as returned by `exchange.IO("lp.stake")`).
+
+Complete runnable strategies, such as re-centering the range after the price leaves it or gauge staking with compounding on Aerodrome and Velodrome, are in `DEX Strategy Examples`.
+
+See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("lp.plan")`, `exchange.IO("lp.simulate")`, `exchange.IO("lp.positions")`, `exchange.IO("lp.collect")`, `exchange.IO("lp.remove")`, `exchange.IO("lp.track")`, `exchange.IO("approve")`, `DEX Strategy Examples`
+
+##### exchange.IO("lp.increase", ...)
+
+```
+exchange.IO(k, positionId, budget)
+exchange.IO(k, positionId, budget, options)
+```
+
+Forms:
+
+- `exchange.IO("lp.increase", ...)`
+
+Adds to an existing position: the budget is split into the two tokens by the position's range and the current price, the short token is bought first, and both go into the same position.
+
+Parameters:
+
+- `k` (string, required): Set to ```lp.increase``` to add to a position.
+- `positionId` (string / number, required): Position ID, from ```id``` of ```lp.add``` or ```lp.positions```.
+- `budget` (number, required): Budget in the quote token.
+- `options` (object, optional): ```{symbol, slippage, stake}```, all optional: ```symbol``` sets the pair orientation (the stablecoin is the quote by default), ```slippage``` the price protection (0.01 by default), ```stake``` see the remarks.
+
+Returns (object / null value): ```{txHash, swapTxHash, id, liquidity, amountBase, amountQuote}```: ```liquidity``` is the added liquidity, ```amountBase``` and ```amountQuote``` the amounts used, ```swapTxHash``` the swap before it (```null``` without one). Null with an error when the wallet does not cover the budget or the position does not exist.
+
+Add 100 USDC to the in-range position with the largest value.
+
+```javascript
+function main() {
+    var ps = exchange.IO("lp.positions", "ETH_USDC").filter(function (p) {
+        return p.inRange && !p.closed
+    })
+    if (ps.length == 0) {
+        Log("No position in range")
+        return
+    }
+    ps.sort(function (a, b) { return b.value - a.value })
+    var r = exchange.IO("lp.increase", ps[0].id, 100, {symbol: "ETH_USDC"})
+    Log(r ? ["Increased", r.id, r.amountBase, "ETH +", r.amountQuote, "USDC"] : GetLastError())
+}
+```
+
+The increase plans a single range at the position's current ticks and executes it; funding, swaps and approvals work as in ```lp.add```: the short token is bought with a market order first, and with a native pair (such as ```options.symbol``` ```ETH_USDC```) the native side is paid as in ```lp.add```; a wallet that falls short fails with the plan's ```shortfall```.
+
+Aerodrome and Velodrome: a staked position must first be taken out with `exchange.IO("lp.unstake")`; for a basic pool (```positionId``` is the pool address) it is another ```lp.add``` into that pool, staked afterwards when ```options.stake``` is ```true```.
+
+See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("lp.add")`, `exchange.IO("lp.decrease")`, `exchange.IO("lp.positions")`
+
+##### exchange.IO("lp.decrease", ...)
+
+```
+exchange.IO(k, positionId, ratio)
+exchange.IO(k, positionId, ratio, options)
+```
+
+Forms:
+
+- `exchange.IO("lp.decrease", ...)`
+
+Withdraws a ratio of a position's liquidity and collects all its fees; the position stays (a ratio of 1 empties it without burning the NFT).
+
+Parameters:
+
+- `k` (string, required): Set to ```lp.decrease``` to reduce a position.
+- `positionId` (string / number, required): Position ID.
+- `ratio` (number, required): Ratio to withdraw, above 0 and at most 1.
+- `options` (object, optional): ```{slippage, sell}```, both optional: ```slippage``` is the price protection (0.01 by default), and ```sell``` ```true``` sells the returned base token for the quote token at market.
+
+Returns (object / null value): ```{txHash, positions: [{id, symbol, principalBase, principalQuote, feesBase, feesQuote, receivedBase, receivedQuote}], sells}```; see the remarks. Null with an error on failure.
+
+Withdraw half of the liquidity and sell the returned ETH for USDC.
+
+```javascript
+function main() {
+    var id = "1381183"     // position ID from lp.add or lp.positions
+    var r = exchange.IO("lp.decrease", id, 0.5, {sell: true})
+    if (!r) {
+        Log("Decrease failed:", GetLastError())
+        return
+    }
+    var p = r.positions[0]
+    Log("Principal:", p.principalBase, "ETH +", p.principalQuote, "USDC")
+    Log("Fees:", p.feesBase, "ETH +", p.feesQuote, "USDC")
+    Log("Sold:", r.sells)
+}
+```
+
+Fields: ```txHash``` is the transaction; ```positions``` gives, per position, the withdrawn principal ```principalBase``` and ```principalQuote```, the collected fees ```feesBase``` and ```feesQuote```, and what actually arrived, ```receivedBase``` and ```receivedQuote``` (principal plus fees); ```sells``` lists the market orders selling back to the quote token, ```[{symbol, qty, txHash}]```, with ```{symbol, qty, error}``` for a sale that failed without affecting the others, and is empty without selling. Amounts are in token units, oriented by the position's pair (the stablecoin is the quote by default).
+
+Compared with ```exchange.IO("lp.remove", ...)```: ```lp.decrease``` handles one position with price protection and always keeps the NFT; ```lp.remove``` takes several positions at once and burns the NFT on a full withdrawal. To collect fees without touching the principal use ```lp.collect```.
+
+In V3 and Slipstream pools the native coin takes part as its wrapped token, so it comes back wrapped (such as WETH); use ```exchange.IO("unwrap", ...)``` for the native coin. Aerodrome and Velodrome: a staked position must first be taken out with `exchange.IO("lp.unstake")` (a basic pool only needs enough unstaked LP tokens in the wallet); basic pools redeem the tokens behind that share of the LP tokens.
+
+See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("lp.remove")`, `exchange.IO("lp.collect")`, `exchange.IO("lp.increase")`, `exchange.IO("lp.positions")`
+
+##### exchange.IO("lp.collect", ...)
+
+```
+exchange.IO(k, positionIds)
+exchange.IO(k, positionIds, sell)
+```
+
+Forms:
+
+- `exchange.IO("lp.collect", ...)`
+
+Collects the fees accrued to positions without touching the principal; several positions go into one transaction.
+
+Parameters:
+
+- `k` (string, required): Set to ```lp.collect``` to collect fees.
+- `positionIds` (string / number / array, required): Position IDs: one ID (string or number) or an array of IDs, such as ```"1381183"``` or ```["v4:123", "456"]```; several IDs may also be written as the leading arguments.
+- `sell` (bool, optional): ```true``` sells the collected base token for the quote token at market; ```false``` by default.
+
+Returns (object / null value): ```{txHash, positions: [{id, symbol, principalBase, principalQuote, feesBase, feesQuote, receivedBase, receivedQuote}], sells}```; see the remarks. Null with an error on failure.
+
+Collect the positions whose uncollected fees exceed 5 USDC in one go.
+
+```javascript
+function main() {
+    var ids = exchange.IO("lp.positions").filter(function (p) {
+        return p.feesValue > 5
+    }).map(function (p) { return p.id })
+    if (ids.length == 0) {
+        return
+    }
+    var r = exchange.IO("lp.collect", ids)
+    if (!r) {
+        Log("Collect failed:", GetLastError())
+        return
+    }
+    r.positions.forEach(function (p) {
+        Log(p.id, p.symbol, "fees:", p.feesBase, "+", p.feesQuote)
+    })
+}
+```
+
+Fields: ```txHash``` is the transaction; ```positions``` gives, per position, the withdrawn principal ```principalBase``` and ```principalQuote```, the collected fees ```feesBase``` and ```feesQuote```, and what actually arrived, ```receivedBase``` and ```receivedQuote``` (principal plus fees); ```sells``` lists the market orders selling back to the quote token, ```[{symbol, qty, txHash}]```, with ```{symbol, qty, error}``` for a sale that failed without affecting the others, and is empty without selling. Amounts are in token units, oriented by the position's pair (the stablecoin is the quote by default). The principal is 0 when collecting.
+
+Several positions share one transaction where possible; when several transactions are needed (such as V3 and V4/Infinity CL positions together, which have different PositionManagers), ```txHash``` is the last one and ```txHashes``` lists them all.
+
+Aerodrome and Velodrome: staked positions earn no trading fees (they go to voters), so collecting fails with a hint to claim the rewards with `exchange.IO("lp.claim")`; basic pools collect the fees accrued to the wallet's LP tokens with the pool's ```claimFees```, one transaction per pool.
+
+See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("lp.positions")`, `exchange.IO("lp.decrease")`, `exchange.IO("lp.remove")`, `exchange.IO("lp.claim")`
+
+##### exchange.IO("lp.remove", ...)
+
+```
+exchange.IO(k, positionIds)
+exchange.IO(k, positionIds, ratio)
+exchange.IO(k, positionIds, ratio, sell)
+```
+
+Forms:
+
+- `exchange.IO("lp.remove", ...)`
+
+Withdraws positions' liquidity and collects their fees, burning the position NFT on a full withdrawal; several positions go into one transaction.
+
+Parameters:
+
+- `k` (string, required): Set to ```lp.remove``` to withdraw liquidity.
+- `positionIds` (string / number / array, required): Position IDs: one ID (string or number) or an array of IDs, such as ```"1381183"``` or ```["v4:123", "456"]```; several IDs may also be written as the leading arguments.
+- `ratio` (number, optional): Ratio to withdraw, above 0 and at most 1; 1 by default (everything, burning the NFT).
+- `sell` (bool, optional): ```true``` sells the returned base token for the quote token at market; ```false``` by default.
+
+Returns (object / null value): ```{txHash, positions: [{id, symbol, principalBase, principalQuote, feesBase, feesQuote, receivedBase, receivedQuote}], sells}```; see the remarks. Null with an error on failure.
+
+Withdraw every position and sell the returned ETH for USDC.
+
+```javascript
+function main() {
+    var ids = exchange.IO("lp.positions", "ETH_USDC").filter(function (p) {
+        return !p.closed
+    }).map(function (p) { return p.id })
+    if (ids.length == 0) {
+        Log("No positions")
+        return
+    }
+    var r = exchange.IO("lp.remove", ids, 1, true)
+    if (!r) {
+        Log("Withdrawal failed:", GetLastError())
+        return
+    }
+    r.positions.forEach(function (p) {
+        Log(p.id, "received:", p.receivedBase, "ETH +", p.receivedQuote, "USDC")
+    })
+    Log("Sold:", r.sells)
+}
+```
+
+Fields: ```txHash``` is the transaction; ```positions``` gives, per position, the withdrawn principal ```principalBase``` and ```principalQuote```, the collected fees ```feesBase``` and ```feesQuote```, and what actually arrived, ```receivedBase``` and ```receivedQuote``` (principal plus fees); ```sells``` lists the market orders selling back to the quote token, ```[{symbol, qty, txHash}]```, with ```{symbol, qty, error}``` for a sale that failed without affecting the others, and is empty without selling. Amounts are in token units, oriented by the position's pair (the stablecoin is the quote by default).
+
+Several positions share one transaction where possible; when several transactions are needed (such as V3 and V4/Infinity CL positions together, which have different PositionManagers), ```txHash``` is the last one and ```txHashes``` lists them all. A full withdrawal collects the fees and burns the NFT in the same transaction, after which ```lp.positions``` no longer lists the position.
+
+Arguments: the first number between 0 and 1 after the IDs is ```ratio``` and a boolean is ```sell```. A V3 position ID written as a number (such as ```1```) would be read as the ratio, so write IDs as strings or an array, such as ```exchange.IO("lp.remove", ["1381183", "1381190"], 1, true)```.
+
+Aerodrome and Velodrome: staked positions are first taken out of the gauge (claiming the rewards, see `exchange.IO("lp.unstake")`); a full withdrawal from a basic pool also sends a ```claimFees``` transaction for the fees.
+
+See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("lp.decrease")`, `exchange.IO("lp.collect")`, `exchange.IO("lp.positions")`, `exchange.IO("lp.add")`
+
+##### exchange.IO("lp.positions", ...)
+
+```
+exchange.IO(k)
+exchange.IO(k, filter)
+exchange.IO(k, filter, wallet)
+```
+
+Forms:
+
+- `exchange.IO("lp.positions", ...)`
+
+Lists a wallet's LP positions with range, in-range flag, liquidity, current amounts and value, and uncollected fees.
+
+Parameters:
+
+- `k` (string, required): Set to ```lp.positions``` to list positions.
+- `filter` (string, optional): A pair (such as ```ETH_USDC```, which also sets the price orientation) or a token (such as ```ETH```, only positions containing it); ```*``` or nothing lists all positions.
+- `wallet` (string, optional): Another wallet's address, to view its positions read-only; this exchange object's wallet when omitted.
+
+Returns (array / null value): An array of positions ```[{id, pool, protocol, symbol, fee, tickLower, tickUpper, priceLower, priceUpper, price, tick, inRange, liquidity, amountBase, amountQuote, value, feesBase, feesQuote, feesValue, closed}]```; see the remarks. Null when the node fails.
+
+View any wallet's ETH/USDC positions read-only: in range or not, value and uncollected fees.
+
+```javascript
+function main() {
+    // omit the third argument to view this exchange object's wallet
+    var wallet = "0xc1906cb9b3e7ab44dec8b0ab6894f8ccbbe40a72"
+    var ps = exchange.IO("lp.positions", "ETH_USDC", wallet)
+    if (!ps) {
+        Log("Query failed:", GetLastError())
+        return
+    }
+    ps.filter(function (p) { return !p.closed }).forEach(function (p) {
+        Log(p.id, p.protocol, "range", p.priceLower, "~", p.priceUpper,
+            p.inRange ? "in range" : "out of range", "value:", p.value, "fees:", p.feesValue)
+    })
+}
+```
+
+Fields of each position:
+
+| Field | Description |
+| - | - |
+| ```id```, ```pool```, ```protocol```, ```symbol```, ```fee``` | Position ID, pool ID, pool type, pair and fee (millionths) |
+| ```tickLower```, ```tickUpper```, ```priceLower```, ```priceUpper``` | The position's range in ticks and prices (quote per base) |
+| ```price```, ```tick```, ```inRange``` | The pool's current price and tick, and whether the price is inside the range (no fees are earned outside it) |
+| ```liquidity``` | The position's liquidity (decimal string) |
+| ```amountBase```, ```amountQuote```, ```value``` | Current token amounts and their value in the quote token |
+| ```feesBase```, ```feesQuote```, ```feesValue``` | Uncollected fees and their value in the quote token |
+| ```closed``` | ```true``` for a position with no liquidity and no uncollected fees (emptied, NFT still there) |
+
+Orientation: a pair given as ```filter``` sets it; otherwise the stablecoin is the quote, so without a pair V3 positions show the wrapped spelling such as ```WETH_USDC```.
+
+How positions are found: V3 positions are listed by the PositionManager per wallet (only the latest 2000 when the wallet holds very many NFTs). The V4/Infinity CL PositionManager cannot list a wallet's positions, so they are found from the logs of NFTs sent to the wallet: a node that serves the full log history finds all of them, while public nodes usually serve only recent blocks, so register older positions with ```exchange.IO("lp.track", ids)``` (positions created by ```lp.add``` in this process are remembered automatically); their IDs look like ```v4:123456``` or ```inf:123456```.
+
+Aerodrome and Velodrome: Slipstream positions in the wallet are listed directly; staked position NFTs are owned by the gauge, so the gauges staked into by this process, found in the logs, holding positions registered with ```lp.track``` or matching ```filter``` are checked; basic pools are checked when added to by this process, registered with ```lp.track```, matching ```filter```, or on the common pairs of the token table. Each row also has ```staked```, ```gauge```, ```rewardToken``` (the reward token), ```rewards``` (claimable reward tokens) and ```rewardsValue``` (in the quote token); basic pools also have ```fullRange```, ```lpTokens``` and ```stakedLpTokens``` and no ticks.
+
+See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("lp.add")`, `exchange.IO("lp.collect")`, `exchange.IO("lp.remove")`, `exchange.IO("lp.track")`, `exchange.IO("lp.history")`
+
+##### exchange.IO("lp.history", ...)
+
+```
+exchange.IO(k, positionId)
+```
+
+Forms:
+
+- `exchange.IO("lp.history", ...)`
+
+Queries a position's cash flow and PnL: deposited and withdrawn principal and collected fees, valued at the current pool price.
+
+Parameters:
+
+- `k` (string, required): Set to ```lp.history``` to query a position's history.
+- `positionId` (string / number, required): Position ID.
+
+Returns (object / null value): ```{id, symbol, events, depositedBase, depositedQuote, withdrawnBase, withdrawnQuote, feesCollectedBase, feesCollectedQuote, price, pnlQuote, note}```; see the remarks. Null with an error when the node cannot serve historical logs.
+
+Look at a position's collected fees and PnL.
+
+```javascript
+function main() {
+    var h = exchange.IO("lp.history", "1381183")
+    if (!h) {
+        Log("Query failed:", GetLastError())
+        return
+    }
+    h.events.forEach(function (e) {
+        Log(e.action, "block", e.block, e.amountBase, "+", e.amountQuote)
+    })
+    Log("Collected fees:", h.feesCollectedBase, "+", h.feesCollectedQuote, "PnL:", h.pnlQuote)
+}
+```
+
+```events``` lists each liquidity change ```[{action, block, txHash, liquidity, amountBase, amountQuote}]``` (```action``` is ```add```, ```remove``` or ```collect```); ```deposited*```, ```withdrawn*``` and ```feesCollected*``` total the deposited and withdrawn principal and the collected fees; ```pnlQuote``` is the PnL at the current pool ```price``` (current value + collected fees + withdrawn principal − deposits, gas excluded).
+
+It needs a node that serves historical logs; public nodes often do not and fail with an error such as ```lp.history needs a node that serves historical logs: …```, so add a node with archive access to the node URL of the exchange configuration.
+
+V4/Infinity CL events on Uniswap and PancakeSwap record no token amounts, so for those positions only each liquidity change and the current position are given: ```{id, pool, symbol, events: [{action, block, txHash, liquidity}], position, note}```. Basic-pool LP tokens on Aerodrome and Velodrome have no per-position events and are not supported.
+
+See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("lp.positions")`, `exchange.IO("lp.collect")`
+
+##### exchange.IO("lp.track", ...)
+
+```
+exchange.IO(k, positionIds)
+```
+
+Forms:
+
+- `exchange.IO("lp.track", ...)`
+
+Registers position IDs so that ```lp.positions``` finds them even when the node does not serve the full log history (recovering older positions after a restart).
+
+Parameters:
+
+- `k` (string, required): Set to ```lp.track``` to register positions.
+- `positionIds` (string / array, required): Position IDs to register: one ID or an array such as ```["v4:123456"]```; on Aerodrome and Velodrome basic pool addresses can be registered too.
+
+Returns (array / null value): Every position ID remembered by this process (V3 positions excluded). Null with an error for a prefix that does not match the exchange object (such as ```inf:``` on Uniswap) or when no ID is given.
+
+After a restart, register the saved position IDs and list the positions.
+
+```javascript
+function main() {
+    var ids = _G("lpIds")    // saved with _G("lpIds", ids) when the positions were added
+    if (ids && ids.length > 0) {
+        Log("Registered:", exchange.IO("lp.track", ids))
+    }
+    Log(exchange.IO("lp.positions"))
+}
+```
+
+Registration is for V4/Infinity CL positions (```v4:```, ```inf:```), Slipstream positions (```aero:```, ```aero2:```, ```velo:```, ```velo2:```) and basic pool addresses; V3 positions are listed by the PositionManager per wallet and are ignored. Registered positions are checked on chain, and ```lp.positions``` verifies ownership on chain every time (staked positions by their staker), leaving out transferred positions.
+
+Registrations live in this process only and must be repeated after a restart: a strategy can save the IDs returned by ```lp.add``` (for example with ```_G()```) and register them at startup. Positions created by ```lp.add``` in this process are remembered automatically.
+
+See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("lp.positions")`, `exchange.IO("lp.add")`
+
+##### exchange.IO("bridge.*", ...)
+
+```
+exchange.IO(k)
+exchange.IO(k, chain)
+exchange.IO(k, params)
+exchange.IO(k, params, stateOverride)
+exchange.IO(k, txHash, options)
+exchange.IO(k, key)
+```
+
+Forms:
+
+- `exchange.IO("bridge.*", ...)`
+
+Cross-chain bridge (Across, Stargate, CCTP and others aggregated by LI.FI): lists the supported chains and tokens, quotes and simulates, moves tokens from this exchange object's chain to another EVM chain or Solana, and tracks delivery.
+
+Parameters:
+
+- `k` (string, required): The command: ```bridge.chains```, ```bridge.tokens```, ```bridge.quote```, ```bridge.simulate```, ```bridge.send```, ```bridge.status``` or ```bridge.apiKey```; see the remarks for their arguments.
+- `chain` (string / number, optional): ```bridge.tokens```: chain ID, LI.FI chain key or chain name; this chain when omitted.
+- `params` (object, optional): ```bridge.quote```, ```bridge.simulate```, ```bridge.send```: the bridge parameters ```{toChain, fromToken, toToken, amount, ...}```, or a ```bridge.quote``` result; see the remarks.
+- `stateOverride` (object, optional): ```bridge.simulate```: state override for ```eth_call```, to give the wallet a temporary balance.
+- `txHash` (string, optional): ```bridge.status```: the source-chain transaction hash returned by ```bridge.send```.
+- `options` (object, optional): ```bridge.status```: ```{toChain, bridge}``` to speed up the lookup.
+- `key` (string, optional): ```bridge.apiKey```: the LI.FI API key; ```""``` clears it.
+
+Returns (object / array / bool / null value): Depends on the command: ```bridge.chains``` and ```bridge.tokens``` return arrays, ```bridge.apiKey``` whether a key is set, the others objects; see the remarks for the fields. Null on errors (bad parameters, short balance, rate limits ```rate limited (HTTP 429 …)``` and so on), with the reason in ```GetLastError()```.
+
+Quote and simulate bridging 0.01 ETH from this chain to Arbitrum (read-only, costs nothing).
+
+```javascript
+function main() {
+    var params = {toChain: "arb", fromToken: "ETH", toToken: "ETH", amount: 0.01}
+    var q = exchange.IO("bridge.quote", params)
+    if (!q) {
+        Log("Quote failed:", GetLastError())
+        return
+    }
+    Log("Via", q.toolName, "to", q.toChainName, "expected", q.toAmount, "at least", q.toAmountMin,
+        "in about", q.executionDuration, "s")
+    q.feeCosts.forEach(function (f) {
+        Log("Fee:", f.name, f.amount, f.token, f.included ? "included in the quote" : "paid on top")
+    })
+    // when the wallet balance is short, give it a temporary 100 ETH for the simulation
+    var ov = {}
+    ov[exchange.IO("address")] = {balance: "0x56bc75e2d63100000"}
+    var s = exchange.IO("bridge.simulate", q, ov)
+    Log(s ? "Simulation passed, calling " + s.to : "Simulation failed: " + GetLastError())
+}
+```
+
+The complete flow: quote → simulate → send → poll the progress every 20 seconds until delivered.
+
+```javascript
+function main() {
+    // bridge 20 USDC from this chain to this wallet on Arbitrum
+    var params = {toChain: "arb", fromToken: "USDC", toToken: "USDC", amount: 20}
+    var q = exchange.IO("bridge.quote", params)
+    if (!q || !exchange.IO("bridge.simulate", q)) {
+        Log("Quote or simulation failed:", GetLastError())
+        return
+    }
+    var r = exchange.IO("bridge.send", q)
+    if (!r) {
+        Log("Send failed:", GetLastError())
+        return
+    }
+    Log("Source transaction", r.txHash, "via", r.tool)
+    while (true) {
+        Sleep(20000)
+        var st = exchange.IO("bridge.status", r.txHash, {toChain: "arb", bridge: r.tool})
+        if (!st) {
+            continue
+        }
+        Log(st.status, st.substatus || "")
+        if (st.status == "DONE") {
+            Log("Received", st.receiving.amount, st.receiving.token.symbol, st.receiving.txLink)
+            break
+        }
+        if (st.status == "FAILED" || st.status == "INVALID") {
+            Log("Bridge failed:", st.substatusMessage)
+            break
+        }
+    }
+}
+```
+
+List the supported chains and quote a transfer to Solana.
+
+```javascript
+function main() {
+    var chains = exchange.IO("bridge.chains")
+    Log(chains.length, "chains supported, such as", chains[0].name, chains[0].key)
+    // a Solana destination needs toAddress (a Solana address)
+    var q = exchange.IO("bridge.quote", {toChain: "Solana", fromToken: "USDC", toToken: "USDC",
+        amount: 50, toAddress: "YOUR_SOLANA_ADDRESS", order: "CHEAPEST"})
+    Log(q ? [q.toolName, q.toAmount, q.toAmountMin] : GetLastError())
+}
+```
+
+The commands:
+
+| Command | Arguments | Description and result |
+| - | - | - |
+| ```bridge.chains``` | none | Chains LI.FI supports (EVM chains and Solana), cached for an hour: an array of ```{id, key, name, chainType, nativeToken}```, ```chainType``` being ```EVM``` or ```SVM``` |
+| ```bridge.tokens``` | ```[chain]``` | Tokens LI.FI knows on a chain (this chain by default), cached for an hour: an array of ```{symbol, address, decimals, name, priceUSD}``` |
+| ```bridge.quote``` | ```params``` | A bridge quote (read-only); fields below |
+| ```bridge.simulate``` | ```params``` or a quote ```[, stateOverride]``` | Re-quotes and runs LI.FI's transaction with ```eth_call```, without signing or broadcasting |
+| ```bridge.send``` | ```params``` or a quote | Re-quotes, approves, simulates, then signs and broadcasts; waits for the source-chain broadcast only, not for delivery |
+| ```bridge.status``` | ```txHash[, {toChain, bridge}]``` | Bridge progress |
+| ```bridge.apiKey``` | ```[key]``` | Sets the LI.FI API key (for this exchange object only, never echoed); ```""``` clears it and no argument queries; returns whether a key is set |
+
+Keys of ```params``` (unknown keys are errors):
+
+| Key | Description |
+| - | - |
+| ```toChain``` | Destination chain: a chain ID (such as ```42161```), a LI.FI chain key (such as ```arb```) or a chain name (such as ```Arbitrum``` or ```Solana```) |
+| ```fromToken``` | Token on this chain: a name in the token table (such as ```USDC``` or ```ETH```) or a contract address |
+| ```toToken``` | Token on the destination chain: a name or address, resolved by LI.FI to its canonical token (```USDC``` on Arbitrum is native USDC, not USDC.e) |
+| ```amount``` | Amount of ```fromToken``` in token units; digits beyond the token's decimals are dropped |
+| ```toAddress``` | Recipient; this wallet by default for an EVM destination, required (a Solana address) for Solana |
+| ```slippage``` | Slippage; the ```exchange.IO("slippage")``` value by default |
+| ```order``` | ```CHEAPEST``` or ```FASTEST``` |
+| ```allowBridges```, ```denyBridges``` | Bridges to use only or to avoid (LI.FI bridge names, an array or comma-separated) |
+
+A quote is ```{tool, toolName, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, fromAmountRaw, toAmountRaw, toAmountMinRaw, fromAmountUSD, toAmountUSD, slippage, toAddress, feeCosts, gasCosts, executionDuration, approvalAddress, steps, transactionId, request}```: ```tool``` is the chosen bridge; amounts are in token units (```*Raw``` in the smallest unit); ```toAmountMin``` is the amount guaranteed after slippage; ```feeCosts``` is ```[{name, amount, token, amountUSD, percentage, included}]``` (fees with ```included``` ```false``` are paid on top); ```gasCosts``` estimates source-chain gas; ```executionDuration``` is the expected time in seconds; ```approvalAddress``` is the contract to approve (```null``` for the native coin); ```steps``` lists the steps (```cross``` bridges, ```swap``` swaps); ```request``` echoes the parameters. A ```bridge.simulate``` result also has ```simulated``` (```true```), ```to```, ```value``` and ```walletBalance```, plus ```allowanceOverride``` when an allowance was supplied.
+
+```bridge.simulate```: a short token allowance is supplied as unlimited through a state override (as in ```exchange.IO("simulate", ...)```); balances are not, so when bridging the native coin give the wallet a ```balance``` in ```stateOverride```. A failure caused by a short balance reports the wallet balance.
+
+```bridge.send``` steps: re-quote → check the balance → approve LI.FI's ```approvalAddress``` when the token allowance is short (following ```exchange.IO("approve")``` ```exact```/```max```, resetting USDT-like tokens to zero first, waiting for the approval to be mined and re-quoting after it) → simulate with ```eth_call``` → sign and broadcast. The gas limit is the larger of the estimate × ```gasMultiplier``` and LI.FI's suggestion. It returns ```{txHash, tool, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, toAddress, value, transactionId}```, ```txHash``` being the source-chain transaction, whose receipt ```exchange.IO("receipt", ...)``` returns. Given a quote it re-quotes from its ```request```; the new quote applies and ```toAmountMin``` is enforced on chain.
+
+```bridge.status``` returns ```{status, substatus, substatusMessage, tool, sending, receiving, fromAddress, toAddress, explorer, bridgeExplorer}```: ```status``` is ```NOT_FOUND```, ```INVALID```, ```PENDING```, ```DONE``` or ```FAILED```; when ```DONE```, ```substatus``` is ```COMPLETED``` (delivered as quoted), ```PARTIAL``` (a different token arrived) or ```REFUNDED``` (returned to the source chain); ```sending``` and ```receiving``` are ```{txHash, txLink, chainId, amount, amountRaw, token, timestamp}```, ```receiving``` being what actually arrived. Right after broadcasting LI.FI may not have indexed it yet and returns ```NOT_FOUND```; keep polling (every 10 to 30 seconds); ```toChain``` and ```bridge``` (the ```tool``` of the send result) in ```options``` speed up the lookup.
+
+Bridging is asynchronous: delivery takes seconds to tens of minutes (see ```executionDuration```) and must be confirmed by polling ```bridge.status```; cross-VM transfers (EVM↔Solana) require ```toAddress```, and funds sent to a wrong address cannot be recovered; the destination wallet needs gas to use what arrives. Without an API key LI.FI limits by outgoing IP (```/quote``` 75 times per 2 hours, used once each by ```bridge.quote```, ```bridge.simulate``` and ```bridge.send```), shared by the strategies on a docker; with a key the limit is 100 per minute. Test with a small amount first.
+
+See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `KyberSwap`, `1inch`, `exchange.IO`, `exchange.IO("receipt")`, `exchange.IO("approve")`, `exchange.IO("slippage")`, `exchange.IO("gasMultiplier")`
 
 #### Jupiter
 
@@ -29922,84 +31944,49 @@ SOL is the native coin and is wrapped and unwrapped automatically during swaps. 
 | ```token``` | [name, mint] | Register a token (for this run only) so its name can be used in pairs; without arguments, list the token table. See the sub-page `exchange.IO("token", ...)`. | ```{symbol, mint, decimals}``` when registering, an array of ```{symbol, mint, decimals, native}``` when listing. |
 | ```transfer``` | to, amount | Transfer SOL out of the wallet; ```amount``` may be ```all``` (the whole balance minus the fee). Only SOL is supported; a third argument naming another token fails. Waits for the broadcast only, not for confirmation. See the sub-page `exchange.IO("transfer", ...)`. | ```{signature, amount, lastValidBlockHeight}``` |
 | ```receipt``` | signature[, waitMs] | Query the status of a Solana transaction, optionally waiting until it is confirmed or fails (up to 10 minutes). For an order, pass the transaction signature after the comma in the order ID. See the sub-page `exchange.IO("receipt", ...)`. | ```{signature, state, slot, confirmationStatus, err, fee, blockTime}```, where ```state``` is ```success```, ```failed``` or ```pending```; ```fee``` and ```blockTime``` appear only once it is confirmed or failed. (more below the table) |
-| ```dca.create``` | params | Creates a DCA order. (more below the table) | ```{id, version, signature, symbol, side, total, perOrder, numberOfOrders, interval, minPrice, maxPrice, startAt, priorityFeeLamports}```: ```version``` is ```v1``` or ```v2```; a v1 ```id``` is the DCA order account address and a V2 ```id``` is Jupiter's order UUID, ```signature``` being the deposit transaction, plus ```vault```. |
-| ```dca.list``` | [params] | Lists the wallet's DCA orders (v1 first, then V2 when an API key is set or ```trigger.api``` is ```v2```): ```params.status``` is ```active``` (default, running) or ```history``` (ended), and ```params.symbol``` limits the list to that pair. (more below the table) | ```[{id, version, symbol, side, state, total, perOrder, numberOfOrders, ordersFilled, interval, minPrice, maxPrice, spent, received, filledQty, avgPrice, fee, createdAt, updatedAt, openTx, closeTx, info}]```, where ```state``` is ```active```, ```completed``` or ```canceled```, and for V2 also ```pending``` (depositing), ```canceling``` (canceled, funds not yet withdrawn) or ```failed``` (deposit failed); V2 rows also carry ```nextFillAt```, and their ```fee``` is ```null``` (the fee is already taken from the tokens received); ```spent``` is the input token spent so far and ```received``` the output token received (```fee```, in the output token, is the fee deducted from it); ```filledQty``` and ```avgPrice``` are the filled amount and average price in base-token terms; ```info``` is Jupiter's raw row. (more below the table) |
-| ```dca.cancel``` | id | Cancels a running DCA order and returns the remaining input token to the wallet; v1 and V2 are told apart by the shape of ```id``` (a V2 ID is a UUID and needs the API key). (more below the table) | v1: ```{id, version, signature, priorityFeeLamports[, indexed]}```; V2: ```{id, version, signature, refund, refundCurrency, roundsRemaining, info}```, where ```signature``` is the withdrawal transaction and ```refund``` the amount of input token returned. |
-| ```dca.simulate``` | params[, wallet] | Builds the transaction of ```dca.create``` from the same parameters and runs it with the node's ```simulateTransaction``` (not signed, nothing broadcast), to check balances, minimums and so on before ordering; with ```params``` written ```{cancel: id}``` it simulates canceling that DCA order. (more below the table) | ```{ok, err, reason, logs, unitsConsumed, wallet, id, plan, priorityFeeLamports}``` (V2 adds ```version``` and ```vault``` and has no ```id```): ```ok``` tells whether the simulation succeeded and ```reason``` explains a failure; ```plan``` holds the normalized DCA parameters. |
-| ```trigger.simulate``` | params[, wallet] | Builds the transaction of a Jupiter limit order and runs it with the node's ```simulateTransaction``` (not signed, nothing broadcast). (more below the table) | v1: ```{ok, err, reason, logs, unitsConsumed, wallet, order, makingAmount, takingAmount, priorityFeeLamports}```, where ```order``` is the order account address and ```makingAmount``` and ```takingAmount``` are the amounts given and received in smallest units; V2: ```{ok, err, reason, logs, unitsConsumed, version, wallet, vault, inputMint, inputAmount, triggerPriceUsd, triggerCondition, expiresAt, priorityFeeLamports}```. |
-| ```trigger.api``` | [mode] | Which API new native limit orders (```tif``` ```gtc```) and new DCA orders use: ```auto``` (default) uses Trigger V2 (custodial vault) when an API key is set and the quote is USDC or USDT, and v1 otherwise; ```v1``` always uses v1 (non-custodial, funds in an on-chain order account), even with an API key; ```v2``` always uses V2, fails orders whose quote is not USDC or USDT, and works without an API key too (Jupiter currently accepts V2 calls without a key, but its documentation says a key is required and this may be enforced at any time). (more below the table) | The current mode: ```auto```, ```v1``` or ```v2```. |
-| ```trigger.vault``` | [action] | Queries this wallet's custodial vault in Jupiter Trigger V2 and its balances (needs the API key, or ```exchange.IO("trigger.api", "v2")```). (more below the table) | ```{wallet, registered: false}``` while there is no vault; otherwise ```{wallet, registered: true, vault, sol, tokens, info}```, where ```tokens``` is ```[{mint, symbol, amount, raw}]``` (```symbol``` only for tokens in the token table) and ```info``` is Jupiter's vault record. |
+| ```dca.create``` | params | Creates a DCA order. See the sub-page `exchange.IO("dca.*", ...)`. | ```{id, version, signature, symbol, side, total, perOrder, numberOfOrders, interval, minPrice, maxPrice, startAt, priorityFeeLamports}```: ```version``` is ```v1``` or ```v2```; a v1 ```id``` is the DCA order account address and a V2 ```id``` is Jupiter's order UUID, ```signature``` being the deposit transaction, plus ```vault```. |
+| ```dca.list``` | [params] | Lists the wallet's DCA orders (v1 first, then V2 when an API key is set or ```trigger.api``` is ```v2```): ```params.status``` is ```active``` (default, running) or ```history``` (ended), and ```params.symbol``` limits the list to that pair. See the sub-page `exchange.IO("dca.*", ...)`. | ```[{id, version, symbol, side, state, total, perOrder, numberOfOrders, ordersFilled, interval, minPrice, maxPrice, spent, received, filledQty, avgPrice, fee, createdAt, updatedAt, openTx, closeTx, info}]```, where ```state``` is ```active```, ```completed``` or ```canceled```, and for V2 also ```pending``` (depositing), ```canceling``` (canceled, funds not yet withdrawn) or ```failed``` (deposit failed); V2 rows also carry ```nextFillAt```, and their ```fee``` is ```null``` (the fee is already taken from the tokens received); ```spent``` is the input token spent so far and ```received``` the output token received (```fee```, in the output token, is the fee deducted from it); ```filledQty``` and ```avgPrice``` are the filled amount and average price in base-token terms; ```info``` is Jupiter's raw row. (more below the table) |
+| ```dca.cancel``` | id | Cancels a running DCA order and returns the remaining input token to the wallet; v1 and V2 are told apart by the shape of ```id``` (a V2 ID is a UUID and needs the API key). See the sub-page `exchange.IO("dca.*", ...)`. | v1: ```{id, version, signature, priorityFeeLamports[, indexed]}```; V2: ```{id, version, signature, refund, refundCurrency, roundsRemaining, info}```, where ```signature``` is the withdrawal transaction and ```refund``` the amount of input token returned. |
+| ```dca.simulate``` | params[, wallet] | Builds the transaction of ```dca.create``` from the same parameters and runs it with the node's ```simulateTransaction``` (not signed, nothing broadcast), to check balances, minimums and so on before ordering; with ```params``` written ```{cancel: id}``` it simulates canceling that DCA order. See the sub-page `exchange.IO("dca.*", ...)`. | ```{ok, err, reason, logs, unitsConsumed, version, wallet, id, plan, priorityFeeLamports}``` (```version``` is ```v1``` or ```v2```; V2 adds ```vault``` and has no ```id```): ```ok``` tells whether the simulation succeeded and ```reason``` explains a failure (when the paying wallet has no SOL at all the node only returns ```err``` ```AccountNotFound```, and ```reason``` adds "the paying wallet has no SOL"); ```id``` is the address of the DCA account that would be created; ```plan``` holds the normalized DCA parameters. |
+| ```trigger.simulate``` | params[, wallet] | Builds the transaction of a Jupiter limit order and runs it with the node's ```simulateTransaction``` (not signed, nothing broadcast). See the sub-page `exchange.IO("trigger.*", ...)`. | v1: ```{ok, err, reason, logs, unitsConsumed, wallet, order, makingAmount, takingAmount, priorityFeeLamports}```, where ```order``` is the order account address and ```makingAmount``` and ```takingAmount``` are the amounts given and received in smallest units; V2: ```{ok, err, reason, logs, unitsConsumed, version, wallet, vault, inputMint, inputAmount, triggerPriceUsd, triggerCondition, expiresAt, priorityFeeLamports}```. (more below the table) |
+| ```trigger.api``` | [mode] | Which API new native limit orders (```tif``` ```gtc```) and new DCA orders use: ```auto``` (default) uses Trigger V2 (custodial vault) when an API key is set and the quote is USDC or USDT, and v1 otherwise; ```v1``` always uses v1 (non-custodial, funds in an on-chain order account), even with an API key; ```v2``` always uses V2, fails orders whose quote is not USDC or USDT, and works without an API key too (Jupiter currently accepts V2 calls without a key, but its documentation says a key is required and this may be enforced at any time). See the sub-page `exchange.IO("trigger.*", ...)`. | The current mode: ```auto```, ```v1``` or ```v2```. |
+| ```trigger.vault``` | [action] | Queries this wallet's custodial vault in Jupiter Trigger V2 and its balances (needs the API key, or ```exchange.IO("trigger.api", "v2")```). See the sub-page `exchange.IO("trigger.*", ...)`. | ```{wallet, registered: false}``` while there is no vault; otherwise ```{wallet, registered: true, vault, sol, tokens, info}```, where ```tokens``` is ```[{mint, symbol, amount, raw}]``` (```symbol``` only for tokens in the token table) and ```info``` is Jupiter's vault record. |
 | ```slippage``` | [ratio] | Slippage protection of market orders, range ```[0, 0.5)```, default ```0.005``` (0.5%), enforced on chain. Limit orders do not use it. Queries when called without an argument. See the sub-page `exchange.IO("slippage", ...)`. | The current slippage ratio. |
 | ```priorityFee``` | [sol] | Cap on the priority fee of each swap transaction, in SOL, 0 to 0.1, default 0.001; Jupiter estimates the actual priority fee from network congestion, up to the cap. Queries when called without an argument. See the sub-page `exchange.IO("priorityFee", ...)`. | The current cap (SOL). |
 | ```dexes``` | [sources] | Restrict the liquidity sources swaps go through (comma-separated) to the group shorthands ```pump```, ```meteora```, ```raydium```, ```orca``` or Jupiter source names (case-sensitive); ```""``` removes the restriction. Market data, quotes and orders all use only these sources. Queries when called without an argument. See the sub-page `exchange.IO("dexes", ...)`. | The array of restricted source names (groups expanded; an empty array means no restriction). |
 | ```rps``` | [n] | Maximum requests per second to the Jupiter API, 0.1 to 500, default 1. Requests are queued with at least ```1/n``` seconds between two of them. Queries when called without an argument. See the sub-page `exchange.IO("rps", ...)`. | The current maximum requests per second. |
 | ```base``` | [url] | Without an argument, returns the current Solana node address; with an address, switches the node (separate several with commas). | The previous address. |
 | ```address``` | — | The wallet address (base58). | — |
-| ```pump.new``` | [options] | Coins recently created on pump.fun, discovered on chain: the recent signatures of the pump.fun mint authority (```TSLvdd1pWpHVjahSpsvCXUbgwsL3JAcvokwaKt1eokM```, which appears only in creation transactions) are listed and each transaction's ```CreateEvent``` is parsed, newest first. (more below the table) | ```[{signature, slot, time, mint, name, symbol, uri, creator, user, bondingCurve, tokenProgram, quote, quoteMint, mayhem, cashback, holderReward, devBuy}]```: ```time``` is the block time (milliseconds); ```user``` is the wallet that sent the creation (usually the ```creator```); ```tokenProgram``` is ```spl-token``` or ```token-2022```; ```quote``` is ```SOL```, ```USDC``` or the quote token's mint (only ```SOL``` coins can be traded with ```pump.buy``` and ```pump.sell```); ```devBuy``` is the first buy in the same transaction, ```{tokens, quoteAmount}``` (```quoteAmount``` includes fees and is ```null``` when the quote is neither SOL nor USDC), or ```null``` when there is none. (more below the table) |
-| ```pump.info``` | mint | The coin's bonding-curve state, read with one ```getMultipleAccounts``` (curve, mint, global config and fee table). Fails for a coin that is not a pump.fun coin. | ```{mint, bondingCurve, creator, tokenProgram, decimals, quote, quoteMint, complete, migrated, virtualTokenReserves, virtualQuoteReserves, realTokenReserves, realQuoteReserves, tokenTotalSupply, price, marketCap, progress, fees, mayhem, cashback, holderReward}```: reserves and supply are in readable units; ```price``` is the quote (SOL) value of one coin and ```marketCap``` is ```price``` times the total supply; ```progress``` is the share of the curve sold (%), and at 100 the curve is complete (```complete```) and then migrates to PumpSwap (```migrated```, reserves zeroed, ```price```, ```marketCap``` and ```fees``` ```null```); ```fees``` is the current rate ```{protocolBps, creatorBps}``` in basis points. |
-| ```pump.quote``` | mint, side, amount | Quotes locally on the bonding curve (no transaction), with the on-chain program's formula and fees: for ```buy``` ```amount``` is the SOL to spend (fees included), for ```sell``` the number of coins to sell. (more below the table) | ```{venue, mint, side, quote, amountIn, amountOut, price, spotPrice, priceAfter, priceImpactPct, fees, protocolFeeBps, creatorFeeBps, crossesCurve}```: ```venue``` is ```pump``` (bonding curve) or ```jupiter``` (graduated, which adds ```route```, the liquidity sources used); ```price``` is the average fill price including fees (SOL per coin), ```priceImpactPct``` is how far the average price before fees is from the current price ```spotPrice``` (%), and ```fees``` is the protocol plus creator fee (SOL); ```crossesCurve``` ```true``` means the buy goes past the end of the curve (see "Pump.fun launches" below). (more below the table) |
-| ```pump.buy``` | mint, solAmount[, options] | Buys on the bonding curve for ```solAmount``` SOL (protocol and creator fees included): the wallet's token account is created idempotently, then ```buy_exact_quote_in_v3``` is sent with a minimum output of the local quote × (1 − ```slippage```), enforced on chain. (more below the table) | ```{txHash, venue, mint, side, solAmount, tokenAmount, price, fee, slot}```: ```venue``` is ```pump``` or ```jupiter``` (which adds ```route```); ```solAmount``` is the SOL paid (protocol and creator fees included, network fee and account deposits excluded), ```tokenAmount``` the coins bought and ```fee``` the network fee (SOL). (more below the table) |
-| ```pump.sell``` | mint, amount[, options] | Sells ```amount``` coins on the bonding curve (```all``` for the whole balance) with ```sell_v3```, with a minimum SOL output of the local quote × (1 − ```slippage```). (more below the table) | Same as ```pump.buy```: ```solAmount``` is the SOL received (protocol and creator fees deducted). |
-| ```pump.holdings``` | [wallet] | The pump.fun coins held by a wallet (by default this exchange object's wallet): the token balances that have a bonding curve, valued on the curve. | ```[{mint, amount, quote, complete, price, value}]```: ```value``` is the quote (fees deducted) that selling the whole balance on the curve would return now; ```price``` and ```value``` are ```null``` once the curve is complete or when the balance exceeds what the curve can buy back (value graduated coins with ```exchange.IO("route", ...)```). |
-| ```lp.pools``` | token[, quote] | Lists a token's Meteora DLMM, Raydium CLMM and Orca Whirlpools pools (against the given quote, or SOL, USDC and USDT) with fee, bin step and active bin (DLMM) or tick spacing and current tick (CLMM), current price, both token balances of the pool and TVL; 24h volume and fees and the USD TVL come from Meteora's data API (```dlmm.datapi.meteora.ag```), the Raydium API v3 (```api-v3.raydium.io```) and Orca's public API (```api.orca.so```) respectively, while prices, balances and the like are read on chain, Raydium's fee from the pool's AmmConfig account. (more below the table) | ```[{id, protocol, dex, symbol, base, quote, fee, feeRate, feeRateNow, binStep, activeId, price, reserveBase, reserveQuote, tvlQuote, tvlUsd, volume24hUsd, fees24hUsd, enabled, rewards, empty}]```: ```protocol``` is ```meteora```; ```price``` is quote per token; ```fee``` is the base fee in millionths (the unit of Uniswap's ```fee```), ```feeRate``` the same as a ratio, and ```feeRateNow``` the current rate including the volatility surcharge; ```rewards``` are the pool's farm reward tokens ```[{mint, symbol}]```. (more below the table) |
-| ```lp.select``` | token, budget[, options] | Picks a pool by rule. (more below the table) | One ```lp.pools``` row with an extra ```reason```. |
-| ```lp.pool``` | poolId | Live state of a pool. (more below the table) | ```{id, protocol, dex, tokenX, tokenY, symbolX, symbolY, decimalsX, decimalsY, price, fee, feeRate, feeRateNow, binStep, activeId, reserveX, reserveY, tvlUsd, volume24hUsd, fees24hUsd, enabled, rewards}```, where ```price``` is Y per X (the pool's own order). (more below the table) |
-| ```lp.ticks``` | poolId[, lowerBinId, upperBinId[, step]] | The liquidity distribution over a bin range (DLMM has bins rather than ticks): both token amounts per segment, ```step``` being the segment width in bins (default 1). (more below the table) | ```{pool, activeId, binStep, price, tokenX, tokenY, symbolX, symbolY, segments: [{binLower, binUpper, priceLower, priceUpper, amountX, amountY, current}]}```, prices in Y per X. (more below the table) |
-| ```lp.plan``` | params | A position plan (read-only, costs nothing). (more below the table) | ```{params, symbol, pool, protocol, fee, feeRate, price, shape, strategy, budget, budgetUsd, binStep, activeId, lowerBinId, upperBinId, bins, positions: [{lowerBinId, upperBinId, priceLower, priceUpper, amountBase, amountQuote, share}], needBase, needQuote, haveBase, haveQuote, swap, shortfall, shareOfPool, volume24hUsd, estDailyFeesUsd, slippageBps, maxActiveBinSlippage, binArraysToCreate, rentSol, rentRefundableSol, warning?}```: ```swap``` is the swap needed before adding (```{side, amount, currency}``` or ```null```); ```shareOfPool``` is the plan's share of the active bin and ```estDailyFeesUsd``` = 24h volume × fee rate × that share (assuming the price stays in range); ```rentSol``` is the rent the positions lock, of which ```rentRefundableSol``` belongs to the position accounts (returned when they are closed) and the rest to new bin arrays (```binArraysToCreate```, not returned). (more below the table) |
-| ```lp.simulate``` | plan[, payer] | Builds the complete add-liquidity transactions of the plan (creating bin arrays, the position, ATAs, wrapping SOL, adding liquidity, unwrapping) and runs them with the node's ```simulateTransaction``` (no signature check, nothing broadcast), one transaction per position. (more below the table) | ```{pool, protocol, payer, ok, positions: [{position, lowerBinId, upperBinId, amountBase, amountQuote, ok, err, error, logs, unitsConsumed, txBytes}], swapNeeded, shortfall, note}```: ```logs``` is the tail of the program logs and ```error``` the failure reason (DLMM, Raydium CLMM and Orca Whirlpool error codes with their names); Raydium and Orca rows carry ```tickLower``` and ```tickUpper``` instead of the bin fields, and ```position``` is the mint of the position NFT. |
-| ```lp.add``` | plan | Adds liquidity by the plan. (more below the table) | ```{txHash, txHashes, swapTxHash, pool, protocol, symbol, positions: [{id, txHash, lowerBinId, upperBinId, priceLower, priceUpper, amountBase, amountQuote, rentSol, feeSol}]}```, with position ```id```s written ```meteora:address```, ```raydium:position NFT mint``` or ```orca:position NFT mint```; Raydium and Orca rows carry ```tickLower``` and ```tickUpper``` instead of the bin fields. |
-| ```lp.increase``` | positionId, budget[, options] | Adds to a position, splitting ```budget``` (in the quote token) over the position's bin range at the current price and swapping first for whichever token is short. (more below the table) | ```{txHash, swapTxHash, id, symbol, amountBase, amountQuote, feeSol}``` |
-| ```lp.decrease``` | positionId, ratio[, options] | Withdraws a ratio (0 to 1, converted to basis points) from every bin of the position that has liquidity and claims all fees and farm rewards; the position stays. (more below the table) | ```{txHash, txHashes, positions: [{id, symbol, txHashes, principalBase, principalQuote, feesBase, feesQuote, receivedBase, receivedQuote, rewards, rentRefundSol, feeSol}], sells}```: ```received*``` come from the balances before and after the transactions, and the fee part is split off by the amounts claimable on chain before sending. |
-| ```lp.collect``` | positionIds[, sell] | Claims fees and farm rewards (```claim_fee2``` and ```claim_reward2``` on DLMM, a zero-liquidity ```decrease_liquidity_v2``` on Raydium, ```update_fees_and_rewards``` + ```collect_fees_v2``` + ```collect_reward_v2``` on Orca), one transaction per position; with ```sell``` ```true``` the collected base token is sold for the quote. | Same as ```lp.decrease```. |
-| ```lp.remove``` | positionIds[, ratio[, sell]] | Withdraws liquidity and claims fees and rewards, each position in its own transactions; ```ratio``` defaults to 1, which withdraws everything and closes the position account (on Raydium, ```close_position``` burns the NFT and closes the NFT account, the NFT mint and the position account), returning its rent (```rentRefundSol```); below 1 only that share is withdrawn. (more below the table) | Same as ```lp.decrease```. |
-| ```lp.positions``` | [filter[, wallet]] | Every Meteora DLMM position of the wallet (found by owner with the node's ```getProgramAccounts```, which the node must serve) and every Raydium CLMM and Orca Whirlpools position (NFTs with amount 1 found with ```getTokenAccountsByOwner```, then their position accounts; on Orca positions in Position Bundles the wallet holds are listed too): bin range, in-range flag, current amounts of both tokens (from the position's share of each bin), value, uncollected fees and farm rewards, and the rent it locks. (more below the table) | ```[{id, pool, protocol, symbol, fee, lowerBinId, upperBinId, activeId, binStep, width, priceLower, priceUpper, price, inRange, liquidity, amountBase, amountQuote, value, feesBase, feesQuote, feesValue, rewards, rentSol, feeOwner, closed}]```, with ```value``` and ```feesValue``` in the quote token, ```rewards``` as ```[{mint, symbol, amount}]``` and ```liquidity``` the sum of the bin shares. (more below the table) |
+| ```pump.new``` | [options] | Coins recently created on pump.fun, discovered on chain: the recent signatures of the pump.fun mint authority (```TSLvdd1pWpHVjahSpsvCXUbgwsL3JAcvokwaKt1eokM```, which appears only in creation transactions) are listed and each transaction's ```CreateEvent``` is parsed, newest first. See the sub-page `exchange.IO("pump.*", ...)`. | ```[{signature, slot, time, mint, name, symbol, uri, creator, user, bondingCurve, tokenProgram, quote, quoteMint, mayhem, cashback, holderReward, devBuy}]```: ```time``` is the block time (milliseconds); ```user``` is the wallet that sent the creation (usually the ```creator```); ```tokenProgram``` is ```spl-token``` or ```token-2022```; ```quote``` is ```SOL```, ```USDC``` or the quote token's mint (only ```SOL``` coins can be traded with ```pump.buy``` and ```pump.sell```); ```devBuy``` is the first buy in the same transaction, ```{tokens, quoteAmount}``` (```quoteAmount``` includes fees and is ```null``` when the quote is neither SOL nor USDC), or ```null``` when there is none. (more below the table) |
+| ```pump.info``` | mint | The coin's bonding-curve state, read with one ```getMultipleAccounts``` (curve, mint, global config and fee table). Fails for a coin that is not a pump.fun coin. See the sub-page `exchange.IO("pump.*", ...)`. | ```{mint, bondingCurve, creator, tokenProgram, decimals, quote, quoteMint, complete, migrated, virtualTokenReserves, virtualQuoteReserves, realTokenReserves, realQuoteReserves, tokenTotalSupply, price, marketCap, progress, fees, mayhem, cashback, holderReward}```: reserves and supply are in readable units; ```price``` is the quote (SOL) value of one coin and ```marketCap``` is ```price``` times the total supply; ```progress``` is the share of the curve sold (%), and at 100 the curve is complete (```complete```) and then migrates to PumpSwap (```migrated```, reserves zeroed, ```price```, ```marketCap``` and ```fees``` ```null```); ```fees``` is the current rate ```{protocolBps, creatorBps}``` in basis points. |
+| ```pump.quote``` | mint, side, amount | Quotes locally on the bonding curve (no transaction), with the on-chain program's formula and fees: for ```buy``` ```amount``` is the SOL to spend (fees included), for ```sell``` the number of coins to sell. See the sub-page `exchange.IO("pump.*", ...)`. | ```{venue, mint, side, quote, amountIn, amountOut, price, spotPrice, priceAfter, priceImpactPct, fees, protocolFeeBps, creatorFeeBps, crossesCurve}```: ```venue``` is ```pump``` (bonding curve) or ```jupiter``` (graduated, which adds ```route```, the liquidity sources used); ```price``` is the average fill price including fees (SOL per coin), ```priceImpactPct``` is how far the average price before fees is from the current price ```spotPrice``` (%), and ```fees``` is the protocol plus creator fee (SOL); ```crossesCurve``` ```true``` means the buy goes past the end of the curve (see "Pump.fun launches" below). (more below the table) |
+| ```pump.buy``` | mint, solAmount[, options] | Buys on the bonding curve for ```solAmount``` SOL (protocol and creator fees included): the wallet's token account is created idempotently, then ```buy_exact_quote_in_v3``` is sent with a minimum output of the local quote × (1 − ```slippage```), enforced on chain. See the sub-page `exchange.IO("pump.*", ...)`. | ```{txHash, venue, mint, side, solAmount, tokenAmount, price, fee, slot}```: ```venue``` is ```pump``` or ```jupiter``` (which adds ```route```); ```solAmount``` is the SOL paid (protocol and creator fees included, network fee and account deposits excluded), ```tokenAmount``` the coins bought and ```fee``` the network fee (SOL). (more below the table) |
+| ```pump.sell``` | mint, amount[, options] | Sells ```amount``` coins on the bonding curve (```all``` for the whole balance) with ```sell_v3```, with a minimum SOL output of the local quote × (1 − ```slippage```). See the sub-page `exchange.IO("pump.*", ...)`. | Same as ```pump.buy```: ```solAmount``` is the SOL received (protocol and creator fees deducted). |
+| ```pump.holdings``` | [wallet] | The pump.fun coins held by a wallet (by default this exchange object's wallet): the token balances that have a bonding curve, valued on the curve. See the sub-page `exchange.IO("pump.*", ...)`. | ```[{mint, amount, quote, complete, price, value}]```: ```value``` is the quote (fees deducted) that selling the whole balance on the curve would return now; ```price``` and ```value``` are ```null``` once the curve is complete or when the balance exceeds what the curve can buy back (value graduated coins with ```exchange.IO("route", ...)```). |
+| ```lp.pools``` | token[, quote] | Lists a token's Meteora DLMM, Raydium CLMM and Orca Whirlpools pools (against the given quote, or SOL, USDC and USDT) with fee, bin step and active bin (DLMM) or tick spacing and current tick (CLMM), current price, both token balances of the pool and TVL; 24h volume and fees and the USD TVL come from Meteora's data API (```dlmm.datapi.meteora.ag```), the Raydium API v3 (```api-v3.raydium.io```) and Orca's public API (```api.orca.so```) respectively, while prices, balances and the like are read on chain, Raydium's fee from the pool's AmmConfig account. See the sub-page `exchange.IO("lp.pools", ...)`. | ```[{id, protocol, dex, symbol, base, quote, fee, feeRate, feeRateNow, binStep, activeId, price, reserveBase, reserveQuote, tvlQuote, tvlUsd, volume24hUsd, fees24hUsd, enabled, rewards, empty}]```: ```protocol``` is ```meteora```; ```price``` is quote per token; ```fee``` is the base fee in millionths (the unit of Uniswap's ```fee```), ```feeRate``` the same as a ratio, and ```feeRateNow``` the current rate including the volatility surcharge; ```rewards``` are the pool's farm reward tokens ```[{mint, symbol}]```. (more below the table) |
+| ```lp.select``` | token, budget[, options] | Picks a pool by rule. See the sub-page `exchange.IO("lp.select", ...)`. | One ```lp.pools``` row with an extra ```reason```. |
+| ```lp.pool``` | poolId | Live state of a pool. See the sub-page `exchange.IO("lp.pool", ...)`. | ```{id, protocol, dex, tokenX, tokenY, symbolX, symbolY, decimalsX, decimalsY, price, fee, feeRate, feeRateNow, binStep, activeId, reserveX, reserveY, tvlUsd, volume24hUsd, fees24hUsd, enabled, rewards}```, where ```price``` is Y per X (the pool's own order). (more below the table) |
+| ```lp.ticks``` | poolId[, lowerBinId, upperBinId[, step]] | The liquidity distribution over a bin range (DLMM has bins rather than ticks): both token amounts per segment, ```step``` being the segment width in bins (default 1). See the sub-page `exchange.IO("lp.ticks", ...)`. | ```{pool, activeId, binStep, price, tokenX, tokenY, symbolX, symbolY, segments: [{binLower, binUpper, priceLower, priceUpper, amountX, amountY, current}]}```, prices in Y per X. (more below the table) |
+| ```lp.plan``` | params | A position plan (read-only, costs nothing). See the sub-page `exchange.IO("lp.plan", ...)`. | ```{params, symbol, pool, protocol, fee, feeRate, price, shape, strategy, budget, budgetUsd, binStep, activeId, lowerBinId, upperBinId, bins, positions: [{lowerBinId, upperBinId, priceLower, priceUpper, amountBase, amountQuote, share}], needBase, needQuote, haveBase, haveQuote, swap, shortfall, shareOfPool, volume24hUsd, estDailyFeesUsd, slippageBps, maxActiveBinSlippage, binArraysToCreate, rentSol, rentRefundableSol, warning?}```: ```swap``` is the swap needed before adding (```{side, amount, currency}``` or ```null```); ```shareOfPool``` is the plan's share of the active bin and ```estDailyFeesUsd``` = 24h volume × fee rate × that share (assuming the price stays in range); ```rentSol``` is the rent the positions lock, of which ```rentRefundableSol``` belongs to the position accounts (returned when they are closed) and the rest to new bin arrays (```binArraysToCreate```, not returned). (more below the table) |
+| ```lp.simulate``` | plan[, payer] | Builds the complete add-liquidity transactions of the plan (creating bin arrays, the position, ATAs, wrapping SOL, adding liquidity, unwrapping) and runs them with the node's ```simulateTransaction``` (no signature check, nothing broadcast), one transaction per position. See the sub-page `exchange.IO("lp.simulate", ...)`. | ```{pool, protocol, payer, ok, positions: [{position, lowerBinId, upperBinId, amountBase, amountQuote, ok, err, error, logs, unitsConsumed, txBytes}], swapNeeded, shortfall, note}```: ```logs``` is the tail of the program logs and ```error``` the failure reason (DLMM, Raydium CLMM and Orca Whirlpool error codes with their names); Raydium and Orca rows carry ```tickLower``` and ```tickUpper``` instead of the bin fields, and ```position``` is the mint of the position NFT. |
+| ```lp.add``` | plan | Adds liquidity by the plan. See the sub-page `exchange.IO("lp.add", ...)`. | ```{txHash, txHashes, swapTxHash, pool, protocol, symbol, positions: [{id, txHash, lowerBinId, upperBinId, priceLower, priceUpper, amountBase, amountQuote, rentSol, feeSol}]}```, with position ```id```s written ```meteora:address```, ```raydium:position NFT mint``` or ```orca:position NFT mint```; Raydium and Orca rows carry ```tickLower``` and ```tickUpper``` instead of the bin fields. |
+| ```lp.increase``` | positionId, budget[, options] | Adds to a position, splitting ```budget``` (in the quote token) over the position's bin range at the current price and swapping first for whichever token is short. See the sub-page `exchange.IO("lp.increase", ...)`. | ```{txHash, swapTxHash, id, symbol, amountBase, amountQuote, feeSol}``` |
+| ```lp.decrease``` | positionId, ratio[, options] | Withdraws a ratio (0 to 1, converted to basis points) from every bin of the position that has liquidity and claims all fees and farm rewards; the position stays. See the sub-page `exchange.IO("lp.decrease", ...)`. | ```{txHash, txHashes, positions: [{id, symbol, txHashes, principalBase, principalQuote, feesBase, feesQuote, receivedBase, receivedQuote, rewards, rentRefundSol, feeSol}], sells}```: ```received*``` come from the balances before and after the transactions, and the fee part is split off by the amounts claimable on chain before sending. |
+| ```lp.collect``` | positionIds[, sell] | Claims fees and farm rewards (```claim_fee2``` and ```claim_reward2``` on DLMM, a zero-liquidity ```decrease_liquidity_v2``` on Raydium, ```update_fees_and_rewards``` + ```collect_fees_v2``` + ```collect_reward_v2``` on Orca), one transaction per position; with ```sell``` ```true``` the collected base token is sold for the quote. See the sub-page `exchange.IO("lp.collect", ...)`. | Same as ```lp.decrease```. |
+| ```lp.remove``` | positionIds[, ratio[, sell]] | Withdraws liquidity and claims fees and rewards, each position in its own transactions; ```ratio``` defaults to 1, which withdraws everything and closes the position account (on Raydium, ```close_position``` burns the NFT and closes the NFT account, the NFT mint and the position account), returning its rent (```rentRefundSol```); below 1 only that share is withdrawn. See the sub-page `exchange.IO("lp.remove", ...)`. | Same as ```lp.decrease```. |
+| ```lp.positions``` | [filter[, wallet]] | Every Meteora DLMM position of the wallet (found by owner with the node's ```getProgramAccounts```, which the node must serve) and every Raydium CLMM and Orca Whirlpools position (NFTs with amount 1 found with ```getTokenAccountsByOwner```, then their position accounts; on Orca positions in Position Bundles the wallet holds are listed too): bin range, in-range flag, current amounts of both tokens (from the position's share of each bin), value, uncollected fees and farm rewards, and the rent it locks. See the sub-page `exchange.IO("lp.positions", ...)`. | ```[{id, pool, protocol, symbol, fee, lowerBinId, upperBinId, activeId, binStep, width, priceLower, priceUpper, price, inRange, liquidity, amountBase, amountQuote, value, feesBase, feesQuote, feesValue, rewards, rentSol, feeOwner, closed}]```, with ```value``` and ```feesValue``` in the quote token, ```rewards``` as ```[{mint, symbol, amount}]``` and ```liquidity``` the sum of the bin shares. (more below the table) |
 | ```lp.track``` | positionIds | Registers positions (```meteora:address```, ```raydium:NFT mint```, ```orca:NFT mint``` or the bare address, Raydium and Orca also accepting the position account address; verified to be positions of that protocol) so that ```lp.positions``` checks them as well (ownership is verified on chain each time; transferred-away and closed positions are not listed). (more below the table) | All position addresses remembered in this process. |
-| ```bridge.chains``` | — | Chains supported by the bridge (LI.FI): EVM chains and Solana, cached for an hour. | An array of ```{id, key, name, chainType, nativeToken}```, ```chainType``` being ```EVM``` or ```SVM```. |
-| ```bridge.tokens``` | [chain] | Tokens LI.FI knows on a chain (Solana by default), cached for an hour. | An array of ```{symbol, address, decimals, name, priceUSD}```. |
-| ```bridge.quote``` | params | A bridge quote (read-only) from this exchange object's chain. (more below the table) | ```{tool, toolName, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, fromAmountRaw, toAmountRaw, toAmountMinRaw, fromAmountUSD, toAmountUSD, slippage, toAddress, feeCosts, gasCosts, executionDuration, approvalAddress, steps, transactionId, request}```: amounts are in token units (```*Raw``` in the smallest unit); ```toAmountMin``` is the amount guaranteed after slippage; ```feeCosts``` is ```[{name, amount, token, amountUSD, percentage, included}]``` (fees with ```included``` ```false``` are paid on top); ```gasCosts``` estimates source-chain gas; ```executionDuration``` is the expected time in seconds; ```approvalAddress``` is the contract to approve (```null``` for the native coin and on Solana); ```steps``` lists the steps (```cross``` bridges, ```swap``` swaps); ```request``` echoes the parameters. |
-| ```bridge.simulate``` | params\|quote | Re-quotes, signs LI.FI's serialized transaction with this wallet and runs ```simulateTransaction``` (with signature verification) without broadcasting. (more below the table) | The ```bridge.quote``` result plus ```simulated``` (```true```), ```unitsConsumed``` and ```signature```. |
-| ```bridge.send``` | params\|quote | Bridges out: re-quotes → checks the balance → signs LI.FI's serialized transaction with this wallet (refusing one this wallet does not sign) → ```simulateTransaction``` → broadcasts through the Solana node. (more below the table) | ```{txHash, tool, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, toAddress, transactionId}```; ```txHash``` is the source-chain signature, whose state ```receipt``` returns. |
-| ```bridge.status``` | signature[, options] | Bridge progress (LI.FI ```/status```) for the source-chain transaction signature returned by ```bridge.send```; ```options``` may give ```{toChain, bridge}``` to speed up the lookup. (more below the table) | ```{status, substatus, substatusMessage, tool, sending, receiving, fromAddress, toAddress, explorer, bridgeExplorer}```: ```status``` is ```NOT_FOUND```, ```INVALID```, ```PENDING```, ```DONE``` or ```FAILED```; when ```DONE```, ```substatus``` is ```COMPLETED``` (delivered as quoted), ```PARTIAL``` (a different token arrived) or ```REFUNDED```; ```sending``` and ```receiving``` are ```{txHash, txLink, chainId, amount, amountRaw, token, timestamp}```, with ```receiving.amount``` and ```receiving.token``` being what actually arrived. |
-| ```bridge.apiKey``` | [key] | Sets the LI.FI API key (header ```x-lifi-api-key```, for this exchange object only, never echoed); ```""``` clears it and no argument just queries. Without a key requests are rate-limited per outgoing IP, see below. | Whether a key is set (a boolean). |
+| ```bridge.chains``` | — | Chains supported by the bridge (LI.FI): EVM chains and Solana, cached for an hour. See the sub-page `exchange.IO("bridge.*", ...)`. | An array of ```{id, key, name, chainType, nativeToken}```, ```chainType``` being ```EVM``` or ```SVM```. |
+| ```bridge.tokens``` | [chain] | Tokens LI.FI knows on a chain (Solana by default), cached for an hour. See the sub-page `exchange.IO("bridge.*", ...)`. | An array of ```{symbol, address, decimals, name, priceUSD}```. |
+| ```bridge.quote``` | params | A bridge quote (read-only) from this exchange object's chain. See the sub-page `exchange.IO("bridge.*", ...)`. | ```{tool, toolName, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, fromAmountRaw, toAmountRaw, toAmountMinRaw, fromAmountUSD, toAmountUSD, slippage, toAddress, feeCosts, gasCosts, executionDuration, approvalAddress, steps, transactionId, request}```: amounts are in token units (```*Raw``` in the smallest unit); ```toAmountMin``` is the amount guaranteed after slippage; ```feeCosts``` is ```[{name, amount, token, amountUSD, percentage, included}]``` (fees with ```included``` ```false``` are paid on top); ```gasCosts``` estimates source-chain gas; ```executionDuration``` is the expected time in seconds; ```approvalAddress``` is the contract to approve (```null``` for the native coin and on Solana); ```steps``` lists the steps (```cross``` bridges, ```swap``` swaps); ```request``` echoes the parameters. |
+| ```bridge.simulate``` | params\|quote | Re-quotes, signs LI.FI's serialized transaction with this wallet and runs ```simulateTransaction``` (with signature verification) without broadcasting. See the sub-page `exchange.IO("bridge.*", ...)`. | The ```bridge.quote``` result plus ```simulated``` (```true```), ```unitsConsumed``` and ```signature```. |
+| ```bridge.send``` | params\|quote | Bridges out: re-quotes → checks the balance → signs LI.FI's serialized transaction with this wallet (refusing one this wallet does not sign) → ```simulateTransaction``` → broadcasts through the Solana node. See the sub-page `exchange.IO("bridge.*", ...)`. | ```{txHash, tool, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, toAddress, transactionId}```; ```txHash``` is the source-chain signature, whose state ```receipt``` returns. |
+| ```bridge.status``` | signature[, options] | Bridge progress (LI.FI ```/status```) for the source-chain transaction signature returned by ```bridge.send```; ```options``` may give ```{toChain, bridge}``` to speed up the lookup. See the sub-page `exchange.IO("bridge.*", ...)`. | ```{status, substatus, substatusMessage, tool, sending, receiving, fromAddress, toAddress, explorer, bridgeExplorer}```: ```status``` is ```NOT_FOUND```, ```INVALID```, ```PENDING```, ```DONE``` or ```FAILED```; when ```DONE```, ```substatus``` is ```COMPLETED``` (delivered as quoted), ```PARTIAL``` (a different token arrived) or ```REFUNDED```; ```sending``` and ```receiving``` are ```{txHash, txLink, chainId, amount, amountRaw, token, timestamp}```, with ```receiving.amount``` and ```receiving.token``` being what actually arrived. |
+| ```bridge.apiKey``` | [key] | Sets the LI.FI API key (header ```x-lifi-api-key```, for this exchange object only, never echoed); ```""``` clears it and no argument just queries. Without a key requests are rate-limited per outgoing IP, see below. See the sub-page `exchange.IO("bridge.*", ...)`. | Whether a key is set (a boolean). |
 
 The rest of the longer descriptions in the table:
 
-- ```dca.create```: With an API key and a USDC or USDT quote it uses Jupiter Trigger V2 DCA, otherwise Recurring v1 (time-based); ```exchange.IO("trigger.api", ...)``` can force either; see "DCA" below for the differences. ```params``` is the same for both: ```{symbol, side, total, perOrder, numberOfOrders, interval, minPrice, maxPrice, startAt}```. With ```side``` ```buy``` the quote token buys the base token in installments, and ```total``` and ```perOrder``` are in the quote token; with ```sell``` the base token is sold in installments and they are in the base token. Give either ```perOrder``` or ```numberOfOrders``` (if both, they must agree; with only ```perOrder```, ```total``` must be a whole multiple of it); ```interval``` is the number of seconds between installments; ```minPrice``` and ```maxPrice``` (optional) bound the price (quote per base), and a round whose price is outside the range is skipped; ```startAt``` (optional) is the start timestamp in milliseconds, default immediately. v1: the total is deposited into the DCA order account at once, Jupiter then swaps an installment every interval and the bought tokens are sent back to the wallet; checked locally before sending: at least 2 installments, each worth at least 50 USD (valued with the Jupiter price API), and neither token is a Token-2022 token; waits for the broadcast only, not for confirmation. V2: the total is deposited into the vault (the connector signs the deposit transaction and Jupiter lands it while creating the order, so it has landed on return); ```interval``` is 60 seconds to 1 year, ```startAt``` at most 30 days ahead, each installment worth at least 10 USD, and with ```minPrice``` or ```maxPrice``` the order is price-conditional (on the base token's USD price), a round outside the range moving to the next interval.
-- ```dca.list```: Jupiter indexes a new v1 DCA order with a delay of a few minutes; meanwhile a v1 order this program created (within 10 minutes) whose on-chain DCA account exists is listed under ```active``` too, with ```indexed``` ```false``` and the numbers taken from the on-chain account.
-- ```dca.list``` returns: A v1 row with ```indexed``` ```false``` (not yet indexed by Jupiter) has ```ordersFilled```, ```fee```, ```updatedAt``` and ```closeTx``` ```null```, and its ```info``` holds fields of the on-chain account.
-- ```dca.cancel```: v1 also returns any output token not yet withdrawn and waits for the broadcast only, not for confirmation. A v1 order Jupiter has not indexed yet (in the first minutes after creation) can be canceled too as long as its on-chain DCA account belongs to this wallet; the connector builds the cancel transaction itself from the DCA program's ```close_dca``` instruction (the same accounts as the cancel transaction Jupiter builds), simulates it, then signs and broadcasts it, and the result has ```indexed``` ```false```. V2 takes two steps; Jupiter stops the order and builds a withdrawal transaction, which the connector checks, signs and hands back to Jupiter to land; if the second step fails the order stays ```canceling``` and canceling it again completes the withdrawal. Rounds already filled are not reversed.
-- ```dca.simulate```: With ```wallet``` set to another wallet address the simulation uses it as the owner (read-only). Simulating the cancel of a v1 order Jupiter has not indexed yet builds the transaction from the on-chain DCA account (as ```dca.cancel``` does). On V2 the deposit into the vault is simulated, only for this wallet; the call fails while the wallet has no vault yet, so register one first with ```exchange.IO("trigger.vault", "register")``` (no funds move), since a simulation never registers it; canceling a V2 DCA order cannot be simulated (the cancel call itself stops the order).
-- ```trigger.simulate```: ```params``` is ```{symbol, side, price, amount, expiry, slippage}``` with the meaning of an order (```amount``` in the base token, ```expiry``` and ```slippage``` as the order extra parameters); written ```{cancel: orderId}``` it simulates canceling that limit order. With ```wallet``` set to another wallet address the simulation uses it as the maker (read-only). On V2 (see "Limit orders" below) the deposit into the vault is simulated, only for this wallet; the call fails while the wallet has no vault yet, so register one first with ```exchange.IO("trigger.vault", "register")``` (no funds move), since a simulation never registers it; canceling a V2 limit order cannot be simulated (the cancel call itself stops the order).
-- ```trigger.api```: Only new orders are affected: existing orders go to v1 or V2 by the shape of their order ID regardless of this setting (in ```v1``` mode with an API key, existing V2 orders can still be queried, canceled and modified). Queries when called without an argument.
-- ```trigger.vault```: The funds of V2 limit orders and DCA orders sit here, including those of open orders, of expired orders not yet withdrawn and of canceled orders whose withdrawal did not complete. With ```action``` ```register```, a vault is registered first when the wallet has none (this only creates the custodial account at Jupiter; no transaction is sent and no funds move; an existing vault is returned as is). The first V2 order registers the vault by itself, but ```trigger.simulate``` and ```dca.simulate``` never do, so call this before simulating ahead of the first order.
-- ```pump.new```: ```options.limit``` is how many creation transactions to look at, 20 by default and at most 100; ```options.since``` is a millisecond timestamp, and only coins created after it are returned (the scan stops at the first older transaction). Parsed transactions are cached in the process, so polling fetches only new ones: each call is one ```getSignaturesForAddress``` plus one ```getTransaction``` per new transaction. Creation transactions that failed on chain are not listed.
-- ```pump.new``` returns: ```name```, ```symbol``` and ```uri``` are whatever the creator chose.
-- ```pump.quote```: Once the curve is complete (graduated) the quote comes from Jupiter, as ```pump.buy``` and ```pump.sell``` trade there (also exact input on ```MINT_SOL```, with the default slippage of buys and sells), and ```venue``` is ```jupiter```; it fails when Jupiter has no route.
-- ```pump.quote``` returns: With ```venue``` ```jupiter```, ```priceImpactPct``` is Jupiter's estimated price impact (%), ```spotPrice```, ```priceAfter```, ```fees```, ```protocolFeeBps``` and ```creatorFeeBps``` are ```null``` and ```crossesCurve``` is ```false```.
-- ```pump.buy```: The transaction is simulated by the node first and is not sent when the simulation fails. ```options```: ```slippage``` (```[0, 1)```, default ```0.05```); ```priorityFee``` (the transaction's total priority fee in SOL, 0 to 1; without it the 75th percentile of recent fees paid by transactions writing the same accounts, capped by ```exchange.IO("priorityFee", ...)```); ```computeUnitLimit``` (default: the simulated usage plus headroom); ```dryRun``` (```true``` simulates only, without signing or sending); ```payer``` (only with ```dryRun```: simulate with this wallet paying); ```wait``` (default ```true``` waits for confirmation and reports the fill from the on-chain events; ```false``` returns right after the broadcast). Coins whose curve is complete are swapped through Jupiter at market instead (see below).
-- ```pump.buy``` returns: With ```wait``` ```false``` it is ```{txHash, venue, mint, side, pending, lastValidBlockHeight, expected}``` (```expected``` is the local quote); with ```dryRun``` it is ```{dryRun, venue, mint, side, payer, ok, simulationError, logs, unitsConsumed, txBytes, solAmount, tokenAmount, price, expected}```, with the fill taken from the simulated on-chain events.
-- ```pump.sell```: With ```all``` the wallet's token account is closed in the same transaction and its deposit returned (keep it with ```options.closeAccount``` ```false```). The other options are those of ```pump.buy```. Selling more than the balance fails without sending; coins whose curve is complete are swapped through Jupiter at market instead.
-- ```lp.pools```: Sorted by USD TVL, largest first. When a protocol's API is unavailable its pools are found on chain by mint with the node's ```getProgramAccounts```, and those rows have ```tvlUsd```, ```volume24hUsd``` and ```fees24hUsd``` ```null```.
-- ```lp.pools``` returns: Raydium rows have ```protocol``` ```raydium``` and, instead of ```feeRateNow```, ```binStep``` and ```activeId```, carry ```tickSpacing```, ```tick```, ```liquidity``` (the current liquidity) and ```sqrtPriceX64```; their ```rewards``` are ```[{mint, symbol, active, endTime}]``` (```active``` meaning the reward is being emitted). Orca rows have ```protocol``` ```orca``` and likewise carry ```tickSpacing```, ```tick```, ```liquidity``` and ```sqrtPriceX64``` instead of ```feeRateNow```, ```binStep``` and ```activeId```; they have no ```enabled``` but carry ```adaptiveFee``` (pools whose fee follows volatility; ```fee``` is then the base fee) and ```fullRangeOnly``` (Splash pools, which take full-range positions only); their ```rewards``` are ```[{mint, symbol, active}]```.
-- ```lp.select```: With ```options.fee``` (the ```fee``` of ```lp.pools```) or ```options.binStep``` only those pools are considered; among pools with a USD TVL of at least max($5000, budget) the one with the largest 24h volume wins, the largest TVL when there is no volume data, and the largest TVL overall when none reaches the floor. ```budget``` is in the quote token, ```options.quote``` sets the quote and ```options.protocol``` filters by protocol (```meteora```, ```raydium```, ```orca```, or an array of them); ```options.binStep``` keeps only Meteora pools and ```options.tickSpacing``` only CLMM pools (Raydium, Orca) of that tick spacing.
-- ```lp.pool```: ```poolId``` is the pool address (a DLMM LbPair account, a Raydium CLMM PoolState account or an Orca Whirlpool account), optionally written ```meteora:address```, ```raydium:address``` or ```orca:address```; an address that is not an account of an LP protocol program is an error.
-- ```lp.pool``` returns: Raydium and Orca pools carry the fields of their protocols rows of ```lp.pools```.
-- ```lp.ticks```: Without a range it covers 35 bins on each side of the active bin; at most 1400 bins per call. For a Raydium pool the two range arguments are ticks (```tickLower```, ```tickUpper```, aligned outward to the tick spacing), and each segment's liquidity and token amounts are derived from the current liquidity through the initialized ticks in the TickArrays, ```step``` being the segment width in ticks (the tick spacing by default); without a range it covers about 10% on each side of the price; at most 200 TickArrays (including the current tick) and 2000 segments per call. Orca pools are given by tick: the range is in ticks (aligned outward to the tick spacing) and ```step``` is the segment width in ticks (rounded up to the tick spacing, one tick spacing by default); without a range it covers 35 tick spacings on each side of the current tick, at most 2000 tick spacings per call; each segment gives the active liquidity of its first cell and both token amounts that liquidity represents over the segment.
-- ```lp.ticks``` returns: For a Raydium pool it is ```{pool, tick, tickSpacing, price, tokenX, tokenY, symbolX, symbolY, segments: [{tickLower, tickUpper, priceLower, priceUpper, liquidity, amountX, amountY, current}]}```, ```liquidity``` being the largest liquidity inside the segment. For Orca: ```{pool, tick, tickSpacing, liquidity, price, tokenX, tokenY, symbolX, symbolY, segments: [{tickLower, tickUpper, priceLower, priceUpper, liquidity, amountX, amountY, current}]}```.
-- ```lp.plan```: ```params```: ```symbol``` (such as ```SOL_USDC```), ```budget``` (in the quote token), ```range``` (```{lower, upper}``` prices, ```{pct: [-5, 5]}``` percent around the current price, or ```{bins: [lowerBinId, upperBinId]}```; prices are rounded outward to bins), ```shape``` (```spot``` equal value per bin, ```curve``` thicker towards the price on both sides, ```bidask``` thicker away from it; these are DLMM's SpotImBalanced, CurveImBalanced and BidAskImBalanced strategies: the active bin and those below hold Y, those above hold X), ```pool``` (picked by ```lp.select``` when omitted), ```fee```, ```binStep```, ```slippage``` (default 0.01, converted into the allowed drift of the active bin in bins, ```maxActiveBinSlippage```). A position holds at most 70 bins: a ```spot``` range wider than that is split into several positions (one transaction and one rent deposit each, at most 10, explained in ```warning```); ```curve``` and ```bidask``` ranges wider than 70 bins are an error. When the wallet falls short the plan is still returned with ```shortfall``` explaining it; the SOL side counts what is left after rent and fees (wSOL in the wallet counts as SOL). Raydium CLMM and Orca Whirlpools pools are planned the Uniswap way: ```range``` may also be ```{ticks: [tickLower, tickUpper]}```, and prices and ticks are aligned outward to the tick spacing; ```shape``` is ```spot``` (one range), ```curve``` (nested layers, thickest at the price) or ```bidask``` (segments on both sides of the price, thicker further out, the cell holding the price left empty), with ```layers``` the number of layers (default 3, at most 20; used by curve and bidask, the same algorithm as the Uniswap exchange object); each position is one NFT and one transaction, at most 20 positions per plan; ```tickSpacing``` picks the pool by tick spacing. ```slippage``` is the allowed price move: on Raydium the token maxima are the most the position can take while the price moves within it, on Orca it bounds the execution price (```priceBounds``` are the resulting price limits, beyond which the transaction fails). Orca's Splash pools (tick spacing of 32768 or more) take full-range positions only, so the range and shape are ignored (explained in ```warning```).
-- ```lp.plan``` returns: A CLMM (Raydium, Orca) plan's positions are ```{tickLower, tickUpper, priceLower, priceUpper, amountBase, amountQuote, share}```; it has no ```strategy```, ```binStep```, ```activeId```, ```lowerBinId```, ```upperBinId```, ```bins```, ```maxActiveBinSlippage``` or ```binArraysToCreate``` and carries ```tickSpacing```, ```tick```, ```tickLower```, ```tickUpper``` (the whole range), ```layers``` (the layers actually built, which can be fewer than ```layersRequested``` in a narrow range), ```layersRequested``` and ```tickArraysToCreate``` (start ticks of TickArrays to create, rent not returned), plus ```liquidities``` (each position's liquidity) on Raydium and ```priceBounds``` on Orca; ```shareOfPool``` is the plan's share of the liquidity at the price, and ```rentRefundableSol``` covers the position NFT mint, the NFT account and the position account (on Orca also two ticks), returned on closing.
-- ```lp.simulate```: With ```payer``` set to another wallet address the simulation uses it as payer and owner (read-only, for checking when your own wallet is empty); a plan that needs a swap first is simulated with the post-swap amounts. A Raydium transaction creates ATAs, wraps SOL, runs ```open_position_with_token22_nft``` (creating the position NFT and position account; missing TickArrays are created by the program) and unwraps. An Orca add transaction creates ATAs, wraps SOL, creates dynamic tick arrays (```initialize_dynamic_tick_array```), opens the position (```open_position_with_token_extensions```), adds liquidity by token maxima (```increase_liquidity_by_token_amounts_v2```) and unwraps.
-- ```lp.add```: When needed it first swaps with a Jupiter market order and waits for it, then recomputes at the latest pool price and balances; each position is one transaction (the position account, or the position NFT mint on Raydium and Orca, is created with a freshly generated key that co-signs), simulated before sending and not sent when the simulation fails; after confirmation the actual deposited amounts come from the balances before and after the transaction. Accepts the plan or its ```params```.
-- ```lp.increase```: ```options.symbol``` sets the orientation (the stablecoin is the quote by default), ```options.shape``` the shape (default ```spot```) and ```options.slippage``` price protection. Only positions of at most 70 bins. Raydium positions use ```increase_liquidity_v2```, when both tokens are needed one token's amount is fixed (the SOL side first) and the other is capped at the most it can take while the price moves within ```slippage``` (at least the planned amount × (1 + ```slippage```)); when only one is needed (the range lies on one side of the price) a fixed liquidity is added, and the other token is capped at what the price moving into the range would take. Orca positions have no width limit: the two amounts go on chain as maxima, and the program adds the most liquidity they allow at the execution price.
-- ```lp.decrease```: With ```options.sell``` ```true``` the returned base token is sold for the quote. Positions wider than 70 bins are handled in transactions of 70 bins each. Raydium positions use one ```decrease_liquidity_v2``` that removes that share of the liquidity and claims the fees and all rewards, with minimum outputs of the amounts at the current price × 0.99. Orca: one transaction decreases liquidity by the ratio (```decrease_liquidity_v2```, with a minimum for each token of the amount estimated at the current price less 1%; a price move beyond that makes the simulation fail and nothing is sent) and collects fees and rewards (```collect_fees_v2```, ```collect_reward_v2```).
-- ```lp.remove```: With ```sell``` ```true``` the proceeds are sold back to the quote. Orca closes the position after withdrawing everything (```close_position_with_token_extensions``` for Token-2022 NFT positions, ```close_position``` for older SPL Token NFT positions, ```close_bundled_position``` for positions in a Position Bundle), returning the rent of the position account, the NFT mint and the NFT token account.
-- ```lp.positions```: ```filter``` is a pair (sets the price orientation) or a token (only positions containing it); ```*``` or nothing means all; ```wallet``` views another wallet read-only. Positions registered with ```lp.track``` are checked too (ownership verified on chain; closed ones are not listed). Orca amounts come from the liquidity at the current price, and uncollected fees and rewards are estimated from the on-chain growth (as the official Orca SDK does).
-- ```lp.positions``` returns: Raydium and Orca rows have no bin fields or ```feeOwner``` and carry ```tickLower```, ```tickUpper```, ```tick```, ```tickSpacing```, ```nftMint``` (the position NFT mint) and ```positionAccount``` (the position account), plus ```nftAccount``` on Raydium and ```nftProgram``` on Orca (positions in a Position Bundle carry ```bundleMint``` and ```bundleIndex``` instead, and their ```id``` is ```orca:position account address```); ```liquidity``` is the position's liquidity. On Raydium uncollected fees and rewards are brought up to date from the growth inside the range (rewards advanced to the current time at their emission rate), and ```rentSol``` covers the position account, the NFT account and the NFT mint; on Orca ```rentSol``` is the lamports held by the position account and the NFT mint.
 - ```lp.track```: Positions of all three protocols are found by owner, so registering is normally unnecessary; the command is kept for parity with Uniswap, and positions created by ```lp.add``` in this process are remembered automatically. Looking up another wallet's Orca position uses the node's ```getTokenLargestAccounts``` to find the NFT holder (public nodes rate-limit it tightly).
-- ```bridge.quote```: ```params```: ```toChain``` (destination chain: a chain ID, a LI.FI chain key such as ```arb```, or a name such as ```Arbitrum``` or ```Solana```), ```fromToken``` (a token on this chain: a name in the token table or a mint address), ```toToken``` (a token on the destination chain: a name or address resolved by LI.FI to its canonical token, so ```USDC``` on Arbitrum is native USDC, not USDC.e), ```amount``` (of ```fromToken```, in token units; digits beyond the token's decimals are dropped), ```toAddress``` (the recipient; required for every destination, since all of them are other chains, an ```0x``` address for EVM chains, checked for format), ```slippage``` (defaults to the ```exchange.IO("slippage")``` value), ```order``` (```CHEAPEST``` or ```FASTEST```), ```allowBridges```/```denyBridges``` (LI.FI bridge names, an array or comma-separated). Unknown keys are errors.
-- ```bridge.simulate```: There is no balance override: without the token to bridge, or without SOL for fees, the simulation fails, and the error gives the reason (```AccountNotFound``` means the wallet has no SOL) and the wallet balance.
-- ```bridge.send```: It does not wait for confirmation; bridging is asynchronous, so poll ```bridge.status```. Given a ```bridge.quote``` result, it re-quotes from its ```request``` (quotes move; the new quote applies).
-- ```bridge.status```: Right after broadcasting LI.FI may not have indexed it yet and returns ```NOT_FOUND```; keep polling (every 10 to 30 seconds).
 
 For the common command ```currency``` see `exchange.IO`.
 
@@ -30166,6 +32153,10 @@ Typical flow: ```bridge.quote``` for a quote → ```bridge.simulate``` to simula
 - Risks: the security of bridge contracts and cross-chain messaging rests with each bridge; quotes move, and ```bridge.send``` re-quotes before sending; the destination wallet needs gas to use what arrives. Test with a small amount first.
 - Rate limits: without an API key LI.FI limits by outgoing IP, ```/quote``` to 75 requests per 2 hours (```bridge.quote```, ```bridge.simulate``` and ```bridge.send``` use one each) and other endpoints to 100 per minute; strategies on the same docker share the quota. With a key set through ```exchange.IO("bridge.apiKey", key)``` the limit is 100 per minute. A rate-limited call fails with ```rate limited (HTTP 429 …)```.
 
+##### Strategy examples
+
+Complete runnable strategies: `Jupiter Limit-Order Grid` (native limit orders), `DEX Dollar-Cost Averaging` (native DCA), `pump.fun Sniping Strategy` and `DEX-CEX Arbitrage`; see `DEX Strategy Examples`.
+
 ##### exchange.IO("route", ...)
 
 ```
@@ -30185,7 +32176,7 @@ Parameters:
 - `side` (string, required): Direction: ```sell``` sells ```qty``` units of the base currency, and ```buy``` buys ```qty``` units of the base currency.
 - `qty` (number, required): Amount of the base currency.
 
-Returns (object / null value): Returns ```{symbol, side, qty, route, quote, price, priceImpactPct}```. ```route``` is the array of liquidity source names the swap goes through, ```quote``` is the amount of quote currency received for a sell or paid for a buy, ```price``` is the average price, and ```priceImpactPct``` is Jupiter's estimated price impact (a ratio, 0.001 = 0.1%). When there is no route an object is still returned, with ```route```, ```quote``` and ```price``` set to ```null```. A null value is returned when a token cannot be recognized or the request fails, with the reason in ```GetLastError()```.
+Returns (object / null value): Returns ```{symbol, side, qty, route, quote, price, priceImpactPct, swapMode, baseQty}```: ```route``` lists the liquidity sources used, ```quote``` is the quote amount received for a sell or paid for a buy, ```baseQty``` the base amount actually sold or bought, ```price``` is ```quote``` / ```baseQty```, and ```swapMode``` is ```ExactIn``` or ```ExactOut```. Without a route these five are ```null```. A null value is returned when a token is unknown or the request fails.
 
 Quote selling 2 SOL.
 
@@ -30204,7 +32195,22 @@ function main() {
 }
 ```
 
-Sells are quoted as exact input and buys as exact output (fewer liquidity sources support exact output, so a buy quote for some small tokens may have no route; in that case a quote in the sell direction can serve as an estimate). Quotes do not include Solana transaction fees.
+Quote buying 1 JUP and check the swap mode.
+
+```javascript
+function main() {
+    var r = exchange.IO("route", "JUP_USDC", "buy", 1)
+    if (!r || r.route === null) {
+        Log("No route:", GetLastError())
+        return
+    }
+    Log("mode", r.swapMode, "buys", r.baseQty, "JUP", "costs", r.quote, "USDC", "average", r.price)
+}
+```
+
+```priceImpactPct``` is Jupiter's estimated price impact (a ratio, 0.001 = 0.1%).
+
+Quotes use the same basis as orders: a sell is quoted as exact input (```swapMode``` ```ExactIn```); a buy is quoted as exact output for ```qty``` base units (```ExactOut```), and when there is no exact-output route (sources such as Meteora and PumpSwap do not support exact output) it is estimated with exact input instead, the same fallback as a limit buy, so ```swapMode``` is ```ExactIn``` and ```baseQty``` may differ slightly from ```qty```. Quotes do not include Solana transaction fees.
 
 See also: `Jupiter`, `exchange.IO`, `exchange.IO("slippage")`, `exchange.IO("dexes")`, `exchange.IO("token")`, `exchange.CreateOrder`
 
@@ -30452,223 +32458,1574 @@ Jupiter limits requests per second: about 0.5 to 1 per second without an API key
 
 See also: `Jupiter`, `exchange.IO`, `exchange.IO("route")`, `exchange.IO("token")`, `exchange.IO("receipt")`
 
-#### KyberSwap
+##### exchange.IO("lp.pools", ...)
 
-Connects to the KyberSwap aggregator: quotes and transaction data come from the KyberSwap Aggregator API (which splits and routes orders across many DEXs and market makers; an API key is optional, see "API key and rate limits" below), and the docker signs them with the configured private key and sends them to KyberSwap's router contract MetaAggregationRouterV2 (```0x6131B5fae19EA4f9D964eAc0408E4408b66337b5```). One exchange object covers one chain: Ethereum, Arbitrum, Base, BNB Chain, Unichain, Polygon, OP Mainnet or Robinhood.
+```
+exchange.IO(k, token)
+exchange.IO(k, token, quote)
+```
 
-It is the aggregator version of the same implementation as the `Uniswap` exchange object: the token table, balances, approvals, orders, cancels, transfers and wrapping work the same way; the difference is that the swap route comes from KyberSwap.
+Forms:
 
-##### Names and Configuration
+- `exchange.IO("lp.pools", ...)`
 
-```exchange.GetName()```: ```KyberSwap``` (Spot); aliases: Kyber.
+List a token's concentrated-liquidity pools on Meteora DLMM, Raydium CLMM and Orca Whirlpools, largest USD TVL first.
 
-| Field | Required | Default | Description |
+Parameters:
+
+- `k` (string, required): Set to ```lp.pools``` to list pools.
+- `token` (string, required): The token to look up: a name in the token table, a verified Jupiter token name or a mint address, for example ```SOL``` or ```JUP```. Every row uses it as the base token.
+- `quote` (string, optional): List only pools against this quote token. Without it, pools against SOL, USDC and USDT are listed (excluding the token itself).
+
+Returns (array / null value): An array of pools sorted by ```tvlUsd```, largest first (rows without TVL data come last). Every row has the common fields ```{id, protocol, dex, symbol, base, quote, fee, feeRate, price, reserveBase, reserveQuote, tvlQuote, tvlUsd, volume24hUsd, fees24hUsd, rewards, empty}``` plus fields of its protocol, see the remarks. A null value is returned when the token cannot be recognized or a request fails, with the reason in ```GetLastError()```.
+
+List the 5 SOL/USDC pools with the largest USD TVL.
+
+```javascript
+function main() {
+    var pools = exchange.IO("lp.pools", "SOL", "USDC")
+    if (!pools) {
+        Log("Query failed:", GetLastError())
+        return
+    }
+    Log(pools.length, "pools")
+    for (var i = 0; i < pools.length && i < 5; i++) {
+        var p = pools[i]
+        var grid = p.protocol == "meteora" ? "binStep " + p.binStep : "tickSpacing " + p.tickSpacing
+        Log(p.dex, p.id, "fee", p.fee / 1e4 + "%", grid, "price", p.price,
+            "TVL", Math.round(p.tvlUsd), "24h volume", Math.round(p.volume24hUsd))
+    }
+}
+```
+
+List the farm rewards of the 10 SOL pools with the largest TVL and whether they are being emitted (Meteora rows have no active).
+
+```javascript
+function main() {
+    var pools = exchange.IO("lp.pools", "SOL")
+    if (!pools) {
+        Log("Query failed:", GetLastError())
+        return
+    }
+    pools.slice(0, 10).forEach(function(p) {
+        var names = (p.rewards || []).map(function(r) {
+            var state = r.active === undefined ? "" : (r.active ? " (emitting)" : " (ended)")
+            return r.symbol + state
+        })
+        Log(p.dex, p.symbol, p.id, "rewards:", names.length ? names.join(", ") : "none")
+    })
+}
+```
+
+###### Common fields
+
+- ```id``` is the pool address, which can be passed to ```lp.pool```, ```lp.ticks``` and the ```pool``` parameter of ```lp.plan```; ```protocol``` is ```meteora```, ```raydium``` or ```orca```, and ```dex``` the display name (```Meteora DLMM```, ```Raydium CLMM```, ```Orca Whirlpools```).
+- ```symbol``` is written ```token_quote```; ```base``` and ```quote``` are the mint addresses of the two tokens; ```price``` is the quote value of one token; ```reserveBase``` and ```reserveQuote``` are the pool's balances of the two tokens, and ```tvlQuote``` is their total value in the quote token at the current price.
+- ```fee``` is the base fee in millionths (```400``` is 0.04%, the unit of the Uniswap exchange object's ```fee```), and ```feeRate``` is the same fee as a ratio (```0.0004```).
+- ```tvlUsd```, ```volume24hUsd``` and ```fees24hUsd``` are the USD TVL, 24h volume and 24h fees from each protocol's data API; when a protocol's API is unavailable its pools are found on chain by mint with the node's ```getProgramAccounts```, and those rows have the three fields ```null```.
+- ```empty``` ```true``` marks an empty pool (no price yet), whose ```price``` and ```tvlQuote``` are ```null```; ```lp.plan``` cannot add liquidity to an empty pool.
+
+###### Fields by protocol
+
+| ```protocol``` | Price grid | Extra fields | Each item of ```rewards``` |
 | - | - | - | - |
-| Chain | Yes | ```Ethereum``` | Options: ```Ethereum```, ```Arbitrum```, ```Base```, ```BNB Chain```, ```Unichain```, ```Polygon```, ```OP Mainnet```, ```Robinhood``` |
-| Private Key | Yes | — | Wallet private key (hex). |
-| Rpc Address | No | ```https://ethereum-rpc.publicnode.com,https://eth.drpc.org``` | RPC node URL; several nodes separated by commas fail over to each other when one errors or lacks data; when empty, each chain's built-in default (a primary node plus a backup, comma-separated) is used. (more below the table) |
-| Rpc Api Key | No | — | RPC authentication: a ```Header-Name: value``` header or a Basic auth value. |
-| KyberSwap Api Key | No | — | API key of the KyberSwap Aggregator API, optional. (more below the table) |
+| ```meteora``` | bins: ```binStep``` (basis points) and the active bin ```activeId``` | ```feeRateNow``` (current fee including the volatility surcharge), ```enabled``` | ```{mint, symbol}``` |
+| ```raydium``` | ticks: ```tickSpacing``` and the current ```tick``` | ```liquidity``` (liquidity at the price), ```sqrtPriceX64```, ```enabled``` | ```{mint, symbol, active, endTime}``` |
+| ```orca``` | ticks: ```tickSpacing``` and the current ```tick``` | ```liquidity```, ```sqrtPriceX64```, ```adaptiveFee```, ```fullRangeOnly``` | ```{mint, symbol, active}``` |
 
-The rest of the longer descriptions in the table:
+```rewards``` are the pool's farm reward tokens, ```active``` ```true``` meaning the reward is being emitted. On Orca, ```adaptiveFee``` ```true``` means the fee follows volatility (```fee``` is the base fee), and ```fullRangeOnly``` ```true``` marks a Splash pool, which takes full-range positions only.
 
-- Rpc Address: Order states need a node that returns receipts of mined transactions; the publicnode public nodes for Base, BNB Chain and Arbitrum cannot (archive access is required), so do not use them alone.
-- KyberSwap Api Key: With it, quotes and swap builds go through KyberSwap's API gateway (header ```X-Api-Key```) with a higher rate limit; without it the public endpoint (about 3 requests per second) is used. See "API key and rate limits" below for how to get one; ```exchange.IO("kyberApiKey", key)``` changes it at run time.
+Data sources: prices and balances are read on chain (Raydium's fee from the pool's AmmConfig account); the USD statistics come from Meteora's data API (```dlmm.datapi.meteora.ag```), the Raydium API v3 (```api-v3.raydium.io```) and Orca's public API (```api.orca.so```).
 
-##### Trading Pairs and Contract Codes
+Popular tokens often have over a hundred pools (most with little TVL); to pick one by rule, use `exchange.IO("lp.select")`.
 
-Pair examples: ```ETH_USDC```, ```WETH_USDC```, ```ETH_USDG```
+See also: `Jupiter`, `exchange.IO`, `exchange.IO("lp.select")`, `exchange.IO("lp.pool")`, `exchange.IO("lp.ticks")`, `exchange.IO("lp.plan")`
 
-Pairs are written as ```ETH_USDC```; the native coin (ETH, BNB, POL) and its wrapped token (WETH, WBNB, WPOL) are different assets. The native coin of Polygon is POL; the Robinhood chain has no USDC or USDT and its main stablecoin is USDG, so pairs are written as ```ETH_USDG```; USDT on Unichain and Polygon is written as ```USDT0```.
+##### exchange.IO("lp.select", ...)
 
-The token table is the one of the `Uniswap` exchange object on the same chain; other tokens can be used in pairs after registering them with ```exchange.IO("token", name, address)```, and ```exchange.GetMarkets()``` lists the pairs of the token table that have a Uniswap pool on the chain.
+```
+exchange.IO(k, token, budget)
+exchange.IO(k, token, budget, options)
+```
 
-##### Exchange-specific IO Commands
+Forms:
 
-| Command | Arguments | Description | Returns |
-| - | - | - | - |
-| ```transfer``` | to, amount[, token] | Transfer the native coin or an ERC20 token out of the configured wallet (```token``` is a token name or contract address, the native coin when omitted); ```amount``` may be ```all``` (the native coin keeps the fee). Waits for the broadcast only, not for confirmation. | ```{txHash, from, to, token, tokenAddress, amount, raw}``` |
-| ```receipt``` | txHash[, waitMs] | Query the receipt of any transaction on this chain (not only those sent by this exchange object), optionally waiting for confirmation (up to 10 minutes). For an order, pass the transaction hash after the comma in the order ID. | ```{txHash, status, blockNumber, gasUsed, fee}``` once mined (```status``` is ```success``` or ```reverted```), ```{txHash, pending: true, known}``` otherwise. |
-| ```route``` | symbol, side, qty | Quote only, no order. The aggregator has a single candidate route (such as ```kyberswap:ETH-USDC```); ```buy``` quotes receiving ```qty``` base (approximated with several exact-input quotes), ```sell``` quotes selling ```qty``` base. | ```{symbol, side, qty, best, quote, price, candidates}``` |
-| ```simulate``` | symbol, side, qty[, price[, stateOverride]] | Build the swap transaction with the order logic (quoting, price protection, building the transaction with KyberSwap) and only simulate it with ```eth_call```; nothing is signed, broadcast or paid. (more below the table) | ```{route, exactIn, amountIn, amountOut, quoted, executed, value, calls}```, plus ```allowanceOverride``` when an allowance was supplied. |
-| ```token``` | [name, address] | Register a token so it can be used in pairs; without arguments, list the token table. | ```{symbol, address, decimals}``` when registering, an array of ```{symbol, address, decimals, native}``` when listing. |
-| ```wrap``` | amount | Wrap the native coin into its wrapped token (e.g. ETH→WETH), 1:1 without slippage, gas only; ```all``` is not accepted (gas must remain). | ```{txHash, action, from, to, amount, raw}``` |
-| ```unwrap``` | amount | Unwrap the wrapped token into the native coin (e.g. WETH→ETH); ```amount``` may be ```all```. | ```{txHash, action, from, to, amount, raw}``` |
-| ```approve``` | ["exact" \| "max"] | Token approval mode (tokens are approved directly to the KyberSwap router contract, not through Permit2): ```exact``` (default) approves only what the swap needs, ```max``` grants an unlimited allowance. Queries when called without an argument. | The current mode. |
-| ```slippage``` | [ratio] | Slippage protection of market orders, range ```[0, 0.5)```, default ```0.005``` (0.5%). Queries when called without an argument. | The current slippage ratio. |
-| ```deadline``` | [seconds] | Transaction deadline in seconds, 10 to 86400, default 120. Queries when called without an argument. The deadline is passed to KyberSwap when the swap transaction is built. | The current deadline (seconds). |
-| ```cancelWait``` | [seconds] | How long a cancel waits for the result, in seconds, 0 to 600, default 30; 0 returns right after the cancel transaction is sent. Queries when called without an argument. | The current wait time (seconds). |
-| ```gasMultiplier``` | [x] | Gas limit multiplier, 1 to 5, default 1.2; a transaction's gasLimit is the node's gas estimate times this value. The gasLimit is only a cap; the gas actually used is what is charged. Queries when called without an argument. | The current multiplier. |
-| ```base``` | [url] | Without an argument, returns the current node address; with an address, switches the node. Several nodes are written as one comma-separated string (with an array only the first address is used). After a switch, the first request checks which chain the node is on and fails if it is not the configured chain. | The previous address. |
-| ```sendBase``` | url | Set a node used only to broadcast transactions (a private transaction channel). Unlike Web3, it does not return the previous address, does not query when called without an argument, and an empty string does not clear the setting. | ```true``` |
-| ```address``` | — | The wallet address of the configured private key (lowercase, starting with ```0x```). | — |
-| ```contracts``` | — | The deployment on this chain, with the same fields as the `Uniswap` exchange object: ```dex``` is ```KyberSwap``` and ```router``` is the KyberSwap router contract; ```quoterV2```, ```v3Factory```, ```v4``` and the like are the chain's Uniswap deployment (used to list markets and estimate USD prices), and ```aerodrome``` is ```null```; ```tokenList``` gives the generation time of the built-in token table and its token count on this chain. | — |
-| ```bridge.chains``` | — | Chains supported by the bridge (LI.FI): EVM chains and Solana, cached for an hour. | An array of ```{id, key, name, chainType, nativeToken}```, ```chainType``` being ```EVM``` or ```SVM```. |
-| ```bridge.tokens``` | [chain] | Tokens LI.FI knows on a chain (this chain by default), cached for an hour. | An array of ```{symbol, address, decimals, name, priceUSD}```. |
-| ```bridge.quote``` | params | A bridge quote (read-only) from this exchange object's chain. (more below the table) | ```{tool, toolName, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, fromAmountRaw, toAmountRaw, toAmountMinRaw, fromAmountUSD, toAmountUSD, slippage, toAddress, feeCosts, gasCosts, executionDuration, approvalAddress, steps, transactionId, request}```: amounts are in token units (```*Raw``` in the smallest unit); ```toAmountMin``` is the amount guaranteed after slippage; ```feeCosts``` is ```[{name, amount, token, amountUSD, percentage, included}]``` (fees with ```included``` ```false``` are paid on top); ```gasCosts``` estimates source-chain gas; ```executionDuration``` is the expected time in seconds; ```approvalAddress``` is the contract to approve (```null``` for the native coin and on Solana); ```steps``` lists the steps (```cross``` bridges, ```swap``` swaps); ```request``` echoes the parameters. |
-| ```bridge.simulate``` | params\|quote[, stateOverride] | Re-quotes and runs LI.FI's transaction with ```eth_call```: nothing is signed, broadcast or paid. (more below the table) | The ```bridge.quote``` result plus ```simulated``` (```true```), ```to```, ```value``` and ```walletBalance```, and ```allowanceOverride``` when an allowance was supplied. |
-| ```bridge.send``` | params\|quote | Bridges out: re-quotes → checks the balance → approves LI.FI's ```approvalAddress``` when the token allowance is short (following ```exchange.IO("approve")``` ```exact```/```max```, resetting USDT-like tokens to zero first, waiting for the approval to be mined and re-quoting after it) → simulates with ```eth_call``` → signs and broadcasts, with a gas limit of the larger of the ```eth_estimateGas``` estimate × ```gasMultiplier``` and LI.FI's suggested ```gasLimit``` (bridge contracts call into other contracts, so the estimate can fall short; only the gas used is charged). (more below the table) | ```{txHash, tool, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, toAddress, value, transactionId}```; ```txHash``` is the source-chain transaction, whose receipt ```receipt``` returns. |
-| ```bridge.status``` | txHash[, options] | Bridge progress (LI.FI ```/status```) for the source-chain transaction hash returned by ```bridge.send```; ```options``` may give ```{toChain, bridge}``` to speed up the lookup. (more below the table) | ```{status, substatus, substatusMessage, tool, sending, receiving, fromAddress, toAddress, explorer, bridgeExplorer}```: ```status``` is ```NOT_FOUND```, ```INVALID```, ```PENDING```, ```DONE``` or ```FAILED```; when ```DONE```, ```substatus``` is ```COMPLETED``` (delivered as quoted), ```PARTIAL``` (a different token arrived) or ```REFUNDED```; ```sending``` and ```receiving``` are ```{txHash, txLink, chainId, amount, amountRaw, token, timestamp}```, with ```receiving.amount``` and ```receiving.token``` being what actually arrived. |
-| ```bridge.apiKey``` | [key] | Sets the LI.FI API key (header ```x-lifi-api-key```, for this exchange object only, never echoed); ```""``` clears it and no argument just queries. Without a key requests are rate-limited per outgoing IP, see below. | Whether a key is set (a boolean). |
-| ```clientId``` | [id] | Set the client id sent with KyberSwap Aggregator API requests (the ```x-client-id``` header, also sent when an API key is set), 1 to 64 letters, digits, ```.```, ```_``` or ```-```. (more below the table) | The current client id. |
-| ```kyberApiKey``` | [key] | Sets the KyberSwap API key (for this exchange object only, never echoed), the same as the ```KyberSwap Api Key``` setting: with a key, quotes and swap builds go to KyberSwap's API gateway ```https://api.kyberswap.com/swap``` with the ```X-Api-Key``` header and a higher rate limit; ```""``` clears it and returns to the public endpoint. (more below the table) | Whether a key is set (a boolean). |
+- `exchange.IO("lp.select", ...)`
 
-The rest of the longer descriptions in the table:
+Pick a concentrated-liquidity pool for a token automatically, by a TVL floor and the 24h volume.
 
-- ```simulate```: The route description then lists the liquidity sources it goes through. The sixth argument (route type filter) does not apply to an aggregator and fails with ```route is not applicable to the KyberSwap aggregator``` if given. For a swap paid with a token (such as buying with USDC), when the wallet's allowance falls short (```approve``` defaults to ```exact```, which approves only right before a real order), the allowance is supplied automatically through an ```eth_call``` state override before simulating (the token's approval of the KyberSwap router), and ```allowanceOverride``` in the result lists what was supplied; a ```stateOverride``` you pass is merged with it, and storage slots you set are not overwritten. If the token's allowance storage slot cannot be located, a failing simulation says the token is not approved yet and needs an approval or your own ```stateOverride```. Balances are not supplied automatically.
-- ```bridge.quote```: ```params```: ```toChain``` (destination chain: a chain ID, a LI.FI chain key such as ```arb```, or a name such as ```Arbitrum``` or ```Solana```), ```fromToken``` (a token on this chain: a name in the token table or a contract address), ```toToken``` (a token on the destination chain: a name or address resolved by LI.FI to its canonical token, so ```USDC``` on Arbitrum is native USDC, not USDC.e), ```amount``` (of ```fromToken```, in token units; digits beyond the token's decimals are dropped), ```toAddress``` (the recipient; defaults to this wallet when the destination is an EVM chain, required, as a Solana address, when the destination is Solana), ```slippage``` (defaults to the ```exchange.IO("slippage")``` value), ```order``` (```CHEAPEST``` or ```FASTEST```), ```allowBridges```/```denyBridges``` (LI.FI bridge names, an array or comma-separated). Unknown keys are errors.
-- ```bridge.simulate```: A short token allowance is supplied as unlimited through a state override (as in ```simulate```; ```allowanceOverride``` in the result lists it); balances are not supplied, pass them yourself in ```stateOverride``` (the third ```eth_call``` argument). A failure caused by a short balance reports the wallet balance.
-- ```bridge.send```: The native coin needs no approval. Only the approval is awaited, not the bridge transaction; bridging is asynchronous, so poll ```bridge.status```. Given a ```bridge.quote``` result, it re-quotes from its ```request``` (quotes move; the new quote applies and ```toAmountMin``` is enforced on chain).
-- ```bridge.status```: Right after broadcasting LI.FI may not have indexed it yet and returns ```NOT_FOUND```; keep polling (every 10 to 30 seconds).
-- ```clientId```: Without an API key KyberSwap's public rate limit (3 requests per second) is counted per client id, so programs sharing an id share that budget; use your own id if HTTP 429 errors are frequent, or set an API key (see ```kyberApiKey```). The default is ```fmz-``` followed by the first 8 hex digits of a hash of the wallet address (stable across restarts for the same wallet, without revealing the address; a value generated randomly for the run when no private key is configured). Queries when called without an argument.
-- ```kyberApiKey```: A key is 1 to 256 visible ASCII characters without spaces; an invalid one fails and keeps the previous setting. No argument just queries. When the key is invalid or expired the gateway answers HTTP 401 and the call fails with ```KyberSwap API key rejected (HTTP 401: invalid api key)```; it does not fall back to the public endpoint.
+Parameters:
 
-For the common command ```currency``` see `exchange.IO`.
+- `k` (string, required): Set to ```lp.select``` to pick a pool.
+- `token` (string, required): The token, written as the ```token``` of ```lp.pools```; it is the base token.
+- `budget` (number, required): The amount to invest, in the quote token; it sets the TVL floor.
+- `options` (object, optional): Filters ```{quote, protocol, fee, binStep, tickSpacing}```, all optional, see the remarks.
 
-The common command ```api``` is not supported (the call fails with an error and returns null).
+Returns (object / null value): The chosen pool: one ```lp.pools``` row with an extra ```reason``` (the reason for the choice, in English). A null value is returned when no pool matches the filters, the token cannot be recognized or a request fails.
 
-##### Function Support
+Pick a SOL/USDC pool for a budget of 100 USDC.
 
-Not supported (the call fails with an error and returns null): `exchange.GetTickers`, `exchange.GetHistoryOrders`, `exchange.ModifyOrder`, `exchange.CreateConditionOrder`, `exchange.ModifyConditionOrder`, `exchange.CancelConditionOrder`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`, `exchange.GetHistoryConditionOrders`, `exchange.GetTrades`.
+```javascript
+function main() {
+    var pool = exchange.IO("lp.select", "SOL", 100, {quote: "USDC"})
+    if (!pool) {
+        Log("Selection failed:", GetLastError())
+        return
+    }
+    Log("Picked:", pool.dex, pool.id, "fee", pool.fee / 1e4 + "%", "reason:", pool.reason)
+}
+```
 
-Served through a fallback:
+Pick only among Raydium and Orca pools.
 
-- `exchange.GetRecords`: Native periods are 1m, 5m, 15m, 1h, 4h, 12h, 1d (GeckoTerminal's timeframes); other periods of a minute or longer are synthesized by the docker, while second-level periods are unavailable (there is no trade feed to build them from).
+```javascript
+function main() {
+    var pool = exchange.IO("lp.select", "SOL", 100, {quote: "USDC", protocol: ["raydium", "orca"]})
+    if (!pool) {
+        Log("Selection failed:", GetLastError())
+        return
+    }
+    Log(pool.dex, pool.id, "tickSpacing", pool.tickSpacing,
+        "24h volume", Math.round(pool.volume24hUsd))
+}
+```
 
-##### Notes
+###### Filters
 
-| Function | Behavior on KyberSwap |
+| Key | Description |
 | - | - |
-| exchange.GetTicker() | Bid and ask are KyberSwap quotes for about $1000; there are no 24h statistics. The two sides are quoted separately and their best sources can differ (such as different market-maker quotes on Base), so two individually executable quotes occasionally cross (bid above ask); both sides then report the mid price and ```Info.crossed``` gives how far they crossed |
-| exchange.GetDepth() | Derived from KyberSwap quotes at increasing sizes (one quote per level and side, queued with back-off and retries when rate-limited, so more levels take longer: about 20 seconds for 10); if a quote fails midway, the levels already obtained are returned (none are made up) with the reason in ```Info.partial```, and it fails only when no level was obtained; when the two sides' best sources differ and cross, crossed prices are reported at the mid price with quantities unchanged, and ```Info.crossed``` gives the mid price and how far it crossed |
-| exchange.GetRecords() | K-lines come from GeckoTerminal's pool-level data: an aggregator has no pools of its own, so the pair's pool (on any DEX) with the largest USD liquidity on GeckoTerminal is used (searched among the top 20 pools of each of the two tokens for one holding exactly this pair; the chosen pool is cached for an hour). Prices are that pool's trade prices (including the pool fee, so they may differ from the mid price of ```exchange.GetTicker()``` by about one pool fee) in quote per base, and ```Volume``` is in the base token; periods without trades repeat the previous close with zero volume, and the last bar may still be open. GeckoTerminal data lags by tens of seconds up to a minute and its public API allows about 10 requests per minute: bars of the same period are cached for a minute, requests queue inside the docker and wait and retry when rate-limited, and fail if that still does not succeed. Fails when GeckoTerminal has no pool of the pair |
-| exchange.GetAssets() | Wallet balances of the native coin and of the tokens in the token table |
-| exchange.CreateOrder() | Swaps on chain immediately: a limit price is the worst acceptable fill, market orders are protected by the slippage setting; a market buy is sized in the quote currency. KyberSwap supports exact input only: a limit buy is executed as "spend at most amount × price and receive at least amount", so the amount actually bought may be slightly more than the order amount. The order extra parameter ```slippage``` overrides the slippage for that order; ```route``` does not apply to an aggregator and fails with ```route is not applicable to the KyberSwap aggregator``` |
-| exchange.GetOrder() | The order ID looks like ```ETH_USDC,0x…``` (the pair, a comma, then the transaction hash); the state comes from the transaction receipt, and the order is reported as canceled once the nonce of the original transaction has been taken by the cancel transaction (or another transaction). Filled amounts come from the router contract's ```Swapped``` event (which also covers the native coin) |
-| exchange.GetOrders() | Lists only the swap transactions sent by this exchange object during the current run that are not yet mined |
-| exchange.CancelOrder() | Sends a replacement transaction with the same nonce (a zero-amount transfer to itself) and waits for the result (at most 30 seconds by default, see ```exchange.IO("cancelWait", ...)```): returns ```true``` if the cancel transaction lands first; if the original order is already mined or lands first, it returns ```false``` (the cancel did not happen, but this is not a call error), with the reason in ```exchange.GetLastError()```; returns ```true``` on timeout, meaning the cancel has been submitted, and ```exchange.GetOrder()``` gives the final state |
+| ```quote``` | The quote token; without it, pools against SOL, USDC and USDT are considered |
+| ```protocol``` | The protocol: ```meteora```, ```raydium```, ```orca```, or an array of them |
+| ```fee``` | The base fee in the unit of ```lp.pools```' ```fee``` (millionths), such as ```400``` |
+| ```binStep``` | Only Meteora pools with this bin step |
+| ```tickSpacing``` | Only Raydium and Orca pools with this tick spacing |
 
-##### API key and rate limits
+###### Selection rule
 
-- Without an API key: requests go to the public endpoint ```https://aggregator-api.kyberswap.com``` and are rate-limited per client id (```x-client-id```, see ```exchange.IO("clientId")```) to 3 requests per second (30 per 10 seconds in the response headers). The docker queues KyberSwap requests within a process (at least about 0.34 seconds apart).
-- With an API key, set in the ```KyberSwap Api Key``` setting or with ```exchange.IO("kyberApiKey", key)```: requests go to the API gateway ```https://api.kyberswap.com/swap``` (same paths as the public endpoint) with the ```X-Api-Key``` header (```x-client-id``` is still sent), at a higher rate limit that depends on the key (KyberSwap's documentation gives no figure).
-- Getting a key: there is no self-service sign-up; email the KyberSwap business team at ```business@kyber.network```. KyberSwap no longer whitelists ```x-client-id``` values, so a higher limit is only available through an API key.
-- When rate-limited (HTTP 429), requests back off for the time in the ```x-ratelimit-reset-after``` response header (at most 10 seconds) or 1, 2 and 4 seconds, retrying at most 3 times; if still limited the call fails with ```rate limited (HTTP 429) after 4 attempts```, and without a key the error suggests setting one. ```exchange.GetDepth()``` quotes level by level and is the most likely to hit the limit.
-- A missing, invalid or expired key makes the gateway answer HTTP 401 and the call fails with ```KyberSwap API key rejected (HTTP 401: …)```; it does not fall back to the public endpoint; clear the key with ```exchange.IO("kyberApiKey", "")```.
+1. The ```lp.pools``` rows are filtered; nothing left is an error.
+2. The floor is the larger of $5000 and ```budget``` in USD, with ```budget``` valued at the USD price of the first pool's quote token.
+3. Among pools whose USD TVL reaches the floor, the one with the largest 24h volume wins; if none of them has volume data, the largest TVL; if no pool reaches the floor, the largest TVL of all.
 
-##### Cross-chain bridge
+```reason``` names the case, as in ```highest 24h volume among pools with TVL >= $5000```, ```largest TVL among pools with TVL >= $5000 (no volume data)``` and ```no pool reaches $5000 TVL; picked the largest```.
 
-```exchange.IO("bridge.*", ...)``` bridges tokens from this exchange object's chain to another chain through the bridges LI.FI aggregates (Across, Stargate, CCTP, deBridge, Mayan, Relay, NEAR Intents and more), between EVM chains and between EVM and Solana (from this exchange object's chain). LI.FI supplies the quote and transaction, and the docker approves, simulates with ```eth_call```, signs and broadcasts. Requests carry the integrator tag ```integrator=fmz``` and add no fee; fees in a quote such as ```LIFI Fixed Fee``` are LI.FI's and the bridges' own and are already deducted from ```toAmount```.
+`exchange.IO("lp.plan")` picks the pool by the same rule when ```pool``` is not given (taking ```fee```, ```protocol```, ```binStep``` and ```tickSpacing``` from the plan parameters). The busiest pool is not necessarily the best for a position: the fee and the price grid (```binStep```, ```tickSpacing```) decide the fee income and how precise the range can be.
 
-Typical flow: ```bridge.quote``` for a quote → ```bridge.simulate``` to simulate → ```bridge.send``` to send → ```bridge.status``` every 10 to 30 seconds until ```DONE``` or ```FAILED```.
+See also: `Jupiter`, `exchange.IO`, `exchange.IO("lp.pools")`, `exchange.IO("lp.plan")`, `exchange.IO("lp.pool")`
 
-- Bridging is asynchronous: when ```bridge.send``` returns, only the source-chain transaction has been broadcast; delivery takes seconds to tens of minutes (see ```executionDuration``` in the quote) and must be confirmed by polling ```bridge.status```; ```PARTIAL``` means a different token arrived on the destination chain and ```REFUNDED``` that the funds went back to the source chain.
-- Cross-VM transfers (EVM↔Solana) require ```toAddress```, checked against the destination chain's address format; funds sent to a wrong address cannot be recovered.
-- Risks: the security of bridge contracts and cross-chain messaging rests with each bridge; quotes move, and ```bridge.send``` re-quotes before sending; the destination wallet needs gas to use what arrives. Test with a small amount first.
-- Rate limits: without an API key LI.FI limits by outgoing IP, ```/quote``` to 75 requests per 2 hours (```bridge.quote```, ```bridge.simulate``` and ```bridge.send``` use one each, plus one more when re-quoting after an approval) and other endpoints to 100 per minute; strategies on the same docker share the quota. With a key set through ```exchange.IO("bridge.apiKey", key)``` the limit is 100 per minute. A rate-limited call fails with ```rate limited (HTTP 429 …)```.
+##### exchange.IO("lp.pool", ...)
 
-#### 1inch
+```
+exchange.IO(k, poolId)
+```
 
-A OneInch exchange object connects to the 1inch aggregator: quotes and transaction data come from the 1inch Swap API v6.0 (which splits and routes orders across 1inch's many liquidity sources), and the docker signs them with the configured private key and sends them to 1inch's router contract AggregationRouterV6 (```0x111111125421cA6dc452d289314280a0f8842A65```). One exchange object covers one chain: Ethereum, Arbitrum, Base, BNB Chain, Unichain, Polygon or OP Mainnet. An API key from the 1inch developer portal is required in the exchange configuration.
+Forms:
 
-It is the aggregator version of the same implementation as the `Uniswap` exchange object: the token table, balances, approvals, orders, cancels, transfers and wrapping work the same way; the difference is that the swap route comes from 1inch.
+- `exchange.IO("lp.pool", ...)`
 
-##### Names and Configuration
+Read the live state and statistics of a concentrated-liquidity pool.
 
-```exchange.GetName()```: ```OneInch``` (Spot).
+Parameters:
 
-| Field | Required | Default | Description |
-| - | - | - | - |
-| Chain | Yes | ```Ethereum``` | Options: ```Ethereum```, ```Arbitrum```, ```Base```, ```BNB Chain```, ```Unichain```, ```Polygon```, ```OP Mainnet``` |
-| Private Key | Yes | — | Wallet private key (hex). |
-| Rpc Address | No | ```https://ethereum-rpc.publicnode.com,https://eth.drpc.org``` | RPC node URL; several nodes separated by commas fail over to each other when one errors or lacks data; when empty, each chain's built-in default (a primary node plus a backup, comma-separated) is used. (more below the table) |
-| 1inch Api Key | Yes | — | API key from the 1inch developer portal (required), sent as ```Authorization: Bearer <key>```. |
+- `k` (string, required): Set to ```lp.pool``` to read a pool.
+- `poolId` (string, required): The pool address (a DLMM LbPair account, a Raydium CLMM PoolState account or an Orca Whirlpool account), optionally written ```meteora:address```, ```raydium:address``` or ```orca:address```. A bare address is matched to its protocol by the program that owns the account.
 
-The rest of the longer descriptions in the table:
+Returns (object / null value): The common fields ```{id, protocol, dex, tokenX, tokenY, symbolX, symbolY, decimalsX, decimalsY, price, fee, feeRate, reserveX, reserveY, tvlUsd, volume24hUsd, fees24hUsd, rewards}``` plus the fields of the protocol (as in ```lp.pools```, see the remarks). A null value is returned when the address is not an account of an LP protocol program or a request fails.
 
-- Rpc Address: Order states need a node that returns receipts of mined transactions; the publicnode public nodes for Base, BNB Chain and Arbitrum cannot (archive access is required), so do not use them alone. RPC nodes are used without authentication.
+Read a pool and derive the price from the current bin or tick.
 
-##### Trading Pairs and Contract Codes
+```javascript
+function main() {
+    var sel = exchange.IO("lp.select", "SOL", 100, {quote: "USDC"})
+    if (!sel) {
+        Log("Selection failed:", GetLastError())
+        return
+    }
+    var p = exchange.IO("lp.pool", sel.protocol + ":" + sel.id)
+    if (!p) {
+        Log("Read failed:", GetLastError())
+        return
+    }
+    var scale = Math.pow(10, p.decimalsX - p.decimalsY)
+    var calc = p.protocol == "meteora"
+        ? Math.pow(1 + p.binStep / 10000, p.activeId) * scale
+        : Math.pow(1.0001, p.tick) * scale
+    Log(p.dex, p.symbolX + "/" + p.symbolY, "price", p.price, "derived", calc)
+    Log("reserves", p.reserveX, p.symbolX, p.reserveY, p.symbolY, "24h fees", p.fees24hUsd)
+}
+```
 
-Pair examples: ```ETH_USDC```, ```WETH_USDC```, ```POL_USDT0```
+X and Y follow the pool's own token order: ```price``` is the Y value of one X, and ```reserveX``` and ```reserveY``` are the pool's balances of the two tokens. ```lp.pools``` converts to base and quote tokens around the token queried, ```lp.pool``` does not; for a quote-per-base price, check the orientation with ```symbolX``` and ```symbolY```. An empty pool has ```price``` 0.
 
-Pairs are written as ```ETH_USDC```; the native coin (ETH, BNB, POL) and its wrapped token (WETH, WBNB, WPOL) are different assets. The native coin of Polygon is POL; USDT on Unichain and Polygon is written as ```USDT0```.
+###### Fields by protocol
 
-The token table is the one of the `Uniswap` exchange object on the same chain; other tokens can be used in pairs after registering them with ```exchange.IO("token", name, address)```, and ```exchange.GetMarkets()``` lists the pairs of the token table that have a Uniswap pool on the chain.
-
-##### Exchange-specific IO Commands
-
-| Command | Arguments | Description | Returns |
-| - | - | - | - |
-| ```transfer``` | to, amount[, token] | Transfer the native coin or an ERC20 token out of the configured wallet (```token``` is a token name or contract address, the native coin when omitted); ```amount``` may be ```all``` (the native coin keeps the fee). Waits for the broadcast only, not for confirmation. | ```{txHash, from, to, token, tokenAddress, amount, raw}``` |
-| ```receipt``` | txHash[, waitMs] | Query the receipt of any transaction on this chain (not only those sent by this exchange object), optionally waiting for confirmation (up to 10 minutes). For an order, pass the transaction hash after the comma in the order ID. | ```{txHash, status, blockNumber, gasUsed, fee}``` once mined (```status``` is ```success``` or ```reverted```), ```{txHash, pending: true, known}``` otherwise. |
-| ```route``` | symbol, side, qty | Quote only, no order. The aggregator has a single candidate route (such as ```1inch:ETH-USDC```); ```buy``` quotes receiving ```qty``` base (approximated with several exact-input quotes), ```sell``` quotes selling ```qty``` base. | ```{symbol, side, qty, best, quote, price, candidates}``` |
-| ```simulate``` | symbol, side, qty[, price[, stateOverride]] | Build the swap transaction with the order logic (quoting, price protection, building the transaction with 1inch) and only simulate it with ```eth_call```; nothing is signed, broadcast or paid. (more below the table) | ```{route, exactIn, amountIn, amountOut, quoted, executed, value, calls}```, plus ```allowanceOverride``` when an allowance was supplied. |
-| ```token``` | [name, address] | Register a token so it can be used in pairs; without arguments, list the token table. | ```{symbol, address, decimals}``` when registering, an array of ```{symbol, address, decimals, native}``` when listing. |
-| ```wrap``` | amount | Wrap the native coin into its wrapped token (e.g. ETH→WETH), 1:1 without slippage, gas only; ```all``` is not accepted (gas must remain). | ```{txHash, action, from, to, amount, raw}``` |
-| ```unwrap``` | amount | Unwrap the wrapped token into the native coin (e.g. WETH→ETH); ```amount``` may be ```all```. | ```{txHash, action, from, to, amount, raw}``` |
-| ```approve``` | ["exact" \| "max"] | Token approval mode (tokens are approved directly to the 1inch router contract, not through Permit2): ```exact``` (default) approves only what the swap needs, ```max``` grants an unlimited allowance. Queries when called without an argument. | The current mode. |
-| ```slippage``` | [ratio] | Slippage protection of market orders, range ```[0, 0.5)```, default ```0.005``` (0.5%). Queries when called without an argument. | The current slippage ratio. |
-| ```deadline``` | [seconds] | Transaction deadline in seconds, 10 to 86400, default 120. Queries when called without an argument. Transactions built by 1inch carry no deadline, so the setting has no effect on swaps of a OneInch exchange object. | The current deadline (seconds). |
-| ```cancelWait``` | [seconds] | How long a cancel waits for the result, in seconds, 0 to 600, default 30; 0 returns right after the cancel transaction is sent. Queries when called without an argument. | The current wait time (seconds). |
-| ```gasMultiplier``` | [x] | Gas limit multiplier, 1 to 5, default 1.2; a transaction's gasLimit is the node's gas estimate times this value. The gasLimit is only a cap; the gas actually used is what is charged. Queries when called without an argument. | The current multiplier. |
-| ```base``` | [url] | Without an argument, returns the current node address; with an address, switches the node. Several nodes are written as one comma-separated string (with an array only the first address is used). After a switch, the first request checks which chain the node is on and fails if it is not the configured chain. | The previous address. |
-| ```sendBase``` | url | Set a node used only to broadcast transactions (a private transaction channel). Unlike Web3, it does not return the previous address, does not query when called without an argument, and an empty string does not clear the setting. | ```true``` |
-| ```address``` | — | The wallet address of the configured private key (lowercase, starting with ```0x```). | — |
-| ```contracts``` | — | The deployment on this chain, with the same fields as the `Uniswap` exchange object: ```dex``` is ```1inch``` and ```router``` is the 1inch router contract; ```quoterV2```, ```v3Factory```, ```v4``` and the like are the chain's Uniswap deployment (used to list markets and estimate USD prices), and ```aerodrome``` is ```null```; ```tokenList``` gives the generation time of the built-in token table and its token count on this chain. | — |
-| ```bridge.chains``` | — | Chains supported by the bridge (LI.FI): EVM chains and Solana, cached for an hour. | An array of ```{id, key, name, chainType, nativeToken}```, ```chainType``` being ```EVM``` or ```SVM```. |
-| ```bridge.tokens``` | [chain] | Tokens LI.FI knows on a chain (this chain by default), cached for an hour. | An array of ```{symbol, address, decimals, name, priceUSD}```. |
-| ```bridge.quote``` | params | A bridge quote (read-only) from this exchange object's chain. (more below the table) | ```{tool, toolName, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, fromAmountRaw, toAmountRaw, toAmountMinRaw, fromAmountUSD, toAmountUSD, slippage, toAddress, feeCosts, gasCosts, executionDuration, approvalAddress, steps, transactionId, request}```: amounts are in token units (```*Raw``` in the smallest unit); ```toAmountMin``` is the amount guaranteed after slippage; ```feeCosts``` is ```[{name, amount, token, amountUSD, percentage, included}]``` (fees with ```included``` ```false``` are paid on top); ```gasCosts``` estimates source-chain gas; ```executionDuration``` is the expected time in seconds; ```approvalAddress``` is the contract to approve (```null``` for the native coin and on Solana); ```steps``` lists the steps (```cross``` bridges, ```swap``` swaps); ```request``` echoes the parameters. |
-| ```bridge.simulate``` | params\|quote[, stateOverride] | Re-quotes and runs LI.FI's transaction with ```eth_call```: nothing is signed, broadcast or paid. (more below the table) | The ```bridge.quote``` result plus ```simulated``` (```true```), ```to```, ```value``` and ```walletBalance```, and ```allowanceOverride``` when an allowance was supplied. |
-| ```bridge.send``` | params\|quote | Bridges out: re-quotes → checks the balance → approves LI.FI's ```approvalAddress``` when the token allowance is short (following ```exchange.IO("approve")``` ```exact```/```max```, resetting USDT-like tokens to zero first, waiting for the approval to be mined and re-quoting after it) → simulates with ```eth_call``` → signs and broadcasts, with a gas limit of the larger of the ```eth_estimateGas``` estimate × ```gasMultiplier``` and LI.FI's suggested ```gasLimit``` (bridge contracts call into other contracts, so the estimate can fall short; only the gas used is charged). (more below the table) | ```{txHash, tool, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, toAddress, value, transactionId}```; ```txHash``` is the source-chain transaction, whose receipt ```receipt``` returns. |
-| ```bridge.status``` | txHash[, options] | Bridge progress (LI.FI ```/status```) for the source-chain transaction hash returned by ```bridge.send```; ```options``` may give ```{toChain, bridge}``` to speed up the lookup. (more below the table) | ```{status, substatus, substatusMessage, tool, sending, receiving, fromAddress, toAddress, explorer, bridgeExplorer}```: ```status``` is ```NOT_FOUND```, ```INVALID```, ```PENDING```, ```DONE``` or ```FAILED```; when ```DONE```, ```substatus``` is ```COMPLETED``` (delivered as quoted), ```PARTIAL``` (a different token arrived) or ```REFUNDED```; ```sending``` and ```receiving``` are ```{txHash, txLink, chainId, amount, amountRaw, token, timestamp}```, with ```receiving.amount``` and ```receiving.token``` being what actually arrived. |
-| ```bridge.apiKey``` | [key] | Sets the LI.FI API key (header ```x-lifi-api-key```, for this exchange object only, never echoed); ```""``` clears it and no argument just queries. Without a key requests are rate-limited per outgoing IP, see below. | Whether a key is set (a boolean). |
-
-The rest of the longer descriptions in the table:
-
-- ```simulate```: The route description then lists the liquidity sources it goes through. The sixth argument (route type filter) does not apply to an aggregator and fails with ```route is not applicable to the 1inch aggregator``` if given. For a swap paid with a token (such as buying with USDC), when the wallet's allowance falls short (```approve``` defaults to ```exact```, which approves only right before a real order), the allowance is supplied automatically through an ```eth_call``` state override before simulating (the token's approval of the 1inch router), and ```allowanceOverride``` in the result lists what was supplied; a ```stateOverride``` you pass is merged with it, and storage slots you set are not overwritten. If the token's allowance storage slot cannot be located, a failing simulation says the token is not approved yet and needs an approval or your own ```stateOverride```. Balances are not supplied automatically.
-- ```bridge.quote```: ```params```: ```toChain``` (destination chain: a chain ID, a LI.FI chain key such as ```arb```, or a name such as ```Arbitrum``` or ```Solana```), ```fromToken``` (a token on this chain: a name in the token table or a contract address), ```toToken``` (a token on the destination chain: a name or address resolved by LI.FI to its canonical token, so ```USDC``` on Arbitrum is native USDC, not USDC.e), ```amount``` (of ```fromToken```, in token units; digits beyond the token's decimals are dropped), ```toAddress``` (the recipient; defaults to this wallet when the destination is an EVM chain, required, as a Solana address, when the destination is Solana), ```slippage``` (defaults to the ```exchange.IO("slippage")``` value), ```order``` (```CHEAPEST``` or ```FASTEST```), ```allowBridges```/```denyBridges``` (LI.FI bridge names, an array or comma-separated). Unknown keys are errors.
-- ```bridge.simulate```: A short token allowance is supplied as unlimited through a state override (as in ```simulate```; ```allowanceOverride``` in the result lists it); balances are not supplied, pass them yourself in ```stateOverride``` (the third ```eth_call``` argument). A failure caused by a short balance reports the wallet balance.
-- ```bridge.send```: The native coin needs no approval. Only the approval is awaited, not the bridge transaction; bridging is asynchronous, so poll ```bridge.status```. Given a ```bridge.quote``` result, it re-quotes from its ```request``` (quotes move; the new quote applies and ```toAmountMin``` is enforced on chain).
-- ```bridge.status```: Right after broadcasting LI.FI may not have indexed it yet and returns ```NOT_FOUND```; keep polling (every 10 to 30 seconds).
-
-For the common command ```currency``` see `exchange.IO`.
-
-The common command ```api``` is not supported (the call fails with an error and returns null).
-
-##### Function Support
-
-Not supported (the call fails with an error and returns null): `exchange.GetTickers`, `exchange.GetHistoryOrders`, `exchange.ModifyOrder`, `exchange.CreateConditionOrder`, `exchange.ModifyConditionOrder`, `exchange.CancelConditionOrder`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`, `exchange.GetHistoryConditionOrders`, `exchange.GetTrades`.
-
-Served through a fallback:
-
-- `exchange.GetRecords`: Native periods are 1m, 5m, 15m, 1h, 4h, 12h, 1d (GeckoTerminal's timeframes); other periods of a minute or longer are synthesized by the docker, while second-level periods are unavailable (there is no trade feed to build them from).
-
-##### Notes
-
-| Function | Behavior on 1inch |
+| ```protocol``` | Extra fields |
 | - | - |
-| exchange.GetTicker() | Bid and ask are 1inch quotes for about $1000; there are no 24h statistics. The two sides are quoted separately and their best sources can differ (such as different market-maker quotes on Base), so two individually executable quotes occasionally cross (bid above ask); both sides then report the mid price and ```Info.crossed``` gives how far they crossed |
-| exchange.GetDepth() | Derived from 1inch quotes at increasing sizes (one quote per level and side, queued with back-off and retries when rate-limited, one per second on the free plan, so 10 levels take about 25 seconds); if a quote fails midway, the levels already obtained are returned (none are made up) with the reason in ```Info.partial```, and it fails only when no level was obtained; when the two sides' best sources differ and cross, crossed prices are reported at the mid price with quantities unchanged, and ```Info.crossed``` gives the mid price and how far it crossed |
-| exchange.GetRecords() | K-lines come from GeckoTerminal's pool-level data: an aggregator has no pools of its own, so the pair's pool (on any DEX) with the largest USD liquidity on GeckoTerminal is used (searched among the top 20 pools of each of the two tokens for one holding exactly this pair; the chosen pool is cached for an hour). Prices are that pool's trade prices (including the pool fee, so they may differ from the mid price of ```exchange.GetTicker()``` by about one pool fee) in quote per base, and ```Volume``` is in the base token; periods without trades repeat the previous close with zero volume, and the last bar may still be open. GeckoTerminal data lags by tens of seconds up to a minute and its public API allows about 10 requests per minute: bars of the same period are cached for a minute, requests queue inside the docker and wait and retry when rate-limited, and fail if that still does not succeed. Fails when GeckoTerminal has no pool of the pair |
-| exchange.GetAssets() | Wallet balances of the native coin and of the tokens in the token table |
-| exchange.CreateOrder() | Swaps on chain immediately: a limit price is the worst acceptable fill, market orders are protected by the slippage setting; a market buy is sized in the quote currency. 1inch supports exact input only: a limit buy is executed as "spend at most amount × price and receive at least amount", so the amount actually bought may be slightly more than the order amount. The order extra parameter ```slippage``` overrides the slippage for that order; ```route``` does not apply to an aggregator and fails with ```route is not applicable to the 1inch aggregator``` |
-| exchange.GetOrder() | The order ID looks like ```ETH_USDC,0x…``` (the pair, a comma, then the transaction hash); the state comes from the transaction receipt, and the order is reported as canceled once the nonce of the original transaction has been taken by the cancel transaction (or another transaction). The 1inch router has no unified fill event: tokens are counted from the wallet's incoming and outgoing transfers in the transaction receipt; when the native coin is received, the amount is the wallet's balance difference between the transaction's block and the previous block plus the fee (inaccurate if the wallet has other transactions in the same block) |
-| exchange.GetOrders() | Lists only the swap transactions sent by this exchange object during the current run that are not yet mined |
-| exchange.CancelOrder() | Sends a replacement transaction with the same nonce (a zero-amount transfer to itself) and waits for the result (at most 30 seconds by default, see ```exchange.IO("cancelWait", ...)```): returns ```true``` if the cancel transaction lands first; if the original order is already mined or lands first, it returns ```false``` (the cancel did not happen, but this is not a call error), with the reason in ```exchange.GetLastError()```; returns ```true``` on timeout, meaning the cancel has been submitted, and ```exchange.GetOrder()``` gives the final state |
+| ```meteora``` | ```binStep```, ```activeId```, ```feeRateNow```, ```enabled``` |
+| ```raydium``` | ```tickSpacing```, ```tick```, ```liquidity```, ```sqrtPriceX64```, ```enabled``` |
+| ```orca``` | ```tickSpacing```, ```tick```, ```liquidity```, ```sqrtPriceX64```, ```adaptiveFee```, ```fullRangeOnly``` |
 
-The 1inch free tier allows 1 request per second; the connector queues requests automatically and waits and retries when rate-limited (HTTP 429).
+See `exchange.IO("lp.pools")` for their meaning and the form of ```rewards```.
 
-##### Cross-chain bridge
+Price and index: the price of DLMM bin ```i``` is (1 + ```binStep```/10000)^```i```, that of Raydium or Orca tick ```i``` is 1.0001^```i```, both multiplied by 10^(```decimalsX``` − ```decimalsY```) for readable units.
 
-```exchange.IO("bridge.*", ...)``` bridges tokens from this exchange object's chain to another chain through the bridges LI.FI aggregates (Across, Stargate, CCTP, deBridge, Mayan, Relay, NEAR Intents and more), between EVM chains and between EVM and Solana (from this exchange object's chain). LI.FI supplies the quote and transaction, and the docker approves, simulates with ```eth_call```, signs and broadcasts. Requests carry the integrator tag ```integrator=fmz``` and add no fee; fees in a quote such as ```LIFI Fixed Fee``` are LI.FI's and the bridges' own and are already deducted from ```toAmount```.
+See also: `Jupiter`, `exchange.IO`, `exchange.IO("lp.pools")`, `exchange.IO("lp.ticks")`, `exchange.IO("lp.select")`
 
-Typical flow: ```bridge.quote``` for a quote → ```bridge.simulate``` to simulate → ```bridge.send``` to send → ```bridge.status``` every 10 to 30 seconds until ```DONE``` or ```FAILED```.
+##### exchange.IO("lp.ticks", ...)
 
-- Bridging is asynchronous: when ```bridge.send``` returns, only the source-chain transaction has been broadcast; delivery takes seconds to tens of minutes (see ```executionDuration``` in the quote) and must be confirmed by polling ```bridge.status```; ```PARTIAL``` means a different token arrived on the destination chain and ```REFUNDED``` that the funds went back to the source chain.
-- Cross-VM transfers (EVM↔Solana) require ```toAddress```, checked against the destination chain's address format; funds sent to a wrong address cannot be recovered.
-- Risks: the security of bridge contracts and cross-chain messaging rests with each bridge; quotes move, and ```bridge.send``` re-quotes before sending; the destination wallet needs gas to use what arrives. Test with a small amount first.
-- Rate limits: without an API key LI.FI limits by outgoing IP, ```/quote``` to 75 requests per 2 hours (```bridge.quote```, ```bridge.simulate``` and ```bridge.send``` use one each, plus one more when re-quoting after an approval) and other endpoints to 100 per minute; strategies on the same docker share the quota. With a key set through ```exchange.IO("bridge.apiKey", key)``` the limit is 100 per minute. A rate-limited call fails with ```rate limited (HTTP 429 …)```.
+```
+exchange.IO(k, poolId)
+exchange.IO(k, poolId, lower, upper)
+exchange.IO(k, poolId, lower, upper, step)
+```
+
+Forms:
+
+- `exchange.IO("lp.ticks", ...)`
+
+View a pool's liquidity distribution over a range, with both token amounts per bin or tick segment.
+
+Parameters:
+
+- `k` (string, required): Set to ```lp.ticks``` to view the liquidity distribution.
+- `poolId` (string, required): The pool address, written as the ```poolId``` of ```lp.pool```.
+- `lower` (number, optional): Lower end of the range: a bin ID on DLMM, a tick on Raydium and Orca. Without ```lower``` and ```upper``` a default range around the price is used, see the remarks.
+- `upper` (number, optional): Upper end of the range, in the unit of ```lower```.
+- `step` (number, optional): Width of each segment: in bins on DLMM (default 1), in ticks on Raydium and Orca (default one tick spacing).
+
+Returns (object / null value): For a DLMM pool ```{pool, activeId, binStep, price, tokenX, tokenY, symbolX, symbolY, segments}```; for Raydium ```{pool, tick, tickSpacing, price, tokenX, tokenY, symbolX, symbolY, segments}```, and Orca adds ```liquidity``` (the liquidity at the price). ```segments``` lists the segments, see the remarks for their fields. A null value is returned when a request fails or the range exceeds the limit.
+
+Find the thickest bin near the price of a Meteora pool.
+
+```javascript
+function main() {
+    var pool = exchange.IO("lp.select", "SOL", 100, {quote: "USDC", protocol: "meteora"})
+    if (!pool) {
+        Log("Selection failed:", GetLastError())
+        return
+    }
+    var d = exchange.IO("lp.ticks", pool.id)
+    if (!d) {
+        Log("Query failed:", GetLastError())
+        return
+    }
+    var ranked = d.segments.map(function(s) {
+        return {seg: s, value: s.amountX * d.price + s.amountY}
+    })
+    ranked.sort(function(a, b) { return b.value - a.value })
+    var best = ranked[0]
+    Log("active bin", d.activeId, "price", d.price, "bins", d.segments.length)
+    Log("thickest bin", best.seg.binLower, "price", best.seg.priceLower,
+        "about", Math.round(best.value), d.symbolY)
+}
+```
+
+Summarize about 10% on each side of a Raydium pool's price in segments of 100 ticks (about 1%).
+
+```javascript
+function main() {
+    var pool = exchange.IO("lp.select", "SOL", 100, {quote: "USDC", protocol: "raydium"})
+    if (!pool) {
+        Log("Selection failed:", GetLastError())
+        return
+    }
+    var d = exchange.IO("lp.ticks", "raydium:" + pool.id, pool.tick - 1000, pool.tick + 1000, 100)
+    if (!d) {
+        Log("Query failed:", GetLastError())
+        return
+    }
+    d.segments.forEach(function(s) {
+        Log(s.current ? "*" : " ", s.priceLower.toFixed(2), "-", s.priceUpper.toFixed(2),
+            s.amountX.toFixed(2), d.symbolX, s.amountY.toFixed(2), d.symbolY)
+    })
+}
+```
+
+###### Ranges and segments by protocol
+
+| Protocol | Without a range | Limit | Each item of ```segments``` |
+| - | - | - | - |
+| Meteora DLMM | 35 bins on each side of the active bin | 1400 bins per call | ```{binLower, binUpper, priceLower, priceUpper, amountX, amountY, current}``` |
+| Raydium CLMM | about 10% on each side of the price | 200 TickArrays (including the current one) and 2000 segments per call | ```{tickLower, tickUpper, priceLower, priceUpper, liquidity, amountX, amountY, current}``` |
+| Orca Whirlpools | 35 tick spacings on each side of the current tick | 2000 tick spacings per call | as Raydium |
+
+- Prices are Y per X (the pool's own order, as in ```lp.pool```); ```amountX``` and ```amountY``` are in readable units; the segment with ```current``` ```true``` holds the price.
+- DLMM: the active bin holds both tokens, bins above it only X and bins below only Y; the amounts per segment are the actual balances of those bins.
+- Raydium: both ends are aligned outward to the tick spacing, and each segment's liquidity and token amounts are derived from the current liquidity through the initialized ticks in the TickArrays; ```liquidity``` is the largest liquidity inside the segment. A pool with tick spacing 1 has nearly 2000 segments in the default range; merge them with ```step```.
+- Orca: both ends are aligned outward to the tick spacing and ```step``` is rounded up to it; each segment gives the active liquidity of its first cell and both token amounts that liquidity represents over the segment.
+
+See also: `Jupiter`, `exchange.IO`, `exchange.IO("lp.pool")`, `exchange.IO("lp.pools")`, `exchange.IO("lp.plan")`
+
+##### exchange.IO("lp.plan", ...)
+
+```
+exchange.IO(k, params)
+```
+
+Forms:
+
+- `exchange.IO("lp.plan", ...)`
+
+Work out a position plan from a budget, a price range and a shape: which pool, how many positions, how much of each token, whether to swap first and how much rent to lock. Read-only, no transaction.
+
+Parameters:
+
+- `k` (string, required): Set to ```lp.plan``` to build a position plan.
+- `params` (object, required): The plan parameters ```{symbol, budget, range, shape, pool, protocol, fee, binStep, tickSpacing, slippage, layers}```, see the remarks. A plan may be passed too (its ```params``` are used).
+
+Returns (object / null value): The plan object, fields in the remarks; it can be handed to ```lp.simulate``` and ```lp.add``` as is. A null value is returned for bad parameters, when no pool can be picked, for an empty pool or a range beyond what one plan can hold, with the reason in ```GetLastError()```. A wallet that falls short is not an error: the plan is still returned, with ```shortfall``` explaining it.
+
+Plan a position 5% around the SOL/USDC price and check whether a swap is needed first.
+
+```javascript
+function main() {
+    var plan = exchange.IO("lp.plan", {symbol: "SOL_USDC", budget: 100, range: {pct: [-5, 5]}})
+    if (!plan) {
+        Log("Plan failed:", GetLastError())
+        return
+    }
+    Log(plan.protocol, plan.pool, "price", plan.price, "positions", plan.positions.length)
+    plan.positions.forEach(function(p) {
+        Log("range", p.priceLower.toFixed(2), "-", p.priceUpper.toFixed(2),
+            "SOL", p.amountBase, "USDC", p.amountQuote)
+    })
+    Log("needs", plan.needBase, "SOL", plan.needQuote, "USDC", "rent", plan.rentSol, "SOL",
+        "refundable", plan.rentRefundableSol)
+    if (plan.shortfall) {
+        Log("Not enough funds:", plan.shortfall)
+    } else if (plan.swap) {
+        Log("Swap first:", plan.swap.side, plan.swap.amount, plan.swap.currency)
+    }
+    Log("Estimated daily fees", plan.estDailyFeesUsd, "USD")
+}
+```
+
+Compare spot and curve on a Meteora pool: a wide spot range is split into several positions, while curve must fit in one.
+
+```javascript
+function main() {
+    var pool = exchange.IO("lp.select", "SOL", 100, {quote: "USDC", protocol: "meteora"})
+    if (!pool) {
+        Log("Selection failed:", GetLastError())
+        return
+    }
+    // about 60 bins: fits in one position
+    var pct = 30 * pool.binStep / 100
+    var curve = exchange.IO("lp.plan", {symbol: "SOL_USDC", budget: 100, pool: pool.id,
+        range: {pct: [-pct, pct]}, shape: "curve"})
+    if (curve) {
+        Log(curve.strategy, "bins", curve.bins, "positions", curve.positions.length)
+    }
+    var spot = exchange.IO("lp.plan", {symbol: "SOL_USDC", budget: 100, pool: pool.id,
+        range: {pct: [-10, 10]}, shape: "spot"})
+    if (spot) {
+        Log(spot.strategy, "bins", spot.bins, "positions", spot.positions.length, spot.warning)
+    }
+}
+```
+
+Plan a 4-layer curve on a Raydium pool.
+
+```javascript
+function main() {
+    var plan = exchange.IO("lp.plan", {symbol: "SOL_USDC", budget: 100, protocol: "raydium",
+        range: {pct: [-5, 5]}, shape: "curve", layers: 4})
+    if (!plan) {
+        Log("Plan failed:", GetLastError())
+        return
+    }
+    Log("tickSpacing", plan.tickSpacing, "layers", plan.layers, "/", plan.layersRequested)
+    plan.positions.forEach(function(p) {
+        Log("ticks", p.tickLower, p.tickUpper, "share", (p.share * 100).toFixed(1) + "%")
+    })
+}
+```
+
+###### Plan parameters
+
+| Key | Required | Description |
+| - | - | - |
+| ```symbol``` | yes | The pair, such as ```SOL_USDC```: sets the price orientation (quote per base) and the currency of ```budget``` |
+| ```budget``` | yes | The budget in the quote token: the total value of both tokens |
+| ```range``` | yes | The price range, in one of four forms below |
+| ```shape``` | no | The shape: ```spot``` (default), ```curve``` or ```bidask```, see below |
+| ```pool``` | no | The pool address or ```protocol:address```; without it a pool is picked by the rule of ```lp.select``` |
+| ```protocol```, ```fee```, ```binStep```, ```tickSpacing``` | no | Pool filters when ```pool``` is not given, as the ```options``` of ```lp.select``` |
+| ```slippage``` | no | Price protection ratio, default ```0.01```, at most ```0.5```, see below |
+| ```layers``` | no | Layers of ```curve``` and ```bidask``` on Raydium and Orca, default 3, at most 20 |
+
+Forms of ```range```:
+
+- ```{lower, upper}```: prices (quote per base).
+- ```{pct: [-5, 5]}```: percent around the current price.
+- ```{bins: [lowerBinId, upperBinId]}```: DLMM bin IDs (both ends included).
+- ```{ticks: [tickLower, tickUpper]}```: Raydium and Orca ticks. ```bins``` and ```ticks``` are synonyms, read as bin IDs or ticks by the pool's protocol.
+
+Prices are rounded outward to bins, or aligned outward to the tick spacing.
+
+###### Shapes
+
+Meteora DLMM distributes by bin with DLMM's three strategies (```strategy```): ```spot``` is SpotImBalanced (equal value per bin), ```curve``` is CurveImBalanced (thicker towards the price on both sides) and ```bidask``` is BidAskImBalanced (thicker away from it). The active bin and those below hold the pool's Y, those above hold X. A position holds at most 70 bins: a wider ```spot``` range is split into several positions (one transaction and one rent deposit each, at most 10, explained in ```warning```), while ```curve``` and ```bidask``` ranges wider than 70 bins are an error.
+
+Raydium CLMM and Orca Whirlpools are planned the Uniswap way: ```spot``` is one range, ```curve``` nested ranges in layers (thickest at the price) and ```bidask``` segments on both sides of the price (thicker further out, the cell holding the price left empty). ```layers``` is the number of layers; in a narrow range the layers actually built (```layers```) can be fewer than ```layersRequested```. Each position is one NFT and one transaction, at most 20 positions per plan. Orca's Splash pools (tick spacing of 32768 or more) take full-range positions only, so range and shape are ignored (explained in ```warning```).
+
+###### Price protection (slippage)
+
+- DLMM: converted into the allowed drift of the active bin in bins, ```maxActiveBinSlippage```; the transaction fails when the active bin moves further at execution.
+- Raydium: caps on the token amounts: one token's amount is fixed (the SOL side first) and the other is capped at the most it can take while the price moves within this ratio.
+- Orca: bounds the execution price; ```priceBounds``` are the resulting limits, beyond which the transaction fails.
+
+###### Result fields
+
+- Common: ```params``` (the parameters as given), ```symbol```, ```pool```, ```protocol```, ```fee```, ```feeRate```, ```price``` (quote per base), ```shape```, ```budget```, ```budgetUsd```, ```slippageBps```, ```volume24hUsd```.
+- ```positions```: each position's ```{lowerBinId, upperBinId, priceLower, priceUpper, amountBase, amountQuote, share}``` (```tickLower``` and ```tickUpper``` on Raydium and Orca), ```share``` being its share of the plan's total value.
+- ```needBase``` and ```needQuote``` are the amounts the plan deposits, ```haveBase``` and ```haveQuote``` what the wallet has available (the SOL side net of the reserve for rent and fees, wSOL in the wallet counted as SOL); ```swap``` is the swap needed before adding, ```{side, amount, currency}``` (1% extra for headroom), or ```null```; when both tokens together are not enough, ```swap``` is ```null``` and ```shortfall``` describes the gap: the two amounts the plan deposits (the same as ```needBase``` and ```needQuote```), what the wallet holds and its value in the quote token at the pool price, and, when the missing token has to be bought with the other one, how much of that other token is needed in all (deposit plus swap cost, with 1% headroom) and how much is missing; on the SOL side it also states what is kept back for rent and fees.
+- ```rentSol``` is the rent the positions lock, of which ```rentRefundableSol``` is that of the position accounts (plus the NFT mint and NFT account on Raydium and Orca, and two ticks on Orca), returned on closing; the rest is for new BinArrays and TickArrays and is not returned.
+- ```shareOfPool``` is the plan's share of the liquidity at the price (on DLMM, of the active bin), and ```estDailyFeesUsd``` = ```volume24hUsd``` × ```feeRate``` × ```shareOfPool``` (assuming the price stays in range); both are 0 for a plan with no liquidity at the price (such as ```bidask```).
+- DLMM adds ```strategy```, ```binStep```, ```activeId```, ```lowerBinId```, ```upperBinId```, ```bins``` (number of bins), ```maxActiveBinSlippage``` and ```binArraysToCreate``` (indexes of BinArrays to create); Raydium and Orca add ```tickSpacing```, ```tick```, ```tickLower```, ```tickUpper``` (the whole range), ```layers```, ```layersRequested``` and ```tickArraysToCreate``` (start ticks of TickArrays to create), plus ```liquidities``` (each position's liquidity) on Raydium and ```priceBounds``` on Orca; ```warning``` appears when something needs explaining.
+
+A plan is a snapshot: ```lp.simulate``` and ```lp.add``` re-plan from its ```params``` at the latest pool price and balances. The fee estimate uses the past 24h volume and is no promise of future income.
+
+See also: `Jupiter`, `exchange.IO`, `exchange.IO("lp.simulate")`, `exchange.IO("lp.add")`, `exchange.IO("lp.select")`, `exchange.IO("lp.ticks")`, `exchange.IO("lp.positions")`
+
+##### exchange.IO("lp.simulate", ...)
+
+```
+exchange.IO(k, plan)
+exchange.IO(k, plan, payer)
+```
+
+Forms:
+
+- `exchange.IO("lp.simulate", ...)`
+
+Build all add-liquidity transactions of a plan and run them with the node's simulation, without signing or broadcasting.
+
+Parameters:
+
+- `k` (string, required): Set to ```lp.simulate``` to simulate adding liquidity.
+- `plan` (object, required): A plan returned by ```lp.plan```, or plan parameters (the ```params``` of ```lp.plan```).
+- `payer` (string, optional): Another wallet address, to simulate with it as payer and position owner (read-only, its private key is not needed), for checking a plan when your own wallet is empty.
+
+Returns (object / null value): ```{pool, protocol, payer, ok, positions, swapNeeded, shortfall, note}```: ```ok``` tells whether all add transactions simulated successfully and ```positions``` holds the result of each transaction, fields in the remarks. A failed simulation is not an error (check ```ok``` and each row's ```error```); a null value is returned when planning or a request fails.
+
+Plan, simulate, and add only when the simulation passes.
+
+```javascript
+function main() {
+    var plan = exchange.IO("lp.plan", {symbol: "SOL_USDC", budget: 100, range: {pct: [-5, 5]}})
+    if (!plan) {
+        Log("Plan failed:", GetLastError())
+        return
+    }
+    var sim = exchange.IO("lp.simulate", plan)
+    if (!sim) {
+        Log("Simulation error:", GetLastError())
+        return
+    }
+    sim.positions.forEach(function(p) {
+        Log(p.ok ? "ok" : "failed", p.amountBase, "SOL", p.amountQuote, "USDC",
+            "compute units", p.unitsConsumed, p.error || "")
+    })
+    Log("All passed:", sim.ok, sim.note)
+}
+```
+
+Check a plan with another wallet as payer (read-only).
+
+```javascript
+var PAYER = ""   // a wallet address holding SOL and USDC
+
+function main() {
+    if (!PAYER) {
+        Log("Set PAYER to a wallet address first")
+        return
+    }
+    var sim = exchange.IO("lp.simulate", {symbol: "SOL_USDC", budget: 200,
+        range: {pct: [-3, 3]}, shape: "spot", protocol: "meteora"}, PAYER)
+    if (!sim) {
+        Log("Simulation error:", GetLastError())
+        return
+    }
+    Log(sim.protocol, sim.pool, "payer", sim.payer, "all passed", sim.ok)
+    sim.positions.forEach(function(p) {
+        Log("bins", p.lowerBinId, p.upperBinId, p.ok, p.unitsConsumed, p.txBytes, p.error || "")
+    })
+}
+```
+
+###### What is simulated
+
+- The plan is first re-planned from its ```params``` at the latest pool price and the payer's balances, then one complete add transaction is built per position and run with the node's ```simulateTransaction``` (no signature check).
+- No swap: when the plan needs a swap first (```swap``` not ```null```) the post-swap amounts are simulated and ```swapNeeded``` is ```true```; with a swap or a ```shortfall```, ```note``` warns that the payer must hold the planned amounts for the simulation to pass, otherwise ```note``` is an empty string.
+- Transactions by protocol: DLMM creates bin arrays, the position account and ATAs, wraps SOL, adds liquidity and unwraps; Raydium creates ATAs, wraps SOL, runs ```open_position_with_token22_nft``` (creating the position NFT and position account; missing TickArrays are created by the program) and unwraps; Orca creates ATAs, wraps SOL, creates dynamic tick arrays (```initialize_dynamic_tick_array```), opens the position (```open_position_with_token_extensions```), adds liquidity by token maxima (```increase_liquidity_by_token_amounts_v2```) and unwraps.
+
+###### Each item of positions
+
+| Field | Description |
+| - | - |
+| ```position``` | The position account (DLMM) or position NFT mint (Raydium, Orca) generated for this simulation; ```lp.add``` generates another |
+| ```lowerBinId```, ```upperBinId``` | The range (```tickLower``` and ```tickUpper``` on Raydium and Orca) |
+| ```amountBase```, ```amountQuote``` | The two token amounts this transaction deposits |
+| ```ok```, ```err```, ```error``` | Success, the node's raw error and the failure reason (DLMM, Raydium CLMM and Orca Whirlpool error codes with their names) |
+| ```logs``` | The tail of the program logs |
+| ```unitsConsumed```, ```txBytes``` | Compute units consumed and transaction size in bytes |
+
+Common failures: ```AccountNotFound``` means the payer has no SOL (a new or empty wallet); a balance below the planned amounts makes the program report insufficient funds. Before funding your own wallet, set ```payer``` to a public wallet holding both tokens to check the plan itself.
+
+See also: `Jupiter`, `exchange.IO`, `exchange.IO("lp.plan")`, `exchange.IO("lp.add")`, `exchange.IO("lp.select")`
+
+##### exchange.IO("lp.add", ...)
+
+```
+exchange.IO(k, plan)
+```
+
+Forms:
+
+- `exchange.IO("lp.add", ...)`
+
+Open concentrated-liquidity positions by a plan: the missing token is swapped through Jupiter first, and each position is one on-chain transaction.
+
+Parameters:
+
+- `k` (string, required): Set to ```lp.add``` to add liquidity.
+- `plan` (object, required): A plan returned by ```lp.plan```, or plan parameters (the ```params``` of ```lp.plan```).
+
+Returns (object / null value): ```{txHash, txHashes, swapTxHash, pool, protocol, symbol, positions}```: ```txHash``` is the first add transaction's signature and ```txHashes``` all of them; ```swapTxHash``` is the signature of the swap before adding (```null``` without one); each item of ```positions``` is ```{id, txHash, lowerBinId, upperBinId, priceLower, priceUpper, amountBase, amountQuote, rentSol, feeSol}``` (```tickLower``` and ```tickUpper``` on Raydium and Orca). A null value is returned when funds are short or a simulation or transaction fails.
+
+Add liquidity 5% around the SOL/USDC price.
+
+```javascript
+function main() {
+    var r = exchange.IO("lp.add", {symbol: "SOL_USDC", budget: 100, range: {pct: [-5, 5]}})
+    if (!r) {
+        Log("Add failed:", GetLastError())
+        return
+    }
+    if (r.swapTxHash) {
+        Log("Swapped first:", r.swapTxHash)
+    }
+    r.positions.forEach(function(p) {
+        Log(p.id, p.priceLower.toFixed(2), "-", p.priceUpper.toFixed(2),
+            "deposited", p.amountBase, "SOL", p.amountQuote, "USDC", "rent", p.rentSol, "SOL")
+    })
+}
+```
+
+Full workflow: pick a pool → plan → simulate → add → monitor and collect → withdraw.
+
+```javascript
+var BUDGET = 100        // budget (USDC)
+var MIN_FEES = 1        // collect once uncollected fees exceed 1 USDC
+
+function main() {
+    // 1. List the pools and pick one
+    var pools = exchange.IO("lp.pools", "SOL", "USDC")
+    if (!pools || pools.length == 0) {
+        Log("No pools:", GetLastError())
+        return
+    }
+    var pool = exchange.IO("lp.select", "SOL", BUDGET, {quote: "USDC"})
+    if (!pool) {
+        Log("Selection failed:", GetLastError())
+        return
+    }
+    Log(pools.length, "candidates, picked", pool.dex, pool.id, pool.reason)
+    // 2. Plan: 5% around the price
+    var plan = exchange.IO("lp.plan", {symbol: "SOL_USDC", budget: BUDGET, pool: pool.id,
+        range: {pct: [-5, 5]}, shape: "spot"})
+    if (!plan || plan.shortfall) {
+        Log("Plan failed or funds short:", plan ? plan.shortfall : GetLastError())
+        return
+    }
+    Log("positions", plan.positions.length, "swap", JSON.stringify(plan.swap), "rent", plan.rentSol)
+    // 3. Simulate
+    var sim = exchange.IO("lp.simulate", plan)
+    if (!sim || !sim.ok) {
+        Log("Simulation did not pass:", sim ? JSON.stringify(sim.positions) : GetLastError())
+        return
+    }
+    // 4. Add liquidity
+    var r = exchange.IO("lp.add", plan)
+    if (!r) {
+        Log("Add failed:", GetLastError())
+        return
+    }
+    var ids = r.positions.map(function(p) { return p.id })
+    Log("Created", ids.join(", "), "transactions", r.txHashes.join(", "))
+    // 5. Monitor: leave the loop when out of range, collect when fees add up
+    while (true) {
+        Sleep(60 * 1000)
+        var list = exchange.IO("lp.positions", "SOL_USDC")
+        if (!list) {
+            continue
+        }
+        var mine = list.filter(function(p) { return ids.indexOf(p.id) >= 0 })
+        var out = mine.some(function(p) { return !p.inRange })
+        var fees = mine.reduce(function(s, p) { return s + p.feesValue }, 0)
+        LogStatus(_D(), "positions", mine.length, "out of range", out, "fees", fees.toFixed(4))
+        if (out) {
+            break
+        }
+        if (fees > MIN_FEES) {
+            var c = exchange.IO("lp.collect", ids)
+            Log("Collected:", c ? c.txHashes.join(", ") : GetLastError())
+        }
+    }
+    // 6. Withdraw everything, close the positions for their rent, sell the SOL back to USDC
+    var rm = exchange.IO("lp.remove", ids, 1, true)
+    if (!rm) {
+        Log("Remove failed:", GetLastError())
+        return
+    }
+    rm.positions.forEach(function(p) {
+        Log(p.id, "received", p.receivedBase, "SOL", p.receivedQuote, "USDC",
+            "fees", p.feesBase, p.feesQuote, "rent back", p.rentRefundSol)
+    })
+}
+```
+
+###### Steps
+
+1. Re-plans from the plan's ```params``` at the latest pool price and wallet balances; a ```shortfall``` is an error and nothing is sent.
+2. When the plan needs a swap, a Jupiter market order of this exchange object swaps first (slippage per `exchange.IO("slippage")`) and is waited for.
+3. Re-plans again after the swap; when slippage and fees leave the balances slightly below the plan, each position is scaled down in proportion.
+4. One transaction per position: the DLMM position account, or the Raydium and Orca position NFT mint, is created with a freshly generated key that co-signs.
+5. After confirmation, ```amountBase``` and ```amountQuote``` are the amounts actually deposited, from the balances before and after; ```rentSol``` is the rent the transaction locked (new BinArrays, TickArrays and the position accounts included) and ```feeSol``` the network fee.
+
+###### Execution
+
+Every transaction is simulated by the node before sending and is not sent when the simulation fails, with the reason reported (DLMM, Raydium CLMM and Orca Whirlpool error codes with their names); the compute-unit limit is the simulated usage plus headroom, and the priority fee is the 75th percentile of recent fees paid by transactions writing the same accounts, capped by `exchange.IO("priorityFee")`. The call returns after confirmation, with actual amounts from the balances before and after. When within 120 seconds the transaction is neither confirmed nor provably expired, the error says ```outcome is unknown``` with the signature: it may have landed, so check it with `exchange.IO("receipt")` before retrying.
+
+###### Position IDs and failures
+
+- Position ```id```s are written ```meteora:position account address```, ```raydium:position NFT mint``` or ```orca:position NFT mint``` and are passed to ```lp.increase```, ```lp.decrease```, ```lp.collect``` and ```lp.remove```; positions created in this process are remembered, so ```lp.positions``` always finds them.
+- When a step after the swap fails, the error carries the swap's signature (the swapped tokens stay in the wallet); when one of several positions fails, the error lists the positions already created.
+
+###### Risks
+
+- Impermanent loss: the further the price moves from the entry, the less the position is worth compared with simply holding.
+- Once the price leaves the range, the position holds only one token and earns no fees.
+- Rent for new BinArrays and TickArrays is not returned; split positions each lock their own position rent.
+- Every add, rebalance, collect and withdrawal is an on-chain transaction; frequent rebalancing can cost more than the fees earned.
+
+See also: `Jupiter`, `exchange.IO`, `exchange.IO("lp.plan")`, `exchange.IO("lp.simulate")`, `exchange.IO("lp.positions")`, `exchange.IO("lp.collect")`, `exchange.IO("lp.remove")`, `exchange.IO("lp.increase")`
+
+##### exchange.IO("lp.increase", ...)
+
+```
+exchange.IO(k, positionId, budget)
+exchange.IO(k, positionId, budget, options)
+```
+
+Forms:
+
+- `exchange.IO("lp.increase", ...)`
+
+Add to an existing position: the budget is split into the two tokens by the position's range and the current price, swapping first for the one that is short.
+
+Parameters:
+
+- `k` (string, required): Set to ```lp.increase``` to add to a position.
+- `positionId` (string, required): A position ID (the ```id``` of ```lp.positions```, such as ```meteora:position address```, ```raydium:NFT mint``` or ```orca:NFT mint```; a bare address is accepted too). The position must belong to this wallet.
+- `budget` (number, required): The amount to add, in the quote token.
+- `options` (object, optional): ```{symbol, shape, slippage}```: ```symbol``` is the pair, setting the orientation and the currency of ```budget``` (by default the stablecoin, then SOL, is the quote); ```shape``` is the DLMM shape (default ```spot```); ```slippage``` the price protection, default ```0.01```.
+
+Returns (object / null value): ```{txHash, swapTxHash, id, symbol, amountBase, amountQuote, feeSol}```: ```amountBase``` and ```amountQuote``` are the amounts actually deposited (from the balances before and after), and ```swapTxHash``` is the signature of the swap made first (```null``` without one). A null value is returned when funds are short, the position does not belong to this wallet, or a simulation or transaction fails.
+
+Add 50 USDC to the first SOL/USDC position.
+
+```javascript
+function main() {
+    var list = exchange.IO("lp.positions", "SOL_USDC")
+    if (!list || list.length == 0) {
+        Log("No SOL/USDC position")
+        return
+    }
+    var r = exchange.IO("lp.increase", list[0].id, 50, {symbol: "SOL_USDC"})
+    if (!r) {
+        Log("Increase failed:", GetLastError())
+        return
+    }
+    Log(r.id, "added", r.amountBase, "SOL", r.amountQuote, "USDC", "transaction", r.txHash)
+}
+```
+
+Planning, swapping and execution work as in ```lp.add```: the position's range is planned at the latest pool price, a shortfall is an error, a Jupiter market order swaps first when needed and is waited for, then the plan is redone and one transaction is sent.
+
+###### Differences between protocols
+
+- Meteora DLMM: distributed over the position's bins by ```shape```; only positions of at most 70 bins (a wider one does not fit in one transaction and fails).
+- Raydium CLMM: uses ```increase_liquidity_v2```. When both tokens are needed one token's amount is fixed (the SOL side first) and the other is capped at the most it can take while the price moves within ```slippage``` (at least the planned amount × (1 + ```slippage```)); when only one is needed (the range lies on one side of the price) a fixed liquidity is added, the other token capped at what the price moving into the range would take.
+- Orca Whirlpools: no width limit; both token amounts go on chain as maxima, and the program adds the most liquidity they allow at the execution price.
+
+###### Execution
+
+Every transaction is simulated by the node before sending and is not sent when the simulation fails, with the reason reported (DLMM, Raydium CLMM and Orca Whirlpool error codes with their names); the compute-unit limit is the simulated usage plus headroom, and the priority fee is the 75th percentile of recent fees paid by transactions writing the same accounts, capped by `exchange.IO("priorityFee")`. The call returns after confirmation, with actual amounts from the balances before and after. When within 120 seconds the transaction is neither confirmed nor provably expired, the error says ```outcome is unknown``` with the signature: it may have landed, so check it with `exchange.IO("receipt")` before retrying.
+
+See also: `Jupiter`, `exchange.IO`, `exchange.IO("lp.add")`, `exchange.IO("lp.positions")`, `exchange.IO("lp.decrease")`, `exchange.IO("lp.plan")`
+
+##### exchange.IO("lp.decrease", ...)
+
+```
+exchange.IO(k, positionId, ratio)
+exchange.IO(k, positionId, ratio, options)
+```
+
+Forms:
+
+- `exchange.IO("lp.decrease", ...)`
+
+Withdraw a share of a position's liquidity and claim all fees and farm rewards; the position stays.
+
+Parameters:
+
+- `k` (string, required): Set to ```lp.decrease``` to reduce a position.
+- `positionId` (string, required): A position ID (the ```id``` of ```lp.positions```, such as ```meteora:position address```, ```raydium:NFT mint``` or ```orca:NFT mint```; a bare address is accepted too). One position per call, which must belong to this wallet.
+- `ratio` (number, required): The share to withdraw, (0, 1], converted to basis points; 1 empties the position without closing it (close with ```lp.remove```).
+- `options` (object, optional): ```{sell}```: with ```sell``` ```true``` the base token received is sold for the quote token with a Jupiter market order.
+
+Returns (object / null value): ```{txHash, txHashes, positions, sells}```: ```txHash``` is the first transaction signature and ```txHashes``` all of them; each item of ```positions``` is one position's ```{id, symbol, txHashes, principalBase, principalQuote, feesBase, feesQuote, receivedBase, receivedQuote, rewards, rentRefundSol, feeSol}```, and ```sells``` lists the swaps back to the quote token, see the remarks. A null value is returned when a position does not belong to this wallet, a simulation fails or a transaction fails.
+
+Withdraw half of each position that is out of range and sell back to USDC.
+
+```javascript
+function main() {
+    var list = exchange.IO("lp.positions", "SOL_USDC")
+    if (!list) {
+        Log("Query failed:", GetLastError())
+        return
+    }
+    list.forEach(function(p) {
+        if (p.inRange) {
+            return
+        }
+        var r = exchange.IO("lp.decrease", p.id, 0.5, {sell: true})
+        if (!r) {
+            Log(p.id, "decrease failed:", GetLastError())
+            return
+        }
+        var row = r.positions[0]
+        Log(p.id, "received", row.receivedBase, "SOL", row.receivedQuote, "USDC",
+            "of which fees", row.feesBase, row.feesQuote, "sold", JSON.stringify(r.sells))
+    })
+}
+```
+
+###### How each protocol does it
+
+- Meteora DLMM: withdraws the ratio from every bin of the position that has liquidity (```remove_liquidity_by_range2```) and claims fees and rewards; positions wider than 70 bins are handled in transactions of 70 bins each. There is no minimum-output protection: what comes back is the position's share of each bin, so the amounts depend on the bins' composition at the time.
+- Raydium CLMM: one ```decrease_liquidity_v2``` removes that share of the liquidity and claims the fees and all rewards, with minimum outputs of the amounts at the current price × 0.99.
+- Orca Whirlpools: one transaction decreases liquidity by the ratio (```decrease_liquidity_v2```, with a minimum for each token of the amount estimated at the current price less 1%; a price move beyond that makes the simulation fail and nothing is sent) and collects fees and rewards (```collect_fees_v2```, ```collect_reward_v2```).
+
+###### Position rows in the result
+
+| Field | Description |
+| - | - |
+| ```receivedBase```, ```receivedQuote``` | The two token amounts actually received (from the balances before and after) |
+| ```feesBase```, ```feesQuote``` | The fee part of them (split off by the amounts claimable on chain before sending) |
+| ```principalBase```, ```principalQuote``` | The principal part = received − fees |
+| ```rewards``` | Farm rewards collected, ```[{mint, symbol, amount}]``` (excluding the pool's two tokens) |
+| ```rentRefundSol``` | Rent returned by closing (SOL) |
+| ```feeSol``` | Network fees paid by these transactions (SOL) |
+
+The orientation (base and quote) takes the stablecoin (then SOL) as the quote. Each item of ```sells``` is ```{symbol, qty, txHash}```, or ```{symbol, qty, error}``` when the sale failed; sales are Jupiter market orders that wait for the broadcast only, so check them with `exchange.IO("receipt")`.
+
+###### Execution
+
+Every transaction is simulated by the node before sending and is not sent when the simulation fails, with the reason reported (DLMM, Raydium CLMM and Orca Whirlpool error codes with their names); the compute-unit limit is the simulated usage plus headroom, and the priority fee is the 75th percentile of recent fees paid by transactions writing the same accounts, capped by `exchange.IO("priorityFee")`. The call returns after confirmation, with actual amounts from the balances before and after. When within 120 seconds the transaction is neither confirmed nor provably expired, the error says ```outcome is unknown``` with the signature: it may have landed, so check it with `exchange.IO("receipt")` before retrying.
+
+See also: `Jupiter`, `exchange.IO`, `exchange.IO("lp.remove")`, `exchange.IO("lp.collect")`, `exchange.IO("lp.positions")`, `exchange.IO("lp.increase")`
+
+##### exchange.IO("lp.collect", ...)
+
+```
+exchange.IO(k, positionIds)
+exchange.IO(k, positionIds, sell)
+exchange.IO(k, id1, id2, ...)
+```
+
+Forms:
+
+- `exchange.IO("lp.collect", ...)`
+
+Collect a position's fees and farm rewards without touching the principal.
+
+Parameters:
+
+- `k` (string, required): Set to ```lp.collect``` to collect fees and rewards.
+- `positionIds` (array / string, required): An array of position IDs; several IDs may also be passed as separate arguments. IDs are written as the ```id``` of ```lp.positions``` and must all belong to this wallet.
+- `sell` (bool, optional): With ```true``` the base token collected is sold for the quote token with a Jupiter market order. Default ```false```.
+
+Returns (object / null value): ```{txHash, txHashes, positions, sells}```: ```txHash``` is the first transaction signature and ```txHashes``` all of them; each item of ```positions``` is one position's ```{id, symbol, txHashes, principalBase, principalQuote, feesBase, feesQuote, receivedBase, receivedQuote, rewards, rentRefundSol, feeSol}```, and ```sells``` lists the swaps back to the quote token, see the remarks. A null value is returned when a position does not belong to this wallet, a simulation fails or a transaction fails.
+
+Collect from every position whose uncollected fees exceed 1 USDC.
+
+```javascript
+function main() {
+    var list = exchange.IO("lp.positions", "SOL_USDC")
+    if (!list) {
+        Log("Query failed:", GetLastError())
+        return
+    }
+    var ids = list.filter(function(p) { return p.feesValue > 1 }).map(function(p) { return p.id })
+    if (ids.length == 0) {
+        Log("Nothing to collect")
+        return
+    }
+    var r = exchange.IO("lp.collect", ids)
+    if (!r) {
+        Log("Collect failed:", GetLastError())
+        return
+    }
+    r.positions.forEach(function(p) {
+        Log(p.id, "fees", p.feesBase, "SOL", p.feesQuote, "USDC",
+            "rewards", JSON.stringify(p.rewards))
+    })
+}
+```
+
+One transaction per position: ```claim_fee2``` and ```claim_reward2``` on DLMM, a zero-liquidity ```decrease_liquidity_v2``` on Raydium (which also settles all of the pool's initialized rewards), and ```update_fees_and_rewards``` + ```collect_fees_v2``` + ```collect_reward_v2``` on Orca. The position and its liquidity stay as they are; the principal part ```principalBase```, ```principalQuote``` is normally 0.
+
+```lp.decrease``` and ```lp.remove``` collect fees and rewards as well, so there is no need to collect before withdrawing. Collecting costs a network fee, which is not worth it for tiny fees: check ```feesValue``` of ```lp.positions``` first.
+
+###### Position rows in the result
+
+| Field | Description |
+| - | - |
+| ```receivedBase```, ```receivedQuote``` | The two token amounts actually received (from the balances before and after) |
+| ```feesBase```, ```feesQuote``` | The fee part of them (split off by the amounts claimable on chain before sending) |
+| ```principalBase```, ```principalQuote``` | The principal part = received − fees |
+| ```rewards``` | Farm rewards collected, ```[{mint, symbol, amount}]``` (excluding the pool's two tokens) |
+| ```rentRefundSol``` | Rent returned by closing (SOL) |
+| ```feeSol``` | Network fees paid by these transactions (SOL) |
+
+The orientation (base and quote) takes the stablecoin (then SOL) as the quote. Each item of ```sells``` is ```{symbol, qty, txHash}```, or ```{symbol, qty, error}``` when the sale failed; sales are Jupiter market orders that wait for the broadcast only, so check them with `exchange.IO("receipt")`.
+
+###### Execution
+
+Every transaction is simulated by the node before sending and is not sent when the simulation fails, with the reason reported (DLMM, Raydium CLMM and Orca Whirlpool error codes with their names); the compute-unit limit is the simulated usage plus headroom, and the priority fee is the 75th percentile of recent fees paid by transactions writing the same accounts, capped by `exchange.IO("priorityFee")`. The call returns after confirmation, with actual amounts from the balances before and after. When within 120 seconds the transaction is neither confirmed nor provably expired, the error says ```outcome is unknown``` with the signature: it may have landed, so check it with `exchange.IO("receipt")` before retrying.
+
+See also: `Jupiter`, `exchange.IO`, `exchange.IO("lp.positions")`, `exchange.IO("lp.decrease")`, `exchange.IO("lp.remove")`, `exchange.IO("lp.add")`
+
+##### exchange.IO("lp.remove", ...)
+
+```
+exchange.IO(k, positionIds)
+exchange.IO(k, positionIds, ratio)
+exchange.IO(k, positionIds, ratio, sell)
+```
+
+Forms:
+
+- `exchange.IO("lp.remove", ...)`
+
+Withdraw a position's liquidity and claim fees and rewards; withdrawing everything closes the position and returns its rent.
+
+Parameters:
+
+- `k` (string, required): Set to ```lp.remove``` to withdraw liquidity.
+- `positionIds` (array / string, required): An array of position IDs; several IDs may also be passed as separate arguments (a number after them is ```ratio```, a boolean ```sell```). All must belong to this wallet.
+- `ratio` (number, optional): The share to withdraw, (0, 1], default 1: withdraw everything and close; below 1 only that share is withdrawn and the position stays.
+- `sell` (bool, optional): With ```true``` the base token received is sold for the quote token with a Jupiter market order. Default ```false```.
+
+Returns (object / null value): ```{txHash, txHashes, positions, sells}```: ```txHash``` is the first transaction signature and ```txHashes``` all of them; each item of ```positions``` is one position's ```{id, symbol, txHashes, principalBase, principalQuote, feesBase, feesQuote, receivedBase, receivedQuote, rewards, rentRefundSol, feeSol}```, and ```sells``` lists the swaps back to the quote token, see the remarks. A null value is returned when a position does not belong to this wallet, a simulation fails or a transaction fails.
+
+Close all SOL/USDC positions and sell the SOL back to USDC.
+
+```javascript
+function main() {
+    var list = exchange.IO("lp.positions", "SOL_USDC")
+    if (!list || list.length == 0) {
+        Log("No positions")
+        return
+    }
+    var ids = list.map(function(p) { return p.id })
+    var r = exchange.IO("lp.remove", ids, 1, true)
+    if (!r) {
+        Log("Remove failed:", GetLastError())
+        return
+    }
+    r.positions.forEach(function(p) {
+        Log(p.id, "principal", p.principalBase, p.principalQuote, "fees", p.feesBase, p.feesQuote,
+            "rent back", p.rentRefundSol, "SOL")
+    })
+    Log("Sold:", JSON.stringify(r.sells))
+}
+```
+
+###### Closing
+
+With ```ratio``` 1 the position is emptied and then closed in the same flow, its rent returned to the wallet (```rentRefundSol```):
+
+- Meteora DLMM: withdraws (```remove_liquidity_by_range2```), claims (```claim_fee2```, ```claim_reward2```) and closes the position account (```close_position_if_empty```). Positions wider than 70 bins take one transaction per 70 bins.
+- Raydium CLMM: after ```decrease_liquidity_v2``` empties and claims, ```close_position``` burns the NFT and closes the NFT account, the NFT mint and the position account.
+- Orca Whirlpools: after emptying and claiming the position is closed with ```close_position_with_token_extensions``` for Token-2022 NFT positions, ```close_position``` for older SPL Token NFT positions and ```close_bundled_position``` for positions in a Position Bundle; the rent of the position account, the NFT mint and the NFT token account is returned. Locked positions (```lock_position```) fail at the simulation.
+
+Rent paid for new BinArrays and TickArrays belongs to the pool and is not returned. With ```ratio``` below 1 this is ```lp.decrease``` for several positions at once.
+
+###### Position rows in the result
+
+| Field | Description |
+| - | - |
+| ```receivedBase```, ```receivedQuote``` | The two token amounts actually received (from the balances before and after) |
+| ```feesBase```, ```feesQuote``` | The fee part of them (split off by the amounts claimable on chain before sending) |
+| ```principalBase```, ```principalQuote``` | The principal part = received − fees |
+| ```rewards``` | Farm rewards collected, ```[{mint, symbol, amount}]``` (excluding the pool's two tokens) |
+| ```rentRefundSol``` | Rent returned by closing (SOL) |
+| ```feeSol``` | Network fees paid by these transactions (SOL) |
+
+The orientation (base and quote) takes the stablecoin (then SOL) as the quote. Each item of ```sells``` is ```{symbol, qty, txHash}```, or ```{symbol, qty, error}``` when the sale failed; sales are Jupiter market orders that wait for the broadcast only, so check them with `exchange.IO("receipt")`.
+
+###### Execution
+
+Every transaction is simulated by the node before sending and is not sent when the simulation fails, with the reason reported (DLMM, Raydium CLMM and Orca Whirlpool error codes with their names); the compute-unit limit is the simulated usage plus headroom, and the priority fee is the 75th percentile of recent fees paid by transactions writing the same accounts, capped by `exchange.IO("priorityFee")`. The call returns after confirmation, with actual amounts from the balances before and after. When within 120 seconds the transaction is neither confirmed nor provably expired, the error says ```outcome is unknown``` with the signature: it may have landed, so check it with `exchange.IO("receipt")` before retrying.
+
+See also: `Jupiter`, `exchange.IO`, `exchange.IO("lp.decrease")`, `exchange.IO("lp.collect")`, `exchange.IO("lp.positions")`, `exchange.IO("lp.add")`
+
+##### exchange.IO("lp.positions", ...)
+
+```
+exchange.IO(k)
+exchange.IO(k, filter)
+exchange.IO(k, filter, wallet)
+```
+
+Forms:
+
+- `exchange.IO("lp.positions", ...)`
+
+List a wallet's Meteora DLMM, Raydium CLMM and Orca Whirlpools positions with range, current amounts, value and uncollected fees.
+
+Parameters:
+
+- `k` (string, required): Set to ```lp.positions``` to query positions.
+- `filter` (string, optional): A pair (such as ```SOL_USDC```: only that pair's positions, with prices and amounts in its orientation) or a token (only positions containing it); ```*``` or nothing means all.
+- `wallet` (string, optional): Another wallet address, to view that wallet's positions read-only. Defaults to this exchange object's wallet.
+
+Returns (array / null value): An array of positions with the common fields ```{id, pool, protocol, symbol, fee, priceLower, priceUpper, price, inRange, liquidity, amountBase, amountQuote, value, feesBase, feesQuote, feesValue, rewards, rentSol, closed}``` plus fields of the protocol, see the remarks. A null value is returned when the node does not serve a required query or a request fails.
+
+List this wallet's positions and flag those out of range.
+
+```javascript
+function main() {
+    var list = exchange.IO("lp.positions")
+    if (!list) {
+        Log("Query failed:", GetLastError())
+        return
+    }
+    if (list.length == 0) {
+        Log("No positions")
+        return
+    }
+    list.forEach(function(p) {
+        Log(p.id, p.symbol, p.priceLower.toFixed(4), "-", p.priceUpper.toFixed(4),
+            p.inRange ? "in range" : "out of range", "value", p.value.toFixed(2),
+            "uncollected fees", p.feesValue.toFixed(4))
+    })
+}
+```
+
+View another wallet's SOL/USDC positions read-only.
+
+```javascript
+var WALLET = ""   // the Solana wallet address to view
+
+function main() {
+    if (!WALLET) {
+        Log("Set WALLET to a wallet address first")
+        return
+    }
+    var list = exchange.IO("lp.positions", "SOL_USDC", WALLET)
+    if (!list) {
+        Log("Query failed:", GetLastError())
+        return
+    }
+    list.forEach(function(p) {
+        Log(p.protocol, p.id, p.inRange ? "in range" : "out of range",
+            "value", p.value, "rent", p.rentSol)
+    })
+}
+```
+
+###### Common fields
+
+- ```id``` is the position ID, which can be passed to ```lp.increase```, ```lp.decrease```, ```lp.collect``` and ```lp.remove```: ```meteora:position account address``` on DLMM, ```raydium:position NFT mint``` and ```orca:position NFT mint``` on Raydium and Orca.
+- Orientation of ```symbol```, prices and amounts: that of the pair when one is given; otherwise the stablecoin (then SOL) is the quote. ```price``` is the current price, ```priceLower``` and ```priceUpper``` the range ends, and ```inRange``` whether the price is inside the range.
+- ```amountBase``` and ```amountQuote``` are the position's current token amounts and ```value``` their worth in the quote token at the current price; ```feesBase```, ```feesQuote``` and ```feesValue``` are the uncollected fees; ```rewards``` are the uncollected farm rewards ```[{mint, symbol, amount}]```.
+- ```rentSol``` is the rent the position locks (returned on closing); ```closed``` ```true``` means the position has no liquidity, fees or rewards left (only the accounts remain; close them with ```lp.remove``` to get the rent back).
+
+###### Fields by protocol
+
+| Protocol | Extra fields | Notes |
+| - | - | - |
+| Meteora DLMM | ```lowerBinId```, ```upperBinId```, ```activeId```, ```binStep```, ```width```, ```feeOwner``` | ```width``` is the number of bins; ```liquidity``` is the sum of the bin shares; a position whose ```feeOwner``` is not ```null``` pays its fees to another wallet and is not supported for operations |
+| Raydium CLMM | ```tickLower```, ```tickUpper```, ```tick```, ```tickSpacing```, ```nftMint```, ```positionAccount```, ```nftAccount``` | Uncollected fees and rewards are brought up to date from the growth inside the range (rewards advanced to now at their emission rate) |
+| Orca Whirlpools | ```tickLower```, ```tickUpper```, ```tick```, ```tickSpacing```, ```nftMint```, ```positionAccount```, ```nftProgram``` | Amounts come from the liquidity at the current price, fees and rewards are estimated from the on-chain growth; positions in a Position Bundle carry ```bundleMint``` and ```bundleIndex```, and their ```id``` is ```orca:position account address``` |
+
+###### How positions are found
+
+- DLMM positions are found by owner with the node's ```getProgramAccounts```; the official public node serves it, some nodes do not or rate-limit it, and then the call fails. For frequent queries configure your own node in the node address setting.
+- Raydium and Orca positions are NFTs: NFTs with amount 1 in the wallet are found with ```getTokenAccountsByOwner``` and their position accounts read (on Orca, positions in Position Bundles the wallet holds are listed too). The position belongs to whoever holds the NFT.
+- Positions created by ```lp.add``` in this process and those registered with ```lp.track``` are checked as well (ownership verified on chain each time; transferred-away and closed ones are not listed).
+
+Monitoring and exiting are up to the strategy: use ```inRange```, ```value``` and ```feesValue``` to decide when to rebalance, collect or cut losses.
+
+See also: `Jupiter`, `exchange.IO`, `exchange.IO("lp.add")`, `exchange.IO("lp.collect")`, `exchange.IO("lp.decrease")`, `exchange.IO("lp.remove")`, `exchange.IO("lp.increase")`
+
+##### exchange.IO("pump.*", ...)
+
+```
+exchange.IO(k)
+exchange.IO(k, options)
+exchange.IO(k, mint)
+exchange.IO(k, mint, side, amount)
+exchange.IO(k, mint, solAmount)
+exchange.IO(k, mint, solAmount, options)
+exchange.IO(k, mint, amount, options)
+exchange.IO(k, wallet)
+```
+
+Forms:
+
+- `exchange.IO("pump.*", ...)`
+
+Discover new coins on the pump.fun bonding curve, read the curve state, quote, buy and sell; graduated coins trade through Jupiter swaps automatically.
+
+Parameters:
+
+- `k` (string, required): The command: ```pump.new```, ```pump.info```, ```pump.quote```, ```pump.buy```, ```pump.sell``` or ```pump.holdings```.
+- `mint` (string, optional): The coin's mint address (```pump.info```, ```pump.quote```, ```pump.buy```, ```pump.sell```).
+- `side` (string, optional): Direction of ```pump.quote```: ```buy``` or ```sell```.
+- `amount` (number / string, optional): ```pump.quote```: the SOL to spend (fees included) for a buy, the coins to sell for a sell; ```pump.sell```: the coins to sell, or ```all``` (the whole balance).
+- `solAmount` (number, optional): The SOL ```pump.buy``` spends, protocol and creator fees included.
+- `options` (object, optional): ```{limit, since}``` for ```pump.new```; the order options ```{slippage, priorityFee, computeUnitLimit, dryRun, payer, wait, closeAccount}``` for ```pump.buy``` and ```pump.sell```. See the remarks.
+- `wallet` (string, optional): The wallet ```pump.holdings``` looks at, this exchange object's wallet by default.
+
+Returns (object / array / null value): ```pump.new``` and ```pump.holdings``` return arrays, the others objects; fields are in the sections of the remarks. A null value is returned for bad arguments, a coin that is not a pump.fun coin, a failed simulation (unless ```dryRun```) or a failed transaction, with the reason in ```GetLastError()```.
+
+Discover new coins and quote them on the curve (read-only).
+
+```javascript
+function main() {
+    var coins = exchange.IO("pump.new", {limit: 10})
+    if (!coins) {
+        Log("Query failed:", GetLastError())
+        return
+    }
+    for (var i = 0; i < coins.length; i++) {
+        var c = coins[i]
+        if (c.quote != "SOL") {
+            continue
+        }
+        var info = exchange.IO("pump.info", c.mint)
+        var q = exchange.IO("pump.quote", c.mint, "buy", 0.1)
+        if (!info || !q) {
+            continue
+        }
+        Log(_D(c.time), c.symbol, c.mint, "progress", info.progress.toFixed(2) + "%",
+            "market cap", info.marketCap.toFixed(2), "SOL", "0.1 SOL buys", q.amountOut,
+            "impact", q.priceImpactPct.toFixed(2) + "%")
+    }
+}
+```
+
+Poll for new coins, buy when the quote looks right, check the holdings, then sell everything.
+
+```javascript
+function main() {
+    var since = Date.now()
+    var seen = {}
+    while (true) {
+        var coins = exchange.IO("pump.new", {limit: 20, since: since}) || []
+        for (var i = 0; i < coins.length; i++) {
+            var c = coins[i]
+            if (seen[c.mint] || c.quote != "SOL" || c.mayhem || c.cashback) {
+                continue
+            }
+            seen[c.mint] = true
+            if (c.devBuy && c.devBuy.quoteAmount > 1) {
+                continue   // the creator's first buy is too large
+            }
+            var q = exchange.IO("pump.quote", c.mint, "buy", 0.01)
+            if (!q || q.priceImpactPct > 5) {
+                continue
+            }
+            var r = exchange.IO("pump.buy", c.mint, 0.01, {slippage: 0.2, priorityFee: 0.0005})
+            if (!r) {
+                Log("Buy failed:", GetLastError())
+                continue
+            }
+            Log("Bought", r.tokenAmount, c.symbol, "for", r.solAmount, "SOL", r.txHash)
+            Sleep(30 * 1000)
+            var h = exchange.IO("pump.holdings") || []
+            h.forEach(function(x) { Log("holding", x.mint, x.amount, "value", x.value, "SOL") })
+            var s = exchange.IO("pump.sell", c.mint, "all", {slippage: 0.2})
+            Log("Sold:", s ? s.solAmount + " SOL " + s.txHash : GetLastError())
+            return
+        }
+        Sleep(1000)
+    }
+}
+```
+
+Simulate a buy only, without signing or sending.
+
+```javascript
+function main() {
+    var coins = exchange.IO("pump.new", {limit: 5})
+    if (!coins || coins.length == 0) {
+        Log("No new coins:", GetLastError())
+        return
+    }
+    var r = exchange.IO("pump.buy", coins[0].mint, 0.01, {dryRun: true})
+    if (!r) {
+        Log("Simulation error:", GetLastError())
+        return
+    }
+    Log("simulation", r.ok ? "ok" : "failed", r.simulationError || "",
+        "expected", JSON.stringify(r.expected), "compute units", r.unitsConsumed)
+}
+```
+
+###### Commands
+
+| Command | Arguments | Purpose |
+| - | - | - |
+| ```pump.new``` | ```[options]``` | Discover recently created coins on chain |
+| ```pump.info``` | ```mint``` | Bonding-curve state: reserves, price, market cap, progress, fees |
+| ```pump.quote``` | ```mint, side, amount``` | Local quote (no transaction) |
+| ```pump.buy``` | ```mint, solAmount[, options]``` | Buy for ```solAmount``` SOL |
+| ```pump.sell``` | ```mint, amount[, options]``` | Sell ```amount``` coins or ```all``` |
+| ```pump.holdings``` | ```[wallet]``` | pump.fun coins held by a wallet, valued on the curve |
+
+These commands trade coins on the bonding curve of the pump.fun program (```6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P```) directly, not through Jupiter: the connector builds, simulates and signs the transactions itself, with the on-chain program's quote formula and fees.
+
+###### pump.new
+
+Lists the recent signatures of the pump.fun mint authority (```TSLvdd1pWpHVjahSpsvCXUbgwsL3JAcvokwaKt1eokM```, which appears only in creation transactions) and parses each creation transaction's ```CreateEvent```, newest first. ```options.limit``` is how many creation transactions to look at (20 by default, at most 100), ```options.since``` a millisecond timestamp: only coins created after it are returned. Parsed transactions are cached in the process, so polling fetches only new ones (one ```getSignaturesForAddress``` plus one ```getTransaction``` per new transaction). Creation transactions that failed on chain are not listed.
+
+Each item is ```{signature, slot, time, mint, name, symbol, uri, creator, user, bondingCurve, tokenProgram, quote, quoteMint, mayhem, cashback, holderReward, devBuy}```: ```time``` is the block time (milliseconds); ```user``` is the wallet that sent the creation (usually the ```creator```); ```tokenProgram``` is ```spl-token``` or ```token-2022```; ```quote``` is ```SOL```, ```USDC``` or the quote token's mint; ```devBuy``` is the first buy in the same transaction, ```{tokens, quoteAmount}``` (```quoteAmount``` includes fees), or ```null```. ```name```, ```symbol``` and ```uri``` are whatever the creator chose; rely on the mint address.
+
+###### pump.info
+
+One ```getMultipleAccounts``` reads the curve, mint, global config and fee table and returns ```{mint, bondingCurve, creator, tokenProgram, decimals, quote, quoteMint, complete, migrated, virtualTokenReserves, virtualQuoteReserves, realTokenReserves, realQuoteReserves, tokenTotalSupply, price, marketCap, progress, fees, mayhem, cashback, holderReward}```: reserves and supply are in readable units; ```price``` is the quote (SOL) value of one coin and ```marketCap``` is ```price``` times the total supply; ```progress``` is the share of the curve sold (%), and at 100 the curve is complete (```complete```) and then migrates to PumpSwap (```migrated```, reserves zeroed, ```price```, ```marketCap``` and ```fees``` ```null```); ```fees``` is the current rate ```{protocolBps, creatorBps}``` in basis points. A coin that is not a pump.fun coin is an error.
+
+###### pump.quote
+
+Quotes locally with the on-chain program's formula and fees and returns ```{venue, mint, side, quote, amountIn, amountOut, price, spotPrice, priceAfter, priceImpactPct, fees, protocolFeeBps, creatorFeeBps, crossesCurve}```: ```venue``` is ```pump```; ```amountIn``` and ```amountOut``` are what is paid and received (SOL and coins for a buy, coins and SOL for a sell); ```price``` is the average fill price including fees (SOL per coin), ```spotPrice``` the current price and ```priceAfter``` the price after the trade; ```priceImpactPct``` is how far the average price before fees is from the current price (%); ```fees``` is the protocol plus creator fee (SOL); ```crossesCurve``` ```true``` means the buy goes past the end of the curve (see below). A sale is paid from the SOL on the curve (```realQuoteReserves```), and more than that is an error.
+
+Once the curve is complete (graduated) the quote comes from Jupiter (exact input on ```MINT_SOL```), with ```venue``` ```jupiter``` plus ```route``` (the liquidity sources used), ```priceImpactPct``` Jupiter's estimated price impact (%) and ```spotPrice```, ```priceAfter```, ```fees```, ```protocolFeeBps``` and ```creatorFeeBps``` ```null```; it fails when Jupiter has no route.
+
+###### pump.buy and pump.sell
+
+- A buy is exact input: it spends ```solAmount``` SOL (fees included), creates the wallet's token account idempotently and sends ```buy_exact_quote_in_v3``` with a minimum output of the local quote × (1 − ```slippage```). A sell sends ```sell_v3``` with a minimum SOL output of the local quote × (1 − ```slippage```); selling more than the balance fails without sending. Both minimums are enforced on chain; when missed the whole transaction fails and only the network fee is paid.
+- The node simulates before sending, and a failed simulation is not sent and is reported (pump.fun error codes with their names, such as ```BuySlippageBelowMinTokensOut```). Waiting for confirmation follows the concentrated-liquidity rules: when it cannot be decided, the error says ```outcome is unknown``` with the signature.
+- Result ```{txHash, venue, mint, side, solAmount, tokenAmount, price, fee, slot}```: ```solAmount``` is the SOL paid for a buy (protocol and creator fees included, network fee and account deposits excluded) or received for a sell (fees deducted); ```tokenAmount``` is the coins traded, from the on-chain events; ```fee``` is the network fee (SOL). With ```wait``` ```false``` the result is ```{txHash, venue, mint, side, pending, lastValidBlockHeight, expected}``` (```expected``` is the local quote); with ```dryRun``` it is ```{dryRun, venue, mint, side, payer, ok, simulationError, logs, unitsConsumed, txBytes, solAmount, tokenAmount, price, expected}```, with the fill taken from the simulated on-chain events.
+
+| Order option | Description |
+| - | - |
+| ```slippage``` | ```[0, 1)```, default ```0.05``` |
+| ```priorityFee``` | The transaction's total priority fee (SOL, 0 to 1); without it the 75th percentile of recent fees paid by transactions writing the same accounts, capped by ```exchange.IO("priorityFee")``` |
+| ```computeUnitLimit``` | The compute-unit limit; default: the simulated usage plus headroom |
+| ```dryRun``` | ```true``` simulates only, without signing or sending |
+| ```payer``` | Only with ```dryRun```: simulate with this wallet paying |
+| ```wait``` | Default ```true``` waits for confirmation and reports the fill from the on-chain events; ```false``` returns right after the broadcast |
+| ```closeAccount``` | ```pump.sell``` only: selling ```all``` closes the wallet's token account in the same transaction and returns its deposit by default; ```false``` keeps it |
+
+###### pump.holdings
+
+The coins in the wallet's token balances that have a bonding curve, as ```[{mint, amount, quote, complete, price, value}]```: ```value``` is the quote (fees deducted) that selling the whole balance on the curve would return now; ```price``` and ```value``` are ```null``` once the curve is complete or when the balance exceeds what the curve can buy back (value graduated coins with `exchange.IO("route")`).
+
+###### Limits and graduation
+
+- SOL-quoted coins only: coins quoted in USDC or another token (```quote``` of ```pump.new```) and cashback coins fail in ```pump.buy``` and ```pump.sell```; cashback coins can be traded through Jupiter with ```exchange.Buy``` and ```exchange.Sell``` on ```MINT_SOL```.
+- Buying past the curve: when a buy exceeds what is left on the curve (except mayhem coins), the excess fills at the price of the PumpSwap pool it migrates to and ```crossesCurve``` is ```true```; the curve then cannot trade until migration completes. A mayhem-coin buy beyond what is left is an error.
+- Graduation: for a coin whose curve is complete, ```pump.buy``` and ```pump.sell``` swap at market through this exchange object's Jupiter swaps (pair ```MINT_SOL```, protected by the order's ```slippage```, which Jupiter requires below 0.5), and ```venue``` is ```jupiter``` with ```route```; the ```priorityFee``` and ```computeUnitLimit``` options are then errors (the priority-fee cap is ```exchange.IO("priorityFee")```), and ```dryRun``` is not supported (quote with ```pump.quote```). For a short time after the curve completes and before migration, both paths may fail.
+- Fees: protocol and creator fees follow the Pump Fees program's tiers by market cap (```pump.info``` and ```pump.quote``` return the actual rates), plus network and priority fees. The first buy of a coin creates a token account (about 0.002 SOL deposit); the wallet's first pump.fun trade also creates its volume account (about 0.0018 SOL, not returned).
+- Public nodes are rate-limited per second and slow; for sniping, configure your own paid node in the node address setting and pay enough ```priorityFee```, or transactions may expire during congestion.
+
+###### Risks
+
+- Most new coins go to zero quickly; creators or wallets bundled with them often buy in the creation transaction or the next few blocks and can dump at any time.
+- Sniping bots and MEV are fierce: a wide slippage invites sandwich attacks that fill at the worst price.
+- Names, symbols and metadata links can impersonate well-known projects; rely on the mint address.
+- Protocol, creator, network and priority fees are paid on every trade, so frequent in-and-out trading is costly.
+
+See also: `Jupiter`, `exchange.IO`, `exchange.IO("route")`, `exchange.IO("dexes")`, `exchange.IO("priorityFee")`, `exchange.IO("receipt")`, `exchange.Buy`
+
+##### exchange.IO("dca.*", ...)
+
+```
+exchange.IO(k)
+exchange.IO(k, params)
+exchange.IO(k, params, wallet)
+exchange.IO(k, id)
+```
+
+Forms:
+
+- `exchange.IO("dca.*", ...)`
+
+Buy or sell in installments with Jupiter's DCA: create, list, cancel and simulate.
+
+Parameters:
+
+- `k` (string, required): The command: ```dca.create```, ```dca.list```, ```dca.cancel``` or ```dca.simulate```.
+- `params` (object, optional): The DCA parameters ```{symbol, side, total, perOrder, numberOfOrders, interval, minPrice, maxPrice, startAt}``` of ```dca.create``` and ```dca.simulate```, see the remarks; ```dca.simulate``` also takes ```{cancel: id}``` to simulate a cancel; ```{status, symbol}``` for ```dca.list```.
+- `id` (string, optional): The DCA order ```dca.cancel``` cancels: the DCA order account address for v1, Jupiter's order UUID for V2.
+- `wallet` (string, optional): For ```dca.simulate```: simulate with another wallet as the owner (read-only, v1 only).
+
+Returns (object / array / null value): ```dca.list``` returns an array, the others objects; fields in the remarks. A null value is returned for invalid parameters, insufficient funds (when creating) or a failed request or transaction, with the reason in ```GetLastError()```; a failed ```dca.simulate``` simulation is not an error, check ```ok``` in the result.
+
+Simulate before creating: buy SOL for 100 USDC a day for 10 days (read-only).
+
+```javascript
+function main() {
+    var params = {symbol: "SOL_USDC", side: "buy", total: 1000, numberOfOrders: 10, interval: 86400}
+    var sim = exchange.IO("dca.simulate", params)
+    if (!sim) {
+        Log("Invalid parameters:", GetLastError())
+        return
+    }
+    Log(sim.version, "simulation", sim.ok ? "ok" : "failed", sim.reason || "",
+        "per installment", sim.plan.perOrder, "installments", sim.plan.numberOfOrders)
+}
+```
+
+Create a DCA order, check its progress, then cancel it.
+
+```javascript
+function main() {
+    var params = {symbol: "SOL_USDC", side: "buy", total: 200, perOrder: 100, interval: 3600,
+        maxPrice: 300}
+    var r = exchange.IO("dca.create", params)
+    if (!r) {
+        Log("Create failed:", GetLastError())
+        return
+    }
+    Log("Created", r.version, r.id, "transaction", r.signature)
+    Sleep(5 * 60 * 1000)
+    var list = exchange.IO("dca.list", {symbol: "SOL_USDC"}) || []
+    list.forEach(function(d) {
+        Log(d.id, d.state, "filled", d.ordersFilled, "/", d.numberOfOrders,
+            "spent", d.spent, "received", d.received, "average", d.avgPrice)
+    })
+    var c = exchange.IO("dca.cancel", r.id)
+    Log("Cancel:", c ? JSON.stringify(c) : GetLastError())
+}
+```
+
+###### v1 and V2
+
+| | Recurring v1 | Trigger V2 |
+| - | - | - |
+| When used (```trigger.api``` at the default ```auto```) | No API key, or a quote other than USDC and USDT | API key set and a USDC or USDT quote |
+| Where the funds are | An on-chain DCA order account (program ```DCA265Vj8a9CEuX1eb1LWRnDT7uK6q1xMipnNyatn23M```) | A vault in Jupiter's custody (shared with V2 limit orders) |
+| DCA ID | The DCA order account address | The order UUID |
+| Minimum | At least 2 installments, each worth at least 50 USD | At least 2 installments, each worth at least 10 USD |
+| Interval and start | Any whole number of seconds | 60 seconds to 1 year; ```startAt``` at most 30 days ahead |
+| Price range | A round outside the range is skipped | Judged on the base token's USD price; a round outside the range moves to the next interval |
+| Other | Token-2022 tokens are not supported; Jupiter charges 0.1% of the tokens received | At most 10 running DCA orders per wallet; slippage set by Jupiter; the fee is already taken from the tokens received |
+
+`exchange.IO("trigger.api")` applies to DCA too: ```v1``` keeps Recurring v1 and ```v2``` forces V2. Jupiter no longer maintains Recurring v1 (it still works). DCA orders do not appear in ```exchange.GetOrders()``` and the other order functions; view them with ```dca.list```.
+
+###### DCA parameters
+
+| Key | Required | Description |
+| - | - | - |
+| ```symbol``` | yes | The pair, such as ```SOL_USDC``` |
+| ```side``` | yes | ```buy```: the quote token buys the base token in installments, ```total``` and ```perOrder``` in the quote token; ```sell```: the base token is sold in installments, amounts in the base token |
+| ```total``` | yes | The total, deposited at creation |
+| ```perOrder```, ```numberOfOrders``` | one of them | Amount per installment or number of installments; if both, they must agree; with only ```perOrder```, ```total``` must be a whole multiple of it |
+| ```interval``` | yes | Seconds between installments (whole number) |
+| ```minPrice```, ```maxPrice``` | no | Price range (quote per base), see the table above |
+| ```startAt``` | no | Start timestamp (milliseconds, in the future), default immediately |
+
+###### dca.create
+
+Returns ```{id, version, signature, symbol, side, total, perOrder, numberOfOrders, interval, minPrice, maxPrice, startAt, priorityFeeLamports}```, with ```version``` ```v1``` or ```v2```. v1: the total goes into a new DCA order account, ```signature``` is the creation transaction, and the call waits for the broadcast only, not for confirmation; the number of installments, the amount per installment (valued in USD with the Jupiter price API) and Token-2022 are checked locally first. V2: the total is deposited into the vault (the connector signs the deposit and Jupiter lands it while creating the order, so it has landed on return), ```id``` is the order UUID, plus ```vault```.
+
+###### dca.list
+
+Lists this wallet's DCA orders (v1 first, then V2 when an API key is set or ```trigger.api``` is ```v2```). Parameters ```{status, symbol}```: ```status``` is ```active``` (default, running) or ```history``` (ended), and ```symbol``` limits the list to that pair. Each item is ```{id, version, symbol, side, state, total, perOrder, numberOfOrders, ordersFilled, interval, minPrice, maxPrice, spent, received, filledQty, avgPrice, fee, createdAt, updatedAt, openTx, closeTx, info}```:
+
+- ```state``` is ```active```, ```completed``` or ```canceled```, and for V2 also ```pending``` (depositing), ```canceling``` (canceled, funds not yet withdrawn) or ```failed``` (deposit failed).
+- ```spent``` is the input token spent so far, ```received``` the output token received and ```fee``` the fee deducted from it (in the output token; ```null``` for V2); ```filledQty``` and ```avgPrice``` are the filled amount and average price in base-token terms; V2 rows also carry ```nextFillAt```; ```info``` is Jupiter's raw row.
+- Jupiter indexes a new v1 DCA order with a delay of a few minutes; meanwhile an order this program created (within 10 minutes) whose on-chain account exists is listed under ```active``` too, with ```indexed``` ```false``` and the numbers from the on-chain account (```ordersFilled```, ```fee```, ```updatedAt``` and ```closeTx``` ```null```).
+
+###### dca.cancel
+
+Cancels a running DCA order; v1 and V2 are told apart by the shape of ```id``` (V2 needs the API key or ```trigger.api``` ```v2```). Rounds already filled are not reversed.
+
+- v1: the remaining input token and any output token not yet withdrawn return to the wallet; the call waits for the broadcast only and returns ```{id, version, signature, priorityFeeLamports}```. A v1 order Jupiter has not indexed yet (in the first minutes) can be canceled too as long as its on-chain account belongs to this wallet: the connector builds the cancel transaction itself from the DCA program's ```close_dca``` instruction, simulates it, then signs and broadcasts it, and the result adds ```indexed: false```.
+- V2 takes two steps: Jupiter stops the order and builds a withdrawal transaction, which the connector checks, signs and hands back to Jupiter to land; it returns ```{id, version, signature, refund, refundCurrency, roundsRemaining, info}```, ```signature``` being the withdrawal and ```refund``` the input token returned. If the second step fails the order stays ```canceling```, and canceling it again completes the withdrawal.
+
+###### dca.simulate
+
+Builds the transaction of ```dca.create``` from the same parameters and runs it with the node's ```simulateTransaction``` (not signed, nothing broadcast), to check balances, minimums and so on before ordering; with ```params``` written ```{cancel: id}``` it simulates canceling that DCA order. Returns ```{ok, err, reason, logs, unitsConsumed, version, wallet, id, plan, priorityFeeLamports}```: ```ok``` tells whether the simulation succeeded and ```reason``` explains a failure (when the paying wallet has no SOL at all the node only returns ```err``` ```AccountNotFound```, and ```reason``` is ```AccountNotFound (the paying wallet has no SOL)```); ```id``` is the address of the DCA account that would be created; ```plan``` holds the normalized parameters.
+
+On V2 the deposit into the vault is simulated, only for this wallet, and the result carries ```vault``` and no ```id```; the call fails while the wallet has no vault, so register one first with ```exchange.IO("trigger.vault", "register")``` (no funds move). Canceling a V2 DCA order cannot be simulated (the cancel call itself stops the order).
+
+See also: `Jupiter`, `exchange.IO`, `exchange.IO("trigger.*")`, `exchange.IO("receipt")`, `exchange.IO("priorityFee")`
+
+##### exchange.IO("trigger.*", ...)
+
+```
+exchange.IO(k)
+exchange.IO(k, mode)
+exchange.IO(k, action)
+exchange.IO(k, params)
+exchange.IO(k, params, wallet)
+```
+
+Forms:
+
+- `exchange.IO("trigger.*", ...)`
+
+Helper commands for Jupiter's native limit orders: choose the v1 or V2 API, view the V2 custodial vault, and simulate placing or canceling.
+
+Parameters:
+
+- `k` (string, required): The command: ```trigger.api```, ```trigger.vault``` or ```trigger.simulate```.
+- `mode` (string, optional): The ```trigger.api``` mode: ```auto```, ```v1``` or ```v2```; without it, query.
+- `action` (string, optional): With ```register```, ```trigger.vault``` registers a vault first when the wallet has none; without it, query.
+- `params` (object, optional): The order parameters of ```trigger.simulate```, ```{symbol, side, price, amount, expiry, slippage}```, or ```{cancel: orderId}```.
+- `wallet` (string, optional): For ```trigger.simulate```: simulate with another wallet as the maker (read-only, v1 only).
+
+Returns (string / object / null value): ```trigger.api``` returns the current mode as a string; ```trigger.vault``` and ```trigger.simulate``` return objects, fields in the remarks. A null value is returned when an API key is required but not set, for bad parameters or a failed request; a failed ```trigger.simulate``` simulation is not an error, check ```ok``` in the result.
+
+Check the API mode and simulate a SOL sell order above the price (read-only).
+
+```javascript
+function main() {
+    Log("API mode:", exchange.IO("trigger.api"))
+    var t = exchange.GetTicker("SOL_USDC")
+    if (!t) {
+        Log("Ticker failed:", GetLastError())
+        return
+    }
+    var sim = exchange.IO("trigger.simulate", {symbol: "SOL_USDC", side: "sell",
+        price: _N(t.Last * 1.2, 2), amount: 0.5, expiry: Date.now() + 7 * 86400 * 1000})
+    if (!sim) {
+        Log("Invalid parameters:", GetLastError())
+        return
+    }
+    Log("simulation", sim.ok ? "ok" : "failed", sim.reason || "", "order account", sim.order,
+        "gives", sim.makingAmount, "receives", sim.takingAmount)
+}
+```
+
+Place a limit order once the simulation passes, query it and cancel it.
+
+```javascript
+function main() {
+    var t = exchange.GetTicker("SOL_USDC")
+    var px = _N(t.Last * 0.8, 2)
+    var params = {symbol: "SOL_USDC", side: "buy", price: px, amount: 0.5}
+    var sim = exchange.IO("trigger.simulate", params)
+    if (!sim || !sim.ok) {
+        Log("Simulation did not pass:", sim ? sim.reason : GetLastError())
+        return
+    }
+    var id = exchange.CreateOrder("SOL_USDC", "buy", px, 0.5, {tif: "gtc"})
+    if (!id) {
+        Log("Order failed:", GetLastError())
+        return
+    }
+    Log("Limit order", id, exchange.GetOrder(id))
+    Sleep(60 * 1000)
+    Log("Cancel:", exchange.CancelOrder(id), GetLastError())
+}
+```
+
+With an API key, view the V2 vault and register it if needed.
+
+```javascript
+function main() {
+    var v = exchange.IO("trigger.vault")
+    if (!v) {
+        Log("Query failed (needs an API key or trigger.api v2):", GetLastError())
+        return
+    }
+    if (!v.registered) {
+        v = exchange.IO("trigger.vault", "register")
+    }
+    Log("vault", v.vault, "SOL", v.sol)
+    v.tokens.forEach(function(x) { Log(x.symbol || x.mint, x.amount) })
+}
+```
+
+###### Where the limit orders are
+
+Jupiter's native limit orders (Trigger) are not conditional orders: place them with ```exchange.CreateOrder(symbol, side, price, amount, {tif: "gtc"})``` (or ```exchange.Buy``` and ```exchange.Sell``` with the same option), and Jupiter's keeper fills them once the price is reached; query and cancel them with ```exchange.GetOrder()```, ```exchange.GetOrders()```, ```exchange.CancelOrder()``` and ```exchange.GetHistoryOrders()```, and change the price of V2 orders with ```exchange.ModifyOrder()```. The order extra parameters are ```expiry``` (expiry timestamp in milliseconds) and ```slippage``` (allowed slippage ratio).
+
+```exchange.CreateConditionOrder()``` and the other conditional-order functions are not supported (Jupiter has no stop orders to map them to); each leg of V2 take-profit, stop-loss and OCO orders placed on jup.ag and elsewhere appears in ```exchange.GetOrders()``` as a plain limit order, priced at its USD trigger price, with the direction in ```Info```'s ```triggerCondition```. The differences between the two APIs (v1 and V2), the fees and the custody risk are described in the "Limit orders" section of the `Jupiter` exchange page.
+
+###### trigger.api
+
+Which API new native limit orders and new DCA orders use: ```auto``` (default) uses Trigger V2 (funds deposited into a vault in Jupiter's custody) when an API key is set and the quote is USDC or USDT, and v1 (non-custodial, funds in an on-chain order account) otherwise; ```v1``` always uses v1; ```v2``` always uses V2, fails orders whose quote is not USDC or USDT, and works without an API key too (Jupiter currently accepts that, but its documentation requires a key). Only new orders are affected: existing orders go to the API matching the shape of their order ID (an account address for v1, a UUID for V2). Returns the mode after the call.
+
+###### trigger.vault
+
+Queries this wallet's custodial vault in Trigger V2 and its balances (needs the API key, or ```trigger.api``` ```v2```). The funds of V2 limit orders and DCA orders sit here, including those of open orders, of expired orders not yet withdrawn and of canceled orders whose withdrawal did not complete. Without a vault it returns ```{wallet, registered: false}```; otherwise ```{wallet, registered: true, vault, sol, tokens, info}```, where ```tokens``` is ```[{mint, symbol, amount, raw}]``` (```symbol``` only for tokens in the token table) and ```info``` is Jupiter's vault record.
+
+With ```register``` a vault is registered first when the wallet has none (this only creates the custodial account at Jupiter; no transaction is sent and no funds move; an existing vault is returned as is). The first V2 order registers it by itself, but ```trigger.simulate``` and ```dca.simulate``` do not, so register before simulating ahead of the first order.
+
+###### trigger.simulate
+
+Builds the transaction placing a limit order and runs it with the node's ```simulateTransaction``` (not signed, nothing broadcast). ```params``` is ```{symbol, side, price, amount, expiry, slippage}``` with the meaning of an order (```amount``` in the base token, ```price``` the limit price); written ```{cancel: orderId}``` it simulates canceling that v1 limit order (the order ID may carry the pair prefix).
+
+- v1 returns ```{ok, err, reason, logs, unitsConsumed, wallet, order, makingAmount, takingAmount, priorityFeeLamports}```: ```order``` is the order account that would be created, and ```makingAmount``` and ```takingAmount``` the amounts given and received in smallest units (strings); ```reason``` explains a failure (when the paying wallet has no SOL at all the node only returns ```err``` ```AccountNotFound```, and ```reason``` is ```AccountNotFound (the paying wallet has no SOL)```).
+- V2 simulates the deposit into the vault, only for this wallet, and returns ```{ok, err, reason, logs, unitsConsumed, version, wallet, vault, inputMint, inputAmount, triggerPriceUsd, triggerCondition, expiresAt, priorityFeeLamports}```; it fails while the wallet has no vault. Canceling a V2 limit order cannot be simulated (the cancel call itself stops the order).
+
+See also: `Jupiter`, `exchange.IO`, `exchange.CreateOrder`, `exchange.CancelOrder`, `exchange.ModifyOrder`, `exchange.IO("dca.*")`
+
+##### exchange.IO("bridge.*", ...)
+
+```
+exchange.IO(k)
+exchange.IO(k, chain)
+exchange.IO(k, params)
+exchange.IO(k, signature)
+exchange.IO(k, signature, options)
+exchange.IO(k, key)
+```
+
+Forms:
+
+- `exchange.IO("bridge.*", ...)`
+
+Bridge tokens from Solana to EVM chains through bridges aggregated by LI.FI: list chains and tokens, quote, simulate, send and track progress.
+
+Parameters:
+
+- `k` (string, required): The command: ```bridge.chains```, ```bridge.tokens```, ```bridge.quote```, ```bridge.simulate```, ```bridge.send```, ```bridge.status``` or ```bridge.apiKey```.
+- `chain` (string / number, optional): The chain ```bridge.tokens``` lists: a chain ID, a LI.FI chain key (such as ```arb```) or a chain name; Solana by default.
+- `params` (object, optional): The bridge parameters ```{toChain, fromToken, toToken, amount, toAddress, slippage, order, allowBridges, denyBridges}``` of ```bridge.quote```, ```bridge.simulate``` and ```bridge.send```, see the remarks; the latter two also accept a ```bridge.quote``` result.
+- `signature` (string, optional): For ```bridge.status```: the source-chain transaction signature ```txHash``` returned by ```bridge.send```.
+- `options` (object, optional): ```{toChain, bridge}``` for ```bridge.status```, to speed up the lookup.
+- `key` (string, optional): For ```bridge.apiKey```: the LI.FI API key, ```""``` to clear it; without it, query only.
+
+Returns (array / object / bool / null value): ```bridge.chains``` and ```bridge.tokens``` return arrays, ```bridge.apiKey``` whether a key is set, the others objects; fields in the remarks. A null value is returned for bad parameters, no route, a failed simulation or a rate-limited request, with the reason in ```GetLastError()```.
+
+List the supported chains and find USDC on Arbitrum (read-only).
+
+```javascript
+function main() {
+    var chains = exchange.IO("bridge.chains")
+    if (!chains) {
+        Log("Query failed:", GetLastError())
+        return
+    }
+    Log(chains.length, "chains:", chains.slice(0, 8).map(function(c) { return c.key }).join(","))
+    var tokens = exchange.IO("bridge.tokens", "arb") || []
+    var usdc = tokens.filter(function(t) { return t.symbol == "USDC" })[0]
+    Log("USDC on Arbitrum:", usdc ? usdc.address : "not found")
+}
+```
+
+Quote bridging 50 USDC to Arbitrum and simulate it (read-only).
+
+```javascript
+var TO = ""   // your recipient address on Arbitrum (0x...)
+
+function main() {
+    if (!TO) {
+        Log("Set TO to your address on the destination chain first")
+        return
+    }
+    var q = exchange.IO("bridge.quote", {toChain: "arb", fromToken: "USDC", toToken: "USDC",
+        amount: 50, toAddress: TO})
+    if (!q) {
+        Log("Quote failed:", GetLastError())
+        return
+    }
+    Log("via", q.toolName, "receive", q.toAmount, "at least", q.toAmountMin,
+        "in about", q.executionDuration, "s")
+    q.feeCosts.forEach(function(f) {
+        Log("fee", f.name, f.amount, f.token, f.included ? "included" : "extra")
+    })
+    var sim = exchange.IO("bridge.simulate", q)
+    Log("Simulation:", sim ? "passed, compute units " + sim.unitsConsumed : GetLastError())
+}
+```
+
+Full flow: quote → simulate → send → poll the progress.
+
+```javascript
+var TO = ""   // your recipient address on Base (0x...)
+
+function main() {
+    if (!TO) {
+        Log("Set TO to your address on the destination chain first")
+        return
+    }
+    var params = {toChain: "base", fromToken: "USDC", toToken: "USDC", amount: 20, toAddress: TO}
+    var q = exchange.IO("bridge.quote", params)
+    if (!q || !exchange.IO("bridge.simulate", q)) {
+        Log("Quote or simulation failed:", GetLastError())
+        return
+    }
+    var r = exchange.IO("bridge.send", q)
+    if (!r) {
+        Log("Send failed:", GetLastError())
+        return
+    }
+    Log("Sent", r.txHash, "expected", r.toAmount, "USDC")
+    while (true) {
+        Sleep(20 * 1000)
+        var s = exchange.IO("bridge.status", r.txHash, {toChain: "base", bridge: r.tool})
+        if (!s) {
+            continue
+        }
+        LogStatus(_D(), s.status, s.substatus || "")
+        if (s.status == "DONE" || s.status == "FAILED" || s.status == "INVALID") {
+            Log("Result", s.status, s.substatus, "received", s.receiving ? s.receiving.amount : "-")
+            break
+        }
+    }
+}
+```
+
+###### Flow
+
+```bridge.quote``` for a quote → ```bridge.simulate``` to simulate → ```bridge.send``` to send → ```bridge.status``` every 10 to 30 seconds until ```DONE``` or ```FAILED```.
+
+Quotes and transactions come from LI.FI (aggregating Across, Stargate, CCTP, deBridge, Mayan, Relay, NEAR Intents and other bridges); LI.FI returns a serialized Solana transaction, which the docker signs with this wallet (refusing one this wallet does not sign), simulates and broadcasts through the Solana node. Requests carry the integrator tag ```integrator=fmz``` and no extra fee; fees such as ```LIFI Fixed Fee``` in a quote belong to LI.FI and the bridges and are already counted in ```toAmount```.
+
+###### Bridge parameters
+
+| Key | Required | Description |
+| - | - | - |
+| ```toChain``` | yes | Destination chain: a chain ID, a LI.FI chain key (such as ```arb```) or a name (such as ```Arbitrum``` or ```Base```, case-insensitive). It cannot be Solana (this chain; swap on the same chain with ```exchange.CreateOrder()```) |
+| ```fromToken``` | yes | A token on Solana: a name in the token table or a mint address |
+| ```toToken``` | yes | A token on the destination chain: a name or address resolved by LI.FI to its canonical token (```USDC``` on Arbitrum is native USDC, not USDC.e) |
+| ```amount``` | yes | The amount of ```fromToken``` in token units; digits beyond the token's decimals are dropped |
+| ```toAddress``` | yes | The recipient on the destination chain (an ```0x``` address, checked for format); all destinations are EVM chains where this wallet has no address, so it must be given |
+| ```slippage``` | no | Slippage ratio, ```[0, 0.5)```, defaults to the ```exchange.IO("slippage")``` value |
+| ```order``` | no | ```CHEAPEST``` or ```FASTEST``` |
+| ```allowBridges```, ```denyBridges``` | no | Use only, or never, these bridges (LI.FI bridge names, an array or comma-separated) |
+
+Unknown keys are errors. Given a ```bridge.quote``` result, the quote is redone from its ```request``` (the parameters as given).
+
+###### Results
+
+- ```bridge.chains```: ```[{id, key, name, chainType, nativeToken}]```, ```chainType``` being ```EVM``` or ```SVM```, cached for an hour.
+- ```bridge.tokens```: ```[{symbol, address, decimals, name, priceUSD}]```, cached for an hour.
+- ```bridge.quote```: ```{tool, toolName, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, fromAmountRaw, toAmountRaw, toAmountMinRaw, fromAmountUSD, toAmountUSD, slippage, toAddress, feeCosts, gasCosts, executionDuration, approvalAddress, steps, transactionId, request}```: amounts in token units (```*Raw``` in the smallest unit); ```toAmountMin``` is the amount guaranteed after slippage; ```feeCosts``` is ```[{name, amount, token, amountUSD, percentage, included}]``` (fees with ```included``` ```false``` are paid on top); ```gasCosts``` estimates source-chain gas; ```executionDuration``` is the expected time in seconds; ```approvalAddress``` is ```null``` on Solana; ```steps``` lists the steps (```cross``` bridges, ```swap``` swaps, ```protocol``` is LI.FI's fee).
+- ```bridge.simulate```: re-quotes, signs with this wallet and runs ```simulateTransaction``` (with signature verification) without broadcasting; returns the ```bridge.quote``` result plus ```simulated``` (```true```), ```unitsConsumed``` and ```signature```. A failed simulation is an error whose message gives the reason (```AccountNotFound``` means the wallet has no SOL) and the wallet balance.
+- ```bridge.send```: re-quotes → checks the balance → signs → simulates → broadcasts, without waiting for confirmation; returns ```{txHash, tool, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, toAddress, transactionId}```, ```txHash``` being the source-chain signature, whose state `exchange.IO("receipt")` returns. Quotes move; the new quote at sending applies.
+- ```bridge.status```: LI.FI's ```/status```, returning ```{status, substatus, substatusMessage, tool, sending, receiving, fromAddress, toAddress, explorer, bridgeExplorer}```: ```status``` is ```NOT_FOUND```, ```INVALID```, ```PENDING```, ```DONE``` or ```FAILED```; when ```DONE```, ```substatus``` is ```COMPLETED``` (delivered as quoted), ```PARTIAL``` (a different token arrived) or ```REFUNDED``` (returned to the source chain); ```sending``` and ```receiving``` are ```{txHash, txLink, chainId, amount, amountRaw, token, timestamp}```. Right after broadcasting LI.FI may not have indexed the transfer and returns ```NOT_FOUND```; keep polling.
+- ```bridge.apiKey```: sets the LI.FI API key (header ```x-lifi-api-key```, for this exchange object only, never echoed) and returns whether a key is set (a boolean).
+
+###### Rate limits and risks
+
+- Without an API key LI.FI rate-limits by outgoing IP: ```/quote``` 75 times per two hours (```bridge.quote```, ```bridge.simulate``` and ```bridge.send``` each use one), other endpoints 100 per minute, shared by the strategies on one docker; with a key, 100 per minute. A rate-limited call fails with ```rate limited (HTTP 429 …)```.
+- Bridging is asynchronous: when ```bridge.send``` returns only the source transaction has been broadcast; delivery takes seconds to tens of minutes (see the quote's ```executionDuration```), so poll ```bridge.status``` to confirm.
+- Funds sent to a wrong address cannot be recovered; bridge contracts and cross-chain messaging carry each bridge's own security risk; the destination wallet needs gas to use what arrives. Test with a small amount first.
+
+See also: `Jupiter`, `exchange.IO`, `exchange.IO("receipt")`, `exchange.IO("slippage")`, `exchange.IO("token")`, `exchange.CreateOrder`
 
 #### OKX DEX
 
@@ -30698,24 +34055,24 @@ A token may be a token name or a contract address (such as ```1:0xa0b8..._USD```
 | ```key``` | string | Replace the wallet mnemonic (12 or 24 words) at runtime; the current wallet is kept if parsing fails. | ```true``` on success. |
 | ```address``` | [chainIndex] | Get the wallet address on a chain (the chain may be a chain index or a chain name); Ethereum (1) when omitted. | — |
 | ```addresses``` | — | Export the wallet addresses on all chains. | An object keyed by chain index with the addresses as values. |
-| ```slippage``` | [number] | Read without an argument, set with one; swap slippage in percent, range (0, 50], default 0.5. | The current value when reading, ```true``` when set. |
+| ```slippage``` | [number] | Read without an argument, set with one; swap slippage in percent, range (0, 50], default 0.5. | The current value when reading (a string such as ```"0.5"```), ```true``` when set. |
 | ```gasLevel``` | [string] | Read without an argument, set with one; gas level: ```average``` (default), ```fast```, ```slow```. | The current value when reading, ```true``` when set. |
 | ```gasMultiplier``` | [number] | Read without an argument, set with one; multiplier of the gas limit of EVM transactions (≥1, default 1.5). | The current value when reading, ```true``` when set. |
 | ```allChainBalance``` | [bool] | Read without an argument, set with one; whether ```exchange.GetAssets()``` queries balances on all chains (only Ethereum by default); when on, ```Equity``` of ```exchange.GetAccount()``` also covers all chains. (more below the table) | The current value when reading, ```true``` when set. |
 | ```rpc``` | [chain[, url]] | Query or set custom RPC addresses per chain; ```chain``` must be the chain index (such as ```1```, ```501```), a chain name has no effect. (more below the table) | ```true``` when set or deleted. |
 | ```regChain``` | chainId, alias | Register a chain alias that can then replace the chain index in symbols. Aliases are case-insensitive, must not contain ```_``` or ```:```, and are at most 20 characters. | ```true``` on success. |
 | ```regToken``` | chainId, alias, address | Bind a token name to a contract address on a chain (```chainId``` must be the chain index); a bound name takes precedence over the OKX token list and is case-insensitive when used; naming rules as for ```regChain```. | ```true``` on success. |
-| ```quote``` | symbol, amount | Read-only quote preview (two-sided symbol, for example ```1:USDC_1:ETH```, both sides on one chain); ```amount``` is the quantity of the first token (spent), and the ```slippage``` setting applies; no on-chain transaction is built. | ```{toAmount, fromAmount, priceImpact, estimateGasFee, routerList, info}``` |
-| ```allowance``` | symbol[, spender] | Query the wallet's ERC-20 allowance for the spender (first token of the symbol); without a spender, the OKX DEX approval contract is used. EVM chains only; configure the chain's RPC with ```exchange.IO("rpc", chainIndex, url)``` first; the native coin has no allowance and fails. | The allowance, as a decimal string in the smallest unit. |
-| ```approve``` | symbol[, amount] | ERC-20 approval for the first token of the symbol (EVM chains only); ```amount``` is in token units (scaled by the token's decimals), the maximum amount when omitted; waits for the transaction to be confirmed (up to 60 seconds). | The transaction hash. |
-| ```signTx``` | tx, chainIndex | Sign only, without broadcasting. ```tx``` is the transaction JSON (a string or an object); ```chainIndex``` may be a chain index or a chain name. | The signed transaction (a string). |
+| ```quote``` | symbol, amount | Read-only quote preview (two-sided symbol, for example ```1:USDC_1:ETH```, both sides on one chain); ```amount``` is the quantity of the first token (spent), and the ```slippage``` setting applies; no on-chain transaction is built. | ```{toAmount, fromAmount, priceImpact, estimateGasFee, routerList, info}```: ```toAmount``` and ```fromAmount``` are token amounts scaled by decimals (numbers); ```priceImpact``` (percent) and ```estimateGasFee``` are strings as given by OKX; ```routerList``` is the route array (each item has ```dexProtocol.dexName```, ```dexProtocol.percent``` and more); ```info``` is the raw data of the OKX quote API as a JSON string. |
+| ```allowance``` | symbol[, spender] | Query the wallet's ERC-20 allowance for the spender (first token of the symbol, or just ```<chain>:<token>``` such as ```1:USDC```); without a spender, the OKX DEX approval contract is used. (more below the table) | The allowance, as a decimal string in the smallest unit. |
+| ```approve``` | symbol[, amount] | ERC-20 approval for the first token of the symbol (or just ```<chain>:<token>```; EVM chains only); ```amount``` is in token units (scaled by the token's decimals), the maximum amount when omitted; waits for the transaction to be confirmed (up to 60 seconds). | The transaction hash. |
+| ```signTx``` | tx, chainIndex | Sign only, without broadcasting. (more below the table) | The signed transaction (a string). |
 | ```broadcast``` | signedTx, chainIndex | Broadcast a signed transaction. | ```{txHash, orderId}``` |
 | ```marketSupportedChains``` | — | Read-only list of chains supported by the market API. | — |
 | ```balanceSupportedChains``` | — | Read-only list of chains supported by the balance API. | — |
-| ```swapSupportedChains``` | — | Read-only list of chains supported by the swap API. | — |
+| ```swapSupportedChains``` | — | Read-only list of chains supported by the swap API. | The raw array of the OKX API; each item has ```chainIndex```, ```chainName``` and ```dexTokenApproveAddress``` (the approval contract). |
 | ```broadcastSupportedChains``` | — | Read-only list of chains supported by the broadcast API. | — |
-| ```tokenSearch``` | chains, search | Search tokens by name or address (```chains``` is a comma-separated list of chain indexes); returns the raw data of the OKX API. | — |
-| ```allTokens``` | chainIndex | List all swappable tokens on a chain; returns the raw data of the OKX API. | — |
+| ```tokenSearch``` | chains, search | Search tokens by name or address (```chains``` is a comma-separated list of chain indexes); returns the raw data of the OKX API. | An array; each item has ```chainIndex```, ```tokenSymbol```, ```tokenName```, ```tokenContractAddress```, ```decimal```, ```price```, ```liquidity``` and more (all strings). |
+| ```allTokens``` | chainIndex | List all swappable tokens on a chain; returns the raw data of the OKX API. | An array; each item has ```tokenSymbol```, ```tokenName```, ```tokenContractAddress```, ```decimals``` and more. |
 
 The rest of the longer descriptions in the table:
 
@@ -30724,8 +34081,145 @@ The rest of the longer descriptions in the table:
 Apply for credentials on the OKX developer portal: https://web3.okx.com/onchainos/dev-portal (the old ```/build/dev-portal``` address no longer works). After logging in, create a project, then create an API key under it: ```Project``` is the project's Project ID; ```ApiKey``` and ```SecretKey``` are the API key and secret key generated with the API key (the secret key is shown only once, at creation); ```Passphrase``` is the passphrase you set when creating the API key. This ```SecretKey``` is the OKX API secret, unrelated to the wallet mnemonic entered in the configuration.
 - ```allChainBalance```: The all-chain query groups chains by wallet address (EVM chains share one address, up to 50 chains per request; every other chain is queried on its own) and waits 1 second between consecutive requests to stay under the rate limit, so one query takes over ten seconds (```exchange.GetAccount()``` also queries the valuation, doubling the requests); do not poll it frequently.
 - ```rpc```: Without arguments returns all, with only a chain returns that chain's address (an empty string if not set), an empty url deletes it. On EVM chains, allowance queries (```allowance``` and the automatic check before orders) require an RPC, which also backs up OKX's nonce API when it fails; Solana, Tron, SUI and TON signing query on-chain state through the chain's public node when none is configured. Unichain (```130```) comes with its official RPC preset.
+- ```allowance```: EVM chains only; configure the chain's RPC with ```exchange.IO("rpc", chainIndex, url)``` first; the native coin has no allowance and fails.
+- ```signTx```: ```tx``` is the transaction JSON (a string or an object); ```chainIndex``` may be a chain index or a chain name. On EVM chains the transaction needs ```to```, ```data``` and ```gas``` (or ```gasLimit```), optionally ```value```, ```gasPrice``` and ```maxPriorityFeePerGas``` (the same as the ```tx``` returned by the OKX swap API): the nonce is looked up automatically, the gas limit is multiplied by ```gasMultiplier```, and a missing ```gasPrice``` is queried through the chain's RPC.
 
 For the common commands ```api```, ```base``` and ```currency``` see `exchange.IO`.
+
+##### Common Usage
+
+###### Preview a quote before swapping (read-only, no transaction)
+
+```javascript
+function main() {
+    // How much ETH 100 USDC buys on Ethereum (chain index 1)
+    var q = exchange.IO("quote", "1:USDC_1:ETH", 100)
+    if (!q) {
+        Log("Quote failed:", GetLastError())
+        return
+    }
+    Log("spend:", q.fromAmount, "USDC", "receive:", q.toAmount, "ETH")
+    Log("price:", q.fromAmount / q.toAmount, "price impact (%):", q.priceImpact,
+        "estimated gas:", q.estimateGasFee)
+    for (var i = 0; i < q.routerList.length; i++) {
+        var p = q.routerList[i].dexProtocol
+        Log("route:", p.dexName, p.percent + "%")
+    }
+    var info = JSON.parse(q.info)    // raw data of the OKX quote API
+    Log("trade fee (USD):", info.tradeFee)
+}
+```
+
+###### Configure an RPC, check the allowance, swap at market, then query the result
+
+```javascript
+function main() {
+    // Allowance queries and the automatic approval before orders need the chain's RPC
+    exchange.IO("rpc", 1, "https://ethereum-rpc.publicnode.com")
+    exchange.IO("slippage", 1)          // 1% slippage
+    exchange.IO("gasLevel", "fast")
+    var allowance = exchange.IO("allowance", "1:USDC")    // decimal string, smallest unit
+    Log("USDC allowance:", allowance)
+    if (Number(allowance) < 20e6) {    // USDC has 6 decimals
+        // Approve 100 USDC only (unlimited without an amount); returns the hash once mined
+        Log("approval tx:", exchange.IO("approve", "1:USDC", 100))
+    }
+    // For a buy the amount is the second token spent: spend 20 USDC on ETH
+    var id = exchange.CreateOrder("1:ETH_1:USDC", "buy", -1, 20)
+    if (!id) {
+        Log("Swap failed:", GetLastError())
+        return
+    }
+    for (var i = 0; i < 20; i++) {
+        var o = exchange.GetOrder(id)
+        if (o && o.Status != ORDER_STATE_PENDING) {
+            Log("status:", o.Status, "ETH bought:", o.DealAmount, "average price:", o.AvgPrice)
+            break
+        }
+        Sleep(3000)
+    }
+}
+```
+
+###### Search tokens, bind a name to a contract address and register a chain alias
+
+```javascript
+function main() {
+    // Search USDC on Base (chain index 8453); returns the raw data of the OKX API
+    var rows = exchange.IO("tokenSearch", "8453", "USDC")
+    if (!rows || rows.length == 0) {
+        Log("Nothing found:", GetLastError())
+        return
+    }
+    for (var i = 0; i < rows.length; i++) {
+        var r = rows[i]
+        Log(r.chainIndex, r.tokenSymbol, r.tokenName, r.tokenContractAddress)
+    }
+    var all = exchange.IO("allTokens", "8453")    // every swappable token on Base
+    Log("swappable tokens:", all.length, "first:", all[0].tokenSymbol)
+    // Chain alias: MYBASE:USDC_USD works from now on (aliases are case-insensitive)
+    exchange.IO("regChain", 8453, "mybase")
+    // Bind the name USDC to the first contract found; it takes precedence over OKX's list
+    exchange.IO("regToken", 8453, "USDC", rows[0].tokenContractAddress)
+    var q = exchange.IO("quote", "MYBASE:USDC_MYBASE:ETH", 10)
+    Log("ETH for 10 USDC:", q ? q.toAmount : GetLastError())
+}
+```
+
+###### List the wallet's addresses on each chain, the chains each API supports and the balances on all chains
+
+```javascript
+function main() {
+    Log("Ethereum:", exchange.IO("address"), "Solana:", exchange.IO("address", "SOL"))
+    var addrs = exchange.IO("addresses")    // {chainIndex: address}
+    Log("Base:", addrs["8453"], "Tron:", addrs["195"])
+    var chains = exchange.IO("swapSupportedChains")
+    for (var i = 0; i < chains.length; i++) {
+        Log("swappable:", chains[i].chainIndex, chains[i].chainName)
+    }
+    Log("market API chains:", exchange.IO("marketSupportedChains").length,
+        "balance API:", exchange.IO("balanceSupportedChains").length,
+        "broadcast API:", exchange.IO("broadcastSupportedChains").length)
+    // GetAssets covers Ethereum only by default; switch to all chains (10+ s, do not poll)
+    exchange.IO("allChainBalance", true)
+    var assets = exchange.GetAssets()
+    for (var j = 0; assets && j < assets.length; j++) {
+        Log(assets[j].Currency, assets[j].Amount)
+    }
+}
+```
+
+###### Get the transaction from the OKX swap API, sign it and broadcast it yourself
+
+```javascript
+function main() {
+    var chain = "1"
+    var wallet = exchange.IO("address", chain)
+    // The transaction for swapping 1 USDC to ETH (amount in the smallest unit);
+    // spending an ERC-20 needs an approval first, see the example above
+    var r = exchange.IO("api", "GET", "/api/v6/dex/aggregator/swap", {
+        chainIndex: chain,
+        amount: "1000000",
+        fromTokenAddress: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        toTokenAddress: "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+        slippagePercent: "0.5",
+        userWalletAddress: wallet
+    })
+    if (!r || r.code != "0") {
+        Log("Getting the transaction failed:", r ? r.msg : GetLastError())
+        return
+    }
+    // tx has to, data, value, gas, gasPrice etc.; signing looks up the nonce and
+    // multiplies the gas limit by gasMultiplier
+    var signed = exchange.IO("signTx", r.data[0].tx, chain)
+    if (!signed) {
+        Log("Signing failed:", GetLastError())
+        return
+    }
+    var res = exchange.IO("broadcast", signed, chain)
+    Log("tx hash:", res.txHash, "OKX order id:", res.orderId)
+}
+```
 
 ##### Function Support
 
@@ -30746,6 +34240,1333 @@ Served through a fallback:
 - ```exchange.GetTickers()``` returns the tokens of the 24h volume leaderboard on Ethereum (chain index 1), not all tokens; ```exchange.GetMarkets()``` lists the swappable tokens on Ethereum (tokens sharing a name on the same chain are left out).
 - ```exchange.GetAssets()``` queries balances on Ethereum only by default, with asset names written as ```chain:token``` (an asset for which OKX gives no token name uses its contract address in place of the name); use ```exchange.IO("allChainBalance", true)``` for all chains. ```exchange.GetAccount()``` queries the chains of the two tokens of the current pair and takes ```Stocks``` (left token) and ```Balance``` (right token; 0 when quoted in ```USD```) by chain index and contract address, whether the pair is written with chain indexes, chain names or contract addresses.
 - The wallet can only be derived from the mnemonic, always with the first account of each chain; choosing an account index or importing a private key is not supported. EVM chains (Ethereum, BSC, Base, Arbitrum and others share one address) use ```m/44'/60'/0'/0/0```, which is account 1 of the mnemonic in wallets such as MetaMask; accounts 2 and later cannot be used. Other chains: ETC ```m/44'/61'/0'/0/0```; Tron ```m/44'/195'/0'/0/0```; Bitcoin ```m/86'/0'/0'/0/0``` (Taproot address ```bc1p…```); Litecoin ```m/49'/2'/0'/0/0``` (P2SH-SegWit); Dogecoin ```m/44'/3'/0'/0/0```, Dash ```m/44'/5'/0'/0/0```, Bitcoin Cash ```m/44'/145'/0'/0/0```; Osmosis ```m/44'/118'/0'/0/0```; Stacks ```m/44'/5757'/0'/0/0```; Solana ```m/44'/501'/0'/0'```; Aptos ```m/44'/637'/0'/0'/0'```; SUI ```m/44'/784'/0'/0'/0'```; TON ```m/44'/607'/0'``` (W5R1 wallet contract address); Starknet derives ```m/44'/9004'/0'/0/0``` from the EVM private key as the seed. Check an address with ```exchange.IO("address", chain)```.
+
+#### DEX Strategy Examples
+
+Complete, ready-to-run DEX strategies: automatic rebalancing of range liquidity, gauge staking and compounding on Aerodrome and Velodrome, DEX-CEX arbitrage, Jupiter limit order grids, dollar-cost averaging (DCA), and pump.fun token sniping. Each page explains the strategy logic, the exchange objects it needs, its parameters and its risks, and includes the full code.
+
+| Strategy | What it does | Exchange objects |
+| - | - | - |
+| `LP Auto-Rebalance` | Provides liquidity in a ±X% range around the current price; when the price leaves the range, withdraws the liquidity and opens a new position at the new price, and collects fees periodically; guardrails cap rebalance frequency, gas and capital | One of Uniswap, PancakeSwap, Aerodrome, Velodrome |
+| `Gauge Staking and Compounding` | Picks a pool by reward APR, opens a position and stakes it in the gauge, then periodically sells the rewards for USDC and adds them back to the position | Aerodrome or Velodrome |
+| `DEX-CEX Arbitrage` | Compares the DEX quote with the CEX order book price, and places one order on each side when the spread, after fees, gas and a safety margin, reaches the threshold | One DEX plus one CEX spot exchange |
+| `Jupiter Limit Order Grid` | Places grid orders above and below the current price using native limit orders, and places a reverse order at the adjacent price level once one fills | Jupiter |
+| `DEX DCA` | Buys on a schedule: Jupiter uses its native DCA, while on other DEXs the strategy places timed market buys; buys double when the price is below the moving average | Any DEX |
+| `pump.fun Sniping Strategy` | Finds new pump.fun tokens, filters them, buys a fixed amount, and sells on take-profit, stop-loss or timeout (extremely high risk) | Jupiter |
+
+##### How to Run
+
+- Copy the code into a new JavaScript strategy; the parameters are at the top of the code. When creating the robot, add the exchange objects as described on each page, and use a dedicated wallet.
+- Strategies that send transactions default to ```DRY_RUN = true```: they only plan, request quotes and run on-chain simulations (```lp.simulate```, ```simulate```, ```trigger.simulate```, ```dca.simulate```, and ```dryRun``` of ```pump.buy```). Nothing is signed or broadcast, and PnL is tracked on paper positions. A simulation error caused by an insufficient wallet balance is normal.
+- Live trading: once the logs and status bar look right, switch to a dedicated wallet funded with a small amount, set ```DRY_RUN``` to ```false```, and adjust parameters such as the gas estimate for the chain you use.
+- Progress such as position IDs, open orders and amount spent is saved in `_G`, so tracking resumes after the robot restarts.
+
+##### Risks
+
+- Impermanent loss: once the price moves away, range liquidity is worth less than simply holding the tokens. Once the price leaves the range, the position holds only one token and stops earning fees.
+- Gas and fees: every position opening, rebalance, claim and swap is an on-chain transaction. Gas on Ethereum mainnet is high, so small-capital strategies rarely pay off there; running on low-fee chains such as Base, Arbitrum, BNB Chain or Solana is recommended.
+- MEV: on-chain swaps can be front-run and hit by sandwich attacks. The wider the slippage tolerance, the larger the maximum loss to a sandwich.
+- Contracts and tokens: contracts such as pools, gauges and the Jupiter escrow vault carry security risk. New tokens may be scams (rug pulls), and their names can be impersonated, so always go by the contract address or mint address.
+- Estimates are not returns: the estimated daily fees and reward APR in the plan are extrapolated from past trades or current emissions. Only use funds you can afford to lose, and test with small amounts first.
+
+For a simplified version of range liquidity ("open position → monitor → withdraw once out of range"), see the complete LP strategy example on the `exchange.IO("lp.add")` page. For the parameters of each command, see the `EVM DEX Common Commands` and `Jupiter` exchange pages.
+
+##### LP Auto-Rebalancing
+
+Opens a single-range position within ±```RANGE_PCT```% of the current price to earn trading fees. When the price stays outside the range for several consecutive checks, the strategy withdraws and re-opens the position centered on the new price, so it keeps providing liquidity. It collects fees on a schedule and has guardrails on rebalance frequency, gas and capital.
+
+###### How It Works
+
+1. Open a position: `exchange.IO("lp.plan")` (```shape``` set to ```spot```, ```range``` set to ```{pct: [-RANGE_PCT, RANGE_PCT]}```) → `exchange.IO("lp.add")`. On the first open, the pool is chosen by the rules of ```lp.select```. You can set the fee tier with ```FEE```. Every later rebalance uses the same pool. The position ID is stored in `_G`, and after a restart it is registered again with `exchange.IO("lp.track")`.
+2. Every ```INTERVAL``` seconds, query the position with `exchange.IO("lp.positions")`: whether it is in range, its current value and its unclaimed fees.
+3. After ```OUT_CONFIRM``` consecutive out-of-range checks, rebalance. First withdraw everything with `exchange.IO("lp.remove")` (```lp.remove(ids, 1, false)```, without selling back into the quote currency). Then plan and open a new position centered on the new price, sized at min(current position value, ```BUDGET```). Any amount above ```BUDGET``` stays in the wallet.
+4. Guardrails: rebalances must be at least ```MIN_REBALANCE_MIN``` minutes apart, with at most ```MAX_REBALANCE_PER_DAY``` rebalances in 24 hours (after the limit is reached, the strategy only monitors). The estimated daily fees of the new range (```estDailyFeesUsd``` in the plan) × ```PAYBACK_DAYS``` must cover the gas of one rebalance (```REBALANCE_TXS``` × ```GAS_USD```). Otherwise the strategy skips this rebalance and keeps waiting.
+5. Every ```COLLECT_HOURS``` hours, if unclaimed fees are at least ```COLLECT_MIN_USD```, collect them with `exchange.IO("lp.collect")`.
+6. Status bar: shows the range, current price, position value, unclaimed and collected fees, rebalance count, gas estimate, and PnL compared with holding (HODL: the two tokens deposited on the first open, left untouched).
+
+Some strategies follow "open → monitor → withdraw and exit when the price leaves the range or hits a stop-loss". This strategy instead re-centers on the price after it leaves the range and keeps providing liquidity. For a simple version of the exit-style strategy, see the full LP strategy example on the `exchange.IO("lp.add")` page.
+
+###### Exchange Object
+
+One `Uniswap / PancakeSwap` or `Aerodrome / Velodrome` exchange object (with a dedicated wallet). The wallet holds the quote currency and a small amount of native coin to pay for gas. Aerodrome and Velodrome positions are not staked and earn only trading fees. For staking to earn rewards, see `Gauge Staking and Compounding`.
+
+###### Parameters
+
+| Parameter | Default | Description |
+| - | - | - |
+| ```SYMBOL``` | ```ETH_USDC``` | Trading pair, in the format base currency_quote currency |
+| ```BUDGET``` | ```100``` | Capital cap (in the quote currency): the budget for each open = min(current position value, ```BUDGET```) |
+| ```RANGE_PCT``` | ```5``` | Range half-width: current price ±5% |
+| ```FEE``` | ```null``` | Fee tier to use (e.g. ```500```). When ```null```, the pool is chosen by the ```lp.select``` rules |
+| ```INTERVAL``` | ```60``` | Check interval (seconds) |
+| ```OUT_CONFIRM``` | ```5``` | Number of consecutive out-of-range checks that triggers a rebalance |
+| ```MIN_REBALANCE_MIN``` | ```60``` | Minimum time between two rebalances (minutes) |
+| ```MAX_REBALANCE_PER_DAY``` | ```4``` | Maximum number of rebalances in 24 hours |
+| ```GAS_USD``` | ```0.3``` | Estimated gas per on-chain transaction (USD): about 0.01–0.3 on Base and Arbitrum, about 2–10 on Ethereum mainnet |
+| ```REBALANCE_TXS``` | ```3``` | Number of transactions in one rebalance: withdraw, swap, open |
+| ```PAYBACK_DAYS``` | ```3``` | Number of days in which the new range's estimated fees must cover the rebalance gas |
+| ```COLLECT_HOURS``` | ```24``` | Interval between fee collections (hours) |
+| ```COLLECT_MIN_USD``` | ```1``` | Fees are not collected while unclaimed fees are below this value |
+| ```DRY_RUN``` | ```true``` | When ```true```, the strategy only plans and simulates and sends no transactions |
+
+###### Risks
+
+- Impermanent loss: the further the price moves from the entry price, the lower the position value is compared with holding. Every rebalance happens after a one-way price move. By the time the strategy withdraws, the position has mostly turned into a single token, and opening again means swapping half of it back. Frequent rebalancing turns impermanent loss into realized losses.
+- Gas: every rebalance and fee collection is an on-chain transaction, and gas costs can exceed fee income. Run the strategy on low-gas chains such as Base, Arbitrum or BNB Chain, and set ```GAS_USD``` for the chain you use.
+- Estimated daily fees are extrapolated from the past 24 hours of trading volume and the position's share of the pool. They are not a guarantee of future returns.
+
+###### DRY_RUN vs. Live Trading
+
+When ```DRY_RUN``` is ```true``` (the default), no transactions are sent. The strategy plans the position with ```lp.plan```, simulates the position-opening transaction with `exchange.IO("lp.simulate")`, and tracks the position's value as a paper position using the V3 formulas. The simulation reports an error when the wallet balance is too low; this is expected. While the price is in range, fees accrue at the plan's estimated daily fee rate, which is only an estimate. Set ```DRY_RUN``` to ```false``` to trade live. Start with a small ```BUDGET``` for a while to confirm that the rebalancing frequency and gas costs are what you expect.
+
+Complete strategy code (when ```DRY_RUN = true```, it only plans and simulates, and sends no transactions).
+
+```javascript
+/*
+ * Concentrated liquidity auto-rebalancing market making (for Uniswap / PancakeSwap / Aerodrome / Velodrome, example strategy)
+ *
+ * Opens a single-range position within ±RANGE_PCT% of the current price to earn fees; when the price is outside the range for OUT_CONFIRM consecutive checks, withdraws the position and reopens it
+ * centered on the new price (rebalance), while periodically collecting fees. Unlike uniswap-lp-monitor.js (open → monitor → withdraw and exit once out of range),
+ * this strategy re-centers on the price after it leaves the range and keeps making markets.
+ *
+ * Guardrails:
+ *   - At least MIN_REBALANCE_MIN minutes between two rebalances, at most MAX_REBALANCE_PER_DAY rebalances within 24 hours (monitor only once the limit is reached);
+ *   - Cost check: the new range's estimated daily fees (estDailyFeesUsd returned by lp.plan) × PAYBACK_DAYS must cover the gas of one rebalance
+ *     (REBALANCE_TXS txs × GAS_USD); otherwise skip this rebalance and keep waiting;
+ *   - Capital cap: budget per position = min(current position value, BUDGET); invested capital never exceeds BUDGET, and the excess stays in the wallet;
+ *   - Fee collection: collect only every COLLECT_HOURS hours and only when uncollected fees are at least COLLECT_MIN_USD (collecting is also an on-chain transaction).
+ *
+ * Status bar: range, current price, whether in range, position value, uncollected / collected fees, rebalance count, gas estimate, and PnL relative to
+ * simply holding (HODL). HODL benchmark = the amounts of both tokens deposited at the first position opening, held unchanged.
+ *
+ * With DRY_RUN = true (default) no transactions are sent: lp.plan plans and lp.simulate simulates the opening transaction (the simulation errors out when the wallet balance is insufficient,
+ * which is normal), and a "paper position" tracks value using the V3 formula; while the price is in range, fees accrue at the plan's estimated daily fees (estimate only).
+ *
+ * Risks: range liquidity is exposed to impermanent loss; every rebalance happens after a one-directional price move, effectively swapping tokens "buy high, sell low", and frequent rebalancing realizes impermanent loss;
+ * every rebalance and collection is an on-chain transaction, and gas may exceed fee income — run on low-gas chains such as Base, Arbitrum and BNB Chain,
+ * adjust GAS_USD per chain, and start with a small budget.
+ *
+ * Usage: add one of the Uniswap, PancakeSwap, Aerodrome or Velodrome exchange objects (a dedicated wallet is recommended); the wallet must hold the quote currency and
+ * a small amount of native coin to pay gas. Aerodrome / Velodrome positions are not staked and earn trading fees only (for staking to claim rewards, see aerodrome-gauge-compound.js).
+ */
+
+// ---------------- Parameters ----------------
+var SYMBOL = "ETH_USDC"          // Trading pair: base_quote
+var BUDGET = 100                 // Capital cap (in quote currency)
+var RANGE_PCT = 5                // Range half-width: current price ±5%
+var FEE = null                   // Specific fee tier (e.g. 500); null = choose the pool by lp.select rules
+var INTERVAL = 60                // Check interval (seconds)
+var OUT_CONFIRM = 5              // Consecutive out-of-range checks required before rebalancing
+var MIN_REBALANCE_MIN = 60       // Minimum interval between two rebalances (minutes)
+var MAX_REBALANCE_PER_DAY = 4    // Maximum rebalances within 24 hours
+var GAS_USD = 0.3                // Estimated gas per on-chain transaction (USD): Base/Arbitrum about 0.01~0.3, Ethereum mainnet about 2~10
+var REBALANCE_TXS = 3            // Transactions per rebalance: withdraw + swap + open
+var PAYBACK_DAYS = 3             // Days within which the new range's estimated fees must cover the rebalance gas
+var COLLECT_HOURS = 24           // Fee collection interval (hours)
+var COLLECT_MIN_USD = 1          // Skip collection when uncollected fees are below this value
+var DRY_RUN = true               // When true, only plan and simulate; send no transactions
+
+var DEXES = ["Uniswap", "PancakeSwap", "Aerodrome", "Velodrome"]
+var KEY = DRY_RUN ? "lp_rebalance_paper" : "lp_rebalance"
+var S = null                     // Persistent state (_G)
+
+function fmt(x, d) {
+    return x === null || x === undefined || isNaN(x) ? "-" : Number(x).toFixed(d === undefined ? 2 : d)
+}
+function save() { _G(KEY, S) }
+
+// Paper position: compute both token amounts from liquidity L using the V3 formula (price = quote/base)
+function paperAmounts(p) {
+    var sp = Math.sqrt(Math.min(Math.max(p, S.lower), S.upper))
+    return { base: S.L * (1 / sp - 1 / Math.sqrt(S.upper)), quote: S.L * (sp - Math.sqrt(S.lower)) }
+}
+
+function makePlan(budget) {
+    var params = { symbol: SYMBOL, budget: budget, range: { pct: [-RANGE_PCT, RANGE_PCT] }, shape: "spot" }
+    if (S && S.pool) params.pool = S.pool          // Stay in the same pool when rebalancing
+    else if (FEE) params.fee = FEE
+    var plan = exchange.IO("lp.plan", params)
+    if (!plan) throw new Error("lp.plan failed: " + GetLastError())
+    return plan
+}
+
+// Open a position (initial opening or rebalance); returns whether it succeeded
+function open(plan) {
+    var x = plan.positions[0]
+    Log("Position plan: pool", plan.pool, "fee", plan.fee, "price", fmt(plan.price, 4), "range", fmt(x.priceLower, 4), "~", fmt(x.priceUpper, 4),
+        "deposit", fmt(x.amountBase, 6), "+", fmt(x.amountQuote, 4), "est. daily fees $" + fmt(plan.estDailyFeesUsd, 4),
+        plan.swap ? "(first " + (plan.swap.side === "buy" ? "buy " : "sell ") + plan.swap.amount + " " + plan.swap.currency + ")" : "")
+    var ids, r = null, base = x.amountBase, quote = x.amountQuote
+    if (DRY_RUN) {
+        var sim = exchange.IO("lp.simulate", plan)
+        Log(sim ? "lp.simulate passed, value " + fmt(sim.value, 4) : "lp.simulate failed (normal when the wallet balance is insufficient): " + GetLastError())
+        ids = ["paper"]
+        S.L = x.amountQuote > 0 ? x.amountQuote / (Math.sqrt(plan.price) - Math.sqrt(x.priceLower))
+            : x.amountBase / (1 / Math.sqrt(plan.price) - 1 / Math.sqrt(x.priceUpper))
+    } else {
+        r = exchange.IO("lp.add", plan)             // Recomputed at execution time from the latest pool price and balances
+        if (!r) { Log("Failed to open position:", GetLastError(), "#FF0000"); return false }
+        ids = r.positions.map(function (p) { return String(p.id) })
+        x = r.positions[0]
+        base = 0; quote = 0
+        r.positions.forEach(function (p) { base += p.amountBase; quote += p.amountQuote })
+        exchange.IO("lp.track", ids)
+        Log("Position opened", r.txHash, "position", ids.join(","), "#00AA00")
+    }
+    S.ids = ids; S.pool = (r && r.pool) || plan.pool; S.lower = x.priceLower; S.upper = x.priceUpper
+    S.estDaily = plan.estDailyFeesUsd || 0
+    S.gasUsd += GAS_USD * (plan.swap ? 2 : 1)
+    if (S.hodlBase === null) { S.hodlBase = base; S.hodlQuote = quote }
+    save()
+    return true
+}
+
+// Current position: {price, inRange, value, fees}
+function readPosition() {
+    if (DRY_RUN) {
+        var t = exchange.GetTicker(SYMBOL)
+        if (!t) throw new Error("GetTicker failed: " + GetLastError())
+        var p = (t.Buy + t.Sell) / 2, a = paperAmounts(p), now = Date.now()
+        var inRange = p >= S.lower && p < S.upper
+        if (inRange && S.lastCheck) S.fees += S.estDaily * (now - S.lastCheck) / 86400000
+        S.lastCheck = now
+        return { price: p, inRange: inRange, value: a.base * p + a.quote, fees: S.fees }
+    }
+    var ps = exchange.IO("lp.positions", SYMBOL)
+    if (!ps) throw new Error("lp.positions failed: " + GetLastError())
+    ps = ps.filter(function (x) { return !x.closed && S.ids.indexOf(String(x.id)) >= 0 })
+    if (ps.length === 0) return null
+    var out = { price: ps[0].price, inRange: false, value: 0, fees: 0 }
+    ps.forEach(function (x) { out.value += x.value; out.fees += x.feesValue; if (x.inRange) out.inRange = true })
+    return out
+}
+
+function rebalance(cur) {
+    var now = Date.now()
+    S.rebalances = S.rebalances.filter(function (t) { return now - t < 86400000 })
+    if (S.rebalances.length >= MAX_REBALANCE_PER_DAY) return "Rebalanced " + S.rebalances.length + " times within 24 hours, rebalancing paused"
+    if (S.lastRebalance && now - S.lastRebalance < MIN_REBALANCE_MIN * 60000) return "Less than " + MIN_REBALANCE_MIN + " minutes since the last rebalance"
+    var budget = Math.min(cur.value, BUDGET)       // Fees are counted separately as collected and not reinvested
+    var plan = makePlan(budget)
+    var cost = REBALANCE_TXS * GAS_USD
+    if (plan.estDailyFeesUsd !== null && plan.estDailyFeesUsd * PAYBACK_DAYS < cost) {
+        return "New range's estimated " + PAYBACK_DAYS + "-day fees $" + fmt(plan.estDailyFeesUsd * PAYBACK_DAYS, 4) + " are not enough to cover rebalance gas $" + fmt(cost, 2)
+    }
+    Log("Rebalancing: price", fmt(cur.price, 4), "out of range for", S.outStreak, "consecutive checks", "#FF9900")
+    if (DRY_RUN) {
+        S.collected += S.fees
+    } else {
+        var r = exchange.IO("lp.remove", S.ids, 1, false)
+        if (!r) { Log("Withdrawal failed:", GetLastError(), "#FF0000"); return "Withdrawal failed" }
+        r.positions.forEach(function (p) { S.collected += p.feesBase * cur.price + p.feesQuote })
+    }
+    S.leftover += cur.value - budget
+    S.fees = 0; S.outStreak = 0; S.lastRebalance = now; S.rebalances.push(now); S.count++
+    S.gasUsd += GAS_USD
+    S.ids = []; S.budget = budget                   // Clear right after withdrawal: if reopening fails, retry in the next round
+    if (!open(plan)) return "Reopening failed, retrying next round"
+    return "Rebalanced"
+}
+
+function collect(cur) {
+    if (Date.now() - S.lastCollect < COLLECT_HOURS * 3600000 || cur.fees < COLLECT_MIN_USD) return
+    Log("Collecting fees $" + fmt(cur.fees, 4))
+    if (!DRY_RUN) {
+        var r = exchange.IO("lp.collect", S.ids, false)
+        if (!r) { Log("Collection failed:", GetLastError(), "#FF0000"); return }
+    }
+    S.collected += cur.fees
+    S.fees = 0
+    S.gasUsd += GAS_USD
+    S.lastCollect = Date.now()
+    save()
+}
+
+function main() {
+    if (DEXES.indexOf(exchange.GetName()) < 0) throw new Error("Please add a " + DEXES.join(" / ") + " exchange object, current: " + exchange.GetName())
+    S = _G(KEY)
+    if (!S || S.symbol !== SYMBOL || S.dex !== exchange.GetName()) {
+        S = { symbol: SYMBOL, dex: exchange.GetName(), ids: [], budget: BUDGET, count: 0, pool: null, lower: 0, upper: 0, L: 0, estDaily: 0, fees: 0, collected: 0, gasUsd: 0, leftover: 0,
+            hodlBase: null, hodlQuote: null, rebalances: [], lastRebalance: 0, lastCollect: Date.now(), outStreak: 0, lastCheck: 0 }
+    }
+    if (S.ids.length && !DRY_RUN) exchange.IO("lp.track", S.ids)
+    if (S.ids.length) Log("Restored position from _G", S.ids.join(","), "range", fmt(S.lower, 4), "~", fmt(S.upper, 4))
+    var note = ""
+    while (true) {
+        try {
+            if (!S.ids.length && !open(makePlan(S.budget))) throw new Error("Failed to open position, retrying next round")
+            var cur = readPosition()
+            if (!cur) { Log("Position no longer exists (withdrawn manually?), stopping", "#FF0000"); _G(KEY, null); return }
+            S.outStreak = cur.inRange ? 0 : S.outStreak + 1
+            note = cur.inRange ? "" : "Out of range " + S.outStreak + "/" + OUT_CONFIRM
+            if (S.outStreak >= OUT_CONFIRM) note = rebalance(cur)
+            else collect(cur)
+            save()
+            var hodl = S.hodlBase * cur.price + S.hodlQuote
+            var total = cur.value + cur.fees + S.collected + S.leftover - S.gasUsd
+            var day = S.rebalances.filter(function (t) { return Date.now() - t < 86400000 }).length
+            var table = { type: "table", title: SYMBOL + " Auto-Rebalancing LP" + (DRY_RUN ? " (DRY_RUN paper position)" : ""), cols: ["Item", "Value"], rows: [
+                ["Position", S.ids.join(",")], ["Pool", S.pool], ["Range", fmt(S.lower, 4) + " ~ " + fmt(S.upper, 4)], ["Price", fmt(cur.price, 4)],
+                ["In range", cur.inRange ? "Yes" : (cur.price < S.lower ? "No (below)" : "No (above)")],
+                ["Position value", fmt(cur.value, 4)], ["Uncollected fees" + (DRY_RUN ? " (est.)" : ""), fmt(cur.fees, 4)], ["Collected fees", fmt(S.collected, 4)],
+                ["Rebalances (last 24h / daily limit)", S.count + " (" + day + " / " + MAX_REBALANCE_PER_DAY + ")"], ["Gas estimate", fmt(S.gasUsd, 4)],
+                ["LP total (incl. collected and un-reinvested funds, net of gas)", fmt(total, 4)], ["HODL", fmt(hodl, 4)],
+                ["PnL vs HODL", fmt(total - hodl, 4)], ["Note", note || "-"]] }
+            LogStatus(_D(), "\n`" + JSON.stringify(table) + "`")
+        } catch (e) {
+            Log("Error in this round:", e.message || e, "#FF0000")
+        }
+        Sleep(INTERVAL * 1000)
+    }
+}
+```
+
+See also: `exchange.IO("lp.plan")`, `exchange.IO("lp.add")`, `exchange.IO("lp.positions")`, `exchange.IO("lp.remove")`, `exchange.IO("lp.collect")`, `exchange.IO("lp.track")`, `DEX Strategy Examples`
+
+##### Gauge Staking Auto-Compound
+
+Selects a pool on Aerodrome or Velodrome by reward APR, opens a position, stakes it in the pool's gauge to earn AERO or VELO rewards, then periodically claims the rewards, swaps them to USDC and adds the proceeds back to the position (compounding).
+
+###### How It Works
+1. Pool selection: from `exchange.IO("lp.pools")`, keep pools whose gauge is still emitting rewards (```gaugeAlive```), that are not empty, whose TVL is at least ```MIN_TVL_USD``` and whose type matches ```POOL_KIND```; sort them by reward APR ```rewardAprPct``` in descending order and take the first. The top 5 candidates are written to the log, with their reward APR and the fee APR they would earn unstaked. When ```POOL_KIND``` is ```slipstream```, a Slipstream concentrated liquidity pool is used (range ±```RANGE_PCT```%); when it is ```basic```, a basic pool is used (full range).
+2. Open and stake: pass ```stake: true``` when calling `exchange.IO("lp.plan")`, so that once `exchange.IO("lp.add")` has opened the position, it is staked in the gauge directly.
+3. Compounding: check every ```CLAIM_HOURS``` hours. When pending rewards are at least ```MIN_CLAIM_USD``` USD and exceed twice the gas cost of one compounding round, use `exchange.IO("lp.claim")` to claim the rewards and swap them to USDC (```lp.claim(ids, true)```). After the sell order is confirmed on-chain and the proceeds are known, add them to the position: for a basic pool use ```lp.increase(池子, 金额, {stake: true})```; a staked Slipstream position cannot be increased directly, so run `exchange.IO("lp.unstake")` → `exchange.IO("lp.increase")` → `exchange.IO("lp.stake")` in sequence.
+4. Status bar: shows the pool's reward APR and daily emissions (read each round via `exchange.IO("lp.pool")`), whether the position is staked and in range, position value, pending rewards, cumulative claimed and compounded amounts, the gas estimate, and the annualized return based on rewards actually claimed.
+
+###### Exchange Object
+One `Aerodrome / Velodrome` exchange object: Aerodrome (Base chain, rewards in AERO) or Velodrome (OP Mainnet, rewards in VELO). Use a dedicated wallet funded with USDC and a small amount of ETH for gas.
+
+###### Parameters
+| Parameter | Default | Description |
+| - | - | - |
+| ```SYMBOL``` | ```ETH_USDC``` | Trading pair |
+| ```BUDGET``` | ```100``` | Position budget (USDC) |
+| ```POOL_KIND``` | ```slipstream``` | ```slipstream``` or ```basic``` |
+| ```RANGE_PCT``` | ```10``` | Slipstream range half-width (%); a staked position earns no rewards once out of range, so a wider range is recommended |
+| ```MIN_TVL_USD``` | ```100000``` | Only pools with TVL at or above this value are considered |
+| ```CLAIM_HOURS``` | ```24``` | Interval between claiming and compounding (hours) |
+| ```MIN_CLAIM_USD``` | ```2``` | Rewards are not claimed while pending rewards are below this value (USD) |
+| ```GAS_USD``` | ```0.05``` | Estimated gas per on-chain transaction (USD) |
+| ```COMPOUND_TXS``` | ```5``` | Transactions per compounding round: claim, sell, unstake, increase, stake |
+| ```INTERVAL``` | ```300``` | Check interval (seconds) |
+| ```DRY_RUN``` | ```true``` | When ```true```, only plans and simulates without sending transactions |
+
+###### Risks
+- The reward APR ```rewardAprPct``` is an instantaneous value extrapolated from the current per-second emissions, and it changes with the reward token price, emissions and total staked amount. For Slipstream pools it is calculated from the staked liquidity at the tick of the current price, so it jumps whenever the price moves and can differ several-fold within minutes; when choosing a pool, it is best to check it several times over a period of time. AERO and VELO prices are highly volatile, so the timing of sales affects actual returns.
+- While staked, trading fees go to voters and the position earns only rewards. A Slipstream position earns no rewards once out of range and is also exposed to impermanent loss; a basic pool covers the full range, with impermanent loss following the constant product curve.
+- Every claim, sell, unstake, increase and stake is an on-chain transaction (about ```COMPOUND_TXS``` per compounding round), so paying gas is not worthwhile when rewards are too small.
+
+###### DRY_RUN vs. Live Trading
+When ```DRY_RUN``` is ```true``` (the default), no transactions are sent: the position is simulated with `exchange.IO("lp.simulate")` (an error from an insufficient wallet balance is expected), and the paper position accrues rewards at the pool's current ```rewardAprPct``` (assuming it always stays in range; the current value is taken each round, which amounts to a time-weighted average). When due, a quote is obtained with `exchange.IO("route")`, and the amount of USDC the rewards would swap to is added to the paper principal. Set ```DRY_RUN``` to ```false``` to switch to live trading, and adjust ```GAS_USD``` for the chain in use.
+
+Complete strategy code (```DRY_RUN = true```: plan and simulate only, no transactions are sent).
+
+```javascript
+/*
+ * Aerodrome / Velodrome gauge staking auto-compounder (example strategy)
+ *
+ * Liquidity positions on Aerodrome (Base) and Velodrome (OP Mainnet) can be staked in the pool's gauge to earn AERO / VELO
+ * emissions (while staked, trading fees go to voters and the position earns only the rewards). This strategy:
+ *   1. Picks from lp.pools, by reward APR (rewardAprPct), a pool whose gauge is still emitting rewards and whose TVL is sufficient:
+ *      POOL_KIND = "slipstream" uses a Slipstream concentrated liquidity pool (±RANGE_PCT% range), "basic" uses a basic pool (full range);
+ *   2. Opens a position and stakes it right away (stake: true in lp.plan → lp.add);
+ *   3. Every CLAIM_HOURS hours, if the rewards are worth enough, claims them and sells them for USDC (lp.claim(ids, true)), then adds the proceeds back to the position (compounding):
+ *      a staked Slipstream position cannot be increased directly, so it runs lp.unstake → lp.increase → lp.stake; for a basic pool, lp.increase(pool, amount, {stake: true});
+ *   4. The status bar shows the pool's reward APR, position value, pending rewards, total claimed and compounded amounts, and the annualized yield based on rewards actually claimed.
+ *
+ * DRY_RUN = true (default) sends no transactions: lp.simulate simulates opening the position (an error is expected when the wallet balance is insufficient), and a paper position accrues rewards at
+ * the pool's current rewardAprPct (assuming the price always stays in range); when due, IO("route") fetches a quote to work out how much USDC selling the rewards would yield,
+ * which is added to the paper principal (compounding).
+ *
+ * Risks:
+ *   - Reward APR changes with the reward token price, emissions and total stake; rewardAprPct is only an instantaneous value extrapolated from the current per-second emissions; for Slipstream pools it
+ *     is computed from the staked liquidity at the current price's tick, so it jumps as soon as the price moves and can differ several-fold within minutes (the paper accrual samples it once per loop, effectively a time average);
+ *     AERO / VELO prices are volatile, and the timing of sales affects the actual return;
+ *   - A Slipstream position earns no rewards once out of range and is exposed to impermanent loss; a basic pool is full range, with impermanent loss following the constant-product curve;
+ *   - Every claim, sell, unstake, increase and stake is an on-chain transaction (about COMPOUND_TXS per compounding round); when rewards are small, gas costs outweigh them.
+ *
+ * Usage: add an Aerodrome or Velodrome exchange object (a dedicated wallet is recommended), and fund the wallet with USDC plus a little ETH for gas.
+ */
+
+// ---------------- Parameters ----------------
+var SYMBOL = "ETH_USDC"          // trading pair
+var BUDGET = 100                 // position budget (USDC)
+var POOL_KIND = "slipstream"     // slipstream or basic
+var RANGE_PCT = 10               // Slipstream range half-width (%); a staked position earns no rewards once out of range, so keep it wide
+var MIN_TVL_USD = 100000         // only consider pools with TVL at or above this
+var CLAIM_HOURS = 24             // claim + compound interval (hours)
+var MIN_CLAIM_USD = 2            // do not claim while pending rewards are below this
+var GAS_USD = 0.05               // estimated gas per on-chain transaction (USD)
+var COMPOUND_TXS = 5             // transactions per compounding round: claim, sell, unstake, increase, stake
+var INTERVAL = 300               // check interval (seconds)
+var DRY_RUN = true               // when true, plan and simulate only, no transactions are sent
+
+var KEY = DRY_RUN ? "gauge_compound_paper" : "gauge_compound"
+var S = null
+var REWARD = null
+
+function fmt(x, d) {
+    return x === null || x === undefined || isNaN(x) ? "-" : Number(x).toFixed(d === undefined ? 2 : d)
+}
+function kindOf(p) { return /^slipstream/.test(p.protocol) ? "slipstream" : "basic" }
+function rewardPrice() {
+    var t = exchange.GetTicker(REWARD + "_USDC")
+    if (!t) throw new Error("GetTicker " + REWARD + "_USDC failed: " + GetLastError())
+    return (t.Buy + t.Sell) / 2
+}
+
+function listPools() {
+    var pair = SYMBOL.split("_")
+    var pools = exchange.IO("lp.pools", pair[0], pair[1])
+    if (!pools) throw new Error("lp.pools failed: " + GetLastError())
+    return pools
+}
+// Current pool state (the gauge fields of lp.pool use the same calculation as lp.pools)
+function poolRow(id) {
+    var row = exchange.IO("lp.pool", id)
+    if (!row) throw new Error("lp.pool failed: " + GetLastError())
+    return row
+}
+
+// Pick the pool by reward APR and list the candidates in the log
+function choosePool() {
+    var ok = listPools().filter(function (p) {
+        return p.symbol === SYMBOL && p.gaugeAlive && !p.empty && p.tvlUsd >= MIN_TVL_USD && kindOf(p) === POOL_KIND
+    }).sort(function (a, b) { return b.rewardAprPct - a.rewardAprPct })
+    ok.slice(0, 5).forEach(function (p) {
+        Log("Candidate", p.protocol, p.id, "tick spacing", p.tickSpacing, "TVL $" + fmt(p.tvlUsd, 0), "staked share", fmt(p.stakedShare * 100, 1) + "%",
+            "reward APR", fmt(p.rewardAprPct, 2) + "%", "fee APR (unstaked)", fmt(p.fees24hUsd * 365 / p.tvlUsd * 100, 2) + "%")
+    })
+    if (!ok.length) throw new Error("No eligible " + POOL_KIND + " pool (TVL ≥ " + MIN_TVL_USD + ", gauge alive)")
+    return ok[0]
+}
+
+function enter(pool) {
+    var params = { symbol: SYMBOL, budget: BUDGET, pool: pool.id, stake: true }
+    if (POOL_KIND === "slipstream") { params.range = { pct: [-RANGE_PCT, RANGE_PCT] }; params.shape = "spot" }
+    var plan = exchange.IO("lp.plan", params)
+    if (!plan) throw new Error("lp.plan failed: " + GetLastError())
+    Log("Entry plan:", plan.protocol, plan.pool, "needs", fmt(plan.needBase, 6), "+", fmt(plan.needQuote, 4), plan.shortfall ? "(" + plan.shortfall + ")" : "")
+    if (DRY_RUN) {
+        var sim = exchange.IO("lp.simulate", plan)
+        Log(sim ? "lp.simulate passed" : "lp.simulate failed (expected when the wallet balance is insufficient): " + GetLastError())
+        return ["paper"]
+    }
+    var r = exchange.IO("lp.add", plan)
+    if (!r) throw new Error("lp.add failed: " + GetLastError())
+    var ids = r.positions ? r.positions.map(function (p) { return String(p.id) }) : [String(r.id)]
+    Log("Position opened and staked", r.txHash, "positions", ids.join(","), r.stake ? "" : "(stake result missing, please check)", "#00AA00")
+    exchange.IO("lp.track", ids)
+    return ids
+}
+
+// Current position: {value, rewards (reward token amount), rewardsValue, staked, inRange}
+function readPosition(pool) {
+    if (DRY_RUN) {
+        var now = Date.now()
+        S.paperRewardsUsd += S.principal * (pool.rewardAprPct || 0) / 100 * (now - S.lastCheck) / (365 * 86400000)
+        S.lastCheck = now
+        var px = rewardPrice()
+        return { value: S.principal, rewards: S.paperRewardsUsd / px, rewardsValue: S.paperRewardsUsd, staked: true, inRange: true }
+    }
+    var ps = exchange.IO("lp.positions", SYMBOL)
+    if (!ps) throw new Error("lp.positions failed: " + GetLastError())
+    var out = { value: 0, rewards: 0, rewardsValue: 0, staked: true, inRange: false }
+    ps.filter(function (p) { return !p.closed && S.ids.indexOf(String(p.id)) >= 0 }).forEach(function (p) {
+        out.value += p.value; out.rewards += p.rewards; out.rewardsValue += p.rewardsValue
+        if (!p.staked) out.staked = false
+        if (p.inRange !== false) out.inRange = true      // basic pools have no range
+    })
+    return out
+}
+
+// Wait for the reward sell order to land on-chain and return the USDC actually received (the sell order is a market swap; GetOrder returns the fill from the receipt)
+function proceeds(orderId) {
+    for (var i = 0; i < 30; i++) {
+        var o = exchange.GetOrder(orderId)
+        if (o && o.Status === ORDER_STATE_CLOSED) return o.DealAmount * o.AvgPrice
+        if (o && o.Status === ORDER_STATE_CANCELED) return 0
+        Sleep(2000)
+    }
+    return 0
+}
+
+// Claim rewards → sell for USDC → add back to the position
+function compound(cur) {
+    Log("Claiming", fmt(cur.rewards, 4), REWARD, "≈ $" + fmt(cur.rewardsValue, 4), "and compounding")
+    var got
+    if (DRY_RUN) {
+        var q = exchange.IO("route", REWARD + "_USDC", "sell", Number(cur.rewards.toFixed(6)))
+        if (!q || q.quote === null) { Log("Quote failed:", GetLastError()); return false }
+        got = q.quote
+        Log("DRY_RUN: selling would yield", fmt(got, 4), "USDC (route", q.best + "); it would be added back to the position via lp.unstake → lp.increase → lp.stake")
+        S.paperRewardsUsd = 0
+        S.principal += got
+    } else {
+        var r = exchange.IO("lp.claim", S.ids, true)
+        if (!r) { Log("Claim failed:", GetLastError(), "#FF0000"); return false }
+        S.claimed += r.rewards
+        S.lastClaim = Date.now()
+        if (!r.sell || r.sell.error) { Log("Rewards claimed, but the sale failed:", r.sell ? r.sell.error : "-", "#FF0000"); return true }
+        got = proceeds(r.sell.txHash)
+        if (got <= 1) { Log("Sale proceeds of", fmt(got, 4), "USDC are too small, not compounding"); return true }
+        var ok
+        if (POOL_KIND === "basic") {
+            ok = exchange.IO("lp.increase", S.ids[0], got, { stake: true })
+        } else {
+            ok = exchange.IO("lp.unstake", S.ids) && exchange.IO("lp.increase", S.ids[0], got) && exchange.IO("lp.stake", S.ids)
+        }
+        if (!ok) { Log("Compounding incomplete:", GetLastError(), "(the USDC stays in the wallet; the position may be left unstaked)", "#FF0000"); return true }
+    }
+    S.claimedUsd += got
+    S.compounded += got
+    S.gasUsd += COMPOUND_TXS * GAS_USD
+    S.lastClaim = Date.now()
+    return true
+}
+
+function main() {
+    var name = exchange.GetName()
+    if (name !== "Aerodrome" && name !== "Velodrome") throw new Error("Please add an Aerodrome or Velodrome exchange object; the current one is " + name)
+    REWARD = name === "Aerodrome" ? "AERO" : "VELO"
+    S = _G(KEY)
+    if (!S || S.symbol !== SYMBOL || S.dex !== name) {
+        var pool = choosePool()
+        S = { symbol: SYMBOL, dex: name, pool: pool.id, ids: [], principal: BUDGET, paperRewardsUsd: 0, claimed: 0, claimedUsd: 0, compounded: 0,
+            gasUsd: 0, start: Date.now(), lastClaim: Date.now(), lastCheck: Date.now() }
+        S.ids = enter(pool)
+        S.gasUsd += 3 * GAS_USD
+        _G(KEY, S)
+    } else {
+        Log("Restored from _G: pool", S.pool, "positions", S.ids.join(","))
+        if (!DRY_RUN) exchange.IO("lp.track", S.ids)
+    }
+    while (true) {
+        try {
+            var pool = poolRow(S.pool)
+            var cur = readPosition(pool)
+            var due = Date.now() - S.lastClaim >= CLAIM_HOURS * 3600000
+            if (due && cur.rewardsValue >= MIN_CLAIM_USD && cur.rewardsValue > 2 * COMPOUND_TXS * GAS_USD && compound(cur)) {
+                cur.rewards = 0; cur.rewardsValue = 0
+            }
+            _G(KEY, S)
+            var days = Math.max((Date.now() - S.start) / 86400000, 1e-6)
+            var realized = (S.claimedUsd + cur.rewardsValue) / BUDGET / days * 365 * 100
+            var table = { type: "table", title: SYMBOL + " gauge staking compounder (" + REWARD + ")" + (DRY_RUN ? " (DRY_RUN paper position)" : ""), cols: ["Item", "Value"], rows: [
+                ["Pool", pool.protocol + " " + S.pool], ["Pool reward APR rewardAprPct", fmt(pool.rewardAprPct, 2) + "%"],
+                ["Daily emissions", fmt(pool.rewardsPerDay, 0) + " " + REWARD + " ($" + fmt(pool.rewardsPerDayUsd, 0) + ")"],
+                ["Positions", S.ids.join(",")], ["Staked / in range", (cur.staked ? "Yes" : "No") + " / " + (cur.inRange ? "Yes" : "No")],
+                ["Position value", fmt(cur.value, 4)], ["Pending rewards", fmt(cur.rewards, 4) + " " + REWARD + " ($" + fmt(cur.rewardsValue, 4) + ")"],
+                ["Total claimed / compounded (USDC)", fmt(S.claimedUsd, 4) + " / " + fmt(S.compounded, 4)], ["Estimated gas", fmt(S.gasUsd, 4)],
+                ["Annualized yield from actual rewards", fmt(realized, 2) + "%"],
+                ["Next claim", due ? "Due (waiting for rewards ≥ $" + MIN_CLAIM_USD + ")" : _D(S.lastClaim + CLAIM_HOURS * 3600000)]] }
+            LogStatus(_D(), "\n`" + JSON.stringify(table) + "`")
+        } catch (e) {
+            Log("Error in this round:", e.message || e, "#FF0000")
+        }
+        Sleep(INTERVAL * 1000)
+    }
+}
+```
+
+See also: `Aerodrome / Velodrome`, `exchange.IO("lp.pools")`, `exchange.IO("lp.pool")`, `exchange.IO("lp.claim")`, `exchange.IO("lp.stake")`, `exchange.IO("lp.unstake")`, `exchange.IO("lp.increase")`, `DEX Strategy Examples`
+
+##### DEX-CEX Arbitrage
+
+Arbitrages the price spread for the same token between an on-chain DEX and a centralized exchange (CEX) spot market. For each trade size, it gets the executable price on each side and subtracts fees, gas and a safety buffer. If the net profit reaches the threshold, it places one trade on each side.
+
+###### How It Works
+
+1. Getting prices: on the DEX side, `exchange.IO("route")` requests a quote for the per-trade size ```QTY``` (one quote for buying and one for selling, using the best route; quotes already include pool fees and price impact). On the CEX side, `exchange.GetDepth` gets the order book depth, and the strategy simulates filling ```QTY``` level by level to work out the average fill price.
+2. The net profit is calculated for each direction. DEX buy → CEX sell = CEX sell proceeds × (1 − ```CEX_FEE```) − DEX buy cost − ```DEX_GAS_USD```. CEX buy → DEX sell = DEX sell proceeds − CEX buy cost × (1 + ```CEX_FEE```) − ```DEX_GAS_USD```.
+3. A trade is placed when all of these are true: the net profit (in bps of trade value), after subtracting the safety buffer ```SAFETY_BPS```, is still at least ```MIN_NET_BPS```; no cooldown is active; both sides hold enough inventory; and the base-currency position is no more than ```MAX_BASE```. The DEX leg goes first, because on-chain transactions can fail or slip, so its limit price allows ```SLIPPAGE```. `exchange.GetOrder` waits for the swap to be confirmed on-chain and checks the filled amount. Then a limit order for that filled amount is placed on the CEX.
+4. Both sides must hold base and quote currency in advance; the strategy does not make any transfers. Once inventory builds up on one side, it can only wait for an arbitrage opportunity in the opposite direction. No trade is placed if either side runs low on inventory.
+5. Status bar: for each direction, shows the DEX price, CEX average fill price, gross spread, net profit, decision and DEX route. It also shows the inventory on both sides.
+
+###### Exchange Objects
+
+Add two exchange objects in this order: ```exchanges[0]``` is the DEX (`Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `Jupiter`, etc.), and ```exchanges[1]``` is the CEX spot exchange (e.g. Binance). Use the same quote currency on both sides if you can (both default to ```ETH_USDC```). Otherwise you are also exposed to the risk of a stablecoin losing its peg.
+
+###### Parameters
+
+| Parameter | Default | Description |
+| - | - | - |
+| ```DEX_SYMBOL``` | ```ETH_USDC``` | DEX trading pair |
+| ```CEX_SYMBOL``` | ```ETH_USDC``` | CEX trading pair (must be the same token; ideally the same quote currency) |
+| ```QTY``` | ```0.01``` | Size of each trade (in base currency) |
+| ```DEX_GAS_USD``` | ```0.05``` | Gas cost per DEX swap (USD): about 0.01–0.1 on Base and Arbitrum, about 0.001 on Solana, about 2–10 on Ethereum mainnet |
+| ```CEX_FEE``` | ```0.001``` | CEX taker fee rate |
+| ```SAFETY_BPS``` | ```10``` | Safety buffer (bps): covers price moves between the quote and the fill |
+| ```MIN_NET_BPS``` | ```20``` | Net profit threshold after the safety buffer (bps) |
+| ```SLIPPAGE``` | ```0.003``` | Order price protection: the DEX and CEX limit prices each allow 0.3% |
+| ```MAX_BASE``` | ```0.1``` | Maximum base-currency position on each side |
+| ```COOLDOWN_SEC``` | ```60``` | Cooldown after each arbitrage trade (seconds) |
+| ```INTERVAL``` | ```15``` | Check interval (seconds) |
+| ```PAPER_BASE``` | ```0.05``` | DRY_RUN paper inventory: starting base currency on each side |
+| ```PAPER_QUOTE``` | ```200``` | DRY_RUN paper inventory: starting quote currency on each side |
+| ```DRY_RUN``` | ```true``` | When ```true```, only logs and simulates; no real orders are placed |
+
+###### Risks
+
+- The two legs are not atomic. After the DEX leg fills, the price may have moved, so the CEX leg fills at a worse price. If the CEX order fails, you are left with one-sided exposure (the log shows it in red, and you must handle it manually).
+- On-chain transactions can be front-run or sandwich-attacked (MEV). They can also revert, which still costs gas. Prices also move while waiting for confirmation.
+- Spreads are usually small. On chains with high gas costs (such as Ethereum mainnet), there are almost no arbitrage opportunities.
+
+###### DRY_RUN and Live Trading
+
+When ```DRY_RUN``` is ```true``` (the default), no real orders are placed. The strategy only logs the trades it "would execute". The DEX leg is simulated with `exchange.IO("simulate")`. Jupiter does not support ```simulate```, so only the quote is checked. The simulation reports an error when the wallet balance is too low; this is expected. Inventory is tracked as paper balances starting from ```PAPER_BASE``` and ```PAPER_QUOTE```. Set ```DRY_RUN``` to ```false``` to trade live. Put inventory on both sides first, and start with a small ```QTY```.
+
+Full strategy code (with ```DRY_RUN = true``` it only logs and simulates, without placing real orders).
+
+```javascript
+/*
+ * DEX ↔ CEX Spot Arbitrage (Example Strategy)
+ *
+ * Arbitrages the price spread of the same coin between an on-chain DEX and a centralized exchange's spot market: for each trade size QTY, obtains the executable price on both sides:
+ *   DEX: the best-route quote from exchange.IO("route", trading pair, "buy"/"sell", QTY) (already includes liquidity pool fees and price impact);
+ *   CEX: the average fill price obtained by walking the GetDepth order book level by level for QTY;
+ * Computes the net profit for each direction:
+ *   DEX buy → CEX sell: CEX sell proceeds × (1 − CEX_FEE) − DEX buy cost − DEX_GAS_USD
+ *   CEX buy → DEX sell: DEX sell proceeds − CEX buy cost × (1 + CEX_FEE) − DEX_GAS_USD
+ * When the net profit (bps, relative to notional) minus the safety buffer SAFETY_BPS is still at least MIN_NET_BPS, one trade is executed on each side: the DEX leg first
+ * (on-chain trades may fail or incur slippage), then, once the fill is confirmed, the CEX leg for the actual filled amount. Both sides must be pre-funded with base and quote currency (the strategy makes no transfers; once inventory
+ * piles up on one side it can only wait for a reverse opportunity), base-currency holdings on each side never exceed MAX_BASE, and no trade is made if either side lacks inventory.
+ *
+ * With DRY_RUN = true (default) no orders are placed: trades that "would have been executed" are only logged, and the DEX leg is simulated with IO("simulate", …) (Jupiter does not support simulate,
+ * quote only; simulation reports an error when the wallet balance is insufficient, which is normal), and inventory is paper-tracked starting from PAPER_*.
+ *
+ * Risks: the two legs are not executed atomically, so the price may have moved after the DEX leg fills, causing the CEX leg to fill at a worse price; on-chain trades may be front-run (MEV),
+ * reverted (only gas is charged), or hit by price changes while waiting for confirmation; when the CEX and DEX quote currencies differ (e.g. USDT vs. USDC) there is also depeg risk,
+ * so by default both sides use the same quote currency. Spreads are usually tiny, and on high-gas chains (such as Ethereum mainnet) there are virtually no opportunities.
+ *
+ * Usage: add a DEX as exchanges[0] (Uniswap, PancakeSwap, Aerodrome, Velodrome, Jupiter, etc.), and as exchanges[1]
+ * add a CEX spot exchange (e.g. Binance); both sides must be funded with base and quote currency.
+ */
+
+// ---------------- Parameters ----------------
+var DEX_SYMBOL = "ETH_USDC"      // DEX trading pair
+var CEX_SYMBOL = "ETH_USDC"      // CEX trading pair (same coin; ideally the same quote currency)
+var QTY = 0.01                   // Size per trade (base currency)
+var DEX_GAS_USD = 0.05           // Gas per DEX swap (USD): Base/Arbitrum ~0.01–0.1, Solana ~0.001, Ethereum mainnet 2–10
+var CEX_FEE = 0.001              // CEX taker fee rate
+var SAFETY_BPS = 10              // Safety buffer (bps): covers price movement between quote and fill
+var MIN_NET_BPS = 20             // Net profit threshold after the safety buffer (bps)
+var SLIPPAGE = 0.003             // Order price protection: DEX and CEX limit prices each concede 0.3%
+var MAX_BASE = 0.1               // Max base-currency holding per side
+var COOLDOWN_SEC = 60            // Cooldown after each arbitrage trade (seconds)
+var INTERVAL = 15                // Check interval (seconds)
+var PAPER_BASE = 0.05            // DRY_RUN paper inventory: initial base-currency amount per side
+var PAPER_QUOTE = 200            // DRY_RUN paper inventory: initial quote-currency amount per side
+var DRY_RUN = true               // true: log and simulate only, no real orders
+
+var dex, cex
+var paper = null                 // DRY_RUN paper inventory {dex: {base, quote}, cex: {base, quote}}
+var stats = _G("arb_stats") || { trades: 0, pnl: 0 }
+var lastTrade = 0
+var cexDecimals = 4              // CEX amount precision (read from GetMarkets at startup)
+
+function fmt(x, d) {
+    return x === null || x === undefined || isNaN(x) ? "-" : Number(x).toFixed(d === undefined ? 2 : d)
+}
+
+// Walk the order book level by level for the given quantity: returns {avg, worst}, or null if depth is insufficient
+function walk(levels, qty) {
+    var left = qty, cost = 0
+    for (var i = 0; i < levels.length && left > 1e-12; i++) {
+        var q = Math.min(left, levels[i].Amount)
+        cost += q * levels[i].Price
+        left -= q
+        if (left <= 1e-12) return { avg: cost / qty, worst: levels[i].Price }
+    }
+    return null
+}
+
+function inventory() {
+    if (DRY_RUN) return paper
+    var a = dex.GetAccount(), b = cex.GetAccount()
+    if (!a || !b) throw new Error("GetAccount failed: " + GetLastError())
+    return { dex: { base: a.Stocks, quote: a.Balance }, cex: { base: b.Stocks, quote: b.Balance } }
+}
+
+// Wait for the DEX swap to be confirmed on-chain; returns the filled base-currency amount (0 on failure)
+function dexFill(id) {
+    for (var i = 0; i < 60; i++) {
+        var o = dex.GetOrder(id)
+        if (o && o.Status === ORDER_STATE_CLOSED) return o.DealAmount
+        if (o && o.Status === ORDER_STATE_CANCELED) return 0
+        Sleep(2000)
+    }
+    Log("DEX order", id, "not confirmed after two minutes; CEX leg skipped, please check manually", "#FF0000")
+    return 0
+}
+
+function execute(op, inv) {
+    var dexSide = op.dir === "A" ? "buy" : "sell", cexSide = op.dir === "A" ? "sell" : "buy"
+    var dexPx = op.dexPrice * (dexSide === "buy" ? 1 + SLIPPAGE : 1 - SLIPPAGE)
+    var cexPx = op.cexWorst * (cexSide === "buy" ? 1 + SLIPPAGE : 1 - SLIPPAGE)
+    Log("Arbitrage", op.name, "qty", QTY, "DEX", dexSide, fmt(op.dexPrice, 4), "CEX", cexSide, fmt(op.cexAvg, 4),
+        "est. net profit", fmt(op.net, 4), "(" + fmt(op.netBps, 1) + " bps)", "#0000FF")
+    lastTrade = Date.now()
+    if (DRY_RUN) {
+        if (dex.GetName() !== "Jupiter") {
+            var sim = dex.IO("simulate", DEX_SYMBOL, dexSide, QTY, dexPx)
+            Log(sim ? "DEX simulate passed: " + sim.route : "DEX simulate failed (normal when the wallet balance is insufficient): " + GetLastError())
+        }
+        var sign = op.dir === "A" ? 1 : -1
+        inv.dex.base += sign * QTY; inv.dex.quote -= sign * op.dexPrice * QTY
+        inv.cex.base -= sign * QTY; inv.cex.quote += sign * op.cexAvg * QTY * (1 - sign * CEX_FEE)
+        stats.trades++; stats.pnl += op.net
+        return
+    }
+    var id = dex.CreateOrder(DEX_SYMBOL, dexSide, dexPx, QTY)
+    if (!id) { Log("DEX order failed (CEX leg skipped):", GetLastError(), "#FF0000"); return }
+    var filled = dexFill(id)
+    if (filled <= 0) { Log("DEX leg not filled, CEX leg skipped"); return }
+    var p = Math.pow(10, cexDecimals)
+    var cid = cex.CreateOrder(CEX_SYMBOL, cexSide, cexPx, Math.floor(filled * p) / p)
+    if (!cid) { Log("CEX leg order failed, one-sided exposure", filled, "please handle manually:", GetLastError(), "#FF0000"); return }
+    stats.trades++; stats.pnl += op.net * filled / QTY
+}
+
+function scan() {
+    var buy = dex.IO("route", DEX_SYMBOL, "buy", QTY)
+    var sell = dex.IO("route", DEX_SYMBOL, "sell", QTY)
+    var depth = cex.GetDepth(CEX_SYMBOL)
+    if (!buy || !sell || !depth) throw new Error("Failed to get prices: " + GetLastError())
+    var bid = walk(depth.Bids, QTY), ask = walk(depth.Asks, QTY)
+    var ops = []
+    if (buy.price && bid) {         // A: DEX buy → CEX sell
+        var netA = bid.avg * QTY * (1 - CEX_FEE) - buy.price * QTY - DEX_GAS_USD
+        ops.push({ dir: "A", name: "DEX buy → CEX sell", dexPrice: buy.price, route: buy.best || buy.route, cexAvg: bid.avg, cexWorst: bid.worst, net: netA, netBps: 0 })
+    }
+    if (sell.price && ask) {        // B: CEX buy → DEX sell
+        var netB = sell.price * QTY - ask.avg * QTY * (1 + CEX_FEE) - DEX_GAS_USD
+        ops.push({ dir: "B", name: "CEX buy → DEX sell", dexPrice: sell.price, route: sell.best || sell.route, cexAvg: ask.avg, cexWorst: ask.worst, net: netB, netBps: 0 })
+    }
+    var inv = inventory()
+    var rows = ops.map(function (op) {
+        op.netBps = op.net / (op.cexAvg * QTY) * 10000
+        var gross = (op.dir === "A" ? op.cexAvg / op.dexPrice - 1 : op.dexPrice / op.cexAvg - 1) * 10000
+        var block = ""
+        if (op.netBps - SAFETY_BPS < MIN_NET_BPS) block = "Below threshold"
+        else if (Date.now() - lastTrade < COOLDOWN_SEC * 1000) block = "Cooling down"
+        else if (op.dir === "A" && (inv.dex.quote < op.dexPrice * QTY * (1 + SLIPPAGE) || inv.cex.base < QTY || inv.dex.base + QTY > MAX_BASE)) block = "Insufficient inventory/over limit"
+        else if (op.dir === "B" && (inv.cex.quote < op.cexAvg * QTY * (1 + CEX_FEE + SLIPPAGE) || inv.dex.base < QTY || inv.cex.base + QTY > MAX_BASE)) block = "Insufficient inventory/over limit"
+        if (!block) { execute(op, inv); block = DRY_RUN ? "Logged (DRY_RUN)" : "Executed" }
+        return [op.name, fmt(op.dexPrice, 4), fmt(op.cexAvg, 4), fmt(gross, 1), fmt(op.net, 4), fmt(op.netBps, 1), block,
+            Array.isArray(op.route) ? op.route.join("+") : op.route]
+    })
+    _G("arb_stats", stats)
+    var t1 = { type: "table", title: "Spread (per trade " + QTY + ", DEX quote incl. pool fee, net profit after CEX fee and gas " + DEX_GAS_USD + ")",
+        cols: ["Direction", "DEX Price", "CEX Avg Price", "Gross Spread bps", "Net Profit", "Net Profit bps", "Result", "DEX Route"], rows: rows }
+    var t2 = { type: "table", title: "Inventory" + (DRY_RUN ? " (DRY_RUN paper)" : ""), cols: ["", "Base Currency", "Quote Currency"], rows: [
+        [dex.GetName() + " " + DEX_SYMBOL, fmt(inv.dex.base, 6), fmt(inv.dex.quote, 4)],
+        [cex.GetName() + " " + CEX_SYMBOL, fmt(inv.cex.base, 6), fmt(inv.cex.quote, 4)]] }
+    LogStatus(_D(), "Arbitrage trades", stats.trades, "Cumulative est. net profit", fmt(stats.pnl, 4), "\n`" + JSON.stringify([t1, t2]) + "`")
+}
+
+function main() {
+    if (exchanges.length < 2) throw new Error("Two exchange objects required: exchanges[0] is the DEX, exchanges[1] is the CEX spot exchange")
+    dex = exchanges[0]; cex = exchanges[1]
+    dex.SetCurrency(DEX_SYMBOL); cex.SetCurrency(CEX_SYMBOL)
+    var m = (cex.GetMarkets() || {})[CEX_SYMBOL]
+    if (m) cexDecimals = m.AmountPrecision
+    if (DRY_RUN) paper = { dex: { base: PAPER_BASE, quote: PAPER_QUOTE }, cex: { base: PAPER_BASE, quote: PAPER_QUOTE } }
+    Log("DEX", dex.GetName(), DEX_SYMBOL, "CEX", cex.GetName(), CEX_SYMBOL, DRY_RUN ? "DRY_RUN: log only, no orders" : "Live trading")
+    while (true) {
+        try {
+            scan()
+        } catch (e) {
+            Log("Error in this round:", e.message || e, "#FF0000")
+        }
+        Sleep(INTERVAL * 1000)
+    }
+}
+```
+
+See also: `exchange.IO("route")`, `exchange.IO("simulate")`, `exchange.IO("route")`, `exchange.GetDepth`, `exchange.CreateOrder`, `exchange.GetOrder`, `DEX Strategy Examples`
+
+##### Jupiter Limit Order Grid
+
+Places several levels of native Jupiter limit orders above and below the current price. When an order fills, a counter-order is placed one grid step away to capture a one-step spread. When the price leaves the range, all open orders are canceled and the grid is rebuilt around the new price.
+
+###### How It Works
+
+1. Build the grid: buy orders at current price × (1 − k × ```STEP_PCT```%) and sell orders at current price × (1 + k × ```STEP_PCT```%), k = 1…```LEVELS```. Orders are placed with ```exchange.CreateOrder(交易对, 方向, 价格, 数量, {tif: "gtc"})```. When the price is reached, Jupiter's keeper fills the order, so the strategy does not need to watch the market continuously.
+2. Every ```INTERVAL``` seconds, open orders missing from the result of `exchange.GetOrders` are checked with `exchange.GetOrder`. For each filled order, a counter-order is placed one grid step away (buy filled → sell one step higher; sell filled → buy one step lower).
+3. When the mid price moves more than ±```BAND_PCT```% from the grid center, all open orders are canceled and the grid is rebuilt around the new price.
+4. Open order IDs are stored in `_G`, so tracking continues after a restart. The status bar lists the current open orders and the PnL of filled orders, valued at the current price.
+
+The size of each order, ```ORDER_USD```, must meet Jupiter's minimum order value: at least $5 for Trigger v1 and at least $10 for V2. At startup the API mode is read with ```exchange.IO("trigger.api")```. If it is not ```v1```, the $10 minimum is checked, with a 5% buffer. If a Jupiter API Key is configured and the quote currency is USDC or USDT, the hosted V2 is used by default. See `exchange.IO("trigger.*", ...)` for details.
+
+###### Exchange Object
+
+One `Jupiter` exchange object (use a dedicated wallet). The wallet must hold the base currency (for sell orders), the quote currency (for buy orders), and a small amount of SOL to pay fees.
+
+###### Parameters
+
+| Parameter | Default | Description |
+| - | - | - |
+| ```SYMBOL``` | ```SOL_USDC``` | Trading pair |
+| ```LEVELS``` | ```3``` | Number of order levels on each side |
+| ```STEP_PCT``` | ```1``` | Grid step (%) |
+| ```ORDER_USD``` | ```12``` | Value of each order (in the quote currency, about USD) |
+| ```BAND_PCT``` | ```5``` | How far (%) the price can move from the center before the grid is rebuilt |
+| ```EXPIRY_HOURS``` | ```0``` | Order expiry (hours). When ```0```, v1 orders never expire and V2 uses the default of 30 days |
+| ```INTERVAL``` | ```60``` | Check interval (seconds) |
+| ```DRY_RUN``` | ```true``` | When ```true```, orders are only simulated and not actually placed |
+
+###### Risks
+
+- In a one-way market the grid keeps buying (as the price falls) or sells out (as the price rises), and re-centering locks in the unrealized loss.
+- v1 limit orders fill at the swap rate. V2 swaps at market once the USD price triggers, so the fill price is not guaranteed. V2 funds are held in a vault hosted by Jupiter.
+- Every order placement and cancellation is a Solana transaction that pays network and priority fees.
+
+###### DRY_RUN vs. Live Trading
+
+When ```DRY_RUN``` is ```true``` (the default), no orders are actually placed. Each order that would be placed is simulated with ```trigger.simulate``` (a failed simulation because of low wallet balance is normal, and ```reason``` gives the cause). Paper orders count as filled when the market price crosses them (buy order: best ask ≤ order price; sell order: best bid ≥ order price). Set ```DRY_RUN``` to ```false``` for live trading. Live orders lock up coins in the wallet.
+
+Complete strategy code (with ```DRY_RUN = true```, orders are only simulated and no real orders are placed).
+
+```javascript
+/*
+ * Jupiter native limit-order grid (Solana, example strategy)
+ *
+ * Uses Jupiter native limit orders (exchange.CreateOrder(…, {tif: "gtc"}); once the price is reached, Jupiter's keeper fills the order,
+ * so there is no need to watch the market continuously) and places LEVELS levels above and below the current price: buy price = current price × (1 − k × STEP_PCT%), sell price = current price × (1 + k × STEP_PCT%).
+ *   - When an order fills, an opposite order is placed one level away to replace it (buy filled → sell one level higher, sell filled → buy one level lower), capturing one grid spread;
+ *   - When the price deviates from the center price by more than ±BAND_PCT%, all open orders are canceled and the grid is rebuilt around the new price;
+ *   - The per-order amount ORDER_USD must meet Jupiter's minimum order size: at least $5 for Trigger v1 and at least $10 for V2
+ *     (when a Jupiter API Key is configured and the quote currency is USDC / USDT, the custodial V2 is used by default; see "Limit Orders" in the exchange documentation).
+ * Order IDs are saved in _G, so they can still be tracked after a restart.
+ *
+ * With DRY_RUN = true (default), no real orders are placed: every order that "would have been placed" is simulated with IO("trigger.simulate", …) (the simulation returns an error when the wallet balance
+ * is insufficient, which is expected), and paper orders are considered filled when the market crosses their price (buy: best ask ≤ order price; sell: best bid ≥ order price).
+ *
+ * Risks: in a one-sided market the grid keeps buying (when falling) or sells out entirely (when rising), and re-centering turns unrealized losses into realized losses; v1 limit orders fill at the swap ratio,
+ * while V2 orders are triggered by the USD price and then swapped at market, so the fill price is not guaranteed; V2 funds are held in a Jupiter-custodied vault; placing and canceling an order are each a separate
+ * Solana transaction and incur network fees and priority fees.
+ *
+ * Usage: add a Jupiter exchange object (a dedicated wallet is recommended); the wallet must hold the base currency (for sell orders), the quote currency (for buy orders) and a small amount of SOL (for fees).
+ */
+
+// ---------------- Parameters ----------------
+var SYMBOL = "SOL_USDC"          // Trading pair
+var LEVELS = 3                   // Number of order levels per side
+var STEP_PCT = 1                 // Grid spacing (%)
+var ORDER_USD = 12               // Per-order amount (in quote currency, roughly USD)
+var BAND_PCT = 5                 // Rebuild the grid when the price deviates from the center price by more than this percentage
+var EXPIRY_HOURS = 0             // Order validity (hours); 0 = never expires on v1, V2 uses the default 30 days
+var INTERVAL = 60                // Check interval (seconds)
+var DRY_RUN = true               // When true, only simulate and do not place real orders
+
+var KEY = DRY_RUN ? "jup_grid_paper" : "jup_grid"
+var G = null                     // {center, seq, orders: {id: {side, price, amount}}, buys, sells, spent, received, bought, sold}
+
+function fmt(x, d) {
+    return x === null || x === undefined || isNaN(x) ? "-" : Number(x).toFixed(d === undefined ? 2 : d)
+}
+function roundPx(p) { return Number(p.toPrecision(6)) }
+
+function place(side, price) {
+    price = roundPx(price)
+    var amount = Math.ceil(ORDER_USD / price * 1e6) / 1e6
+    var opts = { tif: "gtc" }
+    if (EXPIRY_HOURS > 0) opts.expiry = Date.now() + EXPIRY_HOURS * 3600000
+    var id
+    if (DRY_RUN) {
+        var p = { symbol: SYMBOL, side: side, price: price, amount: amount }
+        if (opts.expiry) p.expiry = opts.expiry
+        var sim = exchange.IO("trigger.simulate", p)
+        Log("Place order", side, amount, "@", price, sim ? (sim.ok ? "simulation passed" : "simulation failed: " + sim.reason) : "simulation error: " + GetLastError())
+        id = "paper-" + (++G.seq)
+    } else {
+        id = exchange.CreateOrder(SYMBOL, side, price, amount, opts)
+        if (!id) { Log("Order placement failed", side, amount, "@", price, GetLastError(), "#FF0000"); return }
+        Log("Place order", side, amount, "@", price, id)
+    }
+    G.orders[id] = { side: side, price: price, amount: amount }
+}
+
+function buildGrid(price) {
+    G.center = price
+    for (var k = 1; k <= LEVELS; k++) {
+        place("buy", price * (1 - k * STEP_PCT / 100))
+        place("sell", price * (1 + k * STEP_PCT / 100))
+    }
+    _G(KEY, G)
+}
+
+function cancelAll() {
+    for (var id in G.orders) {
+        if (!DRY_RUN && !exchange.CancelOrder(id)) Log("Cancel failed", id, GetLastError())
+    }
+    G.orders = {}
+}
+
+// Find filled orders, returns [id]
+function filledIds(t) {
+    var out = []
+    if (DRY_RUN) {
+        for (var id in G.orders) {
+            var o = G.orders[id]
+            if ((o.side === "buy" && t.Sell <= o.price) || (o.side === "sell" && t.Buy >= o.price)) out.push(id)
+        }
+        return out
+    }
+    var open = exchange.GetOrders(SYMBOL)
+    if (!open) throw new Error("GetOrders failed: " + GetLastError())
+    var openIds = open.map(function (o) { return o.Id })
+    for (var oid in G.orders) {
+        if (openIds.indexOf(oid) >= 0) continue
+        var r = exchange.GetOrder(oid)
+        if (!r) continue                                   // Not queryable yet, check again next round
+        if (r.Status === ORDER_STATE_CLOSED) out.push(oid)
+        else if (r.Status === ORDER_STATE_CANCELED) { Log("Order canceled", oid); delete G.orders[oid] }
+    }
+    return out
+}
+
+function onFill(id) {
+    var o = G.orders[id]
+    delete G.orders[id]
+    Log("Filled", o.side, o.amount, "@", o.price, "#00AA00")
+    if (o.side === "buy") {
+        G.buys++; G.spent += o.amount * o.price; G.bought += o.amount
+        place("sell", o.price * (1 + STEP_PCT / 100))
+    } else {
+        G.sells++; G.received += o.amount * o.price; G.sold += o.amount
+        place("buy", o.price * (1 - STEP_PCT / 100))
+    }
+}
+
+function main() {
+    if (exchange.GetName() !== "Jupiter") throw new Error("Please add a Jupiter exchange object, current: " + exchange.GetName())
+    var mode = exchange.IO("trigger.api")
+    var minUsd = mode === "v1" ? 5 : 10                    // auto mode may use V2, so assume $10
+    Log("Limit order API:", mode, ", minimum per order", minUsd, "USD")
+    if (ORDER_USD < minUsd * 1.05) throw new Error("ORDER_USD must not be lower than " + (minUsd * 1.05) + " (minimum " + minUsd + " USD, with a 5% buffer)")
+    G = _G(KEY)
+    if (!G || G.symbol !== SYMBOL) G = { symbol: SYMBOL, center: 0, seq: 0, orders: {}, buys: 0, sells: 0, spent: 0, received: 0, bought: 0, sold: 0 }
+    else Log("Restored from _G:", Object.keys(G.orders).length, "open orders, center price", G.center)
+    while (true) {
+        try {
+            var t = exchange.GetTicker(SYMBOL)
+            if (!t) throw new Error("GetTicker failed: " + GetLastError())
+            var mid = (t.Buy + t.Sell) / 2
+            if (!G.center) {
+                buildGrid(mid)
+            } else if (Math.abs(mid / G.center - 1) * 100 > BAND_PCT) {
+                Log("Price", fmt(mid, 4), "left the center", fmt(G.center, 4), "±" + BAND_PCT + "%, canceling all orders and rebuilding the grid", "#FF9900")
+                cancelAll()
+                buildGrid(mid)
+            } else {
+                filledIds(t).forEach(onFill)
+            }
+            _G(KEY, G)
+            var rows = Object.keys(G.orders).map(function (id) {
+                var o = G.orders[id]
+                return [id.length > 24 ? id.slice(0, 12) + "…" + id.slice(-8) : id, o.side === "buy" ? "Buy" : "Sell", o.price, o.amount, fmt((o.price / mid - 1) * 100, 2) + "%"]
+            }).sort(function (a, b) { return b[2] - a[2] })
+            var pnl = G.received - G.spent + (G.bought - G.sold) * mid
+            LogStatus(_D(), SYMBOL, "Price", fmt(mid, 4), "Center", fmt(G.center, 4), "Rebuild threshold ±" + BAND_PCT + "%",
+                "\nFills Buy", G.buys, "Sell", G.sells, ", estimated PnL of filled orders at current price", fmt(pnl, 4), DRY_RUN ? " (DRY_RUN paper orders)" : "",
+                "\n`" + JSON.stringify({ type: "table", title: "Open Orders", cols: ["Order", "Side", "Price", "Amount", "Distance"], rows: rows }) + "`")
+        } catch (e) {
+            Log("Error in this round:", e.message || e, "#FF0000")
+        }
+        Sleep(INTERVAL * 1000)
+    }
+}
+```
+
+See also: `exchange.IO("trigger.*", ...)`, `exchange.CreateOrder`, `exchange.GetOrders`, `exchange.CancelOrder`, `DEX Strategy Examples`
+
+##### DEX DCA
+
+Buys the same token at regular intervals to average down the position cost: on Jupiter it uses native DCA, and on other DEXs the strategy places market buys on a schedule. When the price is below the moving average, that period's buy amount is doubled.
+
+###### How It Works
+The strategy picks its execution mode based on the exchange object:
+1. Jupiter with ```NATIVE``` set to ```true```: uses native DCA through `exchange.IO("dca.*", ...)`. ```dca.create``` deposits the full ```TOTAL``` up front, and Jupiter's keeper buys one ```PER_ORDER``` tranche every ```INTERVAL_HOURS``` hours, so the strategy does not need to keep running. ```MIN_PRICE``` and ```MAX_PRICE``` restrict buys to that price range (when the price is outside the range, the round is skipped or deferred). On startup, the strategy first calls ```dca.list``` to check whether the trading pair already has an active DCA order and creates one only if none exists (the returned ID is also saved via `_G` to prevent duplicate creation). After that, it calls ```dca.list``` every minute to display execution progress. Recurring v1 (no API Key configured) requires at least $50 per tranche and at least 2 tranches; Trigger V2 (API Key configured and quote currency USDC or USDT) requires at least $10 per tranche, with funds held in a Jupiter-managed vault.
+2. Other DEXs (Uniswap, PancakeSwap, Aerodrome, Velodrome, etc.), or ```NATIVE``` set to ```false```: every ```INTERVAL_HOURS``` hours the strategy buys ```PER_ORDER``` with a market order (```exchange.CreateOrder(交易对, "buy", -1, 金额)```; for market buy orders the amount is denominated in the quote currency). When the best ask is ```DIP_PCT```% below the ```MA_DAYS```-day moving average, that period's amount is multiplied by ```DIP_MULT``` (buy more on dips), and total spending never exceeds ```TOTAL```. Each fill is booked after confirmation via `exchange.GetOrder`, and progress is saved with ```_G()``` so execution can resume after a restart.
+
+###### Exchange Object
+One DEX exchange object (a dedicated wallet is recommended). The wallet must hold the quote currency plus a small amount of the native coin to pay fees. When ```SYMBOL``` is ```null```, the trading pair configured on the exchange object is used.
+
+###### Parameters
+| Parameter | Default | Description |
+| - | - | - |
+| ```SYMBOL``` | ```null``` | Trading pair; ```null``` means the trading pair configured on the exchange object |
+| ```TOTAL``` | ```500``` | Total budget (in quote currency) |
+| ```PER_ORDER``` | ```50``` | Amount per tranche (in quote currency) |
+| ```INTERVAL_HOURS``` | ```24``` | Interval between tranche buys (hours) |
+| ```NATIVE``` | ```true``` | Use native DCA on Jupiter (```dca.create```) |
+| ```MIN_PRICE``` | ```null``` | Native DCA: skip the round when the price is below this value (```null``` means no limit) |
+| ```MAX_PRICE``` | ```null``` | Native DCA: skip the round when the price is above this value (```null``` means no limit) |
+| ```DIP_PCT``` | ```5``` | Strategy-driven buys: buy extra when the price is this percentage below the moving average |
+| ```DIP_MULT``` | ```2``` | Strategy-driven buys: multiplier for dip buys |
+| ```MA_DAYS``` | ```20``` | Strategy-driven buys: moving average period in days |
+| ```DRY_RUN``` | ```true``` | When ```true```, only simulates and spends no real funds |
+
+###### Risks
+- DCA only averages your entry cost; it cannot prevent losses from a falling market.
+- Every on-chain transaction incurs gas or network fees, so small, high-frequency buys are not cost-effective.
+- Market orders are subject to slippage (see `exchange.IO("slippage")`).
+
+###### DRY_RUN vs. Live Trading
+When ```DRY_RUN``` is ```true``` (the default), no real funds are spent: native DCA uses ```dca.simulate``` to simulate the creation transaction (```reason``` gives the reason it failed, if any). Strategy-driven buys use `exchange.IO("route")` to get a quote and record a paper fill, and EVM DEXs also use `exchange.IO("simulate")` to simulate the swap transaction (the simulation errors out when the wallet balance is insufficient, which is expected). Set ```DRY_RUN``` to ```false``` to go live. Once created, a native DCA order is executed by Jupiter, so stopping the bot does not stop the DCA; to cancel it, use ```dca.cancel```.
+
+Complete strategy code (```DRY_RUN = true```: simulation only, no real funds are spent).
+
+```javascript
+/*
+ * DEX DCA (dollar-cost averaging, example strategy)
+ *
+ * Two implementations, chosen automatically based on the exchange object:
+ *   1. Jupiter (Solana) with NATIVE = true: uses Jupiter's native DCA exchange.IO("dca.create", …) — the full amount is deposited up front,
+ *      and Jupiter's keeper buys one tranche every INTERVAL_HOURS hours, so the strategy does not need to keep running; MIN_PRICE / MAX_PRICE can restrict
+ *      buys to a price range (a round outside the range is skipped or deferred). The strategy only creates the DCA order and shows its progress via dca.list.
+ *      Recurring v1 (without an API Key) requires at least $50 per order and at least 2 orders; Trigger V2 (with an API Key and a quote currency of
+ *      USDC / USDT) requires at least $10 per order, with funds held in a vault custodied by Jupiter.
+ *   2. Other DEXs (Uniswap, PancakeSwap, Aerodrome, Velodrome, etc.), or NATIVE = false: the strategy itself buys, every
+ *      INTERVAL_HOURS hours, coins worth PER_ORDER of the quote currency with a market order; when the price is DIP_PCT% below the MA_DAYS-day moving average, that order's amount
+ *      is multiplied by DIP_MULT (buying the dip). Total spending never exceeds TOTAL.
+ * Progress is saved in _G, so execution can resume after a restart.
+ *
+ * With DRY_RUN = true (default) no funds are spent: native DCA uses IO("dca.simulate", …) to simulate the creation transaction; the self-buying mode uses
+ * IO("route", …) to get quotes and records paper fills, and on EVM DEXs also uses IO("simulate", …) to simulate the swap transaction (simulation errors are normal when the wallet balance is insufficient).
+ *
+ * Risk warning: DCA only averages out the entry cost and cannot prevent losses in a downtrend; every on-chain transaction incurs gas / network fees, so small high-frequency buys are not cost-effective;
+ * market orders are subject to slippage (see exchange.IO("slippage")).
+ *
+ * Usage: add a DEX exchange object (a dedicated wallet is recommended), and fund the wallet with the quote currency plus a small amount of the native coin for fees.
+ */
+
+// ---------------- Parameters ----------------
+var SYMBOL = null                // Trading pair; null = the pair configured on the exchange object
+var TOTAL = 500                  // Total budget (quote currency)
+var PER_ORDER = 50               // Amount per order (quote currency)
+var INTERVAL_HOURS = 24          // Interval between buys (hours)
+var NATIVE = true                // Use native DCA (dca.create) on Jupiter
+var MIN_PRICE = null             // Native DCA: skip the round when the price is below this value (null = no limit)
+var MAX_PRICE = null             // Native DCA: skip the round when the price is above this value (null = no limit)
+var DIP_PCT = 5                  // Self-buying: buy more when the price is this % below the moving average
+var DIP_MULT = 2                 // Self-buying: multiplier for dip buys
+var MA_DAYS = 20                 // Self-buying: moving average period in days
+var DRY_RUN = true               // true = simulation only, no funds are spent
+
+function fmt(x, d) {
+    return x === null || x === undefined || isNaN(x) ? "-" : Number(x).toFixed(d === undefined ? 2 : d)
+}
+
+// ---------------- Method 1: Jupiter native DCA ----------------
+function nativeDca() {
+    var key = "dca_native_" + SYMBOL          // ID of the created DCA order, prevents duplicate creation after a restart
+    var params = { symbol: SYMBOL, side: "buy", total: TOTAL, perOrder: PER_ORDER, interval: INTERVAL_HOURS * 3600 }
+    if (MIN_PRICE) params.minPrice = MIN_PRICE
+    if (MAX_PRICE) params.maxPrice = MAX_PRICE
+    var active = exchange.IO("dca.list", { status: "active", symbol: SYMBOL })
+    if (!active) throw new Error("dca.list failed: " + GetLastError())
+    if (active.length === 0 && !_G(key)) {
+        if (DRY_RUN) {
+            var sim = exchange.IO("dca.simulate", params)
+            if (!sim) Log("dca.simulate error:", GetLastError())
+            else Log("dca.simulate (" + sim.version + ")", sim.ok ? "passed" : "failed: " + sim.reason, "plan:", JSON.stringify(sim.plan))
+        } else {
+            var r = exchange.IO("dca.create", params)
+            if (!r) throw new Error("dca.create failed: " + GetLastError())
+            Log("DCA created", r.version, r.id, "per order", r.perOrder, "total", r.numberOfOrders, "orders", "#00AA00")
+            _G(key, r.id)
+        }
+    }
+    while (true) {
+        try {
+            var rows = []
+            ;["active", "history"].forEach(function (st) {
+                var list = exchange.IO("dca.list", { status: st, symbol: SYMBOL })
+                if (!list) throw new Error("dca.list failed: " + GetLastError())
+                list.forEach(function (d) {
+                    rows.push([d.id, d.version, d.state, fmt(d.perOrder, 4), (d.ordersFilled === null ? "?" : d.ordersFilled) + " / " + d.numberOfOrders,
+                        fmt(d.spent, 4), fmt(d.filledQty, 6), fmt(d.avgPrice, 4), d.nextFillAt ? _D(d.nextFillAt) : "-"])
+                })
+            })
+            LogStatus(_D(), SYMBOL, "Jupiter native DCA", DRY_RUN ? "(DRY_RUN: creation was only simulated; the table below shows DCA orders already in the wallet)" : "",
+                "\n`" + JSON.stringify({ type: "table", title: "DCA", cols: ["ID", "Version", "State", "Per Order", "Orders Filled", "Spent", "Bought", "Avg Price", "Next"], rows: rows }) + "`")
+        } catch (e) {
+            Log("Error in this round:", e.message || e, "#FF0000")
+        }
+        Sleep(60000)
+    }
+}
+
+// ---------------- Method 2: the strategy buys on its own schedule ----------------
+function buyOnce(D, amount, price) {
+    var q = exchange.IO("route", SYMBOL, "buy", amount / price)       // Quote only: how much it costs to buy this quantity
+    if (DRY_RUN) {
+        if (exchange.GetName() !== "Jupiter") {
+            var sim = exchange.IO("simulate", SYMBOL, "buy", amount)  // Market buy: amount is denominated in the quote currency
+            Log(sim ? "simulate passed: " + sim.route : "simulate failed (normal when the wallet balance is insufficient): " + GetLastError())
+        }
+        if (!q || !q.price) { Log("Quote failed:", GetLastError()); return false }
+        D.spent += amount; D.bought += amount / q.price
+        Log("DRY_RUN buy", fmt(amount, 2), "→", fmt(amount / q.price, 6), "@", fmt(q.price, 4))
+        return true
+    }
+    var id = exchange.CreateOrder(SYMBOL, "buy", -1, amount)
+    if (!id) { Log("Buy failed:", GetLastError(), "#FF0000"); return false }
+    for (var i = 0; i < 60; i++) {
+        var o = exchange.GetOrder(id)
+        if (o && o.Status === ORDER_STATE_CLOSED) {
+            D.spent += amount; D.bought += o.DealAmount
+            Log("Bought", fmt(amount, 2), "→", o.DealAmount, "@", fmt(o.AvgPrice, 4), "#00AA00")
+            return true
+        }
+        if (o && o.Status === ORDER_STATE_CANCELED) { Log("Buy order not filled (canceled / failed on-chain)", id, "#FF0000"); return false }
+        Sleep(2000)
+    }
+    Log("Buy order not confirmed within two minutes; recorded as spent, please verify later", id, "#FF0000")
+    D.spent += amount
+    return true
+}
+
+function loopDca() {
+    var key = DRY_RUN ? "dca_loop_paper" : "dca_loop"
+    var D = _G(key)
+    if (!D || D.symbol !== SYMBOL) D = { symbol: SYMBOL, spent: 0, bought: 0, buys: 0, lastBuy: 0 }
+    while (true) {
+        try {
+            var t = exchange.GetTicker(SYMBOL)
+            if (!t) throw new Error("GetTicker failed: " + GetLastError())
+            var r = exchange.GetRecords(SYMBOL, PERIOD_D1)
+            var ma = r && r.length >= MA_DAYS ? TA.MA(r, MA_DAYS)[r.length - 1] : null
+            var dip = ma !== null && t.Sell < ma * (1 - DIP_PCT / 100)
+            var due = Date.now() - D.lastBuy >= INTERVAL_HOURS * 3600000
+            if (due && D.spent < TOTAL - 1e-9) {
+                var amount = Math.min(PER_ORDER * (dip ? DIP_MULT : 1), TOTAL - D.spent)
+                Log("DCA order #", D.buys + 1, "amount", fmt(amount, 2), dip ? "(below MA by " + DIP_PCT + "%, ×" + DIP_MULT + ")" : "")
+                if (buyOnce(D, amount, t.Sell)) { D.buys++; D.lastBuy = Date.now() }
+                _G(key, D)
+            }
+            var avg = D.bought > 0 ? D.spent / D.bought : null
+            var value = D.bought * t.Buy
+            var table = { type: "table", title: SYMBOL + " DCA" + (DRY_RUN ? " (DRY_RUN paper)" : ""), cols: ["Item", "Value"], rows: [
+                ["Orders Filled", D.buys], ["Spent / Total Budget", fmt(D.spent, 2) + " / " + TOTAL], ["Bought", fmt(D.bought, 6)],
+                ["Avg Entry Price", fmt(avg, 4)], ["Current Price (Best Bid)", fmt(t.Buy, 4)], [MA_DAYS + "-day MA", fmt(ma, 4) + (dip ? " (dip)" : "")],
+                ["Market Value / PnL", fmt(value, 2) + " / " + fmt(value - D.spent, 2)],
+                ["Next Buy", D.spent >= TOTAL - 1e-9 ? "Budget exhausted" : _D(D.lastBuy + INTERVAL_HOURS * 3600000)]] }
+            LogStatus(_D(), "\n`" + JSON.stringify(table) + "`")
+        } catch (e) {
+            Log("Error in this round:", e.message || e, "#FF0000")
+        }
+        Sleep(60000)
+    }
+}
+
+function main() {
+    SYMBOL = SYMBOL || exchange.GetCurrency()
+    if (exchange.GetName() === "Jupiter" && NATIVE) nativeDca()
+    else loopDca()
+}
+```
+
+See also: `exchange.IO("dca.*", ...)`, `exchange.IO("route")`, `exchange.IO("simulate")`, `exchange.IO("slippage")`, `exchange.CreateOrder`, `exchange.GetRecords`, `DEX Strategy Examples`
+
+##### pump.fun Token Sniping Strategy
+
+Extremely high risk, for learning and adaptation only: detects newly created tokens on pump.fun, filters them by set conditions, buys a fixed amount on the bonding curve, and sells the entire position when take-profit, stop-loss or the maximum holding time is reached.
+
+###### How It Works
+
+Uses the `exchange.IO("pump.*", ...)` commands:
+
+1. Every ```POLL_SEC``` seconds, calls ```pump.new``` to find tokens created after the strategy started.
+2. Filtering: buys only tokens quoted in SOL that are not of the mayhem or cashback type; the token must be no older than ```MAX_AGE_SEC``` seconds; the creator's first buy in the creation transaction must not exceed ```MAX_DEV_BUY_SOL```; the curve progress returned by ```pump.info``` must not exceed ```MAX_PROGRESS```%, and the curve must not yet be complete.
+3. Buying: ```pump.buy(mint, BUY_SOL, {slippage, priorityFee})```. Capital guardrails: at most ```MAX_POSITIONS``` positions held at the same time, and total purchases capped at ```MAX_TOTAL_SOL```.
+4. Holding: uses ```pump.quote``` to estimate from the curve how much SOL a full sell would return (graduated tokens use a Jupiter quote instead); when profit reaches ```TAKE_PROFIT_PCT```%, loss reaches ```STOP_LOSS_PCT```%, or the position has been held longer than ```MAX_HOLD_MIN``` minutes, sells the entire position with ```pump.sell(mint, "all")```.
+5. Status bar: shows the number of tokens found and skipped, total purchases, the number of closed positions and realized PnL, plus the cost, current value, PnL and holding time of each open position.
+
+###### Exchange Object
+
+One `Jupiter` exchange object (using a dedicated wallet), with only a small amount of SOL in the wallet. Public nodes are rate-limited and have high latency, so configure your own paid node for sniping.
+
+###### Parameters
+
+| Parameter | Default | Description |
+| - | - | - |
+| ```BUY_SOL``` | ```0.01``` | Buy amount per token (SOL, including protocol and creator fees) |
+| ```MAX_POSITIONS``` | ```3``` | Maximum number of tokens held at the same time |
+| ```MAX_TOTAL_SOL``` | ```0.1``` | Cap on total purchases (SOL) |
+| ```MAX_AGE_SEC``` | ```30``` | Only buy tokens created no more than this many seconds ago |
+| ```MAX_DEV_BUY_SOL``` | ```1``` | Skip when the creator's first buy exceeds this amount of SOL |
+| ```MAX_PROGRESS``` | ```20``` | Skip when curve progress exceeds this percentage |
+| ```TAKE_PROFIT_PCT``` | ```50``` | Take-profit (%) |
+| ```STOP_LOSS_PCT``` | ```30``` | Stop-loss (%) |
+| ```MAX_HOLD_MIN``` | ```30``` | Maximum holding time (minutes) |
+| ```SLIPPAGE``` | ```0.2``` | Slippage for buys and sells |
+| ```PRIORITY_FEE``` | ```0.0005``` | Priority fee per transaction (SOL) |
+| ```POLL_SEC``` | ```5``` | Polling interval (seconds) |
+| ```DRY_RUN``` | ```true``` | When ```true```, only simulates and does not send transactions |
+
+###### Risks
+
+- The vast majority of new tokens quickly go to zero, and the creator or bundled wallets can dump at any time (rug pull); names and symbols can impersonate well-known projects, so always rely on the mint address.
+- Competition from sniper bots and MEV is fierce; setting slippage too high makes you an easy target for sandwich attacks, filling at the worst price; when liquidity dries up, the stop-loss may not sell at the expected price.
+- Every buy and sell incurs protocol fees, creator fees, network fees and priority fees.
+- Only commit a small amount of capital you can afford to lose entirely. Please first read the "Pump.fun Sniping" section of the `Jupiter` exchange page.
+
+###### DRY_RUN vs. Live Trading
+
+When ```DRY_RUN``` is ```true``` (the default), no transactions are sent: buys are simulated with the ```dryRun``` option of ```pump.buy``` (the simulation returns an error when the wallet holds no SOL, which is expected), and paper positions are recorded at the quoted amounts. Because the simulated buys never actually happened, the curve does not hold these tokens, so the current value of paper positions is estimated as the current price from ```pump.info``` × quantity, minus protocol and creator fees (graduated tokens still use ```pump.quote```); take-profit and stop-loss are calculated as usual, and sells are only logged. Set ```DRY_RUN``` to ```false``` for live trading; it is recommended to start with the smallest ```BUY_SOL``` and ```MAX_TOTAL_SOL```.
+
+Complete strategy code (when ```DRY_RUN = true```, it only runs in simulation and sends no transactions).
+
+```javascript
+/*
+ * pump.fun sniping (Solana, example strategy) - extremely high risk, for study and adaptation only
+ *
+ * Uses the pump.* commands of the Jupiter exchange object: polls pump.new for coins just created on pump.fun,
+ * filters them, buys a fixed amount on the bonding curve (pump.buy), and while holding uses pump.quote to
+ * estimate the SOL that selling everything along the curve would return; on take-profit, stop-loss or the
+ * maximum holding time it sells everything (pump.sell(mint, "all")).
+ *
+ * Filters: only coins quoted in SOL that are neither mayhem nor cashback; created within MAX_AGE_SEC seconds;
+ * the creator's first buy in the creation transaction at most MAX_DEV_BUY_SOL; curve progress at most
+ * MAX_PROGRESS%. Money guards: at most MAX_POSITIONS positions at a time, total buys at most MAX_TOTAL_SOL.
+ *
+ * DRY_RUN = true (the default) sends no transactions: buys are simulated with the dryRun option of pump.buy
+ * (the simulation fails when the wallet has no SOL, which is expected), paper positions are booked at the
+ * quoted amounts, take-profit and stop-loss are evaluated as usual, and sells are only logged.
+ *
+ * Risks (read "Pump.fun sniping" on the exchange page first):
+ *   - Most new coins go to zero quickly, and the creator or bundled wallets can dump at any time (rug pull);
+ *     names and symbols can impersonate well-known projects, so go by the mint;
+ *   - sniper bots and MEV compete hard, a wide slippage gets you sandwiched and filled at the worst price, and
+ *     a stop-loss may not sell at the expected price once liquidity dries up;
+ *   - protocol, creator, network and priority fees are paid on every buy and sell; public nodes are rate-limited
+ *     and slow, so configure your own paid node for sniping.
+ *   Only use small money you can afford to lose entirely.
+ *
+ * Usage: add a Jupiter exchange object (dedicated wallet) holding a little SOL.
+ */
+
+// ---------------- Parameters ----------------
+var BUY_SOL = 0.01               // SOL spent per coin (including protocol and creator fees)
+var MAX_POSITIONS = 3            // at most this many coins held at a time
+var MAX_TOTAL_SOL = 0.1          // cap on total buys (SOL)
+var MAX_AGE_SEC = 30             // only buy coins created at most this many seconds ago
+var MAX_DEV_BUY_SOL = 1          // skip coins whose creator's first buy exceeds this many SOL
+var MAX_PROGRESS = 20            // skip coins whose curve progress exceeds this %
+var TAKE_PROFIT_PCT = 50         // take profit (%)
+var STOP_LOSS_PCT = 30           // stop loss (%)
+var MAX_HOLD_MIN = 30            // longest holding time (minutes)
+var SLIPPAGE = 0.2               // slippage for buys and sells
+var PRIORITY_FEE = 0.0005        // priority fee per transaction (SOL)
+var POLL_SEC = 5                 // polling interval (seconds)
+var DRY_RUN = true               // true: simulate only, send no transactions
+
+var KEY = DRY_RUN ? "pump_sniper_paper" : "pump_sniper"
+var S = null                     // {positions: {mint: {symbol, tokens, cost, time}}, spent, closed, realized}
+var seen = {}
+var skipped = 0
+
+function fmt(x, d) {
+    return x === null || x === undefined || isNaN(x) ? "-" : Number(x).toFixed(d === undefined ? 2 : d)
+}
+
+// Filter: null when the coin passes, otherwise the reason
+function reject(c) {
+    if (c.quote !== "SOL" || c.mayhem || c.cashback) return "not SOL-quoted / mayhem / cashback"
+    if (Date.now() - c.time > MAX_AGE_SEC * 1000) return "too old"
+    if (c.devBuy && (c.devBuy.quoteAmount === null || c.devBuy.quoteAmount > MAX_DEV_BUY_SOL)) return "creator's first buy too large"
+    var info = exchange.IO("pump.info", c.mint)
+    if (!info) return "pump.info failed: " + GetLastError()
+    if (info.complete || info.progress > MAX_PROGRESS) return "curve progress " + fmt(info.progress, 1) + "%"
+    return null
+}
+
+function buy(c) {
+    var opts = { slippage: SLIPPAGE, priorityFee: PRIORITY_FEE }
+    if (DRY_RUN) {
+        opts.dryRun = true
+        var sim = exchange.IO("pump.buy", c.mint, BUY_SOL, opts)
+        if (!sim) { Log("Simulated buy failed", c.symbol, GetLastError()); return }
+        Log("DRY_RUN buy", c.symbol, c.mint, BUY_SOL, "SOL → about", fmt(sim.expected.tokenAmount, 0), sim.ok ? "(simulation passed)" : "(simulation failed: " + sim.simulationError + ")")
+        S.positions[c.mint] = { symbol: c.symbol, tokens: sim.expected.tokenAmount, cost: BUY_SOL, time: Date.now() }
+    } else {
+        var r = exchange.IO("pump.buy", c.mint, BUY_SOL, opts)
+        if (!r) { Log("Buy failed", c.symbol, GetLastError(), "#FF0000"); return }
+        Log("Bought", c.symbol, c.mint, r.solAmount, "SOL →", r.tokenAmount, r.txHash, "#00AA00")
+        S.positions[c.mint] = { symbol: c.symbol, tokens: r.tokenAmount, cost: r.solAmount, time: Date.now() }
+    }
+    S.spent += BUY_SOL
+}
+
+// SOL that selling everything would return. Live: pump.quote quotes exactly along the curve. In DRY_RUN the buy
+// never happened and the curve does not hold these coins, so a curve quote cannot sell them; estimate price ×
+// amount − fees instead (graduated coins still use pump.quote, which then goes through Jupiter)
+function sellValue(mint, p) {
+    if (DRY_RUN) {
+        var info = exchange.IO("pump.info", mint)
+        if (info && info.price !== null) return info.price * p.tokens * (1 - (info.fees.protocolBps + info.fees.creatorBps) / 10000)
+    }
+    var q = exchange.IO("pump.quote", mint, "sell", p.tokens)
+    return q ? q.amountOut : null
+}
+
+// Check one position: returns a row of the status table
+function manage(mint) {
+    var p = S.positions[mint]
+    var value = sellValue(mint, p)
+    if (value === null) return [p.symbol, mint, fmt(p.cost, 4), "-", "-", fmt((Date.now() - p.time) / 60000, 1), "quote failed: " + GetLastError()]
+    var pct = (value / p.cost - 1) * 100
+    var age = (Date.now() - p.time) / 60000
+    var why = pct >= TAKE_PROFIT_PCT ? "take profit" : pct <= -STOP_LOSS_PCT ? "stop loss" : age >= MAX_HOLD_MIN ? "time out" : ""
+    if (why) {
+        Log(why, p.symbol, mint, "selling for about", fmt(value, 4), "SOL", fmt(pct, 1) + "%", "#FF9900")
+        var out = value
+        if (!DRY_RUN) {
+            var r = exchange.IO("pump.sell", mint, "all", { slippage: SLIPPAGE, priorityFee: PRIORITY_FEE })
+            if (!r) { Log("Sell failed", p.symbol, GetLastError(), "#FF0000"); return [p.symbol, mint, fmt(p.cost, 4), fmt(value, 4), fmt(pct, 1) + "%", fmt(age, 1), "sell failed, retrying next round"] }
+            out = r.solAmount
+        }
+        S.realized += out - p.cost
+        S.closed++
+        delete S.positions[mint]
+    }
+    return [p.symbol, mint, fmt(p.cost, 4), fmt(value, 4), fmt(pct, 1) + "%", fmt(age, 1), why || "holding"]
+}
+
+function main() {
+    if (exchange.GetName() !== "Jupiter") throw new Error("Add a Jupiter exchange object; this one is " + exchange.GetName())
+    S = _G(KEY) || { positions: {}, spent: 0, closed: 0, realized: 0 }
+    var start = Date.now()
+    while (true) {
+        try {
+            var coins = exchange.IO("pump.new", { limit: 10, since: start })
+            if (!coins) throw new Error("pump.new failed: " + GetLastError())
+            coins.forEach(function (c) {
+                if (seen[c.mint]) return
+                seen[c.mint] = true
+                if (Object.keys(S.positions).length >= MAX_POSITIONS || S.spent + BUY_SOL > MAX_TOTAL_SOL) { skipped++; return }
+                var why = reject(c)
+                if (why) { skipped++; return }
+                buy(c)
+            })
+            var rows = Object.keys(S.positions).map(manage)
+            _G(KEY, S)
+            LogStatus(_D(), "Found", Object.keys(seen).length, "new coins, skipped", skipped, ", bought", fmt(S.spent, 4), "/", MAX_TOTAL_SOL, "SOL in total, closed",
+                S.closed, ", realized P&L", fmt(S.realized, 4), "SOL", DRY_RUN ? "(DRY_RUN paper)" : "",
+                "\n`" + JSON.stringify({ type: "table", title: "Positions", cols: ["Coin", "mint", "Cost SOL", "Value SOL", "P&L", "Minutes held", "State"], rows: rows }) + "`")
+        } catch (e) {
+            Log("Error in this round:", e.message || e, "#FF0000")
+        }
+        Sleep(POLL_SEC * 1000)
+    }
+}
+```
+
+See also: `exchange.IO("pump.*", ...)`, `Jupiter`, `DEX Strategy Examples`
 
 ### Prediction Markets
 
@@ -30804,7 +35625,7 @@ The ```Symbol``` (exchange-native code) of each ```exchange.GetMarkets()``` row 
 | ```markets_cursor``` | [string] | Query or set the paging cursor of ```exchange.GetMarkets()``` (an empty string clears it, back to the first page); ```next``` advances the cursor to the next page; see the notes for usage. | The current cursor string (after setting or advancing); an empty string after advancing past the last page. ```next``` fails if no page has been fetched at the current cursor yet. |
 | ```tickers_cursor``` | [string] | Like ```markets_cursor```, for ```exchange.GetTickers()```; the two cursors are independent. | As for ```markets_cursor```. |
 | ```base``` | [url] / kind, url | Without arguments, returns the current CLOB API address; with one URL, switches the CLOB address (used for orders, the balance, account fills and order books); this is what ```exchange.GetBase()``` and ```exchange.SetBase()``` do. (more below the table) | A string without arguments or with one URL (the current address or the address before the change); null for the ```kind, url``` form. |
-| ```api``` | method, path[, params[, raw]] | Sends a request to the CLOB, L2-signed by default; for ```GET``` the ```params``` become the query string, for other methods the JSON body; ```path``` may be a full URL (e.g. a data API address); a string ```raw``` is sent verbatim as the query string or body, and ```false``` sends the request unsigned. | The raw exchange response (JSON is parsed); an error and null when the request fails. |
+| ```api``` | method, path[, params[, raw]] | Sends a request to the CLOB, L2-signed by default; for ```GET``` the ```params``` become the query string, for other methods the JSON body; ```path``` may be a full URL (e.g. a data API address); a ```raw``` JSON object (or JSON object string) is merged into ```params```, any other string is sent verbatim as the query string or body, and ```false``` sends the request unsigned. | The raw exchange response (JSON is parsed); an error and null when the request fails. |
 | ```gamma``` | path | Sends an unsigned GET request to the Gamma API (market information); ```path``` includes the query string, e.g. (more below the table) | The raw exchange response (JSON is parsed); null when the request fails. |
 | ```clob``` | path | Sends an unsigned GET request to the CLOB API, e.g. ```exchange.IO("clob", "/book?token_id=...")```; use ```exchange.IO("api", ...)``` for private endpoints that need a signature. | The raw exchange response (JSON is parsed); null when the request fails. |
 | ```data``` | path | Sends an unsigned GET request to the data API (positions, market trades), e.g. ```exchange.IO("data", "/trades?market=<conditionId>")```; the address follows ```exchange.IO("base", "data", url)```. | The raw exchange response (JSON is parsed); null when the request fails. |
@@ -30820,6 +35641,127 @@ The rest of the longer descriptions in the table:
 - ```gamma```: ```exchange.IO("gamma", "/markets/slug/will-btc-100k")```; the address follows ```exchange.IO("base", "gamma", url)```. The command name may also be a full service address with the path as the second argument, e.g. ```exchange.IO("https://gamma-api.polymarket.com", "/markets/slug/will-btc-100k")```.
 
 For the common command ```currency``` see `exchange.IO`.
+
+##### Common Usage
+
+###### Find a market with the Gamma API and read its order book and recent trades
+
+```javascript
+function main() {
+    // The open market with the largest 24h volume (/markets lists markets, /events events)
+    var path = "/markets?limit=1&closed=false&order=volume24hr&ascending=false"
+    var list = exchange.IO("gamma", path)
+    var m = exchange.IO("gamma", "/markets/slug/" + list[0].slug)
+    // outcomes and clobTokenIds are JSON strings in the Gamma response
+    var outcomes = JSON.parse(m.outcomes)
+    var tokenIds = JSON.parse(m.clobTokenIds)
+    // Instrument code: market slug + _USDC. + outcome name (spaces replaced with -)
+    var symbol = m.slug + "_USDC." + outcomes[0].replace(/ /g, "-")
+    Log("Symbol:", symbol, "tick:", m.orderPriceMinTickSize, "min size:", m.orderMinSize)
+    var depth = exchange.GetDepth(symbol)
+    Log("Best bid:", depth.Bids[0], "best ask:", depth.Asks[0])
+    // The raw order book of the same outcome: the CLOB /book endpoint, by token ID
+    var book = exchange.IO("clob", "/book?token_id=" + tokenIds[0])
+    Log("Raw book tick_size:", book.tick_size, "bid levels:", book.bids.length)
+    // Recent trades of the market: the data API, by conditionId
+    var trades = exchange.IO("data", "/trades?market=" + m.conditionId + "&limit=5")
+    for (var i = 0; i < trades.length; i++) {
+        Log(trades[i].outcome, trades[i].side, trades[i].price, trades[i].size)
+    }
+}
+```
+
+###### Page through the market list with markets_cursor
+
+```javascript
+function main() {
+    exchange.IO("markets_cursor", "")    // back to the first page
+    var all = {}
+    for (var page = 1; page <= 5; page++) {
+        // Each call returns the page at the current cursor (about 100 markets, one row per
+        // outcome) without moving the cursor
+        var markets = exchange.GetMarkets()
+        for (var k in markets) {
+            all[k] = markets[k]
+        }
+        Log("Page", page, ":", Object.keys(markets).length, "instruments")
+        // Advance to the next page; an empty string after the last page
+        if (exchange.IO("markets_cursor", "next") === "") {
+            break
+        }
+    }
+    Log("Total", Object.keys(all).length, "instruments")
+}
+```
+
+###### Read the deposit wallet's raw positions and open orders
+
+```javascript
+function main() {
+    var wallet = exchange.IO("proxyWalletAddress")
+    // The data API: raw position rows (with fields such as redeemable and conditionId)
+    var rows = exchange.IO("data", "/positions?user=" + wallet + "&sizeThreshold=0")
+    Log("Position rows:", rows.length)
+    // A private CLOB endpoint, L2-signed by default
+    var r = exchange.IO("api", "GET", "/data/orders")
+    Log("Open orders:", r.count, "on this page:", r.data.length)
+}
+```
+
+###### Split and merge, turning USDC into shares of both outcomes and back
+
+```javascript
+function main() {
+    var symbol = "will-btc-100k_USDC.Yes"    // either outcome of the market
+    // Split 10 USDC into 10 shares each of Yes and No, waiting for the relayer to confirm
+    var r = exchange.IO("split", symbol, 10)
+    Log("Split:", r ? r.state : GetLastError())
+    // Merge: without an amount, the smaller of the two outcome positions is merged
+    r = exchange.IO("merge", symbol)
+    Log("Merge:", r ? r.state : GetLastError())
+    // Without waiting for confirmation: the transactionID comes back at once
+    r = exchange.IO("split", {symbol: symbol, amount: 5, wait: false})
+    Log("Submitted:", r ? r.transactionID : GetLastError())
+}
+```
+
+###### Redeem all resolved positions
+
+```javascript
+function main() {
+    var done = {}
+    var positions = exchange.GetPositions()
+    for (var i = 0; i < positions.length; i++) {
+        var p = positions[i]
+        var slug = p.Symbol.split("_USDC.")[0]
+        // Info.redeemable true means the market has resolved; both outcomes of a market are
+        // redeemed together, so call it once per market
+        if (!p.Info.redeemable || p.Amount <= 0 || done[slug]) {
+            continue
+        }
+        var r = exchange.IO("redeem", p.Symbol)
+        Log("Redeem", p.Symbol, r ? r.state : GetLastError())
+        done[slug] = true
+    }
+}
+```
+
+###### Submit several orders at once with batchOrders
+
+```javascript
+function main() {
+    var r = exchange.IO("batchOrders", [
+        {symbol: "will-btc-100k_USDC.Yes", side: "buy", price: 0.3, amount: 10},
+        {symbol: "will-btc-100k_USDC.No", side: "buy", price: 0.6, amount: 10,
+            option: {postOnly: true}}
+    ])
+    // One response item per order: accepted ones carry orderID, rejected ones errorMsg;
+    // null when all are rejected
+    for (var i = 0; r && i < r.length; i++) {
+        Log(i, r[i].errorMsg ? "Rejected: " + r[i].errorMsg : "orderID: " + r[i].orderID)
+    }
+}
+```
 
 ##### Function Support
 
@@ -30881,10 +35823,10 @@ Instrument codes are written ```code.market``` and set with ```exchange.SetContr
 | ```accounts``` | — | Get the full list of trading accounts returned by Futu (raw data, including accounts that do not match the live/paper setting and are not used). | — |
 | ```lock``` | — | Lock trading. | Null on success. |
 | ```unlock``` | — | Unlock trading with the configured trade password. Trade requests also unlock once automatically and retry when Futu asks for unlocking, so a manual call is usually unnecessary. | Null on success. |
-| ```instrument``` | symbol | Get the static information of an instrument, for example ```exchange.IO("instrument", "00700.HK")```; instruments queried this way appear in ```exchange.GetMarkets()```. | ```{instrument, InstrumentID, InstrumentName, VolumeMultiple, IsTrading, SecType, info, ...}```; ```VolumeMultiple``` is the lot size (the contract multiplier for options and futures) and ```info``` is Futu's raw static information. |
+| ```instrument``` | symbol | Get the static information of an instrument, for example ```exchange.IO("instrument", "00700.HK")```; instruments queried this way appear in ```exchange.GetMarkets()```. | ```{instrument, InstrumentID, InstrumentName, VolumeMultiple, IsTrading, SecType, info, ...}```; ```VolumeMultiple``` is the lot size (the contract multiplier for options and futures) and ```info``` is Futu's raw static information (a JSON string). |
 | ```timeout``` | number | Set the timeout for communication with OpenD (milliseconds); 20000 by default, clamped to 100–600000. | ```{"ok": true, "timeout": effective milliseconds}``` |
-| ```statusDetail``` | — | Get connection status details. | ```{"connected":..., "server":..., "simulate":...}``` |
-| ```historyKlines``` | object | Get historical K-lines over a time range (Futu's historical K-line interface, which has a quota); parameter ```{symbol, interval, begin, end, limit}```: ```symbol``` is required (the current instrument is not filled in); ```interval``` is in seconds and must be one of the native periods of ```exchange.GetRecords()```; ```begin``` and ```end``` are dates in ```YYYY-MM-DD``` form, defaulting to the last 7 days plus ```interval``` × ```limit``` up to tomorrow; ```limit``` is the page size (at most 1000, 1000 by default), and pages are fetched until the whole range is covered. (more below the table) | — |
+| ```statusDetail``` | — | Get connection status details. The connection to ```FutuOpenD``` is made on the first request, so ```connected``` is ```false``` before it. | ```{"connected":..., "server":..., "simulate":...}``` |
+| ```historyKlines``` | object | Get historical K-lines over a time range (Futu's historical K-line interface, which has a quota); parameter ```{symbol, interval, begin, end, limit}```: ```symbol``` is required (the current instrument is not filled in); ```interval``` is in seconds and must be one of the native periods of ```exchange.GetRecords()```; ```begin``` and ```end``` are dates in ```YYYY-MM-DD``` form, defaulting to the last 7 days plus ```interval``` × ```limit``` up to tomorrow; ```limit``` is the page size (at most 1000, 1000 by default), and pages are fetched until the whole range is covered. (more below the table) | An array of K-lines, each ```{time, open, high, low, close, volume}``` (lower-case fields, ```time``` in milliseconds). |
 | ```status``` | — | Always returns ```true``` (legacy compatibility); use ```statusDetail``` for the connection status. | — |
 | ```wait``` | [number] | Legacy compatibility probe: the Futu connector has no market data or order push, so it does not wait and always returns ```true```. | — |
 
@@ -30896,6 +35838,82 @@ The rest of the longer descriptions in the table:
 For the common commands ```base``` and ```currency``` see `exchange.IO`.
 
 The common command ```api``` is not supported (the call fails with an error and returns null).
+
+##### Common Usage
+
+###### List all trading accounts returned by Futu and unlock or lock trading by hand
+
+```javascript
+function main() {
+    // Raw account rows: trdEnv 0 paper, 1 live; accStatus 0 active
+    exchange.IO("accounts").forEach(function (a) {
+        Log("Account:", a.accID, "trdEnv:", a.trdEnv, "accType:", a.accType,
+            "accStatus:", a.accStatus, "Markets:", a.trdMarketAuthList)
+    })
+    // Trade requests unlock once automatically when Futu asks for it, so this is
+    // rarely needed; null is returned on success and on failure alike
+    exchange.IO("unlock")
+    var err = GetLastError()
+    Log(err ? "Unlock failed: " + err : "Unlocked")
+    // ... trading ...
+    exchange.IO("lock")
+}
+```
+
+###### Get historical K-lines over a date range
+
+```javascript
+function main() {
+    // symbol is required; interval is in seconds and must be a native period;
+    // ranges longer than limit bars are fetched page by page
+    var bars = exchange.IO("historyKlines", {
+        symbol: "00700.HK", interval: 86400, begin: "2026-01-01", end: "2026-06-30"
+    })
+    if (!bars) {
+        Log("Failed:", GetLastError())
+        return
+    }
+    Log(bars.length, "bars")
+    bars.slice(-3).forEach(function (b) {
+        Log(_D(b.time), "O:", b.open, "H:", b.high, "L:", b.low, "C:", b.close, "V:", b.volume)
+    })
+}
+```
+
+###### Query an instrument's static information (lot size, security type)
+
+```javascript
+function main() {
+    var r = exchange.IO("instrument", "00700.HK")
+    Log(r.InstrumentName, "Lot size:", r.VolumeMultiple, "SecType:", r.SecType,
+        "Not delisted:", r.IsTrading)
+    var basic = JSON.parse(r.info)          // Futu's raw static information
+    Log("Listed on:", basic.listTime)
+    // Instruments queried this way appear in GetMarkets
+    Log(Object.keys(exchange.GetMarkets()))
+}
+```
+
+###### Check the FutuOpenD connection, adjust the timeout and read the cache when polling often
+
+```javascript
+function main() {
+    // status and wait are legacy probes that always return true; they say nothing
+    // about the connection
+    Log(exchange.IO("status"), exchange.IO("wait"))
+    exchange.SetContractType("00700.HK")    // queries FutuOpenD, which connects
+    var d = exchange.IO("statusDetail")
+    Log("Connected:", d.connected, "FutuOpenD:", d.server, "Paper:", d.simulate)
+    Log("Timeout (ms):", exchange.IO("timeout", 60000).timeout)
+    // Trade queries read FutuOpenD's cache, free of the 10-per-30-seconds refresh limit
+    exchange.IO("refresh", false)
+    while (true) {
+        var pos = exchange.GetPositions()
+        Log("Positions:", pos ? pos.length : GetLastError())
+        Sleep(1000)
+    }
+}
+```
 
 ##### Function Support
 
@@ -30965,7 +35983,7 @@ Set with ```exchange.SetContractType()``` (or ```exchange.SetCurrency()```); the
 | ```accounts``` | — | Get the list of managed accounts (account IDs). |
 | ```reqId``` | — | Allocate a new request ID (incremented on every call). |
 | ```orderId``` | — | Take the next available order ID and reserve it, so the docker's own orders no longer use it; useful for placing orders directly with the ```api``` command. |
-| ```ignore``` | codes | Set the TWS error codes ignored by synchronous requests; the argument is an array of codes or its JSON string. Returns: The error code list after the change. |
+| ```ignore``` | codes | Set the TWS error codes ignored by synchronous requests (replacing the whole list; an empty array clears it); the argument is an array of codes or its JSON string. Notices in the ```2100```–```2200``` range and ```10167``` and ```399``` never abort a request anyway. Returns: The error code list after the change (sorted, without duplicates). |
 | ```scan``` | object | Run the market scanner; the argument holds the scanner subscription fields (an object or a JSON string, keyed as in the legacy ```ScannerSubscription```, such as ```Instrument```, ```LocationCode```, ```ScanCode```, ```NumberOfRows``` and ```AbovePrice```) and must contain ```Instrument```, for example ```STK``` with ```LocationCode``` ```STK.US.MAJOR```; ```ScanCode``` defaults to ```HOT_BY_VOLUME```. (more below the table) |
 | ```wait``` | [number] | Wait for and return the next complete message from TWS/IB Gateway; the argument is the timeout in milliseconds (at most 600 seconds), negative means no waiting, 0 or omitted waits up to 30 seconds, and null is returned on timeout. Returns: ```{id, fields}```: ```id``` is the TWS message ID and ```fields``` the remaining fields as an array of strings. |
 | ```debug``` | [bool] | Query or set debug mode; when on, every frame sent to or received from TWS/IB Gateway is written in the TWS API log format (at most 512 bytes per frame) to the docker's standard output log, not to the robot log. Returns: The current debug mode (```true```/```false```). |
@@ -30974,10 +35992,93 @@ Set with ```exchange.SetContractType()``` (or ```exchange.SetCurrency()```); the
 
 The rest of the longer descriptions in the table:
 
-- ```scan```: Returns: An array of scan results, each ```{rank, symbol, conId, secType, exchange, currency, localSymbol, tradingClass, marketName, ...}```.
-- ```api```: The legacy form ```exchange.IO("api", requestName or msgId, paramArray, waitMsgId, timeoutSeconds)``` also works (request names such as ```PlaceOrder``` or ```CancelOrder```; the parameter array may be a JSON string): without a message ID to wait for it returns ```true``` once sent; with one it returns every message received from sending until that message ID arrives, each as an array of strings.
+- ```scan```: Returns: An array of scan results, each ```{rank, symbol, conId, secType, exchange, currency, localSymbol, tradingClass, marketName, ...}```; ```symbol``` is an instrument code that can be passed to ```exchange.SetContractType()``` as is (e.g. ```AAPL.US```).
+- ```api```: The legacy form ```exchange.IO("api", requestName or msgId, paramArray, waitMsgId, timeoutSeconds)``` also works (request names such as ```PlaceOrder``` or ```CancelOrder```; the parameter array may be a JSON string): without a message ID to wait for it returns ```true``` once sent; with one it returns every message received from sending until that message ID arrives, each as an array of its field strings without the message ID.
 
 For the common commands ```base``` and ```currency``` see `exchange.IO`.
+
+##### Common Usage
+
+###### Check the gateway session and read the server time and managed accounts
+
+```javascript
+function main() {
+    // status does not connect by itself: false before the first request
+    Log("Session up:", exchange.IO("status"))
+    var t = exchange.IO("time")             // milliseconds; this request opens the session
+    Log("IB server time:", _D(t), "offset from local (ms):", t - Date.now())
+    Log("Managed accounts:", exchange.IO("accounts"))   // orders use the first by default
+    Log("Session up:", exchange.IO("status"))
+}
+```
+
+###### Pick top gainers with the market scanner and fetch their tickers
+
+```javascript
+function main() {
+    var rows = exchange.IO("scan", {
+        Instrument: "STK",
+        LocationCode: "STK.US.MAJOR",
+        ScanCode: "TOP_PERC_GAIN",
+        NumberOfRows: 10,
+        AbovePrice: 5
+    })
+    if (!rows) {
+        Log("Scan failed:", GetLastError())
+        return
+    }
+    rows.forEach(function (r) {
+        Log(r.rank, r.symbol, "conId:", r.conId, r.exchange, r.currency)
+    })
+    // symbol can be used as the instrument code directly
+    exchange.SetContractType(rows[0].symbol)
+    Log(rows[0].symbol, exchange.GetTicker())
+}
+```
+
+###### Switch to delayed market data without a realtime subscription and ignore partial-subscription errors
+
+```javascript
+function main() {
+    exchange.IO("marketDataType", 3)       // 1 realtime, 2 frozen, 3 delayed, 4 delayed frozen
+    // 10090 (part of the market data not subscribed) no longer aborts a request;
+    // the whole list is replaced and returned
+    Log("Ignored error codes:", exchange.IO("ignore", [10090]))
+    exchange.SetContractType("AAPL.US")
+    Log(exchange.GetTicker())
+    exchange.IO("ignore", [])               // clear the list
+}
+```
+
+###### Send raw TWS requests and collect the replies, or read messages one by one with wait
+
+```javascript
+function main() {
+    exchange.IO("debug", true)    // every frame goes to the docker's standard output log
+    // Legacy named call: a ReqMktData snapshot request, collecting messages until
+    // tickSnapshotEnd (message ID 57), for at most 10 seconds
+    var id = exchange.IO("reqId")
+    var msgs = exchange.IO("api", "ReqMktData", [id, "AAPL.US", "", true, false], 57, 10)
+    if (msgs) {
+        Log("Received", msgs.length, "messages (without message IDs):", msgs)
+    }
+    // Raw frame: message ID 49 (reqCurrentTime, version 1); returns true once sent
+    exchange.IO("api", 49, 1)
+    while (true) {
+        var m = exchange.IO("wait", 5000)
+        if (!m) {
+            Log("No message within 5 seconds")
+            break
+        }
+        if (m.id == 49) {
+            Log("Server time (s):", m.fields[1])   // fields[0] is the message version
+            break
+        }
+        Log("Other message:", m.id, m.fields)
+    }
+    exchange.IO("debug", false)
+}
+```
 
 ##### Function Support
 
@@ -31049,6 +36150,37 @@ Pairs are written as ```BTC_USDT``` and sent to the gateway in lowercase (```btc
 
 For the common commands ```base``` and ```currency``` see `exchange.IO`.
 
+##### Common Usage
+
+###### Call a custom gateway method (```__api_<name>```)
+
+```javascript
+function main() {
+    // The gateway receives method __api_getAccountInfo with header Http-Method: GET
+    // and params {"accountType": "spot", "limit": 10} (numeric strings are sent as numbers)
+    var r = exchange.IO("api", "GET", "getAccountInfo", "accountType=spot&limit=10")
+    Log(r)   // the whole gateway reply, e.g. {"data": {...}}
+    // params can also be an object; nested objects and arrays are forwarded as is
+    var ret = exchange.IO("api", "POST", "batchOrders", {orders: [{symbol: "BTC_USDT", amount: 1}]})
+    Log(ret.data)
+}
+```
+
+###### Forward a numeric command to the gateway's ```io``` method
+
+```javascript
+function main() {
+    // The gateway receives method io with params {"code": 2, "args": ["foo", 1]};
+    // the reply's data is returned
+    var d1 = exchange.IO("io", 2, "foo", 1)
+    var d2 = exchange.IO(2, "foo", 1)   // same as the line above
+    Log(d1, d2)
+    // Code 4 is not forwarded: the first argument runs as a local IO command,
+    // here querying the gateway's server address
+    Log(exchange.IO(4, "base"))
+}
+```
+
 ##### Function Support
 
 Not supported (the call fails with an error and returns null): `exchange.GetTickers`, `exchange.GetMarkets`, `exchange.ModifyOrder`, `exchange.CreateConditionOrder`, `exchange.ModifyConditionOrder`, `exchange.CancelConditionOrder`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`, `exchange.GetHistoryConditionOrders`.
@@ -31101,7 +36233,7 @@ The trading pair plays no part in on-chain operations; any ```BASE_QUOTE``` form
 | ```multicall``` | calls[, options] | Read several contract calls in one request on the same block state through the Multicall3 contract; each item of ```calls``` is ```[address, method, ...args]```, and ```options``` is ```{allowFailure, block, multicall}```. See the sub-page `exchange.IO("multicall", ...)`. | An array of results in the order of ```calls```. By default any failing item fails the whole call (with its index and reason); with ```allowFailure``` ```true```, failed items are null. |
 | ```logs``` | query | Query a contract's event logs (```eth_getLogs```) and decode them by ABI; ```query``` is ```{address, event, filter, fromBlock, toBlock, topics, blockHash}```. EVM only. See the sub-page `exchange.IO("logs", ...)`. | An array of logs, each with ```event``` and ```args``` when it can be decoded. |
 | ```waitReceipt``` | txHash[, options] | Wait until a transaction is mined and has the required confirmations; ```options``` is ```{timeout, confirmations, interval}```: ```timeout``` and ```interval``` are in milliseconds, 120000 (1000 to 600000) and 1500 by default, and ```confirmations``` defaults to 1. See the sub-page `exchange.IO("waitReceipt", ...)`. | The transaction receipt (```status``` as a number, ```events``` decoded); an error and null on timeout. |
-| ```nonce``` | ["sync" \| number] | Show the nonce counter used for sending transactions; ```sync``` resyncs it from the node's pending count, and a number sets the next local nonce. EVM only. See the sub-page `exchange.IO("nonce", ...)`. | ```{address, latest, pending, local}``` (all values are strings). |
+| ```nonce``` | ["sync" \| number] | Show the nonce counter used for sending transactions; ```sync``` resyncs it from the node's pending count, and a number sets the next local nonce. EVM only. See the sub-page `exchange.IO("nonce", ...)`. | ```{address, latest, pending, local}``` (all values are strings; ```local``` is null before any transaction has been sent). |
 | ```speedUp``` | txHash[, options] | Resend a pending transaction with a higher fee (same nonce, recipient, amount, call data and gas limit); ```options``` is ```{multiplier, dryRun}```, ```multiplier``` 1.1 to 10, default 1.125. EVM only. See the sub-page `exchange.IO("speedUp", ...)`. | The replacement transaction's hash; its content with ```dryRun```. |
 | ```cancelTx``` | txHash[, options] | Cancel a pending transaction by sending a zero-amount transaction to yourself with the same nonce and a higher fee; ```options``` as for ```speedUp```. Success is not guaranteed. EVM only. See the sub-page `exchange.IO("cancelTx", ...)`. | The cancel transaction's hash; its content with ```dryRun```. |
 | ```encode``` | [address, ]dataFormat, ...args | Standard ABI encoding by a type list (like Solidity's ```abi.encode```); with a contract address as the first argument, encodes a method call of that contract (calldata). See the sub-page `exchange.IO("encode", ...)`. | A hex string without ```0x```. |
@@ -31408,12 +36540,16 @@ Encoding a call to the ```unwrapWETH9``` method as an example.
 ```javascript
 function main() {
     // ContractV3SwapRouterV2 mainnet address : 0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45
-    // The ABI must be registered before calling the unwrapWETH9 method; the registration step is omitted here
-    // "owner" is the wallet address and must be replaced with the actual address; 1 is amountMinimum, the minimum amount to unwrap, in wei (not 1 WETH):
-    // the router contract unwraps all the WETH it holds into ETH and transfers it to owner; the transaction fails if the amount is less than amountMinimum
-    var data = exchange.IO("encode", "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45",
-        "unwrapWETH9(uint256,address)", 1, "owner")
+    // unwrapWETH9 is not an ERC20 method: register the ABI first (built-in template)
+    var router = "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45"
+    exchange.IO("abi", router, "uniswapV3SwapRouter02")
+    // 1 is amountMinimum, the minimum amount to unwrap, in wei (not 1 WETH): the router unwraps
+    // all the WETH it holds into ETH and sends it to the recipient (the current wallet here);
+    // the transaction fails if the amount is less than amountMinimum
+    var data = exchange.IO("encode", router, "unwrapWETH9(uint256,address)", 1,
+        exchange.IO("address"))
     Log(data)
+    // Output: call data starting with 49404b7c (without 0x)
 }
 ```
 
@@ -32110,13 +37246,17 @@ With ```dryRun: true``` in this parameter, the transaction is signed but not bro
 ```javascript
 function main() {
     var ContractV3SwapRouterV2 = "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45"
+    // multicall(uint256,bytes[]) is not an ERC20 method: register the ABI first (built-in template)
+    exchange.IO("abi", ContractV3SwapRouterV2, "uniswapV3SwapRouter02")
     var tokenInName = "ETH"
     // Convert 0.01 ETH to wei: value for a payable method is an on-chain integer
     var amountIn = exchange.IO("toUnits", "0.01", 18)
     var options = {gasPrice: 5000000000, gasLimit: 300000, nonce: 100}   // Example values only; set them for your actual use case
     // bytes[]: encoded call data for each operation (hex strings starting with 0x); an empty array here, set it for your actual use case
     var data = []
-    var tx = exchange.IO("api", ContractV3SwapRouterV2, "multicall(uint256,bytes[])", (tokenInName == 'ETH' ? amountIn : 0), (new Date().getTime() / 1000) + 3600, data, options || {})
+    var tx = exchange.IO("api", ContractV3SwapRouterV2, "multicall(uint256,bytes[])",
+        (tokenInName == 'ETH' ? amountIn : 0), (new Date().getTime() / 1000) + 3600, data,
+        options || {})
 }
 ```
 
