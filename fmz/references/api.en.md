@@ -28903,7 +28903,7 @@ Account: For a unified account or portfolio margin account, the balance and equi
 - ```Last``` of ```exchange.GetTicker()``` and ```exchange.GetTickers()``` is the mid price; ```Buy``` and ```Sell``` are the exchange's bid/ask impact prices (not the best bid and ask; use ```exchange.GetDepth()``` for those), and ```High```/```Low``` take the same impact prices, as the exchange has no 24h high/low.
 - ```exchange.GetFundings()```: the main dex returns predicted funding rates (settled hourly); HIP-3 instruments need an explicit symbol and return the funding records of the last 24 hours.
 - ```exchange.GetHistoryOrders()``` and ```exchange.GetHistoryConditionOrders()``` return only the recent orders the exchange provides; the ```since``` parameter is not supported and a ```since``` greater than 0 fails.
-- HIP-4 Outcome instruments are spot-like holdings: trade them by buying and selling (integer amounts); reduce-only is not supported, so closing orders (```closebuy```, ```closesell```) fail; holdings come from the Outcome tokens in the spot account. Outcome instruments have no bars or funding rates, and ```Last``` of ```GetTicker()``` is the mid price while ```Buy``` and ```Sell``` are 0.
+- HIP-4 Outcome instruments are spot-like holdings: trade them by buying and selling (integer amounts); reduce-only is not supported, so closing orders (```closebuy```, ```closesell```) fail; holdings come from the Outcome tokens in the spot account. Outcome instruments have no bars or funding rates, and ```Last``` of ```GetTicker()``` is the mid price while ```Buy``` and ```Sell``` are 0. An Outcome instrument the exchange has no mid price for yet (newly listed, not traded yet, and so on) is still listed by ```GetMarkets()``` (```PricePrecision``` is 4 and ```Info.assetCtx.midPx``` is ```null```), is left out of ```GetTickers()```, and fails ```GetTicker()``` and market orders; a holding of it is valued at a mid price of 0 (```Margin``` is 0 and ```Profit``` is minus the entry cost).
 
 #### Lighter
 
@@ -36109,7 +36109,7 @@ Exchange objects that talk to blockchain nodes directly, and self-built exchange
 
 Connects exchanges the platform has not integrated (```exchange.GetName()``` returns ```Exchange```): the standard functions do not access any exchange directly but forward requests to a protocol plugin program (gateway) you run yourself, which talks to the exchange's REST, FIX or other interface. For writing the plugin program, see the [REST protocol reference documentation](https://www.fmz.com/digest-topic/10518) and the [FIX protocol reference project](https://github.com/fmzquant/fixc).
 
-Every call is one HTTP POST to the configured server address with a JSON body ```{"access_key", "secret_key", "nonce", "method", "params"}``` (```nonce``` is a nanosecond timestamp), the request header ```Http-Method``` set to ```POST``` (to the caller's method for ```exchange.IO("api", ...)```) and ```Content-Type``` set to ```application/x-www-form-urlencoded```. A reply with an ```error``` key at the top level is a failure (```null``` or an empty string count too), and the payload is in ```data```.
+Every call is one HTTP POST to the configured server address with a JSON body ```{"access_key", "secret_key", "nonce", "method", "params"}``` (```nonce``` is a nanosecond timestamp), the request header ```Http-Method``` set to ```POST``` (to the caller's method for ```exchange.IO("api", ...)```) and ```Content-Type``` set to ```application/x-www-form-urlencoded```. A reply with an ```error``` key at the top level is a failure (```null``` or an empty string count too, reported as ```gateway returned an error without a message```), and the payload is in ```data```.
 
 | Function | Gateway method | params |
 | - | - | - |
@@ -36120,7 +36120,7 @@ Every call is one HTTP POST to the configured server address with a JSON body ``
 | exchange.GetAccount() | accounts (assets when the gateway returns an error) | none |
 | exchange.GetAssets() | assets | none |
 | exchange.CreateOrder() / exchange.Buy() / exchange.Sell() | trade | symbol, type, price, amount |
-| exchange.GetOrders() | orders | symbol |
+| exchange.GetOrders() | orders | symbol (the current pair when no symbol is given) |
 | exchange.GetHistoryOrders() | historyorders | symbol, since, limit |
 | exchange.GetOrder() | order | id, symbol |
 | exchange.CancelOrder() | cancel | id, symbol |
@@ -36193,6 +36193,10 @@ Served through a fallback:
 
 - Orders (gateway method ```trade```): ```type``` is ```buy``` or ```sell```, and ```closebuy``` or ```closesell``` for closing orders, which can also be set directly with ```direction``` in the order extra parameters; a market order has ```price``` ```"-1"```; other extra parameters are merged into ```params``` as is. Post-only orders and time-in-force other than GTC are not supported.
 - ```exchange.GetAccount()``` calls the gateway's ```accounts``` method first and switches to the ```assets``` method when the gateway replies with an error (for example, the method is not supported), so gateways implementing only ```assets``` also work; ```exchange.GetAssets()``` calls only the ```assets``` method. Both methods reply with ```data``` ```[{currency, free, frozen}]```.
+- The order ID is the value of ```data.id``` in the gateway's ```trade``` reply as is: a number for a positive integer, a string otherwise, which may contain commas (e.g. ```BTC-USDT,123456```); the platform neither adds to nor splits it. `exchange.GetOrder` and `exchange.CancelOrder` send the order ID to the gateway as ```id``` unchanged, with ```symbol``` set to the current pair (call `exchange.SetCurrency` first to query or cancel an order of another pair). An order reply must carry ```data.id```, and the ```data.id``` of the ```exchange.GetOrder()``` reply must match the requested order ID.
+- `exchange.GetOrders` without a symbol queries the current pair (the gateway's ```orders``` always takes a ```symbol```). The ```Symbol``` of the order structures is the requested pair (e.g. ```BTC_USDT```); the gateway's own ```symbol``` stays in ```Info```.
+- The order status is read from the ```state``` field, then from the ```status``` field when that is not recognized (case-insensitive): ```open```, ```pending```, ```pre-submitted```, ```submitting```, ```submitted```, ```partial``` and ```partial-filled``` are pending; ```filled```, ```closed``` and ```finished``` are closed; ```canceled```, ```cancelled``` and ```partial-canceled``` are canceled. When neither is recognized (numeric status codes included), ```exchange.GetOrders()``` treats the order as pending, ```exchange.GetHistoryOrders()``` as closed and ```exchange.GetOrder()``` as unknown.
+- Reply fields may be omitted: missing prices, amounts, times and other numbers are 0, numbers may be strings (thousands separators allowed), and times may be integers, floats or numeric strings; the direction ```type``` is buy for ```buy``` or ```bid``` and sell for anything else. The type of ```data``` must be right (an object for the ticker and a single order, an array for trades, K-lines, balances and order lists, ```[price, amount]``` arrays for depth levels), otherwise an error is reported.
 - Requests time out after 30 seconds by default; the timeout of the standard functions' requests can be changed with `exchange.SetTimeout`, while requests forwarded by ```exchange.IO()``` always use 30 seconds.
 
 #### Web3

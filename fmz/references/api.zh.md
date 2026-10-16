@@ -28740,7 +28740,7 @@ function main() {
 - ```exchange.GetTicker()```、```exchange.GetTickers()```的```Last```为中间价，```Buy```、```Sell```为交易所给出的买、卖冲击价（不是盘口买一、卖一，需要时用```exchange.GetDepth()```），```High```、```Low```也取这两个冲击价，交易所没有24小时最高、最低价。
 - ```exchange.GetFundings()```：主dex取预测资金费率（每小时结算）；HIP-3品种需要传入品种代码，返回最近24小时的资金费率记录。
 - ```exchange.GetHistoryOrders()```、```exchange.GetHistoryConditionOrders()```只能取交易所返回的最近订单，不支持```since```参数，传入大于0的```since```会报错。
-- HIP-4 Outcome品种是现货式头寸：用买入、卖出交易（下单数量为整数），不支持只减仓，平仓单（```closebuy```、```closesell```）会报错；持仓来自现货账户中的Outcome代币。Outcome品种没有K线、资金费率，```GetTicker()```的```Last```为中间价，```Buy```、```Sell```为0。
+- HIP-4 Outcome品种是现货式头寸：用买入、卖出交易（下单数量为整数），不支持只减仓，平仓单（```closebuy```、```closesell```）会报错；持仓来自现货账户中的Outcome代币。Outcome品种没有K线、资金费率，```GetTicker()```的```Last```为中间价，```Buy```、```Sell```为0。交易所还没有给出中间价的Outcome品种（刚上市、尚未成交等）仍出现在```GetMarkets()```中（```PricePrecision```为4，```Info.assetCtx.midPx```为```null```），```GetTickers()```不含该品种，对它调用```GetTicker()```或下市价单会报错；持有这种品种时，持仓按中间价0估值（```Margin```为0，```Profit```为负的买入成本）。
 
 #### Lighter
 
@@ -35928,7 +35928,7 @@ function main() {
 
 用于接入平台还未封装的交易所（```exchange.GetName()```为```Exchange```）：标准函数不直接访问任何交易所，而是把请求转发给用户自建的协议插件程序（网关），由它对接交易所的REST、FIX等接口。协议插件程序的写法参看[REST协议参考文档](https://www.fmz.com/digest-topic/10518)与[FIX协议参考项目](https://github.com/fmzquant/fixc)。
 
-每次调用都是向配置的服务地址发送一次HTTP POST，请求体为JSON：```{"access_key", "secret_key", "nonce", "method", "params"}```（```nonce```为纳秒时间戳），请求头```Http-Method```为```POST```（```exchange.IO("api", ...)```时为调用方指定的方法），```Content-Type```为```application/x-www-form-urlencoded```。应答顶层有```error```键即为失败（```null```、空字符串也算失败），业务数据在```data```中。
+每次调用都是向配置的服务地址发送一次HTTP POST，请求体为JSON：```{"access_key", "secret_key", "nonce", "method", "params"}```（```nonce```为纳秒时间戳），请求头```Http-Method```为```POST```（```exchange.IO("api", ...)```时为调用方指定的方法），```Content-Type```为```application/x-www-form-urlencoded```。应答顶层有```error```键即为失败（```null```、空字符串也算失败，错误信息为```gateway returned an error without a message```），业务数据在```data```中。
 
 | 函数 | 网关方法 | params |
 | - | - | - |
@@ -35939,7 +35939,7 @@ function main() {
 | exchange.GetAccount() | accounts（网关报错时改用assets） | 无 |
 | exchange.GetAssets() | assets | 无 |
 | exchange.CreateOrder() / exchange.Buy() / exchange.Sell() | trade | symbol, type, price, amount |
-| exchange.GetOrders() | orders | symbol |
+| exchange.GetOrders() | orders | symbol（不传品种时为当前交易对） |
 | exchange.GetHistoryOrders() | historyorders | symbol, since, limit |
 | exchange.GetOrder() | order | id, symbol |
 | exchange.CancelOrder() | cancel | id, symbol |
@@ -36010,6 +36010,10 @@ function main() {
 
 - 下单（网关方法```trade```）：```type```为```buy```、```sell```，平仓单为```closebuy```、```closesell```，也可以在下单附加参数中用```direction```直接指定；市价单```price```为```"-1"```；其余附加参数原样并入```params```。不支持只做Maker（postOnly）和GTC以外的有效期。
 - ```exchange.GetAccount()```先调用网关的```accounts```方法，网关应答错误（例如不支持该方法）时改调```assets```方法，因此只实现```assets```的网关也可以使用；```exchange.GetAssets()```只调用```assets```方法。两个方法的应答```data```都是```[{currency, free, frozen}]```。
+- 订单号就是网关```trade```应答```data.id```的原值：正整数返回数字，其余返回字符串，可以含逗号（如```BTC-USDT,123456```），平台不拼接也不拆分。`exchange.GetOrder`、`exchange.CancelOrder`把订单号原样作为```id```发给网关，```symbol```为当前交易对（查、撤其它交易对的订单前先`exchange.SetCurrency`）。下单应答必须带```data.id```，```exchange.GetOrder()```应答的```data.id```必须与请求的订单号一致。
+- `exchange.GetOrders`不传品种时查询当前交易对（网关的```orders```必须带```symbol```）。订单结构的```Symbol```为请求的交易对（如```BTC_USDT```），网关应答里的```symbol```保留在```Info```中。
+- 订单状态先读```state```字段，认不出时再读```status```字段（不分大小写）：```open```、```pending```、```pre-submitted```、```submitting```、```submitted```、```partial```、```partial-filled```为未完成；```filled```、```closed```、```finished```为已完成；```canceled```、```cancelled```、```partial-canceled```为已取消。都认不出（包括数字状态码）时，```exchange.GetOrders()```按未完成、```exchange.GetHistoryOrders()```按已完成、```exchange.GetOrder()```按未知状态处理。
+- 应答字段可以缺省：价格、数量、时间等数值缺失时为0，数字可以写成字符串（可带千分位逗号），时间可以是整数、浮点数或数字字符串；方向```type```为```buy```、```bid```时是买，其余都是卖。```data```的类型必须正确（行情、单个订单是对象，成交、K线、余额、订单列表是数组，深度档位为```[价格, 数量]```数组），否则报错。
 - 请求默认超时30秒；标准函数的请求超时可用`exchange.SetTimeout`修改，```exchange.IO()```转发的请求固定为30秒。
 
 #### Web3
