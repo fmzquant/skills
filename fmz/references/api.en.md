@@ -27297,7 +27297,7 @@ DigiFinex spot has no simulated environment and its configuration has no Simulat
 
 ```GateIO``` (Spot): Gate spot (Gate API v4), plus margin accounts (isolated and cross) and spot trading under a unified account. It connects with a Gate API Key (Access Key and Secret Key); with the Simulate box checked it connects to the Gate testnet.
 
-```Futures_GateIO``` (Futures): Gate USDT-margined perpetual and delivery contracts, coin-margined (BTC-settled) perpetual contracts, and USDT options (Gate API v4). It connects with a Gate API Key (Access Key and Secret Key); both classic and unified accounts are supported. With the Simulate box checked it connects to the Gate testnet.
+```Futures_GateIO``` (Futures): Gate USDT-margined perpetual and delivery contracts, coin-margined (BTC-settled) perpetual contracts, USD1-settled perpetual contracts, and USDT options (Gate API v4). It connects with a Gate API Key (Access Key and Secret Key); both classic and unified accounts are supported. With the Simulate box checked it connects to the Gate testnet.
 
 ##### Names and Configuration
 
@@ -27322,9 +27322,9 @@ Pairs are written as ```BTC_USDT``` without a contract code; symbols with a cont
 
 ###### ```Futures_GateIO``` (Futures)
 
-Pair examples: ```BTC_USDT```, ```BTC_USD```
+Pair examples: ```BTC_USDT```, ```BTC_USD```, ```BTC_USD1```
 
-The quote currency selects the contract family: ```BTC_USDT``` is USDT-margined, ```BTC_USD``` is coin-margined (Gate's BTC-settled contracts). Delivery contracts are USDT-margined.
+The quote currency selects the contract family: ```BTC_USDT``` is USDT-margined, ```BTC_USD``` is coin-margined (Gate's BTC-settled contracts), and ```BTC_USD1``` is a USD1-settled perpetual (perpetuals only, no delivery contracts; see ```exchange.GetMarkets()``` for the listed ones). Delivery contracts are USDT-margined.
 
 | Contract code | Description |
 | - | - |
@@ -27358,7 +27358,7 @@ For the common commands ```api```, ```base``` and ```currency``` see `exchange.I
 | Command | Arguments | Description | Returns |
 | - | - | - | - |
 | ```cross``` | bool[, symbol] | Cross (true) / isolated (false) margin; sends a request to the exchange. (more below the table) | Null also on success; check GetLastError() afterwards when needed. |
-| ```dual``` | bool[, symbol] | Hedge (true) / one-way (false) position mode; sends a request to the exchange. Set per settlement currency (USDT, BTC), perpetual contracts only. | Null also on success; check GetLastError() afterwards when needed. |
+| ```dual``` | bool[, symbol] | Hedge (true) / one-way (false) position mode; sends a request to the exchange. Set per settlement currency (USDT, BTC, USD1), perpetual contracts only. | Null also on success; check GetLastError() afterwards when needed. |
 | ```unified``` | bool | Unified (true) / classic (false) account. Detected automatically on the first private request when not set. | Null also on success; check GetLastError() afterwards when needed. |
 
 The rest of the longer descriptions in the table:
@@ -27401,7 +27401,7 @@ Margin mode: Gate expresses the margin mode through the leverage value (leverage
 
 Position mode: Hedge mode is set per settlement currency and applies to perpetuals only; switch it with ```exchange.IO("dual", bool)```.
 
-Account: Whether the account is unified is detected on the first private request, or set with ```exchange.IO("unified", bool)```. On a classic account, perpetuals, delivery contracts and options are separate wallets, and USDT-margined and coin-margined are separate too: ```exchange.GetAccount()``` and ```exchange.GetAssets()``` return only the wallet of the current contract. On a unified account they return all currencies of the unified account.
+Account: Whether the account is unified is detected on the first private request, or set with ```exchange.IO("unified", bool)```. On a classic account, perpetuals, delivery contracts and options are separate wallets, and USDT-margined, coin-margined and USD1-settled are separate too: ```exchange.GetAccount()``` and ```exchange.GetAssets()``` return only the wallet of the current contract. On a unified account they return all currencies of the unified account.
 
 ##### Options
 
@@ -27424,10 +27424,11 @@ Option codes are Gate native codes: underlying-expiry (YYYYMMDD)-strike-C/P, and
 
 ###### ```Futures_GateIO``` (Futures)
 
-- Order, position and trade amounts are contract counts (the minimum order size is the ```MinQty``` in ```exchange.GetMarkets()```; some contracts accept fractional contracts); what one contract represents is the ```CtVal``` in ```exchange.GetMarkets()```: some base currency for USDT-margined contracts and options, 1 USD per contract for coin-margined contracts.
+- Order, position and trade amounts are contract counts (the minimum order size is the ```MinQty``` in ```exchange.GetMarkets()```; some contracts accept fractional contracts); what one contract represents is the ```CtVal``` in ```exchange.GetMarkets()```: some base currency for USDT-margined and USD1-settled contracts and options, 1 USD per contract for coin-margined contracts.
+- When the futures wallet of a settlement currency has never been opened (no funds transferred in; the exchange reports ```USER_NOT_FOUND```), queries without a specific contract (such as ```exchange.GetPositions()``` and ```exchange.GetOrders()``` over the current contract family) treat that wallet as having no positions and no open orders; a query for a specific contract returns the exchange's error.
 - Market orders are sent with price 0 and ```ioc``` (how Gate futures express a market order).
 - ```exchange.GetHistoryOrders()``` needs a specific contract (the current contract when omitted); an empty string or a range fails. Delivery contracts do not support the ```since``` argument.
-- Conditional orders support take-profit and stop-loss only, not OCO, and trigger on the last traded price; the order placed on trigger is a limit order when an order price is given, otherwise a market order (price 0, ```ioc```). ```exchange.ModifyConditionOrder()``` supports perpetuals only (amended in place); for delivery contracts cancel and recreate instead.
+- Conditional orders support take-profit and stop-loss only, not OCO, and trigger on the last traded price; the order placed on trigger is a limit order when an order price is given, otherwise a market order (price 0, ```ioc```). ```exchange.ModifyConditionOrder()``` supports perpetuals only (amended in place); for delivery contracts cancel and recreate instead. Gate may refuse to amend take-profit/stop-loss orders placed through the API (error code 1077 ```APIOrderNotSupportUpdateTouchOrder```); ```exchange.ModifyConditionOrder()``` then fails, and the order has to be cancelled (```exchange.CancelConditionOrder()```) and created again.
 - ```exchange.GetHistoryConditionOrders()``` does not support the ```since``` argument (the exchange API cannot filter by time) and fails when it is given.
 
 #### Gemini

@@ -27143,7 +27143,7 @@ DigiFinex现货没有模拟盘环境，配置里也没有模拟盘选项；模�
 
 ```GateIO```（现货）：Gate现货（Gate API v4），以及杠杆账户（逐仓、全仓）和统一账户下的现货交易。使用Gate的API Key（Access Key、Secret Key）接入；勾选「模拟盘」时连接Gate测试网。
 
-```Futures_GateIO```（期货）：Gate USDT本位永续与交割合约、币本位（BTC结算）永续合约，以及USDT期权（Gate API v4）。使用Gate的API Key（Access Key、Secret Key）接入，经典账户与统一账户都支持；勾选「模拟盘」时连接Gate测试网。
+```Futures_GateIO```（期货）：Gate USDT本位永续与交割合约、币本位（BTC结算）永续合约、USD1结算永续合约，以及USDT期权（Gate API v4）。使用Gate的API Key（Access Key、Secret Key）接入，经典账户与统一账户都支持；勾选「模拟盘」时连接Gate测试网。
 
 ##### 名称与配置
 
@@ -27168,9 +27168,9 @@ DigiFinex现货没有模拟盘环境，配置里也没有模拟盘选项；模�
 
 ###### ```Futures_GateIO```（期货）
 
-交易对示例：```BTC_USDT```、```BTC_USD```
+交易对示例：```BTC_USDT```、```BTC_USD```、```BTC_USD1```
 
-计价币决定合约类型：```BTC_USDT```为USDT本位合约，```BTC_USD```为币本位合约（Gate的BTC结算合约）。交割合约为USDT本位。
+计价币决定合约类型：```BTC_USDT```为USDT本位合约，```BTC_USD```为币本位合约（Gate的BTC结算合约），```BTC_USD1```为USD1结算的永续合约（只有永续，没有交割合约，品种见```exchange.GetMarkets()```）。交割合约为USDT本位。
 
 | 合约代码 | 说明 |
 | - | - |
@@ -27204,7 +27204,7 @@ DigiFinex现货没有模拟盘环境，配置里也没有模拟盘选项；模�
 | 指令 | 参数 | 说明 | 返回值 |
 | - | - | - | - |
 | ```cross``` | bool[, symbol] | 全仓（true）/逐仓（false），向交易所发送请求。（详见表下） | 成功也返回空值，需要确认时调用后读取GetLastError()。 |
-| ```dual``` | bool[, symbol] | 双向（true）/单向（false）持仓，向交易所发送请求。按结算币（USDT、BTC）分别设置，只适用于永续合约。 | 成功也返回空值，需要确认时调用后读取GetLastError()。 |
+| ```dual``` | bool[, symbol] | 双向（true）/单向（false）持仓，向交易所发送请求。按结算币（USDT、BTC、USD1）分别设置，只适用于永续合约。 | 成功也返回空值，需要确认时调用后读取GetLastError()。 |
 | ```unified``` | bool | 统一账户（true）/经典账户（false）。不调用时首次私有请求自动探测。 | 成功也返回空值，需要确认时调用后读取GetLastError()。 |
 
 表中长说明的其余部分：
@@ -27247,7 +27247,7 @@ DigiFinex现货没有模拟盘环境，配置里也没有模拟盘选项；模�
 
 持仓模式：双向持仓按结算币设置、只适用于永续合约，用```exchange.IO("dual", bool)```切换。
 
-账户：账户是否为统一账户在首次私有请求时自动探测，也可以用```exchange.IO("unified", bool)```指定。经典账户的永续、交割、期权分属不同钱包，USDT本位与币本位也分开：```exchange.GetAccount()```、```exchange.GetAssets()```只返回当前合约所在钱包的资产。统一账户下返回统一账户的全部币种。
+账户：账户是否为统一账户在首次私有请求时自动探测，也可以用```exchange.IO("unified", bool)```指定。经典账户的永续、交割、期权分属不同钱包，USDT本位、币本位与USD1结算也分开：```exchange.GetAccount()```、```exchange.GetAssets()```只返回当前合约所在钱包的资产。统一账户下返回统一账户的全部币种。
 
 ##### 期权
 
@@ -27270,10 +27270,11 @@ DigiFinex现货没有模拟盘环境，配置里也没有模拟盘选项；模�
 
 ###### ```Futures_GateIO```（期货）
 
-- 下单量、持仓量、成交量都是合约张数（最小下单张数见```exchange.GetMarkets()```的```MinQty```，有的合约可以下小数张），每张对应的数量见```exchange.GetMarkets()```的```CtVal```：USDT本位与期权为若干交易币，币本位一张为1美元。
+- 下单量、持仓量、成交量都是合约张数（最小下单张数见```exchange.GetMarkets()```的```MinQty```，有的合约可以下小数张），每张对应的数量见```exchange.GetMarkets()```的```CtVal```：USDT本位、USD1结算与期权为若干交易币，币本位一张为1美元。
+- 某个结算币的合约钱包从未开通（没有划转过资金，交易所报```USER_NOT_FOUND```）时，不指定具体合约的查询（如```exchange.GetPositions()```、```exchange.GetOrders()```按当前合约族查询）把该钱包当作没有持仓和挂单；指定具体合约查询时返回交易所的错误。
 - 市价单以价格0、```ioc```提交（Gate合约市价单的写法）。
 - ```exchange.GetHistoryOrders()```必须指定具体合约（不传时使用当前合约），传空串或范围报错；交割合约不支持```since```参数。
-- 条件单只支持止盈、止损单，不支持OCO，触发价按最新成交价判断；触发后的委托给了委托价为限价单，不给为市价单（价格0、```ioc```）。```exchange.ModifyConditionOrder()```只支持永续合约（原地修改），交割合约需要先撤销再重新创建。
+- 条件单只支持止盈、止损单，不支持OCO，触发价按最新成交价判断；触发后的委托给了委托价为限价单，不给为市价单（价格0、```ioc```）。```exchange.ModifyConditionOrder()```只支持永续合约（原地修改），交割合约需要先撤销再重新创建。Gate可能拒绝修改经API下的止盈止损单（错误码1077 ```APIOrderNotSupportUpdateTouchOrder```），这时```exchange.ModifyConditionOrder()```报错，需要先撤销（```exchange.CancelConditionOrder()```）再重新创建。
 - ```exchange.GetHistoryConditionOrders()```不支持```since```参数（交易所接口不能按时间过滤），传入时报错。
 
 #### Gemini
