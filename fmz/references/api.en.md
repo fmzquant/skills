@@ -29753,9 +29753,11 @@ The Uniswap and PancakeSwap exchange objects each connect to that exchange's poo
 | Chains | Ethereum, Arbitrum, Base, BNB Chain, Unichain, Polygon, OP Mainnet, Robinhood, Arc (Ethereum by default) | Ethereum, Arbitrum, Base, BNB Chain (BNB Chain by default) |
 | V2 pools | Used on Ethereum, Unichain, Robinhood and Arc; 0.3% fee | Used on all four chains; 0.25% fee |
 | V3 fee tiers | 0.01%, 0.05%, 0.3%, 1% | 0.01%, 0.05%, 0.25%, 1% |
-| V4/Infinity CL | Uniswap V4, available on all nine chains (Arc uses only the ERC-20 form of USDC; pools of native USDC are not visible) | Infinity CL, available on BNB Chain and Base only, using only pools with a fee of at most 1%; Infinity Bin pools are not supported |
+| V4/Infinity CL | Uniswap V4, available on all nine chains (Arc uses only the ERC-20 form of USDC; pools of native USDC are not visible); pools come from the common fee combinations and GeckoTerminal (see below), with no fee cap | Infinity CL, available on BNB Chain and Base only, using only pools with a fee of at most 1%; Infinity Bin pools are not supported |
 | V4/Infinity CL position IDs | ```v4:number``` | ```inf:number``` |
 | Swap and approval contracts | Uniswap's Universal Router and Permit2 | PancakeSwap's own Universal Router and Permit2 |
+
+Uniswap V4 has no fixed fee tiers either. The connector first looks for pools at Uniswap's common fee/tick-spacing combinations (0.01%/1, 0.02%/4, 0.03%/6, 0.04%/8, 0.05%/10, 0.3%/60, 1%/200), then takes the PoolIds of Uniswap V4 pools from the token's pool list on GeckoTerminal (the first two pages, the top 40 by volume and liquidity), resolves each PoolKey on chain with the PositionManager's ```poolKeys```, checks it against the PoolId and keeps only hookless pools, adding pools with custom fees and spacings (such as the CASHCAT/USDG 0.269% pool with tick spacing 54 on Robinhood). ```lp.pools```, ```lp.select```, ```lp.plan```, swap routing and the kline pool choice all use these pools. Only tokens that are not hubs (the wrapped native and stablecoins such as USDC and USDT) are looked up, so a pair of two hubs (such as ```ETH_USDC```) uses the common combinations only; results are cached in the process for an hour. The list can still miss pools: pools GeckoTerminal does not index or ranks below the top 40, and pools that never had a position on the PositionManager (```poolKeys``` returns no PoolKey), are not found; while GeckoTerminal is unavailable (for example rate-limited) only the common combinations are used and the lookup is retried after 5 minutes, and ```exchange.IO("route", ...)``` carries a ```warning``` with the reason. A hookless pool missing from the list can be passed by its PoolId to ```lp.pool``` and ```lp.plan``` (```pool```), provided the PositionManager can likewise resolve its PoolKey. Uniswap V4 pools have no fee cap (V4 allows static fees up to 100%, such as the 2% CASHCAT/ETH pool on Robinhood), and swap quotes come from the on-chain V4Quoter at the pool's actual fee; the cap of 1% applies only to PancakeSwap's Infinity CL.
 
 PancakeSwap's Infinity CL has no fixed fee tiers, so the connector collects pools from recent on-chain trades with ```eth_getLogs```, and pools without trades for a long time are not used; when the configured nodes cannot serve logs (the official BSC bsc-dataseed nodes refuse ```eth_getLogs``` outright, and free nodes such as drpc rate-limit it), these public trades are read through the chain's default public nodes, and if that also fails ```exchange.IO("route", ...)``` carries a ```warning``` with the reason.
 
@@ -29795,7 +29797,7 @@ Tokens outside the token table can be used in pairs after registering them with 
 | - | - | - | - |
 | ```transfer``` | to, amount[, token] | Transfer the native coin or an ERC20 token out of the configured wallet (```token``` is a token name or contract address, the native coin when omitted); ```amount``` may be ```all``` (the native coin keeps the fee). Waits for the broadcast only, not for confirmation. See the sub-page `exchange.IO("transfer", ...)`. | ```{txHash, from, to, token, tokenAddress, amount, raw}``` |
 | ```receipt``` | txHash[, waitMs] | Query the receipt of any transaction on this chain (not only those sent by this exchange object), optionally waiting for confirmation (up to 10 minutes). For an order, pass the transaction hash after the comma in the order ID. See the sub-page `exchange.IO("receipt", ...)`. | ```{txHash, status, blockNumber, gasUsed, fee}``` once mined (```status``` is ```success``` or ```reverted```), ```{txHash, pending: true, known}``` otherwise. |
-| ```route``` | symbol, side, qty | Quote only, no order: lists the quote of every candidate route of a swap and the best route. ```qty``` is always in the base token: ```sell``` sells ```qty``` as exact input and ```buy``` buys ```qty``` as exact output (unlike a market buy, which is sized in the quote token). See the sub-page `exchange.IO("route", ...)`. | ```{symbol, side, qty, best, quote, price, candidates}``` (PancakeSwap only: plus ```warning``` when Infinity pools could not be collected (no node served the logs).) |
+| ```route``` | symbol, side, qty | Quote only, no order: lists the quote of every candidate route of a swap and the best route. ```qty``` is always in the base token: ```sell``` sells ```qty``` as exact input and ```buy``` buys ```qty``` as exact output (unlike a market buy, which is sized in the quote token). See the sub-page `exchange.IO("route", ...)`. | ```{symbol, side, qty, best, quote, price, candidates}```, plus ```warning``` with the reason when V4/Infinity CL pools could not all be collected (on Uniswap, V4 pools outside the common combinations could not be looked up on GeckoTerminal; on PancakeSwap, no node served the logs to collect Infinity pools). |
 | ```simulate``` | symbol, side, qty[, price[, stateOverride[, route]]] | Build the swap transaction with the order logic (route selection, quoting, price protection) and only simulate it with ```eth_call```; nothing is signed, broadcast or paid. See the sub-page `exchange.IO("simulate", ...)`. | ```{route, exactIn, amountIn, amountOut, quoted, executed, value, calls}```, plus ```allowanceOverride``` when an allowance was supplied. |
 | ```token``` | [name, address] | Register a token so it can be used in pairs; without arguments, list the token table. See the sub-page `exchange.IO("token", ...)`. | ```{symbol, address, decimals}``` when registering, an array of ```{symbol, address, decimals, native}``` when listing. |
 | ```wrap``` | amount | Wrap the native coin into its wrapped token (e.g. ETH→WETH), 1:1 without slippage, gas only; ```all``` is not accepted (gas must remain). See the sub-page `exchange.IO("wrap", ...)`. | ```{txHash, action, from, to, amount, raw}``` |
@@ -29810,7 +29812,7 @@ Tokens outside the token table can be used in pairs after registering them with 
 | ```address``` | — | The wallet address of the configured private key (lowercase, starting with ```0x```). | — |
 | ```contracts``` | — | The exchange's deployment on its chain; contract addresses, fee tiers and the built-in token list snapshot. | An object: ```dex```, ```chainId```, ```chain```, ```router```, ```quoterV2```, ```v3Factory```, ```v3Fees```, ```positionManager```, ```v2Factory```, ```v2Fee``` (in millionths, 3000 = 0.3%), ```wrappedNative```, ```v4```, ```tokenList``` (the token list snapshot's build time ```embeddedAt```, token count ```tokens``` and common-token count ```core```); deployments absent on the chain are ```null```. (more below the table) |
 | ```lp.pools``` | token[, quote] | Lists every V3 and V4/Infinity CL pool of a token (against the given quote, or the chain's wrapped native, USDC and USDT) with fee tier, tick spacing, current price, liquidity, both token balances of the pool and TVL; 24h volume and fees come from GeckoTerminal (```null``` when unavailable; cached in the process for 5 minutes and shared with ```lp.select``` and ```lp.plan```, with one retry after a pause when rate-limited). See the sub-page `exchange.IO("lp.pools", ...)`. | ```[{id, protocol, dex, symbol, fee, feeRate, tickSpacing, tick, price, liquidity, reserveBase, reserveQuote, tvlQuote, tvlUsd, volume24hUsd, fees24hUsd, empty}]```, where ```price``` is quote per token. |
-| ```lp.select``` | token, budget[, options] | Picks a pool by rule: with ```options.fee```, the pool of that fee tier is used when it meets the liquidity threshold (only that tier when ```exact``` is ```true```); otherwise, among pools whose TVL is at least max($5000, budget), the one with the largest 24h volume, or the largest TVL without volume data. See the sub-page `exchange.IO("lp.select", ...)`. | One ```lp.pools``` row with an extra ```reason```. |
+| ```lp.select``` | token, budget[, options] | Picks a pool by rule among those ```lp.pools``` lists: with ```options.fee```, the pool of that fee tier is used when it meets the liquidity threshold (only that tier when ```exact``` is ```true```); otherwise, among pools whose TVL is at least max($5000, budget), the one with the largest 24h volume, or the largest TVL without volume data. See the sub-page `exchange.IO("lp.select", ...)`. | One ```lp.pools``` row with an extra ```reason```. |
 | ```lp.pool``` | poolId | Live state of a pool. See the sub-page `exchange.IO("lp.pool", ...)`. | ```{id, protocol, currency0, currency1, token0, token1, fee, tickSpacing, tick, sqrtPriceX96, price0, price1, liquidity}```, where ```price0``` is token1 per token0. (more below the table) |
 | ```lp.ticks``` | poolId, tickLower, tickUpper[, step] | Liquidity distribution over a tick range, with each segment's liquidity and amounts of both tokens (summed over initialized ticks inside it); ```step``` is the segment width in ticks (the tick spacing by default). Ranges wider than 120 bitmap words are refused. See the sub-page `exchange.IO("lp.ticks", ...)`. | ```{pool, tick, token0, token1, segments: [{tickLower, tickUpper, price0Lower, price0Upper, liquidity, amount0, amount1, current}]}``` |
 | ```lp.plan``` | params | A position plan (read-only, costs nothing). See the sub-page `exchange.IO("lp.plan", ...)`. | ```{params, symbol, pool, protocol, fee, tickSpacing, tick, price, shape, budget, budgetUsd, positions: [{tickLower, tickUpper, priceLower, priceUpper, liquidity, amountBase, amountQuote, share}], needBase, needQuote, haveBase, haveQuote, swap, payWith, shortfall, shareOfPool, volume24hUsd, estDailyFeesUsd, slippageBps, layers, layersRequested, warning?}```; ```swap``` is the swap needed before adding (```{side, amount, currency}``` or ```null```). |
@@ -29948,7 +29950,7 @@ Tokens outside the token table can be used in pairs after registering them with 
 | ```address``` | — | The wallet address of the configured private key (lowercase, starting with ```0x```). | — |
 | ```contracts``` | — | The exchange's deployment on its chain; contract addresses, fee tiers and the built-in token list snapshot. | An object: ```dex```, ```chainId```, ```chain```, ```router```, ```quoterV2```, ```v3Factory```, ```v3Fees```, ```positionManager```, ```v2Factory```, ```v2Fee``` (in millionths, 3000 = 0.3%), ```wrappedNative```, ```v4```, ```tokenList``` (the token list snapshot's build time ```embeddedAt```, token count ```tokens``` and common-token count ```core```); deployments absent on the chain are ```null```. (more below the table) |
 | ```lp.pools``` | token[, quote] | Lists every Slipstream and basic pool of a token (against the given quote, or the chain's wrapped native, USDC and USDT) with fee tier, tick spacing, current price, liquidity, both token balances of the pool and TVL; 24h volume and fees come from GeckoTerminal (```null``` when unavailable; cached in the process for 5 minutes and shared with ```lp.select``` and ```lp.plan```, with one retry after a pause when rate-limited). See the sub-page `exchange.IO("lp.pools", ...)`. | ```[{id, protocol, dex, symbol, fee, feeRate, tickSpacing, tick, price, liquidity, reserveBase, reserveQuote, tvlQuote, tvlUsd, volume24hUsd, fees24hUsd, empty}]```, where ```price``` is quote per token. (more below the table) |
-| ```lp.select``` | token, budget[, options] | Picks a pool by rule: with ```options.fee```, the pool of that fee tier is used when it meets the liquidity threshold (only that tier when ```exact``` is ```true```); otherwise, among pools whose TVL is at least max($5000, budget), the one with the largest 24h volume, or the largest TVL without volume data. See the sub-page `exchange.IO("lp.select", ...)`. | One ```lp.pools``` row with an extra ```reason```. |
+| ```lp.select``` | token, budget[, options] | Picks a pool by rule among those ```lp.pools``` lists: with ```options.fee```, the pool of that fee tier is used when it meets the liquidity threshold (only that tier when ```exact``` is ```true```); otherwise, among pools whose TVL is at least max($5000, budget), the one with the largest 24h volume, or the largest TVL without volume data. See the sub-page `exchange.IO("lp.select", ...)`. | One ```lp.pools``` row with an extra ```reason```. |
 | ```lp.pool``` | poolId | Live state of a pool. See the sub-page `exchange.IO("lp.pool", ...)`. | ```{id, protocol, currency0, currency1, token0, token1, fee, tickSpacing, tick, sqrtPriceX96, price0, price1, liquidity}```, where ```price0``` is token1 per token0. |
 | ```lp.ticks``` | poolId, tickLower, tickUpper[, step] | Liquidity distribution over a tick range, with each segment's liquidity and amounts of both tokens (summed over initialized ticks inside it); ```step``` is the segment width in ticks (the tick spacing by default). Ranges wider than 120 bitmap words are refused. See the sub-page `exchange.IO("lp.ticks", ...)`. | ```{pool, tick, token0, token1, segments: [{tickLower, tickUpper, price0Lower, price0Upper, liquidity, amount0, amount1, current}]}``` |
 | ```lp.plan``` | params | A position plan (read-only, costs nothing). See the sub-page `exchange.IO("lp.plan", ...)`. | ```{params, symbol, pool, protocol, fee, tickSpacing, tick, price, shape, budget, budgetUsd, positions: [{tickLower, tickUpper, priceLower, priceUpper, liquidity, amountBase, amountQuote, share}], needBase, needQuote, haveBase, haveQuote, swap, payWith, shortfall, shareOfPool, volume24hUsd, estDailyFeesUsd, slippageBps, layers, layersRequested, warning?}```; ```swap``` is the swap needed before adding (```{side, amount, currency}``` or ```null```). (more below the table) |
@@ -30407,16 +30409,16 @@ Forms:
 
 - `exchange.IO("route", ...)`
 
-Quotes a swap without placing an order: lists the quote of every candidate route and the best route.
+Requests quotes for a swap: lists the quote on each candidate route and the best route, without placing an order.
 
 Parameters:
 
 - `k` (string, required): Always ```route```, which requests a quote.
 - `symbol` (string, required): Trading pair, for example ```ETH_USDC```.
-- `side` (string, required): Swap direction: ```sell``` sells ```qty``` units of the base currency, and ```buy``` buys ```qty``` units of the base currency.
+- `side` (string, required): Trade direction: ```sell``` sells ```qty``` units of the base currency, and ```buy``` buys ```qty``` units of the base currency.
 - `qty` (number, required): Amount of the base currency.
 
-Returns (object / null value): Returns ```{symbol, side, qty, best, quote, price, candidates}```, which holds the best route, the best quote, the average price and the quote on each candidate route. See the remarks for the fields. Returns null on error. Call ```GetLastError()``` to see the cause.
+Returns (object / null value): Returns ```{symbol, side, qty, best, quote, price, candidates}```. It holds the best route, the best quote, the average price and the quote on each candidate route. The Remarks section describes each field. On error it returns a null value, and ```GetLastError()``` gives the reason.
 
 Compare the quotes on each route for selling 1 ETH.
 
@@ -30438,13 +30440,13 @@ function main() {
 }
 ```
 
-Candidate routes include the exchange's direct pools and two-hop routes through the wrapped native token or USDC/USDT. The pool types depend on the exchange. Uniswap uses V3 pools at each fee tier, V2 pools and V4 pools without hooks (V4 routes go through the native token or USDC/USDT). PancakeSwap uses V3, V2 and Infinity CL pools. Aerodrome and Velodrome use both generations of Slipstream pools and basic pools. Routes are written like this: ```v3:WETH-500-USDC``` (V3, fee 500 = 0.05%), ```v2:WETH-USDC```, ```v3:UNI-3000-USDT-100-USDC``` (two hops), ```v4:ETH-500/10-USDC``` (Uniswap V4, fee 500, tick spacing 10, ETH is the native token), ```infinity:BNB-67/1-USDT``` (PancakeSwap Infinity CL), ```cl:WETH-100-USDC``` (first-generation Slipstream on Aerodrome and Velodrome; the number is the tick spacing), ```cl2:WETH-500-USDC``` (second-generation Slipstream), ```volatile:AERO-USDC```, ```stable:USDC-USDbC``` (basic pools).
+Candidate routes include the exchange's direct pools and two-hop routes through the wrapped token or USDC/USDT. The pools used depend on the exchange. Uniswap uses V3 pools at each fee tier, V2 pools and V4 pools without hooks. For V4 this means pools with common fee combinations, plus custom-fee pools found through GeckoTerminal (see the `Uniswap / PancakeSwap` page), and V4 routes go through the native coin or USDC/USDT. PancakeSwap uses V3, V2 and Infinity CL pools. Aerodrome and Velodrome use both generations of Slipstream pools and the basic pools. Example route notations: ```v3:WETH-500-USDC``` (V3, fee 500, i.e. 0.05%), ```v2:WETH-USDC```, ```v3:UNI-3000-USDT-100-USDC``` (two hops), ```v4:ETH-500/10-USDC``` (Uniswap V4, fee 500, tick spacing 10, ETH is the native coin), ```infinity:BNB-67/1-USDT``` (PancakeSwap Infinity CL), ```cl:WETH-100-USDC``` (first-generation Slipstream on Aerodrome and Velodrome, where the number is the tick spacing), ```cl2:WETH-500-USDC``` (second-generation Slipstream), ```volatile:AERO-USDC``` and ```stable:USDC-USDbC``` (basic pools).
 
-V3 routes are quoted on-chain through QuoterV2, which simulates the whole swap. V2 routes are calculated locally from the pool reserves. Quotes do not include gas fees.
+V3 routes are quoted on-chain through QuoterV2, which simulates the whole swap. V2 routes are calculated locally from the pool reserves. No quote includes gas fees.
 
-Fields of the returned object: ```best``` is the best route. ```quote``` is the best quote (for a sell, the amount of quote currency received; for a buy, the amount of quote currency spent). ```price``` is the matching average fill price. ```candidates``` holds ```{route, quote}``` for each candidate route (a route that cannot be quoted has a ```quote``` of ```null```). If no pool is available, an object is still returned, with ```best```, ```quote``` and ```price``` all ```null``` and ```candidates``` an empty array (if pools exist but none can be quoted, each item in ```candidates``` has a ```quote``` of ```null```). On errors such as a token in the trading pair that cannot be recognized, or a node on a different chain from the configured one, null is returned. Call ```GetLastError()``` to see the cause.
+Fields of the returned object: ```best``` is the best route. ```quote``` is the best quote: for a sell, the amount of quote currency you receive, and for a buy, the amount of quote currency you spend. ```price``` is the matching average price. ```candidates``` is a list of ```{route, quote}``` for each candidate route, and a route that cannot be quoted has a ```quote``` of ```null```. When no pool is available, an object is still returned: ```best```, ```quote``` and ```price``` are all ```null```, and ```candidates``` is an empty array. When pools exist but none of them can be quoted, the ```quote``` of every item in ```candidates``` is ```null```. If an error occurs, for example a token in the pair cannot be recognized or the node's chain does not match the configuration, a null value is returned, and ```GetLastError()``` gives the reason.
 
-On the KyberSwap and 1inch exchange objects (aggregators) there is a single candidate route, the aggregator's quote, written ```kyberswap:ETH-USDC``` or ```1inch:ETH-USDC``` (```kyberswap:USDC-ETH``` when buying, the paid token first); ```buy``` quotes receiving ```qty``` base tokens, approximated with several exact-input quotes. When PancakeSwap cannot collect Infinity CL pools from on-chain trades (no node serves ```eth_getLogs```), the result carries a ```warning``` with the reason.
+KyberSwap and 1inch exchange objects (aggregators) have only one candidate route: the quote from the aggregator. These routes are written as ```kyberswap:ETH-USDC``` and ```1inch:ETH-USDC```. For a buy they are written as ```kyberswap:USDC-ETH```, with the token you pay first. For ```buy```, the quote is for receiving ```qty``` units of the base currency, and it is approximated through several exact-input quotes. If PancakeSwap cannot fetch on-chain trade records for Infinity CL pools because the node does not support ```eth_getLogs```, the result includes a ```warning``` that explains why. If Uniswap temporarily cannot get V4 pools beyond the common combinations from GeckoTerminal, for example because of rate limiting, the result also includes a ```warning```. During that time only V4 pools with common combinations are used, and the query is retried after 5 minutes.
 
 See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `KyberSwap`, `1inch`, `exchange.IO`, `exchange.IO("simulate")`, `exchange.IO("slippage")`, `exchange.IO("token")`, `exchange.CreateOrder`
 
@@ -30909,17 +30911,17 @@ Forms:
 
 - `exchange.IO("lp.pools", ...)`
 
-Lists every LP pool of a token (V3 and V4/Infinity CL pools on Uniswap and PancakeSwap, Slipstream and basic pools on Aerodrome and Velodrome) with fee, price, liquidity, TVL and 24h volume, largest TVL first.
+Lists all LP pools of a token (V3 and V4/Infinity CL pools for Uniswap and PancakeSwap, Slipstream and basic pools for Aerodrome and Velodrome), including fee rate, current price, liquidity, TVL and 24-hour trading volume, sorted by TVL in descending order.
 
 Parameters:
 
-- `k` (string, required): Set to ```lp.pools``` to list pools.
-- `token` (string, required): Token name or contract address, such as ```ETH```, ```WETH``` or ```UNI```. The pools' ```symbol``` uses this spelling.
-- `quote` (string, optional): Quote token such as ```USDC```: only pools of this pair are listed. When omitted, the token's pools against the chain's wrapped native token, USDC and USDT are listed.
+- `k` (string, required): Fixed as ```lp.pools```, which lists pools.
+- `token` (string, required): Token name or contract address, e.g. ```ETH```, ```WETH```, ```UNI```. The pool's ```symbol``` is displayed using the spelling given here.
+- `quote` (string, optional): Quote currency, e.g. ```USDC```; when specified, only pools of that trading pair are listed. When omitted, pools formed by the token with the chain's wrapped native token, USDC and USDT are listed.
 
-Returns (array / null value): An array of pools ```[{id, protocol, dex, symbol, fee, feeRate, tickSpacing, tick, price, liquidity, reserveBase, reserveQuote, tvlQuote, tvlUsd, volume24hUsd, fees24hUsd, empty}]```; see the remarks for the fields. Null when the token is unknown or the node fails, with the reason in ```GetLastError()```.
+Returns (array / null value): Array of pools ```[{id, protocol, dex, symbol, fee, feeRate, tickSpacing, tick, price, liquidity, reserveBase, reserveQuote, tvlQuote, tvlUsd, volume24hUsd, fees24hUsd, empty}]```; see Remarks for field descriptions. Returns a null value when the token cannot be recognized or the node returns an error; the reason can be checked with ```GetLastError()```.
 
-List the ETH/USDC pools and look at the largest by TVL and volume.
+List ETH/USDC pools and view the top few by TVL and trading volume.
 
 ```javascript
 function main() {
@@ -30929,12 +30931,29 @@ function main() {
         return
     }
     pools.slice(0, 5).forEach(function (p) {
-        Log(p.protocol, p.id, "fee:", p.feeRate, "TVL:", p.tvlUsd, "24h volume:", p.volume24hUsd)
+        Log(p.protocol, p.id, "Fee rate:", p.feeRate, "TVL:", p.tvlUsd, "24h volume:", p.volume24hUsd)
     })
 }
 ```
 
-Aerodrome and Velodrome: rank the pools whose gauge still pays rewards by reward APR.
+Uniswap: list the token's V4 pools (including custom-fee pools outside the common combinations), then query the first one by PoolId.
+
+```javascript
+function main() {
+    var v4 = exchange.IO("lp.pools", "UNI").filter(function (p) {
+        return p.protocol == "v4" && !p.empty
+    })
+    v4.forEach(function (p) {
+        Log(p.symbol, "Fee rate:", p.fee / 10000 + "%", "Tick spacing:", p.tickSpacing, "TVL:", p.tvlUsd)
+    })
+    if (v4.length > 0) {
+        var pool = exchange.IO("lp.pool", v4[0].id)
+        Log(v4[0].id, pool ? "Fee rate: " + pool.fee : GetLastError())
+    }
+}
+```
+
+Aerodrome, Velodrome: among pools whose gauge is still distributing rewards, filter by reward APR.
 
 ```javascript
 function main() {
@@ -30943,35 +30962,38 @@ function main() {
     })
     pools.sort(function (a, b) { return b.rewardAprPct - a.rewardAprPct })
     pools.slice(0, 3).forEach(function (p) {
-        Log(p.protocol, p.id, "tick spacing:", p.tickSpacing, "reward APR %:", p.rewardAprPct,
-            "staked share:", p.stakedShare)
+        Log(p.protocol, p.id, "Tick spacing:", p.tickSpacing, "Reward APR %:", p.rewardAprPct,
+            "Staked share:", p.stakedShare)
     })
 }
 ```
 
-Fields of each item:
-
+Fields of each item in the returned array:
 | Field | Description |
 | - | - |
-| ```id``` | Pool ID: the pool contract address for V3, Slipstream and basic pools, the PoolId (```0x``` plus 64 hex digits) for V4/Infinity CL; pass it to ```lp.pool```, ```lp.ticks``` and ```pool``` of ```lp.plan``` |
-| ```protocol``` | Pool type: ```v3```; ```v4``` for Uniswap V4, ```infinity``` for PancakeSwap Infinity CL; ```slipstream``` (old factory), ```slipstream2``` (new factory), ```volatile``` and ```stable``` (basic pools) on Aerodrome and Velodrome |
-| ```dex```, ```symbol``` | Exchange name and the pool's pair (such as ```WETH_USDC```) |
-| ```fee```, ```feeRate``` | Fee: ```fee``` in millionths (500 = 0.05%), ```feeRate``` as a fraction (0.0005); Slipstream pools set their own (possibly dynamic) fee, and this is the current value |
-| ```tickSpacing```, ```tick``` | Tick spacing and current tick; ```null``` for basic pools, which have no ticks |
-| ```price``` | Current price, quote per token |
+| ```id``` | Pool ID: for V3, Slipstream and basic pools it is the pool contract address; for V4/Infinity CL it is the PoolId (```0x``` followed by 64 hex digits); can be passed as the ```pool``` parameter of ```lp.pool```, ```lp.ticks``` and ```lp.plan``` |
+| ```protocol``` | Pool type: ```v3```, ```v4``` (Uniswap V4), ```infinity``` (PancakeSwap Infinity CL); for Aerodrome and Velodrome it is ```slipstream```, ```slipstream2``` (the old and new factory respectively) and the basic pools ```volatile```, ```stable``` |
+| ```dex```, ```symbol``` | Exchange name and the pool's trading pair (e.g. ```WETH_USDC```) |
+| ```fee```, ```feeRate``` | Fee rate: ```fee``` is in units of one millionth (500 means 0.05%), ```feeRate``` is in decimal form (0.0005); the fee of Slipstream pools may be dynamic, and the current value is shown here |
+| ```tickSpacing```, ```tick``` | Tick spacing and current tick; basic pools have no ticks and the value is ```null``` |
+| ```price``` | Current price, expressed as quote currency per token |
 | ```liquidity``` | Liquidity at the current price (decimal string) |
-| ```reserveBase```, ```reserveQuote``` | Both token balances of the pool; ```null``` for V4/Infinity CL, which is a singleton contract |
-| ```tvlQuote```, ```tvlUsd``` | TVL in the quote token and in USD (from GeckoTerminal for V4/Infinity CL) |
-| ```volume24hUsd```, ```fees24hUsd``` | 24h volume and fees in USD from GeckoTerminal, ```null``` when unavailable |
-| ```empty``` | ```true``` when there is no liquidity at the current price, which makes the price meaningless: ```price```, ```tvlQuote``` and ```tvlUsd``` are ```null``` and the pool comes last |
+| ```reserveBase```, ```reserveQuote``` | Balances of the two tokens in the pool; V4/Infinity CL use a singleton contract, so the value is ```null``` |
+| ```tvlQuote```, ```tvlUsd``` | TVL converted to the quote currency and to USD (data for V4/Infinity CL is taken from GeckoTerminal) |
+| ```volume24hUsd```, ```fees24hUsd``` | 24-hour trading volume and fee income (USD), taken from GeckoTerminal; ```null``` when unavailable |
+| ```empty``` | ```true``` means there is no liquidity at the current price and the current price is not meaningful: ```price```, ```tvlQuote```, ```tvlUsd``` are ```null```, and such pools are placed last |
 
-On Aerodrome and Velodrome each item also has ```stable``` (whether a basic pool uses the stable curve, ```null``` for Slipstream) and gauge data: ```gauge``` (gauge address), ```gaugeAlive``` (whether the gauge still pays rewards), ```stakedShare``` (the share of the liquidity at the current price staked in the gauge), ```rewardsPerDay``` and ```rewardsPerDayUsd``` (reward tokens emitted per day and their USD value) and ```rewardAprPct``` (the reward APR on the staked TVL, %). The APR extrapolates the current per-second rewards and moves with the reward token's price and the staked amount. It is an instantaneous figure: on Slipstream pools ```stakedShare``` is the staked share of the in-range liquidity at the current tick, which jumps as the price moves and positions go in and out of range, so ```rewardAprPct``` can change several-fold within minutes; when picking pools or estimating returns with it, sample it over time and average.
+Each item for Aerodrome and Velodrome additionally includes ```stable``` (whether a basic pool uses the stable curve; ```null``` for Slipstream) and gauge information: ```gauge``` (gauge address), ```gaugeAlive``` (whether the gauge is still distributing rewards), ```stakedShare``` (share of liquidity at the current price staked in the gauge), ```rewardsPerDay```, ```rewardsPerDayUsd``` (amount of reward tokens distributed per day and its USD value), ```rewardAprPct``` (reward APR based on the TVL of the staked portion, in %). The reward APR is extrapolated from the current per-second emission and changes with the reward token price and staked amount, so it is an instantaneous value: for Slipstream pools, ```stakedShare``` is the ratio of staked liquidity to total liquidity at the tick containing the current price; whenever the price moves or positions move in or out of range, this value jumps, and ```rewardAprPct``` may differ several-fold within a few minutes. When using it to select pools or estimate returns, fetch it multiple times at intervals and take the average.
 
-Uniswap and PancakeSwap list only hookless V4/Infinity CL pools: Uniswap V4 lists native and wrapped-token pools separately (such as ```ETH_USDC``` and ```WETH_USDC```); PancakeSwap Infinity CL lists only pools with a fee of at most 1%, and since it has no fixed fee tiers the list holds the pools collected from recent on-chain trades for swap routing and the pools used in this process; any other pool can be passed by its PoolId to ```lp.pool``` and ```lp.plan```.
+For V4/Infinity CL pools of Uniswap and PancakeSwap, only pools without hooks are listed; neither has fixed fee tiers.
 
-GeckoTerminal data is cached in the process for 5 minutes and shared with ```lp.select``` and ```lp.plan```; when rate-limited it waits and retries once, and the fields are ```null``` if that also fails.
+Uniswap V4: native-token pools and wrapped-token pools are listed separately (e.g. ```ETH_USDC``` and ```WETH_USDC```). The listed pools include pools on common fee/tick spacing combinations (0.01%/1, 0.02%/4, 0.03%/6, 0.04%/8, 0.05%/10, 0.3%/60, 1%/200), as well as pools with custom fees and spacings: the PoolIds of Uniswap V4 pools are obtained from the token's pool list on GeckoTerminal (top 40 sorted by volume and liquidity), then the PoolKey is looked up on-chain via PositionManager's ```poolKeys``` and the PoolId is verified, keeping only pools without hooks (e.g. the CASHCAT/USDG 0.269% pool with spacing 54 on Robinhood). There is no upper limit on fees, so high-fee pools such as 2% are also listed. When both the token and the quote currency are routing tokens (wrapped native tokens and stablecoins such as USDC and USDT, e.g. ```lp.pools("ETH", "USDC")```), only common combinations are listed; query results are cached for 1 hour; when GeckoTerminal is temporarily unavailable (e.g. rate-limited), only common combinations are listed and it is retried after 5 minutes. The list may still miss pools: pools not indexed by GeckoTerminal or not in the top 40, and pools for which no position has ever been created on PositionManager (```poolKeys``` cannot find the PoolKey), will not be listed. For hookless pools outside the list, the PoolId can be passed directly to ```lp.pool``` or ```lp.plan``` (```pool``` parameter), provided likewise that its PoolKey can be found on PositionManager.
 
-The KyberSwap and 1inch exchange objects (aggregators) have no LP commands; calls fail with ```LP functions are not available for KyberSwap on Base```.
+PancakeSwap Infinity CL: only pools with fees not exceeding 1% are listed; the listed pools are those collected from recent on-chain trades during swap routing, as well as pools used by this process. Other pools can be passed directly by PoolId to ```lp.pool``` or ```lp.plan```.
+
+GeckoTerminal data is cached in-process for 5 minutes and shared by ```lp.select``` and ```lp.plan```; when rate-limited, it waits briefly and retries once; if it still fails, the corresponding fields are ```null```.
+
+KyberSwap and 1inch exchange objects (aggregators) do not support LP commands; calling them raises the error ```LP functions are not available for KyberSwap on Base```.
 
 See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("lp.select")`, `exchange.IO("lp.pool")`, `exchange.IO("lp.plan")`, `exchange.IO("lp.positions")`
 
@@ -30986,46 +31008,48 @@ Forms:
 
 - `exchange.IO("lp.select", ...)`
 
-Picks an LP pool by rule: the pool with the largest 24h volume among those with enough liquidity, or the pool of a given fee tier.
+Automatically selects an LP pool by rule: chooses the pool with the highest 24h trading volume among pools with sufficient liquidity, or the pool with a specified fee tier.
 
 Parameters:
 
-- `k` (string, required): Set to ```lp.select``` to pick a pool.
-- `token` (string, required): Token name or contract address, such as ```ETH```.
-- `budget` (number, required): Budget in the quote token, which sets the liquidity threshold: a pool's TVL must be at least max($5000, budget).
-- `options` (object, optional): Selection options ```{quote, fee, exact, protocol, tickSpacing}```, all optional; see the remarks.
+- `k` (string, required): Fixed as ```lp.select```, used to select a pool.
+- `token` (string, required): Token name or contract address, e.g. ```ETH```.
+- `budget` (number, required): Budget, denominated in the quote currency, used to set the liquidity threshold: the pool's TVL must be at least the greater of 5,000 USD and the budget.
+- `options` (object, optional): Pool selection criteria ```{quote, fee, exact, protocol, tickSpacing}```. Every field is optional; see the remarks for details.
 
-Returns (object / null value): The chosen pool: an item of ```lp.pools``` plus ```reason``` (why it was chosen). Null with an error when no pool has liquidity, when the fee tier does not exist (with ```exact``` ```true```), and so on.
+Returns (object / null value): The selected pool: one entry from the ```lp.pools``` result, plus a ```reason``` field (why it was selected). Returns null and reports an error when no pool has liquidity, when the specified fee tier does not exist (with ```exact``` set to ```true```), and in similar cases.
 
-Pick an ETH/USDC pool, then pick one among the V4 pools only.
+Select an ETH/USDC pool, then separately select one among V4 pools.
 
 ```javascript
 function main() {
     var p = exchange.IO("lp.select", "ETH", 1000, {quote: "USDC"})
     if (!p) {
-        Log("Selection failed:", GetLastError())
+        Log("Pool selection failed:", GetLastError())
         return
     }
-    Log("Chosen:", p.protocol, p.id, "fee:", p.feeRate, "reason:", p.reason)
-    // V4 pools only (infinity on PancakeSwap, slipstream etc. on Aerodrome and Velodrome)
+    Log("Selected:", p.protocol, p.id, "Fee rate:", p.feeRate, "Reason:", p.reason)
+    // Select only among V4 pools (use infinity for PancakeSwap, slipstream etc. for Aerodrome and Velodrome)
     var v4 = exchange.IO("lp.select", "ETH", 1000, {quote: "USDC", protocol: "v4"})
     Log("V4 pool:", v4 ? v4.id : GetLastError())
 }
 ```
 
-Keys of ```options```:
+Fields of ```options```:
 
 | Key | Description |
 | - | - |
-| ```quote``` | Quote token such as ```USDC```; when omitted, pools against the chain's wrapped native token, USDC and USDT are all compared |
-| ```fee``` | Preferred fee tier in millionths, such as ```500``` |
-| ```exact``` | ```true``` uses only the fee tier given in ```fee``` |
-| ```protocol``` | Pool type, a string or an array: ```v3``` and ```v4``` on Uniswap, ```v3``` and ```infinity``` on PancakeSwap, ```slipstream```, ```slipstream2```, ```volatile``` and ```stable``` on Aerodrome and Velodrome |
-| ```tickSpacing``` | Only pools with this tick spacing (mainly for Slipstream, whose pools are told apart by tick spacing) |
+| ```quote``` | Quote currency, e.g. ```USDC```; if omitted, pools pairing the token with the chain's wrapped native token, USDC or USDT are all compared |
+| ```fee``` | Preferred fee tier, in millionths, e.g. ```500``` |
+| ```exact``` | When ```true```, only the fee tier given by ```fee``` is used |
+| ```protocol``` | Pool type, a string or an array: ```v3``` or ```v4``` for Uniswap; ```v3``` or ```infinity``` for PancakeSwap; ```slipstream```, ```slipstream2```, ```volatile``` or ```stable``` for Aerodrome and Velodrome |
+| ```tickSpacing``` | Only selects pools with this tick spacing (mainly for Slipstream, whose pools are distinguished by tick spacing) |
 
-The rule: empty pools and pools not matching ```protocol``` or ```tickSpacing``` are dropped first; with ```fee```, the pool of that tier is chosen when it meets the liquidity threshold (```reason``` ```fee tier 500 requested```), and with ```exact``` ```true``` it is chosen even below the threshold, failing when no pool has that tier; otherwise, among pools whose TVL is at least max($5000, budget), the one with the largest 24h volume (```largest 24h volume among pools with enough liquidity```), or the largest TVL without volume data; when no pool meets the threshold, the largest TVL, as ```reason``` says.
+Selection rules: first, empty pools and pools that do not match ```protocol``` or ```tickSpacing``` are excluded. If ```fee``` is specified, the pool with that fee tier is selected if it meets the liquidity threshold (```reason``` is ```fee tier 500 requested```); with ```exact``` set to ```true``` it is selected even if it does not meet the threshold; if no pool with that fee tier exists, an error is reported. Otherwise, among pools whose TVL is at least the greater of 5,000 USD and the budget, the one with the highest 24h trading volume is selected (```largest 24h volume among pools with enough liquidity```); if there is no volume data, the pool with the highest TVL is selected. If no pool meets the threshold, the pool with the highest TVL is selected and this is stated in ```reason```.
 
-```exchange.IO("lp.plan", ...)``` without ```pool``` picks a pool by the same rule (with ```fee``` and ```tickSpacing``` from the plan parameters; on Aerodrome and Velodrome a plan with a ```range``` picks among Slipstream pools only). To add liquidity to a V4/Infinity CL pool on Uniswap or PancakeSwap, pick it with ```protocol``` first and pass its ```id``` as the plan's ```pool```.
+The candidate pools are the pools listed by ```lp.pools``` (see the ```lp.pools``` page for where Uniswap V4 pools come from and when some may be missing). To use a pool not on that list, pass its PoolId directly as the ```pool``` of ```lp.plan```.
+
+When ```exchange.IO("lp.plan", ...)``` is called without ```pool```, it selects a pool by the same rules (```fee``` and ```tickSpacing``` are taken from the plan parameters; for Aerodrome and Velodrome, if ```range``` is specified, only Slipstream pools are considered). To open a position in a V4/Infinity CL pool on Uniswap or PancakeSwap, first select the pool with ```protocol```, then pass its ```id``` as the plan's ```pool```.
 
 See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("lp.pools")`, `exchange.IO("lp.plan")`, `exchange.IO("lp.pool")`
 
@@ -31039,16 +31063,16 @@ Forms:
 
 - `exchange.IO("lp.pool", ...)`
 
-Queries a pool's live state: both tokens, fee, tick spacing, current tick, price and liquidity.
+Queries the real-time state of a single pool, including its two tokens, fee tier, tick spacing, current tick, price and liquidity.
 
 Parameters:
 
-- `k` (string, required): Set to ```lp.pool``` to query a pool.
-- `poolId` (string, required): Pool ID: the pool contract address for V3, Slipstream and basic pools, the PoolId (```0x``` plus 64 hex digits) for V4/Infinity CL; take it from ```id``` of ```lp.pools``` or ```lp.select```.
+- `k` (string, required): Fixed as ```lp.pool```, indicating a pool query.
+- `poolId` (string, required): Pool ID: for V3, Slipstream and basic pools it is the pool contract address; for V4/Infinity CL it is the PoolId (```0x``` followed by 64 hexadecimal characters). It can be taken from the ```id``` field in the results returned by ```lp.pools``` or ```lp.select```.
 
-Returns (object / null value): ```{id, protocol, currency0, currency1, token0, token1, fee, tickSpacing, tick, sqrtPriceX96, price0, price1, liquidity}```; see the remarks for the fields. Null with an error when the pool does not exist.
+Returns (object / null value): ```{id, protocol, currency0, currency1, token0, token1, fee, tickSpacing, tick, sqrtPriceX96, price0, price1, liquidity}```; see the remarks for a description of each field. If the pool does not exist, a null value is returned and an error is reported.
 
-Look at the token order and prices of the chosen pool.
+Inspect the token order and price of the selected pool.
 
 ```javascript
 function main() {
@@ -31064,11 +31088,15 @@ function main() {
 }
 ```
 
-The pool is ordered by the contract's ```token0``` and ```token1``` (the smaller address is ```token0```), which need not match a pair's base and quote: ```token0``` and ```token1``` are ```{address, decimals, symbol}```, ```currency0``` and ```currency1``` the two addresses (the native coin is the zero address in V4/Infinity CL pools); ```price0``` is token1 per token0 and ```price1``` token0 per token1; ```sqrtPriceX96``` and ```liquidity``` are the pool's raw values as decimal strings.
+Pools are ordered by ```token0``` and ```token1``` as defined in the contract (the token with the smaller address is ```token0```), which does not necessarily match the base currency and quote currency of the trading pair: ```token0``` and ```token1``` are ```{address, decimals, symbol}```, while ```currency0``` and ```currency1``` are the addresses of the two tokens (in V4/Infinity CL pools, the native coin is the zero address); ```price0``` is the amount of token1 that 1 token0 can be swapped for, and ```price1``` is the amount of token0 that 1 token1 can be swapped for; ```sqrtPriceX96``` and ```liquidity``` are decimal strings of the pool's raw values.
 
-Uniswap and PancakeSwap: V3 pools must come from this exchange's factory (```pool … not found``` when there is no pool at the address); V4/Infinity CL pools must be hookless, Uniswap V4 knows pools that have had positions on the PositionManager or were listed by ```lp.pools```, and any initialized PancakeSwap Infinity CL pool can be looked up by its PoolId.
+Uniswap, PancakeSwap: V3 only supports pools created by this exchange's factory contract; if no pool exists at the address, ```pool … not found``` is reported. V4/Infinity CL only supports pools without hooks.
 
-Aerodrome and Velodrome: the result also has the gauge data of ```lp.pools``` (```gauge```, ```gaugeAlive```, ```stakedShare```, ```rewardsPerDay```, ```rewardsPerDayUsd```, ```rewardAprPct```; ```rewardAprPct``` uses the same TVL as ```lp.pools``` and is the same jumpy instantaneous figure, see the ```lp.pools``` page); basic pools also have the reserves ```reserve0``` and ```reserve1``` and the LP token supply ```lpSupply```.
+Uniswap V4: the pool does not need to appear in ```lp.pools```. Since V4's PoolManager does not store the PoolKey, a query by PoolId performs a reverse lookup through the PositionManager's ```poolKeys```, so pools that have had positions on the PositionManager or that were once listed by ```lp.pools``` can be found; pools in which no one has ever opened a position through the PositionManager cannot be found, and ```pool … not found``` is reported. There is no cap on the fee (V4 static fees can be as high as 100%), so high-fee pools such as 2% can likewise be queried and have positions opened in them.
+
+PancakeSwap Infinity CL: any initialized pool can be found by PoolId, but only pools with a fee of no more than 1% are supported; if the fee exceeds this, ```is not initialized or its fee is above 1%``` is reported.
+
+Aerodrome, Velodrome: the result additionally includes gauge information (same as ```lp.pools```: ```gauge```, ```gaugeAlive```, ```stakedShare```, ```rewardsPerDay```, ```rewardsPerDayUsd```, ```rewardAprPct```; ```rewardAprPct``` uses the same TVL calculation as ```lp.pools``` and is likewise an instantaneous value that may fluctuate significantly; see the ```lp.pools``` page for details); basic pools additionally include the reserves ```reserve0``` and ```reserve1``` and the total LP token supply ```lpSupply```.
 
 See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("lp.pools")`, `exchange.IO("lp.ticks")`, `exchange.IO("lp.plan")`
 
