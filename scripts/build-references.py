@@ -14,10 +14,10 @@ Inputs (all public or in the platform's own repositories):
        fmz/references/rest-api.md (the English user guide's "Extended API Interface" section)
   - MCP tool table: dumped from the server (`mcpToolTable`, JSON with scope + mcp.Tool)
         → fmz/references/tools.md
-  - talib descriptions: botvs misc/helper/talib/api_gen.js (`talibInfo`)   → fmz/references/talib.md
-  - Pine built-ins: botvs backtest/pinescript/src/lib_*.js (`scope.register`) → fmz/references/pine-builtins.md
-  - MyLanguage dictionary: botvs misc/helper/my/trans_dic.txt            → fmz/references/mylanguage-functions.md
-  - Declaration files are copied verbatim from botvs misc/helper/gen_helper/ (js .d.ts, python .pyi,
+  - talib descriptions: fmz/server tools/helper/talib/api_gen.js (`talibInfo`)        → fmz/references/talib.md
+  - Pine built-ins: fmz/server langs/pine-runtime/src/lib_*.js (`scope.register`)  → fmz/references/pine-builtins.md
+  - MyLanguage dictionary: fmz/server tools/helper/my/trans_dic.txt                 → fmz/references/mylanguage-functions.md
+  - Declaration files are copied verbatim from fmz/server tools/helper/gen_helper/ (js .d.ts, python .pyi,
     rust types.rs) and fmz/client/sdk/docs/typings/js/ (newest .d.ts, ctx.d.ts, EVENTS.md).
 
 Usage:
