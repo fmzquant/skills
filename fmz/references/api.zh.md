@@ -34091,6 +34091,7 @@ function main() {
 - 下单附加参数原样传给OKX DEX的兑换接口（例如```slippagePercent```覆盖本单滑点）；Solana上的兑换不带```gasLevel```，改为自动设置```computeUnitPrice```、```computeUnitLimit```，也可以在附加参数中指定。
 - EVM链上花费ERC-20代币（非原生币）的兑换，下单前自动检查授权额度，不足时先发送无限额度的授权交易并等待上链；检查额度需要该链的RPC，没有用```exchange.IO("rpc", 链号, url)```配置时下单报错。
 - ```exchange.GetOrder()```按交易哈希查询OKX的兑换记录，数量按订单ID中品种代码的第一个代币（基础币）统一口径，买卖一致：换到基础币的是买单、花出基础币的是卖单（```Type```）；```Amount```是花出的代币数量（买单是花费的计价币，同下单时的```amount```）；```DealAmount```是成交的基础币数量（买单为买到的、卖单为卖出的）；```AvgPrice```是计价币÷基础币。```DealAmount```与```AvgPrice```只在兑换成功后给出，失败或未完成时为0；交易尚未被索引时状态为未完成。
+- Solana上OKX的兑换记录不给到账代币的数量，```exchange.GetOrder()```改从链上交易读取（钱包在这笔交易前后的余额差，节点为```exchange.IO("rpc", "501", url)```设置的，缺省公共主网节点）；节点还没索引到这笔交易时按挂单中报，下次轮询再取。
 - 请求OKX接口遇到限频（HTTP 429，错误码50011）时自动等待1、2、4秒重试，最多3次，仍失败才报错。
 - 链上没有订单簿和挂单：```exchange.GetDepth()```、```exchange.GetOrders()```、```exchange.CancelOrder()```等函数报错并返回空值。
 - ```exchange.GetTickers()```返回以太坊（链号1）上24小时成交量排行榜中的代币，不是全部代币；```exchange.GetMarkets()```列出以太坊上可兑换的代币（同一条链上重名的代币不列出）。
