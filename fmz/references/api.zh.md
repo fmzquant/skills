@@ -10938,16 +10938,16 @@ DBExec(sql)
 DBExec(sql, ...args)
 ```
 
-数据库接口函数。
+执行SQL语句，操作实盘数据库的数据库接口函数。
 
 Parameters:
 
-- `sql` (string, required): **sql**语句字符串。
-- `arg` (string / number / bool / 空值, optional): **sql**语句中```?```占位符对应的参数值，按顺序传入，```arg```参数可以传多个。仅```JavaScript```、```Python```支持，```Rust```的```DBExec()```只接受**sql**语句一个参数。
+- `sql` (string, required): 要执行的**sql**语句字符串。
+- `arg` (string / number / bool / 空值, optional): **sql**语句中```?```占位符对应的参数值，按顺序传入，可传入多个```arg```参数。仅```JavaScript```、```Python```支持该参数，```Rust```的```DBExec()```只接受**sql**语句这一个参数。
 
-Returns (object): SQL语句的执行结果：```columns```为列名数组，```values```为各行数据组成的二维数组，例如```{"columns":["TS","CLOSE"],"values":[[1518970320000,100]]}```；结构见`DBExec-return`。
+Returns (object): SQL语句的执行结果：```columns```为列名数组，```values```为由各行数据组成的二维数组，例如```{"columns":["TS","CLOSE"],"values":[[1518970320000,100]]}```；结构详见`DBExec-return`。
 
-支持内存数据库，对于```DBExec```函数的参数，如果**sql**语句是以```:```开头则在内存数据库中操作，不写文件速度更快。适合不需要持久化保存的数据库操作，例如。
+支持内存数据库：调用```DBExec```函数时，如果**sql**语句以```:```开头，则在内存数据库中执行操作。由于不写入文件，执行速度更快，适用于无需持久化保存的数据库操作，例如：
 
 ```javascript
 function main() {
@@ -10963,7 +10963,7 @@ function main() {
     var ret = DBExec(strSql)
     Log(ret)
 
-    // 增加一条数据
+    // 插入一条数据
     Log(DBExec(":INSERT INTO TEST_TABLE (TS, HIGH, OPEN, LOW, CLOSE, VOLUME) VALUES (1518970320000, 100, 99.1, 90, 100, 12345.6);"))
 
     // 查询数据
@@ -10988,7 +10988,7 @@ def main():
     ret = DBExec(strSql)
     Log(ret)
 
-    # 增加一条数据
+    # 插入一条数据
     Log(DBExec(":INSERT INTO TEST_TABLE (TS, HIGH, OPEN, LOW, CLOSE, VOLUME) VALUES (1518970320000, 100, 99.1, 90, 100, 12345.6);"))
 
     # 查询数据
@@ -11010,7 +11010,7 @@ fn main() {
     let ret = DBExec(&strSql);
     Log!(format!("{:?}", ret));
 
-    // 增加一条数据
+    // 插入一条数据
     Log!(format!("{:?}", DBExec(":INSERT INTO TEST_TABLE (TS, HIGH, OPEN, LOW, CLOSE, VOLUME) VALUES (1518970320000, 100, 99.1, 90, 100, 12345.6);")));
 
     // 查询数据
@@ -11018,7 +11018,7 @@ fn main() {
 }
 ```
 
-使用```DBExec()```函数创建表。
+使用```DBExec()```函数在数据库中创建数据表。
 
 ```javascript
 function main() {
@@ -11071,7 +11071,7 @@ fn main() {
 }
 ```
 
-表中记录的增删查改操作。
+对表中记录执行增、删、查、改操作。
 
 ```javascript
 function main() {
@@ -11086,16 +11086,16 @@ function main() {
     ].join("")
     Log(DBExec(strSql))
 
-    // 增加一条数据
+    // 插入一条记录
     Log(DBExec("INSERT INTO TEST_TABLE (TS, HIGH, OPEN, LOW, CLOSE, VOLUME) VALUES (1518970320000, 100, 99.1, 90, 100, 12345.6);"))
 
-    // 查询数据
+    // 查询记录
     Log(DBExec("SELECT * FROM TEST_TABLE;"))
 
-    // 修改数据
+    // 更新记录
     Log(DBExec("UPDATE TEST_TABLE SET HIGH=? WHERE TS=?", 110, 1518970320000))
 
-    // 删除数据
+    // 删除记录
     Log(DBExec("DELETE FROM TEST_TABLE WHERE HIGH=?", 110))
 }
 ```
@@ -11116,16 +11116,16 @@ def main():
         strSql += arr[i]
     Log(DBExec(strSql))
 
-    # 增加一条数据
+    # 插入一条记录
     Log(DBExec("INSERT INTO TEST_TABLE (TS, HIGH, OPEN, LOW, CLOSE, VOLUME) VALUES (1518970320000, 100, 99.1, 90, 100, 12345.6);"))
 
-    # 查询数据
+    # 查询记录
     Log(DBExec("SELECT * FROM TEST_TABLE;"))
 
-    # 修改数据
+    # 更新记录
     Log(DBExec("UPDATE TEST_TABLE SET HIGH=? WHERE TS=?", 110, 1518970320000))
 
-    # 删除数据
+    # 删除记录
     Log(DBExec("DELETE FROM TEST_TABLE WHERE HIGH=?", 110))
 ```
 
@@ -11143,24 +11143,25 @@ fn main() {
     let strSql = arr.join("");
     Log!(format!("{:?}", DBExec(&strSql)));
 
-    // 增加一条数据
+    // 插入一条记录
     Log!(format!("{:?}", DBExec("INSERT INTO TEST_TABLE (TS, HIGH, OPEN, LOW, CLOSE, VOLUME) VALUES (1518970320000, 100, 99.1, 90, 100, 12345.6);")));
 
-    // 查询数据
+    // 查询记录
     Log!(format!("{:?}", DBExec("SELECT * FROM TEST_TABLE;")));
 
-    // 修改数据，Rust 的 DBExec() 函数只接受单个SQL语句字符串参数，不支持 ? 占位符传参，参数值直接写在语句中
+    // 更新记录：Rust 版 DBExec() 函数仅接受单个 SQL 语句字符串参数，不支持 ? 占位符传参，参数值需直接写入语句中
     Log!(format!("{:?}", DBExec("UPDATE TEST_TABLE SET HIGH=110 WHERE TS=1518970320000;")));
 
-    // 删除数据
+    // 删除记录
     Log!(format!("{:?}", DBExec("DELETE FROM TEST_TABLE WHERE HIGH=110;")));
 }
 ```
 
-- 函数```DBExec()```通过传入参数，可以操作实盘数据库（SQLite数据库）。
-- 实现对实盘数据库中数据的增、删、查、改等操作，支持**SQLite**语法。
-- 实盘数据库中系统保留表：```kvdb```、```cfg```、```log```、```profit```、```chart```，切勿对这些表进行操作。
-- 目前不支持**事务**，不建议执行此类操作，会引起系统中的冲突。
+- 函数```DBExec()```通过传入参数来操作实盘数据库（SQLite数据库）。
+- 支持对实盘数据库中的数据进行增、删、查、改等操作，支持**SQLite**语法。
+- 非查询语句可一次写入多条，以分号分隔（例如一次创建多张表及其索引），并按顺序逐条执行；```?```占位符的参数按顺序依次分配给各条语句，函数返回最后一条语句的执行结果。若某条语句执行出错，函数会报错，但该语句之前的语句已执行完成。
+- 实盘数据库中的系统保留表包括：```kvdb```、```cfg```、```log```、```profit```、```chart```，切勿对这些表进行操作。
+- 目前不支持**事务**，不建议执行事务相关操作，否则会引起系统冲突。
 - ```DBExec()```函数仅支持实盘。
 
 See also: `_G`

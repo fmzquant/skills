@@ -11052,16 +11052,16 @@ DBExec(sql)
 DBExec(sql, ...args)
 ```
 
-Database interface function.
+Executes SQL statements against the live trading database.
 
 Parameters:
 
-- `sql` (string, required): The **sql** statement string.
-- `arg` (string / number / bool / null value, optional): The values for the ```?``` placeholders in the **sql** statement, passed in order; multiple ```arg``` parameters can be passed. Only supported in ```JavaScript``` and ```Python```; in ```Rust```, ```DBExec()``` accepts only the **sql** statement.
+- `sql` (string, required): The **sql** statement string to execute.
+- `arg` (string / number / bool / null value, optional): Parameter values for the ```?``` placeholders in the **sql** statement, passed in order. Multiple ```arg``` parameters can be passed. Only ```JavaScript``` and ```Python``` support this parameter. In ```Rust```, ```DBExec()``` takes only one parameter, the **sql** statement.
 
-Returns (object): The result of the SQL statement: ```columns``` is the array of column names and ```values``` a two-dimensional array of rows, for example ```{"columns":["TS","CLOSE"],"values":[[1518970320000,100]]}```; see `DBExec-return`.
+Returns (object): The result of the SQL statement: ```columns``` is an array of column names, and ```values``` is a two-dimensional array of row data, for example ```{"columns":["TS","CLOSE"],"values":[[1518970320000,100]]}```. For the full structure, see `DBExec-return`.
 
-Supports in-memory databases. For the parameter of the ```DBExec``` function, if the **sql** statement begins with ```:```, the operation is executed in the in-memory database; since there is no need to write to a file, it is faster. This approach is suitable for database operations that do not require persistent storage, for example.
+Supports in-memory databases: when calling the ```DBExec``` function, if the **sql** statement starts with ```:```, the operation runs in the in-memory database. Because nothing is written to a file, execution is faster. This suits database operations that don't need persistent storage, for example:
 
 ```javascript
 function main() {
@@ -11077,10 +11077,10 @@ function main() {
     var ret = DBExec(strSql)
     Log(ret)
 
-    // Add a record
+    // Insert a record
     Log(DBExec(":INSERT INTO TEST_TABLE (TS, HIGH, OPEN, LOW, CLOSE, VOLUME) VALUES (1518970320000, 100, 99.1, 90, 100, 12345.6);"))
 
-    // Query data
+    // Query the data
     Log(DBExec(":SELECT * FROM TEST_TABLE;"))
 }
 ```
@@ -11102,10 +11102,10 @@ def main():
     ret = DBExec(strSql)
     Log(ret)
 
-    # Add a record
+    # Insert a record
     Log(DBExec(":INSERT INTO TEST_TABLE (TS, HIGH, OPEN, LOW, CLOSE, VOLUME) VALUES (1518970320000, 100, 99.1, 90, 100, 12345.6);"))
 
-    # Query data
+    # Query the data
     Log(DBExec(":SELECT * FROM TEST_TABLE;"))
 ```
 
@@ -11124,15 +11124,15 @@ fn main() {
     let ret = DBExec(&strSql);
     Log!(format!("{:?}", ret));
 
-    // Add a record
+    // Insert a record
     Log!(format!("{:?}", DBExec(":INSERT INTO TEST_TABLE (TS, HIGH, OPEN, LOW, CLOSE, VOLUME) VALUES (1518970320000, 100, 99.1, 90, 100, 12345.6);")));
 
-    // Query data
+    // Query the data
     Log!(format!("{:?}", DBExec(":SELECT * FROM TEST_TABLE;")));
 }
 ```
 
-Use the ```DBExec()``` function to create a data table.
+Use the ```DBExec()``` function to create a data table in the database.
 
 ```javascript
 function main() {
@@ -11185,7 +11185,7 @@ fn main() {
 }
 ```
 
-Perform insert, delete, query, and update operations on records in a data table.
+Perform insert, delete, query and update operations on records in a table.
 
 ```javascript
 function main() {
@@ -11203,13 +11203,13 @@ function main() {
     // Insert a record
     Log(DBExec("INSERT INTO TEST_TABLE (TS, HIGH, OPEN, LOW, CLOSE, VOLUME) VALUES (1518970320000, 100, 99.1, 90, 100, 12345.6);"))
 
-    // Query data
+    // Query records
     Log(DBExec("SELECT * FROM TEST_TABLE;"))
 
-    // Update data
+    // Update a record
     Log(DBExec("UPDATE TEST_TABLE SET HIGH=? WHERE TS=?", 110, 1518970320000))
 
-    // Delete data
+    // Delete records
     Log(DBExec("DELETE FROM TEST_TABLE WHERE HIGH=?", 110))
 }
 ```
@@ -11233,13 +11233,13 @@ def main():
     # Insert a record
     Log(DBExec("INSERT INTO TEST_TABLE (TS, HIGH, OPEN, LOW, CLOSE, VOLUME) VALUES (1518970320000, 100, 99.1, 90, 100, 12345.6);"))
 
-    # Query data
+    # Query records
     Log(DBExec("SELECT * FROM TEST_TABLE;"))
 
-    # Update data
+    # Update a record
     Log(DBExec("UPDATE TEST_TABLE SET HIGH=? WHERE TS=?", 110, 1518970320000))
 
-    # Delete data
+    # Delete records
     Log(DBExec("DELETE FROM TEST_TABLE WHERE HIGH=?", 110))
 ```
 
@@ -11260,26 +11260,23 @@ fn main() {
     // Insert a record
     Log!(format!("{:?}", DBExec("INSERT INTO TEST_TABLE (TS, HIGH, OPEN, LOW, CLOSE, VOLUME) VALUES (1518970320000, 100, 99.1, 90, 100, 12345.6);")));
 
-    // Query data
+    // Query records
     Log!(format!("{:?}", DBExec("SELECT * FROM TEST_TABLE;")));
 
-    // Update data. Rust's DBExec() function only accepts a single SQL statement string argument and does not support the ? placeholder for passing parameters; parameter values are written directly in the statement
+    // Update a record: the Rust DBExec() function accepts only a single SQL statement string and does not support ? placeholders for parameters, so parameter values must be written directly into the statement
     Log!(format!("{:?}", DBExec("UPDATE TEST_TABLE SET HIGH=110 WHERE TS=1518970320000;")));
 
-    // Delete data
+    // Delete records
     Log!(format!("{:?}", DBExec("DELETE FROM TEST_TABLE WHERE HIGH=110;")));
 }
 ```
 
-- By passing an argument to the ```DBExec()``` function, you can operate on the live trading database (SQLite database).
-
-  - It supports insert, delete, query, and update operations on data in the live trading database, and supports **SQLite** syntax.
-
-  - The system-reserved tables in the live trading database include: ```kvdb```, ```cfg```, ```log```, ```profit```, ```chart```. Please do not operate on these tables.
-
-  - **Transactions** are currently not supported, and such operations are not recommended, as they may cause system conflicts.
-
-  - The ```DBExec()``` function only supports live trading.
+- The ```DBExec()``` function operates on the live trading database (an SQLite database) using the parameters passed to it.
+- It supports adding, deleting, querying and updating data in the live trading database, using **SQLite** syntax.
+- Multiple non-query statements can be written in a single call, separated by semicolons (for example, to create several tables and their indexes at once). They are executed one by one, in order. Parameters for the ```?``` placeholders are assigned to the statements in order, and the function returns the result of the last statement. If a statement fails, the function throws an error, but the statements before it have already been executed.
+- The system-reserved tables in the live trading database are ```kvdb```, ```cfg```, ```log```, ```profit``` and ```chart```. Never operate on these tables.
+- **Transactions** are not currently supported. Do not run transaction-related operations, because they will cause system conflicts.
+- The ```DBExec()``` function is only supported in live trading.
 
 See also: `_G`
 
