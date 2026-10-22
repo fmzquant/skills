@@ -12854,22 +12854,22 @@ ctx.poll(streams, timeout)
 ctx.poll(options, timeout)
 ```
 
-Takes the next push event from the current thread's subscriptions, with an optional wait timeout. Events come from subscriptions the current thread created with `ctx.subscribe`. A strategy can handle each event by its ```channel``` (or ```kind```).
+Retrieves the next push event subscribed to by the current thread, with an optional wait timeout. Events come from subscriptions created by the current thread via `ctx.subscribe`. The strategy can handle each event according to its ```channel``` (or ```kind```) field.
 
 Parameters:
 
-- `streams` (object / number / array, optional): The event streams to read from: a `Subscription` object or an event stream ID, or an array of them. Arrays can mix both kinds and can be nested, so the array returned by a batch subscription can be passed in directly. Omit this argument or pass ```[]``` to read all event streams the current thread subscribes to, which is the most common usage. Built-in event streams: ```ctx.STREAM_TIMER``` (timer) and ```ctx.STREAM_STATUS``` (gateway status).
-- `timeout` (number, optional): Wait timeout in milliseconds. Must be a non-negative integer. If omitted, the call waits until an event arrives. ```0``` returns immediately without waiting. A positive number sets the maximum wait time, and the call returns a null value when it times out.
-- `options` (object, optional): An object of the form ```{streams, sources}```, supported only in ```JavaScript```. ```streams``` works as described above. ```sources``` is an array of the event sources to wait on. Possible values are ```engine``` (push events, the default), ```thread``` (thread messages), ```go``` (completion of concurrent tasks such as ```exchange.Go()```), ```dial``` (a ```Dial()``` connection is readable), ```task```, or ```all``` for all sources. In this form, the return value is wrapped as ```{source, event, seq, nano, queue}```, where ```event``` is the event content from the matching source.
+- `streams` (object / number / array, optional): The event streams to read: a `Subscription` object or an event stream ID, or an array of them. Mixed and nested arrays are supported, and the array returned by a batch subscription can be passed in directly. Omit this argument or pass ```[]``` to read all event streams subscribed to by the current thread. This is the most common usage. Built-in event streams: ```ctx.STREAM_TIMER``` (timer) and ```ctx.STREAM_STATUS``` (gateway status).
+- `timeout` (number, optional): The wait timeout in milliseconds. It must be a non-negative integer. If omitted, the call blocks until an event arrives. Pass ```0``` to return immediately without waiting. Pass a positive number to wait at most that long; on timeout, a null value is returned.
+- `options` (object, optional): An object in the form ```{streams, sources}```, supported only in ```JavaScript```. ```streams``` has the same meaning as above. ```sources``` is an array of event sources to wait on. Valid values are ```engine``` (push events, the default), ```thread``` (thread messages), ```go``` (completion of concurrent tasks such as ```exchange.Go()```), ```dial``` (a ```Dial()``` connection becomes readable), ```task```, or ```all``` (all sources). With this form, the return value is wrapped as ```{source, event, seq, nano, queue}```, where ```event``` is the event content from the corresponding source.
 
-Returns (object / null value): An event object; its fields are described below. Returns a null value when the call times out with no event.
+Returns (object / null value): The event object (its fields are described below). Returns a null value if the call times out with no event.
 
-Subscribe to 1-minute klines, process each bar only when it closes, and log gateway status changes.
+Subscribe to 1-minute K-lines, process each bar only when it closes, and log gateway status changes.
 
 ```javascript
 function onKline(ev) {
     if (ev.prefill) {
-        return                        // historical klines pushed on first subscription
+        return                        // Historical K-lines pushed on the initial subscription
     }
     if (ev.closed) {
         Log("closed bar", _D(ev.openTimeMs), "close:", ev.close, "volume:", ev.volume)
@@ -12901,7 +12901,7 @@ function main() {
 ```python
 def on_kline(ev):
     if ev.prefill:
-        return                        # historical klines pushed on first subscription
+        return                        # Historical K-lines pushed on the initial subscription
     if ev.closed:
         Log("closed bar", _D(ev.openTimeMs), "close:", ev.close, "volume:", ev.volume)
 
@@ -12931,7 +12931,7 @@ fn main() {
         match ctx::poll(&[], Some(5000)) {
             ctx::Polled::Event(ev) if ev.stream() == k1m.id() => {
                 if let Some(k) = ev.kline() {
-                    if !k.prefill && k.closed {        // skip historical klines pushed on first subscription
+                    if !k.prefill && k.closed {        // Skip historical K-lines pushed on the initial subscription
                         Log!("closed bar", _D(k.open_time), "close:", k.close, "volume:", k.volume);
                     }
                 } else if let Some(st) = ev.feed_status() {
@@ -12954,7 +12954,7 @@ fn main() {
 }
 ```
 
-Subscribe to the account's private stream: once the account snapshot is ready, read positions and balances, then process the incremental updates as they are pushed.
+Subscribe to the account's private data stream: once the account snapshot is ready, read the positions and balances, then apply incremental updates from pushed events.
 
 ```javascript
 function main() {
@@ -13031,7 +13031,7 @@ fn main() {
 }
 ```
 
-Subscribe to tickers for the entire market, and once a minute log the number of events received together with the receive-buffer counters from ```ctx.connectors()```, to check whether the strategy processes events fast enough to keep up with the market data push.
+Subscribes to tickers for the whole market and, once a minute, logs the number of events received along with the receive-buffer counters from ```ctx.connectors()```, so you can tell whether the strategy processes events fast enough to keep up with the market data feed.
 
 ```javascript
 function main() {
@@ -13106,59 +13106,72 @@ fn main() {
 }
 ```
 
-All events contain the following fields:
+All events have the following fields:
 
 | Field | Type | Description |
 | - | - | - |
-| kind | number | Event type: ```1``` ticker, bbo and tickers; ```3``` depth; ```4``` trade; ```5``` K-line; ```16``` order report; ```17``` position; ```18``` balance; ```32``` timer; ```33``` gateway status; ```35``` initialization status |
-| stream | number | The event stream that delivered the event: for events produced by a subscription, it is the ```id``` of the subscription object in this thread; gateway status events and timer events come from the built-in event streams ```ctx.STREAM_STATUS``` (```2```) and ```ctx.STREAM_TIMER``` (```1```), respectively |
-| type | string | ```data``` (market data, plus order reports, positions and balances from the private stream), ```status``` (gateway status, initialization status), ```timer``` (timer) |
-| channel | string | The channel of the subscription the event belongs to: ```ticker```, ```bbo```, ```tickers```, ```depth```, ```trade```, ```kline```; for private stream events it is ```orders```, ```positions```, ```balance```; for gateway status events it is ```gateway```, and for timer events it is ```timer```; for initialization status events, see below |
-| depth | number | Included only in depth events: the number of levels of the subscription the event belongs to (```0``` means the exchange's default number of levels) |
-| interval | number | Included only in K-line events and in initialization status events of K-line subscriptions: the K-line period, in seconds |
-| ex | number | The index of the account in ```exchanges```, which can be passed directly as the first argument of ```ctx.subscribe()```; ```-1``` for events that do not belong to any account |
-| symbol | string | Symbol code, e.g. ```BTC_USDT```, ```BTC_USDT.swap```; for ```tickers``` events it is the respective symbol of each entry; an empty string for balance events and for status events of the private stream |
+| kind | number | Event type: ```1``` ticker, bbo and tickers, ```3``` depth, ```4``` trade, ```5``` K-line, ```16``` order update, ```17``` position, ```18``` balance, ```32``` timer, ```33``` gateway status, ```35``` initialization status |
+| stream | number | The event stream that delivered the event: for events produced by a subscription, this is the ```id``` of the corresponding subscription object in the current thread; gateway status events and timer events come from the built-in event streams ```ctx.STREAM_STATUS``` (```2```) and ```ctx.STREAM_TIMER``` (```1```) respectively |
+| type | string | ```data``` (market data, plus order updates, positions and balances from the private stream), ```status``` (gateway status, initialization status), ```timer``` (timer) |
+| channel | string | Channel of the subscription the event belongs to: ```ticker```, ```bbo```, ```tickers```, ```depth```, ```trade```, ```kline```; private stream events are ```orders```, ```positions```, ```balance```; gateway status events are ```gateway```, and timer events are ```timer```; for initialization status events, see below |
+| depth | number | Depth events only: the number of levels of the subscription (```0``` means the exchange's default number of levels) |
+| interval | number | K-line events and initialization status events of K-line subscriptions only: K-line period, in seconds |
+| ex | number | Index of the account in ```exchanges```, which can be passed directly as the first argument of ```ctx.subscribe()```; ```-1``` for events that do not belong to any account |
+| symbol | string | Symbol code, e.g. ```BTC_USDT```, ```BTC_USDT.swap```; for ```tickers``` events, it is the respective symbol of each entry; empty string for balance events and private stream status events |
 | seq | number | Event sequence number, monotonically increasing |
-| ts | number | The time at which the docker received the data from the exchange (millisecond timestamp, including a fractional part); ```Date.now() - ev.ts``` is the docker's internal processing and event retrieval latency, excluding the network latency from the exchange to the docker |
+| time | number | Event time (millisecond timestamp): the exchange time when provided by the exchange, otherwise the docker's receive time (same as ```ts```); see below for how each event type sets this value |
+| ts | number | Time the docker received the exchange data (millisecond timestamp, with fractional part); ```Date.now() - ev.ts``` is the latency of the docker's internal processing and event retrieval, excluding network latency from the exchange to the docker |
 
-Additional fields for each event type:
+Additional fields by event type:
 
 | kind | Fields |
 | - | - |
-| 1 (ticker, bbo, tickers) | ```bid```, ```ask```, ```last```, ```bidQty```, ```askQty```, ```volume```, ```openInterest```, ```open```, ```high```, ```low```, ```time``` (exchange time, in milliseconds). When ```bbo``` has no last price, ```last``` is ```0```; when the market-wide push does not include bid/ask prices, ```bid``` and ```ask``` of ```tickers``` are ```0``` |
-| 3 (depth) | Contains no level fields; it only indicates that the order book has been updated. Level data is read via ```ev.book(n)```, see below |
-| 4 (trade) | ```px``` (price), ```qty``` (quantity), ```side``` (aggressor side ```buy```/```sell```, an empty string when not provided by the exchange), ```tradeId```, ```time``` (exchange trade time, in milliseconds) |
-| 5 (K-line) | ```open```, ```high```, ```low```, ```close```, ```volume```, ```openInterest```, ```intervalSec```, ```openTimeMs```, ```closed``` (whether the K-line has closed), ```prefill``` (whether it is a historical K-line pushed on the initial subscription) |
-| 16 (order report) | ```id``` (order ID), ```state``` (```acked```, ```partial```, ```filled```, ```canceled```, ```rejected```), ```px```, ```qty```, ```filledQty```, ```avgPx```, ```reason``` (rejection reason code, ```0``` means none), ```reasonText``` |
-| 17 (position) | ```side``` (```buy``` for long, ```sell``` for short), ```posSide``` (```long```, ```short``` in hedge mode, ```net``` in one-way mode), ```qty```, ```avgPx```, ```profit```, ```margin```, ```liqPx```, ```markPx```, ```leverage```, ```time```, ```snapshot``` |
-| 18 (balance) | ```asset``` (asset name), ```free``` (available), ```frozen``` (frozen), ```equity```, ```upnl```, ```margin```, ```time```, ```snapshot``` |
+| 1 (ticker, bbo, tickers) | ```bid```, ```ask```, ```last```, ```bidQty```, ```askQty```, ```volume```, ```openInterest```, ```open```, ```high```, ```low```. When ```bbo``` has no last price, ```last``` is ```0```; when the market-wide push does not include bid/ask prices, ```bid``` and ```ask``` of ```tickers``` are ```0``` |
+| 3 (depth) | No price level fields; only indicates that the order book has been updated. Level data is read via ```ev.book(n)```, see below |
+| 4 (trade) | ```px``` (price), ```qty``` (quantity), ```side``` (aggressor side ```buy```/```sell```, empty string if not provided by the exchange), ```tradeId``` |
+| 5 (K-line) | ```open```, ```high```, ```low```, ```close```, ```volume```, ```openInterest```, ```intervalSec```, ```openTimeMs```, ```closed``` (the K-line has closed), ```prefill``` (historical K-lines pushed on the initial subscription) |
+| 16 (order update) | ```id``` (order ID), ```state``` (```acked```, ```partial```, ```filled```, ```canceled```, ```rejected```), ```px```, ```qty```, ```filledQty```, ```avgPx```, ```reason``` (rejection reason code, ```0``` means none), ```reasonText``` |
+| 17 (position) | ```side``` (```buy``` for long, ```sell``` for short), ```posSide``` (```long```, ```short``` in hedge mode, ```net``` in one-way mode), ```qty```, ```avgPx```, ```profit```, ```margin```, ```liqPx```, ```markPx```, ```leverage```, ```snapshot``` |
+| 18 (balance) | ```asset``` (asset name), ```free``` (available), ```frozen``` (frozen), ```equity```, ```upnl```, ```margin```, ```snapshot``` |
 | 32 (timer) | ```timerId```, ```scheduledNs``` (a string when it exceeds the ```JavaScript``` safe integer range) |
-| 33 (gateway status) | ```status``` (```1``` connected normally, ```2``` disconnected, ```3``` degraded), ```detail``` |
+| 33 (gateway status) | ```status``` (```1``` connected, ```2``` disconnected, ```3``` degraded), ```detail``` |
 | 35 (initialization status) | ```channelCode``` (numeric code of the channel), ```intervalSec```, ```prefillStatus``` (```1``` ready, ```2``` failed), ```detail```, ```message``` (failure reason) |
 
-Prices and quantities are all real numbers, already converted according to the contract precision.
+Prices and quantities are real numbers, already converted according to contract precision.
 
-The ```tradeId``` of a trade event is always a string, in the same format as the trade IDs returned by `exchange.GetTrades`: numeric trade IDs from the exchange are represented as decimal strings, and other formats are kept as is; when the exchange does not provide a trade ID, it is a synthetic ID prefixed with ```syn:```; an empty string means the connector did not provide a trade ID.
+How ```time``` is set for each event type (in backtesting, both ```time``` and ```ts``` are the simulated backtest time):
 
-Depth events have an ```ev.book(n)``` method that reads the top ```n``` levels of the order book maintained by the subscription the event belongs to (when ```n``` is omitted, the subscription's depth level count is used). It returns ```{bids: [[price, qty], ...], asks: [[price, qty], ...]}```, where ```bids``` are sorted by price from high to low and ```asks``` from low to high, the same as the subscription object's `book` method. ```ev.book``` is a non-enumerable property, so it is not included in the result of ```JSON.stringify(ev)```. Calling it after the subscription has been unsubscribed throws an exception.
+| Event | time |
+| - | - |
+| ticker, bbo, tickers, trades, positions, balances | Exchange time; if the exchange does not provide it, the receive time (same as ```ts```) |
+| K-line | The open time of the bar, same as ```openTimeMs```, and consistent with the K-line ```Time``` returned by `exchange.GetRecords` |
+| Depth, order updates | Receive time (same as ```ts```); the exchange time of these two push types is currently not available |
+| Gateway status, initialization status | Same as ```ts``` |
+| Timer | Scheduled trigger time, using the same clock as ```ts``` (```ts``` is the actual trigger time) |
 
-Position events (```kind``` is ```17```) and balance events (```kind``` is ```18```) come from the ```private``` subscription. Each event is the complete current state of that position or asset, not an incremental update: a position ```qty``` of ```0``` means the position is closed (in one-way position mode, ```side``` is an empty string after closing), and a balance with both ```free``` and ```frozen``` at ```0``` means the asset has been fully cleared. The fields follow the same conventions as `exchange.GetAssets` and `exchange.GetPositions`. When the exchange does not push them, ```profit```, ```margin```, ```liqPx```, ```markPx```, ```leverage```, ```equity``` and ```upnl``` are absent (rather than ```0```). A ```snapshot``` of ```true``` means this is an account snapshot pushed when the subscription takes effect or after a reconnection. After the snapshot, an initialization status event whose ```channel``` is ```private``` follows on the same event stream.
+```ev.ts - ev.time``` can be used to estimate the latency from the exchange to the docker; it is only meaningful when ```time``` is the exchange time.
 
-The initialization status event (```kind``` is ```35```) shares the same event stream as the subscription it belongs to (same ```stream```), and its ```channel``` is that subscription's channel (```private``` for the status event of the private stream snapshot). It is used in the following cases: a K-line subscription has finished pushing the initial batch of historical K-lines, a ```private``` subscription has finished pushing the account snapshot (```prefillStatus``` is ```1```), or the subscription was rejected by the exchange or the connector (```prefillStatus``` is ```2```, ```message``` is the reason for the failure, and the channel can be any channel). Until the ready status arrives, do not treat the few real-time K-lines received so far as complete historical data.
+The ```tradeId``` of a trade event is always a string, in the same format as the trade IDs returned by `exchange.GetTrades`: numeric trade IDs from the exchange are converted to decimal strings, and other formats are kept as they are; when the exchange does not provide a trade ID, it is a synthetic ID starting with ```syn:```; an empty string means the connector did not provide a trade ID.
 
-```ctx.poll()``` only retrieves events subscribed by the current thread: the main thread and threads created by ```threading.Thread()``` (the standard library ```threading.Thread``` in ```Python```) each subscribe and retrieve on their own, and a filter that specifies another thread's subscription object or event stream ID never retrieves any events. When different threads subscribe to the same content, each receives its own copy. Gateway status events are sent to every thread that has subscriptions on that exchange, and timer events are sent only to the main thread.
+Depth events have an ```ev.book(n)``` method that reads the top ```n``` levels of the order book belonging to the subscription the event came from (when ```n``` is omitted, the subscribed depth is used). It returns ```{bids: [[price, qty], ...], asks: [[price, qty], ...]}```, where ```bids``` are sorted by price from high to low and ```asks``` from low to high, the same as the `book` method of the subscription object. ```ev.book``` is non-enumerable, so it is not included in the output of ```JSON.stringify(ev)```; calling it after the subscription has been unsubscribed throws an exception.
 
-Filtering with ```streams``` only means that this call retrieves just the specified event streams: unspecified events remain in this thread's queue and must eventually be drained by a call without a filter (```[]```). Order updates, position, balance, gateway status, initialization status and timer events are not overwritten when they are not retrieved in time; if nobody retrieves them they keep accumulating, up to 10240 events per thread, after which the oldest events are discarded.
+Position (```kind``` is ```17```) and balance (```kind``` is ```18```) events come from the ```private``` subscription. Each event is the complete current state of that position or asset, not an incremental update: a position ```qty``` of ```0``` means the position is closed (in one-way position mode, ```side``` is an empty string after closing), and a balance with both ```free``` and ```frozen``` equal to ```0``` means the asset has been fully cleared. The fields are consistent with `exchange.GetAssets` and `exchange.GetPositions`; ```profit```, ```margin```, ```liqPx```, ```markPx```, ```leverage```, ```equity``` and ```upnl``` are absent (rather than ```0```) when the exchange does not push them. ```snapshot``` being ```true``` indicates an account snapshot pushed when the subscription takes effect or after a reconnect; after the snapshot, an initialization status event with ```channel``` set to ```private``` follows on the same event stream.
 
-While waiting, ```Promise``` and ```setTimeout``` callbacks as well as reads and writes on WebSocket and TCP connections are still executed; when ```timeout``` is ```0```, one round of these tasks is also processed.
+An initialization status event (```kind``` is ```35```) shares the same event stream (same ```stream```) as the subscription it belongs to, and its ```channel``` is that subscription's channel (```private``` for the private stream snapshot status). It notifies of the following: a K-line subscription has finished pushing the initial batch of historical bars, a ```private``` subscription has finished pushing the account snapshot (```prefillStatus``` is ```1```), and a subscription was rejected by the exchange or connector (```prefillStatus``` is ```2```, ```message``` is the failure reason, and the channel can be any channel). Before receiving the ready status, do not treat the few real-time bars already received as complete historical data.
 
-In ```JavaScript``` and ```Rust```, ```ctx.poll()``` and `EventLoop` within the same thread retrieve events from the same event queue, so a thread should use only one of them. A ```JavaScript``` thread can use the ```options``` form to wait for push events, thread messages and other sources at the same time. In ```Python```, ```EventLoop()``` has its own separate queue and does not compete with ```ctx.poll()```.
+```ctx.poll()``` only retrieves events from subscriptions made by the current thread: the main thread and threads created with ```threading.Thread()``` (the standard library ```threading.Thread``` in ```Python```) each subscribe and retrieve on their own, and a filter that specifies another thread's subscription object or event stream ID will never receive any events. When different threads subscribe to the same content, each receives its own copy. Gateway status events are sent to every thread that has subscriptions on that exchange, while timer events are sent only to the main thread.
 
-Diagnosing consumption speed: the docker's buffer for receiving pushes from each exchange automatically expands from 1024 to 32768 events as the backlog grows. Once the limit is reached, market data events are discarded and the connector is told to throttle pushing other events. ```ctx.connectors()``` returns the list of loaded exchanges (the order corresponds to ```ev.ex```); each item contains the fields ```ex```, ```label```, ```name```, ```symbol```, ```interval```, ```orderIdScope``` and ```feed```. ```feed``` holds cumulative counters since the process started, ```{ticksDropped, backpressure, ringCapacity}```, which are, in order: the number of market data events discarded when the buffer was full, the number of times the connector was told to throttle pushing, and the current buffer capacity (in events). Rapid growth of these values indicates that the strategy processes events too slowly; check the processing time per event first. High-frequency subscriptions such as market-wide ```tickers``` should keep the default latest-data-only mode.
+Filtering with ```streams``` only means that this call retrieves events from those streams: unspecified events remain in the current thread's queue and must eventually be drained by a call without a filter (```[]```). Order update, position, balance, gateway status, initialization status and timer events are not overwritten when not retrieved in time; they keep accumulating if no one retrieves them, up to 10240 events per thread, beyond which the oldest events are discarded.
 
-In ```Python``` it is ```ctx.poll(streams=None, timeout_ms=None)```: when ```streams``` is ```None``` or ```[]```, it means all event streams subscribed by this thread; otherwise it is a subscription object, an event stream ID, a ```SubscriptionList```, or a (nested) list of them. When ```timeout_ms``` is ```None``` it waits indefinitely, when ```0``` it does not wait, and when a positive integer it is the maximum number of milliseconds to wait, returning ```None``` on timeout. Events are dictionaries (subclasses of ```dict```) with the same fields as ```JavaScript``` events, and both ```ev["kind"]``` and ```ev.kind``` work; depth events have the ```ev.book(n)``` method. After the live trading bot stops (including while ```onexit()``` is running), calling it throws ```StopError```, and a call that is waiting also throws this exception immediately. The ```options``` form is not supported (passing a dictionary throws ```TypeError```): thread messages and completion notifications of ```exchange.Go()``` are retrieved through ```EventLoop()``` and their respective objects. ```ctx.connectors()``` is the same as in ```JavaScript```, and ```ctx.STREAM_STATUS``` and ```ctx.STREAM_TIMER``` are also available.
+While waiting, ```Promise``` and ```setTimeout``` callbacks, as well as reads and writes on WebSocket and TCP connections, are still executed; when ```timeout``` is ```0```, one round of these tasks is also processed.
 
-In ```Rust```, the signature is ```ctx::poll(streams: &[u32], timeout_ms: Option<u64>) -> ctx::Polled```. For ```streams```, pass ```sub.id()``` or one of the built-in ```ctx::STREAM_TIMER``` and ```ctx::STREAM_STATUS```. An empty slice means every data stream this thread subscribes to. A timeout of ```None``` waits indefinitely. The return value is ```Polled::Event(ev)```, ```Polled::Empty``` (timed out), ```Polled::Stopped``` (the live trading bot has stopped) or ```Polled::Error(rc)```. In ```Rust```, events are raw structs. After you import ```sdk::ctx::EventExt```, you can read them by event type without writing ```unsafe``` code: ```ev.stream()```, ```ev.channel()```, ```ev.book(n)``` (depth events), and ```ev.ticker()```, ```ev.trade()```, ```ev.kline()```, ```ev.order()```, ```ev.position()```, ```ev.balance()```, ```ev.gateway()``` (gateway status) and ```ev.feed_status()``` (initialization status; when ```failed()``` is true, ```message``` holds the failure reason), which already convert values to real numbers. If the event type doesn't match, they return ```None```. Each field maps one-to-one to the event fields in ```JavaScript```. In ```Rust```, any thread can subscribe and call ```poll```, and each thread receives only the events it subscribed to. ```ctx::connectors()``` returns a JSON string with the same content.
+In ```JavaScript``` and ```Rust```, ```ctx.poll()``` and `EventLoop` within the same thread retrieve events from the same event queue, so a thread should use only one of them; a ```JavaScript``` thread can use the ```options``` form to wait simultaneously for push events, thread messages and other sources. In ```Python```, ```EventLoop()``` has its own separate queue and does not compete with ```ctx.poll()```.
+
+Consumption speed diagnostics: the buffer the docker uses to receive pushes for each exchange automatically expands from 1024 to 32768 entries depending on the backlog; once the limit is reached, market data events are discarded and the connector is asked to throttle pushes of other events. ```ctx.connectors()``` returns the list of loaded exchanges (in the order corresponding to ```ev.ex```); each entry contains the fields ```ex```, ```label```, ```name```, ```symbol```, ```interval```, ```orderIdScope``` and ```feed```, where ```feed``` holds cumulative counters since process start ```{ticksDropped, backpressure, ringCapacity}```, which are respectively: the number of market data entries discarded when the buffer was full, the number of times the connector was asked to throttle pushes, and the current buffer capacity (entries). Rapid growth in these values indicates that the strategy is processing events too slowly; first check the processing time of each event, and keep high-frequency subscriptions such as market-wide ```tickers``` in the default latest-only mode.
+
+The signature in ```Python``` is ```ctx.poll(streams=None, timeout_ms=None)```: when ```streams``` is ```None``` or ```[]```, it means all event streams subscribed by the current thread; otherwise it can be a subscription object, an event stream ID, a ```SubscriptionList```, or a (nested) list of them. When ```timeout_ms``` is ```None```, the call waits indefinitely; when it is ```0```, it does not wait; when it is a positive integer, it specifies the maximum wait time in milliseconds, and ```None``` is returned on timeout. Events are dictionaries (subclasses of ```dict```) with the same fields as ```JavaScript``` events; both ```ev["kind"]``` and ```ev.kind``` notations are supported. Depth events provide the ```ev.book(n)``` method. After the live trading bot stops (including during the execution of ```onexit()```), calling it raises a ```StopError```, and any call currently waiting also raises it immediately. The ```options``` form is not supported (passing a dictionary raises a ```TypeError```): thread messages and completion notifications of ```exchange.Go()``` must be obtained via ```EventLoop()``` and their respective objects. ```ctx.connectors()``` is the same as in ```JavaScript```, and ```ctx.STREAM_STATUS``` and ```ctx.STREAM_TIMER``` can also be used.
+
+The signature in ```Rust``` is ```ctx::poll(streams: &[u32], timeout_ms: Option<u64>) -> ctx::Polled```: ```streams``` takes ```sub.id()``` or the built-in ```ctx::STREAM_TIMER``` and ```ctx::STREAM_STATUS```; an empty slice means all event streams subscribed by the current thread, and ```None``` means waiting indefinitely. The return value is ```Polled::Event(ev)```, ```Polled::Empty``` (timeout), ```Polled::Stopped``` (the live trading bot has stopped), or ```Polled::Error(rc)```. Events in ```Rust``` are raw structs; after importing ```sdk::ctx::EventExt```, they can be read by event type without writing any ```unsafe``` code: ```ev.stream()```, ```ev.channel()```, ```ev.book(n)``` (depth events), as well as ```ev.ticker()```, ```ev.trade()```, ```ev.kline()```, ```ev.order()```, ```ev.position()```, ```ev.balance()```, ```ev.gateway()``` (gateway status), and ```ev.feed_status()``` (initialization status; when ```failed()```, ```message``` contains the failure reason), all already converted to floating-point numbers. When the event type does not match, ```None``` is returned; the fields correspond one-to-one with those of ```JavaScript``` events. ```ev.time()``` and ```ev.ts()``` (```f64```, in milliseconds) are the same as ```time``` and ```ts``` of ```JavaScript``` events and can be called on all events; the ```time``` field in each typed result is ```ev.time()```. Any thread in ```Rust``` can subscribe and ```poll```, and each thread only receives the events it has subscribed to. ```ctx::connectors()``` returns a JSON string with the same content.
 
 See also: `ctx.subscribe`, `Subscription`, `EventLoop`
 

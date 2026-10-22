@@ -170,7 +170,21 @@ while True:
 | `ex` | number | 账户在本次装载序列里的下标（`exchanges[i]` 的 i；无归属事件为 -1；余额与私有流状态事件不挂合约，按账户归属）。可**原样回传** `ctx.order/rest/raw` 的第一参数；label 取 `ctx.connectors()[ev.ex].label` |
 | `symbol` | string | 统一格式 `BASE_QUOTE[.contract]`（`BTC_USDT` 现货 / `.swap` 永续 / `.quarter` 季度） |
 | `seq` | number | 引擎全序号（同一实例内单调递增） |
-| `ts` | number | connector 收到原始报文的时刻；引擎自产事件为发布时间（UNIX 毫秒，带微秒小数；回测=虚拟钟）。`Date.now() - ev.ts` = 引擎+poll 延迟。交易所事件的时间不含交易所→本机网络延迟 |
+| `time` | number | 事件**发生**的时刻（UNIX 毫秒）：交易所给了时间就是交易所时间；交易所时间拿不到时为接收时间（同 `ts`）。各类事件的取法见下文对应小节 |
+| `ts` | number | 本机**收到**这条事件的时刻：connector 收到原始报文的时刻；引擎自产事件为发布时间（UNIX 毫秒，带微秒小数；回测=虚拟钟）。`Date.now() - ev.ts` = 引擎+poll 延迟；`ev.ts - ev.time` ≈ 交易所→本机的延迟（仅当 `time` 是交易所时间时有意义） |
+
+`time` 的取法一览（回测里两者都是虚拟钟）：
+
+| 事件 | `time` |
+|---|---|
+| ticker/bbo/tickers、trade、持仓、余额 | 交易所时间；连接器没给时为 `ts` |
+| kline | bar 起始时间，同 `openTimeMs`（与 REST `Record.Time` 同一口径） |
+| depth、订单回报 | 接收时间（= `ts`）：ABI 目前不携带这两类的交易所时间，以后携带了即改为交易所时间 |
+| 网关状态（33）、初始化状态（35） | `ts` |
+| 定时器（32） | 计划触发时刻（`scheduledNs` 换到与 `ts` 相同的毫秒时钟） |
+
+Rust SDK：`sdk::ctx::EventExt` 的 `ev.time()` / `ev.ts()` 按同一规则给出（f64 毫秒），各类型化视图
+（`ev.ticker()` / `ev.order()` …）的 `time` 字段就是 `ev.time()`。
 
 ## ticker（kind=1，channel: "ticker" / "bbo" / "tickers"）
 
@@ -196,7 +210,7 @@ while True:
 ## kline（kind=5，channel: "kline"，opts.interval 单位秒）
 
 `open` `high` `low` `close` `volume` `openInterest` `intervalSec` `openTimeMs` `closed`
-`prefill`。`closed=true` 表示该根已收盘（未收盘的中间态会反复推送）；`prefill=true`
+`prefill`。`time` 与 `openTimeMs` 相同（bar 起始时间，毫秒）。`closed=true` 表示该根已收盘（未收盘的中间态会反复推送）；`prefill=true`
 表示首次订阅的历史初始化数据。
 
 Kline 的原生订阅、合成、历史 prefill 和断线续接都由 connector 负责。需要 prefill 的 connector
@@ -209,7 +223,7 @@ stream 的 kind=35 状态；随后只推普通实时 Kline。
 频道的 ABI 数字码（`CH_*`，此前的数字 `channel` 字段）。`prefillStatus`：1=READY、2=FAILED。FAILED 时
 `message` 是 connector 返回的真实原因，`detail` 是可选协议码。策略不能在收到 FAILED 前把少量实时
 bar 当作完整历史。订阅被拒（见上文「订阅」）也以本事件报告，频道可以是任何频道。私有流的账户快照
-也用它报告（`channel: "private"`，见「私有流」）。
+也用它报告（`channel: "private"`，见「私有流」）。`time` 为接收时间（同 `ts`）。
 
 ## depth（kind=3，channel: "depth"，opts.depth 档数）
 
@@ -217,7 +231,7 @@ bar 当作完整历史。订阅被拒（见上文「订阅」）也以本事件�
 `{bids: [[价,量],…], asks: [[价,量],…]}`（bids 降序 / asks 升序）。两者读的都是**这一路订阅自己的**
 那本簿（同合约 depth 5 与 depth 20 各一本，互不影响）。`ev.book` 是不可枚举方法，
 `JSON.stringify(ev)` 里没有它；事件所属的流已退订时调用抛异常。`bid/ask` 只用于**订单簿侧**命名，
-成交方向一律 `buy/sell`。
+成交方向一律 `buy/sell`。`time` 为接收时间（同 `ts`；ABI 尚不携带深度的交易所时间）。
 
 ## 私有流（channel 订阅 `"private"`：订单 + 持仓 + 余额）
 
@@ -283,15 +297,16 @@ while (true) {
 | `state` | string | `"acked"` `"partial"` `"filled"` `"canceled"` `"rejected"` |
 | `px` `qty` `filledQty` `avgPx` | number | 委托价/量、累计成交量、成交均价（实数） |
 | `reason` | number | ABI 统一拒单原因码；`reasonText` 是该统一码对应的、与 connector 无关的说明 |
+| `time` | number | 毫秒；ABI 尚不携带订单回报的交易所时间，目前为接收时间（同 `ts`） |
 
 ## 网关状态（kind=33，type: "status"，channel: "gateway"，内建 STREAM_STATUS）
 
-`status`：1=UP 2=DOWN 3=DEGRADED；`detail`：适配器自定义码。
+`status`：1=UP 2=DOWN 3=DEGRADED；`detail`：适配器自定义码；`time` 同 `ts`。
 
 ## 引擎定时器（kind=32，type: "timer"，channel: "timer"，内建 STREAM_TIMER）
 
 `timerId` 是定时器 id，`scheduledNs` 是计划触发的引擎时钟纳秒值；超过 JS 安全整数范围时
-以字符串返回。QuickJS 的 `setTimeout` 属于语言运行时回调，不会伪装成 kind=32 业务事件。
+以字符串返回。`time` 是计划触发时刻换到与 `ts` 相同的毫秒时钟（UNIX 毫秒；回测=虚拟钟），`ts` 是实际发布时刻。QuickJS 的 `setTimeout` 属于语言运行时回调，不会伪装成 kind=32 业务事件。
 
 ## 事件归属
 

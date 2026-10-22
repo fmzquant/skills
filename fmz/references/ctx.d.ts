@@ -37,8 +37,12 @@ declare interface IEventBase {
     symbol: string;
     /** 引擎全序号（单调递增） */
     seq: number;
-    /** connector 收到原始报文的时刻（UNIX 毫秒，带微秒小数）；Date.now()-ts = 管道延迟 */
+    /** 本机收到这条事件的时刻：connector 收到原始报文的时刻，引擎自产事件为发布时刻（UNIX 毫秒，带微秒
+     * 小数；回测为虚拟钟）；Date.now()-ts = 管道延迟。 */
     ts: number;
+    /** 事件发生的时刻（UNIX 毫秒），每种事件都有：交易所给了时间就是交易所时间；拿不到交易所时间时为
+     * 接收时间（同 ts）。各类事件的取法见该事件类型的说明。 */
+    time: number;
 }
 
 /** ticker / bbo / 全市场 tickers（kind=1）。bbo 类频道无最新价时 last 为 0；tickers 流的 `symbol`
@@ -91,13 +95,15 @@ declare interface IKlineEvent extends IEventBase {
     volume: number;
     openInterest: number;
     intervalSec: number;
+    /** bar 起始时间（毫秒）；`time` 与它相同（同 REST Record.Time）。 */
     openTimeMs: number;
     closed: boolean;
     /** 首次订阅的历史初始化数据（后来订阅同一路的线程也会补收这些 bar）。 */
     prefill: boolean;
 }
 
-/** 深度更新信号（kind=3）：不带档位，档位用 ev.book(n) 读。 */
+/** 深度更新信号（kind=3）：不带档位，档位用 ev.book(n) 读。`time` 为接收时间（同 ts；ABI 尚不携带
+ * 深度的交易所时间）。 */
 declare interface IDepthEvent extends IEventBase {
     kind: 3;
     type: "data";
@@ -174,7 +180,8 @@ declare interface IBalanceRow {
     time?: number;
 }
 
-/** 订单回报（kind=16，私有流，channel "orders"）。 */
+/** 订单回报（kind=16，私有流，channel "orders"）。`time` 目前为接收时间（同 ts；ABI 尚不携带订单回报的
+ * 交易所时间）。 */
 declare interface IOrderEvent extends IEventBase {
     kind: 16;
     type: "data";
@@ -193,7 +200,7 @@ declare interface IOrderEvent extends IEventBase {
 }
 
 /** 网关状态（kind=33，type "status"，channel "gateway"，stream = STREAM_STATUS）：status 1=UP 2=DOWN
- * 3=DEGRADED。广播给在该交易所有订阅的每个线程。 */
+ * 3=DEGRADED。广播给在该交易所有订阅的每个线程。`time` 同 ts。 */
 declare interface IGatewayEvent extends IEventBase {
     kind: 33;
     type: "status";
@@ -205,7 +212,7 @@ declare interface IGatewayEvent extends IEventBase {
 declare type IStatusEvent = IGatewayEvent;
 
 /** 初始化/订阅状态（kind=35，type "status"）：与目标订阅同一 stream，`channel` 是目标订阅的频道；
- * 订阅被拒也以它报告。私有流的账户快照完成/失败同样用它（channel "private"）。 */
+ * 订阅被拒也以它报告。私有流的账户快照完成/失败同样用它（channel "private"）。`time` 同 ts。 */
 declare interface IFeedStatusEvent extends IEventBase {
     kind: 35;
     type: "status";
@@ -224,7 +231,8 @@ declare interface IFeedStatusEvent extends IEventBase {
     message: string;
 }
 
-/** 定时器（kind=32，type "timer"，stream = STREAM_TIMER；大整数超出 JS 安全范围时为字符串）。 */
+/** 定时器（kind=32，type "timer"，stream = STREAM_TIMER；大整数超出 JS 安全范围时为字符串）。`time` 是
+ * 计划触发时刻（scheduledNs 换到与 ts 相同的毫秒时钟），ts 是实际发布时刻。 */
 declare interface ITimerEvent extends IEventBase {
     kind: 32;
     type: "timer";
