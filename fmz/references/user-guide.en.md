@@ -2688,7 +2688,7 @@ Every function, structure and constant of the API reference, grouped by its cate
 | `Ticker` | Market data returned by ```exchange.GetTicker()```: high, low, best ask, best bid, last price, open, volume and open interest. |
 | `Depth` | Market depth returned by ```exchange.GetDepth()```: the asks ```Asks``` and bids ```Bids``` (OrderBook arrays) and a timestamp. |
 | `OrderBook` | One price level of the asks or bids in market depth (Depth): price and amount. |
-| `Trade` | Returned by ```exchange.GetTrades()```: a market trade's ID, time, price, amount and side. |
+| `Trade` | Market trade records returned by ```exchange.GetTrades()```, including the trade Id, time, price, amount and side. |
 | `Record` | Data structure for candlestick bars in standard OHLC format, used for charting candlesticks and calculating technical indicators. |
 | `Market` | Returned by ```exchange.GetMarkets()```: an instrument's base and quote assets, price and amount steps and precisions, order quantity and notional limits, and contract value. |
 | `Order` | Returned by ```exchange.GetOrder()```, ```exchange.GetOrders()``` and similar: order ID, price, amount, filled amount, average price, status, type, offset, contract code and conditional order settings. |
@@ -2763,6 +2763,7 @@ Every function, structure and constant of the API reference, grouped by its cate
 | - | - |
 | `ORDER_TYPE_BUY` | A buy order; the value is ```0```. |
 | `ORDER_TYPE_SELL` | A sell order; the value is ```1```. |
+| `ORDER_TYPE_NONE` | No direction; the value is ```2```. |
 
 ##### ORDER_CONDITION_TYPE
 

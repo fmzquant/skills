@@ -2688,7 +2688,7 @@ fn main() {
 | `Ticker` | ```exchange.GetTicker()```返回的行情：最高价、最低价、卖一价、买一价、最新成交价、开盘价、成交量与持仓量。 |
 | `Depth` | ```exchange.GetDepth()```返回的市场深度：卖盘```Asks```、买盘```Bids```（OrderBook数组）与时间戳。 |
 | `OrderBook` | 市场深度（Depth）里卖盘、买盘的一档：价格与数量。 |
-| `Trade` | ```exchange.GetTrades()```返回的市场成交记录：成交Id、时间、价格、数量与方向。 |
+| `Trade` | ```exchange.GetTrades()```返回的市场成交记录，包含成交Id、时间、价格、数量和方向。 |
 | `Record` | K线柱的数据结构，标准的OHLC格式，用于绘制K线图和技术指标计算分析。 |
 | `Market` | ```exchange.GetMarkets()```返回的品种市场信息：交易币与计价币、价格与数量的步长和精度、下单数量与金额的上下限、合约面值。 |
 | `Order` | ```exchange.GetOrder()```、```exchange.GetOrders()```等返回的订单：订单Id、价格、数量、成交数量、成交均价、状态、方向、开平仓、合约代码与条件单配置。 |
@@ -2763,6 +2763,7 @@ fn main() {
 | - | - |
 | `ORDER_TYPE_BUY` | 买单，值为```0```。 |
 | `ORDER_TYPE_SELL` | 卖单，值为```1```。 |
+| `ORDER_TYPE_NONE` | 无方向，值为```2```。 |
 
 ##### ORDER_CONDITION_TYPE
 

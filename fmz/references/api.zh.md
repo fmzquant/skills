@@ -23397,17 +23397,17 @@ See also: `exchange.GetDepth`, `Depth`
 
 ### Trade
 
-```exchange.GetTrades()```返回的市场成交记录：成交Id、时间、价格、数量与方向。
+```exchange.GetTrades()```返回的市场成交记录，包含成交Id、时间、价格、数量和方向。
 
 Fields:
 
-- `Id` (string): 市场成交记录的唯一标识符。交易所接口没有提供Id时由平台生成标识（可能是时间戳，也可能是以```syn:```开头的合成字符串），只保证在同一次返回结果中唯一。
-- `Time` (number): 毫秒级时间戳。
+- `Id` (string): 市场成交记录Id。交易所接口未提供Id时，由平台生成标识（可能是时间戳，也可能是以```syn:```开头的合成字符串），仅保证在同一次返回结果中唯一。
+- `Time` (number): 成交时间，毫秒级时间戳。
 - `Price` (number): 成交价格。
 - `Amount` (number): 成交数量。
-- `Type` (number): 订单类型，参考`ORDER_TYPE_BUY`、`ORDER_TYPE_SELL`。交易所没有提供成交方向、无法判定时为```2```，不要用「不是卖就是买」的方式判断方向。
+- `Type` (number): 成交方向（订单类型），参考`ORDER_TYPE_BUY`、`ORDER_TYPE_SELL`。交易所未提供成交方向、无法判定时，该值为`ORDER_TYPE_NONE`（值为```2```），因此不应采用「非卖即买」的方式判断方向。
 
-```exchange.GetTrades()```函数返回Trade数组，没有数据时为空数组，调用失败时返回空值（JavaScript为```null```，Python为```None```）。
+```exchange.GetTrades()```函数返回Trade数组；无数据时返回空数组，调用失败时返回空值（JavaScript中为```null```，Python中为```None```）。
 
 See also: `exchange.GetTrades`
 
@@ -25796,12 +25796,13 @@ See also: `ORDER_STATE`, `Order`, `exchange.GetOrder`, `exchange.GetOrders`
 
 ### ORDER_TYPE
 
-订单方向常量：`Order`结构```Type```字段的取值。
+订单方向常量，即`Order`结构与`Trade`结构中```Type```字段的取值。
 
 | 常量 | 值 | 含义 |
 | - | - | - |
 | `ORDER_TYPE_BUY` | ```0``` | 买单 |
 | `ORDER_TYPE_SELL` | ```1``` | 卖单 |
+| `ORDER_TYPE_NONE` | ```2``` | 无方向，仅用于`Trade`结构，表示交易所未提供成交方向 |
 
 #### ORDER_TYPE_BUY
 
@@ -25814,6 +25815,14 @@ See also: `ORDER_TYPE`, `Order`, `ORDER_OFFSET`
 卖单，值为```1```。用于`Order`结构的```Type```字段。
 
 See also: `ORDER_TYPE`, `Order`, `ORDER_OFFSET`
+
+#### ORDER_TYPE_NONE
+
+无方向，值为```2```。仅出现在`Trade`结构的```Type```字段中：当交易所未提供成交方向、且无法判定买卖方向时，该字段取此值（例如部分交易所的成交接口不提供主动成交方向；国内期货根据行情快照推算出的成交，也可能无法判断方向）。订单`Order`结构的```Type```字段不会取此值。
+
+判断成交方向时，应分别与`ORDER_TYPE_BUY`、`ORDER_TYPE_SELL`进行比较，不要采用「非卖即买」的方式判断。
+
+See also: `ORDER_TYPE`, `Trade`, `exchange.GetTrades`
 
 ### ORDER_CONDITION_TYPE
 

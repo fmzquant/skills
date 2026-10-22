@@ -66,6 +66,8 @@ declare const ORDER_STATE_UNKNOWN: number;
 declare const ORDER_TYPE_BUY: number;
 /** 卖单类型 */
 declare const ORDER_TYPE_SELL: number;
+/** 无方向：交易所没有给出、也无法判定买卖方向的成交（只用于 `ITrade.Type`），值为2 */
+declare const ORDER_TYPE_NONE: number;
 
 // ==================== 条件单类型常量 ====================
 
@@ -269,7 +271,7 @@ declare interface ITrade {
     Price: number;
     /** 成交数量 */
     Amount: number;
-    /** 成交类型: ORDER_TYPE_BUY(0-买入), ORDER_TYPE_SELL(1-卖出) */
+    /** 成交类型: ORDER_TYPE_BUY(0-买入), ORDER_TYPE_SELL(1-卖出), ORDER_TYPE_NONE(2-方向未知) */
     Type: number;
 }
 

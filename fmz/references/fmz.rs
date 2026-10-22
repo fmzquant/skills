@@ -367,6 +367,8 @@ pub const ORDER_STATE_UNKNOWN: i32 = 3;
 
 pub const ORDER_TYPE_BUY: i32 = 0;
 pub const ORDER_TYPE_SELL: i32 = 1;
+/// No direction: `Trade.Type` of a trade whose side the exchange did not report and that cannot be inferred.
+pub const ORDER_TYPE_NONE: i32 = 2;
 
 pub const LOG_TYPE_BUY: i32 = 0;
 pub const LOG_TYPE_SELL: i32 = 1;
@@ -609,7 +611,7 @@ pub struct Trade {
     pub Price: f64,
     /// Trade amount.
     pub Amount: f64,
-    /// `ORDER_TYPE_*` (0 = buy, 1 = sell).
+    /// Taker side `ORDER_TYPE_*`: 0 = buy, 1 = sell, 2 = unknown (`ORDER_TYPE_NONE`).
     pub Type: i32,
 }
 
@@ -2627,7 +2629,7 @@ pub mod prelude {
         ORDER_CONDITION_TYPE_GENERIC, ORDER_CONDITION_TYPE_OCO, ORDER_CONDITION_TYPE_SL,
         ORDER_CONDITION_TYPE_TP, ORDER_OFFSET_CLOSE, ORDER_OFFSET_OPEN, ORDER_STATE_CANCELED,
         ORDER_STATE_CLOSED, ORDER_STATE_PENDING, ORDER_STATE_UNKNOWN, ORDER_TYPE_BUY,
-        ORDER_TYPE_SELL, LOG_TYPE_BUY, LOG_TYPE_SELL, LOG_TYPE_CANCEL, LOG_TYPE_ERROR,
+        ORDER_TYPE_SELL, ORDER_TYPE_NONE, LOG_TYPE_BUY, LOG_TYPE_SELL, LOG_TYPE_CANCEL, LOG_TYPE_ERROR,
         LOG_TYPE_PROFIT, LOG_TYPE_LOG, LOG_TYPE_RESTART, PD_LONG, PD_LONG_YD, PD_SHORT, PD_SHORT_YD, PERIOD_D1, PERIOD_D3,
         PERIOD_H1, PERIOD_H12, PERIOD_H2, PERIOD_H4, PERIOD_H6, PERIOD_M1, PERIOD_M15, PERIOD_M3,
         PERIOD_M30, PERIOD_M5, PERIOD_W1, FUTURES_OP_SET_MARGIN, FUTURES_OP_SET_DIRECTION,

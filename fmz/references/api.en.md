@@ -23528,17 +23528,17 @@ See also: `exchange.GetDepth`, `Depth`
 
 ### Trade
 
-Returned by ```exchange.GetTrades()```: a market trade's ID, time, price, amount and side.
+Market trade records returned by ```exchange.GetTrades()```, including the trade Id, time, price, amount and side.
 
 Fields:
 
-- `Id` (string): Unique identifier for the market trade record. If the exchange API does not provide an Id, the platform generates one (either a timestamp or a synthetic string starting with ```syn:```), which is only guaranteed to be unique within a single result.
-- `Time` (number): Timestamp in milliseconds.
-- `Price` (number): Execution price.
-- `Amount` (number): Execution quantity.
-- `Type` (number): Order type, refer to `ORDER_TYPE_BUY`, `ORDER_TYPE_SELL`. It is ```2``` when the exchange does not report the trade direction and it cannot be determined, so do not treat "not a sell" as "a buy".
+- `Id` (string): Market trade record Id. When the exchange API does not provide an Id, the platform generates an identifier (which may be a timestamp or a synthetic string beginning with ```syn:```); it is only guaranteed to be unique within a single returned result.
+- `Time` (number): Trade time, as a millisecond timestamp.
+- `Price` (number): Trade price.
+- `Amount` (number): Trade amount.
+- `Type` (number): Trade side (order type); see `ORDER_TYPE_BUY` and `ORDER_TYPE_SELL`. When the exchange does not provide the trade side and it cannot be determined, the value is `ORDER_TYPE_NONE` (value ```2```). Therefore, do not determine the side by assuming that any trade that is not a sell is a buy.
 
-The exchange.GetTrades() function returns an array of Trade; it is an empty array when there is no data, and a null value (```null``` in JavaScript, ```None``` in Python) when the call fails.
+The ```exchange.GetTrades()``` function returns an array of Trade structures; it returns an empty array when there is no data, and a null value when the call fails (```null``` in JavaScript, ```None``` in Python).
 
 See also: `exchange.GetTrades`
 
@@ -25928,12 +25928,13 @@ See also: `ORDER_STATE`, `Order`, `exchange.GetOrder`, `exchange.GetOrders`
 
 ### ORDER_TYPE
 
-Order side constants: the values of the ```Type``` field of the `Order` structure.
+Order direction constants, i.e. the values of the ```Type``` field in the `Order` structure and the `Trade` structure.
 
 | Constant | Value | Meaning |
 | - | - | - |
-| `ORDER_TYPE_BUY` | ```0``` | A buy order |
-| `ORDER_TYPE_SELL` | ```1``` | A sell order |
+| `ORDER_TYPE_BUY` | ```0``` | Buy order |
+| `ORDER_TYPE_SELL` | ```1``` | Sell order |
+| `ORDER_TYPE_NONE` | ```2``` | No direction; used only in the `Trade` structure, indicating that the exchange did not provide the trade direction |
 
 #### ORDER_TYPE_BUY
 
@@ -25946,6 +25947,14 @@ See also: `ORDER_TYPE`, `Order`, `ORDER_OFFSET`
 A sell order; the value is ```1```. Used in the ```Type``` field of the `Order` structure.
 
 See also: `ORDER_TYPE`, `Order`, `ORDER_OFFSET`
+
+#### ORDER_TYPE_NONE
+
+No direction; the value is ```2```. It appears only in the ```Type``` field of the `Trade` structure: this value is used when the exchange does not provide the trade direction and the buy/sell side cannot be determined (for example, some exchanges' trade endpoints do not provide the aggressor side; for CTP commodity futures, trades inferred from market snapshots may also have an undeterminable direction). The ```Type``` field of the order `Order` structure never takes this value.
+
+When determining the trade direction, compare against `ORDER_TYPE_BUY` and `ORDER_TYPE_SELL` separately; do not assume that "anything that is not a sell is a buy".
+
+See also: `ORDER_TYPE`, `Trade`, `exchange.GetTrades`
 
 ### ORDER_CONDITION_TYPE
 

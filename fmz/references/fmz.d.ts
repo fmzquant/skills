@@ -66,6 +66,8 @@ declare const ORDER_STATE_UNKNOWN: number;
 declare const ORDER_TYPE_BUY: number;
 /** Sell order type */
 declare const ORDER_TYPE_SELL: number;
+/** No direction: a trade whose side the exchange did not report and that cannot be inferred (`ITrade.Type` only). Value 2 */
+declare const ORDER_TYPE_NONE: number;
 
 // ==================== Conditional Order Type Constants ====================
 
@@ -270,7 +272,7 @@ declare interface ITrade {
     Price: number;
     /** Trade amount */
     Amount: number;
-    /** Trade type: ORDER_TYPE_BUY(0-buy), ORDER_TYPE_SELL(1-sell) */
+    /** Trade type: ORDER_TYPE_BUY(0-buy), ORDER_TYPE_SELL(1-sell), ORDER_TYPE_NONE(2-side unknown) */
     Type: number;
 }
 
