@@ -1,9 +1,17 @@
-from typing import Callable, Optional, TypeVar, Union, List
+from typing import Any, Callable, Generic, Literal, Optional, Sequence, TypedDict, TypeVar, Union, overload
+import talib as talib
+
+# Strategy API declarations for Python strategies. Every name below is injected
+# into the strategy's globals by the runtime: use it directly, no import needed
+# (``talib`` too; ``import talib`` also works). Structures returned by the API
+# are dicts with attribute access: ``ticker.Last`` and ``ticker["Last"]`` both work.
+
+_V = TypeVar("_V")
 
 # ==================== K-line Period Constants ====================
 
 PERIOD_M1: int
-"""1-minute K-line period."""
+"""1-minute K-line period (60 seconds)."""
 
 PERIOD_M3: int
 """3-minute K-line period."""
@@ -44,137 +52,125 @@ PERIOD_W1: int
 # ==================== Order Status Constants ====================
 
 ORDER_STATE_PENDING: int
-"""Order pending status (active order, not yet filled)."""
+"""Order pending (active, not completely filled). Value 0."""
 
 ORDER_STATE_CLOSED: int
-"""Order completed (fully filled)."""
+"""Order completed (fully filled). Value 1."""
 
 ORDER_STATE_CANCELED: int
-"""Order canceled (by user or exchange)."""
+"""Order canceled (by the user or the exchange; also expired / rejected). Value 2."""
 
 ORDER_STATE_UNKNOWN: int
-"""Order status unknown."""
+"""Order status unknown. Value 3."""
 
 # ==================== Order Type Constants ====================
 
 ORDER_TYPE_BUY: int
-"""Buy order type."""
+"""Buy order. Value 0."""
 
 ORDER_TYPE_SELL: int
-"""Sell order type."""
+"""Sell order. Value 1."""
 
-# ==================== Order Direction Constants (Futures) ====================
+ORDER_TYPE_NONE: int
+"""No direction (``Trade.Type`` of a synthesized trade whose side the exchange did not report). Value 2."""
+
+# ==================== Order Offset Constants (Futures) ====================
 
 ORDER_OFFSET_OPEN: int
-"""Open position direction (futures)."""
+"""Opening order (futures). Value 0."""
 
 ORDER_OFFSET_CLOSE: int
-"""Close position direction (futures)."""
+"""Closing order (futures). Value 1."""
 
 # ==================== Conditional Order Type Constants ====================
 
 ORDER_CONDITION_TYPE_OCO: int
-"""OCO conditional order (One-Cancels-the-Other). Sets both take-profit and stop-loss simultaneously."""
+"""OCO conditional order (One-Cancels-the-Other): take-profit and stop-loss together. Value 0."""
 
 ORDER_CONDITION_TYPE_TP: int
-"""Take Profit conditional order."""
+"""Take-profit conditional order. Value 1."""
 
 ORDER_CONDITION_TYPE_SL: int
-"""Stop Loss conditional order."""
+"""Stop-loss conditional order. Value 2."""
 
 ORDER_CONDITION_TYPE_GENERIC: int
-"""Generic conditional order."""
+"""Generic conditional order (only appears in query results, e.g. trailing stops). Value 3."""
 
 # ==================== Log Type Constants ====================
 
 LOG_TYPE_BUY: int
-"""Buy log type, used for ``exchange.Log()``."""
+"""Buy log type, used with ``exchange.Log()``. Value 0."""
 
 LOG_TYPE_SELL: int
-"""Sell log type, used for ``exchange.Log()``."""
+"""Sell log type, used with ``exchange.Log()``. Value 1."""
 
 LOG_TYPE_CANCEL: int
-"""Cancel order log type, used for ``exchange.Log()``."""
+"""Cancel-order log type, used with ``exchange.Log()``. Value 2."""
 
 # ==================== Position Direction Constants (Futures) ====================
 
 PD_LONG: int
-"""Long position direction."""
+"""Long position. Value 0."""
 
 PD_SHORT: int
-"""Short position direction."""
+"""Short position. Value 1."""
 
 PD_LONG_YD: int
-"""Yesterday's long position (SHFE specific)."""
+"""Yesterday's long position (Chinese futures counters). Value 2."""
 
 PD_SHORT_YD: int
-"""Yesterday's short position (SHFE specific)."""
+"""Yesterday's short position (Chinese futures counters). Value 3."""
 
-# ==================== Futures/Exchange Operation Code Constants ====================
+# ==================== JavaScript-style aliases ====================
 
-FUTURES_OP_SET_MARGIN: int
-"""Set margin/leverage operation code."""
+null: None
+"""Alias of ``None`` (kept so code ported from JavaScript runs)."""
 
-FUTURES_OP_SET_DIRECTION: int
-"""Set trading direction operation code."""
+true: bool
+"""Alias of ``True``."""
 
-FUTURES_OP_SET_CONTRACT_TYPE: int
-"""Set contract type operation code."""
+false: bool
+"""Alias of ``False``."""
 
-FUTURES_OP_GET_POSITION: int
-"""Get position operation code."""
-
-EXCHANGE_OP_IO_CONTROL: int
-"""IO control operation code, used for sending arbitrary API requests."""
+NaN: None
+"""Alias of ``None``."""
 
 # ==================== Type Aliases ====================
 
-IOrderId = Union[int, str]
-"""Order ID type, can be int or str depending on the exchange."""
+IOrderId = Union[str, int]
+"""Order ID. Usually a string ``"<exchange symbol>,<raw order id>"`` (e.g. ``"ETH-USDT,1547130415509278720"``)."""
 
-# ==================== Data Interfaces ====================
+# ==================== Data Structures ====================
 
-class IOrderCondition:
-    """Condition order parameter structure, defining take-profit and stop-loss trigger conditions.
-
-    Used with ``exchange.CreateConditionOrder()`` to create conditional orders.
+class IOrderCondition(dict[str, Any]):
+    """Trigger condition and execution prices of a conditional order (``Order.Condition``; the
+    ``condition`` argument of ``exchange.CreateConditionOrder()``).
 
     Example::
 
-        # Take-profit condition
-        tp_condition = {
-            "ConditionType": ORDER_CONDITION_TYPE_TP,
-            "TpTriggerPrice": 55000,
-            "TpOrderPrice": 54900
-        }
-        # Stop-loss condition
-        sl_condition = {
-            "ConditionType": ORDER_CONDITION_TYPE_SL,
-            "SlTriggerPrice": 48000,
-            "SlOrderPrice": 47900
-        }
-        # OCO condition (take-profit + stop-loss)
-        oco_condition = {
-            "ConditionType": ORDER_CONDITION_TYPE_OCO,
-            "TpTriggerPrice": 55000, "TpOrderPrice": 54900,
-            "SlTriggerPrice": 48000, "SlOrderPrice": 47900
-        }
+        # Take-profit
+        tp = {"ConditionType": ORDER_CONDITION_TYPE_TP, "TpTriggerPrice": 55000, "TpOrderPrice": -1}
+        # Stop-loss
+        sl = {"ConditionType": ORDER_CONDITION_TYPE_SL, "SlTriggerPrice": 48000, "SlOrderPrice": 47900}
+        # OCO (take-profit + stop-loss)
+        oco = {"ConditionType": ORDER_CONDITION_TYPE_OCO,
+               "TpTriggerPrice": 55000, "TpOrderPrice": 54900,
+               "SlTriggerPrice": 48000, "SlOrderPrice": 47900}
     """
     ConditionType: int
-    """Condition type: ORDER_CONDITION_TYPE_OCO, TP (take profit), SL (stop loss), or GENERIC."""
-    TpTriggerPrice: Optional[float]
-    """Take-profit trigger price."""
-    TpOrderPrice: Optional[float]
-    """Take-profit order price (places order at this price when triggered)."""
-    SlTriggerPrice: Optional[float]
-    """Stop-loss trigger price."""
-    SlOrderPrice: Optional[float]
-    """Stop-loss order price (places order at this price when triggered)."""
+    """Condition type: ``ORDER_CONDITION_TYPE_OCO`` (0), ``TP`` (1), ``SL`` (2), ``GENERIC`` (3, query results only)."""
+    TpTriggerPrice: float
+    """Take-profit trigger price (TP and OCO)."""
+    TpOrderPrice: float
+    """Take-profit execution price; ``-1`` when placing means market. In query results a market price is usually 0."""
+    SlTriggerPrice: float
+    """Stop-loss trigger price (SL and OCO)."""
+    SlOrderPrice: float
+    """Stop-loss execution price; ``-1`` when placing means market. In query results a market price is usually 0."""
 
-class IOrder:
-    """Order information structure containing complete order details.
-
-    Returned by ``exchange.GetOrder()``, ``exchange.GetOrders()``, etc.
+class IOrder(dict[str, Any]):
+    """Order structure, returned by ``exchange.GetOrder()``, ``exchange.GetOrders()``, ``exchange.GetHistoryOrders()``
+    and the conditional-order queries.
 
     Example::
 
@@ -182,204 +178,207 @@ class IOrder:
         if order:
             Log("Price:", order.Price, "Filled:", order.DealAmount, "Status:", order.Status)
     """
-    Info: object
-    """Original order information returned by exchange (JSON object), format varies by exchange."""
+    Info: Any
+    """Raw exchange response for this order (absent in backtests)."""
+    Symbol: str
+    """Symbol code, e.g. ``"BTC_USDT"`` (spot), ``"BTC_USDT.swap"`` (futures)."""
     Id: IOrderId
-    """Order ID, can be str or int depending on the exchange."""
+    """Order ID: usually ``"<exchange symbol>,<raw order id>"``, e.g. ``"ETH-USDT,1547130415509278720"``."""
     Time: int
-    """Order timestamp (milliseconds)."""
+    """Order creation time (millisecond timestamp)."""
     Price: float
-    """Order price."""
+    """Order price (may be 0 or -1 for market orders)."""
     Amount: float
-    """Order quantity."""
+    """Order quantity (for a spot market buy it may be the quote amount)."""
     DealAmount: float
     """Filled quantity."""
     AvgPrice: float
-    """Average fill price."""
+    """Average fill price (0 when the exchange does not provide it)."""
     Status: int
-    """Order status: ORDER_STATE_PENDING (pending), ORDER_STATE_CLOSED (filled),
-    ORDER_STATE_CANCELED (canceled), ORDER_STATE_UNKNOWN (unknown)."""
+    """``ORDER_STATE_PENDING`` (0), ``ORDER_STATE_CLOSED`` (1), ``ORDER_STATE_CANCELED`` (2), ``ORDER_STATE_UNKNOWN`` (3)."""
     Type: int
-    """Order type: ORDER_TYPE_BUY (buy), ORDER_TYPE_SELL (sell)."""
-    Offset: Optional[int]
-    """Order offset direction (futures): ORDER_OFFSET_OPEN (open), ORDER_OFFSET_CLOSE (close)."""
-    ContractType: Optional[str]
-    """Contract type (futures), e.g. ``"swap"`` (perpetual), ``"quarter"`` (quarterly)."""
-    Condition: Optional[IOrderCondition]
-    """Conditional order information (only present for conditional orders)."""
+    """``ORDER_TYPE_BUY`` (0) or ``ORDER_TYPE_SELL`` (1)."""
+    Offset: int
+    """``ORDER_OFFSET_OPEN`` (0) or ``ORDER_OFFSET_CLOSE`` (1) (futures; spot orders report open)."""
+    ContractType: str
+    """Contract code of a futures order (e.g. ``"swap"``); ``""`` for spot."""
+    Condition: IOrderCondition
+    """Conditional orders only: trigger condition and prices. Normal orders have no such key —
+    read it with ``order.get("Condition")``."""
 
-class IMarketOrder:
-    """Market order entry (bid/ask) in depth data, contains price and amount."""
+class IMarketOrder(dict[str, Any]):
+    """One price level of the order book (``Depth.Asks`` / ``Depth.Bids``)."""
     Price: float
-    """Price level."""
+    """Price."""
     Amount: float
-    """Amount at this price level."""
+    """Quantity."""
 
-class IDepth:
-    """Market depth (order book) data, contains bid and ask order information.
-
-    Asks are sorted by price from low to high, Bids from high to low.
+class IDepth(dict[str, Any]):
+    """Order book, returned by ``exchange.GetDepth()``.
 
     Example::
 
         depth = exchange.GetDepth()
         if depth:
             Log("Best ask:", depth.Asks[0].Price, "Best bid:", depth.Bids[0].Price)
-            Log("Spread:", depth.Asks[0].Price - depth.Bids[0].Price)
     """
-    Info: object
-    """Original depth data returned by exchange."""
+    Info: Any
+    """Raw exchange response (absent in backtests)."""
     Time: int
-    """Timestamp (milliseconds)."""
+    """Millisecond timestamp."""
     Asks: list[IMarketOrder]
-    """Ask order array, sorted by price from low to high (Asks[0] is best ask)."""
+    """Asks, price ascending (``Asks[0]`` is the best ask)."""
     Bids: list[IMarketOrder]
-    """Bid order array, sorted by price from high to low (Bids[0] is best bid)."""
+    """Bids, price descending (``Bids[0]`` is the best bid)."""
 
-class IFunding:
-    """Funding rate information (perpetual contracts).
+class IFunding(dict[str, Any]):
+    """Funding rate (perpetual contracts), returned by ``exchange.GetFundings()``.
 
     Example::
 
         fundings = exchange.GetFundings("BTC_USDT.swap")
         if fundings:
-            Log("Funding rate:", fundings[0].Rate, "Settlement time:", fundings[0].Time)
+            Log("Rate:", fundings[0].Rate, "Next settlement:", _D(fundings[0].Time / 1000))
     """
-    Info: object
-    """Original data returned by exchange."""
-    Time: int
-    """Settlement timestamp (milliseconds)."""
-    Rate: float
-    """Funding rate, e.g. 0.0001 means 0.01%."""
-    Period: float
-    """Settlement period (seconds)."""
+    Info: Any
+    """Raw exchange response."""
     Symbol: str
-    """Trading pair symbol."""
+    """Symbol code, e.g. ``"BTC_USDT.swap"``."""
+    Interval: int
+    """Funding interval in milliseconds (``28800000`` = 8 hours)."""
+    Time: int
+    """Start of the next period (settlement time of this one), millisecond timestamp."""
+    Rate: float
+    """Funding rate used at this settlement, e.g. 0.0001 = 0.01%."""
 
-class IPosition:
-    """Position information structure (futures).
+class IPosition(dict[str, Any]):
+    """Futures position, returned by ``exchange.GetPositions()``.
 
     Example::
 
         positions = exchange.GetPositions("BTC_USDT.swap")
         if positions:
             for pos in positions:
-                direction = "Long" if pos.Type == PD_LONG else "Short"
-                Log("Direction:", direction, "Amount:", pos.Amount, "PnL:", pos.Profit)
+                side = "long" if pos.Type == PD_LONG else "short"
+                Log(pos.Symbol, side, "Amount:", pos.Amount, "PnL:", pos.Profit)
     """
-    Info: object
-    """Original position data returned by exchange."""
+    Info: Any
+    """Raw exchange response (absent in backtests)."""
+    Symbol: str
+    """Symbol code, e.g. ``"BTC_USDT.swap"``."""
     MarginLevel: float
-    """Leverage multiplier."""
+    """Leverage."""
     Amount: float
-    """Position amount."""
+    """Position size (usually contracts)."""
     FrozenAmount: float
-    """Frozen amount (positions in pending close orders)."""
+    """Frozen size (held by pending close orders)."""
     Price: float
     """Average position price."""
     Profit: float
-    """Unrealized profit and loss."""
+    """Unrealized PnL, in the margin currency."""
     Type: int
-    """Position direction: PD_LONG (long), PD_SHORT (short),
-    PD_LONG_YD (long yesterday), PD_SHORT_YD (short yesterday)."""
+    """``PD_LONG`` (0), ``PD_SHORT`` (1), ``PD_LONG_YD`` (2), ``PD_SHORT_YD`` (3)."""
     ContractType: str
-    """Contract type, e.g. ``"swap"``, ``"quarter"``."""
+    """Contract code, e.g. ``"swap"``, ``"quarter"``."""
     Margin: float
-    """Margin used for this position."""
+    """Margin held by the position (0 when not provided)."""
 
-class ITrade:
-    """Recent trade record.
+class ITrade(dict[str, Any]):
+    """Public trade, returned by ``exchange.GetTrades()``.
 
     Example::
 
         trades = exchange.GetTrades()
         if trades:
-            Log("Latest trade:", trades[-1].Price, "Amount:", trades[-1].Amount)
+            Log("Latest trade:", trades[-1].Price, trades[-1].Amount)
     """
-    Id: Union[int, str]
-    """Trade record ID."""
+    Id: str
+    """Trade ID (generated by the platform when the exchange gives none; unique within one result)."""
     Time: int
-    """Trade timestamp (milliseconds)."""
+    """Millisecond timestamp."""
     Price: float
     """Trade price."""
     Amount: float
-    """Trade amount."""
+    """Trade quantity."""
     Type: int
-    """Trade type: ORDER_TYPE_BUY (buy), ORDER_TYPE_SELL (sell)."""
+    """Taker side: ``ORDER_TYPE_BUY`` (0), ``ORDER_TYPE_SELL`` (1); ``ORDER_TYPE_NONE`` (2) when unknown."""
 
-class ITicker:
-    """Ticker data containing current market snapshot information.
+class ITicker(dict[str, Any]):
+    """Market snapshot, returned by ``exchange.GetTicker()`` / ``exchange.GetTickers()``.
 
     Example::
 
         ticker = exchange.GetTicker()
         if ticker:
             Log("Last:", ticker.Last, "Bid:", ticker.Buy, "Ask:", ticker.Sell)
-            Log("24h High:", ticker.High, "Low:", ticker.Low, "Volume:", ticker.Volume)
     """
-    Time: int
-    """Timestamp (milliseconds)."""
+    Info: Any
+    """Raw exchange response (absent in backtests)."""
     Symbol: str
-    """Trading pair symbol."""
+    """Symbol code, e.g. ``"BTC_USDT"``, ``"BTC_USDT.swap"``."""
     High: float
-    """24-hour high price."""
+    """24h high (0 when not provided)."""
     Low: float
-    """24-hour low price."""
+    """24h low (0 when not provided)."""
     Sell: float
-    """Best ask price."""
+    """Best ask (0 when the ticker endpoint has no order book prices)."""
     Buy: float
-    """Best bid price."""
+    """Best bid (0 when not provided)."""
     Last: float
     """Last trade price."""
+    Open: float
+    """Open of the rolling period (0 when not provided)."""
     Volume: float
-    """24-hour trading volume."""
-    Info: object
-    """Original ticker data returned by exchange."""
+    """Recent volume (base currency for spot, contracts for futures, as provided)."""
+    Time: int
+    """Millisecond timestamp."""
+    OpenInterest: float
+    """Open interest (0 when not provided)."""
 
-class IAccount:
-    """Account information structure (spot).
-
-    For futures accounts, returns extended structure with equity and unrealized PnL.
+class IAccount(dict[str, Any]):
+    """Account balances of the current trading pair / contract, returned by ``exchange.GetAccount()``.
 
     Example::
 
         account = exchange.GetAccount()
         if account:
-            Log("Quote balance:", account.Balance, "Frozen:", account.FrozenBalance)
-            Log("Base balance:", account.Stocks, "Frozen:", account.FrozenStocks)
+            Log("Quote:", account.Balance, "Frozen:", account.FrozenBalance)
+            Log("Base:", account.Stocks, "Frozen:", account.FrozenStocks)
     """
-    Info: object
-    """Original account data returned by exchange."""
+    Info: Any
+    """Raw exchange response (absent in backtests)."""
     Balance: float
-    """Quote currency balance (e.g. USDT). For futures, refers to available margin."""
+    """Available quote currency (e.g. USDT for BTC_USDT); for USDT-margined futures, the available margin."""
     FrozenBalance: float
-    """Frozen quote currency balance."""
+    """Frozen quote currency."""
     Stocks: float
-    """Base currency balance (e.g. BTC). For futures, refers to currency corresponding to available margin."""
+    """Available base currency (e.g. BTC); for coin-margined futures, the available margin (coins)."""
     FrozenStocks: float
-    """Frozen base currency balance."""
+    """Frozen base currency."""
     Equity: float
-    """Equity (futures), total account value including unrealized PnL."""
+    """Futures only: total margin equity of the current contract setting (0 when not provided)."""
+    UPnL: float
+    """Futures only: unrealized PnL of all positions of the current contract setting."""
 
-class IAsset:
-    """Asset information representing holdings of a specific currency in the account.
+class IAsset(dict[str, Any]):
+    """One asset of the account, returned by ``exchange.GetAssets()``.
 
     Example::
 
         assets = exchange.GetAssets()
         if assets:
-            for asset in assets:
-                Log("Currency:", asset.Currency, "Available:", asset.Amount, "Frozen:", asset.FrozenAmount)
+            for a in assets:
+                Log(a.Currency, "Available:", a.Amount, "Frozen:", a.FrozenAmount)
     """
     Currency: str
-    """Currency name, e.g. ``"BTC"``, ``"USDT"``."""
+    """Asset name as the exchange calls it (e.g. ``"BTC"``; some exchanges use ``"XBT"``)."""
     Amount: float
     """Available amount."""
     FrozenAmount: float
     """Frozen amount."""
 
-class IRecord:
-    """K-line (candlestick) data structure, containing OHLCV information.
+class IRecord(dict[str, Any]):
+    """One K-line bar, element of ``exchange.GetRecords()``.
 
     Example::
 
@@ -389,7 +388,7 @@ class IRecord:
             Log("Open:", last.Open, "High:", last.High, "Low:", last.Low, "Close:", last.Close)
     """
     Time: int
-    """Candlestick timestamp (milliseconds), representing the start time of this bar."""
+    """Bar start time (millisecond timestamp)."""
     Open: float
     """Open price."""
     High: float
@@ -399,144 +398,148 @@ class IRecord:
     Close: float
     """Close price."""
     Volume: float
-    """Trading volume."""
+    """Volume."""
+    OpenInterest: float
+    """Open interest (0 when not provided)."""
 
 class IRecordList(list[IRecord]):
-    """Extended list of IRecord with convenient property accessors for OHLCV arrays.
+    """K-line list returned by ``exchange.GetRecords()``: a ``list`` of ``IRecord`` plus column accessors.
 
-    Can be passed directly to TA/talib indicator functions. The property accessors
-    extract all values of a specific field into a flat list.
+    ``records.Close`` (any field name) is the list of that field across all bars — a numpy array when
+    numpy/TA-Lib is installed — ready for ``talib`` functions. The list itself can be passed to ``TA``.
 
     Example::
 
         records = exchange.GetRecords(PERIOD_H1)
         if records:
-            closes = records.Close   # list of all close prices
-            highs = records.High     # list of all high prices
+            closes = records.Close
             rsi = TA.RSI(records, 14)
+            macd = talib.MACD(records.Close)
     """
     @property
+    def Time(self) -> list[int]:
+        """Bar start times."""
+        ...
+    @property
     def Open(self) -> list[float]:
-        """List of all open prices extracted from the records."""
+        """Open prices."""
         ...
     @property
     def High(self) -> list[float]:
-        """List of all high prices extracted from the records."""
+        """High prices."""
         ...
     @property
     def Low(self) -> list[float]:
-        """List of all low prices extracted from the records."""
+        """Low prices."""
         ...
     @property
     def Close(self) -> list[float]:
-        """List of all close prices extracted from the records."""
+        """Close prices."""
         ...
     @property
     def Volume(self) -> list[float]:
-        """List of all volume values extracted from the records."""
+        """Volumes."""
+        ...
+    @property
+    def OpenInterest(self) -> list[float]:
+        """Open interest values."""
         ...
 
-class IMarket:
-    """Market/trading pair information, describing precision, limits and other metadata.
-
-    Obtained via ``exchange.GetMarkets()``.
+class IMarket(dict[str, Any]):
+    """Market (instrument) information, values of the dict returned by ``exchange.GetMarkets()``.
 
     Example::
 
         markets = exchange.GetMarkets()
         if markets:
-            btc = markets.get("BTC_USDT")
-            if btc:
-                Log("Price precision:", btc.PricePrecision, "Amount precision:", btc.AmountPrecision)
-                Log("Min qty:", btc.MinQty, "Min notional:", btc.MinNotional)
+            m = markets.get("BTC_USDT")
+            if m:
+                Log("Price precision:", m.PricePrecision, "Min qty:", m.MinQty)
     """
     Symbol: str
-    """Trading pair symbol, e.g. ``"BTC_USDT"``, for futures ``"BTC_USDT.swap"``."""
+    """The exchange's native instrument name, e.g. ``"btcusdt"`` (differs from ``Ticker.Symbol``; the dict key
+    is the platform symbol code)."""
     BaseAsset: str
-    """Base asset (trading currency), e.g. ``"BTC"``."""
+    """Base currency, upper case, e.g. ``"BTC"``."""
     QuoteAsset: str
-    """Quote asset, e.g. ``"USDT"``."""
-    TickSize: Optional[float]
-    """Minimum price tick size, e.g. 0.01."""
-    AmountSize: Optional[float]
-    """Minimum amount step size, e.g. 0.001."""
-    PricePrecision: Optional[int]
-    """Price decimal precision, e.g. 2 means 2 decimal places."""
-    AmountPrecision: Optional[int]
-    """Amount decimal precision, e.g. 3 means 3 decimal places."""
-    MinQty: Optional[float]
+    """Quote currency, upper case, e.g. ``"USDT"``."""
+    TickSize: float
+    """Minimum price increment, e.g. 0.01."""
+    AmountSize: float
+    """Minimum quantity increment, e.g. 0.001."""
+    PricePrecision: int
+    """Price decimals (may be negative: -1 means rounded to tens)."""
+    AmountPrecision: int
+    """Quantity decimals (may be negative)."""
+    MinQty: float
     """Minimum order quantity."""
-    MaxQty: Optional[float]
-    """Maximum order quantity."""
-    MinNotional: Optional[float]
-    """Minimum order value (notional value)."""
-    MaxNotional: Optional[float]
-    """Maximum order value (notional value)."""
-    CtVal: Optional[float]
-    """Contract value (futures), e.g. 0.01 means one contract represents 0.01 coins."""
-    Info: Optional[object]
-    """Raw market information returned by the exchange."""
+    MaxQty: float
+    """Maximum order quantity (9007199254740991 when unlimited)."""
+    MinNotional: float
+    """Minimum order value."""
+    MaxNotional: float
+    """Maximum order value. The key is absent when the exchange does not provide it."""
+    CtVal: float
+    """Contract value of one contract, in ``CtValCcy`` (futures). The key is absent when not provided."""
+    CtValCcy: str
+    """Unit of ``CtVal`` (e.g. ``"BTC"``, ``"USD"``). The key is absent when not provided."""
+    Info: Any
+    """Raw exchange market data for this instrument."""
 
 class IGo:
-    """Concurrent task object returned by ``exchange.Go()``, used for asynchronous result retrieval.
+    """Concurrent task returned by ``exchange.Go()``.
 
     Example::
 
-        # Concurrently fetch ticker and depth
-        go_ticker = exchange.Go("GetTicker")
-        go_depth = exchange.Go("GetDepth")
-        ticker, ok = go_ticker.wait()   # Wait for ticker result
-        depth, ok = go_depth.wait()     # Wait for depth result
+        a = exchange.Go("GetTicker", "BTC_USDT")
+        b = exchange.Go("GetDepth")
+        ticker, ok = a.wait()
+        depth, ok = b.wait()
     """
-    def wait(self, timeout: Optional[int] = None) -> tuple[object, bool]:
-        """Wait for the concurrent task to complete and return the result.
+    def wait(self, timeout: int = 0) -> tuple[Any, bool]:
+        """Wait for the task and take its result.
 
         Args:
-            timeout: Timeout duration in milliseconds.
-
-                - Not passed or 0: Block until the result is returned.
-                - Positive number: Wait at most that many ms; if the task has not finished, return
-                  ``(None, False)`` — you can call ``wait()`` again later.
-                - Negative number (-1): Do not wait; return ``(None, False)`` immediately if not finished.
+            timeout: Milliseconds. Omitted or ``0``: block until done. Positive: wait at most that long; if the
+                task has not finished return ``(None, False)`` — ``wait()`` can be called again later.
+                Negative (``-1``): do not wait.
 
         Returns:
-            A ``(result, ok)`` tuple: ``(return value of the function, True)`` on success;
-            ``(None, False)`` on failure, no data or timeout. Calling ``wait()`` again after the result
-            was taken logs the error ``routine N already finished`` and returns ``(None, False)``.
-
-        Example::
-
-            go = exchange.Go("GetTicker")
-            ticker, ok = go.wait(2000)  # Wait at most 2 seconds
-            if not ok:
-                ticker, ok = go.wait()  # Keep waiting after a timeout
+            ``(result, True)`` on success (the same value the direct call returns); ``(None, False)`` on failure,
+            no data or timeout. Calling ``wait()`` again after the result was taken logs the error
+            ``routine N already finished`` and returns ``(None, False)``.
         """
         ...
 
-class IHttpQueryGo:
-    """Concurrent object returned by ``HttpQuery_Go()``."""
-    def wait(self, timeout: Optional[int] = None) -> Optional[Union[str, "IHttpRet"]]:
-        """Wait for the HTTP request; returns the same value as the synchronous ``HttpQuery()``.
+class IHttpQueryGo(Generic[_V]):
+    """Concurrent request returned by ``HttpQuery_Go()``."""
+    @overload
+    def wait(self) -> _V: ...
+    @overload
+    def wait(self, timeout: int) -> Optional[_V]:
+        """Wait for the request; the result is the same value the synchronous ``HttpQuery()`` returns.
 
         Args:
-            timeout: Timeout in milliseconds. Not passed or 0 waits until done; -1 does not wait; a positive
-                number waits at most that long. Returns ``None`` while unfinished (``wait()`` can be called
-                again); once the result is in, repeated ``wait()`` calls return the same result.
+            timeout: Milliseconds. Omitted or ``0`` waits until done; ``-1`` does not wait; a positive number
+                waits at most that long. Returns ``None`` while unfinished (``wait()`` can be called again).
+                Calling ``wait()`` again after the result was taken logs ``routine N already finished`` and
+                returns ``None``.
         """
         ...
 
-class IData:
+class IData(dict[str, Any]):
     """Return value of ``exchange.GetData()``."""
     Time: int
-    """Timestamp (ms) of the matched row; offset (or the next row's time) when there is none."""
-    Data: object
+    """Timestamp (ms) of the matched row; ``offset`` (or the next row's time) when there is none."""
+    Data: Any
     """Data of the matched row; ``None`` when there is no row, the fetch failed or the source is unavailable
     (read the reason with ``GetLastError()``)."""
 
 class IExchange:
-    """Exchange operation interface, encapsulates all exchange API call methods.
+    """An exchange account object: the global ``exchange`` (= ``exchanges[0]``) or ``exchanges[i]``.
 
-    Access via global variable ``exchange`` (first exchange) or ``exchanges[i]`` (i-th exchange).
+    Failed exchange calls do not raise: they log an error, return ``None`` (``CancelConditionOrder`` returns
+    ``False``) and ``GetLastError()`` returns the reason.
 
     Example::
 
@@ -544,745 +547,118 @@ class IExchange:
         order_id = exchange.Buy(ticker.Sell, 0.1)
         order = exchange.GetOrder(order_id)
     """
-    def Go(self, method: str, *args: object) -> IGo:
-        """Create a concurrent task, asynchronously call exchange methods.
-
-        Does not block current code execution. Call the ``wait()`` method
-        of the returned IGo object to get the result. Multiple concurrent
-        requests can be initiated simultaneously to improve efficiency.
+    def Go(self, method: str, *args: Any) -> IGo:
+        """Call an exchange method concurrently: returns immediately, take the result with ``wait()``.
 
         Args:
-            method: Method name to call, e.g. ``"GetTicker"``, ``"GetDepth"``,
-                ``"GetAccount"``, ``"GetRecords"``, ``"Buy"``, ``"Sell"``, etc.
-            *args: Parameters to pass to the method.
+            method: Method name, e.g. ``"GetTicker"``, ``"GetDepth"``, ``"GetAccount"``, ``"GetRecords"``,
+                ``"CreateOrder"``, ``"Buy"``, ``"IO"``.
+            *args: The method's arguments, as in a direct call.
 
         Returns:
-            IGo object. Call its ``wait()`` method to get the result.
+            IGo task; ``wait()`` returns ``(result, ok)``. On completion ``EventLoop()`` receives an event whose
+            ``Event`` is ``"Exchange_<method>"``.
 
         Example::
 
-            go_ticker = exchange.Go("GetTicker", "BTC_USDT")
-            go_account = exchange.Go("GetAccount")
-            ticker = go_ticker.wait()
-            account = go_account.wait()
+            a = exchange.Go("GetTicker", "BTC_USDT")
+            b = exchange.Go("GetAccount")
+            ticker, ok1 = a.wait()
+            account, ok2 = b.wait()
         """
         ...
 
-    def GetPositions(self, symbol: str = '') -> Optional[list[IPosition]]:
-        """Get current position list (futures).
+    # ---- Market ----
+
+    def GetTicker(self, symbol: str = '') -> Optional[ITicker]:
+        """Get the ticker.
 
         Args:
-            symbol: Trading pair symbol, e.g. ``"BTC_USDT.swap"``.
-                Not passed returns all positions.
+            symbol: Symbol code, e.g. ``"BTC_USDT"`` (spot), ``"BTC_USDT.swap"`` (futures). Omitted: the current
+                trading pair / contract.
 
         Returns:
-            Position list, ``None`` on failure. Empty list ``[]`` when no positions.
-
-        Example::
-
-            positions = exchange.GetPositions("BTC_USDT.swap")
-            if positions and len(positions) > 0:
-                Log("Amount:", positions[0].Amount, "Direction:", positions[0].Type)
-        """
-        ...
-
-    def GetContractType(self) -> str:
-        """Get currently set contract type (futures).
-
-        Returns:
-            Current contract type string, e.g. ``"swap"`` (perpetual),
-            ``"quarter"`` (quarterly), ``"this_week"``, etc.
-        """
-        ...
-
-    def SetContractType(self, symbol: str) -> object:
-        """Set contract type (futures). Must be set before calling trading interfaces.
-
-        Args:
-            symbol: Contract type:
-
-                - ``"swap"``: Perpetual contract
-                - ``"quarter"``: Quarterly contract
-                - ``"next_quarter"``: Next quarter contract
-                - ``"this_week"``: This week contract
-                - ``"next_week"``: Next week contract
-                - Can also pass a contract ID, e.g. ``"BTC-USD-200925"``
-
-        Returns:
-            Setting result.
-
-        Example::
-
-            exchange.SetContractType("swap")       # Perpetual contract
-            exchange.SetContractType("quarter")    # Quarterly contract
-        """
-        ...
-
-    def SetMarginLevel(self, symbol: str|float, num: float=None) -> None:
-        """Set leverage multiplier (futures).
-
-        Can be called with one or two arguments:
-
-        - ``SetMarginLevel(10)`` — Set 10x leverage for all pairs.
-        - ``SetMarginLevel("BTC_USDT.swap", 20)`` — Set 20x leverage for a specific pair.
-
-        Args:
-            symbol: Leverage multiplier (if single arg) or trading pair symbol (if two args).
-            num: Leverage multiplier when symbol is specified.
-
-        Example::
-
-            exchange.SetMarginLevel(10)
-            exchange.SetMarginLevel("BTC_USDT.swap", 20)
-        """
-        ...
-
-    def SetDirection(self, s: str) -> None:
-        """Set futures trading direction. Must be set before placing orders.
-
-        Discouraged: prefer ``CreateOrder``, which takes the side directly, so
-        no ``SetDirection`` is needed.
-
-        Args:
-            s: Trading direction:
-
-                - ``"buy"``: Buy to open long
-                - ``"sell"``: Sell to open short
-                - ``"closebuy"``: Sell to close long
-                - ``"closesell"``: Buy to close short
-
-        Example::
-
-            exchange.SetDirection("buy")
-            exchange.Buy(50000, 1)           # Open long
-            exchange.SetDirection("closebuy")
-            exchange.Sell(51000, 1)           # Close long
-        """
-        ...
-
-    def CancelOrder(self, orderId: object, *extra: object) -> bool:
-        """Cancel a specified order.
-
-        Args:
-            orderId: Order ID to cancel.
-            *extra: Additional log information, will be displayed in the log.
-
-        Returns:
-            ``True`` on successful cancellation, ``False`` on failure.
-
-        Example::
-
-            oid = exchange.Buy(50000, 0.1)
-            if oid:
-                exchange.CancelOrder(oid, "Cancel test order")
-        """
-        ...
-
-    def GetOrder(self, orderId: object) -> Optional[IOrder]:
-        """Query order details by order ID.
-
-        Args:
-            orderId: Order ID.
-
-        Returns:
-            Order information object, ``None`` on failure.
-
-        Example::
-
-            order = exchange.GetOrder(order_id)
-            if order:
-                Log("Status:", order.Status, "Filled:", order.DealAmount)
-        """
-        ...
-
-    def GetOrders(self, symbol: str = '') -> Optional[list[IOrder]]:
-        """Get list of current unfilled pending orders.
-
-        Args:
-            symbol: Trading pair symbol. Not passed uses currently set trading pair.
-
-        Returns:
-            Unfilled order list (empty list means no pending orders), ``None`` on failure.
-
-        Example::
-
-            orders = exchange.GetOrders("BTC_USDT")
-            if orders is not None:
-                Log("Pending orders:", len(orders))
-        """
-        ...
-
-    def GetHistoryOrders(self, symbol: str|int = '', since: int = 0, limit: int = 0) -> Optional[list[IOrder]]:
-        """Get historical orders (filled/cancelled).
-
-        Args:
-            symbol: Trading pair symbol.
-            since: Start timestamp (milliseconds), defaults to most recent.
-            limit: Maximum number to return.
-
-        Returns:
-            Historical order list, ``None`` on failure.
-
-        Example::
-
-            orders = exchange.GetHistoryOrders("BTC_USDT", 0, 100)
-            if orders:
-                Log("Historical orders:", len(orders))
-        """
-        ...
-
-    def CancelConditionOrder(self, orderId: object, *extra: object) -> bool:
-        """Cancel a specified condition order.
-
-        Args:
-            orderId: Condition order ID.
-            *extra: Additional log information.
-
-        Returns:
-            ``True`` on successful cancellation, ``False`` on failure.
-        """
-        ...
-
-    def GetConditionOrder(self, orderId: object) -> Optional[IOrder]:
-        """Query condition order details by ID.
-
-        Args:
-            orderId: Condition order ID.
-
-        Returns:
-            Condition order information, ``None`` on failure.
-        """
-        ...
-
-    def GetConditionOrders(self, symbol: str = '') -> Optional[list[IOrder]]:
-        """Get list of current untriggered condition orders.
-
-        Args:
-            symbol: Trading pair symbol. Not passed returns all.
-
-        Returns:
-            Condition order list, ``None`` on failure.
-        """
-        ...
-
-    def GetHistoryConditionOrders(self, symbol: str|int = '', since: int = 0, limit: int = 0) -> Optional[list[IOrder]]:
-        """Get historical condition order list.
-
-        Args:
-            symbol: Trading pair symbol.
-            since: Start timestamp (milliseconds).
-            limit: Maximum number to return.
-
-        Returns:
-            Historical condition order list, ``None`` on failure.
-        """
-        ...
-
-    def Log(self, orderType: int, price: float, amount: float, *args: object) -> None:
-        """Record simulated trading log (no actual order). Used for virtual trading or signal marking.
-
-        Args:
-            orderType: Log type: ``LOG_TYPE_BUY``, ``LOG_TYPE_SELL``, or ``LOG_TYPE_CANCEL``.
-            price: Price (or order ID when cancelling).
-            amount: Amount.
-            *args: Additional log information.
-
-        Example::
-
-            exchange.Log(LOG_TYPE_BUY, 50000, 0.1, "Simulated buy signal")
-            exchange.Log(LOG_TYPE_SELL, 51000, 0.1, "Simulated sell signal")
-        """
-        ...
-
-    def Sell(self, price: float, amount: float, *extra: object) -> Optional[IOrderId]:
-        """Place sell order (spot sell / futures sell order according to current direction).
-
-        Args:
-            price: Sell price. Pass ``-1`` for market order.
-            amount: Sell amount.
-            *extra: Additional log information.
-
-        Returns:
-            Order ID (str or int), ``None`` on failure.
-
-        Example::
-
-            oid = exchange.Sell(51000, 0.1, "Limit sell")
-            oid = exchange.Sell(-1, 0.1, "Market sell")
-        """
-        ...
-
-    def Buy(self, price: float, amount: float, *extra: object) -> Optional[IOrderId]:
-        """Place buy order (spot buy / futures buy order according to current direction).
-
-        Args:
-            price: Buy price. Pass ``-1`` for market order.
-            amount: Buy amount.
-            *extra: Additional log information.
-
-        Returns:
-            Order ID (str or int), ``None`` on failure.
-
-        Example::
-
-            oid = exchange.Buy(50000, 0.1, "Limit buy")
-            oid = exchange.Buy(-1, 0.1, "Market buy")
-        """
-        ...
-
-    def CreateOrder(self, symbol: str, side: str, price: float, amount: float, *extra: object) -> Optional[IOrderId]:
-        """Generic order function. Supports specifying trading pair and direction directly.
-
-        The ``side`` parameter can have options attached, separated by semicolon,
-        e.g. ``'buy;{"timeInForce":"GTC"}'``.
-
-        Args:
-            symbol: Trading pair symbol, e.g. ``"BTC_USDT"`` (spot) or ``"BTC_USDT.swap"`` (futures).
-            side: Order direction: ``"buy"``, ``"sell"``, ``"closebuy"``, ``"closesell"``.
-            price: Price. Pass ``-1`` for market order.
-            amount: Amount.
-            *extra: Additional log information.
-
-        Returns:
-            Order ID, ``None`` on failure.
-
-        Example::
-
-            # Spot buy
-            exchange.CreateOrder("ETH_USDT", "buy", -1, 1)
-            # Futures open long
-            exchange.CreateOrder("BTC_USDT.swap", "buy", 50000, 1)
-            # Futures close long
-            exchange.CreateOrder("BTC_USDT.swap", "closebuy", -1, 1)
-        """
-        ...
-
-    def ModifyOrder(self, orderId: object, side: str, price: float, amount: float, *extra: object) -> Optional[IOrderId]:
-        """Modify price and amount of an existing order.
-
-        Args:
-            orderId: Order ID to modify. For futures may be in ``"symbol,orderId"`` format.
-            side: Order direction.
-            price: New price.
-            amount: New amount.
-            *extra: Additional log information.
-
-        Returns:
-            Updated order ID, ``None`` on failure.
-        """
-        ...
-
-    def CreateConditionOrder(self, symbol: str, side: str, amount: float, condition: object, *extra: object) -> Optional[IOrderId]:
-        """Create condition order (take profit, stop loss, etc.).
-
-        Args:
-            symbol: Trading pair symbol.
-            side: Order direction: ``"buy"``, ``"sell"``, ``"closebuy"``, ``"closesell"``.
-            amount: Amount.
-            condition: Condition parameters dict, including trigger price, etc.
-            *extra: Additional log information.
-
-        Returns:
-            Condition order ID, ``None`` on failure.
-
-        Example::
-
-            exchange.CreateConditionOrder("BTC_USDT.swap", "closebuy", 1, {
-                "ConditionType": ORDER_CONDITION_TYPE_TP,
-                "TpTriggerPrice": 55000,
-                "TpOrderPrice": 54900
-            })
-        """
-        ...
-
-    def ModifyConditionOrder(self, orderId: object, side: str, amount: float, condition: object, *extra: object) -> Optional[IOrderId]:
-        """Modify an existing condition order.
-
-        Args:
-            orderId: Condition order ID.
-            side: Order direction.
-            amount: New amount.
-            condition: New condition parameters.
-            *extra: Additional log information.
-
-        Returns:
-            Updated condition order ID, ``None`` on failure.
-        """
-        ...
-
-    def GetRawJSON(self) -> str:
-        """Get the raw JSON string returned by the most recent REST API request.
-
-        Useful for debugging and inspecting raw exchange responses.
-
-        Returns:
-            Raw JSON string.
-
-        Example::
-
-            exchange.GetTicker()
-            raw = exchange.GetRawJSON()
-            Log("Raw response:", raw)
-        """
-        ...
-
-    def GetAccount(self) -> Optional[IAccount]:
-        """Get account information (balance, frozen, etc.).
-
-        Returns:
-            Account information object, ``None`` on failure.
-
-        Example::
-
-            account = exchange.GetAccount()
-            if account:
-                Log("Balance:", account.Balance, "Frozen:", account.FrozenBalance)
-        """
-        ...
-
-    def GetRecords(self, symbol: str|int='', period: Optional[int] = None, limit: int = 0) -> Optional[IRecordList]:
-        """Get candlestick/OHLCV data.
-
-        Args:
-            symbol: Trading pair symbol. Not passed uses currently set trading pair.
-            period: Candlestick period (seconds), e.g. ``PERIOD_M1``, ``PERIOD_H1``.
-                Not passed uses default period set when creating the bot.
-            limit: Maximum number of candlesticks to return.
-
-        Returns:
-            Candlestick data list (ascending by time), ``None`` on failure.
-
-        Example::
-
-            records = exchange.GetRecords(PERIOD_H1)
-            records = exchange.GetRecords("ETH_USDT", PERIOD_M5, 100)
-            # Pass to TA for technical analysis
-            dif, dea, macd = TA.MACD(records)
-        """
-        ...
-
-    def SetMaxBarLen(self, n: int) -> None:
-        """Set maximum candlestick cache length (default 200 bars).
-
-        Args:
-            n: Maximum number of candlestick bars.
-
-        Example::
-
-            exchange.SetMaxBarLen(500)  # Cache up to 500 bars
-        """
-        ...
-
-    def GetTrades(self, symbol: str='') -> Optional[list[ITrade]]:
-        """Get recent trade records.
-
-        Args:
-            symbol: Trading pair symbol. Not passed uses currently set trading pair.
-
-        Returns:
-            Trade record list (ascending by time), ``None`` on failure.
-
-        Example::
-
-            trades = exchange.GetTrades()
-            if trades and len(trades) > 0:
-                Log("Latest trade:", trades[-1].Price)
-        """
-        ...
-
-    def GetTicker(self, symbol: str='') -> Optional[ITicker]:
-        """Get current ticker.
-
-        Args:
-            symbol: Trading pair symbol. Not passed uses currently set trading pair.
-
-        Returns:
-            Ticker data, ``None`` on failure.
+            ``ITicker``, ``None`` on failure.
 
         Example::
 
             ticker = exchange.GetTicker("BTC_USDT")
             if ticker:
-                Log("BTC price:", ticker.Last)
+                Log("BTC:", ticker.Last)
         """
         ...
 
     def GetTickers(self) -> Optional[list[ITicker]]:
-        """Get ticker data for all trading pairs (batch fetch).
+        """Get the tickers of every symbol of the exchange (spot: all pairs; futures: all contracts).
 
         Returns:
-            Ticker list for all trading pairs, ``None`` on failure.
+            ``ITicker`` list, ``None`` on failure or when the exchange has no aggregated ticker endpoint.
 
         Example::
 
             tickers = exchange.GetTickers()
             if tickers:
-                for t in tickers:
-                    if t.Symbol == "BTC_USDT":
-                        Log("BTC:", t.Last)
+                Log("Symbols:", len(tickers))
         """
         ...
 
-    def GetFundings(self, symbol: str = '') -> Optional[list[IFunding]]:
-        """Get funding rate information (perpetual contracts).
+    def GetDepth(self, symbol: str = '') -> Optional[IDepth]:
+        """Get the order book. Asks ascending, bids descending.
 
         Args:
-            symbol: Trading pair symbol.
+            symbol: Symbol code; omitted: the current trading pair / contract.
 
         Returns:
-            Funding rate list, ``None`` on failure.
+            ``IDepth``, ``None`` on failure.
 
         Example::
 
-            fundings = exchange.GetFundings("BTC_USDT.swap")
-            if fundings:
-                Log("Funding rate:", fundings[0].Rate)
-        """
-        ...
-
-    def GetDepth(self, symbol: str='') -> Optional[IDepth]:
-        """Get market depth (order book). Asks from low to high, Bids from high to low.
-
-        Args:
-            symbol: Trading pair symbol. Not passed uses currently set trading pair.
-
-        Returns:
-            Depth data, ``None`` on failure.
-
-        Example::
-
-            depth = exchange.GetDepth("BTC_USDT")
+            depth = exchange.GetDepth()
             if depth:
                 Log("Best ask:", depth.Asks[0].Price, "Best bid:", depth.Bids[0].Price)
         """
         ...
 
-    def GetBaseCurrency(self) -> str:
-        """Get base currency name.
-
-        Returns:
-            Base currency string, e.g. ``"BTC"``.
-        """
-        ...
-
-    def GetQuoteCurrency(self) -> str:
-        """Get quote currency name.
-
-        Returns:
-            Quote currency string, e.g. ``"USDT"``.
-        """
-        ...
-
-    def SetProxy(self, proxy: str) -> None:
-        """Set proxy server address.
+    def GetTrades(self, symbol: str = '') -> Optional[list[ITrade]]:
+        """Get recent public trades (ascending by time).
 
         Args:
-            proxy: Proxy address. Supported formats:
+            symbol: Symbol code; omitted: the current trading pair / contract.
 
-                - ``"socks5://user:pass@host:port"`` — SOCKS5 proxy
-                - ``"http://host:port"`` — HTTP proxy
-                - ``""`` — Clear proxy settings
+        Returns:
+            ``ITrade`` list, ``None`` on failure.
+        """
+        ...
+
+    def GetRecords(self, symbol: Union[str, int] = '', period: int = -1, limit: int = 0) -> Optional[IRecordList]:
+        """Get K-lines (ascending by time).
+
+        Call forms: ``GetRecords()``, ``GetRecords(symbol)``, ``GetRecords(symbol, period)``,
+        ``GetRecords(symbol, period, limit)``, ``GetRecords(period)``, ``GetRecords(period, limit)``.
+
+        Args:
+            symbol: Symbol code; omitted: the current trading pair / contract. An int here is the period.
+            period: Bar period in seconds, e.g. ``PERIOD_M1``, ``PERIOD_H1``; omitted: the robot's default period.
+            limit: Number of bars; omitted: the length set by ``SetMaxBarLen()`` (200 by default).
+
+        Returns:
+            ``IRecordList``, ``None`` on failure.
 
         Example::
 
-            exchange.SetProxy("socks5://127.0.0.1:1080")
-            exchange.SetProxy("")  # Cancel proxy
-        """
-        ...
-
-    def SetPrecision(self, pricePrecision: int, amountPrecision: int) -> None:
-        """Set decimal precision for price and amount. Automatically truncates when placing orders.
-
-        Args:
-            pricePrecision: Price decimal places.
-            amountPrecision: Amount decimal places.
-
-        Example::
-
-            exchange.SetPrecision(2, 4)  # Price 2 digits, amount 4 digits
-        """
-        ...
-
-    def IO(self, k: str, *args: object) -> object:
-        """Send arbitrary API request (IO control). Used to call exchange APIs not yet encapsulated.
-
-        Args:
-            k: Request path or control command:
-
-                - API path: e.g. ``"/api/v5/account/balance"``
-                - ``"api"``: Generic API call
-                - ``"currency"``: Switch trading pair
-                - ``"base"``: Switch API base address
-
-            *args: Request parameters.
-
-        Returns:
-            API response result (parsed as object).
-
-        Example::
-
-            ret = exchange.IO("api", "GET", "/api/v5/account/balance")
-            exchange.IO("currency", "ETH_USDT")
-        """
-        ...
-
-    def SetTimeout(self, n: int) -> None:
-        """Set REST API request timeout.
-
-        Args:
-            n: Timeout duration in milliseconds.
-
-        Example::
-
-            exchange.SetTimeout(10000)  # 10 second timeout
-        """
-        ...
-
-    def SetBase(self, s: str) -> None:
-        """Set exchange API base address. Used to switch to alternate domain or testnet.
-
-        Args:
-            s: API base URL.
-
-        Example::
-
-            exchange.SetBase("https://testnet.binance.vision")
-        """
-        ...
-
-    def GetBase(self) -> str:
-        """Get current API base address.
-
-        Returns:
-            API base URL string.
-        """
-        ...
-
-    def SetCurrency(self, s: str) -> None:
-        """Switch current trading pair.
-
-        Args:
-            s: Trading pair string, e.g. ``"BTC_USDT"``, ``"ETH_BTC"``.
-
-        Example::
-
-            exchange.SetCurrency("ETH_USDT")
-            Log(exchange.GetTicker())  # Get ETH ticker
-        """
-        ...
-
-    def SetRate(self, n: float = 1) -> float:
-        """Set exchange rate conversion. All prices will be automatically multiplied by this rate.
-
-        Args:
-            n: Exchange rate value. ``1`` means no conversion; omitted or non-positive means ``1``.
-
-        Returns:
-            The rate in effect before this call.
-
-        Example::
-
-            exchange.SetRate(6.5)  # Convert prices to CNY
-            exchange.SetRate(1)    # Cancel conversion
-        """
-        ...
-
-    def GetRate(self) -> float:
-        """Get currently set exchange rate value.
-
-        Returns:
-            Exchange rate value, default is ``1``.
-        """
-        ...
-
-    def SetData(self, key: str, value: object) -> int:
-        """Write a data set for ``exchange.GetData()`` to read (commonly used to load custom data).
-
-        Args:
-            key: Data set name.
-            value: A ``[[timestamp, data], ...]`` list (or its JSON string), or ``{"schema": [...], "data": [...]}``.
-
-        Returns:
-            Length of the JSON-encoded data; ``0`` (and ``GetLastError()`` set) when the format is wrong.
-
-        Example::
-
-            exchange.SetData("test", [[1579536000000, 123], [1579622400000, 456]])
-            Log(exchange.GetData("test"))
-        """
-        ...
-
-    def GetData(self, key: str, timeout: Optional[int] = None, offset: int = 0) -> IData:
-        """Get a data set written by ``exchange.SetData()`` or provided by an external link.
-
-        http/https links are fetched by this node; the response must be ``[[time, data], ...]`` or
-        ``{"schema": [...], "data": [...]}``, cached for ``timeout`` and refetched when expired. Local data
-        written by SetData never expires. Server-side ``ext.`` data sources are unavailable on this runtime.
-
-        Args:
-            key: Data set name or request link (http/https URL).
-            timeout: Cache timeout in milliseconds, 60000 when omitted, minimum 5000.
-            offset: Take the last row with ``time <= offset``; ``0`` or omitted means the current time.
-
-        Returns:
-            An ``IData`` object (``Time``, ``Data``). Always an object: when there is no row, the fetch failed or
-            the source is unavailable, ``Data`` is ``None`` and ``GetLastError()`` has the reason.
-
-        Example::
-
-            data = exchange.GetData("test")
-            extern = exchange.GetData("https://www.example.com/data.json")
-            if extern.Data is None:
-                Log("no data:", GetLastError())
-        """
-        ...
-
-    def GetUSDCNY(self) -> float:
-        """Get USD to CNY exchange rate.
-
-        Returns:
-            USD/CNY exchange rate.
-        """
-        ...
-
-    def GetLabel(self) -> str:
-        """Get exchange custom label name (set when configuring the exchange on the platform).
-
-        Returns:
-            Label string.
-        """
-        ...
-
-    def GetCurrency(self) -> str:
-        """Get current trading pair name.
-
-        Returns:
-            Trading pair string, e.g. ``"BTC_USDT"``.
-        """
-        ...
-
-    def GetPeriod(self) -> int:
-        """Get currently set candlestick period.
-
-        Returns:
-            Candlestick period in seconds.
-        """
-        ...
-
-    def GetName(self) -> str:
-        """Get exchange name.
-
-        Returns:
-            Exchange platform name, e.g. ``"Binance"``, ``"OKX"``, ``"Futures_Binance"``.
+            records = exchange.GetRecords(PERIOD_H1)
+            records = exchange.GetRecords("ETH_USDT", PERIOD_M5, 100)
+            if records:
+                dif, dea, hist = TA.MACD(records)
         """
         ...
 
     def GetMarkets(self) -> Optional[dict[str, IMarket]]:
-        """Get market information for all trading pairs.
+        """Get market information of the exchange's instruments.
 
         Returns:
-            Market info dict keyed by trading pair symbol (e.g. ``"BTC_USDT"``),
-            ``None`` on failure.
+            Dict keyed by symbol code (e.g. ``"BTC_USDT"``, ``"BTC_USDT.swap"``), ``None`` on failure or when
+            not supported.
 
         Example::
 
@@ -1294,392 +670,782 @@ class IExchange:
         """
         ...
 
-    def GetAssets(self) -> Optional[list[IAsset]]:
-        """Get all asset information for the account.
+    def GetRawJSON(self) -> str:
+        """Raw response of the most recent REST call of this exchange object (including ``IO("api", ...)``);
+        the error string when that call failed, ``""`` before any call.
+
+        Example::
+
+            exchange.GetTicker()
+            Log(exchange.GetRawJSON())
+        """
+        ...
+
+    def SetData(self, key: str, value: Any) -> int:
+        """Load a data set that ``exchange.GetData()`` reads.
+
+        Args:
+            key: Data set name.
+            value: ``[[timestamp, data], ...]`` (or its JSON string), or ``{"schema": [...], "data": [...]}``.
 
         Returns:
-            Asset list, each element contains currency, available amount, frozen amount.
-            ``None`` on failure.
+            Length of the JSON-encoded data; ``0`` (with ``GetLastError()`` set) when the format is wrong.
+
+        Example::
+
+            exchange.SetData("test", [[1579536000000, 123], [1579622400000, 456]])
+        """
+        ...
+
+    def GetData(self, key: str, timeout: int = 60000, offset: int = 0) -> IData:
+        """Read a data set loaded by ``exchange.SetData()`` or served by an http(s) URL.
+
+        The URL must return ``[[time, data], ...]`` or ``{"schema": [...], "data": [...]}``; it is cached for
+        ``timeout`` ms and fetched again when expired. Data loaded by ``SetData()`` never expires.
+
+        Args:
+            key: Data set name or http(s) URL.
+            timeout: Cache timeout in ms (60000 when omitted, minimum 5000).
+            offset: Millisecond timestamp: take the last row with ``time <= offset``; omitted: now (only rows
+                that have already "arrived").
+
+        Returns:
+            Always an ``IData`` ``{Time, Data}``; ``Data`` is ``None`` when there is no row or the fetch failed
+            (``GetLastError()`` has the reason).
+
+        Example::
+
+            d = exchange.GetData("https://www.example.com/data.json")
+            if d.Data is None:
+                Log("no data:", GetLastError())
+        """
+        ...
+
+    # ---- Account ----
+
+    def GetAccount(self) -> Optional[IAccount]:
+        """Get the balances of the current trading pair / contract.
+
+        Returns:
+            ``IAccount``, ``None`` on failure.
+
+        Example::
+
+            account = exchange.GetAccount()
+            if account:
+                Log("Balance:", account.Balance, "Stocks:", account.Stocks)
+        """
+        ...
+
+    def GetAssets(self) -> Optional[list[IAsset]]:
+        """Get every asset of the account.
+
+        Returns:
+            ``IAsset`` list, ``None`` on failure.
 
         Example::
 
             assets = exchange.GetAssets()
             if assets:
                 for a in assets:
-                    Log(a.Currency, "Available:", a.Amount)
+                    Log(a.Currency, a.Amount, a.FrozenAmount)
         """
+        ...
+
+    # ---- Trading ----
+
+    def Buy(self, price: float, amount: float = ..., *args: Any) -> Optional[IOrderId]:
+        """Place a buy order on the current trading pair / contract (futures: direction set by ``SetDirection()``).
+
+        Args:
+            price: Price; ``-1`` = market order. ``Buy(amount)`` with a single argument is also a market order.
+            amount: Quantity (spot market buy: usually the quote amount; futures: contracts).
+            *args: Extra values printed in the order log; a trailing dict is not logged but used as order options
+                (e.g. ``{"type": "post_only"}``).
+
+        Returns:
+            Order ID, ``None`` on failure.
+
+        Example::
+
+            oid = exchange.Buy(50000, 0.01, "limit buy")
+            oid = exchange.Buy(-1, 100)  # market buy for 100 USDT
+        """
+        ...
+
+    def Sell(self, price: float, amount: float = ..., *args: Any) -> Optional[IOrderId]:
+        """Place a sell order on the current trading pair / contract (futures: direction set by ``SetDirection()``).
+
+        Args:
+            price: Price; ``-1`` = market order. ``Sell(amount)`` with a single argument is also a market order.
+            amount: Quantity.
+            *args: Extra values printed in the order log; a trailing dict is used as order options.
+
+        Returns:
+            Order ID, ``None`` on failure.
+
+        Example::
+
+            oid = exchange.Sell(51000, 0.01)
+            oid = exchange.Sell(-1, 0.01)  # market sell
+        """
+        ...
+
+    def CreateOrder(self, symbol: str, side: str, price: float, amount: float, *args: Any) -> Optional[IOrderId]:
+        """Place an order on any symbol with an explicit side (no ``SetCurrency()`` / ``SetDirection()`` needed).
+
+        Args:
+            symbol: Symbol code, e.g. ``"BTC_USDT"`` or ``"BTC_USDT.swap"``; ``""`` = the current one.
+            side: Spot ``"buy"`` / ``"sell"``; futures ``"buy"`` (open long), ``"sell"`` (open short),
+                ``"closebuy"`` (close long), ``"closesell"`` (close short).
+            price: Price; ``-1`` = market order.
+            amount: Quantity (spot market buy: usually the quote amount; futures: contracts).
+            *args: Extra values printed in the order log; a trailing dict is used as order options
+                (``type``, ``tif``, ``postOnly``, ``reduceOnly``, ``clientId``, ...).
+
+        Returns:
+            Order ID, ``None`` on failure.
+
+        Example::
+
+            exchange.CreateOrder("ETH_USDT", "buy", -1, 100)
+            exchange.CreateOrder("BTC_USDT.swap", "buy", 50000, 1)
+            exchange.CreateOrder("BTC_USDT.swap", "closebuy", -1, 1)
+        """
+        ...
+
+    def ModifyOrder(self, orderId: Optional[IOrderId], side: str, price: float, amount: float, *args: Any) -> Optional[IOrderId]:
+        """Modify the price and/or quantity of an open order.
+
+        Args:
+            orderId: ID of the order to modify.
+            side: Side, as in ``CreateOrder()``.
+            price: New price; ``<= 0`` (e.g. ``-1``) keeps the price.
+            amount: New quantity; ``<= 0`` keeps the quantity (price and quantity cannot both be kept).
+            *args: A dict of exchange-specific options.
+
+        Returns:
+            The (possibly new) order ID, ``None`` on failure.
+        """
+        ...
+
+    def CancelOrder(self, orderId: Optional[IOrderId], *args: Any) -> Optional[bool]:
+        """Cancel an order.
+
+        Args:
+            orderId: Order ID.
+            *args: Extra values printed in the cancel log.
+
+        Returns:
+            ``True`` when the request was sent; ``False`` when the order could not be canceled (already filled /
+            final, reason in ``GetLastError()``); ``None`` when the request failed. Check the result with
+            ``GetOrder()``.
+
+        Example::
+
+            oid = exchange.Buy(50000, 0.01)
+            if oid:
+                exchange.CancelOrder(oid, "cancel test order")
+        """
+        ...
+
+    def GetOrder(self, orderId: Optional[IOrderId]) -> Optional[IOrder]:
+        """Get an order by ID.
+
+        Returns:
+            ``IOrder``, ``None`` on failure.
+
+        Example::
+
+            order = exchange.GetOrder(order_id)
+            if order:
+                Log("Status:", order.Status, "Filled:", order.DealAmount)
+        """
+        ...
+
+    def GetOrders(self, symbol: str = '') -> Optional[list[IOrder]]:
+        """Get open orders.
+
+        Args:
+            symbol: Symbol code (``"BTC_USDT.swap"``) or range (``"USDT.swap"``). Omitted or ``""``: spot = all
+                symbols; futures = the current quote currency and contract family (e.g. ``"USDT.swap"``).
+
+        Returns:
+            ``IOrder`` list (``[]`` = none), ``None`` on failure.
+
+        Example::
+
+            orders = exchange.GetOrders()
+            if orders is not None:
+                Log("Open orders:", len(orders))
+        """
+        ...
+
+    def GetHistoryOrders(self, symbol: Union[str, int] = '', since: int = 0, limit: int = 0) -> Optional[list[IOrder]]:
+        """Get finished (filled / canceled) orders.
+
+        Call forms: ``()``, ``(symbol)``, ``(symbol, since)``, ``(symbol, since, limit)``, ``(since)``,
+        ``(since, limit)``.
+
+        Args:
+            symbol: Symbol code; omitted: the current one.
+            since: Start time (millisecond timestamp).
+            limit: Maximum number of orders.
+
+        Returns:
+            ``IOrder`` list, ``None`` on failure.
+        """
+        ...
+
+    def CreateConditionOrder(self, symbol: str, side: str, amount: float, condition: dict[str, Any], *args: Any) -> Optional[IOrderId]:
+        """Create a conditional order (take-profit / stop-loss / OCO).
+
+        Args:
+            symbol: Symbol code; ``""`` = the current one.
+            side: ``"buy"``, ``"sell"``, ``"closebuy"``, ``"closesell"``.
+            amount: Quantity (futures: contracts).
+            condition: ``IOrderCondition`` dict.
+            *args: Extra values printed in the log; a dict is passed to the exchange unchanged.
+
+        Returns:
+            Conditional order ID, ``None`` on failure.
+
+        Example::
+
+            exchange.CreateConditionOrder("BTC_USDT.swap", "closebuy", 1, {
+                "ConditionType": ORDER_CONDITION_TYPE_TP,
+                "TpTriggerPrice": 55000,
+                "TpOrderPrice": -1
+            })
+        """
+        ...
+
+    def ModifyConditionOrder(self, orderId: Optional[IOrderId], side: str, amount: float, condition: dict[str, Any], *args: Any) -> Optional[IOrderId]:
+        """Modify a conditional order.
+
+        Args:
+            orderId: Conditional order ID.
+            side: Side.
+            amount: New quantity (must be > 0).
+            condition: New ``IOrderCondition`` dict.
+            *args: A dict of exchange-specific options.
+
+        Returns:
+            The (possibly new) conditional order ID, ``None`` on failure.
+        """
+        ...
+
+    def CancelConditionOrder(self, orderId: Optional[IOrderId], *args: Any) -> bool:
+        """Cancel a conditional order.
+
+        Returns:
+            ``True`` when the request was sent, ``False`` otherwise.
+        """
+        ...
+
+    def GetConditionOrder(self, orderId: Optional[IOrderId]) -> Optional[IOrder]:
+        """Get a conditional order by ID (``Order.Condition`` holds the condition).
+
+        Returns:
+            ``IOrder``, ``None`` on failure.
+        """
+        ...
+
+    def GetConditionOrders(self, symbol: str = '') -> Optional[list[IOrder]]:
+        """Get pending (untriggered) conditional orders. ``symbol`` default as ``GetOrders()``.
+
+        Returns:
+            ``IOrder`` list, ``None`` on failure.
+        """
+        ...
+
+    def GetHistoryConditionOrders(self, symbol: Union[str, int] = '', since: int = 0, limit: int = 0) -> Optional[list[IOrder]]:
+        """Get finished conditional orders. Call forms as ``GetHistoryOrders()``.
+
+        Returns:
+            ``IOrder`` list, ``None`` on failure.
+        """
+        ...
+
+    def Log(self, orderType: int, price: Union[float, IOrderId], amount: float = 0, *args: Any) -> Optional[Union[str, bool]]:
+        """Write a trade log entry without placing an order.
+
+        Args:
+            orderType: ``LOG_TYPE_BUY``, ``LOG_TYPE_SELL`` or ``LOG_TYPE_CANCEL``.
+            price: Price shown in the log (the order ID for ``LOG_TYPE_CANCEL``).
+            amount: Quantity shown in the log.
+            *args: Extra values appended to the log.
+
+        Returns:
+            Buy / sell: a virtual order ID (``"V"`` + digits); cancel: ``True``.
+
+        Example::
+
+            exchange.Log(LOG_TYPE_BUY, 50000, 0.1, "signal")
+            exchange.Log(LOG_TYPE_CANCEL, "123")
+        """
+        ...
+
+    # ---- Futures ----
+
+    def GetPositions(self, symbol: str = '') -> Optional[list[IPosition]]:
+        """Get futures positions.
+
+        Args:
+            symbol: Symbol code (``"BTC_USDT.swap"``) or range (``"USDT.swap"``). Omitted or ``""``: the current
+                quote currency and contract family (e.g. ``"USDT.swap"``).
+
+        Returns:
+            ``IPosition`` list (``[]`` = no positions), ``None`` on failure.
+
+        Example::
+
+            positions = exchange.GetPositions("BTC_USDT.swap")
+            if positions:
+                Log("Amount:", positions[0].Amount, "Type:", positions[0].Type)
+        """
+        ...
+
+    def GetPosition(self, symbol: str = '') -> Optional[list[IPosition]]:
+        """Legacy alias of ``GetPositions()``."""
+        ...
+
+    def SetContractType(self, symbol: str, *args: Any) -> Optional[dict[str, Any]]:
+        """Set the current contract (futures). Spot exchange objects do not support it.
+
+        Args:
+            symbol: Contract code, e.g. ``"swap"`` (perpetual), ``"quarter"``, ``"next_quarter"``, ``"this_week"``,
+                ``"next_week"``, a native contract code, or ``"BTC_USDT.swap"`` to switch pair and contract at once.
+
+        Returns:
+            The exchange contract, e.g. ``{"InstrumentID": "BTCUSD_230630", "instrument": "BTCUSD_230630"}``;
+            ``None`` on failure (the current contract is unchanged).
+
+        Example::
+
+            exchange.SetContractType("swap")
+            exchange.SetContractType("quarter")
+        """
+        ...
+
+    def GetContractType(self) -> str:
+        """The current contract code, e.g. ``"swap"``, ``"quarter"`` (``""`` for spot)."""
+        ...
+
+    def SetMarginLevel(self, symbol: Union[str, float], marginLevel: float = ...) -> Any:
+        """Set leverage (futures).
+
+        Call forms: ``SetMarginLevel(marginLevel)`` (current contract) and ``SetMarginLevel(symbol, marginLevel)``.
+
+        Example::
+
+            exchange.SetMarginLevel(10)
+            exchange.SetMarginLevel("BTC_USDT.swap", 20)
+        """
+        ...
+
+    def SetDirection(self, direction: str, hedgeFlag: str = ...) -> None:
+        """Set the direction of the next ``Buy()`` / ``Sell()`` (futures). Prefer ``CreateOrder()``, which takes the
+        side directly.
+
+        Args:
+            direction: ``"buy"`` (open long, use ``Buy``), ``"sell"`` (open short, use ``Sell``),
+                ``"closebuy"`` (close long, use ``Sell``), ``"closesell"`` (close short, use ``Buy``).
+                Chinese futures counters also take ``"closebuy_today"`` / ``"closesell_today"``.
+            hedgeFlag: Chinese futures counters: speculation / arbitrage / hedge flag.
+
+        Example::
+
+            exchange.SetDirection("buy")
+            exchange.Buy(50000, 1)
+            exchange.SetDirection("closebuy")
+            exchange.Sell(51000, 1)
+        """
+        ...
+
+    def GetFundings(self, symbol: str = '') -> Optional[list[IFunding]]:
+        """Get funding rates (perpetual contracts).
+
+        Args:
+            symbol: Symbol code (``"BTC_USDT.swap"``) or range (``"USDT.swap"``); omitted: the current quote
+                currency and contract family.
+
+        Returns:
+            ``IFunding`` list, ``None`` on failure.
+        """
+        ...
+
+    # ---- Exchange settings ----
+
+    def GetName(self) -> str:
+        """Exchange name, e.g. ``"Binance"``, ``"Futures_OKX"``."""
+        ...
+
+    def GetLabel(self) -> str:
+        """The label given to this exchange object when it was configured."""
+        ...
+
+    def SetLabel(self, label: str) -> None:
+        """Change the label of this exchange object (this run only; empty string ignored)."""
+        ...
+
+    def GetIndex(self) -> int:
+        """Index of this exchange object in ``exchanges`` (``exchange`` is 0); the same index as ``ev.ex`` of
+        ``ctx.poll()`` events."""
+        ...
+
+    def GetCurrency(self) -> str:
+        """The current trading pair, e.g. ``"BTC_USDT"`` (without the contract part)."""
+        ...
+
+    def SetCurrency(self, currency: str) -> bool:
+        """Switch the trading pair (``"ETH_USDT"``; ``"ETH_USDT.swap"`` also sets the contract).
+
+        Returns:
+            ``True``. An invalid pair logs an error and leaves the pair unchanged.
+
+        Example::
+
+            exchange.SetCurrency("ETH_USDT")
+            Log(exchange.GetTicker())
+        """
+        ...
+
+    def GetBaseCurrency(self) -> str:
+        """Base currency of the current pair, e.g. ``"BTC"``."""
+        ...
+
+    def GetQuoteCurrency(self) -> str:
+        """Quote currency of the current pair, e.g. ``"USDT"``."""
+        ...
+
+    def GetPeriod(self) -> int:
+        """The robot's default K-line period, in seconds."""
+        ...
+
+    def SetMaxBarLen(self, n: int) -> None:
+        """Set the default number of bars ``GetRecords()`` requests and keeps (200 by default)."""
+        ...
+
+    def SetPrecision(self, pricePrecision: Optional[int] = None, amountPrecision: Optional[int] = None) -> None:
+        """Set price / quantity decimals: order prices and quantities are truncated (not rounded) to them.
+
+        Example::
+
+            exchange.SetPrecision(2, 3)
+        """
+        ...
+
+    def SetRate(self, rate: float = 1) -> float:
+        """Set a conversion rate: prices returned afterwards are multiplied by it, order prices divided by it.
+
+        Args:
+            rate: Rate; ``1``, omitted or ``<= 0`` = no conversion.
+
+        Returns:
+            The rate in effect before this call.
+        """
+        ...
+
+    def GetRate(self) -> float:
+        """The conversion rate set by ``SetRate()`` (``1`` by default)."""
+        ...
+
+    def SetTimeout(self, timeout: int) -> int:
+        """Set the timeout of this object's REST requests, in milliseconds."""
+        ...
+
+    def SetProxy(self, proxy: str) -> Optional[bool]:
+        """Set a proxy for this exchange object's requests.
+
+        Args:
+            proxy: ``"socks5://[user:pass@]host:port"``, ``"http://host:port"``; ``""`` removes the proxy.
+
+        Returns:
+            ``True`` on success, ``None`` when the proxy is invalid.
+        """
+        ...
+
+    def SetBase(self, base: str) -> str:
+        """Switch the API base address (e.g. to a testnet).
+
+        Returns:
+            The base address before the switch; ``""`` when the exchange rejected the new one.
+        """
+        ...
+
+    def GetBase(self) -> str:
+        """The current API base address."""
+        ...
+
+    def IO(self, k: str, *args: Any) -> Any:
+        """Exchange-specific calls and settings.
+
+        Common forms:
+
+        - ``IO("api", httpMethod, resource, params="", raw="")``: call a raw exchange endpoint (live only).
+        - ``IO("currency", "ETH_USDT")``: same as ``SetCurrency()``.
+        - ``IO("base")`` / ``IO("base", url)``: read / switch the base address.
+        - ``IO("cross", True)``, ``IO("dual", True)``, ``IO("simulate", True)``: account modes (see each exchange).
+        - ``IO("rate", "GetTicker", 10, "1s")``: client-side rate limits.
+
+        Returns:
+            Depends on the command; ``None`` on failure (reason in ``GetLastError()``).
+
+        Example::
+
+            ret = exchange.IO("api", "GET", "/api/v5/account/balance")
+        """
+        ...
+
+    def Encode(self, algo: str, inputFormat: str, outputFormat: str, data: str, keyFormat: str = ..., key: str = ...) -> str:
+        """Like the global ``Encode()``, but ``data`` / ``key`` may use ``"{{accesskey}}"`` / ``"{{secretkey}}"``,
+        replaced by this exchange object's configured keys (live only).
+
+        Example::
+
+            sign = exchange.Encode("sha256", "string", "hex", "data", "string", "{{secretkey}}")
+        """
+        ...
+
+    def HMAC(self, algo: str, outputFormat: str, data: str, key: str = ...) -> str:
+        """HMAC signature: ``exchange.Encode(algo, "raw", outputFormat, data, "raw", key)``; ``key`` may be
+        ``"{{secretkey}}"``."""
+        ...
+
+    def GetMeta(self, key: str) -> str:
+        """A non-sensitive configuration field of this exchange object (e.g. ``"AccessKey"``), matched
+        case-insensitively; ``""`` when absent or sensitive (secrets are never returned)."""
+        ...
+
+    def G(self, *args: Any) -> Any:
+        """In-memory key/value store private to this exchange object (not persisted; unrelated to ``_G``).
+
+        ``G()`` returns the index, ``G(None)`` clears, ``G(k)`` reads, ``G(k, None)`` deletes, ``G(k, v)`` writes.
+        """
+        ...
+
+    def GetUSDCNY(self) -> Optional[float]:
+        """Legacy: USD/CNY rate. Not available on this runtime: returns ``None`` (fetch rates with ``HttpQuery()``)."""
         ...
 
 # ==================== TA Input Type ====================
 
-t_TAInput = Union[list[float], IRecordList]
-"""Input type for TA indicator functions. Can be a list of floats (e.g. close prices)
-or an IRecordList (candlestick array, automatically uses Close field)."""
+t_TAInput = Union[Sequence[float], Sequence[IRecord]]
+"""Input of the ``TA`` functions: a K-line list (``Close`` is used) or a list of numbers."""
 
 # ==================== Built-in TA Indicator Library ====================
 
 class ITA:
-    """Platform built-in technical analysis indicator library (simplified version).
+    """The platform's built-in indicator library (global ``TA``), computed locally.
 
-    More commonly used and easier to use than talib. Access via global variable ``TA``.
+    Results are lists aligned with the input; the warm-up part is ``None``.
 
     Example::
 
         records = exchange.GetRecords()
         k, d, j = TA.KDJ(records, 9, 3, 3)
-        upper, mid, lower = TA.BOLL(records, 20, 2)
+        up, mid, down = TA.BOLL(records, 20, 2)
     """
-    def CMF(self, inReal: t_TAInput, optInTimePeriod: Optional[IRecordList] = None) -> list[float]:
-        """CMF - Chaikin Money Flow.
-
-        Args:
-            inReal: Input data (candlestick array).
-            optInTimePeriod: Calculation period.
-
-        Returns:
-            CMF array.
-        """
+    def MA(self, inReal: t_TAInput, optInTimePeriod: int = 9) -> list[float]:
+        """Moving average (simple). ``optInTimePeriod`` defaults to 9."""
         ...
 
-    def Alligator(self, inReal: t_TAInput, jawLength: Optional[int] = None, teethLength: Optional[int] = None, lipsLength: Optional[int] = None) -> tuple[list[float], list[float], list[float]]:
-        """Alligator Indicator (Williams).
+    def SMA(self, inReal: t_TAInput, optInTimePeriod: int = 9) -> list[float]:
+        """Simple moving average. ``optInTimePeriod`` defaults to 9."""
+        ...
 
-        Args:
-            inReal: Input data.
-            jawLength: Alligator jaw period, default 13.
-            teethLength: Alligator teeth period, default 8.
-            lipsLength: Alligator lips period, default 5.
+    def EMA(self, inReal: t_TAInput, optInTimePeriod: int = 9) -> list[float]:
+        """Exponential moving average. ``optInTimePeriod`` defaults to 9."""
+        ...
+
+    def MACD(self, inReal: t_TAInput, optInFastPeriod: int = 12, optInSlowPeriod: int = 26, optInSignalPeriod: int = 9) -> tuple[list[float], list[float], list[float]]:
+        """MACD (defaults 12, 26, 9).
 
         Returns:
-            Tuple of (jaw, teeth, lips) arrays.
+            ``[DIF, DEA, MACD histogram]``.
 
         Example::
 
-            jaw, teeth, lips = TA.Alligator(records, 13, 8, 5)
+            dif, dea, hist = TA.MACD(records)
         """
         ...
 
-    def ATR(self, inPriceHLC: IRecordList, optInTimePeriod: Optional[int] = None) -> list[float]:
-        """ATR - Average True Range.
-
-        Args:
-            inPriceHLC: Candlestick data (requires High/Low/Close).
-            optInTimePeriod: Calculation period, default 14.
+    def BOLL(self, inReal: t_TAInput, period: int = 20, multiplier: float = 2) -> tuple[list[float], list[float], list[float]]:
+        """Bollinger bands (defaults 20, 2).
 
         Returns:
-            ATR array.
+            ``[upper, middle, lower]``.
         """
         ...
 
-    def OBV(self, inReal: t_TAInput, inPriceV: IRecordList) -> list[float]:
-        """OBV - On Balance Volume.
-
-        Args:
-            inReal: Close price array or candlestick array.
-            inPriceV: Candlestick array containing Volume.
+    def KDJ(self, inPriceHLC: Sequence[IRecord], period: int = 9, kPeriod: int = 3, dPeriod: int = 3) -> tuple[list[float], list[float], list[float]]:
+        """KDJ stochastic (defaults 9, 3, 3); K-lines only.
 
         Returns:
-            OBV array.
+            ``[K, D, J]``.
         """
         ...
 
-    def RSI(self, inReal: t_TAInput, optInTimePeriod: Optional[int] = None) -> list[float]:
-        """RSI - Relative Strength Index.
-
-        Args:
-            inReal: Input data.
-            optInTimePeriod: Calculation period, default 14.
-
-        Returns:
-            RSI array, value range 0~100. >70 overbought, <30 oversold.
+    def RSI(self, inReal: t_TAInput, optInTimePeriod: int = 14) -> list[float]:
+        """Relative strength index (default 14).
 
         Example::
 
             rsi = TA.RSI(records, 14)
             if rsi[-1] > 70:
-                Log("Overbought zone")
+                Log("overbought")
         """
         ...
 
-    def KDJ(self, inReal: t_TAInput, period: Optional[int] = None, kPeriod: Optional[int] = None, dPeriod: Optional[int] = None) -> tuple[list[float], list[float], list[float]]:
-        """KDJ - Stochastic Oscillator.
-
-        Args:
-            inReal: Candlestick data.
-            period: K-line period, default 9.
-            kPeriod: K-line smoothing period, default 3.
-            dPeriod: D-line smoothing period, default 3.
-
-        Returns:
-            Tuple of (K, D, J) arrays.
-
-        Example::
-
-            k, d, j = TA.KDJ(records, 9, 3, 3)
-            Log("K:", k[-1], "D:", d[-1], "J:", j[-1])
-        """
+    def ATR(self, inPriceHLC: Sequence[IRecord], optInTimePeriod: int = 14) -> list[float]:
+        """Average true range (default 14); K-lines only."""
         ...
 
-    def BOLL(self, inReal: t_TAInput, period: Optional[int] = None, multiplier: Optional[float] = None) -> tuple[list[float], list[float], list[float]]:
-        """BOLL - Bollinger Bands.
-
-        Args:
-            inReal: Input data.
-            period: Calculation period, default 20.
-            multiplier: Standard deviation multiplier, default 2.
-
-        Returns:
-            Tuple of (upper band, middle band, lower band) arrays.
-
-        Example::
-
-            upper, middle, lower = TA.BOLL(records, 20, 2)
-        """
-        ...
-
-    def MACD(self, inReal: t_TAInput, optInFastPeriod: Optional[int] = None, optInSlowPeriod: Optional[int] = None, optInSignalPeriod: Optional[int] = None) -> tuple[list[float], list[float], list[float]]:
-        """MACD - Moving Average Convergence Divergence.
-
-        Args:
-            inReal: Input data.
-            optInFastPeriod: Fast line period, default 12.
-            optInSlowPeriod: Slow line period, default 26.
-            optInSignalPeriod: Signal line period, default 9.
-
-        Returns:
-            Tuple of (DIF, DEA, MACD histogram) arrays.
-
-        Example::
-
-            dif, dea, macd = TA.MACD(records, 12, 26, 9)
-            Log("MACD:", macd[-1])
-        """
-        ...
-
-    def EMA(self, inReal: t_TAInput, optInTimePeriod: Optional[int] = None) -> list[float]:
-        """EMA - Exponential Moving Average.
-
-        Args:
-            inReal: Input data.
-            optInTimePeriod: Calculation period.
-
-        Returns:
-            EMA array.
-        """
-        ...
-
-    def SMA(self, inReal: t_TAInput, optInTimePeriod: Optional[int] = None) -> list[float]:
-        """SMA - Simple Moving Average.
-
-        Args:
-            inReal: Input data.
-            optInTimePeriod: Calculation period.
-
-        Returns:
-            SMA array.
-        """
-        ...
-
-    def MA(self, inReal: t_TAInput, optInTimePeriod: Optional[int] = None) -> list[float]:
-        """MA - Moving Average (default SMA).
-
-        Args:
-            inReal: Input data.
-            optInTimePeriod: Calculation period.
-
-        Returns:
-            MA array.
-        """
+    def OBV(self, inReal: Sequence[IRecord]) -> list[float]:
+        """On-balance volume; K-lines only (uses Close and Volume)."""
         ...
 
     def Highest(self, inReal: t_TAInput, period: int, attr: Optional[str] = None) -> float:
-        """Get the highest value within a period (the current Bar excluded).
+        """Highest value of the last ``period`` bars, the current bar excluded (``period`` 0 = all bars).
 
         Args:
-            inReal: Input data.
-            period: Calculation period (required); ``0`` means all data before the current Bar.
-            attr: Candlestick attribute name when passing candlestick array,
-                e.g. ``"High"``, ``"Low"``, ``"Close"``, ``"Volume"``.
-
-        Returns:
-            Highest value (single number).
+            inReal: K-lines or numbers.
+            period: Number of bars.
+            attr: Field for K-lines: ``"High"``, ``"Low"``, ``"Open"``, ``"Close"``, ``"Volume"``, ``"OpenInterest"``.
 
         Example::
 
-            highest_high = TA.Highest(records, 20, "High")
-            highest_close = TA.Highest(records, 10, "Close")
+            hh = TA.Highest(records, 20, "High")
         """
         ...
 
     def Lowest(self, inReal: t_TAInput, period: int, attr: Optional[str] = None) -> float:
-        """Get the lowest value within a period (the current Bar excluded).
-
-        Args:
-            inReal: Input data.
-            period: Calculation period (required); ``0`` means all data before the current Bar.
-            attr: Candlestick attribute name, e.g. ``"High"``, ``"Low"``, ``"Close"``, ``"Volume"``.
-
-        Returns:
-            Lowest value (single number).
+        """Lowest value of the last ``period`` bars, the current bar excluded (``period`` 0 = all bars).
 
         Example::
 
-            lowest_low = TA.Lowest(records, 20, "Low")
+            ll = TA.Lowest(records, 20, "Low")
         """
         ...
 
-# ==================== Database / Dial / Event Interfaces ====================
+    def Alligator(self, inPriceHL: Sequence[IRecord], jawLength: int = 13, teethLength: int = 8, lipsLength: int = 5) -> tuple[list[float], list[float], list[float]]:
+        """Williams Alligator (defaults 13, 8, 5) on the median price; K-lines only.
 
-class IDBExecRet:
-    """Database execution result structure.
+        Returns:
+            ``[jaw, teeth, lips]``, shifted right by 8, 5 and 3 bars.
+        """
+        ...
 
-    Returned by ``DBExec()`` and ``IDial.exec()``.
-    """
-    values: list[List]
-    """Query result data rows, each row is a list of values."""
+    def CMF(self, inReal: Sequence[IRecord], periods: int = 20) -> list[float]:
+        """Chaikin money flow (default 20); K-lines only."""
+        ...
+
+# ==================== Database / Network ====================
+
+class IDBExecRet(dict[str, Any]):
+    """Result of ``DBExec()`` and ``IDial.exec()``."""
     columns: list[str]
-    """Column name list."""
+    """Column names."""
+    values: list[list[Any]]
+    """Rows, each a list matching ``columns``."""
 
 class IDial:
-    """Network connection object. Supports TCP, WebSocket, database, and KVDB protocols.
-
-    Created via the ``Dial()`` function.
+    """Connection returned by ``Dial()``: TCP / TLS / WebSocket stream or database connection.
 
     Example::
 
-        # WebSocket connection
         ws = Dial("wss://stream.binance.com:9443/ws/btcusdt@ticker")
         if ws:
-            msg = ws.read(5000)  # Read with 5s timeout
+            msg = ws.read(5000)
             ws.close()
 
-        # Database connection
-        db = Dial("sqlite3:///mydata.db")
+        db = Dial("sqlite3://test.db")
         db.exec("CREATE TABLE IF NOT EXISTS kv(k TEXT PRIMARY KEY, v TEXT)")
         db.exec("INSERT INTO kv VALUES(?, ?)", "key1", "value1")
-        ret = db.exec("SELECT * FROM kv")
-        db.close()
     """
-    def read(self, timeout: Optional[int] = None) -> Optional[Union[str, bytes]]:
-        """Read data from the connection.
+    def read(self, timeout: int = 0) -> Optional[str]:
+        """Read one message.
 
         Args:
-            timeout: Timeout in milliseconds. Omit for blocking read, pass ``-1`` for non-blocking.
+            timeout: Milliseconds. Omitted / 0: block until data arrives; positive: wait at most that long.
+                WebSocket only: ``-1`` returns at once (``None`` when nothing is buffered), ``-2`` returns only the
+                latest buffered message.
 
         Returns:
-            Data read from the connection. Returns ``None`` on timeout or no data available.
-            Returns empty string ``""`` when the connection is closed.
+            The data; ``None`` on timeout or when the connection is closed.
         """
         ...
 
-    def write(self, data: Union[str, bytes]) -> None:
-        """Write data to the connection.
-
-        Args:
-            data: Data to send (string or binary data).
-        """
+    def write(self, data: str, timeout: int = 0) -> int:
+        """Send data. Returns the number of bytes sent; ``0`` when the connection is closed."""
         ...
 
-    def exec(self, sql: str, *extra: object) -> Optional[IDBExecRet]:
-        """Execute SQL statement (database connections) or KVDB operations.
-
-        KVDB supported commands: ``"get key"``, ``"set key value"``, ``"del key"``,
-        ``"scan prefix limit"``, ``"range startKey endKey limit"``.
-
-        Args:
-            sql: SQL statement or KVDB command.
-            *extra: Binding values for SQL parameterized queries.
-
-        Returns:
-            Query result object, ``None`` on failure.
-
-        Example::
-
-            ret = db.exec("SELECT * FROM users WHERE age > ?", 18)
-            db.exec("set mykey myvalue")
-        """
-        ...
-
-    def fd(self) -> int:
-        """Get the file descriptor number of the connection.
-
-        Returns:
-            File descriptor number.
-        """
+    def exec(self, sql: str, *args: Any) -> Optional[IDBExecRet]:
+        """Database connections only: execute SQL (``?`` placeholders take ``args``), same result as ``DBExec()``."""
         ...
 
     def close(self) -> None:
-        """Close the connection and release resources."""
+        """Close the connection (also closed when the object is garbage collected)."""
         ...
 
-class IEventMsg:
-    """Event loop message structure, returned by ``EventLoop()``.
+class IEventMsg(dict[str, Any]):
+    """Event returned by ``EventLoop()``.
 
-    Contains information about events such as market updates, thread messages,
-    WebSocket data, etc.
+    ``Event`` is e.g. ``"tick"`` / ``"order"`` (push-only futures counters), ``"Exchange_GetTicker"`` (an
+    ``exchange.Go()`` task finished; ``Index`` = its ticket) or ``"HttpQuery"`` (an ``HttpQuery_Go()`` finished).
     """
     Seq: int
-    """Event sequence number."""
+    """Sequence number."""
     Event: str
-    """Event type, such as ``"ticker"``, ``"order"``, ``"thread"``, etc."""
+    """Event name."""
     ThreadId: int
-    """Thread ID that triggered the event."""
+    """Thread ID (0)."""
     Index: int
-    """Exchange index."""
+    """Exchange index for tick / order events; the task ticket for completion events."""
+    Queue: int
+    """Events still waiting in the queue after this one."""
+    Dropped: int
+    """Events dropped so far because the queue was full."""
     Nano: int
-    """Event time (nanoseconds)."""
+    """Nanosecond timestamp."""
     Symbol: str
-    """Related trading pair."""
-    Ticker: Optional[ITicker]
-    """If it's a market event, contains Ticker data."""
+    """Symbol of a tick event."""
+    Ticker: ITicker
+    """Tick events: the ticker."""
+    Order: IOrder
+    """Order events: the order."""
 
 class IChart:
-    """Chart object for drawing custom charts on the strategy page.
-
-    Created via ``Chart()`` (``KLineChart()`` returns an ``IKLineChart``).
+    """Chart returned by ``Chart()``.
 
     Example::
 
-        chart = Chart({
-            "title": {"text": "Price Trend"},
-            "xAxis": {"type": "datetime"},
-            "series": [{"name": "Price", "data": []}]
-        })
+        chart = Chart({"title": {"text": "Price"}, "xAxis": {"type": "datetime"},
+                       "series": [{"name": "Last", "data": []}]})
         chart.add(0, [Unix() * 1000, ticker.Last])
     """
-    def add(self, series: int, data: Union[list[object], object], index: Optional[int] = None) -> None:
-        """Add a data point to the specified series.
-
-        Args:
-            series: Series index (starting from 0).
-            data: Data point. Format depends on chart type (e.g. ``[timestamp, value]``).
-            index: Update data point at specified index. Omit to append.
-                ``-1`` to update the last point.
-        """
+    def add(self, series: Union[int, list[Any]], data: Any = ..., index: int = ...) -> None:
+        """Write data: ``add(seriesIndex, [x, y])`` appends a point; ``add(seriesIndex, [x, y], -1)`` replaces the
+        last point (another index replaces that point)."""
         ...
 
-    def reset(self, remain: Optional[int] = None) -> None:
-        """Reset chart data.
-
-        Args:
-            remain: Number of recent data points to retain. Defaults to 0 (clear all).
-        """
+    def update(self, options: Union[dict[str, Any], list[dict[str, Any]]]) -> None:
+        """Replace the chart configuration (same argument as ``Chart()``)."""
         ...
 
-    def update(self, options: object) -> None:
-        """Update chart configuration options.
+    def reset(self, remain: int = 0) -> None:
+        """Clear the data, keeping the last ``remain`` points (0 = clear all)."""
+        ...
 
-        Args:
-            options: New chart configuration (Highcharts/Highstock configuration object).
-        """
+    def dell(self, seriesIdx: int = 0) -> None:
+        """Delete a series; ``<= 0`` deletes the whole chart (configuration included). (JavaScript's ``del``.)"""
         ...
 
 class IKLineChart:
-    """Pine-style K-line chart object, created by ``KLineChart()``.
+    """Pine-style K-line chart returned by ``KLineChart()``.
 
-    Each bar starts with ``begin(bar)``, then the plot functions, then ``close()`` outputs it to the chart.
-    Optional plot arguments use the Pine names (``title``, ``color``, ``linewidth``, ``style``, ``overlay``, ...)
-    and are passed as keyword arguments.
+    Per bar: ``begin(bar)``, the drawing calls, then ``close()``.
 
     Example::
 
@@ -1690,130 +1456,138 @@ class IKLineChart:
             c.close()
     """
     def begin(self, bar: IRecord) -> None:
-        """Start a bar; must be the first call of each bar's drawing."""
+        """Start drawing on a bar."""
         ...
 
     def close(self, bar: Optional[IRecord] = None) -> None:
-        """Finish the current bar's drawing and output it to the chart.
-
-        Args:
-            bar: Optional; pass the bar directly (same as calling ``begin(bar)`` first). When omitted the bar
-                recorded by ``begin()`` is used. Closing a bar with the same timestamp again replaces the previous
-                one (an unfinished bar can be updated repeatedly).
-        """
+        """Finish the bar and output it (passing ``bar`` is the same as ``begin(bar)`` first). Closing a bar with the
+        same time again replaces it."""
         ...
 
     def reset(self, remain: int = 0) -> None:
-        """Reset chart data. ``remain`` is the number of latest bars to keep, default 0 (clear all)."""
+        """Clear the chart, keeping the last ``remain`` bars."""
         ...
 
-    def plot(self, series: Optional[float] = None, title: Optional[str] = None, **options: object) -> Optional[int]:
-        """Draw a line (like Pine ``plot``). Returns the plot index (usable by ``fill``), ``None`` when skipped."""
+    def plot(self, series: Optional[float] = None, title: Optional[str] = None, color: Optional[str] = None, linewidth: int = 1, style: str = "line",
+             trackprice: Optional[bool] = None, histbase: float = 0, offset: int = 0, join: bool = False, editable: bool = False,
+             show_last: Optional[int] = None, display: str = "all", overlay: Optional[bool] = None) -> int:
+        """Draw a line; returns its index (for ``fill()``). ``style``: ``"line"``, ``"stepline"``, ``"histogram"``,
+        ``"cross"``, ``"area"``, ``"columns"``, ``"circles"``, ..."""
         ...
 
-    def hline(self, price: float, title: Optional[str] = None, **options: object) -> Optional[int]:
-        """Draw a horizontal line at ``price``. Returns the plot index."""
+    def hline(self, price: float, title: Optional[str] = None, color: Optional[str] = None, linestyle: str = "dashed", linewidth: Optional[int] = None,
+              editable: bool = False, display: str = "all", overlay: Optional[bool] = None) -> int:
+        """Draw a horizontal line; returns its index. ``linestyle``: ``"dashed"``, ``"dotted"``, ``"solid"``."""
         ...
 
-    def plotshape(self, series: object, title: Optional[str] = None, **options: object) -> None:
-        """Draw a shape marker where ``series`` is truthy (``style``, ``location``, ``text``, ...)."""
+    def plotarrow(self, series: Optional[float], title: Optional[str] = None, colorup: str = "#00ff00", colordown: str = "#ff0000", offset: int = 0,
+                  minheight: int = 5, maxheight: int = 100, editable: bool = False, show_last: Optional[int] = None,
+                  display: str = "all", overlay: Optional[bool] = None) -> None:
+        """Draw an up (positive) / down (negative) arrow."""
         ...
 
-    def plotchar(self, series: object, title: Optional[str] = None, char: Optional[str] = None, **options: object) -> None:
-        """Draw a single character where ``series`` is truthy (``char`` is required)."""
+    def plotshape(self, series: Any, title: Optional[str] = None, style: Optional[str] = None, location: str = "abovebar", color: Optional[str] = None,
+                  offset: Optional[int] = None, text: Optional[str] = None, textcolor: Optional[str] = None, editable: Optional[bool] = None,
+                  size: str = "auto", show_last: Optional[int] = None, display: str = "all", overlay: Optional[bool] = None) -> None:
+        """Draw a shape where ``series`` is truthy. ``style``: ``"diamond"``, ``"square"``, ``"label_down"``,
+        ``"label_up"``, ``"arrow_down"``, ``"arrow_up"``, ``"circle"``, ``"flag"``, ``"triangle_down"``,
+        ``"triangle_up"``, ``"cross"``, ``"xcross"``; ``location``: ``"abovebar"``, ``"belowbar"``, ``"top"``,
+        ``"bottom"``, ``"absolute"``."""
         ...
 
-    def plotarrow(self, series: float, title: Optional[str] = None, **options: object) -> None:
-        """Draw an up/down arrow by the sign and size of ``series``."""
+    def plotchar(self, series: Any, title: Optional[str] = None, char: Optional[str] = None, location: str = "abovebar", color: Optional[str] = None,
+                 offset: Optional[int] = None, text: Optional[str] = None, textcolor: Optional[str] = None, editable: Optional[bool] = None,
+                 size: str = "auto", show_last: Optional[int] = None, display: str = "all", overlay: Optional[bool] = None) -> None:
+        """Draw a character (``char`` is required) where ``series`` is truthy."""
         ...
 
-    def plotcandle(self, open: float, high: float, low: float, close: float, title: Optional[str] = None, **options: object) -> None:
-        """Draw an extra candle from explicit OHLC."""
+    def plotcandle(self, open: float, high: float, low: float, close: float, title: Optional[str] = None, color: Optional[str] = None,
+                   wickcolor: Optional[str] = None, editable: Optional[bool] = None, show_last: Optional[int] = None,
+                   bordercolor: Optional[str] = None, display: str = "all", overlay: Optional[bool] = None) -> None:
+        """Draw an extra candle."""
         ...
 
-    def barcolor(self, color: str, **options: object) -> None:
-        """Color the current price bar."""
+    def barcolor(self, color: str, offset: Optional[int] = None, editable: bool = False, show_last: Optional[int] = None,
+                 title: Optional[str] = None, display: str = "all") -> None:
+        """Color the current bar."""
         ...
 
-    def bgcolor(self, color: str, **options: object) -> None:
-        """Color the current bar's background."""
+    def bgcolor(self, color: str, offset: Optional[int] = None, editable: Optional[bool] = None, show_last: Optional[int] = None,
+                title: Optional[str] = None, display: str = "all", overlay: Optional[bool] = None) -> None:
+        """Color the background of the current bar."""
         ...
 
-    def fill(self, plot1: int, plot2: int, color: Optional[str] = None, **options: object) -> None:
-        """Fill the area between two plots (indices returned by ``plot``/``hline``)."""
+    def fill(self, plot1: int, plot2: int, color: Optional[str] = None, title: Optional[str] = None, editable: Optional[bool] = None,
+             show_last: Optional[int] = None, fillgaps: Optional[bool] = None, display: str = "all") -> None:
+        """Fill between two plots (indices returned by ``plot()`` / ``hline()``)."""
         ...
 
     def signal(self, direction: str, price: float, qty: float, id: Optional[str] = None) -> None:
-        """Draw a trade signal marker. ``direction``: ``"buy"``/``"long"``, ``"sell"``/``"short"``,
-        ``"closebuy"``/``"closelong"``, ``"closesell"``/``"closeshort"``; ``id`` defaults to ``direction``."""
+        """Draw a trade signal. ``direction``: ``"buy"``/``"long"``, ``"sell"``/``"short"``, ``"closebuy"``/``"closelong"``,
+        ``"closesell"``/``"closeshort"``; ``id`` defaults to ``direction``."""
         ...
 
-class IHttpOptions:
-    """HTTP request options for ``HttpQuery()`` (a dict passed as the second argument).
-
-    Example::
-
-        ret = HttpQuery("https://api.example.com/data", {
-            "method": "POST",
-            "body": json.dumps({"key": "value"}),
-            "headers": {"Content-Type": "application/json"},
-            "timeout": 5000,
-            "debug": True
-        })
-    """
-    method: Optional[str]
-    """HTTP method: ``"GET"``, ``"POST"``, ``"PUT"``, ``"DELETE"``, etc. Default ``"GET"``."""
-    body: Optional[Union[str, bytes]]
-    """Request body (used for POST and other methods)."""
-    proxy: Optional[str]
-    """Proxy for this request, e.g. ``"socks5://127.0.0.1:1080"``."""
-    charset: Optional[str]
-    """Response character encoding conversion (e.g. ``"gbk"``)."""
-    cookie: Optional[str]
+class IHttpOptions(TypedDict, total=False):
+    """Options of ``HttpQuery()`` (all optional)."""
+    method: str
+    """``"GET"`` (default), ``"POST"``, ``"PUT"``, ``"DELETE"``, ..."""
+    body: str
+    """Request body."""
+    data: str
+    """Request body when ``body`` is not set."""
+    headers: dict[str, Any]
+    """Request headers."""
+    cookie: str
     """Cookie string."""
-    profile: Optional[str]
-    """TLS fingerprint configuration."""
-    debug: Optional[bool]
-    """When ``True``, returns full response object (including status code and headers)."""
-    format: Optional[str]
-    """Output format for response body: ``"base64"`` or ``"hex"``."""
-    close: Optional[bool]
-    """Whether to close connection after request (disable keep-alive)."""
-    headers: Optional[dict[str, object]]
-    """Custom request headers."""
-    timeout: Optional[int]
-    """Request timeout in milliseconds, default 300000 (5 minutes)."""
+    timeout: int
+    """Timeout in milliseconds (300000 by default)."""
+    proxy: str
+    """Proxy for this request: ``http://``, ``https://``, ``socks5://``, ``socks5h://``."""
+    charset: str
+    """Decode the response body from this charset (e.g. ``"GBK"``) to UTF-8."""
+    debug: bool
+    """``True``: return the full ``IHttpRet`` instead of the body."""
 
-class IHttpRet:
-    """Full HTTP response structure returned by ``HttpQuery()`` in debug mode."""
+class _HttpDebugOptions(IHttpOptions):
+    debug: Literal[True]
+
+class IHttpRet(dict[str, Any]):
+    """Full response of ``HttpQuery()`` (option ``debug: True``)."""
     StatusCode: int
-    """HTTP status code, such as 200, 404, 500; 0 when no response was received (refused, DNS, timeout, proxy failure)."""
-    Trace: Optional[object]
-    """Request trace information (available in debug mode)."""
+    """HTTP status; 0 when no response was received (refused, DNS, timeout, proxy failure)."""
     Header: dict[str, list[str]]
-    """Response headers dict. Each key maps to a list of strings."""
-    Cookies: Optional[list[object]]
-    """Cookies (available in debug mode)."""
-    Length: Optional[int]
-    """Message length."""
-    Body: Optional[Union[str, bytes]]
-    """Response body content; an empty string when the request fails."""
-    Error: Optional[str]
-    """Failure reason (method + URL + underlying error); present only when ``StatusCode`` is 0."""
+    """Response headers; each value is a list of strings."""
+    Cookies: list[dict[str, Any]]
+    """Parsed ``Set-Cookie`` entries (``Name``, ``Value``, ``Path``, ``Domain``, ``Expires``, ...)."""
+    Trace: dict[str, Any]
+    """Timings (``elapsed_ms``, ``dns_ms``, ``connect_ms``, ``tls_ms``, ``ttfb_ms``, ...)."""
+    Length: int
+    """Body length (before charset decoding)."""
+    Body: str
+    """Body; ``""`` when the request failed."""
+    Error: str
+    """Failure reason (method + URL + error); present only when ``StatusCode`` is 0."""
+
+# ==================== WebSocket push (ctx) ====================
 
 class StopError(RuntimeError):
-    """Raised by ``ctx.poll()`` (and blocking waits) once the robot is stopping, including
-    during ``onexit()``; let it propagate so the strategy finishes cleanly."""
+    """Raised by ``Sleep()``, ``EventLoop()``, ``ctx.poll()`` and API calls once the robot is stopping; let it
+    propagate so ``onexit()`` runs."""
+    message: str
+
+class CtxRecord(dict[str, Any]):
+    """A dict from the push API (order book, position / balance rows, connector rows) with attribute access:
+    ``row.qty`` and ``row["qty"]`` both work."""
+    def __getattr__(self, name: str) -> Any: ...
 
 class Subscription:
-    """A WebSocket push subscription, returned by ``ctx.subscribe()``.
+    """A push subscription returned by ``ctx.subscribe()`` (read-only identity plus methods).
 
-    Belongs to the thread that called ``ctx.subscribe()``: its events go only to that
-    thread and only that thread can ``unsubscribe()``. Pass it (or its ``id``) to
-    ``ctx.poll()`` to take only its events.
+    It belongs to the thread that subscribed: its events go only to that thread and only that thread can
+    ``unsubscribe()``. Pass it (or its ``id``) to ``ctx.poll()`` to take only its events.
     """
     id: int
-    """Event stream ID (the ``stream`` field of this subscription's events)."""
+    """Event stream ID (``ev.stream`` of its events)."""
     ex: int
     """Account index (``exchanges[ex]``)."""
     channel: str
@@ -1821,52 +1595,53 @@ class Subscription:
     symbol: str
     """Symbol code (empty for ``private`` / ``tickers``)."""
     depth: int
-    """Order book levels of a depth subscription (0 = the exchange's default)."""
+    """Levels of a depth subscription (0 = the exchange default)."""
     interval: int
     """K-line period in seconds."""
 
-    def info(self) -> dict:
-        """The identity fields as a dict: ``{id, ex, channel, symbol, depth, interval}``."""
+    def info(self) -> dict[str, Any]:
+        """The identity as a dict: ``{id, ex, channel, symbol, depth, interval}``."""
         ...
 
-    def book(self, n: Optional[int] = None) -> dict:
-        """This depth subscription's own order book: ``{"bids": [[price, qty], ...], "asks": [...]}``
-        (bids descending, asks ascending; ``n`` defaults to the subscription's depth; both sides
-        empty before the first snapshot). Raises for a non-depth or unsubscribed subscription."""
+    def book(self, n: Optional[int] = None) -> CtxRecord:
+        """Depth subscriptions: its own order book ``{"bids": [[price, qty], ...], "asks": [...]}`` (bids descending,
+        asks ascending; ``n`` levels, default the subscription's depth). Raises for other channels or after
+        unsubscribing."""
         ...
 
-    def positions(self) -> Optional[list]:
-        """Latest positions of a ``private`` subscription (rows ``{symbol, side, posSide, qty, avgPx,
-        profit?, margin?, liqPx?, markPx?, leverage?, time}``); ``None`` until the account snapshot is
-        READY (unknown, not "no positions"); ``[]`` on spot."""
+    def positions(self) -> Optional[list[CtxRecord]]:
+        """``private`` subscriptions: latest positions (rows ``{symbol, side, posSide, qty, avgPx, profit?, margin?,
+        liqPx?, markPx?, leverage?, time}``); ``None`` until the account snapshot is READY (unknown, not "none")."""
         ...
 
-    def balances(self) -> Optional[list]:
-        """Latest balances of a ``private`` subscription (rows ``{asset, free, frozen, equity?, upnl?,
-        margin?, time}``); ``None`` until the account snapshot is READY."""
+    def balances(self) -> Optional[list[CtxRecord]]:
+        """``private`` subscriptions: latest balances (rows ``{asset, free, frozen, equity?, upnl?, margin?, time}``);
+        ``None`` until the account snapshot is READY."""
         ...
 
     def unsubscribe(self) -> None:
-        """Unsubscribe (calling it again is a no-op). Only the subscribing thread can do it."""
+        """Unsubscribe (again on the same object is a no-op). Only the subscribing thread can do it."""
         ...
 
 class SubscriptionList(list[Subscription]):
-    """Result of a batch ``ctx.subscribe()`` (``symbol`` is a list): the subscriptions in the same
-    order; can be passed to ``ctx.poll()`` as a whole."""
+    """Result of a batch ``ctx.subscribe()`` (``symbol`` is a list): the subscriptions in the same order; can be
+    passed to ``ctx.poll()`` as a whole."""
 
     def unsubscribe(self) -> None:
         """Unsubscribe every element."""
         ...
 
-class CtxEvent(dict):
-    """An event returned by ``ctx.poll()``: a dict with the same fields as the JavaScript event
-    (``ev["kind"]`` and ``ev.kind`` both work).
+class CtxEvent(dict[str, Any]):
+    """Event returned by ``ctx.poll()``: a dict with the JavaScript event fields (``ev.kind`` or ``ev["kind"]``).
 
-    Common fields: ``kind`` (1 ticker/bbo/tickers, 3 depth, 4 trade, 5 kline, 16 order, 17 position,
-    18 balance, 32 timer, 33 gateway status, 35 init status), ``stream``, ``type`` (``"data"`` /
-    ``"status"`` / ``"timer"``), ``channel``, ``ex``, ``symbol``, ``seq``, ``ts``. Check ``type`` /
-    ``kind`` first: a kind 35 event carries its subscription's ``channel``. Kind 35 has
-    ``prefillStatus`` (1 READY, 2 FAILED) and ``message`` (the reason when FAILED).
+    Common fields: ``kind`` (1 ticker/bbo/tickers, 3 depth, 4 trade, 5 kline, 16 order, 17 position, 18 balance,
+    32 timer, 33 gateway status, 35 init status), ``stream``, ``type`` (``"data"`` / ``"status"`` / ``"timer"``),
+    ``channel``, ``ex``, ``symbol``, ``seq``, ``ts``. Per kind: 1 ``bid ask last bidQty askQty volume openInterest
+    open high low time``; 4 ``px qty side tradeId time``; 5 ``open high low close volume openInterest intervalSec
+    openTimeMs closed prefill``; 16 ``id state px qty filledQty avgPx reason reasonText``; 17 ``side posSide qty
+    avgPx profit margin liqPx markPx leverage time snapshot``; 18 ``asset free frozen equity upnl margin time
+    snapshot``; 32 ``timerId scheduledNs``; 33 ``status detail``; 35 ``channelCode intervalSec prefillStatus``
+    (1 READY, 2 FAILED) ``detail message``. Depth events (kind 3) carry no levels: read them with ``ev.book(n)``.
     """
     kind: int
     stream: int
@@ -1877,17 +1652,29 @@ class CtxEvent(dict):
     seq: int
     ts: float
 
-    def book(self, n: Optional[int] = None) -> dict:
-        """Depth event (kind 3): the order book of the subscription it belongs to, as ``Subscription.book``."""
+    def book(self, n: Optional[int] = None) -> CtxRecord:
+        """Depth events (kind 3): the order book of the subscription it belongs to, as ``Subscription.book()``."""
         ...
 
+    def __getattr__(self, name: str) -> Any: ...
+
+class _SubscribeOptions(TypedDict, total=False):
+    channel: str
+    depth: int
+    interval: int
+    mode: str
+    buffer: int
+
+class _SubscribeBatchOptions(_SubscribeOptions):
+    symbol: Union[list[str], tuple[str, ...]]
+
 class Ctx:
-    """The global ``ctx``: WebSocket push subscriptions (same semantics as JavaScript ``ctx``).
+    """The global ``ctx``: WebSocket push subscriptions (same semantics as JavaScript ``ctx``; live only).
 
     Example::
 
         def main():
-            book = ctx.subscribe(exchange, {"channel": "depth", "depth": 20})
+            depth = ctx.subscribe(exchange, {"channel": "depth", "depth": 20})
             acct = ctx.subscribe(exchange, {"channel": "private"})
             while True:
                 ev = ctx.poll([], 1000)
@@ -1903,723 +1690,449 @@ class Ctx:
                     Log(acct.positions(), acct.balances())
     """
     STREAM_TIMER: int
-    """Built-in stream of engine timers (kind 32)."""
+    """Built-in stream of engine timers (kind 32). Value 1."""
     STREAM_STATUS: int
-    """Built-in stream of gateway status events (kind 33)."""
+    """Built-in stream of gateway status events (kind 33). Value 2."""
 
-    def subscribe(self, ex: Union[IExchange, int, str], opts: dict) -> Union[Subscription, SubscriptionList]:
-        """Subscribe to WebSocket push: a symbol's market data, market-wide tickers or the account's
-        private stream.
+    @overload
+    def subscribe(self, ex: Union[IExchange, int, str], opts: _SubscribeBatchOptions) -> SubscriptionList: ...
+    @overload
+    def subscribe(self, ex: Union[IExchange, int, str], opts: dict[str, Any]) -> Subscription:
+        """Subscribe to push data: a symbol's market data, market-wide tickers or the account's private stream.
+
+        Exactly two positional arguments.
 
         Args:
-            ex: Exchange object (``exchange``, ``exchanges[1]``) or account index.
-            opts: ``{channel, symbol, depth, interval, mode, buffer}``: ``channel`` ``ticker`` (default),
-                ``bbo``, ``depth``, ``trade``, ``kline``, ``tickers`` (market-wide, no symbol) or
-                ``private`` (orders + positions + balances, no symbol); ``symbol`` required for market
-                data unless ``ex`` is an exchange object (its current pair), a list for a batch;
-                ``depth`` levels; ``interval`` K-line seconds; ``mode: "latest"`` or ``buffer: N``.
+            ex: Exchange object (``exchange``, ``exchanges[1]``) or account index (an int or digit string).
+            opts: ``{channel, symbol, depth, interval, mode, buffer}``. ``channel``: ``"ticker"`` (default),
+                ``"bbo"``, ``"depth"``, ``"trade"``, ``"kline"``, ``"tickers"`` (whole market, no symbol) or
+                ``"private"`` (orders + positions + balances, no symbol). ``symbol``: required for market data
+                unless ``ex`` is an exchange object (its current pair); a list subscribes a batch. ``depth``:
+                levels; ``interval``: K-line seconds; ``mode: "latest"`` or ``buffer: N``.
 
         Returns:
-            ``Subscription``, or a ``SubscriptionList`` when ``symbol`` is a list (validated as a whole).
-            Invalid options raise; a subscription the exchange rejects gets a kind 35 FAILED event
-            on its own stream instead.
+            ``Subscription``; a ``SubscriptionList`` when ``symbol`` is a list or tuple (validated as a whole).
+            Invalid options raise; a subscription the exchange rejects gets a kind 35 FAILED event on its stream.
         """
         ...
 
-    def poll(self, streams: Optional[Union[Subscription, int, list]] = None,
-             timeout_ms: Optional[int] = None) -> Optional[CtxEvent]:
-        """Next event of the current thread's subscriptions.
+    def poll(self, streams: Optional[Union[Subscription, int, Sequence[Any]]] = None, timeout_ms: Optional[int] = None) -> Optional[CtxEvent]:
+        """Next event of this thread's subscriptions.
 
         Args:
-            streams: ``None`` / ``[]`` = all of this thread's subscriptions; otherwise Subscriptions,
-                stream IDs, a SubscriptionList or nested lists of them.
-            timeout_ms: ``None`` waits until an event arrives, ``0`` does not wait, > 0 waits at most
-                that many ms.
+            streams: ``None`` / ``[]`` = all of this thread's subscriptions; otherwise Subscriptions, stream IDs,
+                a SubscriptionList or nested lists of them (``ctx.STREAM_TIMER`` / ``ctx.STREAM_STATUS`` too).
+            timeout_ms: ``None`` waits until an event arrives, ``0`` does not wait, > 0 waits at most that many ms
+                (non-negative int).
 
         Returns:
-            The event, or ``None`` on timeout. Raises ``StopError`` once the robot is stopping.
+            The event, ``None`` on timeout. Raises ``StopError`` once the robot is stopping (also during
+            ``onexit()``).
         """
         ...
 
-    def connectors(self) -> list:
-        """Loaded exchanges: ``[{ex, label, name, symbol, interval, orderIdScope, feed}, ...]``;
-        ``feed`` = ``{ticksDropped, backpressure, ringCapacity}`` push-buffer counters (growing fast
-        means the strategy cannot keep up)."""
+    def connectors(self) -> list[CtxRecord]:
+        """Loaded exchanges: ``[{ex, label, name, symbol, interval, orderIdScope, feed}, ...]``; ``feed`` =
+        ``{ticksDropped, backpressure, ringCapacity}`` push-buffer counters (growing fast = the strategy is too
+        slow)."""
         ...
 
 # ==================== Global Variables ====================
 
-ext = object()
-"""Template class library domain. Used for accessing template library functions."""
+ext: Any
+"""Template library exports: functions a template assigns to ``ext`` (``ext.foo = foo``) are called as ``ext.foo()``."""
 
-TA = ITA()
-"""Built-in technical analysis library, containing simplified versions of common indicators
-(KDJ, BOLL, MACD, EMA, SMA, RSI, etc.)."""
+TA: ITA
+"""Built-in indicator library (MA, EMA, MACD, BOLL, KDJ, RSI, ATR, OBV, Highest, Lowest, Alligator, CMF)."""
 
-exchanges: list[IExchange] = [IExchange()]
-"""List of all added exchange objects. Access the i-th exchange via ``exchanges[i]``."""
+exchanges: list[IExchange]
+"""All exchange objects of the robot, in configuration order."""
 
-exchange: IExchange = exchanges[0]
-"""First (default) exchange object, equivalent to ``exchanges[0]``."""
+exchange: IExchange
+"""The first exchange object, same as ``exchanges[0]``."""
 
-ctx: Ctx = Ctx()
+ctx: Ctx
 """WebSocket push: ``ctx.subscribe()``, ``ctx.poll()``, ``ctx.connectors()`` (live only)."""
 
 # ==================== Global Functions ====================
 
 def Version() -> str:
-    """Get the docker version number.
-
-    Returns:
-        Version number string, e.g. ``"3.7"``.
-    """
+    """Version of the docker (node) running the strategy, e.g. ``"3.9.2"``."""
     ...
 
-def Sleep(millisecond: int) -> None:
-    """Pause strategy execution for the specified number of milliseconds.
-
-    Pending events in the event loop are processed during the pause.
-    It is recommended to add ``Sleep`` in the main strategy loop to avoid
-    overly frequent API requests.
-
-    Args:
-        millisecond: Number of milliseconds to pause.
+def Sleep(millisecond: float) -> None:
+    """Pause for ``millisecond`` milliseconds. Raises ``StopError`` when the robot stops.
 
     Example::
 
         while True:
-            ticker = exchange.GetTicker()
-            Log(ticker.Last)
-            Sleep(1000)  # Execute once per second
+            Log(exchange.GetTicker())
+            Sleep(1000)
     """
     ...
 
 def IsVirtual() -> bool:
-    """Determine whether currently running in a backtest (simulation) environment.
-
-    Returns:
-        ``True`` in backtest environment, ``False`` in live trading.
-
-    Example::
-
-        if IsVirtual():
-            Log("Backtest mode")
-        else:
-            Log("Live trading mode")
-    """
+    """``True`` in a backtest, ``False`` in live trading."""
     ...
 
 def Mail(smtpServer: str, smtpUsername: str, smtpPassword: str, mailTo: str, title: str, body: str) -> bool:
-    """Send email notification via SMTP.
-
-    Args:
-        smtpServer: SMTP server address, e.g. ``"smtp.qq.com:465"``.
-        smtpUsername: SMTP login username (usually email address).
-        smtpPassword: SMTP login password or authorization code.
-        mailTo: Recipient email address.
-        title: Email subject.
-        body: Email body.
-
-    Returns:
-        ``True`` on success, ``False`` on failure.
+    """Send an email via SMTP. Returns ``True`` on success, ``False`` on failure (reason in ``GetLastError()``).
 
     Example::
 
-        Mail("smtp.qq.com:465", "sender@qq.com", "auth_code",
-             "receiver@gmail.com", "Alert", "BTC broke above 50000")
+        Mail("smtp.qq.com:465", "sender@qq.com", "auth_code", "receiver@gmail.com", "Alert", "BTC above 50000")
     """
     ...
 
 def SetErrorFilter(filters: str) -> None:
-    """Set error message filter regex. Matched error messages will not be logged.
-
-    Commonly used to filter frequent irrelevant errors. Can be called multiple
-    times to add multiple filter rules.
-
-    Args:
-        filters: Regular expression string. Pass empty string ``""`` to clear all filter rules.
+    """Error logs matching this regular expression are not recorded. ``""`` clears the filter.
 
     Example::
 
-        SetErrorFilter("timeout|503|rate limit")
-        SetErrorFilter("")  # Clear all filters
+        SetErrorFilter("502:|503:|tcp|character|unexpected|network|timeout")
     """
     ...
 
 def GetPid() -> int:
-    """Get the PID of the current docker process.
-
-    Returns:
-        Process ID number.
-    """
+    """Process ID of the robot."""
     ...
 
-def GetLastError() -> Optional[str]:
-    """Get the most recent error message and clear it.
-
-    After calling, the error message is consumed and subsequent calls return ``None``.
-
-    Returns:
-        Most recent error message string, ``None`` when there is no error.
+def GetLastError() -> str:
+    """The most recent error message, cleared by reading; ``""`` when there is none.
 
     Example::
 
-        exchange.GetTicker()
-        err = GetLastError()
-        if err:
-            Log("Error:", err)
+        if exchange.GetTicker() is None:
+            Log("error:", GetLastError())
     """
     ...
 
-def GetCommand() -> Optional[str]:
-    """Get strategy interaction command.
+def GetCommand(timeout: int = -1) -> Optional[str]:
+    """Read an interactive command (``"ControlName:Data"``) sent from the robot page; ``None`` when there is none.
 
-    Used to read interaction commands sent by users on the live trading page.
-
-    Returns:
-        Command string (format: ``"button_name:parameter"``), ``None`` when there is no command.
+    Args:
+        timeout: Milliseconds: ``-1`` (default) do not wait, ``0`` wait until a command arrives, positive wait at
+            most that long.
 
     Example::
 
         cmd = GetCommand()
         if cmd:
-            Log("Received:", cmd)
-            parts = cmd.split(":")
-            if parts[0] == "buy":
-                exchange.Buy(-1, float(parts[1]))
+            name, _, data = cmd.partition(":")
     """
     ...
 
-def GetChannelData(token: Union[str, int] = "") -> Optional[str]:
-    """Get channel data for cross-strategy communication.
-
-    Read data published by other strategies via ``SetChannelData()``.
-
-    Args:
-        token: Channel token (used to identify data source): a live robot ID (string or number) or a UUID.
-
-    Returns:
-        Data from the channel, ``None`` if no data available.
-    """
+def GetChannelData(channelId: Union[str, int]) -> Any:
+    """Latest data published with ``SetChannelData()`` by another robot (its robot ID), or data sent to the platform
+    through the HTTP API (a 32-char UUID). ``None`` on the first call (retry) or when nothing was published."""
     ...
 
-def SetChannelData(value: str) -> None:
-    """Set channel data for cross-strategy communication between different bots.
-
-    Publish data to the channel, which can be read by other strategies via ``GetChannelData()``.
-
-    Args:
-        value: Data to publish.
-    """
+def SetChannelData(data: Any) -> None:
+    """Publish this robot's state (any JSON-serializable value) for other robots to read with ``GetChannelData()``."""
     ...
 
 def GetMeta() -> Optional[str]:
-    """Get strategy metadata (additional data set when creating the robot).
-
-    Returns:
-        Metadata string, ``None`` when there is no data.
-    """
+    """The ``Meta`` data set when the robot was created (via the API), ``None`` when there is none."""
     ...
 
-def Dial(address: Union[str, int], timeout: Union[int, dict] = None) -> Optional[IDial]:
-    """Create network connection (TCP/WebSocket/database, etc.) for communication with external services.
+def Dial(address: str, timeout: Union[int, dict[str, Any]] = 30) -> Optional[IDial]:
+    """Open a TCP / TLS / WebSocket connection or a database connection (live only).
 
     Args:
-        address: Connection address, supports multiple protocols:
-
-            - WebSocket: ``"wss://stream.binance.com:9443/ws/btcusdt@ticker"``
-            - TCP: ``"tcp://host:port"``
-            - SQLite: ``"sqlite3://test.db"`` (relative paths are under the live trading directory), ``"sqlite3:///path/to/db.sqlite3"`` (absolute path), ``"sqlite3://:memory:"`` (in-memory database)
-            - MySQL: ``"mysql://user:pass@tcp(host:3306)/dbname?charset=utf8mb4&parseTime=true"`` (Go driver DSN); ``"mysql://user:pass@host:3306/dbname"`` also works
-            - PostgreSQL: ``"postgres://user=u password=p host=h port=5432 dbname=d sslmode=disable"`` (libpq key-value); ``"postgres://user:pass@host:5432/dbname?sslmode=disable"`` also works
-            - ClickHouse: ``"clickhouse://tcp://host:9000?username=u&password=p&database=d"`` (clickhouse-go DSN); ``"clickhouse://user:pass@host:9000/db"`` also works
-
-            Options can be appended at the end separated by ``|``, e.g.:
-            ``"wss://....|compress=gzip_raw&mode=recv"``
-
-        timeout: Connection timeout: ws/wss in milliseconds (below 100 = seconds), tcp/tls in seconds, 0 = default timeout; 30 (i.e. 30 seconds) when omitted.
-            An options dict (e.g. ``{"timeout": 10, "headers": {...}}``) is also accepted; without timeout the default timeout applies.
+        address: e.g. ``"wss://host/path"``, ``"tcp://host:port"``, ``"tls://host:443"``, ``"sqlite3://test.db"``,
+            ``"sqlite3://:memory:"``, ``"mysql://user:pass@tcp(host:3306)/db?charset=utf8mb4&parseTime=true"``,
+            ``"postgres://user=u password=p host=h port=5432 dbname=d sslmode=disable"``,
+            ``"clickhouse://tcp://host:9000?username=u&password=p&database=d"``. Options follow a ``|``:
+            ``"wss://...|compress=gzip_raw&mode=recv&reconnect=true&interval=10000&payload=..."``.
+        timeout: Connect timeout: ws/wss in ms (below 100 = seconds), tcp/tls in seconds, 0 = default; 30 when
+            omitted. Or an options dict, e.g. ``{"timeout": 10, "headers": {...}}``.
 
     Returns:
-        IDial connection object, ``None`` on connection failure.
+        ``IDial``, ``None`` when the connection failed (reason in ``GetLastError()``).
 
     Example::
 
         ws = Dial("wss://stream.binance.com:9443/ws/btcusdt@ticker")
         if ws:
-            msg = ws.read(5000)
-            if msg:
-                Log(msg)
+            Log(ws.read(5000))
             ws.close()
-
-        db = Dial("sqlite3://strategy.db")
-        db.exec("CREATE TABLE IF NOT EXISTS logs(time TEXT, msg TEXT)")
     """
     ...
 
-def HttpQuery(url: str, postData: Optional[Union[str, bytes, IHttpOptions, dict]] = None, cookies: Optional[str] = None, headers: Optional[Union[str, dict[str, str]]] = None) -> Optional[Union[str, IHttpRet]]:
-    """Send HTTP request.
-
-    The second argument is either POST data (a non-empty string turns the request into a POST) or an
-    IHttpOptions dict (``method``, ``body``, ``headers``, ``cookie``, ``timeout``, ``proxy``, ``charset``,
-    ``format``, ``debug``, ...). With ``debug: True`` in the options a full IHttpRet response object is returned
-    instead of just the body string. The URL may also carry a proxy prefix, e.g.
-    ``"socks5://127.0.0.1:1080/https://api.example.com"`` (an explicit ``proxy`` option wins).
+@overload
+def HttpQuery(url: str, options: _HttpDebugOptions) -> IHttpRet: ...
+@overload
+def HttpQuery(url: str, postData: Union[str, IHttpOptions, dict[str, Any], None], cookies: Optional[str], headers: Optional[str], isReturnHeader: Literal[True]) -> IHttpRet: ...
+@overload
+def HttpQuery(url: str, postData: Union[str, IHttpOptions, dict[str, Any], None] = None, cookies: Optional[str] = None, headers: Optional[str] = None, isReturnHeader: bool = False) -> str:
+    """Send an HTTP request.
 
     Args:
-        url: Request URL.
-        postData: POST data, or an IHttpOptions dict.
-        cookies: Cookie string (legacy call form).
-        headers: Request headers, string (newline-separated) or dict (legacy call form).
+        url: URL. A proxy prefix is allowed: ``"socks5://127.0.0.1:1080/https://api.example.com"`` (an explicit
+            ``proxy`` option wins).
+        postData: An ``IHttpOptions`` dict (``method``, ``body``, ``headers``, ``cookie``, ``timeout``, ``proxy``,
+            ``charset``, ``format``, ``debug``, ...), or a non-empty string = POST body (legacy form).
+        cookies, headers, isReturnHeader: Legacy positional form.
 
     Returns:
-        Response body string, ``None`` on failure. If ``debug=True`` in options, returns an object with
-        ``StatusCode``, ``Header``, ``Body`` fields (on failure ``StatusCode`` is 0 and ``Error`` holds the reason).
+        The response body string (``""`` on failure; parse JSON with ``json.loads``). With ``{"debug": True}``
+        (or ``isReturnHeader``) the full ``IHttpRet``; on failure its ``StatusCode`` is 0 and ``Error`` the reason.
 
     Example::
 
-        data = HttpQuery("https://api.example.com/ticker")
-        if data:
-            Log(data)
-
-        # Advanced usage with options
+        body = HttpQuery("https://www.okx.com/api/v5/public/time")
         ret = HttpQuery("https://api.example.com/data", {
             "method": "POST",
-            "body": '{"key": "value"}',
+            "body": json.dumps({"key": "value"}),
             "headers": {"Content-Type": "application/json"},
             "debug": True
         })
+        Log(ret.StatusCode, ret.Body)
     """
     ...
 
-def HttpQuery_Go(url: str, postData: Optional[Union[str, bytes, IHttpOptions, dict]] = None, cookies: Optional[str] = None, headers: Optional[Union[str, dict[str, str]]] = None) -> IHttpQueryGo:
-    """Asynchronous ``HttpQuery()``: returns a concurrent object immediately without blocking. Arguments as ``HttpQuery()``.
-
-    Returns:
-        A concurrent object; its ``wait(timeout)`` yields the same result as the synchronous ``HttpQuery()``.
-        On completion ``EventLoop()`` receives an event with ``Event`` ``"HttpQuery"`` (``Index`` = ticket number).
+@overload
+def HttpQuery_Go(url: str, options: _HttpDebugOptions) -> IHttpQueryGo[IHttpRet]: ...
+@overload
+def HttpQuery_Go(url: str, postData: Union[str, IHttpOptions, dict[str, Any], None] = None, cookies: Optional[str] = None, headers: Optional[str] = None) -> IHttpQueryGo[str]:
+    """Asynchronous ``HttpQuery()``: returns at once; ``wait(timeout)`` yields the same result as ``HttpQuery()``.
+    On completion ``EventLoop()`` receives an event with ``Event`` ``"HttpQuery"`` (``Index`` = ticket).
 
     Example::
 
-        r1 = HttpQuery_Go("https://api.example.com/tickerA")
-        r2 = HttpQuery_Go("https://api.example.com/tickerB")
-        tickerA = json.loads(r1.wait())
-        tickerB = json.loads(r2.wait())
+        r1 = HttpQuery_Go("https://api.example.com/a")
+        r2 = HttpQuery_Go("https://api.example.com/b")
+        a = json.loads(r1.wait())
+        b = json.loads(r2.wait())
     """
     ...
 
-def Encode(algo: str, inputFormat: str, outputFormat: str, data: Union[str, bytes], keyFormat: Optional[str] = None, key: Optional[str] = None) -> Union[str, bytes]:
-    """Generic encoding/encryption/signing function.
+def Encode(algo: str, inputFormat: str, outputFormat: str, data: str, keyFormat: str = ..., key: str = ...) -> str:
+    """Encoding, hashing, HMAC, encryption and signing.
 
     Args:
-        algo: Algorithm name:
-
-            - Hash: ``"md5"``, ``"sha256"``, ``"sha512"``, ``"sha1"``, ``"keccak256"``
-            - HMAC: ``"hmac_md5"``, ``"hmac_sha256"``, ``"hmac_sha512"``
-            - Encryption: ``"aes128-cbc"``, ``"aes256-cbc"``, ``"aes192-cbc"``
-            - Signature: ``"ed25519"``, ``"ed25519.seed"``
-            - Encoding: ``"raw"``, ``"text.encoder"``, ``"text.decoder"``
-
-        inputFormat: Input data format: ``"hex"``, ``"base64"``, ``"raw"``, ``"string"``.
-        outputFormat: Output data format: ``"hex"``, ``"base64"``, ``"raw"``, ``"string"``.
+        algo: ``"raw"``; hashes ``"md5"``, ``"sha1"``, ``"sha256"``, ``"sha512"``, ``"sha3.256"``, ``"keccak256"``,
+            ``"ripemd160"``, ``"blake2b.256"``, ... (HMAC when ``key`` is given); ``"sign"``, ``"signTx"``;
+            ``"ed25519"``, ``"ed25519.seed"``; ``"text.encoder.utf8"``, ``"text.decoder.gbk"``;
+            ``"aes.encrypt"`` / ``"aes.decrypt"`` (``.cbc`` default, ``.cfb``, ``.ecb``); ``"gzip.deflate"``,
+            ``"gzip.inflate"``, ``"zlib.deflate"``, ``"zlib.inflate"``, ``"raw.deflate"``, ``"raw.inflate"``.
+        inputFormat: Format of ``data``: ``"raw"``, ``"hex"``, ``"base64"``, ``"string"`` (also ``"base64.url"``,
+            ``"base64.rawurl"``, ``"latin1"``).
+        outputFormat: ``"raw"``, ``"hex"``, ``"base64"``, ``"string"`` (also ``"base64.url"``, ``"base64.rawurl"``).
         data: Input data.
-        keyFormat: Key format (required for encryption): ``"hex"``, ``"base64"``, ``"raw"``, ``"string"``.
-        key: Key (required for encryption algorithms).
-
-    Returns:
-        Encoded/encrypted result.
+        keyFormat: Format of ``key``.
+        key: Key (HMAC / signing / encryption).
 
     Example::
 
-        sign = Encode("hmac_sha256", "string", "hex", "message", "string", "secret")
-        hash_val = Encode("sha256", "string", "hex", "hello")
-    """
-    ...
-
-def UnixNano() -> int:
-    """Get current time as nanosecond-precision timestamp.
-
-    Returns:
-        Nanosecond timestamp (e.g. ``1609459200000000000``).
-
-    Example::
-
-        start = UnixNano()
-        # ... perform operations ...
-        elapsed_ms = (UnixNano() - start) / 1e6
-        Log("Elapsed:", elapsed_ms, "ms")
-    """
-    ...
-
-def Unix() -> int:
-    """Get current time as second-precision timestamp.
-
-    Returns:
-        Second-precision timestamp (e.g. ``1609459200``).
-    """
-    ...
-
-def GetOS() -> str:
-    """Get operating system and architecture information where the docker is running.
-
-    Returns:
-        String in format ``"os/arch"``, e.g. ``"linux/amd64"``, ``"darwin/arm64"``.
-    """
-    ...
-
-def SysInfo(attr: str) -> object:
-    """Get system information.
-
-    Args:
-        attr: Information type:
-
-            - ``"pid"``: Process ID
-            - ``"ppid"``: Parent process ID
-            - ``"ncpu"``: Number of CPU cores
-            - ``"arch"``: CPU architecture (e.g. ``"amd64"``)
-            - ``"os"``: Operating system (e.g. ``"linux"``)
-            - ``"sys_cpu"``: System CPU usage (%)
-            - ``"sys_mem"``: System memory information
-            - ``"cpu"``: Current process CPU usage
-            - ``"mem"``: Current process memory usage
-            - ``"threads"``: Current process thread count
-
-    Returns:
-        Corresponding system information value.
-
-    Example::
-
-        Log("CPU cores:", SysInfo("ncpu"))
+        sign = Encode("sha256", "string", "hex", "message", "string", "secret")  # HMAC-SHA256
+        h = Encode("md5", "raw", "hex", "hello")
     """
     ...
 
 def MD5(data: str) -> str:
-    """Calculate MD5 hash value of a string.
-
-    Args:
-        data: String to hash.
-
-    Returns:
-        32-character hexadecimal MD5 hash string (lowercase).
-
-    Example::
-
-        Log(MD5("hello"))  # "5d41402abc4b2a76b9719d911017c592"
-    """
+    """MD5 of ``data``, 32 lower-case hex characters."""
     ...
 
-def DBExec(sql: str, *extra: object) -> Optional[IDBExecRet]:
-    """Execute SQL statement on the strategy's built-in SQLite database.
+def HMAC(algo: str, outputFormat: str, data: str, key: str) -> str:
+    """Legacy: HMAC signature, same as ``Encode(algo, "raw", outputFormat, data, "raw", key)``."""
+    ...
 
-    Each robot has an independent SQLite database with persistent data storage.
-    When SQL starts with ``":"``, uses in-memory database (data lost after restart).
+def Hash(algo: str, outputFormat: str, data: str) -> str:
+    """Legacy: hash, same as ``Encode(algo, "raw", outputFormat, data)``."""
+    ...
 
-    Args:
-        sql: SQL statement. Supports parameterized queries (use ``?`` as placeholder).
-        *extra: Binding values for parameterized queries.
+def StrDecode(s: str, charset: str) -> str:
+    """Legacy: decode ``s`` (each character's code point is one byte) from ``charset`` (required, e.g. ``"gbk"``)
+    to a UTF-8 string, same as ``Encode("text.decoder." + charset, "latin1", "string", s)``."""
+    ...
 
-    Returns:
-        Query result object (containing ``columns`` and ``values``), ``None`` on failure.
+def UnixNano() -> int:
+    """Current nanosecond timestamp."""
+    ...
 
-    Example::
+def Unix() -> int:
+    """Current second timestamp."""
+    ...
 
-        DBExec("CREATE TABLE IF NOT EXISTS trades(id INTEGER PRIMARY KEY, price REAL, amount REAL)")
-        DBExec("INSERT INTO trades(price, amount) VALUES(?, ?)", 50000, 0.1)
-        ret = DBExec("SELECT * FROM trades ORDER BY id DESC LIMIT 10")
-        if ret:
-            Log("Columns:", ret.columns)
-            Log("Data:", ret.values)
-    """
+def GetOS() -> str:
+    """OS and architecture of the docker, e.g. ``"linux/amd64"``."""
+    ...
+
+def SysInfo(attr: str = ...) -> Any:
+    """System information of the docker process: the whole dict without ``attr``, else one value (``"pid"``,
+    ``"os"``, ``"arch"``, ``"ncpu"``, ...); ``None`` for an unknown key."""
     ...
 
 def UUID() -> str:
-    """Generate UUID string (includes time component).
-
-    Returns:
-        UUID string, e.g. ``"550e8400-e29b-41d4-a716-446655440000"``.
-    """
+    """A UUID: 32 upper-case hex characters, no hyphens."""
     ...
 
-def EventLoop(timeout: Optional[int] = None) -> Optional[IEventMsg]:
-    """Wait for the next event in the event loop (market updates, thread messages, WebSocket data, etc.).
-
-    When the strategy uses WebSocket or multi-threading, ``EventLoop`` is the
-    recommended event-driven approach.
-
-    Args:
-        timeout: Timeout duration in milliseconds:
-
-            - Not passed or 0: Block waiting until there is an event.
-            - Positive number: Wait for specified ms, return ``None`` on timeout.
-            - Negative number (-1): Non-blocking, return ``None`` immediately if no event.
+def DBExec(sql: str, *args: Any) -> Optional[IDBExecRet]:
+    """Execute SQL on the robot's own SQLite database (persistent). ``?`` placeholders take ``args``.
 
     Returns:
-        Event message object, ``None`` on timeout or no event.
+        ``{columns, values}``, ``None`` on failure.
 
     Example::
 
-        while True:
-            ev = EventLoop(1000)
-            if ev:
-                Log("Event:", ev.Event, "Exchange:", ev.Index, "Symbol:", ev.Symbol)
+        DBExec("CREATE TABLE IF NOT EXISTS trades(ts INTEGER, price REAL)")
+        DBExec("INSERT INTO trades VALUES(?, ?)", Unix(), 50000)
+        ret = DBExec("SELECT * FROM trades")
     """
     ...
 
-def _G(k: str, v: Optional[object] = None) -> object:
-    """Global persistent KV storage. Data is saved in the strategy database and persists after restart.
+def EventLoop(timeout: int = 0) -> Optional[IEventMsg]:
+    """Wait for the next event: ``exchange.Go()`` / ``HttpQuery_Go()`` completions and, on push-only futures
+    counters, tick / order events. (WebSocket push subscriptions are read with ``ctx.poll()`` instead.)
 
     Args:
-        k: Key name. Pass ``None`` to clear all KV data.
-        v: Value (optional):
-
-            - Not passed: Read the value for the key.
-            - Pass ``None``: Delete the key.
-            - Pass other value: Save key-value pair.
+        timeout: Milliseconds: ``0`` (default) wait until an event arrives, positive wait at most that long,
+            negative do not wait.
 
     Returns:
-        When reading, returns the corresponding value. When writing, no meaningful return.
-        Calling without parameters returns the robot ID.
+        ``IEventMsg``, ``None`` on timeout. Raises ``StopError`` when the robot stops.
 
     Example::
 
-        _G("lastPrice", 50000)          # Save
-        price = _G("lastPrice")         # Read -> 50000
-        _G("lastPrice", None)           # Delete
+        t = exchange.Go("GetTicker")
+        ev = EventLoop(1000)
+        if ev:
+            Log(ev.Event, ev.Index)
     """
     ...
 
-def _D(timestamp: Optional[Union[int, float]] = None, fmt: Optional[str] = None) -> str:
-    """Format timestamp to readable date string.
+def JSONParse(s: str) -> Any:
+    """Parse JSON; numbers beyond the safe integer range (2^53) are kept as strings."""
+    ...
 
-    Args:
-        timestamp: Timestamp (milliseconds). Uses current time if not passed.
-        fmt: Date format string, default ``"yyyy-MM-dd HH:mm:ss"``.
-
-    Returns:
-        Formatted date string.
+def Log(*args: Any) -> None:
+    """Write a log line (values joined with spaces). A trailing ``"#ff0000"`` colors it; a trailing ``"@"`` also
+    pushes it as a notification (email / WebHook, live only); a trailing ``"&"`` makes it a private log, hidden when
+    the robot is shown publicly. matplotlib figures are shown as images.
 
     Example::
 
-        Log(_D())                     # "2024-01-15 10:30:45"
-        Log(_D(1705284645000))        # "2024-01-15 10:30:45"
+        Log("Price:", ticker.Last, "Amount:", 0.1)
+        Log("Alert #ff0000@")
+    """
+    ...
+
+def LogProfit(profit: float, *args: Any) -> None:
+    """Record profit (calculated by the strategy) and draw the profit curve; ``args`` are appended to the log."""
+    ...
+
+def LogProfitReset(remain: int = ...) -> None:
+    """Clear profit logs, keeping the last ``remain`` entries."""
+    ...
+
+def LogStatus(*args: Any) -> None:
+    """Set the status bar shown above the logs: text, tables (``{"type": "table", "title", "cols", "rows"}``),
+    buttons, status components, or a list of them; dicts / lists are sent as JSON.
+
+    Example::
+
+        table = {"type": "table", "title": "Positions", "cols": ["Symbol", "Amount"], "rows": [["BTC", 1]]}
+        LogStatus("`" + json.dumps(table) + "`")
+    """
+    ...
+
+def LogReset(remain: int = ...) -> None:
+    """Clear logs, keeping the last ``remain`` entries."""
+    ...
+
+def LogVacuum() -> None:
+    """Reclaim database space after ``LogReset()`` (SQLite VACUUM)."""
+    ...
+
+def EnableLog(enable: bool) -> None:
+    """``False`` stops recording order logs (``Buy``/``Sell``/... lines); errors are always logged."""
+    ...
+
+def Chart(options: Union[dict[str, Any], list[dict[str, Any]]]) -> IChart:
+    """Create a chart (Highcharts / Highstocks configuration; a list = several charts).
+
+    Prefer ``Chart`` for general charting; use ``KLineChart`` for Pine-style candlestick charts.
+
+    Example::
+
+        chart = Chart({"title": {"text": "Spread"}, "xAxis": {"type": "datetime"},
+                       "series": [{"name": "Spread", "data": []}]})
+        chart.add(0, [Unix() * 1000, 1.5])
+    """
+    ...
+
+def KLineChart(options: Optional[dict[str, Any]] = None) -> IKLineChart:
+    """Create a Pine-style K-line chart. ``options``: ``overlay`` (main chart), ``pricePrecision``,
+    ``volumePrecision``, ``xAxis``, ``yAxis``, ``candle``, ...
+
+    Example::
+
+        c = KLineChart({"overlay": True})
+    """
+    ...
+
+def _G(k: Optional[str] = ..., v: Any = ...) -> Any:
+    """Persistent key/value storage of the robot (survives restarts).
+
+    ``_G()`` returns the robot ID; ``_G(k)`` reads; ``_G(k, v)`` writes; ``_G(k, None)`` deletes; ``_G(None)``
+    clears everything.
+
+    Example::
+
+        _G("lastPrice", 50000)
+        price = _G("lastPrice")
+    """
+    ...
+
+def _D(timestamp: Optional[float] = None, fmt: Optional[str] = None) -> str:
+    """Format a time. In Python ``timestamp`` is in **seconds** (``records[-1].Time / 1000``); omitted = now.
+    ``fmt`` is a ``time.strftime`` format, default ``"%Y-%m-%d %H:%M:%S"``. Uses the docker's local time zone.
+
+    Example::
+
+        Log(_D())
+        Log(_D(1574993606, "%Y-%m-%d"))
     """
     ...
 
 def _N(num: float, precision: int = 4) -> float:
-    """Number precision truncation (truncates down, no rounding).
-
-    Args:
-        num: Number to truncate.
-        precision: Number of decimal places to keep.
-
-    Returns:
-        Truncated number.
+    """Truncate ``num`` to ``precision`` decimals (no rounding); a negative ``precision`` truncates integer digits.
 
     Example::
 
-        Log(_N(3.14159, 2))   # 3.14
-        Log(_N(3.14959, 2))   # 3.14 (no rounding)
+        _N(3.1415, 2)   # 3.14
+        _N(1300, -3)    # 1000
     """
     ...
 
-def _Cross(arr1: list[float], arr2: list[float]) -> bool:
-    """Determine whether two lines cross (golden cross / death cross).
-
-    Args:
-        arr1: Data array of the first line.
-        arr2: Data array of the second line.
-
-    Returns:
-        Positive number indicates golden cross (arr1 crosses above arr2),
-        negative number indicates death cross (arr1 crosses below arr2),
-        0 indicates no cross.
+def _C(func: Callable[..., Optional[_V]], *args: Any) -> _V:
+    """Call ``func(*args)`` until it returns something other than ``None`` / ``False``, sleeping between attempts
+    (3000 ms, see ``_CDelay``).
 
     Example::
 
-        ema5 = TA.EMA(records, 5)
-        ema20 = TA.EMA(records, 20)
-        cross = _Cross(ema5, ema20)
-        if cross > 0:
-            Log("Golden cross!")
-        if cross < 0:
-            Log("Death cross!")
-    """
-    ...
-
-def JSONParse(s: str) -> dict:
-    """Safe JSON parsing. Throws exception on parsing failure.
-
-    Args:
-        s: JSON string to parse.
-
-    Returns:
-        Parsed dict object.
-
-    Example::
-
-        obj = JSONParse('{"price": 50000, "amount": 0.1}')
-        Log(obj["price"])  # 50000
-    """
-    ...
-
-def Log(s: object, *extra: object) -> None:
-    """Output log to the strategy log area.
-
-    Supports special suffix to control log color: append ``"#FF0000"`` to display in red.
-
-    Args:
-        s: Log content, supports any type.
-        *extra: Additional log parameters, will be appended.
-
-    Example::
-
-        Log("Normal log")
-        Log("Red log #FF0000")
-        Log("Price:", ticker.Last, "Amount:", 0.1)
-    """
-    ...
-
-def LogProfit(profit: float, *extra: object) -> None:
-    """Record profit data and draw profit curve.
-
-    Args:
-        profit: Profit value.
-        *extra: Additional log information.
-
-    Example::
-
-        LogProfit(100.5)
-        LogProfit(100.5, "Profit from this trade")
-    """
-    ...
-
-def LogProfitReset(remain: Optional[int] = None) -> None:
-    """Reset profit log.
-
-    Args:
-        remain: Number of recent records to retain. Default 0 (clear all).
-
-    Example::
-
-        LogProfitReset()     # Clear all
-        LogProfitReset(10)   # Keep last 10
-    """
-    ...
-
-def LogStatus(s: object, *extra: object) -> None:
-    """Set strategy status bar information (displayed at the top of the bot page).
-
-    Supports Markdown tables, HTML, and other formats.
-
-    Args:
-        s: Status information string.
-        *extra: Additional status parameters.
-
-    Example::
-
-        LogStatus("Price: " + str(ticker.Last) + " | Position: " + str(pos.Amount))
-    """
-    ...
-
-def EnableLog(enable: bool) -> None:
-    """Enable or disable log recording.
-
-    Args:
-        enable: ``True`` to enable, ``False`` to disable log recording.
-
-    Example::
-
-        EnableLog(False)  # Disable logging (reduce database writes)
-        EnableLog(True)   # Re-enable
-    """
-    ...
-
-def Chart(options: Union[dict, list[dict]]) -> IChart:
-    """Create custom chart (based on Highcharts/Highstock) for the strategy page.
-
-    Preferred for charting: supports the full range of chart types (line, column,
-    scatter, area, candlestick, ...). Use Chart by default; only use KLineChart
-    when you specifically need a Pine-style candlestick/K-line chart.
-
-    Args:
-        options: Highcharts/Highstock chart configuration object or list of configs.
-
-    Returns:
-        IChart chart object, used to dynamically add data.
-
-    Example::
-
-        chart = Chart({
-            "title": {"text": "Price Trend"},
-            "xAxis": {"type": "datetime"},
-            "series": [
-                {"name": "Price", "type": "line", "data": []},
-                {"name": "MA5", "type": "line", "data": []}
-            ]
-        })
-        chart.add(0, [Unix() * 1000, ticker.Last])
-        chart.reset()
-    """
-    ...
-
-def KLineChart(options: Optional[dict] = None) -> IKLineChart:
-    """Create K-line chart (custom candlestick chart), configuration similar to Pine Script.
-
-    Specialized for K-line (candlestick) charts only — prefer Chart for general
-    charting (it covers every chart type).
-
-    Args:
-        options: K-line chart configuration object.
-
-    Returns:
-        IKLineChart chart object (``begin``/``close`` plus Pine-style plot functions).
-
-    Example::
-
-        chart = KLineChart({"overlay": True})
-    """
-    ...
-
-def LogReset(remain: Optional[int] = None) -> None:
-    """Reset all logs.
-
-    Args:
-        remain: Number of recent logs to retain. Default 0 (clear all).
-
-    Example::
-
-        LogReset()      # Clear all logs
-        LogReset(100)   # Keep last 100
-    """
-    ...
-
-def LogVacuum() -> None:
-    """Execute VACUUM operation on the strategy database to reclaim space.
-
-    Call after deleting large amounts of logs to reduce database file size.
-    """
-    ...
-
-T = TypeVar('T')
-
-def _C(func: Callable[..., Optional[T]], *args: object, **kwargs: object) -> T:
-    """Fault-tolerant retry function. Automatically retries until a non-None value is returned.
-
-    Commonly used to wrap API calls that may return ``None`` due to network issues.
-
-    Args:
-        func: Function to retry calling.
-        *args: Arguments to pass to the function.
-
-    Returns:
-        Non-None value successfully returned by the function.
-
-    Example::
-
-        # Ensure getting Ticker (retries continuously until success)
         ticker = _C(exchange.GetTicker)
-        # Retry with parameters
         depth = _C(exchange.GetDepth, "BTC_USDT")
-        account = _C(exchange.GetAccount)
     """
+    ...
+
+def _CDelay(ms: float) -> None:
+    """Set the retry interval of ``_C()`` in milliseconds (3000 by default)."""
+    ...
+
+def _Cross(arr1: Sequence[Optional[float]], arr2: Sequence[Optional[float]]) -> int:
+    """Bars since ``arr1`` and ``arr2`` crossed: positive = ``arr1`` crossed above ``arr2`` that many bars ago,
+    negative = crossed below, 0 = equal at the last bar. Both lists must have the same length.
+
+    Example::
+
+        n = _Cross(TA.EMA(records, 5), TA.EMA(records, 20))
+        if n == 1:
+            Log("golden cross on the last bar")
+    """
+    ...
+
+def _T(text: str, other: Optional[str] = None) -> str:
+    """Bilingual text: ``_T("中文", "English")`` shows the part matching the viewer's language."""
     ...

@@ -1,9 +1,16 @@
-from typing import Callable, Optional, TypeVar, Union, List
+from typing import Any, Callable, Generic, Literal, Optional, Sequence, TypedDict, TypeVar, Union, overload
+import talib as talib
+
+# Python 策略的 API 声明。下面每个名字都由运行时注入到策略的全局命名空间：直接使用，
+# 不需要 import（``talib`` 也一样；写 ``import talib`` 也可以）。API 返回的结构都是可以按属性
+# 访问的字典：``ticker.Last`` 与 ``ticker["Last"]`` 两种写法都可以。
+
+_V = TypeVar("_V")
 
 # ==================== K-line Period Constants ====================
 
 PERIOD_M1: int
-"""1分钟K线周期。"""
+"""1分钟K线周期（60秒）。"""
 
 PERIOD_M3: int
 """3分钟K线周期。"""
@@ -44,351 +51,340 @@ PERIOD_W1: int
 # ==================== Order Status Constants ====================
 
 ORDER_STATE_PENDING: int
-"""订单挂单状态（活跃订单，尚未成交）。"""
+"""订单未完成（挂单中、部分成交）。值为0。"""
 
 ORDER_STATE_CLOSED: int
-"""订单已完成（完全成交）。"""
+"""订单已完成（全部成交）。值为1。"""
 
 ORDER_STATE_CANCELED: int
-"""订单已取消（由用户或交易所取消）。"""
+"""订单已取消（用户或交易所取消，也包括过期、拒单）。值为2。"""
 
 ORDER_STATE_UNKNOWN: int
-"""订单状态未知。"""
+"""订单状态未知。值为3。"""
 
 # ==================== Order Type Constants ====================
 
 ORDER_TYPE_BUY: int
-"""买入订单类型。"""
+"""买单。值为0。"""
 
 ORDER_TYPE_SELL: int
-"""卖出订单类型。"""
+"""卖单。值为1。"""
 
-# ==================== Order Direction Constants (Futures) ====================
+ORDER_TYPE_NONE: int
+"""无方向（交易所没有给出方向的合成成交的 ``Trade.Type``）。值为2。"""
+
+# ==================== Order Offset Constants (Futures) ====================
 
 ORDER_OFFSET_OPEN: int
-"""开仓方向（期货）。"""
+"""开仓订单（期货）。值为0。"""
 
 ORDER_OFFSET_CLOSE: int
-"""平仓方向（期货）。"""
+"""平仓订单（期货）。值为1。"""
 
 # ==================== Conditional Order Type Constants ====================
 
 ORDER_CONDITION_TYPE_OCO: int
-"""OCO条件单（One-Cancels-the-Other）。同时设置止盈和止损。"""
+"""OCO条件单（二选一）：同时设置止盈与止损。值为0。"""
 
 ORDER_CONDITION_TYPE_TP: int
-"""止盈条件单。"""
+"""止盈条件单。值为1。"""
 
 ORDER_CONDITION_TYPE_SL: int
-"""止损条件单。"""
+"""止损条件单。值为2。"""
 
 ORDER_CONDITION_TYPE_GENERIC: int
-"""通用条件单。"""
+"""通用条件单（只出现在查询结果中，例如追踪止损）。值为3。"""
 
 # ==================== Log Type Constants ====================
 
 LOG_TYPE_BUY: int
-"""买入日志类型，用于 ``exchange.Log()``。"""
+"""买入日志类型，用于 ``exchange.Log()``。值为0。"""
 
 LOG_TYPE_SELL: int
-"""卖出日志类型，用于 ``exchange.Log()``。"""
+"""卖出日志类型，用于 ``exchange.Log()``。值为1。"""
 
 LOG_TYPE_CANCEL: int
-"""取消订单日志类型，用于 ``exchange.Log()``。"""
+"""撤单日志类型，用于 ``exchange.Log()``。值为2。"""
 
 # ==================== Position Direction Constants (Futures) ====================
 
 PD_LONG: int
-"""多头持仓方向。"""
+"""多头持仓。值为0。"""
 
 PD_SHORT: int
-"""空头持仓方向。"""
+"""空头持仓。值为1。"""
 
 PD_LONG_YD: int
-"""昨日多头持仓（上期所特有）。"""
+"""昨日多头持仓（国内期货柜台）。值为2。"""
 
 PD_SHORT_YD: int
-"""昨日空头持仓（上期所特有）。"""
+"""昨日空头持仓（国内期货柜台）。值为3。"""
 
-# ==================== Futures/Exchange Operation Code Constants ====================
+# ==================== JavaScript-style aliases ====================
 
-FUTURES_OP_SET_MARGIN: int
-"""设置保证金/杠杆操作代码。"""
+null: None
+"""``None`` 的别名（保留它是为了让从 JavaScript 移植的代码能运行）。"""
 
-FUTURES_OP_SET_DIRECTION: int
-"""设置交易方向操作代码。"""
+true: bool
+"""``True`` 的别名。"""
 
-FUTURES_OP_SET_CONTRACT_TYPE: int
-"""设置合约类型操作代码。"""
+false: bool
+"""``False`` 的别名。"""
 
-FUTURES_OP_GET_POSITION: int
-"""获取持仓操作代码。"""
-
-EXCHANGE_OP_IO_CONTROL: int
-"""IO控制操作代码，用于发送任意API请求。"""
+NaN: None
+"""``None`` 的别名。"""
 
 # ==================== Type Aliases ====================
 
-IOrderId = Union[int, str]
-"""订单ID类型，根据交易所不同可以是整数或字符串。"""
-# ==================== Data Interfaces ====================
+IOrderId = Union[str, int]
+"""订单Id。通常是字符串 ``"交易所品种代码,交易所原始订单Id"``（例如 ``"ETH-USDT,1547130415509278720"``）。"""
 
-class IOrderCondition:
-    """条件订单参数结构,定义止盈止损的触发条件。
+# ==================== Data Structures ====================
 
-    与 ``exchange.CreateConditionOrder()`` 配合使用来创建条件订单。
+class IOrderCondition(dict[str, Any]):
+    """条件单的触发条件与执行价格（``Order.Condition``；``exchange.CreateConditionOrder()`` 的 ``condition`` 参数）。
 
     Example::
 
-        # Take-profit condition
-        tp_condition = {
-            "ConditionType": ORDER_CONDITION_TYPE_TP,
-            "TpTriggerPrice": 55000,
-            "TpOrderPrice": 54900
-        }
-        # Stop-loss condition
-        sl_condition = {
-            "ConditionType": ORDER_CONDITION_TYPE_SL,
-            "SlTriggerPrice": 48000,
-            "SlOrderPrice": 47900
-        }
-        # OCO condition (take-profit + stop-loss)
-        oco_condition = {
-            "ConditionType": ORDER_CONDITION_TYPE_OCO,
-            "TpTriggerPrice": 55000, "TpOrderPrice": 54900,
-            "SlTriggerPrice": 48000, "SlOrderPrice": 47900
-        }
+        # 止盈
+        tp = {"ConditionType": ORDER_CONDITION_TYPE_TP, "TpTriggerPrice": 55000, "TpOrderPrice": -1}
+        # 止损
+        sl = {"ConditionType": ORDER_CONDITION_TYPE_SL, "SlTriggerPrice": 48000, "SlOrderPrice": 47900}
+        # OCO（止盈 + 止损）
+        oco = {"ConditionType": ORDER_CONDITION_TYPE_OCO,
+               "TpTriggerPrice": 55000, "TpOrderPrice": 54900,
+               "SlTriggerPrice": 48000, "SlOrderPrice": 47900}
     """
     ConditionType: int
-    """条件类型:ORDER_CONDITION_TYPE_OCO、TP(止盈)、SL(止损)或 GENERIC。"""
-    TpTriggerPrice: Optional[float]
-    """止盈触发价格。"""
-    TpOrderPrice: Optional[float]
-    """止盈订单价格(触发时以此价格下单)。"""
-    SlTriggerPrice: Optional[float]
-    """止损触发价格。"""
-    SlOrderPrice: Optional[float]
-    """止损订单价格(触发时以此价格下单)。"""
+    """条件单类型：``ORDER_CONDITION_TYPE_OCO``（0）、``TP``（1）、``SL``（2）、``GENERIC``（3，只出现在查询结果中）。"""
+    TpTriggerPrice: float
+    """止盈触发价（TP 与 OCO）。"""
+    TpOrderPrice: float
+    """止盈执行价；下单时 ``-1`` 表示市价。查询结果中市价执行的价格通常为0。"""
+    SlTriggerPrice: float
+    """止损触发价（SL 与 OCO）。"""
+    SlOrderPrice: float
+    """止损执行价；下单时 ``-1`` 表示市价。查询结果中市价执行的价格通常为0。"""
 
-class IOrder:
-    """订单信息结构,包含完整的订单详情。
-
-    由 ``exchange.GetOrder()``、``exchange.GetOrders()`` 等返回。
+class IOrder(dict[str, Any]):
+    """订单结构，由 ``exchange.GetOrder()``、``exchange.GetOrders()``、``exchange.GetHistoryOrders()`` 与条件单查询函数返回。
 
     Example::
 
         order = exchange.GetOrder(order_id)
         if order:
-            Log("Price:", order.Price, "Filled:", order.DealAmount, "Status:", order.Status)
+            Log("价格:", order.Price, "成交:", order.DealAmount, "状态:", order.Status)
     """
-    Info: object
-    """交易所返回的原始订单信息(JSON 对象),格式因交易所而异。"""
+    Info: Any
+    """交易所接口应答的该订单原始数据（回测时没有）。"""
+    Symbol: str
+    """品种代码，例如 ``"BTC_USDT"``（现货）、``"BTC_USDT.swap"``（期货）。"""
     Id: IOrderId
-    """订单 ID,根据交易所可能是 str 或 int 类型。"""
+    """订单Id：通常为 ``"交易所品种代码,交易所原始订单Id"``，例如 ``"ETH-USDT,1547130415509278720"``。"""
     Time: int
-    """订单时间戳(毫秒)。"""
+    """订单创建时间（毫秒时间戳）。"""
     Price: float
-    """订单价格。"""
+    """下单价格（市价单可能为0或-1）。"""
     Amount: float
-    """订单数量。"""
+    """下单数量（现货市价买单可能是计价币金额）。"""
     DealAmount: float
-    """已成交数量。"""
+    """成交数量。"""
     AvgPrice: float
-    """平均成交价格。"""
+    """成交均价（交易所不提供时为0）。"""
     Status: int
-    """订单状态:ORDER_STATE_PENDING(挂单中)、ORDER_STATE_CLOSED(已成交)、
-    ORDER_STATE_CANCELED(已取消)、ORDER_STATE_UNKNOWN(未知)。"""
+    """``ORDER_STATE_PENDING``（0）、``ORDER_STATE_CLOSED``（1）、``ORDER_STATE_CANCELED``（2）、``ORDER_STATE_UNKNOWN``（3）。"""
     Type: int
-    """订单类型:ORDER_TYPE_BUY(买入)、ORDER_TYPE_SELL(卖出)。"""
-    Offset: Optional[int]
-    """订单开平方向(期货):ORDER_OFFSET_OPEN(开仓)、ORDER_OFFSET_CLOSE(平仓)。"""
-    ContractType: Optional[str]
-    """合约类型(期货),例如 ``"swap"``(永续)、``"quarter"``(季度)。"""
-    Condition: Optional[IOrderCondition]
-    """条件订单信息(仅条件订单包含此字段)。"""
+    """``ORDER_TYPE_BUY``（0）或 ``ORDER_TYPE_SELL``（1）。"""
+    Offset: int
+    """``ORDER_OFFSET_OPEN``（0）或 ``ORDER_OFFSET_CLOSE``（1）（期货；现货订单为开仓）。"""
+    ContractType: str
+    """期货订单的合约代码（例如 ``"swap"``）；现货为 ``""``。"""
+    Condition: IOrderCondition
+    """只有条件单有：触发条件与价格。普通订单没有这个键——用 ``order.get("Condition")`` 读取。"""
 
-class IMarketOrder:
-    """深度数据中的市场订单条目(买单/卖单),包含价格和数量。"""
+class IMarketOrder(dict[str, Any]):
+    """订单簿的一档（``Depth.Asks`` / ``Depth.Bids`` 的元素）。"""
     Price: float
-    """价格档位。"""
+    """价格。"""
     Amount: float
-    """该价格档位的数量。"""
+    """数量。"""
 
-class IDepth:
-    """市场深度(订单簿)数据,包含买卖订单信息。
-
-    卖单按价格从低到高排序,买单从高到低排序。
+class IDepth(dict[str, Any]):
+    """订单簿，由 ``exchange.GetDepth()`` 返回。
 
     Example::
 
         depth = exchange.GetDepth()
         if depth:
-            Log("Best ask:", depth.Asks[0].Price, "Best bid:", depth.Bids[0].Price)
-            Log("Spread:", depth.Asks[0].Price - depth.Bids[0].Price)
+            Log("卖一:", depth.Asks[0].Price, "买一:", depth.Bids[0].Price)
     """
-    Info: object
-    """交易所返回的原始深度数据。"""
+    Info: Any
+    """交易所接口应答的原始数据（回测时没有）。"""
     Time: int
-    """时间戳(毫秒)。"""
+    """毫秒时间戳。"""
     Asks: list[IMarketOrder]
-    """卖单数组,按价格从低到高排序(Asks[0] 为最优卖价)。"""
+    """卖单，价格从低到高（``Asks[0]`` 为卖一）。"""
     Bids: list[IMarketOrder]
-    """买单数组,按价格从高到低排序(Bids[0] 为最优买价)。"""
+    """买单，价格从高到低（``Bids[0]`` 为买一）。"""
 
-class IFunding:
-    """资金费率信息(永续合约)。
+class IFunding(dict[str, Any]):
+    """资金费率（永续合约），由 ``exchange.GetFundings()`` 返回。
 
     Example::
 
         fundings = exchange.GetFundings("BTC_USDT.swap")
         if fundings:
-            Log("Funding rate:", fundings[0].Rate, "Settlement time:", fundings[0].Time)
+            Log("费率:", fundings[0].Rate, "下次结算:", _D(fundings[0].Time / 1000))
     """
-    Info: object
-    """交易所返回的原始数据。"""
-    Time: int
-    """结算时间戳(毫秒)。"""
-    Rate: float
-    """资金费率,例如 0.0001 表示 0.01%。"""
-    Period: float
-    """结算周期(秒)。"""
+    Info: Any
+    """交易所接口应答的原始数据。"""
     Symbol: str
-    """交易对符号。"""
+    """品种代码，例如 ``"BTC_USDT.swap"``。"""
+    Interval: int
+    """资金费率间隔，单位毫秒（``28800000`` 即8小时）。"""
+    Time: int
+    """下一期开始时刻（本期结算时刻），毫秒时间戳。"""
+    Rate: float
+    """本期结算使用的资金费率，例如 0.0001 即 0.01%。"""
 
-class IPosition:
-    """持仓信息结构(期货)。
+class IPosition(dict[str, Any]):
+    """期货持仓，由 ``exchange.GetPositions()`` 返回。
 
     Example::
 
         positions = exchange.GetPositions("BTC_USDT.swap")
         if positions:
             for pos in positions:
-                direction = "Long" if pos.Type == PD_LONG else "Short"
-                Log("Direction:", direction, "Amount:", pos.Amount, "PnL:", pos.Profit)
+                side = "多" if pos.Type == PD_LONG else "空"
+                Log(pos.Symbol, side, "数量:", pos.Amount, "盈亏:", pos.Profit)
     """
-    Info: object
-    """交易所返回的原始持仓数据。"""
+    Info: Any
+    """交易所接口应答的原始数据（回测时没有）。"""
+    Symbol: str
+    """品种代码，例如 ``"BTC_USDT.swap"``。"""
     MarginLevel: float
     """杠杆倍数。"""
     Amount: float
-    """持仓数量。"""
+    """持仓量（通常为合约张数）。"""
     FrozenAmount: float
-    """冻结数量(挂单中待平仓的持仓)。"""
+    """冻结量（平仓挂单占用）。"""
     Price: float
-    """平均持仓价格。"""
+    """持仓均价。"""
     Profit: float
-    """未实现盈亏。"""
+    """未实现盈亏，单位为保证金币种。"""
     Type: int
-    """持仓方向:PD_LONG(多头)、PD_SHORT(空头)、
-    PD_LONG_YD(多头昨仓)、PD_SHORT_YD(空头昨仓)。"""
+    """``PD_LONG``（0）、``PD_SHORT``（1）、``PD_LONG_YD``（2）、``PD_SHORT_YD``（3）。"""
     ContractType: str
-    """合约类型,例如 ``"swap"``、``"quarter"``。"""
+    """合约代码，例如 ``"swap"``、``"quarter"``。"""
     Margin: float
-    """该持仓占用的保证金。"""
+    """仓位占用的保证金（不提供时为0）。"""
 
-class ITrade:
-    """最近成交记录。
+class ITrade(dict[str, Any]):
+    """市场成交记录，由 ``exchange.GetTrades()`` 返回。
 
     Example::
 
         trades = exchange.GetTrades()
         if trades:
-            Log("Latest trade:", trades[-1].Price, "Amount:", trades[-1].Amount)
+            Log("最新成交:", trades[-1].Price, trades[-1].Amount)
     """
-    Id: Union[int, str]
-    """成交记录 ID。"""
+    Id: str
+    """成交Id（交易所不提供时由平台生成，只保证在同一次返回结果中唯一）。"""
     Time: int
-    """成交时间戳(毫秒)。"""
+    """毫秒时间戳。"""
     Price: float
     """成交价格。"""
     Amount: float
     """成交数量。"""
     Type: int
-    """成交类型:ORDER_TYPE_BUY(买入)、ORDER_TYPE_SELL(卖出)。"""
+    """主动成交方向：``ORDER_TYPE_BUY``（0）、``ORDER_TYPE_SELL``（1）；未知时为 ``ORDER_TYPE_NONE``（2）。"""
 
-class ITicker:
-    """行情数据,包含当前市场快照信息。
+class ITicker(dict[str, Any]):
+    """行情快照，由 ``exchange.GetTicker()`` / ``exchange.GetTickers()`` 返回。
 
     Example::
 
         ticker = exchange.GetTicker()
         if ticker:
-            Log("Last:", ticker.Last, "Bid:", ticker.Buy, "Ask:", ticker.Sell)
-            Log("24h High:", ticker.High, "Low:", ticker.Low, "Volume:", ticker.Volume)
+            Log("最新价:", ticker.Last, "买一:", ticker.Buy, "卖一:", ticker.Sell)
     """
-    Time: int
-    """时间戳(毫秒)。"""
+    Info: Any
+    """交易所接口应答的原始数据（回测时没有）。"""
     Symbol: str
-    """交易对符号。"""
+    """品种代码，例如 ``"BTC_USDT"``、``"BTC_USDT.swap"``。"""
     High: float
-    """24小时最高价。"""
+    """24小时最高价（不提供时为0）。"""
     Low: float
-    """24小时最低价。"""
+    """24小时最低价（不提供时为0）。"""
     Sell: float
-    """最优卖价。"""
+    """卖一价（行情接口不含盘口数据时为0）。"""
     Buy: float
-    """最优买价。"""
+    """买一价（不提供时为0）。"""
     Last: float
     """最新成交价。"""
+    Open: float
+    """滚动周期的开盘价（不提供时为0）。"""
     Volume: float
-    """24小时成交量。"""
-    Info: object
-    """交易所返回的原始行情数据。"""
+    """最近成交量（现货为交易币，期货为合约张数，以交易所提供的为准）。"""
+    Time: int
+    """毫秒时间戳。"""
+    OpenInterest: float
+    """持仓量（不提供时为0）。"""
 
-class IAccount:
-    """账户信息结构(现货)。
-
-    对于期货账户,返回包含权益和未实现盈亏的扩展结构。
+class IAccount(dict[str, Any]):
+    """当前交易对 / 合约的账户资产，由 ``exchange.GetAccount()`` 返回。
 
     Example::
 
         account = exchange.GetAccount()
         if account:
-            Log("Quote balance:", account.Balance, "Frozen:", account.FrozenBalance)
-            Log("Base balance:", account.Stocks, "Frozen:", account.FrozenStocks)
+            Log("计价币:", account.Balance, "冻结:", account.FrozenBalance)
+            Log("交易币:", account.Stocks, "冻结:", account.FrozenStocks)
     """
-    Info: object
-    """交易所返回的原始账户数据。"""
+    Info: Any
+    """交易所接口应答的原始数据（回测时没有）。"""
     Balance: float
-    """计价货币余额(例如 USDT)。对于期货,指可用保证金。"""
+    """可用计价币（例如 BTC_USDT 的 USDT）；U本位合约为可用保证金。"""
     FrozenBalance: float
-    """冻结的计价货币余额。"""
+    """冻结的计价币。"""
     Stocks: float
-    """基础货币余额(例如 BTC)。对于期货,指可用保证金对应的币种。"""
+    """可用交易币（例如 BTC）；币本位合约为可用保证金（币）。"""
     FrozenStocks: float
-    """冻结的基础货币余额。"""
+    """冻结的交易币。"""
     Equity: float
-    """权益(期货),包括未实现盈亏的总账户价值。"""
+    """仅期货：当前合约设置下的保证金总权益（不提供时为0）。"""
+    UPnL: float
+    """仅期货：当前合约设置下所有持仓的未实现盈亏。"""
 
-class IAsset:
-    """资产信息,表示账户中特定币种的持有情况。
+class IAsset(dict[str, Any]):
+    """账户中的一种资产，由 ``exchange.GetAssets()`` 返回。
 
     Example::
 
         assets = exchange.GetAssets()
         if assets:
-            for asset in assets:
-                Log("Currency:", asset.Currency, "Available:", asset.Amount, "Frozen:", asset.FrozenAmount)
+            for a in assets:
+                Log(a.Currency, "可用:", a.Amount, "冻结:", a.FrozenAmount)
     """
     Currency: str
-    """币种名称,例如 ``"BTC"``、``"USDT"``。"""
+    """交易所使用的资产名称（例如 ``"BTC"``；有的交易所叫 ``"XBT"``）。"""
     Amount: float
     """可用数量。"""
     FrozenAmount: float
     """冻结数量。"""
 
-class IRecord:
-    """K线数据结构,包含 OHLCV 信息。
+class IRecord(dict[str, Any]):
+    """一根K线，``exchange.GetRecords()`` 的元素。
 
     Example::
 
         records = exchange.GetRecords(PERIOD_H1)
         if records:
             last = records[-1]
-            Log("Open:", last.Open, "High:", last.High, "Low:", last.Low, "Close:", last.Close)
+            Log("开:", last.Open, "高:", last.High, "低:", last.Low, "收:", last.Close)
     """
     Time: int
-    """K线时间戳(毫秒),表示该柱的开始时间。"""
+    """这根K线的起始时间（毫秒时间戳）。"""
     Open: float
     """开盘价。"""
     High: float
@@ -399,288 +395,451 @@ class IRecord:
     """收盘价。"""
     Volume: float
     """成交量。"""
+    OpenInterest: float
+    """持仓量（不提供时为0）。"""
 
 class IRecordList(list[IRecord]):
-    """IRecord 的扩展列表,提供便捷的 OHLCV 数组属性访问器。
+    """``exchange.GetRecords()`` 返回的K线列表：``IRecord`` 的 ``list``，外加按列取值。
 
-    可直接传递给 TA/talib 指标函数。属性访问器将特定字段的所有值
-    提取为一个扁平列表。
+    ``records.Close``（任意字段名）是该字段在所有K线上的列表——安装了 numpy/TA-Lib 时为 numpy 数组——
+    可以直接传给 ``talib`` 的函数。列表本身可以直接传给 ``TA``。
 
     Example::
 
         records = exchange.GetRecords(PERIOD_H1)
         if records:
-            closes = records.Close   # list of all close prices
-            highs = records.High     # list of all high prices
+            closes = records.Close
             rsi = TA.RSI(records, 14)
+            macd = talib.MACD(records.Close)
     """
     @property
+    def Time(self) -> list[int]:
+        """各K线的起始时间。"""
+        ...
+    @property
     def Open(self) -> list[float]:
-        """从记录中提取的所有开盘价列表。"""
+        """开盘价。"""
         ...
     @property
     def High(self) -> list[float]:
-        """从记录中提取的所有最高价列表。"""
+        """最高价。"""
         ...
     @property
     def Low(self) -> list[float]:
-        """从记录中提取的所有最低价列表。"""
+        """最低价。"""
         ...
     @property
     def Close(self) -> list[float]:
-        """从记录中提取的所有收盘价列表。"""
+        """收盘价。"""
         ...
     @property
     def Volume(self) -> list[float]:
-        """从记录中提取的所有成交量列表。"""
+        """成交量。"""
+        ...
+    @property
+    def OpenInterest(self) -> list[float]:
+        """持仓量。"""
         ...
 
-class IMarket:
-    """市场/交易对信息,描述精度、限制及其他元数据。
-
-    通过 ``exchange.GetMarkets()`` 获取。
+class IMarket(dict[str, Any]):
+    """市场（品种）信息，``exchange.GetMarkets()`` 返回的字典的值。
 
     Example::
 
         markets = exchange.GetMarkets()
         if markets:
-            btc = markets.get("BTC_USDT")
-            if btc:
-                Log("Price precision:", btc.PricePrecision, "Amount precision:", btc.AmountPrecision)
-                Log("Min qty:", btc.MinQty, "Min notional:", btc.MinNotional)
+            m = markets.get("BTC_USDT")
+            if m:
+                Log("价格精度:", m.PricePrecision, "最小下单量:", m.MinQty)
     """
     Symbol: str
-    """交易对符号,例如 ``"BTC_USDT"``,期货为 ``"BTC_USDT.swap"``。"""
+    """交易所原始的品种名称，例如 ``"btcusdt"``（与 ``Ticker.Symbol`` 不同；字典的键才是平台的品种代码）。"""
     BaseAsset: str
-    """基础资产(交易币种),例如 ``"BTC"``。"""
+    """交易币，大写，例如 ``"BTC"``。"""
     QuoteAsset: str
-    """计价资产,例如 ``"USDT"``。"""
-    TickSize: Optional[float]
-    """最小价格变动单位,例如 0.01。"""
-    AmountSize: Optional[float]
-    """最小数量步长,例如 0.001。"""
-    PricePrecision: Optional[int]
-    """价格小数精度,例如 2 表示 2 位小数。"""
-    AmountPrecision: Optional[int]
-    """数量小数精度,例如 3 表示 3 位小数。"""
-    MinQty: Optional[float]
-    """最小订单数量。"""
-    MaxQty: Optional[float]
-    """最大订单数量。"""
-    MinNotional: Optional[float]
-    """最小订单价值(名义价值)。"""
-    MaxNotional: Optional[float]
-    """最大订单价值(名义价值)。"""
-    CtVal: Optional[float]
-    """合约面值(期货),例如 0.01 表示一张合约代表 0.01 个币。"""
-    Info: Optional[object]
-    """交易所返回的原始市场信息。"""
+    """计价币，大写，例如 ``"USDT"``。"""
+    TickSize: float
+    """价格最小变动，例如 0.01。"""
+    AmountSize: float
+    """下单量最小变动，例如 0.001。"""
+    PricePrecision: int
+    """价格小数位数（可能为负数：-1 表示取整到十位）。"""
+    AmountPrecision: int
+    """下单量小数位数（可能为负数）。"""
+    MinQty: float
+    """最小下单量。"""
+    MaxQty: float
+    """最大下单量（不限制时为 9007199254740991）。"""
+    MinNotional: float
+    """最小下单金额。"""
+    MaxNotional: float
+    """最大下单金额。交易所不提供时没有这个键。"""
+    CtVal: float
+    """一张合约的价值，单位为 ``CtValCcy``（期货）。不提供时没有这个键。"""
+    CtValCcy: str
+    """``CtVal`` 的单位（例如 ``"BTC"``、``"USD"``）。不提供时没有这个键。"""
+    Info: Any
+    """交易所市场信息接口返回的该品种原始数据。"""
+
 class IGo:
-    """``exchange.Go()`` 返回的并发任务对象,用于异步获取结果。
+    """``exchange.Go()`` 返回的并发任务。
 
-    示例::
+    Example::
 
-        # 并发获取行情和深度
-        go_ticker = exchange.Go("GetTicker")
-        go_depth = exchange.Go("GetDepth")
-        ticker, ok = go_ticker.wait()   # 等待行情结果
-        depth, ok = go_depth.wait()     # 等待深度结果
+        a = exchange.Go("GetTicker", "BTC_USDT")
+        b = exchange.Go("GetDepth")
+        ticker, ok = a.wait()
+        depth, ok = b.wait()
     """
-    def wait(self, timeout: Optional[int] = None) -> tuple[object, bool]:
-        """等待并发任务完成并返回结果。
+    def wait(self, timeout: int = 0) -> tuple[Any, bool]:
+        """等待任务完成并取出结果。
 
-        参数:
-            timeout: 超时时间,单位毫秒。
+        Args:
+            timeout: 毫秒。不传或 ``0``：阻塞到完成。正数：最多等这么久，任务还没完成时返回 ``(None, False)``，
+                之后可以再次调用 ``wait()``。负数（``-1``）：不等待。
 
-                - 不传或传 0:阻塞等待直到返回结果。
-                - 正数:最多等待指定毫秒数,任务未完成返回 ``(None, False)``,之后可以再次 ``wait()``。
-                - 负数 (-1):不等待,任务未完成立即返回 ``(None, False)``。
-
-        返回:
-            ``(结果, ok)`` 元组:成功为 ``(对应函数的返回值, True)``;调用失败、无数据或超时为
-            ``(None, False)``。结果被取走后再次 ``wait()`` 会记录错误
-            ``routine N already finished`` 并返回 ``(None, False)``。
-
-        示例::
-
-            go = exchange.Go("GetTicker")
-            ticker, ok = go.wait(2000)  # 最多等待 2 秒
-            if not ok:
-                ticker, ok = go.wait()  # 超时后可以继续等待
+        Returns:
+            成功时为 ``(结果, True)``（与直接调用的返回值相同）；失败、无数据或超时为 ``(None, False)``。
+            结果已经取走后再次调用 ``wait()`` 会记录错误 ``routine N already finished`` 并返回 ``(None, False)``。
         """
         ...
 
-class IHttpQueryGo:
-    """``HttpQuery_Go()`` 返回的并发对象。"""
-    def wait(self, timeout: Optional[int] = None) -> Optional[Union[str, "IHttpRet"]]:
-        """等待 HTTP 请求完成,返回值与同步 ``HttpQuery()`` 相同。
+class IHttpQueryGo(Generic[_V]):
+    """``HttpQuery_Go()`` 返回的并发请求。"""
+    @overload
+    def wait(self) -> _V: ...
+    @overload
+    def wait(self, timeout: int) -> Optional[_V]:
+        """等待请求完成，结果与同步的 ``HttpQuery()`` 返回值相同。
 
-        参数:
-            timeout: 超时时间(毫秒)。不传或 0 一直等待;-1 不等待;正数最多等待该毫秒数。
-                未完成时返回 ``None``,之后可以再次 ``wait()``;结果取到后重复 ``wait()`` 返回同一份结果。
+        Args:
+            timeout: 毫秒。不传或 ``0`` 一直等到完成；``-1`` 不等待；正数最多等这么久。还没完成时返回 ``None``
+                （可以再次调用 ``wait()``）。结果已经取走后再次调用 ``wait()`` 会记录错误 ``routine N already finished``
+                并返回 ``None``。
         """
         ...
 
-class IData:
+class IData(dict[str, Any]):
     """``exchange.GetData()`` 的返回值。"""
     Time: int
-    """命中记录的时间戳(毫秒);没有记录时为 offset(或下一行的时间)。"""
-    Data: object
-    """命中记录的数据;没有记录、拉取失败或数据源不可用时为 ``None``(原因可用 ``GetLastError()`` 读取)。"""
+    """匹配到的那一行的时间戳（毫秒）；没有时为 ``offset``（或下一行的时间）。"""
+    Data: Any
+    """匹配到的那一行的数据；没有数据、拉取失败或数据源不可用时为 ``None``（原因用 ``GetLastError()`` 读取）。"""
 
 class IExchange:
-    """交易所操作接口,封装所有交易所 API 调用方法。
+    """交易所账户对象：全局变量 ``exchange``（即 ``exchanges[0]``）或 ``exchanges[i]``。
 
-    通过全局变量 ``exchange``(第一个交易所)或 ``exchanges[i]``(第 i 个交易所)访问。
+    交易所函数调用失败时不抛异常：记录一条错误日志，返回 ``None``（``CancelConditionOrder`` 返回 ``False``），
+    原因用 ``GetLastError()`` 读取。
 
-    示例::
+    Example::
 
         ticker = exchange.GetTicker()
         order_id = exchange.Buy(ticker.Sell, 0.1)
         order = exchange.GetOrder(order_id)
     """
-    def Go(self, method: str, *args: object) -> IGo:
-        """创建并发任务,异步调用交易所方法。
+    def Go(self, method: str, *args: Any) -> IGo:
+        """并发调用交易所函数：立即返回，用 ``wait()`` 取结果。
 
-        不阻塞当前代码执行。调用返回的 IGo 对象的 ``wait()`` 方法获取结果。
-        可同时发起多个并发请求,提高效率。
+        Args:
+            method: 函数名，例如 ``"GetTicker"``、``"GetDepth"``、``"GetAccount"``、``"GetRecords"``、
+                ``"CreateOrder"``、``"Buy"``、``"IO"``。
+            *args: 该函数的参数，与直接调用时相同。
 
-        参数:
-            method: 要调用的方法名,如 ``"GetTicker"``、``"GetDepth"``、
-                ``"GetAccount"``、``"GetRecords"``、``"Buy"``、``"Sell"`` 等。
-            *args: 传递给方法的参数。
+        Returns:
+            IGo 任务；``wait()`` 返回 ``(结果, ok)``。完成时 ``EventLoop()`` 收到 ``Event`` 为 ``"Exchange_函数名"`` 的事件。
 
-        返回:
-            IGo 对象。调用其 ``wait()`` 方法获取结果。
+        Example::
 
-        示例::
-
-            go_ticker = exchange.Go("GetTicker", "BTC_USDT")
-            go_account = exchange.Go("GetAccount")
-            ticker = go_ticker.wait()
-            account = go_account.wait()
+            a = exchange.Go("GetTicker", "BTC_USDT")
+            b = exchange.Go("GetAccount")
+            ticker, ok1 = a.wait()
+            account, ok2 = b.wait()
         """
         ...
 
-    def GetPositions(self, symbol: str = '') -> Optional[list[IPosition]]:
-        """获取当前持仓列表(期货)。
+    # ---- Market ----
 
-        参数:
-            symbol: 交易对符号,如 ``"BTC_USDT.swap"``。
-                不传返回所有持仓。
+    def GetTicker(self, symbol: str = '') -> Optional[ITicker]:
+        """获取行情。
 
-        返回:
-            持仓列表,失败返回 ``None``。无持仓时返回空列表 ``[]``。
+        Args:
+            symbol: 品种代码，例如 ``"BTC_USDT"``（现货）、``"BTC_USDT.swap"``（期货）。不传：当前交易对 / 合约。
 
-        示例::
+        Returns:
+            ``ITicker``，失败返回 ``None``。
 
-            positions = exchange.GetPositions("BTC_USDT.swap")
-            if positions and len(positions) > 0:
-                Log("数量:", positions[0].Amount, "方向:", positions[0].Type)
+        Example::
+
+            ticker = exchange.GetTicker("BTC_USDT")
+            if ticker:
+                Log("BTC:", ticker.Last)
         """
         ...
 
-    def GetContractType(self) -> str:
-        """获取当前设置的合约类型(期货)。
+    def GetTickers(self) -> Optional[list[ITicker]]:
+        """获取交易所全部品种的行情（现货为所有交易对，期货为所有合约）。
 
-        返回:
-            当前合约类型字符串,如 ``"swap"``(永续),
-            ``"quarter"``(季度),``"this_week"`` 等。
+        Returns:
+            ``ITicker`` 列表；失败或交易所没有聚合行情接口时返回 ``None``。
+
+        Example::
+
+            tickers = exchange.GetTickers()
+            if tickers:
+                Log("品种数:", len(tickers))
         """
         ...
 
-    def SetContractType(self, symbol: str) -> object:
-        """设置合约类型(期货)。必须在调用交易接口前设置。
+    def GetDepth(self, symbol: str = '') -> Optional[IDepth]:
+        """获取订单簿。卖单价格从低到高，买单从高到低。
 
-        参数:
-            symbol: 合约类型:
+        Args:
+            symbol: 品种代码；不传：当前交易对 / 合约。
 
-                - ``"swap"``:永续合约
-                - ``"quarter"``:季度合约
-                - ``"next_quarter"``:下季度合约
-                - ``"this_week"``:本周合约
-                - ``"next_week"``:下周合约
-                - 也可传合约 ID,如 ``"BTC-USD-200925"``
+        Returns:
+            ``IDepth``，失败返回 ``None``。
 
-        返回:
-            设置结果。
+        Example::
 
-        示例::
-
-            exchange.SetContractType("swap")       # 永续合约
-            exchange.SetContractType("quarter")    # 季度合约
+            depth = exchange.GetDepth()
+            if depth:
+                Log("卖一:", depth.Asks[0].Price, "买一:", depth.Bids[0].Price)
         """
         ...
 
-    def SetMarginLevel(self, symbol: str|float, num: float=None) -> None:
-        """设置杠杆倍数(期货)。
+    def GetTrades(self, symbol: str = '') -> Optional[list[ITrade]]:
+        """获取最近的市场成交记录（按时间升序）。
 
-        可以用一个或两个参数调用:
+        Args:
+            symbol: 品种代码；不传：当前交易对 / 合约。
 
-        - ``SetMarginLevel(10)`` — 为所有交易对设置 10 倍杠杆。
-        - ``SetMarginLevel("BTC_USDT.swap", 20)`` — 为特定交易对设置 20 倍杠杆。
-
-        参数:
-            symbol: 杠杆倍数(单参数时)或交易对符号(双参数时)。
-            num: 指定交易对时的杠杆倍数。
-
-        示例::
-
-            exchange.SetMarginLevel(10)
-            exchange.SetMarginLevel("BTC_USDT.swap", 20)
+        Returns:
+            ``ITrade`` 列表，失败返回 ``None``。
         """
         ...
 
-    def SetDirection(self, s: str) -> None:
-        """设置期货交易方向。下单前必须设置。
+    def GetRecords(self, symbol: Union[str, int] = '', period: int = -1, limit: int = 0) -> Optional[IRecordList]:
+        """获取K线（按时间升序）。
 
-        不推荐：优先用 ``CreateOrder``,可直接指定 side,无需先调用 ``SetDirection``。
+        调用形式：``GetRecords()``、``GetRecords(symbol)``、``GetRecords(symbol, period)``、
+        ``GetRecords(symbol, period, limit)``、``GetRecords(period)``、``GetRecords(period, limit)``。
 
-        参数:
-            s: 交易方向:
+        Args:
+            symbol: 品种代码；不传：当前交易对 / 合约。这一位传整数时表示周期。
+            period: K线周期（秒），例如 ``PERIOD_M1``、``PERIOD_H1``；不传：实盘的默认周期。
+            limit: K线根数；不传：``SetMaxBarLen()`` 设置的长度（默认200）。
 
-                - ``"buy"``:买入开多
-                - ``"sell"``:卖出开空
-                - ``"closebuy"``:卖出平多
-                - ``"closesell"``:买入平空
+        Returns:
+            ``IRecordList``，失败返回 ``None``。
 
-        示例::
+        Example::
 
-            exchange.SetDirection("buy")
-            exchange.Buy(50000, 1)           # 开多
-            exchange.SetDirection("closebuy")
-            exchange.Sell(51000, 1)           # 平多
+            records = exchange.GetRecords(PERIOD_H1)
+            records = exchange.GetRecords("ETH_USDT", PERIOD_M5, 100)
+            if records:
+                dif, dea, hist = TA.MACD(records)
         """
         ...
 
-    def CancelOrder(self, orderId: object, *extra: object) -> bool:
-        """取消指定订单。
+    def GetMarkets(self) -> Optional[dict[str, IMarket]]:
+        """获取交易所各品种的市场信息。
 
-        参数:
-            orderId: 要取消的订单 ID。
-            *extra: 附加日志信息,会显示在日志中。
+        Returns:
+            以品种代码为键的字典（例如 ``"BTC_USDT"``、``"BTC_USDT.swap"``）；失败或不支持时返回 ``None``。
 
-        返回:
-            取消成功返回 ``True``,失败返回 ``False``。
+        Example::
 
-        示例::
+            markets = exchange.GetMarkets()
+            if markets:
+                m = markets.get("BTC_USDT")
+                if m:
+                    Log("最小下单量:", m.MinQty, "价格精度:", m.PricePrecision)
+        """
+        ...
 
-            oid = exchange.Buy(50000, 0.1)
+    def GetRawJSON(self) -> str:
+        """该交易所对象最近一次 REST 调用（包括 ``IO("api", ...)``）的原始应答；那次调用失败时为错误信息，
+        还没有调用过时为 ``""``。
+
+        Example::
+
+            exchange.GetTicker()
+            Log(exchange.GetRawJSON())
+        """
+        ...
+
+    def SetData(self, key: str, value: Any) -> int:
+        """加载数据集，供 ``exchange.GetData()`` 读取。
+
+        Args:
+            key: 数据集名称。
+            value: ``[[时间戳, 数据], ...]``（或它的 JSON 字符串），或 ``{"schema": [...], "data": [...]}``。
+
+        Returns:
+            数据 JSON 编码后的长度；格式不正确时返回 ``0``（并设置 ``GetLastError()``）。
+
+        Example::
+
+            exchange.SetData("test", [[1579536000000, 123], [1579622400000, 456]])
+        """
+        ...
+
+    def GetData(self, key: str, timeout: int = 60000, offset: int = 0) -> IData:
+        """读取 ``exchange.SetData()`` 加载的数据集，或 http(s) 链接提供的数据。
+
+        链接须返回 ``[[时间, 数据], ...]`` 或 ``{"schema": [...], "data": [...]}``；按 ``timeout`` 毫秒缓存，
+        过期后重新拉取。``SetData()`` 加载的数据不会过期。
+
+        Args:
+            key: 数据集名称或 http(s) 链接。
+            timeout: 缓存超时，毫秒（不传为60000，最小5000）。
+            offset: 毫秒时间戳：取 ``time <= offset`` 的最后一行；不传：当前时间（只取已经"到达"的行）。
+
+        Returns:
+            总是返回 ``IData`` ``{Time, Data}``；没有数据或拉取失败时 ``Data`` 为 ``None``（原因见 ``GetLastError()``）。
+
+        Example::
+
+            d = exchange.GetData("https://www.example.com/data.json")
+            if d.Data is None:
+                Log("没有数据:", GetLastError())
+        """
+        ...
+
+    # ---- Account ----
+
+    def GetAccount(self) -> Optional[IAccount]:
+        """获取当前交易对 / 合约的账户资产。
+
+        Returns:
+            ``IAccount``，失败返回 ``None``。
+
+        Example::
+
+            account = exchange.GetAccount()
+            if account:
+                Log("Balance:", account.Balance, "Stocks:", account.Stocks)
+        """
+        ...
+
+    def GetAssets(self) -> Optional[list[IAsset]]:
+        """获取账户的全部资产。
+
+        Returns:
+            ``IAsset`` 列表，失败返回 ``None``。
+
+        Example::
+
+            assets = exchange.GetAssets()
+            if assets:
+                for a in assets:
+                    Log(a.Currency, a.Amount, a.FrozenAmount)
+        """
+        ...
+
+    # ---- Trading ----
+
+    def Buy(self, price: float, amount: float = ..., *args: Any) -> Optional[IOrderId]:
+        """在当前交易对 / 合约上下买单（期货的方向由 ``SetDirection()`` 设置）。
+
+        Args:
+            price: 价格；``-1`` 为市价单。只传一个参数 ``Buy(amount)`` 也是市价单。
+            amount: 数量（现货市价买单通常为计价币金额；期货为合约张数）。
+            *args: 输出到下单日志的附加内容；最后一个字典参数不输出，作为下单选项（例如 ``{"type": "post_only"}``）。
+
+        Returns:
+            订单Id，失败返回 ``None``。
+
+        Example::
+
+            oid = exchange.Buy(50000, 0.01, "限价买入")
+            oid = exchange.Buy(-1, 100)  # 市价买入 100 USDT
+        """
+        ...
+
+    def Sell(self, price: float, amount: float = ..., *args: Any) -> Optional[IOrderId]:
+        """在当前交易对 / 合约上下卖单（期货的方向由 ``SetDirection()`` 设置）。
+
+        Args:
+            price: 价格；``-1`` 为市价单。只传一个参数 ``Sell(amount)`` 也是市价单。
+            amount: 数量。
+            *args: 输出到下单日志的附加内容；最后一个字典参数作为下单选项。
+
+        Returns:
+            订单Id，失败返回 ``None``。
+
+        Example::
+
+            oid = exchange.Sell(51000, 0.01)
+            oid = exchange.Sell(-1, 0.01)  # 市价卖出
+        """
+        ...
+
+    def CreateOrder(self, symbol: str, side: str, price: float, amount: float, *args: Any) -> Optional[IOrderId]:
+        """在任意品种上按指定方向下单（不需要 ``SetCurrency()`` / ``SetDirection()``）。
+
+        Args:
+            symbol: 品种代码，例如 ``"BTC_USDT"`` 或 ``"BTC_USDT.swap"``；``""`` 为当前品种。
+            side: 现货 ``"buy"`` / ``"sell"``；期货 ``"buy"``（开多）、``"sell"``（开空）、``"closebuy"``（平多）、
+                ``"closesell"``（平空）。
+            price: 价格；``-1`` 为市价单。
+            amount: 数量（现货市价买单通常为计价币金额；期货为合约张数）。
+            *args: 输出到下单日志的附加内容；最后一个字典参数作为下单选项（``type``、``tif``、``postOnly``、
+                ``reduceOnly``、``clientId`` 等）。
+
+        Returns:
+            订单Id，失败返回 ``None``。
+
+        Example::
+
+            exchange.CreateOrder("ETH_USDT", "buy", -1, 100)
+            exchange.CreateOrder("BTC_USDT.swap", "buy", 50000, 1)
+            exchange.CreateOrder("BTC_USDT.swap", "closebuy", -1, 1)
+        """
+        ...
+
+    def ModifyOrder(self, orderId: Optional[IOrderId], side: str, price: float, amount: float, *args: Any) -> Optional[IOrderId]:
+        """修改未完成订单的价格和/或数量。
+
+        Args:
+            orderId: 要修改的订单Id。
+            side: 方向，同 ``CreateOrder()``。
+            price: 新价格；``<= 0``（例如 ``-1``）表示不改价格。
+            amount: 新数量；``<= 0`` 表示不改数量（价格和数量不能都不改）。
+            *args: 交易所特定参数的字典。
+
+        Returns:
+            （可能是新的）订单Id，失败返回 ``None``。
+        """
+        ...
+
+    def CancelOrder(self, orderId: Optional[IOrderId], *args: Any) -> Optional[bool]:
+        """撤销订单。
+
+        Args:
+            orderId: 订单Id。
+            *args: 输出到撤单日志的附加内容。
+
+        Returns:
+            请求发送成功返回 ``True``；订单无法撤销（已成交 / 已终结，原因见 ``GetLastError()``）返回 ``False``；
+            请求失败返回 ``None``。撤单结果用 ``GetOrder()`` 确认。
+
+        Example::
+
+            oid = exchange.Buy(50000, 0.01)
             if oid:
-                exchange.CancelOrder(oid, "取消测试订单")
+                exchange.CancelOrder(oid, "撤销测试订单")
         """
         ...
 
-    def GetOrder(self, orderId: object) -> Optional[IOrder]:
-        """根据订单 ID 查询订单详情。
+    def GetOrder(self, orderId: Optional[IOrderId]) -> Optional[IOrder]:
+        """按订单Id查询订单。
 
-        参数:
-            orderId: 订单 ID。
+        Returns:
+            ``IOrder``，失败返回 ``None``。
 
-        返回:
-            订单信息对象,失败返回 ``None``。
-
-        示例::
+        Example::
 
             order = exchange.GetOrder(order_id)
             if order:
@@ -689,986 +848,584 @@ class IExchange:
         ...
 
     def GetOrders(self, symbol: str = '') -> Optional[list[IOrder]]:
-        """获取当前未成交挂单列表。
+        """获取未完成订单。
 
-        参数:
-            symbol: 交易对符号。不传使用当前设置的交易对。
+        Args:
+            symbol: 品种代码（``"BTC_USDT.swap"``）或品种范围（``"USDT.swap"``）。不传或 ``""``：现货查询全部品种；
+                期货查询当前计价币与合约类型的范围（例如 ``"USDT.swap"``）。
 
-        返回:
-            未成交订单列表(空列表表示无挂单),失败返回 ``None``。
+        Returns:
+            ``IOrder`` 列表（``[]`` 表示没有），失败返回 ``None``。
 
-        示例::
+        Example::
 
-            orders = exchange.GetOrders("BTC_USDT")
+            orders = exchange.GetOrders()
             if orders is not None:
-                Log("挂单数量:", len(orders))
+                Log("挂单数:", len(orders))
         """
         ...
 
-    def GetHistoryOrders(self, symbol: str|int = '', since: int = 0, limit: int = 0) -> Optional[list[IOrder]]:
-        """获取历史订单(已成交/已取消)。
+    def GetHistoryOrders(self, symbol: Union[str, int] = '', since: int = 0, limit: int = 0) -> Optional[list[IOrder]]:
+        """获取已完成（成交 / 撤销）的订单。
 
-        参数:
-            symbol: 交易对符号。
-            since: 起始时间戳(毫秒),默认最近的。
-            limit: 返回的最大数量。
+        调用形式：``()``、``(symbol)``、``(symbol, since)``、``(symbol, since, limit)``、``(since)``、``(since, limit)``。
 
-        返回:
-            历史订单列表,失败返回 ``None``。
+        Args:
+            symbol: 品种代码；不传：当前品种。
+            since: 起始时间（毫秒时间戳）。
+            limit: 最多返回的订单数。
 
-        示例::
-
-            orders = exchange.GetHistoryOrders("BTC_USDT", 0, 100)
-            if orders:
-                Log("历史订单:", len(orders))
+        Returns:
+            ``IOrder`` 列表，失败返回 ``None``。
         """
         ...
 
-    def CancelConditionOrder(self, orderId: object, *extra: object) -> bool:
-        """取消指定条件单。
+    def CreateConditionOrder(self, symbol: str, side: str, amount: float, condition: dict[str, Any], *args: Any) -> Optional[IOrderId]:
+        """创建条件单（止盈 / 止损 / OCO）。
 
-        参数:
-            orderId: 条件单 ID。
-            *extra: 附加日志信息。
+        Args:
+            symbol: 品种代码；``""`` 为当前品种。
+            side: ``"buy"``、``"sell"``、``"closebuy"``、``"closesell"``。
+            amount: 数量（期货为合约张数）。
+            condition: ``IOrderCondition`` 字典。
+            *args: 输出到日志的附加内容；字典参数原样传给交易所。
 
-        返回:
-            取消成功返回 ``True``,失败返回 ``False``。
-        """
-        ...
+        Returns:
+            条件单Id，失败返回 ``None``。
 
-    def GetConditionOrder(self, orderId: object) -> Optional[IOrder]:
-        """根据 ID 查询条件单详情。
-
-        参数:
-            orderId: 条件单 ID。
-
-        返回:
-            条件单信息,失败返回 ``None``。
-        """
-        ...
-
-    def GetConditionOrders(self, symbol: str = '') -> Optional[list[IOrder]]:
-        """获取当前未触发的条件单列表。
-
-        参数:
-            symbol: 交易对符号。不传返回所有。
-
-        返回:
-            条件单列表,失败返回 ``None``。
-        """
-        ...
-
-    def GetHistoryConditionOrders(self, symbol: str|int = '', since: int = 0, limit: int = 0) -> Optional[list[IOrder]]:
-        """获取历史条件单列表。
-
-        参数:
-            symbol: 交易对符号。
-            since: 起始时间戳(毫秒)。
-            limit: 返回的最大数量。
-
-        返回:
-            历史条件单列表,失败返回 ``None``。
-        """
-        ...
-
-    def Log(self, orderType: int, price: float, amount: float, *args: object) -> None:
-        """记录模拟交易日志(不实际下单)。用于虚拟交易或信号标记。
-
-        参数:
-            orderType: 日志类型:``LOG_TYPE_BUY``、``LOG_TYPE_SELL`` 或 ``LOG_TYPE_CANCEL``。
-            price: 价格(取消时为订单 ID)。
-            amount: 数量。
-            *args: 附加日志信息。
-
-        示例::
-
-            exchange.Log(LOG_TYPE_BUY, 50000, 0.1, "模拟买入信号")
-            exchange.Log(LOG_TYPE_SELL, 51000, 0.1, "模拟卖出信号")
-        """
-        ...
-
-    def Sell(self, price: float, amount: float, *extra: object) -> Optional[IOrderId]:
-        """下卖单(现货卖出/期货根据当前方向卖出)。
-
-        参数:
-            price: 卖出价格。传 ``-1`` 表示市价单。
-            amount: 卖出数量。
-            *extra: 附加日志信息。
-
-        返回:
-            订单 ID(str 或 int),失败返回 ``None``。
-
-        示例::
-
-            oid = exchange.Sell(51000, 0.1, "限价卖出")
-            oid = exchange.Sell(-1, 0.1, "市价卖出")
-        """
-        ...
-
-    def Buy(self, price: float, amount: float, *extra: object) -> Optional[IOrderId]:
-        """下买单(现货买入/期货根据当前方向买入)。
-
-        参数:
-            price: 买入价格。传 ``-1`` 表示市价单。
-            amount: 买入数量。
-            *extra: 附加日志信息。
-
-        返回:
-            订单 ID(str 或 int),失败返回 ``None``。
-
-        示例::
-
-            oid = exchange.Buy(50000, 0.1, "限价买入")
-            oid = exchange.Buy(-1, 0.1, "市价买入")
-        """
-        ...
-
-    def CreateOrder(self, symbol: str, side: str, price: float, amount: float, *extra: object) -> Optional[IOrderId]:
-        """通用下单函数。支持直接指定交易对和方向。
-
-        ``side`` 参数可附加选项,用分号分隔,
-        如 ``'buy;{"timeInForce":"GTC"}'``。
-
-        参数:
-            symbol: 交易对符号,如 ``"BTC_USDT"``(现货)或 ``"BTC_USDT.swap"``(期货)。
-            side: 订单方向:``"buy"``、``"sell"``、``"closebuy"``、``"closesell"``。
-            price: 价格。传 ``-1`` 表示市价单。
-            amount: 数量。
-            *extra: 附加日志信息。
-
-        返回:
-            订单 ID,失败返回 ``None``。
-
-        示例::
-
-            # 现货买入
-            exchange.CreateOrder("ETH_USDT", "buy", -1, 1)
-            # 期货开多
-            exchange.CreateOrder("BTC_USDT.swap", "buy", 50000, 1)
-            # 期货平多
-            exchange.CreateOrder("BTC_USDT.swap", "closebuy", -1, 1)
-        """
-        ...
-
-    def ModifyOrder(self, orderId: object, side: str, price: float, amount: float, *extra: object) -> Optional[IOrderId]:
-        """修改已有订单的价格和数量。
-
-        参数:
-            orderId: 要修改的订单 ID。期货可能是 ``"symbol,orderId"`` 格式。
-            side: 订单方向。
-            price: 新价格。
-            amount: 新数量。
-            *extra: 附加日志信息。
-
-        返回:
-            更新后的订单 ID,失败返回 ``None``。
-        """
-        ...
-
-    def CreateConditionOrder(self, symbol: str, side: str, amount: float, condition: object, *extra: object) -> Optional[IOrderId]:
-        """创建条件单(止盈、止损等)。
-
-        参数:
-            symbol: 交易对符号。
-            side: 订单方向:``"buy"``、``"sell"``、``"closebuy"``、``"closesell"``。
-            amount: 数量。
-            condition: 条件参数字典,包括触发价格等。
-            *extra: 附加日志信息。
-
-        返回:
-            条件单 ID,失败返回 ``None``。
-
-        示例::
+        Example::
 
             exchange.CreateConditionOrder("BTC_USDT.swap", "closebuy", 1, {
                 "ConditionType": ORDER_CONDITION_TYPE_TP,
                 "TpTriggerPrice": 55000,
-                "TpOrderPrice": 54900
+                "TpOrderPrice": -1
             })
         """
         ...
 
-    def ModifyConditionOrder(self, orderId: object, side: str, amount: float, condition: object, *extra: object) -> Optional[IOrderId]:
-        """修改已有条件单。
+    def ModifyConditionOrder(self, orderId: Optional[IOrderId], side: str, amount: float, condition: dict[str, Any], *args: Any) -> Optional[IOrderId]:
+        """修改条件单。
 
-        参数:
-            orderId: 条件单 ID。
-            side: 订单方向。
-            amount: 新数量。
-            condition: 新条件参数。
-            *extra: 附加日志信息。
+        Args:
+            orderId: 条件单Id。
+            side: 方向。
+            amount: 新数量（必须大于0）。
+            condition: 新的 ``IOrderCondition`` 字典。
+            *args: 交易所特定参数的字典。
 
-        返回:
-            更新后的条件单 ID,失败返回 ``None``。
+        Returns:
+            （可能是新的）条件单Id，失败返回 ``None``。
         """
         ...
 
-    def GetRawJSON(self) -> str:
-        """获取最近一次 REST API 请求返回的原始 JSON 字符串。
+    def CancelConditionOrder(self, orderId: Optional[IOrderId], *args: Any) -> bool:
+        """撤销条件单。
 
-        用于调试和检查交易所原始响应。
-
-        返回:
-            原始 JSON 字符串。
-
-        示例::
-
-            exchange.GetTicker()
-            raw = exchange.GetRawJSON()
-            Log("原始响应:", raw)
+        Returns:
+            请求发送成功返回 ``True``，否则返回 ``False``。
         """
         ...
 
-    def GetAccount(self) -> Optional[IAccount]:
-        """获取账户信息(余额、冻结等)。
+    def GetConditionOrder(self, orderId: Optional[IOrderId]) -> Optional[IOrder]:
+        """按条件单Id查询条件单（条件在 ``Order.Condition`` 中）。
 
-        返回:
-            账户信息对象,失败返回 ``None``。
-
-        示例::
-
-            account = exchange.GetAccount()
-            if account:
-                Log("余额:", account.Balance, "冻结:", account.FrozenBalance)
+        Returns:
+            ``IOrder``，失败返回 ``None``。
         """
         ...
 
-    def GetRecords(self, symbol: str|int='', period: Optional[int] = None, limit: int = 0) -> Optional[IRecordList]:
-        """获取 K 线/OHLCV 数据。
+    def GetConditionOrders(self, symbol: str = '') -> Optional[list[IOrder]]:
+        """获取未触发的条件单。``symbol`` 的缺省范围同 ``GetOrders()``。
 
-        参数:
-            symbol: 交易对符号。不传使用当前设置的交易对。
-            period: K 线周期(秒),如 ``PERIOD_M1``、``PERIOD_H1``。
-                不传使用创建机器人时设置的默认周期。
-            limit: 返回的最大 K 线数量。
-
-        返回:
-            K 线数据列表(按时间升序),失败返回 ``None``。
-
-        示例::
-
-            records = exchange.GetRecords(PERIOD_H1)
-            records = exchange.GetRecords("ETH_USDT", PERIOD_M5, 100)
-            # 传给 TA 进行技术分析
-            dif, dea, macd = TA.MACD(records)
+        Returns:
+            ``IOrder`` 列表，失败返回 ``None``。
         """
         ...
 
-    def SetMaxBarLen(self, n: int) -> None:
-        """设置最大 K 线缓存长度(默认 200 根)。
+    def GetHistoryConditionOrders(self, symbol: Union[str, int] = '', since: int = 0, limit: int = 0) -> Optional[list[IOrder]]:
+        """获取已完成的条件单。调用形式同 ``GetHistoryOrders()``。
 
-        参数:
-            n: 最大 K 线根数。
-
-        示例::
-
-            exchange.SetMaxBarLen(500)  # 缓存最多 500 根
+        Returns:
+            ``IOrder`` 列表，失败返回 ``None``。
         """
         ...
 
-    def GetTrades(self, symbol: str='') -> Optional[list[ITrade]]:
-        """获取最近成交记录。
+    def Log(self, orderType: int, price: Union[float, IOrderId], amount: float = 0, *args: Any) -> Optional[Union[str, bool]]:
+        """输出一条交易日志，不实际下单。
 
-        参数:
-            symbol: 交易对符号。不传使用当前设置的交易对。
+        Args:
+            orderType: ``LOG_TYPE_BUY``、``LOG_TYPE_SELL`` 或 ``LOG_TYPE_CANCEL``。
+            price: 日志中显示的价格（``LOG_TYPE_CANCEL`` 时为订单Id）。
+            amount: 日志中显示的数量。
+            *args: 追加到日志的附加内容。
 
-        返回:
-            成交记录列表(按时间升序),失败返回 ``None``。
+        Returns:
+            买卖：虚拟订单号（``"V"`` 加数字）；撤单：``True``。
 
-        示例::
+        Example::
 
-            trades = exchange.GetTrades()
-            if trades and len(trades) > 0:
-                Log("最新成交:", trades[-1].Price)
+            exchange.Log(LOG_TYPE_BUY, 50000, 0.1, "信号")
+            exchange.Log(LOG_TYPE_CANCEL, "123")
         """
         ...
 
-    def GetTicker(self, symbol: str='') -> Optional[ITicker]:
-        """获取当前行情。
+    # ---- Futures ----
 
-        参数:
-            symbol: 交易对符号。不传使用当前设置的交易对。
+    def GetPositions(self, symbol: str = '') -> Optional[list[IPosition]]:
+        """获取期货持仓。
 
-        返回:
-            行情数据,失败返回 ``None``。
+        Args:
+            symbol: 品种代码（``"BTC_USDT.swap"``）或品种范围（``"USDT.swap"``）。不传或 ``""``：当前计价币与合约类型的范围
+                （例如 ``"USDT.swap"``）。
 
-        示例::
+        Returns:
+            ``IPosition`` 列表（``[]`` 表示没有持仓），失败返回 ``None``。
 
-            ticker = exchange.GetTicker("BTC_USDT")
-            if ticker:
-                Log("BTC 价格:", ticker.Last)
+        Example::
+
+            positions = exchange.GetPositions("BTC_USDT.swap")
+            if positions:
+                Log("数量:", positions[0].Amount, "类型:", positions[0].Type)
         """
         ...
 
-    def GetTickers(self) -> Optional[list[ITicker]]:
-        """获取所有交易对的行情数据(批量获取)。
+    def GetPosition(self, symbol: str = '') -> Optional[list[IPosition]]:
+        """旧名称，同 ``GetPositions()``。"""
+        ...
 
-        返回:
-            所有交易对的行情列表,失败返回 ``None``。
+    def SetContractType(self, symbol: str, *args: Any) -> Optional[dict[str, Any]]:
+        """设置当前合约（期货）。现货交易所对象不支持。
 
-        示例::
+        Args:
+            symbol: 合约代码，例如 ``"swap"``（永续）、``"quarter"``、``"next_quarter"``、``"this_week"``、``"next_week"``、
+                交易所原生合约代码，或 ``"BTC_USDT.swap"``（同时切换交易对与合约）。
 
-            tickers = exchange.GetTickers()
-            if tickers:
-                for t in tickers:
-                    if t.Symbol == "BTC_USDT":
-                        Log("BTC:", t.Last)
+        Returns:
+            交易所合约，例如 ``{"InstrumentID": "BTCUSD_230630", "instrument": "BTCUSD_230630"}``；
+            失败返回 ``None``（当前合约不变）。
+
+        Example::
+
+            exchange.SetContractType("swap")
+            exchange.SetContractType("quarter")
+        """
+        ...
+
+    def GetContractType(self) -> str:
+        """当前合约代码，例如 ``"swap"``、``"quarter"``（现货为 ``""``）。"""
+        ...
+
+    def SetMarginLevel(self, symbol: Union[str, float], marginLevel: float = ...) -> Any:
+        """设置杠杆（期货）。
+
+        调用形式：``SetMarginLevel(marginLevel)``（当前合约）与 ``SetMarginLevel(symbol, marginLevel)``。
+
+        Example::
+
+            exchange.SetMarginLevel(10)
+            exchange.SetMarginLevel("BTC_USDT.swap", 20)
+        """
+        ...
+
+    def SetDirection(self, direction: str, hedgeFlag: str = ...) -> None:
+        """设置下一次 ``Buy()`` / ``Sell()`` 的方向（期货）。推荐使用直接指定方向的 ``CreateOrder()``。
+
+        Args:
+            direction: ``"buy"``（开多，配合 ``Buy``）、``"sell"``（开空，配合 ``Sell``）、
+                ``"closebuy"``（平多，配合 ``Sell``）、``"closesell"``（平空，配合 ``Buy``）。
+                国内期货柜台还支持 ``"closebuy_today"`` / ``"closesell_today"``。
+            hedgeFlag: 国内期货柜台：投机 / 套利 / 套保标志。
+
+        Example::
+
+            exchange.SetDirection("buy")
+            exchange.Buy(50000, 1)
+            exchange.SetDirection("closebuy")
+            exchange.Sell(51000, 1)
         """
         ...
 
     def GetFundings(self, symbol: str = '') -> Optional[list[IFunding]]:
-        """获取资金费率信息(永续合约)。
+        """获取资金费率（永续合约）。
 
-        参数:
-            symbol: 交易对符号。
+        Args:
+            symbol: 品种代码（``"BTC_USDT.swap"``）或品种范围（``"USDT.swap"``）；不传：当前计价币与合约类型的范围。
 
-        返回:
-            资金费率列表,失败返回 ``None``。
-
-        示例::
-
-            fundings = exchange.GetFundings("BTC_USDT.swap")
-            if fundings:
-                Log("资金费率:", fundings[0].Rate)
+        Returns:
+            ``IFunding`` 列表，失败返回 ``None``。
         """
         ...
 
-    def GetDepth(self, symbol: str='') -> Optional[IDepth]:
-        """获取市场深度(订单簿)。卖单从低到高,买单从高到低。
+    # ---- Exchange settings ----
 
-        参数:
-            symbol: 交易对符号。不传使用当前设置的交易对。
+    def GetName(self) -> str:
+        """交易所名称，例如 ``"Binance"``、``"Futures_OKX"``。"""
+        ...
 
-        返回:
-            深度数据,失败返回 ``None``。
+    def GetLabel(self) -> str:
+        """配置该交易所对象时设置的标签。"""
+        ...
 
-        示例::
+    def SetLabel(self, label: str) -> None:
+        """修改该交易所对象的标签（只在本次运行中有效；空字符串不生效）。"""
+        ...
 
-            depth = exchange.GetDepth("BTC_USDT")
-            if depth:
-                Log("最佳卖价:", depth.Asks[0].Price, "最佳买价:", depth.Bids[0].Price)
+    def GetIndex(self) -> int:
+        """该交易所对象在 ``exchanges`` 中的下标（``exchange`` 为0）；与 ``ctx.poll()`` 事件的 ``ev.ex`` 是同一个下标。"""
+        ...
+
+    def GetCurrency(self) -> str:
+        """当前交易对，例如 ``"BTC_USDT"``（不含合约部分）。"""
+        ...
+
+    def SetCurrency(self, currency: str) -> bool:
+        """切换交易对（``"ETH_USDT"``；``"ETH_USDT.swap"`` 同时设置合约）。
+
+        Returns:
+            ``True``。交易对不合法时记录错误日志，交易对不变。
+
+        Example::
+
+            exchange.SetCurrency("ETH_USDT")
+            Log(exchange.GetTicker())
         """
         ...
 
     def GetBaseCurrency(self) -> str:
-        """获取基础币种名称。
-
-        返回:
-            基础币种字符串,如 ``"BTC"``。
-        """
+        """当前交易对的交易币，例如 ``"BTC"``。"""
         ...
 
     def GetQuoteCurrency(self) -> str:
-        """获取计价币种名称。
+        """当前交易对的计价币，例如 ``"USDT"``。"""
+        ...
 
-        返回:
-            计价币种字符串,如 ``"USDT"``。
+    def GetPeriod(self) -> int:
+        """实盘的默认K线周期，单位秒。"""
+        ...
+
+    def SetMaxBarLen(self, n: int) -> None:
+        """设置 ``GetRecords()`` 默认请求与保留的K线根数（默认200）。"""
+        ...
+
+    def SetPrecision(self, pricePrecision: Optional[int] = None, amountPrecision: Optional[int] = None) -> None:
+        """设置价格 / 下单量的小数位数：下单的价格与数量按它截断（不四舍五入）。
+
+        Example::
+
+            exchange.SetPrecision(2, 3)
         """
         ...
 
-    def SetProxy(self, proxy: str) -> None:
-        """设置代理服务器地址。
+    def SetRate(self, rate: float = 1) -> float:
+        """设置汇率：之后返回的价格乘以它，下单价格除以它。
 
-        参数:
-            proxy: 代理地址。支持的格式:
+        Args:
+            rate: 汇率；``1``、不传或 ``<= 0`` 表示不转换。
 
-                - ``"socks5://user:pass@host:port"`` — SOCKS5 代理
-                - ``"http://host:port"`` — HTTP 代理
-                - ``""`` — 清除代理设置
-
-        示例::
-
-            exchange.SetProxy("socks5://127.0.0.1:1080")
-            exchange.SetProxy("")  # 取消代理
-        """
-        ...
-
-    def SetPrecision(self, pricePrecision: int, amountPrecision: int) -> None:
-        """设置价格和数量的小数精度。下单时自动截断。
-
-        参数:
-            pricePrecision: 价格小数位数。
-            amountPrecision: 数量小数位数。
-
-        示例::
-
-            exchange.SetPrecision(2, 4)  # 价格 2 位,数量 4 位
-        """
-        ...
-
-    def IO(self, k: str, *args: object) -> object:
-        """发送任意 API 请求(IO 控制)。用于调用尚未封装的交易所 API。
-
-        参数:
-            k: 请求路径或控制命令:
-
-                - API 路径:如 ``"/api/v5/account/balance"``
-                - ``"api"``:通用 API 调用
-                - ``"currency"``:切换交易对
-                - ``"base"``:切换 API 基础地址
-
-            *args: 请求参数。
-
-        返回:
-            API 响应结果(解析为对象)。
-
-        示例::
-
-            ret = exchange.IO("api", "GET", "/api/v5/account/balance")
-            exchange.IO("currency", "ETH_USDT")
-        """
-        ...
-
-    def SetTimeout(self, n: int) -> None:
-        """设置 REST API 请求超时时间。
-
-        参数:
-            n: 超时时长,单位毫秒。
-
-        示例::
-
-            exchange.SetTimeout(10000)  # 10 秒超时
-        """
-        ...
-
-    def SetBase(self, s: str) -> None:
-        """设置交易所 API 基础地址。用于切换到备用域名或测试网。
-
-        参数:
-            s: API 基础 URL。
-
-        示例::
-
-            exchange.SetBase("https://testnet.binance.vision")
-        """
-        ...
-
-    def GetBase(self) -> str:
-        """获取当前 API 基础地址。
-
-        返回:
-            API 基础 URL 字符串。
-        """
-        ...
-
-    def SetCurrency(self, s: str) -> None:
-        """切换当前交易对。
-
-        参数:
-            s: 交易对字符串,如 ``"BTC_USDT"``、``"ETH_BTC"``。
-
-        示例::
-
-            exchange.SetCurrency("ETH_USDT")
-            Log(exchange.GetTicker())  # 获取 ETH 行情
-        """
-        ...
-
-    def SetRate(self, n: float = 1) -> float:
-        """设置汇率转换。所有价格将自动乘以该汇率。
-
-        参数:
-            n: 汇率值。``1`` 表示不转换;不传或传非正数等同于 ``1``。
-
-        返回:
-            设置之前的汇率值。
-
-        示例::
-
-            exchange.SetRate(6.5)  # 将价格转换为人民币
-            exchange.SetRate(1)    # 取消转换
+        Returns:
+            设置之前的汇率。
         """
         ...
 
     def GetRate(self) -> float:
-        """获取当前设置的汇率值。
+        """``SetRate()`` 设置的汇率（默认 ``1``）。"""
+        ...
 
-        返回:
-            汇率值,默认为 ``1``。
+    def SetTimeout(self, timeout: int) -> int:
+        """设置该对象 REST 请求的超时，单位毫秒。"""
+        ...
+
+    def SetProxy(self, proxy: str) -> Optional[bool]:
+        """为该交易所对象的请求设置代理。
+
+        Args:
+            proxy: ``"socks5://[用户名:密码@]主机:端口"``、``"http://主机:端口"``；``""`` 取消代理。
+
+        Returns:
+            设置成功返回 ``True``，代理格式不正确返回 ``None``。
         """
         ...
 
-    def SetData(self, key: str, value: object) -> int:
-        """写入数据集合,供 ``exchange.GetData()`` 读取(常用于加载自定义数据)。
+    def SetBase(self, base: str) -> str:
+        """切换 API 基地址（例如切换到测试网）。
 
-        参数:
-            key: 数据集合名称。
-            value: ``[[时间戳, 数据], ...]`` 列表(或其 JSON 字符串),也可以是 ``{"schema": [...], "data": [...]}``。
-
-        返回:
-            数据 JSON 编码后的长度;格式不对时返回 ``0`` 并记录 ``GetLastError()``。
-
-        示例::
-
-            exchange.SetData("test", [[1579536000000, 123], [1579622400000, 456]])
-            Log(exchange.GetData("test"))
+        Returns:
+            切换之前的基地址；交易所拒绝新地址时返回 ``""``。
         """
         ...
 
-    def GetData(self, key: str, timeout: Optional[int] = None, offset: int = 0) -> IData:
-        """获取 ``exchange.SetData()`` 写入的数据集合或外部链接提供的数据。
+    def GetBase(self) -> str:
+        """当前的 API 基地址。"""
+        ...
 
-        http/https 链接由本机拉取,响应须是 ``[[time, data], ...]`` 或 ``{"schema": [...], "data": [...]}``,
-        按 ``timeout`` 缓存、过期重拉;SetData 写入的本地集合不过期。``ext.`` 前缀的服务端数据源在当前运行时不可用。
+    def IO(self, k: str, *args: Any) -> Any:
+        """交易所特有的调用与设置。
 
-        参数:
-            key: 数据集合名称或请求链接(http/https URL)。
-            timeout: 缓存超时时间(毫秒),不传为 60000,下限 5000。
-            offset: 取 ``time <= offset`` 的最后一行;``0`` 或不传表示当前时间。
+        常用形式：
 
-        返回:
-            ``IData`` 对象(``Time``、``Data``)。任何情况下都返回对象:没有记录、拉取失败或数据源不可用时
-            ``Data`` 为 ``None``,原因可用 ``GetLastError()`` 读取。
+        - ``IO("api", httpMethod, resource, params="", raw="")``：调用交易所原始接口（仅实盘）。
+        - ``IO("currency", "ETH_USDT")``：同 ``SetCurrency()``。
+        - ``IO("base")`` / ``IO("base", url)``：查询 / 切换基地址。
+        - ``IO("cross", True)``、``IO("dual", True)``、``IO("simulate", True)``：账户模式（见各交易所页面）。
+        - ``IO("rate", "GetTicker", 10, "1s")``：本地限流。
 
-        示例::
+        Returns:
+            由指令决定；失败返回 ``None``（原因见 ``GetLastError()``）。
 
-            data = exchange.GetData("test")
-            extern = exchange.GetData("https://www.example.com/data.json")
-            if extern.Data is None:
-                Log("no data:", GetLastError())
+        Example::
+
+            ret = exchange.IO("api", "GET", "/api/v5/account/balance")
         """
         ...
 
-    def GetUSDCNY(self) -> float:
-        """获取美元兑人民币汇率。
+    def Encode(self, algo: str, inputFormat: str, outputFormat: str, data: str, keyFormat: str = ..., key: str = ...) -> str:
+        """同全局 ``Encode()``，但 ``data`` / ``key`` 中可以写 ``"{{accesskey}}"`` / ``"{{secretkey}}"``，替换为该交易所
+        对象配置的密钥（仅实盘）。
 
-        返回:
-            USD/CNY 汇率。
+        Example::
+
+            sign = exchange.Encode("sha256", "string", "hex", "data", "string", "{{secretkey}}")
         """
         ...
 
-    def GetLabel(self) -> str:
-        """获取交易所自定义标签名称(在平台配置交易所时设置)。
+    def HMAC(self, algo: str, outputFormat: str, data: str, key: str = ...) -> str:
+        """HMAC 签名：即 ``exchange.Encode(algo, "raw", outputFormat, data, "raw", key)``；``key`` 可以写 ``"{{secretkey}}"``。"""
+        ...
 
-        返回:
-            标签字符串。
+    def GetMeta(self, key: str) -> str:
+        """该交易所对象的非敏感配置字段（例如 ``"AccessKey"``），键名不区分大小写；不存在或为敏感字段时返回 ``""``
+        （不会返回密钥）。"""
+        ...
+
+    def G(self, *args: Any) -> Any:
+        """该交易所对象私有的内存键值存储（不持久化，与 ``_G`` 无关）。
+
+        ``G()`` 返回下标，``G(None)`` 清空，``G(k)`` 读取，``G(k, None)`` 删除，``G(k, v)`` 写入。
         """
         ...
 
-    def GetCurrency(self) -> str:
-        """获取当前交易对名称。
-
-        返回:
-            交易对字符串,如 ``"BTC_USDT"``。
-        """
+    def GetUSDCNY(self) -> Optional[float]:
+        """旧接口：美元兑人民币汇率。当前运行环境不提供：返回 ``None``（汇率请用 ``HttpQuery()`` 获取）。"""
         ...
 
-    def GetPeriod(self) -> int:
-        """获取当前设置的 K 线周期。
+# ==================== TA Input Type ====================
 
-        返回:
-            K 线周期,单位秒。
-        """
-        ...
-
-    def GetName(self) -> str:
-        """获取交易所名称。
-
-        返回:
-            交易所平台名称,如 ``"Binance"``、``"OKX"``、``"Futures_Binance"``。
-        """
-        ...
-
-    def GetMarkets(self) -> Optional[dict[str, IMarket]]:
-        """获取所有交易对的市场信息。
-
-        返回:
-            以交易对符号为键(如 ``"BTC_USDT"``)的市场信息字典,
-            失败返回 ``None``。
-
-        示例::
-
-            markets = exchange.GetMarkets()
-            if markets:
-                m = markets.get("BTC_USDT")
-                if m:
-                    Log("最小数量:", m.MinQty, "价格精度:", m.PricePrecision)
-        """
-        ...
-
-    def GetAssets(self) -> Optional[list[IAsset]]:
-        """获取账户的所有资产信息。
-
-        返回:
-            资产列表,每个元素包含币种、可用数量、冻结数量。
-            失败返回 ``None``。
-
-        示例::
-
-            assets = exchange.GetAssets()
-            if assets:
-                for a in assets:
-                    Log(a.Currency, "可用:", a.Amount)
-        """
-        ...# ==================== TA Input Type ====================
-
-t_TAInput = Union[list[float], IRecordList]
-"""TA指标函数的输入类型。可以是浮点数列表(例如收盘价)
-或IRecordList(K线数组,自动使用Close字段)。"""
+t_TAInput = Union[Sequence[float], Sequence[IRecord]]
+"""``TA`` 函数的输入：K线列表（使用 ``Close``）或数值列表。"""
 
 # ==================== Built-in TA Indicator Library ====================
 
 class ITA:
-    """平台内置技术分析指标库(简化版)。
+    """平台内置的指标库（全局变量 ``TA``），在本地计算。
 
-    比talib更常用且更易使用。通过全局变量 ``TA`` 访问。
+    结果是与输入等长的列表，指标预热部分为 ``None``。
 
-    示例::
+    Example::
 
         records = exchange.GetRecords()
         k, d, j = TA.KDJ(records, 9, 3, 3)
-        upper, mid, lower = TA.BOLL(records, 20, 2)
+        up, mid, down = TA.BOLL(records, 20, 2)
     """
-    def CMF(self, inReal: t_TAInput, optInTimePeriod: Optional[IRecordList] = None) -> list[float]:
-        """CMF - 蔡金资金流量指标。
+    def MA(self, inReal: t_TAInput, optInTimePeriod: int = 9) -> list[float]:
+        """移动平均线（简单）。``optInTimePeriod`` 默认9。"""
+        ...
 
-        参数:
-            inReal: 输入数据(K线数组)。
-            optInTimePeriod: 计算周期。
+    def SMA(self, inReal: t_TAInput, optInTimePeriod: int = 9) -> list[float]:
+        """简单移动平均线。``optInTimePeriod`` 默认9。"""
+        ...
 
-        返回:
-            CMF数组。
+    def EMA(self, inReal: t_TAInput, optInTimePeriod: int = 9) -> list[float]:
+        """指数移动平均线。``optInTimePeriod`` 默认9。"""
+        ...
+
+    def MACD(self, inReal: t_TAInput, optInFastPeriod: int = 12, optInSlowPeriod: int = 26, optInSignalPeriod: int = 9) -> tuple[list[float], list[float], list[float]]:
+        """MACD（默认 12、26、9）。
+
+        Returns:
+            ``[DIF, DEA, MACD柱]``。
+
+        Example::
+
+            dif, dea, hist = TA.MACD(records)
         """
         ...
 
-    def Alligator(self, inReal: t_TAInput, jawLength: Optional[int] = None, teethLength: Optional[int] = None, lipsLength: Optional[int] = None) -> tuple[list[float], list[float], list[float]]:
-        """鳄鱼指标(威廉姆斯)。
+    def BOLL(self, inReal: t_TAInput, period: int = 20, multiplier: float = 2) -> tuple[list[float], list[float], list[float]]:
+        """布林带（默认 20、2）。
 
-        参数:
-            inReal: 输入数据。
-            jawLength: 鳄鱼颚线周期,默认13。
-            teethLength: 鳄鱼齿线周期,默认8。
-            lipsLength: 鳄鱼唇线周期,默认5。
-
-        返回:
-            (颚线, 齿线, 唇线)数组的元组。
-
-        示例::
-
-            jaw, teeth, lips = TA.Alligator(records, 13, 8, 5)
+        Returns:
+            ``[上轨, 中轨, 下轨]``。
         """
         ...
 
-    def ATR(self, inPriceHLC: IRecordList, optInTimePeriod: Optional[int] = None) -> list[float]:
-        """ATR - 平均真实波幅。
+    def KDJ(self, inPriceHLC: Sequence[IRecord], period: int = 9, kPeriod: int = 3, dPeriod: int = 3) -> tuple[list[float], list[float], list[float]]:
+        """KDJ 随机指标（默认 9、3、3）；只接受K线。
 
-        参数:
-            inPriceHLC: K线数据(需要High/Low/Close)。
-            optInTimePeriod: 计算周期,默认14。
-
-        返回:
-            ATR数组。
+        Returns:
+            ``[K, D, J]``。
         """
         ...
 
-    def OBV(self, inReal: t_TAInput, inPriceV: IRecordList) -> list[float]:
-        """OBV - 能量潮指标。
+    def RSI(self, inReal: t_TAInput, optInTimePeriod: int = 14) -> list[float]:
+        """相对强弱指标（默认14）。
 
-        参数:
-            inReal: 收盘价数组或K线数组。
-            inPriceV: 包含成交量的K线数组。
-
-        返回:
-            OBV数组。
-        """
-        ...
-
-    def RSI(self, inReal: t_TAInput, optInTimePeriod: Optional[int] = None) -> list[float]:
-        """RSI - 相对强弱指标。
-
-        参数:
-            inReal: 输入数据。
-            optInTimePeriod: 计算周期,默认14。
-
-        返回:
-            RSI数组,取值范围0~100。>70超买,<30超卖。
-
-        示例::
+        Example::
 
             rsi = TA.RSI(records, 14)
             if rsi[-1] > 70:
-                Log("Overbought zone")
+                Log("超买")
         """
         ...
 
-    def KDJ(self, inReal: t_TAInput, period: Optional[int] = None, kPeriod: Optional[int] = None, dPeriod: Optional[int] = None) -> tuple[list[float], list[float], list[float]]:
-        """KDJ - 随机振荡指标。
-
-        参数:
-            inReal: K线数据。
-            period: K线周期,默认9。
-            kPeriod: K线平滑周期,默认3。
-            dPeriod: D线平滑周期,默认3。
-
-        返回:
-            (K, D, J)数组的元组。
-
-        示例::
-
-            k, d, j = TA.KDJ(records, 9, 3, 3)
-            Log("K:", k[-1], "D:", d[-1], "J:", j[-1])
-        """
+    def ATR(self, inPriceHLC: Sequence[IRecord], optInTimePeriod: int = 14) -> list[float]:
+        """平均真实波幅（默认14）；只接受K线。"""
         ...
 
-    def BOLL(self, inReal: t_TAInput, period: Optional[int] = None, multiplier: Optional[float] = None) -> tuple[list[float], list[float], list[float]]:
-        """BOLL - 布林带。
-
-        参数:
-            inReal: 输入数据。
-            period: 计算周期,默认20。
-            multiplier: 标准差乘数,默认2。
-
-        返回:
-            (上轨, 中轨, 下轨)数组的元组。
-
-        示例::
-
-            upper, middle, lower = TA.BOLL(records, 20, 2)
-        """
-        ...
-
-    def MACD(self, inReal: t_TAInput, optInFastPeriod: Optional[int] = None, optInSlowPeriod: Optional[int] = None, optInSignalPeriod: Optional[int] = None) -> tuple[list[float], list[float], list[float]]:
-        """MACD - 指数平滑异同移动平均线。
-
-        参数:
-            inReal: 输入数据。
-            optInFastPeriod: 快线周期,默认12。
-            optInSlowPeriod: 慢线周期,默认26。
-            optInSignalPeriod: 信号线周期,默认9。
-
-        返回:
-            (DIF, DEA, MACD柱状图)数组的元组。
-
-        示例::
-
-            dif, dea, macd = TA.MACD(records, 12, 26, 9)
-            Log("MACD:", macd[-1])
-        """
-        ...
-
-    def EMA(self, inReal: t_TAInput, optInTimePeriod: Optional[int] = None) -> list[float]:
-        """EMA - 指数移动平均线。
-
-        参数:
-            inReal: 输入数据。
-            optInTimePeriod: 计算周期。
-
-        返回:
-            EMA数组。
-        """
-        ...
-
-    def SMA(self, inReal: t_TAInput, optInTimePeriod: Optional[int] = None) -> list[float]:
-        """SMA - 简单移动平均线。
-
-        参数:
-            inReal: 输入数据。
-            optInTimePeriod: 计算周期。
-
-        返回:
-            SMA数组。
-        """
-        ...
-
-    def MA(self, inReal: t_TAInput, optInTimePeriod: Optional[int] = None) -> list[float]:
-        """MA - 移动平均线(默认SMA)。
-
-        参数:
-            inReal: 输入数据。
-            optInTimePeriod: 计算周期。
-
-        返回:
-            MA数组。
-        """
+    def OBV(self, inReal: Sequence[IRecord]) -> list[float]:
+        """能量潮；只接受K线（使用收盘价与成交量）。"""
         ...
 
     def Highest(self, inReal: t_TAInput, period: int, attr: Optional[str] = None) -> float:
-        """获取周期内的最高值(不含当前 Bar)。
+        """最近 ``period`` 根K线的最大值，不含当前K线（``period`` 为0表示全部K线）。
 
-        参数:
-            inReal: 输入数据。
-            period: 计算周期(必填),``0`` 表示当前 Bar 之前的全部数据。
-            attr: 传入K线数组时的K线属性名,
-                例如 ``"High"``, ``"Low"``, ``"Close"``, ``"Volume"``。
+        Args:
+            inReal: K线或数值列表。
+            period: K线根数。
+            attr: K线的字段：``"High"``、``"Low"``、``"Open"``、``"Close"``、``"Volume"``、``"OpenInterest"``。
 
-        返回:
-            最高值(单个数字)。
+        Example::
 
-        示例::
-
-            highest_high = TA.Highest(records, 20, "High")
-            highest_close = TA.Highest(records, 10, "Close")
+            hh = TA.Highest(records, 20, "High")
         """
         ...
 
     def Lowest(self, inReal: t_TAInput, period: int, attr: Optional[str] = None) -> float:
-        """获取周期内的最低值(不含当前 Bar)。
+        """最近 ``period`` 根K线的最小值，不含当前K线（``period`` 为0表示全部K线）。
 
-        参数:
-            inReal: 输入数据。
-            period: 计算周期(必填),``0`` 表示当前 Bar 之前的全部数据。
-            attr: K线属性名,例如 ``"High"``, ``"Low"``, ``"Close"``, ``"Volume"``。
+        Example::
 
-        返回:
-            最低值(单个数字)。
-
-        示例::
-
-            lowest_low = TA.Lowest(records, 20, "Low")
+            ll = TA.Lowest(records, 20, "Low")
         """
         ...
-# ==================== Database / Dial / Event Interfaces ====================
 
-class IDBExecRet:
-    """数据库执行结果结构。
+    def Alligator(self, inPriceHL: Sequence[IRecord], jawLength: int = 13, teethLength: int = 8, lipsLength: int = 5) -> tuple[list[float], list[float], list[float]]:
+        """鳄鱼线（默认 13、8、5），按最高价与最低价的中值计算；只接受K线。
 
-    由 ``DBExec()`` 和 ``IDial.exec()`` 返回。
-    """
-    values: list[List]
-    """查询结果数据行，每行是一个值列表。"""
+        Returns:
+            ``[下颚, 牙齿, 上唇]``，分别向右平移8、5、3根K线。
+        """
+        ...
+
+    def CMF(self, inReal: Sequence[IRecord], periods: int = 20) -> list[float]:
+        """蔡金资金流量（默认20）；只接受K线。"""
+        ...
+
+# ==================== Database / Network ====================
+
+class IDBExecRet(dict[str, Any]):
+    """``DBExec()`` 与 ``IDial.exec()`` 的结果。"""
     columns: list[str]
-    """列名列表。"""
+    """列名。"""
+    values: list[list[Any]]
+    """数据行，每行是与 ``columns`` 对应的列表。"""
 
 class IDial:
-    """网络连接对象。支持 TCP、WebSocket、数据库和 KVDB 协议。
+    """``Dial()`` 返回的连接：TCP / TLS / WebSocket 数据流或数据库连接。
 
-    通过 ``Dial()`` 函数创建。
+    Example::
 
-    示例::
-
-        # WebSocket 连接
         ws = Dial("wss://stream.binance.com:9443/ws/btcusdt@ticker")
         if ws:
-            msg = ws.read(5000)  # 读取，5秒超时
+            msg = ws.read(5000)
             ws.close()
 
-        # 数据库连接
-        db = Dial("sqlite3:///mydata.db")
+        db = Dial("sqlite3://test.db")
         db.exec("CREATE TABLE IF NOT EXISTS kv(k TEXT PRIMARY KEY, v TEXT)")
         db.exec("INSERT INTO kv VALUES(?, ?)", "key1", "value1")
-        ret = db.exec("SELECT * FROM kv")
-        db.close()
     """
-    def read(self, timeout: Optional[int] = None) -> Optional[Union[str, bytes]]:
-        """从连接读取数据。
+    def read(self, timeout: int = 0) -> Optional[str]:
+        """读取一条数据。
 
-        参数:
-            timeout: 超时时间（毫秒）。省略则阻塞读取，传入 ``-1`` 则非阻塞。
+        Args:
+            timeout: 毫秒。不传 / 0：阻塞到有数据；正数：最多等这么久。只对 WebSocket 有效：``-1`` 立即返回
+                （没有缓存数据时返回 ``None``），``-2`` 立即返回，只取缓存中最新的一条。
 
-        返回:
-            从连接读取的数据。超时或无数据时返回 ``None``。
-            连接关闭时返回空字符串 ``""``。
+        Returns:
+            读到的数据；超时或连接已关闭时返回 ``None``。
         """
         ...
 
-    def write(self, data: Union[str, bytes]) -> None:
-        """向连接写入数据。
-
-        参数:
-            data: 要发送的数据（字符串或二进制数据）。
-        """
+    def write(self, data: str, timeout: int = 0) -> int:
+        """发送数据。返回发送的字节数；连接已断开时返回 ``0``。"""
         ...
 
-    def exec(self, sql: str, *extra: object) -> Optional[IDBExecRet]:
-        """执行 SQL 语句（数据库连接）或 KVDB 操作。
-
-        KVDB 支持的命令: ``"get key"``、``"set key value"``、``"del key"``、
-        ``"scan prefix limit"``、``"range startKey endKey limit"``。
-
-        参数:
-            sql: SQL 语句或 KVDB 命令。
-            *extra: SQL 参数化查询的绑定值。
-
-        返回:
-            查询结果对象，失败时返回 ``None``。
-
-        示例::
-
-            ret = db.exec("SELECT * FROM users WHERE age > ?", 18)
-            db.exec("set mykey myvalue")
-        """
-        ...
-
-    def fd(self) -> int:
-        """获取连接的文件描述符编号。
-
-        返回:
-            文件描述符编号。
-        """
+    def exec(self, sql: str, *args: Any) -> Optional[IDBExecRet]:
+        """仅数据库连接：执行 SQL（``?`` 占位符依次取 ``args``），结果同 ``DBExec()``。"""
         ...
 
     def close(self) -> None:
-        """关闭连接并释放资源。"""
+        """关闭连接（对象被回收时也会关闭）。"""
         ...
 
-class IEventMsg:
-    """事件循环消息结构，由 ``EventLoop()`` 返回。
+class IEventMsg(dict[str, Any]):
+    """``EventLoop()`` 返回的事件。
 
-    包含市场更新、线程消息、WebSocket 数据等事件的信息。
+    ``Event`` 例如 ``"tick"`` / ``"order"``（纯推送的期货柜台）、``"Exchange_GetTicker"``（``exchange.Go()`` 的任务
+    完成，``Index`` 为其票据号）、``"HttpQuery"``（``HttpQuery_Go()`` 完成）。
     """
     Seq: int
-    """事件序列号。"""
+    """事件序号。"""
     Event: str
-    """事件类型，例如 ``"ticker"``、``"order"``、``"thread"`` 等。"""
+    """事件名称。"""
     ThreadId: int
-    """触发事件的线程 ID。"""
+    """线程Id（0）。"""
     Index: int
-    """交易所索引。"""
+    """tick / order 事件为交易所下标；完成事件为任务票据号。"""
+    Queue: int
+    """取出这条事件之后队列中还剩的事件数。"""
+    Dropped: int
+    """到目前为止因为队列已满被丢弃的事件数。"""
     Nano: int
-    """事件时间（纳秒）。"""
+    """纳秒时间戳。"""
     Symbol: str
-    """相关交易对。"""
-    Ticker: Optional[ITicker]
-    """如果是市场事件，包含 Ticker 数据。"""
+    """tick 事件的品种。"""
+    Ticker: ITicker
+    """tick 事件：行情。"""
+    Order: IOrder
+    """order 事件：订单。"""
 
 class IChart:
-    """图表对象，用于在策略页面绘制自定义图表。
+    """``Chart()`` 返回的图表对象。
 
-    通过 ``Chart()`` 创建(``KLineChart()`` 返回 ``IKLineChart``)。
+    Example::
 
-    示例::
-
-        chart = Chart({
-            "title": {"text": "Price Trend"},
-            "xAxis": {"type": "datetime"},
-            "series": [{"name": "Price", "data": []}]
-        })
+        chart = Chart({"title": {"text": "价格"}, "xAxis": {"type": "datetime"},
+                       "series": [{"name": "Last", "data": []}]})
         chart.add(0, [Unix() * 1000, ticker.Last])
     """
-    def add(self, series: int, data: Union[list[object], object], index: Optional[int] = None) -> None:
-        """向指定序列添加数据点。
-
-        参数:
-            series: 序列索引（从 0 开始）。
-            data: 数据点。格式取决于图表类型（例如 ``[timestamp, value]``）。
-            index: 在指定索引处更新数据点。省略则追加。
-                ``-1`` 更新最后一个点。
-        """
+    def add(self, series: Union[int, list[Any]], data: Any = ..., index: int = ...) -> None:
+        """写入数据：``add(数据系列索引, [x, y])`` 追加一个点；``add(数据系列索引, [x, y], -1)`` 替换最后一个点
+        （其它索引替换对应的点）。"""
         ...
 
-    def reset(self, remain: Optional[int] = None) -> None:
-        """重置图表数据。
-
-        参数:
-            remain: 要保留的最近数据点数量。默认为 0（清除全部）。
-        """
+    def update(self, options: Union[dict[str, Any], list[dict[str, Any]]]) -> None:
+        """替换图表配置（参数与 ``Chart()`` 相同）。"""
         ...
 
-    def update(self, options: object) -> None:
-        """更新图表配置选项。
+    def reset(self, remain: int = 0) -> None:
+        """清空数据，保留最后 ``remain`` 个点（0 为全部清空）。"""
+        ...
 
-        参数:
-            options: 新的图表配置（Highcharts/Highstock 配置对象）。
-        """
+    def dell(self, seriesIdx: int = 0) -> None:
+        """删除一个数据系列；``<= 0`` 时删除整张图表（包括配置）。（JavaScript 中为 ``del``。）"""
         ...
 
 class IKLineChart:
-    """Pine 风格 K 线图对象,由 ``KLineChart()`` 创建。
+    """``KLineChart()`` 返回的 Pine 风格K线图。
 
-    每根 K 线以 ``begin(bar)`` 开始,调用 plot 等画图函数,再以 ``close()`` 输出到图表。
-    画图函数的可选参数与 Pine 同名(``title``、``color``、``linewidth``、``style``、``overlay`` 等),用关键字参数传入。
+    每根K线：``begin(bar)``，画图函数，然后 ``close()``。
 
-    示例::
+    Example::
 
         c = KLineChart({"overlay": True})
         for bar in exchange.GetRecords():
@@ -1677,178 +1434,186 @@ class IKLineChart:
             c.close()
     """
     def begin(self, bar: IRecord) -> None:
-        """开始处理一根 K 线,必须作为每根 K 线画图操作的起始调用。"""
+        """开始在一根K线上画图。"""
         ...
 
     def close(self, bar: Optional[IRecord] = None) -> None:
-        """结束当前 K 线的画图操作并输出到图表。
-
-        参数:
-            bar: 可选,直接传入这根 K 线(等同先 ``begin(bar)``);不传则使用 ``begin()`` 记下的那根。
-                同一时间戳的 K 线重复 ``close()`` 会替换上一根(可对未完成的 K 线反复更新)。
-        """
+        """结束这根K线的画图并输出（传 ``bar`` 等同先调用 ``begin(bar)``）。同一时间的K线再次 close 会替换它。"""
         ...
 
     def reset(self, remain: int = 0) -> None:
-        """重置图表数据。``remain`` 为保留最近的 K 线数量,默认 0(全部清除)。"""
+        """清空图表，保留最后 ``remain`` 根K线。"""
         ...
 
-    def plot(self, series: Optional[float] = None, title: Optional[str] = None, **options: object) -> Optional[int]:
-        """画线(类似 Pine 的 ``plot``)。返回绘图对象索引(可传给 ``fill``),跳过时返回 ``None``。"""
+    def plot(self, series: Optional[float] = None, title: Optional[str] = None, color: Optional[str] = None, linewidth: int = 1, style: str = "line",
+             trackprice: Optional[bool] = None, histbase: float = 0, offset: int = 0, join: bool = False, editable: bool = False,
+             show_last: Optional[int] = None, display: str = "all", overlay: Optional[bool] = None) -> int:
+        """画一条线，返回线的编号（供 ``fill()`` 使用）。``style``：``"line"``、``"stepline"``、``"histogram"``、
+        ``"cross"``、``"area"``、``"columns"``、``"circles"`` 等。"""
         ...
 
-    def hline(self, price: float, title: Optional[str] = None, **options: object) -> Optional[int]:
-        """在 ``price`` 处画水平线。返回绘图对象索引。"""
+    def hline(self, price: float, title: Optional[str] = None, color: Optional[str] = None, linestyle: str = "dashed", linewidth: Optional[int] = None,
+              editable: bool = False, display: str = "all", overlay: Optional[bool] = None) -> int:
+        """画水平线，返回线的编号。``linestyle``：``"dashed"``、``"dotted"``、``"solid"``。"""
         ...
 
-    def plotshape(self, series: object, title: Optional[str] = None, **options: object) -> None:
-        """``series`` 为真时画形状标记(``style``、``location``、``text`` 等)。"""
+    def plotarrow(self, series: Optional[float], title: Optional[str] = None, colorup: str = "#00ff00", colordown: str = "#ff0000", offset: int = 0,
+                  minheight: int = 5, maxheight: int = 100, editable: bool = False, show_last: Optional[int] = None,
+                  display: str = "all", overlay: Optional[bool] = None) -> None:
+        """画向上（正数）/ 向下（负数）的箭头。"""
         ...
 
-    def plotchar(self, series: object, title: Optional[str] = None, char: Optional[str] = None, **options: object) -> None:
-        """``series`` 为真时画单个字符(``char`` 必填)。"""
+    def plotshape(self, series: Any, title: Optional[str] = None, style: Optional[str] = None, location: str = "abovebar", color: Optional[str] = None,
+                  offset: Optional[int] = None, text: Optional[str] = None, textcolor: Optional[str] = None, editable: Optional[bool] = None,
+                  size: str = "auto", show_last: Optional[int] = None, display: str = "all", overlay: Optional[bool] = None) -> None:
+        """在 ``series`` 为真值处画形状。``style``：``"diamond"``、``"square"``、``"label_down"``、``"label_up"``、
+        ``"arrow_down"``、``"arrow_up"``、``"circle"``、``"flag"``、``"triangle_down"``、``"triangle_up"``、``"cross"``、
+        ``"xcross"``；``location``：``"abovebar"``、``"belowbar"``、``"top"``、``"bottom"``、``"absolute"``。"""
         ...
 
-    def plotarrow(self, series: float, title: Optional[str] = None, **options: object) -> None:
-        """按 ``series`` 的正负与大小画上/下箭头。"""
+    def plotchar(self, series: Any, title: Optional[str] = None, char: Optional[str] = None, location: str = "abovebar", color: Optional[str] = None,
+                 offset: Optional[int] = None, text: Optional[str] = None, textcolor: Optional[str] = None, editable: Optional[bool] = None,
+                 size: str = "auto", show_last: Optional[int] = None, display: str = "all", overlay: Optional[bool] = None) -> None:
+        """在 ``series`` 为真值处画一个字符（必须传 ``char``）。"""
         ...
 
-    def plotcandle(self, open: float, high: float, low: float, close: float, title: Optional[str] = None, **options: object) -> None:
-        """用给定 OHLC 额外画一根蜡烛。"""
+    def plotcandle(self, open: float, high: float, low: float, close: float, title: Optional[str] = None, color: Optional[str] = None,
+                   wickcolor: Optional[str] = None, editable: Optional[bool] = None, show_last: Optional[int] = None,
+                   bordercolor: Optional[str] = None, display: str = "all", overlay: Optional[bool] = None) -> None:
+        """另画一根K线。"""
         ...
 
-    def barcolor(self, color: str, **options: object) -> None:
-        """给当前价格 K 线上色。"""
+    def barcolor(self, color: str, offset: Optional[int] = None, editable: bool = False, show_last: Optional[int] = None,
+                 title: Optional[str] = None, display: str = "all") -> None:
+        """设置当前K线的颜色。"""
         ...
 
-    def bgcolor(self, color: str, **options: object) -> None:
-        """给当前 K 线背景上色。"""
+    def bgcolor(self, color: str, offset: Optional[int] = None, editable: Optional[bool] = None, show_last: Optional[int] = None,
+                title: Optional[str] = None, display: str = "all", overlay: Optional[bool] = None) -> None:
+        """设置当前K线的背景色。"""
         ...
 
-    def fill(self, plot1: int, plot2: int, color: Optional[str] = None, **options: object) -> None:
-        """填充两个绘图对象(``plot``/``hline`` 返回的索引)之间的区域。"""
+    def fill(self, plot1: int, plot2: int, color: Optional[str] = None, title: Optional[str] = None, editable: Optional[bool] = None,
+             show_last: Optional[int] = None, fillgaps: Optional[bool] = None, display: str = "all") -> None:
+        """填充两条线（``plot()`` / ``hline()`` 返回的编号）之间的区域。"""
         ...
 
     def signal(self, direction: str, price: float, qty: float, id: Optional[str] = None) -> None:
-        """画交易信号标记。``direction``:``"buy"``/``"long"``、``"sell"``/``"short"``、
-        ``"closebuy"``/``"closelong"``、``"closesell"``/``"closeshort"``;``id`` 不传时用 ``direction``。"""
+        """画交易信号。``direction``：``"buy"``/``"long"``、``"sell"``/``"short"``、``"closebuy"``/``"closelong"``、
+        ``"closesell"``/``"closeshort"``；``id`` 缺省为 ``direction``。"""
         ...
 
-class IHttpOptions:
-    """``HttpQuery()`` 的 HTTP 请求选项(作为第二个参数传入的字典)。
-
-    示例::
-
-        ret = HttpQuery("https://api.example.com/data", {
-            "method": "POST",
-            "body": json.dumps({"key": "value"}),
-            "headers": {"Content-Type": "application/json"},
-            "timeout": 5000,
-            "debug": True
-        })
-    """
-    method: Optional[str]
-    """HTTP 方法: ``"GET"``、``"POST"``、``"PUT"``、``"DELETE"`` 等。默认 ``"GET"``。"""
-    body: Optional[Union[str, bytes]]
-    """请求体（用于 POST 和其他方法）。"""
-    proxy: Optional[str]
-    """本次请求使用的代理地址,如 ``"socks5://127.0.0.1:1080"``。"""
-    charset: Optional[str]
-    """响应字符编码转换（例如 ``"gbk"``）。"""
-    cookie: Optional[str]
+class IHttpOptions(TypedDict, total=False):
+    """``HttpQuery()`` 的请求设置（所有字段都可选）。"""
+    method: str
+    """``"GET"``（默认）、``"POST"``、``"PUT"``、``"DELETE"`` 等。"""
+    body: str
+    """请求体。"""
+    data: str
+    """没有设置 ``body`` 时作为请求体。"""
+    headers: dict[str, Any]
+    """请求头。"""
+    cookie: str
     """Cookie 字符串。"""
-    profile: Optional[str]
-    """TLS 指纹配置。"""
-    debug: Optional[bool]
-    """为 ``True`` 时，返回完整响应对象（包括状态码和响应头）。"""
-    format: Optional[str]
-    """响应体的输出格式: ``"base64"`` 或 ``"hex"``。"""
-    close: Optional[bool]
-    """请求后是否关闭连接（禁用 keep-alive）。"""
-    headers: Optional[dict[str, object]]
-    """自定义请求头。"""
-    timeout: Optional[int]
-    """请求超时时间（毫秒），默认 300000（5 分钟）。"""
+    timeout: int
+    """超时，单位毫秒（默认300000）。"""
+    proxy: str
+    """本次请求使用的代理：``http://``、``https://``、``socks5://``、``socks5h://``。"""
+    charset: str
+    """把应答体从该字符集（例如 ``"GBK"``）解码为 UTF-8。"""
+    debug: bool
+    """``True``：返回完整的 ``IHttpRet``，而不是应答体。"""
 
-class IHttpRet:
-    """在调试模式下由 ``HttpQuery()`` 返回的完整 HTTP 响应结构。"""
+class _HttpDebugOptions(IHttpOptions):
+    debug: Literal[True]
+
+class IHttpRet(dict[str, Any]):
+    """``HttpQuery()`` 的完整应答（选项 ``debug: True``）。"""
     StatusCode: int
-    """HTTP 状态码，例如 200、404、500;请求没拿到应答(拒绝连接、DNS、超时、代理失败)时为 0。"""
-    Trace: Optional[object]
-    """请求跟踪信息（在调试模式下可用）。"""
+    """HTTP 状态码；没有收到应答（拒绝连接、DNS解析失败、超时、代理失败）时为0。"""
     Header: dict[str, list[str]]
-    """响应头字典。每个键映射到一个字符串列表。"""
-    Cookies: Optional[list[object]]
-    """Cookies 信息(调试模式下可用)。"""
-    Length: Optional[int]
-    """报文长度。"""
-    Body: Optional[Union[str, bytes]]
-    """响应体内容,请求失败时为空字符串。"""
-    Error: Optional[str]
-    """请求失败原因(方法 + URL + 底层错误),只在 ``StatusCode`` 为 0 时出现。"""
+    """应答头；每个值是字符串列表。"""
+    Cookies: list[dict[str, Any]]
+    """解析后的 ``Set-Cookie``（``Name``、``Value``、``Path``、``Domain``、``Expires`` 等）。"""
+    Trace: dict[str, Any]
+    """各阶段耗时（``elapsed_ms``、``dns_ms``、``connect_ms``、``tls_ms``、``ttfb_ms`` 等）。"""
+    Length: int
+    """应答体长度（字符集解码之前）。"""
+    Body: str
+    """应答体；请求失败时为 ``""``。"""
+    Error: str
+    """失败原因（请求方法 + URL + 底层错误）；只在 ``StatusCode`` 为0时出现。"""
+
+# ==================== WebSocket push (ctx) ====================
 
 class StopError(RuntimeError):
-    """实盘停止后（包括 ``onexit()`` 执行期间）``ctx.poll()`` 等阻塞等待抛出的异常；不要捕获吞掉，
-    让它向上传播，策略即可正常结束。"""
+    """实盘停止后 ``Sleep()``、``EventLoop()``、``ctx.poll()`` 与 API 调用抛出它；让它继续向上抛出，``onexit()`` 才会执行。"""
+    message: str
+
+class CtxRecord(dict[str, Any]):
+    """推送接口返回的字典（订单簿、持仓 / 余额行、交易所列表行），可以按属性访问：``row.qty`` 与 ``row["qty"]``
+    两种写法都可以。"""
+    def __getattr__(self, name: str) -> Any: ...
 
 class Subscription:
-    """WebSocket 推送订阅，由 ``ctx.subscribe()`` 返回。
+    """``ctx.subscribe()`` 返回的推送订阅（只读的订阅身份加方法）。
 
-    订阅属于调用 ``ctx.subscribe()`` 的线程：它的事件只投给这个线程，也只有这个线程能
-    ``unsubscribe()``。把它（或它的 ``id``）传给 ``ctx.poll()`` 只取这一路的事件。
+    订阅属于调用 ``ctx.subscribe()`` 的线程：事件只投给这个线程，也只有这个线程能 ``unsubscribe()``。
+    把它（或它的 ``id``）传给 ``ctx.poll()`` 只取这一路的事件。
     """
     id: int
-    """事件流 ID（这路订阅的事件的 ``stream`` 字段）。"""
+    """事件流Id（这一路事件的 ``ev.stream``）。"""
     ex: int
     """账户下标（``exchanges[ex]``）。"""
     channel: str
     """``"ticker"``、``"bbo"``、``"depth"``、``"trade"``、``"kline"``、``"tickers"`` 或 ``"private"``。"""
     symbol: str
-    """品种代码（``private``、``tickers`` 为空）。"""
+    """品种代码（``private`` / ``tickers`` 为空）。"""
     depth: int
     """深度订阅的档数（0 为交易所默认档数）。"""
     interval: int
-    """K线周期（秒）。"""
+    """K线周期，单位秒。"""
 
-    def info(self) -> dict:
-        """订阅身份字段的字典：``{id, ex, channel, symbol, depth, interval}``。"""
+    def info(self) -> dict[str, Any]:
+        """订阅身份的字典：``{id, ex, channel, symbol, depth, interval}``。"""
         ...
 
-    def book(self, n: Optional[int] = None) -> dict:
-        """这路深度订阅自己的订单簿：``{"bids": [[价格, 数量], ...], "asks": [...]}``（bids 降序、asks
-        升序；``n`` 缺省为订阅档数；收到第一份快照前两边为空）。不是深度订阅或已退订时抛出异常。"""
+    def book(self, n: Optional[int] = None) -> CtxRecord:
+        """深度订阅：这一路自己的订单簿 ``{"bids": [[价格, 数量], ...], "asks": [...]}``（bids 从高到低，asks 从低到高；
+        ``n`` 档，缺省为订阅的档数）。不是深度订阅或已退订时抛出异常。"""
         ...
 
-    def positions(self) -> Optional[list]:
-        """``private`` 订阅的最新持仓（行 ``{symbol, side, posSide, qty, avgPx, profit?, margin?, liqPx?,
-        markPx?, leverage?, time}``）；账户快照就绪前为 ``None``（状态未知，不是没有持仓）；现货为 ``[]``。"""
+    def positions(self) -> Optional[list[CtxRecord]]:
+        """``private`` 订阅：最新持仓（行 ``{symbol, side, posSide, qty, avgPx, profit?, margin?, liqPx?, markPx?, leverage?, time}``）；
+        账户快照就绪（READY）之前为 ``None``（状态未知，不是"没有持仓"）。"""
         ...
 
-    def balances(self) -> Optional[list]:
-        """``private`` 订阅的最新余额（行 ``{asset, free, frozen, equity?, upnl?, margin?, time}``）；
-        账户快照就绪前为 ``None``。"""
+    def balances(self) -> Optional[list[CtxRecord]]:
+        """``private`` 订阅：最新余额（行 ``{asset, free, frozen, equity?, upnl?, margin?, time}``）；账户快照就绪之前为 ``None``。"""
         ...
 
     def unsubscribe(self) -> None:
-        """退订（重复调用不报错）。只有订阅它的线程能退订。"""
+        """退订（同一个对象再次调用不做任何事）。只有订阅它的线程能退订。"""
         ...
 
 class SubscriptionList(list[Subscription]):
-    """批量 ``ctx.subscribe()``（``symbol`` 为列表）的结果：与 symbol 同序的订阅对象，可以整个传给
-    ``ctx.poll()``。"""
+    """批量 ``ctx.subscribe()``（``symbol`` 为列表）的结果：同序的订阅对象，可以整个传给 ``ctx.poll()``。"""
 
     def unsubscribe(self) -> None:
         """退订全部元素。"""
         ...
 
-class CtxEvent(dict):
-    """``ctx.poll()`` 返回的事件：字段与 JavaScript 事件相同的字典（``ev["kind"]`` 与 ``ev.kind`` 都可以）。
+class CtxEvent(dict[str, Any]):
+    """``ctx.poll()`` 返回的事件：字段与 JavaScript 事件相同的字典（``ev.kind`` 或 ``ev["kind"]``）。
 
-    公共字段：``kind``（1 ticker/bbo/tickers、3 订单簿、4 逐笔成交、5 K线、16 订单回报、17 持仓、
-    18 余额、32 定时器、33 网关状态、35 初始化状态）、``stream``、``type``（``"data"`` / ``"status"`` /
-    ``"timer"``）、``channel``、``ex``、``symbol``、``seq``、``ts``。先判断 ``type`` / ``kind``：kind 35
-    的 ``channel`` 是它所属订阅的频道。kind 35 带 ``prefillStatus``（1 就绪、2 失败）和 ``message``
-    （失败原因）。
+    公共字段：``kind``（1 ticker/bbo/tickers，3 深度，4 成交，5 K线，16 订单回报，17 持仓，18 余额，32 定时器，
+    33 网关状态，35 初始化状态）、``stream``、``type``（``"data"`` / ``"status"`` / ``"timer"``）、``channel``、``ex``、
+    ``symbol``、``seq``、``ts``。各类事件：1 ``bid ask last bidQty askQty volume openInterest open high low time``；
+    4 ``px qty side tradeId time``；5 ``open high low close volume openInterest intervalSec openTimeMs closed prefill``；
+    16 ``id state px qty filledQty avgPx reason reasonText``；17 ``side posSide qty avgPx profit margin liqPx markPx
+    leverage time snapshot``；18 ``asset free frozen equity upnl margin time snapshot``；32 ``timerId scheduledNs``；
+    33 ``status detail``；35 ``channelCode intervalSec prefillStatus``（1 就绪，2 失败）``detail message``。
+    深度事件（kind 3）不带档位：用 ``ev.book(n)`` 读取。
     """
     kind: int
     stream: int
@@ -1859,17 +1624,29 @@ class CtxEvent(dict):
     seq: int
     ts: float
 
-    def book(self, n: Optional[int] = None) -> dict:
-        """深度事件（kind 3）：它所属订阅的订单簿，同 ``Subscription.book``。"""
+    def book(self, n: Optional[int] = None) -> CtxRecord:
+        """深度事件（kind 3）：所属订阅的订单簿，同 ``Subscription.book()``。"""
         ...
 
-class Ctx:
-    """全局 ``ctx``：WebSocket 推送订阅（与 JavaScript 的 ``ctx`` 语义相同）。
+    def __getattr__(self, name: str) -> Any: ...
 
-    示例::
+class _SubscribeOptions(TypedDict, total=False):
+    channel: str
+    depth: int
+    interval: int
+    mode: str
+    buffer: int
+
+class _SubscribeBatchOptions(_SubscribeOptions):
+    symbol: Union[list[str], tuple[str, ...]]
+
+class Ctx:
+    """全局变量 ``ctx``：WebSocket 推送订阅（与 JavaScript 的 ``ctx`` 同语义；仅实盘）。
+
+    Example::
 
         def main():
-            book = ctx.subscribe(exchange, {"channel": "depth", "depth": 20})
+            depth = ctx.subscribe(exchange, {"channel": "depth", "depth": 20})
             acct = ctx.subscribe(exchange, {"channel": "private"})
             while True:
                 ev = ctx.poll([], 1000)
@@ -1885,713 +1662,439 @@ class Ctx:
                     Log(acct.positions(), acct.balances())
     """
     STREAM_TIMER: int
-    """引擎定时器（kind 32）的内置事件流。"""
+    """引擎定时器的内置事件流（kind 32）。值为1。"""
     STREAM_STATUS: int
-    """网关状态（kind 33）的内置事件流。"""
+    """网关状态事件的内置事件流（kind 33）。值为2。"""
 
-    def subscribe(self, ex: Union[IExchange, int, str], opts: dict) -> Union[Subscription, SubscriptionList]:
-        """订阅WebSocket推送：品种行情、全市场ticker或账户私有流。
+    @overload
+    def subscribe(self, ex: Union[IExchange, int, str], opts: _SubscribeBatchOptions) -> SubscriptionList: ...
+    @overload
+    def subscribe(self, ex: Union[IExchange, int, str], opts: dict[str, Any]) -> Subscription:
+        """订阅推送：某个品种的行情、全市场 ticker 或账户私有流。
 
-        参数:
-            ex: 交易所对象（``exchange``、``exchanges[1]``）或账户下标。
-            opts: ``{channel, symbol, depth, interval, mode, buffer}``：``channel`` 为 ``ticker``（默认）、
-                ``bbo``、``depth``、``trade``、``kline``、``tickers``（全市场，不带 symbol）或 ``private``
-                （订单 + 持仓 + 余额，不带 symbol）；行情频道必须给 ``symbol``（``ex`` 是交易所对象时可省略，
-                取它当前的交易对），列表为批量订阅；``depth`` 档数；``interval`` K线周期（秒）；
-                ``mode: "latest"`` 或 ``buffer: N``。
+        只接受这两个位置参数。
 
-        返回:
-            ``Subscription``；``symbol`` 为列表时返回 ``SubscriptionList``（整批先校验）。选项不合法时抛出
-            异常；交易所拒绝的订阅不抛异常，而是在它自己的事件流上收到 kind 35 失败事件。
+        Args:
+            ex: 交易所对象（``exchange``、``exchanges[1]``）或账户下标（整数或数字字符串）。
+            opts: ``{channel, symbol, depth, interval, mode, buffer}``。``channel``：``"ticker"``（默认）、``"bbo"``、
+                ``"depth"``、``"trade"``、``"kline"``、``"tickers"``（全市场，不传 symbol）或 ``"private"``（订单 +
+                持仓 + 余额，不传 symbol）。``symbol``：行情频道必填，``ex`` 为交易所对象时可省略（取它当前的交易对）；
+                传列表为批量订阅。``depth``：档数；``interval``：K线秒数；``mode: "latest"`` 或 ``buffer: N``。
+
+        Returns:
+            ``Subscription``；``symbol`` 为列表或元组时返回 ``SubscriptionList``（整批先校验）。参数不合法时抛出异常；
+            交易所拒绝的订阅在它的事件流上收到一条 kind 35 失败事件。
         """
         ...
 
-    def poll(self, streams: Optional[Union[Subscription, int, list]] = None,
-             timeout_ms: Optional[int] = None) -> Optional[CtxEvent]:
-        """取本线程订阅的下一条事件。
+    def poll(self, streams: Optional[Union[Subscription, int, Sequence[Any]]] = None, timeout_ms: Optional[int] = None) -> Optional[CtxEvent]:
+        """本线程订阅的下一条事件。
 
-        参数:
-            streams: ``None`` / ``[]`` 表示本线程的全部订阅；否则为订阅对象、事件流 ID、
-                SubscriptionList 或它们的嵌套列表。
-            timeout_ms: ``None`` 一直等待，``0`` 不等待，正数为最多等待的毫秒数。
+        Args:
+            streams: ``None`` / ``[]`` = 本线程的全部订阅；否则为订阅对象、事件流Id、SubscriptionList 或它们的（嵌套）
+                列表（也可以写 ``ctx.STREAM_TIMER`` / ``ctx.STREAM_STATUS``）。
+            timeout_ms: ``None`` 一直等到有事件，``0`` 不等待，> 0 最多等待的毫秒数（非负整数）。
 
-        返回:
-            事件；超时返回 ``None``。实盘停止后抛出 ``StopError``。
+        Returns:
+            事件，超时返回 ``None``。实盘停止后（包括 ``onexit()`` 执行期间）抛出 ``StopError``。
         """
         ...
 
-    def connectors(self) -> list:
-        """已加载的交易所：``[{ex, label, name, symbol, interval, orderIdScope, feed}, ...]``；
-        ``feed`` 为推送缓冲计数 ``{ticksDropped, backpressure, ringCapacity}``（增长快说明策略处理不过来）。"""
+    def connectors(self) -> list[CtxRecord]:
+        """已加载的交易所：``[{ex, label, name, symbol, interval, orderIdScope, feed}, ...]``；``feed`` =
+        ``{ticksDropped, backpressure, ringCapacity}`` 推送缓冲计数（增长快说明策略处理太慢）。"""
         ...
 
 # ==================== Global Variables ====================
 
-ext = object()
-"""模板类库域。用于访问模板库函数。"""
+ext: Any
+"""模板类库的导出：模板赋给 ``ext`` 的函数（``ext.foo = foo``）在策略中以 ``ext.foo()`` 调用。"""
 
-TA = ITA()
-"""内置技术分析库，包含常用指标的简化版本
-（KDJ、BOLL、MACD、EMA、SMA、RSI 等）。"""
+TA: ITA
+"""内置指标库（MA、EMA、MACD、BOLL、KDJ、RSI、ATR、OBV、Highest、Lowest、Alligator、CMF）。"""
 
-exchanges: list[IExchange] = [IExchange()]
-"""所有已添加的交易所对象列表。通过 ``exchanges[i]`` 访问第 i 个交易所。"""
+exchanges: list[IExchange]
+"""实盘的全部交易所对象，按配置顺序排列。"""
 
-exchange: IExchange = exchanges[0]
+exchange: IExchange
+"""第一个交易所对象，即 ``exchanges[0]``。"""
 
-ctx: Ctx = Ctx()
+ctx: Ctx
 """WebSocket 推送：``ctx.subscribe()``、``ctx.poll()``、``ctx.connectors()``（仅实盘）。"""
 
 # ==================== Global Functions ====================
 
 def Version() -> str:
-    """获取托管者版本号。
-
-    返回:
-        版本号字符串,例如 ``"3.7"``。
-    """
+    """运行策略的托管者版本号，例如 ``"3.9.2"``。"""
     ...
 
-def Sleep(millisecond: int) -> None:
-    """暂停策略执行指定的毫秒数。
+def Sleep(millisecond: float) -> None:
+    """暂停 ``millisecond`` 毫秒。实盘停止时抛出 ``StopError``。
 
-    暂停期间会处理事件循环中的待处理事件。
-    建议在策略主循环中添加 ``Sleep`` 以避免过于频繁的 API 请求。
-
-    参数:
-        millisecond: 暂停的毫秒数。
-
-    示例::
+    Example::
 
         while True:
-            ticker = exchange.GetTicker()
-            Log(ticker.Last)
-            Sleep(1000)  # 每秒执行一次
+            Log(exchange.GetTicker())
+            Sleep(1000)
     """
     ...
 
 def IsVirtual() -> bool:
-    """判断当前是否运行在回测(模拟)环境中。
-
-    返回:
-        回测环境下返回 ``True``,实盘交易时返回 ``False``。
-
-    示例::
-
-        if IsVirtual():
-            Log("回测模式")
-        else:
-            Log("实盘模式")
-    """
+    """回测中返回 ``True``，实盘返回 ``False``。"""
     ...
 
 def Mail(smtpServer: str, smtpUsername: str, smtpPassword: str, mailTo: str, title: str, body: str) -> bool:
-    """通过 SMTP 发送邮件通知。
+    """通过 SMTP 发送邮件。成功返回 ``True``，失败返回 ``False``（原因见 ``GetLastError()``）。
 
-    参数:
-        smtpServer: SMTP 服务器地址,例如 ``"smtp.qq.com:465"``。
-        smtpUsername: SMTP 登录用户名(通常是邮箱地址)。
-        smtpPassword: SMTP 登录密码或授权码。
-        mailTo: 收件人邮箱地址。
-        title: 邮件主题。
-        body: 邮件正文。
+    Example::
 
-    返回:
-        成功时返回 ``True``,失败时返回 ``False``。
-
-    示例::
-
-        Mail("smtp.qq.com:465", "sender@qq.com", "auth_code",
-             "receiver@gmail.com", "Alert", "BTC broke above 50000")
+        Mail("smtp.qq.com:465", "sender@qq.com", "授权码", "receiver@gmail.com", "提醒", "BTC 突破 50000")
     """
     ...
 
 def SetErrorFilter(filters: str) -> None:
-    """设置错误信息过滤正则表达式。匹配的错误信息将不会被记录。
+    """匹配这个正则表达式的错误日志不再记录。``""`` 清除过滤。
 
-    常用于过滤频繁出现的无关错误。可以多次调用以添加多个过滤规则。
+    Example::
 
-    参数:
-        filters: 正则表达式字符串。传入空字符串 ``""`` 可清除所有过滤规则。
-
-    示例::
-
-        SetErrorFilter("timeout|503|rate limit")
-        SetErrorFilter("")  # 清除所有过滤器
+        SetErrorFilter("502:|503:|tcp|character|unexpected|network|timeout")
     """
     ...
 
 def GetPid() -> int:
-    """获取当前托管者进程的 PID。
+    """实盘进程Id。"""
+    ...
 
-    返回:
-        进程 ID 号。
+def GetLastError() -> str:
+    """最近一次的错误信息，读取后清除；没有错误时为 ``""``。
+
+    Example::
+
+        if exchange.GetTicker() is None:
+            Log("错误:", GetLastError())
     """
     ...
 
-def GetLastError() -> Optional[str]:
-    """获取最近一次的错误信息并清除它。
+def GetCommand(timeout: int = -1) -> Optional[str]:
+    """读取实盘页面发来的交互命令（``"控件名:数据"``）；没有命令时返回 ``None``。
 
-    调用后,错误信息被消费,后续调用返回 ``None``。
+    Args:
+        timeout: 毫秒：``-1``（默认）不等待，``0`` 一直等到有命令，正数最多等这么久。
 
-    返回:
-        最近的错误信息字符串,没有错误时返回 ``None``。
-
-    示例::
-
-        exchange.GetTicker()
-        err = GetLastError()
-        if err:
-            Log("错误:", err)
-    """
-    ...
-
-def GetCommand() -> Optional[str]:
-    """获取策略交互命令。
-
-    用于读取用户在实盘页面发送的交互命令。
-
-    返回:
-        命令字符串(格式: ``"按钮名称:参数"``),没有命令时返回 ``None``。
-
-    示例::
+    Example::
 
         cmd = GetCommand()
         if cmd:
-            Log("收到:", cmd)
-            parts = cmd.split(":")
-            if parts[0] == "buy":
-                exchange.Buy(-1, float(parts[1]))
+            name, _, data = cmd.partition(":")
     """
     ...
 
-def GetChannelData(token: Union[str, int] = "") -> Optional[str]:
-    """获取跨策略通信的通道数据。
-
-    读取其他策略通过 ``SetChannelData()`` 发布的数据。
-
-    参数:
-        token: 通道令牌(用于标识数据源),实盘 ID(字符串或数字)或 UUID。
-
-    返回:
-        来自通道的数据,没有可用数据时返回 ``None``。
-    """
+def GetChannelData(channelId: Union[str, int]) -> Any:
+    """读取其它实盘用 ``SetChannelData()`` 发布的最新数据（参数为它的实盘Id），或通过 HTTP API 发送到平台的数据
+    （32位 UUID）。首次调用（需要重试）或没有发布过数据时返回 ``None``。"""
     ...
 
-def SetChannelData(value: str) -> None:
-    """设置不同机器人之间跨策略通信的通道数据。
-
-    将数据发布到通道,其他策略可以通过 ``GetChannelData()`` 读取。
-
-    参数:
-        value: 要发布的数据。
-    """
+def SetChannelData(data: Any) -> None:
+    """发布本实盘的状态（任意可 JSON 序列化的值），供其它实盘用 ``GetChannelData()`` 读取。"""
     ...
 
 def GetMeta() -> Optional[str]:
-    """获取策略元数据(创建机器人时设置的附加数据)。
-
-    返回:
-        元数据字符串,没有数据时返回 ``None``。
-    """
+    """创建实盘时（通过 API）设置的 ``Meta`` 数据，没有时返回 ``None``。"""
     ...
 
-def Dial(address: Union[str, int], timeout: Union[int, dict] = None) -> Optional[IDial]:
-    """创建网络连接(TCP/WebSocket/数据库等)以与外部服务通信。
+def Dial(address: str, timeout: Union[int, dict[str, Any]] = 30) -> Optional[IDial]:
+    """建立 TCP / TLS / WebSocket 连接或数据库连接（仅实盘）。
 
-    参数:
-        address: 连接地址,支持多种协议:
+    Args:
+        address: 例如 ``"wss://host/path"``、``"tcp://host:port"``、``"tls://host:443"``、``"sqlite3://test.db"``、
+            ``"sqlite3://:memory:"``、``"mysql://user:pass@tcp(host:3306)/db?charset=utf8mb4&parseTime=true"``、
+            ``"postgres://user=u password=p host=h port=5432 dbname=d sslmode=disable"``、
+            ``"clickhouse://tcp://host:9000?username=u&password=p&database=d"``。功能参数写在 ``|`` 之后：
+            ``"wss://...|compress=gzip_raw&mode=recv&reconnect=true&interval=10000&payload=..."``。
+        timeout: 建立连接的超时：ws/wss 单位毫秒（小于100按秒计），tcp/tls 单位秒，0 为默认超时；不传为30。
+            也可以传选项字典，例如 ``{"timeout": 10, "headers": {...}}``。
 
-            - WebSocket: ``"wss://stream.binance.com:9443/ws/btcusdt@ticker"``
-            - TCP: ``"tcp://host:port"``
-            - SQLite: ``"sqlite3://test.db"``(相对路径在实盘目录下)、``"sqlite3:///path/to/db.sqlite3"``(绝对路径)、``"sqlite3://:memory:"``(内存库)
-            - MySQL: ``"mysql://user:pass@tcp(host:3306)/dbname?charset=utf8mb4&parseTime=true"``(Go 驱动 DSN),也可写 ``"mysql://user:pass@host:3306/dbname"``
-            - PostgreSQL: ``"postgres://user=u password=p host=h port=5432 dbname=d sslmode=disable"``(libpq 键值),也可写 ``"postgres://user:pass@host:5432/dbname?sslmode=disable"``
-            - ClickHouse: ``"clickhouse://tcp://host:9000?username=u&password=p&database=d"``(clickhouse-go DSN),也可写 ``"clickhouse://user:pass@host:9000/db"``
+    Returns:
+        ``IDial``，连接失败返回 ``None``（原因见 ``GetLastError()``）。
 
-            选项可以在末尾用 ``|`` 分隔添加,例如:
-            ``"wss://....|compress=gzip_raw&mode=recv"``
-
-        timeout: 连接超时:ws/wss 单位毫秒(小于 100 视为秒),tcp/tls 单位秒,0 用默认超时;不传时为 30(即 30 秒)。
-            也可传选项字典(如 ``{"timeout": 10, "headers": {...}}``),不含 timeout 时用默认超时。
-
-    返回:
-        IDial 连接对象,连接失败时返回 ``None``。
-
-    示例::
+    Example::
 
         ws = Dial("wss://stream.binance.com:9443/ws/btcusdt@ticker")
         if ws:
-            msg = ws.read(5000)
-            if msg:
-                Log(msg)
+            Log(ws.read(5000))
             ws.close()
-
-        db = Dial("sqlite3://strategy.db")
-        db.exec("CREATE TABLE IF NOT EXISTS logs(time TEXT, msg TEXT)")
     """
     ...
 
-def HttpQuery(url: str, postData: Optional[Union[str, bytes, IHttpOptions, dict]] = None, cookies: Optional[str] = None, headers: Optional[Union[str, dict[str, str]]] = None) -> Optional[Union[str, IHttpRet]]:
+@overload
+def HttpQuery(url: str, options: _HttpDebugOptions) -> IHttpRet: ...
+@overload
+def HttpQuery(url: str, postData: Union[str, IHttpOptions, dict[str, Any], None], cookies: Optional[str], headers: Optional[str], isReturnHeader: Literal[True]) -> IHttpRet: ...
+@overload
+def HttpQuery(url: str, postData: Union[str, IHttpOptions, dict[str, Any], None] = None, cookies: Optional[str] = None, headers: Optional[str] = None, isReturnHeader: bool = False) -> str:
     """发送 HTTP 请求。
 
-    第二个参数可以是 POST 数据(非空字符串时自动变为 POST 请求),也可以是 IHttpOptions 选项字典
-    (``method``、``body``、``headers``、``cookie``、``timeout``、``proxy``、``charset``、``format``、``debug`` 等)。
-    选项中 ``debug`` 为 ``True`` 时返回完整的 IHttpRet 响应对象而不仅仅是正文字符串。
-    URL 也可以带代理前缀,如 ``"socks5://127.0.0.1:1080/https://api.example.com"``
-    (选项里显式给出的 ``proxy`` 优先)。
+    Args:
+        url: 请求地址。可以带代理前缀：``"socks5://127.0.0.1:1080/https://api.example.com"``（显式的 ``proxy`` 选项优先）。
+        postData: ``IHttpOptions`` 字典（``method``、``body``、``headers``、``cookie``、``timeout``、``proxy``、``charset``、
+            ``debug`` 等），或非空字符串 = POST 请求体（旧写法）。
+        cookies, headers, isReturnHeader: 旧的位置参数写法。
 
-    参数:
-        url: 请求 URL。
-        postData: POST 数据,或 IHttpOptions 选项字典。
-        cookies: Cookie 字符串(旧式调用形式)。
-        headers: 请求头,支持字符串(换行分隔)或字典(旧式调用形式)。
+    Returns:
+        应答体字符串（失败时为 ``""``；JSON 用 ``json.loads`` 解析）。设置 ``{"debug": True}``（或 ``isReturnHeader``）时
+        返回完整的 ``IHttpRet``；失败时其 ``StatusCode`` 为0，``Error`` 为原因。
 
-    返回:
-        响应正文字符串,失败时返回 ``None``。如果选项中有 ``debug=True``,
-        返回包含 ``StatusCode``、``Header``、``Body`` 字段的对象(失败时 ``StatusCode`` 为 0,``Error`` 为原因)。
+    Example::
 
-    示例::
-
-        data = HttpQuery("https://api.example.com/ticker")
-        if data:
-            Log(data)
-
-        # 使用选项的高级用法
+        body = HttpQuery("https://www.okx.com/api/v5/public/time")
         ret = HttpQuery("https://api.example.com/data", {
             "method": "POST",
-            "body": '{"key": "value"}',
+            "body": json.dumps({"key": "value"}),
             "headers": {"Content-Type": "application/json"},
             "debug": True
         })
+        Log(ret.StatusCode, ret.Body)
     """
     ...
 
-def HttpQuery_Go(url: str, postData: Optional[Union[str, bytes, IHttpOptions, dict]] = None, cookies: Optional[str] = None, headers: Optional[Union[str, dict[str, str]]] = None) -> IHttpQueryGo:
-    """``HttpQuery()`` 的异步版本,立即返回并发对象,不阻塞当前线程。参数同 ``HttpQuery()``。
+@overload
+def HttpQuery_Go(url: str, options: _HttpDebugOptions) -> IHttpQueryGo[IHttpRet]: ...
+@overload
+def HttpQuery_Go(url: str, postData: Union[str, IHttpOptions, dict[str, Any], None] = None, cookies: Optional[str] = None, headers: Optional[str] = None) -> IHttpQueryGo[str]:
+    """异步的 ``HttpQuery()``：立即返回；``wait(timeout)`` 得到与 ``HttpQuery()`` 相同的结果。
+    完成时 ``EventLoop()`` 收到 ``Event`` 为 ``"HttpQuery"`` 的事件（``Index`` 为票据号）。
 
-    返回:
-        并发对象,调用其 ``wait(timeout)`` 获取与同步 ``HttpQuery()`` 相同的结果。
-        请求完成时 ``EventLoop()`` 收到 ``Event`` 为 ``"HttpQuery"`` 的事件(``Index`` 为票据号)。
+    Example::
 
-    示例::
-
-        r1 = HttpQuery_Go("https://api.example.com/tickerA")
-        r2 = HttpQuery_Go("https://api.example.com/tickerB")
-        tickerA = json.loads(r1.wait())
-        tickerB = json.loads(r2.wait())
+        r1 = HttpQuery_Go("https://api.example.com/a")
+        r2 = HttpQuery_Go("https://api.example.com/b")
+        a = json.loads(r1.wait())
+        b = json.loads(r2.wait())
     """
     ...
 
-def Encode(algo: str, inputFormat: str, outputFormat: str, data: Union[str, bytes], keyFormat: Optional[str] = None, key: Optional[str] = None) -> Union[str, bytes]:
-    """通用编码/加密/签名函数。
+def Encode(algo: str, inputFormat: str, outputFormat: str, data: str, keyFormat: str = ..., key: str = ...) -> str:
+    """编码、哈希、HMAC、加解密与签名。
 
-    参数:
-        algo: 算法名称:
-
-            - 哈希: ``"md5"``, ``"sha256"``, ``"sha512"``, ``"sha1"``, ``"keccak256"``
-            - HMAC: ``"hmac_md5"``, ``"hmac_sha256"``, ``"hmac_sha512"``
-            - 加密: ``"aes128-cbc"``, ``"aes256-cbc"``, ``"aes192-cbc"``
-            - 签名: ``"ed25519"``, ``"ed25519.seed"``
-            - 编码: ``"raw"``, ``"text.encoder"``, ``"text.decoder"``
-
-        inputFormat: 输入数据格式: ``"hex"``, ``"base64"``, ``"raw"``, ``"string"``。
-        outputFormat: 输出数据格式: ``"hex"``, ``"base64"``, ``"raw"``, ``"string"``。
+    Args:
+        algo: ``"raw"``；哈希 ``"md5"``、``"sha1"``、``"sha256"``、``"sha512"``、``"sha3.256"``、``"keccak256"``、
+            ``"ripemd160"``、``"blake2b.256"`` 等（传 ``key`` 时为 HMAC）；``"sign"``、``"signTx"``；``"ed25519"``、
+            ``"ed25519.seed"``；``"text.encoder.utf8"``、``"text.decoder.gbk"``；``"aes.encrypt"`` / ``"aes.decrypt"``
+            （默认 ``.cbc``，可选 ``.cfb``、``.ecb``）；``"gzip.deflate"``、``"gzip.inflate"``、``"zlib.deflate"``、
+            ``"zlib.inflate"``、``"raw.deflate"``、``"raw.inflate"``。
+        inputFormat: ``data`` 的格式：``"raw"``、``"hex"``、``"base64"``、``"string"``（另支持 ``"base64.url"``、
+            ``"base64.rawurl"``、``"latin1"``）。
+        outputFormat: ``"raw"``、``"hex"``、``"base64"``、``"string"``（另支持 ``"base64.url"``、``"base64.rawurl"``）。
         data: 输入数据。
-        keyFormat: 密钥格式(加密时必需): ``"hex"``, ``"base64"``, ``"raw"``, ``"string"``。
-        key: 密钥(加密算法所需)。
+        keyFormat: ``key`` 的格式。
+        key: 密钥（HMAC / 签名 / 加密）。
 
-    返回:
-        编码/加密结果。
+    Example::
 
-    示例::
-
-        sign = Encode("hmac_sha256", "string", "hex", "message", "string", "secret")
-        hash_val = Encode("sha256", "string", "hex", "hello")
-    """
-    ...
-
-def UnixNano() -> int:
-    """获取当前时间的纳秒精度时间戳。
-
-    返回:
-        纳秒时间戳(例如 ``1609459200000000000``)。
-
-    示例::
-
-        start = UnixNano()
-        # ... 执行操作 ...
-        elapsed_ms = (UnixNano() - start) / 1e6
-        Log("耗时:", elapsed_ms, "ms")
-    """
-    ...
-
-def Unix() -> int:
-    """获取当前时间的秒精度时间戳。
-
-    返回:
-        秒精度时间戳(例如 ``1609459200``)。
-    """
-    ...
-
-def GetOS() -> str:
-    """获取托管者运行所在的操作系统和架构信息。
-
-    返回:
-        格式为 ``"os/arch"`` 的字符串,例如 ``"linux/amd64"``、``"darwin/arm64"``。
-    """
-    ...
-
-def SysInfo(attr: str) -> object:
-    """获取系统信息。
-
-    参数:
-        attr: 信息类型:
-
-            - ``"pid"``: 进程 ID
-            - ``"ppid"``: 父进程 ID
-            - ``"ncpu"``: CPU 核心数
-            - ``"arch"``: CPU 架构(例如 ``"amd64"``)
-            - ``"os"``: 操作系统(例如 ``"linux"``)
-            - ``"sys_cpu"``: 系统 CPU 使用率(%)
-            - ``"sys_mem"``: 系统内存信息
-            - ``"cpu"``: 当前进程 CPU 使用率
-            - ``"mem"``: 当前进程内存使用量
-            - ``"threads"``: 当前进程线程数
-
-    返回:
-        对应的系统信息值。
-
-    示例::
-
-        Log("CPU 核心数:", SysInfo("ncpu"))
+        sign = Encode("sha256", "string", "hex", "message", "string", "secret")  # HMAC-SHA256
+        h = Encode("md5", "raw", "hex", "hello")
     """
     ...
 
 def MD5(data: str) -> str:
-    """计算字符串的 MD5 哈希值。
-
-    参数:
-        data: 要计算哈希的字符串。
-
-    返回:
-        32 字符十六进制 MD5 哈希字符串(小写)。
-
-    示例::
-
-        Log(MD5("hello"))  # "5d41402abc4b2a76b9719d911017c592"
-    """
+    """``data`` 的 MD5，32位小写十六进制。"""
     ...
 
-def DBExec(sql: str, *extra: object) -> Optional[IDBExecRet]:
-    """在策略的内置 SQLite 数据库上执行 SQL 语句。
+def HMAC(algo: str, outputFormat: str, data: str, key: str) -> str:
+    """旧接口：HMAC 签名，同 ``Encode(algo, "raw", outputFormat, data, "raw", key)``。"""
+    ...
 
-    每个机器人都有一个独立的 SQLite 数据库,数据持久化存储。
-    当 SQL 以 ``":"`` 开头时,使用内存数据库(重启后数据丢失)。
+def Hash(algo: str, outputFormat: str, data: str) -> str:
+    """旧接口：哈希，同 ``Encode(algo, "raw", outputFormat, data)``。"""
+    ...
 
-    参数:
-        sql: SQL 语句。支持参数化查询(使用 ``?`` 作为占位符)。
-        *extra: 参数化查询的绑定值。
+def StrDecode(s: str, charset: str) -> str:
+    """旧接口：把 ``s``（每个字符的码点为一个字节）按 ``charset``（必填，例如 ``"gbk"``）解码为 UTF-8 字符串，
+    同 ``Encode("text.decoder." + charset, "latin1", "string", s)``。"""
+    ...
 
-    返回:
-        查询结果对象(包含 ``columns`` 和 ``values``),失败时返回 ``None``。
+def UnixNano() -> int:
+    """当前纳秒时间戳。"""
+    ...
 
-    示例::
+def Unix() -> int:
+    """当前秒级时间戳。"""
+    ...
 
-        DBExec("CREATE TABLE IF NOT EXISTS trades(id INTEGER PRIMARY KEY, price REAL, amount REAL)")
-        DBExec("INSERT INTO trades(price, amount) VALUES(?, ?)", 50000, 0.1)
-        ret = DBExec("SELECT * FROM trades ORDER BY id DESC LIMIT 10")
-        if ret:
-            Log("列名:", ret.columns)
-            Log("数据:", ret.values)
-    """
+def GetOS() -> str:
+    """托管者的操作系统与架构，例如 ``"linux/amd64"``。"""
+    ...
+
+def SysInfo(attr: str = ...) -> Any:
+    """托管者进程的系统信息：不传 ``attr`` 返回整个字典，否则返回其中一项（``"pid"``、``"os"``、``"arch"``、``"ncpu"`` 等）；
+    未知的键返回 ``None``。"""
     ...
 
 def UUID() -> str:
-    """生成 UUID 字符串(包含时间组件)。
+    """UUID：32位大写十六进制字符，不带连字符。"""
+    ...
 
-    返回:
-        UUID 字符串,例如 ``"550e8400-e29b-41d4-a716-446655440000"``。
+def DBExec(sql: str, *args: Any) -> Optional[IDBExecRet]:
+    """在实盘自己的 SQLite 数据库（持久化）上执行 SQL。``?`` 占位符依次取 ``args``。
+
+    Returns:
+        ``{columns, values}``，失败返回 ``None``。
+
+    Example::
+
+        DBExec("CREATE TABLE IF NOT EXISTS trades(ts INTEGER, price REAL)")
+        DBExec("INSERT INTO trades VALUES(?, ?)", Unix(), 50000)
+        ret = DBExec("SELECT * FROM trades")
     """
     ...
 
-def EventLoop(timeout: Optional[int] = None) -> Optional[IEventMsg]:
-    """等待事件循环中的下一个事件(市场更新、线程消息、WebSocket 数据等)。
+def EventLoop(timeout: int = 0) -> Optional[IEventMsg]:
+    """等待下一个事件：``exchange.Go()`` / ``HttpQuery_Go()`` 的完成通知，以及纯推送期货柜台的 tick / order 事件。
+    （WebSocket 推送订阅用 ``ctx.poll()`` 读取。）
 
-    当策略使用 WebSocket 或多线程时,``EventLoop`` 是推荐的事件驱动方式。
+    Args:
+        timeout: 毫秒：``0``（默认）一直等到有事件，正数最多等这么久，负数不等待。
 
-    参数:
-        timeout: 超时时间(毫秒):
+    Returns:
+        ``IEventMsg``，超时返回 ``None``。实盘停止时抛出 ``StopError``。
 
-            - 不传或传 0: 阻塞等待直到有事件。
-            - 正数: 等待指定毫秒,超时返回 ``None``。
-            - 负数(-1): 非阻塞,无事件时立即返回 ``None``。
+    Example::
 
-    返回:
-        事件消息对象,超时或无事件时返回 ``None``。
-
-    示例::
-
-        while True:
-            ev = EventLoop(1000)
-            if ev:
-                Log("事件:", ev.Event, "交易所:", ev.Index, "品种:", ev.Symbol)
+        t = exchange.Go("GetTicker")
+        ev = EventLoop(1000)
+        if ev:
+            Log(ev.Event, ev.Index)
     """
     ...
 
-def _G(k: str, v: Optional[object] = None) -> object:
-    """全局持久化 KV 存储。数据保存在策略数据库中,重启后仍然保留。
+def JSONParse(s: str) -> Any:
+    """解析 JSON；超出安全整数范围（2^53）的数字保留为字符串。"""
+    ...
 
-    参数:
-        k: 键名。传入 ``None`` 可清除所有 KV 数据。
-        v: 值(可选):
+def Log(*args: Any) -> None:
+    """输出一条日志（多个值以空格连接）。以 ``"#ff0000"`` 结尾设置颜色；以 ``"@"`` 结尾同时推送消息（邮箱、WebHook，
+    仅实盘）；以 ``"&"`` 结尾为私密日志，实盘公开展示时对其他用户隐藏。matplotlib 图像显示为图片。
 
-            - 不传: 读取该键的值。
-            - 传 ``None``: 删除该键。
-            - 传其他值: 保存键值对。
+    Example::
 
-    返回:
-        读取时返回对应的值。写入时无有意义的返回。
-        不带参数调用时返回机器人 ID。
-
-    示例::
-
-        _G("lastPrice", 50000)          # 保存
-        price = _G("lastPrice")         # 读取 -> 50000
-        _G("lastPrice", None)           # 删除
+        Log("价格:", ticker.Last, "数量:", 0.1)
+        Log("提醒 #ff0000@")
     """
     ...
 
-def _D(timestamp: Optional[Union[int, float]] = None, fmt: Optional[str] = None) -> str:
-    """将时间戳格式化为可读的日期字符串。
+def LogProfit(profit: float, *args: Any) -> None:
+    """记录收益（由策略计算）并画收益曲线；``args`` 附加到这条日志中。"""
+    ...
 
-    参数:
-        timestamp: 时间戳(毫秒)。不传时使用当前时间。
-        fmt: 日期格式字符串,默认 ``"yyyy-MM-dd HH:mm:ss"``。
+def LogProfitReset(remain: int = ...) -> None:
+    """清空收益日志，保留最后 ``remain`` 条。"""
+    ...
 
-    返回:
-        格式化后的日期字符串。
+def LogStatus(*args: Any) -> None:
+    """设置日志上方的状态栏：文字、表格（``{"type": "table", "title", "cols", "rows"}``）、按钮、状态栏组件，或它们组成的
+    列表；字典 / 列表以 JSON 发送。
 
-    示例::
+    Example::
 
-        Log(_D())                     # "2024-01-15 10:30:45"
-        Log(_D(1705284645000))        # "2024-01-15 10:30:45"
+        table = {"type": "table", "title": "持仓", "cols": ["品种", "数量"], "rows": [["BTC", 1]]}
+        LogStatus("`" + json.dumps(table) + "`")
+    """
+    ...
+
+def LogReset(remain: int = ...) -> None:
+    """清空日志，保留最后 ``remain`` 条。"""
+    ...
+
+def LogVacuum() -> None:
+    """``LogReset()`` 之后回收数据库空间（SQLite VACUUM）。"""
+    ...
+
+def EnableLog(enable: bool) -> None:
+    """``False`` 时不再记录订单日志（``Buy``/``Sell`` 等产生的日志）；错误日志总是记录。"""
+    ...
+
+def Chart(options: Union[dict[str, Any], list[dict[str, Any]]]) -> IChart:
+    """创建图表（Highcharts / Highstocks 配置；列表为多张图表）。
+
+    一般画图优先使用 ``Chart``；需要 Pine 风格的K线图时使用 ``KLineChart``。
+
+    Example::
+
+        chart = Chart({"title": {"text": "价差"}, "xAxis": {"type": "datetime"},
+                       "series": [{"name": "价差", "data": []}]})
+        chart.add(0, [Unix() * 1000, 1.5])
+    """
+    ...
+
+def KLineChart(options: Optional[dict[str, Any]] = None) -> IKLineChart:
+    """创建 Pine 风格的K线图。``options``：``overlay``（画在主图）、``pricePrecision``、``volumePrecision``、``xAxis``、
+    ``yAxis``、``candle`` 等。
+
+    Example::
+
+        c = KLineChart({"overlay": True})
+    """
+    ...
+
+def _G(k: Optional[str] = ..., v: Any = ...) -> Any:
+    """实盘的持久化键值存储（重启后仍在）。
+
+    ``_G()`` 返回实盘Id；``_G(k)`` 读取；``_G(k, v)`` 写入；``_G(k, None)`` 删除；``_G(None)`` 清空全部。
+
+    Example::
+
+        _G("lastPrice", 50000)
+        price = _G("lastPrice")
+    """
+    ...
+
+def _D(timestamp: Optional[float] = None, fmt: Optional[str] = None) -> str:
+    """格式化时间。Python 中 ``timestamp`` 的单位是**秒**（``records[-1].Time / 1000``）；不传为当前时间。
+    ``fmt`` 是 ``time.strftime`` 格式，默认 ``"%Y-%m-%d %H:%M:%S"``。使用托管者所在系统的时区。
+
+    Example::
+
+        Log(_D())
+        Log(_D(1574993606, "%Y-%m-%d"))
     """
     ...
 
 def _N(num: float, precision: int = 4) -> float:
-    """数字精度截断(向下截断,不进行四舍五入)。
+    """把 ``num`` 截断到 ``precision`` 位小数（不四舍五入）；``precision`` 为负数时截断整数位。
 
-    参数:
-        num: 要截断的数字。
-        precision: 保留的小数位数。
+    Example::
 
-    返回:
-        截断后的数字。
-
-    示例::
-
-        Log(_N(3.14159, 2))   # 3.14
-        Log(_N(3.14959, 2))   # 3.14 (不四舍五入)
+        _N(3.1415, 2)   # 3.14
+        _N(1300, -3)    # 1000
     """
     ...
 
-def _Cross(arr1: list[float], arr2: list[float]) -> bool:
-    """判断两条线是否交叉(金叉/死叉)。
+def _C(func: Callable[..., Optional[_V]], *args: Any) -> _V:
+    """反复调用 ``func(*args)``，直到返回的不是 ``None`` / ``False``，每次失败后休眠（3000毫秒，见 ``_CDelay``）。
 
-    参数:
-        arr1: 第一条线的数据数组。
-        arr2: 第二条线的数据数组。
+    Example::
 
-    返回:
-        正数表示金叉(arr1 向上穿过 arr2),
-        负数表示死叉(arr1 向下穿过 arr2),
-        0 表示无交叉。
-
-    示例::
-
-        ema5 = TA.EMA(records, 5)
-        ema20 = TA.EMA(records, 20)
-        cross = _Cross(ema5, ema20)
-        if cross > 0:
-            Log("金叉!")
-        if cross < 0:
-            Log("死叉!")
-    """
-    ...
-
-def JSONParse(s: str) -> dict:
-    """安全的 JSON 解析。解析失败时抛出异常。
-
-    参数:
-        s: 要解析的 JSON 字符串。
-
-    返回:
-        解析后的字典对象。
-
-    示例::
-
-        obj = JSONParse('{"price": 50000, "amount": 0.1}')
-        Log(obj["price"])  # 50000
-    """
-    ...
-
-def Log(s: object, *extra: object) -> None:
-    """向策略日志区域输出日志。
-
-    支持特殊后缀来控制日志颜色: 追加 ``"#FF0000"`` 可以红色显示。
-
-    参数:
-        s: 日志内容,支持任意类型。
-        *extra: 额外的日志参数,将被追加。
-
-    示例::
-
-        Log("普通日志")
-        Log("红色日志 #FF0000")
-        Log("价格:", ticker.Last, "数量:", 0.1)
-    """
-    ...
-
-def LogProfit(profit: float, *extra: object) -> None:
-    """记录盈亏数据并绘制盈亏曲线。
-
-    参数:
-        profit: 盈亏值。
-        *extra: 额外的日志信息。
-
-    示例::
-
-        LogProfit(100.5)
-        LogProfit(100.5, "本次交易盈亏")
-    """
-    ...
-
-def LogProfitReset(remain: Optional[int] = None) -> None:
-    """重置盈亏日志。
-
-    参数:
-        remain: 要保留的最近记录数。默认 0(清除所有)。
-
-    示例::
-
-        LogProfitReset()     # 清除所有
-        LogProfitReset(10)   # 保留最后 10 条
-    """
-    ...
-
-def LogStatus(s: object, *extra: object) -> None:
-    """设置策略状态栏信息(显示在机器人页面顶部)。
-
-    支持 Markdown 表格、HTML 等格式。
-
-    参数:
-        s: 状态信息字符串。
-        *extra: 额外的状态参数。
-
-    示例::
-
-        LogStatus("价格: " + str(ticker.Last) + " | 持仓: " + str(pos.Amount))
-    """
-    ...
-
-def EnableLog(enable: bool) -> None:
-    """启用或禁用日志记录。
-
-    参数:
-        enable: ``True`` 启用,``False`` 禁用日志记录。
-
-    示例::
-
-        EnableLog(False)  # 禁用日志(减少数据库写入)
-        EnableLog(True)   # 重新启用
-    """
-    ...
-
-def Chart(options: Union[dict, list[dict]]) -> IChart:
-    """为策略页面创建自定义图表(基于 Highcharts/Highstock)。
-
-    【首选】支持最全面的图表类型(折线/柱状/散点/面积/K线等)。一般绘图请优先使用 Chart;
-    仅当确实需要 Pine 风格 K 线/蜡烛图时才用 KLineChart。
-
-    参数:
-        options: Highcharts/Highstock 图表配置对象或配置列表。
-
-    返回:
-        IChart 图表对象,用于动态添加数据。
-
-    示例::
-
-        chart = Chart({
-            "title": {"text": "Price Trend"},
-            "xAxis": {"type": "datetime"},
-            "series": [
-                {"name": "Price", "type": "line", "data": []},
-                {"name": "MA5", "type": "line", "data": []}
-            ]
-        })
-        chart.add(0, [Unix() * 1000, ticker.Last])
-        chart.reset()
-    """
-    ...
-
-def KLineChart(options: Optional[dict] = None) -> IKLineChart:
-    """创建 K 线图表(自定义蜡烛图),配置类似 Pine Script。
-
-    【专用】仅用于绘制 K 线/蜡烛图;一般绘图请优先使用 Chart(类型更全面)。
-
-    参数:
-        options: K 线图表配置对象。
-
-    返回:
-        IKLineChart 图表对象(``begin``/``close`` 加 Pine 风格画图函数)。
-
-    示例::
-
-        chart = KLineChart({"overlay": True})
-    """
-    ...
-
-def LogReset(remain: Optional[int] = None) -> None:
-    """重置所有日志。
-
-    参数:
-        remain: 要保留的最近日志数。默认 0(清除所有)。
-
-    示例::
-
-        LogReset()      # 清除所有日志
-        LogReset(100)   # 保留最后 100 条
-    """
-    ...
-
-def LogVacuum() -> None:
-    """对策略数据库执行 VACUUM 操作以回收空间。
-
-    在删除大量日志后调用,以减小数据库文件大小。
-    """
-    ...
-
-T = TypeVar('T')
-
-def _C(func: Callable[..., Optional[T]], *args: object, **kwargs: object) -> T:
-    """容错重试函数。自动重试直到返回非 ``None`` 值。
-
-    常用于包装可能因网络问题返回 ``None`` 的 API 调用。
-
-    参数:
-        func: 要重试调用的函数。
-        *args: 传递给函数的参数。
-
-    返回:
-        函数成功返回的非 ``None`` 值。
-
-    示例::
-
-        # 确保获取 Ticker (持续重试直到成功)
         ticker = _C(exchange.GetTicker)
-        # 带参数重试
         depth = _C(exchange.GetDepth, "BTC_USDT")
-        account = _C(exchange.GetAccount)
     """
+    ...
+
+def _CDelay(ms: float) -> None:
+    """设置 ``_C()`` 的重试间隔，单位毫秒（默认3000）。"""
+    ...
+
+def _Cross(arr1: Sequence[Optional[float]], arr2: Sequence[Optional[float]]) -> int:
+    """``arr1`` 与 ``arr2`` 交叉以来的周期数：正数 = ``arr1`` 在这么多根K线之前上穿 ``arr2``，负数 = 下穿，
+    0 = 最后一根相等。两个列表长度必须相同。
+
+    Example::
+
+        n = _Cross(TA.EMA(records, 5), TA.EMA(records, 20))
+        if n == 1:
+            Log("最后一根K线金叉")
+    """
+    ...
+
+def _T(text: str, other: Optional[str] = None) -> str:
+    """双语文本：``_T("中文", "English")`` 按查看者的语言显示对应的部分。"""
     ...

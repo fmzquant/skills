@@ -110,7 +110,7 @@ Every API result is a dict subclass with attribute access: `ticker["Last"]` and 
 
 ## Concurrency
 
-- `g = exchange.Go("GetTicker")`, `exchange.Go("GetRecords", PERIOD_H1)`, `exchange.Go("Buy", price, amount)`, `exchange.Go("IO", "api", "POST", path, "", body)` start the call in the background. `value, ok = g.wait()` blocks; `g.wait(ms)` times out with `ok == False`; waiting twice on the same handle gives `ok == False`. **Python returns a `(value, ok)` tuple** (api docs `exchange.Go`, bootstrap `AsyncRet.wait`, selfcheck); the `fmz.pyi` stub shows a bare value — unpack the tuple.
+- `g = exchange.Go("GetTicker")`, `exchange.Go("GetRecords", PERIOD_H1)`, `exchange.Go("Buy", price, amount)`, `exchange.Go("IO", "api", "POST", path, "", body)` start the call in the background. `value, ok = g.wait()` blocks; `g.wait(ms)` times out with `ok == False`; waiting twice on the same handle gives `ok == False`. **Python returns a `(value, ok)` tuple** (api docs `exchange.Go`, bootstrap `AsyncRet.wait`, selfcheck, `IGo.wait` in `fmz.pyi`) — unpack the tuple.
 - `EventLoop(timeout_ms)` returns the next event dict (`{Seq, Event, ThreadId, Index, Nano, ...}`) or `None`; `0` blocks, `-1` polls. Call `EventLoop(-1)` once early or events raised before the first call are missed.
 - Native `threading.Thread` is allowed (API calls from threads are serialized by the runtime); make them daemon threads and remember they die when `main()` returns. The JavaScript `threading`/`Thread`/`ThreadLock` objects do not exist in Python.
 
@@ -170,7 +170,7 @@ cmd = GetCommand()
 if cmd:
     on_command(cmd)
 ```
-- `Sleep(ms)` (fractions allowed). `Unix()` seconds, `UnixNano()`. **`_D(ts_seconds=None, fmt="%Y-%m-%d %H:%M:%S")` takes seconds in Python** (api docs `_D`, bootstrap, selfcheck); record and ticker `Time` are milliseconds, so write `_D(r["Time"] // 1000)`. Output is in the host's local time zone. The `fmz.pyi` docstring says milliseconds; it is wrong for Python.
+- `Sleep(ms)` (fractions allowed). `Unix()` seconds, `UnixNano()`. **`_D(ts_seconds=None, fmt="%Y-%m-%d %H:%M:%S")` takes seconds in Python** (api docs `_D`, bootstrap, selfcheck); record and ticker `Time` are milliseconds, so write `_D(r["Time"] // 1000)`. Output is in the host's local time zone.
 - `_C(fn, *args)` calls `fn(*args)` until the result is truthy, sleeping 3 s between tries (`_CDelay(ms)` changes it). Pass the function, not a call. It also retries on `0`/`0.0`/`False`, so do not wrap calls that legitimately return zero.
 - `_N(x, digits=4)` truncates toward zero (no rounding). `_Cross(a, b)` > 0 golden cross, < 0 death cross, 0 none; raises if the lists differ in length.
 - `_G(key, value)` stores a JSON-serialisable value per robot (keys case-insensitive), `_G(key)` reads (`None` if absent), `_G(key, None)` deletes, `_G(None)` wipes everything, `_G()` returns the robot id. Persists across restarts in live; cleared after a backtest.
@@ -180,12 +180,12 @@ if cmd:
 ## Charts
 
 - `chart = Chart(cfg)` where `cfg` is a Highcharts/Highstock config dict (or a list of them; `"__isStock": False` for a plain chart). `chart.add(series_index, [ts_ms, value])` appends; `chart.add(i, point, -1)` replaces the last point; `chart.reset(remain=0)`; `chart.update(cfg)` replaces the whole config (pass the full dict). Series indexes run across all charts in the list in order (two series in cfgA → 0, 1; cfgB's first series → 2).
-- `c = KLineChart({"overlay": True})` draws Pine-style on real candles. Per bar: `c.begin(bar)`, then `c.plot(value, title=..., color=..., style="line"|"histogram", overlay=False)` (returns a plot index), `c.hline(price, color=..., linestyle="dashed")`, `c.plotshape(cond, style="triangleup", location="belowbar", color=...)`, `c.plotchar(cond, char="D", location="abovebar")`, `c.plotarrow(value)`, `c.plotcandle(o, h, l, c)`, `c.barcolor(color)`, `c.bgcolor(color)`, `c.fill(idx1, idx2, color=...)`, `c.signal("buy"|"sell"|"closebuy"|"closesell", price, qty)`, and finally `c.close()`. Options are keyword arguments (selfcheck). The runtime's `close()` takes no arguments (one doc example passes `bar`; omit it). These methods are not declared in `fmz.pyi`; the authoritative signatures are in `bootstrap.py`'s `KLineChartObj` and the api docs `#### KLineChart`.
+- `c = KLineChart({"overlay": True})` draws Pine-style on real candles. Per bar: `c.begin(bar)`, then `c.plot(value, title=..., color=..., style="line"|"histogram", overlay=False)` (returns a plot index), `c.hline(price, color=..., linestyle="dashed")`, `c.plotshape(cond, style="triangleup", location="belowbar", color=...)`, `c.plotchar(cond, char="D", location="abovebar")`, `c.plotarrow(value)`, `c.plotcandle(o, h, l, c)`, `c.barcolor(color)`, `c.bgcolor(color)`, `c.fill(idx1, idx2, color=...)`, `c.signal("buy"|"sell"|"closebuy"|"closesell", price, qty)`, and finally `c.close()`. Options are keyword arguments (selfcheck). `c.close(bar)` is the same as `c.begin(bar)` then `c.close()`. Full signatures: `class IKLineChart` in `fmz.pyi` and the api docs `#### KLineChart`.
 
 ## Network
 
 - `ws = Dial("wss://host/path", timeout_ms=30000)` → connection or `None`. `ws.read(timeout_ms)` returns the next message, a falsy value on timeout, `""` once closed (omit the timeout to block, `-1` to poll); `ws.write(str_or_bytes)`; `ws.close()`. Options after `|`: `"wss://...|compress=gzip_raw&mode=recv&reconnect=true&payload=" + json.dumps(sub)`; headers via a dict second argument `Dial(url, {"headers": {...}})`. Also `tcp://`, `tls://`, `sqlite3://`, `mysql://`, `postgres://`, `kvdb://` (then `.exec(sql, *params)`). Keep the handle in a module global and close it in `onexit()`.
-- `HttpQuery(url, options)`: the api docs say Python does not support it and use `urllib.request` instead; the classic bootstrap does not bind it, while `fmz.pyi` declares it. Safe choice: `urllib.request.urlopen(url, timeout=10).read()`; if you do call `HttpQuery`, guard with `'HttpQuery' in globals()`. In backtest `HttpQuery` is GET-only and cached per URL (max 20).
+- `HttpQuery(url, options)` returns the body string (`""` on failure, never `None`); with `{"debug": True}` it returns `{StatusCode, Header, Body, Error, ...}` (`StatusCode` 0 when no response arrived). `HttpQuery_Go(url, options)` returns a handle whose `.wait()` gives the same value. In backtest `HttpQuery` is GET-only and cached per URL (max 20).
 
 ## Indicators
 
@@ -223,7 +223,7 @@ if cmd:
 
 ## References
 
-- `references/fmz.pyi` — complete Python API stub with docstrings. Grep `def GetRecords`, `class IOrder`, `class IMarket`, `def Dial`, `class IDial`, `def _G`, `def CreateConditionOrder`, `def Encode`, `def HttpQuery`, `class IHttpOptions`, and for WebSocket push `class Ctx`, `class Subscription`, `class CtxEvent`. Known stub errors: `IGo.wait` really returns `(value, ok)`; `_D` really takes seconds; `IAccount` lacks `UPnL`; KLineChart's Pine methods are not declared.
+- `references/fmz.pyi` — complete Python API stub with docstrings. Grep `def GetRecords`, `class IOrder`, `class IMarket`, `def Dial`, `class IDial`, `def _G`, `def CreateConditionOrder`, `def Encode`, `def HttpQuery`, `class IHttpOptions`, and for WebSocket push `class Ctx`, `class Subscription`, `class CtxEvent`. Structures are dicts with attribute access (`t.Last` and `t["Last"]`).
 - `references/fmz.zh_CN.pyi` — the same stub in Chinese.
 - `references/talib.pyi` — every `talib.*` signature with defaults (`def MACD`, `def BBANDS`, `def STOCH`, `def CDL...`).
 - `references/selfcheck.py` — known-good strategy exercising the whole surface; copy its idioms (`if t:` guards, `tk, ok = g.wait(0)`, `_D(r["Time"] // 1000)`, KLineChart keyword args, `IsVirtual()` gating of writes, condition-order dicts).

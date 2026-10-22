@@ -1861,7 +1861,8 @@ pub static TA: TAHelper = TAHelper;
 /// different namespaces, so both spellings work.)
 #[allow(non_snake_case)]
 pub mod TA {
-    use super::{Record, Ticks};
+    use super::Record;
+    pub use super::{TAHelper, Ticks};
     pub fn MA<T: Ticks + ?Sized>(src: &T, period: impl Into<Option<usize>>) -> Vec<f64> { todo!() }
     pub fn SMA<T: Ticks + ?Sized>(src: &T, period: impl Into<Option<usize>>) -> Vec<f64> { todo!() }
     pub fn EMA<T: Ticks + ?Sized>(src: &T, period: impl Into<Option<usize>>) -> Vec<f64> { todo!() }
@@ -1932,7 +1933,8 @@ pub fn BigFloat(x: impl ToDecimal) -> Decimal { todo!() }
 /// `kind` and converts fixed-point prices/quantities to real numbers — no `unsafe` needed.
 pub mod abi {
     /// One runtime event (256-byte POD). `payload` is a union keyed by `kind`; read it
-    /// with the safe [`EventExt`](super::ctx::EventExt) accessors instead.
+    /// with the safe [`EventExt`](super::ctx::EventExt) accessors instead (raw prices and
+    /// quantities are fixed-point mantissas, see `ctx::scales_of`).
     #[derive(Clone, Copy)]
     pub struct Event {
         /// Engine sequence number (monotonic within a run).
@@ -1945,8 +1947,143 @@ pub mod abi {
         pub source: u16,
         /// Instrument id (`ctx::instrument_of` → (exchange, symbol)).
         pub instrument: u32,
+        /// Kind-specific payload (reading a field needs `unsafe`; prefer `EventExt`).
+        pub payload: EventPayload,
         /// Delivery stream id (= `Sub::id()`, or `STREAM_TIMER` / `STREAM_STATUS`).
         pub tag: u32,
+    }
+    impl Event {
+        pub fn zeroed() -> Self { todo!() }
+    }
+    /// Event payload, the branch is chosen by `Event::kind`.
+    #[derive(Clone, Copy)]
+    pub union EventPayload {
+        pub tick: MdTick,
+        pub depth5: MdDepth5Side,
+        pub trade: MdTrade,
+        pub kline: MdKline,
+        pub ord: OrdUpdate,
+        pub pos: PosUpdate,
+        pub bal: BalUpdate,
+        pub timer: TimerFired,
+        pub gw: GwStatus,
+        pub feed: FeedStatus,
+        pub raw: [u8; 168],
+    }
+    /// `EV_MD_TICK` (fixed-point mantissas).
+    #[derive(Clone, Copy)]
+    pub struct MdTick {
+        pub bid_px: i64, pub bid_qty: i64, pub ask_px: i64, pub ask_qty: i64,
+        pub last_px: i64, pub last_qty: i64, pub volume: i64, pub open_interest: i64,
+        pub day_open_px: i64, pub day_high_px: i64, pub day_low_px: i64,
+        /// Exchange time (ms; 0 = unknown).
+        pub exch_ts_ms: i64,
+        pub flags: u32, pub _pad: u32,
+    }
+    /// `EV_MD_DEPTH5`: one side, up to 5 levels starting at `start_level`.
+    #[derive(Clone, Copy)]
+    pub struct MdDepth5Side {
+        /// `SIDE_BUY` / `SIDE_SELL`.
+        pub side: u8,
+        pub count: u8,
+        pub start_level: u8,
+        /// `DEPTH5_F_*`.
+        pub flags: u8,
+        pub _pad: [u8; 4],
+        pub px: [i64; 5],
+        pub qty: [i64; 5],
+    }
+    /// `EV_MD_TRADE`.
+    #[derive(Clone, Copy)]
+    pub struct MdTrade {
+        pub px: i64, pub qty: i64, pub exch_ts_ms: i64,
+        /// Taker side (`SIDE_*`; 0 = unknown).
+        pub side: u8,
+        pub _pad: [u8; 7],
+        pub trade_id: [u8; TRADE_ID_CAP],
+    }
+    impl MdTrade {
+        pub fn trade_id_str(&self) -> &str { todo!() }
+    }
+    /// `EV_MD_KLINE`.
+    #[derive(Clone, Copy)]
+    pub struct MdKline {
+        pub open: i64, pub high: i64, pub low: i64, pub close: i64,
+        pub volume: i64, pub quote_volume: i64,
+        pub open_time_ms: u64,
+        pub interval_sec: u32,
+        pub trades: u32,
+        /// 1 = the bar is final.
+        pub closed: u8,
+        /// `KLINE_F_*`.
+        pub flags: u8,
+        pub _pad: [u8; 6],
+        pub open_interest: i64,
+    }
+    /// `EV_ORD_UPDATE`.
+    #[derive(Clone, Copy)]
+    pub struct OrdUpdate {
+        pub ord_id: [u8; ORD_ID_CAP],
+        pub px: i64, pub qty: i64, pub filled_qty: i64, pub avg_px: i64,
+        /// `ORD_ST_*`.
+        pub state: u8,
+        /// `rej::*`.
+        pub reason: u8,
+        pub _pad: [u8; 6],
+    }
+    impl OrdUpdate {
+        pub fn ord_id_str(&self) -> &str { todo!() }
+    }
+    /// `EV_POS_UPDATE`: full current state of one position slot (qty 0 = closed).
+    #[derive(Clone, Copy)]
+    pub struct PosUpdate {
+        pub qty: i64, pub avg_px: i64,
+        pub profit: f64, pub margin: f64, pub liq_px: f64, pub mark_px: f64, pub leverage: f64,
+        pub exch_ts_ms: i64,
+        pub side: u8,
+        /// `POS_SIDE_*`.
+        pub pos_side: u8,
+        /// `PRIV_F_*`.
+        pub flags: u8,
+        pub _pad: [u8; 5],
+    }
+    /// `EV_BAL_UPDATE`: full current amounts of one asset (not a delta).
+    #[derive(Clone, Copy)]
+    pub struct BalUpdate {
+        pub asset: [u8; ASSET_CAP],
+        pub free: f64, pub frozen: f64, pub equity: f64, pub upnl: f64, pub margin: f64,
+        pub exch_ts_ms: i64,
+        pub flags: u8,
+        pub _pad: [u8; 7],
+    }
+    impl BalUpdate {
+        pub fn asset_str(&self) -> &str { todo!() }
+    }
+    /// `EV_TIMER`.
+    #[derive(Clone, Copy)]
+    pub struct TimerFired { pub timer_id: u64, pub scheduled_ns: u64 }
+    /// `EV_GW_STATUS`.
+    #[derive(Clone, Copy)]
+    pub struct GwStatus {
+        /// `GW_*`.
+        pub status: u8,
+        pub _pad: [u8; 7],
+        pub detail: u64,
+    }
+    /// `EV_FEED_STATUS`.
+    #[derive(Clone, Copy)]
+    pub struct FeedStatus {
+        /// `CH_*` of the target subscription.
+        pub channel: u16,
+        /// `FEED_PREFILL_*`.
+        pub status: u8,
+        pub _pad0: u8,
+        pub interval_sec: u32,
+        pub detail: u64,
+        pub message: [u8; 152],
+    }
+    impl FeedStatus {
+        pub fn message_str(&self) -> Result<&str, core::str::Utf8Error> { todo!() }
     }
     pub const EV_MD_TICK: u16 = 1;
     pub const EV_MD_DEPTH5: u16 = 3;
@@ -1960,6 +2097,8 @@ pub mod abi {
     pub const EV_FEED_STATUS: u16 = 35;
     pub const STREAM_TIMER: u32 = 1;
     pub const STREAM_STATUS: u32 = 2;
+    /// Stream ids minted by `subscribe` start here.
+    pub const STREAM_FIRST_DYNAMIC: u32 = 16;
     pub const SIDE_BUY: u8 = 1;
     pub const SIDE_SELL: u8 = 2;
     pub const ORD_ST_ACKED: u8 = 1;
@@ -1975,6 +2114,15 @@ pub mod abi {
     pub const POS_SIDE_LONG: u8 = 1;
     pub const POS_SIDE_SHORT: u8 = 2;
     pub const POS_SIDE_NET: u8 = 3;
+    /// `MdDepth5Side::flags`: last block of this book update.
+    pub const DEPTH5_F_LAST: u8 = 1;
+    /// `MdKline::flags`: history bar sent on the first subscription.
+    pub const KLINE_F_PREFILL: u8 = 1;
+    /// `PosUpdate::flags` / `BalUpdate::flags`: snapshot row after (re)subscribing.
+    pub const PRIV_F_SNAPSHOT: u8 = 1;
+    pub const ORD_ID_CAP: usize = 128;
+    pub const TRADE_ID_CAP: usize = 128;
+    pub const ASSET_CAP: usize = 64;
     pub const CH_TICKER: u16 = 1;
     pub const CH_TRADE: u16 = 2;
     pub const CH_DEPTH: u16 = 3;
@@ -1982,6 +2130,21 @@ pub mod abi {
     pub const CH_BBO: u16 = 5;
     pub const CH_PRIVATE: u16 = 6;
     pub const CH_TICKERS: u16 = 7;
+    /// `ctx::WsOptions::compress`: auto-decompress binary frames.
+    pub const WS_COMP_NONE: u8 = 0;
+    pub const WS_COMP_GZIP: u8 = 1;
+    pub const WS_COMP_DEFLATE: u8 = 2;
+    pub const WS_COMP_RAW_DEFLATE: u8 = 3;
+    /// Unified order reject reasons (`OrdUpdate::reason`, `OrderView::reason`).
+    pub mod rej {
+        pub const NONE: u8 = 0;
+        pub const BAD_REQUEST: u8 = 1;
+        pub const CREDENTIALS: u8 = 2;
+        pub const TRANSPORT: u8 = 3;
+        pub const EXCHANGE: u8 = 4;
+        pub const THROTTLED: u8 = 5;
+        pub fn text(code: u8) -> &'static str { todo!() }
+    }
 }
 pub use abi::*;
 
@@ -2288,13 +2451,152 @@ pub mod ctx {
     pub fn rest(exchange: impl Into<ExIndex>, method: &str, args_json: &str) -> Result<String, String> { todo!() }
     /// Exchange-specific endpoint escape hatch → raw string.
     pub fn raw(exchange: impl Into<ExIndex>, method: &str, args: &str) -> Result<String, String> { todo!() }
+    /// Asynchronous [`rest`]: returns a ticket at once; collect it with [`rest_wait`].
+    pub fn rest_go(exchange: impl Into<ExIndex>, method: &str, args_json: &str) -> Result<u64, String> { todo!() }
+    /// Result of a [`rest_go`] ticket (blocks until done).
+    pub fn rest_wait(ticket: u64) -> Result<String, String> { todo!() }
     /// Wall clock, epoch ms.
     pub fn now() -> f64 { todo!() }
-    /// Sleep `ms` (interrupted by stop).
+    /// Sleep `ms` (interrupted by stop). Events are not lost while sleeping; to wait
+    /// *and* react to events use `poll(&[..], Some(ms))`.
     pub fn sleep(ms: u64) { todo!() }
-    /// Whether a stop was requested.
+    /// [`sleep`] with fractional milliseconds (`0` sleeps nothing but still checks stop).
+    pub fn sleep_f64(ms: f64) { todo!() }
+    /// Whether a stop was requested (no side effects).
     pub fn stopped() -> bool { todo!() }
+
+    // ---- runtime services (the base of the legacy globals) ----
     pub fn log(msg: impl AsRef<str>) { todo!() }
+    pub fn log_status(msg: impl AsRef<str>) { todo!() }
+    pub fn log_profit(profit: f64, note: impl AsRef<str>) { todo!() }
+    /// Trade log row (`sell` false = buy / true = sell), fields in their own columns.
+    pub fn trade_log(exchange: &str, sell: bool, direction: &str, order_id: &str, symbol: &str, price: f64, amount: f64, text: &str) { todo!() }
+    /// Exchange-call failure log row.
+    pub fn error_log(exchange: &str, text: &str) { todo!() }
+    /// Cancel log row.
+    pub fn cancel_log(exchange: &str, order_id: &str, symbol: &str, text: &str) { todo!() }
+    /// Compact the log database (legacy `LogVacuum`).
+    pub fn log_vacuum() { todo!() }
+    /// Chart config JSON (legacy `Chart`).
+    pub fn chart(cfg_json: impl AsRef<str>) { todo!() }
+    /// Add a point (`data_json`: number / `[x, y]` …); `replace` = index to overwrite.
+    pub fn chart_add(series: i64, data_json: &str, replace: Option<i64>) { todo!() }
+    /// Delete a series; `series <= 0` deletes the whole chart (config included).
+    pub fn chart_del(series: i64) { todo!() }
+    /// Clear the chart data, keeping the newest `keep` points.
+    pub fn chart_reset(keep: u64) { todo!() }
+    pub fn set_channel_data(v: impl AsRef<str>) { todo!() }
+    /// Latest data of the `token` channel ("" = nothing received yet); Err = unsupported.
+    pub fn get_channel_data(token: impl AsRef<str>) -> Result<String, String> { todo!() }
+    /// Interactive command: `timeout_ms < 0` non-blocking, `0` blocks until a command or
+    /// stop, `> 0` waits at most that long. "" = no command.
+    pub fn get_command(timeout_ms: f64) -> String { todo!() }
+    /// The strategy sends a command to itself (legacy `SendCommand`).
+    pub fn send_command(cmd: impl AsRef<str>) { todo!() }
+    /// Decrypt a `$$$__` credential field.
+    pub fn decrypt(data: impl AsRef<str>) -> Result<String, String> { todo!() }
+    /// Robot id (legacy `_G()`).
+    pub fn robot_id() -> i64 { todo!() }
+    pub fn uuid() -> String { todo!() }
+    /// Runtime info JSON (legacy `SysInfo()`).
+    pub fn sys_info() -> String { todo!() }
+    /// Backtest (virtual) run (legacy `IsVirtual()`).
+    pub fn is_virtual() -> bool { todo!() }
+    /// Server-pushed runtime config (trading sessions table …); `None` = never pushed.
+    pub fn runtime_context() -> Option<String> { todo!() }
+    /// Persistent KV (legacy `_G`): `None` = missing (an empty value is `Some("")`).
+    pub fn kv_get(key: &str) -> Option<String> { todo!() }
+    pub fn kv_set(key: &str, value: &str) { todo!() }
+    pub fn kv_del(key: &str) { todo!() }
+    /// Encode / digest (legacy `Encode`): `algo` md5/sha256/hmac-sha256/aes.*, formats
+    /// raw|hex|base64; `key_fmt`+`key` for HMAC/AES (else "").
+    pub fn encode(algo: &str, in_fmt: &str, out_fmt: &str, data: &str, key_fmt: &str, key: &str) -> Result<String, String> { todo!() }
+    /// Hex digest (`hash("sha256", s)`).
+    pub fn hash(algo: &str, data: &str) -> Result<String, String> { todo!() }
+    /// Hex HMAC.
+    pub fn hmac(algo: &str, data: &str, key: &str) -> Result<String, String> { todo!() }
+    pub fn md5(data: &str) -> Result<String, String> { todo!() }
+    /// Send a mail (legacy `Mail`).
+    pub fn mail(smtp: &str, user: &str, pass: &str, to: &str, subject: &str, body: &str) -> Result<(), String> { todo!() }
+    /// Set an account's outbound proxy ("" = direct; legacy `exchange.SetProxy`).
+    pub fn set_proxy(exchange: u16, proxy: &str) -> Result<(), String> { todo!() }
+    /// Replace an account's extra request headers (empty = clear).
+    pub fn set_headers(exchange: u16, headers: &[(&str, &str)]) -> Result<(), String> { todo!() }
+
+    // ---- Dial: blocking tcp/tls/ws/sqlite stream, integer fd (base of legacy `Dial`) ----
+    /// Open `tcp://…` / `tls://…` / `ws(s)://…` / `sqlite://…` → fd (`opts_json` "{}" for none).
+    pub fn dial(uri: &str, opts_json: &str) -> Result<i64, String> { todo!() }
+    /// `Some(bytes)` data, `None` timeout, `Some([])` peer closed.
+    pub fn dial_read(fd: i64, timeout_ms: i64) -> Result<Option<Vec<u8>>, String> { todo!() }
+    /// Bytes written.
+    pub fn dial_write(fd: i64, data: &[u8], timeout_ms: i64) -> Result<usize, String> { todo!() }
+    pub fn dial_close(fd: i64) { todo!() }
+
+    // ---- HTTP / WebSocket on the host's shared network stack ----
+    /// HTTP response (owned).
+    pub struct HttpResult {
+        pub status: u16,
+        pub headers: Vec<(String, String)>,
+        pub body: Vec<u8>,
+    }
+    impl HttpResult {
+        /// Body as UTF-8 text (invalid bytes replaced).
+        pub fn text(&self) -> std::borrow::Cow<'_, str> { todo!() }
+    }
+    /// Options of [`http_with`] (default = [`http`]: 30 s timeout, follow 5 redirects).
+    #[derive(Clone, Debug)]
+    pub struct HttpOptions<'a> {
+        /// Whole-request timeout ms (0 = host default).
+        pub timeout_ms: u64,
+        /// Per-request proxy `http(s)://` / `socks5(h)://` ("" = session default).
+        pub proxy: &'a str,
+        /// Max redirects (0 = do not follow).
+        pub redirects: u32,
+    }
+    impl Default for HttpOptions<'_> { fn default() -> Self { todo!() } }
+    /// Blocking HTTP request; TLS certificates are not verified (as the legacy client).
+    pub fn http(method: &str, url: &str, headers: &[(&str, &str)], body: &[u8]) -> Result<HttpResult, String> { todo!() }
+    pub fn http_with(method: &str, url: &str, headers: &[(&str, &str)], body: &[u8], o: &HttpOptions<'_>) -> Result<HttpResult, String> { todo!() }
+    pub fn http_get(url: &str) -> Result<HttpResult, String> { todo!() }
+    /// A WebSocket connection (not closed on drop: call [`WebSocket::close`]). No
+    /// auto-reconnect: a dropped connection shows up as `recv` → Err.
+    pub struct WebSocket;
+    impl WebSocket {
+        pub fn send_text(&self, s: &str) -> Result<(), String> { todo!() }
+        pub fn send_binary(&self, b: &[u8]) -> Result<(), String> { todo!() }
+        /// `timeout_ms < 0` blocks (`<= -2` drops stale frames, newest only);
+        /// `Ok(None)` = timeout, Err = closed.
+        pub fn recv(&self, timeout_ms: i64) -> Result<Option<WsFrame>, String> { todo!() }
+        pub fn close(self) { todo!() }
+    }
+    /// A received frame.
+    pub enum WsFrame {
+        Text(String),
+        Binary(Vec<u8>),
+    }
+    /// Options of [`ws_open_with`] (default = [`ws_open`]). The host sends the
+    /// heartbeat and decompresses frames; reconnecting is up to the caller.
+    #[derive(Default, Clone)]
+    pub struct WsOptions<'a> {
+        /// Handshake headers.
+        pub headers: &'a [(&'a str, &'a str)],
+        pub proxy: &'a str,
+        /// Local outbound IP ("" = system default).
+        pub local_ip: &'a str,
+        /// Heartbeat period ms (0 = none).
+        pub ping_interval_ms: u64,
+        pub ping_payload: &'a str,
+        /// true = heartbeat as a text frame (e.g. `"ping"`); false = protocol Ping.
+        pub ping_text: bool,
+        /// `abi::WS_COMP_GZIP` / `WS_COMP_DEFLATE` / `WS_COMP_RAW_DEFLATE`.
+        pub compress: u8,
+        /// Verify TLS certificates (default false).
+        pub verify_cert: bool,
+    }
+    pub fn ws_open(url: &str) -> Result<WebSocket, String> { todo!() }
+    pub fn ws_open_with(url: &str, o: &WsOptions<'_>) -> Result<WebSocket, String> { todo!() }
+    /// Low-level host service call (`method`, JSON `args`) — escape hatch.
+    pub fn call(method: &str, args: &str) -> Result<String, String> { todo!() }
 }
 
 /// `use sdk::ctx::EventExt;` / `use sdk::abi::*;` resolve as in a compiled strategy.
@@ -2303,7 +2605,7 @@ pub mod sdk {
 }
 
 pub mod prelude {
-    pub use crate::{
+    pub use super::{
         exchange, exchanges, params, Arg, Chart, KLineChart, DBExec, Decrypt, Decrypted, Dial, EnableLog, Encode, Error,
         __decrypt, EventLoop, GetChannelData, GetChannelDataOf, GetCommand, GetLastError, GetMeta, GetOS,
         Go, GoCall, TypedRoutine, AsyncRoutine, Hash, HMAC, HttpOption, IoArgs, ToF64,
@@ -2311,11 +2613,11 @@ pub mod prelude {
         Result, SendCommand, SetChannelData, SetErrorFilter, Sleep, StrDecode, SysInfo, ToArg, Unix, UnixNano,
         Version, _D, _T, JSONParse, MD5, UUID, _CDelay, _Cross, _N,
     };
-    pub use crate::{
+    pub use super::{
         Account, Asset, DBResult, Data, Depth, Exchange, Funding, HttpRet, Index, JsonValue, Market, MarketOrder, Order,
         OrderCondition, OrderId, Position, Record, Ticker, Trade,
     };
-    pub use crate::{
+    pub use super::{
         ORDER_CONDITION_TYPE_GENERIC, ORDER_CONDITION_TYPE_OCO, ORDER_CONDITION_TYPE_SL,
         ORDER_CONDITION_TYPE_TP, ORDER_OFFSET_CLOSE, ORDER_OFFSET_OPEN, ORDER_STATE_CANCELED,
         ORDER_STATE_CLOSED, ORDER_STATE_PENDING, ORDER_STATE_UNKNOWN, ORDER_TYPE_BUY,
@@ -2326,6 +2628,8 @@ pub mod prelude {
         FUTURES_OP_SET_CONTRACT_TYPE, FUTURES_OP_GET_POSITION, EXCHANGE_OP_IO_CONTROL,
     };
     pub use crate::{Log, LogStatus, Panic, _C, _G};
-    pub use crate::{TA, TAHelper, Ticks};
-    pub use crate::{BigDecimal, BigFloat, Decimal, ToDecimal};
+    pub use super::{TA, TAHelper, Ticks};
+    pub use super::{BigDecimal, BigFloat, Decimal, ToDecimal};
+    // The new-model primitives come with the prelude (legacy API and `ctx` can be mixed).
+    pub use super::ctx;
 }
