@@ -59,7 +59,7 @@ In `references/api.zh.md` the same headings are Chinese: `## 通用约定` (`###
 ### IO          exchange.IO, exchange.IO("api" | "currency" | "base" | "rate", ...), exchange.IO(mode, value)   (per-exchange IO commands: the brand pages under ## Exchanges)
 ### Network     HttpQuery, HttpQuery_Go, Dial, Mail, Mail_Go
 ### Storage     _G, DBExec, SetChannelData, GetChannelData
-### Threads     exchange.Go, EventLoop, ctx.subscribe, ctx.poll, ctx.book, threading, Thread, ThreadLock, ThreadEvent, ThreadCondition, ThreadDict, Server (threading.Serve)
+### Threads     exchange.Go, EventLoop, ctx.subscribe, ctx.poll, Subscription (book, positions, balances, unsubscribe), threading, Thread, ThreadLock, ThreadEvent, ThreadCondition, ThreadDict, Server (threading.Serve)
 ### TA          TA.MACD, KDJ, RSI, ATR, OBV, MA, EMA, BOLL, Alligator, CMF, Highest, Lowest, SMA
 ### Talib       talib.* by family (#### OverlapStudies, MomentumIndicators, ..., PatternRecognition), each function a ##### heading
 ### OS          os, File, ListFilesResult, FileStat
@@ -70,7 +70,7 @@ In `references/api.zh.md` the same headings are Chinese: `## 通用约定` (`###
 ### Failures and null values  #### Failed calls return a null value, Unsupported functions, Programming errors throw, Pattern
 ## Exchanges     Names table (exchange.GetName() -> brand, type, aliases)
 ### Capability Matrix
-### Centralized Exchanges           #### AscendEx, Backpack, BigONE, Binance, Bitfinex, bitFlyer, Bitget, Bithumb, Bitstamp, Bybit, Coincheck, Coinone, CoinW, Crypto.com, DeepCoin, Deribit, DigiFinex, Gate, Gemini, HashKey, HitBTC, HTX, Korbit, Kraken, KuCoin, LBank, MEXC, OKX, Poloniex, Upbit, WEEX, WOO X, Zaif
+### Centralized Exchanges           #### Backpack, BigONE, Binance, Bitfinex, bitFlyer, Bitget, Bithumb, Bitstamp, Bybit, Coincheck, Coinone, CoinW, Crypto.com, DeepCoin, Deribit, DigiFinex, Gate, Gemini, HashKey, HitBTC, HTX, Korbit, Kraken, KuCoin, LBank, MEXC, OKX, Poloniex, Upbit, WEEX, WOO X, Zaif
 ### Decentralized Exchanges (DEX)   #### Hyperliquid, Lighter, edgeX, Aster, Aevo, WOOFi Pro, Uniswap (##### its IO commands), Jupiter (##### its IO commands), KyberSwap, 1inch, OKX DEX
 ### Prediction Markets              #### Polymarket
 ### Securities and Futures          #### Futu Securities, Interactive Brokers

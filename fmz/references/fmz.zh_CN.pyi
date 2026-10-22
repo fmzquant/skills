@@ -1787,6 +1787,144 @@ class IHttpRet:
     Error: Optional[str]
     """请求失败原因(方法 + URL + 底层错误),只在 ``StatusCode`` 为 0 时出现。"""
 
+class StopError(RuntimeError):
+    """实盘停止后（包括 ``onexit()`` 执行期间）``ctx.poll()`` 等阻塞等待抛出的异常；不要捕获吞掉，
+    让它向上传播，策略即可正常结束。"""
+
+class Subscription:
+    """WebSocket 推送订阅，由 ``ctx.subscribe()`` 返回。
+
+    订阅属于调用 ``ctx.subscribe()`` 的线程：它的事件只投给这个线程，也只有这个线程能
+    ``unsubscribe()``。把它（或它的 ``id``）传给 ``ctx.poll()`` 只取这一路的事件。
+    """
+    id: int
+    """事件流 ID（这路订阅的事件的 ``stream`` 字段）。"""
+    ex: int
+    """账户下标（``exchanges[ex]``）。"""
+    channel: str
+    """``"ticker"``、``"bbo"``、``"depth"``、``"trade"``、``"kline"``、``"tickers"`` 或 ``"private"``。"""
+    symbol: str
+    """品种代码（``private``、``tickers`` 为空）。"""
+    depth: int
+    """深度订阅的档数（0 为交易所默认档数）。"""
+    interval: int
+    """K线周期（秒）。"""
+
+    def info(self) -> dict:
+        """订阅身份字段的字典：``{id, ex, channel, symbol, depth, interval}``。"""
+        ...
+
+    def book(self, n: Optional[int] = None) -> dict:
+        """这路深度订阅自己的订单簿：``{"bids": [[价格, 数量], ...], "asks": [...]}``（bids 降序、asks
+        升序；``n`` 缺省为订阅档数；收到第一份快照前两边为空）。不是深度订阅或已退订时抛出异常。"""
+        ...
+
+    def positions(self) -> Optional[list]:
+        """``private`` 订阅的最新持仓（行 ``{symbol, side, posSide, qty, avgPx, profit?, margin?, liqPx?,
+        markPx?, leverage?, time}``）；账户快照就绪前为 ``None``（状态未知，不是没有持仓）；现货为 ``[]``。"""
+        ...
+
+    def balances(self) -> Optional[list]:
+        """``private`` 订阅的最新余额（行 ``{asset, free, frozen, equity?, upnl?, margin?, time}``）；
+        账户快照就绪前为 ``None``。"""
+        ...
+
+    def unsubscribe(self) -> None:
+        """退订（重复调用不报错）。只有订阅它的线程能退订。"""
+        ...
+
+class SubscriptionList(list[Subscription]):
+    """批量 ``ctx.subscribe()``（``symbol`` 为列表）的结果：与 symbol 同序的订阅对象，可以整个传给
+    ``ctx.poll()``。"""
+
+    def unsubscribe(self) -> None:
+        """退订全部元素。"""
+        ...
+
+class CtxEvent(dict):
+    """``ctx.poll()`` 返回的事件：字段与 JavaScript 事件相同的字典（``ev["kind"]`` 与 ``ev.kind`` 都可以）。
+
+    公共字段：``kind``（1 ticker/bbo/tickers、3 订单簿、4 逐笔成交、5 K线、16 订单回报、17 持仓、
+    18 余额、32 定时器、33 网关状态、35 初始化状态）、``stream``、``type``（``"data"`` / ``"status"`` /
+    ``"timer"``）、``channel``、``ex``、``symbol``、``seq``、``ts``。先判断 ``type`` / ``kind``：kind 35
+    的 ``channel`` 是它所属订阅的频道。kind 35 带 ``prefillStatus``（1 就绪、2 失败）和 ``message``
+    （失败原因）。
+    """
+    kind: int
+    stream: int
+    type: str
+    channel: str
+    ex: int
+    symbol: str
+    seq: int
+    ts: float
+
+    def book(self, n: Optional[int] = None) -> dict:
+        """深度事件（kind 3）：它所属订阅的订单簿，同 ``Subscription.book``。"""
+        ...
+
+class Ctx:
+    """全局 ``ctx``：WebSocket 推送订阅（与 JavaScript 的 ``ctx`` 语义相同）。
+
+    示例::
+
+        def main():
+            book = ctx.subscribe(exchange, {"channel": "depth", "depth": 20})
+            acct = ctx.subscribe(exchange, {"channel": "private"})
+            while True:
+                ev = ctx.poll([], 1000)
+                if ev is None:
+                    continue
+                if ev.type == "status":
+                    if ev.kind == 35 and ev.prefillStatus == 2:
+                        Log("订阅失败:", ev.channel, ev.message)
+                    continue
+                if ev.channel == "depth":
+                    b = ev.book(5)
+                elif ev.channel in ("positions", "balance"):
+                    Log(acct.positions(), acct.balances())
+    """
+    STREAM_TIMER: int
+    """引擎定时器（kind 32）的内置事件流。"""
+    STREAM_STATUS: int
+    """网关状态（kind 33）的内置事件流。"""
+
+    def subscribe(self, ex: Union[IExchange, int, str], opts: dict) -> Union[Subscription, SubscriptionList]:
+        """订阅WebSocket推送：品种行情、全市场ticker或账户私有流。
+
+        参数:
+            ex: 交易所对象（``exchange``、``exchanges[1]``）或账户下标。
+            opts: ``{channel, symbol, depth, interval, mode, buffer}``：``channel`` 为 ``ticker``（默认）、
+                ``bbo``、``depth``、``trade``、``kline``、``tickers``（全市场，不带 symbol）或 ``private``
+                （订单 + 持仓 + 余额，不带 symbol）；行情频道必须给 ``symbol``（``ex`` 是交易所对象时可省略，
+                取它当前的交易对），列表为批量订阅；``depth`` 档数；``interval`` K线周期（秒）；
+                ``mode: "latest"`` 或 ``buffer: N``。
+
+        返回:
+            ``Subscription``；``symbol`` 为列表时返回 ``SubscriptionList``（整批先校验）。选项不合法时抛出
+            异常；交易所拒绝的订阅不抛异常，而是在它自己的事件流上收到 kind 35 失败事件。
+        """
+        ...
+
+    def poll(self, streams: Optional[Union[Subscription, int, list]] = None,
+             timeout_ms: Optional[int] = None) -> Optional[CtxEvent]:
+        """取本线程订阅的下一条事件。
+
+        参数:
+            streams: ``None`` / ``[]`` 表示本线程的全部订阅；否则为订阅对象、事件流 ID、
+                SubscriptionList 或它们的嵌套列表。
+            timeout_ms: ``None`` 一直等待，``0`` 不等待，正数为最多等待的毫秒数。
+
+        返回:
+            事件；超时返回 ``None``。实盘停止后抛出 ``StopError``。
+        """
+        ...
+
+    def connectors(self) -> list:
+        """已加载的交易所：``[{ex, label, name, symbol, interval, orderIdScope, feed}, ...]``；
+        ``feed`` 为推送缓冲计数 ``{ticksDropped, backpressure, ringCapacity}``（增长快说明策略处理不过来）。"""
+        ...
+
 # ==================== Global Variables ====================
 
 ext = object()
@@ -1800,6 +1938,9 @@ exchanges: list[IExchange] = [IExchange()]
 """所有已添加的交易所对象列表。通过 ``exchanges[i]`` 访问第 i 个交易所。"""
 
 exchange: IExchange = exchanges[0]
+
+ctx: Ctx = Ctx()
+"""WebSocket 推送：``ctx.subscribe()``、``ctx.poll()``、``ctx.connectors()``（仅实盘）。"""
 
 # ==================== Global Functions ====================
 

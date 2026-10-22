@@ -1124,18 +1124,18 @@ fn main() {
 
 #### Event-Driven
 
-Besides polling at a fixed interval, a strategy can wait for events and handle them as they arrive, which avoids useless requests and reacts faster to market changes.
+Besides polling at fixed intervals, a strategy can also wait for events to arrive before processing them, which both reduces wasted requests and responds faster to market changes.
 
 ##### EventLoop
 
-`EventLoop` waits for events such as the completion of concurrent tasks started with ```exchange.Go()``` or ```HttpQuery_Go()```, readable data on a WebSocket connection, or thread messages; when one occurs it returns the event information and the strategy then reads the corresponding data. Events are recorded only from the first call of ```EventLoop()```, so call ```EventLoop(-1)``` once before starting concurrent tasks:
+`EventLoop` waits for events such as the completion of concurrent tasks like ```exchange.Go()``` and ```HttpQuery_Go()```, data becoming readable on a WebSocket connection, or the receipt of a thread message; when an event occurs it returns the event information, and the strategy then reads the corresponding data. Events are only recorded from the first call to ```EventLoop()``` onward, so call ```EventLoop(-1)``` once before launching concurrent tasks:
 
 ```javascript
 function main() {
-    EventLoop(-1)                       // start recording events so none are missed
+    EventLoop(-1)                       // Start recording events so that none occurring afterwards are missed
     var r1 = exchange.Go("GetTicker")
     var r2 = exchange.Go("GetDepth")
-    var ev = EventLoop(1000)            // wait up to 1 second for either task to finish
+    var ev = EventLoop(1000)            // Wait for any concurrent task to complete, up to 1 second
     Log("event:", ev)
     Log("ticker:", r1.wait(), "depth:", r2.wait())
 }
@@ -1143,39 +1143,124 @@ function main() {
 
 ##### ctx.subscribe / ctx.poll
 
-```JavaScript``` and ```Rust``` strategies can also use the docker's event subscription interface: ```ctx.subscribe()``` subscribes to market data or order updates for an account and symbol and returns a stream ID; ```ctx.poll()``` takes the next event (optionally with a timeout), and the strategy handles it according to its ```kind```. ```Python``` strategies do not support it.
+A strategy can also consume the exchange's WebSocket push feeds directly: `ctx.subscribe` subscribes to market data for a given account, the market-wide ticker feed, or the account's private stream, and returns a `Subscription` object; `ctx.poll` retrieves the next pushed event (with an optional wait timeout), and the strategy handles each event according to its ```channel```. ```JavaScript``` and ```Python``` strategies use the global ```ctx``` object; ```Rust``` strategies use the functions of the same name in the ```ctx``` module.
 
 ```javascript
 function main() {
-    ctx.subscribe(0, "BTC_USDT", {channel: "ticker"})   // 0: index of the account in exchanges
-    ctx.subscribe(0, "", {channel: "orders"})           // order updates
+    // The first argument is the exchange object; if no symbol is given, its current trading pair is used
+    var tk = ctx.subscribe(exchange, {channel: "ticker"})
+    var book = ctx.subscribe(exchange, {channel: "depth", depth: 20})    // 20-level order book
+    // Account private stream: order updates, positions and balances are all pushed through this one feed
+    var acct = ctx.subscribe(exchange, {channel: "private"})
     while (true) {
-        const ev = ctx.poll([], 1000)                    // []: all subscriptions; wait up to 1 s
+        const ev = ctx.poll([], 1000)                    // [] means all subscriptions of this thread; wait up to 1 second
         if (!ev) {
             continue
         }
-        if (ev.kind === 1) {
+        if (ev.type === "status") {                      // Handle gateway status and subscription status events separately first
+            if (ev.kind === 35 && ev.prefillStatus === 2) {
+                Log("subscription failed:", ev.channel, ev.message)
+            }
+            continue
+        }
+        if (ev.channel === "ticker") {
             Log("ticker:", ev.symbol, ev.bid, ev.ask, ev.last)
-        } else if (ev.kind === 16) {
+        } else if (ev.channel === "depth") {
+            // Depth events carry no level data; read it from this subscription's own order book
+            const b = ev.book(1)
+            if (b.bids.length > 0 && b.asks.length > 0) {
+                Log("bid1:", b.bids[0][0], "ask1:", b.asks[0][0])
+            }
+        } else if (ev.channel === "orders") {
             Log("order:", ev.id, ev.state, ev.filledQty)
+        } else if (ev.channel === "positions" || ev.channel === "balance") {
+            Log("positions:", acct.positions(), "balances:", acct.balances())
         }
     }
 }
 ```
 
-- ```channel``` can be ```ticker```, ```bbo```, ```depth```, ```trade```, ```kline``` (```interval``` is the period in seconds) or ```orders```.
-- Event ```kind```: 1 ticker, 3 depth (the event only signals that the order book changed; read the levels with ```ctx.book(ev.ex, ev.symbol, n)```), 4 trade, 5 K-line, 16 order update.
-- If market data subscriptions are not consumed in time, only the latest data is kept or the oldest is dropped; order updates are never dropped, so the strategy must keep calling ```ctx.poll()```.
-- ```EventLoop()``` and ```ctx.poll()``` take events from the same queues, so a strategy should use only one of them.
+```Python``` works the same way: options are a dict, and events are dicts too (attribute access such as ```ev.kind``` also works):
 
-In ```Rust``` the calls are ```ctx::subscribe()``` and ```ctx::poll()```; events are raw structures whose prices and quantities are fixed-point integers:
+```python
+def main():
+    tk = ctx.subscribe(exchange, {"channel": "ticker"})
+    book = ctx.subscribe(exchange, {"channel": "depth", "depth": 20})
+    acct = ctx.subscribe(exchange, {"channel": "private"})
+    while True:
+        ev = ctx.poll([], 1000)                          # Returns None on timeout
+        if ev is None:
+            continue
+        if ev.type == "status":
+            if ev.kind == 35 and ev.prefillStatus == 2:
+                Log("subscription failed:", ev.channel, ev.message)
+            continue
+        if ev.channel == "ticker":
+            Log("ticker:", ev.symbol, ev.bid, ev.ask, ev.last)
+        elif ev.channel == "depth":
+            b = ev.book(1)
+            if b["bids"] and b["asks"]:
+                Log("bid1:", b["bids"][0][0], "ask1:", b["asks"][0][0])
+        elif ev.channel == "orders":
+            Log("order:", ev.id, ev.state, ev.filledQty)
+        elif ev.channel in ("positions", "balance"):
+            Log("positions:", acct.positions(), "balances:", acct.balances())
+```
+
+- The first argument is the exchange object (```exchange```, ```exchanges[1]```) or the account's index in ```exchanges```; the second argument is the options object ```{channel, symbol, depth, interval, mode, buffer}```, with the instrument specified in ```symbol```.
+- ```channel``` can be ```ticker```, ```bbo```, ```depth``` (```depth``` is the number of levels), ```trade```, ```kline``` (```interval``` is the candlestick period in seconds), ```tickers``` or ```private```. ```private``` takes no instrument; order updates, positions and balances are all pushed through this one feed, and the corresponding events have ```channel``` set to ```orders```, ```positions``` and ```balance``` respectively. After subscribing, an account snapshot is pushed first; once it is ready, the latest positions and balances can be obtained via the subscription object's ```positions()``` and ```balances()```.
+- ```tickers``` takes no instrument; a single subscription receives tickers for every instrument on the exchange, and the event's ```symbol``` is the corresponding instrument. Only exchanges that provide a market-wide push feed support this channel; see the "Push" column of the `capability matrix` for details. When it is not supported, the subscription receives a failed status event.
+- When ```symbol``` is an array, multiple instruments are subscribed at once and an array of subscription objects is returned in the same order: the whole batch is validated first, and if any instrument is invalid, nothing in the batch is subscribed. The array can be passed directly to ```ctx.poll()```, and calling the array's ```unsubscribe()``` unsubscribes all of them at once.
+- Every event contains fields such as ```stream``` (the ```id``` of the subscription it belongs to), ```type``` and ```channel```; see `ctx.poll` for field details. A depth event only signals that the order book has been updated; the level data must be read via ```ev.book(n)``` or the subscription object's ```book(n)```.
+- Identical subscriptions share a single push feed. To unsubscribe, call the subscription object's ```unsubscribe()```; the subscription is actually cancelled only when the last subscription object unsubscribes. A subscription that the exchange does not support does not throw an exception; instead, that subscription receives a status event with ```prefillStatus``` set to ```2```.
+- If market data subscriptions are not consumed promptly, only the latest data is kept or the oldest data is dropped; order updates, positions and balances are never dropped. The strategy must keep calling ```ctx.poll()```. To check whether events are being processed in time, look at the ```feed``` counters for each exchange in ```ctx.connectors()```.
+- Push feeds and REST interfaces are independent of each other: functions such as ```exchange.GetTicker()``` and ```exchange.GetDepth()``` still call the exchange's REST API on every request and do not read push data. See the respective exchange pages for the push channels each exchange supports.
+- In ```JavaScript``` and ```Rust```, ```EventLoop()``` and ```ctx.poll()``` in the same thread take events from the same event queue, so a thread should use only one of them; in ```Python```, ```EventLoop()``` has its own separate queue and does not compete with ```ctx.poll()```.
+
+A subscription belongs to the thread that called ```ctx.subscribe()```: events are delivered only to that thread, ```ctx.poll()``` only retrieves events for the current thread's subscriptions, and only that thread can unsubscribe. To dedicate a thread to a set of market data, subscribe within that thread; when different threads subscribe to the same content, the exchange side is subscribed only once, but each thread receives its own copy:
+
+```javascript
+function main() {
+    var t = threading.Thread(function(symbols) {
+        var subs = ctx.subscribe(0, {channel: "depth", symbol: symbols, depth: 5})
+        while (true) {
+            var ev = ctx.poll([], 1000)                  // Only the two feeds subscribed by this thread
+            if (ev && ev.kind === 3) {
+                var b = ev.book(1)
+                if (b.bids.length > 0 && b.asks.length > 0) {
+                    Log(ev.symbol, "bid1:", b.bids[0][0], "ask1:", b.asks[0][0])
+                }
+            }
+        }
+    }, ["ETH_USDT", "SOL_USDT"])
+    var acct = ctx.subscribe(0, {channel: "private"})   // The main thread handles only the account private stream
+    while (true) {
+        var ev = ctx.poll([acct], 1000)
+        if (ev && ev.kind === 16) {
+            Log("order:", ev.id, ev.state)
+        }
+    }
+}
+```
+
+```Python``` creates threads with the standard library's ```threading.Thread``` and works the same way; when a thread ends, its subscriptions are unsubscribed automatically.
+
+In ```Rust``` strategies, the calls are ```ctx::subscribe()``` and ```ctx::poll()```; subscription options are built with ```ctx::SubOpts```, batch subscriptions use ```ctx::subscribe_many()```, and any thread can subscribe. Events are raw structs; after importing ```sdk::ctx::EventExt```, methods such as ```ev.channel()```, ```ev.book(n)```, ```ev.ticker()```, ```ev.order()``` and ```ev.feed_status()``` read them according to event type (prices and quantities are already converted to real numbers, so no ```unsafe``` code is needed):
 
 ```rust
+use sdk::ctx::EventExt;
+
 fn main() {
-    let s = ctx::subscribe(0, "BTC_USDT", ctx::SubOpts::ticker()).unwrap();
+    let book = ctx::subscribe(exchange, ctx::SubOpts::depth(20)).unwrap();
     loop {
-        match ctx::poll(&[s], Some(1000)) {
-            ctx::Polled::Event(ev) => Log!("event kind:", ev.kind),
+        match ctx::poll(&[book.id()], Some(1000)) {
+            ctx::Polled::Event(ev) => {
+                if let Ok(b) = ev.book(1) {
+                    if !b.bids.is_empty() && !b.asks.is_empty() {
+                        Log!("bid1:", b.bids[0].0, "ask1:", b.asks[0].0);
+                    }
+                }
+            }
             ctx::Polled::Stopped => break,
             _ => {}
         }
@@ -2153,16 +2238,16 @@ Every function, structure and constant of the API reference, grouped by its cate
 
 | Name | Description |
 | - | - |
-| `exchange.Buy` | Places a buy order. |
-| `exchange.Sell` | Places a sell order. |
-| `exchange.CreateOrder` | Places orders. |
-| `exchange.ModifyOrder` | Modifies an existing regular order, allowing you to modify the order's price and quantity. |
+| `exchange.Buy` | Submits a buy order. |
+| `exchange.Sell` | Submits a sell order. |
+| `exchange.CreateOrder` | Places an order. |
+| `exchange.ModifyOrder` | Modifies the price and quantity of an existing regular order. |
 | `exchange.CancelOrder` | Cancels an order. |
 | `exchange.GetOrder` | Obtains order information. |
 | `exchange.GetOrders` | Obtains the current unfilled orders. |
 | `exchange.GetHistoryOrders` | Retrieves the historical orders of the current trading pair or contract, and supports specifying a particular trading instrument. |
 | `exchange.CreateConditionOrder` | Creates a conditional order. |
-| `exchange.ModifyConditionOrder` | Modifies an existing conditional order, allowing modification of the order amount, trigger condition, and execution price of the conditional order. |
+| `exchange.ModifyConditionOrder` | Modifies an existing conditional order, including its order quantity, trigger condition and execution price. |
 | `exchange.CancelConditionOrder` | Cancels a conditional order. |
 | `exchange.GetConditionOrder` | Retrieves information about a specified conditional order. |
 | `exchange.GetConditionOrders` | Obtains unfinished conditional orders (conditional orders that have not yet been triggered or canceled). |
@@ -2232,7 +2317,7 @@ Every function, structure and constant of the API reference, grouped by its cate
 | Name | Description |
 | - | - |
 | `_G` | Persistently store data. |
-| `DBExec` | Database interface function. |
+| `DBExec` | Executes SQL statements against the live trading database. |
 | `SetChannelData` | Publishes the latest status data to a channel. |
 | `GetChannelData` | Subscribes to the channel data of a specified live trading bot. |
 
@@ -2241,10 +2326,18 @@ Every function, structure and constant of the API reference, grouped by its cate
 | Name | Description |
 | - | - |
 | `exchange.Go` | Multi-threaded asynchronous support function that can convert the operations of all supported functions into asynchronous concurrent execution. |
-| `EventLoop` | Listens for events and returns when any ```WebSocket``` has readable data, or when concurrent tasks such as ```exchange.Go()``` or ```HttpQuery_Go()``` complete. |
-| `ctx.subscribe` | Subscribes to market data pushes for one instrument of an account, or to the order updates of an account, and returns an event stream ID. |
-| `ctx.poll` | Takes the next subscription event, optionally waiting with a timeout. |
-| `ctx.book` | Reads the order book maintained by the docker. |
+| `EventLoop` | Listens for events. |
+| `ctx.subscribe` | Subscribes to WebSocket push streams (market data for a symbol, market-wide tickers, or an account's private streams) and returns a Subscription object. |
+| `ctx.poll` | Takes the next push event from the current thread's subscriptions, with an optional wait timeout. |
+
+##### Threads/Subscription
+
+| Name | Description |
+| - | - |
+| `Subscription.book` | Reads the order book maintained by this depth subscription itself. |
+| `Subscription.positions` | Reads the latest positions that a private subscription maintains from pushed updates. |
+| `Subscription.balances` | Reads the latest balances that a private subscription keeps up to date from pushed events. |
+| `Subscription.unsubscribe` | Unsubscribe: releases the reference held by this subscription object; the actual unsubscribe request is sent to the exchange only when the last reference is released. |
 
 ##### Threads/threading
 

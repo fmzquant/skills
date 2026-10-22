@@ -1018,6 +1018,16 @@ interface IExchange {
     GetUSDCNY(): number;
 
     /**
+     * 获取该交易所对象在 exchanges 数组里的下标（exchange 为 0）；ctx.subscribe / ctx.rest 等
+     * ctx.* 的第一参可以直接传交易所对象，宿主取的就是它
+     * @returns 下标
+     * ```js
+     * Log(exchanges[1].GetIndex());  // 1
+     * ```
+     */
+    GetIndex(): number;
+
+    /**
      * 获取交易所自定义标签名（在平台配置交易所时设置）
      * @returns 标签字符串
      * ```js
@@ -3207,6 +3217,8 @@ declare interface IThreadRet {
     terminated: boolean;
     /** 线程执行耗时（纳秒） */
     elapsed: number;
+    /** 线程函数抛出的异常文本（正常结束为 null） */
+    error: string | null;
     /** 线程函数的返回值 */
     ret: any;
 }

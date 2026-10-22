@@ -1,13 +1,16 @@
 //! Rust strategy SDK — API stub (rust-analyzer + AI context).
 //! The SDK API below is auto-injected via the prelude: call it directly
-//! (exchange, exchanges, TA, Log!/LogStatus!/LogProfit!, _G!/_C!, types, params,
+//! (exchange, exchanges, TA, Log!/LogStatus!/LogProfit, _G!/_C!, types, params,
 //! ...) — no `use`/`mod`/`extern crate` is needed for it.
 //!
 //! Lifecycle: the strategy entry is `fn main()`. A strategy may also optionally
 //! define `fn init()` and/or `fn onexit()` (both no-arg) — the bootstrap wires
 //! them automatically: `init()` runs before `main()`, `onexit()` runs on exit
-//! (same as the JS entry functions). `OnExit(...)` can register extra exit
-//! hooks programmatically.
+//! (normal return or robot stop; same as the JS entry functions). There is no
+//! `OnExit(...)` registration call — define `fn onexit()` instead.
+//!
+//! Threads: use `std::thread` / `std::sync::mpsc` directly; `exchange`, `Log!` and
+//! every other SDK call are thread-safe (there is no `__Thread`/threadId model).
 //!
 //! Third-party crates ARE supported. The strategy source is the only file you
 //! write (there is no separate Cargo.toml), so declare deps with a cargo-script
@@ -39,13 +42,19 @@
 //!     number             -> f64                 // index/count: `N as usize` / `N as i64`
 //!     boolean            -> bool
 //!     string / password  -> &str                // pass straight to the API; it is NOT String
+//!     encrypted string   -> Decrypted           // derefs to &str: `&*SECRET` / `SECRET.to_string()`
 //!     dropdown, single   -> f64 | bool | &str   // by the selected option's value type
 //!     dropdown, multiple -> &[i64] (all ints) | &[f64] (any decimal) | &[&str]
 //!     anything else      -> &str                // the value's raw JSON text — parse it
 //! So e.g. `exchange.GetTicker(SYMBOL)` works because SYMBOL is `&str` (passing a
 //! `String` would fail `impl Into<Option<&str>>`); a numeric param is `f64`, so
 //! cast for integer uses: `let n = Period as usize;`. The full parameter set is
-//! also available as JSON text via `params()`.
+//! also available as JSON text via `params()` ("" when the runtime has no
+//! parameter channel — the baked constants are the primary interface).
+//!
+//! The new-model primitives (`ctx::subscribe`/`ctx::poll`/...) are also in scope
+//! (`ctx` module, raw event vocabulary `Event`/`EV_*` from `abi`) and can be mixed
+//! with this legacy API; read events with `use sdk::ctx::EventExt;` (no `unsafe`).
 
 #![allow(non_snake_case, non_upper_case_globals, dead_code, unused_variables)]
 
@@ -53,20 +62,17 @@ use std::collections::BTreeMap;
 
 /// A parsed JSON value (the Rust equivalent of the other runtimes' `any`).
 /// Read scalars with `as_f64`/`as_i64`/`as_bool`/`as_str`; navigate objects/arrays
-/// with `get(key)`/`get(i)` or indexing (`v["a"][0]`).
-#[derive(Clone, Debug, PartialEq)]
+/// with `get(key)`/`get(i)` or indexing (`v["a"][0]`). `Display` (`to_string()`,
+/// `format!("{}", v)`) prints compact JSON.
+#[derive(Clone, Debug, Default, PartialEq)]
 pub enum JsonValue {
+    #[default]
     Null,
     Bool(bool),
     Number(f64),
     String(String),
     Array(Vec<JsonValue>),
     Object(BTreeMap<String, JsonValue>),
-}
-impl Default for JsonValue {
-    fn default() -> Self {
-        JsonValue::Null
-    }
 }
 /// Index into a [`JsonValue`] — a string key (objects) or a `usize` (arrays);
 /// lets `get(...)` and `value[...]` take either.
@@ -156,6 +162,12 @@ impl<I: Index> std::ops::Index<I> for JsonValue {
         todo!()
     }
 }
+/// Compact JSON serialization (no whitespace).
+impl std::fmt::Display for JsonValue {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        todo!()
+    }
+}
 /// Parse a JSON string into a [`JsonValue`] tree (the canonical `JSONParse`);
 /// `None` on malformed input.
 pub fn JSONParse(s: &str) -> Option<JsonValue> {
@@ -163,13 +175,12 @@ pub fn JSONParse(s: &str) -> Option<JsonValue> {
 }
 
 /// Error returned by fallible API calls (`Result<T>`).
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Error {
     /// Host signalled stop (robot stop / timeout).
     Stopped,
-    /// Backtest reached the end of its time window (engine EOTException).
-    Eot,
-    /// An exchange/API error, carrying the host's message.
+    /// A connector / network / exchange error, carrying the message (HTTP code,
+    /// exchange code and a snippet of the response body included).
     Api(String),
 }
 
@@ -177,7 +188,6 @@ impl std::fmt::Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Error::Stopped => write!(f, "strategy stopped by host"),
-            Error::Eot => write!(f, "strategy stopped by host (end of backtest)"),
             Error::Api(s) => write!(f, "{}", s),
         }
     }
@@ -196,8 +206,8 @@ pub enum Arg {
     Float(f64),
 }
 
-/// Converts a value into an [`Arg`] for the variadic `Log!`/`LogStatus!` macros
-/// and [`IO`](Exchange::IO)-style args.
+/// Converts a value into an [`Arg`] for the variadic `Log!`/`LogStatus!`/`Panic!`
+/// macros and [`IO`](Exchange::IO)-style args.
 pub trait ToArg {
     fn to_arg(&self) -> Arg;
 }
@@ -230,9 +240,10 @@ impl ToArg for &String {
         Arg::Str(self.to_string())
     }
 }
+/// Objects/arrays log as compact JSON, scalars as their value.
 impl ToArg for JsonValue {
     fn to_arg(&self) -> Arg {
-        Arg::Str(format!("{:?}", self))
+        todo!()
     }
 }
 impl ToArg for Arg {
@@ -250,6 +261,7 @@ impl ToArg for Error {
         Arg::Str(self.to_string())
     }
 }
+/// `Log!(exchange.GetTicker(""))` — `Ok` logs the value, `Err` the error text.
 impl<T: ToArg> ToArg for std::result::Result<T, Error> {
     fn to_arg(&self) -> Arg {
         match self {
@@ -268,18 +280,19 @@ impl<K: std::fmt::Debug, V: std::fmt::Debug> ToArg for BTreeMap<K, V> {
         Arg::Str(format!("{:?}", self))
     }
 }
+// Data structures log as `{Field: value, ...}` (Debug without the type name).
 macro_rules! to_arg_debug {
     ($($t:ty),* $(,)?) => {$(impl ToArg for $t {
         fn to_arg(&self) -> Arg { Arg::Str(format!("{:?}", self)) }
     })*};
 }
 to_arg_debug!(
-    Ticker, Record, MarketOrder, Depth, Account, Asset, OrderCondition, Order,
-    Position, Trade, Funding, Data,
+    Data, DBResult, HttpRet, Ticker, Record, MarketOrder, Depth, Account, Asset, OrderCondition,
+    Order, Position, Trade, Funding, Market,
 );
 
-/// Argument forms for [`IO`](Exchange::IO)/[`Go`](Exchange::Go)/[`Futures_OP`](Exchange::Futures_OP):
-/// a tuple of mixed [`ToArg`] values, a single value, a `Vec<Arg>`, or `()`.
+/// Argument forms for [`IO`](Exchange::IO)/[`Go`](Exchange::Go): a tuple of mixed
+/// [`ToArg`] values, a single value, a `Vec<Arg>`, or `()`.
 pub trait IoArgs {
     #[doc(hidden)]
     fn into_io_args(self) -> Vec<Arg>;
@@ -320,13 +333,15 @@ impl_io_args_tuple!(A 0, B 1, C 2, D 3);
 impl_io_args_tuple!(A 0, B 1, C 2, D 3, E 4);
 impl_io_args_tuple!(A 0, B 1, C 2, D 3, E 4, F 5);
 
+/// Backend of the variadic log macros; `kind` = "Log"/"LogStatus"/"Panic".
 #[doc(hidden)]
-pub fn log_args(op: &str, args: &[Arg]) {
-    let _ = (op, args);
+pub fn log_args(kind: &str, args: &[Arg]) {
+    let _ = (kind, args);
 }
 
+/// The [`_C!`] retry delay in milliseconds (set by [`_CDelay`], default 3000).
 #[doc(hidden)]
-pub fn retry_delay_ms() -> f64 {
+pub fn c_retry_delay_ms() -> u64 {
     todo!()
 }
 
@@ -368,6 +383,13 @@ pub const PD_LONG: i32 = 0;
 pub const PD_SHORT: i32 = 1;
 pub const PD_LONG_YD: i32 = 2;
 pub const PD_SHORT_YD: i32 = 3;
+
+// Futures_OP / Exchange_OP operation codes (legacy op numbering).
+pub const FUTURES_OP_SET_MARGIN: i64 = 0;
+pub const FUTURES_OP_SET_DIRECTION: i64 = 1;
+pub const FUTURES_OP_SET_CONTRACT_TYPE: i64 = 2;
+pub const FUTURES_OP_GET_POSITION: i64 = 3;
+pub const EXCHANGE_OP_IO_CONTROL: i64 = 4;
 
 pub const ORDER_CONDITION_TYPE_OCO: i32 = 0;
 pub const ORDER_CONDITION_TYPE_TP: i32 = 1;
@@ -492,8 +514,10 @@ pub struct Asset {
 }
 
 /// Take-profit / stop-loss parameters of a conditional order (`ConditionType`
-/// -1 = not set, else an `ORDER_CONDITION_TYPE_*` value).
-#[derive(Clone, Debug, Default)]
+/// -1 = not set, else an `ORDER_CONDITION_TYPE_*` value). `Default` has
+/// `ConditionType: -1` (0 is a valid OCO), so build one with
+/// `OrderCondition { ConditionType: ORDER_CONDITION_TYPE_TP, TpTriggerPrice: .., ..Default::default() }`.
+#[derive(Clone, Debug)]
 pub struct OrderCondition {
     /// `ORDER_CONDITION_TYPE_*` (-1 = a plain, non-conditional order).
     pub ConditionType: i32,
@@ -505,6 +529,17 @@ pub struct OrderCondition {
     pub SlTriggerPrice: f64,
     /// Stop-loss order price.
     pub SlOrderPrice: f64,
+}
+impl Default for OrderCondition {
+    fn default() -> Self {
+        OrderCondition {
+            ConditionType: -1,
+            TpTriggerPrice: 0.0,
+            TpOrderPrice: 0.0,
+            SlTriggerPrice: 0.0,
+            SlOrderPrice: 0.0,
+        }
+    }
 }
 
 /// An order (`exchange.GetOrder`/`GetOrders`/...).
@@ -593,12 +628,13 @@ pub struct Funding {
     pub Info: JsonValue,
 }
 
-/// A value from the exchange data store / feed (`exchange.GetData`).
+/// A row from the exchange data store / feed (`exchange.GetData`).
 #[derive(Clone, Debug, Default)]
 pub struct Data {
     /// Unix timestamp in milliseconds.
     pub Time: i64,
-    /// The stored value as a JSON string (parse it yourself).
+    /// The row's value as JSON text (parse it yourself); "null" when no row
+    /// at or before the requested offset exists.
     pub Data: String,
 }
 
@@ -606,7 +642,10 @@ pub struct Data {
 /// map. Absent optional fields default to 0 / "".
 #[derive(Clone, Debug, Default)]
 pub struct Market {
-    /// Trading-pair symbol, e.g. "BTC_USDT" (futures "BTC_USDT.swap").
+    /// The exchange's NATIVE instrument name, e.g. "BTCUSDT" (Binance spot) or
+    /// "BTC-USDT-SWAP" (OKX perpetual). The platform unified symbol ("BTC_USDT",
+    /// "BTC_USDT.swap") is the map KEY. Falls back to the unified symbol when the
+    /// exchange provides no native name.
     pub Symbol: String,
     /// Base asset (traded currency), e.g. "BTC".
     pub BaseAsset: String,
@@ -647,48 +686,101 @@ pub struct DBResult {
 }
 
 /// Full HTTP response — what [`HttpQuery`] returns when asked
-/// (`let r: HttpRet = HttpQuery(...)`); for just the body, take a `String`. In a
-/// backtest Header/Cookies are empty.
+/// (`let r: HttpRet = HttpQuery(...)`); for just the body, take a `String`.
 #[derive(Clone, Debug, Default)]
 pub struct HttpRet {
-    /// HTTP status code.
+    /// HTTP status code; 0 when no response was received (see `Error`).
     pub StatusCode: i64,
-    /// Response headers — a `{ name: [values...] }` object.
+    /// Response headers — a `{ name: [values...] }` object (a header may repeat).
     pub Header: JsonValue,
     /// Response cookies.
     pub Cookies: JsonValue,
     /// Response body.
     pub Body: String,
+    /// Failure reason (method + URL + underlying error); "" on success. On failure
+    /// `StatusCode` is 0, so one `StatusCode != 200` check catches both "no
+    /// connection" and HTTP errors.
+    pub Error: String,
 }
 
 /// Possible return types of [`HttpQuery`] — `String` (body) or [`HttpRet`]
-/// (status + headers + body). The call site's return type selects which.
+/// (status + headers + body). The call site's return type selects which. On
+/// failure the body is "" / `HttpRet` has `StatusCode` 0 and `Error` set.
 pub trait HttpResp {
     #[doc(hidden)]
-    fn want_headers() -> bool;
+    fn from_parts(status: u16, headers: &[(String, String)], body: String) -> Self;
     #[doc(hidden)]
-    fn from_http(raw: String) -> Self;
+    fn failed(err: &str) -> Self;
 }
 impl HttpResp for String {
-    fn want_headers() -> bool {
+    fn from_parts(status: u16, headers: &[(String, String)], body: String) -> Self {
         todo!()
     }
-    fn from_http(raw: String) -> Self {
+    fn failed(err: &str) -> Self {
         todo!()
     }
 }
 impl HttpResp for HttpRet {
-    fn want_headers() -> bool {
+    fn from_parts(status: u16, headers: &[(String, String)], body: String) -> Self {
         todo!()
     }
-    fn from_http(raw: String) -> Self {
+    fn failed(err: &str) -> Self {
+        todo!()
+    }
+}
+
+/// Forms the second argument of [`HttpQuery`] accepts (legacy `postData|options`):
+/// - `None` / `""` → GET;
+/// - a string (`&str`/`String`/`&String`) → a POST with that string as the body;
+/// - a [`JsonValue`] object (by value or `&`) → **options**: `method`, `body`/`data`,
+///   `headers` (string or array values), `cookie`, `timeout` (ms, default 300000),
+///   `proxy` (this request's proxy: `http(s)://`/`socks5(h)://`/`ssocks5://`),
+///   `charset` (decode the response from that charset to UTF-8), `format`
+///   (`"base64"`/`"hex"` encodes the body) — same names and meaning as JS.
+pub trait HttpOption {
+    #[doc(hidden)]
+    fn into_http_option(self) -> HttpOpt;
+}
+#[doc(hidden)]
+pub enum HttpOpt {
+    Body(String),
+    Options(JsonValue),
+}
+impl HttpOption for Option<&str> {
+    fn into_http_option(self) -> HttpOpt {
+        todo!()
+    }
+}
+impl HttpOption for &str {
+    fn into_http_option(self) -> HttpOpt {
+        todo!()
+    }
+}
+impl HttpOption for String {
+    fn into_http_option(self) -> HttpOpt {
+        todo!()
+    }
+}
+impl HttpOption for &String {
+    fn into_http_option(self) -> HttpOpt {
+        todo!()
+    }
+}
+impl HttpOption for &JsonValue {
+    fn into_http_option(self) -> HttpOpt {
+        todo!()
+    }
+}
+impl HttpOption for JsonValue {
+    fn into_http_option(self) -> HttpOpt {
         todo!()
     }
 }
 
 /// A configured exchange — use the global `exchange` (or `exchanges[i]`) to call
-/// market-data and trading methods.
-#[derive(Clone, Debug, Default)]
+/// market-data and trading methods. A zero-cost `Copy` handle
+/// (`let ex = exchanges[1];`).
+#[derive(Clone, Copy)]
 pub struct Exchange;
 
 impl Exchange {
@@ -704,6 +796,11 @@ impl Exchange {
     pub fn GetCurrency(&self) -> String {
         todo!()
     }
+    /// Switch the current trading pair, e.g. "ETH_USDT" (upper-cased; a
+    /// "ETH_USDT.swap" form also sets the contract). `Err` on an invalid symbol.
+    pub fn SetCurrency(&self, symbol: &str) -> Result<bool> {
+        todo!()
+    }
     /// Quote-currency name of the current pair, e.g. "USDT".
     pub fn GetQuoteCurrency(&self) -> String {
         todo!()
@@ -712,21 +809,106 @@ impl Exchange {
     pub fn GetBaseCurrency(&self) -> String {
         todo!()
     }
+    /// Currently set contract type (futures), e.g. "swap".
+    pub fn GetContractType(&self) -> String {
+        todo!()
+    }
+    /// Set the contract type (futures), e.g. "swap"/"quarter" (or "BTC_USDT.swap" to
+    /// set pair + contract); call before trading. Returns
+    /// `{"instrument": <native contract>, "InstrumentID": <native contract>}`; `Err` on
+    /// spot or an unknown contract (the contract stays unchanged).
+    pub fn SetContractType(&self, contract_type: &str) -> Result<JsonValue> {
+        todo!()
+    }
+    /// IB overload of [`SetContractType`](Self::SetContractType): `calendar`
+    /// ""/"trading"/"liquid" picks the TWS calendar, any other string is parsed as a
+    /// trading-session expression. Non-IB connectors ignore `calendar`.
+    pub fn SetContractTypeWithCalendar(&self, contract_type: &str, calendar: &str) -> Result<JsonValue> {
+        todo!()
+    }
+    /// Configured K-line period in **seconds**.
+    pub fn GetPeriod(&self) -> i64 {
+        todo!()
+    }
+    /// **不推荐**：优先用 `CreateOrder`(可直接指定 side: "buy"/"sell"/...),无需先 `SetDirection`。
+    /// Sets the direction ("buy"/"sell"/"closebuy"/"closesell") that `Buy`/`Sell`
+    /// use for futures orders; returns it.
+    pub fn SetDirection(&self, direction: &str) -> Result<String> {
+        todo!()
+    }
+    /// Set the max number of K-line bars cached / requested (default 200).
+    pub fn SetMaxBarLen(&self, n: i64) {
+        todo!()
+    }
+    /// Set order price/amount decimal precision (values truncated when ordering;
+    /// negative values round off integer digits).
+    pub fn SetPrecision(&self, price: i64, amount: i64) {
+        todo!()
+    }
+    /// Per-request timeout in milliseconds. Live only.
+    pub fn SetTimeout(&self, ms: impl ToF64) {
+        todo!()
+    }
+    /// Set a fiat conversion rate (prices are multiplied by it; non-positive = 1);
+    /// returns the PREVIOUS rate.
+    pub fn SetRate(&self, rate: impl ToF64) -> f64 {
+        todo!()
+    }
+    /// Effective fiat conversion rate (the value `SetRate` established, else 1).
+    pub fn GetRate(&self) -> f64 {
+        todo!()
+    }
+    /// Raw reply text of this exchange object's most recent REST call (including
+    /// `IO("api")`) — parse it with `JSONParse`. It is the exchange's original
+    /// response when the connector carries one, else the connector's reply; the
+    /// error text after a failed `IO("api")`; "" before any call.
+    pub fn GetRawJSON(&self) -> String {
+        todo!()
+    }
+    /// Current exchange API base address.
+    pub fn GetBase(&self) -> String {
+        todo!()
+    }
+    /// Set the exchange API base URL (e.g. switch to a testnet); returns the
+    /// previous base ("" if the connector rejected it). Live only.
+    pub fn SetBase(&self, base: &str) -> String {
+        todo!()
+    }
+    /// Route this exchange's HTTP/WS through a proxy ("" = direct). Live only.
+    pub fn SetProxy(&self, proxy: &str) -> Result<()> {
+        todo!()
+    }
+    /// Replace the extra request headers sent to this exchange (empty slice clears).
+    pub fn SetHeaders(&self, headers: &[(&str, &str)]) -> Result<()> {
+        todo!()
+    }
+    /// Set the leverage multiplier (futures), e.g. 10 for 10x. `Err` on spot
+    /// (no leverage) or when the exchange rejects it.
+    pub fn SetMarginLevel(&self, level: impl ToF64) -> Result<()> {
+        todo!()
+    }
 
     /// Ticker; `symbol` "" or `None` means the configured trading pair, e.g.
     /// `exchange.GetTicker("ETH_USDT")`.
     pub fn GetTicker<'a>(&self, symbol: impl Into<Option<&'a str>>) -> Result<Ticker> {
         todo!()
     }
-
+    /// Every market's latest ticker.
+    pub fn GetTickers(&self) -> Result<Vec<Ticker>> {
+        todo!()
+    }
     /// Order book; `symbol` "" or `None` means the configured trading pair.
     pub fn GetDepth<'a>(&self, symbol: impl Into<Option<&'a str>>) -> Result<Depth> {
         todo!()
     }
-
+    /// Recent public trades; `symbol` "" or `None` = the configured pair.
+    pub fn GetTrades<'a>(&self, symbol: impl Into<Option<&'a str>>) -> Result<Vec<Trade>> {
+        todo!()
+    }
     /// Fetch K-line records (`GetRecords(symbol?, period?, limit?)`). All three
-    /// args are optional — pass `None` (or the bare value) for any; `period` is in
-    /// seconds (the `PERIOD_*` constants).
+    /// args are optional — pass `None` (or the bare value) for any; `symbol` ""/`None`
+    /// = the configured pair; `period` is in seconds (the `PERIOD_*` constants;
+    /// <= 0 / `None` = the robot's default period); `limit` = bars per call.
     pub fn GetRecords<'a>(
         &self,
         symbol: impl Into<Option<&'a str>>,
@@ -735,172 +917,115 @@ impl Exchange {
     ) -> Result<Vec<Record>> {
         todo!()
     }
+    /// All trading-pair metadata as a `unified symbol -> Market` map. Not a
+    /// `Result`: on failure / no support it logs an error and returns an empty map.
+    pub fn GetMarkets(&self) -> BTreeMap<String, Market> {
+        todo!()
+    }
 
     /// Account balances of the configured pair.
     pub fn GetAccount(&self) -> Result<Account> {
         todo!()
     }
-
     /// Per-currency asset balances.
     pub fn GetAssets(&self) -> Result<Vec<Asset>> {
         todo!()
     }
-
-    /// Open orders; `symbol` "" or `None` means the configured trading pair.
+    /// Open orders. `symbol` "" or `None`: futures → the current quote currency +
+    /// contract family (e.g. "USDT.swap"); spot → all markets. A full symbol
+    /// ("BTC_USDT") or a range ("USDT.swap") narrows it.
     pub fn GetOrders<'a>(&self, symbol: impl Into<Option<&'a str>>) -> Result<Vec<Order>> {
         todo!()
     }
-
     /// One order by id.
     pub fn GetOrder(&self, id: &OrderId) -> Result<Order> {
         todo!()
     }
-
-    /// Place an order; `symbol` "" or `None` = the configured pair. `side` is
-    /// "buy"/"sell"/"closebuy"/"closesell"; market order with `price` -1.
-    pub fn CreateOrder<'a>(&self, symbol: impl Into<Option<&'a str>>, side: &str, price: impl ToF64, amount: impl ToF64) -> Result<OrderId> {
-        todo!()
-    }
-
-    /// Buy order on the configured pair (spot buy / futures buy per direction);
-    /// `price` -1 for a market order. Prefer [`CreateOrder`](Self::CreateOrder).
-    pub fn Buy(&self, price: impl ToF64, amount: impl ToF64) -> Result<OrderId> {
-        todo!()
-    }
-
-    /// Sell order on the configured pair (spot sell / futures sell per direction);
-    /// `price` -1 for a market order. Prefer [`CreateOrder`](Self::CreateOrder).
-    pub fn Sell(&self, price: impl ToF64, amount: impl ToF64) -> Result<OrderId> {
-        todo!()
-    }
-
-    /// Draw a manual simulated-trade marker (`order_type` is `ORDER_TYPE_BUY`/
-    /// `ORDER_TYPE_SELL`); no real order. Distinct from the `Log!` logging macro.
-    pub fn Log(&self, order_type: i32, price: impl ToF64, amount: impl ToF64) {
-        todo!()
-    }
-
-    /// Cancel an order by id.
-    pub fn CancelOrder(&self, id: &OrderId) -> Result<()> {
-        todo!()
-    }
-
-    /// Positions; `symbol` "" or `None` means the configured trading pair.
-    pub fn GetPositions<'a>(&self, symbol: impl Into<Option<&'a str>>) -> Result<Vec<Position>> {
-        todo!()
-    }
-
-    /// Set the contract type (futures), e.g. "swap"/"quarter"; call before trading.
-    pub fn SetContractType(&self, contract_type: &str) -> Result<String> {
-        todo!()
-    }
-
-    /// **不推荐**：优先用 `CreateOrder`(可直接指定 side: "buy"/"sell"/...),无需先 `SetDirection`。
-    pub fn SetDirection(&self, direction: &str) -> Result<String> {
-        todo!()
-    }
-
-    /// Every market's latest ticker.
-    pub fn GetTickers(&self) -> Result<Vec<Ticker>> {
-        todo!()
-    }
-
-    /// Recent public trades; `symbol` "" or `None` = the configured pair.
-    pub fn GetTrades<'a>(&self, symbol: impl Into<Option<&'a str>>) -> Result<Vec<Trade>> {
-        todo!()
-    }
-
-    /// Funding-rate history (perpetuals); `symbol` "" or `None` = the configured pair.
-    pub fn GetFundings<'a>(&self, symbol: impl Into<Option<&'a str>>) -> Result<Vec<Funding>> {
-        todo!()
-    }
-
     /// Finished orders; `symbol` "" = the configured pair. `since`/`limit` page the history.
     pub fn GetHistoryOrders<'a>(&self, symbol: impl Into<Option<&'a str>>, since: impl Into<Option<i64>>, limit: impl Into<Option<i64>>) -> Result<Vec<Order>> {
         todo!()
     }
-
-    /// Switch the current trading pair, e.g. "ETH_USDT".
-    pub fn SetCurrency(&self, symbol: &str) {
+    /// Positions. `symbol` "" or `None`: futures → the current quote currency +
+    /// contract family (e.g. "USDT.swap"); spot → all. A full symbol or a range
+    /// narrows it.
+    pub fn GetPositions<'a>(&self, symbol: impl Into<Option<&'a str>>) -> Result<Vec<Position>> {
         todo!()
     }
-    /// Current exchange API base address.
-    pub fn GetBase(&self) -> String {
+    /// Positions of ONE symbol: `symbol` "" or `None` = the configured pair (unlike
+    /// [`GetPositions`](Self::GetPositions), which defaults to the whole range).
+    pub fn GetPosition<'a>(&self, symbol: impl Into<Option<&'a str>>) -> Result<Vec<Position>> {
         todo!()
     }
-    /// Set the exchange API base URL (e.g. switch to a testnet). Live only.
-    pub fn SetBase(&self, base: &str) -> String {
-        todo!()
-    }
-    /// Currently set contract type (futures), e.g. "swap".
-    pub fn GetContractType(&self) -> String {
-        todo!()
-    }
-    /// All trading-pair metadata as a `symbol -> Market` map.
-    pub fn GetMarkets(&self) -> BTreeMap<String, Market> {
-        todo!()
-    }
-    /// Set a fiat conversion rate (all prices multiplied by it); returns the effective rate.
-    pub fn SetRate(&self, rate: impl ToF64) -> f64 {
-        todo!()
-    }
-    /// Set order price/amount decimal precision (values truncated when ordering).
-    pub fn SetPrecision(&self, price: i64, amount: i64) {
-        todo!()
-    }
-    /// Set the max number of K-line bars cached (default 500).
-    pub fn SetMaxBarLen(&self, n: i64) {
-        todo!()
-    }
-    /// Set the leverage multiplier (futures), e.g. 10 for 10x.
-    pub fn SetMarginLevel(&self, level: impl ToF64) {
-        todo!()
-    }
-    /// Effective fiat conversion rate (the value `SetRate` established, else 1).
-    pub fn GetRate(&self) -> f64 {
-        todo!()
-    }
-    /// Legacy fiat reference rate USD→CNY.
-    pub fn GetUSDCNY(&self) -> f64 {
-        todo!()
-    }
-    /// Legacy fiat reference rate EUR→CNY.
-    pub fn GetEURCNY(&self) -> f64 {
-        todo!()
-    }
-    /// Route this exchange's HTTP/WS through a proxy ("" clears). Live only.
-    pub fn SetProxy(&self, proxy: &str) {
-        todo!()
-    }
-    /// Per-request timeout in milliseconds. Live only.
-    pub fn SetTimeout(&self, ms: impl ToF64) {
-        todo!()
-    }
-    /// HMAC signature helper.
-    pub fn HMAC(&self, algo: &str, out_algo: &str, data: &str, key: &str) -> String {
+    /// Funding rates (perpetuals). `symbol` "" or `None` defaults to a range like
+    /// [`GetPositions`](Self::GetPositions); a full symbol narrows it.
+    pub fn GetFundings<'a>(&self, symbol: impl Into<Option<&'a str>>) -> Result<Vec<Funding>> {
         todo!()
     }
 
-    /// Configured K-line period in **seconds**.
-    pub fn GetPeriod(&self) -> i64 {
+    /// Buy order on the configured pair (spot buy / futures per `SetDirection`);
+    /// `price` -1 for a market order. Prefer [`CreateOrder`](Self::CreateOrder).
+    pub fn Buy(&self, price: impl ToF64, amount: impl ToF64) -> Result<OrderId> {
         todo!()
     }
-
+    /// Sell order on the configured pair (spot sell / futures per `SetDirection`);
+    /// `price` -1 for a market order. Prefer [`CreateOrder`](Self::CreateOrder).
+    pub fn Sell(&self, price: impl ToF64, amount: impl ToF64) -> Result<OrderId> {
+        todo!()
+    }
+    /// Place an order; `symbol` "" or `None` = the configured pair. `side` is
+    /// "buy"/"sell"/"closebuy"/"closesell"; market order with `price` -1. `side`
+    /// may carry exchange-specific params after a `;`:
+    /// `"buy;{\"posSide\":\"long\"}"` or `"buy;k=v&k2=v2"`.
+    pub fn CreateOrder<'a>(&self, symbol: impl Into<Option<&'a str>>, side: &str, price: impl ToF64, amount: impl ToF64) -> Result<OrderId> {
+        todo!()
+    }
+    /// [`CreateOrder`](Self::CreateOrder) with exchange-specific options as a JSON
+    /// object (values keep their JSON types).
+    pub fn CreateOrderWithOptions<'a>(&self, symbol: impl Into<Option<&'a str>>, side: &str, price: impl ToF64, amount: impl ToF64, options: &JsonValue) -> Result<OrderId> {
+        todo!()
+    }
     /// Amend an open order; returns the (possibly new) order id. `side`
     /// ("buy"/"sell") is required by the engine.
     pub fn ModifyOrder(&self, id: &OrderId, side: &str, price: impl ToF64, amount: impl ToF64) -> Result<OrderId> {
         todo!()
     }
-
-    /// Raw futures control op. `op` is a `FUTURES_OP_*` code; `args` are op-specific
-    /// (same shapes as [`IO`](Self::IO)). Returns the raw JSON result.
-    pub fn Futures_OP(&self, op: i64, args: impl IoArgs) -> Result<String> {
+    /// [`ModifyOrder`](Self::ModifyOrder) with exchange-specific options.
+    pub fn ModifyOrderWithOptions(&self, id: &OrderId, side: &str, price: impl ToF64, amount: impl ToF64, options: &JsonValue) -> Result<OrderId> {
+        todo!()
+    }
+    /// Cancel an order by id.
+    pub fn CancelOrder(&self, id: &OrderId) -> Result<()> {
+        todo!()
+    }
+    /// Write a trade-type log entry (`order_type` 0 = buy, 1 = sell, 2 = cancel);
+    /// no real order. Buy/sell return a virtual order id ("V00001"...), cancel
+    /// (pass the order id in `price`) returns "". Muted by `EnableLog(false)`.
+    /// Distinct from the `Log!` logging macro.
+    pub fn Log(&self, order_type: i32, price: impl ToF64, amount: impl ToF64) -> String {
         todo!()
     }
 
     /// Raw exchange IO passthrough (native API calls, mode switching, ...) —
-    /// `exchange.IO(("api", "GET", "/v3/ticker", "symbol=BTC"))`. See [`IoArgs`].
-    pub fn IO(&self, args: impl IoArgs) -> Result<String> {
+    /// `exchange.IO(("api", "GET", "/api/v3/time", "symbol=BTC"))`; returns the
+    /// connector's JSON result. See [`IoArgs`].
+    pub fn IO(&self, args: impl IoArgs) -> Result<JsonValue> {
+        todo!()
+    }
+    /// Same as the global [`Encode`], plus `{{field}}` templates: `{{accesskey}}`,
+    /// `{{secretkey}}` (any config field name) are replaced by this exchange's
+    /// configured values inside digest/sign algorithms. "" on failure.
+    pub fn Encode(&self, algo: &str, in_fmt: &str, out_fmt: &str, data: &str, key_fmt: &str, key: &str) -> String {
+        todo!()
+    }
+    /// `exchange.HMAC(algo, out_fmt, data, key)` = `Encode(algo, "raw", out_fmt,
+    /// data, "raw", key)`, with the same `{{secretkey}}` templates. "" on failure.
+    pub fn HMAC(&self, algo: &str, out_fmt: &str, data: &str, key: &str) -> String {
+        todo!()
+    }
+    /// A non-sensitive field of this exchange's configuration, e.g.
+    /// `GetMeta("AccessKey")` (key matched case/`_`/`-`-insensitively). Secret
+    /// fields (SecretKey/Password/Passphrase/encrypted) always return "".
+    pub fn GetMeta(&self, key: &str) -> String {
         todo!()
     }
 
@@ -909,63 +1034,90 @@ impl Exchange {
     pub fn CreateConditionOrder<'a>(&self, symbol: impl Into<Option<&'a str>>, side: &str, amount: impl ToF64, condition: &OrderCondition) -> Result<OrderId> {
         todo!()
     }
-
-    /// Amend a conditional order.
+    /// [`CreateConditionOrder`](Self::CreateConditionOrder) with exchange-specific options.
+    pub fn CreateConditionOrderWithOptions<'a>(&self, symbol: impl Into<Option<&'a str>>, side: &str, amount: impl ToF64, condition: &OrderCondition, options: &JsonValue) -> Result<OrderId> {
+        todo!()
+    }
+    /// Amend a conditional order (on the configured pair).
     pub fn ModifyConditionOrder(&self, id: &OrderId, side: &str, amount: impl ToF64, condition: &OrderCondition) -> Result<OrderId> {
         todo!()
     }
-
-    /// Open conditional orders; `symbol` "" = the configured pair.
+    /// [`ModifyConditionOrder`](Self::ModifyConditionOrder) with exchange-specific options.
+    pub fn ModifyConditionOrderWithOptions(&self, id: &OrderId, side: &str, amount: impl ToF64, condition: &OrderCondition, options: &JsonValue) -> Result<OrderId> {
+        todo!()
+    }
+    /// Open conditional orders; `symbol` "" or `None` defaults like
+    /// [`GetOrders`](Self::GetOrders).
     pub fn GetConditionOrders<'a>(&self, symbol: impl Into<Option<&'a str>>) -> Result<Vec<Order>> {
         todo!()
     }
-
+    /// One conditional order by id.
+    pub fn GetConditionOrder(&self, id: &OrderId) -> Result<Order> {
+        todo!()
+    }
+    /// Cancel a conditional order.
+    pub fn CancelConditionOrder(&self, id: &OrderId) -> Result<()> {
+        todo!()
+    }
     /// Finished conditional orders; `symbol` "" = the configured pair. `since`/`limit` page it.
     pub fn GetHistoryConditionOrders<'a>(&self, symbol: impl Into<Option<&'a str>>, since: impl Into<Option<i64>>, limit: impl Into<Option<i64>>) -> Result<Vec<Order>> {
         todo!()
     }
 
-    /// One conditional order by id.
-    pub fn GetConditionOrder(&self, id: &OrderId) -> Result<Order> {
-        todo!()
-    }
-
-    /// Cancel a conditional order.
-    pub fn CancelConditionOrder(&self, id: &OrderId) -> Result<()> {
-        todo!()
-    }
-
-    /// Store a custom JSON-string value under `pair` in the exchange data store;
-    /// returns rows affected.
+    /// Store a data set under `pair` for [`GetData`](Self::GetData): `json_value` is
+    /// JSON text (`[[time, value], ...]` or an object with schema + data). Returns
+    /// the JSON text length; 0 (and `GetLastError`) on a bad format. Never expires.
     pub fn SetData(&self, pair: &str, json_value: &str) -> i64 {
         todo!()
     }
-
-    /// Fetch a value from the exchange data store / feed for `pair` (JSON string in
-    /// [`Data::Data`]).
+    /// `GetData(key)` with the default cache timeout (60 s) and offset (now) — see
+    /// [`GetDataWithOptions`](Self::GetDataWithOptions).
     pub fn GetData(&self, pair: &str) -> Result<Data> {
         todo!()
     }
+    /// `GetData(key, timeout?, offset?)`. `key` is a [`SetData`](Self::SetData) name
+    /// (never expires) or an `http(s)://` URL (cached `timeout` ms, default 60000,
+    /// minimum 5000, refetched when expired); `ext.` server feeds are unavailable
+    /// on this runtime (`Err`). Returns the last row with `time <= offset`
+    /// (default now); with no such row, `Data { Time: <next row's time>, Data: "null" }`.
+    /// A failed fetch / missing source is `Err` (and `GetLastError`).
+    pub fn GetDataWithOptions(&self, pair: &str, timeout: impl Into<Option<i64>>, offset: impl Into<Option<i64>>) -> Result<Data> {
+        todo!()
+    }
 
-    /// Start an exchange method asynchronously, typed by a [`mod@Go`] token; one
-    /// `.wait()` then yields the token's result type. `args` take [`IO`](Self::IO)'s shapes.
-    pub fn Go<M: GoCall>(&self, _method: M, args: impl IoArgs) -> TypedRoutine<M> {
+    /// Legacy fiat reference rate USD→CNY. This node has no FX source: returns 0
+    /// and logs a warning — fetch a rate with `HttpQuery` instead.
+    pub fn GetUSDCNY(&self) -> f64 {
+        todo!()
+    }
+    /// Legacy fiat reference rate EUR→CNY. Returns 0 like [`GetUSDCNY`](Self::GetUSDCNY).
+    pub fn GetEURCNY(&self) -> f64 {
+        todo!()
+    }
+
+    /// Start an exchange method asynchronously, typed by a [`mod@Go`] token:
+    /// `exchange.Go(Go::GetRecords, ("BTC_USDT", PERIOD_H1))`. Its REST request goes
+    /// to a worker thread right away; `.wait(timeout)` yields the token's result type
+    /// (see [`TypedRoutine::wait`]). `args` are the method's positional args in
+    /// [`IO`](Self::IO)'s shapes; for `Go::GetRecords` a numeric first arg means the
+    /// legacy `(period, limit)` form. The pair/contract/precision/rate state at
+    /// submit time is snapshotted. On completion [`EventLoop`] receives
+    /// `Event: "Exchange_<Method>"`, `Index` = ticket. At most 2000 unwaited tickets.
+    pub fn Go<M: GoCall>(&self, method: M, args: impl IoArgs) -> TypedRoutine<M> {
         todo!()
     }
 }
 
-pub static exchanges: Vec<Exchange> = Vec::new();
+/// All configured exchanges in load order (`exchanges[0]`, `exchanges.len()`).
+pub static exchanges: std::sync::LazyLock<Vec<Exchange>> = std::sync::LazyLock::new(Vec::new);
 
+/// The first configured exchange (`exchange.GetTicker("")`).
 pub static exchange: Exchange = Exchange;
 
-/// The strategy's parameter set as a JSON text (parse it for raw access).
+/// The strategy's parameter set as JSON text ("" when the runtime has no
+/// parameter channel — the baked parameter constants are the primary interface).
 pub fn params() -> &'static str {
     todo!()
-}
-
-/// Register an exit hook (runs on stop / after `main` in live mode).
-pub fn OnExit<F: FnMut() + 'static>(f: F) {
-    let _ = f;
 }
 
 /// Lets a numeric argument be passed as any integer or float type (converted to
@@ -978,7 +1130,7 @@ macro_rules! impl_to_f64 {
 }
 impl_to_f64!(i8, i16, i32, i64, isize, u8, u16, u32, u64, usize, f32, f64);
 
-/// Sleep for `ms` **milliseconds**.
+/// Sleep for `ms` **milliseconds** (fractions honoured: `Sleep(0.5)`).
 pub fn Sleep(ms: impl ToF64) {
     let _ = ms;
     todo!()
@@ -994,13 +1146,19 @@ pub fn Unix() -> i64 {
     todo!()
 }
 
-/// The runtime/docker version string, e.g. "3.7".
+/// The host (node) version string — same value as JS/Python `Version()`; "" (and
+/// an error log) if the host cannot tell.
 pub fn Version() -> String {
     todo!()
 }
 
-/// "<os>/<arch>" of the backtest runtime, e.g. "linux/amd64" (browser: "linux/wasm").
+/// "<os>/<arch>" of the runtime, e.g. "linux/amd64".
 pub fn GetOS() -> String {
+    todo!()
+}
+
+/// Runtime environment info (os, arch, pid, ...) as a [`JsonValue`].
+pub fn SysInfo() -> JsonValue {
     todo!()
 }
 
@@ -1024,12 +1182,26 @@ pub fn LogProfit(profit: impl ToF64) {
     todo!()
 }
 
-/// Poll the interactive command queue; `timeout_ms` < 0 blocks. `None` = no command.
+/// [`LogProfit`] with a note: `LogProfitText(12.5, "after rebalance")` (the
+/// legacy `LogProfit(profit, ...)` extra args).
+pub fn LogProfitText(profit: impl ToF64, text: &str) {
+    todo!()
+}
+
+/// Poll the interactive command queue. `timeout_ms`: `< 0` (e.g. `-1`) does not
+/// block — returns `None` at once when there is no command (use this in a main
+/// loop); `0` blocks until a command arrives or the robot stops; `> 0` waits at
+/// most that many ms. `None` = no command.
 pub fn GetCommand(timeout_ms: impl ToF64) -> Option<String> {
     todo!()
 }
 
-/// Format a Unix **millisecond** timestamp as "YYYY-MM-DD HH:MM:SS".
+/// Push a command into this robot's own interactive command queue.
+pub fn SendCommand(cmd: &str) {
+    todo!()
+}
+
+/// Format a Unix **millisecond** timestamp as "YYYY-MM-DD HH:MM:SS" (UTC).
 /// `None` = current time; otherwise pass a ms value such as a K-line `Time`
 /// (`_D(None)`, `_D(record.Time)`). Not seconds — for a `Unix()` value use
 /// `_D(Unix() * 1000)`.
@@ -1037,37 +1209,42 @@ pub fn _D(ts_ms: impl Into<Option<i64>>) -> String {
     todo!()
 }
 
-/// Round `n` to `precision` decimals, truncating toward zero (FMZ `_N`):
-/// `_N(-2.7, 0)` == -2, not -3.
-pub fn _N(n: impl ToF64, precision: i32) -> f64 {
+/// Multi-language text marker (legacy `_T`): `_T("中文", Some("English"))` —
+/// the web page shows the part matching the viewer's language.
+pub fn _T(a: &str, b: Option<&str>) -> String {
     todo!()
 }
 
-/// Trend of two equal-length series at their tail (FMZ `_Cross`): bars `a` has
+/// Round `num` to `precision` decimals (`None` = 4), truncating toward zero (
+/// `_N`): `_N(-2.7, 0)` == -2, not -3.
+pub fn _N(num: impl ToF64, precision: impl Into<Option<i32>>) -> f64 {
+    todo!()
+}
+
+/// Trend of two equal-length series at their tail (`_Cross`): bars `a` has
 /// stayed above (`>0`) or below (`<0`) `b`, i.e. how many bars since they crossed.
 pub fn _Cross(a: &[f64], b: &[f64]) -> i64 {
     todo!()
 }
 
-/// Set the [`_C!`] retry delay in milliseconds (FMZ `_CDelay`).
+/// Set the [`_C!`] retry delay in milliseconds (`_CDelay`; default 3000).
 pub fn _CDelay(ms: impl ToF64) {
     todo!()
 }
 
+/// `_G!(k, v)` — write a key (the value's text/JSON is stored).
 #[doc(hidden)]
-pub fn GSet<V: ToArg>(key: &str, value: V) {
-    let _ = (key, value);
+pub fn GSet(k: &str, v: impl ToArg) {
+    let _ = (k, v);
 }
+/// `_G!(k)` — read a key ("" when absent).
 #[doc(hidden)]
-pub fn GGet(key: &str) -> String {
+pub fn GGet(k: &str) -> String {
     todo!()
 }
+/// `_G!(k, null)` — delete a key.
 #[doc(hidden)]
-pub fn GDel(key: &str) {
-    todo!()
-}
-#[doc(hidden)]
-pub fn GCls() {
+pub fn GDel(k: &str) {
     todo!()
 }
 /// Robot / live id — the `_G!()` (no-arg) form; 0 in backtest.
@@ -1076,29 +1253,58 @@ pub fn GId() -> i64 {
     todo!()
 }
 
-/// Enable or disable log recording (`false` reduces database writes).
-pub fn EnableLog(enable: bool) {
+/// `EnableLog(false)` stops recording TRADE logs only (`Buy`/`Sell`/`CreateOrder`/
+/// `CancelOrder`/`exchange.Log`); `Log!`/`LogStatus!`/`LogProfit`/error logs are
+/// unaffected. Process-wide.
+pub fn EnableLog(on: bool) {
     todo!()
 }
 
-/// Robot meta info (the host's "meta" env value) as a navigable [`JsonValue`].
+/// Robot meta info (the host's "meta" env value) as a navigable [`JsonValue`]; `Null` if none.
 pub fn GetMeta() -> JsonValue {
     todo!()
 }
 
-/// Suppress logging of errors matching the regex `filter` ("" clears all filters).
-pub fn SetErrorFilter(filter: &str) {
+/// Add a **regex**; error logs matching any added regex are not recorded ("" clears
+/// all filters). `GetLastError` is unaffected.
+pub fn SetErrorFilter(pattern: &str) {
     todo!()
 }
 
-/// Send an email via SMTP; returns whether it was accepted.
-pub fn Mail(smtp_host: &str, username: &str, password: &str, to: &str, subject: &str, body: &str) -> bool {
+/// Send an email via SMTP; returns whether it was accepted (failure is logged).
+pub fn Mail(smtp: &str, user: &str, pass: &str, to: &str, title: &str, body: &str) -> bool {
     todo!()
 }
 
-/// HTTP request — `url` plus an optional body/options JSON string (`None`/"" = GET).
-/// The return type chooses the result: a body `String`, or a full [`HttpRet`].
-pub fn HttpQuery<'a, R: HttpResp>(url: &str, option: impl Into<Option<&'a str>>) -> R {
+/// Async [`Mail`] (same arguments): the mail is sent on a background thread;
+/// `.wait(timeout)` yields `Mail`'s result (`true` sent, `false` failed — logged
+/// at wait). On completion [`EventLoop`] receives `Event: "Mail"`.
+pub fn Mail_Go(smtp: &str, user: &str, pass: &str, to: &str, title: &str, body: &str) -> AsyncRoutine<bool> {
+    todo!()
+}
+
+/// HTTP request (legacy `HttpQuery(url, postData|options)`; second argument: see
+/// [`HttpOption`]). The return type chooses the result:
+/// `let body: String = HttpQuery(url, None);` /
+/// `let r: HttpRet = HttpQuery(url, None);` /
+/// `let r: HttpRet = HttpQuery(url, &opts);` (`opts` a [`JsonValue`] options object).
+/// A legacy URL proxy prefix also works:
+/// `HttpQuery("socks5://127.0.0.1:8889/http://www.baidu.com/", None)`.
+/// Never `Err`: on failure the error is logged + `GetLastError`, a `String` result
+/// is "" and an `HttpRet` has `StatusCode` 0 + `Error`. Default timeout 300 s.
+pub fn HttpQuery<R: HttpResp>(url: &str, option: impl HttpOption) -> R {
+    todo!()
+}
+
+/// Async [`HttpQuery`] (same arguments): the request starts on a background
+/// thread right away; `.wait(timeout)` yields what `HttpQuery` would return —
+/// the result type picks the body (`String`) or the full [`HttpRet`], failures
+/// included ("" / `StatusCode` 0 + `Error`, logged at wait). `wait` follows
+/// [`TypedRoutine::wait`] (see [`AsyncRoutine::wait`]). On completion
+/// [`EventLoop`] receives `Event: "HttpQuery"`, `Index` = ticket. Shares the
+/// 2000 unwaited-ticket limit with `exchange.Go`.
+/// `let r: String = HttpQuery_Go(url, None).wait(0).unwrap();`
+pub fn HttpQuery_Go<R: HttpResp + 'static>(url: &str, option: impl HttpOption) -> AsyncRoutine<R> {
     todo!()
 }
 
@@ -1107,25 +1313,45 @@ pub fn UUID() -> String {
     todo!()
 }
 
-/// MD5 hex digest of `s`.
-pub fn MD5(s: &str) -> String {
+/// MD5 hex digest of `data` ("" on failure).
+pub fn MD5(data: &str) -> String {
     todo!()
 }
 
-/// Generic hash / HMAC / base64 codec (host `Encode`). `key_format`/`key` are ""
+/// Generic hash / HMAC / codec (host `Encode`). `key_fmt`/`key` are ""
 /// for plain digests, e.g. `Encode("sha256", "string", "hex", data, "", "")`.
-pub fn Encode(algo: &str, input_format: &str, output_format: &str, data: &str, key_format: &str, key: &str) -> String {
+/// "" on failure (reason in `GetLastError`).
+pub fn Encode(algo: &str, in_fmt: &str, out_fmt: &str, data: &str, key_fmt: &str, key: &str) -> String {
     todo!()
 }
 
-/// Decode a non-UTF-8 byte string (default charset "gbk") to UTF-8.
+/// Digest of raw `data` — `Hash("sha256", "hex", data)` =
+/// `Encode(algo, "raw", out_fmt, data, "", "")`.
+pub fn Hash(algo: &str, out_fmt: &str, data: &str) -> String {
+    todo!()
+}
+
+/// HMAC of raw `data` with raw `key` — `HMAC("sha256", "hex", data, key)` =
+/// `Encode(algo, "raw", out_fmt, data, "raw", key)`.
+pub fn HMAC(algo: &str, out_fmt: &str, data: &str, key: &str) -> String {
+    todo!()
+}
+
+/// Decode a byte string (its code points taken as latin1 bytes) from `charset`
+/// (e.g. "gbk", required) to UTF-8.
 pub fn StrDecode(s: &str, charset: &str) -> String {
+    todo!()
+}
+
+/// Decrypt a `$$$__...` encrypted credential string ("" on failure).
+pub fn Decrypt(data: &str) -> String {
     todo!()
 }
 
 /// A lazily-decrypted encrypted strategy parameter. The server bakes an encrypted
 /// UI param as `static name: Decrypted = __decrypt(...)`; it derefs to `&str` so a
-/// strategy uses it like any string param.
+/// strategy uses it like a string param (`&*SECRET`, `SECRET.to_string()`,
+/// `format!("{}", SECRET)`).
 pub struct Decrypted {
     p: &'static str,
     v: &'static str,
@@ -1148,71 +1374,92 @@ impl std::fmt::Display for Decrypted {
         todo!()
     }
 }
-impl ToArg for Decrypted {
-    fn to_arg(&self) -> Arg {
-        todo!()
-    }
-}
 /// Construct a lazily-decrypted param (a `const fn`, so it can initialise a
 /// `static`). Emitted by the server for encrypted UI params. See [`Decrypted`].
 pub const fn __decrypt(p: &'static str, v: &'static str) -> Decrypted {
     Decrypted::new(p, v)
 }
 
-/// Clear the log table; `reverse` > 0 keeps the newest `reverse` rows.
-pub fn LogReset(reverse: i64) {
+/// Clear the log table; `remain` > 0 keeps the newest `remain` rows. Failure is
+/// logged (and `GetLastError`), not silent.
+pub fn LogReset(remain: i64) {
     todo!()
 }
-/// Clear the profit log; `reverse` > 0 keeps the newest `reverse` rows.
-pub fn LogProfitReset(reverse: i64) {
+/// Clear the profit log; `remain` > 0 keeps the newest `remain` rows.
+pub fn LogProfitReset(remain: i64) {
     todo!()
 }
-/// Compact the log database. Live only — a clean no-op error in a backtest.
+/// Compact the log database. Live only.
 pub fn LogVacuum() {
     todo!()
 }
 
-/// Run a local-DB SQL statement (canonical `DBExec`). A query returns its rows and
-/// column names; a write/DDL yields an empty [`DBResult`]. Live only.
+/// Run a SQL statement on the robot's local database (canonical `DBExec`; a ":"
+/// prefix = in-memory DB). A query returns its rows and column names; a write/DDL
+/// yields an empty [`DBResult`]. On error: logged + `GetLastError`, empty result.
 pub fn DBExec(sql: &str) -> DBResult {
     todo!()
 }
 
-/// Block up to `timeout_ms` for the next runtime event as a [`JsonValue`]
-/// (`Null` when none). Live only.
-pub fn EventLoop(timeout_ms: impl ToF64) -> JsonValue {
+/// Wait for the next runtime event. `timeout` < 0 does not wait (`Null` when
+/// none), 0 waits until an event arrives, > 0 waits at most that many ms
+/// (`JsonValue::Null` on timeout). Event objects (same shapes as JS):
+/// - tick: `{Seq, Event:"tick", ThreadId:0, Index:<exchange index>, Queue:0, Nano, Symbol, Ticker}`;
+/// - order: `{..., Event:"order", Index:<exchange index>, Order}`;
+/// - `exchange.Go` done: `{..., Event:"Exchange_<Method>", Index:<ticket>}`.
+/// The first call subscribes the current pair (ticker + order updates) of every
+/// push-only exchange (CTP-style counters; REST venues are never auto-subscribed);
+/// SetCurrency/SetContractType on the thread that first called EventLoop move it
+/// (other threads have their own pair). Don't mix with `ctx::poll` in one thread.
+pub fn EventLoop(timeout: impl ToF64) -> JsonValue {
     todo!()
 }
 
-/// Publish data on the bot's inter-thread channel. Live only.
+/// Publish data on this robot's channel (read by others via [`GetChannelDataOf`]).
 pub fn SetChannelData(s: &str) {
     todo!()
 }
-/// Read data from the bot's inter-thread channel as a [`JsonValue`]. Live only.
+/// Latest data on THIS robot's own channel — same as
+/// `GetChannelDataOf(_G!())`. The first call subscribes and returns `Null`; the
+/// value arrives once the channel syncs. Use [`GetChannelDataOf`] for others.
 pub fn GetChannelData() -> JsonValue {
     todo!()
 }
+/// Latest data on channel `channel` — a robot id (`123456` / `"123456"`) or a
+/// 32-char UUID (legacy `GetChannelData(channelId)`): `Null` until data arrives;
+/// JSON is parsed, anything else is a `JsonValue::String`. On a read error: an
+/// error log, `GetLastError`, and `Null`.
+pub fn GetChannelDataOf(channel: impl ToArg) -> JsonValue {
+    todo!()
+}
 
-/// A streaming socket / WebSocket connection (FMZ `Dial`). Live only — in a
-/// backtest it yields an invalid, already-closed handle. Closed on drop.
+/// A streaming socket / WebSocket / database connection (`Dial`). Opening
+/// failure yields an invalid, already-closed handle (no panic). Closed on drop.
 pub struct Dial {
     fd: i64,
     valid: bool,
     closed: bool,
+    reconnect: bool,
 }
 
-/// Open a connection with the host default timeout. `addr` e.g. "wss://...".
+/// Open a connection with the host default timeout. `addr` e.g. "wss://...",
+/// "tcp://...", "sqlite3://file.db"; legacy tail options work:
+/// `"wss://...|compress=gzip&reconnect=true&payload=..."`.
 pub fn Dial(addr: &str) -> Dial {
     todo!()
 }
 
 impl Dial {
-    /// Open a connection. `timeout` is in seconds (0 = host default).
+    /// Open a connection. `timeout` is the connect timeout in **seconds** (0 = host
+    /// default) — same as `with_options(addr, {"timeout": timeout*1000})`.
     pub fn new(addr: &str, timeout: i64) -> Dial {
         todo!()
     }
 
-    /// Open with a JSON options string (proxy, headers, ...).
+    /// Open with a JSON options string: `{"timeout":30000,"reconnect":true,
+    /// "retry":0,"interval":1000,"payload":"...","compress":"gzip",
+    /// "pingInterval":5000,"pingMessage":"ping","pingType":"text","headers":{...},
+    /// "insecureSkipVerify":true,"proxy":"..."}` (address tail options override).
     pub fn with_options(addr: &str, options: &str) -> Dial {
         todo!()
     }
@@ -1226,8 +1473,10 @@ impl Dial {
         todo!()
     }
 
-    /// Read one message; `timeout` ms (0 = block / host default). "" if nothing
-    /// arrived or the connection is closed.
+    /// Read one message; `timeout` ms: > 0 waits at most that long, 0 blocks until
+    /// data, -1 takes one without waiting, < -1 drops the backlog and takes the
+    /// latest. "" on timeout / no data / peer closed (then `IsClosed()`; with
+    /// `reconnect` the handle stays open and reconnects in the background).
     pub fn read(&mut self, timeout: i64) -> String {
         todo!()
     }
@@ -1237,8 +1486,9 @@ impl Dial {
         todo!()
     }
 
-    /// Run a SQL statement over a DB connection (host `TSocket_DBExec`): a query
-    /// returns rows + column names, a write/DDL yields an empty [`DBResult`].
+    /// Run a SQL statement over a database connection (`Dial("sqlite3://...")`): a
+    /// query returns rows + column names, a write/DDL yields an empty [`DBResult`].
+    /// Not a DB connection / failure: logged + `GetLastError`, empty result.
     pub fn exec(&mut self, sql: &str) -> DBResult {
         todo!()
     }
@@ -1297,7 +1547,8 @@ impl KLineChart {
     pub fn new(config_json: &str) -> KLineChart {
         todo!()
     }
-    /// Start the current bar — subsequent Pine calls accumulate onto it.
+    /// Start the current bar — subsequent Pine calls accumulate onto it until
+    /// [`close`](Self::close).
     pub fn begin(&mut self, bar: &Record) {
         todo!()
     }
@@ -1305,7 +1556,9 @@ impl KLineChart {
     pub fn reset(&mut self, remain: i64) {
         todo!()
     }
-    /// Pack the current bar (OHLCV + plots/signals) into a candle and push it.
+    /// Pack the current bar (OHLCV + plots/signals) into a candle and push it: a
+    /// new bar time appends, the same bar time replaces the last candle (an
+    /// updating bar can be closed repeatedly).
     pub fn close(&mut self) {
         todo!()
     }
@@ -1330,8 +1583,8 @@ impl KLineChart {
     pub fn plotchar(&mut self, cond: bool, opts: &str) {
         todo!()
     }
-    /// Plot an up/down arrow sized by `value`. `opts`: title, colorup, colordown,
-    /// offset, minheight, maxheight, overlay.
+    /// Plot an up/down arrow sized by `value` (NaN/0 → none). `opts`: title,
+    /// colorup, colordown, offset, minheight, maxheight, overlay.
     pub fn plotarrow(&mut self, value: f64, opts: &str) {
         todo!()
     }
@@ -1355,7 +1608,7 @@ impl KLineChart {
         todo!()
     }
     /// Emit a trade signal marker. `direction`: buy/long, sell/short,
-    /// closebuy/closelong, closesell/closeshort. `id` defaults to `direction`.
+    /// closebuy/closelong, closesell/closeshort. `id` "" defaults to `direction`.
     pub fn signal(&mut self, direction: &str, price: f64, qty: f64, id: &str) {
         todo!()
     }
@@ -1365,62 +1618,107 @@ impl KLineChart {
 /// unit structs in [`mod@Go`] implement it — you never implement it yourself.
 pub trait GoCall {
     /// The decoded result type [`TypedRoutine::wait`] returns.
-    type Out;
+    type Out: Clone;
+    /// Method name (the EventLoop completion event is `Exchange_<NAME>`).
+    #[doc(hidden)]
+    const NAME: &'static str;
+    #[doc(hidden)]
+    fn go(ex: &Exchange, args: Vec<Arg>) -> Result<Self::Out>;
 }
 /// Typed handle to an async call started by [`Exchange::Go`]; `wait` yields the
 /// token's result type.
 pub struct TypedRoutine<M: GoCall> {
-    _m: std::marker::PhantomData<M>,
+    _m: std::marker::PhantomData<fn() -> M>,
 }
 impl<M: GoCall> TypedRoutine<M> {
-    /// Block up to `timeout_ms` for the result (0 = block until done, <0 = poll).
-    /// Returns the method's typed result.
+    /// Wait for the result: `timeout_ms < 0` does not wait, `0` waits until done,
+    /// `> 0` waits at most that many ms. Not finished yet →
+    /// `Err("routine N not finished")` (the ticket is kept — wait again later);
+    /// result already taken → `Err("routine N already finished")`; robot stopped →
+    /// `Err(Error::Stopped)`. Otherwise the method's own `Result`.
     pub fn wait(&self, timeout_ms: i64) -> Result<M::Out> {
         todo!()
     }
 }
 
+/// Handle to an async [`HttpQuery_Go`] / [`Mail_Go`] call.
+pub struct AsyncRoutine<T> {
+    _t: std::marker::PhantomData<T>,
+}
+impl<T> AsyncRoutine<T> {
+    /// Wait for the result: `timeout_ms < 0` does not wait, `0` waits until done,
+    /// `> 0` waits at most that many ms. Not finished yet →
+    /// `Err("routine N not finished")` (wait again later); result already taken →
+    /// `Err("routine N already finished")`; robot stopped → `Err(Error::Stopped)`.
+    /// Otherwise `Ok` with the sync function's result.
+    pub fn wait(&self, timeout_ms: i64) -> Result<T> {
+        todo!()
+    }
+}
+
 /// Method tokens for [`Exchange::Go`] — `Go::GetTicker`, `Go::CreateOrder`, … each
-/// selects the async exchange method and its typed result.
+/// selects the async exchange method and its typed result. Args are the method's
+/// positional args (single value, tuple or `Vec<Arg>`), e.g.
+/// `exchange.Go(Go::CreateOrder, ("BTC_USDT", "buy", -1, 0.01))`.
 #[allow(non_snake_case)]
 pub mod Go {
-    /// Token for async [`GetTicker`](super::Exchange::GetTicker).
+    /// Token for async [`GetTicker`](super::Exchange::GetTicker) → `Ticker`.
     pub struct GetTicker;
-    /// Token for async [`GetTickers`](super::Exchange::GetTickers).
+    /// Token for async [`GetTickers`](super::Exchange::GetTickers) → `Vec<Ticker>`.
     pub struct GetTickers;
-    /// Token for async [`GetDepth`](super::Exchange::GetDepth).
+    /// Token for async [`GetDepth`](super::Exchange::GetDepth) → `Depth`.
     pub struct GetDepth;
-    /// Token for async [`GetAccount`](super::Exchange::GetAccount).
+    /// Token for async [`GetAccount`](super::Exchange::GetAccount) → `Account`.
     pub struct GetAccount;
-    /// Token for async [`GetAssets`](super::Exchange::GetAssets).
+    /// Token for async [`GetAssets`](super::Exchange::GetAssets) → `Vec<Asset>`.
     pub struct GetAssets;
-    /// Token for async [`GetPositions`](super::Exchange::GetPositions).
+    /// Token for async [`GetPositions`](super::Exchange::GetPositions) → `Vec<Position>`.
     pub struct GetPositions;
-    /// Token for async [`GetRecords`](super::Exchange::GetRecords).
+    /// Token for async [`GetPosition`](super::Exchange::GetPosition) → `Vec<Position>`.
+    pub struct GetPosition;
+    /// Token for async [`GetRecords`](super::Exchange::GetRecords) → `Vec<Record>`;
+    /// args `(symbol, period, limit)` or the legacy `(period, limit)`.
     pub struct GetRecords;
-    /// Token for async [`GetTrades`](super::Exchange::GetTrades).
+    /// Token for async [`GetTrades`](super::Exchange::GetTrades) → `Vec<Trade>`.
     pub struct GetTrades;
-    /// Token for async [`GetFundings`](super::Exchange::GetFundings).
+    /// Token for async [`GetFundings`](super::Exchange::GetFundings) → `Vec<Funding>`.
     pub struct GetFundings;
-    /// Token for async [`GetOrders`](super::Exchange::GetOrders).
+    /// Token for async [`GetOrders`](super::Exchange::GetOrders) → `Vec<Order>`.
     pub struct GetOrders;
-    /// Token for async [`GetOrder`](super::Exchange::GetOrder).
+    /// Token for async [`GetOrder`](super::Exchange::GetOrder) → `Order`.
     pub struct GetOrder;
-    /// Token for async [`GetHistoryOrders`](super::Exchange::GetHistoryOrders).
+    /// Token for async [`GetHistoryOrders`](super::Exchange::GetHistoryOrders) → `Vec<Order>`.
     pub struct GetHistoryOrders;
-    /// Token for async [`CreateOrder`](super::Exchange::CreateOrder).
+    /// Token for async [`Buy`](super::Exchange::Buy) → `OrderId`; args `(price, amount)`.
+    pub struct Buy;
+    /// Token for async [`Sell`](super::Exchange::Sell) → `OrderId`; args `(price, amount)`.
+    pub struct Sell;
+    /// Token for async [`CreateOrder`](super::Exchange::CreateOrder) → `OrderId`.
     pub struct CreateOrder;
-    /// Token for async [`CreateConditionOrder`](super::Exchange::CreateConditionOrder).
-    pub struct CreateConditionOrder;
-    /// Token for async [`CancelOrder`](super::Exchange::CancelOrder).
+    /// Token for async [`ModifyOrder`](super::Exchange::ModifyOrder) → `OrderId`.
+    pub struct ModifyOrder;
+    /// Token for async [`CancelOrder`](super::Exchange::CancelOrder) → `()`.
     pub struct CancelOrder;
-    /// Token for async [`IO`](super::Exchange::IO).
+    /// Token for async [`CreateConditionOrder`](super::Exchange::CreateConditionOrder)
+    /// → `OrderId`; the condition arg is a JSON object with the `OrderCondition` fields.
+    pub struct CreateConditionOrder;
+    /// Token for async [`GetConditionOrders`](super::Exchange::GetConditionOrders) → `Vec<Order>`.
+    pub struct GetConditionOrders;
+    /// Token for async [`GetConditionOrder`](super::Exchange::GetConditionOrder) → `Order`.
+    pub struct GetConditionOrder;
+    /// Token for async [`CancelConditionOrder`](super::Exchange::CancelConditionOrder) → `()`.
+    pub struct CancelConditionOrder;
+    /// Token for async [`IO`](super::Exchange::IO) → `JsonValue`.
     pub struct IO;
 }
 macro_rules! go_call {
     ($name:ident, $out:ty) => {
         impl GoCall for Go::$name {
             type Out = $out;
+            const NAME: &'static str = stringify!($name);
+            fn go(ex: &Exchange, args: Vec<Arg>) -> Result<$out> {
+                todo!()
+            }
         }
     };
 }
@@ -1430,17 +1728,25 @@ go_call!(GetDepth, Depth);
 go_call!(GetAccount, Account);
 go_call!(GetAssets, Vec<Asset>);
 go_call!(GetPositions, Vec<Position>);
+go_call!(GetPosition, Vec<Position>);
 go_call!(GetRecords, Vec<Record>);
 go_call!(GetTrades, Vec<Trade>);
 go_call!(GetFundings, Vec<Funding>);
 go_call!(GetOrders, Vec<Order>);
 go_call!(GetOrder, Order);
 go_call!(GetHistoryOrders, Vec<Order>);
+go_call!(Buy, OrderId);
+go_call!(Sell, OrderId);
 go_call!(CreateOrder, OrderId);
+go_call!(ModifyOrder, OrderId);
+go_call!(CancelOrder, ());
 go_call!(CreateConditionOrder, OrderId);
-go_call!(CancelOrder, bool);
-go_call!(IO, String);
+go_call!(GetConditionOrders, Vec<Order>);
+go_call!(GetConditionOrder, Order);
+go_call!(CancelConditionOrder, ());
+go_call!(IO, JsonValue);
 
+/// `Log!("price", last, ...)` — variadic, mixed types (any [`ToArg`]).
 #[macro_export]
 macro_rules! Log {
     ($($arg:expr),* $(,)?) => {
@@ -1448,6 +1754,7 @@ macro_rules! Log {
     };
 }
 
+/// `LogStatus!(...)` — refresh the status bar.
 #[macro_export]
 macro_rules! LogStatus {
     ($($arg:expr),* $(,)?) => {
@@ -1455,6 +1762,7 @@ macro_rules! LogStatus {
     };
 }
 
+/// `Panic!(...)` — log an error line, then abort the strategy.
 #[macro_export]
 macro_rules! Panic {
     ($($arg:expr),* $(,)?) => {
@@ -1462,6 +1770,8 @@ macro_rules! Panic {
     };
 }
 
+/// Persistent KV (legacy `_G`), by arity: `_G!()` → robot id; `_G!(k)` → read
+/// ("" when absent); `_G!(k, v)` → write; `_G!(k, null)` → delete.
 #[macro_export]
 macro_rules! _G {
     () => {
@@ -1478,13 +1788,16 @@ macro_rules! _G {
     };
 }
 
+/// Retry until `Ok` (legacy `_C`): `_C!(exchange.GetTicker(""))` re-runs the
+/// expression every [`_CDelay`] ms until it returns `Ok`, then yields the value.
+/// Only for transient errors — a permanent error loops forever.
 #[macro_export]
 macro_rules! _C {
     ($call:expr) => {{
         loop {
             match $call {
                 ::core::result::Result::Ok(v) => break v,
-                ::core::result::Result::Err(_) => $crate::Sleep($crate::retry_delay_ms()),
+                ::core::result::Result::Err(_) => $crate::Sleep($crate::c_retry_delay_ms()),
             }
         }
     }};
@@ -1500,7 +1813,9 @@ impl Ticks for Vec<f64> { fn ticks(&self) -> Vec<f64> { todo!() } }
 impl Ticks for [f64] { fn ticks(&self) -> Vec<f64> { todo!() } }
 impl<const M: usize> Ticks for [f64; M] { fn ticks(&self) -> Vec<f64> { todo!() } }
 
-/// Technical-analysis helpers. Use the global [`TA`].
+/// Technical-analysis helpers (warm-up values are NaN, identical to JS `TA`).
+/// Use the global value [`TA`] (`TA.EMA(&r, 9)`) or the module form
+/// (`TA::EMA(&r, 9)`) — both take the same arguments.
 pub struct TAHelper;
 impl TAHelper {
     /// Simple moving average of the close (alias of [`SMA`](Self::SMA); default period 9).
@@ -1521,28 +1836,483 @@ impl TAHelper {
     pub fn OBV(&self, records: &[Record]) -> Vec<f64> { todo!() }
     /// Average True Range (default period 14). Needs a K-line (uses High/Low/Close).
     pub fn ATR(&self, records: &[Record], period: impl Into<Option<usize>>) -> Vec<f64> { todo!() }
-    /// Bill Williams Alligator → `[jaw, teeth, lips]` (default periods 13/8/5).
+    /// Bill Williams Alligator → `[jaw, teeth, lips]` (default periods 13/8/5;
+    /// SMMA of (High+Low)/2, shifted forward 8/5/3 bars).
     pub fn Alligator(&self, records: &[Record], jaw: impl Into<Option<usize>>, teeth: impl Into<Option<usize>>, lips: impl Into<Option<usize>>) -> [Vec<f64>; 3] { todo!() }
     /// Chaikin Money Flow (default period 20). Needs a K-line (High/Low/Close/Volume).
     pub fn CMF(&self, records: &[Record], periods: impl Into<Option<usize>>) -> Vec<f64> { todo!() }
-    /// Highest value over the `n` bars before the current (last) one.
+    /// Highest value over the `n` bars before the current (last) one (`n` 0 = all).
+    /// On a K-line this reads `Close`; use [`HighestBy`](Self::HighestBy) for another field.
     pub fn Highest<T: Ticks + ?Sized>(&self, src: &T, n: usize) -> f64 { todo!() }
-    /// Lowest value over the `n` bars before the current (last) one.
+    /// Lowest value over the `n` bars before the current (last) one (`n` 0 = all).
     pub fn Lowest<T: Ticks + ?Sized>(&self, src: &T, n: usize) -> f64 { todo!() }
+    /// Legacy `TA.Highest(records, n, attr)`: highest of field `attr` ("High"/"Low"/
+    /// "Open"/"Close"/"Volume"/"OpenInterest"/"Time") over the `n` bars before the
+    /// current one (`n` 0 = all bars). An unknown field gives NaN.
+    pub fn HighestBy(&self, records: &[Record], n: usize, attr: &str) -> f64 { todo!() }
+    /// Legacy `TA.Lowest(records, n, attr)`; same rules as [`HighestBy`](Self::HighestBy).
+    pub fn LowestBy(&self, records: &[Record], n: usize, attr: &str) -> f64 { todo!() }
 }
+/// Global instance: `TA.EMA(&records, 9)`.
 pub static TA: TAHelper = TAHelper;
+
+/// Module form of the [`TA`] helpers: `TA::MA(&r, 5)` — each forwards to
+/// `TA.X(...)` with the same signature. (The module and the `TA` value live in
+/// different namespaces, so both spellings work.)
+#[allow(non_snake_case)]
+pub mod TA {
+    use super::{Record, Ticks};
+    pub fn MA<T: Ticks + ?Sized>(src: &T, period: impl Into<Option<usize>>) -> Vec<f64> { todo!() }
+    pub fn SMA<T: Ticks + ?Sized>(src: &T, period: impl Into<Option<usize>>) -> Vec<f64> { todo!() }
+    pub fn EMA<T: Ticks + ?Sized>(src: &T, period: impl Into<Option<usize>>) -> Vec<f64> { todo!() }
+    pub fn MACD<T: Ticks + ?Sized>(src: &T, fast: impl Into<Option<usize>>, slow: impl Into<Option<usize>>, signal: impl Into<Option<usize>>) -> [Vec<f64>; 3] { todo!() }
+    pub fn BOLL<T: Ticks + ?Sized>(src: &T, period: impl Into<Option<usize>>, multiplier: impl Into<Option<f64>>) -> [Vec<f64>; 3] { todo!() }
+    pub fn KDJ(records: &[Record], n: impl Into<Option<usize>>, k: impl Into<Option<usize>>, d: impl Into<Option<usize>>) -> [Vec<f64>; 3] { todo!() }
+    pub fn RSI<T: Ticks + ?Sized>(src: &T, period: impl Into<Option<usize>>) -> Vec<f64> { todo!() }
+    pub fn OBV(records: &[Record]) -> Vec<f64> { todo!() }
+    pub fn ATR(records: &[Record], period: impl Into<Option<usize>>) -> Vec<f64> { todo!() }
+    pub fn Alligator(records: &[Record], jaw: impl Into<Option<usize>>, teeth: impl Into<Option<usize>>, lips: impl Into<Option<usize>>) -> [Vec<f64>; 3] { todo!() }
+    pub fn CMF(records: &[Record], periods: impl Into<Option<usize>>) -> Vec<f64> { todo!() }
+    pub fn Highest<T: Ticks + ?Sized>(src: &T, n: usize) -> f64 { todo!() }
+    pub fn Lowest<T: Ticks + ?Sized>(src: &T, n: usize) -> f64 { todo!() }
+    pub fn HighestBy(records: &[Record], n: usize, attr: &str) -> f64 { todo!() }
+    pub fn LowestBy(records: &[Record], n: usize, attr: &str) -> f64 { todo!() }
+}
+
+/// Fixed-point decimal (legacy `BigDecimal`/`BigFloat`): an i128 mantissa + scale
+/// (~38 significant digits, NOT arbitrary precision; overflow panics). Avoids f64
+/// rounding for amounts/prices: `BigDecimal("0.1").add(0.2).to_string() == "0.3"`.
+#[derive(Clone, Copy, Debug)]
+pub struct Decimal {
+    v: i128,
+    s: u32,
+}
+/// Values convertible to a [`Decimal`]: `&str`/`String` (parsed, scientific
+/// notation ok), integers, floats, `Decimal`.
+pub trait ToDecimal {
+    fn to_decimal(&self) -> Decimal;
+}
+impl ToDecimal for Decimal { fn to_decimal(&self) -> Decimal { *self } }
+impl ToDecimal for &str { fn to_decimal(&self) -> Decimal { todo!() } }
+impl ToDecimal for String { fn to_decimal(&self) -> Decimal { todo!() } }
+macro_rules! to_decimal_num {
+    ($($t:ty),*) => {$(impl ToDecimal for $t { fn to_decimal(&self) -> Decimal { todo!() } })*};
+}
+to_decimal_num!(i8, i16, i32, i64, i128, isize, u8, u16, u32, u64, f32, f64);
+impl Decimal {
+    /// Parse a decimal string (scientific notation ok). Invalid input panics.
+    pub fn parse(x: &str) -> Decimal { todo!() }
+    pub fn add(&self, o: impl ToDecimal) -> Decimal { todo!() }
+    pub fn sub(&self, o: impl ToDecimal) -> Decimal { todo!() }
+    pub fn mul(&self, o: impl ToDecimal) -> Decimal { todo!() }
+    /// Divide, keeping `scale` decimals (`None` = 20). Division by zero panics.
+    pub fn div(&self, o: impl ToDecimal, scale: impl Into<Option<u32>>) -> Decimal { todo!() }
+    pub fn neg(&self) -> Decimal { todo!() }
+    pub fn abs(&self) -> Decimal { todo!() }
+    pub fn cmp(&self, o: impl ToDecimal) -> std::cmp::Ordering { todo!() }
+    pub fn eq(&self, o: impl ToDecimal) -> bool { todo!() }
+    /// Round half-up to `scale` decimals.
+    pub fn round(&self, scale: u32) -> Decimal { todo!() }
+    pub fn to_f64(&self) -> f64 { todo!() }
+    pub fn to_i64(&self) -> i64 { todo!() }
+}
+/// Plain decimal text (no exponent, trailing zeros trimmed).
+impl std::fmt::Display for Decimal {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result { todo!() }
+}
+/// Construct a fixed-point decimal (legacy `BigDecimal(x)`): `BigDecimal("1.05")` / `BigDecimal(3)`.
+pub fn BigDecimal(x: impl ToDecimal) -> Decimal { todo!() }
+/// Legacy `BigFloat` (same as [`BigDecimal`]).
+pub fn BigFloat(x: impl ToDecimal) -> Decimal { todo!() }
+
+// ---- New model: WebSocket push (`ctx::subscribe` / `ctx::poll`) ----
+
+/// Raw event vocabulary of the new model (`Event`, `EV_*`, `FEED_*`, `GW_*`, `CH_*`, …),
+/// in scope like the SDK's `sdk::abi::*`. Read events through [`ctx::EventExt`]: it checks
+/// `kind` and converts fixed-point prices/quantities to real numbers — no `unsafe` needed.
+pub mod abi {
+    /// One runtime event (256-byte POD). `payload` is a union keyed by `kind`; read it
+    /// with the safe [`EventExt`](super::ctx::EventExt) accessors instead.
+    #[derive(Clone, Copy)]
+    pub struct Event {
+        /// Engine sequence number (monotonic within a run).
+        pub seq: u64,
+        pub ts_ingress_ns: u64,
+        pub ts_publish_ns: u64,
+        /// Event kind: `EV_*`.
+        pub kind: u16,
+        /// Account (load order) the event came from.
+        pub source: u16,
+        /// Instrument id (`ctx::instrument_of` → (exchange, symbol)).
+        pub instrument: u32,
+        /// Delivery stream id (= `Sub::id()`, or `STREAM_TIMER` / `STREAM_STATUS`).
+        pub tag: u32,
+    }
+    pub const EV_MD_TICK: u16 = 1;
+    pub const EV_MD_DEPTH5: u16 = 3;
+    pub const EV_MD_TRADE: u16 = 4;
+    pub const EV_MD_KLINE: u16 = 5;
+    pub const EV_ORD_UPDATE: u16 = 16;
+    pub const EV_POS_UPDATE: u16 = 17;
+    pub const EV_BAL_UPDATE: u16 = 18;
+    pub const EV_TIMER: u16 = 32;
+    pub const EV_GW_STATUS: u16 = 33;
+    pub const EV_FEED_STATUS: u16 = 35;
+    pub const STREAM_TIMER: u32 = 1;
+    pub const STREAM_STATUS: u32 = 2;
+    pub const SIDE_BUY: u8 = 1;
+    pub const SIDE_SELL: u8 = 2;
+    pub const ORD_ST_ACKED: u8 = 1;
+    pub const ORD_ST_PARTIAL: u8 = 2;
+    pub const ORD_ST_FILLED: u8 = 3;
+    pub const ORD_ST_CANCELED: u8 = 4;
+    pub const ORD_ST_REJECTED: u8 = 5;
+    pub const GW_UP: u8 = 1;
+    pub const GW_DOWN: u8 = 2;
+    pub const GW_DEGRADED: u8 = 3;
+    pub const FEED_PREFILL_READY: u8 = 1;
+    pub const FEED_PREFILL_FAILED: u8 = 2;
+    pub const POS_SIDE_LONG: u8 = 1;
+    pub const POS_SIDE_SHORT: u8 = 2;
+    pub const POS_SIDE_NET: u8 = 3;
+    pub const CH_TICKER: u16 = 1;
+    pub const CH_TRADE: u16 = 2;
+    pub const CH_DEPTH: u16 = 3;
+    pub const CH_KLINE: u16 = 4;
+    pub const CH_BBO: u16 = 5;
+    pub const CH_PRIVATE: u16 = 6;
+    pub const CH_TICKERS: u16 = 7;
+}
+pub use abi::*;
+
+/// WebSocket push and the native runtime: subscribe, then poll events yourself (no
+/// callbacks). A subscription belongs to the thread that called [`ctx::subscribe`]: its
+/// events go only to that thread, `poll` returns only that thread's events, and only
+/// that thread can unsubscribe. Push is independent of REST (`GetTicker` etc. always
+/// hit REST). Fallible calls return `Result<_, String>`, never panic.
+///     use sdk::ctx::EventExt;
+///     let book = ctx::subscribe(exchange, ctx::SubOpts::depth(20)).unwrap();
+///     loop {
+///         match ctx::poll(&[], Some(1000)) {
+///             ctx::Polled::Event(ev) => {
+///                 if let Some(st) = ev.feed_status() { if st.failed() { panic!("{}", st.message); } }
+///                 else if let Ok(b) = ev.book(1) { Log!("bid1:", b.bids[0].0); }
+///             }
+///             ctx::Polled::Stopped => break,
+///             _ => {}
+///         }
+///     }
+pub mod ctx {
+    pub use super::abi::{Event, STREAM_STATUS, STREAM_TIMER};
+    use super::Exchange;
+
+    /// Account address: load-order index (`u16`) or an exchange object (`exchange`,
+    /// `exchanges[i]`). With an exchange object and no `symbol`, market-data
+    /// subscriptions use its current pair at subscribe time.
+    #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+    pub struct ExIndex;
+    impl ExIndex {
+        pub fn index(self) -> u16 { todo!() }
+    }
+    impl From<u16> for ExIndex { fn from(_: u16) -> Self { todo!() } }
+    impl From<Exchange> for ExIndex { fn from(_: Exchange) -> Self { todo!() } }
+    impl From<&Exchange> for ExIndex { fn from(_: &Exchange) -> Self { todo!() } }
+
+    /// Subscription options (JS `{channel, symbol, depth, interval, mode, buffer}`).
+    #[derive(Clone, Default, Debug)]
+    pub struct SubOpts {
+        /// "ticker" / "bbo" / "trade" / "depth" / "kline" / "private" / "tickers".
+        pub channel: &'static str,
+        pub symbol: String,
+        pub depth: u16,
+        /// K-line period in seconds.
+        pub interval: u32,
+        /// Latest mode: keep only the newest event (default for ticker/bbo/depth).
+        pub latest: bool,
+        /// Ring mode: bounded buffer of N events, oldest dropped (trade/kline default 1024).
+        pub buffer: u32,
+    }
+    impl SubOpts {
+        pub fn ticker() -> Self { todo!() }
+        /// Best bid/ask (a separate subscription from ticker).
+        pub fn bbo() -> Self { todo!() }
+        pub fn trade() -> Self { todo!() }
+        /// Order book with `n` levels (0 = the venue's default).
+        pub fn depth(n: u16) -> Self { todo!() }
+        pub fn kline(interval_sec: u32) -> Self { todo!() }
+        /// The account's private stream: order updates + positions + balances, no symbol.
+        pub fn private() -> Self { todo!() }
+        /// Market-wide tickers, no symbol; only venues with an all-market stream
+        /// (otherwise a kind 35 FAILED event on this stream).
+        pub fn tickers() -> Self { todo!() }
+        /// Unified symbol `BASE_QUOTE[.contract]`.
+        pub fn symbol(self, symbol: impl Into<String>) -> Self { todo!() }
+        /// Latest delivery mode (exclusive with [`Self::buffer`]).
+        pub fn latest(self) -> Self { todo!() }
+        /// Ring delivery mode with `n` events (exclusive with [`Self::latest`]).
+        pub fn buffer(self, n: u32) -> Self { todo!() }
+    }
+
+    /// Subscription handle (`Copy`). Identical subscriptions in one thread share one
+    /// stream (reference counted: one `unsubscribe` per `subscribe`).
+    #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+    pub struct Sub;
+    impl Sub {
+        /// Stream id: the `poll` filter unit and the events' `ev.stream()`.
+        pub fn id(self) -> u32 { todo!() }
+        pub fn ex(self) -> u16 { todo!() }
+        pub fn channel(self) -> &'static str { todo!() }
+        pub fn depth(self) -> u16 { todo!() }
+        pub fn interval(self) -> u32 { todo!() }
+        /// This depth subscription's own order book, top `n` levels (empty before the
+        /// first snapshot). Not a depth subscription / unsubscribed → Err.
+        pub fn book(self, n: usize) -> Result<Book, String> { todo!() }
+        /// Latest positions of a private subscription; `Ok(None)` = account snapshot
+        /// not READY yet (unknown, not "no positions").
+        pub fn positions(self) -> Result<Option<Vec<PositionRow>>, String> { todo!() }
+        /// Latest balances of a private subscription; `Ok(None)` as for `positions`.
+        pub fn balances(self) -> Result<Option<Vec<BalanceRow>>, String> { todo!() }
+        /// Drop this reference; only the subscribing thread can do it (other threads → Err).
+        pub fn unsubscribe(self) -> Result<(), String> { todo!() }
+    }
+
+    /// Assembled order book: `(price, qty)`, bids descending, asks ascending.
+    #[derive(Clone, Debug, Default, PartialEq)]
+    pub struct Book {
+        pub bids: Vec<(f64, f64)>,
+        pub asks: Vec<(f64, f64)>,
+    }
+
+    /// A position row (full current state). Money fields `None` = not given by the venue.
+    #[derive(Clone, Debug, PartialEq)]
+    pub struct PositionRow {
+        pub symbol: String,
+        /// "buy" (long) / "sell" (short); "" when a net slot is flat.
+        pub side: String,
+        /// "long" / "short" (hedge mode legs) or "net".
+        pub pos_side: String,
+        pub qty: f64,
+        pub avg_px: f64,
+        pub profit: Option<f64>,
+        pub margin: Option<f64>,
+        pub liq_px: Option<f64>,
+        pub mark_px: Option<f64>,
+        pub leverage: Option<f64>,
+        /// Exchange update time (ms).
+        pub time: Option<i64>,
+        /// Part of the snapshot after (re)subscribing.
+        pub snapshot: bool,
+    }
+
+    /// A balance row: the asset's full current amounts (not a delta).
+    #[derive(Clone, Debug, PartialEq)]
+    pub struct BalanceRow {
+        pub asset: String,
+        pub free: f64,
+        pub frozen: f64,
+        pub equity: Option<f64>,
+        pub upnl: Option<f64>,
+        pub margin: Option<f64>,
+        pub time: Option<i64>,
+        pub snapshot: bool,
+    }
+
+    /// Ticker event (kind 1: ticker / bbo / tickers channels), real numbers.
+    #[derive(Clone, Debug, PartialEq)]
+    pub struct TickerView {
+        pub symbol: String,
+        pub bid: f64,
+        pub ask: f64,
+        /// 0 on bbo-type channels without a last price.
+        pub last: f64,
+        pub bid_qty: f64,
+        pub ask_qty: f64,
+        pub volume: f64,
+        pub open_interest: f64,
+        /// Trading-day open/high/low; `last` when the protocol has none.
+        pub open: f64,
+        pub high: f64,
+        pub low: f64,
+        /// Exchange time (ms).
+        pub time: Option<i64>,
+    }
+
+    /// Trade event (kind 4).
+    #[derive(Clone, Debug, PartialEq)]
+    pub struct TradeView {
+        pub symbol: String,
+        pub px: f64,
+        pub qty: f64,
+        /// Taker side "buy" / "sell"; "" when unknown.
+        pub side: &'static str,
+        /// Same id as the REST `trades` row `id`; "" when the venue gives none.
+        pub trade_id: String,
+        pub time: Option<i64>,
+    }
+
+    /// K-line event (kind 5).
+    #[derive(Clone, Debug, PartialEq)]
+    pub struct KlineView {
+        pub symbol: String,
+        pub open: f64,
+        pub high: f64,
+        pub low: f64,
+        pub close: f64,
+        pub volume: f64,
+        pub open_interest: f64,
+        /// Period in seconds.
+        pub interval: u32,
+        /// Bar open time (ms; can go straight to `_D`).
+        pub open_time: i64,
+        /// The bar is final (open bars are pushed repeatedly).
+        pub closed: bool,
+        /// History sent on the first subscription.
+        pub prefill: bool,
+    }
+
+    /// Order update (kind 16, private stream).
+    #[derive(Clone, Debug, PartialEq)]
+    pub struct OrderView {
+        pub symbol: String,
+        /// Exchange order id ("" when the venue gave none).
+        pub id: String,
+        /// "acked" / "partial" / "filled" / "canceled" / "rejected".
+        pub state: &'static str,
+        pub px: f64,
+        pub qty: f64,
+        pub filled_qty: f64,
+        pub avg_px: f64,
+        /// Unified reject reason code (0 = none).
+        pub reason: u8,
+        pub reason_text: &'static str,
+    }
+
+    /// Gateway status (kind 33).
+    #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+    pub struct GatewayView {
+        pub ex: u16,
+        /// `GW_UP` / `GW_DOWN` / `GW_DEGRADED`.
+        pub status: u8,
+        pub detail: u64,
+    }
+
+    /// Subscription init status (kind 35, on the target subscription's stream):
+    /// K-line history, private account snapshot, or a rejected subscription.
+    #[derive(Clone, Debug, PartialEq, Eq)]
+    pub struct FeedStatusView {
+        pub stream: u32,
+        /// The target subscription's channel ("private" for the account snapshot).
+        pub channel: &'static str,
+        pub interval: u32,
+        /// `FEED_PREFILL_READY` (1) / `FEED_PREFILL_FAILED` (2).
+        pub status: u8,
+        pub detail: u64,
+        /// The real reason when FAILED.
+        pub message: String,
+    }
+    impl FeedStatusView {
+        pub fn ready(&self) -> bool { todo!() }
+        pub fn failed(&self) -> bool { todo!() }
+    }
+
+    /// Safe readers for a raw [`Event`] (`use sdk::ctx::EventExt;`): each checks the
+    /// kind (`None` otherwise) and returns real numbers.
+    pub trait EventExt {
+        /// Delivery stream id (`Sub::id()`, `STREAM_TIMER`, `STREAM_STATUS`).
+        fn stream(&self) -> u32;
+        /// ticker / bbo / tickers / depth / trade / kline; orders / positions / balance
+        /// (private stream); "gateway"; "timer"; kind 35 = its subscription's channel.
+        fn channel(&self) -> &'static str;
+        /// Depth event (kind 3): this subscription's book, top `n` levels.
+        fn book(&self, n: usize) -> Result<Book, String>;
+        /// Trade id of a trade event (kind 4).
+        fn trade_id(&self) -> Option<&str>;
+        fn ticker(&self) -> Option<TickerView>;
+        fn trade(&self) -> Option<TradeView>;
+        fn kline(&self) -> Option<KlineView>;
+        fn order(&self) -> Option<OrderView>;
+        fn position(&self) -> Option<PositionRow>;
+        fn balance(&self) -> Option<BalanceRow>;
+        fn gateway(&self) -> Option<GatewayView>;
+        fn feed_status(&self) -> Option<FeedStatusView>;
+    }
+    impl EventExt for Event {
+        fn stream(&self) -> u32 { todo!() }
+        fn channel(&self) -> &'static str { todo!() }
+        fn book(&self, n: usize) -> Result<Book, String> { todo!() }
+        fn trade_id(&self) -> Option<&str> { todo!() }
+        fn ticker(&self) -> Option<TickerView> { todo!() }
+        fn trade(&self) -> Option<TradeView> { todo!() }
+        fn kline(&self) -> Option<KlineView> { todo!() }
+        fn order(&self) -> Option<OrderView> { todo!() }
+        fn position(&self) -> Option<PositionRow> { todo!() }
+        fn balance(&self) -> Option<BalanceRow> { todo!() }
+        fn gateway(&self) -> Option<GatewayView> { todo!() }
+        fn feed_status(&self) -> Option<FeedStatusView> { todo!() }
+    }
+
+    /// Result of [`poll`].
+    pub enum Polled {
+        Event(Event),
+        /// Timed out (only with a timeout).
+        Empty,
+        /// The robot is stopping: finish and return.
+        Stopped,
+        /// Host poll failure (ABI return code; the reason is in the log).
+        Error(i32),
+    }
+
+    /// Subscribe; returns the handle. Lazy: the upstream subscription is sent on the
+    /// first `poll`. A rejected subscription does not fail here — its stream gets a
+    /// kind 35 FAILED event (`ev.feed_status()`).
+    pub fn subscribe(ex: impl Into<ExIndex>, opts: SubOpts) -> Result<Sub, String> { todo!() }
+    /// Batch subscribe `symbols` with the same options; handles in the same order.
+    /// Validated as a whole (one bad symbol → Err, nothing subscribed).
+    pub fn subscribe_many(ex: impl Into<ExIndex>, opts: SubOpts, symbols: &[&str]) -> Result<Vec<Sub>, String> { todo!() }
+    /// Next event of THIS thread's subscriptions (`&[]` = all of them, or `sub.id()`s /
+    /// `STREAM_TIMER` / `STREAM_STATUS`); `None` = wait until an event or stop.
+    pub fn poll(streams: &[u32], timeout_ms: Option<u64>) -> Polled { todo!() }
+    /// Loaded exchanges as JSON `[{ex, label, name, symbol, interval, orderIdScope, feed}]`;
+    /// `feed` = `{ticksDropped, backpressure, ringCapacity}` push-buffer counters.
+    pub fn connectors() -> String { todo!() }
+    /// Instrument id → (exchange index, symbol).
+    pub fn instrument_of(inst: u32) -> std::rc::Rc<(u16, String)> { todo!() }
+    /// Instrument (px_scale, qty_scale) of the raw fixed-point fields.
+    pub fn scales_of(inst: u32) -> (u8, u8) { todo!() }
+    /// Place an order (real px/qty, `side` "buy"/"sell", `opts_json` e.g. `{"type":"limit","tif":"gtc"}`
+    /// or "{}"); returns the exchange order id.
+    pub fn order(exchange: impl Into<ExIndex>, symbol: &str, side: &str, px: f64, qty: f64, opts_json: &str) -> Result<String, String> { todo!() }
+    /// Cancel by exchange order id.
+    pub fn cancel(exchange: impl Into<ExIndex>, symbol: &str, id: &str) -> Result<(), String> { todo!() }
+    /// Synchronous standard REST method (`"ticker"`, `"depth"`, `"assets"`, …) → result JSON.
+    pub fn rest(exchange: impl Into<ExIndex>, method: &str, args_json: &str) -> Result<String, String> { todo!() }
+    /// Exchange-specific endpoint escape hatch → raw string.
+    pub fn raw(exchange: impl Into<ExIndex>, method: &str, args: &str) -> Result<String, String> { todo!() }
+    /// Wall clock, epoch ms.
+    pub fn now() -> f64 { todo!() }
+    /// Sleep `ms` (interrupted by stop).
+    pub fn sleep(ms: u64) { todo!() }
+    /// Whether a stop was requested.
+    pub fn stopped() -> bool { todo!() }
+    pub fn log(msg: impl AsRef<str>) { todo!() }
+}
+
+/// `use sdk::ctx::EventExt;` / `use sdk::abi::*;` resolve as in a compiled strategy.
+pub mod sdk {
+    pub use super::{abi, ctx};
+}
 
 pub mod prelude {
     pub use crate::{
-        exchange, exchanges, params, Arg, Chart, KLineChart, DBExec, Decrypted, Dial, EnableLog, Encode, Error,
-        __decrypt, EventLoop, GetChannelData, GetCommand, GetLastError, GetMeta, GetOS,
-        Go, GoCall, TypedRoutine,
-        GetPid, HttpQuery, HttpResp, IsVirtual, LogProfit, LogProfitReset, LogReset, LogVacuum, Mail, OnExit,
-        Result, SetChannelData, SetErrorFilter, Sleep, StrDecode, ToArg, Unix, UnixNano,
-        Version, _D, JSONParse, MD5, UUID, _CDelay, _Cross, _N,
+        exchange, exchanges, params, Arg, Chart, KLineChart, DBExec, Decrypt, Decrypted, Dial, EnableLog, Encode, Error,
+        __decrypt, EventLoop, GetChannelData, GetChannelDataOf, GetCommand, GetLastError, GetMeta, GetOS,
+        Go, GoCall, TypedRoutine, AsyncRoutine, Hash, HMAC, HttpOption, IoArgs, ToF64,
+        GetPid, HttpQuery, HttpQuery_Go, HttpResp, IsVirtual, LogProfit, LogProfitText, LogProfitReset, LogReset, LogVacuum, Mail, Mail_Go,
+        Result, SendCommand, SetChannelData, SetErrorFilter, Sleep, StrDecode, SysInfo, ToArg, Unix, UnixNano,
+        Version, _D, _T, JSONParse, MD5, UUID, _CDelay, _Cross, _N,
     };
     pub use crate::{
-        Account, Asset, DBResult, Data, Depth, Exchange, Funding, HttpRet, JsonValue, Market, MarketOrder, Order,
+        Account, Asset, DBResult, Data, Depth, Exchange, Funding, HttpRet, Index, JsonValue, Market, MarketOrder, Order,
         OrderCondition, OrderId, Position, Record, Ticker, Trade,
     };
     pub use crate::{
@@ -1552,8 +2322,10 @@ pub mod prelude {
         ORDER_TYPE_SELL, LOG_TYPE_BUY, LOG_TYPE_SELL, LOG_TYPE_CANCEL, LOG_TYPE_ERROR,
         LOG_TYPE_PROFIT, LOG_TYPE_LOG, LOG_TYPE_RESTART, PD_LONG, PD_LONG_YD, PD_SHORT, PD_SHORT_YD, PERIOD_D1, PERIOD_D3,
         PERIOD_H1, PERIOD_H12, PERIOD_H2, PERIOD_H4, PERIOD_H6, PERIOD_M1, PERIOD_M15, PERIOD_M3,
-        PERIOD_M30, PERIOD_M5, PERIOD_W1,
+        PERIOD_M30, PERIOD_M5, PERIOD_W1, FUTURES_OP_SET_MARGIN, FUTURES_OP_SET_DIRECTION,
+        FUTURES_OP_SET_CONTRACT_TYPE, FUTURES_OP_GET_POSITION, EXCHANGE_OP_IO_CONTROL,
     };
     pub use crate::{Log, LogStatus, Panic, _C, _G};
     pub use crate::{TA, TAHelper, Ticks};
+    pub use crate::{BigDecimal, BigFloat, Decimal, ToDecimal};
 }

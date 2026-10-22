@@ -4812,7 +4812,6 @@ fn main() {
 
 部分周期由托管者合成：
 
-- `AscendEx`：原生周期为1分钟、5分钟、15分钟、30分钟、1小时、2小时、4小时、6小时、12小时、1天、1周、1月；其它周期由托管者合成。
 - `Backpack`、`Futures_Backpack`、`Futures_Binance`、`Futures_ApolloX`、`Futures_Aster`：原生周期为1分钟、3分钟、5分钟、15分钟、30分钟、1小时、2小时、4小时、6小时、8小时、12小时、1天、3天、1周、1月；其它周期由托管者合成。
 - `BigONE`：原生周期为1分钟、5分钟、15分钟、30分钟、1小时、3小时、4小时、6小时、12小时、1天、1周、1月；其它周期由托管者合成。
 - `Binance`、`Aster`：原生周期为1秒、1分钟、3分钟、5分钟、15分钟、30分钟、1小时、2小时、4小时、6小时、8小时、12小时、1天、3天、1周、1月；其它周期由托管者合成。
@@ -6822,7 +6821,7 @@ fn main() {
 
 ```condition```的```ConditionType```可取`ORDER_CONDITION_TYPE`中的OCO、TP、SL；`ORDER_CONDITION_TYPE_GENERIC`仅出现在查询结果中（如追踪止损等交易所特有的条件单），创建或修改条件单时不可使用，传入会报错并返回空值。所选类型涉及的触发价格和执行价格均须传入且不能为0（OCO需要全部四项，TP需要止盈的两项，SL需要止损的两项），否则报错并返回空值；执行价格为-1表示触发后以市价单执行。
 
-不支持的交易所：`AscendEx`、`Bithumb`、`Bitstamp`、`Coinw`、`DigiFinex`、`Futures_DigiFinex`、`Gemini`、`HashKey`、`Korbit`、`LBank`、`MEXC`、`Upbit`、`WEEX`、`Zaif`、`Hyperliquid`、`Pendle`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`Jupiter`、`OKX_DEX`、`Futures_Polymarket`、`Futures_Futu`、`Futures_IB`、`Exchange`、`Web3`。调用时报错并返回空值，所有交易所的对照见`能力矩阵`。
+不支持的交易所：`Bithumb`、`Bitstamp`、`Coinw`、`DigiFinex`、`Futures_DigiFinex`、`Gemini`、`HashKey`、`Korbit`、`LBank`、`MEXC`、`Upbit`、`WEEX`、`Zaif`、`Hyperliquid`、`Pendle`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`Jupiter`、`OKX_DEX`、`Futures_Polymarket`、`Futures_Futu`、`Futures_IB`、`Exchange`、`Web3`。调用时报错并返回空值，所有交易所的对照见`能力矩阵`。
 
 See also: `Condition`, `exchange.CancelConditionOrder`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`, `exchange.ModifyConditionOrder`
 
@@ -7224,7 +7223,7 @@ fn main() {
 
 只有未触发的条件单可以被取消；已经触发并转为普通订单的条件单无法通过此函数取消。
 
-不支持的交易所：`AscendEx`、`Bithumb`、`Bitstamp`、`Coinw`、`DigiFinex`、`Futures_DigiFinex`、`Gemini`、`HashKey`、`Korbit`、`LBank`、`MEXC`、`Upbit`、`WEEX`、`Zaif`、`Hyperliquid`、`Pendle`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`Jupiter`、`OKX_DEX`、`Futures_Polymarket`、`Futures_Futu`、`Futures_IB`、`Exchange`、`Web3`。调用时报错并返回空值，所有交易所的对照见`能力矩阵`。
+不支持的交易所：`Bithumb`、`Bitstamp`、`Coinw`、`DigiFinex`、`Futures_DigiFinex`、`Gemini`、`HashKey`、`Korbit`、`LBank`、`MEXC`、`Upbit`、`WEEX`、`Zaif`、`Hyperliquid`、`Pendle`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`Jupiter`、`OKX_DEX`、`Futures_Polymarket`、`Futures_Futu`、`Futures_IB`、`Exchange`、`Web3`。调用时报错并返回空值，所有交易所的对照见`能力矩阵`。
 
 See also: `exchange.CreateConditionOrder`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`, `exchange.ModifyConditionOrder`
 
@@ -7307,7 +7306,7 @@ fn main() {
 
 条件单状态包括：未触发、已触发、已取消等，具体的状态值由交易所而定。
 
-不支持的交易所：`AscendEx`、`Bithumb`、`Bitstamp`、`Coinw`、`DigiFinex`、`Futures_DigiFinex`、`Gemini`、`HashKey`、`Korbit`、`LBank`、`MEXC`、`Upbit`、`WEEX`、`Zaif`、`Hyperliquid`、`Pendle`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`Jupiter`、`OKX_DEX`、`Futures_Polymarket`、`Futures_IB`、`Exchange`、`Web3`。调用时报错并返回空值，所有交易所的对照见`能力矩阵`。
+不支持的交易所：`Bithumb`、`Bitstamp`、`Coinw`、`DigiFinex`、`Futures_DigiFinex`、`Gemini`、`HashKey`、`Korbit`、`LBank`、`MEXC`、`Upbit`、`WEEX`、`Zaif`、`Hyperliquid`、`Pendle`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`Jupiter`、`OKX_DEX`、`Futures_Polymarket`、`Futures_IB`、`Exchange`、`Web3`。调用时报错并返回空值，所有交易所的对照见`能力矩阵`。
 
 以回退方式支持的交易所：交易所的接口不能完整提供本函数，由托管者补足。
 
@@ -7450,7 +7449,7 @@ fn main() {
 
 条件单功能的支持情况取决于具体交易所，部分交易所可能不支持条件单功能。
 
-不支持的交易所：`AscendEx`、`Bithumb`、`Bitstamp`、`Coinw`、`DigiFinex`、`Futures_DigiFinex`、`Gemini`、`HashKey`、`Korbit`、`LBank`、`MEXC`、`Upbit`、`WEEX`、`Zaif`、`Hyperliquid`、`Pendle`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`Jupiter`、`OKX_DEX`、`Futures_Polymarket`、`Futures_IB`、`Exchange`、`Web3`。调用时报错并返回空值，所有交易所的对照见`能力矩阵`。
+不支持的交易所：`Bithumb`、`Bitstamp`、`Coinw`、`DigiFinex`、`Futures_DigiFinex`、`Gemini`、`HashKey`、`Korbit`、`LBank`、`MEXC`、`Upbit`、`WEEX`、`Zaif`、`Hyperliquid`、`Pendle`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`Jupiter`、`OKX_DEX`、`Futures_Polymarket`、`Futures_IB`、`Exchange`、`Web3`。调用时报错并返回空值，所有交易所的对照见`能力矩阵`。
 
 See also: `Order`, `exchange.GetConditionOrder`, `exchange.GetHistoryConditionOrders`
 
@@ -7590,7 +7589,7 @@ fn main() {
 
 对条件单功能的支持情况取决于具体的交易所，部分交易所可能不支持条件单功能或历史条件单查询功能。
 
-不支持的交易所：`AscendEx`、`Bithumb`、`Bitstamp`、`Coincheck`、`Coinone`、`Coinw`、`DigiFinex`、`Futures_DigiFinex`、`Gemini`、`HashKey`、`Korbit`、`LBank`、`MEXC`、`Upbit`、`WEEX`、`Zaif`、`Hyperliquid`、`Pendle`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`Jupiter`、`OKX_DEX`、`Futures_Polymarket`、`Futures_IB`、`Exchange`、`Web3`。调用时报错并返回空值，所有交易所的对照见`能力矩阵`。
+不支持的交易所：`Bithumb`、`Bitstamp`、`Coincheck`、`Coinone`、`Coinw`、`DigiFinex`、`Futures_DigiFinex`、`Gemini`、`HashKey`、`Korbit`、`LBank`、`MEXC`、`Upbit`、`WEEX`、`Zaif`、`Hyperliquid`、`Pendle`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`Jupiter`、`OKX_DEX`、`Futures_Polymarket`、`Futures_IB`、`Exchange`、`Web3`。调用时报错并返回空值，所有交易所的对照见`能力矩阵`。
 
 See also: `Order`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`
 
@@ -9342,7 +9341,7 @@ fn main() {
 
 | 指令 | 交易所 |
 | - | - |
-| ```abi``` | `Web3` |
+| ```abi``` | `Pendle`、`Futures_Boros`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`OKX_DEX`、`Web3` |
 | ```accountId``` | `Futures_Crypto`、`Poloniex` |
 | ```accounts``` | `Futures_Futu`、`Futures_IB` |
 | ```accountType``` | `Bybit`、`Futures_Bybit` |
@@ -9352,7 +9351,7 @@ fn main() {
 | ```allChainBalance``` | `OKX_DEX` |
 | ```allowance``` | `OKX_DEX` |
 | ```allTokens``` | `OKX_DEX` |
-| ```api``` | `AscendEx`、`Backpack`、`Futures_Backpack`、`BigONE`、`Bitstamp`、`Coinw`、`Crypto`、`Futures_Crypto`、`DigiFinex`、`Futures_DigiFinex`、`WOO`、`Futures_WOO`、`Hyperliquid`、`Futures_Hyperliquid`、`Futures_Lighter`、`Futures_EdgeX`、`Futures_Aevo`、`Futures_WOOFi`、`Futures_Polymarket`、`Futures_IB`、`Exchange`、`Web3` |
+| ```api``` | `Backpack`、`Futures_Backpack`、`BigONE`、`Bitstamp`、`Coinw`、`Crypto`、`Futures_Crypto`、`DigiFinex`、`Futures_DigiFinex`、`WOO`、`Futures_WOO`、`Hyperliquid`、`Futures_Hyperliquid`、`Futures_Lighter`、`Futures_EdgeX`、`Futures_Aevo`、`Pendle`、`Futures_Boros`、`Futures_WOOFi`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`Futures_Polymarket`、`Futures_IB`、`Exchange`、`Web3` |
 | ```approve``` | `Pendle`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`OKX_DEX` |
 | ```approveAgent``` | `Futures_Boros` |
 | ```apy``` | `Pendle` |
@@ -9370,10 +9369,11 @@ fn main() {
 | ```broadcast``` | `OKX_DEX` |
 | ```broadcastSupportedChains``` | `OKX_DEX` |
 | ```calcOrderHashAndSign``` | `Futures_EdgeX` |
-| ```call``` | `Web3` |
-| ```cancelTx``` | `Web3` |
+| ```call``` | `Pendle`、`Futures_Boros`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`OKX_DEX`、`Web3` |
+| ```cancelTx``` | `Pendle`、`Futures_Boros`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`OKX_DEX`、`Web3` |
 | ```cancelWait``` | `Pendle`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch` |
 | ```cancelWithdraw``` | `Futures_Boros` |
+| ```chain``` | `OKX_DEX` |
 | ```clientId``` | `KyberSwap` |
 | ```clob``` | `Futures_Polymarket` |
 | ```coinmBase``` | `Futures_Binance` |
@@ -9387,17 +9387,17 @@ fn main() {
 | ```dca.simulate``` | `Jupiter` |
 | ```deadline``` | `Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch` |
 | ```debug``` | `Futures_IB` |
-| ```decode``` | `Web3` |
+| ```decode``` | `Pendle`、`Futures_Boros`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`OKX_DEX`、`Web3` |
 | ```deposit``` | `Futures_Boros` |
 | ```dex``` | `Futures_Hyperliquid` |
 | ```dexes``` | `Jupiter` |
 | ```dual``` | `Futures_Binance`、`Futures_Bitget`、`Futures_Bybit`、`Futures_GateIO`、`Futures_HuobiDM`、`Futures_OKCoin`、`Futures_WOO`、`Futures_ApolloX`、`Futures_Aster` |
 | ```eapiBase``` | `Futures_Binance` |
-| ```encode``` | `Web3` |
-| ```encodePacked``` | `Web3` |
+| ```encode``` | `Pendle`、`Futures_Boros`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`OKX_DEX`、`Web3` |
+| ```encodePacked``` | `Pendle`、`Futures_Boros`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`OKX_DEX`、`Web3` |
 | ```expiresAfter``` | `Hyperliquid`、`Futures_Hyperliquid` |
 | ```expiry``` | `Futures_Lighter` |
-| ```fromUnits``` | `Web3` |
+| ```fromUnits``` | `Pendle`、`Futures_Boros`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`OKX_DEX`、`Web3` |
 | ```gamma``` | `Futures_Polymarket` |
 | ```gasBalance``` | `Futures_Boros` |
 | ```gasLevel``` | `OKX_DEX` |
@@ -9411,7 +9411,7 @@ fn main() {
 | ```key``` | `OKX_DEX`、`Web3` |
 | ```kyberApiKey``` | `KyberSwap` |
 | ```lock``` | `Futures_Futu` |
-| ```logs``` | `Web3` |
+| ```logs``` | `Pendle`、`Futures_Boros`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`OKX_DEX`、`Web3` |
 | ```lp.add``` | `Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`Jupiter` |
 | ```lp.claim``` | `Aerodrome`、`Velodrome` |
 | ```lp.collect``` | `Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`Jupiter` |
@@ -9436,9 +9436,9 @@ fn main() {
 | ```mbase``` | `Futures_Bitfinex` |
 | ```merge``` | `Futures_DeepCoin`、`Futures_Hyperliquid`、`Futures_Polymarket` |
 | ```mergeQuestion``` | `Futures_Hyperliquid` |
-| ```multicall``` | `Web3` |
+| ```multicall``` | `Pendle`、`Futures_Boros`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`OKX_DEX`、`Web3` |
 | ```negate``` | `Futures_Hyperliquid` |
-| ```nonce``` | `Web3` |
+| ```nonce``` | `Pendle`、`Futures_Boros`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`OKX_DEX`、`Web3` |
 | ```orderExpiry``` | `Pendle` |
 | ```orderId``` | `Futures_IB` |
 | ```price``` | `Pendle` |
@@ -9463,16 +9463,16 @@ fn main() {
 | ```scan``` | `Futures_IB` |
 | ```selfTradePreventionMode``` | `Backpack`、`Futures_Backpack`、`Binance`、`Futures_Binance` |
 | ```sendBase``` | `Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`Web3` |
-| ```sign``` | `Web3` |
+| ```sign``` | `Pendle`、`Futures_Boros`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`OKX_DEX`、`Web3` |
 | ```signHost``` | `Futures_HuobiDM` |
 | ```signingKey``` | `Futures_Aevo` |
-| ```signMessage``` | `Web3` |
+| ```signMessage``` | `Pendle`、`Futures_Boros`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`OKX_DEX`、`Web3` |
 | ```signTx``` | `OKX_DEX` |
-| ```signTypedData``` | `Web3` |
+| ```signTypedData``` | `Pendle`、`Futures_Boros`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`OKX_DEX`、`Web3` |
 | ```simulate``` | `Bitget`、`Futures_Bitget`、`Futures_DigiFinex`、`OKEX`、`Futures_OKCoin`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch` |
 | ```slippage``` | `Pendle`、`Futures_Boros`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`Jupiter`、`OKX_DEX` |
 | ```source``` | `Hyperliquid`、`Futures_Hyperliquid` |
-| ```speedUp``` | `Web3` |
+| ```speedUp``` | `Pendle`、`Futures_Boros`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`OKX_DEX`、`Web3` |
 | ```split``` | `Futures_Hyperliquid`、`Futures_Polymarket` |
 | ```status``` | `Futures_Futu`、`Futures_IB` |
 | ```statusDetail``` | `Futures_Futu` |
@@ -9486,22 +9486,22 @@ fn main() {
 | ```token``` | `Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`Jupiter` |
 | ```tokenSearch``` | `OKX_DEX` |
 | ```topUpGas``` | `Futures_Boros` |
-| ```toUnits``` | `Web3` |
-| ```trade_margin``` | `AscendEx`、`Binance`、`Bybit`、`Crypto`、`GateIO`、`Huobi`、`OKEX`、`WOO` |
-| ```trade_normal``` | `AscendEx`、`Binance`、`Bybit`、`Crypto`、`GateIO`、`Huobi`、`OKEX`、`WOO` |
+| ```toUnits``` | `Pendle`、`Futures_Boros`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`OKX_DEX`、`Web3` |
+| ```trade_margin``` | `Binance`、`Bybit`、`Crypto`、`GateIO`、`Huobi`、`OKEX`、`WOO` |
+| ```trade_normal``` | `Binance`、`Bybit`、`Crypto`、`GateIO`、`Huobi`、`OKEX`、`WOO` |
 | ```trade_super_margin``` | `Binance`、`GateIO`、`Huobi`、`OKEX` |
 | ```transfer``` | `Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`Jupiter` |
 | ```trigger.api``` | `Jupiter` |
 | ```trigger.simulate``` | `Jupiter` |
 | ```trigger.vault``` | `Jupiter` |
 | ```unified``` | `Binance`、`Futures_Binance`、`GateIO`、`Futures_GateIO`、`Futures_HuobiDM` |
-| ```uniswapV3``` | `Web3` |
+| ```uniswapV3``` | `Pendle`、`Futures_Boros`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`OKX_DEX`、`Web3` |
 | ```unlock``` | `Futures_Futu` |
 | ```unwrap``` | `Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch` |
 | ```vaultAddress``` | `Hyperliquid`、`Futures_Hyperliquid` |
 | ```version``` | `Bitfinex` |
 | ```wait``` | `Futures_Futu`、`Futures_IB` |
-| ```waitReceipt``` | `Web3` |
+| ```waitReceipt``` | `Pendle`、`Futures_Boros`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`OKX_DEX`、`Web3` |
 | ```wallet``` | `Futures_Boros` |
 | ```walletAddress``` | `Hyperliquid`、`Futures_Hyperliquid` |
 | ```withdraw``` | `Futures_Boros` |
@@ -11737,17 +11737,17 @@ See also: `SetChannelData`; `_G`
 
 ### Threads
 
-并发相关的函数都在这里。`exchange.Go`把耗时的调用放到后台执行，`EventLoop`等待并发调用的结果和事件，这两个函数所有编程语言都可以使用；下面的多线程对象仅支持```JavaScript```。`ctx.subscribe`、`ctx.poll`、`ctx.book`是托管者的事件订阅接口（```JavaScript```；```Rust```使用```ctx```模块的同名函数）。
+本节汇集并发相关的函数。`exchange.Go`将耗时的调用放到后台执行，`EventLoop`用于等待并发调用的结果和事件，这两个函数支持所有编程语言；下文的多线程对象仅支持```JavaScript```。`ctx.subscribe`、`ctx.poll`是托管者提供的WebSocket推送接口：```ctx.subscribe()```用于订阅行情、全市场ticker或账户私有数据流，返回`Subscription`对象（一次订阅多个品种时返回订阅对象数组）；```ctx.poll()```用于取出推送事件。```JavaScript```、```Python```策略使用全局的```ctx```对象，```Rust```策略使用```ctx```模块中的同名函数。订阅归属于发起调用的线程，主线程与各线程分别订阅、分别获取事件。推送接口与```exchange.GetTicker()```等REST接口互不影响，各交易所是否支持推送，请参见`能力矩阵`。
 
-发明者量化交易平台从系统底层真正支持```JavaScript```语言策略的多线程功能，实现了以下对象：
+发明者量化交易平台在系统底层原生支持```JavaScript```策略的多线程功能，并实现了以下对象：
 
 | 对象 | 说明 | 备注 |
 | - | - | - |
-| threading | 多线程全局对象 | 成员函数：```Thread```、```getThread```、```mainThread```等。 |
-| Thread | 线程对象 | 成员函数：```peekMessage```、```postMessage```、```join```等。 |
+| threading | 多线程全局对象 | 成员函数包括：```Thread```、```getThread```、```mainThread```等。 |
+| Thread | 线程对象 | 成员函数包括：```peekMessage```、```postMessage```、```join```等。 |
 | ThreadLock | 线程锁对象 | 成员函数：```acquire```、```release```。可作为线程执行函数的参数传入线程环境。 |
 | ThreadEvent | 事件对象 | 成员函数：```set```、```clear```、```wait```、```isSet```。可作为线程执行函数的参数传入线程环境。 |
-| ThreadCondition | 条件对象 | 成员函数：```notify```、```notifyAll```、```wait```、```acquire```、```release```。可作为线程执行函数的参数传入线程环境。 |
+| ThreadCondition | 条件变量对象 | 成员函数：```notify```、```notifyAll```、```wait```、```acquire```、```release```。可作为线程执行函数的参数传入线程环境。 |
 | ThreadDict | 字典对象 | 成员函数：```get```、```set```。可作为线程执行函数的参数传入线程环境。 |
 | Server | 服务对象 | 由```threading.Serve()```返回。成员函数：```addr```、```close```、```stop```、```join```、```pending```。可作为线程执行函数的参数传入线程环境。 |
 
@@ -12105,15 +12105,15 @@ EventLoop()
 EventLoop(timeout)
 ```
 
-监听事件，在有任意```WebSocket```可读数据或者```exchange.Go()```、```HttpQuery_Go()```等并发的任务完成以后返回。
+监听事件：当任意```WebSocket```有可读数据，或```exchange.Go()```、```HttpQuery_Go()```等并发任务完成时返回。
 
 Parameters:
 
-- `timeout` (number, optional): 超时时间（毫秒）：```0```等到有事件发生才返回，大于0为最长等待时间，小于0立即返回最近的事件。
+- `timeout` (number, optional): 超时时间（毫秒）：为```0```时阻塞等待，直到有事件发生才返回；大于0时为最长等待时间；小于0时立即返回最近的事件。
 
-Returns (object): 事件对象，```Event```为事件类型，例如```{"Seq":1,"Event":"Exchange_GetTrades","ThreadId":0,"Index":3,"Nano":1682068771309583400}```，结构见`EventLoop-return`；超时没有事件时返回空值。
+Returns (object): 事件对象，其中```Event```为事件类型，例如```{"Seq":1,"Event":"Exchange_GetTrades","ThreadId":0,"Index":3,"Nano":1682068771309583400}```，结构详见`EventLoop-return`；超时且无事件时返回空值。
 
-并发获取行情、深度、成交记录，用EventLoop依次取回完成事件。
+并发获取行情、深度和成交记录，并使用EventLoop依次取回完成事件。
 
 ```javascript
 function main() {
@@ -12121,10 +12121,10 @@ function main() {
     var routine_getDepth = exchange.Go("GetDepth")
     var routine_getTrades = exchange.Go("GetTrades")
 
-    // 并发任务在提交时就已登记：即使这里先Sleep(2000)，之后的EventLoop也不会错过这些任务的完成事件
+    // 并发任务在提交时即已登记：即使这里先执行Sleep(2000)，之后的EventLoop也不会错过这些任务的完成事件
 
-    // Log("GetDepth:", routine_getDepth.wait()) 如果这里提前调用wait函数取出GetDepth函数并发调用的结果，
-    // 此次GetDepth函数收到请求结果的事件便不会在EventLoop函数返回
+    // Log("GetDepth:", routine_getDepth.wait()) 如果在这里提前调用wait函数取出GetDepth并发调用的结果，
+    // 则此次GetDepth收到请求结果的事件不会再由EventLoop函数返回
     var ts1 = new Date().getTime()
     var ret1 = EventLoop(0)
 
@@ -12171,15 +12171,15 @@ def main():
 
 ```rust
 fn main() {
-    // Rust 中 exchange.Go 使用类型化 token（如 Go::GetTicker）而非方法名字符串，无参时传 ()
+    // Rust 中 exchange.Go 使用类型化 token（如 Go::GetTicker）而非方法名字符串，无参数时传入 ()
     let routine_getTicker = exchange.Go(Go::GetTicker, ());
     let routine_getDepth = exchange.Go(Go::GetDepth, ());
     let routine_getTrades = exchange.Go(Go::GetTrades, ());
 
-    // 并发任务在提交时就已登记：即使这里先Sleep(2000)，之后的EventLoop也不会错过这些任务的完成事件
+    // 并发任务在提交时即已登记：即使这里先执行Sleep(2000)，之后的EventLoop也不会错过这些任务的完成事件
 
-    // Log!("GetDepth:", routine_getDepth.wait(0)) 如果这里提前调用wait函数取出GetDepth函数并发调用的结果，
-    // 此次GetDepth函数收到请求结果的事件便不会在EventLoop函数返回
+    // Log!("GetDepth:", routine_getDepth.wait(0)) 如果在这里提前调用wait函数取出GetDepth并发调用的结果，
+    // 则此次GetDepth收到请求结果的事件不会再由EventLoop函数返回
     let ts1 = Unix() * 1000;
     let ret1 = EventLoop(0);
 
@@ -12199,88 +12199,115 @@ fn main() {
 }
 ```
 
-```exchange.Go()```、```HttpQuery_Go()```等并发任务在提交时就已登记，即使任务在首次调用```EventLoop()```之前就已完成，也不会错过它的完成事件。底层系统封装的队列结构每个线程最多缓存10240个事件，如果程序执行过程中没有及时调用```EventLoop()```函数取出，超出上限时最早的事件会被丢弃。
-```EventLoop()```函数的调用不会影响系统底层WebSocket的缓存队列，也不影响```exchange.Go()```等并发函数的缓存，对于这些缓存依然需要使用各自的方法取出数据。对于在```EventLoop()```函数返回之前，已经取出的数据，不会在```EventLoop()```函数中产生返回事件。
-```EventLoop()```函数的主要用途就是通知策略层，系统底层接收到了新的网络数据。以事件驱动整个策略。当```EventLoop()```函数返回事件时，只需遍历所有数据来源。例如WebSocket连接、```exchange.Go()```创建的对象尝试获取数据。
+```exchange.Go()```、```HttpQuery_Go()```等并发任务在提交时即已登记，即使任务在首次调用```EventLoop()```之前就已完成，也不会错过其完成事件。底层系统封装的队列结构每个线程最多缓存10240个事件，如果程序运行过程中未及时调用```EventLoop()```函数取出事件，超出上限时最早的事件会被丢弃。
+```EventLoop()```函数的调用不会影响系统底层WebSocket的缓存队列，也不会影响```exchange.Go()```等并发函数的缓存，这些缓存中的数据仍需使用各自的方法取出。在```EventLoop()```函数返回之前已被取出的数据，不会再由```EventLoop()```函数产生返回事件。
+```EventLoop()```函数的主要用途是通知策略层：系统底层已接收到新的网络数据，从而以事件驱动整个策略。当```EventLoop()```函数返回事件时，只需遍历所有数据来源，例如对WebSocket连接、```exchange.Go()```创建的对象尝试获取数据。
 ```EventLoop()```函数仅支持实盘。
 
-在主函数```main()```中调用时，监听主线程的事件。在```JavaScript```语言编写的策略中，```threading.Thread()```函数创建的线程，在线程的执行函数中也可以调用，监听当前线程的事件。
+在主函数```main()```中调用时，监听主线程的事件。在使用```JavaScript```语言编写的策略中，也可以在```threading.Thread()```函数所创建线程的执行函数中调用，此时监听当前线程的事件。
 
-See also: `Dial`, `exchange.Go`, `HttpQuery_Go`
+交易所的WebSocket推送通过`ctx.subscribe`订阅、通过`ctx.poll`取出；```EventLoop()```仅为柜台类（只提供推送接口）的交易所自动订阅当前交易对的行情和订单回报，不会为其他交易所订阅推送。在```JavaScript```、```Rust```中，同一线程内的```EventLoop()```与```ctx.poll()```从同一个事件队列获取事件，因此一个线程只应使用其中一种；```Python```的```EventLoop()```拥有独立的队列，与```ctx.poll()```互不争抢。
+
+See also: `Dial`, `exchange.Go`, `HttpQuery_Go`, `ctx.poll`
 
 #### ctx.subscribe
 
 ```
-ctx.subscribe(ex, symbol)
-ctx.subscribe(ex, symbol, options)
+ctx.subscribe(ex, options)
 ```
 
-订阅某个账户上一个品种的行情推送，或账户的订单回报，返回事件流ID。事件用`ctx.poll`取出，按事件的```kind```分别处理。
+订阅WebSocket推送（品种行情、全市场ticker或账户私有流），返回`Subscription`对象。可订阅单个品种的ticker、最优买卖价、订单簿、逐笔成交和K线，也可订阅整个市场的ticker，或整个账户的订单回报、持仓和余额；```symbol```传入数组时，一次订阅多个品种，并返回订阅对象数组。事件通过`ctx.poll`取出，再按事件的```channel```分别处理。订阅归属于发起调用的线程，主线程和```threading.Thread()```创建的线程均可订阅。
 
 Parameters:
 
-- `ex` (number, required): 账户在```exchanges```数组中的下标：```0```为```exchanges[0]```（即```exchange```），```1```为```exchanges[1]```，以此类推。也可以传数字字符串，例如```"0"```；不能传账户标签。
-- `symbol` (string, required): 品种代码，例如```BTC_USDT```、```BTC_USDT.swap```，写法见`品种代码`。订阅订单回报（```channel```为```orders```）时传空字符串```""```，表示整个账户。
-- `options` (object, optional): 订阅选项，不传时订阅```ticker```：
+- `ex` (object / number, required): 要订阅的账户：可传交易所对象（如```exchange```、```exchanges[1]```），或该账户在```exchanges```数组中的下标（```0```表示```exchanges[0]```，也可传数字字符串```"0"```）。不支持传入账户标签。
+- `options` (object, required): 订阅选项```{channel, symbol, depth, interval, mode, buffer}```。仅支持这一种写法，品种也在此指定；```symbol```传入数组时为批量订阅。各字段说明见下文。
 
-| 字段 | 说明 |
-| - | - |
-| channel | 频道：```ticker```（默认）、```bbo```（最优买卖价）、```depth```（订单簿）、```trade```（逐笔成交）、```kline```（K线）、```orders```（本账户的订单回报） |
-| depth | ```depth```频道的档数 |
-| interval | ```kline```频道的周期，单位秒，例如```60``` |
-| mode | 设为```latest```时只保留最新一条，来不及取的旧事件被覆盖 |
-| buffer | 有界缓冲的条数，溢出时丢弃最旧的事件 |
+Returns (`Subscription`对象 / `Subscription`数组): 订阅对象，包含属性```id```（事件流ID，即该路订阅所产生事件的```ev.stream```）、```ex```、```channel```、```symbol```、```depth```、```interval```，以及方法```book()```、```positions()```、```balances()```、```unsubscribe()```；可直接传给```ctx.poll()```，只取该路订阅的事件。```options.symbol```为数组时，返回与其顺序一致的订阅对象数组。
 
-Returns (number): 事件流ID，可以传给```ctx.poll()```只取这一路事件。重复订阅同一路返回同一个ID。
-
-订阅现货行情与订单回报，按```kind```分别处理。
+以交易所对象订阅当前交易对的ticker与20档订单簿，同时订阅账户私有流，并按```channel```分别处理各类事件。
 
 ```javascript
-function onTicker(ev) {
-    Log("ticker", ev.symbol, "bid:", ev.bid, "ask:", ev.ask, "last:", ev.last)
-}
-
-function onOrder(ev) {
-    Log("order", ev.id, ev.state, "filled:", ev.filledQty, "/", ev.qty)
-}
-
 function main() {
-    // 第一个参数是账户在exchanges中的下标，0即exchanges[0]
-    ctx.subscribe(0, "BTC_USDT", {channel: "ticker"})
-    // 订单回报是账户级的私有流，symbol传空字符串
-    ctx.subscribe(0, "", {channel: "orders"})
+    // 第一个参数传入交易所对象；行情频道未指定symbol时，使用其当前交易对
+    var tk = ctx.subscribe(exchange, {channel: "ticker"})
+    var book = ctx.subscribe(exchange, {channel: "depth", depth: 20})
+    // 私有流不指定symbol，覆盖整个账户：订单回报、持仓、余额均通过此流推送
+    var acct = ctx.subscribe(exchange, {channel: "private"})
+    Log("subscribed:", JSON.stringify(tk), JSON.stringify(book), JSON.stringify(acct))
     while (true) {
-        var ev = ctx.poll([], 1000)   // []表示所有订阅，最多等1秒
+        var ev = ctx.poll([], 1000)    // []表示本线程订阅的全部事件流，最长等待1秒
         if (!ev) {
             continue
         }
-        if (ev.kind === 1) {
-            onTicker(ev)
-        } else if (ev.kind === 16) {
-            onOrder(ev)
+        if (ev.type === "status") {    // 网关状态、初始化状态需优先判断，其channel可能与数据事件相同
+            if (ev.kind === 35 && ev.channel === "private") {
+                Log("account snapshot ready:", ev.prefillStatus === 1, ev.message)
+            }
+            continue
+        }
+        if (ev.channel === "ticker") {
+            Log("ticker", ev.symbol, "bid:", ev.bid, "ask:", ev.ask, "last:", ev.last)
+        } else if (ev.channel === "depth") {
+            var b = book.book(1)       // 与ev.book(1)读取的是同一本订单簿
+            if (b.bids.length > 0 && b.asks.length > 0) {
+                Log("bid1:", b.bids[0][0], "ask1:", b.asks[0][0])
+            }
+        } else if (ev.channel === "orders") {
+            Log("order", ev.id, ev.state, "filled:", ev.filledQty, "/", ev.qty)
         }
     }
 }
 ```
 
-订阅是惰性的：```ctx.subscribe()```立即返回并登记订阅，第一次调用```ctx.poll()```时才向交易所建立连接、发送订阅。连接状态的变化以网关状态事件（```kind```为```33```）通知。
-
-各频道对应的事件```kind```：```ticker```、```bbo```为```1```，```depth```为```3```，```trade```为```4```，```kline```为```5```，```orders```为```16```。事件字段见`ctx.poll`。
-
-取事件不及时的处理（投递模式）：```ticker```、```bbo```、```depth```默认只保留最新一条；```trade```、```kline```默认缓存最近```1024```条，溢出时丢弃最旧的；用```mode```、```buffer```可以改变。订单回报、网关状态不会被丢弃，所以订阅后要持续调用```ctx.poll()```。订单簿在托管者内持续更新，不受取事件快慢影响，任何时候用`ctx.book`读到的都是最新的完整订单簿。
-
-参数有误时（例如未知的```channel```、行情频道没有传```symbol```）抛出异常。取消订阅使用```ctx.unsubscribe(ex, symbol, options)```，参数与```ctx.subscribe()```相同。
-
-```ctx.subscribe()```、```ctx.poll()```与`EventLoop`从同一个事件队列取事件，同一个策略里只使用其中一种方式取事件。
-
-```Rust```策略使用```ctx```模块的同名函数，签名为```ctx::subscribe(ex: u16, symbol: &str, opts: ctx::SubOpts) -> Result<u32, String>```，订阅选项用```ctx::SubOpts::ticker()```、```trade()```、```depth(n)```、```kline(秒数)```、```orders()```构造（没有```mode```、```buffer```选项），失败返回```Err```。```Python```没有这组接口。
+```python
+def main():
+    # 第一个参数传入交易所对象；行情频道未指定symbol时，使用其当前交易对
+    tk = ctx.subscribe(exchange, {"channel": "ticker"})
+    book = ctx.subscribe(exchange, {"channel": "depth", "depth": 20})
+    # 私有流不指定symbol，覆盖整个账户：订单回报、持仓、余额均通过此流推送
+    acct = ctx.subscribe(exchange, {"channel": "private"})
+    Log("subscribed:", tk.info(), book.info(), acct.info())
+    while True:
+        ev = ctx.poll([], 1000)        # []表示本线程订阅的全部事件流，最长等待1秒
+        if ev is None:
+            continue
+        if ev.type == "status":        # 网关状态、初始化状态需优先判断
+            if ev.kind == 35 and ev.channel == "private":
+                Log("account snapshot ready:", ev.prefillStatus == 1, ev.message)
+            continue
+        if ev.channel == "ticker":
+            Log("ticker", ev.symbol, "bid:", ev.bid, "ask:", ev.ask, "last:", ev.last)
+        elif ev.channel == "depth":
+            b = book.book(1)           # 与ev.book(1)读取的是同一本订单簿
+            if b["bids"] and b["asks"]:
+                Log("bid1:", b["bids"][0][0], "ask1:", b["asks"][0][0])
+        elif ev.channel == "orders":
+            Log("order", ev.id, ev.state, "filled:", ev.filledQty, "/", ev.qty)
+```
 
 ```rust
+use sdk::ctx::EventExt;
+
 fn main() {
-    let s = ctx::subscribe(0, "BTC_USDT", ctx::SubOpts::ticker()).unwrap();
+    // 交易所对象作为第一个参数：行情频道未指定symbol时，使用其当前交易对
+    let book = ctx::subscribe(exchange, ctx::SubOpts::depth(20)).unwrap();
+    let acct = ctx::subscribe(exchange, ctx::SubOpts::private()).unwrap();
     loop {
-        match ctx::poll(&[s], Some(1000)) {
-            ctx::Polled::Event(ev) => Log!("event kind:", ev.kind),
+        match ctx::poll(&[], Some(1000)) {
+            ctx::Polled::Event(ev) => match ev.channel() {
+                "depth" => {
+                    if let Ok(b) = book.book(1) {
+                        if !b.bids.is_empty() && !b.asks.is_empty() {
+                            Log!("bid1:", b.bids[0].0, "ask1:", b.asks[0].0);
+                        }
+                    }
+                }
+                "positions" | "balance" => {
+                    Log!("positions:", format!("{:?}", acct.positions()));
+                }
+                channel => Log!("event:", channel, "kind:", ev.kind),
+            },
             ctx::Polled::Stopped => break,
             _ => {}
         }
@@ -12288,7 +12315,410 @@ fn main() {
 }
 ```
 
-See also: `ctx.subscribe`, `ctx.poll`, `ctx.book`, `EventLoop`
+批量订阅三个品种的逐笔成交：订阅后返回订阅对象数组，可将整个数组直接传给```ctx.poll()```；统计1分钟内各品种的成交笔数后，一次性全部退订。
+
+```javascript
+function main() {
+    // symbol传入数组时，返回与其顺序一致的订阅对象数组；只要有一个品种不合法，整批均不订阅
+    var symbols = ["BTC_USDT", "ETH_USDT", "SOL_USDT"]
+    var subs = ctx.subscribe(exchange, {channel: "trade", symbol: symbols})
+    subs.forEach(function(s) {
+        Log(s.symbol, "stream:", s.id)
+    })
+    var count = {}
+    var t0 = Date.now()
+    while (Date.now() - t0 < 60000) {
+        var ev = ctx.poll(subs, 1000)    // 订阅对象数组可直接传给ctx.poll
+        if (!ev) {
+            continue
+        }
+        if (ev.kind === 35 && ev.prefillStatus === 2) {
+            Log("subscription failed:", ev.symbol, ev.message)   // 仅该品种订阅失败
+        } else if (ev.kind === 4) {
+            count[ev.symbol] = (count[ev.symbol] || 0) + 1
+        }
+    }
+    Log("trades in 60 seconds:", count)
+    subs.unsubscribe()                   // 一次性退订全部订阅
+}
+```
+
+```python
+import time
+
+def main():
+    # symbol传入列表时，返回顺序一致的SubscriptionList；只要有一个品种不合法，整批均不订阅
+    symbols = ["BTC_USDT", "ETH_USDT", "SOL_USDT"]
+    subs = ctx.subscribe(exchange, {"channel": "trade", "symbol": symbols})
+    for s in subs:
+        Log(s.symbol, "stream:", s.id)
+    count = {}
+    t0 = time.time()
+    while time.time() - t0 < 60:
+        ev = ctx.poll(subs, 1000)          # SubscriptionList可直接传给ctx.poll
+        if ev is None:
+            continue
+        if ev.kind == 35 and ev.prefillStatus == 2:
+            Log("subscription failed:", ev.symbol, ev.message)
+        elif ev.kind == 4:
+            count[ev.symbol] = count.get(ev.symbol, 0) + 1
+    Log("trades in 60 seconds:", count)
+    subs.unsubscribe()                     # 一次性退订全部订阅
+```
+
+```rust
+use sdk::ctx::EventExt;
+use std::collections::HashMap;
+
+fn main() {
+    let symbols = ["BTC_USDT", "ETH_USDT", "SOL_USDT"];
+    // 返回与symbols顺序一致的句柄；只要有一个品种不合法，整批返回Err
+    let subs = ctx::subscribe_many(exchange, ctx::SubOpts::trade(), &symbols).unwrap();
+    let ids: Vec<u32> = subs.iter().map(|s| s.id()).collect();
+    let mut count: HashMap<u32, u64> = HashMap::new();
+    let t0 = Unix();
+    while Unix() - t0 < 60 {
+        match ctx::poll(&ids, Some(1000)) {
+            ctx::Polled::Event(ev) if ev.kind == EV_MD_TRADE => {
+                *count.entry(ev.stream()).or_insert(0) += 1;
+            }
+            ctx::Polled::Stopped => return,
+            _ => {}
+        }
+    }
+    for (s, symbol) in subs.iter().zip(symbols) {
+        Log!(symbol, "trades in 60 seconds:", count.get(&s.id()).copied().unwrap_or(0));
+        s.unsubscribe().unwrap();
+    }
+}
+```
+
+在线程中订阅：子线程自行订阅两个品种的订单簿，这些事件只投递给该线程；主线程订阅自己的ticker，两者互不干扰。
+
+```javascript
+function main() {
+    var t = threading.Thread(function(symbols, ms) {
+        // 在线程中订阅，这两路订阅的事件只投递给本线程
+        var subs = ctx.subscribe(0, {channel: "depth", symbol: symbols, depth: 5})
+        var n = 0
+        var t0 = Date.now()
+        while (Date.now() - t0 < ms) {
+            var ev = ctx.poll([], 1000)          // 只获取本线程订阅的事件
+            if (ev && ev.kind === 3) {
+                var b = ev.book(1)
+                if (b.bids.length > 0 && b.asks.length > 0) {
+                    Log("thread", ev.symbol, "bid1:", b.bids[0][0], "ask1:", b.asks[0][0])
+                }
+                n++
+            }
+        }
+        subs.unsubscribe()                       // 只能在发起订阅的线程中退订
+        return n
+    }, ["ETH_USDT", "SOL_USDT"], 30000)
+
+    var tk = ctx.subscribe(0, {channel: "ticker", symbol: "BTC_USDT"})
+    var t0 = Date.now()
+    while (Date.now() - t0 < 30000) {
+        var ev = ctx.poll([], 1000)              // 获取不到子线程订阅的深度事件
+        if (ev && ev.kind === 1) {
+            Log("main", ev.symbol, "last:", ev.last)
+        }
+    }
+    tk.unsubscribe()
+    Log("depth updates in the thread:", t.join().ret)
+}
+```
+
+```python
+import threading
+import time
+
+def depth_worker(symbols, seconds):
+    # 在线程中订阅，这两路订阅的事件只投递给本线程
+    subs = ctx.subscribe(0, {"channel": "depth", "symbol": symbols, "depth": 5})
+    t0 = time.time()
+    while time.time() - t0 < seconds:
+        ev = ctx.poll([], 1000)              # 只获取本线程订阅的事件
+        if ev is not None and ev.kind == 3:
+            b = ev.book(1)
+            if b["bids"] and b["asks"]:
+                Log("thread", ev.symbol, "bid1:", b["bids"][0][0], "ask1:", b["asks"][0][0])
+    subs.unsubscribe()                       # 线程结束时也会自动退订
+
+def main():
+    t = threading.Thread(target=depth_worker, args=(["ETH_USDT", "SOL_USDT"], 30))
+    t.start()
+    tk = ctx.subscribe(0, {"channel": "ticker", "symbol": "BTC_USDT"})
+    t0 = time.time()
+    while time.time() - t0 < 30:
+        ev = ctx.poll([], 1000)              # 获取不到子线程订阅的深度事件
+        if ev is not None and ev.kind == 1:
+            Log("main", ev.symbol, "last:", ev.last)
+    tk.unsubscribe()
+    t.join()
+```
+
+```rust
+fn main() {
+    let worker = std::thread::spawn(|| {
+        // 在线程中订阅，这两路订阅的事件只投递给本线程
+        let symbols = ["ETH_USDT", "SOL_USDT"];
+        let subs = ctx::subscribe_many(0u16, ctx::SubOpts::depth(5), &symbols).unwrap();
+        let mut n = 0u64;
+        let t0 = Unix();
+        while Unix() - t0 < 30 {
+            match ctx::poll(&[], Some(1000)) {           // 只获取本线程订阅的事件
+                ctx::Polled::Event(ev) if ev.kind == EV_MD_DEPTH5 => n += 1,
+                ctx::Polled::Stopped => break,
+                _ => {}
+            }
+        }
+        for s in subs {
+            let _ = s.unsubscribe();                     // 只能在发起订阅的线程中退订
+        }
+        n
+    });
+    let tk = ctx::subscribe(0u16, ctx::SubOpts::ticker().symbol("BTC_USDT")).unwrap();
+    let t0 = Unix();
+    while Unix() - t0 < 30 {
+        match ctx::poll(&[tk.id()], Some(1000)) {
+            ctx::Polled::Event(ev) => Log!("main ticker event, seq:", ev.seq),
+            ctx::Polled::Stopped => return,
+            _ => {}
+        }
+    }
+    let _ = tk.unsubscribe();
+    Log!("depth updates in the thread:", worker.join().unwrap_or(0));
+}
+```
+
+订阅全市场ticker：通过一个订阅接收交易所全部品种的ticker，10秒后统计已收到的品种数量；若交易所不支持，该订阅会收到一个失败状态事件。
+
+```javascript
+function main() {
+    // 不指定symbol：一个订阅即可接收该交易所全部品种的ticker
+    var all = ctx.subscribe(exchange, {channel: "tickers"})
+    var last = {}
+    var t0 = Date.now()
+    while (Date.now() - t0 < 10000) {
+        var ev = ctx.poll(all, 1000)
+        if (!ev) {
+            continue
+        }
+        if (ev.kind === 35 && ev.prefillStatus === 2) {
+            Log("tickers not supported:", ev.message)    // 交易所不支持全市场推送
+            return
+        }
+        if (ev.kind === 1) {
+            last[ev.symbol] = ev.last                    // symbol为该条ticker对应的品种
+        }
+    }
+    Log("symbols:", Object.keys(last).length, "BTC_USDT last:", last["BTC_USDT"])
+    all.unsubscribe()
+}
+```
+
+```python
+import time
+
+def main():
+    # 不指定symbol：一个订阅即可接收该交易所全部品种的ticker
+    all_tickers = ctx.subscribe(exchange, {"channel": "tickers"})
+    last = {}
+    t0 = time.time()
+    while time.time() - t0 < 10:
+        ev = ctx.poll(all_tickers, 1000)
+        if ev is None:
+            continue
+        if ev.kind == 35 and ev.prefillStatus == 2:
+            Log("tickers not supported:", ev.message)    # 交易所不支持全市场推送
+            return
+        if ev.kind == 1:
+            last[ev.symbol] = ev.last                    # symbol为该条ticker对应的品种
+    Log("symbols:", len(last), "BTC_USDT last:", last.get("BTC_USDT"))
+    all_tickers.unsubscribe()
+```
+
+```rust
+use sdk::ctx::EventExt;
+use std::collections::HashMap;
+
+fn main() {
+    // 不指定symbol：一个订阅即可接收该交易所全部品种的ticker
+    let all = ctx::subscribe(exchange, ctx::SubOpts::tickers()).unwrap();
+    let mut last: HashMap<String, f64> = HashMap::new();
+    let t0 = Unix();
+    while Unix() - t0 < 10 {
+        match ctx::poll(&[all.id()], Some(1000)) {
+            ctx::Polled::Event(ev) => {
+                if let Some(st) = ev.feed_status() {
+                    if st.failed() {
+                        Log!("tickers not supported:", st.message);   // 交易所不支持全市场推送
+                        return;
+                    }
+                } else if let Some(t) = ev.ticker() {
+                    last.insert(t.symbol, t.last);                     // symbol为该条ticker对应的品种
+                }
+            }
+            ctx::Polled::Stopped => return,
+            _ => {}
+        }
+    }
+    Log!("symbols:", last.len(), "BTC_USDT last:", format!("{:?}", last.get("BTC_USDT")));
+    let _ = all.unsubscribe();
+}
+```
+
+相同的订阅共用同一个事件流：两个订阅对象的```id```相同，其中一个退订后，另一个仍能继续收到事件。
+
+```javascript
+function main() {
+    var a = ctx.subscribe(0, {channel: "trade", symbol: "BTC_USDT"})
+    var b = ctx.subscribe(0, {channel: "trade", symbol: "BTC_USDT"})
+    var c = ctx.subscribe(0, {channel: "ticker", symbol: "BTC_USDT"})
+    Log("a.id:", a.id, "b.id:", b.id, "c.id:", c.id)   // a.id与b.id相同，c.id不同
+
+    a.unsubscribe()    // b仍引用这一路订阅，成交推送不会中断
+    var n = 0
+    while (n < 10) {
+        var ev = ctx.poll(b, 5000)
+        if (!ev) {
+            Log("no trade in 5 seconds")
+            continue
+        }
+        if (ev.kind === 4) {
+            Log("trade", ev.tradeId, ev.side, ev.px, ev.qty)
+            n++
+        }
+    }
+    b.unsubscribe()    // 释放最后一个引用，此时才真正向交易所退订
+    c.unsubscribe()
+}
+```
+
+```python
+def main():
+    a = ctx.subscribe(0, {"channel": "trade", "symbol": "BTC_USDT"})
+    b = ctx.subscribe(0, {"channel": "trade", "symbol": "BTC_USDT"})
+    c = ctx.subscribe(0, {"channel": "ticker", "symbol": "BTC_USDT"})
+    Log("a.id:", a.id, "b.id:", b.id, "c.id:", c.id)   # a.id与b.id相同，c.id不同
+
+    a.unsubscribe()    # b仍引用这一路订阅，成交推送不会中断
+    n = 0
+    while n < 10:
+        ev = ctx.poll(b, 5000)
+        if ev is None:
+            Log("no trade in 5 seconds")
+            continue
+        if ev.kind == 4:
+            Log("trade", ev.tradeId, ev.side, ev.px, ev.qty)
+            n += 1
+    b.unsubscribe()    # 释放最后一个引用，此时才真正向交易所退订
+    c.unsubscribe()
+```
+
+处理被交易所拒绝的订阅：订阅不支持的K线周期不会抛出异常，失败原因会在该订阅自身的事件流中上报。
+
+```javascript
+function main() {
+    // 多数交易所不支持7秒周期的K线
+    var k = ctx.subscribe(exchange, {channel: "kline", interval: 7})
+    while (true) {
+        var ev = ctx.poll(k, 3000)
+        if (!ev) {
+            continue
+        }
+        if (ev.kind === 35) {
+            if (ev.prefillStatus === 2) {
+                Log("kline subscription failed:", ev.message)
+                break
+            }
+            Log("kline history ready")
+        } else if (ev.kind === 5 && ev.closed) {
+            Log("closed bar", _D(ev.openTimeMs), ev.close)
+        }
+    }
+}
+```
+
+```python
+def main():
+    # 多数交易所不支持7秒周期的K线
+    k = ctx.subscribe(exchange, {"channel": "kline", "interval": 7})
+    while True:
+        ev = ctx.poll(k, 3000)
+        if ev is None:
+            continue
+        if ev.kind == 35:
+            if ev.prefillStatus == 2:
+                Log("kline subscription failed:", ev.message)
+                break
+            Log("kline history ready")
+        elif ev.kind == 5 and ev.closed:
+            Log("closed bar", _D(ev.openTimeMs), ev.close)
+```
+
+```options```的字段：
+
+| 字段 | 说明 |
+| - | - |
+| channel | 频道：```ticker```（默认）、```bbo```（最优买卖价）、```depth```（订单簿）、```trade```（逐笔成交）、```kline```（K线）、```tickers```（全市场ticker）、```private```（账户私有流） |
+| symbol | 品种代码，例如```BTC_USDT```、```BTC_USDT.swap```，也可以传品种代码数组（批量订阅）。行情频道必填；```ex```传交易所对象时可以省略，此时取该交易所对象当前的交易对。```tickers```、```private```频道不传此字段 |
+| depth | ```depth```频道的订单簿档数，不传或传```0```时使用交易所的默认档数 |
+| interval | ```kline```频道的K线周期，单位为秒，例如```60``` |
+| mode | 设为```latest```时只保留最新一条事件，未及时取走的旧事件会被覆盖 |
+| buffer | 有界缓冲区的容量（正整数，单位为条），溢出时丢弃最旧的事件 |
+
+品种写法见`品种代码`。```ex```传交易所对象且行情频道未传```symbol```时，使用调用```ctx.subscribe()```那一刻该交易所对象的交易对，期货还包含合约类型（例如```BTC_USDT.swap```）；之后再调用```exchange.SetCurrency()```、```exchange.SetContractType()```不会改变已有的订阅。```ex```传下标时不会自动补全```symbol```；```tickers```（整个市场）和```private```（整个账户）频道始终不带```symbol```。
+
+```symbol```传数组时为批量订阅，一次调用即可订阅多个品种：
+- 返回与数组顺序一致的订阅对象数组，即使数组只有一个元素也返回数组；```symbol```为字符串时仍返回单个订阅对象。
+- 整批先统一校验：任何一个品种或选项不合法，整批抛出异常，所有品种均不订阅。
+- 校验通过后，每个元素都是一路独立的订阅，拥有各自的```id```、订单簿和引用计数；交易所拒绝其中某个品种时，只有该路订阅收到失败的状态事件，其它订阅照常推送。
+- 返回的数组带有```unsubscribe()```方法（不可枚举），调用一次即可退订全部元素；该数组可以直接传给```ctx.poll()```。
+
+订阅的身份由账户、```symbol```、```channel```、```depth```、```interval```共同决定：
+- 同一线程中身份完全相同的订阅共用一路事件流，返回的订阅对象```id```相同。托管者按引用计数管理：每调用一次```ctx.subscribe()```增加一个引用，每个订阅对象调用一次```unsubscribe()```减少一个引用，直到最后一个引用释放时才真正向交易所退订，因此一处退订不会中断其他地方仍在使用的同一路订阅。
+- 任何一项不同即为另一路订阅、另一个事件流：同一品种的```ticker```与```bbo```是两路订阅；```depth```为```5```与```20```也是两路订阅，各自维护一本订单簿（交易所对不同档数的推送频率可能不同，托管者不会将其合并为最大档数）。
+- 事件流ID在一次运行中单调递增、不会复用，全部退订后再次订阅会得到新的ID。
+
+订阅归属于调用```ctx.subscribe()```的线程。主线程和```threading.Thread()```创建的线程（```Python```为标准库的```threading.Thread```，```Rust```为任意线程）都可以订阅和获取事件：
+- 一路订阅的事件只投递给订阅它的线程，```ctx.poll()```只获取本线程自己订阅的事件。若要让多个线程分别接收各自的事件，应在每个线程中分别订阅各自需要的几路。
+- 不同线程订阅身份相同的内容时，交易所只订阅一次，订单簿、K线缓存、账户状态也只保留一份；但每个线程会得到自己的订阅对象（```id```不同）和独立的一份事件，投递模式各自独立，某个线程取得慢不会影响其它线程。所有线程都退订后才真正向交易所退订。
+- 后订阅的线程订阅一路已在推送的K线时，会先补收已缓存的K线（```prefill```为```true```）和最近一条初始化状态事件；私有流同理，账户快照已就绪时立即补收全部快照和就绪事件，```positions()```、```balances()```可立即读取。其它频道从下一条推送开始接收。
+- 只有订阅所属的线程能退订：其它线程调用该订阅对象的```unsubscribe()```会抛出异常，订阅保持有效。线程结束时，其订阅会自动全部退订，其它线程共用的同一路订阅不受影响。
+- 网关状态事件发送给在该交易所有订阅的每个线程；定时器事件只发送给主线程。
+
+```tickers```频道订阅整个市场的ticker：不传```symbol```，一路订阅即可收到该交易所全部品种的ticker。事件与ticker事件相同（```kind```为```1```），```channel```为```tickers```，```symbol```为各自的品种。
+- 仅当交易所提供全市场推送时才支持，各交易所的支持情况见`能力矩阵`中行情分组的「推送」列及各交易所页面。不支持的交易所会在该路订阅上收到一条失败的状态事件（```message```以```unsupported channel: tickers```开头），不会自动改为逐个品种订阅。
+- 部分交易所的全市场推送不含买一价和卖一价，此时```bid```、```ask```为```0```；需要买卖价时，请按品种订阅```ticker```或```bbo```。
+- 默认按品种各保留最新一条：即使取得慢，也能拿到每个品种最新的ticker。
+
+```private```频道是账户的私有流，不传```symbol```，覆盖整个账户，每个账户只有一路。订单回报、持仓、余额都在这一路事件流上推送，对应事件的```channel```分别为```orders```、```positions```、```balance```：
+
+- 订阅生效后（以及每次断线重连后），先推送一份账户快照（持仓、余额，```snapshot```为```true```），再推送一条```kind```为```35```、```channel```为```private```的状态事件：```prefillStatus```为```1```表示快照就绪，为```2```表示快照失败（```message```为失败原因，托管者会自动退避重试）。此后才开始实时推送（```snapshot```为```false```）。订单回报没有快照。
+- 持仓、余额的每条推送都是该持仓或该资产当前的完整状态，而非增量：持仓数量为```0```表示已平仓，可用与冻结均为```0```表示该资产已清空。
+- 订阅对象的`positions`、`balances`方法返回托管者根据推送维护的最新持仓、余额。
+- 实时推送涵盖哪些内容因交易所而异（例如部分交易所不推送持仓，仅提供快照），详见各交易所页面的说明。
+
+订阅是惰性的：```ctx.subscribe()```立即返回并登记订阅，直到首次调用```ctx.poll()```时才与交易所建立连接并发送订阅请求。连接状态的变化通过网关状态事件（```kind```为```33```，```channel```为```gateway```）通知。
+
+订阅失败分为两种情况：
+
+- 参数有误时抛出异常，例如：参数个数不是2个、第二个参数不是对象、```options```中含有未知字段（例如拼错的```intervel```）、未知的```channel```、行情频道未传```symbol```、```tickers```或```private```频道传了```symbol```、同时传入```mode```与```buffer```、```symbol```数组中含有不合法的元素（此时整批均不订阅）。
+- 交易所或连接器拒绝订阅时（例如不支持的频道、K线周期或深度档数），```ctx.subscribe()```不抛出异常，而是在该路订阅自身的事件流上收到一条```kind```为```35```、```prefillStatus```为```2```的状态事件，```message```为失败原因。此后该路订阅作废，调用```unsubscribe()```不执行任何操作。
+
+未及时取事件时的处理（投递模式）：```ticker```、```bbo```、```depth```默认只保留最新一条，```tickers```默认每个品种只保留最新一条；```trade```、```kline```默认缓存最近```1024```条，溢出时丢弃最旧的事件；可通过```mode```或```buffer```修改（二者只能选其一）。订单回报、持仓、余额、网关状态、初始化状态事件不会被丢弃，因此订阅后需要持续调用```ctx.poll()```。订单簿在托管者内持续更新，不受取事件快慢的影响，任何时候通过```book()```读取到的都是最新的完整订单簿。托管者接收推送的缓冲区是否积压，可查看`ctx.poll`中的```ctx.connectors()```计数。
+
+推送与REST接口完全独立：订阅只影响```ctx.poll()```收到的事件。`exchange.GetTicker`、`exchange.GetDepth`、`exchange.GetTrades`、`exchange.GetRecords`、`exchange.GetAccount`等函数每次都直接请求交易所的REST接口，不读取推送数据；是否订阅以及订阅了哪些内容，都不会改变它们的返回结果。
+
+```JavaScript```、```Rust```策略中，同一线程内的```ctx.poll()```与`EventLoop`从同一个事件队列中取事件，一个线程只应使用其中一种方式取事件。```Python```的```EventLoop()```拥有独立的队列（仅包含柜台类交易所自动订阅的行情、订单回报，以及```exchange.Go()```等并发任务的完成通知），与```ctx.poll()```互不争抢。各交易所是否支持推送以及支持哪些频道，见`能力矩阵`和各交易所页面的说明。
+
+```Python```策略的写法与```JavaScript```相同：```ctx.subscribe(ex, options)```只接受这两个位置参数（多传、少传或使用关键字参数均抛出```TypeError```），```options```为字典，字段与校验规则相同，传入的字典不会被修改。```options["symbol"]```为列表（或元组）时返回```SubscriptionList```（```list```的子类，元素顺序与传入一致），调用其```unsubscribe()```可一次性退订全部元素。订阅对象的属性为只读，```info()```返回包含相同字段的字典。通过```threading.Thread```创建的线程结束时会自动退订其订阅；通过```_thread.start_new_thread()```等方式绕过```threading.Thread```创建的线程也可以订阅，但结束时不会自动退订，需要自行调用```unsubscribe()```。
+
+```Rust```策略使用```ctx```模块中的同名函数：```ctx::subscribe(ex, opts: ctx::SubOpts) -> Result<ctx::Sub, String>```，其中```ex```可以是交易所对象（```exchange```、```exchanges[i]```），也可以是```u16```类型的索引；调用失败时返回```Err```，不会panic。订阅选项通过```ctx::SubOpts::ticker()```、```bbo()```、```trade()```、```depth(n)```、```kline(秒数)```、```tickers()```、```private()```构造，然后链式调用```.symbol("BTC_USDT")```、```.latest()```、```.buffer(n)```。批量订阅使用```ctx::subscribe_many(ex, opts, &["BTC_USDT", "ETH_USDT"]) -> Result<Vec<ctx::Sub>, String>```，同样会先校验整批订阅。返回的```ctx::Sub```可以复制，提供的方法包括```id()```（传给```ctx::poll(&[sub.id()], ...)```）、```book(n)```、```positions()```、```balances()```、```unsubscribe()```；引用计数按```ctx::subscribe()```的调用次数计算，每调用一次都需要对应调用一次```unsubscribe()```。```Rust```中的任意线程都可以发起订阅，订阅同样归属于发起订阅的线程。
+
+See also: `ctx.poll`, `Subscription`, `EventLoop`, `exchange.GetTicker`, `交易所能力矩阵`
 
 #### ctx.poll
 
@@ -12299,22 +12729,22 @@ ctx.poll(streams, timeout)
 ctx.poll(options, timeout)
 ```
 
-取出下一条订阅事件，可以设置等待超时。事件由`ctx.subscribe`订阅产生，策略按事件的```kind```分别处理。
+取出本线程所订阅的下一条推送事件，可设置等待超时。事件来自本线程通过`ctx.subscribe`创建的订阅，策略可根据事件的```channel```（或```kind```）分别处理。
 
 Parameters:
 
-- `streams` (number / array, optional): 要取的事件流：```ctx.subscribe()```返回的ID，或ID数组。省略或传```[]```表示全部事件流，单线程的策略一般这样用。内置事件流：```ctx.STREAM_TIMER```（定时器）、```ctx.STREAM_STATUS```（网关状态）、```ctx.STREAM_REST```（所有没有被其它过滤条件点名的事件流）。
-- `timeout` (number, optional): 等待超时，单位毫秒，必须是非负整数。省略时一直等到有事件；```0```表示不等待；正数表示最多等待这么久，超时返回空值。
-- `options` (object, optional): 对象形式```{streams, sources}```：```streams```同上；```sources```为要等待的事件来源数组，可选```engine```（订阅事件，默认）、```thread```（线程消息）、```go```（```exchange.Go()```等并发任务完成）、```dial```（```Dial()```连接可读）、```task```，或```all```表示全部。使用这种形式时返回值包装为```{source, event, seq, nano, queue}```，```event```是对应来源的事件内容。
+- `streams` (object / number / array, optional): 要读取的事件流：`Subscription`对象或事件流ID，也可以是由它们组成的数组（支持混用和嵌套，批量订阅返回的数组可直接传入）。省略或传入```[]```表示本线程订阅的全部事件流，这是最常见的用法。内置事件流：```ctx.STREAM_TIMER```（定时器）、```ctx.STREAM_STATUS```（网关状态）。
+- `timeout` (number, optional): 等待超时时间，单位为毫秒，必须为非负整数。省略时持续等待，直到有事件到达；```0```表示不等待，立即返回；正数表示最长等待时间，超时后返回空值。
+- `options` (object, optional): 对象形式```{streams, sources}```，仅```JavaScript```支持：```streams```含义同上；```sources```为要等待的事件来源数组，可选值包括```engine```（推送事件，默认）、```thread```（线程消息）、```go```（```exchange.Go()```等并发任务完成）、```dial```（```Dial()```连接可读）、```task```，或用```all```表示全部来源。使用此形式时，返回值会包装为```{source, event, seq, nano, queue}```，其中```event```为对应来源的事件内容。
 
-Returns (object / 空值): 事件对象，字段见下文；超时没有事件时返回空值。
+Returns (object / 空值): 事件对象，字段说明见下文；超时且无事件时返回空值。
 
-订阅1分钟K线，只在K线收盘时处理，同时记录网关状态变化。
+订阅1分钟K线，仅在K线收盘时处理，同时记录网关状态变化。
 
 ```javascript
 function onKline(ev) {
     if (ev.prefill) {
-        return                        // 首次订阅推送的历史K线
+        return                        // 首次订阅时推送的历史K线
     }
     if (ev.closed) {
         Log("closed bar", _D(ev.openTimeMs), "close:", ev.close, "volume:", ev.volume)
@@ -12322,103 +12752,720 @@ function onKline(ev) {
 }
 
 function main() {
-    ctx.subscribe(0, "BTC_USDT", {channel: "kline", interval: 60})
+    var k1m = ctx.subscribe(exchange, {channel: "kline", interval: 60})
     while (true) {
         var ev = ctx.poll([], 5000)
         if (!ev) {
             Log("no event in 5 seconds")
             continue
         }
-        if (ev.kind === 5) {
+        if (ev.stream === k1m.id && ev.kind === 5) {
             onKline(ev)
-        } else if (ev.kind === 35) {
-            Log("kline history ready:", JSON.stringify(ev))
+        } else if (ev.stream === k1m.id && ev.kind === 35) {
+            if (ev.prefillStatus === 2) {
+                throw new Error("kline subscription failed: " + ev.message)
+            }
+            Log("kline history ready")
         } else if (ev.kind === 33) {
-            Log("gateway status:", JSON.stringify(ev))
+            Log("gateway status:", ev.status)
         }
     }
 }
 ```
 
-所有事件都有以下字段：
+```python
+def on_kline(ev):
+    if ev.prefill:
+        return                        # 首次订阅时推送的历史K线
+    if ev.closed:
+        Log("closed bar", _D(ev.openTimeMs), "close:", ev.close, "volume:", ev.volume)
 
-| 字段 | 类型 | 说明 |
-| - | - | - |
-| kind | number | 事件类型：```1``` ticker，```3``` 深度，```4``` 成交，```5``` K线，```16``` 订单回报，```32``` 定时器，```33``` 网关状态，```35``` K线历史初始化状态 |
-| ex | number | 账户在```exchanges```中的下标，可以直接传给```ctx.book()```等函数的第一个参数；不属于任何账户的事件为```-1``` |
-| symbol | string | 品种代码，例如```BTC_USDT```、```BTC_USDT.swap``` |
-| seq | number | 事件序号，单调递增 |
-| ts | number | 托管者收到交易所数据的时间（毫秒时间戳，带小数）；```Date.now() - ev.ts```为托管者内部处理与取事件的延迟，不含交易所到托管者的网络延迟 |
-
-各类事件的其它字段：
-
-| kind | 字段 |
-| - | - |
-| 1（ticker、bbo） | ```bid```、```ask```、```last```、```bidQty```、```askQty```、```volume```、```openInterest```、```open```、```high```、```low```、```time```（交易所时间，毫秒）。```bbo```频道没有最新价时```last```为```0``` |
-| 3（深度） | 没有档位字段，只表示订单簿已更新；档位用`ctx.book`读取 |
-| 4（成交） | ```px```（价格）、```qty```（数量）、```side```（主动成交方向```buy```/```sell```，交易所未提供时为```""```）、```tradeId```、```time``` |
-| 5（K线） | ```open```、```high```、```low```、```close```、```volume```、```openInterest```、```intervalSec```、```openTimeMs```、```closed```（该根K线已收盘）、```prefill```（首次订阅时推送的历史K线） |
-| 16（订单回报） | ```id```（订单号）、```state```（```acked```、```partial```、```filled```、```canceled```、```rejected```）、```px```、```qty```、```filledQty```、```avgPx```、```reason```（拒单原因码，```0```为无）、```reasonText``` |
-| 33（网关状态） | ```status```（```1```连接正常，```2```断开，```3```降级）、```detail``` |
-| 35（K线历史初始化） | ```channel```、```intervalSec```、```prefillStatus```（```1```完成，```2```失败）、```message```（失败原因） |
-
-价格、数量都是实数，已按合约精度换算。
-
-使用```streams```过滤时，要保证每个事件流都有人取：订单回报、网关状态、定时器事件不会丢弃，没人取会一直积压。只在一处取事件时传```[]```；分开取时，其中一处要带上```ctx.STREAM_REST```。
-
-等待期间仍会执行```Promise```、```setTimeout```回调和WebSocket、TCP连接的读写；```timeout```为```0```时也会处理一轮这些任务。
-
-订阅事件只能在主线程中取；在```threading.Thread()```创建的线程中只能用```options```形式等待```thread```等其它来源。```ctx.poll()```与`EventLoop`从同一个事件队列取事件，同一个策略里只使用其中一种方式。
-
-```Rust```中为```ctx::poll(streams: &[u32], timeout_ms: Option<u64>) -> ctx::Polled```：空切片表示全部，```None```表示一直等待；返回```Polled::Event(ev)```、```Polled::Empty```（超时）、```Polled::Stopped```（实盘停止）或```Polled::Error(rc)```。```Rust```的事件是原始结构，价格、数量是定点整数（精度用```ctx::scales_of```查询）。```Rust```可以在多个线程中分别```poll```不同的事件流。```Python```没有这组接口。
-
-See also: `ctx.subscribe`, `ctx.poll`, `ctx.book`, `EventLoop`
-
-#### ctx.book
-
-```
-ctx.book(ex, symbol)
-ctx.book(ex, symbol, n)
+def main():
+    k1m = ctx.subscribe(exchange, {"channel": "kline", "interval": 60})
+    while True:
+        ev = ctx.poll([], 5000)
+        if ev is None:
+            Log("no event in 5 seconds")
+            continue
+        if ev.stream == k1m.id and ev.kind == 5:
+            on_kline(ev)
+        elif ev.stream == k1m.id and ev.kind == 35:
+            if ev.prefillStatus == 2:
+                raise Exception("kline subscription failed: " + ev.message)
+            Log("kline history ready")
+        elif ev.kind == 33:
+            Log("gateway status:", ev.status)
 ```
 
-读取托管者维护的订单簿。需要先用`ctx.subscribe`订阅该品种的```depth```频道。
+```rust
+use sdk::ctx::EventExt;
 
-Parameters:
+fn main() {
+    let k1m = ctx::subscribe(exchange, ctx::SubOpts::kline(60)).unwrap();
+    loop {
+        match ctx::poll(&[], Some(5000)) {
+            ctx::Polled::Event(ev) if ev.stream() == k1m.id() => {
+                if let Some(k) = ev.kline() {
+                    if !k.prefill && k.closed {        // 跳过首次订阅时推送的历史K线
+                        Log!("closed bar", _D(k.open_time), "close:", k.close, "volume:", k.volume);
+                    }
+                } else if let Some(st) = ev.feed_status() {
+                    if st.failed() {
+                        panic!("kline subscription failed: {}", st.message);
+                    }
+                    Log!("kline history ready");
+                }
+            }
+            ctx::Polled::Event(ev) => {
+                if let Some(g) = ev.gateway() {
+                    Log!("gateway status:", g.status);
+                }
+            }
+            ctx::Polled::Empty => Log!("no event in 5 seconds"),
+            ctx::Polled::Stopped => break,
+            _ => {}
+        }
+    }
+}
+```
 
-- `ex` (number, required): 账户在```exchanges```数组中的下标，可以直接传深度事件的```ev.ex```。
-- `symbol` (string, required): 品种代码，可以直接传深度事件的```ev.symbol```，写法见`品种代码`。
-- `n` (number, optional): 每一侧返回的档数，不传时为```5```。
-
-Returns (object): ```{bids: [[价格, 数量], ...], asks: [[价格, 数量], ...]}```，```bids```按价格从高到低，```asks```从低到高。还没有收到订单簿数据时两侧都是空数组；品种无法识别时返回```Error```对象（不抛出异常），用```instanceof Error```判断。
-
-订阅订单簿，每次更新时读取买一、卖一。
+订阅账户私有流：等待账户快照就绪后读取持仓和余额，此后根据推送的增量更新进行处理。
 
 ```javascript
 function main() {
-    ctx.subscribe(0, "BTC_USDT", {channel: "depth", depth: 20})
+    var acct = ctx.subscribe(exchange, {channel: "private"})
     while (true) {
         var ev = ctx.poll([], 1000)
-        if (!ev || ev.kind !== 3) {
+        if (!ev || ev.stream !== acct.id) {
             continue
         }
-        // 深度事件只表示订单簿已更新，档位从ctx.book()读取
-        var book = ctx.book(ev.ex, ev.symbol, 5)
-        if (book instanceof Error) {
-            Log("ctx.book failed:", book.message)
-            continue
-        }
-        if (book.bids.length > 0 && book.asks.length > 0) {
-            Log("bid1:", book.bids[0][0], book.bids[0][1], "ask1:", book.asks[0][0], book.asks[0][1])
+        if (ev.kind === 35) {
+            if (ev.prefillStatus === 1) {
+                Log("balances:", acct.balances(), "positions:", acct.positions())
+            } else {
+                Log("account snapshot failed:", ev.message)
+            }
+        } else if (ev.kind === 17 && !ev.snapshot) {
+            Log("position", ev.symbol, ev.posSide, "qty:", ev.qty, "avgPx:", ev.avgPx)
+        } else if (ev.kind === 18 && !ev.snapshot) {
+            Log("balance", ev.asset, "free:", ev.free, "frozen:", ev.frozen)
+        } else if (ev.kind === 16) {
+            Log("order", ev.id, ev.state, "filled:", ev.filledQty, "/", ev.qty)
         }
     }
 }
 ```
 
-深度事件（```kind```为```3```）只表示订单簿已更新，不带档位。订单簿在托管者内按交易所推送持续更新，与策略取事件的快慢无关，任何时候读到的都是最新的完整订单簿。
+```python
+def main():
+    acct = ctx.subscribe(exchange, {"channel": "private"})
+    while True:
+        ev = ctx.poll([], 1000)
+        if ev is None or ev.stream != acct.id:
+            continue
+        if ev.kind == 35:
+            if ev.prefillStatus == 1:
+                Log("balances:", acct.balances(), "positions:", acct.positions())
+            else:
+                Log("account snapshot failed:", ev.message)
+        elif ev.kind == 17 and not ev.snapshot:
+            Log("position", ev.symbol, ev.posSide, "qty:", ev.qty, "avgPx:", ev.avgPx)
+        elif ev.kind == 18 and not ev.snapshot:
+            Log("balance", ev.asset, "free:", ev.free, "frozen:", ev.frozen)
+        elif ev.kind == 16:
+            Log("order", ev.id, ev.state, "filled:", ev.filledQty, "/", ev.qty)
+```
 
-```Rust```中为```ctx::book(ex: u16, symbol: &str, n: usize) -> Result<String, String>```，返回同样结构的JSON字符串。```Python```没有这组接口。
+```rust
+use sdk::ctx::EventExt;
 
-See also: `ctx.subscribe`, `ctx.poll`, `ctx.book`, `EventLoop`, `exchange.GetDepth`
+fn main() {
+    let acct = ctx::subscribe(exchange, ctx::SubOpts::private()).unwrap();
+    loop {
+        match ctx::poll(&[], Some(1000)) {
+            ctx::Polled::Event(ev) if ev.stream() == acct.id() => {
+                if let Some(st) = ev.feed_status() {
+                    if st.ready() {
+                        Log!("balances:", format!("{:?}", acct.balances()),
+                             "positions:", format!("{:?}", acct.positions()));
+                    } else {
+                        Log!("account snapshot failed:", st.message);
+                    }
+                } else if let Some(p) = ev.position().filter(|p| !p.snapshot) {
+                    Log!("position", p.symbol, p.pos_side, "qty:", p.qty, "avgPx:", p.avg_px);
+                } else if let Some(b) = ev.balance().filter(|b| !b.snapshot) {
+                    Log!("balance", b.asset, "free:", b.free, "frozen:", b.frozen);
+                } else if let Some(o) = ev.order() {
+                    Log!("order", o.id, o.state, "filled:", o.filled_qty, "/", o.qty);
+                }
+            }
+            ctx::Polled::Stopped => break,
+            _ => {}
+        }
+    }
+}
+```
+
+订阅全市场ticker，每分钟输出一次收到的事件数以及```ctx.connectors()```中的接收缓冲计数，用于判断策略的处理速度是否跟得上行情推送。
+
+```javascript
+function main() {
+    var all = ctx.subscribe(exchange, {channel: "tickers"})
+    var n = 0
+    var last = Date.now()
+    while (true) {
+        var ev = ctx.poll([], 1000)
+        if (ev && ev.kind === 1) {
+            n++
+        } else if (ev && ev.kind === 35 && ev.prefillStatus === 2) {
+            throw new Error("tickers subscription failed: " + ev.message)
+        }
+        if (Date.now() - last >= 60000) {
+            var feed = ctx.connectors()[exchange.GetIndex()].feed
+            Log("tickers/min:", n, "dropped:", feed.ticksDropped,
+                "backpressure:", feed.backpressure, "ring:", feed.ringCapacity)
+            n = 0
+            last = Date.now()
+        }
+    }
+}
+```
+
+```python
+import time
+
+def main():
+    all_tickers = ctx.subscribe(exchange, {"channel": "tickers"})
+    n = 0
+    last = time.time()
+    while True:
+        ev = ctx.poll([], 1000)
+        if ev is not None and ev.kind == 1:
+            n += 1
+        elif ev is not None and ev.kind == 35 and ev.prefillStatus == 2:
+            raise Exception("tickers subscription failed: " + ev.message)
+        if time.time() - last >= 60:
+            feed = ctx.connectors()[all_tickers.ex].feed
+            Log("tickers/min:", n, "dropped:", feed.ticksDropped,
+                "backpressure:", feed.backpressure, "ring:", feed.ringCapacity)
+            n = 0
+            last = time.time()
+```
+
+```rust
+use sdk::ctx::EventExt;
+
+fn main() {
+    let all = ctx::subscribe(exchange, ctx::SubOpts::tickers()).unwrap();
+    let mut n = 0u64;
+    let mut last = Unix();
+    loop {
+        match ctx::poll(&[all.id()], Some(1000)) {
+            ctx::Polled::Event(ev) => {
+                if ev.kind == EV_MD_TICK {
+                    n += 1;
+                } else if let Some(st) = ev.feed_status().filter(|st| st.failed()) {
+                    panic!("tickers subscription failed: {}", st.message);
+                }
+            }
+            ctx::Polled::Stopped => break,
+            _ => {}
+        }
+        if Unix() - last >= 60 {
+            // 返回JSON数组，每个交易所对应一项，其中feed字段为接收缓冲计数
+            Log!("tickers/min:", n, "connectors:", ctx::connectors());
+            n = 0;
+            last = Unix();
+        }
+    }
+}
+```
+
+所有事件都包含以下字段：
+
+| 字段 | 类型 | 说明 |
+| - | - | - |
+| kind | number | 事件类型：```1``` ticker、bbo与tickers，```3``` 深度，```4``` 成交，```5``` K线，```16``` 订单回报，```17``` 持仓，```18``` 余额，```32``` 定时器，```33``` 网关状态，```35``` 初始化状态 |
+| stream | number | 投递该事件的事件流：订阅产生的事件为本线程中订阅对象的```id```；网关状态事件和定时器事件分别来自内置事件流```ctx.STREAM_STATUS```（```2```）和```ctx.STREAM_TIMER```（```1```） |
+| type | string | ```data```（行情数据，以及私有流的订单回报、持仓、余额）、```status```（网关状态、初始化状态）、```timer```（定时器） |
+| channel | string | 所属订阅的频道：```ticker```、```bbo```、```tickers```、```depth```、```trade```、```kline```；私有流事件为```orders```、```positions```、```balance```；网关状态事件为```gateway```，定时器事件为```timer```；初始化状态事件见下文 |
+| depth | number | 仅深度事件包含：所属订阅的档位数（```0```表示交易所默认档位数） |
+| interval | number | 仅K线事件及K线订阅的初始化状态事件包含：K线周期，单位为秒 |
+| ex | number | 账户在```exchanges```中的索引，可直接作为```ctx.subscribe()```的第一个参数传入；不属于任何账户的事件为```-1``` |
+| symbol | string | 品种代码，例如```BTC_USDT```、```BTC_USDT.swap```；```tickers```事件为各自对应的品种；余额事件及私有流的状态事件为空字符串 |
+| seq | number | 事件序号，单调递增 |
+| ts | number | 托管者收到交易所数据的时间（毫秒时间戳，含小数部分）；```Date.now() - ev.ts```为托管者内部处理及取事件的延迟，不包括交易所到托管者的网络延迟 |
+
+各类事件的其他字段：
+
+| kind | 字段 |
+| - | - |
+| 1（ticker、bbo、tickers） | ```bid```、```ask```、```last```、```bidQty```、```askQty```、```volume```、```openInterest```、```open```、```high```、```low```、```time```（交易所时间，毫秒）。```bbo```无最新价时```last```为```0```；全市场推送不含买卖价时，```tickers```的```bid```、```ask```为```0``` |
+| 3（深度） | 不含档位字段，仅表示订单簿已更新；档位数据通过```ev.book(n)```读取，见下文 |
+| 4（成交） | ```px```（价格）、```qty```（数量）、```side```（主动成交方向```buy```/```sell```，交易所未提供时为空字符串）、```tradeId```、```time```（交易所成交时间，毫秒） |
+| 5（K线） | ```open```、```high```、```low```、```close```、```volume```、```openInterest```、```intervalSec```、```openTimeMs```、```closed```（该K线是否已收盘）、```prefill```（是否为首次订阅时推送的历史K线） |
+| 16（订单回报） | ```id```（订单号）、```state```（```acked```、```partial```、```filled```、```canceled```、```rejected```）、```px```、```qty```、```filledQty```、```avgPx```、```reason```（拒单原因码，```0```表示无）、```reasonText``` |
+| 17（持仓） | ```side```（```buy```为多、```sell```为空）、```posSide```（双向持仓为```long```、```short```，单向持仓为```net```）、```qty```、```avgPx```、```profit```、```margin```、```liqPx```、```markPx```、```leverage```、```time```、```snapshot``` |
+| 18（余额） | ```asset```（资产名称）、```free```（可用）、```frozen```（冻结）、```equity```、```upnl```、```margin```、```time```、```snapshot``` |
+| 32（定时器） | ```timerId```、```scheduledNs```（超出```JavaScript```安全整数范围时为字符串） |
+| 33（网关状态） | ```status```（```1```为连接正常，```2```为断开，```3```为降级）、```detail``` |
+| 35（初始化状态） | ```channelCode```（频道的数字代码）、```intervalSec```、```prefillStatus```（```1```为就绪，```2```为失败）、```detail```、```message```（失败原因） |
+
+价格和数量均为实数，已按合约精度换算。
+
+成交事件的```tradeId```始终为字符串，格式与`exchange.GetTrades`返回的成交ID相同：交易所的数字成交号以十进制字符串表示，其他格式原样保留；交易所未提供成交号时，为以```syn:```开头的合成编号；空字符串表示连接器未提供成交号。
+
+深度事件带有```ev.book(n)```方法，用于读取该事件所属订阅自身维护的订单簿前```n```档（不传```n```时为订阅的档数），返回```{bids: [[price, qty], ...], asks: [[price, qty], ...]}```，其中```bids```按价格从高到低排列，```asks```按价格从低到高排列，与订阅对象的`book`方法相同。```ev.book```为不可枚举属性，```JSON.stringify(ev)```的结果中不包含它；所属订阅已退订时调用该方法会抛出异常。
+
+持仓（```kind```为```17```）和余额（```kind```为```18```）事件来自```private```订阅，每条事件都是该持仓或该资产当前的完整状态，而非增量：持仓```qty```为```0```表示已平仓（单向持仓平仓后```side```为空字符串），余额```free```、```frozen```均为```0```表示该资产已清空。字段与`exchange.GetAssets`、`exchange.GetPositions`的口径一致；```profit```、```margin```、```liqPx```、```markPx```、```leverage```、```equity```、```upnl```在交易所未推送时不出现（而不是为```0```）。```snapshot```为```true```表示这是订阅生效或断线重连后推送的账户快照，快照之后，同一事件流上会有一条```channel```为```private```的初始化状态事件。
+
+初始化状态事件（```kind```为```35```）与其所属订阅共用同一个事件流（```stream```相同），```channel```为所属订阅的频道（私有流快照的状态事件为```private```），用于以下情况：K线订阅推送完首批历史K线、```private```订阅推送完账户快照（```prefillStatus```为```1```），以及订阅被交易所或连接器拒绝（```prefillStatus```为```2```，```message```为失败原因，此时频道可以是任意频道）。在收到就绪状态之前，不要把已收到的少量实时K线当作完整的历史数据。
+
+```ctx.poll()```只获取本线程订阅的事件：主线程和```threading.Thread()```创建的线程（```Python```中为标准库的```threading.Thread```）各自订阅、各自获取，过滤条件中指定其他线程的订阅对象或事件流ID永远获取不到事件。不同线程订阅了相同内容时，各自收到一份。网关状态事件会发送给在该交易所有订阅的每个线程，定时器事件只发送给主线程。
+
+使用```streams```过滤仅表示本次调用只获取指定的几路事件：未指定的事件仍留在本线程的队列中，最终需要一次不带过滤条件（```[]```）的调用将其取走。订单回报、持仓、余额、网关状态、初始化状态和定时器事件不会因为获取不及时而被覆盖，无人获取时会持续积压，每个线程最多积压10240条，超出时丢弃最旧的事件。
+
+等待期间仍会执行```Promise```、```setTimeout```回调以及WebSocket、TCP连接的读写；```timeout```为```0```时也会处理一轮这些任务。
+
+在```JavaScript```、```Rust```中，同一线程内的```ctx.poll()```与`EventLoop`从同一个事件队列获取事件，一个线程只应使用其中一种方式；```JavaScript```线程可以通过```options```形式同时等待推送事件、线程消息等其他来源。```Python```的```EventLoop()```有独立的队列，与```ctx.poll()```互不争抢。
+
+消费速度诊断：托管者为每个交易所接收推送的缓冲区会随积压量从1024条自动扩容至32768条，达到上限后会丢弃行情事件，并让连接器暂缓推送其他事件。```ctx.connectors()```返回已加载的交易所列表（顺序即```ev.ex```），每一项包含```ex```、```label```、```name```、```symbol```、```interval```、```orderIdScope```和```feed```字段，```feed```为进程启动以来的累计计数```{ticksDropped, backpressure, ringCapacity}```，依次为：缓冲区满时丢弃的行情条数、让连接器暂缓推送的次数、缓冲区当前容量（条）。这些数值增长较快说明策略处理事件过慢，应首先检查每条事件的处理耗时；全市场```tickers```这类高频订阅应保持默认的仅保留最新数据模式。
+
+```Python```中为```ctx.poll(streams=None, timeout_ms=None)```：```streams```为```None```或```[]```时表示本线程订阅的全部事件流，否则为订阅对象、事件流ID、```SubscriptionList```或它们的（嵌套）列表；```timeout_ms```为```None```时一直等待，为```0```时不等待，为正整数时表示最多等待的毫秒数，超时返回```None```。事件为字典（```dict```的子类），字段与```JavaScript```的事件相同，```ev["kind"]```和```ev.kind```两种写法均可；深度事件有```ev.book(n)```方法。实盘停止后（包括```onexit()```执行期间）调用会抛出```StopError```，正在等待的调用也会立即抛出该异常。不支持```options```形式（传入字典会抛出```TypeError```）：线程消息、```exchange.Go()```的完成通知分别通过```EventLoop()```和各自的对象获取。```ctx.connectors()```与```JavaScript```中相同，也可以使用```ctx.STREAM_STATUS```、```ctx.STREAM_TIMER```。
+
+```Rust```中的签名为```ctx::poll(streams: &[u32], timeout_ms: Option<u64>) -> ctx::Polled```：```streams```传入```sub.id()```或内置的```ctx::STREAM_TIMER```、```ctx::STREAM_STATUS```，传入空切片表示本线程订阅的全部数据流，超时参数为```None```时表示一直等待；返回值为```Polled::Event(ev)```、```Polled::Empty```（超时）、```Polled::Stopped```（实盘已停止）或```Polled::Error(rc)```。```Rust```中的事件为原始结构体，引入```sdk::ctx::EventExt```后即可按事件类型读取，无需编写```unsafe```代码：```ev.stream()```、```ev.channel()```、```ev.book(n)```（深度事件），以及已换算为实数的```ev.ticker()```、```ev.trade()```、```ev.kline()```、```ev.order()```、```ev.position()```、```ev.balance()```、```ev.gateway()```（网关状态）、```ev.feed_status()```（初始化状态，```failed()```时```message```为失败原因）。事件类型不符时返回```None```，各字段与```JavaScript```中的事件一一对应。```Rust```中任意线程均可订阅并调用```poll```，各线程只获取本线程订阅的事件。```ctx::connectors()```返回内容相同的JSON字符串。
+
+See also: `ctx.subscribe`, `Subscription`, `EventLoop`
+
+#### Subscription
+
+订阅对象，由`ctx.subscribe`返回，代表一路推送订阅。可以直接传给`ctx.poll`，只接收这一路订阅的事件。订阅对象归属于创建它的线程：该路订阅的事件只投递给该线程，也只有该线程能够退订。批量订阅（```symbol```传入数组）时返回订阅对象数组，调用数组的```unsubscribe()```可一次性退订全部元素；该数组也可以直接传给```ctx.poll()```。
+
+订阅对象具有以下只读属性，```JSON.stringify(sub)```的结果仅包含这些属性：
+
+| 属性 | 类型 | 说明 |
+| - | - | - |
+| id | number | 事件流ID，该路订阅所产生事件的```ev.stream```等于此值。同一线程中身份相同的订阅，其```id```相同 |
+| ex | number | 账户在```exchanges```数组中的索引 |
+| channel | string | 频道：```ticker```、```bbo```、```depth```、```trade```、```kline```、```tickers```、```private``` |
+| symbol | string | 品种代码；```tickers```、```private```订阅时为空字符串 |
+| depth | number | ```depth```订阅的档位数（```0```表示使用交易所默认档位数），其他订阅为```0``` |
+| interval | number | ```kline```订阅的周期（秒），其他订阅为```0``` |
+
+方法：`book`读取该路深度订阅的订单簿；`positions`、`balances`读取私有订阅维护的最新持仓和余额；`unsubscribe`用于退订。
+
+```Python```中为```Subscription```对象，属性相同且只读，```info()```返回由这些属性组成的字典；批量订阅返回```SubscriptionList```（```list```的子类），其```unsubscribe()```可退订全部元素。```Rust```中对应```ctx::subscribe()```（批量为```ctx::subscribe_many()```）返回的```ctx::Sub```，属性以方法形式提供：```id()```、```ex()```、```channel()```、```depth()```、```interval()```。
+
+##### Subscription.book
+
+```
+book()
+book(n)
+```
+
+读取本路深度订阅自身维护的订单簿，仅适用于```channel```为```depth```的订阅。
+
+Parameters:
+
+- `n` (number, optional): 每侧返回的档位数。不传时为订阅时指定的档数（订阅时未指定档数则为```5```）。
+
+Returns (object): ```{bids: [[价格, 数量], ...], asks: [[价格, 数量], ...]}```。```bids```按价格从高到低排列，```asks```按价格从低到高排列，价格和数量均为实数。尚未收到完整订单簿时，两侧均为空数组。
+
+订阅20档订单簿，每次更新时读取买一价、卖一价及前5档的挂单总量。
+
+```javascript
+function main() {
+    var sub = ctx.subscribe(exchange, {channel: "depth", depth: 20})
+    while (true) {
+        var ev = ctx.poll(sub, 1000)
+        if (!ev || ev.kind !== 3) {
+            continue
+        }
+        var book = sub.book(5)          // 也可以写ev.book(5)
+        if (book.bids.length === 0 || book.asks.length === 0) {
+            continue                    // 还没有收到完整的订单簿
+        }
+        var bidQty = 0
+        var askQty = 0
+        book.bids.forEach(function(level) { bidQty += level[1] })
+        book.asks.forEach(function(level) { askQty += level[1] })
+        Log("bid1:", book.bids[0][0], "ask1:", book.asks[0][0])
+        Log("top 5 bidQty:", bidQty, "askQty:", askQty)
+    }
+}
+```
+
+```python
+def main():
+    sub = ctx.subscribe(exchange, {"channel": "depth", "depth": 20})
+    while True:
+        ev = ctx.poll(sub, 1000)
+        if ev is None or ev.kind != 3:
+            continue
+        book = sub.book(5)              # 也可以写ev.book(5)
+        if not book["bids"] or not book["asks"]:
+            continue                    # 还没有收到完整的订单簿
+        bid_qty = sum(level[1] for level in book["bids"])
+        ask_qty = sum(level[1] for level in book["asks"])
+        Log("bid1:", book["bids"][0][0], "ask1:", book["asks"][0][0])
+        Log("top 5 bidQty:", bid_qty, "askQty:", ask_qty)
+```
+
+```rust
+fn main() {
+    let sub = ctx::subscribe(exchange, ctx::SubOpts::depth(20)).unwrap();
+    loop {
+        match ctx::poll(&[sub.id()], Some(1000)) {
+            ctx::Polled::Event(_) => {
+                let book = match sub.book(5) {
+                    Ok(b) => b,
+                    Err(e) => panic!("book failed: {e}"),
+                };
+                if book.bids.is_empty() || book.asks.is_empty() {
+                    continue;
+                }
+                let bid_qty: f64 = book.bids.iter().map(|l| l.1).sum();
+                let ask_qty: f64 = book.asks.iter().map(|l| l.1).sum();
+                Log!("bid1:", book.bids[0].0, "ask1:", book.asks[0].0);
+                Log!("top 5 bidQty:", bid_qty, "askQty:", ask_qty);
+            }
+            ctx::Polled::Stopped => break,
+            _ => {}
+        }
+    }
+}
+```
+
+深度事件（```kind```为```3```）仅表示订单簿已更新，不携带档位数据。订单簿在托管者内随交易所推送持续更新，与策略读取事件的快慢无关，任何时候读取到的都是最新的完整订单簿。深度事件的```ev.book(n)```读取的是同一本订单簿。
+
+每路深度订阅各自维护一本订单簿：同一品种```depth```分别为```5```和```20```的两路订阅互不影响，各自读取对应档数的订单簿。
+
+对非深度订阅或已退订的订阅对象调用时，将抛出异常。
+
+```Python```中为```sub.book(n=None)```，返回```{"bids": [[价格, 数量], ...], "asks": [...]}```字典（也可以写作```b.bids```），深度事件同样提供```ev.book(n)```。```Rust```中为```sub.book(n: usize) -> Result<ctx::Book, String>```，```ctx::Book```的```bids```、```asks```为```Vec<(f64, f64)>```（价格、数量）；深度事件在引入```sdk::ctx::EventExt```后也可以使用```ev.book(n)```。```ctx::Sub```可以复制，传入其他线程后同样可以读取这本订单簿（但退订仍只能在创建该订阅的线程中进行）。
+
+See also: `positions`, `balances`, `unsubscribe`, `ctx.subscribe`, `exchange.GetDepth`
+
+##### Subscription.positions
+
+```
+positions()
+```
+
+读取私有订阅根据推送维护的最新持仓，仅适用于```channel```为```private```的订阅。
+
+Returns (array / 空值): 持仓数组，每个元素表示一个持仓槽当前的完整状态，按品种和持仓槽排序；账户快照尚未就绪时返回空值。
+
+订阅私有流，在快照就绪后以及每次持仓变化时输出全部持仓。
+
+```javascript
+function main() {
+    var acct = ctx.subscribe(exchange, {channel: "private"})
+    while (true) {
+        var ev = ctx.poll([], 1000)
+        if (!ev || ev.stream !== acct.id) {
+            continue
+        }
+        var ready = ev.kind === 35 && ev.prefillStatus === 1
+        if (ready || (ev.channel === "positions" && !ev.snapshot)) {
+            var positions = acct.positions()
+            if (positions === null) {
+                continue                    // 账户快照尚未就绪
+            }
+            positions.forEach(function(p) {
+                Log(p.symbol, p.posSide, "qty:", p.qty, "avgPx:", p.avgPx, "profit:", p.profit)
+            })
+        }
+    }
+}
+```
+
+```python
+def main():
+    acct = ctx.subscribe(exchange, {"channel": "private"})
+    while True:
+        ev = ctx.poll([], 1000)
+        if ev is None or ev.stream != acct.id:
+            continue
+        ready = ev.kind == 35 and ev.prefillStatus == 1
+        if ready or (ev.channel == "positions" and not ev.snapshot):
+            positions = acct.positions()
+            if positions is None:
+                continue                    # 账户快照尚未就绪
+            for p in positions:
+                # 交易所未推送的金额字段不在字典中，需用get读取
+                profit = p.get("profit")
+                Log(p.symbol, p.posSide, "qty:", p.qty, "avgPx:", p.avgPx, "profit:", profit)
+```
+
+```rust
+use sdk::ctx::EventExt;
+
+fn main() {
+    let acct = ctx::subscribe(exchange, ctx::SubOpts::private()).unwrap();
+    loop {
+        match ctx::poll(&[], Some(1000)) {
+            ctx::Polled::Event(ev) if ev.stream() == acct.id() => {
+                if ev.channel() != "private" && ev.channel() != "positions" {
+                    continue;
+                }
+                match acct.positions() {
+                    Ok(Some(rows)) => {
+                        for p in rows {
+                            Log!(p.symbol, p.pos_side, "qty:", p.qty, "avgPx:", p.avg_px);
+                        }
+                    }
+                    Ok(None) => {}          // 账户快照尚未就绪
+                    Err(e) => panic!("positions failed: {e}"),
+                }
+            }
+            ctx::Polled::Stopped => break,
+            _ => {}
+        }
+    }
+}
+```
+
+数组元素的字段：
+
+| 字段 | 类型 | 说明 |
+| - | - | - |
+| symbol | string | 品种代码，例如```BTC_USDT.swap``` |
+| side | string | ```buy```（多头）或```sell```（空头） |
+| posSide | string | 持仓槽：双向持仓模式下为```long```或```short```，单向持仓模式下为```net``` |
+| qty | number | 持仓数量，单位与`exchange.GetPositions`相同 |
+| avgPx | number | 持仓均价 |
+| profit、margin、liqPx、markPx、leverage | number | 未实现盈亏、保证金、强平价格、标记价格、杠杆倍数；交易所未推送时不包含该字段 |
+| time | number | 交易所更新时间（毫秒）；交易所未提供时不包含该字段 |
+
+已平仓（数量为```0```）的持仓不会出现在数组中。
+
+返回空值表示状态未知，而非没有持仓：订阅后，需等到该事件流上收到```channel```为```private```、```prefillStatus```为```1```的初始化状态事件后才有数据；最近一次快照失败时（例如断线重连后快照请求失败）也返回空值，直到下一次快照就绪。现货账户没有持仓，就绪后返回空数组。
+
+托管者根据推送的持仓事件（```kind```为```17```）更新这份状态，因此需要持续调用`ctx.poll`获取事件。实时推送是否包含持仓因交易所而异，部分交易所仅在订阅时和重连后提供快照，详见各交易所页面的说明。如需可靠的最新持仓，仍可使用`exchange.GetPositions`查询，该函数始终请求REST接口，不依赖推送。
+
+对非私有订阅调用，或在订阅对象已退订后调用，会抛出异常。
+
+```Rust```中为```sub.positions() -> Result<Option<Vec<ctx::PositionRow>>, String>```，```Ok(None)```表示快照尚未就绪；```PositionRow```的字段为```symbol```、```side```、```pos_side```、```qty```、```avg_px```、```profit```、```margin```、```liq_px```、```mark_px```、```leverage```、```time```（金额与时间字段为```Option```类型）。```Python```中为```sub.positions()```，返回字典列表（字段同上，也支持属性访问写法），快照尚未就绪时返回```None```。
+
+See also: `balances`, `book`, `unsubscribe`, `ctx.subscribe`, `exchange.GetPositions`
+
+##### Subscription.balances
+
+```
+balances()
+```
+
+读取私有订阅根据推送维护的最新余额，仅适用于```channel```为```private```的订阅。
+
+Returns (array / 空值): 余额数组，每个元素为某种资产当前的完整余额，按资产名排序；账户快照尚未就绪时返回空值。
+
+订阅私有流，在快照就绪时及每次余额变化时输出```USDT```的可用数量与冻结数量。
+
+```javascript
+function main() {
+    var acct = ctx.subscribe(exchange, {channel: "private"})
+    while (true) {
+        var ev = ctx.poll([], 1000)
+        if (!ev || ev.stream !== acct.id) {
+            continue
+        }
+        var ready = ev.kind === 35 && ev.prefillStatus === 1
+        if (!ready && ev.channel !== "balance") {
+            continue
+        }
+        var balances = acct.balances()
+        if (balances === null) {
+            continue                        // 账户快照尚未就绪
+        }
+        var usdt = balances.find(function(b) { return b.asset === "USDT" })
+        Log("USDT free:", usdt ? usdt.free : 0, "frozen:", usdt ? usdt.frozen : 0)
+    }
+}
+```
+
+```python
+def main():
+    acct = ctx.subscribe(exchange, {"channel": "private"})
+    while True:
+        ev = ctx.poll([], 1000)
+        if ev is None or ev.stream != acct.id:
+            continue
+        ready = ev.kind == 35 and ev.prefillStatus == 1
+        if not ready and ev.channel != "balance":
+            continue
+        balances = acct.balances()
+        if balances is None:
+            continue                        # 账户快照尚未就绪
+        usdt = next((b for b in balances if b.asset == "USDT"), None)
+        Log("USDT free:", usdt.free if usdt else 0, "frozen:", usdt.frozen if usdt else 0)
+```
+
+```rust
+use sdk::ctx::EventExt;
+
+fn main() {
+    let acct = ctx::subscribe(exchange, ctx::SubOpts::private()).unwrap();
+    loop {
+        match ctx::poll(&[], Some(1000)) {
+            ctx::Polled::Event(ev) if ev.stream() == acct.id() => {
+                if ev.channel() != "private" && ev.channel() != "balance" {
+                    continue;
+                }
+                if let Ok(Some(rows)) = acct.balances() {
+                    if let Some(u) = rows.iter().find(|b| b.asset == "USDT") {
+                        Log!("USDT free:", u.free, "frozen:", u.frozen);
+                    }
+                }
+            }
+            ctx::Polled::Stopped => break,
+            _ => {}
+        }
+    }
+}
+```
+
+数组元素的字段：
+
+| 字段 | 类型 | 说明 |
+| - | - | - |
+| asset | string | 资产名，与`exchange.GetAssets`返回的资产名一致 |
+| free | number | 可用数量 |
+| frozen | number | 冻结数量 |
+| equity、upnl、margin | number | 权益、未实现盈亏、保证金占用；交易所未推送时不包含这些字段 |
+| time | number | 交易所更新时间（毫秒）；交易所未提供时不包含该字段 |
+
+可用数量与冻结数量均为```0```的资产不包含在数组中。
+
+返回空值表示状态未知，而不是没有余额：订阅后，需要等到该事件流上出现```channel```为```private```、```prefillStatus```为```1```的初始化状态事件，之后才有数据；最近一次快照失败时也返回空值，直到下一次快照就绪。
+
+托管者根据推送的余额事件（```kind```为```18```）更新此状态，因此需要持续调用`ctx.poll`获取事件。各交易所推送余额的方式不同（有的交易所在余额变动后由连接器重新请求REST接口再推送，有的只提供快照），详见各交易所页面的说明。`exchange.GetAssets`、`exchange.GetAccount`始终请求REST接口，与推送无关。
+
+对非私有订阅或已退订的订阅对象调用时会抛出异常。
+
+```Rust```中为```sub.balances() -> Result<Option<Vec<ctx::BalanceRow>>, String>```，```Ok(None)```表示快照尚未就绪；```BalanceRow```的字段为```asset```、```free```、```frozen```、```equity```、```upnl```、```margin```、```time```（后四个为```Option```）。```Python```中为```sub.balances()```，返回字典列表（字段同上，也可以用属性方式访问），快照尚未就绪时返回```None```。
+
+See also: `positions`, `book`, `unsubscribe`, `ctx.subscribe`, `exchange.GetAssets`
+
+##### Subscription.unsubscribe
+
+```
+unsubscribe()
+```
+
+退订：释放此订阅对象持有的引用；只有最后一个引用被释放时，才真正向交易所退订。
+
+订阅ticker，收到10条后退订，改为订阅成交推送。
+
+```javascript
+function main() {
+    var tk = ctx.subscribe(exchange, {channel: "ticker"})
+    var n = 0
+    while (n < 10) {
+        var ev = ctx.poll(tk, 1000)
+        if (ev && ev.kind === 1) {
+            Log("ticker", ev.last)
+            n++
+        }
+    }
+    tk.unsubscribe()
+
+    var trades = ctx.subscribe(exchange, {channel: "trade"})
+    while (true) {
+        var t = ctx.poll(trades, 1000)
+        if (t && t.kind === 4) {
+            Log("trade", t.tradeId, t.side, t.px, t.qty)
+        }
+    }
+}
+```
+
+```python
+def main():
+    tk = ctx.subscribe(exchange, {"channel": "ticker"})
+    n = 0
+    while n < 10:
+        ev = ctx.poll(tk, 1000)
+        if ev is not None and ev.kind == 1:
+            Log("ticker", ev.last)
+            n += 1
+    tk.unsubscribe()
+
+    trades = ctx.subscribe(exchange, {"channel": "trade"})
+    while True:
+        t = ctx.poll(trades, 1000)
+        if t is not None and t.kind == 4:
+            Log("trade", t.tradeId, t.side, t.px, t.qty)
+```
+
+```rust
+fn main() {
+    let tk = ctx::subscribe(exchange, ctx::SubOpts::ticker()).unwrap();
+    let mut n = 0;
+    while n < 10 {
+        match ctx::poll(&[tk.id()], Some(1000)) {
+            ctx::Polled::Event(_) => n += 1,
+            ctx::Polled::Stopped => return,
+            _ => {}
+        }
+    }
+    tk.unsubscribe().unwrap();
+    Log!("ticker unsubscribed after", n, "events");
+}
+```
+
+订阅归属于创建它的线程：在子线程中订阅相同内容会得到独立的事件流，且只能退订自己的订阅；主线程通过批量订阅返回的数组一次性退订两路订阅。
+
+```javascript
+function main() {
+    var subs = ctx.subscribe(0, {channel: "ticker", symbol: ["BTC_USDT", "ETH_USDT"]})
+    var t = threading.Thread(function() {
+        // 线程里订阅同样的内容：得到自己的事件流，id与主线程的不同
+        var mine = ctx.subscribe(0, {channel: "ticker", symbol: "BTC_USDT"})
+        var id = mine.id
+        mine.unsubscribe()       // 自己的订阅可以退订
+        return id
+    })
+    Log("main stream:", subs[0].id, "thread stream:", t.join().ret)
+    subs.unsubscribe()           // 主线程退订自己的两路
+}
+```
+
+```python
+import threading
+
+def main():
+    subs = ctx.subscribe(0, {"channel": "ticker", "symbol": ["BTC_USDT", "ETH_USDT"]})
+
+    def worker():
+        # 线程里订阅同样的内容：得到自己的事件流，id与主线程的不同
+        mine = ctx.subscribe(0, {"channel": "ticker", "symbol": "BTC_USDT"})
+        Log("main stream:", subs[0].id, "thread stream:", mine.id)
+        mine.unsubscribe()               # 自己的订阅可以退订
+        try:
+            subs[0].unsubscribe()        # 订阅属于主线程，这里会抛出异常
+        except Exception as e:
+            Log("cannot unsubscribe here:", e)
+
+    t = threading.Thread(target=worker)
+    t.start()
+    t.join()
+    subs.unsubscribe()                   # 主线程退订自己的两路
+```
+
+在同一线程内，身份相同（账户、品种、频道、档数、周期均相同）的订阅共用一路事件流，每调用一次`ctx.subscribe`即增加一个引用。```unsubscribe()```只释放本对象持有的那一个引用，共用同一路事件流的其他订阅对象不受影响，仍正常接收事件；其他线程订阅的相同内容也各自持有引用。所有引用都释放后，托管者才向交易所退订，此后迟到的事件将被丢弃。
+
+只有创建该订阅的线程才能退订：在其他线程中调用会抛出异常（错误信息包含```belongs to another thread```），订阅仍保持有效。线程结束时，其所有订阅会自动退订。
+
+批量订阅返回的数组同样提供```unsubscribe()```方法，可一次性退订数组中的全部元素（每个元素各释放一个引用）。
+
+对同一订阅对象重复调用```unsubscribe()```不会产生任何效果；订阅被交易所拒绝（收到```prefillStatus```为```2```的初始化状态事件）后再调用，同样不产生任何效果。退订后不能再调用该对象的```book()```、```positions()```、```balances()```方法。
+
+退订后再次订阅相同内容，将获得新的事件流ID。
+
+```Python```中为```sub.unsubscribe()```，批量订阅返回的```SubscriptionList```同样提供```unsubscribe()```。```Rust```中为```sub.unsubscribe() -> Result<(), String>```，在其他线程中调用会返回```Err```。```ctx::Sub```可以复制，引用数按```ctx::subscribe()```的调用次数计算：每调用一次```ctx::subscribe()```，对应调用一次```unsubscribe()```；不要对复制出的同一句柄重复退订。
+
+See also: `book`, `positions`, `balances`, `ctx.subscribe`
 
 #### threading
 
@@ -25133,7 +26180,6 @@ fn main() {
 
 | ```exchange.GetName()``` | 品牌 | 类型 | 别名 |
 | - | - | - | - |
-| `AscendEx` | AscendEx | 现货 | AscendEX、BitMax |
 | `Backpack` | Backpack | 现货 | Backpack Exchange |
 | `Futures_Backpack` | Backpack | 期货 | — |
 | `BigONE` | BigONE | 现货 | — |
@@ -25210,98 +26256,96 @@ fn main() {
 
 ### 能力矩阵
 
-各交易所对象对标准函数与交易模式指令的支持情况。✓ 支持；✗ 不支持（调用时报错并返回空值）；合成：交易所的接口不能完整提供该函数（没有对应接口，或缺少部分K线周期等），由托管者补足，说明见交易所页；— 不适用（现货交易所对象没有期货函数）。
+各交易所对象对标准函数与交易模式指令的支持情况。✓ 支持；✗ 不支持（调用时报错并返回空值）；合成：交易所的接口不能完整提供该函数（没有对应接口，或缺少部分K线周期等），由托管者补足，说明见交易所页；— 不适用（现货交易所对象没有期货函数）。行情一组的「推送」列：✓ 支持WebSocket推送（`ctx.subscribe`订阅行情与账户私有流）；✓ tickers 另外支持不带交易对的全市场```tickers```频道；✗ 没有推送，只能用REST查询函数。各频道的细节（深度档数、K线周期、私有流覆盖的内容）见交易所页。
 
 #### 行情
 
-| 交易所 | `GetTicker` | `GetTickers` | `GetDepth` | `GetTrades` | `GetRecords` | `GetMarkets` |
-| - | - | - | - | - | - | - |
-| **中心化交易所** |  |  |  |  |  |  |
-| `AscendEx` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `Backpack` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `Futures_Backpack` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `BigONE` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `Binance` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `Futures_Binance` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `Bitfinex` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `Futures_Bitfinex` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `BitFlyer` | ✓ | ✗ | ✓ | ✓ | 合成 | ✓ |
-| `Bitget` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `Futures_Bitget` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `Bithumb` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `Bitstamp` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `Bybit` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `Futures_Bybit` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `Coincheck` | ✓ | ✗ | ✓ | ✓ | 合成 | ✗ |
-| `Coinone` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `Coinw` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `Futures_Coinw` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `Crypto` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `Futures_Crypto` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `DeepCoin` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `Futures_DeepCoin` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `Futures_Deribit` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `DigiFinex` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `Futures_DigiFinex` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `GateIO` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `Futures_GateIO` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `Gemini` | ✓ | ✗ | ✓ | ✓ | 合成 | ✓ |
-| `HashKey` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `HitBTC` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `Huobi` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `Futures_HuobiDM` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `Korbit` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `Kraken` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `Futures_Kraken` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `KuCoin` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `Futures_KuCoin` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `LBank` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `MEXC` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `Futures_MEXC` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `OKEX` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `Futures_OKCoin` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `Poloniex` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `Upbit` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `WEEX` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `Futures_WEEX` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `WOO` | ✓ | ✗ | ✓ | ✓ | 合成 | ✓ |
-| `Futures_WOO` | ✓ | ✗ | ✓ | ✓ | 合成 | ✓ |
-| `Zaif` | ✓ | ✗ | ✓ | ✓ | 合成 | ✓ |
-| **去中心化交易所** |  |  |  |  |  |  |
-| `Hyperliquid` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `Futures_Hyperliquid` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `Futures_Lighter` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `Futures_EdgeX` | ✓ | ✗ | ✓ | ✗ | 合成 | ✓ |
-| `Aster` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `Futures_ApolloX` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `Futures_Aster` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `Futures_Aevo` | ✓ | ✗ | ✓ | ✓ | 合成 | ✓ |
-| `Pendle` | ✓ | ✗ | ✓ | ✗ | ✗ | ✓ |
-| `Futures_Boros` | ✓ | ✗ | ✓ | ✓ | ✓ | ✓ |
-| `Futures_WOOFi` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `Uniswap` | ✓ | ✗ | ✓ | ✓ | 合成 | ✓ |
-| `PancakeSwap` | ✓ | ✗ | ✓ | ✓ | 合成 | ✓ |
-| `Aerodrome` | ✓ | ✗ | ✓ | ✓ | 合成 | ✓ |
-| `Velodrome` | ✓ | ✗ | ✓ | ✓ | 合成 | ✓ |
-| `KyberSwap` | ✓ | ✗ | ✓ | ✗ | 合成 | ✓ |
-| `OneInch` | ✓ | ✗ | ✓ | ✗ | 合成 | ✓ |
-| `Jupiter` | ✓ | ✗ | ✓ | ✗ | 合成 | ✓ |
-| `OKX_DEX` | ✓ | ✓ | ✗ | ✓ | 合成 | ✓ |
-| **预测市场** |  |  |  |  |  |  |
-| `Futures_Polymarket` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| **证券与期货** |  |  |  |  |  |  |
-| `Futures_Futu` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ |
-| `Futures_IB` | ✓ | ✓ | ✓ | ✗ | 合成 | ✓ |
-| **链上与自定义接入** |  |  |  |  |  |  |
-| `Exchange` | ✓ | ✗ | ✓ | ✓ | 合成 | ✗ |
-| `Web3` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
+| 交易所 | `GetTicker` | `GetTickers` | `GetDepth` | `GetTrades` | `GetRecords` | `GetMarkets` | `推送` |
+| - | - | - | - | - | - | - | - |
+| **中心化交易所** |  |  |  |  |  |  |  |
+| `Backpack` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ |
+| `Futures_Backpack` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ |
+| `BigONE` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ |
+| `Binance` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ tickers |
+| `Futures_Binance` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ tickers |
+| `Bitfinex` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ |
+| `Futures_Bitfinex` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ |
+| `BitFlyer` | ✓ | ✗ | ✓ | ✓ | 合成 | ✓ | ✓ |
+| `Bitget` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ |
+| `Futures_Bitget` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ |
+| `Bithumb` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ |
+| `Bitstamp` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ |
+| `Bybit` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ |
+| `Futures_Bybit` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ |
+| `Coincheck` | ✓ | ✗ | ✓ | ✓ | 合成 | ✗ | ✓ |
+| `Coinone` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ |
+| `Coinw` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ |
+| `Futures_Coinw` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ |
+| `Crypto` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ |
+| `Futures_Crypto` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ |
+| `DeepCoin` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ |
+| `Futures_DeepCoin` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ |
+| `Futures_Deribit` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ |
+| `DigiFinex` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ tickers |
+| `Futures_DigiFinex` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ tickers |
+| `GateIO` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ |
+| `Futures_GateIO` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ |
+| `Gemini` | ✓ | ✗ | ✓ | ✓ | 合成 | ✓ | ✓ |
+| `HashKey` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ |
+| `HitBTC` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ tickers |
+| `Huobi` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ |
+| `Futures_HuobiDM` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ |
+| `Korbit` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ |
+| `Kraken` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ |
+| `Futures_Kraken` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ |
+| `KuCoin` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ tickers |
+| `Futures_KuCoin` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ |
+| `LBank` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ |
+| `MEXC` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ tickers |
+| `Futures_MEXC` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ tickers |
+| `OKEX` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ |
+| `Futures_OKCoin` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ |
+| `Poloniex` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ tickers |
+| `Upbit` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ |
+| `WEEX` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ |
+| `Futures_WEEX` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ |
+| `WOO` | ✓ | ✗ | ✓ | ✓ | 合成 | ✓ | ✓ tickers |
+| `Futures_WOO` | ✓ | ✗ | ✓ | ✓ | 合成 | ✓ | ✓ tickers |
+| `Zaif` | ✓ | ✗ | ✓ | ✓ | 合成 | ✓ | ✗ |
+| **去中心化交易所** |  |  |  |  |  |  |  |
+| `Hyperliquid` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ |
+| `Futures_Hyperliquid` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ |
+| `Futures_Lighter` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ tickers |
+| `Futures_EdgeX` | ✓ | ✗ | ✓ | ✗ | 合成 | ✓ | ✓ tickers |
+| `Aster` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ tickers |
+| `Futures_ApolloX` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ tickers |
+| `Futures_Aster` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ tickers |
+| `Futures_Aevo` | ✓ | ✗ | ✓ | ✓ | 合成 | ✓ | ✓ |
+| `Pendle` | ✓ | ✗ | ✓ | ✗ | ✗ | ✓ | ✗ |
+| `Futures_Boros` | ✓ | ✗ | ✓ | ✓ | ✓ | ✓ | ✗ |
+| `Futures_WOOFi` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ tickers |
+| `Uniswap` | ✓ | ✗ | ✓ | ✓ | 合成 | ✓ | ✗ |
+| `PancakeSwap` | ✓ | ✗ | ✓ | ✓ | 合成 | ✓ | ✗ |
+| `Aerodrome` | ✓ | ✗ | ✓ | ✓ | 合成 | ✓ | ✗ |
+| `Velodrome` | ✓ | ✗ | ✓ | ✓ | 合成 | ✓ | ✗ |
+| `KyberSwap` | ✓ | ✗ | ✓ | ✗ | 合成 | ✓ | ✗ |
+| `OneInch` | ✓ | ✗ | ✓ | ✗ | 合成 | ✓ | ✗ |
+| `Jupiter` | ✓ | ✗ | ✓ | ✗ | 合成 | ✓ | ✗ |
+| `OKX_DEX` | ✓ | ✓ | ✗ | ✓ | 合成 | ✓ | ✗ |
+| **预测市场** |  |  |  |  |  |  |  |
+| `Futures_Polymarket` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ |
+| **证券与期货** |  |  |  |  |  |  |  |
+| `Futures_Futu` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✗ |
+| `Futures_IB` | ✓ | ✓ | ✓ | ✗ | 合成 | ✓ | ✗ |
+| **链上与自定义接入** |  |  |  |  |  |  |  |
+| `Exchange` | ✓ | ✗ | ✓ | ✓ | 合成 | ✗ | ✗ |
+| `Web3` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
 
 #### 交易
 
 | 交易所 | `CreateOrder` | `Buy` | `Sell` | `CancelOrder` | `ModifyOrder` | `GetOrder` | `GetOrders` | `GetHistoryOrders` |
 | - | - | - | - | - | - | - | - | - |
 | **中心化交易所** |  |  |  |  |  |  |  |  |
-| `AscendEx` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✓ |
 | `Backpack` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✓ |
 | `Futures_Backpack` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✓ |
 | `BigONE` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✓ |
@@ -25385,7 +26429,6 @@ fn main() {
 | 交易所 | `CreateConditionOrder` | `ModifyConditionOrder` | `CancelConditionOrder` | `GetConditionOrder` | `GetConditionOrders` | `GetHistoryConditionOrders` |
 | - | - | - | - | - | - | - |
 | **中心化交易所** |  |  |  |  |  |  |
-| `AscendEx` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
 | `Backpack` | ✓ | ✗ | ✓ | ✓ | ✓ | ✓ |
 | `Futures_Backpack` | ✓ | ✗ | ✓ | ✓ | ✓ | ✓ |
 | `BigONE` | ✓ | ✗ | ✓ | ✓ | ✓ | ✓ |
@@ -25469,7 +26512,6 @@ fn main() {
 | 交易所 | `GetAccount` | `GetAssets` | `GetPositions` | `SetMarginLevel` | `SetDirection` | `SetContractType` | `GetFundings` |
 | - | - | - | - | - | - | - | - |
 | **中心化交易所** |  |  |  |  |  |  |  |
-| `AscendEx` | ✓ | ✓ | — | — | — | — | — |
 | `Backpack` | ✓ | ✓ | — | — | — | — | — |
 | `Futures_Backpack` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `BigONE` | ✓ | ✓ | — | — | — | — | — |
@@ -25555,7 +26597,6 @@ fn main() {
 | 交易所 | ```simulate``` | ```cross``` | ```dual``` | ```unified``` | ```trade_margin``` | ```trade_super_margin``` | ```trade_normal``` | ```selfTradePreventionMode``` |
 | - | - | - | - | - | - | - | - | - |
 | **中心化交易所** |  |  |  |  |  |  |  |  |
-| `AscendEx` | ✗ | ✗ | ✗ | ✗ | ✓ | ✗ | ✓ | ✗ |
 | `Backpack` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✓ |
 | `Futures_Backpack` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✓ |
 | `Binance` | ✗ | ✗ | ✗ | ✓ | ✓ | ✓ | ✓ | ✓ |
@@ -25594,71 +26635,6 @@ fn main() {
 ### 中心化交易所
 
 加密货币交易所，每个品牌一页，同品牌的现货、期货交易所对象写在同一页。
-
-#### AscendEx
-
-AscendEX（原BitMax）的现货交易，只提供现货交易对。账户分现货钱包（cash，默认）与杠杆钱包（margin），用```exchange.IO("trade_margin")```、```exchange.IO("trade_normal")```切换，切换后账户、下单与订单查询都走对应钱包的接口。使用API Key与Secret Key接入。
-
-##### 名称与配置
-
-```exchange.GetName()```：```AscendEx```（现货）；别名：AscendEX、BitMax。
-
-| 配置项 | 必填 |
-| - | - |
-| Access Key | 是 |
-| Secret Key | 是 |
-
-##### 交易对与合约代码
-
-交易对示例：```BTC_USDT```、```ETH_USDT```
-
-交易对写作```BASE_QUOTE```，对应AscendEx原生代码```BTC/USDT```。
-
-##### 专属IO指令
-
-| 指令 | 参数 | 说明 | 返回值 |
-| - | - | - | - |
-| ```trade_margin``` | — | 切换为杠杆钱包。之后账户、下单、撤单、查单、挂单与历史订单、```exchange.GetMarkets()```都使用杠杆钱包的接口；杠杆钱包下```exchange.GetTickers()```报错。只保存在本地，不向交易所发请求。 | 指令名本身。 |
-| ```trade_normal``` | — | 切换回现货钱包（默认）。 | 指令名本身。 |
-| ```api``` | method, path[, params[, raw]] | 直接调用AscendEX接口，默认签名。（详见表下） | 交易所的完整应答（含```code```）；```code```不为0时报错。 |
-
-表中长说明的其余部分：
-
-- ```api```：签名只覆盖时间戳与端点名，签名请求的路径必须含```/api/pro```；私有接口的路径要自己带上账户组前缀，如```/<accountGroup>/api/pro/v1/cash/balance```（账户组可用```GET /api/pro/v1/info```查到）。```raw```非空时整体替换```params```：```GET```时是已编码的查询串，```POST```、```DELETE```时是请求体。
-
-通用指令```base```、```currency```见`exchange.IO`。
-
-##### 常用用法
-
-###### 查询账户组，再调用私有接口
-
-```javascript
-function main() {
-    // 私有接口的路径要带上账户组前缀
-    var info = exchange.IO("api", "GET", "/api/pro/v1/info")
-    var group = info.data.accountGroup
-    // 返回完整应答（含code）
-    var bal = exchange.IO("api", "GET", "/" + group + "/api/pro/v1/cash/balance")
-    Log(bal.data)
-    var path = "/" + group + "/api/pro/v1/cash/order/open"
-    var orders = exchange.IO("api", "GET", path, "symbol=BTC/USDT")
-    Log(orders.data)
-}
-```
-
-##### 函数支持差异
-
-不支持（调用时报错并返回空值）：`exchange.ModifyOrder`、`exchange.CreateConditionOrder`、`exchange.ModifyConditionOrder`、`exchange.CancelConditionOrder`、`exchange.GetConditionOrder`、`exchange.GetConditionOrders`、`exchange.GetHistoryConditionOrders`。
-
-以回退方式支持：
-
-- `exchange.GetRecords`：原生周期为1分钟、5分钟、15分钟、30分钟、1小时、2小时、4小时、6小时、12小时、1天、1周、1月；其它周期由托管者合成。
-
-##### 注意事项
-
-- 交易所已停止服务。
-- 现货市价买单的下单量是交易币数，不是计价币金额。
-- 订单的```Time```取自交易所的```createTime```字段；```exchange.GetOrders()```、```exchange.GetOrder()```使用的接口不返回该字段，```Time```为0。
 
 #### Backpack
 
@@ -25769,16 +26745,18 @@ function main() {
 - 市价买单的下单量是要花费的计价币金额（按Backpack的```quoteQuantity```下单），市价卖单为交易币数量。按计价币金额下的市价买单在订单查询中没有委托价，```Price```为0，```Amount```为已成交的交易币数量。
 - ```exchange.GetOrders()```、```exchange.GetHistoryOrders()```只返回普通订单，不含条件单；用```exchange.GetOrder()```查询条件单的订单号会报错，条件单用```exchange.GetConditionOrder()```查询，挂单与历史条件单分别用```exchange.GetConditionOrders()```、```exchange.GetHistoryConditionOrders()```查询。
 - ```exchange.GetAccount()```、```exchange.GetAssets()```只统计可用与冻结数量，不包含质押中的数量。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与账户私有流（订单回报、余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。Backpack只有一种深度推送（全簿实时增量），各档数的深度订阅（缺省20档，最多255档）都由```exchange.GetDepth()```同一接口的整本快照与增量按序号同步，断档时自动重新取快照，每个订阅按自己的档数输出；ticker由24小时统计流与最优买卖流合成；逐笔成交与```exchange.GetTrades()```同一套成交ID；K线周期与```exchange.GetRecords()```相同，首次订阅先推送500根历史，没有成交的K线按REST口径以上一根收盘价为开高低收、成交量为0。交易所对订阅成功不作应答，连接器在每批订阅之后发一条探测消息确认订阅是否被拒，因此订阅生效会有约0.3～2秒的确认延迟。私有流是一路```private```订阅（不带交易对，覆盖整个账户），只在订阅时连接，用API Key的ed25519私钥签名订阅订单与余额频道：订阅生效及每次断线重连后，先用与```exchange.GetAssets()```相同的接口推送余额快照，再报告就绪；之后推送订单回报（只含现货订单）与发生变化的币种余额（可用、冻结与```exchange.GetAssets()```同口径，不含质押）。现货没有持仓。签名被拒时连接状态报告降级、私有流报告失败（行情推送不受影响）。不支持全市场```tickers```订阅（Backpack的ticker推送必须逐个交易对订阅），订阅时报错；请按交易对订阅ticker。
 
 ###### ```Futures_Backpack```（期货）
 
 - 市价单的下单量是合约数量（交易币数量），买卖相同。
 - ```exchange.GetOrders()```、```exchange.GetHistoryOrders()```只返回普通订单，不含条件单；用```exchange.GetOrder()```查询条件单的订单号会报错，条件单用```exchange.GetConditionOrder()```查询。
 - 各合约的资金费率结算间隔不同，```exchange.GetFundings()```按交易所合约信息给出。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与账户私有流（订单回报、持仓、余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。Backpack只有一种深度推送（全簿实时增量），各档数的深度订阅（缺省20档，最多255档）都由```exchange.GetDepth()```同一接口的整本快照与增量按序号同步，断档时自动重新取快照，每个订阅按自己的档数输出；ticker由24小时统计流与最优买卖流合成，不含持仓量；逐笔成交与```exchange.GetTrades()```同一套成交ID；K线周期与```exchange.GetRecords()```相同，首次订阅先推送500根历史，没有成交的K线按REST口径以上一根收盘价为开高低收、成交量为0。交易所对订阅成功不作应答，连接器在每批订阅之后发一条探测消息确认订阅是否被拒，因此订阅生效会有约0.3～2秒的确认延迟。私有流是一路```private```订阅（不带交易对，覆盖整个账户），只在订阅时连接，用API Key的ed25519私钥签名订阅订单、持仓与余额频道：订阅生效及每次断线重连后，先用与```exchange.GetAssets()```、```exchange.GetPositions()```相同的接口推送余额与持仓快照，再报告就绪；之后推送订单回报（只含永续订单）与发生变化的持仓（单向净持仓，平仓推送数量0；推送不含强平价）。余额推送与```exchange.GetAssets()```的抵押品口径不同，余额变动或订单回报到达时重新查询一次```exchange.GetAssets()```同一接口，只推送变化的币种；标记价变动引起的权益变化不推送。签名被拒时连接状态报告降级、私有流报告失败（行情推送不受影响）。不支持全市场```tickers```订阅（Backpack的ticker推送必须逐个合约订阅），订阅时报错；请按交易对订阅ticker。
 
 #### BigONE
 
-BigONE的现货交易，只提供现货交易对。交易所没有普通市价单，只能下限价单（支持IOC与只做Maker）；条件单支持止盈、止损，触发后可以限价或市价成交。使用在BigONE创建的API Key与Secret Key接入。
+BigONE的现货交易，只提供现货交易对。交易所没有普通市价单，只能下限价单（支持IOC与只做Maker）；条件单支持止盈、止损，触发后可以限价或市价成交。使用在BigONE创建的API Key与Secret Key接入。行情与私有数据另有WebSocket推送（见注意事项）。
 
 ##### 名称与配置
 
@@ -25822,6 +26800,7 @@ BigONE的现货交易，只提供现货交易对。交易所没有普通市价�
 - ```exchange.GetHistoryOrders()```、```exchange.GetHistoryConditionOrders()```不支持```since```参数（交易所接口没有时间范围参数），传入时报错；不传时返回最近的订单，缺省最多200条。
 - 条件单支持止盈、止损（不填委托价为触发后市价成交），不支持OCO。
 - ```exchange.GetMarkets()```的下单限制以计价币金额给出（```MinNotional```、```MaxNotional```），```MinQty```、```MaxQty```为0。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。BigONE的ticker流只在有成交时推送，其中的买一卖一价会滞后，所以ticker与bbo推送的买一卖一价与量取自同交易对的深度流（另一条连接上按序号连续性维护的完整盘口，最优档变化才推送bbo）；ticker在两条流都到达后才开始推送。深度推送是全量快照加实时增量（按```changeId```/```prevId```连续性校验，断档时重新订阅取快照）；BigONE只有这一条深度流，不同档数的订阅共用它、各自按档数截断，缺省为20档。逐笔成交推送不带成交ID（交易所在增量里填```0```、时间只到秒），事件里的成交ID是由成交时间、价格、数量和方向拼成的合成ID（以```syn:```开头），与```exchange.GetTrades()```的成交ID不同。K线首次订阅先推送500根历史；BigONE的K线推送不带收盘标志，推送时刻已过该K线结束时间、或收到紧接着的下一根K线时，把该K线作为收盘K线推送。私有流是整个账户的一路```private```订阅（不带交易对），只在订阅时连接并用JWT鉴权，在同一条连接上订阅全部交易对的订单流与余额流：订阅生效后（以及每次断线重连后）先按```exchange.GetAssets()```同一接口推送一次全部余额快照，然后报告就绪，之后推送订单更新；余额推送只作为余额变化的通知，收到后重新查询余额，推送发生变化的币种。未触发的条件单不推送订单更新，触发后照常推送。现货没有持仓，私有流不推送持仓。鉴权失败（例如API Key设置了IP白名单而当前IP不在其中）时连接状态报告降级、私有流报告失败（行情推送不受影响）。不支持全市场```tickers```订阅（BigONE的ticker推送必须指定交易对），订阅时报错；请按交易对订阅ticker。
 
 #### 币安
 
@@ -25981,6 +26960,7 @@ function main() {
 - ```exchange.ModifyOrder()```、```exchange.ModifyConditionOrder()```使用币安的撤单再下单接口（```cancelReplace```，撤单失败则不下新单），返回新订单的ID，之后按新ID操作；只支持普通现货账户，杠杆账户下报错。
 - 条件单只支持止盈、止损单，不支持OCO，需要时分别创建止盈单和止损单。
 - ```exchange.GetHistoryOrders()```、```exchange.GetHistoryConditionOrders()```必须指定交易对。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。深度订阅5、10、20档使用币安的快照流，其它档数（缺省20档，最多255档）由增量流与REST快照同步；逐笔成交是归集成交（与```exchange.GetTrades()```同一套成交ID）；K线首次订阅先推送500根历史。私有流是整个现货账户的一路```private```订阅（不带交易对），使用币安WS-API的用户数据流，只在订阅时连接并签名订阅，要求API Key有交易权限且IP在白名单内。订阅生效后（以及每次断线重连后）先按```exchange.GetAssets()```同一接口推送一次全部余额快照，然后报告就绪；之后推送订单更新与发生变化的币种余额（可用、冻结与```exchange.GetAssets()```同口径；充提与划转的增量并入后推送该币种的完整余额，外部系统锁定或解锁余额时按REST重新读取）。私有流只覆盖现货钱包，切换到杠杆钱包后杠杆账户的订单与余额不在推送里。现货没有持仓，私有流不推送持仓。鉴权失败时连接状态报告降级、私有流报告失败（行情推送不受影响）。全市场```tickers```订阅（不带交易对）使用币安的全市场迷你行情流，每秒推送一次有变化的交易对，带最新价、24小时开高低与成交量，不带买一卖一（币安现货没有全市场的最优挂单流），需要买一卖一请按交易对订阅ticker或bbo。
 
 ###### ```Futures_Binance```（期货）
 
@@ -25988,6 +26968,7 @@ function main() {
 - ```exchange.ModifyOrder()```原地修改价格和数量，订单ID不变；没有传入的价格或数量沿用原订单（数量取原始下单量）。
 - 条件单只支持止盈、止损单，不支持OCO（币安合约没有OCO接口）；不支持修改条件单，需要先撤销再重新创建。
 - ```exchange.GetHistoryOrders()```、```exchange.GetHistoryConditionOrders()```必须指定合约。
+- 支持WebSocket推送（U本位、币本位合约；期权不支持）：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报、持仓与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。ticker推送是币安的24小时行情，买一卖一价与量取自同合约的最优挂单流（币安合约的24小时行情流本身不带买一卖一），两条流都到达后才开始推送。深度订阅5、10、20档使用币安的快照流，其它档数（缺省20档，最多255档）由增量流与REST快照同步；逐笔成交与```exchange.GetTrades()```同一套成交ID；K线首次订阅先推送500根历史。交割合约（```quarter```、```next_quarter```）按订阅时挂牌的那一期订阅，换季后需要重新订阅。私有流是整个账户的一路```private```订阅（不带交易对），使用币安的listenKey用户数据流，只在订阅时申请listenKey并连接，同时连接U本位与币本位两条用户数据流（与不传交易对的```exchange.GetPositions()```、```exchange.GetAssets()```覆盖同一范围；统一账户自动使用组合保证金的用户数据流）。两条都生效后（以及任一条断线重连后）先按```exchange.GetAssets()```与```exchange.GetPositions()```同一接口推送一次全部余额与持仓快照，然后报告就绪；之后推送全部订单的更新、发生变化的持仓（合约、方向、数量单位与```exchange.GetPositions()```相同；双向持仓的多空两条腿分别推送，数量为0表示已平；推送里有均价与浮动盈亏，保证金只在逐仓时给出，杠杆、强平价与标记价不在推送里），以及余额变动事件后按```exchange.GetAssets()```重新读取的变化币种余额。下单、撤单与标记价格变化不触发币安的余额事件，挂单冻结与权益的即时值仍需调用```exchange.GetAssets()```。鉴权失败时连接状态报告降级、私有流报告失败（行情推送不受影响）。全市场```tickers```订阅（不带交易对）同时订阅U本位与币本位的全市场24小时行情流与全市场最优挂单流：随24小时行情每秒推送一次有变化的合约，买一卖一取该合约最新的最优挂单，某合约的最优挂单到达之前不推送该合约。
 
 #### Bitfinex
 
@@ -26089,12 +27070,14 @@ function main() {
 
 - 现货市价买单的下单量是交易币数，不是计价币金额。
 - Bitfinex价格精度为5位有效数字，没有固定的价格步长；`exchange.GetMarkets`返回的```TickSize```、```PricePrecision```按当前最新价换算，价格量级变化后会随之变化；数量精度固定为8位小数。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。ticker与bbo共用Bitfinex的ticker推送（Bitfinex的ticker本身带买一卖一价与量，没有单独的一档盘口流），开盘价与```exchange.GetTicker()```一样按最新价减去24小时涨跌额得到；逐笔成交与```exchange.GetTrades()```同一套成交ID，订阅时交易所补发的近期成交不推送；深度订阅25档以内（缺省25档）使用Bitfinex的25档盘口，更多档数使用100档或250档（最多250档），由快照与增量同步，并按Bitfinex的盘口校验和与连接序号校验，校验失败时重新订阅该盘口；K线首次订阅先推送500根历史，Bitfinex的K线推送没有收盘标志，到了周期结束时间（或下一根到达）时推送该根的收盘。推送的价格比```exchange.GetMarkets()```的价格精度多保留两位小数（Bitfinex价格是5位有效数字，价格量级下降时小数位会变多）。私有流是整个账户的一路```private```订阅（不带交易对），只在订阅时连接Bitfinex的鉴权推送地址并鉴权：订阅生效后（以及每次断线重连后）先按```exchange.GetAccount()```同一接口推送一次全部余额快照，然后报告就绪，之后推送现货交易对的订单更新与发生变化的币种余额（口径与```exchange.GetAccount()```相同，只看交易所钱包；Bitfinex尚未算出可用余额时重新查询一次余额）。现货没有持仓，私有流不推送持仓。鉴权失败或API Key没有订单、钱包读取权限时连接状态报告降级、私有流报告失败（行情推送不受影响）。不支持全市场```tickers```订阅（Bitfinex的ticker推送必须逐个交易对订阅），订阅时报错；请按交易对订阅ticker。
 
 ###### ```Futures_Bitfinex```（期货）
 
 - 下单量的单位是币数，不是合约张数。
 - Bitfinex价格精度为5位有效数字，`exchange.GetMarkets`返回的```TickSize```、```PricePrecision```按当前最新价换算。
 - ```exchange.GetFundings()```的费率取Bitfinex衍生品状态中的当前费率，每8小时结算；不传参数时按当前计价币返回全部永续合约。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报、持仓与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。ticker与bbo共用Bitfinex的ticker推送（Bitfinex的ticker本身带买一卖一价与量，没有单独的一档盘口流），开盘价与```exchange.GetTicker()```一样按最新价减去24小时涨跌额得到；逐笔成交与```exchange.GetTrades()```同一套成交ID，订阅时交易所补发的近期成交不推送；深度订阅25档以内（缺省25档）使用Bitfinex的25档盘口，更多档数使用100档或250档（最多250档），由快照与增量同步，并按Bitfinex的盘口校验和与连接序号校验，校验失败时重新订阅该盘口；K线首次订阅先推送500根历史，Bitfinex的K线推送没有收盘标志，到了周期结束时间（或下一根到达）时推送该根的收盘。推送的价格精度按订阅时的最新价换算5位有效数字再多保留两位小数，数量精度为8位小数。私有流是整个账户的一路```private```订阅（不带交易对），只在订阅时连接Bitfinex的鉴权推送地址并鉴权：订阅生效后（以及每次断线重连后）先按```exchange.GetAccount()```、```exchange.GetPositions()```同一接口推送一次全部余额与持仓快照，然后报告就绪，之后推送永续合约的订单更新、持仓变化（每个合约一条净持仓，平仓后数量为0；Bitfinex推送里没有算出的盈亏、强平价、杠杆不填）与发生变化的保证金币种余额（口径与```exchange.GetAccount()```相同；Bitfinex尚未算出可用余额时重新查询一次余额）。鉴权失败或API Key没有订单、持仓、钱包读取权限时连接状态报告降级、私有流报告失败（行情推送不受影响）。不支持全市场```tickers```订阅（Bitfinex的ticker推送必须逐个合约订阅），订阅时报错；请按交易对订阅ticker。
 
 #### bitFlyer
 
@@ -26133,6 +27116,7 @@ function main() {
 - ```exchange.GetMarkets()```不提供价格、数量精度与下单量限制（交易所接口不给），相应字段为0。
 - 交易所行情接口没有24小时最高价、最低价和开盘价：```exchange.GetTicker()```的```High```、```Low```分别填卖一价、买一价，```Open```为0。
 - 下单返回的订单号是受理号（以```JRF```开头），```exchange.GetOrders()```、```exchange.GetHistoryOrders()```里的是交易所内部订单号；两种订单号都可以用来查询和撤单，条件单（父订单）同样如此。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交）与账户私有流（订单回报、余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。交易所没有K线推送（也没有K线接口），K线订阅任何周期都报不支持。ticker与bbo是同一路行情推送，带买一卖一价与量，没有24小时最高价、最低价和开盘价。深度只有一组推送（约每5秒一份买卖各300档的整本快照，加实时增量，都没有序号）：订阅后等到第一份快照才开始推送，每份快照整本替换本地订单簿，之间按增量更新；增量导致买一不低于卖一时重新订阅并等待下一份快照。各档数的深度订阅（缺省20档）共用这组推送，每个订阅按自己的档数输出。逐笔成交与```exchange.GetTrades()```同一套成交ID，板寄（集合竞价）成交没有主动方向。交易所不提供价格、数量精度，推送的价格按日元计价最多3位小数、BTC计价最多8位小数，数量最多8位小数换算。私有流是一路```private```订阅（不带交易对，覆盖整个账户），只在订阅时连接，用API Key认证（需要「注文のイベントを受信」权限）后订阅订单事件：订阅生效及每次断线重连后，先用与```exchange.GetAssets()```相同的接口推送余额快照，再报告就绪；之后推送现货订单回报（订单号是下单返回的受理号，以```JRF```开头），交易所没有余额推送，每次订单事件之后经REST重读余额并推送发生变化的币种。交易所只推送单笔成交和剩余数量：订阅之后下的订单，累计成交量为委托量减剩余数量，成交均价由推送过的成交计算（有成交没收到时为0）；订阅之前已存在的订单只推送状态，委托量、成交量与均价为0。现货没有持仓。认证被拒时连接状态报告降级、私有流报告失败（行情推送不受影响）。不支持全市场```tickers```订阅（bitFlyer的ticker推送必须逐个产品订阅），订阅时报错；请按交易对订阅ticker。
 
 #### Bitget
 
@@ -26241,6 +27225,7 @@ function main() {
 
 - 统一账户（v3）没有现货条件单接口，条件单相关函数（```exchange.CreateConditionOrder()```、```exchange.GetConditionOrders()```等）报错并返回空值；经典账户（v2）支持止盈、止损条件单（不支持OCO）和```exchange.ModifyConditionOrder()```。
 - ```exchange.ModifyOrder()```：统一账户原地改单；经典账户使用撤单再下单接口（```cancel-replace-order```），返回新订单的ID（以客户端订单号表示，形如```clientOid:…```），可直接用于撤单与查询订单。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。行情推送使用Bitget的v2公共推送（统一账户与经典账户相同，成交号与```exchange.GetTrades()```一致）；ticker推送自带买一卖一价格与数量；bbo与1档深度使用1档快照流，5档、15档深度使用对应的快照流，其它档数（缺省20档，最多255档）使用全深度流，由快照与增量按序号同步，序号断裂时重新订阅。K线周期与```exchange.GetRecords()```相同（统一账户的日线及以上按UTC切分，经典账户按UTC+8），首次订阅先推送500根历史；Bitget的K线推送没有收盘标志，一根K线在下一根出现（或推送时刻已过其结束时间）时作为已收盘推送。私有流是整个账户的一路```private```订阅（不带交易对），只在订阅时连接并登录：统一账户（v3）订阅UTA的订单与账户频道，经典账户（v2）订阅现货的订单与账户频道；订阅生效后（以及每次重连后）先推送与```exchange.GetAccount()```同一接口的全部余额快照，再报告就绪，之后推送订单回报与变动币种的余额（口径与```exchange.GetAccount()```相同）。现货没有持仓，私有流不推送持仓。登录失败（密钥错误、IP不在白名单等）时连接状态报告降级、私有流报告失败（行情推送不受影响）；模拟盘使用Bitget模拟盘的推送地址。不支持全市场```tickers```订阅（Bitget的ticker推送必须逐个交易对订阅），订阅时报错；请按交易对订阅ticker。
 
 ###### ```Futures_Bitget```（期货）
 
@@ -26250,6 +27235,7 @@ function main() {
 - 下单量单位：经典账户（v2）各类合约都是基础币数量（1张为1个币）；统一账户（v3）的USDT、USDC合约为基础币数量，币本位合约为美元张数。见```exchange.GetMarkets()```的```CtVal```、```CtValCcy```。
 - 统一账户（v3）的币本位合约不支持条件单和```exchange.ModifyOrder()```，调用报错。
 - ```exchange.GetHistoryConditionOrders()```不传```since```时，经典账户（v2）查询最近7天、统一账户（v3）查询最近30天；传入```since```时查询从```since```起30天内的记录。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报、持仓与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。行情推送使用Bitget的v2公共推送（成交号与```exchange.GetTrades()```一致，数量单位为币）；ticker推送自带买一卖一价格、数量与持仓量；bbo与1档深度使用1档快照流，5档、15档深度使用对应的快照流，其它档数（缺省20档，最多255档）使用全深度流，由快照与增量按序号同步，序号断裂时重新订阅。K线周期与```exchange.GetRecords()```相同，首次订阅先推送500根历史；Bitget的K线推送没有收盘标志，一根K线在下一根出现（或推送时刻已过其结束时间）时作为已收盘推送。统一账户（v3）的币本位交割合约只在v3接口挂牌，不支持行情推送（订阅报错）。交割合约（如```BTC_USD.quarter```）在订阅时解析为当时的合约，换月后需要重新订阅。私有流是整个账户的一路```private```订阅（不带交易对），只在订阅时连接并登录：统一账户订阅UTA的订单、持仓与账户频道，经典账户订阅U本位、币本位、USDC合约各自的订单与账户频道以及U本位的持仓频道；订阅生效后（以及每次重连后）先推送与```exchange.GetAccount()```、```exchange.GetPositions()```同一接口的余额与持仓快照，再报告就绪，之后推送订单回报、持仓与余额的变化（口径与这两个函数相同；持仓只推送```exchange.GetPositions()```缺省范围的U本位合约，已平的持仓推送数量为0的一行）。登录失败（密钥错误、IP不在白名单等）时连接状态报告降级、私有流报告失败（行情推送不受影响）；模拟盘使用Bitget模拟盘的推送地址。不支持全市场```tickers```订阅（Bitget的ticker推送必须逐个合约订阅），订阅时报错；请按交易对订阅ticker。
 
 #### Bithumb
 
@@ -26287,6 +27273,7 @@ function main() {
 - ```exchange.GetTickers()```的批量行情没有盘口，```Buy```、```Sell```为0；```exchange.GetTicker()```会另查盘口填买一、卖一价。
 - 订单列表接口没有成交明细：```exchange.GetOrders()```、```exchange.GetHistoryOrders()```中已有成交的订单```AvgPrice```按交易所返回的成交总额（```executed_funds```）除以成交量计算；成交总额缺失时限价单取委托价、市价单为0。准确的成交均价以```exchange.GetOrder()```为准。
 - ```exchange.GetHistoryOrders()```返回已成交与已撤销的订单，缺省最多100条；```since```按下单时间在本地过滤。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交）与账户私有流（订单回报、余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。Bithumb没有K线推送，K线订阅一律报```unsupported interval```。深度推送每条都是整本快照，交易所最多15档：深度订阅（缺省15档）统一按15档订阅、剔除量为0的档位后按各自的档数输出，超过15档的订阅会报错。ticker由24小时统计流与盘口合成买卖一价（取第一个量不为0的档位）；逐笔成交的ID与```exchange.GetTrades()```同一口径（成交毫秒数×10000，同一毫秒的后续成交加```-1```、```-2```后缀，同毫秒多笔成交的后缀顺序可能与REST不同）。交易所对订阅成功不作应答，行情订阅以收到的第一条数据为生效。私有流是一路```private```订阅（不带交易对，覆盖整个账户），只在订阅时连接Private v2接口，握手时用API Key签发的JWT鉴权，订阅订单（myOrder）与资产（myAsset）频道：交易所既不应答订阅、也没有查询订阅的请求，连接器在订阅发出后的下一条心跳（约10秒一条）到达且没有收到错误时认为生效，然后（以及每次断线重连后）先用与```exchange.GetAssets()```相同的接口推送余额快照，再报告就绪；之后推送订单回报（均价由成交额与成交量计算）与发生变化的币种余额（可用、冻结与```exchange.GetAssets()```同口径）。现货没有持仓。鉴权被拒时连接状态报告降级、私有流报告失败（行情推送不受影响）。不支持全市场```tickers```订阅（Bithumb的ticker推送必须指定交易对），订阅时报错；请按交易对订阅ticker。
 
 #### Bitstamp
 
@@ -26335,6 +27322,7 @@ Bitstamp的现货交易，只提供现货交易对。交易所没有条件单和
 - 只做Maker（```postOnly```）按Bitstamp的```moc_order```下单，也支持IOC、FOK限价单。
 - ```exchange.GetMarkets()```的最小下单量是交易所给出的最小下单金额（计价币），放在```MinNotional```中，```MinQty```、```MaxQty```为0。
 - ```exchange.GetTrades()```返回最近一小时内的成交（交易所接口的缺省时间窗）。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交）与私有流（订单回报与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。深度订阅（缺省20档，最多100档）使用Bitstamp每次推送前100档整本的订单簿频道，5档、20档等各档数的订阅各自截断输出；bbo取该订单簿的第一档；Bitstamp没有ticker推送，ticker由逐笔成交（最新价、最新成交量）与订单簿第一档（买卖一价）合成，没有24小时统计（成交量为0，开盘价、最高价、最低价等于最新价）；逐笔成交与```exchange.GetTrades()```同一套成交ID。Bitstamp没有K线推送，订阅K线会报错。私有流是一路```private```订阅（不带交易对，覆盖整个账户），只在订阅时连接：用```/api/v2/websockets_token/```取得的token订阅每个在市交易对的订单频道（Bitstamp的私有频道按交易对划分），订阅生效及每次断线重连后，先用与```exchange.GetAssets()```相同的接口推送余额快照，再报告就绪；之后推送订单回报（推送不带成交均价），每次订单变化后重新查询余额并推送发生变化的币种。现货没有持仓。token被拒时连接状态报告降级、私有流报告失败（行情推送不受影响）。不支持全市场```tickers```订阅（Bitstamp没有ticker推送，更没有全市场推送），订阅时报错；请按交易对订阅ticker。
 
 #### Bybit
 
@@ -26496,15 +27484,17 @@ function main() {
 ###### ```Bybit```（现货）
 
 - 市价单的下单量按Bybit接口默认处理（市价买单为计价币金额）；可以在下单附加参数中传```marketUnit```（```baseCoin```或```quoteCoin```）指定数量单位，附加参数原样传给交易所。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。ticker推送的买一卖一价与量取自同交易对的一档盘口流（Bybit现货的ticker流本身不带买一卖一），两条流都到达后才开始推送；逐笔成交与```exchange.GetTrades()```同一套成交ID；深度订阅50档以内（缺省20档）使用Bybit的50档流，更多档数使用200档或1000档流（最多255档），均由快照与增量同步；K线首次订阅先推送500根历史。私有流是整个账户的一路```private```订阅（不带交易对），只在订阅时连接并鉴权，在同一条连接上订阅Bybit的现货订单流与钱包流：订阅生效后（以及每次断线重连后）先按```exchange.GetAccount()```同一接口推送一次全部余额快照，然后报告就绪，之后推送订单更新与发生变化的币种余额（口径与```exchange.GetAccount()```相同，按查询的同一个钱包）。现货没有持仓，私有流不推送持仓。鉴权失败时连接状态报告降级、私有流报告失败（行情推送不受影响）；模拟盘的私有流连接Bybit模拟盘的推送地址，行情推送与实盘相同。不支持全市场```tickers```订阅（Bybit只有逐个交易对的ticker推送），订阅时报错；请按交易对订阅ticker。
 
 ###### ```Futures_Bybit```（期货）
 
 - ```exchange.GetMarkets()```的结果包含盘前交易（PreLaunch）合约。
 - 下单量单位：U本位（linear）合约与期权为基础币数量，币本位（inverse）合约为合约张数，1张为1美元；见```exchange.GetMarkets()```的```CtVal```、```CtValCcy```。
+- 支持WebSocket推送（U本位与币本位合约）：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报、持仓与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。期权合约不支持行情推送（订阅时报错），期权订单的回报可以推送（期权持仓不推送，与不带参数的```exchange.GetPositions()```一致）。交割合约的别名（```quarter```等）在订阅时解析为具体合约，订阅期间不随换月变化。深度订阅50档以内（缺省20档）使用Bybit的50档流，更多档数使用200档或1000档流（最多255档），均由快照与增量同步；逐笔成交与```exchange.GetTrades()```同一套成交ID（Bybit合约的成交ID是UUID文本）；K线首次订阅先推送500根历史。私有流是整个账户的一路```private```订阅（不带交易对），只在订阅时连接并鉴权，在同一条连接上订阅Bybit的订单流、持仓流与钱包流：订阅生效后（以及每次断线重连后）先按```exchange.GetAccount()```与```exchange.GetPositions()```同一接口推送一次全部余额与U本位、币本位持仓快照，然后报告就绪，之后推送订单更新、发生变化的持仓（单向持仓为净持仓，双向持仓多空各一条，平仓推送数量0）与发生变化的币种余额（口径与```exchange.GetAccount()```相同）。统一交易账户1.0的余额由统一钱包与币本位钱包合计，钱包推送到达时重新查询一次余额。鉴权失败时连接状态报告降级、私有流报告失败（行情推送不受影响）；模拟盘的私有流连接Bybit模拟盘的推送地址，行情推送与实盘相同。不支持全市场```tickers```订阅（Bybit只有逐个合约的ticker推送），订阅时报错；请按合约订阅ticker。
 
 #### Coincheck
 
-日本交易所Coincheck的现货交易（接口地址```https://coincheck.com```）。只用REST接口，没有行情和订单推送；私有接口使用Coincheck的API Key（Access Key与Secret Key）签名。交易所没有K线、全市场行情、交易对列表和历史订单接口，相关函数的处理见下文。
+日本交易所Coincheck的现货交易（接口地址```https://coincheck.com```）。查询与下单走REST接口，行情与私有流另有WebSocket推送（见下文）；私有接口使用Coincheck的API Key（Access Key与Secret Key）签名。交易所没有K线、全市场行情、交易对列表和历史订单接口，相关函数的处理见下文。
 
 ##### 名称与配置
 
@@ -26538,10 +27528,11 @@ function main() {
 - ```exchange.GetConditionOrders()```不传```symbol```参数时，无法按现价区分条件单是止盈还是止损，返回的条件单类型为通用类型。
 - ```exchange.GetOrders()```与```exchange.GetConditionOrders()```返回的订单只反映未成交部分：```Amount```是剩余未成交的数量（Coincheck的```pending_amount```），```DealAmount```与```AvgPrice```为0；市价买单（例如触发后为市价的条件买单）的```Amount```是剩余的JPY金额。
 - ```exchange.GetTicker()```没有开盘价，```Open```用最新价填充。
+- 支持WebSocket推送：深度、逐笔成交与私有流（订单回报与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。Coincheck没有ticker、最优买卖价与K线推送，订阅```ticker```、```bbo```、K线会报错（最优买卖价可以用1档深度订阅获得）。Coincheck的订单簿只推送增量，深度订阅（缺省20档，最多100档）先用```exchange.GetDepth()```同一接口取整本快照，再按顺序叠加增量，本地订单簿交叉时自动重新取快照，每小时自动重连一次以重新同步；逐笔成交与```exchange.GetTrades()```同一套成交ID，时间精确到秒。交易所对订阅不作任何应答：订阅前用```exchange.GetTicker()```同一接口校验交易对，收到该频道的第一条数据（或同一连接上的后续消息）后才视为生效，冷门交易对只订阅逐笔成交时，连接状态要等到第一笔成交才报告正常。私有流是一路```private```订阅（不带交易对，覆盖整个账户），只在订阅时连接：用API Key签名登录后订阅订单事件频道（API Key需开通WebSocket的订单事件权限），订阅生效及每次断线重连后，先用与```exchange.GetAssets()```相同的接口推送余额快照，再报告就绪；之后推送订单回报，每次订单事件后重新查询余额并推送发生变化的币种。Coincheck只推送成交、撤单、过期与条件单触发事件（新挂单没有推送），推送不带成交均价；部分成交的累计成交量只统计本次连接收到的成交，全部成交、撤单、过期时按交易所给出的委托量与过期量计算。现货没有持仓。登录被拒或API Key没有订单事件权限时连接状态报告降级、私有流报告失败（行情推送不受影响）。不支持全市场```tickers```订阅（Coincheck没有ticker推送，更没有全市场推送），订阅时报错；买卖一价请按交易对订阅深度。
 
 #### Coinone
 
-韩国交易所Coinone的KRW市场现货交易（接口地址```https://api.coinone.co.kr```）。只用REST接口，没有行情和订单推送；私有接口使用Coinone的API Key（Access Key与Secret Key）签名。
+韩国交易所Coinone的KRW市场现货交易（接口地址```https://api.coinone.co.kr```）。查询与下单走REST接口，行情与私有流另有WebSocket推送（见下文）；私有接口使用Coinone的API Key（Access Key与Secret Key）签名。
 
 ##### 名称与配置
 
@@ -26576,12 +27567,13 @@ function main() {
 - 交易所的已完成订单不带订单类型，无法查询历史条件单。
 - ```exchange.GetConditionOrders()```不传```symbol```参数时，无法按现价区分条件单是止盈还是止损，返回的条件单类型为通用类型。
 - ```exchange.GetHistoryOrders()```读取Coinone的已完成订单（```completed_orders```），只包含已成交的订单，不含已撤销的订单；不传```limit```时最多返回100条。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与账户私有流（订单回报、余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。Coinone只有一种深度推送（每次推送整本快照，每边16档），各档数的深度订阅（缺省16档，最多16档，更多档数订阅时报错）共用这一路推送、按各自档数输出；交易所的ticker推送只在成交时更新，买卖一价改由盘口推送的最优一档提供，bbo同样取自盘口推送；逐笔成交与```exchange.GetTrades()```同一套成交ID；K线周期支持1分钟、3分钟、5分钟、15分钟、30分钟、1小时、2小时、4小时、6小时、1天、1周（10分钟与1月只有```exchange.GetRecords()```支持，订阅时报错），首次订阅先推送500根历史，推送不带收盘标志，下一根K线到来或该K线的结束时刻已过时按收盘处理。订阅前按```exchange.GetMarkets()```核对交易对，不存在或不可交易的交易对订阅时报错。私有流是一路```private```订阅（不带交易对，覆盖整个账户），只在订阅时连接，连接时用API Key签名鉴权，订阅全部交易对的订单变动与余额变动：订阅生效及每次断线重连后，先用与```exchange.GetAssets()```相同的接口推送余额快照，再报告就绪；之后推送订单回报与发生变化的币种余额（可用、冻结与```exchange.GetAssets()```同口径）。交易所的订单推送不带累计成交量，订阅后收到过该订单的挂单推送时，累计成交量由委托量与剩余量推算；订阅前就已存在的订单，累计成交量沿用之前的值。现货没有持仓。不支持全市场```tickers```订阅（Coinone的ticker推送必须逐个交易对订阅），订阅时报错；请按交易对订阅ticker。
 
 #### CoinW
 
-```Coinw```（现货）：CoinW（币赢）现货交易，通过CoinW现货的```command```式接口（```api.coinw.com```）接入，全部是REST轮询，没有行情和订单推送。私有接口需要API Key（Access Key、Secret Key）。只交易现货，没有模拟盘；永续合约请使用```Futures_Coinw```。
+```Coinw```（现货）：CoinW（币赢）现货交易，通过CoinW现货的```command```式接口（```api.coinw.com```）接入，查询与下单走REST接口，行情与私有流另有WebSocket推送（见下文）。私有接口需要API Key（Access Key、Secret Key）。只交易现货，没有模拟盘；永续合约请使用```Futures_Coinw```。
 
-```Futures_Coinw```（期货）：CoinW U本位永续合约（USDT、USDC保证金），通过CoinW合约接口（```api.coinw.com```的```/v1/perpum```）接入，全部是REST轮询，没有行情和订单推送。私有接口需要API Key（Access Key、Secret Key）。只有永续合约，没有币本位与交割合约，没有模拟盘。
+```Futures_Coinw```（期货）：CoinW U本位永续合约（USDT、USDC保证金），通过CoinW合约接口（```api.coinw.com```的```/v1/perpum```）接入，查询与下单走REST接口，行情与私有流另有WebSocket推送（见下文）。私有接口需要API Key（Access Key、Secret Key）。只有永续合约，没有币本位与交割合约，没有模拟盘。
 
 ##### 名称与配置
 
@@ -26685,6 +27677,7 @@ function main() {
 - 查询未完成订单的接口必须带交易对：```exchange.GetOrders()```不传参数时只查询当前交易对的未完成订单，不是所有交易对。
 - 市价买单的下单量是要花费的计价币金额（按CoinW的```funds```下单），市价卖单是交易币数量。
 - 下单只区分限价单与市价单：交易所不支持只做Maker（```postOnly```）、IOC、FOK，传入时报错，订单不会发出。自定义订单号（```clientId```）作为CoinW的```out_trade_no```发送（最长50个字符，只能是字母、数字、```-```、```_```），返回和查询用的订单号仍是交易所订单号。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。推送使用CoinW的原生WebSocket接口（```wss://ws.futurescw.com```），按交易所的数字交易对编号订阅（编号取自行情接口）。ticker推送的买一卖一价与量取自同交易对的深度快照（CoinW的ticker流没有买卖价），两条流都到达后才开始推送；成交量是交易币数量。逐笔成交与```exchange.GetTrades()```同一套成交ID。深度每次推送都是完整快照，最多100档（缺省20档）。K线周期与```exchange.GetRecords()```相同（交易所另有的6小时、12小时与月线不支持，订阅时报错），交易所不标记收盘：推送时刻已过该K线结束时间、或下一根K线出现时视为收盘；首次订阅先推送500根历史。私有流是整个账户的一路```private```订阅（不带交易对），只在订阅时连接并登录：订阅生效后（以及每次断线重连后）先按```exchange.GetAssets()```同一接口推送一次全部余额快照，然后报告就绪，之后推送订单更新（全部交易对）与余额变化（该币种的全部可用与冻结额）。交易所文档只列出新订单与订单终结（成交、撤销）两种订单事件，其它订单事件不推送。现货没有持仓，私有流不推送持仓。登录被拒时连接状态报告降级、私有流报告失败（行情推送不受影响）。不支持全市场```tickers```订阅（CoinW的ticker推送必须逐个交易对订阅），订阅时报错；请按交易对订阅ticker。
 
 ###### ```Futures_Coinw```（期货）
 
@@ -26692,8 +27685,10 @@ function main() {
 - 查询未完成订单和未完成条件单的接口必须带交易对：```exchange.GetOrders()```、```exchange.GetConditionOrders()```不传参数时只查询当前合约，不是所有合约。
 - ```exchange.GetHistoryOrders()```、```exchange.GetHistoryConditionOrders()```不支持```since```参数（交易所的历史订单接口没有时间范围参数），传入时报错，只能查询最近的订单。
 - ```exchange.GetDepth()```的数量是张数：交易所给出的币数量按每张币量换算后取整。```exchange.GetTrades()```的数量同样是张数。
-- USDT本位与USDC本位是两个账户：```exchange.GetAccount()```、```exchange.GetAssets()```按当前合约的计价币查询对应账户（```BTC_USDC.swap```查USDC账户）；不带交易对时两个账户都返回。
+- USDT本位与USDC本位是两个账户：```exchange.GetAccount()```、```exchange.GetAssets()```按当前合约的计价币查询对应账户（```BTC_USDC.swap```查USDC账户）；不带交易对时两个账户都返回，没有开通USDC合约账户时只返回USDT账户（交易所对未开通的USDC账户返回错误码9001，带USDC交易对查询时照常报错）。
+- ```exchange.GetTicker()```的```Volume```为最近24根1小时K线的成交量之和（交易币数量，最后一根尚未收盘），为此每次多请求一次K线；交易所行情接口的```total_volume```只是最近一笔成交的数量，不是24小时成交量。```exchange.GetTickers()```没有逐个合约的K线可用，```Volume```仍为交易所的```total_volume```。
 - 限价单支持IOC、FOK与只做Maker（```postOnly```），分别对应CoinW的```positionType```取值```IOC```、```FOK```、```PostOnly```；市价单、平仓单（```reduceOnly```，走交易所的平仓接口）与条件单不支持这些选项，传入时报错。自定义订单号（```clientId```）作为```thirdOrderId```发送，平仓单不支持。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报、持仓与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。推送使用CoinW的原生WebSocket接口（```wss://ws.futurescw.com/perpum```）。ticker推送的买一卖一价与量取自同合约的深度快照（CoinW的ticker流没有买卖价），两条流都到达后才开始推送；成交量是交易币数量。深度每次推送都是完整快照，最多100档（缺省20档），数量与```exchange.GetDepth()```一样是张数（交易所给出的币数量按每张币量换算后四舍五入）。逐笔成交的数量是张数，成交ID与```exchange.GetTrades()```相同。K线周期与```exchange.GetRecords()```相同，同样按UTC+8切分；交易所不标记收盘：推送时刻已过该K线结束时间、或下一根K线出现时视为收盘；首次订阅先推送300根历史。私有流是整个账户的一路```private```订阅（不带交易对），只在订阅时连接并登录：订阅生效后（以及每次断线重连后）先按```exchange.GetAssets()```、```exchange.GetPositions()```同一接口（USDT与USDC两个账户、全部持仓）推送一次快照，然后报告就绪，之后推送订单更新、持仓与余额变化。持仓推送是某个合约某个方向的当前持仓（张数，平仓后为0），推送里没有未实现盈亏与强平价，这两项不提供；交易所的资产推送与```exchange.GetAssets()```的口径不同，收到后按```exchange.GetAssets()```重新查询，只推送变化的账户。订单推送没有成交量与成交均价：新订单的成交量为0、全部成交时为委托量，部分成交与撤单沿用上一条回报的成交量。快照查询失败时私有流报告失败并自动重试（订单推送不受影响）；登录被拒时连接状态报告降级、私有流报告失败（行情推送不受影响）。不支持全市场```tickers```订阅（CoinW合约的ticker推送必须逐个合约订阅），订阅时报错；请按交易对订阅ticker。
 
 #### Crypto.com
 
@@ -26838,6 +27833,7 @@ function main() {
 - 支持```exchange.ModifyOrder()```与```exchange.ModifyConditionOrder()```（Crypto.com原地改单，订单ID不变），条件单可改触发价、委托价与数量；执行价格传-1可把触发后限价的条件单改成触发后市价，传正数则反过来。不能修改```tif```与```postOnly```（传入时报错）。
 - ```exchange.GetOrders()```、```exchange.GetConditionOrders()```不传参数时返回全部交易对的挂单。```exchange.GetHistoryOrders()```、```exchange.GetHistoryConditionOrders()```不传```limit```时返回最近100条，传更大的```limit```时自动翻页取满。条件单历史不传```since```时，Crypto.com只返回最近一天内的记录，要查更早的请传```since```。
 - ```exchange.GetAssets()```的冻结数量取Crypto.com的```reserved_qty```（挂单与保证金占用之和），可用数量为持有量减去它。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。ticker与bbo都来自Crypto.com的ticker流（自带买一卖一价与量，Crypto.com没有单独的最优买卖流）；逐笔成交与```exchange.GetTrades()```同一套成交ID；深度订阅10档以内使用Crypto.com的10档流，11至50档（缺省20档）使用50档流，均由快照与增量按序号同步，Crypto.com没有更多档位，超过50档的订阅报错；K线周期与```exchange.GetRecords()```的原生周期相同，首次订阅先推送500根历史，Crypto.com的K线推送不带收盘标志，下一根开始时把上一根补发为已收盘。私有流是整个账户的一路```private```订阅（不带交易对），只在订阅时连接并鉴权，在同一条连接上订阅Crypto.com的订单流与余额流：订阅生效后（以及每次断线重连后）先按```exchange.GetAccount()```同一接口推送一次全部余额快照，然后报告就绪，之后推送现货订单更新与发生变化的币种余额（口径与```exchange.GetAccount()```相同）。现货没有持仓，私有流不推送持仓。鉴权失败时连接状态报告降级、私有流报告失败（行情推送不受影响）。不支持全市场```tickers```订阅（Crypto.com的ticker推送必须逐个交易对订阅），订阅时报错；请按交易对订阅ticker。
 
 ###### ```Futures_Crypto```（期货）
 
@@ -26848,12 +27844,13 @@ function main() {
 - 限价单支持```tif```的IOC、FOK与只做Maker（```postOnly```），只做Maker不能与IOC、FOK同时使用；市价单传入```tif```或```postOnly```时报错。条件单中带委托价的（触发后挂限价单）同样支持```tif```与```postOnly```，触发后市价成交的条件单传入时报错。普通单与条件单都支持只减仓（```reduceOnly```）。
 - 支持```exchange.ModifyOrder()```与```exchange.ModifyConditionOrder()```（Crypto.com原地改单），条件单可改触发价、委托价与数量；执行价格传-1可把触发后限价的条件单改成触发后市价，传正数则反过来。不能修改```tif```与```postOnly```（传入时报错）。
 - ```exchange.GetHistoryConditionOrders()```不传```since```时，Crypto.com只返回最近一天内的条件单历史；要查更早的记录请传```since```。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报、持仓与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。合约代码与REST接口相同（交割合约按同一张合约表解析）；ticker与bbo都来自Crypto.com的ticker流（自带买一卖一价与量、持仓量，Crypto.com没有单独的最优买卖流）；逐笔成交与```exchange.GetTrades()```同一套成交ID；深度订阅10档以内使用Crypto.com的10档流，11至50档（缺省20档）使用50档流，均由快照与增量按序号同步，超过50档的订阅报错；K线周期与```exchange.GetRecords()```的原生周期相同，首次订阅先推送500根历史，Crypto.com的K线推送不带收盘标志，下一根开始时把上一根补发为已收盘。私有流是整个账户的一路```private```订阅（不带交易对），只在订阅时连接并鉴权，在同一条连接上订阅Crypto.com的订单流、持仓流与余额流：订阅生效后（以及每次断线重连后）先按```exchange.GetAccount()```与```exchange.GetPositions()```同一接口推送一次全部余额与持仓快照，然后报告就绪，之后推送衍生品订单更新与发生变化的持仓、余额（口径与这两个函数相同，持仓只含查询持仓的同一个账户，平仓推送数量为0的持仓）。鉴权失败时连接状态报告降级、私有流报告失败（行情推送不受影响）。不支持全市场```tickers```订阅（Crypto.com的ticker推送必须逐个合约订阅），订阅时报错；请按交易对订阅ticker。
 
 #### DeepCoin
 
-```DeepCoin```（现货）：DeepCoin现货交易，通过DeepCoin接口（```api.deepcoin.com```）接入，全部是REST轮询，没有行情和订单推送。API KEY需要同时配置Access Key、Secret Key和Passphrase。账户、订单只使用现货账户（```SPOT```）。只交易现货，没有模拟盘；永续合约请使用```Futures_DeepCoin```。
+```DeepCoin```（现货）：DeepCoin现货交易，通过DeepCoin接口（```api.deepcoin.com```）接入；行情与私有流另可经WebSocket推送订阅（见下文说明）。API KEY需要同时配置Access Key、Secret Key和Passphrase。账户、订单只使用现货账户（```SPOT```）。只交易现货，没有模拟盘；永续合约请使用```Futures_DeepCoin```。
 
-```Futures_DeepCoin```（期货）：DeepCoin U本位（USDT保证金）与币本位永续合约，通过DeepCoin接口（```api.deepcoin.com```）接入，全部是REST轮询，没有行情和订单推送。API KEY需要同时配置Access Key、Secret Key和Passphrase。只有永续合约，没有模拟盘。
+```Futures_DeepCoin```（期货）：DeepCoin U本位（USDT保证金）与币本位永续合约，通过DeepCoin接口（```api.deepcoin.com```）接入；行情与私有流另可经WebSocket推送订阅（见下文说明）。API KEY需要同时配置Access Key、Secret Key和Passphrase。只有永续合约，没有模拟盘。
 
 ##### 名称与配置
 
@@ -26955,6 +27952,7 @@ function main() {
 - 市价买单的下单量是要花费的计价币金额（DeepCoin的```tgtCcy```为```quote_ccy```），市价卖单是交易币数量。限价单支持IOC、FOK与只做Maker（```postOnly```）。
 - 条件单只支持止盈、止损单，不支持OCO（需要分成止盈、止损两张条件单下单）。条件单与普通订单的订单号互不通用，条件单只能用```exchange.CancelConditionOrder()```撤销。
 - ```exchange.GetOrders()```、```exchange.GetConditionOrders()```只能按交易对查询：不传或传空字符串时查询当前交易对。未触发条件单的接口没有翻页，单次最多返回100条，交易所正好返回100条时```exchange.GetConditionOrders()```报错（无法确认是否已取全）。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。ticker推送的最新价与24小时开高低量与```exchange.GetTicker()```同源；DeepCoin的ticker流只有买卖一价没有量，推送的买一卖一价与量取自同交易对的盘口流（另开一条连接），两条流都到达后才开始推送。逐笔成交与```exchange.GetTrades()```同一套成交ID，成交方向未知（与```exchange.GetTrades()```相同）；注意交易所现货的REST成交接口只返回较早的成交（实测比当前晚数小时），所以推送的成交号往往不在```exchange.GetTrades()```的结果里。深度最多60档（缺省20档），使用该交易对最小价格精度的盘口流，首条为整本快照、之后为增量；DeepCoin的盘口增量没有序号，本地盘口出现买一价不低于卖一价时视为不同步，自动重新订阅该深度。K线推送只有1分钟周期（DeepCoin只推送1分钟K线），首次订阅先推送300根历史；交易所推送没有收盘标志，按K线结束时间与下一根K线的到来判定收盘；其它周期订阅时报错，由托管者用REST数据合成。私有流是整个账户的一路```private```订阅（不带交易对），只在订阅时申请listenKey并连接（每30分钟续期）：连接确认后（以及每次断线重连后）先按```exchange.GetAssets()```同一接口推送一次全部余额快照，然后报告就绪，之后推送本账户现货订单的更新；交易所的余额推送没有挂单冻结额，收到后按```exchange.GetAssets()```重新查询，只推送变化的币种。现货没有持仓，私有流不推送持仓。API Key无效时连接状态报告降级、私有流报告失败（行情推送不受影响）。不支持全市场```tickers```订阅（DeepCoin的行情推送必须逐个交易对订阅），订阅时报错；请按交易对订阅ticker。
 
 ###### ```Futures_DeepCoin```（期货）
 
@@ -26963,6 +27961,7 @@ function main() {
 - 条件单只支持止盈、止损单，不支持OCO（需要分成止盈、止损两张条件单下单），不能使用自定义订单号（clientId）；未触发的条件单可以用```exchange.ModifyConditionOrder()```修改，修改后订单号不变。条件单与普通订单的订单号互不通用，条件单只能用```exchange.CancelConditionOrder()```撤销。
 - 查询未完成条件单的接口必须带交易对：```exchange.GetConditionOrders()```不传参数时只查询当前合约，不能传范围（如```USDT.swap```）。该接口没有翻页，单次最多返回100条，交易所正好返回100条时报错（无法确认是否已取全）。
 - 交易币本位合约需要账户已在DeepCoin开通币本位合约账户，否则下单会被交易所拒绝。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报、持仓与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。推送里的成交量、K线量、24小时量与深度量都是合约张数（注意```exchange.GetDepth()```的REST接口返回的是币数）。ticker推送的最新价与24小时开高低量与```exchange.GetTicker()```同源；DeepCoin的ticker流只有买卖一价没有量，推送的买一卖一价与量取自同合约的盘口流（另开一条连接），两条流都到达后才开始推送。逐笔成交与```exchange.GetTrades()```同一套成交ID，成交方向未知（与```exchange.GetTrades()```相同）；交易所的REST成交接口只返回部分成交，推送的成交号只有一部分能在```exchange.GetTrades()```里找到。深度最多60档（缺省20档），使用该合约最小价格精度的盘口流，首条为整本快照、之后为增量；DeepCoin的盘口增量没有序号，本地盘口出现买一价不低于卖一价时视为不同步，自动重新订阅该深度；个别合约在最小价格精度上没有盘口流，该深度订阅报告失败。K线推送只有1分钟周期（DeepCoin只推送1分钟K线），首次订阅先推送300根历史；交易所推送没有收盘标志，按K线结束时间与下一根K线的到来判定收盘；其它周期订阅时报错，由托管者用REST数据合成。私有流是整个账户的一路```private```订阅（不带交易对），只在订阅时申请listenKey并连接（每30分钟续期）：连接确认后（以及每次断线重连后）先按```exchange.GetAssets()```与```exchange.GetPositions()```同一接口推送一次全部余额与持仓快照，然后报告就绪，之后推送永续订单更新与持仓变化（每行是该合约该方向此刻的全部张数，0表示已平；推送不带未实现盈亏与强平价，这两项省略）；交易所的余额推送没有挂单冻结与权益，收到后按```exchange.GetAssets()```重新查询，只推送变化的币种。API Key无效时连接状态报告降级、私有流报告失败（行情推送不受影响）。不支持全市场```tickers```订阅（DeepCoin的行情推送必须逐个合约订阅），订阅时报错；请按交易对订阅ticker。
 
 #### Deribit
 
@@ -27042,12 +28041,13 @@ function main() {
 - 条件单只支持止盈、止损单，不支持OCO；支持```exchange.ModifyConditionOrder()```。触发价默认按最新成交价，可在附加参数中传```trigger```（```mark_price```、```index_price```）改用标记价格或指数价格。
 - ```exchange.GetHistoryOrders()```、```exchange.GetHistoryConditionOrders()```按品种查询，不支持```since```参数（传了会报错），返回最近的记录。
 - 范围查询```USD.swap```、```USD.futures```等的```USD```覆盖BTC、ETH币本位合约；差价组合合约的范围是```USD.futures_combo```。当前合约为组合合约时，不传参数默认```USD.futures_combo```（含以原生代码返回的远月组合）；```USD.futures```不含组合合约。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与账户私有流（订单回报、持仓、余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。推送的数量与REST接口同一口径（币本位合约的下单量、成交量、持仓量是USD金额，ticker与K线的成交量是币数）。ticker使用Deribit的```ticker```频道（自带买一卖一价与量、持仓量，开盘价与```exchange.GetTicker()```一样由24小时涨跌幅反推）；深度订阅1档、10档以内、20档以内（缺省20档）分别使用Deribit的1档、10档、20档快照流，深度5与深度20是两路独立订阅；超过20档（最多255档）使用全量订单簿的快照与增量，按```prev_change_id```逐条核对，断档时自动重新订阅该深度；逐笔成交与```exchange.GetTrades()```同一套成交ID；K线周期与```exchange.GetRecords()```相同，Deribit的K线推送不带收盘标志，下一根K线开始时上一根按最后一次推送的数值收盘，首次订阅先推送500根历史。交割合约（如```BTC_USD.quarter```）在订阅时解析成当时的合约，交割换月后需要重新订阅。私有流是一路```private```订阅（不带合约，覆盖整个账户），只在订阅时单独建一条连接并用API Key签名鉴权，订阅Deribit全部衍生品（期货、期权及组合）的订单流、持仓变化流与全部币种的账户摘要流。订阅生效及每次断线重连后，先用与```exchange.GetAssets()```、```exchange.GetPositions()```相同的接口取快照并推送快照行，再报告就绪；之后实时推送订单回报、成交引起的持仓变化（平仓推送数量为0的一行）与余额变化，各字段与REST同口径；标记价引起的持仓浮动盈亏变化不推送。登录失败时连接状态报告降级、私有流报告失败（行情推送不受影响）。用```exchange.IO("base", "https://test.deribit.com")```切换到测试网后，之后建立的推送连接也连接测试网地址。不支持全市场```tickers```订阅（Deribit的ticker推送必须逐个合约订阅），订阅时报错；请按交易对订阅ticker。
 
 #### DigiFinex
 
-```DigiFinex```（现货）：DigiFinex现货交易，通过DigiFinex OpenAPI v3（```openapi.digifinex.com```）的REST接口接入，私有接口需要API Key（Access Key、Secret Key）。只交易现货，没有模拟盘；永续合约请使用```Futures_DigiFinex```。
+```DigiFinex```（现货）：DigiFinex现货交易，通过DigiFinex OpenAPI v3（```openapi.digifinex.com```）的REST接口接入，行情与私有数据另有WebSocket推送（见注意事项），私有接口需要API Key（Access Key、Secret Key）。只交易现货，没有模拟盘；永续合约请使用```Futures_DigiFinex```。
 
-```Futures_DigiFinex```（期货）：DigiFinex永续合约，通过DigiFinex合约接口（```/swap/v2```）的REST接口接入：U本位（如```BTC_USDT.swap```）与币本位反向合约（如```BTC_USD.swap```），没有交割合约。私有接口需要API Key（Access Key、Secret Key）；可勾选「模拟盘」使用DigiFinex合约模拟盘。
+```Futures_DigiFinex```（期货）：DigiFinex永续合约，通过DigiFinex合约接口（```/swap/v2```）的REST接口接入，行情与私有数据另有WebSocket推送（见注意事项）：U本位（如```BTC_USDT.swap```）与币本位反向合约（如```BTC_USD.swap```），没有交割合约。私有接口需要API Key（Access Key、Secret Key）；可勾选「模拟盘」使用DigiFinex合约模拟盘。
 
 ##### 名称与配置
 
@@ -27134,11 +28134,13 @@ DigiFinex只有永续合约，其它合约代码会报错。下单数量单位�
 
 ###### ```DigiFinex```（现货）
 
-DigiFinex现货没有模拟盘环境，配置里也没有模拟盘选项；模拟盘只有合约（```Futures_DigiFinex```）支持。
+- DigiFinex现货没有模拟盘环境，配置里也没有模拟盘选项；模拟盘只有合约（```Futures_DigiFinex```）支持。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交）与私有流（订单回报与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。DigiFinex现货的WebSocket没有K线频道，K线订阅会直接报错（```exchange.GetRecords()```照常可用）；也没有独立的买一卖一频道，bbo取自ticker推送（约每秒一条，ticker自带买一卖一价与量）。逐笔成交与```exchange.GetTrades()```同一套成交ID，订阅时交易所补发的最近成交不推送；深度只有一条100档的推送流（先推整本快照，之后推增量），各档数的深度订阅共用它、各自截断，缺省20档，超过100档不支持；该推送没有序号与校验和，只能按到达顺序合并，断线重连后重新订阅取新快照。私有流是整个账户的一路```private```订阅（不带交易对），只在订阅时连接并鉴权：订单流订阅全部现货交易对、余额流订阅全部交易对涉及的币种（订阅时的交易对列表，之后新上线的交易对要到下次重连才覆盖）。订阅生效后（以及每次断线重连后）先按```exchange.GetAssets()```同一接口推送一次全部余额快照，然后报告就绪，之后推送订单更新与发生变化的币种余额（可用为推送的可用额，冻结为总额减可用）。杠杆订单不推送；市价单不推送委托价，市价买单不推送委托数量。现货没有持仓，私有流不推送持仓。鉴权失败时连接状态报告降级、私有流报告失败（行情推送不受影响）。全市场```tickers```订阅（不带交易对）使用DigiFinex的全市场ticker频道（```all_ticker```），每帧推送一批交易对的最新价、买一卖一价与量、24小时开高低与成交量。
 
 ###### ```Futures_DigiFinex```（期货）
 
 - 不支持批量查询资金费率：```exchange.GetFundings()```必须传入具体永续合约品种（例如```BTC_USDT.swap```），不传或传范围（如```USDT.swap```）时报错。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报、持仓与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。ticker推送自带买一卖一价与量，成交量与```exchange.GetTicker()```相同是张数；没有独立的买一卖一频道，bbo取自ticker推送。逐笔成交与```exchange.GetTrades()```同一套成交ID与主动方向，订阅后交易所补发的最近成交不推送。深度订阅10档以内使用DigiFinex的10档流，缺省（20档）与11到20档使用20档流，21到100档使用100档流；每条流先推整本快照、之后推增量，没有序号与校验和（按到达顺序合并，断线重连后重新订阅取新快照），超过100档不支持。K线周期与```exchange.GetRecords()```相同（1分钟、5分钟、15分钟、30分钟、1小时、4小时、12小时、1天、1周，其它周期报错），首次订阅先推送500根历史；DigiFinex的K线推送不带收盘标志，收到下一根K线时把上一根作为收盘K线推送。私有流是整个账户的一路```private```订阅（不带交易对），只在订阅时连接并鉴权，在同一条连接上订阅DigiFinex的账户、持仓与订单频道（当前账户类型——模拟盘或实盘，以连接时为准——下的全部永续合约）：订阅生效后（以及每次断线重连后）先按```exchange.GetAssets()```与```exchange.GetPositions()```同一接口推送一次全部余额与持仓快照，然后报告就绪，之后推送订单更新以及发生变化的持仓（多空两条腿分别推送，数量为0表示该腿已平）与币种余额的全量当前状态，口径与REST结果相同。下单失败的订单推送为拒单。鉴权失败时连接状态报告降级、私有流报告失败（行情推送不受影响）。模拟盘合约（如```BTC_USDT2.swap```）同样有行情推送。全市场```tickers```订阅（不带合约）使用DigiFinex的全市场ticker频道（```all_ticker```），约每2秒推送一次全部合约的最新价、买一卖一价与量、24小时开高低与成交量（张）。
 
 #### Gate
 
@@ -27268,6 +28270,7 @@ DigiFinex现货没有模拟盘环境，配置里也没有模拟盘选项；模�
 - 市价单默认以```fok```（全部成交或撤销）提交，可以在下单附加参数中传```time_in_force```覆盖。
 - ```exchange.GetHistoryOrders()```必须有交易对（不传时使用当前交易对），传空串报错。
 - 条件单只支持止盈、止损单，不支持OCO；不支持修改条件单，需要先撤销再重新创建。触发后的委托：给了委托价为限价GTC单，不给为市价IOC单；触发条件有效期30天。```exchange.GetHistoryConditionOrders()```不支持```since```参数（交易所接口不能按时间过滤），传入时报错。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。ticker推送的买一卖一价与量取自同交易对的最优买卖流（Gate的ticker流只有价没有量），两条流都到达后才开始推送，开盘价按与```exchange.GetTicker()```相同的方法由24小时涨跌幅还原；逐笔成交与```exchange.GetTrades()```同一套成交ID；深度订阅50档以内（缺省20档）使用Gate的50档订单簿流，更多档数使用400档流（最多255档），均由快照与连续增量同步，序号断档时自动重新订阅该深度；K线周期与```exchange.GetRecords()```相同，首次订阅先推送500根历史。私有流是整个账户的一路```private```订阅（不带交易对），只在订阅时连接，每个私有频道单独签名订阅：订阅生效后（以及每次断线重连后）先按```exchange.GetAssets()```同一接口（当前钱包）推送一次全部余额快照，然后报告就绪，之后推送订单更新（全部交易对）与余额变化。经典账户的现货钱包直接推送变化币种的可用与冻结额；逐仓杠杆、全仓杠杆与统一账户在收到余额变动后按```exchange.GetAssets()```重新查询，只推送变化的币种。现货没有持仓，私有流不推送持仓。签名被拒时连接状态报告降级、私有流报告失败（行情推送不受影响）；模拟盘连接Gate测试网的推送地址。不支持全市场```tickers```订阅（Gate.io的ticker推送必须逐个交易对订阅），订阅时报错；请按交易对订阅ticker。
 
 ###### ```Futures_GateIO```（期货）
 
@@ -27277,10 +28280,11 @@ DigiFinex现货没有模拟盘环境，配置里也没有模拟盘选项；模�
 - ```exchange.GetHistoryOrders()```必须指定具体合约（不传时使用当前合约），传空串或范围报错；交割合约不支持```since```参数。
 - 条件单只支持止盈、止损单，不支持OCO，触发价按最新成交价判断；触发后的委托给了委托价为限价单，不给为市价单（价格0、```ioc```）。```exchange.ModifyConditionOrder()```只支持永续合约（原地修改），交割合约需要先撤销再重新创建。Gate可能拒绝修改经API下的止盈止损单（错误码1077 ```APIOrderNotSupportUpdateTouchOrder```），这时```exchange.ModifyConditionOrder()```报错，需要先撤销（```exchange.CancelConditionOrder()```）再重新创建。
 - ```exchange.GetHistoryConditionOrders()```不支持```since```参数（交易所接口不能按时间过滤），传入时报错。
+- 支持WebSocket推送：永续与交割合约的行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报、持仓与余额）可以通过事件流订阅；期权不支持推送。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。推送里的数量与REST相同，都是合约张数。ticker推送的买一卖一价与量取自同合约的最优买卖流（Gate合约的ticker流没有买卖一），两条流都到达后才开始推送，带持仓量；逐笔成交与```exchange.GetTrades()```同一套成交ID与方向；深度订阅50档以内（缺省20档）使用Gate的50档订单簿流，更多档数使用400档流（最多255档），均由快照与连续增量同步，序号断档时自动重新订阅该深度；K线周期与```exchange.GetRecords()```相同，首次订阅先推送500根历史。交割合约按订阅时的合约表解析别名（如```quarter```），订阅期间换月不会自动切换到新合约。私有流是整个账户的一路```private```订阅（不带交易对），只在订阅时连接：在USDT、BTC、USD1结算的永续与USDT结算的交割各开一条连接（与不带交易对的```exchange.GetPositions()```查询范围相同；模拟盘只有USDT永续），每个私有频道单独签名订阅。订阅生效后（以及每次断线重连后）先按```exchange.GetAssets()```与```exchange.GetPositions()```同一接口推送一次全部余额与持仓快照，然后报告就绪，之后推送订单更新与持仓变化（每行是该持仓此刻的全部数量，0表示已平；推送不带未实现盈亏，该项省略）；交易所的余额推送只有钱包总额，收到后按```exchange.GetAssets()```重新查询，只推送变化的币种。签名被拒或API Key无效时连接状态报告降级、私有流报告失败（行情推送不受影响）；模拟盘连接Gate测试网的推送地址，只支持USDT永续。不支持全市场```tickers```订阅（Gate.io的ticker推送必须逐个合约订阅），订阅时报错；请按交易对订阅ticker。
 
 #### Gemini
 
-Gemini的现货交易（接口地址```https://api.gemini.com```）。只用REST接口，没有行情和订单推送；私有接口使用Gemini的API Key（Access Key与Secret Key）签名。使用主账户密钥（以```master-```开头）时，可以用```exchange.IO("subAccount", name)```指定操作的子账户。不支持市价单和条件单。
+Gemini的现货交易（接口地址```https://api.gemini.com```）。行情与订单回报另有WebSocket推送（见注意事项）；私有接口使用Gemini的API Key（Access Key与Secret Key）签名。使用主账户密钥（以```master-```开头）时，可以用```exchange.IO("subAccount", name)```指定操作的子账户。不支持市价单和条件单。
 
 ##### 名称与配置
 
@@ -27334,10 +28338,11 @@ function main() {
 - K线接口不分页，每个周期只能取到交易所返回的最近一批K线（1分钟K线约为最近一天）。
 - ```exchange.GetMarkets()```只返回状态为```open```的现货交易对，不含Gemini的永续合约；精度等信息要逐个交易对查询交易所，调用耗时较长。
 - ```exchange.GetTrades()```中拍卖撮合的成交没有吃单方向，这类成交的```Type```为```2```。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。行情使用Gemini现行的WebSocket接口（```wss://ws.gemini.com```）：Gemini没有24小时统计行情推送，ticker与bbo同用最优买卖价流```bookTicker```（买一卖一价与量，以及最近一笔成交的价格与数量），ticker推送里没有成交量与开高低价；逐笔成交与```exchange.GetTrades()```同一套成交ID；深度订阅5档以内、6到10档、缺省（20档）与11到20档分别使用Gemini每100毫秒一次的5档、10档、20档快照，21档以上使用全量订单簿增量流（按更新号连续性校验，断档时重新订阅取快照）。K线使用Gemini的v2行情接口（```wss://api.gemini.com/v2/marketdata```），周期与```exchange.GetRecords()```相同（1分钟、5分钟、15分钟、30分钟、1小时、6小时、1天）；首次订阅先推送最多500根历史K线（取自```exchange.GetRecords()```同一接口），Gemini的K线推送不带收盘标志，实测每根K线在其周期结束后才推送一次，推送时刻已过该K线结束时间的作为收盘K线推送（收到更新的一根时上一根若未收盘也补发为收盘），只有有成交的周期才有推送，所以没有盘中未收盘的K线更新。私有流是整个账户的一路```private```订阅（不带交易对），只在订阅时连接Gemini的订单事件流（v1 order events，握手时用与REST相同的API Key签名鉴权，主账户密钥同样使用```exchange.IO("subAccount", name)```指定的子账户）：订阅生效后（以及每次断线重连后）先按```exchange.GetAssets()```同一接口推送一次全部余额快照，然后报告就绪，之后推送订单更新；Gemini没有余额推送，每批订单事件（受理、成交、撤销等）之后重新查询余额，只推送发生变化的币种。订单回报的订单号与下单返回的订单号相同；建连时交易所推送的当前挂单列表不作为订单回报发布；消息序号跳号时立即重连。现货没有持仓，私有流不推送持仓。不支持全市场```tickers```订阅（Gemini的推送必须逐个交易对订阅），订阅时报错；请按交易对订阅ticker。
 
 #### HashKey
 
-HashKey（香港）的现货交易（接口地址```https://api-pro.hashkey.com```），有USDT、USDC、USD、HKD等计价的交易对。只用REST接口，没有行情和订单推送；私有接口使用HashKey的API Key（Access Key与Secret Key）签名。不支持条件单与改单。
+HashKey（香港）的现货交易（接口地址```https://api-pro.hashkey.com```），有USDT、USDC、USD、HKD等计价的交易对。行情与私有数据另有WebSocket推送（见注意事项）；私有接口使用HashKey的API Key（Access Key与Secret Key）签名。不支持条件单与改单。
 
 ##### 名称与配置
 
@@ -27367,10 +28372,11 @@ HashKey（香港）的现货交易（接口地址```https://api-pro.hashkey.com`
 - 限价单支持IOC、FOK与只做Maker（```postOnly```，对应HashKey的```LIMIT_MAKER```）；市价单不支持只做Maker与FOK，传入时报错。
 - ```exchange.GetHistoryOrders()```只返回已结束的订单（不含未成交与部分成交的挂单），不传```limit```时最多返回100条。
 - ```exchange.GetTickers()```跳过最新价、开高低价与成交量全为0（没有成交）的交易对。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报与余额）可以通过事件流订阅，推送地址随REST接口地址（```api-pro```对应```stream-pro```）。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。HashKey的ticker流不带买一卖一，ticker推送的买一卖一价与量取自同交易对的深度流，两条流都到达后才开始推送；HashKey没有单独的买一卖一流，bbo订阅取深度流的第一档。深度推送是HashKey约每300毫秒一次（有变化才推）的整本快照，最多200档，5档以内与其它档数的订阅各自独立订阅、互不影响，缺省20档，超过200档不支持。逐笔成交订阅生效时HashKey先返回的最近成交不推送，之后逐笔推送，成交ID与```exchange.GetTrades()```同一套（HashKey的成交接口不给成交号，按方向、价格、数量与时间拼成）。K线首次订阅先推送300根历史；HashKey的K线推送不带收盘标志，推送时刻已过该K线结束时间（交易所在周期结束时会补推一次上一根）或收到下一根K线时，把上一根作为收盘K线推送。私有流是整个账户的一路```private```订阅（不带交易对），只在订阅时用API Key申请listenKey并连接（每30分钟续期）：订阅生效后（以及每次断线重连后）先按```exchange.GetAssets()```同一接口推送一次全部余额快照，然后报告就绪，之后推送订单更新与发生变化的币种余额（账户里每个币种只有一行时直接取推送的可用与冻结额，否则重新查询余额后推送变化的币种）。现货没有持仓，私有流不推送持仓。申请listenKey被拒（API Key无效或无权限）时连接状态报告降级、私有流报告失败（行情推送不受影响）。不支持全市场```tickers```订阅（HashKey的ticker推送必须逐个交易对订阅），订阅时报错；请按交易对订阅ticker。
 
 #### HitBTC
 
-HitBTC的现货交易（接口地址```https://api.hitbtc.com```，v3接口），不含HitBTC的永续合约（```_PERP```）：```exchange.GetMarkets()```与```exchange.GetTickers()```只列交易所状态为```working```的现货交易对。只用REST接口，没有行情和订单推送；私有接口使用HitBTC的API Key（Access Key与Secret Key）。
+HitBTC的现货交易（接口地址```https://api.hitbtc.com```，v3接口），不含HitBTC的永续合约（```_PERP```）：```exchange.GetMarkets()```与```exchange.GetTickers()```只列交易所状态为```working```的现货交易对。行情与私有数据另有WebSocket推送（见注意事项）；私有接口使用HitBTC的API Key（Access Key与Secret Key）。
 
 ##### 名称与配置
 
@@ -27403,6 +28409,7 @@ HitBTC的现货交易（接口地址```https://api.hitbtc.com```，v3接口）�
 - ```exchange.ModifyOrder()```可以修改价格与数量，价格或数量不为正数时该项不修改。改单后订单的```client_order_id```会变，返回的是新订单号，之后应使用新订单号。
 - 条件单支持止盈、止损（不填委托价为触发后市价成交），不支持OCO；```exchange.ModifyConditionOrder()```可以修改触发价、委托价与数量（不为正数的项不修改），与普通改单一样返回新订单号；撤销条件单与撤销普通订单使用同一接口。
 - ```exchange.GetHistoryOrders()```按交易对查询，只返回已结束的订单，不传```limit```时最多返回1000条。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。ticker推送使用HitBTC的```ticker/1s```（自带买一卖一价与量，有变化才推送，每秒至多一条），bbo使用```orderbook/top/100ms```；逐笔成交与```exchange.GetTrades()```同一套成交ID；深度订阅5档以内、6到10档、缺省（20档）与11到20档分别使用HitBTC每100毫秒一次的5档、10档、20档快照，21档以上使用全量订单簿增量流（按序号连续性校验，断档时重新订阅取快照）；K线首次订阅先推送500根历史，HitBTC的K线推送不带收盘标志，收到更新的一根K线（或推送时刻已过该K线结束时间）时把上一根作为收盘K线推送，只有有成交的周期才有推送。私有流是整个账户的一路```private```订阅（不带交易对），只在订阅时连接交易端点并登录，在同一条连接上订阅订单回报与余额：订阅生效后（以及每次断线重连后）先按```exchange.GetAssets()```同一接口推送一次全部余额快照，然后报告就绪，之后推送订单更新与发生变化的币种余额（可用与冻结额直接取自推送，与```exchange.GetAssets()```同口径）。订单回报的订单号是```client_order_id```，与下单返回的订单号相同；订阅时交易所推送的当前挂单列表不作为订单回报发布。现货没有持仓，私有流不推送持仓。登录失败时连接状态报告降级、私有流报告失败（行情推送不受影响）。全市场```tickers```订阅（不带交易对）使用HitBTC的批量ticker频道（```ticker/1s/batch```，订阅全部交易对），每秒推送一次有变化的交易对，带最新价、24小时开高低、成交量与买一卖一价量；从没有成交过（没有最新价）的交易对不推送。
 
 #### 火币
 
@@ -27534,6 +28541,7 @@ function main() {
 - 限价单支持```tif```的```ioc```、```fok```与只做Maker（```postOnly```，对应HTX的```limit-maker```）。
 - ```exchange.GetHistoryOrders()```、```exchange.GetHistoryConditionOrders()```必须有交易对（不传时使用当前交易对），传空串报错。
 - 条件单使用HTX的策略委托（```/v2/algo-orders```），只支持普通现货账户，只支持止盈、止损单，不支持OCO。条件单的订单ID是下单时的```clientOrderId```（不传时自动生成UUID），不是数字订单号。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。ticker推送自带买一卖一价与量；逐笔成交与```exchange.GetTrades()```同一套成交ID；深度订阅5档以内、10档以内、20档以内（缺省20档）分别使用HTX的5档、10档、20档整本快照流（各自独立），21至150档、151至400档使用150档、400档增量流（快照与增量按序号衔接，断档自动重新同步），最多400档；HTX的K线推送不带收盘标志，下一根开始时把上一根作为收盘K线推送，首次订阅先推送500根历史。私有流是整个账户的一路```private```订阅（不带交易对），只在订阅时连接并鉴权：订阅生效后（以及每次断线重连后）先按```exchange.GetAccount()```同一接口推送一次全部余额快照，然后报告就绪，之后推送全部交易对的订单更新与发生变化的币种余额（可用与冻结，口径与```exchange.GetAccount()```相同，只推当前钱包模式查询的那个账户）。条件单触发失败或触发前撤销的回报使用条件单ID。现货没有持仓，私有流不推送持仓。鉴权失败时连接状态报告降级、私有流报告失败（行情推送不受影响）。不支持全市场```tickers```订阅（火币的ticker推送必须逐个交易对订阅），订阅时报错；请按交易对订阅ticker。
 
 ###### ```Futures_HuobiDM```（期货）
 
@@ -27541,10 +28549,11 @@ function main() {
 - 市价单在经典账户、统一账户下以对手价（```opponent```）下单，多资产保证金模式下为市价单；限价单支持```tif```的```ioc```、```fok```与只做Maker（```postOnly```）。
 - 条件单只支持止盈、止损单，不支持OCO；多资产保证金模式下同样可以使用条件单。不给委托价时触发后以最优20档（```optimal_20```）成交。
 - ```exchange.GetConditionOrders()```按范围查询只支持USDT（如```USDT.swap```），币本位合约需要指定具体合约；经典账户、统一账户下```exchange.GetHistoryConditionOrders()```不支持```since```参数（传入时报错），只能查到最近90天。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报、持仓与余额）可以通过事件流订阅，U本位、币本位永续与币本位交割合约都支持。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。HTX合约的24小时行情只在成交后推送，ticker推送的买一卖一价与量取自同合约的最优买卖流，两条流都到达后才开始推送；成交量与```exchange.GetTicker()```一样是张数；交割合约订阅的是HTX的周期别名（本周、次周、季度、次季），换季后自动跟随；逐笔成交与```exchange.GetTrades()```同一套成交ID，数量是张数；深度订阅20档以内（缺省20档，HTX合约没有5档流，5档与20档各自一路订阅、使用同一种20档流）、21至150档分别使用HTX的20档、150档增量流（首条快照之后按版本号逐条衔接，断档自动重新订阅），最多150档；HTX的K线推送不带收盘标志，下一根开始时把上一根作为收盘K线推送，首次订阅先推送500根历史。私有流是整个账户的一路```private```订阅（不带交易对），订阅时为U本位、币本位永续、币本位交割各建一条连接并鉴权：U本位在多资产保证金模式下使用HTX的v5推送，经典账户按```exchange.IO("cross", …)```当时的保证金模式订阅全仓或逐仓（连接建立后再切换，下一次重连生效）。订阅生效后（以及每次断线重连后）先按```exchange.GetPositions()```、```exchange.GetAccount()```同一接口推送一次全部持仓与余额快照，然后报告就绪，之后推送订单更新与持仓变化（口径与```exchange.GetPositions()```相同；单向持仓为净持仓，双向持仓与币本位合约分多空两腿；合约推送空持仓时补推清零）；余额由多个保证金账户合并而成，余额推送到达后重新查询```exchange.GetAccount()```的同一接口，只推送发生变化的币种。鉴权失败时连接状态报告降级、私有流报告失败（行情推送不受影响）。不支持全市场```tickers```订阅（火币合约的行情推送必须逐个合约订阅），订阅时报错；请按交易对订阅ticker。
 
 #### Korbit
 
-韩国交易所Korbit的现货交易（接口地址```https://api.korbit.co.kr```，v2接口），KRW市场。只用REST接口，没有行情和订单推送；私有接口使用Korbit的API Key（Access Key与Secret Key）签名。不支持条件单与改单。
+韩国交易所Korbit的现货交易（接口地址```https://api.korbit.co.kr```，v2接口），KRW市场。查询与下单走REST接口，行情与私有流另有WebSocket推送（见下文）；私有接口使用Korbit的API Key（Access Key与Secret Key）签名。不支持条件单与改单。
 
 ##### 名称与配置
 
@@ -27575,6 +28584,7 @@ function main() {
 - 只支持GTC限价单与市价单：指定```tif```为```ioc```、```fok```或```postOnly```时报错。
 - ```exchange.GetOrders()```不传```symbol```参数时只查询当前交易对。
 - ```exchange.GetMarkets()```只返回状态为```launched```（已上线交易）的交易对。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交）与账户私有流（订单回报、余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。Korbit只有一种深度推送（每次推送整本快照，每边30档），各档数的深度订阅（缺省20档，最多30档，更多档数订阅时报错）共用这一路推送、按各自档数输出；交易所的ticker推送不带买卖一价的挂单量，ticker与bbo的买卖一价取自盘口推送的最优一档；逐笔成交与```exchange.GetTrades()```同一套成交ID，订阅时交易所补发的最近一笔历史成交不推送，断线重连后交易所重发的成交按成交ID去重。交易所没有K线推送，K线订阅报错（不支持的周期）。订阅前按```exchange.GetMarkets()```核对交易对，不存在或未上线交易的交易对订阅时报错。价格精度取自交易所的价格档位表中最小的报价单位，数量精度为8位小数。私有流是一路```private```订阅（不带交易对，覆盖整个账户），只在订阅时连接，连接时按REST接口的方式签名，订阅全部已上线交易对的订单变动与余额变动（连接期间新上线的交易对在下次重连后覆盖）：订阅生效及每次断线重连后，先用与```exchange.GetAssets()```相同的接口推送余额快照，再报告就绪；之后推送订单回报与发生变化的币种余额（可用、冻结与```exchange.GetAssets()```同口径，冻结为挂单占用）。现货没有持仓。签名被拒时连接状态报告降级、私有流报告失败（行情推送不受影响）。不支持全市场```tickers```订阅（Korbit的ticker推送必须指定交易对），订阅时报错；请按交易对订阅ticker。
 
 #### Kraken
 
@@ -27694,6 +28704,7 @@ Kraken只挂月度和季度交割合约，```this_week```、```month```都指最
 - 下单支持```tif```的IOC与只做Maker（```postOnly```，仅限价委托），不支持FOK，传入时报错。
 - 支持```exchange.ModifyOrder()```与```exchange.ModifyConditionOrder()```：都是Kraken原地改单，订单ID不变；普通单可改价格、数量，条件单可改触发价、委托价与数量。
 - ```exchange.GetOrders()```、```exchange.GetConditionOrders()```不传参数时返回全部交易对的挂单。```exchange.GetHistoryOrders()```、```exchange.GetHistoryConditionOrders()```不传```limit```时返回最近50条，传更大的```limit```时自动翻页取满。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。ticker与bbo使用Kraken随一档变化推送的ticker流（带买卖一价与量及24小时统计）；逐笔成交与```exchange.GetTrades()```同一套成交ID；深度订阅10档以内（缺省10档）、25档以内、100档以内与更多档数（最多255档）分别使用Kraken的10、25、100、500档订单簿流，由快照与增量同步并校验Kraken的CRC32校验和，校验不符时自动重新订阅；K线首次订阅先推送500根历史，Kraken的K线推送只在有成交时更新，一根K线在下一根出现或结束时间过后3秒（以本机时钟为准）标记为收盘。私有流是整个账户的一路```private```订阅（不带交易对），只在订阅时连接，连接前用API Key申请Kraken的WebSocket令牌，在同一条连接上订阅订单执行流与余额流：订阅生效后（以及每次断线重连后）先按```exchange.GetAccount()```同一接口推送一次全部余额快照，然后报告就绪，之后推送订单更新与发生变化的币种余额（Kraken的余额推送没有可用与冻结的拆分，每次余额或订单变化后按```exchange.GetAccount()```同一接口重新读取）。现货没有持仓，私有流不推送持仓；订单到期在推送里报告为已撤销。订阅被拒时连接状态报告降级、私有流报告失败（行情推送不受影响）。不支持全市场```tickers```订阅（Kraken的ticker推送必须逐个交易对订阅），订阅时报错；请按交易对订阅ticker。
 
 ###### ```Futures_Kraken```（期货）
 
@@ -27702,6 +28713,7 @@ Kraken只挂月度和季度交割合约，```this_week```、```month```都指最
 - 条件单只支持止盈、止损单，不支持OCO；条件单以最新成交价触发。
 - 限价单支持```tif```的IOC与只做Maker（```postOnly```），不支持FOK；市价单不支持FOK与只做Maker，条件单不支持```tif```与只做Maker，传入时报错。
 - 支持```exchange.ModifyOrder()```与```exchange.ModifyConditionOrder()```（Kraken的改单接口），条件单可改触发价、委托价与数量。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报、持仓与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。ticker与bbo使用Kraken期货的ticker流（带买卖一价与量）；逐笔成交与```exchange.GetTrades()```同一套成交ID；深度使用Kraken期货的全量订单簿流，由快照与逐条增量同步（序号不连续时自动重新订阅），最多255档、缺省20档；K线使用Kraken期货的K线推送，周期与```exchange.GetRecords()```的原生周期相同，首次订阅先推送500根历史，下一根出现时上一根标记为收盘。私有流是整个账户的一路```private```订阅（不带交易对），只在订阅时连接并按Kraken期货的challenge方式鉴权，在同一条连接上订阅挂单、持仓与余额三路推送：订阅生效后（以及每次断线重连后）先按```exchange.GetAccount()```与```exchange.GetPositions()```同一接口推送一次全部余额与持仓快照，然后报告就绪，之后推送订单更新、持仓变化（每个合约一个净持仓，平仓后推送数量为0的一行；不带杠杆与强平价）与发生变化的币种余额（Kraken期货的余额推送与```exchange.GetAccount()```口径不同，每次余额或订单变化后按```exchange.GetAccount()```同一接口重新读取）。鉴权失败时连接状态报告降级、私有流报告失败（行情推送不受影响）；REST地址为模拟盘时推送也连接模拟盘。不支持全市场```tickers```订阅（Kraken期货的ticker推送必须逐个合约订阅），订阅时报错；请按交易对订阅ticker。
 
 #### 库币
 
@@ -27802,6 +28814,7 @@ Kraken只挂月度和季度交割合约，```this_week```、```month```都指最
 - ```exchange.ModifyOrder()```改单后KuCoin会换新订单号，返回的是新订单ID，原订单ID作废。
 - ```exchange.GetHistoryOrders()```、```exchange.GetHistoryConditionOrders()```必须有交易对（不传时使用当前交易对），传空串报错。
 - 条件单只支持止盈、止损单，不支持OCO（KuCoin没有OCO接口）；不支持修改条件单，需要先撤销再重新创建。条件单与普通订单分属两个订单空间，撤销、查询条件单使用条件单函数。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。每次建立连接都先向KuCoin申请连接令牌，按交易所给的心跳间隔发送ping。ticker推送的最新价、24小时高低价、成交量与开盘价（最新价减24小时涨跌额，同```exchange.GetTicker()```）取自交易对的行情快照流（约2秒一次），买一卖一价与量取自一档盘口流，两条流都到达后才开始推送；逐笔成交与```exchange.GetTrades()```同一套成交ID；深度订阅5档以内使用KuCoin的5档快照流，50档以内（缺省20档）使用50档快照流，5档与20档是两路独立的订阅；超过50档（最多255档）使用增量流，并以交易所的完整订单簿快照校准，完整订单簿是私有接口，需要配置API Key。KuCoin的K线推送不带收盘标志，下一根K线开始时补推上一根的收盘数据；首次订阅K线先推送500根历史K线。私有流是整个账户的一路```private```订阅（不带交易对），只有订阅时才建立私有连接：订阅生效后（以及每次重连后）先按```exchange.GetAccount()```的同一接口推送全部余额快照，再报告就绪，之后推送订单回报与交易账户余额的变化（与```exchange.GetAccount()```同口径，资金账户、杠杆账户的变化不推送）。现货没有持仓，私有流不推送持仓。API Key被拒绝时连接状态报告降级、私有流报告失败，行情推送不受影响。全市场```tickers```订阅（不带交易对）使用KuCoin的全部交易对ticker流（```/market/ticker:all```），交易对的最优挂单变化时推送，带买一卖一价量、最新价与最新成交量，不带24小时开高低与成交量（KuCoin没有全市场的24小时行情推送），需要24小时统计请按交易对订阅ticker；从没有成交过的交易对不推送。
 
 ###### ```Futures_KuCoin```（期货）
 
@@ -27809,10 +28822,11 @@ Kraken只挂月度和季度交割合约，```this_week```、```month```都指最
 - ```exchange.GetHistoryOrders()```、```exchange.GetHistoryConditionOrders()```必须指定具体合约（不传时使用当前合约），传空串或范围报错。
 - 限价单支持```tif```的IOC与只做Maker（```postOnly```），不支持FOK；市价单不支持这些选项，传入时报错。
 - 条件单只支持止盈、止损单，不支持OCO（KuCoin合约没有OCO接口）；条件单以最新成交价触发。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报、持仓与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。每次建立连接都先向KuCoin申请连接令牌，按交易所给的心跳间隔发送ping。数量单位与REST接口相同（合约张数）。ticker推送的最新价、24小时高低价、成交量与开盘价取自合约的24小时快照流（约5秒一次，口径同```exchange.GetTicker()```），买一卖一价与量取自实时最优买卖流，两条流都到达后才开始推送；逐笔成交与```exchange.GetTrades()```同一套成交ID；深度订阅5档以内使用5档快照流，50档以内（缺省20档）使用50档快照流，5档与20档是两路独立的订阅；超过50档（最多255档）使用逐笔增量流，并以交易所的完整订单簿快照校准。KuCoin的K线推送不带收盘标志，下一根K线开始时补推上一根的收盘数据；首次订阅K线先推送500根历史K线。私有流是整个账户的一路```private```订阅（不带交易对），只有订阅时才建立私有连接：订阅生效后（以及每次重连后）先按```exchange.GetAccount()```、```exchange.GetPositions()```的同一接口推送全部余额与持仓快照，再报告就绪，之后推送订单回报、持仓变化（单向持仓，口径同```exchange.GetPositions()```）与余额：余额变化的推送字段与```exchange.GetAccount()```的口径不同，收到后按该结算币重新查询账户再推送。API Key被拒绝时连接状态报告降级、私有流报告失败，行情推送不受影响。不支持全市场```tickers```订阅（KuCoin期货的ticker推送必须逐个合约订阅），订阅时报错；请按交易对订阅ticker。
 
 #### LBank
 
-LBank的现货交易（接口地址```https://api.lbank.info```，v2接口），包括杠杆代币（ETF）交易对。只用REST接口，没有行情和订单推送；私有接口使用LBank的API Key（Access Key与Secret Key）签名。不支持条件单与改单。
+LBank的现货交易（接口地址```https://api.lbank.info```，v2接口），包括杠杆代币（ETF）交易对。行情与私有数据另有WebSocket推送（见注意事项）；私有接口使用LBank的API Key（Access Key与Secret Key）签名。不支持条件单与改单。
 
 ##### 名称与配置
 
@@ -27844,12 +28858,13 @@ LBank的现货交易（接口地址```https://api.lbank.info```，v2接口），
 - ```exchange.GetHistoryOrders()```不支持```since```参数（交易所接口不按时间过滤），传入时报错；不传时返回最近的订单。
 - ```exchange.GetTickers()```同时包含现货与杠杆代币（ETF）交易对的行情。批量行情接口不含买卖一价，返回的```Buy```、```Sell```都是最新价。
 - ```exchange.GetTicker()```的买一、卖一价来自额外查询一次盘口；交易所行情不含开盘价，```Open```由最新价与24小时涨跌幅反推。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。LBank的订阅没有确认应答：收到该订阅的第一条数据，或订阅发出2秒后连接上又收到任何消息且交易所没有报错，就视为订阅成功（交易对与K线周期在订阅时已按市场表与周期表校验）。ticker推送的买一卖一价与量取自同交易对的1档盘口流（LBank的ticker流本身不带买一卖一），两条流都到达后才开始推送，开盘价与```exchange.GetTicker()```一样由最新价与24小时涨跌幅反推；推送里的时间是北京时间，已换算成时间戳。深度订阅N档（2到200档）就订阅LBank的N档盘口，每条推送都是整本快照（约0.5秒一条），不同档数是各自独立的订阅，缺省为20档，1档订阅取2档快照的第一档，超过200档不支持。逐笔成交推送不带成交ID，事件里的成交ID是由成交时间、价格、数量和方向拼成的合成ID（以```syn:```开头），与```exchange.GetTrades()```的成交ID不同。K线首次订阅先推送500根历史；LBank的K线推送不带收盘标志，推送时刻已过该K线结束时间、或收到紧接着的下一根K线时，把该K线作为收盘K线推送（收盘前最后不到1秒的成交可能不在推送的收盘K线里，以```exchange.GetRecords()```为准）。私有流是整个账户的一路```private```订阅（不带交易对），只在订阅时取LBank的subscribeKey（每30分钟续期）并连接，订阅LBank的订单流（全部交易对）与余额流：订阅生效后（以及每次断线重连后）先按```exchange.GetAssets()```同一接口推送一次全部余额快照，然后报告就绪，之后推送订单更新与发生变化的币种余额（可用与冻结额直接取自推送）。市价买单的订单数量与```exchange.GetOrder()```一样取成交数量。现货没有持仓，私有流不推送持仓。subscribeKey无效时连接状态报告降级、私有流报告失败（行情推送不受影响）。不支持全市场```tickers```订阅（LBank的ticker推送必须逐个交易对订阅），订阅时报错；请按交易对订阅ticker。
 
 #### MEXC
 
-```MEXC```（现货）：MEXC（抹茶）现货交易，通过MEXC现货V3接口（```api.mexc.com```）接入，全部是REST轮询，没有行情和订单推送。私有接口需要API Key（Access Key、Secret Key）。只交易现货，没有模拟盘；永续合约请使用```Futures_MEXC```。
+```MEXC```（现货）：MEXC（抹茶）现货交易，通过MEXC现货V3接口（```api.mexc.com```）接入，行情与私有数据另有WebSocket推送（见注意事项）。私有接口需要API Key（Access Key、Secret Key）。只交易现货，没有模拟盘；永续合约请使用```Futures_MEXC```。
 
-```Futures_MEXC```（期货）：MEXC（抹茶）永续合约：USDT、USDC保证金合约与币本位合约，通过MEXC合约接口（```contract.mexc.com```）接入，全部是REST轮询，没有行情和订单推送。私有接口需要API Key（Access Key、Secret Key）。只有永续合约，没有模拟盘。
+```Futures_MEXC```（期货）：MEXC（抹茶）永续合约：USDT、USDC保证金合约与币本位合约，通过MEXC合约接口（```contract.mexc.com```）接入，行情与私有数据另有WebSocket推送（见注意事项）。私有接口需要API Key（Access Key、Secret Key）。只有永续合约，没有模拟盘。
 
 ##### 名称与配置
 
@@ -27934,6 +28949,7 @@ MEXC合约只有永续合约，其它合约代码会报错。原生合约代码�
 - 市价买单的下单量是要花费的计价币金额（按MEXC的```quoteOrderQty```下单），市价卖单是交易币数量。
 - 限价单指定只做Maker（```postOnly```）时按MEXC的```LIMIT_MAKER```类型下单。
 - ```exchange.GetHistoryOrders()```只能查询最近7天的订单（交易所接口的限制），```since```早于7天前时从7天前开始查询。
+- 支持WebSocket推送（MEXC现货V3的protobuf推送）：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。ticker推送取MEXC滚动24小时的mini ticker（最新价、最高最低价与交易币成交量），买一卖一价与量取自同交易对的最优买卖流（每100毫秒聚合一次），两条流都到达后才开始推送；逐笔成交每100毫秒聚合推送一次，MEXC的推送与```exchange.GetTrades()```一样没有成交ID，成交ID按```exchange.GetTrades()```同一规则由时间、方向、价格与数量合成；深度订阅5档以内、6到10档、11到20档分别使用MEXC的5档、10档、20档快照流，缺省（20档）与超过20档使用增量流（先按```exchange.GetDepth()```同一接口取1000档快照，再按版本号连续性校验，断档时重新取快照）；K线首次订阅先推送500根历史，周期与```exchange.GetRecords()```的原生周期相同（不支持8小时），MEXC的K线推送不带收盘标志，收到下一根K线时把上一根作为收盘K线推送。每条连接最多30个订阅，超出自动分到新连接，连接满23小时主动重连（MEXC限制单条连接24小时）。私有流是整个账户的一路```private```订阅（不带交易对），只在订阅时用API Key申请listenKey（每30分钟续期，重连时优先续期沿用）并连接，订阅订单流与余额流：订阅生效后（以及每次断线重连后）先按```exchange.GetAssets()```同一接口推送一次全部余额快照，然后报告就绪，之后推送订单更新与发生变化的币种余额（推送里就是该币种的全额可用与冻结）。现货没有持仓，私有流不推送持仓。API Key无效或权限不足时连接状态报告降级、私有流报告失败（行情推送不受影响）。全市场```tickers```订阅（不带交易对）使用MEXC的全市场迷你行情流（```spot@public.miniTickers.v3.api.pb@24H```），带最新价、滚动24小时高低与成交量，不带买一卖一（MEXC现货没有全市场的最优挂单流），需要买一卖一请按交易对订阅ticker或bbo；没有最新价的交易对不推送。
 
 ###### ```Futures_MEXC```（期货）
 
@@ -27941,6 +28957,7 @@ MEXC合约只有永续合约，其它合约代码会报错。原生合约代码�
 - 条件单只支持止盈、止损单，不支持OCO；不支持修改条件单；条件单不能使用自定义订单号（clientId）。条件单以最新成交价触发，有效期为24小时，到期自动失效。
 - 改单（```exchange.ModifyOrder()```）只能修改限价单，改单后交易所会撤销原订单并挂出新订单，返回值是新订单的Id，之后的查询、撤单应使用新Id。
 - 限价单支持IOC、FOK与只做Maker（```postOnly```）；市价单不能指定FOK或只做Maker，条件单只支持GTC。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报、持仓与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。ticker推送取MEXC每秒一次的合约ticker（最新价、24小时最高最低价、成交量与持仓量，单位为张，与```exchange.GetTicker()```相同），买一卖一价与量取自同合约的5档盘口流，两条流都到达后才开始推送；bbo取5档盘口流的第一档；逐笔成交的成交ID与```exchange.GetTrades()```同一字段，MEXC的推送没有带成交ID时成交ID为空；深度订阅5档以内、6到10档、11到20档分别使用MEXC的5档、10档、20档全量盘口流，缺省（20档）与超过20档使用增量流（先按```exchange.GetDepth()```同一接口取1000档快照，再按版本号连续性校验，断档时重新取快照）；K线首次订阅先推送500根历史，周期与```exchange.GetRecords()```的原生周期相同，MEXC的K线推送不带收盘标志，收到下一根K线时把上一根作为收盘K线推送。私有流是整个账户的一路```private```订阅（不带交易对），只在订阅时连接并用API Key登录：订阅生效后（以及每次断线重连后）先按```exchange.GetAssets()```与```exchange.GetPositions()```同一接口推送一次全部余额与持仓快照，然后报告就绪，之后推送订单更新、持仓变化（与```exchange.GetPositions()```一样只包含当前全仓/逐仓模式下的仓位，平仓后推送数量为0的持仓）与余额变化（MEXC的余额推送不含权益与未实现盈亏，收到后按```exchange.GetAssets()```同一接口重新查询余额，只推送变化的币种）。登录失败时连接状态报告降级、私有流报告失败（行情推送不受影响）。全市场```tickers```订阅（不带交易对）使用MEXC合约的全市场行情推送，每秒推送一次全部合约的最新价、24小时成交量（张）与高低价，不带买一卖一（交易所的全市场推送没有盘口，行里的最高买价、最低卖价是限价范围），需要买一卖一请按交易对订阅ticker或bbo。
 
 #### OKX
 
@@ -28095,16 +29112,18 @@ function main() {
 - ```exchange.ModifyOrder()```使用OKX的改单接口（```amend-order```）原地修改，订单ID不变。
 - 条件单支持止盈、止损和OCO；```exchange.ModifyConditionOrder()```使用OKX的改算法单接口（```amend-algos```）原地修改，不撤单重下。
 - ```exchange.GetHistoryOrders()```只能查单个交易对，传空串时报错；```exchange.GetHistoryConditionOrders()```不支持```since```参数，传入时报错。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与账户私有流（订单回报、余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。深度订阅1档使用OKX的```bbo-tbt```、5档使用```books5```快照，其它档数（缺省20档，最多255档）由```books```频道的快照与增量按序号同步，序号断档时自动重新订阅该深度；逐笔成交使用```trades-all```（逐笔、不合并，与```exchange.GetTrades()```同一套成交ID）；K线首次订阅先推送500根历史；ticker不含持仓量。私有流是一路```private```订阅（不带交易对，覆盖整个账户），只在订阅时连接并登录（要求API Key配置了Passphrase，不支持令牌鉴权），在同一条连接上订阅OKX的```orders```与```account```频道。订阅生效及每次断线重连后，先用与```exchange.GetAssets()```相同的接口取余额快照并推送快照行，再报告就绪；之后实时推送订单回报（只含现货与杠杆订单）与余额变化（可用、冻结与REST同口径，冻结为挂单冻结）。OKX除事件推送外还会定时推送账户快照，快照中缺少某个原有币种时按REST重新核对余额。现货没有持仓，私有流不含持仓。登录失败时连接状态报告降级、私有流报告失败（行情推送不受影响）。模拟盘的推送连接OKX模拟盘的WebSocket地址。不支持全市场```tickers```订阅（OKX的ticker推送必须逐个交易对订阅），订阅时报错；请按交易对订阅ticker。
 
 ###### ```Futures_OKCoin```（期货）
 
 - ```exchange.GetFundings()```不支持批量查询，需要传入具体的永续合约，例如```exchange.GetFundings("ETH_USDT.swap")```；不传或传范围（如```USDT.swap```）时报错。
 - 条件单支持止盈、止损和OCO；```exchange.ModifyOrder()```、```exchange.ModifyConditionOrder()```使用OKX的改单接口原地修改，订单ID不变。
 - ```exchange.GetHistoryConditionOrders()```不支持```since```参数，传入时报错；```exchange.GetHistoryOrders()```支持。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与账户私有流（订单回报、持仓、余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。推送的数量、成交量一律按张（与REST接口同一口径），ticker不含持仓量。深度订阅1档使用OKX的```bbo-tbt```、5档使用```books5```快照，其它档数（缺省20档，最多255档）由```books```频道的快照与增量按序号同步，序号断档时自动重新订阅该深度；逐笔成交使用```trades-all```（逐笔、不合并，与```exchange.GetTrades()```同一套成交ID）；K线首次订阅先推送500根历史。交割合约（如```BTC_USD.quarter```）在订阅时解析成当时的合约，交割换月后需要重新订阅；期权不支持推送。私有流是一路```private```订阅（不带合约，覆盖整个账户），只在订阅时连接并登录（要求API Key配置了Passphrase，不支持令牌鉴权），在同一条连接上订阅OKX的```orders```、```positions```与```account```频道。订阅生效及每次断线重连后，先用与```exchange.GetAssets()```、```exchange.GetPositions()```（永续与交割）相同的接口取快照并推送快照行，再报告就绪；之后实时推送订单回报与持仓变化（只含永续与交割，数量按张，平仓推送数量为0的一行）、余额变化，各字段与REST同口径。OKX除事件推送外还会定时推送持仓（约每5秒）与账户快照，标记价引起的浮动盈亏与权益随之更新；账户快照中缺少某个原有币种时按REST重新核对余额。登录失败时连接状态报告降级、私有流报告失败（行情推送不受影响）。模拟盘的推送连接OKX模拟盘的WebSocket地址。不支持全市场```tickers```订阅（OKX的ticker推送必须逐个合约订阅），订阅时报错；请按合约订阅ticker。
 
 #### Poloniex
 
-Poloniex的现货交易（接口地址```https://api.poloniex.com```，v3接口），下单使用SPOT账户（```accountType```为```SPOT```）。只用REST接口，没有行情和订单推送；私有接口使用Poloniex的API Key（Access Key与Secret Key）签名。条件单使用Poloniex的智能订单（```/smartorders```），只支持止损。
+Poloniex的现货交易（接口地址```https://api.poloniex.com```，v3接口），下单使用SPOT账户（```accountType```为```SPOT```）。行情与私有数据另有WebSocket推送（见注意事项）；私有接口使用Poloniex的API Key（Access Key与Secret Key）签名。条件单使用Poloniex的智能订单（```/smartorders```），只支持止损。
 
 ##### 名称与配置
 
@@ -28162,10 +29181,11 @@ function main() {
 - 现货条件单只支持止损（```ORDER_CONDITION_TYPE_SL```）：买单在价格涨到触发价时触发，卖单在价格跌到触发价时触发。止盈（```ORDER_CONDITION_TYPE_TP```）和OCO条件单会直接报错，不会下单。不填委托价为触发后市价成交。条件单的数量不论买卖一律是交易币数量。
 - 条件单与普通订单是两套订单号：条件单只能用`exchange.CancelConditionOrder`撤销。条件单触发后生成的普通订单出现在```exchange.GetOrders()```中，```exchange.GetConditionOrders()```只列未触发的条件单。
 - ```exchange.GetAccount()```只读一个SPOT账户：```exchange.IO("accountId", id)```指定的账户，未指定时为第一个SPOT账户；```exchange.GetAssets()```汇总所有SPOT账户的资产。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。ticker推送的买一卖一价与量取自同交易对的5档盘口流（Poloniex的ticker流本身不带买一卖一，约每秒一条），两条流都到达后才开始推送；逐笔成交与```exchange.GetTrades()```同一套成交ID；深度订阅5档以内使用Poloniex每100毫秒一次的5档快照，6到10档使用10档快照，缺省（20档）与11到20档使用20档实时增量流（按序号连续性校验，断档时重新订阅取快照），超过20档不支持；K线首次订阅先推送500根历史，Poloniex的K线推送不带收盘标志，收到下一根K线时把上一根作为收盘K线推送。私有流是整个账户的一路```private```订阅（不带交易对），只在订阅时连接并鉴权，在同一条连接上订阅Poloniex的订单流与余额流：订阅生效后（以及每次断线重连后）先按```exchange.GetAssets()```同一接口推送一次全部余额快照（汇总所有SPOT账户），然后报告就绪，之后推送订单更新与发生变化的币种余额（只有一个SPOT账户时直接取推送的可用与冻结额，有多个SPOT账户时重新查询余额后推送变化的币种）。市价买单的订单数量与成交量与```exchange.GetOrder()```相同，是计价币金额。现货没有持仓，私有流不推送持仓。鉴权失败时连接状态报告降级、私有流报告失败（行情推送不受影响）。全市场```tickers```订阅（不带交易对）使用Poloniex的```ticker```频道订阅全部交易对，每秒推送一次全部交易对，带最新价、24小时开高低与成交量，不带买一卖一（Poloniex的盘口频道不支持订阅全部交易对），需要买一卖一请按交易对订阅ticker或bbo。
 
 #### Upbit
 
-韩国交易所Upbit的现货交易（接口地址```https://api.upbit.com```），KRW、BTC、USDT市场。只用REST接口，没有行情和订单推送；私有接口使用Upbit的API Key（Access Key与Secret Key）签名。不支持条件单。
+韩国交易所Upbit的现货交易（接口地址```https://api.upbit.com```），KRW、BTC、USDT市场。查询与下单走REST接口，行情与私有流另有WebSocket推送（见下文）；私有接口使用Upbit的API Key（Access Key与Secret Key）签名。不支持条件单。
 
 ##### 名称与配置
 
@@ -28197,6 +29217,7 @@ function main() {
 - ```exchange.ModifyOrder()```使用Upbit的撤单并重新下单接口（```cancel_and_new```），由交易所原子地撤销原订单并下新订单，返回新订单的订单号，之后应使用新订单号。新订单仍是限价单，必须传入大于0的新价格；价格不为正数时报错，不会改成市价单。不改数量（数量不为正数）时新订单数量为原订单的剩余量。```exchange.ModifyOrder()```不会把订单改成市价单。
 - ```exchange.GetTickers()```的批量行情不含盘口，```Buy```、```Sell```为0。
 - ```exchange.GetHistoryOrders()```返回已成交和已撤销的订单，不传```limit```时最多返回100条。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与账户私有流（订单回报、余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。Upbit的深度推送每条都是整本快照，档数只能是1、5、15、30：深度订阅取不小于所订档数的最小一档（缺省20档，按30档订阅），超过30档的订阅会报错；每种档数各用一条连接，各订阅按自己的档数输出。ticker由24小时统计流与1档盘口合成买卖一价；逐笔成交与```exchange.GetTrades()```同一套成交ID；K线推送只有1秒、1、3、5、10、15、30、60、240分钟周期，其它周期订阅时报```unsupported interval```；首次订阅K线先推送500根历史，交易所不推送收盘标志，一根K线在下一根到来时（或推送时已过结束时间）才标记为收盘，没有成交的周期没有K线。交易所对订阅成功不作应答，行情订阅以收到的第一条数据为生效。私有流是一路```private```订阅（不带交易对，覆盖整个账户），只在订阅时连接，握手时用API Key签发的JWT鉴权，订阅订单（myOrder）与资产（myAsset）频道：订阅生效（以交易所列出的当前订阅为准）及每次断线重连后，先用与```exchange.GetAssets()```相同的接口推送余额快照，再报告就绪；之后推送订单回报与发生变化的币种余额（可用、冻结与```exchange.GetAssets()```同口径）。现货没有持仓。鉴权失败时交易所在握手阶段拒绝私有连接，连接器按断线退避重连（连接状态报告断开，行情推送不受影响）。不支持全市场```tickers```订阅（Upbit的ticker推送必须指定交易对），订阅时报错；请按交易对订阅ticker。
 
 #### WEEX
 
@@ -28270,6 +29291,7 @@ WEEX没有交割合约，其它合约代码会报错。下单数量单位为基�
 - 市价买单的数量为计价币金额：WEEX现货接口不支持按金额下市价单，连接器按当前卖盘（最多200档）把金额折算成基础币数量（按数量步长向下取整）后下单，实际成交金额可能与传入的金额略有差异。卖盘不够花完这笔金额、或折算后的数量小于最小下单量时报错，不会少买。在附加参数中显式传```quantity```时直接使用该数量。查询订单时市价买单的```Amount```是交易所记录的基础币数量。
 - 不支持只做Maker（post-only）订单，限价单的有效方式只有GTC、IOC、FOK。
 - ```exchange.GetHistoryOrders()```只能按交易对查询（交易所的历史订单接口按交易对查询）：不传```symbol```时查询当前交易对，传空字符串时报错。交易所只能回溯约90天，```since```早于90天前时按90天前查询。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。ticker推送的买一卖一价与量取自同交易对的最优买卖流（WEEX的ticker流不带买卖价），两条流都到达后才开始推送；逐笔成交与```exchange.GetTrades()```同一套成交ID，订阅前的历史成交不推送；深度订阅15档以内使用WEEX的15档订单簿流，16至200档（缺省20档）使用200档流，均由快照与首尾相接的增量同步，序号断档时自动重新订阅该深度；K线周期与```exchange.GetRecords()```的原生周期相同，交易所不标记收盘，收盘按K线结束时间或下一根K线到达判定，首次订阅先推送300根历史。私有流是整个账户的一路```private```订阅（不带交易对），只在订阅时连接（连接握手时签名）：订阅生效后（以及每次断线重连后）先按```exchange.GetAssets()```同一接口推送一次全部余额快照，然后报告就绪，之后推送订单更新（全部交易对）与变动币种的余额。现货没有持仓，私有流不推送持仓。WEEX对签名错误的连接直接拒绝握手、不返回可区分的错误，此时私有流按断线处理并退避重连（行情推送不受影响）。WEEX每条连接每小时最多240次订阅操作。不支持全市场```tickers```订阅（WEEX的ticker推送必须逐个交易对订阅），订阅时报错；请按交易对订阅ticker。
 
 ###### ```Futures_WEEX```（期货）
 
@@ -28280,6 +29302,7 @@ WEEX没有交割合约，其它合约代码会报错。下单数量单位为基�
 - ```exchange.GetFundings()```的```Rate```是下一次结算的预测资金费率，```Time```是下一次结算时间；支持批量查询（不传品种，或传范围如```USDT.swap```）。
 - ```exchange.GetTickers()```中没有盘口数据的合约（交易所的盘口行情里没有这一行，例如休市的合约），```Buy```、```Sell```为0。
 - 订单与条件单的```Offset```按买卖方向与持仓方向推出：卖出+多仓方向（平多）、买入+空仓方向（平空）为平仓，其余为开仓。双向持仓下交易所给平仓条件单返回的```reduceOnly```也是```false```，不作为开平依据；只有持仓方向为单向（```BOTH```）或缺省时才按```reduceOnly```/```closePosition```判断。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报、持仓与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。WEEX合约没有最优买卖流：bbo推送取自同合约15档订单簿流（单独一条连接）维护的订单簿的买一卖一（与```exchange.GetTicker()```取订单簿买一卖一同一口径），ticker推送的买一卖一价与量取自它，两条流都到达后才开始推送；逐笔成交与```exchange.GetTrades()```同一套成交ID，订阅前的历史成交与交易所重复推送的成交不推送；深度订阅15档以内使用WEEX的15档订单簿流，16至200档（缺省20档）使用200档流，均由快照与首尾相接的增量同步，序号断档时自动重新订阅；K线周期与```exchange.GetRecords()```的原生周期相同，交易所不标记收盘，收盘按K线结束时间或下一根K线到达判定，首次订阅先推送300根历史。私有流是整个账户的一路```private```订阅（不带交易对），只在订阅时连接（连接握手时签名）：订阅生效后（以及每次断线重连后）先按```exchange.GetAssets()```与```exchange.GetPositions()```同一接口推送一次全部余额与持仓快照，然后报告就绪，之后推送订单更新（全部合约）、持仓变化（持仓量、均价、杠杆、逐仓保证金；推送不带未实现盈亏与全仓保证金，这些字段在持仓推送里缺省）与余额变化（余额推送没有可用余额，收到后按```exchange.GetAssets()```重新查询，只推送变化的币种）。WEEX对签名错误的连接直接拒绝握手、不返回可区分的错误，此时私有流按断线处理并退避重连（行情推送不受影响）。WEEX每条连接每小时最多240次订阅操作。不支持全市场```tickers```订阅（WEEX的ticker推送必须逐个合约订阅），订阅时报错；请按交易对订阅ticker。
 
 #### WOO X
 
@@ -28392,6 +29415,7 @@ WOO X只有永续合约，其它合约代码会报错。下单数量单位为基
 - 条件单支持止盈、止损和OCO；```exchange.ModifyConditionOrder()```只能修改止盈、止损单，不能修改OCO条件单。
 - ```exchange.GetConditionOrders()```只能按交易对查询：不传或传空字符串时查询当前交易对。
 - ```exchange.GetHistoryOrders()```、```exchange.GetHistoryConditionOrders()```只能按交易对查询：不传```symbol```时查询当前交易对，传空字符串时报错。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。行情连接的地址带上配置里的ApplicationId（没有填写时使用不带ApplicationId的地址）。ticker推送的买一卖一价与量取自同交易对的最优买卖流（WOO X的24小时行情流没有买卖价），两条流都到达后才开始推送；成交量与```exchange.GetTicker()```同口径，取聚合成交量。逐笔成交没有交易所成交ID，与```exchange.GetTrades()```使用同一套合成ID（同一毫秒、方向、价格、数量完全相同的多笔成交，```exchange.GetTrades()```会在ID后追加序号，推送不追加）。深度订阅最多100档（缺省20档），由```exchange.GetDepth()```同一接口的快照与按前一条时间戳衔接的增量同步，衔接中断时自动重新取快照；WOO X只在盘口变化时推送，订阅生效后先推送一次快照。K线周期为1分钟、5分钟、15分钟、30分钟、1小时、4小时、12小时、1天、1周、1月，首次订阅先推送500根历史；交易所的K线推送没有收盘标志，推送时间已过该K线结束时间、或下一根K线开始推送时视为收盘。私有流是整个账户的一路```private```订阅（不带交易对），需要配置ApplicationId，只在订阅时连接并登录：订阅生效后（以及每次断线重连后）先按```exchange.GetAssets()```同一接口推送一次全部余额快照，然后报告就绪，之后推送现货订单更新（全部交易对，不含条件单本身，条件单触发后的委托照常推送）；余额推送只作为余额变动通知，收到后按```exchange.GetAssets()```重新查询，只推送变化的币种。现货没有持仓，私有流不推送持仓。签名被拒时连接状态报告降级、私有流报告失败（行情推送不受影响）。全市场```tickers```订阅（不带交易对）使用WOO的全市场24小时行情流与全市场最优挂单流，每秒推送一次全部现货交易对，带最新价、24小时开高低、成交量与买一卖一（成交量与ticker同口径）。
 
 ###### ```Futures_WOO```（期货）
 
@@ -28399,6 +29423,7 @@ WOO X只有永续合约，其它合约代码会报错。下单数量单位为基
 - ```exchange.GetFundings()```的```Rate```是交易所估算的下一次结算资金费率，```Time```是下一次结算时间；支持批量查询。
 - ```exchange.GetPositions()```的```Profit```按（标记价格−开仓均价）×持仓量计算，```Margin```按开仓均价×持仓量÷杠杆估算；持仓的保证金模式取交易所持仓数据里的```marginMode```（同一账户可以同时有全仓和逐仓持仓），与```exchange.IO("cross", bool)```的本地下单设置无关。
 - ```exchange.GetHistoryOrders()```、```exchange.GetHistoryConditionOrders()```与未完成订单的查询一样接受```USDT.swap```这类范围：不按交易对向交易所查询，再按范围筛选，```limit```只计算范围内的订单。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报、持仓与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。行情连接的地址带上配置里的ApplicationId（没有填写时使用不带ApplicationId的地址）。ticker推送的买一卖一价与量取自同合约的最优买卖流（WOO X的24小时行情流没有买卖价），两条流都到达后才开始推送；成交量与```exchange.GetTicker()```同口径（交易所的24小时成交量），推送不带持仓量。逐笔成交没有交易所成交ID，与```exchange.GetTrades()```使用同一套合成ID（同一毫秒、方向、价格、数量完全相同的多笔成交，```exchange.GetTrades()```会在ID后追加序号，推送不追加）。深度订阅最多100档（缺省20档），由```exchange.GetDepth()```同一接口的快照与按前一条时间戳衔接的增量同步，衔接中断时自动重新取快照；WOO X只在盘口变化时推送，订阅生效后先推送一次快照。K线周期为1分钟、5分钟、15分钟、30分钟、1小时、4小时、12小时、1天、1周、1月（1年周期不支持推送），首次订阅先推送500根历史；交易所的K线推送没有收盘标志，推送时间已过该K线结束时间、或下一根K线开始推送时视为收盘。私有流是整个账户的一路```private```订阅（不带交易对），需要配置ApplicationId，只在订阅时连接并登录：订阅生效后（以及每次断线重连后）先按```exchange.GetAssets()```、```exchange.GetPositions()```同一接口推送一次全部余额与持仓快照，然后报告就绪，之后推送永续订单更新（全部合约，不含条件单本身，条件单触发后的委托照常推送）与持仓变化（每条是该合约持仓的全量，盈亏与保证金按```exchange.GetPositions()```同一方法计算，推送没有强平价）；余额推送只作为余额变动通知，收到后按```exchange.GetAssets()```重新查询，只推送变化的币种。签名被拒时连接状态报告降级、私有流报告失败（行情推送不受影响）。全市场```tickers```订阅（不带交易对）使用WOO的全市场24小时行情流与全市场最优挂单流，每秒推送一次全部永续合约，带最新价、24小时开高低、成交量与买一卖一（成交量与ticker同口径，不含持仓量）。
 
 #### Zaif
 
@@ -28731,6 +29756,7 @@ function main() {
 - ```exchange.ModifyOrder()```成功后订单ID会改变，返回值是新的订单ID。
 - ```exchange.GetTicker()```的```Buy```、```Sell```为盘口买一、卖一（一侧没有挂单时用中间价），```Last```、```High```、```Low```都是中间价，交易所没有24小时最高、最低价；```exchange.GetTickers()```的```Buy```、```Sell```也是中间价。
 - ```exchange.GetHistoryOrders()```只能取交易所返回的最近订单，不支持```since```参数，传入大于0的```since```会报错。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。ticker的最新价、成交量、开盘价与```exchange.GetTicker()```同源（中间价、24小时成交量、昨收），买一、卖一取最优买卖推送，没有24小时最高、最低价。深度订阅最多20档：1～5档订阅交易所的5档快速推送（约0.5秒一次），6～20档（缺省20档）订阅20档推送（约5秒一次），两者是各自独立的推送；逐笔成交与```exchange.GetTrades()```同一套成交ID，订阅生效时交易所补发的最近成交不推送；K线周期同```exchange.GetRecords()```，首次订阅先推送500根历史，交易所的K线推送没有收盘标志，下一根开始时上一根作为已收盘推送（成交稀少的交易对收盘推送会延后到下一笔成交）。私有流是整个钱包地址的一路```private```订阅（不带交易对），按```WalletAddress```（或```exchange.IO("walletAddress", ...)```设置的地址）只读订阅、不签名：订阅生效后（以及每次断线重连后）先按```exchange.GetAccount()```同一接口推送一次全部余额快照，然后报告就绪，之后推送现货订单更新（不含成交均价，需要时用```exchange.GetOrder()```）与发生变化的币种余额。不支持全市场```tickers```订阅（Hyperliquid的全市场推送```allMids```只有中间价，不是ticker），订阅时报错；请按交易对订阅ticker。
 
 ###### ```Futures_Hyperliquid```（期货）
 
@@ -28743,6 +29769,7 @@ function main() {
 - ```exchange.GetFundings()```：主dex取预测资金费率（每小时结算）；HIP-3品种需要传入品种代码，返回最近24小时的资金费率记录。
 - ```exchange.GetHistoryOrders()```、```exchange.GetHistoryConditionOrders()```只能取交易所返回的最近订单，不支持```since```参数，传入大于0的```since```会报错。
 - HIP-4 Outcome品种是现货式头寸：用买入、卖出交易（下单数量为整数），不支持只减仓，平仓单（```closebuy```、```closesell```）会报错；持仓来自现货账户中的Outcome代币。Outcome品种没有K线、资金费率，```GetTicker()```的```Last```为中间价，```Buy```、```Sell```为0。交易所还没有给出中间价的Outcome品种（刚上市、尚未成交等）仍出现在```GetMarkets()```中（```PricePrecision```为4，```Info.assetCtx.midPx```为```null```），```GetTickers()```不含该品种，对它调用```GetTicker()```或下市价单会报错；持有这种品种时，持仓按中间价0估值（```Margin```为0，```Profit```为负的买入成本）。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报、持仓与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。ticker的最新价、成交量、开盘价、持仓量与```exchange.GetTicker()```同源（中间价、24小时成交量、昨收、未平仓量），买一、卖一取最优买卖推送（不是冲击价），没有24小时最高、最低价。深度订阅最多20档：1～5档订阅交易所的5档快速推送（约0.5秒一次），6～20档（缺省20档）订阅20档推送（约5秒一次），两者是各自独立的推送；逐笔成交与```exchange.GetTrades()```同一套成交ID，订阅生效时交易所补发的最近成交不推送；K线周期同```exchange.GetRecords()```，首次订阅先推送500根历史，交易所的K线推送没有收盘标志，下一根开始时上一根作为已收盘推送。HIP-4 Outcome品种不支持推送（订阅时报错）。私有流是整个钱包地址的一路```private```订阅（不带交易对），按```WalletAddress```（或```exchange.IO("walletAddress", ...)```设置的地址）只读订阅、不签名：订阅生效后（以及每次断线重连后）先按```exchange.GetAccount()```与```exchange.GetPositions()```同一接口推送一次全部余额与持仓快照，然后报告就绪，之后推送永续订单更新（不含成交均价，需要时用```exchange.GetOrder()```）、发生变化的持仓（单向净持仓，平仓推送数量0）与余额（账户状态推送有变化时按```exchange.GetAccount()```同一接口重新查询，口径相同）。实时持仓只覆盖一个dex（```exchange.IO("dex", ...)```设置的dex，缺省主dex），其它HIP-3 dex上的持仓只在快照中出现。不支持全市场```tickers```订阅（Hyperliquid的全市场推送```allMids```只有中间价，不是ticker），订阅时报错；请按交易对订阅ticker。
 
 #### Lighter
 
@@ -28849,6 +29876,8 @@ function main() {
 | exchange.GetOrder() | 只在挂单和该品种最近100条历史订单中查找，更早的订单返回空值 |
 | exchange.ModifyConditionOrder() | 原地修改数量、触发价和委托价，订单ID不变。不能改变限价/市价类型：限价条件单传委托价-1、市价条件单传正数委托价时报错，需要撤销后重新创建；市价条件单的最差成交价按新的触发价重新计算 |
 | exchange.GetHistoryOrders()、exchange.GetHistoryConditionOrders() | 交易所接口必须指定品种：不传时查当前品种，传空字符串或范围报错；不支持```since```参数，传入时报错；不传```limit```时分别返回最近100条、500条 |
+
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报、持仓与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。ticker的最新价、24小时最高最低价、成交量、持仓量与开盘价（由24小时涨跌幅推算）口径与```exchange.GetTickers()```相同，买卖一价与量来自交易所的最优买卖频道（与bbo订阅同一条推送）。深度订阅（缺省20档、最多255档）由交易所整本快照加增量同步、按撮合序号检查连续性，断档时重新订阅；交易所每个品种只有一条订单簿推送，不同档数的订阅共用这一条、各自按档数截断。推送的深度按价格合并（与```exchange.GetDepth()```的逐笔挂单不同）。逐笔成交与```exchange.GetTrades()```同一套成交ID，强平成交不推送。K线支持1分钟、5分钟、15分钟、30分钟、1小时、4小时、12小时、1天周期（推送没有周线），首次订阅先推送500根历史。私有流是整个账户的一路```private```订阅（不带交易对），需要配置API密钥私钥与账户索引，只在订阅时连接：订单频道带与REST私有接口同一个鉴权令牌，持仓与账户统计频道按账户索引订阅；订阅生效后（以及每次断线重连后）先按```exchange.GetAccount()```与```exchange.GetPositions()```同一接口推送一次USDC余额与全部持仓快照，然后报告就绪，之后推送全部品种的订单更新（订单ID与```exchange.CreateOrder()```返回的相同）、发生变化的持仓（单向净持仓，平仓推送数量0）与变化后的USDC余额（可用为可用保证金，冻结为账户总价值减可用，与```exchange.GetAccount()```相同）。鉴权令牌有效期7小时，私有连接在令牌到期前自动重连换新令牌并重新推送快照；鉴权失败时连接状态报告降级、私有流报告失败（行情推送不受影响）。模拟盘连接测试网的推送地址。全市场```tickers```订阅（不带交易对）使用交易所的全市场统计频道，约每秒推送一次有变化的品种，最新价、24小时高低价、成交量、持仓量与开盘价同ticker，买一卖一只有价格没有数量（交易所没有全市场的最优挂单频道），还没有成交的品种（最新价、24小时高低价与成交量全为0）不推送，同```exchange.GetTickers()```。
 
 #### edgeX
 
@@ -28969,6 +29998,8 @@ function main() {
 | exchange.GetHistoryConditionOrders() | 第三个参数沿用旧版语义，不表示条数：大于1e12时视为截止时间（毫秒时间戳），否则忽略；返回条数不受限制。不传```since```时会翻遍该合约的全部历史订单，超过约1万条时报错，建议传入```since``` |
 
 ```exchange.IO("calcOrderHashAndSign", json)```的参数必须恰好包含10个键：```assetIdSynthetic```、```assetIdCollateral```、```assetIdFee```（十六进制）、```isBuyingSynthetic```（布尔）、```amountSynthetic```、```amountCollateral```、```amountFee```、```nonce```、```accountID```、```expirationTimestamp```（整数，也可以写成十进制字符串；超出JavaScript整数精度的```accountID```要写成字符串）。缺键或值格式错误报```argument X error```，多出键报```argument error```。签名私钥是配置的TradingPrivateKey（按Stark私钥解释），不是旧版账户的Stark私钥；签名随机数是确定性的（RFC 6979），同一输入每次签名相同，与旧托管者签出的值不同但同样有效。
+
+支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报、持仓与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。深度订阅15档以内（缺省15档）使用edgeX的15档盘口流，16～200档使用200档盘口流，都由快照与按版本号首尾相接的增量同步，最多200档。edgeX没有可用的一档行情流，bbo与ticker的买一、卖一价量取自另一条连接上的15档盘口。逐笔成交的成交ID是交易所的```ticketId```（UUID文本）；edgeX没有成交查询接口（```exchange.GetTrades()```不支持），无法与REST对照；订阅时交易所先推送的最近30笔历史成交不作为实时成交推送。K线周期与```exchange.GetRecords()```的原生周期相同，首次订阅先推送500根历史；交易所推送不带收盘标志，下一根开始时上一根以最后一次推送的数据标记为已收盘。私有流是整个账户的一路```private```订阅（不带交易对），需要填写AccountID与V2的API Key、API Secret、API Passphrase，只在订阅时连接并按私有接口同样的HMAC规则鉴权：订阅生效后（以及每次断线重连后）先按```exchange.GetAccount()```与```exchange.GetPositions()```同一接口推送一次全部余额与持仓快照，然后报告就绪，之后推送订单更新与发生变化的持仓（单向净持仓，均价为持仓价值除以持仓数量，平仓推送数量0；推送不含未实现盈亏、保证金与杠杆）；交易所推送的抵押品数额不是可用、冻结余额，每次账户事件后重新查询一次余额，只推送发生变化的币种。鉴权失败时连接状态报告降级、私有流报告失败（行情推送不受影响）。全市场```tickers```订阅（不带交易对）使用edgeX的全市场行情频道，每秒推送一次全部可交易合约，字段同ticker，买一卖一只有价格没有数量，最新价、24小时高低价与成交量全为0的合约不推送。
 
 #### Aster
 
@@ -29092,6 +30123,15 @@ function main() {
 - 按金额市价买时，交易所按数量步进向下取整买入，不足一档的余额不再使用，订单以```EXPIRED```结束；只要有成交，查询到的订单状态就是已成交（```ORDER_STATE_CLOSED```），```Amount```与```DealAmount```都是实际买到的交易币数量。按数量下的市价单因流动性不足没有全部成交时，仍是已撤销（```DealAmount```小于```Amount```）。
 - 条件单只支持止盈、止损单，不支持OCO，需要时分别创建止盈单和止损单；不支持修改条件单（```exchange.ModifyConditionOrder()```），需要先撤销再重新创建。```exchange.GetConditionOrder()```传入普通订单的编号时报错（该订单不是条件单）。
 - ```exchange.GetHistoryOrders()```、```exchange.GetHistoryConditionOrders()```必须指定交易对。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。ticker由Aster的24小时行情流并上最优买卖价流，24小时行情流只在有成交时推送，交易对订阅后还没有成交时不出ticker（bbo照常推送）。深度订阅5、10、20档使用Aster的快照流，其它档数（缺省20档，最多255档）由增量流与REST快照同步；逐笔成交是归集成交（与```exchange.GetTrades()```同一套成交ID）；K线周期1分钟到1个月（没有1秒K线推送），首次订阅先推送500根历史。私有流是整个现货账户的一路```private```订阅（不带交易对），只在订阅时用钱包签名申请listenKey并连接，每30分钟续期。订阅生效后（以及每次断线重连后）先按```exchange.GetAssets()```同一接口推送一次全部余额快照，然后报告就绪；之后推送订单更新（按金额市价买与```exchange.GetOrder()```同口径）与发生变化的币种余额（可用、冻结与```exchange.GetAssets()```同口径）。现货没有持仓，私有流不推送持仓。签名被拒时连接状态报告降级、私有流报告失败（行情推送不受影响）；REST地址切到测试网时推送也连测试网。全市场```tickers```订阅（不带交易对）使用Aster的全市场24小时行情流（每秒推送一次有变化的交易对，带最新价、24小时开高低与成交量）并上全市场最优挂单流的买一卖一，某交易对的买一卖一到过之后才推送它。
+
+###### ```Futures_ApolloX```（期货）
+
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报、持仓与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。ticker由24小时行情流与最优买卖流合并而成。深度订阅5、10、20档使用交易所的档位快照流，其它档数（缺省20档，最多255档）使用增量流并按REST深度快照同步；逐笔成交与```exchange.GetTrades()```同一套成交ID；K线周期与```exchange.GetRecords()```相同（不支持秒级周期），首次订阅先推送500根历史。私有流是整个账户的一路```private```订阅（不带交易对），只在订阅时申请listenKey并连接：订阅生效后（以及每次断线重连后）先按```exchange.GetAccount()```与```exchange.GetPositions()```同一接口推送一次全部余额与持仓快照，然后报告就绪，之后推送订单更新、发生变化的持仓（单向持仓为净持仓，双向持仓多空各一条，平仓推送数量0；推送的持仓不带保证金、杠杆、强平价）以及余额变动后重新查询到的币种余额（口径与```exchange.GetAccount()```相同；挂单、撤单与标记价格变化不触发余额推送）。鉴权失败时连接状态报告降级、私有流报告失败（行情推送不受影响）。全市场```tickers```订阅（不带交易对）使用ApolloX的全市场24小时行情流（每秒推送一次有变化的合约，带最新价、24小时开高低与成交量）并上全市场最优挂单流的买一卖一，某合约的买一卖一到过之后才推送它。
+
+###### ```Futures_Aster```（期货）
+
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报、持仓与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。ticker由Aster的24小时行情流并上最优买卖价流，24小时行情流只在有成交时推送，合约订阅后还没有成交时不出ticker（bbo照常推送）。深度订阅5、10、20档使用Aster的快照流，其它档数（缺省20档，最多255档）由增量流与REST快照同步；逐笔成交与```exchange.GetTrades()```同一套成交ID，强平与自动减仓成交不推送；K线首次订阅先推送500根历史。私有流是整个合约账户的一路```private```订阅（不带交易对），只在订阅时用钱包签名申请listenKey并连接，每30分钟续期。订阅生效后（以及每次断线重连后）先按```exchange.GetAssets()```与```exchange.GetPositions()```同一接口推送一次全部余额与持仓快照，然后报告就绪；之后推送订单更新、发生变化的持仓（单向持仓为净持仓，双向持仓多空各一条，平仓推送数量0；推送里没有保证金、杠杆、强平价与标记价）与余额：余额变动或订单更新后按```exchange.GetAssets()```重新查询一次，只推送变化的币种。标记价变化引起的浮动盈亏与权益变化不推送。签名被拒时连接状态报告降级、私有流报告失败（行情推送不受影响）；REST地址切到测试网时推送也连测试网。全市场```tickers```订阅（不带交易对）使用Aster的全市场24小时行情流（每秒推送一次有变化的合约，带最新价、24小时开高低与成交量）并上全市场最优挂单流的买一卖一，某合约的买一卖一到过之后才推送它。
 
 #### Aevo
 
@@ -29194,6 +30234,7 @@ function main() {
 - 永续合约```exchange.GetTicker()```的```Last```为标记价格、```Open```为24小时前的标记价格，没有最高价、最低价（```High```、```Low```为0），```Volume```为24小时成交张数。
 - 资金费率每小时结算一次；```exchange.GetFundings()```只返回永续合约。
 - ```exchange.GetHistoryOrders()```、```exchange.GetHistoryConditionOrders()```只能按单个品种查询，传空字符串（查询全部品种）会报错。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交）与账户私有流（订单回报、持仓、余额）可以通过事件流订阅，永续与期权都可以订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。交易所没有K线推送（也没有K线接口），K线订阅报错。ticker是交易所每500毫秒一次的行情推送，带买卖一价与数量和持仓量，```Last```与```exchange.GetTicker()```相同为标记价格，没有24小时成交量与开高低；bbo在最优买卖价变化时实时推送。Aevo只有一种深度推送（订阅时推送整本、之后每100毫秒推送增量），各档数的深度订阅（缺省20档，最多255档）共用这一路，每个订阅按自己的档数输出；整本快照按交易所给的校验和核对，增量时间戳倒退或校验不一致时自动重新订阅取快照。逐笔成交与```exchange.GetTrades()```同一套成交ID。私有流是一路```private```订阅（不带交易对，覆盖整个账户），只在订阅时连接，用API Key与Secret Key签名登录后订阅订单、成交与持仓频道：订阅生效及每次断线重连后，先用与```exchange.GetAssets()```、```exchange.GetPositions()```相同的接口推送余额与持仓快照，再报告就绪；之后推送订单回报（订阅时已有的挂单不重复推送）与发生变化的持仓（单向净持仓，平仓推送数量0的行；推送里没有杠杆，沿用最近一次快照的杠杆）。交易所没有余额推送，订单、成交或持仓有推送后连接器用```exchange.GetAssets()```相同的接口重新读取余额，只推送有变化的币种。签名被拒时连接状态报告降级、私有流报告失败（行情推送不受影响）。不支持全市场```tickers```订阅（Aevo的ticker推送必须逐个合约订阅），订阅时报错；请按交易对订阅ticker。
 
 #### Pendle
 
@@ -29254,14 +30295,30 @@ function main() {
 | ```receipt``` | txHash[, waitMs] | 查询交易回执：状态、区块、gas与手续费；可等待到上链（最多10分钟）。查询兑换订单时传订单ID中逗号后面的交易哈希。 | ```{txHash, status, blockNumber, gasUsed, fee}```，```status```为```success```、```reverted```或```pending```；还没上链（```pending```）时只有```txHash```和```status```。 |
 | ```base``` | [url] | 不传参数时返回当前RPC节点地址；传入地址时切换节点（多个用逗号分隔），换节点后第一次请求会核对节点所在的链。 | 切换前的地址。 |
 | ```address``` | — | 钱包地址。 | — |
+| ```abi``` | address, abiContent | 为合约地址注册ABI（JSON字符串，或内置模板名```weth```、```uniswapV3Pool```、```uniswapV3Factory```、```uniswapV3QuoterV2```、```uniswapV3SwapRouter02```、```uniswapV3PositionManager```、```permit2```，PancakeSwap V3有对应的```pancakeV3*```别名），只对本交易所对象有效。见子页`exchange.IO("abi", ...)`。 | — |
+| ```api``` | address \| "eth", method, ...args[, options] | 第一个参数为合约地址时调用合约方法：只读方法（```view```、```pure```）返回解码后的值，写方法用配置的钱包私钥签名并广播后返回交易哈希（payable方法的第一个参数是附带的原生币数量；```options```可设```gasLimit```、```gasPrice```、```nonce```、```dryRun```）。见子页`exchange.IO("api", ...)`。 | — |
+| ```call``` | address, method \| calldata, ...args[, options] | 以```eth_call```模拟执行合约的任意方法（包括写方法），不签名、不广播、不消耗gas，用于询价、交易预演；参数与```api```相同，```options```为```{from, value, block, gasLimit}```，调用者默认为本钱包。见子页`exchange.IO("call", ...)`。 | 方法名调用返回解码后的值（没有返回值时为```true```）；calldata调用返回原始返回数据（十六进制字符串）。 |
+| ```multicall``` | calls[, options] | 通过Multicall3合约在同一区块状态上一次读取多个合约调用，```calls```每项为```[合约地址, 方法, ...参数]```；```options```为```{allowFailure, block, multicall}```。见子页`exchange.IO("multicall", ...)`。 | 与```calls```顺序一致的结果数组。默认任何一项失败都整体报错（带序号与原因）；```allowFailure```为```true```时失败项为空值。 |
+| ```logs``` | query | 查询合约的事件日志（```eth_getLogs```）并按ABI解码；```query```为```{address, event, filter, fromBlock, toBlock, topics, blockHash}```，块号可以是负数（相对最新块）。见子页`exchange.IO("logs", ...)`。 | 日志数组，能解码时每项另有```event```、```args```。 |
+| ```waitReceipt``` | txHash[, options] | 等待交易上链并达到确认数，```options```为```{timeout, confirmations, interval}```：```timeout```、```interval```单位为毫秒，默认120000（范围1000到600000）、1500，```confirmations```默认1。见子页`exchange.IO("waitReceipt", ...)`。 | 交易回执（```status```为数字，```events```为解码后的事件）；超时报错并返回空值。 |
+| ```nonce``` | ["sync" \| number] | 查看本交易所对象发送交易使用的nonce计数（```api```写入与兑换、撤限价单等交易共用）；传```sync```按节点的pending计数重新同步，传数字设置本地下一个nonce。见子页`exchange.IO("nonce", ...)`。 | ```{address, latest, pending, local}```（数值均为字符串；还没有发送过交易时```local```为空值）。 |
+| ```speedUp``` | txHash[, options] | 给还未上链的交易加价重发（同nonce，接收地址、金额、调用数据和gas上限不变）；```options```为```{multiplier, dryRun}```，```multiplier```范围1.1到10，默认1.125。交易必须是本钱包发出、节点看得到的。见子页`exchange.IO("speedUp", ...)`。 | 替换交易的哈希；```dryRun```时返回替换交易的内容。 |
+| ```cancelTx``` | txHash[, options] | 取消还未上链的交易：用同一个nonce发送一笔转给自己的0金额交易，手续费更高；```options```同```speedUp```。不保证成功。见子页`exchange.IO("cancelTx", ...)`。 | 取消交易的哈希；```dryRun```时返回取消交易的内容。 |
+| ```encode``` | [address, ]dataFormat, ...args | 按类型表做标准ABI编码（同Solidity的```abi.encode```）；第一个参数为合约地址时编码该合约的方法调用（calldata）。```pack```是同一指令的旧名。见子页`exchange.IO("encode", ...)`。 | 不带```0x```的十六进制字符串。 |
+| ```encodePacked``` | dataFormat, ...args | 按类型表做紧凑编码（同Solidity的```abi.encodePacked```）。见子页`exchange.IO("encodePacked", ...)`。 | 不带```0x```的十六进制字符串。 |
+| ```decode``` | dataFormat, data | 按类型表解码十六进制数据。```unpack```是同一指令的旧名。见子页`exchange.IO("decode", ...)`。 | 只有一个类型时直接返回值，多个类型时返回数组。 |
+| ```sign``` | hash[, key] | 用secp256k1私钥对32字节哈希签名（不再做哈希），用于EIP-712等链下签名；不传```key```时用配置的钱包私钥。见子页`exchange.IO("sign", ...)`。 | ```{r, s, v, signature, vs}```（```v```为27或28，```vs```为EIP-2098紧凑签名）。 |
+| ```signTypedData``` | typedData[, key] \| domain, types, message[, key] | 按EIP-712对结构化数据签名（Permit2授权、限价单等），一步完成类型哈希、域分隔符、结构体哈希和摘要计算。见子页`exchange.IO("signTypedData", ...)`。 | 同```sign```，另有```digest```（EIP-712摘要）。 |
+| ```signMessage``` | message[, key] | 按EIP-191（```personal_sign```）对消息签名；字符串按UTF-8签名，原始字节传```{hex: "0x..."}```。见子页`exchange.IO("signMessage", ...)`。 | 同```sign```，另有```digest```（EIP-191消息哈希）。 |
+| ```toUnits``` | amount, decimals | 把可读数量换算为链上整数，按字符串精确计算；```decimals```可以是数字或代币合约地址（自动读取```decimals()```）。小数位多于精度时报错。见子页`exchange.IO("toUnits", ...)`。 | 十进制字符串。 |
+| ```fromUnits``` | amount, decimals | 把链上整数换算为可读数量，按字符串精确计算；```decimals```同```toUnits```。见子页`exchange.IO("fromUnits", ...)`。 | 十进制字符串（去掉末尾的0）。 |
+| ```uniswapV3``` | fn, ...args | 集中流动性计算：```tickToPrice```、```priceToTick```、```sqrtPriceToPrice```、```tickToSqrtPrice```、```sqrtPriceToTick```、```nearestUsableTick```、```amountsForLiquidity```、```liquidityForAmounts```；精度参数可以是数字或代币地址。见子页`exchange.IO("uniswapV3", ...)`。 | — |
 
 表中长说明的其余部分：
 
 - ```orderExpiry```：下单附加参数```expiry```单独指定一笔订单的到期时间：秒或毫秒时间戳（是时间点，不是时长），已经过去的报错，晚于市场到期的按市场到期前1分钟。不传参数时查询。
 
 通用指令```currency```见`exchange.IO`。
-
-不支持通用指令```api```（调用时报错并返回空值）。
 
 ###### ```Futures_Boros```（期货）
 
@@ -29283,10 +30340,26 @@ function main() {
 | ```cancelWithdraw``` | currency | 钱包交易：取消未完成的提现申请。 | ```{txHash, currency}``` |
 | ```isolatedTransfer``` | symbol, amount | 在全仓账户与只能逐仓的市场的逐仓账户之间划现金：```amount```（保证金币）为正时从全仓划进逐仓，为负时划回全仓。经中继上链，扣gas余额。提现只能从全仓提，逐仓里的钱要先划回来。 | ```{txHash, symbol, amount, account}``` |
 | ```wallet``` | — | 钱包（不是Boros账户）在Arbitrum上的ETH与各保证金币余额，充值前查看用。 | ```[{currency, amount, token}]```，第一项是钱包的ETH（```currency```为```ETH (gas)```，没有```token```）。 |
+| ```abi``` | address, abiContent | 为合约地址注册ABI（JSON字符串，或内置模板名```weth```、```uniswapV3Pool```、```uniswapV3Factory```、```uniswapV3QuoterV2```、```uniswapV3SwapRouter02```、```uniswapV3PositionManager```、```permit2```，PancakeSwap V3有对应的```pancakeV3*```别名），只对本交易所对象有效。见子页`exchange.IO("abi", ...)`。 | — |
+| ```api``` | address \| "eth", method, ...args[, options] | 第一个参数为合约地址时调用合约方法：只读方法（```view```、```pure```）返回解码后的值，写方法用配置的钱包私钥签名并广播后返回交易哈希（payable方法的第一个参数是附带的原生币数量；```options```可设```gasLimit```、```gasPrice```、```nonce```、```dryRun```）。见子页`exchange.IO("api", ...)`。 | — |
+| ```call``` | address, method \| calldata, ...args[, options] | 以```eth_call```模拟执行合约的任意方法（包括写方法），不签名、不广播、不消耗gas，用于询价、交易预演；参数与```api```相同，```options```为```{from, value, block, gasLimit}```，调用者默认为本钱包。见子页`exchange.IO("call", ...)`。 | 方法名调用返回解码后的值（没有返回值时为```true```）；calldata调用返回原始返回数据（十六进制字符串）。 |
+| ```multicall``` | calls[, options] | 通过Multicall3合约在同一区块状态上一次读取多个合约调用，```calls```每项为```[合约地址, 方法, ...参数]```；```options```为```{allowFailure, block, multicall}```。见子页`exchange.IO("multicall", ...)`。 | 与```calls```顺序一致的结果数组。默认任何一项失败都整体报错（带序号与原因）；```allowFailure```为```true```时失败项为空值。 |
+| ```logs``` | query | 查询合约的事件日志（```eth_getLogs```）并按ABI解码；```query```为```{address, event, filter, fromBlock, toBlock, topics, blockHash}```，块号可以是负数（相对最新块）。见子页`exchange.IO("logs", ...)`。 | 日志数组，能解码时每项另有```event```、```args```。 |
+| ```waitReceipt``` | txHash[, options] | 等待交易上链并达到确认数，```options```为```{timeout, confirmations, interval}```：```timeout```、```interval```单位为毫秒，默认120000（范围1000到600000）、1500，```confirmations```默认1。见子页`exchange.IO("waitReceipt", ...)`。 | 交易回执（```status```为数字，```events```为解码后的事件）；超时报错并返回空值。 |
+| ```nonce``` | ["sync" \| number] | 查看本交易所对象发送交易使用的nonce计数（```api```写入与充值、提现等钱包交易共用）；传```sync```按节点的pending计数重新同步，传数字设置本地下一个nonce。见子页`exchange.IO("nonce", ...)`。 | ```{address, latest, pending, local}```（数值均为字符串；还没有发送过交易时```local```为空值）。 |
+| ```speedUp``` | txHash[, options] | 给还未上链的交易加价重发（同nonce，接收地址、金额、调用数据和gas上限不变）；```options```为```{multiplier, dryRun}```，```multiplier```范围1.1到10，默认1.125。交易必须是本钱包发出、节点看得到的。见子页`exchange.IO("speedUp", ...)`。 | 替换交易的哈希；```dryRun```时返回替换交易的内容。 |
+| ```cancelTx``` | txHash[, options] | 取消还未上链的交易：用同一个nonce发送一笔转给自己的0金额交易，手续费更高；```options```同```speedUp```。不保证成功。见子页`exchange.IO("cancelTx", ...)`。 | 取消交易的哈希；```dryRun```时返回取消交易的内容。 |
+| ```encode``` | [address, ]dataFormat, ...args | 按类型表做标准ABI编码（同Solidity的```abi.encode```）；第一个参数为合约地址时编码该合约的方法调用（calldata）。```pack```是同一指令的旧名。见子页`exchange.IO("encode", ...)`。 | 不带```0x```的十六进制字符串。 |
+| ```encodePacked``` | dataFormat, ...args | 按类型表做紧凑编码（同Solidity的```abi.encodePacked```）。见子页`exchange.IO("encodePacked", ...)`。 | 不带```0x```的十六进制字符串。 |
+| ```decode``` | dataFormat, data | 按类型表解码十六进制数据。```unpack```是同一指令的旧名。见子页`exchange.IO("decode", ...)`。 | 只有一个类型时直接返回值，多个类型时返回数组。 |
+| ```sign``` | hash[, key] | 用secp256k1私钥对32字节哈希签名（不再做哈希），用于EIP-712等链下签名；不传```key```时用配置的钱包私钥。见子页`exchange.IO("sign", ...)`。 | ```{r, s, v, signature, vs}```（```v```为27或28，```vs```为EIP-2098紧凑签名）。 |
+| ```signTypedData``` | typedData[, key] \| domain, types, message[, key] | 按EIP-712对结构化数据签名（Permit2授权、限价单等），一步完成类型哈希、域分隔符、结构体哈希和摘要计算。见子页`exchange.IO("signTypedData", ...)`。 | 同```sign```，另有```digest```（EIP-712摘要）。 |
+| ```signMessage``` | message[, key] | 按EIP-191（```personal_sign```）对消息签名；字符串按UTF-8签名，原始字节传```{hex: "0x..."}```。见子页`exchange.IO("signMessage", ...)`。 | 同```sign```，另有```digest```（EIP-191消息哈希）。 |
+| ```toUnits``` | amount, decimals | 把可读数量换算为链上整数，按字符串精确计算；```decimals```可以是数字或代币合约地址（自动读取```decimals()```）。小数位多于精度时报错。见子页`exchange.IO("toUnits", ...)`。 | 十进制字符串。 |
+| ```fromUnits``` | amount, decimals | 把链上整数换算为可读数量，按字符串精确计算；```decimals```同```toUnits```。见子页`exchange.IO("fromUnits", ...)`。 | 十进制字符串（去掉末尾的0）。 |
+| ```uniswapV3``` | fn, ...args | 集中流动性计算：```tickToPrice```、```priceToTick```、```sqrtPriceToPrice```、```tickToSqrtPrice```、```sqrtPriceToTick```、```nearestUsableTick```、```amountsForLiquidity```、```liquidityForAmounts```；精度参数可以是数字或代币地址。见子页`exchange.IO("uniswapV3", ...)`。 | — |
 
 通用指令```currency```见`exchange.IO`。
-
-不支持通用指令```api```（调用时报错并返回空值）。
 
 ##### 常用用法
 
@@ -29577,6 +30650,7 @@ function main() {
 - 市价单的```Price```为0，成交均价看```AvgPrice```（交易所的```average_executed_price```）。
 - ```exchange.GetPositions()```返回的```MarginLevel```取该持仓的杠杆（交易所持仓行的```leverage```，缺失时取初始保证金率```imr```的倒数），```Margin```为占用的初始保证金（持仓价值 ÷ 杠杆）。
 - 盘口和K线接口也需要签名：```exchange.GetDepth()```、```exchange.GetRecords()```以及```exchange.GetTicker()```（买一、卖一价取自盘口）都要求配置好API密钥；```exchange.GetTickers()```、```exchange.GetTrades()```、```exchange.GetFundings()```、```exchange.GetMarkets()```不需要签名。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报、持仓与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。推送地址带账户ID，所以任何订阅都需要配置```AccountID```。ticker推送的买一卖一价与量取自同合约的最优买卖流（Orderly的24小时ticker流没有买卖价），两条流都到达后才开始推送；逐笔成交没有交易所成交号，与```exchange.GetTrades()```按同一规则合成成交ID（同一毫秒内字段完全相同的几笔只保证推送内唯一，可能与REST的编号对不上）；深度（最多255档，缺省20档）由与```exchange.GetDepth()```相同的签名盘口接口取快照，再接200毫秒一次的增量推送，按增量的上一版时间戳逐条衔接，断链时自动重新取快照，因此深度订阅需要配置API密钥；K线周期支持1分钟、5分钟、15分钟、30分钟、1小时、4小时、12小时、1天、1周、1月（不支持1年），首次订阅先按```exchange.GetRecords()```推送500根历史；交易所的K线推送没有收盘标志，下一根K线出现或推送时间到达该K线结束时间时视为收盘。私有流是整个账户的一路```private```订阅（不带交易对），只在订阅时连接并用API密钥签名登录：订阅生效后（以及每次断线重连后）先按```exchange.GetAssets()```与```exchange.GetPositions()```同一接口推送一次全部余额与持仓快照，然后报告就绪，之后推送订单更新（全部合约）、持仓变化（单向持仓）与余额变化，口径与这两个函数相同。条件单的推送不在私有流里，触发后生成的普通订单照常推送。登录被拒时连接状态报告降级、私有流报告失败（行情推送不受影响）；```RestBase```指向Orderly测试网时推送也连接测试网。全市场```tickers```订阅（不带交易对）使用Orderly的全市场24小时行情流与全市场最优挂单流，每秒推送一次全部永续合约，带最新价、24小时开高低、成交量与买一卖一（同样要求配置AccountID）。
 
 #### Uniswap / PancakeSwap
 
@@ -29645,7 +30719,7 @@ PancakeSwap的Infinity CL没有固定费率档，连接器用```eth_getLogs```�
 | ```sendBase``` | url | 设置只用来广播交易的节点（私有交易通道）。与Web3不同：不返回设置前的地址，不传参数时不查询，传空字符串不会清除设置。 | ```true``` |
 | ```address``` | — | 配置的私钥对应的钱包地址（```0x```开头的小写地址）。 | — |
 | ```contracts``` | — | 本交易所在本链上的部署信息：合约地址、手续费档和内置代币列表快照。 | 对象：```dex```、```chainId```、```chain```、```router```、```quoterV2```、```v3Factory```、```v3Fees```、```positionManager```、```v2Factory```、```v2Fee```（百万分之一，3000即0.3%）、```wrappedNative```、```v4```、```tokenList```（代币列表快照的生成时间```embeddedAt```、代币数```tokens```、常用币数```core```）；本链没有的部署为```null```。（详见表下） |
-| ```lp.pools``` | token[, quote] | 列出代币的全部V3与V4/Infinity CL池子（指定计价币，或本链的包装币、USDC、USDT）：费率、tick间距、现价、流动性、池子两种代币的余额与TVL；24小时成交与手续费取自GeckoTerminal（取不到时为```null```；结果在进程内缓存5分钟，```lp.select```、```lp.plan```共用，限流时等一会儿重试一次）。见子页`exchange.IO("lp.pools", ...)`。 | ```[{id, protocol, dex, symbol, fee, feeRate, tickSpacing, tick, price, liquidity, reserveBase, reserveQuote, tvlQuote, tvlUsd, volume24hUsd, fees24hUsd, empty}]```，```price```为计价币/代币。 |
+| ```lp.pools``` | token[, quote] | 列出代币的全部V3与V4/Infinity CL池子（指定计价币，或本链的包装币、USDC、USDT）：费率、tick间距、现价、流动性、池子两种代币的余额与TVL；24小时成交与手续费取自GeckoTerminal（取不到时为```null```，GeckoTerminal没收录或没有数据的池子也是```null```，例如OP上Velodrome新工厂的部分Slipstream池子，这时```lp.plan```的```estDailyFeesUsd```同样为```null```；结果在进程内缓存5分钟，```lp.select```、```lp.plan```共用，限流时等一会儿重试一次）。见子页`exchange.IO("lp.pools", ...)`。 | ```[{id, protocol, dex, symbol, fee, feeRate, tickSpacing, tick, price, liquidity, reserveBase, reserveQuote, tvlQuote, tvlUsd, volume24hUsd, fees24hUsd, empty}]```，```price```为计价币/代币。 |
 | ```lp.select``` | token, budget[, options] | 在```lp.pools```列出的池子里按规则自动选池：```options.fee```指定费率时该费率的池子满足流动性门槛就选它（```exact```为```true```时只用该费率）；否则在TVL不低于max(5000美元, 预算)的池子里选24小时成交最大的，没有成交数据时选TVL最大的。见子页`exchange.IO("lp.select", ...)`。 | ```lp.pools```的一行，另带```reason```（选择理由）。 |
 | ```lp.pool``` | poolId | 池子实时状态。见子页`exchange.IO("lp.pool", ...)`。 | ```{id, protocol, currency0, currency1, token0, token1, fee, tickSpacing, tick, sqrtPriceX96, price0, price1, liquidity}```，```price0```为1个token0值多少token1。（详见表下） |
 | ```lp.ticks``` | poolId, tickLower, tickUpper[, step] | tick区间内的流动性分布：每段的流动性和两种代币数量（按已初始化的tick细分求和），```step```为合并成的段宽（tick，默认等于tick间距）。区间超过120个位图字时报错。见子页`exchange.IO("lp.ticks", ...)`。 | ```{pool, tick, token0, token1, segments: [{tickLower, tickUpper, price0Lower, price0Upper, liquidity, amount0, amount1, current}]}``` |
@@ -29653,9 +30727,9 @@ PancakeSwap的Infinity CL没有固定费率档，连接器用```eth_getLogs```�
 | ```lp.simulate``` | plan[, stateOverride] | 按计划用```eth_call```执行建仓交易（不签名、不广播），确认能成交及实际投入数量。见子页`exchange.IO("lp.simulate", ...)`。 | ```{pool, positions: [{liquidity, amountBase, amountQuote}], value, swapNeeded, note}``` |
 | ```lp.add``` | plan | 按计划建仓：需要时先用市价单换币，再授权，一笔交易创建全部仓位，等上链后返回。见子页`exchange.IO("lp.add", ...)`。 | ```{txHash, swapTxHash, pool, positions: [{id, tickLower, tickUpper, priceLower, priceUpper, liquidity, amountBase, amountQuote}]}``` |
 | ```lp.increase``` | positionId, budget[, options] | 给仓位加仓：```budget```（计价币）按仓位区间与现价的配比拆成两种代币，缺的那种先换。见子页`exchange.IO("lp.increase", ...)`。 | ```{txHash, swapTxHash, id, liquidity, amountBase, amountQuote}``` |
-| ```lp.decrease``` | positionId, ratio[, options] | 按比例（0到1）减仓，同时领取全部手续费，仓位保留。```options.slippage```价格保护，```options.sell```为```true```时把拿回的代币卖成计价币。见子页`exchange.IO("lp.decrease", ...)`。 | ```{txHash, positions: [{id, symbol, principalBase, principalQuote, feesBase, feesQuote, receivedBase, receivedQuote}], sells}``` |
-| ```lp.collect``` | positionIds[, sell] | 领取手续费，多个仓位合成一笔交易；```sell```为```true```时把领到的代币卖成计价币。见子页`exchange.IO("lp.collect", ...)`。 | 同```lp.decrease```。 |
-| ```lp.remove``` | positionIds[, ratio[, sell]] | 撤出流动性并领取手续费，多个仓位合成一笔交易；```ratio```默认1（全部撤出并销毁仓位NFT），小于1时只撤一部分；```sell```为```true```时卖回计价币。见子页`exchange.IO("lp.remove", ...)`。 | 同```lp.decrease```。 |
+| ```lp.decrease``` | positionId, ratio[, options] | 按比例（0到1）减仓，同时领取全部手续费，仓位保留。```options.slippage```价格保护，```options.sell```为```true```时把拿回的代币卖成计价币（同```lp.remove```的```sell```）。见子页`exchange.IO("lp.decrease", ...)`。 | ```{txHash, positions: [{id, symbol, principalBase, principalQuote, feesBase, feesQuote, receivedBase, receivedQuote}], sells}``` |
+| ```lp.collect``` | positionIds[, sell] | 领取手续费，多个仓位合成一笔交易；```sell```为```true```时把领到的代币卖成计价币（同```lp.remove```的```sell```）。见子页`exchange.IO("lp.collect", ...)`。 | 同```lp.decrease```。 |
+| ```lp.remove``` | positionIds[, ratio[, sell]] | 撤出流动性并领取手续费，多个仓位合成一笔交易；```ratio```默认1（全部撤出并销毁仓位NFT），小于1时只撤一部分；```sell```为```true```时卖回计价币：各仓位领回的基础币（本金加手续费）按交易对合起来下一笔市价卖单（按钱包实际余额封顶，原生币留出gas），等上链确认再返回，```sells```每笔为```{symbol, qty, txHash}```，失败时为```{symbol, qty, error}```并另写一条错误日志（这些币留在钱包里）。见子页`exchange.IO("lp.remove", ...)`。 | 同```lp.decrease```。 |
 | ```lp.positions``` | [filter[, wallet]] | 钱包的全部V3与V4/Infinity CL仓位：区间、是否在区间内、流动性、当前数量与价值、未领手续费。见子页`exchange.IO("lp.positions", ...)`。 | ```[{id, pool, protocol, symbol, fee, tickLower, tickUpper, priceLower, priceUpper, price, tick, inRange, liquidity, amountBase, amountQuote, value, feesBase, feesQuote, feesValue, closed}]```，```value```、```feesValue```按计价币计。 |
 | ```lp.history``` | positionId | 仓位资金流水：存入、撤出本金、领取手续费，以及按当前池价折算的盈亏（现值 + 已领手续费 + 已撤本金 − 存入本金，不含gas）。见子页`exchange.IO("lp.history", ...)`。 | ```{id, symbol, events: [{action, block, txHash, liquidity, amountBase, amountQuote}], depositedBase, depositedQuote, withdrawnBase, withdrawnQuote, feesCollectedBase, feesCollectedQuote, price, pnlQuote, note}```；V4/Infinity CL仓位为```{id, pool, symbol, events: [{action, block, txHash, liquidity}], position, note}```。 |
 | ```lp.track``` | positionIds | 登记V4/Infinity CL仓位ID（如（Uniswap：```["v4:123456"]```；PancakeSwap：```["inf:123456"]```）；与交易所对象不符的前缀报错），之后```lp.positions```会查这些仓位（归属每次按链上核对，转走的不列）。见子页`exchange.IO("lp.track", ...)`。 | 本进程记住的全部仓位ID。 |
@@ -29666,6 +30740,24 @@ PancakeSwap的Infinity CL没有固定费率档，连接器用```eth_getLogs```�
 | ```bridge.send``` | params\|quote | 跨链转出：重新报价 → 检查余额 → 代币对LI.FI的```approvalAddress```授权不够时先授权（按```exchange.IO("approve")```的```exact```/```max```，USDT这类先清零，等授权上链；授权过就再报价一次）→ ```eth_call```模拟 → 签名广播；gasLimit取```eth_estimateGas```估算×```gasMultiplier```与LI.FI建议的```gasLimit```中较大的一个（桥合约还会调用别的合约，估算可能偏少），实际只按用量扣费。见子页`exchange.IO("bridge.*", ...)`。 | ```{txHash, tool, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, toAddress, value, transactionId}```，```txHash```为源链交易哈希，可用```receipt```查回执。 |
 | ```bridge.status``` | txHash[, options] | 跨链进度（LI.FI ```/status```），参数为```bridge.send```返回的源链交易哈希；```options```可给```{toChain, bridge}```加快查找。见子页`exchange.IO("bridge.*", ...)`。 | ```{status, substatus, substatusMessage, tool, sending, receiving, fromAddress, toAddress, explorer, bridgeExplorer}```：```status```为```NOT_FOUND```、```INVALID```、```PENDING```、```DONE```、```FAILED```；```DONE```时```substatus```为```COMPLETED```（按报价到账）、```PARTIAL```（收到的是别的代币）或```REFUNDED```（已退回）；```sending```、```receiving```为```{txHash, txLink, chainId, amount, amountRaw, token, timestamp}```，```receiving.amount```与```receiving.token```为实际到账的数量与代币。 |
 | ```bridge.apiKey``` | [key] | 设置LI.FI的API Key（请求头```x-lifi-api-key```，只对本交易所对象生效，不回显），传```""```清除；不传参数只查询。没有Key时按出口IP限频，见下文。见子页`exchange.IO("bridge.*", ...)`。 | 是否已设置Key（布尔值）。 |
+| ```abi``` | address, abiContent | 为合约地址注册ABI（JSON字符串，或内置模板名```weth```、```uniswapV3Pool```、```uniswapV3Factory```、```uniswapV3QuoterV2```、```uniswapV3SwapRouter02```、```uniswapV3PositionManager```、```permit2```等，见子页），只对本交易所对象有效。见子页`exchange.IO("abi", ...)`。 | — |
+| ```api``` | address \| "eth", method, ...args[, options] | 第一个参数为合约地址时调用合约方法：只读方法（```view```、```pure```）返回解码后的值，写方法用配置的钱包私钥签名并广播后返回交易哈希（payable方法的第一个参数是附带的原生币数量；```options```可设```gasLimit```、```gasPrice```、```nonce```、```dryRun```）。见子页`exchange.IO("api", ...)`。 | — |
+| ```call``` | address, method \| calldata, ...args[, options] | 以```eth_call```模拟执行合约的任意方法（包括写方法），不签名、不广播、不消耗gas，用于询价、交易预演；参数与```api```相同，```options```为```{from, value, block, gasLimit}```，调用者默认为本钱包。见子页`exchange.IO("call", ...)`。 | 方法名调用返回解码后的值（没有返回值时为```true```）；calldata调用返回原始返回数据（十六进制字符串）。 |
+| ```multicall``` | calls[, options] | 通过Multicall3合约在同一区块状态上一次读取多个合约调用，```calls```每项为```[合约地址, 方法, ...参数]```；```options```为```{allowFailure, block, multicall}```。见子页`exchange.IO("multicall", ...)`。 | 与```calls```顺序一致的结果数组。默认任何一项失败都整体报错（带序号与原因）；```allowFailure```为```true```时失败项为空值。 |
+| ```logs``` | query | 查询合约的事件日志（```eth_getLogs```）并按ABI解码；```query```为```{address, event, filter, fromBlock, toBlock, topics, blockHash}```，块号可以是负数（相对最新块）。见子页`exchange.IO("logs", ...)`。 | 日志数组，能解码时每项另有```event```、```args```。 |
+| ```waitReceipt``` | txHash[, options] | 等待交易上链并达到确认数，```options```为```{timeout, confirmations, interval}```：```timeout```、```interval```单位为毫秒，默认120000（范围1000到600000）、1500，```confirmations```默认1。见子页`exchange.IO("waitReceipt", ...)`。 | 交易回执（```status```为数字，```events```为解码后的事件）；超时报错并返回空值。 |
+| ```nonce``` | ["sync" \| number] | 查看本交易所对象发送交易使用的nonce计数（```api```写入与兑换、撤单、转账、LP等交易共用）；传```sync```按节点的pending计数重新同步，传数字设置本地下一个nonce。见子页`exchange.IO("nonce", ...)`。 | ```{address, latest, pending, local}```（数值均为字符串；还没有发送过交易时```local```为空值）。 |
+| ```speedUp``` | txHash[, options] | 给还未上链的交易加价重发（同nonce，接收地址、金额、调用数据和gas上限不变）；```options```为```{multiplier, dryRun}```，```multiplier```范围1.1到10，默认1.125。交易必须是本钱包发出、节点看得到的。见子页`exchange.IO("speedUp", ...)`。 | 替换交易的哈希；```dryRun```时返回替换交易的内容。 |
+| ```cancelTx``` | txHash[, options] | 取消还未上链的交易：用同一个nonce发送一笔转给自己的0金额交易，手续费更高；```options```同```speedUp```。不保证成功。见子页`exchange.IO("cancelTx", ...)`。 | 取消交易的哈希；```dryRun```时返回取消交易的内容。 |
+| ```encode``` | [address, ]dataFormat, ...args | 按类型表做标准ABI编码（同Solidity的```abi.encode```）；第一个参数为合约地址时编码该合约的方法调用（calldata）。```pack```是同一指令的旧名。见子页`exchange.IO("encode", ...)`。 | 不带```0x```的十六进制字符串。 |
+| ```encodePacked``` | dataFormat, ...args | 按类型表做紧凑编码（同Solidity的```abi.encodePacked```）。见子页`exchange.IO("encodePacked", ...)`。 | 不带```0x```的十六进制字符串。 |
+| ```decode``` | dataFormat, data | 按类型表解码十六进制数据。```unpack```是同一指令的旧名。见子页`exchange.IO("decode", ...)`。 | 只有一个类型时直接返回值，多个类型时返回数组。 |
+| ```sign``` | hash[, key] | 用secp256k1私钥对32字节哈希签名（不再做哈希），用于EIP-712等链下签名；不传```key```时用配置的钱包私钥。见子页`exchange.IO("sign", ...)`。 | ```{r, s, v, signature, vs}```（```v```为27或28，```vs```为EIP-2098紧凑签名）。 |
+| ```signTypedData``` | typedData[, key] \| domain, types, message[, key] | 按EIP-712对结构化数据签名（Permit2授权、限价单等），一步完成类型哈希、域分隔符、结构体哈希和摘要计算。见子页`exchange.IO("signTypedData", ...)`。 | 同```sign```，另有```digest```（EIP-712摘要）。 |
+| ```signMessage``` | message[, key] | 按EIP-191（```personal_sign```）对消息签名；字符串按UTF-8签名，原始字节传```{hex: "0x..."}```。见子页`exchange.IO("signMessage", ...)`。 | 同```sign```，另有```digest```（EIP-191消息哈希）。 |
+| ```toUnits``` | amount, decimals | 把可读数量换算为链上整数，按字符串精确计算；```decimals```可以是数字或代币合约地址（自动读取```decimals()```）。小数位多于精度时报错。见子页`exchange.IO("toUnits", ...)`。 | 十进制字符串。 |
+| ```fromUnits``` | amount, decimals | 把链上整数换算为可读数量，按字符串精确计算；```decimals```同```toUnits```。见子页`exchange.IO("fromUnits", ...)`。 | 十进制字符串（去掉末尾的0）。 |
+| ```uniswapV3``` | fn, ...args | 集中流动性计算：```tickToPrice```、```priceToTick```、```sqrtPriceToPrice```、```tickToSqrtPrice```、```sqrtPriceToTick```、```nearestUsableTick```、```amountsForLiquidity```、```liquidityForAmounts```；精度参数可以是数字或代币地址。见子页`exchange.IO("uniswapV3", ...)`。 | — |
 
 表中长说明的其余部分：
 
@@ -29673,7 +30765,24 @@ PancakeSwap的Infinity CL没有固定费率档，连接器用```eth_getLogs```�
 
 通用指令```currency```见`exchange.IO`。
 
-不支持通用指令```api```（调用时报错并返回空值）。
+##### 常用用法
+
+###### 用链上通用指令读合约：ERC20查询、批量读取、事件日志（与Web3交易所对象同样的写法）
+
+```javascript
+function main() {
+    // 本链的包装币（WETH/WBNB），标准ERC20方法不用注册ABI
+    var token = exchange.IO("contracts").wrappedNative
+    var me = exchange.IO("address")
+    Log(exchange.IO("api", token, "symbol"), "decimals:", exchange.IO("api", token, "decimals"))
+    // 同一区块上一次读多个调用
+    var rows = exchange.IO("multicall", [[token, "totalSupply"], [token, "balanceOf", me]])
+    Log("totalSupply:", exchange.IO("fromUnits", rows[0], 18), "balance:", exchange.IO("fromUnits", rows[1], 18))
+    // 最近10个区块的Transfer事件（公共节点对区块跨度限制较严）
+    var logs = exchange.IO("logs", {address: token, event: "Transfer", fromBlock: -10})
+    Log("transfers:", logs.length, logs.length ? logs[0].args : "")
+}
+```
 
 ##### 函数支持差异
 
@@ -29783,7 +30892,7 @@ Aerodrome与Velodrome两个交易所对象使用同一套合约，各连一条�
 | ```sendBase``` | url | 设置只用来广播交易的节点（私有交易通道）。与Web3不同：不返回设置前的地址，不传参数时不查询，传空字符串不会清除设置。 | ```true``` |
 | ```address``` | — | 配置的私钥对应的钱包地址（```0x```开头的小写地址）。 | — |
 | ```contracts``` | — | 本交易所在本链上的部署信息：合约地址、手续费档和内置代币列表快照。 | 对象：```dex```、```chainId```、```chain```、```router```、```quoterV2```、```v3Factory```、```v3Fees```、```positionManager```、```v2Factory```、```v2Fee```（百万分之一，3000即0.3%）、```wrappedNative```、```v4```、```tokenList```（代币列表快照的生成时间```embeddedAt```、代币数```tokens```、常用币数```core```）；本链没有的部署为```null```。（详见表下） |
-| ```lp.pools``` | token[, quote] | 列出代币的全部Slipstream与基础池子（指定计价币，或本链的包装币、USDC、USDT）：费率、tick间距、现价、流动性、池子两种代币的余额与TVL；24小时成交与手续费取自GeckoTerminal（取不到时为```null```；结果在进程内缓存5分钟，```lp.select```、```lp.plan```共用，限流时等一会儿重试一次）。见子页`exchange.IO("lp.pools", ...)`。 | ```[{id, protocol, dex, symbol, fee, feeRate, tickSpacing, tick, price, liquidity, reserveBase, reserveQuote, tvlQuote, tvlUsd, volume24hUsd, fees24hUsd, empty}]```，```price```为计价币/代币。（详见表下） |
+| ```lp.pools``` | token[, quote] | 列出代币的全部Slipstream与基础池子（指定计价币，或本链的包装币、USDC、USDT）：费率、tick间距、现价、流动性、池子两种代币的余额与TVL；24小时成交与手续费取自GeckoTerminal（取不到时为```null```，GeckoTerminal没收录或没有数据的池子也是```null```，例如OP上Velodrome新工厂的部分Slipstream池子，这时```lp.plan```的```estDailyFeesUsd```同样为```null```；结果在进程内缓存5分钟，```lp.select```、```lp.plan```共用，限流时等一会儿重试一次）。见子页`exchange.IO("lp.pools", ...)`。 | ```[{id, protocol, dex, symbol, fee, feeRate, tickSpacing, tick, price, liquidity, reserveBase, reserveQuote, tvlQuote, tvlUsd, volume24hUsd, fees24hUsd, empty}]```，```price```为计价币/代币。（详见表下） |
 | ```lp.select``` | token, budget[, options] | 在```lp.pools```列出的池子里按规则自动选池：```options.fee```指定费率时该费率的池子满足流动性门槛就选它（```exact```为```true```时只用该费率）；否则在TVL不低于max(5000美元, 预算)的池子里选24小时成交最大的，没有成交数据时选TVL最大的。见子页`exchange.IO("lp.select", ...)`。 | ```lp.pools```的一行，另带```reason```（选择理由）。 |
 | ```lp.pool``` | poolId | 池子实时状态。见子页`exchange.IO("lp.pool", ...)`。 | ```{id, protocol, currency0, currency1, token0, token1, fee, tickSpacing, tick, sqrtPriceX96, price0, price1, liquidity}```，```price0```为1个token0值多少token1。 |
 | ```lp.ticks``` | poolId, tickLower, tickUpper[, step] | tick区间内的流动性分布：每段的流动性和两种代币数量（按已初始化的tick细分求和），```step```为合并成的段宽（tick，默认等于tick间距）。区间超过120个位图字时报错。见子页`exchange.IO("lp.ticks", ...)`。 | ```{pool, tick, token0, token1, segments: [{tickLower, tickUpper, price0Lower, price0Upper, liquidity, amount0, amount1, current}]}``` |
@@ -29792,8 +30901,8 @@ Aerodrome与Velodrome两个交易所对象使用同一套合约，各连一条�
 | ```lp.add``` | plan | 按计划建仓：需要时先用市价单换币，再授权，一笔交易创建全部仓位，等上链后返回。见子页`exchange.IO("lp.add", ...)`。 | ```{txHash, swapTxHash, pool, positions: [{id, tickLower, tickUpper, priceLower, priceUpper, liquidity, amountBase, amountQuote}]}``` |
 | ```lp.increase``` | positionId, budget[, options] | 给仓位加仓：```budget```（计价币）按仓位区间与现价的配比拆成两种代币，缺的那种先换。见子页`exchange.IO("lp.increase", ...)`。 | ```{txHash, swapTxHash, id, liquidity, amountBase, amountQuote}``` |
 | ```lp.decrease``` | positionId, ratio[, options] | 按比例（0到1）减仓，同时领取全部手续费，仓位保留。见子页`exchange.IO("lp.decrease", ...)`。 | ```{txHash, positions: [{id, symbol, principalBase, principalQuote, feesBase, feesQuote, receivedBase, receivedQuote}], sells}``` |
-| ```lp.collect``` | positionIds[, sell] | 领取手续费，多个仓位合成一笔交易；```sell```为```true```时把领到的代币卖成计价币。质押着的仓位不收交易手续费（归投票人），报错并提示用```lp.claim```领奖励；基础池用池子的```claimFees```领取钱包里LP代币累积的手续费，每个池子一笔交易。见子页`exchange.IO("lp.collect", ...)`。 | 同```lp.decrease```。 |
-| ```lp.remove``` | positionIds[, ratio[, sell]] | 撤出流动性并领取手续费，多个仓位合成一笔交易；```ratio```默认1（全部撤出并销毁仓位NFT），小于1时只撤一部分；```sell```为```true```时卖回计价币。见子页`exchange.IO("lp.remove", ...)`。 | 同```lp.decrease```。 |
+| ```lp.collect``` | positionIds[, sell] | 领取手续费，多个仓位合成一笔交易；```sell```为```true```时把领到的代币卖成计价币（同```lp.remove```的```sell```）。见子页`exchange.IO("lp.collect", ...)`。 | 同```lp.decrease```。 |
+| ```lp.remove``` | positionIds[, ratio[, sell]] | 撤出流动性并领取手续费，多个仓位合成一笔交易；```ratio```默认1（全部撤出并销毁仓位NFT），小于1时只撤一部分；```sell```为```true```时卖回计价币：各仓位领回的基础币（本金加手续费）按交易对合起来下一笔市价卖单（按钱包实际余额封顶，原生币留出gas），等上链确认再返回，```sells```每笔为```{symbol, qty, txHash}```，失败时为```{symbol, qty, error}```并另写一条错误日志（这些币留在钱包里）。见子页`exchange.IO("lp.remove", ...)`。 | 同```lp.decrease```。 |
 | ```lp.positions``` | [filter[, wallet]] | 钱包的全部Slipstream与基础池仓位：区间、是否在区间内、流动性、当前数量与价值、未领手续费。见子页`exchange.IO("lp.positions", ...)`。 | ```[{id, pool, protocol, symbol, fee, tickLower, tickUpper, priceLower, priceUpper, price, tick, inRange, liquidity, amountBase, amountQuote, value, feesBase, feesQuote, feesValue, closed}]```，```value```、```feesValue```按计价币计。 |
 | ```lp.history``` | positionId | 仓位资金流水：存入、撤出本金、领取手续费，以及按当前池价折算的盈亏（现值 + 已领手续费 + 已撤本金 − 存入本金，不含gas）。需要能查历史日志的节点；公共节点常常不支持。基础池的LP代币没有按仓位的事件，不支持。见子页`exchange.IO("lp.history", ...)`。 | ```{id, symbol, events: [{action, block, txHash, liquidity, amountBase, amountQuote}], depositedBase, depositedQuote, withdrawnBase, withdrawnQuote, feesCollectedBase, feesCollectedQuote, price, pnlQuote, note}``` |
 | ```lp.track``` | positionIds | 登记Slipstream仓位（（Aerodrome：```aero:编号```、```aero2:编号```；Velodrome：```velo:编号```、```velo2:编号```）；与交易所对象不符的前缀报错）和基础池地址，之后```lp.positions```会查这些仓位（归属每次按链上核对，质押在gauge里的按质押人核对，转走的不列）。见子页`exchange.IO("lp.track", ...)`。 | 本进程记住的全部仓位ID。 |
@@ -29807,6 +30916,24 @@ Aerodrome与Velodrome两个交易所对象使用同一套合约，各连一条�
 | ```bridge.send``` | params\|quote | 跨链转出：重新报价 → 检查余额 → 代币对LI.FI的```approvalAddress```授权不够时先授权（按```exchange.IO("approve")```的```exact```/```max```，USDT这类先清零，等授权上链；授权过就再报价一次）→ ```eth_call```模拟 → 签名广播；gasLimit取```eth_estimateGas```估算×```gasMultiplier```与LI.FI建议的```gasLimit```中较大的一个（桥合约还会调用别的合约，估算可能偏少），实际只按用量扣费。见子页`exchange.IO("bridge.*", ...)`。 | ```{txHash, tool, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, toAddress, value, transactionId}```，```txHash```为源链交易哈希，可用```receipt```查回执。 |
 | ```bridge.status``` | txHash[, options] | 跨链进度（LI.FI ```/status```），参数为```bridge.send```返回的源链交易哈希；```options```可给```{toChain, bridge}```加快查找。见子页`exchange.IO("bridge.*", ...)`。 | ```{status, substatus, substatusMessage, tool, sending, receiving, fromAddress, toAddress, explorer, bridgeExplorer}```：```status```为```NOT_FOUND```、```INVALID```、```PENDING```、```DONE```、```FAILED```；```DONE```时```substatus```为```COMPLETED```（按报价到账）、```PARTIAL```（收到的是别的代币）或```REFUNDED```（已退回）；```sending```、```receiving```为```{txHash, txLink, chainId, amount, amountRaw, token, timestamp}```，```receiving.amount```与```receiving.token```为实际到账的数量与代币。 |
 | ```bridge.apiKey``` | [key] | 设置LI.FI的API Key（请求头```x-lifi-api-key```，只对本交易所对象生效，不回显），传```""```清除；不传参数只查询。没有Key时按出口IP限频，见下文。见子页`exchange.IO("bridge.*", ...)`。 | 是否已设置Key（布尔值）。 |
+| ```abi``` | address, abiContent | 为合约地址注册ABI（JSON字符串，或内置模板名```weth```、```uniswapV3Pool```、```uniswapV3Factory```、```uniswapV3QuoterV2```、```uniswapV3SwapRouter02```、```uniswapV3PositionManager```、```permit2```等，见子页），只对本交易所对象有效。见子页`exchange.IO("abi", ...)`。 | — |
+| ```api``` | address \| "eth", method, ...args[, options] | 第一个参数为合约地址时调用合约方法：只读方法（```view```、```pure```）返回解码后的值，写方法用配置的钱包私钥签名并广播后返回交易哈希（payable方法的第一个参数是附带的原生币数量；```options```可设```gasLimit```、```gasPrice```、```nonce```、```dryRun```）。见子页`exchange.IO("api", ...)`。 | — |
+| ```call``` | address, method \| calldata, ...args[, options] | 以```eth_call```模拟执行合约的任意方法（包括写方法），不签名、不广播、不消耗gas，用于询价、交易预演；参数与```api```相同，```options```为```{from, value, block, gasLimit}```，调用者默认为本钱包。见子页`exchange.IO("call", ...)`。 | 方法名调用返回解码后的值（没有返回值时为```true```）；calldata调用返回原始返回数据（十六进制字符串）。 |
+| ```multicall``` | calls[, options] | 通过Multicall3合约在同一区块状态上一次读取多个合约调用，```calls```每项为```[合约地址, 方法, ...参数]```；```options```为```{allowFailure, block, multicall}```。见子页`exchange.IO("multicall", ...)`。 | 与```calls```顺序一致的结果数组。默认任何一项失败都整体报错（带序号与原因）；```allowFailure```为```true```时失败项为空值。 |
+| ```logs``` | query | 查询合约的事件日志（```eth_getLogs```）并按ABI解码；```query```为```{address, event, filter, fromBlock, toBlock, topics, blockHash}```，块号可以是负数（相对最新块）。见子页`exchange.IO("logs", ...)`。 | 日志数组，能解码时每项另有```event```、```args```。 |
+| ```waitReceipt``` | txHash[, options] | 等待交易上链并达到确认数，```options```为```{timeout, confirmations, interval}```：```timeout```、```interval```单位为毫秒，默认120000（范围1000到600000）、1500，```confirmations```默认1。见子页`exchange.IO("waitReceipt", ...)`。 | 交易回执（```status```为数字，```events```为解码后的事件）；超时报错并返回空值。 |
+| ```nonce``` | ["sync" \| number] | 查看本交易所对象发送交易使用的nonce计数（```api```写入与兑换、撤单、转账、LP等交易共用）；传```sync```按节点的pending计数重新同步，传数字设置本地下一个nonce。见子页`exchange.IO("nonce", ...)`。 | ```{address, latest, pending, local}```（数值均为字符串；还没有发送过交易时```local```为空值）。 |
+| ```speedUp``` | txHash[, options] | 给还未上链的交易加价重发（同nonce，接收地址、金额、调用数据和gas上限不变）；```options```为```{multiplier, dryRun}```，```multiplier```范围1.1到10，默认1.125。交易必须是本钱包发出、节点看得到的。见子页`exchange.IO("speedUp", ...)`。 | 替换交易的哈希；```dryRun```时返回替换交易的内容。 |
+| ```cancelTx``` | txHash[, options] | 取消还未上链的交易：用同一个nonce发送一笔转给自己的0金额交易，手续费更高；```options```同```speedUp```。不保证成功。见子页`exchange.IO("cancelTx", ...)`。 | 取消交易的哈希；```dryRun```时返回取消交易的内容。 |
+| ```encode``` | [address, ]dataFormat, ...args | 按类型表做标准ABI编码（同Solidity的```abi.encode```）；第一个参数为合约地址时编码该合约的方法调用（calldata）。```pack```是同一指令的旧名。见子页`exchange.IO("encode", ...)`。 | 不带```0x```的十六进制字符串。 |
+| ```encodePacked``` | dataFormat, ...args | 按类型表做紧凑编码（同Solidity的```abi.encodePacked```）。见子页`exchange.IO("encodePacked", ...)`。 | 不带```0x```的十六进制字符串。 |
+| ```decode``` | dataFormat, data | 按类型表解码十六进制数据。```unpack```是同一指令的旧名。见子页`exchange.IO("decode", ...)`。 | 只有一个类型时直接返回值，多个类型时返回数组。 |
+| ```sign``` | hash[, key] | 用secp256k1私钥对32字节哈希签名（不再做哈希），用于EIP-712等链下签名；不传```key```时用配置的钱包私钥。见子页`exchange.IO("sign", ...)`。 | ```{r, s, v, signature, vs}```（```v```为27或28，```vs```为EIP-2098紧凑签名）。 |
+| ```signTypedData``` | typedData[, key] \| domain, types, message[, key] | 按EIP-712对结构化数据签名（Permit2授权、限价单等），一步完成类型哈希、域分隔符、结构体哈希和摘要计算。见子页`exchange.IO("signTypedData", ...)`。 | 同```sign```，另有```digest```（EIP-712摘要）。 |
+| ```signMessage``` | message[, key] | 按EIP-191（```personal_sign```）对消息签名；字符串按UTF-8签名，原始字节传```{hex: "0x..."}```。见子页`exchange.IO("signMessage", ...)`。 | 同```sign```，另有```digest```（EIP-191消息哈希）。 |
+| ```toUnits``` | amount, decimals | 把可读数量换算为链上整数，按字符串精确计算；```decimals```可以是数字或代币合约地址（自动读取```decimals()```）。小数位多于精度时报错。见子页`exchange.IO("toUnits", ...)`。 | 十进制字符串。 |
+| ```fromUnits``` | amount, decimals | 把链上整数换算为可读数量，按字符串精确计算；```decimals```同```toUnits```。见子页`exchange.IO("fromUnits", ...)`。 | 十进制字符串（去掉末尾的0）。 |
+| ```uniswapV3``` | fn, ...args | 集中流动性计算：```tickToPrice```、```priceToTick```、```sqrtPriceToPrice```、```tickToSqrtPrice```、```sqrtPriceToTick```、```nearestUsableTick```、```amountsForLiquidity```、```liquidityForAmounts```；精度参数可以是数字或代币地址。见子页`exchange.IO("uniswapV3", ...)`。 | — |
 
 表中长说明的其余部分：
 
@@ -29814,7 +30941,24 @@ Aerodrome与Velodrome两个交易所对象使用同一套合约，各连一条�
 
 通用指令```currency```见`exchange.IO`。
 
-不支持通用指令```api```（调用时报错并返回空值）。
+##### 常用用法
+
+###### 用链上通用指令读合约：ERC20查询、批量读取、事件日志（与Web3交易所对象同样的写法）
+
+```javascript
+function main() {
+    // 本链的包装币（WETH/WBNB），标准ERC20方法不用注册ABI
+    var token = exchange.IO("contracts").wrappedNative
+    var me = exchange.IO("address")
+    Log(exchange.IO("api", token, "symbol"), "decimals:", exchange.IO("api", token, "decimals"))
+    // 同一区块上一次读多个调用
+    var rows = exchange.IO("multicall", [[token, "totalSupply"], [token, "balanceOf", me]])
+    Log("totalSupply:", exchange.IO("fromUnits", rows[0], 18), "balance:", exchange.IO("fromUnits", rows[1], 18))
+    // 最近10个区块的Transfer事件（公共节点对区块跨度限制较严）
+    var logs = exchange.IO("logs", {address: token, event: "Transfer", fromBlock: -10})
+    Log("transfers:", logs.length, logs.length ? logs[0].args : "")
+}
+```
 
 ##### 函数支持差异
 
@@ -30068,6 +31212,24 @@ See also: `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("lp.stake")`, `ex
 | ```bridge.send``` | params\|quote | 跨链转出：重新报价 → 检查余额 → 代币对LI.FI的```approvalAddress```授权不够时先授权（按```exchange.IO("approve")```的```exact```/```max```，USDT这类先清零，等授权上链；授权过就再报价一次）→ ```eth_call```模拟 → 签名广播；gasLimit取```eth_estimateGas```估算×```gasMultiplier```与LI.FI建议的```gasLimit```中较大的一个（桥合约还会调用别的合约，估算可能偏少），实际只按用量扣费。见子页`exchange.IO("bridge.*", ...)`。 | ```{txHash, tool, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, toAddress, value, transactionId}```，```txHash```为源链交易哈希，可用```receipt```查回执。 |
 | ```bridge.status``` | txHash[, options] | 跨链进度（LI.FI ```/status```），参数为```bridge.send```返回的源链交易哈希；```options```可给```{toChain, bridge}```加快查找。见子页`exchange.IO("bridge.*", ...)`。 | ```{status, substatus, substatusMessage, tool, sending, receiving, fromAddress, toAddress, explorer, bridgeExplorer}```：```status```为```NOT_FOUND```、```INVALID```、```PENDING```、```DONE```、```FAILED```；```DONE```时```substatus```为```COMPLETED```（按报价到账）、```PARTIAL```（收到的是别的代币）或```REFUNDED```（已退回）；```sending```、```receiving```为```{txHash, txLink, chainId, amount, amountRaw, token, timestamp}```，```receiving.amount```与```receiving.token```为实际到账的数量与代币。 |
 | ```bridge.apiKey``` | [key] | 设置LI.FI的API Key（请求头```x-lifi-api-key```，只对本交易所对象生效，不回显），传```""```清除；不传参数只查询。没有Key时按出口IP限频，见下文。见子页`exchange.IO("bridge.*", ...)`。 | 是否已设置Key（布尔值）。 |
+| ```abi``` | address, abiContent | 为合约地址注册ABI（JSON字符串，或内置模板名```weth```、```uniswapV3Pool```、```uniswapV3Factory```、```uniswapV3QuoterV2```、```uniswapV3SwapRouter02```、```uniswapV3PositionManager```、```permit2```等，见子页），只对本交易所对象有效。见子页`exchange.IO("abi", ...)`。 | — |
+| ```api``` | address \| "eth", method, ...args[, options] | 第一个参数为合约地址时调用合约方法：只读方法（```view```、```pure```）返回解码后的值，写方法用配置的钱包私钥签名并广播后返回交易哈希（payable方法的第一个参数是附带的原生币数量；```options```可设```gasLimit```、```gasPrice```、```nonce```、```dryRun```）。见子页`exchange.IO("api", ...)`。 | — |
+| ```call``` | address, method \| calldata, ...args[, options] | 以```eth_call```模拟执行合约的任意方法（包括写方法），不签名、不广播、不消耗gas，用于询价、交易预演；参数与```api```相同，```options```为```{from, value, block, gasLimit}```，调用者默认为本钱包。见子页`exchange.IO("call", ...)`。 | 方法名调用返回解码后的值（没有返回值时为```true```）；calldata调用返回原始返回数据（十六进制字符串）。 |
+| ```multicall``` | calls[, options] | 通过Multicall3合约在同一区块状态上一次读取多个合约调用，```calls```每项为```[合约地址, 方法, ...参数]```；```options```为```{allowFailure, block, multicall}```。见子页`exchange.IO("multicall", ...)`。 | 与```calls```顺序一致的结果数组。默认任何一项失败都整体报错（带序号与原因）；```allowFailure```为```true```时失败项为空值。 |
+| ```logs``` | query | 查询合约的事件日志（```eth_getLogs```）并按ABI解码；```query```为```{address, event, filter, fromBlock, toBlock, topics, blockHash}```，块号可以是负数（相对最新块）。见子页`exchange.IO("logs", ...)`。 | 日志数组，能解码时每项另有```event```、```args```。 |
+| ```waitReceipt``` | txHash[, options] | 等待交易上链并达到确认数，```options```为```{timeout, confirmations, interval}```：```timeout```、```interval```单位为毫秒，默认120000（范围1000到600000）、1500，```confirmations```默认1。见子页`exchange.IO("waitReceipt", ...)`。 | 交易回执（```status```为数字，```events```为解码后的事件）；超时报错并返回空值。 |
+| ```nonce``` | ["sync" \| number] | 查看本交易所对象发送交易使用的nonce计数（```api```写入与兑换、撤单、转账、LP等交易共用）；传```sync```按节点的pending计数重新同步，传数字设置本地下一个nonce。见子页`exchange.IO("nonce", ...)`。 | ```{address, latest, pending, local}```（数值均为字符串；还没有发送过交易时```local```为空值）。 |
+| ```speedUp``` | txHash[, options] | 给还未上链的交易加价重发（同nonce，接收地址、金额、调用数据和gas上限不变）；```options```为```{multiplier, dryRun}```，```multiplier```范围1.1到10，默认1.125。交易必须是本钱包发出、节点看得到的。见子页`exchange.IO("speedUp", ...)`。 | 替换交易的哈希；```dryRun```时返回替换交易的内容。 |
+| ```cancelTx``` | txHash[, options] | 取消还未上链的交易：用同一个nonce发送一笔转给自己的0金额交易，手续费更高；```options```同```speedUp```。不保证成功。见子页`exchange.IO("cancelTx", ...)`。 | 取消交易的哈希；```dryRun```时返回取消交易的内容。 |
+| ```encode``` | [address, ]dataFormat, ...args | 按类型表做标准ABI编码（同Solidity的```abi.encode```）；第一个参数为合约地址时编码该合约的方法调用（calldata）。```pack```是同一指令的旧名。见子页`exchange.IO("encode", ...)`。 | 不带```0x```的十六进制字符串。 |
+| ```encodePacked``` | dataFormat, ...args | 按类型表做紧凑编码（同Solidity的```abi.encodePacked```）。见子页`exchange.IO("encodePacked", ...)`。 | 不带```0x```的十六进制字符串。 |
+| ```decode``` | dataFormat, data | 按类型表解码十六进制数据。```unpack```是同一指令的旧名。见子页`exchange.IO("decode", ...)`。 | 只有一个类型时直接返回值，多个类型时返回数组。 |
+| ```sign``` | hash[, key] | 用secp256k1私钥对32字节哈希签名（不再做哈希），用于EIP-712等链下签名；不传```key```时用配置的钱包私钥。见子页`exchange.IO("sign", ...)`。 | ```{r, s, v, signature, vs}```（```v```为27或28，```vs```为EIP-2098紧凑签名）。 |
+| ```signTypedData``` | typedData[, key] \| domain, types, message[, key] | 按EIP-712对结构化数据签名（Permit2授权、限价单等），一步完成类型哈希、域分隔符、结构体哈希和摘要计算。见子页`exchange.IO("signTypedData", ...)`。 | 同```sign```，另有```digest```（EIP-712摘要）。 |
+| ```signMessage``` | message[, key] | 按EIP-191（```personal_sign```）对消息签名；字符串按UTF-8签名，原始字节传```{hex: "0x..."}```。见子页`exchange.IO("signMessage", ...)`。 | 同```sign```，另有```digest```（EIP-191消息哈希）。 |
+| ```toUnits``` | amount, decimals | 把可读数量换算为链上整数，按字符串精确计算；```decimals```可以是数字或代币合约地址（自动读取```decimals()```）。小数位多于精度时报错。见子页`exchange.IO("toUnits", ...)`。 | 十进制字符串。 |
+| ```fromUnits``` | amount, decimals | 把链上整数换算为可读数量，按字符串精确计算；```decimals```同```toUnits```。见子页`exchange.IO("fromUnits", ...)`。 | 十进制字符串（去掉末尾的0）。 |
+| ```uniswapV3``` | fn, ...args | 集中流动性计算：```tickToPrice```、```priceToTick```、```sqrtPriceToPrice```、```tickToSqrtPrice```、```sqrtPriceToTick```、```nearestUsableTick```、```amountsForLiquidity```、```liquidityForAmounts```；精度参数可以是数字或代币地址。见子页`exchange.IO("uniswapV3", ...)`。 | — |
 | ```clientId``` | [id] | 设置请求KyberSwap Aggregator API时携带的客户端标识（请求头```x-client-id```，设置了API Key时也照发），只能是字母、数字、```.```、```_```、```-```，1到64个字符。（详见表下） | 当前的客户端标识。 |
 | ```kyberApiKey``` | [key] | 设置KyberSwap的API Key（只对本交易所对象生效，不回显），与配置项```KyberSwap Api Key```相同：设置后报价与生成交易改走KyberSwap的API网关```https://api.kyberswap.com/swap```，请求头带```X-Api-Key```，限频更高；传```""```清除，回到公开端点。（详见表下） | 是否已设置Key（布尔值）。 |
 
@@ -30078,7 +31240,24 @@ See also: `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("lp.stake")`, `ex
 
 通用指令```currency```见`exchange.IO`。
 
-不支持通用指令```api```（调用时报错并返回空值）。
+##### 常用用法
+
+###### 用链上通用指令读合约：ERC20查询、批量读取、事件日志（与Web3交易所对象同样的写法）
+
+```javascript
+function main() {
+    // 本链的包装币（WETH/WBNB），标准ERC20方法不用注册ABI
+    var token = exchange.IO("contracts").wrappedNative
+    var me = exchange.IO("address")
+    Log(exchange.IO("api", token, "symbol"), "decimals:", exchange.IO("api", token, "decimals"))
+    // 同一区块上一次读多个调用
+    var rows = exchange.IO("multicall", [[token, "totalSupply"], [token, "balanceOf", me]])
+    Log("totalSupply:", exchange.IO("fromUnits", rows[0], 18), "balance:", exchange.IO("fromUnits", rows[1], 18))
+    // 最近10个区块的Transfer事件（公共节点对区块跨度限制较严）
+    var logs = exchange.IO("logs", {address: token, event: "Transfer", fromBlock: -10})
+    Log("transfers:", logs.length, logs.length ? logs[0].args : "")
+}
+```
 
 ##### 函数支持差异
 
@@ -30178,10 +31357,45 @@ OneInch交易所对象接入1inch聚合器：报价和交易数据来自1inch Sw
 | ```bridge.send``` | params\|quote | 跨链转出：重新报价 → 检查余额 → 代币对LI.FI的```approvalAddress```授权不够时先授权（按```exchange.IO("approve")```的```exact```/```max```，USDT这类先清零，等授权上链；授权过就再报价一次）→ ```eth_call```模拟 → 签名广播；gasLimit取```eth_estimateGas```估算×```gasMultiplier```与LI.FI建议的```gasLimit```中较大的一个（桥合约还会调用别的合约，估算可能偏少），实际只按用量扣费。见子页`exchange.IO("bridge.*", ...)`。 | ```{txHash, tool, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, toAddress, value, transactionId}```，```txHash```为源链交易哈希，可用```receipt```查回执。 |
 | ```bridge.status``` | txHash[, options] | 跨链进度（LI.FI ```/status```），参数为```bridge.send```返回的源链交易哈希；```options```可给```{toChain, bridge}```加快查找。见子页`exchange.IO("bridge.*", ...)`。 | ```{status, substatus, substatusMessage, tool, sending, receiving, fromAddress, toAddress, explorer, bridgeExplorer}```：```status```为```NOT_FOUND```、```INVALID```、```PENDING```、```DONE```、```FAILED```；```DONE```时```substatus```为```COMPLETED```（按报价到账）、```PARTIAL```（收到的是别的代币）或```REFUNDED```（已退回）；```sending```、```receiving```为```{txHash, txLink, chainId, amount, amountRaw, token, timestamp}```，```receiving.amount```与```receiving.token```为实际到账的数量与代币。 |
 | ```bridge.apiKey``` | [key] | 设置LI.FI的API Key（请求头```x-lifi-api-key```，只对本交易所对象生效，不回显），传```""```清除；不传参数只查询。没有Key时按出口IP限频，见下文。见子页`exchange.IO("bridge.*", ...)`。 | 是否已设置Key（布尔值）。 |
+| ```abi``` | address, abiContent | 为合约地址注册ABI（JSON字符串，或内置模板名```weth```、```uniswapV3Pool```、```uniswapV3Factory```、```uniswapV3QuoterV2```、```uniswapV3SwapRouter02```、```uniswapV3PositionManager```、```permit2```等，见子页），只对本交易所对象有效。见子页`exchange.IO("abi", ...)`。 | — |
+| ```api``` | address \| "eth", method, ...args[, options] | 第一个参数为合约地址时调用合约方法：只读方法（```view```、```pure```）返回解码后的值，写方法用配置的钱包私钥签名并广播后返回交易哈希（payable方法的第一个参数是附带的原生币数量；```options```可设```gasLimit```、```gasPrice```、```nonce```、```dryRun```）。见子页`exchange.IO("api", ...)`。 | — |
+| ```call``` | address, method \| calldata, ...args[, options] | 以```eth_call```模拟执行合约的任意方法（包括写方法），不签名、不广播、不消耗gas，用于询价、交易预演；参数与```api```相同，```options```为```{from, value, block, gasLimit}```，调用者默认为本钱包。见子页`exchange.IO("call", ...)`。 | 方法名调用返回解码后的值（没有返回值时为```true```）；calldata调用返回原始返回数据（十六进制字符串）。 |
+| ```multicall``` | calls[, options] | 通过Multicall3合约在同一区块状态上一次读取多个合约调用，```calls```每项为```[合约地址, 方法, ...参数]```；```options```为```{allowFailure, block, multicall}```。见子页`exchange.IO("multicall", ...)`。 | 与```calls```顺序一致的结果数组。默认任何一项失败都整体报错（带序号与原因）；```allowFailure```为```true```时失败项为空值。 |
+| ```logs``` | query | 查询合约的事件日志（```eth_getLogs```）并按ABI解码；```query```为```{address, event, filter, fromBlock, toBlock, topics, blockHash}```，块号可以是负数（相对最新块）。见子页`exchange.IO("logs", ...)`。 | 日志数组，能解码时每项另有```event```、```args```。 |
+| ```waitReceipt``` | txHash[, options] | 等待交易上链并达到确认数，```options```为```{timeout, confirmations, interval}```：```timeout```、```interval```单位为毫秒，默认120000（范围1000到600000）、1500，```confirmations```默认1。见子页`exchange.IO("waitReceipt", ...)`。 | 交易回执（```status```为数字，```events```为解码后的事件）；超时报错并返回空值。 |
+| ```nonce``` | ["sync" \| number] | 查看本交易所对象发送交易使用的nonce计数（```api```写入与兑换、撤单、转账、LP等交易共用）；传```sync```按节点的pending计数重新同步，传数字设置本地下一个nonce。见子页`exchange.IO("nonce", ...)`。 | ```{address, latest, pending, local}```（数值均为字符串；还没有发送过交易时```local```为空值）。 |
+| ```speedUp``` | txHash[, options] | 给还未上链的交易加价重发（同nonce，接收地址、金额、调用数据和gas上限不变）；```options```为```{multiplier, dryRun}```，```multiplier```范围1.1到10，默认1.125。交易必须是本钱包发出、节点看得到的。见子页`exchange.IO("speedUp", ...)`。 | 替换交易的哈希；```dryRun```时返回替换交易的内容。 |
+| ```cancelTx``` | txHash[, options] | 取消还未上链的交易：用同一个nonce发送一笔转给自己的0金额交易，手续费更高；```options```同```speedUp```。不保证成功。见子页`exchange.IO("cancelTx", ...)`。 | 取消交易的哈希；```dryRun```时返回取消交易的内容。 |
+| ```encode``` | [address, ]dataFormat, ...args | 按类型表做标准ABI编码（同Solidity的```abi.encode```）；第一个参数为合约地址时编码该合约的方法调用（calldata）。```pack```是同一指令的旧名。见子页`exchange.IO("encode", ...)`。 | 不带```0x```的十六进制字符串。 |
+| ```encodePacked``` | dataFormat, ...args | 按类型表做紧凑编码（同Solidity的```abi.encodePacked```）。见子页`exchange.IO("encodePacked", ...)`。 | 不带```0x```的十六进制字符串。 |
+| ```decode``` | dataFormat, data | 按类型表解码十六进制数据。```unpack```是同一指令的旧名。见子页`exchange.IO("decode", ...)`。 | 只有一个类型时直接返回值，多个类型时返回数组。 |
+| ```sign``` | hash[, key] | 用secp256k1私钥对32字节哈希签名（不再做哈希），用于EIP-712等链下签名；不传```key```时用配置的钱包私钥。见子页`exchange.IO("sign", ...)`。 | ```{r, s, v, signature, vs}```（```v```为27或28，```vs```为EIP-2098紧凑签名）。 |
+| ```signTypedData``` | typedData[, key] \| domain, types, message[, key] | 按EIP-712对结构化数据签名（Permit2授权、限价单等），一步完成类型哈希、域分隔符、结构体哈希和摘要计算。见子页`exchange.IO("signTypedData", ...)`。 | 同```sign```，另有```digest```（EIP-712摘要）。 |
+| ```signMessage``` | message[, key] | 按EIP-191（```personal_sign```）对消息签名；字符串按UTF-8签名，原始字节传```{hex: "0x..."}```。见子页`exchange.IO("signMessage", ...)`。 | 同```sign```，另有```digest```（EIP-191消息哈希）。 |
+| ```toUnits``` | amount, decimals | 把可读数量换算为链上整数，按字符串精确计算；```decimals```可以是数字或代币合约地址（自动读取```decimals()```）。小数位多于精度时报错。见子页`exchange.IO("toUnits", ...)`。 | 十进制字符串。 |
+| ```fromUnits``` | amount, decimals | 把链上整数换算为可读数量，按字符串精确计算；```decimals```同```toUnits```。见子页`exchange.IO("fromUnits", ...)`。 | 十进制字符串（去掉末尾的0）。 |
+| ```uniswapV3``` | fn, ...args | 集中流动性计算：```tickToPrice```、```priceToTick```、```sqrtPriceToPrice```、```tickToSqrtPrice```、```sqrtPriceToTick```、```nearestUsableTick```、```amountsForLiquidity```、```liquidityForAmounts```；精度参数可以是数字或代币地址。见子页`exchange.IO("uniswapV3", ...)`。 | — |
 
 通用指令```currency```见`exchange.IO`。
 
-不支持通用指令```api```（调用时报错并返回空值）。
+##### 常用用法
+
+###### 用链上通用指令读合约：ERC20查询、批量读取、事件日志（与Web3交易所对象同样的写法）
+
+```javascript
+function main() {
+    // 本链的包装币（WETH/WBNB），标准ERC20方法不用注册ABI
+    var token = exchange.IO("contracts").wrappedNative
+    var me = exchange.IO("address")
+    Log(exchange.IO("api", token, "symbol"), "decimals:", exchange.IO("api", token, "decimals"))
+    // 同一区块上一次读多个调用
+    var rows = exchange.IO("multicall", [[token, "totalSupply"], [token, "balanceOf", me]])
+    Log("totalSupply:", exchange.IO("fromUnits", rows[0], 18), "balance:", exchange.IO("fromUnits", rows[1], 18))
+    // 最近10个区块的Transfer事件（公共节点对区块跨度限制较严）
+    var logs = exchange.IO("logs", {address: token, event: "Transfer", fromBlock: -10})
+    Log("transfers:", logs.length, logs.length ? logs[0].args : "")
+}
+```
 
 ##### 函数支持差异
 
@@ -33932,6 +35146,24 @@ See also: `Jupiter`, `exchange.IO`, `exchange.IO("receipt")`, `exchange.IO("slip
 | ```broadcastSupportedChains``` | — | 只读查询广播接口支持的链。 | — |
 | ```tokenSearch``` | chains, search | 按名称或地址搜索代币（```chains```为逗号分隔的链号），返回OKX接口的原始数据。 | 数组，每项有```chainIndex```、```tokenSymbol```、```tokenName```、```tokenContractAddress```、```decimal```、```price```、```liquidity```等（都是字符串）。 |
 | ```allTokens``` | chainIndex | 列出某条链上可兑换的全部代币，返回OKX接口的原始数据。 | 数组，每项有```tokenSymbol```、```tokenName```、```tokenContractAddress```、```decimals```等。 |
+| ```chain``` | [chainIndex] | 选择下面这些链上通用指令作用的EVM链（chainIndex或已登记的链别名），默认```1```（Ethereum）；节点用```exchange.IO("rpc", chainIndex, url)```登记的地址，第一次使用时核对节点的chainId。（详见表下） | 选中的chainIndex。 |
+| ```abi``` | address, abiContent | 为合约地址注册ABI（JSON字符串，或内置模板名```weth```、```uniswapV3Pool```、```uniswapV3Factory```、```uniswapV3QuoterV2```、```uniswapV3SwapRouter02```、```uniswapV3PositionManager```、```permit2```，PancakeSwap V3有对应的```pancakeV3*```别名），只对本交易所对象有效。见子页`exchange.IO("abi", ...)`。 | — |
+| ```call``` | address, method \| calldata, ...args[, options] | 以```eth_call```模拟执行合约的任意方法（包括写方法），不签名、不广播、不消耗gas，用于询价、交易预演；参数与```api```相同，```options```为```{from, value, block, gasLimit}```，调用者默认为本钱包。见子页`exchange.IO("call", ...)`。 | 方法名调用返回解码后的值（没有返回值时为```true```）；calldata调用返回原始返回数据（十六进制字符串）。 |
+| ```multicall``` | calls[, options] | 通过Multicall3合约在同一区块状态上一次读取多个合约调用，```calls```每项为```[合约地址, 方法, ...参数]```；```options```为```{allowFailure, block, multicall}```。见子页`exchange.IO("multicall", ...)`。 | 与```calls```顺序一致的结果数组。默认任何一项失败都整体报错（带序号与原因）；```allowFailure```为```true```时失败项为空值。 |
+| ```logs``` | query | 查询合约的事件日志（```eth_getLogs```）并按ABI解码；```query```为```{address, event, filter, fromBlock, toBlock, topics, blockHash}```，块号可以是负数（相对最新块）。见子页`exchange.IO("logs", ...)`。 | 日志数组，能解码时每项另有```event```、```args```。 |
+| ```waitReceipt``` | txHash[, options] | 等待交易上链并达到确认数，```options```为```{timeout, confirmations, interval}```：```timeout```、```interval```单位为毫秒，默认120000（范围1000到600000）、1500，```confirmations```默认1。见子页`exchange.IO("waitReceipt", ...)`。 | 交易回执（```status```为数字，```events```为解码后的事件）；超时报错并返回空值。 |
+| ```nonce``` | ["sync" \| number] | 查看钱包在所选链上的nonce（```latest```、```pending```来自节点）；传```sync```按节点的pending计数重新同步本地计数，传数字设置本地下一个nonce。OKX DEX自己的兑换与授权按OKX接口查nonce，不用这个计数。见子页`exchange.IO("nonce", ...)`。 | ```{address, latest, pending, local}```（数值均为字符串；还没有发送过交易时```local```为空值）。 |
+| ```speedUp``` | txHash[, options] | 给还未上链的交易加价重发（同nonce，接收地址、金额、调用数据和gas上限不变）；```options```为```{multiplier, dryRun}```，```multiplier```范围1.1到10，默认1.125。交易必须是本钱包发出、节点看得到的。见子页`exchange.IO("speedUp", ...)`。 | 替换交易的哈希；```dryRun```时返回替换交易的内容。 |
+| ```cancelTx``` | txHash[, options] | 取消还未上链的交易：用同一个nonce发送一笔转给自己的0金额交易，手续费更高；```options```同```speedUp```。不保证成功。见子页`exchange.IO("cancelTx", ...)`。 | 取消交易的哈希；```dryRun```时返回取消交易的内容。 |
+| ```encode``` | [address, ]dataFormat, ...args | 按类型表做标准ABI编码（同Solidity的```abi.encode```）；第一个参数为合约地址时编码该合约的方法调用（calldata）。```pack```是同一指令的旧名。见子页`exchange.IO("encode", ...)`。 | 不带```0x```的十六进制字符串。 |
+| ```encodePacked``` | dataFormat, ...args | 按类型表做紧凑编码（同Solidity的```abi.encodePacked```）。见子页`exchange.IO("encodePacked", ...)`。 | 不带```0x```的十六进制字符串。 |
+| ```decode``` | dataFormat, data | 按类型表解码十六进制数据。```unpack```是同一指令的旧名。见子页`exchange.IO("decode", ...)`。 | 只有一个类型时直接返回值，多个类型时返回数组。 |
+| ```sign``` | hash[, key] | 用secp256k1私钥对32字节哈希签名（不再做哈希），用于EIP-712等链下签名；不传```key```时用助记词派生的EVM钱包私钥。见子页`exchange.IO("sign", ...)`。 | ```{r, s, v, signature, vs}```（```v```为27或28，```vs```为EIP-2098紧凑签名）。 |
+| ```signTypedData``` | typedData[, key] \| domain, types, message[, key] | 按EIP-712对结构化数据签名（Permit2授权、限价单等），一步完成类型哈希、域分隔符、结构体哈希和摘要计算。见子页`exchange.IO("signTypedData", ...)`。 | 同```sign```，另有```digest```（EIP-712摘要）。 |
+| ```signMessage``` | message[, key] | 按EIP-191（```personal_sign```）对消息签名；字符串按UTF-8签名，原始字节传```{hex: "0x..."}```。见子页`exchange.IO("signMessage", ...)`。 | 同```sign```，另有```digest```（EIP-191消息哈希）。 |
+| ```toUnits``` | amount, decimals | 把可读数量换算为链上整数，按字符串精确计算；```decimals```可以是数字或代币合约地址（自动读取```decimals()```）。小数位多于精度时报错。见子页`exchange.IO("toUnits", ...)`。 | 十进制字符串。 |
+| ```fromUnits``` | amount, decimals | 把链上整数换算为可读数量，按字符串精确计算；```decimals```同```toUnits```。见子页`exchange.IO("fromUnits", ...)`。 | 十进制字符串（去掉末尾的0）。 |
+| ```uniswapV3``` | fn, ...args | 集中流动性计算：```tickToPrice```、```priceToTick```、```sqrtPriceToPrice```、```tickToSqrtPrice```、```sqrtPriceToTick```、```nearestUsableTick```、```amountsForLiquidity```、```liquidityForAmounts```；精度参数可以是数字或代币地址。见子页`exchange.IO("uniswapV3", ...)`。 | — |
 
 表中长说明的其余部分：
 
@@ -33942,6 +35174,7 @@ See also: `Jupiter`, `exchange.IO`, `exchange.IO("receipt")`, `exchange.IO("slip
 - ```rpc```：EVM链查询授权额度（```allowance```与下单前的自动检查）必须配置RPC，OKX的nonce接口失败时也用它兜底；Solana、Tron、SUI、TON签名时查询链上状态，未配置时使用各链的公共节点。Unichain（```130```）已预置官方RPC。
 - ```allowance```：只适用于EVM链，需要先用```exchange.IO("rpc", 链号, url)```配置该链的RPC；原生币没有授权，报错。
 - ```signTx```：```tx```为交易JSON（字符串或对象），```chainIndex```可写链号或链名。EVM链的交易要有```to```、```data```、```gas```（或```gasLimit```），可选```value```、```gasPrice```、```maxPriorityFeePerGas```（与OKX兑换接口返回的```tx```相同）：nonce自动查询，gas上限乘以```gasMultiplier```，没有```gasPrice```时经该链的RPC查询。
+- ```chain```：选中Solana等非EVM链时这些指令一律报错。不传参数时查询。
 
 通用指令```api```、```base```、```currency```见`exchange.IO`。
 
@@ -35432,7 +36665,7 @@ See also: `exchange.IO("pump.*", ...)`, `Jupiter`, `DEX 策略示例`
 
 #### Polymarket
 
-Polygon链上的预测市场。交易所对象通过Polymarket的CLOB（中央限价订单簿）接口下单、查询订单簿、订单、余额和账户成交，通过Gamma接口查询市场信息，通过data接口查询持仓和市场成交；赎回、合并、拆分经Polymarket的免Gas中继（relayer）提交链上交易。全部是REST轮询，没有行情和订单推送。
+Polygon链上的预测市场。交易所对象通过Polymarket的CLOB（中央限价订单簿）接口下单、查询订单簿、订单、余额和账户成交，通过Gamma接口查询市场信息，通过data接口查询持仓和市场成交；赎回、合并、拆分经Polymarket的免Gas中继（relayer）提交链上交易。查询与下单走REST接口，行情与私有流另有WebSocket推送（见下文）。
 
 ##### 名称与配置
 
@@ -35645,6 +36878,7 @@ function main() {
 - ```exchange.GetHistoryOrders()```由账户成交记录生成：每笔成交一行（状态为已成交，同一订单多次成交会出现多行），已撤销或从未成交的订单不会出现；```since```可传毫秒或秒，不传```limit```时最多300条。
 - ```exchange.GetTicker()```取该选项自己的订单簿和最新成交价，```High```、```Low```就是当前卖一、买一价（没有24小时高低价），```Volume```是整个市场（两个选项合计）的24小时成交额。```exchange.GetTickers()```取自Gamma市场列表，第二个选项的价格由第一个选项按```1 - x```换算。
 - ```exchange.GetMarkets()```、```exchange.GetTickers()```每次只返回一页（约100个市场）。游标为空时只返回Gamma市场列表的第一页；调用返回当前游标处的一页，不移动游标（```exchange.SetContractType()```等内部查询也不会推进它）；取过一页后用```exchange.IO("markets_cursor", "next")```（或```tickers_cursor```）推进到下一页，最后一页之后游标回到空串。逐页翻：```exchange.IO("markets_cursor", "")```，然后循环调用```exchange.GetMarkets()```与```exchange.IO("markets_cursor", "next")```直到返回空串。也可以直接设置游标，例如Gamma接口```/markets/keyset```应答中的```next_cursor```。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交）与账户私有流（订单回报、持仓与余额）可以通过事件流订阅，按选项（outcome）订阅，交易对写法与其它函数相同。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。ticker与bbo的买一、卖一（带挂单量）由该选项的整本订单簿推送得出，最新价取订单簿快照里的最新成交价与之后的成交，没有24小时成交量和开高低价；逐笔成交与```exchange.GetTrades()```同一套成交ID（链上交易哈希），方向是吃单方向。交易所只有一种深度推送（整本快照加增量），各档数的深度订阅（缺省20档，最多255档）共用一条，每个订阅按自己的档数输出；推送没有序号，连接器用每条增量附带的最优买卖价核对本地订单簿，对不上就重新订阅取快照。交易所没有K线推送，订阅K线会报不支持的周期。推送事件的价格按4位小数、数量按6位小数（份额的最小单位）输出，不随市场价格步长变化。私有流是一路```private```订阅（不带交易对，覆盖整个账户），只在订阅时连接，用与下单相同的CLOB API凭据（由钱包私钥派生）鉴权：订阅生效及每次断线重连后，先用与```exchange.GetAssets()```、```exchange.GetPositions()```相同的接口推送USDC余额与各选项持仓的快照，再报告就绪；之后推送订单回报（订单ID与下单返回值相同，撮合过的订单成交均价按委托价计）以及成交后变化的USDC余额。交易所没有持仓推送，持仓只在订阅生效与重连后的快照里更新。鉴权被拒（交易所会立刻断开连接）连续三次后连接状态报告降级、私有流报告失败（行情推送不受影响）。不支持全市场```tickers```订阅（Polymarket本连接器使用的CLOB行情频道只能逐个token订阅），订阅时报错；请按交易对订阅ticker。
 
 ### 证券与期货
 

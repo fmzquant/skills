@@ -4874,7 +4874,6 @@ The exchange has no such endpoint; the docker implements the function:
 
 Some periods are synthesized by the docker:
 
-- `AscendEx`: Native periods are 1m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 12h, 1d, 1w, 1M; other periods are synthesized by the docker.
 - `Backpack`, `Futures_Backpack`, `Futures_Binance`, `Futures_ApolloX`, `Futures_Aster`: Native periods are 1m, 3m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 8h, 12h, 1d, 3d, 1w, 1M; other periods are synthesized by the docker.
 - `BigONE`: Native periods are 1m, 5m, 15m, 30m, 1h, 3h, 4h, 6h, 12h, 1d, 1w, 1M; other periods are synthesized by the docker.
 - `Binance`, `Aster`: Native periods are 1s, 1m, 3m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 8h, 12h, 1d, 3d, 1w, 1M; other periods are synthesized by the docker.
@@ -6898,7 +6897,7 @@ Parameters can also be appended after the ```side``` parameter (legacy syntax), 
 
 The ```ConditionType``` of ```condition``` can be OCO, TP or SL from `ORDER_CONDITION_TYPE`. `ORDER_CONDITION_TYPE_GENERIC` appears only in query results (for exchange-specific conditional orders such as trailing stops). It cannot be used when creating or modifying a conditional order; passing it raises an error and returns a null value. Every trigger price and execution price required by the selected type must be passed and must not be 0 (OCO needs all four, TP needs the two take-profit prices, SL needs the two stop-loss prices); otherwise an error is raised and a null value is returned. An execution price of -1 means the order is executed as a market order once triggered.
 
-Exchanges that do not support this function: `AscendEx`, `Bithumb`, `Bitstamp`, `Coinw`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Korbit`, `LBank`, `MEXC`, `Upbit`, `WEEX`, `Zaif`, `Hyperliquid`, `Pendle`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter`, `OKX_DEX`, `Futures_Polymarket`, `Futures_Futu`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
+Exchanges that do not support this function: `Bithumb`, `Bitstamp`, `Coinw`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Korbit`, `LBank`, `MEXC`, `Upbit`, `WEEX`, `Zaif`, `Hyperliquid`, `Pendle`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter`, `OKX_DEX`, `Futures_Polymarket`, `Futures_Futu`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
 
 See also: `Condition`, `exchange.CancelConditionOrder`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`, `exchange.ModifyConditionOrder`
 
@@ -7300,7 +7299,7 @@ The return value of the ```exchange.CancelConditionOrder()``` function only indi
 
 Only untriggered conditional orders can be canceled; conditional orders that have already been triggered and converted into regular orders cannot be canceled through this function.
 
-Exchanges that do not support this function: `AscendEx`, `Bithumb`, `Bitstamp`, `Coinw`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Korbit`, `LBank`, `MEXC`, `Upbit`, `WEEX`, `Zaif`, `Hyperliquid`, `Pendle`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter`, `OKX_DEX`, `Futures_Polymarket`, `Futures_Futu`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
+Exchanges that do not support this function: `Bithumb`, `Bitstamp`, `Coinw`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Korbit`, `LBank`, `MEXC`, `Upbit`, `WEEX`, `Zaif`, `Hyperliquid`, `Pendle`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter`, `OKX_DEX`, `Futures_Polymarket`, `Futures_Futu`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
 
 See also: `exchange.CreateConditionOrder`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`, `exchange.ModifyConditionOrder`
 
@@ -7385,7 +7384,7 @@ The returned conditional order structure contains information such as the trigge
 
 Conditional order statuses include: not triggered, triggered, canceled, etc. The specific status values are determined by the exchange.
 
-Exchanges that do not support this function: `AscendEx`, `Bithumb`, `Bitstamp`, `Coinw`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Korbit`, `LBank`, `MEXC`, `Upbit`, `WEEX`, `Zaif`, `Hyperliquid`, `Pendle`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter`, `OKX_DEX`, `Futures_Polymarket`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
+Exchanges that do not support this function: `Bithumb`, `Bitstamp`, `Coinw`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Korbit`, `LBank`, `MEXC`, `Upbit`, `WEEX`, `Zaif`, `Hyperliquid`, `Pendle`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter`, `OKX_DEX`, `Futures_Polymarket`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
 
 Exchanges that serve this function through a fallback: the exchange's API does not fully provide this function, and the docker fills the gap.
 
@@ -7528,7 +7527,7 @@ On a few exchanges the open conditional-order endpoint requires a symbol: there,
 
 Support for the conditional order feature depends on the specific exchange; some exchanges may not support the conditional order feature.
 
-Exchanges that do not support this function: `AscendEx`, `Bithumb`, `Bitstamp`, `Coinw`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Korbit`, `LBank`, `MEXC`, `Upbit`, `WEEX`, `Zaif`, `Hyperliquid`, `Pendle`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter`, `OKX_DEX`, `Futures_Polymarket`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
+Exchanges that do not support this function: `Bithumb`, `Bitstamp`, `Coinw`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Korbit`, `LBank`, `MEXC`, `Upbit`, `WEEX`, `Zaif`, `Hyperliquid`, `Pendle`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter`, `OKX_DEX`, `Futures_Polymarket`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
 
 See also: `Order`, `exchange.GetConditionOrder`, `exchange.GetHistoryConditionOrders`
 
@@ -7668,7 +7667,7 @@ The returned array of historical conditional orders is sorted in ascending order
 
 Support for the conditional order feature depends on the specific exchange. Some exchanges may not support the conditional order feature or the historical conditional order query feature.
 
-Exchanges that do not support this function: `AscendEx`, `Bithumb`, `Bitstamp`, `Coincheck`, `Coinone`, `Coinw`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Korbit`, `LBank`, `MEXC`, `Upbit`, `WEEX`, `Zaif`, `Hyperliquid`, `Pendle`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter`, `OKX_DEX`, `Futures_Polymarket`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
+Exchanges that do not support this function: `Bithumb`, `Bitstamp`, `Coincheck`, `Coinone`, `Coinw`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Korbit`, `LBank`, `MEXC`, `Upbit`, `WEEX`, `Zaif`, `Hyperliquid`, `Pendle`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter`, `OKX_DEX`, `Futures_Polymarket`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
 
 See also: `Order`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`
 
@@ -9438,7 +9437,7 @@ Commands of ```exchange.IO()``` specific to an exchange object; see the exchange
 
 | Command | Exchanges |
 | - | - |
-| ```abi``` | `Web3` |
+| ```abi``` | `Pendle`, `Futures_Boros`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Web3` |
 | ```accountId``` | `Futures_Crypto`, `Poloniex` |
 | ```accounts``` | `Futures_Futu`, `Futures_IB` |
 | ```accountType``` | `Bybit`, `Futures_Bybit` |
@@ -9448,7 +9447,7 @@ Commands of ```exchange.IO()``` specific to an exchange object; see the exchange
 | ```allChainBalance``` | `OKX_DEX` |
 | ```allowance``` | `OKX_DEX` |
 | ```allTokens``` | `OKX_DEX` |
-| ```api``` | `AscendEx`, `Backpack`, `Futures_Backpack`, `BigONE`, `Bitstamp`, `Coinw`, `Crypto`, `Futures_Crypto`, `DigiFinex`, `Futures_DigiFinex`, `WOO`, `Futures_WOO`, `Hyperliquid`, `Futures_Hyperliquid`, `Futures_Lighter`, `Futures_EdgeX`, `Futures_Aevo`, `Futures_WOOFi`, `Futures_Polymarket`, `Futures_IB`, `Exchange`, `Web3` |
+| ```api``` | `Backpack`, `Futures_Backpack`, `BigONE`, `Bitstamp`, `Coinw`, `Crypto`, `Futures_Crypto`, `DigiFinex`, `Futures_DigiFinex`, `WOO`, `Futures_WOO`, `Hyperliquid`, `Futures_Hyperliquid`, `Futures_Lighter`, `Futures_EdgeX`, `Futures_Aevo`, `Pendle`, `Futures_Boros`, `Futures_WOOFi`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Futures_Polymarket`, `Futures_IB`, `Exchange`, `Web3` |
 | ```approve``` | `Pendle`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `OKX_DEX` |
 | ```approveAgent``` | `Futures_Boros` |
 | ```apy``` | `Pendle` |
@@ -9466,10 +9465,11 @@ Commands of ```exchange.IO()``` specific to an exchange object; see the exchange
 | ```broadcast``` | `OKX_DEX` |
 | ```broadcastSupportedChains``` | `OKX_DEX` |
 | ```calcOrderHashAndSign``` | `Futures_EdgeX` |
-| ```call``` | `Web3` |
-| ```cancelTx``` | `Web3` |
+| ```call``` | `Pendle`, `Futures_Boros`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Web3` |
+| ```cancelTx``` | `Pendle`, `Futures_Boros`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Web3` |
 | ```cancelWait``` | `Pendle`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch` |
 | ```cancelWithdraw``` | `Futures_Boros` |
+| ```chain``` | `OKX_DEX` |
 | ```clientId``` | `KyberSwap` |
 | ```clob``` | `Futures_Polymarket` |
 | ```coinmBase``` | `Futures_Binance` |
@@ -9483,17 +9483,17 @@ Commands of ```exchange.IO()``` specific to an exchange object; see the exchange
 | ```dca.simulate``` | `Jupiter` |
 | ```deadline``` | `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch` |
 | ```debug``` | `Futures_IB` |
-| ```decode``` | `Web3` |
+| ```decode``` | `Pendle`, `Futures_Boros`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Web3` |
 | ```deposit``` | `Futures_Boros` |
 | ```dex``` | `Futures_Hyperliquid` |
 | ```dexes``` | `Jupiter` |
 | ```dual``` | `Futures_Binance`, `Futures_Bitget`, `Futures_Bybit`, `Futures_GateIO`, `Futures_HuobiDM`, `Futures_OKCoin`, `Futures_WOO`, `Futures_ApolloX`, `Futures_Aster` |
 | ```eapiBase``` | `Futures_Binance` |
-| ```encode``` | `Web3` |
-| ```encodePacked``` | `Web3` |
+| ```encode``` | `Pendle`, `Futures_Boros`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Web3` |
+| ```encodePacked``` | `Pendle`, `Futures_Boros`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Web3` |
 | ```expiresAfter``` | `Hyperliquid`, `Futures_Hyperliquid` |
 | ```expiry``` | `Futures_Lighter` |
-| ```fromUnits``` | `Web3` |
+| ```fromUnits``` | `Pendle`, `Futures_Boros`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Web3` |
 | ```gamma``` | `Futures_Polymarket` |
 | ```gasBalance``` | `Futures_Boros` |
 | ```gasLevel``` | `OKX_DEX` |
@@ -9507,7 +9507,7 @@ Commands of ```exchange.IO()``` specific to an exchange object; see the exchange
 | ```key``` | `OKX_DEX`, `Web3` |
 | ```kyberApiKey``` | `KyberSwap` |
 | ```lock``` | `Futures_Futu` |
-| ```logs``` | `Web3` |
+| ```logs``` | `Pendle`, `Futures_Boros`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Web3` |
 | ```lp.add``` | `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `Jupiter` |
 | ```lp.claim``` | `Aerodrome`, `Velodrome` |
 | ```lp.collect``` | `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `Jupiter` |
@@ -9532,9 +9532,9 @@ Commands of ```exchange.IO()``` specific to an exchange object; see the exchange
 | ```mbase``` | `Futures_Bitfinex` |
 | ```merge``` | `Futures_DeepCoin`, `Futures_Hyperliquid`, `Futures_Polymarket` |
 | ```mergeQuestion``` | `Futures_Hyperliquid` |
-| ```multicall``` | `Web3` |
+| ```multicall``` | `Pendle`, `Futures_Boros`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Web3` |
 | ```negate``` | `Futures_Hyperliquid` |
-| ```nonce``` | `Web3` |
+| ```nonce``` | `Pendle`, `Futures_Boros`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Web3` |
 | ```orderExpiry``` | `Pendle` |
 | ```orderId``` | `Futures_IB` |
 | ```price``` | `Pendle` |
@@ -9559,16 +9559,16 @@ Commands of ```exchange.IO()``` specific to an exchange object; see the exchange
 | ```scan``` | `Futures_IB` |
 | ```selfTradePreventionMode``` | `Backpack`, `Futures_Backpack`, `Binance`, `Futures_Binance` |
 | ```sendBase``` | `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Web3` |
-| ```sign``` | `Web3` |
+| ```sign``` | `Pendle`, `Futures_Boros`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Web3` |
 | ```signHost``` | `Futures_HuobiDM` |
 | ```signingKey``` | `Futures_Aevo` |
-| ```signMessage``` | `Web3` |
+| ```signMessage``` | `Pendle`, `Futures_Boros`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Web3` |
 | ```signTx``` | `OKX_DEX` |
-| ```signTypedData``` | `Web3` |
+| ```signTypedData``` | `Pendle`, `Futures_Boros`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Web3` |
 | ```simulate``` | `Bitget`, `Futures_Bitget`, `Futures_DigiFinex`, `OKEX`, `Futures_OKCoin`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch` |
 | ```slippage``` | `Pendle`, `Futures_Boros`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter`, `OKX_DEX` |
 | ```source``` | `Hyperliquid`, `Futures_Hyperliquid` |
-| ```speedUp``` | `Web3` |
+| ```speedUp``` | `Pendle`, `Futures_Boros`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Web3` |
 | ```split``` | `Futures_Hyperliquid`, `Futures_Polymarket` |
 | ```status``` | `Futures_Futu`, `Futures_IB` |
 | ```statusDetail``` | `Futures_Futu` |
@@ -9582,22 +9582,22 @@ Commands of ```exchange.IO()``` specific to an exchange object; see the exchange
 | ```token``` | `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter` |
 | ```tokenSearch``` | `OKX_DEX` |
 | ```topUpGas``` | `Futures_Boros` |
-| ```toUnits``` | `Web3` |
-| ```trade_margin``` | `AscendEx`, `Binance`, `Bybit`, `Crypto`, `GateIO`, `Huobi`, `OKEX`, `WOO` |
-| ```trade_normal``` | `AscendEx`, `Binance`, `Bybit`, `Crypto`, `GateIO`, `Huobi`, `OKEX`, `WOO` |
+| ```toUnits``` | `Pendle`, `Futures_Boros`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Web3` |
+| ```trade_margin``` | `Binance`, `Bybit`, `Crypto`, `GateIO`, `Huobi`, `OKEX`, `WOO` |
+| ```trade_normal``` | `Binance`, `Bybit`, `Crypto`, `GateIO`, `Huobi`, `OKEX`, `WOO` |
 | ```trade_super_margin``` | `Binance`, `GateIO`, `Huobi`, `OKEX` |
 | ```transfer``` | `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter` |
 | ```trigger.api``` | `Jupiter` |
 | ```trigger.simulate``` | `Jupiter` |
 | ```trigger.vault``` | `Jupiter` |
 | ```unified``` | `Binance`, `Futures_Binance`, `GateIO`, `Futures_GateIO`, `Futures_HuobiDM` |
-| ```uniswapV3``` | `Web3` |
+| ```uniswapV3``` | `Pendle`, `Futures_Boros`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Web3` |
 | ```unlock``` | `Futures_Futu` |
 | ```unwrap``` | `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch` |
 | ```vaultAddress``` | `Hyperliquid`, `Futures_Hyperliquid` |
 | ```version``` | `Bitfinex` |
 | ```wait``` | `Futures_Futu`, `Futures_IB` |
-| ```waitReceipt``` | `Web3` |
+| ```waitReceipt``` | `Pendle`, `Futures_Boros`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `OKX_DEX`, `Web3` |
 | ```wallet``` | `Futures_Boros` |
 | ```walletAddress``` | `Hyperliquid`, `Futures_Hyperliquid` |
 | ```withdraw``` | `Futures_Boros` |
@@ -11862,19 +11862,19 @@ See also: `SetChannelData`; `_G`
 
 ### Threads
 
-All concurrency functions are here. `exchange.Go` runs a slow call in the background and `EventLoop` waits for the results of concurrent calls and other events; both work in every programming language. The multi-threading objects below are ```JavaScript``` only. `ctx.subscribe`, `ctx.poll` and `ctx.book` are the docker's event subscription interface (```JavaScript```; ```Rust``` uses the functions of the same name in the ```ctx``` module).
+This section covers the concurrency-related functions. `exchange.Go` runs time-consuming calls in the background, and `EventLoop` waits for the results of concurrent calls and for events. Both functions work in all programming languages. The multithreading objects described below work only in ```JavaScript```. `ctx.subscribe` and `ctx.poll` are the WebSocket push interfaces provided by the docker. ```ctx.subscribe()``` subscribes to market data, all-market tickers or private account data streams and returns a `Subscription` object (it returns an array of subscription objects when several symbols are subscribed at once). ```ctx.poll()``` retrieves push events. ```JavaScript``` and ```Python``` strategies use the global ```ctx``` object, and ```Rust``` strategies use the functions of the same names in the ```ctx``` module. A subscription belongs to the thread that made the call, so the main thread and each worker thread subscribe and receive events separately. The push interfaces and REST interfaces such as ```exchange.GetTicker()``` do not affect each other. To check whether an exchange supports push, see the `Capability Matrix`.
 
-The FMZ Quant Trading Platform provides true multi-threading support for ```JavaScript``` language strategies at the system level, implementing the following objects:
+The FMZ Quant Trading Platform supports multithreading for ```JavaScript``` strategies natively at the system level and provides the following objects:
 
-| Object | Description | Notes |
+| Object | Description | Remarks |
 | - | - | - |
-| threading | Global multi-threading object | Member functions: ```Thread```, ```getThread```, ```mainThread```, etc. |
-| Thread | One thread, created or obtained through ```threading``` | Member functions: ```peekMessage```, ```postMessage```, ```join```, etc. |
-| ThreadLock | Thread lock object | Member functions: ```acquire```, ```release```. Can be passed as a parameter to thread execution functions into the thread environment. |
-| ThreadEvent | Event object | Member functions: ```set```, ```clear```, ```wait```, ```isSet```. Can be passed as a parameter to thread execution functions into the thread environment. |
-| ThreadCondition | Condition object | Member functions: ```notify```, ```notifyAll```, ```wait```, ```acquire```, ```release```. Can be passed as a parameter to thread execution functions into the thread environment. |
-| ThreadDict | Dictionary object | Member functions: ```get```, ```set```. Can be passed as a parameter to thread execution functions into the thread environment. |
-| Server | Service object | Returned by ```threading.Serve()```. Member functions: ```addr```, ```close```, ```stop```, ```join```, ```pending```. Can be passed as a parameter to thread execution functions into the thread environment. |
+| threading | Global multithreading object | Member functions include ```Thread```, ```getThread```, ```mainThread```, etc. |
+| Thread | Thread object | Member functions include ```peekMessage```, ```postMessage```, ```join```, etc. |
+| ThreadLock | Thread lock object | Member functions: ```acquire```, ```release```. Can be passed into the thread environment as an argument of the thread's execution function. |
+| ThreadEvent | Event object | Member functions: ```set```, ```clear```, ```wait```, ```isSet```. Can be passed into the thread environment as an argument of the thread's execution function. |
+| ThreadCondition | Condition variable object | Member functions: ```notify```, ```notifyAll```, ```wait```, ```acquire```, ```release```. Can be passed into the thread environment as an argument of the thread's execution function. |
+| ThreadDict | Dictionary object | Member functions: ```get```, ```set```. Can be passed into the thread environment as an argument of the thread's execution function. |
+| Server | Server object | Returned by ```threading.Serve()```. Member functions: ```addr```, ```close```, ```stop```, ```join```, ```pending```. Can be passed into the thread environment as an argument of the thread's execution function. |
 
 #### exchange.Go
 
@@ -12230,15 +12230,15 @@ EventLoop()
 EventLoop(timeout)
 ```
 
-Listens for events and returns when any ```WebSocket``` has readable data, or when concurrent tasks such as ```exchange.Go()``` or ```HttpQuery_Go()``` complete.
+Listens for events. Returns when any ```WebSocket``` has readable data, or when a concurrent task such as ```exchange.Go()``` or ```HttpQuery_Go()``` completes.
 
 Parameters:
 
-- `timeout` (number, optional): Timeout in milliseconds: ```0``` waits until an event occurs, a positive value is the longest wait, and a negative value returns the latest event at once.
+- `timeout` (number, optional): Timeout in milliseconds. If set to ```0```, the call blocks until an event occurs. If greater than 0, it is the maximum wait time. If less than 0, the most recent event is returned immediately.
 
-Returns (object): An event object whose ```Event``` is the event type, for example ```{"Seq":1,"Event":"Exchange_GetTrades","ThreadId":0,"Index":3,"Nano":1682068771309583400}```, see `EventLoop-return`; a null value when the wait times out without an event.
+Returns (object): An event object, where ```Event``` is the event type, for example ```{"Seq":1,"Event":"Exchange_GetTrades","ThreadId":0,"Index":3,"Nano":1682068771309583400}```. For the full structure, see `EventLoop-return`. Returns a null value if the timeout expires and no event has occurred.
 
-Fetch the ticker, depth and trades concurrently and use EventLoop to receive each completion event.
+Fetch the ticker, order book depth and trade records concurrently, then use EventLoop to retrieve the completion events one by one.
 
 ```javascript
 function main() {
@@ -12246,12 +12246,10 @@ function main() {
     var routine_getDepth = exchange.Go("GetDepth")
     var routine_getTrades = exchange.Go("GetTrades")
 
-    // Concurrent tasks are registered when submitted: even with a Sleep(2000) here, the later
-    // EventLoop calls will not miss their completion events
+    // Concurrent tasks are registered when submitted: even if Sleep(2000) runs here first, the later EventLoop calls will not miss these tasks' completion events
 
-    // Log("GetDepth:", routine_getDepth.wait()) If the wait function is called here in advance to
-    // retrieve the result of the concurrent GetDepth function call, the event of this GetDepth
-    // function receiving the request result will not be returned in the EventLoop function
+    // Log("GetDepth:", routine_getDepth.wait()) If wait is called here early to retrieve the result of the concurrent GetDepth call,
+    // the event for this GetDepth request result will no longer be returned by EventLoop
     var ts1 = new Date().getTime()
     var ret1 = EventLoop(0)
 
@@ -12298,18 +12296,15 @@ def main():
 
 ```rust
 fn main() {
-    // In Rust, exchange.Go uses typed tokens (such as Go::GetTicker) instead of method-name
-    // strings; pass () when there are no arguments
+    // In Rust, exchange.Go takes a typed token (e.g. Go::GetTicker) instead of a method-name string; pass () when there are no arguments
     let routine_getTicker = exchange.Go(Go::GetTicker, ());
     let routine_getDepth = exchange.Go(Go::GetDepth, ());
     let routine_getTrades = exchange.Go(Go::GetTrades, ());
 
-    // Concurrent tasks are registered when submitted: even with a Sleep(2000) here, the later
-    // EventLoop calls will not miss their completion events
+    // Concurrent tasks are registered when submitted: even if Sleep(2000) runs here first, the later EventLoop calls will not miss these tasks' completion events
 
-    // Log!("GetDepth:", routine_getDepth.wait(0)) If the wait function is called here in advance to
-    // retrieve the result of the concurrent GetDepth function call, the event of this GetDepth
-    // function receiving the request result will not be returned in the EventLoop function
+    // Log!("GetDepth:", routine_getDepth.wait(0)) If wait is called here early to retrieve the result of the concurrent GetDepth call,
+    // the event for this GetDepth request result will no longer be returned by EventLoop
     let ts1 = Unix() * 1000;
     let ret1 = EventLoop(0);
 
@@ -12329,91 +12324,115 @@ fn main() {
 }
 ```
 
-Concurrent tasks such as ```exchange.Go()``` and ```HttpQuery_Go()``` are registered when they are submitted, so their completion events are not missed even if a task finishes before ```EventLoop()``` is called for the first time. The queue structure encapsulated at the system's underlying level caches at most 10240 events per thread; if the program does not call the ```EventLoop()``` function in time to retrieve them, the oldest events are dropped once the limit is exceeded.
+Concurrent tasks such as ```exchange.Go()``` and ```HttpQuery_Go()``` are registered when they are submitted. Their completion events are not missed, even if a task completes before ```EventLoop()``` is called for the first time. The underlying system uses a queue that caches up to 10240 events per thread. If the program does not call ```EventLoop()``` often enough to retrieve events, the oldest events are discarded once this limit is exceeded.
+```EventLoop()``` does not affect the system's underlying WebSocket cache queue or the caches of concurrent functions such as ```exchange.Go()```. Data in those caches must still be retrieved with their own methods. If data is retrieved before ```EventLoop()``` returns, ```EventLoop()``` does not return an event for that data.
+The main purpose of ```EventLoop()``` is to notify the strategy layer that the system has received new network data, so the whole strategy can be event-driven. When ```EventLoop()``` returns an event, go through all data sources and try to read from each one, such as WebSocket connections and objects created by ```exchange.Go()```.
+```EventLoop()``` is only supported in live trading.
 
-Calling the ```EventLoop()``` function does not affect the underlying WebSocket cache queue of the system, nor does it affect the cache of concurrent functions such as ```exchange.Go()```. The data in these caches must still be retrieved using their respective methods. For data that has already been retrieved before the ```EventLoop()``` function returns, no return event will be generated again in the ```EventLoop()``` function.
+When called in the main function ```main()```, it listens for events on the main thread. In strategies written in ```JavaScript```, it can also be called in the function run by a thread created with ```threading.Thread()```. In that case, it listens for events on the current thread.
 
-The main purpose of the ```EventLoop()``` function is to notify the strategy layer that the system's underlying level has received new network data, thereby driving the entire strategy in an event-driven manner. When the ```EventLoop()``` function returns an event, you only need to iterate through all data sources (such as WebSocket connections and objects created by ```exchange.Go()```) and attempt to retrieve the data.
+Exchange WebSocket pushes are subscribed to with `ctx.subscribe` and retrieved with `ctx.poll`. ```EventLoop()``` only subscribes automatically to market data and order updates for the current trading pair on broker-type exchanges that provide only a push interface. It does not subscribe to pushes for other exchanges. In ```JavaScript``` and ```Rust```, ```EventLoop()``` and ```ctx.poll()``` in the same thread read events from the same event queue, so each thread should use only one of them. In ```Python```, ```EventLoop()``` has its own queue and does not compete with ```ctx.poll()```.
 
-The ```EventLoop()``` function is only supported in live trading.
-
-When called in the main function ```main()```, it listens for events on the main thread. In strategies written in ```JavaScript```, it can also be called in the execution function of a thread created by the ```threading.Thread()``` function to listen for events on the current thread.
-
-See also: `Dial`, `exchange.Go`, `HttpQuery_Go`
+See also: `Dial`, `exchange.Go`, `HttpQuery_Go`, `ctx.poll`
 
 #### ctx.subscribe
 
 ```
-ctx.subscribe(ex, symbol)
-ctx.subscribe(ex, symbol, options)
+ctx.subscribe(ex, options)
 ```
 
-Subscribes to market data pushes for one instrument of an account, or to the order updates of an account, and returns an event stream ID. Events are taken with `ctx.poll` and handled by their ```kind```.
+Subscribes to WebSocket push streams (market data for a symbol, market-wide tickers, or an account's private streams) and returns a `Subscription` object. You can subscribe to a single symbol's ticker, best bid/ask, order book, trades and K-lines (candlesticks), to the tickers of an entire market, or to an entire account's order updates, positions and balances. When ```symbol``` is an array, one call subscribes to several symbols and returns an array of subscription objects. Retrieve events with `ctx.poll`, then handle each event according to its ```channel```. A subscription belongs to the thread that created it. Both the main thread and threads created with ```threading.Thread()``` can subscribe.
 
 Parameters:
 
-- `ex` (number, required): Index of the account in the ```exchanges``` array: ```0``` is ```exchanges[0]``` (i.e. ```exchange```), ```1``` is ```exchanges[1]```, and so on. A numeric string such as ```"0"``` is also accepted; an account label is not.
-- `symbol` (string, required): Instrument code, for example ```BTC_USDT``` or ```BTC_USDT.swap```; the notation is described in `Symbols`. For order updates (```channel``` ```orders```) pass an empty string ```""```, meaning the whole account.
-- `options` (object, optional): Subscription options; ```ticker``` when omitted:
+- `ex` (object / number, required): The account to subscribe to. Pass an exchange object (such as ```exchange``` or ```exchanges[1]```), or the account's index in the ```exchanges``` array (```0``` means ```exchanges[0]```; the numeric string ```"0"``` also works). Account labels are not supported.
+- `options` (object, required): Subscription options ```{channel, symbol, depth, interval, mode, buffer}```. This is the only supported form, and the symbol is also set here. When ```symbol``` is an array, the call is a batch subscription. Each field is described below.
 
-| Field | Description |
-| - | - |
-| channel | Channel: ```ticker``` (default), ```bbo``` (best bid/ask), ```depth``` (order book), ```trade``` (trades), ```kline``` (K-lines), ```orders``` (order updates of this account) |
-| depth | Number of levels for the ```depth``` channel |
-| interval | Period of the ```kline``` channel in seconds, for example ```60``` |
-| mode | ```latest``` keeps only the newest event; older events not yet taken are overwritten |
-| buffer | Size of a bounded buffer; the oldest events are dropped on overflow |
+Returns (`Subscription` object / `Subscription` array): The subscription object. Its properties are ```id``` (the event stream ID, which is the ```ev.stream``` of the events this subscription produces), ```ex```, ```channel```, ```symbol```, ```depth``` and ```interval```. Its methods are ```book()```, ```positions()```, ```balances()``` and ```unsubscribe()```. Pass it directly to ```ctx.poll()``` to get only this subscription's events. When ```options.symbol``` is an array, the call returns an array of subscription objects in the same order.
 
-Returns (number): Event stream ID, which can be passed to ```ctx.poll()``` to take only this stream. Subscribing to the same stream again returns the same ID.
-
-Subscribe to spot market data and order updates and handle them by ```kind```.
+Subscribes to the ticker and the 20-level order book of the current trading pair through the exchange object. It also subscribes to the account's private stream and handles each event type separately according to ```channel```.
 
 ```javascript
-function onTicker(ev) {
-    Log("ticker", ev.symbol, "bid:", ev.bid, "ask:", ev.ask, "last:", ev.last)
-}
-
-function onOrder(ev) {
-    Log("order", ev.id, ev.state, "filled:", ev.filledQty, "/", ev.qty)
-}
-
 function main() {
-    // the first argument is the account index in exchanges; 0 is exchanges[0]
-    ctx.subscribe(0, "BTC_USDT", {channel: "ticker"})
-    // order updates are a private per-account stream: pass an empty symbol
-    ctx.subscribe(0, "", {channel: "orders"})
+    // Pass the exchange object as the first argument; when a market data channel does not specify a symbol, the exchange object's current trading pair is used
+    var tk = ctx.subscribe(exchange, {channel: "ticker"})
+    var book = ctx.subscribe(exchange, {channel: "depth", depth: 20})
+    // The private stream takes no symbol and covers the whole account: order updates, positions and balances are all pushed through this stream
+    var acct = ctx.subscribe(exchange, {channel: "private"})
+    Log("subscribed:", JSON.stringify(tk), JSON.stringify(book), JSON.stringify(acct))
     while (true) {
-        var ev = ctx.poll([], 1000)   // [] means all subscriptions; wait at most 1 second
+        var ev = ctx.poll([], 1000)    // [] means all event streams subscribed by this thread; wait at most 1 second
         if (!ev) {
             continue
         }
-        if (ev.kind === 1) {
-            onTicker(ev)
-        } else if (ev.kind === 16) {
-            onOrder(ev)
+        if (ev.type === "status") {    // Check gateway status and initialization status first; their channel may be the same as that of data events
+            if (ev.kind === 35 && ev.channel === "private") {
+                Log("account snapshot ready:", ev.prefillStatus === 1, ev.message)
+            }
+            continue
+        }
+        if (ev.channel === "ticker") {
+            Log("ticker", ev.symbol, "bid:", ev.bid, "ask:", ev.ask, "last:", ev.last)
+        } else if (ev.channel === "depth") {
+            var b = book.book(1)       // Reads the same order book as ev.book(1)
+            if (b.bids.length > 0 && b.asks.length > 0) {
+                Log("bid1:", b.bids[0][0], "ask1:", b.asks[0][0])
+            }
+        } else if (ev.channel === "orders") {
+            Log("order", ev.id, ev.state, "filled:", ev.filledQty, "/", ev.qty)
         }
     }
 }
 ```
 
-Subscriptions are lazy: ```ctx.subscribe()``` returns at once and records the subscription; the connection to the exchange is opened and the subscription sent on the first ```ctx.poll()``` call. Connection state changes are reported as gateway status events (```kind``` ```33```).
-
-Event ```kind``` per channel: ```1``` for ```ticker``` and ```bbo```, ```3``` for ```depth```, ```4``` for ```trade```, ```5``` for ```kline```, ```16``` for ```orders```. Event fields are described in `ctx.poll`.
-
-When events are not taken in time (delivery mode): ```ticker```, ```bbo``` and ```depth``` keep only the newest event by default; ```trade``` and ```kline``` buffer the latest ```1024``` events and drop the oldest on overflow; ```mode``` and ```buffer``` change this. Order updates and gateway status events are never dropped, so keep calling ```ctx.poll()``` after subscribing. The order book is kept up to date inside the docker regardless of how fast events are taken; `ctx.book` always returns the latest full book.
-
-Invalid arguments (for example an unknown ```channel```, or a market data channel without ```symbol```) throw an exception. To unsubscribe use ```ctx.unsubscribe(ex, symbol, options)``` with the same arguments as ```ctx.subscribe()```.
-
-```ctx.subscribe()```/```ctx.poll()``` and `EventLoop` take events from the same queue; use only one of them to take events in a strategy.
-
-```Rust``` strategies use the functions of the same name in the ```ctx``` module: ```ctx::subscribe(ex: u16, symbol: &str, opts: ctx::SubOpts) -> Result<u32, String>```, with options built by ```ctx::SubOpts::ticker()```, ```trade()```, ```depth(n)```, ```kline(seconds)``` and ```orders()``` (there are no ```mode``` / ```buffer``` options); failures return ```Err```. ```Python``` has no such interface.
+```python
+def main():
+    # Pass the exchange object as the first argument; when a market data channel does not specify a symbol, the exchange object's current trading pair is used
+    tk = ctx.subscribe(exchange, {"channel": "ticker"})
+    book = ctx.subscribe(exchange, {"channel": "depth", "depth": 20})
+    # The private stream takes no symbol and covers the whole account: order updates, positions and balances are all pushed through this stream
+    acct = ctx.subscribe(exchange, {"channel": "private"})
+    Log("subscribed:", tk.info(), book.info(), acct.info())
+    while True:
+        ev = ctx.poll([], 1000)        # [] means all event streams subscribed by this thread; wait at most 1 second
+        if ev is None:
+            continue
+        if ev.type == "status":        # Check gateway status and initialization status first
+            if ev.kind == 35 and ev.channel == "private":
+                Log("account snapshot ready:", ev.prefillStatus == 1, ev.message)
+            continue
+        if ev.channel == "ticker":
+            Log("ticker", ev.symbol, "bid:", ev.bid, "ask:", ev.ask, "last:", ev.last)
+        elif ev.channel == "depth":
+            b = book.book(1)           # Reads the same order book as ev.book(1)
+            if b["bids"] and b["asks"]:
+                Log("bid1:", b["bids"][0][0], "ask1:", b["asks"][0][0])
+        elif ev.channel == "orders":
+            Log("order", ev.id, ev.state, "filled:", ev.filledQty, "/", ev.qty)
+```
 
 ```rust
+use sdk::ctx::EventExt;
+
 fn main() {
-    let s = ctx::subscribe(0, "BTC_USDT", ctx::SubOpts::ticker()).unwrap();
+    // The exchange object is the first argument: when a market data channel does not specify a symbol, its current trading pair is used
+    let book = ctx::subscribe(exchange, ctx::SubOpts::depth(20)).unwrap();
+    let acct = ctx::subscribe(exchange, ctx::SubOpts::private()).unwrap();
     loop {
-        match ctx::poll(&[s], Some(1000)) {
-            ctx::Polled::Event(ev) => Log!("event kind:", ev.kind),
+        match ctx::poll(&[], Some(1000)) {
+            ctx::Polled::Event(ev) => match ev.channel() {
+                "depth" => {
+                    if let Ok(b) = book.book(1) {
+                        if !b.bids.is_empty() && !b.asks.is_empty() {
+                            Log!("bid1:", b.bids[0].0, "ask1:", b.asks[0].0);
+                        }
+                    }
+                }
+                "positions" | "balance" => {
+                    Log!("positions:", format!("{:?}", acct.positions()));
+                }
+                channel => Log!("event:", channel, "kind:", ev.kind),
+            },
             ctx::Polled::Stopped => break,
             _ => {}
         }
@@ -12421,7 +12440,410 @@ fn main() {
 }
 ```
 
-See also: `ctx.subscribe`, `ctx.poll`, `ctx.book`, `EventLoop`
+Subscribe to tick-by-tick trades for three symbols in one batch. The call returns an array of subscription objects, which can be passed straight to ```ctx.poll()```. The example counts each symbol's trades over 1 minute and then unsubscribes from all of them at once.
+
+```javascript
+function main() {
+    // When symbol is an array, the subscription objects come back in the same order; if any symbol is invalid, none of the batch is subscribed
+    var symbols = ["BTC_USDT", "ETH_USDT", "SOL_USDT"]
+    var subs = ctx.subscribe(exchange, {channel: "trade", symbol: symbols})
+    subs.forEach(function(s) {
+        Log(s.symbol, "stream:", s.id)
+    })
+    var count = {}
+    var t0 = Date.now()
+    while (Date.now() - t0 < 60000) {
+        var ev = ctx.poll(subs, 1000)    // The subscription array can be passed straight to ctx.poll
+        if (!ev) {
+            continue
+        }
+        if (ev.kind === 35 && ev.prefillStatus === 2) {
+            Log("subscription failed:", ev.symbol, ev.message)   // Only this symbol's subscription failed
+        } else if (ev.kind === 4) {
+            count[ev.symbol] = (count[ev.symbol] || 0) + 1
+        }
+    }
+    Log("trades in 60 seconds:", count)
+    subs.unsubscribe()                   // Unsubscribe from all subscriptions at once
+}
+```
+
+```python
+import time
+
+def main():
+    # When symbol is a list, a SubscriptionList comes back in the same order; if any symbol is invalid, none of the batch is subscribed
+    symbols = ["BTC_USDT", "ETH_USDT", "SOL_USDT"]
+    subs = ctx.subscribe(exchange, {"channel": "trade", "symbol": symbols})
+    for s in subs:
+        Log(s.symbol, "stream:", s.id)
+    count = {}
+    t0 = time.time()
+    while time.time() - t0 < 60:
+        ev = ctx.poll(subs, 1000)          # A SubscriptionList can be passed straight to ctx.poll
+        if ev is None:
+            continue
+        if ev.kind == 35 and ev.prefillStatus == 2:
+            Log("subscription failed:", ev.symbol, ev.message)
+        elif ev.kind == 4:
+            count[ev.symbol] = count.get(ev.symbol, 0) + 1
+    Log("trades in 60 seconds:", count)
+    subs.unsubscribe()                     # Unsubscribe from all subscriptions at once
+```
+
+```rust
+use sdk::ctx::EventExt;
+use std::collections::HashMap;
+
+fn main() {
+    let symbols = ["BTC_USDT", "ETH_USDT", "SOL_USDT"];
+    // Returns handles in the same order as symbols; if any symbol is invalid, the whole batch returns Err
+    let subs = ctx::subscribe_many(exchange, ctx::SubOpts::trade(), &symbols).unwrap();
+    let ids: Vec<u32> = subs.iter().map(|s| s.id()).collect();
+    let mut count: HashMap<u32, u64> = HashMap::new();
+    let t0 = Unix();
+    while Unix() - t0 < 60 {
+        match ctx::poll(&ids, Some(1000)) {
+            ctx::Polled::Event(ev) if ev.kind == EV_MD_TRADE => {
+                *count.entry(ev.stream()).or_insert(0) += 1;
+            }
+            ctx::Polled::Stopped => return,
+            _ => {}
+        }
+    }
+    for (s, symbol) in subs.iter().zip(symbols) {
+        Log!(symbol, "trades in 60 seconds:", count.get(&s.id()).copied().unwrap_or(0));
+        s.unsubscribe().unwrap();
+    }
+}
+```
+
+Subscribing in a thread: the child thread subscribes to the order books of two symbols on its own, and these events are delivered only to that thread. The main thread subscribes to its own ticker, and the two do not interfere with each other.
+
+```javascript
+function main() {
+    var t = threading.Thread(function(symbols, ms) {
+        // Subscribe in the thread; events from these two subscriptions are delivered only to this thread
+        var subs = ctx.subscribe(0, {channel: "depth", symbol: symbols, depth: 5})
+        var n = 0
+        var t0 = Date.now()
+        while (Date.now() - t0 < ms) {
+            var ev = ctx.poll([], 1000)          // Only receives events subscribed by this thread
+            if (ev && ev.kind === 3) {
+                var b = ev.book(1)
+                if (b.bids.length > 0 && b.asks.length > 0) {
+                    Log("thread", ev.symbol, "bid1:", b.bids[0][0], "ask1:", b.asks[0][0])
+                }
+                n++
+            }
+        }
+        subs.unsubscribe()                       // Can only unsubscribe in the thread that created the subscription
+        return n
+    }, ["ETH_USDT", "SOL_USDT"], 30000)
+
+    var tk = ctx.subscribe(0, {channel: "ticker", symbol: "BTC_USDT"})
+    var t0 = Date.now()
+    while (Date.now() - t0 < 30000) {
+        var ev = ctx.poll([], 1000)              // Cannot receive the depth events subscribed by the child thread
+        if (ev && ev.kind === 1) {
+            Log("main", ev.symbol, "last:", ev.last)
+        }
+    }
+    tk.unsubscribe()
+    Log("depth updates in the thread:", t.join().ret)
+}
+```
+
+```python
+import threading
+import time
+
+def depth_worker(symbols, seconds):
+    # Subscribe in the thread; events from these two subscriptions are delivered only to this thread
+    subs = ctx.subscribe(0, {"channel": "depth", "symbol": symbols, "depth": 5})
+    t0 = time.time()
+    while time.time() - t0 < seconds:
+        ev = ctx.poll([], 1000)              # Only receives events subscribed by this thread
+        if ev is not None and ev.kind == 3:
+            b = ev.book(1)
+            if b["bids"] and b["asks"]:
+                Log("thread", ev.symbol, "bid1:", b["bids"][0][0], "ask1:", b["asks"][0][0])
+    subs.unsubscribe()                       # Also unsubscribed automatically when the thread exits
+
+def main():
+    t = threading.Thread(target=depth_worker, args=(["ETH_USDT", "SOL_USDT"], 30))
+    t.start()
+    tk = ctx.subscribe(0, {"channel": "ticker", "symbol": "BTC_USDT"})
+    t0 = time.time()
+    while time.time() - t0 < 30:
+        ev = ctx.poll([], 1000)              # Cannot receive the depth events subscribed by the child thread
+        if ev is not None and ev.kind == 1:
+            Log("main", ev.symbol, "last:", ev.last)
+    tk.unsubscribe()
+    t.join()
+```
+
+```rust
+fn main() {
+    let worker = std::thread::spawn(|| {
+        // Subscribe in the thread; events from these two subscriptions are delivered only to this thread
+        let symbols = ["ETH_USDT", "SOL_USDT"];
+        let subs = ctx::subscribe_many(0u16, ctx::SubOpts::depth(5), &symbols).unwrap();
+        let mut n = 0u64;
+        let t0 = Unix();
+        while Unix() - t0 < 30 {
+            match ctx::poll(&[], Some(1000)) {           // Only receives events subscribed by this thread
+                ctx::Polled::Event(ev) if ev.kind == EV_MD_DEPTH5 => n += 1,
+                ctx::Polled::Stopped => break,
+                _ => {}
+            }
+        }
+        for s in subs {
+            let _ = s.unsubscribe();                     // Can only unsubscribe in the thread that created the subscription
+        }
+        n
+    });
+    let tk = ctx::subscribe(0u16, ctx::SubOpts::ticker().symbol("BTC_USDT")).unwrap();
+    let t0 = Unix();
+    while Unix() - t0 < 30 {
+        match ctx::poll(&[tk.id()], Some(1000)) {
+            ctx::Polled::Event(ev) => Log!("main ticker event, seq:", ev.seq),
+            ctx::Polled::Stopped => return,
+            _ => {}
+        }
+    }
+    let _ = tk.unsubscribe();
+    Log!("depth updates in the thread:", worker.join().unwrap_or(0));
+}
+```
+
+Subscribe to all-market tickers: receive tickers for every symbol on the exchange through a single subscription, then count how many symbols have been received after 10 seconds; if the exchange does not support this, the subscription receives a failed status event.
+
+```javascript
+function main() {
+    // No symbol specified: a single subscription receives tickers for all symbols on the exchange
+    var all = ctx.subscribe(exchange, {channel: "tickers"})
+    var last = {}
+    var t0 = Date.now()
+    while (Date.now() - t0 < 10000) {
+        var ev = ctx.poll(all, 1000)
+        if (!ev) {
+            continue
+        }
+        if (ev.kind === 35 && ev.prefillStatus === 2) {
+            Log("tickers not supported:", ev.message)    // The exchange does not support all-market push
+            return
+        }
+        if (ev.kind === 1) {
+            last[ev.symbol] = ev.last                    // symbol is the instrument this ticker belongs to
+        }
+    }
+    Log("symbols:" , Object.keys(last).length, "BTC_USDT last:", last["BTC_USDT"])
+    all.unsubscribe()
+}
+```
+
+```python
+import time
+
+def main():
+    # No symbol specified: a single subscription receives tickers for all symbols on the exchange
+    all_tickers = ctx.subscribe(exchange, {"channel": "tickers"})
+    last = {}
+    t0 = time.time()
+    while time.time() - t0 < 10:
+        ev = ctx.poll(all_tickers, 1000)
+        if ev is None:
+            continue
+        if ev.kind == 35 and ev.prefillStatus == 2:
+            Log("tickers not supported:", ev.message)    # The exchange does not support all-market push
+            return
+        if ev.kind == 1:
+            last[ev.symbol] = ev.last                    # symbol is the instrument this ticker belongs to
+    Log("symbols:", len(last), "BTC_USDT last:" , last.get("BTC_USDT"))
+    all_tickers.unsubscribe()
+```
+
+```rust
+use sdk::ctx::EventExt;
+use std::collections::HashMap;
+
+fn main() {
+    // No symbol specified: a single subscription receives tickers for all symbols on the exchange
+    let all = ctx::subscribe(exchange, ctx::SubOpts::tickers()).unwrap();
+    let mut last: HashMap<String, f64> = HashMap::new();
+    let t0 = Unix();
+    while Unix() - t0 < 10 {
+        match ctx::poll(&[all.id()], Some(1000)) {
+            ctx::Polled::Event(ev) => {
+                if let Some(st) = ev.feed_status() {
+                    if st.failed() {
+                        Log!("tickers not supported:" , st.message);   // The exchange does not support all-market push
+                        return;
+                    }
+                } else if let Some(t) = ev.ticker() {
+                    last.insert(t.symbol, t.last);                     // symbol is the instrument this ticker belongs to
+                }
+            }
+            ctx::Polled::Stopped => return,
+            _ => {}
+        }
+    }
+    Log!("symbols:", last.len(), "BTC_USDT last:", format!("{:?}", last.get("BTC_USDT")));
+    let _ = all.unsubscribe();
+}
+```
+
+Identical subscriptions share a single event stream: the two subscription objects have the same ```id```, and after one of them unsubscribes, the other still keeps receiving events.
+
+```javascript
+function main() {
+    var a = ctx.subscribe(0, {channel: "trade", symbol: "BTC_USDT"})
+    var b = ctx.subscribe(0, {channel: "trade", symbol: "BTC_USDT"})
+    var c = ctx.subscribe(0, {channel: "ticker", symbol: "BTC_USDT"})
+    Log("a.id:", a.id, "b.id:", b.id, "c.id:", c.id)   // a.id and b.id are the same, c.id is different
+
+    a.unsubscribe()    // b still references this subscription, so the trade feed is not interrupted
+    var n = 0
+    while (n < 10) {
+        var ev = ctx.poll(b, 5000)
+        if (!ev) {
+            Log("no trade in 5 seconds")
+            continue
+        }
+        if (ev.kind === 4) {
+            Log("trade", ev.tradeId, ev.side, ev.px, ev.qty)
+            n++
+        }
+    }
+    b.unsubscribe()    // Releases the last reference; only now is the exchange actually unsubscribed
+    c.unsubscribe()
+}
+```
+
+```python
+def main():
+    a = ctx.subscribe(0, {"channel": "trade", "symbol": "BTC_USDT"})
+    b = ctx.subscribe(0, {"channel": "trade", "symbol": "BTC_USDT"})
+    c = ctx.subscribe(0, {"channel": "ticker", "symbol": "BTC_USDT"})
+    Log("a.id:", a.id, "b.id:", b.id, "c.id:", c.id)   # a.id and b.id are the same, c.id is different
+
+    a.unsubscribe()    # b still references this subscription, so the trade feed is not interrupted
+    n = 0
+    while n < 10:
+        ev = ctx.poll(b, 5000)
+        if ev is None:
+            Log("no trade in 5 seconds")
+            continue
+        if ev.kind == 4:
+            Log("trade", ev.tradeId, ev.side, ev.px, ev.qty)
+            n += 1
+    b.unsubscribe()    # Releases the last reference; only now is the exchange actually unsubscribed
+    c.unsubscribe()
+```
+
+Handling subscriptions rejected by the exchange: subscribing to an unsupported K-line interval does not throw an exception. Instead, the reason for the failure is reported in that subscription's own event stream.
+
+```javascript
+function main() {
+    // Most exchanges do not support 7-second K-lines
+    var k = ctx.subscribe(exchange, {channel: "kline", interval: 7})
+    while (true) {
+        var ev = ctx.poll(k, 3000)
+        if (!ev) {
+            continue
+        }
+        if (ev.kind === 35) {
+            if (ev.prefillStatus === 2) {
+                Log("kline subscription failed:", ev.message)
+                break
+            }
+            Log("kline history ready")
+        } else if (ev.kind === 5 && ev.closed) {
+            Log("closed bar", _D(ev.openTimeMs), ev.close)
+        }
+    }
+}
+```
+
+```python
+def main():
+    # Most exchanges do not support 7-second K-lines
+    k = ctx.subscribe(exchange, {"channel": "kline", "interval": 7})
+    while True:
+        ev = ctx.poll(k, 3000)
+        if ev is None:
+            continue
+        if ev.kind == 35:
+            if ev.prefillStatus == 2:
+                Log("kline subscription failed:", ev.message)
+                break
+            Log("kline history ready")
+        elif ev.kind == 5 and ev.closed:
+            Log("closed bar", _D(ev.openTimeMs), ev.close)
+```
+
+Fields of ```options```:
+
+| Field | Description |
+| - | - |
+| channel | Channel: ```ticker``` (default), ```bbo``` (best bid/offer), ```depth``` (order book), ```trade``` (tick-by-tick trades), ```kline``` (candlesticks), ```tickers``` (market-wide tickers), ```private``` (private account stream) |
+| symbol | Symbol code, e.g. ```BTC_USDT```, ```BTC_USDT.swap```; an array of symbol codes can also be passed (batch subscription). Required for market data channels; it can be omitted when ```ex``` is an exchange object, in which case the current trading pair of that exchange object is used. Do not pass this field for the ```tickers``` and ```private``` channels |
+| depth | Number of order book levels for the ```depth``` channel; when omitted or set to ```0```, the exchange's default depth is used |
+| interval | Candlestick period for the ```kline``` channel, in seconds, e.g. ```60``` |
+| mode | When set to ```latest```, only the most recent event is kept; older events not consumed in time are overwritten |
+| buffer | Capacity of the bounded buffer (positive integer, in number of events); on overflow the oldest events are discarded |
+
+For symbol notation, see `Symbol Codes`. When ```ex``` is an exchange object and ```symbol``` is not passed for a market data channel, the trading pair of that exchange object at the moment ```ctx.subscribe()``` is called is used; for futures, the contract type is included as well (e.g. ```BTC_USDT.swap```). Subsequent calls to ```exchange.SetCurrency()``` or ```exchange.SetContractType()``` do not change existing subscriptions. When ```ex``` is an index, ```symbol``` is not filled in automatically; the ```tickers``` (entire market) and ```private``` (entire account) channels never carry a ```symbol```.
+
+Passing an array as ```symbol``` makes a batch subscription, subscribing to multiple symbols in a single call:
+- Returns an array of subscription objects in the same order as the input array, even if the array has only one element; when ```symbol``` is a string, a single subscription object is still returned.
+- The whole batch is validated up front: if any symbol or option is invalid, an exception is thrown for the whole batch and none of the symbols is subscribed.
+- Once validation passes, each element is an independent subscription with its own ```id```, order book and reference count; if the exchange rejects one of the symbols, only that subscription receives a failed status event, and the other subscriptions keep pushing as normal.
+- The returned array has an ```unsubscribe()``` method (non-enumerable) that unsubscribes all elements in one call; the array can be passed directly to ```ctx.poll()```.
+
+The identity of a subscription is determined jointly by the account, ```symbol```, ```channel```, ```depth``` and ```interval```:
+- Within the same thread, subscriptions with exactly the same identity share one event stream, and the returned subscription objects have the same ```id```. The docker manages them by reference count: each call to ```ctx.subscribe()``` adds a reference, and each call to ```unsubscribe()``` on a subscription object removes one; the docker actually unsubscribes from the exchange only when the last reference is released, so unsubscribing in one place does not interrupt the same subscription still in use elsewhere.
+- If any of these differs, it is a separate subscription with a separate event stream: ```ticker``` and ```bbo``` for the same symbol are two subscriptions; ```depth``` of ```5``` and ```20``` are also two subscriptions, each maintaining its own order book (exchanges may push different depths at different frequencies, and the docker does not merge them into the largest depth).
+- Event stream IDs increase monotonically within a run and are never reused; subscribing again after fully unsubscribing yields a new ID.
+
+A subscription belongs to the thread that called ```ctx.subscribe()```. Both the main thread and threads created by ```threading.Thread()``` (the standard library ```threading.Thread``` in ```Python```, any thread in ```Rust```) can subscribe and receive events:
+- Events of a subscription are delivered only to the thread that subscribed to it, and ```ctx.poll()``` receives only the events of subscriptions made by the current thread. To have multiple threads each receive their own events, subscribe to the required streams separately in each thread.
+- When different threads subscribe to the same identity, the exchange is subscribed only once, and only one copy of the order book, candlestick cache and account state is kept; however, each thread gets its own subscription object (with a different ```id```) and its own independent copy of the events, with independent delivery modes, so a slow consumer in one thread does not affect other threads. The docker actually unsubscribes from the exchange only after all threads have unsubscribed.
+- When a thread subscribes later to a candlestick stream that is already pushing, it first receives the cached candlesticks (```prefill``` is ```true```) and the most recent initialization status event; the same applies to the private stream: if the account snapshot is ready, the thread immediately receives the full snapshot and the ready event, and ```positions()``` and ```balances()``` can be read right away. Other channels start receiving from the next push.
+- Only the thread that owns a subscription can unsubscribe it: calling ```unsubscribe()``` on that subscription object from another thread throws an exception, and the subscription remains active. When a thread ends, all its subscriptions are automatically unsubscribed; the same subscriptions shared by other threads are not affected.
+- Gateway status events are sent to every thread that has subscriptions on that exchange; timer events are sent only to the main thread.
+
+The ```tickers``` channel subscribes to tickers for the entire market: without passing ```symbol```, a single subscription receives tickers for all symbols on that exchange. The events are the same as ticker events (```kind``` is ```1```), with ```channel``` set to ```tickers``` and ```symbol``` set to each respective symbol.
+- Supported only when the exchange provides a market-wide push; for each exchange's support, see the "Push" column of the market data group in `Capability Matrix` and the individual exchange pages. On unsupported exchanges, the subscription receives a failed status event (```message``` starts with ```unsupported channel: tickers```), and it does not automatically fall back to per-symbol subscriptions.
+- On some exchanges the market-wide push does not include the best bid and best ask prices, in which case ```bid``` and ```ask``` are ```0```; if you need bid/ask prices, subscribe to ```ticker``` or ```bbo``` per symbol.
+- By default, the latest event is kept for each symbol: even if consumption is slow, you still get the latest ticker for every symbol.
+
+The ```private``` channel is the account's private stream. It takes no ```symbol```, covers the entire account, and there is only one per account. Order updates, positions and balances are all pushed on this single event stream, with the ```channel``` of the corresponding events being ```orders```, ```positions``` and ```balance``` respectively:
+
+- Once the subscription takes effect (and after each reconnection), an account snapshot (positions, balances, with ```snapshot``` set to ```true```) is pushed first, followed by a status event with ```kind``` of ```35``` and ```channel``` of ```private```: ```prefillStatus``` of ```1``` means the snapshot is ready, and ```2``` means the snapshot failed (```message``` gives the reason for failure, and the docker automatically retries with backoff). Only after that does real-time pushing begin (```snapshot``` is ```false```). Order updates have no snapshot.
+- Every push of a position or balance is the complete current state of that position or asset, not an incremental update: a position quantity of ```0``` means the position has been closed, and both available and frozen being ```0``` means the asset has been cleared.
+- The `positions` and `balances` methods of the subscription object return the latest positions and balances maintained by the docker from the pushed data.
+- What the real-time pushes cover varies by exchange (for example, some exchanges do not push positions and only provide a snapshot). See the notes on each exchange's page for details.
+
+Subscriptions are lazy: ```ctx.subscribe()``` returns immediately and registers the subscription, but the connection to the exchange is not established and the subscription request is not sent until ```ctx.poll()``` is called for the first time. Changes in connection status are notified through gateway status events (```kind``` is ```33```, ```channel``` is ```gateway```).
+
+Subscription failures fall into two cases:
+
+- An exception is thrown when the parameters are invalid, for example: the number of parameters is not 2, the second parameter is not an object, ```options``` contains an unknown field (such as a misspelled ```intervel```), an unknown ```channel```, a market data channel without ```symbol```, the ```tickers``` or ```private``` channel with ```symbol```, both ```mode``` and ```buffer``` passed at the same time, or the ```symbol``` array contains an invalid element (in which case none of the batch is subscribed).
+- When the exchange or connector rejects the subscription (for example, an unsupported channel, K-line period or depth level), ```ctx.subscribe()``` does not throw an exception. Instead, a status event with ```kind``` of ```35``` and ```prefillStatus``` of ```2``` is received on that subscription's own event stream, with ```message``` giving the reason for failure. After that, the subscription is void, and calling ```unsubscribe()``` does nothing.
+
+Handling when events are not retrieved in time (delivery mode): ```ticker```, ```bbo``` and ```depth``` keep only the latest event by default, and ```tickers``` keeps only the latest event per symbol by default; ```trade``` and ```kline``` buffer the most recent ```1024``` events by default, discarding the oldest events on overflow. This can be changed via ```mode``` or ```buffer``` (only one of the two may be used). Order update, position, balance, gateway status and initialization status events are never discarded, so ```ctx.poll()``` must be called continuously after subscribing. The order book is continuously updated inside the docker and is not affected by how fast events are retrieved; reading it via ```book()``` at any time always returns the latest complete order book. To check whether the docker's buffer for receiving pushes is backed up, see the ```ctx.connectors()``` counters in `ctx.poll`.
+
+Pushes are completely independent of the REST interfaces: subscriptions only affect the events received by ```ctx.poll()```. Functions such as `exchange.GetTicker`, `exchange.GetDepth`, `exchange.GetTrades`, `exchange.GetRecords` and `exchange.GetAccount` request the exchange's REST interface directly every time and do not read pushed data; whether you subscribe, and what you subscribe to, does not change their return values.
+
+In ```JavaScript``` and ```Rust``` strategies, ```ctx.poll()``` and `EventLoop` within the same thread retrieve events from the same event queue, so a thread should use only one of the two methods to retrieve events. In ```Python```, ```EventLoop()``` has its own independent queue (containing only the market data and order updates automatically subscribed for broker-counter exchanges, plus completion notifications of concurrent tasks such as ```exchange.Go()```), and does not compete with ```ctx.poll()```. For whether each exchange supports pushes and which channels it supports, see the `capability matrix` and the notes on each exchange's page.
+
+```Python``` strategies are written the same way as ```JavaScript```: ```ctx.subscribe(ex, options)``` accepts only these two positional arguments (passing more, fewer, or keyword arguments raises ```TypeError```), ```options``` is a dict with the same fields and validation rules, and the dict passed in is not modified. When ```options["symbol"]``` is a list (or tuple), a ```SubscriptionList``` is returned (a subclass of ```list```, with elements in the same order as passed in), and calling its ```unsubscribe()``` unsubscribes all elements at once. The attributes of a subscription object are read-only, and ```info()``` returns a dict containing the same fields. Threads created via ```threading.Thread``` automatically unsubscribe their subscriptions when they end; threads created by bypassing ```threading.Thread```, such as via ```_thread.start_new_thread()```, can also subscribe, but do not automatically unsubscribe when they end, so you need to call ```unsubscribe()``` yourself.
+
+```Rust``` strategies use the function of the same name in the ```ctx``` module: ```ctx::subscribe(ex, opts: ctx::SubOpts) -> Result<ctx::Sub, String>```, where ```ex``` can be an exchange object (```exchange```, ```exchanges[i]```) or an index of type ```u16```; on failure it returns ```Err``` and does not panic. Subscription options are built with ```ctx::SubOpts::ticker()```, ```bbo()```, ```trade()```, ```depth(n)```, ```kline(seconds)```, ```tickers()``` or ```private()```, followed by chained calls to ```.symbol("BTC_USDT")```, ```.latest()``` and ```.buffer(n)```. Batch subscriptions use ```ctx::subscribe_many(ex, opts, &["BTC_USDT", "ETH_USDT"]) -> Result<Vec<ctx::Sub>, String>```, which also validates the entire batch first. The returned ```ctx::Sub``` can be copied and provides the methods ```id()``` (passed to ```ctx::poll(&[sub.id()], ...)```), ```book(n)```, ```positions()```, ```balances()``` and ```unsubscribe()```. The reference count is based on the number of ```ctx::subscribe()``` calls, so every call must be matched by one call to ```unsubscribe()```. Any thread in ```Rust``` can create a subscription, and the subscription likewise belongs to the thread that created it.
+
+See also: `ctx.poll`, `Subscription`, `EventLoop`, `exchange.GetTicker`, `Exchange Capability Matrix`
 
 #### ctx.poll
 
@@ -12432,22 +12854,22 @@ ctx.poll(streams, timeout)
 ctx.poll(options, timeout)
 ```
 
-Takes the next subscription event, optionally waiting with a timeout. Events come from subscriptions made with `ctx.subscribe`; the strategy handles them by their ```kind```.
+Takes the next push event from the current thread's subscriptions, with an optional wait timeout. Events come from subscriptions the current thread created with `ctx.subscribe`. A strategy can handle each event by its ```channel``` (or ```kind```).
 
 Parameters:
 
-- `streams` (number / array, optional): Streams to take events from: an ID returned by ```ctx.subscribe()``` or an array of IDs. Omitted or ```[]``` means all streams, which is what a single-threaded strategy normally uses. Built-in streams: ```ctx.STREAM_TIMER``` (timers), ```ctx.STREAM_STATUS``` (gateway status), ```ctx.STREAM_REST``` (every stream not named by another filter).
-- `timeout` (number, optional): Wait timeout in milliseconds; must be a non-negative integer. When omitted it waits until an event arrives; ```0``` does not wait; a positive number waits at most that long and returns a null value on timeout.
-- `options` (object, optional): Object form ```{streams, sources}```: ```streams``` as above; ```sources``` is an array of event sources to wait on: ```engine``` (subscription events, the default), ```thread``` (thread messages), ```go``` (completion of ```exchange.Go()``` and other concurrent tasks), ```dial``` (a ```Dial()``` connection is readable), ```task```, or ```all``` for all of them. In this form the return value is wrapped as ```{source, event, seq, nano, queue}```, where ```event``` is the payload of that source.
+- `streams` (object / number / array, optional): The event streams to read from: a `Subscription` object or an event stream ID, or an array of them. Arrays can mix both kinds and can be nested, so the array returned by a batch subscription can be passed in directly. Omit this argument or pass ```[]``` to read all event streams the current thread subscribes to, which is the most common usage. Built-in event streams: ```ctx.STREAM_TIMER``` (timer) and ```ctx.STREAM_STATUS``` (gateway status).
+- `timeout` (number, optional): Wait timeout in milliseconds. Must be a non-negative integer. If omitted, the call waits until an event arrives. ```0``` returns immediately without waiting. A positive number sets the maximum wait time, and the call returns a null value when it times out.
+- `options` (object, optional): An object of the form ```{streams, sources}```, supported only in ```JavaScript```. ```streams``` works as described above. ```sources``` is an array of the event sources to wait on. Possible values are ```engine``` (push events, the default), ```thread``` (thread messages), ```go``` (completion of concurrent tasks such as ```exchange.Go()```), ```dial``` (a ```Dial()``` connection is readable), ```task```, or ```all``` for all sources. In this form, the return value is wrapped as ```{source, event, seq, nano, queue}```, where ```event``` is the event content from the matching source.
 
-Returns (object / null value): Event object, fields below; a null value when the timeout expires without an event.
+Returns (object / null value): An event object; its fields are described below. Returns a null value when the call times out with no event.
 
-Subscribe to 1-minute K-lines, act only when a bar closes, and log gateway status changes.
+Subscribe to 1-minute klines, process each bar only when it closes, and log gateway status changes.
 
 ```javascript
 function onKline(ev) {
     if (ev.prefill) {
-        return                        // historical bars pushed on the first subscription
+        return                        // historical klines pushed on first subscription
     }
     if (ev.closed) {
         Log("closed bar", _D(ev.openTimeMs), "close:", ev.close, "volume:", ev.volume)
@@ -12455,103 +12877,717 @@ function onKline(ev) {
 }
 
 function main() {
-    ctx.subscribe(0, "BTC_USDT", {channel: "kline", interval: 60})
+    var k1m = ctx.subscribe(exchange, {channel: "kline", interval: 60})
     while (true) {
         var ev = ctx.poll([], 5000)
         if (!ev) {
             Log("no event in 5 seconds")
             continue
         }
-        if (ev.kind === 5) {
+        if (ev.stream === k1m.id && ev.kind === 5) {
             onKline(ev)
-        } else if (ev.kind === 35) {
-            Log("kline history ready:", JSON.stringify(ev))
+        } else if (ev.stream === k1m.id && ev.kind === 35) {
+            if (ev.prefillStatus === 2) {
+                throw new Error("kline subscription failed: " + ev.message)
+            }
+            Log("kline history ready")
         } else if (ev.kind === 33) {
-            Log("gateway status:", JSON.stringify(ev))
+            Log("gateway status:", ev.status)
         }
     }
 }
 ```
 
-Every event has these fields:
+```python
+def on_kline(ev):
+    if ev.prefill:
+        return                        # historical klines pushed on first subscription
+    if ev.closed:
+        Log("closed bar", _D(ev.openTimeMs), "close:", ev.close, "volume:", ev.volume)
 
-| Field | Type | Description |
-| - | - | - |
-| kind | number | Event type: ```1``` ticker, ```3``` depth, ```4``` trade, ```5``` K-line, ```16``` order update, ```32``` timer, ```33``` gateway status, ```35``` K-line history status |
-| ex | number | Index of the account in ```exchanges```; can be passed directly as the first argument of ```ctx.book()``` etc. ```-1``` for events that belong to no account |
-| symbol | string | Instrument code, for example ```BTC_USDT``` or ```BTC_USDT.swap``` |
-| seq | number | Event sequence number, monotonically increasing |
-| ts | number | Time the docker received the exchange data (millisecond timestamp with a fraction); ```Date.now() - ev.ts``` is the docker's internal and polling latency, excluding the network latency from the exchange |
-
-Other fields per event type:
-
-| kind | Fields |
-| - | - |
-| 1 (ticker, bbo) | ```bid```, ```ask```, ```last```, ```bidQty```, ```askQty```, ```volume```, ```openInterest```, ```open```, ```high```, ```low```, ```time``` (exchange time, ms). ```last``` is ```0``` on a ```bbo``` channel without a last price |
-| 3 (depth) | No level fields; it only signals that the order book changed. Read the levels with `ctx.book` |
-| 4 (trade) | ```px``` (price), ```qty``` (quantity), ```side``` (taker side ```buy```/```sell```, ```""``` when the exchange does not provide it), ```tradeId```, ```time``` |
-| 5 (K-line) | ```open```, ```high```, ```low```, ```close```, ```volume```, ```openInterest```, ```intervalSec```, ```openTimeMs```, ```closed``` (the bar is closed), ```prefill``` (historical bar pushed on the first subscription) |
-| 16 (order update) | ```id``` (order ID), ```state``` (```acked```, ```partial```, ```filled```, ```canceled```, ```rejected```), ```px```, ```qty```, ```filledQty```, ```avgPx```, ```reason``` (rejection code, ```0``` for none), ```reasonText``` |
-| 33 (gateway status) | ```status``` (```1``` up, ```2``` down, ```3``` degraded), ```detail``` |
-| 35 (K-line history) | ```channel```, ```intervalSec```, ```prefillStatus``` (```1``` ready, ```2``` failed), ```message``` (failure reason) |
-
-Prices and quantities are real numbers, already converted with the contract precision.
-
-When filtering with ```streams```, make sure every stream is consumed somewhere: order updates, gateway status and timer events are never dropped and pile up if nobody takes them. Pass ```[]``` when events are taken in one place; when they are taken in several places, one of them must include ```ctx.STREAM_REST```.
-
-While waiting, ```Promise``` and ```setTimeout``` callbacks and WebSocket/TCP I/O keep running; with ```timeout``` ```0``` one round of these tasks is still processed.
-
-Subscription events can only be taken on the main thread; in a thread created by ```threading.Thread()``` only the ```options``` form waiting on other sources such as ```thread``` is available. ```ctx.poll()``` and `EventLoop` take events from the same queue; use only one of them in a strategy.
-
-In ```Rust``` it is ```ctx::poll(streams: &[u32], timeout_ms: Option<u64>) -> ctx::Polled```: an empty slice means all streams and ```None``` waits indefinitely; it returns ```Polled::Event(ev)```, ```Polled::Empty``` (timeout), ```Polled::Stopped``` (the live trading is stopping) or ```Polled::Error(rc)```. ```Rust``` events are raw structures whose prices and quantities are fixed-point integers (query the scales with ```ctx::scales_of```). ```Rust``` can poll different streams in different threads. ```Python``` has no such interface.
-
-See also: `ctx.subscribe`, `ctx.poll`, `ctx.book`, `EventLoop`
-
-#### ctx.book
-
-```
-ctx.book(ex, symbol)
-ctx.book(ex, symbol, n)
+def main():
+    k1m = ctx.subscribe(exchange, {"channel": "kline", "interval": 60})
+    while True:
+        ev = ctx.poll([], 5000)
+        if ev is None:
+            Log("no event in 5 seconds")
+            continue
+        if ev.stream == k1m.id and ev.kind == 5:
+            on_kline(ev)
+        elif ev.stream == k1m.id and ev.kind == 35:
+            if ev.prefillStatus == 2:
+                raise Exception("kline subscription failed: " + ev.message)
+            Log("kline history ready")
+        elif ev.kind == 33:
+            Log("gateway status:", ev.status)
 ```
 
-Reads the order book maintained by the docker. The ```depth``` channel of the instrument must be subscribed first with `ctx.subscribe`.
+```rust
+use sdk::ctx::EventExt;
 
-Parameters:
+fn main() {
+    let k1m = ctx::subscribe(exchange, ctx::SubOpts::kline(60)).unwrap();
+    loop {
+        match ctx::poll(&[], Some(5000)) {
+            ctx::Polled::Event(ev) if ev.stream() == k1m.id() => {
+                if let Some(k) = ev.kline() {
+                    if !k.prefill && k.closed {        // skip historical klines pushed on first subscription
+                        Log!("closed bar", _D(k.open_time), "close:", k.close, "volume:", k.volume);
+                    }
+                } else if let Some(st) = ev.feed_status() {
+                    if st.failed() {
+                        panic!("kline subscription failed: {}", st.message);
+                    }
+                    Log!("kline history ready");
+                }
+            }
+            ctx::Polled::Event(ev) => {
+                if let Some(g) = ev.gateway() {
+                    Log!("gateway status:", g.status);
+                }
+            }
+            ctx::Polled::Empty => Log!("no event in 5 seconds"),
+            ctx::Polled::Stopped => break,
+            _ => {}
+        }
+    }
+}
+```
 
-- `ex` (number, required): Index of the account in the ```exchanges``` array; ```ev.ex``` of a depth event can be passed directly.
-- `symbol` (string, required): Instrument code; ```ev.symbol``` of a depth event can be passed directly. The notation is described in `Symbols`.
-- `n` (number, optional): Number of levels per side; ```5``` when omitted.
-
-Returns (object): ```{bids: [[price, quantity], ...], asks: [[price, quantity], ...]}```, with ```bids``` from high to low price and ```asks``` from low to high. Both sides are empty arrays until order book data arrives; an unknown instrument returns an ```Error``` object (no exception is thrown), checked with ```instanceof Error```.
-
-Subscribe to the order book and read the best bid and ask on every update.
+Subscribe to the account's private stream: once the account snapshot is ready, read positions and balances, then process the incremental updates as they are pushed.
 
 ```javascript
 function main() {
-    ctx.subscribe(0, "BTC_USDT", {channel: "depth", depth: 20})
+    var acct = ctx.subscribe(exchange, {channel: "private"})
     while (true) {
         var ev = ctx.poll([], 1000)
-        if (!ev || ev.kind !== 3) {
+        if (!ev || ev.stream !== acct.id) {
             continue
         }
-        // a depth event only signals that the book changed; read the levels with ctx.book()
-        var book = ctx.book(ev.ex, ev.symbol, 5)
-        if (book instanceof Error) {
-            Log("ctx.book failed:", book.message)
-            continue
-        }
-        if (book.bids.length > 0 && book.asks.length > 0) {
-            Log("bid1:", book.bids[0][0], book.bids[0][1], "ask1:", book.asks[0][0], book.asks[0][1])
+        if (ev.kind === 35) {
+            if (ev.prefillStatus === 1) {
+                Log("balances:", acct.balances(), "positions:", acct.positions())
+            } else {
+                Log("account snapshot failed:", ev.message)
+            }
+        } else if (ev.kind === 17 && !ev.snapshot) {
+            Log("position", ev.symbol, ev.posSide, "qty:", ev.qty, "avgPx:", ev.avgPx)
+        } else if (ev.kind === 18 && !ev.snapshot) {
+            Log("balance", ev.asset, "free:", ev.free, "frozen:", ev.frozen)
+        } else if (ev.kind === 16) {
+            Log("order", ev.id, ev.state, "filled:", ev.filledQty, "/", ev.qty)
         }
     }
 }
 ```
 
-A depth event (```kind``` ```3```) only signals that the order book changed and carries no levels. The book is updated inside the docker from the exchange pushes, independent of how fast the strategy takes events, so it always reads the latest full book.
+```python
+def main():
+    acct = ctx.subscribe(exchange, {"channel": "private"})
+    while True:
+        ev = ctx.poll([], 1000)
+        if ev is None or ev.stream != acct.id:
+            continue
+        if ev.kind == 35:
+            if ev.prefillStatus == 1:
+                Log("balances:", acct.balances(), "positions:", acct.positions())
+            else:
+                Log("account snapshot failed:", ev.message)
+        elif ev.kind == 17 and not ev.snapshot:
+            Log("position", ev.symbol, ev.posSide, "qty:", ev.qty, "avgPx:", ev.avgPx)
+        elif ev.kind == 18 and not ev.snapshot:
+            Log("balance", ev.asset, "free:", ev.free, "frozen:", ev.frozen)
+        elif ev.kind == 16:
+            Log("order", ev.id, ev.state, "filled:", ev.filledQty, "/", ev.qty)
+```
 
-In ```Rust``` it is ```ctx::book(ex: u16, symbol: &str, n: usize) -> Result<String, String>```, returning a JSON string of the same structure. ```Python``` has no such interface.
+```rust
+use sdk::ctx::EventExt;
 
-See also: `ctx.subscribe`, `ctx.poll`, `ctx.book`, `EventLoop`, `exchange.GetDepth`
+fn main() {
+    let acct = ctx::subscribe(exchange, ctx::SubOpts::private()).unwrap();
+    loop {
+        match ctx::poll(&[], Some(1000)) {
+            ctx::Polled::Event(ev) if ev.stream() == acct.id() => {
+                if let Some(st) = ev.feed_status() {
+                    if st.ready() {
+                        Log!("balances:", format!("{:?}", acct.balances()),
+                             "positions:", format!("{:?}", acct.positions()));
+                    } else {
+                        Log!("account snapshot failed:", st.message);
+                    }
+                } else if let Some(p) = ev.position().filter(|p| !p.snapshot) {
+                    Log!("position", p.symbol, p.pos_side, "qty:", p.qty, "avgPx:", p.avg_px);
+                } else if let Some(b) = ev.balance().filter(|b| !b.snapshot) {
+                    Log!("balance", b.asset, "free:", b.free, "frozen:", b.frozen);
+                } else if let Some(o) = ev.order() {
+                    Log!("order", o.id, o.state, "filled:", o.filled_qty, "/", o.qty);
+                }
+            }
+            ctx::Polled::Stopped => break,
+            _ => {}
+        }
+    }
+}
+```
+
+Subscribe to tickers for the entire market, and once a minute log the number of events received together with the receive-buffer counters from ```ctx.connectors()```, to check whether the strategy processes events fast enough to keep up with the market data push.
+
+```javascript
+function main() {
+    var all = ctx.subscribe(exchange, {channel: "tickers"})
+    var n = 0
+    var last = Date.now()
+    while (true) {
+        var ev = ctx.poll([], 1000)
+        if (ev && ev.kind === 1) {
+            n++
+        } else if (ev && ev.kind === 35 && ev.prefillStatus === 2) {
+            throw new Error("tickers subscription failed: " + ev.message)
+        }
+        if (Date.now() - last >= 60000) {
+            var feed = ctx.connectors()[exchange.GetIndex()].feed
+            Log("tickers/min:", n, "dropped:", feed.ticksDropped,
+                "backpressure:", feed.backpressure, "ring:", feed.ringCapacity)
+            n = 0
+            last = Date.now()
+        }
+    }
+}
+```
+
+```python
+import time
+
+def main():
+    all_tickers = ctx.subscribe(exchange, {"channel": "tickers"})
+    n = 0
+    last = time.time()
+    while True:
+        ev = ctx.poll([], 1000)
+        if ev is not None and ev.kind == 1:
+            n += 1
+        elif ev is not None and ev.kind == 35 and ev.prefillStatus == 2:
+            raise Exception("tickers subscription failed: " + ev.message)
+        if time.time() - last >= 60:
+            feed = ctx.connectors()[all_tickers.ex].feed
+            Log("tickers/min:", n, "dropped:", feed.ticksDropped,
+                "backpressure:", feed.backpressure, "ring:", feed.ringCapacity)
+            n = 0
+            last = time.time()
+```
+
+```rust
+use sdk::ctx::EventExt;
+
+fn main() {
+    let all = ctx::subscribe(exchange, ctx::SubOpts::tickers()).unwrap();
+    let mut n = 0u64;
+    let mut last = Unix();
+    loop {
+        match ctx::poll(&[all.id()], Some(1000)) {
+            ctx::Polled::Event(ev) => {
+                if ev.kind == EV_MD_TICK {
+                    n += 1;
+                } else if let Some(st) = ev.feed_status().filter(|st| st.failed()) {
+                    panic!("tickers subscription failed: {}", st.message);
+                }
+            }
+            ctx::Polled::Stopped => break,
+            _ => {}
+        }
+        if Unix() - last >= 60 {
+            // Returns a JSON array with one entry per exchange; its feed field holds the receive-buffer counters
+            Log!("tickers/min:", n, "connectors:", ctx::connectors());
+            n = 0;
+            last = Unix();
+        }
+    }
+}
+```
+
+All events contain the following fields:
+
+| Field | Type | Description |
+| - | - | - |
+| kind | number | Event type: ```1``` ticker, bbo and tickers; ```3``` depth; ```4``` trade; ```5``` K-line; ```16``` order report; ```17``` position; ```18``` balance; ```32``` timer; ```33``` gateway status; ```35``` initialization status |
+| stream | number | The event stream that delivered the event: for events produced by a subscription, it is the ```id``` of the subscription object in this thread; gateway status events and timer events come from the built-in event streams ```ctx.STREAM_STATUS``` (```2```) and ```ctx.STREAM_TIMER``` (```1```), respectively |
+| type | string | ```data``` (market data, plus order reports, positions and balances from the private stream), ```status``` (gateway status, initialization status), ```timer``` (timer) |
+| channel | string | The channel of the subscription the event belongs to: ```ticker```, ```bbo```, ```tickers```, ```depth```, ```trade```, ```kline```; for private stream events it is ```orders```, ```positions```, ```balance```; for gateway status events it is ```gateway```, and for timer events it is ```timer```; for initialization status events, see below |
+| depth | number | Included only in depth events: the number of levels of the subscription the event belongs to (```0``` means the exchange's default number of levels) |
+| interval | number | Included only in K-line events and in initialization status events of K-line subscriptions: the K-line period, in seconds |
+| ex | number | The index of the account in ```exchanges```, which can be passed directly as the first argument of ```ctx.subscribe()```; ```-1``` for events that do not belong to any account |
+| symbol | string | Symbol code, e.g. ```BTC_USDT```, ```BTC_USDT.swap```; for ```tickers``` events it is the respective symbol of each entry; an empty string for balance events and for status events of the private stream |
+| seq | number | Event sequence number, monotonically increasing |
+| ts | number | The time at which the docker received the data from the exchange (millisecond timestamp, including a fractional part); ```Date.now() - ev.ts``` is the docker's internal processing and event retrieval latency, excluding the network latency from the exchange to the docker |
+
+Additional fields for each event type:
+
+| kind | Fields |
+| - | - |
+| 1 (ticker, bbo, tickers) | ```bid```, ```ask```, ```last```, ```bidQty```, ```askQty```, ```volume```, ```openInterest```, ```open```, ```high```, ```low```, ```time``` (exchange time, in milliseconds). When ```bbo``` has no last price, ```last``` is ```0```; when the market-wide push does not include bid/ask prices, ```bid``` and ```ask``` of ```tickers``` are ```0``` |
+| 3 (depth) | Contains no level fields; it only indicates that the order book has been updated. Level data is read via ```ev.book(n)```, see below |
+| 4 (trade) | ```px``` (price), ```qty``` (quantity), ```side``` (aggressor side ```buy```/```sell```, an empty string when not provided by the exchange), ```tradeId```, ```time``` (exchange trade time, in milliseconds) |
+| 5 (K-line) | ```open```, ```high```, ```low```, ```close```, ```volume```, ```openInterest```, ```intervalSec```, ```openTimeMs```, ```closed``` (whether the K-line has closed), ```prefill``` (whether it is a historical K-line pushed on the initial subscription) |
+| 16 (order report) | ```id``` (order ID), ```state``` (```acked```, ```partial```, ```filled```, ```canceled```, ```rejected```), ```px```, ```qty```, ```filledQty```, ```avgPx```, ```reason``` (rejection reason code, ```0``` means none), ```reasonText``` |
+| 17 (position) | ```side``` (```buy``` for long, ```sell``` for short), ```posSide``` (```long```, ```short``` in hedge mode, ```net``` in one-way mode), ```qty```, ```avgPx```, ```profit```, ```margin```, ```liqPx```, ```markPx```, ```leverage```, ```time```, ```snapshot``` |
+| 18 (balance) | ```asset``` (asset name), ```free``` (available), ```frozen``` (frozen), ```equity```, ```upnl```, ```margin```, ```time```, ```snapshot``` |
+| 32 (timer) | ```timerId```, ```scheduledNs``` (a string when it exceeds the ```JavaScript``` safe integer range) |
+| 33 (gateway status) | ```status``` (```1``` connected normally, ```2``` disconnected, ```3``` degraded), ```detail``` |
+| 35 (initialization status) | ```channelCode``` (numeric code of the channel), ```intervalSec```, ```prefillStatus``` (```1``` ready, ```2``` failed), ```detail```, ```message``` (failure reason) |
+
+Prices and quantities are all real numbers, already converted according to the contract precision.
+
+The ```tradeId``` of a trade event is always a string, in the same format as the trade IDs returned by `exchange.GetTrades`: numeric trade IDs from the exchange are represented as decimal strings, and other formats are kept as is; when the exchange does not provide a trade ID, it is a synthetic ID prefixed with ```syn:```; an empty string means the connector did not provide a trade ID.
+
+Depth events have an ```ev.book(n)``` method that reads the top ```n``` levels of the order book maintained by the subscription the event belongs to (when ```n``` is omitted, the subscription's depth level count is used). It returns ```{bids: [[price, qty], ...], asks: [[price, qty], ...]}```, where ```bids``` are sorted by price from high to low and ```asks``` from low to high, the same as the subscription object's `book` method. ```ev.book``` is a non-enumerable property, so it is not included in the result of ```JSON.stringify(ev)```. Calling it after the subscription has been unsubscribed throws an exception.
+
+Position events (```kind``` is ```17```) and balance events (```kind``` is ```18```) come from the ```private``` subscription. Each event is the complete current state of that position or asset, not an incremental update: a position ```qty``` of ```0``` means the position is closed (in one-way position mode, ```side``` is an empty string after closing), and a balance with both ```free``` and ```frozen``` at ```0``` means the asset has been fully cleared. The fields follow the same conventions as `exchange.GetAssets` and `exchange.GetPositions`. When the exchange does not push them, ```profit```, ```margin```, ```liqPx```, ```markPx```, ```leverage```, ```equity``` and ```upnl``` are absent (rather than ```0```). A ```snapshot``` of ```true``` means this is an account snapshot pushed when the subscription takes effect or after a reconnection. After the snapshot, an initialization status event whose ```channel``` is ```private``` follows on the same event stream.
+
+The initialization status event (```kind``` is ```35```) shares the same event stream as the subscription it belongs to (same ```stream```), and its ```channel``` is that subscription's channel (```private``` for the status event of the private stream snapshot). It is used in the following cases: a K-line subscription has finished pushing the initial batch of historical K-lines, a ```private``` subscription has finished pushing the account snapshot (```prefillStatus``` is ```1```), or the subscription was rejected by the exchange or the connector (```prefillStatus``` is ```2```, ```message``` is the reason for the failure, and the channel can be any channel). Until the ready status arrives, do not treat the few real-time K-lines received so far as complete historical data.
+
+```ctx.poll()``` only retrieves events subscribed by the current thread: the main thread and threads created by ```threading.Thread()``` (the standard library ```threading.Thread``` in ```Python```) each subscribe and retrieve on their own, and a filter that specifies another thread's subscription object or event stream ID never retrieves any events. When different threads subscribe to the same content, each receives its own copy. Gateway status events are sent to every thread that has subscriptions on that exchange, and timer events are sent only to the main thread.
+
+Filtering with ```streams``` only means that this call retrieves just the specified event streams: unspecified events remain in this thread's queue and must eventually be drained by a call without a filter (```[]```). Order updates, position, balance, gateway status, initialization status and timer events are not overwritten when they are not retrieved in time; if nobody retrieves them they keep accumulating, up to 10240 events per thread, after which the oldest events are discarded.
+
+While waiting, ```Promise``` and ```setTimeout``` callbacks as well as reads and writes on WebSocket and TCP connections are still executed; when ```timeout``` is ```0```, one round of these tasks is also processed.
+
+In ```JavaScript``` and ```Rust```, ```ctx.poll()``` and `EventLoop` within the same thread retrieve events from the same event queue, so a thread should use only one of them. A ```JavaScript``` thread can use the ```options``` form to wait for push events, thread messages and other sources at the same time. In ```Python```, ```EventLoop()``` has its own separate queue and does not compete with ```ctx.poll()```.
+
+Diagnosing consumption speed: the docker's buffer for receiving pushes from each exchange automatically expands from 1024 to 32768 events as the backlog grows. Once the limit is reached, market data events are discarded and the connector is told to throttle pushing other events. ```ctx.connectors()``` returns the list of loaded exchanges (the order corresponds to ```ev.ex```); each item contains the fields ```ex```, ```label```, ```name```, ```symbol```, ```interval```, ```orderIdScope``` and ```feed```. ```feed``` holds cumulative counters since the process started, ```{ticksDropped, backpressure, ringCapacity}```, which are, in order: the number of market data events discarded when the buffer was full, the number of times the connector was told to throttle pushing, and the current buffer capacity (in events). Rapid growth of these values indicates that the strategy processes events too slowly; check the processing time per event first. High-frequency subscriptions such as market-wide ```tickers``` should keep the default latest-data-only mode.
+
+In ```Python``` it is ```ctx.poll(streams=None, timeout_ms=None)```: when ```streams``` is ```None``` or ```[]```, it means all event streams subscribed by this thread; otherwise it is a subscription object, an event stream ID, a ```SubscriptionList```, or a (nested) list of them. When ```timeout_ms``` is ```None``` it waits indefinitely, when ```0``` it does not wait, and when a positive integer it is the maximum number of milliseconds to wait, returning ```None``` on timeout. Events are dictionaries (subclasses of ```dict```) with the same fields as ```JavaScript``` events, and both ```ev["kind"]``` and ```ev.kind``` work; depth events have the ```ev.book(n)``` method. After the live trading bot stops (including while ```onexit()``` is running), calling it throws ```StopError```, and a call that is waiting also throws this exception immediately. The ```options``` form is not supported (passing a dictionary throws ```TypeError```): thread messages and completion notifications of ```exchange.Go()``` are retrieved through ```EventLoop()``` and their respective objects. ```ctx.connectors()``` is the same as in ```JavaScript```, and ```ctx.STREAM_STATUS``` and ```ctx.STREAM_TIMER``` are also available.
+
+In ```Rust```, the signature is ```ctx::poll(streams: &[u32], timeout_ms: Option<u64>) -> ctx::Polled```. For ```streams```, pass ```sub.id()``` or one of the built-in ```ctx::STREAM_TIMER``` and ```ctx::STREAM_STATUS```. An empty slice means every data stream this thread subscribes to. A timeout of ```None``` waits indefinitely. The return value is ```Polled::Event(ev)```, ```Polled::Empty``` (timed out), ```Polled::Stopped``` (the live trading bot has stopped) or ```Polled::Error(rc)```. In ```Rust```, events are raw structs. After you import ```sdk::ctx::EventExt```, you can read them by event type without writing ```unsafe``` code: ```ev.stream()```, ```ev.channel()```, ```ev.book(n)``` (depth events), and ```ev.ticker()```, ```ev.trade()```, ```ev.kline()```, ```ev.order()```, ```ev.position()```, ```ev.balance()```, ```ev.gateway()``` (gateway status) and ```ev.feed_status()``` (initialization status; when ```failed()``` is true, ```message``` holds the failure reason), which already convert values to real numbers. If the event type doesn't match, they return ```None```. Each field maps one-to-one to the event fields in ```JavaScript```. In ```Rust```, any thread can subscribe and call ```poll```, and each thread receives only the events it subscribed to. ```ctx::connectors()``` returns a JSON string with the same content.
+
+See also: `ctx.subscribe`, `Subscription`, `EventLoop`
+
+#### Subscription
+
+A subscription object, returned by `ctx.subscribe`, represents a single push subscription. It can be passed directly to `ctx.poll` to receive events from this subscription only. A subscription object belongs to the thread that created it: events from the subscription are delivered only to that thread, and only that thread can unsubscribe it. For a batch subscription (an array passed as ```symbol```), an array of subscription objects is returned. Calling ```unsubscribe()``` on the array unsubscribes all of its elements at once. The array can also be passed directly to ```ctx.poll()```.
+A subscription object has the following read-only properties. The result of ```JSON.stringify(sub)``` contains only these properties:
+
+| Property | Type | Description |
+| - | - | - |
+| id | number | Event stream ID. The ```ev.stream``` of events produced by this subscription equals this value. Subscriptions with the same identity in the same thread have the same ```id``` |
+| ex | number | Index of the account in the ```exchanges``` array |
+| channel | string | Channel: ```ticker```, ```bbo```, ```depth```, ```trade```, ```kline```, ```tickers```, ```private``` |
+| symbol | string | Symbol code. Empty string for ```tickers``` and ```private``` subscriptions |
+| depth | number | Number of order book levels for a ```depth``` subscription (```0``` means the exchange's default number of levels). ```0``` for other subscriptions |
+| interval | number | Period (in seconds) of a ```kline``` subscription. ```0``` for other subscriptions |
+Methods: `book` reads the order book of this depth subscription. `positions` and `balances` read the latest positions and balances maintained by a private subscription. `unsubscribe` unsubscribes.
+In ```Python```, it is a ```Subscription``` object with the same read-only properties, and ```info()``` returns a dictionary made up of these properties. A batch subscription returns a ```SubscriptionList``` (a subclass of ```list```), whose ```unsubscribe()``` unsubscribes all of its elements. In ```Rust```, the equivalent is the ```ctx::Sub``` returned by ```ctx::subscribe()``` (```ctx::subscribe_many()``` for batch subscriptions), and its properties are provided as methods: ```id()```, ```ex()```, ```channel()```, ```depth()```, ```interval()```.
+
+##### Subscription.book
+
+```
+book()
+book(n)
+```
+
+Reads the order book maintained by this depth subscription itself. Only applies to subscriptions whose ```channel``` is ```depth```.
+
+Parameters:
+
+- `n` (number, optional): Number of price levels returned per side. If omitted, the number of levels specified when subscribing is used (```5``` if no level count was specified when subscribing).
+
+Returns (object): ```{bids: [[price, amount], ...], asks: [[price, amount], ...]}```. ```bids``` are sorted by price from high to low, ```asks``` are sorted by price from low to high, and both price and amount are real numbers. Before a complete order book has been received, both sides are empty arrays.
+
+Subscribe to a 20-level order book, and on each update read the best bid price, the best ask price, and the total order quantity of the top 5 levels.
+
+```javascript
+function main() {
+    var sub = ctx.subscribe(exchange, {channel: "depth", depth: 20})
+    while (true) {
+        var ev = ctx.poll(sub, 1000)
+        if (!ev || ev.kind !== 3) {
+            continue
+        }
+        var book = sub.book(5)          // ev.book(5) also works
+        if (book.bids.length === 0 || book.asks.length === 0) {
+            continue                    // complete order book not received yet
+        }
+        var bidQty = 0
+        var askQty = 0
+        book.bids.forEach(function(level) { bidQty += level[1] })
+        book.asks.forEach(function(level) { askQty += level[1] })
+        Log("bid1:", book.bids[0][0], "ask1:", book.asks[0][0])
+        Log("top 5 bidQty:", bidQty, "askQty:", askQty)
+    }
+}
+```
+
+```python
+def main():
+    sub = ctx.subscribe(exchange, {"channel": "depth", "depth": 20})
+    while True:
+        ev = ctx.poll(sub, 1000)
+        if ev is None or ev.kind != 3:
+            continue
+        book = sub.book(5)              # ev.book(5) also works
+        if not book["bids"] or not book["asks"]:
+            continue                    # complete order book not received yet
+        bid_qty = sum(level[1] for level in book["bids"])
+        ask_qty = sum(level[1] for level in book["asks"])
+        Log("bid1:", book["bids"][0][0], "ask1:", book["asks"][0][0])
+        Log("top 5 bidQty:", bid_qty, "askQty:", ask_qty)
+```
+
+```rust
+fn main() {
+    let sub = ctx::subscribe(exchange, ctx::SubOpts::depth(20)).unwrap();
+    loop {
+        match ctx::poll(&[sub.id()], Some(1000)) {
+            ctx::Polled::Event(_) => {
+                let book = match sub.book(5) {
+                    Ok(b) => b,
+                    Err(e) => panic!("book failed: {e}"),
+                };
+                if book.bids.is_empty() || book.asks.is_empty() {
+                    continue;
+                }
+                let bid_qty: f64 = book.bids.iter().map(|l| l.1).sum();
+                let ask_qty: f64 = book.asks.iter().map(|l| l.1).sum();
+                Log!("bid1:", book.bids[0].0, "ask1:", book.asks[0].0);
+                Log!("top 5 bidQty:", bid_qty, "askQty:", ask_qty);
+            }
+            ctx::Polled::Stopped => break,
+            _ => {}
+        }
+    }
+}
+```
+
+A depth event (```kind``` is ```3```) only indicates that the order book has been updated; it does not carry any price level data. The order book is continuously updated inside the docker as the exchange pushes data, independent of how fast the strategy reads events, so whatever is read at any moment is always the latest complete order book. ```ev.book(n)``` on a depth event reads the same order book.
+
+Each depth subscription maintains its own order book: two subscriptions on the same symbol with ```depth``` set to ```5``` and ```20``` respectively do not affect each other, and each reads an order book with its corresponding number of levels.
+
+Calling it on a non-depth subscription or on a subscription object that has already been unsubscribed throws an exception.
+
+In ```Python``` it is ```sub.book(n=None)```, returning a dict ```{"bids": [[price, amount], ...], "asks": [...]}``` (can also be written as ```b.bids```); depth events likewise provide ```ev.book(n)```. In ```Rust``` it is ```sub.book(n: usize) -> Result<ctx::Book, String>```, where ```bids``` and ```asks``` of ```ctx::Book``` are ```Vec<(f64, f64)>``` (price, amount); after importing ```sdk::ctx::EventExt```, depth events can also use ```ev.book(n)```. ```ctx::Sub``` can be copied, and after being passed to another thread it can still read this order book (but unsubscribing can only be done in the thread that created the subscription).
+
+See also: `positions`, `balances`, `unsubscribe`, `ctx.subscribe`, `exchange.GetDepth`
+
+##### Subscription.positions
+
+```
+positions()
+```
+
+Reads the latest positions that a private subscription maintains from pushed updates. Applies only to subscriptions whose ```channel``` is ```private```.
+
+Returns (array / null value): An array of positions. Each element holds the current full state of one position slot, sorted by symbol and position slot. Returns a null value while the account snapshot is not ready yet.
+
+Subscribe to the private stream and print all positions once the snapshot is ready and on every position change.
+
+```javascript
+function main() {
+    var acct = ctx.subscribe(exchange, {channel: "private"})
+    while (true) {
+        var ev = ctx.poll([], 1000)
+        if (!ev || ev.stream !== acct.id) {
+            continue
+        }
+        var ready = ev.kind === 35 && ev.prefillStatus === 1
+        if (ready || (ev.channel === "positions" && !ev.snapshot)) {
+            var positions = acct.positions()
+            if (positions === null) {
+                continue                    // Account snapshot not ready yet
+            }
+            positions.forEach(function(p) {
+                Log(p.symbol, p.posSide, "qty:", p.qty, "avgPx:", p.avgPx, "profit:", p.profit)
+            })
+        }
+    }
+}
+```
+
+```python
+def main():
+    acct = ctx.subscribe(exchange, {"channel": "private"})
+    while True:
+        ev = ctx.poll([], 1000)
+        if ev is None or ev.stream != acct.id:
+            continue
+        ready = ev.kind == 35 and ev.prefillStatus == 1
+        if ready or (ev.channel == "positions" and not ev.snapshot):
+            positions = acct.positions()
+            if positions is None:
+                continue                    # Account snapshot not ready yet
+            for p in positions:
+                # Amount fields the exchange did not push are absent from the dict; read them with get
+                profit = p.get("profit")
+                Log(p.symbol, p.posSide, "qty:", p.qty, "avgPx:", p.avgPx, "profit:", profit)
+```
+
+```rust
+use sdk::ctx::EventExt;
+
+fn main() {
+    let acct = ctx::subscribe(exchange, ctx::SubOpts::private()).unwrap();
+    loop {
+        match ctx::poll(&[], Some(1000)) {
+            ctx::Polled::Event(ev) if ev.stream() == acct.id() => {
+                if ev.channel() != "private" && ev.channel() != "positions" {
+                    continue;
+                }
+                match acct.positions() {
+                    Ok(Some(rows)) => {
+                        for p in rows {
+                            Log!(p.symbol, p.pos_side, "qty:", p.qty, "avgPx:", p.avg_px);
+                        }
+                    }
+                    Ok(None) => {}          // Account snapshot not ready yet
+                    Err(e) => panic!("positions failed: {e}"),
+                }
+            }
+            ctx::Polled::Stopped => break,
+            _ => {}
+        }
+    }
+}
+```
+
+Fields of each array element:
+
+| Field | Type | Description |
+| - | - | - |
+| symbol | string | Symbol code, e.g. ```BTC_USDT.swap``` |
+| side | string | ```buy``` (long) or ```sell``` (short) |
+| posSide | string | Position slot: ```long``` or ```short``` in hedge (two-way) position mode, ```net``` in one-way position mode |
+| qty | number | Position quantity, in the same unit as `exchange.GetPositions` |
+| avgPx | number | Average entry price of the position |
+| profit、margin、liqPx、markPx、leverage | number | Unrealized PnL, margin, liquidation price, mark price and leverage; a field is left out when the exchange does not push it |
+| time | number | Exchange update time (milliseconds); left out when the exchange does not provide it |
+
+Closed positions (quantity ```0```) do not appear in the array.
+
+A null return means the state is unknown, not that there are no positions. After subscribing, data is available only once the event stream delivers the initialization status event with ```channel``` set to ```private``` and ```prefillStatus``` set to ```1```. If the most recent snapshot failed (for example, the snapshot request failed after a reconnect), it also returns a null value until the next snapshot is ready. Spot accounts have no positions and return an empty array once ready.
+
+The docker updates this state from pushed position events (```kind``` is ```17```), so you need to keep calling `ctx.poll` to receive events. Whether the real-time feed includes positions depends on the exchange. Some exchanges send a snapshot only at subscription time and after a reconnect; see each exchange's page for details. For reliable up-to-date positions you can still query `exchange.GetPositions`, which always calls the REST API and does not depend on pushed updates.
+
+Calling it on a non-private subscription, or after the subscription object has been unsubscribed, throws an exception.
+
+In ```Rust``` it is ```sub.positions() -> Result<Option<Vec<ctx::PositionRow>>, String>```, where ```Ok(None)``` means the snapshot is not ready yet. The fields of ```PositionRow``` are ```symbol```, ```side```, ```pos_side```, ```qty```, ```avg_px```, ```profit```, ```margin```, ```liq_px```, ```mark_px```, ```leverage``` and ```time``` (the amount and time fields are ```Option``` types). In ```Python``` it is ```sub.positions()```, which returns a list of dicts (same fields as above, attribute access also supported) and returns ```None``` while the snapshot is not ready yet.
+
+See also: `balances`, `book`, `unsubscribe`, `ctx.subscribe`, `exchange.GetPositions`
+
+##### Subscription.balances
+
+```
+balances()
+```
+
+Reads the latest balances that a private subscription keeps up to date from pushed events. Applies only to subscriptions whose ```channel``` is ```private```.
+
+Returns (array / null value): An array of balances sorted by asset name. Each element holds the current full balance of one asset. Returns a null value while the account snapshot is not ready yet.
+
+Subscribe to the private stream and print the available and frozen amounts of ```USDT``` once the snapshot is ready and on every balance change.
+
+```javascript
+function main() {
+    var acct = ctx.subscribe(exchange, {channel: "private"})
+    while (true) {
+        var ev = ctx.poll([], 1000)
+        if (!ev || ev.stream !== acct.id) {
+            continue
+        }
+        var ready = ev.kind === 35 && ev.prefillStatus === 1
+        if (!ready && ev.channel !== "balance") {
+            continue
+        }
+        var balances = acct.balances()
+        if (balances === null) {
+            continue                        // Account snapshot is not ready yet
+        }
+        var usdt = balances.find(function(b) { return b.asset === "USDT" })
+        Log("USDT free:", usdt ? usdt.free : 0, "frozen:", usdt ? usdt.frozen : 0)
+    }
+}
+```
+
+```python
+def main():
+    acct = ctx.subscribe(exchange, {"channel": "private"})
+    while True:
+        ev = ctx.poll([], 1000)
+        if ev is None or ev.stream != acct.id:
+            continue
+        ready = ev.kind == 35 and ev.prefillStatus == 1
+        if not ready and ev.channel != "balance":
+            continue
+        balances = acct.balances()
+        if balances is None:
+            continue                        # Account snapshot is not ready yet
+        usdt = next((b for b in balances if b.asset == "USDT"), None)
+        Log("USDT free:", usdt.free if usdt else 0, "frozen:", usdt.frozen if usdt else 0)
+```
+
+```rust
+use sdk::ctx::EventExt;
+
+fn main() {
+    let acct = ctx::subscribe(exchange, ctx::SubOpts::private()).unwrap();
+    loop {
+        match ctx::poll(&[], Some(1000)) {
+            ctx::Polled::Event(ev) if ev.stream() == acct.id() => {
+                if ev.channel() != "private" && ev.channel() != "balance" {
+                    continue;
+                }
+                if let Ok(Some(rows)) = acct.balances() {
+                    if let Some(u) = rows.iter().find(|b| b.asset == "USDT") {
+                        Log!("USDT free:", u.free, "frozen:", u.frozen);
+                    }
+                }
+            }
+            ctx::Polled::Stopped => break,
+            _ => {}
+        }
+    }
+}
+```
+
+Fields of each array element:
+
+| Field | Type | Description |
+| - | - | - |
+| asset | string | Asset name, the same as the asset name returned by `exchange.GetAssets` |
+| free | number | Available amount |
+| frozen | number | Frozen amount |
+| equity、upnl、margin | number | Equity, unrealized PnL and margin in use. These fields are left out when the exchange does not push them |
+| time | number | Exchange update time in milliseconds. This field is left out when the exchange does not provide it |
+
+Assets whose available amount and frozen amount are both ```0``` are not included in the array.
+
+A null return value means the state is unknown. It does not mean there is no balance. After subscribing, data is available only after this event stream delivers the initialization status event with ```channel``` set to ```private``` and ```prefillStatus``` set to ```1```. A null value is also returned when the most recent snapshot failed, until the next snapshot is ready.
+
+The docker updates this state from the pushed balance events (```kind``` is ```18```), so you need to keep calling `ctx.poll` to receive events. Exchanges push balances in different ways. On some exchanges, the connector requests the REST API again after a balance change and then pushes the result. Other exchanges only provide snapshots. See each exchange's page for details. `exchange.GetAssets` and `exchange.GetAccount` always request the REST API and do not depend on pushed data.
+
+Calling this method on a subscription that is not private, or on one that has been unsubscribed, throws an exception.
+
+In ```Rust``` the signature is ```sub.balances() -> Result<Option<Vec<ctx::BalanceRow>>, String>```, where ```Ok(None)``` means the snapshot is not ready yet. The fields of ```BalanceRow``` are ```asset```, ```free```, ```frozen```, ```equity```, ```upnl```, ```margin``` and ```time```, and the last four are ```Option```. In ```Python``` the call is ```sub.balances()```. It returns a list of dictionaries with the same fields, which can also be read as attributes, and it returns ```None``` while the snapshot is not ready yet.
+
+See also: `positions`, `book`, `unsubscribe`, `ctx.subscribe`, `exchange.GetAssets`
+
+##### Subscription.unsubscribe
+
+```
+unsubscribe()
+```
+
+Unsubscribe: releases the reference held by this subscription object; the actual unsubscribe request is sent to the exchange only when the last reference is released.
+
+Subscribe to ticker, unsubscribe after receiving 10 updates, then switch to subscribing to the trade feed.
+
+```javascript
+function main() {
+    var tk = ctx.subscribe(exchange, {channel: "ticker"})
+    var n = 0
+    while (n < 10) {
+        var ev = ctx.poll(tk, 1000)
+        if (ev && ev.kind === 1) {
+            Log("ticker", ev.last)
+            n++
+        }
+    }
+    tk.unsubscribe()
+
+    var trades = ctx.subscribe(exchange, {channel: "trade"})
+    while (true) {
+        var t = ctx.poll(trades, 1000)
+        if (t && t.kind === 4) {
+            Log("trade", t.tradeId, t.side, t.px, t.qty)
+        }
+    }
+}
+```
+
+```python
+def main():
+    tk = ctx.subscribe(exchange, {"channel": "ticker"})
+    n = 0
+    while n < 10:
+        ev = ctx.poll(tk, 1000)
+        if ev is not None and ev.kind == 1:
+            Log("ticker", ev.last)
+            n += 1
+    tk.unsubscribe()
+
+    trades = ctx.subscribe(exchange, {"channel": "trade"})
+    while True:
+        t = ctx.poll(trades, 1000)
+        if t is not None and t.kind == 4:
+            Log("trade", t.tradeId, t.side, t.px, t.qty)
+```
+
+```rust
+fn main() {
+    let tk = ctx::subscribe(exchange, ctx::SubOpts::ticker()).unwrap();
+    let mut n = 0;
+    while n < 10 {
+        match ctx::poll(&[tk.id()], Some(1000)) {
+            ctx::Polled::Event(_) => n += 1,
+            ctx::Polled::Stopped => return,
+            _ => {}
+        }
+    }
+    tk.unsubscribe().unwrap();
+    Log!("ticker unsubscribed after", n, "events");
+}
+```
+
+A subscription belongs to the thread that created it: subscribing to the same content in a child thread yields an independent event stream, and a thread can only unsubscribe its own subscriptions; the main thread unsubscribes both streams at once through the array returned by the batch subscription.
+
+```javascript
+function main() {
+    var subs = ctx.subscribe(0, {channel: "ticker", symbol: ["BTC_USDT", "ETH_USDT"]})
+    var t = threading.Thread(function() {
+        // Subscribe to the same content in the thread: it gets its own event stream, with an id different from the main thread's
+        var mine = ctx.subscribe(0, {channel: "ticker", symbol: "BTC_USDT"})
+        var id = mine.id
+        mine.unsubscribe()       // A thread can unsubscribe its own subscription
+        return id
+    })
+    Log("main stream:", subs[0].id, "thread stream:", t.join().ret)
+    subs.unsubscribe()           // The main thread unsubscribes its own two streams
+}
+```
+
+```python
+import threading
+
+def main():
+    subs = ctx.subscribe(0, {"channel": "ticker", "symbol": ["BTC_USDT", "ETH_USDT"]})
+
+    def worker():
+        # Subscribe to the same content in the thread: it gets its own event stream, with an id different from the main thread's
+        mine = ctx.subscribe(0, {"channel": "ticker", "symbol": "BTC_USDT"})
+        Log("main stream:", subs[0].id, "thread stream:", mine.id)
+        mine.unsubscribe()               # A thread can unsubscribe its own subscription
+        try:
+            subs[0].unsubscribe()        # The subscription belongs to the main thread, so this raises an exception
+        except Exception as e:
+            Log("cannot unsubscribe here:", e)
+
+    t = threading.Thread(target=worker)
+    t.start()
+    t.join()
+    subs.unsubscribe()                   # The main thread unsubscribes its own two streams
+```
+
+Within the same thread, subscriptions with the same identity (same account, symbol, channel, depth levels and period) share a single event stream, and each call to `ctx.subscribe` adds one reference. ```unsubscribe()``` releases only the one reference held by this object; other subscription objects sharing the same event stream are not affected and continue to receive events normally. Identical subscriptions made in other threads also hold their own references. Only after all references have been released does the docker unsubscribe from the exchange; any events arriving after that are discarded.
+
+Only the thread that created the subscription can unsubscribe it: calling it from another thread throws an exception (the error message contains ```belongs to another thread```), and the subscription remains active. When a thread ends, all of its subscriptions are unsubscribed automatically.
+
+The array returned by a batch subscription also provides an ```unsubscribe()``` method, which unsubscribes all elements of the array at once (each element releases one reference).
+
+Calling ```unsubscribe()``` repeatedly on the same subscription object has no effect; calling it after the subscription has been rejected by the exchange (an initialization status event with ```prefillStatus``` equal to ```2``` was received) likewise has no effect. After unsubscribing, the object's ```book()```, ```positions()``` and ```balances()``` methods can no longer be called.
+
+Subscribing to the same content again after unsubscribing yields a new event stream ID.
+
+In ```Python``` it is ```sub.unsubscribe()```, and the ```SubscriptionList``` returned by a batch subscription also provides ```unsubscribe()```. In ```Rust``` it is ```sub.unsubscribe() -> Result<(), String>```, and calling it from another thread returns ```Err```. ```ctx::Sub``` can be copied, and the reference count is based on the number of ```ctx::subscribe()``` calls: for each call to ```ctx::subscribe()```, call ```unsubscribe()``` once; do not unsubscribe the same copied handle more than once.
+
+See also: `book`, `positions`, `balances`, `ctx.subscribe`
 
 #### threading
 
@@ -25276,7 +26312,6 @@ An exchange object is named by the value of ```exchange.GetName()```; click a na
 
 | ```exchange.GetName()``` | Brand | Type | Aliases |
 | - | - | - | - |
-| `AscendEx` | AscendEx | Spot | AscendEX, BitMax |
 | `Backpack` | Backpack | Spot | Backpack Exchange |
 | `Futures_Backpack` | Backpack | Futures | — |
 | `BigONE` | BigONE | Spot | — |
@@ -25353,98 +26388,96 @@ An exchange object is named by the value of ```exchange.GetName()```; click a na
 
 ### Capability Matrix
 
-Support of the standard functions and trading-mode commands per exchange object. ✓ supported; ✗ not supported (the call fails with an error and returns null); Synth: the exchange's API does not fully provide the function (no such endpoint, or some K-line periods missing, etc.) and the docker fills the gap, see the exchange page; — not applicable (spot exchange objects have no futures functions).
+Support of the standard functions and trading-mode commands per exchange object. ✓ supported; ✗ not supported (the call fails with an error and returns null); Synth: the exchange's API does not fully provide the function (no such endpoint, or some K-line periods missing, etc.) and the docker fills the gap, see the exchange page; — not applicable (spot exchange objects have no futures functions). The Push column of the Market group: ✓ WebSocket push is supported (`ctx.subscribe` subscribes market data and the account's private stream); ✓ tickers also supports the market-wide ```tickers``` channel (no symbol); ✗ no push, only the REST query functions. For the details of each channel (depth levels, K-line periods, what the private stream covers) see the exchange page.
 
 #### Market
 
-| Exchange | `GetTicker` | `GetTickers` | `GetDepth` | `GetTrades` | `GetRecords` | `GetMarkets` |
-| - | - | - | - | - | - | - |
-| **Centralized Exchanges** |  |  |  |  |  |  |
-| `AscendEx` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `Backpack` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `Futures_Backpack` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `BigONE` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `Binance` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `Futures_Binance` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `Bitfinex` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `Futures_Bitfinex` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `BitFlyer` | ✓ | ✗ | ✓ | ✓ | Synth | ✓ |
-| `Bitget` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `Futures_Bitget` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `Bithumb` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `Bitstamp` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `Bybit` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `Futures_Bybit` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `Coincheck` | ✓ | ✗ | ✓ | ✓ | Synth | ✗ |
-| `Coinone` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `Coinw` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `Futures_Coinw` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `Crypto` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `Futures_Crypto` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `DeepCoin` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `Futures_DeepCoin` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `Futures_Deribit` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `DigiFinex` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `Futures_DigiFinex` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `GateIO` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `Futures_GateIO` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `Gemini` | ✓ | ✗ | ✓ | ✓ | Synth | ✓ |
-| `HashKey` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `HitBTC` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `Huobi` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `Futures_HuobiDM` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `Korbit` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `Kraken` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `Futures_Kraken` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `KuCoin` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `Futures_KuCoin` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `LBank` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `MEXC` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `Futures_MEXC` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `OKEX` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `Futures_OKCoin` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `Poloniex` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `Upbit` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `WEEX` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `Futures_WEEX` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `WOO` | ✓ | ✗ | ✓ | ✓ | Synth | ✓ |
-| `Futures_WOO` | ✓ | ✗ | ✓ | ✓ | Synth | ✓ |
-| `Zaif` | ✓ | ✗ | ✓ | ✓ | Synth | ✓ |
-| **Decentralized Exchanges (DEX)** |  |  |  |  |  |  |
-| `Hyperliquid` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `Futures_Hyperliquid` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `Futures_Lighter` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `Futures_EdgeX` | ✓ | ✗ | ✓ | ✗ | Synth | ✓ |
-| `Aster` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `Futures_ApolloX` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `Futures_Aster` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `Futures_Aevo` | ✓ | ✗ | ✓ | ✓ | Synth | ✓ |
-| `Pendle` | ✓ | ✗ | ✓ | ✗ | ✗ | ✓ |
-| `Futures_Boros` | ✓ | ✗ | ✓ | ✓ | ✓ | ✓ |
-| `Futures_WOOFi` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `Uniswap` | ✓ | ✗ | ✓ | ✓ | Synth | ✓ |
-| `PancakeSwap` | ✓ | ✗ | ✓ | ✓ | Synth | ✓ |
-| `Aerodrome` | ✓ | ✗ | ✓ | ✓ | Synth | ✓ |
-| `Velodrome` | ✓ | ✗ | ✓ | ✓ | Synth | ✓ |
-| `KyberSwap` | ✓ | ✗ | ✓ | ✗ | Synth | ✓ |
-| `OneInch` | ✓ | ✗ | ✓ | ✗ | Synth | ✓ |
-| `Jupiter` | ✓ | ✗ | ✓ | ✗ | Synth | ✓ |
-| `OKX_DEX` | ✓ | ✓ | ✗ | ✓ | Synth | ✓ |
-| **Prediction Markets** |  |  |  |  |  |  |
-| `Futures_Polymarket` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| **Securities and Futures** |  |  |  |  |  |  |
-| `Futures_Futu` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ |
-| `Futures_IB` | ✓ | ✓ | ✓ | ✗ | Synth | ✓ |
-| **On-chain & Custom** |  |  |  |  |  |  |
-| `Exchange` | ✓ | ✗ | ✓ | ✓ | Synth | ✗ |
-| `Web3` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
+| Exchange | `GetTicker` | `GetTickers` | `GetDepth` | `GetTrades` | `GetRecords` | `GetMarkets` | `Push` |
+| - | - | - | - | - | - | - | - |
+| **Centralized Exchanges** |  |  |  |  |  |  |  |
+| `Backpack` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ |
+| `Futures_Backpack` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ |
+| `BigONE` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ |
+| `Binance` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ tickers |
+| `Futures_Binance` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ tickers |
+| `Bitfinex` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ |
+| `Futures_Bitfinex` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ |
+| `BitFlyer` | ✓ | ✗ | ✓ | ✓ | Synth | ✓ | ✓ |
+| `Bitget` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ |
+| `Futures_Bitget` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ |
+| `Bithumb` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ |
+| `Bitstamp` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ |
+| `Bybit` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ |
+| `Futures_Bybit` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ |
+| `Coincheck` | ✓ | ✗ | ✓ | ✓ | Synth | ✗ | ✓ |
+| `Coinone` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ |
+| `Coinw` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ |
+| `Futures_Coinw` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ |
+| `Crypto` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ |
+| `Futures_Crypto` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ |
+| `DeepCoin` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ |
+| `Futures_DeepCoin` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ |
+| `Futures_Deribit` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ |
+| `DigiFinex` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ tickers |
+| `Futures_DigiFinex` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ tickers |
+| `GateIO` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ |
+| `Futures_GateIO` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ |
+| `Gemini` | ✓ | ✗ | ✓ | ✓ | Synth | ✓ | ✓ |
+| `HashKey` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ |
+| `HitBTC` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ tickers |
+| `Huobi` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ |
+| `Futures_HuobiDM` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ |
+| `Korbit` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ |
+| `Kraken` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ |
+| `Futures_Kraken` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ |
+| `KuCoin` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ tickers |
+| `Futures_KuCoin` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ |
+| `LBank` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ |
+| `MEXC` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ tickers |
+| `Futures_MEXC` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ tickers |
+| `OKEX` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ |
+| `Futures_OKCoin` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ |
+| `Poloniex` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ tickers |
+| `Upbit` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ |
+| `WEEX` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ |
+| `Futures_WEEX` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ |
+| `WOO` | ✓ | ✗ | ✓ | ✓ | Synth | ✓ | ✓ tickers |
+| `Futures_WOO` | ✓ | ✗ | ✓ | ✓ | Synth | ✓ | ✓ tickers |
+| `Zaif` | ✓ | ✗ | ✓ | ✓ | Synth | ✓ | ✗ |
+| **Decentralized Exchanges (DEX)** |  |  |  |  |  |  |  |
+| `Hyperliquid` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ |
+| `Futures_Hyperliquid` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ |
+| `Futures_Lighter` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ tickers |
+| `Futures_EdgeX` | ✓ | ✗ | ✓ | ✗ | Synth | ✓ | ✓ tickers |
+| `Aster` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ tickers |
+| `Futures_ApolloX` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ tickers |
+| `Futures_Aster` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ tickers |
+| `Futures_Aevo` | ✓ | ✗ | ✓ | ✓ | Synth | ✓ | ✓ |
+| `Pendle` | ✓ | ✗ | ✓ | ✗ | ✗ | ✓ | ✗ |
+| `Futures_Boros` | ✓ | ✗ | ✓ | ✓ | ✓ | ✓ | ✗ |
+| `Futures_WOOFi` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ tickers |
+| `Uniswap` | ✓ | ✗ | ✓ | ✓ | Synth | ✓ | ✗ |
+| `PancakeSwap` | ✓ | ✗ | ✓ | ✓ | Synth | ✓ | ✗ |
+| `Aerodrome` | ✓ | ✗ | ✓ | ✓ | Synth | ✓ | ✗ |
+| `Velodrome` | ✓ | ✗ | ✓ | ✓ | Synth | ✓ | ✗ |
+| `KyberSwap` | ✓ | ✗ | ✓ | ✗ | Synth | ✓ | ✗ |
+| `OneInch` | ✓ | ✗ | ✓ | ✗ | Synth | ✓ | ✗ |
+| `Jupiter` | ✓ | ✗ | ✓ | ✗ | Synth | ✓ | ✗ |
+| `OKX_DEX` | ✓ | ✓ | ✗ | ✓ | Synth | ✓ | ✗ |
+| **Prediction Markets** |  |  |  |  |  |  |  |
+| `Futures_Polymarket` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ |
+| **Securities and Futures** |  |  |  |  |  |  |  |
+| `Futures_Futu` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✗ |
+| `Futures_IB` | ✓ | ✓ | ✓ | ✗ | Synth | ✓ | ✗ |
+| **On-chain & Custom** |  |  |  |  |  |  |  |
+| `Exchange` | ✓ | ✗ | ✓ | ✓ | Synth | ✗ | ✗ |
+| `Web3` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
 
 #### Trading
 
 | Exchange | `CreateOrder` | `Buy` | `Sell` | `CancelOrder` | `ModifyOrder` | `GetOrder` | `GetOrders` | `GetHistoryOrders` |
 | - | - | - | - | - | - | - | - | - |
 | **Centralized Exchanges** |  |  |  |  |  |  |  |  |
-| `AscendEx` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✓ |
 | `Backpack` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✓ |
 | `Futures_Backpack` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✓ |
 | `BigONE` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✓ |
@@ -25528,7 +26561,6 @@ Support of the standard functions and trading-mode commands per exchange object.
 | Exchange | `CreateConditionOrder` | `ModifyConditionOrder` | `CancelConditionOrder` | `GetConditionOrder` | `GetConditionOrders` | `GetHistoryConditionOrders` |
 | - | - | - | - | - | - | - |
 | **Centralized Exchanges** |  |  |  |  |  |  |
-| `AscendEx` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
 | `Backpack` | ✓ | ✗ | ✓ | ✓ | ✓ | ✓ |
 | `Futures_Backpack` | ✓ | ✗ | ✓ | ✓ | ✓ | ✓ |
 | `BigONE` | ✓ | ✗ | ✓ | ✓ | ✓ | ✓ |
@@ -25612,7 +26644,6 @@ Support of the standard functions and trading-mode commands per exchange object.
 | Exchange | `GetAccount` | `GetAssets` | `GetPositions` | `SetMarginLevel` | `SetDirection` | `SetContractType` | `GetFundings` |
 | - | - | - | - | - | - | - | - |
 | **Centralized Exchanges** |  |  |  |  |  |  |  |
-| `AscendEx` | ✓ | ✓ | — | — | — | — | — |
 | `Backpack` | ✓ | ✓ | — | — | — | — | — |
 | `Futures_Backpack` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `BigONE` | ✓ | ✓ | — | — | — | — | — |
@@ -25698,7 +26729,6 @@ Support of the ```exchange.IO()``` trading-mode commands: ✓ supported, ✗ not
 | Exchange | ```simulate``` | ```cross``` | ```dual``` | ```unified``` | ```trade_margin``` | ```trade_super_margin``` | ```trade_normal``` | ```selfTradePreventionMode``` |
 | - | - | - | - | - | - | - | - | - |
 | **Centralized Exchanges** |  |  |  |  |  |  |  |  |
-| `AscendEx` | ✗ | ✗ | ✗ | ✗ | ✓ | ✗ | ✓ | ✗ |
 | `Backpack` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✓ |
 | `Futures_Backpack` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | ✓ |
 | `Binance` | ✗ | ✗ | ✗ | ✓ | ✓ | ✓ | ✓ | ✓ |
@@ -25737,71 +26767,6 @@ Support of the ```exchange.IO()``` trading-mode commands: ✓ supported, ✗ not
 ### Centralized Exchanges
 
 Crypto exchanges, one page per brand; the spot and futures exchange objects of a brand share the page.
-
-#### AscendEx
-
-Spot trading on AscendEX (formerly BitMax); only spot pairs are served. The account has a cash wallet (the default) and a margin wallet, switched with ```exchange.IO("trade_margin")``` and ```exchange.IO("trade_normal")```; after switching, account, order placement and order queries use that wallet's endpoints. Access uses an API Key and Secret Key.
-
-##### Names and Configuration
-
-```exchange.GetName()```: ```AscendEx``` (Spot); aliases: AscendEX, BitMax.
-
-| Field | Required |
-| - | - |
-| Access Key | Yes |
-| Secret Key | Yes |
-
-##### Trading Pairs and Contract Codes
-
-Pair examples: ```BTC_USDT```, ```ETH_USDT```
-
-Trading pairs are written ```BASE_QUOTE```, matching the AscendEx native code ```BTC/USDT```.
-
-##### Exchange-specific IO Commands
-
-| Command | Arguments | Description | Returns |
-| - | - | - | - |
-| ```trade_margin``` | — | Switch to the margin wallet. Account, order placement, cancellation, order queries, open and historical orders and ```exchange.GetMarkets()``` then use the margin wallet endpoints; ```exchange.GetTickers()``` fails on the margin wallet. Kept locally; no request is sent to the exchange. | The command name itself. |
-| ```trade_normal``` | — | Switch back to the cash wallet (the default). | The command name itself. |
-| ```api``` | method, path[, params[, raw]] | Call an AscendEX endpoint directly; requests are signed by default. (more below the table) | The full exchange response (including ```code```); an error is raised when ```code``` is not 0. |
-
-The rest of the longer descriptions in the table:
-
-- ```api```: The signature covers only the timestamp and the endpoint name, and the path of a signed request must contain ```/api/pro```; private endpoints need the account group prefix in the path, such as ```/<accountGroup>/api/pro/v1/cash/balance``` (the account group can be read with ```GET /api/pro/v1/info```). A non-empty ```raw``` replaces ```params``` entirely: an encoded query string for ```GET```, the request body for ```POST``` and ```DELETE```.
-
-For the common commands ```base``` and ```currency``` see `exchange.IO`.
-
-##### Common Usage
-
-###### Look up the account group, then call private endpoints
-
-```javascript
-function main() {
-    // Paths of private endpoints need the account group prefix
-    var info = exchange.IO("api", "GET", "/api/pro/v1/info")
-    var group = info.data.accountGroup
-    // The whole reply (with code) is returned
-    var bal = exchange.IO("api", "GET", "/" + group + "/api/pro/v1/cash/balance")
-    Log(bal.data)
-    var path = "/" + group + "/api/pro/v1/cash/order/open"
-    var orders = exchange.IO("api", "GET", path, "symbol=BTC/USDT")
-    Log(orders.data)
-}
-```
-
-##### Function Support
-
-Not supported (the call fails with an error and returns null): `exchange.ModifyOrder`, `exchange.CreateConditionOrder`, `exchange.ModifyConditionOrder`, `exchange.CancelConditionOrder`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`, `exchange.GetHistoryConditionOrders`.
-
-Served through a fallback:
-
-- `exchange.GetRecords`: Native periods are 1m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 12h, 1d, 1w, 1M; other periods are synthesized by the docker.
-
-##### Notes
-
-- The exchange has ceased operation.
-- The amount of a spot market buy order is in the base currency, not a quote-currency amount.
-- The order ```Time``` comes from the exchange's ```createTime``` field; the endpoints behind ```exchange.GetOrders()``` and ```exchange.GetOrder()``` do not return it, so ```Time``` is 0 there.
 
 #### Backpack
 
@@ -25913,16 +26878,18 @@ Account: ```exchange.GetAccount()``` reads the collateral account: ```Balance```
 - The amount of a market buy order is the quote currency to spend (placed with Backpack's ```quoteQuantity```); a market sell order uses the base currency amount. Such market buy orders have no order price in queries, so ```Price``` is 0, and ```Amount``` is the filled base currency amount.
 - ```exchange.GetOrders()``` and ```exchange.GetHistoryOrders()``` return regular orders only, without conditional orders; querying a conditional order ID with ```exchange.GetOrder()``` fails, so use ```exchange.GetConditionOrder()``` for conditional orders, and ```exchange.GetConditionOrders()``` / ```exchange.GetHistoryConditionOrders()``` for open and historical conditional orders.
 - ```exchange.GetAccount()``` and ```exchange.GetAssets()``` count available and frozen amounts only, not staked amounts.
+- WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private account stream (order updates, balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. Backpack has a single depth stream (real-time deltas of the whole book): depth subscriptions of any size (20 levels by default, at most 255) are synchronized from the same full snapshot as ```exchange.GetDepth()``` plus sequence-checked deltas, a gap refetches the snapshot, and each subscription publishes its own number of levels. The ticker combines the 24-hour statistics stream with the best bid/ask stream. Trades carry the same trade IDs as ```exchange.GetTrades()```. Kline periods are the same as ```exchange.GetRecords()```; a first kline subscription pushes 500 historical bars first, and a bar without trades has the previous close as open, high, low and close with zero volume, as in REST. The exchange does not acknowledge successful subscriptions, so after each batch of subscriptions the connector sends a probe message to find out whether any was rejected; a subscription therefore becomes active after a confirmation delay of about 0.3 to 2 seconds. The private stream is one ```private``` subscription for the whole account (no symbol). It connects only when subscribed and signs the order and balance subscriptions with the API key's ed25519 private key: once active (and again after every reconnect) it first pushes a balance snapshot from the same endpoint as ```exchange.GetAssets()```, then reports ready, and afterwards pushes order updates (spot orders only) and the balances of coins that changed (available and frozen as in ```exchange.GetAssets()```, without staked amounts). Spot has no positions. A rejected signature reports a degraded connection status and a failed private stream (market data push is unaffected). A market-wide ```tickers``` subscription is not supported (Backpack ticker push is per symbol only) and fails at subscribe; subscribe ticker per symbol.
 
 ###### ```Futures_Backpack``` (Futures)
 
 - The amount of a market order is the contract quantity (in the base currency) for both buys and sells.
 - ```exchange.GetOrders()``` and ```exchange.GetHistoryOrders()``` return regular orders only, without conditional orders; querying a conditional order ID with ```exchange.GetOrder()``` fails, so use ```exchange.GetConditionOrder()``` for conditional orders.
 - Funding intervals differ between contracts; ```exchange.GetFundings()``` reports each one from the exchange's contract information.
+- WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private account stream (order updates, positions, balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. Backpack has a single depth stream (real-time deltas of the whole book): depth subscriptions of any size (20 levels by default, at most 255) are synchronized from the same full snapshot as ```exchange.GetDepth()``` plus sequence-checked deltas, a gap refetches the snapshot, and each subscription publishes its own number of levels. The ticker combines the 24-hour statistics stream with the best bid/ask stream and has no open interest. Trades carry the same trade IDs as ```exchange.GetTrades()```. Kline periods are the same as ```exchange.GetRecords()```; a first kline subscription pushes 500 historical bars first, and a bar without trades has the previous close as open, high, low and close with zero volume, as in REST. The exchange does not acknowledge successful subscriptions, so after each batch of subscriptions the connector sends a probe message to find out whether any was rejected; a subscription therefore becomes active after a confirmation delay of about 0.3 to 2 seconds. The private stream is one ```private``` subscription for the whole account (no symbol). It connects only when subscribed and signs the order, position and balance subscriptions with the API key's ed25519 private key: once active (and again after every reconnect) it first pushes a snapshot of balances and positions from the same endpoints as ```exchange.GetAssets()``` and ```exchange.GetPositions()```, then reports ready, and afterwards pushes order updates (perpetual orders only) and positions that changed (one net position per contract, a closed position is pushed with quantity 0; the push carries no liquidation price). Balance pushes use a different basis from the collateral figures of ```exchange.GetAssets()```, so a balance change or an order update triggers one query of the same endpoint as ```exchange.GetAssets()``` and only the coins that changed are pushed; equity changes caused by mark price moves are not pushed. A rejected signature reports a degraded connection status and a failed private stream (market data push is unaffected). A market-wide ```tickers``` subscription is not supported (Backpack ticker push is per contract only) and fails at subscribe; subscribe ticker per symbol.
 
 #### BigONE
 
-Spot trading on BigONE; only spot pairs are served. The exchange has no regular market order, so only limit orders can be placed (IOC and maker-only are supported); conditional orders support take-profit and stop-loss and can execute at a limit or at market once triggered. Access uses an API Key and Secret Key created on BigONE.
+Spot trading on BigONE; only spot pairs are served. The exchange has no regular market order, so only limit orders can be placed (IOC and maker-only are supported); conditional orders support take-profit and stop-loss and can execute at a limit or at market once triggered. Access uses an API Key and Secret Key created on BigONE. Market data and private data can also be pushed over WebSocket (see the notes).
 
 ##### Names and Configuration
 
@@ -25966,6 +26933,7 @@ Served through a fallback:
 - ```exchange.GetHistoryOrders()``` and ```exchange.GetHistoryConditionOrders()``` do not support the ```since``` argument (the exchange API has no time-range parameter) and fail when it is given; without it they return the most recent orders, at most 200 by default.
 - Conditional orders support take-profit and stop-loss (without an order price they execute at market once triggered), not OCO.
 - The order limits in ```exchange.GetMarkets()``` are given as quote-currency amounts (```MinNotional```, ```MaxNotional```); ```MinQty``` and ```MaxQty``` are 0.
+- WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private stream (order updates and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. BigONE's ticker stream is pushed only on trades and its best bid/ask lag behind, so the best bid/ask prices and sizes of the ticker and bbo pushes come from the pair's depth stream (a complete order book kept on a separate connection with sequence checks; bbo is pushed when the best level changes); the ticker push starts once both streams have arrived. The depth push is a full snapshot followed by real-time increments (checked for ```changeId```/```prevId``` continuity and resubscribed for a fresh snapshot on a gap); BigONE has only this one depth stream, so subscriptions with different level counts share it and are each truncated to their own count, with 20 levels by default. Trade pushes carry no trade ID (the exchange sends ```0``` in increments and times only to the second), so the trade ID in the event is a synthetic ID built from the trade time, price, quantity and direction (starting with ```syn:```) and differs from the trade IDs of ```exchange.GetTrades()```. A first kline subscription pushes 500 historical bars first; BigONE's kline push carries no closed flag, so a bar is pushed as closed when it is pushed after its end time or when the immediately following bar arrives. The private stream is one ```private``` subscription for the whole account (no symbol). It connects and authenticates with a JWT only when subscribed, subscribing the order stream for all pairs and the balance stream on that one connection: once the subscription is active (and again after every reconnect) it first pushes a snapshot of all balances from the same endpoint as ```exchange.GetAssets()```, then reports ready, and afterwards pushes order updates; a balance push is taken only as a notice that balances changed, so the balances are queried again and the coins that changed are pushed. Untriggered conditional orders push no order updates; they do once triggered. Spot has no positions, so the private stream pushes none. An authentication failure (for example an API key with an IP whitelist that does not include the current IP) reports a degraded connection status and a failed private stream (market data push is unaffected). A market-wide ```tickers``` subscription is not supported (BigONE ticker push needs explicit markets) and fails at subscribe; subscribe ticker per symbol.
 
 #### Binance
 
@@ -26127,6 +27095,7 @@ Option codes are Binance native codes: underlying-expiry (YYMMDD)-strike-C/P, C 
 - ```exchange.ModifyOrder()``` and ```exchange.ModifyConditionOrder()``` use Binance's cancel-replace endpoint (```cancelReplace```; no new order is placed if the cancellation fails) and return the new order's ID, which should be used from then on; only the normal spot account is supported, margin accounts report an error.
 - Conditional orders support take-profit and stop-loss only, not OCO; create a take-profit order and a stop-loss order separately when needed.
 - ```exchange.GetHistoryOrders()``` and ```exchange.GetHistoryConditionOrders()``` require a trading pair.
+- WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private stream (order updates and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. Depth subscriptions of 5, 10 and 20 levels use Binance's snapshot streams; other depths (20 levels by default, at most 255) are synchronized from the diff stream and a REST snapshot. Trades are aggregate trades (the same trade IDs as ```exchange.GetTrades()```). A first kline subscription pushes 500 historical bars first. The private stream is one ```private``` subscription for the whole spot account (no symbol). It uses the user data stream of the Binance WebSocket API, connects and signs the subscription only when subscribed, and needs an API Key with trading permission and an allowed IP. Once the subscription is active (and again after every reconnect) it first pushes a snapshot of all balances from the same endpoint as ```exchange.GetAssets()```, then reports ready, and afterwards pushes order updates and the balances of coins that changed (free and frozen as in ```exchange.GetAssets()```; deposit, withdrawal and transfer deltas are merged and pushed as the coin's complete balance, and a lock or unlock by an external system re-reads the balances through REST). The private stream covers the spot wallet only: after switching to a margin wallet, the margin account's orders and balances are not pushed. Spot has no positions, so the private stream pushes none. An authentication failure reports a degraded connection status and a failed private stream (market data push is unaffected). A market-wide ```tickers``` subscription (no symbol) uses Binance's all-market mini ticker stream: once a second it pushes the pairs that changed, with the last price, the 24-hour open/high/low and the volume, but no best bid/ask (Binance spot has no all-market book ticker stream); subscribe ticker or bbo per symbol for bid/ask.
 
 ###### ```Futures_Binance``` (Futures)
 
@@ -26134,6 +27103,7 @@ Option codes are Binance native codes: underlying-expiry (YYMMDD)-strike-C/P, C 
 - ```exchange.ModifyOrder()``` amends the price and quantity in place and keeps the order ID; a price or quantity not given keeps the original order's value (the quantity is the original order quantity).
 - Conditional orders support take-profit and stop-loss only, not OCO (Binance futures have no OCO endpoint); modifying a conditional order is not supported, cancel and recreate it instead.
 - ```exchange.GetHistoryOrders()``` and ```exchange.GetHistoryConditionOrders()``` require a contract.
+- WebSocket push is supported (USDⓈ-M and COIN-M contracts; not options): market data (ticker, bbo, depth, trades, klines) and the private stream (order updates, positions and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. The ticker push is Binance's 24-hour ticker with the best bid/ask prices and sizes taken from the contract's book ticker stream (the futures 24-hour stream carries none); it starts once both streams have arrived. Depth subscriptions of 5, 10 and 20 levels use Binance's snapshot streams; other depths (20 levels by default, at most 255) are synchronized from the diff stream and a REST snapshot. Trades carry the same trade IDs as ```exchange.GetTrades()```. A first kline subscription pushes 500 historical bars first. Delivery contracts (```quarter```, ```next_quarter```) are subscribed as the contract listed at subscription time; subscribe again after the quarterly roll. The private stream is one ```private``` subscription for the whole account (no symbol) on Binance's listenKey user data streams: it requests listenKeys and connects only when subscribed, and connects both the USDⓈ-M and the COIN-M user data stream (the same scope as ```exchange.GetPositions()``` and ```exchange.GetAssets()``` without a symbol; a unified account uses the portfolio margin user data stream automatically). Once both are active (and again after either one reconnects) it first pushes a snapshot of all balances and positions from the same endpoints as ```exchange.GetAssets()``` and ```exchange.GetPositions()```, then reports ready, and afterwards pushes updates of all orders, the positions that changed (contract, direction and quantity unit as in ```exchange.GetPositions()```; in hedge mode the long and short legs are pushed separately, and a quantity of 0 means closed; the push carries the average price and the unrealized profit, the margin only for isolated positions, and no leverage, liquidation price or mark price), and, after each balance event, the changed balances re-read as in ```exchange.GetAssets()```. Placing or canceling orders and mark price moves do not trigger Binance's balance event, so call ```exchange.GetAssets()``` for the current frozen amount and equity. An authentication failure reports a degraded connection status and a failed private stream (market data push is unaffected). A market-wide ```tickers``` subscription (no symbol) subscribes the all-market 24-hour ticker and book ticker streams of both USDⓈ-M and COIN-M: once a second it pushes the contracts that changed with the 24-hour stream, taking the best bid/ask from the contract's latest book ticker; a contract is not pushed before its book ticker has arrived.
 
 #### Bitfinex
 
@@ -26235,12 +27205,14 @@ Account: Futures margin sits on the ```F0```-suffixed currencies (such as ```UST
 
 - The amount of a spot market buy order is in the base currency, not a quote-currency amount.
 - Bitfinex prices have 5 significant digits and no fixed tick size; the ```TickSize``` and ```PricePrecision``` returned by `exchange.GetMarkets` are derived from the current last price and change when the price moves to another order of magnitude; amount precision is fixed at 8 decimals.
+- WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private stream (order updates and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. Ticker and bbo share Bitfinex's ticker stream (Bitfinex's ticker already carries the best bid/ask prices and sizes; there is no separate top-of-book stream), and the open price is the last price minus the 24-hour change, as in ```exchange.GetTicker()```. Trades carry the same trade IDs as ```exchange.GetTrades()```; the recent trades the exchange replays on subscription are not pushed. Depth subscriptions of up to 25 levels (25 by default) use Bitfinex's 25-level book, larger depths use the 100- or 250-level book (at most 250 levels), synchronized from a snapshot plus deltas and verified with Bitfinex's book checksum and connection sequence numbers; a failed check resubscribes that book. A first kline subscription pushes 500 historical bars first; Bitfinex's kline stream has no close flag, so a bar is pushed as closed once its period has ended (or the next bar arrives). Pushed prices keep two more decimals than the price precision of ```exchange.GetMarkets()``` (Bitfinex prices have 5 significant digits, so they gain decimals when the price falls an order of magnitude). The private stream is one ```private``` subscription for the whole account (no symbol). It connects to Bitfinex's authenticated push endpoint and authenticates only when subscribed: once the subscription is active (and again after every reconnect) it first pushes a snapshot of all balances from the same endpoint as ```exchange.GetAccount()```, then reports ready, and afterwards pushes order updates for spot pairs and the balances of coins that changed (same figures as ```exchange.GetAccount()```, exchange wallet only; when Bitfinex has not yet computed the available balance the balances are queried once more). Spot has no positions, so the private stream pushes none. An authentication failure, or an API key without order and wallet read permission, reports a degraded connection status and a failed private stream (market data push is unaffected). A market-wide ```tickers``` subscription is not supported (Bitfinex ticker push is per symbol only) and fails at subscribe; subscribe ticker per symbol.
 
 ###### ```Futures_Bitfinex``` (Futures)
 
 - Order amounts are in coins, not numbers of contracts.
 - Bitfinex prices have 5 significant digits; the ```TickSize``` and ```PricePrecision``` returned by `exchange.GetMarkets` are derived from the current last price.
 - The rate from ```exchange.GetFundings()``` is the current rate from Bitfinex's derivatives status, settled every 8 hours; without arguments it returns every perpetual of the current quote currency.
+- WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private stream (order updates, positions and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. Ticker and bbo share Bitfinex's ticker stream (Bitfinex's ticker already carries the best bid/ask prices and sizes; there is no separate top-of-book stream), and the open price is the last price minus the 24-hour change, as in ```exchange.GetTicker()```. Trades carry the same trade IDs as ```exchange.GetTrades()```; the recent trades the exchange replays on subscription are not pushed. Depth subscriptions of up to 25 levels (25 by default) use Bitfinex's 25-level book, larger depths use the 100- or 250-level book (at most 250 levels), synchronized from a snapshot plus deltas and verified with Bitfinex's book checksum and connection sequence numbers; a failed check resubscribes that book. A first kline subscription pushes 500 historical bars first; Bitfinex's kline stream has no close flag, so a bar is pushed as closed once its period has ended (or the next bar arrives). Pushed prices use 5 significant digits of the last price at subscription time plus two more decimals; amounts use 8 decimals. The private stream is one ```private``` subscription for the whole account (no symbol). It connects to Bitfinex's authenticated push endpoint and authenticates only when subscribed: once the subscription is active (and again after every reconnect) it first pushes a snapshot of all balances and positions from the same endpoints as ```exchange.GetAccount()``` and ```exchange.GetPositions()```, then reports ready, and afterwards pushes order updates for perpetual contracts, position changes (one net position per contract, quantity 0 once closed; profit, liquidation price and leverage that Bitfinex has not computed in the push are left out) and the balances of margin currencies that changed (same figures as ```exchange.GetAccount()```; when Bitfinex has not yet computed the available balance the balances are queried once more). An authentication failure, or an API key without order, position and wallet read permission, reports a degraded connection status and a failed private stream (market data push is unaffected). A market-wide ```tickers``` subscription is not supported (Bitfinex ticker push is per contract only) and fails at subscribe; subscribe ticker per symbol.
 
 #### bitFlyer
 
@@ -26279,6 +27251,7 @@ Served through a fallback:
 - ```exchange.GetMarkets()``` gives no price/amount precision or order-size limits (the exchange API does not provide them); those fields are 0.
 - The exchange's ticker endpoint has no 24-hour high, low or open price: ```High``` and ```Low``` in ```exchange.GetTicker()``` are filled with the best ask and best bid, and ```Open``` is 0.
 - The order ID returned on placement is the acceptance ID (starting with ```JRF```), while ```exchange.GetOrders()``` and ```exchange.GetHistoryOrders()``` give the exchange's internal order ID; both IDs can be used to query and cancel, and the same applies to conditional (parent) orders.
+- WebSocket push is supported: market data (ticker, bbo, depth, trades) and the private account stream (order updates, balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. The exchange has no kline push (and no kline endpoint), so kline subscriptions of any period are rejected as unsupported. Ticker and bbo come from the same ticker push, which carries the best bid/ask and their sizes but no 24-hour high, low or open. Depth has a single set of pushes (a full snapshot of 300 levels per side about every 5 seconds plus real-time deltas, neither with sequence numbers): a depth subscription starts publishing once the first snapshot arrives, every snapshot replaces the local order book and the deltas update it in between; when deltas leave the best bid at or above the best ask, the connector resubscribes and waits for the next snapshot. Depth subscriptions of any size (20 levels by default) share these pushes and each publishes its own number of levels. Trades carry the same trade IDs as ```exchange.GetTrades()```; itayose (call auction) trades have no taker side. The exchange publishes no price or amount precision: pushed prices are converted with up to 3 decimals for JPY quotes and up to 8 for BTC quotes, amounts with up to 8 decimals. The private stream is one ```private``` subscription for the whole account (no symbol). It connects only when subscribed, authenticates with the API key (the key needs the permission to receive order events) and subscribes to order events: once active (and again after every reconnect) it first pushes a balance snapshot from the same endpoint as ```exchange.GetAssets()```, then reports ready, and afterwards pushes spot order updates (the order ID is the acceptance ID returned on placement, starting with ```JRF```). The exchange has no balance push, so after each order event the balances are re-read through REST and the coins that changed are pushed. The exchange only pushes individual fills and the remaining amount: for orders placed after subscribing, the filled amount is the order amount minus the remaining amount and the average price is computed from the pushed fills (0 if a fill was missed); orders that existed before subscribing only report their state, with amount, filled amount and average price 0. Spot has no positions. A rejected authentication reports a degraded connection status and a failed private stream (market data push is unaffected). A market-wide ```tickers``` subscription is not supported (bitFlyer ticker push is per product only) and fails at subscribe; subscribe ticker per symbol.
 
 #### Bitget
 
@@ -26387,6 +27360,7 @@ Simulation: Check the Simulate box when adding the exchange (or switch at run ti
 
 - A unified account (v3) has no spot conditional-order API, so conditional-order functions (```exchange.CreateConditionOrder()```, ```exchange.GetConditionOrders()```, etc.) report an error and return null; a classic account (v2) supports take-profit and stop-loss conditional orders (not OCO) and ```exchange.ModifyConditionOrder()```.
 - ```exchange.ModifyOrder()``` amends in place on a unified account; on a classic account it uses the cancel-replace endpoint (```cancel-replace-order```) and returns the new order's ID (expressed by its client order ID, in the form ```clientOid:…```), which works directly for cancelling and querying the order.
+- WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private stream (order updates and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. Market data push uses Bitget's v2 public streams for both unified and classic accounts (trade IDs match ```exchange.GetTrades()```); the ticker push carries the best bid/ask prices and sizes. bbo and 1-level depth use the 1-level snapshot stream, 5- and 15-level depth use the matching snapshot streams, and any other depth (20 levels by default, at most 255) uses the full-depth stream synchronized from a snapshot plus sequenced updates, resubscribing on a sequence gap. Kline periods are those of ```exchange.GetRecords()``` (daily and longer bars split at UTC for a unified account, UTC+8 for a classic account); a first kline subscription pushes 500 historical bars first. Bitget's kline push has no close flag: a bar is pushed as closed when the next bar appears (or once the push time is past its end). The private stream is one ```private``` subscription for the whole account (no symbol). It connects and logs in only when subscribed, using the UTA order and account channels for a unified account (v3) or the spot order and account channels for a classic account (v2): once the subscription is active (and again after every reconnect) it first pushes a snapshot of all balances from the same endpoint as ```exchange.GetAccount()```, then reports ready, and afterwards pushes order updates and the balances of coins that changed (same figures as ```exchange.GetAccount()```). Spot has no positions, so the private stream pushes none. A login failure (wrong key, IP not whitelisted, ...) reports a degraded connection status and a failed private stream (market data push is unaffected). Demo trading uses Bitget's demo push endpoints. A market-wide ```tickers``` subscription is not supported (Bitget ticker push is per instrument only) and fails at subscribe; subscribe ticker per symbol.
 
 ###### ```Futures_Bitget``` (Futures)
 
@@ -26396,6 +27370,7 @@ Simulation: Check the Simulate box when adding the exchange (or switch at run ti
 - Order quantity units: on a classic account (v2) every contract family is in base coin (1 contract = 1 coin); on a unified account (v3) USDT and USDC contracts are in base coin and coin-margined contracts in USD contracts. See ```CtVal``` and ```CtValCcy``` in ```exchange.GetMarkets()```.
 - On a unified account (v3), coin-margined contracts support neither conditional orders nor ```exchange.ModifyOrder()```; calls report an error.
 - Without ```since```, ```exchange.GetHistoryConditionOrders()``` covers the last 7 days on a classic account (v2) and the last 30 days on a unified account (v3); with ```since``` it covers the 30 days starting at ```since```.
+- WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private stream (order updates, positions and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. Market data push uses Bitget's v2 public streams (trade IDs match ```exchange.GetTrades()```, quantities are in coins); the ticker push carries the best bid/ask prices and sizes and the open interest. bbo and 1-level depth use the 1-level snapshot stream, 5- and 15-level depth use the matching snapshot streams, and any other depth (20 levels by default, at most 255) uses the full-depth stream synchronized from a snapshot plus sequenced updates, resubscribing on a sequence gap. Kline periods are those of ```exchange.GetRecords()```; a first kline subscription pushes 500 historical bars first. Bitget's kline push has no close flag: a bar is pushed as closed when the next bar appears (or once the push time is past its end). Coin-margined delivery contracts of a unified account (v3) are listed only on the v3 API and have no market data push (subscribing reports an error). A delivery contract (e.g. ```BTC_USD.quarter```) is resolved to the current contract when subscribed; resubscribe after it rolls over. The private stream is one ```private``` subscription for the whole account (no symbol). It connects and logs in only when subscribed, using the UTA order, position and account channels for a unified account, or the order and account channels of the USDT-, coin- and USDC-margined families plus the USDT-margined position channel for a classic account: once the subscription is active (and again after every reconnect) it first pushes a snapshot of balances and positions from the same endpoints as ```exchange.GetAccount()``` and ```exchange.GetPositions()```, then reports ready, and afterwards pushes order updates and changes of positions and balances (same figures as those two functions; positions cover the USDT-margined contracts of the ```exchange.GetPositions()``` default scope, and a closed position is pushed as a row with quantity 0). A login failure (wrong key, IP not whitelisted, ...) reports a degraded connection status and a failed private stream (market data push is unaffected). Demo trading uses Bitget's demo push endpoints. A market-wide ```tickers``` subscription is not supported (Bitget ticker push is per contract only) and fails at subscribe; subscribe ticker per symbol.
 
 #### Bithumb
 
@@ -26433,6 +27408,7 @@ Served through a fallback:
 - The batch data of ```exchange.GetTickers()``` has no order book, so ```Buy``` and ```Sell``` are 0; ```exchange.GetTicker()``` queries the order book separately for the best bid and ask.
 - The order list endpoints carry no fill details: for orders with fills, ```AvgPrice``` in ```exchange.GetOrders()``` and ```exchange.GetHistoryOrders()``` is the executed total returned by the exchange (```executed_funds```) divided by the filled amount; when that total is missing it is the order price for limit orders and 0 for market orders. Use ```exchange.GetOrder()``` for the exact average fill price.
 - ```exchange.GetHistoryOrders()``` returns filled and canceled orders, at most 100 by default; ```since``` is applied locally to the order creation time.
+- WebSocket push is supported: market data (ticker, bbo, depth, trades) and the private account stream (order updates, balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. Bithumb has no kline push, so kline subscriptions always fail with ```unsupported interval```. Every depth push is a full snapshot of at most 15 levels: depth subscriptions (15 levels by default) all subscribe to 15 levels and publish their own number of levels after levels with zero quantity are dropped; a subscription above 15 levels fails. The ticker takes its best bid/ask from the order book (the first level with a non-zero quantity). Trade IDs follow ```exchange.GetTrades()``` (the trade time in milliseconds × 10000, with ```-1```, ```-2``` suffixes on later trades in the same millisecond; for several trades in one millisecond the suffix order may differ from REST). The exchange does not acknowledge subscriptions, so a market data subscription becomes active with its first message. The private stream is one ```private``` subscription for the whole account (no symbol). It connects to the Private v2 endpoint only when subscribed, authenticates the handshake with a JWT signed with the API key, and subscribes to the order (myOrder) and asset (myAsset) channels. The exchange neither acknowledges subscriptions nor offers a request to list them, so the connector treats the subscription as active when the next heartbeat (about one every 10 seconds) arrives without an error; then (and again after every reconnect) it first pushes a balance snapshot from the same endpoint as ```exchange.GetAssets()```, reports ready, and afterwards pushes order updates (the average price is the filled amount divided by the filled quantity) and the balances of coins that changed (available and frozen as in ```exchange.GetAssets()```). Spot has no positions. A rejected authentication reports a degraded connection status and a failed private stream (market data push is unaffected). A market-wide ```tickers``` subscription is not supported (Bithumb ticker push needs explicit market codes) and fails at subscribe; subscribe ticker per symbol.
 
 #### Bitstamp
 
@@ -26481,6 +27457,7 @@ Served through a fallback:
 - Maker-only (```postOnly```) orders are placed with Bitstamp's ```moc_order```; IOC and FOK limit orders are supported as well.
 - The minimum order size in ```exchange.GetMarkets()``` is the exchange's minimum order value (in the quote currency), given in ```MinNotional```; ```MinQty``` and ```MaxQty``` are 0.
 - ```exchange.GetTrades()``` returns the trades of the last hour (the exchange endpoint's default time window).
+- WebSocket push is supported: market data (ticker, bbo, depth, trades) and the private stream (order updates and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. Depth subscriptions (20 levels by default, at most 100) use Bitstamp's order book channel, whose every push is a full snapshot of the top 100 levels; subscriptions of 5, 20 or other depths each publish their own number of levels. bbo is the first level of that order book. Bitstamp has no ticker stream: the ticker combines the trade stream (last price and quantity) with the first order book level (best bid and ask) and has no 24-hour statistics (volume is 0; open, high and low equal the last price). Trades carry the same trade IDs as ```exchange.GetTrades()```. Bitstamp has no kline stream, so kline subscriptions report an error. The private stream is one ```private``` subscription for the whole account (no symbol) that connects only when subscribed: with a token from ```/api/v2/websockets_token/``` it subscribes the order channel of every trading pair (Bitstamp's private channels are per pair). Once active (and again after every reconnect) it first pushes a balance snapshot from the same endpoint as ```exchange.GetAssets()```, then reports ready; afterwards it pushes order updates (without an average fill price), and after every order change re-reads the balances and pushes the coins that changed. Spot has no positions. A rejected token reports a degraded connection status and a failed private stream (market data push is unaffected). A market-wide ```tickers``` subscription is not supported (Bitstamp has no ticker push at all, let alone a market-wide one) and fails at subscribe; subscribe ticker per symbol.
 
 #### Bybit
 
@@ -26643,15 +27620,17 @@ Option codes are Bybit native codes: underlying-expiry-strike-C/P-settlement coi
 ###### ```Bybit``` (Spot)
 
 - Market-order quantities follow the Bybit API default (a market buy is a quote-currency amount); pass ```marketUnit``` (```baseCoin``` or ```quoteCoin```) in the order's extra parameters to choose the unit; extra parameters are passed to the exchange as is.
+- WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private stream (order updates and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. The ticker push takes its best bid/ask prices and sizes from the pair's 1-level order book stream (Bybit's spot ticker stream carries none) and starts once both streams have arrived. Trades carry the same trade IDs as ```exchange.GetTrades()```. Depth subscriptions of up to 50 levels (20 by default) use Bybit's 50-level stream, larger depths use the 200- or 1000-level stream (at most 255 levels), all synchronized from a snapshot plus deltas. A first kline subscription pushes 500 historical bars first. The private stream is one ```private``` subscription for the whole account (no symbol). It connects and authenticates only when subscribed and subscribes Bybit's spot order stream and wallet stream on that one connection: once the subscription is active (and again after every reconnect) it first pushes a snapshot of all balances from the same endpoint as ```exchange.GetAccount()```, then reports ready, and afterwards pushes order updates and the balances of coins that changed (same figures as ```exchange.GetAccount()```, from the same wallet). Spot has no positions, so the private stream pushes none. An authentication failure reports a degraded connection status and a failed private stream (market data push is unaffected). In simulated trading the private stream uses Bybit's demo push endpoint, while market data push is the same as live. A market-wide ```tickers``` subscription is not supported (Bybit only pushes tickers per symbol) and fails at subscribe; subscribe ticker per symbol.
 
 ###### ```Futures_Bybit``` (Futures)
 
 - The result of ```exchange.GetMarkets()``` includes pre-launch (PreLaunch) contracts.
 - Order quantity units: linear contracts and options are in base coin; inverse (coin-margined) contracts are in contracts of 1 USD each; see ```CtVal``` and ```CtValCcy``` in ```exchange.GetMarkets()```.
+- WebSocket push is supported for linear and inverse contracts: market data (ticker, bbo, depth, trades, klines) and the private stream (order updates, positions and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. Options have no market data push (subscribing reports an error), while option order updates are pushed (option positions are not, matching ```exchange.GetPositions()``` without arguments). Delivery aliases (```quarter``` and so on) are resolved to a concrete contract when subscribing and do not roll over during the subscription. Depth subscriptions of up to 50 levels (20 by default) use Bybit's 50-level stream, larger depths use the 200- or 1000-level stream (at most 255 levels), all synchronized from a snapshot plus deltas. Trades carry the same trade IDs as ```exchange.GetTrades()``` (Bybit contract trade IDs are UUID strings). A first kline subscription pushes 500 historical bars first. The private stream is one ```private``` subscription for the whole account (no symbol). It connects and authenticates only when subscribed and subscribes Bybit's order, position and wallet streams on that one connection: once the subscription is active (and again after every reconnect) it first pushes a snapshot of all balances and of the linear and inverse positions from the same endpoints as ```exchange.GetAccount()``` and ```exchange.GetPositions()```, then reports ready, and afterwards pushes order updates, positions that changed (one net position in one-way mode, one long and one short leg in hedge mode, a closed position is pushed with quantity 0) and the balances of coins that changed (same figures as ```exchange.GetAccount()```). On a unified trading account 1.0 the balances add up the unified and the inverse wallet, so a wallet push triggers one balance query. An authentication failure reports a degraded connection status and a failed private stream (market data push is unaffected). In simulated trading the private stream uses Bybit's demo push endpoint, while market data push is the same as live. A market-wide ```tickers``` subscription is not supported (Bybit only pushes tickers per contract) and fails at subscribe; subscribe ticker per contract.
 
 #### Coincheck
 
-Spot trading on the Japanese exchange Coincheck (API address ```https://coincheck.com```). It uses REST only, with no market-data or order push. Private endpoints are signed with a Coincheck API key (Access Key and Secret Key). The exchange has no K-line, all-market ticker, market list or historical order endpoint; see below for how the affected functions behave.
+Spot trading on the Japanese exchange Coincheck (API address ```https://coincheck.com```). Queries and orders use the REST API; market data and the private stream are also available as WebSocket push (see below). Private endpoints are signed with a Coincheck API key (Access Key and Secret Key). The exchange has no K-line, all-market ticker, market list or historical order endpoint; see below for how the affected functions behave.
 
 ##### Names and Configuration
 
@@ -26685,10 +27664,11 @@ Served through a fallback:
 - When ```exchange.GetConditionOrders()``` is called without the ```symbol``` argument, take-profit and stop-loss cannot be told apart from the current price, and the conditional orders are returned with the generic condition type.
 - The orders returned by ```exchange.GetOrders()``` and ```exchange.GetConditionOrders()``` only reflect the unfilled part: ```Amount``` is the remaining unfilled quantity (Coincheck's ```pending_amount```), and ```DealAmount``` and ```AvgPrice``` are 0; for a market buy order (such as a conditional buy that executes at market once triggered), ```Amount``` is the remaining JPY amount.
 - ```exchange.GetTicker()``` has no opening price, so ```Open``` is filled with the last price.
+- WebSocket push is supported: depth, trades and the private stream (order updates and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. Coincheck has no ticker, best bid/ask or kline stream, so ```ticker```, ```bbo``` and kline subscriptions report an error (a 1-level depth subscription gives the best bid and ask). Coincheck's order book channel pushes changes only: depth subscriptions (20 levels by default, at most 100) take a full snapshot from the same endpoint as ```exchange.GetDepth()``` and apply the changes in order on top of it, refetch the snapshot when the local book becomes crossed, and reconnect once an hour to resynchronize. Trades carry the same trade IDs as ```exchange.GetTrades()```, with times in whole seconds. The exchange does not answer subscriptions at all: the trading pair is checked against the same endpoint as ```exchange.GetTicker()``` before subscribing, and a subscription counts as active once the first message of that channel (or a later message on the same connection) arrives; a connection carrying only the trades of a quiet pair reports a normal status only after its first trade. The private stream is one ```private``` subscription for the whole account (no symbol) that connects only when subscribed: it logs in with the signed API key and subscribes the order events channel (the API key needs the WebSocket order events permission). Once active (and again after every reconnect) it first pushes a balance snapshot from the same endpoint as ```exchange.GetAssets()```, then reports ready; afterwards it pushes order updates and, after every order event, re-reads the balances and pushes the coins that changed. Coincheck only pushes fills, cancellations, expiries and triggered stop orders (new orders are not pushed), without an average fill price; the cumulative filled amount of a partial fill counts only the fills received on the current connection, while full fills, cancellations and expiries use the order and expired amounts given by the exchange. Spot has no positions. A rejected login, or an API key without the order events permission, reports a degraded connection status and a failed private stream (market data push is unaffected). A market-wide ```tickers``` subscription is not supported (Coincheck has no ticker push at all, let alone a market-wide one) and fails at subscribe; subscribe depth per symbol for the best bid/ask.
 
 #### Coinone
 
-Spot trading on the KRW market of the Korean exchange Coinone (API address ```https://api.coinone.co.kr```). It uses REST only, with no market-data or order push. Private endpoints are signed with a Coinone API key (Access Key and Secret Key).
+Spot trading on the KRW market of the Korean exchange Coinone (API address ```https://api.coinone.co.kr```). Queries and orders use the REST API; market data and the private stream are also available as WebSocket push (see below). Private endpoints are signed with a Coinone API key (Access Key and Secret Key).
 
 ##### Names and Configuration
 
@@ -26723,12 +27703,13 @@ Served through a fallback:
 - The exchange's completed orders carry no order type, so historical conditional orders cannot be queried.
 - When ```exchange.GetConditionOrders()``` is called without the ```symbol``` argument, take-profit and stop-loss cannot be told apart from the current price, and the conditional orders are returned with the generic condition type.
 - ```exchange.GetHistoryOrders()``` reads Coinone's completed orders (```completed_orders```), which include filled orders only, not canceled ones; without ```limit```, at most 100 orders are returned.
+- WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private account stream (order updates, balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. Coinone has a single depth stream (a full snapshot on every push, 16 levels per side): depth subscriptions of any size (16 levels by default and at most; a larger depth is rejected at subscription) share it and each publishes its own number of levels. The exchange's ticker stream only updates on trades, so the ticker's best bid/ask come from the top level of the order book stream, as does bbo. Trades carry the same trade IDs as ```exchange.GetTrades()```. Kline periods are 1, 3, 5, 15 and 30 minutes, 1, 2, 4 and 6 hours, 1 day and 1 week (10 minutes and 1 month are supported only by ```exchange.GetRecords()``` and rejected at subscription); a first kline subscription pushes 500 historical bars first, and since pushes carry no closed flag, a bar counts as closed when the next bar arrives or its end time has passed. Symbols are checked against ```exchange.GetMarkets()``` before subscribing; unknown or non-trading pairs are rejected at subscription. The private stream is one ```private``` subscription for the whole account (no symbol). It connects only when subscribed, authenticates the connection with the API key signature, and subscribes to order and balance changes of all pairs: once active (and again after every reconnect) it first pushes a balance snapshot from the same endpoint as ```exchange.GetAssets()```, then reports ready, and afterwards pushes order updates and the balances of coins that changed (available and frozen as in ```exchange.GetAssets()```). The exchange's order pushes carry no cumulative filled amount: for an order whose resting update was received after subscribing, the filled amount is derived from the order amount and the remaining amount; for orders that existed before subscribing, the filled amount keeps its previous value. Spot has no positions. A market-wide ```tickers``` subscription is not supported (Coinone ticker push is per pair only) and fails at subscribe; subscribe ticker per symbol.
 
 #### CoinW
 
-```Coinw``` (Spot): CoinW spot trading through CoinW's ```command```-style spot API (```api.coinw.com```); everything is REST polling, with no market data or order push. Private endpoints need an API key (Access Key and Secret Key). Spot only, with no simulated trading; use ```Futures_Coinw``` for perpetual contracts.
+```Coinw``` (Spot): CoinW spot trading through CoinW's ```command```-style spot API (```api.coinw.com```); queries and orders use the REST API, and market data and the private stream are also available as WebSocket push (see below). Private endpoints need an API key (Access Key and Secret Key). Spot only, with no simulated trading; use ```Futures_Coinw``` for perpetual contracts.
 
-```Futures_Coinw``` (Futures): CoinW USDⓈ-margined perpetual contracts (USDT and USDC margin), through the CoinW futures API (```/v1/perpum``` on ```api.coinw.com```); everything is REST polling, with no market data or order push. Private endpoints need an API key (Access Key and Secret Key). Perpetual contracts only, with no coin-margined or delivery contracts and no simulated trading.
+```Futures_Coinw``` (Futures): CoinW USDⓈ-margined perpetual contracts (USDT and USDC margin), through the CoinW futures API (```/v1/perpum``` on ```api.coinw.com```); queries and orders use the REST API, and market data and the private stream are also available as WebSocket push (see below). Private endpoints need an API key (Access Key and Secret Key). Perpetual contracts only, with no coin-margined or delivery contracts and no simulated trading.
 
 ##### Names and Configuration
 
@@ -26833,6 +27814,7 @@ Position mode: One-way positions only; ```exchange.IO("dual", ...)``` is not sup
 - The open-order endpoint requires a trading pair: ```exchange.GetOrders()``` without arguments queries the open orders of the current trading pair only, not all pairs.
 - The amount of a market buy order is the quote-currency sum to spend (sent as CoinW's ```funds```); a market sell order's amount is in the base currency.
 - Orders are only limit or market: the exchange does not support post-only (```postOnly```), IOC or FOK, and passing them fails without sending the order. A custom order id (```clientId```) is sent as CoinW's ```out_trade_no``` (at most 50 characters, letters, digits, ```-``` and ```_``` only); the returned and queried order ID is still the exchange order ID.
+- WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private stream (order updates and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. The push uses CoinW's native WebSocket API (```wss://ws.futurescw.com```) and subscribes by the exchange's numeric pair code (taken from the ticker endpoint). The ticker push takes its best bid/ask prices and sizes from the pair's order book snapshot (CoinW's ticker stream has no bid/ask) and starts once both streams have arrived; its volume is in the base currency. Trades carry the same trade IDs as ```exchange.GetTrades()```. Every depth push is a full snapshot of at most 100 levels (20 by default). Kline periods are the same as ```exchange.GetRecords()``` (the exchange's extra 6-hour, 12-hour and monthly periods are not supported and fail at subscription). The exchange does not flag closed klines: a bar counts as closed once the push arrives after its end time or the next bar appears. A first kline subscription pushes 500 historical bars first. The private stream is one ```private``` subscription for the whole account (no symbol). It connects and logs in only when subscribed: once the subscription is active (and again after every reconnect) it first pushes a snapshot of all balances from the same endpoint as ```exchange.GetAssets()```, then reports ready, and afterwards pushes order updates (all pairs) and balance changes (the full free and frozen amounts of the currency). The exchange documents only two order events, new orders and finished orders (filled or canceled); other order events are not pushed. Spot has no positions, so the private stream pushes none. A rejected login reports a degraded connection status and a failed private stream (market data push is unaffected). A market-wide ```tickers``` subscription is not supported (CoinW ticker push is per pair only) and fails at subscribe; subscribe ticker per symbol.
 
 ###### ```Futures_Coinw``` (Futures)
 
@@ -26840,8 +27822,10 @@ Position mode: One-way positions only; ```exchange.IO("dual", ...)``` is not sup
 - The open-order and open-conditional-order endpoints require a trading pair: ```exchange.GetOrders()``` and ```exchange.GetConditionOrders()``` without arguments query the current contract only, not all contracts.
 - ```exchange.GetHistoryOrders()``` and ```exchange.GetHistoryConditionOrders()``` do not support the ```since``` argument (the exchange's history endpoint has no time-range parameter) and fail when it is given; only the most recent orders can be queried.
 - Amounts in ```exchange.GetDepth()``` are in contracts: the coin amounts from the exchange are converted with the coin amount per contract and rounded. Amounts in ```exchange.GetTrades()``` are in contracts as well.
-- USDT-margined and USDC-margined contracts use two accounts: ```exchange.GetAccount()``` and ```exchange.GetAssets()``` query the account of the current contract's quote currency (```BTC_USDC.swap``` queries the USDC account); without a trading pair both accounts are returned.
+- USDT-margined and USDC-margined contracts use two accounts: ```exchange.GetAccount()``` and ```exchange.GetAssets()``` query the account of the current contract's quote currency (```BTC_USDC.swap``` queries the USDC account); without a trading pair both accounts are returned, and only the USDT account when no USDC futures account has been opened (the exchange answers error code 9001 for an unopened USDC account; a query with a USDC trading pair still fails).
+- ```Volume``` in ```exchange.GetTicker()``` is the sum of the last 24 one-hour klines (in the base currency, the last bar still open), which costs one extra kline request per call; the ```total_volume``` of the exchange's ticker endpoint is only the amount of the most recent trade, not a 24-hour volume. ```exchange.GetTickers()``` has no per-contract klines to use, so its ```Volume``` is still the exchange's ```total_volume```.
 - Limit orders support IOC, FOK and post-only (```postOnly```), mapped to the CoinW ```positionType``` values ```IOC```, ```FOK``` and ```PostOnly```; market orders, closing orders (```reduceOnly```, which use the exchange's close-position endpoint) and conditional orders do not support these options and fail when they are given. A custom order ID (```clientId```) is sent as ```thirdOrderId```; closing orders do not support it.
+- WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private stream (order updates, positions and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. The push uses CoinW's native WebSocket API (```wss://ws.futurescw.com/perpum```). The ticker push takes its best bid/ask prices and sizes from the contract's order book snapshot (CoinW's ticker stream has no bid/ask) and starts once both streams have arrived; its volume is in the base currency. Every depth push is a full snapshot of at most 100 levels (20 by default), with amounts in contracts like ```exchange.GetDepth()``` (the exchange's coin amounts converted with the coin amount per contract and rounded). Trade amounts are in contracts and trade IDs are the same as ```exchange.GetTrades()```. Kline periods are the same as ```exchange.GetRecords()``` and are cut in UTC+8 as well. The exchange does not flag closed klines: a bar counts as closed once the push arrives after its end time or the next bar appears. A first kline subscription pushes 300 historical bars first. The private stream is one ```private``` subscription for the whole account (no symbol). It connects and logs in only when subscribed: once the subscription is active (and again after every reconnect) it first pushes a snapshot from the same endpoints as ```exchange.GetAssets()``` and ```exchange.GetPositions()``` (both the USDT and USDC accounts, all positions), then reports ready, and afterwards pushes order updates, positions and balance changes. A position push is the current position of one contract in one direction (in contracts, 0 once closed); the push has no unrealized profit or liquidation price, so those are not provided. The exchange's asset push does not match the figures of ```exchange.GetAssets()```, so on each one the connector queries ```exchange.GetAssets()``` again and pushes only the accounts that changed. Order pushes carry no filled amount or average price: a new order has 0 filled, a fully filled order has its whole amount filled, and partial fills and cancellations keep the filled amount of the previous update. If the snapshot query fails the private stream reports a failure and retries automatically (order pushes are unaffected); a rejected login reports a degraded connection status and a failed private stream (market data push is unaffected). A market-wide ```tickers``` subscription is not supported (CoinW futures ticker push is per contract only) and fails at subscribe; subscribe ticker per symbol.
 
 #### Crypto.com
 
@@ -26987,6 +27971,7 @@ Account: ```exchange.SetMarginLevel()``` sets the leverage of the whole trading 
 - ```exchange.ModifyOrder()``` and ```exchange.ModifyConditionOrder()``` are supported (Crypto.com amends the order in place, keeping its order ID); conditional orders can change the trigger price, order price and amount, and an order price of -1 turns a conditional limit order into one that executes at market when triggered (a positive price does the reverse). ```tif``` and ```postOnly``` cannot be changed (passing them reports an error).
 - ```exchange.GetOrders()``` and ```exchange.GetConditionOrders()``` without arguments return the open orders of all trading pairs. ```exchange.GetHistoryOrders()``` and ```exchange.GetHistoryConditionOrders()``` return the latest 100 records when ```limit``` is not given, and page automatically to fill a larger ```limit```. Without ```since```, Crypto.com returns only the last day of conditional order history; pass ```since``` to query earlier records.
 - The frozen amount in ```exchange.GetAssets()``` is Crypto.com's ```reserved_qty``` (open orders plus margin in use), and the available amount is the holding minus it.
+- WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private stream (order updates and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. Both ticker and bbo come from Crypto.com's ticker stream (it carries the best bid/ask prices and sizes; Crypto.com has no separate best bid/offer stream). Trades carry the same trade IDs as ```exchange.GetTrades()```. Depth subscriptions of up to 10 levels use Crypto.com's 10-level stream and 11 to 50 levels (20 by default) its 50-level stream, both synchronized from a snapshot plus sequenced deltas; Crypto.com has no deeper books, so a subscription above 50 levels reports an error. Kline periods are the native periods of ```exchange.GetRecords()```; a first kline subscription pushes 500 historical bars first, and since Crypto.com's kline push carries no closed flag, the previous bar is pushed again as closed when the next one starts. The private stream is one ```private``` subscription for the whole account (no symbol). It connects and authenticates only when subscribed and subscribes Crypto.com's order stream and balance stream on that one connection: once the subscription is active (and again after every reconnect) it first pushes a snapshot of all balances from the same endpoint as ```exchange.GetAccount()```, then reports ready, and afterwards pushes spot order updates and the balances of coins that changed (same figures as ```exchange.GetAccount()```). Spot has no positions, so the private stream pushes none. An authentication failure reports a degraded connection status and a failed private stream (market data push is unaffected). A market-wide ```tickers``` subscription is not supported (Crypto.com ticker push is per instrument only) and fails at subscribe; subscribe ticker per symbol.
 
 ###### ```Futures_Crypto``` (Futures)
 
@@ -26997,12 +27982,13 @@ Account: ```exchange.SetMarginLevel()``` sets the leverage of the whole trading 
 - Limit orders support ```tif``` IOC, FOK and maker-only (```postOnly```); maker-only cannot be combined with IOC or FOK, and passing ```tif``` or ```postOnly``` on a market order reports an error. Conditional orders with an order price (a limit order once triggered) support ```tif``` and ```postOnly``` too; conditional orders that execute at market once triggered report an error when given them. Both regular and conditional orders support reduce-only (```reduceOnly```).
 - ```exchange.ModifyOrder()``` and ```exchange.ModifyConditionOrder()``` are supported (Crypto.com amends the order in place); conditional orders can change the trigger price, order price and amount, and an order price of -1 turns a conditional limit order into one that executes at market when triggered (a positive price does the reverse). ```tif``` and ```postOnly``` cannot be changed (passing them reports an error).
 - Without ```since```, ```exchange.GetHistoryConditionOrders()``` returns only the last day of conditional order history from Crypto.com; pass ```since``` to query earlier records.
+- WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private stream (order updates, positions and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. Contract codes are the same as in the REST API (delivery contracts resolve from the same contract table). Both ticker and bbo come from Crypto.com's ticker stream (it carries the best bid/ask prices and sizes and the open interest; Crypto.com has no separate best bid/offer stream). Trades carry the same trade IDs as ```exchange.GetTrades()```. Depth subscriptions of up to 10 levels use Crypto.com's 10-level stream and 11 to 50 levels (20 by default) its 50-level stream, both synchronized from a snapshot plus sequenced deltas; a subscription above 50 levels reports an error. Kline periods are the native periods of ```exchange.GetRecords()```; a first kline subscription pushes 500 historical bars first, and since Crypto.com's kline push carries no closed flag, the previous bar is pushed again as closed when the next one starts. The private stream is one ```private``` subscription for the whole account (no symbol). It connects and authenticates only when subscribed and subscribes Crypto.com's order, position and balance streams on that one connection: once the subscription is active (and again after every reconnect) it first pushes a snapshot of all balances and positions from the same endpoints as ```exchange.GetAccount()``` and ```exchange.GetPositions()```, then reports ready, and afterwards pushes derivative order updates and the positions and balances that changed (same figures as those two functions; positions are those of the same account the position query uses, and a closed position is pushed with amount 0). An authentication failure reports a degraded connection status and a failed private stream (market data push is unaffected). A market-wide ```tickers``` subscription is not supported (Crypto.com ticker push is per instrument only) and fails at subscribe; subscribe ticker per symbol.
 
 #### DeepCoin
 
-```DeepCoin``` (Spot): DeepCoin spot trading through the DeepCoin API (```api.deepcoin.com```); everything is REST polling, with no market data or order push. The API KEY configuration needs the Access Key, Secret Key and Passphrase. Account and order calls use the spot account (```SPOT```) only. Spot only, with no simulated trading; use ```Futures_DeepCoin``` for perpetual contracts.
+```DeepCoin``` (Spot): DeepCoin spot trading through the DeepCoin API (```api.deepcoin.com```); market data and the private stream can also be subscribed as WebSocket push (see the notes below). The API KEY configuration needs the Access Key, Secret Key and Passphrase. Account and order calls use the spot account (```SPOT```) only. Spot only, with no simulated trading; use ```Futures_DeepCoin``` for perpetual contracts.
 
-```Futures_DeepCoin``` (Futures): DeepCoin USDT-margined and coin-margined perpetual contracts through the DeepCoin API (```api.deepcoin.com```); everything is REST polling, with no market data or order push. The API KEY configuration needs the Access Key, Secret Key and Passphrase. Perpetual contracts only, with no simulated trading.
+```Futures_DeepCoin``` (Futures): DeepCoin USDT-margined and coin-margined perpetual contracts through the DeepCoin API (```api.deepcoin.com```); market data and the private stream can also be subscribed as WebSocket push (see the notes below). The API KEY configuration needs the Access Key, Secret Key and Passphrase. Perpetual contracts only, with no simulated trading.
 
 ##### Names and Configuration
 
@@ -27105,6 +28091,7 @@ Position mode: Choose merged/split positions with ```exchange.IO("merge", bool)`
 - The amount of a market buy order is the quote-currency sum to spend (DeepCoin's ```tgtCcy``` is ```quote_ccy```); a market sell order's amount is in the base currency. Limit orders support IOC, FOK and post-only (```postOnly```).
 - Conditional orders support take-profit and stop-loss only, not OCO (place the take-profit and stop-loss legs as two conditional orders). Conditional and regular order ids are not interchangeable; conditional orders can only be canceled with ```exchange.CancelConditionOrder()```.
 - ```exchange.GetOrders()``` and ```exchange.GetConditionOrders()``` query one trading pair only: when omitted or empty they query the current trading pair. The untriggered conditional-order endpoint has no pagination and returns at most 100 orders per call; when the exchange returns exactly 100 orders, ```exchange.GetConditionOrders()``` reports an error (completeness cannot be confirmed).
+- WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private stream (order updates and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. The ticker push carries the same last price and 24h open/high/low/volume as ```exchange.GetTicker()```; DeepCoin's ticker stream has best bid/ask prices but no sizes, so the pushed best bid/ask prices and sizes come from the pair's order book stream (on a second connection), and pushing starts once both streams have arrived. Trades carry the same trade IDs as ```exchange.GetTrades()``` and an unknown side (as in ```exchange.GetTrades()```); note that the exchange's spot REST trades endpoint only returns older trades (hours behind in tests), so pushed trade IDs are usually not in the ```exchange.GetTrades()``` result. Depth goes up to 60 levels (20 by default) from the order book stream at the pair's price tick, a full snapshot followed by updates; DeepCoin's book updates carry no sequence numbers, so a local book whose best bid is not below its best ask is treated as out of sync and that depth is resubscribed automatically. Kline push has the 1-minute period only (DeepCoin pushes 1-minute klines only), and a first kline subscription pushes 300 historical bars first; the exchange's pushes have no closed flag, so a bar is closed by its end time or by the arrival of the next bar. Other periods fail at subscription and are synthesized by the docker from REST data. The private stream is one ```private``` subscription for the whole account (no symbol); it requests a listenKey and connects only when subscribed (renewed every 30 minutes). Once the connection is confirmed (and again after every reconnect) it first pushes a snapshot of all balances from the same endpoint as ```exchange.GetAssets()```, then reports ready, and afterwards pushes this account's spot order updates; the exchange's balance push has no order-frozen amount, so it triggers a re-query through ```exchange.GetAssets()``` and only the changed currencies are pushed. Spot has no positions, so the private stream pushes none. An invalid API key reports a degraded connection status and a failed private stream (market data push is unaffected). A market-wide ```tickers``` subscription is not supported (DeepCoin market data push is per instrument only) and fails at subscribe; subscribe ticker per symbol.
 
 ###### ```Futures_DeepCoin``` (Futures)
 
@@ -27113,6 +28100,7 @@ Position mode: Choose merged/split positions with ```exchange.IO("merge", bool)`
 - Conditional orders support take-profit and stop-loss only, not OCO (place the take-profit and stop-loss legs as two conditional orders), and cannot carry a custom order id (clientId); untriggered conditional orders can be modified with ```exchange.ModifyConditionOrder()```, which keeps the order id. Conditional and regular order ids are not interchangeable; conditional orders can only be canceled with ```exchange.CancelConditionOrder()```.
 - The open-conditional-order endpoint requires a trading pair: ```exchange.GetConditionOrders()``` without arguments queries the current contract only, and ranges (such as ```USDT.swap```) are not accepted. The endpoint has no pagination and returns at most 100 orders per call; a response of exactly 100 orders is an error (completeness cannot be confirmed).
 - Trading coin-margined contracts requires the account to have opened a coin-margined contract account on DeepCoin; otherwise orders are rejected by the exchange.
+- WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private stream (order updates, positions and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. Trade sizes, kline volumes, the 24h volume and depth sizes in pushes are contract counts (note that the REST endpoint behind ```exchange.GetDepth()``` returns coin amounts). The ticker push carries the same last price and 24h open/high/low/volume as ```exchange.GetTicker()```; DeepCoin's ticker stream has best bid/ask prices but no sizes, so the pushed best bid/ask prices and sizes come from the contract's order book stream (on a second connection), and pushing starts once both streams have arrived. Trades carry the same trade IDs as ```exchange.GetTrades()``` and an unknown side (as in ```exchange.GetTrades()```); the exchange's REST trades endpoint returns only part of the trades, so only some pushed trade IDs can be found in ```exchange.GetTrades()```. Depth goes up to 60 levels (20 by default) from the order book stream at the contract's price tick, a full snapshot followed by updates; DeepCoin's book updates carry no sequence numbers, so a local book whose best bid is not below its best ask is treated as out of sync and that depth is resubscribed automatically. A few contracts have no order book stream at their price tick, and their depth subscription reports a failure. Kline push has the 1-minute period only (DeepCoin pushes 1-minute klines only), and a first kline subscription pushes 300 historical bars first; the exchange's pushes have no closed flag, so a bar is closed by its end time or by the arrival of the next bar. Other periods fail at subscription and are synthesized by the docker from REST data. The private stream is one ```private``` subscription for the whole account (no symbol); it requests a listenKey and connects only when subscribed (renewed every 30 minutes). Once the connection is confirmed (and again after every reconnect) it first pushes a snapshot of all balances and positions from the same endpoints as ```exchange.GetAssets()``` and ```exchange.GetPositions()```, then reports ready, and afterwards pushes perpetual order updates and position changes (each row is the full current size of that contract and side, 0 meaning closed; pushes carry no unrealized PnL or liquidation price, so those fields are omitted). The exchange's balance push has no order-frozen amount or equity, so it triggers a re-query through ```exchange.GetAssets()``` and only the changed currencies are pushed. An invalid API key reports a degraded connection status and a failed private stream (market data push is unaffected). A market-wide ```tickers``` subscription is not supported (DeepCoin market data push is per instrument only) and fails at subscribe; subscribe ticker per symbol.
 
 #### Deribit
 
@@ -27192,12 +28180,13 @@ Option codes are Deribit native codes: underlying-expiry (day-month-year abbrevi
 - Conditional orders support take-profit and stop-loss only, not OCO; ```exchange.ModifyConditionOrder()``` is supported. Triggers use the last trade price by default; pass ```trigger``` (```mark_price```, ```index_price```) in the extra parameters to use the mark or index price.
 - ```exchange.GetHistoryOrders()``` and ```exchange.GetHistoryConditionOrders()``` query by symbol and do not support the ```since``` argument (passing it fails); they return the most recent records.
 - In range queries such as ```USD.swap``` and ```USD.futures```, ```USD``` covers the BTC and ETH coin-margined contracts; the range for spread combination contracts is ```USD.futures_combo```. When the current contract is a combination, calls without arguments default to ```USD.futures_combo``` (including far combinations returned with native codes); ```USD.futures``` does not include combinations.
+- WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private account stream (order updates, positions and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. Pushed quantities use the same units as the REST API (order, trade and position amounts of coin-margined contracts are in USD; ticker and kline volumes are in coins). The ticker uses Deribit's ```ticker``` channel (it carries the best bid/ask with sizes and the open interest; the open price is derived from the 24-hour change as in ```exchange.GetTicker()```). Depth subscriptions of 1 level, up to 10 levels and up to 20 levels (20 by default) use Deribit's 1-, 10- and 20-level snapshot streams, so depth 5 and depth 20 are two independent subscriptions; more than 20 levels (at most 255) use the full order book's snapshot and updates, each checked against ```prev_change_id```, and a gap resubscribes that depth automatically. Trades carry the same trade IDs as ```exchange.GetTrades()```. Kline periods are the same as ```exchange.GetRecords()```; Deribit's kline push has no close flag, so a bar closes with its last pushed values when the next bar starts. A first kline subscription pushes 500 historical bars first. A delivery contract (such as ```BTC_USD.quarter```) resolves to the contract current at subscription time; subscribe again after the contract rolls over. The private stream is one ```private``` subscription (no symbol; it covers the whole account). Only when subscribed does it open a separate connection, authenticate with an API key signature and subscribe Deribit's order, position-change and all-currency account summary channels for every derivative kind (futures, options and combinations). Each time the subscription takes effect, and after every reconnect, it first takes a snapshot through the same endpoints as ```exchange.GetAssets()``` and ```exchange.GetPositions()```, pushes the snapshot rows and then reports ready; after that it pushes order updates, position changes caused by trades (a closed position as a row with quantity 0) and balance changes live, every field as in the REST API. Position profit changes caused by the mark price are not pushed. A login failure reports a degraded connection status and a failed private stream (market data push is unaffected). After ```exchange.IO("base", "https://test.deribit.com")``` switches to the testnet, push connections opened afterwards connect to the testnet as well. A market-wide ```tickers``` subscription is not supported (Deribit ticker push is per instrument only) and fails at subscribe; subscribe ticker per symbol.
 
 #### DigiFinex
 
-```DigiFinex``` (Spot): DigiFinex spot trading over the REST endpoints of DigiFinex OpenAPI v3 (```openapi.digifinex.com```); private endpoints need an API key (Access Key and Secret Key). Spot only, with no simulated trading; use ```Futures_DigiFinex``` for perpetual contracts.
+```DigiFinex``` (Spot): DigiFinex spot trading over the REST endpoints of DigiFinex OpenAPI v3 (```openapi.digifinex.com```); market data and private data can also be pushed over WebSocket (see the notes). Private endpoints need an API key (Access Key and Secret Key). Spot only, with no simulated trading; use ```Futures_DigiFinex``` for perpetual contracts.
 
-```Futures_DigiFinex``` (Futures): DigiFinex perpetual contracts over the REST endpoints of the DigiFinex futures API (```/swap/v2```): USDⓈ-margined (e.g. ```BTC_USDT.swap```) and coin-margined inverse contracts (e.g. ```BTC_USD.swap```), with no delivery contracts. Private endpoints need an API key (Access Key and Secret Key); check Simulate to use DigiFinex futures simulated trading.
+```Futures_DigiFinex``` (Futures): DigiFinex perpetual contracts over the REST endpoints of the DigiFinex futures API (```/swap/v2```), with market data and private data also pushed over WebSocket (see the notes): USDⓈ-margined (e.g. ```BTC_USDT.swap```) and coin-margined inverse contracts (e.g. ```BTC_USD.swap```), with no delivery contracts. Private endpoints need an API key (Access Key and Secret Key); check Simulate to use DigiFinex futures simulated trading.
 
 ##### Names and Configuration
 
@@ -27284,11 +28273,13 @@ Simulation: Check the Simulate box when adding the exchange to use DigiFinex fut
 
 ###### ```DigiFinex``` (Spot)
 
-DigiFinex spot has no simulated environment and its configuration has no Simulate option; only futures (```Futures_DigiFinex```) support simulated trading.
+- DigiFinex spot has no simulated environment and its configuration has no Simulate option; only futures (```Futures_DigiFinex```) support simulated trading.
+- WebSocket push is supported: market data (ticker, bbo, depth, trades) and the private stream (order updates and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. DigiFinex's spot WebSocket has no kline channel, so a kline subscription returns an error (```exchange.GetRecords()``` works as usual); it has no separate best bid/ask channel either, so bbo comes from the ticker push (about one message a second, carrying the best bid/ask prices and sizes). Trades carry the same trade IDs as ```exchange.GetTrades()```; the recent trades the exchange replays on subscription are not pushed. Depth has a single 100-level stream (a full snapshot first, then increments) shared by depth subscriptions of every size, each truncated to its own size; the default is 20 levels and more than 100 levels is not supported. That stream has no sequence numbers or checksum, so increments are merged in arrival order, and a reconnect resubscribes for a fresh snapshot. The private stream is one ```private``` subscription for the whole account (no symbol). It connects and authenticates only when subscribed: the order stream is subscribed for every spot pair and the balance stream for every currency of those pairs (the pair list at subscription time; pairs listed later are covered from the next reconnect). Once the subscription is active (and again after every reconnect) it first pushes a snapshot of all balances from the same endpoint as ```exchange.GetAssets()```, then reports ready, and afterwards pushes order updates and the balances of coins that changed (free is the pushed available amount, frozen is the total minus that). Margin orders are not pushed; market orders carry no order price and market buy orders no order quantity. Spot has no positions, so the private stream pushes none. An authentication failure reports a degraded connection status and a failed private stream (market data push is unaffected). A market-wide ```tickers``` subscription (no symbol) uses DigiFinex's all-market ticker channel (```all_ticker```): each frame pushes a batch of pairs with the last price, best bid/ask with sizes, and the 24-hour open/high/low and volume.
 
 ###### ```Futures_DigiFinex``` (Futures)
 
 - Batch funding rate queries are not supported: ```exchange.GetFundings()``` requires a concrete perpetual contract (for example ```BTC_USDT.swap```) and fails when it is omitted or given a range (such as ```USDT.swap```).
+- WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private stream (order updates, positions and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. The ticker push carries the best bid/ask prices and sizes itself, and its volume is in contracts as in ```exchange.GetTicker()```; there is no separate best bid/ask channel, so bbo comes from the ticker push. Trades carry the same trade IDs and taker side as ```exchange.GetTrades()```; the recent trades the exchange replays right after subscribing are not pushed. Depth subscriptions of up to 10 levels use DigiFinex's 10-level stream, the default (20 levels) and 11 to 20 levels the 20-level stream, and 21 to 100 levels the 100-level stream; each stream starts with a full snapshot followed by increments, has no sequence numbers or checksum (increments are merged in arrival order and a reconnect resubscribes for a fresh snapshot), and more than 100 levels is not supported. Kline periods are the same as ```exchange.GetRecords()``` (1m, 5m, 15m, 30m, 1h, 4h, 12h, 1d, 1w; other periods return an error); a first kline subscription pushes 500 historical bars first, and since DigiFinex's kline push carries no closed flag, a bar is pushed as closed when the next bar arrives. The private stream is one ```private``` subscription for the whole account (no symbol). It connects and authenticates only when subscribed and subscribes DigiFinex's account, position and order channels for all perpetual contracts of the account type in use (simulated or real, chosen when the stream connects) on that one connection: once the subscription is active (and again after every reconnect) it first pushes a snapshot of all balances and positions from the same endpoints as ```exchange.GetAssets()``` and ```exchange.GetPositions()```, then reports ready, and afterwards pushes order updates and the full current state of every position leg (long and short separately; quantity 0 means the leg is closed) and currency that changed, in the same units as the REST results. An order that fails to be placed is pushed as rejected. An authentication failure reports a degraded connection status and a failed private stream (market data push is unaffected). Simulated contracts (such as ```BTC_USDT2.swap```) have market data push as well. A market-wide ```tickers``` subscription (no contract) uses DigiFinex's all-market ticker channel (```all_ticker```): about every 2 seconds it pushes every contract with the last price, best bid/ask with sizes, and the 24-hour open/high/low and volume (in contracts).
 
 #### Gate
 
@@ -27418,6 +28409,7 @@ Option codes are Gate native codes: underlying-expiry (YYYYMMDD)-strike-C/P, and
 - Market orders are submitted as ```fok``` (fill or kill) by default; override with ```time_in_force``` in the order's extra parameters.
 - ```exchange.GetHistoryOrders()``` needs a pair (the current pair when omitted); an empty string fails.
 - Conditional orders support take-profit and stop-loss only, not OCO; modifying a conditional order is not supported, cancel and recreate it instead. The order placed on trigger is a GTC limit order when an order price is given, otherwise an IOC market order; the trigger is valid for 30 days. ```exchange.GetHistoryConditionOrders()``` does not support the ```since``` argument (the exchange API cannot filter by time) and fails when it is given.
+- WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private stream (order updates and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. The ticker push takes its best bid/ask prices and sizes from the pair's best bid/ask stream (Gate's ticker stream has prices but no sizes) and starts once both streams have arrived; the open price is derived from the 24h change the same way as ```exchange.GetTicker()```. Trades carry the same trade IDs as ```exchange.GetTrades()```. Depth subscriptions of up to 50 levels (20 by default) use Gate's 50-level order book stream and larger depths the 400-level stream (at most 255 levels), both synchronized from a snapshot plus contiguous updates; a sequence gap resubscribes that depth automatically. Kline periods are the same as ```exchange.GetRecords()```, and a first kline subscription pushes 500 historical bars first. The private stream is one ```private``` subscription for the whole account (no symbol). It connects only when subscribed and signs each private channel subscription: once the subscription is active (and again after every reconnect) it first pushes a snapshot of all balances from the same endpoint as ```exchange.GetAssets()``` (the current wallet), then reports ready, and afterwards pushes order updates (all pairs) and balance changes. For the spot wallet of a classic account the changed currencies' free and frozen amounts are pushed directly; for isolated margin, cross margin and unified accounts a balance change triggers a re-query through ```exchange.GetAssets()``` and only the changed currencies are pushed. Spot has no positions, so the private stream pushes none. A rejected signature reports a degraded connection status and a failed private stream (market data push is unaffected). In simulated trading the push connects to Gate's testnet address. A market-wide ```tickers``` subscription is not supported (Gate.io ticker push is per pair only) and fails at subscribe; subscribe ticker per symbol.
 
 ###### ```Futures_GateIO``` (Futures)
 
@@ -27427,10 +28419,11 @@ Option codes are Gate native codes: underlying-expiry (YYYYMMDD)-strike-C/P, and
 - ```exchange.GetHistoryOrders()``` needs a specific contract (the current contract when omitted); an empty string or a range fails. Delivery contracts do not support the ```since``` argument.
 - Conditional orders support take-profit and stop-loss only, not OCO, and trigger on the last traded price; the order placed on trigger is a limit order when an order price is given, otherwise a market order (price 0, ```ioc```). ```exchange.ModifyConditionOrder()``` supports perpetuals only (amended in place); for delivery contracts cancel and recreate instead. Gate may refuse to amend take-profit/stop-loss orders placed through the API (error code 1077 ```APIOrderNotSupportUpdateTouchOrder```); ```exchange.ModifyConditionOrder()``` then fails, and the order has to be cancelled (```exchange.CancelConditionOrder()```) and created again.
 - ```exchange.GetHistoryConditionOrders()``` does not support the ```since``` argument (the exchange API cannot filter by time) and fails when it is given.
+- WebSocket push is supported: market data for perpetual and delivery contracts (ticker, bbo, depth, trades, klines) and the private stream (order updates, positions and balances) can be subscribed through the event stream; options have no push. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. Quantities in pushes are contract counts, the same as the REST API. The ticker push takes its best bid/ask prices and sizes from the contract's best bid/ask stream (Gate's futures ticker stream has none) and starts once both streams have arrived; it carries the open interest. Trades carry the same trade IDs and sides as ```exchange.GetTrades()```. Depth subscriptions of up to 50 levels (20 by default) use Gate's 50-level order book stream and larger depths the 400-level stream (at most 255 levels), both synchronized from a snapshot plus contiguous updates; a sequence gap resubscribes that depth automatically. Kline periods are the same as ```exchange.GetRecords()```, and a first kline subscription pushes 500 historical bars first. A delivery alias (such as ```quarter```) is resolved from the contract list when subscribing; the subscription does not roll over to the next contract by itself. The private stream is one ```private``` subscription for the whole account (no symbol). It connects only when subscribed, opening one connection each for USDT-, BTC- and USD1-settled perpetuals and USDT-settled delivery contracts (the same scope as ```exchange.GetPositions()``` without a symbol; simulated trading has USDT perpetuals only), and signs each private channel subscription. Once the subscription is active (and again after every reconnect) it first pushes a snapshot of all balances and positions from the same endpoints as ```exchange.GetAssets()``` and ```exchange.GetPositions()```, then reports ready, and afterwards pushes order updates and position changes (each row is the position's full current size, 0 meaning closed; pushes carry no unrealized PnL, so that field is omitted). The exchange's balance push has the wallet total only, so it triggers a re-query through ```exchange.GetAssets()``` and only the changed currencies are pushed. A rejected signature or an invalid API key reports a degraded connection status and a failed private stream (market data push is unaffected). In simulated trading the push connects to Gate's testnet address and supports USDT perpetuals only. A market-wide ```tickers``` subscription is not supported (Gate.io ticker push is per contract only) and fails at subscribe; subscribe ticker per symbol.
 
 #### Gemini
 
-Spot trading on Gemini (API address ```https://api.gemini.com```). It uses REST only, with no market-data or order push. Private endpoints are signed with a Gemini API key (Access Key and Secret Key). With a master API key (starting with ```master-```), ```exchange.IO("subAccount", name)``` selects the sub-account to operate on. Market orders and conditional orders are not supported.
+Spot trading on Gemini (API address ```https://api.gemini.com```). Market data and order updates can also be pushed over WebSocket (see the notes). Private endpoints are signed with a Gemini API key (Access Key and Secret Key). With a master API key (starting with ```master-```), ```exchange.IO("subAccount", name)``` selects the sub-account to operate on. Market orders and conditional orders are not supported.
 
 ##### Names and Configuration
 
@@ -27485,10 +28478,11 @@ Served through a fallback:
 - The K-line endpoint has no paging, so each period only gives the most recent batch the exchange returns (about the last day for 1-minute K-lines).
 - ```exchange.GetMarkets()``` returns only the spot pairs whose status is ```open```, not Gemini's perpetual contracts; precision and similar details are queried from the exchange one pair at a time, so the call takes a while.
 - In ```exchange.GetTrades()```, trades from auction matching have no taker side, so their ```Type``` is ```2```.
+- WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private stream (order updates and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. Market data uses Gemini's current WebSocket API (```wss://ws.gemini.com```). Gemini has no 24-hour statistics push, so ticker and bbo both use the best bid/ask stream ```bookTicker``` (best bid/ask prices and sizes plus the price and size of the last trade); the ticker push carries no volume or open/high/low prices. Trades carry the same trade IDs as ```exchange.GetTrades()```. Depth subscriptions of up to 5 levels, 6 to 10 levels, and the default (20 levels) or 11 to 20 levels use Gemini's 5-, 10- and 20-level snapshots every 100 ms; more than 20 levels uses the full order book incremental stream (checked for update-ID continuity and resubscribed for a fresh snapshot on a gap). Klines use Gemini's v2 market data API (```wss://api.gemini.com/v2/marketdata```) with the same periods as ```exchange.GetRecords()``` (1m, 5m, 15m, 30m, 1h, 6h, 1d). A first kline subscription pushes up to 500 historical bars first (from the same endpoint as ```exchange.GetRecords()```); Gemini's kline push carries no closed flag; in practice each bar is pushed once after its period has ended, so a bar pushed after its end time is pushed as closed (and a bar that is still open when a newer one arrives is re-pushed as closed). Only periods with trades are pushed, so there are no intrabar updates of the open bar. The private stream is one ```private``` subscription for the whole account (no symbol). It connects to Gemini's order events stream (v1 order events, authenticated in the handshake with the same API key signature as REST; a master API key uses the sub-account set with ```exchange.IO("subAccount", name)``` as well) only when subscribed: once the subscription is active (and again after every reconnect) it first pushes a snapshot of all balances from the same endpoint as ```exchange.GetAssets()```, then reports ready, and afterwards pushes order updates. Gemini has no balance push, so after each batch of order events (accepted, filled, canceled and so on) the balances are queried again and only the coins that changed are pushed. Order updates carry the same order ID that order placement returns; the list of open orders the exchange pushes on connection is not published as order updates, and a gap in the message sequence numbers reconnects immediately. Spot has no positions, so the private stream pushes none. A market-wide ```tickers``` subscription is not supported (Gemini market data push is per symbol only) and fails at subscribe; subscribe ticker per symbol.
 
 #### HashKey
 
-Spot trading on the Hong Kong-based exchange HashKey (API address ```https://api-pro.hashkey.com```), with pairs quoted in USDT, USDC, USD, HKD and others. It uses REST only, with no market-data or order push. Private endpoints are signed with a HashKey API key (Access Key and Secret Key). Conditional orders and order amendment are not supported.
+Spot trading on the Hong Kong-based exchange HashKey (API address ```https://api-pro.hashkey.com```), with pairs quoted in USDT, USDC, USD, HKD and others. Market data and private data can also be pushed over WebSocket (see the notes). Private endpoints are signed with a HashKey API key (Access Key and Secret Key). Conditional orders and order amendment are not supported.
 
 ##### Names and Configuration
 
@@ -27518,10 +28512,11 @@ Served through a fallback:
 - Limit orders support IOC, FOK and maker-only (```postOnly```, HashKey's ```LIMIT_MAKER```); market orders do not support maker-only or FOK and report an error when they are passed.
 - ```exchange.GetHistoryOrders()``` returns finished orders only (not open or partially filled orders still on the book); without ```limit```, at most 100 orders are returned.
 - ```exchange.GetTickers()``` skips pairs whose last, open, high and low prices and volume are all 0 (no trades).
+- WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private stream (order updates and balances) can be subscribed through the event stream; the push address follows the REST API address (```api-pro``` maps to ```stream-pro```). ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. HashKey's ticker stream carries no best bid/ask, so the ticker push takes its best bid/ask prices and sizes from the pair's depth stream and starts once both streams have arrived; HashKey has no separate best bid/ask stream, so a bbo subscription takes the first level of the depth stream. Depth pushes are HashKey's full order book snapshots of up to 200 levels, about every 300 ms when the book changes; subscriptions of up to 5 levels and of other depths are separate subscriptions that do not affect each other, the default is 20 levels, and more than 200 levels is not supported. When a trade subscription starts, the recent trades HashKey returns first are not pushed; trades are pushed one by one afterwards, with the same trade IDs as ```exchange.GetTrades()``` (HashKey's trades API returns no trade number, so the ID is built from side, price, quantity and time). A first kline subscription pushes 300 historical bars first; HashKey's kline push carries no closed flag, so a bar is pushed as closed once the push time has passed the bar's end (HashKey pushes the previous bar once more when the period ends) or when the next bar arrives. The private stream is one ```private``` subscription for the whole account (no symbol). Only when it is subscribed does it request a listenKey with the API key and connect (renewed every 30 minutes): once the subscription is active (and again after every reconnect) it first pushes a snapshot of all balances from the same endpoint as ```exchange.GetAssets()```, then reports ready, and afterwards pushes order updates and the balances of coins that changed (taken directly from the push when the account has one row per coin; otherwise the balances are queried again and the changed coins pushed). Spot has no positions, so the private stream pushes none. If the listenKey request is rejected (invalid API key or missing permission), the connection status reports degraded and the private stream reports failure (market data push is unaffected). A market-wide ```tickers``` subscription is not supported (HashKey ticker push is per symbol only) and fails at subscribe; subscribe ticker per symbol.
 
 #### HitBTC
 
-Spot trading on HitBTC (API address ```https://api.hitbtc.com```, v3 API), without HitBTC's perpetual contracts (```_PERP```): ```exchange.GetMarkets()``` and ```exchange.GetTickers()``` list only the spot pairs whose exchange status is ```working```. It uses REST only, with no market-data or order push. Private endpoints use a HitBTC API key (Access Key and Secret Key).
+Spot trading on HitBTC (API address ```https://api.hitbtc.com```, v3 API), without HitBTC's perpetual contracts (```_PERP```): ```exchange.GetMarkets()``` and ```exchange.GetTickers()``` list only the spot pairs whose exchange status is ```working```. Market data and private data can also be pushed over WebSocket (see the notes). Private endpoints use a HitBTC API key (Access Key and Secret Key).
 
 ##### Names and Configuration
 
@@ -27554,6 +28549,7 @@ Served through a fallback:
 - ```exchange.ModifyOrder()``` can change the price and amount; a price or amount that is not positive is left unchanged. Amending gives the order a new ```client_order_id```, so the new order ID is returned; use the new ID from then on.
 - Conditional orders support take-profit and stop-loss (without an order price they execute at market once triggered), not OCO; ```exchange.ModifyConditionOrder()``` can change the trigger price, order price and amount (values that are not positive are left unchanged) and, like a normal amendment, returns the new order ID; conditional orders are canceled through the same endpoint as normal orders.
 - ```exchange.GetHistoryOrders()``` queries by trading pair and returns finished orders only; without ```limit```, at most 1000 orders are returned.
+- WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private stream (order updates and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. The ticker push uses HitBTC's ```ticker/1s``` (which carries the best bid/ask prices and sizes itself, pushed on change, at most once a second) and bbo uses ```orderbook/top/100ms```. Trades carry the same trade IDs as ```exchange.GetTrades()```. Depth subscriptions of up to 5 levels, 6 to 10 levels, and the default (20 levels) or 11 to 20 levels use HitBTC's 5-, 10- and 20-level snapshots every 100 ms; more than 20 levels uses the full order book incremental stream (checked for sequence continuity and resubscribed for a fresh snapshot on a gap). A first kline subscription pushes 500 historical bars first; HitBTC's kline push carries no closed flag, so a bar is pushed as closed when a newer bar arrives (or when it is pushed after its end time), and only periods with trades are pushed. The private stream is one ```private``` subscription for the whole account (no symbol). It connects to the trading endpoint and logs in only when subscribed, and subscribes order reports and balances on that one connection: once the subscription is active (and again after every reconnect) it first pushes a snapshot of all balances from the same endpoint as ```exchange.GetAssets()```, then reports ready, and afterwards pushes order updates and the balances of coins that changed (available and frozen amounts taken directly from the push, the same as ```exchange.GetAssets()```). Order updates carry the ```client_order_id```, the same order ID that order placement returns; the list of open orders the exchange pushes on subscription is not published as order updates. Spot has no positions, so the private stream pushes none. A login failure reports a degraded connection status and a failed private stream (market data push is unaffected). A market-wide ```tickers``` subscription (no symbol) uses HitBTC's batch ticker channel (```ticker/1s/batch``` for all pairs): once a second it pushes the pairs that changed, with the last price, the 24-hour open/high/low, the volume and the best bid/ask with sizes; pairs that have never traded (no last price) are not pushed.
 
 #### HTX
 
@@ -27686,6 +28682,7 @@ Account: The connector detects the shape of the USDT-margined account (classic, 
 - Limit orders support ```tif``` ```ioc```, ```fok``` and post-only (```postOnly```, HTX's ```limit-maker```).
 - ```exchange.GetHistoryOrders()``` and ```exchange.GetHistoryConditionOrders()``` need a pair (the current pair when omitted); an empty string fails.
 - Conditional orders use HTX algo orders (```/v2/algo-orders```), are available on the normal spot account only, and support take-profit and stop-loss only, not OCO. A conditional order's ID is its ```clientOrderId``` (a UUID is generated when none is given), not a numeric order ID.
+- WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private stream (order updates and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. The ticker push carries best bid/ask prices and sizes itself. Trades carry the same trade IDs as ```exchange.GetTrades()```. Depth subscriptions of up to 5, 10 or 20 levels (20 by default) use HTX's 5-, 10- and 20-level whole-book snapshot streams (each its own stream); 21 to 150 and 151 to 400 levels use the 150- and 400-level incremental streams (snapshot and deltas are linked by sequence numbers and resynchronize on a gap), at most 400 levels. HTX kline pushes carry no closed flag, so the previous bar is pushed as closed when the next one starts; a first kline subscription pushes 500 historical bars first. The private stream is one ```private``` subscription for the whole account (no symbol). It connects and authenticates only when subscribed: once the subscription is active (and again after every reconnect) it first pushes a snapshot of all balances from the same endpoint as ```exchange.GetAccount()```, then reports ready, and afterwards pushes order updates of all pairs and the balances of coins that changed (free and frozen, same figures as ```exchange.GetAccount()```, from the account the current wallet mode queries). Updates of conditional orders that fail to trigger or are canceled before triggering use the conditional order ID. Spot has no positions, so the private stream pushes none. An authentication failure reports a degraded connection status and a failed private stream (market data push is unaffected). A market-wide ```tickers``` subscription is not supported (HTX ticker push is per symbol only) and fails at subscribe; subscribe ticker per symbol.
 
 ###### ```Futures_HuobiDM``` (Futures)
 
@@ -27693,10 +28690,11 @@ Account: The connector detects the shape of the USDT-margined account (classic, 
 - On classic and unified accounts market orders are placed at the opponent price (```opponent```); in multi-asset margin mode they are market orders. Limit orders support ```tif``` ```ioc```, ```fok``` and post-only (```postOnly```).
 - Conditional orders support take-profit and stop-loss only, not OCO; they are also available in multi-asset margin mode. Without an order price, the triggered order executes at the best 20 levels (```optimal_20```).
 - Range queries in ```exchange.GetConditionOrders()``` support USDT only (such as ```USDT.swap```); coin-margined contracts need a specific contract. On classic and unified accounts ```exchange.GetHistoryConditionOrders()``` does not support the ```since``` argument (fails when it is given) and only covers the last 90 days.
+- WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private stream (order updates, positions and balances) can be subscribed through the event stream, for USDT-margined contracts, coin-margined swaps and coin-margined futures alike. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. HTX pushes the contract 24h market data only after trades, so the ticker push takes its best bid/ask prices and sizes from the contract's best bid/offer stream and starts once both streams have arrived; the volume is in contracts, as in ```exchange.GetTicker()```. Delivery contracts are subscribed by HTX's period aliases (this week, next week, quarter, next quarter) and follow the roll automatically. Trades carry the same trade IDs as ```exchange.GetTrades()```, with amounts in contracts. Depth subscriptions of up to 20 levels (20 by default; HTX contracts have no 5-level stream, so depth 5 and depth 20 are separate subscriptions on the same kind of 20-level stream) and 21 to 150 levels use HTX's 20- and 150-level incremental streams (a snapshot first, then deltas linked by version, resubscribing on a gap), at most 150 levels. HTX kline pushes carry no closed flag, so the previous bar is pushed as closed when the next one starts; a first kline subscription pushes 500 historical bars first. The private stream is one ```private``` subscription for the whole account (no symbol); when subscribed it opens and authenticates one connection each for USDT-margined, coin-margined swap and coin-margined futures: USDT-margined uses HTX's v5 push in multi-asset margin mode, and on classic accounts subscribes cross or isolated margin according to ```exchange.IO("cross", …)``` at the time (switching after the connection is up takes effect on the next reconnect). Once the subscription is active (and again after every reconnect) it first pushes a snapshot of all positions and balances from the same endpoints as ```exchange.GetPositions()``` and ```exchange.GetAccount()```, then reports ready, and afterwards pushes order updates and position changes (same figures as ```exchange.GetPositions()```; one-way positions are net, two-way positions and coin-margined contracts have long and short legs; an empty position push for a contract is followed by zero rows). Balances combine several margin accounts, so a balance push triggers a re-query of the same endpoint as ```exchange.GetAccount()``` and only the coins that changed are pushed. An authentication failure reports a degraded connection status and a failed private stream (market data push is unaffected). A market-wide ```tickers``` subscription is not supported (HTX futures market data push is per contract only) and fails at subscribe; subscribe ticker per symbol.
 
 #### Korbit
 
-Spot trading on the KRW market of the Korean exchange Korbit (API address ```https://api.korbit.co.kr```, v2 API). It uses REST only, with no market-data or order push. Private endpoints are signed with a Korbit API key (Access Key and Secret Key). Conditional orders and order amendment are not supported.
+Spot trading on the KRW market of the Korean exchange Korbit (API address ```https://api.korbit.co.kr```, v2 API). Queries and orders use the REST API; market data and the private stream are also available as WebSocket push (see below). Private endpoints are signed with a Korbit API key (Access Key and Secret Key). Conditional orders and order amendment are not supported.
 
 ##### Names and Configuration
 
@@ -27727,6 +28725,7 @@ Served through a fallback:
 - Only GTC limit orders and market orders are supported: a ```tif``` of ```ioc``` or ```fok```, or ```postOnly```, fails.
 - Without the ```symbol``` argument, ```exchange.GetOrders()``` queries the current trading pair only.
 - ```exchange.GetMarkets()``` returns only the pairs whose status is ```launched``` (listed for trading).
+- WebSocket push is supported: market data (ticker, bbo, depth, trades) and the private account stream (order updates, balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. Korbit has a single depth stream (a full snapshot on every push, 30 levels per side): depth subscriptions of any size (20 levels by default, at most 30; a larger depth is rejected at subscription) share it and each publishes its own number of levels. The exchange's ticker stream carries no best bid/ask sizes, so the best bid/ask of ticker and bbo come from the top level of the order book stream. Trades carry the same trade IDs as ```exchange.GetTrades()```; the latest past trade the exchange sends when a subscription starts is not pushed, and trades the exchange resends after a reconnect are de-duplicated by trade ID. The exchange has no kline stream, so kline subscriptions are rejected (unsupported period). Symbols are checked against ```exchange.GetMarkets()``` before subscribing; unknown or not launched pairs are rejected at subscription. The price precision is the smallest tick of the exchange's tick size table, and amounts use 8 decimal places. The private stream is one ```private``` subscription for the whole account (no symbol). It connects only when subscribed, signs the connection the same way as the REST API, and subscribes to order changes of all launched pairs (pairs launched while connected are covered after the next reconnect) and to balance changes: once active (and again after every reconnect) it first pushes a balance snapshot from the same endpoint as ```exchange.GetAssets()```, then reports ready, and afterwards pushes order updates and the balances of coins that changed (available and frozen as in ```exchange.GetAssets()```; frozen is the amount held by open orders). Spot has no positions. A rejected signature reports a degraded connection status and a failed private stream (market data push is unaffected). A market-wide ```tickers``` subscription is not supported (Korbit ticker push needs explicit symbols) and fails at subscribe; subscribe ticker per symbol.
 
 #### Kraken
 
@@ -27846,6 +28845,7 @@ Option codes are Kraken native codes: ```OF_```, underlying and quote currency, 
 - Orders support ```tif``` IOC and maker-only (```postOnly```, limit prices only); FOK is not supported and reports an error.
 - ```exchange.ModifyOrder()``` and ```exchange.ModifyConditionOrder()``` are supported; both amend the order in place on Kraken and keep the order ID. Regular orders can change price and amount; conditional orders can change the trigger price, order price and amount.
 - ```exchange.GetOrders()``` and ```exchange.GetConditionOrders()``` without arguments return the open orders of all trading pairs. ```exchange.GetHistoryOrders()``` and ```exchange.GetHistoryConditionOrders()``` return the latest 50 records when ```limit``` is not given, and page automatically to fill a larger ```limit```.
+- WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private stream (order updates and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. Ticker and bbo use Kraken's ticker stream triggered by best bid/ask changes (it carries the best bid/ask prices and sizes and the 24-hour statistics). Trades carry the same trade IDs as ```exchange.GetTrades()```. Depth subscriptions of up to 10 levels (10 by default), up to 25, up to 100 and more (at most 255 levels) use Kraken's 10-, 25-, 100- and 500-level book streams, synchronized from a snapshot plus deltas and verified against Kraken's CRC32 checksum; a mismatch resubscribes automatically. A first kline subscription pushes 500 historical bars first; Kraken's kline stream only updates when trades happen, so a bar is marked closed when the next bar appears or 3 seconds after its end time (by the local clock). The private stream is one ```private``` subscription for the whole account (no symbol). It connects only when subscribed, obtains a Kraken WebSocket token with the API key before connecting, and subscribes the executions stream and the balances stream on that one connection: once the subscription is active (and again after every reconnect) it first pushes a snapshot of all balances from the same endpoint as ```exchange.GetAccount()```, then reports ready, and afterwards pushes order updates and the balances of coins that changed (Kraken's balance push has no available/frozen split, so after every balance or order change the balances are re-read from the same endpoint as ```exchange.GetAccount()```). Spot has no positions, so the private stream pushes none; an expired order is reported as canceled in the push. A rejected subscription reports a degraded connection status and a failed private stream (market data push is unaffected). A market-wide ```tickers``` subscription is not supported (Kraken ticker push is per pair only) and fails at subscribe; subscribe ticker per symbol.
 
 ###### ```Futures_Kraken``` (Futures)
 
@@ -27854,6 +28854,7 @@ Option codes are Kraken native codes: ```OF_```, underlying and quote currency, 
 - Conditional orders support take-profit and stop-loss only, not OCO; they trigger on the last traded price.
 - Limit orders support ```tif``` IOC and maker-only (```postOnly```), but not FOK; market orders do not support FOK or maker-only, and conditional orders support neither ```tif``` nor maker-only; passing them reports an error.
 - ```exchange.ModifyOrder()``` and ```exchange.ModifyConditionOrder()``` are supported (Kraken's edit-order endpoint); conditional orders can change the trigger price, order price and amount.
+- WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private stream (order updates, positions and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. Ticker and bbo use the Kraken Futures ticker stream (it carries the best bid/ask prices and sizes). Trades carry the same trade IDs as ```exchange.GetTrades()```. Depth uses the Kraken Futures full order book stream, synchronized from a snapshot plus per-level deltas (a sequence gap resubscribes automatically), at most 255 levels and 20 by default. Klines use the Kraken Futures candle push with the same native periods as ```exchange.GetRecords()```; a first kline subscription pushes 500 historical bars first, and a bar is marked closed when the next bar appears. The private stream is one ```private``` subscription for the whole account (no symbol). It connects only when subscribed, authenticates with the Kraken Futures challenge, and subscribes the open orders, open positions and balances streams on that one connection: once the subscription is active (and again after every reconnect) it first pushes a snapshot of all balances and positions from the same endpoints as ```exchange.GetAccount()``` and ```exchange.GetPositions()```, then reports ready, and afterwards pushes order updates, position changes (one net position per contract, a closed position is pushed as a row with amount 0; leverage and liquidation price are not included) and the balances of coins that changed (the Kraken Futures balance push does not match the figures of ```exchange.GetAccount()```, so after every balance or order change the balances are re-read from the same endpoint as ```exchange.GetAccount()```). An authentication failure reports a degraded connection status and a failed private stream (market data push is unaffected); when the REST base is the demo environment, the push connects to the demo environment as well. A market-wide ```tickers``` subscription is not supported (Kraken Futures ticker push is per contract only) and fails at subscribe; subscribe ticker per symbol.
 
 #### KuCoin
 
@@ -27954,6 +28955,7 @@ Account: KuCoin futures have no set-leverage endpoint: ```exchange.SetMarginLeve
 - ```exchange.ModifyOrder()``` makes KuCoin issue a new order ID: the new order ID is returned and the original ID becomes invalid.
 - ```exchange.GetHistoryOrders()``` and ```exchange.GetHistoryConditionOrders()``` need a pair (the current pair when omitted); an empty string fails.
 - Conditional orders support take-profit and stop-loss only, not OCO (KuCoin has no OCO endpoint); modifying a conditional order is not supported, cancel and recreate it instead. Conditional orders live in a separate order space from regular orders; cancel and query them with the conditional-order functions.
+- WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private stream (order updates and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. Every connection first obtains a connection token from KuCoin and pings at the interval the exchange gives. The ticker push takes the last price, 24h high/low, volume and open (last price minus the 24h change, as in ```exchange.GetTicker()```) from the pair's market snapshot stream (about every 2 seconds) and the best bid/ask prices and sizes from the 1-level order book stream, and starts once both streams have arrived. Trades carry the same trade IDs as ```exchange.GetTrades()```. Depth subscriptions of up to 5 levels use KuCoin's 5-level snapshot stream and up to 50 levels (20 by default) the 50-level snapshot stream, so depth 5 and depth 20 are two separate subscriptions; more than 50 levels (at most 255) use the incremental stream calibrated with the exchange's full order book snapshot, which is a private endpoint and needs an API key. KuCoin's kline push carries no closed flag, so the previous bar's final values are pushed as closed when the next bar starts; a first kline subscription pushes 500 historical bars first. The private stream is one ```private``` subscription for the whole account (no symbol). It connects only when subscribed: once the subscription is active (and again after every reconnect) it first pushes a snapshot of all balances from the same endpoint as ```exchange.GetAccount()```, then reports ready, and afterwards pushes order updates and changes of trading-account balances (same figures as ```exchange.GetAccount()```; changes of the funding and margin accounts are not pushed). Spot has no positions, so the private stream pushes none. A rejected API key reports a degraded connection status and a failed private stream (market data push is unaffected). A market-wide ```tickers``` subscription (no symbol) uses KuCoin's all-symbols ticker stream (```/market/ticker:all```): it pushes a pair whenever its best bid/ask changes, with the best bid/ask and sizes, the last price and the last trade size, but no 24-hour open/high/low or volume (KuCoin has no all-market 24-hour push); subscribe ticker per symbol for the 24-hour statistics. Pairs that have never traded are not pushed.
 
 ###### ```Futures_KuCoin``` (Futures)
 
@@ -27961,10 +28963,11 @@ Account: KuCoin futures have no set-leverage endpoint: ```exchange.SetMarginLeve
 - ```exchange.GetHistoryOrders()``` and ```exchange.GetHistoryConditionOrders()``` need a specific contract (the current contract when omitted); an empty string or a range fails.
 - Limit orders support ```tif``` IOC and maker-only (```postOnly```), but not FOK; market orders do not support these options and report an error when they are passed.
 - Conditional orders support take-profit and stop-loss only, not OCO (KuCoin futures have no OCO endpoint); they trigger on the last traded price.
+- WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private stream (order updates, positions and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. Every connection first obtains a connection token from KuCoin and pings at the interval the exchange gives. Quantities use the same unit as the REST API (contracts). The ticker push takes the last price, 24h high/low, volume and open from the contract's 24h snapshot stream (about every 5 seconds, same figures as ```exchange.GetTicker()```) and the best bid/ask prices and sizes from the real-time best bid/ask stream, and starts once both streams have arrived. Trades carry the same trade IDs as ```exchange.GetTrades()```. Depth subscriptions of up to 5 levels use the 5-level snapshot stream and up to 50 levels (20 by default) the 50-level snapshot stream, so depth 5 and depth 20 are two separate subscriptions; more than 50 levels (at most 255) use the per-change incremental stream calibrated with the exchange's full order book snapshot. KuCoin's kline push carries no closed flag, so the previous bar's final values are pushed as closed when the next bar starts; a first kline subscription pushes 500 historical bars first. The private stream is one ```private``` subscription for the whole account (no symbol). It connects only when subscribed: once the subscription is active (and again after every reconnect) it first pushes a snapshot of all balances and positions from the same endpoints as ```exchange.GetAccount()``` and ```exchange.GetPositions()```, then reports ready, and afterwards pushes order updates, position changes (one-way positions, same figures as ```exchange.GetPositions()```) and balances: the balance-change push carries different fields from ```exchange.GetAccount()```, so on each one the account of that settlement currency is queried again and pushed. A rejected API key reports a degraded connection status and a failed private stream (market data push is unaffected). A market-wide ```tickers``` subscription is not supported (KuCoin Futures ticker push is per contract only) and fails at subscribe; subscribe ticker per symbol.
 
 #### LBank
 
-Spot trading on LBank (API address ```https://api.lbank.info```, v2 API), including leveraged-token (ETF) pairs. It uses REST only, with no market-data or order push. Private endpoints are signed with an LBank API key (Access Key and Secret Key). Conditional orders and order amendment are not supported.
+Spot trading on LBank (API address ```https://api.lbank.info```, v2 API), including leveraged-token (ETF) pairs. Market data and private data can also be pushed over WebSocket (see the notes). Private endpoints are signed with an LBank API key (Access Key and Secret Key). Conditional orders and order amendment are not supported.
 
 ##### Names and Configuration
 
@@ -27996,12 +28999,13 @@ Served through a fallback:
 - ```exchange.GetHistoryOrders()``` does not support the ```since``` argument (the exchange API does not filter by time) and fails when it is given; without it, it returns the most recent orders.
 - ```exchange.GetTickers()``` includes the tickers of both spot pairs and leveraged-token (ETF) pairs. The batch ticker endpoints carry no best bid or ask, so the returned ```Buy``` and ```Sell``` are both the last price.
 - The best bid and ask of ```exchange.GetTicker()``` come from an extra order book query; the exchange ticker has no opening price, so ```Open``` is derived from the last price and the 24-hour change.
+- WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private stream (order updates and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. LBank does not acknowledge subscriptions: a subscription counts as active once its first message arrives, or once any message arrives on the connection 2 seconds after it was sent without an error from the exchange (the pair and the kline period are checked against the market list and the period table when subscribing). The ticker push takes its best bid/ask prices and sizes from the pair's 1-level order book stream (LBank's ticker stream carries none) and starts once both streams have arrived; as with ```exchange.GetTicker()```, the opening price is derived from the last price and the 24-hour change. Times in the push are Beijing time and are converted to timestamps. A depth subscription of N levels (2 to 200) subscribes LBank's N-level order book, where every message is a full snapshot (about one every 0.5 seconds); different level counts are separate subscriptions, the default is 20 levels, a 1-level subscription takes the first level of the 2-level snapshot, and more than 200 levels is not supported. Trade pushes carry no trade ID, so the trade ID in the event is a synthetic ID built from the trade time, price, quantity and direction (starting with ```syn:```) and differs from the trade IDs of ```exchange.GetTrades()```. A first kline subscription pushes 500 historical bars first; LBank's kline push carries no closed flag, so a bar is pushed as closed when it is pushed after its end time or when the immediately following bar arrives (trades in the last second before the close may be missing from the pushed closed bar; ```exchange.GetRecords()``` is authoritative). The private stream is one ```private``` subscription for the whole account (no symbol). Only when subscribed does it fetch an LBank subscribeKey (renewed every 30 minutes) and connect, subscribing LBank's order stream (all pairs) and balance stream: once the subscription is active (and again after every reconnect) it first pushes a snapshot of all balances from the same endpoint as ```exchange.GetAssets()```, then reports ready, and afterwards pushes order updates and the balances of coins that changed (available and frozen amounts taken directly from the push). As in ```exchange.GetOrder()```, the order quantity of a market buy order is its filled quantity. Spot has no positions, so the private stream pushes none. An invalid subscribeKey reports a degraded connection status and a failed private stream (market data push is unaffected). A market-wide ```tickers``` subscription is not supported (LBank ticker push is per pair only) and fails at subscribe; subscribe ticker per symbol.
 
 #### MEXC
 
-```MEXC``` (Spot): MEXC spot trading through the MEXC spot V3 API (```api.mexc.com```); everything is REST polling, with no market data or order push. Private endpoints need an API key (Access Key and Secret Key). Spot only, with no simulated trading; use ```Futures_MEXC``` for perpetual contracts.
+```MEXC``` (Spot): MEXC spot trading through the MEXC spot V3 API (```api.mexc.com```); market data and private data can also be pushed over WebSocket (see the notes). Private endpoints need an API key (Access Key and Secret Key). Spot only, with no simulated trading; use ```Futures_MEXC``` for perpetual contracts.
 
-```Futures_MEXC``` (Futures): MEXC perpetual contracts: USDT- and USDC-margined and coin-margined contracts, through the MEXC futures API (```contract.mexc.com```); everything is REST polling, with no market data or order push. Private endpoints need an API key (Access Key and Secret Key). Perpetual contracts only, with no simulated trading.
+```Futures_MEXC``` (Futures): MEXC perpetual contracts: USDT- and USDC-margined and coin-margined contracts, through the MEXC futures API (```contract.mexc.com```); market data and private data can also be pushed over WebSocket (see the notes). Private endpoints need an API key (Access Key and Secret Key). Perpetual contracts only, with no simulated trading.
 
 ##### Names and Configuration
 
@@ -28086,6 +29090,7 @@ Account: In cross mode ```exchange.SetMarginLevel()``` changes the contract's le
 - The amount of a market buy order is the quote-currency sum to spend (sent as MEXC's ```quoteOrderQty```); a market sell order's amount is in the base currency.
 - A limit order with post-only (```postOnly```) is placed as MEXC's ```LIMIT_MAKER``` type.
 - ```exchange.GetHistoryOrders()``` can only query orders from the last 7 days (an exchange API limit); a ```since``` earlier than 7 days ago starts from 7 days ago.
+- WebSocket push is supported (MEXC spot V3 protobuf streams): market data (ticker, bbo, depth, trades, klines) and the private stream (order updates and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. The ticker push takes MEXC's rolling 24-hour mini ticker (last price, high/low and base-currency volume) and the best bid/ask prices and sizes from the pair's best bid/ask stream (aggregated every 100 ms), and starts once both streams have arrived. Trades are pushed in 100 ms batches; like ```exchange.GetTrades()```, MEXC gives no trade IDs, so the trade ID is synthesized from time, side, price and quantity by the same rule as ```exchange.GetTrades()```. Depth subscriptions of up to 5, 6 to 10 and 11 to 20 levels use MEXC's 5-, 10- and 20-level snapshot streams; the default (20 levels) and more than 20 levels use the incremental stream (a 1000-level snapshot from the same endpoint as ```exchange.GetDepth()``` first, then checked for version continuity and re-snapshotted on a gap). A first kline subscription pushes 500 historical bars first; the periods are the native periods of ```exchange.GetRecords()``` (8 hours is not supported). MEXC's kline push carries no closed flag, so a bar is pushed as closed when the next bar arrives. Each connection carries at most 30 subscriptions (more open further connections automatically) and is renewed after 23 hours (MEXC closes a connection after 24 hours). The private stream is one ```private``` subscription for the whole account (no symbol). Only when subscribed does it request a listenKey with the API key (kept alive every 30 minutes and reused on reconnect when still valid), connect, and subscribe the order and balance streams: once the subscription is active (and again after every reconnect) it first pushes a snapshot of all balances from the same endpoint as ```exchange.GetAssets()```, then reports ready, and afterwards pushes order updates and the balances of coins that changed (the push carries the coin's full available and frozen amounts). Spot has no positions, so the private stream pushes none. An invalid API key or missing permission reports a degraded connection status and a failed private stream (market data push is unaffected). A market-wide ```tickers``` subscription (no symbol) uses MEXC's all-market mini ticker stream (```spot@public.miniTickers.v3.api.pb@24H```) with the last price and the rolling 24-hour high/low and volume, but no best bid/ask (MEXC spot has no all-market book ticker stream); subscribe ticker or bbo per symbol for bid/ask. Pairs without a last price are not pushed.
 
 ###### ```Futures_MEXC``` (Futures)
 
@@ -28093,6 +29098,7 @@ Account: In cross mode ```exchange.SetMarginLevel()``` changes the contract's le
 - Conditional orders support take-profit and stop-loss only, not OCO; modifying a conditional order is not supported, and conditional orders cannot carry a custom order id (clientId). They trigger on the last traded price and are valid for 24 hours, expiring automatically afterwards.
 - Order amendment (```exchange.ModifyOrder()```) works on limit orders only; the exchange cancels the original order and places a new one; the return value is the new order's Id, use it for later queries and cancellation.
 - Limit orders support IOC, FOK and post-only (```postOnly```); market orders cannot use FOK or post-only, and conditional orders support GTC only.
+- WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private stream (order updates, positions and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. The ticker push takes MEXC's contract ticker, once a second (last price, 24-hour high/low, volume and open interest in contracts, as in ```exchange.GetTicker()```), and the best bid/ask prices and sizes from the contract's 5-level book stream, and starts once both streams have arrived; bbo is the first level of the 5-level book stream. Trade IDs are the same field as in ```exchange.GetTrades()```; when MEXC's push carries no trade ID, the trade ID is empty. Depth subscriptions of up to 5, 6 to 10 and 11 to 20 levels use MEXC's 5-, 10- and 20-level full book streams; the default (20 levels) and more than 20 levels use the incremental stream (a 1000-level snapshot from the same endpoint as ```exchange.GetDepth()``` first, then checked for version continuity and re-snapshotted on a gap). A first kline subscription pushes 500 historical bars first; the periods are the native periods of ```exchange.GetRecords()```. MEXC's kline push carries no closed flag, so a bar is pushed as closed when the next bar arrives. The private stream is one ```private``` subscription for the whole account (no symbol); it connects and logs in with the API key only when subscribed. Once the subscription is active (and again after every reconnect) it first pushes a snapshot of all balances and positions from the same endpoints as ```exchange.GetAssets()``` and ```exchange.GetPositions()```, then reports ready, and afterwards pushes order updates, position changes (like ```exchange.GetPositions()```, only positions in the current cross/isolated mode; a closed position is pushed with quantity 0) and balance changes (MEXC's balance push has no equity or unrealized profit, so the balances are queried again from the same endpoint as ```exchange.GetAssets()``` and only the changed currencies are pushed). A login failure reports a degraded connection status and a failed private stream (market data push is unaffected). A market-wide ```tickers``` subscription (no symbol) uses MEXC futures' all-market ticker push: once a second it pushes every contract's last price, 24h volume (in contracts) and high/low, without best bid/ask (the all-market push has no order book data, and its maximum bid / minimum ask fields are price limits); subscribe ticker or bbo per symbol for bid/ask.
 
 #### OKX
 
@@ -28248,16 +29254,18 @@ Option codes are OKX native codes: underlying-quote-expiry (YYMMDD)-strike-C/P. 
 - ```exchange.ModifyOrder()``` amends in place through OKX's amend endpoint (```amend-order```), keeping the order ID.
 - Conditional orders support take-profit, stop-loss and OCO; ```exchange.ModifyConditionOrder()``` amends in place through OKX's amend-algo endpoint (```amend-algos```) without canceling and re-placing.
 - ```exchange.GetHistoryOrders()``` queries one pair at a time; an empty string fails. ```exchange.GetHistoryConditionOrders()``` does not support the ```since``` parameter; passing it fails.
+- WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private account stream (order updates and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. A 1-level depth subscription uses OKX's ```bbo-tbt``` and 5 levels use the ```books5``` snapshots; other depths (20 levels by default, at most 255) are synchronized from the ```books``` channel's snapshot and sequenced updates, and a sequence gap resubscribes that depth automatically. Trades come from ```trades-all``` (one event per trade, not merged, with the same trade IDs as ```exchange.GetTrades()```). A first kline subscription pushes 500 historical bars first. The ticker carries no open interest. The private stream is one ```private``` subscription (no symbol; it covers the whole account). It connects and logs in only when subscribed (the API key needs its Passphrase; token authentication is not supported) and subscribes OKX's ```orders``` and ```account``` channels on one connection. Each time the subscription takes effect, and after every reconnect, it first takes a balance snapshot through the same endpoint as ```exchange.GetAssets()```, pushes the snapshot rows and then reports ready; after that it pushes order updates (spot and margin orders only) and balance changes live (free and frozen as in the REST API, frozen being the amount held by open orders). Besides event pushes OKX sends regular account snapshots; when a previously held currency is missing from it, the balances are re-checked through REST. Spot has no positions, so the private stream carries none. A login failure reports a degraded connection status and a failed private stream (market data push is unaffected). In demo trading the push connects to OKX's demo WebSocket address. A market-wide ```tickers``` subscription is not supported (OKX ticker push is per instrument only) and fails at subscribe; subscribe ticker per symbol.
 
 ###### ```Futures_OKCoin``` (Futures)
 
 - ```exchange.GetFundings()``` has no batch query; pass a specific perpetual contract, for example ```exchange.GetFundings("ETH_USDT.swap")```; calling it without a symbol or with a range (such as ```USDT.swap```) fails.
 - Conditional orders support take-profit, stop-loss and OCO; ```exchange.ModifyOrder()``` and ```exchange.ModifyConditionOrder()``` amend in place through OKX's amend endpoints, keeping the order ID.
 - ```exchange.GetHistoryConditionOrders()``` does not support the ```since``` parameter; passing it fails. ```exchange.GetHistoryOrders()``` does.
+- WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private account stream (order updates, positions and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. Pushed quantities and volumes are in contracts (the same unit as the REST API), and the ticker carries no open interest. A 1-level depth subscription uses OKX's ```bbo-tbt``` and 5 levels use the ```books5``` snapshots; other depths (20 levels by default, at most 255) are synchronized from the ```books``` channel's snapshot and sequenced updates, and a sequence gap resubscribes that depth automatically. Trades come from ```trades-all``` (one event per trade, not merged, with the same trade IDs as ```exchange.GetTrades()```). A first kline subscription pushes 500 historical bars first. A delivery contract (such as ```BTC_USD.quarter```) resolves to the contract current at subscription time; subscribe again after the contract rolls over. Options are not supported by push. The private stream is one ```private``` subscription (no symbol; it covers the whole account). It connects and logs in only when subscribed (the API key needs its Passphrase; token authentication is not supported) and subscribes OKX's ```orders```, ```positions``` and ```account``` channels on one connection. Each time the subscription takes effect, and after every reconnect, it first takes a snapshot through the same endpoints as ```exchange.GetAssets()``` and ```exchange.GetPositions()``` (perpetual and delivery), pushes the snapshot rows and then reports ready; after that it pushes order updates, position changes (perpetual and delivery only, quantities in contracts, a closed position as a row with quantity 0) and balance changes live, every field as in the REST API. Besides event pushes OKX sends regular position (about every 5 seconds) and account snapshots, so unrealized profit and equity follow the mark price; when a previously held currency is missing from an account snapshot, the balances are re-checked through REST. A login failure reports a degraded connection status and a failed private stream (market data push is unaffected). In demo trading the push connects to OKX's demo WebSocket address. A market-wide ```tickers``` subscription is not supported (OKX ticker push is per instrument only) and fails at subscribe; subscribe ticker per contract.
 
 #### Poloniex
 
-Spot trading on Poloniex (API address ```https://api.poloniex.com```, v3 API); orders are placed in the SPOT account (```accountType``` is ```SPOT```). It uses REST only, with no market-data or order push. Private endpoints are signed with a Poloniex API key (Access Key and Secret Key). Conditional orders use Poloniex smart orders (```/smartorders```) and support stop-loss only.
+Spot trading on Poloniex (API address ```https://api.poloniex.com```, v3 API); orders are placed in the SPOT account (```accountType``` is ```SPOT```). Market data and private data can also be pushed over WebSocket (see the notes). Private endpoints are signed with a Poloniex API key (Access Key and Secret Key). Conditional orders use Poloniex smart orders (```/smartorders```) and support stop-loss only.
 
 ##### Names and Configuration
 
@@ -28316,10 +29324,11 @@ Served through a fallback:
 - Spot conditional orders support stop-loss only (```ORDER_CONDITION_TYPE_SL```): a buy triggers when the price rises to the trigger price, a sell when it falls to the trigger price. Take-profit (```ORDER_CONDITION_TYPE_TP```) and OCO conditional orders return an error and no order is placed. Without an order price they execute at market once triggered. The amount of a conditional order is always the base-currency quantity, for both buys and sells.
 - Conditional orders and normal orders have separate order IDs: a conditional order can only be canceled with `exchange.CancelConditionOrder`. The normal order created when a conditional order triggers appears in ```exchange.GetOrders()```, while ```exchange.GetConditionOrders()``` lists only untriggered conditional orders.
 - ```exchange.GetAccount()``` reads one SPOT account: the one set with ```exchange.IO("accountId", id)```, or the first SPOT account when none is set; ```exchange.GetAssets()``` sums the assets of all SPOT accounts.
+- WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private stream (order updates and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. The ticker push takes its best bid/ask prices and sizes from the pair's 5-level order book stream (Poloniex's ticker stream, about one message a second, carries none) and starts once both streams have arrived. Trades carry the same trade IDs as ```exchange.GetTrades()```. Depth subscriptions of up to 5 levels use Poloniex's 5-level snapshot every 100 ms, 6 to 10 levels the 10-level snapshot, and the default (20 levels) and 11 to 20 levels the real-time 20-level incremental stream (checked for sequence continuity and resubscribed for a fresh snapshot on a gap); more than 20 levels is not supported. A first kline subscription pushes 500 historical bars first; Poloniex's kline push carries no closed flag, so a bar is pushed as closed when the next bar arrives. The private stream is one ```private``` subscription for the whole account (no symbol). It connects and authenticates only when subscribed and subscribes Poloniex's order stream and balance stream on that one connection: once the subscription is active (and again after every reconnect) it first pushes a snapshot of all balances from the same endpoint as ```exchange.GetAssets()``` (summed over all SPOT accounts), then reports ready, and afterwards pushes order updates and the balances of coins that changed (taken directly from the push when there is a single SPOT account; with several SPOT accounts the balances are queried again and the changed coins pushed). The order quantity and filled quantity of a market buy order are quote-currency amounts, as in ```exchange.GetOrder()```. Spot has no positions, so the private stream pushes none. An authentication failure reports a degraded connection status and a failed private stream (market data push is unaffected). A market-wide ```tickers``` subscription (no symbol) subscribes Poloniex's ```ticker``` channel for all pairs: once a second it pushes every pair with the last price, the 24-hour open/high/low and the volume, but no best bid/ask (Poloniex's book channels cannot be subscribed for all pairs); subscribe ticker or bbo per symbol for bid/ask.
 
 #### Upbit
 
-Spot trading on the Korean exchange Upbit (API address ```https://api.upbit.com```): the KRW, BTC and USDT markets. It uses REST only, with no market-data or order push. Private endpoints are signed with an Upbit API key (Access Key and Secret Key). Conditional orders are not supported.
+Spot trading on the Korean exchange Upbit (API address ```https://api.upbit.com```): the KRW, BTC and USDT markets. Queries and orders use the REST API; market data and the private stream are also available as WebSocket push (see below). Private endpoints are signed with an Upbit API key (Access Key and Secret Key). Conditional orders are not supported.
 
 ##### Names and Configuration
 
@@ -28351,6 +29360,7 @@ Served through a fallback:
 - ```exchange.ModifyOrder()``` uses Upbit's cancel-and-new endpoint (```cancel_and_new```): the exchange atomically cancels the original order and places a new one, and the new order ID is returned; use the new ID from then on. The new order stays a limit order and needs a new price greater than 0; a price that is not positive is an error and never turns it into a market order. When the amount is not changed (not positive), the new order takes the original order's remaining amount. ```exchange.ModifyOrder()``` never turns an order into a market order.
 - The batch tickers of ```exchange.GetTickers()``` carry no order book, so ```Buy``` and ```Sell``` are 0.
 - ```exchange.GetHistoryOrders()``` returns filled and canceled orders; without ```limit```, at most 100 orders are returned.
+- WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private account stream (order updates, balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. Every Upbit depth push is a full snapshot and the only sizes are 1, 5, 15 and 30 levels: a depth subscription uses the smallest size not below the requested depth (20 levels by default, subscribed as 30), and a subscription above 30 levels fails; each size uses its own connection and each subscription publishes its own number of levels. The ticker takes its best bid/ask from the 1-level book. Trades carry the same trade IDs as ```exchange.GetTrades()```. Kline push exists only for 1 second and 1, 3, 5, 10, 15, 30, 60 and 240 minutes; other periods fail with ```unsupported interval``` at subscription. A first kline subscription pushes 500 historical bars first; the exchange sends no close flag, so a bar is marked closed when the next bar arrives (or when it is already past its end time when pushed), and periods without trades have no bar. The exchange does not acknowledge subscriptions, so a market data subscription becomes active with its first message. The private stream is one ```private``` subscription for the whole account (no symbol). It connects only when subscribed, authenticates the handshake with a JWT signed with the API key, and subscribes to the order (myOrder) and asset (myAsset) channels: once active (as listed by the exchange's current subscriptions) and again after every reconnect it first pushes a balance snapshot from the same endpoint as ```exchange.GetAssets()```, then reports ready, and afterwards pushes order updates and the balances of coins that changed (available and frozen as in ```exchange.GetAssets()```). Spot has no positions. If authentication fails the exchange refuses the private connection at the handshake and the connector retries with backoff as for a disconnect (the connection status reports down; market data push is unaffected). A market-wide ```tickers``` subscription is not supported (Upbit ticker push needs explicit market codes) and fails at subscribe; subscribe ticker per symbol.
 
 #### WEEX
 
@@ -28424,6 +29434,7 @@ Position mode: Every order carries the position side ```positionSide```, derived
 - The amount of a market buy order is in the quote currency: the WEEX spot API cannot place market orders by amount, so the connector converts the amount into a base-currency quantity using the current asks (up to 200 levels, rounded down to the quantity step) before ordering; the filled amount may differ slightly from the amount passed. If the asks cannot absorb the amount, or the converted quantity is below the minimum order size, an error is reported instead of buying less. An explicit ```quantity``` in the extra parameters is used as is. When the order is queried, the ```Amount``` of a market buy order is the base-currency quantity recorded by the exchange.
 - Post-only (maker-only) orders are not supported; limit orders accept GTC, IOC and FOK only.
 - ```exchange.GetHistoryOrders()``` queries one trading pair only (the exchange's order history endpoint is per pair): without ```symbol``` it queries the current trading pair, and an empty string fails. The exchange looks back about 90 days only; a ```since``` older than that is queried from 90 days ago.
+- WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private stream (order updates and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. The ticker push takes its best bid/ask prices and sizes from the pair's best bid/ask stream (the WEEX ticker stream carries no bid/ask) and starts once both streams have arrived. Trades carry the same trade IDs as ```exchange.GetTrades()```; trades from before the subscription are not pushed. Depth subscriptions of up to 15 levels use the WEEX 15-level order book stream and 16 to 200 levels (20 by default) the 200-level stream, both synchronized from a snapshot plus updates that chain onto the previous one; a sequence gap resubscribes that depth automatically. Kline periods are the native periods of ```exchange.GetRecords()```; the exchange does not flag closed bars, so a bar counts as closed once its end time has passed or the next bar arrives, and a first kline subscription pushes 300 historical bars first. The private stream is one ```private``` subscription for the whole account (no symbol); it connects only when subscribed (signed in the connection handshake). Once the subscription is active (and again after every reconnect) it first pushes a snapshot of all balances from the same endpoint as ```exchange.GetAssets()```, then reports ready, and afterwards pushes order updates (all pairs) and the balances of changed currencies. Spot has no positions, so the private stream pushes none. WEEX rejects the handshake of a connection with a bad signature without a distinguishable error, so the private stream then treats it as a disconnect and reconnects with backoff (market data push is unaffected). WEEX allows at most 240 subscribe operations per connection per hour. A market-wide ```tickers``` subscription is not supported (WEEX ticker push is per symbol only) and fails at subscribe; subscribe ticker per symbol.
 
 ###### ```Futures_WEEX``` (Futures)
 
@@ -28434,6 +29445,7 @@ Position mode: Every order carries the position side ```positionSide```, derived
 - The ```Rate``` of ```exchange.GetFundings()``` is the forecast funding rate of the next settlement and ```Time``` is the next settlement time; batch queries are supported (no symbol, or a range such as ```USDT.swap```).
 - In ```exchange.GetTickers()```, contracts without order book data (missing from the exchange's book ticker, for example a contract whose market is closed) have ```Buy``` and ```Sell``` of 0.
 - ```Offset``` of orders and conditional orders follows the side and the position side: selling on the long side (close long) and buying on the short side (close short) are closing, everything else is opening. In hedge mode the exchange returns ```reduceOnly``` as ```false``` even for closing conditional orders, so it is not used; only when the position side is one-way (```BOTH```) or missing are ```reduceOnly```/```closePosition``` used.
+- WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private stream (order updates, positions and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. WEEX futures have no best bid/ask stream: the bbo push is the top of an order book maintained from the contract's 15-level order book stream (on a connection of its own), the same source as the bid/ask of ```exchange.GetTicker()```, and the ticker push takes its bid/ask prices and sizes from it, starting once both streams have arrived. Trades carry the same trade IDs as ```exchange.GetTrades()```; trades from before the subscription and trades the exchange repeats are not pushed. Depth subscriptions of up to 15 levels use the WEEX 15-level order book stream and 16 to 200 levels (20 by default) the 200-level stream, both synchronized from a snapshot plus updates that chain onto the previous one; a sequence gap resubscribes automatically. Kline periods are the native periods of ```exchange.GetRecords()```; the exchange does not flag closed bars, so a bar counts as closed once its end time has passed or the next bar arrives, and a first kline subscription pushes 300 historical bars first. The private stream is one ```private``` subscription for the whole account (no symbol); it connects only when subscribed (signed in the connection handshake). Once the subscription is active (and again after every reconnect) it first pushes a snapshot of all balances and positions from the same endpoints as ```exchange.GetAssets()``` and ```exchange.GetPositions()```, then reports ready, and afterwards pushes order updates (all contracts), position changes (amount, average price, leverage, isolated margin; the push carries no unrealized profit or cross margin, so those fields are absent from position pushes) and balance changes (the balance push has no available balance, so it triggers a re-query through ```exchange.GetAssets()``` and only changed currencies are pushed). WEEX rejects the handshake of a connection with a bad signature without a distinguishable error, so the private stream then treats it as a disconnect and reconnects with backoff (market data push is unaffected). WEEX allows at most 240 subscribe operations per connection per hour. A market-wide ```tickers``` subscription is not supported (WEEX ticker push is per contract only) and fails at subscribe; subscribe ticker per symbol.
 
 #### WOO X
 
@@ -28546,6 +29558,7 @@ Position mode: Switch hedge/one-way mode with ```exchange.IO("dual", bool)```. T
 - Conditional orders support take-profit, stop-loss and OCO; ```exchange.ModifyConditionOrder()``` can modify take-profit and stop-loss orders only, not OCO conditional orders.
 - ```exchange.GetConditionOrders()``` queries one trading pair only: when omitted or empty it queries the current trading pair.
 - ```exchange.GetHistoryOrders()``` and ```exchange.GetHistoryConditionOrders()``` query one trading pair only: without ```symbol``` they query the current trading pair, and an empty string fails.
+- WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private stream (order updates and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. The market data connection URL carries the configured ApplicationId (without one, the URL without an ApplicationId is used). The ticker push takes its best bid/ask prices and sizes from the pair's best bid/ask stream (WOO X's 24h ticker stream has no bid/ask) and starts once both streams have arrived; its volume is the aggregated volume, the same as ```exchange.GetTicker()```. Trades carry no exchange trade IDs and use the same synthesized IDs as ```exchange.GetTrades()``` (when several trades share the same millisecond, side, price and amount, ```exchange.GetTrades()``` appends a sequence number to the ID; the push does not). Depth subscriptions go up to 100 levels (20 by default) and are synchronized from a snapshot of the same endpoint as ```exchange.GetDepth()``` plus updates chained by the previous update's timestamp; a broken chain fetches a new snapshot automatically. WOO X only pushes when the book changes, so a snapshot is pushed first once the subscription is active. Kline periods are 1 minute, 5, 15 and 30 minutes, 1 hour, 4 hours, 12 hours, 1 day, 1 week and 1 month, and a first kline subscription pushes 500 historical bars first; the exchange's kline push has no closed flag, so a bar counts as closed when it is pushed after its end time or when the next bar starts. The private stream is one ```private``` subscription for the whole account (no symbol); it needs the ApplicationId and connects and logs in only when subscribed: once the subscription is active (and again after every reconnect) it first pushes a snapshot of all balances from the same endpoint as ```exchange.GetAssets()```, then reports ready, and afterwards pushes spot order updates (all pairs; conditional orders themselves are not pushed, the orders they place when triggered are). Balance pushes only signal a change: each one triggers a re-query through ```exchange.GetAssets()``` and only the changed currencies are pushed. Spot has no positions, so the private stream pushes none. A rejected signature reports a degraded connection status and a failed private stream (market data push is unaffected). A market-wide ```tickers``` subscription (no symbol) uses WOO's all-market 24-hour ticker stream together with its all-market best bid/ask stream: once a second it pushes every spot pair with the last price, the 24-hour open/high/low, the volume (same as the ticker) and the best bid/ask.
 
 ###### ```Futures_WOO``` (Futures)
 
@@ -28553,6 +29566,7 @@ Position mode: Switch hedge/one-way mode with ```exchange.IO("dual", bool)```. T
 - The ```Rate``` of ```exchange.GetFundings()``` is the exchange's estimated funding rate for the next settlement and ```Time``` is the next settlement time; batch queries are supported.
 - In ```exchange.GetPositions()```, ```Profit``` is computed as (mark price − average open price) × position size and ```Margin``` is estimated as average open price × position size ÷ leverage; the position's margin mode is the ```marginMode``` in the exchange's position data (one account can hold both cross and isolated positions), independent of the local ```exchange.IO("cross", bool)``` order setting.
 - Like the open-order queries, ```exchange.GetHistoryOrders()``` and ```exchange.GetHistoryConditionOrders()``` accept ranges such as ```USDT.swap```: the exchange is queried without a trading pair and the results are filtered by the range, with ```limit``` counting only orders inside the range.
+- WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private stream (order updates, positions and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. The market data connection URL carries the configured ApplicationId (without one, the URL without an ApplicationId is used). The ticker push takes its best bid/ask prices and sizes from the contract's best bid/ask stream (WOO X's 24h ticker stream has no bid/ask) and starts once both streams have arrived; its volume is the exchange's 24h volume, the same as ```exchange.GetTicker()```, and it carries no open interest. Trades carry no exchange trade IDs and use the same synthesized IDs as ```exchange.GetTrades()``` (when several trades share the same millisecond, side, price and amount, ```exchange.GetTrades()``` appends a sequence number to the ID; the push does not). Depth subscriptions go up to 100 levels (20 by default) and are synchronized from a snapshot of the same endpoint as ```exchange.GetDepth()``` plus updates chained by the previous update's timestamp; a broken chain fetches a new snapshot automatically. WOO X only pushes when the book changes, so a snapshot is pushed first once the subscription is active. Kline periods are 1 minute, 5, 15 and 30 minutes, 1 hour, 4 hours, 12 hours, 1 day, 1 week and 1 month (the 1-year period is not available for push), and a first kline subscription pushes 500 historical bars first; the exchange's kline push has no closed flag, so a bar counts as closed when it is pushed after its end time or when the next bar starts. The private stream is one ```private``` subscription for the whole account (no symbol); it needs the ApplicationId and connects and logs in only when subscribed: once the subscription is active (and again after every reconnect) it first pushes a snapshot of all balances and positions from the same endpoints as ```exchange.GetAssets()``` and ```exchange.GetPositions()```, then reports ready, and afterwards pushes perpetual order updates (all contracts; conditional orders themselves are not pushed, the orders they place when triggered are) and position changes (each one the full position of that contract, with profit and margin computed the same way as ```exchange.GetPositions()```; the push carries no liquidation price). Balance pushes only signal a change: each one triggers a re-query through ```exchange.GetAssets()``` and only the changed currencies are pushed. A rejected signature reports a degraded connection status and a failed private stream (market data push is unaffected). A market-wide ```tickers``` subscription (no symbol) uses WOO's all-market 24-hour ticker stream together with its all-market best bid/ask stream: once a second it pushes every perpetual with the last price, the 24-hour open/high/low, the volume (same as the ticker; no open interest) and the best bid/ask.
 
 #### Zaif
 
@@ -28890,6 +29904,7 @@ Account: For a unified account or portfolio margin account, the balance and equi
 - After a successful ```exchange.ModifyOrder()``` the order ID changes; the return value is the new order ID.
 - ```Buy``` and ```Sell``` of ```exchange.GetTicker()``` are the best bid and ask (the mid price when one side is empty); ```Last```, ```High``` and ```Low``` are all the mid price, as the exchange has no 24h high/low. ```Buy``` and ```Sell``` of ```exchange.GetTickers()``` are the mid price too.
 - ```exchange.GetHistoryOrders()``` returns only the recent orders the exchange provides; the ```since``` parameter is not supported and a ```since``` greater than 0 fails.
+- WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private stream (order updates and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. The ticker's last price, volume and open come from the same source as ```exchange.GetTicker()``` (mid price, 24h volume, previous day price), the best bid and ask come from the best bid/offer stream, and there is no 24h high or low. Depth subscriptions take at most 20 levels: 1 to 5 levels use the exchange's fast 5-level book (about every 0.5 seconds) and 6 to 20 levels (20 by default) use its 20-level book (about every 5 seconds); the two are separate streams. Trades carry the same trade IDs as ```exchange.GetTrades()```; the recent trades the exchange replays when a subscription becomes active are not pushed. Kline periods are the same as ```exchange.GetRecords()```, a first kline subscription pushes 500 historical bars first, and since the exchange's kline push has no closed flag a bar is pushed as closed when the next bar starts (on thinly traded pairs that waits for the next trade). The private stream is one ```private``` subscription for the whole wallet address (no symbol), subscribed read-only by ```WalletAddress``` (or the address set with ```exchange.IO("walletAddress", ...)```) without signing: once the subscription is active (and again after every reconnect) it first pushes a snapshot of all balances from the same endpoint as ```exchange.GetAccount()```, then reports ready, and afterwards pushes spot order updates (without the average fill price; use ```exchange.GetOrder()``` for it) and the balances of coins that changed. A market-wide ```tickers``` subscription is not supported (Hyperliquid's all-market ```allMids``` push carries mid prices only, not tickers) and fails at subscribe; subscribe ticker per symbol.
 
 ###### ```Futures_Hyperliquid``` (Futures)
 
@@ -28902,6 +29917,7 @@ Account: For a unified account or portfolio margin account, the balance and equi
 - ```exchange.GetFundings()```: the main dex returns predicted funding rates (settled hourly); HIP-3 instruments need an explicit symbol and return the funding records of the last 24 hours.
 - ```exchange.GetHistoryOrders()``` and ```exchange.GetHistoryConditionOrders()``` return only the recent orders the exchange provides; the ```since``` parameter is not supported and a ```since``` greater than 0 fails.
 - HIP-4 Outcome instruments are spot-like holdings: trade them by buying and selling (integer amounts); reduce-only is not supported, so closing orders (```closebuy```, ```closesell```) fail; holdings come from the Outcome tokens in the spot account. Outcome instruments have no bars or funding rates, and ```Last``` of ```GetTicker()``` is the mid price while ```Buy``` and ```Sell``` are 0. An Outcome instrument the exchange has no mid price for yet (newly listed, not traded yet, and so on) is still listed by ```GetMarkets()``` (```PricePrecision``` is 4 and ```Info.assetCtx.midPx``` is ```null```), is left out of ```GetTickers()```, and fails ```GetTicker()``` and market orders; a holding of it is valued at a mid price of 0 (```Margin``` is 0 and ```Profit``` is minus the entry cost).
+- WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private stream (order updates, positions and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. The ticker's last price, volume, open and open interest come from the same source as ```exchange.GetTicker()``` (mid price, 24h volume, previous day price, open interest), the best bid and ask come from the best bid/offer stream (not the impact prices), and there is no 24h high or low. Depth subscriptions take at most 20 levels: 1 to 5 levels use the exchange's fast 5-level book (about every 0.5 seconds) and 6 to 20 levels (20 by default) use its 20-level book (about every 5 seconds); the two are separate streams. Trades carry the same trade IDs as ```exchange.GetTrades()```; the recent trades the exchange replays when a subscription becomes active are not pushed. Kline periods are the same as ```exchange.GetRecords()```, a first kline subscription pushes 500 historical bars first, and since the exchange's kline push has no closed flag a bar is pushed as closed when the next bar starts. HIP-4 Outcome instruments have no push (subscribing reports an error). The private stream is one ```private``` subscription for the whole wallet address (no symbol), subscribed read-only by ```WalletAddress``` (or the address set with ```exchange.IO("walletAddress", ...)```) without signing: once the subscription is active (and again after every reconnect) it first pushes a snapshot of all balances and positions from the same endpoints as ```exchange.GetAccount()``` and ```exchange.GetPositions()```, then reports ready, and afterwards pushes perpetual order updates (without the average fill price; use ```exchange.GetOrder()``` for it), positions that changed (one-way net positions; a closed position is pushed with quantity 0) and balances (re-queried from the same endpoint as ```exchange.GetAccount()``` when the pushed account state changes, so the figures are the same). Live positions cover one dex (the dex set with ```exchange.IO("dex", ...)```, the main dex by default); positions on other HIP-3 dexes appear only in the snapshots. A market-wide ```tickers``` subscription is not supported (Hyperliquid's all-market ```allMids``` push carries mid prices only, not tickers) and fails at subscribe; subscribe ticker per symbol.
 
 #### Lighter
 
@@ -29010,6 +30026,8 @@ Simulation: The Simulate box connects to the Lighter testnet (```https://testnet
 | exchange.GetOrder() | Searches only the open orders and the latest 100 historical orders of the instrument; older orders return null |
 | exchange.ModifyConditionOrder() | Modifies the amount, trigger price and order price in place; the order ID stays the same. The limit/market variant cannot change: an order price of -1 on a limit conditional order, or a positive one on a market conditional order, fails (cancel and recreate instead); a market conditional order's worst fill price is recomputed from the new trigger price |
 | exchange.GetHistoryOrders(), exchange.GetHistoryConditionOrders() | The exchange API requires an instrument: the current one is queried when omitted, and an empty string or a range raises an error; the ```since``` parameter is not supported and raises an error; without ```limit``` the latest 100 and 500 orders are returned respectively |
+
+- WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private stream (order updates, positions and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. The ticker's last price, 24h high/low, volume, open interest and open price (derived from the 24h change) match ```exchange.GetTickers()```, while the best bid/ask prices and sizes come from the exchange's best bid/offer channel (the same push as a bbo subscription). Depth subscriptions (20 levels by default, at most 255) are synchronized from the exchange's full-book snapshot plus deltas, checking the matching engine's sequence numbers for continuity and resubscribing on a gap; the exchange has a single order book stream per instrument, so subscriptions of different depths share it and each is cut to its own depth. Pushed depth is aggregated by price (unlike the individual resting orders of ```exchange.GetDepth()```). Trades carry the same trade IDs as ```exchange.GetTrades()```; liquidation trades are not pushed. Klines support the 1m, 5m, 15m, 30m, 1h, 4h, 12h and 1d periods (the push has no weekly period), and a first kline subscription pushes 500 historical bars first. The private stream is one ```private``` subscription for the whole account (no symbol); it needs the API key private key and the account index and connects only when subscribed: the order channel carries the same auth token as the private REST endpoints, while the position and account statistics channels are subscribed by account index. Once the subscription is active (and again after every reconnect) it first pushes a snapshot of the USDC balance and all positions from the same endpoints as ```exchange.GetAccount()``` and ```exchange.GetPositions()```, then reports ready, and afterwards pushes order updates on every instrument (the order ID is the one ```exchange.CreateOrder()``` returns), positions that changed (one-way net positions, a closed position is pushed with quantity 0) and the USDC balance after a change (free is the available margin and frozen is the total account value minus it, the same as ```exchange.GetAccount()```). The auth token is valid for 7 hours; the private connection reconnects with a fresh token before it expires and pushes a new snapshot. An authentication failure reports a degraded connection status and a failed private stream (market data push is unaffected). Simulated trading uses the testnet push endpoint. A market-wide ```tickers``` subscription (no symbol) uses the exchange's all-market statistics channel: about once a second it pushes the instruments that changed, with the last price, 24h high/low, volume, open interest and open price as in the ticker, and the best bid/ask prices without sizes (the exchange has no all-market best bid/offer channel); instruments that have not traded yet (last price, 24h high/low and volume all zero) are not pushed, as in ```exchange.GetTickers()```.
 
 #### edgeX
 
@@ -29131,6 +30149,8 @@ Account: The account, positions and orders are queried by the configured Account
 | exchange.GetHistoryConditionOrders() | The third parameter keeps its legacy meaning and is not a count: a value above 1e12 is taken as the end time (millisecond timestamp) and smaller values are ignored; the number of results is not limited. Without ```since``` the call pages through the contract's whole order history and fails beyond about 10,000 orders, so passing ```since``` is recommended |
 
 The argument of ```exchange.IO("calcOrderHashAndSign", json)``` must have exactly 10 keys: ```assetIdSynthetic```, ```assetIdCollateral```, ```assetIdFee``` (hex), ```isBuyingSynthetic``` (bool), ```amountSynthetic```, ```amountCollateral```, ```amountFee```, ```nonce```, ```accountID``` and ```expirationTimestamp``` (integers, or decimal strings; an ```accountID``` beyond JavaScript integer precision must be a string). A missing or malformed key reports ```argument X error```, and extra keys report ```argument error```. The signing key is the configured TradingPrivateKey (used as a Stark private key), not the Stark key of an old account; the signing nonce is deterministic (RFC 6979), so the same input always gives the same signature, which differs from the old docker's but is equally valid.
+
+WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private stream (order updates, positions and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. Depth subscriptions of up to 15 levels (15 by default) use edgeX's 15-level book stream and 16 to 200 levels the 200-level stream, both synchronized from a snapshot plus version-linked deltas, at most 200 levels. edgeX has no usable top-of-book stream, so bbo and the ticker's bid/ask prices and sizes come from the 15-level book on a separate connection. Trades carry the exchange's ```ticketId``` (a UUID string) as the trade ID; edgeX has no trades query (```exchange.GetTrades()``` is not supported), so they cannot be compared with REST, and the 30 recent trades the exchange sends on subscription are not pushed as live trades. Kline periods are the native periods of ```exchange.GetRecords()```, and a first kline subscription pushes 500 historical bars first; the exchange's push has no closed flag, so when the next bar starts the previous one is marked closed with its last pushed values. The private stream is one ```private``` subscription for the whole account (no symbol); it needs the AccountID and the V2 API Key, API Secret and API Passphrase, connects only when subscribed and authenticates with the same HMAC scheme as the private endpoints: once the subscription is active (and again after every reconnect) it first pushes a snapshot of all balances and positions from the same endpoints as ```exchange.GetAccount()``` and ```exchange.GetPositions()```, then reports ready, and afterwards pushes order updates and positions that changed (one-way net positions with the average price taken as position value divided by size; a closed position is pushed with quantity 0; the push carries no unrealized profit, margin or leverage). The collateral amount in the exchange's push is not the free/frozen balance, so every account event triggers one balance query and only coins that changed are pushed. An authentication failure reports a degraded connection status and a failed private stream (market data push is unaffected). A market-wide ```tickers``` subscription (no symbol) uses edgeX's all-market ticker channel: once a second it pushes every tradable contract with the same fields as the ticker, the best bid/ask carrying prices without sizes; contracts whose last price, 24h high/low and volume are all zero are not pushed.
 
 #### Aster
 
@@ -29254,6 +30274,15 @@ Account: In single-asset mode ```exchange.GetAccount()``` reads the row of the c
 - A market buy by quote amount is rounded down to the quantity step by the exchange; the leftover amount below one step is not used and the order ends as ```EXPIRED```. As long as anything was filled, the queried order status is filled (```ORDER_STATE_CLOSED```), and both ```Amount``` and ```DealAmount``` are the base-currency quantity actually bought. A market order placed by quantity that is not fully filled for lack of liquidity is still canceled (```DealAmount``` less than ```Amount```).
 - Conditional orders support take-profit and stop-loss only, not OCO; create a take-profit order and a stop-loss order separately when needed. Modifying a conditional order (```exchange.ModifyConditionOrder()```) is not supported; cancel and recreate it instead. ```exchange.GetConditionOrder()``` with the ID of a regular order fails (that order is not conditional).
 - ```exchange.GetHistoryOrders()``` and ```exchange.GetHistoryConditionOrders()``` require a trading pair.
+- WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private stream (order updates and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. The ticker merges Aster's 24-hour ticker stream with the best bid/ask stream; the 24-hour stream only pushes when trades happen, so a pair that has not traded since the subscription has no ticker yet (bbo is pushed as usual). Depth subscriptions of 5, 10 and 20 levels use Aster's snapshot streams; other depths (20 by default, at most 255) are synchronized from the diff stream and a REST snapshot. Trades are aggregate trades (the same trade IDs as ```exchange.GetTrades()```). Klines from 1 minute to 1 month are pushed (there is no 1-second kline stream); a first kline subscription pushes 500 historical bars first. The private stream is one ```private``` subscription for the whole spot account (no symbol); it requests a listenKey with the wallet signature and connects only when subscribed, and renews the key every 30 minutes. Once the subscription is active (and again after every reconnect) it first pushes a snapshot of all balances from the same endpoint as ```exchange.GetAssets()```, then reports ready, and afterwards pushes order updates (market buys by amount match ```exchange.GetOrder()```) and the balances of coins that changed (free and frozen match ```exchange.GetAssets()```). Spot has no positions, so the private stream pushes none. A rejected signature reports a degraded connection status and a failed private stream (market data push is unaffected); when the REST address points to the testnet, push connects to the testnet too. A market-wide ```tickers``` subscription (no symbol) uses Aster's all-market 24-hour ticker stream (once a second, the pairs that changed, with the last price, the 24-hour open/high/low and the volume) together with the best bid/ask from the all-market book ticker stream; a pair is pushed once its best bid/ask has arrived.
+
+###### ```Futures_ApolloX``` (Futures)
+
+- WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private stream (order updates, positions and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. The ticker merges the 24-hour ticker stream with the best bid/ask stream. Depth subscriptions of 5, 10 or 20 levels use the exchange's partial-depth snapshot streams; other depths (20 by default, at most 255 levels) use the diff stream synchronized with a REST depth snapshot. Trades carry the same trade IDs as ```exchange.GetTrades()```. Kline periods are the same as ```exchange.GetRecords()``` (no second-level periods), and a first kline subscription pushes 500 historical bars first. The private stream is one ```private``` subscription for the whole account (no symbol); it requests a listenKey and connects only when subscribed. Once the subscription is active (and again after every reconnect) it first pushes a snapshot of all balances and positions from the same endpoints as ```exchange.GetAccount()``` and ```exchange.GetPositions()```, then reports ready, and afterwards pushes order updates, positions that changed (one net position in one-way mode, one long and one short leg in hedge mode, a closed position is pushed with quantity 0; pushed positions carry no margin, leverage or liquidation price) and the balances re-queried after a balance change (same figures as ```exchange.GetAccount()```; placing or canceling orders and mark price moves do not trigger a balance push). An authentication failure reports a degraded connection status and a failed private stream (market data push is unaffected). A market-wide ```tickers``` subscription (no symbol) uses ApolloX's all-market 24-hour ticker stream (once a second, the contracts that changed, with the last price, the 24-hour open/high/low and the volume) together with the best bid/ask from the all-market book ticker stream; a contract is pushed once its best bid/ask has arrived.
+
+###### ```Futures_Aster``` (Futures)
+
+- WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private stream (order updates, positions and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. The ticker merges Aster's 24-hour ticker stream with the best bid/ask stream; the 24-hour stream only pushes when trades happen, so a contract that has not traded since the subscription has no ticker yet (bbo is pushed as usual). Depth subscriptions of 5, 10 and 20 levels use Aster's snapshot streams; other depths (20 by default, at most 255) are synchronized from the diff stream and a REST snapshot. Trades carry the same trade IDs as ```exchange.GetTrades()```; liquidation and auto-deleveraging fills are not pushed. A first kline subscription pushes 500 historical bars first. The private stream is one ```private``` subscription for the whole futures account (no symbol); it requests a listenKey with the wallet signature and connects only when subscribed, and renews the key every 30 minutes. Once the subscription is active (and again after every reconnect) it first pushes a snapshot of all balances and positions from the same endpoints as ```exchange.GetAssets()``` and ```exchange.GetPositions()```, then reports ready, and afterwards pushes order updates, positions that changed (one net position in one-way mode, one long and one short leg in hedge mode, a closed position is pushed with quantity 0; the push carries no margin, leverage, liquidation price or mark price) and balances: after a balance change or an order update the balances are queried once more like ```exchange.GetAssets()``` and only the coins that changed are pushed. Floating profit and equity changes caused by the mark price are not pushed. A rejected signature reports a degraded connection status and a failed private stream (market data push is unaffected); when the REST address points to the testnet, push connects to the testnet too. A market-wide ```tickers``` subscription (no symbol) uses Aster's all-market 24-hour ticker stream (once a second, the contracts that changed, with the last price, the 24-hour open/high/low and the volume) together with the best bid/ask from the all-market book ticker stream; a contract is pushed once its best bid/ask has arrived.
 
 #### Aevo
 
@@ -29356,6 +30385,7 @@ Option codes are Aevo native codes: underlying-expiry (DDMMMYY)-strike-C/P, C fo
 - For perpetuals, ```Last``` in ```exchange.GetTicker()``` is the mark price and ```Open``` the mark price 24 hours ago; there is no high or low (```High``` and ```Low``` are 0), and ```Volume``` is the 24-hour volume in contracts.
 - Funding is settled every hour; ```exchange.GetFundings()``` returns perpetuals only.
 - ```exchange.GetHistoryOrders()``` and ```exchange.GetHistoryConditionOrders()``` query one symbol at a time; an empty string (all symbols) is rejected.
+- WebSocket push is supported: market data (ticker, bbo, depth, trades) and the private account stream (order updates, positions, balances) can be subscribed through the event stream, for perpetuals and options. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. The exchange has no kline stream (and no kline endpoint), so kline subscriptions fail. The ticker is the exchange's 500 ms ticker push with the best bid/ask, their sizes and open interest; ```Last``` is the mark price as in ```exchange.GetTicker()```, and there is no 24-hour volume, open, high or low. bbo is pushed in real time whenever the best bid/ask changes. Aevo has a single depth stream (the whole book on subscription, then deltas every 100 ms): depth subscriptions of any size (20 levels by default, at most 255) share it and each publishes its own number of levels; the full book is verified against the exchange's checksum, and a delta whose timestamp goes backwards or a checksum mismatch resubscribes for a fresh book. Trades carry the same trade IDs as ```exchange.GetTrades()```. The private stream is one ```private``` subscription for the whole account (no symbol). It connects only when subscribed, logs in with a signature made from the API key and secret key, and subscribes to the order, fill and position channels: once active (and again after every reconnect) it first pushes a balance and position snapshot from the same endpoints as ```exchange.GetAssets()``` and ```exchange.GetPositions()```, then reports ready, and afterwards pushes order updates (orders already open when subscribing are not reported again) and positions that changed (one-way net positions; a closed position is pushed with quantity 0; the push carries no leverage, so the leverage of the latest snapshot is kept). The exchange has no balance push: after an order, fill or position push the connector re-reads the balances from the same endpoint as ```exchange.GetAssets()``` and pushes the coins that changed. A rejected signature reports a degraded connection status and a failed private stream (market data push is unaffected). A market-wide ```tickers``` subscription is not supported (Aevo ticker push is per instrument only) and fails at subscribe; subscribe ticker per symbol.
 
 #### Pendle
 
@@ -29416,14 +30446,30 @@ Contract codes are Boros market names with underscores, ```funding source_asset_
 | ```receipt``` | txHash[, waitMs] | Query a transaction receipt: status, block, gas and fee, optionally waiting until it is mined (up to 10 minutes). For a swap order, pass the transaction hash after the comma in the order ID. | ```{txHash, status, blockNumber, gasUsed, fee}```, where ```status``` is ```success```, ```reverted``` or ```pending```; while not mined (```pending```) only ```txHash``` and ```status``` are present. |
 | ```base``` | [url] | Without an argument, returns the current RPC node address; with an address, switches the node (separate several with commas), and the first request afterwards checks that the node is on the configured chain. | The previous address. |
 | ```address``` | — | The wallet address. | — |
+| ```abi``` | address, abiContent | Register the ABI of a contract address (a JSON string, or one of the built-in templates ```weth```, ```uniswapV3Pool```, ```uniswapV3Factory```, ```uniswapV3QuoterV2```, ```uniswapV3SwapRouter02```, ```uniswapV3PositionManager```, ```permit2```, with matching ```pancakeV3*``` aliases for PancakeSwap V3), for this exchange object only. See the sub-page `exchange.IO("abi", ...)`. | — |
+| ```api``` | address \| "eth", method, ...args[, options] | With a contract address as the first argument, calls a contract method; read-only methods (```view```, ```pure```) return the decoded value, and write methods are signed with the configured wallet key and broadcast and return the transaction hash (a payable method takes the native amount as its first argument; ```options``` may set ```gasLimit```, ```gasPrice```, ```nonce```, ```dryRun```). See the sub-page `exchange.IO("api", ...)`. | — |
+| ```call``` | address, method \| calldata, ...args[, options] | Simulate any contract method (including write methods) with ```eth_call```, without signing, broadcasting or spending gas, for quotes and dry runs; the arguments are as for ```api```, ```options``` is ```{from, value, block, gasLimit}```, and the caller defaults to this wallet. See the sub-page `exchange.IO("call", ...)`. | The decoded value when called by method name (```true``` for a method without return values); the raw return data (a hex string) when called with calldata. |
+| ```multicall``` | calls[, options] | Read several contract calls in one request on the same block state through the Multicall3 contract; each item of ```calls``` is ```[address, method, ...args]```, and ```options``` is ```{allowFailure, block, multicall}```. See the sub-page `exchange.IO("multicall", ...)`. | An array of results in the order of ```calls```. By default any failing item fails the whole call (with its index and reason); with ```allowFailure``` ```true```, failed items are null. |
+| ```logs``` | query | Query a contract's event logs (```eth_getLogs```) and decode them by ABI; ```query``` is ```{address, event, filter, fromBlock, toBlock, topics, blockHash}```, and block numbers may be negative (relative to the latest block). See the sub-page `exchange.IO("logs", ...)`. | An array of logs, each with ```event``` and ```args``` when it can be decoded. |
+| ```waitReceipt``` | txHash[, options] | Wait until a transaction is mined and has the required confirmations; ```options``` is ```{timeout, confirmations, interval}```: ```timeout``` and ```interval``` are in milliseconds, 120000 (1000 to 600000) and 1500 by default, and ```confirmations``` defaults to 1. See the sub-page `exchange.IO("waitReceipt", ...)`. | The transaction receipt (```status``` as a number, ```events``` decoded); an error and null on timeout. |
+| ```nonce``` | ["sync" \| number] | Show the nonce counter this exchange object sends with (shared by ```api``` writes and swaps, limit-order cancels and the like); ```sync``` resyncs it from the node's pending count, and a number sets the next local nonce. See the sub-page `exchange.IO("nonce", ...)`. | ```{address, latest, pending, local}``` (all values are strings; ```local``` is null before any transaction has been sent). |
+| ```speedUp``` | txHash[, options] | Resend a pending transaction with a higher fee (same nonce, recipient, amount, call data and gas limit); ```options``` is ```{multiplier, dryRun}```, ```multiplier``` 1.1 to 10, default 1.125. The transaction must come from this wallet and be visible to the node. See the sub-page `exchange.IO("speedUp", ...)`. | The replacement transaction's hash; its content with ```dryRun```. |
+| ```cancelTx``` | txHash[, options] | Cancel a pending transaction by sending a zero-amount transaction to yourself with the same nonce and a higher fee; ```options``` as for ```speedUp```. Success is not guaranteed. See the sub-page `exchange.IO("cancelTx", ...)`. | The cancel transaction's hash; its content with ```dryRun```. |
+| ```encode``` | [address, ]dataFormat, ...args | Standard ABI encoding by a type list (like Solidity's ```abi.encode```); with a contract address as the first argument, encodes a method call of that contract (calldata). ```pack``` is an older name of the same command. See the sub-page `exchange.IO("encode", ...)`. | A hex string without ```0x```. |
+| ```encodePacked``` | dataFormat, ...args | Packed encoding by a type list (like Solidity's ```abi.encodePacked```). See the sub-page `exchange.IO("encodePacked", ...)`. | A hex string without ```0x```. |
+| ```decode``` | dataFormat, data | Decode hex data by a type list. ```unpack``` is an older name of the same command. See the sub-page `exchange.IO("decode", ...)`. | The value itself for a single type, an array for several. |
+| ```sign``` | hash[, key] | Sign a 32-byte hash with a secp256k1 private key (no further hashing), for off-chain signatures such as EIP-712; the configured wallet key is used when ```key``` is omitted. See the sub-page `exchange.IO("sign", ...)`. | ```{r, s, v, signature, vs}``` (```v``` is 27 or 28, ```vs``` the EIP-2098 compact signature). |
+| ```signTypedData``` | typedData[, key] \| domain, types, message[, key] | Sign structured data per EIP-712 (Permit2 permits, limit orders and the like), computing the type hash, domain separator, struct hash and digest in one call. See the sub-page `exchange.IO("signTypedData", ...)`. | As for ```sign```, plus ```digest``` (the EIP-712 digest). |
+| ```signMessage``` | message[, key] | Sign a message per EIP-191 (```personal_sign```); a string is signed as UTF-8, raw bytes are passed as ```{hex: "0x..."}```. See the sub-page `exchange.IO("signMessage", ...)`. | As for ```sign```, plus ```digest``` (the EIP-191 message hash). |
+| ```toUnits``` | amount, decimals | Convert a readable amount into an on-chain integer with exact string arithmetic; ```decimals``` may be a number or a token contract address (its ```decimals()``` is read). More fractional digits than the precision fail. See the sub-page `exchange.IO("toUnits", ...)`. | A decimal string. |
+| ```fromUnits``` | amount, decimals | Convert an on-chain integer into a readable amount with exact string arithmetic; ```decimals``` as for ```toUnits```. See the sub-page `exchange.IO("fromUnits", ...)`. | A decimal string (trailing zeros removed). |
+| ```uniswapV3``` | fn, ...args | Concentrated-liquidity math: ```tickToPrice```, ```priceToTick```, ```sqrtPriceToPrice```, ```tickToSqrtPrice```, ```sqrtPriceToTick```, ```nearestUsableTick```, ```amountsForLiquidity```, ```liquidityForAmounts```; precision arguments may be numbers or token addresses. See the sub-page `exchange.IO("uniswapV3", ...)`. | — |
 
 The rest of the longer descriptions in the table:
 
 - ```orderExpiry```: The order option ```expiry``` sets the expiry of one order as a timestamp in seconds or milliseconds (a point in time, not a duration); a time already past fails, and a time after the market's expiry becomes one minute before it. Queries when called without an argument.
 
 For the common command ```currency``` see `exchange.IO`.
-
-The common command ```api``` is not supported (the call fails with an error and returns null).
 
 ###### ```Futures_Boros``` (Futures)
 
@@ -29445,10 +30491,26 @@ The common command ```api``` is not supported (the call fails with an error and 
 | ```cancelWithdraw``` | currency | A wallet transaction: cancel a pending withdrawal request. | ```{txHash, currency}``` |
 | ```isolatedTransfer``` | symbol, amount | Move cash between the cross account and the isolated account of an isolated-only market: a positive ```amount``` (in the collateral) moves it from cross into isolated, a negative one moves it back. Goes through the relayer and uses the gas balance. Withdrawals come from the cross account only, so move isolated cash back first. | ```{txHash, symbol, amount, account}``` |
 | ```wallet``` | — | The wallet's (not the Boros account's) ETH and collateral token balances on Arbitrum, for checking before a deposit. | ```[{currency, amount, token}]```; the first item is the wallet's ETH (```currency``` is ```ETH (gas)```, without ```token```). |
+| ```abi``` | address, abiContent | Register the ABI of a contract address (a JSON string, or one of the built-in templates ```weth```, ```uniswapV3Pool```, ```uniswapV3Factory```, ```uniswapV3QuoterV2```, ```uniswapV3SwapRouter02```, ```uniswapV3PositionManager```, ```permit2```, with matching ```pancakeV3*``` aliases for PancakeSwap V3), for this exchange object only. See the sub-page `exchange.IO("abi", ...)`. | — |
+| ```api``` | address \| "eth", method, ...args[, options] | With a contract address as the first argument, calls a contract method; read-only methods (```view```, ```pure```) return the decoded value, and write methods are signed with the configured wallet key and broadcast and return the transaction hash (a payable method takes the native amount as its first argument; ```options``` may set ```gasLimit```, ```gasPrice```, ```nonce```, ```dryRun```). See the sub-page `exchange.IO("api", ...)`. | — |
+| ```call``` | address, method \| calldata, ...args[, options] | Simulate any contract method (including write methods) with ```eth_call```, without signing, broadcasting or spending gas, for quotes and dry runs; the arguments are as for ```api```, ```options``` is ```{from, value, block, gasLimit}```, and the caller defaults to this wallet. See the sub-page `exchange.IO("call", ...)`. | The decoded value when called by method name (```true``` for a method without return values); the raw return data (a hex string) when called with calldata. |
+| ```multicall``` | calls[, options] | Read several contract calls in one request on the same block state through the Multicall3 contract; each item of ```calls``` is ```[address, method, ...args]```, and ```options``` is ```{allowFailure, block, multicall}```. See the sub-page `exchange.IO("multicall", ...)`. | An array of results in the order of ```calls```. By default any failing item fails the whole call (with its index and reason); with ```allowFailure``` ```true```, failed items are null. |
+| ```logs``` | query | Query a contract's event logs (```eth_getLogs```) and decode them by ABI; ```query``` is ```{address, event, filter, fromBlock, toBlock, topics, blockHash}```, and block numbers may be negative (relative to the latest block). See the sub-page `exchange.IO("logs", ...)`. | An array of logs, each with ```event``` and ```args``` when it can be decoded. |
+| ```waitReceipt``` | txHash[, options] | Wait until a transaction is mined and has the required confirmations; ```options``` is ```{timeout, confirmations, interval}```: ```timeout``` and ```interval``` are in milliseconds, 120000 (1000 to 600000) and 1500 by default, and ```confirmations``` defaults to 1. See the sub-page `exchange.IO("waitReceipt", ...)`. | The transaction receipt (```status``` as a number, ```events``` decoded); an error and null on timeout. |
+| ```nonce``` | ["sync" \| number] | Show the nonce counter this exchange object sends with (shared by ```api``` writes and wallet transactions such as deposits and withdrawals); ```sync``` resyncs it from the node's pending count, and a number sets the next local nonce. See the sub-page `exchange.IO("nonce", ...)`. | ```{address, latest, pending, local}``` (all values are strings; ```local``` is null before any transaction has been sent). |
+| ```speedUp``` | txHash[, options] | Resend a pending transaction with a higher fee (same nonce, recipient, amount, call data and gas limit); ```options``` is ```{multiplier, dryRun}```, ```multiplier``` 1.1 to 10, default 1.125. The transaction must come from this wallet and be visible to the node. See the sub-page `exchange.IO("speedUp", ...)`. | The replacement transaction's hash; its content with ```dryRun```. |
+| ```cancelTx``` | txHash[, options] | Cancel a pending transaction by sending a zero-amount transaction to yourself with the same nonce and a higher fee; ```options``` as for ```speedUp```. Success is not guaranteed. See the sub-page `exchange.IO("cancelTx", ...)`. | The cancel transaction's hash; its content with ```dryRun```. |
+| ```encode``` | [address, ]dataFormat, ...args | Standard ABI encoding by a type list (like Solidity's ```abi.encode```); with a contract address as the first argument, encodes a method call of that contract (calldata). ```pack``` is an older name of the same command. See the sub-page `exchange.IO("encode", ...)`. | A hex string without ```0x```. |
+| ```encodePacked``` | dataFormat, ...args | Packed encoding by a type list (like Solidity's ```abi.encodePacked```). See the sub-page `exchange.IO("encodePacked", ...)`. | A hex string without ```0x```. |
+| ```decode``` | dataFormat, data | Decode hex data by a type list. ```unpack``` is an older name of the same command. See the sub-page `exchange.IO("decode", ...)`. | The value itself for a single type, an array for several. |
+| ```sign``` | hash[, key] | Sign a 32-byte hash with a secp256k1 private key (no further hashing), for off-chain signatures such as EIP-712; the configured wallet key is used when ```key``` is omitted. See the sub-page `exchange.IO("sign", ...)`. | ```{r, s, v, signature, vs}``` (```v``` is 27 or 28, ```vs``` the EIP-2098 compact signature). |
+| ```signTypedData``` | typedData[, key] \| domain, types, message[, key] | Sign structured data per EIP-712 (Permit2 permits, limit orders and the like), computing the type hash, domain separator, struct hash and digest in one call. See the sub-page `exchange.IO("signTypedData", ...)`. | As for ```sign```, plus ```digest``` (the EIP-712 digest). |
+| ```signMessage``` | message[, key] | Sign a message per EIP-191 (```personal_sign```); a string is signed as UTF-8, raw bytes are passed as ```{hex: "0x..."}```. See the sub-page `exchange.IO("signMessage", ...)`. | As for ```sign```, plus ```digest``` (the EIP-191 message hash). |
+| ```toUnits``` | amount, decimals | Convert a readable amount into an on-chain integer with exact string arithmetic; ```decimals``` may be a number or a token contract address (its ```decimals()``` is read). More fractional digits than the precision fail. See the sub-page `exchange.IO("toUnits", ...)`. | A decimal string. |
+| ```fromUnits``` | amount, decimals | Convert an on-chain integer into a readable amount with exact string arithmetic; ```decimals``` as for ```toUnits```. See the sub-page `exchange.IO("fromUnits", ...)`. | A decimal string (trailing zeros removed). |
+| ```uniswapV3``` | fn, ...args | Concentrated-liquidity math: ```tickToPrice```, ```priceToTick```, ```sqrtPriceToPrice```, ```tickToSqrtPrice```, ```sqrtPriceToTick```, ```nearestUsableTick```, ```amountsForLiquidity```, ```liquidityForAmounts```; precision arguments may be numbers or token addresses. See the sub-page `exchange.IO("uniswapV3", ...)`. | — |
 
 For the common command ```currency``` see `exchange.IO`.
-
-The common command ```api``` is not supported (the call fails with an error and returns null).
 
 ##### Common Usage
 
@@ -29740,6 +30802,7 @@ Account: The equity of ```exchange.GetAccount()``` is the USDC holding, and the 
 - For market orders ```Price``` is 0; the average fill price is in ```AvgPrice``` (the exchange's ```average_executed_price```).
 - ```MarginLevel``` in ```exchange.GetPositions()``` is the position's leverage (the exchange's ```leverage``` on the position row, or the reciprocal of the initial margin ratio ```imr``` when it is absent), and ```Margin``` is the initial margin in use (position value ÷ leverage).
 - The order book and K-line endpoints also require a signature: ```exchange.GetDepth()```, ```exchange.GetRecords()``` and ```exchange.GetTicker()``` (best bid and ask come from the order book) all need a configured API key; ```exchange.GetTickers()```, ```exchange.GetTrades()```, ```exchange.GetFundings()``` and ```exchange.GetMarkets()``` need no signature.
+- WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private stream (order updates, positions and balances) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. The stream addresses contain the account ID, so every subscription needs ```AccountID``` configured. The ticker push takes its best bid/ask prices and sizes from the contract's best bid/ask stream (Orderly's 24h ticker stream has no bid/ask) and starts once both streams have arrived. Trades carry no exchange trade ID; the trade IDs are synthesized by the same rule as ```exchange.GetTrades()``` (several trades with identical fields in the same millisecond are only unique within the push and may not match the REST numbering). Depth (at most 255 levels, 20 by default) takes its snapshot from the same signed order book endpoint as ```exchange.GetDepth()``` and then applies the 200 ms incremental pushes, linking each update to the previous version's timestamp; a broken chain refetches the snapshot automatically, so depth subscriptions need the API key. Kline periods are 1 minute, 5, 15 and 30 minutes, 1 hour, 4 hours, 12 hours, 1 day, 1 week and 1 month (1 year is not supported), and a first kline subscription pushes 500 historical bars from ```exchange.GetRecords()``` first; the exchange's kline push has no closed flag, so a bar counts as closed when the next bar appears or the push time reaches the bar's end time. The private stream is one ```private``` subscription for the whole account (no symbol). It connects only when subscribed and logs in with an API key signature: once the subscription is active (and again after every reconnect) it first pushes a snapshot of all balances and positions from the same endpoints as ```exchange.GetAssets()``` and ```exchange.GetPositions()```, then reports ready, and afterwards pushes order updates (all contracts), position changes (one-way positions) and balance changes with the same meaning as those two functions. Conditional orders are not pushed on the private stream; the regular order placed when one triggers is pushed as usual. A rejected login reports a degraded connection status and a failed private stream (market data push is unaffected); when ```RestBase``` points to the Orderly testnet the push connects to the testnet as well. A market-wide ```tickers``` subscription (no symbol) uses Orderly's all-market 24-hour ticker stream together with its all-market best bid/ask stream: once a second it pushes every perpetual with the last price, the 24-hour open/high/low, the volume and the best bid/ask (it also needs the AccountID).
 
 #### Uniswap / PancakeSwap
 
@@ -29808,7 +30871,7 @@ Tokens outside the token table can be used in pairs after registering them with 
 | ```sendBase``` | url | Set a node used only to broadcast transactions (a private transaction channel). Unlike Web3, it does not return the previous address, does not query when called without an argument, and an empty string does not clear the setting. | ```true``` |
 | ```address``` | — | The wallet address of the configured private key (lowercase, starting with ```0x```). | — |
 | ```contracts``` | — | The exchange's deployment on its chain; contract addresses, fee tiers and the built-in token list snapshot. | An object: ```dex```, ```chainId```, ```chain```, ```router```, ```quoterV2```, ```v3Factory```, ```v3Fees```, ```positionManager```, ```v2Factory```, ```v2Fee``` (in millionths, 3000 = 0.3%), ```wrappedNative```, ```v4```, ```tokenList``` (the token list snapshot's build time ```embeddedAt```, token count ```tokens``` and common-token count ```core```); deployments absent on the chain are ```null```. (more below the table) |
-| ```lp.pools``` | token[, quote] | Lists every V3 and V4/Infinity CL pool of a token (against the given quote, or the chain's wrapped native, USDC and USDT) with fee tier, tick spacing, current price, liquidity, both token balances of the pool and TVL; 24h volume and fees come from GeckoTerminal (```null``` when unavailable; cached in the process for 5 minutes and shared with ```lp.select``` and ```lp.plan```, with one retry after a pause when rate-limited). See the sub-page `exchange.IO("lp.pools", ...)`. | ```[{id, protocol, dex, symbol, fee, feeRate, tickSpacing, tick, price, liquidity, reserveBase, reserveQuote, tvlQuote, tvlUsd, volume24hUsd, fees24hUsd, empty}]```, where ```price``` is quote per token. |
+| ```lp.pools``` | token[, quote] | Lists every V3 and V4/Infinity CL pool of a token (against the given quote, or the chain's wrapped native, USDC and USDT) with fee tier, tick spacing, current price, liquidity, both token balances of the pool and TVL; 24h volume and fees come from GeckoTerminal (```null``` when unavailable, including pools GeckoTerminal has not indexed or has no data for, such as some new-factory Slipstream pools of Velodrome on OP Mainnet, in which case ```estDailyFeesUsd``` of ```lp.plan``` is ```null``` too; cached in the process for 5 minutes and shared with ```lp.select``` and ```lp.plan```, with one retry after a pause when rate-limited). See the sub-page `exchange.IO("lp.pools", ...)`. | ```[{id, protocol, dex, symbol, fee, feeRate, tickSpacing, tick, price, liquidity, reserveBase, reserveQuote, tvlQuote, tvlUsd, volume24hUsd, fees24hUsd, empty}]```, where ```price``` is quote per token. |
 | ```lp.select``` | token, budget[, options] | Picks a pool by rule among those ```lp.pools``` lists: with ```options.fee```, the pool of that fee tier is used when it meets the liquidity threshold (only that tier when ```exact``` is ```true```); otherwise, among pools whose TVL is at least max($5000, budget), the one with the largest 24h volume, or the largest TVL without volume data. See the sub-page `exchange.IO("lp.select", ...)`. | One ```lp.pools``` row with an extra ```reason```. |
 | ```lp.pool``` | poolId | Live state of a pool. See the sub-page `exchange.IO("lp.pool", ...)`. | ```{id, protocol, currency0, currency1, token0, token1, fee, tickSpacing, tick, sqrtPriceX96, price0, price1, liquidity}```, where ```price0``` is token1 per token0. (more below the table) |
 | ```lp.ticks``` | poolId, tickLower, tickUpper[, step] | Liquidity distribution over a tick range, with each segment's liquidity and amounts of both tokens (summed over initialized ticks inside it); ```step``` is the segment width in ticks (the tick spacing by default). Ranges wider than 120 bitmap words are refused. See the sub-page `exchange.IO("lp.ticks", ...)`. | ```{pool, tick, token0, token1, segments: [{tickLower, tickUpper, price0Lower, price0Upper, liquidity, amount0, amount1, current}]}``` |
@@ -29816,9 +30879,9 @@ Tokens outside the token table can be used in pairs after registering them with 
 | ```lp.simulate``` | plan[, stateOverride] | Runs the plan's add-liquidity transaction with ```eth_call``` (no signing, no broadcast) to confirm it executes and see the amounts used. See the sub-page `exchange.IO("lp.simulate", ...)`. | ```{pool, positions: [{liquidity, amountBase, amountQuote}], value, swapNeeded, note}``` |
 | ```lp.add``` | plan | Adds liquidity by the plan, swapping first with a market order when needed, approving, and creating every position in one transaction; returns after it is mined. See the sub-page `exchange.IO("lp.add", ...)`. | ```{txHash, swapTxHash, pool, positions: [{id, tickLower, tickUpper, priceLower, priceUpper, liquidity, amountBase, amountQuote}]}``` |
 | ```lp.increase``` | positionId, budget[, options] | Adds to a position, splitting ```budget``` (in the quote token) by the position's range and the current price and swapping first for whichever token is short. See the sub-page `exchange.IO("lp.increase", ...)`. | ```{txHash, swapTxHash, id, liquidity, amountBase, amountQuote}``` |
-| ```lp.decrease``` | positionId, ratio[, options] | Withdraws a ratio (0 to 1) of a position's liquidity and collects all its fees; the position stays. ```options.slippage``` sets price protection; with ```options.sell``` ```true``` the returned token is sold for the quote. See the sub-page `exchange.IO("lp.decrease", ...)`. | ```{txHash, positions: [{id, symbol, principalBase, principalQuote, feesBase, feesQuote, receivedBase, receivedQuote}], sells}``` |
-| ```lp.collect``` | positionIds[, sell] | Collects fees, several positions in one transaction; with ```sell``` ```true``` the collected token is sold for the quote. See the sub-page `exchange.IO("lp.collect", ...)`. | Same as ```lp.decrease```. |
-| ```lp.remove``` | positionIds[, ratio[, sell]] | Withdraws liquidity and collects fees, several positions in one transaction; ```ratio``` defaults to 1 (withdraw everything and burn the position NFT), below 1 only that share is withdrawn; with ```sell``` ```true``` the returned token is sold for the quote. See the sub-page `exchange.IO("lp.remove", ...)`. | Same as ```lp.decrease```. |
+| ```lp.decrease``` | positionId, ratio[, options] | Withdraws a ratio (0 to 1) of a position's liquidity and collects all its fees; the position stays. ```options.slippage``` sets price protection; with ```options.sell``` ```true``` the returned token is sold for the quote (as ```sell``` of ```lp.remove```). See the sub-page `exchange.IO("lp.decrease", ...)`. | ```{txHash, positions: [{id, symbol, principalBase, principalQuote, feesBase, feesQuote, receivedBase, receivedQuote}], sells}``` |
+| ```lp.collect``` | positionIds[, sell] | Collects fees, several positions in one transaction; with ```sell``` ```true``` the collected token is sold for the quote (as ```sell``` of ```lp.remove```). See the sub-page `exchange.IO("lp.collect", ...)`. | Same as ```lp.decrease```. |
+| ```lp.remove``` | positionIds[, ratio[, sell]] | Withdraws liquidity and collects fees, several positions in one transaction; ```ratio``` defaults to 1 (withdraw everything and burn the position NFT), below 1 only that share is withdrawn; with ```sell``` ```true``` the returned tokens are sold for the quote, the base tokens returned by all the positions (principal plus fees) are added up per pair into one market sell (capped at the wallet's actual balance, keeping gas for the native coin), which is awaited until it is confirmed; each ```sells``` entry is ```{symbol, qty, txHash}```, or ```{symbol, qty, error}``` on failure, which also writes an error log (those tokens stay in the wallet). See the sub-page `exchange.IO("lp.remove", ...)`. | Same as ```lp.decrease```. |
 | ```lp.positions``` | [filter[, wallet]] | Every V3 and V4/Infinity CL position of the wallet with range, in-range flag, liquidity, current amounts and value, and uncollected fees. See the sub-page `exchange.IO("lp.positions", ...)`. | ```[{id, pool, protocol, symbol, fee, tickLower, tickUpper, priceLower, priceUpper, price, tick, inRange, liquidity, amountBase, amountQuote, value, feesBase, feesQuote, feesValue, closed}]```, with ```value``` and ```feesValue``` in the quote token. |
 | ```lp.history``` | positionId | A position's cash flow: deposits, withdrawn principal, collected fees, and PnL valued at the current pool price (current value + collected fees + withdrawn principal − deposits, gas excluded). See the sub-page `exchange.IO("lp.history", ...)`. | ```{id, symbol, events: [{action, block, txHash, liquidity, amountBase, amountQuote}], depositedBase, depositedQuote, withdrawnBase, withdrawnQuote, feesCollectedBase, feesCollectedQuote, price, pnlQuote, note}```; for V4/Infinity CL positions ```{id, pool, symbol, events: [{action, block, txHash, liquidity}], position, note}```. |
 | ```lp.track``` | positionIds | Registers V4/Infinity CL position IDs (such as (Uniswap: ```["v4:123456"]```; PancakeSwap: ```["inf:123456"]```); a prefix that does not match the exchange object is an error) so that ```lp.positions``` checks them (ownership is verified on chain each time; transferred-away positions are not listed). See the sub-page `exchange.IO("lp.track", ...)`. | Every position ID remembered by this process. |
@@ -29829,6 +30892,24 @@ Tokens outside the token table can be used in pairs after registering them with 
 | ```bridge.send``` | params\|quote | Bridges out: re-quotes → checks the balance → approves LI.FI's ```approvalAddress``` when the token allowance is short (following ```exchange.IO("approve")``` ```exact```/```max```, resetting USDT-like tokens to zero first, waiting for the approval to be mined and re-quoting after it) → simulates with ```eth_call``` → signs and broadcasts, with a gas limit of the larger of the ```eth_estimateGas``` estimate × ```gasMultiplier``` and LI.FI's suggested ```gasLimit``` (bridge contracts call into other contracts, so the estimate can fall short; only the gas used is charged). See the sub-page `exchange.IO("bridge.*", ...)`. | ```{txHash, tool, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, toAddress, value, transactionId}```; ```txHash``` is the source-chain transaction, whose receipt ```receipt``` returns. |
 | ```bridge.status``` | txHash[, options] | Bridge progress (LI.FI ```/status```) for the source-chain transaction hash returned by ```bridge.send```; ```options``` may give ```{toChain, bridge}``` to speed up the lookup. See the sub-page `exchange.IO("bridge.*", ...)`. | ```{status, substatus, substatusMessage, tool, sending, receiving, fromAddress, toAddress, explorer, bridgeExplorer}```: ```status``` is ```NOT_FOUND```, ```INVALID```, ```PENDING```, ```DONE``` or ```FAILED```; when ```DONE```, ```substatus``` is ```COMPLETED``` (delivered as quoted), ```PARTIAL``` (a different token arrived) or ```REFUNDED```; ```sending``` and ```receiving``` are ```{txHash, txLink, chainId, amount, amountRaw, token, timestamp}```, with ```receiving.amount``` and ```receiving.token``` being what actually arrived. |
 | ```bridge.apiKey``` | [key] | Sets the LI.FI API key (header ```x-lifi-api-key```, for this exchange object only, never echoed); ```""``` clears it and no argument just queries. Without a key requests are rate-limited per outgoing IP, see below. See the sub-page `exchange.IO("bridge.*", ...)`. | Whether a key is set (a boolean). |
+| ```abi``` | address, abiContent | Register the ABI of a contract address (a JSON string, or one of the built-in templates ```weth```, ```uniswapV3Pool```, ```uniswapV3Factory```, ```uniswapV3QuoterV2```, ```uniswapV3SwapRouter02```, ```uniswapV3PositionManager```, ```permit2``` and more, see the sub-page), for this exchange object only. See the sub-page `exchange.IO("abi", ...)`. | — |
+| ```api``` | address \| "eth", method, ...args[, options] | With a contract address as the first argument, calls a contract method; read-only methods (```view```, ```pure```) return the decoded value, and write methods are signed with the configured wallet key and broadcast and return the transaction hash (a payable method takes the native amount as its first argument; ```options``` may set ```gasLimit```, ```gasPrice```, ```nonce```, ```dryRun```). See the sub-page `exchange.IO("api", ...)`. | — |
+| ```call``` | address, method \| calldata, ...args[, options] | Simulate any contract method (including write methods) with ```eth_call```, without signing, broadcasting or spending gas, for quotes and dry runs; the arguments are as for ```api```, ```options``` is ```{from, value, block, gasLimit}```, and the caller defaults to this wallet. See the sub-page `exchange.IO("call", ...)`. | The decoded value when called by method name (```true``` for a method without return values); the raw return data (a hex string) when called with calldata. |
+| ```multicall``` | calls[, options] | Read several contract calls in one request on the same block state through the Multicall3 contract; each item of ```calls``` is ```[address, method, ...args]```, and ```options``` is ```{allowFailure, block, multicall}```. See the sub-page `exchange.IO("multicall", ...)`. | An array of results in the order of ```calls```. By default any failing item fails the whole call (with its index and reason); with ```allowFailure``` ```true```, failed items are null. |
+| ```logs``` | query | Query a contract's event logs (```eth_getLogs```) and decode them by ABI; ```query``` is ```{address, event, filter, fromBlock, toBlock, topics, blockHash}```, and block numbers may be negative (relative to the latest block). See the sub-page `exchange.IO("logs", ...)`. | An array of logs, each with ```event``` and ```args``` when it can be decoded. |
+| ```waitReceipt``` | txHash[, options] | Wait until a transaction is mined and has the required confirmations; ```options``` is ```{timeout, confirmations, interval}```: ```timeout``` and ```interval``` are in milliseconds, 120000 (1000 to 600000) and 1500 by default, and ```confirmations``` defaults to 1. See the sub-page `exchange.IO("waitReceipt", ...)`. | The transaction receipt (```status``` as a number, ```events``` decoded); an error and null on timeout. |
+| ```nonce``` | ["sync" \| number] | Show the nonce counter this exchange object sends with (shared by ```api``` writes and swaps, cancels, transfers, LP and the like); ```sync``` resyncs it from the node's pending count, and a number sets the next local nonce. See the sub-page `exchange.IO("nonce", ...)`. | ```{address, latest, pending, local}``` (all values are strings; ```local``` is null before any transaction has been sent). |
+| ```speedUp``` | txHash[, options] | Resend a pending transaction with a higher fee (same nonce, recipient, amount, call data and gas limit); ```options``` is ```{multiplier, dryRun}```, ```multiplier``` 1.1 to 10, default 1.125. The transaction must come from this wallet and be visible to the node. See the sub-page `exchange.IO("speedUp", ...)`. | The replacement transaction's hash; its content with ```dryRun```. |
+| ```cancelTx``` | txHash[, options] | Cancel a pending transaction by sending a zero-amount transaction to yourself with the same nonce and a higher fee; ```options``` as for ```speedUp```. Success is not guaranteed. See the sub-page `exchange.IO("cancelTx", ...)`. | The cancel transaction's hash; its content with ```dryRun```. |
+| ```encode``` | [address, ]dataFormat, ...args | Standard ABI encoding by a type list (like Solidity's ```abi.encode```); with a contract address as the first argument, encodes a method call of that contract (calldata). ```pack``` is an older name of the same command. See the sub-page `exchange.IO("encode", ...)`. | A hex string without ```0x```. |
+| ```encodePacked``` | dataFormat, ...args | Packed encoding by a type list (like Solidity's ```abi.encodePacked```). See the sub-page `exchange.IO("encodePacked", ...)`. | A hex string without ```0x```. |
+| ```decode``` | dataFormat, data | Decode hex data by a type list. ```unpack``` is an older name of the same command. See the sub-page `exchange.IO("decode", ...)`. | The value itself for a single type, an array for several. |
+| ```sign``` | hash[, key] | Sign a 32-byte hash with a secp256k1 private key (no further hashing), for off-chain signatures such as EIP-712; the configured wallet key is used when ```key``` is omitted. See the sub-page `exchange.IO("sign", ...)`. | ```{r, s, v, signature, vs}``` (```v``` is 27 or 28, ```vs``` the EIP-2098 compact signature). |
+| ```signTypedData``` | typedData[, key] \| domain, types, message[, key] | Sign structured data per EIP-712 (Permit2 permits, limit orders and the like), computing the type hash, domain separator, struct hash and digest in one call. See the sub-page `exchange.IO("signTypedData", ...)`. | As for ```sign```, plus ```digest``` (the EIP-712 digest). |
+| ```signMessage``` | message[, key] | Sign a message per EIP-191 (```personal_sign```); a string is signed as UTF-8, raw bytes are passed as ```{hex: "0x..."}```. See the sub-page `exchange.IO("signMessage", ...)`. | As for ```sign```, plus ```digest``` (the EIP-191 message hash). |
+| ```toUnits``` | amount, decimals | Convert a readable amount into an on-chain integer with exact string arithmetic; ```decimals``` may be a number or a token contract address (its ```decimals()``` is read). More fractional digits than the precision fail. See the sub-page `exchange.IO("toUnits", ...)`. | A decimal string. |
+| ```fromUnits``` | amount, decimals | Convert an on-chain integer into a readable amount with exact string arithmetic; ```decimals``` as for ```toUnits```. See the sub-page `exchange.IO("fromUnits", ...)`. | A decimal string (trailing zeros removed). |
+| ```uniswapV3``` | fn, ...args | Concentrated-liquidity math: ```tickToPrice```, ```priceToTick```, ```sqrtPriceToPrice```, ```tickToSqrtPrice```, ```sqrtPriceToTick```, ```nearestUsableTick```, ```amountsForLiquidity```, ```liquidityForAmounts```; precision arguments may be numbers or token addresses. See the sub-page `exchange.IO("uniswapV3", ...)`. | — |
 
 The rest of the longer descriptions in the table:
 
@@ -29836,7 +30917,24 @@ The rest of the longer descriptions in the table:
 
 For the common command ```currency``` see `exchange.IO`.
 
-The common command ```api``` is not supported (the call fails with an error and returns null).
+##### Common Usage
+
+###### Read contracts with the shared on-chain commands: ERC20 queries, batched reads and event logs (written the same way as on the Web3 exchange object)
+
+```javascript
+function main() {
+    // The chain's wrapped native token (WETH/WBNB); standard ERC20 methods need no ABI
+    var token = exchange.IO("contracts").wrappedNative
+    var me = exchange.IO("address")
+    Log(exchange.IO("api", token, "symbol"), "decimals:", exchange.IO("api", token, "decimals"))
+    // Several calls in one read on the same block
+    var rows = exchange.IO("multicall", [[token, "totalSupply"], [token, "balanceOf", me]])
+    Log("totalSupply:", exchange.IO("fromUnits", rows[0], 18), "balance:", exchange.IO("fromUnits", rows[1], 18))
+    // Transfer events of the last 10 blocks (public nodes limit the block range tightly)
+    var logs = exchange.IO("logs", {address: token, event: "Transfer", fromBlock: -10})
+    Log("transfers:", logs.length, logs.length ? logs[0].args : "")
+}
+```
 
 ##### Function Support
 
@@ -29946,7 +31044,7 @@ Tokens outside the token table can be used in pairs after registering them with 
 | ```sendBase``` | url | Set a node used only to broadcast transactions (a private transaction channel). Unlike Web3, it does not return the previous address, does not query when called without an argument, and an empty string does not clear the setting. | ```true``` |
 | ```address``` | — | The wallet address of the configured private key (lowercase, starting with ```0x```). | — |
 | ```contracts``` | — | The exchange's deployment on its chain; contract addresses, fee tiers and the built-in token list snapshot. | An object: ```dex```, ```chainId```, ```chain```, ```router```, ```quoterV2```, ```v3Factory```, ```v3Fees```, ```positionManager```, ```v2Factory```, ```v2Fee``` (in millionths, 3000 = 0.3%), ```wrappedNative```, ```v4```, ```tokenList``` (the token list snapshot's build time ```embeddedAt```, token count ```tokens``` and common-token count ```core```); deployments absent on the chain are ```null```. (more below the table) |
-| ```lp.pools``` | token[, quote] | Lists every Slipstream and basic pool of a token (against the given quote, or the chain's wrapped native, USDC and USDT) with fee tier, tick spacing, current price, liquidity, both token balances of the pool and TVL; 24h volume and fees come from GeckoTerminal (```null``` when unavailable; cached in the process for 5 minutes and shared with ```lp.select``` and ```lp.plan```, with one retry after a pause when rate-limited). See the sub-page `exchange.IO("lp.pools", ...)`. | ```[{id, protocol, dex, symbol, fee, feeRate, tickSpacing, tick, price, liquidity, reserveBase, reserveQuote, tvlQuote, tvlUsd, volume24hUsd, fees24hUsd, empty}]```, where ```price``` is quote per token. (more below the table) |
+| ```lp.pools``` | token[, quote] | Lists every Slipstream and basic pool of a token (against the given quote, or the chain's wrapped native, USDC and USDT) with fee tier, tick spacing, current price, liquidity, both token balances of the pool and TVL; 24h volume and fees come from GeckoTerminal (```null``` when unavailable, including pools GeckoTerminal has not indexed or has no data for, such as some new-factory Slipstream pools of Velodrome on OP Mainnet, in which case ```estDailyFeesUsd``` of ```lp.plan``` is ```null``` too; cached in the process for 5 minutes and shared with ```lp.select``` and ```lp.plan```, with one retry after a pause when rate-limited). See the sub-page `exchange.IO("lp.pools", ...)`. | ```[{id, protocol, dex, symbol, fee, feeRate, tickSpacing, tick, price, liquidity, reserveBase, reserveQuote, tvlQuote, tvlUsd, volume24hUsd, fees24hUsd, empty}]```, where ```price``` is quote per token. (more below the table) |
 | ```lp.select``` | token, budget[, options] | Picks a pool by rule among those ```lp.pools``` lists: with ```options.fee```, the pool of that fee tier is used when it meets the liquidity threshold (only that tier when ```exact``` is ```true```); otherwise, among pools whose TVL is at least max($5000, budget), the one with the largest 24h volume, or the largest TVL without volume data. See the sub-page `exchange.IO("lp.select", ...)`. | One ```lp.pools``` row with an extra ```reason```. |
 | ```lp.pool``` | poolId | Live state of a pool. See the sub-page `exchange.IO("lp.pool", ...)`. | ```{id, protocol, currency0, currency1, token0, token1, fee, tickSpacing, tick, sqrtPriceX96, price0, price1, liquidity}```, where ```price0``` is token1 per token0. |
 | ```lp.ticks``` | poolId, tickLower, tickUpper[, step] | Liquidity distribution over a tick range, with each segment's liquidity and amounts of both tokens (summed over initialized ticks inside it); ```step``` is the segment width in ticks (the tick spacing by default). Ranges wider than 120 bitmap words are refused. See the sub-page `exchange.IO("lp.ticks", ...)`. | ```{pool, tick, token0, token1, segments: [{tickLower, tickUpper, price0Lower, price0Upper, liquidity, amount0, amount1, current}]}``` |
@@ -29955,8 +31053,8 @@ Tokens outside the token table can be used in pairs after registering them with 
 | ```lp.add``` | plan | Adds liquidity by the plan, swapping first with a market order when needed, approving, and creating every position in one transaction; returns after it is mined. See the sub-page `exchange.IO("lp.add", ...)`. | ```{txHash, swapTxHash, pool, positions: [{id, tickLower, tickUpper, priceLower, priceUpper, liquidity, amountBase, amountQuote}]}``` |
 | ```lp.increase``` | positionId, budget[, options] | Adds to a position, splitting ```budget``` (in the quote token) by the position's range and the current price and swapping first for whichever token is short. See the sub-page `exchange.IO("lp.increase", ...)`. | ```{txHash, swapTxHash, id, liquidity, amountBase, amountQuote}``` |
 | ```lp.decrease``` | positionId, ratio[, options] | Withdraws a ratio (0 to 1) of a position's liquidity and collects all its fees; the position stays. See the sub-page `exchange.IO("lp.decrease", ...)`. | ```{txHash, positions: [{id, symbol, principalBase, principalQuote, feesBase, feesQuote, receivedBase, receivedQuote}], sells}``` |
-| ```lp.collect``` | positionIds[, sell] | Collects fees, several positions in one transaction; with ```sell``` ```true``` the collected token is sold for the quote. Staked positions earn no trading fees (they go to voters), so they fail with a hint to claim the rewards with ```lp.claim```; basic pools collect the fees accrued to the wallet's LP tokens with the pool's ```claimFees```, one transaction per pool. See the sub-page `exchange.IO("lp.collect", ...)`. | Same as ```lp.decrease```. |
-| ```lp.remove``` | positionIds[, ratio[, sell]] | Withdraws liquidity and collects fees, several positions in one transaction; ```ratio``` defaults to 1 (withdraw everything and burn the position NFT), below 1 only that share is withdrawn; with ```sell``` ```true``` the returned token is sold for the quote. See the sub-page `exchange.IO("lp.remove", ...)`. | Same as ```lp.decrease```. |
+| ```lp.collect``` | positionIds[, sell] | Collects fees, several positions in one transaction; with ```sell``` ```true``` the collected token is sold for the quote (as ```sell``` of ```lp.remove```). See the sub-page `exchange.IO("lp.collect", ...)`. | Same as ```lp.decrease```. |
+| ```lp.remove``` | positionIds[, ratio[, sell]] | Withdraws liquidity and collects fees, several positions in one transaction; ```ratio``` defaults to 1 (withdraw everything and burn the position NFT), below 1 only that share is withdrawn; with ```sell``` ```true``` the returned tokens are sold for the quote, the base tokens returned by all the positions (principal plus fees) are added up per pair into one market sell (capped at the wallet's actual balance, keeping gas for the native coin), which is awaited until it is confirmed; each ```sells``` entry is ```{symbol, qty, txHash}```, or ```{symbol, qty, error}``` on failure, which also writes an error log (those tokens stay in the wallet). See the sub-page `exchange.IO("lp.remove", ...)`. | Same as ```lp.decrease```. |
 | ```lp.positions``` | [filter[, wallet]] | Every Slipstream and basic-pool position of the wallet with range, in-range flag, liquidity, current amounts and value, and uncollected fees. See the sub-page `exchange.IO("lp.positions", ...)`. | ```[{id, pool, protocol, symbol, fee, tickLower, tickUpper, priceLower, priceUpper, price, tick, inRange, liquidity, amountBase, amountQuote, value, feesBase, feesQuote, feesValue, closed}]```, with ```value``` and ```feesValue``` in the quote token. |
 | ```lp.history``` | positionId | A position's cash flow: deposits, withdrawn principal, collected fees, and PnL valued at the current pool price (current value + collected fees + withdrawn principal − deposits, gas excluded). Needs a node that serves historical logs; public nodes often do not. Basic-pool LP tokens have no per-position events and are not supported. See the sub-page `exchange.IO("lp.history", ...)`. | ```{id, symbol, events: [{action, block, txHash, liquidity, amountBase, amountQuote}], depositedBase, depositedQuote, withdrawnBase, withdrawnQuote, feesCollectedBase, feesCollectedQuote, price, pnlQuote, note}``` |
 | ```lp.track``` | positionIds | Registers Slipstream positions ((Aerodrome: ```aero:number```, ```aero2:number```; Velodrome: ```velo:number```, ```velo2:number```); a prefix that does not match the exchange object is an error) and basic pool addresses so that ```lp.positions``` checks them (ownership is verified on chain each time, staked positions by their staker; transferred-away positions are not listed). See the sub-page `exchange.IO("lp.track", ...)`. | Every position ID remembered by this process. |
@@ -29970,6 +31068,24 @@ Tokens outside the token table can be used in pairs after registering them with 
 | ```bridge.send``` | params\|quote | Bridges out: re-quotes → checks the balance → approves LI.FI's ```approvalAddress``` when the token allowance is short (following ```exchange.IO("approve")``` ```exact```/```max```, resetting USDT-like tokens to zero first, waiting for the approval to be mined and re-quoting after it) → simulates with ```eth_call``` → signs and broadcasts, with a gas limit of the larger of the ```eth_estimateGas``` estimate × ```gasMultiplier``` and LI.FI's suggested ```gasLimit``` (bridge contracts call into other contracts, so the estimate can fall short; only the gas used is charged). See the sub-page `exchange.IO("bridge.*", ...)`. | ```{txHash, tool, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, toAddress, value, transactionId}```; ```txHash``` is the source-chain transaction, whose receipt ```receipt``` returns. |
 | ```bridge.status``` | txHash[, options] | Bridge progress (LI.FI ```/status```) for the source-chain transaction hash returned by ```bridge.send```; ```options``` may give ```{toChain, bridge}``` to speed up the lookup. See the sub-page `exchange.IO("bridge.*", ...)`. | ```{status, substatus, substatusMessage, tool, sending, receiving, fromAddress, toAddress, explorer, bridgeExplorer}```: ```status``` is ```NOT_FOUND```, ```INVALID```, ```PENDING```, ```DONE``` or ```FAILED```; when ```DONE```, ```substatus``` is ```COMPLETED``` (delivered as quoted), ```PARTIAL``` (a different token arrived) or ```REFUNDED```; ```sending``` and ```receiving``` are ```{txHash, txLink, chainId, amount, amountRaw, token, timestamp}```, with ```receiving.amount``` and ```receiving.token``` being what actually arrived. |
 | ```bridge.apiKey``` | [key] | Sets the LI.FI API key (header ```x-lifi-api-key```, for this exchange object only, never echoed); ```""``` clears it and no argument just queries. Without a key requests are rate-limited per outgoing IP, see below. See the sub-page `exchange.IO("bridge.*", ...)`. | Whether a key is set (a boolean). |
+| ```abi``` | address, abiContent | Register the ABI of a contract address (a JSON string, or one of the built-in templates ```weth```, ```uniswapV3Pool```, ```uniswapV3Factory```, ```uniswapV3QuoterV2```, ```uniswapV3SwapRouter02```, ```uniswapV3PositionManager```, ```permit2``` and more, see the sub-page), for this exchange object only. See the sub-page `exchange.IO("abi", ...)`. | — |
+| ```api``` | address \| "eth", method, ...args[, options] | With a contract address as the first argument, calls a contract method; read-only methods (```view```, ```pure```) return the decoded value, and write methods are signed with the configured wallet key and broadcast and return the transaction hash (a payable method takes the native amount as its first argument; ```options``` may set ```gasLimit```, ```gasPrice```, ```nonce```, ```dryRun```). See the sub-page `exchange.IO("api", ...)`. | — |
+| ```call``` | address, method \| calldata, ...args[, options] | Simulate any contract method (including write methods) with ```eth_call```, without signing, broadcasting or spending gas, for quotes and dry runs; the arguments are as for ```api```, ```options``` is ```{from, value, block, gasLimit}```, and the caller defaults to this wallet. See the sub-page `exchange.IO("call", ...)`. | The decoded value when called by method name (```true``` for a method without return values); the raw return data (a hex string) when called with calldata. |
+| ```multicall``` | calls[, options] | Read several contract calls in one request on the same block state through the Multicall3 contract; each item of ```calls``` is ```[address, method, ...args]```, and ```options``` is ```{allowFailure, block, multicall}```. See the sub-page `exchange.IO("multicall", ...)`. | An array of results in the order of ```calls```. By default any failing item fails the whole call (with its index and reason); with ```allowFailure``` ```true```, failed items are null. |
+| ```logs``` | query | Query a contract's event logs (```eth_getLogs```) and decode them by ABI; ```query``` is ```{address, event, filter, fromBlock, toBlock, topics, blockHash}```, and block numbers may be negative (relative to the latest block). See the sub-page `exchange.IO("logs", ...)`. | An array of logs, each with ```event``` and ```args``` when it can be decoded. |
+| ```waitReceipt``` | txHash[, options] | Wait until a transaction is mined and has the required confirmations; ```options``` is ```{timeout, confirmations, interval}```: ```timeout``` and ```interval``` are in milliseconds, 120000 (1000 to 600000) and 1500 by default, and ```confirmations``` defaults to 1. See the sub-page `exchange.IO("waitReceipt", ...)`. | The transaction receipt (```status``` as a number, ```events``` decoded); an error and null on timeout. |
+| ```nonce``` | ["sync" \| number] | Show the nonce counter this exchange object sends with (shared by ```api``` writes and swaps, cancels, transfers, LP and the like); ```sync``` resyncs it from the node's pending count, and a number sets the next local nonce. See the sub-page `exchange.IO("nonce", ...)`. | ```{address, latest, pending, local}``` (all values are strings; ```local``` is null before any transaction has been sent). |
+| ```speedUp``` | txHash[, options] | Resend a pending transaction with a higher fee (same nonce, recipient, amount, call data and gas limit); ```options``` is ```{multiplier, dryRun}```, ```multiplier``` 1.1 to 10, default 1.125. The transaction must come from this wallet and be visible to the node. See the sub-page `exchange.IO("speedUp", ...)`. | The replacement transaction's hash; its content with ```dryRun```. |
+| ```cancelTx``` | txHash[, options] | Cancel a pending transaction by sending a zero-amount transaction to yourself with the same nonce and a higher fee; ```options``` as for ```speedUp```. Success is not guaranteed. See the sub-page `exchange.IO("cancelTx", ...)`. | The cancel transaction's hash; its content with ```dryRun```. |
+| ```encode``` | [address, ]dataFormat, ...args | Standard ABI encoding by a type list (like Solidity's ```abi.encode```); with a contract address as the first argument, encodes a method call of that contract (calldata). ```pack``` is an older name of the same command. See the sub-page `exchange.IO("encode", ...)`. | A hex string without ```0x```. |
+| ```encodePacked``` | dataFormat, ...args | Packed encoding by a type list (like Solidity's ```abi.encodePacked```). See the sub-page `exchange.IO("encodePacked", ...)`. | A hex string without ```0x```. |
+| ```decode``` | dataFormat, data | Decode hex data by a type list. ```unpack``` is an older name of the same command. See the sub-page `exchange.IO("decode", ...)`. | The value itself for a single type, an array for several. |
+| ```sign``` | hash[, key] | Sign a 32-byte hash with a secp256k1 private key (no further hashing), for off-chain signatures such as EIP-712; the configured wallet key is used when ```key``` is omitted. See the sub-page `exchange.IO("sign", ...)`. | ```{r, s, v, signature, vs}``` (```v``` is 27 or 28, ```vs``` the EIP-2098 compact signature). |
+| ```signTypedData``` | typedData[, key] \| domain, types, message[, key] | Sign structured data per EIP-712 (Permit2 permits, limit orders and the like), computing the type hash, domain separator, struct hash and digest in one call. See the sub-page `exchange.IO("signTypedData", ...)`. | As for ```sign```, plus ```digest``` (the EIP-712 digest). |
+| ```signMessage``` | message[, key] | Sign a message per EIP-191 (```personal_sign```); a string is signed as UTF-8, raw bytes are passed as ```{hex: "0x..."}```. See the sub-page `exchange.IO("signMessage", ...)`. | As for ```sign```, plus ```digest``` (the EIP-191 message hash). |
+| ```toUnits``` | amount, decimals | Convert a readable amount into an on-chain integer with exact string arithmetic; ```decimals``` may be a number or a token contract address (its ```decimals()``` is read). More fractional digits than the precision fail. See the sub-page `exchange.IO("toUnits", ...)`. | A decimal string. |
+| ```fromUnits``` | amount, decimals | Convert an on-chain integer into a readable amount with exact string arithmetic; ```decimals``` as for ```toUnits```. See the sub-page `exchange.IO("fromUnits", ...)`. | A decimal string (trailing zeros removed). |
+| ```uniswapV3``` | fn, ...args | Concentrated-liquidity math: ```tickToPrice```, ```priceToTick```, ```sqrtPriceToPrice```, ```tickToSqrtPrice```, ```sqrtPriceToTick```, ```nearestUsableTick```, ```amountsForLiquidity```, ```liquidityForAmounts```; precision arguments may be numbers or token addresses. See the sub-page `exchange.IO("uniswapV3", ...)`. | — |
 
 The rest of the longer descriptions in the table:
 
@@ -29977,7 +31093,24 @@ The rest of the longer descriptions in the table:
 
 For the common command ```currency``` see `exchange.IO`.
 
-The common command ```api``` is not supported (the call fails with an error and returns null).
+##### Common Usage
+
+###### Read contracts with the shared on-chain commands: ERC20 queries, batched reads and event logs (written the same way as on the Web3 exchange object)
+
+```javascript
+function main() {
+    // The chain's wrapped native token (WETH/WBNB); standard ERC20 methods need no ABI
+    var token = exchange.IO("contracts").wrappedNative
+    var me = exchange.IO("address")
+    Log(exchange.IO("api", token, "symbol"), "decimals:", exchange.IO("api", token, "decimals"))
+    // Several calls in one read on the same block
+    var rows = exchange.IO("multicall", [[token, "totalSupply"], [token, "balanceOf", me]])
+    Log("totalSupply:", exchange.IO("fromUnits", rows[0], 18), "balance:", exchange.IO("fromUnits", rows[1], 18))
+    // Transfer events of the last 10 blocks (public nodes limit the block range tightly)
+    var logs = exchange.IO("logs", {address: token, event: "Transfer", fromBlock: -10})
+    Log("transfers:", logs.length, logs.length ? logs[0].args : "")
+}
+```
 
 ##### Function Support
 
@@ -30231,6 +31364,24 @@ The token table is the one of the `Uniswap` exchange object on the same chain; o
 | ```bridge.send``` | params\|quote | Bridges out: re-quotes → checks the balance → approves LI.FI's ```approvalAddress``` when the token allowance is short (following ```exchange.IO("approve")``` ```exact```/```max```, resetting USDT-like tokens to zero first, waiting for the approval to be mined and re-quoting after it) → simulates with ```eth_call``` → signs and broadcasts, with a gas limit of the larger of the ```eth_estimateGas``` estimate × ```gasMultiplier``` and LI.FI's suggested ```gasLimit``` (bridge contracts call into other contracts, so the estimate can fall short; only the gas used is charged). See the sub-page `exchange.IO("bridge.*", ...)`. | ```{txHash, tool, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, toAddress, value, transactionId}```; ```txHash``` is the source-chain transaction, whose receipt ```receipt``` returns. |
 | ```bridge.status``` | txHash[, options] | Bridge progress (LI.FI ```/status```) for the source-chain transaction hash returned by ```bridge.send```; ```options``` may give ```{toChain, bridge}``` to speed up the lookup. See the sub-page `exchange.IO("bridge.*", ...)`. | ```{status, substatus, substatusMessage, tool, sending, receiving, fromAddress, toAddress, explorer, bridgeExplorer}```: ```status``` is ```NOT_FOUND```, ```INVALID```, ```PENDING```, ```DONE``` or ```FAILED```; when ```DONE```, ```substatus``` is ```COMPLETED``` (delivered as quoted), ```PARTIAL``` (a different token arrived) or ```REFUNDED```; ```sending``` and ```receiving``` are ```{txHash, txLink, chainId, amount, amountRaw, token, timestamp}```, with ```receiving.amount``` and ```receiving.token``` being what actually arrived. |
 | ```bridge.apiKey``` | [key] | Sets the LI.FI API key (header ```x-lifi-api-key```, for this exchange object only, never echoed); ```""``` clears it and no argument just queries. Without a key requests are rate-limited per outgoing IP, see below. See the sub-page `exchange.IO("bridge.*", ...)`. | Whether a key is set (a boolean). |
+| ```abi``` | address, abiContent | Register the ABI of a contract address (a JSON string, or one of the built-in templates ```weth```, ```uniswapV3Pool```, ```uniswapV3Factory```, ```uniswapV3QuoterV2```, ```uniswapV3SwapRouter02```, ```uniswapV3PositionManager```, ```permit2``` and more, see the sub-page), for this exchange object only. See the sub-page `exchange.IO("abi", ...)`. | — |
+| ```api``` | address \| "eth", method, ...args[, options] | With a contract address as the first argument, calls a contract method; read-only methods (```view```, ```pure```) return the decoded value, and write methods are signed with the configured wallet key and broadcast and return the transaction hash (a payable method takes the native amount as its first argument; ```options``` may set ```gasLimit```, ```gasPrice```, ```nonce```, ```dryRun```). See the sub-page `exchange.IO("api", ...)`. | — |
+| ```call``` | address, method \| calldata, ...args[, options] | Simulate any contract method (including write methods) with ```eth_call```, without signing, broadcasting or spending gas, for quotes and dry runs; the arguments are as for ```api```, ```options``` is ```{from, value, block, gasLimit}```, and the caller defaults to this wallet. See the sub-page `exchange.IO("call", ...)`. | The decoded value when called by method name (```true``` for a method without return values); the raw return data (a hex string) when called with calldata. |
+| ```multicall``` | calls[, options] | Read several contract calls in one request on the same block state through the Multicall3 contract; each item of ```calls``` is ```[address, method, ...args]```, and ```options``` is ```{allowFailure, block, multicall}```. See the sub-page `exchange.IO("multicall", ...)`. | An array of results in the order of ```calls```. By default any failing item fails the whole call (with its index and reason); with ```allowFailure``` ```true```, failed items are null. |
+| ```logs``` | query | Query a contract's event logs (```eth_getLogs```) and decode them by ABI; ```query``` is ```{address, event, filter, fromBlock, toBlock, topics, blockHash}```, and block numbers may be negative (relative to the latest block). See the sub-page `exchange.IO("logs", ...)`. | An array of logs, each with ```event``` and ```args``` when it can be decoded. |
+| ```waitReceipt``` | txHash[, options] | Wait until a transaction is mined and has the required confirmations; ```options``` is ```{timeout, confirmations, interval}```: ```timeout``` and ```interval``` are in milliseconds, 120000 (1000 to 600000) and 1500 by default, and ```confirmations``` defaults to 1. See the sub-page `exchange.IO("waitReceipt", ...)`. | The transaction receipt (```status``` as a number, ```events``` decoded); an error and null on timeout. |
+| ```nonce``` | ["sync" \| number] | Show the nonce counter this exchange object sends with (shared by ```api``` writes and swaps, cancels, transfers, LP and the like); ```sync``` resyncs it from the node's pending count, and a number sets the next local nonce. See the sub-page `exchange.IO("nonce", ...)`. | ```{address, latest, pending, local}``` (all values are strings; ```local``` is null before any transaction has been sent). |
+| ```speedUp``` | txHash[, options] | Resend a pending transaction with a higher fee (same nonce, recipient, amount, call data and gas limit); ```options``` is ```{multiplier, dryRun}```, ```multiplier``` 1.1 to 10, default 1.125. The transaction must come from this wallet and be visible to the node. See the sub-page `exchange.IO("speedUp", ...)`. | The replacement transaction's hash; its content with ```dryRun```. |
+| ```cancelTx``` | txHash[, options] | Cancel a pending transaction by sending a zero-amount transaction to yourself with the same nonce and a higher fee; ```options``` as for ```speedUp```. Success is not guaranteed. See the sub-page `exchange.IO("cancelTx", ...)`. | The cancel transaction's hash; its content with ```dryRun```. |
+| ```encode``` | [address, ]dataFormat, ...args | Standard ABI encoding by a type list (like Solidity's ```abi.encode```); with a contract address as the first argument, encodes a method call of that contract (calldata). ```pack``` is an older name of the same command. See the sub-page `exchange.IO("encode", ...)`. | A hex string without ```0x```. |
+| ```encodePacked``` | dataFormat, ...args | Packed encoding by a type list (like Solidity's ```abi.encodePacked```). See the sub-page `exchange.IO("encodePacked", ...)`. | A hex string without ```0x```. |
+| ```decode``` | dataFormat, data | Decode hex data by a type list. ```unpack``` is an older name of the same command. See the sub-page `exchange.IO("decode", ...)`. | The value itself for a single type, an array for several. |
+| ```sign``` | hash[, key] | Sign a 32-byte hash with a secp256k1 private key (no further hashing), for off-chain signatures such as EIP-712; the configured wallet key is used when ```key``` is omitted. See the sub-page `exchange.IO("sign", ...)`. | ```{r, s, v, signature, vs}``` (```v``` is 27 or 28, ```vs``` the EIP-2098 compact signature). |
+| ```signTypedData``` | typedData[, key] \| domain, types, message[, key] | Sign structured data per EIP-712 (Permit2 permits, limit orders and the like), computing the type hash, domain separator, struct hash and digest in one call. See the sub-page `exchange.IO("signTypedData", ...)`. | As for ```sign```, plus ```digest``` (the EIP-712 digest). |
+| ```signMessage``` | message[, key] | Sign a message per EIP-191 (```personal_sign```); a string is signed as UTF-8, raw bytes are passed as ```{hex: "0x..."}```. See the sub-page `exchange.IO("signMessage", ...)`. | As for ```sign```, plus ```digest``` (the EIP-191 message hash). |
+| ```toUnits``` | amount, decimals | Convert a readable amount into an on-chain integer with exact string arithmetic; ```decimals``` may be a number or a token contract address (its ```decimals()``` is read). More fractional digits than the precision fail. See the sub-page `exchange.IO("toUnits", ...)`. | A decimal string. |
+| ```fromUnits``` | amount, decimals | Convert an on-chain integer into a readable amount with exact string arithmetic; ```decimals``` as for ```toUnits```. See the sub-page `exchange.IO("fromUnits", ...)`. | A decimal string (trailing zeros removed). |
+| ```uniswapV3``` | fn, ...args | Concentrated-liquidity math: ```tickToPrice```, ```priceToTick```, ```sqrtPriceToPrice```, ```tickToSqrtPrice```, ```sqrtPriceToTick```, ```nearestUsableTick```, ```amountsForLiquidity```, ```liquidityForAmounts```; precision arguments may be numbers or token addresses. See the sub-page `exchange.IO("uniswapV3", ...)`. | — |
 | ```clientId``` | [id] | Set the client id sent with KyberSwap Aggregator API requests (the ```x-client-id``` header, also sent when an API key is set), 1 to 64 letters, digits, ```.```, ```_``` or ```-```. (more below the table) | The current client id. |
 | ```kyberApiKey``` | [key] | Sets the KyberSwap API key (for this exchange object only, never echoed), the same as the ```KyberSwap Api Key``` setting: with a key, quotes and swap builds go to KyberSwap's API gateway ```https://api.kyberswap.com/swap``` with the ```X-Api-Key``` header and a higher rate limit; ```""``` clears it and returns to the public endpoint. (more below the table) | Whether a key is set (a boolean). |
 
@@ -30241,7 +31392,24 @@ The rest of the longer descriptions in the table:
 
 For the common command ```currency``` see `exchange.IO`.
 
-The common command ```api``` is not supported (the call fails with an error and returns null).
+##### Common Usage
+
+###### Read contracts with the shared on-chain commands: ERC20 queries, batched reads and event logs (written the same way as on the Web3 exchange object)
+
+```javascript
+function main() {
+    // The chain's wrapped native token (WETH/WBNB); standard ERC20 methods need no ABI
+    var token = exchange.IO("contracts").wrappedNative
+    var me = exchange.IO("address")
+    Log(exchange.IO("api", token, "symbol"), "decimals:", exchange.IO("api", token, "decimals"))
+    // Several calls in one read on the same block
+    var rows = exchange.IO("multicall", [[token, "totalSupply"], [token, "balanceOf", me]])
+    Log("totalSupply:", exchange.IO("fromUnits", rows[0], 18), "balance:", exchange.IO("fromUnits", rows[1], 18))
+    // Transfer events of the last 10 blocks (public nodes limit the block range tightly)
+    var logs = exchange.IO("logs", {address: token, event: "Transfer", fromBlock: -10})
+    Log("transfers:", logs.length, logs.length ? logs[0].args : "")
+}
+```
 
 ##### Function Support
 
@@ -30341,10 +31509,45 @@ The token table is the one of the `Uniswap` exchange object on the same chain; o
 | ```bridge.send``` | params\|quote | Bridges out: re-quotes → checks the balance → approves LI.FI's ```approvalAddress``` when the token allowance is short (following ```exchange.IO("approve")``` ```exact```/```max```, resetting USDT-like tokens to zero first, waiting for the approval to be mined and re-quoting after it) → simulates with ```eth_call``` → signs and broadcasts, with a gas limit of the larger of the ```eth_estimateGas``` estimate × ```gasMultiplier``` and LI.FI's suggested ```gasLimit``` (bridge contracts call into other contracts, so the estimate can fall short; only the gas used is charged). See the sub-page `exchange.IO("bridge.*", ...)`. | ```{txHash, tool, fromChain, toChain, toChainName, fromToken, toToken, fromAmount, toAmount, toAmountMin, toAddress, value, transactionId}```; ```txHash``` is the source-chain transaction, whose receipt ```receipt``` returns. |
 | ```bridge.status``` | txHash[, options] | Bridge progress (LI.FI ```/status```) for the source-chain transaction hash returned by ```bridge.send```; ```options``` may give ```{toChain, bridge}``` to speed up the lookup. See the sub-page `exchange.IO("bridge.*", ...)`. | ```{status, substatus, substatusMessage, tool, sending, receiving, fromAddress, toAddress, explorer, bridgeExplorer}```: ```status``` is ```NOT_FOUND```, ```INVALID```, ```PENDING```, ```DONE``` or ```FAILED```; when ```DONE```, ```substatus``` is ```COMPLETED``` (delivered as quoted), ```PARTIAL``` (a different token arrived) or ```REFUNDED```; ```sending``` and ```receiving``` are ```{txHash, txLink, chainId, amount, amountRaw, token, timestamp}```, with ```receiving.amount``` and ```receiving.token``` being what actually arrived. |
 | ```bridge.apiKey``` | [key] | Sets the LI.FI API key (header ```x-lifi-api-key```, for this exchange object only, never echoed); ```""``` clears it and no argument just queries. Without a key requests are rate-limited per outgoing IP, see below. See the sub-page `exchange.IO("bridge.*", ...)`. | Whether a key is set (a boolean). |
+| ```abi``` | address, abiContent | Register the ABI of a contract address (a JSON string, or one of the built-in templates ```weth```, ```uniswapV3Pool```, ```uniswapV3Factory```, ```uniswapV3QuoterV2```, ```uniswapV3SwapRouter02```, ```uniswapV3PositionManager```, ```permit2``` and more, see the sub-page), for this exchange object only. See the sub-page `exchange.IO("abi", ...)`. | — |
+| ```api``` | address \| "eth", method, ...args[, options] | With a contract address as the first argument, calls a contract method; read-only methods (```view```, ```pure```) return the decoded value, and write methods are signed with the configured wallet key and broadcast and return the transaction hash (a payable method takes the native amount as its first argument; ```options``` may set ```gasLimit```, ```gasPrice```, ```nonce```, ```dryRun```). See the sub-page `exchange.IO("api", ...)`. | — |
+| ```call``` | address, method \| calldata, ...args[, options] | Simulate any contract method (including write methods) with ```eth_call```, without signing, broadcasting or spending gas, for quotes and dry runs; the arguments are as for ```api```, ```options``` is ```{from, value, block, gasLimit}```, and the caller defaults to this wallet. See the sub-page `exchange.IO("call", ...)`. | The decoded value when called by method name (```true``` for a method without return values); the raw return data (a hex string) when called with calldata. |
+| ```multicall``` | calls[, options] | Read several contract calls in one request on the same block state through the Multicall3 contract; each item of ```calls``` is ```[address, method, ...args]```, and ```options``` is ```{allowFailure, block, multicall}```. See the sub-page `exchange.IO("multicall", ...)`. | An array of results in the order of ```calls```. By default any failing item fails the whole call (with its index and reason); with ```allowFailure``` ```true```, failed items are null. |
+| ```logs``` | query | Query a contract's event logs (```eth_getLogs```) and decode them by ABI; ```query``` is ```{address, event, filter, fromBlock, toBlock, topics, blockHash}```, and block numbers may be negative (relative to the latest block). See the sub-page `exchange.IO("logs", ...)`. | An array of logs, each with ```event``` and ```args``` when it can be decoded. |
+| ```waitReceipt``` | txHash[, options] | Wait until a transaction is mined and has the required confirmations; ```options``` is ```{timeout, confirmations, interval}```: ```timeout``` and ```interval``` are in milliseconds, 120000 (1000 to 600000) and 1500 by default, and ```confirmations``` defaults to 1. See the sub-page `exchange.IO("waitReceipt", ...)`. | The transaction receipt (```status``` as a number, ```events``` decoded); an error and null on timeout. |
+| ```nonce``` | ["sync" \| number] | Show the nonce counter this exchange object sends with (shared by ```api``` writes and swaps, cancels, transfers, LP and the like); ```sync``` resyncs it from the node's pending count, and a number sets the next local nonce. See the sub-page `exchange.IO("nonce", ...)`. | ```{address, latest, pending, local}``` (all values are strings; ```local``` is null before any transaction has been sent). |
+| ```speedUp``` | txHash[, options] | Resend a pending transaction with a higher fee (same nonce, recipient, amount, call data and gas limit); ```options``` is ```{multiplier, dryRun}```, ```multiplier``` 1.1 to 10, default 1.125. The transaction must come from this wallet and be visible to the node. See the sub-page `exchange.IO("speedUp", ...)`. | The replacement transaction's hash; its content with ```dryRun```. |
+| ```cancelTx``` | txHash[, options] | Cancel a pending transaction by sending a zero-amount transaction to yourself with the same nonce and a higher fee; ```options``` as for ```speedUp```. Success is not guaranteed. See the sub-page `exchange.IO("cancelTx", ...)`. | The cancel transaction's hash; its content with ```dryRun```. |
+| ```encode``` | [address, ]dataFormat, ...args | Standard ABI encoding by a type list (like Solidity's ```abi.encode```); with a contract address as the first argument, encodes a method call of that contract (calldata). ```pack``` is an older name of the same command. See the sub-page `exchange.IO("encode", ...)`. | A hex string without ```0x```. |
+| ```encodePacked``` | dataFormat, ...args | Packed encoding by a type list (like Solidity's ```abi.encodePacked```). See the sub-page `exchange.IO("encodePacked", ...)`. | A hex string without ```0x```. |
+| ```decode``` | dataFormat, data | Decode hex data by a type list. ```unpack``` is an older name of the same command. See the sub-page `exchange.IO("decode", ...)`. | The value itself for a single type, an array for several. |
+| ```sign``` | hash[, key] | Sign a 32-byte hash with a secp256k1 private key (no further hashing), for off-chain signatures such as EIP-712; the configured wallet key is used when ```key``` is omitted. See the sub-page `exchange.IO("sign", ...)`. | ```{r, s, v, signature, vs}``` (```v``` is 27 or 28, ```vs``` the EIP-2098 compact signature). |
+| ```signTypedData``` | typedData[, key] \| domain, types, message[, key] | Sign structured data per EIP-712 (Permit2 permits, limit orders and the like), computing the type hash, domain separator, struct hash and digest in one call. See the sub-page `exchange.IO("signTypedData", ...)`. | As for ```sign```, plus ```digest``` (the EIP-712 digest). |
+| ```signMessage``` | message[, key] | Sign a message per EIP-191 (```personal_sign```); a string is signed as UTF-8, raw bytes are passed as ```{hex: "0x..."}```. See the sub-page `exchange.IO("signMessage", ...)`. | As for ```sign```, plus ```digest``` (the EIP-191 message hash). |
+| ```toUnits``` | amount, decimals | Convert a readable amount into an on-chain integer with exact string arithmetic; ```decimals``` may be a number or a token contract address (its ```decimals()``` is read). More fractional digits than the precision fail. See the sub-page `exchange.IO("toUnits", ...)`. | A decimal string. |
+| ```fromUnits``` | amount, decimals | Convert an on-chain integer into a readable amount with exact string arithmetic; ```decimals``` as for ```toUnits```. See the sub-page `exchange.IO("fromUnits", ...)`. | A decimal string (trailing zeros removed). |
+| ```uniswapV3``` | fn, ...args | Concentrated-liquidity math: ```tickToPrice```, ```priceToTick```, ```sqrtPriceToPrice```, ```tickToSqrtPrice```, ```sqrtPriceToTick```, ```nearestUsableTick```, ```amountsForLiquidity```, ```liquidityForAmounts```; precision arguments may be numbers or token addresses. See the sub-page `exchange.IO("uniswapV3", ...)`. | — |
 
 For the common command ```currency``` see `exchange.IO`.
 
-The common command ```api``` is not supported (the call fails with an error and returns null).
+##### Common Usage
+
+###### Read contracts with the shared on-chain commands: ERC20 queries, batched reads and event logs (written the same way as on the Web3 exchange object)
+
+```javascript
+function main() {
+    // The chain's wrapped native token (WETH/WBNB); standard ERC20 methods need no ABI
+    var token = exchange.IO("contracts").wrappedNative
+    var me = exchange.IO("address")
+    Log(exchange.IO("api", token, "symbol"), "decimals:", exchange.IO("api", token, "decimals"))
+    // Several calls in one read on the same block
+    var rows = exchange.IO("multicall", [[token, "totalSupply"], [token, "balanceOf", me]])
+    Log("totalSupply:", exchange.IO("fromUnits", rows[0], 18), "balance:", exchange.IO("fromUnits", rows[1], 18))
+    // Transfer events of the last 10 blocks (public nodes limit the block range tightly)
+    var logs = exchange.IO("logs", {address: token, event: "Transfer", fromBlock: -10})
+    Log("transfers:", logs.length, logs.length ? logs[0].args : "")
+}
+```
 
 ##### Function Support
 
@@ -34099,6 +35302,24 @@ A token may be a token name or a contract address (such as ```1:0xa0b8..._USD```
 | ```broadcastSupportedChains``` | — | Read-only list of chains supported by the broadcast API. | — |
 | ```tokenSearch``` | chains, search | Search tokens by name or address (```chains``` is a comma-separated list of chain indexes); returns the raw data of the OKX API. | An array; each item has ```chainIndex```, ```tokenSymbol```, ```tokenName```, ```tokenContractAddress```, ```decimal```, ```price```, ```liquidity``` and more (all strings). |
 | ```allTokens``` | chainIndex | List all swappable tokens on a chain; returns the raw data of the OKX API. | An array; each item has ```tokenSymbol```, ```tokenName```, ```tokenContractAddress```, ```decimals``` and more. |
+| ```chain``` | [chainIndex] | Choose the EVM chain the on-chain commands below work on (a chainIndex or a registered chain alias), ```1``` (Ethereum) by default; the node is the one registered with ```exchange.IO("rpc", chainIndex, url)```, and its chainId is checked on first use. (more below the table) | The selected chainIndex. |
+| ```abi``` | address, abiContent | Register the ABI of a contract address (a JSON string, or one of the built-in templates ```weth```, ```uniswapV3Pool```, ```uniswapV3Factory```, ```uniswapV3QuoterV2```, ```uniswapV3SwapRouter02```, ```uniswapV3PositionManager```, ```permit2```, with matching ```pancakeV3*``` aliases for PancakeSwap V3), for this exchange object only. See the sub-page `exchange.IO("abi", ...)`. | — |
+| ```call``` | address, method \| calldata, ...args[, options] | Simulate any contract method (including write methods) with ```eth_call```, without signing, broadcasting or spending gas, for quotes and dry runs; the arguments are as for ```api```, ```options``` is ```{from, value, block, gasLimit}```, and the caller defaults to this wallet. See the sub-page `exchange.IO("call", ...)`. | The decoded value when called by method name (```true``` for a method without return values); the raw return data (a hex string) when called with calldata. |
+| ```multicall``` | calls[, options] | Read several contract calls in one request on the same block state through the Multicall3 contract; each item of ```calls``` is ```[address, method, ...args]```, and ```options``` is ```{allowFailure, block, multicall}```. See the sub-page `exchange.IO("multicall", ...)`. | An array of results in the order of ```calls```. By default any failing item fails the whole call (with its index and reason); with ```allowFailure``` ```true```, failed items are null. |
+| ```logs``` | query | Query a contract's event logs (```eth_getLogs```) and decode them by ABI; ```query``` is ```{address, event, filter, fromBlock, toBlock, topics, blockHash}```, and block numbers may be negative (relative to the latest block). See the sub-page `exchange.IO("logs", ...)`. | An array of logs, each with ```event``` and ```args``` when it can be decoded. |
+| ```waitReceipt``` | txHash[, options] | Wait until a transaction is mined and has the required confirmations; ```options``` is ```{timeout, confirmations, interval}```: ```timeout``` and ```interval``` are in milliseconds, 120000 (1000 to 600000) and 1500 by default, and ```confirmations``` defaults to 1. See the sub-page `exchange.IO("waitReceipt", ...)`. | The transaction receipt (```status``` as a number, ```events``` decoded); an error and null on timeout. |
+| ```nonce``` | ["sync" \| number] | Show the wallet's nonce on the selected chain (```latest``` and ```pending``` from the node); ```sync``` resyncs the local counter from the node's pending count, and a number sets the next local nonce. OKX DEX's own swaps and approvals take their nonce from the OKX API, not from this counter. See the sub-page `exchange.IO("nonce", ...)`. | ```{address, latest, pending, local}``` (all values are strings; ```local``` is null before any transaction has been sent). |
+| ```speedUp``` | txHash[, options] | Resend a pending transaction with a higher fee (same nonce, recipient, amount, call data and gas limit); ```options``` is ```{multiplier, dryRun}```, ```multiplier``` 1.1 to 10, default 1.125. The transaction must come from this wallet and be visible to the node. See the sub-page `exchange.IO("speedUp", ...)`. | The replacement transaction's hash; its content with ```dryRun```. |
+| ```cancelTx``` | txHash[, options] | Cancel a pending transaction by sending a zero-amount transaction to yourself with the same nonce and a higher fee; ```options``` as for ```speedUp```. Success is not guaranteed. See the sub-page `exchange.IO("cancelTx", ...)`. | The cancel transaction's hash; its content with ```dryRun```. |
+| ```encode``` | [address, ]dataFormat, ...args | Standard ABI encoding by a type list (like Solidity's ```abi.encode```); with a contract address as the first argument, encodes a method call of that contract (calldata). ```pack``` is an older name of the same command. See the sub-page `exchange.IO("encode", ...)`. | A hex string without ```0x```. |
+| ```encodePacked``` | dataFormat, ...args | Packed encoding by a type list (like Solidity's ```abi.encodePacked```). See the sub-page `exchange.IO("encodePacked", ...)`. | A hex string without ```0x```. |
+| ```decode``` | dataFormat, data | Decode hex data by a type list. ```unpack``` is an older name of the same command. See the sub-page `exchange.IO("decode", ...)`. | The value itself for a single type, an array for several. |
+| ```sign``` | hash[, key] | Sign a 32-byte hash with a secp256k1 private key (no further hashing), for off-chain signatures such as EIP-712; the EVM wallet key derived from the mnemonic is used when ```key``` is omitted. See the sub-page `exchange.IO("sign", ...)`. | ```{r, s, v, signature, vs}``` (```v``` is 27 or 28, ```vs``` the EIP-2098 compact signature). |
+| ```signTypedData``` | typedData[, key] \| domain, types, message[, key] | Sign structured data per EIP-712 (Permit2 permits, limit orders and the like), computing the type hash, domain separator, struct hash and digest in one call. See the sub-page `exchange.IO("signTypedData", ...)`. | As for ```sign```, plus ```digest``` (the EIP-712 digest). |
+| ```signMessage``` | message[, key] | Sign a message per EIP-191 (```personal_sign```); a string is signed as UTF-8, raw bytes are passed as ```{hex: "0x..."}```. See the sub-page `exchange.IO("signMessage", ...)`. | As for ```sign```, plus ```digest``` (the EIP-191 message hash). |
+| ```toUnits``` | amount, decimals | Convert a readable amount into an on-chain integer with exact string arithmetic; ```decimals``` may be a number or a token contract address (its ```decimals()``` is read). More fractional digits than the precision fail. See the sub-page `exchange.IO("toUnits", ...)`. | A decimal string. |
+| ```fromUnits``` | amount, decimals | Convert an on-chain integer into a readable amount with exact string arithmetic; ```decimals``` as for ```toUnits```. See the sub-page `exchange.IO("fromUnits", ...)`. | A decimal string (trailing zeros removed). |
+| ```uniswapV3``` | fn, ...args | Concentrated-liquidity math: ```tickToPrice```, ```priceToTick```, ```sqrtPriceToPrice```, ```tickToSqrtPrice```, ```sqrtPriceToTick```, ```nearestUsableTick```, ```amountsForLiquidity```, ```liquidityForAmounts```; precision arguments may be numbers or token addresses. See the sub-page `exchange.IO("uniswapV3", ...)`. | — |
 
 The rest of the longer descriptions in the table:
 
@@ -34109,6 +35330,7 @@ Apply for credentials on the OKX developer portal: https://web3.okx.com/onchaino
 - ```rpc```: Without arguments returns all, with only a chain returns that chain's address (an empty string if not set), an empty url deletes it. On EVM chains, allowance queries (```allowance``` and the automatic check before orders) require an RPC, which also backs up OKX's nonce API when it fails; Solana, Tron, SUI and TON signing query on-chain state through the chain's public node when none is configured. Unichain (```130```) comes with its official RPC preset.
 - ```allowance```: EVM chains only; configure the chain's RPC with ```exchange.IO("rpc", chainIndex, url)``` first; the native coin has no allowance and fails.
 - ```signTx```: ```tx``` is the transaction JSON (a string or an object); ```chainIndex``` may be a chain index or a chain name. On EVM chains the transaction needs ```to```, ```data``` and ```gas``` (or ```gasLimit```), optionally ```value```, ```gasPrice``` and ```maxPriorityFeePerGas``` (the same as the ```tx``` returned by the OKX swap API): the nonce is looked up automatically, the gas limit is multiplied by ```gasMultiplier```, and a missing ```gasPrice``` is queried through the chain's RPC.
+- ```chain```: With a non-EVM chain such as Solana selected, these commands all fail. Queries when called without an argument.
 
 For the common commands ```api```, ```base``` and ```currency``` see `exchange.IO`.
 
@@ -35601,7 +36823,7 @@ Markets that trade shares in the outcomes of events.
 
 #### Polymarket
 
-A prediction market on the Polygon chain. The exchange object places orders and reads order books, orders, the balance and the account's fills through Polymarket's CLOB (central limit order book) API, reads market information through the Gamma API, and reads positions and market trades through the data API; redeem, merge and split are submitted as on-chain transactions through Polymarket's gas-free relayer. Everything is REST polling, with no market data or order push.
+A prediction market on the Polygon chain. The exchange object places orders and reads order books, orders, the balance and the account's fills through Polymarket's CLOB (central limit order book) API, reads market information through the Gamma API, and reads positions and market trades through the data API; redeem, merge and split are submitted as on-chain transactions through Polymarket's gas-free relayer. Queries and orders use the REST API; market data and the private stream are also available as WebSocket push (see below).
 
 ##### Names and Configuration
 
@@ -35817,6 +37039,7 @@ Simulation: There is no simulated trading; every call uses real funds on the Pol
 - ```exchange.GetHistoryOrders()``` is built from the account's trade records: one row per fill (status filled; an order filled in several trades appears several times), and canceled or never-filled orders do not appear; ```since``` may be milliseconds or seconds, and at most 300 rows are returned when ```limit``` is not given.
 - ```exchange.GetTicker()``` reads the outcome's own order book and last trade price; ```High``` and ```Low``` are the current best ask and best bid (there is no 24-hour high/low), and ```Volume``` is the 24-hour volume of the whole market (both outcomes). ```exchange.GetTickers()``` comes from the Gamma market list, with the second outcome's prices derived from the first as ```1 - x```.
 - ```exchange.GetMarkets()``` and ```exchange.GetTickers()``` return one page (about 100 markets) per call. With no cursor set, they return only the first page of the Gamma market list; a call returns the page at the current cursor without moving it (internal queries such as ```exchange.SetContractType()``` do not advance it either); after a page has been fetched, ```exchange.IO("markets_cursor", "next")``` (or ```tickers_cursor```) advances to the next page, and after the last page the cursor returns to an empty string. To page through: ```exchange.IO("markets_cursor", "")```, then loop over ```exchange.GetMarkets()``` and ```exchange.IO("markets_cursor", "next")``` until it returns an empty string. A cursor can also be set directly, e.g. the ```next_cursor``` of a Gamma ```/markets/keyset``` response.
+- WebSocket push is supported: market data (ticker, bbo, depth, trades) and the private account stream (order updates, positions and balance) can be subscribed through the event stream, per outcome, with the same instrument codes as the other functions. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. The best bid and ask of ticker and bbo (with their sizes) come from the outcome's full order book stream, and the last price is the last trade price in the book snapshot and the trades after it; there is no 24-hour volume, open, high or low. Trades carry the same trade IDs as ```exchange.GetTrades()``` (the on-chain transaction hash), and their side is the taker side. The exchange has a single depth stream (full snapshot plus deltas): depth subscriptions of any size (20 levels by default, at most 255) share it, and each subscription publishes its own number of levels; the stream has no sequence numbers, so the connector checks the local book against the best bid and ask attached to every delta and resubscribes for a fresh snapshot when they disagree. The exchange has no kline stream; a kline subscription fails with an unsupported interval. Push events carry prices with 4 decimals and quantities with 6 decimals (the smallest share unit), independent of the market's price step. The private stream is one ```private``` subscription for the whole account (no symbol). It connects only when subscribed and authenticates with the same CLOB API credentials as order placement (derived from the wallet private key): once active (and again after every reconnect) it first pushes a snapshot of the USDC balance and the outcome positions from the same endpoints as ```exchange.GetAssets()``` and ```exchange.GetPositions()```, then reports ready, and afterwards pushes order updates (the order ID is the one order placement returns; a matched order's average price is its order price) and the USDC balance whenever a fill changes it. The exchange has no position push, so positions are updated only by the snapshot taken when the subscription becomes active and after reconnects. After three rejected authentications in a row (the exchange closes the connection at once) the connection status reports degraded and the private stream reports failure (market data push is unaffected). A market-wide ```tickers``` subscription is not supported (the Polymarket CLOB market channel this connector uses is per token only) and fails at subscribe; subscribe ticker per symbol.
 
 ### Securities and Futures
 

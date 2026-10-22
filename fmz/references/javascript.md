@@ -89,7 +89,7 @@ Placement rules (api.en.md `#### exchange.Buy`, `#### exchange.CreateOrder`):
 | Case | Call | `price` | `amount` unit |
 |---|---|---|---|
 | Spot limit | `exchange.Buy(price, amount)` / `exchange.Sell(price, amount)` / `exchange.CreateOrder("BTC_USDT", "buy"\|"sell", price, amount)` | limit price | base currency (BTC) |
-| Spot market **buy** | `exchange.Buy(-1, amount)` | `-1` | **quote currency to spend (USDT)**; AscendEx, BitMEX and Bitfinex take base coins instead |
+| Spot market **buy** | `exchange.Buy(-1, amount)` | `-1` | **quote currency to spend (USDT)**; BitMEX and Bitfinex take base coins instead |
 | Spot market sell | `exchange.Sell(-1, amount)` | `-1` | base currency |
 | Futures open long | `CreateOrder("BTC_USDT.swap", "buy", price, amount)` or `SetDirection("buy"); Buy(price, amount)` | limit or `-1` | **number of contracts** (`GetMarkets()[sym].CtVal` coins each) |
 | Futures open short | `CreateOrder(sym, "sell", ...)` or `SetDirection("sell"); Sell(...)` | limit or `-1` | contracts |
@@ -215,13 +215,19 @@ Interaction and persistence:
 On the Rust-based node a global `ctx` exposes the engine directly (`references/ctx.d.ts`, `references/events.md`). It is a separate programming model: subscribe, then poll events. Failures come back as **values**, never exceptions: a transport failure is an `Error` instance, an exchange-side failure is an object with an `error` field, and both must be checked.
 
 ```js
-var tick = ctx.subscribe(0, "BTC_USDT", {channel: "ticker"});   // ex = account index (never the label); returns a stream id
-ctx.subscribe(0, "", {channel: "orders"});                        // private order stream, empty symbol
+var tick = ctx.subscribe(exchange, {channel: "ticker"});        // exchange object or account index; symbol defaults to its current pair
+var book = ctx.subscribe(0, {channel: "depth", symbol: "BTC_USDT", depth: 20});
+var acct = ctx.subscribe(exchange, {channel: "private"});       // orders + positions + balances, whole account, no symbol
+var pair = ctx.subscribe(0, {channel: "trade", symbol: ["BTC_USDT", "ETH_USDT"]});   // batch: array of Subscriptions, pair.unsubscribe() drops all
+var all = ctx.subscribe(0, {channel: "tickers"});              // market-wide tickers, no symbol; FAILED on venues without an all-market stream
 while (true) {
-  var ev = ctx.poll([], 1000);                                    // [] = every stream; null on timeout; also pumps timers/Promises/WS
+  var ev = ctx.poll([], 1000);                                    // [] = every stream of THIS thread; null on timeout; also pumps timers/Promises/WS
   if (!ev) continue;
-  if (ev.kind === 1) { /* ticker: bid ask last bidQty askQty volume openInterest open high low time */ }
-  else if (ev.kind === 16) { /* order: id state(acked|partial|filled|canceled|rejected) px qty filledQty avgPx reason reasonText */ }
+  if (ev.type === "status") { /* gateway (33) / init status (35): check first, their channel can equal a data channel */ continue; }
+  if (ev.channel === "ticker") { /* bid ask last bidQty askQty volume openInterest open high low time */ }
+  else if (ev.channel === "depth") { var b = ev.book(5); /* {bids: [[px, qty]...], asks: [...]} of this subscription's own book */ }
+  else if (ev.channel === "orders") { /* id state(acked|partial|filled|canceled|rejected) px qty filledQty avgPx reason reasonText */ }
+  else if (ev.channel === "tickers") { /* a ticker event; ev.symbol is each instrument */ }
 }
 var id = ctx.order(0, "BTC_USDT", "buy", 50000, 0.01, {type: "limit", tif: "gtc"});   // string | Error
 if (id instanceof Error) { ctx.log("rejected", id.message); }
@@ -229,16 +235,17 @@ if (id instanceof Error) { ctx.log("rejected", id.message); }
 
 | Piece | Details |
 |---|---|
-| Event kinds | 1 ticker/bbo; 3 depth (signal only — read levels with `ctx.book(ex, symbol, n)` → `{bids: [[px, qty]...], asks: [...]}`); 4 trade (`px qty side tradeId`); 5 kline (`open high low close volume intervalSec openTimeMs closed prefill`); 16 order report; 32 timer (`ctx.STREAM_TIMER`); 33 gateway status (`ctx.STREAM_STATUS`, `status` 1 UP 2 DOWN 3 DEGRADED); 35 market-data prefill status. Common fields `kind ex symbol seq ts`. |
-| `ctx.subscribe(ex, symbol, opts)` | `channel` (`ticker|bbo|trade|depth|kline|orders`), `depth`, `interval` (s), `mode: "latest"` or `buffer: N` (slow-consumer policy, events.md "投递模式") |
-| `ctx.poll(streams?, timeoutMs?)` | `[]`/omitted = all streams; filtered consumers should include `ctx.STREAM_REST`; `ctx.poll({sources: "all"}, ms)` also waits on threads, Go, Dial and tasks |
+| Event kinds | 1 ticker/bbo/tickers; 3 depth (signal only — read levels with `ev.book(n)` / `sub.book(n)` → `{bids: [[px, qty]...], asks: [...]}`); 4 trade (`px qty side tradeId`, `tradeId` always a string); 5 kline (`open high low close volume intervalSec openTimeMs closed prefill`); 16 order report (`channel` `orders`); 17 position row / 18 balance row (full current state, `snapshot` flag); 32 timer (`ctx.STREAM_TIMER`); 33 gateway status (`ctx.STREAM_STATUS`, `channel` `gateway`, `status` 1 UP 2 DOWN 3 DEGRADED); 35 init status (`prefillStatus` 1 READY / 2 FAILED, `message`; kline history, private snapshot, rejected subscription). Common fields `kind stream type channel ex symbol seq ts` (+ `depth` / `interval`). |
+| `ctx.subscribe(ex, opts)` | two arguments only; `ex` = exchange object or account index; `opts` = `{channel, symbol, depth, interval, mode, buffer}`: `channel` `ticker|bbo|tickers|trade|depth|kline|private`, `symbol` required for market data unless `ex` is an exchange object (its current pair at subscribe time), none for `private` / `tickers`; `mode: "latest"` or `buffer: N` (slow-consumer policy, events.md "投递模式"; `tickers` keeps the latest per instrument). Returns a Subscription `{id, ex, channel, symbol, depth, interval}` with `book(n)`, `positions()` / `balances()` (private; `null` until the snapshot is READY) and `unsubscribe()`. `symbol` as an array → array of Subscriptions in the same order (validated as a whole: one bad element throws and subscribes nothing), with a non-enumerable `unsubscribe()` for all. Identical subscriptions in one thread share one stream (reference counted). A rejected subscription does not throw: its own stream gets a kind 35 FAILED event (`tickers` on a venue without an all-market stream: `unsupported channel: tickers ...`; per-exchange support in the Capability Matrix "Push" column) |
+| Threads | a subscription belongs to the thread that called `ctx.subscribe` (main or a `threading.Thread` worker): its events go only to that thread, `ctx.poll` returns only that thread's own events, only that thread can `unsubscribe()` (others throw). Identical subscriptions in different threads share one upstream but each thread gets its own stream id and copy; a thread's subscriptions are released when it ends. Gateway status goes to every thread subscribed on that exchange, timers to the main thread |
+| `ctx.poll(streams?, timeoutMs?)` | Subscription objects, stream ids or (nested) arrays of them (a batch array as is); `[]`/omitted = all of this thread's streams; unnamed events stay queued for a later unfiltered poll (`STREAM_REST` is retired); `ctx.poll({streams, sources: "all"}, ms)` also waits on threads, Go, Dial and tasks |
 | `ctx.order(ex, symbol, "buy"\|"sell", px, qty, opts?)` | `opts`: `type` (`limit|market|stop|stopLimit`), `tif` (`gtc|ioc|fak|fok|postOnly`), `reduceOnly`, `postOnly`, `closeToday`, `replaceId`, `cond: {type: "tp"|"sl"|"oco", tpTrigger, tpPx, slTrigger, slPx}`, `extra`; returns the exchange id or an `Error` |
 | `ctx.cancel(ex, symbol, id)` | `void | Error` |
 | `ctx.rest(ex, method, args)` | synchronous REST for any symbol (`"ticker"`, `"depth"`, `"klines"`, `"assets"`, ...; names from `abi::REST_METHODS`), rate-limited 20/s per exchange (blocks) |
 | `ctx.raw(ex, method, args)` | exchange-specific endpoint, returns a **string** or `Error` |
-| Runtime | `ctx.connectors()` (index, label, name, symbol), `ctx.sleep(ms)`, `ctx.log/logStatus/logProfit`, `ctx.chart/chartAdd/chartReset/chartDel`, `ctx.getCommand(timeoutMs?)` (`""` when none), `ctx.setChannelData/getChannelData`, `ctx.robotId()` |
+| Runtime | `ctx.connectors()` (`ex label name symbol interval orderIdScope feed`; `feed` = `{ticksDropped, backpressure, ringCapacity}` counters of the exchange's push buffer, growing fast = the strategy cannot keep up), `ctx.sleep(ms)`, `ctx.log/logStatus/logProfit`, `ctx.chart/chartAdd/chartReset/chartDel`, `ctx.getCommand(timeoutMs?)` (`""` when none), `ctx.setChannelData/getChannelData`, `ctx.robotId()` |
 
-`EventLoop` and `ctx.poll` drain the same queues: pick one consumer per strategy. Do not mix `ctx` calls into the classic API above; `ctx` does not exist on the legacy Go node.
+Push and REST are independent: `GetTicker`/`GetDepth`/`ctx.rest` always hit REST and never read pushed data. In one thread `EventLoop` and `ctx.poll` drain the same queue: pick one consumer per thread. `ctx.subscribe`/`ctx.poll` combine with the classic `exchange.*` calls (exchange objects are accepted as `ex`); `ctx` does not exist on the legacy Go node. The manual pages are api.en.md `#### ctx.subscribe`, `#### ctx.poll`, `#### Subscription`.
 
 ## Pitfalls
 

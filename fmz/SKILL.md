@@ -100,7 +100,7 @@ Scripts and schedulers can use the signed REST "extended API" with the same key:
 | Task | Read |
 |---|---|
 | Write or review a strategy in JavaScript | `references/javascript.md` (signatures: `references/fmz.d.ts`, Chinese `references/fmz.zh_CN.d.ts`; native event API `references/ctx.d.ts` + `references/events.md`; known-good sample `references/selfcheck.js`) |
-| Python | `references/python.md` (`references/fmz.pyi`, `references/fmz.zh_CN.pyi`, `references/talib.pyi`, `references/selfcheck.py`) |
+| Python | `references/python.md` (`references/fmz.pyi`, `references/fmz.zh_CN.pyi`, `references/talib.pyi`, `references/selfcheck.py`; WebSocket push `ctx`: `references/events.md` section "Python") |
 | Rust | `references/rust.md` (`references/fmz.rs`, `references/selfcheck.rs`) |
 | Pine Script | `references/pine.md` (built-ins the engine implements: `references/pine-builtins.md`) |
 | MyLanguage (麦语言) | `references/mylanguage.md` (`references/mylanguage-functions.md`, official templates in `references/mylanguage-examples/`) |

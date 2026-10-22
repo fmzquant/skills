@@ -1028,6 +1028,16 @@ interface IExchange {
     GetUSDCNY(): number;
 
     /**
+     * Get the index of this exchange object in the exchanges array (exchange is 0); ctx.subscribe,
+     * ctx.rest and the other ctx.* calls accept the exchange object as their first argument and use it
+     * @returns Index
+     * ```js
+     * Log(exchanges[1].GetIndex());  // 1
+     * ```
+     */
+    GetIndex(): number;
+
+    /**
      * Get exchange custom label name (set when configuring the exchange on the platform)
      * @returns Label string
      * ```js
@@ -3231,6 +3241,8 @@ declare interface IThreadRet {
     terminated: boolean;
     /** Thread execution time (nanoseconds) */
     elapsed: number;
+    /** Text of the exception the thread function threw (null on a normal exit) */
+    error: string | null;
     /** Return value of the thread function */
     ret: any;
 }

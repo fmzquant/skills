@@ -114,6 +114,36 @@ Every API result is a dict subclass with attribute access: `ticker["Last"]` and 
 - `EventLoop(timeout_ms)` returns the next event dict (`{Seq, Event, ThreadId, Index, Nano, ...}`) or `None`; `0` blocks, `-1` polls. Call `EventLoop(-1)` once early or events raised before the first call are missed.
 - Native `threading.Thread` is allowed (API calls from threads are serialized by the runtime); make them daemon threads and remember they die when `main()` returns. The JavaScript `threading`/`Thread`/`ThreadLock` objects do not exist in Python.
 
+### WebSocket push (`ctx`, live)
+
+The global `ctx` has the same push API as JavaScript (api.en.md `#### ctx.subscribe`, `#### ctx.poll`, `#### Subscription`; field reference `references/events.md`, section "Python"):
+
+```python
+def main():
+    book = ctx.subscribe(exchange, {"channel": "depth", "depth": 20})   # exchange object or account index; symbol defaults to its current pair
+    acct = ctx.subscribe(exchange, {"channel": "private"})            # orders + positions + balances, whole account, no symbol
+    pair = ctx.subscribe(0, {"channel": "trade", "symbol": ["BTC_USDT", "ETH_USDT"]})   # SubscriptionList, pair.unsubscribe() drops all
+    while True:
+        ev = ctx.poll([], 1000)              # all of THIS thread's subscriptions; None on timeout; raises StopError on stop
+        if ev is None:
+            continue
+        if ev.type == "status":              # gateway (33) / init status (35) first: their channel can equal a data channel
+            if ev.kind == 35 and ev.prefillStatus == 2:
+                Log("subscription failed:", ev.channel, ev.message)
+            continue
+        if ev.channel == "depth":
+            b = ev.book(5)                   # {"bids": [[px, qty], ...], "asks": [...]} of this subscription's own book
+        elif ev.channel == "orders":
+            Log(ev.id, ev.state, ev.filledQty)
+        elif ev.channel in ("positions", "balance"):
+            Log(acct.positions(), acct.balances())   # None until the account snapshot is READY
+```
+
+- `ctx.subscribe(ex, opts)` takes exactly two positional arguments; `opts` is a dict `{channel, symbol, depth, interval, mode, buffer}` with channels `ticker bbo tickers trade depth kline private` (`tickers` = market-wide, no symbol, only on venues with an all-market stream, see the Capability Matrix "Push" column; otherwise a kind 35 FAILED event). `symbol` as a list → `SubscriptionList` in the same order, validated as a whole.
+- `Subscription`: read-only `id ex channel symbol depth interval`, `info()`, `book(n=None)`, `positions()`, `balances()`, `unsubscribe()`. Events are dicts with attribute access (`ev["kind"]` = `ev.kind`), same fields as JavaScript.
+- Subscriptions belong to the thread that made them: a `threading.Thread` worker can subscribe and `ctx.poll` its own events; identical subscriptions in two threads share the upstream but each gets its own copy; only the owning thread can unsubscribe; a worker's subscriptions are released when it ends.
+- `EventLoop()` has its own queue (Go completions and the auto-subscribed feeds of counter-type venues such as CTP) and never competes with `ctx.poll`. Push is independent of REST: `exchange.GetTicker()` etc. always hit REST. `ctx.connectors()[i].feed` = `{ticksDropped, backpressure, ringCapacity}` push-buffer counters. There is no `ctx.order/rest/raw` in Python (trade with `exchange.*`) and no `{streams, sources}` options form.
+
 ## Logging, status, timing, persistence
 
 - `Log(*args)` joins arguments with spaces. Trailing `"#ff0000"` colours the line, trailing `"@"` pushes it (email/webhook, live only, ~1 per 20 s), trailing `"&"` marks it private. `` Log("`data:image/png;base64,...`") `` shows an image; `Log(plt)` logs a matplotlib figure. `print()` goes to the process stdout (`get_robot_output` / debug panel), not the strategy log.
@@ -193,7 +223,7 @@ if cmd:
 
 ## References
 
-- `references/fmz.pyi` — complete Python API stub with docstrings. Grep `def GetRecords`, `class IOrder`, `class IMarket`, `def Dial`, `class IDial`, `def _G`, `def CreateConditionOrder`, `def Encode`, `def HttpQuery`, `class IHttpOptions`. Known stub errors: `IGo.wait` really returns `(value, ok)`; `_D` really takes seconds; `IAccount` lacks `UPnL`; KLineChart's Pine methods are not declared.
+- `references/fmz.pyi` — complete Python API stub with docstrings. Grep `def GetRecords`, `class IOrder`, `class IMarket`, `def Dial`, `class IDial`, `def _G`, `def CreateConditionOrder`, `def Encode`, `def HttpQuery`, `class IHttpOptions`, and for WebSocket push `class Ctx`, `class Subscription`, `class CtxEvent`. Known stub errors: `IGo.wait` really returns `(value, ok)`; `_D` really takes seconds; `IAccount` lacks `UPnL`; KLineChart's Pine methods are not declared.
 - `references/fmz.zh_CN.pyi` — the same stub in Chinese.
 - `references/talib.pyi` — every `talib.*` signature with defaults (`def MACD`, `def BBANDS`, `def STOCH`, `def CDL...`).
 - `references/selfcheck.py` — known-good strategy exercising the whole surface; copy its idioms (`if t:` guards, `tk, ok = g.wait(0)`, `_D(r["Time"] // 1000)`, KLineChart keyword args, `IsVirtual()` gating of writes, condition-order dicts).

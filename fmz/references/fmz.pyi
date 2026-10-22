@@ -1801,6 +1801,152 @@ class IHttpRet:
     Error: Optional[str]
     """Failure reason (method + URL + underlying error); present only when ``StatusCode`` is 0."""
 
+class StopError(RuntimeError):
+    """Raised by ``ctx.poll()`` (and blocking waits) once the robot is stopping, including
+    during ``onexit()``; let it propagate so the strategy finishes cleanly."""
+
+class Subscription:
+    """A WebSocket push subscription, returned by ``ctx.subscribe()``.
+
+    Belongs to the thread that called ``ctx.subscribe()``: its events go only to that
+    thread and only that thread can ``unsubscribe()``. Pass it (or its ``id``) to
+    ``ctx.poll()`` to take only its events.
+    """
+    id: int
+    """Event stream ID (the ``stream`` field of this subscription's events)."""
+    ex: int
+    """Account index (``exchanges[ex]``)."""
+    channel: str
+    """``"ticker"``, ``"bbo"``, ``"depth"``, ``"trade"``, ``"kline"``, ``"tickers"`` or ``"private"``."""
+    symbol: str
+    """Symbol code (empty for ``private`` / ``tickers``)."""
+    depth: int
+    """Order book levels of a depth subscription (0 = the exchange's default)."""
+    interval: int
+    """K-line period in seconds."""
+
+    def info(self) -> dict:
+        """The identity fields as a dict: ``{id, ex, channel, symbol, depth, interval}``."""
+        ...
+
+    def book(self, n: Optional[int] = None) -> dict:
+        """This depth subscription's own order book: ``{"bids": [[price, qty], ...], "asks": [...]}``
+        (bids descending, asks ascending; ``n`` defaults to the subscription's depth; both sides
+        empty before the first snapshot). Raises for a non-depth or unsubscribed subscription."""
+        ...
+
+    def positions(self) -> Optional[list]:
+        """Latest positions of a ``private`` subscription (rows ``{symbol, side, posSide, qty, avgPx,
+        profit?, margin?, liqPx?, markPx?, leverage?, time}``); ``None`` until the account snapshot is
+        READY (unknown, not "no positions"); ``[]`` on spot."""
+        ...
+
+    def balances(self) -> Optional[list]:
+        """Latest balances of a ``private`` subscription (rows ``{asset, free, frozen, equity?, upnl?,
+        margin?, time}``); ``None`` until the account snapshot is READY."""
+        ...
+
+    def unsubscribe(self) -> None:
+        """Unsubscribe (calling it again is a no-op). Only the subscribing thread can do it."""
+        ...
+
+class SubscriptionList(list[Subscription]):
+    """Result of a batch ``ctx.subscribe()`` (``symbol`` is a list): the subscriptions in the same
+    order; can be passed to ``ctx.poll()`` as a whole."""
+
+    def unsubscribe(self) -> None:
+        """Unsubscribe every element."""
+        ...
+
+class CtxEvent(dict):
+    """An event returned by ``ctx.poll()``: a dict with the same fields as the JavaScript event
+    (``ev["kind"]`` and ``ev.kind`` both work).
+
+    Common fields: ``kind`` (1 ticker/bbo/tickers, 3 depth, 4 trade, 5 kline, 16 order, 17 position,
+    18 balance, 32 timer, 33 gateway status, 35 init status), ``stream``, ``type`` (``"data"`` /
+    ``"status"`` / ``"timer"``), ``channel``, ``ex``, ``symbol``, ``seq``, ``ts``. Check ``type`` /
+    ``kind`` first: a kind 35 event carries its subscription's ``channel``. Kind 35 has
+    ``prefillStatus`` (1 READY, 2 FAILED) and ``message`` (the reason when FAILED).
+    """
+    kind: int
+    stream: int
+    type: str
+    channel: str
+    ex: int
+    symbol: str
+    seq: int
+    ts: float
+
+    def book(self, n: Optional[int] = None) -> dict:
+        """Depth event (kind 3): the order book of the subscription it belongs to, as ``Subscription.book``."""
+        ...
+
+class Ctx:
+    """The global ``ctx``: WebSocket push subscriptions (same semantics as JavaScript ``ctx``).
+
+    Example::
+
+        def main():
+            book = ctx.subscribe(exchange, {"channel": "depth", "depth": 20})
+            acct = ctx.subscribe(exchange, {"channel": "private"})
+            while True:
+                ev = ctx.poll([], 1000)
+                if ev is None:
+                    continue
+                if ev.type == "status":
+                    if ev.kind == 35 and ev.prefillStatus == 2:
+                        Log("subscription failed:", ev.channel, ev.message)
+                    continue
+                if ev.channel == "depth":
+                    b = ev.book(5)
+                elif ev.channel in ("positions", "balance"):
+                    Log(acct.positions(), acct.balances())
+    """
+    STREAM_TIMER: int
+    """Built-in stream of engine timers (kind 32)."""
+    STREAM_STATUS: int
+    """Built-in stream of gateway status events (kind 33)."""
+
+    def subscribe(self, ex: Union[IExchange, int, str], opts: dict) -> Union[Subscription, SubscriptionList]:
+        """Subscribe to WebSocket push: a symbol's market data, market-wide tickers or the account's
+        private stream.
+
+        Args:
+            ex: Exchange object (``exchange``, ``exchanges[1]``) or account index.
+            opts: ``{channel, symbol, depth, interval, mode, buffer}``: ``channel`` ``ticker`` (default),
+                ``bbo``, ``depth``, ``trade``, ``kline``, ``tickers`` (market-wide, no symbol) or
+                ``private`` (orders + positions + balances, no symbol); ``symbol`` required for market
+                data unless ``ex`` is an exchange object (its current pair), a list for a batch;
+                ``depth`` levels; ``interval`` K-line seconds; ``mode: "latest"`` or ``buffer: N``.
+
+        Returns:
+            ``Subscription``, or a ``SubscriptionList`` when ``symbol`` is a list (validated as a whole).
+            Invalid options raise; a subscription the exchange rejects gets a kind 35 FAILED event
+            on its own stream instead.
+        """
+        ...
+
+    def poll(self, streams: Optional[Union[Subscription, int, list]] = None,
+             timeout_ms: Optional[int] = None) -> Optional[CtxEvent]:
+        """Next event of the current thread's subscriptions.
+
+        Args:
+            streams: ``None`` / ``[]`` = all of this thread's subscriptions; otherwise Subscriptions,
+                stream IDs, a SubscriptionList or nested lists of them.
+            timeout_ms: ``None`` waits until an event arrives, ``0`` does not wait, > 0 waits at most
+                that many ms.
+
+        Returns:
+            The event, or ``None`` on timeout. Raises ``StopError`` once the robot is stopping.
+        """
+        ...
+
+    def connectors(self) -> list:
+        """Loaded exchanges: ``[{ex, label, name, symbol, interval, orderIdScope, feed}, ...]``;
+        ``feed`` = ``{ticksDropped, backpressure, ringCapacity}`` push-buffer counters (growing fast
+        means the strategy cannot keep up)."""
+        ...
+
 # ==================== Global Variables ====================
 
 ext = object()
@@ -1815,6 +1961,9 @@ exchanges: list[IExchange] = [IExchange()]
 
 exchange: IExchange = exchanges[0]
 """First (default) exchange object, equivalent to ``exchanges[0]``."""
+
+ctx: Ctx = Ctx()
+"""WebSocket push: ``ctx.subscribe()``, ``ctx.poll()``, ``ctx.connectors()`` (live only)."""
 
 # ==================== Global Functions ====================
 
