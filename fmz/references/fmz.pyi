@@ -121,6 +121,23 @@ PD_LONG_YD: int
 PD_SHORT_YD: int
 """Yesterday's short position (Chinese futures counters). Value 3."""
 
+# ==================== Futures/Exchange Operation Code Constants ====================
+
+FUTURES_OP_SET_MARGIN: int
+"""Set margin/leverage operation code. Value 0."""
+
+FUTURES_OP_SET_DIRECTION: int
+"""Set trading direction operation code. Value 1."""
+
+FUTURES_OP_SET_CONTRACT_TYPE: int
+"""Set contract type operation code. Value 2."""
+
+FUTURES_OP_GET_POSITION: int
+"""Get position operation code. Value 3."""
+
+EXCHANGE_OP_IO_CONTROL: int
+"""IO control operation code, used for sending arbitrary API requests. Value 4."""
+
 # ==================== JavaScript-style aliases ====================
 
 null: None

@@ -120,6 +120,23 @@ PD_LONG_YD: int
 PD_SHORT_YD: int
 """昨日空头持仓（国内期货柜台）。值为3。"""
 
+# ==================== Futures/Exchange Operation Code Constants ====================
+
+FUTURES_OP_SET_MARGIN: int
+"""设置保证金/杠杆操作代码。值为0。"""
+
+FUTURES_OP_SET_DIRECTION: int
+"""设置交易方向操作代码。值为1。"""
+
+FUTURES_OP_SET_CONTRACT_TYPE: int
+"""设置合约类型操作代码。值为2。"""
+
+FUTURES_OP_GET_POSITION: int
+"""获取持仓操作代码。值为3。"""
+
+EXCHANGE_OP_IO_CONTROL: int
+"""IO控制操作代码，用于发送任意API请求。值为4。"""
+
 # ==================== JavaScript-style aliases ====================
 
 null: None

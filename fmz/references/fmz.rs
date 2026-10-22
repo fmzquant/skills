@@ -792,6 +792,12 @@ impl Exchange {
     pub fn GetLabel(&self) -> String {
         todo!()
     }
+    /// Index of this exchange object in `exchanges` (`exchange` is 0): the account
+    /// index the `ctx::*` functions take (`ExIndex`), `Sub::ex()`, and `ex` of the
+    /// `ctx::connectors()` rows.
+    pub fn GetIndex(&self) -> u16 {
+        todo!()
+    }
     /// Current trading-pair string, e.g. "BTC_USDT".
     pub fn GetCurrency(&self) -> String {
         todo!()
