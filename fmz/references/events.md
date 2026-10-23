@@ -169,7 +169,7 @@ while True:
 | `interval` | number | 仅 K 线事件与 K 线订阅的 kind=35：周期（秒） |
 | `ex` | number | 账户在本次装载序列里的下标（`exchanges[i]` 的 i；无归属事件为 -1；余额与私有流状态事件不挂合约，按账户归属）。可**原样回传** `ctx.order/rest/raw` 的第一参数；label 取 `ctx.connectors()[ev.ex].label` |
 | `symbol` | string | 统一格式 `BASE_QUOTE[.contract]`（`BTC_USDT` 现货 / `.swap` 永续 / `.quarter` 季度） |
-| `seq` | number | 引擎全序号（同一实例内单调递增） |
+| `seq` | number | 引擎全序号（同一实例内单调递增；引擎自产的事件——订阅失败、后来者补发——同样有） |
 | `time` | number | 事件**发生**的时刻（UNIX 毫秒）：交易所给了时间就是交易所时间；交易所时间拿不到时为接收时间（同 `ts`）。各类事件的取法见下文对应小节 |
 | `ts` | number | 本机**收到**这条事件的时刻：connector 收到原始报文的时刻；引擎自产事件为发布时间（UNIX 毫秒，带微秒小数；回测=虚拟钟）。`Date.now() - ev.ts` = 引擎+poll 延迟；`ev.ts - ev.time` ≈ 交易所→本机的延迟（仅当 `time` 是交易所时间时有意义） |
 
@@ -333,6 +333,8 @@ while (true) {
   **恒常新**的完整簿；Latest 丢的只是"簿已更新"信号本身，不丢深度增量；
 - 回报/持仓/余额/状态走每线程的无损队列（有界 10240，只有某个线程订阅了却从不取时才会满、丢最旧
   并计入 evdrop）；
+- 一条流的状态事件（kind=35）不会越过它之前已排队的**本流**数据：prefill 的 bar 全部交出后才是
+  READY / FAILED；Latest 已覆盖作废的旧数据不算，在它之后到的数据排在它后面；
 - 每个连接器的来源环按积压从 1024 条增长到 32768 条（全市场 ticker 一帧就是几百上千条）；到顶后
   tick 丢弃、其余事件向 connector 传导背压（connector 线程重试），因此策略仍须持续 poll；
 - 丢弃累计随资源监控上报：`load.evdrop`（引擎侧慢消费：Latest 覆盖 / Ring 溢出 / 无损队列溢出）、
