@@ -2327,8 +2327,12 @@ fn main() {
 | - | - |
 | `exchange.Go` | 多线程异步支持函数，可以把所有支持的函数的操作变成异步并发执行。 |
 | `EventLoop` | 监听事件：当任意```WebSocket```有可读数据，或```exchange.Go()```、```HttpQuery_Go()```等并发任务完成时返回。 |
-| `ctx.subscribe` | 订阅WebSocket推送（品种行情、全市场ticker或账户私有流），返回Subscription对象。 |
-| `ctx.poll` | 取出本线程所订阅的下一条推送事件，可设置等待超时。 |
+| `ctx.subscribe` | 订阅WebSocket推送，可订阅品种行情、全市场ticker或账户私有数据流，返回Subscription对象。 |
+| `ctx.poll` | 取出本线程所订阅事件流中的下一条推送事件，可设置等待超时。 |
+| `ctx.order` | 下单，并在交易所返回订单号后返回。 |
+| `ctx.cancel` | 撤销一个订单，收到交易所确认后返回。 |
+| `ctx.orderAsync` | 异步下单：立即返回请求号，不等待交易所应答。 |
+| `ctx.cancelAsync` | 异步撤单：立即返回请求号，不等待交易所确认；撤单结果以一条应答事件（```kind```为```20```，```op```为```cancel```）投递给发起请求的线程，可用ctx.poll取出。 |
 
 ##### Threads/Subscription
 

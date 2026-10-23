@@ -20,7 +20,7 @@ Python 见「Python」。
 var tk  = ctx.subscribe(exchange, {channel: "ticker"});                    // 交易所对象：symbol 取它当前的交易对
 var d20 = ctx.subscribe(0, {channel: "depth", symbol: "BTC_USDT", depth: 20});
 var k1m = ctx.subscribe(exchanges[1], {channel: "kline", symbol: "ETH_USDT.swap", interval: 60});
-var acct = ctx.subscribe(0, {channel: "private"});                         // 私有流：订单 + 持仓 + 余额一路，整个账户
+var acct = ctx.subscribe(0, {channel: "private"});                         // 私有流：订单 + 成交 + 持仓 + 余额一路，整个账户
 var all = ctx.subscribe(0, {channel: "tickers"});                          // 全市场 ticker：一路收该交易所全部合约
 var pair = ctx.subscribe(0, {channel: "trade", symbol: ["BTC_USDT", "ETH_USDT"]}); // 批量：订阅对象数组
 ```
@@ -74,7 +74,7 @@ Rust SDK 对应：`ctx::subscribe(ex, SubOpts::depth(20).symbol("BTC_USDT")) -> 
 （`None` = 快照还没 READY）、`unsubscribe()`——`Sub` 可复制，引用计数按 **`subscribe` 调用次数**算，
 每次 `subscribe` 对应一次 `unsubscribe`。原始 `Event` 经 `EventExt` 安全读取（策略不写 `unsafe`）：
 `stream()` / `channel()` / `book(n)`（深度事件）/ `trade_id()`，以及按 kind 的实数视图——`ticker()`
-（kind 1）、`trade()`（4）、`kline()`（5）、`order()`（16）、`position()` / `balance()`（17/18）、`gateway()`
+（kind 1）、`trade()`（4）、`kline()`（5）、`order()`（16）、`position()` / `balance()`（17/18）、`fill()`（19）、`gateway()`
 （33）、`feed_status()`（35：`status`/`channel`/`interval`/`message`/`stream`，`ready()` / `failed()`），
 kind 不符为 `None`，字段与本文各节的 JS 字段一一对应（Rust 命名）。
 
@@ -144,8 +144,9 @@ while True:
   `ctx.poll({streams, sources}, …)` 是 **JS 专有**（Python 传 dict 抛 `TypeError`）：Python 的线程消息、
   `exchange.Go` 完成通知由 `EventLoop` 与各自的句柄交付，`ctx.poll` 只取引擎事件。
 - 另有 `ctx.connectors()`（同 JS：`[{ex, label, name, symbol, interval, orderIdScope, feed}, …]`）与
-  `ctx.STREAM_STATUS` / `ctx.STREAM_TIMER`。`ctx.order/cancel/rest/raw` 等 JS 面不在 Python 的 `ctx` 上
-  （交易与查询走 `exchange.*`）。
+  `ctx.STREAM_STATUS` / `ctx.STREAM_TIMER` / `ctx.STREAM_ORDER_ACK`。下单撤单 `ctx.order` / `ctx.cancel` /
+  `ctx.orderAsync` / `ctx.cancelAsync` 与 JS 同参数同语义（见「下单与异步应答」；失败**返回** `CtxError`
+  实例、不抛，`isinstance(r, CtxError)` 判）；`ctx.rest/raw` 不在 Python 的 `ctx` 上（查询走 `exchange.*`）。
 - **线程**：主线程（以及替它跑 `onexit` 的线程）的订阅属于主线程；`threading.Thread` 起的线程各是一个
   属主（`fmz.py` 从 1 起单调发号、不复用），在线程里 `ctx.subscribe` / `ctx.poll` 就是这个线程自己的；
   线程体结束（正常返回或抛异常）时它的订阅一次退干净。`_thread.start_new_thread` 这类绕过
@@ -161,10 +162,10 @@ while True:
 
 | 字段 | 类型 | 说明 |
 |---|---|---|
-| `kind` | number | 事件类型：1=ticker/bbo 3=depth 4=trade 5=kline 16=订单回报 17=持仓 18=余额 32=定时器 33=网关状态 35=初始化状态 |
-| `stream` | number | 投递这条事件的流：订阅流 = 本线程订阅对象的 `id`；网关状态 / 定时器为内建流 `ctx.STREAM_STATUS`(2) / `ctx.STREAM_TIMER`(1) |
-| `type` | string | `"data"`（行情、私有流的订单/持仓/余额）/ `"status"`（网关状态、初始化状态）/ `"timer"`（定时器） |
-| `channel` | string | 所属订阅的频道：`ticker` `bbo` `tickers` `depth` `trade` `kline`；私有流的事件说明自己是哪一种：`orders` / `positions` / `balance`（同一路 `private` 订阅、同一个 `stream`）；网关状态 `"gateway"`，定时器 `"timer"`；kind=35 为它所属订阅的频道（私有流快照状态为 `"private"`）——所以只看 `channel` 分不出数据事件与 kind=35，先判 `type`/`kind` |
+| `kind` | number | 事件类型：1=ticker/bbo 3=depth 4=trade 5=kline 16=订单回报 17=持仓 18=余额 19=成交回报 20=异步下单应答 32=定时器 33=网关状态 35=初始化状态 |
+| `stream` | number | 投递这条事件的流：订阅流 = 本线程订阅对象的 `id`；网关状态 / 定时器 / 异步下单应答为内建流 `ctx.STREAM_STATUS`(2) / `ctx.STREAM_TIMER`(1) / `ctx.STREAM_ORDER_ACK`(4) |
+| `type` | string | `"data"`（行情、私有流的订单/成交/持仓/余额）/ `"status"`（网关状态、初始化状态）/ `"timer"`（定时器）/ `"ack"`（异步下单应答） |
+| `channel` | string | 所属订阅的频道：`ticker` `bbo` `tickers` `depth` `trade` `kline`；私有流的事件说明自己是哪一种：`orders` / `fills` / `positions` / `balance`（同一路 `private` 订阅、同一个 `stream`）；网关状态 `"gateway"`，定时器 `"timer"`，异步下单应答 `"ack"`；kind=35 为它所属订阅的频道（私有流快照状态为 `"private"`）——所以只看 `channel` 分不出数据事件与 kind=35，先判 `type`/`kind` |
 | `depth` | number | 仅深度事件：所属订阅的档数（0 = 连接器默认） |
 | `interval` | number | 仅 K 线事件与 K 线订阅的 kind=35：周期（秒） |
 | `ex` | number | 账户在本次装载序列里的下标（`exchanges[i]` 的 i；无归属事件为 -1；余额与私有流状态事件不挂合约，按账户归属）。可**原样回传** `ctx.order/rest/raw` 的第一参数；label 取 `ctx.connectors()[ev.ex].label` |
@@ -180,7 +181,9 @@ while True:
 | ticker/bbo/tickers、trade、持仓、余额 | 交易所时间；连接器没给时为 `ts` |
 | kline | bar 起始时间，同 `openTimeMs`（与 REST `Record.Time` 同一口径） |
 | depth、订单回报 | 接收时间（= `ts`）：ABI 目前不携带这两类的交易所时间，以后携带了即改为交易所时间 |
+| 成交回报（19） | 交易所成交时间；连接器没给时为 `ts` |
 | 网关状态（33）、初始化状态（35） | `ts` |
+| 异步下单应答（20） | 交易所应答时间；交易所没给（REST 应答）时为 `ts` |
 | 定时器（32） | 计划触发时刻（`scheduledNs` 换到与 `ts` 相同的毫秒时钟） |
 
 Rust SDK：`sdk::ctx::EventExt` 的 `ev.time()` / `ev.ts()` 按同一规则给出（f64 毫秒），各类型化视图
@@ -227,17 +230,23 @@ bar 当作完整历史。订阅被拒（见上文「订阅」）也以本事件�
 
 ## depth（kind=3，channel: "depth"，opts.depth 档数）
 
+`opts.depth` 可以是 0–255 的任意整数：0（或省略）= 连接器默认档数，1–255 = 要的档数，每个档数都是
+一路独立订阅（depth 7 与 depth 10 是两条流、两本簿）。连接器取交易所原生档位里覆盖所需档数的
+最小一档、按所需档数截断（例：原生只有 5/10/20 档快照时 depth 7 订 10 档、发布 7 档；两路共用
+一条原生订阅，各自截断发布）。超过 255 或不是整数时 `ctx.subscribe` 同步抛异常；超过该交易所上限
+时在这一路的流上来 FAILED（`message` 以 `unsupported depth` 开头），各交易所的原生档位与上限见其文档。
+
 事件本身只是"订单簿已更新"的信号，**不带档位**；档位读组装视图：`ev.book(n)` 或 `sub.book(n)` →
 `{bids: [[价,量],…], asks: [[价,量],…]}`（bids 降序 / asks 升序）。两者读的都是**这一路订阅自己的**
 那本簿（同合约 depth 5 与 depth 20 各一本，互不影响）。`ev.book` 是不可枚举方法，
 `JSON.stringify(ev)` 里没有它；事件所属的流已退订时调用抛异常。`bid/ask` 只用于**订单簿侧**命名，
 成交方向一律 `buy/sell`。`time` 为接收时间（同 `ts`；ABI 尚不携带深度的交易所时间）。
 
-## 私有流（channel 订阅 `"private"`：订单 + 持仓 + 余额）
+## 私有流（channel 订阅 `"private"`：订单 + 成交 + 持仓 + 余额）
 
-一个账户只有**一路**私有订阅，订单回报、持仓、余额都在它的 `stream` 上（私有推送很稀疏，不分订阅）；
-事件的 `channel` 说明这一条是什么：`orders`（kind 16）、`positions`（kind 17）、`balance`（kind 18）。三种都走
-无损队列。
+一个账户只有**一路**私有订阅，订单回报、成交回报、持仓、余额都在它的 `stream` 上（私有推送很稀疏，不分订阅）；
+事件的 `channel` 说明这一条是什么：`orders`（kind 16）、`fills`（kind 19，见「成交回报」）、`positions`（kind 17）、
+`balance`（kind 18）。四种都走无损队列。
 
 - **快照**：订阅生效后（以及每次断线重连之后）连接器用它的 `rest.assets` / `rest.positions` 取一份账户
   快照，先发全部快照行（`snapshot: true`），再在同一 stream 上发一条 kind=35 状态（`channel: "private"`，
@@ -247,9 +256,11 @@ bar 当作完整历史。订阅被拒（见上文「订阅」）也以本事件�
   某资产此刻的 free/frozen 全额（都为 0 = 已清空）。按 (symbol, posSide) / asset 覆盖即得账户状态——
   `sub.positions()` / `sub.balances()` 就是引擎这样维护的那份。
 - 口径与该交易所的 `ctx.rest(ex, "positions")` / `("assets")` 相同：统一 symbol、`side`、张或币、资产名、
-  均价（每单位标的）。推送没有给的金额字段**省略**（不是 0）。
-- 实时推送的覆盖面因交易所而异（例：币安合约的余额行在余额变动事件后经 REST 重读；CTP 柜台不推持仓
-  与资金，只有快照），以各交易所文档为准。
+  均价（每单位标的）。推送没有给的金额字段**省略**（不是 0）；余额推送里没有同口径的可用/冻结时，
+  `free`/`frozen` 为 `null`。
+- 推送路径里**不调 REST 补数据**：快照之后只发交易所推来的东西。交易所不推的（例：币安合约下单、撤单
+  不推余额；CTP 柜台不推持仓与资金，只有快照），要最新值就调 `GetAssets()` / `GetPositions()`。
+  实时推送的覆盖面因交易所而异，以各交易所文档为准。
 
 持仓（kind=17，`channel: "positions"`）：
 
@@ -268,7 +279,7 @@ bar 当作完整历史。订阅被拒（见上文「订阅」）也以本事件�
 | 字段 | 类型 | 说明 |
 |---|---|---|
 | `asset` | string | 资产名（同 `rest("assets").balances[].asset`） |
-| `free` `frozen` | number | 该资产此刻的可用 / 冻结全额 |
+| `free` `frozen` | number \| null | 该资产此刻的可用 / 冻结全额；推送里没有同口径的值时为 `null`（快照行总有值） |
 | `equity` `upnl` `margin` | number? | 权益、未实现盈亏、保证金占用；没有就没有该键 |
 | `time` `snapshot` | | 同持仓 |
 
@@ -298,6 +309,111 @@ while (true) {
 | `px` `qty` `filledQty` `avgPx` | number | 委托价/量、累计成交量、成交均价（实数） |
 | `reason` | number | ABI 统一拒单原因码；`reasonText` 是该统一码对应的、与 connector 无关的说明 |
 | `time` | number | 毫秒；ABI 尚不携带订单回报的交易所时间，目前为接收时间（同 `ts`） |
+
+## 成交回报（kind=19，channel: "fills"，私有流）
+
+自己订单的**一笔**成交（my trade），与订单回报同一路 `private` 订阅、同一个 `stream`、同样无损：
+
+| 字段 | 类型 | 说明 |
+|---|---|---|
+| `orderId` | string | 所属订单的订单号，与订单回报的 `id`、`ctx.order` 的返回值同域 |
+| `tradeId` | string | 交易所成交号，**恒为字符串**（数字号写十进制、UUID 原样；交易所不给号时为 `syn:` 合成号；空串 = 连接器没给号） |
+| `px` `qty` | number | **这一笔**的成交价 / 成交量（量纲同该订单的 `qty`/`filledQty`：张或币同 REST） |
+| `fee` | number? | 这一笔的手续费：正 = 付出，负 = 返佣；交易所没给就**没有该键**（不是 0） |
+| `feeCcy` | string | 手续费资产（同 `rest("assets").balances[].asset` 的资产名）；`""` = 未知 |
+| `side` | string | **订单方向** `"buy"` / `"sell"`（不是 taker 方向） |
+| `liquidity` | string | `"maker"`（挂单成交）/ `"taker"`（吃单成交）/ `""`（交易所没说） |
+| `time` | number | 交易所成交时间（毫秒）；连接器没给时为 `ts` |
+
+- **先成交、后订单**：连接器先发成交，再发反映它的订单回报（同一帧既带成交又带订单新状态时也是这个顺序）。
+  收到订单回报 `filledQty` 增长时，构成它的成交已经都到了；一张单全部成交的 `qty` 之和 = 它的 `filledQty`。
+- **不补快照、不回补历史**：订阅生效与断线重连之后都不发历史成交（要历史走 REST 的成交查询）；断线期间的
+  成交不会补发，订单回报的累计量仍是权威值。交易所重连后重发的同一笔成交由连接器按（订单号, 成交号）去重。
+- 自成交（同一账户买卖对敲）时同一个 `tradeId` 会以两张单各出一条（`orderId` 不同）。
+- 只有交易所私有推送带逐笔成交的连接器才发（各交易所文档写明）；没有的交易所只有订单回报。
+
+```javascript
+var acct = ctx.subscribe(exchange, {channel: "private"});
+var filled = {};                                   // orderId -> 已收到的成交量
+while (true) {
+    var ev = ctx.poll([acct], 1000);
+    if (!ev) continue;
+    if (ev.kind === 19) {
+        filled[ev.orderId] = (filled[ev.orderId] || 0) + ev.qty;
+        Log("fill", ev.orderId, ev.tradeId, ev.side, ev.px, ev.qty, ev.liquidity, ev.fee, ev.feeCcy);
+    } else if (ev.kind === 16 && ev.state === "filled") {
+        Log("order done", ev.id, ev.filledQty, "fills sum", filled[ev.id] || 0);
+        delete filled[ev.id];
+    }
+}
+```
+
+Rust SDK：`ev.fill() -> Option<FillView>`（`order_id` `trade_id` `px` `qty` `fee: Option<f64>` `fee_ccy`
+`side` `liquidity` `time`）；Python 事件 dict 字段同 JS。
+
+## 下单与异步应答（`ctx.order` / `ctx.orderAsync`，kind=20）
+
+下单撤单不需要订阅，主线程与 threading worker 都可以调：
+
+```javascript
+var id = ctx.order(0, "BTC_USDT", "buy", 30000, 0.001);                     // 同步，缺省 REST
+var ws = ctx.order(0, "BTC_USDT", "buy", 30000, 0.001, {via: "ws"});        // 同步，交易所的 WS 交易 API
+var r  = ctx.cancel(0, "BTC_USDT", ws, {via: "ws"});
+var req = ctx.orderAsync(0, "BTC_USDT", "sell", 31000, 0.001, {via: "ws", clientId: "grid-17"});
+var ack = ctx.poll([ctx.STREAM_ORDER_ACK], 5000);                           // kind 20：只有本线程收得到
+if (ack && ack.reqId === req && ack.ok) Log("placed", ack.id, ack.via, ack.latencyMs);
+```
+
+- **同步** `ctx.order(ex, symbol, side, px, qty, opts?)` → 交易所订单号；`ctx.cancel(ex, symbol, id, opts?)`。
+  等一个往返；失败**返回** `Error` 值（不抛）。`opts` 在原有的 `type tif reduceOnly postOnly extra` 之外认
+  `clientId`（原样交给交易所）、`via`（`"rest"` 缺省 / `"ws"`）、`timeout`（等应答的毫秒数）；撤单的 `opts`
+  只有 `via` / `timeout`。未知键报错（不静默丢）：交易所专属参数放 `extra`，条件单走
+  `ctx.rest(ex, "condSubmit", …)`，改单走 `ctx.rest(ex, "amend", …)`。
+- **异步** `ctx.orderAsync(...)` / `ctx.cancelAsync(...)`：参数相同，**立即**返回请求号（number），结果是投给
+  **调用线程**的一条 kind=20 应答事件（内建流 `ctx.STREAM_ORDER_ACK`；`ctx.poll([])` 也取得到，别的线程取不到）。
+  参数错、连接器不支持 `via:"ws"`、在途请求超过 256 时当场回 `Error`，不会有应答。异步与传输无关：缺省同样走 REST。
+  并发的请求互不排队（宿主派发池 8 条线程，`ORDER_WORKERS` 可调），应答按完成顺序到达——要"先下后撤"
+  就等下单的应答。限频照旧：REST 令牌桶、`IO("rate")` 规则在派发线程上生效，不卡调用线程。
+- **`via: "ws"`**（交易所的 WebSocket 交易 API；目前币安、OKX、Bybit、Gate、Bitget 的现货与合约（Gate 合约限永续、Bybit 模拟盘不支持），以各交易所文档为准）：连接器
+  没有 WS 下单通道时回 unsupported 错误，**绝不悄悄改走 REST**。每个账户一条专用交易连接，第一次 WS
+  下单时建立（预热：`exchange.IO("wsTrade", "connect")`）；每张 WS 单都带客户端订单号（不给时连接器按交易所
+  格式与渠道规则生成，在应答的 `clientId` 里）。
+  - 请求**发出之前**交易连接不可用（没连上、没登录）：自动改走 REST，应答的 `via` 是 `"rest"`（同步调用在
+    stdout 记一行）。
+  - 请求**发出之后**没等到应答（超时、连接中途断开、交易所回"执行状态未知"）：连接器只读地按客户端订单号
+    查一次，查到就是成功；查不到则为**状态未知**——异步应答 `status: "unknown"`，同步返回的 Error 以
+    `order state unknown (clientId …)` 开头。订单可能已经在交易所：**不要重发**，按 `clientId` 查单或等私有流
+    回报对账（不能指望交易所拒绝同号重下：币安只拒绝与**仍挂着**的订单同号的新单）。
+  - 超过交易所的下单限额（连接器声明的窗口，或交易所报告的用量已满）当场失败（`reason` 5），不排队、
+    不改走 REST——交易所的订单限额通常 REST 与 WS 共用。
+
+应答事件（kind=20，`type: "ack"`，`channel: "ack"`）：
+
+| 字段 | 类型 | 说明 |
+|---|---|---|
+| `reqId` | number | `orderAsync` / `cancelAsync` 返回的请求号 |
+| `op` | string | `"place"` / `"cancel"` |
+| `status` / `ok` | string / boolean | `"ok"` / `"failed"` / `"unknown"`（见上）；`ok` = `status === "ok"` |
+| `via` | string | 实际使用的传输：`"ws"` / `"rest"` |
+| `id` | string | 交易所订单号（下单成功 / 撤单的目标单；下单失败为 `""`） |
+| `clientId` | string | 客户端订单号（WS 下单一定有；REST 只有 `opts.clientId` 给了才有） |
+| `symbol` / `ex` | | 请求里的 symbol 与账户下标 |
+| `error` | string | 失败原因（成功为 `""`；最长 119 字节，完整原因走同步调用） |
+| `reason` / `reasonText` | number / string | 统一原因码（1 请求错误、2 凭据、3 传输/未知、4 交易所拒绝、5 限频）与说明 |
+| `exchTime` | number \| null | 交易所应答时间（毫秒）；REST 应答没有为 `null` |
+| `latencyMs` | number | 往返耗时：调用 `orderAsync`/`cancelAsync` → 拿到结果 |
+| `time` | number | 交易所应答时间，没有时同 `ts` |
+
+撤单"订单已先一步成交/终态"（REST 的 `canceled:false`）在同步调用里是带原因的 Error、在应答里是
+`status: "failed"`。回测：回测引擎在服务端下发的代码包里，不在本仓库；`via` 只对实盘的连接器有意义，
+应答事件不进 journal。
+
+Rust SDK：`ctx::order(ex, symbol, side, px, qty, opts_json)`（`opts_json` 同 JS 的 opts，如 `r#"{"via":"ws"}"#`）、
+`ctx::cancel_with(ex, symbol, id, opts_json)`、`ctx::order_async(...) -> Result<u64, String>`、
+`ctx::cancel_async(...) -> Result<u64, String>`；应答用 `ev.order_ack() -> Option<OrderAckView>`（`req_id` `op`
+`status` `ok` `via` `id` `client_id` `symbol` `error` `reason` `reason_text` `exch_time: Option<i64>` `latency_ms`
+`time`），流 id `ctx::STREAM_ORDER_ACK`。Python：`ctx.order` / `ctx.cancel` / `ctx.orderAsync` / `ctx.cancelAsync`
+同名同参（`opts` 是 dict），应答 dict 字段同 JS。
 
 ## 网关状态（kind=33，type: "status"，channel: "gateway"，内建 STREAM_STATUS）
 

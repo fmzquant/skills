@@ -2327,8 +2327,12 @@ Every function, structure and constant of the API reference, grouped by its cate
 | - | - |
 | `exchange.Go` | Multi-threaded asynchronous support function that can convert the operations of all supported functions into asynchronous concurrent execution. |
 | `EventLoop` | Listens for events. |
-| `ctx.subscribe` | Subscribes to WebSocket push streams (market data for a symbol, market-wide tickers, or an account's private streams) and returns a Subscription object. |
-| `ctx.poll` | Takes the next push event from the current thread's subscriptions, with an optional wait timeout. |
+| `ctx.subscribe` | Subscribes to WebSocket push data. |
+| `ctx.poll` | Retrieves the next pushed event from the event streams subscribed to by the current thread, with an optional wait timeout. |
+| `ctx.order` | Places an order and returns once the exchange returns the order ID. |
+| `ctx.cancel` | Cancels an order and returns once the exchange confirms the cancellation. |
+| `ctx.orderAsync` | Asynchronous order placement: returns a request ID immediately without waiting for the exchange's response. |
+| `ctx.cancelAsync` | Asynchronous order cancellation: returns a request ID immediately without waiting for exchange confirmation. |
 
 ##### Threads/Subscription
 
@@ -2336,7 +2340,7 @@ Every function, structure and constant of the API reference, grouped by its cate
 | - | - |
 | `Subscription.book` | Reads the order book maintained by this depth subscription itself. |
 | `Subscription.positions` | Reads the latest positions that a private subscription maintains from pushed updates. |
-| `Subscription.balances` | Reads the latest balances that a private subscription keeps up to date from pushed events. |
+| `Subscription.balances` | Reads the latest balances that a private subscription maintains from pushed updates. |
 | `Subscription.unsubscribe` | Unsubscribe: releases the reference held by this subscription object; the actual unsubscribe request is sent to the exchange only when the last reference is released. |
 
 ##### Threads/threading
