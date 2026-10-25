@@ -145,7 +145,7 @@ while True:
   `exchange.Go` 完成通知由 `EventLoop` 与各自的句柄交付，`ctx.poll` 只取引擎事件。
 - 另有 `ctx.connectors()`（同 JS：`[{ex, label, name, symbol, interval, orderIdScope, feed}, …]`）与
   `ctx.STREAM_STATUS` / `ctx.STREAM_TIMER` / `ctx.STREAM_ORDER_ACK`。下单撤单 `ctx.order` / `ctx.cancel` /
-  `ctx.orderAsync` / `ctx.cancelAsync` 与 JS 同参数同语义（见「下单与异步应答」；失败**返回** `CtxError`
+  `ctx.submit` 与 JS 同参数同语义（见「下单：ctx.order / ctx.cancel / ctx.submit」；失败**返回** `CtxError`
   实例、不抛，`isinstance(r, CtxError)` 判）；`ctx.rest/raw` 不在 Python 的 `ctx` 上（查询走 `exchange.*`）。
 - **线程**：主线程（以及替它跑 `onexit` 的线程）的订阅属于主线程；`threading.Thread` 起的线程各是一个
   属主（`fmz.py` 从 1 起单调发号、不复用），在线程里 `ctx.subscribe` / `ctx.poll` 就是这个线程自己的；
@@ -164,8 +164,8 @@ while True:
 |---|---|---|
 | `kind` | number | 事件类型：1=ticker/bbo 3=depth 4=trade 5=kline 16=订单回报 17=持仓 18=余额 19=成交回报 20=异步下单应答 32=定时器 33=网关状态 35=初始化状态 |
 | `stream` | number | 投递这条事件的流：订阅流 = 本线程订阅对象的 `id`；网关状态 / 定时器 / 异步下单应答为内建流 `ctx.STREAM_STATUS`(2) / `ctx.STREAM_TIMER`(1) / `ctx.STREAM_ORDER_ACK`(4) |
-| `type` | string | `"data"`（行情、私有流的订单/成交/持仓/余额）/ `"status"`（网关状态、初始化状态）/ `"timer"`（定时器）/ `"ack"`（异步下单应答） |
-| `channel` | string | 所属订阅的频道：`ticker` `bbo` `tickers` `depth` `trade` `kline`；私有流的事件说明自己是哪一种：`orders` / `fills` / `positions` / `balance`（同一路 `private` 订阅、同一个 `stream`）；网关状态 `"gateway"`，定时器 `"timer"`，异步下单应答 `"ack"`；kind=35 为它所属订阅的频道（私有流快照状态为 `"private"`）——所以只看 `channel` 分不出数据事件与 kind=35，先判 `type`/`kind` |
+| `type` | string | `"data"`（行情、私有流的订单/成交/持仓/余额）/ `"status"`（网关状态、初始化状态）/ `"timer"`（定时器）/ `"ack"`（`ctx.submit` 的应答） |
+| `channel` | string | 所属订阅的频道：`ticker` `bbo` `tickers` `depth` `trade` `kline`；私有流的事件说明自己是哪一种：`orders` / `fills` / `positions` / `balance`（同一路 `private` 订阅、同一个 `stream`）；网关状态 `"gateway"`，定时器 `"timer"`，`ctx.submit` 的应答 `"ack"`；kind=35 为它所属订阅的频道（私有流快照状态为 `"private"`）——所以只看 `channel` 分不出数据事件与 kind=35，先判 `type`/`kind` |
 | `depth` | number | 仅深度事件：所属订阅的档数（0 = 连接器默认） |
 | `interval` | number | 仅 K 线事件与 K 线订阅的 kind=35：周期（秒） |
 | `ex` | number | 账户在本次装载序列里的下标（`exchanges[i]` 的 i；无归属事件为 -1；余额与私有流状态事件不挂合约，按账户归属）。可**原样回传** `ctx.order/rest/raw` 的第一参数；label 取 `ctx.connectors()[ev.ex].label` |
@@ -305,6 +305,7 @@ while (true) {
 | 字段 | 类型 | 说明 |
 |---|---|---|
 | `id` | string | 订单号（`ctx.order` 的返回值；空串 = 连接器没给号） |
+| `clientId` | string | 客户端订单号（交易所推送里的原值；`ctx.submit` 下的单就是它返回的 localId）；`""` = 推送没给或连接器还没接入 |
 | `state` | string | `"acked"` `"partial"` `"filled"` `"canceled"` `"rejected"` |
 | `px` `qty` `filledQty` `avgPx` | number | 委托价/量、累计成交量、成交均价（实数） |
 | `reason` | number | ABI 统一拒单原因码；`reasonText` 是该统一码对应的、与 connector 无关的说明 |
@@ -317,6 +318,7 @@ while (true) {
 | 字段 | 类型 | 说明 |
 |---|---|---|
 | `orderId` | string | 所属订单的订单号，与订单回报的 `id`、`ctx.order` 的返回值同域 |
+| `clientId` | string | 所属订单的客户端订单号，与订单回报的 `clientId` 同一口径；`""` = 推送没给 |
 | `tradeId` | string | 交易所成交号，**恒为字符串**（数字号写十进制、UUID 原样；交易所不给号时为 `syn:` 合成号；空串 = 连接器没给号） |
 | `px` `qty` | number | **这一笔**的成交价 / 成交量（量纲同该订单的 `qty`/`filledQty`：张或币同 REST） |
 | `fee` | number? | 这一笔的手续费：正 = 付出，负 = 返佣；交易所没给就**没有该键**（不是 0） |
@@ -348,72 +350,105 @@ while (true) {
 }
 ```
 
-Rust SDK：`ev.fill() -> Option<FillView>`（`order_id` `trade_id` `px` `qty` `fee: Option<f64>` `fee_ccy`
-`side` `liquidity` `time`）；Python 事件 dict 字段同 JS。
+Rust SDK：`ev.fill() -> Option<FillView>`（`order_id` `client_id` `trade_id` `px` `qty` `fee: Option<f64>`
+`fee_ccy` `side` `liquidity` `time`），`ev.order()` 的 `OrderView` 同样带 `client_id`；Python 事件 dict 字段同 JS。
 
-## 下单与异步应答（`ctx.order` / `ctx.orderAsync`，kind=20）
+`clientId` 的来源（各交易所推送字段）：币安现货 `executionReport` 的 `c`（撤单回报用 `C`，即原单的号）、
+币安 U 本位 `ORDER_TRADE_UPDATE.o.c`、OKX `clOrdId`、Bybit `orderLinkId`、Gate `text`、Bitget `clientOid`；
+其余交易所陆续接入，接入前为 `""`。
+
+## 下单：ctx.order / ctx.cancel / ctx.submit（应答 kind=20）
 
 下单撤单不需要订阅，主线程与 threading worker 都可以调：
 
 ```javascript
-var id = ctx.order(0, "BTC_USDT", "buy", 30000, 0.001);                     // 同步，缺省 REST
-var ws = ctx.order(0, "BTC_USDT", "buy", 30000, 0.001, {via: "ws"});        // 同步，交易所的 WS 交易 API
-var r  = ctx.cancel(0, "BTC_USDT", ws, {via: "ws"});
-var req = ctx.orderAsync(0, "BTC_USDT", "sell", 31000, 0.001, {via: "ws", clientId: "grid-17"});
-var ack = ctx.poll([ctx.STREAM_ORDER_ACK], 5000);                           // kind 20：只有本线程收得到
-if (ack && ack.reqId === req && ack.ok) Log("placed", ack.id, ack.via, ack.latencyMs);
+var id = ctx.order(0, "BTC_USDT", "buy", 30000, 0.001);       // REST，同步等交易所订单号
+ctx.cancel(0, "BTC_USDT", id);                                 // REST
+
+// WS：写出即返回 localId（= 发给交易所的客户端订单号），结论是投给本线程的应答事件
+var lid = ctx.submit(exchange, {op: "order", symbol: "BTC_USDT", side: "buy", price: 30000, amount: 0.001,
+                                postOnly: true});
+if (lid instanceof Error) throw lid;
+var ack = ctx.poll([ctx.STREAM_ORDER_ACK], 5000);              // kind 20：只有本线程收得到
+if (ack && ack.reqId === lid && ack.ok) Log("placed", ack.id, ack.latencyMs);
+var c = ctx.submit(exchange, {op: "cancel", symbol: "BTC_USDT", id: lid});   // id 可以是 localId
+
+// 批量：同序的请求号数组，每一项一条应答
+var ids = ctx.submit(exchange, {op: "order", orders: [
+    {symbol: "BTC_USDT", side: "buy",  price: 29000, amount: 0.001},
+    {symbol: "BTC_USDT", side: "sell", price: 31000, amount: 0.001}]});
 ```
 
-- **同步** `ctx.order(ex, symbol, side, px, qty, opts?)` → 交易所订单号；`ctx.cancel(ex, symbol, id, opts?)`。
-  等一个往返；失败**返回** `Error` 值（不抛）。`opts` 在原有的 `type tif reduceOnly postOnly extra` 之外认
-  `clientId`（原样交给交易所）、`via`（`"rest"` 缺省 / `"ws"`）、`timeout`（等应答的毫秒数）；撤单的 `opts`
-  只有 `via` / `timeout`。未知键报错（不静默丢）：交易所专属参数放 `extra`，条件单走
-  `ctx.rest(ex, "condSubmit", …)`，改单走 `ctx.rest(ex, "amend", …)`。
-- **异步** `ctx.orderAsync(...)` / `ctx.cancelAsync(...)`：参数相同，**立即**返回请求号（number），结果是投给
-  **调用线程**的一条 kind=20 应答事件（内建流 `ctx.STREAM_ORDER_ACK`；`ctx.poll([])` 也取得到，别的线程取不到）。
-  参数错、连接器不支持 `via:"ws"`、在途请求超过 256 时当场回 `Error`，不会有应答。异步与传输无关：缺省同样走 REST。
-  并发的请求互不排队（宿主派发池 8 条线程，`ORDER_WORKERS` 可调），应答按完成顺序到达——要"先下后撤"
-  就等下单的应答。限频照旧：REST 令牌桶、`IO("rate")` 规则在派发线程上生效，不卡调用线程。
-- **`via: "ws"`**（交易所的 WebSocket 交易 API；目前币安、OKX、Bybit、Gate、Bitget 的现货与合约（Gate 合约限永续、Bybit 模拟盘不支持），以各交易所文档为准）：连接器
-  没有 WS 下单通道时回 unsupported 错误，**绝不悄悄改走 REST**。每个账户一条专用交易连接，第一次 WS
-  下单时建立（预热：`exchange.IO("wsTrade", "connect")`）；每张 WS 单都带客户端订单号（不给时连接器按交易所
-  格式与渠道规则生成，在应答的 `clientId` 里）。
-  - 请求**发出之前**交易连接不可用（没连上、没登录）：自动改走 REST，应答的 `via` 是 `"rest"`（同步调用在
-    stdout 记一行）。
-  - 请求**发出之后**没等到应答（超时、连接中途断开、交易所回"执行状态未知"）：连接器只读地按客户端订单号
-    查一次，查到就是成功；查不到则为**状态未知**——异步应答 `status: "unknown"`，同步返回的 Error 以
-    `order state unknown (clientId …)` 开头。订单可能已经在交易所：**不要重发**，按 `clientId` 查单或等私有流
-    回报对账（不能指望交易所拒绝同号重下：币安只拒绝与**仍挂着**的订单同号的新单）。
-  - 超过交易所的下单限额（连接器声明的窗口，或交易所报告的用量已满）当场失败（`reason` 5），不排队、
-    不改走 REST——交易所的订单限额通常 REST 与 WS 共用。
+- **REST** `ctx.order(ex, symbol, side, px, qty, opts?)` → 交易所订单号；`ctx.cancel(ex, symbol, id)`。等一个
+  REST 往返；失败**返回** `Error` 值（不抛）。`opts` 只认 `type tif reduceOnly postOnly extra`，未知键报错（不静默
+  丢）：交易所专属参数放 `extra`，条件单走 `ctx.rest(ex, "condSubmit", …)`，改单走 `ctx.rest(ex, "amend", …)`。
+  `ctx.cancel` 的 `id` 也可以是本进程 `ctx.submit` 返回的 localId（按客户端订单号撤，连接器的 REST 撤单不支持时
+  如实报错）；其余输入与此前完全相同。
+- **WS** `ctx.submit(ex, req)`：**恰好两个参数**——账户（下标或交易所对象）和一个普通对象，经交易所的
+  WebSocket 交易连接发请求。`req.op` 选操作：
+  - `"order"`：`symbol side price amount`，外加 `ctx.order` 认的 `type tif postOnly reduceOnly extra`
+    （市价单可省 `price`）；
+  - `"cancel"`：`symbol id`，`id` 是交易所订单号或本进程 `ctx.submit` 返回的 localId；
+  - 批量：`{op, orders: [项, …]}`（项的字段同单笔，不再写 `op`）。整批先校验：未知 `op`、未知键、类型不对、超过该
+    交易所的批量上限，任何一项不合法整批回 `Error`，**什么都不发**。交易所有原生批量接口时一帧发出，没有时同一条
+    连接上逐项流水线发出（不是原子的）；原生批量同样可能部分成功，每项的结论各自一条应答。
+  - **只走 WS**：连接器没有 WS 下单（或不支持这个账户形态，如 Bybit 模拟盘）当场回 `Error`，不改走 REST。交易连接
+    还没起来时第一次调用会建连（至多等连接器的建连超时，约 5 秒），起不来回 `Error`，不会无限排队；预热用
+    `exchange.IO("wsTrade", "connect")`。
+  - **写出即返回请求号**（不等交易所回答）：单笔是字符串、批量是同序的数组。下单的请求号**就是**发给交易所的
+    客户端订单号（localId），只由我们生成（连接器按交易所的字符集、长度与渠道前缀规则生成，经 `IO("extend")` 的
+    `ws:order` 规则；策略不能自带——`clientId` 键与 `extra` 里的客户端订单号字段都报错），时间 + 随机，跨重启不
+    重复；它也出现在之后的订单回报、成交回报的 `clientId` 里。撤单的请求号是一个新号（`c-…`）。
+  - 在途请求（发出、还没出结论）至多 256 个，超了当场回 `Error`；本地限频（连接器声明的下单窗口、交易所报告的
+    用量）也是当场 `Error`，不排队。策略自设的 `IO("rate")` 规则按 REST 下单/撤单同名计。
+  - 已发出却没等到结论（超时、连接中途断开、交易所回"执行状态未知"）：**绝不重发**；连接器只读地按客户端订单号
+    查一次，查到就是 `ok`，查不到应答 `status: "unknown"` + `clientId`，按它查单或等私有流回报对账。
 
-应答事件（kind=20，`type: "ack"`，`channel: "ack"`）：
+应答事件（kind=20，`type: "ack"`，`channel: "ack"`，内建流 `ctx.STREAM_ORDER_ACK`）——每一项一条，**只投给调用
+`ctx.submit` 的那个线程**（不用订阅；`ctx.poll([])` 也取得到，别的线程取不到）。线程的应答队列有界（1024 条，满了
+丢最旧，计数在 `ctx.connectors()[i].acksDropped`）：从不取应答的策略内存不会增长；线程结束后才到的应答丢弃。
+应答不进 journal。
+
+```json
+{"kind":20,"type":"ack","channel":"ack","stream":4,"ex":0,"symbol":"BTC_USDT","seq":812,"ts":1761380000123.456,
+ "reqId":"x-BFQC3WFT_6F1A2B3C4D5E6F70","op":"order","status":"ok","ok":true,"id":"4398712394",
+ "clientId":"x-BFQC3WFT_6F1A2B3C4D5E6F70","error":"","reason":0,"reasonText":"",
+ "exchTime":1761380000120,"latencyMs":3.912,"time":1761380000120}
+```
 
 | 字段 | 类型 | 说明 |
 |---|---|---|
-| `reqId` | number | `orderAsync` / `cancelAsync` 返回的请求号 |
-| `op` | string | `"place"` / `"cancel"` |
-| `status` / `ok` | string / boolean | `"ok"` / `"failed"` / `"unknown"`（见上）；`ok` = `status === "ok"` |
-| `via` | string | 实际使用的传输：`"ws"` / `"rest"` |
+| `reqId` | string | `ctx.submit` 返回的请求号（下单 = localId，撤单 = 新号） |
+| `op` | string | `"order"` / `"cancel"` |
+| `status` / `ok` | string / boolean | `"ok"`（拿到订单号 / 撤单确认，含按客户端订单号查实的）/ `"failed"`（交易所拒绝、限频拒单、撤单时订单已先一步终态）/ `"unknown"`（见上）；`ok` = `status === "ok"` |
 | `id` | string | 交易所订单号（下单成功 / 撤单的目标单；下单失败为 `""`） |
-| `clientId` | string | 客户端订单号（WS 下单一定有；REST 只有 `opts.clientId` 给了才有） |
-| `symbol` / `ex` | | 请求里的 symbol 与账户下标 |
-| `error` | string | 失败原因（成功为 `""`；最长 119 字节，完整原因走同步调用） |
-| `reason` / `reasonText` | number / string | 统一原因码（1 请求错误、2 凭据、3 传输/未知、4 交易所拒绝、5 限频）与说明 |
-| `exchTime` | number \| null | 交易所应答时间（毫秒）；REST 应答没有为 `null` |
-| `latencyMs` | number | 往返耗时：调用 `orderAsync`/`cancelAsync` → 拿到结果 |
+| `clientId` | string | 目标订单的客户端订单号：下单 = localId；按 localId 撤单时是它，按交易所订单号撤为 `""` |
+| `symbol` / `ex` | | 这一项的 symbol 与账户下标 |
+| `error` | string | 失败原因（与 REST 同款错误串；成功为 `""`；最长 127 字节） |
+| `reason` / `reasonText` | number / string | 统一原因码（3 传输/未知、4 交易所拒绝、5 限频）与说明 |
+| `exchTime` | number \| null | 交易所应答时间（毫秒）；交易所没给为 `null` |
+| `latencyMs` | number | 往返耗时：请求写出前一刻 → 宿主拿到交易所的结论 |
 | `time` | number | 交易所应答时间，没有时同 `ts` |
 
-撤单"订单已先一步成交/终态"（REST 的 `canceled:false`）在同步调用里是带原因的 Error、在应答里是
-`status: "failed"`。回测：回测引擎在服务端下发的代码包里，不在本仓库；`via` 只对实盘的连接器有意义，
-应答事件不进 journal。
+Rust SDK：`ctx::order(ex, symbol, side, px, qty, opts_json)`、`ctx::cancel(ex, symbol, id)`；
+`ctx::submit(ex, req_json) -> Result<String, String>`（单笔）、`ctx::submit_batch(ex, req_json) -> Result<Vec<String>, String>`
+（`{op, orders}`）；应答用 `ev.order_ack() -> Option<OrderAckView>`（`req_id` `op` `status` `ok` `id` `client_id` `symbol`
+`error` `reason` `reason_text` `exch_time: Option<i64>` `latency_ms` `time`），流 id `ctx::STREAM_ORDER_ACK`：
 
-Rust SDK：`ctx::order(ex, symbol, side, px, qty, opts_json)`（`opts_json` 同 JS 的 opts，如 `r#"{"via":"ws"}"#`）、
-`ctx::cancel_with(ex, symbol, id, opts_json)`、`ctx::order_async(...) -> Result<u64, String>`、
-`ctx::cancel_async(...) -> Result<u64, String>`；应答用 `ev.order_ack() -> Option<OrderAckView>`（`req_id` `op`
-`status` `ok` `via` `id` `client_id` `symbol` `error` `reason` `reason_text` `exch_time: Option<i64>` `latency_ms`
-`time`），流 id `ctx::STREAM_ORDER_ACK`。Python：`ctx.order` / `ctx.cancel` / `ctx.orderAsync` / `ctx.cancelAsync`
-同名同参（`opts` 是 dict），应答 dict 字段同 JS。
+```rust
+let lid = ctx::submit(0, r#"{"op":"order","symbol":"BTC_USDT","side":"buy","price":30000,"amount":0.001}"#)?;
+if let Polled::Event(ev) = ctx::poll(&[ctx::STREAM_ORDER_ACK], Some(5000)) {
+    if let Some(a) = ev.order_ack() { Log!("ack", a.req_id == lid, a.status, a.id, a.latency_ms); }
+}
+```
+
+Python：`ctx.order` / `ctx.cancel` / `ctx.submit(ex, req)` 同名同参（`req` 是 dict，返回 str / list，失败回
+`CtxError`），应答 dict 字段同 JS：
+
+```python
+lid = ctx.submit(exchange, {"op": "order", "symbol": "BTC_USDT", "side": "buy", "price": 30000, "amount": 0.001})
+ack = ctx.poll([ctx.STREAM_ORDER_ACK], 5000)
+```
 
 ## 网关状态（kind=33，type: "status"，channel: "gateway"，内建 STREAM_STATUS）
 

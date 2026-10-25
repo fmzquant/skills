@@ -15,7 +15,7 @@
 declare type SubChannel = "ticker" | "bbo" | "tickers" | "trade" | "depth" | "kline" | "private";
 
 /** 事件所属订阅的频道；私有流的事件说明自己是哪一种（orders/fills/positions/balance，同属一路 "private"
- * 订阅），私有流快照状态为 "private"；网关状态为 "gateway"，定时器为 "timer"，异步下单应答为 "ack"。 */
+ * 订阅），私有流快照状态为 "private"；网关状态为 "gateway"，定时器为 "timer"，ctx.submit 的应答为 "ack"。 */
 declare type EventChannel =
     | "ticker" | "bbo" | "tickers" | "depth" | "trade" | "kline"
     | "orders" | "fills" | "positions" | "balance" | "private"
@@ -23,11 +23,11 @@ declare type EventChannel =
 
 /** 所有事件的公共字段。 */
 declare interface IEventBase {
-    /** 1=ticker/bbo/tickers 3=depth 4=trade 5=kline 16=订单回报 17=持仓 18=余额 19=成交回报 20=异步下单应答 32=定时器 33=网关状态 35=初始化状态 */
+    /** 1=ticker/bbo/tickers 3=depth 4=trade 5=kline 16=订单回报 17=持仓 18=余额 19=成交回报 20=ctx.submit 应答 32=定时器 33=网关状态 35=初始化状态 */
     kind: number;
     /** 投递这条事件的流：订阅流 = ISubscription.id（本线程自己的订阅）；内建流 STREAM_TIMER/STREAM_STATUS/STREAM_ORDER_ACK。 */
     stream: StreamId;
-    /** data = 行情/私有流（订单、成交、持仓、余额），status = 网关状态/初始化状态，timer = 定时器，ack = 异步下单应答。 */
+    /** data = 行情/私有流（订单、成交、持仓、余额），status = 网关状态/初始化状态，timer = 定时器，ack = ctx.submit 的应答。 */
     type: "data" | "status" | "timer" | "ack";
     /** 所属订阅的频道。 */
     channel: EventChannel;
@@ -191,6 +191,8 @@ declare interface IOrderEvent extends IEventBase {
     channel: "orders";
     /** 订单号（与 ctx.order 的返回值同域；空串 = 连接器没给号）。 */
     id: string;
+    /** 客户端订单号（交易所推送里的原值；ctx.submit 下的单就是它返回的 localId）；"" = 推送没给。 */
+    clientId: string;
     state: "acked" | "partial" | "filled" | "canceled" | "rejected";
     px: number;
     qty: number;
@@ -210,6 +212,8 @@ declare interface IFillEvent extends IEventBase {
     channel: "fills";
     /** 所属订单的订单号（与 IOrderEvent.id、ctx.order 的返回值同域）。 */
     orderId: string;
+    /** 所属订单的客户端订单号（同 IOrderEvent.clientId）；"" = 推送没给。 */
+    clientId: string;
     /** 交易所成交号，恒为字符串（交易所不给号时为 "syn:" 合成号；空串 = 连接器没给号）。 */
     tradeId: string;
     /** 这一笔的成交价 / 成交量（量纲同该订单的 qty/filledQty）。 */
@@ -269,33 +273,31 @@ declare interface ITimerEvent extends IEventBase {
     scheduledNs: number | string;
 }
 
-/** 异步下单/撤单应答（kind=20，type "ack"，channel "ack"，stream = STREAM_ORDER_ACK）：ctx.orderAsync /
- * ctx.cancelAsync 的结果，**只投给发起请求的线程**（不必订阅）。`symbol`/`ex` 是请求里的。 */
+/** ctx.submit 的应答（kind=20，type "ack"，channel "ack"，stream = STREAM_ORDER_ACK）：每一项一条，**只投给调用
+ * ctx.submit 的线程**（不必订阅）。`symbol`/`ex` 是这一项的。 */
 declare interface IOrderAckEvent extends IEventBase {
     kind: 20;
     type: "ack";
     channel: "ack";
-    /** orderAsync / cancelAsync 返回的请求号。 */
-    reqId: number;
-    op: "place" | "cancel";
-    /** ok = 拿到订单号 / 撤单确认；failed = 拒单、限频、参数或调用失败；unknown = WS 请求已发出却没等到应答
-     * （订单可能已在交易所：**不要重发**，按 clientId 查单或等私有流回报对账）。 */
+    /** ctx.submit 返回的请求号：下单就是这张单的客户端订单号（localId），撤单是一个新号。 */
+    reqId: string;
+    op: "order" | "cancel";
+    /** ok = 拿到订单号 / 撤单确认；failed = 交易所拒绝、限频拒单、撤单时订单已先一步终态；unknown = 请求已发出却没等到
+     * 结论（订单可能已在交易所：**不要重发**，按 clientId 查单或等私有流回报对账）。 */
     status: "ok" | "failed" | "unknown";
     ok: boolean;
-    /** 实际使用的传输：WS 在发送前不可用（没连上/没登录）时自动改走 REST，这里就是 "rest"。 */
-    via: "ws" | "rest";
     /** 交易所订单号（下单成功 / 撤单的目标单；下单失败为空串）。 */
     id: string;
-    /** 客户端订单号（WS 下单一定有；REST 只有 opts.clientId 给了才有）。 */
+    /** 目标订单的客户端订单号：下单 = localId；按 localId 撤单时是它，按交易所订单号撤为空串。 */
     clientId: string;
-    /** 失败原因（成功为空串；最长 119 字节，完整原因用同步 ctx.order/ctx.cancel）。 */
+    /** 失败原因（与 REST 同款错误串；成功为空串；最长 127 字节）。 */
     error: string;
-    /** ABI 统一原因码（0=无 1=请求错误 2=凭据 3=传输/未知 4=交易所拒绝 5=限频）与说明。 */
+    /** ABI 统一原因码（0=无 3=传输/未知 4=交易所拒绝 5=限频）与说明。 */
     reason: number;
     reasonText: string;
-    /** 交易所应答时间（毫秒）；交易所没给（REST 应答）为 null。 */
+    /** 交易所应答时间（毫秒）；交易所没给为 null。 */
     exchTime: number | null;
-    /** 往返耗时（毫秒）：调用 orderAsync/cancelAsync → 拿到结果。 */
+    /** 往返耗时（毫秒）：请求写出前一刻 → 宿主拿到交易所的结论。 */
     latencyMs: number;
     /** 交易所应答时间，没有时同 ts。 */
     time: number;
@@ -388,6 +390,8 @@ declare interface IConnectorInfo {
     /** 推送面来源环的计数（只读诊断，进程启动以来累计）：环满丢掉的 tick、回给连接器的背压次数、
      * 环当前容量（条，按积压从 1024 增长到 32768）。涨得快 = 消费跟不上这个连接器的推送。 */
     feed: { ticksDropped: number; backpressure: number; ringCapacity: number };
+    /** ctx.submit 的应答因发起线程的应答队列（1024 条）满了被丢掉的累计条数（策略从不取应答时增长）。 */
+    acksDropped: number;
 }
 
 /** sub.book() / ev.book() 返回的组装簿：[价, 量] 数组，bids 降序、asks 升序。 */
@@ -396,7 +400,7 @@ declare interface IBook {
     asks: [number, number][];
 }
 
-/** 下单可选项（ctx.order / ctx.orderAsync 的第六参）。**白名单**：只认下面这些键，其他键一律报
+/** 下单可选项（ctx.order 的第六参；ctx.submit 的下单项也认这些键）。**白名单**：只认下面这些键，其他键一律报
  * `unknown order opt` 错误（不静默丢掉）。交易所专属参数放 `extra`；条件单走
  * `ctx.rest(ex, "condSubmit", {symbol, side, qty, cond, replaceId?, …})`；改挂着的单走
  * `ctx.rest(ex, "amend", {id, px?, qty?})`。 */
@@ -409,25 +413,32 @@ declare interface IOrderOpts {
     reduceOnly?: boolean;
     /** 只做 maker，缺省 false。 */
     postOnly?: boolean;
-    /** 交易所专属参数（逃生口，连接器原样透传给交易所）。 */
+    /** 交易所专属参数（逃生口，连接器原样透传给交易所）。ctx.submit 里不能用它带客户端订单号。 */
     extra?: any;
-    /** 客户端订单号（原样交给交易所；最长 64 字节）。WS 下单不给时由连接器按交易所格式生成。 */
-    clientId?: string;
-    /** 传输：缺省 "rest"；"ws" = 交易所的 WebSocket 交易 API（连接器支持才行，否则返回 unsupported 错误，
-     * 绝不悄悄改走 REST）。WS 在发送前不可用时改走 REST（异步应答的 via 是 "rest"）；已发出却没等到应答时
-     * 返回 `order state unknown (clientId …)` 错误——不要重发，按客户端订单号对账。 */
-    via?: "rest" | "ws";
-    /** 等应答的毫秒数（0/省略 = 连接器缺省）。 */
-    timeout?: number;
 }
 
-/** 撤单可选项（ctx.cancel / ctx.cancelAsync 的第四参）。 */
-declare interface ICancelOpts {
-    /** 传输，同 IOrderOpts.via。 */
-    via?: "rest" | "ws";
-    /** 等应答的毫秒数（0/省略 = 连接器缺省）。 */
-    timeout?: number;
+/** ctx.submit 的一张下单（`op: "order"` 的单笔字段，或 `orders` 数组的一项）。客户端订单号由我们生成，不能自带。 */
+declare interface ISubmitOrderItem extends IOrderOpts {
+    /** 统一符号 BASE_QUOTE[.contract]。 */
+    symbol: string;
+    side: "buy" | "sell";
+    /** 限价；市价单（type: "market"）可省。 */
+    price?: number;
+    /** 数量（> 0，量纲同 ctx.order 的 qty）。 */
+    amount: number;
 }
+
+/** ctx.submit 的一次撤单（`op: "cancel"` 的单笔字段，或 `orders` 数组的一项）。 */
+declare interface ISubmitCancelItem {
+    symbol: string;
+    /** 交易所订单号，或本进程 ctx.submit 返回的 localId（按客户端订单号撤）。 */
+    id: string;
+}
+
+declare type ISubmitOrder = { op: "order" } & ISubmitOrderItem;
+declare type ISubmitOrderBatch = { op: "order"; orders: ISubmitOrderItem[] };
+declare type ISubmitCancel = { op: "cancel" } & ISubmitCancelItem;
+declare type ISubmitCancelBatch = { op: "cancel"; orders: ISubmitCancelItem[] };
 
 /** 交易所对象（exchange、exchanges[i]，即 lib.d.ts 的 IExchange）：ctx.* 第一参取它的 GetIndex()。 */
 declare interface IExchangeLike {
@@ -478,7 +489,7 @@ declare interface ICtx {
     readonly STREAM_TIMER: 1;
     /** 内建网关状态事件流 id（kind=33）。 */
     readonly STREAM_STATUS: 2;
-    /** 内建异步下单应答流 id（kind=20，只投给发起请求的线程）。 */
+    /** 内建 ctx.submit 应答流 id（kind=20，只投给发起请求的线程）。 */
     readonly STREAM_ORDER_ACK: 4;
     /** 订阅一个行情或账户私有流，立即返回订阅对象（可交给 ctx.poll 过滤）。**只有两参形式**：
      * symbol 写在 opts 里；第二参不是对象/参数个数不对/未知键/未知频道/行情频道缺 symbol 都抛异常。
@@ -515,10 +526,8 @@ declare interface ICtx {
     //      （order/cancel 这种没有对象返回值的，走第 1 层）。
     // 调用方应先判 `instanceof Error`，再判普通对象上的 `error` 字段。
 
-    /** 下单：**同步**等一个往返（缺省 REST；`opts.via: "ws"` 走交易所的 WS 交易 API），返回交易所订单号
-     * （回报经私有流 private 回到 ctx.poll）。未订阅也可下单；主线程与 threading worker 都可调。失败回
-     * `Error` 值，绝不返回假号——用前先 `instanceof Error`。WS 请求已发出却没等到应答时 Error 的 message 以
-     * `order state unknown (clientId …)` 开头。 */
+    /** 下单（REST）：**同步**等一个往返，返回交易所订单号（回报经私有流 private 回到 ctx.poll）。未订阅也可下单；
+     * 主线程与 threading worker 都可调。失败回 `Error` 值，绝不返回假号——用前先 `instanceof Error`。 */
     order(
         ex: ExRef,
         symbol: string,
@@ -527,21 +536,20 @@ declare interface ICtx {
         qty: number,
         opts?: IOrderOpts
     ): string | Error;
-    /** 撤单：id 传 order() 的返回值。失败回 `Error` 值。 */
-    cancel(ex: ExRef, symbol: string, id: string, opts?: ICancelOpts): void | Error;
-    /** 异步下单：参数同 order，**立即**返回请求号（number）；结果是投给**本线程**的 kind=20 应答事件
-     * （IOrderAckEvent，`ctx.poll([ctx.STREAM_ORDER_ACK], …)` 或 `ctx.poll([])` 取）。参数错、连接器不支持
-     * via "ws"、在途请求太多（256）时当场回 `Error` 值（不会有应答）。并发的请求互不排队，应答按完成顺序到达。 */
-    orderAsync(
-        ex: ExRef,
-        symbol: string,
-        side: "buy" | "sell",
-        px: number,
-        qty: number,
-        opts?: IOrderOpts
-    ): number | Error;
-    /** 异步撤单：参数同 cancel，立即返回请求号；结果同 orderAsync 以应答事件到达。 */
-    cancelAsync(ex: ExRef, symbol: string, id: string, opts?: ICancelOpts): number | Error;
+    /** 撤单（REST）：id 传 order() 的返回值，或本进程 ctx.submit 返回的 localId。失败回 `Error` 值。 */
+    cancel(ex: ExRef, symbol: string, id: string): void | Error;
+    /** 经交易所的 WebSocket 交易连接下单（**只走 WS**，连接器不支持时回 Error，不改走 REST）。**写出即返回**
+     * 请求号，就是发给交易所的客户端订单号（localId，由连接器生成；之后的订单/成交回报 `clientId` 也是它）；结论是投给
+     * **本线程**的 kind=20 应答事件（IOrderAckEvent，`ctx.poll([ctx.STREAM_ORDER_ACK], …)`）。参数错、交易连接起不来
+     * （首次至多等约 5 秒）、在途请求太多（256）、本地限频时当场回 `Error`，什么都没发出去。 */
+    submit(ex: ExRef, req: ISubmitOrder): string | Error;
+    /** 批量下单：返回与 `orders` 同序的 localId 数组，每一项一条应答。整批先校验，任何一项不合法整批回 Error、什么都
+     * 不发；交易所有原生批量接口时一帧发出，否则同一连接上流水线发出（不是原子的）。 */
+    submit(ex: ExRef, req: ISubmitOrderBatch): string[] | Error;
+    /** 撤单（WS）：返回一个新的请求号（应答的 reqId）。 */
+    submit(ex: ExRef, req: ISubmitCancel): string | Error;
+    /** 批量撤单：同序的请求号数组。 */
+    submit(ex: ExRef, req: ISubmitCancelBatch): string[] | Error;
 
     // —— REST 查询面（同步、可查未订阅品种、宿主限频）——
     /** 标准方法由 extension-api/abi 的 REST_METHODS 登记，JSON 契约见其 README。
