@@ -2301,7 +2301,7 @@ Every function, structure and constant of the API reference, grouped by its cate
 | ```exchange.IO("base", ...)``` | Queries or switches the base address of the exchange API. |
 | ```exchange.IO(mode, value)``` | Switches the trading mode of an exchange, including demo/live trading, cross/isolated margin, hedge/one-way position mode, unified account, margin trading mode and self-trade prevention. |
 | ```exchange.IO("rate", ...)``` | Limits how often each API function is called: ```rate``` for smoothed limiting, ```quota``` for quota limiting. |
-| ```exchange.IO("extend", ...)``` | Inject parameters (such as the exchange's self-trade prevention mode, ```recvWindow```, or partner identifier) into requests sent by the exchange object without changing how order placement and other functions are called. |
+| ```exchange.IO("extend", ...)``` | Inject parameters into requests sent by an exchange object (such as the exchange's self-trade prevention mode, ```recvWindow```, or partner identifier) without modifying calls to order placement or other functions. |
 
 ##### Network
 
@@ -2331,8 +2331,8 @@ Every function, structure and constant of the API reference, grouped by its cate
 | `ctx.subscribe` | Subscribes to WebSocket push data. |
 | `ctx.poll` | Retrieves the next push event from subscriptions in the current thread, with an optional wait timeout. |
 | `ctx.order` | Places an order through the exchange's REST API and returns after receiving the order ID from the exchange. |
-| `ctx.cancel` | Cancels an order through the exchange's REST API and returns after receiving confirmation from the exchange. |
-| `ctx.submit` | Submit order placement and cancellation requests through the exchange's WebSocket trading API: returns a request ID immediately after sending the request, without waiting for the exchange's response; the result of each request is delivered… |
+| `ctx.cancel` | Cancels an order through the exchange's REST API and returns after the exchange confirms the cancellation. |
+| `ctx.submit` | Places and cancels orders through the exchange's WebSocket trading API: returns a request ID immediately after the request is written, without waiting for the exchange's response; the result of each request is sent as an acknowledgment… |
 
 ##### Threads/Subscription
 

@@ -9507,7 +9507,7 @@ fn main() {
 | ```walletAddress``` | `Hyperliquid`、`Futures_Hyperliquid` |
 | ```withdraw``` | `Futures_Boros` |
 | ```wrap``` | `Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch` |
-| ```wsTrade``` | `Binance`、`Futures_Binance`、`Bitget`、`Futures_Bitget`、`Bybit`、`Futures_Bybit`、`GateIO`、`Futures_GateIO`、`OKEX`、`Futures_OKCoin` |
+| ```wsTrade``` | `Binance`、`Futures_Binance`、`Bitfinex`、`Futures_Bitfinex`、`Bitget`、`Futures_Bitget`、`Bybit`、`Futures_Bybit`、`Crypto`、`Futures_Crypto`、`Futures_Deribit`、`GateIO`、`Futures_GateIO`、`HitBTC`、`Kraken`、`OKEX`、`Futures_OKCoin`、`Poloniex`、`Hyperliquid`、`Futures_Hyperliquid`、`Futures_Lighter` |
 
 See also: `exchange.SetBase`, `exchange.SetCurrency`
 
@@ -10317,16 +10317,16 @@ Forms:
 
 - `exchange.IO("extend", ...)`
 
-向交易所对象发出的请求注入参数（例如交易所的自成交保护模式、```recvWindow```、合作方标识），无需修改下单等函数的调用方式。每条规则使用正则表达式匹配请求的目标字符串：REST请求为HTTP方法加接口路径（例如```POST/api/v3/order```），`ctx.submit`的WebSocket下单请求为```ws:order```、撤单请求为```ws:cancel```。
+向交易所对象发出的请求注入参数（例如交易所的自成交保护模式、```recvWindow```、合作方标识），无需修改下单等函数的调用。每条规则使用正则表达式匹配请求的目标字符串：REST请求为HTTP方法加接口路径（例如```POST/api/v3/order```），`ctx.submit`的WebSocket下单为```ws:order```、撤单为```ws:cancel```。
 
 Parameters:
 
-- `k` (string, required): ```extend```表示默认注入（仅在请求中该参数缺失或为空时填入）；```extend!```表示强制注入（所有规则均按```force```为```true```处理，覆盖请求中已有的值）。
-- `rules` (array / object / string, optional): 规则数组，每条规则为```{match, params, force}```，字段说明见下文；仅有一条规则时可以直接传入该对象，也可以传入规则数组的JSON字符串。传入空字符串可清空全部策略规则；不传入时查询当前策略规则。
+- `k` (string, required): ```extend```为默认注入（仅在请求中该参数缺失或为空时填入）；```extend!```为强制注入（所有规则均按```force```为```true```处理，覆盖请求中已有的值）。
+- `rules` (array / object / string, optional): 规则数组，每条规则为```{match, params, force}```，字段说明见下文；仅有一条规则时可直接传入该对象，也可传入规则数组的JSON字符串。传入空字符串可清空全部规则；未传入时查询当前规则。
 
-Returns (bool / array / 空值): 设置成功时返回```true```；不传入```rules```时返回当前的规则数组，每一项为```{match, params, force, hits}```，```hits```表示该规则的命中次数。规则无效时报错并返回空值，原有规则保持不变。
+Returns (bool / array / 空值): 设置成功时返回```true```；未传入```rules```时返回当前规则数组，每项为```{match, params, force, hits}```，```hits```为该规则的命中次数。规则无效时报错并返回空值，原有规则保持不变。
 
-为币安现货的REST下单请求和WebSocket下单请求注入自成交保护模式，设置后查询规则的命中次数。
+为币安现货的REST下单和WebSocket下单均添加自成交保护模式，设置后查询规则的命中次数。
 
 ```javascript
 function main() {
@@ -10383,7 +10383,7 @@ fn main() {
 }
 ```
 
-为匹配指定路径的GET请求添加```recvWindow```，强制覆盖下单请求中的指定参数，最后清空策略设置的规则（内置规则不受影响）。
+为所有签名的GET请求添加```recvWindow```，强制覆盖下单请求中的一个参数，最后清空策略设置的规则（内置规则不受影响）。
 
 ```javascript
 function main() {
@@ -10418,15 +10418,15 @@ fn main() {
 }
 ```
 
-规则字段说明：
+规则字段：
 
 | 字段 | 类型 | 说明 |
 | - | - | - |
 | match | string / array | 正则表达式，或正则表达式数组（匹配其中任意一个即可），用于匹配请求的目标字符串，必填 |
 | params | object | 待注入的参数```{name: value}```，必填；非字符串值按JSON文本注入 |
-| force | bool | 为```true```时覆盖请求中已有的同名参数；默认为```false```，仅在该参数缺失或为空时填入 |
+| force | bool | ```true```时覆盖请求中已有的同名参数；默认为```false```，仅在该参数缺失或为空时填入 |
 
-旧写法```query```、```body```仍可使用，与```params```作用相同，但仅注入到请求的查询参数（```query```）或请求体（```body```）；每条规则只能指定```params```、```query```、```body```中的一个。旧的对象写法```{"<regex>": {name: value}}```也仍可使用，等同于每个正则表达式对应一条```query```规则，按正则表达式的字典序排列；需要控制应用顺序时使用数组写法。
+旧写法```query```、```body```仍然可用，与```params```作用相同，但仅注入到请求的查询参数（```query```）或请求体（```body```）；一条规则只能指定```params```、```query```、```body```中的一个。旧的对象写法```{"<regex>": {name: value}}```也仍然可用，等同于每个正则表达式对应一条```query```规则，按正则表达式的字典顺序排列；需要控制顺序时使用数组写法。
 
 目标字符串：
 
@@ -10436,17 +10436,17 @@ fn main() {
 | `ctx.submit`下单 | ```ws:order```（批量请求逐单匹配） | ```ws:order``` |
 | `ctx.submit`撤单 | ```ws:cancel``` | ```ws:cancel``` |
 
-请使用带锚点的正则表达式，例如```^POST/api/v3/order$```、```^ws:order$```。不带锚点的正则表达式（例如```order```）会同时匹配REST请求和WebSocket请求。REST路径规则不适用于WebSocket下单，```ws:```规则也不适用于REST请求；需要向两类请求注入同一个参数时，在```match```中指定两个正则表达式。
+请使用带锚点的正则表达式，例如```^POST/api/v3/order$```、```^ws:order$```。不带锚点的正则表达式（例如```order```）会同时匹配REST请求和WebSocket请求。REST的路径规则不适用于WebSocket下单，```ws:```规则也不适用于REST请求；同一参数需要同时注入到这两类请求时，在```match```中指定两个正则表达式。
 
-参数的注入位置由交易所对象决定：构造查询参数的请求注入到查询参数，构造JSON请求体的请求注入到请求体（两者都有时注入到请求体），WebSocket下单请求注入到对应订单的参数中。参数注入在签名之前完成，注入的参数参与签名计算。参数值中可以使用模板：```{{uuid}}```（每次请求时新生成的32位大写十六进制字符串）、```{{uuid:N}}```（取前N位）、```{{ts}}```（毫秒时间戳）。
+参数注入位置由交易所对象决定：构造查询参数的请求注入到查询参数，构造JSON请求体的请求注入到请求体（两者都有时注入到请求体），WebSocket下单注入到该订单的参数中。参数注入在签名前完成，注入的参数参与签名。参数值中可以使用模板：```{{uuid}}```（每次请求新生成的32位大写十六进制字符串）、```{{uuid:N}}```（取前N位）、```{{ts}}```（毫秒时间戳）。
 
-规则按数组顺序依次应用，同一请求可以命中多条规则；同一个参数由多条规则设置时，前面的规则先填入值，后面启用```force```的规则会覆盖该值。
+规则按数组顺序依次应用，一个请求可命中多条规则；同一参数由多条规则设置时，前面的规则先填入，后续启用```force```的规则覆盖该值。
 
-规则分为两层：先应用交易所对象的内置规则（例如交易所的渠道标识、客户端订单号的渠道前缀），再应用策略设置的规则。```exchange.IO("extend", rules)```仅替换策略设置的规则，不会清空内置规则，查询时也仅返回策略设置的规则。内置规则均采用默认注入方式，不会覆盖策略请求中已有的同名参数；如需覆盖内置规则填入的值，请使用启用```force```的规则或```extend!```。
+规则分为两层：先应用交易所对象的内置规则（例如交易所的渠道标识、客户端订单号的渠道前缀），再应用策略设置的规则。```exchange.IO("extend", rules)```仅替换策略设置的规则层，不会清除内置规则，查询时也仅返回策略设置的规则。内置规则均采用默认注入，策略请求中已有的同名参数不会被改写；需要改写内置规则填入的值时，使用启用```force```的规则或```extend!```。
 
-`ctx.submit`下单时使用的客户端订单号（localId）也通过```ws:order```规则生成：规则注入交易所的客户端订单号字段后，注入的值即为localId，必须符合该交易所对客户端订单号的要求。通常无需自行设置，各交易所的内置规则已包含渠道前缀。
+`ctx.submit`下单的客户端订单号（localId）也通过```ws:order```规则生成：规则注入交易所的客户端订单号字段时，注入后的值即为localId，必须符合该交易所对客户端订单号的要求。通常无需设置，带有渠道前缀的交易所已在内置规则中设置该前缀。Hyperliquid、Bitfinex、Lighter的客户端订单号由托管者直接生成，```ws:order```规则无法修改。
 
-规则按交易所对象分别设置，仅在本次运行期间有效。规则在设置时进行校验：JSON格式错误、正则表达式无法编译、缺少```match```或```params```、一条规则同时指定```params```、```query```、```body```中的两个或更多字段、或包含```headers```字段时会报错，原有规则保持不变。可通过查询结果中的```hits```检查规则是否命中：命中次数始终为```0```通常表示正则表达式有误。
+规则按交易所对象分别设置，仅在本次运行期间有效。规则在设置时进行校验：JSON格式错误、正则表达式无法编译、缺少```match```或```params```、一条规则同时指定```params```、```query```、```body```中的两个以上、或包含```headers```字段时均报错，原有规则保持不变。可通过查询结果中的```hits```检查规则是否命中：命中次数始终为```0```通常表示正则表达式有误。
 
 See also: `exchange.IO`, `ctx.submit`, `ctx.order`
 
@@ -13517,17 +13517,17 @@ See also: `ctx.cancel`, `ctx.submit`, `ctx.subscribe`, `ctx.poll`, `exchange.Cre
 ctx.cancel(ex, symbol, id)
 ```
 
-通过交易所的REST接口撤销一个订单，等待交易所确认后返回。订单可通过交易所订单号指定，也可通过本次运行中`ctx.submit`返回的localId（客户端订单号）指定。主线程和```threading.Thread()```创建的线程均可调用。通过WebSocket撤单且不等待结果时使用`ctx.submit`的```cancel```请求。
+通过交易所的REST接口撤销一个订单，等待交易所确认后返回。可通过交易所订单号指定订单，也可通过本次运行中`ctx.submit`返回的localId（客户端订单号）指定。主线程和```threading.Thread()```创建的线程均可调用。如需通过WebSocket撤单且不等待结果，请使用`ctx.submit`的```cancel```请求。
 
 Parameters:
 
-- `ex` (object / number, required): 订单所属账户：交易所对象，或账户在```exchanges```数组中的索引，与`ctx.order`相同。
+- `ex` (object / number, required): 订单所属账户：交易所对象，或账户在```exchanges```数组中的下标，与`ctx.order`相同。
 - `symbol` (string, required): 订单的交易品种代码，例如```BTC_USDT```、```BTC_USDT.swap```。
-- `id` (string, required): 待撤销订单的标识：交易所订单号（`ctx.order`的返回值、订单回报中的```id```），或本次运行中`ctx.submit`下单返回的localId。
+- `id` (string, required): 待撤销订单的标识：交易所订单号（`ctx.order`的返回值、订单回报中的```id```），或本次运行中通过`ctx.submit`下单时返回的localId。
 
-Returns (undefined / object): 撤单成功时无返回值；失败时不抛出异常，返回```Error```对象，```message```为失败原因。
+Returns (undefined / object): 撤单成功时无返回值；失败时不抛出异常，返回```Error```对象，```message```表示失败原因。
 
-撤销一个订单，无法撤销（例如已成交）时输出失败原因。
+撤销一个订单，撤单失败（例如订单已成交）时输出失败原因。
 
 ```javascript
 function main() {
@@ -13655,13 +13655,13 @@ fn main() {
 }
 ```
 
-订单已成交或已处于其他终态而无法撤销时同样视为撤单失败，返回包含失败原因的```Error```对象。网络故障、鉴权失败、交易所未明确确认撤单时同样返回错误。
+订单已成交或已进入其他终态、无法撤销时同样视为失败，返回包含失败原因的```Error```对象。网络错误、鉴权失败、交易所未明确确认撤单时同样返回错误。
 
-```id```为本次运行中```ctx.submit()```返回的localId时，按客户端订单号撤单。适用于尚未收到WebSocket下单应答、订单状态未知，或交易连接断开的情况：无需等待交易所订单号，可直接使用localId撤单。交易所的REST接口不支持按客户端订单号撤单时返回错误。托管者仅记录本次运行中发出的localId，重启后请使用交易所订单号撤单。
+```id```为本次运行中```ctx.submit()```返回的localId时，按客户端订单号撤单。适用于WebSocket下单应答尚未收到、订单状态未知，或交易连接断开的情况：无需等待交易所订单号，可直接使用localId撤单。交易所的REST接口不支持按客户端订单号撤单时返回错误，此时可使用```ctx.submit()```按localId撤单。Deribit按```label```撤单。Kraken、Crypto.com合约先通过只读查询获取订单号再撤单；Bitfinex按客户端订单号及由其推导的UTC日期撤单，下单时间恰好位于UTC零点附近时可能报告订单不存在，此时请改用订单号。托管者仅记录本次运行产生的localId，重新启动后请使用交易所订单号撤单。
 
-仅通过REST接口撤单，调用会阻塞当前线程直到收到交易所应答。
+仅通过REST接口发送请求，调用会阻塞当前线程直到收到交易所应答。
 
-```Python```中为```ctx.cancel(ex, symbol, id)```，成功时返回```None```，失败时返回```CtxError```对象（不抛出异常）。```Rust```中为```ctx::cancel(ex, symbol: &str, id: &str) -> Result<(), String>```。
+```Python```中的调用形式为```ctx.cancel(ex, symbol, id)```，成功时返回```None```，失败时返回```CtxError```对象（不抛出异常）。```Rust```中的函数签名为```ctx::cancel(ex, symbol: &str, id: &str) -> Result<(), String>```。
 
 See also: `ctx.order`, `ctx.submit`, `exchange.CancelOrder`
 
@@ -13671,16 +13671,16 @@ See also: `ctx.order`, `ctx.submit`, `exchange.CancelOrder`
 ctx.submit(ex, req)
 ```
 
-通过交易所的WebSocket交易接口提交下单、撤单请求：请求发送后立即返回请求号，不等待交易所应答；每笔请求的结果通过一条应答事件（```kind```为```20```）发送给发起调用的线程，通过`ctx.poll`获取。支持单笔提交，也支持通过```orders```数组批量提交。仅使用WebSocket：交易所不支持时返回错误，不会改用REST接口；需要等待交易所返回订单号的REST下单操作见`ctx.order`。
+通过交易所的WebSocket交易接口下单、撤单：请求写出后立即返回请求号，不等待交易所应答；每笔请求的结果以一条应答事件（```kind```为```20```）发送至调用该函数的线程，通过`ctx.poll`获取。可以一次发送单笔请求，也可以通过```orders```数组一次发送多笔请求。仅使用WebSocket：交易所不支持时返回错误，不会改用REST接口；需要等待交易所返回订单号的REST下单方式见`ctx.order`。
 
 Parameters:
 
-- `ex` (object / number, required): 用于下单的账户：交易所对象（```exchange```、```exchanges[1]```等），或账户在```exchanges```数组中的下标（也支持数字字符串```"0"```），同`ctx.order`。
-- `req` (object, required): 请求对象：```op```指定操作类型（```order```下单，```cancel```撤单），其余字段指定该笔请求的具体内容；批量提交时将各笔请求放入```orders```数组。字段说明见下文。
+- `ex` (object / number, required): 交易账户：交易所对象（```exchange```、```exchanges[1]```等），或账户在```exchanges```数组中的索引（也可以传入数字字符串```"0"```），与`ctx.order`相同。
+- `req` (object, required): 请求对象：```op```指定操作类型（```order```下单，```cancel```撤单），其余字段指定该笔请求的参数；批量请求时将各笔请求放入```orders```数组。字段说明见下文。
 
-Returns (string / array / object): 单笔请求返回请求号（字符串），批量请求返回与```orders```顺序一致的请求号数组。下单请求的请求号即发送给交易所的客户端订单号（下文称localId），后续该订单的订单回报、成交回报中的```clientId```也使用该编号；撤单请求的请求号为新生成的编号。请求未发出时（参数错误、交易所不支持、交易连接无法建立、在途请求过多、触发本地限频）不抛出异常，返回```Error```对象，此时不会产生应答事件。
+Returns (string / array / object): 单笔请求返回请求号（字符串），批量请求返回与```orders```顺序一致的请求号数组。下单请求号即发送给交易所的客户端订单号（下文称localId），后续该订单的订单回报、成交回报中的```clientId```也使用此值；撤单请求号是新生成的编号。请求未发出时（参数错误、交易所不支持、交易连接无法建立、在途请求过多、触发本地频率限制）不抛出异常，返回```Error```对象，此时不会产生应答事件。
 
-通过WebSocket提交一笔仅以maker身份成交的限价买单，收到成功应答后根据localId撤单；订单状态未知时不重新提交。
+通过WebSocket提交一笔仅作为maker成交的限价买单，收到下单成功应答后按localId撤单；订单状态未知时不重发。
 
 ```javascript
 function waitAck(reqId) {
@@ -13831,7 +13831,7 @@ fn main() {
 }
 ```
 
-批量提交三个价格档位的限价买单，按请求编号收集每笔订单的应答，再批量撤销已成功挂出的订单。
+批量提交三个价格档位的限价买单，按请求号收集各笔订单的应答，再批量撤销已成功挂出的订单。
 
 ```javascript
 function collectAcks(reqIds) {
@@ -14015,7 +14015,7 @@ fn main() {
 }
 ```
 
-订阅私有流后通过WebSocket提交一笔IOC买单，在同一循环中处理应答，并根据```clientId```（即localId）查找该订单的成交回报和订单回报。
+订阅私有数据流后通过WebSocket提交一笔IOC买单，在同一个循环中处理应答，并根据```clientId```（即localId）匹配该订单的成交回报和订单回报。
 
 ```javascript
 function main() {
@@ -14147,60 +14147,68 @@ fn main() {
 | op | ```order```下单，```cancel```撤单，必填 |
 | symbol | 品种代码，例如```BTC_USDT```、```BTC_USDT.swap```，必填 |
 | side | 下单方向：```buy```买入，```sell```卖出 |
-| price | 委托价格；市价单可省略 |
-| amount | 委托数量，必须大于```0```，计量口径与`ctx.order`的```qty```相同 |
+| price | 委托价格；市价单可不传入 |
+| amount | 委托数量，必须大于```0```，数量口径与`ctx.order`的```qty```相同 |
 | type、tif、reduceOnly、postOnly、extra | 下单选项，与`ctx.order`的```options```相同 |
 | id | 撤单的目标订单标识：交易所订单号，或本次运行中```ctx.submit()```返回的localId |
-| orders | 批量请求数组，每一项包含一笔请求的字段（不包含```op```），所有请求的操作类型均与外层的```op```相同 |
+| orders | 批量请求数组，每一项包含一笔请求的字段（不填写```op```），所有请求的操作类型均与外层的```op```相同 |
 
 下单需要```symbol```、```side```、```amount```（限价单还需要```price```），撤单需要```symbol```、```id```。仅接受上表中的字段：存在未知字段、字段类型不正确时不发送请求，返回错误。客户端订单号只能由托管者生成：传入```clientId```字段，或在```extra```中包含交易所的客户端订单号字段（例如币安的```newClientOrderId```、OKX的```clOrdId```）均返回错误。
 
-调用过程：
+调用流程：
 
 - 先校验整批请求：任意一笔请求不合法（包括请求数量超过该交易所的单批上限）时整批返回```Error```对象，不发送任何请求。
-- 每个账户使用一条独立的交易连接，与行情、私有流的推送连接相互独立。首次调用时建立连接，最多等待约5秒，连接失败时返回错误，不会无限排队；可提前调用```exchange.IO("wsTrade", "connect")```建立连接，调用```exchange.IO("wsTrade", "status")```查看连接状态。
-- 请求写出后立即返回请求号，不等待交易所应答。同时在途（已发出、尚未收到结果）的请求最多256个，超出时返回错误。
-- 交易所的下单数量限额通常与REST接口共用：本地估算将超出限额、或交易所报告的用量已达上限时直接返回限频错误，不排队等待。`限流规则`同样适用于```ctx.submit()```，下单按```CreateOrder```、撤单按```CancelOrder```计数。
-- 交易所提供原生批量接口时，一批请求在同一帧中发出；未提供时在同一条连接上逐笔连续发出。两种方式均非原子操作，可能部分成功，每笔请求各对应一条应答事件。
+- 每个账户使用一条独立的交易连接，与行情、私有流的推送连接相互独立。首次调用时建立连接，最多等待约5秒，连接失败时返回错误，不会无限排队；可以提前调用```exchange.IO("wsTrade", "connect")```建立连接，调用```exchange.IO("wsTrade", "status")```查看连接状态。
+- 请求写出后立即返回请求号，不等待交易所应答。同时在途（已发出、尚未收到结果）的请求最多256个，超过上限时返回错误。
+- 交易所的下单数量限额通常与REST接口共用：本地估算超限、或交易所报告的用量已达上限时直接返回限频错误，不排队等待。`限流规则`同样适用于```ctx.submit()```，下单按```CreateOrder```、撤单按```CancelOrder```计数。
+- 交易所提供原生批量接口时，一批请求在一帧中发出；未提供时在同一条连接上逐笔连续发出。两种情况均不保证原子性，可能部分成功，每笔请求分别对应一条应答事件。
 
-应答事件（```kind```为```20```，```type```、```channel```均为```ack```）通过内置事件流```ctx.STREAM_ORDER_ACK```（值为```4```）投递，每笔请求对应一条，仅投递给调用```ctx.submit()```的线程，无需订阅：```ctx.poll([ctx.STREAM_ORDER_ACK], timeout)```仅获取应答事件，```ctx.poll([], timeout)```同时获取应答事件与已订阅的事件，其他线程无法获取这些应答事件。除公共字段外还包含以下字段：
+应答事件（```kind```为```20```，```type```、```channel```均为```ack```）通过内置事件流```ctx.STREAM_ORDER_ACK```（值为```4```）投递，每笔请求对应一条，仅投递给调用```ctx.submit()```的线程，无需订阅：```ctx.poll([ctx.STREAM_ORDER_ACK], timeout)```仅获取应答事件，```ctx.poll([], timeout)```同时获取应答事件与已订阅的事件，其他线程无法获取。除公共字段外还包含以下字段：
 
 | 字段 | 类型 | 说明 |
 | - | - | - |
-| reqId | string | 请求号，即```ctx.submit()```的返回值（批量请求时为返回数组中对应的元素） |
+| reqId | string | 请求号，即```ctx.submit()```的返回值（批量请求时为返回数组中的对应项） |
 | op | string | ```order```（下单）或```cancel```（撤单） |
-| status | string | ```ok```成功（已获取订单号或已确认撤单，包括通过客户端订单号查询确认的情况），```failed```失败（交易所拒绝、限频拒单、撤单时订单已成交或已处于其他终态），```unknown```状态未知（见下文） |
+| status | string | ```ok```成功（已获取订单号或撤单已获确认，包括通过客户端订单号查询确认的情况），```failed```失败（交易所拒绝、限频拒单、撤单时订单已成交或已进入其他终态），```unknown```状态未知（见下文） |
 | ok | bool | ```status```为```ok```时为```true``` |
 | id | string | 交易所订单号：下单成功时为新订单号，撤单时为目标订单号；下单失败时为空字符串 |
 | clientId | string | 目标订单的客户端订单号：下单时为localId；按localId撤单时为该localId，按交易所订单号撤单时为空字符串 |
 | error | string | 失败原因，与REST接口的错误信息相同；成功时为空字符串，最长127字节 |
-| reason | number | 统一原因码：```0```无，```3```传输错误或状态未知，```4```交易所拒绝，```5```限频 |
+| reason | number | 统一原因码：```0```无，```3```传输异常或状态未知，```4```交易所拒绝，```5```限频 |
 | reasonText | string | ```reason```的说明 |
 | exchTime | number | 交易所应答时间（毫秒）；交易所未提供时为空值 |
 | latencyMs | number | 往返耗时（毫秒）：从请求写出前一刻到托管者收到交易所结果的时间间隔 |
 
-```symbol```、```ex```分别为该笔请求的品种代码与账户下标；```time```为交易所应答时间，未提供时与```ts```相同。
+```symbol```、```ex```分别为该笔请求的品种与账户下标；```time```为交易所应答时间，未提供时与```ts```相同。
 
-```status```为```unknown```表示请求已发出，但未能确认执行结果（超时、连接中途断开、交易所回复执行状态未知）。托管者不会重发请求：先按客户端订单号执行一次只读订单查询，查到订单即为```ok```；仍无法确认时才报告```unknown```。此时订单可能已被交易所接受，不要重发请求，应按```clientId```查询订单，或等待私有流的订单回报确认。
+```status```为```unknown```表示请求已发出，但未能确认执行结果（超时、连接中途断开、交易所回复执行状态未知）。托管者不会重发：先按客户端订单号执行一次只读订单查询，查到即为```ok```；仍无法确认时才报告```unknown```。此时订单可能已在交易所创建，请勿重发，应按```clientId```查询订单，或等待私有流的订单回报确认。
 
-localId由托管者按各交易所的客户端订单号规则生成（字符集、长度、渠道前缀），包含时间与随机部分，重启后也不会重复。生成过程会应用```exchange.IO("extend", ...)```中目标串为```ws:order```的规则（见`请求参数注入`），交易所的渠道前缀由内置规则指定，策略设置的规则不会将其清除。托管者会记录本次运行中发出的localId，可直接将其作为`ctx.cancel`或```ctx.submit()```撤单时的```id```（按客户端订单号撤单）；重启后请使用交易所订单号撤单。
+localId由托管者按各交易所的客户端订单号规则生成（字符集、长度、渠道前缀），包含时间与随机部分，重启后也不会重复。生成过程会应用```exchange.IO("extend", ...)```中目标串为```ws:order```的规则（见`请求参数注入`），交易所的渠道前缀由内置规则指定，策略设置的规则不会将其清除。Hyperliquid的```cloid```、Bitfinex的```cid```、Lighter的```ClientOrderIndex```由托管者直接生成，```ws:order```规则无法修改其生成方式。本次运行中发出的localId会被记录，可直接作为`ctx.cancel`或```ctx.submit()```撤单时的```id```（按客户端订单号撤单）；重启后请使用交易所订单号撤单。
 
-每个线程的应答队列最多保存1024条应答，队列满时丢弃最旧的一条，累计丢弃数量记录在```ctx.connectors()[i].acksDropped```中；不读取应答不会导致应答队列的内存占用持续增长，但会丢失应答，应持续调用```ctx.poll()```读取应答。线程结束后才到达的应答会被丢弃。
+每个线程的应答队列最多保存1024条应答，队列满时丢弃最旧的一条，累计丢弃数记录在```ctx.connectors()[i].acksDropped```中；不读取应答时队列占用的内存不会持续增长，但会丢失应答，因此需要持续调用```ctx.poll()```读取应答。线程结束后到达的应答会被丢弃。
 
 支持WebSocket下单的交易所：
 
-| 交易所 | 批量方式 | 每批上限 | localId |
+| 交易所 | 批量方式 | 单批上限 | localId |
 | - | - | - | - |
 | `币安`现货 | 逐笔连续发送 | 10 | ```x-BFQC3WFT_```加16位随机字符串，共27位 |
 | `币安`U本位合约 | 逐笔连续发送 | 5 | ```x-P8kHxmCJ_```加16位随机字符串，共27位 |
-| `OKX`现货、合约 | 原生批量 | 20 | 32位字母数字字符串 |
-| `Bybit`现货、合约 | 原生批量（不同品类的订单逐笔发送） | 现货10；合约20；期权下单20、撤单5 | 32位 |
+| `OKX`现货、合约 | 原生批量 | 20 | 32位字母数字组合 |
+| `Bybit`现货、合约 | 原生批量（品类不同的订单逐笔发送） | 现货10；合约20；期权下单20、撤单5 | 32位 |
 | `Gate`现货、永续合约 | 原生批量 | 下单10、撤单20 | ```t-```开头，共26位 |
 | `Bitget`现货、合约 | 统一账户原生批量，经典账户逐笔连续发送 | 统一账户20，经典账户10 | 32位 |
+| `Hyperliquid`现货、合约 | 原生批量；撤单时按订单号撤单与按localId撤单的请求各发送一帧 | 20 | ```0x```加32位十六进制数字 |
+| `Deribit`合约 | 逐笔连续发送 | 10 | ```ws```开头，共32位 |
+| `Kraken`现货 | 同一交易对的下单请求使用原生批量，交易对不同时逐笔发送；撤单请求全部使用订单号时使用原生批量，包含localId时逐笔发送 | 下单15、撤单50 | ```ws```开头，共18位 |
+| `Crypto.com`现货、合约 | 各订单仅使用列表接口支持的字段时使用原生批量，否则逐笔发送；撤单请求全部使用订单号时使用原生批量，包含localId时逐笔发送 | 10 | ```ws```开头，共32位 |
+| `Bitfinex`现货、合约 | 原生批量 | 75 | 14位十进制数字 |
+| `HitBTC`现货 | 逐笔连续发送 | 10 | ```ws```开头，共32位，同时用作订单号 |
+| `Poloniex`现货 | 下单逐笔连续发送，撤单使用原生批量 | 下单10、撤单20 | ```ws```开头，共32位 |
+| `Lighter`合约 | 原生批量，交易所整批受理或整批拒绝 | 15 | 十进制数字字符串，同时用作订单号 |
 
-Bybit模拟盘、Gate交割合约与期权、币安杠杆账户、币本位合约等不提供WebSocket下单接口的账户或产品类型会返回错误。各交易所的具体规则（限额、支持的账户与合约）请参阅对应的交易所页面。
+Bybit模拟盘、Gate交割合约与期权、币安杠杆账户、币本位合约等不提供WebSocket下单接口的账户或产品类型会返回错误；表中未列出的交易所（例如KuCoin、Kraken期货）同样返回错误。Deribit的合作方标识仅包含在REST请求头中，WebSocket下单请求不携带该标识；Kraken、Crypto.com、Bitfinex、HitBTC、Poloniex、Lighter的REST与WebSocket下单请求均不携带渠道标识。各交易所的具体规则（限额、支持的账户与合约）请参阅对应的交易所页面。
 
-```Python```中调用方式为```ctx.submit(ex, req)```，```req```为字典，字段相同；单笔请求返回请求编号字符串，批量请求返回列表，失败时返回```CtxError```对象（不抛出异常），可用```isinstance(r, CtxError)```判断；应答事件为字典，字段同上。```Rust```中单笔请求使用```ctx::submit(ex, req_json: &str) -> Result<String, String>```，批量请求使用```ctx::submit_batch(ex, req_json: &str) -> Result<Vec<String>, String>```，请求以JSON字符串形式传入；应答事件通过```ev.order_ack()```读取（```OrderAckView```：```req_id```、```op```、```status```、```ok```、```id```、```client_id```、```symbol```、```error```、```reason```、```reason_text```、```exch_time```（```Option<i64>```）、```latency_ms```、```time```），事件流ID为```ctx::STREAM_ORDER_ACK```。
+```Python```中调用方式为```ctx.submit(ex, req)```，```req```为字典，字段相同；单笔请求返回请求号字符串，批量请求返回列表，失败时返回```CtxError```对象（不抛出异常），可用```isinstance(r, CtxError)```判断；应答事件为字典，字段同上。```Rust```中单笔请求调用方式为```ctx::submit(ex, req_json: &str) -> Result<String, String>```，批量请求调用方式为```ctx::submit_batch(ex, req_json: &str) -> Result<Vec<String>, String>```，请求以JSON字符串形式传入；应答事件通过```ev.order_ack()```读取（```OrderAckView```：```req_id```、```op```、```status```、```ok```、```id```、```client_id```、```symbol```、```error```、```reason```、```reason_text```、```exch_time```（```Option<i64>```）、```latency_ms```、```time```），事件流ID为```ctx::STREAM_ORDER_ACK```。
 
 See also: `ctx.order`, `ctx.cancel`, `ctx.poll`, `ctx.subscribe`, `exchange.IO("extend", ...)`
 
@@ -28140,7 +28148,7 @@ function main() {
 - 私有流（```private```订阅）推送每一笔成交：订单成交时先推送成交回报（kind 19，```channel```为```fills```：订单ID、币安成交ID、这一笔的成交价与数量、手续费与手续费币种、挂单或吃单），再推送反映这笔成交的订单更新。成交回报不回补历史，断线期间的成交不补推（订单更新的累计成交量仍然准确），重连后币安重发的同一笔成交只推送一次。
 - ```exchange.GetHistoryOrders()```、```exchange.GetHistoryConditionOrders()```必须指定交易对。
 - 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。深度订阅1–20档使用币安的5、10、20档快照流中覆盖所需档数的最小一档（如7档订阅10档流、发布7档），缺省（20档）与21–255档由增量流与REST快照同步；逐笔成交是归集成交（与```exchange.GetTrades()```同一套成交ID）；K线首次订阅先推送500根历史。私有流是整个现货账户的一路```private```订阅（不带交易对），使用币安WS-API的用户数据流，只在订阅时连接并签名订阅，要求API Key有交易权限且IP在白名单内。订阅生效后（以及每次断线重连后）先按```exchange.GetAssets()```同一接口推送一次全部余额快照，然后报告就绪；之后推送订单更新与发生变化的币种余额（可用、冻结与```exchange.GetAssets()```同口径；充提与划转的增量并入后推送该币种的完整余额；外部系统锁定或解锁余额时交易所的推送不带完整余额，不推送，需要当前值时调用```exchange.GetAssets()```）。私有流只覆盖现货钱包，切换到杠杆钱包后杠杆账户的订单与余额不在推送里。现货没有持仓，私有流不推送持仓。鉴权失败时连接状态报告降级、私有流报告失败（行情推送不受影响）。全市场```tickers```订阅（不带交易对）使用币安的全市场迷你行情流，每秒推送一次有变化的交易对，带最新价、24小时开高低与成交量，不带买一卖一（币安现货没有全市场的最优挂单流），需要买一卖一请按交易对订阅ticker或bbo。
-- 支持WebSocket下单（```ctx.submit(exchange, req)```）：经币安WebSocket API（```order.place```、```order.cancel```）下单撤单，使用单独的一条交易连接（第一次使用时建立，至多等5秒，连不上直接报错，不改用REST；模拟盘为demo环境的WebSocket API）。```req.op```为```"order"```（```symbol side price amount```及```type tif postOnly reduceOnly extra```）或```"cancel"```（```symbol id```）。币安WebSocket API没有批量下单/撤单，```orders```数组的批量在同一条连接上逐单连续发出（不是原子的，整批先按订单数限额预检，放不下时整批不发），每批至多10单，每单各自一条应答。只支持普通现货账户，杠杆账户报不支持；参数、订单ID与错误信息与REST下单相同。每张WebSocket单的客户端订单ID（```newClientOrderId```）就是```ctx.submit```返回的localId：由内置的```IO("extend")```规则```^ws:order$```生成，与REST下单同一个渠道前缀```x-BFQC3WFT_```加16位随机串（共27位）；内置规则被清掉时由连接器生成（```ws```加8位base36毫秒时间与随机字母数字，共32位）。下单参数里不能自带```clientId```或```extra.newClientOrderId```。撤单的```id```可以是币安订单ID或localId（按```origClientOrderId```撤），REST的```ctx.cancel()```也认本次运行返回的localId。订单回报与成交回报带```clientId```（```executionReport```的```c```；撤单回报取原单的```C```）。```IO("extend")```规则的```match```对REST请求匹配```方法/路径```，对WebSocket下单匹配```ws:order```、```ws:cancel```，两者互不影响；请写带锚点的正则（```^POST/…```、```^ws:…```），不带锚点的正则可能同时命中两种请求。已发出但没有收到应答（或币安回复5xx、-1007）时不会重发：按客户端订单ID只读查询订单确认，仍无法确认时应答状态为未知并带上客户端订单ID。订单数限额（每10秒100单）与REST共用，本地超限或币安报告用量已满时直接报限频错误。
+- 支持WebSocket下单（```ctx.submit(exchange, req)```）：经币安WebSocket API（```order.place```、```order.cancel```）下单撤单，使用单独的一条交易连接（第一次使用时建立，至多等5秒，连不上直接报错，不改用REST；模拟盘为demo环境的WebSocket API）。```req.op```为```order```（```symbol side price amount```及```type tif postOnly reduceOnly extra```）或```cancel```（```symbol id```）。币安WebSocket API没有批量下单/撤单，```orders```数组的批量在同一条连接上逐单连续发出（不是原子的，整批先按订单数限额预检，放不下时整批不发），每批至多10单，每单各自一条应答。只支持普通现货账户，杠杆账户报不支持；参数、订单ID与错误信息与REST下单相同。每张WebSocket单的客户端订单ID（```newClientOrderId```）就是```ctx.submit```返回的localId：由内置的```IO("extend")```规则```^ws:order$```生成，与REST下单同一个渠道前缀```x-BFQC3WFT_```加16位随机串（共27位）；内置规则被清掉时由连接器生成（```ws```加8位base36毫秒时间与随机字母数字，共32位）。下单参数里不能自带```clientId```或```extra.newClientOrderId```。撤单的```id```可以是币安订单ID或localId（按```origClientOrderId```撤），REST的```ctx.cancel()```也认本次运行返回的localId。订单回报与成交回报带```clientId```（```executionReport```的```c```；撤单回报取原单的```C```）。```IO("extend")```规则的```match```对REST请求匹配```方法/路径```，对WebSocket下单匹配```ws:order```、```ws:cancel```，两者互不影响；请写带锚点的正则（```^POST/…```、```^ws:…```），不带锚点的正则可能同时命中两种请求。已发出但没有收到应答（或币安回复5xx、-1007）时不会重发：按客户端订单ID只读查询订单确认，仍无法确认时应答状态为未知并带上客户端订单ID。订单数限额（每10秒100单）与REST共用，本地超限或币安报告用量已满时直接报限频错误。
 
 ###### ```Futures_Binance```（期货）
 
@@ -28150,7 +28158,7 @@ function main() {
 - 私有流（```private```订阅）推送每一笔成交：订单成交时先推送成交回报（kind 19，```channel```为```fills```：订单ID、币安成交ID、这一笔的成交价与数量（U本位是币、币本位是张，与订单更新相同）、手续费与手续费币种、挂单或吃单），再推送反映这笔成交的订单更新；币安没有推送手续费时表示这笔没有手续费（手续费为0、币种为空）。执行类型不是```TRADE```的回报（如```CALCULATED```）不推送成交回报。成交回报不回补历史，断线期间的成交不补推（订单更新的累计成交量仍然准确），重连后币安重发的同一笔成交只推送一次。
 - ```exchange.GetHistoryOrders()```、```exchange.GetHistoryConditionOrders()```必须指定合约。
 - 支持WebSocket推送（U本位、币本位合约；期权不支持）：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报、持仓与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。ticker推送是币安的24小时行情，买一卖一价与量取自同合约的最优挂单流（币安合约的24小时行情流本身不带买一卖一），两条流都到达后才开始推送。深度订阅1–20档使用币安的5、10、20档快照流中覆盖所需档数的最小一档（如7档订阅10档流、发布7档），缺省（20档）与21–255档由增量流与REST快照同步；逐笔成交与```exchange.GetTrades()```同一套成交ID；K线首次订阅先推送500根历史。交割合约（```quarter```、```next_quarter```）按订阅时挂牌的那一期订阅，换季后需要重新订阅。私有流是整个账户的一路```private```订阅（不带交易对），使用币安的listenKey用户数据流，只在订阅时申请listenKey并连接，同时连接U本位与币本位两条用户数据流（与不传交易对的```exchange.GetPositions()```、```exchange.GetAssets()```覆盖同一范围；统一账户自动使用组合保证金的用户数据流）。两条都生效后（以及任一条断线重连后）先按```exchange.GetAssets()```与```exchange.GetPositions()```同一接口推送一次全部余额与持仓快照，然后报告就绪；之后推送全部订单的更新、发生变化的持仓（合约、方向、数量单位与```exchange.GetPositions()```相同；双向持仓的多空两条腿分别推送，数量为0表示已平；推送里有均价与浮动盈亏，保证金只在逐仓时给出，杠杆、强平价与标记价不在推送里）。币安的余额事件只有钱包余额，没有```exchange.GetAssets()```口径的可用、冻结与权益，所以不推送余额变动（私有流的余额只有快照）；下单、撤单也不触发币安的余额事件，标记价格变化同样不推送，需要当前余额与权益时调用```exchange.GetAssets()```。鉴权失败时连接状态报告降级、私有流报告失败（行情推送不受影响）。全市场```tickers```订阅（不带交易对）同时订阅U本位与币本位的全市场24小时行情流与全市场最优挂单流：随24小时行情每秒推送一次有变化的合约，买一卖一取该合约最新的最优挂单，某合约的最优挂单到达之前不推送该合约。
-- 支持WebSocket下单（```ctx.submit(exchange, req)```）：U本位普通账户的普通单经币安合约WebSocket API（```ws-fapi```的```order.place```、```order.cancel```）下单撤单，使用单独的一条交易连接（第一次使用时建立，至多等5秒，连不上直接报错，不改用REST；模拟盘为测试网```ws-fapi```）。```req.op```为```"order"```（```symbol side price amount```及```type tif postOnly reduceOnly extra```）或```"cancel"```（```symbol id```）。```ws-fapi```没有批量下单/撤单，```orders```数组的批量在同一条连接上逐单连续发出（不是原子的，整批先按订单数限额预检，放不下时整批不发），每批至多5单（与REST批量下单同量级），每单各自一条应答。币本位、组合保证金、期权与条件单报不支持；参数（单向/双向持仓的```positionSide```、```reduceOnly```、STP、```extra```）、订单ID与错误信息与REST下单相同，-4061同样会清掉持仓模式缓存。每张WebSocket单的客户端订单ID（```newClientOrderId```）就是```ctx.submit```返回的localId：由内置的```IO("extend")```规则```^ws:order$```生成，与REST下单同一个渠道前缀```x-P8kHxmCJ_```加16位随机串（共27位）；内置规则被清掉时由连接器生成（```ws```加8位base36毫秒时间与随机字母数字，共32位）。下单参数里不能自带```clientId```或```extra.newClientOrderId```。撤单的```id```可以是币安订单ID或localId（按```origClientOrderId```撤），REST的```ctx.cancel()```也认本次运行返回的localId（期权不支持按客户端订单ID撤）。订单回报与成交回报带```clientId```（```ORDER_TRADE_UPDATE```的```o.c```）。```IO("extend")```规则的```match```对REST请求匹配```方法/路径```，对WebSocket下单匹配```ws:order```、```ws:cancel```，两者互不影响；请写带锚点的正则（```^POST/…```、```^ws:…```），不带锚点的正则可能同时命中两种请求。已发出但没有收到应答（或币安回复5xx、-1007）时不会重发：按客户端订单ID只读查询订单确认，仍无法确认时应答状态为未知并带上客户端订单ID。订单数限额（每10秒300单、每分钟1200单）与REST共用，本地超限或币安报告用量已满时直接报限频错误。
+- 支持WebSocket下单（```ctx.submit(exchange, req)```）：U本位普通账户的普通单经币安合约WebSocket API（```ws-fapi```的```order.place```、```order.cancel```）下单撤单，使用单独的一条交易连接（第一次使用时建立，至多等5秒，连不上直接报错，不改用REST；模拟盘为测试网```ws-fapi```）。```req.op```为```order```（```symbol side price amount```及```type tif postOnly reduceOnly extra```）或```cancel```（```symbol id```）。```ws-fapi```没有批量下单/撤单，```orders```数组的批量在同一条连接上逐单连续发出（不是原子的，整批先按订单数限额预检，放不下时整批不发），每批至多5单（与REST批量下单同量级），每单各自一条应答。币本位、组合保证金、期权与条件单报不支持；参数（单向/双向持仓的```positionSide```、```reduceOnly```、STP、```extra```）、订单ID与错误信息与REST下单相同，-4061同样会清掉持仓模式缓存。每张WebSocket单的客户端订单ID（```newClientOrderId```）就是```ctx.submit```返回的localId：由内置的```IO("extend")```规则```^ws:order$```生成，与REST下单同一个渠道前缀```x-P8kHxmCJ_```加16位随机串（共27位）；内置规则被清掉时由连接器生成（```ws```加8位base36毫秒时间与随机字母数字，共32位）。下单参数里不能自带```clientId```或```extra.newClientOrderId```。撤单的```id```可以是币安订单ID或localId（按```origClientOrderId```撤），REST的```ctx.cancel()```也认本次运行返回的localId（期权不支持按客户端订单ID撤）。订单回报与成交回报带```clientId```（```ORDER_TRADE_UPDATE```的```o.c```）。```IO("extend")```规则的```match```对REST请求匹配```方法/路径```，对WebSocket下单匹配```ws:order```、```ws:cancel```，两者互不影响；请写带锚点的正则（```^POST/…```、```^ws:…```），不带锚点的正则可能同时命中两种请求。已发出但没有收到应答（或币安回复5xx、-1007）时不会重发：按客户端订单ID只读查询订单确认，仍无法确认时应答状态为未知并带上客户端订单ID。订单数限额（每10秒300单、每分钟1200单）与REST共用，本地超限或币安报告用量已满时直接报限频错误。
 
 #### Bitfinex
 
@@ -28194,9 +28202,10 @@ Bitfinex只有永续合约，其它合约代码会报错。
 
 ###### ```Bitfinex```（现货）
 
-| 指令 | 说明 | 返回值 |
-| - | - | - |
-| ```version``` | 获取API版本号。 | 固定返回```v2```。 |
+| 指令 | 参数 | 说明 | 返回值 |
+| - | - | - | - |
+| ```version``` | — | 获取API版本号。 | 固定返回```v2```。 |
+| ```wsTrade``` | string | WebSocket下单连接：```connect```预先建立连接（否则第一次```ctx.submit()```时才连接），```status```查看连接状态与在途请求数（Bitfinex的通知不带限频用量，```usage```为空）。 | 连接状态对象```{state, inFlight, lastError, connectedForMs, usage}```。 |
 
 通用指令```api```、```base```、```currency```见`exchange.IO`。
 
@@ -28205,6 +28214,7 @@ Bitfinex只有永续合约，其它合约代码会报错。
 | 指令 | 参数 | 说明 | 返回值 |
 | - | - | - | - |
 | ```mbase``` | [url] | 查询或切换行情（公开）接口基地址（只接受```http://```、```https://```地址），与交易接口基地址（```base```指令）分开；未设置时与交易接口相同。 | 修改前的地址。 |
+| ```wsTrade``` | string | WebSocket下单连接：```connect```预先建立连接（否则第一次```ctx.submit()```时才连接），```status```查看连接状态与在途请求数（Bitfinex的通知不带限频用量，```usage```为空）。 | 连接状态对象```{state, inFlight, lastError, connectedForMs, usage}```。 |
 
 通用指令```api```、```base```、```currency```见`exchange.IO`。
 
@@ -28254,6 +28264,7 @@ function main() {
 - Bitfinex价格精度为5位有效数字，没有固定的价格步长；`exchange.GetMarkets`返回的```TickSize```、```PricePrecision```按当前最新价换算，价格量级变化后会随之变化；数量精度固定为8位小数。
 - 私有流（```private```订阅）推送每一笔成交（kind 19，```channel```为```fills```）：取自Bitfinex带手续费的成交更新（```tu```），包含订单ID、成交ID、这一笔的成交价与数量（币，与订单更新相同）、手续费（付出为正）与手续费币种（```UST```即```USDT```，与```exchange.GetAssets()```相同）、挂单或吃单；不带手续费的成交执行消息（```te```）不推送。成交回报与订单更新是Bitfinex的两条消息，成交回报通常在反映这笔成交的订单更新之后到达。成交回报不回补历史，断线期间的成交不补推（订单更新的累计成交量仍然准确），重连后重发的同一笔成交只推送一次。
 - 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。ticker与bbo共用Bitfinex的ticker推送（Bitfinex的ticker本身带买一卖一价与量，没有单独的一档盘口流），开盘价与```exchange.GetTicker()```一样按最新价减去24小时涨跌额得到；逐笔成交与```exchange.GetTrades()```同一套成交ID，订阅时交易所补发的近期成交不推送；深度订阅25档以内（缺省25档）使用Bitfinex的25档盘口，更多档数使用100档或250档（最多250档），由快照与增量同步，并按Bitfinex的盘口校验和与连接序号校验，校验失败时重新订阅该盘口；K线首次订阅先推送500根历史，Bitfinex的K线推送没有收盘标志，按交易所时间到了周期结束时间（月线按自然月）或下一根到达时推送该根的收盘，每根只推送一次收盘。推送的价格比```exchange.GetMarkets()```的价格精度多保留两位小数（Bitfinex价格是5位有效数字，价格量级下降时小数位会变多）。私有流是整个账户的一路```private```订阅（不带交易对），只在订阅时连接Bitfinex的鉴权推送地址并鉴权：订阅生效后（以及每次断线重连后）先按```exchange.GetAccount()```同一接口推送一次全部余额快照，然后报告就绪，之后推送现货交易对的订单更新与发生变化的币种余额（口径与```exchange.GetAccount()```相同，只看交易所钱包；Bitfinex尚未算出可用余额的那条余额推送不带可用与冻结额，不推送，需要当前值时调用```exchange.GetAccount()```）。现货没有持仓，私有流不推送持仓。鉴权失败或API Key没有订单、钱包读取权限时连接状态报告降级、私有流报告失败（行情推送不受影响）。不支持全市场```tickers```订阅（Bitfinex的ticker推送必须逐个交易对订阅），订阅时报错；请按交易对订阅ticker。
+- 支持WebSocket下单（```ctx.submit(exchange, req)```）：经Bitfinex鉴权WebSocket（```wss://api.bitfinex.com/ws/2```）的订单输入下单撤单，使用单独的一条交易连接（与私有流分开；第一次使用时建立并鉴权，至多等5秒，连不上直接报错，不改用REST；鉴权的nonce与REST签名共用同一个递增计数）。```req.op```为```order```（```symbol side price amount```及```type tif postOnly reduceOnly extra```）或```cancel```（```symbol id```），单笔用```on```/```oc```，```orders```数组的批量用原生```ox_multi```一帧发出，每批至多75单；Bitfinex逐单给出结果，部分成功时各单各自一条应答（批量不是原子的）。普通现货（```EXCHANGE```类型）订单。参数、订单ID与错误信息与REST下单相同（拒单的错误串同REST的```bitfinex request ERROR: …```）；Bitfinex的REST下单不带渠道码，WebSocket下单也不带。每张WebSocket单的客户端订单ID（```cid```）就是```ctx.submit```返回的localId，只由连接器生成：毫秒时间×10再加一位随机数（14位十进制，进程内严格递增），下单参数里不能自带```clientId```或```extra.cid```/```extra.cid_date```；撤单的```id```可以是Bitfinex订单ID或localId（按```cid```与由它推出的UTC日期```cid_date```撤；下单恰在UTC零点前后时交易所记的日期可能与推出的不同，此时按localId撤单会报订单不存在，请改用订单ID），REST的```ctx.cancel()```也认本次运行返回的localId。订单回报与成交回报带```clientId```（即```cid```）。Bitfinex的订单输入没有请求号，应答按通知里的```cid```（下单）或订单ID（撤单）对应；已发出但没有收到通知时不会重发：按```cid```只读查询该交易对的挂单与历史订单确认，仍无法确认时应答状态为未知并带上客户端订单ID。官方没有公布WebSocket下单的限额，按Bitfinex官方Node库说明的每账户每5分钟1000单（与其它API连接共用）本地预检，超限或交易所回复限频时直接报限频错误。
 
 ###### ```Futures_Bitfinex```（期货）
 
@@ -28262,6 +28273,7 @@ function main() {
 - ```exchange.GetFundings()```的费率取Bitfinex衍生品状态中的当前费率，每8小时结算；不传参数时按当前计价币返回全部永续合约。
 - 私有流（```private```订阅）推送每一笔成交（kind 19，```channel```为```fills```）：取自Bitfinex带手续费的成交更新（```tu```），包含订单ID、成交ID、这一笔的成交价与数量（币，与订单更新相同）、手续费（付出为正）与手续费币种（去掉```F0```后缀，与```exchange.GetAssets()```相同）、挂单或吃单；不带手续费的成交执行消息（```te```）不推送。成交回报与订单更新是Bitfinex的两条消息，成交回报通常在反映这笔成交的订单更新之后到达。成交回报不回补历史，断线期间的成交不补推（订单更新的累计成交量仍然准确），重连后重发的同一笔成交只推送一次。
 - 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报、持仓与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。ticker与bbo共用Bitfinex的ticker推送（Bitfinex的ticker本身带买一卖一价与量，没有单独的一档盘口流），开盘价与```exchange.GetTicker()```一样按最新价减去24小时涨跌额得到；逐笔成交与```exchange.GetTrades()```同一套成交ID，订阅时交易所补发的近期成交不推送；深度订阅25档以内（缺省25档）使用Bitfinex的25档盘口，更多档数使用100档或250档（最多250档），由快照与增量同步，并按Bitfinex的盘口校验和与连接序号校验，校验失败时重新订阅该盘口；K线首次订阅先推送500根历史，Bitfinex的K线推送没有收盘标志，按交易所时间到了周期结束时间（月线按自然月）或下一根到达时推送该根的收盘，每根只推送一次收盘。推送的价格精度按订阅时的最新价换算5位有效数字再多保留两位小数，数量精度为8位小数。私有流是整个账户的一路```private```订阅（不带交易对），只在订阅时连接Bitfinex的鉴权推送地址并鉴权：订阅生效后（以及每次断线重连后）先按```exchange.GetAccount()```、```exchange.GetPositions()```同一接口推送一次全部余额与持仓快照，然后报告就绪，之后推送永续合约的订单更新、持仓变化（每个合约一条净持仓，平仓后数量为0；Bitfinex推送里没有算出的盈亏、强平价、杠杆不填）与发生变化的保证金币种余额（按Bitfinex推送的钱包更新，口径与```exchange.GetAccount()```相同；Bitfinex尚未算出可用余额时只推送总额，可用与冻结为null，需要时调用```exchange.GetAssets()```）。鉴权失败或API Key没有订单、持仓、钱包读取权限时连接状态报告降级、私有流报告失败（行情推送不受影响）。不支持全市场```tickers```订阅（Bitfinex的ticker推送必须逐个合约订阅），订阅时报错；请按交易对订阅ticker。
+- 支持WebSocket下单（```ctx.submit(exchange, req)```）：经Bitfinex鉴权WebSocket（```wss://api.bitfinex.com/ws/2```）的订单输入下单撤单，使用单独的一条交易连接（与私有流分开；第一次使用时建立并鉴权，至多等5秒，连不上直接报错，不改用REST；鉴权的nonce与REST签名共用同一个递增计数）。```req.op```为```order```（```symbol side price amount```及```type tif postOnly reduceOnly extra```）或```cancel```（```symbol id```），单笔用```on```/```oc```，```orders```数组的批量用原生```ox_multi```一帧发出，每批至多75单；Bitfinex逐单给出结果，部分成功时各单各自一条应答（批量不是原子的）。杠杆```lev```与REST下单相同（```exchange.SetMarginLevel()```设过的倍数，没设过10倍），```reduceOnly```、```postOnly```为同一组标志位。参数、订单ID与错误信息与REST下单相同（拒单的错误串同REST的```bitfinex request ERROR: …```）；Bitfinex的REST下单不带渠道码，WebSocket下单也不带。每张WebSocket单的客户端订单ID（```cid```）就是```ctx.submit```返回的localId，只由连接器生成：毫秒时间×10再加一位随机数（14位十进制，进程内严格递增），下单参数里不能自带```clientId```或```extra.cid```/```extra.cid_date```；撤单的```id```可以是Bitfinex订单ID或localId（按```cid```与由它推出的UTC日期```cid_date```撤；下单恰在UTC零点前后时交易所记的日期可能与推出的不同，此时按localId撤单会报订单不存在，请改用订单ID），REST的```ctx.cancel()```也认本次运行返回的localId。订单回报与成交回报带```clientId```（即```cid```）。Bitfinex的订单输入没有请求号，应答按通知里的```cid```（下单）或订单ID（撤单）对应；已发出但没有收到通知时不会重发：按```cid```只读查询该交易对的挂单与历史订单确认，仍无法确认时应答状态为未知并带上客户端订单ID。官方没有公布WebSocket下单的限额，按Bitfinex官方Node库说明的每账户每5分钟1000单（与其它API连接共用）本地预检，超限或交易所回复限频时直接报限频错误。
 
 #### bitFlyer
 
@@ -28961,6 +28973,7 @@ function main() {
 | ```api``` | httpMethod, method[, params[, raw]] | 直接调用Crypto.com接口：资源写RPC方法名，如```private/user-balance```、```public/get-tickers```（也可以写```/exchange/v1/```开头的路径或完整URL）。（详见表下） | 交易所的完整应答（```code```为0）；业务错误时返回空值。 |
 | ```trade_margin``` | — | 切换为现货杠杆：之后的普通订单带```spot_margin=MARGIN```下单，条件单带```exec_inst```的```MARGIN_ORDER```下单。只影响下单，不向交易所发请求。 | 指令名本身。 |
 | ```trade_normal``` | — | 切换回普通现货下单（默认）。 | 指令名本身。 |
+| ```wsTrade``` | string | WebSocket下单连接：```connect```预先建立连接并鉴权（否则第一次```ctx.submit()```时才连接），```status```查看连接状态与在途请求数（Crypto.com的应答不带限频用量，```usage```为空）。 | 连接状态对象```{state, inFlight, lastError, connectedForMs, usage}```。 |
 
 表中长说明的其余部分：
 
@@ -28974,6 +28987,7 @@ function main() {
 | - | - | - | - |
 | ```api``` | httpMethod, method[, params[, raw]] | 直接调用Crypto.com接口：资源写RPC方法名，如```private/get-positions```、```public/get-tickers```（也可以写```/exchange/v1/```开头的路径或完整URL）。（详见表下） | 交易所的完整应答（```code```为0）；业务错误时返回空值。 |
 | ```accountId``` | string | 设置交易账户ID（账户uuid），用于查询持仓和设置杠杆；不设置时自动使用主账户。 | 形如```{"accountId": "..."}```的对象。 |
+| ```wsTrade``` | string | WebSocket下单连接：```connect```预先建立连接并鉴权（否则第一次```ctx.submit()```时才连接），```status```查看连接状态与在途请求数（Crypto.com的应答不带限频用量，```usage```为空）。 | 连接状态对象```{state, inFlight, lastError, connectedForMs, usage}```。 |
 
 表中长说明的其余部分：
 
@@ -29029,6 +29043,10 @@ function main() {
 
 ##### 注意事项
 
+###### 全部交易所对象
+
+- 渠道标识：Crypto.com的REST下单不带渠道参数（没有内置的```IO("extend")```规则），WebSocket下单同样不带。```exchange.IO("extend", 规则)```的规则按目标串匹配：REST请求是```方法+/RPC方法名```（如```POST/private/create-order```），WebSocket下单是```ws:order```、撤单是```ws:cancel```（批量逐单注入）；REST路径规则不作用于WebSocket下单，反之亦然——请写锚定的正则（```^POST/private/create-order$```、```^ws:order$```）。```ws:order```规则可以给出```client_oid```，它就是这张单的请求ID（须是1–36位字母、数字、```-```、```_```）；规则注入官方列表字段以外的参数时，该批改为逐单发出。
+
 ###### ```Crypto```（现货）
 
 - 市价买单的下单量是交易币数（Crypto.com的```quantity```），不是计价币金额；触发后为市价的条件买单同样按交易币数下单。
@@ -29039,6 +29057,7 @@ function main() {
 - ```exchange.GetAssets()```的冻结数量取Crypto.com的```reserved_qty```（挂单与保证金占用之和），可用数量为持有量减去它。
 - 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。ticker与bbo都来自Crypto.com的ticker流（自带买一卖一价与量，Crypto.com没有单独的最优买卖流）；逐笔成交与```exchange.GetTrades()```同一套成交ID；深度订阅10档以内使用Crypto.com的10档流，11至50档（缺省20档）使用50档流，均由快照与增量按序号同步，Crypto.com没有更多档位，超过50档的订阅报错；K线周期与```exchange.GetRecords()```的原生周期相同，首次订阅先推送500根历史，订阅时交易所随订阅应答附带的最近成交与历史K线是订阅前的历史，不作为实时推送发出；Crypto.com的K线推送不带收盘标志：收到更晚的一根K线（中间隔着没有成交的周期也算），或按交易所时间（推送里的服务端时间）过了该K线结束时间1秒，就把该K线作为收盘K线推送，每根只推送一次收盘。私有流是整个账户的一路```private```订阅（不带交易对），只在订阅时连接并鉴权，在同一条连接上订阅Crypto.com的订单流与余额流：订阅生效后（以及每次断线重连后）先按```exchange.GetAccount()```同一接口推送一次全部余额快照，然后报告就绪，之后推送现货订单更新与发生变化的币种余额（口径与```exchange.GetAccount()```相同）。现货没有持仓，私有流不推送持仓。鉴权失败时连接状态报告降级、私有流报告失败（行情推送不受影响）。不支持全市场```tickers```订阅（Crypto.com的ticker推送必须逐个交易对订阅），订阅时报错；请按交易对订阅ticker。
 - 私有流（```private```订阅）同时订阅Crypto.com的成交频道（```user.trade```），推送每一笔现货成交（kind 19，```channel```为```fills```：订单ID、Crypto.com成交ID、这一笔的成交价与数量、手续费（交易所以负数表示扣费，这里换成付出为正）与手续费币种、挂单或吃单）。成交与订单更新来自两个频道，交易所不保证两者的先后。成交回报不回补历史，断线期间的成交不补推（订单更新的累计成交量仍然准确），重连后重发的同一笔成交只推送一次。
+- 支持WebSocket下单：```ctx.submit(exchange, {op: "order", symbol, side, price, amount, ...})```经Crypto.com的User API WebSocket（```private/create-order```）下单，```{op: "cancel", symbol, id}```撤单（```private/cancel-order```），使用单独的一条交易连接（地址与私有推送相同：生产```wss://stream.crypto.com/exchange/v1/user```，REST地址为UAT时用UAT地址；建连后按官方建议等1秒再用```public/auth```鉴权，第一次使用时至多等7秒，连不上直接报错，不改用REST），参数、订单ID与错误信息与REST下单相同（错误为```crypto.com 代码: 描述```）；现货杠杆（```IO("trade_margin")```）同样带```spot_margin=MARGIN```。写出请求后立即返回请求ID，结果以应答事件（kind 20）投给调用的线程。下单的请求ID就是发给Crypto.com的客户端订单ID（```client_oid```，由连接器生成：```ws``` + 8位毫秒时间 + 22位随机字母数字，共32位；不能经下单参数指定，下单参数里带```clientId```或```extra.client_oid```时报错；需要自定义格式时用```IO("extend")```的```ws:order```规则给出），订单回报与成交回报的```clientId```就是它；撤单的```id```可以是Crypto.com订单ID，也可以是```ctx.submit()```返回的请求ID（按```client_oid```撤）。批量写```{op, orders: [...]}```，每批至多10单（超出时整批报错、什么都不发）：参数都在官方```private/create-order-list```单项字段内的多单用原生列表接口（```contingency_type: LIST```）一帧发出，现货杠杆（```spot_margin```）或带```extra```里其它参数的批量在同一条连接上逐单```private/create-order```发出；全部按订单ID撤的批量用```private/cancel-order-list```一帧发出，含请求ID的批量逐单撤。批量都不是原子的，逐单报告结果，可能部分成功。服务端每30秒的心跳由连接器按同一ID回复。已发出但没有收到应答（或Crypto.com回复40801、50001这类不代表成败的错误）时不会重发，按```client_oid```（撤单按撤单用的ID）只读查询订单确认，仍无法确认时报告状态未知并带上客户端订单ID。限频按官方WebSocket User API每连接每秒150个请求：本地按请求数预检（下单撤单合计），下单、撤单还各按单数计每秒150，批量按单数计，整批放不下时整批不发；本地超限或Crypto.com回复42901时直接报限频错误。REST撤单（```exchange.CancelOrder```/```ctx.cancel```）也接受```ctx.submit()```返回的请求ID（按```client_oid```撤）。
 
 ###### ```Futures_Crypto```（期货）
 
@@ -29051,6 +29070,7 @@ function main() {
 - ```exchange.GetHistoryConditionOrders()```不传```since```时，Crypto.com只返回最近一天内的条件单历史；要查更早的记录请传```since```。
 - 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报、持仓与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。合约代码与REST接口相同（交割合约按同一张合约表解析）；ticker与bbo都来自Crypto.com的ticker流（自带买一卖一价与量、持仓量，Crypto.com没有单独的最优买卖流）；逐笔成交与```exchange.GetTrades()```同一套成交ID；深度订阅10档以内使用Crypto.com的10档流，11至50档（缺省20档）使用50档流，均由快照与增量按序号同步，超过50档的订阅报错；K线周期与```exchange.GetRecords()```的原生周期相同，首次订阅先推送500根历史，订阅时交易所随订阅应答附带的最近成交与历史K线是订阅前的历史，不作为实时推送发出；Crypto.com的K线推送不带收盘标志：收到更晚的一根K线（中间隔着没有成交的周期也算），或按交易所时间（推送里的服务端时间）过了该K线结束时间1秒，就把该K线作为收盘K线推送，每根只推送一次收盘。私有流是整个账户的一路```private```订阅（不带交易对），只在订阅时连接并鉴权，在同一条连接上订阅Crypto.com的订单流、持仓流与余额流：订阅生效后（以及每次断线重连后）先按```exchange.GetAccount()```与```exchange.GetPositions()```同一接口推送一次全部余额与持仓快照，然后报告就绪，之后推送衍生品订单更新与发生变化的持仓、余额（口径与这两个函数相同，持仓只含查询持仓的同一个账户，平仓推送数量为0的持仓）。鉴权失败时连接状态报告降级、私有流报告失败（行情推送不受影响）。不支持全市场```tickers```订阅（Crypto.com的ticker推送必须逐个合约订阅），订阅时报错；请按交易对订阅ticker。
 - 私有流（```private```订阅）同时订阅Crypto.com的成交频道（```user.trade```），推送每一笔合约成交（kind 19，```channel```为```fills```：订单ID、Crypto.com成交ID、这一笔的成交价与数量、手续费（交易所以负数表示扣费，这里换成付出为正、返佣为负）与手续费币种、挂单或吃单）。成交与订单更新来自两个频道，交易所不保证两者的先后。成交回报不回补历史，断线期间的成交不补推（订单更新的累计成交量仍然准确），重连后重发的同一笔成交只推送一次。
+- 支持WebSocket下单：```ctx.submit(exchange, {op: "order", symbol, side, price, amount, ...})```经Crypto.com的User API WebSocket（```private/create-order```）下单，```{op: "cancel", symbol, id}```撤单（```private/cancel-order```），使用单独的一条交易连接（地址与私有推送相同：生产```wss://stream.crypto.com/exchange/v1/user```，REST地址为UAT时用UAT地址；建连后按官方建议等1秒再用```public/auth```鉴权，第一次使用时至多等7秒，连不上直接报错，不改用REST），参数、订单ID与错误信息与REST下单相同（错误为```crypto.com 代码: 描述```）；合约代码与REST相同（永续```BTCUSD-PERP```，交割按同一张合约表解析）；只减仓（```reduceOnly```）同样带```REDUCE_ONLY```。写出请求后立即返回请求ID，结果以应答事件（kind 20）投给调用的线程。下单的请求ID就是发给Crypto.com的客户端订单ID（```client_oid```，由连接器生成：```ws``` + 8位毫秒时间 + 22位随机字母数字，共32位；不能经下单参数指定，下单参数里带```clientId```或```extra.client_oid```时报错；需要自定义格式时用```IO("extend")```的```ws:order```规则给出），订单回报与成交回报的```clientId```就是它；撤单必须带合约（与REST相同）；撤单的```id```可以是Crypto.com订单ID，也可以是```ctx.submit()```返回的请求ID（按```client_oid```撤）。批量写```{op, orders: [...]}```，每批至多10单（超出时整批报错、什么都不发）：参数都在官方```private/create-order-list```单项字段内的多单用原生列表接口（```contingency_type: LIST```）一帧发出，带只减仓（```REDUCE_ONLY```）或```extra```里其它参数的批量在同一条连接上逐单```private/create-order```发出；全部按订单ID撤的批量用```private/cancel-order-list```一帧发出，含请求ID的批量逐单撤。批量都不是原子的，逐单报告结果，可能部分成功。服务端每30秒的心跳由连接器按同一ID回复。已发出但没有收到应答（或Crypto.com回复40801、50001这类不代表成败的错误）时不会重发，按```client_oid```（撤单按撤单用的ID）只读查询订单确认，仍无法确认时报告状态未知并带上客户端订单ID。限频按官方WebSocket User API每连接每秒150个请求：本地按请求数预检（下单撤单合计），下单、撤单还各按单数计每秒150，批量按单数计，整批放不下时整批不发；本地超限或Crypto.com回复42901时直接报限频错误。REST撤单（```exchange.CancelOrder```/```ctx.cancel```）也接受```ctx.submit()```返回的请求ID：先按```client_oid```只读查出订单ID并核对合约，再按订单ID撤。
 
 #### DeepCoin
 
@@ -29212,6 +29232,14 @@ function main() {
 
 任何交割或组合合约都可以直接写Deribit的原生代码（日期为日月年缩写），超出上述代码范围的远期合约就用这种写法，例如交易对```BTC_USD```、合约代码```BTC-30JUL26```。查询结果中映射不回上述代码的合约也以原生代码返回。
 
+##### 专属IO指令
+
+| 指令 | 参数 | 说明 | 返回值 |
+| - | - | - | - |
+| ```wsTrade``` | string | WebSocket下单连接：```connect```预先建立连接（否则第一次```ctx.submit()```时才连接），```status```查看连接状态与在途请求数（Deribit的应答不带限频用量，```usage```为空）。 | 连接状态对象```{state, inFlight, lastError, connectedForMs, usage}```。 |
+
+通用指令```api```、```base```、```currency```见`exchange.IO`。
+
 ##### 函数支持差异
 
 不支持（调用时报错并返回空值）：`exchange.SetMarginLevel`。
@@ -29252,6 +29280,8 @@ function main() {
 - 范围查询```USD.swap```、```USD.futures```等的```USD```覆盖BTC、ETH币本位合约；差价组合合约的范围是```USD.futures_combo```。当前合约为组合合约时，不传参数默认```USD.futures_combo```（含以原生代码返回的远月组合）；```USD.futures```不含组合合约。
 - 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与账户私有流（订单回报、持仓、余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。推送的数量与REST接口同一口径（币本位合约的下单量、成交量、持仓量是USD金额，ticker与K线的成交量是币数）。ticker使用Deribit的```ticker```频道（自带买一卖一价与量、持仓量，开盘价与```exchange.GetTicker()```一样由24小时涨跌幅反推）；深度订阅1档、10档以内、20档以内（缺省20档）分别使用Deribit的1档、10档、20档快照流，深度5与深度20是两路独立订阅；超过20档（最多255档）使用全量订单簿的快照与增量，按```prev_change_id```逐条核对，断档时自动重新订阅该深度；逐笔成交与```exchange.GetTrades()```同一套成交ID；K线周期与```exchange.GetRecords()```相同，Deribit的K线推送不带收盘标志，下一根K线开始或按交易所时间过了结束时间时，该根按最后一次推送的数值收盘（每根只收盘一次），首次订阅先推送500根历史。交割合约（如```BTC_USD.quarter```）在订阅时解析成当时的合约，交割换月后需要重新订阅。私有流是一路```private```订阅（不带合约，覆盖整个账户），只在订阅时单独建一条连接并用API Key签名鉴权，订阅Deribit全部衍生品（期货、期权及组合）的订单流、持仓变化流与全部币种的账户摘要流。订阅生效及每次断线重连后，先用与```exchange.GetAssets()```、```exchange.GetPositions()```相同的接口取快照并推送快照行，再报告就绪；之后实时推送订单回报、成交引起的持仓变化（平仓推送数量为0的一行）与余额变化，各字段与REST同口径；标记价引起的持仓浮动盈亏变化不推送。登录失败时连接状态报告降级、私有流报告失败（行情推送不受影响）。用```exchange.IO("base", "https://test.deribit.com")```切换到测试网后，之后建立的推送连接也连接测试网地址。不支持全市场```tickers```订阅（Deribit的ticker推送必须逐个合约订阅），订阅时报错；请按交易对订阅ticker。
 - 私有流（```private```订阅）推送每一笔成交：成交回报（kind 19，```channel```为```fills```：订单ID、Deribit的成交ID、这一笔的成交价与数量（与订单更新相同：币本位合约是USD金额，USDC线性合约与期权是币数）、手续费与手续费币种（挂单返佣为负数）、挂单或吃单）取自Deribit持仓变化推送里的成交明细，先于同一次推送的持仓变化推送；订单更新是另一路推送，Deribit不保证两者的先后。成交回报不回补历史，断线期间的成交不补推（订单更新的累计成交量仍然准确），重连后重复的同一笔成交只推送一次。
+- 支持WebSocket下单（```ctx.submit(exchange, req)```）：经Deribit的JSON-RPC over WebSocket（```private/buy```、```private/sell```、```private/cancel```、```private/cancel_by_label```）下单撤单，使用单独的一条交易连接（与推送同一地址，第一次使用时建立并以```public/auth```（```client_signature```）鉴权，至多等5秒，连不上直接报错，不改用REST；REST地址为测试网时连接测试网）。```req.op```为```order```（```symbol side price amount```及```type tif postOnly reduceOnly extra```）或```cancel```（```symbol id```）。参数、订单ID与核对与REST下单相同（数量、价格等按JSON类型发送）；交易所拒绝时错误信息与REST相同（```HTTP 400: {"jsonrpc":"2.0","error":…}```）。Deribit没有批量下单/撤单，```orders```数组的批量在同一条连接上逐单连续发出（不是原子的，整批先按限额预检，放不下时整批不发），每批至多10单，每单各自一条应答。每张WebSocket单的客户端订单ID（```label```）就是```ctx.submit```返回的localId：```IO("extend")```的```^ws:order$```规则给了```label```就用它（至多64个字符），否则由连接器生成（```ws```加8位base36毫秒时间与随机字母数字，共32位）；下单参数里不能自带```clientId```或```extra.label```。撤单的```id```可以是Deribit订单ID（```private/cancel```）或localId（```private/cancel_by_label```；交易所只回撤掉的单数，没有挂着的该```label```时应答为撤单失败，不带订单ID）。订单回报与成交回报带```clientId```（即```label```）。```IO("extend")```规则的```match```对REST请求匹配```方法/路径```，对WebSocket下单匹配```ws:order```、```ws:cancel```，两者互不影响；请写带锚点的正则（```^GET/…```、```^ws:…```），不带锚点的正则可能同时命中两种请求。内置的合作方返佣标识（```appid```/```appsig```）只附加在REST请求的```Authorization```头上，Deribit的WebSocket鉴权没有对应字段，WebSocket下单不带合作方标识。已发出但没有收到应答（或交易所回复```internal_server_error```、```temporarily_unavailable```、```error```这类不代表成败的错误）时不会重发：下单按```label```只读查询（```private/get_order_state_by_label```），撤单按订单ID或```label```只读查询订单状态确认，仍无法确认时应答状态为未知并带上客户端订单ID。撮合引擎请求的限额按子账户与REST共用（最低档每秒5次、突发20次）：本地下单、撤单各每4秒10次，本地超限或交易所回复```too_many_requests```等限频错误时直接报限频错误（```too_many_requests```时交易所会断开连接，在途请求按未知处理）。鉴权令牌接近到期时在心跳应答后计划内换连接并重新鉴权。
+- REST撤单（```exchange.CancelOrder()```/```ctx.cancel()```）也接受```ctx.submit()```返回的localId：按```label```撤单（```private/cancel_by_label```）；没有挂着的这个label时撤单失败并给出原因。
 
 #### DigiFinex
 
@@ -29613,6 +29643,14 @@ HitBTC的现货交易（接口地址```https://api.hitbtc.com```，v3接口）�
 
 交易对写作```BASE_QUOTE```，对应HitBTC原生代码```BTCUSDT```。
 
+##### 专属IO指令
+
+| 指令 | 参数 | 说明 | 返回值 |
+| - | - | - | - |
+| ```wsTrade``` | string | WebSocket下单连接：```connect```预先建立连接（否则第一次```ctx.submit()```时才连接），```status```查看连接状态与在途请求数。 | 连接状态对象```{state, inFlight, lastError, connectedForMs, usage}```。 |
+
+通用指令```api```、```base```、```currency```见`exchange.IO`。
+
 ##### 函数支持差异
 
 没有不支持的标准函数。
@@ -29631,6 +29669,7 @@ HitBTC的现货交易（接口地址```https://api.hitbtc.com```，v3接口）�
 - ```exchange.GetHistoryOrders()```按交易对查询，只返回已结束的订单，不传```limit```时最多返回1000条。
 - 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。ticker推送使用HitBTC的```ticker/1s```（自带买一卖一价与量，有变化才推送，每秒至多一条），bbo使用```orderbook/top/100ms```；逐笔成交与```exchange.GetTrades()```同一套成交ID；深度订阅5档以内、6到10档、缺省（20档）与11到20档分别使用HitBTC每100毫秒一次的5档、10档、20档快照，21档以上使用全量订单簿增量流（按序号连续性校验，断档时重新订阅取快照）；K线首次订阅先推送500根历史，HitBTC的K线推送不带收盘标志：收到更晚的一根K线（中间隔着没有成交的周期也算），或按交易所时间（推送里的服务端时间）过了该K线结束时间1秒，就把该K线作为收盘K线推送，每根只推送一次收盘（K线推送本身不带时间，交易所时间取同时订阅的其它行情推送），只有有成交的周期才有推送；订阅前的历史K线不作为实时推送发出。私有流是整个账户的一路```private```订阅（不带交易对），只在订阅时连接交易端点并登录，在同一条连接上订阅订单回报与余额：订阅生效后（以及每次断线重连后）先按```exchange.GetAssets()```同一接口推送一次全部余额快照，然后报告就绪，之后推送订单更新与发生变化的币种余额（可用与冻结额直接取自推送，与```exchange.GetAssets()```同口径）。订单回报的订单号是```client_order_id```，与下单返回的订单号相同；订阅时交易所推送的当前挂单列表不作为订单回报发布。现货没有持仓，私有流不推送持仓。登录失败时连接状态报告降级、私有流报告失败（行情推送不受影响）。全市场```tickers```订阅（不带交易对）使用HitBTC的批量ticker频道（```ticker/1s/batch```，订阅全部交易对），每秒推送一次有变化的交易对，带最新价、24小时开高低、成交量与买一卖一价量；从没有成交过（没有最新价）的交易对不推送。
 - 私有流（```private```订阅）推送每一笔成交：订单成交时先推送成交回报（kind 19，```channel```为```fills```：订单ID、HitBTC成交ID、这一笔的成交价与数量、手续费（返佣为负）与该交易对的手续费币种、挂单或吃单），再推送反映这笔成交的订单更新。成交回报不回补历史，断线期间的成交不补推（订单更新的累计成交量仍然准确），重连后重发的同一笔成交只推送一次。
+- 支持WebSocket下单（```ctx.submit(exchange, req)```）：经HitBTC交易WebSocket（```/api/3/ws/trading```，先```login```登录）的```spot_new_order```下单、```spot_cancel_order```撤单，使用单独的一条交易连接（第一次使用时建立，至多等5秒，连不上直接报错，不改用REST；REST接口地址是demo环境时连demo环境）。```req.op```为```order```（```symbol side price amount```及```type tif postOnly extra```）或```cancel```（```symbol id```）。参数、订单ID与错误信息与REST下单相同（错误为```HTTP 状态: {"error":{...}}```，WebSocket应答不带HTTP状态，按HitBTC错误码表对应的状态补上）。HitBTC的订单ID就是客户端订单ID（```client_order_id```）：每张WebSocket单的```client_order_id```就是```ctx.submit```返回的localId，由连接器生成（```ws```加8位base36毫秒时间与随机字母数字，共32位；```IO("extend")```的```^ws:order$```规则可以给出```client_order_id```，须为1到32位字母、数字、```_```、```-```），下单参数里不能自带```clientId```或```extra.client_order_id```；应答的订单ID与localId相同，订单回报与成交回报的```clientId```也是它。HitBTC的批量下单（```spot_new_order_list```）只有全部成交否则取消（AON）、OCO、OTO、OTOCO四种联动类型，没有互不相干的批量，所以```orders```数组的批量在同一条连接上逐单连续发出（不是原子的，整批先按限额预检，放不下时整批不发），每批至多10单，每单各自一条应答；撤单同样逐单发出。撤单的```id```可以是订单ID或localId（同一个号），REST的```ctx.cancel()```也认localId。HitBTC的REST下单不带任何渠道标识，WebSocket下单同样不带；```IO("extend")```规则的```match```对REST请求匹配```方法/路径```，对WebSocket下单匹配```ws:order```、```ws:cancel```，两者互不影响。已发出但没有收到应答（或HitBTC回复500、503、504）时不会重发：按```client_order_id```只读查询历史订单确认，仍无法确认时应答状态为未知并带上客户端订单ID。限频：下单每秒300次（HitBTC的```spot_new_order```每账户限额），撤单每秒10次（交易WebSocket每IP限额），本地超限或HitBTC回复429时直接报限频错误。
 
 #### 火币
 
@@ -29867,7 +29906,11 @@ Kraken只挂月度和季度交割合约，```this_week```、```month```都指最
 
 ###### ```Kraken```（现货）
 
-没有专属指令，通用指令见`exchange.IO`。
+| 指令 | 参数 | 说明 | 返回值 |
+| - | - | - | - |
+| ```wsTrade``` | string | WebSocket下单连接：```connect```预先建立连接并申请WebSocket令牌（否则第一次```ctx.submit()```时才连接），```status```查看连接状态与在途请求数（Kraken的应答不带限频用量，```usage```为空）。 | 连接状态对象```{state, inFlight, lastError, connectedForMs, usage}```。 |
+
+通用指令```api```、```base```、```currency```见`exchange.IO`。
 
 ###### ```Futures_Kraken```（期货）
 
@@ -29930,6 +29973,7 @@ Kraken只挂月度和季度交割合约，```this_week```、```month```都指最
 - ```exchange.GetOrders()```、```exchange.GetConditionOrders()```不传参数时返回全部交易对的挂单。```exchange.GetHistoryOrders()```、```exchange.GetHistoryConditionOrders()```不传```limit```时返回最近50条，传更大的```limit```时自动翻页取满。
 - 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。ticker与bbo使用Kraken随一档变化推送的ticker流（带买卖一价与量及24小时统计）；逐笔成交与```exchange.GetTrades()```同一套成交ID；深度订阅10档以内（缺省10档）、25档以内、100档以内与更多档数（最多255档）分别使用Kraken的10、25、100、500档订单簿流，由快照与增量同步并校验Kraken的CRC32校验和，校验不符时自动重新订阅；K线首次订阅先推送500根历史，Kraken的K线推送只在有成交时更新，一根K线在下一根出现或按交易所时间过了结束时间1秒后标记为收盘（每根只收盘一次）；每个K线周期各用一条连接（Kraken一条连接上同一交易对只能订阅一个K线周期）。私有流是整个账户的一路```private```订阅（不带交易对），只在订阅时连接，连接前用API Key申请Kraken的WebSocket令牌，订阅订单执行流：订阅生效后（以及每次断线重连后）先按```exchange.GetAccount()```同一接口推送一次全部余额快照，然后报告就绪，之后推送订单更新。Kraken的余额推送只有总额，没有可用与冻结的拆分，与```exchange.GetAccount()```的口径对不上，所以不订阅余额推送，余额只有连接时的快照；下单、撤单与成交后不推送余额，需要当前余额时请调用```exchange.GetAccount()```。现货没有持仓，私有流不推送持仓；订单到期在推送里报告为已撤销。订阅被拒时连接状态报告降级、私有流报告失败（行情推送不受影响）。不支持全市场```tickers```订阅（Kraken的ticker推送必须逐个交易对订阅），订阅时报错；请按交易对订阅ticker。
 - 私有流（```private```订阅）推送每一笔成交：订单成交时先推送成交回报（kind 19，```channel```为```fills```：订单ID、Kraken的成交执行ID、这一笔的成交价与数量、手续费与手续费币种（Kraken按计价币收取）、挂单或吃单），再推送反映这笔成交的订单更新；全部成交、撤单等不带成交的订单回报不推送成交回报。成交回报不回补历史（订阅时不重放最近的成交），断线期间的成交不补推（订单更新的累计成交量仍然准确），重连后重复的同一笔成交只推送一次。
+- 支持WebSocket下单（```ctx.submit(exchange, req)```）：经Kraken WebSocket v2下单撤单，使用单独的一条交易连接```wss://ws-auth.kraken.com/v2```（第一次使用时建立，至多等5秒，连不上直接报错，不改用REST）；每个请求带用API Key申请的WebSocket令牌（10分钟内复用，申请失败时这次请求不发出）。```req.op```为```order```（```symbol side price amount```及```type tif postOnly extra```）或```cancel```（```symbol id```）。下单参数的含义与REST下单相同（市价单数量同为交易币数，```tif```支持IOC，FOK同样报错，```postOnly```仅限价委托），```extra```里的字段按Kraken WebSocket v2 ```add_order```的字段名原样传入。单笔用```add_order```；```orders```数组的批量每批至多15单，同一交易对的批量用原生```batch_add```一帧发出（整批校验不通过时整批被拒，资金不足等逐单拒绝，其余照常，不是原子的），交易对混合时在同一条连接上逐单发出；撤单批量每批至多50单，全是Kraken订单ID时用原生```batch_cancel```一帧发出（Kraken只回撤掉的单数，少于单数时逐单只读查询订单状态确认），含localId时逐单发出```cancel_order```。每张WebSocket单的客户端订单ID（```cl_ord_id```，与REST下单同一个字段）就是```ctx.submit```返回的localId，只由连接器生成（```ws```加8位base36毫秒时间与8位随机字母数字，共18位），下单参数里不能自带```clientId```、```extra.cl_ord_id```或```extra.order_userref```；撤单的```id```可以是Kraken订单ID或localId（按```cl_ord_id```撤），REST的```ctx.cancel()```也认localId（先查挂单取得订单ID再撤）。订单回报与成交回报带```clientId```（即```cl_ord_id```）。Kraken的REST下单没有渠道标识，WebSocket下单同样不带；```IO("extend")```规则的```match```对REST请求匹配```方法/路径```，对WebSocket下单匹配```ws:order```、```ws:cancel```，两者互不影响。错误信息与REST相同（```kraken: EOrder:…```）。已发出但没有收到应答（或Kraken回复```EGeneral:Internal error```、```EService:Unavailable```这类不代表成败的错误）时不会重发：按客户端订单ID只读查询挂单与历史订单确认，仍无法确认时应答状态为未知并带上客户端订单ID。Kraken的交易限额按交易对计（与REST共用，按认证等级60/125/180并每秒衰减）；本地按最低等级给每个交易对每60秒60单的下单限额（批量按单数计，整批放不下时整批不发），本地超限或Kraken回复限频时直接报限频错误。
 
 ###### ```Futures_Kraken```（期货）
 
@@ -30347,7 +30391,7 @@ function main() {
 - ```exchange.GetHistoryOrders()```只能查单个交易对，传空串时报错；```exchange.GetHistoryConditionOrders()```不支持```since```参数，传入时报错。
 - 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与账户私有流（订单回报、余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。深度订阅1档使用OKX的```bbo-tbt```、2–5档使用```books5```快照（各自发布所需档数），缺省（20档）与6–255档由```books```频道的快照与增量按序号同步，序号断档时自动重新订阅该深度；逐笔成交使用```trades-all```（逐笔、不合并，与```exchange.GetTrades()```同一套成交ID）；K线首次订阅先推送500根历史；ticker不含持仓量。私有流是一路```private```订阅（不带交易对，覆盖整个账户），只在订阅时连接并登录（要求API Key配置了Passphrase，不支持令牌鉴权），在同一条连接上订阅OKX的```orders```与```account```频道。订阅生效及每次断线重连后，先用与```exchange.GetAssets()```相同的接口取余额快照并推送快照行，再报告就绪；之后实时推送订单回报（只含现货与杠杆订单）与余额变化（可用、冻结与REST同口径，冻结为挂单冻结）。OKX除事件推送外还会定时推送账户快照；余额只按交易所的推送更新，OKX只推送余额非零的币种，某个币种从推送中消失（例如余额归零而没有推送）时不会更新，直到重新连接时的快照，需要当前余额时请调用```exchange.GetAssets()```。现货没有持仓，私有流不含持仓。登录失败时连接状态报告降级、私有流报告失败（行情推送不受影响）。模拟盘的推送连接OKX模拟盘的WebSocket地址。不支持全市场```tickers```订阅（OKX的ticker推送必须逐个交易对订阅），订阅时报错；请按交易对订阅ticker。
 - 私有流（```private```订阅）推送每一笔成交：成交来自现货与杠杆订单频道（```orders```）里带成交号的订单更新，先推送成交回报（kind 19，```channel```为```fills```：订单ID、OKX成交ID、这一笔的成交价与数量（交易币数量）、手续费与手续费币种（OKX的返佣按负手续费给出）、挂单或吃单——强平、ADL等系统成交交易所不给，为未知），再推送同一帧的订单更新。成交回报不回补历史，断线期间的成交不补推（订单更新的累计成交量仍然准确），重连后OKX重发的同一笔成交只推送一次。
-- 支持WebSocket下单（```ctx.submit(exchange, req)```）：经OKX私有WebSocket下单撤单，使用单独的一条交易连接（第一次使用时建立，至多等5秒，连不上直接报错，不改用REST；模拟盘为```wspap```地址并带```x-simulated-trading: 1```握手头）。```req.op```为```"order"```（```symbol side price amount```及```type tif postOnly reduceOnly extra```）或```"cancel"```（```symbol id```），单笔用```order```/```cancel-order```，```orders```数组的批量用原生```batch-orders```/```batch-cancel-orders```一帧发出，每批至多20单；OKX逐单返回结果，部分成功时各单各自一条应答（批量不是原子的）。普通现货与杠杆（```tdMode```）都支持，参数、订单ID与错误信息与REST下单相同；AccessKey为令牌URL的鉴权方式没有WebSocket登录，报不支持。每张WebSocket单的客户端订单ID（```clOrdId```）就是```ctx.submit```返回的localId，只由连接器生成（```ws```加8位base36毫秒时间与随机字母数字，共32位），下单参数里不能自带```clientId```或```extra.clOrdId```；撤单的```id```可以是OKX订单ID或localId（按```clOrdId```撤），REST的```ctx.cancel()```也认本次运行返回的localId。订单回报与成交回报带```clientId```（即```clOrdId```）。渠道标识```tag```与REST下单相同，来自内置的```IO("extend")```规则：REST下单体由```(r?)POST/api/v5/trade/(order|batch.orders)```规则注入，WebSocket下单由```^ws:order$```规则注入（每单一份）。```IO("extend")```规则的```match```对REST请求匹配```方法/路径```，对WebSocket下单匹配```ws:order```、```ws:cancel```，两者互不影响；请写带锚点的正则（```^POST/…```、```^ws:…```），不带锚点的正则可能同时命中两种请求。已发出但没有收到应答（或OKX回复50004这类不代表成败的错误）时不会重发：按客户端订单ID只读查询订单确认，仍无法确认时应答状态为未知并带上客户端订单ID。下单、撤单限额为每个交易对每2秒60次（与REST共用，批量按单数计，整批放不下时整批不发），本地超限或OKX回复限频时直接报限频错误。OKX的WebSocket下单撤单以整数```instIdCode```标识品种（REST仍用```instId```）：连接器从```/api/v5/public/instruments```整表取得（现货一张表）并缓存一小时，实盘与模拟盘分开取；某类品种第一次用到时现取，```IO("wsTrade", "connect")```会预先取好现货表。品种不存在、还没有```instIdCode```或查询失败时该次请求直接报错，不会发出。
+- 支持WebSocket下单（```ctx.submit(exchange, req)```）：经OKX私有WebSocket下单撤单，使用单独的一条交易连接（第一次使用时建立，至多等5秒，连不上直接报错，不改用REST；模拟盘为```wspap```地址并带```x-simulated-trading: 1```握手头）。```req.op```为```order```（```symbol side price amount```及```type tif postOnly reduceOnly extra```）或```cancel```（```symbol id```），单笔用```order```/```cancel-order```，```orders```数组的批量用原生```batch-orders```/```batch-cancel-orders```一帧发出，每批至多20单；OKX逐单返回结果，部分成功时各单各自一条应答（批量不是原子的）。普通现货与杠杆（```tdMode```）都支持，参数、订单ID与错误信息与REST下单相同；AccessKey为令牌URL的鉴权方式没有WebSocket登录，报不支持。每张WebSocket单的客户端订单ID（```clOrdId```）就是```ctx.submit```返回的localId，只由连接器生成（```ws```加8位base36毫秒时间与随机字母数字，共32位），下单参数里不能自带```clientId```或```extra.clOrdId```；撤单的```id```可以是OKX订单ID或localId（按```clOrdId```撤），REST的```ctx.cancel()```也认本次运行返回的localId。订单回报与成交回报带```clientId```（即```clOrdId```）。渠道标识```tag```与REST下单相同，来自内置的```IO("extend")```规则：REST下单体由```(r?)POST/api/v5/trade/(order|batch.orders)```规则注入，WebSocket下单由```^ws:order$```规则注入（每单一份）。```IO("extend")```规则的```match```对REST请求匹配```方法/路径```，对WebSocket下单匹配```ws:order```、```ws:cancel```，两者互不影响；请写带锚点的正则（```^POST/…```、```^ws:…```），不带锚点的正则可能同时命中两种请求。已发出但没有收到应答（或OKX回复50004这类不代表成败的错误）时不会重发：按客户端订单ID只读查询订单确认，仍无法确认时应答状态为未知并带上客户端订单ID。下单、撤单限额为每个交易对每2秒60次（与REST共用，批量按单数计，整批放不下时整批不发），本地超限或OKX回复限频时直接报限频错误。OKX的WebSocket下单撤单以整数```instIdCode```标识品种（REST仍用```instId```）：连接器从```/api/v5/public/instruments```整表取得（现货一张表）并缓存一小时，实盘与模拟盘分开取；某类品种第一次用到时现取，```IO("wsTrade", "connect")```会预先取好现货表。品种不存在、还没有```instIdCode```或查询失败时该次请求直接报错，不会发出。
 
 ###### ```Futures_OKCoin```（期货）
 
@@ -30356,7 +30400,7 @@ function main() {
 - ```exchange.GetHistoryConditionOrders()```不支持```since```参数，传入时报错；```exchange.GetHistoryOrders()```支持。
 - 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与账户私有流（订单回报、持仓、余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。推送的数量、成交量一律按张（与REST接口同一口径），ticker不含持仓量。深度订阅1档使用OKX的```bbo-tbt```、2–5档使用```books5```快照（各自发布所需档数），缺省（20档）与6–255档由```books```频道的快照与增量按序号同步，序号断档时自动重新订阅该深度；逐笔成交使用```trades-all```（逐笔、不合并，与```exchange.GetTrades()```同一套成交ID）；K线首次订阅先推送500根历史。交割合约（如```BTC_USD.quarter```）在订阅时解析成当时的合约，交割换月后需要重新订阅；期权不支持推送。私有流是一路```private```订阅（不带合约，覆盖整个账户），只在订阅时连接并登录（要求API Key配置了Passphrase，不支持令牌鉴权），在同一条连接上订阅OKX的```orders```、```positions```与```account```频道。订阅生效及每次断线重连后，先用与```exchange.GetAssets()```、```exchange.GetPositions()```（永续与交割）相同的接口取快照并推送快照行，再报告就绪；之后实时推送订单回报与持仓变化（只含永续与交割，数量按张，平仓推送数量为0的一行）、余额变化，各字段与REST同口径。OKX除事件推送外还会定时推送持仓（约每5秒）与账户快照，标记价引起的浮动盈亏与权益随之更新；余额只按交易所的推送更新，OKX只推送余额非零的币种，某个币种从推送中消失（例如余额归零而没有推送）时不会更新，直到重新连接时的快照，需要当前余额时请调用```exchange.GetAssets()```。登录失败时连接状态报告降级、私有流报告失败（行情推送不受影响）。模拟盘的推送连接OKX模拟盘的WebSocket地址。不支持全市场```tickers```订阅（OKX的ticker推送必须逐个合约订阅），订阅时报错；请按合约订阅ticker。
 - 私有流（```private```订阅）推送每一笔成交：成交来自永续与交割合约订单频道（```orders```）里带成交号的订单更新，先推送成交回报（kind 19，```channel```为```fills```：订单ID、OKX成交ID、这一笔的成交价与数量（张）、手续费与手续费币种（OKX的返佣按负手续费给出）、挂单或吃单——强平、ADL等系统成交交易所不给，为未知），再推送同一帧的订单更新。成交回报不回补历史，断线期间的成交不补推（订单更新的累计成交量仍然准确），重连后OKX重发的同一笔成交只推送一次。
-- 支持WebSocket下单（```ctx.submit(exchange, req)```）：经OKX私有WebSocket下单撤单，使用单独的一条交易连接（第一次使用时建立，至多等5秒，连不上直接报错，不改用REST；模拟盘为```wspap```地址并带```x-simulated-trading: 1```握手头）。```req.op```为```"order"```（```symbol side price amount```及```type tif postOnly reduceOnly extra```）或```"cancel"```（```symbol id```），单笔用```order```/```cancel-order```，```orders```数组的批量用原生```batch-orders```/```batch-cancel-orders```一帧发出，每批至多20单；OKX逐单返回结果，部分成功时各单各自一条应答（批量不是原子的）。永续与交割合约都支持，持仓方向、保证金模式与张数映射与REST下单相同，参数、订单ID与错误信息与REST下单相同；AccessKey为令牌URL的鉴权方式没有WebSocket登录，报不支持。每张WebSocket单的客户端订单ID（```clOrdId```）就是```ctx.submit```返回的localId，只由连接器生成（```ws```加8位base36毫秒时间与随机字母数字，共32位），下单参数里不能自带```clientId```或```extra.clOrdId```；撤单的```id```可以是OKX订单ID或localId（按```clOrdId```撤），REST的```ctx.cancel()```也认本次运行返回的localId。订单回报与成交回报带```clientId```（即```clOrdId```）。渠道标识```tag```与REST下单相同，来自内置的```IO("extend")```规则：REST下单体由```(r?)POST/api/v5/trade/(order|batch.orders)```规则注入，WebSocket下单由```^ws:order$```规则注入（每单一份）。```IO("extend")```规则的```match```对REST请求匹配```方法/路径```，对WebSocket下单匹配```ws:order```、```ws:cancel```，两者互不影响；请写带锚点的正则（```^POST/…```、```^ws:…```），不带锚点的正则可能同时命中两种请求。已发出但没有收到应答（或OKX回复50004这类不代表成败的错误）时不会重发：按客户端订单ID只读查询订单确认，仍无法确认时应答状态为未知并带上客户端订单ID。下单、撤单限额为每个交易对每2秒60次（与REST共用，批量按单数计，整批放不下时整批不发），本地超限或OKX回复限频时直接报限频错误。OKX的WebSocket下单撤单以整数```instIdCode```标识品种（REST仍用```instId```）：连接器从```/api/v5/public/instruments```整表取得（永续、交割各一张表，期权按标的族分表）并缓存一小时，实盘与模拟盘分开取；某类品种第一次用到时现取，```IO("wsTrade", "connect")```会预先取好永续与交割两张表。品种不存在、还没有```instIdCode```或查询失败时该次请求直接报错，不会发出。
+- 支持WebSocket下单（```ctx.submit(exchange, req)```）：经OKX私有WebSocket下单撤单，使用单独的一条交易连接（第一次使用时建立，至多等5秒，连不上直接报错，不改用REST；模拟盘为```wspap```地址并带```x-simulated-trading: 1```握手头）。```req.op```为```order```（```symbol side price amount```及```type tif postOnly reduceOnly extra```）或```cancel```（```symbol id```），单笔用```order```/```cancel-order```，```orders```数组的批量用原生```batch-orders```/```batch-cancel-orders```一帧发出，每批至多20单；OKX逐单返回结果，部分成功时各单各自一条应答（批量不是原子的）。永续与交割合约都支持，持仓方向、保证金模式与张数映射与REST下单相同，参数、订单ID与错误信息与REST下单相同；AccessKey为令牌URL的鉴权方式没有WebSocket登录，报不支持。每张WebSocket单的客户端订单ID（```clOrdId```）就是```ctx.submit```返回的localId，只由连接器生成（```ws```加8位base36毫秒时间与随机字母数字，共32位），下单参数里不能自带```clientId```或```extra.clOrdId```；撤单的```id```可以是OKX订单ID或localId（按```clOrdId```撤），REST的```ctx.cancel()```也认本次运行返回的localId。订单回报与成交回报带```clientId```（即```clOrdId```）。渠道标识```tag```与REST下单相同，来自内置的```IO("extend")```规则：REST下单体由```(r?)POST/api/v5/trade/(order|batch.orders)```规则注入，WebSocket下单由```^ws:order$```规则注入（每单一份）。```IO("extend")```规则的```match```对REST请求匹配```方法/路径```，对WebSocket下单匹配```ws:order```、```ws:cancel```，两者互不影响；请写带锚点的正则（```^POST/…```、```^ws:…```），不带锚点的正则可能同时命中两种请求。已发出但没有收到应答（或OKX回复50004这类不代表成败的错误）时不会重发：按客户端订单ID只读查询订单确认，仍无法确认时应答状态为未知并带上客户端订单ID。下单、撤单限额为每个交易对每2秒60次（与REST共用，批量按单数计，整批放不下时整批不发），本地超限或OKX回复限频时直接报限频错误。OKX的WebSocket下单撤单以整数```instIdCode```标识品种（REST仍用```instId```）：连接器从```/api/v5/public/instruments```整表取得（永续、交割各一张表，期权按标的族分表）并缓存一小时，实盘与模拟盘分开取；某类品种第一次用到时现取，```IO("wsTrade", "connect")```会预先取好永续与交割两张表。品种不存在、还没有```instIdCode```或查询失败时该次请求直接报错，不会发出。
 
 #### Poloniex
 
@@ -30382,6 +30426,7 @@ Poloniex的现货交易（接口地址```https://api.poloniex.com```，v3接口�
 | 指令 | 参数 | 说明 | 返回值 |
 | - | - | - | - |
 | ```accountId``` | string | 指定`exchange.GetAccount`读取的现货账户ID：设置后只读这个现货账户，找不到该账户时报错；传空字符串恢复默认（读取第一个现货账户）。不影响`exchange.GetAssets`，它总是汇总全部现货账户。 | 空值。 |
+| ```wsTrade``` | string | WebSocket下单连接：```connect```预先建立连接（否则第一次```ctx.submit()```时才连接），```status```查看连接状态与在途请求数。 | 连接状态对象```{state, inFlight, lastError, connectedForMs, usage}```。 |
 
 通用指令```api```、```base```、```currency```见`exchange.IO`。
 
@@ -30420,6 +30465,7 @@ function main() {
 - ```exchange.GetAccount()```只读一个SPOT账户：```exchange.IO("accountId", id)```指定的账户，未指定时为第一个SPOT账户；```exchange.GetAssets()```汇总所有SPOT账户的资产。
 - 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。ticker推送的买一卖一价与量取自同交易对的5档盘口流（Poloniex的ticker流本身不带买一卖一，约每秒一条），两条流都到达后才开始推送；逐笔成交与```exchange.GetTrades()```同一套成交ID；深度订阅5档以内使用Poloniex每100毫秒一次的5档快照，6到10档使用10档快照，缺省（20档）与11到20档使用20档实时增量流（按序号连续性校验，断档时重新订阅取快照），超过20档不支持；K线首次订阅先推送500根历史，Poloniex的K线推送不带收盘标志：收到更晚的一根K线（中间隔着没有成交的周期也算），或按交易所时间（推送里的服务端时间）过了该K线结束时间1秒，就把该K线作为收盘K线推送，每根只推送一次收盘。私有流是整个账户的一路```private```订阅（不带交易对），只在订阅时连接并鉴权，在同一条连接上订阅Poloniex的订单流与余额流：订阅生效后（以及每次断线重连后）先按```exchange.GetAssets()```同一接口推送一次全部余额快照（汇总所有SPOT账户），然后报告就绪，之后推送订单更新与发生变化的币种余额（余额只按交易所的推送更新：只有一个SPOT账户时推送可用与冻结额；有多个SPOT账户时单个账户的推送与```exchange.GetAssets()```的汇总口径对不上，不推送余额变化，需要当前余额时请调用```exchange.GetAssets()```）。市价买单的订单数量与成交量与```exchange.GetOrder()```相同，是计价币金额。现货没有持仓，私有流不推送持仓。鉴权失败时连接状态报告降级、私有流报告失败（行情推送不受影响）。全市场```tickers```订阅（不带交易对）使用Poloniex的```ticker```频道订阅全部交易对，每秒推送一次全部交易对，带最新价、24小时开高低与成交量，不带买一卖一（Poloniex的盘口频道不支持订阅全部交易对），需要买一卖一请按交易对订阅ticker或bbo。
 - 私有流（```private```订阅）推送每一笔成交：订单成交时先推送成交回报（kind 19，```channel```为```fills```：订单ID、Poloniex成交ID、这一笔的成交价与数量（与订单更新相同：市价买单是计价币金额，其余是交易币数量）、手续费与手续费币种、挂单或吃单），再推送反映这笔成交的订单更新。成交回报不回补历史，断线期间的成交不补推（订单更新的累计成交量仍然准确），重连后重发的同一笔成交只推送一次。
+- 支持WebSocket下单（```ctx.submit(exchange, req)```）：经Poloniex私有WebSocket（```wss://ws.poloniex.com/ws/private```，先```auth```鉴权）的交易请求```createOrder```下单、```cancelOrders```撤单，使用单独的一条交易连接（第一次使用时建立，至多等5秒，连不上直接报错，不改用REST）。```req.op```为```order```（```symbol side price amount```及```type tif postOnly extra```）或```cancel```（```symbol id```）。下单参数与REST下单是同一份请求体（市价买单按计价币金额```amount```），订单ID与错误信息与REST相同（错误为```HTTP 400: {"code":...,"message":...}```，WebSocket应答不带HTTP状态：业务错误记400，系统错误500、603记500）。每张WebSocket单的客户端订单ID（```clientOrderId```）就是```ctx.submit```返回的localId，由连接器生成（```ws```加8位base36毫秒时间与随机字母数字，共32位；```IO("extend")```的```^ws:order$```规则可以给出```clientOrderId```，须为1到64位字母、数字、```_```、```-```），下单参数里不能自带```clientId```或```extra.clientOrderId```；订单回报与成交回报的```clientId```就是它。Poloniex的WebSocket没有批量下单，```orders```数组的批量在同一条连接上逐单连续发出（不是原子的，整批先按限额预检，放不下时整批不发），每批至多10单，每单各自一条应答；批量撤单用原生的```cancelOrders```一次发出（订单ID放```orderIds```、localId放```clientOrderIds```），每批至多20单，逐单报告结果，可能部分成功。撤单的```id```可以是Poloniex订单ID或localId，REST的```ctx.cancel()```也认localId（按```DELETE /orders/cid:{clientOrderId}```撤，返回交易所订单ID）。Poloniex的REST下单不带任何渠道标识，WebSocket下单同样不带；```IO("extend")```规则的```match```对REST请求匹配```方法/路径```，对WebSocket下单匹配```ws:order```、```ws:cancel```（撤单规则注入整帧```cancelOrders```的参数），两者互不影响。已发出但没有收到应答（或Poloniex回复500、603）时不会重发：按客户端订单ID只读查询订单（```GET /orders/cid:{clientOrderId}```）确认，仍无法确认时应答状态为未知并带上客户端订单ID。限频（与REST共用、按VIP0）：下单每秒50次，批量撤单每秒10帧，本地超限或Poloniex回复429时直接报限频错误。
 
 #### Upbit
 
@@ -30777,6 +30823,7 @@ HIP-4 Outcome品种的交易对为市场名称（空格、```/```换成```-```�
 | ```expiresAfter``` | timestamp | 设置之后所有签名动作（下单、撤单、改单等）携带的```expiresAfter```：毫秒级Unix时间戳，超过这个时间交易所拒绝该动作；0取消（默认）。设置值一直生效，过期后的动作都会被拒绝，需要重新设置或改回0。 | 设置的值。 |
 | ```source``` | "a" \| "b" | 签名使用的网络：```a```为主网（默认；配置勾选「模拟盘（测试网）」时为```b```），```b```为测试网。（详见表下） | 设置的值。 |
 | ```api``` | method, path[, params[, body]] | 直接调用Hyperliquid接口。（详见表下） | 交易所的原始应答。 |
+| ```wsTrade``` | string | WebSocket下单连接：```connect```预先建立连接（否则第一次```ctx.submit()```时才连接），```status```查看连接状态与在途请求数（Hyperliquid的应答不带限频用量，```usage```为空）。 | 连接状态对象```{state, inFlight, lastError, connectedForMs, usage}```。 |
 
 表中长说明的其余部分：
 
@@ -30800,6 +30847,7 @@ HIP-4 Outcome品种的交易对为市场名称（空格、```/```换成```-```�
 | ```mergeQuestion``` | symbol[, amount] | HIP-4按问题合并（```mergeQuestion```动作）：对```symbol```所属Outcome所在的问题（question）做合并，```amount```可省略（省略或不大于0时请求不带数量）。该Outcome不属于任何问题时报错。 | 交易所的原始应答（```status```为```ok```）。 |
 | ```negate``` | symbol, amount | HIP-4取反（```negateOutcome```动作）：在```symbol```所属的问题中对该Outcome做取反转换，```amount```必须大于0。该Outcome不属于任何问题时报错。 | 交易所的原始应答（```status```为```ok```）。 |
 | ```api``` | method, path[, params[, body]] | 直接调用Hyperliquid接口。（详见表下） | 交易所的原始应答。 |
+| ```wsTrade``` | string | WebSocket下单连接：```connect```预先建立连接（否则第一次```ctx.submit()```时才连接），```status```查看连接状态与在途请求数（Hyperliquid的应答不带限频用量，```usage```为空）。 | 连接状态对象```{state, inFlight, lastError, connectedForMs, usage}```。 |
 
 表中长说明的其余部分：
 
@@ -31001,6 +31049,7 @@ function main() {
 - ```exchange.GetHistoryOrders()```只能取交易所返回的最近订单，不支持```since```参数，传入大于0的```since```会报错。
 - 私有流（```private```订阅）推送每一笔现货成交（kind 19，```channel```为```fills```：订单ID、Hyperliquid成交ID、这一笔的成交价与数量、手续费（挂单返佣为负数，含builder费）与手续费币种、挂单或吃单），来自按地址订阅的```userFills```；成交与订单更新是两路订阅，交易所不保证两者的先后。订阅时交易所补发的历史成交不推送，成交回报不回补历史，断线期间的成交不补推（订单更新的状态仍然准确），重连后重发的同一笔成交只推送一次。
 - 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。ticker的最新价、成交量、开盘价与```exchange.GetTicker()```同源（中间价、24小时成交量、昨收），买一、卖一取最优买卖推送，没有24小时最高、最低价。深度订阅最多20档：1～5档订阅交易所的5档快速推送（约0.5秒一次），6～20档（缺省20档）订阅20档推送（约5秒一次），两者是各自独立的推送；逐笔成交与```exchange.GetTrades()```同一套成交ID，订阅生效时交易所补发的最近成交不推送；K线周期同```exchange.GetRecords()```，首次订阅先推送500根历史，交易所的K线推送没有收盘标志，下一根开始时上一根作为已收盘推送（成交稀少的交易对收盘推送会延后到下一笔成交）。私有流是整个钱包地址的一路```private```订阅（不带交易对），按```WalletAddress```（或```exchange.IO("walletAddress", ...)```设置的地址）只读订阅、不签名：订阅生效后（以及每次断线重连后）先按```exchange.GetAccount()```同一接口推送一次全部余额快照，然后报告就绪，之后推送现货订单更新（不含成交均价，需要时用```exchange.GetOrder()```）与发生变化的币种余额。不支持全市场```tickers```订阅（Hyperliquid的全市场推送```allMids```只有中间价，不是ticker），订阅时报错；请按交易对订阅ticker。
+- 支持WebSocket下单（```ctx.submit(exchange, req)```）：经Hyperliquid WebSocket的```post```请求下单撤单，使用单独的一条交易连接（与推送同一地址，第一次使用时建立，至多等5秒，连不上直接报错，不改用REST；配置勾选「模拟盘（测试网）」时为测试网地址）。```req.op```为```order```（```symbol side price amount```及```type tif postOnly reduceOnly extra```）或```cancel```（```symbol id```）。每个请求与REST下单一样用API钱包私钥签名（```IO("vaultAddress")```、```IO("expiresAfter")```同样生效），参数、价格规则、订单ID与错误信息与REST下单相同。```orders```数组的批量放进一个原生```order```动作一帧发出，每批至多20单，交易所逐单返回结果，部分成功时各单各自一条应答（批量不是原子的）；同一批各单```extra```里的动作级参数（```builder```、```grouping```）必须相同，不同时整批报错。批量撤单时按订单ID撤的进一个```cancel```动作、按客户端订单ID撤的进一个```cancelByCloid```动作，两种都有时分两帧连续发出。每张WebSocket单的客户端订单ID（```cloid```）就是```ctx.submit```返回的localId，只由连接器生成：```0x```加32位小写十六进制（前12位为毫秒时间，后20位随机）；下单参数里不能自带```clientId```或```extra.orders```。撤单的```id```可以是Hyperliquid订单ID或localId（按```cloid```撤），REST的```ctx.cancel()```也认本次运行返回的localId。订单回报与成交回报带```clientId```（即```cloid```）。连接器不内置builder费用：```builder```只来自下单的```extra```或```IO("extend")```规则，REST与WebSocket一致。```IO("extend")```规则的```match```对REST请求匹配```方法/路径```（```POST/exchange```），对WebSocket下单匹配```ws:order```、```ws:cancel```，都注入到动作上，两者互不影响；请写带锚点的正则（```^POST/…```、```^ws:…```），不带锚点的正则可能同时命中两种请求。已发出但没有收到应答（或交易所回复5xx类错误、应答无法解析）时不会重发：按客户端订单ID只读查询订单状态（```orderStatus```）确认，仍无法确认时应答状态为未知并带上客户端订单ID。本地限频为下单、撤单各每分钟900单且每秒100单（交易所按IP每分钟至多2000条WebSocket消息、至多100个在途请求；按地址的累计成交额额度由交易所判断），本地超限或交易所回复限频时直接报限频错误。
 
 ###### ```Futures_Hyperliquid```（期货）
 
@@ -31015,6 +31064,7 @@ function main() {
 - HIP-4 Outcome品种是现货式头寸：用买入、卖出交易（下单数量为整数），不支持只减仓，平仓单（```closebuy```、```closesell```）会报错；持仓来自现货账户中的Outcome代币。Outcome品种没有K线、资金费率，```GetTicker()```的```Last```为中间价，```Buy```、```Sell```为0。交易所还没有给出中间价的Outcome品种（刚上市、尚未成交等）仍出现在```GetMarkets()```中（```PricePrecision```为4，```Info.assetCtx.midPx```为```null```），```GetTickers()```不含该品种，对它调用```GetTicker()```或下市价单会报错；持有这种品种时，持仓按中间价0估值（```Margin```为0，```Profit```为负的买入成本）。
 - 私有流（```private```订阅）推送每一笔永续成交（kind 19，```channel```为```fills```：订单ID、Hyperliquid成交ID、这一笔的成交价与数量（币，与订单更新相同）、手续费（挂单返佣为负数，含builder费）与手续费币种、挂单或吃单），来自按地址订阅的```userFills```；成交与订单更新是两路订阅，交易所不保证两者的先后。订阅时交易所补发的历史成交不推送，成交回报不回补历史，断线期间的成交不补推（订单更新的状态仍然准确），重连后重发的同一笔成交只推送一次。
 - 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报、持仓与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。ticker的最新价、成交量、开盘价、持仓量与```exchange.GetTicker()```同源（中间价、24小时成交量、昨收、未平仓量），买一、卖一取最优买卖推送（不是冲击价），没有24小时最高、最低价。深度订阅最多20档：1～5档订阅交易所的5档快速推送（约0.5秒一次），6～20档（缺省20档）订阅20档推送（约5秒一次），两者是各自独立的推送；逐笔成交与```exchange.GetTrades()```同一套成交ID，订阅生效时交易所补发的最近成交不推送；K线周期同```exchange.GetRecords()```，首次订阅先推送500根历史，交易所的K线推送没有收盘标志，下一根开始时上一根作为已收盘推送。HIP-4 Outcome品种不支持推送（订阅时报错）。私有流是整个钱包地址的一路```private```订阅（不带交易对），按```WalletAddress```（或```exchange.IO("walletAddress", ...)```设置的地址）只读订阅、不签名：订阅生效后（以及每次断线重连后）先按```exchange.GetAccount()```与```exchange.GetPositions()```同一接口推送一次全部余额与持仓快照，然后报告就绪，之后推送永续订单更新（不含成交均价，需要时用```exchange.GetOrder()```）、发生变化的持仓（单向净持仓，平仓推送数量0）与余额（由账户状态推送算出，口径与```exchange.GetAccount()```相同：普通账户取永续账户状态推送，统一账户或组合保证金取现货USDC余额推送；账户模式以订阅生效或断线重连时为准，期间切换模式要到下一次重连后才跟上）。实时持仓只覆盖一个dex（```exchange.IO("dex", ...)```设置的dex，缺省主dex），其它HIP-3 dex上的持仓只在快照中出现。不支持全市场```tickers```订阅（Hyperliquid的全市场推送```allMids```只有中间价，不是ticker），订阅时报错；请按交易对订阅ticker。
+- 支持WebSocket下单（```ctx.submit(exchange, req)```）：经Hyperliquid WebSocket的```post```请求下单撤单，使用单独的一条交易连接（与推送同一地址，第一次使用时建立，至多等5秒，连不上直接报错，不改用REST；配置勾选「模拟盘（测试网）」时为测试网地址）。```req.op```为```order```（```symbol side price amount```及```type tif postOnly reduceOnly extra```）或```cancel```（```symbol id```）。每个请求与REST下单一样用API钱包私钥签名（```IO("vaultAddress")```、```IO("expiresAfter")```同样生效），普通单、触发单（```extra```里的```triggerPx```与```tpsl```）与HIP-4 Outcome品种都支持，参数、价格规则、订单ID与错误信息与REST下单相同。```orders```数组的批量放进一个原生```order```动作一帧发出，每批至多20单，交易所逐单返回结果，部分成功时各单各自一条应答（批量不是原子的）；同一批各单```extra```里的动作级参数（```builder```、```grouping```）必须相同，不同时整批报错。批量撤单时按订单ID撤的进一个```cancel```动作、按客户端订单ID撤的进一个```cancelByCloid```动作，两种都有时分两帧连续发出。每张WebSocket单的客户端订单ID（```cloid```）就是```ctx.submit```返回的localId，只由连接器生成：```0x```加32位小写十六进制（前12位为毫秒时间，后20位随机）；下单参数里不能自带```clientId```或```extra.orders```。撤单的```id```可以是Hyperliquid订单ID或localId（按```cloid```撤），REST的```ctx.cancel()```也认本次运行返回的localId。订单回报与成交回报带```clientId```（即```cloid```）。连接器不内置builder费用：```builder```只来自下单的```extra```或```IO("extend")```规则，REST与WebSocket一致。```IO("extend")```规则的```match```对REST请求匹配```方法/路径```（```POST/exchange```），对WebSocket下单匹配```ws:order```、```ws:cancel```，都注入到动作上，两者互不影响；请写带锚点的正则（```^POST/…```、```^ws:…```），不带锚点的正则可能同时命中两种请求。已发出但没有收到应答（或交易所回复5xx类错误、应答无法解析）时不会重发：按客户端订单ID只读查询订单状态（```orderStatus```）确认，仍无法确认时应答状态为未知并带上客户端订单ID。本地限频为下单、撤单各每分钟900单且每秒100单（交易所按IP每分钟至多2000条WebSocket消息、至多100个在途请求；按地址的累计成交额额度由交易所判断），本地超限或交易所回复限频时直接报限频错误。
 
 #### Lighter
 
@@ -31050,6 +31100,7 @@ Lighter只有永续合约，```swap```以外的合约代码会报错。
 | ```cross``` | bool[, symbol] | 全仓（true）/逐仓（false），不传```symbol```时作用于当前合约。（详见表下） | ```{symbol, leverage, marginMode, initialMarginFraction, txHash, ok}```，```txHash```为这笔链上交易的哈希。 |
 | ```expiry``` | number | 之后所下限价单和条件单的存活时长（毫秒，必须大于0），默认29天（交易所允许的上限）；订单的过期时间为下单时刻加10分钟再加该时长。市价单不受影响。 | ```true``` |
 | ```api``` | method, path[, params[, raw[, sign]]] | 直接调用Lighter接口，只支持```GET```、```POST```。（详见表下） | 交易所的原始应答；应答```code```不是200时报错。 |
+| ```wsTrade``` | string | WebSocket下单连接：```connect```预先建立连接（否则第一次```ctx.submit()```时才连接），```status```查看连接状态与在途请求数。 | 连接状态对象```{state, inFlight, lastError, connectedForMs, usage}```。 |
 
 表中长说明的其余部分：
 
@@ -31124,6 +31175,7 @@ function main() {
 
 - 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报、持仓与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。ticker的最新价、24小时最高最低价、成交量、持仓量与开盘价（由24小时涨跌幅推算）口径与```exchange.GetTickers()```相同，买卖一价与量来自交易所的最优买卖频道（与bbo订阅同一条推送）。深度订阅（缺省20档、最多255档）由交易所整本快照加增量同步、按撮合序号检查连续性，断档时重新订阅；交易所每个品种只有一条订单簿推送，不同档数的订阅共用这一条、各自按档数截断。推送的深度按价格合并（与```exchange.GetDepth()```的逐笔挂单不同）。逐笔成交与```exchange.GetTrades()```同一套成交ID，强平、自动减仓与市场结算的成交不推送。K线支持1分钟、5分钟、15分钟、30分钟、1小时、4小时、12小时、1天周期（推送没有周线），首次订阅先推送500根历史。私有流是整个账户的一路```private```订阅（不带交易对），需要配置API密钥私钥与账户索引，只在订阅时连接：订单频道带与REST私有接口同一个鉴权令牌，持仓与账户统计频道按账户索引订阅；订阅生效后（以及每次断线重连后）先按```exchange.GetAccount()```与```exchange.GetPositions()```同一接口推送一次USDC余额与全部持仓快照，然后报告就绪，之后推送全部品种的订单更新（订单ID与```exchange.CreateOrder()```返回的相同）、发生变化的持仓（单向净持仓，平仓推送数量0）与变化后的USDC余额（可用为可用保证金，冻结为账户总价值减可用，与```exchange.GetAccount()```相同）。鉴权令牌有效期7小时，私有连接在令牌到期前自动重连换新令牌并重新推送快照；鉴权失败时连接状态报告降级、私有流报告失败（行情推送不受影响）。模拟盘连接测试网的推送地址。全市场```tickers```订阅（不带交易对）使用交易所的全市场统计频道，约每秒推送一次有变化的品种，最新价、24小时高低价、成交量、持仓量与开盘价同ticker，买一卖一只有价格没有数量（交易所没有全市场的最优挂单频道），还没有成交的品种（最新价、24小时高低价与成交量全为0）不推送，同```exchange.GetTickers()```。
 - 私有流（```private```订阅）同时订阅交易所的账户成交频道（不需要鉴权令牌），推送本账户的每一笔成交（kind 19，```channel```为```fills```：订单ID（与订单更新、```exchange.CreateOrder()```返回的相同）、交易所成交ID（与逐笔成交、```exchange.GetTrades()```同一套）、这一笔的成交价与数量（币）、手续费（USDC，按这一笔的成交额乘本方费率计算；交易所没有给出本方费率表示这笔没有手续费，手续费为0）、挂单或吃单）；自成交时买单、卖单各推送一条。成交与订单更新来自交易所的两个频道，两者到达的先后不保证。强平单与挂单的撮合推送成交，自动减仓与市场结算不推送。成交回报不回补历史：订阅生效时交易所给出的成交不推送，断线期间的成交不补推（订单更新的累计成交量仍然准确），重连后交易所重发的同一笔成交只推送一次。
+- 支持WebSocket下单（```ctx.submit(exchange, req)```）：经Lighter的```/stream```WebSocket发送与REST下单完全相同的已签名L2交易（下单```jsonapi/sendtx```，多笔用```jsonapi/sendtxbatch```一帧发出），使用单独的一条交易连接（第一次使用时建立，至多等5秒，连不上直接报错，不改用REST；REST接口地址含```testnet```时连测试网）。```req.op```为```order```（```symbol side price amount```及```type tif postOnly reduceOnly extra```，市价单同样按对手价加滑点保护）或```cancel```（```symbol id```）。订单ID就是客户端订单下标（```ClientOrderIndex```），即```ctx.submit```返回的localId（十进制数字串，与REST下单同一个生成器：毫秒时间加同毫秒计数），撤单、改单都认它，订单回报与成交回报的```clientId```也是它；下单参数里不能自带```clientId```或```extra.ClientOrderIndex```。批量```orders```用原生```sendtxbatch```一帧发出（同一API Key、nonce连续），每批至多15笔，交易所整批受理或整批拒绝，每笔各自一条应答（受理时带各自的交易哈希）。```code```为200只表示交易已被受理，撮合结果（如只做Maker被取消）看订单回报，与REST下单相同。nonce与REST共用一本账：取号、签名、发出与REST在同一把锁下，WebSocket第一次（或失败后）以```/api/v1/nextNonce```为准，之后本地连续递增（交易所的nextNonce不会立刻反映刚受理的交易）；用过WebSocket下单之后，REST交易取交易所nonce与本地计数中较大的一个；任何一笔被拒、结果未知时下一笔重新以交易所为准，两条路径不会重复使用同一个nonce。错误信息与REST相同（```lighter 错误码: 原因```）。本连接器的REST下单不带任何渠道（integrator）字段，WebSocket下单同样不带；```IO("extend")```的```ws:order```、```ws:cancel```规则注入这一帧的```data```（与REST规则注入```sendTx```表单同位），不能改```id```、```tx_type```、```tx_info```、```tx_types```、```tx_infos```。已发出但没有收到应答（或交易所回复29500、29501）时不会重发：按客户端订单下标只读查询挂单与历史订单确认，仍无法确认时应答状态为未知并带上客户端订单ID。限频：交易所的sendTx额度与REST共用、一帧算一次，额度取决于账户类型（Standard账户每分钟60次且与其它REST请求合计，Plus与Premium每分钟4000次起），本地按每分钟4000次预检，交易所回复429、23000或21506时直接报限频错误。
 
 #### edgeX
 
