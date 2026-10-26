@@ -4851,6 +4851,7 @@ fn main() {
 - `Hyperliquid`：原生周期为1分钟、3分钟、5分钟、15分钟、30分钟、1小时、2小时、4小时、8小时、12小时、1天、3天、1周、1月；其它周期由托管者合成。
 - `Futures_Hyperliquid`：原生周期为1分钟、3分钟、5分钟、15分钟、30分钟、1小时、2小时、4小时、8小时、12小时、1天、3天、1周；其它周期由托管者合成。Outcome品种没有K线。
 - `Futures_EdgeX`：原生周期为1分钟、5分钟、15分钟、30分钟、1小时、2小时、4小时、6小时、8小时、12小时、1天、1周、1月；其它60秒整数倍的周期由托管者用原生K线合成，其余周期（如秒级）不可用（交易所没有成交接口）。
+- `Futures_dYdX`：原生周期为1分钟、5分钟、15分钟、30分钟、1小时、4小时、1天；其它周期由托管者合成。
 - `Futures_WOOFi`：原生周期为1分钟、5分钟、15分钟、30分钟、1小时、4小时、12小时、1天、1周、1月、1年；其它周期由托管者合成。单次最多返回1000根。
 - `Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`：原生周期为1分钟、5分钟、15分钟、1小时、4小时、12小时、1天（GeckoTerminal的周期）；其它周期由托管者合成：分钟级以上的周期由原生周期合并，秒级周期由```exchange.GetTrades()```的链上成交逐笔累积（首次调用只有最近约10分钟成交覆盖的那几根，之后随每次调用累积；还没有成交时报错并说明原因，取成交失败时报错带上失败原因）。
 - `KyberSwap`、`OneInch`、`Jupiter`：原生周期为1分钟、5分钟、15分钟、1小时、4小时、12小时、1天（GeckoTerminal的周期）；其它分钟级以上的周期由托管者合成，秒级周期不可用（没有成交记录接口可供合成）。
@@ -6042,7 +6043,7 @@ fn main() {
 
 也可以将参数附加在```side```参数之后（旧写法），格式为```"side;{JSON对象}"```或```"side;key=value&key=value"```，例如```"buy;{\"priceMatch\":\"QUEUE_20\"}"```或```"buy;priceMatch=QUEUE_20"```。具体支持哪些参数取决于交易所API。
 
-仅以下交易所支持：`Binance`、`Futures_Binance`、`Bitfinex`、`Futures_Bitfinex`、`Bitget`、`Futures_Bitget`、`Bybit`、`Futures_Bybit`、`Crypto`、`Futures_Crypto`、`Futures_DeepCoin`、`Futures_Deribit`、`GateIO`、`Futures_GateIO`、`HitBTC`、`Kraken`、`Futures_Kraken`、`KuCoin`、`Futures_MEXC`、`OKEX`、`Futures_OKCoin`、`Poloniex`、`Upbit`、`WOO`、`Futures_WOO`、`Hyperliquid`、`Futures_Hyperliquid`、`Futures_Lighter`、`Futures_Aevo`、`Futures_Boros`、`Futures_WOOFi`、`Jupiter`、`Futures_Futu`。其余交易所调用时报错并返回空值，所有交易所的对照见`能力矩阵`。
+仅以下交易所支持：`Binance`、`Futures_Binance`、`Bitfinex`、`Futures_Bitfinex`、`Bitget`、`Futures_Bitget`、`Bybit`、`Futures_Bybit`、`Crypto`、`Futures_Crypto`、`Futures_DeepCoin`、`Futures_Deribit`、`GateIO`、`Futures_GateIO`、`HitBTC`、`Kraken`、`Futures_Kraken`、`KuCoin`、`Futures_MEXC`、`OKEX`、`Futures_OKCoin`、`Poloniex`、`Upbit`、`WOO`、`Futures_WOO`、`Hyperliquid`、`Futures_Hyperliquid`、`Futures_Lighter`、`Futures_Aevo`、`Futures_dYdX`、`Futures_Boros`、`Futures_WOOFi`、`Jupiter`、`Futures_Futu`。其余交易所调用时报错并返回空值，所有交易所的对照见`能力矩阵`。
 
 See also: `exchange.CreateOrder`, `exchange.CancelOrder`, `exchange.GetOrder`, `exchange.GetOrders`
 
@@ -7891,6 +7892,7 @@ fn main() {
 | `Futures_ApolloX` | ✓ |  |  |  |  |  |  |  |  |  |
 | `Futures_Aster` | ✓ |  |  |  |  |  |  |  |  |  |
 | `Futures_Aevo` | ✓ |  |  |  |  |  |  |  |  |  |
+| `Futures_dYdX` | ✓ |  |  |  |  |  |  |  |  |  |
 | `Futures_WOOFi` | ✓ |  |  |  |  |  |  |  |  |  |
 | `Futures_Polymarket` |  |  |  |  |  |  |  |  |  | ```Yes```、```No```、```Up```、```Down``` |
 
@@ -9352,7 +9354,7 @@ fn main() {
 | ```allChainBalance``` | `OKX_DEX` |
 | ```allowance``` | `OKX_DEX` |
 | ```allTokens``` | `OKX_DEX` |
-| ```api``` | `Backpack`、`Futures_Backpack`、`BigONE`、`Bitstamp`、`Coinw`、`Crypto`、`Futures_Crypto`、`DigiFinex`、`Futures_DigiFinex`、`WOO`、`Futures_WOO`、`Hyperliquid`、`Futures_Hyperliquid`、`Futures_Lighter`、`Futures_EdgeX`、`Futures_Aevo`、`Pendle`、`Futures_Boros`、`Futures_WOOFi`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`Futures_Polymarket`、`Futures_IB`、`Exchange`、`Web3` |
+| ```api``` | `Backpack`、`Futures_Backpack`、`BigONE`、`Bitstamp`、`Coinw`、`Crypto`、`Futures_Crypto`、`DigiFinex`、`Futures_DigiFinex`、`WOO`、`Futures_WOO`、`Hyperliquid`、`Futures_Hyperliquid`、`Futures_Lighter`、`Futures_EdgeX`、`Futures_Aevo`、`Futures_dYdX`、`Pendle`、`Futures_Boros`、`Futures_WOOFi`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`Futures_Polymarket`、`Futures_IB`、`Exchange`、`Web3` |
 | ```approve``` | `Pendle`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`OKX_DEX` |
 | ```approveAgent``` | `Futures_Boros` |
 | ```apy``` | `Pendle` |
@@ -27465,6 +27467,7 @@ fn main() {
 | `Futures_ApolloX` | Aster | 期货 | ApolloX、ApolloX DEX |
 | `Futures_Aster` | Aster | 期货 | Aster期货 |
 | `Futures_Aevo` | Aevo | 期货 | — |
+| `Futures_dYdX` | dYdX | 期货 | dYdX v4、dYdX Chain |
 | `Pendle` | Pendle | 现货 | Pendle Finance、PT、YT |
 | `Futures_Boros` | Pendle | 期货 | Boros、Pendle Boros、Futures_Boros |
 | `Futures_WOOFi` | WOOFi Pro | 期货 | WOOFi、Orderly |
@@ -27549,6 +27552,7 @@ fn main() {
 | `Futures_ApolloX` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ tickers |
 | `Futures_Aster` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ tickers |
 | `Futures_Aevo` | ✓ | ✗ | ✓ | ✓ | 合成 | ✓ | ✓ |
+| `Futures_dYdX` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ |
 | `Pendle` | ✓ | ✗ | ✓ | ✗ | ✗ | ✓ | ✗ |
 | `Futures_Boros` | ✓ | ✗ | ✓ | ✓ | ✓ | ✓ | ✗ |
 | `Futures_WOOFi` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ tickers |
@@ -27632,6 +27636,7 @@ fn main() {
 | `Futures_ApolloX` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✓ | ✗ |
 | `Futures_Aster` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✓ | ✗ |
 | `Futures_Aevo` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
+| `Futures_dYdX` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
 | `Pendle` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✓ | ✗ |
 | `Futures_Boros` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
 | `Futures_WOOFi` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
@@ -27715,6 +27720,7 @@ fn main() {
 | `Futures_ApolloX` | ✓ | ✗ | ✓ | ✓ | ✓ | ✓ |
 | `Futures_Aster` | ✓ | ✗ | ✓ | ✓ | ✓ | ✓ |
 | `Futures_Aevo` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `Futures_dYdX` | ✓ | ✗ | ✓ | ✓ | ✓ | ✓ |
 | `Pendle` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
 | `Futures_Boros` | ✓ | ✗ | ✓ | ✓ | ✓ | ✓ |
 | `Futures_WOOFi` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
@@ -27798,6 +27804,7 @@ fn main() {
 | `Futures_ApolloX` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `Futures_Aster` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `Futures_Aevo` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `Futures_dYdX` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `Pendle` | ✓ | ✓ | — | — | — | — | — |
 | `Futures_Boros` | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✓ |
 | `Futures_WOOFi` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
@@ -30804,7 +30811,7 @@ WOO X只有永续合约，其它合约代码会报错。下单数量单位为基
 
 #### 订单簿永续合约
 
-链上订单簿撮合的永续合约交易所：`Hyperliquid`、`Lighter`、`edgeX`、`Aster`、`Aevo`、`Pendle`、`WOOFi Pro`。
+链上订单簿撮合的永续合约交易所：`Hyperliquid`、`Lighter`、`edgeX`、`Aster`、`Aevo`、`dYdX`、`Pendle`、`WOOFi Pro`。
 
 #### 兑换与聚合器
 
@@ -31589,6 +31596,130 @@ function main() {
 - ```exchange.GetHistoryOrders()```、```exchange.GetHistoryConditionOrders()```只能按单个品种查询，传空字符串（查询全部品种）会报错。
 - 私有流（```private```订阅）推送每一笔成交（kind ```fill```，```channel```为```fills```：订单ID、Aevo成交ID、这一笔的成交价与数量、手续费（USDC）、挂单或吃单），来自Aevo的```fills```频道；成交与订单更新是两个频道，交易所不保证两者的先后。成交回报不回补历史，断线期间的成交不补推（订单更新的累计成交量仍然准确），重连后重发的同一笔成交只推送一次。
 - 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交）与账户私有流（订单回报、持仓、余额）可以通过事件流订阅，永续与期权都可以订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。交易所没有K线推送（也没有K线接口），K线订阅报错。ticker是交易所每500毫秒一次的行情推送，带买卖一价与数量和持仓量，```Last```与```exchange.GetTicker()```相同为标记价格，没有24小时成交量与开高低；bbo在最优买卖价变化时实时推送。Aevo只有一种深度推送（订阅时推送整本、之后每100毫秒推送增量），各档数的深度订阅（缺省20档，最多255档）共用这一路，每个订阅按自己的档数输出；整本快照按交易所给的校验和核对，增量时间戳倒退或校验不一致时自动重新订阅取快照。逐笔成交与```exchange.GetTrades()```同一套成交ID。私有流是一路```private```订阅（不带交易对，覆盖整个账户），只在订阅时连接，用API Key与Secret Key签名登录后订阅订单与持仓频道：订阅生效及每次断线重连后，先用与```exchange.GetAssets()```、```exchange.GetPositions()```相同的接口推送余额与持仓快照，再报告就绪；之后推送订单回报（订阅时已有的挂单不重复推送）与发生变化的持仓（单向净持仓，平仓推送数量0的行；推送里没有杠杆，沿用最近一次快照的杠杆）。交易所没有余额推送，私有流的余额只有快照，之后不推送余额变动；下单、撤单、成交后需要当前余额时调用```exchange.GetAssets()```。签名被拒时连接状态报告降级、私有流报告失败（行情推送不受影响）。不支持全市场```tickers```订阅（Aevo的ticker推送必须逐个合约订阅），订阅时报错；请按交易对订阅ticker。
+
+#### dYdX
+
+dYdX v4（dYdX Chain）的永续合约，以USDC作保证金。支持行情、账户、持仓与订单查询，下单、撤单、短期订单改单、止盈止损条件单、设置杠杆，以及行情和账户的WebSocket推送。交易由托管者用助记词在本地签名后提交到dYdX链上，不经过任何中间服务；钱包地址由助记词推出。只支持全仓（cross）市场。
+
+##### 名称与配置
+
+```exchange.GetName()```：```Futures_dYdX```（期货）；别名：dYdX v4、dYdX Chain。
+
+| 配置项 | 必填 | 默认值 | 说明 |
+| - | - | - | - |
+| 助记词 | 是 | — | dYdX主账户助记词（12或24个词，在dYdX网页的「Export secret phrase」导出）。钱包地址由它推出，不用另外填写。用于交易签名，只保存在托管者本地。 |
+| 子账户 | 否 | ```0``` | 子账户编号（0～128000），默认0。 |
+| 模拟盘 | 否 | 不勾选 | 勾选后连接dYdX测试网。 |
+
+##### 交易对与合约代码
+
+交易对示例：```BTC_USD```、```ETH_USD```
+
+交易对写作```BTC_USD```（计价币写USD，保证金为USDC），完整代码形如```BTC_USD.swap```；写成```BTC_USDC```也能识别，返回数据中统一为```BTC_USD```。交易对不区分大小写，返回数据中为大写。只列出交易中的全仓市场；逐仓（isolated）市场需要单独的子账户承载仓位，本版本不支持，传入逐仓市场的交易对时报错。
+
+| 合约代码 | 说明 |
+| - | - |
+| ```swap``` | USDC保证金永续合约（唯一的合约类型）。 |
+
+dYdX只有永续合约，```swap```以外的合约代码会报错。合约面值为1个标的币，数量以币为单位。
+
+##### 专属IO指令
+
+| 指令 | 参数 | 说明 | 返回值 |
+| - | - | - | - |
+| ```api``` | method, path[, params] | 直接调用dYdX Indexer接口（如```/v4/perpetualMarkets```），只支持```GET```；```params```编入查询串（JSON对象或```a=1&b=2```）。```path```可以是完整URL。 | 交易所的原始应答；HTTP状态不是2xx时报错。 |
+
+通用指令```base```、```currency```见`exchange.IO`。
+
+##### 常用用法
+
+###### 查询市场参数与账户
+
+```javascript
+function main() {
+    var m = exchange.IO("api", "GET", "/v4/perpetualMarkets", {ticker: "ETH-USD"})
+    Log("ETH-USD tickSize:", m.markets["ETH-USD"].tickSize, "stepSize:", m.markets["ETH-USD"].stepSize)
+    var acc = exchange.GetAccount()
+    Log("可用:", acc.Balance, "占用:", acc.FrozenBalance, "权益:", acc.Equity)
+    var pos = exchange.GetPositions()
+    for (var i = 0; i < pos.length; i++) {
+        Log(pos[i].Symbol, pos[i].Type == PD_LONG ? "多" : "空", pos[i].Amount, pos[i].Price)
+    }
+}
+```
+
+###### 挂单、撤单，市价开仓后只减仓平仓，再挂一张止损单（建议先勾选「模拟盘」在测试网运行）
+
+```javascript
+function main() {
+    exchange.SetCurrency("BTC_USD")
+    exchange.SetContractType("swap")
+    var depth = exchange.GetDepth()
+    // 远离盘口的只做挂单买单
+    var id = exchange.CreateOrder("BTC_USD.swap", "buy", _N(depth.Bids[0].Price * 0.9, 0), 0.001, {postOnly: true})
+    Log("挂单:", id, exchange.GetOrder(id))
+    exchange.CancelOrder(id)
+    // 市价开多，再用 closebuy 市价平仓（只减仓）
+    exchange.SetMarginLevel(5)
+    var open = exchange.CreateOrder("BTC_USD.swap", "buy", -1, 0.001)
+    Log("开仓:", exchange.GetOrder(open))
+    var close = exchange.CreateOrder("BTC_USD.swap", "closebuy", -1, 0.001)
+    Log("平仓:", exchange.GetOrder(close))
+    // 止损：价格跌到触发价后市价卖出
+    var sl = exchange.CreateConditionOrder("BTC_USD.swap", "sell", 0.001, {
+        ConditionType: ORDER_CONDITION_TYPE_SL, SlTriggerPrice: _N(depth.Bids[0].Price * 0.8, 0), SlOrderPrice: -1
+    })
+    Log("条件单:", exchange.GetConditionOrders())
+    exchange.CancelConditionOrder(sl)
+}
+```
+
+##### 函数支持差异
+
+不支持（调用时报错并返回空值）：`exchange.ModifyConditionOrder`。
+
+以回退方式支持：
+
+- `exchange.GetRecords`：原生周期为1分钟、5分钟、15分钟、30分钟、1小时、4小时、1天；其它周期由托管者合成。
+
+##### 保证金、账户与模拟盘
+
+保证金模式：只支持全仓（cross）市场。```exchange.SetMarginLevel()```按市场设置杠杆（写到链上，对该子账户在这个市场的仓位和挂单生效），杠杆不能低于1，也不能超过该市场的最大杠杆。持仓不返回```MarginLevel```。
+
+持仓模式：单向（净）持仓。
+
+账户：账户、持仓与订单按助记词推出的钱包地址和「子账户」查询。```exchange.GetAccount()```与```exchange.GetAssets()```给出一行USDC：```Balance```为可用保证金，```FrozenBalance```为被持仓与挂单占用的保证金（权益减可用），```Equity```为含未实现盈亏的账户权益。子账户还没有入金时查询报错。
+
+模拟盘：勾选「模拟盘」连接dYdX测试网：行情与账户查询走```https://indexer.v4testnet.dydx.exchange```，交易提交到测试网（链ID ```dydx-testnet-4```）。测试网的USDC与手续费代币可以从dYdX测试网水龙头领取。签名前会核对所连节点属于配置的网络，不一致时拒绝提交。
+
+##### 注意事项
+
+| 函数 | Futures_dYdX的行为 |
+| - | - |
+| exchange.GetTicker() | 买一、卖一取自盘口，最新价取最近一笔成交，24小时最高最低价、开盘价与成交量由最近24根1小时K线（含未收盘的当前一根）合计，每次调用发三个请求。盘口一侧为空或没有成交时对应字段为空值。```Time```为本地时间（交易所盘口没有时间戳） |
+| exchange.GetTickers() | 不传参数时返回全部交易中的全仓市场，但交易所的市场列表没有最新价、买一卖一和24小时高低价，这些字段（```Last```、```Buy```、```Sell```、```High```、```Low```、```Open```、```Volume```）为空值，不用预言机价格代替；预言机价格等原始数据在```Info```中。传入具体品种时返回该品种的完整行情（同```exchange.GetTicker()```） |
+| exchange.GetDepth() | 交易所盘口每边最多100档。交易所的盘口偶尔有过时的档位导致买一不低于卖一，返回前会去掉造成交叉的档位（保留量较大的一侧） |
+| exchange.GetTrades() | 返回盘口成交（含强平单的成交），自动减仓不返回 |
+| exchange.GetFundings() | ```Rate```为交易所当前这一小时的预测费率，```Interval```为1小时，```Time```为下一个整点（每小时结算）。不传参数时一次返回全部交易中的全仓市场 |
+| exchange.GetOrders() | 返回挂单，不传参数时返回全部市场。已经过期的短期订单不返回。订单的```AvgPrice```由该账户的成交记录算出（最近1万笔成交中找不齐这张订单的全部成交时为0） |
+| exchange.GetOrder() | 订单ID自带合约，直接按订单查询；查不到时报错 |
+| exchange.GetHistoryOrders() | 返回已成交与已撤销的订单（含撤单已被节点接受、尚待链上确认的订单），按更新时间从新到旧，不传```limit```时最多100条；```since```只保留更新时间不早于它的订单 |
+| exchange.CreateOrder() / exchange.Buy() / exchange.Sell() | 限价单（缺省）在链上挂单，有效期28天；```postOnly```只做挂单；```tif```为```ioc```（或```fak```）时立即成交、剩余部分撤销；市价单（价格```-1```）是带保护价的立即成交单，保护价为预言机价格上下5%，可用选项```{slippage: 0.01}```调整（0到1之间）。不支持```fok```。返回订单ID即表示订单已被节点接受，最终结果（成交、撤销）请用```exchange.GetOrder()```或私有流确认 |
+| 只减仓（```SetDirection("closebuy")```/```"closesell"```、```reduceOnly```） | dYdX只允许立即成交类订单只减仓：市价单或```tif```为```ioc```的限价单可以，普通限价单与只做挂单的限价单带只减仓时报错并返回空值（不会悄悄去掉只减仓、也不会改成立即成交）。用限价平仓请下普通方向的限价单 |
+| exchange.CancelOrder() | 返回```true```表示撤单已被节点接受。短期订单（市价单、立即成交的限价单与短期限价单）的撤单是尽力而为，极少数情况下撤单生效前仍可能成交，以```exchange.GetOrder()```或私有流为准；链上已不存在且已成交或已撤销的订单返回```false```，原因见```GetLastError()``` |
+| exchange.ModifyOrder() | 只能修改本次运行中用选项```{shortTerm: true}```下的短期限价单（原地修改价格、数量，订单ID不变，已成交数量计入新数量）。普通限价单与条件单在链上不能修改，报错并返回空值，请撤单后重新下单 |
+| exchange.CreateConditionOrder() | 只支持单腿的止盈（```ORDER_CONDITION_TYPE_TP```）或止损（```ORDER_CONDITION_TYPE_SL```），按预言机价格触发；不支持OCO。委托价不大于0时触发后按市价成交（保护价以触发价为基准上下5%，可用```{slippage: 0.01}```调整），大于0时触发后挂限价单。只减仓同样只能用于触发后按市价的条件单 |
+| exchange.GetConditionOrders() / exchange.GetConditionOrder() / exchange.GetHistoryConditionOrders() | 列表只含尚未触发的条件单；触发后的条件单进入盘口，出现在```exchange.GetOrders()```中。历史条件单为已成交或已撤销的条件单，按更新时间从新到旧，不传```limit```时最多100条；交易所接口不能只查条件单时，只在已成交、已撤销的订单中各取最近1000张来找 |
+
+订单的```Time```是交易所最后更新订单的时间；尚未出块确认的短期订单没有这个时间，为0。
+
+下单数量按数量步长向下取整，不足一个步长时报错；限价不在最小变动价位上时按方向取整（买单向下、卖单向上，成交价不会差于给出的价格）。短期限价单（选项```{shortTerm: true}```，可与```postOnly```同用）约20个区块（十几秒）后自动过期，适合不断改价的做市，过期后按已撤销处理。子账户权益低于20 USDC时链上不允许下单；保证金不足、只减仓违规等被链拒绝的订单当场报错，错误信息带链上给出的原因。下单、撤单与设置杠杆不收取手续费代币（gas），成交手续费照常从USDC扣除。托管者所在机器的时钟与链上时间相差超过30秒时交易会被拒绝。
+
+dYdX链对同一账户的普通限价单与条件单有频率限制（每100个区块50笔），短期订单的限额宽得多；能同时挂的订单数按子账户权益分级。
+
+支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报、成交回报、持仓）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。深度订阅缺省20档、最多100档，由交易所的快照加增量同步，交易所每个品种只有一条盘口推送，不同档数的订阅共用这一条、各自按档数截断；增量推送偶尔会漏掉删除，盘口出现交叉时按dYdX官方网页的规则去掉过时的档位，交叉持续时重新订阅取新快照。bbo为去交叉后的买一卖一。ticker的最新价与量取自逐笔成交，买一卖一取自盘口；推送没有24小时统计，```High```、```Low```、```Open```与```Volume```为0；```Time```为收到推送的时间。逐笔成交与```exchange.GetTrades()```同一套成交ID。K线支持1分钟、5分钟、15分钟、30分钟、1小时、4小时、1天周期，首次订阅先推送500根历史；交易所推送不带收盘标志，下一根开始时（或按交易所时间过了结束时间时）上一根以最后一次推送的数据标记为已收盘。不支持全市场```tickers```订阅（交易所没有带最新价和买一卖一的全市场推送）。不支持WebSocket下单。
+
+私有流是整个子账户的一路```private```订阅（不带交易对）：订阅生效后（以及每次断线重连后）先按```exchange.GetAccount()```与```exchange.GetPositions()```同一接口推送一次USDC余额与全部持仓快照，然后报告就绪，之后推送订单更新（订单ID与```exchange.GetOrders()```相同；撤单被节点接受即推送为已撤销）、成交回报（kind ```fill```：订单ID、交易所成交ID、这一笔的成交价与数量、手续费（USDC，负数为手续费返还）、挂单或吃单；同一条推送里先推送成交再推送订单更新）和发生变化的持仓（单向净持仓，平仓推送数量0）。交易所推送的是USDC抵押品数量，不是可用、冻结余额，所以就绪之后不推送余额，需要当前余额请调用```exchange.GetAssets()```。订阅之前就已存在、之后从没有推送过订单更新的订单，它的成交无法对应到订单ID，不推送。成交回报不回补历史：断线期间的成交不补推（订单更新的累计成交量仍然准确）。
 
 #### Pendle
 

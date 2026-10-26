@@ -4913,6 +4913,7 @@ Some periods are synthesized by the docker:
 - `Hyperliquid`: Native periods are 1m, 3m, 5m, 15m, 30m, 1h, 2h, 4h, 8h, 12h, 1d, 3d, 1w, 1M; other periods are synthesized by the docker.
 - `Futures_Hyperliquid`: Native periods are 1m, 3m, 5m, 15m, 30m, 1h, 2h, 4h, 8h, 12h, 1d, 3d, 1w; other periods are synthesized by the docker. Outcome instruments have no bars.
 - `Futures_EdgeX`: Native periods are 1m, 5m, 15m, 30m, 1h, 2h, 4h, 6h, 8h, 12h, 1d, 1w, 1M; other periods that are a multiple of 60 seconds are synthesized by the docker from native bars, and the rest (such as second-level periods) are not available (the exchange has no trades endpoint).
+- `Futures_dYdX`: Native periods are 1m, 5m, 15m, 30m, 1h, 4h and 1d; other periods are synthesized by the docker.
 - `Futures_WOOFi`: Native periods are 1m, 5m, 15m, 30m, 1h, 4h, 12h, 1d, 1w, 1M, 1y; other periods are synthesized by the docker. At most 1000 bars per call.
 - `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`: Native periods are 1m, 5m, 15m, 1h, 4h, 12h, 1d (GeckoTerminal's timeframes); other periods are synthesized by the docker: periods of a minute or longer are merged from native periods, and second-level periods are accumulated from the on-chain trades of ```exchange.GetTrades()``` (the first call has only the bars covered by the trades of roughly the last 10 minutes, and later calls keep accumulating; with no trade seen yet the call fails saying so, and when fetching trades fails the error carries that cause).
 - `KyberSwap`, `OneInch`, `Jupiter`: Native periods are 1m, 5m, 15m, 1h, 4h, 12h, 1d (GeckoTerminal's timeframes); other periods of a minute or longer are synthesized by the docker, while second-level periods are unavailable (there is no trade feed to build them from).
@@ -6112,7 +6113,7 @@ Support for order modification varies by exchange. Some exchanges do not support
 
 Parameters can also be appended to the ```side``` parameter (legacy syntax), in the format ```"side;{JSON对象}"``` or ```"side;key=value&key=value"```, for example ```"buy;{\"priceMatch\":\"QUEUE_20\"}"``` or ```"buy;priceMatch=QUEUE_20"```. The supported parameters depend on the exchange API.
 
-Only these exchanges support this function: `Binance`, `Futures_Binance`, `Bitfinex`, `Futures_Bitfinex`, `Bitget`, `Futures_Bitget`, `Bybit`, `Futures_Bybit`, `Crypto`, `Futures_Crypto`, `Futures_DeepCoin`, `Futures_Deribit`, `GateIO`, `Futures_GateIO`, `HitBTC`, `Kraken`, `Futures_Kraken`, `KuCoin`, `Futures_MEXC`, `OKEX`, `Futures_OKCoin`, `Poloniex`, `Upbit`, `WOO`, `Futures_WOO`, `Hyperliquid`, `Futures_Hyperliquid`, `Futures_Lighter`, `Futures_Aevo`, `Futures_Boros`, `Futures_WOOFi`, `Jupiter`, `Futures_Futu`. On every other exchange the call fails with an error and returns null; for all exchanges see `Capability Matrix`.
+Only these exchanges support this function: `Binance`, `Futures_Binance`, `Bitfinex`, `Futures_Bitfinex`, `Bitget`, `Futures_Bitget`, `Bybit`, `Futures_Bybit`, `Crypto`, `Futures_Crypto`, `Futures_DeepCoin`, `Futures_Deribit`, `GateIO`, `Futures_GateIO`, `HitBTC`, `Kraken`, `Futures_Kraken`, `KuCoin`, `Futures_MEXC`, `OKEX`, `Futures_OKCoin`, `Poloniex`, `Upbit`, `WOO`, `Futures_WOO`, `Hyperliquid`, `Futures_Hyperliquid`, `Futures_Lighter`, `Futures_Aevo`, `Futures_dYdX`, `Futures_Boros`, `Futures_WOOFi`, `Jupiter`, `Futures_Futu`. On every other exchange the call fails with an error and returns null; for all exchanges see `Capability Matrix`.
 
 See also: `exchange.CreateOrder`, `exchange.CancelOrder`, `exchange.GetOrder`, `exchange.GetOrders`
 
@@ -7973,6 +7974,7 @@ Common contract codes of crypto futures (their usual meaning; what each exchange
 | `Futures_ApolloX` | ✓ |  |  |  |  |  |  |  |  |  |
 | `Futures_Aster` | ✓ |  |  |  |  |  |  |  |  |  |
 | `Futures_Aevo` | ✓ |  |  |  |  |  |  |  |  |  |
+| `Futures_dYdX` | ✓ |  |  |  |  |  |  |  |  |  |
 | `Futures_WOOFi` | ✓ |  |  |  |  |  |  |  |  |  |
 | `Futures_Polymarket` |  |  |  |  |  |  |  |  |  | ```Yes```, ```No```, ```Up```, ```Down``` |
 
@@ -9448,7 +9450,7 @@ Commands of ```exchange.IO()``` specific to an exchange object; see the exchange
 | ```allChainBalance``` | `OKX_DEX` |
 | ```allowance``` | `OKX_DEX` |
 | ```allTokens``` | `OKX_DEX` |
-| ```api``` | `Backpack`, `Futures_Backpack`, `BigONE`, `Bitstamp`, `Coinw`, `Crypto`, `Futures_Crypto`, `DigiFinex`, `Futures_DigiFinex`, `WOO`, `Futures_WOO`, `Hyperliquid`, `Futures_Hyperliquid`, `Futures_Lighter`, `Futures_EdgeX`, `Futures_Aevo`, `Pendle`, `Futures_Boros`, `Futures_WOOFi`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Futures_Polymarket`, `Futures_IB`, `Exchange`, `Web3` |
+| ```api``` | `Backpack`, `Futures_Backpack`, `BigONE`, `Bitstamp`, `Coinw`, `Crypto`, `Futures_Crypto`, `DigiFinex`, `Futures_DigiFinex`, `WOO`, `Futures_WOO`, `Hyperliquid`, `Futures_Hyperliquid`, `Futures_Lighter`, `Futures_EdgeX`, `Futures_Aevo`, `Futures_dYdX`, `Pendle`, `Futures_Boros`, `Futures_WOOFi`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Futures_Polymarket`, `Futures_IB`, `Exchange`, `Web3` |
 | ```approve``` | `Pendle`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `OKX_DEX` |
 | ```approveAgent``` | `Futures_Boros` |
 | ```apy``` | `Pendle` |
@@ -27606,6 +27608,7 @@ An exchange object is named by the value of ```exchange.GetName()```; click a na
 | `Futures_ApolloX` | Aster | Futures | ApolloX, ApolloX DEX |
 | `Futures_Aster` | Aster | Futures | — |
 | `Futures_Aevo` | Aevo | Futures | — |
+| `Futures_dYdX` | dYdX | Futures | dYdX v4, dYdX Chain |
 | `Pendle` | Pendle | Spot | Pendle Finance, PT, YT |
 | `Futures_Boros` | Pendle | Futures | Boros, Pendle Boros, Futures_Boros |
 | `Futures_WOOFi` | WOOFi Pro | Futures | WOOFi, Orderly |
@@ -27690,6 +27693,7 @@ Support of the standard functions and trading-mode commands per exchange object.
 | `Futures_ApolloX` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ tickers |
 | `Futures_Aster` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ tickers |
 | `Futures_Aevo` | ✓ | ✗ | ✓ | ✓ | Synth | ✓ | ✓ |
+| `Futures_dYdX` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ |
 | `Pendle` | ✓ | ✗ | ✓ | ✗ | ✗ | ✓ | ✗ |
 | `Futures_Boros` | ✓ | ✗ | ✓ | ✓ | ✓ | ✓ | ✗ |
 | `Futures_WOOFi` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ tickers |
@@ -27773,6 +27777,7 @@ Support of the standard functions and trading-mode commands per exchange object.
 | `Futures_ApolloX` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✓ | ✗ |
 | `Futures_Aster` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✓ | ✗ |
 | `Futures_Aevo` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
+| `Futures_dYdX` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
 | `Pendle` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✓ | ✗ |
 | `Futures_Boros` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
 | `Futures_WOOFi` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
@@ -27856,6 +27861,7 @@ Support of the standard functions and trading-mode commands per exchange object.
 | `Futures_ApolloX` | ✓ | ✗ | ✓ | ✓ | ✓ | ✓ |
 | `Futures_Aster` | ✓ | ✗ | ✓ | ✓ | ✓ | ✓ |
 | `Futures_Aevo` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `Futures_dYdX` | ✓ | ✗ | ✓ | ✓ | ✓ | ✓ |
 | `Pendle` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
 | `Futures_Boros` | ✓ | ✗ | ✓ | ✓ | ✓ | ✓ |
 | `Futures_WOOFi` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
@@ -27939,6 +27945,7 @@ Support of the standard functions and trading-mode commands per exchange object.
 | `Futures_ApolloX` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `Futures_Aster` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `Futures_Aevo` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `Futures_dYdX` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `Pendle` | ✓ | ✓ | — | — | — | — | — |
 | `Futures_Boros` | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✓ |
 | `Futures_WOOFi` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
@@ -30956,7 +30963,7 @@ On-chain order-book exchanges and swap aggregators; transactions are signed with
 
 #### Order-book Perpetuals
 
-Perpetual exchanges with an on-chain order book: `Hyperliquid`, `Lighter`, `edgeX`, `Aster`, `Aevo`, `Pendle`, `WOOFi Pro`.
+Perpetual exchanges with an on-chain order book: `Hyperliquid`, `Lighter`, `edgeX`, `Aster`, `Aevo`, `dYdX`, `Pendle`, `WOOFi Pro`.
 
 #### Swaps and Aggregators
 
@@ -31749,6 +31756,130 @@ Option codes are Aevo native codes: underlying-expiry (DDMMMYY)-strike-C/P, C fo
 - ```exchange.GetHistoryOrders()``` and ```exchange.GetHistoryConditionOrders()``` query one symbol at a time; an empty string (all symbols) is rejected.
 - The private stream (```private``` subscription) pushes every fill (kind ```fill```, ```channel``` ```fills```: order ID, Aevo trade ID, this fill's price and quantity, the fee (USDC), maker or taker) from Aevo's ```fills``` channel; fills and order updates are separate channels and the exchange does not guarantee which arrives first. Fills are not backfilled: fills during a disconnection are not pushed afterwards (the cumulative filled amount of the order updates stays correct), and a fill sent again after a reconnect is pushed once.
 - WebSocket push is supported: market data (ticker, bbo, depth, trades) and the private account stream (order updates, positions, balances) can be subscribed through the event stream, for perpetuals and options. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. The exchange has no kline stream (and no kline endpoint), so kline subscriptions fail. The ticker is the exchange's 500 ms ticker push with the best bid/ask, their sizes and open interest; ```Last``` is the mark price as in ```exchange.GetTicker()```, and there is no 24-hour volume, open, high or low. bbo is pushed in real time whenever the best bid/ask changes. Aevo has a single depth stream (the whole book on subscription, then deltas every 100 ms): depth subscriptions of any size (20 levels by default, at most 255) share it and each publishes its own number of levels; the full book is verified against the exchange's checksum, and a delta whose timestamp goes backwards or a checksum mismatch resubscribes for a fresh book. Trades carry the same trade IDs as ```exchange.GetTrades()```. The private stream is one ```private``` subscription for the whole account (no symbol). It connects only when subscribed, logs in with a signature made from the API key and secret key, and subscribes to the order and position channels: once active (and again after every reconnect) it first pushes a balance and position snapshot from the same endpoints as ```exchange.GetAssets()``` and ```exchange.GetPositions()```, then reports ready, and afterwards pushes order updates (orders already open when subscribing are not reported again) and positions that changed (one-way net positions; a closed position is pushed with quantity 0; the push carries no leverage, so the leverage of the latest snapshot is kept). The exchange has no balance push, so the private stream carries balances only in the snapshot and pushes no balance changes afterwards; call ```exchange.GetAssets()``` for current balances after placing, canceling or filling orders. A rejected signature reports a degraded connection status and a failed private stream (market data push is unaffected). A market-wide ```tickers``` subscription is not supported (Aevo ticker push is per instrument only) and fails at subscribe; subscribe ticker per symbol.
+
+#### dYdX
+
+dYdX v4 (dYdX Chain) perpetual futures with USDC as collateral. Supported: market data, account, position and order queries, placing and canceling orders, modifying short-term orders, take-profit/stop-loss conditional orders, setting leverage, and WebSocket push of market data and account updates. Trades are signed locally by the docker with the mnemonic and submitted to the dYdX chain directly, without any intermediary service; the wallet address is derived from the mnemonic. Only cross-margin markets are supported.
+
+##### Names and Configuration
+
+```exchange.GetName()```: ```Futures_dYdX``` (Futures); aliases: dYdX v4, dYdX Chain.
+
+| Field | Required | Default | Description |
+| - | - | - | - |
+| Mnemonic | Yes | — | The dYdX main account mnemonic (12 or 24 words, exported with "Export secret phrase" on the dYdX website). The wallet address is derived from it and is not entered separately. It is used to sign trades and stays on the docker. |
+| Subaccount | No | ```0``` | The subaccount number (0 to 128000), 0 by default. |
+| Simulate | No | Unchecked | Connect to the dYdX testnet when checked. |
+
+##### Trading Pairs and Contract Codes
+
+Pair examples: ```BTC_USD```, ```ETH_USD```
+
+Write trading pairs as ```BTC_USD``` (quoted in USD, with USDC as collateral), with full symbols such as ```BTC_USD.swap```; ```BTC_USDC``` is also recognized, and returned data always uses ```BTC_USD```. Pairs are case-insensitive and returned in upper case. Only cross-margin markets that are trading are listed; isolated-margin markets need a separate subaccount to hold positions and are not supported in this version, so passing an isolated-market pair raises an error.
+
+| Contract code | Description |
+| - | - |
+| ```swap``` | USDC-margined perpetual contract (the only contract type). |
+
+dYdX lists perpetuals only; contract codes other than ```swap``` are rejected. One contract is one coin of the underlying, and amounts are in coins.
+
+##### Exchange-specific IO Commands
+
+| Command | Arguments | Description | Returns |
+| - | - | - | - |
+| ```api``` | method, path[, params] | Call a dYdX Indexer endpoint directly (such as ```/v4/perpetualMarkets```); only ```GET``` is supported. ```params``` goes into the query string (a JSON object or ```a=1&b=2```). ```path``` may be a full URL. | The raw exchange response; an error is raised when the HTTP status is not 2xx. |
+
+For the common commands ```base``` and ```currency``` see `exchange.IO`.
+
+##### Common Usage
+
+###### Query market parameters and the account
+
+```javascript
+function main() {
+    var m = exchange.IO("api", "GET", "/v4/perpetualMarkets", {ticker: "ETH-USD"})
+    Log("ETH-USD tickSize:", m.markets["ETH-USD"].tickSize, "stepSize:", m.markets["ETH-USD"].stepSize)
+    var acc = exchange.GetAccount()
+    Log("free:", acc.Balance, "in use:", acc.FrozenBalance, "equity:", acc.Equity)
+    var pos = exchange.GetPositions()
+    for (var i = 0; i < pos.length; i++) {
+        Log(pos[i].Symbol, pos[i].Type == PD_LONG ? "long" : "short", pos[i].Amount, pos[i].Price)
+    }
+}
+```
+
+###### Place and cancel a limit order, open at market and close reduce-only, then place a stop-loss (best tried on the testnet with Simulate checked first)
+
+```javascript
+function main() {
+    exchange.SetCurrency("BTC_USD")
+    exchange.SetContractType("swap")
+    var depth = exchange.GetDepth()
+    // a post-only buy away from the book
+    var id = exchange.CreateOrder("BTC_USD.swap", "buy", _N(depth.Bids[0].Price * 0.9, 0), 0.001, {postOnly: true})
+    Log("resting:", id, exchange.GetOrder(id))
+    exchange.CancelOrder(id)
+    // open long at market, then close at market with closebuy (reduce-only)
+    exchange.SetMarginLevel(5)
+    var open = exchange.CreateOrder("BTC_USD.swap", "buy", -1, 0.001)
+    Log("open:", exchange.GetOrder(open))
+    var close = exchange.CreateOrder("BTC_USD.swap", "closebuy", -1, 0.001)
+    Log("close:", exchange.GetOrder(close))
+    // stop-loss: sell at market once the price falls to the trigger
+    var sl = exchange.CreateConditionOrder("BTC_USD.swap", "sell", 0.001, {
+        ConditionType: ORDER_CONDITION_TYPE_SL, SlTriggerPrice: _N(depth.Bids[0].Price * 0.8, 0), SlOrderPrice: -1
+    })
+    Log("conditional orders:", exchange.GetConditionOrders())
+    exchange.CancelConditionOrder(sl)
+}
+```
+
+##### Function Support
+
+Not supported (the call fails with an error and returns null): `exchange.ModifyConditionOrder`.
+
+Served through a fallback:
+
+- `exchange.GetRecords`: Native periods are 1m, 5m, 15m, 30m, 1h, 4h and 1d; other periods are synthesized by the docker.
+
+##### Margin, Account and Simulation
+
+Margin mode: Only cross-margin markets are supported. ```exchange.SetMarginLevel()``` sets the leverage per market (written on chain, applying to the subaccount's position and orders in that market); it cannot be below 1 or above the market's maximum leverage. Positions carry no ```MarginLevel```.
+
+Position mode: One-way (net) positions.
+
+Account: The account, positions and orders are queried by the wallet address derived from the mnemonic and the configured subaccount. ```exchange.GetAccount()``` and ```exchange.GetAssets()``` give one USDC row: ```Balance``` is the free collateral, ```FrozenBalance``` is the margin taken by positions and open orders (equity minus free collateral), and ```Equity``` is the account equity including unrealized profit. Querying a subaccount that has never been funded raises an error.
+
+Simulation: The Simulate box connects to the dYdX testnet: queries go to ```https://indexer.v4testnet.dydx.exchange``` and trades are submitted to the testnet (chain ID ```dydx-testnet-4```). Testnet USDC and gas tokens can be requested from the dYdX testnet faucet. Before signing, the node is checked to belong to the configured network; on a mismatch nothing is submitted.
+
+##### Notes
+
+| Function | Behavior on Futures_dYdX |
+| - | - |
+| exchange.GetTicker() | Bid and ask come from the order book, the last price from the latest trade, and the 24h high/low, open and volume from the latest 24 one-hour klines (including the current, unclosed one), so each call makes three requests. Fields are null when one side of the book is empty or there has been no trade. ```Time``` is the local time (the exchange's order book has no timestamp) |
+| exchange.GetTickers() | Without arguments it returns all cross-margin markets that are trading, but the exchange's market list has no last price, best bid/ask or 24h high/low, so those fields (```Last```, ```Buy```, ```Sell```, ```High```, ```Low```, ```Open```, ```Volume```) are null rather than the oracle price; the oracle price and other raw data are in ```Info```. With a specific symbol it returns that instrument's full ticker (as ```exchange.GetTicker()```) |
+| exchange.GetDepth() | The exchange's order book has at most 100 levels per side. Its book occasionally keeps stale levels that make the best bid not lower than the best ask; such crossing levels are removed before returning (the side with the larger size is kept) |
+| exchange.GetTrades() | Returns order book trades (including fills of liquidation orders); auto-deleveraging is not returned |
+| exchange.GetFundings() | ```Rate``` is the exchange's predicted rate for the current hour, ```Interval``` is 1 hour and ```Time``` is the next full hour (settled hourly). Without arguments it returns all cross-margin markets that are trading in one request |
+| exchange.GetOrders() | Returns open orders, of all markets when no argument is passed. Expired short-term orders are not returned. An order's ```AvgPrice``` is computed from the account's fills (0 when the latest 10,000 fills do not hold all of the order's fills) |
+| exchange.GetOrder() | The order ID carries its contract, so the order is looked up directly; an order that cannot be found raises an error |
+| exchange.GetHistoryOrders() | Returns filled and canceled orders (including orders whose cancellation has been accepted by a node and awaits on-chain confirmation), newest update first, at most 100 when ```limit``` is omitted; ```since``` keeps only orders updated at or after it |
+| exchange.CreateOrder() / exchange.Buy() / exchange.Sell() | Limit orders (the default) rest on chain for 28 days; ```postOnly``` only adds liquidity; with ```tif``` ```ioc``` (or ```fak```) an order executes immediately and the rest is canceled; a market order (price ```-1```) is an immediate order with a protective price at the oracle price plus or minus 5%, adjustable with the option ```{slippage: 0.01}``` (between 0 and 1). ```fok``` is not supported. A returned order ID means a node has accepted the order; confirm the outcome (filled, canceled) with ```exchange.GetOrder()``` or the private stream |
+| Reduce-only (```SetDirection("closebuy")```/```"closesell"```, ```reduceOnly```) | dYdX allows reduce-only only on immediate orders: market orders or limit orders with ```tif``` ```ioc```. A plain or post-only limit order with reduce-only raises an error and returns null (reduce-only is neither dropped silently nor turned into an immediate order). To close with a resting limit order, place a limit order in the plain direction |
+| exchange.CancelOrder() | ```true``` means a node has accepted the cancellation. Canceling a short-term order (market orders, immediate limit orders and short-term limit orders) is best effort and in rare cases the order can still fill before the cancellation takes effect; rely on ```exchange.GetOrder()``` or the private stream. An order that is no longer on chain because it was filled or canceled returns ```false```, with the reason in ```GetLastError()``` |
+| exchange.ModifyOrder() | Only short-term limit orders placed in this run with the option ```{shortTerm: true}``` can be modified (price and amount in place, the order ID stays, and the filled amount counts toward the new amount). Plain limit orders and conditional orders cannot be modified on chain; it raises an error and returns null, so cancel and place a new order |
+| exchange.CreateConditionOrder() | Only single-leg take-profit (```ORDER_CONDITION_TYPE_TP```) or stop-loss (```ORDER_CONDITION_TYPE_SL```) orders, triggered by the oracle price; OCO is not supported. With an order price not above 0 the order executes at market once triggered (protective price at the trigger price plus or minus 5%, adjustable with ```{slippage: 0.01}```); with a positive order price a limit order is placed once triggered. Reduce-only likewise works only on conditional orders that execute at market |
+| exchange.GetConditionOrders() / exchange.GetConditionOrder() / exchange.GetHistoryConditionOrders() | The list holds untriggered conditional orders only; a triggered conditional order enters the order book and shows in ```exchange.GetOrders()```. Historical conditional orders are filled or canceled ones, newest update first, at most 100 when ```limit``` is omitted; when the exchange API cannot query conditional orders alone, they are searched among the latest 1000 filled and the latest 1000 canceled orders |
+
+An order's ```Time``` is when the exchange last updated it; short-term orders that are not yet confirmed in a block have no such time and show 0.
+
+Order amounts are rounded down to the amount step, and an amount below one step raises an error; a limit price off the tick is rounded by side (buy down, sell up, so the fill is never worse than the given price). Short-term limit orders (option ```{shortTerm: true}```, combinable with ```postOnly```) expire after about 20 blocks (a dozen-odd seconds), which suits market making with frequent repricing; once expired they count as canceled. The chain allows no orders while the subaccount equity is below 20 USDC; orders the chain rejects (insufficient margin, reduce-only violations and so on) raise an error at once with the chain's reason. Placing and canceling orders and setting leverage cost no gas tokens; trading fees are charged in USDC as usual. Trades are rejected when the docker machine's clock is more than 30 seconds off the chain time.
+
+The dYdX chain rate-limits plain limit and conditional orders per account (50 per 100 blocks); short-term orders have much wider limits. How many orders can be open at once is tiered by subaccount equity.
+
+WebSocket push is supported: market data (ticker, bbo, depth, trades, klines) and the private stream (order updates, fills, positions) can be subscribed through the event stream. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. Depth subscriptions (20 levels by default, at most 100) are synchronized from the exchange's snapshot plus deltas; the exchange has a single order book stream per instrument, so subscriptions of different depths share it and each is cut to its own depth. The delta stream occasionally misses a removal; when the book crosses, stale levels are removed by the rule of the official dYdX website, and if the crossing persists the stream is resubscribed for a fresh snapshot. bbo is the best bid/ask after uncrossing. The ticker's last price and size come from the trade stream and its best bid/ask from the order book; the push carries no 24h statistics, so ```High```, ```Low```, ```Open``` and ```Volume``` are 0, and ```Time``` is when the push arrived. Trades carry the same trade IDs as ```exchange.GetTrades()```. Klines support the 1m, 5m, 15m, 30m, 1h, 4h and 1d periods, and a first kline subscription pushes 500 historical bars first; the exchange's push has no closed flag, so when the next bar starts (or its end time has passed by exchange time) a bar is marked closed with its last pushed values. The market-wide ```tickers``` subscription is not supported (the exchange has no market-wide push with last and best bid/ask prices). WebSocket order entry is not supported.
+
+The private stream is one ```private``` subscription for the whole subaccount (no symbol): once the subscription is active (and again after every reconnect) it first pushes a snapshot of the USDC balance and all positions from the same endpoints as ```exchange.GetAccount()``` and ```exchange.GetPositions()```, then reports ready, and afterwards pushes order updates (the order ID is the same as in ```exchange.GetOrders()```; an order is pushed as canceled once a node accepts its cancellation), fills (kind ```fill```: the order ID, the exchange trade ID, this fill's price and quantity, the fee (USDC, negative for a fee rebate), maker or taker; within one push the fill comes before the order update) and positions that changed (one-way net positions, a closed position is pushed with quantity 0). The exchange pushes the USDC collateral amount rather than free/frozen balances, so no balances are pushed after ready; call ```exchange.GetAssets()``` for current balances. Fills of orders that existed before the subscription and have had no order update since cannot be matched to an order ID and are not pushed. Fills are not backfilled: fills during a disconnection are not pushed afterwards (the cumulative filled amount of the order updates stays correct).
 
 #### Pendle
 
