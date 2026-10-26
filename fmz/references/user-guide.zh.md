@@ -1245,7 +1245,7 @@ function main() {
 
 ```Python```使用标准库的```threading.Thread```创建线程，订阅与事件处理方式相同；线程结束时其所属订阅会自动退订。
 
-```Rust```策略使用```ctx::subscribe()```、```ctx::poll()```，订阅选项通过```ctx::SubOpts```构造，批量订阅使用```ctx::subscribe_many()```，任意线程均可订阅；事件以原始结构表示，引入```sdk::ctx::EventExt```后可使用```ev.kind_str()```（与```kind```相同的类型名）、```ev.channel()```、```ev.book(n)```、```ev.ticker()```、```ev.order()```、```ev.feed_status()```等方法按事件类型读取数据（价格、数量已换算为实数，无需编写```unsafe```）：
+```Rust```策略使用```ctx::subscribe()```、```ctx::poll()```，订阅选项通过```ctx::SubOpts```构造，批量订阅使用```ctx::subscribe_many()```，任意线程均可订阅；事件以原始结构提供，引入```sdk::ctx::EventExt```后可通过```ev.channel()```、```ev.book(n)```、```ev.ticker()```、```ev.order()```、```ev.feed_status()```等方法按事件类型读取（价格、数量已换算为实数，无需编写```unsafe```，事件类型不匹配时返回```None```）；需要按类型分别处理多种事件时使用```match ev.event_kind()```匹配枚举```ctx::Kind```（如```Kind::Fill```、```Kind::Order```，需要包含```_```分支），```ev.kind_str()```返回与```kind```相同的类型名称，可用于输出日志：
 
 ```rust
 use sdk::ctx::EventExt;

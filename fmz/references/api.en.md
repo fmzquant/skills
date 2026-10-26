@@ -12649,7 +12649,7 @@ def main():
 ```
 
 ```rust
-use sdk::ctx::EventExt;
+use sdk::ctx::{EventExt, Kind};
 use std::collections::HashMap;
 
 fn main() {
@@ -12661,7 +12661,7 @@ fn main() {
     let t0 = Unix();
     while Unix() - t0 < 60 {
         match ctx::poll(&ids, Some(1000)) {
-            ctx::Polled::Event(ev) if ev.kind_str() == "trade" => {
+            ctx::Polled::Event(ev) if ev.event_kind() == Kind::Trade => {
                 *count.entry(ev.stream()).or_insert(0) += 1;
             }
             ctx::Polled::Stopped => return,
@@ -12741,7 +12741,7 @@ def main():
 ```
 
 ```rust
-use sdk::ctx::EventExt;
+use sdk::ctx::{EventExt, Kind};
 
 fn main() {
     let worker = std::thread::spawn(|| {
@@ -12752,7 +12752,7 @@ fn main() {
         let t0 = Unix();
         while Unix() - t0 < 30 {
             match ctx::poll(&[], Some(1000)) {           // Only receives events subscribed by this thread
-                ctx::Polled::Event(ev) if ev.kind_str() == "depth" => n += 1,
+                ctx::Polled::Event(ev) if ev.event_kind() == Kind::Depth => n += 1,
                 ctx::Polled::Stopped => break,
                 _ => {}
             }
@@ -13346,7 +13346,7 @@ def main():
 ```
 
 ```rust
-use sdk::ctx::EventExt;
+use sdk::ctx::{EventExt, Kind};
 
 fn main() {
     let all = ctx::subscribe(exchange, ctx::SubOpts::tickers()).unwrap();
@@ -13354,13 +13354,15 @@ fn main() {
     let mut last = Unix();
     loop {
         match ctx::poll(&[all.id()], Some(1000)) {
-            ctx::Polled::Event(ev) => {
-                if ev.kind_str() == "ticker" {
-                    n += 1;
-                } else if let Some(st) = ev.feed_status().filter(|st| st.failed()) {
-                    panic!("tickers subscription failed: {}", st.message);
+            ctx::Polled::Event(ev) => match ev.event_kind() {
+                Kind::Ticker => n += 1,
+                Kind::Status => {
+                    if let Some(st) = ev.feed_status().filter(|st| st.failed()) {
+                        panic!("tickers subscription failed: {}", st.message);
+                    }
                 }
-            }
+                _ => {}
+            },
             ctx::Polled::Stopped => break,
             _ => {}
         }
@@ -13491,7 +13493,7 @@ Event consumption rate diagnostics: The push reception buffer configured by the 
 
 The interface in ```Python``` is ```ctx.poll(streams=None, timeout_ms=None)```: When ```streams``` is ```None``` or ```[]```, it represents all event streams subscribed to by the current thread. Otherwise, pass a subscription object, an event stream ID, a ```SubscriptionList```, or a (nested) list containing these items; when ```timeout_ms``` is ```None```, the call waits indefinitely, ```0``` means no waiting, and a positive integer specifies the maximum wait time in milliseconds. The call returns ```None``` on timeout. Events are dictionaries (subclasses of ```dict```) with the same fields as ```JavaScript``` events (```kind``` is also a type name string). Both ```ev["kind"]``` and ```ev.kind``` access syntax are supported; order book depth events provide the ```ev.book(n)``` method. Calling this interface after live trading stops (including during the execution of ```onexit()```) raises ```StopError```, and calls already waiting immediately raise the same exception. The ```options``` form is not supported (passing a dictionary raises ```TypeError```): thread messages and completion notifications from ```exchange.Go()``` are retrieved through ```EventLoop()``` and their respective objects. ```ctx.connectors()``` has the same interface as in ```JavaScript```, and ```ctx.STREAM_STATUS```, ```ctx.STREAM_TIMER```, and ```ctx.STREAM_ORDER_ACK``` are also available.
 
-The interface in ```Rust``` is ```ctx::poll(streams: &[u32], timeout_ms: Option<u64>) -> ctx::Polled```: The elements of ```streams``` are ```sub.id()``` or the built-in ```ctx::STREAM_TIMER```, ```ctx::STREAM_STATUS```, and ```ctx::STREAM_ORDER_ACK``` constants. An empty slice represents all event streams subscribed to by the current thread, and ```None``` means waiting indefinitely; the call returns ```Polled::Event(ev)```, ```Polled::Empty``` (timeout), ```Polled::Stopped``` (live trading stopped), or ```Polled::Error(rc)```. ```Rust``` events are represented using raw structures. After importing ```sdk::ctx::EventExt```, they can be read by event type without writing ```unsafe``` code: ```ev.kind_str()``` (the type name, identical to ```kind``` in ```JavaScript``` events, such as ```fill```), ```ev.stream()```, ```ev.channel()```, ```ev.book(n)``` (order book depth events), and the following methods that convert numeric fields to real numbers: ```ev.ticker()```, ```ev.trade()```, ```ev.kline()```, ```ev.order()``` (order reports, with ```OrderView``` containing ```client_id```), ```ev.position()```, ```ev.balance()```, ```ev.fill()``` (fill reports, ```FillView```: ```order_id```, ```client_id```, ```trade_id```, ```px```, ```qty```, ```fee``` (```Option<f64>```), ```fee_ccy```, ```side```, ```liquidity```, ```time```), ```ev.order_ack()``` (WebSocket order acknowledgments, ```OrderAckView```: ```req_id```, ```op```, ```status```, ```ok```, ```id```, ```client_id```, ```error```, ```reason```, ```reason_text```, ```exch_time``` (```Option<i64>```), ```latency_ms```, ```time```), ```ev.gateway()``` (gateway status), and ```ev.feed_status()``` (initialization status, where ```message``` indicates the failure reason when ```failed()``` is true). These methods return ```None``` when the event type does not match, and the fields correspond to those in ```JavaScript``` events. When handling events separately by type, use these typed methods or ```ev.kind_str()```. The numeric ```kind``` field in the event structure is a type code for the underlying interface and should not be used directly for comparisons; ```ev.time()``` and ```ev.ts()``` (```f64``` milliseconds) are identical to ```time``` and ```ts``` in ```JavaScript``` events and apply to all events. The ```time``` field in every typed result equals ```ev.time()```. Any thread in ```Rust``` can subscribe and call ```poll```, and each thread receives only the events it subscribes to. ```ctx::connectors()``` returns a JSON string with the same content.
+The function signature in ```Rust``` is ```ctx::poll(streams: &[u32], timeout_ms: Option<u64>) -> ctx::Polled```: pass ```sub.id()``` or the built-in ```ctx::STREAM_TIMER```, ```ctx::STREAM_STATUS```, or ```ctx::STREAM_ORDER_ACK``` to ```streams```; an empty slice selects all subscriptions on the current thread, and ```None``` means waiting indefinitely. The return value is ```Polled::Event(ev)```, ```Polled::Empty``` (timeout), ```Polled::Stopped``` (live trading stopped), or ```Polled::Error(rc)```. Events in ```Rust``` use raw structures. After importing ```sdk::ctx::EventExt```, you can read them by event type without writing ```unsafe```: ```ev.event_kind()``` (event type, the ```ctx::Kind``` enum), ```ev.kind_str()``` (type name, identical to ```kind``` in ```JavaScript``` events, such as ```fill```), ```ev.stream()```, ```ev.channel()```, ```ev.book(n)``` (market depth events), and the following methods that convert numeric fields to floating-point values: ```ev.ticker()```, ```ev.trade()```, ```ev.kline()```, ```ev.order()``` (order reports; ```OrderView``` includes ```client_id```), ```ev.position()```, ```ev.balance()```, ```ev.fill()``` (fill reports; ```FillView```: ```order_id```, ```client_id```, ```trade_id```, ```px```, ```qty```, ```fee``` (```Option<f64>```), ```fee_ccy```, ```side```, ```liquidity```, ```time```), ```ev.order_ack()``` (WebSocket order submission acknowledgments; ```OrderAckView```: ```req_id```, ```op```, ```status```, ```ok```, ```id```, ```client_id```, ```error```, ```reason```, ```reason_text```, ```exch_time``` (```Option<i64>```), ```latency_ms```, ```time```), ```ev.gateway()``` (gateway status), and ```ev.feed_status()``` (initialization status; when ```failed()``` is true, ```message``` contains the failure reason). These methods return ```None``` when the event type does not match, and their fields match the corresponding fields in ```JavaScript``` events. The three ways to distinguish event types suit different scenarios: when handling only one event type, use a typed method directly, such as ```if let Some(f) = ev.fill() { ... }```, to check the type and read the fields in one step; when handling multiple event types separately, use ```match ev.event_kind() { Kind::Fill => ..., Kind::Order => ..., _ => {} }``` (```use sdk::ctx::{EventExt, Kind};```). The variants of ```ctx::Kind``` are ```Ticker```, ```Depth```, ```Trade```, ```Kline```, ```Order```, ```Position```, ```Balance```, ```Fill```, ```Ack```, ```Timer```, ```Gateway```, ```Status```, and ```Unknown``` (the docker sent an event type that the current SDK does not recognize). Additional variants may be introduced in the future, so ```match``` must include a ```_``` arm. Use ```ev.kind_str()``` for logging or comparison with type names in ```JavaScript``` and ```Python```; it returns the same value as ```ev.event_kind().as_str()```. The numeric ```kind``` field in the event structure is a type code for the underlying interface and should not be used directly for type comparisons; ```ev.time()``` and ```ev.ts()``` (```f64``` milliseconds) are identical to ```time``` and ```ts``` in ```JavaScript``` events and are available for all events. The ```time``` field in each typed result is identical to ```ev.time()```. Any thread in ```Rust``` can subscribe to events and call ```poll```, and each thread receives only the events it subscribes to. ```ctx::connectors()``` returns a JSON string with the same content.
 
 See also: `ctx.subscribe`, `Subscription`, `ctx.order`, `ctx.submit`, `EventLoop`
 

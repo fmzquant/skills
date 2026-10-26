@@ -12524,7 +12524,7 @@ def main():
 ```
 
 ```rust
-use sdk::ctx::EventExt;
+use sdk::ctx::{EventExt, Kind};
 use std::collections::HashMap;
 
 fn main() {
@@ -12536,7 +12536,7 @@ fn main() {
     let t0 = Unix();
     while Unix() - t0 < 60 {
         match ctx::poll(&ids, Some(1000)) {
-            ctx::Polled::Event(ev) if ev.kind_str() == "trade" => {
+            ctx::Polled::Event(ev) if ev.event_kind() == Kind::Trade => {
                 *count.entry(ev.stream()).or_insert(0) += 1;
             }
             ctx::Polled::Stopped => return,
@@ -12616,7 +12616,7 @@ def main():
 ```
 
 ```rust
-use sdk::ctx::EventExt;
+use sdk::ctx::{EventExt, Kind};
 
 fn main() {
     let worker = std::thread::spawn(|| {
@@ -12627,7 +12627,7 @@ fn main() {
         let t0 = Unix();
         while Unix() - t0 < 30 {
             match ctx::poll(&[], Some(1000)) {           // 只获取本线程订阅的事件
-                ctx::Polled::Event(ev) if ev.kind_str() == "depth" => n += 1,
+                ctx::Polled::Event(ev) if ev.event_kind() == Kind::Depth => n += 1,
                 ctx::Polled::Stopped => break,
                 _ => {}
             }
@@ -13218,7 +13218,7 @@ def main():
 ```
 
 ```rust
-use sdk::ctx::EventExt;
+use sdk::ctx::{EventExt, Kind};
 
 fn main() {
     let all = ctx::subscribe(exchange, ctx::SubOpts::tickers()).unwrap();
@@ -13226,13 +13226,15 @@ fn main() {
     let mut last = Unix();
     loop {
         match ctx::poll(&[all.id()], Some(1000)) {
-            ctx::Polled::Event(ev) => {
-                if ev.kind_str() == "ticker" {
-                    n += 1;
-                } else if let Some(st) = ev.feed_status().filter(|st| st.failed()) {
-                    panic!("tickers subscription failed: {}", st.message);
+            ctx::Polled::Event(ev) => match ev.event_kind() {
+                Kind::Ticker => n += 1,
+                Kind::Status => {
+                    if let Some(st) = ev.feed_status().filter(|st| st.failed()) {
+                        panic!("tickers subscription failed: {}", st.message);
+                    }
                 }
-            }
+                _ => {}
+            },
             ctx::Polled::Stopped => break,
             _ => {}
         }
@@ -13360,7 +13362,7 @@ WebSocket下单应答（```kind```为```ack```，```type```与```channel```均�
 
 ```Python```中的接口为```ctx.poll(streams=None, timeout_ms=None)```：```streams```为```None```或```[]```时表示本线程订阅的全部事件流，否则应传入订阅对象、事件流ID、```SubscriptionList```或由它们组成的（嵌套）列表；```timeout_ms```为```None```时持续等待，```0```表示不等待，正整数表示最长等待的毫秒数，超时返回```None```。事件是字典（```dict```的子类），字段与```JavaScript```事件的字段相同（```kind```同样是类型名字符串），```ev["kind"]```与```ev.kind```两种访问方式均可使用；深度事件提供```ev.book(n)```方法。实盘停止后（包括```onexit()```执行期间）调用该接口会抛出```StopError```，正在等待的调用也会立即抛出该异常。不支持```options```形式（传入字典会抛出```TypeError```）：线程消息、```exchange.Go()```的完成通知通过```EventLoop()```和各自的对象获取。```ctx.connectors()```与```JavaScript```中的接口相同，```ctx.STREAM_STATUS```、```ctx.STREAM_TIMER```、```ctx.STREAM_ORDER_ACK```也可使用。
 
-```Rust```中的接口为```ctx::poll(streams: &[u32], timeout_ms: Option<u64>) -> ctx::Polled```：```streams```的元素为```sub.id()```或内置的```ctx::STREAM_TIMER```、```ctx::STREAM_STATUS```、```ctx::STREAM_ORDER_ACK```，空切片表示本线程订阅的全部事件流，```None```表示持续等待；返回```Polled::Event(ev)```、```Polled::Empty```（超时）、```Polled::Stopped```（实盘停止）或```Polled::Error(rc)```。```Rust```事件使用原始结构表示，引入```sdk::ctx::EventExt```后可按事件类型读取，无需编写```unsafe```：```ev.kind_str()```（类型名，与```JavaScript```事件的```kind```相同，如```fill```）、```ev.stream()```、```ev.channel()```、```ev.book(n)```（深度事件），以及将数值字段换算为实数的```ev.ticker()```、```ev.trade()```、```ev.kline()```、```ev.order()```（订单回报，```OrderView```包含```client_id```）、```ev.position()```、```ev.balance()```、```ev.fill()```（成交回报，```FillView```：```order_id```、```client_id```、```trade_id```、```px```、```qty```、```fee```（```Option<f64>```）、```fee_ccy```、```side```、```liquidity```、```time```）、```ev.order_ack()```（WebSocket下单应答，```OrderAckView```：```req_id```、```op```、```status```、```ok```、```id```、```client_id```、```error```、```reason```、```reason_text```、```exch_time```（```Option<i64>```）、```latency_ms```、```time```）、```ev.gateway()```（网关状态）、```ev.feed_status()```（初始化状态，```failed()```为真时```message```表示失败原因），事件类型不匹配时返回```None```，字段与```JavaScript```事件的字段对应。按类型分别处理时应使用这些类型化方法或```ev.kind_str()```，事件结构中数字形式的```kind```字段是底层接口的类型代码，不应直接用它进行比较；```ev.time()```、```ev.ts()```（```f64```毫秒）与```JavaScript```事件的```time```、```ts```相同，适用于所有事件，各类型化结果的```time```字段均等于```ev.time()```。```Rust```中的任意线程均可订阅、```poll```，各线程仅获取本线程订阅的事件。```ctx::connectors()```返回内容相同的JSON字符串。
+```Rust```中的函数签名为```ctx::poll(streams: &[u32], timeout_ms: Option<u64>) -> ctx::Polled```：```streams```传入```sub.id()```或内置的```ctx::STREAM_TIMER```、```ctx::STREAM_STATUS```、```ctx::STREAM_ORDER_ACK```，空切片表示本线程的全部订阅，```None```表示无限等待；返回```Polled::Event(ev)```、```Polled::Empty```（超时）、```Polled::Stopped```（实盘停止）或```Polled::Error(rc)```。```Rust```的事件采用原始结构，引入```sdk::ctx::EventExt```后可按事件类型读取，无需编写```unsafe```：```ev.event_kind()```（事件类型，枚举```ctx::Kind```）、```ev.kind_str()```（类型名称，与```JavaScript```事件的```kind```相同，如```fill```）、```ev.stream()```、```ev.channel()```、```ev.book(n)```（深度事件），以及将数值字段换算为浮点数的```ev.ticker()```、```ev.trade()```、```ev.kline()```、```ev.order()```（订单回报，```OrderView```包含```client_id```）、```ev.position()```、```ev.balance()```、```ev.fill()```（成交回报，```FillView```：```order_id```、```client_id```、```trade_id```、```px```、```qty```、```fee```（```Option<f64>```）、```fee_ccy```、```side```、```liquidity```、```time```）、```ev.order_ack()```（WebSocket下单应答，```OrderAckView```：```req_id```、```op```、```status```、```ok```、```id```、```client_id```、```error```、```reason```、```reason_text```、```exch_time```（```Option<i64>```）、```latency_ms```、```time```）、```ev.gateway()```（网关状态）、```ev.feed_status()```（初始化状态，```failed()```时```message```为失败原因），事件类型不匹配时返回```None```，字段与```JavaScript```事件的对应字段一致。区分事件类型的三种写法适用于不同场景：仅处理一种事件时直接使用类型化方法，如```if let Some(f) = ev.fill() { ... }```，一步完成类型判断与字段读取；需要按类型分别处理多种事件时使用```match ev.event_kind() { Kind::Fill => ..., Kind::Order => ..., _ => {} }```（```use sdk::ctx::{EventExt, Kind};```），```ctx::Kind```的取值为```Ticker```、```Depth```、```Trade```、```Kline```、```Order```、```Position```、```Balance```、```Fill```、```Ack```、```Timer```、```Gateway```、```Status```、```Unknown```（托管者发送了当前SDK无法识别的事件类型），后续可能新增取值，```match```需要包含```_```分支；```ev.kind_str()```用于输出日志或与```JavaScript```、```Python```的类型名称对照，返回值与```ev.event_kind().as_str()```相同。事件结构中以数字表示的```kind```字段是底层接口的类型代码，不应直接用于类型比较；```ev.time()```、```ev.ts()```（```f64```毫秒）与```JavaScript```事件的```time```、```ts```相同，可用于所有事件，各类型化结果的```time```字段均与```ev.time()```一致。```Rust```的任意线程均可订阅事件并调用```poll```，各线程仅获取本线程订阅的事件。```ctx::connectors()```返回内容相同的JSON字符串。
 
 See also: `ctx.subscribe`, `Subscription`, `ctx.order`, `ctx.submit`, `EventLoop`
 

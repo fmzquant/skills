@@ -73,11 +73,23 @@ Rust SDK 对应：`ctx::subscribe(ex, SubOpts::depth(20).symbol("BTC_USDT")) -> 
 `positions() -> Result<Option<Vec<PositionRow>>, String>` / `balances() -> Result<Option<Vec<BalanceRow>>, String>`
 （`None` = 快照还没 READY）、`unsubscribe()`——`Sub` 可复制，引用计数按 **`subscribe` 调用次数**算，
 每次 `subscribe` 对应一次 `unsubscribe`。原始 `Event` 经 `EventExt` 安全读取（策略不写 `unsafe`）：
-`kind_str()`（与 JS 的 `ev.kind` 同名，如 `"depth"`）/ `stream()` / `channel()` / `book(n)`（深度事件）/
+`event_kind()` / `kind_str()` / `stream()` / `channel()` / `book(n)`（深度事件）/
 `trade_id()`，以及按类型的实数视图——`ticker()`、`trade()`、`kline()`、`order()`、`position()` / `balance()`、
 `fill()`、`order_ack()`、`gateway()`、`feed_status()`（`status`/`channel`/`interval`/`message`/`stream`，
-`ready()` / `failed()`），类型不符为 `None`，字段与本文各节的 JS 字段一一对应（Rust 命名）。按类型分发用这些
-视图或 `kind_str()`；`Event.kind` 数字是 ABI 字段，不要拿它比较。
+`ready()` / `failed()`），类型不符为 `None`，字段与本文各节的 JS 字段一一对应（Rust 命名）。
+
+事件类型在 Rust 里是枚举 `sdk::ctx::Kind`（与 `EventExt` 一起导入：`use sdk::ctx::{EventExt, Kind};`）：
+`Ticker` `Depth` `Trade` `Kline` `Order` `Position` `Balance` `Fill` `Ack` `Timer` `Gateway` `Status` `Unknown`，
+`Kind::as_str()`（及 `Display`）就是 JS 的 `ev.kind` 名，`ev.kind_str() == ev.event_kind().as_str()`——两者都由
+同一张 `abi::kind_name` 表来（SDK 单测逐个 ABI 数字核对）。三者分工：
+
+- **处理一种事件**用类型化视图：`if let Some(f) = ev.fill() { … }`，判定与读字段一步完成；
+- **分发多种事件**用 `match ev.event_kind() { Kind::Fill => …, Kind::Order => …, _ => {} }`；
+- **日志 / 跨语言按名字对照**用 `ev.kind_str()`（如 `"depth"`，与 JS/Python 同名）。
+
+`Kind` 标了 `#[non_exhaustive]`：以后新增事件类型只加变体，`match` 必须带 `_` 分支，SDK 升级不会让已有
+策略编译失败。`Kind::Unknown` 是运行时兜底（宿主发来本 SDK 不认识的 ABI 数字，`kind_str()` 为
+`"unknown"`），不是未来类型的占位。`Event.kind` 数字是 ABI 字段，不要拿它比较。
 
 ## 线程与订阅归属
 
@@ -565,5 +577,5 @@ var a = ctx.rest(0, "assets");
 - **不暴露内部句柄**：引擎的 instrument id 等进程内实现细节不进事件（跨重启不稳定）。
 - 枚举字段的字符串化只做在**语义层**（kind/side/state/channel）；协议码（reason/status/prefillStatus）保留数字。
 - **`kind` 是名字，不是数字**：名字表只有一份（`abi::kind_name`，宿主编组 JS/Python 事件与 Rust
-  `EventExt::kind_str` 共用）。新增事件类型只加新名字、不改已有名字；宿主不认识的类型是 `"unknown"`。
+  `EventExt::kind_str` 共用；Rust 的 `ctx::Kind` 枚举逐项对应它，单测核对）。新增事件类型只加新名字、不改已有名字；宿主不认识的类型是 `"unknown"`。
   ABI 层的 `Event.kind` 仍是数字常量（`EV_*`，连接器与引擎用），策略不要依赖这些数字。
