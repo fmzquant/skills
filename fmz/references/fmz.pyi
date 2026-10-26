@@ -1205,6 +1205,10 @@ class IExchange:
         - ``IO("base")`` / ``IO("base", url)``: read / switch the base address.
         - ``IO("cross", True)``, ``IO("dual", True)``, ``IO("simulate", True)``: account modes (see each exchange).
         - ``IO("rate", "GetTicker", 10, "1s")``: client-side rate limits.
+        - ``IO("extend", [{"match": "^POST/api/v3/order$", "params": {...}, "force": False}])``: inject parameters
+          into requests by target string (``METHOD/path`` for REST, ``ws:order`` / ``ws:cancel`` for ``ctx.submit()``);
+          ``IO("extend")`` lists the rules with hit counts, ``IO("extend", "")`` clears them, ``IO("extend!", rules)``
+          overwrites existing values.
 
         Returns:
             Depends on the command; ``None`` on failure (reason in ``GetLastError()``).
@@ -1612,7 +1616,7 @@ class Subscription:
     symbol: str
     """Symbol code (empty for ``private`` / ``tickers``)."""
     depth: int
-    """Levels of a depth subscription (0 = the exchange default)."""
+    """Levels of a depth subscription: 0 = the exchange default, 1–255 = the subscribed levels."""
     interval: int
     """K-line period in seconds."""
 
@@ -1633,7 +1637,8 @@ class Subscription:
 
     def balances(self) -> Optional[list[CtxRecord]]:
         """``private`` subscriptions: latest balances (rows ``{asset, free, frozen, equity?, upnl?, margin?, time}``);
-        ``None`` until the account snapshot is READY."""
+        ``None`` until the account snapshot is READY. ``free`` / ``frozen`` are ``None`` when the push carries no value
+        consistent with ``GetAssets()`` (pushes are never filled in from REST)."""
         ...
 
     def unsubscribe(self) -> None:
@@ -1651,26 +1656,41 @@ class SubscriptionList(list[Subscription]):
 class CtxEvent(dict[str, Any]):
     """Event returned by ``ctx.poll()``: a dict with the JavaScript event fields (``ev.kind`` or ``ev["kind"]``).
 
-    Common fields: ``kind`` (1 ticker/bbo/tickers, 3 depth, 4 trade, 5 kline, 16 order, 17 position, 18 balance,
-    32 timer, 33 gateway status, 35 init status), ``stream``, ``type`` (``"data"`` / ``"status"`` / ``"timer"``),
-    ``channel``, ``ex``, ``symbol``, ``seq``, ``ts``. Per kind: 1 ``bid ask last bidQty askQty volume openInterest
-    open high low time``; 4 ``px qty side tradeId time``; 5 ``open high low close volume openInterest intervalSec
-    openTimeMs closed prefill``; 16 ``id state px qty filledQty avgPx reason reasonText``; 17 ``side posSide qty
-    avgPx profit margin liqPx markPx leverage time snapshot``; 18 ``asset free frozen equity upnl margin time
-    snapshot``; 32 ``timerId scheduledNs``; 33 ``status detail``; 35 ``channelCode intervalSec prefillStatus``
-    (1 READY, 2 FAILED) ``detail message``. Depth events (kind 3) carry no levels: read them with ``ev.book(n)``.
+    Common fields: ``kind`` (the event type name, a string: ``"ticker"`` (shared by ticker/bbo/tickers, told apart by
+    ``channel``), ``"depth"``, ``"trade"``, ``"kline"``, ``"order"`` (order update), ``"position"``, ``"balance"``,
+    ``"fill"`` (own fill), ``"ack"`` (WebSocket order ack), ``"timer"``, ``"gateway"`` (gateway status), ``"status"``
+    (init status); new names may be added later, unrecognized ones are ``"unknown"``; do not hard-code numbers),
+    ``stream`` (the subscription ``id`` or a built-in stream), ``type`` (``"data"`` / ``"status"`` / ``"timer"`` /
+    ``"ack"``), ``channel`` (which data within a kind; ``orders`` / ``fills`` / ``positions`` / ``balance`` on the
+    private stream), ``ex``, ``symbol``, ``seq``, ``time``, ``ts``. Branch on ``kind`` for the event type, on ``channel``
+    for data of the same kind (ticker vs bbo, the private stream's parts), and on ``ev.stream == sub.id`` or
+    ``ctx.poll([sub])`` for several subscriptions of one channel (BTC vs ETH, depth 5 vs 20). Per kind: ``"ticker"``
+    ``bid ask last bidQty askQty volume openInterest open high low time``; ``"trade"`` ``px qty side tradeId time``;
+    ``"kline"`` ``open high low close volume openInterest intervalSec openTimeMs closed prefill``; ``"order"`` ``id
+    clientId state px qty filledQty avgPx reason reasonText``; ``"position"`` ``side posSide qty avgPx profit margin liqPx
+    markPx leverage time snapshot``; ``"balance"`` ``asset free frozen equity upnl margin time snapshot`` (``free`` /
+    ``frozen`` may be ``None``); ``"fill"`` ``orderId clientId tradeId px qty fee feeCcy side liquidity time`` (one fill
+    of your own order; no ``fee`` key when unknown); ``clientId`` is the client order ID (for an order placed by
+    ``ctx.submit()`` the localId it returned; ``""`` when the push has none); ``"ack"`` ``reqId op status ok id clientId
+    error reason reasonText exchTime latencyMs`` (the result of each ``ctx.submit()`` item; ``op`` is ``"order"`` /
+    ``"cancel"``, ``status`` is ``"ok"`` / ``"failed"`` / ``"unknown"``); ``"timer"`` ``timerId scheduledNs``;
+    ``"gateway"`` ``status detail``; ``"status"`` ``channelCode intervalSec prefillStatus`` (1 READY, 2 FAILED) ``detail
+    message``. Depth events (``"depth"``) carry no levels: read them with ``ev.book(n)``.
     """
-    kind: int
+    kind: str
+    """Event type name: ``"ticker"`` ``"depth"`` ``"trade"`` ``"kline"`` ``"order"`` ``"position"`` ``"balance"``
+    ``"fill"`` ``"ack"`` ``"timer"`` ``"gateway"`` ``"status"`` (``"unknown"`` when unrecognized)."""
     stream: int
     type: str
     channel: str
     ex: int
     symbol: str
     seq: int
+    time: float
     ts: float
 
     def book(self, n: Optional[int] = None) -> CtxRecord:
-        """Depth events (kind 3): the order book of the subscription it belongs to, as ``Subscription.book()``."""
+        """Depth events (kind ``"depth"``): the order book of the subscription it belongs to, as ``Subscription.book()``."""
         ...
 
     def __getattr__(self, name: str) -> Any: ...
@@ -1685,6 +1705,36 @@ class _SubscribeOptions(TypedDict, total=False):
 class _SubscribeBatchOptions(_SubscribeOptions):
     symbol: Union[list[str], tuple[str, ...]]
 
+class _OrderOptions(TypedDict, total=False):
+    type: str
+    tif: str
+    reduceOnly: bool
+    postOnly: bool
+    extra: Any
+
+class _SubmitBase(TypedDict):
+    op: str
+    symbol: str
+
+class _SubmitOne(_SubmitBase, total=False):
+    side: str
+    price: float
+    amount: float
+    type: str
+    tif: str
+    reduceOnly: bool
+    postOnly: bool
+    extra: Any
+    id: str
+
+class _SubmitBatch(TypedDict):
+    op: str
+    orders: Sequence[Any]
+
+class CtxError(Exception):
+    """The **return value** (not raised) of a failed ``ctx.order()`` / ``ctx.cancel()`` / ``ctx.submit()``: test it
+    with ``isinstance(r, CtxError)``; ``str(r)`` is the reason."""
+
 class Ctx:
     """The global ``ctx``: WebSocket push subscriptions (same semantics as JavaScript ``ctx``; live only).
 
@@ -1698,7 +1748,7 @@ class Ctx:
                 if ev is None:
                     continue
                 if ev.type == "status":
-                    if ev.kind == 35 and ev.prefillStatus == 2:
+                    if ev.kind == "status" and ev.prefillStatus == 2:
                         Log("subscription failed:", ev.channel, ev.message)
                     continue
                 if ev.channel == "depth":
@@ -1707,9 +1757,12 @@ class Ctx:
                     Log(acct.positions(), acct.balances())
     """
     STREAM_TIMER: int
-    """Built-in stream of engine timers (kind 32). Value 1."""
+    """Built-in stream of engine timers (kind ``"timer"``). Value 1."""
     STREAM_STATUS: int
-    """Built-in stream of gateway status events (kind 33). Value 2."""
+    """Built-in stream of gateway status events (kind ``"gateway"``). Value 2."""
+    STREAM_ORDER_ACK: int
+    """Built-in stream of ``ctx.submit()`` acks (kind ``"ack"``; delivered only to the requesting thread, no subscription
+    needed). Value 4."""
 
     @overload
     def subscribe(self, ex: Union[IExchange, int, str], opts: _SubscribeBatchOptions) -> SubscriptionList: ...
@@ -1723,13 +1776,15 @@ class Ctx:
             ex: Exchange object (``exchange``, ``exchanges[1]``) or account index (an int or digit string).
             opts: ``{channel, symbol, depth, interval, mode, buffer}``. ``channel``: ``"ticker"`` (default),
                 ``"bbo"``, ``"depth"``, ``"trade"``, ``"kline"``, ``"tickers"`` (whole market, no symbol) or
-                ``"private"`` (orders + positions + balances, no symbol). ``symbol``: required for market data
-                unless ``ex`` is an exchange object (its current pair); a list subscribes a batch. ``depth``:
-                levels; ``interval``: K-line seconds; ``mode: "latest"`` or ``buffer: N``.
+                ``"private"`` (orders + fills + positions + balances, no symbol). ``symbol``: required for market
+                data unless ``ex`` is an exchange object (its current pair); a list subscribes a batch. ``depth``:
+                levels, 0 (default) or any integer 1–255, each its own subscription (above 255 raises; above the
+                exchange's maximum gets an ``unsupported depth`` FAILED event); ``interval``: K-line seconds;
+                ``mode: "latest"`` or ``buffer: N``.
 
         Returns:
             ``Subscription``; a ``SubscriptionList`` when ``symbol`` is a list or tuple (validated as a whole).
-            Invalid options raise; a subscription the exchange rejects gets a kind 35 FAILED event on its stream.
+            Invalid options raise; a subscription the exchange rejects gets a kind ``"status"`` FAILED event (``prefillStatus`` 2) on its stream.
         """
         ...
 
@@ -1738,7 +1793,8 @@ class Ctx:
 
         Args:
             streams: ``None`` / ``[]`` = all of this thread's subscriptions; otherwise Subscriptions, stream IDs,
-                a SubscriptionList or nested lists of them (``ctx.STREAM_TIMER`` / ``ctx.STREAM_STATUS`` too).
+                a SubscriptionList or nested lists of them (``ctx.STREAM_TIMER`` / ``ctx.STREAM_STATUS`` / ``ctx.STREAM_ORDER_ACK``
+                too).
             timeout_ms: ``None`` waits until an event arrives, ``0`` does not wait, > 0 waits at most that many ms
                 (non-negative int).
 
@@ -1749,9 +1805,79 @@ class Ctx:
         ...
 
     def connectors(self) -> list[CtxRecord]:
-        """Loaded exchanges: ``[{ex, label, name, symbol, interval, orderIdScope, feed}, ...]``; ``feed`` =
+        """Loaded exchanges: ``[{ex, label, name, symbol, interval, orderIdScope, feed, acksDropped}, ...]``; ``feed`` =
         ``{ticksDropped, backpressure, ringCapacity}`` push-buffer counters (growing fast = the strategy is too
-        slow)."""
+        slow); ``acksDropped`` = ``ctx.submit()`` acks dropped because the requesting thread's ack queue (1024) was
+        full."""
+        ...
+
+    def order(self, ex: Union[IExchange, int, str], symbol: str, side: str, px: float, qty: float,
+              opts: Optional[Union[_OrderOptions, dict[str, Any]]] = None) -> Union[str, CtxError]:
+        """Place an order through the exchange's REST API and wait for its order ID (no subscription needed;
+        callable from the main thread and ``threading.Thread`` threads).
+
+        Args:
+            ex: Exchange object or account index.
+            symbol: Symbol code, e.g. ``"BTC_USDT"``, ``"BTC_USDT.swap"``.
+            side: ``"buy"`` or ``"sell"``.
+            px: Price (0 is fine for market orders).
+            qty: Quantity (greater than 0, in the units of the exchange's REST orders).
+            opts: ``{type, tif, reduceOnly, postOnly, extra}``; only these keys (others return an error).
+                ``type``: ``"limit"`` (default) / ``"market"``; ``tif``: ``"gtc"`` / ``"ioc"`` / ``"fak"`` /
+                ``"fok"`` / ``"postOnly"``; ``extra``: exchange-specific parameters. WebSocket orders go through
+                ``ctx.submit()``.
+
+        Returns:
+            The exchange order ID (same as ``id`` of order updates and ``orderId`` of fills); a ``CtxError`` on
+            failure (not raised).
+        """
+        ...
+
+    def cancel(self, ex: Union[IExchange, int, str], symbol: str, id: str) -> Optional[CtxError]:
+        """Cancel an order through the exchange's REST API and wait for the exchange to confirm. ``id`` is the
+        exchange order ID, or a localId ``ctx.submit()`` returned in this run (canceled by client order ID; an error
+        where the exchange does not support that). Returns ``None`` on success, a ``CtxError`` on failure (including
+        an order that already filled)."""
+        ...
+
+    @overload
+    def submit(self, ex: Union[IExchange, int, str], req: _SubmitBatch) -> Union[list[str], CtxError]: ...
+    @overload
+    def submit(self, ex: Union[IExchange, int, str], req: _SubmitOne) -> Union[str, CtxError]: ...
+    @overload
+    def submit(self, ex: Union[IExchange, int, str], req: dict[str, Any]) -> Union[str, list[str], CtxError]:
+        """Place / cancel orders through the exchange's WebSocket trading API (WebSocket only: an error where the
+        exchange does not support it, never a REST fallback).
+
+        Exactly two positional arguments. Returns once the request is written, without waiting for the exchange;
+        the result of each item is an ack event (kind ``"ack"``) delivered to **this thread**
+        (``ctx.poll([ctx.STREAM_ORDER_ACK], timeout_ms)``, ``ev.reqId`` equals the request ID), no subscription
+        needed.
+
+        Args:
+            ex: Exchange object or account index.
+            req: ``{"op": "order", symbol, side, price, amount, type?, tif?, reduceOnly?, postOnly?, extra?}`` to
+                place (``price`` may be omitted for market orders), ``{"op": "cancel", symbol, id}`` to cancel (``id``
+                is the exchange order ID or a localId of this run); a batch is ``{"op": ..., "orders": [item, ...]}``
+                (validated as a whole: one bad item and nothing is sent). Client order IDs are generated for you
+                and cannot be given (``clientId``, or the exchange's client-order-ID field in ``extra``, is an error).
+
+        Returns:
+            The request ID (``str``) for a single request, a list in the same order for a batch; the request ID
+            of an order is the client order ID sent to the exchange (the localId), which is also the ``clientId``
+            of its order and fill pushes. Bad arguments, unsupported, a trading connection that cannot be opened
+            (the first call waits about 5 s at most), more than 256 requests in flight or a local rate limit return
+            a ``CtxError`` (nothing was sent, no ack follows).
+
+        Example::
+
+            lid = ctx.submit(exchange, {"op": "order", "symbol": "BTC_USDT", "side": "buy",
+                                        "price": 30000, "amount": 0.001})
+            if not isinstance(lid, CtxError):
+                ack = ctx.poll([ctx.STREAM_ORDER_ACK], 5000)
+                if ack is not None and ack.reqId == lid and ack.ok:
+                    Log("placed", ack.id, ack.latencyMs)
+        """
         ...
 
 # ==================== Global Variables ====================
@@ -1769,7 +1895,8 @@ exchange: IExchange
 """The first exchange object, same as ``exchanges[0]``."""
 
 ctx: Ctx
-"""WebSocket push: ``ctx.subscribe()``, ``ctx.poll()``, ``ctx.connectors()`` (live only)."""
+"""WebSocket push and orders: ``ctx.subscribe()``, ``ctx.poll()``, ``ctx.connectors()``, ``ctx.order()``,
+``ctx.cancel()``, ``ctx.submit()`` (live only)."""
 
 # ==================== Global Functions ====================
 

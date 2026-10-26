@@ -261,6 +261,15 @@ impl ToArg for Error {
         Arg::Str(self.to_string())
     }
 }
+/// `Log!(opt)` — `Some` logs the value, `None` logs `null`.
+impl<T: ToArg> ToArg for Option<T> {
+    fn to_arg(&self) -> Arg {
+        match self {
+            Some(v) => v.to_arg(),
+            None => Arg::Null,
+        }
+    }
+}
 /// `Log!(exchange.GetTicker(""))` — `Ok` logs the value, `Err` the error text.
 impl<T: ToArg> ToArg for std::result::Result<T, Error> {
     fn to_arg(&self) -> Arg {
@@ -1940,7 +1949,7 @@ pub fn BigFloat(x: impl ToDecimal) -> Decimal { todo!() }
 /// in scope like the SDK's `sdk::abi::*`. Read events through [`ctx::EventExt`]: it checks
 /// `kind` and converts fixed-point prices/quantities to real numbers — no `unsafe` needed.
 pub mod abi {
-    /// One runtime event (256-byte POD). `payload` is a union keyed by `kind`; read it
+    /// One runtime event (512-byte POD). `payload` is a union keyed by `kind`; read it
     /// with the safe [`EventExt`](super::ctx::EventExt) accessors instead (raw prices and
     /// quantities are fixed-point mantissas, see `ctx::scales_of`).
     #[derive(Clone, Copy)]
@@ -1949,7 +1958,10 @@ pub mod abi {
         pub seq: u64,
         pub ts_ingress_ns: u64,
         pub ts_publish_ns: u64,
-        /// Event kind: `EV_*`.
+        /// Event kind as the ABI number (`EV_*`). Strategies should not compare it: use the
+        /// typed views (`ev.fill()`, `ev.order_ack()`, …),
+        /// [`EventExt::event_kind`](super::ctx::EventExt::event_kind) (a [`Kind`](super::ctx::Kind))
+        /// or [`EventExt::kind_str`](super::ctx::EventExt::kind_str) (the same name as JS `ev.kind`).
         pub kind: u16,
         /// Account (load order) the event came from.
         pub source: u16,
@@ -1957,7 +1969,7 @@ pub mod abi {
         pub instrument: u32,
         /// Kind-specific payload (reading a field needs `unsafe`; prefer `EventExt`).
         pub payload: EventPayload,
-        /// Delivery stream id (= `Sub::id()`, or `STREAM_TIMER` / `STREAM_STATUS`).
+        /// Delivery stream id (= `Sub::id()`, or `STREAM_TIMER` / `STREAM_STATUS` / `STREAM_ORDER_ACK`).
         pub tag: u32,
     }
     impl Event {
@@ -1973,10 +1985,12 @@ pub mod abi {
         pub ord: OrdUpdate,
         pub pos: PosUpdate,
         pub bal: BalUpdate,
+        pub fill: FillUpdate,
+        pub ack: OrdAck,
         pub timer: TimerFired,
         pub gw: GwStatus,
         pub feed: FeedStatus,
-        pub raw: [u8; 168],
+        pub raw: [u8; 472],
     }
     /// `EV_MD_TICK` (fixed-point mantissas).
     #[derive(Clone, Copy)]
@@ -2032,6 +2046,8 @@ pub mod abi {
     #[derive(Clone, Copy)]
     pub struct OrdUpdate {
         pub ord_id: [u8; ORD_ID_CAP],
+        /// Client order id from the push (the localId for orders placed by `ctx::submit`); empty = none.
+        pub client_id: [u8; CLIENT_ID_CAP],
         pub px: i64, pub qty: i64, pub filled_qty: i64, pub avg_px: i64,
         /// `ORD_ST_*`.
         pub state: u8,
@@ -2041,6 +2057,7 @@ pub mod abi {
     }
     impl OrdUpdate {
         pub fn ord_id_str(&self) -> &str { todo!() }
+        pub fn client_id_str(&self) -> &str { todo!() }
     }
     /// `EV_POS_UPDATE`: full current state of one position slot (qty 0 = closed).
     #[derive(Clone, Copy)]
@@ -2066,6 +2083,63 @@ pub mod abi {
     }
     impl BalUpdate {
         pub fn asset_str(&self) -> &str { todo!() }
+    }
+    /// `EV_FILL`: one fill of your own order (private stream, channel "fills").
+    #[derive(Clone, Copy)]
+    pub struct FillUpdate {
+        /// Order id of the filled order (same as `OrdUpdate::ord_id`).
+        pub ord_id: [u8; ORD_ID_CAP],
+        /// Client order id of the filled order (same as `OrdUpdate::client_id`); empty = none.
+        pub client_id: [u8; CLIENT_ID_CAP],
+        /// Exchange trade id (`syn:` synthetic id when the venue gives none).
+        pub trade_id: [u8; TRADE_ID_CAP],
+        /// Fee asset; empty = unknown.
+        pub fee_ccy: [u8; ASSET_CAP],
+        pub px: i64, pub qty: i64,
+        /// Fee of this fill: positive = paid, negative = rebate; NaN = unknown.
+        pub fee: f64,
+        /// Exchange fill time (ms; 0 = unknown).
+        pub exch_ts_ms: i64,
+        /// Order side (`SIDE_*`, not the taker side; 0 = unknown).
+        pub side: u8,
+        /// `LIQ_*`.
+        pub liquidity: u8,
+        pub _pad: [u8; 6],
+    }
+    impl FillUpdate {
+        pub fn ord_id_str(&self) -> &str { todo!() }
+        pub fn client_id_str(&self) -> &str { todo!() }
+        pub fn trade_id_str(&self) -> &str { todo!() }
+        pub fn fee_ccy_str(&self) -> &str { todo!() }
+    }
+    /// `EV_ORD_ACK`: result of one `ctx::submit` / `ctx::submit_batch` item (host-generated).
+    #[derive(Clone, Copy)]
+    pub struct OrdAck {
+        /// Host time just before the request was written (`now_ns` clock).
+        pub sent_ns: u64,
+        /// Exchange answer time (ms; 0 = not given).
+        pub exch_ts_ms: i64,
+        /// `ACK_OP_*`.
+        pub op: u8,
+        /// `ACK_ST_*`.
+        pub status: u8,
+        /// `rej::*` (0 on success).
+        pub reason: u8,
+        pub _pad: [u8; 5],
+        /// Request id `submit` returned: the order's client order id (localId) for orders, a new id for cancels.
+        pub req_id: [u8; CLIENT_ID_CAP],
+        /// Client order id of the target order (the localId; empty when canceling by exchange order id).
+        pub client_id: [u8; CLIENT_ID_CAP],
+        pub ord_id: [u8; ORD_ID_CAP],
+        pub symbol: [u8; ACK_SYMBOL_CAP],
+        /// Failure reason (truncated to 127 bytes); empty on success.
+        pub message: [u8; ACK_MESSAGE_CAP],
+    }
+    impl OrdAck {
+        pub fn ord_id_str(&self) -> &str { todo!() }
+        pub fn client_id_str(&self) -> &str { todo!() }
+        pub fn symbol_str(&self) -> &str { todo!() }
+        pub fn message_str(&self) -> &str { todo!() }
     }
     /// `EV_TIMER`.
     #[derive(Clone, Copy)]
@@ -2100,11 +2174,17 @@ pub mod abi {
     pub const EV_ORD_UPDATE: u16 = 16;
     pub const EV_POS_UPDATE: u16 = 17;
     pub const EV_BAL_UPDATE: u16 = 18;
+    /// One fill of your own order (private stream, channel "fills").
+    pub const EV_FILL: u16 = 19;
+    /// WebSocket order / cancel ack (one per `ctx::submit` item), on `STREAM_ORDER_ACK`.
+    pub const EV_ORD_ACK: u16 = 20;
     pub const EV_TIMER: u16 = 32;
     pub const EV_GW_STATUS: u16 = 33;
     pub const EV_FEED_STATUS: u16 = 35;
     pub const STREAM_TIMER: u32 = 1;
     pub const STREAM_STATUS: u32 = 2;
+    /// `ctx::submit` acks (kind "ack"), delivered only to the requesting thread.
+    pub const STREAM_ORDER_ACK: u32 = 4;
     /// Stream ids minted by `subscribe` start here.
     pub const STREAM_FIRST_DYNAMIC: u32 = 16;
     pub const SIDE_BUY: u8 = 1;
@@ -2131,6 +2211,21 @@ pub mod abi {
     pub const ORD_ID_CAP: usize = 128;
     pub const TRADE_ID_CAP: usize = 128;
     pub const ASSET_CAP: usize = 64;
+    pub const CLIENT_ID_CAP: usize = 64;
+    pub const SYMBOL_CAP: usize = 128;
+    /// `FillUpdate::liquidity`.
+    pub const LIQ_UNKNOWN: u8 = 0;
+    pub const LIQ_MAKER: u8 = 1;
+    pub const LIQ_TAKER: u8 = 2;
+    /// `OrdAck::op` / `status`.
+    pub const ACK_OP_ORDER: u8 = 1;
+    pub const ACK_OP_CANCEL: u8 = 2;
+    pub const ACK_ST_OK: u8 = 1;
+    pub const ACK_ST_FAILED: u8 = 2;
+    pub const ACK_ST_UNKNOWN: u8 = 3;
+    /// `OrdAck::symbol` / `message` capacities.
+    pub const ACK_SYMBOL_CAP: usize = 64;
+    pub const ACK_MESSAGE_CAP: usize = 128;
     pub const CH_TICKER: u16 = 1;
     pub const CH_TRADE: u16 = 2;
     pub const CH_DEPTH: u16 = 3;
@@ -2174,7 +2269,7 @@ pub use abi::*;
 ///         }
 ///     }
 pub mod ctx {
-    pub use super::abi::{Event, STREAM_STATUS, STREAM_TIMER};
+    pub use super::abi::{Event, STREAM_ORDER_ACK, STREAM_STATUS, STREAM_TIMER};
     use super::Exchange;
 
     /// Account address: load-order index (`u16`) or an exchange object (`exchange`,
@@ -2208,13 +2303,15 @@ pub mod ctx {
         /// Best bid/ask (a separate subscription from ticker).
         pub fn bbo() -> Self { todo!() }
         pub fn trade() -> Self { todo!() }
-        /// Order book with `n` levels (0 = the venue's default).
+        /// Order book with `n` levels: 0 = the venue's default, or any 1..=255, each level count its own
+        /// subscription (smallest native level covering `n`, truncated to `n`). Above 255 `subscribe` returns
+        /// Err; above the venue's maximum the stream gets a kind "status" FAILED ("unsupported depth ...").
         pub fn depth(n: u16) -> Self { todo!() }
         pub fn kline(interval_sec: u32) -> Self { todo!() }
-        /// The account's private stream: order updates + positions + balances, no symbol.
+        /// The account's private stream: order updates + fills + positions + balances, no symbol.
         pub fn private() -> Self { todo!() }
         /// Market-wide tickers, no symbol; only venues with an all-market stream
-        /// (otherwise a kind 35 FAILED event on this stream).
+        /// (otherwise a kind "status" FAILED event on this stream).
         pub fn tickers() -> Self { todo!() }
         /// Unified symbol `BASE_QUOTE[.contract]`.
         pub fn symbol(self, symbol: impl Into<String>) -> Self { todo!() }
@@ -2269,8 +2366,9 @@ pub mod ctx {
         pub liq_px: Option<f64>,
         pub mark_px: Option<f64>,
         pub leverage: Option<f64>,
-        /// Exchange update time (ms).
-        pub time: Option<i64>,
+        /// Exchange update time (ms): always `Some` on events (ingress time when the venue gave
+        /// none); `None` in `Sub::positions()` rows when the venue gave none.
+        pub time: Option<f64>,
         /// Part of the snapshot after (re)subscribing.
         pub snapshot: bool,
     }
@@ -2279,16 +2377,18 @@ pub mod ctx {
     #[derive(Clone, Debug, PartialEq)]
     pub struct BalanceRow {
         pub asset: String,
-        pub free: f64,
-        pub frozen: f64,
+        /// `None`: the push carries no value with `GetAssets()`'s meaning (pushes are never back-filled from REST).
+        pub free: Option<f64>,
+        pub frozen: Option<f64>,
         pub equity: Option<f64>,
         pub upnl: Option<f64>,
         pub margin: Option<f64>,
-        pub time: Option<i64>,
+        /// As `PositionRow::time`.
+        pub time: Option<f64>,
         pub snapshot: bool,
     }
 
-    /// Ticker event (kind 1: ticker / bbo / tickers channels), real numbers.
+    /// Ticker event (kind "ticker": ticker / bbo / tickers channels), real numbers.
     #[derive(Clone, Debug, PartialEq)]
     pub struct TickerView {
         pub symbol: String,
@@ -2304,11 +2404,11 @@ pub mod ctx {
         pub open: f64,
         pub high: f64,
         pub low: f64,
-        /// Exchange time (ms).
-        pub time: Option<i64>,
+        /// Exchange time (ms; ingress time when the venue gave none), same as `ev.time()`.
+        pub time: f64,
     }
 
-    /// Trade event (kind 4).
+    /// Trade event (kind "trade").
     #[derive(Clone, Debug, PartialEq)]
     pub struct TradeView {
         pub symbol: String,
@@ -2318,10 +2418,11 @@ pub mod ctx {
         pub side: &'static str,
         /// Same id as the REST `trades` row `id`; "" when the venue gives none.
         pub trade_id: String,
-        pub time: Option<i64>,
+        /// Exchange trade time (ms; ingress time when the venue gave none).
+        pub time: f64,
     }
 
-    /// K-line event (kind 5).
+    /// K-line event (kind "kline").
     #[derive(Clone, Debug, PartialEq)]
     pub struct KlineView {
         pub symbol: String,
@@ -2335,18 +2436,22 @@ pub mod ctx {
         pub interval: u32,
         /// Bar open time (ms; can go straight to `_D`).
         pub open_time: i64,
+        /// Same as `open_time` (f64, the uniform `time` of every view).
+        pub time: f64,
         /// The bar is final (open bars are pushed repeatedly).
         pub closed: bool,
         /// History sent on the first subscription.
         pub prefill: bool,
     }
 
-    /// Order update (kind 16, private stream).
+    /// Order update (kind "order", private stream).
     #[derive(Clone, Debug, PartialEq)]
     pub struct OrderView {
         pub symbol: String,
         /// Exchange order id ("" when the venue gave none).
         pub id: String,
+        /// Client order id from the push (the localId [`submit`] returned for orders it placed; "" = none).
+        pub client_id: String,
         /// "acked" / "partial" / "filled" / "canceled" / "rejected".
         pub state: &'static str,
         pub px: f64,
@@ -2356,20 +2461,81 @@ pub mod ctx {
         /// Unified reject reason code (0 = none).
         pub reason: u8,
         pub reason_text: &'static str,
+        /// Ingress time (ms): order updates carry no exchange time yet.
+        pub time: f64,
     }
 
-    /// Gateway status (kind 33).
-    #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+    /// Fill (kind "fill", private stream "fills"): one fill of your own order. Pushed before the
+    /// order update that reflects it; no snapshot, no backfill after (re)subscribing.
+    #[derive(Clone, Debug, PartialEq)]
+    pub struct FillView {
+        pub symbol: String,
+        /// Order id of the filled order (same as `OrderView::id` / `ctx::order`'s result).
+        pub order_id: String,
+        /// Client order id of the filled order (same as `OrderView::client_id`; "" = none).
+        pub client_id: String,
+        /// Exchange trade id ("syn:" synthetic id when the venue gives none; "" when none at all).
+        pub trade_id: String,
+        /// This fill's price / quantity.
+        pub px: f64,
+        pub qty: f64,
+        /// Fee of this fill: positive = paid, negative = rebate; `None` = not given (not 0).
+        pub fee: Option<f64>,
+        /// Fee asset; "" = unknown.
+        pub fee_ccy: String,
+        /// Order side "buy" / "sell" (not the taker side); "" when unknown.
+        pub side: &'static str,
+        /// "maker" / "taker"; "" when the venue does not say.
+        pub liquidity: &'static str,
+        /// Exchange fill time (ms; ingress time when the venue gave none).
+        pub time: f64,
+    }
+
+    /// WebSocket order / cancel ack (kind "ack", stream `STREAM_ORDER_ACK`): the result of one
+    /// [`submit`] / [`submit_batch`] item, delivered only to the requesting thread.
+    #[derive(Clone, Debug, PartialEq)]
+    pub struct OrderAckView {
+        /// The request id [`submit`] returned: the order's client order id (localId) for orders, a new id
+        /// for cancels.
+        pub req_id: String,
+        /// "order" / "cancel".
+        pub op: &'static str,
+        /// "ok" / "failed" / "unknown" (sent, no verdict: do NOT resend, reconcile by `client_id`).
+        pub status: &'static str,
+        /// `status == "ok"`.
+        pub ok: bool,
+        /// Exchange order id (new order / cancel target; "" for a failed placement).
+        pub id: String,
+        /// Client order id of the target order (the localId; "" when canceling by exchange order id).
+        pub client_id: String,
+        pub symbol: String,
+        /// Failure reason (same text as REST; "" on success; truncated to 127 bytes).
+        pub error: String,
+        /// Unified reason code (`rej::*`, 0 on success) and its text.
+        pub reason: u8,
+        pub reason_text: &'static str,
+        /// Exchange answer time (ms); `None` = not given.
+        pub exch_time: Option<i64>,
+        /// Round trip (ms): just before the request was written → the host got the verdict.
+        pub latency_ms: f64,
+        /// Exchange answer time, else `ev.ts()`.
+        pub time: f64,
+    }
+
+    /// Gateway status (kind "gateway").
+    #[derive(Clone, Copy, Debug, PartialEq)]
     pub struct GatewayView {
         pub ex: u16,
         /// `GW_UP` / `GW_DOWN` / `GW_DEGRADED`.
         pub status: u8,
         pub detail: u64,
+        /// Ingress time (ms).
+        pub time: f64,
     }
 
-    /// Subscription init status (kind 35, on the target subscription's stream):
+    /// Subscription init status (kind "status", on the target subscription's stream):
     /// K-line history, private account snapshot, or a rejected subscription.
-    #[derive(Clone, Debug, PartialEq, Eq)]
+    #[derive(Clone, Debug, PartialEq)]
     pub struct FeedStatusView {
         pub stream: u32,
         /// The target subscription's channel ("private" for the account snapshot).
@@ -2380,34 +2546,106 @@ pub mod ctx {
         pub detail: u64,
         /// The real reason when FAILED.
         pub message: String,
+        /// Ingress time (ms).
+        pub time: f64,
     }
     impl FeedStatusView {
         pub fn ready(&self) -> bool { todo!() }
         pub fn failed(&self) -> bool { todo!() }
     }
 
+    /// Event type ([`EventExt::event_kind`]; `use sdk::ctx::{EventExt, Kind};`). Each variant's
+    /// [`as_str`](Kind::as_str) (also its `Display`) is the JS / Python `ev.kind` name.
+    /// Handle one kind with its typed view (`if let Some(f) = ev.fill() { … }`), dispatch
+    /// several with `match ev.event_kind() { Kind::Fill => …, Kind::Order => …, _ => {} }`,
+    /// and use [`EventExt::kind_str`] for logging or comparing names across languages.
+    /// `#[non_exhaustive]`: new event kinds may be added as variants, so a `match` needs a
+    /// `_` arm. `Unknown` is what an event of a kind this SDK does not know reads as.
+    /// ticker / bbo / tickers are all `Ticker` (told apart by [`channel`](EventExt::channel)).
+    #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+    #[non_exhaustive]
+    pub enum Kind {
+        /// "ticker" → `ev.ticker()`.
+        Ticker,
+        /// "depth" → `ev.book(n)`.
+        Depth,
+        /// "trade" → `ev.trade()`.
+        Trade,
+        /// "kline" → `ev.kline()`.
+        Kline,
+        /// "order" → `ev.order()`.
+        Order,
+        /// "position" → `ev.position()`.
+        Position,
+        /// "balance" → `ev.balance()`.
+        Balance,
+        /// "fill" → `ev.fill()`.
+        Fill,
+        /// "ack" (async order / cancel ack) → `ev.order_ack()`.
+        Ack,
+        /// "timer".
+        Timer,
+        /// "gateway" → `ev.gateway()`.
+        Gateway,
+        /// "status" (subscription READY / FAILED) → `ev.feed_status()`.
+        Status,
+        /// "unknown": a kind this SDK does not know.
+        Unknown,
+    }
+    impl Kind {
+        /// ABI event number (`Event.kind`) → `Kind` (`Unknown` if not registered).
+        pub const fn from_abi(kind: u16) -> Kind { todo!() }
+        /// The JS / Python `ev.kind` name: `Kind::Fill.as_str() == "fill"`.
+        pub const fn as_str(self) -> &'static str { todo!() }
+    }
+    impl std::fmt::Display for Kind {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result { todo!() }
+    }
+
     /// Safe readers for a raw [`Event`] (`use sdk::ctx::EventExt;`): each checks the
     /// kind (`None` otherwise) and returns real numbers.
     pub trait EventExt {
-        /// Delivery stream id (`Sub::id()`, `STREAM_TIMER`, `STREAM_STATUS`).
+        /// Event type as a [`Kind`]: dispatch several kinds with
+        /// `match ev.event_kind() { Kind::Fill => …, _ => {} }`; for one kind use its typed
+        /// view (`if let Some(f) = ev.fill()`). Never compare the numeric `Event.kind` (the ABI field).
+        fn event_kind(&self) -> Kind;
+        /// Event type name, the same as JS / Python `ev.kind` (= `ev.event_kind().as_str()`):
+        /// "ticker" (ticker / bbo / tickers, told apart by [`channel`](EventExt::channel)),
+        /// "depth", "trade", "kline", "order", "position", "balance", "fill", "ack", "timer",
+        /// "gateway", "status"; "unknown" for a kind this SDK does not know. Use it for logging
+        /// and cross-language name comparison; dispatch with [`event_kind`](EventExt::event_kind)
+        /// or the typed views.
+        fn kind_str(&self) -> &'static str;
+        /// Delivery stream id (`Sub::id()`, `STREAM_TIMER`, `STREAM_STATUS`, `STREAM_ORDER_ACK`).
         fn stream(&self) -> u32;
-        /// ticker / bbo / tickers / depth / trade / kline; orders / positions / balance
-        /// (private stream); "gateway"; "timer"; kind 35 = its subscription's channel.
+        /// ticker / bbo / tickers / depth / trade / kline; orders / fills / positions / balance
+        /// (private stream); "gateway"; "timer"; "ack"; kind "status" = its subscription's channel.
         fn channel(&self) -> &'static str;
-        /// Depth event (kind 3): this subscription's book, top `n` levels.
+        /// Depth event (kind "depth"): this subscription's book, top `n` levels.
         fn book(&self, n: usize) -> Result<Book, String>;
-        /// Trade id of a trade event (kind 4).
+        /// Trade id of a trade event (kind "trade").
         fn trade_id(&self) -> Option<&str>;
         fn ticker(&self) -> Option<TickerView>;
         fn trade(&self) -> Option<TradeView>;
         fn kline(&self) -> Option<KlineView>;
         fn order(&self) -> Option<OrderView>;
+        /// Fill (kind "fill").
+        fn fill(&self) -> Option<FillView>;
+        /// Async order / cancel ack (kind "ack").
+        fn order_ack(&self) -> Option<OrderAckView>;
         fn position(&self) -> Option<PositionRow>;
         fn balance(&self) -> Option<BalanceRow>;
         fn gateway(&self) -> Option<GatewayView>;
         fn feed_status(&self) -> Option<FeedStatusView>;
+        /// Ingress time (ms, µs fraction; JS `ts`): `ctx::now() - ev.ts()` = engine + poll latency.
+        fn ts(&self) -> f64;
+        /// When the event happened (ms; JS `time`): the exchange time when given (ticker, trade,
+        /// fill, position, balance, ack), bar open for klines, scheduled time for timers, else `ts()`.
+        fn time(&self) -> f64;
     }
     impl EventExt for Event {
+        fn event_kind(&self) -> Kind { todo!() }
+        fn kind_str(&self) -> &'static str { todo!() }
         fn stream(&self) -> u32 { todo!() }
         fn channel(&self) -> &'static str { todo!() }
         fn book(&self, n: usize) -> Result<Book, String> { todo!() }
@@ -2416,10 +2654,14 @@ pub mod ctx {
         fn trade(&self) -> Option<TradeView> { todo!() }
         fn kline(&self) -> Option<KlineView> { todo!() }
         fn order(&self) -> Option<OrderView> { todo!() }
+        fn fill(&self) -> Option<FillView> { todo!() }
+        fn order_ack(&self) -> Option<OrderAckView> { todo!() }
         fn position(&self) -> Option<PositionRow> { todo!() }
         fn balance(&self) -> Option<BalanceRow> { todo!() }
         fn gateway(&self) -> Option<GatewayView> { todo!() }
         fn feed_status(&self) -> Option<FeedStatusView> { todo!() }
+        fn ts(&self) -> f64 { todo!() }
+        fn time(&self) -> f64 { todo!() }
     }
 
     /// Result of [`poll`].
@@ -2435,26 +2677,49 @@ pub mod ctx {
 
     /// Subscribe; returns the handle. Lazy: the upstream subscription is sent on the
     /// first `poll`. A rejected subscription does not fail here — its stream gets a
-    /// kind 35 FAILED event (`ev.feed_status()`).
+    /// kind "status" FAILED event (`ev.feed_status()`).
     pub fn subscribe(ex: impl Into<ExIndex>, opts: SubOpts) -> Result<Sub, String> { todo!() }
     /// Batch subscribe `symbols` with the same options; handles in the same order.
     /// Validated as a whole (one bad symbol → Err, nothing subscribed).
     pub fn subscribe_many(ex: impl Into<ExIndex>, opts: SubOpts, symbols: &[&str]) -> Result<Vec<Sub>, String> { todo!() }
     /// Next event of THIS thread's subscriptions (`&[]` = all of them, or `sub.id()`s /
-    /// `STREAM_TIMER` / `STREAM_STATUS`); `None` = wait until an event or stop.
+    /// `STREAM_TIMER` / `STREAM_STATUS` / `STREAM_ORDER_ACK`); `None` = wait until an event or stop.
     pub fn poll(streams: &[u32], timeout_ms: Option<u64>) -> Polled { todo!() }
-    /// Loaded exchanges as JSON `[{ex, label, name, symbol, interval, orderIdScope, feed}]`;
-    /// `feed` = `{ticksDropped, backpressure, ringCapacity}` push-buffer counters.
+    /// Loaded exchanges as JSON `[{ex, label, name, symbol, interval, orderIdScope, feed, acksDropped}]`;
+    /// `feed` = `{ticksDropped, backpressure, ringCapacity}` push-buffer counters; `acksDropped` =
+    /// [`submit`] acks dropped because the requesting thread's ack queue (1024) was full.
     pub fn connectors() -> String { todo!() }
     /// Instrument id → (exchange index, symbol).
     pub fn instrument_of(inst: u32) -> std::rc::Rc<(u16, String)> { todo!() }
     /// Instrument (px_scale, qty_scale) of the raw fixed-point fields.
     pub fn scales_of(inst: u32) -> (u8, u8) { todo!() }
-    /// Place an order (real px/qty, `side` "buy"/"sell", `opts_json` e.g. `{"type":"limit","tif":"gtc"}`
-    /// or "{}"); returns the exchange order id.
+    /// Place an order over REST synchronously (real px/qty, `side` "buy"/"sell"; callable from any
+    /// thread) → the exchange order id. `opts_json` (pass "{}" for none) only takes `type`
+    /// ("limit"/"market"), `tif` ("gtc"/"ioc"/"fak"/"fok"/"postOnly"), `reduceOnly`, `postOnly` and
+    /// `extra`; other keys → Err. WebSocket order entry is [`submit`].
     pub fn order(exchange: impl Into<ExIndex>, symbol: &str, side: &str, px: f64, qty: f64, opts_json: &str) -> Result<String, String> { todo!() }
-    /// Cancel by exchange order id.
+    /// Cancel over REST synchronously. `id` = the exchange order id, or a localId [`submit`] returned in
+    /// this run (canceled by client order id; Err where the exchange does not support that). An order
+    /// that already filled → Err.
     pub fn cancel(exchange: impl Into<ExIndex>, symbol: &str, id: &str) -> Result<(), String> { todo!() }
+    /// WebSocket order / cancel (WS only: Err where unsupported, never a REST fallback). `req_json` =
+    /// `{"op":"order", symbol, side, price, amount, type?, tif?, postOnly?, reduceOnly?, extra?}` or
+    /// `{"op":"cancel", symbol, id}` (`id` = exchange order id or a localId of this run). Returns the
+    /// request id once written: for orders it is the client order id sent to the exchange (localId,
+    /// generated for you — `clientId` is rejected), also the `client_id` of its order / fill pushes.
+    /// The verdict is a kind "ack" event to THIS thread (`poll(&[STREAM_ORDER_ACK], …)`, `ev.order_ack()`).
+    /// Bad request / unsupported / trading connection not up (first call waits ~5 s) / more than 256
+    /// in flight / local rate limit → Err (nothing sent, no ack). A batch goes through [`submit_batch`].
+    ///
+    ///     let lid = ctx::submit(0, r#"{"op":"order","symbol":"BTC_USDT","side":"buy","price":30000,"amount":0.001}"#)?;
+    ///     if let ctx::Polled::Event(ev) = ctx::poll(&[ctx::STREAM_ORDER_ACK], Some(5000)) {
+    ///         if let Some(a) = ev.order_ack() { Log!("ack", a.req_id == lid, a.status, a.id); }
+    ///     }
+    pub fn submit(exchange: impl Into<ExIndex>, req_json: &str) -> Result<String, String> { todo!() }
+    /// Batch [`submit`]: `req_json` = `{"op":"order"|"cancel","orders":[item, …]}` → request ids in the
+    /// same order, one ack per item. Validated as a whole (one bad item → Err, nothing sent); one frame
+    /// on venues with a native batch API, pipelined on one connection otherwise (not atomic).
+    pub fn submit_batch(exchange: impl Into<ExIndex>, req_json: &str) -> Result<Vec<String>, String> { todo!() }
     /// Synchronous standard REST method (`"ticker"`, `"depth"`, `"assets"`, …) → result JSON.
     pub fn rest(exchange: impl Into<ExIndex>, method: &str, args_json: &str) -> Result<String, String> { todo!() }
     /// Exchange-specific endpoint escape hatch → raw string.

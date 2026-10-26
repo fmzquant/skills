@@ -1185,6 +1185,9 @@ class IExchange:
         - ``IO("base")`` / ``IO("base", url)``：查询 / 切换基地址。
         - ``IO("cross", True)``、``IO("dual", True)``、``IO("simulate", True)``：账户模式（见各交易所页面）。
         - ``IO("rate", "GetTicker", 10, "1s")``：本地限流。
+        - ``IO("extend", [{"match": "^POST/api/v3/order$", "params": {...}, "force": False}])``：按目标串（REST 为
+          ``方法/路径``，``ctx.submit()`` 为 ``ws:order`` / ``ws:cancel``）给请求注入参数；``IO("extend")`` 查询规则与命中数，
+          ``IO("extend", "")`` 清空，``IO("extend!", 规则)`` 强制覆盖已有值。
 
         Returns:
             由指令决定；失败返回 ``None``（原因见 ``GetLastError()``）。
@@ -1587,7 +1590,7 @@ class Subscription:
     symbol: str
     """品种代码（``private`` / ``tickers`` 为空）。"""
     depth: int
-    """深度订阅的档数（0 为交易所默认档数）。"""
+    """深度订阅的档数：0 为交易所默认档数，1–255 为订阅的档数。"""
     interval: int
     """K线周期，单位秒。"""
 
@@ -1606,7 +1609,8 @@ class Subscription:
         ...
 
     def balances(self) -> Optional[list[CtxRecord]]:
-        """``private`` 订阅：最新余额（行 ``{asset, free, frozen, equity?, upnl?, margin?, time}``）；账户快照就绪之前为 ``None``。"""
+        """``private`` 订阅：最新余额（行 ``{asset, free, frozen, equity?, upnl?, margin?, time}``）；账户快照就绪之前为 ``None``。
+        推送里没有与 ``GetAssets()`` 同口径的值时 ``free`` / ``frozen`` 为 ``None``（推送不请求 REST 补齐）。"""
         ...
 
     def unsubscribe(self) -> None:
@@ -1623,26 +1627,39 @@ class SubscriptionList(list[Subscription]):
 class CtxEvent(dict[str, Any]):
     """``ctx.poll()`` 返回的事件：字段与 JavaScript 事件相同的字典（``ev.kind`` 或 ``ev["kind"]``）。
 
-    公共字段：``kind``（1 ticker/bbo/tickers，3 深度，4 成交，5 K线，16 订单回报，17 持仓，18 余额，32 定时器，
-    33 网关状态，35 初始化状态）、``stream``、``type``（``"data"`` / ``"status"`` / ``"timer"``）、``channel``、``ex``、
-    ``symbol``、``seq``、``ts``。各类事件：1 ``bid ask last bidQty askQty volume openInterest open high low time``；
-    4 ``px qty side tradeId time``；5 ``open high low close volume openInterest intervalSec openTimeMs closed prefill``；
-    16 ``id state px qty filledQty avgPx reason reasonText``；17 ``side posSide qty avgPx profit margin liqPx markPx
-    leverage time snapshot``；18 ``asset free frozen equity upnl margin time snapshot``；32 ``timerId scheduledNs``；
-    33 ``status detail``；35 ``channelCode intervalSec prefillStatus``（1 就绪，2 失败）``detail message``。
-    深度事件（kind 3）不带档位：用 ``ev.book(n)`` 读取。
+    公共字段：``kind``（事件类型名，字符串：``"ticker"``（ticker/bbo/tickers 共用，``channel`` 区分）、``"depth"``、
+    ``"trade"``、``"kline"``、``"order"``（订单回报）、``"position"``、``"balance"``、``"fill"``（成交回报）、``"ack"``
+    （WebSocket 下单应答）、``"timer"``、``"gateway"``（网关状态）、``"status"``（初始化状态）；以后可能增加新名字，
+    不认识的为 ``"unknown"``，不要写数字）、``stream``（所属订阅的 ``id`` 或内置事件流）、``type``（``"data"`` /
+    ``"status"`` / ``"timer"`` / ``"ack"``）、``channel``（同一类事件里的哪一种数据；私有流为 ``orders`` / ``fills`` /
+    ``positions`` / ``balance``）、``ex``、``symbol``、``seq``、``time``、``ts``。按类型分支判断 ``kind``，同类数据
+    （ticker 与 bbo、私有流的几种）用 ``channel``，同频道的多路订阅（BTC 与 ETH、depth 5 与 20）用
+    ``ev.stream == sub.id`` 或 ``ctx.poll([sub])``。各类事件：``"ticker"`` ``bid ask last bidQty askQty volume
+    openInterest open high low time``；``"trade"`` ``px qty side tradeId time``；``"kline"`` ``open high low close volume
+    openInterest intervalSec openTimeMs closed prefill``；``"order"`` ``id clientId state px qty filledQty avgPx reason
+    reasonText``；``"position"`` ``side posSide qty avgPx profit margin liqPx markPx leverage time snapshot``；``"balance"``
+    ``asset free frozen equity upnl margin time snapshot``（``free`` / ``frozen`` 可能为 ``None``）；``"fill"`` ``orderId
+    clientId tradeId px qty fee feeCcy side liquidity time``（自己订单的一笔成交，``fee`` 没有时不出现）；
+    ``clientId`` 为客户端订单号（``ctx.submit()`` 下的单就是它返回的 localId；推送没有时为 ``""``）；
+    ``"ack"`` ``reqId op status ok id clientId error reason reasonText exchTime latencyMs``（``ctx.submit()`` 每一笔的结果，
+    ``op`` 为 ``"order"`` / ``"cancel"``，``status`` 为 ``"ok"`` / ``"failed"`` / ``"unknown"``）；``"timer"`` ``timerId
+    scheduledNs``；``"gateway"`` ``status detail``；``"status"`` ``channelCode intervalSec prefillStatus``（1 就绪，2 失败）
+    ``detail message``。深度事件（``"depth"``）不带档位：用 ``ev.book(n)`` 读取。
     """
-    kind: int
+    kind: str
+    """事件类型名：``"ticker"`` ``"depth"`` ``"trade"`` ``"kline"`` ``"order"`` ``"position"`` ``"balance"`` ``"fill"``
+    ``"ack"`` ``"timer"`` ``"gateway"`` ``"status"``（不认识的为 ``"unknown"``）。"""
     stream: int
     type: str
     channel: str
     ex: int
     symbol: str
     seq: int
+    time: float
     ts: float
 
     def book(self, n: Optional[int] = None) -> CtxRecord:
-        """深度事件（kind 3）：所属订阅的订单簿，同 ``Subscription.book()``。"""
+        """深度事件（kind ``"depth"``）：所属订阅的订单簿，同 ``Subscription.book()``。"""
         ...
 
     def __getattr__(self, name: str) -> Any: ...
@@ -1657,6 +1674,36 @@ class _SubscribeOptions(TypedDict, total=False):
 class _SubscribeBatchOptions(_SubscribeOptions):
     symbol: Union[list[str], tuple[str, ...]]
 
+class _OrderOptions(TypedDict, total=False):
+    type: str
+    tif: str
+    reduceOnly: bool
+    postOnly: bool
+    extra: Any
+
+class _SubmitBase(TypedDict):
+    op: str
+    symbol: str
+
+class _SubmitOne(_SubmitBase, total=False):
+    side: str
+    price: float
+    amount: float
+    type: str
+    tif: str
+    reduceOnly: bool
+    postOnly: bool
+    extra: Any
+    id: str
+
+class _SubmitBatch(TypedDict):
+    op: str
+    orders: Sequence[Any]
+
+class CtxError(Exception):
+    """``ctx.order()`` / ``ctx.cancel()`` / ``ctx.submit()`` 失败时的**返回值**（不抛出），用 ``isinstance(r, CtxError)``
+    判断，``str(r)`` 是原因。"""
+
 class Ctx:
     """全局变量 ``ctx``：WebSocket 推送订阅（与 JavaScript 的 ``ctx`` 同语义；仅实盘）。
 
@@ -1670,7 +1717,7 @@ class Ctx:
                 if ev is None:
                     continue
                 if ev.type == "status":
-                    if ev.kind == 35 and ev.prefillStatus == 2:
+                    if ev.kind == "status" and ev.prefillStatus == 2:
                         Log("订阅失败:", ev.channel, ev.message)
                     continue
                 if ev.channel == "depth":
@@ -1679,9 +1726,11 @@ class Ctx:
                     Log(acct.positions(), acct.balances())
     """
     STREAM_TIMER: int
-    """引擎定时器的内置事件流（kind 32）。值为1。"""
+    """引擎定时器的内置事件流（kind ``"timer"``）。值为1。"""
     STREAM_STATUS: int
-    """网关状态事件的内置事件流（kind 33）。值为2。"""
+    """网关状态事件的内置事件流（kind ``"gateway"``）。值为2。"""
+    STREAM_ORDER_ACK: int
+    """``ctx.submit()`` 应答的内置事件流（kind ``"ack"``，只投给发起请求的线程，不需要订阅）。值为4。"""
 
     @overload
     def subscribe(self, ex: Union[IExchange, int, str], opts: _SubscribeBatchOptions) -> SubscriptionList: ...
@@ -1695,12 +1744,13 @@ class Ctx:
             ex: 交易所对象（``exchange``、``exchanges[1]``）或账户下标（整数或数字字符串）。
             opts: ``{channel, symbol, depth, interval, mode, buffer}``。``channel``：``"ticker"``（默认）、``"bbo"``、
                 ``"depth"``、``"trade"``、``"kline"``、``"tickers"``（全市场，不传 symbol）或 ``"private"``（订单 +
-                持仓 + 余额，不传 symbol）。``symbol``：行情频道必填，``ex`` 为交易所对象时可省略（取它当前的交易对）；
-                传列表为批量订阅。``depth``：档数；``interval``：K线秒数；``mode: "latest"`` 或 ``buffer: N``。
+                成交 + 持仓 + 余额，不传 symbol）。``symbol``：行情频道必填，``ex`` 为交易所对象时可省略（取它当前的交易对）；
+                传列表为批量订阅。``depth``：档数，0（默认）或 1–255 的任意整数，每个档数一路订阅（超过 255 抛出异常，
+                超过交易所上限时收到 ``unsupported depth`` 失败事件）；``interval``：K线秒数；``mode: "latest"`` 或 ``buffer: N``。
 
         Returns:
             ``Subscription``；``symbol`` 为列表或元组时返回 ``SubscriptionList``（整批先校验）。参数不合法时抛出异常；
-            交易所拒绝的订阅在它的事件流上收到一条 kind 35 失败事件。
+            交易所拒绝的订阅在它的事件流上收到一条 kind ``"status"`` 失败事件（``prefillStatus`` 为 2）。
         """
         ...
 
@@ -1709,7 +1759,7 @@ class Ctx:
 
         Args:
             streams: ``None`` / ``[]`` = 本线程的全部订阅；否则为订阅对象、事件流Id、SubscriptionList 或它们的（嵌套）
-                列表（也可以写 ``ctx.STREAM_TIMER`` / ``ctx.STREAM_STATUS``）。
+                列表（也可以写 ``ctx.STREAM_TIMER`` / ``ctx.STREAM_STATUS`` / ``ctx.STREAM_ORDER_ACK``）。
             timeout_ms: ``None`` 一直等到有事件，``0`` 不等待，> 0 最多等待的毫秒数（非负整数）。
 
         Returns:
@@ -1718,8 +1768,68 @@ class Ctx:
         ...
 
     def connectors(self) -> list[CtxRecord]:
-        """已加载的交易所：``[{ex, label, name, symbol, interval, orderIdScope, feed}, ...]``；``feed`` =
-        ``{ticksDropped, backpressure, ringCapacity}`` 推送缓冲计数（增长快说明策略处理太慢）。"""
+        """已加载的交易所：``[{ex, label, name, symbol, interval, orderIdScope, feed, acksDropped}, ...]``；``feed`` =
+        ``{ticksDropped, backpressure, ringCapacity}`` 推送缓冲计数（增长快说明策略处理太慢）；``acksDropped`` =
+        ``ctx.submit()`` 应答因本线程应答队列（1024 条）已满被丢弃的累计数。"""
+        ...
+
+    def order(self, ex: Union[IExchange, int, str], symbol: str, side: str, px: float, qty: float,
+              opts: Optional[Union[_OrderOptions, dict[str, Any]]] = None) -> Union[str, CtxError]:
+        """通过交易所的 REST 接口下单，等到交易所返回订单号（不需要订阅；主线程与 ``threading.Thread`` 线程都可以调用）。
+
+        Args:
+            ex: 交易所对象或账户下标。
+            symbol: 品种代码，例如 ``"BTC_USDT"``、``"BTC_USDT.swap"``。
+            side: ``"buy"`` 或 ``"sell"``。
+            px: 价格（市价单可以传 0）。
+            qty: 数量（大于 0，口径同该交易所的 REST 下单）。
+            opts: ``{type, tif, reduceOnly, postOnly, extra}``，只认这些键（其它键返回错误）。
+                ``type``：``"limit"``（默认）/ ``"market"``；``tif``：``"gtc"`` / ``"ioc"`` / ``"fak"`` / ``"fok"`` /
+                ``"postOnly"``；``extra``：交易所专属参数。WebSocket 下单用 ``ctx.submit()``。
+
+        Returns:
+            交易所订单号（与订单回报的 ``id``、成交回报的 ``orderId`` 相同）；失败返回 ``CtxError``（不抛出）。
+        """
+        ...
+
+    def cancel(self, ex: Union[IExchange, int, str], symbol: str, id: str) -> Optional[CtxError]:
+        """通过交易所的 REST 接口撤单，等到交易所确认。``id`` 为交易所订单号，或本次运行中 ``ctx.submit()`` 返回的
+        localId（按客户端订单号撤单，交易所不支持时返回错误）。成功返回 ``None``；失败（含订单已先一步成交）返回
+        ``CtxError``。"""
+        ...
+
+    @overload
+    def submit(self, ex: Union[IExchange, int, str], req: _SubmitBatch) -> Union[list[str], CtxError]: ...
+    @overload
+    def submit(self, ex: Union[IExchange, int, str], req: _SubmitOne) -> Union[str, CtxError]: ...
+    @overload
+    def submit(self, ex: Union[IExchange, int, str], req: dict[str, Any]) -> Union[str, list[str], CtxError]:
+        """通过交易所的 WebSocket 交易接口下单 / 撤单（只走 WebSocket，交易所不支持时返回错误，不会改走 REST）。
+
+        只接受这两个位置参数。请求写出即返回，不等待交易所应答；每一笔的结果是投给**本线程**的 kind ``"ack"`` 应答事件
+        （``ctx.poll([ctx.STREAM_ORDER_ACK], timeout_ms)``，``ev.reqId`` 等于请求号），不需要订阅。
+
+        Args:
+            ex: 交易所对象或账户下标。
+            req: ``{"op": "order", symbol, side, price, amount, type?, tif?, reduceOnly?, postOnly?, extra?}`` 下单
+                （市价单可以不传 ``price``），``{"op": "cancel", symbol, id}`` 撤单（``id`` 为交易所订单号或本次运行的
+                localId）；批量写 ``{"op": ..., "orders": [每一笔, ...]}``（整批先校验，任何一笔不合法整批不发）。
+                客户端订单号由托管者生成，不能自带（``clientId`` 或 ``extra`` 里的客户端订单号字段返回错误）。
+
+        Returns:
+            单笔返回请求号（``str``），批量返回同序的列表；下单的请求号就是发给交易所的客户端订单号（localId），
+            之后订单回报、成交回报的 ``clientId`` 也是它。参数错、不支持、交易连接建立不起来（第一次最多等约 5 秒）、
+            在途请求超过 256、本地限频时返回 ``CtxError``（什么都没发出，不会有应答）。
+
+        Example::
+
+            lid = ctx.submit(exchange, {"op": "order", "symbol": "BTC_USDT", "side": "buy",
+                                        "price": 30000, "amount": 0.001})
+            if not isinstance(lid, CtxError):
+                ack = ctx.poll([ctx.STREAM_ORDER_ACK], 5000)
+                if ack is not None and ack.reqId == lid and ack.ok:
+                    Log("placed", ack.id, ack.latencyMs)
+        """
         ...
 
 # ==================== Global Variables ====================
@@ -1737,7 +1847,8 @@ exchange: IExchange
 """第一个交易所对象，即 ``exchanges[0]``。"""
 
 ctx: Ctx
-"""WebSocket 推送：``ctx.subscribe()``、``ctx.poll()``、``ctx.connectors()``（仅实盘）。"""
+"""WebSocket 推送与下单：``ctx.subscribe()``、``ctx.poll()``、``ctx.connectors()``、``ctx.order()``、``ctx.cancel()``、
+``ctx.submit()``（仅实盘）。"""
 
 # ==================== Global Functions ====================
 
