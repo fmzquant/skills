@@ -2301,7 +2301,7 @@ Every function, structure and constant of the API reference, grouped by its cate
 | ```exchange.IO("base", ...)``` | Queries or switches the base address of the exchange API. |
 | ```exchange.IO(mode, value)``` | Switches the trading mode of an exchange, including demo/live trading, cross/isolated margin, hedge/one-way position mode, unified account, margin trading mode and self-trade prevention. |
 | ```exchange.IO("rate", ...)``` | Limits how often each API function is called: ```rate``` for smoothed limiting, ```quota``` for quota limiting. |
-| ```exchange.IO("extend", ...)``` | Inject parameters into requests sent by an exchange object (such as the exchange's self-trade prevention mode, ```recvWindow```, or partner identifier) without modifying calls to order placement or other functions. |
+| ```exchange.IO("extend", ...)``` | Inject parameters into requests sent by an exchange object (such as the exchange's self-trade prevention mode or ```recvWindow```) without modifying calls to order placement or other functions. |
 
 ##### Network
 
