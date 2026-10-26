@@ -6,10 +6,10 @@
 
 // ---------------- 事件 ----------------
 //
-// ctx.poll 返回的事件是按 `kind`（以及 `type`）区分的联合类型 IAnyEvent：先判 `kind`（或先排除
-// `type === "status"`），再读该类事件的字段，tsc 才能收窄。注意 kind=35（初始化/订阅状态）的
-// `channel` 是它所属订阅的频道（可以是 "ticker"、"depth"…），所以**只看 channel 不足以区分**数据
-// 事件与状态事件——先判 `ev.type === "status"`（或 `ev.kind`）。
+// ctx.poll 返回的事件是按 `kind`（字符串名）区分的联合类型 IAnyEvent：先判 `ev.kind === "fill"` 这类，
+// 再读该类事件的字段，tsc 才能收窄。注意 kind "status"（初始化/订阅状态）的 `channel` 是它所属订阅的
+// 频道（可以是 "ticker"、"depth"…），所以**只看 channel 不足以区分**数据事件与状态事件——先判
+// `ev.kind`（或 `ev.type === "status"`）。
 
 /** 订阅频道（ISubOpts.channel / ISubscription.channel）。 */
 declare type SubChannel = "ticker" | "bbo" | "tickers" | "trade" | "depth" | "kline" | "private";
@@ -21,10 +21,18 @@ declare type EventChannel =
     | "orders" | "fills" | "positions" | "balance" | "private"
     | "gateway" | "timer" | "ack";
 
+/** 事件类型名（`ev.kind`）：ticker（ticker/bbo/tickers 频道共用，channel 区分）、depth、trade、kline、
+ * order（订单回报）、position（持仓）、balance（余额）、fill（成交回报）、ack（ctx.submit 应答）、timer（定时器）、
+ * gateway（网关状态）、status（初始化/订阅状态）。以后新增的类型会加新名字；宿主不认识的为 "unknown"。 */
+declare type EventKind =
+    | "ticker" | "depth" | "trade" | "kline"
+    | "order" | "position" | "balance" | "fill" | "ack"
+    | "timer" | "gateway" | "status";
+
 /** 所有事件的公共字段。 */
 declare interface IEventBase {
-    /** 1=ticker/bbo/tickers 3=depth 4=trade 5=kline 16=订单回报 17=持仓 18=余额 19=成交回报 20=ctx.submit 应答 32=定时器 33=网关状态 35=初始化状态 */
-    kind: number;
+    /** 事件类型名（见 EventKind）；按它分发，tsc 会把 IAnyEvent 收窄到对应的事件类型。 */
+    kind: EventKind;
     /** 投递这条事件的流：订阅流 = ISubscription.id（本线程自己的订阅）；内建流 STREAM_TIMER/STREAM_STATUS/STREAM_ORDER_ACK。 */
     stream: StreamId;
     /** data = 行情/私有流（订单、成交、持仓、余额），status = 网关状态/初始化状态，timer = 定时器，ack = ctx.submit 的应答。 */
@@ -45,10 +53,10 @@ declare interface IEventBase {
     time: number;
 }
 
-/** ticker / bbo / 全市场 tickers（kind=1）。bbo 类频道无最新价时 last 为 0；tickers 流的 `symbol`
+/** ticker / bbo / 全市场 tickers（kind "ticker"）。bbo 类频道无最新价时 last 为 0；tickers 流的 `symbol`
  * 逐条是各自的合约（交易所的全市场流不带买卖价时 bid/ask 为 0，见该交易所文档）。 */
 declare interface ITickEvent extends IEventBase {
-    kind: 1;
+    kind: "ticker";
     type: "data";
     channel: "ticker" | "bbo" | "tickers";
     bid: number;
@@ -66,9 +74,9 @@ declare interface ITickEvent extends IEventBase {
     time: number;
 }
 
-/** 逐笔成交（kind=4）。side = taker 方向。 */
+/** 逐笔成交（kind "trade"）。side = taker 方向。 */
 declare interface ITradeEvent extends IEventBase {
-    kind: 4;
+    kind: "trade";
     type: "data";
     channel: "trade";
     px: number;
@@ -81,9 +89,9 @@ declare interface ITradeEvent extends IEventBase {
     time: number;
 }
 
-/** K 线（kind=5）。closed=true 表示该根已收盘。 */
+/** K 线（kind "kline"）。closed=true 表示该根已收盘。 */
 declare interface IKlineEvent extends IEventBase {
-    kind: 5;
+    kind: "kline";
     type: "data";
     channel: "kline";
     /** 周期（秒），同 intervalSec。 */
@@ -102,10 +110,10 @@ declare interface IKlineEvent extends IEventBase {
     prefill: boolean;
 }
 
-/** 深度更新信号（kind=3）：不带档位，档位用 ev.book(n) 读。`time` 为接收时间（同 ts；ABI 尚不携带
+/** 深度更新信号（kind "depth"）：不带档位，档位用 ev.book(n) 读。`time` 为接收时间（同 ts；ABI 尚不携带
  * 深度的交易所时间）。 */
 declare interface IDepthEvent extends IEventBase {
-    kind: 3;
+    kind: "depth";
     type: "data";
     channel: "depth";
     /** 所属深度订阅的档数（0 = 连接器默认）。 */
@@ -115,10 +123,10 @@ declare interface IDepthEvent extends IEventBase {
     book(n?: number): IBook;
 }
 
-/** 持仓行（kind=17，私有流，channel "positions"）：该合约该持仓槽的**全量**当前状态（qty 0 = 已平）。
+/** 持仓行（kind "position"，私有流，channel "positions"）：该合约该持仓槽的**全量**当前状态（qty 0 = 已平）。
  * 口径同 ctx.rest(ex, "positions") 的行；交易所没给的金额字段没有该键。 */
 declare interface IPositionEvent extends IEventBase {
-    kind: 17;
+    kind: "position";
     type: "data";
     channel: "positions";
     /** 多 "buy" / 空 "sell"（同 rest positions 的 side）；净持仓已平为 ""。 */
@@ -134,13 +142,13 @@ declare interface IPositionEvent extends IEventBase {
     leverage?: number;
     /** 交易所更新时间（毫秒）；没给时为 ts。 */
     time: number;
-    /** 订阅生效/重连后的账户快照行（随后同一 stream 上有 kind=35 READY）。 */
+    /** 订阅生效/重连后的账户快照行（随后同一 stream 上有 kind "status" READY）。 */
     snapshot: boolean;
 }
 
-/** 余额行（kind=18，私有流，channel "balance"，symbol 为空串）：该资产此刻的**全量** free/frozen。 */
+/** 余额行（kind "balance"，私有流，channel "balance"，symbol 为空串）：该资产此刻的**全量** free/frozen。 */
 declare interface IBalanceEvent extends IEventBase {
-    kind: 18;
+    kind: "balance";
     type: "data";
     channel: "balance";
     asset: string;
@@ -183,10 +191,10 @@ declare interface IBalanceRow {
     time?: number;
 }
 
-/** 订单回报（kind=16，私有流，channel "orders"）。`time` 目前为接收时间（同 ts；ABI 尚不携带订单回报的
+/** 订单回报（kind "order"，私有流，channel "orders"）。`time` 目前为接收时间（同 ts；ABI 尚不携带订单回报的
  * 交易所时间）。 */
 declare interface IOrderEvent extends IEventBase {
-    kind: 16;
+    kind: "order";
     type: "data";
     channel: "orders";
     /** 订单号（与 ctx.order 的返回值同域；空串 = 连接器没给号）。 */
@@ -204,10 +212,10 @@ declare interface IOrderEvent extends IEventBase {
     reasonText: string;
 }
 
-/** 成交回报（kind=19，私有流，channel "fills"）：自己订单的**一笔**成交（my trade）。连接器先发成交、
+/** 成交回报（kind "fill"，私有流，channel "fills"）：自己订单的**一笔**成交（my trade）。连接器先发成交、
  * 再发反映它的订单回报；一张单全部成交的 qty 之和 = 它的 filledQty。不补快照（订阅/重连后不回补历史成交）。 */
 declare interface IFillEvent extends IEventBase {
-    kind: 19;
+    kind: "fill";
     type: "data";
     channel: "fills";
     /** 所属订单的订单号（与 IOrderEvent.id、ctx.order 的返回值同域）。 */
@@ -231,10 +239,10 @@ declare interface IFillEvent extends IEventBase {
     time: number;
 }
 
-/** 网关状态（kind=33，type "status"，channel "gateway"，stream = STREAM_STATUS）：status 1=UP 2=DOWN
+/** 网关状态（kind "gateway"，type "status"，channel "gateway"，stream = STREAM_STATUS）：status 1=UP 2=DOWN
  * 3=DEGRADED。广播给在该交易所有订阅的每个线程。`time` 同 ts。 */
 declare interface IGatewayEvent extends IEventBase {
-    kind: 33;
+    kind: "gateway";
     type: "status";
     channel: "gateway";
     status: number;
@@ -243,10 +251,10 @@ declare interface IGatewayEvent extends IEventBase {
 /** @deprecated 旧名，同 IGatewayEvent。 */
 declare type IStatusEvent = IGatewayEvent;
 
-/** 初始化/订阅状态（kind=35，type "status"）：与目标订阅同一 stream，`channel` 是目标订阅的频道；
+/** 初始化/订阅状态（kind "status"，type "status"）：与目标订阅同一 stream，`channel` 是目标订阅的频道；
  * 订阅被拒也以它报告。私有流的账户快照完成/失败同样用它（channel "private"）。`time` 同 ts。 */
 declare interface IFeedStatusEvent extends IEventBase {
-    kind: 35;
+    kind: "status";
     type: "status";
     channel: SubChannel;
     /** 目标订阅频道的 ABI 数字码（CH_*）；字符串形式在 channel。 */
@@ -263,20 +271,20 @@ declare interface IFeedStatusEvent extends IEventBase {
     message: string;
 }
 
-/** 定时器（kind=32，type "timer"，stream = STREAM_TIMER；大整数超出 JS 安全范围时为字符串）。`time` 是
+/** 定时器（kind "timer"，type "timer"，stream = STREAM_TIMER；大整数超出 JS 安全范围时为字符串）。`time` 是
  * 计划触发时刻（scheduledNs 换到与 ts 相同的毫秒时钟），ts 是实际发布时刻。 */
 declare interface ITimerEvent extends IEventBase {
-    kind: 32;
+    kind: "timer";
     type: "timer";
     channel: "timer";
     timerId: number | string;
     scheduledNs: number | string;
 }
 
-/** ctx.submit 的应答（kind=20，type "ack"，channel "ack"，stream = STREAM_ORDER_ACK）：每一项一条，**只投给调用
+/** ctx.submit 的应答（kind "ack"，type "ack"，channel "ack"，stream = STREAM_ORDER_ACK）：每一项一条，**只投给调用
  * ctx.submit 的线程**（不必订阅）。`symbol`/`ex` 是这一项的。 */
 declare interface IOrderAckEvent extends IEventBase {
-    kind: 20;
+    kind: "ack";
     type: "ack";
     channel: "ack";
     /** ctx.submit 返回的请求号：下单就是这张单的客户端订单号（localId），撤单是一个新号。 */
@@ -303,7 +311,7 @@ declare interface IOrderAckEvent extends IEventBase {
     time: number;
 }
 
-/** ctx.poll 的事件：按 `kind` 区分（ticker/bbo/tickers 共用 kind 1，再看 channel）。 */
+/** ctx.poll 的事件：按 `kind` 区分（ticker/bbo/tickers 共用 kind "ticker"，再看 channel）。 */
 declare type IAnyEvent =
     | ITickEvent
     | ITradeEvent
@@ -485,18 +493,18 @@ declare type IRuntimePollEvent =
 
 declare interface ICtx {
     // —— 事件流 ——
-    /** 内建定时器事件流 id（kind=32）。 */
+    /** 内建定时器事件流 id（kind "timer"）。 */
     readonly STREAM_TIMER: 1;
-    /** 内建网关状态事件流 id（kind=33）。 */
+    /** 内建网关状态事件流 id（kind "gateway"）。 */
     readonly STREAM_STATUS: 2;
-    /** 内建 ctx.submit 应答流 id（kind=20，只投给发起请求的线程）。 */
+    /** 内建 ctx.submit 应答流 id（kind "ack"，只投给发起请求的线程）。 */
     readonly STREAM_ORDER_ACK: 4;
     /** 订阅一个行情或账户私有流，立即返回订阅对象（可交给 ctx.poll 过滤）。**只有两参形式**：
      * symbol 写在 opts 里；第二参不是对象/参数个数不对/未知键/未知频道/行情频道缺 symbol 都抛异常。
      * 订阅属于调用它的线程（主线程或 threading worker），事件只投给这个线程。
      * 同一线程里订阅身份 = (ex, symbol, channel, depth, interval) 相同的重复订阅回同一条流（引用计数）；
      * 同合约的 ticker 与 bbo、depth 5 与 depth 20 是不同的订阅、不同的 stream。
-     * 订阅被拒时，该订阅自己的流上来一条 kind=35、prefillStatus=2 的事件（tickers 在交易所没有原生
+     * 订阅被拒时，该订阅自己的流上来一条 kind "status"、prefillStatus=2 的事件（tickers 在交易所没有原生
      * 全市场流时也这样报 unsupported）。
      * 订阅不影响 REST：ctx.rest / exchange.GetTicker 等照旧打交易所 REST，不读推送缓存。 */
     subscribe(ex: ExRef, opts: ISubOpts): ISubscription;
@@ -540,7 +548,7 @@ declare interface ICtx {
     cancel(ex: ExRef, symbol: string, id: string): void | Error;
     /** 经交易所的 WebSocket 交易连接下单（**只走 WS**，连接器不支持时回 Error，不改走 REST）。**写出即返回**
      * 请求号，就是发给交易所的客户端订单号（localId，由连接器生成；之后的订单/成交回报 `clientId` 也是它）；结论是投给
-     * **本线程**的 kind=20 应答事件（IOrderAckEvent，`ctx.poll([ctx.STREAM_ORDER_ACK], …)`）。参数错、交易连接起不来
+     * **本线程**的 kind "ack" 应答事件（IOrderAckEvent，`ctx.poll([ctx.STREAM_ORDER_ACK], …)`）。参数错、交易连接起不来
      * （首次至多等约 5 秒）、在途请求太多（256）、本地限频时当场回 `Error`，什么都没发出去。 */
     submit(ex: ExRef, req: ISubmitOrder): string | Error;
     /** 批量下单：返回与 `orders` 同序的 localId 数组，每一项一条应答。整批先校验，任何一项不合法整批回 Error、什么都
