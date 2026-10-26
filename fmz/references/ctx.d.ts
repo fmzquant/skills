@@ -227,7 +227,7 @@ declare interface IFillEvent extends IEventBase {
     /** 这一笔的成交价 / 成交量（量纲同该订单的 qty/filledQty）。 */
     px: number;
     qty: number;
-    /** 这一笔的手续费：正 = 付出，负 = 返佣；交易所没给就没有该键。 */
+    /** 这一笔的手续费：正 = 付出，负 = 手续费返还；交易所没给就没有该键。 */
     fee?: number;
     /** 手续费资产（同 ctx.rest(ex, "assets") 的资产名）；"" = 未知。 */
     feeCcy: string;
