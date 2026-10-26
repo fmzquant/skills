@@ -9507,7 +9507,7 @@ fn main() {
 | ```walletAddress``` | `Hyperliquid`、`Futures_Hyperliquid` |
 | ```withdraw``` | `Futures_Boros` |
 | ```wrap``` | `Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch` |
-| ```wsTrade``` | `Binance`、`Futures_Binance`、`Bitfinex`、`Futures_Bitfinex`、`Bitget`、`Futures_Bitget`、`Bybit`、`Futures_Bybit`、`Crypto`、`Futures_Crypto`、`Futures_Deribit`、`GateIO`、`Futures_GateIO`、`HitBTC`、`Kraken`、`OKEX`、`Futures_OKCoin`、`Poloniex`、`Hyperliquid`、`Futures_Hyperliquid`、`Futures_Lighter` |
+| ```wsTrade``` | `Binance`、`Futures_Binance`、`Bitfinex`、`Futures_Bitfinex`、`Bitget`、`Futures_Bitget`、`Bybit`、`Futures_Bybit`、`Crypto`、`Futures_Crypto`、`Futures_Deribit`、`GateIO`、`Futures_GateIO`、`HitBTC`、`Kraken`、`KuCoin`、`Futures_KuCoin`、`OKEX`、`Futures_OKCoin`、`Poloniex`、`Hyperliquid`、`Futures_Hyperliquid`、`Futures_Lighter` |
 
 See also: `exchange.SetBase`, `exchange.SetCurrency`
 
@@ -27608,8 +27608,8 @@ fn main() {
 | `Korbit` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✓ | ✗ |
 | `Kraken` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `Futures_Kraken` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
-| `KuCoin` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
-| `Futures_KuCoin` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✓ | ✗ |
+| `KuCoin` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `Futures_KuCoin` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✓ | ✓ |
 | `LBank` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✓ | ✗ |
 | `MEXC` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✓ | ✗ |
 | `Futures_MEXC` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
@@ -30083,13 +30083,18 @@ Kraken只挂月度和季度交割合约，```this_week```、```month```都指最
 
 ###### ```KuCoin```（现货）
 
-没有专属指令，通用指令见`exchange.IO`。
+| 指令 | 参数 | 说明 | 返回值 |
+| - | - | - | - |
+| ```wsTrade``` | string | WebSocket下单连接：```connect```预先建立连接（否则第一次```ctx.submit()```时才连接），```status```查看连接状态与在途请求数。 | 连接状态对象```{state, inFlight, lastError, connectedForMs, usage}```。 |
+
+通用指令```api```、```base```、```currency```见`exchange.IO`。
 
 ###### ```Futures_KuCoin```（期货）
 
 | 指令 | 参数 | 说明 | 返回值 |
 | - | - | - | - |
 | ```cross``` | bool[, symbol] | 全仓（true）/逐仓（false），向交易所切换当前合约（或指定合约）的保证金模式，并作为之后所有订单的保证金模式。 | 成功也返回空值，需要确认时调用后读取GetLastError()。 |
+| ```wsTrade``` | string | WebSocket下单连接：```connect```预先建立连接（否则第一次```ctx.submit()```时才连接），```status```查看连接状态与在途请求数。 | 连接状态对象```{state, inFlight, lastError, connectedForMs, usage}```。 |
 
 通用指令```api```、```base```、```currency```见`exchange.IO`。
 
@@ -30132,6 +30137,7 @@ Kraken只挂月度和季度交割合约，```this_week```、```month```都指最
 - 条件单只支持止盈、止损单，不支持OCO（KuCoin没有OCO接口）；不支持修改条件单，需要先撤销再重新创建。条件单与普通订单分属两个订单空间，撤销、查询条件单使用条件单函数。
 - 私有流（```private```订阅）推送每一笔成交：订单成交时先推送成交回报（kind ```fill```，```channel```为```fills```：订单ID、KuCoin成交ID、这一笔的成交价与数量、挂单或吃单），再推送反映这笔成交的订单更新；订单推送只有费率类型、没有手续费金额，成交回报的手续费与手续费币种为空。成交回报不回补历史，断线期间的成交不补推（订单更新的累计成交量仍然准确），重连后重发的同一笔成交只推送一次。
 - 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。每次建立连接都先向KuCoin申请连接令牌，按交易所给的心跳间隔发送ping。ticker推送的最新价、24小时高低价、成交量与开盘价（最新价减24小时涨跌额，同```exchange.GetTicker()```）取自交易对的行情快照流（约2秒一次），买一卖一价与量取自一档盘口流，两条流都到达后才开始推送；逐笔成交与```exchange.GetTrades()```同一套成交ID；深度订阅5档以内使用KuCoin的5档快照流，50档以内（缺省20档）使用50档快照流，5档与20档是两路独立的订阅；超过50档（最多255档）使用增量流，并以交易所的完整订单簿快照校准，完整订单簿是私有接口，需要配置API Key。KuCoin的K线推送不带收盘标志，下一根K线开始时补推上一根的收盘数据；首次订阅K线先推送500根历史K线。私有流是整个账户的一路```private```订阅（不带交易对），只有订阅时才建立私有连接：订阅生效后（以及每次重连后）先按```exchange.GetAccount()```的同一接口推送全部余额快照，再报告就绪，之后推送订单回报与交易账户余额的变化（余额只按交易所的推送更新，与```exchange.GetAccount()```同口径；资金账户、杠杆账户的变化不推送；同一币种有多个交易账户、或订阅之后新开的账户，推送与```exchange.GetAccount()```的口径对不上，到重新连接之前不推送，需要当前余额时请调用```exchange.GetAccount()```）。现货没有持仓，私有流不推送持仓。API Key被拒绝时连接状态报告降级、私有流报告失败，行情推送不受影响。全市场```tickers```订阅（不带交易对）使用KuCoin的全部交易对ticker流（```/market/ticker:all```），交易对的最优挂单变化时推送，带买一卖一价量、最新价与最新成交量，不带24小时开高低与成交量（KuCoin没有全市场的24小时行情推送），需要24小时统计请按交易对订阅ticker；从没有成交过的交易对不推送。
+- 支持WebSocket下单（```ctx.submit(exchange, req)```）：经KuCoin WebSocket交易网关的```spot.order```下单、```spot.cancel```撤单，使用单独的一条交易连接（```wss://wsapi.kucoin.com/v1/private```，与行情、私有流的连接无关；第一次使用时建立，建连地址带API key、时间戳与签名，服务端推送会话质询、连接器签名回复，收到```welcome```后才开始下单，至多等5秒，连不上直接报错，不改用REST）。KuCoin的WebSocket交易网关只接受V3版API key，V1、V2版key会在建连时被拒（错误信息提示需要V3 key；REST下单不受影响）。```req.op```为```"order"```（```symbol side price amount```及```type tif postOnly extra```）或```"cancel"```（```symbol id```，必须带交易对）。下单参数与REST下单是同一份请求体（市价买单按计价币金额```funds```；只下现货单，```extra.tradeType```为杠杆交易时报不支持，请用REST），订单ID与REST相同；交易所拒绝时错误信息与REST的KuCoin错误格式相同（```kucoin 错误码: 信息```），429开头的错误码按限频错误报告。每张WebSocket单的```clientOid```就是```ctx.submit```返回的localId，由连接器生成（```ws```加8位base36毫秒时间与随机字母数字，共32位；```IO("extend")```的```^ws:order$```规则可以给出```clientOid```，须为1到40位字母、数字、```_```、```-```），下单参数里不能自带```clientId```或```extra.clientOid```；订单回报与成交回报的```clientId```就是它。KuCoin的WebSocket交易网关没有批量下单/撤单，```orders```数组的批量在同一条连接上逐单连续发出（不是原子的，整批先按限额预检，放不下时整批不发），下单、撤单每批各至多10单，每单各自一条应答。撤单的```id```可以是KuCoin订单ID（按```orderId```撤）或localId（按```clientOid```撤；交易所应答不带订单ID时，订单ID取这张单WebSocket下单应答里的订单ID），REST的```ctx.cancel()```也认localId（按```DELETE /api/v1/order/client-order/{clientOid}```撤，返回交易所订单ID）。合作方返佣标识（```KC-API-PARTNER```请求头）只附加在REST请求上，KuCoin的WebSocket交易网关没有对应字段，WebSocket下单不带合作方标识。```IO("extend")```规则的```match```对REST请求匹配```方法/路径```，对WebSocket下单匹配```ws:order```、```ws:cancel```，两者互不影响。已发出但没有收到应答（或交易所回复5开头的系统错误码）时不会重发：按```clientOid```只读查询订单（```GET /api/v1/order/client-order/{clientOid}```）确认，撤单按订单ID或```clientOid```查询订单状态确认，仍无法确认时应答状态为未知并带上客户端订单ID。限频：本地下单每3秒45次、撤单每3秒60次（KuCoin旧版逐接口限额的保守值），交易所应答里的```userRateLimit```用尽时在重置前直接报限频错误，本地超限或交易所回复限频错误时直接报限频错误。
 
 ###### ```Futures_KuCoin```（期货）
 
@@ -30141,6 +30147,7 @@ Kraken只挂月度和季度交割合约，```this_week```、```month```都指最
 - 条件单只支持止盈、止损单，不支持OCO（KuCoin合约没有OCO接口）；条件单以最新成交价触发。
 - 私有流（```private```订阅）推送每一笔成交：订单成交时先推送成交回报（kind ```fill```，```channel```为```fills```：订单ID、KuCoin成交ID、这一笔的成交价与数量（张，与订单更新相同）、挂单或吃单），再推送反映这笔成交的订单更新；订单推送只有费率类型、没有手续费金额，成交回报的手续费与手续费币种为空。成交回报不回补历史，断线期间的成交不补推（订单更新的累计成交量仍然准确），重连后重发的同一笔成交只推送一次。
 - 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报、持仓与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。每次建立连接都先向KuCoin申请连接令牌，按交易所给的心跳间隔发送ping。数量单位与REST接口相同（合约张数）。ticker推送的最新价、24小时高低价、成交量与开盘价取自合约的24小时快照流（约5秒一次，口径同```exchange.GetTicker()```），买一卖一价与量取自实时最优买卖流，两条流都到达后才开始推送；逐笔成交与```exchange.GetTrades()```同一套成交ID；深度订阅5档以内使用5档快照流，50档以内（缺省20档）使用50档快照流，5档与20档是两路独立的订阅；超过50档（最多255档）使用逐笔增量流，并以交易所的完整订单簿快照校准。KuCoin的K线推送不带收盘标志，下一根K线开始时补推上一根的收盘数据；首次订阅K线先推送500根历史K线。私有流是整个账户的一路```private```订阅（不带交易对），只有订阅时才建立私有连接：订阅生效后（以及每次重连后）先按```exchange.GetAccount()```、```exchange.GetPositions()```的同一接口推送全部余额与持仓快照，再报告就绪，之后推送订单回报、持仓变化（单向持仓，口径同```exchange.GetPositions()```）与余额：余额推送里只有可用余额与权益与```exchange.GetAccount()```口径相同，冻结、未实现盈亏与保证金推送为null（不另外查询），需要这些值请调用```exchange.GetAssets()```。API Key被拒绝时连接状态报告降级、私有流报告失败，行情推送不受影响。不支持全市场```tickers```订阅（KuCoin期货的ticker推送必须逐个合约订阅），订阅时报错；请按交易对订阅ticker。
+- 支持WebSocket下单（```ctx.submit(exchange, req)```）：经KuCoin WebSocket交易网关的```futures.order```下单、```futures.cancel```撤单，使用单独的一条交易连接（```wss://wsapi.kucoin.com/v1/private```，与行情、私有流的连接无关；第一次使用时建立，建连地址带API key、时间戳与签名，服务端推送会话质询、连接器签名回复，收到```welcome```后才开始下单，至多等5秒，连不上直接报错，不改用REST）。KuCoin的WebSocket交易网关只接受V3版API key，V1、V2版key会在建连时被拒（错误信息提示需要V3 key；REST下单不受影响）。```req.op```为```"order"```（```symbol side price amount```及```type tif postOnly reduceOnly extra```）或```"cancel"```（```symbol id```，必须带交易对）。下单参数与REST下单是同一份请求体（数量为合约张数，带```IO("cross")```设定的保证金模式与```exchange.SetMarginLevel()```设定的杠杆），订单ID与REST相同；交易所拒绝时错误信息与REST的KuCoin错误格式相同（```kucoin 错误码: 信息```），429开头的错误码按限频错误报告。每张WebSocket单的```clientOid```就是```ctx.submit```返回的localId，由连接器生成（```ws```加8位base36毫秒时间与随机字母数字，共32位；```IO("extend")```的```^ws:order$```规则可以给出```clientOid```，须为1到40位字母、数字、```_```、```-```），下单参数里不能自带```clientId```或```extra.clientOid```；订单回报与成交回报的```clientId```就是它。KuCoin的WebSocket交易网关没有批量下单/撤单，```orders```数组的批量在同一条连接上逐单连续发出（不是原子的，整批先按限额预检，放不下时整批不发），下单、撤单每批各至多10单，每单各自一条应答。撤单的```id```可以是KuCoin订单ID（按```orderId```撤）或localId（按```clientOid```撤；交易所应答不带订单ID时，订单ID取这张单WebSocket下单应答里的订单ID），REST的```ctx.cancel()```也认localId（按```DELETE /api/v1/orders/client-order/{clientOid}```撤，交易所应答不带订单ID）。合作方返佣标识（```KC-API-PARTNER```请求头）只附加在REST请求上，KuCoin的WebSocket交易网关没有对应字段，WebSocket下单不带合作方标识。```IO("extend")```规则的```match```对REST请求匹配```方法/路径```，对WebSocket下单匹配```ws:order```、```ws:cancel```，两者互不影响。已发出但没有收到应答（或交易所回复5开头的系统错误码）时不会重发：按```clientOid```只读查询订单（```GET /api/v1/orders/byClientOid```）确认，撤单按订单ID或```clientOid```查询订单状态确认，仍无法确认时应答状态为未知并带上客户端订单ID。限频：本地下单每3秒30次、撤单每3秒40次（KuCoin旧版逐接口限额的保守值），交易所应答里的```userRateLimit```用尽时在重置前直接报限频错误，本地超限或交易所回复限频错误时直接报限频错误。
 
 #### LBank
 
