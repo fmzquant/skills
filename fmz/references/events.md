@@ -411,7 +411,7 @@ var ids = ctx.submit(exchange, {op: "order", orders: [
     还没起来时第一次调用会建连（至多等连接器的建连超时，约 5 秒），起不来回 `Error`，不会无限排队；预热用
     `exchange.IO("wsTrade", "connect")`。
   - **写出即返回请求号**（不等交易所回答）：单笔是字符串、批量是同序的数组。下单的请求号**就是**发给交易所的
-    客户端订单号（localId），只由我们生成（连接器按交易所的字符集、长度与渠道前缀规则生成，经 `IO("extend")` 的
+    客户端订单号（localId），只由我们生成（连接器按交易所的字符集、长度与前缀规则生成，经 `IO("extend")` 的
     `ws:order` 规则；策略不能自带——`clientId` 键与 `extra` 里的客户端订单号字段都报错），时间 + 随机，跨重启不
     重复；它也出现在之后的订单回报、成交回报的 `clientId` 里。撤单的请求号是一个新号（`c-…`）。
   - 在途请求（发出、还没出结论）至多 256 个，超了当场回 `Error`；本地限频（连接器声明的下单窗口、交易所报告的
@@ -426,8 +426,8 @@ var ids = ctx.submit(exchange, {op: "order", orders: [
 
 ```json
 {"kind":"ack","type":"ack","channel":"ack","stream":4,"ex":0,"symbol":"BTC_USDT","seq":812,"ts":1761380000123.456,
- "reqId":"x-BFQC3WFT_6F1A2B3C4D5E6F70","op":"order","status":"ok","ok":true,"id":"4398712394",
- "clientId":"x-BFQC3WFT_6F1A2B3C4D5E6F70","error":"","reason":0,"reasonText":"",
+ "reqId":"ws0mh3k2q9A7bC4dE6fG8hJ1kL3mN5pQ","op":"order","status":"ok","ok":true,"id":"4398712394",
+ "clientId":"ws0mh3k2q9A7bC4dE6fG8hJ1kL3mN5pQ","error":"","reason":0,"reasonText":"",
  "exchTime":1761380000120,"latencyMs":3.912,"time":1761380000120}
 ```
 
