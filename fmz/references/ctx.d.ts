@@ -202,9 +202,12 @@ declare interface IOrderEvent extends IEventBase {
     /** 客户端订单号（交易所推送里的原值；ctx.submit 下的单就是它返回的 localId）；"" = 推送没给。 */
     clientId: string;
     state: "acked" | "partial" | "filled" | "canceled" | "rejected";
+    /** 委托价、委托数量。 */
     px: number;
     qty: number;
+    /** 累计成交量（部分成交时随每笔成交增加；每笔的量见成交回报 FillEvent.qty）。 */
     filledQty: number;
+    /** 成交均价。 */
     avgPx: number;
     /** 拒单/撤单原因码（0=无）。跨连接器统一含义。 */
     reason: number;

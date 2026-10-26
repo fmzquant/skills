@@ -13272,7 +13272,7 @@ fn main() {
 | ```depth```（深度） | 不包含档位字段，仅表示订单簿已更新；档位数据通过```ev.book(n)```读取，见下文 |
 | ```trade```（成交） | ```px```（价格）、```qty```（数量）、```side```（主动成交方向```buy```/```sell```，交易所未提供时为空字符串）、```tradeId``` |
 | ```kline```（K线） | ```open```、```high```、```low```、```close```、```volume```、```openInterest```、```intervalSec```、```openTimeMs```、```closed```（该根K线是否已收盘）、```prefill```（是否为首次订阅时推送的历史K线） |
-| ```order```（订单回报） | ```id```（订单号）、```clientId```（客户端订单号，见下文）、```state```（```acked```、```partial```、```filled```、```canceled```、```rejected```）、```px```、```qty```、```filledQty```、```avgPx```、```reason```（拒单原因码，```0```表示无拒单原因）、```reasonText``` |
+| ```order```（订单回报） | ```id```（订单号）、```clientId```（客户端订单号，见下文）、```state```（```acked```、```partial```、```filled```、```canceled```、```rejected```）、```px```、```qty```（委托价、委托数量）、```filledQty```（累计成交量，部分成交时随每笔成交增加）、```avgPx```（成交均价）、```reason```（拒单原因码，```0```表示无拒单原因）、```reasonText``` |
 | ```position```（持仓） | ```side```（```buy```表示多头、```sell```表示空头）、```posSide```（双向持仓模式下为```long```、```short```，单向持仓模式下为```net```）、```qty```、```avgPx```、```profit```、```margin```、```liqPx```、```markPx```、```leverage```、```snapshot``` |
 | ```balance```（余额） | ```asset```（资产名称）、```free```（可用余额）、```frozen```（冻结余额）、```equity```、```upnl```、```margin```、```snapshot``` |
 | ```fill```（成交回报） | ```orderId```（订单号）、```clientId```（所属订单的客户端订单号）、```tradeId```（成交编号）、```px```、```qty```（本笔成交的价格、数量）、```fee```（手续费，负数表示手续费返还）、```feeCcy```（手续费计价资产）、```side```（订单方向）、```liquidity```（```maker```或```taker```），见下文 |
