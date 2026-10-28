@@ -2,20 +2,16 @@
 
 # FMZ backtesting
 
-The backtest engine is one native program, compiled to WebAssembly for JavaScript-family and Rust strategies and loaded as a native library for Python. It replays history with a virtual clock and a simulated account per exchange. Everything below is what that engine, the local runner, the MCP tools and the website form actually do; `references/backtest-config.md` has the full key table and worked configurations.
+The backtest engine is one native program, compiled to WebAssembly for in-browser runs of JavaScript/Rust strategies and run natively on a node for Python and for cloud runs. It replays history with a virtual clock and a simulated account per exchange. Everything below is what that engine, the MCP tools and the website form actually do; `references/backtest-config.md` has the full key table and worked configurations.
 
-## 0. Local by default
+## 0. Cloud or local?
 
-Run backtests **locally** with `scripts/backtest.js` (`references/backtest-local.md`): every language (JavaScript, TypeScript, Python, Pine, MyLanguage, Rust), templates and required libraries, real-tick mode, every header key, parameter optimisation, and no cloud slot. The platform prepares the run (compiles, resolves templates, fills the website's defaults) through the MCP tool `prepare_backtest`; the engine and the history data are the platform's own, so the numbers match a website backtest with the same settings.
+Two ways to run a backtest, same engine core and the same history data:
 
-```bash
-node scripts/backtest.js run strategy.js     # settings from the source's /*backtest*/ header
-node scripts/backtest.js run backtest.json   # or a config file; optimize / prepare / exec are the other commands
-```
+- **Cloud** — `run_backtest` / `get_backtest` through MCP. Any language, templates and class libraries attached automatically, the result is also visible on the website. Costs an account concurrency slot and a round trip of tens of seconds to minutes. Everything below describes this path.
+- **Local** — the open-source engine installed on the machine the agent runs on (`pip install` of `fmzquant/backtest_python`). JavaScript/Python strategies only, no templates, but a two-week run finishes in well under a second and there is no slot to wait for. Use it for the write–run–fix loop and parameter sweeps, then confirm once on the cloud. Details, install and result format: `references/backtest-local.md`.
 
-Use the **cloud** (`run_backtest`, section 1) only for a strategy whose source this account cannot see (rented, encrypted), or when the user wants the run on the website.
-
-## 1. Cloud backtests (MCP)
+## 1. How a cloud backtest runs (MCP)
 
 1. `run_backtest` submits a task to the cloud cluster and returns `task_id` immediately.
 2. `get_backtest(task_id, wait)` returns progress or the result. `wait` (0-60 s) blocks on the server, polling every 2 s, so one call per minute is enough. While running it returns `{status:"running", progress, elapsed_ms, logs_count}`.
@@ -45,9 +41,7 @@ Fee defaults (maker/taker, %): Huobi, OKX, Binance 0.15/0.2; Futures_BitMEX 0.00
 
 The underlying ("base") K-line period is derived from `period`: `1d`/`4h` -> 1h, `1h` -> 30m, `30m` -> 15m, `15m` -> 5m, `5m` and `1m` -> 1m (Futures_BitMEX: 15m/30m base becomes 5m). The MCP path always runs the **simulated-tick (bar) mode**; real-tick mode is only available from the website.
 
-Locally the settings are the header keys below (in the source, or under `backtest` in the config file), with the website's defaults; see `references/backtest-local.md`.
-
-### 2b. The `/*backtest ... */` header (website and local runner)
+### 2b. The `/*backtest ... */` header (website and local engines)
 
 The website's editor reads a comment block at the top of the source and fills the backtest form from it (the "Save backtest settings" button writes it; the code lens above the block re-syncs the form after you edit it). Keys are one per line, `key: value`, whitespace trimmed, `exchanges` is JSON:
 
@@ -62,11 +56,11 @@ args: [["fast",5],["slow",20]]
 */
 ```
 
-Python uses `'''backtest ... '''`, MyLanguage `(*backtest ... *)`; JavaScript, TypeScript, Pine and Rust use `/*backtest ... */` (the block is the language's comment start followed immediately by the word `backtest`).
+Python uses `'''backtest ... '''`; Rust and JavaScript use `/*backtest ... */` (the block is the language's comment start followed immediately by the word `backtest`).
 
 | Key | Value format | Notes |
 |---|---|---|
-| `start`, `end` | `YYYY-MM-DD HH:mm:ss` | local time: the browser's on the website, the machine's (or `timezone`) for the local runner |
+| `start`, `end` | `YYYY-MM-DD HH:mm:ss` | parsed by the browser (local time) |
 | `period` | `Nm`, `Nh`, `Nd`, or plain seconds | strategy K-line period; website default 1d |
 | `basePeriod` | same format | underlying K-line period used to generate ticks; defaults to `period` when absent; ignored when `mode: 1` |
 | `mode` | `1` | real-tick mode (omit for simulated-tick mode) |
@@ -75,15 +69,15 @@ Python uses `'''backtest ... '''`, MyLanguage `(*backtest ... *)`; JavaScript, T
 
 "Save backtest settings" also appends website-form keys (`btSlipPoint`, `btNetDelay`, `btMaxBarLen`, `btDepthDeep`, `btFaultTolerant`, `btMaxRuntimeLogs`, ...) when they differ from the defaults; the sync handler visibly applies `start/end/period/basePeriod/mode/exchanges/args`, so treat the `bt*` lines as a record of the form rather than something to hand-edit.
 
-The local runner reads the same header (the platform parses it in `prepare_backtest`) and also accepts the other keys of `references/backtest-local.md` (`timezone`, `netDelay`, `slipPoint`, `faultTolerant`, `maxBarLen`, log caps, ...).
+The open-source local engines (`backtest_python`: `VCtx(__doc__)`, `backtest_javascript`) read the same header. The bundled JavaScript parser (`worker.js` `VCtx`) also accepts `dataServer`, and converts an `h` suffix with a wrong factor (`360000` ms), so prefer minute values (`60m`) there.
 
 ## 3. Exchanges, pairs and contracts
 
 - `eid` names come from `list_exchanges`: spot ids like `Binance`, `OKX`, `Huobi`, `Bitfinex`; futures ids are prefixed `Futures_` (`Futures_Binance`, `Futures_OKX`, `Futures_HuobiDM`, `Futures_BitMEX`, `Futures_CTP`, `Futures_XTP`, `Futures_Futu`).
 - Pair is `BASE_QUOTE`, upper case (`BTC_USDT`). The MCP tool uppercases it and, if there is no `_`, appends `_USD`.
-- Crypto futures: the pair is the **margin pair** (`BTC_USDT` for USDT-margined, `BTC_USD` for coin-margined). The contract is chosen in the strategy with `exchange.SetContractType("swap" | "this_week" | "next_week" | "quarter" | "next_quarter")`, or by passing a full symbol such as `BTC_USDT.swap` to `GetRecords/GetTicker`. Until a contract is set, the engine raises `symbol BTC_USDT not set contract on Futures_Binance`. Do not put `.swap` into the MCP `pair` (it is split on `_`); the local runner strips it and warns.
+- Crypto futures: the pair is the **margin pair** (`BTC_USDT` for USDT-margined, `BTC_USD` for coin-margined). The contract is chosen in the strategy with `exchange.SetContractType("swap" | "this_week" | "next_week" | "quarter" | "next_quarter")`, or by passing a full symbol such as `BTC_USDT.swap` to `GetRecords/GetTicker`. Until a contract is set, the engine raises `symbol BTC_USDT not set contract on Futures_Binance`. Do not put `.swap` into the MCP `pair` (it is split on `_`).
 - Futu (`Futures_Futu`) supports daily data only, with `currency: "STOCK"` and `exchange.SetContractType("TLSA.US")`-style codes.
-- The history data server is chosen by the platform (`q.fmz.com`; CTP/XTP on `q.youquant.com`); you never set it. No data for the pair in the date range -> the task ends with a symbol-not-found error (see section 7).
+- The history data server is chosen by the platform (the cloud nodes reach it through the cluster's own proxy); you never set it. No data for the pair in the date range -> the task ends with a symbol-not-found error (see section 7).
 
 ## 4. The simulation model (what the engine does)
 
@@ -100,13 +94,11 @@ The local runner reads the same header (the platform parses it in `prepare_backt
 - Time is virtual: `Unix()`, `UnixNano()`, `_D()` read the engine clock, which starts at `start`, advances by `Sleep(ms)` and by `NetDelay` per API call, and is moved to the next tick when the same market function is called again. When the clock passes `end` the engine throws `EOF` (JavaScript string exception / Python `EOFError`-style exception) and the run ends; `onexit()` is not called unless the strategy catches EOF itself. A `while(true)` loop with a short `Sleep` is the normal shape; `Sleep(100)` in tick mode, larger sleeps only cost virtual time.
 - `GetRecords()` returns bars of the strategy period, built from the base period. A custom period smaller than `basePeriod` cannot be produced. The first call returns pre-fetched history capped at `MaxBarLen` (engine default 1000; website 100-5000, default 300; the docs' "5000 by default" is the live-trading cap). `SetMaxBarLen(n)` caps the array the JS glue returns. The last element is the forming bar.
 - `exchange.GetAccount()`, `GetPosition()`, orders and cancels work against the simulated account. `Order.Info` is empty, `SetPrecision` is ignored (precision comes from the market detail), `GetRawJSON` is live-only, `GetCommand()` returns nothing, `onerror()` is not supported, HTTP/mail/channel features are restricted. `_C()` retries still work and are the right way to survive fault-tolerance failures.
-- Logs are capped: local runs and the website keep up to 8000 runtime log lines, 8000 profit points and 3000 chart points by default (the engine caps at 10000); MCP cloud runs keep 2000/800/0. `Log()`, `LogStatus()`, `LogProfit()` and `exchange.Log()` are all recorded.
+- Logs are capped: MCP runs keep the last 2000 runtime log lines and 800 profit points and no chart data (the website keeps up to 8000/8000/3000; the engine caps at 10000). `Log()`, `LogStatus()`, `LogProfit()` and `exchange.Log()` are all recorded.
 - **`profit`, `max_drawdown` and `profit_curve` exist only if the strategy calls `LogProfit(value)`**; the engine does not compute them by itself. Without it, read `final_accounts`.
 - Custom data: `exchange.SetData(key, [[ms, value], ...])` loads a time series; `exchange.GetData(key)` returns the entry whose time is the latest `<=` now as `{Time, Data}`. `GetData(url)` GETs a JSON `{"schema":["time","data"],"data":[[ms, value], ...]}`. A custom K-line feed is configured per exchange with `feeder: "http://host/path"` in the header; the engine calls it with `symbol, eid, period (ms), depth, trades, from, to, round=true, detail=true` and expects `{detail:{...}, schema:["time","open","high","low","close","vol"], data:[...]}` (see the user guide's custom data source section).
 
-## 6. Reading results
-
-The local runner's summary (status, the website's return / Sharpe / drawdown / win-rate statistics, order and error counts, error lines, final accounts) is described in `references/backtest-local.md`. The cloud's `get_backtest`:
+## 6. Reading results (`get_backtest`)
 
 | Field | Meaning |
 |---|---|
@@ -142,8 +134,9 @@ Workflow: start with `detail=summary`; if `errors > 0` read `error_lines`; if th
 | `orders: 0` with no errors | strategy never traded: check the period vs signal logic, the `Sleep` loop, and that `IsVirtual()` branches do not skip trading |
 | `data columns length mismatch` | custom feeder returned rows that do not match its `schema` |
 
-## 8. Not available on the MCP cloud path
+## 8. Website-only features (for completeness)
 
-- **Real-tick mode** (`mode: 1`): per-second recorded ticks with depth (1-20 levels) and optional trade prints; up to 50 MB of data per run, so shorten the range or lower depth/disable trades. `GetDepth`/`GetTrades` return real data there. Local runner and website.
-- **Parameter optimisation**: a grid over parameter values. Local runner (`optimize`, any language) and website.
-- The website result page's CSV downloads (status table, log table) and the Sharpe algorithm are described in the platform user guide ("Backtesting System"); the local summary uses the same algorithm.
+- **Real-tick mode** (`mode: 1`): per-second recorded ticks with depth (1-20 levels) and optional trade prints; up to 50 MB of data per run, so shorten the range or lower depth/disable trades. `GetDepth`/`GetTrades` return real data there.
+- **Parameter optimisation**: min/max/step on numeric parameters, run as a grid; concurrency only for JavaScript/Pine/My language.
+- **Local engines**: `backtest_python` and `backtest_javascript` on GitHub, driven by the same header; the run ends with an `EOF` exception you catch to print results.
+- The result page's CSV downloads (status table, log table) and the Sharpe algorithm are described in the platform user guide ("Backtesting System").

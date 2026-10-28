@@ -218,7 +218,7 @@ if cmd:
 1. `check_strategy` has **no static check for Python** (returns ok without parsing): run `python3 -m py_compile file.py` locally first.
 2. `save_strategy` with `language: "python"`, `source`, `args` definitions. Updating: pass `strategy_id`; `save_strategy_version` first if the old code must stay retrievable.
 3. `run_backtest` (`strategy_id`, or `source` + `language: "python"`) → `get_backtest` with `wait`; read `error_lines`, `profit`, `orders`.
-   Backtest on this machine: `node scripts/backtest.js run strategy.py` (Python 3 runs the platform's engine; settings from a `'''backtest ... '''` docstring at the top of the file, the Python form of `/*backtest*/`, or a config file; see `references/backtest-local.md`). Runs take seconds and need no cloud slot.
+   For the fast loop, backtest on this machine first: `pip install https://github.com/fmzquant/backtest_python/archive/master.zip`, add the `'''backtest ... '''` header and `task = VCtx(__doc__)` (see `references/backtest-local.md`); runs take seconds and need no cloud slot. A `'''backtest ... '''` docstring at the top of the file (Python form of `/*backtest*/`) can carry start/end/period/exchanges/args; it is optional and documented in the `references/backtest.md`.
 4. Live: `create_robot` / `start_robot` / `send_robot_command` / `get_robot_logs` as described in `SKILL.md`.
 
 ## References
