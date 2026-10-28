@@ -263,7 +263,7 @@ Push and REST are independent: `GetTicker`/`GetDepth`/`ctx.rest` always hit REST
 - **`wait()` semantics.** `undefined` = timed out (call `wait` again), `null` = the call failed; waiting on a consumed object errors.
 - **Strings.** Byte strings that cannot be encoded come back as `ArrayBuffer`; every string parameter accepts `ArrayBuffer` too (user-guide `#### JavaScript` under "### Programming Languages").
 - Before saving run `check_strategy`; before going live run `run_backtest` and read `error_lines`; test with a sandbox account or a tiny amount first (`SKILL.md`).
-- Fast local iteration: the platform's local engine (`references/backtest-local.md`) runs a JavaScript strategy on this machine in seconds (`npm install git+https://github.com/fmzquant/backtest_javascript.git`); confirm on the cloud with `run_backtest` before going live.
+- Backtest locally: `node scripts/backtest.js run strategy.js` runs the strategy on this machine in seconds with the platform's engine, settings from the `/*backtest*/` header (`references/backtest-local.md`).
 
 ## References
 

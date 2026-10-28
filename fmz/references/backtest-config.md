@@ -2,7 +2,7 @@
 
 Three layers describe the same run:
 
-1. the **header** (`/*backtest ... */` in the source; what the website form and the local engines read),
+1. the **header** (`/*backtest ... */` in the source; what the website form reads, and the keys of the local runner's config, see `references/backtest-local.md`),
 2. the **MCP `run_backtest` parameters**,
 3. the **engine task JSON** (`Code`, `Exchanges[]`, `Options`) that both of the above are turned into and that the engine reads.
 
@@ -24,7 +24,7 @@ Fee integers: the engine computes `rate = FeeMaker / 10^FeeDenominator`. The MCP
 | `btMaxProfitLogs` | - | `MaxProfitLogs` | `LogProfit` points kept | 800 | 8000 | capped at 10000 |
 | `btMaxChartLogs` | - | `MaxChartLogs` | chart data points kept | 0 | 3000 | capped at 10000 |
 | - | - | `SnapshotPeriod` | ms between account snapshots | auto: span <= 2 h -> 60 s, <= 2 d -> 5 min, < 30 d -> 1 h, else 1 d | auto (same, `< 20 d` for the hourly step) | required |
-| `dataServer` (local JS engine only) | - | `DataServer` | history server | set by the server (`http://q.fmz.com`, reached via the cluster proxy) | site origin | required |
+| - | - | `DataServer` | history server | set by the server (`http://q.fmz.com`, reached via the cluster proxy) | site origin (local runner: `https://q.fmz.com`) | required |
 | - | - | `RetFlags` | bitmask of result sections: 1 Status, 2 Symbols, 4 Indicators, 8 Chart, 16 ProfitLogs, 32 RuntimeLogs, 64 CloseProfitLogs, 128 Accounts, 256 Accounts_PnL, 512 Event, 1024 Orders, 2048 FilledOrders | `1|16|32|256` | `1|8|16|32|64|128|256` | required |
 | - | - | `UpdatePeriod` | ms between progress callbacks | 5000 | 500 (5000 for Python) | required |
 | `args` | `args` | `Code[i][1]` | parameter values: header `[["name", value]]` or `[["name", value, templateId]]`; MCP `{name: value}` or `[[name, value]]` | - | form | - |
@@ -67,11 +67,11 @@ Fee integers: the engine computes `rate = FeeMaker / 10^FeeDenominator`. The MCP
 | Futures_XTP | 0.03 | 0.13 |
 | any other id | 0.2 | 0.2 |
 
-The same table is used by the MCP tool and by the local JavaScript engine (`worker.js`); the website takes defaults from each market's detail instead.
+The MCP tool uses this table; the website and the local runner take defaults from each market's detail on the history server instead (this table only when that detail is unavailable).
 
 ## Examples
 
-Each example shows the header, the equivalent MCP call, and what the strategy has to do.
+Each example shows the header, the equivalent MCP call, and what the strategy has to do. The column "Website default" in the tables above is also what the local runner sends.
 
 ### Spot (Binance BTC_USDT, 1h bars, 30-minute base)
 
@@ -165,7 +165,7 @@ function main() {
 
 Each exchange has its own simulated account, fee schedule and feed; `exchange` is `exchanges[0]`. The clock is shared, so a call on one exchange also advances time for the other.
 
-### Real-tick mode (website only)
+### Real-tick mode (website and local runner)
 
 ```javascript
 /*backtest

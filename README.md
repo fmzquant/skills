@@ -18,6 +18,8 @@ Connecting an agent to the platform (device-code authorization, MCP URL, permiss
 fmz/
 ├── SKILL.md                  entry point: connecting, the platform model, every MCP tool, workflows, safety rules,
 │                             and a routing table that says which reference to read for which task
+├── scripts/
+│   └── backtest.js backtest.py                                        local backtest runner (Node 18+; Python 3 for Python strategies)
 └── references/
     ├── javascript.md python.md rust.md pine.md mylanguage.md          how to write a strategy in each language
     ├── fmz.d.ts fmz.zh_CN.d.ts ctx.d.ts events.md selfcheck.js        JavaScript declarations, native event API, self-check
@@ -27,7 +29,7 @@ fmz/
     ├── mylanguage-functions.md mylanguage-examples/                   麦语言 dictionary and official templates
     ├── api-docs.md api.en.md api.zh.md                                the complete strategy API documentation (en/zh)
     ├── indicators.md ta.md talib.md                                   TA.* and talib.*
-    ├── backtest.md backtest-config.md backtest-local.md               cloud backtesting, local engine on the agent's machine
+    ├── backtest-local.md backtest.md backtest-config.md               local backtests (default), simulation model, cloud backtests
     ├── tools.md rest-api.md                                           MCP tool parameters, REST extended API
     └── user-guide.en.md user-guide.zh.md                              the platform user guide as markdown
 ```

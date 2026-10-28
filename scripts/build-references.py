@@ -182,7 +182,7 @@ TITLES = {
 def build_tools(src, dst):
     d = json.load(open(src, encoding="utf-8"))
     order = ["read", "backtest", "write", "trade", "danger"]
-    desc = {"read": "List/inspect; results never contain secrets.", "backtest": "Start, poll, stop cloud backtests.",
+    desc = {"read": "List/inspect; results never contain secrets.", "backtest": "Prepare local backtests (prepare_backtest, used by scripts/backtest.js); start, poll, stop cloud backtests.",
             "write": "Save strategies and versions, groups, alert switches, edit stopped robots.",
             "trade": "Create/start/stop robots and send them commands: spends balance and places real orders. Confirm with the user first.",
             "danger": "Delete strategies/robots/nodes, publish strategies. Never included in a key by default; confirm with the user first."}

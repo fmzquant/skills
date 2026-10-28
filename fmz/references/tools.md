@@ -129,7 +129,7 @@ The user's robot groups or strategy groups (folders).
 
 ## scope `backtest`
 
-Start, poll, stop cloud backtests.
+Prepare local backtests (prepare_backtest, used by scripts/backtest.js); start, poll, stop cloud backtests.
 
 ### run_backtest
 
@@ -171,6 +171,18 @@ The account's cloud backtests that still hold a concurrency slot (running, or fi
 Stop a running backtest, or discard a finished one. Read the result with get_backtest first: after stop_backtest the task and its result are gone (get_backtest then says not found). Not needed to free the concurrency slot after a result was read.
 
 - `task_id` (string, required)
+
+### prepare_backtest
+
+Prepare a backtest to run on the agent's own machine: resolves templates and the libraries the language requires, compiles Pine / MyLanguage / TypeScript to JavaScript and Rust (with its templates) to wasm, checks the exchanges and pairs against the history data server and fills every default the website backtest uses. Returns the complete engine task plus the engine to run it with (download from /api/agent/backtest/engine/<name>). The result is large (the full task including library sources): it is meant for the fmz skill's local runner (scripts/backtest.js), not for reading. Compile errors come back as the tool error, with line numbers.
+
+- `args` (object): Parameter values: {name: value} for the strategy, or [[name, value], ...]; a third element [name, value, templateIdOrName] sets a template's parameter. Omitted parameters take their defaults.
+- `config` (object): Backtest settings, same keys as the website's /*backtest*/ header: start, end ("YYYY-MM-DD HH:mm:ss" in `timezone`, ISO with offset, or unix), timezone (IANA or +08:00, default UTC), period, basePeriod (1m..1d), mode (0 K-line / 1 real tick), exchanges [{eid, currency, balance, stocks, fee:[maker%, taker%], feeMin, depthDeep, depthAmount, tradesMode, quotePrecision, basePrecision, label}], netDelay, slipPoint, faultTolerant, maxBarLen, maxRuntimeLogs, maxProfitLogs, maxChartLogs, orders (filled|all), symbols (true: K-lines and indicators in the result), events. Keys not given come from the source's own header, then from the website defaults.
+- `language` (string one of javascript/typescript/python/pine/mylanguage/rust): Required with source
+- `source` (string): Raw source instead of strategy_id
+- `strategy_id` (number): A saved strategy whose source is visible to this account (own, or public with source). Rented / encrypted strategies cannot run locally: use run_backtest
+- `task_overrides` (object): Expert: merged into the final engine task last, {Options:{...}, Exchanges:[{...} per exchange]}
+- `templates` (array of any): Templates instead of the strategy's own: template ids, or inline {name, source, args} (e.g. a template kept in a local file). The libraries the language requires are always added.
 
 ## scope `write`
 
