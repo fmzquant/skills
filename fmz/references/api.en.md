@@ -10742,30 +10742,27 @@ Dial(address, timeout)
 Dial(address, options)
 ```
 
-Used for raw ```Socket``` access, supporting the ```tcp``` and ```tls``` (also written as ```ssl```) protocols as well as the WebSocket ```ws``` and ```wss``` protocols. Also supports connecting to databases, with supported databases including: ```sqlite3```, ```mysql```, ```postgres```, and ```clickhouse```.
+Used for raw ```Socket``` access. Supports the ```tcp``` and ```tls``` (also written as ```ssl```) protocols, as well as the WebSocket ```ws``` and ```wss``` protocols. It can also connect to databases; supported databases include ```sqlite3```, ```mysql```, ```postgres```, and ```clickhouse```.
 
 Parameters:
 
 - `address` (string, required): The request address.
-- `timeout` (number, optional): The connection timeout. For ```ws``` and ```wss``` it is in milliseconds (values less than 100 are treated as seconds); for ```tcp``` and ```tls``` it is in seconds. When set to 0, the default timeout is used. In ```JavaScript``` and ```Python```, it is 30 (i.e. 30 seconds) when this parameter is omitted. In ```Rust```, ```Dial(address)``` uses the default timeout; to specify a timeout use ```Dial::new(address, timeout)```, where ```timeout``` has the same units as above.
-- `options` (object, optional): Configuration options, such as ```headers``` (WebSocket request headers) and ```timeout``` (same units as the ```timeout``` parameter; the default timeout is used when it is not set).
+- `timeout` (number, optional): The timeout for establishing the connection. For the ```ws``` and ```wss``` protocols the unit is milliseconds (values below 100 are treated as seconds); for the ```tcp``` and ```tls``` protocols the unit is seconds. When set to 0, the default timeout is used. In ```JavaScript``` and ```Python```, if this parameter is omitted, the default value is 30, i.e. 30 seconds. In ```Rust```, ```Dial(address)``` uses the default timeout; to specify a timeout, use ```Dial::new(address, timeout)```, where the unit of ```timeout``` follows the same rules as above.
+- `options` (object, optional): Configuration options, such as ```headers``` (WebSocket request headers) and ```timeout``` (same unit as the ```timeout``` parameter; the default timeout is used if not set).
 
-Returns (object): A connection object with ```read()```, ```write()```, ```close()``` and other methods (database connections also have ```exec()```), see `Dial-return`. When the connection fails (for example on timeout) a null value is returned and an error is logged (```Rust``` returns a connection object whose ```Valid()``` is ```false```).
+Returns (object): Connection object that provides methods such as ```read()```, ```write()``` and ```close()``` (database connections also provide the ```exec()``` method). For details, see `Dial-return`. If the connection fails (for example, on timeout), a null value is returned and the error is logged (in ```Rust```, a connection object whose ```Valid()``` is ```false``` is returned instead).
 
-Dial function call example.
+Example of calling the Dial function.
 
 ```javascript
 function main(){
-    // Dial supports the tcp:// and tls:// protocols as well as ws:// and wss://; for tcp:// and
-    // tls:// an extra parameter specifies the timeout in seconds
+    // Dial supports the tcp://, tls://, ws:// and wss:// protocols; for tcp:// and tls://, an additional parameter can be passed to specify the timeout, in seconds
     var client = Dial("tls://www.baidu.com:443")
     if (client) {
-        // write can take an additional numeric parameter to specify a timeout, and returns the
-        // number of bytes successfully sent
+        // write accepts an optional numeric parameter to specify the timeout; the return value is the number of bytes sent successfully
         client.write("GET / HTTP/1.1\nConnection: Closed\n\n")
         while (true) {
-            // read can take an additional numeric parameter to specify a timeout, in milliseconds;
-            // returning null indicates an error, timeout, or that the socket has been closed
+            // read accepts an optional numeric parameter to specify the timeout, in milliseconds. A return value of null indicates an error, a timeout, or that the socket has been closed
             var buf = client.read()
             if (!buf) {
                 break
@@ -10792,17 +10789,13 @@ def main():
 
 ```rust
 fn main() {
-    // Dial supports the tcp:// and tls:// protocols as well as ws:// and wss://; for tcp:// and
-    // tls:// you can use Dial::new(addr, timeout) to specify the timeout in seconds
+    // Dial supports the tcp://, tls://, ws:// and wss:// protocols; for tcp:// and tls://, use Dial::new(addr, timeout) to specify the timeout, in seconds
     let mut client = Dial("tls://www.baidu.com:443");
     if client.Valid() {
-        // The second numeric parameter of write is used to specify a timeout, and it returns the
-        // number of bytes successfully sent
+        // The second (numeric) parameter of write specifies the timeout; the return value is the number of bytes sent successfully
         client.write("GET / HTTP/1.1\nConnection: Closed\n\n", 0);
         loop {
-            // The numeric parameter of read is used to specify a timeout, in milliseconds;
-            // returning an empty string indicates an error, timeout, or that the socket has been
-            // closed
+            // The numeric parameter of read specifies the timeout, in milliseconds. An empty string return value indicates an error, a timeout, or that the socket has been closed
             let buf = client.read(0);
             if buf == "" {
                 break;
@@ -10814,12 +10807,12 @@ fn main() {
 }
 ```
 
-Access Binance's WebSocket market data interface.
+Connect to Binance's WebSocket market data interface.
 
 ```javascript
 function main() {
     LogStatus("Connecting...")
-    // Access Binance's WebSocket interface
+    // Connect to Binance's WebSocket interface
     var client = Dial("wss://stream.binance.com:9443/ws/!ticker@arr")
     if (!client) {
         Log("Connection failed, exiting")
@@ -10834,8 +10827,8 @@ function main() {
         }
         var table = {
             type: 'table',
-            title: 'Market Chart',
-            cols: ['Symbol', 'High', 'Low', 'Bid', 'Ask', 'Last Price', 'Volume', 'Update Time'],
+            title: '行情图表',
+            cols: ['币种', '最高', '最低', '买一', '卖一', '最后成交价', '成交量', '更新时间'],
             rows: []
         }
         var obj = JSON.parse(buf)
@@ -10863,8 +10856,8 @@ def main():
             break
         table = {
             "type" : "table",
-            "title" : "Market Chart",
-            "cols" : ["Symbol", "High", "Low", "Bid", "Ask", "Last Price", "Volume", "Update Time"],
+            "title" : "行情图表",
+            "cols" : ["币种", "最高", "最低", "买一", "卖一", "最后成交价", "成交量", "更新时间"],
             "rows" : []
         }
         obj = json.loads(buf)
@@ -10877,7 +10870,7 @@ def main():
 ```rust
 fn main() {
     LogStatus!("Connecting...");
-    // Access Binance's WebSocket interface
+    // Connect to Binance's WebSocket interface
     let mut client = Dial("wss://stream.binance.com:9443/ws/!ticker@arr");
     if !client.Valid() {
         Log!("Connection failed, exiting");
@@ -10891,8 +10884,7 @@ fn main() {
             break;
         }
         let obj = JSONParse(&buf).unwrap();
-        // The Rust SDK has no JSON serialization; here we use string concatenation to build the
-        // JSON text for the status bar table
+        // The Rust SDK does not provide JSON serialization, so the JSON text of the status bar table is built by string concatenation
         let mut rows = String::new();
         if let Some(arr) = obj.as_array() {
             for ticker in arr {
@@ -10906,23 +10898,22 @@ fn main() {
                     ticker["q"].as_str().unwrap_or(""), _D(ticker["E"].as_i64().unwrap_or(0)));
             }
         }
-        let table = format!(r#"{{"type":"table","title":"Market Chart","cols":["Symbol","High","Low","Bid","Ask","Last Price","Volume","Update Time"],"rows":[{}]}}"#, rows);
+        let table = format!(r#"{{"type":"table","title":"行情图表","cols":["币种","最高","最低","买一","卖一","最后成交价","成交量","更新时间"],"rows":[{}]}}"#, rows);
         LogStatus!(format!("`{}`", table));
     }
     client.close();
 }
 ```
 
-Connect to an ```sqlite3``` database and execute SQL statements with the ```exec()``` method of the connection object (see `Dial-return`).
+Connect to a ```sqlite3``` database and execute SQL statements with the connection object's ```exec()``` method (see `Dial-return`).
 
 ```javascript
 var client = null
 function main() {
     // client = Dial("sqlite3://:memory:")   // Use an in-memory database
-    // Open/connect to the database file in the live trading directory
-    client = Dial("sqlite3://test1.db")
+    client = Dial("sqlite3://test1.db")      // Open/connect to the database file in the live trading directory
 
-    // Query the tables in the database
+    // Query all tables in the database
     var ret = client.exec("SELECT name FROM sqlite_master WHERE type='table'")
     Log(ret)
 }
@@ -10938,10 +10929,9 @@ client = None
 def main():
     global client
     # client = Dial("sqlite3://:memory:")   # Use an in-memory database
-    # Open/connect to the database file in the live trading directory
-    client = Dial("sqlite3://test1.db")
+    client = Dial("sqlite3://test1.db")      # Open/connect to the database file in the live trading directory
 
-    # Query the tables in the database
+    # Query all tables in the database
     ret = client.exec("SELECT name FROM sqlite_master WHERE type='table'")
     Log(ret)
 
@@ -10953,12 +10943,11 @@ def onexit():
 ```rust
 fn main() {
     // let mut client = Dial("sqlite3://:memory:");   // Use an in-memory database
-    // Open/connect to the database file in the live trading directory
-    let mut client = Dial("sqlite3://test1.db");
+    let mut client = Dial("sqlite3://test1.db");      // Open/connect to the database file in the live trading directory
 
-    // Rust's connection object does not support the fd() method
+    // The Rust connection object does not support the fd() method
 
-    // Query the tables in the database
+    // Query all tables in the database
     let ret = client.exec("SELECT name FROM sqlite_master WHERE type='table'");
     Log!(format!("{:?}", ret));
 
@@ -10967,43 +10956,41 @@ fn main() {
 }
 ```
 
-```address``` parameter details: after the standard address ```wss://ws.okx.com:8443/ws/v5/public```, use the ```|``` symbol as a separator. If the parameter string contains the ```|``` character, use ```||``` as the separator instead. The portion after the separator specifies the functional parameter settings, with individual parameters joined by the ```&``` character.
+Details of the ```address``` parameter: after the regular address ```wss://ws.okx.com:8443/ws/v5/public```, add a ```|``` separator. If the parameter string itself contains the ```|``` character, use ```||``` as the separator instead. The part after the separator sets the feature parameters, and each parameter is joined with the ```&``` character.
 
-For example, to set both an ```ss5``` proxy and compression parameters at the same time, you can write:
-
+For example, to set an ```ss5``` proxy and compression parameters at the same time, write:
 ```Dial("wss://ws.okx.com:8443/ws/v5/public|proxy=socks5://xxx:9999&compress=gzip_raw&mode=recv")```
 
 | Features supported by the address parameter of the Dial function | Parameter description |
 | - | - |
-| Parameters related to WebSocket protocol data compression: compress=value | compress specifies the compression method. Available values: gzip, gzip_raw (also written as flate), zlib (also written as deflate). gzip_raw is raw deflate data without a gzip header, which can be used when the received data is not in standard gzip format. An unsupported value causes an error. |
-| Parameters related to WebSocket protocol data compression: mode=value | mode specifies the compression mode. Only recv (receive compressed data and decompress it locally) is supported, and it is the default when not set. When compress is set, setting mode to send or dual causes an error. |
-| Enable the WebSocket protocol compression setting: enableCompression=true | This parameter is accepted but has no effect; no WebSocket permessage-deflate compression negotiation is performed. |
-| Parameters for configuring underlying auto-reconnection of the WebSocket protocol: reconnect=value | reconnect sets whether to auto-reconnect. reconnect=true enables reconnection. If this parameter is not set, reconnection is disabled by default. |
-| Parameters for configuring underlying auto-reconnection of the WebSocket protocol: interval=value | interval is the retry interval, in milliseconds. For example, interval=10000 means a retry interval of 10 seconds; when not set, it defaults to 1 second, i.e., interval=1000. |
-| Parameters for configuring underlying auto-reconnection of the WebSocket protocol: payload=value | payload is the subscription message to be sent when the WebSocket reconnects, for example: payload=okok. |
-| Parameters related to the socks5 proxy: proxy=value | proxy configures the ss5 proxy. The value format is: socks5://name:pwd@192.168.0.1:1080. Here name is the username of the ss5 server, pwd is the login password of the ss5 server, and 1080 is the port of the ss5 service. |
-| WebSocket receive buffer limit: qsize=value | qsize is the maximum number of messages kept in the receive buffer. Defaults to 4096 when not set. |
-| WebSocket receive buffer limit: qbytes=value | qbytes is the maximum number of bytes kept in the receive buffer. Defaults to 16777216 (16 MB) when not set. |
+| WebSocket data compression parameter: compress=value | compress sets the compression method. Valid values are gzip, gzip_raw (also written as flate) and zlib (also written as deflate). gzip_raw means raw deflate data without a gzip header. Use it when the received data is not in standard gzip format. An unsupported value causes an error. |
+| WebSocket data compression parameter: mode=value | mode sets the compression mode. Only recv is supported, which receives compressed data and decompresses it locally. If mode is not set, it defaults to recv. If compress is set and mode is set to send or dual, an error occurs. |
+| Enable WebSocket compression: enableCompression=true | Negotiates the WebSocket permessage-deflate compression extension during the handshake. Once the server accepts it, the docker decompresses received compressed messages automatically, so the data you read is still the original data. Sent data is not compressed. If the server does not support the extension, the connection is made without compression. Some exchanges, such as dYdX, require this option, and the handshake may fail without it (HTTP 426). |
+| WebSocket automatic reconnection parameter: reconnect=value | reconnect sets whether reconnection is enabled. reconnect=true enables it. If this parameter is not set, the connection does not reconnect by default. |
+| WebSocket automatic reconnection parameter: interval=value | interval sets the time between reconnection attempts, in milliseconds. For example, interval=10000 sets a retry interval of 10 seconds. If it is not set, the default is 1 second, which is interval=1000. |
+| WebSocket automatic reconnection parameter: payload=value | payload is the subscription message sent when the WebSocket reconnects, for example: payload=okok. |
+| socks5 proxy parameter: proxy=value | proxy sets the ss5 proxy. The value format is socks5://name:pwd@192.168.0.1:1080, where name is the ss5 server username, pwd is the ss5 server login password and 1080 is the ss5 server port. |
+| WebSocket receive buffer limit: qsize=value | qsize sets the maximum number of messages the receive buffer can hold. If it is not set, the default is 4096. |
+| WebSocket receive buffer limit: qbytes=value | qbytes sets the maximum number of bytes the receive buffer can hold. If it is not set, the default is 16777216 (16MB). |
 
-The ```Dial()``` function is only supported in live trading.
+The ```Dial()``` function is supported only in live trading.
 
-When using the Dial function to connect to a database, write the connection string as follows:
-
-| Supported databases | Connection String |
+When using the Dial function to connect to a database, the connection string format for each database is as follows:
+| Supported Database | Connection String |
 | - | - |
 | sqlite3 | sqlite3://test1.db |
 | mysql | mysql://username:yourpassword@tcp(localhost:3306)/yourdatabase?charset=utf8mb4&parseTime=true |
 | postgres | postgres://user=username password=yourpassword host=localhost port=5432 dbname=yourdatabase sslmode=disable |
 | clickhouse | clickhouse://tcp://localhost:9000?username=username&password=yourpassword&database=yourdatabase |
 
-Notes on each connection string:
+Notes on the connection string for each database:
 
-- sqlite3: The ```sqlite3://``` prefix indicates that the sqlite3 database is used. A database file with a relative path is located in the live trading directory (```logs/storage/<live trading ID>/```); ```sqlite3://:memory:``` is an in-memory database that creates no file, and its data is discarded when the connection is closed; URI forms such as ```sqlite3://file:test.db?cache=shared&mode=memory``` are also supported.
-- mysql: The part after ```mysql://``` is written the same way as a DSN of the Go MySQL driver (go-sql-driver/mysql). Parameters such as ```charset```, ```collation```, ```timeout```, ```readTimeout```, ```writeTimeout``` and ```tls``` (```true```, ```false```, ```skip-verify```, ```preferred```) take effect, and ```ssl-mode``` can also be used to configure TLS; ```parseTime``` and ```loc``` are only validated and have no effect; custom TLS config names are not supported; any other unrecognized parameter is treated as a session variable and ```SET name = value``` is executed after connecting. It can also be written in URL form: ```mysql://username:yourpassword@localhost:3306/yourdatabase```.
-- postgres: libpq key-value form, with items separated by spaces. ```sslmode``` follows libpq semantics: ```disable``` does not use TLS, ```require``` and similar modes use TLS without verifying the certificate, and only ```verify-ca``` and ```verify-full``` verify the certificate; parameters that read files, such as ```sslrootcert```, ```sslcert```, ```sslkey```, ```passfile``` and ```service```, are not supported; any other unrecognized parameter is set as a runtime parameter. It can also be written in URL form: ```postgres://username:yourpassword@localhost:5432/yourdatabase?sslmode=disable```.
-- clickhouse: The part after ```clickhouse://``` is written the same way as a DSN of the Go ClickHouse driver (clickhouse-go): ```tcp://``` uses the native TCP protocol (port 9000; TLS with port 9440 or the parameter ```secure=true```, and the certificate is not verified with ```skip_verify=true```), and ```http://``` or ```https://``` use the HTTP interface; any other unrecognized parameter is treated as a ClickHouse setting. It can also be written in URL form: ```clickhouse://username:yourpassword@localhost:9000/yourdatabase```, which uses the native TCP protocol by default; the ```clickhouse+http://``` and ```clickhouse+https://``` prefixes, or ports 8123 and 8443, use the HTTP interface.
+- sqlite3: The ```sqlite3://``` prefix indicates that a sqlite3 database is used. When a relative path is used, the database file is located in the live trading directory (```logs/storage/<实盘ID>/```); ```sqlite3://:memory:``` denotes an in-memory database, no file is created, and the data is discarded once the connection is closed; URI notation in the form ```sqlite3://file:test.db?cache=shared&mode=memory``` is also supported.
+- mysql: The part after ```mysql://``` uses the same DSN format as the Go MySQL driver (go-sql-driver/mysql). Parameters such as ```charset```, ```collation```, ```timeout```, ```readTimeout```, ```writeTimeout``` and ```tls``` (```true```, ```false```, ```skip-verify```, ```preferred```) are supported, and TLS can also be configured via ```ssl-mode```; ```parseTime``` and ```loc``` are only validated and have no effect; custom TLS configuration names are not supported; any other unrecognized parameters are treated as session variables, and ```SET 参数名 = 参数值``` is executed after the connection is established. The URL form can also be used: ```mysql://username:yourpassword@localhost:3306/yourdatabase```.
+- postgres: Uses the libpq key-value format, with items separated by spaces. ```sslmode``` follows libpq semantics: ```disable``` means TLS is not used, ```require``` and similar modes use TLS without verifying the certificate, and only ```verify-ca``` and ```verify-full``` verify the certificate; parameters that require reading files, such as ```sslrootcert```, ```sslcert```, ```sslkey```, ```passfile``` and ```service```, are not supported; any other unrecognized parameters are set as runtime parameters. The URL form can also be used: ```postgres://username:yourpassword@localhost:5432/yourdatabase?sslmode=disable```.
+- clickhouse: The part after ```clickhouse://``` uses the same DSN format as the Go ClickHouse driver (clickhouse-go): ```tcp://``` means the native TCP protocol is used (port 9000; TLS is used when the port is 9440 or the parameter ```secure=true``` is set, and the certificate is not verified when ```skip_verify=true``` is set); ```http://``` or ```https://``` can also be used to access the HTTP interface; any other unrecognized parameters are treated as ClickHouse settings. The URL form can also be used: ```clickhouse://username:yourpassword@localhost:9000/yourdatabase```, which uses the native TCP protocol by default; the HTTP interface is used when the ```clickhouse+http://``` or ```clickhouse+https://``` prefix is used, or when the port is 8123 or 8443.
 
-Parameters after ```|``` in ```address``` are joined with ```&``` and assigned with ```=```, so a ```payload``` containing characters such as ```=``` or ```&``` (for example a base64 signature or JSON) breaks the parsing. In that case do not put it in ```payload```; send the subscription message with ```write()``` after connecting.
+The parameters after ```|``` in ```address``` are separated by ```&``` and assigned with ```=```. Therefore, when the content of ```payload``` contains characters such as ```=``` or ```&``` (for example, a base64-encoded signature or JSON), parsing will be disrupted. In this case, do not put it in ```payload```; instead, send the subscription message with ```write()``` after the connection is established.
 
 See also: `Dial return object`, `HttpQuery`, `EventLoop`, `DBExec`, `threading.Serve`, `exchange.Encode`
 
