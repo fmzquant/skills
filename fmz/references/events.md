@@ -51,7 +51,7 @@ var pair = ctx.subscribe(0, {channel: "trade", symbol: ["BTC_USDT", "ETH_USDT"]}
     现货没有持仓，READY 后 `positions()` 是 `[]`。不是私有订阅、已退订都抛异常。
   - `sub.unsubscribe()`：退订；同一个对象重复调用是空操作。**只有订阅它的线程能退订**：stream id 全运行
     唯一，别的线程拿着同一个订阅对象/数字去退会抛异常（`… belongs to another thread …`），订阅保持有效。
-- 订阅身份 = `(ex, symbol, channel, depth, interval)`。**同一线程里**身份相同的订阅共用一条流（`id`
+- 订阅身份 = `(ex, symbol, channel, depth, interval, group)`。**同一线程里**身份相同的订阅共用一条流（`id`
   相同），引擎按**引用计数**管理：每次 `subscribe` 加一个引用，每个订阅对象的 `unsubscribe()` 退一个，
   最后一个退掉才真正向交易所退订——一处退订不会掐断别处还在用的同一路行情。任何一维不同就是另一路
   订阅、另一条流：同合约的 ticker 与 bbo 各一路，depth 5 与 depth 20 各一路（交易所不同档位推送频率

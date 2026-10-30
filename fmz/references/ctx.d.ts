@@ -513,7 +513,7 @@ declare interface ICtx {
     /** 订阅一个行情或账户私有流，立即返回订阅对象（可交给 ctx.poll 过滤）。**只有两参形式**：
      * symbol 写在 opts 里；第二参不是对象/参数个数不对/未知键/未知频道/行情频道缺 symbol 都抛异常。
      * 订阅属于调用它的线程（主线程或 threading worker），事件只投给这个线程。
-     * 同一线程里订阅身份 = (ex, symbol, channel, depth, interval) 相同的重复订阅回同一条流（引用计数）；
+     * 同一线程里订阅身份 = (ex, symbol, channel, depth, interval, group) 相同的重复订阅回同一条流（引用计数）；
      * 同合约的 ticker 与 bbo、depth 5 与 depth 20 是不同的订阅、不同的 stream。
      * 订阅被拒时，该订阅自己的流上来一条 kind "status"、prefillStatus=2 的事件（tickers 在交易所没有原生
      * 全市场流时也这样报 unsupported）。
