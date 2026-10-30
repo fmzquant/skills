@@ -1593,9 +1593,11 @@ class Subscription:
     """深度订阅的档数：0 为交易所默认档数，1–255 为订阅的档数。"""
     interval: int
     """K线周期，单位秒。"""
+    group: str
+    """订阅时传入的分组名（``""`` 为默认分组）。"""
 
     def info(self) -> dict[str, Any]:
-        """订阅身份的字典：``{id, ex, channel, symbol, depth, interval}``。"""
+        """订阅身份的字典：``{id, ex, channel, symbol, depth, interval, group}``。"""
         ...
 
     def book(self, n: Optional[int] = None) -> CtxRecord:
@@ -1643,7 +1645,7 @@ class CtxEvent(dict[str, Any]):
     ``clientId`` 为客户端订单号（``ctx.submit()`` 下的单就是它返回的 localId；推送没有时为 ``""``）；
     ``"ack"`` ``reqId op status ok id clientId error reason reasonText exchTime latencyMs``（``ctx.submit()`` 每一笔的结果，
     ``op`` 为 ``"order"`` / ``"cancel"``，``status`` 为 ``"ok"`` / ``"failed"`` / ``"unknown"``）；``"timer"`` ``timerId
-    scheduledNs``；``"gateway"`` ``status detail``；``"status"`` ``channelCode intervalSec prefillStatus``（1 就绪，2 失败）
+    scheduledNs``；``"gateway"`` ``status detail group``（``group`` 为订阅分组，``""`` 为默认分组）；``"status"`` ``channelCode intervalSec prefillStatus``（1 就绪，2 失败）
     ``detail message``。深度事件（``"depth"``）不带档位：用 ``ev.book(n)`` 读取。
     """
     kind: str
@@ -1670,6 +1672,7 @@ class _SubscribeOptions(TypedDict, total=False):
     interval: int
     mode: str
     buffer: int
+    group: str
 
 class _SubscribeBatchOptions(_SubscribeOptions):
     symbol: Union[list[str], tuple[str, ...]]
@@ -1742,11 +1745,12 @@ class Ctx:
 
         Args:
             ex: 交易所对象（``exchange``、``exchanges[1]``）或账户下标（整数或数字字符串）。
-            opts: ``{channel, symbol, depth, interval, mode, buffer}``。``channel``：``"ticker"``（默认）、``"bbo"``、
+            opts: ``{channel, symbol, depth, interval, mode, buffer, group}``。``channel``：``"ticker"``（默认）、``"bbo"``、
                 ``"depth"``、``"trade"``、``"kline"``、``"tickers"``（全市场，不传 symbol）或 ``"private"``（订单 +
                 成交 + 持仓 + 余额，不传 symbol）。``symbol``：行情频道必填，``ex`` 为交易所对象时可省略（取它当前的交易对）；
                 传列表为批量订阅。``depth``：档数，0（默认）或 1–255 的任意整数，每个档数一路订阅（超过 255 抛出异常，
-                超过交易所上限时收到 ``unsupported depth`` 失败事件）；``interval``：K线秒数；``mode: "latest"`` 或 ``buffer: N``。
+                超过交易所上限时收到 ``unsupported depth`` 失败事件）；``interval``：K线秒数；``mode: "latest"`` 或 ``buffer: N``；``group``：订阅分组名
+                （字符串，最多 32 字节，不传为默认分组），不同分组的订阅使用不同的连接，网关状态按分组推送；``private`` 不分组（传入抛出异常）。
 
         Returns:
             ``Subscription``；``symbol`` 为列表或元组时返回 ``SubscriptionList``（整批先校验）。参数不合法时抛出异常；

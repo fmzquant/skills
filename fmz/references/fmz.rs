@@ -2284,7 +2284,7 @@ pub mod ctx {
     impl From<Exchange> for ExIndex { fn from(_: Exchange) -> Self { todo!() } }
     impl From<&Exchange> for ExIndex { fn from(_: &Exchange) -> Self { todo!() } }
 
-    /// Subscription options (JS `{channel, symbol, depth, interval, mode, buffer}`).
+    /// Subscription options (JS `{channel, symbol, depth, interval, mode, buffer, group}`).
     #[derive(Clone, Default, Debug)]
     pub struct SubOpts {
         /// "ticker" / "bbo" / "trade" / "depth" / "kline" / "private" / "tickers".
@@ -2297,6 +2297,9 @@ pub mod ctx {
         pub latest: bool,
         /// Ring mode: bounded buffer of N events, oldest dropped (trade/kline default 1024).
         pub buffer: u32,
+        /// Subscription group (empty = the default group): groups do not share connections, gateway status is
+        /// reported per group ([`GatewayView::group`]). The private stream has no group.
+        pub group: String,
     }
     impl SubOpts {
         pub fn ticker() -> Self { todo!() }
@@ -2319,6 +2322,9 @@ pub mod ctx {
         pub fn latest(self) -> Self { todo!() }
         /// Ring delivery mode with `n` events (exclusive with [`Self::latest`]).
         pub fn buffer(self, n: u32) -> Self { todo!() }
+        /// Subscription group (at most 32 bytes): subscriptions of different groups use separate connections,
+        /// so one group reconnecting does not affect another.
+        pub fn group(self, group: impl Into<String>) -> Self { todo!() }
     }
 
     /// Subscription handle (`Copy`). Identical subscriptions in one thread share one
@@ -2523,12 +2529,14 @@ pub mod ctx {
     }
 
     /// Gateway status (kind "gateway").
-    #[derive(Clone, Copy, Debug, PartialEq)]
+    #[derive(Clone, Debug, PartialEq)]
     pub struct GatewayView {
         pub ex: u16,
         /// `GW_UP` / `GW_DOWN` / `GW_DEGRADED`.
         pub status: u8,
         pub detail: u64,
+        /// The subscription group this status covers ([`SubOpts::group`]; empty = the default group).
+        pub group: String,
         /// Ingress time (ms).
         pub time: f64,
     }

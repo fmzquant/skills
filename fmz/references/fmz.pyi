@@ -1619,9 +1619,11 @@ class Subscription:
     """Levels of a depth subscription: 0 = the exchange default, 1–255 = the subscribed levels."""
     interval: int
     """K-line period in seconds."""
+    group: str
+    """Subscription group given at subscribe time (``""`` = the default group)."""
 
     def info(self) -> dict[str, Any]:
-        """The identity as a dict: ``{id, ex, channel, symbol, depth, interval}``."""
+        """The identity as a dict: ``{id, ex, channel, symbol, depth, interval, group}``."""
         ...
 
     def book(self, n: Optional[int] = None) -> CtxRecord:
@@ -1674,7 +1676,7 @@ class CtxEvent(dict[str, Any]):
     ``ctx.submit()`` the localId it returned; ``""`` when the push has none); ``"ack"`` ``reqId op status ok id clientId
     error reason reasonText exchTime latencyMs`` (the result of each ``ctx.submit()`` item; ``op`` is ``"order"`` /
     ``"cancel"``, ``status`` is ``"ok"`` / ``"failed"`` / ``"unknown"``); ``"timer"`` ``timerId scheduledNs``;
-    ``"gateway"`` ``status detail``; ``"status"`` ``channelCode intervalSec prefillStatus`` (1 READY, 2 FAILED) ``detail
+    ``"gateway"`` ``status detail group`` (``group``: the subscription group, ``""`` = default); ``"status"`` ``channelCode intervalSec prefillStatus`` (1 READY, 2 FAILED) ``detail
     message``. Depth events (``"depth"``) carry no levels: read them with ``ev.book(n)``.
     """
     kind: str
@@ -1701,6 +1703,7 @@ class _SubscribeOptions(TypedDict, total=False):
     interval: int
     mode: str
     buffer: int
+    group: str
 
 class _SubscribeBatchOptions(_SubscribeOptions):
     symbol: Union[list[str], tuple[str, ...]]
@@ -1774,13 +1777,15 @@ class Ctx:
 
         Args:
             ex: Exchange object (``exchange``, ``exchanges[1]``) or account index (an int or digit string).
-            opts: ``{channel, symbol, depth, interval, mode, buffer}``. ``channel``: ``"ticker"`` (default),
+            opts: ``{channel, symbol, depth, interval, mode, buffer, group}``. ``channel``: ``"ticker"`` (default),
                 ``"bbo"``, ``"depth"``, ``"trade"``, ``"kline"``, ``"tickers"`` (whole market, no symbol) or
                 ``"private"`` (orders + fills + positions + balances, no symbol). ``symbol``: required for market
                 data unless ``ex`` is an exchange object (its current pair); a list subscribes a batch. ``depth``:
                 levels, 0 (default) or any integer 1–255, each its own subscription (above 255 raises; above the
                 exchange's maximum gets an ``unsupported depth`` FAILED event); ``interval``: K-line seconds;
-                ``mode: "latest"`` or ``buffer: N``.
+                ``mode: "latest"`` or ``buffer: N``; ``group``: subscription group name (string, at most 32 bytes,
+                default group when omitted): subscriptions of different groups use separate connections and
+                gateway status is reported per group; ``private`` takes no group (raises).
 
         Returns:
             ``Subscription``; a ``SubscriptionList`` when ``symbol`` is a list or tuple (validated as a whole).
