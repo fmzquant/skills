@@ -243,13 +243,15 @@ declare interface IFillEvent extends IEventBase {
 }
 
 /** 网关状态（kind "gateway"，type "status"，channel "gateway"，stream = STREAM_STATUS）：status 1=UP 2=DOWN
- * 3=DEGRADED。广播给在该交易所有订阅的每个线程。`time` 同 ts。 */
+ * 3=DEGRADED。按交易所 + 订阅分组汇总，广播给在该交易所有订阅的每个线程。`time` 同 ts。 */
 declare interface IGatewayEvent extends IEventBase {
     kind: "gateway";
     type: "status";
     channel: "gateway";
     status: number;
     detail: number;
+    /** 这条状态对应的订阅分组（ISubOpts.group；默认分组为 ""）。 */
+    group: string;
 }
 /** @deprecated 旧名，同 IGatewayEvent。 */
 declare type IStatusEvent = IGatewayEvent;
@@ -347,6 +349,10 @@ declare interface ISubOpts {
     mode?: "latest";
     /** 投递模式：有界数组，溢出丢最旧（trade/kline 默认 1024）。与 mode 二选一。 */
     buffer?: number;
+    /** 订阅分组（至多 32 字节，缺省 = 默认分组 ""）：不同组的订阅不共用连接，一组断线重连不影响另一组；
+     * 网关状态按组报告（IGatewayEvent.group）。同一路订阅放在两个组里是两路。private 不收 group；
+     * 只有一条连接的交易所（CTP 等）忽略它。 */
+    group?: string;
 }
 
 /** 批量订阅的选项：symbol 是数组（每个元素一路独立订阅）。 */
@@ -357,7 +363,7 @@ declare interface ISubOptsBatch extends Omit<ISubOpts, "symbol"> {
 /**
  * ctx.subscribe 返回的订阅对象。身份字段只读；JSON.stringify(sub) 只含身份字段。
  * 订阅属于调用 ctx.subscribe 的线程（主线程或 threading worker）：它的事件只投给这个线程。
- * 同一线程里身份 (ex, symbol, channel, depth, interval) 相同的订阅共用一条流（id 相同、引用计数）；
+ * 同一线程里身份 (ex, symbol, channel, depth, interval, group) 相同的订阅共用一条流（id 相同、引用计数）；
  * 别的线程订同一身份是它自己的另一条流（共用一路上游，各收一份）。
  */
 declare interface ISubscription {
@@ -367,6 +373,8 @@ declare interface ISubscription {
     readonly symbol: string;
     readonly depth: number;
     readonly interval: number;
+    /** 订阅分组（默认分组为 ""）。 */
+    readonly group: string;
     /** 这一路深度订阅自己的订单簿前 n 档（n 缺省 = 订阅档数；还没收到快照时两边为空）。
      * 不是深度订阅、已退订都抛异常。 */
     book(n?: number): IBook;

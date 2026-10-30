@@ -466,7 +466,9 @@ ack = ctx.poll([ctx.STREAM_ORDER_ACK], 5000)
 
 ## 网关状态（kind `"gateway"`，type: "status"，channel: "gateway"，内建 STREAM_STATUS）
 
-`status`：1=UP 2=DOWN 3=DEGRADED；`detail`：适配器自定义码；`time` 同 `ts`。
+`status`：1=UP 2=DOWN 3=DEGRADED；`detail`：适配器自定义码；`group`：这条状态汇总的订阅分组
+（`ctx.subscribe` 的 `group`，默认分组为 `""`；连接器按组分别汇总、分别发，不支持分组的连接器恒为 `""`）；
+`time` 同 `ts`。
 
 ## 引擎定时器（kind `"timer"`，type: "timer"，channel: "timer"，内建 STREAM_TIMER）
 

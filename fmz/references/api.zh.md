@@ -12363,31 +12363,31 @@ See also: `Dial`, `exchange.Go`, `HttpQuery_Go`, `ctx.poll`
 ctx.subscribe(ex, options)
 ```
 
-订阅WebSocket推送：品种行情、全市场ticker或账户私有流，返回`Subscription`对象。可订阅某个品种的ticker、最优买卖价、订单簿、逐笔成交、K线，整个市场的ticker，或整个账户的订单回报、成交回报、持仓、余额；```symbol```传数组时一次订阅多个品种，返回订阅对象数组。事件用`ctx.poll`取出，按事件的```channel```分别处理。订阅属于调用它的线程，主线程和```threading.Thread()```创建的线程都可以订阅。
+订阅WebSocket推送，可订阅品种行情、全市场ticker或账户私有数据流，返回`Subscription`对象。支持订阅单个品种的ticker、最优买卖价、订单簿、逐笔成交和K线，整个市场的ticker，以及整个账户的订单回报、成交回报、持仓和余额。```symbol```传入数组时，一次订阅多个品种，并返回订阅对象数组。事件通过`ctx.poll`取出，再按事件的```channel```分别处理。订阅归属于调用它的线程，主线程和```threading.Thread()```创建的线程都可以订阅。
 
 Parameters:
 
-- `ex` (object / number, required): 要订阅的账户：交易所对象（```exchange```、```exchanges[1]```等），或账户在```exchanges```数组中的下标（```0```表示```exchanges[0]```，也可传入数字字符串```"0"```）。不支持传入账户标签。
-- `options` (object, required): 订阅选项```{channel, symbol, depth, interval, mode, buffer}```，仅支持此格式，品种也通过此对象指定；```symbol```为数组时执行批量订阅。字段说明见下文。
+- `ex` (object / number, required): 要订阅的账户，可以是交易所对象（```exchange```、```exchanges[1]```等），也可以是该账户在```exchanges```数组中的索引（```0```对应```exchanges[0]```，也可以传入数字字符串```"0"```）。不支持传入账户标签。
+- `options` (object, required): 订阅选项```{channel, symbol, depth, interval, mode, buffer, group}```。只支持这一种写法，品种也在这里指定。```symbol```传入数组时为批量订阅。各字段的说明见下文。
 
-Returns (`Subscription`对象 / `Subscription`数组): 订阅对象：```id```（事件流ID，即此订阅事件的```ev.stream```）、```ex```、```channel```、```symbol```、```depth```、```interval```，以及```book()```、```positions()```、```balances()```、```unsubscribe()```方法，可直接传给```ctx.poll()```以仅获取此订阅的事件。```options.symbol```为数组时返回与输入品种顺序一致的订阅对象数组。
+Returns (`Subscription`对象 / `Subscription`数组): 订阅对象，包含```id```（事件流ID，即该订阅所产生事件的```ev.stream```）、```ex```、```channel```、```symbol```、```depth```、```interval```、```group```属性，以及```book()```、```positions()```、```balances()```、```unsubscribe()```方法。可以直接传给```ctx.poll()```，只取出该订阅的事件。```options.symbol```为数组时，返回与其顺序一致的订阅对象数组。
 
-使用交易所对象订阅当前交易对的ticker和20档订单簿，同时订阅账户私有事件流，并按```channel```分别处理。
+使用交易所对象订阅当前交易对的ticker和20档订单簿，同时订阅账户私有流，并按```channel```分别处理各类事件。
 
 ```javascript
 function main() {
     // 第一个参数传入交易所对象；行情频道未指定symbol时，使用该交易所对象当前的交易对
     var tk = ctx.subscribe(exchange, {channel: "ticker"})
     var book = ctx.subscribe(exchange, {channel: "depth", depth: 20})
-    // 私有流不指定symbol，覆盖整个账户：订单回报、成交回报、持仓和余额均通过该流推送
+    // 私有流不指定symbol，覆盖整个账户：订单回报、成交回报、持仓和余额均通过这一路推送
     var acct = ctx.subscribe(exchange, {channel: "private"})
     Log("subscribed:", JSON.stringify(tk), JSON.stringify(book), JSON.stringify(acct))
     while (true) {
-        var ev = ctx.poll([], 1000)    // []表示本线程订阅的全部事件流，最多等待1秒
+        var ev = ctx.poll([], 1000)    // []表示本线程订阅的全部事件流，最长等待1秒
         if (!ev) {
             continue
         }
-        if (ev.type === "status") {    // 网关状态、初始化状态事件需优先判断，它们的channel可能与数据事件相同
+        if (ev.type === "status") {    // 网关状态、初始化状态事件需优先判断，其channel可能与数据事件相同
             if (ev.kind === "status" && ev.channel === "private") {
                 Log("account snapshot ready:", ev.prefillStatus === 1, ev.message)
             }
@@ -12414,11 +12414,11 @@ def main():
     # 第一个参数传入交易所对象；行情频道未指定symbol时，使用该交易所对象当前的交易对
     tk = ctx.subscribe(exchange, {"channel": "ticker"})
     book = ctx.subscribe(exchange, {"channel": "depth", "depth": 20})
-    # 私有流不指定symbol，覆盖整个账户：订单回报、成交回报、持仓和余额均通过该流推送
+    # 私有流不指定symbol，覆盖整个账户：订单回报、成交回报、持仓和余额均通过这一路推送
     acct = ctx.subscribe(exchange, {"channel": "private"})
     Log("subscribed:", tk.info(), book.info(), acct.info())
     while True:
-        ev = ctx.poll([], 1000)        # []表示本线程订阅的全部事件流，最多等待1秒
+        ev = ctx.poll([], 1000)        # []表示本线程订阅的全部事件流，最长等待1秒
         if ev is None:
             continue
         if ev.type == "status":        # 网关状态、初始化状态事件需优先判断
@@ -12432,7 +12432,7 @@ def main():
             if b["bids"] and b["asks"]:
                 Log("bid1:", b["bids"][0][0], "ask1:", b["asks"][0][0])
         elif ev.channel == "fills":
-            # 交易所未提供手续费时，事件中不含fee字段
+            # 交易所未返回手续费时，事件中不含fee字段
             Log("fill", ev.orderId, ev.side, ev.px, ev.qty, "fee:", ev.get("fee"), ev.feeCcy)
         elif ev.channel == "orders":
             Log("order", ev.id, ev.state, "filled:", ev.filledQty, "/", ev.qty)
@@ -12442,7 +12442,7 @@ def main():
 use sdk::ctx::EventExt;
 
 fn main() {
-    // 交易所对象作为第一个参数：行情频道未指定symbol时，使用其当前的交易对
+    // 交易所对象作为第一个参数；行情频道未指定symbol时，使用其当前的交易对
     let book = ctx::subscribe(exchange, ctx::SubOpts::depth(20)).unwrap();
     let acct = ctx::subscribe(exchange, ctx::SubOpts::private()).unwrap();
     loop {
@@ -12473,11 +12473,11 @@ fn main() {
 }
 ```
 
-批量订阅三个品种的逐笔成交：返回订阅对象数组，将整个数组传给```ctx.poll()```，统计1分钟内各品种的成交笔数后统一退订。
+批量订阅三个品种的逐笔成交：返回订阅对象数组，将整个数组传给```ctx.poll()```，统计1分钟内各品种的成交笔数，最后一次性全部退订。
 
 ```javascript
 function main() {
-    // symbol传入数组时，返回与其顺序一致的订阅对象数组；只要有一个品种不合法，整批均不订阅
+    // symbol传入数组：返回与之同序的订阅对象数组；只要有一个品种不合法，整批均不订阅
     var symbols = ["BTC_USDT", "ETH_USDT", "SOL_USDT"]
     var subs = ctx.subscribe(exchange, {channel: "trade", symbol: symbols})
     subs.forEach(function(s) {
@@ -12486,18 +12486,18 @@ function main() {
     var count = {}
     var t0 = Date.now()
     while (Date.now() - t0 < 60000) {
-        var ev = ctx.poll(subs, 1000)    // 订阅对象数组可直接传给ctx.poll
+        var ev = ctx.poll(subs, 1000)    // 数组可直接传给ctx.poll
         if (!ev) {
             continue
         }
         if (ev.kind === "status" && ev.prefillStatus === 2) {
-            Log("subscription failed:", ev.symbol, ev.message)   // 仅该品种订阅失败，其余品种不受影响
+            Log("subscription failed:", ev.symbol, ev.message)   // 仅这一路订阅失败
         } else if (ev.kind === "trade") {
             count[ev.symbol] = (count[ev.symbol] || 0) + 1
         }
     }
     Log("trades in 60 seconds:", count)
-    subs.unsubscribe()                   // 一次性退订数组中的全部订阅
+    subs.unsubscribe()                   // 一次性退订全部元素
 }
 ```
 
@@ -12505,7 +12505,7 @@ function main() {
 import time
 
 def main():
-    # symbol传入列表时，返回顺序一致的SubscriptionList；只要有一个品种不合法，整批均不订阅
+    # symbol传入列表：返回同序的SubscriptionList；只要有一个品种不合法，整批均不订阅
     symbols = ["BTC_USDT", "ETH_USDT", "SOL_USDT"]
     subs = ctx.subscribe(exchange, {"channel": "trade", "symbol": symbols})
     for s in subs:
@@ -12521,7 +12521,7 @@ def main():
         elif ev.kind == "trade":
             count[ev.symbol] = count.get(ev.symbol, 0) + 1
     Log("trades in 60 seconds:", count)
-    subs.unsubscribe()                     # 一次性退订列表中的全部订阅
+    subs.unsubscribe()                     # 一次性退订全部元素
 ```
 
 ```rust
@@ -12530,7 +12530,7 @@ use std::collections::HashMap;
 
 fn main() {
     let symbols = ["BTC_USDT", "ETH_USDT", "SOL_USDT"];
-    // 返回与symbols顺序一致的句柄；只要有一个品种不合法，整批返回Err
+    // 返回与symbols同序的句柄；只要有一个品种不合法，整批返回Err
     let subs = ctx::subscribe_many(exchange, ctx::SubOpts::trade(), &symbols).unwrap();
     let ids: Vec<u32> = subs.iter().map(|s| s.id()).collect();
     let mut count: HashMap<u32, u64> = HashMap::new();
@@ -12551,17 +12551,17 @@ fn main() {
 }
 ```
 
-在线程中订阅：工作线程独立订阅两个交易品种的订单簿，事件仅分发给该线程；主线程订阅自己的ticker，两者互不干扰。
+在线程中订阅：子线程自行订阅两个品种的订单簿，相应事件仅投递给该线程；主线程订阅自身的ticker，两者互不干扰。
 
 ```javascript
 function main() {
     var t = threading.Thread(function(symbols, ms) {
-        // 在线程中订阅，这两路订阅的事件只投递给本线程
+        // 在线程中订阅，这两路事件仅投递给本线程
         var subs = ctx.subscribe(0, {channel: "depth", symbol: symbols, depth: 5})
         var n = 0
         var t0 = Date.now()
         while (Date.now() - t0 < ms) {
-            var ev = ctx.poll([], 1000)          // 只获取本线程订阅的事件
+            var ev = ctx.poll([], 1000)          // 仅获取本线程订阅的事件
             if (ev && ev.kind === "depth") {
                 var b = ev.book(1)
                 if (b.bids.length > 0 && b.asks.length > 0) {
@@ -12570,14 +12570,14 @@ function main() {
                 n++
             }
         }
-        subs.unsubscribe()                       // 只能在创建该订阅的线程中退订
+        subs.unsubscribe()                       // 只能在发起订阅的线程中退订
         return n
-    }, ["ETH_USDT" , "SOL_USDT"], 30000)
+    }, ["ETH_USDT", "SOL_USDT"], 30000)
 
-    var tk = ctx.subscribe(0, {channel: "ticker" , symbol: "BTC_USDT"})
+    var tk = ctx.subscribe(0, {channel: "ticker", symbol: "BTC_USDT"})
     var t0 = Date.now()
     while (Date.now() - t0 < 30000) {
-        var ev = ctx.poll([], 1000)              // 获取不到子线程订阅的深度事件
+        var ev = ctx.poll([], 1000)              // 无法获取子线程订阅的深度事件
         if (ev && ev.kind === "ticker") {
             Log("main", ev.symbol, "last:", ev.last)
         }
@@ -12592,24 +12592,24 @@ import threading
 import time
 
 def depth_worker(symbols, seconds):
-    # 在线程中订阅，这两路订阅的事件只投递给本线程
-    subs = ctx.subscribe(0, {"channel": "depth" , "symbol": symbols, "depth": 5})
+    # 在线程中订阅，这两路事件仅投递给本线程
+    subs = ctx.subscribe(0, {"channel": "depth", "symbol": symbols, "depth": 5})
     t0 = time.time()
     while time.time() - t0 < seconds:
-        ev = ctx.poll([], 1000)              # 只获取本线程订阅的事件
+        ev = ctx.poll([], 1000)              # 仅获取本线程订阅的事件
         if ev is not None and ev.kind == "depth":
             b = ev.book(1)
             if b["bids"] and b["asks"]:
-                Log("thread" , ev.symbol, "bid1:", b["bids"][0][0], "ask1:", b["asks"][0][0])
+                Log("thread", ev.symbol, "bid1:", b["bids"][0][0], "ask1:", b["asks"][0][0])
     subs.unsubscribe()                       # 线程结束时也会自动退订
 
 def main():
-    t = threading.Thread(target=depth_worker, args=(["ETH_USDT", "SOL_USDT" ], 30))
+    t = threading.Thread(target=depth_worker, args=(["ETH_USDT", "SOL_USDT"], 30))
     t.start()
     tk = ctx.subscribe(0, {"channel": "ticker", "symbol": "BTC_USDT"})
     t0 = time.time()
     while time.time() - t0 < 30:
-        ev = ctx.poll([], 1000)              # 获取不到子线程订阅的深度事件
+        ev = ctx.poll([], 1000)              # 无法获取子线程订阅的深度事件
         if ev is not None and ev.kind == "ticker":
             Log("main", ev.symbol, "last:", ev.last)
     tk.unsubscribe()
@@ -12621,20 +12621,20 @@ use sdk::ctx::{EventExt, Kind};
 
 fn main() {
     let worker = std::thread::spawn(|| {
-        // 在线程中订阅，这两路订阅的事件只投递给本线程
+        // 在线程中订阅，这两路事件仅投递给本线程
         let symbols = ["ETH_USDT", "SOL_USDT"];
         let subs = ctx::subscribe_many(0u16, ctx::SubOpts::depth(5), &symbols).unwrap();
         let mut n = 0u64;
         let t0 = Unix();
         while Unix() - t0 < 30 {
-            match ctx::poll(&[], Some(1000)) {           // 只获取本线程订阅的事件
+            match ctx::poll(&[], Some(1000)) {           // 仅获取本线程订阅的事件
                 ctx::Polled::Event(ev) if ev.event_kind() == Kind::Depth => n += 1,
                 ctx::Polled::Stopped => break,
                 _ => {}
             }
         }
         for s in subs {
-            let _ = s.unsubscribe();                     // 只能在创建该订阅的线程中退订
+            let _ = s.unsubscribe();                     // 只能在发起订阅的线程中退订
         }
         n
     });
@@ -12652,7 +12652,7 @@ fn main() {
 }
 ```
 
-订阅全市场ticker：通过单路订阅接收交易所全部品种的ticker，10秒后统计已接收行情的品种数；交易所不支持时通过该订阅接收表示失败的状态事件。
+订阅全市场ticker：通过一路订阅接收交易所全部品种的ticker，10秒后统计收到的品种数量；若交易所不支持全市场推送，该订阅会收到一个表示失败的状态事件。
 
 ```javascript
 function main() {
@@ -12670,7 +12670,7 @@ function main() {
             return
         }
         if (ev.kind === "ticker") {
-            last[ev.symbol] = ev.last                    // symbol为该条ticker所属的品种
+            last[ev.symbol] = ev.last                    // symbol为该条ticker对应的品种
         }
     }
     Log("symbols:", Object.keys(last).length, "BTC_USDT last:", last["BTC_USDT"])
@@ -12694,7 +12694,7 @@ def main():
             Log("tickers not supported:", ev.message)    # 交易所不支持全市场推送
             return
         if ev.kind == "ticker":
-            last[ev.symbol] = ev.last                    # symbol为该条ticker所属的品种
+            last[ev.symbol] = ev.last                    # symbol为该条ticker对应的品种
     Log("symbols:", len(last), "BTC_USDT last:", last.get("BTC_USDT"))
     all_tickers.unsubscribe()
 ```
@@ -12717,7 +12717,7 @@ fn main() {
                         return;
                     }
                 } else if let Some(t) = ev.ticker() {
-                    last.insert(t.symbol, t.last);                     // symbol为该条ticker所属的品种
+                    last.insert(t.symbol, t.last);                    // symbol为该条ticker对应的品种
                 }
             }
             ctx::Polled::Stopped => return,
@@ -12729,16 +12729,16 @@ fn main() {
 }
 ```
 
-相同订阅共用一个事件流：两个订阅对象的```id```相同，其中一个退订后另一个仍可收到事件。
+同一路订阅共用一个事件流：两个订阅对象的```id```相同，其中一个退订后，另一个仍能继续收到事件。
 
 ```javascript
 function main() {
     var a = ctx.subscribe(0, {channel: "trade", symbol: "BTC_USDT"})
     var b = ctx.subscribe(0, {channel: "trade", symbol: "BTC_USDT"})
     var c = ctx.subscribe(0, {channel: "ticker", symbol: "BTC_USDT"})
-    Log("a.id:", a.id, "b.id:", b.id, "c.id:", c.id)   // a.id与b.id相同，c.id不同
+    Log("a.id:", a.id, "b.id:", b.id, "c.id:", c.id)   // a.id与b.id相同，而c.id不同
 
-    a.unsubscribe()    // b仍引用这路订阅，成交推送不会中断
+    a.unsubscribe()    // b仍持有引用，这一路成交推送不会中断
     var n = 0
     while (n < 10) {
         var ev = ctx.poll(b, 5000)
@@ -12751,7 +12751,7 @@ function main() {
             n++
         }
     }
-    b.unsubscribe()    // 释放最后一个引用，此时才真正向交易所退订
+    b.unsubscribe()    // 已是最后一个引用，此时才会向交易所退订
     c.unsubscribe()
 }
 ```
@@ -12761,9 +12761,9 @@ def main():
     a = ctx.subscribe(0, {"channel": "trade", "symbol": "BTC_USDT"})
     b = ctx.subscribe(0, {"channel": "trade", "symbol": "BTC_USDT"})
     c = ctx.subscribe(0, {"channel": "ticker", "symbol": "BTC_USDT"})
-    Log("a.id:", a.id, "b.id:", b.id, "c.id:", c.id)   # a.id与b.id相同，c.id不同
+    Log("a.id:", a.id, "b.id:", b.id, "c.id:", c.id)   # a.id与b.id相同，而c.id不同
 
-    a.unsubscribe()    # b仍引用这路订阅，成交推送不会中断
+    a.unsubscribe()    # b仍持有引用，这一路成交推送不会中断
     n = 0
     while n < 10:
         ev = ctx.poll(b, 5000)
@@ -12773,11 +12773,11 @@ def main():
         if ev.kind == "trade":
             Log("trade", ev.tradeId, ev.side, ev.px, ev.qty)
             n += 1
-    b.unsubscribe()    # 释放最后一个引用，此时才真正向交易所退订
+    b.unsubscribe()    # 已是最后一个引用，此时才会向交易所退订
     c.unsubscribe()
 ```
 
-处理被交易所拒绝的订阅：订阅不受支持的K线周期时不会抛出异常，失败原因通过该订阅自身的事件流报告。
+处理被交易所拒绝的订阅：订阅不支持的K线周期时不会抛出异常，失败原因会通过该路订阅自身的事件流上报。
 
 ```javascript
 function main() {
@@ -12818,7 +12818,7 @@ def main():
             Log("closed bar", _D(ev.openTimeMs), ev.close)
 ```
 
-支持任意档数的深度订阅：7档订阅使用交易所支持且能覆盖7档的最小原生档位、截断至7档后推送；超过```255```档立即抛出异常，超过交易所上限时该订阅会收到表示失败的状态事件。
+任意档数的深度订阅：订阅7档时，使用交易所能覆盖7档的最小原生档位，并截断为7档推送；超过```255```档时当场抛出异常；超过交易所上限时，该路订阅会收到失败状态事件。
 
 ```javascript
 function main() {
@@ -12839,7 +12839,7 @@ function main() {
             break
         }
         if (ev.kind === "depth") {
-            var b = ev.book()          // 不传n时，返回订阅的档数
+            var b = ev.book()          // 不传n时返回订阅的档数
             Log("levels:", b.bids.length, b.asks.length)
             n++
         }
@@ -12864,7 +12864,7 @@ def main():
             Log("depth 7 subscription failed:", ev.message)      # 例如交易所不支持该档数
             break
         if ev.kind == "depth":
-            b = ev.book()              # 不传n时，返回订阅的档数
+            b = ev.book()              # 不传n时返回订阅的档数
             Log("levels:", len(b["bids"]), len(b["asks"]))
             n += 1
     d7.unsubscribe()
@@ -12905,77 +12905,89 @@ fn main() {
 | 字段 | 说明 |
 | - | - |
 | channel | 频道：```ticker```（默认）、```bbo```（最优买卖价）、```depth```（订单簿）、```trade```（逐笔成交）、```kline```（K线）、```tickers```（全市场ticker）、```private```（账户私有流） |
-| symbol | 品种代码，例如```BTC_USDT```、```BTC_USDT.swap```，或品种代码数组（批量订阅）。行情频道必填；```ex```传入交易所对象时可以省略，使用该交易所对象当前的交易对。```tickers```、```private```频道不传入此字段 |
-| depth | ```depth```频道的档数：不传入或传入```0```时使用交易所的默认档数，```1```到```255```之间的任意整数表示所需档数，详见下文 |
-| interval | ```kline```频道的周期，单位为秒，例如```60``` |
-| mode | 设为```latest```时仅保留最新一条事件，未及时读取的旧事件会被覆盖 |
-| buffer | 有界缓冲区的事件容量（正整数），溢出时丢弃最旧的事件 |
+| symbol | 品种代码，例如```BTC_USDT```、```BTC_USDT.swap```；也可以传品种代码数组（批量订阅）。行情频道必填；```ex```传入交易所对象时可以省略，此时使用该交易所对象当前的交易对。```tickers```、```private```频道不传此字段 |
+| depth | ```depth```频道的档数：不传或传```0```时使用交易所的默认档数；传```1```到```255```之间的整数时为所需档数，见下文 |
+| interval | ```kline```频道的K线周期，单位为秒，例如```60``` |
+| mode | 设为```latest```时只保留最新一条事件，来不及取走的旧事件会被覆盖 |
+| buffer | 有界缓冲区的容量（条数，正整数），溢出时丢弃最旧的事件 |
+| group | 分组名（字符串，最多32字节），不传时使用默认分组。不同分组的订阅使用不同的连接，见下文 |
 
-品种代码格式见`品种代码`。```ex```传入交易所对象、且行情频道未传入```symbol```时，使用调用```ctx.subscribe()```时该交易所对象的交易对，期货品种包含合约类型（例如```BTC_USDT.swap```）；之后调用```exchange.SetCurrency()```、```exchange.SetContractType()```不会改变已有的订阅。```ex```传入下标时不会自动补全```symbol```；```tickers```（整个市场）和```private```（整个账户）频道始终不传入```symbol```。
+品种写法见`品种代码`。```ex```传入交易所对象且行情频道未传```symbol```时，使用调用```ctx.subscribe()```那一刻该交易所对象的交易对，期货还包含合约类型（例如```BTC_USDT.swap```）；之后再调用```exchange.SetCurrency()```、```exchange.SetContractType()```不会改变已有的订阅。```ex```传入下标时不会自动补全```symbol```；```tickers```（整个市场）和```private```（整个账户）频道始终不带```symbol```。
 
-```symbol```传入数组时执行批量订阅，一次调用可订阅多个品种：
+```symbol```传入数组时为批量订阅，一次调用即可订阅多个品种：
 
-- 返回与输入数组顺序一致的订阅对象数组，输入数组仅包含一个元素时也返回数组；```symbol```为字符串时仍返回单个订阅对象。
-- 首先校验整批订阅：任一品种或选项不合法，整批订阅即抛出异常，不创建任何订阅。
-- 校验通过后每个元素都对应一路独立订阅，拥有各自的```id```、订单簿和引用计数；交易所拒绝其中一个品种时，仅对应的订阅收到失败状态事件，其余订阅正常推送。
-- 数组提供```unsubscribe()```方法（不可枚举），可一次退订全部元素；数组可以直接传给```ctx.poll()```。
+- 返回与数组顺序一致的订阅对象数组，即使数组只有一个元素也返回数组；```symbol```为字符串时仍返回单个订阅对象。
+- 整批先统一校验：任一品种或选项不合法时，整批抛出异常，所有品种均不订阅。
+- 校验通过后，每个元素都是一路独立的订阅，拥有各自的```id```、订单簿和引用计数；交易所拒绝其中某个品种时，只有该路订阅收到失败的状态事件，其他订阅照常推送。
+- 返回的数组带有```unsubscribe()```方法（不可枚举），调用一次即可退订全部元素；该数组也可以直接传给```ctx.poll()```。
 
-订阅的唯一性由账户、```symbol```、```channel```、```depth```、```interval```共同决定：
+订阅的身份由账户、```symbol```、```channel```、```depth```、```interval```共同决定：
 
-- 同一线程中上述参数完全相同的订阅共用一路事件流，返回的订阅对象的```id```相同。托管组件按引用计数管理订阅：每调用一次```ctx.subscribe()```增加一个引用，每个订阅对象调用一次```unsubscribe()```减少一个引用，最后一个引用释放时才真正向交易所退订，因此一处退订不会中断其他位置仍在使用的同一路订阅。
-- 任一参数不同即对应另一路订阅、另一个事件流：同一品种的```ticker```与```bbo```是两路订阅；```depth```为```5```与```20```时也是两路订阅，各自维护独立的订单簿（交易所对不同档数的推送频率可能不同，托管组件不会将其合并为最大档数）。
-- 事件流ID在单次运行期间只增不减、不会复用，全部退订后重新订阅会获得新的ID。
+- 同一线程内身份完全相同的订阅共用一路事件流，返回的订阅对象```id```相同。托管者按引用计数管理：每调用一次```ctx.subscribe()```增加一个引用，每个订阅对象调用一次```unsubscribe()```减少一个引用，最后一个引用释放时才真正向交易所退订，因此一处退订不会中断其他地方仍在使用的同一路订阅。
+- 任何一项不同即为另一路订阅、另一个事件流：同一品种的```ticker```与```bbo```是两路订阅；```depth```为```5```与```20```也是两路订阅，各自维护一份订单簿（交易所对不同档数的推送频率可能不同，托管者不会将其合并为最大档数）。
+- 事件流ID在一次运行中单调递增、不会复用，全部退订后再次订阅会得到新的ID。
 
-订阅归属于调用```ctx.subscribe()```的线程。主线程、```threading.Thread()```创建的线程（```Python```为标准库的```threading.Thread```，```Rust```为任意线程）均可订阅和读取事件：
+订阅归属于调用```ctx.subscribe()```的线程。主线程和```threading.Thread()```创建的线程（```Python```中为标准库的```threading.Thread```，```Rust```中为任意线程）都可以订阅和获取事件：
 
-- 该订阅的事件仅投递给创建订阅的线程，```ctx.poll()```仅读取当前线程所订阅的事件。若需多个线程分别接收事件，应在各线程中分别创建所需的订阅。
-- 不同线程创建上述参数相同的订阅时，仅向交易所订阅一次，订单簿、K线缓存、账户状态也仅维护一份；但每个线程获得独立的订阅对象（```id```不同）和各自的一份事件，投递模式相互独立，单个线程读取缓慢不会影响其他线程。所有线程均退订后才真正向交易所退订。
-- 后续线程订阅已经在推送的K线时，会先补收已缓存的K线（```prefill```为```true```）和最近一条初始化状态事件；私有流同理，账户快照已就绪时会立即补收全部快照和就绪事件，```positions()```、```balances()```随即可读取。其他频道从下一条推送开始接收。
-- 仅创建订阅的线程可以退订：其他线程调用该订阅对象的```unsubscribe()```会抛出异常，订阅保持有效。线程结束时会自动退订其全部订阅，其他线程共用的同一路订阅不受影响。
-- 网关状态事件会发送给在该交易所存在订阅的每个线程；定时器事件仅发送给主线程。
+- 某路订阅的事件只投递给订阅它的线程，```ctx.poll()```也只获取本线程自己订阅的事件。若要让多个线程分别接收各自的数据，请在每个线程中分别订阅所需的几路。
+- 不同线程订阅身份相同的内容时，交易所只订阅一次，订单簿、K线缓存和账户状态也只保留一份；但每个线程会得到自己的订阅对象（```id```不同）和独立的一份事件，投递模式相互独立，某个线程取事件较慢不会影响其他线程。所有线程都退订后，才真正向交易所退订。
+- 后订阅的线程订阅一路已在推送的K线时，会先补收已缓存的K线（```prefill```为```true```）和最近一条初始化状态事件；私有流同理，账户快照已就绪时会立即补收全部快照和就绪事件，```positions()```、```balances()```可以立即读取。其他频道从下一条推送开始接收。
+- 只有订阅它的线程才能退订：其他线程调用该订阅对象的```unsubscribe()```会抛出异常，订阅保持有效。线程结束时，其订阅会全部自动退订，其他线程共用的同一路订阅不受影响。
+- 网关状态事件发送给在该交易所上有订阅的每个线程；定时器事件只发送给主线程。
 
-```tickers```频道用于订阅整个市场的ticker：不传入```symbol```，通过一路订阅即可接收该交易所全部品种的ticker。事件与ticker事件相同（```kind```为```ticker```），```channel```为```tickers```，```symbol```为对应的品种代码。
+```tickers```频道订阅整个市场的ticker：无需传```symbol```，一路订阅即可收到该交易所全部品种的ticker。事件格式与ticker事件相同（```kind```为```ticker```），```channel```为```tickers```，```symbol```为各自对应的品种。
 
-- 仅在交易所提供全市场推送时支持，各交易所的支持情况见`能力矩阵`行情分组中的「推送」列和交易所页面。交易所不支持时，该订阅会收到一条失败状态事件（```message```以```unsupported channel: tickers```开头），不会改为逐个品种订阅。
-- 部分交易所的全市场推送不包含买一卖一价格，此时```bid```、```ask```为```0```，需要买卖价时应按品种订阅```ticker```或```bbo```。
-- 默认对每个品种仅保留最新一条事件：即使读取缓慢，也能获取每个品种最新的ticker。
+- 仅在交易所提供全市场推送时支持，各交易所的支持情况见`能力矩阵`中行情分组的「推送」列及各交易所页面。不支持的交易所会在该路订阅上收到一条失败的状态事件（```message```以```unsupported channel: tickers```开头），不会自动改为逐个品种订阅。
+- 部分交易所的全市场推送不包含买一价和卖一价，此时```bid```、```ask```为```0```；如需买卖价，请按品种订阅```ticker```或```bbo```。
+- 默认按品种各保留最新一条事件：即使取事件较慢，也能获取每个品种最新的ticker。
 
-```private```频道是账户的私有流，不传```symbol```，覆盖整个账户，一个账户只有一路。订单回报、成交回报、持仓、余额都在这一路事件流上，事件的```channel```分别为```orders```、```fills```、```positions```、```balance```：
+```private```频道是账户的私有流，无需传入```symbol```，覆盖整个账户，每个账户只有一路。订单回报、成交回报、持仓和余额都在这一路事件流上推送，对应事件的```channel```分别为```orders```、```fills```、```positions```、```balance```：
 
-- 订阅生效后（以及每次断线重连后），先推送一份账户快照（持仓、余额，```snapshot```为```true```），再推送一条```kind```为```status```、```channel```为```private```的状态事件：```prefillStatus```为```1```表示快照就绪，为```2```表示失败（```message```是原因，托管者会自动退避重试）。之后才是实时推送（```snapshot```为```false```）。订单回报、成交回报没有快照。
-- 持仓、余额的每一条推送都是该持仓或该资产此刻的完整状态，不是增量：持仓数量为```0```表示已平仓，可用与冻结都为```0```表示该资产已清空。
-- 成交回报（```kind```为```fill```，```channel```为```fills```）是自己订单的每一笔成交，带订单号、客户端订单号、成交号、这一笔的价格、数量、手续费和挂单或吃单；先推送成交、再推送反映它的订单回报。订阅生效和断线重连后不补发历史成交，只有交易所的私有推送带逐笔成交时才有，字段见`ctx.poll`。
-- 订阅对象的`positions`、`balances`方法返回托管者按推送维护的最新持仓、余额。
-- 推送之后托管者不会再请求REST接口补齐数据：快照之后只推送交易所推来的内容。交易所不推送的变化（例如有的交易所下单、撤单不推送余额，有的不推送持仓、只有快照）不会出现在推送里；余额推送里没有与`exchange.GetAssets`同口径的可用、冻结时，对应字段为```null```。需要最新值时调用`exchange.GetAssets`、`exchange.GetPositions`。实时推送覆盖哪些内容见各交易所页面的说明。
+- 订阅生效后（以及每次断线重连后），先推送一份账户快照（持仓、余额，```snapshot```为```true```），再推送一条```kind```为```status```、```channel```为```private```的状态事件：```prefillStatus```为```1```表示快照就绪，为```2```表示快照失败（```message```为失败原因，托管者会自动退避重试）。此后才是实时推送（```snapshot```为```false```）。订单回报和成交回报没有快照。
+- 持仓、余额的每一条推送都是该持仓或该资产当前的完整状态，而非增量：持仓数量为```0```表示已平仓，可用与冻结均为```0```表示该资产已清空。
+- 成交回报（```kind```为```fill```，```channel```为```fills```）是自身订单的逐笔成交，包含订单号、客户端订单号、成交号，以及该笔成交的价格、数量、手续费和挂单/吃单标识；先推送成交回报，再推送反映该成交的订单回报。订阅生效和断线重连后不补发历史成交，且仅当交易所的私有推送包含逐笔成交时才会推送，字段说明见`ctx.poll`。
+- 订阅对象的`positions`、`balances`方法返回托管者根据推送维护的最新持仓和余额。
+- 托管者不会在推送之后再请求REST接口补齐数据：快照之后只转发交易所推送的内容。交易所不推送的变化（例如部分交易所下单、撤单时不推送余额，部分交易所不推送持仓、只提供快照）不会出现在推送中；余额推送中缺少与`exchange.GetAssets`同口径的可用、冻结数据时，对应字段为```null```。需要最新值时，请调用`exchange.GetAssets`、`exchange.GetPositions`。实时推送覆盖的内容见各交易所页面的说明。
 
-订阅采用惰性机制：```ctx.subscribe()```立即返回并登记订阅，首次调用```ctx.poll()```时才与交易所建立连接、发送订阅请求。连接状态变化通过网关状态事件（```kind```为```gateway```，```channel```为```gateway```）通知。
+订阅是惰性的：```ctx.subscribe()```会立即返回并登记订阅，直到第一次调用```ctx.poll()```时才与交易所建立连接并发送订阅。连接状态的变化通过网关状态事件（```kind```为```gateway```，```channel```为```gateway```）通知。
+
+订阅分组（```group```）：
+
+- 不同分组的订阅不共用连接，某个分组的连接断开、重连或订阅排队，不会影响其他分组。例如，主要品种使用默认分组，批量扫描的品种放在```group: "scan"```中，扫描分组断线时，主要品种仍正常推送。
+- 分组内仍按交易所的限制拆分连接；同一路订阅（交易所、频道、品种、档数、周期均相同）放在两个分组中，即为两路独立的订阅，各自从交易所接收一份数据。
+- 网关状态事件按分组分别推送，```ev.group```为分组名（默认分组为空字符串）；订阅对象的```group```为订阅时传入的分组名。
+- 分组无法突破交易所的限制：连接数、订阅消息频率等按IP计算的限制由所有分组共享，分组越多占用的连接越多，超过交易所的连接数上限时，该路订阅会收到失败的状态事件。
+- ```private```频道不分组（每个账户只有一路私有订阅），传入```group```时会抛出异常。只有一条连接的交易所（如国内期货CTP）不支持分组，```group```将被忽略，各分组中的同一路订阅合并为一路。
+
+连接与重连：
+
+- 一个交易所的订阅可能分布在多条连接上（订阅较多时按交易所的限制拆分）。网关状态事件按交易所和分组汇总，事件的```group```为分组名：分组中任意一条连接断开时推送```status```为```2```；该分组所有断开的连接均重新连上，且其订阅均重新得到交易所确认后，推送```1```；私有流鉴权失败（API KEY、权限或IP白名单问题）时推送```3```，行情订阅不受影响。因此，已恢复连接上的数据可能先于```1```到达。
+- 连接断开后自动重连，次数不限：第一次约0.5秒后重试，之后间隔逐次翻倍，最长约10秒；连接稳定30秒后，重试间隔重新从头计算。同时重连的连接较多时，还会按交易所的建连频率限制依次进行。
+- 连接未关闭但收不到任何数据（链路假死）时，超过一定时间（取决于交易所的心跳规则，一般为30到90秒）即判定为断开，推送```status```为```2```并重连。
+- 重连后自动重新发送该连接上的全部订阅，发送速度遵守交易所的限频规则；订单簿重新获取快照，K线补齐断线期间的数据，私有流重新推送账户快照（见上文）。无需在策略中重新订阅。
+- 订阅帧发出后交易所始终未确认时，会自动重发，最多再重发2次；三次均未确认，或交易所明确拒绝时，该路订阅会收到失败的状态事件（```prefillStatus```为```2```，未确认时```message```包含```gave up```），之后该订阅作废，如有需要，由策略重新调用```ctx.subscribe()```。重连后的重新订阅未得到确认时，按连接故障处理，即断开并重连，不会作废订阅。
+- 托管者为每条交易所连接保留一个接收缓冲区（最多4096条、16MB），连接器处理不及时会丢弃最旧的数据，并在日志中记录```ws recv queue full```。这类丢弃不计入```ctx.connectors()```的```ticksDropped```（该字段统计的是策略取事件不及时造成的丢弃）；对于订单簿数据带序号的交易所，会检测到缺口并重新同步，```book()```读取到的仍是最新订单簿。
 
 ```depth```频道的档数可以是```0```到```255```之间的任意整数：
-
-  - 不传或传```0```时使用交易所的默认档数，```1```到```255```表示所需档数。每个档数对应独立的一路订阅，同一品种```depth```为```7```与```10```时对应两路订阅、两本订单簿。
-
-  - 托管者选择交易所原生档位中能够覆盖所需档数的最小档位，再截取所需档数进行推送。例如交易所仅提供5、10、20档快照时，```depth```为```7```的订阅使用10档快照、仅保留前7档；同一品种的多路订阅可以共用一路原生订阅，分别截取所需档数。
-
-  - 超过```255```或不是整数时```ctx.subscribe()```抛出异常；超过该交易所支持的最大档数时不抛出异常，该订阅会收到一条表示失败的状态事件，```message```以```unsupported
-  depth```开头。各交易所的原生档位与档数上限见交易所页面。
+- 不传或传```0```时使用交易所的默认档数，```1```到```255```表示所需档数。每个档数都是一路独立的订阅：同一品种```depth```为```7```和```10```是两路订阅，对应两本订单簿。
+- 托管者从交易所原生档位中选取能覆盖所需档数的最小一档，再截断到所需档数后推送。例如交易所只提供5、10、20档快照时，```depth```为```7```的订阅使用10档快照，只保留前7档；同一品种的多路订阅可以共用一路原生订阅，再各自截断。
+- 超过```255```或不是整数时，```ctx.subscribe()```抛出异常；超过该交易所支持的最大档数时不抛出异常，而是由这路订阅收到一条失败的状态事件，其```message```以```unsupported depth```开头。各交易所的原生档位与上限见对应的交易所页面。
 
 订阅失败分为两种情况：
+- 参数有误时抛出异常，例如：参数个数不是2个、第二个参数不是对象、```depth```超过```255```、```options```中有未知字段（例如拼错的```intervel```）、```channel```未知、行情频道未传```symbol```、```tickers```或```private```频道传入了```symbol```、同时传入```mode```与```buffer```、```symbol```数组中有不合法的元素（此时整批均不订阅）、```group```不是字符串或超过32字节、```private```频道传入了```group```。
+- 交易所或连接器拒绝订阅时（例如不支持的频道、K线周期或深度档数），```ctx.subscribe()```不抛出异常，而是在这路订阅自身的事件流上收到一条```kind```为```status```、```prefillStatus```为```2```的状态事件，```message```为失败原因。此后这路订阅失效，调用```unsubscribe()```不执行任何操作。
 
-  - 参数有误时抛出异常，例如参数个数不是2个、第二个参数不是对象、```depth```超过```255```、```options```中包含未知字段（例如拼写错误的```intervel```）、未知的```channel```、行情频道未传```symbol```、```tickers```或```private```频道传入了```symbol```、```mode```与```buffer```同时传入、```symbol```数组中包含无效元素（整批均不订阅）。
+未能及时取事件时的处理（投递模式）：```ticker```、```bbo```、```depth```默认只保留最新一条，```tickers```默认每个品种只保留最新一条；```trade```、```kline```默认缓存最近```1024```条，溢出时丢弃最旧的事件；可通过```mode```或```buffer```（二选一）修改。订单回报、成交回报、持仓、余额、网关状态、初始化状态事件不会被丢弃，因此订阅后需要持续调用```ctx.poll()```。订单簿在托管者内持续更新，不受取事件快慢的影响，任何时候通过```book()```读取的都是最新的完整订单簿。托管者接收推送的缓冲区是否积压，可查看`ctx.poll`中```ctx.connectors()```的计数。
 
-  - 交易所或连接器拒绝订阅时（例如不支持的频道、K线周期或深度档数），```ctx.subscribe()```不抛出异常，而是通过该订阅的事件流返回一条```kind```为```status```、```prefillStatus```为```2```的状态事件，```message```为失败原因。随后该订阅失效，调用```unsubscribe()```不执行任何操作。
+推送与REST接口完全独立：订阅只影响```ctx.poll()```收到的事件。`exchange.GetTicker`、`exchange.GetDepth`、`exchange.GetTrades`、`exchange.GetRecords`、`exchange.GetAccount`等函数每次调用都直接请求交易所的REST接口，不读取推送数据；是否订阅以及订阅了哪些频道，都不会改变它们的返回结果。
 
-取事件不及时的处理（投递模式）：```ticker```、```bbo```、```depth```默认只保留最新一条，```tickers```默认每个品种只保留最新一条；```trade```、```kline```默认缓存最近```1024```条，溢出时丢弃最旧的；用```mode```、```buffer```可以改变（二选一）。订单回报、成交回报、持仓、余额、网关状态、初始化状态事件不会被丢弃，所以订阅后要持续调用```ctx.poll()```。订单簿在托管者内持续更新，不受取事件快慢影响，任何时候用```book()```读到的都是最新的完整订单簿。托管者接收推送的缓冲是否积压，见`ctx.poll`中的```ctx.connectors()```计数。
+```JavaScript```、```Rust```策略中，同一线程内的```ctx.poll()```与`EventLoop`从同一个事件队列中取事件，因此一个线程只应使用其中一种方式取事件。```Python```的```EventLoop()```使用独立的队列（仅包含柜台类交易所自动订阅的行情和订单回报，以及```exchange.Go()```等并发任务的完成通知），与```ctx.poll()```互不争抢。各交易所是否支持推送以及支持哪些频道，见`能力矩阵`和各交易所页面的说明。
 
-推送与REST接口完全独立：订阅仅影响```ctx.poll()```接收的事件。`exchange.GetTicker`、`exchange.GetDepth`、`exchange.GetTrades`、`exchange.GetRecords`、`exchange.GetAccount`等函数每次调用都会直接请求交易所的REST接口，不读取推送数据，是否订阅、订阅哪些数据均不影响这些函数的返回结果。
+```Python```策略的写法与```JavaScript```相同：```ctx.subscribe(ex, options)```只接受这两个位置参数（多传、少传或使用关键字参数时抛出```TypeError```），```options```为字典，字段与校验规则相同，传入的字典不会被修改。```options["symbol"]```为列表（或元组）时返回```SubscriptionList```（```list```的子类，顺序与输入一致），调用它的```unsubscribe()```可一次性退订全部元素。订阅对象的属性均为只读，```info()```返回字段相同的字典。通过```threading.Thread```创建的线程结束时会自动退订其订阅；通过```_thread.start_new_thread()```等方式绕过```threading.Thread```创建的线程也可以订阅，但结束时不会自动退订，需要自行调用```unsubscribe()```。
 
-```JavaScript```、```Rust```策略中，同一线程中的```ctx.poll()```与`EventLoop`从同一个事件队列获取事件，每个线程应仅使用其中一种方式获取事件。```Python```的```EventLoop()```有独立的事件队列（仅包含柜台类交易所自动订阅的行情、订单回报，以及```exchange.Go()```等并发任务的完成通知），与```ctx.poll()```不会相互争用事件。各交易所是否支持推送、支持哪些频道，请参见`能力矩阵`和各交易所页面的说明。
+```Rust```策略使用```ctx```模块中的同名函数：```ctx::subscribe(ex, opts: ctx::SubOpts) -> Result<ctx::Sub, String>```，其中```ex```可以是交易所对象（```exchange```、```exchanges[i]```），也可以是```u16```类型的索引；调用失败时返回```Err```，不会触发panic。订阅选项通过```ctx::SubOpts::ticker()```、```bbo()```、```trade()```、```depth(n)```、```kline(秒数)```、```tickers()```、```private()```构造，再链式调用```.symbol("BTC_USDT")```、```.latest()```、```.buffer(n)```、```.group("scan")```进行配置。批量订阅使用```ctx::subscribe_many(ex, opts, &["BTC_USDT", "ETH_USDT"]) -> Result<Vec<ctx::Sub>, String>```，同样会先校验整批参数。返回的```ctx::Sub```可以复制，提供的方法有```id()```（传给```ctx::poll(&[sub.id()], ...)```）、```book(n)```、```positions()```、```balances()```、```unsubscribe()```；引用计数按```ctx::subscribe()```的调用次数计算，每调用一次都需要对应调用一次```unsubscribe()```。```Rust```策略中的任意线程都可以发起订阅，订阅同样归属于发起订阅的线程。
 
-```Python```策略的写法与```JavaScript```相同：```ctx.subscribe(ex, options)```仅接受这两个位置参数（多传、少传或使用关键字参数时均抛出```TypeError```），```options```为字典，字段与校验规则相同，传入的字典不会被修改。```options["symbol"]```为列表（或元组）时返回```SubscriptionList```（```list```的子类，元素顺序与输入一致），其```unsubscribe()```方法可一次性退订全部元素。订阅对象的属性为只读，```info()```返回包含相同字段的字典。通过```threading.Thread```创建的线程结束时会自动退订该线程的订阅；通过```_thread.start_new_thread()```等方式绕过```threading.Thread```创建的线程也可以订阅，但结束时不会自动退订，需要显式调用```unsubscribe()```。
-
-```Rust```策略使用```ctx```模块的同名函数：```ctx::subscribe(ex, opts: ctx::SubOpts) -> Result<ctx::Sub, String>```，```ex```可以是交易所对象（```exchange```、```exchanges[i]```）或```u16```类型的索引；失败时返回```Err```，不会panic。订阅选项通过```ctx::SubOpts::ticker()```、```bbo()```、```trade()```、```depth(n)```、```kline(秒数)```、```tickers()```、```private()```构造，再链式调用```.symbol("BTC_USDT")```、```.latest()```、```.buffer(n)```。批量订阅使用```ctx::subscribe_many(ex, opts, &["BTC_USDT", "ETH_USDT"]) -> Result<Vec<ctx::Sub>, String>```，同样先对整批订阅进行校验。返回的```ctx::Sub```可以复制，提供的方法包括```id()```（传给```ctx::poll(&[sub.id()], ...)```）、```book(n)```、```positions()```、```balances()```、```unsubscribe()```；引用计数按```ctx::subscribe()```的调用次数计算，每次调用均需对应一次```unsubscribe()```调用。```Rust```的任意线程都可以订阅，订阅同样归属于发起订阅的线程。
-
-See also: `ctx.poll`, `Subscription`, `EventLoop`, `exchange.GetTicker`, `能力矩阵`
+See also: `ctx.poll`, `Subscription`, `EventLoop`, `exchange.GetTicker`, `交易所能力矩阵`
 
 #### ctx.poll
 
@@ -12986,22 +12998,22 @@ ctx.poll(streams, timeout)
 ctx.poll(options, timeout)
 ```
 
-获取本线程订阅的下一条推送事件，可设置等待超时时间。事件来自本线程通过`ctx.subscribe`创建的订阅，策略根据事件的```kind```、```channel```、```stream```分别处理。
+取出本线程订阅的下一条推送事件，可设置等待超时。事件来自本线程通过`ctx.subscribe`创建的订阅，策略可根据事件的```kind```、```channel```、```stream```字段分别处理。
 
 Parameters:
 
-- `streams` (object / number / array, optional): 要获取事件的事件流：`Subscription`对象或事件流ID，也可以是它们组成的数组（支持混用、嵌套，批量订阅返回的数组可以直接传入）。省略或传入```[]```表示本线程订阅的全部事件流，通常使用此方式。内置事件流：```ctx.STREAM_TIMER```（定时器）、```ctx.STREAM_STATUS```（网关状态）、```ctx.STREAM_ORDER_ACK```（`ctx.submit`的应答）。
-- `timeout` (number, optional): 等待超时时间，单位为毫秒，必须是非负整数。省略时持续等待直到收到事件；```0```表示不等待；正数表示最长等待时间，超时返回空值。
-- `options` (object, optional): 对象形式```{streams, sources}```，仅```JavaScript```支持：```streams```含义同上；```sources```为要等待的事件来源数组，可选```engine```（推送事件，默认）、```thread```（线程消息）、```go```（```exchange.Go()```等并发任务完成）、```dial```（```Dial()```连接可读）、```task```，或```all```表示全部来源。使用此形式时返回值封装为```{source, event, seq, nano, queue}```，```event```为对应来源的事件内容。
+- `streams` (object / number / array, optional): 要读取的事件流：`Subscription`对象或事件流ID，也可以是由它们组成的数组（支持混用和嵌套，批量订阅返回的数组可直接传入）。省略或传入```[]```表示读取本线程订阅的全部事件流，这是最常见的用法。内置事件流包括：```ctx.STREAM_TIMER```（定时器）、```ctx.STREAM_STATUS```（网关状态）、```ctx.STREAM_ORDER_ACK```（`ctx.submit`的应答）。
+- `timeout` (number, optional): 等待超时时间，单位为毫秒，必须为非负整数。省略时持续等待，直到有事件到达；```0```表示不等待，立即返回；正数表示最长等待时间，超时后返回空值。
+- `options` (object, optional): 对象形式```{streams, sources}```，仅```JavaScript```支持：```streams```含义同上；```sources```为要等待的事件来源数组，可选值包括```engine```（推送事件，默认）、```thread```（线程消息）、```go```（```exchange.Go()```等并发任务完成）、```dial```（```Dial()```连接可读）、```task```，或用```all```表示全部来源。使用此形式时，返回值包装为```{source, event, seq, nano, queue}```，其中```event```为对应来源的事件内容。
 
-Returns (object / 空值): 事件对象，字段见下文；超时且未收到事件时返回空值。
+Returns (object / 空值): 事件对象，字段说明见下文；超时且没有事件时返回空值。
 
-订阅1分钟K线，仅在K线收盘时处理，并记录网关状态变化。
+订阅1分钟K线，仅在K线收盘时进行处理，同时记录网关状态的变化。
 
 ```javascript
 function onKline(ev) {
     if (ev.prefill) {
-        return                        // 首次订阅推送的历史K线
+        return                        // 首次订阅时推送的历史K线
     }
     if (ev.closed) {
         Log("closed bar", _D(ev.openTimeMs), "close:", ev.close, "volume:", ev.volume)
@@ -13033,7 +13045,7 @@ function main() {
 ```python
 def on_kline(ev):
     if ev.prefill:
-        return                        # 首次订阅推送的历史K线
+        return                        # 首次订阅时推送的历史K线
     if ev.closed:
         Log("closed bar", _D(ev.openTimeMs), "close:", ev.close, "volume:", ev.volume)
 
@@ -13063,7 +13075,7 @@ fn main() {
         match ctx::poll(&[], Some(5000)) {
             ctx::Polled::Event(ev) if ev.stream() == k1m.id() => {
                 if let Some(k) = ev.kline() {
-                    if !k.prefill && k.closed {        // 跳过首次订阅推送的历史K线
+                    if !k.prefill && k.closed {        // 跳过首次订阅时推送的历史K线
                         Log!("closed bar", _D(k.open_time), "close:", k.close, "volume:", k.volume);
                     }
                 } else if let Some(st) = ev.feed_status() {
@@ -13086,7 +13098,7 @@ fn main() {
 }
 ```
 
-订阅账户私有数据流：待账户快照就绪后读取持仓、余额，随后根据推送更新数据，并输出每笔成交。
+订阅账户私有数据流：待账户快照就绪后读取持仓和余额，此后随推送增量更新，并输出每一笔成交。
 
 ```javascript
 function main() {
@@ -13105,7 +13117,7 @@ function main() {
         } else if (ev.kind === "position" && !ev.snapshot) {
             Log("position", ev.symbol, ev.posSide, "qty:", ev.qty, "avgPx:", ev.avgPx)
         } else if (ev.kind === "balance" && !ev.snapshot) {
-            Log("balance", ev.asset, "free:", ev.free, "frozen:", ev.frozen)   // 推送里没有同口径的值时为null
+            Log("balance", ev.asset, "free:", ev.free, "frozen:", ev.frozen)   // 推送中没有同口径的值时为null
         } else if (ev.kind === "fill") {
             Log("fill", ev.orderId, ev.side, ev.px, ev.qty, ev.liquidity, "fee:", ev.fee, ev.feeCcy)
         } else if (ev.kind === "order") {
@@ -13130,7 +13142,7 @@ def main():
         elif ev.kind == "position" and not ev.snapshot:
             Log("position", ev.symbol, ev.posSide, "qty:", ev.qty, "avgPx:", ev.avgPx)
         elif ev.kind == "balance" and not ev.snapshot:
-            Log("balance", ev.asset, "free:", ev.free, "frozen:", ev.frozen)   # 推送里没有同口径的值时为None
+            Log("balance", ev.asset, "free:", ev.free, "frozen:", ev.frozen)   # 推送中没有同口径的值时为None
         elif ev.kind == "fill":
             Log("fill", ev.orderId, ev.side, ev.px, ev.qty, "fee:", ev.get("fee"), ev.feeCcy)
         elif ev.kind == "order":
@@ -13155,7 +13167,7 @@ fn main() {
                 } else if let Some(p) = ev.position().filter(|p| !p.snapshot) {
                     Log!("position", p.symbol, p.pos_side, "qty:", p.qty, "avgPx:", p.avg_px);
                 } else if let Some(b) = ev.balance().filter(|b| !b.snapshot) {
-                    // free、frozen为Option：推送里没有同口径的值时为None
+                    // free、frozen为Option类型：推送中没有同口径的值时为None
                     let (free, frozen) = (format!("{:?}", b.free), format!("{:?}", b.frozen));
                     Log!("balance", b.asset, "free:", free, "frozen:", frozen);
                 } else if let Some(f) = ev.fill() {
@@ -13172,7 +13184,7 @@ fn main() {
 }
 ```
 
-订阅全市场ticker，每分钟输出接收到的事件数和```ctx.connectors()```的接收缓冲区计数，判断策略能否及时处理事件。
+订阅全市场ticker，每分钟输出一次期间收到的事件数，以及```ctx.connectors()```返回的接收缓冲计数，用于判断策略的处理速度是否跟得上行情推送。
 
 ```javascript
 function main() {
@@ -13240,7 +13252,7 @@ fn main() {
             _ => {}
         }
         if Unix() - last >= 60 {
-            // JSON数组，每个交易所一项，feed字段为接收缓冲计数
+            // 返回JSON数组，每个交易所对应一项，其中feed字段为接收缓冲计数
             Log!("tickers/min:", n, "connectors:", ctx::connectors());
             n = 0;
             last = Unix();
@@ -13249,48 +13261,48 @@ fn main() {
 }
 ```
 
-所有事件均包含以下字段：
+所有事件都包含以下字段：
 
 | 字段 | 类型 | 说明 |
 | - | - | - |
-| kind | string | 事件类型名称：```ticker```（ticker、bbo、tickers共用）、```depth```、```trade```、```kline```、```order```（订单回报）、```position```、```balance```、```fill```（成交回报）、```ack```（WebSocket下单应答）、```timer```、```gateway```（网关状态）、```status```（初始化状态） |
-| stream | number | 投递该事件的事件流标识：订阅产生的事件为当前线程中订阅对象的```id```；网关状态、定时器、WebSocket下单应答事件分别使用内置事件流```ctx.STREAM_STATUS```（```2```）、```ctx.STREAM_TIMER```（```1```）、```ctx.STREAM_ORDER_ACK```（```4```） |
-| type | string | ```data```（行情，以及私有流的订单回报、成交回报、持仓、余额）、```status```（网关状态、初始化状态）、```timer```（定时器）、```ack```（WebSocket下单应答） |
+| kind | string | 事件类型名：```ticker```（ticker、bbo、tickers共用）、```depth```、```trade```、```kline```、```order```（订单回报）、```position```、```balance```、```fill```（成交回报）、```ack```（WebSocket下单应答）、```timer```、```gateway```（网关状态）、```status```（初始化状态） |
+| stream | number | 投递该事件的事件流：订阅产生的事件为本线程订阅对象的```id```；网关状态、定时器、WebSocket下单应答事件分别来自内置事件流```ctx.STREAM_STATUS```（```2```）、```ctx.STREAM_TIMER```（```1```）、```ctx.STREAM_ORDER_ACK```（```4```） |
+| type | string | ```data```（行情数据，以及私有流的订单回报、成交回报、持仓、余额）、```status```（网关状态、初始化状态）、```timer```（定时器）、```ack```（WebSocket下单应答） |
 | channel | string | 所属订阅的频道：```ticker```、```bbo```、```tickers```、```depth```、```trade```、```kline```；私有流为```orders```、```fills```、```positions```、```balance```；网关状态为```gateway```，定时器为```timer```，下单应答为```ack```；初始化状态见下文 |
-| depth | number | 仅深度事件包含此字段：所属订阅的深度档数（```0```表示交易所默认档数） |
-| interval | number | 仅K线事件和K线订阅的初始化状态事件包含此字段：K线周期，单位为秒 |
-| ex | number | 账户在```exchanges```中的索引，可直接作为```ctx.subscribe()```的第一个参数；不属于任何账户的事件为```-1``` |
-| symbol | string | 品种代码，例如```BTC_USDT```、```BTC_USDT.swap```；```tickers```事件中为该事件对应的品种代码；余额事件和私有流的状态事件中为空字符串 |
+| depth | number | 仅深度事件包含此字段：所属订阅的档位数（```0```表示交易所默认档位数） |
+| interval | number | 仅K线事件及K线订阅的初始化状态事件包含此字段：K线周期，单位为秒 |
+| ex | number | 账户在```exchanges```中的索引，可直接作为```ctx.subscribe()```的第一个参数传入；不属于任何账户的事件取值为```-1``` |
+| symbol | string | 品种代码，例如```BTC_USDT```、```BTC_USDT.swap```；```tickers```事件为各自对应的品种；余额事件和私有流的状态事件为空字符串 |
 | seq | number | 事件序号，单调递增 |
-| time | number | 事件发生时间（毫秒时间戳）：交易所提供时间时使用交易所时间，无法获取交易所时间时使用托管者的接收时间（与```ts```相同）；各类事件的取值规则见下文 |
-| ts | number | 托管者收到交易所数据的时间（毫秒时间戳，包含小数部分）；```Date.now() - ev.ts```表示托管者内部处理及事件获取的延迟，不包含交易所到托管者的网络延迟 |
+| time | number | 事件发生时间（毫秒时间戳）：交易所提供时间时取交易所时间，否则取托管者的接收时间（与```ts```相同）；各类事件的取值方式见下文 |
+| ts | number | 托管者收到交易所数据的时间（毫秒时间戳，带小数）；```Date.now() - ev.ts```即托管者内部处理及取出事件的延迟，不包含交易所到托管者的网络延迟 |
 
 各类事件的其他字段：
 
 | kind | 字段 |
 | - | - |
-| ```ticker```（ticker、bbo、tickers） | ```bid```、```ask```、```last```、```bidQty```、```askQty```、```volume```、```openInterest```、```open```、```high```、```low```。```bbo```未提供最新成交价时```last```为```0```；全市场推送未提供买卖报价时```tickers```的```bid```、```ask```为```0``` |
-| ```depth```（深度） | 不包含档位字段，仅表示订单簿已更新；档位数据通过```ev.book(n)```读取，见下文 |
+| ```ticker```（ticker、bbo、tickers） | ```bid```、```ask```、```last```、```bidQty```、```askQty```、```volume```、```openInterest```、```open```、```high```、```low```。```bbo```无最新价时```last```为```0```；全市场推送不含买卖价时，```tickers```的```bid```、```ask```为```0``` |
+| ```depth```（深度） | 不含档位字段，仅表示订单簿已更新；档位数据通过```ev.book(n)```读取，见下文 |
 | ```trade```（成交） | ```px```（价格）、```qty```（数量）、```side```（主动成交方向```buy```/```sell```，交易所未提供时为空字符串）、```tradeId``` |
 | ```kline```（K线） | ```open```、```high```、```low```、```close```、```volume```、```openInterest```、```intervalSec```、```openTimeMs```、```closed```（该根K线是否已收盘）、```prefill```（是否为首次订阅时推送的历史K线） |
-| ```order```（订单回报） | ```id```（订单号）、```clientId```（客户端订单号，见下文）、```state```（```acked```、```partial```、```filled```、```canceled```、```rejected```）、```px```、```qty```（委托价、委托数量）、```filledQty```（累计成交量，部分成交时随每笔成交增加）、```avgPx```（成交均价）、```reason```（拒单原因码，```0```表示无拒单原因）、```reasonText``` |
-| ```position```（持仓） | ```side```（```buy```表示多头、```sell```表示空头）、```posSide```（双向持仓模式下为```long```、```short```，单向持仓模式下为```net```）、```qty```、```avgPx```、```profit```、```margin```、```liqPx```、```markPx```、```leverage```、```snapshot``` |
-| ```balance```（余额） | ```asset```（资产名称）、```free```（可用余额）、```frozen```（冻结余额）、```equity```、```upnl```、```margin```、```snapshot``` |
-| ```fill```（成交回报） | ```orderId```（订单号）、```clientId```（所属订单的客户端订单号）、```tradeId```（成交编号）、```px```、```qty```（本笔成交的价格、数量）、```fee```（手续费，负数表示手续费返还）、```feeCcy```（手续费计价资产）、```side```（订单方向）、```liquidity```（```maker```或```taker```），见下文 |
+| ```order```（订单回报） | ```id```（订单号）、```clientId```（客户端订单号，见下文）、```state```（```acked```、```partial```、```filled```、```canceled```、```rejected```）、```px```、```qty```（委托价格、委托数量）、```filledQty```（累计成交量，部分成交时随每笔成交递增）、```avgPx```（成交均价）、```reason```（拒单原因码，```0```表示无）、```reasonText``` |
+| ```position```（持仓） | ```side```（```buy```为多头、```sell```为空头）、```posSide```（双向持仓模式为```long```、```short```，单向持仓模式为```net```）、```qty```、```avgPx```、```profit```、```margin```、```liqPx```、```markPx```、```leverage```、```snapshot``` |
+| ```balance```（余额） | ```asset```（资产名称）、```free```（可用）、```frozen```（冻结）、```equity```、```upnl```、```margin```、```snapshot``` |
+| ```fill```（成交回报） | ```orderId```（订单号）、```clientId```（所属订单的客户端订单号）、```tradeId```（成交号）、```px```、```qty```（该笔成交的价格、数量）、```fee```（手续费，负数表示手续费返还）、```feeCcy```（手续费币种）、```side```（订单方向）、```liquidity```（```maker```或```taker```），见下文 |
 | ```ack```（WebSocket下单应答） | ```reqId```、```op```、```status```、```ok```、```id```、```clientId```、```error```、```reason```、```reasonText```、```exchTime```、```latencyMs```，见`ctx.submit` |
-| ```timer```（定时器） | ```timerId```、```scheduledNs```（超出```JavaScript```安全整数范围时以字符串表示） |
-| ```gateway```（网关状态） | ```status```（```1```表示连接正常，```2```表示连接断开，```3```表示降级）、```detail``` |
-| ```status```（初始化状态） | ```channelCode```（频道的数字代码）、```intervalSec```、```prefillStatus```（```1```表示就绪，```2```表示失败）、```detail```、```message```（失败原因） |
+| ```timer```（定时器） | ```timerId```、```scheduledNs```（超出```JavaScript```安全整数范围时为字符串） |
+| ```gateway```（网关状态） | ```status```（```1```连接正常，```2```连接断开，```3```服务降级）、```detail```、```group```（该状态对应的订阅分组，默认分组为空字符串，见`ctx.subscribe`） |
+| ```status```（初始化状态） | ```channelCode```（频道的数字代码）、```intervalSec```、```prefillStatus```（```1```就绪，```2```失败）、```detail```、```message```（失败原因） |
 
-价格、数量均为实数，已按合约精度换算。
+价格和数量均为实数，已按合约精度完成换算。
 
 ##### 区分事件：kind、channel、stream
 
-一条事件可以从三个维度区分，按需组合使用：
+一条事件可以从三个维度区分，可按需组合使用：
 
-- ```ev.kind```：事件的类型，例如```depth```、```order```、```fill```、```status```。需要按事件类型分别处理时判断此字段。```kind```是类型名称字符串，后续可能新增类型，策略中不要使用数字代码表示类型，遇到无法识别的```kind```时跳过即可（托管者无法识别的类型为```unknown```）。
-- ```ev.channel```：同一事件类型下的数据类别。```ticker```、```bbo```、```tickers```三个频道的事件```kind```均为```ticker```，通过```channel```区分；```private```订阅的订单回报、成交回报、持仓、余额位于同一事件流中，```channel```分别为```orders```、```fills```、```positions```、```balance```。初始化状态事件的```channel```为其所属订阅的频道名称，可能与数据事件相同，因此应先判断```kind```。
-- ```ev.stream```：事件所属的订阅，通过与订阅对象的```id```比较（```ev.stream === sub.id```），或使用```ctx.poll([sub])```仅获取该订阅的事件。同一频道存在多个订阅时（例如BTC与ETH的深度，或同一品种的5档与20档深度），只能通过此字段区分。
+- ```ev.kind```：事件的类别，例如```depth```、```order```、```fill```、```status```。需要按事件类型分别处理时，判断此字段。```kind```是类型名称字符串，今后可能新增类型，因此策略中不要使用数字代码；遇到无法识别的```kind```直接跳过即可（托管者无法识别的类型为```unknown```）。
+- ```ev.channel```：同一类事件中的具体数据种类。```ticker```、```bbo```、```tickers```三个频道的事件```kind```均为```ticker```，需用```channel```区分；```private```订阅的订单回报、成交回报、持仓、余额推送位于同一个事件流上，```channel```分别为```orders```、```fills```、```positions```、```balance```。初始化状态事件的```channel```为其所属订阅的频道，会与数据事件重名，因此应先判断```kind```。
+- ```ev.stream```：事件来自哪一路订阅，可与订阅对象的```id```比较（```ev.stream === sub.id```），也可以用```ctx.poll([sub])```只获取这一路的事件。同一频道订阅了多路时（例如BTC与ETH的深度，或同一品种的5档与20档深度），只能通过它来区分。
 
 ```javascript
 function main() {
@@ -13319,51 +13331,51 @@ function main() {
 }
 ```
 
-```time```在各类事件中的取值规则（回测中```time```与```ts```均为回测模拟时间）：
+```time```在各类事件中的取值方式（回测中```time```与```ts```均为回测的模拟时间）：
 
 | 事件 | time |
 | - | - |
 | ticker、bbo、tickers、成交、成交回报、持仓、余额 | 交易所时间；交易所未提供时为接收时间（与```ts```相同） |
-| K线 | 该根K线的起始时间，与```openTimeMs```相同，与`exchange.GetRecords`返回的K线```Time```含义一致 |
+| K线 | 该根K线的开始时间，与```openTimeMs```相同，与`exchange.GetRecords`返回的K线```Time```口径一致 |
 | 深度、订单回报 | 接收时间（与```ts```相同），目前无法获取这两类推送的交易所时间 |
 | 网关状态、初始化状态 | 与```ts```相同 |
-| WebSocket下单应答 | 交易所应答时间；交易所未提供时与```ts```相同 |
+| WebSocket下单应答 | 交易所的应答时间；交易所未提供时与```ts```相同 |
 | 定时器 | 计划触发时间，与```ts```使用同一时钟（```ts```为实际触发时间） |
 
-```ev.ts - ev.time```可用于估算交易所到托管者的延迟，仅在```time```为交易所时间时有意义。
+```ev.ts - ev.time```可用于估算交易所到托管者的延迟，仅当```time```为交易所时间时才有意义。
 
-成交事件的```tradeId```始终为字符串，与`exchange.GetTrades`返回的成交ID格式一致：交易所的数字成交编号转换为十进制字符串，其他格式原样保留；交易所未提供成交编号时使用以```syn:```开头的合成编号；空字符串表示连接器未提供成交编号。
+成交事件的```tradeId```始终为字符串，与`exchange.GetTrades`返回的成交ID格式相同：交易所的数字成交号转为十进制字符串，其他格式原样保留；交易所不提供成交号时，为以```syn:```开头的合成编号；空字符串表示连接器未提供成交号。
 
-深度事件提供```ev.book(n)```方法，用于读取该事件所属订阅的订单簿前```n```档（未传入```n```时使用订阅档数），返回```{bids: [[price, qty], ...], asks: [[price, qty], ...]}```，```bids```按价格从高到低排序，```asks```按价格从低到高排序，与订阅对象的`book`方法相同。```ev.book```不可枚举，```JSON.stringify(ev)```的结果中不包含该方法；所属订阅已退订时调用该方法会抛出异常。
+深度事件带有```ev.book(n)```方法，用于读取该事件所属订阅自身订单簿的前```n```档（不传```n```时为订阅的档数），返回```{bids: [[price, qty], ...], asks: [[price, qty], ...]}```，其中```bids```按价格从高到低排列，```asks```按价格从低到高排列，与订阅对象的`book`方法相同。```ev.book```不可枚举，因此```JSON.stringify(ev)```的结果中不包含它；所属订阅退订后再调用会抛出异常。
 
-持仓（```kind```为```position```）、余额（```kind```为```balance```）事件来自```private```订阅，每条事件均表示该持仓或该资产当前的完整状态，而非增量更新：持仓```qty```为```0```表示已平仓（单向持仓平仓后```side```为空字符串），余额```free```、```frozen```均为```0```表示该资产余额已清零；交易所的余额推送中未提供同口径的可用余额或冻结余额时，对应字段为```null```（推送后不会再请求REST接口补齐）。字段与`exchange.GetAssets`、`exchange.GetPositions`的口径一致；```profit```、```margin```、```liqPx```、```markPx```、```leverage```、```equity```、```upnl```在交易所未推送相应字段时不出现（而非```0```）。```snapshot```为```true```表示订阅生效或断线重连后推送的账户快照，快照推送完成后同一事件流上会推送一条```channel```为```private```的初始化状态事件。
+持仓（```kind```为```position```）和余额（```kind```为```balance```）事件来自```private```订阅，每条事件都是该持仓或该资产当前的完整状态，而非增量：持仓```qty```为```0```表示已平仓（单向持仓模式下平仓后```side```为空字符串）；余额```free```、```frozen```均为```0```表示该资产已清空；若交易所的余额推送中没有同口径的可用或冻结数值，对应字段为```null```（推送后不会再请求REST接口补齐）。字段与`exchange.GetAssets`、`exchange.GetPositions`同口径；```profit```、```margin```、```liqPx```、```markPx```、```leverage```、```equity```、```upnl```在交易所未推送时不出现（而非为```0```）。```snapshot```为```true```表示订阅生效或断线重连后推送的账户快照，快照之后，同一事件流上会有一条```channel```为```private```的初始化状态事件。
 
-成交回报（```kind```为```fill```，```channel```为```fills```）来自```private```订阅，与订单回报共用同一事件流，表示本账户订单的一笔成交：
+成交回报（```kind```为```fill```，```channel```为```fills```）来自```private```订阅，与订单回报位于同一个事件流，表示自己订单的一笔成交：
 
-- 先推送成交回报、再推送反映该笔成交的订单回报：收到```filledQty```增加的订单回报时，对应的成交回报均已收到；一个订单全部成交时，其各笔成交的```qty```之和等于订单的```filledQty```。
-- ```orderId```与订单回报的```id```、`ctx.order`的返回值相同，```clientId```与订单回报的```clientId```相同；```tradeId```始终为字符串，交易所不提供成交编号时为```syn:```开头的合成编号。```side```表示订单方向，而非主动成交方向。
-- 不提供快照：订阅生效和断线重连后不补发历史成交，断线期间的成交也不会补发（订单回报的累计成交量仍然准确），需要历史成交时调用REST接口查询。交易所重连后重复推送的同一笔成交仅向事件流推送一次。同一账户的买单与卖单互相成交时，同一个```tradeId```会分别对应两个订单各推送一条成交回报。
-- 仅当交易所的私有推送包含逐笔成交信息时才会提供成交回报，具体见各交易所页面的说明；不支持的交易所仅提供订单回报。
+- 先推送成交，再推送反映该成交的订单回报：当收到的订单回报中```filledQty```增加时，构成这部分增量的成交均已收到；订单全部成交时，其各笔成交的```qty```之和等于订单的```filledQty```。
+- ```orderId```与订单回报的```id```及`ctx.order`的返回值相同，```clientId```与订单回报的```clientId```相同；```tradeId```始终为字符串，交易所不提供成交编号时为以```syn:```开头的合成编号。```side```为订单方向，而非主动成交方向。
+- 没有快照：订阅生效及断线重连后不会补发历史成交，断线期间的成交也不会补发（订单回报的累计成交量仍然准确），需要历史成交时请调用REST接口查询。交易所在重连后重复推送的同一笔成交只会推送一次。同一账户的买单与卖单相互成交时，同一个```tradeId```会按两个订单分别推送一条。
+- 只有交易所的私有推送包含逐笔成交时才会产生成交回报，详见各交易所页面的说明；不支持的交易所只有订单回报。
 
-订单回报、成交回报的```clientId```是交易所推送中的客户端订单号：通过`ctx.submit`提交的订单使用该方法返回的localId，可用于将推送与请求关联；通过其他方式提交的订单使用交易所推送中该订单的客户端订单号原值。推送中未包含该字段、或尚未支持该交易所时为空字符串，目前支持币安现货与U本位合约、OKX、Bybit、Gate、Bitget。
+订单回报和成交回报中的```clientId```是交易所推送中的客户端订单号：通过`ctx.submit`提交的订单，该值即为其返回的localId，可据此将推送与请求对应起来；通过其它方式提交的订单，该值为交易所推送中该订单客户端订单号的原始值。推送中没有该字段或该交易所尚未支持时，值为空字符串。目前支持的交易所有：币安现货与U本位合约、OKX、Bybit、Gate、Bitget。
 
-WebSocket下单应答（```kind```为```ack```，```type```与```channel```均为```ack```）是`ctx.submit`每笔请求的处理结果，通过内置事件流```ctx.STREAM_ORDER_ACK```传递，仅发送给发起请求的线程，无需订阅：```ctx.poll([ctx.STREAM_ORDER_ACK], timeout)```仅获取应答，```ctx.poll([], timeout)```也可获取。```status```为```unknown```表示请求已发出但尚未收到结果，订单可能已在交易所创建，请勿重复发送，应按```clientId```查询订单或等待私有流的订单回报确认。每个线程最多积压1024条应答，超出时丢弃最旧的应答，丢弃数量见```ctx.connectors()```的```acksDropped```。
+WebSocket下单应答（```kind```为```ack```，```type```与```channel```均为```ack```）是`ctx.submit`每一笔请求的结果，位于内置事件流```ctx.STREAM_ORDER_ACK```上，只投递给发起请求的线程，无需订阅：```ctx.poll([ctx.STREAM_ORDER_ACK], timeout)```只获取应答，```ctx.poll([], timeout)```也能获取到。```status```为```unknown```表示请求已发出但未等到结果，订单可能已提交到交易所，请勿重复下单，应按```clientId```查询订单，或等待私有流的订单回报进行确认。每个线程最多积压1024条应答，超出时丢弃最旧的应答，丢弃数量见```ctx.connectors()```返回的```acksDropped```。
 
-初始化状态事件（```kind```为```status```）与其所属订阅共用同一事件流（```stream```相同），```channel```表示所属订阅的频道（私有流的快照状态为```private```），用于通知：K线订阅已完成首次历史K线推送、```private```订阅已完成账户快照推送（```prefillStatus```为```1```），以及订阅被交易所或连接器拒绝（```prefillStatus```为```2```，```message```表示失败原因，频道可以是任意频道）。在收到就绪状态之前，请勿将已收到的少量实时K线视为完整的历史数据。
+初始化状态事件（```kind```为```status```）与其所属订阅共用同一个事件流（```stream```相同），```channel```为所属订阅的频道（私有流快照的状态事件为```private```），用于表示：K线订阅已推送完首批历史K线、```private```订阅已推送完账户快照（```prefillStatus```为```1```），以及订阅被交易所或连接器拒绝（```prefillStatus```为```2```，```message```为失败原因，此时频道可以是任意频道）。在收到就绪状态之前，不要将已收到的少量实时K线当作完整的历史数据。
 
-```ctx.poll()```仅获取本线程订阅的事件：主线程、```threading.Thread()```创建的线程（```Python```为标准库的```threading.Thread```）分别订阅、分别获取，在过滤条件中指定其他线程的订阅对象或事件流ID无法获取事件。不同线程订阅相同内容时，每个线程各收到一份。网关状态事件发送给在该交易所存在订阅的每个线程，定时器事件仅发送给主线程。
+```ctx.poll()```只获取本线程订阅的事件：主线程及```threading.Thread()```创建的线程（```Python```中为标准库的```threading.Thread```）各自订阅、各自获取，若过滤条件中填写其它线程的订阅对象或事件流ID，将永远获取不到事件。不同线程订阅了相同内容时，各自收到一份。网关状态事件会发送给在该交易所有订阅的每个线程，定时器事件只发送给主线程。
 
-使用```streams```过滤仅表示本次调用只获取指定事件流的事件：未指定的事件保留在本线程的队列中，后续需要通过不带过滤条件（```[]```）的调用将其取出。订单回报、成交回报、持仓、余额、网关状态、初始化状态、定时器事件不会因获取不及时而被覆盖，未被获取的事件会持续积压，每个线程最多积压10240条，超出时丢弃最旧的事件（WebSocket下单应答单独积压，最多1024条）。
+使用```streams```过滤仅表示本次只获取指定的几路事件：未指定的事件会保留在本线程的队列中，最终需要通过一次不带过滤条件（```[]```）的调用将其取走。订单回报、成交回报、持仓、余额、网关状态、初始化状态和定时器事件不会因获取不及时而被覆盖，未被获取时会一直积压，每个线程最多积压10240条，超出时丢弃最旧的事件（WebSocket下单应答单独积压，最多1024条）。
 
-等待期间仍会执行```Promise```、```setTimeout```回调以及WebSocket、TCP连接的读写操作；```timeout```为```0```时也会处理一轮这些任务。
+等待期间仍会执行```Promise```、```setTimeout```回调，以及WebSocket、TCP连接的读写；```timeout```为```0```时也会处理一轮上述任务。
 
-```JavaScript```、```Rust```中，同一线程内的```ctx.poll()```与`EventLoop`从同一事件队列获取事件，每个线程应仅使用其中一种方式；```JavaScript```线程可通过```options```形式同时等待推送事件与线程消息等其他来源的事件。```Python```的```EventLoop()```使用独立队列，与```ctx.poll()```互不争抢事件。
+在```JavaScript```和```Rust```中，同一线程内的```ctx.poll()```与`EventLoop`从同一个事件队列获取事件，一个线程只应使用其中一种方式；```JavaScript```线程可以使用```options```形式同时等待推送事件与线程消息等其它来源。```Python```的```EventLoop()```拥有独立的队列，与```ctx.poll()```互不争抢。
 
-消费速度诊断：托管者为每个交易所设置的推送接收缓冲区会随事件积压从1024条自动扩容至32768条，达到容量上限后丢弃行情事件、并通知连接器暂缓推送其他事件。```ctx.connectors()```返回已加载的交易所列表（顺序对应```ev.ex```），每一项包含```ex```、```label```、```name```、```symbol```、```interval```、```orderIdScope```、```feed```和```acksDropped```字段，```feed```包含进程启动以来的累计计数及当前缓冲区容量```{ticksDropped, backpressure, ringCapacity}```：缓冲区已满时丢弃的行情条数、通知连接器暂缓推送的次数、缓冲区当前的容量（条）；```acksDropped```是WebSocket下单应答因发起线程的应答队列已满而被丢弃的累计条数。这些累计计数快速增长表明策略处理事件的速度过慢，应先检查每条事件的处理耗时，全市场```tickers```这类高频订阅应保持默认的仅保留最新事件模式。
+消费速度诊断：托管者为每个交易所设有接收推送的缓冲区，容量随积压量从1024条自动扩容至32768条；达到上限后会丢弃行情事件，并让连接器暂缓推送其他事件。```ctx.connectors()```返回已加载的交易所列表（列表顺序即```ev.ex```），每一项包含```ex```、```label```、```name```、```symbol```、```interval```、```orderIdScope```、```feed```和```acksDropped```字段。```feed```是自进程启动以来的累计计数```{ticksDropped, backpressure, ringCapacity}```，依次为：缓冲区满时丢弃的行情条数、让连接器暂缓推送的次数、缓冲区当前容量（条）；```acksDropped```是因发起线程的应答队列已满而被丢弃的WebSocket下单应答累计条数。若这些数值增长较快，说明策略处理事件过慢，应先检查每条事件的处理耗时；全市场```tickers```这类高频订阅应保持默认的仅保留最新数据模式。
 
-```Python```中的接口为```ctx.poll(streams=None, timeout_ms=None)```：```streams```为```None```或```[]```时表示本线程订阅的全部事件流，否则应传入订阅对象、事件流ID、```SubscriptionList```或由它们组成的（嵌套）列表；```timeout_ms```为```None```时持续等待，```0```表示不等待，正整数表示最长等待的毫秒数，超时返回```None```。事件是字典（```dict```的子类），字段与```JavaScript```事件的字段相同（```kind```同样是类型名字符串），```ev["kind"]```与```ev.kind```两种访问方式均可使用；深度事件提供```ev.book(n)```方法。实盘停止后（包括```onexit()```执行期间）调用该接口会抛出```StopError```，正在等待的调用也会立即抛出该异常。不支持```options```形式（传入字典会抛出```TypeError```）：线程消息、```exchange.Go()```的完成通知通过```EventLoop()```和各自的对象获取。```ctx.connectors()```与```JavaScript```中的接口相同，```ctx.STREAM_STATUS```、```ctx.STREAM_TIMER```、```ctx.STREAM_ORDER_ACK```也可使用。
+```Python```中的形式为```ctx.poll(streams=None, timeout_ms=None)```：```streams```为```None```或```[]```时表示本线程订阅的全部事件流，否则可以是订阅对象、事件流ID、```SubscriptionList```或它们的（嵌套）列表；```timeout_ms```为```None```时持续等待，为```0```时不等待，为正整数时表示最长等待的毫秒数，超时返回```None```。事件为字典（```dict```的子类），字段与```JavaScript```的事件相同（```kind```同样为类型名字符串），```ev["kind"]```与```ev.kind```两种写法均可；深度事件提供```ev.book(n)```方法。实盘停止后（包括```onexit()```执行期间）调用会抛出```StopError```，正在等待中的调用也会立即抛出该异常。不支持```options```形式（传入字典会抛出```TypeError```）：线程消息和```exchange.Go()```的完成通知需通过```EventLoop()```及各自的对象获取。```ctx.connectors()```与```JavaScript```中的用法相同，```ctx.STREAM_STATUS```、```ctx.STREAM_TIMER```、```ctx.STREAM_ORDER_ACK```同样可用。
 
-```Rust```中的函数签名为```ctx::poll(streams: &[u32], timeout_ms: Option<u64>) -> ctx::Polled```：```streams```传入```sub.id()```或内置的```ctx::STREAM_TIMER```、```ctx::STREAM_STATUS```、```ctx::STREAM_ORDER_ACK```，空切片表示本线程的全部订阅，```None```表示无限等待；返回```Polled::Event(ev)```、```Polled::Empty```（超时）、```Polled::Stopped```（实盘停止）或```Polled::Error(rc)```。```Rust```的事件采用原始结构，引入```sdk::ctx::EventExt```后可按事件类型读取，无需编写```unsafe```：```ev.event_kind()```（事件类型，枚举```ctx::Kind```）、```ev.kind_str()```（类型名称，与```JavaScript```事件的```kind```相同，如```fill```）、```ev.stream()```、```ev.channel()```、```ev.book(n)```（深度事件），以及将数值字段换算为浮点数的```ev.ticker()```、```ev.trade()```、```ev.kline()```、```ev.order()```（订单回报，```OrderView```包含```client_id```）、```ev.position()```、```ev.balance()```、```ev.fill()```（成交回报，```FillView```：```order_id```、```client_id```、```trade_id```、```px```、```qty```、```fee```（```Option<f64>```）、```fee_ccy```、```side```、```liquidity```、```time```）、```ev.order_ack()```（WebSocket下单应答，```OrderAckView```：```req_id```、```op```、```status```、```ok```、```id```、```client_id```、```error```、```reason```、```reason_text```、```exch_time```（```Option<i64>```）、```latency_ms```、```time```）、```ev.gateway()```（网关状态）、```ev.feed_status()```（初始化状态，```failed()```时```message```为失败原因），事件类型不匹配时返回```None```，字段与```JavaScript```事件的对应字段一致。区分事件类型的三种写法适用于不同场景：仅处理一种事件时直接使用类型化方法，如```if let Some(f) = ev.fill() { ... }```，一步完成类型判断与字段读取；需要按类型分别处理多种事件时使用```match ev.event_kind() { Kind::Fill => ..., Kind::Order => ..., _ => {} }```（```use sdk::ctx::{EventExt, Kind};```），```ctx::Kind```的取值为```Ticker```、```Depth```、```Trade```、```Kline```、```Order```、```Position```、```Balance```、```Fill```、```Ack```、```Timer```、```Gateway```、```Status```、```Unknown```（托管者发送了当前SDK无法识别的事件类型），后续可能新增取值，```match```需要包含```_```分支；```ev.kind_str()```用于输出日志或与```JavaScript```、```Python```的类型名称对照，返回值与```ev.event_kind().as_str()```相同。事件结构中以数字表示的```kind```字段是底层接口的类型代码，不应直接用于类型比较；```ev.time()```、```ev.ts()```（```f64```毫秒）与```JavaScript```事件的```time```、```ts```相同，可用于所有事件，各类型化结果的```time```字段均与```ev.time()```一致。```Rust```的任意线程均可订阅事件并调用```poll```，各线程仅获取本线程订阅的事件。```ctx::connectors()```返回内容相同的JSON字符串。
+```Rust```中的签名为```ctx::poll(streams: &[u32], timeout_ms: Option<u64>) -> ctx::Polled```：```streams```传入```sub.id()```或内置的```ctx::STREAM_TIMER```、```ctx::STREAM_STATUS```、```ctx::STREAM_ORDER_ACK```，传空切片表示本线程订阅的全部流；超时参数为```None```时表示一直等待。返回值为```Polled::Event(ev)```、```Polled::Empty```（超时）、```Polled::Stopped```（实盘已停止）或```Polled::Error(rc)```。```Rust```中的事件是原始结构体，引入```sdk::ctx::EventExt```后即可按事件类型读取，无需编写```unsafe```代码：```ev.event_kind()```（事件类型，枚举```ctx::Kind```）、```ev.kind_str()```（类型名，与```JavaScript```事件的```kind```相同，如```fill```）、```ev.stream()```、```ev.channel()```、```ev.book(n)```（深度事件），以及已换算为实数的```ev.ticker()```、```ev.trade()```、```ev.kline()```、```ev.order()```（订单回报，```OrderView```包含```client_id```）、```ev.position()```、```ev.balance()```、```ev.fill()```（成交回报，```FillView```：```order_id```、```client_id```、```trade_id```、```px```、```qty```、```fee```（```Option<f64>```）、```fee_ccy```、```side```、```liquidity```、```time```）、```ev.order_ack()```（WebSocket下单应答，```OrderAckView```：```req_id```、```op```、```status```、```ok```、```id```、```client_id```、```error```、```reason```、```reason_text```、```exch_time```（```Option<i64>```）、```latency_ms```、```time```）、```ev.gateway()```（网关状态）、```ev.feed_status()```（初始化状态，```failed()```为真时```message```为失败原因）。事件类型不匹配时上述方法返回```None```，各字段与```JavaScript```事件的字段一一对应。区分事件类型有三种写法，适用场景各不相同：只处理某一种事件时，直接使用类型化方法，如```if let Some(f) = ev.fill() { ... }```，类型判断与字段读取一步完成；需要按类型分别处理多种事件时，使用```match ev.event_kind() { Kind::Fill => ..., Kind::Order => ..., _ => {} }```（```use sdk::ctx::{EventExt, Kind};```）。```ctx::Kind```的取值包括```Ticker```、```Depth```、```Trade```、```Kline```、```Order```、```Position```、```Balance```、```Fill```、```Ack```、```Timer```、```Gateway```、```Status```、```Unknown```（托管者发送了当前SDK无法识别的事件类型），后续版本可能新增取值，因此```match```必须包含```_```分支；```ev.kind_str()```用于输出日志，或与```JavaScript```、```Python```中的类型名对照，其结果与```ev.event_kind().as_str()```相同。事件结构体中数字形式的```kind```字段是底层接口的类型代码，请勿用它进行比较。```ev.time()```、```ev.ts()```（```f64```，单位为毫秒）与```JavaScript```事件的```time```、```ts```含义相同，所有事件均可调用，各类型化结果中的```time```字段即```ev.time()```。```Rust```的任意线程都可以订阅并调用```poll```，每个线程只获取本线程订阅的事件。```ctx::connectors()```以JSON字符串形式返回相同的内容。
 
 See also: `ctx.subscribe`, `Subscription`, `ctx.order`, `ctx.submit`, `EventLoop`
 
@@ -14262,19 +14274,23 @@ See also: `ctx.order`, `ctx.cancel`, `ctx.poll`, `ctx.subscribe`, `exchange.IO("
 
 #### Subscription
 
-订阅对象，由`ctx.subscribe`返回，代表一路推送订阅。可以直接传给`ctx.poll`，只获取这一路的事件。订阅对象归属于创建它的线程：该路订阅的事件只投递给这个线程，也只有这个线程能够退订。批量订阅（```symbol```传入数组）时返回订阅对象数组，调用数组的```unsubscribe()```可一次性退订全部元素；该数组也可以直接传给```ctx.poll()```。
+订阅对象，由`ctx.subscribe`返回，代表一路推送订阅。可将其直接传给`ctx.poll`，只获取这一路的事件。订阅对象归属于创建它的线程：该订阅的事件只投递给这个线程，也只有这个线程能够退订。批量订阅（```symbol```传入数组）返回订阅对象数组，调用数组的```unsubscribe()```可一次性退订全部元素，该数组也可以直接传给```ctx.poll()```。
+
 订阅对象具有以下只读属性，```JSON.stringify(sub)```的结果仅包含这些属性：
 
 | 属性 | 类型 | 说明 |
 | - | - | - |
-| id | number | 事件流ID，该路订阅所产生事件的```ev.stream```即等于此值。同一线程中身份相同的订阅，其```id```相同 |
+| id | number | 事件流ID，该订阅所产生事件的```ev.stream```与之相等。同一线程中身份相同的订阅具有相同的```id``` |
 | ex | number | 账户在```exchanges```数组中的索引 |
 | channel | string | 频道：```ticker```、```bbo```、```depth```、```trade```、```kline```、```tickers```、```private``` |
 | symbol | string | 品种代码；```tickers```、```private```订阅时为空字符串 |
-| depth | number | ```depth```订阅的档数（```0```到```255```，```0```表示使用交易所默认档数），其他订阅为```0``` |
+| depth | number | ```depth```订阅的档位数（```0```到```255```，```0```表示使用交易所默认档位数），其他订阅为```0``` |
 | interval | number | ```kline```订阅的周期（秒），其他订阅为```0``` |
-方法：`book`用于读取该路深度订阅的订单簿；`positions`、`balances`用于读取私有订阅维护的最新持仓和余额；`unsubscribe`用于退订。
-```Python```中为```Subscription```对象，属性相同且只读，```info()```返回由这些属性组成的字典；批量订阅返回```SubscriptionList```（```list```的子类），其```unsubscribe()```会退订全部元素。```Rust```中对应的是```ctx::subscribe()```（批量订阅为```ctx::subscribe_many()```）返回的```ctx::Sub```，属性以方法形式提供：```id()```、```ex()```、```channel()```、```depth()```、```interval()```。
+| group | string | 订阅分组名，默认分组为空字符串（参见`ctx.subscribe`的```group```参数） |
+
+方法：`book`读取该深度订阅的订单簿；`positions`、`balances`读取私有订阅维护的最新持仓和余额；`unsubscribe`用于退订。
+
+```Python```中为```Subscription```对象，属性相同且均为只读，```info()```返回由这些属性组成的字典；批量订阅返回```SubscriptionList```（```list```的子类），其```unsubscribe()```可退订全部元素。```Rust```中对应```ctx::subscribe()```（批量订阅为```ctx::subscribe_many()```）返回的```ctx::Sub```，属性以方法形式提供：```id()```、```ex()```、```channel()```、```depth()```、```interval()```。
 
 ##### Subscription.book
 
@@ -28037,7 +28053,7 @@ BigONE的现货交易，只提供现货交易对。交易所没有普通市价�
 - 条件单支持止盈、止损（不填委托价为触发后市价成交），不支持OCO。
 - ```exchange.GetMarkets()```的下单限制以计价币金额给出（```MinNotional```、```MaxNotional```），```MinQty```、```MaxQty```为0。
 - BigONE的推送没有逐笔成交，私有流的成交回报（kind ```fill```，```channel```为```fills```）由同一订单相邻两次订单更新推算：数量为累计成交量之差，价格为成交额（均价×累计成交量）之差除以数量，成交ID为```syn:```开头的合成号，没有手续费与挂单/吃单信息。一条成交回报可能合并了两次更新之间的多笔成交（订阅前已有成交的订单在第一次更新时合并成一条），但同一订单全部成交回报的数量之和等于订单的累计成交量。成交回报先于对应的订单更新推送；断线期间的成交在重连后的第一次订单更新里合并推送。
-- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。BigONE的ticker流只在有成交时推送，其中的买一卖一价会滞后，所以ticker与bbo推送的买一卖一价与量取自同交易对的深度流（另一条连接上按序号连续性维护的完整盘口，最优档变化才推送bbo）；ticker在两条流都到达后才开始推送。深度推送是全量快照加实时增量（按```changeId```/```prevId```连续性校验，断档时重新订阅取快照）；BigONE只有这一条深度流，不同档数的订阅共用它、各自按档数截断，缺省为20档。逐笔成交推送不带成交ID（交易所在增量里填```0```、时间只到秒），事件里的成交ID是由成交时间、价格、数量和方向拼成的合成ID（以```syn:```开头），与```exchange.GetTrades()```的成交ID不同；同一秒内价格、数量、方向都相同的几笔，第二笔起在合成ID后加```#1```、```#2```……以保证唯一。K线首次订阅先推送500根历史；BigONE的K线推送不带收盘标志：收到更晚的一根K线时（不论是否紧接着）把上一根作为收盘K线推送；订阅了逐笔成交时，还按成交推送里的交易所时间判断，K线结束时刻过后约1秒仍没有下一根时按收盘推送（不看本机时钟）。每根K线至多推送一次收盘；断线重连后不会把断线前未收盘的K线当作收盘推送。私有流是整个账户的一路```private```订阅（不带交易对），只在订阅时连接并用JWT鉴权，在同一条连接上订阅全部交易对的订单流与余额流：订阅生效后（以及每次断线重连后）先按```exchange.GetAssets()```同一接口推送一次全部余额快照，然后报告就绪，之后推送订单更新与发生变化的币种余额：BigONE的余额推送里只有冻结额与```exchange.GetAssets()```同口径，所以只推送冻结额，可用额为null，需要可用额时调用```exchange.GetAssets()```。未触发的条件单不推送订单更新，触发后照常推送。现货没有持仓，私有流不推送持仓。鉴权失败（例如API Key设置了IP白名单而当前IP不在其中）时连接状态报告降级、私有流报告失败（行情推送不受影响）。不支持全市场```tickers```订阅（BigONE的ticker推送必须指定交易对），订阅时报错；请按交易对订阅ticker。
+- 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。BigONE的ticker流只在有成交时推送，其中的买一卖一价会滞后，所以ticker与bbo推送的买一卖一价与量取自同交易对的深度流（另一条连接上按序号连续性维护的完整盘口，最优档变化才推送bbo）；ticker在两条流都到达后才开始推送。深度推送是全量快照加实时增量（按```changeId```/```prevId```连续性校验，断档时重新订阅取快照）；BigONE只有这一条深度流，不同档数的订阅共用它、各自按档数截断，缺省为20档。深度只在盘口变化时推送：主要交易对的前几档常由做市挂单在原价补单，有成交时盘口也可能几十秒不变，这段时间没有深度推送是正常的。逐笔成交推送不带成交ID（交易所在增量里填```0```、时间只到秒），事件里的成交ID是由成交时间、价格、数量和方向拼成的合成ID（以```syn:```开头），与```exchange.GetTrades()```的成交ID不同；同一秒内价格、数量、方向都相同的几笔，第二笔起在合成ID后加```#1```、```#2```……以保证唯一。K线首次订阅先推送500根历史；BigONE的K线推送不带收盘标志：收到更晚的一根K线时（不论是否紧接着）把上一根作为收盘K线推送；订阅了逐笔成交时，还按成交推送里的交易所时间判断，K线结束时刻过后约1秒仍没有下一根时按收盘推送（不看本机时钟）。每根K线至多推送一次收盘；断线重连后不会把断线前未收盘的K线当作收盘推送。私有流是整个账户的一路```private```订阅（不带交易对），只在订阅时连接并用JWT鉴权，在同一条连接上订阅全部交易对的订单流与余额流：订阅生效后（以及每次断线重连后）先按```exchange.GetAssets()```同一接口推送一次全部余额快照，然后报告就绪，之后推送订单更新与发生变化的币种余额：BigONE的余额推送里只有冻结额与```exchange.GetAssets()```同口径，所以只推送冻结额，可用额为null，需要可用额时调用```exchange.GetAssets()```。未触发的条件单不推送订单更新，触发后照常推送。现货没有持仓，私有流不推送持仓。鉴权失败（例如API Key设置了IP白名单而当前IP不在其中）时连接状态报告降级、私有流报告失败（行情推送不受影响）。不支持全市场```tickers```订阅（BigONE的ticker推送必须指定交易对），订阅时报错；请按交易对订阅ticker。
 
 #### 币安
 
@@ -31230,6 +31246,7 @@ function main() {
 
 - 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与私有流（订单回报、持仓与余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。ticker的最新价、24小时最高最低价、成交量、持仓量与开盘价（由24小时涨跌幅推算）口径与```exchange.GetTickers()```相同，买卖一价与量来自交易所的最优买卖频道（与bbo订阅同一条推送）。深度订阅（缺省20档、最多255档）由交易所整本快照加增量同步、按撮合序号检查连续性，断档时重新订阅；交易所每个品种只有一条订单簿推送，不同档数的订阅共用这一条、各自按档数截断。推送的深度按价格合并（与```exchange.GetDepth()```的逐笔挂单不同）。逐笔成交与```exchange.GetTrades()```同一套成交ID，强平、自动减仓与市场结算的成交不推送。K线支持1分钟、5分钟、15分钟、30分钟、1小时、4小时、12小时、1天周期（推送没有周线），首次订阅先推送500根历史。私有流是整个账户的一路```private```订阅（不带交易对），需要配置API密钥私钥与账户索引，只在订阅时连接：订单频道带与REST私有接口同一个鉴权令牌，持仓与账户统计频道按账户索引订阅；订阅生效后（以及每次断线重连后）先按```exchange.GetAccount()```与```exchange.GetPositions()```同一接口推送一次USDC余额与全部持仓快照，然后报告就绪，之后推送全部品种的订单更新（订单ID与```exchange.CreateOrder()```返回的相同）、发生变化的持仓（单向净持仓，平仓推送数量0）与变化后的USDC余额（可用为可用保证金，冻结为账户总价值减可用，与```exchange.GetAccount()```相同）。鉴权令牌有效期7小时，私有连接在令牌到期前自动重连换新令牌并重新推送快照；鉴权失败时连接状态报告降级、私有流报告失败（行情推送不受影响）。模拟盘连接测试网的推送地址。全市场```tickers```订阅（不带交易对）使用交易所的全市场统计频道，约每秒推送一次有变化的品种，最新价、24小时高低价、成交量、持仓量与开盘价同ticker，买一卖一只有价格没有数量（交易所没有全市场的最优挂单频道），还没有成交的品种（最新价、24小时高低价与成交量全为0）不推送，同```exchange.GetTickers()```。
 - 私有流（```private```订阅）同时订阅交易所的账户成交频道（不需要鉴权令牌），推送本账户的每一笔成交（kind ```fill```，```channel```为```fills```：订单ID（与订单更新、```exchange.CreateOrder()```返回的相同）、交易所成交ID（与逐笔成交、```exchange.GetTrades()```同一套）、这一笔的成交价与数量（币）、手续费（USDC，按这一笔的成交额乘本方费率计算；交易所没有给出本方费率表示这笔没有手续费，手续费为0）、挂单或吃单）；自成交时买单、卖单各推送一条。成交与订单更新来自交易所的两个频道，两者到达的先后不保证。强平单与挂单的撮合推送成交，自动减仓与市场结算不推送。成交回报不回补历史：订阅生效时交易所给出的成交不推送，断线期间的成交不补推（订单更新的累计成交量仍然准确），重连后交易所重发的同一笔成交只推送一次。
+- 订阅速度与断线检测：交易所按IP限制客户端每分钟最多发送200条消息（超出的订阅交易所不应答），本交易所的全部推送连接合计每分钟最多发送170条订阅消息，超出的排队依次发送。ticker订阅占两条（24小时统计与最优买卖两个频道），其它订阅各占一条，一次订阅很多品种时需要几分钟才全部生效，已经生效的照常推送。托管者每30秒向每条连接发送一次心跳、交易所必定回复，连接45秒没有收到任何数据即判定为断开并重连。
 - 支持WebSocket下单（```ctx.submit(exchange, req)```）：经Lighter的```/stream```WebSocket发送与REST下单完全相同的已签名L2交易（下单```jsonapi/sendtx```，多笔用```jsonapi/sendtxbatch```一帧发出），使用单独的一条交易连接（第一次使用时建立，至多等5秒，连不上直接报错，不改用REST；REST接口地址含```testnet```时连测试网）。```req.op```为```order```（```symbol side price amount```及```type tif postOnly reduceOnly extra```，市价单同样按对手价加滑点保护）或```cancel```（```symbol id```）。订单ID就是客户端订单下标（```ClientOrderIndex```），即```ctx.submit```返回的localId（数字串，与REST下单一样由连接器生成），撤单、改单都认它，订单回报与成交回报的```clientId```也是它；下单参数里不能自带```clientId```或```extra.ClientOrderIndex```。批量```orders```用原生```sendtxbatch```一帧发出（同一API Key、nonce连续），每批至多15笔，交易所整批受理或整批拒绝，每笔各自一条应答（受理时带各自的交易哈希）。```code```为200只表示交易已被受理，撮合结果（如只做Maker被取消）看订单回报，与REST下单相同。nonce与REST共用一本账：取号、签名、发出与REST在同一把锁下，WebSocket第一次（或失败后）以```/api/v1/nextNonce```为准，之后本地连续递增（交易所的nextNonce不会立刻反映刚受理的交易）；用过WebSocket下单之后，REST交易取交易所nonce与本地计数中较大的一个；任何一笔被拒、结果未知时下一笔重新以交易所为准，两条路径不会重复使用同一个nonce。错误信息与REST相同（```lighter 错误码: 原因```）。```IO("extend")```的```ws:order```、```ws:cancel```规则注入这一帧的```data```（与REST规则注入```sendTx```表单同位），不能改```id```、```tx_type```、```tx_info```、```tx_types```、```tx_infos```。已发出但没有收到应答（或交易所回复29500、29501）时不会重发：按客户端订单下标只读查询挂单与历史订单确认，仍无法确认时应答状态为未知并带上客户端订单ID。限频：交易所的sendTx额度与REST共用、一帧算一次，额度取决于账户类型（Standard账户每分钟60次且与其它REST请求合计，Plus与Premium每分钟4000次起），本地按每分钟4000次预检，交易所回复429、23000或21506时直接报限频错误。
 
 #### edgeX
