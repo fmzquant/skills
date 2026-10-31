@@ -10641,27 +10641,27 @@ Dial(address, timeout)
 Dial(address, options)
 ```
 
-用于原始的```Socket```访问，支持```tcp```、```tls```（也可写作```ssl```）协议，以及WebSocket的```ws```、```wss```协议。还支持连接数据库，支持的数据库包括：```sqlite3```、```mysql```、```postgres```、```clickhouse```。
+用于原始的```Socket```访问，支持```tcp```、```tls```（也可写作```ssl```）协议，以及WebSocket的```ws```、```wss```协议。也可用于连接数据库，目前支持的数据库包括：```sqlite3```、```mysql```、```postgres```、```clickhouse```。
 
 Parameters:
 
 - `address` (string, required): 请求地址。
-- `timeout` (number, optional): 建立连接的超时时间。```ws```、```wss```协议的单位为毫秒（数值小于100时按秒计算），```tcp```、```tls```协议的单位为秒；设置为0时使用默认超时时间。在```JavaScript```、```Python```中，不传该参数时默认值为30，即30秒。在```Rust```中，```Dial(address)```使用默认超时时间；如需指定超时时间，请使用```Dial::new(address, timeout)```，其中```timeout```的单位与上述规则相同。
+- `timeout` (number, optional): 建立连接的超时时间。```ws```、```wss```协议的单位为毫秒（取值小于100时按秒计算），```tcp```、```tls```协议的单位为秒；设置为0时使用默认超时时间。在```JavaScript```、```Python```中，不传入该参数时默认为30，即30秒。在```Rust```中，```Dial(address)```使用默认超时时间；如需指定超时时间，请使用```Dial::new(address, timeout)```，其中```timeout```的单位与上述规则相同。
 - `options` (object, optional): 配置选项，例如```headers```（WebSocket请求头）、```timeout```（单位与```timeout```参数相同，未设置时使用默认超时时间）。
 
-Returns (object): 连接对象，提供```read()```、```write()```、```close()```等方法（数据库连接还提供```exec()```方法），详见`Dial-return`。连接失败（例如超时）时返回空值并记录错误（```Rust```中则返回```Valid()```为```false```的连接对象）。
+Returns (object): 连接对象，提供```read()```、```write()```、```close()```等方法（数据库连接对象还提供```exec()```方法），详见`Dial-return`。连接失败（例如超时）时返回空值，并记录错误信息（```Rust```中返回```Valid()```为```false```的连接对象）。
 
 Dial函数调用示例。
 
 ```javascript
 function main(){
-    // Dial支持tcp://、tls://、ws://和wss://协议，其中tcp://、tls://可额外传入一个参数指定超时时间，单位：秒
+    // Dial支持tcp://、tls://、ws://、wss://协议，使用tcp://、tls://协议时可额外传入一个参数，指定超时时间（单位：秒）
     var client = Dial("tls://www.baidu.com:443")
     if (client) {
-        // write可额外传入一个数字参数指定超时时间，返回值为成功发送的字节数
+        // write可额外传入一个数值参数指定超时时间，返回值为成功发送的字节数
         client.write("GET / HTTP/1.1\nConnection: Closed\n\n")
         while (true) {
-            // read可额外传入一个数字参数指定超时时间，单位：毫秒。返回null表示出错、超时或socket已关闭
+            // read可额外传入一个数值参数指定超时时间，单位：毫秒。返回null表示出错、超时或socket已关闭
             var buf = client.read()
             if (!buf) {
                  break
@@ -10688,13 +10688,13 @@ def main():
 
 ```rust
 fn main() {
-    // Dial支持tcp://、tls://、ws://和wss://协议，其中tcp://、tls://可使用Dial::new(addr, timeout)指定超时时间，单位：秒
+    // Dial支持tcp://、tls://、ws://、wss://协议，使用tcp://、tls://协议时可通过Dial::new(addr, timeout)指定超时时间（单位：秒）
     let mut client = Dial("tls://www.baidu.com:443");
     if client.Valid() {
-        // write的第二个数字参数用于指定超时时间，返回值为成功发送的字节数
+        // write的第二个数值参数用于指定超时时间，返回值为成功发送的字节数
         client.write("GET / HTTP/1.1\nConnection: Closed\n\n", 0);
         loop {
-            // read的数字参数用于指定超时时间，单位：毫秒。返回空字符串表示出错、超时或socket已关闭
+            // read的数值参数用于指定超时时间，单位：毫秒。返回空字符串表示出错、超时或socket已关闭
             let buf = client.read(0);
             if buf == "" {
                 break;
@@ -10706,7 +10706,7 @@ fn main() {
 }
 ```
 
-连接币安（binance）的WebSocket行情接口。
+通过WebSocket连接币安（binance）的行情接口。
 
 ```javascript
 function main() {
@@ -10719,7 +10719,7 @@ function main() {
     }
 
     while (true) {
-        // read仅返回调用read之后接收到的数据
+        // read仅返回调用read之后收到的数据
         var buf = client.read()
         if (!buf) {
             break
@@ -10777,13 +10777,13 @@ fn main() {
     }
 
     loop {
-        // read仅返回调用read之后接收到的数据
+        // read仅返回调用read之后收到的数据
         let buf = client.read(0);
         if buf == "" {
             break;
         }
         let obj = JSONParse(&buf).unwrap();
-        // Rust SDK 未提供 JSON 序列化功能，因此通过字符串拼接构造状态栏表格的 JSON 文本
+        // Rust SDK 不提供 JSON 序列化功能，因此通过字符串拼接构造状态栏表格的 JSON 文本
         let mut rows = String::new();
         if let Some(arr) = obj.as_array() {
             for ticker in arr {
@@ -10804,7 +10804,7 @@ fn main() {
 }
 ```
 
-连接```sqlite3```数据库，并使用连接对象的```exec()```方法执行SQL语句（参见`Dial-return`）。
+连接```sqlite3```数据库，并通过连接对象的```exec()```方法执行SQL语句（参见`Dial-return`）。
 
 ```javascript
 var client = null
@@ -10855,26 +10855,27 @@ fn main() {
 }
 ```
 
-```address```参数的详细说明：在常规地址```wss://ws.okx.com:8443/ws/v5/public```之后，使用```|```符号分隔。如果参数字符串中包含```|```字符，则使用```||```作为分隔符。分隔符之后的部分为功能参数设置，各参数之间用```&```字符连接。
+```address```参数的详细说明：在正常的地址```wss://ws.okx.com/ws/v5/public```之后，以```|```符号分隔。如果参数字符串中包含```|```字符，则以```||```作为分隔符。分隔符之后的部分为功能参数设置，各参数之间用```&```字符连接。
 
 例如，同时设置```ss5```代理和压缩参数时，可以写作：
-```Dial("wss://ws.okx.com:8443/ws/v5/public|proxy=socks5://xxx:9999&compress=gzip_raw&mode=recv")```
+```Dial("wss://ws.okx.com/ws/v5/public|proxy=socks5://xxx:9999&compress=gzip_raw&mode=recv")```
 
 | Dial函数的address参数支持的功能 | 参数说明 |
 | - | - |
-| WebSocket协议数据压缩相关的参数：compress=参数值 | compress为压缩方式，可选值为gzip、gzip_raw（也可写作flate）、zlib（也可写作deflate）。gzip_raw表示不带gzip头的原始deflate数据，适用于接收的数据不是标准gzip格式的情况。设置不支持的值会报错。 |
-| WebSocket协议数据压缩相关的参数：mode=参数值 | mode为压缩模式，仅支持recv（接收压缩数据并在本地解压缩），未设置时默认为recv。设置了compress时，若将mode设置为send或dual会报错。 |
-| WebSocket协议启用compression设置：enableCompression=true | 握手时协商WebSocket的permessage-deflate压缩扩展。服务端接受后，收到的压缩消息由托管者自动解压，读取到的仍是原始数据；发送的数据不进行压缩。服务端不支持时，按不压缩方式连接。部分交易所（如dYdX）要求开启此选项，否则可能握手失败（HTTP 426）。 |
-| WebSocket协议设置底层自动重连相关的参数：reconnect=参数值 | reconnect表示是否启用重连，reconnect=true为启用重连。未设置该参数时默认不重连。 |
-| WebSocket协议设置底层自动重连相关的参数：interval=参数值 | interval为重连重试的时间间隔，单位为毫秒。例如interval=10000表示重试间隔为10秒；未设置时默认为1秒，即interval=1000。 |
+| WebSocket协议数据压缩相关的参数：compress=参数值 | compress为压缩方式，可选gzip、gzip_raw（也可写作flate）、zlib（也可写作deflate）。gzip_raw为不带gzip头的原始deflate数据，当接收的数据不是标准gzip格式时可使用该方式。设置不支持的值会报错。 |
+| WebSocket协议数据压缩相关的参数：mode=参数值 | mode为压缩模式，仅支持recv（接收压缩数据并在本地解压缩），不设置时默认为recv。设置了compress时，若将mode设置为send或dual会报错。 |
+| WebSocket协议启用compression设置：enableCompression=true | 握手时协商WebSocket的permessage-deflate压缩扩展。服务端接受后，收到的压缩消息由托管者自动解压，读取到的仍是原始数据；发送的数据不做压缩。服务端不支持时按不压缩方式连接。部分交易所（如dYdX）要求开启此项，否则可能握手失败（HTTP 426）。 |
+| WebSocket协议设置底层自动重连相关的参数：reconnect=参数值 | reconnect用于设置是否重连，reconnect=true表示启用重连。不设置该参数时默认不重连。 |
+| WebSocket协议设置底层自动重连相关的参数：interval=参数值 | interval为重连的时间间隔，单位为毫秒，例如interval=10000表示重连间隔为10秒。不设置时默认为1秒，即interval=1000。 |
 | WebSocket协议设置底层自动重连相关的参数：payload=参数值 | payload为WebSocket重连时需要发送的订阅消息，例如：payload=okok。 |
 | socks5代理的相关参数：proxy=参数值 | proxy为ss5代理设置，参数值格式为：socks5://name:pwd@192.168.0.1:1080，其中name为ss5服务端用户名，pwd为ss5服务端登录密码，1080为ss5服务端口。 |
-| WebSocket接收缓冲区上限：qsize=参数值 | qsize为接收缓冲区最多保存的消息条数，未设置时默认为4096。 |
-| WebSocket接收缓冲区上限：qbytes=参数值 | qbytes为接收缓冲区最多保存的字节数，未设置时默认为16777216（16MB）。 |
+| WebSocket接收缓冲区上限：qsize=参数值 | qsize为接收缓冲区最多保存的消息条数，不设置时默认为4096。 |
+| WebSocket接收缓冲区上限：qbytes=参数值 | qbytes为接收缓冲区最多保存的字节数，不设置时默认为16777216（16MB）。 |
 
 ```Dial()```函数仅支持实盘。
 
-使用Dial函数连接数据库时，各数据库连接字符串的格式如下：
+使用Dial函数连接数据库时，连接字符串的格式如下：
+
 | 支持的数据库 | 连接字符串（Connection String） |
 | - | - |
 | sqlite3 | sqlite3://test1.db |
@@ -10885,13 +10886,13 @@ fn main() {
 各数据库连接字符串的说明：
 
 - sqlite3：```sqlite3://```前缀表示使用sqlite3数据库。使用相对路径时，数据库文件位于实盘目录（```logs/storage/<实盘ID>/```）下；```sqlite3://:memory:```表示内存数据库，不创建文件，连接关闭后数据即被丢弃；也支持```sqlite3://file:test.db?cache=shared&mode=memory```形式的URI写法。
-- mysql：```mysql://```之后的部分与Go语言MySQL驱动（go-sql-driver/mysql）的DSN格式相同。支持```charset```、```collation```、```timeout```、```readTimeout```、```writeTimeout```、```tls```（```true```、```false```、```skip-verify```、```preferred```）等参数，也可以通过```ssl-mode```设置TLS；```parseTime```、```loc```仅校验取值，不生效；不支持自定义TLS配置名；其他无法识别的参数将作为会话变量，在连接建立后执行```SET 参数名 = 参数值```。也可以写成URL形式：```mysql://username:yourpassword@localhost:3306/yourdatabase```。
-- postgres：采用libpq键值对格式，各项之间以空格分隔。```sslmode```遵循libpq的语义：```disable```表示不使用TLS，```require```等使用TLS但不校验证书，仅```verify-ca```、```verify-full```会校验证书；不支持```sslrootcert```、```sslcert```、```sslkey```、```passfile```、```service```等需要读取文件的参数；其他无法识别的参数将作为运行时参数设置。也可以写成URL形式：```postgres://username:yourpassword@localhost:5432/yourdatabase?sslmode=disable```。
-- clickhouse：```clickhouse://```之后的部分与Go语言ClickHouse驱动（clickhouse-go）的DSN格式相同：```tcp://```表示使用原生TCP协议（端口9000；端口为9440或设置参数```secure=true```时使用TLS，设置```skip_verify=true```时不校验证书），也可以写成```http://```、```https://```以使用HTTP接口；其他无法识别的参数将作为ClickHouse设置（settings）。也可以写成URL形式：```clickhouse://username:yourpassword@localhost:9000/yourdatabase```，默认使用原生TCP协议；使用```clickhouse+http://```、```clickhouse+https://```前缀，或端口为8123、8443时，使用HTTP接口。
+- mysql：```mysql://```之后的部分与Go语言MySQL驱动（go-sql-driver/mysql）的DSN格式相同。支持```charset```、```collation```、```timeout```、```readTimeout```、```writeTimeout```、```tls```（```true```、```false```、```skip-verify```、```preferred```）等参数，也可以通过```ssl-mode```设置TLS；```parseTime```、```loc```仅校验取值，不生效；不支持自定义TLS配置名；其他无法识别的参数将作为会话变量，在连接建立后执行```SET 参数名 = 参数值```。也可写作URL形式：```mysql://username:yourpassword@localhost:3306/yourdatabase```。
+- postgres：采用libpq键值对格式，各项以空格分隔。```sslmode```遵循libpq的语义：```disable```表示不使用TLS，```require```等使用TLS但不校验证书，只有```verify-ca```、```verify-full```会校验证书；不支持```sslrootcert```、```sslcert```、```sslkey```、```passfile```、```service```等需要读取文件的参数；其他无法识别的参数将作为运行时参数设置。也可写作URL形式：```postgres://username:yourpassword@localhost:5432/yourdatabase?sslmode=disable```。
+- clickhouse：```clickhouse://```之后的部分与Go语言ClickHouse驱动（clickhouse-go）的DSN格式相同：```tcp://```表示使用原生TCP协议（端口9000；端口为9440或设置参数```secure=true```时使用TLS，设置```skip_verify=true```时不校验证书），也可写作```http://```、```https://```以使用HTTP接口；其他无法识别的参数将作为ClickHouse设置（settings）。也可写作URL形式：```clickhouse://username:yourpassword@localhost:9000/yourdatabase```，默认使用原生TCP协议；使用```clickhouse+http://```、```clickhouse+https://```前缀或端口为8123、8443时使用HTTP接口。
 
-```address```中```|```之后的参数以```&```分隔、以```=```赋值，因此当```payload```的内容含有```=```、```&```等字符（例如base64编码的签名、JSON）时会干扰解析。这种情况下不要将其写入```payload```，而应在连接成功后使用```write()```发送订阅消息。
+```address```中```|```之后的参数以```&```分隔、以```=```赋值，因此当```payload```的内容含有```=```、```&```等字符（例如base64编码的签名或JSON）时会干扰解析。这种情况下不要将其写入```payload```，而应在连接成功后通过```write()```发送订阅消息。
 
-See also: `Dial 返回对象`, `HttpQuery`, `EventLoop`, `DBExec`, `threading.Serve`, `exchange.Encode`
+See also: `Dial返回对象`, `HttpQuery`, `EventLoop`, `DBExec`, `threading.Serve`, `exchange.Encode`
 
 #### Mail
 
