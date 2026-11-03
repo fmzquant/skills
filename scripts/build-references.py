@@ -17,8 +17,8 @@ Inputs (all public or in the platform's own repositories):
   - talib descriptions: fmz/server tools/helper/talib/api_gen.js (`talibInfo`)        → fmz/references/talib.md
   - Pine built-ins: fmz/server langs/pine-runtime/src/lib_*.js (`scope.register`)  → fmz/references/pine-builtins.md
   - MyLanguage dictionary: fmz/server tools/helper/my/trans_dic.txt                 → fmz/references/mylanguage-functions.md
-  - Declaration files are copied verbatim from fmz/server tools/helper/gen_helper/ (js .d.ts, python .pyi,
-    rust types.rs) and fmz/client/sdk/docs/typings/js/ (newest .d.ts, ctx.d.ts, EVENTS.md).
+  - Declaration files are copied verbatim from fmz/client/sdk/api/ (js .d.ts, ctx.d.ts, python .pyi, rust types.rs)
+    and fmz/client/sdk/docs/ (EVENTS.md).
 
 Usage:
   build-references.py docs  <syntax-guide.data|syntax_*.json> <lang> <out.md>      # lang = en | zh
