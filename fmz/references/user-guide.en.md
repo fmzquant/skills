@@ -5107,48 +5107,48 @@ One formula can output several results at once when written as a list: for examp
 
 #### Functions and Operators
 
-What can be used in formulas of the alpha factor analysis tool. Expressions are case-insensitive; below, ```x``` and ```y``` are time series, ```d``` is a number of periods, and ```{}``` is a placeholder.
+Functions and operators available in the formulas of the Alpha factor analysis tool. Expressions are case-insensitive; below, ```x``` and ```y``` denote time series, ```d``` denotes the number of periods, and ```{}``` denotes a placeholder.
 
 ##### Operators
 
-```+```, ```-```, ```*```, ```/```, ```>``` and ```<``` have their standard meaning; ```==``` tests equality, ```||``` is logical or, and ```x ? y : z``` is the ternary conditional operator.
+```+```, ```-```, ```*```, ```/```, ```>```, and ```<``` are calculated with their standard meanings; ```==``` tests for equality, ```||``` denotes logical OR, and ```x ? y : z``` is the ternary conditional operator.
 
 ##### Functions
 
 | Function | Description |
 | - | - |
-| ```abs(x)```, ```log(x)```, ```sign(x)``` | Absolute value, logarithm, sign |
-| ```rank(x)``` | Cross-sectional percentile rank; needs a pool of instruments, and with a single one returns the value unchanged |
-| ```delay(x, d)``` | Value of x d periods ago |
-| ```sma(x, d)``` | Simple moving average of x over d periods |
-| ```correlation(x, y, d)``` | Correlation of x and y over the past d periods |
-| ```covariance(x, y, d)``` | Covariance of x and y over the past d periods |
-| ```scale(x, a)``` | Normalize so that ```sum(abs(x)) = a``` (a defaults to 1) |
-| ```delta(x, d)``` | Current value of x minus its value d periods ago |
-| ```signedpower(x, a)``` | ```x^a``` |
-| ```decay_linear(x, d)``` | Weighted moving average of x over d periods with weights d, d-1, …, 1 (normalized) |
-| ```indneutralize(x, g)``` | Neutralize by industry classification g; not supported yet |
-| ```ts_{O}(x, d)``` | Apply operation O (min, max, ..., see the rows below) to the past d periods of x; d is converted to an integer |
-| ```ts_min(x, d)```, ```min(x, d)``` | Minimum over the past d periods |
-| ```ts_max(x, d)```, ```max(x, d)``` | Maximum over the past d periods |
-| ```ts_argmin(x, d)``` | Position of ```ts_min(x, d)``` |
-| ```ts_argmax(x, d)``` | Position of ```ts_max(x, d)``` |
-| ```ts_rank(x, d)``` | Rank (percentile) of x within the past d periods |
-| ```sum(x, d)``` | Sum over the past d periods |
-| ```product(x, d)``` | Product over the past d periods |
-| ```stddev(x, d)``` | Standard deviation over the past d periods |
+| ```abs(x)```, ```log(x)```, ```sign(x)``` | Absolute value, logarithm, and sign functions |
+| ```rank(x)``` | Cross-sectional rank: at each point in time, ranks x across the symbols in the symbol pool and returns the percentile, in the range (0, 1]; tied values receive their average rank, and symbols with no data at that time are excluded from the ranking. The symbol pool consists of the multiple symbols selected on the web page, or the symbols specified by a formula prefix, for example ```binance.btc_usdt,binance.eth_usdt:rank(close)```; with only one symbol, the result is always 1 and the ranking has no practical meaning |
+| ```delay(x, d)``` | The value of x d periods ago |
+| ```sma(x, d)``` | The simple moving average of x over d periods |
+| ```correlation(x, y, d)``` | The correlation coefficient of x and y over the past d periods |
+| ```covariance(x, y, d)``` | The covariance of x and y over the past d periods |
+| ```scale(x, a)``` | Normalizes x so that ```sum(abs(x)) = a``` (a defaults to 1) |
+| ```delta(x, d)``` | The current value of x minus its value d periods ago |
+| ```signedpower(x, a)``` | Signed power: ```sign(x) * abs(x)^a```; when x is negative, the result remains negative |
+| ```decay_linear(x, d)``` | The d-period linearly weighted moving average of x, with weights d, d-1, …, 1 (normalized) |
+| ```indneutralize(x, g)``` | Neutralization: subtracts the mean of the symbol pool at each point in time. No industry classification data is currently available, so g has no effect and the entire symbol pool is treated as a single group |
+| ```ts_{O}(x, d)``` | Applies operation O to x over the past d periods (O is min, max, etc.; see the rows below); d is converted to an integer |
+| ```ts_min(x, d)```, ```min(x, d)``` | The minimum value over the past d periods |
+| ```ts_max(x, d)```, ```max(x, d)``` | The maximum value over the past d periods |
+| ```ts_argmin(x, d)``` | The position of ```ts_min(x, d)``` |
+| ```ts_argmax(x, d)``` | The position of ```ts_max(x, d)``` |
+| ```ts_rank(x, d)``` | The rank (percentile) of x over the past d periods |
+| ```sum(x, d)``` | The cumulative sum over the past d periods |
+| ```product(x, d)``` | The cumulative product over the past d periods |
+| ```stddev(x, d)``` | The standard deviation over the past d periods |
 
 #### Input Data
 
-Market data that formulas can refer to. Input data is case-insensitive and defaults to the instrument selected on the web page; an instrument can also be given directly, e.g. ```binance.ada_bnb```.
+Market data that can be referenced in formulas. Input data names are case-insensitive. By default, the symbols selected on the web page are used (multiple selection is supported), and you can also specify a symbol directly, for example ```binance.ada_bnb```.
 
 | Data | Description |
 | - | - |
-| ```returns``` | Return of the close price |
-| ```open```, ```close```, ```high```, ```low```, ```volume``` | Open, close, high, low and volume of the period |
-| ```vwap``` | Volume-weighted average price; not implemented yet, currently the close price |
-| ```cap``` | Total market capitalization; not implemented yet |
-| ```IndClass``` | Industry classification; not implemented yet |
+| ```returns``` | Closing price return |
+| ```open```, ```close```, ```high```, ```low```, ```volume``` | Opening price, closing price, highest price, lowest price and trading volume within the period |
+| ```vwap``` | Approximation of the volume-weighted average price: since the market data does not include turnover, it is calculated as ```(high + low + close) / 3``` |
+| ```cap``` | Total market capitalization, not yet implemented |
+| ```IndClass``` | Industry classification, not yet implemented |
 
 ## Extended API Interface
 
