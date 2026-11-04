@@ -1789,6 +1789,28 @@ macro_rules! Panic {
 
 /// Persistent KV (legacy `_G`), by arity: `_G!()` → robot id; `_G!(k)` → read
 /// ("" when absent); `_G!(k, v)` → write; `_G!(k, null)` → delete.
+///
+/// **Stores text, not objects.** The value is rendered as text and kept in the robot's
+/// own SQLite database (table kvdb), not shared between robots. A read always returns
+/// a `String`.
+/// - Strings are stored as they are; numbers and bools as text: `_G!("n", 42)` reads `"42"`.
+/// - Only a `JsonValue` object or array is stored as JSON; read it with `JSONParse(&_G!(k))`.
+/// - `Vec`, `BTreeMap`, `Ticker`, `Order` and other SDK structs are stored as `Debug`
+///   text: fine to look at, not a format to restore from.
+/// - Your own structs do not compile here; build a JSON string or `JsonValue` from their fields.
+/// - Only the literal `null` deletes; `None` and `JsonValue::Null` store the text `null`.
+/// - An empty string cannot be told apart from a missing key.
+///
+/// Every read and write handles the whole value, so avoid large values in fast loops.
+/// Writes go to memory first and reach disk within about a second, so killing the
+/// process can lose the latest ones. In a backtest the data stays in memory.
+///
+/// ```ignore
+/// _G!("pos", format!(r#"{{"qty":{},"price":{}}}"#, pos.qty, pos.price));
+/// if let Some(saved) = JSONParse(&_G!("pos")) {
+///     let pos = Pos { qty: saved["qty"].as_f64().unwrap_or(0.0), price: saved["price"].as_f64().unwrap_or(0.0) };
+/// }
+/// ```
 #[macro_export]
 macro_rules! _G {
     () => {

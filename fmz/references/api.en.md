@@ -11109,22 +11109,22 @@ _G(k)
 _G(k, v)
 ```
 
-Persistently store data. This function implements a persistently stored global dictionary, saving data as key-value (KV) pairs permanently in the local database file of the hosting device (docker).
+Persistently saves data. This function implements a persistent global dictionary with a KV table data structure, and the data is stored permanently in a local database file on the docker.
 
 Parameters:
 
-- `k` (string / null value, optional): The parameter ```k``` is the key name in the key-value pair to be stored; it is case-sensitive.
-- `v` (string / number / bool / object / array / null value, optional): The parameter ```v``` is the value in the key-value pair to be stored; it can be any data that can be ```JSON``` serialized.
+- `k` (string / null, optional): The key name of the key-value pair to be saved. It is case-sensitive.
+- `v` (string / number / bool / object / array / null, optional): The value of the key-value pair to be saved. It can be any data that supports ```JSON``` serialization.
 
-Returns (string / number / bool / object / array / null value): The value data in the persistently stored ```k-v``` key-value pair.
+Returns (string / number / bool / object / array / null): The value data of the persisted ```k-v``` key-value pair.
 
-Set, change and delete persistent variables, and read the robot ID.
+Set, modify, and delete persistent variables, and read the live trading ID.
 
 ```javascript
 function main(){
-    // Set a global variable num with a value of 1
+    // Set a global variable num with the value 1
     _G("num", 1)
-    // Change the global variable num to the string value ok
+    // Change the global variable num to the string ok
     _G("num", "ok")
     // Delete the global variable num
     _G("num", null)
@@ -11133,7 +11133,7 @@ function main(){
     // Output: null (num has been deleted)
     // Delete all global variables
     _G(null)
-    // Return the live trading bot ID
+    // Return the live trading ID
     var robotId = _G()
 }
 ```
@@ -11151,33 +11151,108 @@ def main():
 
 ```rust
 fn main() {
-    // Set a global variable num with a value of 1
+    // Set a global variable num with the value 1
     _G!("num", 1);
-    // Change the global variable num to the string value ok
+    // Change the global variable num to the string ok
     _G!("num", "ok");
     // Delete the global variable num
     _G!("num", null);
     // Return the value of the global variable num
     Log!(_G!("num"));
     // Rust does not support the _G!(null) form for deleting all global variables
-    // Return the live trading bot ID
+    // Return the live trading ID
     let robotId = _G!();
 }
 ```
 
-Each live trading bot corresponds to a separate database. After the strategy restarts or the hosting device (docker) stops running, the data saved by the ```_G()``` function will still persist. However, after a backtest ends, the data saved by the ```_G()``` function in the backtesting system will be cleared. When using the ```_G()``` function to persistently store data, use it reasonably according to the memory and disk space of the hardware device, and never abuse it.
+Save a class instance: save its fields, and reconstruct the instance after reading.
 
-In live trading, when the ```_G()``` function is called without passing any parameters, the ```_G()``` function returns the ```Id``` of the current live trading bot.
+```javascript
+class Position {
+    constructor(qty, price) {
+        this.qty = qty
+        this.price = price
+    }
+    value() {
+        return this.qty * this.price
+    }
+}
 
-When calling the ```_G()``` function, passing a null value for the parameter ```v``` indicates deleting the corresponding ```k-v``` key-value pair.
+function main() {
+    var pos = new Position(1, 100)
+    _G("pos", {qty: pos.qty, price: pos.price})
+    var saved = _G("pos")
+    if (saved) {
+        pos = new Position(saved.qty, saved.price)
+        Log(pos.value())
+    }
+}
+```
 
-When calling the ```_G()``` function, if only the parameter ```k``` is passed as a string, then the ```_G()``` function returns the stored value corresponding to the parameter ```k```.
+```python
+class Position:
+    def __init__(self, qty, price):
+        self.qty = qty
+        self.price = price
 
-When calling the ```_G()``` function, if only the parameter ```k``` is passed as a null value, it indicates deleting all recorded ```k-v``` key-value pairs.
+    def value(self):
+        return self.qty * self.price
 
-After a ```k-v``` key-value pair has been persistently stored, calling the ```_G()``` function again and passing the persistently stored key name as the parameter ```k``` and a new value as the parameter ```v``` will update that ```k-v``` key-value pair.
+def main():
+    pos = Position(1, 100)
+    _G("pos", {"qty": pos.qty, "price": pos.price})
+    saved = _G("pos")
+    if saved:
+        pos = Position(saved["qty"], saved["price"])
+        Log(pos.value())
+```
 
-Taking a live trading bot with Id ```123456``` as an example, the K-V key-value data persistently stored using the ```_G()``` function is stored in the ```/logs/storage/123456/123456.db3``` database file located in the directory of the hosting device (docker) to which the live trading bot (i.e., the strategy instance program) belongs, and the data is recorded in the ```kvdb``` table.
+```rust
+struct Position {
+    qty: f64,
+    price: f64,
+}
+
+fn main() {
+    let pos = Position { qty: 1.0, price: 100.0 };
+    _G!("pos", format!(r#"{{"qty":{},"price":{}}}"#, pos.qty, pos.price));
+    if let Some(saved) = JSONParse(&_G!("pos")) {
+        let pos = Position {
+            qty: saved["qty"].as_f64().unwrap_or(0.0),
+            price: saved["price"].as_f64().unwrap_or(0.0),
+        };
+        Log!(pos.qty * pos.price);
+    }
+}
+```
+
+Each live trading instance uses its own separate database. Data saved by the ```_G()``` function persists after the strategy restarts or the docker stops running. When a backtest ends, data saved by the ```_G()``` function in the backtesting system is cleared. When using the ```_G()``` function to persist data, use it reasonably according to the memory and disk space of the hardware device, and avoid overusing it.
+
+When the ```_G()``` function is called without any parameters during live trading, it returns the ```Id``` of the current live trading instance.
+When calling the ```_G()``` function, passing a null value for parameter ```v``` deletes that ```k-v``` key-value pair.
+When calling the ```_G()``` function, if only parameter ```k``` is passed as a string, the ```_G()``` function returns the saved value corresponding to parameter ```k```.
+When calling the ```_G()``` function, if only parameter ```k``` is passed as a null value, all recorded ```k-v``` key-value pairs are deleted.
+Once a ```k-v``` key-value pair has been persisted, call the ```_G()``` function again with the saved key name as parameter ```k``` and the new value as parameter ```v``` to update that ```k-v``` key-value pair.
+
+Parameter ```v``` can only save data that ```JSON``` can represent: numbers, strings, booleans, plain objects (dictionaries), and arrays. Reading returns a new copy of the data, without the original type or methods; after modifying an object you have read, you must call ```_G()``` again to save it.
+Values of other types usually do not raise an error, but the result read back will have changed:
+
+| Saved value | Read back in JavaScript | Read back in Python |
+| --- | --- | --- |
+| Class instance | Plain object with fields only, no methods | String, for example ```<__main__.Foo object at 0x...>``` |
+| ```Map```, ```Set```, ```set``` | ```{}``` | String |
+| Function | Null | String |
+| Date and time | String | String |
+| ```NaN```, ```Infinity``` | Null | Null |
+| Tuple | Not applicable | Array |
+| Integer with an absolute value greater than 2^53 | Loses precision | String |
+
+In ```JavaScript```, saving a ```BigInt``` or an object with circular references throws an error. Do not save runtime objects such as exchange objects, network connections, or threads; obtain them again after the strategy restarts.
+In ```Rust```, ```_G!()``` saves text, and the result read back is always a string. Custom structs cannot be saved directly; first assemble them into a ```JSON``` string, then parse it with ```JSONParse()``` after reading. Types such as ```Vec```, ```Ticker```, and ```Order``` are saved as debug text, which cannot be used to restore the data.
+
+Every read and write processes the entire value, so do not read or write very large data in high-frequency loops. Saved data is written to disk within about 1 second; if the docker process is forcibly terminated, the most recently written data may be lost.
+
+Taking a live trading Id of ```123456``` as an example, the K-V data persisted by the ```_G()``` function is stored in the database file ```/logs/storage/123456/123456.db3``` (123456.db3) under the directory of the docker to which this live trading instance (i.e., the strategy instance program) belongs, with the data recorded in the ```kvdb``` table.
 
 See also: `DBExec`
 

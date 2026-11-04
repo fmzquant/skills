@@ -2973,6 +2973,21 @@ declare function _T(a: string, b?: string): string;
 
 /**
  * 全局持久化KV存储，数据保存在策略数据库中，重启后仍然保留
+ *
+ * **只能存可序列化的纯数据。** 写入是 `JSON.stringify(v)`，读取是 `JSON.parse`，值以 JSON 文本存在
+ * 实盘自己的 SQLite（kvdb 表）里，不跨实盘共享。读回的是一份新数据，不保留类型和方法。除了标明抛错的，下面这些都不报错：
+ * - class 实例：只留自身可枚举字段，读回普通对象，没有原型和方法
+ * - Map、Set、RegExp、ArrayBuffer：读回 `{}`；Date：读回 ISO 字符串；TypedArray：读回 `{"0":1}` 形式的对象
+ * - 函数、Symbol：直接存时返回 true，但读回 null；作为对象字段时字段消失，作为数组元素时变成 null
+ * - NaN、Infinity：读回 null
+ * - 绝对值超过 2^53 的整数：丢精度，订单号等先转字符串
+ * - BigInt、循环引用：抛 TypeError
+ * - 交易所对象、连接、线程等运行时对象：不要存，重启后重新获取
+ *
+ * `_G(k, undefined)` 是读取，`_G(k, null)` 是删除，都不是写入。
+ * 修改读回的对象不会自动保存，要再调用一次 `_G(k, obj)`。
+ * 每次读写都处理整个值，不要在高频循环里读写大对象。
+ * 写入先进内存，约 1 秒内异步落盘，进程被强杀可能丢失最近的写入。回测的数据只在内存里。
  * @param k - 键名
  * @param v - 值（可选）:
  *   - 不传: 读取键对应的值
@@ -2985,6 +3000,11 @@ declare function _T(a: string, b?: string): string;
  * _G("lastPrice", null);           // 删除
  * _G(null);                        // 清空所有KV数据
  * _G();                            // 获取机器人ID
+ *
+ * // class 实例：存字段，读回后重新构造
+ * _G("pos", {qty: pos.qty, price: pos.price});
+ * var saved = _G("pos");
+ * var pos = saved ? new Position(saved.qty, saved.price) : null;
  * ```
  */
 declare function _G(k?: string, v?: any): any;

@@ -2173,10 +2173,28 @@ def _G(k: Optional[str] = ..., v: Any = ...) -> Any:
 
     ``_G()`` 返回实盘Id；``_G(k)`` 读取；``_G(k, v)`` 写入；``_G(k, None)`` 删除；``_G(None)`` 清空全部。
 
+    **只能存 JSON 能表示的纯数据。** 写入走 ``json.dumps``，值以 JSON 文本存在实盘自己的 SQLite（kvdb 表）里，不跨实盘共享。
+    无法序列化的对象会被 ``str(obj)`` 转成字符串，读回的只是这个字符串。除了标明抛错的，下面这些都不报错：
+
+    - class 实例：读回 ``'<__main__.Foo object at 0x...>'``；dataclass 读回 ``'Foo(a=1)'``；类和函数同样变成字符串
+    - set、bytes、datetime、Decimal、Enum、numpy 数组和整数：读回字符串（``IntEnum`` 读回 int）
+    - tuple、namedtuple：读回 list；dict 的 int 键：读回 str 键；tuple 键：抛 ``TypeError``
+    - NaN、inf：在 dict、list 里读回 None；直接存等于删除这个键
+    - 绝对值大于等于 2^53 的整数：读回字符串，超出 64 位的还会丢精度
+    - 交易所对象、连接、线程等运行时对象：不要存，重启后重新获取
+
+    修改读回的对象不会自动保存，要再调用一次 ``_G(k, obj)``。每次读写都处理整个值，不要在高频循环里读写大对象。
+    写入先进内存，约 1 秒内异步落盘，进程被强杀可能丢失最近的写入。回测的数据只在内存里。
+
     Example::
 
         _G("lastPrice", 50000)
         price = _G("lastPrice")
+
+        # class 实例：存字段，读回后重新构造
+        _G("pos", {"qty": pos.qty, "price": pos.price})
+        saved = _G("pos")
+        pos = Position(saved["qty"], saved["price"]) if saved else None
     """
     ...
 

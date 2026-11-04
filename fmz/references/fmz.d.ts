@@ -2995,6 +2995,22 @@ declare function _T(a: string, b?: string): string;
 
 /**
  * Global persistent KV storage, data is saved in the strategy database and persists after restart
+ *
+ * **Plain serializable data only.** A write is `JSON.stringify(v)` and a read is `JSON.parse`; the value is kept as
+ * JSON text in the robot's own SQLite database (table kvdb) and is not shared between robots. A read returns a new
+ * copy without types or methods. Unless marked as throwing, none of these report an error:
+ * - Class instance: keeps only its own enumerable fields and reads back as a plain object with no prototype or methods
+ * - Map, Set, RegExp, ArrayBuffer: read back as `{}`; Date: reads back as an ISO string; TypedArray: reads back as an object like `{"0":1}`
+ * - Function, Symbol: stored directly, the call returns true but the read gives null; as an object field the field disappears; as an array element it becomes null
+ * - NaN, Infinity: read back as null
+ * - Integers beyond 2^53: lose precision, so store order IDs and the like as strings
+ * - BigInt, circular references: throw TypeError
+ * - Exchange objects, connections, threads and other runtime objects: do not store them; get them again after a restart
+ *
+ * `_G(k, undefined)` reads and `_G(k, null)` deletes; neither writes.
+ * Changing an object you read back does not save it; call `_G(k, obj)` again.
+ * Every read and write handles the whole value, so avoid large values in fast loops.
+ * Writes go to memory first and reach disk within about a second, so killing the process can lose the latest ones. In a backtest the data stays in memory.
  * @param k - Key name
  * @param v - Value (optional):
  *   - Not passed: Read the value corresponding to the key
@@ -3007,6 +3023,11 @@ declare function _T(a: string, b?: string): string;
  * _G("lastPrice", null);           // Delete
  * _G(null);                        // Clear all KV data
  * _G();                            // Get robot ID
+ *
+ * // Class instance: store its fields and construct it again after reading
+ * _G("pos", {qty: pos.qty, price: pos.price});
+ * var saved = _G("pos");
+ * var pos = saved ? new Position(saved.qty, saved.price) : null;
  * ```
  */
 declare function _G(k?: string, v?: any): any;

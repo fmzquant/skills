@@ -184,7 +184,7 @@ Charts:
 
 Interaction and persistence:
 - `GetCommand()` → `null` when nothing is pending, else `"cmdBtn"` (button) or `"name:value"`: numbers `"cmdNum:123"`, booleans `"cmdBool:true"`, strings `"cmdStr:abc"`, dropdowns `"cmdCombox:1"` (index). Split on the first `":"` yourself. Invalid in backtests. Controls are declared in the strategy's interaction settings or built in the status bar; `send_robot_command` delivers the same strings.
-- `_G(key, value)` persists JSON-serialisable values per robot across restarts; `_G(key)` reads (`null` if absent); `_G(key, null)` deletes; `_G(null)` wipes everything; `_G()` returns the robot id. Keys are case-insensitive. Cleared when a backtest ends.
+- `_G(key, value)` persists JSON-serialisable values per robot across restarts; `_G(key)` reads (`null` if absent); `_G(key, null)` deletes; `_G(null)` wipes everything; `_G()` returns the robot id. Live keys are case-sensitive. Cleared when a backtest ends. Plain JSON data only: a class instance reads back as a plain object without methods, `Map`/`Set` as `{}`, a function as `null`, with no error. Store the fields and construct the object again after reading.
 
 ## Templates and built-in libraries
 

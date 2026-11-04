@@ -2227,10 +2227,30 @@ def _G(k: Optional[str] = ..., v: Any = ...) -> Any:
     ``_G()`` returns the robot ID; ``_G(k)`` reads; ``_G(k, v)`` writes; ``_G(k, None)`` deletes; ``_G(None)``
     clears everything.
 
+    **Plain JSON data only.** A write goes through ``json.dumps`` and the value is kept as JSON text in the robot's own
+    SQLite database (table kvdb), not shared between robots. Anything that cannot be serialized becomes ``str(obj)``,
+    and a read returns only that string. Unless marked as raising, none of these report an error:
+
+    - Class instance: reads back as ``'<__main__.Foo object at 0x...>'``; a dataclass as ``'Foo(a=1)'``; classes and functions also become strings
+    - set, bytes, datetime, Decimal, Enum, numpy arrays and integers: read back as strings (``IntEnum`` reads back as an int)
+    - tuple, namedtuple: read back as a list; int dict keys: read back as str keys; tuple keys: raise ``TypeError``
+    - NaN, inf: inside a dict or list they read back as None; stored directly they delete the key
+    - Integers at or beyond 2^53 in magnitude: read back as strings, and beyond 64 bits they also lose precision
+    - Exchange objects, connections, threads and other runtime objects: do not store them; get them again after a restart
+
+    Changing an object you read back does not save it; call ``_G(k, obj)`` again. Every read and write handles the whole
+    value, so avoid large values in fast loops. Writes go to memory first and reach disk within about a second, so
+    killing the process can lose the latest ones. In a backtest the data stays in memory.
+
     Example::
 
         _G("lastPrice", 50000)
         price = _G("lastPrice")
+
+        # Class instance: store its fields and construct it again after reading
+        _G("pos", {"qty": pos.qty, "price": pos.price})
+        saved = _G("pos")
+        pos = Position(saved["qty"], saved["price"]) if saved else None
     """
     ...
 
