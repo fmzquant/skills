@@ -1993,6 +1993,11 @@ pub mod abi {
         pub payload: EventPayload,
         /// Delivery stream id (= `Sub::id()`, or `STREAM_TIMER` / `STREAM_STATUS` / `STREAM_ORDER_ACK`).
         pub tag: u32,
+        /// The venue's raw message (address, length, `RAW_TEXT` / `RAW_BYTES`): 0 when absent. Read it with
+        /// [`EventExt::raw`](super::ctx::EventExt::raw), which also checks it is still valid.
+        pub raw_ptr: u64,
+        pub raw_len: u32,
+        pub raw_kind: u32,
     }
     impl Event {
         pub fn zeroed() -> Self { todo!() }
@@ -2203,6 +2208,10 @@ pub mod abi {
     pub const EV_TIMER: u16 = 32;
     pub const EV_GW_STATUS: u16 = 33;
     pub const EV_FEED_STATUS: u16 = 35;
+    /// `Event::raw_kind`: a text message.
+    pub const RAW_TEXT: u32 = 1;
+    /// `Event::raw_kind`: a binary message.
+    pub const RAW_BYTES: u32 = 2;
     pub const STREAM_TIMER: u32 = 1;
     pub const STREAM_STATUS: u32 = 2;
     /// `ctx::submit` acks (kind "ack"), delivered only to the requesting thread.
@@ -2322,6 +2331,9 @@ pub mod ctx {
         /// Subscription group (empty = the default group): groups do not share connections, gateway status is
         /// reported per group ([`GatewayView::group`]). The private stream has no group.
         pub group: String,
+        /// Events carry the venue's raw message ([`EventExt::raw`]). Without `latest` / `buffer` the delivery
+        /// mode is a ring of 10240 events, never merged.
+        pub raw: bool,
     }
     impl SubOpts {
         pub fn ticker() -> Self { todo!() }
@@ -2347,6 +2359,15 @@ pub mod ctx {
         /// Subscription group (at most 32 bytes): subscriptions of different groups use separate connections,
         /// so one group reconnecting does not affect another.
         pub fn group(self, group: impl Into<String>) -> Self { todo!() }
+        /// Events carry the venue's raw message, read with [`EventExt::raw`].
+        pub fn raw(self) -> Self { todo!() }
+    }
+
+    /// The venue's raw message ([`EventExt::raw`]), not parsed: read it per the venue's protocol.
+    #[derive(Clone, Debug, PartialEq, Eq)]
+    pub enum Raw {
+        Text(String),
+        Bytes(Vec<u8>),
     }
 
     /// Subscription handle (`Copy`). Identical subscriptions in one thread share one
@@ -2394,9 +2415,11 @@ pub mod ctx {
         pub liq_px: Option<f64>,
         pub mark_px: Option<f64>,
         pub leverage: Option<f64>,
-        /// Exchange update time (ms): always `Some` on events (ingress time when the venue gave
-        /// none); `None` in `Sub::positions()` rows when the venue gave none.
+        /// On events: when the host received it, always `Some` (see `EventExt::time`). On
+        /// `Sub::positions` rows: the exchange update time, `None` when not given.
         pub time: Option<f64>,
+        /// Exchange update time (ms); `None` = not given.
+        pub exch_time: Option<i64>,
         /// Part of the snapshot after (re)subscribing.
         pub snapshot: bool,
     }
@@ -2413,6 +2436,8 @@ pub mod ctx {
         pub margin: Option<f64>,
         /// As `PositionRow::time`.
         pub time: Option<f64>,
+        /// As `PositionRow::exch_time`.
+        pub exch_time: Option<i64>,
         pub snapshot: bool,
     }
 
@@ -2432,8 +2457,10 @@ pub mod ctx {
         pub open: f64,
         pub high: f64,
         pub low: f64,
-        /// Exchange time (ms; ingress time when the venue gave none), same as `ev.time()`.
+        /// When the host received it (ms), same as `ev.time()`.
         pub time: f64,
+        /// Exchange time (ms); `None` = not given.
+        pub exch_time: Option<i64>,
     }
 
     /// Trade event (kind "trade").
@@ -2446,8 +2473,10 @@ pub mod ctx {
         pub side: &'static str,
         /// Same id as the REST `trades` row `id`; "" when the venue gives none.
         pub trade_id: String,
-        /// Exchange trade time (ms; ingress time when the venue gave none).
+        /// When the host received it (ms), same as `ev.time()`.
         pub time: f64,
+        /// Exchange trade time (ms); `None` = not given.
+        pub exch_time: Option<i64>,
     }
 
     /// K-line event (kind "kline").
@@ -2464,7 +2493,7 @@ pub mod ctx {
         pub interval: u32,
         /// Bar open time (ms; can go straight to `_D`).
         pub open_time: i64,
-        /// Same as `open_time` (f64, the uniform `time` of every view).
+        /// When the host received it (ms), same as `ev.time()`; the bar's own time is `open_time`.
         pub time: f64,
         /// The bar is final (open bars are pushed repeatedly).
         pub closed: bool,
@@ -2489,7 +2518,7 @@ pub mod ctx {
         /// Unified reject reason code (0 = none).
         pub reason: u8,
         pub reason_text: &'static str,
-        /// Ingress time (ms): order updates carry no exchange time yet.
+        /// When the host received it (ms), same as `ev.time()`. Order updates carry no exchange time.
         pub time: f64,
     }
 
@@ -2515,8 +2544,10 @@ pub mod ctx {
         pub side: &'static str,
         /// "maker" / "taker"; "" when the venue does not say.
         pub liquidity: &'static str,
-        /// Exchange fill time (ms; ingress time when the venue gave none).
+        /// When the host received it (ms), same as `ev.time()`.
         pub time: f64,
+        /// Exchange fill time (ms); `None` = not given.
+        pub exch_time: Option<i64>,
     }
 
     /// WebSocket order / cancel ack (kind "ack", stream `STREAM_ORDER_ACK`): the result of one
@@ -2546,7 +2577,7 @@ pub mod ctx {
         pub exch_time: Option<i64>,
         /// Round trip (ms): just before the request was written → the host got the verdict.
         pub latency_ms: f64,
-        /// Exchange answer time, else `ev.ts()`.
+        /// When the host received it (ms), same as `ev.time()`.
         pub time: f64,
     }
 
@@ -2559,7 +2590,7 @@ pub mod ctx {
         pub detail: u64,
         /// The subscription group this status covers ([`SubOpts::group`]; empty = the default group).
         pub group: String,
-        /// Ingress time (ms).
+        /// When the host received it (ms), same as `ev.time()`.
         pub time: f64,
     }
 
@@ -2576,7 +2607,7 @@ pub mod ctx {
         pub detail: u64,
         /// The real reason when FAILED.
         pub message: String,
-        /// Ingress time (ms).
+        /// When the host received it (ms), same as `ev.time()`.
         pub time: f64,
     }
     impl FeedStatusView {
@@ -2667,11 +2698,16 @@ pub mod ctx {
         fn balance(&self) -> Option<BalanceRow>;
         fn gateway(&self) -> Option<GatewayView>;
         fn feed_status(&self) -> Option<FeedStatusView>;
-        /// Ingress time (ms, µs fraction; JS `ts`): `ctx::now() - ev.ts()` = engine + poll latency.
-        fn ts(&self) -> f64;
-        /// When the event happened (ms; JS `time`): the exchange time when given (ticker, trade,
-        /// fill, position, balance, ack), bar open for klines, scheduled time for timers, else `ts()`.
+        /// When the host received this event (ms, µs fraction; JS `time`), the same meaning on every
+        /// event: `ctx::now() - ev.time()` = engine + poll latency. Exchange time is `exch_time` on the
+        /// views, a bar's own time is `KlineView::open_time`.
         fn time(&self) -> f64;
+        /// The same moment as `time()` in nanoseconds (JS `nano`).
+        fn nano(&self) -> u64;
+        /// The venue's raw message (only on subscriptions with [`SubOpts::raw`], never in a backtest). Only the
+        /// event this thread's latest [`poll`] handed out can read it: the host keeps the message until the next
+        /// event, so a copy kept past that returns `None`. To keep the message, keep this return value.
+        fn raw(&self) -> Option<Raw>;
     }
     impl EventExt for Event {
         fn event_kind(&self) -> Kind { todo!() }
@@ -2692,6 +2728,7 @@ pub mod ctx {
         fn feed_status(&self) -> Option<FeedStatusView> { todo!() }
         fn ts(&self) -> f64 { todo!() }
         fn time(&self) -> f64 { todo!() }
+        fn raw(&self) -> Option<Raw> { todo!() }
     }
 
     /// Result of [`poll`].

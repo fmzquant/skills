@@ -128,19 +128,19 @@ def main():
         if ev is None:
             continue
         if ev.type == "status":              # gateway / init status first: their channel can equal a data channel
-            if ev.kind == "status" and ev.prefillStatus == 2:
-                Log("subscription failed:", ev.channel, ev.message)
+            if ev.kind == "status" and ev.status.prefillStatus == 2:
+                Log("subscription failed:", ev.channel, ev.status.message)
             continue
         if ev.channel == "depth":
             b = ev.book(5)                   # {"bids": [[px, qty], ...], "asks": [...]} of this subscription's own book
         elif ev.channel == "orders":
-            Log(ev.id, ev.state, ev.filledQty)
+            Log(ev.order.id, ev.order.state, ev.order.filledQty)
         elif ev.channel in ("positions", "balance"):
             Log(acct.positions(), acct.balances())   # None until the account snapshot is READY
 ```
 
 - `ctx.subscribe(ex, opts)` takes exactly two positional arguments; `opts` is a dict `{channel, symbol, depth, interval, mode, buffer}` with channels `ticker bbo tickers trade depth kline private` (`tickers` = market-wide, no symbol, only on venues with an all-market stream, see the Capability Matrix "Push" column; otherwise a `kind == "status"` FAILED event). `symbol` as a list → `SubscriptionList` in the same order, validated as a whole.
-- `Subscription`: read-only `id ex channel symbol depth interval`, `info()`, `book(n=None)`, `positions()`, `balances()`, `unsubscribe()`. Events are dicts with attribute access (`ev["kind"]` = `ev.kind`), same fields as JavaScript.
+- `Subscription`: read-only `id ex channel symbol depth interval`, `info()`, `book(n=None)`, `positions()`, `balances()`, `unsubscribe()`. Events are dicts with attribute access (`ev["kind"]` = `ev.kind`), same fields as JavaScript: each kind's fields in a sub-object named after the kind (`ev.ticker.bid`, `ev.order.id`), common fields on top (`kind stream type channel ex symbol seq time nano`). `nano` is an `int` here (a string in JS).
 - Subscriptions belong to the thread that made them: a `threading.Thread` worker can subscribe and `ctx.poll` its own events (naming another thread's stream does not raise: it times out, or waits until the strategy stops when no timeout is given); identical subscriptions in two threads share the upstream but each gets its own copy; only the owning thread can unsubscribe; a worker's subscriptions are released when it ends.
 - `EventLoop()` has its own queue (Go completions and the auto-subscribed feeds of counter-type venues such as CTP) and never competes with `ctx.poll`. Push is independent of REST: `exchange.GetTicker()` etc. always hit REST. `ctx.connectors()[i].feed` = `{ticksDropped, backpressure, ringCapacity}` push-buffer counters. There is no `ctx.order/rest/raw` in Python (trade with `exchange.*`) and no `{streams, sources}` options form.
 

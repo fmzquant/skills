@@ -1660,28 +1660,30 @@ class CtxEvent(dict[str, Any]):
 
     Common fields: ``kind`` (the event type name, a string: ``"ticker"`` (shared by ticker/bbo/tickers, told apart by
     ``channel``), ``"depth"``, ``"trade"``, ``"kline"``, ``"order"`` (order update), ``"position"``, ``"balance"``,
-    ``"fill"`` (own fill), ``"ack"`` (WebSocket order ack), ``"timer"``, ``"gateway"`` (gateway status), ``"status"``
+    ``"fill"`` (own fill), ``"ack"`` (WebSocket order ack), ``"gateway"`` (gateway status), ``"status"``
     (init status); new names may be added later, unrecognized ones are ``"unknown"``; do not hard-code numbers),
-    ``stream`` (the subscription ``id`` or a built-in stream), ``type`` (``"data"`` / ``"status"`` / ``"timer"`` /
+    ``stream`` (the subscription ``id`` or a built-in stream), ``type`` (``"data"`` / ``"status"`` /
     ``"ack"``), ``channel`` (which data within a kind; ``orders`` / ``fills`` / ``positions`` / ``balance`` on the
-    private stream), ``ex``, ``symbol``, ``seq``, ``time``, ``ts``. Branch on ``kind`` for the event type, on ``channel``
+    private stream), ``ex``, ``symbol``, ``seq``, ``time`` (when the event was received, ms), ``nano`` (the same moment in ns, an int). Branch on ``kind`` for the event type, on ``channel``
     for data of the same kind (ticker vs bbo, the private stream's parts), and on ``ev.stream == sub.id`` or
-    ``ctx.poll([sub])`` for several subscriptions of one channel (BTC vs ETH, depth 5 vs 20). Per kind: ``"ticker"``
-    ``bid ask last bidQty askQty volume openInterest open high low time``; ``"trade"`` ``px qty side tradeId time``;
+    ``ctx.poll([sub])`` for several subscriptions of one channel (BTC vs ETH, depth 5 vs 20). Each kind's own fields are in a sub-object named after ``kind`` (``ev.ticker.bid``, ``ev.order.id``): ``"ticker"``
+    ``bid ask last bidQty askQty volume openInterest open high low exchTime``; ``"trade"`` ``px qty side tradeId exchTime``;
     ``"kline"`` ``open high low close volume openInterest intervalSec openTimeMs closed prefill``; ``"order"`` ``id
     clientId state px qty filledQty avgPx reason reasonText``; ``"position"`` ``side posSide qty avgPx profit margin liqPx
-    markPx leverage time snapshot``; ``"balance"`` ``asset free frozen equity upnl margin time snapshot`` (``free`` /
-    ``frozen`` may be ``None``); ``"fill"`` ``orderId clientId tradeId px qty fee feeCcy side liquidity time`` (one fill
+    markPx leverage exchTime snapshot``; ``"balance"`` ``asset free frozen equity upnl margin exchTime snapshot`` (``free`` /
+    ``frozen`` may be ``None``); ``"fill"`` ``orderId clientId tradeId px qty fee feeCcy side liquidity exchTime`` (one fill
     of your own order; no ``fee`` key when unknown); ``clientId`` is the client order ID (for an order placed by
     ``ctx.submit()`` the localId it returned; ``""`` when the push has none); ``"ack"`` ``reqId op status ok id clientId
     error reason reasonText exchTime latencyMs`` (the result of each ``ctx.submit()`` item; ``op`` is ``"order"`` /
-    ``"cancel"``, ``status`` is ``"ok"`` / ``"failed"`` / ``"unknown"``); ``"timer"`` ``timerId scheduledNs``;
+    ``"cancel"``, ``status`` is ``"ok"`` / ``"failed"`` / ``"unknown"``);
     ``"gateway"`` ``status detail group`` (``group``: the subscription group, ``""`` = default); ``"status"`` ``channelCode intervalSec prefillStatus`` (1 READY, 2 FAILED) ``detail
     message``. Depth events (``"depth"``) carry no levels: read them with ``ev.book(n)``.
+    ``exchTime`` is the exchange time (ms), ``None`` when the exchange gave none; a K-line's start time is ``ev.kline.openTimeMs``.
+    Subscriptions with ``raw: True`` also have ``raw`` (see that field).
     """
     kind: str
     """Event type name: ``"ticker"`` ``"depth"`` ``"trade"`` ``"kline"`` ``"order"`` ``"position"`` ``"balance"``
-    ``"fill"`` ``"ack"`` ``"timer"`` ``"gateway"`` ``"status"`` (``"unknown"`` when unrecognized)."""
+    ``"fill"`` ``"ack"`` ``"gateway"`` ``"status"`` (``"unknown"`` when unrecognized)."""
     stream: int
     type: str
     channel: str
@@ -1689,7 +1691,21 @@ class CtxEvent(dict[str, Any]):
     symbol: str
     seq: int
     time: float
-    ts: float
+    nano: int
+    ticker: CtxRecord
+    trade: CtxRecord
+    kline: CtxRecord
+    order: CtxRecord
+    position: CtxRecord
+    balance: CtxRecord
+    fill: CtxRecord
+    ack: CtxRecord
+    gateway: CtxRecord
+    status: CtxRecord
+    raw: Union[str, bytes]
+    """The exchange's raw message, only on subscriptions with ``raw: True``: ``str`` for a text message, ``bytes`` for a
+    binary one. It is not parsed: read it per the exchange's protocol. Events that did not come from the exchange
+    (filled-in K-lines, account snapshots, status events and so on) do not have it, nor do backtests."""
 
     def book(self, n: Optional[int] = None) -> CtxRecord:
         """Depth events (kind ``"depth"``): the order book of the subscription it belongs to, as ``Subscription.book()``."""
@@ -1704,6 +1720,7 @@ class _SubscribeOptions(TypedDict, total=False):
     mode: str
     buffer: int
     group: str
+    raw: bool
 
 class _SubscribeBatchOptions(_SubscribeOptions):
     symbol: Union[list[str], tuple[str, ...]]
@@ -1777,7 +1794,7 @@ class Ctx:
 
         Args:
             ex: Exchange object (``exchange``, ``exchanges[1]``) or account index (an int or digit string).
-            opts: ``{channel, symbol, depth, interval, mode, buffer, group}``. ``channel``: ``"ticker"`` (default),
+            opts: ``{channel, symbol, depth, interval, mode, buffer, group, raw}``. ``channel``: ``"ticker"`` (default),
                 ``"bbo"``, ``"depth"``, ``"trade"``, ``"kline"``, ``"tickers"`` (whole market, no symbol) or
                 ``"private"`` (orders + fills + positions + balances, no symbol). ``symbol``: required for market
                 data unless ``ex`` is an exchange object (its current pair); a list subscribes a batch. ``depth``:
@@ -1785,7 +1802,9 @@ class Ctx:
                 exchange's maximum gets an ``unsupported depth`` FAILED event); ``interval``: K-line seconds;
                 ``mode: "latest"`` or ``buffer: N``; ``group``: subscription group name (string, at most 32 bytes,
                 default group when omitted): subscriptions of different groups use separate connections and
-                gateway status is reported per group; ``private`` takes no group (raises).
+                gateway status is reported per group; ``private`` takes no group (raises); ``raw``: ``True`` makes events
+                carry the exchange's raw message ``ev.raw``, and without ``mode`` / ``buffer`` delivery is
+                ``buffer: 10240``, never merged.
 
         Returns:
             ``Subscription``; a ``SubscriptionList`` when ``symbol`` is a list or tuple (validated as a whole).

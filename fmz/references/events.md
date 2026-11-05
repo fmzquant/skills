@@ -104,7 +104,7 @@ worker（worker 里同样有 `ctx.subscribe`、订阅对象的全部方法和 `c
 - 后来的线程订阅一路**已经在跑**的 K 线：先补收已缓存的 bar（prefill 的带 `prefill: true`）和最近一条
   初始化状态（kind `"status"`），不用等 connector 再拉一次历史；私有流同理：账户快照已 READY 时补收全部快照
   行（`snapshot: true`）与 READY，`sub.positions()` / `sub.balances()` 立即可读。其它频道从下一条起收。
-- 网关状态（kind `"gateway"`）广播给**在该交易所有订阅**的每个线程；定时器（kind `"timer"`）归主线程。
+- 网关状态（kind `"gateway"`）广播给**在该交易所有订阅**的每个线程。
 - 线程结束时它的订阅自动全部退掉（别的线程共用的同一路不受影响）。退订只能在订阅它的线程里做。
 - 没有任何订阅的事件（例如没订私有流时，下单兜底连上的私有连接推来的订单回报）不投给任何线程，
   只进入宿主缓存（`exchange.IO("wait")` 这类旧接口照样读得到）。曾经的兜底流 `STREAM_REST` 已退役：
@@ -129,8 +129,8 @@ while True:
     if ev is None:
         continue
     if ev["kind"] == "status":                 # 初始化状态（先判，channel 会与数据事件重名）
-        if ev["prefillStatus"] == 2:
-            raise Exception(ev["message"])
+        if ev["status"]["prefillStatus"] == 2:
+            raise Exception(ev["status"]["message"])
         continue
     if ev["kind"] == "gateway":
         continue
@@ -153,7 +153,7 @@ while True:
   线程里调，别的线程调用抛异常）。不是对应频道、已退订（本对象）都抛异常。
 - `ctx.poll(streams=None, timeout_ms=None)`：`streams` 为 `None`/`[]` = 本线程的全部；否则是订阅对象、流 id、
   `SubscriptionList` 或它们的（嵌套）列表。`timeout_ms`：`None` 一直等、`0` 不等、`>0` 毫秒；超时回 `None`。
-  事件是 `CtxEvent`（`dict` 子类，字段同 JS 事件 JSON；`ev["kind"]` 与 `ev.kind` 都能用），深度事件
+  事件是 `CtxEvent`（`dict` 子类，字段同 JS 事件 JSON；`ev["kind"]` 与 `ev.kind` 都能用，子对象同样 `ev.ticker.bid` / `ev["ticker"]["bid"]`），深度事件
   （kind `"depth"`）的 `ev.book(n=None)` 读该事件所属订阅的簿。实盘停止后（含 `onexit` 期）抛 `StopError`，正在等的
   也立即抛（同 JS 的 interrupted；其余 `ctx` 调用照常）。JS 的选项形式
   `ctx.poll({streams, sources}, …)` 是 **JS 专有**（Python 传 dict 抛 `TypeError`）：Python 的线程消息、
@@ -177,71 +177,77 @@ while True:
 
 | 字段 | 类型 | 说明 |
 |---|---|---|
-| `kind` | string | 事件类型名：`ticker`（ticker/bbo/tickers 共用，`channel` 区分）`depth` `trade` `kline` `order`（订单回报）`position`（持仓）`balance`（余额）`fill`（成交回报）`ack`（异步下单应答）`timer`（定时器）`gateway`（网关状态）`status`（初始化状态）；以后新增类型会加新名字，宿主不认识的为 `unknown`（见文末「约定」） |
-| `stream` | number | 投递这条事件的流：订阅流 = 本线程订阅对象的 `id`；网关状态 / 定时器 / 异步下单应答为内建流 `ctx.STREAM_STATUS`(2) / `ctx.STREAM_TIMER`(1) / `ctx.STREAM_ORDER_ACK`(4) |
-| `type` | string | `"data"`（行情、私有流的订单/成交/持仓/余额）/ `"status"`（网关状态、初始化状态）/ `"timer"`（定时器）/ `"ack"`（`ctx.submit` 的应答） |
-| `channel` | string | 所属订阅的频道：`ticker` `bbo` `tickers` `depth` `trade` `kline`；私有流的事件说明自己是哪一种：`orders` / `fills` / `positions` / `balance`（同一路 `private` 订阅、同一个 `stream`）；网关状态 `"gateway"`，定时器 `"timer"`，`ctx.submit` 的应答 `"ack"`；kind `"status"` 为它所属订阅的频道（私有流快照状态为 `"private"`）——所以只看 `channel` 分不出数据事件与 `status` 事件，先判 `kind`/`type` |
+| `kind` | string | 事件类型名：`ticker`（ticker/bbo/tickers 共用，`channel` 区分）`depth` `trade` `kline` `order`（订单回报）`position`（持仓）`balance`（余额）`fill`（成交回报）`ack`（异步下单应答）`gateway`（网关状态）`status`（初始化状态）；以后新增类型会加新名字，宿主不认识的为 `unknown`（见文末「约定」） |
+| `stream` | number | 投递这条事件的流：订阅流 = 本线程订阅对象的 `id`；网关状态 / 异步下单应答为内建流 `ctx.STREAM_STATUS`(2) / `ctx.STREAM_ORDER_ACK`(4) |
+| `type` | string | `"data"`（行情、私有流的订单/成交/持仓/余额）/ `"status"`（网关状态、初始化状态）/ `"ack"`（`ctx.submit` 的应答） |
+| `channel` | string | 所属订阅的频道：`ticker` `bbo` `tickers` `depth` `trade` `kline`；私有流的事件说明自己是哪一种：`orders` / `fills` / `positions` / `balance`（同一路 `private` 订阅、同一个 `stream`）；网关状态 `"gateway"`，`ctx.submit` 的应答 `"ack"`；kind `"status"` 为它所属订阅的频道（私有流快照状态为 `"private"`）——所以只看 `channel` 分不出数据事件与 `status` 事件，先判 `kind`/`type` |
 | `depth` | number | 仅深度事件：所属订阅的档数（0 = 连接器默认） |
 | `interval` | number | 仅 K 线事件与 K 线订阅的 kind `"status"`：周期（秒） |
 | `ex` | number | 账户在本次装载序列里的下标（`exchanges[i]` 的 i；无归属事件为 -1；余额与私有流状态事件不挂合约，按账户归属）。可**原样回传** `ctx.order/rest/raw` 的第一参数；label 取 `ctx.connectors()[ev.ex].label` |
 | `symbol` | string | 统一格式 `BASE_QUOTE[.contract]`（`BTC_USDT` 现货 / `.swap` 永续 / `.quarter` 季度） |
 | `seq` | number | 引擎全序号（同一实例内单调递增；引擎自产的事件——订阅失败、后来者补发——同样有） |
-| `time` | number | 事件**发生**的时刻（UNIX 毫秒）：交易所给了时间就是交易所时间；交易所时间拿不到时为接收时间（同 `ts`）。各类事件的取法见下文对应小节 |
-| `ts` | number | 本机**收到**这条事件的时刻：connector 收到原始报文的时刻；引擎自产事件为发布时间（UNIX 毫秒，带微秒小数；回测=虚拟钟）。`Date.now() - ev.ts` = 引擎+poll 延迟；`ev.ts - ev.time` ≈ 交易所→本机的延迟（仅当 `time` 是交易所时间时有意义） |
+| `time` | number | 本机**收到**这条事件的时刻（UNIX 毫秒，带微秒小数；回测=虚拟钟）：connector 收到原始报文的时刻，引擎自产事件为发布时间。所有事件同一含义；`Date.now() - ev.time` = 引擎+poll 的管道延迟，不含交易所到本机的网络延迟 |
+| `nano` | string | 与 `time` 同一时刻的纳秒值。超出 JS 安全整数，JS 里是字符串，要运算时 `BigInt(ev.nano)`；Python 里是 int，Rust 的 `ev.nano()` 是 u64，都可以直接运算 |
 
-`time` 的取法一览（回测里两者都是虚拟钟）：
+各类事件自己的字段放在**与 `kind` 同名的子对象**里，公共字段只在外层：
 
-| 事件 | `time` |
-|---|---|
-| ticker/bbo/tickers、trade、持仓、余额 | 交易所时间；连接器没给时为 `ts` |
-| kline | bar 起始时间，同 `openTimeMs`（与 REST `Record.Time` 同一口径） |
-| depth、订单回报 | 接收时间（= `ts`）：ABI 目前不携带这两类的交易所时间，以后携带了即改为交易所时间 |
-| 成交回报（`fill`） | 交易所成交时间；连接器没给时为 `ts` |
-| 网关状态（`gateway`）、初始化状态（`status`） | `ts` |
-| 下单应答（`ack`） | 交易所应答时间；交易所没给（REST 应答）时为 `ts` |
-| 定时器（`timer`） | 计划触发时刻（`scheduledNs` 换到与 `ts` 相同的毫秒时钟） |
+```json
+{"kind":"ticker","stream":3,"type":"data","channel":"ticker","ex":0,"symbol":"BTC_USDT.swap","seq":1024,
+ "time":1761380000123.456,"nano":"1761380000123456000",
+ "ticker":{"bid":104497,"ask":104498,"last":104497.5,"bidQty":1.2,"askQty":0.8,"volume":8123.4,"exchTime":1761380000120}}
+```
 
-Rust SDK：`sdk::ctx::EventExt` 的 `ev.time()` / `ev.ts()` 按同一规则给出（f64 毫秒），各类型化视图
-（`ev.ticker()` / `ev.order()` …）的 `time` 字段就是 `ev.time()`。
+子对象：`ev.ticker` `ev.trade` `ev.kline` `ev.order` `ev.position` `ev.balance` `ev.fill` `ev.ack` `ev.gateway` `ev.status`。
+深度事件没有子对象（档位用 `ev.book(n)`）。下文各节列的都是子对象的字段（`symbol` 等公共字段除外）。
 
-## ticker（kind `"ticker"`，channel: "ticker" / "bbo" / "tickers"）
+`exchTime`（number \| null）是子对象里的交易所时间（UNIX 毫秒）：ticker/bbo/tickers、trade、持仓、余额、成交回报、
+下单应答有这个键，交易所没给时 `null`；depth、订单回报、K 线、状态事件没有。`ev.time - ev.ticker.exchTime` 估算交易所到
+本机的延迟（含两边时钟误差）。K 线的 bar 起始时间是 `ev.kline.openTimeMs`（与 REST `Record.Time` 同一口径），`ev.time` 仍是收到时刻。
+
+旧接口不变：`EventLoop()` 与 `exchange.IO("wait")` 的信封仍是平铺字段（胶水把子对象展开回去），只有 `ctx.poll` 是这个形状。
+
+Rust SDK：`sdk::ctx::EventExt` 的 `ev.time()`（f64 毫秒）、`ev.nano()`（u64 纳秒）按同一规则给出，各类型化视图
+（`ev.ticker()` / `ev.order()` …）的 `time` 字段就是 `ev.time()`，`exch_time: Option<i64>` 对应 `exchTime`，
+`KlineView.open_time` 对应 `openTimeMs`。
+
+## ticker（`ev.ticker`，kind `"ticker"`，channel: "ticker" / "bbo" / "tickers"）
 
 `bid` `ask` `last` `bidQty` `askQty` `volume` `openInterest` —— 全部实数（已按合约精度
-换算）。`time` 是交易所时间（毫秒；连接器未提供时回落到 `ts`）；`open` `high` `low`
+换算）。`exchTime` 是交易所时间；`open` `high` `low`
 由 ticker 自身携带的交易日字段提供，协议没有时回落到 `last`。bbo 类频道无最新价时 `last` 为 0。
 `tickers` 的事件逐条是各自的合约（`symbol`）；交易所的全市场流本身不带买卖价时 `bid`/`ask` 为 0
 （例：币安现货 `!miniTicker@arr`，见该交易所文档）。`tickers` 只投递，不更新 `exchange.GetTicker`
 那份推送缓存。
 
-## trade（kind `"trade"`，channel: "trade"）
+## trade（`ev.trade`，kind `"trade"`，channel: "trade"）
 
 | 字段 | 类型 | 说明 |
 |---|---|---|
 | `px` `qty` | number | 成交价/量（实数） |
 | `side` | string | **taker 方向**：`"buy"` / `"sell"`；交易所未提供时 `""` |
 | `tradeId` | string | 成交号，**恒为字符串**，与 `rest("trades")` 行的 `id` 同一口径：交易所原始号（数字号写十进制、UUID 原样），交易所不给号时为 `syn:` 合成号；空串 = 连接器没给号 |
-| `time` | number | 交易所成交时间（毫秒）；连接器未提供时回落到 `ts` |
+| `exchTime` | number \| null | 交易所成交时间（毫秒）；连接器未提供时 `null` |
 
 `tradeId` 永远是 string（ABI v24 起；不会是 number）。Rust SDK 拿到的是原始 `Event`：成交号用
 `sdk::ctx::EventExt` 的 `ev.trade_id()`（非成交事件为 `None`），整条成交用 `ev.trade()`。
 
-## kline（kind `"kline"`，channel: "kline"，opts.interval 单位秒）
+## kline（`ev.kline`，kind `"kline"`，channel: "kline"，opts.interval 单位秒）
 
 `open` `high` `low` `close` `volume` `openInterest` `intervalSec` `openTimeMs` `closed`
-`prefill`。`time` 与 `openTimeMs` 相同（bar 起始时间，毫秒）。`closed=true` 表示该根已收盘（未收盘的中间态会反复推送）；`prefill=true`
+`prefill`。`openTimeMs` 是 bar 起始时间（毫秒）。`closed=true` 表示该根已收盘（未收盘的中间态会反复推送）；`prefill=true`
 表示首次订阅的历史初始化数据。
 
 Kline 的原生订阅、合成、历史 prefill 和断线续接都由 connector 负责。需要 prefill 的 connector
 先确认实时订阅生效并暂存期间形成的全部 bar，再按时间发布历史和当前 bar，最后发布同一
 stream 的 kind `"status"` 状态；随后只推普通实时 Kline。
 
-## 初始化状态（kind `"status"`，type: "status"，与目标订阅共用 stream）
+## 初始化状态（`ev.status`，kind `"status"`，type: "status"，与目标订阅共用 stream）
 
-`stream`、`channel`（字符串，如 `"kline"`）、`interval`/`intervalSec` 标识目标订阅；`channelCode` 是同一
+外层 `stream`、`channel`（字符串，如 `"kline"`）、`interval` 与子对象的 `intervalSec` 标识目标订阅；`channelCode` 是同一
 频道的 ABI 数字码（`CH_*`，此前的数字 `channel` 字段）。`prefillStatus`：1=READY、2=FAILED。FAILED 时
 `message` 是 connector 返回的真实原因，`detail` 是可选协议码。策略不能在收到 FAILED 前把少量实时
 bar 当作完整历史。订阅被拒（见上文「订阅」）也以本事件报告，频道可以是任何频道。私有流的账户快照
-也用它报告（`channel: "private"`，见「私有流」）。`time` 为接收时间（同 `ts`）。
+也用它报告（`channel: "private"`，见「私有流」）。
 
 ## depth（kind `"depth"`，channel: "depth"，opts.depth 档数）
 
@@ -254,8 +260,8 @@ bar 当作完整历史。订阅被拒（见上文「订阅」）也以本事件�
 事件本身只是"订单簿已更新"的信号，**不带档位**，买卖两侧都换成新的一版才发（订阅后的第一条事件到达时簿已完整，不会读到空簿）；档位读组装视图：`ev.book(n)` 或 `sub.book(n)` →
 `{bids: [[价,量],…], asks: [[价,量],…]}`（bids 降序 / asks 升序）。两者读的都是**这一路订阅自己的**
 那本簿（同合约 depth 5 与 depth 20 各一本，互不影响）。`ev.book` 是不可枚举方法，
-`JSON.stringify(ev)` 里没有它；事件所属的流已退订时调用抛异常。`bid/ask` 只用于**订单簿侧**命名，
-成交方向一律 `buy/sell`。`time` 为接收时间（同 `ts`；ABI 尚不携带深度的交易所时间）。
+`JSON.stringify(ev)` 里没有它；事件所属的流已退订时调用抛异常。深度事件没有子对象。`bid/ask` 只用于**订单簿侧**命名，
+成交方向一律 `buy/sell`。ABI 尚不携带深度的交易所时间，没有 `exchTime`。
 
 ## 私有流（channel 订阅 `"private"`：订单 + 成交 + 持仓 + 余额）
 
@@ -277,26 +283,25 @@ bar 当作完整历史。订阅被拒（见上文「订阅」）也以本事件�
   不推余额；CTP 柜台不推持仓与资金，只有快照），要最新值就调 `GetAssets()` / `GetPositions()`。
   实时推送的覆盖面因交易所而异，以各交易所文档为准。
 
-持仓（kind `"position"`，`channel: "positions"`）：
+持仓（`ev.position`，kind `"position"`，`channel: "positions"`）；`sub.positions()` 的行是平铺的同名字段：
 
 | 字段 | 类型 | 说明 |
 |---|---|---|
-| `symbol` | string | 统一 symbol |
 | `side` | string | `"buy"`（多）/ `"sell"`（空），同 `rest("positions")` 行的 `side`；净持仓已平时 `""` |
 | `posSide` | string | 持仓槽：`"long"` / `"short"`（双向持仓的两条腿）/ `"net"`（单向持仓，方向随 `side`） |
 | `qty` `avgPx` | number | 持仓量（≥ 0，张或币同 REST）、持仓均价 |
 | `profit` `margin` `liqPx` `markPx` `leverage` | number? | 未实现盈亏、保证金、强平价、标记价、杠杆；交易所没给就没有该键 |
-| `time` | number | 交易所更新时间（毫秒）；没给时为 `ts` |
+| `exchTime` | number \| null | 交易所更新时间（毫秒）；没给时 `null` |
 | `snapshot` | boolean | 属于订阅生效/重连后的快照 |
 
-余额（kind `"balance"`，`channel: "balance"`，`symbol` 为空串）：
+余额（`ev.balance`，kind `"balance"`，`channel: "balance"`，外层 `symbol` 为空串）；`sub.balances()` 的行同样平铺：
 
 | 字段 | 类型 | 说明 |
 |---|---|---|
 | `asset` | string | 资产名（同 `rest("assets").balances[].asset`） |
 | `free` `frozen` | number \| null | 该资产此刻的可用 / 冻结全额；推送里没有同口径的值时为 `null`（快照行总有值） |
 | `equity` `upnl` `margin` | number? | 权益、未实现盈亏、保证金占用；没有就没有该键 |
-| `time` `snapshot` | | 同持仓 |
+| `exchTime` `snapshot` | | 同持仓 |
 
 精度：数量与均价按合约精度定点后还原（均价截断到一个价格最小单位以内）；金额与余额是双精度浮点
 （15～16 位有效数字，与 REST 面相同）。
@@ -307,15 +312,15 @@ while (true) {
     var ev = ctx.poll([acct], 1000);
     if (!ev || ev.stream !== acct.id) continue;
     if (ev.kind === "status") {                   // 快照完成 / 失败
-        if (ev.prefillStatus === 1) Log("account", acct.balances(), acct.positions());
-        else Log("account snapshot failed:", ev.message);
-    } else if (ev.channel === "positions" && !ev.snapshot) onPosition(ev);   // 用户函数
-    else if (ev.channel === "balance" && !ev.snapshot) onBalance(ev);
-    else if (ev.channel === "orders") onOrder(ev);
+        if (ev.status.prefillStatus === 1) Log("account", acct.balances(), acct.positions());
+        else Log("account snapshot failed:", ev.status.message);
+    } else if (ev.channel === "positions" && !ev.position.snapshot) onPosition(ev.position);   // 用户函数
+    else if (ev.channel === "balance" && !ev.balance.snapshot) onBalance(ev.balance);
+    else if (ev.channel === "orders") onOrder(ev.order);
 }
 ```
 
-## 订单回报（kind `"order"`，channel: "orders"，私有流）
+## 订单回报（`ev.order`，kind `"order"`，channel: "orders"，私有流）
 
 | 字段 | 类型 | 说明 |
 |---|---|---|
@@ -324,9 +329,8 @@ while (true) {
 | `state` | string | `"acked"` `"partial"` `"filled"` `"canceled"` `"rejected"` |
 | `px` `qty` `filledQty` `avgPx` | number | 委托价/量、累计成交量、成交均价（实数） |
 | `reason` | number | ABI 统一拒单原因码；`reasonText` 是该统一码对应的、与 connector 无关的说明 |
-| `time` | number | 毫秒；ABI 尚不携带订单回报的交易所时间，目前为接收时间（同 `ts`） |
 
-## 成交回报（kind `"fill"`，channel: "fills"，私有流）
+## 成交回报（`ev.fill`，kind `"fill"`，channel: "fills"，私有流）
 
 自己订单的**一笔**成交（my trade），与订单回报同一路 `private` 订阅、同一个 `stream`、同样无损：
 
@@ -340,7 +344,7 @@ while (true) {
 | `feeCcy` | string | 手续费资产（同 `rest("assets").balances[].asset` 的资产名）；`""` = 未知 |
 | `side` | string | **订单方向** `"buy"` / `"sell"`（不是 taker 方向） |
 | `liquidity` | string | `"maker"`（挂单成交）/ `"taker"`（吃单成交）/ `""`（交易所没说） |
-| `time` | number | 交易所成交时间（毫秒）；连接器没给时为 `ts` |
+| `exchTime` | number \| null | 交易所成交时间（毫秒）；连接器没给时 `null` |
 
 - **先成交、后订单**：连接器先发成交，再发反映它的订单回报（同一帧既带成交又带订单新状态时也是这个顺序）。
   收到订单回报 `filledQty` 增长时，构成它的成交已经都到了；一张单全部成交的 `qty` 之和 = 它的 `filledQty`。
@@ -356,17 +360,18 @@ while (true) {
     var ev = ctx.poll([acct], 1000);
     if (!ev) continue;
     if (ev.kind === "fill") {
-        filled[ev.orderId] = (filled[ev.orderId] || 0) + ev.qty;
-        Log("fill", ev.orderId, ev.tradeId, ev.side, ev.px, ev.qty, ev.liquidity, ev.fee, ev.feeCcy);
-    } else if (ev.kind === "order" && ev.state === "filled") {
-        Log("order done", ev.id, ev.filledQty, "fills sum", filled[ev.id] || 0);
-        delete filled[ev.id];
+        var f = ev.fill;
+        filled[f.orderId] = (filled[f.orderId] || 0) + f.qty;
+        Log("fill", f.orderId, f.tradeId, f.side, f.px, f.qty, f.liquidity, f.fee, f.feeCcy);
+    } else if (ev.kind === "order" && ev.order.state === "filled") {
+        Log("order done", ev.order.id, ev.order.filledQty, "fills sum", filled[ev.order.id] || 0);
+        delete filled[ev.order.id];
     }
 }
 ```
 
 Rust SDK：`ev.fill() -> Option<FillView>`（`order_id` `client_id` `trade_id` `px` `qty` `fee: Option<f64>`
-`fee_ccy` `side` `liquidity` `time`），`ev.order()` 的 `OrderView` 同样带 `client_id`；Python 事件 dict 字段同 JS。
+`fee_ccy` `side` `liquidity` `time` `exch_time`），`ev.order()` 的 `OrderView` 同样带 `client_id`；Python 事件 dict 字段同 JS。
 
 `clientId` 的来源（各交易所推送字段）：币安现货 `executionReport` 的 `c`（撤单回报用 `C`，即原单的号）、
 币安 U 本位 `ORDER_TRADE_UPDATE.o.c`、OKX `clOrdId`、Bybit `orderLinkId`、Gate `text`、Bitget `clientOid`；
@@ -384,8 +389,8 @@ ctx.cancel(0, "BTC_USDT", id);                                 // REST
 var lid = ctx.submit(exchange, {op: "order", symbol: "BTC_USDT", side: "buy", price: 30000, amount: 0.001,
                                 postOnly: true});
 if (lid instanceof Error) throw lid;
-var ack = ctx.poll([ctx.STREAM_ORDER_ACK], 5000);              // kind "ack"：只有本线程收得到
-if (ack && ack.reqId === lid && ack.ok) Log("placed", ack.id, ack.latencyMs);
+var ev = ctx.poll([ctx.STREAM_ORDER_ACK], 5000);               // kind "ack"：只有本线程收得到
+if (ev && ev.ack.reqId === lid && ev.ack.ok) Log("placed", ev.ack.id, ev.ack.latencyMs);
 var c = ctx.submit(exchange, {op: "cancel", symbol: "BTC_USDT", id: lid});   // id 可以是 localId
 
 // 批量：同序的请求号数组，每一项一条应答
@@ -424,10 +429,10 @@ var ids = ctx.submit(exchange, {op: "order", orders: [
 应答不进 journal。
 
 ```json
-{"kind":"ack","type":"ack","channel":"ack","stream":4,"ex":0,"symbol":"BTC_USDT","seq":812,"ts":1761380000123.456,
- "reqId":"ws0mh3k2q9A7bC4dE6fG8hJ1kL3mN5pQ","op":"order","status":"ok","ok":true,"id":"4398712394",
+{"kind":"ack","type":"ack","channel":"ack","stream":4,"ex":0,"symbol":"BTC_USDT","seq":812,"time":1761380000123.456,"nano":"1761380000123456000",
+ "ack":{"reqId":"ws0mh3k2q9A7bC4dE6fG8hJ1kL3mN5pQ","op":"order","status":"ok","ok":true,"id":"4398712394",
  "clientId":"ws0mh3k2q9A7bC4dE6fG8hJ1kL3mN5pQ","error":"","reason":0,"reasonText":"",
- "exchTime":1761380000120,"latencyMs":3.912,"time":1761380000120}
+ "exchTime":1761380000120,"latencyMs":3.912}}
 ```
 
 | 字段 | 类型 | 说明 |
@@ -437,12 +442,10 @@ var ids = ctx.submit(exchange, {op: "order", orders: [
 | `status` / `ok` | string / boolean | `"ok"`（拿到订单号 / 撤单确认，含按客户端订单号查实的）/ `"failed"`（交易所拒绝、限频拒单、撤单时订单已先一步终态）/ `"unknown"`（见上）；`ok` = `status === "ok"` |
 | `id` | string | 交易所订单号（下单成功 / 撤单的目标单；下单失败为 `""`） |
 | `clientId` | string | 目标订单的客户端订单号：下单 = localId；按 localId 撤单时是它，按交易所订单号撤为 `""` |
-| `symbol` / `ex` | | 这一项的 symbol 与账户下标 |
 | `error` | string | 失败原因（与 REST 同款错误串；成功为 `""`；最长 127 字节） |
 | `reason` / `reasonText` | number / string | 统一原因码（3 传输/未知、4 交易所拒绝、5 限频）与说明 |
 | `exchTime` | number \| null | 交易所应答时间（毫秒）；交易所没给为 `null` |
 | `latencyMs` | number | 往返耗时：请求写出前一刻 → 宿主拿到交易所的结论 |
-| `time` | number | 交易所应答时间，没有时同 `ts` |
 
 Rust SDK：`ctx::order(ex, symbol, side, px, qty, opts_json)`、`ctx::cancel(ex, symbol, id)`；
 `ctx::submit(ex, req_json) -> Result<String, String>`（单笔）、`ctx::submit_batch(ex, req_json) -> Result<Vec<String>, String>`
@@ -457,23 +460,17 @@ if let Polled::Event(ev) = ctx::poll(&[ctx::STREAM_ORDER_ACK], Some(5000)) {
 ```
 
 Python：`ctx.order` / `ctx.cancel` / `ctx.submit(ex, req)` 同名同参（`req` 是 dict，返回 str / list，失败回
-`CtxError`），应答 dict 字段同 JS：
+`CtxError`），应答字段同 JS（外层 `symbol`、`ex` 是这一项的品种与账户下标，同 JS）：
 
 ```python
 lid = ctx.submit(exchange, {"op": "order", "symbol": "BTC_USDT", "side": "buy", "price": 30000, "amount": 0.001})
-ack = ctx.poll([ctx.STREAM_ORDER_ACK], 5000)
+ev = ctx.poll([ctx.STREAM_ORDER_ACK], 5000)   # ev.ack.reqId / ev.ack.ok
 ```
 
-## 网关状态（kind `"gateway"`，type: "status"，channel: "gateway"，内建 STREAM_STATUS）
+## 网关状态（`ev.gateway`，kind `"gateway"`，type: "status"，channel: "gateway"，内建 STREAM_STATUS）
 
 `status`：1=UP 2=DOWN 3=DEGRADED；`detail`：适配器自定义码；`group`：这条状态汇总的订阅分组
-（`ctx.subscribe` 的 `group`，默认分组为 `""`；连接器按组分别汇总、分别发，不支持分组的连接器恒为 `""`）；
-`time` 同 `ts`。
-
-## 引擎定时器（kind `"timer"`，type: "timer"，channel: "timer"，内建 STREAM_TIMER）
-
-`timerId` 是定时器 id，`scheduledNs` 是计划触发的引擎时钟纳秒值；超过 JS 安全整数范围时
-以字符串返回。`time` 是计划触发时刻换到与 `ts` 相同的毫秒时钟（UNIX 毫秒；回测=虚拟钟），`ts` 是实际发布时刻。QuickJS 的 `setTimeout` 属于语言运行时回调，不会伪装成 kind `"timer"` 业务事件。
+（`ctx.subscribe` 的 `group`，默认分组为 `""`；连接器按组分别汇总、分别发，不支持分组的连接器恒为 `""`）。
 
 ## 事件归属
 
@@ -525,13 +522,13 @@ while (true) {
     const ev = ctx.poll([], 1000);
     if (!ev) continue;
     if (ev.kind === "status") {                    // 初始化状态（先判，channel 会与数据事件重名）
-        if (ev.prefillStatus === 2) throw new Error(ev.message);
+        if (ev.status.prefillStatus === 2) throw new Error(ev.status.message);
         continue;
     }
     if (ev.kind === "gateway") continue;           // 网关状态
-    if (ev.channel === "ticker") onTick(ev);
+    if (ev.channel === "ticker") onTick(ev.ticker);
     else if (ev.channel === "depth") onBook(ev.book(5));
-    else if (ev.channel === "orders") onOrder(ev); // onTick/onBook/onOrder 是用户函数，不是宿主 API
+    else if (ev.channel === "orders") onOrder(ev.order); // onTick/onBook/onOrder 是用户函数，不是宿主 API
     else if (ev.channel === "positions" || ev.channel === "balance") onAccount(acct.positions(), acct.balances());
 }
 ```

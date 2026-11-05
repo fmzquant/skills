@@ -1631,26 +1631,27 @@ class CtxEvent(dict[str, Any]):
 
     公共字段：``kind``（事件类型名，字符串：``"ticker"``（ticker/bbo/tickers 共用，``channel`` 区分）、``"depth"``、
     ``"trade"``、``"kline"``、``"order"``（订单回报）、``"position"``、``"balance"``、``"fill"``（成交回报）、``"ack"``
-    （WebSocket 下单应答）、``"timer"``、``"gateway"``（网关状态）、``"status"``（初始化状态）；以后可能增加新名字，
+    （WebSocket 下单应答）、``"gateway"``（网关状态）、``"status"``（初始化状态）；以后可能增加新名字，
     不认识的为 ``"unknown"``，不要写数字）、``stream``（所属订阅的 ``id`` 或内置事件流）、``type``（``"data"`` /
-    ``"status"`` / ``"timer"`` / ``"ack"``）、``channel``（同一类事件里的哪一种数据；私有流为 ``orders`` / ``fills`` /
-    ``positions`` / ``balance``）、``ex``、``symbol``、``seq``、``time``、``ts``。按类型分支判断 ``kind``，同类数据
+    ``"status"`` / ``"ack"``）、``channel``（同一类事件里的哪一种数据；私有流为 ``orders`` / ``fills`` /
+    ``positions`` / ``balance``）、``ex``、``symbol``、``seq``、``time``（收到事件的毫秒时间戳）、``nano``（同一时刻的纳秒，整数）。按类型分支判断 ``kind``，同类数据
     （ticker 与 bbo、私有流的几种）用 ``channel``，同频道的多路订阅（BTC 与 ETH、depth 5 与 20）用
-    ``ev.stream == sub.id`` 或 ``ctx.poll([sub])``。各类事件：``"ticker"`` ``bid ask last bidQty askQty volume
-    openInterest open high low time``；``"trade"`` ``px qty side tradeId time``；``"kline"`` ``open high low close volume
+    ``ev.stream == sub.id`` 或 ``ctx.poll([sub])``。各类型自己的字段在以 ``kind`` 命名的子结构里（``ev.ticker.bid``、``ev.order.id``）：``"ticker"`` ``bid ask last bidQty askQty volume
+    openInterest open high low exchTime``；``"trade"`` ``px qty side tradeId exchTime``；``"kline"`` ``open high low close volume
     openInterest intervalSec openTimeMs closed prefill``；``"order"`` ``id clientId state px qty filledQty avgPx reason
-    reasonText``；``"position"`` ``side posSide qty avgPx profit margin liqPx markPx leverage time snapshot``；``"balance"``
-    ``asset free frozen equity upnl margin time snapshot``（``free`` / ``frozen`` 可能为 ``None``）；``"fill"`` ``orderId
-    clientId tradeId px qty fee feeCcy side liquidity time``（自己订单的一笔成交，``fee`` 没有时不出现）；
+    reasonText``；``"position"`` ``side posSide qty avgPx profit margin liqPx markPx leverage exchTime snapshot``；``"balance"``
+    ``asset free frozen equity upnl margin exchTime snapshot``（``free`` / ``frozen`` 可能为 ``None``）；``"fill"`` ``orderId
+    clientId tradeId px qty fee feeCcy side liquidity exchTime``（自己订单的一笔成交，``fee`` 没有时不出现）；
     ``clientId`` 为客户端订单号（``ctx.submit()`` 下的单就是它返回的 localId；推送没有时为 ``""``）；
     ``"ack"`` ``reqId op status ok id clientId error reason reasonText exchTime latencyMs``（``ctx.submit()`` 每一笔的结果，
-    ``op`` 为 ``"order"`` / ``"cancel"``，``status`` 为 ``"ok"`` / ``"failed"`` / ``"unknown"``）；``"timer"`` ``timerId
-    scheduledNs``；``"gateway"`` ``status detail group``（``group`` 为订阅分组，``""`` 为默认分组）；``"status"`` ``channelCode intervalSec prefillStatus``（1 就绪，2 失败）
+    ``op`` 为 ``"order"`` / ``"cancel"``，``status`` 为 ``"ok"`` / ``"failed"`` / ``"unknown"``）；``"gateway"`` ``status detail group``（``group`` 为订阅分组，``""`` 为默认分组）；``"status"`` ``channelCode intervalSec prefillStatus``（1 就绪，2 失败）
     ``detail message``。深度事件（``"depth"``）不带档位：用 ``ev.book(n)`` 读取。
+    ``exchTime`` 是交易所时间（毫秒），交易所没给时为 ``None``；K 线开始时间是 ``ev.kline.openTimeMs``。
+    订阅传了 ``raw: True`` 时另有 ``raw``（见该字段）。
     """
     kind: str
     """事件类型名：``"ticker"`` ``"depth"`` ``"trade"`` ``"kline"`` ``"order"`` ``"position"`` ``"balance"`` ``"fill"``
-    ``"ack"`` ``"timer"`` ``"gateway"`` ``"status"``（不认识的为 ``"unknown"``）。"""
+    ``"ack"`` ``"gateway"`` ``"status"``（不认识的为 ``"unknown"``）。"""
     stream: int
     type: str
     channel: str
@@ -1658,7 +1659,20 @@ class CtxEvent(dict[str, Any]):
     symbol: str
     seq: int
     time: float
-    ts: float
+    nano: int
+    ticker: CtxRecord
+    trade: CtxRecord
+    kline: CtxRecord
+    order: CtxRecord
+    position: CtxRecord
+    balance: CtxRecord
+    fill: CtxRecord
+    ack: CtxRecord
+    gateway: CtxRecord
+    status: CtxRecord
+    raw: Union[str, bytes]
+    """交易所原始报文，订阅带 ``raw: True`` 才有：文本消息是 ``str``，二进制消息是 ``bytes``。内容不解析，按交易所协议
+    自己读；不是交易所推来的事件（补齐的K线、账户快照、状态事件等）没有这个字段，回测也没有。"""
 
     def book(self, n: Optional[int] = None) -> CtxRecord:
         """深度事件（kind ``"depth"``）：所属订阅的订单簿，同 ``Subscription.book()``。"""
@@ -1673,6 +1687,7 @@ class _SubscribeOptions(TypedDict, total=False):
     mode: str
     buffer: int
     group: str
+    raw: bool
 
 class _SubscribeBatchOptions(_SubscribeOptions):
     symbol: Union[list[str], tuple[str, ...]]
@@ -1745,12 +1760,13 @@ class Ctx:
 
         Args:
             ex: 交易所对象（``exchange``、``exchanges[1]``）或账户下标（整数或数字字符串）。
-            opts: ``{channel, symbol, depth, interval, mode, buffer, group}``。``channel``：``"ticker"``（默认）、``"bbo"``、
+            opts: ``{channel, symbol, depth, interval, mode, buffer, group, raw}``。``channel``：``"ticker"``（默认）、``"bbo"``、
                 ``"depth"``、``"trade"``、``"kline"``、``"tickers"``（全市场，不传 symbol）或 ``"private"``（订单 +
                 成交 + 持仓 + 余额，不传 symbol）。``symbol``：行情频道必填，``ex`` 为交易所对象时可省略（取它当前的交易对）；
                 传列表为批量订阅。``depth``：档数，0（默认）或 1–255 的任意整数，每个档数一路订阅（超过 255 抛出异常，
                 超过交易所上限时收到 ``unsupported depth`` 失败事件）；``interval``：K线秒数；``mode: "latest"`` 或 ``buffer: N``；``group``：订阅分组名
                 （字符串，最多 32 字节，不传为默认分组），不同分组的订阅使用不同的连接，网关状态按分组推送；``private`` 不分组（传入抛出异常）。
+                ``raw``：``True`` 时事件带交易所原始报文 ``ev.raw``；没给 ``mode`` / ``buffer`` 时投递模式为 ``buffer: 10240``，不合并。
 
         Returns:
             ``Subscription``；``symbol`` 为列表或元组时返回 ``SubscriptionList``（整批先校验）。参数不合法时抛出异常；
