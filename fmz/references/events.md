@@ -25,7 +25,8 @@ var all = ctx.subscribe(0, {channel: "tickers"});                          // �
 var pair = ctx.subscribe(0, {channel: "trade", symbol: ["BTC_USDT", "ETH_USDT"]}); // 批量：订阅对象数组
 ```
 
-- **只有两参形式** `ctx.subscribe(ex, opts)`；`opts = {channel, symbol, depth, interval, mode, buffer}`，
+- **只有两参形式** `ctx.subscribe(ex, opts)`；`opts = {channel, symbol, depth, interval, mode, buffer, group, raw}`
+  （`group` 见下文「订阅分组」一条，`raw` 见「原始报文」），
   第二参不是对象、多传参数、未知键（如拼错的 `intervel`）、未知频道、行情频道缺 symbol、私有频道或
   `tickers` 给了 symbol 都抛异常。`channel` 缺省 `"ticker"`；频道：`ticker` `bbo` `tickers` `depth`
   `trade` `kline` `private`。
@@ -42,7 +43,7 @@ var pair = ctx.subscribe(0, {channel: "trade", symbol: ["BTC_USDT", "ETH_USDT"]}
 - 第一参是交易所对象、行情频道又没给 `symbol` 时，用该对象**订阅这一刻**的交易对（含合约类型，
   如 `BTC_USDT.swap`）；之后 `SetCurrency/SetContractType` 不改已有订阅。下标形式不补 symbol；
   私有频道与 `tickers` 永远不补（整个账户 / 整个市场）。
-- 返回的订阅对象：`{id, ex, channel, symbol, depth, interval}`（只读、可 `JSON.stringify`）加这些方法：
+- 返回的订阅对象：`{id, ex, channel, symbol, depth, interval, group}`（只读、可 `JSON.stringify`；`group` 缺省组为 `""`）加这些方法：
   - `sub.book(n)`：**这一路**深度订阅自己的订单簿前 n 档 `{bids: [[价,量],…], asks: […]}`
     （bids 降序 / asks 升序；n 缺省为订阅档数）；还没收到完整快照时两边为空数组；
     不是深度订阅、已退订都抛异常。
@@ -56,6 +57,8 @@ var pair = ctx.subscribe(0, {channel: "trade", symbol: ["BTC_USDT", "ETH_USDT"]}
   最后一个退掉才真正向交易所退订——一处退订不会掐断别处还在用的同一路行情。任何一维不同就是另一路
   订阅、另一条流：同合约的 ticker 与 bbo 各一路，depth 5 与 depth 20 各一路（交易所不同档位推送频率
   不同，引擎**不合并成最大档**，每路一本簿）。不同线程订同一身份见「线程与订阅归属」。
+- **订阅分组** `group`（字符串，至多 32 字节、不含控制字符；缺省 `""` = 缺省组）是订阅分组：不同组的订阅不共用连接，一组断线
+  重连不影响另一组；不支持分组的连接器把各组合并到缺省组。私有流没有分组（给了非空 `group` 抛异常）。
 - stream id 在一次运行内单调递增、不复用（全部退订后再订是新 id）。
 - 订阅被交易所/连接器拒绝（如不支持的 K 线周期）时，**该订阅自己的流**上来一条 kind `"status"`、
   `prefillStatus=2`（FAILED）的状态事件，`message` 是真实原因；`ctx.poll([sub])` 收得到。之后这条流
@@ -65,7 +68,7 @@ var pair = ctx.subscribe(0, {channel: "trade", symbol: ["BTC_USDT", "ETH_USDT"]}
 建连/重放；连接状态变化通过网关状态事件回报。
 
 Rust SDK 对应：`ctx::subscribe(ex, SubOpts::depth(20).symbol("BTC_USDT")) -> Result<Sub, String>`
-（`ex` 是 `u16` 下标或 `exchange`/`exchanges[i]`；`SubOpts` 另有 `.latest()` / `.buffer(n)`，私有流是
+（`ex` 是 `u16` 下标或 `exchange`/`exchanges[i]`；`SubOpts` 另有 `.latest()` / `.buffer(n)` / `.group(name)` / `.raw()`，私有流是
 `SubOpts::private()`，全市场是 `SubOpts::tickers()`）；批量是
 `ctx::subscribe_many(ex, SubOpts::trade(), &["BTC_USDT", "ETH_USDT"]) -> Result<Vec<Sub>, String>`（同样整批
 先校验）；`Sub` 是 `Copy` 句柄：`id()`（交给 `ctx::poll(&[sub.id()], …)`）、
@@ -74,7 +77,7 @@ Rust SDK 对应：`ctx::subscribe(ex, SubOpts::depth(20).symbol("BTC_USDT")) -> 
 （`None` = 快照还没 READY）、`unsubscribe()`——`Sub` 可复制，引用计数按 **`subscribe` 调用次数**算，
 每次 `subscribe` 对应一次 `unsubscribe`。原始 `Event` 经 `EventExt` 安全读取（策略不写 `unsafe`）：
 `event_kind()` / `kind_str()` / `stream()` / `channel()` / `book(n)`（深度事件）/
-`trade_id()`，以及按类型的实数视图——`ticker()`、`trade()`、`kline()`、`order()`、`position()` / `balance()`、
+`trade_id()` / `raw()`（原始报文，见「原始报文」），以及按类型的实数视图——`ticker()`、`trade()`、`kline()`、`order()`、`position()` / `balance()`、
 `fill()`、`order_ack()`、`gateway()`、`feed_status()`（`status`/`channel`/`interval`/`message`/`stream`，
 `ready()` / `failed()`），类型不符为 `None`，字段与本文各节的 JS 字段一一对应（Rust 命名）。
 
@@ -147,7 +150,7 @@ while True:
   下标（int 或数字串）或交易所对象（`exchange`、`exchanges[i]`；取下标，行情频道没给 symbol 时取它此刻的
   `symbol`，之后 `SetCurrency` 不跟随；`private`/`tickers` 不补）。`opts["symbol"]` 是列表（或元组）→
   `SubscriptionList`（`list` 子类，同序；整批先校验；`.unsubscribe()` 退订全部元素）。传入的 `opts` 不被修改。
-- 订阅对象 `Subscription`：只读属性 `id ex channel symbol depth interval`，`info()` 给同字段的 dict；方法
+- 订阅对象 `Subscription`：只读属性 `id ex channel symbol depth interval group`，`info()` 给同字段的 dict；方法
   `book(n=None)`（深度订阅自己的簿，`{"bids": [[价, 量], …], "asks": […]}`，n 缺省为订阅档数）、
   `positions()` / `balances()`（私有订阅；快照 READY 之前为 `None`）、`unsubscribe()`（幂等；只能在订阅它的
   线程里调，别的线程调用抛异常）。不是对应频道、已退订（本对象）都抛异常。
@@ -158,7 +161,7 @@ while True:
   也立即抛（同 JS 的 interrupted；其余 `ctx` 调用照常）。JS 的选项形式
   `ctx.poll({streams, sources}, …)` 是 **JS 专有**（Python 传 dict 抛 `TypeError`）：Python 的线程消息、
   `exchange.Go` 完成通知由 `EventLoop` 与各自的句柄交付，`ctx.poll` 只取引擎事件。
-- 另有 `ctx.connectors()`（同 JS：`[{ex, label, name, symbol, interval, orderIdScope, feed}, …]`）与
+- 另有 `ctx.connectors()`（同 JS：`[{ex, label, name, symbol, interval, orderIdScope, acksDropped, feed}, …]`）与
   `ctx.STREAM_STATUS` / `ctx.STREAM_TIMER` / `ctx.STREAM_ORDER_ACK`。下单撤单 `ctx.order` / `ctx.cancel` /
   `ctx.submit` 与 JS 同参数同语义（见「下单：ctx.order / ctx.cancel / ctx.submit」；失败**返回** `CtxError`
   实例、不抛，`isinstance(r, CtxError)` 判）；`ctx.rest/raw` 不在 Python 的 `ctx` 上（查询走 `exchange.*`）。
@@ -283,7 +286,8 @@ bar 当作完整历史。订阅被拒（见上文「订阅」）也以本事件�
   不推余额；CTP 柜台不推持仓与资金，只有快照），要最新值就调 `GetAssets()` / `GetPositions()`。
   实时推送的覆盖面因交易所而异，以各交易所文档为准。
 
-持仓（`ev.position`，kind `"position"`，`channel: "positions"`）；`sub.positions()` 的行是平铺的同名字段：
+持仓（`ev.position`，kind `"position"`，`channel: "positions"`）。`sub.positions()` 的行是平铺对象：`symbol` 加下表
+除 `exchTime`/`snapshot` 外的字段，交易所更新时间放在 `time`（毫秒，交易所没给就没有该键），没有 `snapshot`：
 
 | 字段 | 类型 | 说明 |
 |---|---|---|
@@ -294,7 +298,8 @@ bar 当作完整历史。订阅被拒（见上文「订阅」）也以本事件�
 | `exchTime` | number \| null | 交易所更新时间（毫秒）；没给时 `null` |
 | `snapshot` | boolean | 属于订阅生效/重连后的快照 |
 
-余额（`ev.balance`，kind `"balance"`，`channel: "balance"`，外层 `symbol` 为空串）；`sub.balances()` 的行同样平铺：
+余额（`ev.balance`，kind `"balance"`，`channel: "balance"`，外层 `symbol` 为空串）。`sub.balances()` 的行同样平铺：
+下表除 `exchTime`/`snapshot` 外的字段，交易所更新时间放在 `time`（没给就没有该键），没有 `snapshot`：
 
 | 字段 | 类型 | 说明 |
 |---|---|---|
@@ -326,7 +331,7 @@ while (true) {
 |---|---|---|
 | `id` | string | 订单号（`ctx.order` 的返回值；空串 = 连接器没给号） |
 | `clientId` | string | 客户端订单号（交易所推送里的原值；`ctx.submit` 下的单就是它返回的 localId）；`""` = 推送没给或连接器还没接入 |
-| `state` | string | `"acked"` `"partial"` `"filled"` `"canceled"` `"rejected"` |
+| `state` | string | `"acked"` `"partial"` `"filled"` `"canceled"` `"rejected"`；连接器给了未登记的状态码时为 `"unknown"` |
 | `px` `qty` `filledQty` `avgPx` | number | 委托价/量、累计成交量、成交均价（实数） |
 | `reason` | number | ABI 统一拒单原因码；`reasonText` 是该统一码对应的、与 connector 无关的说明 |
 
@@ -495,12 +500,16 @@ ev = ctx.poll([ctx.STREAM_ORDER_ACK], 5000)   # ev.ack.reqId / ev.ack.ok
 - 取走即清：每次 poll 拿到的必然是上次之后的新数据；
 - **深度特殊**：订单簿在引擎入口持续 apply——策略消费多慢，`ev.book()`/`sub.book()` 都是
   **恒常新**的完整簿；Latest 丢的只是"簿已更新"信号本身，不丢深度增量；
-- 回报/持仓/余额/状态走每线程的无损队列（有界 10240，只有某个线程订阅了却从不取时才会满、丢最旧
-  并计入 evdrop）；
+- 回报/持仓/余额/状态走每线程的无损队列（有界 10240，只有某个线程订阅了却从不取时才会满）。满了丢最旧
+  并计入 evdrop，**但不静默**：被挤掉的事件按所属的流累计成缺口，这条流下一次交给策略的先是一条缺口事件——
+  kind `"status"`、`prefillStatus=2`（FAILED），`detail` 是丢了几条，`message` 以 `event queue overflow` 开头——
+  之后才是还留着的较新事件。缺口事件不作废这条流（与订阅被拒的 FAILED 不同），只说明它的增量不完整，
+  应该用 REST 重新对账。开了 `raw` 的流在 Ring 溢出时同样报缺口；
 - 一条流的状态事件（kind `"status"`）不会越过它之前已排队的**本流**数据：prefill 的 bar 全部交出后才是
   READY / FAILED；Latest 已覆盖作废的旧数据不算，在它之后到的数据排在它后面；
 - 每个连接器的来源环按积压从 1024 条增长到 32768 条（全市场 ticker 一帧就是几百上千条）；到顶后
-  tick 丢弃、其余事件向 connector 传导背压（connector 线程重试），因此策略仍须持续 poll；
+  不带原始报文的 tick 丢弃（下一帧会覆盖它），其余事件——包括带原始报文的 tick——回 connector
+  `RC_ERR_FULL`，由 connector 线程重试（背压），因此策略仍须持续 poll；
 - 丢弃累计随资源监控上报：`load.evdrop`（引擎侧慢消费：Latest 覆盖 / Ring 溢出 / 无损队列溢出）、
   `load.feeddrop`（来源环满丢掉的 tick）、`load.feedfull`（回给 connector 的背压次数）；策略自己读
   `ctx.connectors()[i].feed`（`{ticksDropped, backpressure, ringCapacity}`，按连接器）。涨得快 =
@@ -546,6 +555,23 @@ var t = threading.Thread(function () {
     }
 });
 ```
+
+## 原始报文（`raw: true`）
+
+订阅时给 `raw: true`，这一路的事件在**外层**（不在 kind 子对象里）额外带上它所依据的交易所原始消息（同一条消息拆出的多条事件带同一份）：
+
+| 语言 | 取法 | 类型 |
+|---|---|---|
+| JS | `ev.raw` | 文本消息是字符串，二进制消息是 `ArrayBuffer` |
+| Python | `ev["raw"]` / `ev.raw` | 文本是 `str`，二进制是 `bytes` |
+| Rust | `SubOpts::...().raw()` 订阅，`ev.raw() -> Option<Raw>` | `Raw::Text(String)` / `Raw::Bytes(Vec<u8>)` |
+
+- 没有原始消息的事件（引擎自产的状态事件、连接器没给原文时）没有 `raw` 键（Rust 为 `None`）。
+- `raw` 不是订阅身份的一部分：同一线程里同身份的订阅共用一条流，任何一次带 `raw: true` 都会让这条流从此带
+  原文，直到退订。没开 `raw` 的流不拷贝、不持有原文。
+- 投递模式：`raw: true` 又没给 `mode`/`buffer` 时缺省是 `buffer: 10240`（要原文就是要每一帧，不按 Latest
+  合并）；Ring 溢出时这条流报缺口（见「投递模式」）。带原文的 tick 在来源环满时也不丢，改为背压。
+- Rust 的 `ev.raw()` 只在本线程取下一条事件之前有效（之后返回 `None`），要留用就在当场复制。
 
 ## REST 查询面
 

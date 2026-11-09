@@ -3681,6 +3681,7 @@ interface IServeContext {
  *     if (ctx.upgrade("websocket")) {
  *         while (true) {
  *             var msg = ctx.read(5000);
+ *             if (msg === "") break; // 对端关闭返回空串，超时返回 null
  *             if (msg) ctx.write("Echo: " + msg);
  *         }
  *     }

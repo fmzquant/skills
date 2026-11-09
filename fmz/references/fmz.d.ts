@@ -3707,6 +3707,7 @@ interface IServeContext {
  *     if (ctx.upgrade("websocket")) {
  *         while (true) {
  *             var msg = ctx.read(5000);
+ *             if (msg === "") break; // "" = peer closed, null = timeout
  *             if (msg) ctx.write("Echo: " + msg);
  *         }
  *     }
