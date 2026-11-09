@@ -12552,31 +12552,31 @@ See also: `Dial`, `exchange.Go`, `HttpQuery_Go`, `ctx.poll`
 ctx.subscribe(ex, options)
 ```
 
-Subscribes to WebSocket push streams (symbol market data, market-wide tickers, or private account streams) and returns a `Subscription` object. You can subscribe to a single symbol's ticker, best bid/ask, order book, trades, and K-lines, to the tickers of an entire market, and to an entire account's order updates, execution reports, positions, and balances. When ```symbol``` is an array, multiple symbols are subscribed at once and an array of subscription objects is returned. Events are retrieved through `ctx.poll` and handled according to each event's ```channel```. A subscription belongs to the thread that created it; both the main thread and threads created by ```threading.Thread()``` can subscribe.
+Subscribes to WebSocket push streams (per-symbol market data, market-wide tickers, or private account streams) and returns a `Subscription` object. You can subscribe to a single symbol's ticker, best bid/ask, order book, trades, and K-lines (candlesticks), to tickers for an entire market, or to an entire account's order updates, fill updates, positions, and balances. When ```symbol``` is an array, multiple symbols are subscribed in one call and an array of subscription objects is returned. Use `ctx.poll` to retrieve events, then handle each event according to its ```channel```. A subscription belongs to the thread that creates it; both the main thread and threads created by ```threading.Thread()``` can subscribe.
 
 Parameters:
 
-- `ex` (object / number, required): The account to subscribe to: either an exchange object (```exchange```, ```exchanges[1]```, etc.) or the account's index in the ```exchanges``` array (```0``` means ```exchanges[0]```; the numeric string ```"0"``` is also accepted). Account labels are not supported.
-- `options` (object, required): Subscription options ```{channel, symbol, depth, interval, mode, buffer, group, raw}```. This is the only supported way to pass parameters, and the symbol is also specified here; passing an array as ```symbol``` makes it a batch subscription. Each field is described below.
+- `ex` (object / number, required): The account to subscribe to: pass an exchange object (e.g. ```exchange```, ```exchanges[1]```), or the account's index in the ```exchanges``` array (```0``` means ```exchanges[0]```; a numeric string such as ```"0"``` is also accepted). Account labels are not supported.
+- `options` (object, required): Subscription options ```{channel, symbol, depth, interval, mode, buffer, group, raw}```. This is the only supported form, and the symbol is also specified here. When ```symbol``` is an array, it is a batch subscription. Each field is described below.
 
-Returns (`Subscription` object / `Subscription` array): The subscription object, which has the properties ```id``` (the event stream ID, i.e. the ```ev.stream``` of events produced by this subscription), ```ex```, ```channel```, ```symbol```, ```depth```, ```interval```, and ```group```, as well as the methods ```book()```, ```positions()```, ```balances()```, and ```unsubscribe()```. It can be passed directly to ```ctx.poll()``` to retrieve only this subscription's events. When ```options.symbol``` is an array, an array of subscription objects is returned in the same order.
+Returns (`Subscription` object / `Subscription` array): A subscription object has the properties ```id``` (the event stream ID, i.e. the ```ev.stream``` of events produced by this subscription), ```ex```, ```channel```, ```symbol```, ```depth```, ```interval```, and ```group```, and the methods ```book()```, ```positions()```, ```balances()```, and ```unsubscribe()```. A subscription object can be passed directly to ```ctx.poll()``` to retrieve only that subscription's events. When ```options.symbol``` is an array, an array of subscription objects is returned in the same order.
 
-Use the exchange object to subscribe to the ticker and 20-level order book of the current trading pair, subscribe to the account's private stream as well, and handle events separately by ```channel```.
+Subscribe to the ticker and the 20-level order book of the current trading pair through the exchange object, subscribe to the account's private stream as well, and handle each type of event separately according to ```channel```.
 
 ```javascript
 function main() {
-    // The first parameter takes the exchange object; when subscribing to a market data channel without specifying symbol, the object's current trading pair is used
+    // Pass the exchange object as the first argument; when a market data channel does not specify a symbol, the exchange object's current trading pair is used
     var tk = ctx.subscribe(exchange, {channel: "ticker"})
     var book = ctx.subscribe(exchange, {channel: "depth", depth: 20})
-    // The private stream needs no symbol and covers the entire account: order updates, fill updates, positions and balances are all pushed through this one stream
+    // The private stream takes no symbol and covers the entire account: order updates, fill reports, positions and balances are all pushed through this one stream
     var acct = ctx.subscribe(exchange, {channel: "private"})
     Log("subscribed:", JSON.stringify(tk), JSON.stringify(book), JSON.stringify(acct))
     while (true) {
-        var ev = ctx.poll([], 1000)    // [] means all event streams subscribed by this thread; waits up to 1 second
+        var ev = ctx.poll([], 1000)    // [] means all event streams subscribed by this thread; wait at most 1 second
         if (!ev) {
             continue
         }
-        if (ev.type === "status") {    // Gateway status and initialization status events: check these first, as their channel may be the same as that of data events
+        if (ev.type === "status") {    // Check gateway status and initialization status first; their channel may be the same as that of data events
             if (ev.kind === "status" && ev.channel === "private") {
                 Log("account snapshot ready:", ev.status.prefillStatus === 1, ev.status.message)
             }
@@ -12600,17 +12600,17 @@ function main() {
 
 ```python
 def main():
-    # The first parameter takes the exchange object; when subscribing to a market data channel without specifying symbol, the object's current trading pair is used
+    # Pass the exchange object as the first argument; when a market data channel does not specify a symbol, the exchange object's current trading pair is used
     tk = ctx.subscribe(exchange, {"channel": "ticker"})
     book = ctx.subscribe(exchange, {"channel": "depth", "depth": 20})
-    # The private stream needs no symbol and covers the entire account: order updates, fill updates, positions and balances are all pushed through this one stream
+    # The private stream takes no symbol and covers the entire account: order updates, fill reports, positions and balances are all pushed through this one stream
     acct = ctx.subscribe(exchange, {"channel": "private"})
     Log("subscribed:", tk.info(), book.info(), acct.info())
     while True:
-        ev = ctx.poll([], 1000)        # [] means all event streams subscribed by this thread; waits up to 1 second
+        ev = ctx.poll([], 1000)        # [] means all event streams subscribed by this thread; wait at most 1 second
         if ev is None:
             continue
-        if ev.type == "status":        # Gateway status and initialization status events: check these first
+        if ev.type == "status":        # Check gateway status and initialization status first
             if ev.kind == "status" and ev.channel == "private":
                 Log("account snapshot ready:", ev.status.prefillStatus == 1, ev.status.message)
             continue
@@ -12631,7 +12631,7 @@ def main():
 use sdk::ctx::EventExt;
 
 fn main() {
-    // The first parameter takes the exchange object; when subscribing to a market data channel without specifying symbol, the object's current trading pair is used
+    // The exchange object is the first argument: when a market data channel does not specify a symbol, its current trading pair is used
     let book = ctx::subscribe(exchange, ctx::SubOpts::depth(20)).unwrap();
     let acct = ctx::subscribe(exchange, ctx::SubOpts::private()).unwrap();
     loop {
@@ -12662,11 +12662,11 @@ fn main() {
 }
 ```
 
-Subscribe to the tick-by-tick trades of three symbols in a single batch: an array of subscription objects is returned. Pass the whole array to ```ctx.poll()```, count the trades of each symbol over 1 minute, then unsubscribe from all of them at once.
+Subscribe to tick-by-tick trades for three symbols in one batch: the subscription returns an array of subscription objects, and you can pass the whole array directly to ```ctx.poll()```. After counting the number of trades for each symbol over 1 minute, unsubscribe from all of them at once.
 
 ```javascript
 function main() {
-    // When symbol is an array, an array of subscription objects in the same order is returned; if any symbol is invalid, none in the batch are subscribed
+    // When symbol is an array, an array of subscription objects is returned in the same order; if any symbol is invalid, none of the batch is subscribed
     var symbols = ["BTC_USDT", "ETH_USDT", "SOL_USDT"]
     var subs = ctx.subscribe(exchange, {channel: "trade", symbol: symbols})
     subs.forEach(function(s) {
@@ -12675,18 +12675,18 @@ function main() {
     var count = {}
     var t0 = Date.now()
     while (Date.now() - t0 < 60000) {
-        var ev = ctx.poll(subs, 1000)    // The array can be passed directly to ctx.poll
+        var ev = ctx.poll(subs, 1000)    // An array of subscription objects can be passed directly to ctx.poll
         if (!ev) {
             continue
         }
         if (ev.kind === "status" && ev.status.prefillStatus === 2) {
-            Log("subscription failed:", ev.symbol, ev.status.message)   // Only this symbol's subscription failed
+            Log("subscription failed:", ev.symbol, ev.status.message)   // Only this subscription failed; other symbols are not affected
         } else if (ev.kind === "trade") {
             count[ev.symbol] = (count[ev.symbol] || 0) + 1
         }
     }
     Log("trades in 60 seconds:", count)
-    subs.unsubscribe()                   // Unsubscribe from all elements at once
+    subs.unsubscribe()                   // Unsubscribe from all subscriptions in the array at once
 }
 ```
 
@@ -12694,7 +12694,7 @@ function main() {
 import time
 
 def main():
-    # When symbol is a list, a SubscriptionList in the same order is returned; if any symbol is invalid, none in the batch are subscribed
+    # When symbol is a list, a SubscriptionList is returned in the same order; if any symbol is invalid, none of the batch is subscribed
     symbols = ["BTC_USDT", "ETH_USDT", "SOL_USDT"]
     subs = ctx.subscribe(exchange, {"channel": "trade", "symbol": symbols})
     for s in subs:
@@ -12710,7 +12710,7 @@ def main():
         elif ev.kind == "trade":
             count[ev.symbol] = count.get(ev.symbol, 0) + 1
     Log("trades in 60 seconds:", count)
-    subs.unsubscribe()                     # Unsubscribe from all elements at once
+    subs.unsubscribe()                     # Unsubscribe from all subscriptions in the list at once
 ```
 
 ```rust
@@ -12740,17 +12740,17 @@ fn main() {
 }
 ```
 
-Subscribing in a thread: the child thread subscribes to the order books of two symbols, and the corresponding events are delivered only to that thread; the main thread subscribes to its own ticker, and the two do not interfere with each other.
+Subscribing in a thread: the child thread subscribes to the order books of two symbols on its own, and those events are delivered only to that thread. The main thread subscribes to its own ticker, and the two do not interfere with each other.
 
 ```javascript
 function main() {
     var t = threading.Thread(function(symbols, ms) {
-        // Subscribe in the thread; these two event streams are delivered only to this thread
+        // Subscribe in the child thread; these two event streams are delivered only to this thread
         var subs = ctx.subscribe(0, {channel: "depth", symbol: symbols, depth: 5})
         var n = 0
         var t0 = Date.now()
         while (Date.now() - t0 < ms) {
-            var ev = ctx.poll([], 1000)          // Only retrieves events subscribed by this thread
+            var ev = ctx.poll([], 1000)          // Only receives events subscribed by this thread
             if (ev && ev.kind === "depth") {
                 var b = ev.book(1)
                 if (b.bids.length > 0 && b.asks.length > 0) {
@@ -12759,14 +12759,14 @@ function main() {
                 n++
             }
         }
-        subs.unsubscribe()                       // Can only unsubscribe in the thread that initiated the subscription
+        subs.unsubscribe()                       // Can only unsubscribe in the thread that created the subscription
         return n
     }, ["ETH_USDT", "SOL_USDT"], 30000)
 
     var tk = ctx.subscribe(0, {channel: "ticker", symbol: "BTC_USDT"})
     var t0 = Date.now()
     while (Date.now() - t0 < 30000) {
-        var ev = ctx.poll([], 1000)              // Cannot retrieve depth events subscribed by the child thread
+        var ev = ctx.poll([], 1000)              // Cannot receive depth events subscribed by the child thread
         if (ev && ev.kind === "ticker") {
             Log("main", ev.symbol, "last:", ev.ticker.last)
         }
@@ -12781,16 +12781,16 @@ import threading
 import time
 
 def depth_worker(symbols, seconds):
-    # Subscribe in the thread; these two event streams are delivered only to this thread
+    # Subscribe in the child thread; these two event streams are delivered only to this thread
     subs = ctx.subscribe(0, {"channel": "depth", "symbol": symbols, "depth": 5})
     t0 = time.time()
     while time.time() - t0 < seconds:
-        ev = ctx.poll([], 1000)              # Only retrieves events subscribed by this thread
+        ev = ctx.poll([], 1000)              # Only receives events subscribed by this thread
         if ev is not None and ev.kind == "depth":
             b = ev.book(1)
             if b["bids"] and b["asks"]:
                 Log("thread", ev.symbol, "bid1:", b["bids"][0][0], "ask1:", b["asks"][0][0])
-    subs.unsubscribe()                       # Also unsubscribed automatically when the thread ends
+    subs.unsubscribe()                       # Subscriptions are also removed automatically when the thread exits
 
 def main():
     t = threading.Thread(target=depth_worker, args=(["ETH_USDT", "SOL_USDT"], 30))
@@ -12798,7 +12798,7 @@ def main():
     tk = ctx.subscribe(0, {"channel": "ticker", "symbol": "BTC_USDT"})
     t0 = time.time()
     while time.time() - t0 < 30:
-        ev = ctx.poll([], 1000)              # Cannot retrieve depth events subscribed by the child thread
+        ev = ctx.poll([], 1000)              # Cannot receive depth events subscribed by the child thread
         if ev is not None and ev.kind == "ticker":
             Log("main", ev.symbol, "last:", ev.ticker.last)
     tk.unsubscribe()
@@ -12810,20 +12810,20 @@ use sdk::ctx::{EventExt, Kind};
 
 fn main() {
     let worker = std::thread::spawn(|| {
-        // Subscribe in the thread; these two event streams are delivered only to this thread
+        // Subscribe in the child thread; these two event streams are delivered only to this thread
         let symbols = ["ETH_USDT", "SOL_USDT"];
         let subs = ctx::subscribe_many(0u16, ctx::SubOpts::depth(5), &symbols).unwrap();
         let mut n = 0u64;
         let t0 = Unix();
         while Unix() - t0 < 30 {
-            match ctx::poll(&[], Some(1000)) {           // Only retrieves events subscribed by this thread
+            match ctx::poll(&[], Some(1000)) {           // Only receives events subscribed by this thread
                 ctx::Polled::Event(ev) if ev.event_kind() == Kind::Depth => n += 1,
                 ctx::Polled::Stopped => break,
                 _ => {}
             }
         }
         for s in subs {
-            let _ = s.unsubscribe();                     // Can only unsubscribe in the thread that initiated the subscription
+            let _ = s.unsubscribe();                     // Can only unsubscribe in the thread that created the subscription
         }
         n
     });
@@ -12841,7 +12841,7 @@ fn main() {
 }
 ```
 
-Subscribe to market-wide tickers: receive tickers for all symbols on the exchange through a single subscription, then count the symbols received after 10 seconds. If the exchange does not support this, the subscription receives a status event indicating failure.
+Subscribe to full-market tickers: receive tickers for all symbols on the exchange through a single subscription, then count the number of symbols received after 10 seconds. If the exchange does not support full-market push, this subscription receives a status event indicating failure.
 
 ```javascript
 function main() {
@@ -12855,7 +12855,7 @@ function main() {
             continue
         }
         if (ev.kind === "status" && ev.status.prefillStatus === 2) {
-            Log("tickers not supported:", ev.status.message)    // The exchange does not support market-wide push
+            Log("tickers not supported:", ev.status.message)    // The exchange does not support full-market push
             return
         }
         if (ev.kind === "ticker") {
@@ -12880,7 +12880,7 @@ def main():
         if ev is None:
             continue
         if ev.kind == "status" and ev.status.prefillStatus == 2:
-            Log("tickers not supported:", ev.status.message)    # The exchange does not support market-wide push
+            Log("tickers not supported:", ev.status.message)    # The exchange does not support full-market push
             return
         if ev.kind == "ticker":
             last[ev.symbol] = ev.ticker.last                    # symbol is the symbol this ticker belongs to
@@ -12902,7 +12902,7 @@ fn main() {
             ctx::Polled::Event(ev) => {
                 if let Some(st) = ev.feed_status() {
                     if st.failed() {
-                        Log!("tickers not supported:", st.message);   // The exchange does not support market-wide push
+                        Log!("tickers not supported:", st.message);   // The exchange does not support full-market push
                         return;
                     }
                 } else if let Some(t) = ev.ticker() {
@@ -12918,14 +12918,14 @@ fn main() {
 }
 ```
 
-Subscriptions to the same stream share one event stream: the two subscription objects have the same ```id```, and when one of them unsubscribes, the other continues to receive events.
+Identical subscriptions share the same event stream: the two subscription objects have the same ```id```, and after one of them unsubscribes, the other still continues to receive events.
 
 ```javascript
 function main() {
     var a = ctx.subscribe(0, {channel: "trade", symbol: "BTC_USDT"})
     var b = ctx.subscribe(0, {channel: "trade", symbol: "BTC_USDT"})
     var c = ctx.subscribe(0, {channel: "ticker", symbol: "BTC_USDT"})
-    Log("a.id:", a.id, "b.id:", b.id, "c.id:", c.id)   // a.id and b.id are the same, c.id is different
+    Log("a.id:", a.id, "b.id:", b.id, "c.id:", c.id)   // a.id is the same as b.id, c.id is different
 
     a.unsubscribe()    // b still holds a reference, so this trade stream is not interrupted
     var n = 0
@@ -12940,7 +12940,7 @@ function main() {
             n++
         }
     }
-    b.unsubscribe()    // Release the last reference; only now is the exchange subscription canceled
+    b.unsubscribe()    // This is the last reference; only now is the subscription actually cancelled on the exchange
     c.unsubscribe()
 }
 ```
@@ -12950,7 +12950,7 @@ def main():
     a = ctx.subscribe(0, {"channel": "trade", "symbol": "BTC_USDT"})
     b = ctx.subscribe(0, {"channel": "trade", "symbol": "BTC_USDT"})
     c = ctx.subscribe(0, {"channel": "ticker", "symbol": "BTC_USDT"})
-    Log("a.id:", a.id, "b.id:", b.id, "c.id:", c.id)   # a.id and b.id are the same, c.id is different
+    Log("a.id:", a.id, "b.id:", b.id, "c.id:", c.id)   # a.id is the same as b.id, c.id is different
 
     a.unsubscribe()    # b still holds a reference, so this trade stream is not interrupted
     n = 0
@@ -12962,15 +12962,15 @@ def main():
         if ev.kind == "trade":
             Log("trade", ev.trade.tradeId, ev.trade.side, ev.trade.px, ev.trade.qty)
             n += 1
-    b.unsubscribe()    # Release the last reference; only now is the exchange subscription canceled
+    b.unsubscribe()    # This is the last reference; only now is the subscription actually cancelled on the exchange
     c.unsubscribe()
 ```
 
-Handling subscriptions rejected by the exchange: an unsupported K-line period does not throw an exception; the reason for the failure is reported on that subscription's own event stream.
+Handling a subscription rejected by the exchange: subscribing to an unsupported K-line period does not throw an exception; the failure reason is reported through that subscription's own event stream.
 
 ```javascript
 function main() {
-    // Most exchanges do not support a 7-second K-line period
+    // Most exchanges do not support 7-second K-lines
     var k = ctx.subscribe(exchange, {channel: "kline", interval: 7})
     while (true) {
         var ev = ctx.poll(k, 3000)
@@ -12992,7 +12992,7 @@ function main() {
 
 ```python
 def main():
-    # Most exchanges do not support a 7-second K-line period
+    # Most exchanges do not support 7-second K-lines
     k = ctx.subscribe(exchange, {"channel": "kline", "interval": 7})
     while True:
         ev = ctx.poll(k, 3000)
@@ -13007,7 +13007,7 @@ def main():
             Log("closed bar", _D(ev.kline.openTimeMs), ev.kline.close)
 ```
 
-Depth subscription with any number of levels: when subscribing to 7 levels, the smallest native depth tier on the exchange that covers 7 levels is used, and the data is truncated to 7 levels before being pushed; a request for more than ```255``` levels throws an exception immediately; if the request exceeds the exchange's limit, that subscription receives a failed status event.
+Subscribe to order book depth with any number of levels: when subscribing to 7 levels, the smallest native depth level offered by the exchange that covers 7 levels is used, and the pushed data is truncated to 7 levels; if the number of levels exceeds ```255```, an exception is thrown immediately; if it exceeds the maximum supported by the exchange, the subscription receives a status event indicating failure.
 
 ```javascript
 function main() {
@@ -13024,11 +13024,11 @@ function main() {
             continue
         }
         if (ev.kind === "status" && ev.status.prefillStatus === 2) {
-            Log("depth 7 subscription failed:", ev.status.message)       // For example, the exchange does not support this number of levels
+            Log("depth 7 subscription failed:", ev.status.message)       // e.g. the exchange does not support this number of levels
             break
         }
         if (ev.kind === "depth") {
-            var b = ev.book()          // Returns the subscribed number of levels when n is not passed
+            var b = ev.book()          // Without n, returns the subscribed number of levels
             Log("levels:", b.bids.length, b.asks.length)
             n++
         }
@@ -13050,10 +13050,10 @@ def main():
         if ev is None:
             continue
         if ev.kind == "status" and ev.status.prefillStatus == 2:
-            Log("depth 7 subscription failed:", ev.status.message)      # For example, the exchange does not support this number of levels
+            Log("depth 7 subscription failed:", ev.status.message)      # e.g. the exchange does not support this number of levels
             break
         if ev.kind == "depth":
-            b = ev.book()              # Returns the subscribed number of levels when n is not passed
+            b = ev.book()              # Without n, returns the subscribed number of levels
             Log("levels:", len(b["bids"]), len(b["asks"]))
             n += 1
     d7.unsubscribe()
@@ -13089,7 +13089,7 @@ fn main() {
 }
 ```
 
-Get the raw exchange message: in addition to the event fields, you can parse ```ev.raw``` yourself according to the exchange's protocol.
+Get the exchange's raw message: in addition to the event fields, you can parse ```ev.raw``` yourself according to the exchange's protocol.
 
 ```javascript
 function main() {
@@ -13156,108 +13156,97 @@ fn main() {
 ```
 
 Fields of ```options```:
-
 | Field | Description |
 | - | - |
-| channel | Channel: ```ticker``` (default), ```bbo``` (best bid and offer), ```depth``` (order book), ```trade``` (tick-by-tick trades), ```kline``` (candlesticks), ```tickers``` (market-wide tickers), ```private``` (private account stream) |
-| symbol | Symbol code, e.g. ```BTC_USDT```, ```BTC_USDT.swap```, or an array of symbol codes (batch subscription). Required for market data channels; it can be omitted when ```ex``` is an exchange object, in which case the current trading pair of that exchange object is used. Not passed for the ```tickers``` and ```private``` channels |
-| depth | Number of levels for the ```depth``` channel: when omitted or set to ```0```, the exchange's default number of levels is used; when set to any integer from ```1``` to ```255```, the specified number of levels is used, see below |
-| interval | Period of the ```kline``` channel in seconds, e.g. ```60``` |
-| mode | When set to ```latest```, only the latest event is kept, and older events not retrieved in time are overwritten |
-| buffer | Capacity of the bounded buffer (positive integer, in number of events); the oldest events are discarded on overflow |
-| group | Group name (string, up to 32 bytes); the default group is used when omitted. Subscriptions in different groups use different connections, see below |
+| channel | Channel: ```ticker``` (default), ```bbo``` (best bid/offer), ```depth``` (order book), ```trade``` (tick-by-tick trades), ```kline``` (candlesticks), ```tickers``` (market-wide tickers), ```private``` (private account stream) |
+| symbol | Symbol code, e.g. ```BTC_USDT```, ```BTC_USDT.swap```; can also be an array of symbol codes (batch subscription). Required for market data channels; may be omitted when ```ex``` is an exchange object, in which case the current trading pair of that exchange object is used. Not passed for the ```tickers``` and ```private``` channels |
+| depth | Number of levels for the ```depth``` channel: when omitted or set to ```0```, the exchange's default depth is used; an integer between ```1``` and ```255``` specifies the number of levels, see below |
+| interval | Candlestick period for the ```kline``` channel, in seconds, e.g. ```60``` |
+| mode | When set to ```latest```, only the most recent event is kept; older events not retrieved in time are overwritten |
+| buffer | Capacity of the bounded buffer (positive integer, in number of events); on overflow the oldest events are discarded |
+| group | Group name (string, up to 32 bytes); if omitted, the subscription goes to the default group. Subscriptions in different groups use different connections, see below |
 | raw | When set to ```true```, events carry the exchange's raw message in ```ev.raw```, see below |
 
-For symbol notation, see `Symbol Codes`. When ```ex``` is an exchange object and ```symbol``` is not passed for a market data channel, the trading pair of that exchange object at the time ```ctx.subscribe()``` is called is used, which for futures also includes the contract type (e.g. ```BTC_USDT.swap```); subsequent calls to ```exchange.SetCurrency()``` and ```exchange.SetContractType()``` do not change existing subscriptions. When ```ex``` is an index, ```symbol``` is not filled in automatically; the ```tickers``` (entire market) and ```private``` (entire account) channels never take a ```symbol```.
+For symbol notation, see `Symbol Codes`. When ```ex``` is an exchange object and ```symbol``` is not passed for a market data channel, the trading pair of that exchange object at the moment ```ctx.subscribe()``` is called is used; for futures this also includes the contract type (e.g. ```BTC_USDT.swap```). Subsequent calls to ```exchange.SetCurrency()``` or ```exchange.SetContractType()``` do not change existing subscriptions. When ```ex``` is an index, ```symbol``` is not filled in automatically; the ```tickers``` (entire market) and ```private``` (entire account) channels never take a ```symbol```.
 
-When ```symbol``` is an array, the call is a batch subscription, and a single call can subscribe to multiple symbols:
-
-- It returns an array of subscription objects in the same order as the input array, and returns an array even if the input has only one element; when ```symbol``` is a string, a single subscription object is still returned.
-- The whole batch is validated first: if any symbol or option is invalid, an exception is thrown for the whole batch and none of the symbols are subscribed.
-- Once validation passes, each element is an independent subscription with its own ```id```, order book and reference count; if the exchange rejects one of the symbols, only that subscription receives a failed status event, and the other subscriptions continue to push as usual.
+Passing an array as ```symbol``` makes a batch subscription, subscribing to multiple symbols in a single call:
+- Returns an array of subscription objects in the same order as the input array, even if the array has only one element; when ```symbol``` is a string, a single subscription object is still returned.
+- The whole batch is validated first: if any symbol or option is invalid, the entire batch throws an exception and no symbol is subscribed.
+- Once validation passes, each element is an independent subscription with its own ```id```, order book and reference count; if the exchange rejects one of the symbols, only that subscription receives a failure status event, while the other subscriptions continue to push as normal.
 - The returned array has an ```unsubscribe()``` method (non-enumerable) that unsubscribes all elements at once; the array can also be passed directly to ```ctx.poll()```.
 
 The identity of a subscription is determined jointly by the account, ```symbol```, ```channel```, ```depth``` and ```interval```:
+- Within the same thread, subscriptions with exactly the same identity share one event stream, and the returned subscription objects have the same ```id```. The docker manages them by reference counting: each call to ```ctx.subscribe()``` adds a reference, and each call to ```unsubscribe()``` on a subscription object removes one; the docker actually unsubscribes from the exchange only when the last reference is released, so unsubscribing in one place does not interrupt the same subscription still in use elsewhere.
+- If any of these differs, it is a separate subscription with a separate event stream: ```ticker``` and ```bbo``` for the same symbol are two subscriptions; ```depth``` of ```5``` and ```20``` are also two, each maintaining its own order book (exchanges may push different depths at different frequencies, and the docker does not merge them into the largest depth).
+- Event stream IDs increase monotonically within a run and are never reused; subscribing again after unsubscribing everything yields a new ID.
 
-- Subscriptions with exactly the same identity in the same thread share one event stream, and the returned subscription objects have the same ```id```. The Docker manages them by reference counting: each call to ```ctx.subscribe()``` adds one reference, each call to ```unsubscribe()``` on a subscription object removes one reference, and the actual unsubscription from the exchange takes place only when the last reference is released, so unsubscribing in one place does not interrupt the same subscription still in use elsewhere.
-- If any item differs, it is a separate subscription with a separate event stream: ```ticker``` and ```bbo``` for the same symbol are two subscriptions; ```depth``` of ```5``` and ```20``` are also two subscriptions, each maintaining its own order book (exchanges may push different numbers of levels at different frequencies, and the Docker does not merge them into the largest number of levels).
-- Event stream IDs only increase within a single run and are never reused; subscribing again after unsubscribing from everything yields a new ID.
-
-A subscription belongs to the thread that called ```ctx.subscribe()```. Both the main thread and threads created by ```threading.Thread()``` (the standard library's ```threading.Thread``` in ```Python```, any thread in ```Rust```) can subscribe and retrieve events:
-
-- Events of a subscription are delivered only to the thread that subscribed to it, and ```ctx.poll()``` retrieves only events subscribed to by the current thread. For multiple threads to receive events separately, subscribe to the required data in each thread.
-- When different threads subscribe with the same identity, the exchange side is subscribed only once, and there is only one copy of the order book, candlestick cache and account state; however, each thread gets its own subscription object (with a different ```id```) and its own independent copy of the events, delivery modes are independent of each other, and one thread retrieving slowly does not affect the others. The actual unsubscription from the exchange takes place only after all threads have unsubscribed.
-- When a later thread subscribes to a candlestick stream that is already pushing, it first receives the cached candlesticks (with ```prefill``` set to ```true```) and the most recent initialization status event; the same applies to the private stream: when the account snapshot is ready, the thread immediately receives all snapshots and the ready event, and ```positions()``` and ```balances()``` can be read immediately. Other channels start receiving from the next push.
-- Only the thread that owns a subscription can unsubscribe it: when another thread calls ```unsubscribe()``` on the subscription object, an exception is thrown and the subscription remains valid. When a thread ends, all its subscriptions are automatically unsubscribed, and the same subscriptions shared by other threads are not affected.
+A subscription belongs to the thread that called ```ctx.subscribe()```. Both the main thread and threads created by ```threading.Thread()``` (the standard library ```threading.Thread``` in ```Python```, any thread in ```Rust```) can subscribe and receive events:
+- Events of a subscription are delivered only to the thread that subscribed to it, and ```ctx.poll()``` only retrieves events from the current thread's own subscriptions. For multiple threads to each receive the data they need, subscribe to the required streams separately in each thread.
+- When different threads subscribe to content with the same identity, the exchange side is subscribed only once, and the order book, candlestick cache and account state are maintained only once; however, each thread gets its own subscription object (with a different ```id```) and its own copy of the events, with independent delivery modes, so one thread consuming slowly does not affect other threads. The docker actually unsubscribes from the exchange only after all threads have unsubscribed.
+- When a later thread subscribes to a candlestick stream that is already pushing, it first receives the cached candlesticks (```prefill``` is ```true```) and the most recent initialization status event; the private stream works the same way: if the account snapshot is ready, the thread immediately receives the full snapshot and the ready event, and ```positions()``` and ```balances()``` can be read right away. Other channels start receiving from the next push.
+- Only the subscribing thread can unsubscribe: calling ```unsubscribe()``` on the subscription object from another thread throws an exception and the subscription remains active. When a thread exits, all its subscriptions are automatically unsubscribed; the same subscriptions shared by other threads are unaffected.
 - Gateway status events are sent to every thread that has a subscription on that exchange.
 
-The ```tickers``` channel subscribes to the tickers of the entire market: no ```symbol``` is needed, and a single subscription receives the tickers of all symbols on that exchange. The events are the same as ticker events (```kind``` is ```ticker```), with ```channel``` set to ```tickers``` and ```symbol``` set to the symbol of each event.
+The ```tickers``` channel subscribes to market-wide tickers: no ```symbol``` is passed, and a single subscription receives tickers for all symbols on that exchange. The event format is the same as ticker events (```kind``` is ```ticker```), with ```channel``` set to ```tickers``` and ```symbol``` set to the respective symbol.
+- Supported only when the exchange provides a market-wide push; for support by exchange, see the "Push" column of the market data group in `Capability Matrix` and each exchange's page. On unsupported exchanges, the subscription receives a failure status event (```message``` starting with ```unsupported channel: tickers```), and it is not automatically converted into per-symbol subscriptions.
+- Some exchanges' market-wide pushes do not include the best bid and best ask prices, in which case ```bid``` and ```ask``` are ```0```; if you need bid/ask prices, subscribe to ```ticker``` or ```bbo``` per symbol.
+- By default only the latest event is kept for each symbol: even if you consume slowly, you still get the latest ticker for every symbol.
 
-- It is supported only when the exchange provides a market-wide push; for each exchange's support, see the "Push" column in the market data group of the `Capability Matrix` and the exchange pages. On unsupported exchanges, a failed status event is sent on this subscription (with ```message``` starting with ```unsupported channel: tickers```), and it does not fall back to per-symbol subscriptions.
-- The market-wide push of some exchanges does not include the best bid and best ask prices, in which case ```bid``` and ```ask``` are ```0```; if bid and ask prices are needed, subscribe to ```ticker``` or ```bbo``` by symbol.
-- By default, the latest event is kept for each symbol: even when retrieving slowly, you can get the latest ticker for every symbol.
+The ```private``` channel is the account's private stream. It takes no ```symbol```, covers the entire account, and each account has only one such stream. Order updates, fill reports, positions and balances are all pushed through this single event stream, and the ```channel``` of the corresponding events is ```orders```, ```fills```, ```positions``` and ```balance``` respectively:
+- After the subscription takes effect (and after every reconnection), an account snapshot (positions and balances, with ```ev.position.snapshot``` and ```ev.balance.snapshot``` set to ```true```) is pushed first, followed by a status event whose ```kind``` is ```status``` and whose ```channel``` is ```private```: ```ev.status.prefillStatus``` set to ```1``` means the snapshot is ready, and ```2``` means the snapshot failed (```ev.status.message``` gives the reason, and the docker automatically retries with backoff). Real-time pushing (with ```snapshot``` set to ```false```) begins only after this. Order updates and fill reports have no snapshot.
+- Every position or balance push carries the complete current state of that position or asset, not an increment: a position quantity of ```0``` means the position is closed, and both available and frozen being ```0``` means the asset has been fully cleared.
+- A fill report (```kind``` is ```fill```, ```channel``` is ```fills```) corresponds to each execution of your own orders and contains the order ID, client order ID and trade ID, along with the price, quantity, fee and maker/taker flag of that execution. The fill report is pushed first, followed by the order update reflecting that fill. Historical fills are not re-sent after the subscription takes effect or after a reconnection; fill reports are available only when the exchange's private push includes per-trade executions. For field descriptions, see `ctx.poll`.
+- The `positions` and `balances` methods of the subscription object return the latest positions and balances maintained by the docker from the pushed data.
+- Once pushing has started, the docker no longer calls REST endpoints to fill in data: after the snapshot, only what the exchange pushes is delivered. Changes the exchange does not push (for example, some exchanges do not push balances when orders are placed or canceled, and some do not push positions and provide only a snapshot) will not appear in the pushes. When a balance push lacks available and frozen data consistent with the definition used by `exchange.GetAssets`, the corresponding fields are ```null```. When you need the latest values, call `exchange.GetAssets` and `exchange.GetPositions`. For what real-time pushes cover, see the notes on each exchange's page.
 
-The ```private``` channel is the account's private stream. It takes no ```symbol```, covers the entire account, and each account has only one such stream. Order updates, fill updates, positions and balances are all delivered on this single event stream, with the event ```channel``` being ```orders```, ```fills```, ```positions``` and ```balance``` respectively:
-
-- Once the subscription takes effect (and after each reconnection), an account snapshot of positions and balances is pushed first (```ev.position.snapshot``` and ```ev.balance.snapshot``` are ```true```), followed by a status event whose ```kind``` is ```status``` and ```channel``` is ```private```: ```ev.status.prefillStatus``` of ```1``` means the snapshot is ready, and ```2``` means the snapshot failed (```ev.status.message``` gives the reason, and the Docker automatically backs off and retries). Real-time pushes begin only after this (```snapshot``` is ```false```). Order updates and fill updates have no snapshot.
-- Each position or balance push carries the complete current state of that position or asset, not an increment: a position quantity of ```0``` means the position is closed, and available and frozen both being ```0``` means the asset has been cleared.
-- Fill updates (```kind``` is ```fill```, ```channel``` is ```fills```) correspond to each individual fill of your own orders and include the order ID, client order ID and trade ID, along with the price, quantity, fee and maker/taker flag of that fill. The fill update is pushed first, followed by the order update reflecting that fill. Historical fills are not resent when the subscription takes effect or after a reconnection, and fill updates are available only when the exchange's private feed includes per-trade fills. For field details, see `ctx.poll`.
-- The `positions` and `balances` methods of the subscription object return the latest positions and balances maintained by the Docker from the pushes.
-- After receiving a push, the Docker does not call REST interfaces to fill in missing data: after the snapshot, only what the exchange pushes is delivered. Changes the exchange does not push (for example, some exchanges do not push balances on order placement or cancellation, and some do not push position changes and provide only a snapshot) will not appear in the pushes. When a balance push has no available and frozen data consistent with the definitions used by `exchange.GetAssets`, the corresponding fields are ```null```. When you need the latest values, call `exchange.GetAssets` and `exchange.GetPositions`. For what real-time pushes cover, see the notes on each exchange's page.
-
-Subscriptions are lazy: ```ctx.subscribe()``` returns immediately and registers the subscription, and the connection to the exchange is established and the subscription sent only on the first call to ```ctx.poll()```. Connection state changes are notified through gateway status events (```kind``` is ```gateway```, ```channel``` is ```gateway```).
+Subscriptions are lazy: ```ctx.subscribe()``` returns immediately and registers the subscription, and the connection to the exchange is established and the subscription request sent only on the first call to ```ctx.poll()```. Changes in connection state are notified through gateway status events (```kind``` is ```gateway```, ```channel``` is ```gateway```).
 
 Subscription groups (```group```):
-
-- Subscriptions in different groups do not share connections, so a disconnection, reconnection or subscription queuing in one group does not affect other groups. For example, keep your main symbols in the default group and put symbols for batch scanning in ```group: "scan"```. If the scan group disconnects, pushes for the main symbols continue as normal.
-- Within a group, connections are still split according to the exchange's limits. The same subscription (identical exchange, channel, symbol, depth levels and period) placed in two groups counts as two independent subscriptions, each receiving its own copy of the data from the exchange.
-- Gateway status events are pushed separately for each group, with ```ev.gateway.group``` being the group name (an empty string for the default group). The ```group``` of a subscription object is the group name passed when subscribing.
-- Groups cannot get around the exchange's limits: per-IP limits such as the number of connections and the subscription message rate are shared by all groups, and more groups occupy more connections. When the exchange's connection limit is exceeded, the subscription receives a failed status event.
-- The ```private``` channel does not support groups (each account has only one private subscription), and passing ```group``` throws an exception. Exchanges with only a single connection (such as CTP for Chinese domestic futures) do not support groups: ```group``` is ignored, and the same subscription across groups is merged into one.
+- Subscriptions in different groups do not share connections, so a disconnection, reconnection or queued subscription in one group does not affect other groups. For example, use the default group for your main instruments and put batch-scanned instruments in ```group: "scan"```; when the scan group disconnects, pushes for the main instruments are unaffected.
+- Within a group, connections are still split according to the exchange's limits. The same subscription (identical exchange, channel, symbol, depth and period) placed in two groups becomes two independent subscriptions, each receiving its own copy of the data from the exchange.
+- Gateway status events are pushed separately for each group, with ```ev.gateway.group``` as the group name (an empty string for the default group); the ```group``` of a subscription object is the group name passed at subscription time.
+- Groups cannot get around the exchange's limits: per-IP limits such as connection count and subscription message rate are shared by all groups, and the more groups there are, the more connections are used. When the exchange's connection limit is exceeded, the subscription receives a failure status event.
+- The ```private``` channel is not grouped (an account has only one private subscription), and passing ```group``` throws an exception. Exchanges with only a single connection (such as domestic futures CTP) do not support groups; the ```group``` parameter is ignored, and identical subscriptions across groups are merged into one.
 
 Connection and reconnection:
-
-- An exchange's subscriptions may be spread over multiple connections (split according to the exchange's limits when there are many subscriptions). Gateway status events are aggregated by exchange and group, with the event's ```ev.gateway.group``` being the group name: when any connection in a group disconnects, ```ev.gateway.status``` of ```2``` is pushed; when all disconnected connections in that group have reconnected and all of their subscriptions have been reconfirmed by the exchange, ```1``` is pushed; when private stream authentication fails (an API KEY, permission or IP whitelist problem), ```3``` is pushed, and market data subscriptions are not affected. As a result, data on connections that have already recovered may arrive before ```1```.
-- After a disconnection, reconnection is automatic with no limit on attempts: the first retry occurs after about 0.5 seconds, the interval then doubles with each attempt up to about 10 seconds, and once a connection has been stable for 30 seconds, the interval resets to its initial value. When many connections are reconnecting at the same time, they also proceed one after another according to the exchange's connection rate limit.
-- When a connection is not closed but receives no data at all (a dead link), it is deemed disconnected after a certain time (depending on the exchange's heartbeat rules, generally 30 to 90 seconds), ```ev.gateway.status``` of ```2``` is pushed, and it reconnects.
-- After reconnecting, all subscriptions on that connection are automatically resent at a rate that respects the exchange's rate limits. Order books fetch a new snapshot, K-lines backfill data from the disconnection period, and the private stream pushes the account snapshot again (see above). There is no need to resubscribe in the strategy.
-- After a subscription frame is sent, if the exchange has not confirmed it, the frame is automatically resent up to 2 more times. If all three attempts go unconfirmed or the exchange explicitly rejects it, the subscription receives a failed status event (```ev.status.prefillStatus``` is ```2```, and when unconfirmed, ```ev.status.message``` contains ```gave up```) and is then voided. If needed, the strategy can call ```ctx.subscribe()``` again. When a resubscription after reconnecting is not confirmed, it is treated as a connection failure: the connection is closed and reconnected, and the subscription is not voided.
-- The Docker keeps a receive buffer for each exchange connection (up to 4096 messages and 16MB). If the connector cannot keep up, the oldest data is discarded and ```ws recv queue full``` is recorded in the log. Such discards are not counted in the ```ticksDropped``` of ```ctx.connectors()``` (that field counts discards caused by the strategy not fetching events in time). For exchanges whose order book data carries sequence numbers, the Docker detects the gap and resynchronizes, and ```book()``` still reads the latest order book.
+- An exchange's subscriptions may be spread across multiple connections (when there are many subscriptions, they are split according to the exchange's limits). Gateway status events are aggregated per exchange and group, with ```ev.gateway.group``` as the group name: when any connection in a group disconnects, ```ev.gateway.status``` is pushed as ```2```; once all disconnected connections in that group have reconnected and all their subscriptions have been reconfirmed by the exchange, ```1``` is pushed; when private stream authentication fails (an API KEY, permission or IP whitelist issue), ```3``` is pushed, and market data subscriptions are unaffected. Therefore, data on connections that have already recovered may arrive before ```1```.
+- After a disconnection, the connection is re-established automatically with unlimited retries: the first retry happens after about 0.5 seconds, the interval then doubles each time up to a maximum of about 10 seconds, and once a connection has been stable for 30 seconds, the interval resets to its initial value. When many connections are reconnecting at the same time, they also proceed one after another in line with the exchange's connection rate limits.
+- When a connection is not closed but receives no data at all (a half-dead link), it is deemed disconnected after a certain time (depending on the exchange's heartbeat rules, typically 30 to 90 seconds); ```ev.gateway.status``` is pushed as ```2``` and the connection is re-established.
+- After reconnection, all subscriptions on that connection are automatically re-sent at a rate that respects the exchange's rate limits; order books fetch a fresh snapshot, K-lines backfill data from the disconnection period, and the private stream re-pushes the account snapshot (see above). There is no need to resubscribe in the strategy.
+- If the exchange never confirms a subscription frame after it is sent, it is resent automatically, up to 2 more times. If none of the three attempts is confirmed, or the exchange explicitly rejects it, the subscription receives a failure status event (```ev.status.prefillStatus``` is ```2```; when unconfirmed, ```ev.status.message``` contains ```gave up```), after which the subscription is discarded; if needed, the strategy can call ```ctx.subscribe()``` again. When a resubscription after reconnection is not confirmed, it is treated as a connection failure, i.e. the connection is dropped and re-established, and the subscription is not discarded.
+- The docker keeps a receive buffer for each exchange connection (up to 4096 messages, 16MB). When the connector cannot keep up, the oldest data is discarded and ```ws recv queue full``` is written to the log. Such drops are not counted in ```ticksDropped``` of ```ctx.connectors()``` (that field counts drops caused by the strategy not consuming events in time). For exchanges whose order book data carries sequence numbers, the docker detects the gap and resynchronizes, so ```book()``` still reads the latest order book.
 
 The number of levels for the ```depth``` channel can be any integer from ```0``` to ```255```:
+- If omitted or set to ```0```, the exchange's default number of levels is used; ```1``` to ```255``` specify the number of levels required. Each level count is a separate subscription: for the same symbol, ```depth``` set to ```7``` and set to ```10``` are two subscriptions with two separate order books.
+- From the exchange's native depth levels, the docker picks the smallest one that covers the required number of levels, then truncates it to that number before pushing. For example, if the exchange only provides 5-, 10- and 20-level snapshots, a subscription with ```depth``` set to ```7``` uses the 10-level snapshot and keeps only the top 7 levels. Several subscriptions to the same symbol can share one native subscription, and each one is truncated separately.
+- If the number of levels exceeds ```255``` or is not an integer, ```ctx.subscribe()``` throws an exception. If it exceeds the maximum the exchange supports, no exception is thrown. Instead, that subscription receives a failed status event whose ```message``` starts with ```unsupported depth```. See each exchange's page for its native depth levels and limit.
 
-- If it is omitted or set to ```0```, the exchange's default number of levels is used; a value from ```1``` to ```255``` uses the specified number of levels. Each number of levels is an independent subscription: for the same symbol, a ```depth``` of ```7``` and a ```depth``` of ```10``` are two subscriptions with two separate order books.
-- The docker selects the smallest of the exchange's native levels that covers the requested number of levels, then truncates it to the requested number before pushing. For example, if an exchange only provides 5-, 10- and 20-level snapshots, a subscription with a ```depth``` of ```7``` uses the 10-level snapshot and keeps only the top 7 levels; multiple subscriptions for the same symbol can share one native subscription, each truncated separately.
-- If the number of levels exceeds ```255``` or is not an integer, ```ctx.subscribe()``` throws an exception; if it exceeds the maximum supported by the exchange, no exception is thrown, and the subscription instead receives a failed status event whose ```message``` starts with ```unsupported depth```. See the exchange pages for each exchange's native levels and limits.
+A subscription can fail in two ways:
+- Invalid parameters throw an exception. Examples: the number of arguments is not 2; the second argument is not an object; ```depth``` exceeds ```255```; ```options``` contains an unknown field (such as the misspelled ```intervel```); ```channel``` is unknown; a market data channel has no ```symbol```; ```symbol``` is passed to the ```tickers``` or ```private``` channel; both ```mode``` and ```buffer``` are passed; the ```symbol``` array contains an invalid element (in which case nothing in the batch is subscribed); ```group``` is not a string or is longer than 32 bytes; ```group``` is passed to the ```private``` channel.
+- If the exchange or connector rejects the subscription (for example, an unsupported channel, K-line period or depth level), ```ctx.subscribe()``` does not throw an exception. Instead, that subscription's own event stream receives a status event with ```kind``` set to ```status``` and ```ev.status.prefillStatus``` set to ```2```, and ```ev.status.message``` gives the reason for the failure. The subscription is then void, and calling ```unsubscribe()``` does nothing.
 
-Subscription failures fall into two cases:
+What happens when events are not taken in time (delivery mode): by default, ```ticker```, ```bbo``` and ```depth``` keep only the latest event, and ```tickers``` keeps only the latest event for each symbol. ```trade``` and ```kline``` cache the most recent ```1024``` events by default and drop the oldest events when the cache overflows. You can change this with either ```mode``` or ```buffer``` (not both). Order updates, trade updates, position, balance, gateway status and initialization status events can back up to ```10240``` per thread, so none are lost if events are taken normally. If ```ctx.poll()``` is not called for a long time and the backlog exceeds this limit, the oldest events are dropped. Before that, the corresponding event stream receives an event with ```kind``` set to ```status```, ```ev.status.prefillStatus``` set to ```2```, and ```ev.status.message``` starting with ```event queue overflow``` (```ev.status.detail``` is the number of events dropped). When this happens, query orders, positions and balances again through REST. The subscription itself stays valid. For this reason, keep calling ```ctx.poll()``` after subscribing. The docker keeps updating the order book whether events are taken quickly or slowly, so ```book()``` always returns the latest complete order book. To check whether the docker's buffer for incoming pushes is backing up, see the counts from ```ctx.connectors()``` in `ctx.poll`.
 
-- An exception is thrown when the parameters are invalid, for example: the number of parameters is not 2, the second parameter is not an object, ```depth``` exceeds ```255```, ```options``` contains an unknown field (such as a misspelled ```intervel```), ```channel``` is unknown, a market data channel is missing ```symbol```, the ```tickers``` or ```private``` channel is given a ```symbol```, ```mode``` and ```buffer``` are both passed, the ```symbol``` array contains an invalid element (in which case nothing in the batch is subscribed), ```group``` is not a string or exceeds 32 bytes, or the ```private``` channel is given a ```group```.
-- When the exchange or connector rejects the subscription (for example, an unsupported channel, K-line period or depth level), ```ctx.subscribe()``` does not throw an exception. Instead, the subscription receives a status event on its own event stream with ```kind``` set to ```status``` and ```ev.status.prefillStatus``` set to ```2```, and ```ev.status.message``` gives the reason for the failure. The subscription is then invalid, and calling ```unsubscribe()``` does nothing.
-
-Handling when events are not retrieved in time (delivery mode): by default, ```ticker```, ```bbo``` and ```depth``` keep only the latest event, and ```tickers``` keeps only the latest event for each symbol; ```trade``` and ```kline``` cache the most recent ```1024``` events by default, discarding the oldest on overflow. This can be changed with either ```mode``` or ```buffer``` (choose one). Order updates, trade updates, positions, balances, gateway status and initialization status events can back up to at most ```10240``` per thread, and are not lost when events are retrieved normally. If ```ctx.poll()``` is not called for a long time and the backlog exceeds this limit, the oldest events are discarded, and an event is first pushed on the corresponding event stream with ```kind``` set to ```status```, ```ev.status.prefillStatus``` set to ```2```, and ```ev.status.message``` starting with ```event queue overflow``` (```ev.status.detail``` is the number of discarded events). In this case, re-query orders, positions and balances via REST; the subscription itself remains valid. Therefore, keep calling ```ctx.poll()``` after subscribing. The order book is continuously updated within the docker regardless of how quickly events are retrieved, so ```book()``` always returns the latest complete order book. To check whether the docker's buffer for receiving pushes is backing up, see the ```ctx.connectors()``` counters in `ctx.poll`.
-
-Raw messages (```raw```): when the event fields do not meet your needs (for example, you need additional fields provided by the exchange or unconverted content), pass ```raw: true``` when subscribing. Events then carry an additional ```raw``` field containing the original message pushed by the exchange. The docker does not parse this field; parse it yourself according to the exchange's protocol:
-
-- Text messages are strings; binary messages are ```ArrayBuffer``` in ```JavaScript``` and ```bytes``` in ```Python```. In ```Rust```, use ```SubOpts::ticker().raw()``` when subscribing and call ```ev.raw()``` on the event, which returns ```Option<Raw>``` (```Raw::Text``` or ```Raw::Bytes```); it is available only when the event is the one most recently returned by ```poll``` on the current thread, so save the return value if you need to keep it.
-- When a single push is split into multiple events (for example, one message containing several trades), the ```raw``` of these events is the same message.
+Raw messages (```raw```): when the event fields are not enough (for example, you need extra fields the exchange provides or values that have not been converted), pass ```raw: true``` when subscribing. Events then carry an extra ```raw``` field containing the original message pushed by the exchange. The docker does not parse this field, so you need to parse it yourself according to the exchange's protocol:
+- Text messages are strings. Binary messages are ```ArrayBuffer``` in ```JavaScript``` and ```bytes``` in ```Python```. In ```Rust```, subscribe with ```SubOpts::ticker().raw()``` and call ```ev.raw()``` on the event, which returns ```Option<Raw>``` (```Raw::Text``` or ```Raw::Bytes```). It is available only when the event is the one most recently returned by ```poll``` on this thread. To keep it, save the return value.
+- When one push is split into several events (for example, a message that contains several trades), all of those events have the same message in ```raw```.
 - Only market data and private stream events pushed by the exchange carry ```raw```. Prefilled K-lines (```ev.kline.prefill``` is ```true```), K-lines closed by time, account snapshots, gateway status and initialization status events do not have this field.
-- If neither ```mode``` nor ```buffer``` is passed, the delivery mode is ```buffer: 10240```, with no merging or overwriting. If ```mode: "latest"``` is passed, only the latest event is kept.
-- When the buffer is full, the oldest events are discarded and the subscription receives a status event (```kind``` is ```status```) whose ```ev.status.message``` starts with ```event queue overflow```.
-- ```raw``` is not part of a subscription's identity: subscriptions with the same identity share one event stream, and once any of them passes ```raw: true```, all subsequent events on that stream carry ```raw```.
-- Messages are retained only on demand, so subscriptions that do not pass ```raw``` incur no extra overhead.
-- Backtesting has no exchange messages: the option is accepted as usual, but events have no ```raw``` field.
-- For domestic futures CTP, ```raw``` is a string containing the JSON of the complete market data for the current tick, with the same fields as ```exchange.IO("snapshot", symbol)```.
+- If neither ```mode``` nor ```buffer``` is passed, the delivery mode is ```buffer: 4096``` (each subscription caches up to 4096 events), with no merging or overwriting. If you need more, pass ```buffer```. If ```mode: "latest"``` is passed, only the latest event is kept.
+- When the buffer is full, the oldest events are dropped and the subscription receives a status event (```kind``` is ```status```) whose ```ev.status.message``` starts with ```event queue overflow```. A warning is also written to the log (at most one per minute).
+- ```raw``` is not part of a subscription's identity: subscriptions with the same identity share one event stream, and once any of them passes ```raw: true```, all later events on that stream carry ```raw```.
+- Messages are kept only when requested, so subscriptions without ```raw``` have no extra overhead.
+- Backtests have no exchange messages: the option is still accepted, but events have no ```raw``` field.
+- For domestic futures (CTP), ```raw``` is a string containing the full market data of the tick as JSON, with the same fields as ```exchange.IO("snapshot", symbol)```.
 
-Push and REST interfaces are completely independent: subscriptions only affect the events received by ```ctx.poll()```. Functions such as `exchange.GetTicker`, `exchange.GetDepth`, `exchange.GetTrades`, `exchange.GetRecords` and `exchange.GetAccount` directly request the exchange's REST interface on every call and do not read pushed data; neither whether you subscribe nor what you subscribe to changes their results.
+Push data and the REST API are completely independent: subscriptions only affect the events received by ```ctx.poll()```. Functions such as `exchange.GetTicker`, `exchange.GetDepth`, `exchange.GetTrades`, `exchange.GetRecords` and `exchange.GetAccount` send a request to the exchange's REST API on every call and do not read push data. Whether you subscribe, and what you subscribe to, does not change their results.
 
-In ```JavaScript``` and ```Rust``` strategies, ```ctx.poll()``` and `EventLoop` within the same thread retrieve events from the same event queue, so a thread should use only one of these methods to retrieve events. ```EventLoop()``` in ```Python``` uses a separate queue (containing only the market data and order updates automatically subscribed by CTP-style exchanges, plus completion notifications for concurrent tasks such as ```exchange.Go()```), and does not compete with ```ctx.poll()``` for events. For whether each exchange supports push and which channels it supports, see `Capability Matrix` and the notes on each exchange's page.
+In ```JavaScript``` and ```Rust``` strategies, ```ctx.poll()``` and `EventLoop` take events from the same event queue when called in the same thread, so each thread should use only one of them to fetch events. In ```Python```, ```EventLoop()``` has its own queue, which holds only the market data and order updates that broker-type (counter) exchanges subscribe to automatically, plus completion notices for concurrent tasks such as ```exchange.Go()```. It therefore does not compete with ```ctx.poll()``` for events. To see whether an exchange supports push data and which channels it offers, refer to the `Capability Matrix` and to that exchange's own page.
 
-```Python``` strategies are written the same way as ```JavaScript``` strategies: ```ctx.subscribe(ex, options)``` accepts only these two positional arguments (passing more or fewer, or using keyword arguments, raises a ```TypeError```). ```options``` is a dictionary with the same fields and validation rules, and the dictionary passed in is not modified. When ```options["symbol"]``` is a list (or tuple), a ```SubscriptionList``` is returned (a subclass of ```list```, in the same order as passed in), and calling its ```unsubscribe()``` unsubscribes all elements at once. The properties of a subscription object are read-only, and ```info()``` returns a dictionary containing the same fields. Threads created with ```threading.Thread``` automatically unsubscribe their subscriptions when they end; threads created by bypassing ```threading.Thread```, such as through ```_thread.start_new_thread()```, can also subscribe, but do not automatically unsubscribe when they end and must call ```unsubscribe()``` themselves.
+```Python``` strategies use the same syntax as ```JavaScript```. ```ctx.subscribe(ex, options)``` accepts only these two positional arguments, and passing too many or too few arguments, or using keyword arguments, raises ```TypeError```. ```options``` is a dict with the same fields and validation rules, and the dict passed in is not modified. If ```options["symbol"]``` is a list (or tuple), the call returns a ```SubscriptionList```, which is a subclass of ```list``` whose elements keep the order they were passed in. Calling its ```unsubscribe()``` unsubscribes all elements at once. Subscription object attributes are read-only, and ```info()``` returns a dict with the same fields. When a thread created with ```threading.Thread``` ends, its subscriptions are unsubscribed automatically. Threads created without ```threading.Thread```, for example with ```_thread.start_new_thread()```, can also subscribe, but their subscriptions are not unsubscribed automatically when the thread ends, so you must call ```unsubscribe()``` yourself.
 
-```Rust``` strategies use the functions of the same name in the ```ctx``` module: ```ctx::subscribe(ex, opts: ctx::SubOpts) -> Result<ctx::Sub, String>```, where ```ex``` can be an exchange object (```exchange```, ```exchanges[i]```) or a ```u16``` index; on failure it returns ```Err``` and does not panic. Subscription options are constructed with ```ctx::SubOpts::ticker()```, ```bbo()```, ```trade()```, ```depth(n)```, ```kline(秒数)```, ```tickers()```, ```private()```, and then configured by chaining ```.symbol("BTC_USDT")```, ```.latest()```, ```.buffer(n)```, ```.group("scan")```. Batch subscriptions use ```ctx::subscribe_many(ex, opts, &["BTC_USDT", "ETH_USDT"]) -> Result<Vec<ctx::Sub>, String>```, which likewise validates the whole batch of parameters first. The returned ```ctx::Sub``` can be copied, and its methods include ```id()``` (passed to ```ctx::poll(&[sub.id()], ...)```), ```book(n)```, ```positions()```, ```balances()```, ```unsubscribe()```; the reference count is based on the number of ```ctx::subscribe()``` calls, and each call must be matched by one ```unsubscribe()```. Any ```Rust``` thread can subscribe, and a subscription likewise belongs to the thread that created it.
+```Rust``` strategies use the functions of the same names in the ```ctx``` module: ```ctx::subscribe(ex, opts: ctx::SubOpts) -> Result<ctx::Sub, String>```. Here ```ex``` can be an exchange object (```exchange```, ```exchanges[i]```) or an index of type ```u16```. If the call fails it returns ```Err``` and does not panic. Build subscription options with ```ctx::SubOpts::ticker()```, ```bbo()```, ```trade()```, ```depth(n)```, ```kline(seconds)```, ```tickers()``` or ```private()```, then configure them with chained calls such as ```.symbol("BTC_USDT")```, ```.latest()```, ```.buffer(n)``` and ```.group("scan")```. For batch subscriptions use ```ctx::subscribe_many(ex, opts, &["BTC_USDT", "ETH_USDT"]) -> Result<Vec<ctx::Sub>, String>```, which also validates the whole batch of parameters first. The returned ```ctx::Sub``` can be copied. Its methods are ```id()``` (passed to ```ctx::poll(&[sub.id()], ...)```), ```book(n)```, ```positions()```, ```balances()``` and ```unsubscribe()```. Reference counts are based on the number of ```ctx::subscribe()``` calls, so every call needs its own matching ```unsubscribe()``` call. Any ```Rust``` thread can subscribe, and a subscription belongs to the thread that created it.
 
-See also: `ctx.poll`, `Subscription`, `EventLoop`, `exchange.GetTicker`, `Capability Matrix`
+See also: `ctx.poll`, `Subscription`, `EventLoop`, `exchange.GetTicker`, `Exchange Capability Matrix`
 
 #### ctx.poll
 

@@ -2332,7 +2332,7 @@ pub mod ctx {
         /// reported per group ([`GatewayView::group`]). The private stream has no group.
         pub group: String,
         /// Events carry the venue's raw message ([`EventExt::raw`]). Without `latest` / `buffer` the delivery
-        /// mode is a ring of 10240 events, never merged.
+        /// mode is a ring of 4096 events, never merged.
         pub raw: bool,
     }
     impl SubOpts {

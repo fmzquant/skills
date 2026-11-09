@@ -1804,7 +1804,7 @@ class Ctx:
                 default group when omitted): subscriptions of different groups use separate connections and
                 gateway status is reported per group; ``private`` takes no group (raises); ``raw``: ``True`` makes events
                 carry the exchange's raw message ``ev.raw``, and without ``mode`` / ``buffer`` delivery is
-                ``buffer: 10240``, never merged.
+                ``buffer: 4096``, never merged.
 
         Returns:
             ``Subscription``; a ``SubscriptionList`` when ``symbol`` is a list or tuple (validated as a whole).

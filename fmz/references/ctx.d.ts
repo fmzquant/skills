@@ -407,7 +407,7 @@ declare interface ISubOpts {
      * 网关状态按组报告（IGatewayEvent.group）。同一路订阅放在两个组里是两路。private 不收 group；
      * 只有一条连接的交易所（CTP 等）忽略它。 */
     group?: string;
-    /** true = 事件带交易所原始报文（IEventBase.raw）。没给 mode/buffer 时投递模式为 buffer: 10240，不合并。
+    /** true = 事件带交易所原始报文（IEventBase.raw）。没给 mode/buffer 时投递模式为 buffer: 4096，不合并。
      * 不算订阅身份：身份相同的订阅共用一路事件流，有一次传了 true，这路事件流之后的事件都带。 */
     raw?: boolean;
 }

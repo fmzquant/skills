@@ -1766,7 +1766,7 @@ class Ctx:
                 传列表为批量订阅。``depth``：档数，0（默认）或 1–255 的任意整数，每个档数一路订阅（超过 255 抛出异常，
                 超过交易所上限时收到 ``unsupported depth`` 失败事件）；``interval``：K线秒数；``mode: "latest"`` 或 ``buffer: N``；``group``：订阅分组名
                 （字符串，最多 32 字节，不传为默认分组），不同分组的订阅使用不同的连接，网关状态按分组推送；``private`` 不分组（传入抛出异常）。
-                ``raw``：``True`` 时事件带交易所原始报文 ``ev.raw``；没给 ``mode`` / ``buffer`` 时投递模式为 ``buffer: 10240``，不合并。
+                ``raw``：``True`` 时事件带交易所原始报文 ``ev.raw``；没给 ``mode`` / ``buffer`` 时投递模式为 ``buffer: 4096``，不合并。
 
         Returns:
             ``Subscription``；``symbol`` 为列表或元组时返回 ``SubscriptionList``（整批先校验）。参数不合法时抛出异常；
