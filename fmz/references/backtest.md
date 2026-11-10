@@ -64,7 +64,7 @@ Python uses `'''backtest ... '''`; Rust and JavaScript use `/*backtest ... */` (
 | `period` | `Nm`, `Nh`, `Nd`, or plain seconds | strategy K-line period; website default 1d |
 | `basePeriod` | same format | underlying K-line period used to generate ticks; defaults to `period` when absent; ignored when `mode: 1` |
 | `mode` | `1` | real-tick mode (omit for simulated-tick mode) |
-| `exchanges` | JSON array of `{eid, currency, balance, stocks, fee:[maker,taker], feeMin, feeder, tradesMode, depthDeep, depthAmount, quotePrecision, basePrecision}` | `currency` is `BASE_QUOTE`; `fee` in percent; only `eid` and `currency` are required |
+| `exchanges` | JSON array of `{eid, currency, balance, stocks, fee:[maker,taker], feeMin, feeder, tradesMode, depthDeep, depthAmount, quotePrecision, basePrecision, maintenanceMargin}` | `currency` is `BASE_QUOTE`; `fee` in percent; only `eid` and `currency` are required |
 | `args` | JSON `[["name", value], ["name", value, templateId]]` | third element targets a template's parameter |
 
 "Save backtest settings" also appends website-form keys (`btSlipPoint`, `btNetDelay`, `btMaxBarLen`, `btDepthDeep`, `btFaultTolerant`, `btMaxRuntimeLogs`, ...) when they differ from the defaults; the sync handler visibly applies `start/end/period/basePeriod/mode/exchanges/args`, so treat the `bt*` lines as a record of the form rather than something to hand-edit.
