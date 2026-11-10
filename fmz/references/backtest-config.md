@@ -53,7 +53,7 @@ Fee integers: the engine computes `rate = FeeMaker / 10^FeeDenominator`. The MCP
 | - | - | `MatchVol` | tick mode: queue simulation for orders resting at best bid/ask | - | - | true |
 | - | - | `TimezoneOffset` | ms offset used to align bars of 1 day or longer | not sent | 0 unless the market defines one | 28800000 (UTC+8) |
 | - | - | `MarginCurrency` | futures margin currency; equal to quote = USDT-margined, equal to base = coin-margined | not sent | from market | the loaded contract's margin currency |
-| `maintenanceMargin` (local Python/JS engines only) | - | `MaintenanceMargin` | futures liquidation line (cross margin, checked every tick): `r` = liquidate when equity <= position value x r; `0` = never liquidate | not sent | not sent | crypto futures: the contract's `maintMarginRatio` from the market detail, else 0.005; CTP and stocks: liquidate when equity < used margin |
+| `maintenanceMargin` (local Python/JS engines only) | - | `MaintenanceMargin` | futures liquidation line (cross margin, checked every tick): `r` = liquidate when equity <= position value x r; `0` = never liquidate | not sent | not sent | crypto futures: the contract's `maintMarginRatio` from the market detail, else 0.005; stocks: none for cash (1x) holdings, 0.25 for margin (leveraged) holdings; CTP: liquidate when equity < used margin |
 | `quotePrecision`, `basePrecision` | - | `QuotePrecision`, `BasePrecision` | sent by the website; precision actually comes from the market detail | - | 2 / 2 | not read |
 | `btHistoryMode`, `btOrder`, `logEvent`, `btConcurrentMax` | - | - | website form fields (history mode, order mode, event logging, optimisation threads); no engine key in these sources | - | `"0"`, `"0"`, false, CPU count | - |
 
