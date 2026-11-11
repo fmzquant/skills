@@ -32491,16 +32491,17 @@ function main() {
 
 #### Aerodrome / Velodrome
 
-Aerodrome与Velodrome两个交易所对象使用同一套合约，各连一条链上本交易所的池子，把链上兑换映射为现货交易函数；池子种类、兑换与LP用法都相同，所以合写一页。链是固定的，配置里没有「链」选项（旧式配置带了别的```Chain```时启动报错）。使用Slipstream集中流动性池子（新旧两代部署都使用，池子按tick间距区分，手续费由池子自己设定）和基础池子（volatile为恒定乘积，stable为稳定币曲线）。基础池子只支持精确输入：限价买入（按买到的数量成交）只能走Slipstream池子。两类池子都支持LP与gauge质押领奖励。两者的差别：
+Aerodrome与Velodrome两个交易所对象使用同一套合约，各连一条链上本交易所的池子，把链上兑换映射为现货交易函数；池子种类、兑换与LP用法都相同，所以合写一页。链是固定的，配置里没有「链」选项（旧式配置带了别的```Chain```时启动报错）。使用Slipstream集中流动性池子（各代部署都使用：Aerodrome三代、Velodrome两代，池子按tick间距区分，手续费由池子自己设定）和基础池子（volatile为恒定乘积，stable为稳定币曲线）。基础池子只支持精确输入：限价买入（按买到的数量成交）只能走Slipstream池子。两类池子都支持LP与gauge质押领奖励。两者的差别：
 
 | 比较项 | Aerodrome | Velodrome |
 | - | - | - |
 | 链 | Base | OP Mainnet |
 | gauge奖励币 | AERO | VELO |
-| Slipstream仓位ID | ```aero:编号```（老工厂）、```aero2:编号```（新工厂） | ```velo:编号```（老工厂）、```velo2:编号```（新工厂） |
+| Slipstream部署 | 三代，```protocol```为```slipstream```、```slipstream2```、```slipstream3``` | 两代，```protocol```为```slipstream```、```slipstream2``` |
+| Slipstream仓位ID | ```aero:编号```、```aero2:编号```、```aero3:编号```（第一、二、三代） | ```velo:编号```、```velo2:编号```（第一、二代） |
 | ```exchange.IO("contracts")```里本交易所的合约 | ```aerodrome``` | ```velodrome``` |
 
-每笔兑换在所有可用池子的直连路径和经中转币的两跳路径中选报价最好的一条。基础池子和两代Slipstream各有自己的路由合约，代币分别授权给本次兑换所用的那个路由。
+每笔兑换在所有可用池子的直连路径和经中转币的两跳路径中选报价最好的一条。基础池子和每代Slipstream各有自己的路由合约，代币分别授权给本次兑换所用的那个路由。
 
 同一套实现的还有`Uniswap / PancakeSwap`和兑换聚合器`KyberSwap`、`1inch`：代币表、余额、授权、订单、撤单、转账与跨链桥的用法相同。Aerodrome、Velodrome原是Uniswap交易所「DEX」配置项的选项，2026年10月起是独立的交易所；以前在Uniswap交易所选了它们的配置启动时报错，请改建对应的交易所。
 
@@ -32642,7 +32643,7 @@ function main() {
 
 ##### 区间流动性（LP）
 
-```exchange.IO("lp.*", ...)```指令提供Slipstream池子与基础池子的区间流动性：选池、规划与模拟、建仓、加减仓、领手续费、撤出和仓位查询，以及gauge质押领奖励。Slipstream池子（新旧两代工厂）是集中流动性池子，仓位是各代PositionManager的NFT，写成```前缀:编号```（老工厂）或```前缀2:编号```（新工厂），前缀Aerodrome为```aero```、Velodrome为```velo```；池子费率由池子自己定（可能是动态费率），```fee```为当前值。没有质押的Slipstream仓位要把一部分手续费（池子的```unstakedFee```，目前多为5%）交给gauge。
+```exchange.IO("lp.*", ...)```指令提供Slipstream池子与基础池子的区间流动性：选池、规划与模拟、建仓、加减仓、领手续费、撤出和仓位查询，以及gauge质押领奖励。Slipstream池子（各代工厂）是集中流动性池子，仓位是各代PositionManager的NFT，第一代写成```前缀:编号```，第N代写成```前缀N:编号```（如```aero2:编号```、```aero3:编号```），前缀Aerodrome为```aero```、Velodrome为```velo```；池子费率由池子自己定（可能是动态费率），```fee```为当前值。没有质押的Slipstream仓位要把一部分手续费（池子的```unstakedFee```，目前多为5%）交给gauge。
 
 基础池（volatile、stable）是全区间的：```lp.plan```不给```range```即为基础池计划，两种代币按储备比例存入，仓位就是池子的LP代币，```id```为池子地址。
 
@@ -32681,16 +32682,16 @@ Forms:
 
 - `exchange.IO("lp.stake", ...)`
 
-Aerodrome、Velodrome：把仓位质押进所在池子的gauge，改为领取奖励币（AERO或VELO）。
+适用于Aerodrome和Velodrome：将仓位质押到所在池子的gauge中，此后仓位改为领取奖励代币（AERO或VELO）。
 
 Parameters:
 
-- `k` (string, required): 固定为```lp.stake```，用于质押仓位。
-- `positionIds` (string / array, required): 仓位ID：单个ID或ID数组，Slipstream仓位如```aero:123```、```aero2:456```（Velodrome为```velo:```、```velo2:```），基础池子为池子地址。
+- `k` (string, required): 固定为```lp.stake```，表示质押仓位。
+- `positionIds` (string / array, required): 仓位ID，可传单个ID或ID数组。Slipstream仓位的ID形如```aero:123```、```aero2:456```、```aero3:789```（Velodrome为```velo:```、```velo2:```）；基础池子的仓位ID为池子地址。
 
-Returns (object / 空值): ```{positions: [{id, gauge, approveTxHash, txHash, feesBase, feesQuote}]}```：```approveTxHash```为把NFT授权给gauge的交易（已授权时为```null```），```feesBase```、```feesQuote```为存入时gauge转给本人的未领手续费；基础池子为```{id, gauge, txHash, lpTokens}```。失败时返回空值并报错。
+Returns (object / 空值): ```{positions: [{id, gauge, approveTxHash, txHash, feesBase, feesQuote}]}```：其中```approveTxHash```为将NFT授权给gauge的交易哈希（已授权时为```null```），```feesBase```、```feesQuote```为存入时gauge转给本人的未领取手续费；基础池子返回```{id, gauge, txHash, lpTokens}```。失败时返回空值并报错。
 
-把钱包里没有质押、仍在区间内的仓位都质押进gauge。
+将钱包中所有未质押且仍在价格区间内的仓位质押到gauge。
 
 ```javascript
 function main() {
@@ -32711,11 +32712,11 @@ function main() {
 }
 ```
 
-每个仓位各发交易：Slipstream仓位先把NFT授权给gauge（已授权时跳过），再把整个NFT存入，存入时gauge把仓位未领的手续费转给本人；基础池子把钱包里未质押的LP代币全部存入。gauge已被Voter停掉（```lp.pools```的```gaugeAlive```为```false```）时不能存入，报错。
+每个仓位分别发送交易：对于Slipstream仓位，先将NFT授权给gauge（已授权则跳过），再将整个NFT存入，存入时gauge会把该仓位未领取的手续费转给本人；对于基础池子，则将钱包中所有未质押的LP代币全部存入。若gauge已被Voter停用（```lp.pools```返回的```gaugeAlive```为```false```），则无法存入并报错。
 
-质押期间仓位的交易手续费归投票人，仓位只拿奖励币；Slipstream仓位在区间外时也不发奖励。质押着的仓位不能加减仓或领手续费，要先用```lp.unstake```取回（```lp.remove```会自动先取回）。没有质押的Slipstream仓位要把一部分手续费（池子的```unstakedFee```，目前多为5%）交给gauge。
+质押期间，仓位产生的交易手续费归投票人所有，仓位只获得奖励代币；Slipstream仓位超出价格区间时也不产生奖励。已质押的仓位不能加仓、减仓或领取手续费，需先用```lp.unstake```取回（```lp.remove```会自动先取回）。未质押的Slipstream仓位则需将一部分手续费（即池子的```unstakedFee```，目前多为5%）交给gauge。
 
-也可以在建仓时质押：```lp.plan```的参数写```stake: true```，```lp.add```建完直接质押，结果另有```stake```。
+也可以在建仓时直接质押：在```lp.plan```的参数中设置```stake: true```，```lp.add```建仓完成后即自动质押，返回结果中会额外包含```stake```字段。
 
 See also: `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("lp.stake")`, `exchange.IO("lp.unstake")`, `exchange.IO("lp.claim")`, `exchange.IO("lp.positions")`, `exchange.IO("lp.pools")`
 
@@ -32729,16 +32730,16 @@ Forms:
 
 - `exchange.IO("lp.unstake", ...)`
 
-Aerodrome、Velodrome：把质押的仓位从gauge取回；Slipstream仓位同时领走累积的奖励。
+Aerodrome、Velodrome：将已质押的仓位从gauge中取回（解除质押）；Slipstream仓位会同时领取已累积的奖励。
 
 Parameters:
 
-- `k` (string, required): 固定为```lp.unstake```，用于取回质押。
-- `positionIds` (string / array, required): 仓位ID：单个ID或ID数组，Slipstream仓位如```aero:123```、```aero2:456```（Velodrome为```velo:```、```velo2:```），基础池子为池子地址。
+- `k` (string, required): 固定为```lp.unstake```，表示取回已质押的仓位。
+- `positionIds` (string / array, required): 仓位ID，可传入单个ID或ID数组。Slipstream仓位ID形如```aero:123```、```aero2:456```、```aero3:789```（Velodrome对应前缀为```velo:```、```velo2:```），基础池子仓位使用池子地址。
 
-Returns (object / 空值): ```{positions: [{id, gauge, txHash, rewards}]}```，```rewards```为这笔交易领到的奖励币数量；基础池子另有```lpTokens```（取回的LP代币）。失败时返回空值并报错。
+Returns (object / 空值): ```{positions: [{id, gauge, txHash, rewards}]}```，其中```rewards```为本笔交易领取到的奖励代币数量；基础池子仓位另含```lpTokens```字段（取回的LP代币数量）。失败时返回空值并输出错误信息。
 
-取回全部质押的仓位。
+取回全部已质押的仓位。
 
 ```javascript
 function main() {
@@ -32759,9 +32760,9 @@ function main() {
 }
 ```
 
-每个仓位各自一笔交易。Slipstream仓位取回NFT，同时领走累积的奖励；基础池子取回全部质押的LP代币，奖励留在gauge里，用```lp.claim```领取。
+每个仓位单独发送一笔交易。Slipstream仓位会取回NFT，并同时领取已累积的奖励；基础池子会取回全部已质押的LP代币，但奖励仍保留在gauge中，需使用```lp.claim```领取。
 
-取回后仓位恢复收交易手续费，可以加减仓、领手续费、撤出；要撤出时直接用```lp.remove```即可，它会先取回。
+取回后，仓位恢复赚取交易手续费，可进行加仓、减仓、领取手续费和撤出流动性等操作；如需撤出，直接调用```lp.remove```即可，它会自动先执行取回。
 
 See also: `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("lp.stake")`, `exchange.IO("lp.unstake")`, `exchange.IO("lp.claim")`, `exchange.IO("lp.positions")`, `exchange.IO("lp.pools")`
 
@@ -32776,17 +32777,17 @@ Forms:
 
 - `exchange.IO("lp.claim", ...)`
 
-Aerodrome、Velodrome：领取质押仓位在gauge里累积的奖励币，可以直接卖成USDC。
+Aerodrome、Velodrome：领取质押仓位在gauge中累积的奖励币，并可直接按市价卖出换成USDC。
 
 Parameters:
 
-- `k` (string, required): 固定为```lp.claim```，用于领取奖励。
-- `positionIds` (string / array, required): 仓位ID：单个ID或ID数组，Slipstream仓位如```aero:123```、```aero2:456```（Velodrome为```velo:```、```velo2:```），基础池子为池子地址。
-- `sell` (bool, optional): 为```true```时把领到的奖励币按市价卖成USDC，默认```false```。
+- `k` (string, required): 固定为```lp.claim```，表示领取奖励。
+- `positionIds` (string / array, required): 仓位ID，可传单个ID或ID数组。Slipstream仓位的ID形如```aero:123```、```aero2:456```、```aero3:789```（Velodrome对应为```velo:```、```velo2:```前缀），基础池仓位的ID为池子地址。
+- `sell` (bool, optional): 为```true```时，将领取到的奖励币按市价卖出换成USDC；默认为```false```。
 
-Returns (object / 空值): ```{txHash, gauges, rewardToken, rewards, sell}```：```gauges```为领取的gauge地址，```rewardToken```为```AERO```或```VELO```，```rewards```为领到的数量；卖出时另有```sell```（```{symbol, qty, txHash}```，卖出失败时为```{symbol, qty, error}```）。失败时返回空值并报错。
+Returns (object / 空值): ```{txHash, gauges, rewardToken, rewards, sell}```：```gauges```为本次领取涉及的gauge地址，```rewardToken```为```AERO```或```VELO```，```rewards```为领取到的奖励数量；启用卖出时另含```sell```字段（```{symbol, qty, txHash}```，卖出失败时为```{symbol, qty, error}```）。调用失败时返回空值并输出错误信息。
 
-奖励价值超过10 USDC时领取并卖成USDC。
+当奖励价值超过10 USDC时领取奖励，并卖出换成USDC。
 
 ```javascript
 function main() {
@@ -32805,9 +32806,9 @@ function main() {
 }
 ```
 
-一笔```Voter.claimRewards```交易领取这些仓位所在gauge里本钱包的全部奖励，同一个gauge里本钱包的其它质押仓位也一起领。可领的数量见```lp.positions```的```rewards```、```rewardsValue```。
+通过一笔```Voter.claimRewards```交易，领取这些仓位所在gauge中属于本钱包的全部奖励；同一gauge中本钱包的其他质押仓位的奖励也会一并领取。可领取的数量可通过```lp.positions```返回的```rewards```、```rewardsValue```字段查看。
 
-奖励按奖励币计价，价格波动大，领到后可以用```sell```卖成USDC；只想领奖励而不取回仓位时用它，取回仓位（```lp.unstake```）会顺带领走Slipstream仓位的奖励。
+奖励以奖励币计价，价格波动较大，领取后可通过```sell```参数直接卖出换成USDC。本命令适用于只领取奖励、不取回仓位的场景；取回仓位（```lp.unstake```）时会顺带领取Slipstream仓位的奖励。
 
 See also: `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("lp.stake")`, `exchange.IO("lp.unstake")`, `exchange.IO("lp.claim")`, `exchange.IO("lp.positions")`, `exchange.IO("lp.pools")`
 
@@ -33114,7 +33115,7 @@ Forms:
 
 - `exchange.IO("route", ...)`
 
-询价：列出一笔兑换在各条候选路径上的报价及最优路径，不下单。
+询价：列出一笔兑换在各条候选路径上的报价，并给出最优路径，不下单。
 
 Parameters:
 
@@ -33123,7 +33124,7 @@ Parameters:
 - `side` (string, required): 交易方向：```sell```表示卖出```qty```个基础币，```buy```表示买入```qty```个基础币。
 - `qty` (number, required): 基础币数量。
 
-Returns (object / 空值): 返回```{symbol, side, qty, best, quote, price, candidates}```，包含最优路径、最优报价、平均价格及各候选路径的报价，字段说明见备注。出错时返回空值，原因可通过```GetLastError()```获取。
+Returns (object / 空值): 返回```{symbol, side, qty, best, quote, price, candidates}```，包含最优路径、最优报价、平均成交价格以及各候选路径的报价，字段说明见备注。出错时返回空值，可通过```GetLastError()```查看原因。
 
 比较卖出1个ETH时各条路径的报价。
 
@@ -33145,13 +33146,13 @@ function main() {
 }
 ```
 
-候选路径包括本交易所的直连池子，以及经包装币或USDC/USDT中转的两跳路径。池子范围因交易所而异：Uniswap为V3各费率档、V2及不带hook的V4池子（常用费率组合的池子，加上从GeckoTerminal查到的自定义费率池子，见`Uniswap / PancakeSwap`页；V4经原生币或USDC/USDT中转），PancakeSwap为V3、V2及Infinity CL池子，Aerodrome、Velodrome为两代Slipstream池子及基础池子。路径写法示例：```v3:WETH-500-USDC```（V3，费率500即0.05%）、```v2:WETH-USDC```、```v3:UNI-3000-USDT-100-USDC```（两跳）、```v4:ETH-500/10-USDC```（Uniswap V4，费率500、tick间距10，ETH为原生币）、```infinity:BNB-67/1-USDT```（PancakeSwap Infinity CL）、```cl:WETH-100-USDC```（Aerodrome、Velodrome的第一代Slipstream，数字为tick间距）、```cl2:WETH-500-USDC```（第二代Slipstream）、```volatile:AERO-USDC```、```stable:USDC-USDbC```（基础池子）。
+候选路径包括本交易所的直连池子，以及经包装币或USDC/USDT中转的两跳路径。各交易所的池子范围不同：Uniswap为V3各费率档、V2以及不带hook的V4池子（包括常用费率组合的池子和从GeckoTerminal查到的自定义费率池子，见`Uniswap / PancakeSwap`页；V4经原生币或USDC/USDT中转），PancakeSwap为V3、V2和Infinity CL池子，Aerodrome、Velodrome为各代Slipstream池子（Aerodrome三代、Velodrome两代）和基础池子。路径写法示例：```v3:WETH-500-USDC```（V3，费率500即0.05%）、```v2:WETH-USDC```、```v3:UNI-3000-USDT-100-USDC```（两跳）、```v4:ETH-500/10-USDC```（Uniswap V4，费率500、tick间距10，ETH为原生币）、```infinity:BNB-67/1-USDT```（PancakeSwap Infinity CL）、```cl:WETH-100-USDC```（Aerodrome、Velodrome的第一代Slipstream，数字为tick间距）、```cl2:WETH-500-USDC```、```cl3:USDC-10-MSTRc```（第二、三代Slipstream，第三代仅Aerodrome有）、```volatile:AERO-USDC```、```stable:USDC-USDbC```（基础池子）。
 
-V3路径通过链上QuoterV2询价（完整模拟整笔兑换），V2根据池子储备在本地计算；报价均不含gas费用。
+V3路径通过链上QuoterV2询价（完整模拟整笔兑换），V2路径根据池子储备在本地计算，报价均不含gas费用。
 
-返回对象的字段：```best```为最优路径；```quote```为最优报价（卖出时为可得到的计价币数量，买入时为需花费的计价币数量）；```price```为对应的平均价格；```candidates```为各候选路径的```{route, quote}```列表（无法报价的路径，其```quote```为```null```）。没有可用池子时仍返回对象：```best```、```quote```、```price```均为```null```，```candidates```为空数组（有池子但均无法报价时，```candidates```各项的```quote```为```null```）。若交易对中的代币无法识别、节点所在链与配置不一致等导致出错，则返回空值，原因可通过```GetLastError()```获取。
+返回对象的字段：```best```为最优路径；```quote```为最优报价（卖出时为可获得的计价币数量，买入时为需花费的计价币数量）；```price```为对应的平均成交价格；```candidates```为各候选路径的```{route, quote}```（无法报价的路径，其```quote```为```null```）。没有可用池子时仍返回对象，其中```best```、```quote```、```price```均为```null```，```candidates```为空数组（有池子但均无法报价时，```candidates```各项的```quote```为```null```）。若交易对中的代币无法识别、节点所在链与配置不一致等，则返回空值，可通过```GetLastError()```查看原因。
 
-KyberSwap、1inch交易所对象（聚合器）只有一条候选路径，即聚合器给出的报价，路径写作```kyberswap:ETH-USDC```、```1inch:ETH-USDC```（买入时为```kyberswap:USDC-ETH```，先写付出的币）；```buy```按买到```qty```个基础币询价，通过多次精确输入询价近似得出。PancakeSwap无法查询Infinity CL池子的链上成交记录（节点不支持```eth_getLogs```）时，结果中会附带```warning```说明原因。Uniswap暂时无法从GeckoTerminal查到常用组合以外的V4池子（如被限流）时，结果同样附带```warning```；在此期间仅使用常用组合的V4池子，5分钟后重新查询。
+KyberSwap、1inch交易所对象（聚合器）只有一条候选路径，即聚合器的报价，路径写作```kyberswap:ETH-USDC```、```1inch:ETH-USDC```（买入时为```kyberswap:USDC-ETH```，先写付出的币）；```buy```按买入```qty```个基础币询价，结果由多次精确输入询价近似得出。若PancakeSwap无法查询Infinity CL池子的链上成交记录（节点不支持```eth_getLogs```），结果中会额外包含```warning```字段说明原因。若Uniswap暂时无法从GeckoTerminal查到常用组合以外的V4池子（如被限流），结果中同样包含```warning```，期间仅使用常用组合的V4池子，5分钟后重新查询。
 
 See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `KyberSwap`, `1inch`, `exchange.IO`, `exchange.IO("simulate")`, `exchange.IO("slippage")`, `exchange.IO("token")`, `exchange.CreateOrder`
 
@@ -33433,14 +33434,14 @@ Forms:
 
 - `exchange.IO("approve", ...)`
 
-设置代币授权模式：每次只授权本次兑换需要的数量，或授权无限额度。
+设置代币授权模式：每次仅授权本次兑换所需的数量，或授权无限额度。
 
 Parameters:
 
 - `k` (string, required): 固定为```approve```，用于设置代币授权模式。
-- `mode` (string, optional): 授权模式：```exact```（默认）表示每次只授权本次兑换需要的数量，```max```表示授权无限额度，之后同一个代币不需要再授权。不传表示查询当前模式。
+- `mode` (string, optional): 授权模式：```exact```（默认）表示每次仅授权本次兑换所需的数量；```max```表示授权无限额度，此后同一代币无需再次授权。不传此参数时，查询当前模式。
 
-Returns (string): 返回当前模式```exact```或```max```。
+Returns (string): 返回当前授权模式：```exact```或```max```。
 
 设置代币授权模式。
 
@@ -33451,13 +33452,13 @@ function main() {
 }
 ```
 
-卖出代币（ERC20输入）前，连接器会检查路由合约的授权额度，不够时先发送授权交易并等待上链，再发送兑换交易。授权额度不为0又不够时先清零再授权（USDT等代币要求）。
+卖出代币（以ERC20代币作为输入）前，连接器会检查路由合约的授权额度；额度不足时，先发送授权交易并等待上链确认，再发送兑换交易。若授权额度不为0但仍不足，则先将其清零再重新授权（USDT等代币有此要求）。
 
-Uniswap的V4路径、PancakeSwap的Infinity路径分两步：先把代币授权给Permit2合约（规则同上；两个交易所各用自己的Permit2），再在Permit2中授权对应的Universal Router使用（```exact```模式只授权本次数量、1天后过期，```max```模式授权无限额度、30天后过期）。两步都只在额度不够或已过期时才发送交易。
+Uniswap的V4路径和PancakeSwap的Infinity路径分两步授权：先将代币授权给Permit2合约（规则同上；两个交易所各自使用自己的Permit2），再在Permit2中授权对应的Universal Router使用（```exact```模式仅授权本次数量，1天后过期；```max```模式授权无限额度，30天后过期）。两步均仅在额度不足或授权已过期时才发送交易。
 
-```max```模式省去后续的授权交易和gas，但路由合约可以动用该代币的全部余额，请按需选择。
+```max```模式可省去后续的授权交易及相应的gas费用，但路由合约将可以动用该代币的全部余额，请根据需要选择。
 
-授权给谁因交易所而异：Uniswap、PancakeSwap的V2/V3路径授权各自的路由合约，V4/Infinity CL路径经Permit2（见上）；Aerodrome、Velodrome授权本次兑换所用的那个路由（基础池子与两代Slipstream各有自己的路由）；KyberSwap、1inch直接授权聚合器的路由合约（KyberSwap为MetaAggregationRouterV2，1inch为AggregationRouterV6），不经过Permit2。LP、跨链桥的授权同样按这里的模式：```lp.add```授权PositionManager，```bridge.send```授权LI.FI报价里的```approvalAddress```。
+授权对象因交易所而异：Uniswap、PancakeSwap的V2/V3路径授权给各自的路由合约，V4/Infinity CL路径经由Permit2授权（见上文）；Aerodrome、Velodrome授权给本次兑换所使用的路由（基础池与每一代Slipstream各有独立的路由）；KyberSwap、1inch直接授权给聚合器的路由合约（KyberSwap为MetaAggregationRouterV2，1inch为AggregationRouterV6），不经过Permit2。LP和跨链桥的授权同样遵循此处设置的模式：```lp.add```授权给PositionManager，```bridge.send```授权给LI.FI报价中的```approvalAddress```。
 
 See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `KyberSwap`, `1inch`, `exchange.IO`, `exchange.IO("transfer")`, `exchange.IO("simulate")`, `exchange.IO("gasMultiplier")`
 
@@ -33616,15 +33617,15 @@ Forms:
 
 - `exchange.IO("lp.pools", ...)`
 
-列出代币的全部LP池子（Uniswap、PancakeSwap为V3与V4/Infinity CL池子，Aerodrome、Velodrome为Slipstream与基础池子），包括费率、现价、流动性、TVL与24小时成交额，按TVL从高到低排列。
+列出代币的全部LP池子（Uniswap、PancakeSwap为V3与V4/Infinity CL池子，Aerodrome、Velodrome为Slipstream与基础池子），返回费率、现价、流动性、TVL与24小时成交额，并按TVL从大到小排序。
 
 Parameters:
 
 - `k` (string, required): 固定为```lp.pools```，表示列出池子。
 - `token` (string, required): 代币名称或合约地址，例如```ETH```、```WETH```、```UNI```。池子的```symbol```按此处的写法显示。
-- `quote` (string, optional): 计价币，例如```USDC```；指定后只列出该交易对的池子。不传时，列出该代币与本链包装币、USDC、USDT组成的池子。
+- `quote` (string, optional): 计价币，例如```USDC```，传入后只列出该交易对的池子。不传时，列出代币与本链包装币、USDC、USDT组成的池子。
 
-Returns (array / 空值): 池子数组```[{id, protocol, dex, symbol, fee, feeRate, tickSpacing, tick, price, liquidity, reserveBase, reserveQuote, tvlQuote, tvlUsd, volume24hUsd, fees24hUsd, empty}]```，字段说明见备注。代币无法识别或节点出错时返回空值，可通过```GetLastError()```查看原因。
+Returns (array / 空值): 池子数组```[{id, protocol, dex, symbol, fee, feeRate, tickSpacing, tick, price, liquidity, reserveBase, reserveQuote, tvlQuote, tvlUsd, volume24hUsd, fees24hUsd, empty}]```，各字段说明见备注。代币无法识别或节点出错时返回空值，可通过```GetLastError()```获取原因。
 
 列出ETH/USDC的池子，查看TVL与成交额最大的几个。
 
@@ -33641,7 +33642,7 @@ function main() {
 }
 ```
 
-Uniswap：列出代币的V4池子（包括常用组合以外、自定义费率的池子），再按PoolId查询其中第一个。
+Uniswap：列出代币的V4池子（包括常用组合以外、自定义费率的池子），再按PoolId查询第一个池子。
 
 ```javascript
 function main() {
@@ -33658,7 +33659,7 @@ function main() {
 }
 ```
 
-Aerodrome、Velodrome：在gauge仍在发放奖励的池子中，按奖励年化收益率筛选。
+Aerodrome、Velodrome：按奖励年化挑选gauge仍在发放奖励的池子。
 
 ```javascript
 function main() {
@@ -33676,29 +33677,29 @@ function main() {
 返回数组中每一项的字段：
 | 字段 | 说明 |
 | - | - |
-| ```id``` | 池子ID：V3、Slipstream与基础池子为池子合约地址，V4/Infinity CL为PoolId（```0x```加64位十六进制）；可作为```lp.pool```、```lp.ticks```和```lp.plan```的```pool```参数传入 |
-| ```protocol``` | 池子类型：```v3```、```v4```（Uniswap V4）、```infinity```（PancakeSwap Infinity CL）；Aerodrome、Velodrome为```slipstream```、```slipstream2```（分别对应旧、新工厂）以及基础池子```volatile```、```stable``` |
+| ```id``` | 池子ID：V3、Slipstream与基础池子为池子合约地址，V4/Infinity CL为PoolId（```0x```加64位十六进制字符）；可传给```lp.pool```、```lp.ticks```以及```lp.plan```的```pool```参数 |
+| ```protocol``` | 池子类型：```v3```、```v4```（Uniswap V4）、```infinity```（PancakeSwap Infinity CL）；Aerodrome、Velodrome为```slipstream```、```slipstream2```、```slipstream3```（Slipstream第一、二、三代工厂，第三代仅Aerodrome有）以及基础池子```volatile```、```stable``` |
 | ```dex```、```symbol``` | 交易所名称、池子的交易对（如```WETH_USDC```） |
 | ```fee```、```feeRate``` | 手续费率：```fee```以百万分之一为单位（500即0.05%），```feeRate```为小数形式（0.0005）；Slipstream池子的费率可能是动态的，此处为当前值 |
-| ```tickSpacing```、```tick``` | tick间距与当前tick；基础池子没有tick，值为```null``` |
-| ```price``` | 现价，以计价币/代币表示 |
+| ```tickSpacing```、```tick``` | tick间距与当前tick；基础池子没有tick，均为```null``` |
+| ```price``` | 现价，单位为计价币/代币 |
 | ```liquidity``` | 现价处的流动性（十进制字符串） |
-| ```reserveBase```、```reserveQuote``` | 池子中两种代币的余额；V4/Infinity CL为单例合约，值为```null``` |
+| ```reserveBase```、```reserveQuote``` | 池子中两种代币的余额；V4/Infinity CL为单例合约，均为```null``` |
 | ```tvlQuote```、```tvlUsd``` | 按计价币、美元折算的TVL（V4/Infinity CL的数据取自GeckoTerminal） |
 | ```volume24hUsd```、```fees24hUsd``` | 24小时成交额与手续费收入（美元），取自GeckoTerminal，获取不到时为```null``` |
-| ```empty``` | ```true```表示现价处没有流动性，现价无参考意义：```price```、```tvlQuote```、```tvlUsd```为```null```，此类池子排在最后 |
+| ```empty``` | 为```true```时表示现价处没有流动性，现价无参考意义：```price```、```tvlQuote```、```tvlUsd```均为```null```，排在列表末尾 |
 
-Aerodrome、Velodrome的每一项还额外包含```stable```（基础池子是否为stable曲线，Slipstream为```null```）以及gauge信息：```gauge```（gauge地址）、```gaugeAlive```（gauge是否仍在发放奖励）、```stakedShare```（现价处质押在gauge中的流动性占比）、```rewardsPerDay```、```rewardsPerDayUsd```（每日发放的奖励币数量及其美元价值）、```rewardAprPct```（按质押部分TVL折算的奖励年化收益率，单位%）。奖励年化按当前每秒奖励外推，会随奖励币价格和质押量变化，是一个瞬时值：Slipstream池子的```stakedShare```是现价所在tick上已质押流动性占该处总流动性的比例，价格一变动、仓位进出区间，该值就会跳变，```rewardAprPct```在几分钟内可能相差数倍。用它选池或估算收益时，应间隔一段时间多次获取并取平均值。
+Aerodrome、Velodrome的每一项还包含```stable```（基础池子是否为stable曲线，Slipstream池子为```null```）及gauge信息：```gauge```（gauge地址）、```gaugeAlive```（gauge是否仍在发放奖励）、```stakedShare```（现价处质押在gauge中的流动性占比）、```rewardsPerDay```、```rewardsPerDayUsd```（每天发放的奖励币数量及其美元价值）、```rewardAprPct```（按质押部分TVL折算的奖励年化收益率，%）。奖励年化按当前每秒奖励外推得出，会随奖励币价格和质押量变化，属于瞬时值：Slipstream池子的```stakedShare```是现价所在tick上质押的流动性占区间内总流动性的比例，价格一变动、仓位一进出区间就会跳变，```rewardAprPct```在几分钟内可能相差数倍；用它选池或估算收益时，建议间隔一段时间多次获取并取平均值。
 
-Uniswap、PancakeSwap的V4/Infinity CL池子只列出不带hook的池子，二者都没有固定的费率档位。
+Uniswap、PancakeSwap的V4/Infinity CL池子只列出不带hook的池子，且两者都没有固定的费率档位。
 
-Uniswap V4：原生币池子与包装币池子分别列出（如```ETH_USDC```与```WETH_USDC```）。列出的池子包括常用费率/tick间距组合（0.01%/1、0.02%/4、0.03%/6、0.04%/8、0.05%/10、0.3%/60、1%/200）上的池子，以及自定义费率与间距的池子：从GeckoTerminal上该代币的池子列表（按成交额与流动性排序的前40个）中获取Uniswap V4池子的PoolId，再通过PositionManager的```poolKeys```在链上反查PoolKey并核对PoolId，只保留不带hook的池子（如Robinhood上CASHCAT/USDG 0.269%、间距54的池子）。手续费不设上限，2%这类高费率池子也会列出。当代币与计价币都是中转币（包装币以及USDC、USDT等稳定币，如```lp.pools("ETH", "USDC")```）时，只列出常用组合；查询结果缓存1小时；GeckoTerminal暂时不可用（如被限流）时只列出常用组合，5分钟后重试。该清单仍可能遗漏池子：GeckoTerminal未收录或未进入前40名的池子，以及在PositionManager上从未创建过仓位（```poolKeys```查不到PoolKey）的池子，都不会列出。清单之外的不带hook的池子，可以直接将PoolId传给```lp.pool```、```lp.plan```（```pool```参数），前提同样是能在PositionManager上查到其PoolKey。
+Uniswap V4：原生币池子与包装币池子分开列出（如```ETH_USDC```与```WETH_USDC```）。列出的池子包括常用费率/tick间距组合（0.01%/1、0.02%/4、0.03%/6、0.04%/8、0.05%/10、0.3%/60、1%/200）上的池子，以及自定义费率与间距的池子：从GeckoTerminal上该代币的池子列表（按成交额与流动性排序的前40个）中获取Uniswap V4池子的PoolId，再通过PositionManager的```poolKeys```在链上反查PoolKey并核对PoolId，只保留不带hook的池子（如Robinhood上CASHCAT/USDG 0.269%、间距54的池子）。手续费不设上限，2%这类高费率池子也会列出。代币与计价币均为中转币（包装币及USDC、USDT等稳定币，如```lp.pools("ETH", "USDC")```）时，只列出常用组合；查询结果缓存1小时，GeckoTerminal暂时不可用（如被限流）时只列出常用组合，5分钟后重试。此清单仍可能遗漏池子：GeckoTerminal未收录或未进入前40名的池子、PositionManager上从未创建过仓位（```poolKeys```查不到PoolKey）的池子不会列出。清单之外不带hook的池子可直接将PoolId传给```lp.pool```、```lp.plan```（```pool```参数），前提同样是能在PositionManager上查到其PoolKey。
 
-PancakeSwap Infinity CL：只列出手续费不超过1%的池子；列出的是兑换选路时从近期链上成交中收集到的池子，以及本进程使用过的池子。其他池子可以直接将PoolId传给```lp.pool```、```lp.plan```。
+PancakeSwap Infinity CL：只列出手续费不超过1%的池子；列出的是兑换选路时从近期链上成交中收集到的池子以及本进程使用过的池子，其它池子可直接将PoolId传给```lp.pool```、```lp.plan```。
 
-GeckoTerminal的数据在进程内缓存5分钟，由```lp.select```、```lp.plan```共用；遇到限频时会等待片刻后重试一次，仍然失败则相应字段为```null```。
+GeckoTerminal的数据在进程内缓存5分钟，由```lp.select```、```lp.plan```共用；被限频时会等待片刻后重试一次，仍失败则相应字段为```null```。
 
-KyberSwap、1inch交易所对象（聚合器）不支持LP指令，调用时会报错```LP functions are not available for KyberSwap on Base```。
+KyberSwap、1inch交易所对象（聚合器）不支持LP指令，调用时报错```LP functions are not available for KyberSwap on Base```。
 
 See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("lp.select")`, `exchange.IO("lp.pool")`, `exchange.IO("lp.plan")`, `exchange.IO("lp.positions")`
 
@@ -33713,16 +33714,16 @@ Forms:
 
 - `exchange.IO("lp.select", ...)`
 
-按规则自动选择一个LP池子：在流动性充足的池子中选择24小时成交额最大的，或选择指定费率的池子。
+按规则自动选择一个LP池子：在流动性充足的池子中选择24小时成交量最大的池子，或选择指定费率的池子。
 
 Parameters:
 
-- `k` (string, required): 固定为```lp.select```，用于选择池子。
+- `k` (string, required): 固定为```lp.select```，表示执行选池操作。
 - `token` (string, required): 代币名称或合约地址，例如```ETH```。
-- `budget` (number, required): 预算，以计价币计，用于确定流动性门槛：池子的TVL至少为5000美元与预算二者中的较大值。
+- `budget` (number, required): 预算，以计价币计，用于确定流动性门槛：池子的TVL须不低于5000美元与预算两者中的较大值。
 - `options` (object, optional): 选池条件```{quote, fee, exact, protocol, tickSpacing}```，各项均可省略，详见备注。
 
-Returns (object / 空值): 选中的池子：```lp.pools```返回结果中的一项，另附```reason```（选择理由）。没有带流动性的池子、指定的费率不存在（```exact```为```true```时）等情况下，返回空值并报错。
+Returns (object / 空值): 选中的池子，即```lp.pools```返回结果中的一项，并附带```reason```（选择理由）。若没有带流动性的池子，或指定的费率不存在（```exact```为```true```时）等，则返回空值并报错。
 
 选择一个ETH/USDC池子，再单独在V4池子中选择一个。
 
@@ -33734,7 +33735,7 @@ function main() {
         return
     }
     Log("选中:", p.protocol, p.id, "费率:", p.feeRate, "理由:", p.reason)
-    // 只在V4池子中选择（PancakeSwap填infinity，Aerodrome、Velodrome填slipstream等）
+    // 只在V4池子里选（PancakeSwap写infinity，Aerodrome、Velodrome写slipstream等）
     var v4 = exchange.IO("lp.select", "ETH", 1000, {quote: "USDC", protocol: "v4"})
     Log("V4池子:", v4 ? v4.id : GetLastError())
 }
@@ -33744,17 +33745,17 @@ function main() {
 
 | 键 | 说明 |
 | - | - |
-| ```quote``` | 计价币，例如```USDC```；省略时，代币与本链包装币、USDC、USDT组成的池子都参与比较 |
-| ```fee``` | 优先使用的费率，以百万分之一为单位，例如```500``` |
-| ```exact``` | 为```true```时只使用```fee```指定的费率 |
-| ```protocol``` | 池子类型，字符串或数组：Uniswap为```v3```、```v4```，PancakeSwap为```v3```、```infinity```，Aerodrome、Velodrome为```slipstream```、```slipstream2```、```volatile```、```stable``` |
-| ```tickSpacing``` | 只选择该tick间距的池子（主要用于Slipstream，其池子按tick间距区分） |
+| ```quote``` | 计价币，例如```USDC```；省略时，代币与本链包装币、USDC、USDT组成的池子均参与比较 |
+| ```fee``` | 优先选用的费率，单位为百万分之一，例如```500``` |
+| ```exact``` | 为```true```时仅使用```fee```指定的费率 |
+| ```protocol``` | 池子类型，可为字符串或数组：Uniswap为```v3```、```v4```，PancakeSwap为```v3```、```infinity```，Aerodrome、Velodrome为```slipstream```、```slipstream2```、```slipstream3```（仅Aerodrome）、```volatile```、```stable``` |
+| ```tickSpacing``` | 仅选择该tick间距的池子（主要用于Slipstream，其池子按tick间距区分） |
 
-选池规则：先排除空池子以及不符合```protocol```、```tickSpacing```的池子；指定了```fee```时，若该费率的池子满足流动性门槛则选择它（```reason```为```fee tier 500 requested```），```exact```为```true```时即使不满足门槛也选择它，若不存在该费率的池子则报错；否则在TVL不低于5000美元与预算二者较大值的池子中选择24小时成交额最大的（```largest 24h volume among pools with enough liquidity```），没有成交数据时选择TVL最大的；所有池子都不满足门槛时选择TVL最大的，并在```reason```中说明。
+选池规则：先排除空池子以及不符合```protocol```、```tickSpacing```的池子；若指定了```fee```，该费率的池子满足流动性门槛时即选择它（```reason```为```fee tier 500 requested```），```exact```为```true```时即使不满足门槛也选择它，若不存在该费率的池子则报错；否则，在TVL不低于5000美元与预算两者中较大值的池子里选择24小时成交量最大的池子（```largest 24h volume among pools with enough liquidity```），无成交数据时选择TVL最大的池子；若所有池子都不满足门槛，则选择TVL最大的池子，并在```reason```中说明。
 
-候选池子即```lp.pools```列出的池子（Uniswap V4池子的来源及可能遗漏的情况，见```lp.pools```页面）；如需使用清单之外的池子，可直接将其PoolId作为```lp.plan```的```pool```。
+候选池子即```lp.pools```列出的池子（Uniswap V4池子的来源及可能遗漏的池子，见```lp.pools```页面）；如需使用清单之外的池子，可直接将其PoolId作为```lp.plan```的```pool```参数。
 
-```exchange.IO("lp.plan", ...)```未指定```pool```时，按相同规则选池（```fee```、```tickSpacing```取自计划参数；对于Aerodrome、Velodrome，指定了```range```时只在Slipstream池子中选择）。Uniswap、PancakeSwap如需使用V4/Infinity CL池子建仓，应先用```protocol```选出池子，再将其```id```作为计划的```pool```。
+```exchange.IO("lp.plan", ...)```未指定```pool```时，按相同规则选池（```fee```、```tickSpacing```取自计划参数；对于Aerodrome、Velodrome，指定了```range```时仅在Slipstream池子中选择）。Uniswap、PancakeSwap如需使用V4/Infinity CL池子建仓，应先通过```protocol```选出池子，再将其```id```作为计划的```pool```。
 
 See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("lp.pools")`, `exchange.IO("lp.plan")`, `exchange.IO("lp.pool")`
 
@@ -33859,16 +33860,16 @@ Forms:
 
 - `exchange.IO("lp.plan", ...)`
 
-生成建仓计划（只读，不花钱）：按预算、价格区间和形状算出各仓位的区间、流动性和两种代币的数量，以及钱包够不够、还要换多少币。
+生成建仓计划（只读操作，不会花费资金）：根据预算、价格区间和流动性分布形状，计算各仓位的价格区间、流动性和两种代币的数量，并检查钱包余额是否充足、还需兑换多少代币。
 
 Parameters:
 
-- `k` (string, required): 固定为```lp.plan```，用于生成建仓计划。
-- `params` (object, required): 计划参数，如```{symbol: "ETH_USDC", budget: 100, range: {pct: [-5, 5]}}```；```symbol```、```budget```必填，集中流动性池子还要```range```，各参数见备注。
+- `k` (string, required): 固定为```lp.plan```，表示生成建仓计划。
+- `params` (object, required): 计划参数，例如```{symbol: "ETH_USDC", budget: 100, range: {pct: [-5, 5]}}```；其中```symbol```和```budget```为必填项，集中流动性池还需提供```range```，各参数详见备注。
 
-Returns (object / 空值): 计划对象，字段说明见备注；可以原样传给```lp.simulate```、```lp.add```。参数错误、池子不存在或现价处没有流动性时返回空值并报错。钱包余额不够时照样返回计划，```shortfall```说明差额。
+Returns (object / 空值): 计划对象，各字段说明详见备注；可直接传给```lp.simulate```、```lp.add```。参数错误、池子不存在或当前价格处没有流动性时，返回空值并报错。钱包余额不足时仍会返回计划，差额由```shortfall```字段给出。
 
-在选中的池子里规划一个现价±5%的区间仓位，看需要多少资金、钱包够不够。
+在选定的池子中规划一个以现价±5%为区间的仓位，查看所需资金以及钱包余额是否充足。
 
 ```javascript
 function main() {
@@ -33892,7 +33893,7 @@ function main() {
 }
 ```
 
-三层curve形状：现价附近的仓位最厚。
+三层curve形状：越靠近现价的仓位，分配的资金越多。
 
 ```javascript
 function main() {
@@ -33907,7 +33908,7 @@ function main() {
 }
 ```
 
-Aerodrome、Velodrome：不写range即为基础池子（volatile）计划。
+Aerodrome、Velodrome：不指定range时，按基础池（volatile）进行规划。
 
 ```javascript
 function main() {
@@ -33921,43 +33922,43 @@ function main() {
 
 | 参数 | 说明 |
 | - | - |
-| ```symbol``` | 交易对，如```ETH_USDC```；价格按计价币/基础币 |
-| ```budget``` | 预算，按计价币计 |
-| ```range``` | 价格区间，三种写法：```{lower, upper}```为价格；```{pct: [-5, 5]}```为相对现价的百分比；```{ticks: [lo, hi]}```为tick。都会对齐到池子的tick间距 |
-| ```shape``` | 形状：```spot```（默认）单一区间；```curve```多层嵌套、现价附近最厚；```bidask```两侧分段、越远越厚 |
+| ```symbol``` | 交易对，如```ETH_USDC```；价格以“计价币/基础币”表示 |
+| ```budget``` | 预算，以计价币计 |
+| ```range``` | 价格区间，支持三种写法：```{lower, upper}```为价格；```{pct: [-5, 5]}```为相对现价的百分比；```{ticks: [lo, hi]}```为tick。均会对齐到池子的tick间距 |
+| ```shape``` | 形状：```spot```（默认）为单一区间；```curve```为多层嵌套，现价附近最厚；```bidask```为两侧分段，离现价越远越厚 |
 | ```layers``` | ```curve```、```bidask```的层数，默认3，最多20 |
-| ```pool``` | 池子ID；不写时按```lp.select```的规则选池（用到下面的```fee```、```tickSpacing```） |
-| ```fee``` | 选池时优先的费率（百万分之一） |
+| ```pool``` | 池子ID；不指定时按```lp.select```的规则选池（会用到下面的```fee```、```tickSpacing```） |
+| ```fee``` | 选池时优先选择的费率（单位为百万分之一） |
 | ```slippage``` | 价格保护比例，默认```0.01```（1%），最大0.5 |
-| ```tickSpacing```、```protocol``` | Aerodrome、Velodrome选Slipstream池子时的筛选，```protocol```默认```["slipstream", "slipstream2"]``` |
-| ```stable``` | Aerodrome、Velodrome基础池子计划：```true```为stable池子，```false```为volatile池子，不写两种都看 |
-| ```stake``` | Aerodrome、Velodrome：为```true```时```lp.add```建仓后直接质押进gauge |
+| ```tickSpacing```、```protocol``` | Aerodrome、Velodrome选择Slipstream池子时的筛选条件，```protocol```默认为本交易所的全部Slipstream版本（Aerodrome为```["slipstream", "slipstream2", "slipstream3"]```，Velodrome为```["slipstream", "slipstream2"]```） |
+| ```stable``` | Aerodrome、Velodrome基础池子计划：```true```为stable池子，```false```为volatile池子，不指定时两种都考虑 |
+| ```stake``` | Aerodrome、Velodrome：为```true```时，```lp.add```建仓后直接将仓位质押到gauge |
 
 计划对象的字段：
 
 | 字段 | 说明 |
 | - | - |
-| ```params``` | 计划参数原样回显 |
-| ```symbol```、```pool```、```protocol```、```fee```、```tickSpacing```、```tick```、```price``` | 选中的池子与现价 |
-| ```shape```、```layers```、```layersRequested``` | 形状、实际层数与请求的层数；实际层数少于请求时另有```warning```说明原因 |
-| ```budget```、```budgetUsd``` | 预算（计价币、美元） |
-| ```positions``` | 各仓位```{tickLower, tickUpper, priceLower, priceUpper, liquidity, amountBase, amountQuote, share}```，```share```为该仓位占预算的比例 |
-| ```needBase```、```needQuote``` | 建仓需要的两种代币数量 |
-| ```haveBase```、```haveQuote``` | 钱包里可用的数量 |
-| ```swap``` | 建仓前要换的币```{side, amount, currency}```（```sell```为卖出基础币，```buy```为买入基础币），不用换为```null``` |
-| ```payWith``` | 交易对写原生币时，包装币那一侧用哪种币付（如```ETH```或```WETH```），其它情况为```null``` |
-| ```shortfall``` | 钱包不够时的说明，够时为```null```；有它时```lp.add```报错。内容见下文「资金」 |
+| ```params``` | 计划参数，原样回显 |
+| ```symbol```、```pool```、```protocol```、```fee```、```tickSpacing```、```tick```、```price``` | 选中的池子及现价 |
+| ```shape```、```layers```、```layersRequested``` | 形状、实际层数与请求的层数；实际层数少于请求层数时，另有```warning```说明原因 |
+| ```budget```、```budgetUsd``` | 预算（分别以计价币、美元计） |
+| ```positions``` | 各仓位```{tickLower, tickUpper, priceLower, priceUpper, liquidity, amountBase, amountQuote, share}```，其中```share```为该仓位占预算的比例 |
+| ```needBase```、```needQuote``` | 建仓所需的两种代币数量 |
+| ```haveBase```、```haveQuote``` | 钱包中的可用数量 |
+| ```swap``` | 建仓前需要兑换的币种```{side, amount, currency}```（```sell```为卖出基础币，```buy```为买入基础币），无需兑换时为```null``` |
+| ```payWith``` | 交易对写的是原生币时，包装币一侧用哪种币支付（如```ETH```或```WETH```），其他情况为```null``` |
+| ```shortfall``` | 钱包余额不足时的说明，余额充足时为```null```；存在该字段时```lp.add```会报错。内容见下文「资金」 |
 | ```shareOfPool``` | 建仓后在现价处占池子流动性的比例 |
-| ```volume24hUsd```、```estDailyFeesUsd``` | 池子24小时成交额、按占池比例估算的日手续费（美元），只是按过去成交外推 |
-| ```slippageBps``` | 价格保护（万分之几） |
+| ```volume24hUsd```、```estDailyFeesUsd``` | 池子24小时成交额，以及按占池比例估算的日手续费（美元），仅根据历史成交外推 |
+| ```slippageBps``` | 价格保护（单位为万分之一） |
 
-资金：钱包里缺哪种代币就用另一种换（多换1%），```swap```给出要换的数量，```lp.add```执行时先下这笔市价单；两种代币加起来都不够预算时```shortfall```说明差额：计划存入的两种代币数量（与```needBase```、```needQuote```相同）、钱包现有数量（```haveBase```、```haveQuote```）及按池价折合的计价币价值，缺的那种要用另一种换时，付换币的那一种一共需要多少（存入量加换币成本，含1%余量）、还差多少。例如预算100 USDC、计划存入0.02 ETH + 50 USDC、钱包只有60 USDC时，说明里写买缺的0.02 ETH约需50.5 USDC，USDC一侧共需100.5 USDC（存入50 + 换币50.5），还差40.5 USDC。原生币按当前gas价留出约300万gas的手续费，其余才算可用。V3、Slipstream池子里原生币以包装币参与，交易对写原生币（如```ETH_USDC```）时，包装币那一侧要么整笔用原生币付、要么整笔用包装币付，不会拼着用：原生币够这一侧全额时用原生币，否则包装币够就用包装币，都不够时按余额多的那种计算，```payWith```为实际用的币。V4/Infinity CL池子里原生币池子与包装币池子是两种池子，各用各的币。
+资金：钱包中缺少哪种代币，就用另一种代币兑换（多换1%），```swap```给出需要兑换的数量，```lp.add```执行时会先下这笔市价单；两种代币合计仍不足预算时，由```shortfall```说明缺口，内容包括：计划存入的两种代币数量（与```needBase```、```needQuote```相同）、钱包现有数量（```haveBase```、```haveQuote```）及其按池价折合的计价币价值；若缺少的代币需要用另一种兑换，还会说明用于兑换的那种代币一共需要多少（存入量加兑换成本，含1%余量）以及还差多少。例如预算100 USDC、计划存入0.02 ETH + 50 USDC、钱包只有60 USDC时，说明中会写明：买入所缺的0.02 ETH约需50.5 USDC，USDC一侧共需100.5 USDC（存入50 + 兑换50.5），还差40.5 USDC。原生币会按当前gas价格预留约300万gas的手续费，其余部分才计为可用。V3、Slipstream池子中原生币以包装币形式参与，交易对写的是原生币（如```ETH_USDC```）时，包装币一侧要么全部用原生币支付，要么全部用包装币支付，不会混合使用：原生币足够支付该侧全额时用原生币，否则包装币足够时用包装币，两者都不足时按余额较多的那种计算，```payWith```为实际使用的币种。V4/Infinity CL池子中，原生币池子与包装币池子是两种不同的池子，各自使用对应的币种。
 
-选池：不写```pool```时每次都按```lp.select```的规则重新选池，```lp.simulate```、```lp.add```收到计划后也是按其中的```params```重新计算（用最新池价），可能选到别的池子；要建在看过的那个池子里，就在```params```里写上```pool```。Uniswap、PancakeSwap用V4/Infinity CL池子时必须写```pool```（取自```lp.select```的```{protocol: "v4"}```或```{protocol: "infinity"}```）。
+选池：不指定```pool```时，每次都会按```lp.select```的规则重新选池；```lp.simulate```、```lp.add```收到计划后，也会按其中的```params```重新计算（使用最新池价），因此可能选到其他池子。如需在之前查看过的池子中建仓，请在```params```中指定```pool```。Uniswap、PancakeSwap使用V4/Infinity CL池子时必须指定```pool```（取自```lp.select```的```{protocol: "v4"}```或```{protocol: "infinity"}```的结果）。
 
-区间与形状：区间在现价以上时整个仓位都是基础币，在现价以下时都是计价币，这时```estDailyFeesUsd```为0，价格回到区间才赚手续费。```curve```的各层都跨过现价、互不相同且对齐tick间距，优先逐层向内嵌套，排不下时用区间内其它跨现价的组合补齐；双边区间最多能放下「现价以下的合法下沿数×现价以上的合法上沿数」层，超过时给出能放下的最多层数。
+区间与形状：区间位于现价上方时，整个仓位全部为基础币；位于现价下方时，则全部为计价币。此时```estDailyFeesUsd```为0，只有价格回到区间内才能赚取手续费。```curve```的各层均须跨越现价、互不相同且对齐tick间距，优先逐层向内嵌套，无法排布时使用区间内其他跨越现价的组合补齐；双边区间最多可容纳「现价以下的合法下沿数×现价以上的合法上沿数」层，超出时按可容纳的最大层数给出。
 
-Aerodrome、Velodrome：有```range```时用Slipstream池子；不写```range```（或```pool```是基础池子）时为基础池子计划：两种代币按储备比例存入，计划为```{params, symbol, pool, protocol, stable, fee, price, budget, budgetUsd, needBase, needQuote, haveBase, haveQuote, amountBase, amountQuote, lpTokens, swap, shortfall, shareOfPool, volume24hUsd, estDailyFeesUsd, slippageBps}```，```lpTokens```为预计得到的LP代币数量。```stake```为```true```时建仓后直接质押（见`exchange.IO("lp.stake")`）。
+Aerodrome、Velodrome：指定```range```时使用Slipstream池；未指定```range```（或```pool```为基础池）时生成基础池计划：两种代币按储备比例存入，计划为```{params, symbol, pool, protocol, stable, fee, price, budget, budgetUsd, needBase, needQuote, haveBase, haveQuote, amountBase, amountQuote, lpTokens, swap, shortfall, shareOfPool, volume24hUsd, estDailyFeesUsd, slippageBps}```，其中```lpTokens```为预计获得的LP代币数量。```stake```为```true```时，建仓后直接质押（见`exchange.IO("lp.stake")`）。
 
 See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("lp.select")`, `exchange.IO("lp.simulate")`, `exchange.IO("lp.add")`, `exchange.IO("lp.pools")`
 
@@ -34032,16 +34033,16 @@ Forms:
 
 - `exchange.IO("lp.add", ...)`
 
-按计划建仓：需要时先换币，再授权，一笔交易创建计划中的全部仓位，等交易上链后返回仓位ID。
+按计划建仓：如有需要，先换币，再授权，然后通过一笔交易创建计划中的全部仓位，交易上链后返回仓位ID。
 
 Parameters:
 
-- `k` (string, required): 固定为```lp.add```，用于建仓。
-- `plan` (object, required): ```exchange.IO("lp.plan", ...)```返回的计划，或计划的参数```params```；执行时按```params```用最新池价重新计算。
+- `k` (string, required): 固定为```lp.add```，表示建仓。
+- `plan` (object, required): ```exchange.IO("lp.plan", ...)```返回的计划，或该计划的参数```params```；执行时会根据```params```按最新池价重新计算。
 
-Returns (object / 空值): ```{txHash, swapTxHash, pool, positions: [{id, tickLower, tickUpper, priceLower, priceUpper, liquidity, amountBase, amountQuote}]}```：```txHash```为建仓交易，```swapTxHash```为建仓前的换币交易（没换为```null```），```positions```的```id```为仓位ID。失败时返回空值并报错。
+Returns (object / 空值): ```{txHash, swapTxHash, pool, positions: [{id, tickLower, tickUpper, priceLower, priceUpper, liquidity, amountBase, amountQuote}]}```：```txHash```为建仓交易的哈希，```swapTxHash```为建仓前换币交易的哈希（未换币时为```null```），```positions```中的```id```为仓位ID。失败时返回空值并报错。
 
-在选中的池子里建一个现价±5%的仓位。
+在选定的流动性池中，以当前价格±5%为区间建立仓位。
 
 ```javascript
 function main() {
@@ -34049,7 +34050,7 @@ function main() {
     var params = {symbol: "ETH_USDC", budget: 200, pool: sel.id, range: {pct: [-5, 5]}}
     var plan = exchange.IO("lp.plan", params)
     if (!plan || plan.shortfall) {
-        Log("不能建仓:", plan ? plan.shortfall : GetLastError())
+        Log("无法建仓:", plan ? plan.shortfall : GetLastError())
         return
     }
     var r = exchange.IO("lp.add", plan)
@@ -34064,15 +34065,15 @@ function main() {
 }
 ```
 
-完整的LP策略：选池、计划、模拟、建仓，每分钟检查仓位，手续费够多就领取，连续在区间外就撤出并重新建仓。
+完整的LP策略：选池、制定计划、模拟、建仓，每分钟检查一次仓位；未领取的手续费足够多时进行领取，连续处于区间外时撤出并重新建仓。
 
 ```javascript
-// 区间流动性的完整流程：选池 → 计划 → 模拟 → 建仓 → 监控 → 领手续费 → 出区间后撤出重建
+// 区间流动性的完整流程：选池 → 制定计划 → 模拟 → 建仓 → 监控 → 领取手续费 → 移出区间后撤出并重新建仓
 var SYMBOL = "ETH_USDC"
 var BUDGET = 200              // 每次建仓的预算（USDC）
-var RANGE = {pct: [-5, 5]}    // 现价±5%
-var OUT_LIMIT = 30            // 连续这么多次（分钟）在区间外就撤出重建
-var MIN_FEES = 5              // 未领手续费超过这么多USDC时领取
+var RANGE = {pct: [-5, 5]}    // 以现价为中心±5%
+var OUT_LIMIT = 30            // 连续处于区间外达到此次数（每次间隔1分钟）时撤出并重新建仓
+var MIN_FEES = 5              // 未领取的手续费超过此金额（USDC）时进行领取
 
 function open() {
     var sel = exchange.IO("lp.select", "ETH", BUDGET, {quote: "USDC"})
@@ -34082,11 +34083,11 @@ function open() {
     }
     var plan = exchange.IO("lp.plan", {symbol: SYMBOL, budget: BUDGET, pool: sel.id, range: RANGE})
     if (!plan || plan.shortfall) {
-        Log("不能建仓:", plan ? plan.shortfall : GetLastError())
+        Log("无法建仓:", plan ? plan.shortfall : GetLastError())
         return null
     }
-    Log("池子", plan.pool, plan.protocol, "预估日手续费", plan.estDailyFeesUsd, "美元")
-    // 需要先换币的计划，模拟时钱包里还没有换来的币，跳过模拟（lp.add会先换币）
+    Log("池", plan.pool, plan.protocol, "预估日手续费", plan.estDailyFeesUsd, "美元")
+    // 若计划需要先兑换代币，模拟时钱包中尚无兑换所得的代币，因此跳过模拟（lp.add会先执行兑换）
     if (!plan.swap && !exchange.IO("lp.simulate", plan)) {
         Log("模拟失败:", GetLastError())
         return null
@@ -34097,7 +34098,7 @@ function open() {
         return null
     }
     var ids = r.positions.map(function (p) { return p.id })
-    _G("lpIds", ids)    // 记下仓位ID，重启后用lp.track找回
+    _G("lpIds", ids)    // 保存仓位ID，重启后通过lp.track恢复
     Log("建仓完成", ids, "交易", r.txHash)
     return ids
 }
@@ -34105,7 +34106,7 @@ function open() {
 function main() {
     var ids = _G("lpIds")
     if (ids) {
-        exchange.IO("lp.track", ids)   // V4/Infinity CL、Aerodrome/Velodrome的仓位靠它在重启后找回
+        exchange.IO("lp.track", ids)   // V4/Infinity CL、Aerodrome/Velodrome的仓位需依靠它在重启后恢复
     }
     var outCount = 0
     while (true) {
@@ -34129,13 +34130,13 @@ function main() {
             fees += p.feesValue
             inRange = inRange || p.inRange
         })
-        LogStatus(_D(), "仓位", ids, inRange ? "区间内" : "区间外", "未领手续费", fees, "USDC")
+        LogStatus(_D(), "仓位", ids, inRange ? "区间内" : "区间外", "未领取手续费" , fees, "USDC")
         if (fees > MIN_FEES) {
             exchange.IO("lp.collect", ids)
         }
         outCount = inRange ? 0 : outCount + 1
         if (outCount >= OUT_LIMIT) {
-            // 全部撤出并把拿回的ETH卖成USDC，下一轮重新建仓
+            // 全部撤出，并将取回的ETH兑换为USDC，下一轮重新建仓
             var r = exchange.IO("lp.remove", ids, 1, true)
             Log("撤出", r ? r.txHash : GetLastError())
             ids = null
@@ -34147,19 +34148,19 @@ function main() {
 }
 ```
 
-执行步骤：按最新池价重算计划，计划有```shortfall```时报错、不发交易 → 需要时先用市价单换币（```swapTxHash```） → 授权：V3、Slipstream授权PositionManager，V4/Infinity CL先授权Permit2、再在Permit2里给PositionManager额度，授权方式按```exchange.IO("approve")```的```exact```/```max``` → 一笔交易创建全部仓位，等上链后返回。换币之后的步骤失败时，报错里说明换币已经发生（换来的币留在钱包里）。
+执行步骤：按最新池价重新计算计划，若计划存在```shortfall```则报错且不发送交易 → 如有需要，先用市价单换币（```swapTxHash```） → 授权：V3、Slipstream授权给PositionManager；V4/Infinity CL先授权给Permit2，再在Permit2中为PositionManager设置额度；授权方式与```exchange.IO("approve")```的```exact```/```max```相同 → 通过一笔交易创建全部仓位，上链后返回。若换币之后的步骤失败，报错信息会说明换币已完成（换得的币保留在钱包中）。
 
-价格保护与付款：每个仓位的付款上限为计划量加滑点（计划的```slippage```，默认1%，不超过钱包可用量），执行时价格变动使投入量低于计划量×(1−滑点)则整笔回滚（只损失gas）。V3、Slipstream池子交易对写原生币时按计划的```payWith```付包装币那一侧：整笔原生币（随交易附带，多的由```refundETH```退回）或整笔包装币；之后领回来的是包装币。V4/Infinity CL的原生币池子用原生币余额、领回原生币。建仓时原生币按当前gas价留出约300万gas的手续费。
+价格保护与付款：每个仓位的付款上限为计划量加滑点（滑点取计划的```slippage```，默认1%；付款上限不超过钱包可用量）。若执行时价格变动导致投入量低于计划量×(1−滑点)，整笔交易回滚（仅损失gas）。V3、Slipstream池子的交易对写为原生币时，包装币一侧按计划的```payWith```付款：全部使用原生币（随交易附带，多余部分由```refundETH```退回），或全部使用包装币；之后领回的均为包装币。V4/Infinity CL的原生币池子使用原生币余额付款，领回的也是原生币。建仓时会按当前gas价格预留约300万gas所需的原生币作为手续费。
 
-仓位ID：V3为PositionManager的NFT编号（如```1381183```）；Uniswap V4为```v4:编号```，PancakeSwap Infinity CL为```inf:编号```；Aerodrome为```aero:编号```（老工厂）、```aero2:编号```（新工厂），Velodrome为```velo:编号```、```velo2:编号```；基础池子没有NFT，仓位ID为池子地址。V4/Infinity CL与Slipstream仓位在节点查不到完整历史日志时，重启后要用```exchange.IO("lp.track", ids)```登记才能被```lp.positions```找到，建议把返回的ID存下来（如用```_G()```）。
+仓位ID：V3为PositionManager的NFT编号（如```1381183```）；Uniswap V4为```v4:编号```，PancakeSwap Infinity CL为```inf:编号```；Aerodrome为```aero:编号```、```aero2:编号```、```aero3:编号```（分别对应Slipstream第一、二、三代），Velodrome为```velo:编号```、```velo2:编号```；基础池子没有NFT，仓位ID即池子地址。若节点无法查询完整的历史日志，V4/Infinity CL与Slipstream仓位在重启后需用```exchange.IO("lp.track", ids)```登记，才能被```lp.positions```查到，因此建议保存返回的ID（如使用```_G()```）。
 
-写指令在交易上链后返回；之后一分钟内的链上读取都不早于该交易所在的区块，紧接着调用```lp.positions```等指令能看到新仓位。
+写操作指令在交易上链后返回；此后一分钟内的链上读取均不早于该交易所在的区块，因此紧接着调用```lp.positions```等指令即可看到新仓位。
 
-Aerodrome、Velodrome的基础池子经Router存入（交易对写原生币时用原生币余额，```addLiquidityETH```），返回```{txHash, swapTxHash, pool, id, lpTokens, amountBase, amountQuote}```；计划的```stake```为```true```时结果另有```stake```（同`exchange.IO("lp.stake")`的返回）。
+Aerodrome、Velodrome的基础池子通过Router存入（交易对写为原生币时使用原生币余额，即```addLiquidityETH```），返回```{txHash, swapTxHash, pool, id, lpTokens, amountBase, amountQuote}```；若计划的```stake```为```true```，结果中还包含```stake```（与`exchange.IO("lp.stake")`的返回值相同）。
 
-出区间后自动调仓、Aerodrome与Velodrome的gauge质押复投等可以直接运行的完整策略见`DEX策略示例`。
+出区间后自动调仓、Aerodrome与Velodrome的gauge质押复投等可直接运行的完整策略，请参见`DEX策略示例`。
 
-See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("lp.plan")`, `exchange.IO("lp.simulate")`, `exchange.IO("lp.positions")`, `exchange.IO("lp.collect")`, `exchange.IO("lp.remove")`, `exchange.IO("lp.track")`, `exchange.IO("approve")`, `DEX策略示例`
+See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("lp.plan")`, `exchange.IO("lp.simulate")`, `exchange.IO("lp.positions")`, `exchange.IO("lp.collect")`, `exchange.IO("lp.remove")`, `exchange.IO("lp.track")`, `exchange.IO("approve")`, `DEX 策略示例`
 
 ##### exchange.IO("lp.increase", ...)
 
@@ -34472,16 +34473,16 @@ Forms:
 
 - `exchange.IO("lp.track", ...)`
 
-登记仓位ID，让```lp.positions```在节点查不到完整历史日志时也能找到这些仓位（重启后找回以前建的仓位）。
+登记仓位ID。当节点无法查询到完整的历史日志时，```lp.positions```仍能找到这些仓位，例如重启后找回此前创建的仓位。
 
 Parameters:
 
-- `k` (string, required): 固定为```lp.track```，用于登记仓位。
-- `positionIds` (string / array, required): 要登记的仓位ID：单个ID或ID数组，如```["v4:123456"]```；Aerodrome、Velodrome还可以登记基础池子的地址。
+- `k` (string, required): 固定为```lp.track```，表示登记仓位。
+- `positionIds` (string / array, required): 要登记的仓位ID，可以传入单个ID或ID数组，如```["v4:123456"]```；在Aerodrome、Velodrome上还可以登记基础池的地址。
 
-Returns (array / 空值): 本进程记住的全部仓位ID（不含V3仓位）。前缀与交易所对象不符（如在Uniswap上登记```inf:```）、不传ID时返回空值并报错。
+Returns (array / 空值): 当前进程已记录的全部仓位ID（不含V3仓位）。如果前缀与交易所对象不匹配（如在Uniswap上登记```inf:```仓位），或者未传入ID，则返回空值并报错。
 
-重启后登记以前保存的仓位ID，再查询仓位。
+重启后登记此前保存的仓位ID，然后查询仓位。
 
 ```javascript
 function main() {
@@ -34493,9 +34494,9 @@ function main() {
 }
 ```
 
-需要登记的是V4/Infinity CL仓位（```v4:```、```inf:```）、Slipstream仓位（```aero:```、```aero2:```、```velo:```、```velo2:```）和基础池子地址；V3仓位由PositionManager按钱包列出，不用登记，传入时忽略。登记时会到链上核对仓位存在，之后```lp.positions```每次按链上核对归属（质押在gauge里的按质押人），已转走的不列出。
+需要登记的是V4/Infinity CL仓位（```v4:```、```inf:```）、Slipstream仓位（```aero:```、```aero2:```、```aero3:```、```velo:```、```velo2:```）以及基础池地址。V3仓位由PositionManager按钱包地址列出，无需登记，传入时会被忽略。登记时会在链上核验仓位是否存在。此后```lp.positions```每次都会按链上数据核验仓位归属（质押在gauge中的仓位归属于质押人），已转出的仓位不再列出。
 
-登记只保存在本进程内，重启后要再登记一次：策略可以把```lp.add```返回的ID存起来（如用```_G()```），启动时登记。本进程```lp.add```建的仓位会自动记住。
+登记信息仅保存在当前进程内，重启后需要重新登记。策略可以把```lp.add```返回的ID保存下来（如使用```_G()```），在启动时重新登记。当前进程中通过```lp.add```创建的仓位会被自动记录。
 
 See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("lp.positions")`, `exchange.IO("lp.add")`
 

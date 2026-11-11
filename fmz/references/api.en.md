@@ -32626,16 +32626,17 @@ Typical flow: ```bridge.quote``` for a quote → ```bridge.simulate``` to simula
 
 #### Aerodrome / Velodrome
 
-The Aerodrome and Velodrome exchange objects use the same contracts, each connecting to that exchange's pools on one chain and mapping on-chain swaps onto the spot trading functions; pool kinds, swaps and LP work the same way, so they share this page. The chain is fixed; the configuration has no Chain option (an old-style configuration carrying another ```Chain``` fails at startup). Uses Slipstream concentrated-liquidity pools (both the old and the new deployment, pools distinguished by tick spacing, fees set by each pool) and basic pools (volatile is constant product, stable is the stablecoin curve). Basic pools support exact input only: limit buys (filled by the amount bought) can only go through Slipstream pools. Both kinds support LP and staking in gauges for rewards. The differences:
+The Aerodrome and Velodrome exchange objects use the same contracts, each connecting to that exchange's pools on one chain and mapping on-chain swaps onto the spot trading functions; pool kinds, swaps and LP work the same way, so they share this page. The chain is fixed; the configuration has no Chain option (an old-style configuration carrying another ```Chain``` fails at startup). Uses Slipstream concentrated-liquidity pools (every deployment generation: three on Aerodrome, two on Velodrome; pools distinguished by tick spacing, fees set by each pool) and basic pools (volatile is constant product, stable is the stablecoin curve). Basic pools support exact input only: limit buys (filled by the amount bought) can only go through Slipstream pools. Both kinds support LP and staking in gauges for rewards. The differences:
 
 | Aspect | Aerodrome | Velodrome |
 | - | - | - |
 | Chain | Base | OP Mainnet |
 | Gauge reward token | AERO | VELO |
-| Slipstream position IDs | ```aero:number``` (old factory), ```aero2:number``` (new factory) | ```velo:number``` (old factory), ```velo2:number``` (new factory) |
+| Slipstream deployments | three, ```protocol``` ```slipstream```, ```slipstream2```, ```slipstream3``` | two, ```protocol``` ```slipstream```, ```slipstream2``` |
+| Slipstream position IDs | ```aero:number```, ```aero2:number```, ```aero3:number``` (generations 1, 2, 3) | ```velo:number```, ```velo2:number``` (generations 1, 2) |
 | This exchange's contracts in ```exchange.IO("contracts")``` | ```aerodrome``` | ```velodrome``` |
 
-Each swap takes the best-quoted route among the direct routes through all available pools and the two-hop routes through hub tokens. The basic pools and the two Slipstream generations each have their own router contract, and tokens are approved to the router used by the swap at hand.
+Each swap takes the best-quoted route among the direct routes through all available pools and the two-hop routes through hub tokens. The basic pools and each Slipstream generation have their own router contract, and tokens are approved to the router used by the swap at hand.
 
 The same implementation also serves `Uniswap / PancakeSwap` and the swap aggregators `KyberSwap` and `1inch`, with the same token table, balances, approvals, orders, cancels, transfers and bridge. Aerodrome and Velodrome used to be options of the Uniswap exchange's "DEX" setting and are separate exchanges since October 2026; configurations that chose them on the Uniswap exchange fail at startup, so add the dedicated exchange instead.
 
@@ -32777,7 +32778,7 @@ Served through a fallback:
 
 ##### Concentrated liquidity (LP)
 
-The ```exchange.IO("lp.*", ...)``` commands provide concentrated liquidity on Slipstream and basic pools: pool selection, planning and simulation, adding, increasing and decreasing, fee collection, withdrawal and position queries, plus gauge staking for rewards. Slipstream pools (both factory generations) are concentrated-liquidity pools whose positions are NFTs of each generation's PositionManager, written ```prefix:number``` (old factory) or ```prefix2:number``` (new factory), the prefix being ```aero``` on Aerodrome and ```velo``` on Velodrome; each pool sets its own fee (possibly dynamic), and ```fee``` is the current value. An unstaked Slipstream position gives part of its fees (the pool's ```unstakedFee```, mostly 5% today) to the gauge.
+The ```exchange.IO("lp.*", ...)``` commands provide concentrated liquidity on Slipstream and basic pools: pool selection, planning and simulation, adding, increasing and decreasing, fee collection, withdrawal and position queries, plus gauge staking for rewards. Slipstream pools (every factory generation) are concentrated-liquidity pools whose positions are NFTs of each generation's PositionManager, written ```prefix:number``` for the first generation and ```prefixN:number``` for generation N (such as ```aero2:number```, ```aero3:number```), the prefix being ```aero``` on Aerodrome and ```velo``` on Velodrome; each pool sets its own fee (possibly dynamic), and ```fee``` is the current value. An unstaked Slipstream position gives part of its fees (the pool's ```unstakedFee```, mostly 5% today) to the gauge.
 
 Basic pools (volatile, stable) are full-range: ```lp.plan``` without a ```range``` plans for a basic pool, both tokens are deposited in the reserve ratio, and the position is the pool's LP token with the pool address as ```id```.
 
@@ -32816,16 +32817,16 @@ Forms:
 
 - `exchange.IO("lp.stake", ...)`
 
-Aerodrome and Velodrome: stakes positions in their pool's gauge to earn the reward token (AERO or VELO) instead.
+For Aerodrome and Velodrome: stakes positions into the gauge of their pool. From then on, the positions earn reward tokens (AERO or VELO) instead of trading fees.
 
 Parameters:
 
-- `k` (string, required): Set to ```lp.stake``` to stake positions.
-- `positionIds` (string / array, required): Position IDs: one ID or an array; Slipstream positions such as ```aero:123``` or ```aero2:456``` (```velo:``` and ```velo2:``` on Velodrome), basic pools by the pool address.
+- `k` (string, required): Fixed as ```lp.stake```, which stakes positions.
+- `positionIds` (string / array, required): Position IDs, either a single ID or an array of IDs. Slipstream position IDs look like ```aero:123```, ```aero2:456``` and ```aero3:789``` (```velo:``` and ```velo2:``` on Velodrome). For a basic pool, the position ID is the pool address.
 
-Returns (object / null value): ```{positions: [{id, gauge, approveTxHash, txHash, feesBase, feesQuote}]}```: ```approveTxHash``` is the transaction approving the NFT to the gauge (```null``` when already approved), ```feesBase``` and ```feesQuote``` the uncollected fees the gauge passed to the owner on deposit; for a basic pool ```{id, gauge, txHash, lpTokens}```. Null with an error on failure.
+Returns (object / null value): ```{positions: [{id, gauge, approveTxHash, txHash, feesBase, feesQuote}]}```: ```approveTxHash``` is the hash of the transaction that approves the NFT to the gauge (```null``` if it was already approved). ```feesBase``` and ```feesQuote``` are the unclaimed fees that the gauge transfers to you on deposit. For basic pools, it returns ```{id, gauge, txHash, lpTokens}```. On failure, it returns a null value and logs an error.
 
-Stake every unstaked position of the wallet that is still in range.
+Stake every position in the wallet that is unstaked and still in range into its gauge.
 
 ```javascript
 function main() {
@@ -32837,20 +32838,20 @@ function main() {
     }
     var r = exchange.IO("lp.stake", ids)
     if (!r) {
-        Log("Staking failed:", GetLastError())
+        Log("质押失败:", GetLastError())
         return
     }
     r.positions.forEach(function (p) {
-        Log(p.id, "staked in", p.gauge, "transaction", p.txHash)
+        Log(p.id, "已质押到", p.gauge, "交易", p.txHash)
     })
 }
 ```
 
-One set of transactions per position: a Slipstream position NFT is first approved to the gauge (skipped when already approved) and then deposited whole, the gauge passing the position's uncollected fees to the owner on deposit; for a basic pool all unstaked LP tokens in the wallet are deposited. A gauge killed by the Voter (```gaugeAlive``` ```false``` in ```lp.pools```) accepts no deposits and fails.
+A separate transaction is sent for each position. For a Slipstream position, the NFT is first approved to the gauge (skipped if already approved), and then the whole NFT is deposited. On deposit, the gauge transfers the position's unclaimed fees to you. For a basic pool, all unstaked LP tokens in the wallet are deposited. If the Voter has killed the gauge (```gaugeAlive``` returned by ```lp.pools``` is ```false```), the deposit fails with an error.
 
-While staked, the position's trading fees go to voters and it earns only the reward token; an out-of-range Slipstream position earns no rewards either. Staked positions cannot be increased, decreased or have fees collected until taken out with ```lp.unstake``` (```lp.remove``` takes them out automatically). An unstaked Slipstream position gives part of its fees (the pool's ```unstakedFee```, mostly 5% today) to the gauge.
+While staked, the trading fees a position earns go to voters, and the position earns only reward tokens. A Slipstream position also earns no rewards while it is out of its price range. You cannot add liquidity to a staked position, remove liquidity from it or claim its fees. Withdraw it with ```lp.unstake``` first (```lp.remove``` does this automatically). An unstaked Slipstream position must give part of its fees to the gauge. This share is the pool's ```unstakedFee```, currently 5% in most pools.
 
-Positions can also be staked when added: put ```stake: true``` in the ```lp.plan``` parameters, and ```lp.add``` stakes right after adding, with ```stake``` in its result.
+You can also stake a position when you open it. Set ```stake: true``` in the parameters of ```lp.plan```, and the position is staked automatically once ```lp.add``` opens it. The result then includes an extra ```stake``` field.
 
 See also: `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("lp.stake")`, `exchange.IO("lp.unstake")`, `exchange.IO("lp.claim")`, `exchange.IO("lp.positions")`, `exchange.IO("lp.pools")`
 
@@ -32864,16 +32865,16 @@ Forms:
 
 - `exchange.IO("lp.unstake", ...)`
 
-Aerodrome and Velodrome: takes staked positions out of the gauge; Slipstream positions also claim their accrued rewards.
+Aerodrome, Velodrome: withdraw staked positions from the gauge (unstake); Slipstream positions also claim accrued rewards at the same time.
 
 Parameters:
 
-- `k` (string, required): Set to ```lp.unstake``` to take positions out of the gauge.
-- `positionIds` (string / array, required): Position IDs: one ID or an array; Slipstream positions such as ```aero:123``` or ```aero2:456``` (```velo:``` and ```velo2:``` on Velodrome), basic pools by the pool address.
+- `k` (string, required): Fixed as ```lp.unstake```, which withdraws staked positions.
+- `positionIds` (string / array, required): Position ID. Pass a single ID or an array of IDs. Slipstream position IDs look like ```aero:123```, ```aero2:456``` or ```aero3:789``` (the Velodrome prefixes are ```velo:``` and ```velo2:```). Basic pool positions use the pool address.
 
-Returns (object / null value): ```{positions: [{id, gauge, txHash, rewards}]}```, where ```rewards``` is the reward tokens received in that transaction; basic pools also have ```lpTokens``` (the LP tokens returned). Null with an error on failure.
+Returns (object / null): ```{positions: [{id, gauge, txHash, rewards}]}```, where ```rewards``` is the amount of reward tokens claimed in that transaction. Basic pool positions also include an ```lpTokens``` field (the amount of LP tokens withdrawn). On failure, returns null and prints an error message.
 
-Take every staked position out of the gauge.
+Withdraw all staked positions.
 
 ```javascript
 function main() {
@@ -32885,18 +32886,18 @@ function main() {
     }
     var r = exchange.IO("lp.unstake", ids)
     if (!r) {
-        Log("Unstaking failed:", GetLastError())
+        Log("取回失败:", GetLastError())
         return
     }
     r.positions.forEach(function (p) {
-        Log(p.id, "taken out, rewards received:", p.rewards)
+        Log(p.id, "已取回，领到奖励:", p.rewards)
     })
 }
 ```
 
-One transaction per position. A Slipstream position NFT comes back together with its accrued rewards; a basic pool returns all staked LP tokens and leaves the rewards in the gauge for ```lp.claim```.
+A separate transaction is sent for each position. Slipstream positions return the NFT and claim accrued rewards at the same time. Basic pools withdraw all staked LP tokens, but the rewards stay in the gauge and must be claimed with ```lp.claim```.
 
-Once taken out, the position earns trading fees again and can be increased, decreased, collected or withdrawn; to withdraw, just call ```lp.remove```, which takes staked positions out first.
+Once withdrawn, a position earns trading fees again and supports increasing or decreasing liquidity, collecting fees and removing liquidity. To remove liquidity, just call ```lp.remove```, which withdraws the position first automatically.
 
 See also: `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("lp.stake")`, `exchange.IO("lp.unstake")`, `exchange.IO("lp.claim")`, `exchange.IO("lp.positions")`, `exchange.IO("lp.pools")`
 
@@ -32911,17 +32912,17 @@ Forms:
 
 - `exchange.IO("lp.claim", ...)`
 
-Aerodrome and Velodrome: claims the reward tokens accrued in the gauges of staked positions, optionally selling them for USDC.
+Aerodrome, Velodrome: claims the reward tokens accumulated in the gauge by staked positions, with the option to sell them at market price for USDC right away.
 
 Parameters:
 
-- `k` (string, required): Set to ```lp.claim``` to claim rewards.
-- `positionIds` (string / array, required): Position IDs: one ID or an array; Slipstream positions such as ```aero:123``` or ```aero2:456``` (```velo:``` and ```velo2:``` on Velodrome), basic pools by the pool address.
-- `sell` (bool, optional): ```true``` sells the claimed reward token for USDC at market; ```false``` by default.
+- `k` (string, required): Fixed as ```lp.claim```, which means claiming rewards.
+- `positionIds` (string / array, required): Position ID. Pass a single ID or an array of IDs. Slipstream position IDs look like ```aero:123```, ```aero2:456``` or ```aero3:789``` (for Velodrome the prefixes are ```velo:``` and ```velo2:```). For a basic pool position, the ID is the pool address.
+- `sell` (bool, optional): When ```true```, the claimed reward tokens are sold at market price for USDC. The default is ```false```.
 
-Returns (object / null value): ```{txHash, gauges, rewardToken, rewards, sell}```: ```gauges``` are the gauges claimed from, ```rewardToken``` is ```AERO``` or ```VELO``` and ```rewards``` the amount received; when selling there is also ```sell``` (```{symbol, qty, txHash}```, or ```{symbol, qty, error}``` when the sale failed). Null with an error on failure.
+Returns (object / null): ```{txHash, gauges, rewardToken, rewards, sell}```: ```gauges``` holds the gauge addresses included in this claim, ```rewardToken``` is ```AERO``` or ```VELO```, and ```rewards``` is the amount of rewards claimed. When selling is enabled, the object also includes a ```sell``` field (```{symbol, qty, txHash}```, or ```{symbol, qty, error}``` if the sale fails). If the call fails, it returns a null value and logs an error message.
 
-Claim the rewards and sell them for USDC once they are worth more than 10 USDC.
+Claim rewards once their value exceeds 10 USDC, and sell them for USDC.
 
 ```javascript
 function main() {
@@ -32933,16 +32934,16 @@ function main() {
     }
     var r = exchange.IO("lp.claim", staked.map(function (p) { return p.id }), true)
     if (!r) {
-        Log("Claim failed:", GetLastError())
+        Log("领取失败:", GetLastError())
         return
     }
-    Log("Received", r.rewards, r.rewardToken, "sold:", r.sell)
+    Log("领到", r.rewards, r.rewardToken, "卖出:", r.sell)
 }
 ```
 
-One ```Voter.claimRewards``` transaction claims the wallet's rewards in the gauges of these positions, including the wallet's other staked positions in the same gauges. The claimable amount is ```rewards``` and ```rewardsValue``` in ```lp.positions```.
+A single ```Voter.claimRewards``` transaction claims all of this wallet's rewards in the gauges that hold these positions. Rewards from this wallet's other staked positions in the same gauge are claimed too. To check the claimable amount, see the ```rewards``` and ```rewardsValue``` fields returned by ```lp.positions```.
 
-Rewards are paid in the reward token, whose price is volatile, so ```sell``` converts them to USDC; use this to claim without taking positions out, since ```lp.unstake``` also claims the rewards of Slipstream positions.
+Rewards are paid in the reward token, whose price is highly volatile. After claiming, use the ```sell``` parameter to sell them for USDC right away. Use this command when you only want to claim rewards and keep the position staked. Withdrawing a position (```lp.unstake```) also claims the rewards of Slipstream positions.
 
 See also: `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("lp.stake")`, `exchange.IO("lp.unstake")`, `exchange.IO("lp.claim")`, `exchange.IO("lp.positions")`, `exchange.IO("lp.pools")`
 
@@ -33249,44 +33250,44 @@ Forms:
 
 - `exchange.IO("route", ...)`
 
-Requests quotes for a swap: lists the quote on each candidate route and the best route, without placing an order.
+Quote inquiry: lists the quotes for a swap across all candidate routes and returns the best route, without placing an order.
 
 Parameters:
 
-- `k` (string, required): Always ```route```, which requests a quote.
-- `symbol` (string, required): Trading pair, for example ```ETH_USDC```.
-- `side` (string, required): Trade direction: ```sell``` sells ```qty``` units of the base currency, and ```buy``` buys ```qty``` units of the base currency.
+- `k` (string, required): Fixed as ```route```, indicating a quote inquiry.
+- `symbol` (string, required): Trading pair, e.g. ```ETH_USDC```.
+- `side` (string, required): Trade direction: ```sell``` means selling ```qty``` units of the base currency, ```buy``` means buying ```qty``` units of the base currency.
 - `qty` (number, required): Amount of the base currency.
 
-Returns (object / null value): Returns ```{symbol, side, qty, best, quote, price, candidates}```. It holds the best route, the best quote, the average price and the quote on each candidate route. The Remarks section describes each field. On error it returns a null value, and ```GetLastError()``` gives the reason.
+Returns (object / null): Returns ```{symbol, side, qty, best, quote, price, candidates}```, containing the best route, the best quote, the average execution price and the quotes of all candidate routes; see the remarks for field descriptions. Returns a null value on error; the cause can be checked with ```GetLastError()```.
 
-Compare the quotes on each route for selling 1 ETH.
+Compare the quotes across routes when selling 1 ETH.
 
 ```javascript
 function main() {
     var r = exchange.IO("route", "ETH_USDC", "sell", 1)
     if (!r) {
-        Log("Quote failed:", GetLastError())
+        Log("Quote error:", GetLastError())
         return
     }
     if (r.best === null) {
-        Log("No usable pool")
+        Log("No available pools")
         return
     }
-    Log("Best route:", r.best, "receive:", r.quote, "USDC")
+    Log("Best route:", r.best, "Receivable:", r.quote, "USDC")
     r.candidates.forEach(function (c) {
         Log(c.route, c.quote)
     })
 }
 ```
 
-Candidate routes include the exchange's direct pools and two-hop routes through the wrapped token or USDC/USDT. The pools used depend on the exchange. Uniswap uses V3 pools at each fee tier, V2 pools and V4 pools without hooks. For V4 this means pools with common fee combinations, plus custom-fee pools found through GeckoTerminal (see the `Uniswap / PancakeSwap` page), and V4 routes go through the native coin or USDC/USDT. PancakeSwap uses V3, V2 and Infinity CL pools. Aerodrome and Velodrome use both generations of Slipstream pools and the basic pools. Example route notations: ```v3:WETH-500-USDC``` (V3, fee 500, i.e. 0.05%), ```v2:WETH-USDC```, ```v3:UNI-3000-USDT-100-USDC``` (two hops), ```v4:ETH-500/10-USDC``` (Uniswap V4, fee 500, tick spacing 10, ETH is the native coin), ```infinity:BNB-67/1-USDT``` (PancakeSwap Infinity CL), ```cl:WETH-100-USDC``` (first-generation Slipstream on Aerodrome and Velodrome, where the number is the tick spacing), ```cl2:WETH-500-USDC``` (second-generation Slipstream), ```volatile:AERO-USDC``` and ```stable:USDC-USDbC``` (basic pools).
+Candidate routes include the exchange's direct pools as well as two-hop routes via the wrapped token or USDC/USDT. The pool coverage differs by exchange: Uniswap covers all V3 fee tiers, V2, and V4 pools without hooks (including pools with common fee combinations and custom-fee pools found via GeckoTerminal, see the `Uniswap / PancakeSwap` page; V4 routes hop via the native coin or USDC/USDT); PancakeSwap covers V3, V2 and Infinity CL pools; Aerodrome and Velodrome cover each generation of Slipstream pools (three generations on Aerodrome, two on Velodrome) and basic pools. Route notation examples: ```v3:WETH-500-USDC``` (V3, fee 500 i.e. 0.05%), ```v2:WETH-USDC```, ```v3:UNI-3000-USDT-100-USDC``` (two hops), ```v4:ETH-500/10-USDC``` (Uniswap V4, fee 500, tick spacing 10, ETH is the native coin), ```infinity:BNB-67/1-USDT``` (PancakeSwap Infinity CL), ```cl:WETH-100-USDC``` (first-generation Slipstream on Aerodrome and Velodrome, the number is the tick spacing), ```cl2:WETH-500-USDC```, ```cl3:USDC-10-MSTRc``` (second- and third-generation Slipstream; the third generation exists only on Aerodrome), ```volatile:AERO-USDC```, ```stable:USDC-USDbC``` (basic pools).
 
-V3 routes are quoted on-chain through QuoterV2, which simulates the whole swap. V2 routes are calculated locally from the pool reserves. No quote includes gas fees.
+V3 routes are quoted on-chain via QuoterV2 (a full simulation of the entire swap), while V2 routes are calculated locally from pool reserves; none of the quotes include gas fees.
 
-Fields of the returned object: ```best``` is the best route. ```quote``` is the best quote: for a sell, the amount of quote currency you receive, and for a buy, the amount of quote currency you spend. ```price``` is the matching average price. ```candidates``` is a list of ```{route, quote}``` for each candidate route, and a route that cannot be quoted has a ```quote``` of ```null```. When no pool is available, an object is still returned: ```best```, ```quote``` and ```price``` are all ```null```, and ```candidates``` is an empty array. When pools exist but none of them can be quoted, the ```quote``` of every item in ```candidates``` is ```null```. If an error occurs, for example a token in the pair cannot be recognized or the node's chain does not match the configuration, a null value is returned, and ```GetLastError()``` gives the reason.
+Fields of the returned object: ```best``` is the best route; ```quote``` is the best quote (when selling, the amount of quote currency receivable; when buying, the amount of quote currency to be spent); ```price``` is the corresponding average execution price; ```candidates``` holds the ```{route, quote}``` of each candidate route (for routes that cannot be quoted, ```quote``` is ```null```). When no pool is available, an object is still returned, with ```best```, ```quote``` and ```price``` all ```null``` and ```candidates``` an empty array (when pools exist but none can be quoted, the ```quote``` of each item in ```candidates``` is ```null```). If a token in the trading pair cannot be recognized, or the node's chain does not match the configuration, etc., a null value is returned; the cause can be checked with ```GetLastError()```.
 
-KyberSwap and 1inch exchange objects (aggregators) have only one candidate route: the quote from the aggregator. These routes are written as ```kyberswap:ETH-USDC``` and ```1inch:ETH-USDC```. For a buy they are written as ```kyberswap:USDC-ETH```, with the token you pay first. For ```buy```, the quote is for receiving ```qty``` units of the base currency, and it is approximated through several exact-input quotes. If PancakeSwap cannot fetch on-chain trade records for Infinity CL pools because the node does not support ```eth_getLogs```, the result includes a ```warning``` that explains why. If Uniswap temporarily cannot get V4 pools beyond the common combinations from GeckoTerminal, for example because of rate limiting, the result also includes a ```warning```. During that time only V4 pools with common combinations are used, and the query is retried after 5 minutes.
+KyberSwap and 1inch exchange objects (aggregators) have only one candidate route, namely the aggregator's quote, written as ```kyberswap:ETH-USDC``` and ```1inch:ETH-USDC``` (```kyberswap:USDC-ETH``` when buying, with the token being paid written first); ```buy``` quotes for buying ```qty``` units of the base currency, and the result is approximated from multiple exact-input quotes. If PancakeSwap cannot query on-chain trade records of Infinity CL pools (the node does not support ```eth_getLogs```), the result will additionally include a ```warning``` field explaining the reason. If Uniswap temporarily cannot look up V4 pools beyond the common combinations from GeckoTerminal (e.g. due to rate limiting), the result likewise includes a ```warning```; during this period only V4 pools with common combinations are used, and the lookup is retried after 5 minutes.
 
 See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `KyberSwap`, `1inch`, `exchange.IO`, `exchange.IO("simulate")`, `exchange.IO("slippage")`, `exchange.IO("token")`, `exchange.CreateOrder`
 
@@ -33569,14 +33570,14 @@ Forms:
 
 - `exchange.IO("approve", ...)`
 
-Sets the token approval mode: approve only what each swap needs, or grant an unlimited allowance.
+Sets the token approval mode: approve only the amount needed for the current swap each time, or grant an unlimited allowance.
 
 Parameters:
 
-- `k` (string, required): Fixed to ```approve```. Sets the token approval mode.
-- `mode` (string, optional): Approval mode. ```exact``` (default) approves only the amount needed for the current swap. ```max``` grants an unlimited allowance, so the same token does not need to be approved again. If this parameter is omitted, the call returns the current mode.
+- `k` (string, required): Fixed as ```approve```, used to set the token approval mode.
+- `mode` (string, optional): Approval mode: ```exact``` (default) approves only the amount needed for the current swap each time; ```max``` grants an unlimited allowance, after which the same token does not need to be approved again. When this parameter is omitted, the current mode is queried.
 
-Returns (string): Returns the current approval mode, either ```exact``` or ```max```.
+Returns (string): Returns the current approval mode: ```exact``` or ```max```.
 
 Set the token approval mode.
 
@@ -33587,12 +33588,13 @@ function main() {
 }
 ```
 
-Before selling a token (using an ERC20 token as the input), the connector checks how much the router contract is allowed to spend. If that allowance is too low, the connector first sends an approval transaction and waits for it to be confirmed on-chain. Only then does it send the swap transaction. If the existing allowance is not 0 but is still too low, the connector first resets it to 0 and then approves again, because some tokens such as USDT require this.
-Uniswap V4 routes and PancakeSwap Infinity routes use a two-step approval. First, the token is approved for the Permit2 contract, following the same rules as above (each exchange uses its own Permit2). Second, the matching Universal Router is approved to spend through Permit2. In ```exact``` mode this second approval covers only the current amount and expires after 1 day. In ```max``` mode it is unlimited and expires after 30 days. For each step, a transaction is sent only when the allowance is too low or has expired.
+Before selling a token (with an ERC20 token as the input), the connector checks the router contract's allowance; if the allowance is insufficient, it first sends an approval transaction and waits for it to be confirmed on-chain, then sends the swap transaction. If the allowance is non-zero but still insufficient, it is first reset to 0 and then re-approved (required by tokens such as USDT).
 
-```max``` mode avoids later approval transactions and their gas fees, but the router contract can then spend your entire balance of that token. Choose the mode that fits your needs.
+Uniswap's V4 path and PancakeSwap's Infinity path use two-step approval: the token is first approved to the Permit2 contract (same rules as above; each exchange uses its own Permit2), and then the corresponding Universal Router is authorized within Permit2 (```exact``` mode approves only the current amount and expires after 1 day; ```max``` mode grants an unlimited allowance and expires after 30 days). Each step sends a transaction only when the allowance is insufficient or the approval has expired.
 
-Who gets approved depends on the exchange: on Uniswap and PancakeSwap, V2/V3 routes approve their router and V4/Infinity CL routes go through Permit2 (see above); Aerodrome and Velodrome approve the router used by the swap (the basic pools and both Slipstream generations each have their own); KyberSwap and 1inch approve the aggregator's router directly (MetaAggregationRouterV2 for KyberSwap, AggregationRouterV6 for 1inch), without Permit2. LP and bridge approvals follow this mode too: ```lp.add``` approves the PositionManager and ```bridge.send``` the ```approvalAddress``` of the LI.FI quote.
+```max``` mode saves subsequent approval transactions and the corresponding gas fees, but the router contract will be able to spend the entire balance of that token; choose according to your needs.
+
+The approval target varies by exchange: the V2/V3 paths of Uniswap and PancakeSwap approve their respective router contracts, while the V4/Infinity CL paths approve via Permit2 (see above); Aerodrome and Velodrome approve the router used by the current swap (the basic pools and each generation of Slipstream have their own separate routers); KyberSwap and 1inch approve the aggregator's router contract directly (MetaAggregationRouterV2 for KyberSwap, AggregationRouterV6 for 1inch), without going through Permit2. LP and cross-chain bridge approvals also follow the mode set here: ```lp.add``` approves the PositionManager, and ```bridge.send``` approves the ```approvalAddress``` in the LI.FI quote.
 
 See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `KyberSwap`, `1inch`, `exchange.IO`, `exchange.IO("transfer")`, `exchange.IO("simulate")`, `exchange.IO("gasMultiplier")`
 
@@ -33751,32 +33753,32 @@ Forms:
 
 - `exchange.IO("lp.pools", ...)`
 
-Lists all LP pools of a token (V3 and V4/Infinity CL pools for Uniswap and PancakeSwap, Slipstream and basic pools for Aerodrome and Velodrome), including fee rate, current price, liquidity, TVL and 24-hour trading volume, sorted by TVL in descending order.
+Lists all LP pools for a token (V3 and V4/Infinity CL pools for Uniswap and PancakeSwap; Slipstream and basic pools for Aerodrome and Velodrome). For each pool it returns the fee tier, current price, liquidity, TVL and 24h trading volume. Pools are sorted by TVL, largest first.
 
 Parameters:
 
-- `k` (string, required): Fixed as ```lp.pools```, which lists pools.
-- `token` (string, required): Token name or contract address, e.g. ```ETH```, ```WETH```, ```UNI```. The pool's ```symbol``` is displayed using the spelling given here.
-- `quote` (string, optional): Quote currency, e.g. ```USDC```; when specified, only pools of that trading pair are listed. When omitted, pools formed by the token with the chain's wrapped native token, USDC and USDT are listed.
+- `k` (string, required): Always ```lp.pools```, which lists pools.
+- `token` (string, required): Token name or contract address, e.g. ```ETH```, ```WETH```, ```UNI```. The pool ```symbol``` uses the spelling given here.
+- `quote` (string, optional): Quote currency, e.g. ```USDC```. If set, only pools for that trading pair are listed. If omitted, pools pairing the token with the chain's wrapped native token, USDC and USDT are listed.
 
-Returns (array / null value): Array of pools ```[{id, protocol, dex, symbol, fee, feeRate, tickSpacing, tick, price, liquidity, reserveBase, reserveQuote, tvlQuote, tvlUsd, volume24hUsd, fees24hUsd, empty}]```; see Remarks for field descriptions. Returns a null value when the token cannot be recognized or the node returns an error; the reason can be checked with ```GetLastError()```.
+Returns (array / null): Array of pools ```[{id, protocol, dex, symbol, fee, feeRate, tickSpacing, tick, price, liquidity, reserveBase, reserveQuote, tvlQuote, tvlUsd, volume24hUsd, fees24hUsd, empty}]```. The fields are described in the remarks. Returns null if the token is not recognized or the node returns an error. Call ```GetLastError()``` to get the reason.
 
-List ETH/USDC pools and view the top few by TVL and trading volume.
+List the ETH/USDC pools and look at the few with the highest TVL and volume.
 
 ```javascript
 function main() {
     var pools = exchange.IO("lp.pools", "ETH", "USDC")
     if (!pools) {
-        Log("Query failed:", GetLastError())
+        Log("查询失败:", GetLastError())
         return
     }
     pools.slice(0, 5).forEach(function (p) {
-        Log(p.protocol, p.id, "Fee rate:", p.feeRate, "TVL:", p.tvlUsd, "24h volume:", p.volume24hUsd)
+        Log(p.protocol, p.id, "费率:", p.feeRate, "TVL:", p.tvlUsd, "24h成交:", p.volume24hUsd)
     })
 }
 ```
 
-Uniswap: list the token's V4 pools (including custom-fee pools outside the common combinations), then query the first one by PoolId.
+Uniswap: list a token's V4 pools (including custom-fee pools outside the common pairs), then query the first pool by its PoolId.
 
 ```javascript
 function main() {
@@ -33784,16 +33786,16 @@ function main() {
         return p.protocol == "v4" && !p.empty
     })
     v4.forEach(function (p) {
-        Log(p.symbol, "Fee rate:", p.fee / 10000 + "%", "Tick spacing:", p.tickSpacing, "TVL:", p.tvlUsd)
+        Log(p.symbol, "费率:", p.fee / 10000 + "%", "tick间距:", p.tickSpacing, "TVL:", p.tvlUsd)
     })
     if (v4.length > 0) {
         var pool = exchange.IO("lp.pool", v4[0].id)
-        Log(v4[0].id, pool ? "Fee rate: " + pool.fee : GetLastError())
+        Log(v4[0].id, pool ? "费率: " + pool.fee : GetLastError())
     }
 }
 ```
 
-Aerodrome, Velodrome: among pools whose gauge is still distributing rewards, filter by reward APR.
+Aerodrome, Velodrome: pick pools whose gauge still emits rewards, ranked by reward APR.
 
 ```javascript
 function main() {
@@ -33802,8 +33804,8 @@ function main() {
     })
     pools.sort(function (a, b) { return b.rewardAprPct - a.rewardAprPct })
     pools.slice(0, 3).forEach(function (p) {
-        Log(p.protocol, p.id, "Tick spacing:", p.tickSpacing, "Reward APR %:", p.rewardAprPct,
-            "Staked share:", p.stakedShare)
+        Log(p.protocol, p.id, "tick间距:", p.tickSpacing, "奖励年化%:", p.rewardAprPct,
+            "质押占比:", p.stakedShare)
     })
 }
 ```
@@ -33811,29 +33813,29 @@ function main() {
 Fields of each item in the returned array:
 | Field | Description |
 | - | - |
-| ```id``` | Pool ID: for V3, Slipstream and basic pools it is the pool contract address; for V4/Infinity CL it is the PoolId (```0x``` followed by 64 hex digits); can be passed as the ```pool``` parameter of ```lp.pool```, ```lp.ticks``` and ```lp.plan``` |
-| ```protocol``` | Pool type: ```v3```, ```v4``` (Uniswap V4), ```infinity``` (PancakeSwap Infinity CL); for Aerodrome and Velodrome it is ```slipstream```, ```slipstream2``` (the old and new factory respectively) and the basic pools ```volatile```, ```stable``` |
+| ```id``` | Pool ID. For V3, Slipstream and basic pools this is the pool contract address. For V4/Infinity CL it is the PoolId (```0x``` followed by 64 hex characters). It can be passed to ```lp.pool``` and ```lp.ticks```, and as the ```pool``` parameter of ```lp.plan``` |
+| ```protocol``` | Pool type: ```v3```, ```v4``` (Uniswap V4), ```infinity``` (PancakeSwap Infinity CL). For Aerodrome and Velodrome: ```slipstream```, ```slipstream2```, ```slipstream3``` (Slipstream factory generations 1, 2 and 3; generation 3 exists only on Aerodrome), plus the basic pools ```volatile``` and ```stable``` |
 | ```dex```, ```symbol``` | Exchange name and the pool's trading pair (e.g. ```WETH_USDC```) |
-| ```fee```, ```feeRate``` | Fee rate: ```fee``` is in units of one millionth (500 means 0.05%), ```feeRate``` is in decimal form (0.0005); the fee of Slipstream pools may be dynamic, and the current value is shown here |
-| ```tickSpacing```, ```tick``` | Tick spacing and current tick; basic pools have no ticks and the value is ```null``` |
-| ```price``` | Current price, expressed as quote currency per token |
+| ```fee```, ```feeRate``` | Fee rate. ```fee``` is in millionths (500 = 0.05%) and ```feeRate``` is the decimal form (0.0005). Slipstream pools can have dynamic fees; the value shown is the current fee |
+| ```tickSpacing```, ```tick``` | Tick spacing and current tick. Basic pools have no ticks, so both are ```null``` |
+| ```price``` | Current price, in quote currency per token |
 | ```liquidity``` | Liquidity at the current price (decimal string) |
-| ```reserveBase```, ```reserveQuote``` | Balances of the two tokens in the pool; V4/Infinity CL use a singleton contract, so the value is ```null``` |
-| ```tvlQuote```, ```tvlUsd``` | TVL converted to the quote currency and to USD (data for V4/Infinity CL is taken from GeckoTerminal) |
-| ```volume24hUsd```, ```fees24hUsd``` | 24-hour trading volume and fee income (USD), taken from GeckoTerminal; ```null``` when unavailable |
-| ```empty``` | ```true``` means there is no liquidity at the current price and the current price is not meaningful: ```price```, ```tvlQuote```, ```tvlUsd``` are ```null```, and such pools are placed last |
+| ```reserveBase```, ```reserveQuote``` | Balances of the two tokens in the pool. V4/Infinity CL use a singleton contract, so both are ```null``` |
+| ```tvlQuote```, ```tvlUsd``` | TVL in the quote currency and in USD (for V4/Infinity CL the data comes from GeckoTerminal) |
+| ```volume24hUsd```, ```fees24hUsd``` | 24h trading volume and fee income (USD), from GeckoTerminal; ```null``` if unavailable |
+| ```empty``` | ```true``` means there is no liquidity at the current price, so the price is not meaningful. In that case ```price```, ```tvlQuote``` and ```tvlUsd``` are all ```null``` and the pool is placed at the end of the list |
 
-Each item for Aerodrome and Velodrome additionally includes ```stable``` (whether a basic pool uses the stable curve; ```null``` for Slipstream) and gauge information: ```gauge``` (gauge address), ```gaugeAlive``` (whether the gauge is still distributing rewards), ```stakedShare``` (share of liquidity at the current price staked in the gauge), ```rewardsPerDay```, ```rewardsPerDayUsd``` (amount of reward tokens distributed per day and its USD value), ```rewardAprPct``` (reward APR based on the TVL of the staked portion, in %). The reward APR is extrapolated from the current per-second emission and changes with the reward token price and staked amount, so it is an instantaneous value: for Slipstream pools, ```stakedShare``` is the ratio of staked liquidity to total liquidity at the tick containing the current price; whenever the price moves or positions move in or out of range, this value jumps, and ```rewardAprPct``` may differ several-fold within a few minutes. When using it to select pools or estimate returns, fetch it multiple times at intervals and take the average.
+For Aerodrome and Velodrome, each item also has ```stable``` (whether a basic pool uses the stable curve; ```null``` for Slipstream pools) and gauge fields: ```gauge``` (gauge address), ```gaugeAlive``` (whether the gauge still emits rewards), ```stakedShare``` (share of the liquidity at the current price that is staked in the gauge), ```rewardsPerDay``` and ```rewardsPerDayUsd``` (reward tokens emitted per day and their USD value), and ```rewardAprPct``` (reward APR based on the TVL of the staked portion, in %). The reward APR is projected from the current per-second emission rate. It changes with the reward token price and the amount staked, so it is only a snapshot. For Slipstream pools, ```stakedShare``` is the staked share of the in-range liquidity at the current tick. It jumps whenever the price moves or positions enter or leave the range, and ```rewardAprPct``` can change several times over within minutes. If you use it to choose a pool or estimate returns, fetch it several times over a period and average the results.
 
-For V4/Infinity CL pools of Uniswap and PancakeSwap, only pools without hooks are listed; neither has fixed fee tiers.
+For Uniswap and PancakeSwap V4/Infinity CL pools, only pools without hooks are listed. Neither protocol has fixed fee tiers.
 
-Uniswap V4: native-token pools and wrapped-token pools are listed separately (e.g. ```ETH_USDC``` and ```WETH_USDC```). The listed pools include pools on common fee/tick spacing combinations (0.01%/1, 0.02%/4, 0.03%/6, 0.04%/8, 0.05%/10, 0.3%/60, 1%/200), as well as pools with custom fees and spacings: the PoolIds of Uniswap V4 pools are obtained from the token's pool list on GeckoTerminal (top 40 sorted by volume and liquidity), then the PoolKey is looked up on-chain via PositionManager's ```poolKeys``` and the PoolId is verified, keeping only pools without hooks (e.g. the CASHCAT/USDG 0.269% pool with spacing 54 on Robinhood). There is no upper limit on fees, so high-fee pools such as 2% are also listed. When both the token and the quote currency are routing tokens (wrapped native tokens and stablecoins such as USDC and USDT, e.g. ```lp.pools("ETH", "USDC")```), only common combinations are listed; query results are cached for 1 hour; when GeckoTerminal is temporarily unavailable (e.g. rate-limited), only common combinations are listed and it is retried after 5 minutes. The list may still miss pools: pools not indexed by GeckoTerminal or not in the top 40, and pools for which no position has ever been created on PositionManager (```poolKeys``` cannot find the PoolKey), will not be listed. For hookless pools outside the list, the PoolId can be passed directly to ```lp.pool``` or ```lp.plan``` (```pool``` parameter), provided likewise that its PoolKey can be found on PositionManager.
+Uniswap V4: native-token pools and wrapped-token pools are listed separately (e.g. ```ETH_USDC``` and ```WETH_USDC```). The list includes pools on the common fee/tick-spacing pairs (0.01%/1, 0.02%/4, 0.03%/6, 0.04%/8, 0.05%/10, 0.3%/60, 1%/200) and pools with custom fees and spacings. Custom pools are found this way: the PoolIds of Uniswap V4 pools are taken from the token's pool list on GeckoTerminal (the top 40 by volume and liquidity). Each PoolKey is then looked up on-chain through the PositionManager's ```poolKeys``` and checked against the PoolId. Only pools without hooks are kept (e.g. the CASHCAT/USDG 0.269% pool with tick spacing 54 on Robinhood). There is no fee cap, so high-fee pools such as 2% are also listed. If both the token and the quote currency are routing tokens (wrapped native tokens and stablecoins such as USDC and USDT, e.g. ```lp.pools("ETH", "USDC")```), only the common pairs are listed. Results are cached for 1 hour. If GeckoTerminal is temporarily unavailable (e.g. rate-limited), only the common pairs are listed and the lookup is retried after 5 minutes. The list can still miss pools: pools that GeckoTerminal does not index or that are not in the top 40, and pools that have never had a position created on the PositionManager (so ```poolKeys``` returns no PoolKey). For a hookless pool that is not listed, pass its PoolId directly to ```lp.pool``` or ```lp.plan``` (```pool``` parameter). This also requires that its PoolKey can be found on the PositionManager.
 
-PancakeSwap Infinity CL: only pools with fees not exceeding 1% are listed; the listed pools are those collected from recent on-chain trades during swap routing, as well as pools used by this process. Other pools can be passed directly by PoolId to ```lp.pool``` or ```lp.plan```.
+PancakeSwap Infinity CL: only pools with fees of 1% or less are listed. The list contains pools collected from recent on-chain trades during swap routing and pools this process has already used. For any other pool, pass its PoolId directly to ```lp.pool``` or ```lp.plan```.
 
-GeckoTerminal data is cached in-process for 5 minutes and shared by ```lp.select``` and ```lp.plan```; when rate-limited, it waits briefly and retries once; if it still fails, the corresponding fields are ```null```.
+GeckoTerminal data is cached in the process for 5 minutes and shared by ```lp.select``` and ```lp.plan```. If rate-limited, the request waits briefly and retries once. If that also fails, the related fields are ```null```.
 
-KyberSwap and 1inch exchange objects (aggregators) do not support LP commands; calling them raises the error ```LP functions are not available for KyberSwap on Base```.
+The KyberSwap and 1inch exchange objects (aggregators) do not support LP commands. Calling one raises the error ```LP functions are not available for KyberSwap on Base```.
 
 See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("lp.select")`, `exchange.IO("lp.pool")`, `exchange.IO("lp.plan")`, `exchange.IO("lp.positions")`
 
@@ -33848,18 +33850,18 @@ Forms:
 
 - `exchange.IO("lp.select", ...)`
 
-Automatically selects an LP pool by rule: chooses the pool with the highest 24h trading volume among pools with sufficient liquidity, or the pool with a specified fee tier.
+Automatically selects an LP pool by rule: among pools with sufficient liquidity, it picks the one with the largest 24-hour trading volume, or it picks the pool with a specified fee tier.
 
 Parameters:
 
-- `k` (string, required): Fixed as ```lp.select```, used to select a pool.
+- `k` (string, required): Always ```lp.select```, which runs the pool-selection operation.
 - `token` (string, required): Token name or contract address, e.g. ```ETH```.
-- `budget` (number, required): Budget, denominated in the quote currency, used to set the liquidity threshold: the pool's TVL must be at least the greater of 5,000 USD and the budget.
-- `options` (object, optional): Pool selection criteria ```{quote, fee, exact, protocol, tickSpacing}```. Every field is optional; see the remarks for details.
+- `budget` (number, required): Budget in the quote currency, used to set the liquidity threshold: a pool's TVL must be at least $5,000 or the budget, whichever is larger.
+- `options` (object, optional): Pool-selection criteria ```{quote, fee, exact, protocol, tickSpacing}```. Each field is optional. See the remarks for details.
 
-Returns (object / null value): The selected pool: one entry from the ```lp.pools``` result, plus a ```reason``` field (why it was selected). Returns null and reports an error when no pool has liquidity, when the specified fee tier does not exist (with ```exact``` set to ```true```), and in similar cases.
+Returns (object / null value): The selected pool, which is one entry from the result of ```lp.pools```, with an added ```reason``` (the reason it was selected). If no pool has liquidity, or the specified fee tier does not exist (when ```exact``` is ```true```), and in similar cases, a null value is returned and an error is reported.
 
-Select an ETH/USDC pool, then separately select one among V4 pools.
+Select an ETH/USDC pool, then separately select one from V4 pools only.
 
 ```javascript
 function main() {
@@ -33869,27 +33871,26 @@ function main() {
         return
     }
     Log("Selected:", p.protocol, p.id, "Fee rate:", p.feeRate, "Reason:", p.reason)
-    // Select only among V4 pools (use infinity for PancakeSwap, slipstream etc. for Aerodrome and Velodrome)
+    // Select from V4 pools only (use infinity for PancakeSwap, slipstream etc. for Aerodrome/Velodrome)
     var v4 = exchange.IO("lp.select", "ETH", 1000, {quote: "USDC", protocol: "v4"})
     Log("V4 pool:", v4 ? v4.id : GetLastError())
 }
 ```
 
 Fields of ```options```:
-
 | Key | Description |
 | - | - |
-| ```quote``` | Quote currency, e.g. ```USDC```; if omitted, pools pairing the token with the chain's wrapped native token, USDC or USDT are all compared |
+| ```quote``` | Quote currency, e.g. ```USDC```. If omitted, all pools that pair the token with the chain's wrapped native token, USDC or USDT are compared |
 | ```fee``` | Preferred fee tier, in millionths, e.g. ```500``` |
 | ```exact``` | When ```true```, only the fee tier given by ```fee``` is used |
-| ```protocol``` | Pool type, a string or an array: ```v3``` or ```v4``` for Uniswap; ```v3``` or ```infinity``` for PancakeSwap; ```slipstream```, ```slipstream2```, ```volatile``` or ```stable``` for Aerodrome and Velodrome |
+| ```protocol``` | Pool type, as a string or an array: ```v3``` or ```v4``` for Uniswap; ```v3``` or ```infinity``` for PancakeSwap; ```slipstream```, ```slipstream2```, ```slipstream3``` (Aerodrome only), ```volatile``` or ```stable``` for Aerodrome and Velodrome |
 | ```tickSpacing``` | Only selects pools with this tick spacing (mainly for Slipstream, whose pools are distinguished by tick spacing) |
 
-Selection rules: first, empty pools and pools that do not match ```protocol``` or ```tickSpacing``` are excluded. If ```fee``` is specified, the pool with that fee tier is selected if it meets the liquidity threshold (```reason``` is ```fee tier 500 requested```); with ```exact``` set to ```true``` it is selected even if it does not meet the threshold; if no pool with that fee tier exists, an error is reported. Otherwise, among pools whose TVL is at least the greater of 5,000 USD and the budget, the one with the highest 24h trading volume is selected (```largest 24h volume among pools with enough liquidity```); if there is no volume data, the pool with the highest TVL is selected. If no pool meets the threshold, the pool with the highest TVL is selected and this is stated in ```reason```.
+Selection rules: first, empty pools and pools that do not match ```protocol``` or ```tickSpacing``` are excluded. If ```fee``` is specified, the pool with that fee tier is selected when it meets the liquidity threshold (```reason``` is ```fee tier 500 requested```). When ```exact``` is ```true```, that pool is selected even if it does not meet the threshold, and an error is reported if no pool with that fee tier exists. Otherwise, among pools whose TVL is at least $5,000 or the budget, whichever is larger, the pool with the largest 24-hour trading volume is selected (```largest 24h volume among pools with enough liquidity```). If there is no volume data, the pool with the largest TVL is selected. If no pool meets the threshold, the pool with the largest TVL is selected and this is noted in ```reason```.
 
-The candidate pools are the pools listed by ```lp.pools``` (see the ```lp.pools``` page for where Uniswap V4 pools come from and when some may be missing). To use a pool not on that list, pass its PoolId directly as the ```pool``` of ```lp.plan```.
+The candidate pools are the pools listed by ```lp.pools``` (see the ```lp.pools``` page for where Uniswap V4 pools come from and which pools may be missing). To use a pool that is not on the list, pass its PoolId directly as the ```pool``` parameter of ```lp.plan```.
 
-When ```exchange.IO("lp.plan", ...)``` is called without ```pool```, it selects a pool by the same rules (```fee``` and ```tickSpacing``` are taken from the plan parameters; for Aerodrome and Velodrome, if ```range``` is specified, only Slipstream pools are considered). To open a position in a V4/Infinity CL pool on Uniswap or PancakeSwap, first select the pool with ```protocol```, then pass its ```id``` as the plan's ```pool```.
+When ```exchange.IO("lp.plan", ...)``` does not specify ```pool```, it selects a pool by the same rules (```fee``` and ```tickSpacing``` come from the plan parameters; for Aerodrome and Velodrome, only Slipstream pools are considered when ```range``` is specified). To open a position in a V4/Infinity CL pool on Uniswap or PancakeSwap, first select the pool with ```protocol```, then pass its ```id``` as the plan's ```pool```.
 
 See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("lp.pools")`, `exchange.IO("lp.plan")`, `exchange.IO("lp.pool")`
 
@@ -33994,16 +33995,16 @@ Forms:
 
 - `exchange.IO("lp.plan", ...)`
 
-Builds a position plan (read-only, costs nothing): from a budget, a price range and a shape, it computes each position's range, liquidity and token amounts, whether the wallet covers them and what must be swapped first.
+Generates a position-opening plan (read-only operation, no funds are spent): based on the budget, price range and liquidity distribution shape, it calculates the price range, liquidity and amounts of both tokens for each position, and checks whether the wallet balance is sufficient and how many tokens still need to be swapped.
 
 Parameters:
 
-- `k` (string, required): Set to ```lp.plan``` to build a plan.
-- `params` (object, required): Plan parameters such as ```{symbol: "ETH_USDC", budget: 100, range: {pct: [-5, 5]}}```; ```symbol``` and ```budget``` are required, and concentrated-liquidity pools also need ```range```; see the remarks.
+- `k` (string, required): Fixed as ```lp.plan```, indicating generation of a position-opening plan.
+- `params` (object, required): Plan parameters, e.g. ```{symbol: "ETH_USDC", budget: 100, range: {pct: [-5, 5]}}```; ```symbol``` and ```budget``` are required, and concentrated liquidity pools also require ```range```. See the remarks for details on each parameter.
 
-Returns (object / null value): The plan; see the remarks for its fields. Pass it unchanged to ```lp.simulate``` or ```lp.add```. Null with an error for bad parameters, an unknown pool or no liquidity at the current price. When the wallet falls short the plan is still returned, with ```shortfall``` explaining it.
+Returns (object / null): Plan object; see the remarks for a description of each field. It can be passed directly to ```lp.simulate``` and ```lp.add```. If the parameters are invalid, the pool does not exist, or there is no liquidity at the current price, null is returned and an error is reported. If the wallet balance is insufficient, the plan is still returned, with the shortfall given in the ```shortfall``` field.
 
-Plan a ±5% range position in the chosen pool and see the funds needed and whether the wallet covers them.
+Plan a position in the selected pool with a range of ±5% around the current price, and check the required funds and whether the wallet balance is sufficient.
 
 ```javascript
 function main() {
@@ -34015,26 +34016,26 @@ function main() {
         return
     }
     var p = plan.positions[0]
-    Log("Range:", p.priceLower, "~", p.priceUpper, "price:", plan.price)
-    Log("Needs:", plan.needBase, "ETH +", plan.needQuote, "USDC")
+    Log("Range:", p.priceLower, "~", p.priceUpper, "Current price:", plan.price)
+    Log("Required:", plan.needBase, "ETH +", plan.needQuote, "USDC")
     Log("Estimated daily fees:", plan.estDailyFeesUsd, "USD")
     if (plan.swap) {
-        Log("Swap first:", plan.swap.side, plan.swap.amount, plan.swap.currency)
+        Log("Before opening the position, first", plan.swap.side, plan.swap.amount, plan.swap.currency)
     }
     if (plan.shortfall) {
-        Log("Wallet short:", plan.shortfall)
+        Log("Insufficient wallet balance:", plan.shortfall)
     }
 }
 ```
 
-A three-layer curve: the positions near the price are the thickest.
+Three-layer curve shape: the closer a position is to the current price, the more funds it is allocated.
 
 ```javascript
 function main() {
     var plan = exchange.IO("lp.plan", {symbol: "ETH_USDC", budget: 100, range: {pct: [-5, 5]},
         shape: "curve", layers: 3})
     plan.positions.forEach(function (p) {
-        Log(p.priceLower, "~", p.priceUpper, "share of budget:", p.share)
+        Log(p.priceLower, "~", p.priceUpper, "Share of budget:", p.share)
     })
     if (plan.warning) {
         Log(plan.warning)
@@ -34042,57 +34043,55 @@ function main() {
 }
 ```
 
-Aerodrome and Velodrome: a plan without range is a basic (volatile) pool plan.
+Aerodrome, Velodrome: when range is not specified, planning is done against the basic pool (volatile).
 
 ```javascript
 function main() {
     var plan = exchange.IO("lp.plan", {symbol: "ETH_USDC", budget: 100, stable: false})
-    Log(plan.protocol, plan.pool, "deposit:", plan.amountBase, "ETH +", plan.amountQuote, "USDC",
-        "LP tokens:", plan.lpTokens)
+    Log(plan.protocol, plan.pool, "Deposit:", plan.amountBase, "ETH +", plan.amountQuote, "USDC",
+        "LP tokens received:", plan.lpTokens)
 }
 ```
 
-Keys of ```params```:
-
-| Key | Description |
+Fields of ```params```:
+| Parameter | Description |
 | - | - |
-| ```symbol``` | Pair such as ```ETH_USDC```; prices are quote per base |
-| ```budget``` | Budget in the quote token |
-| ```range``` | Price range, in one of three forms: ```{lower, upper}``` prices; ```{pct: [-5, 5]}``` percent around the current price; ```{ticks: [lo, hi]}``` ticks. Aligned to the pool's tick spacing |
-| ```shape``` | ```spot``` (default) one range; ```curve``` nested layers, thickest at the price; ```bidask``` segments on both sides, thicker further out |
-| ```layers``` | Number of layers for ```curve``` and ```bidask```, default 3, at most 20 |
-| ```pool``` | Pool ID; when omitted the pool is picked by the ```lp.select``` rule (using ```fee``` and ```tickSpacing``` below) |
-| ```fee``` | Preferred fee tier when picking the pool (millionths) |
-| ```slippage``` | Price protection, default ```0.01``` (1%), at most 0.5 |
-| ```tickSpacing```, ```protocol``` | Aerodrome and Velodrome: filters when picking a Slipstream pool; ```protocol``` defaults to ```["slipstream", "slipstream2"]``` |
-| ```stable``` | Aerodrome and Velodrome basic-pool plan: ```true``` a stable pool, ```false``` a volatile pool; both when omitted |
-| ```stake``` | Aerodrome and Velodrome: ```true``` makes ```lp.add``` stake into the gauge right after adding |
+| ```symbol``` | Trading pair, e.g. ```ETH_USDC```; prices are expressed as "quote currency/base currency" |
+| ```budget``` | Budget, denominated in the quote currency |
+| ```range``` | Price range, in one of three forms: ```{lower, upper}``` as prices; ```{pct: [-5, 5]}``` as percentages relative to the current price; ```{ticks: [lo, hi]}``` as ticks. All are aligned to the pool's tick spacing |
+| ```shape``` | Shape: ```spot``` (default) is a single range; ```curve``` is multiple nested layers, thickest near the current price; ```bidask``` is segmented on both sides, getting thicker the farther it is from the current price |
+| ```layers``` | Number of layers for ```curve``` and ```bidask```, default 3, maximum 20 |
+| ```pool``` | Pool ID; when not specified, the pool is selected using the rules of ```lp.select``` (which use ```fee``` and ```tickSpacing``` below) |
+| ```fee``` | Preferred fee tier when selecting a pool (in units of one millionth) |
+| ```slippage``` | Price protection ratio, default ```0.01``` (1%), maximum 0.5 |
+| ```tickSpacing```, ```protocol``` | Filters for selecting Slipstream pools on Aerodrome and Velodrome; ```protocol``` defaults to all Slipstream versions on that exchange (```["slipstream", "slipstream2", "slipstream3"]``` for Aerodrome, ```["slipstream", "slipstream2"]``` for Velodrome) |
+| ```stable``` | Aerodrome and Velodrome basic-pool plans: ```true``` for stable pools, ```false``` for volatile pools; both are considered when not specified |
+| ```stake``` | Aerodrome and Velodrome: when ```true```, ```lp.add``` stakes the position in the gauge right after opening it |
 
-Fields of the plan:
-
+Fields of the plan object:
 | Field | Description |
 | - | - |
-| ```params``` | The parameters, echoed |
-| ```symbol```, ```pool```, ```protocol```, ```fee```, ```tickSpacing```, ```tick```, ```price``` | The chosen pool and the current price |
-| ```shape```, ```layers```, ```layersRequested``` | Shape, actual and requested layer count; ```warning``` explains a count below the request |
-| ```budget```, ```budgetUsd``` | Budget in the quote token and in USD |
-| ```positions``` | Each position ```{tickLower, tickUpper, priceLower, priceUpper, liquidity, amountBase, amountQuote, share}```, ```share``` being its part of the budget |
-| ```needBase```, ```needQuote``` | Token amounts the positions need |
-| ```haveBase```, ```haveQuote``` | Amounts available in the wallet |
-| ```swap``` | The swap needed first, ```{side, amount, currency}``` (```sell``` sells base, ```buy``` buys base), or ```null``` |
-| ```payWith``` | With a native pair, the coin that pays the wrapped-token side (such as ```ETH``` or ```WETH```); otherwise ```null``` |
-| ```shortfall``` | Why the wallet falls short, or ```null```; ```lp.add``` fails while it is set. Its content is described under Funding below |
-| ```shareOfPool``` | Share of the pool's liquidity at the current price after adding |
-| ```volume24hUsd```, ```estDailyFeesUsd``` | The pool's 24h volume and the daily fees estimated from the pool share (USD), an extrapolation of past volume |
-| ```slippageBps``` | Price protection in basis points |
+| ```params``` | Plan parameters, echoed back as is |
+| ```symbol```, ```pool```, ```protocol```, ```fee```, ```tickSpacing```, ```tick```, ```price``` | The selected pool and its current price |
+| ```shape```, ```layers```, ```layersRequested``` | Shape, actual number of layers and requested number of layers; when fewer layers are used than requested, a ```warning``` explains why |
+| ```budget```, ```budgetUsd``` | Budget (in the quote currency and in USD, respectively) |
+| ```positions``` | Each position ```{tickLower, tickUpper, priceLower, priceUpper, liquidity, amountBase, amountQuote, share}```, where ```share``` is that position's share of the budget |
+| ```needBase```, ```needQuote``` | Amounts of the two tokens needed to open the positions |
+| ```haveBase```, ```haveQuote``` | Available amounts in the wallet |
+| ```swap``` | The swap needed before opening the positions ```{side, amount, currency}``` (```sell``` sells the base currency, ```buy``` buys the base currency); ```null``` when no swap is needed |
+| ```payWith``` | When the trading pair names the native coin, which coin pays for the wrapped-token side (e.g. ```ETH``` or ```WETH```); ```null``` otherwise |
+| ```shortfall``` | Explanation when the wallet balance is insufficient; ```null``` when the balance is sufficient. If this field is present, ```lp.add``` returns an error. See "Funds" below for its contents |
+| ```shareOfPool``` | Share of the pool's liquidity at the current price after the positions are opened |
+| ```volume24hUsd```, ```estDailyFeesUsd``` | The pool's 24-hour trading volume, and the estimated daily fees (USD) based on the share of the pool, extrapolated from historical volume only |
+| ```slippageBps``` | Price protection (in basis points) |
 
-Funding: a token the wallet lacks is bought with the other one (1% extra), ```swap``` gives the amount and ```lp.add``` places that market order first; when the two tokens together do not cover the budget, ```shortfall``` explains it: the two amounts the plan deposits (the same as ```needBase``` and ```needQuote```), what the wallet holds (```haveBase```, ```haveQuote```) and its value in the quote token at the pool price, and, when the missing token has to be bought with the other one, how much of that other token is needed in all (deposit plus swap cost, with 1% headroom) and how much is missing. For example, with a budget of 100 USDC, a plan depositing 0.02 ETH + 50 USDC and a wallet holding only 60 USDC, it says that buying the missing 0.02 ETH takes about 50.5 USDC, so the USDC side needs 100.5 USDC in all (50 to deposit + 50.5 for the swap) and is 40.5 USDC short. About 3 million gas at the current gas price is kept back from the native coin for fees. In V3 and Slipstream pools the native coin takes part as its wrapped token, so with a native pair (such as ```ETH_USDC```) the wrapped-token side is paid either entirely in the native coin or entirely in the wrapped token, never a mix: the native coin when it covers the whole side, otherwise the wrapped token when that does, and when neither does the larger balance is used for the calculation; ```payWith``` is the coin actually used. In V4/Infinity CL native and wrapped pools are different pools, each using its own coin.
+Funds: whichever token the wallet is short of is obtained by swapping the other token (swapping 1% extra); ```swap``` gives the amount to swap, and ```lp.add``` places this market order first when executing. When the two tokens combined still fall short of the budget, ```shortfall``` describes the gap, including: the planned deposit amounts of the two tokens (same as ```needBase``` and ```needQuote```), the amounts currently in the wallet (```haveBase```, ```haveQuote```) and their value in the quote currency at the pool price; if the missing token must be obtained by swapping the other one, it also states how much of the token used for the swap is needed in total (deposit amount plus swap cost, including the 1% margin) and how much is still missing. For example, with a budget of 100 USDC, a planned deposit of 0.02 ETH + 50 USDC and only 60 USDC in the wallet, the explanation states: buying the missing 0.02 ETH costs about 50.5 USDC, the USDC side needs 100.5 USDC in total (deposit 50 + swap 50.5), and 40.5 USDC is still missing. For the native coin, a fee of about 3 million gas at the current gas price is reserved, and only the remainder counts as available. In V3 and Slipstream pools the native coin takes part in its wrapped form. When the trading pair names the native coin (e.g. ```ETH_USDC```), the wrapped-token side is paid either entirely in the native coin or entirely in the wrapped token, never a mix: the native coin is used if it covers that side in full, otherwise the wrapped token is used if it is sufficient, and if neither is sufficient the one with the larger balance is used for the calculation; ```payWith``` is the coin actually used. In V4/Infinity CL pools, native-coin pools and wrapped-token pools are two different pools, and each uses its own coin.
 
-Pool choice: without ```pool``` the pool is picked by the ```lp.select``` rule every time, and ```lp.simulate``` and ```lp.add``` recompute a plan from its ```params``` (at the latest pool price), so they may pick another pool; to add to the pool you looked at, put ```pool``` in ```params```. V4/Infinity CL pools on Uniswap and PancakeSwap always need ```pool``` (from ```lp.select``` with ```{protocol: "v4"}``` or ```{protocol: "infinity"}```).
+Pool selection: when ```pool``` is not specified, the pool is reselected each time using the rules of ```lp.select```; after ```lp.simulate``` and ```lp.add``` receive a plan, they also recalculate from its ```params``` (using the latest pool price), so a different pool may be selected. To open positions in a pool you viewed earlier, specify ```pool``` in ```params```. On Uniswap and PancakeSwap, ```pool``` must be specified when using V4/Infinity CL pools (taken from the results of ```lp.select``` with ```{protocol: "v4"}``` or ```{protocol: "infinity"}```).
 
-Range and shape: a range above the current price holds only the base token and one below it only the quote token; ```estDailyFeesUsd``` is then 0, and fees are earned once the price enters the range. ```curve``` layers all cross the current price, are distinct and aligned to the tick spacing, nesting inward first and filling with the range's other price-crossing combinations when nesting runs out; a two-sided range holds at most (legal lower bounds below the price) × (legal upper bounds above it) layers, and beyond that the plan gives as many as fit.
+Range and shape: when the range sits above the current price, the entire position is held in the base currency; when it sits below the current price, the entire position is held in the quote currency. In either case ```estDailyFeesUsd``` is 0, and the position earns fees only after the price moves back into the range. Each layer of ```curve``` must span the current price, be distinct from the others and be aligned to the tick spacing. Layers are nested inward one by one where possible; when they cannot be arranged that way, other combinations within the range that span the current price fill the remaining layers. A two-sided range can hold at most "number of valid lower bounds below the current price × number of valid upper bounds above the current price" layers; if more are requested, the maximum number of layers that fit is returned.
 
-Aerodrome and Velodrome: a ```range``` means a Slipstream pool; without ```range``` (or with a basic ```pool```) the plan is for a basic pool, depositing both tokens in the reserve ratio, and is ```{params, symbol, pool, protocol, stable, fee, price, budget, budgetUsd, needBase, needQuote, haveBase, haveQuote, amountBase, amountQuote, lpTokens, swap, shortfall, shareOfPool, volume24hUsd, estDailyFeesUsd, slippageBps}```, ```lpTokens``` being the expected LP tokens. ```stake``` ```true``` stakes right after adding (see `exchange.IO("lp.stake")`).
+Aerodrome, Velodrome: when ```range``` is specified, a Slipstream pool is used. When ```range``` is not specified (or ```pool``` is a basic pool), a basic pool plan is generated: both tokens are deposited in proportion to the pool reserves, and the plan is ```{params, symbol, pool, protocol, stable, fee, price, budget, budgetUsd, needBase, needQuote, haveBase, haveQuote, amountBase, amountQuote, lpTokens, swap, shortfall, shareOfPool, volume24hUsd, estDailyFeesUsd, slippageBps}```, where ```lpTokens``` is the estimated number of LP tokens to be received. When ```stake``` is ```true```, the position is staked right after it is opened (see `exchange.IO("lp.stake")`).
 
 See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("lp.select")`, `exchange.IO("lp.simulate")`, `exchange.IO("lp.add")`, `exchange.IO("lp.pools")`
 
@@ -34167,16 +34166,16 @@ Forms:
 
 - `exchange.IO("lp.add", ...)`
 
-Adds liquidity by a plan: swaps first when needed, approves, creates every position of the plan in one transaction and returns the position IDs once it is mined.
+Open positions according to a plan: swap tokens first if needed, then grant approvals, and then create all positions in the plan in a single transaction. Returns the position IDs once the transaction is confirmed on-chain.
 
 Parameters:
 
-- `k` (string, required): Set to ```lp.add``` to add liquidity.
-- `plan` (object, required): A plan returned by ```exchange.IO("lp.plan", ...)```, or its ```params```; it is recomputed from ```params``` at the latest pool price.
+- `k` (string, required): Fixed as ```lp.add```, which opens positions.
+- `plan` (object, required): The plan returned by ```exchange.IO("lp.plan", ...)```, or that plan's parameters ```params```. At execution time, the plan is recalculated from ```params``` using the latest pool price.
 
-Returns (object / null value): ```{txHash, swapTxHash, pool, positions: [{id, tickLower, tickUpper, priceLower, priceUpper, liquidity, amountBase, amountQuote}]}```: ```txHash``` is the add transaction, ```swapTxHash``` the swap before it (```null``` without one), and ```id``` in ```positions``` the position ID. Null with an error on failure.
+Returns (object / null): ```{txHash, swapTxHash, pool, positions: [{id, tickLower, tickUpper, priceLower, priceUpper, liquidity, amountBase, amountQuote}]}```: ```txHash``` is the hash of the position-opening transaction, ```swapTxHash``` is the hash of the swap transaction executed before opening the positions (```null``` if no swap was made), and ```id``` in ```positions``` is the position ID. Returns null and reports an error on failure.
 
-Add a ±5% position in the chosen pool.
+In the selected liquidity pool, open a position with a price range of ±5% around the current price.
 
 ```javascript
 function main() {
@@ -34184,31 +34183,30 @@ function main() {
     var params = {symbol: "ETH_USDC", budget: 200, pool: sel.id, range: {pct: [-5, 5]}}
     var plan = exchange.IO("lp.plan", params)
     if (!plan || plan.shortfall) {
-        Log("Cannot add:", plan ? plan.shortfall : GetLastError())
+        Log("Unable to open position:", plan ? plan.shortfall : GetLastError())
         return
     }
     var r = exchange.IO("lp.add", plan)
     if (!r) {
-        Log("Adding failed:", GetLastError())
+        Log("Failed to open position:", GetLastError())
         return
     }
     r.positions.forEach(function (p) {
-        Log("Position", p.id, "range", p.priceLower, "~", p.priceUpper,
-            "uses", p.amountBase, "ETH +", p.amountQuote, "USDC")
+        Log("Position", p.id, "range", p.priceLower, "~", p.priceUpper, "deposited", p.amountBase, "ETH +",
+            p.amountQuote, "USDC")
     })
 }
 ```
 
-A complete LP strategy: pick a pool, plan, simulate and add; check the positions every minute, collect fees once they are large enough, and withdraw and re-add after the price stays out of range.
+A complete LP strategy: select a pool, build a plan, simulate, open the position, and check it once a minute. Collect fees when enough have accrued, and when the position stays out of range for too long, withdraw and reopen it.
 
 ```javascript
-// The complete LP flow: pick a pool → plan → simulate → add → monitor → collect fees
-// → withdraw and re-add after the price leaves the range
+// Full concentrated-liquidity workflow: select pool → build plan → simulate → open position → monitor → collect fees → withdraw and reopen once out of range
 var SYMBOL = "ETH_USDC"
-var BUDGET = 200              // budget of each position (USDC)
-var RANGE = {pct: [-5, 5]}    // ±5% around the price
-var OUT_LIMIT = 30            // withdraw and re-add after this many checks (minutes) out of range
-var MIN_FEES = 5              // collect once uncollected fees exceed this many USDC
+var BUDGET = 200              // Budget per position opening (USDC)
+var RANGE = {pct: [-5, 5]}    // ±5% around the current price
+var OUT_LIMIT = 30            // Withdraw and reopen after this many consecutive out-of-range checks (1 minute apart)
+var MIN_FEES = 5              // Collect when uncollected fees exceed this amount (USDC)
 
 function open() {
     var sel = exchange.IO("lp.select", "ETH", BUDGET, {quote: "USDC"})
@@ -34218,31 +34216,30 @@ function open() {
     }
     var plan = exchange.IO("lp.plan", {symbol: SYMBOL, budget: BUDGET, pool: sel.id, range: RANGE})
     if (!plan || plan.shortfall) {
-        Log("Cannot add:", plan ? plan.shortfall : GetLastError())
+        Log("Cannot open position:", plan ? plan.shortfall : GetLastError())
         return null
     }
-    Log("Pool", plan.pool, plan.protocol, "est. daily fees", plan.estDailyFeesUsd, "USD")
-    // a plan that needs a swap cannot be simulated before the swap (lp.add swaps first)
+    Log("Pool", plan.pool, plan.protocol, "estimated daily fees", plan.estDailyFeesUsd, "USD")
+    // If the plan needs a token swap first, the wallet does not hold the swapped tokens yet at simulation time, so skip the simulation (lp.add performs the swap first)
     if (!plan.swap && !exchange.IO("lp.simulate", plan)) {
         Log("Simulation failed:", GetLastError())
         return null
     }
     var r = exchange.IO("lp.add", plan)
     if (!r) {
-        Log("Adding failed:", GetLastError())
+        Log("Failed to open position:", GetLastError())
         return null
     }
     var ids = r.positions.map(function (p) { return p.id })
-    _G("lpIds", ids)    // keep the IDs to find the positions again after a restart
-    Log("Added", ids, "transaction", r.txHash)
+    _G("lpIds", ids)    // Save the position IDs; restore them with lp.track after a restart
+    Log("Position opened", ids, "tx", r.txHash)
     return ids
 }
 
 function main() {
     var ids = _G("lpIds")
     if (ids) {
-        // lets lp.positions find V4/Infinity CL and Aerodrome/Velodrome positions after a restart
-        exchange.IO("lp.track", ids)
+        exchange.IO("lp.track", ids)   // V4/Infinity CL and Aerodrome/Velodrome positions rely on this to be restored after a restart
     }
     var outCount = 0
     while (true) {
@@ -34266,14 +34263,13 @@ function main() {
             fees += p.feesValue
             inRange = inRange || p.inRange
         })
-        LogStatus(_D(), "positions", ids, inRange ? "in range" : "out of range",
-            "fees", fees, "USDC")
+        LogStatus(_D(), "Positions", ids, inRange ? "in range" : "out of range", "uncollected fees" , fees, "USDC")
         if (fees > MIN_FEES) {
             exchange.IO("lp.collect", ids)
         }
         outCount = inRange ? 0 : outCount + 1
         if (outCount >= OUT_LIMIT) {
-            // withdraw everything and sell the returned ETH for USDC; re-add in the next round
+            // Withdraw everything and swap the returned ETH to USDC; reopen on the next loop
             var r = exchange.IO("lp.remove", ids, 1, true)
             Log("Withdrawn", r ? r.txHash : GetLastError())
             ids = null
@@ -34285,17 +34281,17 @@ function main() {
 }
 ```
 
-Steps: the plan is recomputed at the latest pool price, and a plan with ```shortfall``` fails without sending anything → the needed swap goes first as a market order (```swapTxHash```) → approvals: V3 and Slipstream approve the PositionManager, V4/Infinity CL approve Permit2 and then grant the PositionManager an allowance inside Permit2, following ```exchange.IO("approve")``` ```exact```/```max``` → one transaction creates every position, and the call returns once it is mined. If a step after the swap fails, the error says the swap already went through (the swapped tokens stay in the wallet).
+Execution steps: recalculate the plan using the latest pool price; if the plan has a ```shortfall```, an error is reported and no transaction is sent → if needed, swap tokens first with a market order (```swapTxHash```) → approve: V3 and Slipstream approve the PositionManager; V4/Infinity CL first approve Permit2, then set an allowance for the PositionManager in Permit2; the approval mode is the same as the ```exact```/```max``` options of ```exchange.IO("approve")``` → create all positions in a single transaction and return once it is confirmed on-chain. If a step after the swap fails, the error message states that the swap has already been completed (the swapped tokens remain in the wallet).
 
-Price protection and payment: each position pays at most its planned amounts plus slippage (the plan's ```slippage```, 1% by default, within what the wallet holds), and the whole transaction reverts (costing only gas) when price moves make it use less than the planned amounts × (1 − slippage). In V3 and Slipstream pools with a native pair the wrapped-token side is paid as the plan's ```payWith``` says: entirely in the native coin (sent with the transaction, the excess refunded by ```refundETH```) or entirely in the wrapped token; collected amounts later come back as the wrapped token. V4/Infinity CL native pools use and return the native coin. About 3 million gas at the current gas price is kept back from the native coin for fees.
+Price protection and payment: the maximum payment for each position is the planned amount plus slippage (slippage is the plan's ```slippage```, default 1%; the maximum payment does not exceed the wallet's available balance). If a price move at execution time causes the deposited amount to fall below the planned amount × (1 − slippage), the entire transaction is reverted (only gas is lost). For V3 and Slipstream pools whose trading pair is written with the native coin, the wrapped-token side is paid according to the plan's ```payWith```: either entirely in the native coin (attached to the transaction, with any excess refunded via ```refundETH```), or entirely in the wrapped token; anything collected afterwards is in the wrapped token. Native-coin pools on V4/Infinity CL are paid from the native coin balance, and anything collected is also in the native coin. When opening positions, native coin sufficient for about 3 million gas at the current gas price is reserved as the fee.
 
-Position IDs: V3 positions are PositionManager NFT numbers (such as ```1381183```); ```v4:number``` on Uniswap V4 and ```inf:number``` on PancakeSwap Infinity CL; ```aero:number``` (old factory) and ```aero2:number``` (new factory) on Aerodrome, ```velo:number``` and ```velo2:number``` on Velodrome; a basic pool has no NFT and its position ID is the pool address. When the node does not serve the full log history, V4/Infinity CL and Slipstream positions must be registered with ```exchange.IO("lp.track", ids)``` after a restart before ```lp.positions``` finds them, so keep the returned IDs (for example with ```_G()```).
+Position ID: for V3 it is the PositionManager NFT number (e.g. ```1381183```); for Uniswap V4 it is ```v4:number```, for PancakeSwap Infinity CL it is ```inf:number```; for Aerodrome it is ```aero:number```, ```aero2:number```, ```aero3:number``` (corresponding to Slipstream generations 1, 2 and 3 respectively), and for Velodrome it is ```velo:number```, ```velo2:number```; basic pools have no NFT, so the position ID is the pool address. If the node cannot query the full historical logs, V4/Infinity CL and Slipstream positions must be registered with ```exchange.IO("lp.track", ids)``` after a restart before they can be found by ```lp.positions```, so it is recommended to save the returned IDs (e.g. with ```_G()```).
 
-Write commands return after the transaction is mined, and for the next minute on-chain reads are pinned to no earlier than its block, so ```lp.positions``` called right after sees the new positions.
+Write commands return after the transaction is confirmed on-chain; for one minute afterwards, on-chain reads are no earlier than the block containing that transaction, so calling ```lp.positions``` and similar commands immediately afterwards will show the new positions.
 
-Aerodrome and Velodrome basic pools are added through the Router (using the native balance with a native pair, ```addLiquidityETH```), returning ```{txHash, swapTxHash, pool, id, lpTokens, amountBase, amountQuote}```; with ```stake``` ```true``` in the plan the result also has ```stake``` (as returned by `exchange.IO("lp.stake")`).
+Basic pools on Aerodrome and Velodrome are deposited via the Router (when the trading pair is written with the native coin, the native coin balance is used, i.e. ```addLiquidityETH```), returning ```{txHash, swapTxHash, pool, id, lpTokens, amountBase, amountQuote}```; if the plan's ```stake``` is ```true```, the result also contains ```stake``` (identical to the return value of `exchange.IO("lp.stake")`).
 
-Complete runnable strategies, such as re-centering the range after the price leaves it or gauge staking with compounding on Aerodrome and Velodrome, are in `DEX Strategy Examples`.
+For complete, ready-to-run strategies such as automatic rebalancing after the price moves out of range and gauge staking with compounding on Aerodrome and Velodrome, see `DEX Strategy Examples`.
 
 See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("lp.plan")`, `exchange.IO("lp.simulate")`, `exchange.IO("lp.positions")`, `exchange.IO("lp.collect")`, `exchange.IO("lp.remove")`, `exchange.IO("lp.track")`, `exchange.IO("approve")`, `DEX Strategy Examples`
 
@@ -34610,30 +34606,30 @@ Forms:
 
 - `exchange.IO("lp.track", ...)`
 
-Registers position IDs so that ```lp.positions``` finds them even when the node does not serve the full log history (recovering older positions after a restart).
+Registers position IDs. When the node cannot query the complete historical logs, ```lp.positions``` can still find these positions, for example to recover positions created before a restart.
 
 Parameters:
 
-- `k` (string, required): Set to ```lp.track``` to register positions.
-- `positionIds` (string / array, required): Position IDs to register: one ID or an array such as ```["v4:123456"]```; on Aerodrome and Velodrome basic pool addresses can be registered too.
+- `k` (string, required): Fixed as ```lp.track```, which registers positions.
+- `positionIds` (string / array, required): The position IDs to register. Pass a single ID or an array of IDs, such as ```["v4:123456"]```. On Aerodrome and Velodrome, you can also register the addresses of basic pools.
 
-Returns (array / null value): Every position ID remembered by this process (V3 positions excluded). Null with an error for a prefix that does not match the exchange object (such as ```inf:``` on Uniswap) or when no ID is given.
+Returns (array / null): All position IDs recorded by the current process (V3 positions not included). If the prefix does not match the exchange object (for example, registering an ```inf:``` position on Uniswap), or if no ID is passed, it returns a null value and reports an error.
 
-After a restart, register the saved position IDs and list the positions.
+After a restart, register the previously saved position IDs, then query the positions.
 
 ```javascript
 function main() {
-    var ids = _G("lpIds")    // saved with _G("lpIds", ids) when the positions were added
+    var ids = _G("lpIds")    // Position IDs saved with _G("lpIds", ids) when the positions were opened
     if (ids && ids.length > 0) {
-        Log("Registered:", exchange.IO("lp.track", ids))
+        Log("已登记:", exchange.IO("lp.track", ids))
     }
     Log(exchange.IO("lp.positions"))
 }
 ```
 
-Registration is for V4/Infinity CL positions (```v4:```, ```inf:```), Slipstream positions (```aero:```, ```aero2:```, ```velo:```, ```velo2:```) and basic pool addresses; V3 positions are listed by the PositionManager per wallet and are ignored. Registered positions are checked on chain, and ```lp.positions``` verifies ownership on chain every time (staked positions by their staker), leaving out transferred positions.
+Register V4/Infinity CL positions (```v4:```, ```inf:```), Slipstream positions (```aero:```, ```aero2:```, ```aero3:```, ```velo:```, ```velo2:```) and basic pool addresses. V3 positions do not need to be registered because the PositionManager lists them by wallet address. If you pass V3 positions, they are ignored. Registration checks on-chain that each position exists. After that, every ```lp.positions``` call checks position ownership against on-chain data (a position staked in a gauge belongs to the staker), and positions that have been transferred out are no longer listed.
 
-Registrations live in this process only and must be repeated after a restart: a strategy can save the IDs returned by ```lp.add``` (for example with ```_G()```) and register them at startup. Positions created by ```lp.add``` in this process are remembered automatically.
+Registrations are kept only in the current process and must be registered again after a restart. A strategy can save the IDs returned by ```lp.add``` (for example, with ```_G()```) and register them again at startup. Positions created through ```lp.add``` in the current process are recorded automatically.
 
 See also: `Uniswap / PancakeSwap`, `Aerodrome / Velodrome`, `exchange.IO`, `exchange.IO("lp.positions")`, `exchange.IO("lp.add")`
 
