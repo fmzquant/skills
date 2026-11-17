@@ -182,8 +182,8 @@ TITLES = {
 def build_tools(src, dst):
     d = json.load(open(src, encoding="utf-8"))
     order = ["read", "backtest", "write", "trade", "danger"]
-    desc = {"read": "List/inspect; results never contain secrets.", "backtest": "Start, poll, stop cloud backtests.",
-            "write": "Save strategies and versions, groups, alert switches, edit stopped robots.",
+    desc = {"read": "List/inspect, including strategy frontends; results never contain secrets.", "backtest": "Start, poll, stop cloud backtests.",
+            "write": "Save strategies and versions, strategy frontend files, groups, alert switches, edit stopped robots.",
             "trade": "Create/start/stop robots and send them commands: spends balance and places real orders. Confirm with the user first.",
             "danger": "Delete strategies/robots/nodes, publish strategies. Never included in a key by default; confirm with the user first."}
     out = ["# FMZ MCP tools (generated from the server's tool table)", "",
@@ -205,7 +205,15 @@ def build_tools(src, dst):
             t = r["tool"]; out += [f"### {t['name']}", "", t["description"], ""]
             ls = schema_lines(t.get("inputSchema") or {}); out += (ls + [""]) if ls else ["(no parameters)", ""]
     out += ["## Legacy raw names", "", "These older method names stay callable for existing integrations but are not listed in `tools/list`: " + ", ".join(f"`{x}`" for x in d["legacy"]) + ".", ""]
-    out += ["## Strategy languages", "", "`language` values: " + ", ".join(f"`{x}`" for x in d["langs"]) + ".", ""]
+    # typescript 是输入别名（存成 javascript + //@ts-check），blockly 只读不收新存：单独说，别混进可选值
+    langs = [x for x in d["langs"] if x not in ("blockly", "typescript")]
+    line = "`language` values: " + ", ".join(f"`{x}`" for x in langs)
+    if "typescript" in d["langs"]:
+        line += ", and `typescript` as an input alias (stored as `javascript` with a `//@ts-check` line)"
+    line += "."
+    if "blockly" in d["langs"]:
+        line += " `blockly` is frozen: existing blockly strategies can still be read, checked and backtested, but no new ones can be saved."
+    out += ["## Strategy languages", "", line, ""]
     open(dst, "w", encoding="utf-8").write("\n".join(out))
 
 def build_talib(src, dst):

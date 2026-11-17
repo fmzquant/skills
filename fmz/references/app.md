@@ -67,7 +67,7 @@ await app.fetch("/api/x")                          // call a route declared in a
 
 ## Strategy side (`ctx.app`)
 
-Full reference with JavaScript / Python / Rust examples: `### ctx.app` in `references/api.en.md` (Chinese: `api.zh.md`); declarations in `references/ctx.d.ts` (`IApp`, `IAppEvent`), `references/fmz.pyi` (`CtxApp`, `AppEvent`), `references/fmz.rs` (`ctx::app`).
+Full reference with JavaScript / Python / Rust examples: `#### ctx.app` in `references/api.en.md` (Chinese: `api.zh.md`); the user-facing walkthrough is `### Strategy Frontend` in `references/user-guide.en.md` (Chinese: `### 策略前端` in `user-guide.zh.md`); declarations in `references/ctx.d.ts` (`IApp`, `IAppEvent`), `references/fmz.pyi` (`CtxApp`, `AppEvent`), `references/fmz.rs` (`ctx::app`).
 
 | Call | Does |
 |---|---|

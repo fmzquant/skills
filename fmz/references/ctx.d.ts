@@ -534,12 +534,12 @@ declare type StreamId = number;
 /** ctx.poll 的流过滤：订阅对象、数字 id，或它们的（可嵌套）数组（批量订阅的结果可直接传）。 */
 declare type StreamRef = StreamId | ISubscription | StreamRef[];
 
-/** `ctx.poll(options)` 可统一等待的运行时来源。 */
-declare type RuntimePollSource = "engine" | "thread" | "go" | "dial" | "task";
+/** `ctx.poll(options)` 可统一等待的运行时来源。"app" 是应用通道（ctx.app）的事件，不在 "all" 里，要显式写。 */
+declare type RuntimePollSource = "engine" | "thread" | "go" | "dial" | "task" | "app";
 declare interface IRuntimePollOptions {
     /** Engine 来源的 stream 过滤（订阅对象或 id，可混排、可嵌套）；省略或 [] 表示本线程的全部。 */
     streams?: StreamRef;
-    /** 默认仅 engine；"all" 表示全部来源。 */
+    /** 默认仅 engine；"all" 表示 engine/thread/go/dial/task（不含 "app"：要应用事件就写 ["app", …]）。 */
     sources?: RuntimePollSource[] | "all";
 }
 declare interface IRuntimePollMeta {
@@ -555,7 +555,111 @@ declare type IRuntimePollEvent =
     | (IRuntimePollMeta & { source: "thread"; event: any })
     | (IRuntimePollMeta & { source: "go"; event: { ticket: number; name: string } })
     | (IRuntimePollMeta & { source: "dial"; event: { fd: number } })
-    | (IRuntimePollMeta & { source: "task"; event: { id: number; name: string } });
+    | (IRuntimePollMeta & { source: "task"; event: { id: number; name: string } })
+    | (IRuntimePollMeta & { source: "app"; event: IAppEvent });
+
+// ---------------- ctx.app（应用通道） ----------------
+
+/** 应用事件的种类。 */
+declare type AppEventType = "message" | "http" | "open" | "close" | "subscribe" | "unsubscribe";
+/** 应用消息体：JSON 值，或原始字节（ArrayBuffer / 类型化数组，网页收到 ArrayBuffer）。 */
+declare type AppBody = any | ArrayBuffer | ArrayBufferView;
+
+/**
+ * 应用通道的一个事件（`ctx.poll({sources: ["app"]})` 的 `ev.event`，或 `ctx.app.poll()` 的返回值）。
+ * 没有的字段不出现。回复时把整个事件传回 `ctx.app.reply` / `ctx.app.fail`。
+ */
+declare interface IAppEvent {
+    /**
+     * - "message"：网页 `app.request(method, params)`（`data` 是 `{method, params}`，要回复）或
+     *   `app.send(data)`（`data` 是内容，不用回复）；
+     * - "http"：访问 app.json 里声明的路由（要回复）；
+     * - "open" / "close"：一个网页会话连上 / 断开；
+     * - "subscribe" / "unsubscribe"：主题有人订阅 / 没人订阅了（`topic`、`count`）。
+     */
+    type: AppEventType;
+    /** 网页会话号（message / open / close）；`ctx.app.send(session, …)` 用它单发。 */
+    session?: string;
+    /** 平台用户 ID、昵称（message / http / open / close；游客没有 uid）。 */
+    uid?: string;
+    nick?: string;
+    /**
+     * 对方身份："owner"（策略的作者）、"user"（登录了的别人）、"guest"（没登录）。
+     * 谁的消息都会交给策略，只该自己做的事要在代码里判断 `role === "owner"`。
+     */
+    role?: "owner" | "user" | "guest" | string;
+    /** message 的内容：request 是 `{method: string, params: any}`（params 为字节时是 ArrayBuffer），send 是 JSON 值或 ArrayBuffer。 */
+    data?: any;
+    /** subscribe / unsubscribe 的主题，与 `count`（1 = 有人订阅，0 = 没人了）。 */
+    topic?: string;
+    count?: number;
+    /** http：请求方法、路径、查询参数（同名取第一个）、请求头（小写键，不含 cookie）、客户端 IP。 */
+    method?: string;
+    path?: string;
+    query?: { [key: string]: string };
+    headers?: { [key: string]: string };
+    ip?: string;
+    /** http：请求体原始字节（没有请求体是空的 ArrayBuffer），可自行验第三方签名。 */
+    body?: ArrayBuffer;
+    /** 回复用的标识（网关请求号、网页请求号），原样留在事件里即可。 */
+    id?: string;
+    rid?: string;
+}
+
+/** `ctx.app.reply` 回复 http 事件时的第二参。 */
+declare interface IAppHttpReply {
+    /** HTTP 状态码，默认 200。 */
+    status?: number;
+    /** Content-Type，默认 "text/plain; charset=utf-8"。 */
+    type?: string;
+    headers?: { [key: string]: string };
+    /** 响应体：字符串或字节。 */
+    body?: string | ArrayBuffer | ArrayBufferView;
+}
+
+/**
+ * 应用通道：实盘作为一个应用的后端，经应用网关和网页收发消息。只在作为应用后端运行的实盘里连着
+ * （`connected`）；回测里没有。
+ *
+ * 前端公开后别人也能打开，他们发来的消息同样会交给策略。平台不替你拦：每个事件带 `role`，
+ * 下单、改参数这类只该自己做的事，要在代码里判断 `e.role === "owner"`，不是就用 `ctx.app.fail` 拒绝。
+ *
+ * 限制：发布的单条消息 64KB，回复和 HTTP 响应体 1MB，请求 10 秒内没回复网页收到超时。
+ * 网页断线重连后会用同一个编号重发没回复的请求，平台保证同一请求只交给策略一次（重发的直接重放第一次的回复），
+ * 下单类请求不用自己去重。
+ *
+ * ```js
+ * while (true) {
+ *     var ev = ctx.poll({ sources: ["app"] }, 1000);
+ *     if (ev && ev.source === "app") {
+ *         var e = ev.event;
+ *         if (e.type === "message") {
+ *             if (e.data.method === "status") ctx.app.reply(e, { ok: true });          // 谁都能调
+ *             else if (e.role !== "owner") ctx.app.fail(e, "Only the owner can do this"); // 其余只认作者
+ *             else ctx.app.reply(e, { ok: true, method: e.data.method });
+ *         }
+ *         else if (e.type === "http") ctx.app.reply(e, { status: 200, type: "application/json", body: JSON.stringify({ now: Date.now() }) });
+ *     }
+ *     ctx.app.publish("time", { now: Date.now() }, { retain: true });
+ * }
+ * ```
+ */
+declare interface IApp {
+    /** 取下一个事件；没有返回 null。timeoutMs 省略或 0 不等待，> 0 最多等这么久。和 `ctx.poll({sources: ["app"]})` 取的是同一个队列。 */
+    poll(timeoutMs?: number): IAppEvent | null;
+    /** 回复一个请求消息（data 为 JSON 值或字节）；回复 http 事件时 data 是 `{status, type, headers, body}`。 */
+    reply(e: IAppEvent, data?: AppBody | IAppHttpReply): void;
+    /** 以错误回复：网页的 request 收到这条错误；http 事件回 500 与 `{"error": message}`。 */
+    fail(e: IAppEvent, message: string): void;
+    /** 发布到主题，网关分发给订阅它的网页。没人订阅时不出进程、返回 false。`{retain: true}` 记住最后一条，之后才订阅的网页立即收到。 */
+    publish(topic: string, data: AppBody, opts?: { retain?: boolean }): boolean;
+    /** 只发给一个会话（事件里的 `session`）；"*" 发给所有在线会话。 */
+    send(session: string, data: AppBody): boolean;
+    /** 主题有没有人订阅：1 或 0。可以用它或 subscribe / unsubscribe 事件，只在有人看时计算。 */
+    subscribers(topic: string): number;
+    /** 和应用网关的连接是否通着（断了会自动重连）。 */
+    readonly connected: boolean;
+}
 
 // ---------------- ctx ----------------
 
@@ -592,6 +696,10 @@ declare interface ICtx {
      * timeoutMs 语义与上面的 Engine-only 重载相同。
      */
     poll(options: IRuntimePollOptions, timeoutMs?: number): IRuntimePollEvent | null;
+
+    // —— 应用通道 ——
+    /** 应用后端的收发：网页的请求、HTTP 路由、主题发布（见 IApp）。仅实盘。 */
+    readonly app: IApp;
 
     // —— 交易 ——
     //

@@ -519,7 +519,12 @@ ev = ctx.poll([ctx.STREAM_ORDER_ACK], 5000)   # ev.ack.reqId / ev.ack.ok
 
 推荐 `ctx.poll([], timeoutMs)` 拉取本线程的全部事件。需要过滤时，参数可传单个订阅对象/stream id
 或它们的（可嵌套）数组（可混排；批量订阅返回的数组直接传），选项形式 `ctx.poll({streams, sources},
-timeoutMs)` 同样收订阅对象。过滤只是"这次只要这几路"：没点名的事件留在本线程的队列里，迟早要有一次
+timeoutMs)` 同样收订阅对象。`sources` 选运行时来源：`"engine"`（缺省，本文的推送事件）`"thread"` `"go"`
+`"dial"` `"task"` `"app"`，`"all"` 是前五个、**不含 `"app"`**。`"app"` 是策略前端的应用通道事件（网页请求、
+HTTP 路由、会话开关、主题订阅变化），返回 `{source: "app", event}`，`event` 与 `ctx.app.poll()` 取的同一个
+队列；字段与 `ctx.app.reply/fail/publish/send/subscribers` 见 API 文档 `ctx.app` 与 `ctx.d.ts` 的
+`IAppEvent` / `IApp`。Python / Rust 没有选项形式，用 `ctx.app.poll(timeout_ms)` / `ctx::app::poll(ms)` 单独取。
+过滤只是"这次只要这几路"：没点名的事件留在本线程的队列里，迟早要有一次
 不带过滤器的 poll 取走。等待期间 `ctx.poll` 仍推进 Promise、`setTimeout` 和 WS/TCP；timeoutMs=0
 只是不等待业务事件，调用时仍会泵一轮这些语言运行时任务。
 

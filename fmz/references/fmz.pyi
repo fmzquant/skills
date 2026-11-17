@@ -1755,6 +1755,101 @@ class CtxError(Exception):
     """The **return value** (not raised) of a failed ``ctx.order()`` / ``ctx.cancel()`` / ``ctx.submit()``: test it
     with ``isinstance(r, CtxError)``; ``str(r)`` is the reason."""
 
+class AppEvent(dict[str, Any]):
+    """One app-channel event (returned by ``ctx.app.poll()``): a dict whose top-level keys also read as attributes
+    (``e.type``, ``e.data``); a missing key is ``None``.
+
+    ``type``: ``"message"`` (the page's ``app.request(method, params)``: ``data`` is ``{"method", "params"}`` and needs
+    a reply; or ``app.send(data)``: ``data`` is the content, no reply), ``"http"`` (a request to a route declared in
+    app.json; needs a reply), ``"open"`` / ``"close"`` (a page session connected / left), ``"subscribe"`` /
+    ``"unsubscribe"`` (a topic gained its first / lost its last subscriber; with ``topic`` and ``count``). Bytes sent by
+    the page arrive as ``bytes`` in ``data`` (send) or ``data["params"]`` (request). Pass the whole event back to
+    ``ctx.app.reply()`` / ``ctx.app.fail()`` to answer it.
+    """
+    type: str
+    """``"message"`` / ``"http"`` / ``"open"`` / ``"close"`` / ``"subscribe"`` / ``"unsubscribe"``."""
+    session: Optional[str]
+    """Page session id; ``ctx.app.send(session, ...)`` targets it."""
+    uid: Optional[str]
+    """Platform user id (absent for guests)."""
+    nick: Optional[str]
+    role: Optional[str]
+    """``"owner"`` (the strategy's author), ``"user"`` (someone else, signed in) or ``"guest"`` (not signed
+    in). Messages from everyone reach the strategy; check ``e.role == "owner"`` for anything only you should do."""
+    data: Any
+    topic: Optional[str]
+    count: Optional[int]
+    """subscribe / unsubscribe: 1 = someone subscribes, 0 = nobody any more."""
+    method: Optional[str]
+    """http: request method."""
+    path: Optional[str]
+    query: Optional[dict[str, str]]
+    """http: query parameters (first value of each name)."""
+    headers: Optional[dict[str, str]]
+    """http: request headers (lower-case names, no cookie)."""
+    ip: Optional[str]
+    body: Optional[bytes]
+    """http: the raw request body (``b""`` when there is none)."""
+
+class CtxApp:
+    """``ctx.app``: the robot as the backend of an app, exchanging messages with its web page through the app gateway
+    (same semantics as JavaScript ``ctx.app``; live only).
+
+    Once the frontend is published other people can open it, and their messages reach the strategy like yours.
+    The platform does not filter them: every event carries ``role``, so anything only you should do (placing
+    orders, changing parameters) must check ``e.role == "owner"`` and refuse the rest with ``ctx.app.fail``.
+
+    A body is a JSON value or ``bytes`` (the page gets an ArrayBuffer). Limits: 64KB per published message, 1MB per
+    reply or HTTP body; a request unanswered for 10 s times out on the page. A request the page resends after a
+    reconnect reaches the strategy once, so order handlers need no dedupe of their own.
+
+    Example::
+
+        import json, time
+
+        def main():
+            while True:
+                e = ctx.app.poll(1000)
+                if e is not None:
+                    if e.type == "message":
+                        if e.data["method"] == "status":      # anyone may call this
+                            ctx.app.reply(e, {"ok": True})
+                        elif e.role != "owner":               # everything else is the owner's
+                            ctx.app.fail(e, "Only the owner can do this")
+                        else:
+                            ctx.app.reply(e, {"ok": True, "method": e.data["method"]})
+                    elif e.type == "http":
+                        ctx.app.reply(e, {"status": 200, "type": "application/json", "body": json.dumps({"now": time.time()})})
+                ctx.app.publish("time", {"now": time.time()}, retain=True)
+    """
+    def poll(self, timeout_ms: int = 0) -> Optional[AppEvent]:
+        """The next event, or ``None``; with ``timeout_ms > 0`` waits up to that long."""
+        ...
+    def reply(self, e: AppEvent, data: Any = None) -> None:
+        """Answer a request message (``data`` is a JSON value or ``bytes``); for an http event ``data`` is
+        ``{"status", "type", "headers", "body"}`` (status defaults to 200, type to ``text/plain; charset=utf-8``,
+        body is str or bytes)."""
+        ...
+    def fail(self, e: AppEvent, message: str) -> None:
+        """Answer with an error: the page's request rejects with it; an http event gets 500 and ``{"error": message}``."""
+        ...
+    def publish(self, topic: str, data: Any = None, retain: bool = False) -> bool:
+        """Publish to a topic; the gateway delivers it to the pages subscribed to it. With no subscriber nothing
+        leaves the process and it returns ``False``; ``retain=True`` keeps the last message so a page that
+        subscribes later gets it at once."""
+        ...
+    def send(self, session: str, data: Any = None) -> bool:
+        """Send to one session (``session`` of an event); ``"*"`` sends to every connected session."""
+        ...
+    def subscribers(self, topic: str) -> int:
+        """Whether the topic has a subscriber: 1 or 0. Use it, or the subscribe / unsubscribe events, to compute a
+        feed only while it is watched."""
+        ...
+    @property
+    def connected(self) -> bool:
+        """Whether the link to the app gateway is up (it reconnects by itself)."""
+        ...
+
 class Ctx:
     """The global ``ctx``: WebSocket push subscriptions (same semantics as JavaScript ``ctx``; live only).
 
@@ -1776,6 +1871,8 @@ class Ctx:
                 elif ev.channel in ("positions", "balance"):
                     Log(acct.positions(), acct.balances())
     """
+    app: CtxApp
+    """The app channel: the robot as an app's backend talking to its web page (see ``CtxApp``). Live only."""
     STREAM_TIMER: int
     """Built-in stream of engine timers (kind ``"timer"``). Value 1."""
     STREAM_STATUS: int

@@ -1722,6 +1722,93 @@ class CtxError(Exception):
     """``ctx.order()`` / ``ctx.cancel()`` / ``ctx.submit()`` 失败时的**返回值**（不抛出），用 ``isinstance(r, CtxError)``
     判断，``str(r)`` 是原因。"""
 
+class AppEvent(dict[str, Any]):
+    """应用通道的一个事件（``ctx.app.poll()`` 的返回值）：字典，顶层键也能按属性取（``e.type``、``e.data``），没有的键是 ``None``。
+
+    ``type``：``"message"``（网页 ``app.request(method, params)``，``data`` 是 ``{"method", "params"}``，要回复；
+    或 ``app.send(data)``，``data`` 是内容，不用回复）、``"http"``（访问 app.json 声明的路由，要回复）、
+    ``"open"`` / ``"close"``（网页会话连上 / 断开）、``"subscribe"`` / ``"unsubscribe"``（主题有人订阅 / 没人了，
+    带 ``topic``、``count``）。网页发来的字节在 ``data``（send）或 ``data["params"]``（request）里是 ``bytes``。
+    回复时把整个事件传回 ``ctx.app.reply()`` / ``ctx.app.fail()``。
+    """
+    type: str
+    """``"message"`` / ``"http"`` / ``"open"`` / ``"close"`` / ``"subscribe"`` / ``"unsubscribe"``。"""
+    session: Optional[str]
+    """网页会话号；``ctx.app.send(session, …)`` 用它单发。"""
+    uid: Optional[str]
+    """平台用户 ID（游客没有）。"""
+    nick: Optional[str]
+    role: Optional[str]
+    """``"owner"``（策略的作者）、``"user"``（登录了的别人）、``"guest"``（没登录）。谁的消息都会交给
+    策略，只该自己做的事要在代码里判断 ``e.role == "owner"``。"""
+    data: Any
+    topic: Optional[str]
+    count: Optional[int]
+    """subscribe / unsubscribe：1 = 有人订阅，0 = 没人了。"""
+    method: Optional[str]
+    """http：请求方法。"""
+    path: Optional[str]
+    query: Optional[dict[str, str]]
+    """http：查询参数（同名取第一个）。"""
+    headers: Optional[dict[str, str]]
+    """http：请求头（小写键，不含 cookie）。"""
+    ip: Optional[str]
+    body: Optional[bytes]
+    """http：请求体原始字节（没有请求体是 ``b""``）。"""
+
+class CtxApp:
+    """``ctx.app``：实盘作为一个应用的后端，经应用网关和网页收发消息（与 JavaScript 的 ``ctx.app`` 同语义；仅实盘）。
+
+    前端公开后别人也能打开，他们发来的消息同样会交给策略。平台不替你拦：每个事件带 ``role``，下单、改参数
+    这类只该自己做的事，要在代码里判断 ``e.role == "owner"``，不是就用 ``ctx.app.fail`` 拒绝。
+
+    消息体是 JSON 值或 ``bytes``（网页收到 ArrayBuffer）。限制：发布的单条消息 64KB，回复和 HTTP 响应体 1MB，
+    请求 10 秒内没回复网页收到超时。网页重连后重发的请求平台只交给策略一次，下单类请求不用自己去重。
+
+    Example::
+
+        import json, time
+
+        def main():
+            while True:
+                e = ctx.app.poll(1000)
+                if e is not None:
+                    if e.type == "message":
+                        if e.data["method"] == "status":      # 谁都能调
+                            ctx.app.reply(e, {"ok": True})
+                        elif e.role != "owner":               # 其余只认作者
+                            ctx.app.fail(e, "Only the owner can do this")
+                        else:
+                            ctx.app.reply(e, {"ok": True, "method": e.data["method"]})
+                    elif e.type == "http":
+                        ctx.app.reply(e, {"status": 200, "type": "application/json", "body": json.dumps({"now": time.time()})})
+                ctx.app.publish("time", {"now": time.time()}, retain=True)
+    """
+    def poll(self, timeout_ms: int = 0) -> Optional[AppEvent]:
+        """下一个事件，没有返回 ``None``；``timeout_ms > 0`` 时最多等这么久。"""
+        ...
+    def reply(self, e: AppEvent, data: Any = None) -> None:
+        """回复请求消息（``data`` 为 JSON 值或 ``bytes``）；回复 http 事件时 ``data`` 是
+        ``{"status", "type", "headers", "body"}``（status 默认 200，type 默认 ``text/plain; charset=utf-8``，body 为 str 或 bytes）。"""
+        ...
+    def fail(self, e: AppEvent, message: str) -> None:
+        """以错误回复：网页的 request 收到这条错误；http 事件回 500 与 ``{"error": message}``。"""
+        ...
+    def publish(self, topic: str, data: Any = None, retain: bool = False) -> bool:
+        """发布到主题，网关分发给订阅它的网页。没人订阅时不出进程、返回 ``False``；``retain=True`` 记住最后一条，
+        之后才订阅的网页立即收到。"""
+        ...
+    def send(self, session: str, data: Any = None) -> bool:
+        """只发给一个会话（事件里的 ``session``）；``"*"`` 发给所有在线会话。"""
+        ...
+    def subscribers(self, topic: str) -> int:
+        """主题有没有人订阅：1 或 0。可以用它或 subscribe / unsubscribe 事件，只在有人看时计算。"""
+        ...
+    @property
+    def connected(self) -> bool:
+        """和应用网关的连接是否通着（断了会自动重连）。"""
+        ...
+
 class Ctx:
     """全局变量 ``ctx``：WebSocket 推送订阅（与 JavaScript 的 ``ctx`` 同语义；仅实盘）。
 
@@ -1743,6 +1830,8 @@ class Ctx:
                 elif ev.channel in ("positions", "balance"):
                     Log(acct.positions(), acct.balances())
     """
+    app: CtxApp
+    """应用通道：实盘作为应用的后端收发网页的消息（见 ``CtxApp``）。仅实盘。"""
     STREAM_TIMER: int
     """引擎定时器的内置事件流（kind ``"timer"``）。值为1。"""
     STREAM_STATUS: int

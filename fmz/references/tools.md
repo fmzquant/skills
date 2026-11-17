@@ -4,7 +4,7 @@ Every tool the `fmz` MCP server exposes to agents, grouped by scope. A key's pri
 
 ## scope `read`
 
-List/inspect; results never contain secrets.
+List/inspect, including strategy frontends; results never contain secrets.
 
 ### get_app
 
@@ -188,7 +188,7 @@ Stop a running backtest, or discard a finished one. Read the result with get_bac
 
 ## scope `write`
 
-Save strategies and versions, groups, alert switches, edit stopped robots.
+Save strategies and versions, strategy frontend files, groups, alert switches, edit stopped robots.
 
 ### write_app_file
 

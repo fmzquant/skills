@@ -2726,7 +2726,7 @@ pub mod ctx {
         fn balance(&self) -> Option<BalanceRow> { todo!() }
         fn gateway(&self) -> Option<GatewayView> { todo!() }
         fn feed_status(&self) -> Option<FeedStatusView> { todo!() }
-        fn ts(&self) -> f64 { todo!() }
+        fn nano(&self) -> u64 { todo!() }
         fn time(&self) -> f64 { todo!() }
         fn raw(&self) -> Option<Raw> { todo!() }
     }
@@ -2937,6 +2937,105 @@ pub mod ctx {
     pub fn ws_open_with(url: &str, o: &WsOptions<'_>) -> Result<WebSocket, String> { todo!() }
     /// Low-level host service call (`method`, JSON `args`) — escape hatch.
     pub fn call(method: &str, args: &str) -> Result<String, String> { todo!() }
+
+    /// The app channel: the robot as the backend of an app, talking to its web page through
+    /// the app gateway (same semantics as JS / Python `ctx.app`; live only).
+    ///
+    /// Once the frontend is published other people can open it, and their messages reach the
+    /// strategy like yours. The platform does not filter them: every event carries `role`, so
+    /// anything only you should do (placing orders, changing parameters) must check
+    /// `e.role == "owner"` and refuse the rest with [`app::fail`].
+    ///
+    /// Limits: 64KB per published message, 1MB per reply or HTTP body; a request unanswered
+    /// for 10 s times out on the page. A request the page resends after a reconnect reaches
+    /// the strategy once, so order handlers need no dedupe of their own.
+    ///
+    /// ```ignore
+    /// loop {
+    ///     if let Some(e) = ctx::app::poll(1000) {
+    ///         match e.kind.as_str() {
+    ///             "message" if e.role != "owner" => ctx::app::fail(&e, "Only the owner can do this"),
+    ///             "message" => ctx::app::reply(&e, r#"{"ok":true}"#),          // JSON text
+    ///             "http" => ctx::app::reply_http(&e, 200, "text/plain", &[], b"hi".to_vec()),
+    ///             _ => {}
+    ///         }
+    ///     }
+    ///     ctx::app::publish("time", &format!("{{\"now\":{}}}", Unix()), true);
+    /// }
+    /// ```
+    pub mod app {
+        use super::super::JsonValue;
+
+        /// A message body: `&str` / `String` / [`JsonValue`] are JSON (a string is sent as
+        /// JSON text verbatim), `Vec<u8>` / `&[u8]` are raw bytes (the page gets an ArrayBuffer).
+        #[derive(Clone, Debug)]
+        pub enum Body {
+            /// JSON text, sent as is.
+            Json(String),
+            Bytes(Vec<u8>),
+        }
+        impl From<&str> for Body { fn from(_: &str) -> Self { todo!() } }
+        impl From<String> for Body { fn from(_: String) -> Self { todo!() } }
+        impl From<&String> for Body { fn from(_: &String) -> Self { todo!() } }
+        impl From<JsonValue> for Body { fn from(_: JsonValue) -> Self { todo!() } }
+        impl From<&JsonValue> for Body { fn from(_: &JsonValue) -> Self { todo!() } }
+        impl From<Vec<u8>> for Body { fn from(_: Vec<u8>) -> Self { todo!() } }
+        impl From<&[u8]> for Body { fn from(_: &[u8]) -> Self { todo!() } }
+
+        /// One event. Fields an event does not carry are empty.
+        #[derive(Clone, Debug, Default)]
+        pub struct Event {
+            /// `"message"` (the page's `app.request(method, params)`: `data` is `{method, params}`,
+            /// needs a reply; or `app.send(data)`), `"http"` (a route declared in app.json; needs a
+            /// reply), `"open"` / `"close"` (a page session connected / left), `"subscribe"` /
+            /// `"unsubscribe"` (a topic gained its first / lost its last subscriber).
+            pub kind: String,
+            /// Page session id; [`send`] targets it.
+            pub session: String,
+            /// Platform user id (empty for guests), nickname, and role:
+            /// `"owner"` (the strategy's author), `"user"` (someone else, signed in) or
+            /// `"guest"` (not signed in).
+            pub uid: String,
+            pub nick: String,
+            pub role: String,
+            /// subscribe / unsubscribe: the topic, and 1 = someone subscribes, 0 = nobody any more.
+            pub topic: String,
+            pub count: i64,
+            /// The message's JSON content (a request is `{method, params}`); Null when the content
+            /// is bytes, which are in `bytes`.
+            pub data: JsonValue,
+            /// Raw bytes that came with the event: the content of `send(bytes)`, the params of
+            /// `request(method, bytes)`, or the http request body.
+            pub bytes: Vec<u8>,
+            /// http: request method, path, query parameters (object of strings), headers
+            /// (lower-case names, no cookie), client IP.
+            pub method: String,
+            pub path: String,
+            pub query: JsonValue,
+            pub headers: JsonValue,
+            pub ip: String,
+        }
+
+        /// The next event, or None; with `timeout_ms > 0` waits up to that long (blocks the
+        /// calling thread). When the robot stops it ends like `ctx::sleep`.
+        pub fn poll(timeout_ms: u64) -> Option<Event> { todo!() }
+        /// Answer a request message.
+        pub fn reply(e: &Event, data: impl Into<Body>) { todo!() }
+        /// Answer an http event. `headers` are (name, value) pairs; `body` becomes the response body.
+        pub fn reply_http(e: &Event, status: u16, content_type: &str, headers: &[(&str, &str)], body: impl Into<Vec<u8>>) { todo!() }
+        /// Answer with an error (an http event gets 500 and `{"error": message}`).
+        pub fn fail(e: &Event, message: &str) { todo!() }
+        /// Publish to a topic; the gateway delivers it to the pages subscribed to it. With no
+        /// subscriber nothing leaves the process and it returns false; `retain` keeps the last
+        /// message so a page that subscribes later gets it at once.
+        pub fn publish(topic: &str, data: impl Into<Body>, retain: bool) -> bool { todo!() }
+        /// Send to one session (`session` of an event); `"*"` sends to every connected session.
+        pub fn send(session: &str, data: impl Into<Body>) -> bool { todo!() }
+        /// Whether the topic has a subscriber: 1 or 0.
+        pub fn subscribers(topic: &str) -> i64 { todo!() }
+        /// Whether the link to the app gateway is up (it reconnects by itself).
+        pub fn connected() -> bool { todo!() }
+    }
 }
 
 /// `use sdk::ctx::EventExt;` / `use sdk::abi::*;` resolve as in a compiled strategy.

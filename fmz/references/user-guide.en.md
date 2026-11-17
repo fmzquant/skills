@@ -729,7 +729,7 @@ A sub-account sees only the live robots authorized to it. On those robots it can
 
 ## Writing Strategies
 
-Covers strategy structure (lifecycle, main loop, event-driven), notes for each programming language, strategy parameters, interactive controls, template libraries, built-in libraries, Chinese/English text in the strategy UI, and a categorized quick reference of all API functions.
+Covers strategy structure (lifecycle, main loop, event-driven), usage notes for each programming language, strategy parameters, interactive controls, strategy frontends (building a web interface for a strategy), template libraries, built-in libraries, how to write bilingual Chinese/English text for the strategy interface, and a categorized quick reference of all API functions.
 
 ### Strategy Structure
 
@@ -1896,6 +1896,82 @@ function main() {
 ```
 
 For the fields of every component and examples in three languages see `Status Bar Components`; for the input forms (objects, backticks, several arguments) see `LogStatus`.
+
+### Strategy Frontend
+
+```JavaScript```, ```Python```, and ```Rust``` strategies can include a frontend: a set of web files (the root directory must contain ```index.html```) deployed at an address dedicated to the strategy and accessed through a browser. Frontends are suited to building market-watch pages, control panels, and small data tools. The page communicates with the running live trading instance through the page SDK (```AppKit```), and the strategy receives page requests and pushes data to the page through `ctx.app`. MyLanguage, Pine, visual (Blockly), and Workflow strategies do not support frontends.
+
+#### Adding a Frontend
+
+After you click "Add Frontend" on the strategy editing page, the system uses a sample as the frontend's initial content. You can edit files and preview them in real time on the "Frontend Resources" tab. Changes take effect as soon as they are saved (no drafts are kept). You can also:
+
+- Ask the editor's built-in AI assistant to modify the frontend based on a description.
+- Download a zip package, modify it locally, and upload the whole package to replace the frontend; the root directory must contain ```index.html```.
+- Use AI tools (for example, Claude Code or Cursor connected to the platform via MCP) to read and write frontend files.
+
+When a strategy version is saved, the frontend resources are saved with that version, so restoring the version also restores the frontend from that time. When you copy another user's public strategy, the frontend files are copied too; the copied strategy has its own address and connects to the copier's own live trading instance.
+
+#### Which Live Trading Instance the Frontend Connects To
+
+The frontend's backend is the author's **most recent live trading instance** running the strategy. The connection is established automatically after the live trading instance starts, so no connection code is needed. When no live trading instance is running, the page still opens normally but shows an offline status, and requests fail. For pure-page frontends that run entirely in the browser, you can select "No live trading required" in "Frontend Settings".
+
+Each live trading instance also has its own address, which only its owner can open. Use it to target a specific instance when the same strategy runs in several live trading instances.
+
+A user who rents a strategy with a frontend gets a dedicated frontend address, whose backend is the renter's own live trading instance running the strategy; at that address, the renter is the ```owner```.
+
+#### Access Permissions
+
+By default, only the author can open the frontend. After "Publish to App Square" is enabled in "Frontend Settings" (you can choose tags and add a one-line description), anyone can use the frontend through its address (no login required), and the frontend also appears in the App Square. Whether the frontend is public is independent of whether the strategy or the live trading instance is public.
+
+#### Security: The Strategy Must Verify Identity
+
+Anyone who can open the page can send requests to the strategy. The platform does not filter them on your behalf, and every request is passed to the strategy for handling. Each event carries a ```role``` field:
+
+| role | Meaning |
+| --- | --- |
+| ```owner``` | The strategy author (the renter, at the renter's address) |
+| ```user``` | Other logged-in users |
+| ```guest``` | Visitors who are not logged in |
+
+For operations that only the author should perform, such as placing orders, changing parameters, or stopping logic, the strategy must check whether ```role``` is ```owner``` and reject every other identity with `ctx.app.fail`. Before making a frontend public, make sure the strategy implements this check.
+
+#### Page SDK
+
+The sample page already loads the platform's page SDK script. Once connected, you can call:
+
+```javascript
+const app = await AppKit.connect()
+app.role                                         // "owner" | "user" | "guest"
+const r = await app.request("status", params)    // Request; the strategy replies with ctx.app.reply
+app.send(data)                                   // One-way message
+const off = app.subscribe("ticker", fn)          // Subscribe to a topic; the strategy pushes with ctx.app.publish
+app.on("message", fn)                            // Messages sent individually by the strategy with ctx.app.send
+app.on("status", ({connected, online}) => {})    // Connection and live trading online status
+await app.storage.get(k) / set(k, v)             // Small amounts of per-user data; unavailable to guests
+```
+
+When a request fails, the error object has a ```code``` field: ```offline``` (the live trading instance is not running), ```timeout```, ```backend``` (the strategy called ```ctx.app.fail```; the content is the reason the strategy gave), ```rate```, or ```too_large```. After a disconnect, the SDK reconnects and resubscribes automatically. Requests that have not received a reply are resent after reconnecting, and the platform guarantees that each request is passed to the strategy only once.
+
+#### HTTP Routes
+
+To let external programs or links access the strategy directly, place an ```app.json``` in the frontend root directory to declare the HTTP paths handled by the strategy:
+
+```json
+{"routes": [
+    {"path": "/feed.json", "auth": "guest", "methods": ["GET"], "cache": 5},
+    {"path": "/api/*", "auth": "user"}
+]}
+```
+
+```auth``` sets the minimum identity required to call the route (```owner```, ```user```, ```guest```), and ```cache``` can only be used on ```guest``` routes. ```GET``` routes should not perform any modifying operations; use ```POST``` for operations such as placing orders or changing settings. The strategy receives an event whose ```type``` is ```http``` and responds with the status code, response headers, and response body through `ctx.app.reply`.
+
+Place the frontend icon in the root directory as ```icon.svg```, ```icon.png```, or ```icon.webp```, no larger than 256KB.
+
+#### Limits
+
+- A single pushed message (```publish```, ```send```) can be at most 64KB; replies and HTTP request and response bodies can be at most 1MB.
+- A request with no reply within 10 seconds times out; the page can extend the wait to at most 2 minutes.
+- For strategy-side event handling, the full list of methods, and examples, see `ctx.app`.
 
 ### Template Library
 
