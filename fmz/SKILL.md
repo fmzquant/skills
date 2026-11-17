@@ -1,6 +1,6 @@
 ---
 name: fmz
-description: "Operate the FMZ Quant trading platform (fmz.com) through its MCP tools and write strategies for it in JavaScript, Python, Rust, Pine Script or MyLanguage (麦语言). Covers getting authorized and connected (device-code flow, API key, Bearer header, scopes), the platform model (exchange accounts, nodes, strategies, templates, robots, backtests, messages), every MCP tool and the REST extended API, the complete strategy API documentation with JavaScript/Python/Rust examples, TA/talib indicators, cloud backtest configuration and result reading, and the safety rules of a real-money platform. Use whenever the fmz MCP server is connected, or when a task mentions FMZ, its robots, strategies, backtests, nodes or API keys, or strategy code for the platform."
+description: "Operate the FMZ Quant trading platform (fmz.com) through its MCP tools and write strategies for it in JavaScript, Python, Rust, Pine Script or MyLanguage (麦语言). Covers getting authorized and connected (device-code flow, API key, Bearer header, scopes), the platform model (exchange accounts, nodes, strategies, templates, robots, backtests, messages), every MCP tool and the REST extended API, the complete strategy API documentation with JavaScript/Python/Rust examples, TA/talib indicators, cloud backtest configuration and result reading, strategy frontends (apps: web pages served at the strategy's address that talk to the running robot through ctx.app), and the safety rules of a real-money platform. Use whenever the fmz MCP server is connected, or when a task mentions FMZ, its robots, strategies, backtests, nodes or API keys, or strategy code for the platform."
 license: MIT
 ---
 # FMZ platform via MCP
@@ -30,6 +30,7 @@ Scripts can use the same key against the signed REST API instead (`references/re
 | Strategy | Source code + language + parameter definitions (`args`) + optional templates. Has versions (snapshots), a group (folder), a visibility (private/shared/verify/premium/system). Rented or public strategies can be run but their source may be hidden. | `list_strategies` (scope mine/public/official/templates), `get_strategy`, `save_strategy`, `check_strategy`, `save_strategy_version`. |
 | Template | A strategy of category "template" whose functions a strategy imports (`$.` namespace in JS). Listed in `save_strategy.templates` by id. | `list_strategies` with `scope: templates`. |
 | Robot (实盘) | A running instance: strategy (+ pinned version) + `exchanges: [{platform_id, pair}]` + `args` + `period` + node. Prepaid by the hour from the account balance. Has a log database (trades, errors, prints), a status page (`LogStatus`), stdout/stderr output, and a profit curve (`LogProfit`). | `list_robots`, `get_robot`, `get_robot_logs`, `get_robot_output`; `create_robot` / `start_robot` / `stop_robot` / `restart_robot` / `send_robot_command` are `[trade]`. |
+| Frontend (app) | Optional web files (`index.html` at the root) carried by a JavaScript/Python/Rust strategy and served at the strategy's own address. The author's newest running robot of the strategy is its backend and answers the page through `ctx.app`. Only the author can open it until "Publish to Apps" is turned on (website setting); then anyone can, and the strategy must check each request's `role`. | `get_app`, `read_app_file`; `write_app_file`, `delete_app_file`, `upload_app_bundle` (write). See `references/app.md`. |
 | Backtest | A cloud task that replays history data through the strategy with simulated accounts. Holds a concurrency slot until collected or stopped. | `run_backtest`, `get_backtest`, `list_backtests`, `stop_backtest` (see `references/backtest.md`). |
 | Messages | Robot push messages (`Log("...@")`, trade notices) and system alerts (node offline, robot stopped). | `list_messages`, `delete_messages`, `set_robot_alert`, `set_node_alert`. |
 | Groups | Folders for robots or strategies. | `list_groups`, `save_group`, `move_to_group`, `delete_group`. |
@@ -45,17 +46,18 @@ Robot `status` values: `queue` (waiting for a node), `running`, `stopping`, `com
 5. **Go live** (`[trade]`, confirm with the user first): `create_robot` with `name`, `strategy_id`, `exchanges: [{platform_id, pair}]`, optional `args`, `period` (seconds, default 60), `node_id` (omit = least loaded online node), `strategy_version_id` (pin a version), `group_id`. It prepays one hour and starts the robot; the result is the robot after the start attempt. `status: error` → read `error`, `get_robot_output`, `get_robot_logs`.
 6. **Watch**: `get_robot` (configuration, status, profit, status page text, last error), `get_robot_logs` (newest first; `before_id` pages back; `types` filters; `with_status` adds the status page), `get_robot_profit` (the LogProfit() curve, newest first, read from the node), `get_robot_output` (process stdout/stderr tail), `list_messages`.
 7. **Change**: `stop_robot` → `update_robot` (only stopped robots; `args` merges into the current values — pass just the parameters to change, `replace_args: true` to reset the whole set; the strategy itself cannot change, create a new robot for that) → `start_robot`. `restart_robot` = stop + start. `send_robot_command` delivers a string to a running robot's `GetCommand()`; interactive buttons use the `name:value` form.
-8. **Finish**: `stop_robot` does not close positions — say so. Delete only on explicit request (`delete_robot` needs a stopped robot; `remove_logs` is irreversible). When the user asks you to disconnect, `revoke_my_key` with `confirm: true` revokes only the key this connection uses.
+8. **Frontend** (optional): `get_app` for the addresses and the SDK script, `write_app_file` for `index.html` (and `app.json` for HTTP routes), the strategy answers with `ctx.app`; a running robot is the backend. Requests from anyone who can open the page reach the strategy: guard owner-only actions with `e.role === "owner"`. Details: `references/app.md`.
+9. **Finish**: `stop_robot` does not close positions — say so. Delete only on explicit request (`delete_robot` needs a stopped robot; `remove_logs` is irreversible). When the user asks you to disconnect, `revoke_my_key` with `confirm: true` revokes only the key this connection uses.
 
 ## Tool catalog
 
-`references/tools.md` is the complete, generated list (40 tools: every parameter, type, default). By scope:
+`references/tools.md` is the complete, generated list (46 tools: every parameter, type, default). By scope:
 
 | Scope | Tools | Granted |
 |---|---|---|
-| `read` | ping, revoke_my_key, get_account_summary, list_exchanges, list_platforms, list_nodes, list_strategies, get_strategy, list_strategy_versions, get_strategy_version, list_robots, get_robot, get_robot_logs, get_robot_profit, get_robot_output, list_messages, list_groups | default |
+| `read` | get_app, read_app_file, ping, revoke_my_key, get_account_summary, list_exchanges, list_platforms, list_nodes, list_strategies, get_strategy, list_strategy_versions, get_strategy_version, list_robots, get_robot, get_robot_logs, get_robot_profit, get_robot_output, list_messages, list_groups | default |
 | `backtest` | run_backtest, get_backtest, list_backtests, stop_backtest | default |
-| `write` | check_strategy, save_strategy, save_strategy_version, delete_strategy_version, update_robot, save_group, move_to_group, delete_group, set_robot_alert, set_node_alert, delete_messages | default |
+| `write` | write_app_file, delete_app_file, upload_app_bundle, check_strategy, save_strategy, save_strategy_version, delete_strategy_version, update_robot, save_group, move_to_group, delete_group, set_robot_alert, set_node_alert, delete_messages | default |
 | `trade` | create_robot, start_robot, stop_robot, restart_robot, send_robot_command | default (device-flow keys); costs money and places real orders |
 | `danger` | delete_strategy, delete_robot, delete_node, publish_strategy | never by default; the user grants it explicitly |
 
@@ -109,6 +111,7 @@ Scripts and schedulers can use the signed REST "extended API" with the same key:
 | Indicators (`TA.*`, `talib.*`) | `references/indicators.md` (`references/ta.md`, `references/talib.md`) |
 | Configure, run, debug or interpret a backtest | `references/backtest.md` (every config key: `references/backtest-config.md`) |
 | Backtest locally in seconds on this machine (Python engine; no cloud slot) | `references/backtest-local.md` |
+| Give a strategy a web frontend (dashboard, control panel), or answer its page with `ctx.app` | `references/app.md` |
 | Exact parameters of an MCP tool | `references/tools.md` (generated from the server) |
 | Scripts that call the platform without MCP | `references/rest-api.md` |
 | Platform concepts as written for people (nodes, robots, templates, parameters, interactive controls, options, debugging tool...) | `references/user-guide.en.md` / `references/user-guide.zh.md` (grep the `## ` chapter and `### ` page titles) |

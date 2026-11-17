@@ -6,6 +6,19 @@ Every tool the `fmz` MCP server exposes to agents, grouped by scope. A key's pri
 
 List/inspect; results never contain secrets.
 
+### get_app
+
+The frontend of a strategy: whether it has one, its address, the files in it, the SDK address pages load, and the strategy's robots. A strategy written in JavaScript, Python or Rust can carry a frontend: web files (index.html at the root) served at the strategy's own address (get_app returns it as url; it is assigned, not chosen). The page talks to the strategy through ctx.app (requests, publish/subscribe, optional HTTP routes listed in app.json); its backend is the author's newest running robot of this strategy, and while no robot is running the address shows a "not running" page instead (unless the author marked the frontend as needing no robot). There is no draft: saving takes effect at once, and each saved version of the strategy records its frontend. Only the author can open the address unless the author turned on "Publish to Apps" in the Frontend settings (then everyone can, signed in or not, and it is listed in Apps); this has nothing to do with whether the strategy or its robot is public. Requests from everyone who can open it reach the strategy, each with a role the platform sets (owner, user or guest): the strategy's code must check e.role itself and refuse what only the author should do.
+
+- `strategy_id` (number, required)
+
+### read_app_file
+
+Read a text file of a strategy's frontend (for example index.html).
+
+- `path` (string, required)
+- `strategy_id` (number, required)
+
 ### ping
 
 Health check: confirms the platform is reachable and the credentials are valid.
@@ -38,7 +51,7 @@ The user's configured exchange accounts (API keys are never returned). `id` is t
 
 ### list_nodes
 
-The user's own nodes (the hosts that run robots). A robot can only start on an online node; if none is online the user must deploy one on the website first.
+The user's own nodes (the hosts that run robots). A robot can only start on an online node; if none is online the user must deploy one on the website first. `loaded` is how many robots the node is running. `info` is the node's own description sent at login, passed through as-is (keys depend on the node version; a Rust node sends os, arch, impl, js, buildtime, mem = the machine's physical memory in bytes, ncpu = cores). Live resource usage is per robot: see `load` in get_robot.
 
 (no parameters)
 
@@ -75,7 +88,7 @@ One saved strategy version, with its source when with_source is true.
 
 ### list_robots
 
-List the user's robots (live strategies) with status and profit. `total` is how many robots match the filters (the page is a slice of it); `status_totals` counts ALL the user's robots per status, regardless of filters and paging. Use get_robot for configuration, get_robot_logs for what it is doing and get_robot_profit for its profit curve.
+List the user's robots (live strategies) with status and profit. Running robots on a Rust node also carry `load`: the strategy process's latest resource sample (cpu = process CPU%, 5s average, may exceed 100 on multi-core; mem = RSS bytes; net_in/net_out cumulative bytes; in_bps/out_bps; fd = open handles; date = sample time ms). `total` is how many robots match the filters (the page is a slice of it); `status_totals` counts ALL the user's robots per status, regardless of filters and paging. Use get_robot for configuration, get_robot_logs for what it is doing and get_robot_profit for its profit curve.
 
 - `group_id` (number): Only this robot group; 0 = ungrouped
 - `keyword` (string): Fuzzy match on the robot name
@@ -83,16 +96,17 @@ List the user's robots (live strategies) with status and profit. `total` is how 
 - `offset` (number)
 - `status` (string one of all/queue/running/stopping/complete/stopped/error): Default all
 - `strategy_id` (number): Only robots of this strategy, whatever their status — e.g. to see what still references a strategy before deleting it
+- `tag` (string): Only robots with exactly this tag; "ai" is the tag recommended for robots an AI creates (see create_robot)
 
 ### get_robot
 
-One robot's configuration and state: strategy, parameters (args), exchange accounts and pairs, node, status, profit, the status page text, and the error output when status is error.
+One robot's configuration and state: strategy, parameters (args), exchange accounts and pairs, node, status, profit, the status page text, and the error output when status is error. While it runs on a Rust node, `load` is the strategy process's latest resource sample (cpu %, mem RSS bytes, net_in/net_out, in_bps/out_bps, fd, date ms; refreshed every 5s). Absent when stopped or on an old node.
 
 - `robot_id` (number, required)
 
 ### get_robot_logs
 
-A robot's runtime log, newest first: trades, errors, prints. The tool to find out why a robot behaves oddly. Page older entries with before_id = the smallest id already seen.
+A robot's runtime log, always newest first: trades, errors, prints. The tool to find out why a robot behaves oddly. There is no sort order, offset, text or time filter: page older entries with before_id = the smallest id already seen.
 
 - `before_id` (number): Only entries with id below this
 - `limit` (number): Default 50, max 200
@@ -175,6 +189,27 @@ Stop a running backtest, or discard a finished one. Read the result with get_bac
 ## scope `write`
 
 Save strategies and versions, groups, alert switches, edit stopped robots.
+
+### write_app_file
+
+Create or replace a text file in a strategy's frontend; the first write gives the strategy a frontend. In index.html load the page SDK with the full address that get_app returns as sdk (<script src="..."></script>, then const app = await AppKit.connect()); the same files then also run when downloaded and opened on localhost. app.json is optional and only lists the HTTP routes the strategy answers ({"routes": [{"path": "/api/*", "auth": "user"}]}, auth names who at least may call it: owner = only the author, user = anyone signed in who may open the page, guest = anyone; events carry the caller as role with the same three words); a bad one is refused and nothing changes. An icon is a file named icon.svg, icon.png or icon.webp at the root. A strategy written in JavaScript, Python or Rust can carry a frontend: web files (index.html at the root) served at the strategy's own address (get_app returns it as url; it is assigned, not chosen). The page talks to the strategy through ctx.app (requests, publish/subscribe, optional HTTP routes listed in app.json); its backend is the author's newest running robot of this strategy, and while no robot is running the address shows a "not running" page instead (unless the author marked the frontend as needing no robot). There is no draft: saving takes effect at once, and each saved version of the strategy records its frontend. Only the author can open the address unless the author turned on "Publish to Apps" in the Frontend settings (then everyone can, signed in or not, and it is listed in Apps); this has nothing to do with whether the strategy or its robot is public. Requests from everyone who can open it reach the strategy, each with a role the platform sets (owner, user or guest): the strategy's code must check e.role itself and refuse what only the author should do.
+
+- `content` (string, required): The whole file
+- `path` (string, required)
+- `strategy_id` (number, required)
+
+### delete_app_file
+
+Delete a file from a strategy's frontend.
+
+- `path` (string, required)
+- `strategy_id` (number, required)
+
+### upload_app_bundle
+
+Get a one-time address for uploading a whole frontend as a zip (index.html at the zip root). PUT the zip to the returned url (relative to the site) within ten minutes: curl -X PUT --data-binary @app.zip <site><url>. It replaces the strategy's frontend.
+
+- `strategy_id` (number, required)
 
 ### update_robot
 
@@ -291,6 +326,7 @@ Create/start/stop robots and send them commands: spends balance and places real 
 - `period` (number): Default K-line period in seconds the strategy sees, default 60
 - `strategy_id` (number, required)
 - `strategy_version_id` (number): Pin a saved version instead of the latest source
+- `tag` (string): A label kept on the robot and shown to the user, at most 50 characters. Use "ai" for every robot you create unless the user asks for another, so that list_robots with tag "ai" finds them again in any conversation. It cannot be changed later
 
 ### start_robot
 
@@ -353,4 +389,4 @@ These older method names stay callable for existing integrations but are not lis
 
 ## Strategy languages
 
-`language` values: `javascript`, `python`, `mylanguage`, `pine`, `flow`, `rust`, and `typescript` as an input alias (stored as `javascript` with a `//@ts-check` line).
+`language` values: `javascript`, `python`, `mylanguage`, `pine`, `flow`, `rust`, and `typescript` as an input alias (stored as `javascript` with a `//@ts-check` line). `blockly` is frozen: existing blockly strategies can still be read, checked and backtested, but no new ones can be saved.
