@@ -33,7 +33,7 @@ Turning on "Publish to Apps", the listing text and tags are settings on the webs
 
 Files:
 
-- `index.html` at the root (required). Load the SDK with the full address from `get_app.sdk`: `<script src="..."></script>`. Write that address exactly as given, never the page's own address or a relative `/__app/sdk.js`: the same files then also run on localhost (see below). Plain HTML/CSS/JS with no build step works best; other files (`app.js`, `style.css`) are served from the same folder.
+- `index.html` at the root (required). Load the SDK with the full address from `get_app.sdk` followed by `?app=` and `get_app.code`: `<script src="<sdk>?app=<code>"></script>`. Never the page's own address or a relative `/__app/sdk.js`. Always write the `?app=` part: online it is ignored, and on localhost it is how the SDK knows which frontend this is (without it the page fails to connect there, or connects to another strategy the browser remembered), so the same files also run on localhost (see below). Plain HTML/CSS/JS with no build step works best; other files (`app.js`, `style.css`) are served from the same folder.
 - `app.json` (optional): only the HTTP routes the strategy answers. A bad one is refused and nothing changes.
 
   ```json
