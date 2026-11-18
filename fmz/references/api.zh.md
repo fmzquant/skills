@@ -29209,7 +29209,7 @@ function main() {
 
 ###### ```Futures_Bitget```（期货）
 
-- ```exchange.GetFundings()```不支持批量查询，需要传入具体的永续合约，例如```exchange.GetFundings("ETH_USDT.swap")```。
+- ```exchange.GetFundings()```支持批量查询：不传品种时返回当前计价币的全部永续（如```USDT.swap```、```USDC.swap```、币本位```USD.swap```，也可以直接传这类范围），一次请求取回；传入具体永续合约（如```ETH_USDT.swap```）返回该合约一条。```Time```为下一次结算时间，```Interval```为交易所给出的结算间隔。
 - 条件单只支持止盈、止损单，不支持OCO，需要时分别创建止盈单和止损单。
 - 经典账户（v2）的```exchange.ModifyOrder()```由交易所撤旧单下新单，订单ID会变，返回新订单的ID（形如```clientOid:...```的客户端订单号，可以照常用于查询、撤单）；统一账户（v3）原地改单。
 - 下单量单位：经典账户（v2）各类合约都是基础币数量（1张为1个币）；统一账户（v3）的USDT、USDC合约为基础币数量，币本位合约为美元张数。见```exchange.GetMarkets()```的```CtVal```、```CtValCcy```。
@@ -31176,7 +31176,7 @@ function main() {
 
 ###### ```Futures_OKCoin```（期货）
 
-- ```exchange.GetFundings()```不支持批量查询，需要传入具体的永续合约，例如```exchange.GetFundings("ETH_USDT.swap")```；不传或传范围（如```USDT.swap```）时报错。
+- ```exchange.GetFundings()```支持批量查询：不传品种时返回当前计价币的全部永续（如```USDT.swap```、币本位```USD.swap```，也可以直接传这类范围），一次请求取回；传入具体永续合约（如```ETH_USDT.swap```）返回该合约一条。```Rate```为当期资金费率，```Time```为下一次结算时间，```Interval```为下一次与再下一次结算时间之差。交割合约（包括长期交割```XPERP```）没有资金费率，传入报错。
 - 条件单支持止盈、止损和OCO；```exchange.ModifyOrder()```、```exchange.ModifyConditionOrder()```使用OKX的改单接口原地修改，订单ID不变。
 - ```exchange.GetHistoryConditionOrders()```不支持```since```参数，传入时报错；```exchange.GetHistoryOrders()```支持。
 - 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交、K线）与账户私有流（订单回报、持仓、余额）可以通过事件流订阅。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。推送的数量、成交量一律按张（与REST接口同一口径），ticker不含持仓量。深度订阅1档使用OKX的```bbo-tbt```、2–5档使用```books5```快照（各自发布所需档数），缺省（20档）与6–255档由```books```频道的快照与增量按序号同步，序号断档时自动重新订阅该深度；逐笔成交使用```trades-all```（逐笔、不合并，与```exchange.GetTrades()```同一套成交ID）；K线首次订阅先推送500根历史。交割合约（如```BTC_USD.quarter```）在订阅时解析成当时的合约，交割换月后需要重新订阅；期权不支持推送。私有流是一路```private```订阅（不带合约，覆盖整个账户），只在订阅时连接并登录（要求API Key配置了Passphrase，不支持令牌鉴权），在同一条连接上订阅OKX的```orders```、```positions```与```account```频道。订阅生效及每次断线重连后，先用与```exchange.GetAssets()```、```exchange.GetPositions()```（永续与交割）相同的接口取快照并推送快照行，再报告就绪；之后实时推送订单回报与持仓变化（只含永续与交割，数量按张，平仓推送数量为0的一行）、余额变化，各字段与REST同口径。OKX除事件推送外还会定时推送持仓（约每5秒）与账户快照，标记价引起的浮动盈亏与权益随之更新；余额只按交易所的推送更新，OKX只推送余额非零的币种，某个币种从推送中消失（例如余额归零而没有推送）时不会更新，直到重新连接时的快照，需要当前余额时请调用```exchange.GetAssets()```。登录失败时连接状态报告降级、私有流报告失败（行情推送不受影响）。模拟盘的推送连接OKX模拟盘的WebSocket地址。不支持全市场```tickers```订阅（OKX的ticker推送必须逐个合约订阅），订阅时报错；请按合约订阅ticker。
