@@ -1799,7 +1799,7 @@ class CtxApp:
     The platform does not filter them: every event carries ``role``, so anything only you should do (placing
     orders, changing parameters) must check ``e.role == "owner"`` and refuse the rest with ``ctx.app.fail``.
 
-    A body is a JSON value or ``bytes`` (the page gets an ArrayBuffer). Limits: 64KB per published message, 1MB per
+    A body is a JSON value or ``bytes`` (the page gets an ArrayBuffer). Limits: 256KB per published message, 1MB per
     reply or HTTP body; a request unanswered for 10 s times out on the page. A request the page resends after a
     reconnect reaches the strategy once, so order handlers need no dedupe of their own.
 

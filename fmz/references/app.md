@@ -107,7 +107,7 @@ Full reference with JavaScript / Python / Rust examples: `#### ctx.app` in `refe
 
 Event `type` (Rust: `kind`): `message` (`data` = `{method, params}` for a request, the content for `send`), `http` (`method`, `path`, `query`, `headers`, `ip`, `body` raw bytes), `open` / `close` (a page session), `subscribe` / `unsubscribe` (`topic`, `count` 1/0; the last unsubscribe arrives 10 s late). Every event from a page carries `role`, `uid`, `nick`, `session` where they apply. Bodies are JSON values or raw bytes (the page gets an ArrayBuffer). Outside a robot that backs a frontend (other robots, backtests) `ctx.app` is disconnected: `poll` returns null, `publish` / `send` return false. In a backtest there is no page at all: a strategy that only pushes to its page backtests normally, but one that waits for the page (`ctx.app.poll` with a timeout, or `ctx.poll` on the `app` source alone) is stopped with an error, because it would only idle.
 
-Limits: 64 KB per published or sent message; 1 MB per reply, HTTP request and response body; a request unanswered for 10 s times out (the page may ask for up to 2 min); 8192 pending events; 30 messages/s upstream per page connection; 2 MB/s (burst 8 MB) pushed per robot, counted per delivery; 100 storage keys of up to 64 KB per user per app.
+Limits: 256 KB per published or sent message; 1 MB per reply, HTTP request and response body; a request unanswered for 10 s times out (the page may ask for up to 2 min); 8192 pending events; 30 messages/s upstream per page connection; 2 MB/s (burst 8 MB) pushed per robot, counted per delivery; 100 storage keys of up to 64 KB per user per app.
 
 ## Minimal example
 
