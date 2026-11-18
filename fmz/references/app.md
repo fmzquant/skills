@@ -27,7 +27,7 @@ Everyone who can open the page can send requests, and **all of them reach the st
 | Delete a file | `delete_app_file` (write) |
 | Replace the whole frontend with a zip (`index.html` at the zip root, images and other binary files) | `upload_app_bundle` (write) returns a one-time `url`; within ten minutes `curl -X PUT --data-binary @app.zip <site><url>` |
 
-Then the strategy needs a running robot as backend (`create_robot` / `start_robot`, `[trade]`: confirm with the user first). A robot already running keeps the old strategy code until `restart_robot`; frontend files take effect at once without a restart. Opening `url` / `dev_url` in a browser is the user's step; the address needs their sign-in.
+Then the strategy needs a running robot as backend (`create_robot` / `start_robot`, `[trade]`: confirm with the user first). A robot already running keeps the old strategy code until `restart_robot`; frontend files take effect at once without a restart. **Create the frontend before starting the robot**: a robot that was started while the strategy had no frontend never connects to the app channel (`ctx.app.connected` stays false and the address says "not running", although `get_app.backend` names it), so restart it once the first file is saved. Opening `url` / `dev_url` in a browser is the user's step; the address needs their sign-in.
 
 Turning on "Publish to Apps", the listing text and tags are settings on the website (strategy editor, Frontend settings), not MCP tools. Publishing to Apps exposes the page to everyone: do it only when the user asks.
 
@@ -65,7 +65,7 @@ Plan around these, and tell the user where their step is:
 
 ## Writing a page that works for everyone who opens it
 
-- Never show made-up data. `app.on("status", ...)` is called at once and on every change: when `online` is false say the strategy is offline, and reload your state when it turns true again (a robot restart does not reload the page).
+- Never show made-up data. `app.on("status", ...)` is called at once (so do not also start your first load yourself, or it runs twice) and on every change: when `online` is false say the strategy is offline, and reload your state when it turns true again (a robot restart does not reload the page).
 - What everyone may see comes from a subscription to a topic the strategy publishes with `retain` (a new visitor gets the latest value at once), from a method the strategy answers for every role, or from a `guest` route. Show the owner's controls only when `app.role === "owner"`; the strategy still checks `e.role` itself.
 - Do not call `app.login()` when the page loads or when a request fails with `login`: that sends every visitor to the sign-in page. Check `app.user`, skip what a guest cannot do, and offer a sign-in button.
 - Whatever the strategy publishes, every visitor can read. For data only the owner may see, remember the owner's sessions (`open` / `close` events, and also `e.session` of any owner request: do not count on a fresh `open` from pages that were already open when the robot restarted) and use `ctx.app.send(session, data)`.
