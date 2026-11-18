@@ -27,13 +27,13 @@ Everyone who can open the page can send requests, and **all of them reach the st
 | Delete a file | `delete_app_file` (write) |
 | Replace the whole frontend with a zip (`index.html` at the zip root, images and other binary files) | `upload_app_bundle` (write) returns a one-time `url`; within ten minutes `curl -X PUT --data-binary @app.zip <site><url>` |
 
-Then the strategy needs a running robot as backend (`create_robot` / `start_robot`, `[trade]`: confirm with the user first). Opening `url` / `dev_url` in a browser is the user's step; the address needs their sign-in.
+Then the strategy needs a running robot as backend (`create_robot` / `start_robot`, `[trade]`: confirm with the user first). A robot already running keeps the old strategy code until `restart_robot`; frontend files take effect at once without a restart. Opening `url` / `dev_url` in a browser is the user's step; the address needs their sign-in.
 
 Turning on "Publish to Apps", the listing text and tags are settings on the website (strategy editor, Frontend settings), not MCP tools. Publishing to Apps exposes the page to everyone: do it only when the user asks.
 
 Files:
 
-- `index.html` at the root (required). Load the SDK with the full address from `get_app.sdk`: `<script src="..."></script>`. The same files then also run when downloaded and opened on localhost.
+- `index.html` at the root (required). Load the SDK with the full address from `get_app.sdk`: `<script src="..."></script>`. Write that address exactly as given, never the page's own address or a relative `/__app/sdk.js`: the same files then also run on localhost (see below). Plain HTML/CSS/JS with no build step works best; other files (`app.js`, `style.css`) are served from the same folder.
 - `app.json` (optional): only the HTTP routes the strategy answers. A bad one is refused and nothing changes.
 
   ```json
@@ -45,6 +45,32 @@ Files:
 
   `auth` is who at least may call it: `owner` only the owner, `user` anyone signed in who may open the page, `guest` anyone (may carry `cache` seconds). While the frontend is not published, `guest` routes count as `user`. GET routes must not change anything (other sites can trigger a GET by a link); use POST for orders and settings. Matching order: `/__app/*`, then `routes`, then files, then extension-less paths fall back to `index.html`.
 - Icon: a file named `icon.svg`, `icon.png` or `icon.webp` at the root (256 KB max). Do not put `mode`, `guests` or `icon` keys in `app.json`; they are refused.
+
+## What the tools cannot do
+
+Plan around these, and tell the user where their step is:
+
+- **Frontend settings are on the website only** (strategy editor, Frontend settings): "Publish to Apps", the listing text and tags, and "needs no robot". A pure frontend (no `ctx.app`, everything runs in the browser) shows "not running" at its address until the user ticks "needs no robot" there, so say so when you deliver one.
+- **You cannot open the address yourself.** It needs the author's sign-in; an API key does not open `url` or `dev_url`. Check your work as far as you can (below) and ask the user to open the page for the rest.
+- **Binary files go in only through `upload_app_bundle`, and a bundle replaces everything.** To add an image, zip all the files again: read the text ones back with `read_app_file`; binary ones cannot be read back, so they must come from your working folder or from the user.
+- `write_app_file` takes the whole file each time; there is no partial edit. Keep a local copy of large files and upload a bundle rather than resending them.
+- There is no tool that removes a frontend altogether (the user does that on the website). Deleting `index.html` is refused: a frontend must keep one at the root.
+
+## Checking the result
+
+- **Strategy side first.** Keep the request handling in plain functions and run them locally against a stand-in for `ctx.app` and `exchanges` before saving; from the page a handler that never replies is only a `timeout`, and one that throws stops the robot.
+- **The robot's own view.** After `create_robot` / `restart_robot`, `get_robot_logs` with `with_status: true` shows what the strategy logged and its status text. Log every refused or failed request while developing, and show in the status text whether `ctx.app.connected` is true and how many pages are open. `get_app.backend` is the id of the robot the address is connected to (0 when none is running).
+- **On localhost, as the author.** Serve the folder (`python3 -m http.server 5173`) with the script tag written as `<script src="<get_app.sdk>?app=<get_app.code>"></script>`. On `localhost` / `127.0.0.1` the SDK talks to the strategy's development entry across origins as the author: the first time it sends the browser to sign in (the user's step), then keeps a token for 7 days. `?app=` is ignored online, so the same file can be delivered as it is. Two things differ from the real address: routes come from the `app.json` **saved on the platform**, not the local file (save it first with `write_app_file`), and a relative `fetch("/api/x")` goes to the local server, so call routes with `app.fetch("/api/x")`.
+- **HTTP routes** answer the signed-in browser only (unless the frontend is published and the route is `guest`), so a plain `curl` gets 401 from a route and a redirect to the sign-in page from the address itself; an API key does not help.
+
+## Writing a page that works for everyone who opens it
+
+- Never show made-up data. `app.on("status", ...)` is called at once and on every change: when `online` is false say the strategy is offline, and reload your state when it turns true again (a robot restart does not reload the page).
+- What everyone may see comes from a subscription to a topic the strategy publishes with `retain` (a new visitor gets the latest value at once), from a method the strategy answers for every role, or from a `guest` route. Show the owner's controls only when `app.role === "owner"`; the strategy still checks `e.role` itself.
+- Do not call `app.login()` when the page loads or when a request fails with `login`: that sends every visitor to the sign-in page. Check `app.user`, skip what a guest cannot do, and offer a sign-in button.
+- Whatever the strategy publishes, every visitor can read. For data only the owner may see, remember the owner's sessions (`open` / `close` events, and also `e.session` of any owner request: do not count on a fresh `open` from pages that were already open when the robot restarted) and use `ctx.app.send(session, data)`.
+- A long job must not block the strategy's loop: reply at once and publish progress, or reply later. Requests wait while the loop is inside a slow exchange call.
+- State the strategy must keep across restarts goes in `_G(key, value)`; per-visitor preferences go in `app.storage` (signed-in users) with `localStorage` as the fallback.
 
 ## Page side (`AppKit`)
 
