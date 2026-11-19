@@ -30,7 +30,7 @@ Scripts can use the same key against the signed REST API instead (`references/re
 | Strategy | Source code + language + parameter definitions (`args`) + optional templates. Has versions (snapshots), a group (folder), a visibility (private/shared/verify/premium/system). Rented or public strategies can be run but their source may be hidden. | `list_strategies` (scope mine/public/official/templates), `get_strategy`, `save_strategy`, `check_strategy`, `save_strategy_version`. |
 | Template | A strategy of category "template" whose functions a strategy imports (`$.` namespace in JS). Listed in `save_strategy.templates` by id. | `list_strategies` with `scope: templates`. |
 | Robot (实盘) | A running instance: strategy (+ pinned version) + `exchanges: [{platform_id, pair}]` + `args` + `period` + node. Prepaid by the hour from the account balance. Has a log database (trades, errors, prints), a status page (`LogStatus`), stdout/stderr output, and a profit curve (`LogProfit`). | `list_robots`, `get_robot`, `get_robot_logs`, `get_robot_output`; `create_robot` / `start_robot` / `stop_robot` / `restart_robot` / `send_robot_command` are `[trade]`. |
-| Frontend (app) | Optional web files (`index.html` at the root) carried by a JavaScript/Python/Rust strategy and served at the strategy's own address. The author's newest running robot of the strategy is its backend and answers the page through `ctx.app`. Only the author can open it until "Publish to Apps" is turned on (website setting); then anyone can, and the strategy must check each request's `role`. | `get_app`, `read_app_file`; `write_app_file`, `delete_app_file`, `upload_app_bundle` (write). See `references/app.md`. |
+| Frontend (app) | Optional web files (`index.html` at the root) carried by a JavaScript/Python/Rust strategy and served at the strategy's own address. The author's newest running robot of the strategy is its backend and answers the page through `ctx.app`. Only the author can open it until "Publish to Apps" is turned on (website only); then anyone can, and the strategy must check each request's `role`. Tags, the Apps description and "needs no robot" are set with `set_app_settings`. | `get_app`, `read_app_file`; `write_app_file`, `delete_app_file`, `upload_app_bundle`, `set_app_settings` (write). See `references/app.md`. |
 | Backtest | A cloud task that replays history data through the strategy with simulated accounts. Holds a concurrency slot until collected or stopped. | `run_backtest`, `get_backtest`, `list_backtests`, `stop_backtest` (see `references/backtest.md`). |
 | Messages | Robot push messages (`Log("...@")`, trade notices) and system alerts (node offline, robot stopped). | `list_messages`, `delete_messages`, `set_robot_alert`, `set_node_alert`. |
 | Groups | Folders for robots or strategies. | `list_groups`, `save_group`, `move_to_group`, `delete_group`. |
@@ -51,13 +51,13 @@ Robot `status` values: `queue` (waiting for a node), `running`, `stopping`, `com
 
 ## Tool catalog
 
-`references/tools.md` is the complete, generated list (46 tools: every parameter, type, default). By scope:
+`references/tools.md` is the complete, generated list (47 tools: every parameter, type, default). By scope:
 
 | Scope | Tools | Granted |
 |---|---|---|
 | `read` | get_app, read_app_file, ping, revoke_my_key, get_account_summary, list_exchanges, list_platforms, list_nodes, list_strategies, get_strategy, list_strategy_versions, get_strategy_version, list_robots, get_robot, get_robot_logs, get_robot_profit, get_robot_output, list_messages, list_groups | default |
 | `backtest` | run_backtest, get_backtest, list_backtests, stop_backtest | default |
-| `write` | write_app_file, delete_app_file, upload_app_bundle, check_strategy, save_strategy, save_strategy_version, delete_strategy_version, update_robot, save_group, move_to_group, delete_group, set_robot_alert, set_node_alert, delete_messages | default |
+| `write` | write_app_file, delete_app_file, upload_app_bundle, set_app_settings, check_strategy, save_strategy, save_strategy_version, delete_strategy_version, update_robot, save_group, move_to_group, delete_group, set_robot_alert, set_node_alert, delete_messages | default |
 | `trade` | create_robot, start_robot, stop_robot, restart_robot, send_robot_command | default (device-flow keys); costs money and places real orders |
 | `danger` | delete_strategy, delete_robot, delete_node, publish_strategy | never by default; the user grants it explicitly |
 

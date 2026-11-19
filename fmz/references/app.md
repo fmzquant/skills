@@ -26,10 +26,11 @@ Everyone who can open the page can send requests, and **all of them reach the st
 | Create or replace a text file; the first write creates the frontend | `write_app_file` (write) |
 | Delete a file | `delete_app_file` (write) |
 | Replace the whole frontend with a zip (`index.html` at the zip root, images and other binary files) | `upload_app_bundle` (write) returns a one-time `url`; within ten minutes `curl -X PUT --data-binary @app.zip <site><url>` |
+| Set the Apps tags, the one-line description, and whether the page needs a robot | `set_app_settings` (write) |
 
 Then the strategy needs a running robot as backend (`create_robot` / `start_robot`, `[trade]`: confirm with the user first). A robot already running keeps the old strategy code until `restart_robot`; frontend files take effect at once without a restart. **Create the frontend before starting the robot**: a robot that was started while the strategy had no frontend never connects to the app channel (`ctx.app.connected` stays false and the address says "not running", although `get_app.backend` names it), so restart it once the first file is saved. Opening `url` / `dev_url` in a browser is the user's step; the address needs their sign-in.
 
-Turning on "Publish to Apps", the listing text and tags are settings on the website (strategy editor, Frontend settings), not MCP tools. Publishing to Apps exposes the page to everyone: do it only when the user asks.
+`set_app_settings` (write) changes the frontend's settings: `tags` (comma-separated ids from `get_app.tag_table`, at most 3), `intro` (the one-line Apps description, at most 80 characters) and `needs_robot`; anything left out keeps its value, and an empty string clears `tags` or `intro`. Only "Publish to Apps" stays on the website (strategy editor, Frontend settings): the author turns it on there; `get_app.open` tells whether it is on. Publishing to Apps exposes the page to everyone: suggest it only when the user asks. Once published, a frontend that needs a robot is listed in Apps only while the author has a robot of the strategy queued or running; one that needs no robot stays listed.
 
 Files:
 
@@ -50,7 +51,7 @@ Files:
 
 Plan around these, and tell the user where their step is:
 
-- **Frontend settings are on the website only** (strategy editor, Frontend settings): "Publish to Apps", the listing text and tags, and "needs no robot". A pure frontend (no `ctx.app`, everything runs in the browser) shows "not running" at its address until the user ticks "needs no robot" there, so say so when you deliver one.
+- **"Publish to Apps" is on the website only** (strategy editor, Frontend settings); the tags, the description and "needs no robot" you set with `set_app_settings`. A pure frontend (no `ctx.app`, everything runs in the browser) shows "not running" at its address until `needs_robot` is false, so set it when you deliver one. A robot already running must be restarted to connect or disconnect after `needs_robot` changes.
 - **You cannot open the address yourself.** It needs the author's sign-in; an API key does not open `url` or `dev_url`. Check your work as far as you can (below) and ask the user to open the page for the rest.
 - **Binary files go in only through `upload_app_bundle`, and a bundle replaces everything.** To add an image, zip all the files again: read the text ones back with `read_app_file`; binary ones cannot be read back, so they must come from your working folder or from the user.
 - `write_app_file` takes the whole file each time; there is no partial edit. Keep a local copy of large files and upload a bundle rather than resending them.
