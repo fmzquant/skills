@@ -215,7 +215,7 @@ Get a one-time address for uploading a whole frontend as a zip (index.html at th
 
 Change a strategy's frontend settings: its Apps tags and one-line description, and whether it needs a running robot. The tags and description are shown in Apps only while the author has turned on "Publish to Apps" in the Frontend settings (get_app returns that as open, the current tags, intro and static, and tag_table, the tags to choose from). Anything left out keeps its current value.
 
-- `intro` (string): One-line description, at most 80 characters; an empty string clears it
+- `intro` (string): One-line description, at most 160 characters; an empty string clears it. To show it in both languages write "中文|English" (160 characters each): Chinese pages show the first part, English pages the second
 - `needs_robot` (boolean): false: a pure web page that works without a robot, so the address always opens; true: the page talks to the author's running robot and shows "not running" while there is none. A robot already running must be restarted to connect or disconnect
 - `strategy_id` (number, required)
 - `tags` (string): Comma-separated tag ids from get_app's tag_table, at most 3; an empty string clears them
