@@ -56,44 +56,44 @@ See also: `GetOS`, `GetPid`, `IsVirtual`
 IsVirtual()
 ```
 
-Used to determine whether the strategy's runtime environment is the backtesting system.
+Determines whether the strategy runs in a virtual environment: the backtesting system, or a bot whose exchange accounts are all paper trading.
 
-Returns (bool): When the strategy runs in the backtesting system environment, it returns a truthy value, for example: ```true```; when the strategy runs in the live trading environment, it returns a falsy value, for example: ```false```.
+Returns (bool): Returns a truthy value, for example ```true```, when the strategy runs in the backtesting system or when all of the bot's exchange accounts are paper trading; returns a falsy value, for example ```false```, otherwise.
 
-Log a different message depending on whether it runs in backtest or live.
+Log a different message depending on whether it runs in backtest, paper trading or live.
 
 ```javascript
 function main() {
     if (IsVirtual()) {
-        Log("Running in backtest")
+        Log("Running in backtest or paper trading")
     } else {
-        Log("Running in live trading")
+        Log("Running live")
     }
-    // Output: "Running in backtest" in a backtest, "Running in live trading" in live trading
+    // Output: "Running in backtest or paper trading" in a backtest or when all exchange accounts are paper trading, "Running live" when trading with a real account
 }
 ```
 
 ```python
 def main():
     if IsVirtual():
-        Log("Running in backtest")
+        Log("Running in backtest or paper trading")
     else:
-        Log("Running in live trading")
-    # Output: "Running in backtest" in a backtest, "Running in live trading" in live trading
+        Log("Running live")
+    # Output: "Running in backtest or paper trading" in a backtest or when all exchange accounts are paper trading, "Running live" when trading with a real account
 ```
 
 ```rust
 fn main() {
     if IsVirtual() {
-        Log!("Running in backtest");
+        Log!("Running in backtest or paper trading");
     } else {
-        Log!("Running in live trading");
+        Log!("Running live");
     }
-    // Output: "Running in backtest" in a backtest, "Running in live trading" in live trading
+    // Output: "Running in backtest or paper trading" in a backtest or when all exchange accounts are paper trading, "Running live" when trading with a real account
 }
 ```
 
-Used to determine whether the current runtime environment is the backtesting system, in order to accommodate the differences between the backtesting and live trading environments.
+Used to handle the differences between backtesting, paper trading and live trading. An account added with the trading mode set to "Paper trading" uses the exchange's real market data, and its orders are matched locally on the docker instead of being sent to the exchange. In live trading, it returns a truthy value when every exchange object is a paper trading account, and a falsy value as soon as one exchange object is connected to a real account. The exchange's own demo trading (testnet, the "Demo trading" checkbox when adding the exchange) goes through the exchange's real API and does not count as a virtual environment.
 
 See also: `GetOS`, `Version`, `GetPid`
 

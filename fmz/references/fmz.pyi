@@ -2037,7 +2037,7 @@ def Sleep(millisecond: float) -> None:
     ...
 
 def IsVirtual() -> bool:
-    """``True`` in a backtest, ``False`` in live trading."""
+    """``True`` in a backtest or when every exchange account is paper trading; ``False`` as soon as one account is connected to a real exchange account."""
     ...
 
 def Mail(smtpServer: str, smtpUsername: str, smtpPassword: str, mailTo: str, title: str, body: str) -> bool:

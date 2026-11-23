@@ -2610,11 +2610,11 @@ declare function Sleep(millisecond: number): void;
 declare function sleepAsync(millisecond: number): Promise<void>;
 
 /**
- * 判断当前是否在回测（模拟）环境中运行
- * @returns 回测环境返回 true，实盘环境返回 false
+ * 判断策略是否在虚拟环境中运行：回测，或交易所账户全部是模拟交易（订单在托管者本地撮合）
+ * @returns 回测中、交易所账户全部是模拟交易时返回 true；只要有一个账户连接真实交易所就返回 false
  * ```js
  * if (IsVirtual()) {
- *     Log("当前为回测模式");
+ *     Log("当前为回测或模拟交易");
  * } else {
  *     Log("当前为实盘模式");
  * }

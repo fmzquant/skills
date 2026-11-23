@@ -2629,11 +2629,11 @@ declare function Sleep(millisecond: number): void;
 declare function sleepAsync(millisecond: number): Promise<void>;
 
 /**
- * Determine whether currently running in a backtest (simulation) environment
- * @returns Returns true in backtest environment, false in live trading environment
+ * Determine whether the strategy runs in a virtual environment: a backtest, or a bot whose exchange accounts are all paper trading (orders matched locally on the docker)
+ * @returns true in a backtest or when every exchange account is paper trading; false as soon as one account is connected to a real exchange account
  * ```js
  * if (IsVirtual()) {
- *     Log("Currently in backtest mode");
+ *     Log("Running in backtest or paper trading");
  * } else {
  *     Log("Currently in live trading mode");
  * }

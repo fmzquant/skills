@@ -1189,7 +1189,8 @@ pub fn GetPid() -> i64 {
     todo!()
 }
 
-/// True when running in a backtest (simulation), false in live trading.
+/// True in a backtest or when every exchange account is paper trading; false as soon as one
+/// account is connected to a real exchange account.
 pub fn IsVirtual() -> bool {
     todo!()
 }
@@ -2840,7 +2841,8 @@ pub mod ctx {
     pub fn uuid() -> String { todo!() }
     /// Runtime info JSON (legacy `SysInfo()`).
     pub fn sys_info() -> String { todo!() }
-    /// Backtest (virtual) run (legacy `IsVirtual()`).
+    /// Backtest run (virtual clock). Paper trading runs on the real clock and reports false;
+    /// `IsVirtual()` also covers paper trading.
     pub fn is_virtual() -> bool { todo!() }
     /// Server-pushed runtime config (trading sessions table …); `None` = never pushed.
     pub fn runtime_context() -> Option<String> { todo!() }

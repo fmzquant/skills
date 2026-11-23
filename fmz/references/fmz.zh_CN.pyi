@@ -1977,7 +1977,7 @@ def Sleep(millisecond: float) -> None:
     ...
 
 def IsVirtual() -> bool:
-    """回测中返回 ``True``，实盘返回 ``False``。"""
+    """回测中、或交易所账户全部是模拟交易时返回 ``True``；只要有一个账户连接真实交易所就返回 ``False``。"""
     ...
 
 def Mail(smtpServer: str, smtpUsername: str, smtpPassword: str, mailTo: str, title: str, body: str) -> bool:
