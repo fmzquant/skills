@@ -56,11 +56,11 @@ See also: `GetOS`, `GetPid`, `IsVirtual`
 IsVirtual()
 ```
 
-用于判断策略是否运行在虚拟环境中：回测系统，或交易所账户全部为模拟交易。
+判断策略是否在虚拟环境中运行：策略正在回测，或所有交易所账户均使用模拟交易模式。
 
-Returns (bool): 当策略运行在回测系统中，或实盘的交易所账户全部为模拟交易时，返回真值，例如：```true```；其余情况返回假值，例如：```false```。
+Returns (bool): 策略在回测系统中运行，或实盘中的所有交易所账户均使用模拟交易模式时返回真值，即：```true```。其他情况下返回假值，即：```false```。
 
-根据运行环境（回测、模拟交易或实盘）输出不同日志。
+根据运行环境（回测、模拟交易或实盘）输出相应的日志消息。
 
 ```javascript
 function main() {
@@ -93,7 +93,7 @@ fn main() {
 }
 ```
 
-用于兼容回测、模拟交易与实盘之间的差异。添加交易所时交易模式选择「模拟交易」的账户使用交易所的真实行情，订单在托管者本地撮合成交，不会发送到交易所。实盘中所有交易所对象都是模拟交易账户时返回真值；只要有一个交易所对象连接真实账户，就返回假值。交易所自身的模拟盘（测试网，即添加交易所时勾选的「模拟盘」）使用的是交易所的真实接口，不算虚拟环境。
+用于在回测、模拟交易与实盘中按运行环境调整策略行为。添加交易所时将交易模式设为「模拟交易」的账户使用交易所的真实行情，订单由托管者在本地撮合，不会发送至交易所。实盘运行时若所有交易所对象均使用模拟交易账户则返回真值；只要有一个交易所对象连接真实账户就返回假值。交易所提供的模拟盘（测试网，添加交易所时勾选的「模拟盘」）直接调用交易所的接口，不视为虚拟环境。模拟交易的撮合规则及支持的功能请参阅用户指南「平台基础 → 交易所 → 模拟交易」。
 
 See also: `GetOS`, `Version`, `GetPid`
 
@@ -6606,27 +6606,27 @@ exchange.CreateConditionOrder(symbol, side, amount, condition)
 exchange.CreateConditionOrder(symbol, side, amount, condition, ...args)
 ```
 
-创建条件单。条件单是在满足指定触发条件时自动执行的订单。
+创建条件单。条件单是一种在满足指定条件时自动触发的订单类型。
 
 Parameters:
 
-- `symbol` (string, required): 条件单的交易品种，例如现货交易所对象上的```BTC_USDT```、期货交易所对象上的```BTC_USDT.swap```；品种代码的写法（含期权）见`品种代码`。
-- `side` (string, required): 交易方向：现货为```buy```（买入）、```sell```（卖出）；期货为```buy```（开多）、```sell```（开空）、```closebuy```（平多）、```closesell```（平空）。可附带交易所特定参数，见备注。
-- `amount` (number, required): 条件单的下单量。注意：**现货市价买单**的下单量为买入金额；个别现货交易所的市价买单下单量为交易币数量而非金额，详见各交易所页面的注意事项。对于期货交易所对象，下单量参数```amount```均为合约张数。
-- `condition` (object, required): 条件单的触发条件和执行价格，结构见`Condition`；各条件类型必须传入的价格见备注。
-- `arg` (string / number / bool / object / array / any, optional): 扩展参数，可传入多个```arg```参数。字符串、数字等参数会输出到该条件单的日志中（多个参数以空格连接）。对象参数不会输出到日志，而是作为交易所特定参数原样传递给交易所（```extra```子对象会先展开，并与```side```参数中的附加参数合并）。Rust使用```exchange.CreateConditionOrderWithOptions()```传入对象参数。
+- `symbol` (string, required): 条件单的交易品种，例如现货交易所对象使用的```BTC_USDT```、期货交易所对象使用的```BTC_USDT.swap```，品种代码格式（含期权）见`品种代码`。
+- `side` (string, required): 交易方向：现货支持```buy```（买入）、```sell```（卖出）；期货支持```buy```（开多）、```sell```（开空）、```closebuy```（平多）、```closesell```（平空）。该参数可附带交易所特定参数，详见备注。
+- `amount` (number, required): 条件单的下单量。订单为**现货市价买单**时，下单量为买入金额；部分现货交易所的市价买单以下单所购买的基础币种数量为准，详见各交易所页面的注意事项。对于期货交易所对象，下单量参数```amount```均以合约张数表示。
+- `condition` (object, required): 条件单的触发条件和执行价格，参数结构见`Condition`；各条件类型所需的价格参数见备注。
+- `arg` (string / number / bool / object / array / any, optional): 扩展参数，可传入多个```arg```参数。字符串、数字等参数会写入该条件单的日志（多个参数以空格分隔）。对象参数作为交易所特定参数原样传给交易所，且不写入日志（```extra```子对象会先展开；随后与```side```参数中的附加参数合并）。Rust中使用```exchange.CreateConditionOrderWithOptions()```传入对象参数。
 
-Returns (string / 空值): 创建成功时返回条件单Id，失败时返回空值。条件单Id的格式与普通订单Id类似，由交易所品种代码和交易所原始条件单Id组成，以英文逗号分隔。
+Returns (string / 空值): 创建成功时返回条件单Id，创建失败时返回空值。条件单Id格式与普通订单Id类似，由交易所品种代码和交易所原始条件单Id组成，两者以英文逗号分隔。
 
-创建止盈单（TP）：价格上涨至目标价位时自动卖出。
+创建止盈单（TP）：当价格涨至目标价位时自动提交卖出委托。
 
 ```javascript
 function main() {
-    // 创建止盈单：当BTC_USDT价格上涨至65000时，以65000的价格卖出0.01个BTC
+    // 创建止盈单：当BTC_USDT价格涨到65000时，以65000价格卖出0.01个BTC
     var condition = {
         ConditionType: ORDER_CONDITION_TYPE_TP,  // 止盈单
         TpTriggerPrice: 65000,   // 触发价格
-        TpOrderPrice: 65000      // 委托价格；也可设为-1，表示按市价下单
+        TpOrderPrice: 65000      // 执行价格，也可以设置为-1表示市价单
     }
     var id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition)
     Log("TP order Id:", id)
@@ -6635,11 +6635,11 @@ function main() {
 
 ```python
 def main():
-    # 创建止盈单：当BTC_USDT价格上涨至65000时，以65000的价格卖出0.01个BTC
+    # 创建止盈单：当BTC_USDT价格涨到65000时，以65000价格卖出0.01个BTC
     condition = {
         "ConditionType": ORDER_CONDITION_TYPE_TP,  # 止盈单
         "TpTriggerPrice": 65000,   # 触发价格
-        "TpOrderPrice": 65000      # 委托价格；也可设为-1，表示按市价下单
+        "TpOrderPrice": 65000      # 执行价格，也可以设置为-1表示市价单
     }
     id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition)
     Log("TP order Id:", id)
@@ -6647,11 +6647,11 @@ def main():
 
 ```rust
 fn main() {
-    // 创建止盈单：当BTC_USDT价格上涨至65000时，以65000的价格卖出0.01个BTC
+    // 创建止盈单：当BTC_USDT价格涨到65000时，以65000价格卖出0.01个BTC
     let condition = OrderCondition {
         ConditionType: ORDER_CONDITION_TYPE_TP,  // 止盈单
         TpTriggerPrice: 65000.0,   // 触发价格
-        TpOrderPrice: 65000.0,     // 委托价格；也可设为-1，表示按市价下单
+        TpOrderPrice: 65000.0,     // 执行价格，也可以设置为-1表示市价单
         ..Default::default()
     };
     let id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, &condition);
@@ -6659,15 +6659,15 @@ fn main() {
 }
 ```
 
-创建止损单（SL）：价格下跌至止损价位时自动卖出。
+创建止损单（SL）：当价格跌至止损价位时自动提交卖出委托。
 
 ```javascript
 function main() {
-    // 创建止损单：当BTC_USDT价格下跌至58000时，以市价卖出0.01个BTC
+    // 创建止损单：当BTC_USDT价格跌到58000时，以市价卖出0.01个BTC
     var condition = {
         ConditionType: ORDER_CONDITION_TYPE_SL,  // 止损单
         SlTriggerPrice: 58000,   // 触发价格
-        SlOrderPrice: -1         // -1表示按市价下单
+        SlOrderPrice: -1         // -1表示市价单
     }
     var id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition)
     Log("SL order Id:", id)
@@ -6676,11 +6676,11 @@ function main() {
 
 ```python
 def main():
-    # 创建止损单：当BTC_USDT价格下跌至58000时，以市价卖出0.01个BTC
+    # 创建止损单：当BTC_USDT价格跌到58000时，以市价卖出0.01个BTC
     condition = {
         "ConditionType": ORDER_CONDITION_TYPE_SL,  # 止损单
         "SlTriggerPrice": 58000,   # 触发价格
-        "SlOrderPrice": -1         # -1表示按市价下单
+        "SlOrderPrice": -1         # -1表示市价单
     }
     id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition)
     Log("SL order Id:", id)
@@ -6688,11 +6688,11 @@ def main():
 
 ```rust
 fn main() {
-    // 创建止损单：当BTC_USDT价格下跌至58000时，以市价卖出0.01个BTC
+    // 创建止损单：当BTC_USDT价格跌到58000时，以市价卖出0.01个BTC
     let condition = OrderCondition {
         ConditionType: ORDER_CONDITION_TYPE_SL,  // 止损单
         SlTriggerPrice: 58000.0,   // 触发价格
-        SlOrderPrice: -1.0,        // -1表示按市价下单
+        SlOrderPrice: -1.0,        // -1表示市价单
         ..Default::default()
     };
     let id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, &condition);
@@ -6700,17 +6700,17 @@ fn main() {
 }
 ```
 
-创建OCO订单：同时设置止盈和止损，其中任一方向触发后，另一方向的订单将自动撤销。
+创建OCO订单：同时设置止盈和止损条件，任一条件触发后另一条件自动取消。
 
 ```javascript
 function main() {
     // 创建OCO订单：止盈价65000，止损价58000
     var condition = {
-        ConditionType: ORDER_CONDITION_TYPE_OCO,  // 条件类型：OCO订单
+        ConditionType: ORDER_CONDITION_TYPE_OCO,  // OCO订单
         TpTriggerPrice: 65000,   // 止盈触发价格
-        TpOrderPrice: 65000,     // 止盈委托价格
+        TpOrderPrice: 65000,     // 止盈执行价格
         SlTriggerPrice: 58000,   // 止损触发价格
-        SlOrderPrice: 58000      // 止损委托价格
+        SlOrderPrice: 58000      // 止损执行价格
     }
     var id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition)
     Log("OCO order Id:", id)
@@ -6721,11 +6721,11 @@ function main() {
 def main():
     # 创建OCO订单：止盈价65000，止损价58000
     condition = {
-        "ConditionType": ORDER_CONDITION_TYPE_OCO,  # 条件类型：OCO订单
+        "ConditionType": ORDER_CONDITION_TYPE_OCO,  # OCO订单
         "TpTriggerPrice": 65000,   # 止盈触发价格
-        "TpOrderPrice": 65000,     # 止盈委托价格
+        "TpOrderPrice": 65000,     # 止盈执行价格
         "SlTriggerPrice": 58000,   # 止损触发价格
-        "SlOrderPrice": 58000      # 止损委托价格
+        "SlOrderPrice": 58000      # 止损执行价格
     }
     id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition)
     Log("OCO order Id:", id)
@@ -6735,22 +6735,22 @@ def main():
 fn main() {
     // 创建OCO订单：止盈价65000，止损价58000
     let condition = OrderCondition {
-        ConditionType: ORDER_CONDITION_TYPE_OCO,  // 条件类型：OCO订单
+        ConditionType: ORDER_CONDITION_TYPE_OCO,  // OCO订单
         TpTriggerPrice: 65000.0,   // 止盈触发价格
-        TpOrderPrice: 65000.0,     // 止盈委托价格
+        TpOrderPrice: 65000.0,     // 止盈执行价格
         SlTriggerPrice: 58000.0,   // 止损触发价格
-        SlOrderPrice: 58000.0      // 止损委托价格
+        SlOrderPrice: 58000.0      // 止损执行价格
     };
     let id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, &condition);
     Log!("OCO order Id:", id);
 }
 ```
 
-使用附加参数（option）创建条件单，传入交易所特定参数。
+通过附加参数（option）传入交易所特定参数，创建条件单。
 
 ```javascript
 function main() {
-    // 交易所特定参数放在最后一个对象参数中
+    // 交易所特定参数放在最后一个对象参数里
     var option = {
         "type": "TRAILING_STOP_MARKET",
         "activatePrice": "300",
@@ -6771,7 +6771,7 @@ function main() {
 
 ```python
 def main():
-    # 交易所特定参数放在最后一个对象参数中
+    # 交易所特定参数放在最后一个对象参数里
     option = {
         "type": "TRAILING_STOP_MARKET",
         "activatePrice": "300",
@@ -6791,7 +6791,7 @@ def main():
 
 ```rust
 fn main() {
-    // Rust 使用带 WithOptions 后缀的函数传入对象参数
+    // Rust用带WithOptions后缀的函数传对象参数
     let opts = JSONParse(r#"{"type": "TRAILING_STOP_MARKET", "activatePrice": "300", "callbackRate": "0.1"}"#).unwrap();
     let condition = OrderCondition {
         ConditionType: ORDER_CONDITION_TYPE_TP,
@@ -6807,25 +6807,25 @@ fn main() {
 }
 ```
 
-条件单的支持情况取决于具体交易所，部分交易所不支持条件单。
+条件单的支持情况因交易所而异，部分交易所暂不支持此功能。
 
-条件单在触发前不占用账户资金，触发后才会实际下单并占用资金。
+条件单触发前不占用账户资金，触发后才提交订单并占用资金。
 
-各交易所对条件单的支持程度和具体参数可能存在差异，使用前请查阅对应交易所的API文档。
+不同交易所支持的条件单类型和参数可能有所不同，使用前请查阅对应交易所的API文档。
 
-交易所特定参数（option）放在最后一个对象参数中，例如```exchange.CreateConditionOrder(symbol, "buy", amount, condition, {type: "TRAILING_STOP_MARKET", activatePrice: "300"})```，对象中的键会原样传递给交易所。Rust使用```exchange.CreateConditionOrderWithOptions()```。
+交易所专用参数（option）通过最后一个对象参数传入，例如```exchange.CreateConditionOrder(symbol, "buy", amount, condition, {type: "TRAILING_STOP_MARKET", activatePrice: "300"})```，对象中的所有键均原样传递给交易所。Rust使用```exchange.CreateConditionOrderWithOptions()```。
 
-不同交易所支持的option参数不同，具体以交易所API文档为准。常见参数包括：订单类型（type）、生效规则（timeInForce）、触发价格（activatePrice）、回调比率（callbackRate）等。
+各交易所支持的option参数有所不同，具体以对应交易所的API文档为准。常见参数包括：订单类型（type）、订单有效方式（timeInForce）、激活价格（activatePrice）、回调比例（callbackRate）等。
 
-使用option参数时，仍需提供```amount```和```condition```参数。如果交易所API中的某些参数已通过option传递，这些基础参数可能会被option中的对应参数覆盖，具体行为取决于交易所API的实现。
+使用option时，仍须传入```amount```和```condition```参数。如果通过option传入了与基础参数对应的字段，这些基础参数可能被option中的对应字段覆盖，具体行为取决于交易所API的实现。
 
-也可以将参数附加在```side```参数之后（旧写法）：写成```"side;{JSON对象}"```或```"side;key=value&key=value"```，例如```"buy;{\"type\":\"TRAILING_STOP_MARKET\",\"activatePrice\":\"300\"}"```或```"buy;type=TRAILING_STOP_MARKET&activatePrice=300"```。具体支持的参数取决于交易所API。
+也可将参数附加在```side```参数末尾（旧写法）：格式为```"side;{JSON对象}"```或```"side;key=value&key=value"```，例如```"buy;{\"type\":\"TRAILING_STOP_MARKET\",\"activatePrice\":\"300\"}"```或```"buy;type=TRAILING_STOP_MARKET&activatePrice=300"```。具体支持的参数取决于交易所API。
 
-```condition```的```ConditionType```可取`ORDER_CONDITION_TYPE`中的OCO、TP、SL；`ORDER_CONDITION_TYPE_GENERIC`仅出现在查询结果中（如追踪止损等交易所特有的条件单），创建或修改条件单时不可使用，传入会报错并返回空值。所选类型涉及的触发价格和执行价格均须传入且不能为0（OCO需要全部四项，TP需要止盈的两项，SL需要止损的两项），否则报错并返回空值；执行价格为-1表示触发后以市价单执行。
+```condition```的```ConditionType```可取`ORDER_CONDITION_TYPE`中定义的OCO、TP、SL；`ORDER_CONDITION_TYPE_GENERIC`仅在查询结果中用于标识交易所特有的条件单（如追踪止损单），创建或修改条件单时不得使用该类型，传入该类型将报错并返回空值。所选类型要求的触发价格和执行价格均须传入且不得为0（OCO须提供全部四项，TP须提供止盈的两项，SL须提供止损的两项），否则将报错并返回空值；执行价格为-1表示触发后提交市价单。
 
-不支持的交易所：`Bithumb`、`Bitstamp`、`Coinw`、`DigiFinex`、`Futures_DigiFinex`、`Gemini`、`HashKey`、`Korbit`、`LBank`、`MEXC`、`Upbit`、`WEEX`、`Zaif`、`Hyperliquid`、`Pendle`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`Jupiter`、`OKX_DEX`、`Futures_Polymarket`、`Futures_PredictFun`、`Futures_Futu`、`Futures_IB`、`Exchange`、`Web3`。调用时报错并返回空值，所有交易所的对照见`能力矩阵`。
+不支持条件单的交易所：`Bithumb`、`Bitstamp`、`Coinw`、`DigiFinex`、`Futures_DigiFinex`、`Gemini`、`HashKey`、`Korbit`、`LBank`、`MEXC`、`Upbit`、`WEEX`、`Zaif`、`Hyperliquid`、`Pendle`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`Jupiter`、`OKX_DEX`、`Futures_Polymarket`、`Futures_PredictFun`、`Futures_Futu`、`Futures_IB`、`Exchange`、`Web3`。在上述交易所调用条件单接口将报错并返回空值，各交易所的支持情况参见`能力矩阵`。
 
-模拟交易（添加交易所时交易模式选「模拟交易」）的账户也支持条件单（预测市场除外），触发规则与回测系统相同：买单的止盈在价格跌到触发价及以下时触发、止损在涨到触发价及以上时触发，卖单相反；OCO哪条先满足就执行哪条，价格取盘口中间价。触发后按该条的委托价下普通限价单，委托价为-1时下市价单。触发前不冻结资金，触发时按普通订单检查余额与保证金，下单被拒时条件单记为已取消并写明原因。用`exchange.ModifyConditionOrder`修改后条件单Id不变。
+模拟交易账户（添加交易所时将交易模式设为「模拟交易」）也支持条件单（预测市场除外），触发规则与回测系统相同：买入条件单在价格跌至触发价或更低时触发止盈、在价格涨至触发价或更高时触发止损，卖出条件单的触发方向相反；OCO仅执行最先满足触发条件的一侧，各条件单均以盘口中间价作为触发判断依据。触发后按对应的委托价提交普通限价单，委托价为-1时提交市价单。触发前不冻结资金，触发时按普通订单的规则检查余额和保证金，若下单请求被拒绝则将条件单标记为已取消并记录原因。通过`exchange.ModifyConditionOrder`修改条件单后，条件单Id保持不变。模拟交易的其他规则参见用户指南「平台基础 → 交易所 → 模拟交易」。
 
 See also: `Condition`, `exchange.CancelConditionOrder`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`, `exchange.ModifyConditionOrder`
 
@@ -9801,14 +9801,14 @@ Forms:
 
 - `exchange.IO(mode, value)`
 
-切换交易所的交易模式，包括模拟盘/实盘、全仓/逐仓、双向/单向持仓、统一账户、杠杆模式及自成交预防等。
+切换交易所的交易模式：模拟盘/实盘、全仓/逐仓、双向/单向持仓、统一账户、杠杆模式、自成交预防等。
 
 Parameters:
 
-- `mode` (string, required): 模式指令，例如```simulate```、```cross```、```dual```，完整指令列表见下表。
-- `value` (bool / string, optional): 指令的取值，类型与含义见下表；部分指令无需此参数。
+- `mode` (string, required): 交易模式指令，例如```simulate```、```cross```、```dual```，完整列表见下表。
+- `value` (bool / string, optional): 指令参数的取值，类型和含义见下表；部分指令无需传入此参数。
 
-Returns (string / number / bool / object / array / any): 返回值因指令而异，部分指令（例如某些交易所的```cross```、```dual```）即使调用成功也返回空值；调用失败时返回空值，可通过`GetLastError`获取错误信息。
+Returns (string / number / bool / object / array / any): 返回值取决于指令，部分指令（例如某些交易所的```cross```、```dual```）在调用成功时也会返回空值；调用失败时返回空值，可通过`GetLastError`获取错误信息。
 
 切换模拟盘/实盘环境（以```Futures_OKCoin```（OKX期货）为例）。
 
@@ -9835,7 +9835,7 @@ fn main() {
 }
 ```
 
-切换合约的保证金模式和持仓模式（以币安期货为例）。
+切换合约保证金模式和持仓模式（以币安期货为例）。
 
 ```javascript
 function main() {
@@ -9869,7 +9869,7 @@ fn main() {
 }
 ```
 
-切换统一账户模式（以币安期货为例）。
+切换账户模式（以币安期货为例）。
 
 ```javascript
 function main() {
@@ -9891,7 +9891,7 @@ fn main() {
 }
 ```
 
-设置自成交预防（STP）模式（以币安为例）。
+设置自成交预防模式（以币安为例）。
 
 ```javascript
 function main() {
@@ -9914,24 +9914,34 @@ fn main() {
 
 ##### 通用交易模式指令
 
-以下指令在多个交易所中通用。各交易所支持哪些指令见`能力矩阵`；取值含义、是否按合约生效以及返回值的差异，见各交易所页面。
+以下指令适用于多个交易所，各交易所支持的指令见`能力矩阵`，参数含义、是否按合约生效及返回值详见各交易所文档。
 
 | 指令 | 参数 | 功能 |
 | - | - | - |
-| ```simulate``` | bool | 模拟盘（true）/实盘（false）。建议在添加交易所时勾选“模拟盘”，此指令仅为兼容旧策略而保留 |
+| ```simulate``` | bool | 模拟盘（true）/实盘（false）。建议在添加交易所时勾选“模拟盘”，此指令用于兼容旧策略 |
 | ```cross``` | bool | 全仓（true）/逐仓（false） |
 | ```dual``` | bool | 双向持仓（true）/单向持仓（false） |
 | ```unified``` | bool | 统一账户（true）/普通账户（false） |
-| ```trade_margin``` | 无 | 切换为逐仓杠杆模式 |
-| ```trade_super_margin``` | 无 | 切换为全仓杠杆模式 |
+| ```trade_margin``` | 无 | 切换至逐仓杠杆模式 |
+| ```trade_super_margin``` | 无 | 切换至全仓杠杆模式 |
 | ```trade_normal``` | 无 | 切换回普通现货模式 |
 | ```selfTradePreventionMode``` | string | 自成交预防（STP）模式 |
 
 ##### 模拟盘
 
-支持模拟盘的交易所在添加时的配置中提供“模拟盘”勾选项。勾选后，该交易所对象自启动起即连接模拟盘（测试网），策略无需再切换。支持的交易所包括：币安现货与期货、Bybit现货与期货、OKX现货与期货、Bitget现货与期货、Gate.io现货与期货、Futures_DigiFinex、Hyperliquid现货与期货（测试网）、Futures_Lighter、富途（模拟交易账户）。
+对于支持模拟盘的交易所，添加时可在配置中勾选“模拟盘”选项，勾选后交易所对象会在启动时连接模拟盘（测试网），策略无需手动切换：币安现货与期货、Bybit现货与期货、OKX现货与期货、Bitget现货与期货、Gate.io现货与期货、Futures_DigiFinex、Hyperliquid现货与期货（测试网）、Futures_Lighter、富途（模拟交易账户）。
 
-```exchange.IO("simulate", true/false)```仍可在运行中切换模拟盘/实盘，用于兼容旧策略（支持的交易所见下方各指令的支持表）；新策略应以添加交易所时的勾选为准。DigiFinex现货交易所本身不提供模拟环境。
+```exchange.IO("simulate", true/false)```仍可在策略运行期间切换模拟盘和实盘，用于兼容旧策略（支持的交易所见下方各指令的支持表）；新策略以添加交易所时的配置为准。DigiFinex现货交易所不提供模拟环境。
+
+##### 模拟交易账户
+
+添加交易所时将交易模式设为「模拟交易」的账户使用真实行情、在托管者本地模拟成交，与上文的模拟盘不同（详见用户指南「平台基础 → 交易所 → 模拟交易」）。此类账户的交易模式指令仅更新模拟账户的设置，不会发送至交易所：
+
+| 指令 | 说明 |
+| - | - |
+| ```exchange.IO("paper.reset")``` | 重置模拟账户：撤销全部挂单和条件单、清空持仓，资金恢复为交易所配置中的初始资金；保留单向/双向持仓设置。修改初始资金后，已运行过的实盘策略需调用此指令才能应用新的初始资金 |
+| ```exchange.IO("dual", true/false)``` | 切换双向/单向持仓模式，存在持仓或合约挂单时无法切换 |
+| ```exchange.IO("cross", true)``` | 仅支持全仓模式，调用```exchange.IO("cross", false)```会报错 |
 
 See also: `exchange.IO`
 

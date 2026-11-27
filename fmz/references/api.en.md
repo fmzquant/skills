@@ -56,44 +56,44 @@ See also: `GetOS`, `GetPid`, `IsVirtual`
 IsVirtual()
 ```
 
-Determines whether the strategy runs in a virtual environment: the backtesting system, or a bot whose exchange accounts are all paper trading.
+Checks whether the strategy is running in a virtual environment, either because it is backtesting or because all exchange accounts use paper trading mode.
 
-Returns (bool): Returns a truthy value, for example ```true```, when the strategy runs in the backtesting system or when all of the bot's exchange accounts are paper trading; returns a falsy value, for example ```false```, otherwise.
+Returns (bool): Returns ```true``` when the strategy runs in the backtesting system or when all exchange accounts in a live run use paper trading mode. Otherwise, returns ```false```.
 
-Log a different message depending on whether it runs in backtest, paper trading or live.
+Logs a message based on the runtime environment (backtesting, paper trading, or live trading).
 
 ```javascript
 function main() {
     if (IsVirtual()) {
-        Log("Running in backtest or paper trading")
+        Log("当前为回测或模拟交易环境")
     } else {
-        Log("Running live")
+        Log("当前为实盘环境")
     }
-    // Output: "Running in backtest or paper trading" in a backtest or when all exchange accounts are paper trading, "Running live" when trading with a real account
+    // Logs “当前为回测或模拟交易环境” during backtesting or when all exchange accounts use paper trading, and “当前为实盘环境” during a live run with a real account.
 }
 ```
 
 ```python
 def main():
     if IsVirtual():
-        Log("Running in backtest or paper trading")
+        Log("当前为回测或模拟交易环境")
     else:
-        Log("Running live")
-    # Output: "Running in backtest or paper trading" in a backtest or when all exchange accounts are paper trading, "Running live" when trading with a real account
+        Log("当前为实盘环境")
+    # Logs “当前为回测或模拟交易环境” during backtesting or when all exchange accounts use paper trading, and “当前为实盘环境” during a live run with a real account.
 ```
 
 ```rust
 fn main() {
     if IsVirtual() {
-        Log!("Running in backtest or paper trading");
+        Log!("当前为回测或模拟交易环境");
     } else {
-        Log!("Running live");
+        Log!("当前为实盘环境");
     }
-    // Output: "Running in backtest or paper trading" in a backtest or when all exchange accounts are paper trading, "Running live" when trading with a real account
+    // Logs “当前为回测或模拟交易环境” during backtesting or when all exchange accounts use paper trading, and “当前为实盘环境” during a live run with a real account.
 }
 ```
 
-Used to handle the differences between backtesting, paper trading and live trading. An account added with the trading mode set to "Paper trading" uses the exchange's real market data, and its orders are matched locally on the docker instead of being sent to the exchange. In live trading, it returns a truthy value when every exchange object is a paper trading account, and a falsy value as soon as one exchange object is connected to a real account. The exchange's own demo trading (testnet, the "Demo trading" checkbox when adding the exchange) goes through the exchange's real API and does not count as a virtual environment.
+Use this function to adapt strategy behavior to backtesting, paper trading, or live trading. Accounts configured for Paper Trading when adding an exchange use real market data from the exchange. The Docker matches orders locally without sending them to the exchange. During a live run, the function returns true if every exchange object uses a paper trading account and false if any exchange object connects to a real account. Exchange-provided testnets, enabled by selecting Testnet when adding an exchange, call the exchange's API directly and are excluded from the virtual environment classification. For paper trading order matching rules and supported features, see the user guide under “Platform Basics → Exchanges → Paper Trading”.
 
 See also: `GetOS`, `Version`, `GetPid`
 
@@ -6682,27 +6682,27 @@ exchange.CreateConditionOrder(symbol, side, amount, condition)
 exchange.CreateConditionOrder(symbol, side, amount, condition, ...args)
 ```
 
-Creates a conditional order. A conditional order is executed automatically once its trigger condition is met.
+Creates a conditional order. A conditional order is an order type that triggers automatically when the specified condition is met.
 
 Parameters:
 
-- `symbol` (string, required): The trading symbol of the conditional order, e.g. ```BTC_USDT``` on a spot exchange object or ```BTC_USDT.swap``` on a futures exchange object. See `Symbol Codes` for how to write symbol codes, including options.
-- `side` (string, required): The trade direction. For spot: ```buy``` (buy) and ```sell``` (sell). For futures: ```buy``` (open long), ```sell``` (open short), ```closebuy``` (close long) and ```closesell``` (close short). Exchange-specific parameters can be appended; see Remarks.
-- `amount` (number, required): The order quantity of the conditional order. Note: for a **spot market buy order**, the quantity is the amount to spend. On a few spot exchanges, the quantity of a market buy order is the number of coins rather than the amount to spend; see the notes on each exchange's page. For futures exchange objects, the ```amount``` parameter is always the number of contracts.
-- `condition` (object, required): The trigger condition and execution price of the conditional order. See `Condition` for its structure. See Remarks for the prices each condition type requires.
-- `arg` (string / number / bool / object / array / any, optional): Extended parameters. You can pass more than one ```arg``` parameter. String, number and similar parameters are written to the log of this conditional order, joined by spaces. Object parameters are not logged. They are passed unchanged to the exchange as exchange-specific parameters. The ```extra``` sub-object is unpacked first and then merged with the parameters appended to ```side```. In Rust, use ```exchange.CreateConditionOrderWithOptions()``` to pass object parameters.
+- `symbol` (string, required): The trading symbol for the conditional order, such as ```BTC_USDT``` for a spot exchange object or ```BTC_USDT.swap``` for a futures exchange object. For symbol formats, including options, see `Instrument Symbols`.
+- `side` (string, required): Order side. Spot trading supports ```buy``` (buy) and ```sell``` (sell). Futures trading supports ```buy``` (open a long position), ```sell``` (open a short position), ```closebuy``` (close a long position), and ```closesell``` (close a short position). This parameter can also include exchange-specific parameters. See the remarks for details.
+- `amount` (number, required): The size of the conditional order. For a **spot market buy order**, the order size is the amount to spend. Some spot exchanges instead expect the quantity of the base asset to buy. See the notes on each exchange's page for details. For futures exchange objects, ```amount``` is always expressed as the number of contracts.
+- `condition` (object, required): The trigger condition and execution price of the conditional order. See `Condition` for the parameter structure and the remarks for the price parameters required by each condition type.
+- `arg` (string / number / bool / object / array / any, optional): Optional arguments. You can pass multiple ```arg``` values. Strings, numbers, and similar values are written to the conditional order log, with multiple values separated by spaces. Object arguments are passed through to the exchange as exchange-specific parameters and are omitted from the log (the ```extra``` subobject is expanded first, then the resulting parameters are merged with the additional parameters in ```side```). In Rust, use ```exchange.CreateConditionOrderWithOptions()``` to pass object arguments.
 
-Returns (string / null value): Returns the conditional order Id on success and a null value on failure. A conditional order Id has a similar format to a regular order Id: the exchange's symbol code and the exchange's original conditional order Id, separated by a comma.
+Returns (string / null): Returns the conditional order ID on success and null on failure. Like a regular order ID, the conditional order ID consists of the exchange's instrument symbol and the original conditional order ID issued by the exchange, separated by a comma.
 
-Create a take-profit (TP) order that sells automatically once the price rises to the target level.
+Create a take-profit (TP) order that automatically submits a sell order when the price rises to the target level.
 
 ```javascript
 function main() {
-    // Create a take-profit order: when the BTC_USDT price rises to 65000, sell 0.01 BTC at a price of 65000
+    // Create a take-profit order to sell 0.01 BTC at 65000 when BTC_USDT rises to 65000
     var condition = {
         ConditionType: ORDER_CONDITION_TYPE_TP,  // Take-profit order
         TpTriggerPrice: 65000,   // Trigger price
-        TpOrderPrice: 65000      // Order price; can also be set to -1 to place a market order
+        TpOrderPrice: 65000      // Order price. Set to -1 for a market order
     }
     var id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition)
     Log("TP order Id:", id)
@@ -6711,11 +6711,11 @@ function main() {
 
 ```python
 def main():
-    # Create a take-profit order: when the BTC_USDT price rises to 65000, sell 0.01 BTC at a price of 65000
+    # Create a take-profit order to sell 0.01 BTC at 65000 when BTC_USDT rises to 65000
     condition = {
         "ConditionType": ORDER_CONDITION_TYPE_TP,  # Take-profit order
         "TpTriggerPrice": 65000,   # Trigger price
-        "TpOrderPrice": 65000      # Order price; can also be set to -1 to place a market order
+        "TpOrderPrice": 65000      # Order price. Set to -1 for a market order
     }
     id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition)
     Log("TP order Id:", id)
@@ -6723,11 +6723,11 @@ def main():
 
 ```rust
 fn main() {
-    // Create a take-profit order: when the BTC_USDT price rises to 65000, sell 0.01 BTC at a price of 65000
+    // Create a take-profit order to sell 0.01 BTC at 65000 when BTC_USDT rises to 65000
     let condition = OrderCondition {
         ConditionType: ORDER_CONDITION_TYPE_TP,  // Take-profit order
         TpTriggerPrice: 65000.0,   // Trigger price
-        TpOrderPrice: 65000.0,     // Order price; can also be set to -1 to place a market order
+        TpOrderPrice: 65000.0,     // Order price. Set to -1 for a market order
         ..Default::default()
     };
     let id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, &condition);
@@ -6735,15 +6735,15 @@ fn main() {
 }
 ```
 
-Create a stop-loss (SL) order that sells automatically once the price falls to the stop level.
+Create a stop-loss (SL) order that automatically submits a sell order when the price falls to the stop-loss level.
 
 ```javascript
 function main() {
-    // Create a stop-loss order: when the BTC_USDT price falls to 58000, sell 0.01 BTC at market price
+    // Create a stop-loss order to sell 0.01 BTC at market when BTC_USDT falls to 58000
     var condition = {
         ConditionType: ORDER_CONDITION_TYPE_SL,  // Stop-loss order
         SlTriggerPrice: 58000,   // Trigger price
-        SlOrderPrice: -1         // -1 means place a market order
+        SlOrderPrice: -1         // -1 specifies a market order
     }
     var id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition)
     Log("SL order Id:", id)
@@ -6752,11 +6752,11 @@ function main() {
 
 ```python
 def main():
-    # Create a stop-loss order: when the BTC_USDT price falls to 58000, sell 0.01 BTC at market price
+    # Create a stop-loss order to sell 0.01 BTC at market when BTC_USDT falls to 58000
     condition = {
         "ConditionType": ORDER_CONDITION_TYPE_SL,  # Stop-loss order
         "SlTriggerPrice": 58000,   # Trigger price
-        "SlOrderPrice": -1         # -1 means place a market order
+        "SlOrderPrice": -1         # -1 specifies a market order
     }
     id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, condition)
     Log("SL order Id:", id)
@@ -6764,11 +6764,11 @@ def main():
 
 ```rust
 fn main() {
-    // Create a stop-loss order: when the BTC_USDT price falls to 58000, sell 0.01 BTC at market price
+    // Create a stop-loss order to sell 0.01 BTC at market when BTC_USDT falls to 58000
     let condition = OrderCondition {
         ConditionType: ORDER_CONDITION_TYPE_SL,  // Stop-loss order
         SlTriggerPrice: 58000.0,   // Trigger price
-        SlOrderPrice: -1.0,        // -1 means place a market order
+        SlOrderPrice: -1.0,        // -1 specifies a market order
         ..Default::default()
     };
     let id = exchange.CreateConditionOrder("BTC_USDT", "sell", 0.01, &condition);
@@ -6776,13 +6776,13 @@ fn main() {
 }
 ```
 
-Creates an OCO order: sets both a take-profit and a stop-loss at the same time. When either side is triggered, the order on the other side is canceled automatically.
+Create an OCO order by setting both take-profit and stop-loss conditions. When either condition triggers, the other is automatically canceled.
 
 ```javascript
 function main() {
-    // Create an OCO order: take-profit price 65000, stop-loss price 58000
+    // Create an OCO order with a take-profit price of 65000 and a stop-loss price of 58000
     var condition = {
-        ConditionType: ORDER_CONDITION_TYPE_OCO,  // Condition type: OCO order
+        ConditionType: ORDER_CONDITION_TYPE_OCO,  // OCO order
         TpTriggerPrice: 65000,   // Take-profit trigger price
         TpOrderPrice: 65000,     // Take-profit order price
         SlTriggerPrice: 58000,   // Stop-loss trigger price
@@ -6795,9 +6795,9 @@ function main() {
 
 ```python
 def main():
-    # Create an OCO order: take-profit price 65000, stop-loss price 58000
+    # Create an OCO order with a take-profit price of 65000 and a stop-loss price of 58000
     condition = {
-        "ConditionType": ORDER_CONDITION_TYPE_OCO,  # Condition type: OCO order
+        "ConditionType": ORDER_CONDITION_TYPE_OCO,  # OCO order
         "TpTriggerPrice": 65000,   # Take-profit trigger price
         "TpOrderPrice": 65000,     # Take-profit order price
         "SlTriggerPrice": 58000,   # Stop-loss trigger price
@@ -6809,9 +6809,9 @@ def main():
 
 ```rust
 fn main() {
-    // Create an OCO order: take-profit price 65000, stop-loss price 58000
+    // Create an OCO order with a take-profit price of 65000 and a stop-loss price of 58000
     let condition = OrderCondition {
-        ConditionType: ORDER_CONDITION_TYPE_OCO,  // Condition type: OCO order
+        ConditionType: ORDER_CONDITION_TYPE_OCO,  // OCO order
         TpTriggerPrice: 65000.0,   // Take-profit trigger price
         TpOrderPrice: 65000.0,     // Take-profit order price
         SlTriggerPrice: 58000.0,   // Stop-loss trigger price
@@ -6822,11 +6822,11 @@ fn main() {
 }
 ```
 
-Creates a conditional order with an extra argument (option) that passes exchange-specific parameters.
+Create a conditional order by passing exchange-specific parameters through the optional `option` argument.
 
 ```javascript
 function main() {
-    // Exchange-specific parameters go in the last object argument
+    // Pass exchange-specific parameters in the final object argument
     var option = {
         "type": "TRAILING_STOP_MARKET",
         "activatePrice": "300",
@@ -6847,7 +6847,7 @@ function main() {
 
 ```python
 def main():
-    # Exchange-specific parameters go in the last object argument
+    # Pass exchange-specific parameters in the final object argument
     option = {
         "type": "TRAILING_STOP_MARKET",
         "activatePrice": "300",
@@ -6867,7 +6867,7 @@ def main():
 
 ```rust
 fn main() {
-    // Rust passes the object argument through the function with the WithOptions suffix
+    // In Rust, use the function with the WithOptions suffix to pass an object argument
     let opts = JSONParse(r#"{"type": "TRAILING_STOP_MARKET", "activatePrice": "300", "callbackRate": "0.1"}"#).unwrap();
     let condition = OrderCondition {
         ConditionType: ORDER_CONDITION_TYPE_TP,
@@ -6883,25 +6883,25 @@ fn main() {
 }
 ```
 
-Support for conditional orders depends on the specific exchange; some exchanges do not support conditional orders.
+Conditional order support varies by exchange. Some exchanges do not currently support conditional orders.
 
-A conditional order does not tie up account funds before it is triggered; the order is actually placed and funds are tied up only after it is triggered.
+Conditional orders do not reserve account funds before they trigger. Funds are committed when the order is submitted after triggering.
 
-Exchanges differ in how far they support conditional orders and in the specific parameters they accept. Check the corresponding exchange's API documentation before use.
+Supported conditional order types and parameters may vary by exchange. Consult the exchange's API documentation before use.
 
-Exchange-specific parameters (option) go in the last parameter as an object, for example ```exchange.CreateConditionOrder(symbol, "buy", amount, condition, {type: "TRAILING_STOP_MARKET", activatePrice: "300"})```. The keys in the object are passed to the exchange as is. In Rust, use ```exchange.CreateConditionOrderWithOptions()```.
+Exchange-specific parameters (option) are passed in the final object argument, as in ```exchange.CreateConditionOrder(symbol, "buy", amount, condition, {type: "TRAILING_STOP_MARKET", activatePrice: "300"})```. All keys in the object are passed to the exchange unchanged. In Rust, use ```exchange.CreateConditionOrderWithOptions()```.
 
-The supported option parameters vary by exchange; refer to the exchange's API documentation for details. Common parameters include order type (type), time in force (timeInForce), activation price (activatePrice) and callback rate (callbackRate).
+Supported option parameters vary by exchange. Refer to the exchange's API documentation. Common parameters include order type (type), time in force (timeInForce), activation price (activatePrice), and callback rate (callbackRate).
 
-The ```amount``` and ```condition``` parameters are still required when using option parameters. If some exchange API parameters are already passed through option, the corresponding parameters in option may override these basic parameters. The exact behavior depends on the exchange's API implementation.
+When using option, you must still pass the ```amount``` and ```condition``` arguments. If option contains fields that correspond to the base arguments, those fields may override the base arguments, depending on how the exchange API is implemented.
 
-Parameters can also be appended after the ```side``` parameter (legacy syntax), written as ```"side;{JSON object}"``` or ```"side;key=value&key=value"```, for example ```"buy;{\"type\":\"TRAILING_STOP_MARKET\",\"activatePrice\":\"300\"}"``` or ```"buy;type=TRAILING_STOP_MARKET&activatePrice=300"```. The supported parameters depend on the exchange API.
+You can also append parameters to the ```side``` argument using the legacy syntax. Use ```"side;{JSON对象}"``` or ```"side;key=value&key=value"```, as in ```"buy;{\"type\":\"TRAILING_STOP_MARKET\",\"activatePrice\":\"300\"}"``` or ```"buy;type=TRAILING_STOP_MARKET&activatePrice=300"```. Supported parameters depend on the exchange API.
 
-The ```ConditionType``` of ```condition``` can be OCO, TP or SL from `ORDER_CONDITION_TYPE`. `ORDER_CONDITION_TYPE_GENERIC` appears only in query results (for exchange-specific conditional orders such as trailing stops). It cannot be used when creating or modifying a conditional order; passing it raises an error and returns a null value. Every trigger price and execution price required by the selected type must be passed and must not be 0 (OCO needs all four, TP needs the two take-profit prices, SL needs the two stop-loss prices); otherwise an error is raised and a null value is returned. An execution price of -1 means the order is executed as a market order once triggered.
+The ```ConditionType``` field of ```condition``` accepts OCO, TP, and SL as defined in `ORDER_CONDITION_TYPE`. `ORDER_CONDITION_TYPE_GENERIC` is used only in query results to identify exchange-specific conditional orders such as trailing stop orders. Passing this type when creating or modifying a conditional order produces an error and returns null. Provide all trigger and execution prices required by the selected type (all four for OCO, both take-profit prices for TP, and both stop-loss prices for SL). A missing or zero price produces an error and returns null. An execution price of -1 submits a market order when triggered.
 
-Exchanges that do not support this function: `Bithumb`, `Bitstamp`, `Coinw`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Korbit`, `LBank`, `MEXC`, `Upbit`, `WEEX`, `Zaif`, `Hyperliquid`, `Pendle`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter`, `OKX_DEX`, `Futures_Polymarket`, `Futures_PredictFun`, `Futures_Futu`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
+The following exchanges do not support conditional orders: `Bithumb`, `Bitstamp`, `Coinw`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Korbit`, `LBank`, `MEXC`, `Upbit`, `WEEX`, `Zaif`, `Hyperliquid`, `Pendle`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter`, `OKX_DEX`, `Futures_Polymarket`, `Futures_PredictFun`, `Futures_Futu`, `Futures_IB`, `Exchange`, and `Web3`. Calling the conditional order API on any of these exchanges produces an error and returns null. See the `Capability Matrix` for support by exchange.
 
-Paper trading accounts (added with the trading mode set to "Paper trading") also support conditional orders, except on prediction markets. They trigger by the same rules as in the backtesting system: a buy take-profit triggers when the price falls to or below its trigger price and a buy stop-loss when the price rises to or above it, the other way round for sells; an OCO order executes whichever leg is met first, judged on the order book mid price. Once triggered, a normal limit order is placed at the order price of that leg, or a market order when the order price is -1. Nothing is frozen before the trigger; at the trigger the order is checked like a normal order for balance and margin, and if it is refused the conditional order is recorded as canceled together with the reason. Modifying it with `exchange.ModifyConditionOrder` keeps the conditional order Id.
+Simulated trading accounts (created by setting the trading mode to “Simulated Trading” when adding an exchange) also support conditional orders, except on prediction markets. They follow the same trigger rules as the backtesting system. For a buy conditional order, take-profit triggers when the price falls to or below the trigger price, and stop-loss triggers when the price rises to or above it. The trigger directions are reversed for sell conditional orders. An OCO order executes only the leg whose trigger condition is met first. All conditional orders use the order book midpoint to evaluate trigger conditions. Once triggered, a standard limit order is submitted at the specified order price. An order price of -1 submits a market order. Funds are not reserved before triggering. At trigger time, balance and margin are checked under the standard order rules. If order submission is rejected, the conditional order is marked as canceled and the reason is recorded. The conditional order ID remains the same after modification through `exchange.ModifyConditionOrder`. For other simulated trading rules, see “Platform Basics → Exchanges → Simulated Trading” in the user guide.
 
 See also: `Condition`, `exchange.CancelConditionOrder`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`, `exchange.ModifyConditionOrder`
 
@@ -9901,16 +9901,16 @@ Forms:
 
 - `exchange.IO(mode, value)`
 
-Switches the trading mode of an exchange, including demo/live trading, cross/isolated margin, hedge/one-way position mode, unified account, margin trading mode and self-trade prevention.
+Switches exchange trading modes, including demo/live trading, cross/isolated margin, hedge/one-way position mode, unified account mode, margin trading modes, and self-trade prevention.
 
 Parameters:
 
-- `mode` (string, required): The command, e.g. ```simulate```, ```cross```, ```dual```. See the table below for the full list of commands.
-- `value` (bool / string, optional): The value for the command. Its type and meaning are given in the table below. Some commands do not take this parameter.
+- `mode` (string, required): Trading mode command, such as ```simulate```, ```cross```, or ```dual```. See the table below for the full list.
+- `value` (bool / string, optional): Value for the command parameter. See the table below for its type and meaning. Some commands take no parameter.
 
-Returns (string / number / bool / object / array / any): The return value depends on the command. Some commands (e.g. ```cross``` and ```dual``` on certain exchanges) return a null value even when the call succeeds. On failure, a null value is returned, and the error message can be retrieved with `GetLastError`.
+Returns (string / number / bool / object / array / any): The return value depends on the command. Some commands, such as ```cross``` and ```dual``` on certain exchanges, may return an empty value even on success. A failed call returns an empty value. Use `GetLastError` to retrieve the error details.
 
-Switch between demo and live trading environments (using ```Futures_OKCoin``` (OKX Futures) as an example).
+Switch between the demo and live trading environments (using ```Futures_OKCoin``` (OKX Futures) as an example).
 
 ```javascript
 function main() {
@@ -9935,7 +9935,7 @@ fn main() {
 }
 ```
 
-Switch the margin mode and position mode of contracts (using Binance Futures as an example).
+Switch futures margin and position modes (using Binance Futures as an example).
 
 ```javascript
 function main() {
@@ -9969,7 +9969,7 @@ fn main() {
 }
 ```
 
-Switch unified account mode (using Binance Futures as an example).
+Switch account modes (using Binance Futures as an example).
 
 ```javascript
 function main() {
@@ -9991,7 +9991,7 @@ fn main() {
 }
 ```
 
-Set the self-trade prevention (STP) mode (using Binance as an example).
+Set the self-trade prevention mode (using Binance as an example).
 
 ```javascript
 function main() {
@@ -10012,26 +10012,36 @@ fn main() {
 }
 ```
 
-##### General Trading Mode Commands
+##### Common Trading Mode Commands
 
-The following commands are shared by multiple exchanges. For which commands each exchange supports, see the `capability matrix`. For differences in value meaning, whether a command applies per contract, and return values, see the page for each exchange.
+The following commands apply to multiple exchanges. See the `Capability Matrix` for the commands supported by each exchange. See the individual exchange documentation for parameter meanings, whether each command applies per contract, and return values.
 
 | Command | Parameter | Function |
 | - | - | - |
-| ```simulate``` | bool | Demo trading (true) / live trading (false). It is recommended to tick "Demo trading" when adding the exchange; this command is kept only for compatibility with legacy strategies |
-| ```cross``` | bool | Cross margin (true) / isolated margin (false) |
-| ```dual``` | bool | Hedge mode (true) / one-way mode (false) |
-| ```unified``` | bool | Unified account (true) / normal account (false) |
+| ```simulate``` | bool | Demo trading (true)/live trading (false). Select “Demo Trading” when adding the exchange. This command is retained for compatibility with legacy strategies |
+| ```cross``` | bool | Cross margin (true)/isolated margin (false) |
+| ```dual``` | bool | Hedge mode (true)/one-way mode (false) |
+| ```unified``` | bool | Unified account (true)/standard account (false) |
 | ```trade_margin``` | None | Switch to isolated margin trading mode |
 | ```trade_super_margin``` | None | Switch to cross margin trading mode |
-| ```trade_normal``` | None | Switch back to normal spot mode |
+| ```trade_normal``` | None | Switch back to standard spot trading mode |
 | ```selfTradePreventionMode``` | string | Self-trade prevention (STP) mode |
 
 ##### Demo Trading
 
-Exchanges that support demo trading offer a "Demo trading" checkbox in their configuration when added. Once ticked, the exchange object connects to the demo environment (testnet) from startup, and the strategy does not need to switch. Supported exchanges include: Binance Spot and Futures, Bybit Spot and Futures, OKX Spot and Futures, Bitget Spot and Futures, Gate.io Spot and Futures, Futures_DigiFinex, Hyperliquid Spot and Futures (testnet), Futures_Lighter, and Futu (paper trading account).
+For exchanges that support demo trading, select “Demo Trading” in the configuration when adding the exchange. The exchange object then connects to the demo environment (testnet) at startup, so the strategy can use it directly. Supported exchanges include Binance spot and futures, Bybit spot and futures, OKX spot and futures, Bitget spot and futures, Gate.io spot and futures, Futures_DigiFinex, Hyperliquid spot and futures (testnet), Futures_Lighter, and Futu (paper trading accounts).
 
-```exchange.IO("simulate", true/false)``` can still switch between demo and live trading at runtime for compatibility with legacy strategies (see the support tables for each command below for supported exchanges); new strategies should rely on the checkbox set when adding the exchange. The DigiFinex spot exchange itself does not provide a demo environment.
+```exchange.IO("simulate", true/false)``` can still switch between demo and live trading while a strategy is running for compatibility with legacy strategies (see the support tables for each command below). New strategies use the mode selected when adding the exchange. DigiFinex spot has no demo trading environment.
+
+##### Paper Trading Accounts
+
+Accounts configured with the “Paper Trading” mode when adding an exchange use live market data and simulate fills locally on the Docker. This mode is separate from the demo environment described above (see “Platform Basics → Exchanges → Paper Trading” in the User Guide). Trading mode commands for these accounts update only the local paper trading settings:
+
+| Command | Description |
+| - | - |
+| ```exchange.IO("paper.reset")``` | Reset the paper trading account by canceling all open and conditional orders, clearing all positions, and restoring the initial funds specified in the exchange configuration. The one-way/hedge mode setting is retained. After changing the initial funds, live strategy instances that have run before must call this command to apply the new amount |
+| ```exchange.IO("dual", true/false)``` | Switch between hedge and one-way position modes. The switch is blocked while there are open positions or outstanding futures orders |
+| ```exchange.IO("cross", true)``` | Only cross margin mode is supported. Calling ```exchange.IO("cross", false)``` returns an error |
 
 See also: `exchange.IO`
 

@@ -135,48 +135,49 @@ The basic objects of the platform: exchange accounts, the docker that runs strat
 
 ### Exchange
 
-The [Exchange](https://www.fmz.com/m/platforms) page manages the exchange accounts you have configured. On FMZ, an "exchange" is an account a strategy program can operate: it holds the keys of the funding account together with the protocol and API wrapper used to talk to that exchange.
+The [Exchanges](https://www.fmz.com/m/platforms) page lets you manage configured exchange accounts. On the FMZ Quant Trading Platform, an “exchange” is an account that a strategy can operate. It includes the API credentials for the trading account and the protocol and API wrappers needed to communicate with the exchange.
 
-#### Adding an exchange account
+#### Add an Exchange Account
 
-1. **Create an API key on the exchange**: enable only read and trade permissions, never withdrawal; if the exchange supports an IP whitelist, bind the outbound IP of the docker that will run the robot (see the checklist in `Key Security`).
-2. **Open the add page**: click "Add Exchange" on the Exchange page to open the [add exchange page](https://www.fmz.com/m/add-platform).
-3. **Choose the protocol**: pick the exchange by category, or search by exchange name or ID. Spot and futures (contracts) are two different exchange objects and are added separately; futures exchanges carry a "Futures" tag. For example Binance spot is ```Binance``` and Binance futures is ```Futures_Binance```.
-4. **Fill in the configuration**: "Label" is the account's name on the platform (the exchange name by default) and tells several accounts on the same exchange apart. The other fields depend on the exchange; the common ones are listed below, and the full list for each exchange is on its exchange page in the syntax manual (all exchanges are listed in `Capability Matrix`). Fields not marked optional are required.
-5. **Confirm**: click the confirm button and enter your platform account password. Encrypted fields such as keys are encrypted in the browser with the account password before upload, so the platform never stores them in plain text.
-6. **Use it**: select the exchange account when creating a live robot or a backtest. If you use the platform's public dockers, their IPs are listed at the bottom of the add page; add them to the exchange's IP whitelist.
+1. **Create an API key on the exchange**: Grant only read and trade permissions and leave withdrawal permissions disabled. If the exchange supports IP allowlisting, restrict the key to the outbound IP address of the Docker that runs the live strategy (see `API Key Security` for the configuration checklist).
+2. **Open the setup page**: Click “Add Exchange” on the Exchanges page to open the [Add Exchange page](https://www.fmz.com/m/add-platform).
+3. **Select a protocol**: Select an exchange by category or search by exchange name or ID. Spot and futures trading use separate exchange objects and must be added separately. Futures exchange objects are marked “Futures”. For example, Binance spot uses ```Binance```, and Binance futures uses ```Futures_Binance```.
+4. **Enter the configuration**: “Label” is the account’s display name on the platform. It defaults to the exchange name and helps distinguish multiple accounts on the same exchange. The remaining settings vary by exchange. The table below lists common settings. For the full configuration, see the exchange’s page in the API Reference (see the `Capability Matrix` for the exchange list). All settings are required unless marked “Optional”.
+5. **Confirm the setup**: Click “Confirm Add” and enter your platform account password. Your browser uses the password to encrypt the API credentials and other sensitive fields before uploading them. The platform does not store these fields in plaintext.
+6. **Use the account**: Select the exchange account when creating a live trading instance or configuring a backtest. If you use the platform’s shared Dockers, their outbound IP addresses are listed at the bottom of the setup page. Add them to the exchange’s IP allowlist.
 
-#### Common fields
+#### Common Configuration Settings
 
-| Field | Description |
+| Setting | Description |
 | - | - |
-| Access Key, Secret Key | The exchange API key and secret. Secret Key is an encrypted field |
-| Passphrase | The passphrase set when creating the API key; required by some exchanges (see below) |
-| Simulate (demo) | When checked, connects to the exchange's demo trading or testnet; usually needs a separate API key |
-| Version, V5 protocol, V3 protocol | The exchange API version; keep the default on most exchanges |
-| Wallet address and private keys | The wallet address, wallet private key or exchange-generated API private key used to sign on on-chain exchanges |
-| Rpc Address, Chain, ChainType | Node address and chain for the on-chain swap and Web3 exchange objects; see `Web3` |
-| Server address, trading password | Securities and futures accounts such as Futu and Interactive Brokers; see `Securities and Futures` in the syntax manual |
+| Access Key, Secret Key | The API key and its corresponding secret issued by the exchange. The Secret Key field is encrypted |
+| Passphrase | The passphrase set when creating the API key. Some exchanges require it (see below) |
+| Trading Mode | “Live Trading” sends orders to the exchange. “Paper Trading” simulates fills locally on the Docker using real market data and requires no real funds. See `Paper Trading`. This setting is available only for exchange objects that support paper trading |
+| Demo Trading | Enable this option to connect to the exchange’s demo environment (testnet). You typically need to create a separate API key on the exchange. For the differences between demo trading and paper trading, see `Paper Trading` |
+| Version, V5 Protocol, V3 Protocol | Specifies the exchange API version. The default works for most exchanges |
+| Wallet Address and Private Key Fields | The wallet address, wallet private key, or exchange-generated API private key used to sign requests for on-chain exchanges |
+| Rpc Address, Chain, ChainType | The node address and blockchain used by on-chain swap and Web3 exchange objects. See `Web3` |
+| Server Address, Trading Password | Used for securities and futures brokerage accounts such as Futu and Interactive Brokers. See the relevant exchange page under `Securities and Futures` in the API Reference |
 
-- Passphrase: required by ```OKEX``` (OKX), ```Futures_OKCoin``` (OKX futures), Bitget, DeepCoin, ```Futures_KuCoin```, ```WEEX```, ```Futures_WEEX``` and others. For ```KuCoin``` spot this field is labeled Password.
-- Simulate (demo): supported by some exchange objects of Binance, OKX, Bybit, Gate and DigiFinex.
-- API version: on a few exchanges the version selects the account type, for example v3 is the unified account and v2 the classic account on Bitget; see the exchange page.
-- Wallet address and private keys: used by on-chain exchanges such as Hyperliquid, Lighter, EdgeX, Aster and Polymarket; see the exchange pages under `Decentralized Exchanges` and `Prediction Markets` in the syntax manual for the exact fields.
+- Passphrase: Exchanges that require this field include ```OKEX``` (OKX), ```Futures_OKCoin``` (OKX futures), Bitget, DeepCoin, ```Futures_KuCoin```, ```WEEX```, and ```Futures_WEEX```. For ```KuCoin``` spot, this field is labeled Password.
+- Demo Trading: Some exchange objects for Binance, OKX, Bybit, Gate, and DigiFinex support demo trading.
+- API Version: Some exchanges use different API versions for different account types. For example, Bitget v3 is for Unified Accounts and v2 is for Classic Accounts. See the relevant exchange page for details.
+- Wallet Address and Private Key Fields: Used for on-chain exchanges such as Hyperliquid, Lighter, EdgeX, Aster, and Polymarket. For the specific fields, see the relevant exchange pages under `Decentralized Exchanges` and `Prediction Markets` in the API Reference.
 
-Every masked (encrypted) input can hold a credential file path instead, so the private key stays only on the docker's machine; see `Local Credential Files`.
+All masked, encrypted input fields accept a credentials file path so the private key can stay on the machine running the Docker. See `Local Credentials Files`.
 
-#### Exchange objects
-In strategy code a configured exchange is the exchange object `exchange`. A backtest or live robot can be configured with several exchanges; in code they form the exchange object array `exchanges`. ```exchange.GetName()``` returns the name of the exchange object (such as ```Futures_Binance```); the documentation uses this name when it refers to a specific exchange, with the common name in parentheses where helpful.
+#### Exchange Objects
+A configured exchange account is represented in strategy code by the `exchange` exchange object. When configuring a backtest or a live trading instance, you can add multiple exchange accounts. In code, these are represented by the `exchanges` array of exchange objects. ```exchange.GetName()``` returns the exchange object’s name (such as ```Futures_Binance```). This documentation uses that name to refer to a specific exchange object and gives the commonly used name in parentheses where needed.
 
-Strategy code reads the account and market data, places orders and cancels them through the exchange object. In ```JavaScript```:
+In strategy code, you can use exchange objects to retrieve account information and market data, place orders, and cancel orders. Here is a ```JavaScript``` example:
 
 ```javascript
 function main() {
-    let account = exchange.GetAccount()    // query account information
-    let ticker = exchange.GetTicker()      // get the ticker
-    let id = exchange.Buy(1000, 1)         // price 1000, amount 1
+    let account = exchange.GetAccount()    // Retrieve account information
+    let ticker = exchange.GetTicker()      // Retrieve ticker data
+    let id = exchange.Buy(1000, 1)         // Place an order at a price of 1000 for a quantity of 1
     if (id) {
-        exchange.CancelOrder(id)           // cancel the order if it is still open
+        exchange.CancelOrder(id)           // Only successful submissions return an order ID. Cancel the order if it is still unfilled.
     }
 }
 ```
@@ -184,6 +185,71 @@ function main() {
 #### Exchange-Specific Notes
 
 The configuration, contract codes, exchange-specific commands and notes of each exchange have moved to the "Exchanges" chapter of the syntax manual. Function and trading-mode command support of all exchanges is in `Capability Matrix`; the exchange pages are grouped under `Centralized Exchanges`, `Decentralized Exchanges`, `Prediction Markets`, `Securities and Futures` and `On-chain & Custom`.
+
+#### Paper Trading
+
+When adding an exchange, select “Live Trading” or “Paper Trading” under “Trading Mode.” A paper trading account uses real market data from the exchange. The Docker simulates order placement, cancellations, and queries for orders, balances, and positions locally. Orders never reach the exchange, and no real funds are used. This mode lets you validate a strategy’s order placement logic and capital management using real market data before committing real funds.
+
+Only exchanges that support paper trading show the “Paper Trading” option under Trading Mode. Paper trading accounts require a newer Docker version. Starting a live trading instance that includes a paper trading account on an older Docker returns an error.
+
+##### Differences from Exchange Demo Trading
+
+Some exchanges run their own demo environment (testnet). To use it, check “Demo Trading” in the exchange settings. The two modes differ as follows:
+
+| | Paper Trading | Exchange Demo Trading |
+| - | - | - |
+| Setup | Select “Paper Trading” under Trading Mode | Check “Demo Trading” in the exchange settings |
+| Market Data | Real market data from the exchange | Market data from the exchange’s test environment |
+| Order Matching | The Docker simulates matching locally using the real order book | The exchange’s test environment matches orders |
+| API Key | Complete only the fields shown in the form. Most exchanges do not require API credentials | Usually requires a separate API key created in the exchange’s test environment |
+| ```IsVirtual()``` | Returns true when all exchange accounts in the live trading instance are paper trading accounts | Returns false |
+
+##### Configuration Options
+
+| Option | Description |
+| - | - |
+| Initial Funds | The starting balances for the paper trading account. For spot trading, you can specify multiple assets. For derivatives, you can specify one margin asset only. Use the quote currency for stablecoin-margined contracts (e.g., 10000 USDT) and the base currency for coin-margined contracts (e.g., 1 BTC). |
+| Trading Fees (Optional) | Select “Custom Fee Rates” and enter the maker and taker rates as percentages (```0.05``` represents 0.05%). Changes apply only to subsequent fills. |
+| Minimum Fee per Order (Optional) | Securities venues provide this option. If the fee calculated for an order is below this amount, the minimum fee applies. |
+
+- If no fee rates are specified, the system uses the rates in the exchange’s instrument specifications. If those specifications do not include rates, the defaults are 0.1% for spot trades and 0.02% maker and 0.05% taker for derivatives.
+- Prediction markets charge fees according to each market’s fee schedule. On-chain swap fees are included in the quote. Neither venue type offers configurable trading fees.
+
+##### Paper Trading Accounts
+- Each live trading instance has its own paper trading account. Accounts remain independent even when multiple instances use the same exchange configuration.
+- Balances, positions, open orders, and conditional orders persist across restarts.
+- Changing the initial funds does not affect a live trading instance that has already run. To reset the account using the new initial funds, call ```exchange.IO("paper.reset")``` in the strategy. This cancels all open and conditional orders, clears all positions, and resets the balances to their initial values. The one-way or hedge mode setting is preserved.
+- Orders are not matched while the live trading instance is stopped. On restart, the system does not match orders retroactively using market data from the downtime.
+- The strategy can still receive push updates for orders, fills, balances, and positions. The paper trading account generates these updates.
+
+##### Order Matching Rules
+- **Taker Orders**: Market orders and limit orders that can execute immediately against the opposite side of the book are matched level by level against the real order book at submission. Each fill uses the price at the corresponding level, and partial fills are allowed. Any unfilled portion of a market order is automatically canceled. For limit orders, TimeInForce determines what happens to the unfilled portion. GTC leaves it on the book, IOC cancels it, FOK cancels the entire order if it cannot be filled in full, and PostOnly rejects the order if it would execute immediately.
+- **Maker Orders**: When the opposite-side price reaches a resting order’s limit price, the order fills at its limit price. The fill quantity is capped by the opposing order book liquidity that can match the resting order. Queue position is not simulated: the order fills as soon as the opposite price reaches its limit price, without waiting for other orders resting ahead of it at the same price.
+- **Conditional Orders**: Take-profit, stop-loss, and OCO orders trigger based on the order book midpoint. The trigger rules are the same as in the backtesting system. See ```exchange.CreateConditionOrder``` in the API reference.
+- Orders must meet the price precision, quantity precision, and minimum order size requirements in the exchange’s instrument specifications. Orders fail if the balance or margin is insufficient.
+- If a market data outage makes the order book unavailable, the system suspends matching for resting orders, unrealized P&L calculations, and liquidations.
+
+##### Derivatives
+- Only cross margin mode is supported. Calling ```exchange.IO("cross", false)``` to switch to isolated margin mode returns an error.
+- Use ```exchange.IO("dual", true)``` to switch to hedge mode and ```exchange.IO("dual", false)``` to switch to one-way mode. The mode cannot be changed while there are open positions or open derivatives orders.
+- The default leverage is 10x. If the instrument allows a lower maximum, that maximum applies. Call ```exchange.SetMarginLevel()``` to adjust leverage.
+- Position margin = position size × average entry price / leverage. Resting orders reserve margin only for the portion that opens a position. Closing and reduce-only orders require no margin and can be submitted even when the available balance is negative.
+- Unrealized P&L is calculated using the order book midpoint.
+- For perpetual contracts, funding is settled at each scheduled funding time using the exchange’s funding rate at that time. Long positions pay when the rate is positive.
+- Liquidation occurs when account equity is at or below the maintenance margin (0.5% of position notional value). All positions are closed at the order book midpoint, and conditional orders are canceled.
+
+##### Securities
+
+Paper trading with Futu Securities (```Futures_Futu```) or Interactive Brokers (```Futures_IB```) requires neither ```FutuOpenD``` nor TWS, and no exchange configuration fields need to be completed. Paper trading uses public market data and supports only U.S. equities (symbols use the ```AAPL.US``` format). Initial funds are denominated in USD. Short selling is unavailable, and the sell quantity cannot exceed the position size.
+
+##### Prediction Markets
+
+The following paper trading rules apply to Polymarket and predict.fun. Purchases must be paid in full, and short selling is unsupported. Fees follow the market’s fee schedule and are paid only by takers. Open orders are canceled when the market stops trading or settles. Settled shares are automatically redeemed for cash at 1 or 0 per share. Before settlement, shares are valued at the latest price. Prediction markets do not support conditional orders. Polymarket split, merge, and redeem operations are recorded only in the paper trading account and are never submitted to the blockchain.
+
+##### Unsupported Features
+- Raw exchange API calls via exchange-specific methods such as ```exchange.IO("api", ...)```. These calls may directly access trading endpoints for real accounts. Paper trading accounts reject them, except for a few read-only queries.
+- ```ctx.submit``` (WebSocket order placement).
+- Isolated margin.
 
 #### Local Credential Files
 
@@ -474,30 +540,30 @@ When a rented strategy expires, the robots using it are stopped and cannot be st
 
 ### Live Trading
 
-As opposed to a backtest, a live robot is a strategy program instance that really interacts with an exchange (fetching market data, querying positions, placing and canceling orders, etc.). An instance connected to the exchange's production environment is a live robot, and so is one connected to the exchange's simulation environment (many exchanges offer a test environment).
+The term “live trading” distinguishes a running strategy instance that interacts with an exchange (to retrieve market data, query positions, place orders, cancel orders, and so on) from a backtest. Live trading instances can connect to either an exchange’s production environment or its simulated environment (many exchanges provide a test environment). When the exchange account’s trading mode is set to “Paper Trading”, the live trading instance uses live market data and simulates fills locally on the Docker without using real funds. See `Paper Trading`.
 
-#### Creating a live robot
-On the [robot creation page](https://www.fmz.com/m/add-robot), choose the strategy, the docker and the exchange accounts, then create the robot. Three things must be ready beforehand:
-- A strategy: click "New Strategy" in the [Strategy Library](https://www.fmz.com/m/strategies), write it and save it.
-- An online docker: click "Deploy Docker" on the [Docker page](https://www.fmz.com/m/nodes) (see `Docker`).
-- An exchange account: click "Add Exchange" on the [Exchange page](https://www.fmz.com/m/platforms) and configure it (see `Exchange`).
+#### Create a Live Trading Instance
+On the [Create Live Trading page](https://www.fmz.com/m/add-robot), select a strategy, a Docker, and an exchange account to create a live trading instance. Make sure you have all three ready:
+- A strategy: Click “New Strategy” in the [Strategy Library](https://www.fmz.com/m/strategies) to write and save a strategy.
+- An online Docker: Click “Deploy Docker” on the [Dockers page](https://www.fmz.com/m/nodes). See `Docker`.
+- An exchange account: Click “Add Exchange” on the [Exchanges page](https://www.fmz.com/m/platforms) and configure the account. See `Exchanges`.
 
-Live robots are billed by the hour and cannot start without enough balance (see `Live Robot Billing and Top-up`).
+Live trading is billed by the hour. Your account must have sufficient balance to start a live trading instance. See `Live Trading Billing and Top-Ups`.
 
-#### Robot monitoring
-On the [live trading page](https://www.fmz.com/m/robots), click "Monitor" in the actions column of a running robot to enable monitoring. Once enabled, when the robot exits for any reason other than a manual operation, the platform sends a notification according to the [push settings](https://www.fmz.com/m/account#push) (App, email, Telegram; never to the WebHook).
+#### Live Trading Monitoring
+On the [Live Trading Management page](https://www.fmz.com/m/robots), click “Monitor” in the Actions column to the right of a running live trading instance to enable monitoring. Once monitoring is enabled, if the instance exits for any reason other than manual intervention, the platform sends a notification according to your [Notification Settings](https://www.fmz.com/m/account#push) (via the app, email, or Telegram. WebHook notifications are excluded).
 
-#### Robot database
-For robot ID ```123456```, the database file is ```logs/storage/123456/123456.db3``` (```SQLite```) under the working directory of the docker running it, with these tables:
-- chart: chart data.
-- cfg: the latest state such as the status bar content and the chart configuration.
-- kvdb: data persisted with the ```_G()``` function.
-- log: robot logs.
-- profit: profit data.
+#### Live Trading Database
+For example, for a live trading instance with ID ```123456```, the database file’s path relative to its Docker’s working directory is ```logs/storage/123456/123456.db3``` (```SQLite``` format). The database contains the following tables:
+- chart: Chart data.
+- cfg: State information, including the latest status bar contents and chart configuration.
+- kvdb: Data persisted by the ```_G()``` function.
+- log: Live trading logs.
+- profit: Profit data.
 
-The same directory also holds the strategy process's standard output ```stdout.log``` and standard error ```stderr.log```.
+The same directory also contains the strategy process’s standard output log ```stdout.log``` and standard error log ```stderr.log```.
 
-To let other people view and operate some of your robots, use sub-accounts (see `Sub-accounts`).
+You can use `Sub-Accounts` to authorize others to view and manage specific live trading instances.
 
 #### Grouping
 
