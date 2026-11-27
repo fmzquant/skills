@@ -4871,6 +4871,7 @@ The exchange has no such endpoint; the docker implements the function:
 
 - `BitFlyer`, `Coincheck`, `Zaif`, `Futures_Polymarket`: The exchange has no K-line endpoint; bars are synthesized by the docker from trades. The first call covers only the few bars spanned by recent trades, and more accumulate with later calls.
 - `Futures_Aevo`: The exchange has no K-line endpoint; bars are synthesized by the docker from trades. The first call covers only the few bars spanned by recent trades, and more accumulate with later calls. The result is empty while the contract has no trades.
+- `Futures_PredictFun`: The exchange has no K-line endpoint; bars are aggregated from the exchange's match records: 1m, 5m, 15m, 30m, 1h, 4h, 1d and 1w are supported, and other periods are synthesized by the docker from these. A period without trades repeats the previous close with zero volume; there are no bars before the first trade. At most 6000 trades are read per call; with more, only the bars they cover are returned.
 
 Some periods are synthesized by the docker:
 
@@ -6898,7 +6899,7 @@ Parameters can also be appended after the ```side``` parameter (legacy syntax), 
 
 The ```ConditionType``` of ```condition``` can be OCO, TP or SL from `ORDER_CONDITION_TYPE`. `ORDER_CONDITION_TYPE_GENERIC` appears only in query results (for exchange-specific conditional orders such as trailing stops). It cannot be used when creating or modifying a conditional order; passing it raises an error and returns a null value. Every trigger price and execution price required by the selected type must be passed and must not be 0 (OCO needs all four, TP needs the two take-profit prices, SL needs the two stop-loss prices); otherwise an error is raised and a null value is returned. An execution price of -1 means the order is executed as a market order once triggered.
 
-Exchanges that do not support this function: `Bithumb`, `Bitstamp`, `Coinw`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Korbit`, `LBank`, `MEXC`, `Upbit`, `WEEX`, `Zaif`, `Hyperliquid`, `Pendle`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter`, `OKX_DEX`, `Futures_Polymarket`, `Futures_Futu`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
+Exchanges that do not support this function: `Bithumb`, `Bitstamp`, `Coinw`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Korbit`, `LBank`, `MEXC`, `Upbit`, `WEEX`, `Zaif`, `Hyperliquid`, `Pendle`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter`, `OKX_DEX`, `Futures_Polymarket`, `Futures_PredictFun`, `Futures_Futu`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
 
 See also: `Condition`, `exchange.CancelConditionOrder`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`, `exchange.ModifyConditionOrder`
 
@@ -7300,7 +7301,7 @@ The return value of the ```exchange.CancelConditionOrder()``` function only indi
 
 Only untriggered conditional orders can be canceled; conditional orders that have already been triggered and converted into regular orders cannot be canceled through this function.
 
-Exchanges that do not support this function: `Bithumb`, `Bitstamp`, `Coinw`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Korbit`, `LBank`, `MEXC`, `Upbit`, `WEEX`, `Zaif`, `Hyperliquid`, `Pendle`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter`, `OKX_DEX`, `Futures_Polymarket`, `Futures_Futu`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
+Exchanges that do not support this function: `Bithumb`, `Bitstamp`, `Coinw`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Korbit`, `LBank`, `MEXC`, `Upbit`, `WEEX`, `Zaif`, `Hyperliquid`, `Pendle`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter`, `OKX_DEX`, `Futures_Polymarket`, `Futures_PredictFun`, `Futures_Futu`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
 
 See also: `exchange.CreateConditionOrder`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`, `exchange.ModifyConditionOrder`
 
@@ -7385,7 +7386,7 @@ The returned conditional order structure contains information such as the trigge
 
 Conditional order statuses include: not triggered, triggered, canceled, etc. The specific status values are determined by the exchange.
 
-Exchanges that do not support this function: `Bithumb`, `Bitstamp`, `Coinw`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Korbit`, `LBank`, `MEXC`, `Upbit`, `WEEX`, `Zaif`, `Hyperliquid`, `Pendle`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter`, `OKX_DEX`, `Futures_Polymarket`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
+Exchanges that do not support this function: `Bithumb`, `Bitstamp`, `Coinw`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Korbit`, `LBank`, `MEXC`, `Upbit`, `WEEX`, `Zaif`, `Hyperliquid`, `Pendle`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter`, `OKX_DEX`, `Futures_Polymarket`, `Futures_PredictFun`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
 
 Exchanges that serve this function through a fallback: the exchange's API does not fully provide this function, and the docker fills the gap.
 
@@ -7528,7 +7529,7 @@ On a few exchanges the open conditional-order endpoint requires a symbol: there,
 
 Support for the conditional order feature depends on the specific exchange; some exchanges may not support the conditional order feature.
 
-Exchanges that do not support this function: `Bithumb`, `Bitstamp`, `Coinw`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Korbit`, `LBank`, `MEXC`, `Upbit`, `WEEX`, `Zaif`, `Hyperliquid`, `Pendle`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter`, `OKX_DEX`, `Futures_Polymarket`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
+Exchanges that do not support this function: `Bithumb`, `Bitstamp`, `Coinw`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Korbit`, `LBank`, `MEXC`, `Upbit`, `WEEX`, `Zaif`, `Hyperliquid`, `Pendle`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter`, `OKX_DEX`, `Futures_Polymarket`, `Futures_PredictFun`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
 
 See also: `Order`, `exchange.GetConditionOrder`, `exchange.GetHistoryConditionOrders`
 
@@ -7668,7 +7669,7 @@ The returned array of historical conditional orders is sorted in ascending order
 
 Support for the conditional order feature depends on the specific exchange. Some exchanges may not support the conditional order feature or the historical conditional order query feature.
 
-Exchanges that do not support this function: `Bithumb`, `Bitstamp`, `Coincheck`, `Coinone`, `Coinw`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Korbit`, `LBank`, `MEXC`, `Upbit`, `WEEX`, `Zaif`, `Hyperliquid`, `Pendle`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter`, `OKX_DEX`, `Futures_Polymarket`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
+Exchanges that do not support this function: `Bithumb`, `Bitstamp`, `Coincheck`, `Coinone`, `Coinw`, `DigiFinex`, `Futures_DigiFinex`, `Gemini`, `HashKey`, `Korbit`, `LBank`, `MEXC`, `Upbit`, `WEEX`, `Zaif`, `Hyperliquid`, `Pendle`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter`, `OKX_DEX`, `Futures_Polymarket`, `Futures_PredictFun`, `Futures_IB`, `Exchange`, `Web3`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
 
 See also: `Order`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`
 
@@ -7948,35 +7949,36 @@ Common contract codes of crypto futures (their usual meaning; what each exchange
 
 ✓ available; ✗ explicitly rejected by the exchange (setting it fails); blank: no such contract. See the exchange pages for what each code means and how to write native codes.
 
-| Exchange | swap | this_week | next_week | month | next_month | quarter | next_quarter | third_quarter | fourth_quarter | Other |
-| - | - | - | - | - | - | - | - | - | - | - |
-| `Futures_Backpack` | ✓ |  |  |  |  |  |  |  |  |  |
-| `Futures_Binance` | ✓ | ✗ | ✗ |  |  | ✓ | ✓ |  |  |  |
-| `Futures_Bitfinex` | ✓ |  |  |  |  |  |  |  |  |  |
-| `Futures_Bitget` | ✓ |  |  |  |  | ✓ | ✓ |  |  |  |
-| `Futures_Bybit` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |  | ```delivery```, ```third_week``` |
-| `Futures_Coinw` | ✓ |  |  |  |  |  |  |  |  |  |
-| `Futures_Crypto` | ✓ | ✓ | ✓ |  |  | ✓ | ✓ |  |  | ```January```, ```February```, ```March```, ```April```, ```May```, ```June```, ```July```, ```August```, ```September```, ```October```, ```November```, ```December``` |
-| `Futures_DeepCoin` | ✓ |  |  |  |  |  |  |  |  |  |
-| `Futures_Deribit` | ✓ | ✓ | ✓ | ✓ |  | ✓ | ✓ | ✓ | ✓ | ```today```, ```tomorrow``` |
-| `Futures_DigiFinex` | ✓ |  |  |  |  |  |  |  |  |  |
-| `Futures_GateIO` | ✓ | ✓ | ✓ |  |  | ✓ | ✓ |  |  |  |
-| `Futures_HuobiDM` | ✓ | ✓ | ✓ |  |  | ✓ | ✓ |  |  |  |
-| `Futures_Kraken` | ✓ | ✓ |  | ✓ |  | ✓ | ✓ | ✓ |  | ```swap_pf```, ```month_ff```, ```this_week_ff```, ```quarter_ff```, ```next_quarter_ff```, ```third_quarter_ff``` |
-| `Futures_KuCoin` | ✓ |  |  |  |  | ✓ | ✓ |  |  |  |
-| `Futures_MEXC` | ✓ |  |  |  |  |  |  |  |  |  |
-| `Futures_OKCoin` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |  |
-| `Futures_WEEX` | ✓ |  |  |  |  |  |  |  |  |  |
-| `Futures_WOO` | ✓ |  |  |  |  |  |  |  |  |  |
-| `Futures_Hyperliquid` | ✓ |  |  |  |  |  |  |  |  |  |
-| `Futures_Lighter` | ✓ |  |  |  |  |  |  |  |  |  |
-| `Futures_EdgeX` | ✓ |  |  |  |  |  |  |  |  |  |
-| `Futures_ApolloX` | ✓ |  |  |  |  |  |  |  |  |  |
-| `Futures_Aster` | ✓ |  |  |  |  |  |  |  |  |  |
-| `Futures_Aevo` | ✓ |  |  |  |  |  |  |  |  |  |
-| `Futures_dYdX` | ✓ |  |  |  |  |  |  |  |  |  |
-| `Futures_WOOFi` | ✓ |  |  |  |  |  |  |  |  |  |
-| `Futures_Polymarket` |  |  |  |  |  |  |  |  |  | ```Yes```, ```No```, ```Up```, ```Down``` |
+| Exchange | swap | this_week | next_week | month | next_month | quarter | next_quarter | third_quarter | fourth_quarter | Down | No | Up | Yes | Other |
+| - | - | - | - | - | - | - | - | - | - | - | - | - | - | - |
+| `Futures_Backpack` | ✓ |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| `Futures_Binance` | ✓ | ✗ | ✗ |  |  | ✓ | ✓ |  |  |  |  |  |  |  |
+| `Futures_Bitfinex` | ✓ |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| `Futures_Bitget` | ✓ |  |  |  |  | ✓ | ✓ |  |  |  |  |  |  |  |
+| `Futures_Bybit` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |  |  |  |  |  | ```delivery```, ```third_week``` |
+| `Futures_Coinw` | ✓ |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| `Futures_Crypto` | ✓ | ✓ | ✓ |  |  | ✓ | ✓ |  |  |  |  |  |  | ```January```, ```February```, ```March```, ```April```, ```May```, ```June```, ```July```, ```August```, ```September```, ```October```, ```November```, ```December``` |
+| `Futures_DeepCoin` | ✓ |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| `Futures_Deribit` | ✓ | ✓ | ✓ | ✓ |  | ✓ | ✓ | ✓ | ✓ |  |  |  |  | ```today```, ```tomorrow``` |
+| `Futures_DigiFinex` | ✓ |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| `Futures_GateIO` | ✓ | ✓ | ✓ |  |  | ✓ | ✓ |  |  |  |  |  |  |  |
+| `Futures_HuobiDM` | ✓ | ✓ | ✓ |  |  | ✓ | ✓ |  |  |  |  |  |  |  |
+| `Futures_Kraken` | ✓ | ✓ |  | ✓ |  | ✓ | ✓ | ✓ |  |  |  |  |  | ```swap_pf```, ```month_ff```, ```this_week_ff```, ```quarter_ff```, ```next_quarter_ff```, ```third_quarter_ff``` |
+| `Futures_KuCoin` | ✓ |  |  |  |  | ✓ | ✓ |  |  |  |  |  |  |  |
+| `Futures_MEXC` | ✓ |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| `Futures_OKCoin` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |  |  |  |  |  |
+| `Futures_WEEX` | ✓ |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| `Futures_WOO` | ✓ |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| `Futures_Hyperliquid` | ✓ |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| `Futures_Lighter` | ✓ |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| `Futures_EdgeX` | ✓ |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| `Futures_ApolloX` | ✓ |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| `Futures_Aster` | ✓ |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| `Futures_Aevo` | ✓ |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| `Futures_dYdX` | ✓ |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| `Futures_WOOFi` | ✓ |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| `Futures_Polymarket` |  |  |  |  |  |  |  |  |  | ✓ | ✓ | ✓ | ✓ |  |
+| `Futures_PredictFun` |  |  |  |  |  |  |  |  |  | ✓ | ✓ | ✓ | ✓ |  |
 
 See also: `exchange.GetContractType`, `exchange.SetCurrency`
 
@@ -8140,7 +8142,7 @@ On some exchanges, the leverage value of a futures contract is a parameter in th
 
 On other exchanges, the leverage value of a futures contract is an independent setting of the exchange, which needs to be set through the exchange's website page or API interface. In this case, calling the ```exchange.SetMarginLevel()``` function will generate a network request and may fail to set the value. There can be various reasons for failure, for example: there are currently open positions or pending orders, which prevents a new leverage value from being set for that trading pair or contract.
 
-Exchanges that do not support this function: `Futures_Deribit`, `Futures_EdgeX`, `Futures_Boros`, `Futures_Polymarket`, `Futures_Futu`, `Futures_IB`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
+Exchanges that do not support this function: `Futures_Deribit`, `Futures_EdgeX`, `Futures_Boros`, `Futures_Polymarket`, `Futures_PredictFun`, `Futures_Futu`, `Futures_IB`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
 
 See also: `exchange`
 
@@ -8518,7 +8520,7 @@ The ```exchange.GetFundings()``` function supports both live trading and the bac
 
 Which futures exchanges cannot query funding rates in batch and need a concrete symbol (for example ```ETH_USDT.swap```) is noted on each exchange page (all exchanges are listed in `Capability Matrix`).
 
-Exchanges that do not support this function: `Futures_Polymarket`, `Futures_Futu`, `Futures_IB`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
+Exchanges that do not support this function: `Futures_Polymarket`, `Futures_PredictFun`, `Futures_Futu`, `Futures_IB`. The call fails with an error and returns null; for all exchanges see `Capability Matrix`.
 
 See also: `Funding`
 
@@ -9444,13 +9446,13 @@ Commands of ```exchange.IO()``` specific to an exchange object; see the exchange
 | ```accountId``` | `Futures_Crypto`, `Poloniex` |
 | ```accounts``` | `Futures_Futu`, `Futures_IB` |
 | ```accountType``` | `Bybit`, `Futures_Bybit` |
-| ```address``` | `Pendle`, `Futures_Boros`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter`, `OKX_DEX`, `Web3` |
+| ```address``` | `Pendle`, `Futures_Boros`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter`, `OKX_DEX`, `Futures_PredictFun`, `Web3` |
 | ```addresses``` | `OKX_DEX` |
 | ```agent``` | `Futures_Boros` |
 | ```allChainBalance``` | `OKX_DEX` |
 | ```allowance``` | `OKX_DEX` |
 | ```allTokens``` | `OKX_DEX` |
-| ```api``` | `Backpack`, `Futures_Backpack`, `BigONE`, `Bitstamp`, `Coinw`, `Crypto`, `Futures_Crypto`, `DigiFinex`, `Futures_DigiFinex`, `WOO`, `Futures_WOO`, `Hyperliquid`, `Futures_Hyperliquid`, `Futures_Lighter`, `Futures_EdgeX`, `Futures_Aevo`, `Futures_dYdX`, `Pendle`, `Futures_Boros`, `Futures_WOOFi`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Futures_Polymarket`, `Futures_IB`, `Exchange`, `Web3` |
+| ```api``` | `Backpack`, `Futures_Backpack`, `BigONE`, `Bitstamp`, `Coinw`, `Crypto`, `Futures_Crypto`, `DigiFinex`, `Futures_DigiFinex`, `WOO`, `Futures_WOO`, `Hyperliquid`, `Futures_Hyperliquid`, `Futures_Lighter`, `Futures_EdgeX`, `Futures_Aevo`, `Futures_dYdX`, `Pendle`, `Futures_Boros`, `Futures_WOOFi`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Futures_Polymarket`, `Futures_PredictFun`, `Futures_IB`, `Exchange`, `Web3` |
 | ```approve``` | `Pendle`, `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `OKX_DEX` |
 | ```approveAgent``` | `Futures_Boros` |
 | ```apy``` | `Pendle` |
@@ -9528,9 +9530,9 @@ Commands of ```exchange.IO()``` specific to an exchange object; see the exchange
 | ```lp.ticks``` | `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `Jupiter` |
 | ```lp.track``` | `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `Jupiter` |
 | ```lp.unstake``` | `Aerodrome`, `Velodrome` |
-| ```market``` | `Pendle`, `Futures_Boros` |
+| ```market``` | `Pendle`, `Futures_Boros`, `Futures_PredictFun` |
 | ```marketDataType``` | `Futures_IB` |
-| ```markets_cursor``` | `Futures_Polymarket` |
+| ```markets_cursor``` | `Futures_Polymarket`, `Futures_PredictFun` |
 | ```marketSupportedChains``` | `OKX_DEX` |
 | ```mbase``` | `Futures_Bitfinex` |
 | ```merge``` | `Futures_DeepCoin`, `Futures_Hyperliquid`, `Futures_Polymarket` |
@@ -9579,7 +9581,7 @@ Commands of ```exchange.IO()``` specific to an exchange object; see the exchange
 | ```swapSupportedChains``` | `OKX_DEX` |
 | ```tdMode``` | `OKEX`, `Futures_OKCoin` |
 | ```tick``` | `Futures_Boros` |
-| ```tickers_cursor``` | `Futures_Polymarket` |
+| ```tickers_cursor``` | `Futures_Polymarket`, `Futures_PredictFun` |
 | ```time``` | `Futures_IB` |
 | ```timeout``` | `Futures_Futu` |
 | ```token``` | `Uniswap`, `PancakeSwap`, `Aerodrome`, `Velodrome`, `KyberSwap`, `OneInch`, `Jupiter` |
@@ -28320,6 +28322,7 @@ An exchange object is named by the value of ```exchange.GetName()```; click a na
 | `Jupiter` | Jupiter | Spot | — |
 | `OKX_DEX` | OKX DEX | Spot | OKX Web3 |
 | `Futures_Polymarket` | Polymarket | Prediction market | Futures_Polymarket |
+| `Futures_PredictFun` | predict.fun | Prediction market | Futures_PredictFun, Predict, PredictFun |
 | `Futures_Futu` | Futu Securities | Securities and futures | Futu |
 | `Futures_IB` | Interactive Brokers | Securities and futures | IB |
 | `Exchange` | General Protocol | Custom access | Custom Exchange |
@@ -28406,6 +28409,7 @@ Support of the standard functions and trading-mode commands per exchange object.
 | `OKX_DEX` | ✓ | ✓ | ✗ | ✓ | Synth | ✓ | ✗ |
 | **Prediction Markets** |  |  |  |  |  |  |  |
 | `Futures_Polymarket` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ |
+| `Futures_PredictFun` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✓ |
 | **Securities and Futures** |  |  |  |  |  |  |  |
 | `Futures_Futu` | ✓ | ✓ | ✓ | ✓ | Synth | ✓ | ✗ |
 | `Futures_IB` | ✓ | ✓ | ✓ | ✗ | Synth | ✓ | ✗ |
@@ -28490,6 +28494,7 @@ Support of the standard functions and trading-mode commands per exchange object.
 | `OKX_DEX` | ✓ | ✓ | ✓ | ✗ | ✗ | ✓ | ✗ | ✗ | ✗ |
 | **Prediction Markets** |  |  |  |  |  |  |  |  |  |
 | `Futures_Polymarket` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✓ | ✗ |
+| `Futures_PredictFun` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✓ | ✗ |
 | **Securities and Futures** |  |  |  |  |  |  |  |  |  |
 | `Futures_Futu` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
 | `Futures_IB` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✗ | ✗ |
@@ -28574,6 +28579,7 @@ Support of the standard functions and trading-mode commands per exchange object.
 | `OKX_DEX` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
 | **Prediction Markets** |  |  |  |  |  |  |
 | `Futures_Polymarket` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
+| `Futures_PredictFun` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
 | **Securities and Futures** |  |  |  |  |  |  |
 | `Futures_Futu` | ✗ | ✗ | ✗ | Synth | ✓ | ✓ |
 | `Futures_IB` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
@@ -28658,6 +28664,7 @@ Support of the standard functions and trading-mode commands per exchange object.
 | `OKX_DEX` | ✓ | ✓ | — | — | — | — | — |
 | **Prediction Markets** |  |  |  |  |  |  |  |
 | `Futures_Polymarket` | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✗ |
+| `Futures_PredictFun` | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✗ |
 | **Securities and Futures** |  |  |  |  |  |  |  |
 | `Futures_Futu` | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✗ |
 | `Futures_IB` | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✗ |
@@ -39232,6 +39239,112 @@ Simulation: There is no simulated trading; every call uses real funds on the Pol
 - ```exchange.GetMarkets()``` and ```exchange.GetTickers()``` return one page (about 100 markets) per call. With no cursor set, they return only the first page of the Gamma market list; a call returns the page at the current cursor without moving it (internal queries such as ```exchange.SetContractType()``` do not advance it either); after a page has been fetched, ```exchange.IO("markets_cursor", "next")``` (or ```tickers_cursor```) advances to the next page, and after the last page the cursor returns to an empty string. To page through: ```exchange.IO("markets_cursor", "")```, then loop over ```exchange.GetMarkets()``` and ```exchange.IO("markets_cursor", "next")``` until it returns an empty string. A cursor can also be set directly, e.g. the ```next_cursor``` of a Gamma ```/markets/keyset``` response.
 - The private stream (```private``` subscription) pushes every fill of this account (kind ```fill```, ```channel``` ```fills```: order ID (the order hash, as in the order updates), match ID, this fill's price and shares, side, maker or taker) from the user channel's ```trade``` events: a fill is pushed once matched, and later on-chain settlement status changes of the same match are not pushed again; a match whose settlement fails (```FAILED```) does not retract a fill already pushed. The push carries only the fee rate, not the fee amount: the fee is 0 when the rate is 0 and empty otherwise. Fills and order updates are separate events and the exchange does not guarantee which arrives first. Fills are not backfilled: fills during a disconnection are not pushed afterwards (the cumulative filled amount of the order updates stays correct).
 - WebSocket push is supported: market data (ticker, bbo, depth, trades) and the private account stream (order updates, positions and balance) can be subscribed through the event stream, per outcome, with the same instrument codes as the other functions. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the other functions still request the REST API directly, and ```EventLoop()``` does not subscribe to this exchange's push streams by itself. The best bid and ask of ticker and bbo (with their sizes) come from the outcome's full order book stream, and the last price comes only from that outcome's own trades (the last trade price in the book snapshot is market-wide and may belong to the other outcome, so it is not used), so the last price is 0 until the outcome's first trade after subscribing; there is no 24-hour volume, open, high or low. Trades carry the same trade IDs as ```exchange.GetTrades()``` (the on-chain transaction hash; the push has no per-fill ID, so when one on-chain transaction matches several resting orders the second and later fills get ```-1```, ```-2```… appended to keep IDs unique), and their side is the taker side. The exchange has a single depth stream (full snapshot plus deltas): depth subscriptions of any size (20 levels by default, at most 255) share it, and each subscription publishes its own number of levels; the stream has no sequence numbers, so the connector checks the local book against the best bid and ask attached to every delta and resubscribes for a fresh snapshot when they disagree. The exchange has no kline stream; a kline subscription fails with an unsupported interval. Push events carry prices with 4 decimals and quantities with 6 decimals (the smallest share unit), independent of the market's price step. The private stream is one ```private``` subscription for the whole account (no symbol). It connects only when subscribed and authenticates with the same CLOB API credentials as order placement (derived from the wallet private key): once active (and again after every reconnect) it first pushes a snapshot of the USDC balance and the outcome positions from the same endpoints as ```exchange.GetAssets()``` and ```exchange.GetPositions()```, then reports ready, and afterwards pushes order updates and fills (the order ID is the one order placement returns; partial and full fills are told apart by the filled size; a matched order's average price is its order price). The exchange has no balance push and no position push, so no balances or positions are pushed after ready (order placement, cancels and fills push neither); call ```exchange.GetAssets()``` and ```exchange.GetPositions()``` for current values (the positions endpoint updates only after on-chain confirmation, several seconds after the fill). After three rejected authentications in a row (the exchange closes the connection at once) the connection status reports degraded and the private stream reports failure (market data push is unaffected). A market-wide ```tickers``` subscription is not supported (the Polymarket CLOB market channel this connector uses is per token only) and fails at subscribe; subscribe ticker per symbol.
+
+#### predict.fun
+
+A prediction market on BNB Chain, priced in USDT. The exchange object reads markets, order books, trades, orders and positions through the predict.fun REST API, logs in with the wallet private key and places orders signed with EIP-712; the USDT balance is read from a BNB Chain node (the exchange has no balance endpoint). Queries and orders go through REST; market data and the private stream also have WebSocket push (see below).
+
+##### Names and Configuration
+
+```exchange.GetName()```: ```Futures_PredictFun``` (Prediction market); aliases: Futures_PredictFun, Predict, PredictFun.
+
+| Field | Required | Description |
+| - | - | - |
+| API Key | Yes | predict.fun API key, requested at developers.predict.fun |
+| Wallet Private Key | Yes | Private key for login and order signing. With a Predict account, use the Privy wallet key exported from the predict.fun account settings (keep it safe and never share it) |
+| Predict Account Address | No | The address of the Predict account (smart-contract wallet) created on the predict.fun website, which holds the funds and positions. (more below the table) |
+
+The rest of the longer descriptions in the table:
+
+- Predict Account Address: The deposit address the website gives when you deposit may be only a forwarding address (USDT sent to it is moved on to the Predict account automatically), so it is not the Predict account and does not belong here; on a block explorer, the address the deposit forwarded its USDT to is the Predict account. When set, orders use it as maker and signer, signed by the private key (the Privy wallet key exported from the website's account settings) in the Kernel account format, and login, positions and the balance use it; when empty, the wallet of the private key trades directly. It must be a valid 0x address or startup fails. When login is refused, the address is checked on chain, and if it is not a Predict account managed by this key (for example the website's forwarding deposit address was entered), the error says why and what to change.
+
+##### Trading Pairs and Contract Codes
+
+Pair examples: ```4889683_USDT```
+
+The trading pair is the market ID (predict.fun's numeric ```marketId```) plus ```_USDT```; the quote currency can only be ```USDT```. Every candidate of a multi-outcome event (e.g. "who will win the match") is a separate binary market with its own market ID; market IDs are the ```BaseAsset``` of ```exchange.GetMarkets()``` rows, or the ```markets``` of ```exchange.IO("api", "GET", "/categories/<event slug>")```.
+
+| Contract code | Description |
+| - | - |
+| ```Yes``` | The outcome "Yes"; most markets have the two outcomes ```Yes``` and ```No```. |
+| ```No``` | The outcome "No". |
+| ```Up``` | An outcome of up/down markets; the other one is ```Down```. |
+| ```Down``` | An outcome of up/down markets. |
+
+Prediction markets have no perpetual/delivery distinction and no default contract: the contract code is the name of one of the market's outcomes, and every market has exactly two outcomes (sports and similar markets may use team names); spaces in the name are replaced with ```-```, so a full instrument code looks like ```4889683_USDT.Yes```. Outcome names are matched case-insensitively; ```exchange.GetPositions()``` and the other functions return the exchange's spelling.
+
+Finding instrument codes: ```exchange.GetMarkets()``` has one row per outcome, keyed by the full instrument code; ```exchange.IO("market", symbol)``` returns the market's full information (including ```outcomes```).
+
+The ```Symbol``` (exchange-native code) of each ```exchange.GetMarkets()``` row is that outcome's on-chain token ID (the order's ```tokenId```); it is for cross-referencing the exchange API only and cannot be used as a contract code.
+
+##### Exchange-specific IO Commands
+
+| Command | Arguments | Description | Returns |
+| - | - | - | - |
+| ```address``` | — | Get the address orders are placed from (EIP-55 checksum form): the Predict account when ```PredictAccount``` is configured, otherwise the wallet of the private key. Positions and the balance are queried for this address. | The address string. An error when no private key is configured. |
+| ```market``` | symbol | Get the full information of the market an instrument code belongs to (the exchange's market object, not cached), including the trading status ```tradingStatus```, price precision ```decimalPrecision```, fee rate ```feeRateBps```, the two ```outcomes``` (```onChainId``` is the token ID) and the resolution ```resolution```. (more below the table) | — |
+| ```markets_cursor``` | [string] | Query or set the paging cursor of ```exchange.GetMarkets()``` (an empty string clears it, back to the first page); ```next``` advances the cursor to the next page; see the notes for usage. | The current cursor string (after setting or advancing); an empty string after advancing past the last page. ```next``` fails if no page has been fetched at the current cursor yet. |
+| ```tickers_cursor``` | [string] | Like ```markets_cursor```, for ```exchange.GetTickers()```; the two cursors are independent. | As for ```markets_cursor```. |
+| ```api``` | method, path[, params[, body]] | Call the predict.fun REST API directly and return the raw exchange response (with ```success```, ```data```, ```cursor```). (more below the table) | — |
+
+The rest of the longer descriptions in the table:
+
+- ```market```: It works without a private key.
+- ```api```: ```path``` is relative to ```/v1``` (e.g. ```/positions?first=10```) or a full URL; ```params``` is an object or ```"a=1&b=2"```, appended to the query string for GET and sent as the JSON body otherwise; ```body```, when given, is sent as the request body as is. With a private key configured the request carries the login session (so endpoints that need login work); otherwise only the API key is sent.
+
+The common commands ```base``` and ```currency``` are not supported (the call fails with an error and returns null).
+
+##### Common Usage
+
+###### Find the most active market and read its order book and recent trades
+
+```javascript
+function main() {
+    // The open market with the largest 24h volume
+    var r = exchange.IO("api", "GET", "/markets", {status: "OPEN", sort: "VOLUME_24H_DESC", first: 1})
+    var m = r.data[0]
+    var symbol = m.id + "_USDT." + m.outcomes[0].name.replace(/ /g, "-")
+    Log("Symbol:", symbol, m.question, "precision:", m.decimalPrecision)
+    var depth = exchange.GetDepth(symbol)
+    Log("Best bid:", depth.Bids[0], "best ask:", depth.Asks[0])
+    var trades = exchange.GetTrades(symbol)
+    for (var i = Math.max(0, trades.length - 5); i < trades.length; i++) {
+        Log(_D(trades[i].Time), trades[i].Type == 0 ? "buy" : "sell", trades[i].Price, trades[i].Amount)
+    }
+}
+```
+
+##### Function Support
+
+Not supported (the call fails with an error and returns null): `exchange.ModifyOrder`, `exchange.SetMarginLevel`, `exchange.GetFundings`, `exchange.CreateConditionOrder`, `exchange.ModifyConditionOrder`, `exchange.CancelConditionOrder`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`, `exchange.GetHistoryConditionOrders`.
+
+Served through a fallback:
+
+- `exchange.GetRecords`: The exchange has no K-line endpoint; bars are aggregated from the exchange's match records: 1m, 5m, 15m, 30m, 1h, 4h, 1d and 1w are supported, and other periods are synthesized by the docker from these. A period without trades repeats the previous close with zero volume; there are no bars before the first trade. At most 6000 trades are read per call; with more, only the bars they cover are returned.
+
+##### Margin, Account and Simulation
+
+Margin mode: There is no margin or leverage: shares are paid for in full in USDT.
+
+Position mode: Positions are long only: the shares of each outcome form one position (```Type``` long); to bet against an outcome, buy the other one. ```Price``` is the exchange's average buy price, ```Profit``` is the exchange's PnL (```pnlUsd```) and ```Margin``` is the position valued at the price it could be sold for (```valueUsd```). There are no close directions: orders with ```closebuy```/```closesell``` as the side (or with ```reduceOnly```) are rejected; selling simply sells shares you hold.
+
+Account: Funds and positions are held at the order address (see ```address```). The balance of ```exchange.GetAccount()``` is that address's USDT on BNB Chain (```balanceOf```); ```FrozenBalance``` is the USDT still to be paid for open buy orders (the exchange reserves it per market, outcome and side) and ```Balance``` is the balance minus that; ```Equity``` is the on-chain balance plus the value of all positions, and ```UPnL``` is the sum of the positions' PnL.
+
+Simulation: The exchange has no simulated trading; on a live account every call uses real funds on the BNB Chain mainnet. The exchange configuration can choose local paper trading instead: only the API Key is needed (market data comes from the mainnet, no private key), and the initial funds can only be USDT. Orders are matched locally against the live mainnet book; buys are paid in full and shares cannot be sold short; the taker fee follows the market's rate (```feeRateBps``` × min(price, 1 − price)) and is taken from USDT, makers pay none. While a market is paused nothing fills and resting orders stay; when it stops trading or resolves, resting orders are cancelled and resolved shares are cashed in at 1 or 0 USDT automatically.
+
+##### Notes
+
+- Prices are USDT per share, between 0 and 1 (exclusive), rounded to the market's price precision (```TickSize``` of ```exchange.GetMarkets()```, 0.01 or 0.001); quantities are shares, truncated to 0.01 shares. A buy must be worth at least 1 USDT and a limit sell must be at least 1 share; the exchange checks both.
+- Each market has a single order book quoted in the first outcome (usually Yes); the second outcome's book and trade prices are derived from the first as ```1 - x``` (bids and asks swapped), so buying No takes the same liquidity as selling Yes.
+- Order types: a limit order (GTC) rests on the book; pass ```{tif: "postOnly"}``` as the last argument to only rest (the exchange cancels it when it would fill at once). A limit order with ```{tif: "ioc"}``` or ```{tif: "fok"}``` fills at once up to the limit price and the rest is cancelled (fok cancels the whole order unless it fills completely). A market order (price ```-1``` or ```type: "market"```) walks the opposite side of the book to the level that covers the order quantity (the last level if the book is too thin), widens that by ```slippage``` (0.01 by default) as the worst price, fills at once and cancels the rest; an empty opposite side is an error. Buy and sell quantities are both in shares.
+- Other order parameters go in the last object argument: ```expiration``` (expiry of a limit order, Unix seconds, at least 2 minutes ahead; no expiry when omitted), ```slippage``` (market orders), ```selfTradePrevention``` (```CANCEL_MAKER```, ```CANCEL_TAKER```, ```CANCEL_BOTH```; without it your own orders may match each other).
+- The order ID is the order hash. When order placement returns, the order is not final yet: the exchange checks the balance and approvals asynchronously and cancels orders that fail. Before the first buy or sell, the order address must approve the exchange contracts on chain to use its USDT and shares (trading once on the predict.fun website does this); otherwise the exchange rejects orders with an approval error.
+- Some markets delay taker orders and lock cancellation for a while (post-only orders excepted): cancelling then fails; retry shortly.
+- ```exchange.GetOrders()``` and ```exchange.GetPositions()``` without a symbol cover all markets. ```exchange.GetHistoryOrders()``` lists the finished orders that had fills, found from the account's match records (orders placed on the website included), newest first, the latest 50 by default (adjust with the ```limit``` parameter); orders cancelled or expired without any fill cannot be listed and can be read with ```exchange.GetOrder()``` by their order ID. Without a symbol it covers only the current instrument, and an empty string covers all. The exchange's position list leaves out remainders below 0.01 shares (such as what is left after selling a quantity truncated to 0.01 shares); they are not counted in ```Equity``` either, cannot be sold because they are below the minimum order size, and are cashed in automatically when the market resolves.
+- The exchange's order data has no creation time and no average fill price: orders placed by this exchange object carry their creation time, others have ```Time``` 0; in ```exchange.GetOrders()``` a partly filled limit order's ```AvgPrice``` is its order price, while ```exchange.GetOrder()``` and ```exchange.GetHistoryOrders()``` compute the average fill price from the match records. A market order's ```Price``` is the protection price it was signed with (the worst acceptable price), not its fill price.
+- ```exchange.GetTicker()``` reads the outcome's order book and last trade price; ```High``` and ```Low``` are the current best ask and best bid (there is no 24-hour high/low or open, ```Open``` is 0), and ```Volume``` is the 24-hour volume of the whole market (both outcomes) in USDT. The last price of ```exchange.GetTickers()``` comes from the last settled trade on the order book, to 0.01.
+- ```exchange.GetMarkets()``` and ```exchange.GetTickers()``` list only markets that are trading, one page (about 100 markets) per call; mainnet has tens of thousands of open markets and reading them all takes more than half a minute. A call returns the page at the current cursor without moving it (internal queries such as ```exchange.SetContractType()``` do not advance it either); after a page has been fetched, ```exchange.IO("markets_cursor", "next")``` (or ```tickers_cursor```) advances to the next page, and after the last page the cursor returns to an empty string. To page through: ```exchange.IO("markets_cursor", "")```, then loop over ```exchange.GetMarkets()``` and ```exchange.IO("markets_cursor", "next")``` until it returns an empty string. With a symbol, only that instrument's market is read. To pick markets by volume and the like, query the exchange's market list directly with ```exchange.IO("api", "GET", "/markets", {...})``` (see the example). The exchange also has events on a newer protocol (```protocol``` ```PREDICT```) whose order signing is not public; orders on them fail.
+- WebSocket push is supported: depth, ticker and bbo market data and the account's private stream (order and fill updates, plus a balance and position snapshot on subscribe) can be subscribed through the event stream, per outcome, with the same symbols as the other functions; the testnet connects to the testnet push endpoint. ```exchange.GetTicker()```, ```exchange.GetDepth()``` and the like still call the REST API, and ```EventLoop()``` does not subscribe to this exchange's push on its own. The exchange pushes a single book per market quoted in the first outcome; the second outcome's push is derived the same way as ```1 - x``` (bids and asks swapped, quantities unchanged), and both outcomes of a market share one push subscription. Every depth push is the whole book (not an increment); depth subscriptions of any level count (20 by default, no limit) share one push and each subscription outputs its own number of levels. Ticker and bbo come from the exchange's best bid/ask push: only the best bid and ask with their quantities, pushed when the best price changes; there is no last price (0), no volume and no open/high/low, and the push carries no exchange time. The exchange has no trade, kline or market-wide ```tickers``` push; subscribing to them reports unsupported. Push events carry prices and quantities to 6 decimals regardless of the market's price precision (book quantities are finer than the order step). The private stream is a single ```private``` subscription (no symbol, covering the whole account) that connects only when subscribed and authenticates with the same wallet login (JWT) as REST: once the subscription is active, and after every reconnect, it first pushes a snapshot of the USDT balance and the outcome positions from the same endpoints as ```exchange.GetAssets()``` and ```exchange.GetPositions()```, then reports ready; after that it pushes order and fill updates. The order ID is the order hash, the same as the order placement return value; an order the exchange accepted is open, a fill settled on chain pushes a fill update (fill ID, fill price and shares, maker or taker, fee; a fee taken in shares has the symbol as its fee currency), and the order is filled only once its fills reach the full quantity and have settled on chain; an order the exchange did not accept is rejected, and cancelled or expired orders are canceled. The exchange has no balance or position push: after ready, balances and positions are not pushed; call ```exchange.GetAssets()``` and ```exchange.GetPositions()``` for current values. When the login is renewed before it expires, the private stream reconnects and resubscribes on its own; when authentication is refused it logs in again once, and if it is still refused the private stream reports failure (market data push is unaffected).
 
 ### Securities and Futures
 

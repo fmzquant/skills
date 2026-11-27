@@ -656,7 +656,7 @@ interface IExchange {
      * Sell order (spot sell/futures sell order according to current direction)
      * @param price - Sell price, pass -1 for market order
      * @param amount - Sell amount
-     * @param extra - Additional log information
+     * @param extra - Additional log information; a trailing object is the order options `{type, tif, postOnly, reduceOnly}`, a string is only a log remark ("ioc" as a string does not make an IOC order)
      * @returns Order ID (string or number), null on failure
      * ```js
      * // Limit sell order
@@ -671,13 +671,15 @@ interface IExchange {
      * Buy order (spot buy/futures buy order according to current direction)
      * @param price - Buy price, pass -1 for market order
      * @param amount - Buy amount
-     * @param extra - Additional log information
+     * @param extra - Additional log information; a trailing object is the order options `{type, tif, postOnly, reduceOnly}`, a string is only a log remark ("ioc" as a string does not make an IOC order)
      * @returns Order ID (string or number), null on failure
      * ```js
      * // Limit buy order
      * var id = exchange.Buy(50000, 0.1, "Limit buy");
      * // Market buy order
      * var id = exchange.Buy(-1, 0.1, "Market buy");
+     * // IOC: what cannot fill at once is canceled; maker only is {postOnly: true}
+     * var id = exchange.Buy(50000, 0.1, {tif: "ioc"});
      * ```
      */
     Buy(price: number, amount: number, ...extra: any[]): string | number | null;

@@ -652,7 +652,7 @@ interface IExchange {
      * 卖出下单（现货卖出/期货按当前方向下卖单）
      * @param price - 卖出价格，传 -1 为市价单
      * @param amount - 卖出数量
-     * @param extra - 附加日志信息
+     * @param extra - 附加日志信息；最后一个对象参数是下单选项 `{type, tif, postOnly, reduceOnly}`，字符串只当日志附言（写 "ioc" 不会变成 IOC 单）
      * @returns 订单ID（字符串或数字），失败返回 null
      * ```js
      * // 限价卖出
@@ -667,13 +667,15 @@ interface IExchange {
      * 买入下单（现货买入/期货按当前方向下买单）
      * @param price - 买入价格，传 -1 为市价单
      * @param amount - 买入数量
-     * @param extra - 附加日志信息
+     * @param extra - 附加日志信息；最后一个对象参数是下单选项 `{type, tif, postOnly, reduceOnly}`，字符串只当日志附言（写 "ioc" 不会变成 IOC 单）
      * @returns 订单ID（字符串或数字），失败返回 null
      * ```js
      * // 限价买入
      * var id = exchange.Buy(50000, 0.1, "限价买入");
      * // 市价买入
      * var id = exchange.Buy(-1, 0.1, "市价买入");
+     * // IOC：成交不了的部分立即撤掉；只做挂单方用 {postOnly: true}
+     * var id = exchange.Buy(50000, 0.1, {tif: "ioc"});
      * ```
      */
     Buy(price: number, amount: number, ...extra: any[]): string | number | null;

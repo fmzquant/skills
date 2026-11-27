@@ -4809,6 +4809,7 @@ fn main() {
 
 - `BitFlyer`、`Coincheck`、`Zaif`、`Futures_Polymarket`：交易所没有K线接口，由托管者用成交记录合成：首次调用只有最近成交覆盖的少量K线，随调用逐步累积。
 - `Futures_Aevo`：交易所没有K线接口，由托管者用成交记录合成：首次调用只有最近成交覆盖的少量K线，随调用逐步累积。合约没有成交时为空。
+- `Futures_PredictFun`：交易所没有K线接口，K线由交易所的撮合记录按周期聚合：支持1分钟、5分钟、15分钟、30分钟、1小时、4小时、1天、1周，其它周期由托管者用这些周期合成。没有成交的周期以上一根的收盘价补齐、成交量为0；最早一笔成交之前没有K线。一次最多翻6000笔成交，成交更多时只返回覆盖到的K线。
 
 部分周期由托管者合成：
 
@@ -6822,7 +6823,7 @@ fn main() {
 
 ```condition```的```ConditionType```可取`ORDER_CONDITION_TYPE`中的OCO、TP、SL；`ORDER_CONDITION_TYPE_GENERIC`仅出现在查询结果中（如追踪止损等交易所特有的条件单），创建或修改条件单时不可使用，传入会报错并返回空值。所选类型涉及的触发价格和执行价格均须传入且不能为0（OCO需要全部四项，TP需要止盈的两项，SL需要止损的两项），否则报错并返回空值；执行价格为-1表示触发后以市价单执行。
 
-不支持的交易所：`Bithumb`、`Bitstamp`、`Coinw`、`DigiFinex`、`Futures_DigiFinex`、`Gemini`、`HashKey`、`Korbit`、`LBank`、`MEXC`、`Upbit`、`WEEX`、`Zaif`、`Hyperliquid`、`Pendle`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`Jupiter`、`OKX_DEX`、`Futures_Polymarket`、`Futures_Futu`、`Futures_IB`、`Exchange`、`Web3`。调用时报错并返回空值，所有交易所的对照见`能力矩阵`。
+不支持的交易所：`Bithumb`、`Bitstamp`、`Coinw`、`DigiFinex`、`Futures_DigiFinex`、`Gemini`、`HashKey`、`Korbit`、`LBank`、`MEXC`、`Upbit`、`WEEX`、`Zaif`、`Hyperliquid`、`Pendle`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`Jupiter`、`OKX_DEX`、`Futures_Polymarket`、`Futures_PredictFun`、`Futures_Futu`、`Futures_IB`、`Exchange`、`Web3`。调用时报错并返回空值，所有交易所的对照见`能力矩阵`。
 
 See also: `Condition`, `exchange.CancelConditionOrder`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`, `exchange.ModifyConditionOrder`
 
@@ -7224,7 +7225,7 @@ fn main() {
 
 只有未触发的条件单可以被取消；已经触发并转为普通订单的条件单无法通过此函数取消。
 
-不支持的交易所：`Bithumb`、`Bitstamp`、`Coinw`、`DigiFinex`、`Futures_DigiFinex`、`Gemini`、`HashKey`、`Korbit`、`LBank`、`MEXC`、`Upbit`、`WEEX`、`Zaif`、`Hyperliquid`、`Pendle`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`Jupiter`、`OKX_DEX`、`Futures_Polymarket`、`Futures_Futu`、`Futures_IB`、`Exchange`、`Web3`。调用时报错并返回空值，所有交易所的对照见`能力矩阵`。
+不支持的交易所：`Bithumb`、`Bitstamp`、`Coinw`、`DigiFinex`、`Futures_DigiFinex`、`Gemini`、`HashKey`、`Korbit`、`LBank`、`MEXC`、`Upbit`、`WEEX`、`Zaif`、`Hyperliquid`、`Pendle`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`Jupiter`、`OKX_DEX`、`Futures_Polymarket`、`Futures_PredictFun`、`Futures_Futu`、`Futures_IB`、`Exchange`、`Web3`。调用时报错并返回空值，所有交易所的对照见`能力矩阵`。
 
 See also: `exchange.CreateConditionOrder`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`, `exchange.ModifyConditionOrder`
 
@@ -7307,7 +7308,7 @@ fn main() {
 
 条件单状态包括：未触发、已触发、已取消等，具体的状态值由交易所而定。
 
-不支持的交易所：`Bithumb`、`Bitstamp`、`Coinw`、`DigiFinex`、`Futures_DigiFinex`、`Gemini`、`HashKey`、`Korbit`、`LBank`、`MEXC`、`Upbit`、`WEEX`、`Zaif`、`Hyperliquid`、`Pendle`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`Jupiter`、`OKX_DEX`、`Futures_Polymarket`、`Futures_IB`、`Exchange`、`Web3`。调用时报错并返回空值，所有交易所的对照见`能力矩阵`。
+不支持的交易所：`Bithumb`、`Bitstamp`、`Coinw`、`DigiFinex`、`Futures_DigiFinex`、`Gemini`、`HashKey`、`Korbit`、`LBank`、`MEXC`、`Upbit`、`WEEX`、`Zaif`、`Hyperliquid`、`Pendle`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`Jupiter`、`OKX_DEX`、`Futures_Polymarket`、`Futures_PredictFun`、`Futures_IB`、`Exchange`、`Web3`。调用时报错并返回空值，所有交易所的对照见`能力矩阵`。
 
 以回退方式支持的交易所：交易所的接口不能完整提供本函数，由托管者补足。
 
@@ -7450,7 +7451,7 @@ fn main() {
 
 条件单功能的支持情况取决于具体交易所，部分交易所可能不支持条件单功能。
 
-不支持的交易所：`Bithumb`、`Bitstamp`、`Coinw`、`DigiFinex`、`Futures_DigiFinex`、`Gemini`、`HashKey`、`Korbit`、`LBank`、`MEXC`、`Upbit`、`WEEX`、`Zaif`、`Hyperliquid`、`Pendle`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`Jupiter`、`OKX_DEX`、`Futures_Polymarket`、`Futures_IB`、`Exchange`、`Web3`。调用时报错并返回空值，所有交易所的对照见`能力矩阵`。
+不支持的交易所：`Bithumb`、`Bitstamp`、`Coinw`、`DigiFinex`、`Futures_DigiFinex`、`Gemini`、`HashKey`、`Korbit`、`LBank`、`MEXC`、`Upbit`、`WEEX`、`Zaif`、`Hyperliquid`、`Pendle`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`Jupiter`、`OKX_DEX`、`Futures_Polymarket`、`Futures_PredictFun`、`Futures_IB`、`Exchange`、`Web3`。调用时报错并返回空值，所有交易所的对照见`能力矩阵`。
 
 See also: `Order`, `exchange.GetConditionOrder`, `exchange.GetHistoryConditionOrders`
 
@@ -7590,7 +7591,7 @@ fn main() {
 
 对条件单功能的支持情况取决于具体的交易所，部分交易所可能不支持条件单功能或历史条件单查询功能。
 
-不支持的交易所：`Bithumb`、`Bitstamp`、`Coincheck`、`Coinone`、`Coinw`、`DigiFinex`、`Futures_DigiFinex`、`Gemini`、`HashKey`、`Korbit`、`LBank`、`MEXC`、`Upbit`、`WEEX`、`Zaif`、`Hyperliquid`、`Pendle`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`Jupiter`、`OKX_DEX`、`Futures_Polymarket`、`Futures_IB`、`Exchange`、`Web3`。调用时报错并返回空值，所有交易所的对照见`能力矩阵`。
+不支持的交易所：`Bithumb`、`Bitstamp`、`Coincheck`、`Coinone`、`Coinw`、`DigiFinex`、`Futures_DigiFinex`、`Gemini`、`HashKey`、`Korbit`、`LBank`、`MEXC`、`Upbit`、`WEEX`、`Zaif`、`Hyperliquid`、`Pendle`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`Jupiter`、`OKX_DEX`、`Futures_Polymarket`、`Futures_PredictFun`、`Futures_IB`、`Exchange`、`Web3`。调用时报错并返回空值，所有交易所的对照见`能力矩阵`。
 
 See also: `Order`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`
 
@@ -7866,35 +7867,36 @@ fn main() {
 
 ✓ 可用；✗ 该交易所明确不支持（设置时报错）；空白表示没有该合约。各合约代码的含义、交易所原生代码的写法见交易所页。
 
-| 交易所 | swap | this_week | next_week | month | next_month | quarter | next_quarter | third_quarter | fourth_quarter | 其它 |
-| - | - | - | - | - | - | - | - | - | - | - |
-| `Futures_Backpack` | ✓ |  |  |  |  |  |  |  |  |  |
-| `Futures_Binance` | ✓ | ✗ | ✗ |  |  | ✓ | ✓ |  |  |  |
-| `Futures_Bitfinex` | ✓ |  |  |  |  |  |  |  |  |  |
-| `Futures_Bitget` | ✓ |  |  |  |  | ✓ | ✓ |  |  |  |
-| `Futures_Bybit` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |  | ```delivery```、```third_week``` |
-| `Futures_Coinw` | ✓ |  |  |  |  |  |  |  |  |  |
-| `Futures_Crypto` | ✓ | ✓ | ✓ |  |  | ✓ | ✓ |  |  | ```January```、```February```、```March```、```April```、```May```、```June```、```July```、```August```、```September```、```October```、```November```、```December``` |
-| `Futures_DeepCoin` | ✓ |  |  |  |  |  |  |  |  |  |
-| `Futures_Deribit` | ✓ | ✓ | ✓ | ✓ |  | ✓ | ✓ | ✓ | ✓ | ```today```、```tomorrow``` |
-| `Futures_DigiFinex` | ✓ |  |  |  |  |  |  |  |  |  |
-| `Futures_GateIO` | ✓ | ✓ | ✓ |  |  | ✓ | ✓ |  |  |  |
-| `Futures_HuobiDM` | ✓ | ✓ | ✓ |  |  | ✓ | ✓ |  |  |  |
-| `Futures_Kraken` | ✓ | ✓ |  | ✓ |  | ✓ | ✓ | ✓ |  | ```swap_pf```、```month_ff```、```this_week_ff```、```quarter_ff```、```next_quarter_ff```、```third_quarter_ff``` |
-| `Futures_KuCoin` | ✓ |  |  |  |  | ✓ | ✓ |  |  |  |
-| `Futures_MEXC` | ✓ |  |  |  |  |  |  |  |  |  |
-| `Futures_OKCoin` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |  |
-| `Futures_WEEX` | ✓ |  |  |  |  |  |  |  |  |  |
-| `Futures_WOO` | ✓ |  |  |  |  |  |  |  |  |  |
-| `Futures_Hyperliquid` | ✓ |  |  |  |  |  |  |  |  |  |
-| `Futures_Lighter` | ✓ |  |  |  |  |  |  |  |  |  |
-| `Futures_EdgeX` | ✓ |  |  |  |  |  |  |  |  |  |
-| `Futures_ApolloX` | ✓ |  |  |  |  |  |  |  |  |  |
-| `Futures_Aster` | ✓ |  |  |  |  |  |  |  |  |  |
-| `Futures_Aevo` | ✓ |  |  |  |  |  |  |  |  |  |
-| `Futures_dYdX` | ✓ |  |  |  |  |  |  |  |  |  |
-| `Futures_WOOFi` | ✓ |  |  |  |  |  |  |  |  |  |
-| `Futures_Polymarket` |  |  |  |  |  |  |  |  |  | ```Yes```、```No```、```Up```、```Down``` |
+| 交易所 | swap | this_week | next_week | month | next_month | quarter | next_quarter | third_quarter | fourth_quarter | Down | No | Up | Yes | 其它 |
+| - | - | - | - | - | - | - | - | - | - | - | - | - | - | - |
+| `Futures_Backpack` | ✓ |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| `Futures_Binance` | ✓ | ✗ | ✗ |  |  | ✓ | ✓ |  |  |  |  |  |  |  |
+| `Futures_Bitfinex` | ✓ |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| `Futures_Bitget` | ✓ |  |  |  |  | ✓ | ✓ |  |  |  |  |  |  |  |
+| `Futures_Bybit` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |  |  |  |  |  | ```delivery```、```third_week``` |
+| `Futures_Coinw` | ✓ |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| `Futures_Crypto` | ✓ | ✓ | ✓ |  |  | ✓ | ✓ |  |  |  |  |  |  | ```January```、```February```、```March```、```April```、```May```、```June```、```July```、```August```、```September```、```October```、```November```、```December``` |
+| `Futures_DeepCoin` | ✓ |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| `Futures_Deribit` | ✓ | ✓ | ✓ | ✓ |  | ✓ | ✓ | ✓ | ✓ |  |  |  |  | ```today```、```tomorrow``` |
+| `Futures_DigiFinex` | ✓ |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| `Futures_GateIO` | ✓ | ✓ | ✓ |  |  | ✓ | ✓ |  |  |  |  |  |  |  |
+| `Futures_HuobiDM` | ✓ | ✓ | ✓ |  |  | ✓ | ✓ |  |  |  |  |  |  |  |
+| `Futures_Kraken` | ✓ | ✓ |  | ✓ |  | ✓ | ✓ | ✓ |  |  |  |  |  | ```swap_pf```、```month_ff```、```this_week_ff```、```quarter_ff```、```next_quarter_ff```、```third_quarter_ff``` |
+| `Futures_KuCoin` | ✓ |  |  |  |  | ✓ | ✓ |  |  |  |  |  |  |  |
+| `Futures_MEXC` | ✓ |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| `Futures_OKCoin` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |  |  |  |  |  |
+| `Futures_WEEX` | ✓ |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| `Futures_WOO` | ✓ |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| `Futures_Hyperliquid` | ✓ |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| `Futures_Lighter` | ✓ |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| `Futures_EdgeX` | ✓ |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| `Futures_ApolloX` | ✓ |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| `Futures_Aster` | ✓ |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| `Futures_Aevo` | ✓ |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| `Futures_dYdX` | ✓ |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| `Futures_WOOFi` | ✓ |  |  |  |  |  |  |  |  |  |  |  |  |  |
+| `Futures_Polymarket` |  |  |  |  |  |  |  |  |  | ✓ | ✓ | ✓ | ✓ |  |
+| `Futures_PredictFun` |  |  |  |  |  |  |  |  |  | ✓ | ✓ | ✓ | ✓ |  |
 
 See also: `exchange.GetContractType`, `exchange.SetCurrency`
 
@@ -8053,7 +8055,7 @@ fn main() {
 
 在另一些交易所中，期货合约的杠杆值是交易所的一项独立设置，需要通过交易所网站页面或API接口进行设置。此时调用```exchange.SetMarginLevel()```函数则会产生网络请求，并且有可能设置失败。失败原因可能有多种，例如：当前存在持仓或挂单，导致该交易对、合约无法再设置新的杠杆值。
 
-不支持的交易所：`Futures_Deribit`、`Futures_EdgeX`、`Futures_Boros`、`Futures_Polymarket`、`Futures_Futu`、`Futures_IB`。调用时报错并返回空值，所有交易所的对照见`能力矩阵`。
+不支持的交易所：`Futures_Deribit`、`Futures_EdgeX`、`Futures_Boros`、`Futures_Polymarket`、`Futures_PredictFun`、`Futures_Futu`、`Futures_IB`。调用时报错并返回空值，所有交易所的对照见`能力矩阵`。
 
 See also: `exchange`
 
@@ -8429,7 +8431,7 @@ fn main() {
 
 哪些期货交易所不支持批量查询资金费率、必须传入具体品种（例如```ETH_USDT.swap```），见各交易所页的注意事项（所有交易所的入口见`能力矩阵`）。
 
-不支持的交易所：`Futures_Polymarket`、`Futures_Futu`、`Futures_IB`。调用时报错并返回空值，所有交易所的对照见`能力矩阵`。
+不支持的交易所：`Futures_Polymarket`、`Futures_PredictFun`、`Futures_Futu`、`Futures_IB`。调用时报错并返回空值，所有交易所的对照见`能力矩阵`。
 
 See also: `Funding`
 
@@ -9348,13 +9350,13 @@ fn main() {
 | ```accountId``` | `Futures_Crypto`、`Poloniex` |
 | ```accounts``` | `Futures_Futu`、`Futures_IB` |
 | ```accountType``` | `Bybit`、`Futures_Bybit` |
-| ```address``` | `Pendle`、`Futures_Boros`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`Jupiter`、`OKX_DEX`、`Web3` |
+| ```address``` | `Pendle`、`Futures_Boros`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`Jupiter`、`OKX_DEX`、`Futures_PredictFun`、`Web3` |
 | ```addresses``` | `OKX_DEX` |
 | ```agent``` | `Futures_Boros` |
 | ```allChainBalance``` | `OKX_DEX` |
 | ```allowance``` | `OKX_DEX` |
 | ```allTokens``` | `OKX_DEX` |
-| ```api``` | `Backpack`、`Futures_Backpack`、`BigONE`、`Bitstamp`、`Coinw`、`Crypto`、`Futures_Crypto`、`DigiFinex`、`Futures_DigiFinex`、`WOO`、`Futures_WOO`、`Hyperliquid`、`Futures_Hyperliquid`、`Futures_Lighter`、`Futures_EdgeX`、`Futures_Aevo`、`Futures_dYdX`、`Pendle`、`Futures_Boros`、`Futures_WOOFi`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`Futures_Polymarket`、`Futures_IB`、`Exchange`、`Web3` |
+| ```api``` | `Backpack`、`Futures_Backpack`、`BigONE`、`Bitstamp`、`Coinw`、`Crypto`、`Futures_Crypto`、`DigiFinex`、`Futures_DigiFinex`、`WOO`、`Futures_WOO`、`Hyperliquid`、`Futures_Hyperliquid`、`Futures_Lighter`、`Futures_EdgeX`、`Futures_Aevo`、`Futures_dYdX`、`Pendle`、`Futures_Boros`、`Futures_WOOFi`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`Futures_Polymarket`、`Futures_PredictFun`、`Futures_IB`、`Exchange`、`Web3` |
 | ```approve``` | `Pendle`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`OKX_DEX` |
 | ```approveAgent``` | `Futures_Boros` |
 | ```apy``` | `Pendle` |
@@ -9432,9 +9434,9 @@ fn main() {
 | ```lp.ticks``` | `Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`Jupiter` |
 | ```lp.track``` | `Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`Jupiter` |
 | ```lp.unstake``` | `Aerodrome`、`Velodrome` |
-| ```market``` | `Pendle`、`Futures_Boros` |
+| ```market``` | `Pendle`、`Futures_Boros`、`Futures_PredictFun` |
 | ```marketDataType``` | `Futures_IB` |
-| ```markets_cursor``` | `Futures_Polymarket` |
+| ```markets_cursor``` | `Futures_Polymarket`、`Futures_PredictFun` |
 | ```marketSupportedChains``` | `OKX_DEX` |
 | ```mbase``` | `Futures_Bitfinex` |
 | ```merge``` | `Futures_DeepCoin`、`Futures_Hyperliquid`、`Futures_Polymarket` |
@@ -9483,7 +9485,7 @@ fn main() {
 | ```swapSupportedChains``` | `OKX_DEX` |
 | ```tdMode``` | `OKEX`、`Futures_OKCoin` |
 | ```tick``` | `Futures_Boros` |
-| ```tickers_cursor``` | `Futures_Polymarket` |
+| ```tickers_cursor``` | `Futures_Polymarket`、`Futures_PredictFun` |
 | ```time``` | `Futures_IB` |
 | ```timeout``` | `Futures_Futu` |
 | ```token``` | `Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`Jupiter` |
@@ -28205,6 +28207,7 @@ fn main() {
 | `Jupiter` | Jupiter | 现货 | — |
 | `OKX_DEX` | OKX DEX | 现货 | OKX Web3、欧易DEX |
 | `Futures_Polymarket` | Polymarket | 预测市场 | Futures_Polymarket |
+| `Futures_PredictFun` | predict.fun | 预测市场 | Futures_PredictFun、Predict、PredictFun |
 | `Futures_Futu` | 富途证券 | 证券与期货 | Futu |
 | `Futures_IB` | 盈透证券 | 证券与期货 | IB、盈透 |
 | `Exchange` | 通用协议 | 自定义接入 | 自定义交易所、Custom Exchange |
@@ -28291,6 +28294,7 @@ fn main() {
 | `OKX_DEX` | ✓ | ✓ | ✗ | ✓ | 合成 | ✓ | ✗ |
 | **预测市场** |  |  |  |  |  |  |  |
 | `Futures_Polymarket` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ |
+| `Futures_PredictFun` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✓ |
 | **证券与期货** |  |  |  |  |  |  |  |
 | `Futures_Futu` | ✓ | ✓ | ✓ | ✓ | 合成 | ✓ | ✗ |
 | `Futures_IB` | ✓ | ✓ | ✓ | ✗ | 合成 | ✓ | ✗ |
@@ -28375,6 +28379,7 @@ fn main() {
 | `OKX_DEX` | ✓ | ✓ | ✓ | ✗ | ✗ | ✓ | ✗ | ✗ | ✗ |
 | **预测市场** |  |  |  |  |  |  |  |  |  |
 | `Futures_Polymarket` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✓ | ✗ |
+| `Futures_PredictFun` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✓ | ✗ |
 | **证券与期货** |  |  |  |  |  |  |  |  |  |
 | `Futures_Futu` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ |
 | `Futures_IB` | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✗ | ✗ |
@@ -28459,6 +28464,7 @@ fn main() {
 | `OKX_DEX` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
 | **预测市场** |  |  |  |  |  |  |
 | `Futures_Polymarket` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
+| `Futures_PredictFun` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
 | **证券与期货** |  |  |  |  |  |  |
 | `Futures_Futu` | ✗ | ✗ | ✗ | 合成 | ✓ | ✓ |
 | `Futures_IB` | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
@@ -28543,6 +28549,7 @@ fn main() {
 | `OKX_DEX` | ✓ | ✓ | — | — | — | — | — |
 | **预测市场** |  |  |  |  |  |  |  |
 | `Futures_Polymarket` | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✗ |
+| `Futures_PredictFun` | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✗ |
 | **证券与期货** |  |  |  |  |  |  |  |
 | `Futures_Futu` | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✗ |
 | `Futures_IB` | ✓ | ✓ | ✓ | ✗ | ✓ | ✓ | ✗ |
@@ -39093,6 +39100,112 @@ function main() {
 - ```exchange.GetMarkets()```、```exchange.GetTickers()```每次只返回一页（约100个市场）。游标为空时只返回Gamma市场列表的第一页；调用返回当前游标处的一页，不移动游标（```exchange.SetContractType()```等内部查询也不会推进它）；取过一页后用```exchange.IO("markets_cursor", "next")```（或```tickers_cursor```）推进到下一页，最后一页之后游标回到空串。逐页翻：```exchange.IO("markets_cursor", "")```，然后循环调用```exchange.GetMarkets()```与```exchange.IO("markets_cursor", "next")```直到返回空串。也可以直接设置游标，例如Gamma接口```/markets/keyset```应答中的```next_cursor```。
 - 私有流（```private```订阅）推送本账户的每一笔成交（kind ```fill```，```channel```为```fills```：订单ID（订单哈希，与订单更新相同）、撮合ID、这一笔的成交价与份数、方向、挂单或吃单），来自用户频道的```trade```事件，撮合成功即推送，之后同一笔的链上结算状态变化不重复推送；结算失败（```FAILED```）的撮合不会撤回已推送的成交。推送只有费率没有手续费金额：费率为0时手续费为0，否则手续费为空。成交与订单更新是两个事件，交易所不保证两者的先后。成交回报不回补历史，断线期间的成交不补推（订单更新的累计成交量仍然准确）。
 - 支持WebSocket推送：行情（ticker、bbo、深度、逐笔成交）与账户私有流（订单回报、持仓与余额）可以通过事件流订阅，按选项（outcome）订阅，交易对写法与其它函数相同。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。ticker与bbo的买一、卖一（带挂单量）由该选项的整本订单簿推送得出，最新价只取该选项自己的成交推送（订单簿快照里的最新成交价是整个市场的，可能是另一个选项的价格，不采用），订阅后该选项第一笔成交之前最新价为0，没有24小时成交量和开高低价；逐笔成交与```exchange.GetTrades()```同一套成交ID（链上交易哈希；推送没有逐笔成交号，同一笔链上交易撮合多个挂单时第二笔起在哈希后加```-1```、```-2```…以免重复），方向是吃单方向。交易所只有一种深度推送（整本快照加增量），各档数的深度订阅（缺省20档，最多255档）共用一条，每个订阅按自己的档数输出；推送没有序号，连接器用每条增量附带的最优买卖价核对本地订单簿，对不上就重新订阅取快照。交易所没有K线推送，订阅K线会报不支持的周期。推送事件的价格按4位小数、数量按6位小数（份额的最小单位）输出，不随市场价格步长变化。私有流是一路```private```订阅（不带交易对，覆盖整个账户），只在订阅时连接，用与下单相同的CLOB API凭据（由钱包私钥派生）鉴权：订阅生效及每次断线重连后，先用与```exchange.GetAssets()```、```exchange.GetPositions()```相同的接口推送USDC余额与各选项持仓的快照，再报告就绪；之后推送订单回报与成交回报（订单ID与下单返回值相同，按累计成交量区分部分成交与全部成交，撮合过的订单成交均价按委托价计）。交易所没有余额推送，也没有持仓推送：就绪之后不推送余额与持仓（下单、撤单、成交都不推送），需要当前余额与持仓请调用```exchange.GetAssets()```与```exchange.GetPositions()```（持仓接口在链上确认后才更新，比成交晚几秒到十几秒）。鉴权被拒（交易所会立刻断开连接）连续三次后连接状态报告降级、私有流报告失败（行情推送不受影响）。不支持全市场```tickers```订阅（Polymarket本连接器使用的CLOB行情频道只能逐个token订阅），订阅时报错；请按交易对订阅ticker。
+
+#### predict.fun
+
+BNB Chain上的预测市场，以USDT计价。交易所对象通过predict.fun的REST接口查询市场、订单簿、成交、订单和持仓，用钱包私钥登录并对订单做EIP-712签名后下单；USDT余额从BNB Chain节点读取（交易所没有余额接口）。查询与下单走REST接口，行情与私有流另有WebSocket推送（见下文）。
+
+##### 名称与配置
+
+```exchange.GetName()```：```Futures_PredictFun```（预测市场）；别名：Futures_PredictFun、Predict、PredictFun。
+
+| 配置项 | 必填 | 说明 |
+| - | - | - |
+| API Key | 是 | predict.fun 的 API Key，在 developers.predict.fun 申请 |
+| 钱包私钥 | 是 | 用于登录和订单签名的私钥。使用 Predict 账户时填 predict.fun 账户设置里导出的 Privy 钱包私钥（请妥善保管，切勿泄露） |
+| Predict 账户地址 | 否 | predict.fun网页创建的Predict账户（智能合约钱包）地址，资金和持仓都在这个地址上。（详见表下） |
+
+表中长说明的其余部分：
+
+- Predict 账户地址：注意网页充值时给出的充值地址可能只是转发地址：转进去的USDT会被自动转入Predict账户，它本身不是Predict账户，不能填在这里；可以在区块浏览器里查看充值地址转出USDT的去向，收款的地址就是Predict账户。填写后订单以它为下单方和签名方，由私钥（网页账户设置里导出的Privy钱包私钥）按Kernel账户的格式签名，登录、持仓、余额都按它查询；留空则直接用私钥对应的钱包交易。必须是合法的0x地址，否则启动失败。登录被拒时会在链上核对这个地址：它不是该私钥管理的Predict账户（例如填成了网页的充值转发地址）时，错误信息里会说明原因和改法。
+
+##### 交易对与合约代码
+
+交易对示例：```4889683_USDT```
+
+交易对为市场ID（predict.fun的数字```marketId```）加```_USDT```，计价币只能是```USDT```。一个多选项事件（例如「谁会赢得比赛」）下的每个候选都是一个独立的二元市场，各有自己的市场ID；市场ID可以从```exchange.GetMarkets()```的```BaseAsset```或```exchange.IO("api", "GET", "/categories/<事件slug>")```的```markets```里查到。
+
+| 合约代码 | 说明 |
+| - | - |
+| ```Yes``` | 结果选项「Yes」，大多数市场的两个选项是```Yes```、```No```。 |
+| ```No``` | 结果选项「No」。 |
+| ```Up``` | 涨跌类市场的结果选项，另一个是```Down```。 |
+| ```Down``` | 涨跌类市场的结果选项。 |
+
+预测市场没有永续、交割之分，也没有默认合约：合约代码就是市场的结果选项名称，每个市场恰好两个选项（体育等市场的选项可能是队名），名称中的空格换成```-```，完整品种代码形如```4889683_USDT.Yes```。按选项名不区分大小写匹配；```exchange.GetPositions()```等返回的品种代码用交易所给出的写法。
+
+获取品种代码：```exchange.GetMarkets()```每个选项一行，键就是完整品种代码；```exchange.IO("market", 品种代码)```返回该市场的完整信息（含```outcomes```）。
+
+```exchange.GetMarkets()```里每行的```Symbol```（交易所原生代码）是该选项的链上代币ID（订单里的```tokenId```），只用于对照交易所接口，不能当作合约代码使用。
+
+##### 专属IO指令
+
+| 指令 | 参数 | 说明 | 返回值 |
+| - | - | - | - |
+| ```address``` | — | 获取下单使用的地址（EIP-55校验和格式）：配置了```PredictAccount```时是该Predict账户地址，否则是私钥对应的钱包地址。持仓、余额都按这个地址查询。 | 地址字符串。没有配置私钥时报错。 |
+| ```market``` | symbol | 查询品种代码所在市场的完整信息（交易所的市场对象，不走缓存），包括交易状态```tradingStatus```、价格精度```decimalPrecision```、手续费率```feeRateBps```、两个选项的```outcomes```（```onChainId```为代币ID）、结算结果```resolution```等。（详见表下） | — |
+| ```markets_cursor``` | [string] | 查询或设置```exchange.GetMarkets()```的分页游标（传空串清除，回到第一页）；传```next```把游标推进到下一页，用法见注意事项。 | 当前（设置或推进后）的游标字符串；推进到最后一页之后为空串。当前游标还没有取过页时传```next```报错。 |
+| ```tickers_cursor``` | [string] | 同```markets_cursor```，作用于```exchange.GetTickers()```，两个游标相互独立。 | 同```markets_cursor```。 |
+| ```api``` | method, path[, params[, body]] | 直接调用predict.fun的REST接口，返回交易所原始应答（含```success```、```data```、```cursor```）。（详见表下） | — |
+
+表中长说明的其余部分：
+
+- ```market```：没有配置私钥也可以调用。
+- ```api```：```path```相对```/v1```（如```/positions?first=10```），也可以是完整URL；```params```为对象或```"a=1&b=2"```，GET请求拼进查询串，其它请求作为JSON请求体；给了```body```就原样作为请求体。配置了私钥时带登录状态（可以调用需要登录的接口），否则只带API Key。
+
+不支持通用指令```base```、```currency```（调用时报错并返回空值）。
+
+##### 常用用法
+
+###### 找到成交最活跃的市场，读取盘口与最近成交
+
+```javascript
+function main() {
+    // 24小时成交额最大的进行中市场
+    var r = exchange.IO("api", "GET", "/markets", {status: "OPEN", sort: "VOLUME_24H_DESC", first: 1})
+    var m = r.data[0]
+    var symbol = m.id + "_USDT." + m.outcomes[0].name.replace(/ /g, "-")
+    Log("品种:", symbol, m.question, "价格精度:", m.decimalPrecision)
+    var depth = exchange.GetDepth(symbol)
+    Log("买一:", depth.Bids[0], "卖一:", depth.Asks[0])
+    var trades = exchange.GetTrades(symbol)
+    for (var i = Math.max(0, trades.length - 5); i < trades.length; i++) {
+        Log(_D(trades[i].Time), trades[i].Type == 0 ? "买" : "卖", trades[i].Price, trades[i].Amount)
+    }
+}
+```
+
+##### 函数支持差异
+
+不支持（调用时报错并返回空值）：`exchange.ModifyOrder`、`exchange.SetMarginLevel`、`exchange.GetFundings`、`exchange.CreateConditionOrder`、`exchange.ModifyConditionOrder`、`exchange.CancelConditionOrder`、`exchange.GetConditionOrder`、`exchange.GetConditionOrders`、`exchange.GetHistoryConditionOrders`。
+
+以回退方式支持：
+
+- `exchange.GetRecords`：交易所没有K线接口，K线由交易所的撮合记录按周期聚合：支持1分钟、5分钟、15分钟、30分钟、1小时、4小时、1天、1周，其它周期由托管者用这些周期合成。没有成交的周期以上一根的收盘价补齐、成交量为0；最早一笔成交之前没有K线。一次最多翻6000笔成交，成交更多时只返回覆盖到的K线。
+
+##### 保证金、账户与模拟盘
+
+保证金模式：没有保证金和杠杆：买入份额用USDT全额支付。
+
+持仓模式：持仓只有多头：每个选项的份额是一个持仓（```Type```为多头），看空某个选项就买入另一个选项。```Price```为交易所给出的平均买入价，```Profit```为交易所给出的盈亏（```pnlUsd```），```Margin```为持仓按可卖出价格的估值（```valueUsd```）。没有平仓方向：下单方向写```closebuy```/```closesell```（或带```reduceOnly```）会被拒绝，卖出就是卖出持有的份额。
+
+账户：资金和持仓在下单地址（见```address```）里。```exchange.GetAccount()```的余额来自BNB Chain上该地址的USDT（```balanceOf```），```FrozenBalance```为挂着的买单还需支付的USDT（交易所按市场、选项、方向预留），```Balance```为余额减去它；```Equity```为链上余额加全部持仓估值，```UPnL```为各持仓盈亏之和。
+
+模拟盘：交易所没有模拟盘，实盘的所有调用都在BNB Chain主网上使用真实资金。交易所配置可以选本地模拟：只需填API Key（行情取自主网，不填私钥），初始资金只能是USDT；下单按主网的实时盘口在本地撮合，买入全额付款、不能卖空，吃单手续费按市场费率（```feeRateBps``` × min(价格, 1 − 价格)）从USDT中扣除，挂单不收；市场暂停时不成交、挂单保留，停止交易或结算后撤销挂单，结算的份额按1或0自动换回USDT。
+
+##### 注意事项
+
+- 价格是每份的USDT价格，在0~1之间（不含0和1），按市场的价格精度（```exchange.GetMarkets()```的```TickSize```，0.01或0.001）四舍五入；数量单位是份额，截断到0.01份。买单金额至少1 USDT，限价卖单至少1份，由交易所检查。
+- 每个市场只有一本订单簿，按第一个选项（一般是Yes）报价；第二个选项的盘口、成交价由第一个选项按```1 - x```换算（买盘与卖盘互换），买入No与卖出Yes吃的是同一份流动性。
+- 下单类型：限价单（GTC）挂在盘口，可以在最后一个参数传```{tif: "postOnly"}```只做挂单（会立即成交时被交易所撤销）；限价单带```{tif: "ioc"}```或```{tif: "fok"}```时按限价立即成交，未成交部分撤销（fok不能全部成交则整单撤销）。市价单（价格传```-1```或```type: "market"```）沿对手盘累计到下单量所在档位（深度不够取最后一档），再放宽```slippage```（默认0.01）作为最差价格，立即成交、未成交部分撤销；对手盘为空时报错。买卖数量都是份额。
+- 其它下单参数放在最后一个对象参数里：```expiration```（限价单的到期时间，Unix秒，至少2分钟后；不传则不过期）、```slippage```（市价单）、```selfTradePrevention```（```CANCEL_MAKER```、```CANCEL_TAKER```、```CANCEL_BOTH```，不传则自己的订单之间可以成交）。
+- 订单ID是订单哈希。下单成功返回时订单还没有最终确认：交易所随后异步检查余额与授权，不满足的订单会变为已撤销。首次买入或卖出前，下单地址需要在链上授权交易所合约使用USDT与份额（在predict.fun网页上交易过一次即可），否则交易所拒单并报告授权错误。
+- 部分市场有吃单延迟，并在一段时间内不能撤单（只做挂单的订单除外）：此时撤单报错，稍后重试。
+- ```exchange.GetOrders()```、```exchange.GetPositions()```不传品种时返回全部市场。```exchange.GetHistoryOrders()```按本账户的成交记录列出有过成交、已经结束的订单（含网页上下的单），最新的在前，默认最近50张，可以用```limit```参数调整；一点没成交就撤销或过期的订单列不出来，可以用```exchange.GetOrder()```按订单ID查询。不传品种时只查当前品种，传空串查全部。交易所的持仓接口不列出不足0.01份的零头（例如按0.01份截断卖出后剩下的部分），这部分也不计入```Equity```，且因为小于最小下单量无法卖出，市场结算时按结果自动换回现金。
+- 交易所的订单数据没有下单时间和成交均价：本交易所对象下的订单带下单时间，其它地方下的订单```Time```为0；```exchange.GetOrders()```里部分成交的限价单```AvgPrice```按委托价计，```exchange.GetOrder()```与```exchange.GetHistoryOrders()```按撮合记录计算成交均价。市价单的```Price```是签名时的保护价（最差可接受价），不是成交价。
+- ```exchange.GetTicker()```取该选项的订单簿与最新成交价，```High```、```Low```就是当前卖一、买一价（没有24小时高低价和开盘价，```Open```为0），```Volume```是整个市场（两个选项合计）的24小时成交额（USDT）。```exchange.GetTickers()```的最新价取自订单簿上最近结算的一笔，精确到0.01。
+- ```exchange.GetMarkets()```、```exchange.GetTickers()```只列出交易中的市场，每次只返回一页（约100个市场；主网进行中的市场上万个，一次全部取完要半分钟以上）。调用返回当前游标处的一页，不移动游标（```exchange.SetContractType()```等内部查询也不会推进它）；取过一页后用```exchange.IO("markets_cursor", "next")```（或```tickers_cursor```）推进到下一页，最后一页之后游标回到空串。逐页翻：```exchange.IO("markets_cursor", "")```，然后循环调用```exchange.GetMarkets()```与```exchange.IO("markets_cursor", "next")```直到返回空串。带品种代码调用时只查该品种所在的市场。要按成交额等条件挑市场，用```exchange.IO("api", "GET", "/markets", {...})```直接查询交易所的市场列表（见示例）。交易所另有一类采用新协议（```protocol```为```PREDICT```）的事件，其订单签名方式没有公开，下单报错。
+- 支持WebSocket推送：深度、ticker与bbo行情和账户私有流（订单回报、成交回报，订阅时的余额与持仓快照）可以通过事件流订阅，按选项（outcome）订阅，交易对写法与其它函数相同；测试网连接测试网的推送地址。```exchange.GetTicker()```、```exchange.GetDepth()```等函数仍然直接请求REST接口，```EventLoop()```也不会自动订阅本交易所的推送。交易所每个市场只推一本按第一个选项报价的订单簿，第二个选项的推送同样按```1 - x```换算（买盘与卖盘互换，量不变），同一市场两个选项的订阅共用一路推送。深度推送每条都是整本订单簿（不是增量），各档数的深度订阅（缺省20档，不限档数）共用一路，每个订阅按自己的档数输出。ticker与bbo取自交易所的最优买卖价推送，只有买一、卖一及其挂单量，最优价变化时才推送；没有最新价（为0）、成交量和开高低价，推送不带交易所时间。交易所没有逐笔成交、K线与全市场```tickers```推送，订阅时报不支持。推送事件的价格与数量按6位小数输出，不随市场价格精度变化（盘口份数比下单步进更细）。私有流是一路```private```订阅（不带交易对，覆盖整个账户），只在订阅时连接，用与REST相同的钱包登录凭据（JWT）鉴权：订阅生效及每次断线重连后，先用与```exchange.GetAssets()```、```exchange.GetPositions()```相同的接口推送USDT余额与各选项持仓的快照，再报告就绪；之后推送订单回报与成交回报。订单ID是订单哈希，与下单返回值相同；交易所接受订单后为未成交，链上结算成功的成交推送成交回报（成交ID、成交价与份数、挂单或吃单、手续费；手续费以份额扣除时手续费币种写品种代码），订单在累计成交到全量且链上结算成功后才算全部成交；交易所未接受的订单为拒单，撤销与过期的订单为已撤销。交易所没有余额与持仓推送：就绪之后不推送余额与持仓，需要当前余额与持仓请调用```exchange.GetAssets()```与```exchange.GetPositions()```。登录凭据到期前换新时私有流自动重连重订；鉴权被拒时重新登录一次，仍被拒则私有流报告失败（行情推送不受影响）。
 
 ### 证券与期货
 
