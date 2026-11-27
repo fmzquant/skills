@@ -35,7 +35,7 @@
 //! across live robots (windows/linux/mac). Better still, for websockets use the
 //! built-in `Dial("wss://...")` — no external crate needed.
 //!
-//! Strategy parameters are injected as global constants — reference each by its
+//! Strategy parameters are injected as global read-only values — reference each by its
 //! own name directly (no `use`, same as the SDK API). The Rust type is derived
 //! from the parameter's real value, so write code against that type and cast
 //! only when you need another:
@@ -48,9 +48,10 @@
 //!     anything else      -> &str                // the value's raw JSON text — parse it
 //! So e.g. `exchange.GetTicker(SYMBOL)` works because SYMBOL is `&str` (passing a
 //! `String` would fail `impl Into<Option<&str>>`); a numeric param is `f64`, so
-//! cast for integer uses: `let n = Period as usize;`. The full parameter set is
-//! also available as JSON text via `params()` ("" when the runtime has no
-//! parameter channel — the baked constants are the primary interface).
+//! cast for integer uses: `let n = Period as usize;`. Values are loaded when the
+//! strategy starts (one build serves every set of values), so a parameter is not a
+//! compile-time constant: no `[0; N]`, `const`, or `match` pattern on it. The
+//! strategy's own parameters are also available as JSON object text via `params()`.
 //!
 //! The new-model primitives (`ctx::subscribe`/`ctx::poll`/...) are also in scope
 //! (`ctx` module, raw event vocabulary `Event`/`EV_*` from `abi`) and can be mixed
@@ -1131,8 +1132,8 @@ pub static exchanges: std::sync::LazyLock<Vec<Exchange>> = std::sync::LazyLock::
 /// The first configured exchange (`exchange.GetTicker("")`).
 pub static exchange: Exchange = Exchange;
 
-/// The strategy's parameter set as JSON text ("" when the runtime has no
-/// parameter channel — the baked parameter constants are the primary interface).
+/// The strategy's own parameters (not its templates') as JSON object text,
+/// `{"Name": value, ...}`. Referring to each parameter by name is the usual way.
 pub fn params() -> &'static str {
     todo!()
 }

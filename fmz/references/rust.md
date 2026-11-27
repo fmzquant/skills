@@ -7,7 +7,7 @@ A strategy is one `.rs` source with a `fn main()` entry. The platform compiles i
 ```rust
 fn init() { Log!("init"); }                       // optional, runs before main
 fn main() {
-    Log!("fast", Fast, "slow", Slow);             // parameters are typed consts (f64 here)
+    Log!("fast", Fast, "slow", Slow);             // parameters are typed read-only values (f64 here)
     let (fast, slow) = (Fast as usize, Slow as usize);
     loop {
         let ticker = _C!(exchange.GetTicker(None)); // retry until Ok (transient errors only)
@@ -50,7 +50,7 @@ fn onexit() { Log!("exit"); }                     // optional, runs when the rob
 
 ## Parameters
 
-Declared when saving (`save_strategy.args`): `[[name, label, description, default], ...]`. Each becomes a module-scope `pub const` typed by the value, glob-imported into your code, so refer to it by name (also reachable as `args::Name`). Values come from the robot's or backtest's `args`.
+Declared when saving (`save_strategy.args`): `[[name, label, description, default], ...]`. Each becomes a module-scope read-only `static` typed by the value, glob-imported into your code, so refer to it by name (also reachable as `args::Name`); reading it needs no `unsafe`. Values come from the robot's or backtest's `args` and are loaded when the strategy starts, before `init`, so one compiled build serves every set of values: changing only parameter values does not recompile. A parameter is not a compile-time constant: it cannot size an array (`[0; N]`), initialize a `const`, or appear as a `match` pattern; use a runtime value (`vec![0; N as usize]`, a `let`, an `if`). A missing value or a value of the wrong type stops the strategy with an error naming the parameter.
 
 | Parameter kind | Rust type | Notes |
 |---|---|---|
@@ -62,7 +62,7 @@ Declared when saving (`save_strategy.args`): `[[name, label, description, defaul
 | dropdown, multiple | `&[i64]` \| `&[f64]` \| `&[&str]` | all-int / any-decimal / all-string selections |
 | anything else | `&str` | the raw JSON text; parse it with `JSONParse` |
 
-Unset optional controls get the zero value of the same type (`0.0`, `""`, `false`, `&[]`). `params()` returns the whole set as JSON text (`&'static str`). Defining your own item with a parameter's name shadows the UI value silently.
+Unset optional controls get the zero value of the same type (`0.0`, `""`, `false`, `&[]`). `params()` returns the strategy's own parameters (not its templates') as a JSON object text (`&'static str`). Defining your own item with a parameter's name shadows the UI value silently.
 
 ## Exchange API
 
@@ -192,6 +192,7 @@ LogProfit(_N(equity - start_equity, 2));                // plain function, one n
 - **Float output.** `Log!` hands `f64` to the host unformatted (full precision); for readable numbers use `_N(x, 2)` or `format!("{:.2}", x)`. `Log!(records)` prints every bar as Debug text; log `records.last()` or a field.
 - **`_D` takes milliseconds**, `Unix()` returns seconds. `Record.Time`, `Ticker.Time`, `Order.Time` are already milliseconds.
 - **Shadowing.** A `const`, `static` or `fn` with a parameter's name silently replaces the UI value.
+- **Parameters are not `const`.** `[0; Size]`, `const X: f64 = Fast * 2.0;` and `match n { Fast => .. }` do not compile; compute at run time instead.
 - **`OnExit` replaces** the current exit hook, including `fn onexit`.
 - **`Chart::update` resets** the chart to the config you pass; keep the full config around.
 - **Spot market buy amount is quote currency**; limit orders and market sells are base currency; futures are contracts. Check `exchange.GetName()` starts with `Futures_` before assuming contract semantics.
