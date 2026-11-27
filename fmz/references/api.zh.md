@@ -14433,7 +14433,7 @@ localId由托管者生成，重启后也不会重复；生成时同样会应用`
 | `Poloniex`现货 | 下单逐笔连续发出，撤单使用原生批量 | 下单10、撤单20 |
 | `Lighter`合约 | 原生批量，交易所整批受理或整批拒绝 | 15 |
 
-Bybit模拟盘、Gate交割合约与期权、币安杠杆账户、币本位合约等没有WebSocket下单接口的账户形态会返回错误；表中未列出的交易所（例如Kraken期货）同样返回错误。HitBTC、Lighter的订单号即localId。各交易所的具体规则（限额、支持的账户与合约）请参见相应的交易所页面。模拟交易账户不受上表限制：交易所有私有流（`能力矩阵`中「私有流」列为✓）时都可以使用，请求在模拟账户中当场撮合，每一笔的```status```只有```ok```或```failed```。
+Bybit模拟盘、Gate交割合约与期权、币安杠杆账户、币本位合约等没有WebSocket下单接口的账户形态会返回错误；表中未列出的交易所（例如Kraken期货）同样返回错误。HitBTC、Lighter的订单号即localId。各交易所的具体规则（限额、支持的账户与合约）请参见相应的交易所页面。模拟交易账户不受上表限制：交易所有私有流（`能力矩阵`中「私有流」列为✓）时都可以使用，请求号立即返回，请求随后在模拟账户中按发出顺序撮合，每一笔的```status```只有```ok```或```failed```。
 
 ```Python```中使用```ctx.submit(ex, req)```，```req```为字典，字段相同；单笔提交返回请求号字符串，批量提交返回列表，失败时返回```CtxError```对象（不抛出异常），可用```isinstance(r, CtxError)```判断；应答事件为字典，字段同上。```Rust```中单笔提交使用```ctx::submit(ex, req_json: &str) -> Result<String, String>```，批量提交使用```ctx::submit_batch(ex, req_json: &str) -> Result<Vec<String>, String>```，请求需写成JSON字符串；应答事件通过```ev.order_ack()```读取（```OrderAckView```：```req_id```、```op```、```status```、```ok```、```id```、```client_id```、```symbol```、```error```、```reason```、```reason_text```、```exch_time```（```Option<i64>```）、```latency_ms```、```time```），事件流ID为```ctx::STREAM_ORDER_ACK```。
 
