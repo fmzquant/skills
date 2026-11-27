@@ -39281,14 +39281,14 @@ The ```Symbol``` (exchange-native code) of each ```exchange.GetMarkets()``` row 
 | Command | Arguments | Description | Returns |
 | - | - | - | - |
 | ```address``` | — | Get the address orders are placed from (EIP-55 checksum form): the key's Predict account when one is found on chain, otherwise the wallet of the private key. Positions and the balance are queried for this address. | The address string. An error when no private key is configured, or when the on-chain lookup fails. |
-| ```market``` | symbol | Get the full information of the market an instrument code belongs to (the exchange's market object, not cached), including the trading status ```tradingStatus```, price precision ```decimalPrecision```, fee rate ```feeRateBps```, the two ```outcomes``` (```onChainId``` is the token ID) and the resolution ```resolution```. (more below the table) | — |
+| ```market``` | symbol | Get the full information of the market an instrument code belongs to (the exchange's market object, not cached). (more below the table) | — |
 | ```markets_cursor``` | [string] | Query or set the paging cursor of ```exchange.GetMarkets()``` (an empty string clears it, back to the first page); ```next``` advances the cursor to the next page; see the notes for usage. | The current cursor string (after setting or advancing); an empty string after advancing past the last page. ```next``` fails if no page has been fetched at the current cursor yet. |
 | ```tickers_cursor``` | [string] | Like ```markets_cursor```, for ```exchange.GetTickers()```; the two cursors are independent. | As for ```markets_cursor```. |
 | ```api``` | method, path[, params[, body]] | Call the predict.fun REST API directly and return the raw exchange response (with ```success```, ```data```, ```cursor```). (more below the table) | — |
 
 The rest of the longer descriptions in the table:
 
-- ```market```: It works without a private key.
+- ```market```: The code can also name a category, ```<categorySlug>_USDT.<outcome>```, when the category holds a single market; for example ```btc-updown-5m-1795763700_USDT.Up``` gets the BTC 5-minute Up/Down market by its opening time (Unix seconds), and the ```id``` of the returned object is the market ID of its instrument codes. The object includes the trading status ```tradingStatus```, price precision ```decimalPrecision```, fee rate ```feeRateBps```, the two ```outcomes``` (```onChainId``` is the token ID) and the resolution ```resolution```. It works without a private key.
 - ```api```: ```path``` is relative to ```/v1``` (e.g. ```/positions?first=10```) or a full URL; ```params``` is an object or ```"a=1&b=2"```, appended to the query string for GET and sent as the JSON body otherwise; ```body```, when given, is sent as the request body as is. With a private key configured the request carries the login session (so endpoints that need login work); otherwise only the API key is sent.
 
 The common commands ```base``` and ```currency``` are not supported (the call fails with an error and returns null).

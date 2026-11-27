@@ -39142,14 +39142,14 @@ BNB Chain上的预测市场，以USDT计价。交易所对象通过predict.fun�
 | 指令 | 参数 | 说明 | 返回值 |
 | - | - | - | - |
 | ```address``` | — | 获取下单使用的地址（EIP-55校验和格式）：在链上找到了私钥的Predict账户时是该账户地址，否则是私钥对应的钱包地址。持仓、余额都按这个地址查询。 | 地址字符串。没有配置私钥时报错；链上查询失败时也报错。 |
-| ```market``` | symbol | 查询品种代码所在市场的完整信息（交易所的市场对象，不走缓存），包括交易状态```tradingStatus```、价格精度```decimalPrecision```、手续费率```feeRateBps```、两个选项的```outcomes```（```onChainId```为代币ID）、结算结果```resolution```等。（详见表下） | — |
+| ```market``` | symbol | 查询品种代码所在市场的完整信息（交易所的市场对象，不走缓存）。（详见表下） | — |
 | ```markets_cursor``` | [string] | 查询或设置```exchange.GetMarkets()```的分页游标（传空串清除，回到第一页）；传```next```把游标推进到下一页，用法见注意事项。 | 当前（设置或推进后）的游标字符串；推进到最后一页之后为空串。当前游标还没有取过页时传```next```报错。 |
 | ```tickers_cursor``` | [string] | 同```markets_cursor```，作用于```exchange.GetTickers()```，两个游标相互独立。 | 同```markets_cursor```。 |
 | ```api``` | method, path[, params[, body]] | 直接调用predict.fun的REST接口，返回交易所原始应答（含```success```、```data```、```cursor```）。（详见表下） | — |
 
 表中长说明的其余部分：
 
-- ```market```：没有配置私钥也可以调用。
+- ```market```：品种代码也可以写成类别的写法```<类别slug>_USDT.<选项>```（类别里只有一个市场时），例如```btc-updown-5m-1795763700_USDT.Up```按开盘时刻（Unix秒）取BTC五分钟涨跌盘，返回对象里的```id```就是品种代码里的市场ID。返回内容包括交易状态```tradingStatus```、价格精度```decimalPrecision```、手续费率```feeRateBps```、两个选项的```outcomes```（```onChainId```为代币ID）、结算结果```resolution```等。没有配置私钥也可以调用。
 - ```api```：```path```相对```/v1```（如```/positions?first=10```），也可以是完整URL；```params```为对象或```"a=1&b=2"```，GET请求拼进查询串，其它请求作为JSON请求体；给了```body```就原样作为请求体。配置了私钥时带登录状态（可以调用需要登录的接口），否则只带API Key。
 
 不支持通用指令```base```、```currency```（调用时报错并返回空值）。
