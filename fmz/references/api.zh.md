@@ -5736,7 +5736,7 @@ Parameters:
 - `side` (string, required): 交易方向：现货为```buy```（买入）、```sell```（卖出）；期货为```buy```（开多）、```sell```（开空）、```closebuy```（平多）、```closesell```（平空）。可附带交易所特定参数，见备注。
 - `price` (number, required): 订单价格。价格为-1时表示市价单。
 - `amount` (number, required): 订单的下单量。注意：订单为**现货市价买单**时，下单量为买入金额；个别现货交易所的市价买单下单量为交易币数量而非金额，详见各交易所页面的注意事项。对于期货交易所对象，使用```CreateOrder()```/```Buy()```/```Sell()```函数下单时，如无特殊说明，下单量参数```amount```均为合约张数。
-- `arg` (string / number / bool / object / array / any, optional): 扩展参数，```arg```参数可传入多个。字符串、数字等参数会输出到本次下单的日志中（多个参数以空格连接）。最后一个对象参数不输出到日志，而是作为下单选项，支持的键包括：```type```（仅可为```market```或```limit```，用于显式指定市价单或限价单）、```tif```、```reduceOnly```、```postOnly```；其余键作为交易所特定参数传给交易所，与在```side```参数中附带```"side;{JSON对象}"```等效（同名键以```side```中的为准），例如```{"slippage":0.01}```。
+- `arg` (string / number / bool / object / array / any, optional): 扩展参数，```arg```参数可传入多个。字符串、数字等参数会输出到本次下单的日志中（多个参数以空格连接）。最后一个对象参数不输出到日志，而是作为下单选项，支持的键包括：```type```（仅可为```market```或```limit```，用于显式指定市价单或限价单）、```tif```（```gtc```、```ioc```、```fak```、```fok```、```postOnly```，不区分大小写）、```reduceOnly```、```postOnly```；其余键作为交易所特定参数传给交易所，与在```side```参数中附带```"side;{JSON对象}"```等效（同名键以```side```中的为准），例如```{"slippage":0.01}```。
 
 Returns (string / 空值): 下单成功返回订单Id，下单失败返回空值。FMZ平台订单`Order`结构的```Id```属性由交易所品种代码和交易所原始订单Id组成，以英文逗号分隔。例如，OKX交易所现货交易对```ETH_USDT```的订单，其```Id```属性格式为：```ETH-USDT,1547130415509278720```。
 调用```exchange.CreateOrder(symbol, side, price, amount)```函数下单时，返回的订单```Id```与订单`Order`结构的```Id```属性一致。
@@ -6824,6 +6824,8 @@ fn main() {
 ```condition```的```ConditionType```可取`ORDER_CONDITION_TYPE`中的OCO、TP、SL；`ORDER_CONDITION_TYPE_GENERIC`仅出现在查询结果中（如追踪止损等交易所特有的条件单），创建或修改条件单时不可使用，传入会报错并返回空值。所选类型涉及的触发价格和执行价格均须传入且不能为0（OCO需要全部四项，TP需要止盈的两项，SL需要止损的两项），否则报错并返回空值；执行价格为-1表示触发后以市价单执行。
 
 不支持的交易所：`Bithumb`、`Bitstamp`、`Coinw`、`DigiFinex`、`Futures_DigiFinex`、`Gemini`、`HashKey`、`Korbit`、`LBank`、`MEXC`、`Upbit`、`WEEX`、`Zaif`、`Hyperliquid`、`Pendle`、`Uniswap`、`PancakeSwap`、`Aerodrome`、`Velodrome`、`KyberSwap`、`OneInch`、`Jupiter`、`OKX_DEX`、`Futures_Polymarket`、`Futures_PredictFun`、`Futures_Futu`、`Futures_IB`、`Exchange`、`Web3`。调用时报错并返回空值，所有交易所的对照见`能力矩阵`。
+
+模拟交易（添加交易所时交易模式选「模拟交易」）的账户也支持条件单（预测市场除外），触发规则与回测系统相同：买单的止盈在价格跌到触发价及以下时触发、止损在涨到触发价及以上时触发，卖单相反；OCO哪条先满足就执行哪条，价格取盘口中间价。触发后按该条的委托价下普通限价单，委托价为-1时下市价单。触发前不冻结资金，触发时按普通订单检查余额与保证金，下单被拒时条件单记为已取消并写明原因。用`exchange.ModifyConditionOrder`修改后条件单Id不变。
 
 See also: `Condition`, `exchange.CancelConditionOrder`, `exchange.GetConditionOrder`, `exchange.GetConditionOrders`, `exchange.ModifyConditionOrder`
 
